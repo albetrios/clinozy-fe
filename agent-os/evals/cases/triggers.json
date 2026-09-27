@@ -1,0 +1,80 @@
+{
+  "_comment": "Tier-2 trigger evals for clinozy-fe: changed file → skill(s) skill-triggers.md must surface. Add a case when wiring a new file-pattern route.",
+  "cases": [
+    {
+      "file": "src/pages/login/login.route.tsx",
+      "expectSkills": ["fe-route-island"],
+      "why": "Route marker files must run the fe-route-island skill."
+    },
+    {
+      "file": "src/app/routes/routeTree.tsx",
+      "expectSkills": ["fe-routing-tenancy"],
+      "why": "Org guard chains and gatewayFromManifest live in routeTree."
+    },
+    {
+      "file": "src/core/resources/members.resource.ts",
+      "expectSkills": ["fe-resource-crud"],
+      "why": "Resource manifests follow the fe-resource-crud skill."
+    },
+    {
+      "file": "src/pages/login/forms/LoginForm/LoginForm.tsx",
+      "expectSkills": ["fe-http-forms-errors", "composition-patterns"],
+      "why": "Forms with API mutations need error-mapping checklist."
+    },
+    {
+      "file": "src/core/config/env-schema.ts",
+      "expectSkills": ["fe-platform-hygiene", "fe-env-schema-add"],
+      "why": "Env schema changes require platform hygiene and fe-env-schema-add."
+    },
+    {
+      "file": "src/pages/dashboard/components/ActivityFeed/ActivityFeed.tsx",
+      "expectSkills": ["composition-patterns", "fe-test-generation"],
+      "why": "Page components need composition + colocated tests."
+    },
+    {
+      "file": "src/shared/components/ui/button.tsx",
+      "expectSkills": ["shadcn"],
+      "why": "Vendored shadcn primitives route through the shadcn skill."
+    },
+    {
+      "file": "src/pages/organization/hooks/useOrganizations/useOrganizations.ts",
+      "expectSkills": ["react-best-practices"],
+      "why": "TanStack Query hooks must follow react-best-practices."
+    },
+    {
+      "file": "tests/e2e/login.e2e.test.ts",
+      "expectSkills": ["fe-e2e-testids"],
+      "why": "E2E specs require stable data-testid conventions."
+    },
+    {
+      "file": "src/index.css",
+      "expectSkills": ["frontend-design"],
+      "why": "Design tokens and Tailwind entry must stay semantic."
+    },
+    {
+      "file": ".env.example",
+      "expectSkills": ["fe-platform-hygiene", "fe-env-schema-add"],
+      "why": "Env template changes must stay documented and secret-free."
+    },
+    {
+      "file": "src/pages/login/login.constants.ts",
+      "expectSkills": ["fe-i18n-constants", "fe-code-structure"],
+      "why": "Constants files hold keys/IDs/defaults and route to fe-i18n-constants."
+    },
+    {
+      "file": "src/core/config/app-manifest.ts",
+      "expectSkills": ["fe-pwa-manifest"],
+      "why": "The PWA manifest source of truth routes to fe-pwa-manifest."
+    },
+    {
+      "file": "docs/reference/routes-and-ui.md",
+      "expectSkills": ["fe-documentation-maintenance"],
+      "why": "Docs changes route to fe-documentation-maintenance."
+    },
+    {
+      "file": "tests/e2e/visual.e2e.test.ts",
+      "expectSkills": ["fe-visual-regression"],
+      "why": "Screenshot-baseline spec edits follow the fe-visual-regression skill (baseline discipline, snapshot matrix)."
+    }
+  ]
+}

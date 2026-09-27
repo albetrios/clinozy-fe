@@ -1,0 +1,1028 @@
+/* `source('../src')` — generate utilities from the APP, not from the repository.
+   Left to its automatic detection Tailwind reads every tracked file, so any
+   class-shaped string in `docs/`, the agent-os skills, a `tooling/` gate fixture
+   or an E2E spec was emitted into the production stylesheet: `p-[24px]` and
+   `rounded-[3px]` shipped to users because a validator's TEST spells them out as
+   things not to write. `index.html` needs no entry — the boot splash is styled
+   by its own inline CSS. */
+@import 'tailwindcss' source('../src');
+/* …and tests are not the app either: a class that appears only in an assertion
+   (`not.toHaveClass('sm:px-8')`) is not something a user can ever see. jsdom
+   never loads this CSS, so nothing under test needs it. */
+@source not './**/*.test.ts';
+@source not './**/*.test.tsx';
+/* Enter/exit utilities (animate-in / animate-out / fade / zoom / slide)
+   used by the shadcn overlays: dialog, dropdown, popover, tooltip, select. */
+@import 'tw-animate-css';
+
+/* ── Design tokens via @theme directive ── */
+@theme {
+  /* Colors — light mode defaults (neutral / black & white) */
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-secondary: oklch(0.97 0 0);
+  --color-secondary-foreground: oklch(0.205 0 0);
+  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(0.985 0 0);
+  /* Status colors — semantic, themeable (never use raw palette classes;
+     enforced by scripts/validate/design-tokens.sh) */
+  --color-success: oklch(0.596 0.145 163.225);
+  --color-success-foreground: oklch(0.985 0 0);
+  --color-warning: oklch(0.666 0.179 58.318);
+  --color-warning-foreground: oklch(0.145 0 0);
+  --color-info: oklch(0.588 0.158 241.966);
+  --color-info-foreground: oklch(0.985 0 0);
+  /* Brand surface — the always-dark marketing panel (AuthLayout). Constant
+     across light/dark; themes may restyle it without touching components. */
+  --color-brand: oklch(0.145 0 0);
+  --color-brand-foreground: oklch(0.985 0 0);
+  /* Scrim behind overlays/drawers — used with opacity (bg-overlay/50). */
+  --color-overlay: oklch(0 0 0);
+  --color-muted: oklch(0.97 0 0);
+  --color-muted-foreground: oklch(0.556 0 0);
+  --color-accent: oklch(0.97 0 0);
+  --color-accent-foreground: oklch(0.205 0 0);
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.145 0 0);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.145 0 0);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.145 0 0);
+  --color-border: oklch(0.922 0 0);
+  --color-input: oklch(0.922 0 0);
+  --color-ring: oklch(0.708 0 0);
+  --color-sidebar: oklch(0.985 0 0);
+  --color-sidebar-foreground: oklch(0.145 0 0);
+  --color-sidebar-primary: oklch(0.205 0 0);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-sidebar-accent: oklch(0.97 0 0);
+  --color-sidebar-accent-foreground: oklch(0.205 0 0);
+  --color-sidebar-border: oklch(0.922 0 0);
+  --color-sidebar-ring: oklch(0.708 0 0);
+
+  /* Chart colors — monochrome grayscale */
+  --color-chart-1: oklch(0.205 0 0);
+  --color-chart-2: oklch(0.439 0 0);
+  --color-chart-3: oklch(0.556 0 0);
+  --color-chart-4: oklch(0.708 0 0);
+  --color-chart-5: oklch(0.835 0 0);
+
+  /* Breakpoints past Tailwind's `2xl` (96rem) — the big-monitor tier. `2xl`
+     stops at a 1536px laptop; a 1920px desktop and a 2560px+ monitor are
+     different canvases again, and without a name for them every layout simply
+     stopped growing and floated in the middle of the glass. Use `3xl:` / `4xl:`
+     to let shells, containers and the auth hero keep scaling. */
+  --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 160rem;
+
+  /* Radii. `sm`/`md`/`lg`/`xl` are the ones the Corner radius axis sets inline
+     (presets.ts). Every OTHER step DERIVES from `--radius-lg`, so `rounded-xs`,
+     `rounded-2xl`… follow the axis too: left at Tailwind's fixed defaults they
+     kept a 16px corner under radius "None", which is how the dashboard hero
+     stayed round in an otherwise square app. With the default `lg` of 0.5rem
+     these resolve to exactly Tailwind's stock values — nothing moves until the
+     axis does. (A bare `rounded` and `rounded-[…]` are NOT token-backed; the
+     theme-axis gate rejects them in app code.) */
+  --radius-xs: calc(var(--radius-lg) * 0.25);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: calc(var(--radius-lg) * 2);
+  --radius-3xl: calc(var(--radius-lg) * 3);
+  --radius-4xl: calc(var(--radius-lg) * 4);
+
+  /* Font families */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
+  /* Subtle, professional content reveal used for page/route transitions. */
+  --animate-fade-in: fade-in 0.2s ease-out both;
+  --animate-fade-in-up: route-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+  --animate-otp-shake: otp-shake 0.42s ease-in-out;
+}
+
+/* ── Dark mode overrides via .dark class ── */
+.dark {
+  --color-background: oklch(0.145 0 0);
+  --color-foreground: oklch(0.985 0 0);
+  --color-card: oklch(0.205 0 0);
+  --color-card-foreground: oklch(0.985 0 0);
+  --color-popover: oklch(0.205 0 0);
+  --color-popover-foreground: oklch(0.985 0 0);
+  --color-primary: oklch(0.922 0 0);
+  --color-primary-foreground: oklch(0.205 0 0);
+  --color-secondary: oklch(0.269 0 0);
+  --color-secondary-foreground: oklch(0.985 0 0);
+  --color-muted: oklch(0.269 0 0);
+  --color-muted-foreground: oklch(0.708 0 0);
+  --color-accent: oklch(0.269 0 0);
+  --color-accent-foreground: oklch(0.985 0 0);
+  --color-destructive: oklch(0.704 0.191 22.216);
+  --color-destructive-foreground: oklch(0.985 0 0);
+  --color-success: oklch(0.765 0.177 163.223);
+  --color-success-foreground: oklch(0.205 0 0);
+  --color-warning: oklch(0.828 0.189 84.429);
+  --color-warning-foreground: oklch(0.205 0 0);
+  --color-info: oklch(0.746 0.16 232.661);
+  --color-info-foreground: oklch(0.205 0 0);
+  --color-brand: oklch(0.145 0 0);
+  --color-brand-foreground: oklch(0.985 0 0);
+  --color-overlay: oklch(0 0 0);
+  --color-border: oklch(0.269 0 0);
+  --color-input: oklch(0.269 0 0);
+  --color-ring: oklch(0.556 0 0);
+  --color-sidebar: oklch(0.205 0 0);
+  --color-sidebar-foreground: oklch(0.985 0 0);
+  --color-sidebar-primary: oklch(0.922 0 0);
+  --color-sidebar-primary-foreground: oklch(0.205 0 0);
+  --color-sidebar-accent: oklch(0.269 0 0);
+  --color-sidebar-accent-foreground: oklch(0.985 0 0);
+  --color-sidebar-border: oklch(0.269 0 0);
+  --color-sidebar-ring: oklch(0.556 0 0);
+
+  /* Chart colors - dark (monochrome grayscale) */
+  --color-chart-1: oklch(0.985 0 0);
+  --color-chart-2: oklch(0.8 0 0);
+  --color-chart-3: oklch(0.65 0 0);
+  --color-chart-4: oklch(0.5 0 0);
+  --color-chart-5: oklch(0.35 0 0);
+}
+
+/* ── Theme presets (data-theme) — accent overrides, composed with .dark ── */
+[data-theme='violet'] {
+  --color-primary: oklch(0.55 0.22 290);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.55 0.22 290);
+  --color-sidebar-primary: oklch(0.55 0.22 290);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.58 0.18 290);
+  --color-chart-2: oklch(0.66 0.15 314);
+  --color-chart-3: oklch(0.62 0.16 266);
+  --color-chart-4: oklch(0.72 0.13 338);
+  --color-chart-5: oklch(0.52 0.17 278);
+}
+.dark[data-theme='violet'] {
+  --color-primary: oklch(0.62 0.19 290);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.62 0.19 290);
+  --color-sidebar-primary: oklch(0.62 0.19 290);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.72 0.17 290);
+  --color-chart-2: oklch(0.78 0.15 314);
+  --color-chart-3: oklch(0.68 0.16 266);
+  --color-chart-4: oklch(0.82 0.13 338);
+  --color-chart-5: oklch(0.62 0.17 278);
+}
+[data-theme='emerald'] {
+  --color-primary: oklch(0.6 0.14 162);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.6 0.14 162);
+  --color-sidebar-primary: oklch(0.6 0.14 162);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.58 0.18 162);
+  --color-chart-2: oklch(0.66 0.15 186);
+  --color-chart-3: oklch(0.62 0.16 138);
+  --color-chart-4: oklch(0.72 0.13 210);
+  --color-chart-5: oklch(0.52 0.17 150);
+}
+.dark[data-theme='emerald'] {
+  --color-primary: oklch(0.7 0.15 162);
+  --color-primary-foreground: oklch(0.205 0 0);
+  --color-ring: oklch(0.7 0.15 162);
+  --color-sidebar-primary: oklch(0.7 0.15 162);
+  --color-sidebar-primary-foreground: oklch(0.205 0 0);
+  --color-chart-1: oklch(0.72 0.17 162);
+  --color-chart-2: oklch(0.78 0.15 186);
+  --color-chart-3: oklch(0.68 0.16 138);
+  --color-chart-4: oklch(0.82 0.13 210);
+  --color-chart-5: oklch(0.62 0.17 150);
+}
+[data-theme='rose'] {
+  --color-primary: oklch(0.58 0.21 12);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.58 0.21 12);
+  --color-sidebar-primary: oklch(0.58 0.21 12);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.58 0.18 12);
+  --color-chart-2: oklch(0.66 0.15 36);
+  --color-chart-3: oklch(0.62 0.16 348);
+  --color-chart-4: oklch(0.72 0.13 60);
+  --color-chart-5: oklch(0.52 0.17 0);
+}
+.dark[data-theme='rose'] {
+  --color-primary: oklch(0.65 0.19 12);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.65 0.19 12);
+  --color-sidebar-primary: oklch(0.65 0.19 12);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.72 0.17 12);
+  --color-chart-2: oklch(0.78 0.15 36);
+  --color-chart-3: oklch(0.68 0.16 348);
+  --color-chart-4: oklch(0.82 0.13 60);
+  --color-chart-5: oklch(0.62 0.17 0);
+}
+[data-theme='ocean'] {
+  --color-primary: oklch(0.55 0.16 230);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.55 0.16 230);
+  --color-sidebar-primary: oklch(0.55 0.16 230);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.58 0.18 230);
+  --color-chart-2: oklch(0.66 0.15 254);
+  --color-chart-3: oklch(0.62 0.16 206);
+  --color-chart-4: oklch(0.72 0.13 278);
+  --color-chart-5: oklch(0.52 0.17 218);
+}
+.dark[data-theme='ocean'] {
+  --color-primary: oklch(0.62 0.14 230);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: oklch(0.62 0.14 230);
+  --color-sidebar-primary: oklch(0.62 0.14 230);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-chart-1: oklch(0.72 0.17 230);
+  --color-chart-2: oklch(0.78 0.15 254);
+  --color-chart-3: oklch(0.68 0.16 206);
+  --color-chart-4: oklch(0.82 0.13 278);
+  --color-chart-5: oklch(0.62 0.17 218);
+}
+
+/* ── Base colour (data-base) — tint the neutral surfaces/borders, keeping each
+   token's per-mode lightness so light/dark stay correct. `neutral` = no block. */
+[data-base='stone'] {
+  --color-background: oklch(1 0.004 60);
+  --color-card: oklch(1 0.004 60);
+  --color-popover: oklch(1 0.004 60);
+  --color-muted: oklch(0.97 0.005 60);
+  --color-secondary: oklch(0.97 0.005 60);
+  --color-accent: oklch(0.97 0.005 60);
+  --color-border: oklch(0.922 0.006 60);
+  --color-input: oklch(0.922 0.006 60);
+  --color-sidebar: oklch(0.985 0.004 60);
+  --color-sidebar-accent: oklch(0.97 0.005 60);
+  --color-sidebar-border: oklch(0.922 0.006 60);
+}
+.dark[data-base='stone'] {
+  --color-background: oklch(0.145 0.004 60);
+  --color-card: oklch(0.205 0.005 60);
+  --color-popover: oklch(0.205 0.005 60);
+  --color-muted: oklch(0.269 0.006 60);
+  --color-secondary: oklch(0.269 0.006 60);
+  --color-accent: oklch(0.269 0.006 60);
+  --color-border: oklch(0.269 0.006 60);
+  --color-input: oklch(0.269 0.006 60);
+  --color-sidebar: oklch(0.205 0.005 60);
+  --color-sidebar-accent: oklch(0.269 0.006 60);
+  --color-sidebar-border: oklch(0.269 0.006 60);
+}
+[data-base='slate'] {
+  --color-background: oklch(1 0.005 255);
+  --color-card: oklch(1 0.005 255);
+  --color-popover: oklch(1 0.005 255);
+  --color-muted: oklch(0.97 0.007 255);
+  --color-secondary: oklch(0.97 0.007 255);
+  --color-accent: oklch(0.97 0.007 255);
+  --color-border: oklch(0.922 0.009 255);
+  --color-input: oklch(0.922 0.009 255);
+  --color-sidebar: oklch(0.985 0.005 255);
+  --color-sidebar-accent: oklch(0.97 0.007 255);
+  --color-sidebar-border: oklch(0.922 0.009 255);
+}
+.dark[data-base='slate'] {
+  --color-background: oklch(0.145 0.006 255);
+  --color-card: oklch(0.205 0.008 255);
+  --color-popover: oklch(0.205 0.008 255);
+  --color-muted: oklch(0.269 0.009 255);
+  --color-secondary: oklch(0.269 0.009 255);
+  --color-accent: oklch(0.269 0.009 255);
+  --color-border: oklch(0.269 0.009 255);
+  --color-input: oklch(0.269 0.009 255);
+  --color-sidebar: oklch(0.205 0.008 255);
+  --color-sidebar-accent: oklch(0.269 0.009 255);
+  --color-sidebar-border: oklch(0.269 0.009 255);
+}
+[data-base='olive'] {
+  --color-background: oklch(1 0.008 110);
+  --color-card: oklch(1 0.008 110);
+  --color-popover: oklch(1 0.008 110);
+  --color-muted: oklch(0.97 0.011 110);
+  --color-secondary: oklch(0.97 0.011 110);
+  --color-accent: oklch(0.97 0.011 110);
+  --color-border: oklch(0.922 0.014 110);
+  --color-input: oklch(0.922 0.014 110);
+  --color-sidebar: oklch(0.985 0.008 110);
+  --color-sidebar-accent: oklch(0.97 0.011 110);
+  --color-sidebar-border: oklch(0.922 0.014 110);
+}
+.dark[data-base='olive'] {
+  --color-background: oklch(0.145 0.009 110);
+  --color-card: oklch(0.205 0.011 110);
+  --color-popover: oklch(0.205 0.011 110);
+  --color-muted: oklch(0.269 0.013 110);
+  --color-secondary: oklch(0.269 0.013 110);
+  --color-accent: oklch(0.269 0.013 110);
+  --color-border: oklch(0.269 0.013 110);
+  --color-input: oklch(0.269 0.013 110);
+  --color-sidebar: oklch(0.205 0.011 110);
+  --color-sidebar-accent: oklch(0.269 0.013 110);
+  --color-sidebar-border: oklch(0.269 0.013 110);
+}
+[data-base='zinc'] {
+  --color-background: oklch(1 0.003 286);
+  --color-card: oklch(1 0.003 286);
+  --color-popover: oklch(1 0.003 286);
+  --color-muted: oklch(0.97 0.004 286);
+  --color-secondary: oklch(0.97 0.004 286);
+  --color-accent: oklch(0.97 0.004 286);
+  --color-border: oklch(0.922 0.006 286);
+  --color-input: oklch(0.922 0.006 286);
+  --color-sidebar: oklch(0.985 0.003 286);
+  --color-sidebar-accent: oklch(0.97 0.004 286);
+  --color-sidebar-border: oklch(0.922 0.006 286);
+}
+.dark[data-base='zinc'] {
+  --color-background: oklch(0.145 0.005 286);
+  --color-card: oklch(0.205 0.006 286);
+  --color-popover: oklch(0.205 0.006 286);
+  --color-muted: oklch(0.269 0.007 286);
+  --color-secondary: oklch(0.269 0.007 286);
+  --color-accent: oklch(0.269 0.007 286);
+  --color-border: oklch(0.269 0.007 286);
+  --color-input: oklch(0.269 0.007 286);
+  --color-sidebar: oklch(0.205 0.006 286);
+  --color-sidebar-accent: oklch(0.269 0.007 286);
+  --color-sidebar-border: oklch(0.269 0.007 286);
+}
+[data-base='warm'] {
+  --color-background: oklch(0.995 0.008 75);
+  --color-card: oklch(0.995 0.008 75);
+  --color-popover: oklch(0.995 0.008 75);
+  --color-muted: oklch(0.96 0.012 75);
+  --color-secondary: oklch(0.96 0.012 75);
+  --color-accent: oklch(0.96 0.012 75);
+  --color-border: oklch(0.91 0.016 75);
+  --color-input: oklch(0.91 0.016 75);
+  --color-sidebar: oklch(0.98 0.01 75);
+  --color-sidebar-accent: oklch(0.96 0.012 75);
+  --color-sidebar-border: oklch(0.91 0.016 75);
+}
+.dark[data-base='warm'] {
+  --color-background: oklch(0.16 0.012 75);
+  --color-card: oklch(0.21 0.014 75);
+  --color-popover: oklch(0.21 0.014 75);
+  --color-muted: oklch(0.27 0.016 75);
+  --color-secondary: oklch(0.27 0.016 75);
+  --color-accent: oklch(0.27 0.016 75);
+  --color-border: oklch(0.32 0.018 75);
+  --color-input: oklch(0.32 0.018 75);
+  --color-sidebar: oklch(0.19 0.013 75);
+  --color-sidebar-accent: oklch(0.27 0.016 75);
+  --color-sidebar-border: oklch(0.32 0.018 75);
+}
+
+/* ── Accent swatches (Appearance pickers) — fixed catalog hues ── */
+.theme-dot-rose {
+  background-color: oklch(0.58 0.21 12);
+}
+.theme-dot-orange {
+  background-color: oklch(0.58 0.21 50);
+}
+.theme-dot-amber {
+  background-color: oklch(0.58 0.21 75);
+}
+.theme-dot-lime {
+  background-color: oklch(0.58 0.21 130);
+}
+.theme-dot-emerald {
+  background-color: oklch(0.58 0.21 160);
+}
+.theme-dot-teal {
+  background-color: oklch(0.58 0.21 190);
+}
+.theme-dot-blue {
+  background-color: oklch(0.58 0.21 255);
+}
+.theme-dot-violet {
+  background-color: oklch(0.58 0.21 290);
+}
+.theme-dot-pink {
+  background-color: oklch(0.58 0.21 350);
+}
+
+/* ── Menu style (data-menu) — translucent dropdowns/popovers/selects ── */
+[data-menu='translucent'] [data-slot='dropdown-menu-content'],
+[data-menu='translucent'] [data-slot='popover-content'],
+[data-menu='translucent'] [data-slot='select-content'],
+[data-menu='translucent'] [data-slot='tooltip-content'] {
+  background-color: color-mix(in oklch, var(--color-popover) 78%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+[data-menu='glass'] [data-slot='dropdown-menu-content'],
+[data-menu='glass'] [data-slot='popover-content'],
+[data-menu='glass'] [data-slot='select-content'],
+[data-menu='glass'] [data-slot='tooltip-content'] {
+  background-color: color-mix(in oklch, var(--color-popover) 62%, transparent);
+  backdrop-filter: blur(16px) saturate(1.35);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  border-color: color-mix(in oklch, var(--color-border) 55%, transparent);
+}
+
+/* ── Floating surface default lift ──
+   A non-modal surface pinned over the page (the consent card) has no scrim to
+   separate it, so it carries a soft shadow even before any generated look has
+   set `data-elevation`. Declared ABOVE the elevation block on purpose: those
+   rules have the same specificity, so the theme axis still wins whenever it is
+   set — `flat` removes this, `lifted`/`floating` deepen it. */
+[data-slot='surface'][data-floating] {
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 0.06),
+    0 12px 32px -12px oklch(0 0 0 / 0.22);
+}
+/* `:where()` keeps this at the same specificity as the axis rules below. */
+:where(.dark) [data-slot='surface'][data-floating] {
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 0.4),
+    0 16px 36px -12px oklch(0 0 0 / 0.7);
+}
+
+/* ── Surface elevation (data-elevation) — flat (border-only) … lifted (deep shadow).
+   Targets shadcn `[data-slot]` surfaces. App code must not add shadow-* on these slots.
+   Lists use `:is()` for the same reason the Shape block does (one prefix per
+   list; every argument a single attribute selector, so specificity is unchanged). ── */
+[data-elevation='flat']
+  :is(
+    [data-slot='card'],
+    [data-slot='surface'],
+    [data-slot='popover-content'],
+    [data-slot='dropdown-menu-content'],
+    [data-slot='dialog-content'],
+    [data-slot='alert-dialog-content'],
+    [data-slot='select-content'],
+    [data-slot='floating-edge']
+  ) {
+  box-shadow: none !important;
+}
+[data-elevation='soft'] [data-slot='card'] {
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.06);
+}
+.dark[data-elevation='soft'] [data-slot='card'] {
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.35);
+}
+[data-elevation='soft']
+  :is(
+    [data-slot='surface'],
+    [data-slot='popover-content'],
+    [data-slot='dropdown-menu-content'],
+    [data-slot='dialog-content'],
+    [data-slot='alert-dialog-content'],
+    [data-slot='select-content']
+  ) {
+  box-shadow: 0 4px 14px -6px oklch(0 0 0 / 0.12);
+}
+[data-elevation='soft'] [data-slot='floating-edge'] {
+  box-shadow: 0 4px 14px -6px oklch(0 0 0 / 0.2);
+}
+[data-elevation='lifted'] [data-slot='card'] {
+  box-shadow: 0 10px 24px -12px oklch(0 0 0 / 0.28);
+}
+[data-elevation='lifted']
+  :is(
+    [data-slot='surface'],
+    [data-slot='popover-content'],
+    [data-slot='dropdown-menu-content'],
+    [data-slot='dialog-content'],
+    [data-slot='alert-dialog-content'],
+    [data-slot='select-content']
+  ) {
+  box-shadow: 0 20px 44px -16px oklch(0 0 0 / 0.42);
+}
+[data-elevation='lifted'] [data-slot='floating-edge'] {
+  box-shadow: 0 12px 28px -8px oklch(0 0 0 / 0.35);
+}
+.dark[data-elevation='lifted'] [data-slot='card'] {
+  box-shadow: 0 12px 28px -10px oklch(0 0 0 / 0.6);
+}
+[data-elevation='floating'] [data-slot='card'] {
+  box-shadow: 0 16px 40px -14px oklch(0 0 0 / 0.35);
+}
+[data-elevation='floating']
+  :is(
+    [data-slot='surface'],
+    [data-slot='popover-content'],
+    [data-slot='dropdown-menu-content'],
+    [data-slot='dialog-content'],
+    [data-slot='alert-dialog-content'],
+    [data-slot='select-content'],
+    [data-slot='floating-edge']
+  ) {
+  box-shadow: 0 28px 56px -18px oklch(0 0 0 / 0.48);
+}
+.dark[data-elevation='floating'] [data-slot='card'] {
+  box-shadow: 0 18px 44px -12px oklch(0 0 0 / 0.72);
+}
+
+/* ── Surface contrast (data-contrast) — soft (gentler) / crisp (sharper),
+   composed with .dark so it reads in both modes. Overrides neutral tokens only;
+   the generated accent (inline vars) is untouched. ── */
+[data-contrast='soft'] {
+  --color-border: oklch(0.93 0 0);
+  --color-muted-foreground: oklch(0.6 0 0);
+}
+.dark[data-contrast='soft'] {
+  --color-background: oklch(0.205 0 0);
+  --color-card: oklch(0.245 0 0);
+  --color-popover: oklch(0.245 0 0);
+  --color-border: oklch(0.32 0 0);
+  --color-muted-foreground: oklch(0.72 0 0);
+}
+[data-contrast='crisp'] {
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0 0 0);
+  --color-border: oklch(0.8 0 0);
+  --color-input: oklch(0.8 0 0);
+}
+.dark[data-contrast='crisp'] {
+  --color-background: oklch(0 0 0);
+  --color-foreground: oklch(1 0 0);
+  --color-card: oklch(0.16 0 0);
+  --color-popover: oklch(0.16 0 0);
+  --color-border: oklch(0.42 0 0);
+  --color-input: oklch(0.42 0 0);
+}
+/* dim + amoled are dark-only surface tones (no-op in light → render as normal). */
+.dark[data-contrast='dim'] {
+  --color-background: oklch(0.22 0.012 264);
+  --color-card: oklch(0.26 0.012 264);
+  --color-popover: oklch(0.26 0.012 264);
+  --color-border: oklch(0.32 0.012 264);
+  --color-muted: oklch(0.3 0.012 264);
+  --color-sidebar: oklch(0.24 0.012 264);
+}
+.dark[data-contrast='amoled'] {
+  --color-background: oklch(0 0 0);
+  --color-card: oklch(0.13 0 0);
+  --color-popover: oklch(0.13 0 0);
+  --color-border: oklch(0.28 0 0);
+  --color-sidebar: oklch(0 0 0);
+}
+
+/* ── Surface separation — border (default) / shadow (card shadow, no border). ── */
+[data-separation='shadow'] [data-slot='card'] {
+  border-color: transparent;
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 0.06),
+    0 4px 12px -4px oklch(0 0 0 / 0.14);
+}
+.dark[data-separation='shadow'] [data-slot='card'] {
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 0.4),
+    0 6px 16px -4px oklch(0 0 0 / 0.55);
+}
+[data-separation='hairline'] [data-slot='card'],
+[data-separation='hairline'] [data-slot='surface'] {
+  border-width: 0.5px;
+  box-shadow: none !important;
+}
+
+/* ── Shape language (data-shape) — pill (round buttons/inputs) / sharp (square
+   cards/inputs); uniform uses the global radius.
+
+   `:is()` on purpose: one prefix per list instead of one per slot. It takes the
+   specificity of its most specific argument — every argument here is a single
+   attribute selector, so each rule weighs exactly what the long-hand
+   `[data-shape='x'] [data-slot='y']` did. The initial-CSS budget is what asked
+   for it (`pnpm size`). ── */
+[data-shape='pill']
+  :is(
+    [data-slot='button'],
+    [data-slot='input'],
+    [data-slot='select-trigger'],
+    [data-slot='textarea']
+  ),
+[data-shape='mixed']
+  :is(
+    [data-slot='button'],
+    [data-slot='input'],
+    [data-slot='select-trigger'],
+    [data-slot='textarea'],
+    [data-slot='nav-item'],
+    [data-slot='menu-item']
+  ) {
+  border-radius: 9999px;
+}
+[data-shape='sharp'] :is(
+  [data-slot='card'],
+  [data-slot='surface'],
+  [data-slot='dialog-content'],
+  [data-slot='alert-dialog-content'],
+  [data-slot='popover-content'],
+  [data-slot='dropdown-menu-content'],
+  [data-slot='tooltip-content'],
+  [data-slot='skeleton'],
+  [data-slot='icon-chip'],
+  [data-slot='nav-item'],
+  [data-slot='menu-item'],
+  [data-slot='input'],
+  [data-slot='textarea'],
+  [data-slot='button'],
+  [data-slot='select-trigger'],
+  [data-slot='select-content'],
+  [data-slot='select-item'],
+  [data-slot='dropdown-menu-sub-content'],
+  [data-slot='dropdown-menu-item'],
+  [data-slot='dropdown-menu-checkbox-item'],
+  [data-slot='dropdown-menu-radio-item'],
+  [data-slot='dropdown-menu-sub-trigger'],
+  /* Round BY DESIGN — `rounded-full` in every other shape — but under Sharp
+     nothing is round. Primitives first, then `pill`: the opt-in slot for
+     app-level chips, count badges, icon discs and tracks. Status dots (≤ 10px)
+     and blurred glows are indicators, not surfaces, and deliberately do not
+     opt in. The vendored carousel RE-SLOTS its arrow <Button>s, so `button`
+     above no longer matches them — found by the browser sweep
+     (theme-shape.e2e), not by reading: the class string says `rounded-full`,
+     the slot says nothing. */
+  [data-slot='badge'],
+  [data-slot='avatar'],
+  [data-slot='avatar-fallback'],
+  [data-slot='checkbox'],
+  [data-slot='switch'],
+  [data-slot='switch-thumb'],
+  [data-slot='progress'],
+  [data-slot='progress-indicator'],
+  [data-slot='input-otp-slot'],
+  [data-slot='floating-edge'],
+  [data-slot='carousel-previous'],
+  [data-slot='carousel-next'],
+  [data-slot='kbd'],
+  [data-slot='pill']
+),
+/* The active-route markers are pseudo-elements (`before:rounded-full` on the
+   sidebar, `after:rounded-full` on the top nav) — they cannot carry a slot of
+   their own and a pseudo-element cannot go inside `:is()`, so they are squared
+   through the nav item that draws them. */
+[data-shape='sharp'] [data-slot='nav-item']::before,
+[data-shape='sharp'] [data-slot='nav-item']::after {
+  border-radius: 0;
+}
+
+/* Icon tiles — token-backed radius (independent of Tailwind scale steps). */
+[data-slot='icon-chip'] {
+  border-radius: var(--radius-lg);
+}
+
+[data-slot='nav-item'],
+[data-slot='menu-item'] {
+  border-radius: var(--radius-md);
+}
+
+/* ── Focus-ring personality (data-focus) — glow / offset / underline / inset;
+   ring is stock shadcn. Non-ring modes reset Tailwind ring utilities. ── */
+[data-focus='glow'] [data-slot]:focus-visible,
+[data-focus='underline'] [data-slot]:focus-visible,
+[data-focus='offset'] [data-slot]:focus-visible,
+[data-focus='inset'] [data-slot]:focus-visible {
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-width: 0px !important;
+}
+[data-focus='glow'] [data-slot]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-ring) 40%, transparent) !important;
+}
+[data-focus='offset'] [data-slot]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-ring) !important;
+}
+[data-focus='underline'] [data-slot]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -2px 0 0 var(--color-ring) !important;
+}
+[data-focus='inset'] [data-slot]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-ring) !important;
+}
+
+/* ── Keyframes ── */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes route-rise {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes otp-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Indeterminate top progress bar for in-app navigations (RouteProgressBar). */
+@keyframes route-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
+}
+
+/* Gentle "breathing" pulse for the branded boot loader (FullPageSpinner + HTML
+   splash). Softer scale/opacity so the HTML→React handoff never blinks. */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.94);
+    opacity: 0.88;
+  }
+}
+
+.animate-boot-breathe {
+  animation: breathe 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.animate-boot-progress {
+  animation: route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ── Utility classes (avoid inline styles) ── */
+.chart-tooltip {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-card-foreground);
+}
+
+.skeleton-shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    var(--color-muted) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Elevation shown under a sticky header once content scrolls beneath it.
+   Mode-aware via `--color-foreground` (which flips with .dark): a soft dark
+   shadow on the light surface, and a faint light separator on the dark surface —
+   a fixed dark shadow would be invisible there. Same rule, the token adapts. */
+.scroll-shadow-top {
+  box-shadow: 0 6px 10px -8px
+    color-mix(in oklch, var(--color-foreground) 22%, transparent);
+}
+.dark .scroll-shadow-top {
+  box-shadow: 0 6px 10px -8px
+    color-mix(in oklch, var(--color-foreground) 14%, transparent);
+}
+
+/* shadcn menu/select items ship a `cursor-default` utility (utilities layer),
+   which defeats the pointer affordance declared in @layer base below. Restore a
+   pointer cursor on interactive menu/select items — this block is UNLAYERED, so
+   it wins over the Tailwind utility regardless of source order. Disabled items
+   keep the default arrow. */
+[data-slot='dropdown-menu-item']:not([data-disabled]),
+[data-slot='dropdown-menu-checkbox-item']:not([data-disabled]),
+[data-slot='dropdown-menu-radio-item']:not([data-disabled]),
+[data-slot='dropdown-menu-sub-trigger']:not([data-disabled]),
+[data-slot='select-item']:not([data-disabled]),
+[data-slot='context-menu-item']:not([data-disabled]),
+[data-slot='command-item']:not([data-disabled]) {
+  cursor: pointer;
+}
+
+/* ── Base layer resets ── */
+@layer base {
+  /* Themed scrollbars app-wide — token-driven; replaces native OS chrome in Firefox + WebKit. */
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-muted-foreground);
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading, var(--font-sans));
+  }
+  /* Icon weight — Lucide/Tabler stroke-width, driven by the Appearance picker.
+     (Phosphor uses fixed path weights, so it ignores this.) */
+  svg.lucide,
+  svg.tabler-icon {
+    stroke-width: var(--icon-stroke, 2);
+    color: var(--icon-app-color, currentColor);
+  }
+
+  [data-icon-color='foreground'] svg.lucide,
+  [data-icon-color='foreground'] svg.tabler-icon {
+    --icon-app-color: var(--color-foreground);
+  }
+  [data-icon-color='muted'] svg.lucide,
+  [data-icon-color='muted'] svg.tabler-icon {
+    --icon-app-color: var(--color-muted-foreground);
+  }
+  [data-icon-color='primary'] svg.lucide,
+  [data-icon-color='primary'] svg.tabler-icon {
+    --icon-app-color: var(--color-primary);
+  }
+  [data-icon-color='accent'] svg.lucide,
+  [data-icon-color='accent'] svg.tabler-icon {
+    --icon-app-color: var(--color-primary);
+  }
+  [data-icon-color='destructive'] svg.lucide,
+  [data-icon-color='destructive'] svg.tabler-icon {
+    --icon-app-color: var(--color-destructive);
+  }
+
+  /* ── Pointer cursor on interactive elements ──
+     Tailwind v4 Preflight no longer forces `cursor: pointer` on <button>, so
+     buttons + headless Radix primitives (which set ARIA roles, not cursors)
+     would otherwise show the default arrow. Restore pointer affordance for the
+     whole app in one place; disabled controls keep the default cursor. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']):not([data-disabled]),
+  [role='tab']:not([data-disabled]),
+  [role='menuitem']:not([data-disabled]),
+  [role='menuitemcheckbox']:not([data-disabled]),
+  [role='menuitemradio']:not([data-disabled]),
+  [role='option']:not([data-disabled]),
+  [role='switch']:not(:disabled):not([data-disabled]),
+  [role='radio']:not([data-disabled]),
+  [role='checkbox']:not(:disabled):not([data-disabled]),
+  summary {
+    cursor: pointer;
+  }
+}
+
+/* ── Floating corner surfaces (consent card, feedback trigger) ──
+   A shell that renders the mobile tab bar publishes its height here, so nothing
+   pinned to the bottom edge sits on top of primary navigation. `:has()` keeps it
+   declarative: no shell has to know which floating surfaces exist, and a screen
+   without a tab bar (login, onboarding) reserves nothing. The tab bar is
+   `md:hidden`, so the reservation ends at the same breakpoint. */
+:root:has([data-slot='mobile-nav']) {
+  --floating-bottom-offset: 3.75rem;
+}
+@media (min-width: 48rem) {
+  :root:has([data-slot='mobile-nav']) {
+    --floating-bottom-offset: 0rem;
+  }
+}
+
+/* Below `sm` the consent card spans the width and can cover a page's last
+   control. It publishes its measured height (ConsentBanner) and whatever scrolls
+   reserves that much at its end, so the control can be scrolled clear. The
+   document scrolls on the auth/public layouts; the app shell scrolls `<main>`. */
+@media (max-width: 39.9375rem) {
+  body {
+    padding-bottom: var(--consent-card-height, 0px);
+  }
+  [data-slot='app-main'] {
+    padding-bottom: calc(5rem + var(--consent-card-height, 0px));
+  }
+}
+
+/* The Sentry feedback trigger is third-party and lives in a shadow root, but it
+   positions itself from custom properties on its host — so it can be steered
+   from here. It owns the bottom-END corner; lift it clear of the tab bar too. */
+#sentry-feedback {
+  --inset: auto 0 var(--floating-bottom-offset, 0rem) auto;
+}
+/* Below `sm` the consent card spans the full width, so the two would share a
+   corner and the trigger lands on top of "Accept". The consent decision is a
+   one-off, seconds-long state: the trigger simply waits for it. */
+@media (max-width: 39.9375rem) {
+  :root:has([data-slot='surface'][data-floating]) #sentry-feedback {
+    display: none;
+  }
+}
+/* Same rule, the other direction: a MODAL dialog owns the screen while it is
+   open, and the trigger is pinned above everything the dialog dims — so it sat
+   lit up over Settings, over a confirm, over the invite form, at every width.
+   Keyed on the OVERLAY rather than the content: that is what marks a dialog as
+   modal, so the non-modal Appearance panel (no scrim, page stays live) keeps
+   its trigger, which is right — nothing is being interrupted there. */
+:root:has([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'])
+  #sentry-feedback {
+  display: none;
+}
+
+/* ── Accessibility: honour reduced-motion globally ──
+   Users who set "reduce motion" get a near-instant, motion-free experience
+   (page fades, overlay transitions, shimmer, and hover lifts are neutralised). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

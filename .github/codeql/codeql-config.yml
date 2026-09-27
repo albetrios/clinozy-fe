@@ -1,0 +1,45 @@
+# CodeQL analysis configuration for clinozy-fe.
+# Security-focused query suite (complements the Semgrep SAST lane in ci.yml);
+# quality queries are intentionally omitted because Biome + ESLint + SonarQube
+# already cover maintainability, keeping CodeQL findings high-signal.
+name: clinozy-fe CodeQL config
+
+queries:
+  - uses: security-extended
+
+# Scope analysis to the DEPLOYED application surface — the Vite app under src/.
+# Tests, mocks/fixtures, build plugins, and dev/CI scripts are excluded because
+# their inputs are trusted (developer argv, local env, seeded demo data), not
+# attacker-controlled, so security-extended taint queries systematically
+# mis-flag them. Same scoping rationale as sonar-project.properties.
+paths-ignore:
+  - dist
+  - coverage
+  - test-results
+  - public
+  - tests/**
+  - '**/__tests__/**'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  # REPLACE_WITH_API placeholder UI data (e.g. dashboard.placeholder-data.ts).
+  - src/**/*.placeholder-data.ts
+  - src/**/*.fixtures.ts
+  # Local agent worktrees checked out under .claude/ are gitignored stale
+  # copies of the repo; never analyze them.
+  - .claude/**
+  # Dev/CI command-line utilities and Vite build plugins. These run locally or
+  # in CI with trusted inputs (a developer's own argv, local .env files, local
+  # `git` output), never untrusted request data.
+  - tooling/**
+  - plugins/**
+  # Agent-OS skill/hook Node scripts (e.g. the impeccable live-preview tooling).
+  # Same trusted-input rationale as tooling/**: they run on a developer's own
+  # machine against local files and argv during agent sessions, are never part
+  # of the deployed Vite bundle under src/, and so security-extended taint
+  # queries systematically mis-flag them (fs-race, temp-file, regex-sanitize).
+  - agent-os/**
+
+# No query-filters yet: clinozy-be suppresses three verified architectural false
+# positives (rate limiting, password-hash KDF, logger redaction) that are
+# server-side concerns. Add an exclude here only with the same standard of
+# proof — a verified, documented architectural false positive for THIS app.

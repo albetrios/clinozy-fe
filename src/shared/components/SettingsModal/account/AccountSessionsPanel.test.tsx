@@ -1,0 +1,325 @@
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import i18n from '@/lib/i18n/i18n.ts';
+import { ensureLocale } from '@/lib/i18n/load-namespace.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+
+const { useSessionsMock, revokeMutateAsync } = vi.hoisted(() => ({
+  useSessionsMock: vi.fn(),
+  revokeMutateAsync: vi.fn(),
+}));
+vi.mock('@/shared/hooks/useSessions/index.ts', () => ({
+  useSessions: useSessionsMock,
+  useRevokeSession: () => ({ mutateAsync: revokeMutateAsync }),
+}));
+// The re-auth dialog has its own suite — stub it to a button that verifies, so
+// this one exercises the guard wiring rather than the dialog's internals.
+vi.mock('@/shared/components/StepUpDialog/StepUpDialog.tsx', () => ({
+  StepUpDialog: ({
+    onVerified,
+    allowEmailCode,
+  }: {
+    onVerified: () => void;
+    allowEmailCode?: boolean;
+  }) => (
+    <button
+      type="button"
+      data-testid="stub-step-up"
+      data-allow-email={String(allowEmailCode)}
+      onClick={onVerified}
+    >
+      verify
+    </button>
+  ),
+}));
+
+import { SETTINGS_KEYS, SETTINGS_NS } from '../settings.constants.ts';
+import { AccountSessionsPanel } from './AccountSessionsPanel.tsx';
+
+const KEYS = SETTINGS_KEYS.panels.sessions;
+
+/** The panel's copy as the bundle renders it — never the English literal. */
+const copy = (key: string, lng = 'en') => i18n.t(key, { ns: SETTINGS_NS, lng });
+
+const CURRENT = {
+  id: 'ses_current',
+  device: 'MacBook Pro',
+  browser: 'Chrome',
+  location: 'SF',
+  lastActiveAt: '2026-06-24T00:00:00.000Z',
+  current: true,
+};
+const OTHER = {
+  id: 'ses_other',
+  device: 'iPhone 15',
+  browser: 'Safari',
+  location: 'SF',
+  lastActiveAt: '2026-06-23T00:00:00.000Z',
+  current: false,
+};
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  revokeMutateAsync.mockResolvedValue(undefined);
+});
+
+afterEach(async () => {
+  // The locale is process-wide — a test that switches it must hand English
+  // back, or every suite after this one renders in the last language used.
+  if (i18n.language === 'en') return;
+  await act(async () => {
+    await i18n.changeLanguage('en');
+  });
+});
+
+describe('AccountSessionsPanel', () => {
+  it('shows a loading state', () => {
+    useSessionsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<AccountSessionsPanel />);
+    expect(screen.getByTestId('sessions-loading')).toBeInTheDocument();
+  });
+
+  it('lists sessions; the current device is badged and not revocable', () => {
+    useSessionsMock.mockReturnValue({
+      data: [CURRENT, OTHER],
+      isLoading: false,
+      isError: false,
+    });
+    render(<AccountSessionsPanel />);
+    expect(screen.getByText('MacBook Pro')).toBeInTheDocument();
+    // `device` is data, the badge is copy — assert the badge through the bundle.
+    expect(screen.getByText(copy(KEYS.currentBadge))).toBeInTheDocument();
+    // current session has no revoke control; the other one does
+    expect(screen.queryByTestId('session-revoke-ses_current')).not.toBeInTheDocument();
+    expect(screen.getByTestId('session-revoke-ses_other')).toBeInTheDocument();
+  });
+
+  it('confirms and revokes another session', async () => {
+    useSessionsMock.mockReturnValue({
+      data: [CURRENT, OTHER],
+      isLoading: false,
+      isError: false,
+    });
+    const user = userEvent.setup();
+    render(<AccountSessionsPanel />);
+    await user.click(screen.getByTestId('session-revoke-ses_other'));
+    await user.click(screen.getByTestId('confirm-accept'));
+    await waitFor(() => expect(revokeMutateAsync).toHaveBeenCalledWith('ses_other'));
+  });
+
+  // A session clinozy-be could not label: `parseUserAgent` knows seven device
+  // families and five browsers and returns null for anything else — a mobile
+  // app, an API client, curl, a headless run. The wire schema used to demand
+  // strings, and `parseListTolerant` drops what it rejects, so the row never
+  // reached this panel at all: invisible, and therefore impossible to sign out.
+  it('lists and can revoke a session whose device and browser are unknown', async () => {
+    const UNLABELLED = {
+      id: 'ses_cli',
+      device: null,
+      browser: null,
+      ipAddress: '203.0.113.9',
+      lastActiveAt: '2026-06-23T00:00:00.000Z',
+      current: false,
+    };
+    useSessionsMock.mockReturnValue({
+      data: [CURRENT, UNLABELLED],
+      isLoading: false,
+      isError: false,
+    });
+    const user = userEvent.setup();
+    render(<AccountSessionsPanel />);
+
+    // Named through the bundle, never "null" or a blank line.
+    expect(screen.getByText(copy(KEYS.deviceFallback))).toBeInTheDocument();
+    // The IP survives on its own — no dangling separator where the browser was.
+    expect(screen.getByText(/203\.0\.113\.9/)).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('session-revoke-ses_cli'));
+    await user.click(screen.getByTestId('confirm-accept'));
+    await waitFor(() => expect(revokeMutateAsync).toHaveBeenCalledWith('ses_cli'));
+  });
+
+  // clinozy-be gates DELETE /auth/me/sessions/:session_id behind a STRONG recent
+  // step-up (sec-A7). Without the guard the 403 was swallowed whole:
+  // `useAppMutation` suppresses the toast for a step-up error — on the
+  // documented assumption that the caller opens the dialog — and rolled the
+  // optimistic removal back, so the row reappeared unchanged with nothing on
+  // screen to explain it. A spinner, then the session exactly as it was.
+  it('opens re-authentication when clinozy-be demands a step-up, then retries', async () => {
+    const stepUp = new HttpError(
+      'Recent step-up authentication is required',
+      403,
+      '/api/v1/auth/me/sessions/ses_other',
+      'DELETE',
+    );
+    revokeMutateAsync.mockRejectedValueOnce(stepUp).mockResolvedValueOnce(undefined);
+    useSessionsMock.mockReturnValue({
+      data: [CURRENT, OTHER],
+      isLoading: false,
+      isError: false,
+    });
+    const user = userEvent.setup();
+    render(<AccountSessionsPanel />);
+
+    await user.click(screen.getByTestId('session-revoke-ses_other'));
+    await user.click(screen.getByTestId('confirm-accept'));
+
+    const prompt = await screen.findByTestId('stub-step-up');
+    // Revoking is destructive, so the bootstrap email code must not be offered —
+    // clinozy-be would reject that window anyway.
+    expect(prompt).toHaveAttribute('data-allow-email', 'false');
+
+    await user.click(prompt);
+    // Re-run after verification, against the id captured before the confirm
+    // dialog closed and cleared it.
+    await waitFor(() => expect(revokeMutateAsync).toHaveBeenCalledTimes(2));
+    expect(revokeMutateAsync).toHaveBeenLastCalledWith('ses_other');
+  });
+
+  // ── SET-20 / SET-21: a failure you can act on, an empty list you can read ──
+
+  it('offers a retry when the sessions fetch fails', async () => {
+    // Regression: a plain sentence. The only way to try again was to close
+    // Settings and open it again.
+    const refetch = vi.fn();
+    const user = userEvent.setup();
+    useSessionsMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      isFetching: false,
+      refetch,
+    });
+    render(<AccountSessionsPanel />);
+
+    expect(screen.getByTestId('sessions-error')).toBeInTheDocument();
+    await user.click(screen.getByTestId('retry-button'));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables the retry while the refetch is in flight', () => {
+    // The retry is a request like any other — it says so, and cannot be
+    // hammered while it runs.
+    useSessionsMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      isFetching: true,
+      refetch: vi.fn(),
+    });
+    render(<AccountSessionsPanel />);
+
+    const retry = screen.getByTestId('retry-button');
+    expect(retry).toBeDisabled();
+    expect(retry.querySelector('.animate-spin')).not.toBeNull();
+  });
+
+  it('says the list is empty instead of rendering nothing', () => {
+    // Regression: the skeleton handed over to blank space, which reads as
+    // "still loading" forever (SET-21).
+    useSessionsMock.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      isFetching: false,
+      refetch: vi.fn(),
+    });
+    render(<AccountSessionsPanel />);
+
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    expect(screen.queryByTestId('sessions-list')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sessions-loading')).not.toBeInTheDocument();
+  });
+
+  // ── SET-22: a skeleton the size of the thing it stands in for ────────────
+
+  it('renders the skeleton in the same row shell as the real list', () => {
+    // Regression: two 56px bars stood in for rows that render ~66px inside a
+    // card, so the panel jumped when the data landed.
+    useSessionsMock.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      isFetching: true,
+      refetch: vi.fn(),
+    });
+    const { container } = render(<AccountSessionsPanel />);
+
+    // One skeleton, the same shape every other settings wait draws — the
+    // bespoke row-shell copy of the list is gone along with the second stage.
+    expect(screen.getByTestId('sessions-loading')).toBeInTheDocument();
+    const clone = container.cloneNode(true) as HTMLElement;
+    for (const srOnly of clone.querySelectorAll('.sr-only')) srOnly.remove();
+    expect(clone.querySelector('[data-testid="sessions-loading"]')?.textContent).toBe('');
+  });
+
+  // ── X-9: copy comes from the locale bundle, not from the component ───────
+
+  describe('localization', () => {
+    it('renders the session row sentence around the relative time', () => {
+      // The meta line is a <Trans> slot: the browser/IP details and the
+      // FormattedDate element must both survive the substitution.
+      useSessionsMock.mockReturnValue({
+        data: [{ ...OTHER, ipAddress: '203.0.113.7' }],
+        isLoading: false,
+        isError: false,
+      });
+      const { container } = render(<AccountSessionsPanel />);
+
+      // The <time> is the FormattedDate slot — its presence proves the
+      // component survived the substitution rather than being flattened away.
+      const time = container.querySelector('[data-testid="sessions-list"] time');
+      expect(time).not.toBeNull();
+      const meta = time?.parentElement;
+      expect(meta?.textContent).toContain('Safari');
+      expect(meta?.textContent).toContain('203.0.113.7');
+      expect(meta?.textContent).toContain('active');
+    });
+
+    it('follows the active locale instead of shipping English literals', async () => {
+      // Regression (X-9): this panel hardcoded "Sessions", "No active
+      // sessions", "Sessions appear here once you sign in on a device.",
+      // "This device" and "Sign out" — every one of them stayed English in a
+      // multi-locale app.
+      useSessionsMock.mockReturnValue({
+        data: [],
+        isLoading: false,
+        isError: false,
+        isFetching: false,
+        refetch: vi.fn(),
+      });
+      await ensureLocale('es');
+      await act(async () => {
+        await i18n.changeLanguage('es');
+      });
+      render(<AccountSessionsPanel />);
+
+      for (const key of [KEYS.title, KEYS.emptyTitle, KEYS.emptyDescription]) {
+        // A Spanish value that merely copies English would not be a translation.
+        expect(copy(key, 'es')).not.toBe(copy(key, 'en'));
+        expect(screen.getByText(copy(key, 'es'))).toBeInTheDocument();
+      }
+      expect(screen.queryByText(copy(KEYS.emptyTitle, 'en'))).not.toBeInTheDocument();
+    });
+
+    it('names the device in the revoke confirmation', async () => {
+      useSessionsMock.mockReturnValue({
+        data: [CURRENT, OTHER],
+        isLoading: false,
+        isError: false,
+      });
+      const user = userEvent.setup();
+      render(<AccountSessionsPanel />);
+      await user.click(screen.getByTestId('session-revoke-ses_other'));
+
+      expect(screen.getByText(copy(KEYS.revokeTitle))).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          i18n.t(KEYS.revokeDescription, { ns: SETTINGS_NS, device: OTHER.device }),
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+});

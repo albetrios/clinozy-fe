@@ -1,0 +1,73 @@
+{
+  "description": "Skill taxonomy — every project skill belongs to exactly one group. Single source for grouped rendering of the skill registry and for group-level operations ('run all docs maintainers'). agent-os/evals/check.ts asserts this stays in sync with the skills on disk (every skill grouped exactly once; no unknown names).",
+  "groups": {
+    "ui-design": [
+      "frontend-design",
+      "shadcn",
+      "ui-ux-pro-max",
+      "impeccable",
+      "web-design-guidelines",
+      "composition-patterns",
+      "fe-theme-axis-audit",
+      "fe-pwa-manifest",
+      "fe-rtl-logical-css"
+    ],
+    "routing-pages": [
+      "fe-page-scaffolding",
+      "fe-route-island",
+      "fe-routing-tenancy",
+      "fe-resource-crud",
+      "fe-http-forms-errors",
+      "fe-resilient-interactions"
+    ],
+    "testing": [
+      "fe-test-generation",
+      "fe-e2e-testids",
+      "fe-playwright-e2e",
+      "fe-visual-regression"
+    ],
+    "quality": [
+      "fe-lint-guard",
+      "fe-code-smells-best-practices",
+      "fe-code-quality-security",
+      "fe-full-code-review",
+      "fe-before-commit-guard",
+      "fe-project-health-check",
+      "react-best-practices",
+      "fe-code-structure",
+      "fe-component-promotion",
+      "systematic-debugging",
+      "fe-guard-authoring",
+      "fe-pre-pr-sweep",
+      "fe-safe-bulk-edits",
+      "fe-review-response"
+    ],
+    "docs": [
+      "fe-documentation-maintenance",
+      "fe-requirement-format"
+    ],
+    "i18n": [
+      "fe-i18n-constants",
+      "fe-locale-formatting",
+      "fe-locale-preferences"
+    ],
+    "platform": [
+      "fe-env-schema-add",
+      "fe-platform-hygiene",
+      "fe-extension-settings-recommendations",
+      "fe-dependency-management",
+      "fe-bundle-performance"
+    ],
+    "workflow": [
+      "fe-auto-implement",
+      "fe-skill-registry",
+      "fe-agent-os-authoring"
+    ],
+    "external": [
+      "animejs",
+      "emil-design-eng",
+      "review-animations",
+      "find-skills"
+    ]
+  }
+}

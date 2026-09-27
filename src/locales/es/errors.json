@@ -1,0 +1,181 @@
+{
+  "global": {
+    "title": "Algo salió mal",
+    "message": "Ocurrió un error inesperado. Intenta recargar la página.",
+    "reload": "Recargar página"
+  },
+  "route": {
+    "notFound": "La página que buscas no existe.",
+    "generic": "Algo salió mal.",
+    "pageTitle": "Esta página tuvo un error",
+    "pageMessage": "Algo salió mal al renderizar esta página.",
+    "tryAgain": "Reintentar",
+    "goHome": "Ir al inicio",
+    "refresh": "Actualizar página",
+    "forbidden": "No tienes permiso para acceder a esta página.",
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…"
+  },
+  "widget": {
+    "unavailable": "{{title}} no disponible",
+    "message": "Algo salió mal al cargar esta sección. Inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "unavailableShort": "No disponible",
+    "controlRetry": "{{title}} no disponible. Selecciona para reintentar.",
+    "pageContent": "Contenido de la página",
+    "navigation": "Navegación",
+    "emailBanner": "Verificación de correo",
+    "notifications": "Notificaciones",
+    "organizationSwitcher": "Selector de organización",
+    "commandPalette": "Paleta de comandos",
+    "settings": "Configuración",
+    "appearance": "Apariencia",
+    "analytics": "Analíticas",
+    "members": "Miembros",
+    "schedule": "Agenda",
+    "highlights": "Destacados",
+    "themeShowcase": "Muestra de temas",
+    "sessionTimeout": "Temporizador de sesión",
+    "securityCheck": "Verificación de seguridad",
+    "appearanceControls": "Controles de apariencia",
+    "payment": "Pago",
+    "cancellation": "Cancelación"
+  },
+  "toast": {
+    "dismiss": "Descartar notificación",
+    "preview": {
+      "successTitle": "Cambios guardados",
+      "successDescription": "Tu configuración ya está activa.",
+      "errorTitle": "Algo salió mal",
+      "errorDescription": "Inténtalo de nuevo.",
+      "warningTitle": "Atención",
+      "warningDescription": "Esta acción necesita revisión.",
+      "infoTitle": "¿Sabías que…?",
+      "infoDescription": "Mezclar también cambia este diseño."
+    },
+    "undo": "Deshacer",
+    "undone": "Acción cancelada",
+    "processing": "Procesando…"
+  },
+  "api": {
+    "fallback": "Algo salió mal. Inténtalo de nuevo.",
+    "unexpected": "Ocurrió un error inesperado",
+    "http400": "La solicitud no es válida. Revisa los datos e inténtalo de nuevo.",
+    "http401": "Tu sesión expiró. Inicia sesión de nuevo.",
+    "http403": "No tienes permiso para realizar esta acción.",
+    "http404": "No se encontró el recurso solicitado.",
+    "http409": "Hubo un conflicto. Es posible que otra persona haya modificado el recurso.",
+    "http422": "Los datos enviados no son válidos. Revísalos e inténtalo de nuevo.",
+    "http429": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "http500": "Ocurrió un error interno. Inténtalo más tarde.",
+    "http502": "El servidor no está disponible temporalmente. Inténtalo más tarde.",
+    "http503": "El servicio no está disponible temporalmente. Inténtalo más tarde."
+  },
+  "frontend": {
+    "query": {
+      "loadFailed": "No se pudieron cargar los datos.",
+      "retry": "Reintentar"
+    },
+    "organization": {
+      "roleRequired": "Se requiere un rol para cambiar el rol de un miembro.",
+      "updateFailed": "No se pudo actualizar la organización",
+      "logoInvalidType": "Elige un archivo de imagen.",
+      "logoTooLarge": "El logo debe pesar menos de 5 MB.",
+      "logoReadFailed": "No se pudo leer ese archivo.",
+      "formCheck": "Revisa el formulario",
+      "updateSuccess": "Organización actualizada",
+      "createSuccess": "Se creó {{name}}",
+      "createdSwitchFailed": "Se creó {{name}}, pero no pudimos abrirla. Selecciónala en el selector de organizaciones.",
+      "logoUpdated": "Logotipo actualizado.",
+      "logoRemoved": "Logotipo eliminado."
+    },
+    "account": {
+      "copyFailed": "No se pudo copiar al portapapeles",
+      "themeCodeNumeric": "Introduce un código de tema numérico",
+      "copySuccess": "ID de cuenta copiado",
+      "themeLinkCopied": "Enlace del tema copiado",
+      "themeLinkCopiedDescription": "Comparte esta URL para reproducir el aspecto.",
+      "notificationStylePreview": "Estilo de notificación",
+      "notificationStylePreviewDescription": "{{variant}} — con tu acento y colores semánticos.",
+      "accountDeletionPending": "Cuenta eliminada. Cerrando sesión…",
+      "avatarInvalidType": "Elige un archivo de imagen.",
+      "avatarTooLarge": "El avatar debe pesar menos de 2 MB.",
+      "avatarUpdated": "Avatar actualizado.",
+      "avatarRemoved": "Avatar eliminado."
+    },
+    "hooks": {
+      "passkeys": {
+        "addFailed": "No se pudo añadir la llave de acceso",
+        "removeFailed": "No se pudo eliminar la llave de acceso",
+        "addSuccess": "Llave de acceso añadida",
+        "removeSuccess": "Llave de acceso eliminada"
+      },
+      "mfa": {
+        "disableFailed": "No se pudo desactivar la autenticación en dos pasos",
+        "enableSuccess": "Autenticación en dos pasos activada",
+        "disableSuccess": "Autenticación en dos pasos desactivada"
+      },
+      "members": {
+        "updateRoleFailed": "No se pudo actualizar el rol",
+        "removeFailed": "No se pudo eliminar al miembro",
+        "updateFailed": "No se pudo actualizar al miembro",
+        "updateRoleSuccess": "Rol del miembro actualizado",
+        "removeSuccess": "Miembro eliminado",
+        "suspendSuccess": "Miembro suspendido",
+        "reactivateSuccess": "Miembro reactivado"
+      },
+      "roles": {
+        "createFailed": "No se pudo crear el rol",
+        "updateFailed": "No se pudo actualizar el rol",
+        "deleteFailed": "No se pudo eliminar el rol",
+        "createSuccess": "Rol \"{{name}}\" creado",
+        "updateSuccess": "Rol \"{{name}}\" actualizado",
+        "deleteSuccess": "Rol eliminado"
+      },
+      "apiKeys": {
+        "createFailed": "No se pudo crear la clave API",
+        "renameFailed": "No se pudo renombrar la clave API",
+        "revokeFailed": "No se pudo revocar la clave API",
+        "createSuccess": "Clave API creada",
+        "renameSuccess": "Clave API renombrada",
+        "revokeSuccess": "Clave API revocada"
+      },
+      "sessions": {
+        "signOutFailed": "No se pudo cerrar esa sesión",
+        "signOutSuccess": "Sesión cerrada"
+      },
+      "notifications": {
+        "updateFailed": "No se pudo actualizar la notificación",
+        "updateManyFailed": "No se pudieron actualizar las notificaciones",
+        "savePreferencesFailed": "No se pudieron guardar las preferencias",
+        "savePreferencesSuccess": "Preferencias de notificación guardadas"
+      },
+      "webhooks": {
+        "createFailed": "No se pudo crear el webhook",
+        "deleteFailed": "No se pudo eliminar el webhook",
+        "createSuccess": "Webhook creado",
+        "deleteSuccess": "Webhook eliminado",
+        "updateSuccess": "Webhook actualizado"
+      },
+      "subscription": {
+        "changePlanFailed": "No se pudo cambiar el plan",
+        "changePlanSuccess": "Cambiado al plan {{plan}}",
+        "paymentSetupFailed": "Se cambió el plan, pero no se pudo iniciar el paso de pago. Vuelve a abrir Facturación para completarlo.",
+        "cancelSuccess": "La suscripción terminará al final del periodo",
+        "resumeSuccess": "Suscripción reanudada"
+      },
+      "invitations": {
+        "sendFailed": "No se pudo enviar la invitación",
+        "sendSuccess": "Invitación enviada a {{email}}",
+        "resendSuccess": "Invitación reenviada a {{email}}",
+        "cancelSuccess": "Invitación cancelada"
+      }
+    },
+    "profileUpdated": "Perfil actualizado"
+  },
+  "suspended": {
+    "title": "Organización suspendida",
+    "message": "Esta organización está suspendida. Contacta con una persona administradora para revisar la facturación o cambia a otra organización.",
+    "switchOrganization": "Cambiar de organización"
+  }
+}

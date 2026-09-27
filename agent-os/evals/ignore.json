@@ -1,0 +1,12 @@
+{
+  "paths": [
+    "agent-os/mcp/mcp.json",
+    "dist/",
+    "coverage/",
+    "test-results/",
+    ".codegraph/",
+    "docs/REQUIREMENT_FORMAT.md",
+    "scripts/setup-shadcnblocks.sh",
+    "scripts/get-api-key.sh"
+  ]
+}

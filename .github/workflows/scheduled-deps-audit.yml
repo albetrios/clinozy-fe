@@ -1,0 +1,35 @@
+name: Scheduled deps audit
+
+# Weekly `pnpm audit` over the full dependency tree. The PR `security-audit`
+# lane now runs only when a dependency manifest changes (pr-ci.yml `deps`
+# filter) — this cron restores advisory-drift coverage: a CVE published against
+# an already-installed, unchanged dependency is caught here even when no PR
+# touches package.json / pnpm-lock.yaml. Scheduled, so a finding surfaces as a
+# red run on the Actions tab (there is no merge to block); trigger on demand
+# with workflow_dispatch. Same two steps as the PR lane (all + prod deps).
+
+on:
+  schedule:
+    - cron: '30 7 * * 1' # weekly Mon 07:30 UTC — after the sync-drift canary (07:00)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Dependency audit (all deps)
+        run: pnpm deps:audit
+      - name: Production dependency audit
+        run: pnpm deps:audit:prod

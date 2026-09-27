@@ -1,0 +1,4 @@
+{
+  "_comment": "Frontend endpoint references that intentionally have no clinozy-be route YET. Each entry needs a reason; the gate (pnpm contracts:drift) fails when an entry becomes stale (the backend ships the route) so this list can only shrink toward zero.",
+  "entries": []
+}

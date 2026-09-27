@@ -1,0 +1,36 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: clinozy-fe
+  title: Clinozy Frontend
+  description: Enterprise multi-tenant admin dashboard (React + TypeScript + Vite)
+  annotations:
+    github.com/project-slug: albetrios/clinozy-fe
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/source-location: url:https://github.com/albetrios/clinozy-fe
+    sentry.io/project-slug: clinozy-fe
+    lighthouse.com/website-url: https://app.example.com
+  tags:
+    - react
+    - typescript
+    - vite
+    - tailwindcss
+    - enterprise
+  links:
+    - url: https://app.example.com
+      title: Production
+      icon: web
+    - url: https://staging.app.example.com
+      title: Staging
+      icon: web
+    - url: https://github.com/albetrios/clinozy-fe/actions
+      title: CI/CD
+      icon: github
+spec:
+  type: website
+  lifecycle: production
+  owner: team-frontend
+  system: clinozy-platform
+  dependsOn:
+    - component:clinozy-be
+  providesApis: []

@@ -1,0 +1,66 @@
+name: Reusable — Vitest unit (no browser)
+
+# PR gate: runs the full unit Vitest project (colocated src suites) with coverage
+# ratchet thresholds. Intentionally NOT `vitest --changed` — the full suite is the
+# authoritative merge gate (mirrors clinozy-be reusable-vitest-unit-only.yml).
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  run:
+    name: Unit + global
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Patch-coverage diffs against the PR base merge-base.
+          fetch-depth: 0
+
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      - name: Cache Vitest
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.vitest
+          key: vitest-unit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'vitest.config.ts') }}
+          restore-keys: |
+            vitest-unit-${{ runner.os }}-
+
+      - name: Run unit tests with coverage
+        run: pnpm test:ci
+
+      - name: Patch coverage (changed lines ≥ 90%)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch origin "$BASE_REF" --quiet
+          node tooling/ci/check-patch-coverage.mjs \
+            --coverage coverage/coverage-final.json \
+            --base "origin/$BASE_REF" \
+            --threshold 90
+
+      - name: Coverage summary
+        if: always() && hashFiles('coverage/coverage-summary.json') != ''
+        run: node tooling/ci/coverage-summary.mjs
+
+      - name: Upload coverage artifact
+        if: always() && hashFiles('coverage/lcov.info') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: coverage
+          path: |
+            coverage/lcov.info
+            coverage/coverage-summary.json
+          retention-days: 7

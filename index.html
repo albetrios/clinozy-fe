@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{PRODUCT_NAME}} — {{PRODUCT_DESCRIPTION}}" />
+    <link rel="preconnect" href="https://us.i.posthog.com" crossorigin />
+    <link rel="dns-prefetch" href="https://us.i.posthog.com" />
+    <!-- Turnstile loads on the login critical path (captcha script + iframe);
+         preconnecting shaves the TLS/handshake off LCP. -->
+    <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+    <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
+    <link rel="dns-prefetch" href="https://o0.ingest.sentry.io" />
+    <meta name="theme-color" content="{{PRODUCT_THEME_COLOR}}" />
+    <!-- frame-ancestors is intentionally absent here: browsers ignore it in
+         meta CSPs (header-only directive). It ships as a real header from
+         public/_headers, alongside X-Frame-Options: DENY. -->
+    <!-- CSP upgrade-insecure is header-only (dist/_headers). Omitting it from meta
+         avoids Safari/WebKit upgrading http://localhost assets to HTTPS during
+         local preview. See buildContentSecurityPolicy() in csp-api-origin.ts. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+             script-src 'self' https://challenges.cloudflare.com https://js.stripe.com https://us-assets.i.posthog.com;
+             style-src 'self' 'unsafe-inline';
+             connect-src 'self'<!-- CSP_API_CONNECT_SRC -->
+               https://*.ingest.sentry.io
+               https://*.sentry.io
+               https://us.i.posthog.com
+               https://us-assets.i.posthog.com
+               https://api.pwnedpasswords.com
+               https://api.stripe.com
+               https://m.stripe.com
+               https://m.stripe.network;
+             img-src 'self' data: blob:;
+             font-src 'self';
+             worker-src 'self' blob:;
+             frame-src https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com;
+             object-src 'none';
+             base-uri 'self';
+             form-action 'self';"
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>{{PRODUCT_NAME}}</title>
+    <!-- Runtime config from Docker entrypoint (noop in dev) -->
+    <script src="/config.js" defer></script>
+    <!-- Prevent theme FOUC: apply dark class + saved accent/radius before React hydrates -->
+    <script src="/theme-init.js"></script>
+    <!-- Prevent locale/dir FOUC: apply lang + dir from locale-preference before paint -->
+    <script src="/locale-init.js"></script>
+    <!-- Branded boot loader: mirrors the React FullPageSpinner so the HTML→React
+         handoff is ONE continuous screen. theme-init.js sets `.dark` first, so the
+         bg + colours are theme-correct (no white flash). A breathing pulse (not a
+         rotation) means the swap to React shows no visible animation restart.
+         `position: fixed` can't introduce a scrollbar. Replaced when React mounts. -->
+    <style>
+      html {
+        --color-background: oklch(1 0 0);
+        --color-foreground: oklch(0.145 0 0);
+        --color-primary: oklch(0.205 0 0);
+        --color-primary-foreground: oklch(0.985 0 0);
+        --color-muted: oklch(0.97 0 0);
+        --radius-lg: 0.5rem;
+        background: var(--color-background);
+      }
+      html.dark {
+        --color-background: oklch(0.145 0 0);
+        --color-foreground: oklch(0.985 0 0);
+        --color-primary: oklch(0.922 0 0);
+        --color-primary-foreground: oklch(0.205 0 0);
+        --color-muted: oklch(0.269 0 0);
+      }
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        overflow: hidden;
+        background: var(--color-background);
+        /* Keep in step with EXIT_FALLBACK_MS in src/lib/app-splash.ts. An
+           ease-OUT: the reveal starts fast, so the page underneath reads as
+           "there" within the first frames rather than half way through. */
+        transition:
+          opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 200ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      #app-splash.app-splash-exiting {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .app-splash-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      .app-splash-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: var(--radius-lg);
+        background: var(--color-primary);
+        color: var(--color-primary-foreground);
+        animation: app-splash-breathe 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+      }
+      .app-splash-mark svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+      .app-splash-name {
+        font:
+          600 1rem/1.2 'Inter',
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
+        letter-spacing: -0.01em;
+        color: var(--color-foreground);
+      }
+      .app-splash-track {
+        width: 8rem;
+        height: 0.25rem;
+        border-radius: 9999px;
+        background: var(--color-muted);
+        overflow: hidden;
+      }
+      .app-splash-bar {
+        width: 50%;
+        height: 100%;
+        border-radius: 9999px;
+        background: var(--color-primary);
+        animation: app-splash-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes app-splash-breathe {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(0.94);
+          opacity: 0.88;
+        }
+      }
+      @keyframes app-splash-progress {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(350%);
+        }
+      }
+      /* Shape language: Sharp (set pre-paint by theme-init.js). Mirrors what
+         index.css does to the React BrandLoader's `icon-chip` and `pill` slots,
+         so the HTML → React handoff does not change shape mid-boot. */
+      html[data-shape='sharp'] .app-splash-mark,
+      html[data-shape='sharp'] .app-splash-track,
+      html[data-shape='sharp'] .app-splash-bar {
+        border-radius: 0;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .app-splash-mark,
+        .app-splash-bar {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <p style="padding: 2rem; text-align: center">
+        JavaScript is required to run this application.
+      </p>
+    </noscript>
+    <!-- Boot splash sits OUTSIDE #root so React mount doesn't hard-cut it.
+         main.tsx fades it out after the first paint (ease-out crossfade). -->
+    <div id="app-splash" role="status" aria-label="Loading">
+      <div class="app-splash-brand">
+        <div class="app-splash-mark">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"
+            />
+            <path d="m7 16.5-4.74-2.85" />
+            <path d="m7 16.5 5-3" />
+            <path d="M7 16.5v5.17" />
+            <path
+              d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"
+            />
+            <path d="m17 16.5-5-3" />
+            <path d="m17 16.5 4.74-2.85" />
+            <path d="M17 16.5v5.17" />
+            <path
+              d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"
+            />
+            <path d="M12 8 7.26 5.15" />
+            <path d="m12 8 4.74-2.85" />
+            <path d="M12 13.5V8" />
+          </svg>
+        </div>
+        <span class="app-splash-name">{{PRODUCT_NAME}}</span>
+      </div>
+      <div class="app-splash-track"><div class="app-splash-bar"></div></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

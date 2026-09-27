@@ -1,0 +1,76 @@
+name: Release deploy
+
+# Production deploy, decoupled from post-merge. Fires when a GitHub Release is
+# published (release-please cuts it on the Release-PR merge, attributed to the
+# PAT, which is why the event fires) and is pinned to the RELEASE TAG — never a
+# moving branch SHA — so it is immune to any following merge and re-runnable for
+# the same tag via workflow_dispatch. The production Environment's required
+# reviewer (enforced inside reusable-netlify-deploy) is the one human gate.
+#
+# Why not deploy from post-merge-ci.yml: keying prod off `releases_created` in the
+# merge run ties it to that run's context and SHA. An event-driven, tag-pinned
+# deploy is re-runnable in isolation (re-publish the release, or dispatch{tag})
+# and can never deploy a SHA other than the tagged one.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to (re)deploy to production, e.g. v1.2.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  resolve:
+    name: Resolve release tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - id: tag
+        env:
+          EVENT_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${INPUT_TAG:-$EVENT_TAG}"
+          if [ -z "$tag" ]; then
+            echo "::error title=No release tag::Could not resolve a release tag from the event or input." >&2
+            exit 1
+          fi
+          # Stable release tags only — vX.Y.Z. Prereleases never reach production.
+          if ! printf '%s' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error title=Unexpected tag::'$tag' is not a stable vX.Y.Z tag; refusing to deploy." >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Resolved release tag: $tag"
+
+  deploy:
+    name: Deploy production
+    needs: resolve
+    # Rebuilds dist/ from the tagged tree (FE bakes VITE_* per build, so there is
+    # no image to promote — the tag ref is the pin). The production reviewer gate
+    # and never-cancel concurrency both live in the reusable.
+    # id-token/attestations: the reusable's run job mints the build-provenance
+    # attestation for the production bundle; a reusable's permissions must be a
+    # subset of the caller's grant or the workflow startup-fails.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/reusable-netlify-deploy.yml
+    secrets: inherit
+    with:
+      github_environment: production
+      ref: ${{ needs.resolve.outputs.tag }}
+      upload-release-artifact: true

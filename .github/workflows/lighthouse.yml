@@ -1,0 +1,64 @@
+name: Lighthouse CI
+
+# Weekly performance/a11y/best-practices budget over the built app — the
+# frontend analog of clinozy-be's scheduled k6 SLO lane. Budgets and asserted
+# categories live in .lighthouserc.cjs (perf ≥ 0.9 warn, a11y = 1.0 error,
+# best-practices ≥ 0.95 warn). Scheduled and non-blocking for PRs; a failing
+# run means a budget regressed on main.
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Every Monday 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  lighthouse:
+    name: Lighthouse budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - run: pnpm build
+
+      # Per-route transfer budgets for every route a signed-OUT visitor can
+      # reach, each measured in a cold browser context. Lives here rather than
+      # in the PR gate for the same reason Lighthouse does — it builds and
+      # drives a real browser — and it belongs with Lighthouse specifically
+      # because they answer the same question at different resolutions: the
+      # assertions in .lighthouserc.cjs are a coarse per-page ceiling, this
+      # names the individual chunks. Public routes need no backend, which is
+      # what lets either of them run in CI at all.
+      #
+      # `--update` is never passed here: re-pinning a budget is a decision, not
+      # something a scheduled job does on its own.
+      - run: pnpm exec playwright install --with-deps chromium
+      # Off 5173 deliberately: `lhci autorun` below starts `pnpm preview` on that
+      # port with --strictPort, so it fails hard rather than falling back if the
+      # port is still held. The two steps are sequential and this one exits
+      # first, but the default exists for the LOCAL `--authed` run, where 5173 is
+      # the origin clinozy-be's CSRF check allows. CI measures public routes only,
+      # where the origin does not matter — so there is nothing to trade here.
+      - run: pnpm perf:routes
+        env:
+          PERF_PORT: '4183'
+
+      # @lhci/cli is installed ad-hoc (heavy, only needed here);
+      # configuration lives in .lighthouserc.cjs.
+      - run: pnpm dlx @lhci/cli@0.15.x autorun
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 30

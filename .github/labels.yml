@@ -1,0 +1,89 @@
+# Manual reference for GitHub label name + color (pastel) + description.
+# Path-based attachment to PRs is handled by .github/labeler.yml; create/update
+# these labels in GitHub settings when label names, colors, or descriptions change.
+#
+# When adding a new area:
+#   1. Add an `area:<new>` entry under "Areas" below (keep alphabetised).
+#   2. Add the same key in .github/labeler.yml with its glob.
+#
+# Colors are 6-digit hex without `#` (GitHub label format).
+
+# ---------- Areas (pastel rainbow — one hue per area) ----------
+
+- name: 'area:auth'
+  color: 'F8BBD0'
+  description: 'Auth screens + auth runtime (token, refresh, idle-timeout, mocks)'
+
+- name: 'area:onboarding'
+  color: 'FFE0B2'
+  description: 'Post-signup onboarding flow (src/pages/onboarding)'
+
+- name: 'area:organization'
+  color: 'BBDEFB'
+  description: 'Organization islands, tenancy runtime, org-domain API'
+
+- name: 'area:settings'
+  color: 'E1BEE7'
+  description: 'Hash-driven SettingsModal (#settings/<scope>/<section>)'
+
+# ---------- Layers ----------
+
+- name: 'app-shell'
+  color: 'D7CCC8'
+  description: 'Route tree, guards, providers, analytics/observability bootstrap (src/app)'
+
+- name: 'core'
+  color: 'C5CAE9'
+  description: 'Framework-agnostic platform: HTTP, RBAC, config, data-provider (src/core)'
+
+- name: 'shared'
+  color: 'CFD8DC'
+  description: 'Cross-page components, forms, hooks, layouts, store (src/shared)'
+
+- name: 'ui-primitives'
+  color: 'B2EBF2'
+  description: 'Vendored shadcn/ui primitives (src/shared/components/ui)'
+
+# ---------- Concerns ----------
+
+- name: 'ci'
+  color: 'F0F4C3'
+  description: 'GitHub Actions workflows, composite actions, rulesets'
+
+- name: 'tests'
+  color: 'B2DFDB'
+  description: 'Vitest colocated suites, Playwright e2e, test utils'
+
+- name: 'docs'
+  color: 'FFECB3'
+  description: 'Hand-written docs under docs/ and top-level *.md'
+
+- name: 'dependencies'
+  color: 'D1C4E9'
+  description: 'package.json / pnpm lockfile updates (also set by Dependabot)'
+
+- name: 'tooling'
+  color: 'DCEDC8'
+  description: 'Dev/CI scripts, Vite build plugins, quality-gate configs'
+
+- name: 'agent-os'
+  color: 'FFF9C4'
+  description: 'Agent skills, rules, hooks, MCP config (agent-os/)'
+
+# ---------- PR size (set by .github/workflows/pr-governance.yml) ----------
+
+- name: 'size/small'
+  color: 'C8E6C9'
+  description: '≤ 50 added+deleted lines'
+
+- name: 'size/medium'
+  color: 'FFF9C4'
+  description: '51–200 added+deleted lines'
+
+- name: 'size/large'
+  color: 'FFE0B2'
+  description: '201–500 added+deleted lines'
+
+- name: 'size/x-large'
+  color: 'FFCDD2'
+  description: '> 500 added+deleted lines — consider splitting'

@@ -1,0 +1,258 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type ReactNode, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+
+import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
+import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
+import {
+  SETTINGS_KEYS,
+  SETTINGS_NS,
+} from '@/shared/components/SettingsModal/settings.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/components/ui/dialog.tsx';
+import { Input } from '@/shared/components/ui/input.tsx';
+import { Label } from '@/shared/components/ui/label.tsx';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select.tsx';
+import { useInviteMember } from '@/shared/hooks/useInvitations/index.ts';
+import { useRoles } from '@/shared/hooks/useRoles/index.ts';
+import { UserPlus } from '@/shared/icons/index.ts';
+
+const inviteSchema = z.object({
+  email: z.email('Enter a valid email address'),
+  roleId: z.string().min(1, 'Select a role'),
+});
+
+type InviteInput = z.infer<typeof inviteSchema>;
+
+/** The Owner role is never an invite target — an org has exactly one owner. */
+function isInvitableRole(role: RoleSummary): boolean {
+  return role.name.toLowerCase() !== 'owner';
+}
+
+/**
+ * Preselection order for the Role field, least privilege first. Every TEAM
+ * organization is provisioned with Admin / Member / Viewer, so one of these two
+ * is present unless someone has deleted it.
+ */
+const LEAST_PRIVILEGE_ROLE_NAMES = ['member', 'viewer'] as const;
+
+/**
+ * The role an invite should OPEN on: the least-privileged well-known role the
+ * organization still has, or nothing.
+ *
+ * The field used to open on `invitableRoles[0]`, which is whatever the roster
+ * sorts first — `Admin`, alphabetically, in every organization this app
+ * provisions. So the quiet path through the dialog (type an address, press
+ * send) handed a new teammate the second-most-powerful role in the
+ * organization, and the only thing standing between that and a real invite was
+ * the inviter noticing a select they never had to touch.
+ *
+ * A custom role is never preselected. The list carries no permission set to
+ * rank it by (`useRoles` omits permissions), so preselecting one would be a
+ * guess at how powerful it is — and a wrong guess here is a privilege grant.
+ * Returning `undefined` leaves the placeholder showing and makes the inviter
+ * choose, which the Role error below now says out loud.
+ */
+function leastPrivilegeRoleId(invitableRoles: RoleSummary[]): string | undefined {
+  for (const name of LEAST_PRIVILEGE_ROLE_NAMES) {
+    const match = invitableRoles.find((role) => role.name.toLowerCase() === name);
+    if (match) return match.id;
+  }
+  return undefined;
+}
+
+/**
+ * Dialog + form for inviting a new member to the active organization. Roles come
+ * from the org's real role set (`role_id` is required by clinozy-be's add-member
+ * endpoint), so a freshly-created org — which only has the system Owner role —
+ * shows a "create a role first" hint instead of an unusable form. Gated by the
+ * caller (render only when the user holds `invitation:manage`).
+ */
+export function InviteMemberDialog() {
+  const { t } = useTranslation(SETTINGS_NS);
+  const [open, setOpen] = useState(false);
+  const invite = useInviteMember();
+  const roles = useRoles();
+  const invitableRoles = (roles.rows ?? []).filter(isInvitableRole);
+  const hasRoles = invitableRoles.length > 0;
+  const defaultRoleId = leastPrivilegeRoleId(invitableRoles);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    getValues,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<InviteInput>({
+    resolver: zodResolver(inviteSchema),
+    defaultValues: { email: '', roleId: '' },
+  });
+
+  // Preselect the least-privileged well-known role once the list loads. Only
+  // while the field is UNTOUCHED: this effect re-runs whenever that id changes,
+  // and a refetch that reorders the list used to overwrite a role the user had
+  // already picked, mid-session (SET-11). When the organization has no Member
+  // and no Viewer the field stays empty on purpose — see leastPrivilegeRoleId.
+  useEffect(() => {
+    if (!defaultRoleId || getValues('roleId')) return;
+    setValue('roleId', defaultRoleId);
+  }, [defaultRoleId, getValues, setValue]);
+
+  const onSubmit = async (data: InviteInput) => {
+    await invite.mutateAsync(data);
+    reset({ email: '', roleId: defaultRoleId ?? '' });
+    setOpen(false);
+  };
+
+  let body: ReactNode;
+  if (roles.isPending) {
+    body = (
+      <p className="text-muted-foreground text-sm" data-testid="invite-member-loading">
+        Loading roles…
+      </p>
+    );
+  } else if (hasRoles) {
+    body = (
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+        data-testid="invite-member-form"
+      >
+        <div className="space-y-2">
+          <Label htmlFor="invite-email">Email</Label>
+          <Input
+            id="invite-email"
+            type="email"
+            placeholder={t(SETTINGS_KEYS.panels.members.emailPlaceholder)}
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'invite-email-error' : undefined}
+            data-testid="invite-member-email"
+            {...register('email')}
+          />
+          {errors.email && (
+            <p id="invite-email-error" className="text-destructive text-xs" role="alert">
+              {translateFormMessage(errors.email.message)}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="invite-role">Role</Label>
+          <Controller
+            control={control}
+            name="roleId"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="invite-role"
+                  className="w-full"
+                  aria-invalid={!!errors.roleId}
+                  aria-describedby={errors.roleId ? 'invite-role-error' : undefined}
+                  data-testid="invite-member-role"
+                >
+                  <SelectValue
+                    placeholder={t(SETTINGS_KEYS.panels.members.rolePlaceholder)}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {invitableRoles.map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {/* An organization with no Member and no Viewer opens with no role
+              chosen, and `handleSubmit` then blocks the send. Without this the
+              press did nothing, said nothing, and left the inviter staring at a
+              filled-in form — the Email field one div up has always shown its
+              error; this one never did. */}
+          {errors.roleId && (
+            <p id="invite-role-error" className="text-destructive text-xs" role="alert">
+              {translateFormMessage(errors.roleId.message)}
+            </p>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            data-testid="invite-member-submit"
+          >
+            {isSubmitting ? 'Sending…' : 'Send invitation'}
+          </Button>
+        </DialogFooter>
+      </form>
+    );
+  } else if (roles.isError) {
+    // "Create a role first" is a claim about the organization. A failed fetch is
+    // not evidence for it — the roles almost certainly exist (SET-11).
+    body = (
+      <div data-testid="invite-member-roles-error">
+        <RetryError
+          message={t(SETTINGS_KEYS.panels.roles.loadFailed)}
+          onRetry={roles.refetch}
+          isRetrying={roles.isFetching}
+        />
+      </div>
+    );
+  } else {
+    body = (
+      <div className="space-y-3" data-testid="invite-member-no-roles">
+        <p className="text-muted-foreground text-sm">
+          You need a role to assign before inviting anyone. Create one in the{' '}
+          <span className="text-foreground font-medium">Roles</span> tab, then come back
+          here.
+        </p>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </div>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" data-testid="invite-member-open">
+          <UserPlus className="me-2 h-4 w-4" />
+          Invite member
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite a member</DialogTitle>
+          <DialogDescription>
+            Send an email invitation to join this organization.
+          </DialogDescription>
+        </DialogHeader>
+        {body}
+      </DialogContent>
+    </Dialog>
+  );
+}

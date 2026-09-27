@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Refresh the codegraph index after a merge/pull. Local, incremental,
+# backgrounded → costs no LLM tokens and never blocks the merge.
+command -v codegraph >/dev/null 2>&1 || exit 0
+[ -f .codegraph/codegraph.db ] || exit 0
+( codegraph sync -q >/dev/null 2>&1 & ) || true

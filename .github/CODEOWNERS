@@ -1,0 +1,51 @@
+# CODEOWNERS — auto-assign reviewers based on file paths.
+#
+# Owner handles are DERIVED from `tooling/setup/setup.config.json` →
+# `project.codeowner`. To change them (a single user, or an `@org/team` once the
+# team grows), edit that field and run `pnpm identity:sync` — do not hand-edit the
+# rules below, or `pnpm validate:identity` will fail on the drift.
+
+# Default — all files
+* @nikunjmavani
+
+# Application shell and platform
+/src/app/                @nikunjmavani
+/src/core/               @nikunjmavani
+
+# Route islands
+/src/pages/              @nikunjmavani
+
+# Shared layer (auth runtime, tenancy, settings modal, ui primitives)
+/src/shared/             @nikunjmavani
+
+# Pure utilities
+/src/lib/                @nikunjmavani
+
+# Tests (e2e, load, utils)
+/tests/                  @nikunjmavani
+
+# CI/CD and repo automation
+/.github/                @nikunjmavani
+
+# Tooling, plugins, docs
+/tooling/                @nikunjmavani
+/plugins/                @nikunjmavani
+/docs/                   @nikunjmavani
+
+# Tooling and editor
+/.husky/                 @nikunjmavani
+/.vscode/                @nikunjmavani
+
+# Root configuration
+/package.json            @nikunjmavani
+/pnpm-lock.yaml          @nikunjmavani
+/tsconfig.json           @nikunjmavani
+/vite.config.ts          @nikunjmavani
+/vitest.config.ts        @nikunjmavani
+/playwright.config.ts    @nikunjmavani
+/biome.json              @nikunjmavani
+/sonar-project.properties @nikunjmavani
+/stryker.config.json     @nikunjmavani
+/.gitleaks.toml          @nikunjmavani
+/.semgrepignore          @nikunjmavani
+/netlify.toml            @nikunjmavani

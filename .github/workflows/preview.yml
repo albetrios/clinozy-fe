@@ -1,0 +1,227 @@
+name: Preview Deploy
+
+# Per-PR Netlify preview. Builds dist/ with the DEVELOPMENT environment's client
+# env (dev API, dev captcha) and publishes to a PR-scoped Netlify alias
+# (pr-<number>--clinozy-fe.netlify.app), then upserts a sticky PR comment with the
+# live URL. Advisory — NOT a required check (the ruleset requires only
+# `Quality gate` + `Checks`).
+#
+# Why separate from reusable-netlify-deploy.yml: that reusable is the GOVERNED
+# deploy path — fixed development/production aliases, the production reviewer
+# gate, per-environment never-cancel/batch concurrency, and release-artifact
+# upload. A preview differs on every one of those axes (a PR-scoped alias, no
+# gate, per-PR cancel-in-progress, no artifact), so it stays self-contained. It
+# still MIRRORS the reusable's env-materialization + build so a preview boots
+# identically (same VITE_* baked in → no boot-invariant white screen).
+#
+# Secrets: NETLIFY_* and VITE_* are ENVIRONMENT secrets (development). The job
+# declares `environment: development` (no protection → no gate, no branch policy)
+# to read them. Fork PRs and Dependabot PRs receive no environment secrets, so
+# HAS_NETLIFY is empty and the deploy is skipped with a notice — build coverage
+# for those PRs already comes from pr-ci's build-verify lane. Path-filtered so a
+# docs-only PR does not spend a build.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'plugins/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'tsconfig*.json'
+      - '.env.example'
+
+concurrency:
+  group: preview-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  preview:
+    name: Build & deploy preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: development
+    env:
+      # secrets.* is not readable in a step `if:` — hoist presence to job env so
+      # the deploy is SKIPPED (not failed) on fork/Dependabot PRs, which receive
+      # no environment secrets.
+      HAS_NETLIFY: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Preview unavailable (no deploy secrets)
+        if: env.HAS_NETLIFY != 'true'
+        run: echo "::notice title=Preview skipped::No Netlify environment secrets on this PR (fork or Dependabot). pr-ci build-verify still covers the build."
+
+      - uses: ./.github/actions/setup-node-pnpm
+        if: env.HAS_NETLIFY == 'true'
+
+      - name: Validate client env (development profile)
+        if: env.HAS_NETLIFY == 'true'
+        env:
+          DEPLOY_ENV: development
+          VITE_APP_ENV: development
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_CAPTCHA_DISABLED: ${{ vars.VITE_CAPTCHA_DISABLED }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_DEBUG_LOGGING: ${{ vars.VITE_DEBUG_LOGGING }}
+          VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
+          VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
+          VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+        run: pnpm validate:client-env --env "$DEPLOY_ENV"
+
+      - name: Resolve app version from release-please manifest
+        if: env.HAS_NETLIFY == 'true'
+        id: version
+        run: |
+          set -euo pipefail
+          version="$(jq -r '."."' ".github/release-please/manifest.json")"
+          echo "vite_app_version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build (development client env)
+        if: env.HAS_NETLIFY == 'true'
+        # Same env materialization as reusable-netlify-deploy.yml: Vite bakes
+        # import.meta.env.VITE_* from .env FILES, and all .env* are gitignored, so
+        # write the deploy-provided client env into .env.production.local (highest
+        # precedence, never uploaded — we deploy --dir=dist) before building.
+        # Key list = the reusable workflow's list minus the Sentry keys (PR
+        # previews never report to Sentry or upload sourcemaps); the sync is
+        # enforced by tests/ci/deploy-env-sync.policy.test.ts.
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_APP_ENV: development
+          VITE_APP_VERSION: ${{ steps.version.outputs.vite_app_version }}
+          VITE_CAPTCHA_DISABLED: ${{ vars.VITE_CAPTCHA_DISABLED }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
+          VITE_PRIVACY_POLICY_URL: ${{ secrets.VITE_PRIVACY_POLICY_URL }}
+          VITE_CSP_REPORT_URI: ${{ secrets.VITE_CSP_REPORT_URI }}
+          VITE_DEBUG_LOGGING: ${{ vars.VITE_DEBUG_LOGGING }}
+          VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
+          VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
+          VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+        run: |
+          set -euo pipefail
+          : > .env.production.local
+          for key in VITE_API_BASE_URL VITE_APP_ENV VITE_APP_VERSION VITE_CAPTCHA_DISABLED \
+            VITE_TURNSTILE_SITE_KEY VITE_STRIPE_PUBLISHABLE_KEY VITE_POSTHOG_KEY VITE_POSTHOG_HOST \
+            VITE_PRIVACY_POLICY_URL VITE_CSP_REPORT_URI \
+            VITE_DEBUG_LOGGING VITE_DEVTOOLS VITE_E2E_HOOKS VITE_VERSION_CHECK; do
+            value="${!key}"
+            if [ -n "$value" ]; then
+              printf '%s=%s\n' "$key" "$value" >> .env.production.local
+            fi
+          done
+          echo "Materialized $(grep -c = .env.production.local) client env keys for the preview build."
+          pnpm build
+
+      - name: Deploy preview to Netlify alias
+        if: env.HAS_NETLIFY == 'true'
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          alias="pr-${PR_NUMBER}"
+          pnpm exec netlify deploy --alias "$alias" --dir=dist --json > deploy-result.json
+          # Prefer the URL that actually carries the alias (pr-<n>--…), which is
+          # the reviewable preview; fall back across netlify's URL fields.
+          url=$(ALIAS="$alias" node -e '
+            const r = JSON.parse(require("fs").readFileSync("deploy-result.json", "utf8"));
+            const alias = process.env.ALIAS;
+            const cands = [r.deploy_ssl_url, r.deploy_url, r.ssl_url, r.url].filter(Boolean);
+            const aliased = cands.find((u) => u.includes(alias + "--"));
+            process.stdout.write(aliased || cands[0] || "");
+          ')
+          permalink=$(node -e '
+            const r = JSON.parse(require("fs").readFileSync("deploy-result.json", "utf8"));
+            process.stdout.write(r.deploy_url ?? r.deploy_ssl_url ?? "");
+          ')
+          if [ -z "$url" ]; then
+            echo "Could not read the preview URL from netlify output:" >&2
+            cat deploy-result.json >&2
+            exit 1
+          fi
+          echo "Preview deployed to $url"
+          {
+            echo "alias=$alias"
+            echo "url=$url"
+            echo "permalink=$permalink"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Preview smoke (best-effort)
+        if: env.HAS_NETLIFY == 'true' && steps.deploy.outputs.url != ''
+        id: smoke
+        continue-on-error: true
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          version_json=$(curl -fsS --retry 3 --retry-delay 5 "$DEPLOY_URL/version.json")
+          build_id=$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).buildId ?? ""))' "$version_json")
+          echo "build_id=${build_id}" >> "$GITHUB_OUTPUT"
+          echo "Preview smoke OK — buildId ${build_id}."
+
+      - name: Upsert preview comment
+        if: env.HAS_NETLIFY == 'true' && steps.deploy.outputs.url != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+          PREVIEW_PERMALINK: ${{ steps.deploy.outputs.permalink }}
+          PREVIEW_ALIAS: ${{ steps.deploy.outputs.alias }}
+          BUILD_ID: ${{ steps.smoke.outputs.build_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        with:
+          script: |
+            const marker = '<!-- preview-deploy -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const buildId = process.env.BUILD_ID || '_pending_';
+            const permalink = process.env.PREVIEW_PERMALINK;
+            const body = [
+              marker,
+              '## 🔎 Preview deploy ready',
+              '',
+              '| | |',
+              '| --- | --- |',
+              `| **Preview** | ${process.env.PREVIEW_URL} |`,
+              permalink ? `| **Permalink** | ${permalink} |` : '',
+              `| **Alias** | \`${process.env.PREVIEW_ALIAS}\` |`,
+              `| **Commit** | \`${process.env.HEAD_SHA}\` |`,
+              `| **Build ID** | \`${buildId}\` |`,
+              '',
+              '_Built with the development client env — not a production build._',
+            ].filter(Boolean).join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => (comment.body || '').includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              core.notice(`Updated preview comment #${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.notice('Created preview comment');
+            }

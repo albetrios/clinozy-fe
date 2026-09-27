@@ -1,0 +1,2 @@
+# One path fragment per line; optional #rule suffix to scope the exemption.
+# Example: src/pages/foo/FooPage.tsx #page-root

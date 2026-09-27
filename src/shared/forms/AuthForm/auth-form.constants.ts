@@ -1,0 +1,69 @@
+/** Unified auth entry — single screen for sign-in and sign-up. */
+export const AUTH_FORM_TEST_IDS = {
+  form: 'auth-form',
+  continueGoogle: 'auth-continue-google',
+  continueGithub: 'auth-continue-github',
+  continueApple: 'auth-continue-apple',
+  continuePasskey: 'auth-continue-passkey',
+  methodDivider: 'auth-method-divider',
+  socialMethods: 'auth-social-methods',
+  methodErrorBanner: 'auth-method-error-banner',
+  /** Fallback when the email panel itself throws (its own section boundary). */
+  emailPanelError: 'auth-email-panel-error',
+  emailPanel: 'auth-email-panel',
+  email: 'auth-email',
+  emailError: 'auth-email-error',
+  password: 'auth-password',
+  passwordToggle: 'auth-password-toggle',
+  passwordError: 'auth-password-error',
+  emailSubmit: 'auth-email-submit',
+  emailErrorBanner: 'auth-email-error-banner',
+  emailVerifyPanel: 'auth-email-verify-panel',
+  emailCode: 'auth-email-code',
+  emailVerify: 'auth-email-verify',
+  emailResend: 'auth-email-resend',
+  emailChange: 'auth-email-change',
+  autoGooglePending: 'auth-auto-google-pending',
+  // The gate notice (this branch) and the inline Turnstile slot (main) are
+  // different surfaces on the same screen, so both sets of hooks are kept.
+  captchaSlot: 'auth-captcha-slot',
+  skipAutoGoogle: 'auth-skip-auto-google',
+  /** Fallback selector for providers without a dedicated `continue*` id. */
+  continueProvider: (provider: string) => `auth-continue-${provider}`,
+} as const;
+
+/** Minimum wait before another email verification code can be sent from the verify step. */
+export const AUTH_EMAIL_VERIFICATION_CODE_RESEND_COOLDOWN_MS = 2 * 60 * 1000;
+
+/** Preferred OAuth button order on `/login` (unknown providers append after). */
+const AUTH_OAUTH_PROVIDER_ORDER = ['google', 'github', 'apple'] as const;
+
+export function sortOAuthProviders(providers: string[]): string[] {
+  const rank = new Map<string, number>(
+    AUTH_OAUTH_PROVIDER_ORDER.map((id, index) => [id, index]),
+  );
+  return [...providers].sort((a, b) => {
+    const ar = rank.get(a) ?? AUTH_OAUTH_PROVIDER_ORDER.length;
+    const br = rank.get(b) ?? AUTH_OAUTH_PROVIDER_ORDER.length;
+    return ar - br || a.localeCompare(b);
+  });
+}
+
+/**
+ * Keys naming each captcha-gated control, so an escalated challenge renders at the
+ * control the user pressed rather than at whichever slot mounted last.
+ *
+ * @remarks
+ * The email steps and every OAuth provider are separate targets. They are plain
+ * strings rather than a union so a provider added to the deployment's auth methods
+ * needs no change here.
+ */
+export const AUTH_CHALLENGE_KEYS = {
+  emailSend: 'email-send',
+  emailVerify: 'email-verify',
+} as const;
+
+/** Challenge-target key for one OAuth provider's button. */
+export function oauthChallengeKey(provider: string): string {
+  return `oauth:${provider}`;
+}

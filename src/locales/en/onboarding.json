@@ -1,0 +1,127 @@
+{
+  "manifest": {
+    "title": "Onboarding"
+  },
+  "steps": {
+    "welcome": {
+      "title": "Welcome aboard",
+      "description": "Let's set up your account in a few quick steps."
+    },
+    "profile": {
+      "title": "About you",
+      "description": "Tell us a little about yourself."
+    },
+    "questions": {
+      "title": "A few quick questions",
+      "description": "Optional — this helps us tailor your workspace."
+    },
+    "workspace": {
+      "title": "Your workspace",
+      "description": "Name the organization you want to create."
+    },
+    "invite": {
+      "title": "Invite your team",
+      "description": "Add teammates now or skip and do it later."
+    },
+    "done": {
+      "title": "You're all set",
+      "description": "Review and jump into your dashboard."
+    }
+  },
+  "welcome": {
+    "body": "We'll help you set up your profile, create your first organization, and invite your team. It only takes a minute.",
+    "bodyPersonal": "We'll help you set up your profile and personalize your workspace. It only takes a minute."
+  },
+  "profile": {
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "Ada",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Lovelace"
+  },
+  "questions": {
+    "teamSize": {
+      "label": "How big is your team?",
+      "options": {
+        "justMe": "Just me",
+        "twoToTen": "2–10",
+        "elevenToFifty": "11–50",
+        "fiftyOneToTwoHundred": "51–200",
+        "twoHundredPlus": "200+"
+      }
+    },
+    "useCase": {
+      "label": "What will you mainly use {{productName}} for?",
+      "options": {
+        "customerManagement": "Customer management",
+        "teamCollaboration": "Team collaboration",
+        "analyticsReporting": "Analytics & reporting",
+        "internalTools": "Internal tools",
+        "somethingElse": "Something else"
+      }
+    },
+    "referral": {
+      "label": "How did you hear about us?",
+      "options": {
+        "search": "Search",
+        "socialMedia": "Social media",
+        "friendOrColleague": "Friend or colleague",
+        "blogOrArticle": "Blog or article",
+        "other": "Other"
+      }
+    }
+  },
+  "workspace": {
+    "organizationNameLabel": "Organization name",
+    "organizationNamePlaceholder": "Acme Inc.",
+    "slugLabel": "Workspace URL (optional)",
+    "slugPlaceholder": "acme",
+    "urlPreview": "Your workspace will live at <1>{{productDomain}}/{{slug}}</1>",
+    "slugFallback": "your-workspace",
+    "slugInvalid": "Use lowercase letters, numbers and hyphens only."
+  },
+  "invite": {
+    "emailLabel": "Teammate email",
+    "emailPlaceholder": "teammate@company.com",
+    "addButton": "Add",
+    "invalidEmail": "Enter a valid email address.",
+    "duplicateEmail": "That teammate is already on the list.",
+    "removeAriaLabel": "Remove {{email}}"
+  },
+  "done": {
+    "nameLabel": "Name",
+    "organizationLabel": "Organization",
+    "invitesLabel": "Invites",
+    "emptyValue": "—",
+    "invitesPending_one": "{{count}} pending",
+    "invitesPending_other": "{{count}} pending"
+  },
+  "actions": {
+    "back": "Back",
+    "continue": "Continue",
+    "enterDashboard": "Enter dashboard",
+    "settingUp": "Setting up…"
+  },
+  "defaults": {
+    "organizationName": "My organization",
+    "memberRoleName": "Member",
+    "memberRoleDescription": "Default role for invited teammates."
+  },
+  "toast": {
+    "finishSuccess": "Welcome! Your workspace is ready.",
+    "finishSuccessWithInvites_one": "Welcome! Your workspace is ready — {{count}} invitation sent.",
+    "finishSuccessWithInvites_other": "Welcome! Your workspace is ready — {{count}} invitations sent.",
+    "finishError": "Something went wrong finishing setup. Please try again.",
+    "profileSaveFailed": "We couldn't save your name. Your workspace is ready — add it in Settings.",
+    "invitePartialFailure_one": "Workspace ready — {{count}} invite couldn't be sent. You can resend from Members.",
+    "invitePartialFailure_other": "Workspace ready — {{count}} invites couldn't be sent. You can resend from Members."
+  },
+  "session": {
+    "loadError": "We couldn't load your account setup. Check your connection and try again."
+  },
+  "guard": {
+    "title": "Leave onboarding?",
+    "description": "Your progress is saved locally, but leaving now may interrupt setup.",
+    "discard": "Leave",
+    "stay": "Stay"
+  }
+}

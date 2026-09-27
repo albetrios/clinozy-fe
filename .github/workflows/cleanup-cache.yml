@@ -1,0 +1,346 @@
+name: Cleanup caches
+
+# Keeps the repository's GitHub Actions cache footprint well below the 10 GB
+# repo cap. When the cap is hit, GitHub silently stops scheduling workflow
+# runs (no banner, no error, just zero new runs and HTTP 500 on dispatch),
+# which has bitten clinozy-be before.
+#
+# Triggers:
+#   - pull_request closed (merged or not)          -> drop every cache scoped
+#                                                    to the PR ref. PR caches
+#                                                    have no use once the PR
+#                                                    is closed. Also tears down
+#                                                    the PR's Netlify preview
+#                                                    alias (pr-<n>) from
+#                                                    preview.yml (separate job).
+#   - workflow_run completed for our top-level CI  -> for PR runs, drop all
+#                                                    caches on that PR ref;
+#                                                    for main runs, keep
+#                                                    only the most-recent N
+#                                                    caches per key so post-
+#                                                    merge runs stay fast.
+#   - schedule (daily)                             -> safety-net LRU cap across
+#                                                    main refs.
+#   - workflow_dispatch                            -> manual prune (defaults
+#                                                    to the dispatching ref).
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_run:
+    # Names must match each workflow's `name:` exactly — a stale name here means
+    # that trigger never fires (this listened for the old 'CI' name before).
+    workflows:
+      - 'PR CI'
+      - 'PR Governance'
+      - 'Docs lane'
+      - 'Post-merge CI'
+    types: [completed]
+  schedule:
+    - cron: '15 4 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to clean (e.g. refs/heads/main or refs/pull/123/merge). Defaults to the dispatching ref.'
+        required: false
+        default: ''
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: cache-cleanup-${{ github.event.pull_request.number || github.event.workflow_run.id || github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+  KEEP_PER_BRANCH: '10'
+  KEEP_FAILED_RUNS: '3'
+
+jobs:
+  cleanup:
+    name: Delete caches
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Resolve cache scope
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DISPATCH_REF: ${{ inputs.ref }}
+          DEFAULT_REF: ${{ github.ref }}
+          WF_RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WF_RUN_EVENT: ${{ github.event.workflow_run.event }}
+          WF_RUN_PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          WF_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+
+          ref=""
+          mode="full"
+          keep_count="${KEEP_PER_BRANCH}"
+
+          case "$EVENT_NAME" in
+            pull_request)
+              ref="refs/pull/${PR_NUMBER}/merge"
+              ;;
+            workflow_run)
+              if [ "$WF_RUN_EVENT" = "pull_request" ] && [ -n "${WF_RUN_PR_NUMBER:-}" ]; then
+                ref="refs/pull/${WF_RUN_PR_NUMBER}/merge"
+                if [ "$WF_RUN_CONCLUSION" = "failure" ]; then
+                  mode="lru"
+                  keep_count="${KEEP_FAILED_RUNS}"
+                fi
+              elif [ -n "${WF_RUN_BRANCH:-}" ]; then
+                ref="refs/heads/${WF_RUN_BRANCH}"
+                case "$WF_RUN_BRANCH" in
+                  main)
+                    mode="lru"
+                    if [ "$WF_RUN_CONCLUSION" = "failure" ]; then
+                      keep_count="${KEEP_FAILED_RUNS}"
+                    fi
+                    ;;
+                esac
+              fi
+              ;;
+            schedule)
+              mode="scheduled"
+              ;;
+            workflow_dispatch)
+              if [ -n "${DISPATCH_REF:-}" ]; then
+                ref="$DISPATCH_REF"
+              else
+                ref="$DEFAULT_REF"
+              fi
+              ;;
+            *)
+              echo "Unsupported event: $EVENT_NAME"
+              ;;
+          esac
+
+          if [ "$mode" = "scheduled" ]; then
+            {
+              echo "mode=scheduled"
+              echo "keep_count=${KEEP_PER_BRANCH}"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "$ref" ]; then
+            echo "Could not resolve a cache ref; nothing to do."
+            {
+              echo "ref="
+              echo "mode=skip"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Cleaning caches for ref=$ref (mode=$mode keep=$keep_count)"
+          {
+            echo "ref=$ref"
+            echo "mode=$mode"
+            echo "keep_count=$keep_count"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install gh actions-cache extension
+        if: steps.scope.outputs.mode != 'skip'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh extension install actions/gh-actions-cache --force
+
+      - name: Delete caches
+        if: steps.scope.outputs.mode != 'skip' && steps.scope.outputs.mode != 'scheduled'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ steps.scope.outputs.ref }}
+          MODE: ${{ steps.scope.outputs.mode }}
+          KEEP_PER_BRANCH: ${{ steps.scope.outputs.keep_count }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t entries < <(
+            gh actions-cache list --repo "$REPO" --ref "$REF" --limit 100 \
+              --order desc --sort last-used \
+              | awk 'NF' || true
+          )
+
+          if [ "${#entries[@]}" -eq 0 ]; then
+            echo "No caches found for $REF."
+            exit 0
+          fi
+
+          if [ "$MODE" = "full" ]; then
+            echo "Deleting all ${#entries[@]} cache entries for $REF."
+            for entry in "${entries[@]}"; do
+              key="$(printf '%s' "$entry" | awk '{print $1}')"
+              [ -n "$key" ] || continue
+              gh actions-cache delete "$key" --repo "$REPO" --ref "$REF" --confirm || true
+            done
+            exit 0
+          fi
+
+          declare -A seen
+          deleted=0
+          kept=0
+          for entry in "${entries[@]}"; do
+            key="$(printf '%s' "$entry" | awk '{print $1}')"
+            [ -n "$key" ] || continue
+            count="${seen[$key]:-0}"
+            if [ "$count" -lt "$KEEP_PER_BRANCH" ]; then
+              seen[$key]=$((count + 1))
+              kept=$((kept + 1))
+              continue
+            fi
+            gh actions-cache delete "$key" --repo "$REPO" --ref "$REF" --confirm || true
+            deleted=$((deleted + 1))
+          done
+          echo "LRU prune complete for $REF - kept $kept, deleted $deleted."
+
+      - name: Scheduled safety-net LRU for main
+        if: steps.scope.outputs.mode == 'scheduled'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          KEEP_PER_BRANCH: ${{ env.KEEP_PER_BRANCH }}
+        run: |
+          set -euo pipefail
+          for branch in main; do
+            ref="refs/heads/${branch}"
+            mapfile -t entries < <(
+              gh actions-cache list --repo "$REPO" --ref "$ref" --limit 100 \
+                --order desc --sort last-used \
+                | awk 'NF' || true
+            )
+            if [ "${#entries[@]}" -eq 0 ]; then
+              continue
+            fi
+            declare -A seen
+            for entry in "${entries[@]}"; do
+              key="$(printf '%s' "$entry" | awk '{print $1}')"
+              [ -n "$key" ] || continue
+              count="${seen[$key]:-0}"
+              if [ "$count" -lt "$KEEP_PER_BRANCH" ]; then
+                seen[$key]=$((count + 1))
+                continue
+              fi
+              gh actions-cache delete "$key" --repo "$REPO" --ref "$ref" --confirm || true
+            done
+            echo "Scheduled LRU prune complete for ${ref}."
+          done
+
+  preview-teardown:
+    name: Teardown preview deploys
+    # Only on PR close — delete the pr-<number> Netlify preview alias's deploys so
+    # closed PRs don't accumulate previews (Netlify keeps every deploy forever).
+    # The other triggers (workflow_run/schedule/dispatch) are cache-only. Declares
+    # environment: development to read the Netlify secrets; fork/Dependabot PRs get
+    # no environment secrets → HAS_NETLIFY empty → skipped. Best-effort: a failure
+    # to reach Netlify never fails PR-close cleanup.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: development
+    # Job-level permissions REPLACE the workflow-level (actions: write) set — this
+    # job needs pull-requests: write for the comment, not cache access.
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      # secrets.* is not readable in a step `if:` — hoist presence to job env.
+      HAS_NETLIFY: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+    steps:
+      - name: Preview teardown unavailable (no deploy secrets)
+        if: env.HAS_NETLIFY != 'true'
+        run: echo "::notice title=Preview teardown skipped::No Netlify environment secrets (fork/Dependabot PR); nothing to tear down."
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.HAS_NETLIFY == 'true'
+        with:
+          fetch-depth: 1
+
+      - uses: ./.github/actions/setup-node-pnpm
+        if: env.HAS_NETLIFY == 'true'
+
+      - name: Delete pr-<number> preview deploys
+        if: env.HAS_NETLIFY == 'true'
+        id: teardown
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          alias="pr-${PR_NUMBER}"
+          site_data=$(jq -nc --arg s "$NETLIFY_SITE_ID" '{site_id:$s}')
+          if ! deploys_json=$(pnpm exec netlify api listSiteDeploys --data "$site_data"); then
+            echo "::warning title=Preview teardown::Could not list Netlify deploys; leaving previews to age out."
+            echo "deleted=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Match deploys whose alias URL carries this PR's alias (pr-<n>--<site>).
+          # The alias lives in links.alias; the immutable deploy_ssl_url does not,
+          # so check every URL field. Best-effort — under-matching just leaves a
+          # preview to age out, never fails the close.
+          mapfile -t ids < <(ALIAS="$alias" DEPLOYS_JSON="$deploys_json" node -e '
+            const alias = process.env.ALIAS;
+            const deploys = JSON.parse(process.env.DEPLOYS_JSON);
+            for (const d of deploys) {
+              const urls = [
+                d.deploy_ssl_url, d.deploy_url, d.ssl_url, d.url,
+                d.links && d.links.alias,
+              ].filter(Boolean);
+              if (urls.some((u) => String(u).includes(alias + "--")) && d.id) {
+                process.stdout.write(d.id + "\n");
+              }
+            }
+          ')
+          if [ "${#ids[@]}" -eq 0 ]; then
+            echo "No preview deploys found for alias ${alias}."
+            echo "deleted=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          deleted=0
+          for id in "${ids[@]}"; do
+            [ -n "$id" ] || continue
+            data=$(jq -nc --arg d "$id" '{deploy_id:$d}')
+            if pnpm exec netlify api deleteDeploy --data "$data"; then
+              deleted=$((deleted + 1))
+            else
+              echo "Could not delete deploy ${id} (already gone?)."
+            fi
+          done
+          echo "Deleted ${deleted} preview deploy(s) for alias ${alias}."
+          echo "deleted=${deleted}" >> "$GITHUB_OUTPUT"
+
+      - name: Mark preview comment torn down
+        if: env.HAS_NETLIFY == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_ALIAS: pr-${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const marker = '<!-- preview-deploy -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => (comment.body || '').includes(marker));
+            if (!existing) {
+              core.notice('No preview comment to update.');
+              return;
+            }
+            const body = [
+              marker,
+              '## 🔎 Preview deploy',
+              '',
+              `_Torn down — the \`${process.env.PR_ALIAS}\` preview alias was removed when this PR closed._`,
+            ].join('\n');
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            core.notice(`Updated preview comment #${existing.id} (torn down).`);

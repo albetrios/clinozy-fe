@@ -1,0 +1,11 @@
+[allowlist]
+description = "Global Allowlist"
+paths = [
+  '''node_modules''',
+  '''\.git''',
+  '''dist''',
+  '''build''',
+  '''coverage''',
+  '''\.env\.example''',
+  '''pnpm-lock\.yaml''',
+]

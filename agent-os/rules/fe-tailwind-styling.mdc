@@ -1,0 +1,155 @@
+---
+description: Tailwind CSS v4 styling conventions and design token usage for clinozy-fe
+globs: src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Tailwind CSS v4 Styling Guide
+
+## Configuration
+
+This project uses **Tailwind CSS v4** with CSS-first configuration. There is NO `tailwind.config.ts` file.
+
+- All design tokens are defined in `src/index.css` via the `@theme` directive
+- The Vite plugin `@tailwindcss/vite` handles processing
+- Colors use the **OKLCH** color space for perceptual uniformity
+
+## Design Tokens
+
+Use these semantic color tokens (not raw colors):
+
+| Token                    | Usage                                |
+| ------------------------ | ------------------------------------ |
+| `bg-background`          | Page background                      |
+| `text-foreground`        | Primary text                         |
+| `bg-card` / `text-card-foreground` | Card surfaces              |
+| `bg-primary` / `text-primary-foreground` | Primary buttons, links |
+| `bg-secondary`           | Secondary buttons, subtle backgrounds|
+| `bg-destructive`         | Delete buttons, error states         |
+| `bg-muted` / `text-muted-foreground` | Disabled, subtle text     |
+| `bg-accent`              | Hover states, highlights             |
+| `border-border`          | Default borders                      |
+| `ring-ring`              | Focus rings                          |
+| `bg-sidebar`             | Sidebar background                   |
+
+## Dark Mode
+
+- Dark mode is toggled via `.dark` class on `<html>`
+- Managed by `useThemeStore` (persisted to localStorage)
+- Dark overrides are defined in `src/index.css` under `.dark { ... }`
+- **Never use** `dark:` variant in component code — the CSS variables handle it automatically
+
+## Class Merging
+
+Always use `cn()` from `@/lib/utils.ts` to merge Tailwind classes:
+
+```tsx
+import { cn } from '@/lib/utils.ts';
+
+<div className={cn('base-classes', isActive && 'active-classes', className)} />
+```
+
+This correctly handles Tailwind class conflicts (e.g., `p-2` vs `p-4`).
+
+## Responsive Design
+
+Use Tailwind's mobile-first breakpoints:
+
+```tsx
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+```
+
+Breakpoints: `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px), `2xl` (1536px),
+plus two declared in `index.css` for the big-monitor tier — **`3xl` (1920px)** and
+**`4xl` (2560px)**. A layout that stops growing at `2xl` floats in the middle of a big
+monitor: let the content column, the sidebar, hero type and large overlays keep scaling.
+
+House rules (full reasoning: `docs/reference/design.md` → Screen tiers):
+
+- The sidebar is a **drawer below `lg`**, not `md`; closed means `invisible`, not just
+  translated away (off-screen is still focusable).
+- The bottom tab bar exists below `md`. Anything else pinned to the bottom edge uses
+  `bottom-[calc(var(--floating-bottom-offset,0rem)+…)]` so it rides above the bar.
+- An overlay that is a sheet on phones must **undo** the sheet from `sm`
+  (`sm:w-[calc(100%-2rem)] sm:rounded-lg`), not merely cap its width.
+- User-supplied text that may have no break opportunity gets `wrap-anywhere`.
+- New floating surfaces take the bottom-**start** corner; the end corner is taken.
+
+## What Tailwind scans
+
+`src/index.css` imports Tailwind with `source('../src')` and excludes `*.test.ts(x)`: the
+production stylesheet is generated from the app, not from docs, skills, tooling fixtures or
+specs (which used to contribute ~2.2 kB gzipped of utilities nothing renders). Two
+consequences: write **full** class names in source — a name assembled at runtime
+(`` `gap-${n}` ``) is not generated — and never rely on a class that only a test or a doc
+spells. `pnpm build:check` trips if the scan widens again.
+
+## Spacing follows the Density axis
+
+Write padding, margin and gap as **scale steps** (`p-6`, `gap-2`). Each one is
+`calc(var(--spacing) * n)` and the Density axis sets `--spacing`, so they follow the theme
+for free. A literal (`p-[24px]`, `gap-[0.5rem]`) is pixel-identical on the default look and
+ignores the setting — `pnpm validate:theme-axis` (check 7) rejects it; `[var(--…)]` and
+`[calc(…)]` are fine.
+
+Dialogs are inset `p-6` by `DialogContent`. A surface that opts out with `p-0` to lay out
+its own panes (the settings modal) repeats that same step on **every** pane, so no pane
+hugs a corner while its neighbor floats.
+
+## Corner radius
+
+Use a **named** step — `rounded-xs` … `rounded-4xl`. All of them follow the Corner radius
+axis (`sm/md/lg/xl` are set inline; the rest derive from `--radius-lg` in `index.css`).
+A bare `rounded` and an arbitrary `rounded-[3px]` follow nothing and are rejected by
+`pnpm validate:theme-axis`; `rounded-[var(--radius-*)]` is fine.
+
+`rounded-full` is a **shape** decision. On anything that is a surface — a chip, a count
+badge, an icon disc, a track — add `data-slot="pill"` (or use a primitive that already has
+a slot: `Badge`, `Avatar`, `Button`, `Skeleton`) so the Sharp shape can square it.
+`pnpm validate:theme-axis` (check 6) rejects a `rounded-full` with no slot within 5 lines
+above it. Status dots (at most 10px — `size-2.5`), blurred glows and pseudo-element markers
+stay round / are squared in `index.css`. Never write an unconditional `rounded-none`; scope
+it to the breakpoint where the element really is edge-to-edge.
+
+## Typography
+
+- Font family: Inter (sans), JetBrains Mono (mono) — defined in `@theme`
+- Use Tailwind's `text-*` utilities for sizing — **minimum `text-xs` (12px) for readable UI copy**; do not use arbitrary sizes below 12px (e.g. `text-[0.6875rem]`) for labels, hints, or body text on product surfaces
+- **Surface pairing:** on `bg-card` / `bg-popover`, use `text-card-foreground` (or shadcn `Card`, which sets it). On `bg-background`, use `text-foreground`. Never put `text-foreground` on a card surface without checking contrast in both modes
+- **Preset axes:** type scale, density, and motion floors — `docs/reference/preset-product-design-rules.md`
+- Heading pattern: `text-3xl font-bold tracking-tight text-foreground`
+- Body pattern: `text-sm text-muted-foreground`
+
+## Spacing Conventions
+
+- Page padding: `p-6`
+- Section gaps: `space-y-6` or `space-y-8`
+- Card internal padding: handled by shadcn Card components
+- Grid gaps: `gap-4` (standard), `gap-6` (sections)
+
+## Component Styling with CVA
+
+Use `class-variance-authority` for components with variants:
+
+```tsx
+const variants = cva('base', {
+  variants: {
+    variant: { default: '...', destructive: '...' },
+    size: { sm: '...', default: '...', lg: '...' },
+  },
+  defaultVariants: { variant: 'default', size: 'default' },
+});
+```
+
+## shadcn/ui Components
+
+All shadcn/ui primitives live in `src/shared/components/ui/`. When adding new components via the shadcn CLI, they will be placed there automatically (configured in `components.json`).
+
+## Forbidden Patterns
+
+- Never use inline `style={}` attributes
+- Never use `@apply` in component files (only in `index.css` base layer)
+- Never use `dark:` variant in components — rely on CSS variable overrides
+- Never hardcode colors — always use design tokens
+- Never use `!important`
+- **Never fade page/route content with opacity** — `--animate-fade-in-up` maps to transform-only `route-rise` in `index.css`. Do not reintroduce `opacity: 0` on `PageTransition`, layout outlets, or other wrappers that hold primary copy (causes invisible text with `animation-fill-mode: both` + reduced motion). Opacity fades are OK on overlays/dialogs, not on main content shells

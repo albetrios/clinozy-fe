@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "pnpm",
+      "args": ["exec", "codegraph", "serve", "--mcp"]
+    },
+    "headroom": {
+      "command": "uvx",
+      "args": ["--from", "headroom-ai[mcp]", "headroom", "mcp", "serve"]
+    },
+    "context7": {
+      "command": "pnpm",
+      "args": ["exec", "context7-mcp", "--api-key", "${CONTEXT7_API_KEY}"]
+    },
+    "shadcn": {
+      "command": "pnpm",
+      "args": ["exec", "shadcn", "mcp"]
+    },
+    "tailwindcss": {
+      "command": "pnpm",
+      "args": ["exec", "tailwindcss-server"]
+    },
+    "clinozy-be-api": {
+      "url": "http://localhost:3000/api/v1/mcp"
+    },
+    "semgrep": {
+      "command": "uvx",
+      "args": ["semgrep-mcp"]
+    },
+    "chrome-devtools": {
+      "command": "node",
+      "args": ["tooling/dev/chrome-devtools-mcp.mjs"]
+    },
+    "sonarqube": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--init",
+        "--pull=always",
+        "--rm",
+        "-i",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "-e",
+        "SONARQUBE_URL",
+        "mcp/sonarqube"
+      ]
+    }
+  }
+}

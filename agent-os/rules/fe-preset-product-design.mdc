@@ -1,0 +1,48 @@
+---
+description: Product-design rules for Appearance/Shuffle preset axes — typography floors, density, contrast, motion. Read before changing presets.ts, theme apply logic, or dense product UI.
+globs:
+  - src/shared/theme/**
+  - src/shared/components/AppearanceDialog/**
+  - src/shared/store/useThemeStore/**
+  - docs/reference/theming.md
+  - docs/reference/design.md
+  - docs/reference/preset-product-design-rules.md
+---
+
+# Preset product-design rules
+
+Before changing theme catalogs, `applyGeneratedTheme`, Appearance pickers, or
+dense product UI that relies on preset axes, read:
+
+**`docs/reference/preset-product-design-rules.md`**
+
+## Non-negotiable product floors
+
+1. **Type scale:** `default` keeps stock Tailwind sizes. Product UI must not
+   ship with `--text-xs` below **0.75rem (12px)**. Avoid `grand` / `display`
+   for admin labels; prefer `text-sm` for secondary copy.
+2. **Density:** Scales **`--spacing` only**, not font size. Default product =
+   `cozy`. `compact` is desktop/data-heavy opt-in.
+3. **Contrast:** Semantic token pairs only; `text-card-foreground` on
+   `bg-card`. Verify light + dark at AA.
+4. **Motion:** No opacity-based fades on route/content shells (`PageTransition`
+   = transform-only). Honour `prefers-reduced-motion` → instant.
+5. **Touch:** Interactive targets ≥ **24×24 CSS px** (44×44 for primary on
+   coarse pointer).
+6. **Layout:** Default **`contained`** shell; user picks **Standard / Full / Reading**
+   in Appearance → Layout (unless `VITE_LAYOUT_WIDTH` locks deploy).
+
+## Shuffle vs product defaults
+
+Shuffle may pick extreme axes for demos. Production defaults live in
+`DEFAULT_LOOK` (`presets.ts`): `cozy`, `default` type scale, `normal` contrast.
+Do not change defaults without updating the doc + `validate:theme-catalog`.
+
+## When implementing UI
+
+- Use relative type utilities (`text-sm`, `text-xs`), not px/arbitrary sub-12px.
+- Surfaces that participate in elevation/separation need `data-slot`.
+- Test Appearance at axis extremes once per feature area.
+
+Full per-axis tables, external references (Atlassian, Material, Cloudscape,
+WCAG), and diagnostics: **`docs/reference/preset-product-design-rules.md`**.

@@ -1,0 +1,419 @@
+name: Post-merge CI
+
+# Trunk post-merge pipeline — runs on every push to `main` (the single trunk;
+# hotfixes are fix-forward on `main`, no release branches). Single-channel: one
+# release-please config, one manifest, one changelog.
+#
+# NO redundant testing: pr-ci.yml is the merge gate and already ran lint, types,
+# unit + security tests, build, and the security scans on this exact SHA behind
+# the required `quality-gate` check. Post-merge does ONLY what the gate cannot.
+#
+# Per-merge cost is minimized — a routine feature merge runs only release-please
+# (~30s) + a batched development-alias deploy:
+#   • SBOM is generated ONLY when release-please actually cuts a release (it is
+#     consumed only by release-sbom), not on every merge.
+#   • deploy-development batches: cancel-in-progress on its concurrency group, so
+#     a burst of N merges close together collapses to ONE deploy of the final
+#     HEAD; a lone merge deploys by itself.
+#   • deploy-development is decoupled from release-please — the development alias tracks
+#     trunk HEAD even if release-please has a transient failure.
+# release-please is serialized and NEVER cancelled, so a release is never lost to
+# a following merge. The production deploy is a separate workflow, release-deploy.yml
+# (on `release: published`, pinned to the tag).
+#
+# Deploy split (deploy-per-purpose, not deploy-per-branch):
+#   deploy-development → src pushes to main → Netlify --alias development (ungated)
+#   production deploy  → MOVED to release-deploy.yml (on `release: published`,
+#                        pinned to the tag) — this workflow no longer deploys prod.
+#
+# Rollback: rollback-deploy.yml (instant restore of the previous deploy). Redeploy
+# an old tag: release-deploy.yml via workflow_dispatch{tag}. Both keep the
+# production reviewer gate.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_deploy:
+        description: Skip Netlify deploy
+        required: false
+        type: boolean
+        default: false
+      skip_release:
+        description: Skip release-please
+        required: false
+        type: boolean
+        default: false
+
+# No workflow-level concurrency: runs may overlap so a burst of merges can batch
+# at the deploy. The critical sections are serialized per-JOB below.
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      src-code: ${{ steps.filter.outputs.src-code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            src-code:
+              - 'src/**'
+              - 'plugins/**'
+              - 'public/**'
+              - 'tests/**'
+              - 'tooling/**'
+              - 'index.html'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'vite.config.ts'
+              - 'vitest.config.ts'
+              - 'playwright.config.ts'
+              - 'tsconfig*.json'
+
+  release-please:
+    name: Release Please
+    if: always() && inputs.skip_release != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Serialized across runs, NEVER cancelled — a release push must complete, and
+    # concurrent runs must not race on the standing Release PR.
+    concurrency:
+      group: post-merge-release-please-${{ github.ref }}
+      cancel-in-progress: false
+    # RELEASE_PLEASE_TOKEN is an ENVIRONMENT secret, so this job must select an
+    # environment to read it. `development` is the only viable choice: its
+    # protection block is empty (.github/environments/development.json), so
+    # selecting it grants secret access WITHOUT adding a gate. `production` is
+    # not usable here — its requiredReviewers would pause this job on every
+    # merge to main. Effectively still ungated: refreshing the standing Release
+    # PR is harmless, and the ONE human gate lives at the production deploy
+    # (release-deploy.yml), nowhere else.
+    #
+    # ⚠ Adding any protection rule to the `development` environment (required
+    # reviewers, wait timer, branch policy) will silently start blocking this
+    # job — and the pat-canary and dependabot-auto-merge jobs with it.
+    environment: development
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: write
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created == 'true' && 'true' || 'false' }}
+    env:
+      # secrets.* is not readable in step `if:` expressions — hoist to job env.
+      HAS_RELEASE_PLEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      # The github.token fallback keeps the job green if the PAT is ever unset,
+      # but degrades SILENTLY: auto-merged release-PR merges then do not
+      # re-trigger this workflow, so the tag/GitHub Release is never cut. Surface
+      # it on every run instead of at release time.
+      - name: Tripwire — RELEASE_PLEASE_TOKEN not provisioned
+        if: env.HAS_RELEASE_PLEASE_TOKEN != 'true'
+        run: |
+          echo "::warning title=RELEASE_PLEASE_TOKEN not provisioned::Release Please is running on the default GITHUB_TOKEN fallback. Release-PR auto-merge will NOT re-trigger post-merge CI, so no tag/GitHub Release is created on the merge commit. Add a PAT (Contents + Pull requests + Workflows, read/write) as the RELEASE_PLEASE_TOKEN ENVIRONMENT secret on 'development': gh secret set RELEASE_PLEASE_TOKEN --env development. A repository-scoped secret of the same name is NOT read by this job."
+
+      # When the PAT IS set, probe it actively: an expired/revoked PAT still lets
+      # release-please fall back to github.token and run green, but the merged
+      # Release PR then never re-triggers this workflow → no tag/Release/prod
+      # deploy. A 401 is deterministic (bad token), so fail loud on it; treat other
+      # non-200 (5xx/network) as transient and continue.
+      - name: Verify RELEASE_PLEASE_TOKEN is valid
+        if: env.HAS_RELEASE_PLEASE_TOKEN == 'true'
+        env:
+          GH_PAT: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${GH_PAT}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/user || echo 000)
+          if [ "$code" = "401" ]; then
+            echo "::error title=RELEASE_PLEASE_TOKEN invalid::The PAT returned 401 (expired or revoked). A merged Release PR will not cut a tag/Release and production will not deploy. Rotate the RELEASE_PLEASE_TOKEN environment secret on 'development': gh secret set RELEASE_PLEASE_TOKEN --env development."
+            exit 1
+          fi
+          if [ "$code" != "200" ]; then
+            echo "::warning title=RELEASE_PLEASE_TOKEN probe inconclusive::GitHub API returned HTTP ${code} probing the PAT (transient?). Continuing."
+          else
+            echo "RELEASE_PLEASE_TOKEN valid."
+          fi
+
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        id: release
+        with:
+          # PAT (repo + workflow scopes) read from the repository secret. Falls
+          # back to github.token only if unset (which cannot create releases).
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          target-branch: ${{ github.ref_name }}
+          config-file: .github/release-please/config.json
+          manifest-file: .github/release-please/manifest.json
+
+      - name: Lint-fix CHANGELOG on release PR branches
+        if: steps.release.outputs.prs_created == 'true' || steps.release.outputs.pr != ''
+        env:
+          # PAT (not github.token) so the lint-fix commit pushed to the release PR
+          # branch re-triggers the PR checks that auto-merge waits on.
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          RELEASE_PRS: ${{ steps.release.outputs.prs }}
+          RELEASE_PR: ${{ steps.release.outputs.pr }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t branches < <(
+            jq -rn --arg pr "${RELEASE_PR}" --arg prs "${RELEASE_PRS}" '
+              def parse_object($raw):
+                try ($raw | fromjson) catch null;
+              def parse_array($raw):
+                try ($raw | fromjson) catch [];
+              (
+                [parse_object($pr) | .headBranchName // .headRefName // empty] +
+                [parse_array($prs)[] | .headBranchName // .headRefName // empty]
+              )
+              | map(select(. != null and . != ""))
+              | unique
+              | .[]
+            '
+          )
+
+          if [ "${#branches[@]}" -eq 0 ]; then
+            echo "No release PR branches to lint-fix."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for branch in "${branches[@]}"; do
+            echo "::group::Lint-fix CHANGELOG on ${branch}"
+            git fetch origin "${branch}" --depth=2
+            git checkout -B "${branch}" "origin/${branch}"
+            npx --yes markdownlint-cli2@0.22.1 \
+              --fix \
+              'CHANGELOG*.md' || true
+            if [ -n "$(git status --porcelain CHANGELOG*.md 2>/dev/null)" ]; then
+              git add CHANGELOG*.md
+              git commit -m "chore(docs): lint-fix CHANGELOG after release-please"
+              git push origin "${branch}"
+              echo "Pushed CHANGELOG lint-fix to ${branch}"
+            else
+              echo "${branch} CHANGELOG already lint-clean."
+            fi
+            echo "::endgroup::"
+          done
+
+      # NO auto-merge of the Release PR — release on cadence. release-please keeps
+      # the standing "chore: release X.Y.Z" PR up to date; MERGING it (squash, by
+      # hand) is the ship button. That merge re-triggers this workflow, which cuts
+      # the tag + GitHub Release + SBOM and gates the production deploy.
+
+  sbom:
+    name: SBOM
+    needs: [release-please]
+    # Generated ONLY when a release is actually cut — it is consumed solely by
+    # release-sbom. Skipping it on routine merges is the main per-merge saving.
+    if: always() && needs.release-please.outputs.releases_created == 'true'
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+
+      - name: Attest CycloneDX source SBOM
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
+        with:
+          subject-path: sbom.cyclonedx.json
+          sbom-path: sbom.cyclonedx.json
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: sbom.cyclonedx.json
+          path: sbom.cyclonedx.json
+          retention-days: 30
+
+  release-sbom:
+    name: Release SBOM
+    needs: [sbom, release-please]
+    if: |
+      always() &&
+      needs.release-please.outputs.releases_created == 'true' &&
+      needs.sbom.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Resolve release tag
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag_name="$(
+            gh release list \
+              --repo "${GH_REPOSITORY}" \
+              --limit 20 \
+              --json tagName,isPrerelease \
+              --jq '[.[] | select(.isPrerelease == false)][0].tagName // ""'
+          )"
+          if [ -z "${tag_name}" ] || [ "${tag_name}" = "null" ]; then
+            echo "::error::No GitHub Release found after release-please."
+            exit 1
+          fi
+          echo "tag_name=${tag_name}" >> "$GITHUB_OUTPUT"
+          echo "Attaching SBOM to release ${tag_name}"
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: sbom.cyclonedx.json
+          path: .
+
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+        with:
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          files: sbom.cyclonedx.json
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  deploy-development:
+    name: Deploy (development alias)
+    needs: [changes]
+    # Decoupled from release-please: the development alias tracks trunk HEAD regardless of
+    # release health. Src pushes to the default branch only (docs/chore-only merges
+    # skip the rebuild). Concurrency (batch non-prod) lives in the reusable.
+    if: |
+      always() &&
+      inputs.skip_deploy != true &&
+      github.ref_name == github.event.repository.default_branch &&
+      needs.changes.outputs.src-code == 'true'
+    # A reusable's job permissions must be a SUBSET of what the caller grants —
+    # the reusable's run job needs id-token/attestations for build provenance
+    # (prod-gated at runtime, but validated statically at startup for every
+    # caller), so the grant must be here even though this call deploys the
+    # development alias. Without it the whole workflow is a startup_failure.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/reusable-netlify-deploy.yml
+    secrets: inherit
+    with:
+      github_environment: development
+
+  notify-failure:
+    name: Notify failure
+    needs: [release-please, deploy-development]
+    if: |
+      always() &&
+      (
+        needs.release-please.result == 'failure' ||
+        needs.deploy-development.result == 'failure'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # `issues: write` to open/update the tracked `ci-failure` issue; the
+    # workflow default is `contents: read`, so widen it here only.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Emit post-merge failure notice
+        env:
+          RELEASE_RESULT: ${{ needs.release-please.result }}
+          DEV_DEPLOY_RESULT: ${{ needs.deploy-development.result }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          echo "::error title=Post-merge CI failed::release=${RELEASE_RESULT} deploy-dev=${DEV_DEPLOY_RESULT} — ${WORKFLOW_URL}"
+
+      # A run-scoped ::error annotation dies with the run. Persist a tracked issue
+      # (find-or-create by a hidden marker, labelled `ci-failure`) so a broken
+      # release/deploy stays visible until someone acts on it. Idempotent: reuses
+      # the open issue and appends a comment rather than spamming new ones.
+      - name: Open or update the ci-failure issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          RELEASE_RESULT: ${{ needs.release-please.result }}
+          DEV_DEPLOY_RESULT: ${{ needs.deploy-development.result }}
+        with:
+          script: |
+            const marker = '<!-- post-merge-ci-failure -->';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = [
+              marker,
+              `Post-merge CI failed on \`${context.sha}\`.`,
+              '',
+              '| Job | Result |',
+              '| --- | --- |',
+              `| release-please | ${process.env.RELEASE_RESULT} |`,
+              `| deploy-development | ${process.env.DEV_DEPLOY_RESULT} |`,
+              '',
+              `Run: ${runUrl}`,
+            ].join('\n');
+
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'ci-failure',
+              per_page: 100,
+            });
+            const existing = open.find((issue) => (issue.body || '').includes(marker));
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.notice(`Updated ci-failure issue #${existing.number}`);
+            } else {
+              // `labels` auto-creates the `ci-failure` label if it does not exist.
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: 'Post-merge CI failing',
+                labels: ['ci-failure'],
+                body,
+              });
+              core.notice(`Opened ci-failure issue #${created.data.number}`);
+            }

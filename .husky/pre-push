@@ -1,0 +1,72 @@
+#!/usr/bin/env sh
+# Fast gate before push — full suite runs in CI (.github/workflows/pr-ci.yml).
+
+# Branch-name policy — short-lived branches follow <type>/<description>
+# (parity with clinozy-be). The trunk and a detached HEAD are exempt. The trunk is
+# resolved from tooling/setup/setup.config.json (git.defaultBranch), never
+# hardcoded, so a renamed trunk stays exempt automatically. Claude Code web
+# session branches (claude/*) are allowlisted as a FALLBACK — the cloud git proxy
+# does NOT pin a session to its claude/* branch (a push under any conventional
+# name succeeds), but it does refuse every form of branch delete, so rename
+# before the first push. See agent-os/rules/fe-git-branch-naming.mdc. Bypass once:
+#   SKIP_BRANCH_CHECK=1 git push
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)
+DEFAULT_BRANCH=$(node -e "const fs=require('fs');try{const c=JSON.parse(fs.readFileSync('tooling/setup/setup.config.json','utf8'));process.stdout.write((c.git&&c.git.defaultBranch)||'main')}catch(e){process.stdout.write('main')}" 2>/dev/null || echo main)
+if [ "${SKIP_BRANCH_CHECK:-0}" = "1" ]; then
+  echo "Skipping branch-name policy on pre-push."
+elif [ "$CURRENT_BRANCH" != "HEAD" ] && [ "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ]; then
+  if ! printf '%s' "$CURRENT_BRANCH" | grep -Eq '^(claude/.+|(feat|feature|fix|hotfix|chore|ci|docs|refactor|test|perf|build|style|revert)/[a-z0-9._-]+)$'; then
+    echo "✖ Branch name '$CURRENT_BRANCH' does not follow <type>/<description>." >&2
+    echo "  Allowed types: feat feature fix hotfix chore ci docs refactor test perf build style revert" >&2
+    echo "  Description: lowercase letters, digits, . _ - (e.g. ci/branch-name-guard)." >&2
+    echo "  AI web sessions: claude/*.  Bypass once: SKIP_BRANCH_CHECK=1 git push" >&2
+    echo "  Rename with: git branch -m <type>/<description>" >&2
+    exit 1
+  fi
+fi
+
+pnpm biome:check
+pnpm type-check
+pnpm build
+pnpm build:check
+
+# Markdown lint on the pushed diff (mirrors the Docs lint CI lane). lint-staged
+# only formats staged markdown; this lints every changed file in the push.
+# Base falls back to origin/main when the branch has no upstream yet (first
+# push of a new branch) — otherwise the diff is empty and the gate is skipped.
+PUSH_BASE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)
+PUSHED_MD=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E '\.md$' || true)
+if [ -n "$PUSHED_MD" ]; then
+  pnpm docs:lint:changed
+else
+  echo "Skipping changed-markdown lint on pre-push (no markdown changes)."
+fi
+
+# Unit tests (matches the CI unit lane).
+# Run only when pushed commits include unit-relevant files.
+PUSHED_UNIT_RELEVANT=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E \
+  '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$)' || true)
+if [ -n "$PUSHED_UNIT_RELEVANT" ]; then
+  pnpm test
+else
+  echo "Skipping unit tests on pre-push (no unit-relevant changes)."
+fi
+
+# API contract drift — every endpoint this app references must exist in
+# clinozy-be's committed route catalog (skips with a notice when the sibling
+# clinozy-be checkout is absent). Catches endpoint typos before they ship.
+pnpm contracts:drift
+
+# SonarQube quality gate — scans against the local SonarQube server and BLOCKS the push if any
+# unresolved Sonar issue exists. Runs only when the pushed commits touch deployed-surface code
+# (src/ runtime — the only thing Sonar analyzes; tests/mocks/fixtures/scripts are excluded). The
+# gate auto-starts the server on first use (first boot ~2 min) and provisions a token in
+# .env.local. There is no per-gate skip: a red Sonar gate must be fixed, not bypassed.
+SONAR_BASE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)
+PUSHED_RUNTIME=$(git diff --name-only "$SONAR_BASE"...HEAD 2>/dev/null | grep -E '^src/.*\.(ts|tsx)$' | \
+  grep -Ev '(__tests__/|\.test\.tsx?$|\.spec\.tsx?$|\.fixtures\.ts$|/mock-[^/]*\.ts$|\.d\.ts$)' || true)
+if [ -n "$PUSHED_RUNTIME" ]; then
+  pnpm sonar:scan
+else
+  echo "Skipping SonarQube gate on pre-push (no deployed-surface code changes)."
+fi

@@ -1,0 +1,6 @@
+# Clinozy is an authenticated admin dashboard — there is no public content
+# to index, and login/app URLs should not surface in search results.
+# Disallow all crawling. (Relax per-path only if a genuinely public,
+# marketing-style surface is ever added.)
+User-agent: *
+Disallow: /

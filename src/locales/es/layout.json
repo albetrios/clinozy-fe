@@ -1,0 +1,158 @@
+{
+  "brand": {
+    "name": "{{productName}}"
+  },
+  "a11y": {
+    "skipToMain": "Saltar al contenido principal",
+    "mainNavigation": "Navegación principal",
+    "sidebarNavigation": "Navegación lateral",
+    "mobileNavigation": "Navegación móvil"
+  },
+  "auth": {
+    "switchToRegister": "Crear una cuenta",
+    "switchToSignIn": "Iniciar sesión",
+    "statusOperational": "Todos los sistemas operativos",
+    "badge": "Operaciones, unificadas",
+    "heroTitle": "El sistema operativo de su organización.",
+    "heroSubtitle": "Miembros, roles, facturación y seguridad — un espacio de trabajo rápido y orientado al teclado para cada equipo.",
+    "features": {
+      "multiOrg": {
+        "title": "Multi-organización por diseño",
+        "body": "Cambie de equipo sin cambiar de herramienta."
+      },
+      "secure": {
+        "title": "Seguro por defecto",
+        "body": "RBAC, MFA, llaves de acceso y registros de auditoría."
+      },
+      "fast": {
+        "title": "Rápido en todas partes",
+        "body": "Diseñado para trabajo en tiempo real con el teclado."
+      }
+    },
+    "stats": {
+      "teams": "equipos",
+      "uptime": "disponibilidad",
+      "compliant": "certificado"
+    }
+  },
+  "app": {
+    "search": "Buscar",
+    "searchShortcutMac": "⌘K",
+    "searchShortcutWindows": "Ctrl+K",
+    "searchPlaceholder": "Buscar...",
+    "userMenu": "Menú de usuario",
+    "userFallback": "Usuario",
+    "settings": "Configuración",
+    "logOut": "Cerrar sesión",
+    "toggleSidebar": "Alternar barra lateral",
+    "footerCopyright": "© {{year}} {{productName}} Platform",
+    "nav": {
+      "dashboard": "Panel"
+    },
+    "sidebar": {
+      "workspace": "Espacio de trabajo",
+      "menu": "Menú",
+      "shortcuts": "Accesos directos"
+    },
+    "contextStrip": {
+      "label": "Acceso rápido",
+      "labelSolo": "Ir a",
+      "profile": "Perfil",
+      "security": "Seguridad",
+      "billing": "Facturación",
+      "appearance": "Apariencia",
+      "shortcuts": "Atajos"
+    },
+    "workspaceSwitch": {
+      "preparing": "Preparando tu espacio de trabajo",
+      "loadingAccess": "Cargando miembros y permisos",
+      "almostReady": "Casi listo"
+    },
+    "orgSwitcher": {
+      "selectPlaceholder": "Seleccionar organización",
+      "triggerLabel": "Cambiar de organización — actual: {{name}}",
+      "personal": "Personal",
+      "yourOrganizations": "Tus organizaciones",
+      "organizations": "Organizaciones",
+      "addOrganization": "Añadir organización"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "ariaWithUnread": "Notificaciones, {{count}} sin leer",
+      "ariaDefault": "Notificaciones",
+      "newBadge": "{{count}} nuevas",
+      "markAllRead": "Marcar todo como leído",
+      "loadError": "No se pudieron cargar las notificaciones. Inténtalo de nuevo.",
+      "retry": "Reintentar",
+      "emptyTitle": "Sin notificaciones",
+      "emptyDescription": "Verás actualizaciones de tu cuenta y organización aquí.",
+      "markRead": "Marcar como leído",
+      "settingsLink": "Configuración de notificaciones"
+    },
+    "commandPalette": {
+      "ariaLabel": "Paleta de comandos",
+      "placeholder": "Escribe un comando o busca...",
+      "empty": "No se encontraron resultados.",
+      "groups": {
+        "navigation": "Navegación",
+        "theme": "Tema",
+        "account": "Cuenta",
+        "organizations": "Organizaciones",
+        "shortcuts": "Atajos"
+      },
+      "dashboard": "Panel",
+      "userSettings": "Configuración de usuario",
+      "organizationSettings": "Configuración de organización",
+      "lightMode": "Modo claro",
+      "darkMode": "Modo oscuro",
+      "systemTheme": "Tema del sistema",
+      "settings": "Configuración",
+      "logOut": "Cerrar sesión",
+      "openShortcuts": "Atajos de teclado",
+      "switchOrganization": "Cambiar a {{name}}",
+      "currentOrganization": "{{name}} (actual)"
+    },
+    "emailVerify": {
+      "message": "Verifica tu correo para proteger tu cuenta.",
+      "resend": "Reenviar correo",
+      "sending": "Enviando…",
+      "sent": "Enviado",
+      "notifySuccess": "Correo de verificación enviado — revisa tu bandeja.",
+      "notifyError": "No se pudo reenviar el correo."
+    },
+    "sessionTimeout": {
+      "title": "La sesión expira",
+      "description": "Tu sesión expirará en {{countdown}} por inactividad. Haz clic en \"Permanecer conectado\" para continuar.",
+      "signOut": "Cerrar sesión",
+      "staySignedIn": "Permanecer conectado",
+      "signingOut": "Cerrando sesión…",
+      "signingOutDescription": "Estamos cerrando tu sesión de forma segura. Te llevaremos a la página de inicio de sesión."
+    },
+    "shortcuts": {
+      "title": "Atajos de teclado",
+      "description": "Referencia rápida de navegación y acciones.",
+      "commandPalette": "Abrir paleta de comandos",
+      "showShortcuts": "Mostrar atajos de teclado",
+      "showShortcutsAlt": "Mostrar atajos (alternativo)",
+      "closeDialog": "Cerrar diálogo"
+    },
+    "orgCreate": {
+      "namePlaceholder": "Acme Inc.",
+      "slugPlaceholder": "acme",
+      "title": "Crear organización",
+      "nameLabel": "Nombre de la organización",
+      "slugLabel": "URL del espacio (opcional)",
+      "submit": "Crear organización",
+      "submitting": "Creando…"
+    },
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema",
+      "shuffle": "Tema aleatorio"
+    }
+  },
+  "public": {
+    "brandTagline": "Espacio de trabajo seguro para tu equipo"
+  }
+}

@@ -1,0 +1,120 @@
+name: Rollback deploy
+
+# Instant production rollback — restores a PREVIOUS immutable Netlify deploy
+# without a rebuild (Netlify keeps every deploy). Manual only. The job runs in the
+# `production` GitHub Environment, so the required reviewer still gates it — same
+# governance as a forward deploy, but seconds instead of a full rebuild.
+#
+# Default: restore the deploy published immediately before the current live one.
+# Pass an explicit `deploy_id` (from the Netlify UI or `netlify api
+# listSiteDeploys`) to roll back to any earlier deploy.
+#
+# Forward alternative (rebuild an old tag instead of restoring): the reusable
+# deploy's workflow_dispatch with target=production + ref=vX.Y.Z. Use this restore
+# path for speed; use the rebuild path when you need a clean build of that tag.
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_id:
+        description: Netlify deploy id to restore (empty = the previous published production deploy)
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+concurrency:
+  # Share the production deploy group so a rollback never races a forward deploy.
+  group: netlify-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Rollback production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Resolve rollback target
+        id: resolve
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          DEPLOY_ID_INPUT: ${{ inputs.deploy_id }}
+        run: |
+          set -euo pipefail
+          if [ -n "${DEPLOY_ID_INPUT}" ]; then
+            echo "deploy_id=${DEPLOY_ID_INPUT}" >> "$GITHUB_OUTPUT"
+            echo "Target: explicit deploy ${DEPLOY_ID_INPUT}"
+            exit 0
+          fi
+          site_data=$(jq -nc --arg s "$NETLIFY_SITE_ID" '{site_id:$s}')
+          SITE_JSON=$(pnpm exec netlify api getSite --data "$site_data")
+          DEPLOYS_JSON=$(pnpm exec netlify api listSiteDeploys --data "$site_data")
+          # Current live = site.published_deploy.id; previous = the next-older
+          # READY production-context deploy after it (robust even after a prior
+          # rollback, where the newest deploy is not the live one).
+          prev=$(SITE_JSON="$SITE_JSON" DEPLOYS_JSON="$DEPLOYS_JSON" node -e '
+            const site = JSON.parse(process.env.SITE_JSON);
+            const deploys = JSON.parse(process.env.DEPLOYS_JSON);
+            const liveId = site.published_deploy && site.published_deploy.id;
+            const prod = deploys.filter((d) => d.state === "ready" && d.context === "production");
+            let target = "";
+            if (liveId) {
+              const i = prod.findIndex((d) => d.id === liveId);
+              if (i >= 0 && prod[i + 1]) target = prod[i + 1].id;
+            }
+            if (!target && prod[1]) target = prod[1].id;
+            process.stdout.write(target || "");
+          ')
+          if [ -z "$prev" ]; then
+            echo "::error title=No rollback target::No previous production deploy found to restore." >&2
+            exit 1
+          fi
+          echo "deploy_id=$prev" >> "$GITHUB_OUTPUT"
+          echo "Target: previous production deploy $prev"
+
+      - name: Restore deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          DEPLOY_ID: ${{ steps.resolve.outputs.deploy_id }}
+        run: |
+          set -euo pipefail
+          data=$(jq -nc --arg s "$NETLIFY_SITE_ID" --arg d "$DEPLOY_ID" '{site_id:$s, deploy_id:$d}')
+          pnpm exec netlify api restoreSiteDeploy --data "$data"
+          echo "Restored deploy $DEPLOY_ID as the live production deploy."
+
+      - name: Post-rollback smoke
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          set -euo pipefail
+          site_data=$(jq -nc --arg s "$NETLIFY_SITE_ID" '{site_id:$s}')
+          url=$(pnpm exec netlify api getSite --data "$site_data" \
+            | node -e 'const s=JSON.parse(require("fs").readFileSync(0,"utf8"));process.stdout.write(s.ssl_url||s.url||"")')
+          if [ -z "$url" ]; then
+            echo "Could not resolve the site URL for the smoke check — skipping." >&2
+            exit 0
+          fi
+          echo "Smoking $url after rollback"
+          version_json=$(curl -fsS --retry 3 --retry-delay 5 "$url/version.json")
+          echo "version.json: $version_json"
+          build_id=$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).buildId ?? ""))' "$version_json")
+          if [ -z "$build_id" ]; then
+            echo "::error::version.json has no buildId after rollback — restore may have failed." >&2
+            exit 1
+          fi
+          echo "Rollback OK — buildId $build_id live."

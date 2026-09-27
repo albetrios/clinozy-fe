@@ -1,0 +1,162 @@
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+
+export const LAYOUT_NS = I18N_NAMESPACES.layout;
+
+export const LAYOUT_KEYS = {
+  brand: { name: 'brand.name' },
+  a11y: {
+    skipToMain: 'a11y.skipToMain',
+    mainNavigation: 'a11y.mainNavigation',
+    sidebarNavigation: 'a11y.sidebarNavigation',
+    mobileNavigation: 'a11y.mobileNavigation',
+  },
+  auth: {
+    switchToRegister: 'auth.switchToRegister',
+    switchToSignIn: 'auth.switchToSignIn',
+    statusOperational: 'auth.statusOperational',
+    badge: 'auth.badge',
+    heroTitle: 'auth.heroTitle',
+    heroSubtitle: 'auth.heroSubtitle',
+    features: {
+      multiOrg: {
+        title: 'auth.features.multiOrg.title',
+        body: 'auth.features.multiOrg.body',
+      },
+      secure: { title: 'auth.features.secure.title', body: 'auth.features.secure.body' },
+      fast: { title: 'auth.features.fast.title', body: 'auth.features.fast.body' },
+    },
+    stats: {
+      teams: 'auth.stats.teams',
+      uptime: 'auth.stats.uptime',
+      compliant: 'auth.stats.compliant',
+    },
+  },
+  app: {
+    theme: {
+      light: 'app.theme.light',
+      dark: 'app.theme.dark',
+      system: 'app.theme.system',
+      shuffle: 'app.theme.shuffle',
+    },
+    search: 'app.search',
+    searchPlaceholder: 'app.searchPlaceholder',
+    searchShortcutMac: 'app.searchShortcutMac',
+    searchShortcutWindows: 'app.searchShortcutWindows',
+    userMenu: 'app.userMenu',
+    userFallback: 'app.userFallback',
+    settings: 'app.settings',
+    logOut: 'app.logOut',
+    toggleSidebar: 'app.toggleSidebar',
+    footerCopyright: 'app.footerCopyright',
+    nav: { dashboard: 'app.nav.dashboard' },
+    sidebar: {
+      workspace: 'app.sidebar.workspace',
+      menu: 'app.sidebar.menu',
+      shortcuts: 'app.sidebar.shortcuts',
+    },
+    contextStrip: {
+      label: 'app.contextStrip.label',
+      labelSolo: 'app.contextStrip.labelSolo',
+      profile: 'app.contextStrip.profile',
+      security: 'app.contextStrip.security',
+      billing: 'app.contextStrip.billing',
+      appearance: 'app.contextStrip.appearance',
+      shortcuts: 'app.contextStrip.shortcuts',
+    },
+    orgCreate: {
+      namePlaceholder: 'app.orgCreate.namePlaceholder',
+      slugPlaceholder: 'app.orgCreate.slugPlaceholder',
+      title: 'app.orgCreate.title',
+      nameLabel: 'app.orgCreate.nameLabel',
+      slugLabel: 'app.orgCreate.slugLabel',
+      submit: 'app.orgCreate.submit',
+      submitting: 'app.orgCreate.submitting',
+    },
+    workspaceSwitch: {
+      preparing: 'app.workspaceSwitch.preparing',
+      loadingAccess: 'app.workspaceSwitch.loadingAccess',
+      almostReady: 'app.workspaceSwitch.almostReady',
+    },
+    orgSwitcher: {
+      selectPlaceholder: 'app.orgSwitcher.selectPlaceholder',
+      triggerLabel: 'app.orgSwitcher.triggerLabel',
+      personal: 'app.orgSwitcher.personal',
+      yourOrganizations: 'app.orgSwitcher.yourOrganizations',
+      organizations: 'app.orgSwitcher.organizations',
+      addOrganization: 'app.orgSwitcher.addOrganization',
+    },
+    notifications: {
+      title: 'app.notifications.title',
+      ariaWithUnread: 'app.notifications.ariaWithUnread',
+      ariaDefault: 'app.notifications.ariaDefault',
+      newBadge: 'app.notifications.newBadge',
+      markAllRead: 'app.notifications.markAllRead',
+      loadError: 'app.notifications.loadError',
+      emptyTitle: 'app.notifications.emptyTitle',
+      emptyDescription: 'app.notifications.emptyDescription',
+      markRead: 'app.notifications.markRead',
+      settingsLink: 'app.notifications.settingsLink',
+      retry: 'app.notifications.retry',
+    },
+    commandPalette: {
+      ariaLabel: 'app.commandPalette.ariaLabel',
+      placeholder: 'app.commandPalette.placeholder',
+      empty: 'app.commandPalette.empty',
+      groups: {
+        navigation: 'app.commandPalette.groups.navigation',
+        theme: 'app.commandPalette.groups.theme',
+        account: 'app.commandPalette.groups.account',
+        organizations: 'app.commandPalette.groups.organizations',
+        shortcuts: 'app.commandPalette.groups.shortcuts',
+      },
+      dashboard: 'app.commandPalette.dashboard',
+      userSettings: 'app.commandPalette.userSettings',
+      organizationSettings: 'app.commandPalette.organizationSettings',
+      lightMode: 'app.commandPalette.lightMode',
+      darkMode: 'app.commandPalette.darkMode',
+      systemTheme: 'app.commandPalette.systemTheme',
+      settings: 'app.commandPalette.settings',
+      logOut: 'app.commandPalette.logOut',
+      openShortcuts: 'app.commandPalette.openShortcuts',
+      switchOrganization: 'app.commandPalette.switchOrganization',
+      currentOrganization: 'app.commandPalette.currentOrganization',
+    },
+    shortcuts: {
+      title: 'app.shortcuts.title',
+      description: 'app.shortcuts.description',
+      commandPalette: 'app.shortcuts.commandPalette',
+      showShortcuts: 'app.shortcuts.showShortcuts',
+      showShortcutsAlt: 'app.shortcuts.showShortcutsAlt',
+      closeDialog: 'app.shortcuts.closeDialog',
+    },
+    emailVerify: {
+      message: 'app.emailVerify.message',
+      resend: 'app.emailVerify.resend',
+      sending: 'app.emailVerify.sending',
+      sent: 'app.emailVerify.sent',
+      notifySuccess: 'app.emailVerify.notifySuccess',
+      notifyError: 'app.emailVerify.notifyError',
+    },
+    sessionTimeout: {
+      title: 'app.sessionTimeout.title',
+      description: 'app.sessionTimeout.description',
+      signOut: 'app.sessionTimeout.signOut',
+      staySignedIn: 'app.sessionTimeout.staySignedIn',
+      signingOut: 'app.sessionTimeout.signingOut',
+      signingOutDescription: 'app.sessionTimeout.signingOutDescription',
+    },
+  },
+  public: {
+    brandTagline: 'public.brandTagline',
+  },
+} as const;
+
+export const AUTH_LAYOUT_STAT_KEYS = [
+  { value: '10k+', labelKey: LAYOUT_KEYS.auth.stats.teams },
+  { value: '99.99%', labelKey: LAYOUT_KEYS.auth.stats.uptime },
+  { value: 'SOC 2', labelKey: LAYOUT_KEYS.auth.stats.compliant },
+] as const;
+
+export const APP_NAV_SEGMENT_KEYS = {
+  dashboard: LAYOUT_KEYS.app.nav.dashboard,
+} as const;

@@ -1,0 +1,101 @@
+# Dependabot version updates. CI failure triage: .github/workflows/dependabot-ci-triage.yml
+#
+# npm PRs are grouped by risk to reduce lockfile-conflict cascades (same shape
+# as clinozy-be):
+#   - `npm-non-major` (patch + minor, prod + dev) — auto-merged after approval via
+#     .github/workflows/dependabot-auto-merge.yml.
+#   - `npm-major` (major, prod + dev) — manual review + merge.
+#   - `security-updates` — manual review + merge.
+# github-actions bumps are reviewed and merged manually.
+#
+# Single trunk: all ecosystems open PRs against the repository default branch
+# (`main`) — no `target-branch` override needed.
+
+version: 2
+
+updates:
+  # npm (pnpm) dependencies — lockfile + semver ranges in package.json
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'Asia/Kolkata'
+    open-pull-requests-limit: 15
+    versioning-strategy: increase
+    commit-message:
+      prefix: 'chore'
+      prefix-development: 'chore'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+    ignore:
+      - dependency-name: '@types/node'
+        update-types:
+          - 'version-update:semver-major'
+      # Held on the 6.x line: the type-aware ESLint toolchain does not support
+      # TypeScript 7 yet — typescript-eslint's peer range is `>=4.8.4 <6.1.0`
+      # (latest 8.64.0), so TS 7.x crashes typescript-estree's watch-program
+      # setup and reds the ESLint lane (PR #136). Lift this ignore once
+      # typescript-eslint ships a version whose peer range admits TS 7.
+      - dependency-name: 'typescript'
+        update-types:
+          - 'version-update:semver-major'
+      # Pinned to the 1.170.x line (docs/reference/dependency-upgrades.md):
+      # the 1.169 minors that regressed guard tests are resolved as of 1.170.17
+      # (verified against the full guard + unit suite), but minor/major bumps on
+      # this fast-moving router still go through a deliberate spike, not
+      # auto-merge. Patches within ~1.170.x still flow.
+      - dependency-name: '@tanstack/react-router'
+        update-types:
+          - 'version-update:semver-minor'
+          - 'version-update:semver-major'
+      # Majors go through a deliberate migration, never an auto-opened PR:
+      # v9 (#228) was a full API rewrite — features became opt-in via
+      # `tableFeatures()`, `useReactTable` -> `useTable`, row models moved off
+      # the table options onto the feature set, and every generic gained a
+      # leading `TFeatures`. It broke type-check, the unit suite and the build,
+      # and shipped as a hand-written migration (#233) touching 11 files rather
+      # than as a version bump. Minors and patches still flow. Lift this when
+      # the next major is scheduled work rather than a surprise PR.
+      - dependency-name: '@tanstack/react-table'
+        update-types:
+          - 'version-update:semver-major'
+    groups:
+      # Low risk: patch + minor across production and development dependencies.
+      # Auto-merged (after approval) by dependabot-auto-merge.yml.
+      npm-non-major:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - patch
+          - minor
+      # Major upgrades across production and development dependencies. Manual.
+      npm-major:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - major
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - '*'
+
+  # GitHub Actions versions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    labels:
+      - 'ci'
+    groups:
+      actions:
+        patterns:
+          - '*'

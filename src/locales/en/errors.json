@@ -1,0 +1,181 @@
+{
+  "global": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please try reloading the page.",
+    "reload": "Reload page"
+  },
+  "route": {
+    "notFound": "The page you are looking for does not exist.",
+    "generic": "Something went wrong.",
+    "pageTitle": "This page hit an error",
+    "pageMessage": "Something went wrong rendering this page.",
+    "tryAgain": "Try again",
+    "goHome": "Go home",
+    "refresh": "Refresh page",
+    "forbidden": "You do not have permission to access this page.",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "widget": {
+    "unavailable": "{{title}} unavailable",
+    "message": "Something went wrong loading this section. Try again.",
+    "retry": "Retry",
+    "unavailableShort": "Unavailable",
+    "controlRetry": "{{title}} unavailable. Select to retry.",
+    "pageContent": "Page content",
+    "navigation": "Navigation",
+    "emailBanner": "Email verification",
+    "notifications": "Notifications",
+    "organizationSwitcher": "Organization switcher",
+    "commandPalette": "Command palette",
+    "settings": "Settings",
+    "appearance": "Appearance",
+    "analytics": "Analytics",
+    "members": "Members",
+    "schedule": "Schedule",
+    "highlights": "Highlights",
+    "themeShowcase": "Theme showcase",
+    "sessionTimeout": "Session timer",
+    "securityCheck": "Security check",
+    "appearanceControls": "Appearance controls",
+    "payment": "Payment",
+    "cancellation": "Cancellation"
+  },
+  "toast": {
+    "dismiss": "Dismiss notification",
+    "undo": "Undo",
+    "undone": "Action cancelled",
+    "processing": "Processing…",
+    "preview": {
+      "successTitle": "Changes saved",
+      "successDescription": "Your settings are live.",
+      "errorTitle": "Something went wrong",
+      "errorDescription": "Please try again.",
+      "warningTitle": "Heads up",
+      "warningDescription": "This action needs a review.",
+      "infoTitle": "Did you know?",
+      "infoDescription": "Shuffle also rolls this design."
+    }
+  },
+  "api": {
+    "fallback": "Something went wrong. Please try again.",
+    "unexpected": "An unexpected error occurred",
+    "http400": "The request was invalid. Please check your input and try again.",
+    "http401": "Your session has expired. Please sign in again.",
+    "http403": "You do not have permission to perform this action.",
+    "http404": "The requested resource was not found.",
+    "http409": "A conflict occurred. The resource may have been modified by someone else.",
+    "http422": "The submitted data is invalid. Please review and try again.",
+    "http429": "Too many requests. Please wait a moment and try again.",
+    "http500": "An internal server error occurred. Please try again later.",
+    "http502": "The server is temporarily unavailable. Please try again later.",
+    "http503": "The service is temporarily unavailable. Please try again later."
+  },
+  "frontend": {
+    "query": {
+      "loadFailed": "Could not load data.",
+      "retry": "Try again"
+    },
+    "organization": {
+      "roleRequired": "A role is required to change a member role.",
+      "updateFailed": "Could not update organization",
+      "logoInvalidType": "Please choose an image file.",
+      "logoTooLarge": "Logo must be under 5 MB.",
+      "logoReadFailed": "Could not read that file.",
+      "formCheck": "Check the form",
+      "updateSuccess": "Organization updated",
+      "createSuccess": "Created {{name}}",
+      "createdSwitchFailed": "{{name}} was created, but we couldn't open it. Pick it from the organization switcher.",
+      "logoUpdated": "Logo updated.",
+      "logoRemoved": "Logo removed."
+    },
+    "account": {
+      "copyFailed": "Could not copy to clipboard",
+      "themeCodeNumeric": "Enter a numeric theme code",
+      "copySuccess": "Account ID copied",
+      "themeLinkCopied": "Theme link copied",
+      "themeLinkCopiedDescription": "Share this URL to reproduce the look.",
+      "notificationStylePreview": "Notification style",
+      "notificationStylePreviewDescription": "{{variant}} — themed with your accent and semantic colors.",
+      "accountDeletionPending": "Account deleted. Signing you out…",
+      "avatarInvalidType": "Please choose an image file.",
+      "avatarTooLarge": "Avatar must be under 2 MB.",
+      "avatarUpdated": "Avatar updated.",
+      "avatarRemoved": "Avatar removed."
+    },
+    "hooks": {
+      "passkeys": {
+        "addFailed": "Could not add passkey",
+        "removeFailed": "Could not remove passkey",
+        "addSuccess": "Passkey added",
+        "removeSuccess": "Passkey removed"
+      },
+      "mfa": {
+        "disableFailed": "Could not disable two-factor authentication",
+        "enableSuccess": "Two-factor authentication enabled",
+        "disableSuccess": "Two-factor authentication disabled"
+      },
+      "members": {
+        "updateRoleFailed": "Could not update role",
+        "removeFailed": "Could not remove member",
+        "updateFailed": "Could not update member",
+        "updateRoleSuccess": "Member role updated",
+        "removeSuccess": "Member removed",
+        "suspendSuccess": "Member suspended",
+        "reactivateSuccess": "Member reactivated"
+      },
+      "roles": {
+        "createFailed": "Could not create role",
+        "updateFailed": "Could not update role",
+        "deleteFailed": "Could not delete role",
+        "createSuccess": "Role \"{{name}}\" created",
+        "updateSuccess": "Role \"{{name}}\" updated",
+        "deleteSuccess": "Role deleted"
+      },
+      "apiKeys": {
+        "createFailed": "Could not create API key",
+        "renameFailed": "Could not rename API key",
+        "revokeFailed": "Could not revoke API key",
+        "createSuccess": "API key created",
+        "renameSuccess": "API key renamed",
+        "revokeSuccess": "API key revoked"
+      },
+      "sessions": {
+        "signOutFailed": "Could not sign out that session",
+        "signOutSuccess": "Signed out of that session"
+      },
+      "notifications": {
+        "updateFailed": "Could not update notification",
+        "updateManyFailed": "Could not update notifications",
+        "savePreferencesFailed": "Could not save preferences",
+        "savePreferencesSuccess": "Notification preferences saved"
+      },
+      "webhooks": {
+        "createFailed": "Could not create webhook",
+        "deleteFailed": "Could not delete webhook",
+        "createSuccess": "Webhook created",
+        "deleteSuccess": "Webhook deleted",
+        "updateSuccess": "Webhook updated"
+      },
+      "subscription": {
+        "changePlanFailed": "Could not change plan",
+        "changePlanSuccess": "Switched to the {{plan}} plan",
+        "paymentSetupFailed": "Plan changed, but the payment step couldn't start. Reopen billing to finish it.",
+        "cancelSuccess": "Subscription set to end at the period close",
+        "resumeSuccess": "Subscription resumed"
+      },
+      "invitations": {
+        "sendFailed": "Could not send invitation",
+        "sendSuccess": "Invitation sent to {{email}}",
+        "resendSuccess": "Invitation sent again to {{email}}",
+        "cancelSuccess": "Invitation cancelled"
+      }
+    },
+    "profileUpdated": "Profile updated"
+  },
+  "suspended": {
+    "title": "Organization suspended",
+    "message": "This organization is currently suspended. Contact an organization administrator to review billing, or switch to another organization.",
+    "switchOrganization": "Switch organization"
+  }
+}

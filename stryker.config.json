@@ -1,0 +1,56 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/core/schema/stryker-schema.json",
+  "packageManager": "pnpm",
+  "testRunner": "vitest",
+  "plugins": ["@stryker-mutator/vitest-runner"],
+  "ignorePatterns": [
+    ".claude",
+    ".cursor",
+    "agent-os",
+    "docs",
+    "coverage",
+    "dist",
+    "test-results",
+    "reports",
+    ".netlify",
+    ".pnpm-store",
+    "tests/e2e"
+  ],
+  "mutate": [
+    "src/core/rbac/**/*.ts",
+    "src/core/config/env.ts",
+    "src/core/data-provider/**/*.ts",
+    "src/app/guards/**/*.ts",
+    "src/shared/auth/**/*.ts",
+    "src/shared/tenancy/**/*.ts",
+    "src/lib/routes/**/*.ts",
+    "src/lib/csv.ts",
+    "src/lib/utils.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/*.placeholder-data.ts",
+    "!src/**/*.fixtures.ts",
+    "!src/**/index.ts"
+  ],
+  "mutator": {
+    "excludedMutations": ["StringLiteral", "Regex", "TemplateLiteral"]
+  },
+  "thresholds": {
+    "high": 80,
+    "low": 70,
+    "break": 70
+  },
+  "reporters": ["html", "clear-text", "progress", "json"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/mutation-report.html"
+  },
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation-report.json"
+  },
+  "vitest": {
+    "related": true
+  },
+  "timeoutMS": 60000,
+  "dryRunTimeoutMinutes": 15,
+  "concurrency": 4
+}

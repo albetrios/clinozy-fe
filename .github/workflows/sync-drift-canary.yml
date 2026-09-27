@@ -1,0 +1,178 @@
+# Sync-drift canary — weekly docs↔code drift watch.
+#
+# The deterministic drift gates (route-islands, testids, i18n, project-tree,
+# agent-os wiring) block the PR lane, so STRUCTURAL drift never reaches main.
+# This canary catches the OTHER class: prose in docs/skills/rules that drifts
+# out of sync with the code — a reference to a renamed path or a deleted symbol.
+# No single commit "breaks" it, so it cannot be a per-PR gate; it accretes
+# silently. Left unwatched it is exactly what a manual audit had to chase down
+# after the fact. Here it becomes a Monday ping instead.
+#
+# Two scans run:
+#   • pnpm sync:check     — the deterministic set, as a periodic backstop against
+#     a check skipped by PR path-filtering or broken by a tool/version bump.
+#     Green on main by construction; a RED here means real regression.
+#   • pnpm docs:staleness — advisory semantic scan (dead paths + dead store/hook
+#     symbols in docs). Allowed false positives live in the scanner's allowlist,
+#     so a finding here is a human-triage item, not a build failure.
+#
+# On drift from EITHER scan, a single tracked `sync-drift` issue is opened or
+# refreshed (find-or-create by hidden marker — never spams new issues). When
+# both scans are clean again, the canary self-heals: it comments and closes the
+# open issue.
+
+name: Sync-drift canary
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # weekly (Monday 07:00 UTC) — after the release-flow guards
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-drift-canary
+  cancel-in-progress: false
+
+jobs:
+  sync-drift:
+    name: Docs↔code sync drift
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 7 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # `issues: write` to open/update/close the tracked `sync-drift` issue; the
+    # workflow default is `contents: read`, so widen it here only.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      # Both scans run to completion regardless of outcome — the `if` blocks make
+      # each step exit 0 and record pass/fail so the issue step sees both results.
+      - name: Deterministic sync checks (sync:check)
+        id: sync
+        run: |
+          if pnpm sync:check > sync-check.log 2>&1; then
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+          fi
+          cat sync-check.log
+
+      - name: Doc staleness scan (docs:staleness)
+        id: staleness
+        run: |
+          if pnpm docs:staleness > staleness.log 2>&1; then
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+          fi
+          cat staleness.log
+
+      - name: Open, update, or close the sync-drift issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          SYNC_STATUS: ${{ steps.sync.outputs.status }}
+          STALENESS_STATUS: ${{ steps.staleness.outputs.status }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- sync-drift-canary -->';
+            const label = 'sync-drift';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            const syncFailed = process.env.SYNC_STATUS === 'fail';
+            const staleFailed = process.env.STALENESS_STATUS === 'fail';
+            const drift = syncFailed || staleFailed;
+
+            const read = (f) => {
+              try {
+                return fs.readFileSync(f, 'utf8').trim().slice(0, 8000);
+              } catch {
+                return '(no output captured)';
+              }
+            };
+
+            // Find the one tracked issue (open) by its hidden marker.
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: label,
+              per_page: 100,
+            });
+            const existing = open.find((issue) => (issue.body || '').includes(marker));
+
+            if (!drift) {
+              core.notice('Sync-drift canary clean — docs and code are in sync.');
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  body: `${marker}\nResolved — both \`sync:check\` and \`docs:staleness\` are clean as of \`${context.sha}\`.\n\nRun: ${runUrl}`,
+                });
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: 'closed',
+                });
+                core.notice(`Closed resolved sync-drift issue #${existing.number}`);
+              }
+              return;
+            }
+
+            const section = (title, failed, log) =>
+              failed
+                ? `\n### ${title} — DRIFT\n\n\`\`\`\n${read(log)}\n\`\`\`\n`
+                : `\n### ${title} — ok\n`;
+
+            const body = [
+              marker,
+              `Docs↔code drift detected on \`${context.sha}\`.`,
+              '',
+              '| Scan | Result |',
+              '| --- | --- |',
+              `| \`sync:check\` (deterministic) | ${syncFailed ? 'DRIFT' : 'ok'} |`,
+              `| \`docs:staleness\` (advisory) | ${staleFailed ? 'DRIFT' : 'ok'} |`,
+              section('sync:check', syncFailed, 'sync-check.log'),
+              section('docs:staleness', staleFailed, 'staleness.log'),
+              '',
+              'Fix the reference, or if it is intentional add it to',
+              '`tooling/ci/doc-staleness-allowlist.json` with a reason.',
+              '',
+              `Run: ${runUrl}`,
+            ].join('\n');
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.notice(`Updated sync-drift issue #${existing.number}`);
+            } else {
+              // `labels` auto-creates the `sync-drift` label if it does not exist.
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: 'Docs↔code sync drift detected',
+                labels: [label],
+                body,
+              });
+              core.notice(`Opened sync-drift issue #${created.data.number}`);
+            }

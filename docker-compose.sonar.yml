@@ -1,0 +1,62 @@
+# Local SonarQube instance for code quality analysis.
+# Usage:
+#   pnpm sonar:up                                       # start SonarQube
+#   pnpm sonar:scan                                     # scan + quality gate
+#   pnpm sonar:down                                     # stop (keep data)
+#   pnpm sonar:reset                                    # teardown incl. volumes
+#
+# Dashboard: http://localhost:9001  (admin / admin on first login)
+#
+# Port 9000 is shared with clinozy-be's local SonarQube. If clinozy-be's server is
+# already running, the gate script reuses it (one server, two projects) — copy
+# SONAR_ADMIN_PASSWORD from clinozy-be/.env.local into this repo's .env.local
+# so the gate can mint a clinozy-fe token.
+
+services:
+  sonarqube:
+    image: sonarqube:25.5.0.107428-community
+    container_name: clinozy-fe-sonarqube
+    ports:
+      - '${SONAR_HOST_PORT:-9001}:9000'
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: 'true'
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'wget -qO- http://localhost:9000/api/system/status | grep -q "UP"']
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 120s
+
+  # The scanner targets the HOST port (host.docker.internal:9001), not the
+  # compose-network hostname, so it reaches whichever server owns :9000 —
+  # this repo's or clinozy-be's. No depends_on: the gate script (sonar-gate.mjs)
+  # guarantees a healthy server before invoking the scanner.
+  scanner:
+    image: sonarsource/sonar-scanner-cli:11
+    container_name: clinozy-fe-sonar-scanner
+    profiles: ['scan']
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - .:/usr/src
+    working_dir: /usr/src
+    environment:
+      SONAR_HOST_URL: http://host.docker.internal:9001
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+    command: >
+      sonar-scanner
+        -Dsonar.projectKey=clinozy-fe
+        -Dsonar.projectName="clinozy-fe"
+        -Dsonar.projectVersion=1.0.0-alpha.0
+        -Dsonar.host.url=http://host.docker.internal:9001
+        -Dsonar.token=${SONAR_TOKEN:-admin:admin@}
+
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:

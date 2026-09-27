@@ -1,0 +1,29 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "clinozy-fe API Reference",
+  "entryPoints": ["src/core", "src/lib", "src/shared"],
+  "entryPointStrategy": "expand",
+  "tsconfig": "tsconfig.app.json",
+  "out": "docs/api",
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.property.test.ts",
+    "**/*.fixtures.ts",
+    "**/*.placeholder-data.ts",
+    "**/__tests__/**"
+  ],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "skipErrorChecking": true,
+  "readme": "none",
+  "githubPages": false,
+  "hideGenerator": true,
+  "gitRevision": "main",
+  "validation": {
+    "invalidLink": false,
+    "notExported": false,
+    "notDocumented": false
+  }
+}

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Refresh the codegraph index after a branch switch. Local, incremental,
+# backgrounded → costs no LLM tokens and never blocks the checkout.
+# $3 = 1 for a branch checkout, 0 for a file checkout.
+[ "$3" = "1" ] || exit 0
+command -v codegraph >/dev/null 2>&1 || exit 0
+[ -f .codegraph/codegraph.db ] || exit 0
+( codegraph sync -q >/dev/null 2>&1 & ) || true

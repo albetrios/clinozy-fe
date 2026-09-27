@@ -1,0 +1,140 @@
+{
+  "description": "Declarative skill chains — ordered, named pipelines that capture the fe-skill-registry 'multi-skill scenarios' as runnable sequences. Single source for: workflow commands, the routing reminder hooks, and the eventual skill planner. agent-os/evals/check.ts asserts every step (and optional step) references a real skill directory; triggers are kept consistent with agent-os/docs/skill-triggers.md. Steps run in order; each step is an existing skill invoked by name.",
+  "chains": {
+    "page-change": {
+      "description": "Adding or changing a page / route island end-to-end.",
+      "trigger": "src/pages/**/*.route.tsx",
+      "steps": [
+        "fe-page-scaffolding",
+        "fe-route-island",
+        "fe-e2e-testids",
+        "fe-test-generation"
+      ],
+      "optional": [
+        "fe-routing-tenancy"
+      ]
+    },
+    "fe-component-promotion": {
+      "description": "Promoting a page-local component up the ladder into shared / family-shared.",
+      "trigger": "src/shared/components/**/*.tsx",
+      "steps": [
+        "fe-component-promotion",
+        "composition-patterns",
+        "fe-test-generation"
+      ]
+    },
+    "fe-resource-crud": {
+      "description": "Scaffolding a backend resource UI — list page plus URL-driven create/edit dialogs.",
+      "trigger": "src/pages/**/*.resource.ts",
+      "steps": [
+        "fe-resource-crud",
+        "fe-http-forms-errors",
+        "fe-i18n-constants",
+        "fe-test-generation"
+      ]
+    },
+    "ui-review": {
+      "description": "Building or restyling UI — craft, accessibility, and motion review.",
+      "trigger": "src/**/components/**/*.tsx",
+      "steps": [
+        "frontend-design",
+        "web-design-guidelines",
+        "review-animations"
+      ],
+      "optional": [
+        "fe-theme-axis-audit",
+        "fe-visual-regression"
+      ]
+    },
+    "form-mutation": {
+      "description": "Building a form that mutates via apiClient and maps server/validation errors.",
+      "trigger": "src/**/forms/**/*.tsx",
+      "steps": [
+        "composition-patterns",
+        "fe-http-forms-errors",
+        "fe-test-generation"
+      ]
+    },
+    "data-hook": {
+      "description": "Adding a TanStack Query hook / data layer over the fetch client.",
+      "trigger": "src/**/*.api.ts",
+      "steps": [
+        "react-best-practices",
+        "fe-test-generation"
+      ]
+    },
+    "styling": {
+      "description": "Styling / theming with semantic tokens and Tailwind.",
+      "trigger": "src/index.css",
+      "steps": [
+        "frontend-design",
+        "web-design-guidelines"
+      ],
+      "optional": [
+        "fe-theme-axis-audit",
+        "fe-visual-regression"
+      ]
+    },
+    "env-change": {
+      "description": "Adding, renaming, or removing an env var and keeping schema + templates in sync.",
+      "trigger": "src/core/config/env-schema.ts",
+      "steps": [
+        "fe-env-schema-add"
+      ],
+      "optional": [
+        "fe-platform-hygiene"
+      ]
+    },
+    "new-guard": {
+      "description": "Adding a machine-enforced invariant (validator, eslint restriction, CI static-sync step).",
+      "trigger": "tooling/validate/**",
+      "steps": [
+        "fe-guard-authoring",
+        "fe-code-quality-security",
+        "fe-documentation-maintenance"
+      ]
+    },
+    "pr-readiness": {
+      "description": "Final pass before opening a pull request or requesting review. Intent-triggered — no file glob; a glob here would match every change.",
+      "trigger": null,
+      "steps": [
+        "fe-pre-pr-sweep",
+        "fe-before-commit-guard"
+      ],
+      "optional": [
+        "fe-project-health-check",
+        "fe-documentation-maintenance"
+      ]
+    },
+    "i18n-surface": {
+      "description": "Adding or changing user-facing copy, dates/numbers, or locale preferences.",
+      "trigger": "src/locales/**",
+      "steps": [
+        "fe-i18n-constants",
+        "fe-locale-formatting",
+        "fe-rtl-logical-css",
+        "fe-test-generation"
+      ],
+      "optional": [
+        "fe-locale-preferences"
+      ]
+    },
+    "fe-review-response": {
+      "description": "Working a code-review report or PR review threads to completion. Intent-triggered — no file glob; a glob here would match every change.",
+      "trigger": null,
+      "steps": [
+        "fe-review-response",
+        "fe-pre-pr-sweep",
+        "fe-documentation-maintenance"
+      ]
+    },
+    "agent-os-change": {
+      "description": "Adding, renaming or removing an agent-os skill or rule.",
+      "trigger": "agent-os/skills/**",
+      "steps": [
+        "fe-agent-os-authoring",
+        "fe-documentation-maintenance"
+      ]
+    }
+  }
+}

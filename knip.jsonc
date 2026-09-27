@@ -1,0 +1,59 @@
+// Dead-code gate: unused files, exports, types, dependencies, and binaries.
+// This is the layer that catches "config that nothing runs" and "exports
+// nothing imports" — the exact class of drift found by hand before adopting
+// it (.lighthouserc.cjs unwired, axios-client.ts compat shim, never-called
+// cleanup handlers). Run with `pnpm knip`; CI runs it as its own lane.
+//
+// Philosophy: a finding is either FIXED (delete/unexport) or the surface is
+// declared here with a reason. No silent suppressions.
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/App.tsx",
+    // Route islands are lazy-loaded from routeTree; manifests are the
+    // validator-mandated metadata file of every island (some are read only by
+    // tooling/conventions, not imported at runtime).
+    "src/pages/**/*.route.tsx",
+    "src/pages/**/*.manifest.ts",
+    // Folder-per-unit barrels are the unit's public API (validator-enforced);
+    // treating them as entries means "exported from the barrel" counts as the
+    // unit's surface, mirroring the file-structure contract.
+    "src/**/index.ts",
+    // Vite build plugins (imported by vite.config.ts) and CLI/dev scripts run
+    // via `node`/`pnpm` directly.
+    "plugins/**/*.ts",
+    "tooling/**/*.{mjs,ts}",
+    "tests/security/**/*.test.ts",
+    "tests/utils/**/*.{ts,tsx}",
+  ],
+  "project": ["src/**/*.{ts,tsx}", "plugins/**/*.ts", "tooling/**/*.{mjs,ts}"],
+  // Nothing suppressed — every prior ignore (vendored ui/**, staged
+  // organization-contracts, recharts-via-chart) is now genuinely used or
+  // reachable, so knip stays clean without them. Keep it that way.
+  "ignore": [],
+  // Dependencies knip cannot see (no CSS parsing; shell-script / MCP invocation):
+  //  - tailwindcss + tw-animate-css: imported in src/index.css (Tailwind v4 CSS-first)
+  //  - lint-staged: invoked by tooling/validate/before-commit-guard.sh (pre-commit)
+  //  - MCP server binaries: launched via `pnpm exec` in agent-os/mcp/mcp.json
+  //    (symlinked as .mcp.json), never imported — @upstash/context7-mcp →
+  //    context7, shadcn → shadcn, tailwindcss-mcp-server → tailwindcss,
+  //    @colbymchenry/codegraph → codegraph, chrome-devtools-mcp →
+  //    chrome-devtools (spawned by tooling/dev/chrome-devtools-mcp.mjs).
+  "ignoreDependencies": [
+    "tailwindcss",
+    "tw-animate-css",
+    "lint-staged",
+    "@upstash/context7-mcp",
+    "shadcn",
+    "tailwindcss-mcp-server",
+    "@colbymchenry/codegraph",
+    "chrome-devtools-mcp",
+  ],
+  // External CLIs invoked from tooling/workflows but not npm dependencies:
+  // gitleaks/semgrep (security scanners),
+  // stryker (installed ad-hoc by mutation-test.yml),
+  // rg (ripgrep, used by tooling/reports/code-review-report.mjs).
+  // (gh + python3 removed — knip resolves them via its default binary set,
+  //  so listing them here is redundant; re-adding reintroduces a knip hint.)
+  "ignoreBinaries": ["gitleaks", "semgrep", "stryker", "rg"],
+}

@@ -1,0 +1,285 @@
+{
+  "_note": "Real positive-path responses captured from a running clinozy-be on 2026-06-24 via a throwaway signup (LOCAL dev). Access tokens/session ids redacted. This is the source-of-truth for the snake_case WIRE contract the FE maps into FE-domain (camelCase) shapes. Re-verify with clinozy-be on :3000: pnpm test:e2e -- tests/e2e/*-api.e2e.test.ts",
+  "POST /auth/signup": {
+    "data": {
+      "access_token": "<redacted>",
+      "session_id": "<redacted>"
+    },
+    "meta": {
+      "request_id": "d8ff48a6-4c19-4c75-a744-5a59c78240e7"
+    }
+  },
+  "GET /auth/me/context": {
+    "data": {
+      "user": {
+        "id": "usr_uo4k6huzikbhmfn59otn3",
+        "email": "fe-cap-1782278998-9578@acme.test",
+        "is_email_verified": false,
+        "is_mfa_enabled": false,
+        "first_name": "Capture",
+        "last_name": "User",
+        "avatar_url": null,
+        "status": "ACTIVE",
+        "created_at": "2026-06-24T05:29:58.176Z",
+        "updated_at": "2026-06-24T05:29:58.176Z",
+        "capabilities": {
+          "personal_organizations": true,
+          "team_organizations": true
+        },
+        "personal_organization_id": "org_dd8r5wvq2b7gtnkugbnw1"
+      },
+      "active_organization": {
+        "id": "org_dd8r5wvq2b7gtnkugbnw1",
+        "name": "Personal",
+        "slug": null,
+        "type": "PERSONAL",
+        "status": "ACTIVE",
+        "logo_url": null,
+        "capabilities": {
+          "can_invite_members": false,
+          "can_manage_members": false,
+          "can_manage_roles": false,
+          "can_transfer_ownership": false,
+          "can_delete": false
+        },
+        "created_at": "2026-06-24T05:29:58.189Z",
+        "updated_at": "2026-06-24T05:29:58.189Z"
+      },
+      "my_permissions": [
+        "api-key:manage",
+        "api-key:read",
+        "invitation:manage",
+        "membership:manage",
+        "membership:read",
+        "notification-policy:manage",
+        "notification-policy:read",
+        "organization:delete",
+        "organization:read",
+        "organization:update",
+        "role:manage",
+        "role:read"
+      ],
+      "global_role": "user",
+      "organizations": [
+        {
+          "id": "org_dd8r5wvq2b7gtnkugbnw1",
+          "name": "Personal",
+          "slug": null,
+          "type": "PERSONAL",
+          "status": "ACTIVE",
+          "logo_url": null,
+          "capabilities": {
+            "can_invite_members": false,
+            "can_manage_members": false,
+            "can_manage_roles": false,
+            "can_transfer_ownership": false,
+            "can_delete": false
+          },
+          "created_at": "2026-06-24T05:29:58.189Z",
+          "updated_at": "2026-06-24T05:29:58.189Z",
+          "is_active": true
+        }
+      ]
+    },
+    "meta": {
+      "request_id": "39548060-ff86-4822-b7a5-8b8fb0143dbd"
+    }
+  },
+  "GET /billing/plans": {
+    "data": [
+      {
+        "id": "pln_sdtmjt7arqtzhood26fpd",
+        "name": "Free",
+        "description": null,
+        "price_monthly": "0.00",
+        "price_yearly": "0.00",
+        "currency": "USD",
+        "is_active": true,
+        "features": {},
+        "limits": {
+          "seats": null
+        },
+        "created_at": "2026-06-22T18:01:56.402Z",
+        "updated_at": "2026-06-22T18:01:56.402Z"
+      },
+      {
+        "id": "pln_1dzp8oyxt3hj79yvyimvj",
+        "name": "Starter",
+        "description": null,
+        "price_monthly": "29.00",
+        "price_yearly": "290.00",
+        "currency": "USD",
+        "is_active": true,
+        "features": {},
+        "limits": {
+          "seats": null
+        },
+        "created_at": "2026-06-22T18:01:56.411Z",
+        "updated_at": "2026-06-22T18:01:56.411Z"
+      },
+      {
+        "id": "pln_g0fu7wcajseuy94s0swvm",
+        "name": "Pro",
+        "description": null,
+        "price_monthly": "99.00",
+        "price_yearly": "990.00",
+        "currency": "USD",
+        "is_active": true,
+        "features": {},
+        "limits": {
+          "seats": null
+        },
+        "created_at": "2026-06-22T18:01:56.413Z",
+        "updated_at": "2026-06-22T18:01:56.413Z"
+      }
+    ],
+    "meta": {
+      "request_id": "79ac3b0d-9623-4b5d-a7e5-8a2c8b917a00",
+      "pagination": {
+        "per_page": 3,
+        "next": null,
+        "has_more": false,
+        "estimated_total": 3
+      }
+    }
+  },
+  "GET /tenancy/permissions": {
+    "data": [
+      {
+        "code": "audit-log:read",
+        "name": "View Audit Logs",
+        "description": null,
+        "category": "audit",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "subscription:manage",
+        "name": "Manage Subscription",
+        "description": null,
+        "category": "billing",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "subscription:read",
+        "name": "View Subscription",
+        "description": null,
+        "category": "billing",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "webhook:manage",
+        "name": "Manage Webhooks",
+        "description": null,
+        "category": "notify",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "webhook:read",
+        "name": "View Webhooks",
+        "description": null,
+        "category": "notify",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "api-key:manage",
+        "name": "Manage API Keys",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "api-key:read",
+        "name": "View API Keys",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "invitation:manage",
+        "name": "Manage Invitations",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "membership:manage",
+        "name": "Manage Members",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "membership:read",
+        "name": "View Members",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "notification-policy:manage",
+        "name": "Manage Notification Policies",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "notification-policy:read",
+        "name": "View Notification Policies",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "organization:delete",
+        "name": "Delete Organization",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "organization:read",
+        "name": "View Organization",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "organization:update",
+        "name": "Update Organization",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "role:manage",
+        "name": "Manage Roles",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "role:read",
+        "name": "View Roles",
+        "description": null,
+        "category": "tenancy",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      },
+      {
+        "code": "upload:manage",
+        "name": "Manage Uploads",
+        "description": null,
+        "category": "upload",
+        "created_at": "2026-06-22T12:27:53.616Z"
+      }
+    ],
+    "meta": {
+      "request_id": "2c821f4e-d35b-4e42-9659-c3e1979ee9f8",
+      "pagination": {
+        "per_page": 18,
+        "next": null,
+        "has_more": false,
+        "estimated_total": 18
+      }
+    }
+  }
+}

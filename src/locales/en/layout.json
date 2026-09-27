@@ -1,0 +1,158 @@
+{
+  "brand": {
+    "name": "{{productName}}"
+  },
+  "a11y": {
+    "skipToMain": "Skip to main content",
+    "mainNavigation": "Main navigation",
+    "sidebarNavigation": "Sidebar navigation",
+    "mobileNavigation": "Mobile navigation"
+  },
+  "auth": {
+    "switchToRegister": "Create an account",
+    "switchToSignIn": "Sign in",
+    "statusOperational": "All systems operational",
+    "badge": "Operations, unified",
+    "heroTitle": "The operating system for your organization.",
+    "heroSubtitle": "Members, roles, billing, and security — one fast, keyboard-first workspace for every team you run.",
+    "features": {
+      "multiOrg": {
+        "title": "Multi-org by design",
+        "body": "Switch teams without switching tools."
+      },
+      "secure": {
+        "title": "Secure by default",
+        "body": "RBAC, MFA, passkeys, and audit trails."
+      },
+      "fast": {
+        "title": "Fast everywhere",
+        "body": "Built for keyboard-first, real-time work."
+      }
+    },
+    "stats": {
+      "teams": "teams",
+      "uptime": "uptime",
+      "compliant": "compliant"
+    }
+  },
+  "app": {
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "searchShortcutMac": "⌘K",
+    "searchShortcutWindows": "Ctrl+K",
+    "userMenu": "User menu",
+    "userFallback": "User",
+    "settings": "Settings",
+    "logOut": "Log out",
+    "toggleSidebar": "Toggle sidebar",
+    "footerCopyright": "© {{year}} {{productName}} Platform",
+    "nav": {
+      "dashboard": "Dashboard"
+    },
+    "sidebar": {
+      "workspace": "Workspace",
+      "menu": "Menu",
+      "shortcuts": "Shortcuts"
+    },
+    "contextStrip": {
+      "label": "Quick access",
+      "labelSolo": "Jump to",
+      "profile": "Profile",
+      "security": "Security",
+      "billing": "Billing",
+      "appearance": "Appearance",
+      "shortcuts": "Shortcuts"
+    },
+    "workspaceSwitch": {
+      "preparing": "Preparing your workspace",
+      "loadingAccess": "Loading members and permissions",
+      "almostReady": "Almost ready"
+    },
+    "orgSwitcher": {
+      "selectPlaceholder": "Select organization",
+      "triggerLabel": "Switch organization — current: {{name}}",
+      "personal": "Personal",
+      "yourOrganizations": "Your organizations",
+      "organizations": "Organizations",
+      "addOrganization": "Add organization"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "ariaWithUnread": "Notifications, {{count}} unread",
+      "ariaDefault": "Notifications",
+      "newBadge": "{{count}} new",
+      "markAllRead": "Mark all read",
+      "loadError": "Couldn't load notifications. Please try again.",
+      "retry": "Try again",
+      "emptyTitle": "No notifications",
+      "emptyDescription": "You'll see updates about your account and organization here.",
+      "markRead": "Mark as read",
+      "settingsLink": "Notification settings"
+    },
+    "commandPalette": {
+      "ariaLabel": "Command palette",
+      "placeholder": "Type a command or search...",
+      "empty": "No results found.",
+      "groups": {
+        "navigation": "Navigation",
+        "theme": "Theme",
+        "account": "Account",
+        "organizations": "Organizations",
+        "shortcuts": "Shortcuts"
+      },
+      "dashboard": "Dashboard",
+      "userSettings": "User settings",
+      "organizationSettings": "Organization settings",
+      "lightMode": "Light mode",
+      "darkMode": "Dark mode",
+      "systemTheme": "System theme",
+      "settings": "Settings",
+      "logOut": "Log out",
+      "openShortcuts": "Keyboard shortcuts",
+      "switchOrganization": "Switch to {{name}}",
+      "currentOrganization": "{{name}} (current)"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "description": "Quick reference for navigation and actions.",
+      "commandPalette": "Open command palette",
+      "showShortcuts": "Show keyboard shortcuts",
+      "showShortcutsAlt": "Show keyboard shortcuts (alternate)",
+      "closeDialog": "Close dialog"
+    },
+    "emailVerify": {
+      "message": "Verify your email to secure your account.",
+      "resend": "Resend email",
+      "sending": "Sending…",
+      "sent": "Sent",
+      "notifySuccess": "Verification email sent — check your inbox.",
+      "notifyError": "Could not resend the email."
+    },
+    "sessionTimeout": {
+      "title": "Session expiring",
+      "description": "Your session will expire in {{countdown}} due to inactivity. Click \"Stay signed in\" to continue.",
+      "signOut": "Sign out",
+      "staySignedIn": "Stay signed in",
+      "signingOut": "Signing out…",
+      "signingOutDescription": "Ending your session securely. You will be taken to the sign-in page."
+    },
+    "orgCreate": {
+      "namePlaceholder": "Acme Inc.",
+      "slugPlaceholder": "acme",
+      "title": "Create organization",
+      "nameLabel": "Organization name",
+      "slugLabel": "Workspace URL (optional)",
+      "submit": "Create organization",
+      "submitting": "Creating…"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "shuffle": "Shuffle theme"
+    }
+  },
+  "public": {
+    "brandTagline": "Secure workspace for your team"
+  }
+}

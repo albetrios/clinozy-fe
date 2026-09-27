@@ -1,0 +1,9 @@
+{
+  "install": "bash agent-os/cloud-environment/install.sh",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "pnpm dev"
+    }
+  ]
+}

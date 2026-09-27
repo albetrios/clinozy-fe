@@ -1,0 +1,278 @@
+{
+  "greeting": "Bon retour, {{name}}",
+  "greetingFallback": "vous",
+  "heroSubtitle": "Voici ce qui se passe aujourd'hui dans votre espace de travail.",
+  "heroSubtitleSolo": "Voici ce qui se passe aujourd'hui.",
+  "errorLoad": "Impossible de charger votre espace de travail. Actualisez pour réessayer.",
+  "workspaceFallback": "Votre espace de travail",
+  "workspaceNameFallback": "votre espace de travail",
+  "orgType": {
+    "team": "Équipe",
+    "personal": "Personnel"
+  },
+  "status": {
+    "active": "Actif",
+    "suspended": "Suspendu",
+    "archived": "Archivé"
+  },
+  "overview": {
+    "ariaLabel": "Aperçu"
+  },
+  "stats": {
+    "workspaces": "Espaces de travail",
+    "workspacesHintOne": "Celui-ci uniquement",
+    "workspacesHintMany": "Vous êtes membre",
+    "permissions": "Vos autorisations",
+    "permissionsHint": "Dans cet espace",
+    "type": "Type d'espace",
+    "typeHintTeam": "Partagé avec votre équipe",
+    "typeHintPersonal": "Privé pour vous",
+    "billing": "Facturation",
+    "billingNone": "—",
+    "billingNoPlan": "Aucun forfait",
+    "billingHintPlan": "Facturation {{cycle}}",
+    "billingCycleMonthly": "mensuelle",
+    "billingCycleYearly": "annuelle"
+  },
+  "nextSteps": {
+    "ariaLabel": "Prochaines étapes suggérées",
+    "heading": "Prochaines étapes suggérées"
+  },
+  "quickActions": {
+    "ariaLabel": "Actions rapides",
+    "heading": "Actions rapides",
+    "inviteTitle": "Inviter des membres",
+    "inviteDescription": "Ajouter des coéquipiers à {{orgName}}",
+    "rolesTitle": "Gérer les rôles",
+    "rolesDescription": "Définir qui peut faire quoi",
+    "billingTitle": "Facturation et forfait",
+    "billingDescription": "Abonnement et factures",
+    "orgSettingsTitle": "Paramètres de l'organisation",
+    "orgSettingsDescription": "Nom, image de marque et plus",
+    "accountTitle": "Votre compte",
+    "accountDescription": "Profil, sécurité, sessions"
+  },
+  "organizations": {
+    "ariaLabel": "Vos organisations",
+    "heading": "Vos organisations",
+    "current": "Actuelle",
+    "openWorkspace": "Ouvrir l'espace →"
+  },
+  "insights": {
+    "ariaLabel": "Aperçus de l'espace",
+    "heading": "Aperçus de l'espace"
+  },
+  "highlights": {
+    "ariaLabel": "Points forts de l'espace",
+    "heading": "Points forts",
+    "description": "Des pistes pour tirer le meilleur de votre espace de travail",
+    "tabsLabel": "Thèmes des points forts",
+    "slideAnnouncement": "Diapositive {{current}} sur {{total}} : {{title}}",
+    "previousSlide": "Point fort précédent",
+    "nextSlide": "Point fort suivant",
+    "goToSlide": "Aller au point fort {{title}}",
+    "tabs": {
+      "appearance": "Apparence",
+      "invite": "Équipe",
+      "security": "Sécurité"
+    },
+    "slides": {
+      "appearance": {
+        "title": "Personnalisez-le",
+        "description": "Ajustez le thème, la densité et l'accent pour que l'espace corresponde à votre façon de travailler.",
+        "action": "Ouvrir les paramètres d'apparence"
+      },
+      "invite": {
+        "title": "Développez votre équipe",
+        "description": "Invitez des coéquipiers et attribuez des rôles pour que chacun ait le bon accès dès le premier jour.",
+        "action": "Inviter des membres"
+      },
+      "security": {
+        "title": "Sécurisez le tout",
+        "description": "Vérifiez la MFA, les sessions actives et les méthodes de connexion pour protéger votre compte.",
+        "action": "Vérifier les paramètres de sécurité"
+      }
+    }
+  },
+  "analytics": {
+    "heading": "Activité de l'espace",
+    "description": "Sessions et appels API dans le temps",
+    "rangeLabel": "Sélectionner la période",
+    "seriesSessions": "Sessions",
+    "seriesApiCalls": "Appels API",
+    "range": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "90 derniers jours"
+    }
+  },
+  "members": {
+    "ariaLabel": "Membres de l'équipe",
+    "heading": "Membres de l'équipe",
+    "description_one": "{{count}} personne dans cet espace",
+    "description_many": "{{count}} de personnes dans cet espace",
+    "description_other": "{{count}} personnes dans cet espace",
+    "columnMember": "Membre",
+    "columnRole": "Rôle",
+    "columnStatus": "Statut",
+    "columnJoined": "Rejoint",
+    "status": {
+      "active": "Actif",
+      "invited": "Invité",
+      "suspended": "Suspendu"
+    },
+    "error": "Impossible de charger les membres.",
+    "empty": "Personne n’a encore rejoint cet espace de travail.",
+    "noWorkspace": "Aucun espace de travail sélectionné."
+  },
+  "trends": {
+    "heading": "Tendances d'utilisation",
+    "description": "Évolution semaine après semaine"
+  },
+  "usageBars": {
+    "heading": "Utilisation hebdo",
+    "description": "Sessions et appels API par semaine"
+  },
+  "heatmap": {
+    "heading": "Heatmap d'activité",
+    "description": "Douze semaines d'activité quotidienne",
+    "less": "Moins",
+    "more": "Plus"
+  },
+  "funnel": {
+    "heading": "Entonnoir d'acquisition",
+    "description": "De la première visite à l'activation",
+    "stages": {
+      "visited": "Visiteurs",
+      "signedUp": "Inscrits",
+      "onboarded": "Intégrés",
+      "activated": "Activés"
+    }
+  },
+  "radar": {
+    "heading": "Santé de l'espace",
+    "description": "Cinq dimensions en un coup d'œil",
+    "axes": {
+      "activity": "Activité",
+      "growth": "Croissance",
+      "security": "Sécurité",
+      "automation": "Automatisation",
+      "engagement": "Engagement"
+    }
+  },
+  "leaderboard": {
+    "heading": "Top automatisations",
+    "description": "Plus d'exécutions ce mois-ci",
+    "runs": "exécutions",
+    "items": {
+      "welcomeEmail": "E-mail de bienvenue",
+      "weeklyDigest": "Résumé hebdo",
+      "slackSync": "Sync Slack",
+      "backupJob": "Sauvegarde"
+    }
+  },
+  "focus": {
+    "heading": "Minuteur de concentration",
+    "description": "Un sprint de 25 minutes de travail profond",
+    "start": "Démarrer",
+    "pause": "Pause",
+    "reset": "Réinitialiser"
+  },
+  "meters": {
+    "heading": "Utilisation du forfait",
+    "description": "Part du forfait utilisée"
+  },
+  "billingCard": {
+    "heading": "Résumé de facturation",
+    "description": "Forfait, renouvellement et paiement",
+    "plan": "Forfait",
+    "nextInvoice": "Prochaine facture",
+    "payment": "Paiement",
+    "noPlan": "Aucun forfait",
+    "choosePlan": "Choisir un forfait",
+    "manage": "Gérer la facturation"
+  },
+  "ai": {
+    "heading": "Interrogez votre espace",
+    "description": "Recherchez, lancez des actions, naviguez",
+    "placeholder": "Demandez ce que vous voulez…",
+    "chips": {
+      "usage": "Voir l'utilisation",
+      "members": "Inviter des membres",
+      "appearance": "Changer le thème"
+    }
+  },
+  "map": {
+    "heading": "Activité mondiale",
+    "description": "Sessions par région cette semaine",
+    "regions": {
+      "americas": "Amériques",
+      "europe": "Europe",
+      "asia": "Asie",
+      "oceania": "Océanie"
+    }
+  },
+  "donut": {
+    "heading": "Sessions par source",
+    "description": "D'où viennent les sessions de la semaine",
+    "segments": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "api": "API"
+    }
+  },
+  "ranking": {
+    "heading": "Utilisation des fonctionnalités",
+    "description": "Progression vers les objectifs hebdo"
+  },
+  "timeline": {
+    "heading": "Ce mois-ci",
+    "description": "Dates clés du mois",
+    "today": "Aujourd'hui"
+  },
+  "activity": {
+    "heading": "Activité récente",
+    "description": "Derniers changements de cet espace de travail",
+    "events": {
+      "inviteAccepted": "Un nouveau membre a accepté son invitation",
+      "roleUpdated": "Le rôle d'un membre a été mis à jour",
+      "planRenewed": "L'abonnement a été renouvelé avec succès",
+      "settingsChanged": "Les paramètres de l'espace ont été mis à jour"
+    }
+  },
+  "pulse": {
+    "heading": "Pouls de l'espace",
+    "description": "Activité hebdomadaire de cet espace de travail",
+    "score": "de l'objectif hebdo",
+    "metrics": {
+      "sessions": "Sessions",
+      "automations": "Automatisations",
+      "reviews": "Révisions"
+    }
+  },
+  "schedule": {
+    "ariaLabel": "Calendrier",
+    "heading": "Calendrier",
+    "description": "Renouvellements, revues et événements d'équipe",
+    "upcoming": "À venir",
+    "legendEvent": "Jour d'événement",
+    "empty": "Rien de prévu",
+    "events": {
+      "planRenewal": "Renouvellement du forfait",
+      "accessReview": "Revue d’accès trimestrielle",
+      "teamSync": "Sync d’équipe",
+      "invoiceDue": "Facture due"
+    }
+  },
+  "sampleBadge": "Données d'exemple",
+  "themeShowcase": {
+    "ariaLabel": "Thème de l'espace de travail",
+    "heading": "Thème de l'espace de travail",
+    "shuffle": "Aléatoire",
+    "customize": "Personnaliser",
+    "custom": "Personnalisé",
+    "default": "Par défaut",
+    "shuffledTitle": "Thème mélangé",
+    "shuffledDescription": "Nouvelle couleur d'accent, polices et rayon — et style de notification."
+  }
+}

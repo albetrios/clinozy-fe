@@ -1,0 +1,308 @@
+name: Reusable — Netlify deploy
+
+# Builds dist/ on GitHub Actions and publishes to Netlify. Deploy-per-purpose:
+# the GitHub Environment (not a branch) selects the target and its secrets.
+#   production   → production deploy (--prod, clinozy-fe.netlify.app)
+#   <any other>  → alias deploy      (--alias <env>, <env>--clinozy-fe.netlify.app —
+#                                     development → development--clinozy-fe.netlify.app)
+# Adding a new environment = a new GitHub Environment + a deploy-<env> job in
+# post-merge-ci.yml; this reusable needs no change (it derives the alias from the
+# environment name). Point a new env's NETLIFY_SITE_ID at a separate site if you
+# want it off the shared "clinozy-fe" project.
+#
+# Two ways in (parity with clinozy-be's reusable-railway-deploy.yml):
+#   - workflow_call  — post-merge-ci passes github_environment (+ optional ref).
+#   - workflow_dispatch — deploy on demand: pick the `target` environment and an
+#     optional `ref` (a tag vX.Y.Z) to rebuild+republish for rollback, without
+#     the release-please pipeline. The production environment's required reviewer
+#     still gates a manual prod deploy, so governance is preserved.
+
+on:
+  workflow_call:
+    inputs:
+      github_environment:
+        description: GitHub Environment name (development or production)
+        required: true
+        type: string
+      ref:
+        description: Git ref to build (tag/branch/SHA). Empty = the triggering ref.
+        required: false
+        type: string
+        default: ''
+      upload-release-artifact:
+        description: Upload dist/ as a release artifact when a release was created
+        required: false
+        type: boolean
+        default: false
+      artifact-name:
+        description: Artifact name when upload-release-artifact is true
+        required: false
+        type: string
+        default: release-dist
+  workflow_dispatch:
+    inputs:
+      target:
+        description: GitHub Environment to deploy
+        required: true
+        type: choice
+        options:
+          - production
+          - development
+      ref:
+        description: Git ref to (re)deploy — e.g. a tag v1.1.0 for rollback. Empty = current branch.
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+# Concurrency policy per environment (single source — callers don't repeat it):
+#   - production   → NEVER cancel: a prod deploy must complete; a manual
+#                    (workflow_dispatch) deploy queues behind an in-flight one.
+#   - every other  → BATCH: a burst of pushes collapses to one deploy of the
+#                    final HEAD (cancel the superseded in-flight deploy).
+concurrency:
+  group: netlify-deploy-${{ inputs.target || inputs.github_environment }}
+  cancel-in-progress: ${{ (inputs.target || inputs.github_environment) != 'production' }}
+
+jobs:
+  resolve-environment:
+    name: Resolve deploy target
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      environment: ${{ steps.map.outputs.environment }}
+      ref: ${{ steps.map.outputs.ref }}
+    steps:
+      - id: map
+        env:
+          # `github.event_name` LEAKS into a called reusable as the CALLER's
+          # event (e.g. 'workflow_dispatch' when post-merge-ci was itself
+          # dispatched), so only trust `target` when it is actually set —
+          # otherwise fall back to the workflow_call inputs. Same guard clinozy-be
+          # documents in reusable-railway-deploy.yml.
+          EVENT_NAME: ${{ github.event_name }}
+          TARGET_INPUT: ${{ inputs.target }}
+          GH_ENV_INPUT: ${{ inputs.github_environment }}
+          REF_INPUT: ${{ inputs.ref }}
+          REF_NAME: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$TARGET_INPUT" ]; then
+            # Manual deploy / rollback: environment from the `target` input.
+            environment="$TARGET_INPUT"
+          elif [ -n "$GH_ENV_INPUT" ]; then
+            # Called from post-merge-ci.
+            environment="$GH_ENV_INPUT"
+          else
+            echo "::error::Could not resolve a deploy environment (no dispatch target and no github_environment input)."
+            exit 1
+          fi
+          case "$environment" in
+            production | development) ;;
+            *) echo "::error::Unsupported environment: $environment" && exit 1 ;;
+          esac
+          # ref: explicit rollback ref (a tag) wins; else the triggering ref.
+          ref="${REF_INPUT:-$REF_NAME}"
+          echo "environment=$environment" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "Resolved deploy target: environment=$environment ref=$ref (event=$EVENT_NAME)"
+
+  run:
+    name: Netlify deploy (${{ needs.resolve-environment.outputs.environment }})
+    needs: resolve-environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: ${{ needs.resolve-environment.outputs.environment }}
+    # id-token/attestations: mint a build-provenance attestation for the exact
+    # production bundle before it ships (production deploys only — see the
+    # prod-gated attest step). contents:read is kept for checkout.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Rollback lane: a dispatch with ref=vX.Y.Z rebuilds that exact tag.
+          # Maintainer-supplied via workflow_dispatch/_call — not untrusted input.
+          ref: ${{ needs.resolve-environment.outputs.ref }}
+          fetch-depth: 1
+
+      - name: Validate deploy secrets (fail loud)
+        env:
+          GITHUB_ENV_VALIDATION_SOURCE: runtime
+          SKIP_GITHUB_ENV: '1'
+          CONFIG: ${{ needs.resolve-environment.outputs.environment }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
+          VITE_PRIVACY_POLICY_URL: ${{ secrets.VITE_PRIVACY_POLICY_URL }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_CSP_REPORT_URI: ${{ secrets.VITE_CSP_REPORT_URI }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+        run: node tooling/setup/github/validate-github-env.mjs
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # Runs for BOTH environments so each is checked against its own strict
+      # profile (required + forbidden + allowed value sets). The diagnostics
+      # flags are exposed so the per-environment `allowed` check can enforce them
+      # (e.g. production rejects VITE_DEBUG_LOGGING=true).
+      - name: Validate client env (VITE_*)
+        env:
+          DEPLOY_ENV: ${{ needs.resolve-environment.outputs.environment }}
+          VITE_APP_ENV: ${{ needs.resolve-environment.outputs.environment }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_CAPTCHA_DISABLED: ${{ vars.VITE_CAPTCHA_DISABLED }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_DEBUG_LOGGING: ${{ vars.VITE_DEBUG_LOGGING }}
+          VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
+          VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
+          VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+        run: pnpm validate:client-env --env "$DEPLOY_ENV"
+
+      - name: Resolve app version from release-please manifest
+        id: version
+        run: |
+          set -euo pipefail
+          # Single channel — one manifest. On a rollback the checked-out tag
+          # carries its own manifest, so this self-reports the deployed version.
+          version="$(jq -r '."."' ".github/release-please/manifest.json")"
+          echo "vite_app_version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        # Vite bakes `import.meta.env.VITE_*` into the client bundle from `.env`
+        # FILES — bare `process.env.VITE_*` (a workflow `env:` block) is NOT
+        # reliably exposed to `import.meta.env` in CI, and all `.env*` files are
+        # gitignored so none exist on a fresh checkout. So materialize the
+        # deploy-provided client env into `.env.production.local` (highest Vite
+        # precedence, gitignored, never uploaded — we deploy `--dir=dist`) before
+        # building. Without this the app booted with VITE_CAPTCHA_DISABLED unset
+        # and VITE_API_BASE_URL blank → `validatePlatformInvariantsAtBoot` threw
+        # a white-screen error. The key list is kept in sync with the validate
+        # step, preview.yml, and tooling/setup/github/validate-github-env.mjs by
+        # tests/ci/deploy-env-sync.policy.test.ts. SENTRY_AUTH_TOKEN/ORG/PROJECT
+        # are build-time (non-VITE) keys for the sourcemap-upload plugin
+        # (vite.config.ts reads them via loadEnv, so they must be in the file).
+        run: |
+          : > .env.production.local
+          for key in VITE_API_BASE_URL VITE_APP_ENV VITE_APP_VERSION VITE_CAPTCHA_DISABLED \
+            VITE_TURNSTILE_SITE_KEY VITE_STRIPE_PUBLISHABLE_KEY VITE_POSTHOG_KEY VITE_POSTHOG_HOST \
+            VITE_PRIVACY_POLICY_URL VITE_CSP_REPORT_URI \
+            VITE_DEBUG_LOGGING VITE_DEVTOOLS VITE_E2E_HOOKS VITE_VERSION_CHECK \
+            VITE_SENTRY_DSN VITE_SENTRY_TRACES_SAMPLE_RATE \
+            VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE VITE_SENTRY_PROFILES_SAMPLE_RATE \
+            VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE \
+            SENTRY_AUTH_TOKEN SENTRY_ORG SENTRY_PROJECT; do
+            value="${!key}"
+            if [ -n "$value" ]; then
+              printf '%s=%s\n' "$key" "$value" >> .env.production.local
+            fi
+          done
+          echo "Materialized $(grep -c = .env.production.local) client env keys for the build."
+          pnpm build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_APP_ENV: ${{ needs.resolve-environment.outputs.environment }}
+          VITE_APP_VERSION: ${{ steps.version.outputs.vite_app_version }}
+          VITE_CAPTCHA_DISABLED: ${{ vars.VITE_CAPTCHA_DISABLED }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
+          VITE_PRIVACY_POLICY_URL: ${{ secrets.VITE_PRIVACY_POLICY_URL }}
+          VITE_CSP_REPORT_URI: ${{ secrets.VITE_CSP_REPORT_URI }}
+          VITE_DEBUG_LOGGING: ${{ vars.VITE_DEBUG_LOGGING }}
+          VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
+          VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
+          VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_SENTRY_TRACES_SAMPLE_RATE: ${{ vars.VITE_SENTRY_TRACES_SAMPLE_RATE }}
+          VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: ${{ vars.VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE }}
+          VITE_SENTRY_PROFILES_SAMPLE_RATE: ${{ vars.VITE_SENTRY_PROFILES_SAMPLE_RATE }}
+          VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: ${{ vars.VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+
+      # Build-provenance for the exact bytes that ship to production. Package
+      # dist/ into one deterministic subject and attest it BEFORE deploy, so a
+      # production bundle is never published without a verifiable provenance
+      # attestation (fail-closed). Production only — the development alias is not
+      # a release surface. Verify later with:
+      #   gh attestation verify clinozy-fe-dist.tgz --repo albetrios/clinozy-fe
+      - name: Package dist for provenance
+        if: needs.resolve-environment.outputs.environment == 'production'
+        run: tar -czf clinozy-fe-dist.tgz -C dist .
+
+      - name: Attest production build provenance
+        if: needs.resolve-environment.outputs.environment == 'production'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: clinozy-fe-dist.tgz
+
+      - name: Upload release artifact
+        if: inputs.upload-release-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: dist/
+          retention-days: 90
+
+      - name: Deploy to Netlify
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          GITHUB_ENVIRONMENT: ${{ needs.resolve-environment.outputs.environment }}
+        run: |
+          # Deploy target — no hardcoded alias:
+          #   production   → --prod (the live site, clinozy-fe.netlify.app)
+          #   <any other>  → --alias <env-name>  (development → development--clinozy-fe.netlify.app,
+          #                                        staging → staging--…, …)
+          # A new GitHub Environment deploys to its own alias with zero rewiring.
+          if [ "$GITHUB_ENVIRONMENT" = "production" ]; then
+            DEPLOY_FLAGS="--prod"
+          else
+            DEPLOY_FLAGS="--alias $GITHUB_ENVIRONMENT"
+          fi
+          # shellcheck disable=SC2086 # DEPLOY_FLAGS is two words by design
+          pnpm exec netlify deploy $DEPLOY_FLAGS --dir=dist --json > deploy-result.json
+          DEPLOY_URL=$(node -e "const r=JSON.parse(require('fs').readFileSync('deploy-result.json','utf8')); console.log(r.url ?? r.deploy_url ?? '')")
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "Could not read the deploy URL from netlify output:" >&2
+            cat deploy-result.json >&2
+            exit 1
+          fi
+          echo "Deployed to $DEPLOY_URL (${{ needs.resolve-environment.outputs.environment }})"
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Post-deploy smoke
+        if: steps.deploy.outputs.url != ''
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          echo "Smoking $DEPLOY_URL"
+          VERSION_JSON=$(curl -fsS --retry 3 --retry-delay 5 "$DEPLOY_URL/version.json")
+          echo "version.json: $VERSION_JSON"
+          BUILD_ID=$(node -e "console.log(JSON.parse(process.argv[1]).buildId ?? '')" "$VERSION_JSON")
+          if [ -z "$BUILD_ID" ]; then
+            echo "version.json has no buildId — deploy looks broken." >&2
+            exit 1
+          fi
+          LOGIN_HTML=$(curl -fsS --retry 3 --retry-delay 5 "$DEPLOY_URL/login")
+          echo "$LOGIN_HTML" | grep -q 'id="root"' || {
+            echo "/login did not serve the app shell (SPA redirect broken?)." >&2
+            exit 1
+          }
+          echo "Smoke OK — buildId $BUILD_ID live."

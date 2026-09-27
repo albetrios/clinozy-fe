@@ -1,0 +1,100 @@
+# Dead-code audit reminder — quarterly nudge to run the barrel-hidden dead-code sweep.
+#
+# The per-PR `knip` gate treats folder barrels (`src/**/index.ts`) as entry
+# points, so a symbol re-exported from a barrel but imported by NOTHING slips
+# past it (e.g. the animation modules + @deprecated aliases pruned in #151). That
+# class accumulates slowly and — given this repo's mixed barrel/direct-import
+# conventions — is caught far more reliably by a periodic MANUAL pass than by any
+# brittle automated scan. So this is deliberately a reminder, not a detector: it
+# opens a tracked issue with the audit playbook every quarter, and escalates via
+# comment if a prior one is left unactioned.
+
+name: Dead-code audit reminder
+
+on:
+  schedule:
+    - cron: '0 7 1 */3 *' # quarterly — 1st of Jan/Apr/Jul/Oct, 07:00 UTC
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dead-code-audit-reminder
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    name: Open dead-code audit reminder
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 7 1 */3 *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # `issues: write` to open/refresh the tracked reminder; workflow default is
+    # `contents: read`, so widen it here only.
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or escalate the dead-code audit issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const marker = '<!-- dead-code-audit-reminder -->';
+            const label = 'dead-code-audit';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            const body = [
+              marker,
+              '## Quarterly dead-code audit',
+              '',
+              'Time for the periodic barrel-hidden dead-code sweep. The per-PR `knip` gate',
+              'treats folder barrels (`src/**/index.ts`) as entry points, so a symbol',
+              're-exported from a barrel but imported by **nothing** slips past it (e.g. the',
+              'animation modules and `@deprecated` aliases pruned in #151). This class',
+              'accumulates slowly, so a manual pass is the reliable catch.',
+              '',
+              '### How to run it',
+              '- For each `export` in `src/`, confirm a **real** consumer — a named import or',
+              '  JSX usage, not just a path/dir-name match. Fan out by area (components, hooks,',
+              '  lib, shared) for speed.',
+              '- Focus on: `@deprecated` aliases with zero consumers, barrel re-exports nobody',
+              '  imports, and modules reachable only via a barrel.',
+              '- While here, re-check unused `package.json` scripts and docs referencing removed code.',
+              '',
+              'Close this issue once the sweep is done (open a cleanup PR if anything turns up).',
+              '',
+              `Run: ${runUrl}`,
+            ].join('\n');
+
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: label,
+              per_page: 100,
+            });
+            const existing = open.find((issue) => (issue.body || '').includes(marker));
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body: `${marker}\nAnother quarter has elapsed and this audit is still open — it is now overdue.\n\nRun: ${runUrl}`,
+              });
+              core.notice(`Bumped overdue dead-code audit issue #${existing.number}`);
+            } else {
+              // `labels` auto-creates the `dead-code-audit` label if it does not exist.
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: 'Quarterly dead-code audit',
+                labels: [label],
+                body,
+              });
+              core.notice(`Opened dead-code audit issue #${created.data.number}`);
+            }

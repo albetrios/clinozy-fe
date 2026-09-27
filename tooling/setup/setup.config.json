@@ -1,0 +1,120 @@
+{
+  "project": {
+    "name": "clinozy-fe",
+    "displayName": "Clinozy Frontend",
+    "organization": "albetrios",
+    "productName": "Clinozy",
+    "productDescription": "Enterprise multi-tenant admin dashboard",
+    "themeColor": "#0a0a0a",
+    "backgroundColor": "#ffffff",
+    "codeowner": "@nikunjmavani",
+    "backendName": "clinozy-be",
+    "namespace": "clinozy",
+    "previousNames": [
+      "core-fe",
+      "core-be",
+      "clinovia-fe",
+      "clinovia-be",
+      "Clinovia",
+      "clinovia"
+    ]
+  },
+  "git": {
+    "protectedBranches": ["main"],
+    "defaultBranch": "main"
+  },
+  "environments": [
+    {
+      "name": "development",
+      "label": "Development",
+      "viteMode": "development",
+      "protected": true,
+      "isDefault": true,
+      "cookieBanner": {
+        "captureConsentEvents": true,
+        "posthogEventName": "analytics_consent_decision"
+      },
+      "deploySecretsRequired": [
+        "VITE_API_BASE_URL",
+        "NETLIFY_AUTH_TOKEN",
+        "NETLIFY_SITE_ID"
+      ],
+      "deploySecrets": [
+        "VITE_API_BASE_URL",
+        "VITE_POSTHOG_KEY",
+        "VITE_POSTHOG_HOST",
+        "VITE_PRIVACY_POLICY_URL",
+        "VITE_TURNSTILE_SITE_KEY",
+        "VITE_STRIPE_PUBLISHABLE_KEY",
+        "VITE_CSP_REPORT_URI",
+        "VITE_SENTRY_DSN",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "NETLIFY_AUTH_TOKEN",
+        "NETLIFY_SITE_ID"
+      ],
+      "deployVariables": [
+        "VITE_CAPTCHA_DISABLED",
+        "VITE_DEBUG_LOGGING",
+        "VITE_DEVTOOLS",
+        "VITE_E2E_HOOKS",
+        "VITE_VERSION_CHECK",
+        "VITE_SENTRY_TRACES_SAMPLE_RATE",
+        "VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE",
+        "VITE_SENTRY_PROFILES_SAMPLE_RATE",
+        "VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE"
+      ]
+    },
+    {
+      "name": "production",
+      "label": "Production",
+      "viteMode": "production",
+      "protected": true,
+      "cookieBanner": {
+        "captureConsentEvents": true,
+        "posthogEventName": "analytics_consent_decision"
+      },
+      "deploySecretsRequired": [
+        "VITE_API_BASE_URL",
+        "NETLIFY_AUTH_TOKEN",
+        "NETLIFY_SITE_ID"
+      ],
+      "deploySecrets": [
+        "VITE_API_BASE_URL",
+        "VITE_POSTHOG_KEY",
+        "VITE_POSTHOG_HOST",
+        "VITE_PRIVACY_POLICY_URL",
+        "VITE_TURNSTILE_SITE_KEY",
+        "VITE_STRIPE_PUBLISHABLE_KEY",
+        "VITE_CSP_REPORT_URI",
+        "VITE_SENTRY_DSN",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "NETLIFY_AUTH_TOKEN",
+        "NETLIFY_SITE_ID"
+      ],
+      "deployVariables": [
+        "VITE_CAPTCHA_DISABLED",
+        "VITE_DEBUG_LOGGING",
+        "VITE_DEVTOOLS",
+        "VITE_E2E_HOOKS",
+        "VITE_VERSION_CHECK",
+        "VITE_SENTRY_TRACES_SAMPLE_RATE",
+        "VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE",
+        "VITE_SENTRY_PROFILES_SAMPLE_RATE",
+        "VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE"
+      ]
+    }
+  ],
+  "providers": {
+    "netlify": {
+      "enabled": true
+    },
+    "github": {
+      "enabled": true,
+      "repository": "albetrios/clinozy-fe"
+    }
+  }
+}

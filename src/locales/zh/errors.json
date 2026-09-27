@@ -1,0 +1,181 @@
+{
+  "global": {
+    "title": "出了点问题",
+    "message": "发生意外错误。请尝试重新加载页面。",
+    "reload": "重新加载"
+  },
+  "route": {
+    "notFound": "您访问的页面不存在。",
+    "generic": "出了点问题。",
+    "pageTitle": "此页面发生错误",
+    "pageMessage": "渲染此页面时出错。",
+    "tryAgain": "重试",
+    "goHome": "返回首页",
+    "refresh": "刷新页面",
+    "forbidden": "你没有访问此页面的权限。",
+    "signOut": "退出登录",
+    "signingOut": "正在退出…"
+  },
+  "widget": {
+    "unavailable": "{{title}} 不可用",
+    "message": "加载此区域时出错。请重试。",
+    "retry": "重试",
+    "unavailableShort": "不可用",
+    "controlRetry": "{{title}}不可用。选择以重试。",
+    "pageContent": "页面内容",
+    "navigation": "导航",
+    "emailBanner": "邮箱验证",
+    "notifications": "通知",
+    "organizationSwitcher": "组织切换",
+    "commandPalette": "命令面板",
+    "settings": "设置",
+    "appearance": "外观",
+    "analytics": "分析",
+    "members": "成员",
+    "schedule": "日程",
+    "highlights": "精选",
+    "themeShowcase": "主题展示",
+    "sessionTimeout": "会话计时器",
+    "securityCheck": "安全检查",
+    "appearanceControls": "外观控件",
+    "payment": "付款",
+    "cancellation": "取消订阅"
+  },
+  "toast": {
+    "dismiss": "关闭通知",
+    "preview": {
+      "successTitle": "已保存更改",
+      "successDescription": "您的设置已生效。",
+      "errorTitle": "出了点问题",
+      "errorDescription": "请重试。",
+      "warningTitle": "请注意",
+      "warningDescription": "此操作需要审核。",
+      "infoTitle": "你知道吗？",
+      "infoDescription": "随机切换也会改变此设计。"
+    },
+    "undo": "撤销",
+    "undone": "已取消操作",
+    "processing": "处理中…"
+  },
+  "api": {
+    "fallback": "出了点问题。请重试。",
+    "unexpected": "发生意外错误",
+    "http400": "请求无效。请检查输入后重试。",
+    "http401": "会话已过期。请重新登录。",
+    "http403": "您没有执行此操作的权限。",
+    "http404": "未找到请求的资源。",
+    "http409": "发生冲突。资源可能已被他人修改。",
+    "http422": "提交的数据无效。请检查后重试。",
+    "http429": "请求过于频繁。请稍后再试。",
+    "http500": "发生内部错误。请稍后重试。",
+    "http502": "服务器暂时不可用。请稍后重试。",
+    "http503": "服务暂时不可用。请稍后重试。"
+  },
+  "frontend": {
+    "query": {
+      "loadFailed": "无法加载数据。",
+      "retry": "重试"
+    },
+    "organization": {
+      "roleRequired": "更改成员角色需要选择角色。",
+      "updateFailed": "无法更新组织",
+      "logoInvalidType": "请选择图片文件。",
+      "logoTooLarge": "Logo 必须小于 5 MB。",
+      "logoReadFailed": "无法读取该文件。",
+      "formCheck": "请检查表单",
+      "updateSuccess": "组织已更新",
+      "createSuccess": "已创建 {{name}}",
+      "createdSwitchFailed": "已创建 {{name}}，但无法打开。请在组织切换器中选择它。",
+      "logoUpdated": "已更新标志。",
+      "logoRemoved": "已移除标志。"
+    },
+    "account": {
+      "copyFailed": "无法复制到剪贴板",
+      "themeCodeNumeric": "请输入数字主题代码",
+      "copySuccess": "账户 ID 已复制",
+      "themeLinkCopied": "主题链接已复制",
+      "themeLinkCopiedDescription": "分享此 URL 以复现外观。",
+      "notificationStylePreview": "通知样式",
+      "notificationStylePreviewDescription": "{{variant}} — 使用您的强调色和语义颜色。",
+      "accountDeletionPending": "账户已删除，正在登出…",
+      "avatarInvalidType": "请选择图片文件。",
+      "avatarTooLarge": "头像必须小于 2 MB。",
+      "avatarUpdated": "头像已更新。",
+      "avatarRemoved": "头像已移除。"
+    },
+    "hooks": {
+      "passkeys": {
+        "addFailed": "无法添加通行密钥",
+        "removeFailed": "无法移除通行密钥",
+        "addSuccess": "通行密钥已添加",
+        "removeSuccess": "通行密钥已移除"
+      },
+      "mfa": {
+        "disableFailed": "无法关闭双因素认证",
+        "enableSuccess": "双因素认证已启用",
+        "disableSuccess": "双因素认证已关闭"
+      },
+      "members": {
+        "updateRoleFailed": "无法更新角色",
+        "removeFailed": "无法移除成员",
+        "updateFailed": "无法更新成员",
+        "updateRoleSuccess": "成员角色已更新",
+        "removeSuccess": "成员已移除",
+        "suspendSuccess": "成员已暂停",
+        "reactivateSuccess": "成员已重新激活"
+      },
+      "roles": {
+        "createFailed": "无法创建角色",
+        "updateFailed": "无法更新角色",
+        "deleteFailed": "无法删除角色",
+        "createSuccess": "角色 \"{{name}}\" 已创建",
+        "updateSuccess": "角色 \"{{name}}\" 已更新",
+        "deleteSuccess": "角色已删除"
+      },
+      "apiKeys": {
+        "createFailed": "无法创建 API 密钥",
+        "renameFailed": "无法重命名 API 密钥",
+        "revokeFailed": "无法撤销 API 密钥",
+        "createSuccess": "API 密钥已创建",
+        "renameSuccess": "API 密钥已重命名",
+        "revokeSuccess": "API 密钥已撤销"
+      },
+      "sessions": {
+        "signOutFailed": "无法退出该会话",
+        "signOutSuccess": "已退出该会话"
+      },
+      "notifications": {
+        "updateFailed": "无法更新通知",
+        "updateManyFailed": "无法更新通知",
+        "savePreferencesFailed": "无法保存偏好设置",
+        "savePreferencesSuccess": "通知偏好已保存"
+      },
+      "webhooks": {
+        "createFailed": "无法创建 Webhook",
+        "deleteFailed": "无法删除 Webhook",
+        "createSuccess": "Webhook 已创建",
+        "deleteSuccess": "Webhook 已删除",
+        "updateSuccess": "Webhook 已更新"
+      },
+      "subscription": {
+        "changePlanFailed": "无法更改套餐",
+        "changePlanSuccess": "已切换到 {{plan}} 套餐",
+        "paymentSetupFailed": "套餐已更改，但无法开始付款步骤。请重新打开账单页面完成。",
+        "cancelSuccess": "订阅将在本计费周期结束时终止",
+        "resumeSuccess": "订阅已恢复"
+      },
+      "invitations": {
+        "sendFailed": "无法发送邀请",
+        "sendSuccess": "邀请已发送至 {{email}}",
+        "resendSuccess": "邀请已重新发送至 {{email}}",
+        "cancelSuccess": "邀请已取消"
+      }
+    },
+    "profileUpdated": "个人资料已更新"
+  },
+  "suspended": {
+    "title": "组织已暂停",
+    "message": "该组织当前已暂停。请联系组织管理员核对账单，或切换到其他组织。",
+    "switchOrganization": "切换组织"
+  }
+}

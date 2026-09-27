@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Initial JS (entry + vendor)",
+    "path": "dist/assets/index-*.js",
+    "limit": "260 kB",
+    "gzip": true
+  },
+  {
+    "name": "Initial CSS",
+    "path": "dist/assets/index-*.css",
+    "limit": "30 kB",
+    "gzip": true
+  }
+]

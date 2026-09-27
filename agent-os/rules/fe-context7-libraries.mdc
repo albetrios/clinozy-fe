@@ -1,0 +1,51 @@
+---
+description: Use Context7 MCP for up-to-date docs for project libraries
+alwaysApply: true
+---
+
+# Context7 — Up-to-Date Library Docs
+
+Use **Context7 MCP** when working with library APIs, setup, or code generation. Add `use context7` to prompts, or specify a library ID for faster, version-specific docs.
+
+## Dedicated MCPs (shadcn + Tailwind)
+
+- **shadcn MCP**: Browse registry, search components, install via CLI. Use prompts like "Add the dialog component from shadcn" or "Show me all components in the shadcn registry". Uses `components.json`.
+- **Tailwind MCP**: Utilities, colors, docs search, CSS-to-Tailwind conversion, color palette generation. Use for Tailwind-specific questions.
+
+> **shadcn skill (single source of truth):** For hands-on shadcn work, the installed skill **`agent-os/skills/shadcn/SKILL.md`** takes precedence — it covers the CLI workflow, Critical Rules, and the project's allowed-sources/selection policy. Use Context7/shadcn MCP for extra docs, but follow that skill's rules.
+
+## Installed Context7 Skills (`agent-os/skills/`)
+
+- **react-best-practices**: Vercel React/Next.js performance rules (waterfalls, bundle size, re-renders, etc.)
+- **web-design-guidelines**: UI audit for accessibility, focus, forms, typography, dark mode
+- **composition-patterns**: Compound components, avoid boolean props, state lifting
+
+## Quick Reference — Project Library IDs
+
+| Library | Context7 ID | Use for |
+|---------|-------------|---------|
+| shadcn/ui | `/shadcn-ui/ui` | Components, theming, Radix |
+| Vite | `/vitejs/vite` | Build, HMR, config |
+| React | `/facebook/react` | Hooks, context, patterns |
+| Tailwind | `/tailwindlabs/tailwindcss` | v4, @theme, utilities |
+| TanStack Query | `/TanStack/query` | Queries, mutations |
+| Zod | `/colinhacks/zod` | Schemas, validation |
+| react-hook-form | `/react-hook-form/react-hook-form` | Forms |
+| Zustand | `/pmndrs/zustand` | Client state |
+| TanStack Router | `/TanStack/router` | Routes, `beforeLoad`, search params |
+| Radix UI | `/radix-ui/primitives` | Primitives |
+
+## Prompt Patterns
+
+- **Single lib**: `Add a shadcn Dialog. use context7 /shadcn-ui/ui`
+- **Multi-lib**: `Tailwind + shadcn theme. use context7 for tailwindcss, shadcn`
+- **Version-specific**: `React 19 context provider. use context7 /facebook/react`
+- **Token limit**: `tokens:2000` via MCP params for focused snippets
+
+## Setup
+
+1. Get API key: [context7.com/dashboard](https://context7.com/dashboard)
+2. Replace `YOUR_API_KEY` in `agent-os/mcp/mcp.json`
+3. Restart Cursor or reload MCP
+
+Full library list: `context7.json` in project root.

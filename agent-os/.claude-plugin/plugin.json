@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "fe-agentforge",
+  "version": "0.1.0",
+  "description": "Single-source, multi-runtime agent tooling for clinozy-fe: skills, agents, workflow commands, and the requirement to production-ready build pipeline, all driven from agent-os/.",
+  "author": { "name": "clinozy-fe" },
+  "commands": ["./commands"],
+  "skills": ["./skills"],
+  "agents": [
+    "./agents/fe-a11y-auditor.md",
+    "./agents/fe-bundle-size-reviewer.md",
+    "./agents/fe-changelog-reviewer.md",
+    "./agents/fe-ci-investigator.md",
+    "./agents/fe-dependency-auditor.md",
+    "./agents/fe-docs-auditor.md",
+    "./agents/fe-i18n-auditor.md",
+    "./agents/fe-perf-auditor.md",
+    "./agents/fe-production-hardening-reviewer.md",
+    "./agents/fe-tsdoc-coverage-reviewer.md",
+    "./agents/fe-verifier.md"
+  ],
+  "mcpServers": "./mcp/mcp.default.json"
+}

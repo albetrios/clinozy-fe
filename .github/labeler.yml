@@ -1,0 +1,111 @@
+# PR auto-labeling config for actions/labeler v6 (invoked by .github/workflows/pr-governance.yml).
+# Maps changed-file globs to labels. Label colors and descriptions live in .github/labels.yml
+# as the manual reference for GitHub label setup.
+#
+# Adding a new area (a new route-island family or shared subsystem):
+#   1. Add an `area:<new>` block in the alphabetised area section below.
+#   2. Add the same label name with pastel color + description in .github/labels.yml.
+#   3. (Optional) update .github/CODEOWNERS so the new area has reviewers.
+
+# ---------- Areas (alphabetised — add new entries here) ----------
+
+# area:auth — Auth screens + auth runtime (token, refresh, idle-timeout, mocks)
+area:auth:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/pages/login/**'
+          - 'src/pages/mfa/**'
+          - 'src/pages/callback/**'
+          - 'src/pages/accept-invite/**'
+          - 'src/shared/auth/**'
+          - 'src/shared/api/auth-*.ts'
+          - 'src/shared/forms/AuthForm/**'
+
+# area:onboarding — Post-signup onboarding flow
+area:onboarding:
+  - changed-files:
+      - any-glob-to-any-file: 'src/pages/onboarding/**'
+
+# area:organization — Organization islands, tenancy runtime, org-domain API
+area:organization:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/pages/organization/**'
+          - 'src/shared/tenancy/**'
+          - 'src/shared/api/organization-*.ts'
+
+# area:settings — Hash-driven SettingsModal (#settings/<scope>/<section>)
+area:settings:
+  - changed-files:
+      - any-glob-to-any-file: 'src/shared/components/SettingsModal/**'
+
+# ---------- Layers ----------
+
+# app-shell — Route tree, guards, providers, analytics/observability bootstrap
+app-shell:
+  - changed-files:
+      - any-glob-to-any-file: 'src/app/**'
+
+# core — Framework-agnostic platform: HTTP, RBAC, config, data-provider, version
+core:
+  - changed-files:
+      - any-glob-to-any-file: 'src/core/**'
+
+# shared — Cross-page components, forms, hooks, layouts, store (src/shared)
+shared:
+  - changed-files:
+      - any-glob-to-any-file: 'src/shared/**'
+
+# ui-primitives — Vendored shadcn/ui primitives
+ui-primitives:
+  - changed-files:
+      - any-glob-to-any-file: 'src/shared/components/ui/**'
+
+# ---------- Concerns ----------
+
+# ci — GitHub Actions workflows, composite actions, rulesets
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'
+
+# tests — Vitest colocated suites, Playwright e2e, test utils
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
+          - 'src/**/*.test.ts'
+          - 'src/**/*.test.tsx'
+          - 'src/**/__tests__/**'
+          - 'vitest.config.ts'
+          - 'playwright.config.ts'
+
+# docs — Hand-written docs under docs/ and top-level *.md
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '*.md'
+
+# dependencies — package.json / pnpm lockfile updates (also set by Dependabot)
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'pnpm-lock.yaml'
+
+# tooling — Dev/CI scripts, Vite build plugins, quality-gate configs
+tooling:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tooling/**'
+          - 'plugins/**'
+          - 'biome.json'
+          - 'sonar-project.properties'
+          - 'docker-compose.sonar.yml'
+          - 'stryker.config.json'
+          - '.lighthouserc.cjs'
+
+# agent-os — Agent skills, rules, hooks, MCP config
+agent-os:
+  - changed-files:
+      - any-glob-to-any-file: 'agent-os/**'

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://context7.com/schema.json",
+  "description": "Context7 library IDs for clinozy-fe dependencies. Use in prompts: 'use context7 /library/id' or 'use context7' for auto-matching.",
+  "libraries": [
+    {
+      "id": "/shadcn-ui/ui",
+      "package": "shadcn/ui",
+      "topic": "UI components, Radix primitives, theming"
+    },
+    {
+      "id": "/vitejs/vite",
+      "package": "vite",
+      "topic": "Build config, HMR, plugins"
+    },
+    {
+      "id": "/facebook/react",
+      "package": "react",
+      "topic": "React 19 patterns, context, hooks"
+    },
+    {
+      "id": "/tailwindlabs/tailwindcss",
+      "package": "tailwindcss",
+      "topic": "Tailwind v4, @theme, utilities"
+    },
+    {
+      "id": "/TanStack/query",
+      "package": "@tanstack/react-query",
+      "topic": "Queries, mutations, devtools"
+    },
+    {
+      "id": "/colinhacks/zod",
+      "package": "zod",
+      "topic": "Schemas, validation, type inference"
+    },
+    {
+      "id": "/react-hook-form/react-hook-form",
+      "package": "react-hook-form",
+      "topic": "Forms, validation"
+    },
+    {
+      "id": "/pmndrs/zustand",
+      "package": "zustand",
+      "topic": "Client state, stores"
+    },
+    {
+      "id": "/juliangarnier/anime",
+      "package": "animejs",
+      "topic": "Timelines, staggers, SVG, keyframes"
+    },
+    {
+      "id": "/TanStack/router",
+      "package": "@tanstack/react-router",
+      "topic": "Routes, beforeLoad guards, search params"
+    },
+    {
+      "id": "/radix-ui/primitives",
+      "package": "@radix-ui/*",
+      "topic": "Radix UI primitives (Dialog, Dropdown, etc.)"
+    },
+    {
+      "id": "/colinhacks/zod",
+      "package": "@hookform/resolvers",
+      "topic": "Zod resolver for react-hook-form"
+    }
+  ],
+  "promptExamples": [
+    "Add a shadcn Dialog with form. use context7 /shadcn-ui/ui",
+    "Configure Vite HMR for this project. use context7 /vitejs/vite",
+    "Tailwind + shadcn theme tokens. use context7 for tailwindcss, shadcn",
+    "TanStack Query mutation with optimistic update. use context7 /TanStack/query",
+    "Zod schema for API response. use context7 /colinhacks/zod"
+  ]
+}

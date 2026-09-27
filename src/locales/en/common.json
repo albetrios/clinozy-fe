@@ -1,0 +1,197 @@
+{
+  "a11y": {
+    "close": "Close",
+    "loading": "Loading",
+    "loadingNamed": "Loading {{name}}…",
+    "loadingPage": "Loading page",
+    "toggleTheme": "Toggle theme",
+    "openAppearance": "Open appearance",
+    "cookieConsent": "Cookie consent",
+    "rowsPerPage": "Rows per page",
+    "goFirstPage": "Go to first page",
+    "goPreviousPage": "Go to previous page",
+    "goNextPage": "Go to next page",
+    "goLastPage": "Go to last page",
+    "selectAll": "Select all",
+    "copyAccountId": "Copy account ID",
+    "onboardingProgress": "Onboarding progress",
+    "themeCode": "Theme code",
+    "mode": "Mode"
+  },
+  "language": {
+    "openAria": "Language & regional settings",
+    "heading": "Language",
+    "description": "UI copy follows the language you pick. Dates, numbers, and currency have their own cards below.",
+    "directionDescription": "Force left-to-right or right-to-left layout on this device.",
+    "en": "English",
+    "es": "Español",
+    "zh": "中文",
+    "fr": "Français",
+    "de": "Deutsch",
+    "ja": "日本語",
+    "pt": "Português",
+    "ar": "العربية",
+    "hi": "हिन्दी",
+    "ko": "한국어",
+    "it": "Italiano"
+  },
+  "formatLocale": {
+    "heading": "Regional format locale",
+    "description": "Intl date, number, and currency output — independent of UI language."
+  },
+  "dateTime": {
+    "heading": "Date & time",
+    "description": "Saved on this device — changes apply live to every date in the app."
+  },
+  "timeZone": {
+    "heading": "Timezone",
+    "device": "Device timezone",
+    "preview": "Timezone: {{value}}"
+  },
+  "dateFormat": {
+    "heading": "Date & time format",
+    "auto": "Locale default (numeric)",
+    "short": "Short",
+    "medium": "Medium",
+    "long": "Long",
+    "full": "Full",
+    "iso": "ISO-style (YYYY-MM-DD)",
+    "date": "Date only",
+    "time": "Time only",
+    "datetime": "Date + time",
+    "previewDate": "Date & time: {{value}}",
+    "previewNumber": "Number: {{value}}",
+    "previewRelative": "Relative: {{value}}",
+    "previewTime": "Time only: {{value}}"
+  },
+  "hourCycle": {
+    "heading": "Clock format",
+    "auto": "Locale default",
+    "h12": "12-hour (AM/PM)",
+    "h23": "24-hour"
+  },
+  "numberStyle": {
+    "heading": "Number format",
+    "description": "Number and currency output — independent of UI language.",
+    "auto": "Locale default",
+    "standard": "Grouped",
+    "compact": "Compact (1.2M)",
+    "engineering": "Engineering",
+    "scientific": "Scientific"
+  },
+  "currencyDisplay": {
+    "heading": "Currency display",
+    "auto": "Locale default",
+    "symbol": "Symbol",
+    "narrowSymbol": "Narrow symbol",
+    "code": "ISO code",
+    "name": "Currency name"
+  },
+  "currencyCode": {
+    "heading": "Preview currency"
+  },
+  "direction": {
+    "heading": "Text direction",
+    "auto": "Follow language",
+    "ltr": "Left-to-right",
+    "rtl": "Right-to-left"
+  },
+  "firstDay": {
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "monday": "Monday"
+  },
+  "measurement": {
+    "metric": "Metric",
+    "imperial": "Imperial"
+  },
+  "localePreview": {
+    "heading": "Live preview",
+    "currency": "Currency: {{value}}",
+    "direction": "Text direction: {{value}}",
+    "firstDay": "Week starts: {{value}}",
+    "measurement": "Units: {{value}}"
+  },
+  "versionUpdate": {
+    "title": "Update available",
+    "description": "A new version of the app is ready.",
+    "refresh": "Refresh now"
+  },
+  "appearance": {
+    "themeTitle": "Theme",
+    "themeLocked": "The theme is managed by your organization's configuration and can't be changed here.",
+    "themeDescription": "Named accent presets — or copy a link / paste a theme code to reproduce an exact generated look.",
+    "presetAria": "Named accent preset",
+    "copyLink": "Copy link",
+    "shuffleHint": "Shuffle to generate a code.",
+    "codeLabel": "Code: {{seed}}",
+    "codePlaceholder": "Paste a theme code",
+    "apply": "Apply",
+    "pickAnyColour": "Pick any colour",
+    "modeTitle": "Mode",
+    "modeDescription": "Saved on this device.",
+    "colourTitle": "Colour",
+    "colourDescription": "Accent, charts, and the neutral base.",
+    "accentColour": "Accent colour",
+    "chartColour": "Chart colour",
+    "baseColour": "Base colour",
+    "harmony": "Harmony",
+    "harmonyAria": "Colour harmony",
+    "accentIntensity": "Accent intensity",
+    "typeTitle": "Type & shape",
+    "typeDescription": "Fonts, corner radius, and menu surface.",
+    "bodyFont": "Body font",
+    "headingFont": "Heading font",
+    "radius": "Radius",
+    "shapeLanguage": "Shape language",
+    "typeScale": "Type scale",
+    "menu": "Menu",
+    "menuAria": "Menu style",
+    "iconsTitle": "Icons",
+    "iconsDescription": "Stroke weight, colour, and icon set.",
+    "iconWeight": "Icon weight",
+    "iconColour": "Icon colour",
+    "iconLibrary": "Icon library",
+    "layoutTitle": "Layout",
+    "layoutDescription": "How wide the main workspace is — standard for dashboards, reading for focused copy.",
+    "contentWidth": "Content width",
+    "dashboardTitle": "Dashboard",
+    "dashboardDescription": "How the dashboard arranges its sections.",
+    "dashboardArrangement": "Arrangement",
+    "surfaceTitle": "Surface & motion",
+    "surfaceDescription": "Spacing, depth, contrast, and how it moves.",
+    "density": "Density",
+    "contrast": "Contrast",
+    "elevation": "Elevation",
+    "separation": "Separation",
+    "separationAria": "Surface separation",
+    "motion": "Motion",
+    "focusRing": "Focus ring",
+    "notificationsTitle": "Notifications",
+    "notificationsDescription": "Pick or shuffle a toast design — previews use your live theme tokens.",
+    "toastDesign": "Toast design",
+    "position": "Position",
+    "positionAria": "Toast position",
+    "previewSuccess": "Success",
+    "previewError": "Error",
+    "previewWarning": "Warning",
+    "previewInfo": "Info",
+    "shuffleSection": "Shuffle {{section}}",
+    "sectionColour": "colour",
+    "sectionType": "type & shape",
+    "sectionSurface": "surface & motion",
+    "sectionDashboard": "dashboard layout",
+    "sectionNotifications": "notification style",
+    "custom": "Custom",
+    "customWith": "Custom — {{look}}"
+  },
+  "table": {
+    "searchPlaceholder": "Search..."
+  },
+  "consent": {
+    "description": "We use cookies for product analytics to improve {{productName}}. Essential functionality and error monitoring work without them.",
+    "privacyPolicy": "Privacy Policy",
+    "accept": "Accept",
+    "decline": "Decline"
+  }
+}

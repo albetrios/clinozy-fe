@@ -1,0 +1,3 @@
+# Intentionally empty env dir — vitest.config.ts points `envDir` here so the test
+# runner loads NO .env files (not even `.env.local`, which Vite loads in all modes),
+# keeping the suite hermetic on every machine and in CI. Do not add .env files here.

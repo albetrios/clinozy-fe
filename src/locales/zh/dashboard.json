@@ -1,0 +1,276 @@
+{
+  "greeting": "欢迎回来，{{name}}",
+  "greetingFallback": "您好",
+  "heroSubtitle": "以下是您工作区今日的动态。",
+  "heroSubtitleSolo": "以下是今日的动态。",
+  "errorLoad": "无法加载您的工作区。请刷新页面后重试。",
+  "workspaceFallback": "您的工作区",
+  "workspaceNameFallback": "您的工作区",
+  "orgType": {
+    "team": "团队",
+    "personal": "个人"
+  },
+  "status": {
+    "active": "活跃",
+    "suspended": "已暂停",
+    "archived": "已归档"
+  },
+  "overview": {
+    "ariaLabel": "概览"
+  },
+  "stats": {
+    "workspaces": "工作区",
+    "workspacesHintOne": "仅此一个",
+    "workspacesHintMany": "您已是成员",
+    "permissions": "您的权限",
+    "permissionsHint": "在此工作区",
+    "type": "工作区类型",
+    "typeHintTeam": "与团队共享",
+    "typeHintPersonal": "仅您可见",
+    "billing": "账单",
+    "billingNone": "—",
+    "billingNoPlan": "尚无方案",
+    "billingHintPlan": "{{cycle}}结算",
+    "billingCycleMonthly": "按月",
+    "billingCycleYearly": "按年"
+  },
+  "nextSteps": {
+    "ariaLabel": "建议的后续步骤",
+    "heading": "建议的后续步骤"
+  },
+  "quickActions": {
+    "ariaLabel": "快捷操作",
+    "heading": "快捷操作",
+    "inviteTitle": "邀请成员",
+    "inviteDescription": "将队友添加到 {{orgName}}",
+    "rolesTitle": "管理角色",
+    "rolesDescription": "定义谁可以做什么",
+    "billingTitle": "账单与套餐",
+    "billingDescription": "订阅与发票",
+    "orgSettingsTitle": "组织设置",
+    "orgSettingsDescription": "名称、品牌等",
+    "accountTitle": "您的账户",
+    "accountDescription": "个人资料、安全、会话"
+  },
+  "organizations": {
+    "ariaLabel": "您的组织",
+    "heading": "您的组织",
+    "current": "当前",
+    "openWorkspace": "打开工作区 →"
+  },
+  "highlights": {
+    "ariaLabel": "工作区亮点",
+    "heading": "亮点",
+    "description": "精选建议，帮你更好地使用工作区",
+    "tabsLabel": "亮点主题",
+    "slideAnnouncement": "第 {{current}} 条，共 {{total}} 条：{{title}}",
+    "previousSlide": "上一条亮点",
+    "nextSlide": "下一条亮点",
+    "goToSlide": "跳转到{{title}}亮点",
+    "tabs": {
+      "appearance": "外观",
+      "invite": "团队",
+      "security": "安全"
+    },
+    "slides": {
+      "appearance": {
+        "title": "打造专属风格",
+        "description": "调整主题、密度和强调色，让工作区贴合团队的工作方式。",
+        "action": "打开外观设置"
+      },
+      "invite": {
+        "title": "壮大团队",
+        "description": "邀请队友并分配角色，让每个人从第一天起就拥有合适的权限。",
+        "action": "邀请成员"
+      },
+      "security": {
+        "title": "加强安全",
+        "description": "检查 MFA、活跃会话和登录方式，保障账户安全。",
+        "action": "查看安全设置"
+      }
+    }
+  },
+  "insights": {
+    "ariaLabel": "工作区洞察",
+    "heading": "工作区洞察"
+  },
+  "analytics": {
+    "heading": "工作区活动",
+    "description": "一段时间内的会话与 API 调用",
+    "rangeLabel": "选择时间范围",
+    "seriesSessions": "会话",
+    "seriesApiCalls": "API 调用",
+    "range": {
+      "7d": "最近 7 天",
+      "30d": "最近 30 天",
+      "90d": "最近 90 天"
+    }
+  },
+  "members": {
+    "ariaLabel": "团队成员",
+    "heading": "团队成员",
+    "description_other": "此工作区有 {{count}} 人",
+    "columnMember": "成员",
+    "columnRole": "角色",
+    "columnStatus": "状态",
+    "columnJoined": "加入时间",
+    "status": {
+      "active": "活跃",
+      "invited": "已邀请",
+      "suspended": "已暂停"
+    },
+    "error": "无法加载成员。",
+    "empty": "还没有人加入此工作区。",
+    "noWorkspace": "未选择工作区。"
+  },
+  "trends": {
+    "heading": "使用趋势",
+    "description": "周环比变化"
+  },
+  "usageBars": {
+    "heading": "每周用量",
+    "description": "每周的会话与 API 调用"
+  },
+  "heatmap": {
+    "heading": "活动热力图",
+    "description": "十二周的每日活动",
+    "less": "少",
+    "more": "多"
+  },
+  "funnel": {
+    "heading": "获客漏斗",
+    "description": "从首次访问到激活",
+    "stages": {
+      "visited": "访问",
+      "signedUp": "注册",
+      "onboarded": "完成引导",
+      "activated": "已激活"
+    }
+  },
+  "radar": {
+    "heading": "工作区健康度",
+    "description": "五个维度一目了然",
+    "axes": {
+      "activity": "活跃度",
+      "growth": "增长",
+      "security": "安全",
+      "automation": "自动化",
+      "engagement": "参与度"
+    }
+  },
+  "leaderboard": {
+    "heading": "热门自动化",
+    "description": "本月运行次数最多",
+    "runs": "次运行",
+    "items": {
+      "welcomeEmail": "欢迎邮件",
+      "weeklyDigest": "每周摘要",
+      "slackSync": "Slack 同步",
+      "backupJob": "备份任务"
+    }
+  },
+  "focus": {
+    "heading": "专注计时器",
+    "description": "25 分钟深度工作冲刺",
+    "start": "开始",
+    "pause": "暂停",
+    "reset": "重置"
+  },
+  "meters": {
+    "heading": "套餐用量",
+    "description": "套餐使用情况"
+  },
+  "billingCard": {
+    "heading": "账单摘要",
+    "description": "套餐、续订与支付",
+    "plan": "套餐",
+    "nextInvoice": "下次账单",
+    "payment": "支付方式",
+    "noPlan": "无方案",
+    "choosePlan": "选择方案",
+    "manage": "管理账单"
+  },
+  "ai": {
+    "heading": "询问你的工作区",
+    "description": "搜索、执行操作或快速跳转",
+    "placeholder": "随便问点什么…",
+    "chips": {
+      "usage": "查看用量",
+      "members": "邀请成员",
+      "appearance": "更换主题"
+    }
+  },
+  "map": {
+    "heading": "全球活动",
+    "description": "本周按地区的会话",
+    "regions": {
+      "americas": "美洲",
+      "europe": "欧洲",
+      "asia": "亚洲",
+      "oceania": "大洋洲"
+    }
+  },
+  "donut": {
+    "heading": "按来源的会话",
+    "description": "本周会话的来源分布",
+    "segments": {
+      "web": "网页",
+      "mobile": "移动端",
+      "api": "API"
+    }
+  },
+  "ranking": {
+    "heading": "功能使用",
+    "description": "周目标进度"
+  },
+  "timeline": {
+    "heading": "本月",
+    "description": "本月关键日期",
+    "today": "今天"
+  },
+  "activity": {
+    "heading": "最近动态",
+    "description": "本工作区的最新变更",
+    "events": {
+      "inviteAccepted": "新成员已接受邀请",
+      "roleUpdated": "成员角色已更新",
+      "planRenewed": "套餐已成功续订",
+      "settingsChanged": "工作区设置已更新"
+    }
+  },
+  "pulse": {
+    "heading": "工作区脉搏",
+    "description": "本工作区的每周活动",
+    "score": "周目标完成度",
+    "metrics": {
+      "sessions": "会话",
+      "automations": "自动化",
+      "reviews": "审核"
+    }
+  },
+  "schedule": {
+    "ariaLabel": "日程",
+    "heading": "日程",
+    "description": "续订、评审与团队活动",
+    "upcoming": "即将到来",
+    "legendEvent": "活动日",
+    "empty": "暂无安排",
+    "events": {
+      "planRenewal": "套餐续订",
+      "accessReview": "季度访问审查",
+      "teamSync": "团队同步",
+      "invoiceDue": "发票到期"
+    }
+  },
+  "sampleBadge": "示例数据",
+  "themeShowcase": {
+    "ariaLabel": "工作区主题",
+    "heading": "工作区主题",
+    "shuffle": "随机",
+    "customize": "自定义",
+    "custom": "自定义",
+    "default": "默认",
+    "shuffledTitle": "主题已随机",
+    "shuffledDescription": "全新的强调色、字体和圆角——以及提示样式。"
+  }
+}

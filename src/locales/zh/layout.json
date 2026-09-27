@@ -1,0 +1,158 @@
+{
+  "brand": {
+    "name": "{{productName}}"
+  },
+  "a11y": {
+    "skipToMain": "跳至主要内容",
+    "mainNavigation": "主导航",
+    "sidebarNavigation": "侧边栏导航",
+    "mobileNavigation": "移动端导航"
+  },
+  "auth": {
+    "switchToRegister": "创建账户",
+    "switchToSignIn": "登录",
+    "statusOperational": "所有系统运行正常",
+    "badge": "运营，一体化",
+    "heroTitle": "您组织的操作系统。",
+    "heroSubtitle": "成员、角色、账单与安全 —— 为每个团队提供快速、键盘优先的工作空间。",
+    "features": {
+      "multiOrg": {
+        "title": "原生多组织",
+        "body": "切换团队，无需切换工具。"
+      },
+      "secure": {
+        "title": "默认安全",
+        "body": "RBAC、MFA、通行密钥与审计追踪。"
+      },
+      "fast": {
+        "title": "处处快速",
+        "body": "为键盘优先的实时工作而构建。"
+      }
+    },
+    "stats": {
+      "teams": "团队",
+      "uptime": "可用性",
+      "compliant": "合规"
+    }
+  },
+  "app": {
+    "search": "搜索",
+    "searchShortcutMac": "⌘K",
+    "searchShortcutWindows": "Ctrl+K",
+    "searchPlaceholder": "搜索...",
+    "userMenu": "用户菜单",
+    "userFallback": "用户",
+    "settings": "设置",
+    "logOut": "退出登录",
+    "toggleSidebar": "切换侧边栏",
+    "footerCopyright": "© {{year}} {{productName}} Platform",
+    "nav": {
+      "dashboard": "控制台"
+    },
+    "sidebar": {
+      "workspace": "工作区",
+      "menu": "菜单",
+      "shortcuts": "快捷方式"
+    },
+    "contextStrip": {
+      "label": "快速访问",
+      "labelSolo": "前往",
+      "profile": "个人资料",
+      "security": "安全",
+      "billing": "账单",
+      "appearance": "外观",
+      "shortcuts": "快捷键"
+    },
+    "workspaceSwitch": {
+      "preparing": "正在准备您的工作区",
+      "loadingAccess": "正在加载成员和权限",
+      "almostReady": "即将完成"
+    },
+    "orgSwitcher": {
+      "selectPlaceholder": "选择组织",
+      "triggerLabel": "切换组织 — 当前：{{name}}",
+      "personal": "个人",
+      "yourOrganizations": "您的组织",
+      "organizations": "组织",
+      "addOrganization": "添加组织"
+    },
+    "notifications": {
+      "title": "通知",
+      "ariaWithUnread": "通知，{{count}} 条未读",
+      "ariaDefault": "通知",
+      "newBadge": "{{count}} 条新消息",
+      "markAllRead": "全部标为已读",
+      "loadError": "无法加载通知。请重试。",
+      "retry": "重试",
+      "emptyTitle": "暂无通知",
+      "emptyDescription": "账户与组织的更新将显示在这里。",
+      "markRead": "标为已读",
+      "settingsLink": "通知设置"
+    },
+    "commandPalette": {
+      "ariaLabel": "命令面板",
+      "placeholder": "输入命令或搜索…",
+      "empty": "未找到结果。",
+      "groups": {
+        "navigation": "导航",
+        "theme": "主题",
+        "account": "账户",
+        "organizations": "组织",
+        "shortcuts": "快捷键"
+      },
+      "dashboard": "控制台",
+      "userSettings": "用户设置",
+      "organizationSettings": "组织设置",
+      "lightMode": "浅色模式",
+      "darkMode": "深色模式",
+      "systemTheme": "跟随系统",
+      "settings": "设置",
+      "logOut": "退出登录",
+      "openShortcuts": "键盘快捷键",
+      "switchOrganization": "切换到 {{name}}",
+      "currentOrganization": "{{name}}（当前）"
+    },
+    "emailVerify": {
+      "message": "验证邮箱以保护您的账户。",
+      "resend": "重新发送邮件",
+      "sending": "发送中…",
+      "sent": "已发送",
+      "notifySuccess": "验证邮件已发送 — 请查收收件箱。",
+      "notifyError": "无法重新发送邮件。"
+    },
+    "sessionTimeout": {
+      "title": "会话即将过期",
+      "description": "由于不活动，您的会话将在 {{countdown}} 后过期。点击「保持登录」以继续。",
+      "signOut": "退出登录",
+      "staySignedIn": "保持登录",
+      "signingOut": "正在退出登录…",
+      "signingOutDescription": "正在安全地结束您的会话，随后将转到登录页面。"
+    },
+    "shortcuts": {
+      "title": "键盘快捷键",
+      "description": "导航与操作的快速参考。",
+      "commandPalette": "打开命令面板",
+      "showShortcuts": "显示键盘快捷键",
+      "showShortcutsAlt": "显示快捷键（备用）",
+      "closeDialog": "关闭对话框"
+    },
+    "orgCreate": {
+      "namePlaceholder": "Acme Inc.",
+      "slugPlaceholder": "acme",
+      "title": "新建组织",
+      "nameLabel": "组织名称",
+      "slugLabel": "工作区 URL（可选）",
+      "submit": "新建组织",
+      "submitting": "正在创建…"
+    },
+    "theme": {
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统",
+      "shuffle": "随机主题"
+    }
+  },
+  "public": {
+    "brandTagline": "团队安全工作空间"
+  }
+}
