@@ -1,9 +1,9 @@
 # Kickoff prompt
 
-> **Superseded by the `kickoff-planning` skill**
-> (`agent-os/skills/kickoff-planning/SKILL.md`) — saying "kickoff v1" /
+> **Superseded by the `fe-kickoff-planning` skill**
+> (`agent-os/skills/fe-kickoff-planning/SKILL.md`) — saying "kickoff v1" /
 > "plan from legacy" now triggers it directly; it plans and stops, then
-> `legacy-ditto` builds. This prompt is kept as the explicit paste-in entry
+> `fe-legacy-ditto` builds. This prompt is kept as the explicit paste-in entry
 > point and for other projects.
 
 **Paste this to Claude Code (here, in clinozy-fe) to start a build**, once the specs
@@ -15,7 +15,7 @@ change the `SCOPE` lines.
 
 ---
 
-Use the **`legacy-ditto`** skill. Follow it in order; do not skip its stop points.
+Use the **`fe-legacy-ditto`** skill. Follow it in order; do not skip its stop points.
 
 **First, build a delta ledger** — one numbered row per change, each with a
 status. Show it to me. Update rows to `done` as you go. **Do not report success

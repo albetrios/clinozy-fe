@@ -10,8 +10,8 @@ v2, and v3.
 
 ## The skill
 
-Everything runs through **`legacy-ditto`**
-([`agent-os/skills/legacy-ditto/SKILL.md`](../../../agent-os/skills/legacy-ditto/SKILL.md)).
+Everything runs through **`fe-legacy-ditto`**
+([`agent-os/skills/fe-legacy-ditto/SKILL.md`](../../../agent-os/skills/fe-legacy-ditto/SKILL.md)).
 It auto-triggers on "ditto", "same as the html", or a `legacy/` path.
 
 It enforces one loop: **read → reconcile → gate → build → verify.** You never
@@ -26,9 +26,9 @@ legacy", and it drives.
 | [`ditto-intake-checklist.md`](../design/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate             |
 | [`design-handoff.contract.json`](../design/design-handoff.contract.json) | Preset → token mapping                             |
 | `shadcn`                                                                 | Which primitive to reach for                       |
-| `route-island`                                                           | Page structure + registrations                     |
+| `fe-route-island`                                                        | Page structure + registrations                     |
 | `frontend-design`                                                        | Craft, once fidelity is met                        |
-| `visual-regression`                                                      | Baselines (the pin step)                           |
+| `fe-visual-regression`                                                   | Baselines (the pin step)                           |
 
 ## The four rules that never change
 

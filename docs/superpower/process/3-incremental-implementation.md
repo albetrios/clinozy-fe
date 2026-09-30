@@ -131,7 +131,7 @@ one level up.)
 | **Layout / shell change** (auth, public, app shell)     | **High** | **Every route the shell owns**       | **Sub-kickoff (3b)** |
 
 - **First three rows batch safely** — apply directly.
-- **Structural / new-screen** run the full `legacy-ditto` gate as if new
+- **Structural / new-screen** run the full `fe-legacy-ditto` gate as if new
   (Process 2, steps 3–4, scoped to those screens).
 - **Preset / layout change** are cross-cutting — they don't touch one screen,
   they re-tone or re-frame all of them. Route them through **Step 3b**.
@@ -216,7 +216,7 @@ much _changed_ — which for a v2 or v3 is usually small.
 
 ## Known gap
 
-`legacy-ditto` has **no delta mode** — Process 3 is a documented procedure, not
+`fe-legacy-ditto` has **no delta mode** — Process 3 is a documented procedure, not
 an automated one. The highest-leverage improvement is a Step 0 in the skill that
 diffs spec versions, classifies each change against the Step 3 table, and runs
 the full gate only on structural changes. Until then, the classification is

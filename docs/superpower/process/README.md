@@ -68,4 +68,4 @@ portable and every future version benefits.
 ## Related
 
 - Design prompts and briefs: [`../design/`](../design/README.md)
-- The build skill: [`legacy-ditto`](../../../agent-os/skills/legacy-ditto/SKILL.md)
+- The build skill: [`fe-legacy-ditto`](../../../agent-os/skills/fe-legacy-ditto/SKILL.md)

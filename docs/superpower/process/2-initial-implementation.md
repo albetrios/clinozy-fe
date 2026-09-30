@@ -85,7 +85,7 @@ kickoff file is the fuller version that spells out the stop points.)
 > `.md`. This kickoff prompt goes to **Claude Code** and consumes them. Different
 > apps, different jobs.
 
-`legacy-ditto` now:
+`fe-legacy-ditto` now:
 
 1. Inventories `legacy/` (`ls legacy/`)
 2. Reads every `.md` **and** the prototype, in full

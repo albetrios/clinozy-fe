@@ -187,7 +187,7 @@ clinozy-fe/
 │   │   ├── fe-testing-requirements.mdc
 │   │   ├── fe-theme-axis-audit.mdc
 │   │   └── fe-ui-sources.mdc
-│   ├── skills/  (50 skills: fe-auto-implement, shadcn, fe-route-island, …)
+│   ├── skills/  (52 skills: fe-auto-implement, shadcn, fe-route-island, …)
 │   └── skills-lock.json
 ├── docs/
 │   ├── deployment/
