@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json.schemastore.org/base.json",
+  "name": "claude",
+  "label": "Claude",
+  "description": "Anthropic terracotta accent preset for clinozy-fe. Accent-only: it overrides brand/accent/chart tokens and inherits every surface, radius, and typography token from the base @theme palette.",
+  "brandSource": {
+    "hex": "#c96442",
+    "name": "Anthropic terracotta",
+    "oklch": "oklch(0.617 0.138 39)",
+    "note": "The true brand hex is 3.74:1 on white — below the 4.5:1 AA floor for normal text. It is therefore used ONLY for non-text tokens (ring, chart-1). Filled text surfaces use darkened/lightened variants; see tokens.light.--color-primary."
+  },
+
+  "scope": {
+    "type": "accent-only",
+    "overrides": [
+      "primary",
+      "accent",
+      "sidebar-primary",
+      "sidebar-accent",
+      "ring",
+      "chart-1..5"
+    ],
+    "inheritsFromBase": [
+      "background",
+      "foreground",
+      "card",
+      "popover",
+      "muted",
+      "border",
+      "input",
+      "destructive",
+      "success",
+      "warning",
+      "radius",
+      "font-family",
+      "spacing"
+    ],
+    "contrastWith": "The 'flowdm' preset, which is a FULL surface palette (backgrounds, radii, ambient canvas). 'claude' deliberately does not touch surfaces."
+  },
+
+  "tokens": {
+    "light": {
+      "selector": "[data-theme='claude']",
+      "--color-primary": "oklch(0.55 0.13 40)",
+      "--color-primary-foreground": "oklch(0.985 0 0)",
+      "--color-ring": "oklch(0.617 0.138 39)",
+      "--color-sidebar-primary": "oklch(0.55 0.13 40)",
+      "--color-sidebar-primary-foreground": "oklch(0.985 0 0)",
+      "--color-accent": "oklch(0.965 0.012 55)",
+      "--color-accent-foreground": "oklch(0.36 0.06 40)",
+      "--color-sidebar-accent": "oklch(0.965 0.012 55)",
+      "--color-sidebar-accent-foreground": "oklch(0.36 0.06 40)",
+      "--color-chart-1": "oklch(0.617 0.138 39)",
+      "--color-chart-2": "oklch(0.68 0.11 62)",
+      "--color-chart-3": "oklch(0.56 0.1 22)",
+      "--color-chart-4": "oklch(0.74 0.09 84)",
+      "--color-chart-5": "oklch(0.49 0.11 30)"
+    },
+    "dark": {
+      "selector": ".dark[data-theme='claude']",
+      "--color-primary": "oklch(0.7 0.13 40)",
+      "--color-primary-foreground": "oklch(0.205 0 0)",
+      "--color-ring": "oklch(0.672 0.131 39)",
+      "--color-sidebar-primary": "oklch(0.7 0.13 40)",
+      "--color-sidebar-primary-foreground": "oklch(0.205 0 0)",
+      "--color-accent": "oklch(0.288 0.022 45)",
+      "--color-accent-foreground": "oklch(0.94 0.02 55)",
+      "--color-sidebar-accent": "oklch(0.288 0.022 45)",
+      "--color-sidebar-accent-foreground": "oklch(0.94 0.02 55)",
+      "--color-chart-1": "oklch(0.72 0.13 39)",
+      "--color-chart-2": "oklch(0.79 0.11 62)",
+      "--color-chart-3": "oklch(0.66 0.12 22)",
+      "--color-chart-4": "oklch(0.84 0.09 84)",
+      "--color-chart-5": "oklch(0.6 0.12 30)"
+    }
+  },
+
+  "accessibility": {
+    "standard": "WCAG 2.1 AA (4.5:1 normal text)",
+    "verifiedPairs": [
+      {
+        "pair": "primary / primary-foreground",
+        "mode": "light",
+        "resolved": "#af5331 on #fafafa",
+        "ratio": 4.92,
+        "pass": true
+      },
+      {
+        "pair": "primary / primary-foreground",
+        "mode": "dark",
+        "resolved": "#e2805e on #171717",
+        "ratio": 6.39,
+        "pass": true
+      },
+      {
+        "pair": "accent / accent-foreground",
+        "mode": "light",
+        "resolved": "#faf2ec on #583224",
+        "ratio": 10.03,
+        "pass": true
+      },
+      {
+        "pair": "accent / accent-foreground",
+        "mode": "dark",
+        "resolved": "#342822 on #f6e8df",
+        "ratio": 11.95,
+        "pass": true
+      }
+    ],
+    "nonTextTokens": {
+      "--color-ring": "#c96442 (light) — focus ring, non-text, exempt from 4.5:1",
+      "--color-chart-1": "#c96442 (light) / #e98665 (dark) — data viz, non-text"
+    },
+    "designRule": "Keep the true brand hex where it is decorative; darken/lighten only where text sits on it. This preserves brand identity without failing contrast."
+  },
+
+  "registration": {
+    "note": "Four files must agree. A preset registered in fewer than all four either fails to paint, flashes on load, or is unreachable from the picker.",
+    "files": [
+      {
+        "path": "src/index.css",
+        "lines": "172-202, 574-576",
+        "change": "Added [data-theme='claude'] and .dark[data-theme='claude'] token blocks, plus a .theme-dot-claude swatch (background-color: oklch(0.617 0.138 39)) for the Appearance picker.",
+        "required": true
+      },
+      {
+        "path": "src/shared/theme/presets.ts",
+        "change": "Added { id: 'claude', label: 'Claude' } to THEME_PRESETS.",
+        "required": true
+      },
+      {
+        "path": "public/theme-init.js",
+        "change": "Added claude to PRESET_PRIMARY with light/dark [primary, primaryForeground] pairs. This is the pre-hydration inline script — it paints the accent before React mounts.",
+        "required": true,
+        "failureIfMissing": "Flash of default accent on every cold load."
+      },
+      {
+        "path": "src/shared/store/useThemeStore/useThemeStore.ts",
+        "change": "No claude-specific change. setPreset validates against THEME_PRESETS and falls back to BASE_PRESET for unknown ids, so registration in presets.ts is sufficient.",
+        "required": false
+      }
+    ]
+  },
+
+  "presetRegistryChange": {
+    "problem": "applyThemePreset() clears the data-theme attribute for the app's default preset (the stock @theme palette needs no attribute). A single DEFAULT_PRESET constant therefore made it impossible to ship a named preset as the default — selecting it would strip the very attribute that paints it.",
+    "solution": "Split one constant into two with distinct meanings.",
+    "constants": {
+      "BASE_PRESET": {
+        "value": "default",
+        "meaning": "The stock @theme palette — the ONLY preset carrying no data-theme attribute. Also the reset target for an invalid/unknown preset id."
+      },
+      "DEFAULT_PRESET": {
+        "value": "flowdm",
+        "meaning": "The preset a fresh install starts on. Now free to be any named preset."
+      }
+    },
+    "effect": "Setting DEFAULT_PRESET to 'claude' would ship it as the out-of-the-box theme, with no other code change.",
+    "currentShippedDefault": "flowdm"
+  },
+
+  "activation": {
+    "runtime": "useThemeStore.getState().setPreset('claude')",
+    "ui": "Settings → Appearance → theme swatch labelled \"Claude\"",
+    "domResult": "<html data-theme=\"claude\"> (plus class=\"dark\" in dark mode)",
+    "shipAsDefault": "Set DEFAULT_PRESET = 'claude' in src/shared/theme/presets.ts and the matching fallback in public/theme-init.js (var preset = state.preset || 'claude')."
+  },
+
+  "verification": [
+    {
+      "command": "pnpm validate:tokens",
+      "checks": "No raw palette classes in app code — semantic tokens only.",
+      "status": "green"
+    },
+    {
+      "command": "pnpm validate:theme-axis",
+      "checks": "All 18 theme axes respected; no hardcoded axis values.",
+      "status": "green"
+    },
+    { "command": "pnpm type-check", "status": "green" }
+  ],
+
+  "reproduce": {
+    "step1": "Append the tokens.light and tokens.dark blocks to src/index.css under their listed selectors.",
+    "step2": "Append .theme-dot-claude { background-color: oklch(0.617 0.138 39); } near the other swatches.",
+    "step3": "Add { id: 'claude', label: 'Claude' } to THEME_PRESETS in src/shared/theme/presets.ts.",
+    "step4": "Add the claude entry to PRESET_PRIMARY in public/theme-init.js.",
+    "step5": "Run pnpm validate:tokens && pnpm validate:theme-axis."
+  }
+}
