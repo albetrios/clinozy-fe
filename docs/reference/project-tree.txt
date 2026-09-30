@@ -1589,6 +1589,7 @@ clinozy-fe/
 │   │   ├── i18n-locale-parity.mjs
 │   │   ├── identity-allowlist.txt
 │   │   ├── identity.mjs
+│   │   ├── large-staged-files.sh
 │   │   ├── lockfile-sync.sh
 │   │   ├── logical-css.sh
 │   │   ├── no-bare-intl.mjs
@@ -1603,7 +1604,7 @@ clinozy-fe/
 │   │   ├── theme-axis.sh
 │   │   ├── theme-catalog.mjs
 │   │   ├── vite-env-reads.mjs
-│   │   └── [2 test files]
+│   │   └── [3 test files]
 │   ├── load-env-files.mjs
 │   └── README.md
 ├── .commitlintrc.json
