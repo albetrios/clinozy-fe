@@ -16,8 +16,9 @@ For this process:
   `iterations/launch-<YYYY-MM-DD>-<id>/` — this repo's is
   `launch-2026-09-30-jxmr`. It is opened with `pnpm iteration:new launch`, and
   its Baseline is `none`: MODE `initial`.
-- Its `intake-files/` hold the full drop, exactly as delivered — the same as
-  every later iteration.
+- Its intake is always `--mode full`: the whole drop, exactly as delivered.
+  Every later iteration's `intake-files/` is a full snapshot too, built in
+  `full`, `overlay` or `brief` mode.
 - Every later iteration runs [Incremental iteration](incremental-iteration.md)
   against a Baseline you confirm.
 
@@ -79,8 +80,9 @@ pnpm iteration:intake <iteration> <drop-folder>            # --both copies PRD.m
 ```
 
 The intake copies the drop into `iterations/<iteration>/intake-files/` exactly
-as delivered and fills the README's Drop placed, Drop source and Schema-routes
-rows. Status stays `planning`.
+as delivered and fills the README's Drop placed, Drop source, Intake mode
+(`full`), Intake note, Schema-routes and Intake hash rows. Status stays
+`planning`.
 
 ## ==== STEP 4 — Plan (no code), then approve ====
 
@@ -88,8 +90,10 @@ Say **"plan iteration <iteration>"** (or paste
 [`iteration-planning-prompt.md`](../prompts/iteration-planning-prompt.md)).
 `fe-iteration-planning` stops after every step:
 
-0. Confirms the iteration (`pnpm iteration:list`, eligibility table, your answer).
-1. Re-checks the intake, reads every file in full, builds the coverage matrix.
+0. Confirms the iteration (`pnpm iteration:list`, eligibility table, your answer),
+   then runs the gate, `pnpm iteration:intake <iteration> --check` — if it
+   fails, planning stops at once, writes nothing and prints why.
+1. Reads every intake file in full and builds the coverage matrix.
 2. Delta — `n/a` for an initial iteration.
 3. Reconciles the markdown against the prototype (prototype wins), with evidence.
 4. Asks the blocking (RED) questions; answers go to `plans/decisions.md`.
@@ -107,8 +111,9 @@ than the source — is what produced every rebuild in this repo.
 
 Say **"kickoff iteration <iteration>"** (or paste
 [`kickoff-iteration-prompt.md`](../prompts/kickoff-iteration-prompt.md)).
-`fe-kickoff-iteration` moves the iteration to `implementing`, starts
-`AS-BUILT.md`, and follows the ledger in the order from Adoption — **preset →
+`fe-kickoff-iteration` runs the gate again, moves the iteration to
+`implementing`, starts `AS-BUILT.md` (its Standing deviations start empty), and
+follows the ledger in the order from Adoption — **preset →
 shell → screens**:
 
 - Preset: recompute every contrast ratio locally; register in all four places.
@@ -139,7 +144,8 @@ editing.
 
 When every ledger row is `done` (or `deferred` with your OK) and `AS-BUILT.md`
 has its summary — planned but not built, built but not planned, follow-ups —
-the kickoff runs `pnpm iteration:status <iteration> done`. In the last commit
+and its Standing deviations (every place the code deliberately differs from the
+design), the kickoff runs `pnpm iteration:status <iteration> done`. In the last commit
 before the branch merges:
 
 ```bash
@@ -148,7 +154,8 @@ git add iterations/<iteration>/ && git commit -m "chore: freeze <iteration> (as 
 ```
 
 After the merge the folder is never edited. The next design change is a new
-iteration with the full drop, and this one is its Baseline.
+iteration — its intake a full snapshot, from a whole drop, an overlay or a
+brief — and this one is its Baseline.
 
 ---
 

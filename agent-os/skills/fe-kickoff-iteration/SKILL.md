@@ -1,6 +1,6 @@
 ---
 name: fe-kickoff-iteration
-description: Implement an approved design iteration — confirm which approved iteration to build (Step 0) and move it to implementing, then follow its KICKOFF.md ledger one row at a time — build each screen through fe-design-ditto, verify side by side at 375px and 1440px per state, write the AS-BUILT.md entry, check the impact on upcoming rows (a scope change stops for the user) and stop for review before the next row. Closes with the static design gates, the AS-BUILT summary and iteration:status done. Use when the user says "kickoff", "kickoff iteration <name>", "start implementing <iteration>". Requires README Status approved.
+description: Implement an approved design iteration — confirm which approved iteration to build (Step 0), pass the intake gate (iteration:intake --check — stop on failure) and move it to implementing, then follow its KICKOFF.md ledger one row at a time — build each screen through fe-design-ditto, verify by Intake mode (side by side at 375px and 1440px per state, or the BRIEF.md acceptance criteria), write the AS-BUILT.md entry, check the impact on upcoming rows (a scope change stops for the user) and stop for review before the next row. Closes with the static design gates, the AS-BUILT summary with its Standing deviations and iteration:status done. Use when the user says "kickoff", "kickoff iteration <name>", "start implementing <iteration>". Requires README Status approved.
 ---
 
 # Kickoff an iteration (build an approved `KICKOFF.md`, row by row)
@@ -26,8 +26,19 @@ Baseline. Recommend the earliest-opened eligible iteration (the launch always
 comes first). If the user named one, check it against the rule. Always ask with
 **AskUserQuestion** — never pick silently.
 
-Once confirmed: `pnpm iteration:status <iteration> implementing`, and create
-`AS-BUILT.md` from the skeleton below, dated today.
+Once confirmed, **the gate**:
+
+```bash
+pnpm iteration:intake <iteration> --check
+```
+
+**Gate rule:** if it exits non-zero, stop now — write nothing, change no status, ask nothing
+else; print the command's output and end the turn. The intake has to be fixed (and the plan
+re-approved if it changed) before any build.
+
+When it passes: `pnpm iteration:status <iteration> implementing`, and create `AS-BUILT.md` from
+the skeleton below, dated today, with the Baseline's Standing deviations copied in as the starting
+list (empty for an initial iteration).
 
 ## Step 1 — Read the approved plan. Stop.
 
@@ -46,15 +57,23 @@ Follow the ledger in its order (respecting Depends on). For each row:
    motion. A foundation row runs the skill it names (`fe-theme-axis-audit` for
    the preset, the shell variant made live, `fe-route-island` /
    `fe-page-scaffolding` for islands, and so on).
-2. **Verify** — the row's Acceptance. A screen gets a **side-by-side comparison
-   against the source at 375px and 1440px, per state** — the prototype open in
-   the browser pane beside the app, or the md walked field by field — and the
-   per-screen UI walk ([Adoption](../../../docs/design-workflow/process/adoption.md)).
-   MODE incremental: verify the changed screens **and** re-run the full
-   baseline set; an unexpected diff on an untouched screen is a finding, not a
-   baseline to bless.
+2. **Verify** — the row's Acceptance, by the README's Intake mode:
+   - **`full` / `overlay`** — a screen gets a **side-by-side comparison against
+     the source at 375px and 1440px, per state** — the prototype open in the
+     browser pane beside the app, or the md walked field by field — and the
+     per-screen UI walk ([Adoption](../../../docs/design-workflow/process/adoption.md)).
+   - **`brief`** — there is no new design source: the row meets the `BRIEF.md`
+     acceptance criteria it covers, and the screens it touches still match their
+     carried-forward specs except where the brief changes them.
+
+   MODE incremental, every mode: verify the changed screens **and** re-run the
+   full baseline set; an unexpected diff on an untouched screen is a finding,
+   not a baseline to bless.
 3. **Record** — add the row's `AS-BUILT.md` entry: planned · actually built ·
-   difference · why · decision link · commit. Set the ledger row's Status.
+   difference · why · decision link · commit. Set the ledger row's Status. Where
+   the build now differs from the design on purpose, add a **Standing
+   deviation** (item · design says · built as · since iteration · decision);
+   where this row resolves one, remove it.
 4. **Check the impact on upcoming rows.**
    - **Small, inside the row** (a prop renamed, a component split): record it in
      the entry and continue.
@@ -76,6 +95,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
   recorded. An open row means not done — say so and keep going.
 - **`AS-BUILT.md` › Summary:** planned but not built (deferred, user OK), built
   but not planned, follow-ups for the next iteration.
+- **`AS-BUILT.md` › Standing deviations:** the complete list of where the code
+  now differs from the design — the Baseline's list, minus what this iteration
+  resolved, plus its new ones. The next iteration plans against it.
 - `pnpm iteration:status <iteration> done`. `frozen` goes in the last commit
   before the iteration's branch merges; after that the folder is never edited —
   a correction is a new `fix` iteration.
@@ -104,6 +126,11 @@ What was actually built, ledger row by ledger row, against the approved plan in
 - **Planned, not built** (deferred, user OK): —
 - **Built, not planned:** —
 - **Follow-ups for the next iteration:** —
+
+## Standing deviations
+
+| Item | Design says | Built as | Since iteration | Decision |
+| --- | --- | --- | --- | --- |
 ```
 
 Entries are numbered `#1`, `#2`, … in the order rows are built; a revision cites
@@ -114,6 +141,8 @@ the entry that caused it.
 | Failure                                                             | Prevention here                                 |
 | ------------------------------------------------------------------- | ----------------------------------------------- |
 | The wrong iteration built, or one built on an unbuilt Baseline      | Step 0 eligibility table + AskUserQuestion      |
+| A build on an incomplete or edited intake                           | Step 0 gate (`iteration:intake --check`)        |
+| A deliberate difference from the design that nobody can find later  | Standing deviations, carried forward            |
 | Rows built in a batch, a wrong turn found late                      | One row at a time, a review stop after each     |
 | "Done" from a functional check while the UI matches nothing         | Side-by-side at 375 and 1440 per state          |
 | A token change that silently shifts an untouched screen             | Full baseline set on incremental iterations     |

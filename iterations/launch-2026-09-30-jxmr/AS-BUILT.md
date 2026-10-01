@@ -25,3 +25,12 @@ Written when every ledger row is `done`, or `deferred` with the user's OK.
 - **Planned, not built** (deferred, user OK): —
 - **Built, not planned:** —
 - **Follow-ups for the next iteration:** —
+
+## Standing deviations
+
+The complete list of where the code differs from the design. The launch has no Baseline, so the
+list starts empty; a deviation is added when it is found and removed when an iteration resolves it.
+The next iteration copies this list as its starting point.
+
+| Item | Design says | Built as | Since iteration | Decision |
+| ---- | ----------- | -------- | --------------- | -------- |

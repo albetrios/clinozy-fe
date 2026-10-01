@@ -741,15 +741,16 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-iteration-planning/SKILL.md`
 
-**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, check and read the full drop, establish the incremental delta, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
+**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, pass the intake gate and read the full snapshot, establish the incremental delta by Intake mode, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
 
 **Trigger keywords:** "plan iteration <name>", "iteration planning", "plan the next iteration", "make a plan from legacy", "plan from legacy", "review the legacy version"
 
 **Key behaviors:**
 
 - Step 0 shows the eligibility table (Status `planning`) and confirms the iteration and its Baseline with AskUserQuestion (`pnpm iteration:baseline`)
-- `pnpm iteration:intake --dry-run` must pass; every intake file is read in full and proved with a coverage matrix
-- MODE incremental: `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; every change classified, omissions raised as findings
+- The intake gate `pnpm iteration:intake <it> --check [--baseline <b>]` runs at Step 0; on failure the skill stops at once (writes nothing, changes no status) and prints the output
+- Every intake file is read in full and proved with a coverage matrix
+- MODE incremental, by Intake mode: full/overlay — `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ. Always the Baseline's Standing deviations; every change classified, omissions raised as findings
 - Every md ↔ prototype verdict carries file:line or selector evidence; RED questions go to AskUserQuestion and `plans/decisions.md`, never a guess
 - Writes every KICKOFF section (`n/a — reason` allowed, absent not) with the route-ordered ledger (Kind, Depends on, Skill/driver, Acceptance, Assignee, Status), then `iteration:status ready-for-approval` and stops; `approved` on the user's go-ahead
 
@@ -767,7 +768,8 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Key behaviors:**
 
-- Each screen row runs **fe-design-ditto**; each row is verified side by side at 375px and 1440px per state (incremental: the changed screens and the full baseline set)
+- Runs the intake gate before `implementing` (stop on failure); each screen row runs **fe-design-ditto**; each row is verified by Intake mode — side by side at 375px and 1440px per state, or the `BRIEF.md` acceptance criteria (incremental: plus the full baseline set)
+- Keeps `AS-BUILT.md` › Standing deviations: the Baseline's list, minus what this iteration resolves, plus its new ones
 - Every row gets an `AS-BUILT.md` entry: planned · built · difference · why · decision · commit
 - A scope change (row added or removed, acceptance or order changed) stops for the user, then goes to `plans/decisions.md` and AS-BUILT's revisions; KICKOFF gets only `revised → AS-BUILT #n`
 - Never pushes, opens a PR or merges

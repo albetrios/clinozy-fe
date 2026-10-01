@@ -7,9 +7,12 @@
 > [`kickoff-iteration-prompt.md`](kickoff-iteration-prompt.md).
 
 **Paste this to Claude Code (here, in clinozy-fe)** once the drop is in the
-iteration's `intake-files/` (`pnpm iteration:intake <iteration> <folder>`). Set
-`ITERATION` and `Build`; the mode comes from the iteration's README — Baseline
-`none` is initial, anything else is incremental against that Baseline.
+iteration's `intake-files/` — `pnpm iteration:intake <iteration> <folder>` with
+`--mode full` (the whole drop), `overlay` (only the changed files) or `brief`
+(only a `BRIEF.md`, e.g. "implement these kinds of screens"). Set `ITERATION`
+and `Build`; everything else comes from the iteration's README — Baseline
+`none` is initial, anything else is incremental against that Baseline, and the
+Intake mode says how the delta is found.
 
 ---
 
@@ -29,19 +32,31 @@ Status `planning`. Recommend the earliest-opened eligible one (the launch
 first). For an incremental iteration, suggest the Baseline — the latest `done`
 or `frozen` iteration in this repo — and let me confirm or pick another; save it
 with `pnpm iteration:baseline`. Ask me (AskUserQuestion) before going on.
+Then run **the gate**: `pnpm iteration:intake <iteration> --check` (add
+`--baseline <baseline>` when incremental). **If it exits non-zero, stop now** —
+write nothing, change no status, ask nothing else; print its output and end the
+turn.
 
-**1. Read everything first.** `pnpm iteration:intake <iteration>
-iterations/<iteration>/intake-files --dry-run` must pass. Then read every file
-in `intake-files/` in full — every `.md`, the prototype HTML and its JS. Do not
+**1. Read everything first.** Read every file in `intake-files/` in full —
+every `.md` (`BRIEF.md` first in brief mode), the prototype HTML and its JS. Do not
 skim, do not grep-only. Give me the coverage matrix and what you found — theme
 tokens, shell structure, screens, interaction shapes, step sequences, timings,
 states — **and stop.**
 
-**2. The delta (incremental only).** Run `pnpm iteration:diff <baseline>
-<iteration>` — it compares the two `intake-files/` folders — and read the
-designer's **"What changed"** notes. Anything the diff shows that the notes
-omit is a finding: surface it, don't silently plan it. Classify every change and
-show me the table:
+**2. The delta (incremental only)**, by the README's Intake mode:
+
+- **full / overlay** — run `pnpm iteration:diff <baseline> <iteration>` (it
+  compares the two `intake-files/` folders) and read the designer's **"What
+  changed"** notes. Anything the diff shows that the notes omit is a finding:
+  surface it, don't silently plan it.
+- **brief** — `BRIEF.md` is the change list, and `iteration:diff` must show
+  nothing but `BRIEF.md` added.
+- **always** — read the Baseline's `AS-BUILT.md` › Standing deviations and the
+  current code of the affected parts: where the build differs from the design,
+  plan against what was built. List the deviations this change touches in
+  KICKOFF.md.
+
+Classify every change and show me the table:
 
 | Change                                              | Cost    | Blast radius                               |
 | --------------------------------------------------- | ------- | ------------------------------------------ |
@@ -60,7 +75,8 @@ not persisted). **Stop** and show me.
 **3. Reconcile.** Where a prototype exists and disagrees with the markdown, the
 prototype wins. Give me the reconciliation table, every verdict with file:line
 evidence. Flag dead CSS rather than planning it; record md-only additions as
-deviations.
+deviations. In brief mode, reconcile `BRIEF.md` against the current screens'
+specs and code instead.
 
 **4. Gate.** Score each screen on the intake checklists. **Stop and ask** on any
 RED — unknown popup shape, unknown mobile behaviour, unknown conditional step

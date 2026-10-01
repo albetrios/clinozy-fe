@@ -85,26 +85,39 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
 `iterations/README.md`, a worked example in `docs/design-workflow/process/iteration-walkthrough.md`:
 
 1. **Planning — no code.** `pnpm iteration:new <type> [topic] [--both]` opens the folder and its
-   README; `pnpm iteration:intake <iteration> <drop-folder> [--both]` places the **full** drop, exactly
-   as delivered, in `intake-files/` and checks the required set. "plan iteration <name>" runs
-   **`fe-iteration-planning`** (Steps 0–6, stopping after each) → `KICKOFF.md` with its ordered ledger
-   and `plans/decisions.md` → Status `ready-for-approval`. The user's approval → `approved`, which locks
-   `intake-files/` and freezes `KICKOFF.md`.
+   README; `pnpm iteration:intake <iteration> <source> [--mode full|overlay|brief] [--both]` writes the
+   iteration's **full snapshot** to `intake-files/` (received files exactly as delivered) and checks the
+   required set. "plan iteration <name>" runs **`fe-iteration-planning`** (Steps 0–6, stopping after
+   each) → `KICKOFF.md` with its ordered ledger and `plans/decisions.md` → Status `ready-for-approval`.
+   The user's approval → `approved`, which locks `intake-files/` and freezes `KICKOFF.md`.
 2. **Kickoff — build.** "kickoff iteration <name>" runs **`fe-kickoff-iteration`**: one ledger row at a
-   time through its skill (screens through **`fe-design-ditto`**), verified side by side at 375px and
-   1440px, recorded in `AS-BUILT.md`; a scope change stops for the user. Then `done`, and `frozen` in the
-   last commit before the merge — a frozen iteration is never edited; a correction is a new `fix`.
+   time through its skill (screens through **`fe-design-ditto`**), verified by Intake mode (side by side
+   at 375px and 1440px, or the `BRIEF.md` acceptance criteria), recorded in `AS-BUILT.md`; a scope change
+   stops for the user. Then `done` — `AS-BUILT.md` closes with its **Standing deviations**, the complete
+   list of where the code differs from the design — and `frozen` in the last commit before the merge. A
+   frozen iteration is never edited; a correction is a new `fix`.
+
+- **Intake modes.** `full` — the whole drop (the launch is always full). `overlay` — only the changed
+  files, laid over the Baseline's snapshot. `brief` — no design files, only a written `BRIEF.md` ("implement
+  these kinds of screens"; template `tooling/iterations/templates/BRIEF.md`) added to the Baseline's
+  snapshot. The README records the Intake mode, an Intake note and the Intake hash.
+- **The gate.** `pnpm iteration:intake <iteration> --check [--baseline <baseline>]` proves the mandatory
+  files are present and each Intake hash still matches; both skills run it first. When it exits
+  non-zero, **stop at once** — write nothing, change no status, ask nothing else; print its output and
+  end the turn.
 
 - **Mode.** Baseline `none` is MODE initial; otherwise incremental against the Baseline the user
   confirms at planning Step 0 (`pnpm iteration:baseline`). The delta is the designer's "What changed"
-  plus `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders only —
-  so the Baseline's intake is mandatory.
+  plus `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders only
+  (in `brief` mode, `BRIEF.md` itself) — so the Baseline's intake is mandatory. Planning also reads the
+  Baseline's Standing deviations and the current code: what was built beats what was drawn.
 - **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` only
   through `pnpm iteration:status` (back to `planning` with `--reason`); it and `iteration:baseline`
   append the README's History. Never edit `intake-files/` or a README's values by hand (Summary
   excepted); `pnpm iteration:list` is the index.
 - **Both repos.** clinozy-be uses the same names, commands and README template (`--both` opens and
-  fills the same-named folder there; `PRD.md` and `schema-routes.md` stay byte-identical).
+  fills the same-named folder there, in the same Intake mode against its own Baseline; `PRD.md` and
+  `schema-routes.md` — and `BRIEF.md` in brief mode — stay byte-identical).
 
 ## Agent-os naming
 

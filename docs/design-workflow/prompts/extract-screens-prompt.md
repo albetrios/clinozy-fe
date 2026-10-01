@@ -374,7 +374,10 @@ template, go back and fill it before returning.
    the backend changes too). It copies the files into
    `iterations/<iteration>/intake-files/` exactly as delivered and fails on any
    required file that is missing — including a `<slug>.md` for a Slug in
-   `_index.md`.
+   `_index.md`. When only some screens changed, add `--mode overlay` and send
+   only the changed files: they are laid over the Baseline's snapshot and the
+   required set is checked on the result, so a returned `_index.md` must still
+   list every screen.
 3. Say **"plan iteration <iteration>"**.
 
 Planning scores each screen against

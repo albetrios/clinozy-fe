@@ -22,17 +22,22 @@ builds **one screen (or one foundation piece) at a time** for
 The iteration rule (in full: `iterations/README.md`):
 
 - Baseline `none` → **MODE initial**: every screen is built.
-- Otherwise **MODE incremental** against the Baseline: every intake still holds
-  the full drop, and the delta — `pnpm iteration:diff <baseline> <iteration>`
-  over the two `intake-files/` folders, reconciled with the designer's "What
-  changed" — is what the ledger builds. Unchanged screens are not rebuilt.
+- Otherwise **MODE incremental** against the Baseline: `intake-files/` is still
+  a full snapshot (Intake mode `full`, `overlay` or `brief`), and the delta —
+  `pnpm iteration:diff <baseline> <iteration>` over the two `intake-files/`
+  folders, reconciled with the designer's "What changed", or `BRIEF.md` in brief
+  mode — is what the ledger builds. Unchanged screens are not rebuilt.
+- **Brief mode has no new design source.** The screen's carried-forward spec and
+  the current code are the source; `BRIEF.md` says what changes and how it is
+  accepted. Build to those, and record any deliberate difference from the
+  design as a Standing deviation in `AS-BUILT.md`.
 - `intake-files/` is locked from Status `approved`; what was actually built is
   recorded in `AS-BUILT.md`.
 
 ```text
 iterations/<iteration>/
 ├── README.md            ← Type, Baseline, Status, Drop placed, Schema-routes, … + History
-├── intake-files/        ← the drop, exactly as delivered
+├── intake-files/        ← the full snapshot; received files exactly as delivered
 │   ├── PRD.md · schema-routes.md · _index.md
 │   ├── preset.md        ← theme: tokens, fonts, radius, density, motion
 │   ├── shell.md         ← header, sidebar, nav — the frame around every screen

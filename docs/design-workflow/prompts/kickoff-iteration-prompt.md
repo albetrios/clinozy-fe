@@ -25,8 +25,11 @@ skip the stop after each row.
 **0. Confirm the iteration.** Run `pnpm iteration:list` and show
 `| Iteration | Type | Baseline | Status | Eligible | Why |` — eligible means
 Status `approved`, not yet implementing, and Baseline `none` or `done`/`frozen`.
-Ask me (AskUserQuestion), then `pnpm iteration:status <iteration> implementing`
-and start `AS-BUILT.md`.
+Ask me (AskUserQuestion), then run **the gate**: `pnpm iteration:intake
+<iteration> --check`. **If it exits non-zero, stop now** — write nothing,
+change no status, ask nothing else; print its output and end the turn. When it
+passes: `pnpm iteration:status <iteration> implementing`, and start
+`AS-BUILT.md` with the Baseline's Standing deviations copied in.
 
 ## Build order — initial
 
@@ -65,9 +68,10 @@ mark the KICKOFF row `revised → AS-BUILT #n`.
 
 ## VERIFY & CLOSE
 
-**Verify by comparison.** Side-by-side screenshots, source vs implementation, at
-**375px and 1440px**, per screen, per state. Functional checks do not prove
-fidelity.
+**Verify by the Intake mode.** full / overlay: side-by-side screenshots, source
+vs implementation, at **375px and 1440px**, per screen, per state — functional
+checks do not prove fidelity. brief: the `BRIEF.md` acceptance criteria, with
+the touched screens still matching their carried-forward specs.
 
 - initial → verify every screen built.
 - incremental → verify changed screens, **and re-run the full baseline set** to
@@ -84,7 +88,9 @@ per-screen UI walk (text, font px, colour, bg, spacing, radius, border, shadow,
 icons, layout, states, motion) was done against the source.
 
 **Recap.** Write `AS-BUILT.md`'s summary — planned but not built (deferred, my
-OK), built but not planned, follow-ups for the next iteration — then
+OK), built but not planned, follow-ups for the next iteration — and its
+**Standing deviations** (the Baseline's list, minus what this iteration
+resolved, plus its new ones), then
 `pnpm iteration:status <iteration> done`. Remind me that `frozen` goes in the
 last commit before the branch merges, and that after it the folder is never
 edited (a correction is a new `fix` iteration). Never push, open a PR or merge.

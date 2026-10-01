@@ -1,6 +1,6 @@
 ---
 name: fe-iteration-planning
-description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration and its Baseline, check and read the full intake (iteration:intake --dry-run, coverage matrix), establish the delta for an incremental iteration (iteration:diff of the two intake-files/ folders + the designer's "What changed"), reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
+description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration and its Baseline, pass the intake gate (iteration:intake --check — stop on failure), read the full snapshot (coverage matrix), establish the delta by Intake mode (full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md) and the Baseline's Standing deviations, reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
 ---
 
 # Iteration planning (plan from `iterations/<iteration>/intake-files/`)
@@ -22,24 +22,33 @@ The rules: [`iterations/README.md`](../../../iterations/README.md).
 ```text
 iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
 ├── README.md            ← field table (Status, Baseline, Drop placed, Schema-routes, …) + ## History
-├── intake-files/        ← the FULL drop, exactly as delivered, flat; locked from Status approved
+├── intake-files/        ← the FULL snapshot (Intake mode full, overlay or brief), flat; locked from approved
 │   ├── PRD.md · schema-routes.md · _index.md · preset.md · shell.md · <slug>.md per screen
-│   └── <prototype>.html · the *.js it loads (optional: _patterns.md, _report.md, …)
+│   ├── <prototype>.html · the *.js it loads (optional: _patterns.md, _report.md, …)
+│   └── BRIEF.md         ← brief mode only: the written change
 ├── plans/decisions.md   ← blocking-question answers + every scope decision
 ├── KICKOFF.md           ← this skill's output: the plan + ordered ledger; frozen at approval
-└── AS-BUILT.md          ← written by fe-kickoff-iteration while it builds
+└── AS-BUILT.md          ← written by fe-kickoff-iteration; ends with the Standing deviations
 ```
 
 - **Mode.** Baseline `none` → **MODE initial** (the first iteration in this
   repo): everything is new; read everything. Otherwise **MODE incremental**
   against the Baseline the user confirms in Step 0 — the suggestion is the
   latest `done` or `frozen` iteration in this repo.
-- **Every intake holds the full drop.** The incremental delta is the designer's
-  "What changed" notes plus `pnpm iteration:diff <baseline> <iteration>`, which
-  compares the two `intake-files/` folders and nothing else. The Baseline's
-  `intake-files/` are mandatory for an incremental iteration — without them
-  there is nothing to diff, so stop. Anything the diff shows that the notes
-  omit is a finding.
+- **Intake modes.** `intake-files/` is always a full snapshot. `full` — the drop as received (the
+  launch is always full). `overlay` — only the changed files arrived: the Baseline's snapshot with
+  them laid over it. `brief` — no design files, only a written change such as "implement these
+  kinds of screens": the Baseline's snapshot plus `BRIEF.md`. The README records the Intake mode,
+  an Intake note (received versus carried forward) and an Intake hash.
+- **The delta by mode.** `full` / `overlay`: the designer's "What changed" notes plus
+  `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders and
+  nothing else — anything the diff shows that the notes omit is a finding. `brief`: `BRIEF.md` is
+  the change list, and the diff must show nothing else changed. Always: the Baseline's Standing
+  deviations — where the build differs from the drop, plan against what was actually built.
+- **The gate.** `pnpm iteration:intake <iteration> --check [--baseline <baseline>]` proves every
+  mandatory file is in the snapshot (and the Baseline's) and that no file changed since the intake.
+  **Gate rule:** when it exits non-zero, stop now — write nothing, change no status, ask nothing
+  else; print the command's output and end the turn.
 - The README's Status and Baseline change only through `pnpm iteration:status`
   and `pnpm iteration:baseline`, which also append its History line.
 
@@ -57,24 +66,30 @@ Eligible = Status `planning`. Recommend the earliest-opened eligible iteration
 rule. For an incremental iteration, suggest the Baseline — the latest `done` or
 `frozen` iteration in this repo — and let the user confirm it or pick another;
 save it with `pnpm iteration:baseline <iteration> <baseline>`. Always ask with
-**AskUserQuestion** — never pick silently.
+**AskUserQuestion** — never pick silently. An `overlay` or `brief` snapshot was built on the
+Baseline recorded at intake; picking another means rebuilding it (the gate fails until
+`pnpm iteration:intake <iteration> <source> --mode <mode> --replace` has run).
 
-### Step 1 — Intake check, read everything, coverage matrix. Stop.
+Then **the gate**:
 
 ```bash
-pnpm iteration:intake <iteration> iterations/<iteration>/intake-files --dry-run
+pnpm iteration:intake <iteration> --check                         # MODE initial
+pnpm iteration:intake <iteration> --check --baseline <baseline>   # MODE incremental
 ```
 
-It must pass: `PRD.md`, `schema-routes.md`, the prototype `*.html` with every
-`*.js` it loads, `_index.md`, one `<slug>.md` per Slug in `_index.md`'s table,
-`preset.md` and `shell.md`. A missing file goes back to the designer — never
-plan around it. Its warnings (extras, screen files not in `_index.md`) are
-findings.
+**Gate rule:** if it exits non-zero, stop now — write nothing, change no status, ask nothing
+else; print the command's output and end the turn. A failing gate goes back to whoever placed the
+drop; the plan never works around a missing or edited file.
 
-Then read **every** file in `intake-files/` **in full** — every `.md`, the
-prototype HTML including any state machine embedded at the bottom, and every
-`.js` (classify each JS file: app logic to honour, or generic runtime engine to
-ignore — say which and why).
+### Step 1 — Read everything, coverage matrix. Stop.
+
+The gate passed, so the snapshot is complete and unedited. The intake warnings (extras, screen
+files not in `_index.md`) are findings.
+
+Read **every** file in `intake-files/` **in full** — every `.md` (with `BRIEF.md` first in brief
+mode), the prototype HTML including any state machine embedded at the bottom, and every `.js`
+(classify each JS file: app logic to honour, or generic runtime engine to ignore — say which and
+why).
 
 **The completeness contract is a coverage matrix.** The plan is only "perfect"
 if nothing in the drop escaped it, and the matrix is the proof:
@@ -96,21 +111,30 @@ shapes, step sequences, exact timings, states. **Stop.**
 
 ### Step 2 — Delta (MODE incremental only). Stop.
 
-MODE initial: write `n/a — initial` and go on. MODE incremental: establish the
-delta from two signals and reconcile them.
+MODE initial: write `n/a — initial` and go on. MODE incremental: establish the delta by the
+README's Intake mode, then read what the Baseline actually built.
 
-```bash
-pnpm iteration:diff <baseline> <iteration>          # summary, then the raw diff of the two intake-files/ folders
-pnpm iteration:diff <baseline> <iteration> --json   # the summary for this step
-```
+- **`full` / `overlay`** — two signals, reconciled:
+  1. **The designer's "What changed"** — the notes in the changed specs and the PRD.
+  2. **The diff** — files and screens added, removed or changed; whether the PRD,
+     `schema-routes.md` or the prototype changed; the entities, fields, enums, routes and
+     operations added, removed or changed.
 
-1. **The designer's "What changed"** — the notes in the changed specs and the PRD.
-2. **The diff** — files and screens added, removed or changed; whether the PRD,
-   `schema-routes.md` or the prototype changed; the entities, fields, enums and
-   routes added, removed or changed.
+  ```bash
+  pnpm iteration:diff <baseline> <iteration>          # summary, then the raw diff of the two intake-files/ folders
+  pnpm iteration:diff <baseline> <iteration> --json   # the summary for this step
+  ```
+
+- **`brief`** — `BRIEF.md` is the change list: what changes, why, the affected screens, entities
+  and routes, the rules, the acceptance criteria, and what is out of scope.
+  `pnpm iteration:diff <baseline> <iteration>` must show only `BRIEF.md` added; anything else is a
+  finding to resolve before planning.
+- **Always** — the Baseline's `AS-BUILT.md` › Standing deviations (wherever the build differs from
+  the drop, plan against what was actually built) and the current code of the affected parts. List
+  the relevant standing deviations in KICKOFF.md §7.
 
 A diff hit the notes omit is a **finding** — surface it, never build it
-silently. The reconciled delta is the work list; classify every change:
+silently. The reconciled delta (or the brief) is the work list; classify every change:
 
 | Change                                              | Cost    | Blast radius                               |
 | --------------------------------------------------- | ------- | ------------------------------------------ |
@@ -158,6 +182,8 @@ Mandatory coverage — each is a row, never a blank:
   become questions, not guesses.
 
 MODE incremental: reconcile the changed screens and whatever they touch.
+**Brief mode:** there is no new design source — reconcile `BRIEF.md` against the current screens'
+specs (the carried-forward intake) and the current code, every verdict with file:line evidence.
 **Stop.**
 
 ### Step 4 — Blocking questions (the RED gate). Stop.
@@ -216,14 +242,17 @@ A section may say `n/a — <reason>`; it may never be absent.
    reconciliation locked; each block names the **skill(s)** that build it.
 7. **Deviations** — where the plan builds to the md over the prototype (states,
    mobile, gating) and where project rules override the source (tokens, shadcn,
-   i18n, icons, settings-stays-a-hash-modal).
-8. **Verification** — side-by-side against the source at **375px and 1440px**,
-   per screen, per state (MODE incremental: the changed screens **and** the full
-   baseline set); the static gates (`pnpm validate:tokens && pnpm
+   i18n, icons, settings-stays-a-hash-modal); and the Baseline's **Standing
+   deviations** that this change touches (item · design says · built as · since ·
+   decision), with whether this iteration keeps or resolves each.
+8. **Verification** — by Intake mode: `full` / `overlay` → side-by-side against
+   the source at **375px and 1440px**, per screen, per state (MODE incremental:
+   the changed screens **and** the full baseline set); `brief` → the `BRIEF.md`
+   acceptance criteria **and** the full baseline set; the static gates (`pnpm validate:tokens && pnpm
    validate:theme-axis && pnpm validate:structure && pnpm validate:testids &&
    pnpm type-check && pnpm lint`); colocated Vitest per unit; and the close —
-   `AS-BUILT.md` summary, `pnpm iteration:status <iteration> done`, `frozen` in
-   the last commit before the branch merges.
+   `AS-BUILT.md` summary with the Standing deviations, `pnpm iteration:status
+   <iteration> done`, `frozen` in the last commit before the branch merges.
 9. **The route — the ordered ledger.** One row per work item, in build order:
 
    | #   | Work item | Kind | Depends on | Skill/driver | Acceptance | Assignee | Status |
@@ -253,8 +282,9 @@ and `revised → AS-BUILT #n` markers change. **Stop.**
 
 Confirm every box; fix before presenting, never after:
 
-- [ ] `iteration:intake --dry-run` passes, and every file in `intake-files/` is read fully and owned by a plan section
-- [ ] MODE incremental: the delta reconciles `iteration:diff` with the "What changed" notes, every change classified, every omission raised as a finding
+- [ ] The gate (`iteration:intake --check`) passed, and every file in `intake-files/` is read fully and owned by a plan section
+- [ ] MODE incremental: the delta follows the Intake mode (full/overlay: `iteration:diff` ⟷ "What changed"; brief: `BRIEF.md`, nothing else changed), every change classified, every omission raised as a finding
+- [ ] The Baseline's Standing deviations are read, and the ones this change touches are in §7
 - [ ] Every screen in `_index.md` has spec + reconciliation rows + plan block + ledger rows
 - [ ] All four rebuild-forcing facts resolved (or RED question raised) per screen
 - [ ] Every reconciliation verdict carries file:line / selector evidence
@@ -331,7 +361,8 @@ the rules a plan most often gets wrong:
 | Failure                                                                | Prevention here                       |
 | ---------------------------------------------------------------------- | ------------------------------------- |
 | The wrong iteration planned, or against an unconfirmed Baseline        | Step 0 eligibility table + AskUserQuestion |
-| A plan built on an incomplete drop                                     | Step 1 `iteration:intake --dry-run`   |
+| A plan built on an incomplete or edited intake                         | Step 0 gate (`iteration:intake --check`) |
+| A plan against the design where the build already differs             | Step 2 Standing deviations            |
 | Plan built from a summary; a screen or state silently missing          | Step 1 coverage matrix                |
 | A changed screen the designer's notes forgot                           | Step 2 diff ↔ "What changed"          |
 | md↔prototype verdicts asserted without evidence                        | Step 3 evidence columns               |
