@@ -94,7 +94,10 @@ describe('SettingsModal', () => {
       renderWithProviders(<SettingsModal />, {
         initialEntries: [`/#settings/${section}`],
       });
-      expect(await screen.findByTestId(id)).toBeInTheDocument();
+      // Each case is the first in this file to import its panel's lazy chunk, and a cold
+      // import under the full suite's load outlasts findBy's 1s default — the same wait the
+      // layout tests give their cold chunks.
+      expect(await screen.findByTestId(id, {}, { timeout: 15_000 })).toBeInTheDocument();
       expect(screen.getByTestId('settings-search')).toBeEnabled();
       expect(screen.getByRole('button', { name: 'Close', exact: true })).toBeEnabled();
     },
