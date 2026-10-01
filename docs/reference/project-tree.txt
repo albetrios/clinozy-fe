@@ -207,6 +207,7 @@ clinozy-fe/
 │   │   │   ├── adoption.md
 │   │   │   ├── incremental-iteration.md
 │   │   │   ├── initial-iteration.md
+│   │   │   ├── iteration-walkthrough.md
 │   │   │   └── README.md
 │   │   └── prompts/
 │   │       ├── auth-public-routes-brief.md

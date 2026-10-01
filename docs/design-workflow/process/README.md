@@ -5,11 +5,12 @@ phases, **planning** (no code; it ends in your approval) and **kickoff** (the
 approved plan built one ledger row at a time) — and how every iteration after
 the first costs a fraction of the first.
 
-| Page                                              | When                                                            |
-| ------------------------------------------------- | --------------------------------------------------------------- |
-| [Adoption](adoption.md)                           | Always — the skills, rules and gates both phases share          |
-| [Initial iteration](initial-iteration.md)         | Baseline `none` — the first iteration in this repo (the launch) |
-| [Incremental iteration](incremental-iteration.md) | Every later iteration, against a Baseline you confirm           |
+| Page                                              | When                                                                              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [Adoption](adoption.md)                           | Always — the skills, rules and gates both phases share                            |
+| [Initial iteration](initial-iteration.md)         | Baseline `none` — the first iteration in this repo (the launch)                   |
+| [Incremental iteration](incremental-iteration.md) | Every later iteration, against a Baseline you confirm                             |
+| [Iteration walkthrough](iteration-walkthrough.md) | The whole flow as text diagrams, plus one incremental iteration traced end to end |
 
 ## The flow
 
