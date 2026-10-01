@@ -1,10 +1,12 @@
 # Ditto intake — clinozy-fe appendix
 
-**The checklist itself is global and project-agnostic:**
-`~/.claude/design-intake-checklist.md`
+**The checklist itself is project-agnostic:**
+[design-intake-checklist.md](design-intake-checklist.md) — Part A (what to
+extract), Part B (the RED / AMBER / GREEN scoreboard), Part C (what silently
+breaks fidelity).
 
 Use it for any project. This file holds only the clinozy-fe-specific rules that
-layer on top — keep project constraints here, never in the global file.
+layer on top — keep project constraints here, never in the checklist.
 
 ---
 

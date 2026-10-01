@@ -89,8 +89,10 @@ Mandatory reconciliation coverage — each is a row, never a blank:
 
 ### Step 3 — RED gate
 
-Score every screen against the intake checklist
-(`docs/superpower/design/ditto-intake-checklist.md`). Any RED — unknown popup
+Score every screen on the intake checklist's Part B scoreboard — A1–A12 per
+screen (`docs/superpower/design/design-intake-checklist.md`), with the
+clinozy-fe rules layered on top (`docs/superpower/design/ditto-intake-checklist.md`).
+Any RED — unknown popup
 shape, unknown mobile behaviour, unknown conditional sequence, unknown
 table-vs-card — resolves from the prototype first; if the source is genuinely
 silent, **stop and ask**. A wrong guess here is a rebuild. AMBER (missing copy,
@@ -255,6 +257,7 @@ the rules a kickoff most often gets wrong:
 
 - `fe-legacy-ditto` — the build half; its Steps 4–6 execute this plan
 - [`kickoff-prompt.md`](../../../docs/superpower/design/kickoff-prompt.md) — the paste-prompt this skill supersedes (kept as the user-facing entry point)
-- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the RED/AMBER gate
+- [`design-intake-checklist.md`](../../../docs/superpower/design/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
+- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the RED/AMBER gate's clinozy-fe rules
 - `docs/superpower/process/2-initial-implementation.md` · `3-incremental-implementation.md` — the process docs
 - `legacy/v1/KICKOFF.md` — the reference example of a complete plan

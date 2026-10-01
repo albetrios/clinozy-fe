@@ -102,8 +102,10 @@ cross-screen consistency (shared components described differently), and every
 
 ### Step 3 — Gate on the four blockers
 
-Score every screen against
-[the intake checklist](../../../docs/superpower/design/ditto-intake-checklist.md):
+Score every screen on the Part B scoreboard of
+[the intake checklist](../../../docs/superpower/design/design-intake-checklist.md),
+with [the clinozy-fe rules](../../../docs/superpower/design/ditto-intake-checklist.md)
+layered on top:
 
 | 🔴 RED — do not build | Why it blocks |
 | --------------------- | ------------- |
@@ -291,7 +293,8 @@ Each produced a real rebuild in this repo.
 ## Related
 
 - `fe-kickoff-planning` — the planning half; writes the `legacy/vN/KICKOFF.md` this skill executes
-- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the gate
+- [`design-intake-checklist.md`](../../../docs/superpower/design/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
+- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the gate's clinozy-fe rules
 - [`extract-screens-prompt.md`](../../../docs/superpower/design/extract-screens-prompt.md) — generates `legacy/` specs
 - [`design-handoff.contract.json`](../../../docs/superpower/design/design-handoff.contract.json) — preset mapping
 - `frontend-design` — craft, once fidelity is met

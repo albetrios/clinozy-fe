@@ -23,6 +23,7 @@ legacy", and it drives.
 | Asset                                                                    | Role                                               |
 | ------------------------------------------------------------------------ | -------------------------------------------------- |
 | [`kickoff-prompt.md`](../design/kickoff-prompt.md)                       | Starts a build with the skill's stop points intact |
+| [`design-intake-checklist.md`](../design/design-intake-checklist.md)     | The portable checklist the gate scores against     |
 | [`ditto-intake-checklist.md`](../design/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate             |
 | [`design-handoff.contract.json`](../design/design-handoff.contract.json) | Preset → token mapping                             |
 | `shadcn`                                                                 | Which primitive to reach for                       |
