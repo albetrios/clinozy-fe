@@ -1,7 +1,7 @@
 /**
  * Design-iteration model behind the `pnpm iteration:*` commands: names, the README field table
- * and its History, the Status lifecycle, the intake's required set, the Baseline suggestion and the
- * sibling repository. The rules: iterations/README.md.
+ * and its History, the Status lifecycle, the intake modes, the snapshot's required set and its
+ * Intake hash, the Baseline suggestion and the sibling repository. The rules: iterations/README.md.
  *
  * clinozy-be's `tooling/iterations/iteration.util.ts` implements the same rules, and the README
  * template is byte-identical to its own, so an iteration reads the same in both repositories.
@@ -47,8 +47,11 @@ export const NO_BASELINE = 'none';
 /** Placeholder for an empty README field. */
 export const EMPTY_FIELD = '—';
 
-/** Hex characters of the sha256 shown for `schema-routes.md` (the same in both repositories). */
-export const SCHEMA_ROUTES_HASH_LENGTH = 12;
+/**
+ * Hex characters of the sha256 shown for a fingerprint — the Schema-routes row (`schema-routes.md`)
+ * and the Intake hash row (the whole snapshot) — the same in both repositories.
+ */
+export const FINGERPRINT_LENGTH = 12;
 
 /** README field labels, in table order — the template lists exactly these rows. */
 export const README_FIELD_LABELS = [
@@ -62,10 +65,36 @@ export const README_FIELD_LABELS = [
   'Summary',
   'Drop placed',
   'Drop source',
+  'Intake mode',
+  'Intake note',
   'Schema-routes',
+  'Intake hash',
 ];
 
-/** Files every frontend drop must contain, besides the screens `_index.md` lists and the prototype. */
+/**
+ * How `pnpm iteration:intake` builds the snapshot: `full` — the whole drop as received; `overlay`
+ * — the received files laid over the Baseline's snapshot; `brief` — the Baseline's snapshot plus a
+ * received `BRIEF.md`, with no other changed file.
+ */
+export const INTAKE_MODES = ['full', 'overlay', 'brief'];
+
+/** The Intake mode when `--mode` is not given — and always the launch's. */
+export const DEFAULT_INTAKE_MODE = 'full';
+
+/** The written change a `brief` intake receives instead of design files. */
+export const BRIEF_FILE = 'BRIEF.md';
+
+/** The `## ` sections every `BRIEF.md` has, as in `templates/BRIEF.md`. */
+export const BRIEF_SECTIONS = [
+  'What changes',
+  'Why',
+  'Affected screens, entities and routes',
+  'Rules',
+  'Acceptance criteria',
+  'Out of scope',
+];
+
+/** Files every frontend snapshot must contain, besides the screens `_index.md` lists and the prototype. */
 export const REQUIRED_INTAKE_FILES = [
   'PRD.md',
   'schema-routes.md',
@@ -74,7 +103,7 @@ export const REQUIRED_INTAKE_FILES = [
   'shell.md',
 ];
 
-/** Name patterns a drop may also contain without a warning. */
+/** Name patterns a snapshot may also contain without a warning — mandatory once `_index.md` names them. */
 const OPTIONAL_INTAKE_PATTERNS = [
   /^_[a-z][a-z-]*\.md$/, // shared files: _patterns.md, _report.md
   /^design-brief[a-z-]*\.md$/,
@@ -82,6 +111,7 @@ const OPTIONAL_INTAKE_PATTERNS = [
   /^(system-surfaces?|overlays?|loading)[a-z-]*\.md$/,
   /^preset\.json$/,
   /^design-overview\.md$/,
+  /^BRIEF\.md$/, // carried forward from a brief-mode Baseline
 ];
 
 const ITERATION_NAME_PATTERN = new RegExp(
@@ -91,6 +121,7 @@ const FIELD_LABEL = /^[A-Za-z][A-Za-z -]*$/;
 const HISTORY_HEADING = '## History';
 const FINISHED_ENTRY = /^- (\d{4}-\d{2}-\d{2}) · \S+ → (done|frozen) · /;
 const SCRIPT_SOURCE = /<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi;
+const FILE_REFERENCE = /[\w.-]+\.(?:md|json)\b/g;
 const EXTERNAL_SOURCE = /^(?:[a-z]+:|\/\/|\/)/i;
 const BASELINE_STATUSES = new Set(['done', 'frozen']);
 const SIBLING_SUFFIXES = { '-fe': '-be', '-be': '-fe' };
@@ -427,24 +458,44 @@ export function prototypeScripts(html) {
 }
 
 /**
- * Checks a frontend drop against the required set: `PRD.md`, `schema-routes.md`, `_index.md`,
- * `preset.md`, `shell.md`, one `<slug>.md` per Slug in `_index.md`, a prototype `*.html` and
- * every local `*.js` it loads. Everything else is optional (`_`-prefixed shared files,
- * design-brief / auth / system-surface notes, `preset.json`, `design-overview.md`) or an extra.
+ * The optional files `_index.md` names (for example "Shared: `_patterns.md`") — those become
+ * mandatory, because the screens rely on them.
  *
- * @param {{ names: readonly string[], readText: (name: string) => string }} drop the flat file
- *   names and a reader for their text
+ * @param {string | undefined} indexMarkdown
+ * @returns {string[]}
+ */
+export function referencedOptionalFiles(indexMarkdown) {
+  if (indexMarkdown === undefined) return [];
+  const names = new Set();
+  for (const [name] of indexMarkdown.matchAll(FILE_REFERENCE)) {
+    if (OPTIONAL_INTAKE_PATTERNS.some((pattern) => pattern.test(name))) names.add(name);
+  }
+  return [...names].sort((left, right) => left.localeCompare(right));
+}
+
+/**
+ * Checks a frontend snapshot against the mandatory set: `PRD.md`, `schema-routes.md`, `_index.md`,
+ * `preset.md`, `shell.md`, one `<slug>.md` per Slug in `_index.md`, every optional file
+ * `_index.md` names, a prototype `*.html`, every local `*.js` it loads, and `BRIEF.md` in `brief`
+ * mode. Everything else is optional (`_`-prefixed shared files, design-brief / auth /
+ * system-surface notes, `preset.json`, `design-overview.md`, a carried-forward `BRIEF.md`) or an
+ * extra.
+ *
+ * @param {{ names: readonly string[], readText: (name: string) => string, mode?: string }} snapshot
+ *   the flat file names, a reader for their text, and the Intake mode (default `full`)
  * @returns {{ missing: string[], extras: string[], unlistedScreens: string[] }} `unlistedScreens`
  *   are `.md` files outside the required and optional sets that `_index.md` does not list
  */
-export function checkIntakeSet({ names, readText }) {
+export function checkIntakeSet({ names, readText, mode = DEFAULT_INTAKE_MODE }) {
   const present = new Set(names);
-  const slugs = present.has('_index.md') ? indexSlugs(readText('_index.md')) : [];
+  const index = present.has('_index.md') ? readText('_index.md') : undefined;
   const pages = names.filter((name) => name.endsWith('.html'));
   const scripts = pages.flatMap((page) => prototypeScripts(readText(page)));
   const required = new Set([
     ...REQUIRED_INTAKE_FILES,
-    ...slugs.map((slug) => `${slug}.md`),
+    ...(mode === 'brief' ? [BRIEF_FILE] : []),
+    ...indexSlugs(index).map((slug) => `${slug}.md`),
+    ...referencedOptionalFiles(index),
     ...scripts,
   ]);
   const missing = [...required].filter((name) => !present.has(name));
@@ -476,7 +527,18 @@ export function flatFileNames(folder) {
 }
 
 /**
- * The required files an iteration's `intake-files/` is missing — empty when the drop is complete.
+ * The Intake mode a README records — `full` when the row is missing or not a known mode.
+ *
+ * @param {Map<string, string>} fields
+ */
+export function recordedIntakeMode(fields) {
+  const mode = fields.get('Intake mode') ?? '';
+  return INTAKE_MODES.includes(mode) ? mode : DEFAULT_INTAKE_MODE;
+}
+
+/**
+ * The mandatory files an iteration's `intake-files/` is missing, for the Intake mode its README
+ * records — empty when the snapshot is complete.
  *
  * @param {{ repositoryRoot: string, iteration: string }} location
  * @returns {string[]}
@@ -484,25 +546,92 @@ export function flatFileNames(folder) {
 export function missingIntakeFiles(location) {
   const folder = intakeFolder(location);
   if (!existsSync(folder)) return [`${INTAKE_DIRECTORY}/`];
+  const readme = join(iterationFolder(location), 'README.md');
   return checkIntakeSet({
     names: flatFileNames(folder),
     readText: (name) => readFileSync(join(folder, name), 'utf-8'),
+    mode: existsSync(readme)
+      ? recordedIntakeMode(parseIterationReadme(readFileSync(readme, 'utf-8')))
+      : DEFAULT_INTAKE_MODE,
   }).missing;
 }
 
 /**
- * Fingerprints a `schema-routes.md`: the first {@link SCHEMA_ROUTES_HASH_LENGTH} hex characters of
- * the sha256 of its bytes, or {@link EMPTY_FIELD} when the file is missing. The same file sits in
- * both repositories, so equal fingerprints mean the copies match.
+ * The `## ` sections of {@link BRIEF_SECTIONS} a `BRIEF.md` lacks.
  *
- * @param {string} path
+ * @param {string} markdown
+ * @returns {string[]}
+ */
+export function missingBriefSections(markdown) {
+  const headings = new Set(
+    markdown
+      .split('\n')
+      .filter((line) => line.startsWith('## '))
+      .map((line) => line.slice(3).trim()),
+  );
+  return BRIEF_SECTIONS.filter((section) => !headings.has(section));
+}
+
+/**
+ * Fingerprints a `schema-routes.md`: the first {@link FINGERPRINT_LENGTH} hex characters of the
+ * sha256 of its bytes, or {@link EMPTY_FIELD} when the file is missing. The same file sits in both
+ * repositories, so equal fingerprints mean the copies match.
+ *
+ * @param {string | undefined} path
  */
 export function schemaRoutesHash(path) {
-  if (!existsSync(path)) return EMPTY_FIELD;
+  if (path === undefined || !existsSync(path)) return EMPTY_FIELD;
   return createHash('sha256')
     .update(readFileSync(path))
     .digest('hex')
-    .slice(0, SCHEMA_ROUTES_HASH_LENGTH);
+    .slice(0, FINGERPRINT_LENGTH);
+}
+
+/** Code-unit order: the same on every machine and in clinozy-be, unlike `localeCompare`. */
+function byCodeUnit(left, right) {
+  if (left < right) return -1;
+  return left > right ? 1 : 0;
+}
+
+/**
+ * Fingerprints a whole snapshot — the Intake hash: the first {@link FINGERPRINT_LENGTH} hex
+ * characters of one sha256 over every file, names in code-unit order, each fed as its name, a NUL,
+ * its bytes and a NUL. {@link EMPTY_FIELD} for an empty snapshot. Any added, removed, renamed or
+ * edited file changes it.
+ *
+ * @param {ReadonlyMap<string, Buffer>} files file name → bytes
+ */
+export function snapshotFingerprint(files) {
+  if (files.size === 0) return EMPTY_FIELD;
+  const hash = createHash('sha256');
+  for (const name of [...files.keys()].sort(byCodeUnit)) {
+    hash.update(name);
+    hash.update('\0');
+    hash.update(files.get(name));
+    hash.update('\0');
+  }
+  return hash.digest('hex').slice(0, FINGERPRINT_LENGTH);
+}
+
+/**
+ * A folder's flat, visible files and their bytes ({@link flatFileNames}).
+ *
+ * @param {string} folder
+ * @returns {Map<string, Buffer>}
+ */
+export function readSnapshot(folder) {
+  return new Map(
+    flatFileNames(folder).map((name) => [name, readFileSync(join(folder, name))]),
+  );
+}
+
+/**
+ * The Intake hash of a folder as it is on disk ({@link snapshotFingerprint}).
+ *
+ * @param {string} folder
+ */
+export function intakeHash(folder) {
+  return snapshotFingerprint(readSnapshot(folder));
 }
 
 // ── Baseline ─────────────────────────────────────────────────────────────────
@@ -596,22 +725,38 @@ export function resolveSiblingRoot({ repositoryRoot, siblingPath }) {
 }
 
 /**
- * Parses `--sibling <path>`, `--both` and the given flags out of a command line.
+ * Parses `--sibling <path>`, `--both`, the given flags and the given value options
+ * (`--name <value>` or `--name=<value>`) out of a command line.
  *
  * @param {readonly string[]} commandLine
- * @param {{ flags: readonly string[], maxPositionals: number, usage: string }} shape
- * @returns {{ positionals: string[], flags: Set<string>, createInSibling: boolean, siblingPath: string | undefined, help: boolean }}
- * @throws on an unknown option, a `--sibling` without a path, or too many positionals
+ * @param {{ flags: readonly string[], values?: readonly string[], maxPositionals: number, usage: string }} shape
+ * @returns {{ positionals: string[], flags: Set<string>, values: Map<string, string>, createInSibling: boolean, siblingPath: string | undefined, help: boolean }}
+ * @throws on an unknown option, a `--sibling` or value option without its value, or too many
+ *   positionals
  */
-export function parseCommandLine(commandLine, { flags, maxPositionals, usage }) {
+export function parseCommandLine(
+  commandLine,
+  { flags, values = [], maxPositionals, usage },
+) {
   const positionals = [];
   const seen = new Set();
+  const optionValues = new Map();
   let createInSibling = false;
   let siblingPath;
   let help = false;
   for (let index = 0; index < commandLine.length; index += 1) {
     const token = commandLine[index];
-    if (token === '--help' || token === '-h') help = true;
+    const equals = token.indexOf('=');
+    const option =
+      token.startsWith('--') && equals !== -1 ? token.slice(0, equals) : token;
+    if (values.includes(option)) {
+      const value = option === token ? commandLine[index + 1] : token.slice(equals + 1);
+      if (value === undefined || value === '' || value.startsWith('--')) {
+        throw new Error(`${option} needs a value — ${usage}`);
+      }
+      optionValues.set(option, value);
+      if (option === token) index += 1;
+    } else if (token === '--help' || token === '-h') help = true;
     else if (token === '--both' && flags.includes('--both')) createInSibling = true;
     else if (token === '--sibling' && flags.includes('--both')) {
       siblingPath = commandLine[index + 1];
@@ -627,5 +772,12 @@ export function parseCommandLine(commandLine, { flags, maxPositionals, usage }) 
   if (positionals.length > maxPositionals) {
     throw new Error(`Too many arguments: ${positionals.join(' ')} — ${usage}`);
   }
-  return { positionals, flags: seen, createInSibling, siblingPath, help };
+  return {
+    positionals,
+    flags: seen,
+    values: optionValues,
+    createInSibling,
+    siblingPath,
+    help,
+  };
 }

@@ -5,9 +5,9 @@
  * Usage:
  *   pnpm iteration:diff [<baseline>] <current> [--json]
  *
- * Every iteration's intake holds the full drop, so the delta of an incremental iteration is this
- * comparison plus the designer's "What changed" notes; anything the comparison shows that the
- * notes omit is a finding. Only `intake-files/` is compared — never the README, `KICKOFF.md`,
+ * Every iteration's intake holds a full snapshot, so the delta of an incremental iteration is this
+ * comparison plus the designer's "What changed" notes (in brief mode, `BRIEF.md` — and the
+ * comparison shows nothing else); anything the comparison shows that the notes omit is a finding. Only `intake-files/` is compared — never the README, `KICKOFF.md`,
  * `plans/` or `AS-BUILT.md` — so both sides need theirs. Prints a summary (files; screens via
  * `_index.md` Slugs; whether the PRD, `schema-routes.md` or the prototype changed; the
  * `schema-routes.md` entities, fields, enums, routes and operations added, removed or changed),
@@ -17,12 +17,11 @@
  * clinozy-be's `tooling/iterations/iteration-diff.util.ts` prints the same summary and JSON shape.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   EMPTY_FIELD,
-  flatFileNames,
   gitEnvironment,
   INTAKE_DIRECTORY,
   indexSlugs,
@@ -30,6 +29,7 @@ import {
   ITERATIONS_DIRECTORY,
   NO_BASELINE,
   readIterationReadme,
+  readSnapshot,
   suggestBaseline,
   tableCells,
 } from './iterations.mjs';
@@ -161,12 +161,6 @@ export function compareSchemaRoutes({ before, after }) {
   };
 }
 
-function readDrop(folder) {
-  return new Map(
-    flatFileNames(folder).map((name) => [name, readFileSync(join(folder, name))]),
-  );
-}
-
 /**
  * Summarizes the difference between two iterations' intake files: the flat file sets byte by byte;
  * changed `<slug>.md` files as screens (through either side's `_index.md` Slug column); whether
@@ -187,8 +181,8 @@ export function summarizeIntakeDiff({ repositoryRoot, baseline, current }) {
       );
     }
   }
-  const before = readDrop(intakeFolder({ repositoryRoot, iteration: baseline }));
-  const after = readDrop(intakeFolder({ repositoryRoot, iteration: current }));
+  const before = readSnapshot(intakeFolder({ repositoryRoot, iteration: baseline }));
+  const after = readSnapshot(intakeFolder({ repositoryRoot, iteration: current }));
   const files = compareMaps({ before, after, same: (left, right) => left.equals(right) });
   const touched = new Set([...files.added, ...files.removed, ...files.changed]);
   const slugs = new Set([

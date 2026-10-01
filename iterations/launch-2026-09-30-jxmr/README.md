@@ -12,7 +12,10 @@
 | Summary | Full clinic app: 12 screens, 93 routes, 40 entities |
 | Drop placed | 2026-10-01 |
 | Drop source | legacy/v1/ (Claude Design export) + ~/Downloads (PRD.md, schema-routes.md) |
+| Intake mode | full |
+| Intake note | imported (pre-intake) |
 | Schema-routes | 5f90325208e1 |
+| Intake hash | 158afb87d00c |
 
 ## History
 

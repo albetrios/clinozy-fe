@@ -1,7 +1,8 @@
 /**
  * The shared design-iteration model (`iterations.mjs`): names, the README table and History, the
- * Status lifecycle, the frontend's required intake set, the Baseline suggestion and the sibling
- * repository. The same rules as clinozy-be's `iteration.util.ts`.
+ * Status lifecycle, the frontend's mandatory set by Intake mode, the Intake hash, the Baseline
+ * suggestion, the sibling repository and the command line. The same rules as clinozy-be's
+ * `iteration.util.ts`.
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -9,26 +10,34 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, test } from 'node:test';
 import {
+  brief,
   cleanScratch,
   completeDrop,
   createRepository,
   scratchFolder,
+  writeDrop,
   writeIteration,
 } from './iteration-fixtures.mjs';
 import {
   appendHistoryEntry,
   checkIntakeSet,
   indexSlugs,
+  intakeHash,
   localDate,
+  missingBriefSections,
   missingIntakeFiles,
+  parseCommandLine,
   parseIterationName,
   parseIterationReadme,
   prototypeScripts,
+  recordedIntakeMode,
+  referencedOptionalFiles,
   renderHistoryEntry,
   resolveSiblingRoot,
   schemaRoutesHash,
   setReadmeField,
   siblingPackageName,
+  snapshotFingerprint,
   suggestBaseline,
   validateStatusTransition,
 } from './iterations.mjs';
@@ -239,6 +248,48 @@ describe('the required intake set', () => {
     assert.deepEqual(result.unlistedScreens, ['gamma.md']);
   });
 
+  test('an optional file _index.md names becomes mandatory', () => {
+    const drop = completeDrop();
+    delete drop['_patterns.md'];
+    drop['_index.md'] +=
+      '\nShared: `_patterns.md` · `preset.json` · see alpha.md and PRD.md\n';
+    assert.deepEqual(referencedOptionalFiles(drop['_index.md']), [
+      '_patterns.md',
+      'preset.json',
+    ]);
+    assert.deepEqual(
+      checkIntakeSet({ names: Object.keys(drop), readText: readerOf(drop) }).missing,
+      ['_patterns.md', 'preset.json'],
+    );
+  });
+
+  test('brief mode also needs BRIEF.md; elsewhere BRIEF.md is optional', () => {
+    const drop = completeDrop();
+    assert.deepEqual(
+      checkIntakeSet({
+        names: Object.keys(drop),
+        readText: readerOf(drop),
+        mode: 'brief',
+      }).missing,
+      ['BRIEF.md'],
+    );
+    const carried = { ...drop, 'BRIEF.md': brief() };
+    assert.deepEqual(
+      checkIntakeSet({ names: Object.keys(carried), readText: readerOf(carried) }),
+      { missing: [], extras: [], unlistedScreens: [] },
+    );
+  });
+
+  test('a BRIEF.md needs every template section', () => {
+    assert.deepEqual(missingBriefSections(brief()), []);
+    assert.deepEqual(
+      missingBriefSections(
+        brief().replace('## Why', '## Reason').replace('## Rules\n', ''),
+      ),
+      ['Why', 'Rules'],
+    );
+  });
+
   test('reads Slugs from the Slug column and local scripts from the prototype', () => {
     assert.deepEqual(indexSlugs(completeDrop()['_index.md']), ['alpha', 'beta']);
     assert.deepEqual(
@@ -250,6 +301,26 @@ describe('the required intake set', () => {
         '<script src="support.js"></script><script defer src="./lib/app.js#x"></script><script src="/abs.js"></script><script src="https://x.test/y.js"></script>',
       ),
       ['app.js', 'support.js'],
+    );
+  });
+
+  test("reads the README's Intake mode — full when missing or unknown", () => {
+    assert.equal(recordedIntakeMode(new Map([['Intake mode', 'brief']])), 'brief');
+    assert.equal(recordedIntakeMode(new Map([['Intake mode', '—']])), 'full');
+    assert.equal(recordedIntakeMode(new Map()), 'full');
+  });
+
+  test('checks an iteration folder for the mode its README records', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: completeDrop(),
+      fields: { intakeMode: 'brief' },
+    });
+    assert.deepEqual(
+      missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
+      ['BRIEF.md'],
     );
   });
 
@@ -283,6 +354,56 @@ describe('schemaRoutesHash', () => {
       createHash('sha256').update('routes\n').digest('hex').slice(0, 12),
     );
     assert.equal(schemaRoutesHash(join(folder, 'missing.md')), '—');
+  });
+});
+
+describe('the Intake hash', () => {
+  test('is one sha256 over every file — name, NUL, bytes, NUL — in code-unit order', () => {
+    const files = new Map([
+      ['b.md', Buffer.from('two\n')],
+      ['B.md', Buffer.from('one\n')],
+      ['a.md', Buffer.from('three\n')],
+    ]);
+    const expected = createHash('sha256');
+    for (const name of ['B.md', 'a.md', 'b.md']) {
+      expected.update(name);
+      expected.update('\0');
+      expected.update(files.get(name));
+      expected.update('\0');
+    }
+    assert.equal(snapshotFingerprint(files), expected.digest('hex').slice(0, 12));
+    assert.equal(snapshotFingerprint(new Map()), '—');
+  });
+
+  test('changes with any edited, added, removed or renamed file; ignores dotfiles', () => {
+    const folder = writeDrop(join(scratchFolder(), 'intake'), completeDrop());
+    const original = intakeHash(folder);
+    assert.match(original, /^[0-9a-f]{12}$/);
+    writeFileSync(join(folder, '.DS_Store'), 'x');
+    assert.equal(intakeHash(folder), original);
+    const fingerprintOf = (change) => {
+      const files = new Map(
+        Object.entries(completeDrop()).map(([name, text]) => [name, Buffer.from(text)]),
+      );
+      change(files);
+      return snapshotFingerprint(files);
+    };
+    assert.equal(
+      fingerprintOf(() => {}),
+      original,
+    );
+    for (const change of [
+      (files) => files.set('alpha.md', Buffer.from('# Screen: Alpha!\n')),
+      (files) => files.set('gamma.md', Buffer.from('')),
+      (files) => files.delete('_patterns.md'),
+      (files) => {
+        files.set('_shared.md', files.get('_patterns.md'));
+        files.delete('_patterns.md');
+      },
+    ]) {
+      assert.notEqual(fingerprintOf(change), original);
+    }
+    assert.equal(intakeHash(join(folder, 'missing')), '—');
   });
 });
 
@@ -342,6 +463,36 @@ describe('suggestBaseline', () => {
       intake: completeDrop(),
     });
     assert.equal(suggestBaseline({ repositoryRoot }), undefined);
+  });
+});
+
+describe('parseCommandLine', () => {
+  const shape = {
+    flags: ['--both', '--check'],
+    values: ['--mode'],
+    maxPositionals: 2,
+    usage: 'expected <a> <b>.',
+  };
+
+  test('reads flags, --name value and --name=value options, and --sibling', () => {
+    const parsed = parseCommandLine(
+      ['x', '--mode', 'overlay', 'y', '--check', '--sibling', '../b'],
+      shape,
+    );
+    assert.deepEqual(parsed.positionals, ['x', 'y']);
+    assert.deepEqual([...parsed.flags], ['--check']);
+    assert.equal(parsed.values.get('--mode'), 'overlay');
+    assert.equal(parsed.siblingPath, '../b');
+    assert.equal(parsed.createInSibling, true);
+    assert.equal(parseCommandLine(['--mode=brief'], shape).values.get('--mode'), 'brief');
+  });
+
+  test('refuses a value option without its value, an unknown option and extra positionals', () => {
+    assert.throws(() => parseCommandLine(['--mode'], shape), /--mode needs a value/);
+    assert.throws(() => parseCommandLine(['--mode', '--check'], shape), /needs a value/);
+    assert.throws(() => parseCommandLine(['--mode='], shape), /needs a value/);
+    assert.throws(() => parseCommandLine(['--nope'], shape), /Unknown option "--nope"/);
+    assert.throws(() => parseCommandLine(['a', 'b', 'c'], shape), /Too many arguments/);
   });
 });
 

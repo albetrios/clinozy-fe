@@ -8,7 +8,7 @@
  *
  * Creates `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/README.md` — Owner, Opened, Branch, a
  * suggested Baseline and Status `planning` filled in. An iteration starts with its README only;
- * `pnpm iteration:intake` fills `intake-files/`. `--both` opens the same folder in the sibling
+ * `pnpm iteration:intake` writes its snapshot into `intake-files/`. `--both` opens the same folder in the sibling
  * repository (clinozy-be), whose README suggests its own Baseline. The model: iterations/README.md.
  */
 import { randomInt } from 'node:crypto';
@@ -266,7 +266,10 @@ export function planNewIteration(request) {
     summary: EMPTY_FIELD,
     dropPlaced: EMPTY_FIELD,
     dropSource: EMPTY_FIELD,
+    intakeMode: EMPTY_FIELD,
+    intakeNote: EMPTY_FIELD,
     schemaRoutes: EMPTY_FIELD,
+    intakeHash: EMPTY_FIELD,
   };
   const localFolder = join(repositoryRoot, ITERATIONS_DIRECTORY, name);
   const files = [
@@ -345,11 +348,18 @@ function describePlan(plan, repositoryRoot) {
 
 function nextSteps(plan) {
   const both = plan.siblingRoot === undefined ? '' : ' --both';
+  const modes =
+    plan.fields.type === 'launch'
+      ? []
+      : [
+          `     Only the changed files: --mode overlay · only a BRIEF.md: --mode brief — both build on the README's Baseline (${plan.fields.baseline}); for another one, first: pnpm iteration:baseline ${plan.name} <baseline>`,
+        ];
   return [
     'Next:',
     `  1. Write the Summary line in ${ITERATIONS_DIRECTORY}/${plan.name}/README.md.`,
-    `  2. Place the full drop: pnpm iteration:intake ${plan.name} <drop-folder>${both}`,
-    `  3. Say "plan iteration ${plan.name}" — fe-iteration-planning confirms the Baseline and writes KICKOFF.md.`,
+    `  2. Place the drop: pnpm iteration:intake ${plan.name} <drop-folder>${both}`,
+    ...modes,
+    `  3. Say "plan iteration ${plan.name}" — fe-iteration-planning runs the gate, confirms the Baseline and writes KICKOFF.md.`,
   ];
 }
 

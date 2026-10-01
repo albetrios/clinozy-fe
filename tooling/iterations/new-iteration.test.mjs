@@ -165,7 +165,10 @@ describe('the README template', () => {
           'summary',
           'dropPlaced',
           'dropSource',
+          'intakeMode',
+          'intakeNote',
           'schemaRoutes',
+          'intakeHash',
         ].map((key) => [key, key]),
       ),
     });
@@ -219,7 +222,10 @@ describe('planNewIteration', () => {
       summary: '—',
       dropPlaced: '—',
       dropSource: '—',
+      intakeMode: '—',
+      intakeNote: '—',
       schemaRoutes: '—',
+      intakeHash: '—',
     });
     assert.deepEqual(
       launch.files.map((file) => file.path),
@@ -387,6 +393,22 @@ describe('runNewIteration', () => {
     );
     assert.ok(
       existsSync(join(repositoryRoot, 'iterations', `launch-${TODAY}-jxmr`, 'README.md')),
+    );
+    assert.ok(!real.lines.some((line) => line.includes('--mode overlay')));
+
+    const feature = runNewIteration(['feat', 'returns'], {
+      repositoryRoot,
+      baseBranch: BASE_BRANCH,
+      today: TODAY,
+      nextId: () => 'kqzx',
+    });
+    assert.ok(
+      feature.lines.some(
+        (line) =>
+          line.includes('--mode overlay') &&
+          line.includes('--mode brief') &&
+          line.includes(`pnpm iteration:baseline feat-returns-${TODAY}-kqzx <baseline>`),
+      ),
     );
 
     assert.equal(runNewIteration([], { repositoryRoot }).exitCode, 1);

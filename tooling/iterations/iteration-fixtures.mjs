@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { EMPTY_FIELD, gitEnvironment } from './iterations.mjs';
+import { EMPTY_FIELD, gitEnvironment, intakeHash } from './iterations.mjs';
 import { configuredBaseBranch, renderIterationReadme } from './new-iteration.mjs';
 
 export const BASE_BRANCH = configuredBaseBranch();
@@ -155,9 +155,42 @@ export function writeDrop(folder, files) {
   return folder;
 }
 
+/** A `BRIEF.md` with every template section. */
+export function brief(change = 'Show a returned badge on sales') {
+  return `# Brief — ${change}
+
+## What changes
+
+${change}.
+
+## Why
+
+Staff cannot tell which sales were returned.
+
+## Affected screens, entities and routes
+
+- Screens: alpha
+- Entities: Patient
+- Routes: /alpha
+
+## Rules
+
+Only a returned sale shows the badge.
+
+## Acceptance criteria
+
+- [ ] A returned sale shows the badge.
+
+## Out of scope
+
+Refunds.
+`;
+}
+
 /**
- * Writes an iteration folder: a README rendered from the real template (plus History lines), and
- * optionally its `intake-files/`; commits when `commitTime` is given.
+ * Writes an iteration folder: optionally its `intake-files/`, then a README rendered from the real
+ * template (plus History lines) — with an intake, its Intake mode, note and hash are filled as a
+ * full intake would (`fields` overrides them); commits when `commitTime` is given.
  *
  * @param {{ repositoryRoot: string, name: string, fields?: Record<string, string>, history?: string[], intake?: Record<string, string>, commitTime?: number }} iteration
  */
@@ -171,6 +204,15 @@ export function writeIteration({
 }) {
   const folder = join(repositoryRoot, 'iterations', name);
   mkdirSync(folder, { recursive: true });
+  if (intake !== undefined) writeDrop(join(folder, 'intake-files'), intake);
+  const intakeFields =
+    intake === undefined
+      ? {}
+      : {
+          intakeMode: 'full',
+          intakeNote: `${Object.keys(intake).length} received`,
+          intakeHash: intakeHash(join(folder, 'intake-files')),
+        };
   const readme = renderIterationReadme({
     name,
     fields: {
@@ -184,14 +226,17 @@ export function writeIteration({
       summary: EMPTY_FIELD,
       dropPlaced: EMPTY_FIELD,
       dropSource: EMPTY_FIELD,
+      intakeMode: EMPTY_FIELD,
+      intakeNote: EMPTY_FIELD,
       schemaRoutes: EMPTY_FIELD,
+      intakeHash: EMPTY_FIELD,
+      ...intakeFields,
       ...fields,
     },
   });
   const withHistory =
     history.length === 0 ? readme : `${readme}\n## History\n\n${history.join('\n')}\n`;
   writeFileSync(join(folder, 'README.md'), withHistory);
-  if (intake !== undefined) writeDrop(join(folder, 'intake-files'), intake);
   if (commitTime !== undefined) commitAll(repositoryRoot, `add ${name}`, commitTime);
   return folder;
 }
