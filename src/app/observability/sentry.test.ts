@@ -64,7 +64,23 @@ describe('initSentry', () => {
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     const cfg = initConfig();
     expect(cfg.dsn).toBe('https://key@sentry.example/1');
-    expect(cfg.sendDefaultPii).toBe(false);
+    // v11's dataCollection defaults collect everything — every category stays off.
+    expect(cfg.dataCollection).toEqual({
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      queues: false,
+      stackFrameVariables: false,
+    });
+    // Streamed spans would skip the beforeSendTransaction URL scrubbing.
+    expect(cfg.traceLifecycle).toBe('static');
+    // Without 'trace', browserProfilingIntegration stays 'manual' and never profiles.
+    expect(cfg.profileLifecycle).toBe('trace');
     expect(Sentry.replayIntegration).toHaveBeenCalledWith({
       maskAllText: true,
       blockAllMedia: true,
