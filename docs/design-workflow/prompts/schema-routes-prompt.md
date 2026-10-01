@@ -2,14 +2,16 @@
 
 Produces **one** file — `schema-routes.md` — the data model and route map implied
 by the design, written at the level a **senior engineer** needs to build contracts
-and a route tree without seeing the design. Save it into the iteration folder,
-`clinozy-fe/iterations/<iteration>/`; when the change touches the backend, copy
-it to the same-named `clinozy-be/iterations/<iteration>/` too; then say
-**"kickoff <iteration>"**. (Theme comes from `preset.md`, UI from `screens.md` —
-do **not** repeat them here.)
+and a route tree without seeing the design. Save it into the drop folder with the
+rest of the drop, place the drop with `pnpm iteration:intake <iteration>
+<drop-folder>` (`--both` when the backend changes too), then say **"plan
+iteration <iteration>"**. (Theme comes from `preset.md`, UI from the screen files
+— `shell.md`, `_index.md` and one `<slug>.md` per screen — do **not** repeat them
+here.)
 
-Fill in the two lines under **SCOPE** — every screen for the launch, only the
-changed screens for any later iteration. Everything else is paste-as-is.
+Fill in the design source under **SCOPE**. Every drop is complete, so the screens
+to cover are always every screen — the delta between iterations comes from
+comparing drops. Everything else is paste-as-is.
 
 ---
 
@@ -19,12 +21,12 @@ typed data contracts, API calls, and the app's routes from this markdown alone. 
 you leave vague becomes a wrong type; a route you leave implicit becomes a wrong
 URL.
 
-Do not describe the UI (that lives in `screens.md`). Specify only **data** and
+Do not describe the UI (that lives in the screen files). Specify only **data** and
 **navigation**.
 
 ## SCOPE
 
-- Screens to cover: `<"every screen" for the launch; otherwise only the screens this iteration changes>`
+- Screens to cover: every screen (each drop is complete)
 - Design source: `<project name / file / URL>`
 
 ## OUTPUT
@@ -196,15 +198,15 @@ marked n/a: M. Gaps I could not resolve: <list, or none>.`
 
 ## After it returns
 
-1. Save `schema-routes.md` directly into the iteration folder,
-   `clinozy-fe/iterations/<iteration>/` (opened with `pnpm iteration:new`) —
-   one file, over the placeholder the generator wrote. For the launch it covers
-   every screen; for any later iteration, SCOPE is only the changed screens.
-2. When the change touches the backend, copy the same file, byte-for-byte, into
-   the same-named clinozy-be iteration, `clinozy-be/iterations/<iteration>/`
-   (`pnpm iteration:new … --both` opens both) — the backend builds its
-   contracts from it.
-3. Say **"kickoff <iteration>"**.
+1. Save `schema-routes.md` into the drop folder with the rest of the drop —
+   one file, as returned.
+2. Place the drop: `pnpm iteration:intake <iteration> <drop-folder>`. It copies
+   the files into `iterations/<iteration>/intake-files/` exactly as delivered
+   and records the file's fingerprint in the README. When the backend changes
+   too, add `--both`: `PRD.md` and `schema-routes.md` also go, byte-for-byte,
+   into the same-named clinozy-be iteration (open it in both with
+   `pnpm iteration:new … --both`) — the backend builds its contracts from them.
+3. Say **"plan iteration <iteration>"**.
 
 I'll turn the entities and enums into typed data contracts, the operations into
 data hooks, and the route map into the app's route registrations (access guards

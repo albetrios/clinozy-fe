@@ -1,56 +1,49 @@
 # Initial iteration
 
-**Run once, for the launch.** Everything is new; there is no Baseline.
-Assumes [Adoption](adoption.md).
+**Run when the Baseline is `none` — the first iteration in this repo (the
+launch).** Everything is new; nothing exists to diff against. Assumes
+[Adoption](adoption.md).
 
-Five steps. The first four are yours and already work. Step 5 is the one that
-makes the _next_ iteration cheap.
+Six steps. The first two are design work and stay yours. Planning ends in your
+approval; the kickoff then builds the plan one ledger row at a time.
 
 ## The iteration rule
 
-The rules are in [`iterations/README.md`](../../../iterations/README.md). For
-this process:
+The rules and commands are in [`iterations/README.md`](../../../iterations/README.md).
+For this process:
 
-- The launch is the first and only `launch` iteration,
+- The first iteration in this repo is the **launch**,
   `iterations/launch-<YYYY-MM-DD>-<id>/` — this repo's is
-  `launch-2026-09-30-jxmr`. Open it with `pnpm iteration:new launch`.
-- It is the one full snapshot — the full PRD, the full `schema-routes.md`, the
-  prototype and every screen spec — MODE `initial`, Baseline `none`.
-- Every later iteration holds only its change and follows
-  [Incremental iteration](incremental-iteration.md).
+  `launch-2026-09-30-jxmr`. It is opened with `pnpm iteration:new launch`, and
+  its Baseline is `none`: MODE `initial`.
+- Its `intake-files/` hold the full drop, exactly as delivered — the same as
+  every later iteration.
+- Every later iteration runs [Incremental iteration](incremental-iteration.md)
+  against a Baseline you confirm.
 
 ---
 
-## Prerequisites — have these before Step 3
+## Prerequisites — the drop
 
-Step 3 (the start button) does nothing useful until the launch folder,
-`iterations/launch-<YYYY-MM-DD>-<id>/`, is populated. Steps 1–2 produce these;
-confirm they exist first.
+`pnpm iteration:intake` places the drop and refuses it while anything required
+is missing. Steps 1–2 produce these; put them all, flat, in one folder.
 
-| File                            | Source                                                                                              | Required?                                                       |
-| ------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `README.md`                     | `pnpm iteration:new launch`                                                                         | **Yes** — Type, Owner, Baseline `none`, Status                  |
-| `PRD.md`                        | Product — the brief the design is built from                                                        | **Yes** — what the product is                                   |
-| `preset.md`                     | Claude Design — [`design-brief-prompt.md`](../prompts/design-brief-prompt.md)                       | **Yes** — theme first                                           |
-| `<screen>.md` (one per screen)  | Claude Design — [`extract-screens-prompt.md`](../prompts/extract-screens-prompt.md)                 | **Yes** — the screens to build                                  |
-| `shell.md`                      | Claude Design — same screens prompt                                                                 | If a custom app shell is in scope                               |
-| `schema-routes.md`              | Claude Design — [`schema-routes-prompt.md`](../prompts/schema-routes-prompt.md)                     | **Yes** — entities and routes; the same file goes to clinozy-be |
-| `<auth/public>.md` + layout JSX | Claude Design — [`auth-public-routes-brief.md`](../prompts/auth-public-routes-brief.md)             | If auth/public routes are in scope                              |
-| `<overlays/loading>.md`         | Claude Design — [`extract-system-surfaces-prompt.md`](../prompts/extract-system-surfaces-prompt.md) | If overlays/loading are in scope                                |
-| `*.html`, `*.js`                | Claude Design — the prototype export                                                                | Optional, but it **outranks the md** when present               |
+| File                                                           | Source                                                                                                                                                       | Required?                                             |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `PRD.md`                                                       | Product — the brief the design is built from                                                                                                                 | **Yes** — what the product is                         |
+| `<prototype>.html` + every `*.js` it loads                     | Claude Design — the prototype export                                                                                                                         | **Yes** — it **outranks the md** for behaviour        |
+| `preset.md`                                                    | Claude Design — [`design-brief-prompt.md`](../prompts/design-brief-prompt.md)                                                                                | **Yes** — theme first                                 |
+| `shell.md`, `_index.md`, one `<slug>.md` per Slug in the index | Claude Design — [`extract-screens-prompt.md`](../prompts/extract-screens-prompt.md)                                                                          | **Yes** — the frame and the screens to build          |
+| `schema-routes.md`                                             | Claude Design — [`schema-routes-prompt.md`](../prompts/schema-routes-prompt.md)                                                                              | **Yes** — entities and routes; shared with clinozy-be |
+| `_patterns.md`, `_report.md` (`_`-prefixed shared files)       | Claude Design                                                                                                                                                | Optional                                              |
+| `design-brief*.md`, auth and system-surface `.md`              | [`auth-public-routes-brief.md`](../prompts/auth-public-routes-brief.md), [`extract-system-surfaces-prompt.md`](../prompts/extract-system-surfaces-prompt.md) | Optional                                              |
+| `preset.json`, `design-overview.md`                            | [`design-overview-prompt.md`](../prompts/design-overview-prompt.md)                                                                                          | Optional                                              |
 
-Everything sits **flat in the iteration folder**, next to the `README.md` that
-`pnpm iteration:new launch` wrote (Type `launch`, Baseline `none`, Status
-`planning` — set it to `building` when the build starts). Nothing from the
-clinozy-fe repo is a prerequisite — the skills read the live codebase
-themselves. If none of these exist yet, you're not ready for Step 3; do Steps
-1–2 first.
-
-Quick check:
+Any other file is reported as an extra, and a `<slug>.md` that `_index.md`
+doesn't list is a warning — both are findings for planning. Quick check:
 
 ```bash
-pnpm iteration:list          # the launch, its Owner and Status
-ls iterations/launch-*/
+pnpm iteration:intake <iteration> <drop-folder> --dry-run
 ```
 
 ---
@@ -67,86 +60,73 @@ Nothing to do in clinozy-fe yet. This is design work, and it should stay yours.
 
 ## ==== STEP 2 — Extract ====
 
-Paste these prompts into Claude Design, in this order. Save every returned `.md`
-**flat in the iteration folder**, alongside the prototype files.
+Paste these prompts into Claude Design, in this order. Save every returned file
+**flat in one drop folder**, beside the prototype export and `PRD.md`.
 
-| #   | Prompt                                                                              | Frequency                                                                   |
-| --- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| 1   | [`design-brief-prompt.md`](../prompts/design-brief-prompt.md)                       | **Once, ever** — the preset. After this it never changes.                   |
-| 2   | [`extract-screens-prompt.md`](../prompts/extract-screens-prompt.md)                 | **Per iteration** — shell + screens.                                        |
-| 3   | [`schema-routes-prompt.md`](../prompts/schema-routes-prompt.md)                     | **Per iteration** — entities and routes; copy the result to clinozy-be too. |
-| 4   | [`auth-public-routes-brief.md`](../prompts/auth-public-routes-brief.md)             | Once — auth/public layouts + routes.                                        |
-| 5   | [`extract-system-surfaces-prompt.md`](../prompts/extract-system-surfaces-prompt.md) | Once — overlays + loading.                                                  |
+| #   | Prompt                                                                              | Gives you                                           |
+| --- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
+| 1   | [`design-brief-prompt.md`](../prompts/design-brief-prompt.md)                       | `preset.md` — the theme                             |
+| 2   | [`extract-screens-prompt.md`](../prompts/extract-screens-prompt.md)                 | `shell.md`, `_index.md`, one `<slug>.md` per screen |
+| 3   | [`schema-routes-prompt.md`](../prompts/schema-routes-prompt.md)                     | `schema-routes.md` — entities and routes            |
+| 4   | [`auth-public-routes-brief.md`](../prompts/auth-public-routes-brief.md)             | auth/public layouts and routes, if in scope         |
+| 5   | [`extract-system-surfaces-prompt.md`](../prompts/extract-system-surfaces-prompt.md) | overlays and loading, if in scope                   |
 
-End state — the launch folder holds:
+## ==== STEP 3 — Open the iteration and place the drop ====
 
-```text
-iterations/launch-2026-09-30-jxmr/
-├── README.md            ← from pnpm iteration:new launch
-├── PRD.md               ← the product brief
-├── preset.md            ← from prompt 1
-├── shell.md             ← from prompt 2
-├── <screen>.md          ← from prompt 2, one per screen
-├── schema-routes.md     ← from prompt 3
-├── <name>.html          ← the prototype
-└── support.js
+```bash
+pnpm iteration:new launch                                  # --both opens it in clinozy-be too
+pnpm iteration:intake <iteration> <drop-folder>            # --both copies PRD.md + schema-routes.md there
 ```
 
-## ==== STEP 3 — Start the build (this is the "start button") ====
+The intake copies the drop into `iterations/<iteration>/intake-files/` exactly
+as delivered and fills the README's Drop placed, Drop source and Schema-routes
+rows. Status stays `planning`.
 
-**Paste [`kickoff-prompt.md`](../prompts/kickoff-prompt.md) to Claude Code (here,
-in clinozy-fe)** with:
+## ==== STEP 4 — Plan (no code), then approve ====
 
-```text
-MODE: initial
-ITERATION: launch-2026-09-30-jxmr
-Build: all screens
-```
+Say **"plan iteration <iteration>"** (or paste
+[`iteration-planning-prompt.md`](../prompts/iteration-planning-prompt.md)).
+`fe-iteration-planning` stops after every step:
 
-(Short form: just say **"kickoff launch-2026-09-30-jxmr"** —
-`fe-kickoff-planning` auto-triggers, and "plan from legacy" still works too. The
-kickoff file is the fuller version that spells out the stop points.)
+0. Confirms the iteration (`pnpm iteration:list`, eligibility table, your answer).
+1. Re-checks the intake, reads every file in full, builds the coverage matrix.
+2. Delta — `n/a` for an initial iteration.
+3. Reconciles the markdown against the prototype (prototype wins), with evidence.
+4. Asks the blocking (RED) questions; answers go to `plans/decisions.md`.
+5. Writes `KICKOFF.md` — every required section, and the ledger in route order:
+   foundation (preset, shell made live, stores, icons) → screens.
+6. Self-checks, sets `ready-for-approval` and stops.
 
-> **Who gets what:** the Step 2 prompts go to **Claude Design** and produce
-> `.md`. This kickoff prompt goes to **Claude Code** and consumes them. Different
-> apps, different jobs.
+Read the plan. When it is right, approve it: planning runs
+`pnpm iteration:status <iteration> approved`, which locks `intake-files/`.
 
-`fe-kickoff-planning` now:
+**Do not skip the stops.** They exist because building on a summary — rather
+than the source — is what produced every rebuild in this repo.
 
-1. Inventories the folder (`ls -R iterations/<iteration>/`)
-2. Reads every `.md` **and** the prototype, in full
-3. Reconciles the markdown against the prototype (prototype wins)
-4. Writes `iterations/<iteration>/KICKOFF.md` and **stops for your
-   confirmation** before any code is written
+## ==== STEP 5 — Kickoff — build row by row ====
 
-Anything RED (see Adoption) comes back as a question. Once you confirm,
-`fe-design-ditto` builds the plan.
-
-**Do not skip the stop.** It exists because building on a summary — rather than
-the source — is what produced every rebuild in this repo.
-
-## ==== STEP 4 — Build ====
-
-In the order from Adoption: **preset → shell → screens**.
+Say **"kickoff iteration <iteration>"** (or paste
+[`kickoff-iteration-prompt.md`](../prompts/kickoff-iteration-prompt.md)).
+`fe-kickoff-iteration` moves the iteration to `implementing`, starts
+`AS-BUILT.md`, and follows the ledger in the order from Adoption — **preset →
+shell → screens**:
 
 - Preset: recompute every contrast ratio locally; register in all four places.
-- Shell: new variant, relocate-never-delete.
-- Screens: one at a time, desktop and mobile together.
+- Shell: new variant, relocate-never-delete, made live (default, pinned, not
+  persisted).
+- Screens: through `fe-design-ditto`, one at a time, desktop and mobile together.
 
-This is where "ditto" happens — the implementation matches the design across all
-screens.
+After each row: verify it, write its `AS-BUILT.md` entry, check its impact on
+the rows still to come (a scope change stops for you), and wait for your review.
 
-## ==== STEP 5 — Verify · Pin · Freeze ====
+## ==== STEP 6 — Verify · Pin · Close ====
 
-**The step that was missing.** Its absence is why every design round used to
-cost as much as the first. Three parts, in order:
-
-### 5a. Verify by comparison
+### 6a. Verify by comparison
 
 Side-by-side, source vs implementation, 375px and 1440px, per screen, per state.
 Then the static gates (Adoption, DONE definition).
 
-### 5b. Pin the result
+### 6b. Pin the result
 
 Capture visual-regression baselines
 ([`fe-visual-regression`](../../../agent-os/skills/fe-visual-regression/SKILL.md)).
@@ -155,26 +135,23 @@ This is the safety net for the _next_ iteration: when a later iteration changes
 a token, the diff shows every screen it touched — including the ones you weren't
 editing.
 
-### 5c. Freeze the iteration
+### 6c. Close and freeze
 
-In the last commit before the launch's branch merges to `main`, set
-`Status: frozen` in its `README.md`:
+When every ledger row is `done` (or `deferred` with your OK) and `AS-BUILT.md`
+has its summary — planned but not built, built but not planned, follow-ups —
+the kickoff runs `pnpm iteration:status <iteration> done`. In the last commit
+before the branch merges:
 
 ```bash
+pnpm iteration:status <iteration> frozen
 git add iterations/<iteration>/ && git commit -m "chore: freeze <iteration> (as built)"
 ```
 
-After the merge the folder is never edited. The next design change is a
-**new** iteration holding only that change —
-`pnpm iteration:new <feat|change|fix> <topic>` — with this one as its Baseline,
-and its own folder is its work list. A correction to the launch is a `fix`
-iteration, never an edit.
-
-> A frozen launch is what makes the next iteration incremental instead of
-> another initial build.
+After the merge the folder is never edited. The next design change is a new
+iteration with the full drop, and this one is its Baseline.
 
 ---
 
-**Result:** a ditto Claude-Design implementation across all screens, pinned,
-with its iteration frozen. **Next iteration →**
+**Result:** a ditto Claude Design implementation across all screens, pinned, with
+its plan, its as-built record and its frozen iteration. **Next iteration →**
 [Incremental iteration](incremental-iteration.md).

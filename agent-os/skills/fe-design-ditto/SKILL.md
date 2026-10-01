@@ -1,66 +1,58 @@
 ---
 name: fe-design-ditto
-description: Build faithfully ("ditto") from the markdown specs in an iterations/<iteration>/ folder — a preset/theme spec plus one spec per screen, optionally alongside a prototype HTML/JS. Reads every spec first, reconciles against any prototype (prototype wins), gates on four rebuild-forcing unknowns, then verifies side-by-side at 375px and 1440px. Use when the user says ditto, "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", or drops specs into iterations/. Build half of fe-kickoff-planning — it executes a confirmed iterations/<iteration>/KICKOFF.md.
+description: Build faithfully ("ditto") from the markdown specs in an iterations/<iteration>/ folder — a preset/theme spec plus one spec per screen, optionally alongside a prototype HTML/JS. Reads every spec first, reconciles against any prototype (prototype wins), gates on four rebuild-forcing unknowns, then verifies side-by-side at 375px and 1440px. Use when the user says ditto, "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", or drops specs into iterations/. The per-screen build skill fe-kickoff-iteration drives for each row of an approved iterations/<iteration>/KICKOFF.md.
 ---
 
-# Design ditto (build faithfully from `iterations/<iteration>/`)
+# Design ditto (build faithfully from `iterations/<iteration>/intake-files/`)
 
-For when "close enough" is a failure. The user drops specs into an iteration
-folder and wants clinozy-fe to match them — not to be inspired by them.
+For when "close enough" is a failure. The designer's drop lands in an
+iteration's `intake-files/` and clinozy-fe must match it — not be inspired by it.
 
-**The one-line rule: read every file in the iteration folder before planning
-anything.** Every expensive failure in this repo's ditto work came from building
+**The one-line rule: read every source file before building anything.** Every expensive failure in this repo's ditto work came from building
 against a summary of the source instead of the source.
 
-## Expected iteration layout
+## Where the source lives
 
-Each design iteration gets its own folder under `iterations/`, and everything
-in it arrives as markdown, **flat in that folder**. A prototype may or may not be
-present alongside it. Below, `iterations/<iteration>/` is the iteration being
-built; when `fe-kickoff-planning` has run, its
-`iterations/<iteration>/KICKOFF.md` is the plan these steps execute.
+Each design iteration is a folder under `iterations/`; the designer's drop is
+in its `intake-files/` — flat, exactly as delivered, never edited. This skill
+builds **one screen (or one foundation piece) at a time** for
+`fe-kickoff-iteration`, which walks the ledger of the approved
+`iterations/<iteration>/KICKOFF.md` and names the row being built.
 
 The iteration rule (in full: `iterations/README.md`):
 
-- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
-  `pnpm iteration:new`; each has a `README.md` naming its Type, Owner,
-  Baseline and Status.
-- The **launch** (`launch-<YYYY-MM-DD>-<id>`, the only one) is a full
-  snapshot — **MODE initial**: every screen is built.
-- Every later iteration (`feat`, `change`, `fix`) holds **only its change** —
-  a feature PRD, `schema-routes.md` scoped to the changed screens, and those
-  screens' specs — and is **MODE incremental** against its Baseline. The folder
-  is the delta, and only the delta is built; two snapshots are never diffed.
-- An iteration is frozen once it merges to `main`; a correction is a new `fix`
-  iteration. The current state is the launch plus the merged iterations, in
-  merge order.
+- Baseline `none` → **MODE initial**: every screen is built.
+- Otherwise **MODE incremental** against the Baseline: every intake still holds
+  the full drop, and the delta — `pnpm iteration:diff <baseline> <iteration>`
+  over the two `intake-files/` folders, reconciled with the designer's "What
+  changed" — is what the ledger builds. Unchanged screens are not rebuilt.
+- `intake-files/` is locked from Status `approved`; what was actually built is
+  recorded in `AS-BUILT.md`.
 
 ```text
 iterations/<iteration>/
-├── README.md            ← Type, Topic, Owner, Opened, Branch, Baseline, Status, Summary
-├── PRD.md               ← the product brief (a feature PRD after the launch)
-├── schema-routes.md     ← entities and routes (only the changed screens' after the launch)
-├── preset.md            ← theme: tokens, fonts, radius, density, motion
-├── shell.md             ← header, sidebar, nav — the frame around every screen
-├── automations.md       ← one .md per screen, named after the screen
-├── contacts.md
-├── dashboard.md
-├── KICKOFF.md           ← the plan (fe-kickoff-planning)
-└── (optional) *.html, *.js   ← the running prototype, if one exists
+├── README.md            ← Type, Baseline, Status, Drop placed, Schema-routes, … + History
+├── intake-files/        ← the drop, exactly as delivered
+│   ├── PRD.md · schema-routes.md · _index.md
+│   ├── preset.md        ← theme: tokens, fonts, radius, density, motion
+│   ├── shell.md         ← header, sidebar, nav — the frame around every screen
+│   ├── <slug>.md        ← one .md per screen in _index.md
+│   └── <prototype>.html · *.js   ← the running prototype
+├── plans/decisions.md   ← blocking answers and scope decisions
+├── KICKOFF.md           ← the approved plan (fe-iteration-planning)
+└── AS-BUILT.md          ← what was built, row by row (fe-kickoff-iteration)
 ```
 
-Filenames vary. **Do not assume** — run `ls iterations/<iteration>/` and read every `.md` there.
-The preset is whichever file describes tokens/typography; the rest are screens.
-A single combined `.md` covering everything is equally valid. After the launch,
-a folder carries only the files its change touches — a `preset.md` or
-`shell.md` only when the theme or the shell changes.
+Filenames vary. **Do not assume** — run `ls iterations/<iteration>/intake-files/`
+and read every `.md` there. The preset is whichever file describes
+tokens/typography; the screens are the Slugs in `_index.md`.
 
 | Input | Role | Authority |
 | ----- | ---- | --------- |
-| `iterations/<iteration>/preset.md` | Theme — tokens, type, radius, density, motion | Theme truth |
-| `iterations/<iteration>/shell.md` | Header, sidebar, nav chrome | Shell truth — **see Step 4b** |
-| `iterations/<iteration>/<screen>.md` | Per-screen structure, copy, states | Screen truth |
-| `iterations/<iteration>/*.html`, `iterations/<iteration>/*.js` | Prototype, when present | **Outranks the md for behaviour** |
+| `intake-files/preset.md` | Theme — tokens, type, radius, density, motion | Theme truth |
+| `intake-files/shell.md` | Header, sidebar, nav chrome | Shell truth — **see Step 4b** |
+| `intake-files/<slug>.md` | Per-screen structure, copy, states | Screen truth |
+| `intake-files/*.html`, `intake-files/*.js` | Prototype, when present | **Outranks the md for behaviour** |
 
 **Precedence:** when a prototype exists and disagrees with the markdown, the
 prototype wins — a spec is someone's reading of it. Say so in the recap. When no
@@ -72,7 +64,7 @@ question for the user, never a guess.
 ### Step 1 — Inventory and read. Report. Stop.
 
 ```bash
-ls iterations/<iteration>/
+ls iterations/<iteration>/intake-files/
 ```
 
 Then read, in full:
@@ -93,19 +85,19 @@ Skipping this step is the single most expensive mistake available here.
 
 ```bash
 # Interaction shape — sheet or dialog?
-grep -nE "sheet|drawer|modal|dialog|popup|overlay" iterations/<iteration>/*.html iterations/<iteration>/*.js
+grep -nE "sheet|drawer|modal|dialog|popup|overlay" iterations/<iteration>/intake-files/*.html iterations/<iteration>/intake-files/*.js
 
 # Conditional step sequences (the most-missed fact)
-grep -nE "step|stage|wizard|sequence|Keys?For|switch *\(" iterations/<iteration>/*.js
+grep -nE "step|stage|wizard|sequence|Keys?For|switch *\(" iterations/<iteration>/intake-files/*.js
 
 # Timings — adjectives in a spec must resolve to numbers here
-grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" iterations/<iteration>/*.js iterations/<iteration>/*.html
+grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" iterations/<iteration>/intake-files/*.js iterations/<iteration>/intake-files/*.html
 
 # Responsive rules the spec may have flattened
-grep -nE "@media|max-width|min-width" iterations/<iteration>/*.html
+grep -nE "@media|max-width|min-width" iterations/<iteration>/intake-files/*.html
 
 # Dead code — CSS whose markup no longer exists
-grep -nE "data-[a-z-]+" iterations/<iteration>/*.html | sort -u
+grep -nE "data-[a-z-]+" iterations/<iteration>/intake-files/*.html | sort -u
 ```
 
 Record the result:
@@ -141,7 +133,7 @@ structure, resolve before done.
 
 ### Step 4 — Theme first, then screens
 
-**Apply `iterations/<iteration>/preset.md` before building any screen.** Screens built against
+**Apply `intake-files/preset.md` before building any screen.** Screens built against
 the wrong tokens look wrong even when their structure is right, and re-theming
 afterwards means re-screenshotting everything.
 
@@ -313,7 +305,8 @@ Each produced a real rebuild in this repo.
 
 ## Related
 
-- `fe-kickoff-planning` — the planning half; writes the `iterations/<iteration>/KICKOFF.md` this skill executes
+- `fe-kickoff-iteration` — drives this skill once per ledger row of an approved `KICKOFF.md`
+- `fe-iteration-planning` — writes that `KICKOFF.md`
 - [`design-intake-checklist.md`](../../../docs/design-workflow/prompts/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
 - [`ditto-intake-checklist.md`](../../../docs/design-workflow/prompts/ditto-intake-checklist.md) — the gate's clinozy-fe rules
 - [`extract-screens-prompt.md`](../../../docs/design-workflow/prompts/extract-screens-prompt.md) — generates the iteration specs

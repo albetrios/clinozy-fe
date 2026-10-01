@@ -1,158 +1,100 @@
 # Incremental iteration
 
-**Run for every iteration after the launch** — a `feat`, `change` or `fix`.
-Assumes [Adoption](adoption.md) and a launch that was built and frozen
-([Initial iteration](initial-iteration.md) step 5c).
+**Run for every iteration with a Baseline** — any `feat`, `change` or `fix`
+after the first. Assumes [Adoption](adoption.md) and a Baseline that was built
+([Initial iteration](initial-iteration.md), or an earlier incremental run).
 
-The whole goal: **touch only what changed.** If you find yourself re-reading a
-screen the change doesn't alter, you've fallen back to the initial process.
+The whole goal: **touch only what changed.** If you find yourself re-building a
+screen the diff didn't touch, you've fallen back to the initial process.
 
 ## The iteration rule
 
-The rules are in [`iterations/README.md`](../../../iterations/README.md). For
-this process:
+The rules and commands are in [`iterations/README.md`](../../../iterations/README.md).
+For this process:
 
-- An incremental iteration is **one person, one branch, changes only**:
-  `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
-  `pnpm iteration:new <feat|change|fix> <topic>`.
-- It holds a feature PRD, a `schema-routes.md` with SCOPE limited to the
-  changed screens, the changed screens' specs and its own `KICKOFF.md`. **The
-  folder is the delta** — two snapshots are never diffed.
-- Its `README.md` names its Baseline: the latest iteration on `main` when it was
-  opened. The current state it changes is the launch plus every merged
-  iteration, in merge order.
-- Parallel iterations on other branches are fine. Before merging, if newer
-  iterations reached `main`, update the Baseline and check for overlap (step
-  5c).
-- Merged means frozen. Never edit a merged iteration; a correction is a new
-  `fix` iteration.
-- The folder exists only in the repo(s) the change touches — the same name in
-  clinozy-fe and clinozy-be when it touches both.
+- **Every intake holds the full drop** — every screen, the full PRD and the full
+  `schema-routes.md` — never only the changed screens.
+- **The Baseline is yours to confirm.** At planning Step 0 the suggestion is the
+  latest `done` or `frozen` iteration in this repo; confirm it or pick another,
+  and it is saved with `pnpm iteration:baseline <iteration> <baseline>`.
+- **The delta has two signals:** the designer's "What changed" notes, and
+  `pnpm iteration:diff <baseline> <iteration>`, which compares the two
+  `intake-files/` folders and nothing else. The Baseline's `intake-files/` are
+  mandatory — without them there is nothing to diff. Anything the diff shows
+  that the notes omit is a **finding**.
+- Planning can start while the Baseline is still being built; the **kickoff
+  waits** until the Baseline is `done` or `frozen`.
 
 ---
 
 ## Prerequisites — have these before starting
 
-| Prerequisite                                                                           | Source                                                                                      | Required?                                            |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| The launch, built and merged — plus any iterations merged since                        | earlier runs                                                                                | **Yes** — the current state the change applies to    |
-| The iteration folder, opened with `pnpm iteration:new` (its README names the Baseline) | you                                                                                         | **Yes**                                              |
-| A feature `PRD.md` — only what changes                                                 | Product                                                                                     | **Yes** — what changes and why                       |
-| `schema-routes.md` with SCOPE = the changed screens                                    | Claude Design — [`schema-routes-prompt.md`](../prompts/schema-routes-prompt.md)             | **Yes** — the entities and routes the change touches |
-| Specs for the changed screens, each opening with "What changed"                        | Claude Design — [`extract-screens-prompt.md`](../prompts/extract-screens-prompt.md), scoped | **Yes** — what the changed screens become            |
-| A prototype of the changed screens (`*.html` / `*.js`)                                 | Claude Design                                                                               | If one is used — it outranks the md                  |
-| Visual-regression baselines from earlier iterations                                    | an earlier run, step 5b                                                                     | Recommended — catches ripple                         |
+| Prerequisite                                                                    | Source                  | Required?                                   |
+| ------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------- |
+| The Baseline iteration, with its `intake-files/` (and `done`/`frozen` to build) | an earlier run          | **Yes** — the other side of the diff        |
+| The new **full** drop — the required set, as in the initial process             | Claude Design + Product | **Yes** — `iteration:intake` checks it      |
+| "What changed" notes in the changed specs (and `Preset: unchanged` when so)     | Claude Design           | **Yes** — the designer's stated delta       |
+| The existing clinozy-fe implementation of the Baseline                          | an earlier run          | **Yes** — there must be something to update |
+| Visual-regression baselines from earlier iterations                             | an earlier run, step 6b | Recommended — catches ripple                |
 
-The **preset never re-enters** here — it's a once-ever file (initial process,
-Step 2). An incremental run touches it only if the change explicitly moves
-tokens; then a `preset.md` with the new values is part of the folder.
-
-Quick check:
-
-```bash
-pnpm iteration:list                                                                         # Type, Baseline, Status
-git log main --reverse --diff-filter=A --name-only --format= -- 'iterations/*/README.md'   # merged iterations, in merge order
-```
+The **preset never re-enters** unless the drop changes it — the diff says so.
 
 ---
 
-## Precondition — is this incremental?
-
-Read the iteration's `README.md`. Type `launch` → not this process; run the
-[initial process](initial-iteration.md). Any other type must name a Baseline —
-`pnpm iteration:new` refuses to open one before a launch exists. A non-launch
-iteration with Baseline `none` is a mistake: **stop** and fix the README first.
-
-## The "start button"
-
-**Paste [`kickoff-prompt.md`](../prompts/kickoff-prompt.md) to Claude Code** with:
-
-```text
-MODE: incremental
-ITERATION: feat-pharmacy-returns-2026-10-06-kqzx
-Build: just the delta
-```
-
-That drives the steps below — it reads the iteration folder, finds the current
-state of the screens it changes, and classifies the changes. The steps here are
-what it does; you don't run them by hand.
-
----
-
-## ==== STEP 1 — Open the iteration and get the change from Claude Design ====
-
-Open the iteration on its own branch:
+## ==== STEP 1 — Open, place the drop, confirm the Baseline ====
 
 ```bash
-pnpm iteration:new feat pharmacy-returns          # or change / fix; --both when clinozy-be changes too
+pnpm iteration:new feat pharmacy-returns              # or change / fix; --both when clinozy-be changes too
+pnpm iteration:intake <iteration> <drop-folder>       # the full drop; --both copies PRD.md + schema-routes.md
 ```
 
-It writes the folder with its `README.md` (Owner, Opened, Branch, Baseline,
-Status `planning`), a feature-PRD skeleton and a `schema-routes.md`
-placeholder. Write the PRD — only what changes — then ask Claude Design for the
-**changed screens only**: their specs (and a prototype, if one helps), each
-opening with a **"What changed"** section that notes `Preset: unchanged` when it
-is. Generate `schema-routes.md` with SCOPE = the changed screens; when the
-change touches the backend, copy it byte-for-byte into the same-named
-clinozy-be iteration.
-
-```text
-iterations/
-├── launch-2026-09-30-jxmr/                    ← frozen — the full launch snapshot
-│   ├── PRD.md · schema-routes.md · <screen>.md …
-│   └── Clinozy ….html · support.js
-└── feat-pharmacy-returns-2026-10-06-kqzx/     ← NEW — only the change
-    ├── README.md            ← Baseline: launch-2026-09-30-jxmr
-    ├── PRD.md               ← the feature PRD
-    ├── schema-routes.md     ← SCOPE = the changed screens
-    ├── medical.md           ← a changed screen, opening with "What changed"
-    └── KICKOFF.md           ← the delta plan (fe-kickoff-planning)
-```
+`iteration:new` writes the README with a **suggested** Baseline. Planning Step 0
+confirms it with you (or saves another with `pnpm iteration:baseline`).
 
 ## ==== STEP 2 — Establish the delta from two signals ====
 
-The kickoff reads **both**, because they catch different things:
+Say **"plan iteration <iteration>"**. Planning Step 2 reads **both**, because
+they catch different things:
 
-1. **The feature PRD and the "What changed" sections** — what the change is
-   _meant_ to do.
-2. **Each changed screen's new spec against its current one** — the latest spec
-   for that screen among the launch and the merged iterations, plus its current
-   code — for what actually moves, including anything the PRD forgot.
+1. **The "What changed" notes** — what the designer _meant_ to change.
+2. **The diff** — what actually changed between the two drops:
 
-If a changed spec moves something the PRD doesn't state, **that is a finding** —
-surface it, don't silently build it. A PRD is someone's account of the change;
-the specs are the truth. (Same rule as prototype-outranks-spec, one level up.)
+   ```bash
+   pnpm iteration:diff <baseline> <iteration>          # summary, then the raw diff of the two intake-files/
+   pnpm iteration:diff <baseline> <iteration> --json   # the summary, for the skill
+   ```
 
-**The reconciled delta is the work list.** Nothing outside it gets re-read.
+   The summary names the files and screens added, removed or changed (screens by
+   their `_index.md` Slug), whether the PRD, `schema-routes.md` or the
+   prototype changed, and the entities, fields, enums, routes and operations
+   added, removed or changed.
 
-## ==== STEP 3 — Classify every change before touching code ====
+If the diff shows a change the notes don't mention, **that is a finding** —
+surface it, don't silently build it. A changelog is someone's account of the
+diff; the diff is the truth. (Same rule as prototype-outranks-spec, one level
+up.) **The reconciled delta is the work list.**
 
-| Change                                                  | Cost     | Blast radius                         | Gate                 |
-| ------------------------------------------------------- | -------- | ------------------------------------ | -------------------- |
-| Token values                                            | Trivial  | **Every screen** — re-screenshot all | Contrast recheck     |
-| Copy                                                    | Trivial  | Locale files only                    | —                    |
-| Component styling                                       | Low      | Contained                            | —                    |
-| **Structural** (popup shape, step sequence, table↔card) | **High** | Rebuild                              | **Full RED gate**    |
-| **New screen / surface**                                | High     | New island + registrations           | **Full RED gate**    |
-| **Preset change** (tokens/type/radius/motion)           | **High** | **Every screen + all presets**       | **Sub-kickoff (3b)** |
-| **Layout / shell change** (auth, public, app shell)     | **High** | **Every route the shell owns**       | **Sub-kickoff (3b)** |
+## ==== STEP 3 — Classify every change before planning the build ====
 
-- **First three rows batch safely** — apply directly.
-- **Structural / new-screen** run the full `fe-design-ditto` gate as if new
-  (the initial process, steps 3–4, scoped to those screens).
-- **Preset / layout change** are cross-cutting — they don't touch one screen,
-  they re-tone or re-frame all of them. Route them through **Step 3b**.
+| Change                                                  | Cost     | Blast radius                         | Gate                    |
+| ------------------------------------------------------- | -------- | ------------------------------------ | ----------------------- |
+| Token values                                            | Trivial  | **Every screen** — re-screenshot all | Contrast recheck        |
+| Copy                                                    | Trivial  | Locale files only                    | —                       |
+| Component styling                                       | Low      | Contained                            | —                       |
+| **Structural** (popup shape, step sequence, table↔card) | **High** | Rebuild                              | **Full RED gate**       |
+| **New screen / surface**                                | High     | New island + registrations           | **Full RED gate**       |
+| **Preset change** (tokens/type/radius/motion)           | **High** | **Every screen + all presets**       | **Scoped section (3b)** |
+| **Layout / shell change** (auth, public, app shell)     | **High** | **Every route the shell owns**       | **Scoped section (3b)** |
 
-**The token-change trap:** trivial to make, touches _every_ screen. This is
-exactly what step 5b's baselines exist to catch — a value tweak that silently
-shifts a screen you weren't editing.
+- **Structural / new-screen** rows get the full RED gate (planning Steps 3–4),
+  scoped to those screens.
+- **The token-change trap:** trivial to make, touches _every_ screen. This is
+  exactly what step 6b's baselines exist to catch.
 
-## ==== STEP 3b — Preset or layout changed? Spin a scoped kickoff ====
+## ==== STEP 3b — Preset or layout changed? A scoped section first ====
 
 A preset or layout change is not a screen edit — it re-tones or re-frames the
-whole app. Treat it like a mini-build with its own plan, the same way an initial
-build does. **Before touching code, write a short scoped kickoff** (in the
-iteration's `iterations/<iteration>/KICKOFF.md`) covering just this change:
+whole app. Planning writes a scoped section into `KICKOFF.md` and **stops**:
 
 **If the PRESET changed:**
 
@@ -161,7 +103,7 @@ iteration's `iterations/<iteration>/KICKOFF.md`) covering just this change:
   value only on non-text tokens.
 - The four registration points (`index.css` block, `.theme-dot`, `THEME_PRESETS`,
   `theme-init.js`) — confirm all four.
-- Blast radius: **every screen re-screenshots** (step 5b full baseline).
+- Blast radius: **every screen re-screenshots** (step 6b full baseline).
 
 **If a LAYOUT / SHELL changed:**
 
@@ -174,53 +116,46 @@ iteration's `iterations/<iteration>/KICKOFF.md`) covering just this change:
 - Platform-surface check: relocate-never-delete — every surface still has a home.
 - Blast radius: **every route the shell owns** re-verifies, not one.
 
-Show me the scoped kickoff and **stop** before building. This is the step whose
-absence once caused "the new layout isn't the default" and "you didn't take the
-exact design values" — it forces both to the front.
+## ==== STEP 4 — Approve, then kick off — apply only the delta ====
 
-## ==== STEP 4 — Apply only the delta ====
+The plan's ledger holds only the delta, in route order: **global changes**
+(tokens, preset, layout) → **copy** → **styling** → **structural** → **new
+screens**, then verification. Approve it, then say **"kickoff iteration
+<iteration>"** — the kickoff starts only once the Baseline is `done` or
+`frozen`. Each structural or new-screen row follows the build order from
+Adoption (interaction shell → skeleton → regions → content → states → motion),
+scoped to its screen; nothing outside the ledger is touched.
 
-Work the classified list. **Do not re-read screens the change doesn't touch** —
-that re-reading is the cost the incremental process exists to avoid.
+## ==== STEP 5 — Record as you go ====
 
-For structural or new-screen rows, the build order from Adoption still applies
-(interaction shell → skeleton → regions → content → states → motion), just
-scoped to the changed screen.
+Every row gets its `AS-BUILT.md` entry. A row that changes rows still to come
+records the revision; a scope change (a row added or removed, an Acceptance or
+the order changed) **stops for you**, and the decision goes into
+`plans/decisions.md`.
 
-## ==== STEP 5 — Verify · Pin · Freeze ====
+## ==== STEP 6 — Verify · Pin · Close ====
 
-Same as the initial process's step 5, with two differences:
+Same as the initial process's step 6, with one difference:
 
-- **5a. Verify** the changed screens by comparison, and **close the delta
-  ledger** — every row `done` or `deferred` with recorded OK (Adoption → _The
-  delta ledger_). An open row = not done; keep going, don't report success.
-- **5b. Re-run the _full_ baseline set** — not just changed screens. The point is
+- **6a. Verify** the changed screens by comparison, at 375px and 1440px per
+  state.
+- **6b. Re-run the _full_ baseline set** — not just changed screens. The point is
   to catch ripple. Update baselines only where the change was intended; an
   unexpected diff is a finding, not a baseline to bless.
-- **5c. Check the Baseline, then freeze.** If other iterations merged to `main`
-  after this one's Baseline, set Baseline to the newest of them and check for
-  overlap — the same screen, entity or route changed by both — and resolve it
-  in review. Then, in the last commit before the merge, set `Status: frozen` in
-  the iteration's `README.md`:
-
-```bash
-git log main --reverse --diff-filter=A --name-only --format= -- 'iterations/*/README.md'   # merged since the Baseline?
-git add iterations/<iteration>/ && git commit -m "chore: freeze <iteration> (as built)"
-```
-
-After the merge the folder is never edited. The next change is a new iteration
-whose Baseline is the latest one on `main`. The loop sustains itself.
+- **6c. Close:** every row `done` or `deferred` with your OK, the AS-BUILT
+  summary, `pnpm iteration:status <iteration> done`; `frozen` in the last commit
+  before the merge.
 
 ---
 
 ## Why this is cheaper than the initial process
 
-|             | Initial             | Incremental                                       |
-| ----------- | ------------------- | ------------------------------------------------- |
-| Read        | Every spec, in full | The iteration folder + the changed screens' state |
-| Build       | Every screen        | Only changed screens                              |
-| Verify      | Every screen        | Changed screens + full ripple check               |
-| Cost driver | Screen count        | Change count                                      |
+|             | Initial             | Incremental                                      |
+| ----------- | ------------------- | ------------------------------------------------ |
+| Read        | Every spec, in full | The diff summary, then the changed files in full |
+| Build       | Every screen        | Only changed screens                             |
+| Verify      | Every screen        | Changed screens + full ripple check              |
+| Cost driver | Screen count        | Change count                                     |
 
 The initial process's cost scales with how big the design is. The incremental
 process's scales with how much _changed_ — which for a later iteration is
@@ -230,9 +165,8 @@ usually small.
 
 ## Known gap
 
-`fe-design-ditto` has **no delta mode** — the build side of the incremental
-process is a documented procedure, not an automated one (`fe-kickoff-planning`
-plans the delta in its Step 4-inc). The highest-leverage improvement is a Step 0
-in the build skill that reads the iteration folder, classifies each change
-against the Step 3 table, and runs the full gate only on structural changes.
-Until then, the classification is yours to make.
+`pnpm iteration:diff` finds what changed mechanically — files, screens, PRD,
+prototype, and the schema-routes entities, fields, enums, routes and operations
+— but classifying each change (token / copy / styling / structural / new
+screen) is still the planner's judgement in Step 3. A classifier over the diff's
+JSON is the next improvement.

@@ -1,9 +1,11 @@
 # Paste this to Claude Design
 
-Produces **one** file — `screens.md` — holding the shell, a screen index, and
-every screen spec. Save it into the iteration folder,
-`clinozy-fe/iterations/<iteration>/`, then say **"kickoff <iteration>"**. (The theme preset comes from the separate `design-brief-prompt.md` as
-`preset.md`; do **not** produce a preset here.)
+Produces the screen part of a design drop: `shell.md`, `_index.md` (the screen
+index, one row per Slug) and one `<slug>.md` per screen. Save them into the drop
+folder and place it with `pnpm iteration:intake <iteration> <drop-folder>` —
+clinozy-fe requires exactly these files. (The theme preset comes from the
+separate `design-brief-prompt.md` as `preset.md`; do **not** produce a preset
+here.)
 
 Fill in the two lines under **SCOPE**. Everything else is paste-as-is.
 
@@ -47,25 +49,36 @@ exist to them until you write it down. Err on the side of over-specifying.
 
 ## OUTPUT
 
-**Return exactly ONE markdown file and nothing else** — no prose before or after
-it, no second file, no subfolders. The file is named `screens.md` and it holds
-**everything**: the shell, the screen index, and one section per screen, in this
-order:
+**Return these markdown files and nothing else** — no prose before or after
+them, no other files, no subfolders. Every screen gets a **Slug**: lowercase
+kebab-case, no digits (`patient-file`, `clinic-stock`). The files, in this order:
 
 ```text
-screens.md
-├── # Shell            ← header, sidebar, nav — the frame around every screen
-├── # Index            ← every screen: route + one-line purpose
-├── # Screen: <name>   ← one section per screen (repeat the screen template)
-├── # Screen: <name>
-└── …
+shell.md          ← header, sidebar, nav — the frame around every screen (PART 1)
+_index.md         ← every screen: Slug, route, one-line purpose (PART 2)
+<slug>.md         ← one file per screen, named after its Slug (PART 3)
+<slug>.md
+…
 ```
 
-Do not emit `shell.md`, `_index.md`, or per-screen files. Merge all of it into the
-single `screens.md`. Output it in one fenced block, prefixed with its filename:
+`_index.md` lists every screen exactly once, and every row has its `<slug>.md` —
+clinozy-fe checks the pair when the drop is placed. Output each file in its own
+fenced block, prefixed with its filename:
 
 ````markdown
-**`screens.md`**
+**`shell.md`**
+
+```markdown
+<contents>
+```
+
+**`_index.md`**
+
+```markdown
+<contents>
+```
+
+**`<slug>.md`**
 
 ```markdown
 <contents>
@@ -109,11 +122,10 @@ single `screens.md`. Output it in one fenced block, prefixed with its filename:
 14. **Boundaries and limits.** Truncation rules, max lengths, min/max counts,
     overflow behaviour, and what happens at zero / one / max items.
 
-Assemble the single `screens.md` from the three parts below, in order: the
-**Shell** section once, the **Index** section once, then the **Screen** section
-repeated for every screen.
+Write the files from the three parts below: `shell.md` from PART 1, `_index.md`
+from PART 2, and one `<slug>.md` per screen from PART 3.
 
-## PART 1 — `# Shell` (once, the frame around every screen)
+## PART 1 — `shell.md` (once, the frame around every screen)
 
 ```markdown
 # Shell
@@ -187,19 +199,19 @@ the header hides.
 
 ---
 
-## PART 2 — `# Index` (once, every screen at a glance)
+## PART 2 — `_index.md` (once, every screen at a glance)
 
 ```markdown
-# Index
+# Screens
 
-| Screen | Route | Purpose (one line) |
-| ------ | ----- | ------------------ |
-|        |       |                    |
+| Slug | Route | Purpose (one line) |
+| ---- | ----- | ------------------ |
+|      |       |                    |
 ```
 
 ---
 
-## PART 3 — `# Screen: <name>` (repeat this section for every screen)
+## PART 3 — `<slug>.md` (one file per screen)
 
 ```markdown
 # Screen: <name>
@@ -328,8 +340,8 @@ Reduced-motion: <what degrades, and to what>
 Re-read your own output and confirm each. If any is "no", fix it before
 returning:
 
-- [ ] Output is a **single** `screens.md` — shell + index + all screens merged, no other files
-- [ ] **Every screen in the Index has a full screen section** — none abbreviated, none "same as above", none merged
+- [ ] Output is `shell.md`, `_index.md` and one `<slug>.md` per screen — no other files, no subfolders
+- [ ] **Every Slug in `_index.md` has its full `<slug>.md`** — none abbreviated, none "same as above", none merged
 - [ ] Every interactive element specs **default / hover / focus / active / disabled / loading**
 - [ ] Every field specs its **validation rule, when it fires, exact error string, limit, and default value**
 - [ ] Every date / number / currency / relative-time has an **exact format, locale, and timezone**
@@ -348,20 +360,25 @@ returning:
 - [ ] Every blank field is `n/a` **with a reason** — nothing silently removed
 
 Report at the end: `Screens specified: N. Fields marked n/a: M. Gaps I could not
-resolve: <list, or none>.` If any screen section is shorter than the full
+resolve: <list, or none>.` If any screen file is shorter than the full
 template, go back and fill it before returning.
 
 ---
 
 ## After it returns
 
-1. Save `screens.md` directly into `clinozy-fe/iterations/<iteration>/` — one
-   file, no subfolders.
-   (The preset lives beside it as `preset.md` from the design-brief prompt.)
-2. Say **"kickoff <iteration>"**.
+1. Save every returned file, flat, into one drop folder with the rest of the
+   drop — `preset.md` from the design-brief prompt, `PRD.md`,
+   `schema-routes.md`, and the prototype `*.html` with its `*.js`.
+2. Place it: `pnpm iteration:intake <iteration> <drop-folder>` (`--both` when
+   the backend changes too). It copies the files into
+   `iterations/<iteration>/intake-files/` exactly as delivered and fails on any
+   required file that is missing — including a `<slug>.md` for a Slug in
+   `_index.md`.
+3. Say **"plan iteration <iteration>"**.
 
-I'll score each screen against
-[the intake gate](ditto-intake-checklist.md) before writing code — anything
+Planning scores each screen against
+[the intake gate](ditto-intake-checklist.md) before any code is written — anything
 scoring RED (unknown popup shape, unknown mobile behaviour, unknown conditional
 step sequence, unknown table-vs-card) comes back to you as a question rather than
 becoming a guess.

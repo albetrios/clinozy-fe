@@ -1,89 +1,93 @@
 # Design → clinozy-fe process
 
-How a Claude Design requirement becomes a faithful clinozy-fe implementation,
-and how every iteration after the first costs a fraction of the first.
+How a Claude Design drop becomes a faithful clinozy-fe implementation — in two
+phases, **planning** (no code; it ends in your approval) and **kickoff** (the
+approved plan built one ledger row at a time) — and how every iteration after
+the first costs a fraction of the first.
 
-Three documents. Read **Adoption** once, then pick **Initial** or **Incremental**.
+| Page                                              | When                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| [Adoption](adoption.md)                           | Always — the skills, rules and gates both phases share          |
+| [Initial iteration](initial-iteration.md)         | Baseline `none` — the first iteration in this repo (the launch) |
+| [Incremental iteration](incremental-iteration.md) | Every later iteration, against a Baseline you confirm           |
 
-| Process                                           | When                                                   |
-| ------------------------------------------------- | ------------------------------------------------------ |
-| [Adoption](adoption.md)                           | Always — the skills, rules, and gates both paths share |
-| [Initial iteration](initial-iteration.md)         | The launch — the one full snapshot                     |
-| [Incremental iteration](incremental-iteration.md) | Every `feat`, `change` or `fix` after it               |
+## The flow
+
+```text
+new ─► intake ─► planning ─► approval ─► kickoff ─► AS-BUILT ─► done ─► frozen
+```
+
+| #   | Step     | How                                                                                 | Status after         |
+| --- | -------- | ----------------------------------------------------------------------------------- | -------------------- |
+| 1   | New      | `pnpm iteration:new <type> [topic] [--both]` — the folder and its README            | `planning`           |
+| 2   | Intake   | `pnpm iteration:intake <iteration> <drop-folder> [--both]` — the full drop, checked | `planning`           |
+| 3   | Planning | "plan iteration <iteration>" → **`fe-iteration-planning`**, Steps 0–6, no code      | `ready-for-approval` |
+| 4   | Approval | You approve `KICKOFF.md` → `pnpm iteration:status <iteration> approved`             | `approved`           |
+| 5   | Kickoff  | "kickoff iteration <iteration>" → **`fe-kickoff-iteration`**                        | `implementing`       |
+| 6   | AS-BUILT | One ledger row at a time: build → verify → `AS-BUILT.md` entry → review             | `implementing`       |
+| 7   | Done     | Gates green, every row done or deferred (your OK), AS-BUILT summary written         | `done`               |
+| 8   | Frozen   | `pnpm iteration:status <iteration> frozen` in the last commit before the merge      | `frozen`             |
+
+Approval locks `intake-files/` and freezes `KICKOFF.md` (afterwards only its
+ledger Status column and `revised → AS-BUILT #n` markers change). To change the
+plan after that, go back first:
+`pnpm iteration:status <iteration> planning --reason "<why>"` — allowed from
+`ready-for-approval`, `approved` or `implementing`. A frozen iteration is never
+edited; a correction is a new `fix` iteration.
 
 ## Iterations
 
-Every change to the product's design lives in its own folder under
-`iterations/`. The rules are in
-[`iterations/README.md`](../../../iterations/README.md); in short:
+Every design change is its own folder under `iterations/`. The rules and the
+commands are in [`iterations/README.md`](../../../iterations/README.md); in short:
 
-- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
-  `pnpm iteration:new <type> [topic]` and listed with `pnpm iteration:list`.
-  The type is `launch`, `feat`, `change` or `fix` — for example
-  `launch-2026-09-30-jxmr` or `feat-pharmacy-returns-2026-10-06-kqzx`.
-- The **launch** is the one full snapshot: MODE `initial`, Baseline `none`.
-- Every later iteration is one person on one branch, holding **only its
-  change**: a feature PRD, `schema-routes.md` scoped to the changed screens,
-  the changed screens' specs and its own `KICKOFF.md`. It is MODE
-  `incremental` against its Baseline — the latest iteration on `main` when it
-  was opened.
-- Each iteration's own `README.md` records its Type, Topic, Owner, Opened,
-  Branch, Baseline, Status (`planning` → `building` → `frozen`) and Summary.
-  There is no shared index file.
-- Merged means frozen; a correction is a new `fix` iteration. The current
-  picture is the launch plus the merged iterations, in merge order.
+- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/` — type `launch`,
+  `feat`, `change` or `fix`, e.g. `launch-2026-09-30-jxmr` or
+  `feat-pharmacy-returns-2026-10-06-kqzx`. `pnpm iteration:list` lists them.
+- **`intake-files/`** holds the **full** drop, exactly as delivered — never
+  only the changed screens. **`plans/decisions.md`** holds every blocking answer
+  and scope decision. **`KICKOFF.md`** is the plan; **`AS-BUILT.md`** is what was
+  actually built.
+- **Mode.** Baseline `none` → **initial**. Otherwise **incremental** against
+  the Baseline you confirm at planning Step 0 — the suggestion is the latest
+  `done` or `frozen` iteration in this repo. The delta is the designer's "What
+  changed" plus `pnpm iteration:diff <baseline> <iteration>`, which compares the
+  two `intake-files/` folders only; the Baseline's `intake-files/` are mandatory.
+- Each iteration's `README.md` records Type, Topic, Owner, Opened, Branch,
+  Baseline, Status, Summary, Drop placed, Drop source and Schema-routes, and a
+  History of every Status and Baseline change written by the commands.
 
 An iteration is a product and design iteration, not an app release — releases
 are `package.json` and `CHANGELOG.md`.
 
----
+## Prompts go to two different apps — don't mix them up
 
-## The loop, in one picture
+| Prompt                                                                                                                                         | Paste it to                           | You get back                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------ |
+| Extract prompts (`design-brief`, `extract-screens`, `schema-routes`, `design-overview`, `auth-public-routes-brief`, `extract-system-surfaces`) | **Claude Design**                     | the drop — `.md` files               |
+| [`iteration-planning-prompt.md`](../prompts/iteration-planning-prompt.md)                                                                      | **Claude Code** (here, in clinozy-fe) | the plan — `KICKOFF.md`              |
+| [`kickoff-iteration-prompt.md`](../prompts/kickoff-iteration-prompt.md)                                                                        | **Claude Code** (here, in clinozy-fe) | the implementation and `AS-BUILT.md` |
 
-```text
-   1. DESIGN ──► 2. EXTRACT ──► 3. READ+GATE ──► 4. BUILD ──► 5. PIN ─┐
-   (Claude       (preset once,   ("kickoff        (preset→     (verify │
-    Design →      screens per      <iteration>",    shell→       ·pin·  │
-    html+js)      iteration)       skill stops)     screens)     freeze)│
-        ▲                                                               │
-        └───────────────────────────────────────────────────────────── ┘
-              the next design change is a new iteration holding only
-              that change; its Baseline is the latest one on main
-```
-
-## Two prompts, two apps — don't mix them up
-
-The one thing that trips people up: prompts go to two different places.
-
-| Prompt                                                                                                     | Paste it to                           | You get back       |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------ |
-| Extract prompts (`design-brief`, `extract-screens`, `auth-public-routes-brief`, `extract-system-surfaces`) | **Claude Design**                     | `.md` spec files   |
-| [`kickoff-prompt.md`](../prompts/kickoff-prompt.md)                                                        | **Claude Code** (here, in clinozy-fe) | the implementation |
-
-The extract prompts **produce** the specs; the kickoff prompt **consumes** them.
-Open the iteration with `pnpm iteration:new`, then save the `.md` files into its
-folder, `iterations/<iteration>/`. The kickoff prompt is your **start button** —
-`MODE: initial` for the launch, `MODE: incremental` for every later iteration.
+The extract prompts **produce** the drop; save it, with the prototype export, in
+one folder and place it with `pnpm iteration:intake`. The two Claude Code prompts
+are the explicit start buttons for the skills — saying "plan iteration
+<iteration>" or "kickoff iteration <iteration>" does the same.
 
 ## Which path am I on?
 
-| Situation                                | Path                                                               |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| The launch (no iteration exists yet)     | **Initial**                                                        |
-| A new feature, change or fix after it    | **Incremental**, against its Baseline                              |
-| Structural change to an existing screen  | **Incremental**, full RED gate on that screen                      |
-| New screen in an existing design         | **Incremental** for the delta, **Initial**'s rigour for the screen |
-| A correction to an iteration that merged | A new `fix` iteration — **Incremental**                            |
+| Situation                                        | Path                                                               |
+| ------------------------------------------------ | ------------------------------------------------------------------ |
+| The first iteration in this repo (Baseline none) | **Initial**                                                        |
+| A new feature, change or fix                     | **Incremental**, against the Baseline you confirm                  |
+| Structural change to an existing screen          | **Incremental**, full RED gate on that screen                      |
+| New screen in an existing design                 | **Incremental** for the delta, **Initial**'s rigour for the screen |
+| A correction to a frozen iteration               | A new `fix` iteration — **Incremental**                            |
 
 ## The one habit that unlocks everything
 
-Start every design change as a **new iteration** — `pnpm iteration:new` —
-holding only that change, and never edit one that has merged. Freeze each
-iteration (`Status: frozen` in its README) in the last commit before it merges.
-
-Because a later iteration holds only its change, its folder is the work list —
-there are no snapshots to diff — and the incremental process becomes possible.
-The current picture is the launch plus the merged iterations, in merge order.
+Start every design change as a **new iteration** (`pnpm iteration:new`) holding
+the **full** drop, and never edit a frozen one. Because every drop is complete,
+`pnpm iteration:diff` turns the Baseline and the new drop into the work list,
+and the incremental process costs what changed — not what exists.
 
 ## Do this before your next iteration
 
@@ -96,6 +100,7 @@ portable and every future iteration benefits.
 ## Related
 
 - Design prompts and briefs: [`../prompts/`](../prompts/README.md)
-- The plan skill: [`fe-kickoff-planning`](../../../agent-os/skills/fe-kickoff-planning/SKILL.md)
-- The build skill: [`fe-design-ditto`](../../../agent-os/skills/fe-design-ditto/SKILL.md)
-- The iteration rules: [`iterations/README.md`](../../../iterations/README.md)
+- The planning skill: [`fe-iteration-planning`](../../../agent-os/skills/fe-iteration-planning/SKILL.md)
+- The kickoff skill: [`fe-kickoff-iteration`](../../../agent-os/skills/fe-kickoff-iteration/SKILL.md)
+- The per-screen build skill: [`fe-design-ditto`](../../../agent-os/skills/fe-design-ditto/SKILL.md)
+- The iteration rules and commands: [`iterations/README.md`](../../../iterations/README.md)

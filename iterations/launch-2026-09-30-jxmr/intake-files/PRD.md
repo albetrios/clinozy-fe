@@ -1,6 +1,6 @@
 # Clinozy — PRD for Prototype
 
-## PART A — App / Software PRD
+# PART A — App / Software PRD
 
 ---
 
@@ -12,16 +12,16 @@ Clinozy is a clinic management app for skin, hair and aesthetic clinics in India
 
 ## 2. Users & Roles
 
-| Role          | Description                     | Key abilities                                             |
-| ------------- | ------------------------------- | --------------------------------------------------------- |
-| Front desk    | Reception staff running the day | Leads, bookings, check-in, collect payments, tasks        |
-| Doctor        | Consults and prescribes         | Patient file, clinical notes, Rx, offering plan, feedback |
-| Therapist     | Performs procedures             | Treatments, visit photos, clinic stock usage              |
-| Counsellor    | Explains plans and packages     | Offering suggestions, packages, invoices                  |
-| Pharmacist    | Runs the in-house medical store | Medical sales, medicines, purchases, suppliers            |
-| Accountant    | Money in / out                  | Payments ledger, pending credits, day close               |
-| Marketing     | Brings enquiries in             | Leads, sources, reviews                                   |
-| Owner / Admin | Runs the clinic                 | Everything, plus Users, roles & access, branches          |
+| Role | Description | Key abilities |
+|------|-------------|---------------|
+| Front desk | Reception staff running the day | Leads, bookings, check-in, collect payments, tasks |
+| Doctor | Consults and prescribes | Patient file, clinical notes, Rx, offering plan, feedback |
+| Therapist | Performs procedures | Treatments, visit photos, clinic stock usage |
+| Counsellor | Explains plans and packages | Offering suggestions, packages, invoices |
+| Pharmacist | Runs the in-house medical store | Medical sales, medicines, purchases, suppliers |
+| Accountant | Money in / out | Payments ledger, pending credits, day close |
+| Marketing | Brings enquiries in | Leads, sources, reviews |
+| Owner / Admin | Runs the clinic | Everything, plus Users, roles & access, branches |
 
 Each role only sees the sections it is allowed to view (set in Users › Roles & access). On Today, each role's own stages are highlighted.
 
@@ -34,84 +34,72 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 ### 3.1 Screen list
 
 #### Screen: Splash
-
 - **Purpose:** Branded load before the app (~3.7 s).
 - **Who sees it:** Everyone, on open.
 - **Contents:** Mark draws in, wordmark fades up, greeting, thin progress bar, 3-step ticker. Offline version says the app can't reach the clinic and offers Retry.
 - **Actions:** None — fades into Today.
 
 #### Screen: Today (butter)
-
 - **Purpose:** The clinic floor right now.
 - **Who sees it:** All roles.
 - **Contents:** Stage columns Enquiry · Booked · Waiting · With doctor · Treatment · Checkout · Pharmacy · Done. One card per visit: person chip, time, service, doctor, plan flag ("✓ Plan ready" / "○ Plan pending").
 - **Actions:** Card click opens the appointment form drawer. "New ⌄" split button creates an appointment, walk-in, lead, payment.
 
 #### Screen: Leads (lavender)
-
 - **Purpose:** Enquiries and their conversations until they become patients.
 - **Who sees it:** Front desk, Marketing, Counsellor, Owner.
 - **Contents:** Table — person, source, interested in, status (progress steps), assigned & involved, follow-up date, last message. Filters (status, source, assigned, Created, Follow-up date).
 - **Actions:** Row click opens the lead drawer (steps on the left, chat column on the right). "New lead" opens the New lead drawer. Closing a lead uses "Close as" chips. Booking from a lead opens the appointment form prefilled.
 
 #### Screen: Appointments (sky)
-
 - **Purpose:** Bookings by doctor, room and machine.
 - **Who sees it:** Front desk, Doctor, Therapist, Counsellor, Owner.
 - **Contents:** Day / Week calendar by doctor, room or machine, and a List view. Each booking shows patient, service, status colour.
 - **Actions:** Click an empty slot → New appointment (date & time prefilled). Click a booking → appointment form: Visit status strip (Scheduled → Confirmed → Checked in → Completed), Copy, Cancel visit (with reason), Photos from this visit (after check-in), Offering suggestions, "Not a patient yet · Create patient record" for leads. Moving the time before check-in marks it Rescheduled.
 
 #### Screen: Patients (sage)
-
 - **Purpose:** Registered patients.
 - **Who sees it:** All clinical roles, Front desk, Owner.
 - **Contents:** Table — patient (avatar + ID), mobile, last visit, doctor, dues, follow-up.
 - **Actions:** Row click opens the Patient file. "New patient" opens the drawer (name, mobile, gender, DOB, address, type, consent, first photos, notes).
 
 #### Screen: Patient file (sage, tabs in their section colours)
-
 - **Purpose:** Everything about one patient.
 - **Who sees it:** Clinical roles, Front desk, Counsellor, Accountant (billing).
 - **Contents:** Left rail (identity, contact, details, Up next). Tabs from a folder popover grouped Clinical / Care / Billing / Team: Clinical notes (Complaints · Diagnosis · Treatment suggestions · Future suggestions, then Offering suggestions and Feedback cards), Prescriptions, Treatments, Images, Packages, Invoices, Payments, Team.
 - **Actions:** Every "New …" keeps the patient selected. Rx row: Print, Preview, "Sell medicines". Invoice row: Print, Preview. Rail: Book, Collect. Log feedback ⌄ opens check-in / review drawers.
 
 #### Screen: Medical (blush)
-
 - **Purpose:** The in-house medicine store.
 - **Who sees it:** Pharmacist, Accountant, Owner.
 - **Contents:** Tabs Sales · Medicines · Purchases · Suppliers · Manufacturers · MRs · Payments (extra tabs fold into "More ⌄"). Stock with batches and nearest expiry.
 - **Actions:** "New sale" (same invoice drawer, type Medical), "Prescriptions to fill" dd, new PO (Ordered → Received → Paid), add supplier / manufacturer / MR, Print sale. Sales are never edited — only viewed, collected, returned or voided.
 
 #### Screen: Clinic stock (mint)
-
 - **Purpose:** Consumables used in procedures (not sold).
 - **Who sees it:** Therapist, Front desk, Owner.
 - **Contents:** Tabs Items · Movements · Purchases · Vendors. Stock shown as "2.5 tube · 75 g".
 - **Actions:** Row "Use" popover (stepper, unit toggle, quick chips, Used-for), "Stock check" drawer (counted vs system), Revert a movement, new purchase.
 
 #### Screen: Payments (peach)
-
 - **Purpose:** One ledger of money in and out.
 - **Who sees it:** Accountant, Front desk, Owner.
 - **Contents:** Tabs Payments · Pending. Columns When · What (Received / Paid) · From / to · Mode · Amount. All ids PAY-####.
 - **Actions:** **Receive** (money in) and **Pay** (money out; pick a supplier bill or "Other spend"). Pending: "Add pending" (Give / Take), Give back · Got it back · Use on next bill. "Day close" opens the day summary drawer; after close, rows lock. Refunds issue a credit note (CN-###).
 
 #### Screen: Tasks (plum)
-
 - **Purpose:** Every human follow-up with an owner and due time.
 - **Who sees it:** All roles (own tasks), Owner (all).
 - **Contents:** Tasks from rules — lead follow-ups, appointment reminders, aftercare calls, negative-feedback call-backs, payment dues.
 - **Actions:** Outcome buttons per task (e.g. Log check-in · Doing well · No answer = snooze 3 h), reassign, new task.
 
 #### Screen: Offerings (lime)
-
 - **Purpose:** What the clinic sells.
 - **Who sees it:** Counsellor, Owner.
 - **Contents:** Offerings, packages, offers with category, sessions, list price, minimum price.
 - **Actions:** New offering / package / offer; row click edits.
 
 #### Screen: Users (slate)
-
 - **Purpose:** Team, roles & access, branches.
 - **Who sees it:** Owner, Admin.
 - **Contents:** Tabs Team · Roles & access · Branches.
@@ -120,21 +108,18 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 ### 3.2 Key flows
 
 **Flow 1: Enquiry becomes a patient**
-
 1. Front desk opens Leads → "New lead" → name, mobile, source chip, interested in → Save.
 2. Lead drawer → chat on WhatsApp → "Book appointment" → appointment form opens prefilled → pick doctor, Today chip, time → Save.
 3. On the day, Today shows the visit in Booked → open it → status Checked in. The lead moves to "Clinic visited" automatically.
 4. The "Not a patient yet" card → Create patient record → the visit can now be Completed.
 
 **Flow 2: Visit → prescription → sale → payment**
-
 1. Doctor opens the patient from Today → Patient file › Prescriptions → "New prescription".
 2. Quick line: types `adapalene 0-0-1 face 4w` ↵ → row added with dose, where, qty. Save & sell.
 3. Medical sale drawer opens prefilled; stock is deducted by earliest expiry.
 4. Front desk → Receive → ₹ amount, mode UPI → Save. Ledger shows PAY-1042 Received.
 
 **Flow 3: Treatment plan and feedback**
-
 1. In the appointment form, Offering suggestions → "Add offering" → Hydrafacial ×3 package, price → status Planned.
 2. Counsellor creates the invoice; the plan row turns "✓ Invoiced".
 3. Next day an Aftercare call task appears → outcome "Log check-in" → feel Worse, 3/10 → card shows "Action needed" and a doctor call-back task is created.
@@ -167,32 +152,31 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 
 ### 4.2 Sample data
 
-| Patient     | ID     | Mobile          | Last visit             | Doctor           | Due    |
-| ----------- | ------ | --------------- | ---------------------- | ---------------- | ------ |
-| Priya Shah  | P-1042 | +91 98250 44120 | Today · Hydrafacial    | Dr. Nisha Mavani | ₹0     |
-| Ankit Desai | P-0987 | +91 99090 21877 | 24 Sep · PRP (2 of 6)  | Dr. Reenal Patel | ₹4,500 |
-| Hetal Joshi | P-1110 | +91 97277 63014 | 18 Sep · Chemical peel | Dr. Nisha Mavani | ₹0     |
+| Patient | ID | Mobile | Last visit | Doctor | Due |
+|---------|----|--------|-----------|--------|-----|
+| Priya Shah | P-1042 | +91 98250 44120 | Today · Hydrafacial | Dr. Nisha Mavani | ₹0 |
+| Ankit Desai | P-0987 | +91 99090 21877 | 24 Sep · PRP (2 of 6) | Dr. Reenal Patel | ₹4,500 |
+| Hetal Joshi | P-1110 | +91 97277 63014 | 18 Sep · Chemical peel | Dr. Nisha Mavani | ₹0 |
 | Rohan Mehta | P-0751 | +91 98980 11536 | 02 Sep · LHR full face | Dr. Reenal Patel | ₹1,200 |
 
-| Appointment          | Time  | Service       | Doctor     | Status     |
-| -------------------- | ----- | ------------- | ---------- | ---------- |
-| Priya Shah           | 11:30 | Hydrafacial   | Dr. Nisha  | Checked in |
-| Kavya Trivedi (lead) | 12:15 | Consultation  | Dr. Reenal | Confirmed  |
-| Ankit Desai          | 15:00 | PRP session 3 | Dr. Reenal | Scheduled  |
+| Appointment | Time | Service | Doctor | Status |
+|-------------|------|---------|--------|--------|
+| Priya Shah | 11:30 | Hydrafacial | Dr. Nisha | Checked in |
+| Kavya Trivedi (lead) | 12:15 | Consultation | Dr. Reenal | Confirmed |
+| Ankit Desai | 15:00 | PRP session 3 | Dr. Reenal | Scheduled |
 
-| Offering         | Category | Sessions | List    | Min     |
-| ---------------- | -------- | -------- | ------- | ------- |
-| Hydrafacial      | Facial   | 1        | ₹3,500  | ₹3,000  |
-| PRP hair package | Hair     | 6        | ₹24,000 | ₹21,000 |
-| Glycolic peel    | Peel     | 1        | ₹2,200  | ₹1,800  |
-| LHR full face    | Laser    | 6        | ₹15,000 | ₹13,500 |
+| Offering | Category | Sessions | List | Min |
+|----------|----------|----------|------|-----|
+| Hydrafacial | Facial | 1 | ₹3,500 | ₹3,000 |
+| PRP hair package | Hair | 6 | ₹24,000 | ₹21,000 |
+| Glycolic peel | Peel | 1 | ₹2,200 | ₹1,800 |
+| LHR full face | Laser | 6 | ₹15,000 | ₹13,500 |
 
 ---
 
 ## 5. Feature Priorities
 
 **Must-have (working in prototype):**
-
 - [x] Header with pinned section tabs, All sections, branch picker, ⌘K
 - [x] Today floor stages
 - [x] Leads list + lead drawer with chat and progress
@@ -211,14 +195,12 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 - [x] Dark mode, reduced motion, offline splash, failed-load states
 
 **Nice-to-have (visual only is OK):**
-
 - [ ] WhatsApp sending (chat is simulated)
 - [ ] Real reminders going out on save
 - [ ] "Verify your email" banner
 - [ ] Final route URLs (currently one page switching sections)
 
 **Explicitly out of scope:**
-
 - [ ] Phone layout (desktop / tablet only for now)
 - [ ] Patient-facing app or booking page
 - [ ] Real backend, auth, integrations
@@ -227,7 +209,7 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 
 ## 6. Visual Direction
 
-- **Design system / brand guide:** Clinozy's own — shadcn-style zinc neutrals, deep pastel section colours with dark ink (AA contrast), Lucide icons. Rules in `CLAUDE.md`, tokens in `iterations/launch-2026-09-30-jxmr/preset.md`.
+- **Design system / brand guide:** Clinozy's own — shadcn-style zinc neutrals, deep pastel section colours with dark ink (AA contrast), Lucide icons. Rules in `CLAUDE.md`, tokens in `legacy/preset.md`.
 - **Products whose look you like:** shadcn/ui, Linear, Notion-style calm tables.
 - **Adjectives:** calm, clean, fast, colour-coded, dense but readable, light theme with dark mode.
 - **Logo / brand colors:** Clinozy "C" mark with a green dot · green oklch(0.52 0.12 150) for success · #18181b for primary actions.
@@ -258,7 +240,7 @@ Desktop / tablet web app. One header for every screen: logo · "All sections" co
 
 - Dark-mode pale tints need a visual check on real screens.
 - Should the "verify your email" banner be built now?
-- Final URLs: routes are proposed in `iterations/launch-2026-09-30-jxmr/schema-routes.md` (93 routes) but the prototype is still one page.
+- Final URLs: routes are proposed in `legacy/schema-routes.md` (93 routes) but the prototype is still one page.
 - When should the phone layout be designed, and for which roles first (doctor? front desk)?
 - Is WhatsApp the only messaging channel, or are SMS / calls logged too?
 

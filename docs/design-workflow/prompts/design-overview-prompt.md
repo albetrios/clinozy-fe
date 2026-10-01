@@ -2,9 +2,10 @@
 
 Produces **one** file — `design-overview.md` — a complete, detailed record of the
 **current design as it exists right now** in this Claude Design project: every
-screen, every flow, every component, every decision. Save it into the
-iteration folder, `clinozy-fe/iterations/<iteration>/`. This is the top-level map; the deep dives come from the other
-prompts (`preset.md` for theme, `screens.md` for per-screen UI,
+screen, every flow, every component, every decision. Save it into the drop
+folder with the rest of the drop (it is optional in the intake). This is the
+top-level map; the deep dives come from the other prompts (`preset.md` for
+theme, `shell.md` + `_index.md` + one `<slug>.md` per screen for the UI,
 `schema-routes.md` for data + routes).
 
 Nothing to fill in — paste as-is.
@@ -186,14 +187,10 @@ Inconsistencies: N.`
 
 ## After it returns
 
-1. Save `design-overview.md` directly into the iteration folder,
-   `clinozy-fe/iterations/<iteration>/` — one file, beside the others.
-2. Use it to sanity-check the other three files (`preset.md`, `screens.md`,
-   `schema-routes.md`). For the launch, every screen in this inventory must
-   have a section in `screens.md` and a row in the `schema-routes.md` route
-   map. For any later iteration, SCOPE is the changed screens: each of those
-   must have its spec and its routes, and the rest of the inventory is context,
-   not work.
-3. When the change touches the backend, copy `schema-routes.md` into the
-   same-named clinozy-be iteration, `clinozy-be/iterations/<iteration>/`, too;
-   then say **"kickoff <iteration>"**.
+1. Save `design-overview.md` into the drop folder, beside the other files.
+2. Use it to sanity-check the rest of the drop: every screen in this inventory
+   must have a row in `_index.md`, its own `<slug>.md`, and a row in the
+   `schema-routes.md` route map.
+3. Place the drop with `pnpm iteration:intake <iteration> <drop-folder>`
+   (`--both` when the backend changes too), then say **"plan iteration
+   <iteration>"**.

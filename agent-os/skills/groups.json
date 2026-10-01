@@ -62,7 +62,8 @@
       "fe-auto-implement",
       "fe-skill-registry",
       "fe-agent-os-authoring",
-      "fe-kickoff-planning",
+      "fe-iteration-planning",
+      "fe-kickoff-iteration",
       "fe-design-ditto"
     ],
     "external": [

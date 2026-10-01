@@ -77,9 +77,13 @@
       "why": "Screenshot-baseline spec edits follow the fe-visual-regression skill (baseline discipline, snapshot matrix)."
     },
     {
-      "file": "iterations/launch-2026-09-30-jxmr/shell.md",
-      "expectSkills": ["fe-kickoff-planning", "fe-design-ditto"],
-      "why": "An iterations/<iteration>/ design drop is planned by fe-kickoff-planning and built by fe-design-ditto."
+      "file": "iterations/launch-2026-09-30-jxmr/intake-files/shell.md",
+      "expectSkills": [
+        "fe-iteration-planning",
+        "fe-kickoff-iteration",
+        "fe-design-ditto"
+      ],
+      "why": "An iteration's intake-files/ drop is planned by fe-iteration-planning, built row by row by fe-kickoff-iteration, each screen through fe-design-ditto."
     }
   ]
 }

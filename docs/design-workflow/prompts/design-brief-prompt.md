@@ -149,7 +149,7 @@ Notes on the shape:
 
 ## When it comes back
 
-Save `preset.md` into the iteration folder, `clinozy-fe/iterations/<iteration>/`, then paste it to me with: **"apply this preset"**.
+Save `preset.md` into the drop folder with the rest of the drop and place it with `pnpm iteration:intake <iteration> <drop-folder>`; the iteration's plan applies the preset before any screen. (A preset on its own can still be pasted to me with **"apply this preset"**.)
 
 I'll write the CSS blocks, register it in the three places that need to agree
 (`presets.ts`, `index.css`, `public/theme-init.js`), re-verify every contrast

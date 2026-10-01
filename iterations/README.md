@@ -4,8 +4,8 @@ An iteration is one product/design change, recorded as a folder under `iteration
 product/design iteration, **not** an app release — releases are the `package.json` version and
 `CHANGELOG.md`.
 
-Open one with `pnpm iteration:new`; list them with `pnpm iteration:list`. There is no shared index
-file — each iteration describes itself in its own `README.md`.
+How an iteration is planned and built: [docs/design-workflow/process/README.md](../docs/design-workflow/process/README.md).
+There is no shared index file — `pnpm iteration:list` is the index.
 
 ## Naming
 
@@ -18,83 +18,96 @@ file — each iteration describes itself in its own `README.md`.
 | `<YYYY-MM-DD>` | the day the iteration was opened                                                         |
 | `<id>`         | four random lowercase letters, so names stay unique across people                        |
 
-Examples: `launch-2026-09-30-jxmr`, `feat-pharmacy-returns-2026-10-06-kqzx`.
+Examples: `launch-2026-09-30-jxmr`, `feat-pharmacy-returns-2026-10-06-kqzx`. There is only ever one
+launch. The date is a value (when the iteration was opened) and the only part that carries digits.
 
-The date is a value (when the iteration was opened); the type, topic and `<id>` carry no digits.
+The same name is used in clinozy-fe and clinozy-be. Create the folder only in the repository the
+change touches; `pnpm iteration:new <type> <topic> --both` creates it in both.
 
-The same name is used in clinozy-fe and clinozy-be. Create the folder only in the repo(s) the change
-touches; `pnpm iteration:new <type> <topic> --both` creates it in both.
+## The folder
 
-## Launch and later iterations
+| Path            | Holds                                                                                                                          | Written by                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `README.md`     | the field table, then a `## History` list                                                                                      | `iteration:new`, then only the commands                         |
+| `intake-files/` | the files received from outside, **exactly as delivered**, flat, never edited                                                  | `iteration:intake`                                              |
+| `KICKOFF.md`    | the plan and its ordered ledger (the route)                                                                                    | fe-iteration-planning                                           |
+| `plans/`        | our supporting documents: `decisions.md` (blocking-question answers and every scope decision)                                  | fe-iteration-planning (+ scope decisions during implementation) |
+| `AS-BUILT.md`   | per ledger row: planned · actually built · difference · why · decision · commit; revisions to upcoming rows; a closing summary | fe-kickoff-iteration                                            |
 
-- **launch** — the full snapshot: the full PRD, the full schema-routes, the prototype and every
-  screen spec. MODE initial, Baseline `none`. There is only ever one launch.
-- **feat**, **change**, **fix** — one person, one branch, **changes only**: a feature PRD for the
-  changed screens, flows and data, a `schema-routes.md` scoped to the changed screens, specs for the
-  changed screens, and its own `KICKOFF.md`. MODE incremental against its Baseline. The iteration
-  folder **is** the delta — never diff two snapshots.
+- **`intake-files/`** holds the **full drop** in every iteration, not only the launch. Frontend
+  required set: `PRD.md`, `schema-routes.md`, the prototype `*.html` and every `*.js` it loads,
+  `_index.md`, one `<slug>.md` per Slug in `_index.md`'s table, `preset.md`, `shell.md`. Optional:
+  `_`-prefixed shared files (`_patterns.md`, `_report.md`), design-brief / auth / system-surface
+  `.md`, `preset.json`, `design-overview.md`. It is locked once the Status is `approved` or later.
+- **`KICKOFF.md`** is frozen at approval: afterwards only its ledger Status column and
+  "revised → AS-BUILT #n" markers change.
+- `schema-routes.md` (and `PRD.md`) is the same file, byte-for-byte, in the same-named clinozy-be
+  iteration — `pnpm iteration:list` shows its fingerprint in both repositories.
 
 ## README fields
 
-Every iteration folder has a `README.md` holding one table:
+| Field         | Value                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Type          | `launch`, `feat`, `change` or `fix`                                                     |
+| Topic         | the kebab-case topic; `—` for launch                                                    |
+| Owner         | the person driving it (`git config user.name`)                                          |
+| Opened        | `YYYY-MM-DD`                                                                            |
+| Branch        | the branch it is built on                                                               |
+| Baseline      | `none` (initial), an earlier iteration (incremental), or `—` until the user confirms it |
+| Status        | `planning`, `ready-for-approval`, `approved`, `implementing`, `done` or `frozen`        |
+| Summary       | one line on what it changes                                                             |
+| Drop placed   | the day `iteration:intake` placed the drop                                              |
+| Drop source   | where the drop came from                                                                |
+| Schema-routes | the first 12 characters of the sha256 of `intake-files/schema-routes.md`                |
 
-| Field    | Value                                              |
-| -------- | -------------------------------------------------- |
-| Type     | `launch`, `feat`, `change` or `fix`                |
-| Topic    | the kebab-case topic; `—` for launch               |
-| Owner    | the person driving it (`git config user.name`)     |
-| Opened   | `YYYY-MM-DD`                                       |
-| Branch   | the branch it is built on                          |
-| Baseline | `none` (launch only) or the iteration it builds on |
-| Status   | `planning`, `building` or `frozen`                 |
-| Summary  | one line on what it changes                        |
+Below the table, a `## History` list records every Status and Baseline change, one line each:
+`- <date> · <from> → <to> · <reason or —> · <git user.name>` (a Baseline change reads
+`Baseline <from> → <to>`). Only the commands write the table values and the History — never edit them
+by hand. The README template (`tooling/iterations/templates/README.md`) is byte-identical to
+clinozy-be's.
 
-## Baseline
+## Mode and Baseline
 
-- Baseline is the latest iteration on `main` when the iteration was opened: the most recent Opened
-  date, and on a tie the one whose last commit on `main` is newest (merge order).
-  `pnpm iteration:new` fills it in. While `main` holds no iteration yet, it falls back to the latest
-  iteration on the current branch and says so.
-- Parallel branches are fine. Before merging, if newer iterations reached `main` meanwhile, update
-  Baseline to the newest one and check overlap — the same screen, entity or route changed by both —
-  and resolve it in review.
+- **Baseline `none` → MODE initial** — the first iteration in this repository: everything is new.
+- **Otherwise MODE incremental**, against a Baseline **the user confirms** at planning Step 0 (saved
+  with `pnpm iteration:baseline`). The suggestion is the latest `done` / `frozen` iteration in this
+  repository.
+- The incremental delta is the designer's "What changed" notes **plus**
+  `pnpm iteration:diff <baseline> <iteration>`, which compares the two iterations' `intake-files/`
+  **only** (never the README, `KICKOFF.md`, `plans/` or `AS-BUILT.md`). The Baseline's
+  `intake-files/` is therefore mandatory: `iteration:baseline` refuses a Baseline without the required
+  set, and `iteration:diff` refuses an iteration without `intake-files/`. Anything the diff shows that
+  the notes omit is a finding.
+- Parallel branches are fine. Before merging, if another iteration reached `main` meanwhile, check
+  overlap — the same screen, entity or route changed by both — and resolve it in review.
 
 ## Lifecycle
 
-- Status moves `planning` → `building` → `frozen`.
-- An iteration is frozen once it merges to `main`: set Status `frozen` in the last commit before the
-  merge. Never edit a merged iteration; a correction is a new `fix` iteration.
-- The current full picture is the launch plus every merged iteration, in merge order.
+Status moves one step at a time with `pnpm iteration:status <iteration> <status>`:
 
-## Contents (clinozy-fe)
+| Status               | Set by                           | When                                                       |
+| -------------------- | -------------------------------- | ---------------------------------------------------------- |
+| `planning`           | `pnpm iteration:new`             | the folder is opened; the drop is placed and planned       |
+| `ready-for-approval` | fe-iteration-planning            | `KICKOFF.md` passes the self-check                         |
+| `approved`           | the user's go-ahead              | `KICKOFF.md` and `intake-files/` freeze                    |
+| `implementing`       | fe-kickoff-iteration             | the user confirms the iteration to kick off                |
+| `done`               | fe-kickoff-iteration             | every ledger row is closed and `AS-BUILT.md` is summarized |
+| `frozen`             | the last commit before the merge | the iteration merges to `main`                             |
 
-| Path                         | Launch                                                | Later iterations                                                         |
-| ---------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
-| `README.md`                  | the field table                                       | the field table                                                          |
-| `PRD.md`                     | the full PRD                                          | a feature PRD for the changed screens, flows and data                    |
-| `schema-routes.md`           | the full data model and route map                     | the same, scoped to the changed screens                                  |
-| Screen specs (`<screen>.md`) | the preset, the shell and every screen                | the changed screens only; `preset.md` / `shell.md` only when they change |
-| Prototype (`*.html`, `*.js`) | the whole app                                         | the changed screens, when Claude Design made one                         |
-| `KICKOFF.md`                 | the build plan and its ledger (`fe-kickoff-planning`) | the delta plan and its ledger                                            |
-
-- `schema-routes.md` comes from Claude Design
-  ([`schema-routes-prompt.md`](../docs/design-workflow/prompts/schema-routes-prompt.md)) and is
-  copied byte-for-byte into the clinozy-be folder of the same name when the change touches the
-  backend.
-- The Claude Design files stay as authored. `schema-routes.md` and each iteration's `README.md` are
-  byte-identical to the clinozy-be copies, so Prettier and markdownlint leave them alone.
-- How an iteration is planned and built:
-  [`docs/design-workflow/process/`](../docs/design-workflow/process/README.md).
-
-clinozy-be holds the backend side of the same iteration (`plans/product-plan.md` and one
-`plans/<table>.md` per new or changed table) under the same folder name.
+`ready-for-approval`, `approved` or `implementing` may go back to `planning` with
+`--reason "<why>"`; nothing else is allowed. Never edit a frozen iteration — a correction is a new
+`fix` iteration.
 
 ## Commands
 
 ```bash
-pnpm iteration:new launch
-pnpm iteration:new feat pharmacy-returns
-pnpm iteration:new fix invoice-rounding --both
-pnpm iteration:new change patient-consent --both --sibling ../clinozy-be --dry-run
-pnpm iteration:list
+pnpm iteration:new feat pharmacy-returns --both          # open (README only)
+pnpm iteration:intake <iteration> <source-folder> --both # place the drop + check it
+pnpm iteration:baseline <iteration> <baseline|none>      # record the confirmed Baseline
+pnpm iteration:diff <baseline> <iteration> [--json]      # the delta: intake-files/ only
+pnpm iteration:status <iteration> <status> [--reason "<text>"]
+pnpm iteration:list                                      # Name · Type · Owner · Opened · Baseline · Status · Schema-routes · Drop placed
 ```
+
+Every command takes `--help`. `iteration:new` and `iteration:intake` take `--dry-run`; `--both` works
+on the same-named folder in the sibling repository (`--sibling <path>` overrides where it is).

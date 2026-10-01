@@ -48,14 +48,14 @@ test('allows a staged file exactly at the limit', () => {
 
 test('exempts design exports under iterations/', () => {
   const { status, output } = runGateWith({
-    'iterations/launch-2026-09-30-jxmr/Prototype.html': LIMIT_BYTES * 3,
+    'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
   });
   assert.equal(status, 0, output);
 });
 
 test('the iterations/ exemption does not hide a large file elsewhere in the same commit', () => {
   const { status, output } = runGateWith({
-    'iterations/launch-2026-09-30-jxmr/Prototype.html': LIMIT_BYTES * 3,
+    'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
     'docs/big.bin': LIMIT_BYTES + 1,
   });
   assert.equal(status, 1, output);

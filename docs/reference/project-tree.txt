@@ -187,7 +187,7 @@ clinozy-fe/
 │   │   ├── fe-testing-requirements.mdc
 │   │   ├── fe-theme-axis-audit.mdc
 │   │   └── fe-ui-sources.mdc
-│   ├── skills/  (52 skills: fe-auto-implement, shadcn, fe-route-island, …)
+│   ├── skills/  (53 skills: fe-auto-implement, shadcn, fe-route-island, …)
 │   └── skills-lock.json
 ├── docs/
 │   ├── deployment/
@@ -219,7 +219,8 @@ clinozy-fe/
 │   │       ├── extract-auth-screens-prompt.md
 │   │       ├── extract-screens-prompt.md
 │   │       ├── extract-system-surfaces-prompt.md
-│   │       ├── kickoff-prompt.md
+│   │       ├── iteration-planning-prompt.md
+│   │       ├── kickoff-iteration-prompt.md
 │   │       ├── README.md
 │   │       └── schema-routes-prompt.md
 │   ├── getting-started/
@@ -286,30 +287,34 @@ clinozy-fe/
 │   └── README.md
 ├── iterations/
 │   ├── launch-2026-09-30-jxmr/
-│   │   ├── _index.md
-│   │   ├── _patterns.md
-│   │   ├── _report.md
-│   │   ├── appointments.md
-│   │   ├── clinic-stock.md
-│   │   ├── Clinozy.dc.html
-│   │   ├── design-brief-preset.md
+│   │   ├── intake-files/
+│   │   │   ├── _index.md
+│   │   │   ├── _patterns.md
+│   │   │   ├── _report.md
+│   │   │   ├── appointments.md
+│   │   │   ├── clinic-stock.md
+│   │   │   ├── Clinozy.dc.html
+│   │   │   ├── design-brief-preset.md
+│   │   │   ├── leads.md
+│   │   │   ├── medical.md
+│   │   │   ├── offerings.md
+│   │   │   ├── patient-file.md
+│   │   │   ├── patients.md
+│   │   │   ├── payments.md
+│   │   │   ├── PRD.md
+│   │   │   ├── preset.md
+│   │   │   ├── schema-routes.md
+│   │   │   ├── shell.md
+│   │   │   ├── splash.md
+│   │   │   ├── support.js
+│   │   │   ├── tasks.md
+│   │   │   ├── today.md
+│   │   │   └── users.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
-│   │   ├── leads.md
-│   │   ├── medical.md
-│   │   ├── offerings.md
-│   │   ├── patient-file.md
-│   │   ├── patients.md
-│   │   ├── payments.md
-│   │   ├── PRD.md
-│   │   ├── preset.md
-│   │   ├── README.md
-│   │   ├── schema-routes.md
-│   │   ├── shell.md
-│   │   ├── splash.md
-│   │   ├── support.js
-│   │   ├── tasks.md
-│   │   ├── today.md
-│   │   └── users.md
+│   │   └── README.md
 │   └── README.md
 ├── plugins/
 │   ├── csp-api-origin.ts

@@ -4,36 +4,44 @@
 Incremental processes both assume it.
 
 The one job of this document: the rules and assets that do not change from one
-iteration to the next. The iteration rule itself — folders, modes, baselines —
-is in [the process index](README.md#iterations).
+iteration to the next. The flow and the iteration rules — folders, statuses,
+modes, baselines — are in [the process index](README.md).
 
 ---
 
 ## The skills
 
-Everything runs through two skills: **`fe-kickoff-planning`** plans
-([`agent-os/skills/fe-kickoff-planning/SKILL.md`](../../../agent-os/skills/fe-kickoff-planning/SKILL.md)),
-and **`fe-design-ditto`** builds
-([`agent-os/skills/fe-design-ditto/SKILL.md`](../../../agent-os/skills/fe-design-ditto/SKILL.md)).
-They auto-trigger on "kickoff", "ditto", "same as the html", "from legacy", or
-an `iterations/` path.
+Everything runs through three skills:
 
-They enforce one loop: **read → reconcile → gate → build → verify.** You never
-run the steps by hand — you drop specs in `iterations/<iteration>/` and say
-"kickoff <iteration>", and they drive.
+- **`fe-iteration-planning`** plans — no code
+  ([`agent-os/skills/fe-iteration-planning/SKILL.md`](../../../agent-os/skills/fe-iteration-planning/SKILL.md));
+  say "plan iteration <iteration>".
+- **`fe-kickoff-iteration`** builds the approved plan, one ledger row at a time
+  ([`agent-os/skills/fe-kickoff-iteration/SKILL.md`](../../../agent-os/skills/fe-kickoff-iteration/SKILL.md));
+  say "kickoff iteration <iteration>".
+- **`fe-design-ditto`** builds each screen faithfully to the source
+  ([`agent-os/skills/fe-design-ditto/SKILL.md`](../../../agent-os/skills/fe-design-ditto/SKILL.md));
+  the kickoff drives it per row, and "ditto" / "same as the html" call it
+  directly.
+
+They enforce one loop: **read → reconcile → gate → plan → approve → build →
+verify → record.** You never run the steps by hand — you place the drop with
+`pnpm iteration:intake`, say "plan iteration <iteration>", approve, then say
+"kickoff iteration <iteration>", and they drive.
 
 ## The assets
 
-| Asset                                                                     | Role                                               |
-| ------------------------------------------------------------------------- | -------------------------------------------------- |
-| [`kickoff-prompt.md`](../prompts/kickoff-prompt.md)                       | Starts a build with the skill's stop points intact |
-| [`design-intake-checklist.md`](../prompts/design-intake-checklist.md)     | The portable checklist the gate scores against     |
-| [`ditto-intake-checklist.md`](../prompts/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate             |
-| [`design-handoff.contract.json`](../prompts/design-handoff.contract.json) | Preset → token mapping                             |
-| `shadcn`                                                                  | Which primitive to reach for                       |
-| `fe-route-island`                                                         | Page structure + registrations                     |
-| `frontend-design`                                                         | Craft, once fidelity is met                        |
-| `fe-visual-regression`                                                    | Baselines (the pin step)                           |
+| Asset                                                                     | Role                                                |
+| ------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`iteration-planning-prompt.md`](../prompts/iteration-planning-prompt.md) | Starts planning with the skill's stop points intact |
+| [`kickoff-iteration-prompt.md`](../prompts/kickoff-iteration-prompt.md)   | Starts the build of an approved plan                |
+| [`design-intake-checklist.md`](../prompts/design-intake-checklist.md)     | The portable checklist the gate scores against      |
+| [`ditto-intake-checklist.md`](../prompts/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate              |
+| [`design-handoff.contract.json`](../prompts/design-handoff.contract.json) | Preset → token mapping                              |
+| `shadcn`                                                                  | Which primitive to reach for                        |
+| `fe-route-island`                                                         | Page structure + registrations                      |
+| `frontend-design`                                                         | Craft, once fidelity is met                         |
+| `fe-visual-regression`                                                    | Baselines (the pin step)                            |
 
 ## The four rules that never change
 
@@ -95,26 +103,27 @@ by a persisted value (is the field in `partialize`? does `migrate` reset it?).
 State in the recap: _"default = <variant>, pinned, not persisted."_ If you can't
 say that sentence, the variant isn't live.
 
-## The delta ledger — nothing closes with an open row
+## The ledger — nothing closes with an open row
 
 **The single biggest failure is a forgotten change: a delta item slips, the task
 looks done, the process stops half-finished.** Prevent it with a written ledger,
 kept from the first read to the last commit.
 
-**Before building** — turn the iteration's change into an explicit numbered
-list, one row per change, each with an assignee (`—` until someone takes it)
-and a status. Show it to the user:
+**Before building** — planning ends with the ledger in `KICKOFF.md`: every work
+item in build order (the route), one row each, approved before any code:
 
 ```text
-Delta ledger — <iteration>
-[ ] 1. <change>            — <file/surface>        — <assignee>   — not started
-[ ] 2. <change>            — <file/surface>        — <assignee>   — not started
-...
+| # | Work item | Kind | Depends on | Skill/driver | Acceptance | Assignee | Status |
+| 1 | <change>  | …    | —          | <skill>      | <how it's proved> | —  | open   |
 ```
 
-**While building** — update the row (`in progress` → `done`) as each lands.
-Never drop a row; if something turns out bigger than expected, split it into
-sub-rows rather than silently deferring it.
+**While building** — one row at a time: build it, verify it against its
+Acceptance, write its `AS-BUILT.md` entry (planned · built · difference · why ·
+decision · commit), and set its Status (`in progress` → `done`). Never drop a
+row. A small change inside the row is recorded in its entry; a scope change — a
+row added or removed, an Acceptance or the order changed — **stops for the
+user**, then goes into `plans/decisions.md` and AS-BUILT's revisions, and the
+KICKOFF row is marked `revised → AS-BUILT #n`.
 
 **Closing is blocked while any row is open.** The build is not done until **every
 row is `done`** — or explicitly `deferred` _with the user's OK recorded in the
@@ -165,7 +174,7 @@ source. Missing one of these is what makes a screen read as "not quite it":
 - [ ] **States** — hover, active, focus, disabled, loading, empty, error
 - [ ] **Motion** — transitions and durations
 
-Record each screen's walk in the delta ledger; a screen isn't `done` until every
+Record each screen's walk in its `AS-BUILT.md` entry; a screen isn't `done` until every
 box is checked against the source.
 
 ## The DONE definition (whenever you finish anything)
@@ -173,9 +182,9 @@ box is checked against the source.
 Functional checks cannot detect a fidelity defect — "the user can create the
 thing" passes while the UI matches nothing. So DONE is comparative:
 
-- **Delta ledger fully closed** — every row `done` (or `deferred` with recorded
+- **Ledger fully closed** — every row `done` (or `deferred` with recorded
   user OK). Reprint it in the recap. An open row means NOT done — no exceptions
-  (see _The delta ledger_ above).
+  (see _The ledger_ above).
 - **Per-screen UI checklist walked** — for every screen touched, each box in
   _Walk this list on EVERY screen_ checked against the source.
 - **Side-by-side** screenshot, source vs implementation, at **375px and 1440px**,
@@ -194,6 +203,6 @@ pnpm type-check && pnpm lint
 
 ---
 
-**Next:** [Initial iteration](initial-iteration.md) for the launch, or
-[Incremental iteration](incremental-iteration.md) for every `feat`, `change` or
-`fix` after it.
+**Next:** [Initial iteration](initial-iteration.md) when the Baseline is `none`
+(the first iteration in this repo), or [Incremental iteration](incremental-iteration.md)
+for every iteration with a Baseline.

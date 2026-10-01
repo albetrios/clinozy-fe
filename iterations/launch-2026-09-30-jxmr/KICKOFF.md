@@ -1,10 +1,13 @@
 # Clinozy launch — kickoff plan
 
-> **Status: plan only — awaiting your confirmation. Nothing is built.**
-> The four RED questions were answered on 2026-10-01 (D17–D20, Appendix C.2).
-> Before any build step, confirm or amend the decisions in §2 (D1–D16) and the
-> proposed defaults in Appendix D.
-> `fe-design-ditto` then executes §3–§8 in ledger order (§9).
+> **Status: approved plan — the iteration is `implementing` since 2026-10-01,**
+> when the folder moved to the two-phase workflow. The four RED questions were
+> answered on 2026-10-01 (D17–D20, Appendix C.2). The first ledger row (L-01)
+> confirms or amends D1–D16 and the Appendix D defaults before any build step.
+> `fe-kickoff-iteration` builds §3–§8 in ledger order (§9), each screen through
+> `fe-design-ditto`; what was actually built is recorded in `AS-BUILT.md`.
+> The received files are in `intake-files/`; every `file:line` below refers to
+> them, and `PRD.md` is the file exactly as delivered.
 
 ## 1. Header
 
@@ -14,8 +17,8 @@
 | Date             | 2026-10-01                                                                                                                                                                                                                                                                                                                                                      |
 | Product          | Clinozy — clinic operations for the front desk, doctors, pharmacy and money. Desktop 1440 and tablet 1024; phone is not designed, by decision (`_report.md:13`)                                                                                                                                                                                                 |
 | Sources          | 20 docs: `PRD.md` (the product brief), `schema-routes.md` (added after this plan, not yet read — L-61), `_index.md`, `_patterns.md`, `_report.md`, `preset.md`, `design-brief-preset.md`, `shell.md` and 12 screen specs · `Clinozy.dc.html` (5,929 lines: template H:8–2754, app script H:2755–5927) · `support.js` (1,911 lines; generic runtime, not ported) |
-| Planned by       | `fe-kickoff-planning` (this file)                                                                                                                                                                                                                                                                                                                               |
-| Built by         | `fe-design-ditto`, with the skills named per ledger row (§9)                                                                                                                                                                                                                                                                                                    |
+| Planned by       | `fe-iteration-planning` (this file)                                                                                                                                                                                                                                                                                                                             |
+| Built by         | `fe-kickoff-iteration`, driving `fe-design-ditto` and the skills named per ledger row (§9)                                                                                                                                                                                                                                                                      |
 | Readiness gate   | `docs/design-workflow/prompts/design-intake-checklist.md` Part B, with the clinozy-fe rules in `docs/design-workflow/prompts/ditto-intake-checklist.md`                                                                                                                                                                                                         |
 | Authority        | Prototype over md for behaviour. md-only additions build to the md only where §7.1 lists them. CLAUDE.md and the repo rules override both (§7.2)                                                                                                                                                                                                                |
 | Evidence         | `H:n` = `Clinozy.dc.html` line n · `<spec>.md:n` = spec line n · `S:n` = `support.js` line n                                                                                                                                                                                                                                                                    |
@@ -425,7 +428,7 @@ shadcn primitives to add (`pnpm dlx shadcn@latest add …`, `shadcn` skill):
   offers it.
 - **Fixtures** are seeded from the prototype's seed data and converted to the
   contracts. The prototype's duplicate patient sets (`PT_SEED` vs `PATIENTS`) merge into one. The prototype's seeds come first so
-  side-by-side screenshots match; the PRD's sample records (PRD.md:168) are added
+  side-by-side screenshots match; the PRD's sample records (PRD.md:153) are added
   alongside.
 
 ### 3.7 Access
@@ -594,7 +597,7 @@ steps included → regions, desktop and mobile together → content (fields, cop
 icons) → states → motion.
 
 **Pacing:** one screen at a time. After each, show the side-by-side comparison
-and wait for your OK before starting the next (`kickoff-prompt.md`, Pacing).
+and wait for your OK before starting the next (`kickoff-iteration-prompt.md`, Pacing).
 
 ### 6.0 Shared behaviour (all rooms)
 
@@ -647,7 +650,7 @@ and wait for your OK before starting the next (`kickoff-prompt.md`, Pacing).
 - Disabled controls are at 50% opacity.
 - On touch screens (the consult-room tablet), row actions and checkboxes are
   always visible, tooltips open on tap, and quick inputs get 44px targets
-  (H:43; PRD.md:241).
+  (H:43; PRD.md:223).
 
 **States** (prototype engine plus the md's per-room copy, §7.1):
 
@@ -756,7 +759,7 @@ and preview.
   `today.md:18` lists eight stages, including Done; the prototype has seven, and the Done lane is not built (D20).
 
 - **Selected lane panel:** cards `auto-fill minmax(210px, 1fr)` — name 13.5/500
-  with time, service, flag pills and the action button. A card click opens the booking drawer (`today.md:30`, PRD.md:48).
+  with time, service, flag pills and the action button. A card click opens the booking drawer (`today.md:30`, PRD.md:46).
 - **Aside (312px):** the Work queue — tasks with outcomes, filtered Mine /
   Everyone. Empty: "No one here right now." One task model with Tasks (Q-T3).
 - **Stage machine** (prototype):
@@ -1340,7 +1343,7 @@ follow-up, computed rather than the prototype's fixed "Oct 26 · 11:00".
   3. Clinical notes — Notes, Lab report, Today's procedure.
 - **Save** "Save prescription"; empty error "Add a medicine".
 - Unknown medicines are added to Medical as drafts (Q-M4). Print preview is an 820px drawer. "Save & sell" is dead in the prototype
-  (H:4571), but PRD Flow 2 needs it (PRD.md:132): build it to save the Rx and
+  (H:4571), but PRD Flow 2 needs it (PRD.md:118): build it to save the Rx and
   open the Medical sale prefilled.
 
 **Treatment drawer** (680px):
@@ -1441,7 +1444,7 @@ Q-M3 (near-expiry discount at sale).
 
 **Toolbar:** h1 "Clinic stock" · tabs Items · Purchases · Movements (they
 scroll) · search "Search item, category or supplier…" · saved views · Filters ·
-Columns · "Stock check" (Items only) · "New item" / "New purchase". The Vendors tab (`clinic-stock.md:3`, PRD.md:89) is built per Q-K1.
+Columns · "Stock check" (Items only) · "New item" / "New purchase". The Vendors tab (`clinic-stock.md:3`, PRD.md:81) is built per Q-K1.
 
 **Tables:**
 
@@ -1694,7 +1697,7 @@ views. Pay is gated by Create and Day close by the `dayclose` ability (Q-G4).
   - Snoozed: "No snoozed tasks";
   - Done: "Nothing resolved yet today".
 - **Access:** every role sees its own tasks; the Everyone scope is for Admin
-  (PRD.md:102). The prototype limits Tasks to Admin, Doctor, Front desk and
+  (PRD.md:92). The prototype limits Tasks to Admin, Doctor, Front desk and
   Counsellor, with Therapist view-only.
 
 ### 6.11 Offerings (`offerings/`, `/offerings/$tab`)
@@ -1896,7 +1899,7 @@ moved out of Settings — never duplicated.
 | Errors below the field, plus a toast naming the first missing field; email-format and 10-digit validation                                                                                                                                                                                 | `_patterns.md:13`, `appointments.md:40`, `users.md:29–30`                                                   | toasts only, after the save delay (H:4222–4224)                     |
 | Save disabled until dirty, and a discard guard (per Q-P1)                                                                                                                                                                                                                                 | `_patterns.md:12`                                                                                           | always enabled; Cancel closes                                       |
 | Per-room empty copy and hints. Users: "No team members yet" / "Invite doctors, therapists and front desk so work can be assigned." Payments: "Nothing to collect here" / "Receipts, invoices and dues show up as soon as a visit is billed." Offerings, Medical, Stock and Tasks likewise | `users.md:90`, `payments.md:85`, `offerings.md:86`, `medical.md:86`, `clinic-stock.md:82`, `tasks.md:79–81` | the generic "Nothing here yet. Try another tab or search." (H:4327) |
-| Every list's empty state offers its "New …" button                                                                                                                                                                                                                                        | `_patterns.md:52`, PRD.md:250                                                                               | missing in places (Offerings: `onNew` not passed)                   |
+| Every list's empty state offers its "New …" button                                                                                                                                                                                                                                        | `_patterns.md:52`, PRD.md:232                                                                               | missing in places (Offerings: `onNew` not passed)                   |
 | States the prototype lacks: Month loading skeleton; chat skeleton and error; Snoozed and Done empties                                                                                                                                                                                     | `appointments.md:105`, `leads.md:100`, `tasks.md:80–81`                                                     | none                                                                |
 | Shell: notifications bell, Tasks shortcut, the 36px system-banner strip                                                                                                                                                                                                                   | `shell.md:22, 56`                                                                                           | absent                                                              |
 | Manual "New task"                                                                                                                                                                                                                                                                         | `tasks.md:17`                                                                                               | unreachable (Q-T4)                                                  |
@@ -1995,7 +1998,7 @@ moved out of Settings — never duplicated.
      same room and state.
    - Per screen, walk the UI against the source: text, font size, colour,
      background, spacing, radius, border, shadow, icons, layout, states and
-     motion (`kickoff-prompt.md`, Verify & close).
+     motion (`kickoff-iteration-prompt.md`, Verify & close).
    - One right-to-left pass per screen, in Arabic at 1440px.
 2. **Static gates, every PR:**
 
@@ -2020,10 +2023,11 @@ moved out of Settings — never duplicated.
    selectors. After fidelity sign-off, light and dark baselines per route (`fe-visual-regression`), and the axe lane (`tests/e2e/accessibility.e2e.test.ts`).
 7. **Recap** (`fe-design-ditto` Step 6): the closed ledger, what was built,
    what still differs from the source and why, and what couldn't be verified.
-8. **Freeze** once the build matches: set `Status: frozen` in
-   `iterations/launch-2026-09-30-jxmr/README.md` in the last commit before this
-   iteration's branch merges to `main`. After the merge the folder is never
-   edited; a correction is a new `fix` iteration.
+8. **Close and freeze:** when every row is `done` (or `deferred` with the user's
+   OK) and `AS-BUILT.md` has its summary, run
+   `pnpm iteration:status launch-2026-09-30-jxmr done`; `frozen` goes in the last
+   commit before this iteration's branch merges to `main`. After the merge the
+   folder is never edited; a correction is a new `fix` iteration.
 
 ## 9. Delta ledger
 
@@ -2089,11 +2093,11 @@ is open.**
 | L-54 | Static, i18n, sync and build gates green                                                                                                                                                                                                                     | `fe-pre-pr-sweep`                                                                   | L-53                   | —        | open   |
 | L-55 | E2E smoke per room and the test-id inventory                                                                                                                                                                                                                 | `fe-e2e-testids`, `fe-playwright-e2e`                                               | L-53                   | —        | open   |
 | L-56 | Visual baselines, after fidelity sign-off                                                                                                                                                                                                                    | `fe-visual-regression`                                                              | L-55                   | —        | open   |
-| L-57 | AMBER — confirm from the source at build: Visit sheet icons and strings (H:2258–2457); the reschedule copy (PRD.md:252); `info` = sky; the 34 long-tail colours in Appendix E                                                                                | `fe-design-ditto`                                                                   | per screen             | —        | open   |
-| L-58 | Freeze the iteration: set `Status: frozen` in its README in the last commit before merging to `main`                                                                                                                                                         | —                                                                                   | L-54–L-57              | —        | open   |
+| L-57 | AMBER — confirm from the source at build: Visit sheet icons and strings (H:2258–2457); the reschedule copy (PRD.md:234); `info` = sky; the 34 long-tail colours in Appendix E                                                                                | `fe-design-ditto`                                                                   | per screen             | —        | open   |
+| L-58 | Close the iteration: `pnpm iteration:status … done` once `AS-BUILT.md` has its summary; `frozen` in the last commit before merging to `main`                                                                                                                 | —                                                                                   | L-54–L-57              | —        | open   |
 | L-59 | Brand identity: the Clinozy mark in `BrandLogo`, `public/app-icon.svg` and its PNGs, the manifest colours (`app-manifest.ts`), the HTML splash mark                                                                                                          | `fe-pwa-manifest`                                                                   | L-04; with L-09        | —        | open   |
 | L-60 | Hand Appendix F to clinozy-be. As each API lands, remove that room's `REPLACE_WITH_API` markers and enable its module in production (D8)                                                                                                                     | — (clinozy-be)                                                                      | L-24                   | —        | open   |
-| L-61 | Read `iterations/launch-2026-09-30-jxmr/schema-routes.md` (93 routes, 40 entities; added after this plan) in full, add it to the coverage matrix, and reconcile §4 and the contracts against it                                                              | `fe-kickoff-planning`                                                               | —                      | —        | open   |
+| L-61 | Read `iterations/launch-2026-09-30-jxmr/intake-files/schema-routes.md` (93 routes, 40 entities; added after this plan) in full, add it to the coverage matrix, and reconcile §4 and the contracts against it                                                 | `fe-iteration-planning`                                                             | —                      | —        | open   |
 
 ## Appendix A — Coverage matrix
 
@@ -2168,7 +2172,7 @@ that a reader only mentioned, without reading them, were excluded.
   | Signed-out overlay; "How data connects"; Blueprint                           | out (D2). The explainer and Blueprint stay as domain-rule sources (Q-F3) |
   | WhatsApp status chip, role lens, stat rail, funnel, pipeline, legacy threads | dead                                                                     |
 
-- **Prototype probes** (`fe-kickoff-planning` Step 2):
+- **Prototype probes** (`fe-iteration-planning` Step 3):
   - **Responsive:** the only media rules are dark-on-screen (H:12), reduced
     motion (H:13, H:135, H:201), hover capability (H:43, H:236) and print
     (H:256), plus container queries (H:129–131, H:240–244). All are planned.
@@ -2177,7 +2181,7 @@ that a reader only mentioned, without reading them, were excluded.
   - **Colours:** 13 neutral steps and 127 accent variables, all used; each is
     mapped in Appendix E.
 - **Other findings:**
-  - `schema-routes.md` (93 routes, cited at PRD.md:261) was added on 2026-10-01,
+  - `schema-routes.md` (93 routes, cited at PRD.md:243) was added on 2026-10-01,
     after this plan was written. It is in `iterations/launch-2026-09-30-jxmr/` but not yet read
     or reconciled (L-61).
   - The global intake checklist was missing. It's now vendored at
@@ -2425,38 +2429,38 @@ answer, M = the screen md.
 | #   | Fact                  | PRD says                                                                                                      | Prototype / plan says                                                                            | Winner                 | Action                                                                 |
 | --- | --------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------- | ---------------------------------------------------------------------- |
 | R1  | Roles                 | Marketing; Owner / Admin (PRD.md:23–24)                                                                       | 7 roles, no Marketing (H:3352)                                                                   | PRD                    | seed a Marketing role (Q-U2)                                           |
-| R2  | Today stages          | 8, including Done (PRD.md:47)                                                                                 | 7 lanes (H:398–475); you kept the prototype (D20)                                                | You                    | **confirm D20 stands**, or add the Done lane                           |
-| R3  | Today card click      | opens the appointment form drawer (PRD.md:48)                                                                 | AMBER (H:397–475); `today.md:30` agrees with the PRD                                             | PRD + M                | card click opens the booking drawer                                    |
-| R4  | Today "New"           | one split "New ⌄": appointment, walk-in, lead, payment (PRD.md:48)                                            | two buttons, "New booking" and "Walk-in" (H:404, H:5835)                                         | P                      | keep two buttons; their targets per Q-T2                               |
-| R5  | Leads access          | Front desk, Marketing, Counsellor, Owner (PRD.md:53)                                                          | Admin, Doctor, Front desk, Counsellor (H:3392–3393); doctors appear in the assign rules (H:5464) | PRD + P                | union of both (Q-L5)                                                   |
-| R6  | Leads columns         | + follow-up date, last message (PRD.md:54)                                                                    | Lead · Status · Source · Interested in · Team · Updated (H:5899)                                 | P                      | no change (as `leads.md:23`, B.6 L1)                                   |
-| R7  | Appointment resources | by doctor, room and machine; Day / Week by resource plus List (PRD.md:59–61); room/machine field (PRD.md:150) | doctor-only; Agenda / Day / Week / Month; resource calendar dead (H:1817, H:3311–3318)           | P for UI, PRD for data | optional room/machine in the contract; UI doctor-only (Q-A1)           |
-| R8  | Patients columns      | + last visit, doctor (PRD.md:68)                                                                              | no such columns (H:4459)                                                                         | P                      | no change                                                              |
-| R9  | New patient fields    | include consent and first photos (PRD.md:69)                                                                  | only the quick-add form has them                                                                 | PRD                    | one drawer with both (Q-P2)                                            |
-| R10 | File tabs             | no Overview, Visits or Reports (PRD.md:75)                                                                    | 11 sections (H:4685); Overview is the default (D19)                                              | You + P                | keep; the PRD list is a subset                                         |
-| R11 | File access           | Accountant reads billing (PRD.md:74)                                                                          | Accountant has no Patients access (H:3392–3393)                                                  | PRD                    | Accountant reads Invoices and Payments (Q-F1)                          |
-| R12 | Log feedback          | a dropdown (PRD.md:76)                                                                                        | a 560px picker drawer (H:4170)                                                                   | P                      | no change (B.9 F5)                                                     |
-| R13 | Stock access          | Therapist, Front desk, Owner (PRD.md:88)                                                                      | Admin, Pharmacist; Accountant view-only (H:3392–3393)                                            | PRD + M                | Q-K2                                                                   |
-| R14 | Stock tabs            | Items · Movements · Purchases · Vendors (PRD.md:89); vendors have name, phone, connections (PRD.md:161)       | no Vendors tab (H:1111–1174)                                                                     | PRD + M                | build a Vendors table (Q-K1)                                           |
-| R15 | Use on next bill      | a Pending action (PRD.md:97)                                                                                  | `crAdjust` exists but is unreachable (H:4189, H:546)                                             | PRD                    | wire it (Q-G9)                                                         |
-| R16 | Tasks                 | every role sees its own tasks, Owner sees all; new task (PRD.md:102, 104)                                     | Admin, Doctor, Front desk, Counsellor; Therapist view-only; no New task                          | PRD                    | every role, own tasks; build New task (Q-T4)                           |
-| R17 | Offerings             | minimum price shown (PRD.md:110)                                                                              | a floor field behind the `floor` ability, no column (H:5258)                                     | P                      | no column                                                              |
-| R18 | User drawer           | Profile → Access → Hours (PRD.md:118)                                                                         | 2 steps (H:3609–3610)                                                                            | P                      | no change (B.11 U2)                                                    |
-| R19 | User fields           | no password (PRD.md:165)                                                                                      | a password field (H:4928)                                                                        | PRD + You              | invitation, no password (D17)                                          |
-| R20 | "Save & sell"         | Flow 2 depends on it (PRD.md:132)                                                                             | dead (H:4571)                                                                                    | PRD                    | build it: save the Rx, then open the Medical sale prefilled            |
-| R21 | Aftercare task        | Flow 3 creates it, then a call-back on a bad check-in (PRD.md:138–140)                                        | no aftercare task; the call-back exists (C report)                                               | PRD                    | yes (Q-F7)                                                             |
-| R22 | Ids                   | Patient P-####; PAY-####, INV- / S-, CN-### (PRD.md:149–157)                                                  | #3508, PT-0412 (B report)                                                                        | PRD                    | Q-X4                                                                   |
-| R23 | Appointment statuses  | no No show (PRD.md:150)                                                                                       | No show is a status (H:5655)                                                                     | P                      | keep No show                                                           |
-| R24 | Invoice types         | Clinic, Medical (PRD.md:156)                                                                                  | plus Consultation (H:3397)                                                                       | P                      | keep three                                                             |
-| R25 | Tablet                | row actions always visible, tap tooltips, 44px quick inputs (PRD.md:241)                                      | actions shown on touch (H:43); touch tooltip 1,400ms                                             | agree                  | §6.0                                                                   |
-| R26 | Empty states          | every list offers its "New …" button (PRD.md:250)                                                             | missing in places (Offerings, G report)                                                          | PRD + M                | §7.1                                                                   |
-| R27 | Sorting               | every list sorts (PRD.md:253)                                                                                 | the ledger and Branches sort nothing (H:4870, H:4960)                                            | P                      | no change                                                              |
-| R28 | Appointment filters   | include type (PRD.md:253)                                                                                     | Appointed to, Status, Created, Follow-up (H:1822–1844)                                           | P                      | no change                                                              |
-| R29 | Reschedule copy       | "a new reminder goes out on save" (PRD.md:252)                                                                | not confirmed in the booking drawer                                                              | AMBER                  | L-57                                                                   |
-| R30 | Route schema          | `iterations/launch-2026-09-30-jxmr/schema-routes.md`, 93 routes (PRD.md:261)                                  | added 2026-10-01, after this plan; not yet read                                                  | —                      | reconcile §4 against it (L-61); §4 stands until then                   |
-| R31 | Verify-email banner   | open question (PRD.md:217, 260)                                                                               | absent                                                                                           | plan                   | build it: a platform surface, relocate never delete (§3.2)             |
-| R32 | Landing               | the splash fades into Today (PRD.md:41)                                                                       | opens Leads (H:4255)                                                                             | PRD + M                | Today (Q-T1)                                                           |
-| R33 | Sample data           | realistic rows (PRD.md:168)                                                                                   | the prototype's seeds                                                                            | P                      | prototype seeds for screenshot parity; PRD rows added alongside (§3.6) |
+| R2  | Today stages          | 8, including Done (PRD.md:45)                                                                                 | 7 lanes (H:398–475); you kept the prototype (D20)                                                | You                    | **confirm D20 stands**, or add the Done lane                           |
+| R3  | Today card click      | opens the appointment form drawer (PRD.md:46)                                                                 | AMBER (H:397–475); `today.md:30` agrees with the PRD                                             | PRD + M                | card click opens the booking drawer                                    |
+| R4  | Today "New"           | one split "New ⌄": appointment, walk-in, lead, payment (PRD.md:46)                                            | two buttons, "New booking" and "Walk-in" (H:404, H:5835)                                         | P                      | keep two buttons; their targets per Q-T2                               |
+| R5  | Leads access          | Front desk, Marketing, Counsellor, Owner (PRD.md:50)                                                          | Admin, Doctor, Front desk, Counsellor (H:3392–3393); doctors appear in the assign rules (H:5464) | PRD + P                | union of both (Q-L5)                                                   |
+| R6  | Leads columns         | + follow-up date, last message (PRD.md:51)                                                                    | Lead · Status · Source · Interested in · Team · Updated (H:5899)                                 | P                      | no change (as `leads.md:23`, B.6 L1)                                   |
+| R7  | Appointment resources | by doctor, room and machine; Day / Week by resource plus List (PRD.md:55–57); room/machine field (PRD.md:135) | doctor-only; Agenda / Day / Week / Month; resource calendar dead (H:1817, H:3311–3318)           | P for UI, PRD for data | optional room/machine in the contract; UI doctor-only (Q-A1)           |
+| R8  | Patients columns      | + last visit, doctor (PRD.md:63)                                                                              | no such columns (H:4459)                                                                         | P                      | no change                                                              |
+| R9  | New patient fields    | include consent and first photos (PRD.md:64)                                                                  | only the quick-add form has them                                                                 | PRD                    | one drawer with both (Q-P2)                                            |
+| R10 | File tabs             | no Overview, Visits or Reports (PRD.md:69)                                                                    | 11 sections (H:4685); Overview is the default (D19)                                              | You + P                | keep; the PRD list is a subset                                         |
+| R11 | File access           | Accountant reads billing (PRD.md:68)                                                                          | Accountant has no Patients access (H:3392–3393)                                                  | PRD                    | Accountant reads Invoices and Payments (Q-F1)                          |
+| R12 | Log feedback          | a dropdown (PRD.md:70)                                                                                        | a 560px picker drawer (H:4170)                                                                   | P                      | no change (B.9 F5)                                                     |
+| R13 | Stock access          | Therapist, Front desk, Owner (PRD.md:80)                                                                      | Admin, Pharmacist; Accountant view-only (H:3392–3393)                                            | PRD + M                | Q-K2                                                                   |
+| R14 | Stock tabs            | Items · Movements · Purchases · Vendors (PRD.md:81); vendors have name, phone, connections (PRD.md:146)       | no Vendors tab (H:1111–1174)                                                                     | PRD + M                | build a Vendors table (Q-K1)                                           |
+| R15 | Use on next bill      | a Pending action (PRD.md:88)                                                                                  | `crAdjust` exists but is unreachable (H:4189, H:546)                                             | PRD                    | wire it (Q-G9)                                                         |
+| R16 | Tasks                 | every role sees its own tasks, Owner sees all; new task (PRD.md:92, 104)                                      | Admin, Doctor, Front desk, Counsellor; Therapist view-only; no New task                          | PRD                    | every role, own tasks; build New task (Q-T4)                           |
+| R17 | Offerings             | minimum price shown (PRD.md:99)                                                                               | a floor field behind the `floor` ability, no column (H:5258)                                     | P                      | no column                                                              |
+| R18 | User drawer           | Profile → Access → Hours (PRD.md:106)                                                                         | 2 steps (H:3609–3610)                                                                            | P                      | no change (B.11 U2)                                                    |
+| R19 | User fields           | no password (PRD.md:150)                                                                                      | a password field (H:4928)                                                                        | PRD + You              | invitation, no password (D17)                                          |
+| R20 | "Save & sell"         | Flow 2 depends on it (PRD.md:118)                                                                             | dead (H:4571)                                                                                    | PRD                    | build it: save the Rx, then open the Medical sale prefilled            |
+| R21 | Aftercare task        | Flow 3 creates it, then a call-back on a bad check-in (PRD.md:123–125)                                        | no aftercare task; the call-back exists (C report)                                               | PRD                    | yes (Q-F7)                                                             |
+| R22 | Ids                   | Patient P-####; PAY-####, INV- / S-, CN-### (PRD.md:134–142)                                                  | #3508, PT-0412 (B report)                                                                        | PRD                    | Q-X4                                                                   |
+| R23 | Appointment statuses  | no No show (PRD.md:135)                                                                                       | No show is a status (H:5655)                                                                     | P                      | keep No show                                                           |
+| R24 | Invoice types         | Clinic, Medical (PRD.md:141)                                                                                  | plus Consultation (H:3397)                                                                       | P                      | keep three                                                             |
+| R25 | Tablet                | row actions always visible, tap tooltips, 44px quick inputs (PRD.md:223)                                      | actions shown on touch (H:43); touch tooltip 1,400ms                                             | agree                  | §6.0                                                                   |
+| R26 | Empty states          | every list offers its "New …" button (PRD.md:232)                                                             | missing in places (Offerings, G report)                                                          | PRD + M                | §7.1                                                                   |
+| R27 | Sorting               | every list sorts (PRD.md:235)                                                                                 | the ledger and Branches sort nothing (H:4870, H:4960)                                            | P                      | no change                                                              |
+| R28 | Appointment filters   | include type (PRD.md:235)                                                                                     | Appointed to, Status, Created, Follow-up (H:1822–1844)                                           | P                      | no change                                                              |
+| R29 | Reschedule copy       | "a new reminder goes out on save" (PRD.md:234)                                                                | not confirmed in the booking drawer                                                              | AMBER                  | L-57                                                                   |
+| R30 | Route schema          | `iterations/launch-2026-09-30-jxmr/intake-files/schema-routes.md`, 93 routes (PRD.md:243)                     | added 2026-10-01, after this plan; not yet read                                                  | —                      | reconcile §4 against it (L-61); §4 stands until then                   |
+| R31 | Verify-email banner   | open question (PRD.md:200, 260)                                                                               | absent                                                                                           | plan                   | build it: a platform surface, relocate never delete (§3.2)             |
+| R32 | Landing               | the splash fades into Today (PRD.md:40)                                                                       | opens Leads (H:4255)                                                                             | PRD + M                | Today (Q-T1)                                                           |
+| R33 | Sample data           | realistic rows (PRD.md:153)                                                                                   | the prototype's seeds                                                                            | P                      | prototype seeds for screenshot parity; PRD rows added alongside (§3.6) |
 
 ## Appendix C — Readiness gate (RED / AMBER)
 
@@ -2564,7 +2568,7 @@ AMBER item is a ledger row (L-57) or an Appendix D default.
 ### C.3 AMBER — resolve before "done" (ledger L-57)
 
 - the Visit sheet's icons and strings (H:2258–2457);
-- the reschedule copy "a new reminder goes out on save" (PRD.md:252);
+- the reschedule copy "a new reminder goes out on save" (PRD.md:234);
 - `info` = sky tone (a plan choice);
 - the 34 long-tail colours in Appendix E (ΔE above 0.03);
 - icon export names (`FileIcon`, `ImageIcon`, `LinkIcon`);
@@ -2583,7 +2587,7 @@ Confirm in bulk or amend by ID. A default applies once you confirm it.
 | Q-X1 | Source of the 10 non-English locale files                       | parity gate; D14                     | Machine-translated drafts per room in the same PR, flagged for native review; English authored verbatim                                                                                       |
 | Q-X2 | Print and patient-message languages (English / ગુજરાતી / हिंदी) | Visit sheet Rx print; Blueprint      | English only in launch; Gujarati and Hindi templates later                                                                                                                                    |
 | Q-X3 | Money precision in contracts                                    | `inrF` (H:3350); print `r2` (H:4176) | Integer paise; ₹ formatting at the edge                                                                                                                                                       |
-| Q-X4 | ID display formats                                              | H:4174, H:4865, H:3809; B.13 R22     | The PRD's (PRD.md:149–157): Patient P-####, PAY-####, INV- / S-, CN-###; server-issued, mimicked by fixtures                                                                                  |
+| Q-X4 | ID display formats                                              | H:4174, H:4865, H:3809; B.13 R22     | The PRD's (PRD.md:134–142): Patient P-####, PAY-####, INV- / S-, CN-###; server-issued, mimicked by fixtures                                                                                  |
 | Q-P1 | Drawer dirty rules                                              | B.3 P2; B.7 AP7–AP8                  | Edit: Save disabled until dirty. Create: Save enabled, validated on submit. Closing a dirty drawer asks "Discard changes?". The label stays "Cancel". The contact editor commits only on Done |
 | Q-P2 | One patient-create form or two                                  | §6.5                                 | One drawer; consent and first photos join step 2; pickers open it as a child drawer                                                                                                           |
 | Q-P3 | j/k row navigation                                              | Leads only (H:4271)                  | Every table                                                                                                                                                                                   |
@@ -2620,7 +2624,7 @@ Confirm in bulk or amend by ID. A default applies once you confirm it.
 | Q-L9  | Owner activity resets the hold; replies auto-add involved people           | the copy (H:5498, H:1611) vs the code (H:5412–5416) | Yes — build what the copy promises                                                                                                                |
 | Q-L10 | WhatsApp outage signal; message states                                     | H:4337, H:5833                                      | Fixture-driven; the outage line stays hidden until the backend sends a signal                                                                     |
 | Q-L11 | Dead extras: stat rail, funnel, pipeline, re-target list, timeline filters | B.12                                                | Not built                                                                                                                                         |
-| Q-A1  | Rooms and machines                                                         | B.7 AP2; B.13 R7                                    | An optional room or machine on each appointment in the contract (PRD.md:150); the calendar stays doctor-only, and resource views come later       |
+| Q-A1  | Rooms and machines                                                         | B.7 AP2; B.13 R7                                    | An optional room or machine on each appointment in the contract (PRD.md:135); the calendar stays doctor-only, and resource views come later       |
 | Q-A2  | Day view: merged, or one column per doctor                                 | B.7 AP3                                             | Merged, with the doctor filter                                                                                                                    |
 | Q-A3  | Source of bookable hours                                                   | B.7 AP15                                            | Grid 9:00–22:00; slots from branch opening hours and the doctor's working days and hours (Users); clicks outside hours warn                       |
 | Q-A4  | Conflict rule                                                              | B.7 AP16                                            | Same doctor, overlapping time                                                                                                                     |
@@ -2642,7 +2646,7 @@ Confirm in bulk or amend by ID. A default applies once you confirm it.
 
 | ID   | Question                                 | Evidence                                | Proposed default                                                                                                                                                                                           |
 | ---- | ---------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Q-F1 | Per-section access                       | B.9 F9; B.13 R11                        | Room-level access, plus the `clinical` ability for clinical sections; the Accountant reads Invoices and Payments in the file (PRD.md:74)                                                                   |
+| Q-F1 | Per-section access                       | B.9 F9; B.13 R11                        | Room-level access, plus the `clinical` ability for clinical sections; the Accountant reads Invoices and Payments in the file (PRD.md:68)                                                                   |
 | Q-F2 | The rail on tablets                      | B.9 F3                                  | Prototype: the rail hides below 1000px (1280px with Activity); identity moves to the file bar                                                                                                              |
 | Q-F3 | Record lifecycle                         | "What remove does" (H:2508–2512)        | Follow it: packages close, appointments cancel, sessions reverse, payments refund, invoices get a credit note, prescriptions stop, complaints / diagnosis / follow-ups delete, plans withdraw, photos hide |
 | Q-F4 | Privacy masking scope                    | masked rail, unmasked tables (C report) | Mask money and phones across the whole file by default, tables included; reveal per session                                                                                                                |
@@ -2657,8 +2661,8 @@ Confirm in bulk or amend by ID. A default applies once you confirm it.
 | Q-M5 | Medical's default tab                    | B.10 M1                                 | Sales                                                                                                                                                                                                      |
 | Q-M6 | "Send payment reminders"                 | a toast stub                            | Hidden until messaging exists                                                                                                                                                                              |
 | Q-M7 | PO print                                 | a toast stub                            | Not in launch                                                                                                                                                                                              |
-| Q-K1 | A Vendors tab                            | B.10 K1; B.13 R14                       | Build it (PRD.md:89, `clinic-stock.md:3`), modelled on Medical's Suppliers table: name, phone, connections (PRD.md:161)                                                                                    |
-| Q-K2 | Stock access                             | B.10 K2; B.13 R13                       | PRD roles (PRD.md:88): Therapist and Front desk view and use stock; Admin full; Pharmacist and Accountant as the prototype                                                                                 |
+| Q-K1 | A Vendors tab                            | B.10 K1; B.13 R14                       | Build it (PRD.md:81, `clinic-stock.md:3`), modelled on Medical's Suppliers table: name, phone, connections (PRD.md:146)                                                                                    |
+| Q-K2 | Stock access                             | B.10 K2; B.13 R13                       | PRD roles (PRD.md:80): Therapist and Front desk view and use stock; Admin full; Pharmacist and Accountant as the prototype                                                                                 |
 
 ### D.5 Payments, Offerings and Users
 
@@ -2671,7 +2675,7 @@ Confirm in bulk or amend by ID. A default applies once you confirm it.
 | Q-G5  | Split payments in Day close                                   | H:4872                           | Each mode row counts under its mode; Credit separately                                                                                                                                                                            |
 | Q-G6  | Branch scoping                                                | no record stores a branch        | Per branch, following the header branch                                                                                                                                                                                           |
 | Q-G7  | Overall discount after GST                                    | H:3419                           | Before tax (the Blueprint's rule)                                                                                                                                                                                                 |
-| Q-G9  | "Use on next bill"                                            | B.11 G8; B.13 R15                | Build it: wire the prototype's unreachable `crAdjust` (PRD.md:97)                                                                                                                                                                 |
+| Q-G9  | "Use on next bill"                                            | B.11 G8; B.13 R15                | Build it: wire the prototype's unreachable `crAdjust` (PRD.md:88)                                                                                                                                                                 |
 | Q-G10 | Reversing settled payments                                    | dead Undo drawer                 | Not in launch                                                                                                                                                                                                                     |
 | Q-G11 | Day-close review columns                                      | H:4900 bug                       | Ref · What · When · From/to · Mode · Amount · State · Checked                                                                                                                                                                     |
 | Q-G12 | Dues ageing (7 / 30 days)                                     | H:3421 (dead)                    | Only on the rail's Due card                                                                                                                                                                                                       |
@@ -2890,5 +2894,4 @@ Every room ships on fixtures. Each row below unblocks its rooms in production
       (§7).
 - [x] **The ledger** covers all the work: 61 rows, all open (§9).
 
-**Stop.** Nothing is built until you confirm. RED-1–4 are answered (D17–D20). Next: confirm D10 and the rest of §2, and confirm or amend Appendix D. `fe-design-ditto` then starts at
-L-02.
+**Approved** (2026-10-01, on the move to the two-phase workflow). RED-1–4 are answered (D17–D20). `fe-kickoff-iteration` builds the ledger from L-01: confirm D10 and the rest of §2, confirm or amend Appendix D, then L-02 onward.
