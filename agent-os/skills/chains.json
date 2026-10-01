@@ -135,6 +135,21 @@
         "fe-agent-os-authoring",
         "fe-documentation-maintenance"
       ]
+    },
+    "legacy-build": {
+      "description": "Planning and building a design version from a legacy/vN/ drop (markdown specs + optional prototype).",
+      "trigger": "legacy/**",
+      "steps": [
+        "fe-kickoff-planning",
+        "fe-legacy-ditto",
+        "fe-route-island",
+        "fe-test-generation"
+      ],
+      "optional": [
+        "fe-page-scaffolding",
+        "fe-theme-axis-audit",
+        "fe-visual-regression"
+      ]
     }
   }
 }

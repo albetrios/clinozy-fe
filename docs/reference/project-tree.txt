@@ -187,7 +187,7 @@ clinozy-fe/
 │   │   ├── fe-testing-requirements.mdc
 │   │   ├── fe-theme-axis-audit.mdc
 │   │   └── fe-ui-sources.mdc
-│   ├── skills/  (50 skills: fe-auto-implement, shadcn, fe-route-island, …)
+│   ├── skills/  (52 skills: fe-auto-implement, shadcn, fe-route-island, …)
 │   └── skills-lock.json
 ├── docs/
 │   ├── deployment/
@@ -263,7 +263,48 @@ clinozy-fe/
 │   │   ├── 2026-06-29-codebase-audit-loop.md
 │   │   ├── 2026-09-24-production-readiness.md
 │   │   └── README.md
+│   ├── superpower/
+│   │   ├── design/
+│   │   │   ├── auth-public-routes-brief.md
+│   │   │   ├── claude-theme-preset.json
+│   │   │   ├── design-brief-prompt.md
+│   │   │   ├── design-handoff.contract.json
+│   │   │   ├── design-overview-prompt.md
+│   │   │   ├── ditto-intake-checklist.md
+│   │   │   ├── extract-auth-screens-prompt.md
+│   │   │   ├── extract-screens-prompt.md
+│   │   │   ├── extract-system-surfaces-prompt.md
+│   │   │   ├── kickoff-prompt.md
+│   │   │   ├── README.md
+│   │   │   └── schema-routes-prompt.md
+│   │   └── process/
+│   │       ├── 1-common-adoption.md
+│   │       ├── 2-initial-implementation.md
+│   │       ├── 3-incremental-implementation.md
+│   │       └── README.md
 │   └── README.md
+├── legacy/
+│   └── v1/
+│       ├── _index.md
+│       ├── _patterns.md
+│       ├── _report.md
+│       ├── appointments.md
+│       ├── clinic-stock.md
+│       ├── Clinozy.dc.html
+│       ├── design-brief-preset.md
+│       ├── leads.md
+│       ├── medical.md
+│       ├── offerings.md
+│       ├── patient-file.md
+│       ├── patients.md
+│       ├── payments.md
+│       ├── preset.md
+│       ├── shell.md
+│       ├── splash.md
+│       ├── support.js
+│       ├── tasks.md
+│       ├── today.md
+│       └── users.md
 ├── plugins/
 │   ├── csp-api-origin.ts
 │   ├── i18n-build.ts
@@ -1548,6 +1589,7 @@ clinozy-fe/
 │   │   ├── i18n-locale-parity.mjs
 │   │   ├── identity-allowlist.txt
 │   │   ├── identity.mjs
+│   │   ├── large-staged-files.sh
 │   │   ├── lockfile-sync.sh
 │   │   ├── logical-css.sh
 │   │   ├── no-bare-intl.mjs
@@ -1562,7 +1604,7 @@ clinozy-fe/
 │   │   ├── theme-axis.sh
 │   │   ├── theme-catalog.mjs
 │   │   ├── vite-env-reads.mjs
-│   │   └── [2 test files]
+│   │   └── [3 test files]
 │   ├── load-env-files.mjs
 │   └── README.md
 ├── .commitlintrc.json

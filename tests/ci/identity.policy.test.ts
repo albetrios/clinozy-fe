@@ -1,4 +1,13 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -311,11 +320,33 @@ describe('product identity', () => {
       // encoding the previous logo, so a derived product fixes the 2 dark failures
       // and ships 3 baselines asserting the old brand is correct. `pnpm rebrand`
       // deletes them so the next `test:visual` fails loudly instead.
-      const baselines = staleBaselines(ROOT);
-      expect(baselines.length).toBeGreaterThan(0);
-      for (const file of baselines) {
-        expect(file).toMatch(/^tests\/e2e\/visual\.e2e\.test\.ts-snapshots\/.+\.png$/);
+      //
+      // Probed on a scratch tree, not the repo: right after a rename the repo has
+      // NO baselines (rebrand deleted them, and only a local `test:visual` run
+      // against the backend can regenerate them), so asserting on the real folder
+      // reddened CI for every PR until someone did.
+      const scratch = mkdtempSync(join(tmpdir(), 'identity-baselines-'));
+      try {
+        const snapshots = join(scratch, 'tests/e2e/visual.e2e.test.ts-snapshots');
+        mkdirSync(snapshots, { recursive: true });
+        for (const name of [
+          'login-light-chromium.png',
+          'login-dark-chromium.png',
+          'notes.md',
+        ]) {
+          writeFileSync(join(snapshots, name), '');
+        }
+        expect(staleBaselines(scratch)).toEqual([
+          'tests/e2e/visual.e2e.test.ts-snapshots/login-dark-chromium.png',
+          'tests/e2e/visual.e2e.test.ts-snapshots/login-light-chromium.png',
+        ]);
+      } finally {
+        rmSync(scratch, { recursive: true, force: true });
       }
+      // That folder is Playwright's default `<spec>-snapshots` for the visual spec,
+      // so the helper looks exactly where `toHaveScreenshot` writes.
+      expect(read('tests/e2e/visual.e2e.test.ts')).toContain('toHaveScreenshot(');
+      expect(read('playwright.config.ts')).not.toMatch(/snapshot(?:PathTemplate|Dir)/);
       // Pins the wiring: the helper existing is useless if rebrand never calls it.
       expect(read('tooling/identity/rebrand.mjs')).toContain('staleBaselines(ROOT)');
     });

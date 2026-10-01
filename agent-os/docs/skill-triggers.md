@@ -28,6 +28,8 @@ Read in order; **project guardrails always win** over skill suggestions.
 | When the task is…                              | Run skill(s)                                                                  |
 | ---------------------------------------------- | ----------------------------------------------------------------------------- |
 | a new page / route                             | `fe-page-scaffolding` → `fe-route-island`                                     |
+| kickoff / plan a `legacy/vN/` design drop      | `fe-kickoff-planning` (plan + ledger; stops for confirmation)                 |
+| build from `legacy/` specs ("ditto")           | `fe-legacy-ditto` (after a confirmed kickoff)                                 |
 | adding a validate gate / enforced lint rule    | `fe-guard-authoring`                                                          |
 | opening a PR / "ready for review"              | `fe-pre-pr-sweep`                                                             |
 | user-facing copy / dates / numbers / money     | `fe-i18n-constants` → `fe-locale-formatting`                                  |
@@ -81,6 +83,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | `package.json` · `pnpm-lock.yaml` · `pnpm.overrides`                                           | `fe-dependency-management`                                                                                 |
 | `tooling/validate/**` · `eslint.config.mjs` restrictions · `pr-ci.yml` static-sync steps       | `fe-guard-authoring` (probe both directions; wire into CI, not just health-check)                          |
 | `agent-os/skills/**` · `agent-os/rules/**`                                                     | `fe-agent-os-authoring` (eight surfaces; regenerate the tree last)                                         |
+| `legacy/**`                                                                                    | `fe-kickoff-planning` (plan), `fe-legacy-ditto` (build)                                                    |
 | `src/locales/**` · `*.constants.ts` copy keys                                                  | `fe-i18n-constants` → `fe-locale-formatting` (if dates/numbers)                                            |
 | `src/lib/i18n/format.ts` · `useLocaleFormat/` · any date/number/money render                   | `fe-locale-formatting`                                                                                     |
 | `useLocaleStore/` · `public/locale-init.js` · `BUILD_I18N_MODE`                                | `fe-locale-preferences`                                                                                    |
