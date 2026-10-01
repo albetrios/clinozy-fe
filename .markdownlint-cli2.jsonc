@@ -30,6 +30,9 @@
     // make the two copies drift.
     "iterations/*/schema-routes.md",
     "iterations/*/README.md",
+    // The templates `pnpm iteration:new` fills, byte-identical to clinozy-be's
+    // tooling/iterations/templates/ so `--both` writes the same files from either repo.
+    "tooling/iterations/templates/**",
     ".claude/**",
     ".netlify/**",
     ".pnpm-store/**",

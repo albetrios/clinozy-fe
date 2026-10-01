@@ -11,6 +11,9 @@ docs/reference/env-catalog.md
 # commit) would make the two copies drift.
 iterations/*/schema-routes.md
 iterations/*/README.md
+# The templates `pnpm iteration:new` fills, byte-identical to clinozy-be's
+# tooling/iterations/templates/ so `--both` writes the same files from either repo.
+tooling/iterations/templates/
 # pnpm owns the lockfile format — Prettier's YAML rules must never rewrite it
 # (lint-staged's *.yaml pattern would otherwise format it on dependency commits).
 pnpm-lock.yaml

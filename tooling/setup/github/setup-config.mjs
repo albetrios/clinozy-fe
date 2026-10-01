@@ -13,6 +13,7 @@ const SETUP_CONFIG_PATH = resolve(import.meta.dirname, '../setup.config.json');
  * @returns {{
  *   environments: SetupEnvironment[],
  *   repository?: string,
+ *   defaultBranch?: string,
  * }}
  */
 export function loadSetupConfig() {
@@ -20,6 +21,7 @@ export function loadSetupConfig() {
   return {
     environments: raw.environments ?? [],
     repository: raw.providers?.github?.repository,
+    defaultBranch: raw.git?.defaultBranch,
   };
 }
 
