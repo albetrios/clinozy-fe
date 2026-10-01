@@ -78,15 +78,40 @@ export async function initSentry(router: AnyRouter): Promise<void> {
     enabled: true,
     integrations: buildIntegrations(Sentry, router),
 
-    sendDefaultPii: false,
+    // Sentry v11 replaced `sendDefaultPii: false` with `dataCollection`, whose
+    // defaults collect everything. Keep the old posture: no IP inference
+    // (`userInfo`), cookies, headers, bodies or query params, no GraphQL / gen-AI
+    // payloads and no local variables. Source context lines are code, not user
+    // data, so `frameContextLines` keeps its default.
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      queues: false,
+      stackFrameVariables: false,
+    },
     attachStacktrace: true,
     maxBreadcrumbs: 100,
     normalizeDepth: 6,
 
-    enableLogs: true,
+    // v11 captures logs whenever a logging integration is present
+    // (consoleLoggingIntegration above); the old `enableLogs` option is gone.
 
+    // v11 streams spans by default, and streamed spans skip `beforeSendTransaction`
+    // (the URL scrubbing below) and carry no scope tags. Keep transaction events
+    // until that scrubbing moves to `beforeSendSpan`.
+    traceLifecycle: 'static',
     tracesSampleRate: platformConfig.sentryTracesSampleRate,
-    profilesSampleRate: platformConfig.sentryProfilesSampleRate,
+    // v11 dropped per-transaction `profilesSampleRate`: sample profiling per session
+    // and profile while a trace is active — the closest match to the old behaviour.
+    // (browserProfilingIntegration defaults to 'manual', which never profiles on its own.)
+    profileSessionSampleRate: platformConfig.sentryProfilesSampleRate,
+    profileLifecycle: 'trace',
     tracePropagationTargets: ['localhost', /^https:\/\/api\./, /^\/api\//],
 
     replaysSessionSampleRate: platformConfig.sentryReplaysSessionSampleRate,

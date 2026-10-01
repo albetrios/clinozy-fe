@@ -131,11 +131,11 @@ Use this table when configuring Sentry dashboards, alerts, and sampling.
 
 **Sampling (production defaults in `sentry.ts`):**
 
-| Setting                   | Value                                 | Sentry UI                                                 |
-| ------------------------- | ------------------------------------- | --------------------------------------------------------- |
-| `tracesSampleRate`        | `0.1` (10%)                           | Performance → Transactions                                |
-| `profilesSampleRate`      | `1.0` of traced                       | Performance → Profiles                                    |
-| `tracePropagationTargets` | `localhost`, `https://api.*`, `/api/` | Distributed traces to clinozy-be when BE also uses Sentry |
+| Setting                    | Value                                                                             | Sentry UI                                                 |
+| -------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `tracesSampleRate`         | `0.1` (10%)                                                                       | Performance → Transactions                                |
+| `profileSessionSampleRate` | `1.0` of sessions, `profileLifecycle: 'trace'` (profiles while a trace is active) | Performance → Profiles                                    |
+| `tracePropagationTargets`  | `localhost`, `https://api.*`, `/api/`                                             | Distributed traces to clinozy-be when BE also uses Sentry |
 
 ### Session Replay (production)
 
@@ -149,9 +149,9 @@ Use replays to reproduce UI bugs with masked DOM — no readable user input.
 
 ### Logs (production)
 
-`enableLogs: true` + `consoleLoggingIntegration({ levels: ['warn', 'error'] })` sends
-structured logs to **Sentry → Logs** (SDK v10+). Useful for correlating warnings with
-errors in the same trace.
+`consoleLoggingIntegration({ levels: ['warn', 'error'] })` sends structured logs to
+**Sentry → Logs**; since SDK v11 the integration alone turns logs on (`enableLogs` is
+gone). Useful for correlating warnings with errors in the same trace.
 
 ### User Feedback (production)
 
@@ -175,7 +175,13 @@ All outgoing events pass through scrubbers in `lib/telemetry-scrub.ts`:
 - **UI input breadcrumbs** → message replaced with `[Filtered]`
 - **No PII in user object** — id only
 - **No API response bodies** in error extras
-- **`sendDefaultPii: false`**
+- **`dataCollection` — every category off**: no IP inference (`userInfo`), cookies,
+  headers, request/response bodies, query params, GraphQL / gen-AI payloads or local
+  variables. Sentry v11 replaced `sendDefaultPii` with this option, and its defaults
+  collect all of them.
+- **`traceLifecycle: 'static'`** — transactions, not streamed spans, so
+  `beforeSendTransaction` keeps scrubbing pageload / navigation URLs (v11 streams spans
+  by default, and streamed spans skip that hook).
 
 ---
 
