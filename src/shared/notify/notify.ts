@@ -78,11 +78,22 @@ function enqueue(item: QueuedToast) {
   const duration = item.preview.options.duration ?? 4000;
   if (Number.isFinite(duration)) {
     item.expiresAt = Date.now() + duration;
-    item.timer = setTimeout(() => dismiss(id), duration);
+    item.timer = setTimeout(() => expireQueued(id), duration);
   }
   queued.set(id, item);
   emit();
   prepareRuntime();
+}
+
+/**
+ * A queued toast outlived its duration before any renderer took it, so it only leaves
+ * the queue. The renderer never received it (activation clears these timers), so there
+ * is nothing to dismiss there. Calling in anyway reached sonner after a test file's
+ * jsdom teardown, where its dismiss needs `requestAnimationFrame`.
+ */
+function expireQueued(id: string | number) {
+  queued.delete(id);
+  emit();
 }
 
 function show(type: ToastType, message: string, options: NotifyOptions = {}) {
