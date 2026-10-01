@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { type SubmitEventHandler, useEffect, useRef, useState } from 'react';
 import { type FieldError, useForm, type UseFormRegister } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -290,7 +290,7 @@ function EmailStepForm({
   isSubmitting: boolean;
   pending: AuthContinuePending | null;
   captchaActive: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onSubmit: SubmitEventHandler<HTMLFormElement>;
   onInteract: (() => void) | undefined;
 }) {
   const { t } = useTranslation(AUTH_NS);
