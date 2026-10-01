@@ -1,129 +1,79 @@
 /**
- * Design-iteration listing (`pnpm iteration:list`) and the README reader it shares with
- * `pnpm iteration:new`. Fixtures live in throwaway folders under the OS temp folder.
+ * `pnpm iteration:list` — every working-tree iteration as Name | Type | Owner | Opened | Baseline |
+ * Status | Schema-routes | Drop placed, oldest first, with the live schema-routes fingerprint.
  */
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
+import { afterEach, test } from 'node:test';
 import {
-  formatIterationTable,
-  parseIterationReadme,
-  readIterationListings,
-  workingTreeIterationNames,
-} from './list-iterations.mjs';
+  cleanScratch,
+  completeDrop,
+  createRepository,
+  SCHEMA_ROUTES,
+  writeIteration,
+} from './iteration-fixtures.mjs';
+import { formatIterationTable, readIterationListings } from './list-iterations.mjs';
 
-const scratchFolders = [];
+afterEach(cleanScratch);
 
-afterEach(() => {
-  for (const folder of scratchFolders.splice(0))
-    rmSync(folder, { recursive: true, force: true });
-});
-
-function scratchRepository() {
-  const repositoryRoot = mkdtempSync(join(tmpdir(), 'iteration-list-'));
-  scratchFolders.push(repositoryRoot);
-  return repositoryRoot;
-}
-
-function writeReadme(repositoryRoot, name, fields) {
-  const folder = join(repositoryRoot, 'iterations', name);
-  mkdirSync(folder, { recursive: true });
-  const rows = Object.entries(fields).map(([label, value]) => `| ${label} | ${value} |`);
-  writeFileSync(
-    join(folder, 'README.md'),
-    [`# ${name}`, '', '| Field | Value |', '| --- | --- |', ...rows, ''].join('\n'),
-  );
-}
-
-describe('parseIterationReadme', () => {
-  test('reads the generator table and a padded (Prettier-style) one alike', () => {
-    const unpadded =
-      '# x\n\n| Field | Value |\n| --- | --- |\n| Type | feat |\n| Summary | — |\n';
-    const padded =
-      '# x\n\n| Field   | Value |\n| ------- | ----- |\n| Type    | feat  |\n| Summary | —     |\n';
-    for (const markdown of [unpadded, padded]) {
-      const fields = parseIterationReadme(markdown);
-      assert.deepEqual(
-        [...fields.entries()],
-        [
-          ['Type', 'feat'],
-          ['Summary', '—'],
-        ],
-      );
-    }
+test('lists every iteration oldest first, with the live fingerprint of intake-files/schema-routes.md', () => {
+  const repositoryRoot = createRepository();
+  writeIteration({
+    repositoryRoot,
+    name: 'feat-returns-2026-10-06-kqzx',
+    fields: { baseline: 'launch-2026-09-30-jxmr', dropPlaced: '2026-10-07' },
   });
+  writeIteration({
+    repositoryRoot,
+    name: 'launch-2026-09-30-jxmr',
+    fields: { status: 'implementing', dropPlaced: '2026-10-01' },
+    intake: completeDrop(),
+  });
+  mkdirSync(join(repositoryRoot, 'iterations', 'b-pharmacy-returns'));
 
-  test('keeps a pipe inside the value and ignores rows that are not fields', () => {
-    const fields = parseIterationReadme(
+  const listings = readIterationListings(repositoryRoot);
+  assert.deepEqual(
+    listings.map((listing) => [
+      listing.name,
+      listing.status,
+      listing.schemaRoutes,
+      listing.dropPlaced,
+    ]),
+    [
       [
-        '| Summary | returns | refunds |',
-        '| Two words | x |',
-        'not a table row',
-        '|',
-        '| Owner |',
-      ].join('\n'),
-    );
-    assert.deepEqual([...fields.entries()], [['Summary', 'returns | refunds']]);
-  });
+        'launch-2026-09-30-jxmr',
+        'implementing',
+        createHash('sha256').update(SCHEMA_ROUTES).digest('hex').slice(0, 12),
+        '2026-10-01',
+      ],
+      ['feat-returns-2026-10-06-kqzx', 'planning', '—', '2026-10-07'],
+    ],
+  );
+  const lines = formatIterationTable(listings).split('\n');
+  assert.match(
+    lines[0],
+    /^\| Name +\| Type +\| Owner +\| Opened +\| Baseline +\| Status +\| Schema-routes +\| Drop placed +\|$/,
+  );
+  assert.equal(new Set(lines.map((line) => line.length)).size, 1);
 });
 
-describe('readIterationListings', () => {
-  test('lists every iteration oldest first as an aligned table', () => {
-    const repositoryRoot = scratchRepository();
-    writeReadme(repositoryRoot, 'feat-returns-2026-10-06-kqzx', {
-      Type: 'feat',
-      Owner: 'Test Owner',
-      Opened: '2026-10-06',
-      Baseline: 'launch-2026-09-30-jxmr',
-      Status: 'planning',
-    });
-    writeReadme(repositoryRoot, 'launch-2026-09-30-jxmr', {
-      Type: 'launch',
-      Owner: 'Test Owner',
-      Opened: '2026-09-30',
-      Baseline: 'none',
-      Status: 'frozen',
-    });
-    // Not iterations: a folder outside the name grammar, and a stray file.
-    mkdirSync(join(repositoryRoot, 'iterations', 'b-pharmacy-returns'));
-    writeFileSync(
-      join(repositoryRoot, 'iterations', 'README.md'),
-      '# Design iterations\n',
-    );
-
-    const listings = readIterationListings(repositoryRoot);
-    assert.deepEqual(
-      listings.map((listing) => listing.name),
-      ['launch-2026-09-30-jxmr', 'feat-returns-2026-10-06-kqzx'],
-    );
-    const lines = formatIterationTable(listings).split('\n');
-    assert.match(
-      lines[0],
-      /^\| Name +\| Type +\| Owner +\| Opened +\| Baseline +\| Status +\|$/,
-    );
-    assert.equal(new Set(lines.map((line) => line.length)).size, 1);
+test('shows — for an iteration folder without a README', () => {
+  const repositoryRoot = createRepository();
+  mkdirSync(join(repositoryRoot, 'iterations', 'fix-typo-2026-10-07-abcd'), {
+    recursive: true,
   });
-
-  test('shows — for a missing README or field', () => {
-    const repositoryRoot = scratchRepository();
-    mkdirSync(join(repositoryRoot, 'iterations', 'fix-typo-2026-10-07-abcd'), {
-      recursive: true,
-    });
-    assert.deepEqual(readIterationListings(repositoryRoot), [
-      {
-        name: 'fix-typo-2026-10-07-abcd',
-        type: '—',
-        owner: '—',
-        opened: '—',
-        baseline: '—',
-        status: '—',
-      },
-    ]);
-  });
-
-  test('is empty when there is no iterations folder', () => {
-    assert.deepEqual(workingTreeIterationNames(scratchRepository()), []);
-  });
+  assert.deepEqual(readIterationListings(repositoryRoot), [
+    {
+      name: 'fix-typo-2026-10-07-abcd',
+      type: '—',
+      owner: '—',
+      opened: '—',
+      baseline: '—',
+      status: '—',
+      schemaRoutes: '—',
+      dropPlaced: '—',
+    },
+  ]);
 });
