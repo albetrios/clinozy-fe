@@ -1,12 +1,16 @@
-# Manual reference for GitHub label name + color (pastel) + description.
+# Every GitHub label for this repository: name + color (pastel) + description —
+# including the labels workflows create and GitHub's built-in ones, so nothing is
+# left at GitHub's default gray once these are applied to the repository.
 # Path-based attachment to PRs is handled by .github/labeler.yml; create/update
-# these labels in GitHub settings when label names, colors, or descriptions change.
+# these labels on GitHub when label names, colors, or descriptions change.
 #
 # When adding a new area:
 #   1. Add an `area:<new>` entry under "Areas" below (keep alphabetised).
 #   2. Add the same key in .github/labeler.yml with its glob.
 #
-# Colors are 6-digit hex without `#` (GitHub label format).
+# Colors are 6-digit hex without `#` (GitHub label format). The sections up to PR
+# size use Material's 100 tones; tracked issues and GitHub's defaults use the 200
+# tone of their hue, so they stay pastel but read as their own group.
 
 # ---------- Areas (pastel rainbow — one hue per area) ----------
 
@@ -87,3 +91,51 @@
 - name: 'size/x-large'
   color: 'FFCDD2'
   description: '> 500 added+deleted lines — consider splitting'
+
+# ---------- Tracked issues (opened and updated by workflows) ----------
+
+- name: 'ci-failure'
+  color: 'FFAB91'
+  description: 'Post-merge CI failed on main (tracked issue from post-merge-ci.yml)'
+
+- name: 'sync-drift'
+  color: 'FFE082'
+  description: 'Weekly docs↔code drift found (tracked issue from sync-drift-canary.yml)'
+
+# ---------- GitHub defaults (the default hue, as a pastel 200 tone) ----------
+
+- name: 'bug'
+  color: 'EF9A9A'
+  description: "Something isn't working"
+
+- name: 'documentation'
+  color: '90CAF9'
+  description: 'Improvements or additions to documentation'
+
+- name: 'duplicate'
+  color: '9FA8DA'
+  description: 'This issue or pull request already exists'
+
+- name: 'enhancement'
+  color: '80DEEA'
+  description: 'New feature or request'
+
+- name: 'good first issue'
+  color: 'B39DDB'
+  description: 'Good for newcomers'
+
+- name: 'help wanted'
+  color: '80CBC4'
+  description: 'Extra attention is needed'
+
+- name: 'invalid'
+  color: 'E6EE9C'
+  description: "This doesn't seem right"
+
+- name: 'question'
+  color: 'CE93D8'
+  description: 'Further information is requested'
+
+- name: 'wontfix'
+  color: 'BCAAA4'
+  description: 'This will not be worked on'
