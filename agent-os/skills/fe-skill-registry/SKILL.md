@@ -29,8 +29,9 @@ Complete inventory of project skills. Use this to find the right skill for any t
 - ...visual regression / screenshot baselines / snapshot diff -> **fe-visual-regression** (local-only; needs clinozy-be)
 - ...debug a bug / test failure / unexpected behavior (before any fix) -> **systematic-debugging** (root cause first)
 - ...route island / self-contained path / nested sub-route folder -> **fe-route-island**
-- ...plan a build from a `legacy/vN/` design drop ("kickoff", "plan v1/v2") -> **fe-kickoff-planning** (plan + delta ledger, then stop for confirmation)
-- ...build faithfully from `legacy/` specs + prototype ("ditto", "match the design exactly") -> **fe-legacy-ditto** (executes a confirmed kickoff)
+- ...plan a design iteration from its `intake-files/` ("plan iteration <name>", "iteration planning", "plan from legacy") -> **fe-iteration-planning** (no code: KICKOFF.md + ordered ledger, then stop for approval)
+- ...implement an approved iteration ("kickoff", "kickoff iteration <name>", "start implementing <iteration>") -> **fe-kickoff-iteration** (one ledger row at a time, AS-BUILT.md per row)
+- ...build one screen faithfully from `intake-files/` specs + prototype ("ditto", "ditto from legacy", "match the design exactly") -> **fe-design-ditto** (driven per row by fe-kickoff-iteration)
 - ...org-scoped route, guards, gateway, session context, settings hash -> **fe-routing-tenancy**
 - ...backend resource CRUD (list, URL dialogs, resource manifest) -> **fe-resource-crud**
 - ...form mutation errors, 422 mapping, rate limit, QueryBoundary -> **fe-http-forms-errors**
@@ -66,7 +67,7 @@ For each common task, the skills below are required/auto-invoked. `fe-auto-imple
 | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Implement a feature / requirement (end-to-end)**        | fe-auto-implement ★ → fe-requirement-format (if vague) → fe-code-structure → fe-page-scaffolding (if new route) → shadcn + frontend-design (UI) → fe-test-generation → fe-lint-guard → fe-code-smells-best-practices → fe-documentation-maintenance |
 | **New page / route / sub-route**                          | fe-route-island → fe-page-scaffolding → fe-code-structure → shadcn (UI) → fe-test-generation → fe-e2e-testids → fe-lint-guard → fe-documentation-maintenance                                                                                     |
-| **Build a design version from `legacy/vN/` (ditto)**      | **fe-kickoff-planning** (plan, stop for confirmation) → **fe-legacy-ditto** → fe-route-island → fe-page-scaffolding → shadcn → fe-test-generation → fe-e2e-testids → fe-visual-regression                                                        |
+| **Build a design iteration from `iterations/<iteration>/` (ditto)**      | **fe-iteration-planning** (plan, stop for approval) → **fe-kickoff-iteration** → **fe-design-ditto** → fe-route-island → fe-page-scaffolding → shadcn → fe-test-generation → fe-e2e-testids → fe-visual-regression                                                        |
 | **Org-scoped route / guards / gateway**                   | fe-route-island → **fe-routing-tenancy** → fe-test-generation → fe-lint-guard → fe-documentation-maintenance                                                                                                                               |
 | **Backend resource CRUD island**                          | fe-route-island → **fe-resource-crud** → **fe-routing-tenancy** (if org-scoped) → **fe-http-forms-errors** (forms) → fe-test-generation → fe-e2e-testids → fe-lint-guard                                                                         |
 | **Form + API mutation**                                   | composition-patterns → **fe-http-forms-errors** → **fe-resilient-interactions** → fe-test-generation → fe-lint-guard                                                                                                                                                 |
@@ -110,7 +111,7 @@ For each common task, the skills below are required/auto-invoked. `fe-auto-imple
 
 > If a task has **no** matching row here or in `fe-skill-router.mdc`, use **find-skills** to look for one before building from scratch; if none exists, proceed with general capabilities.
 
-## Skill Inventory (52 skills)
+## Skill Inventory (53 skills)
 
 ### 0a. fe-auto-implement (Master Orchestrator)
 
@@ -490,7 +491,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 - Runs via `./tooling/validate/before-commit-guard.sh` on every `git commit`
 - Checks: validate:env-example, validate:public, lint-staged, type-check
-- Plus (in pre-commit): gitleaks, merge conflict markers, large file (>1MB; `legacy/` exempt)
+- Plus (in pre-commit): gitleaks, merge conflict markers, large file (>1MB; `iterations/` exempt)
 - Manual run: `pnpm run before-commit-guard`
 - Documents how to fix each failure type
 
@@ -736,33 +737,54 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 ---
 
-### 6g. fe-kickoff-planning
+### 6g. fe-iteration-planning
 
-**Path:** `agent-os/skills/fe-kickoff-planning/SKILL.md`
+**Path:** `agent-os/skills/fe-iteration-planning/SKILL.md`
 
-**Purpose:** Turn a `legacy/vN/` design drop (markdown specs + optional prototype HTML/JS) into a gated `legacy/vN/KICKOFF.md` plan and delta ledger **before any code** — the planning half of a ditto build.
+**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, pass the intake gate and read the full snapshot, establish the incremental delta by Intake mode, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
 
-**Trigger keywords:** "kickoff", "set up a kickoff", "plan v1", "plan v2", "make a plan from legacy", "review the legacy version"
+**Trigger keywords:** "plan iteration <name>", "iteration planning", "plan the next iteration", "make a plan from legacy", "plan from legacy", "review the legacy version"
 
 **Key behaviors:**
 
-- Reads every file in the drop and proves it with a coverage matrix — nothing escapes the plan
-- Every md ↔ prototype verdict carries file:line or selector evidence; the prototype wins on behaviour
-- RED gate on the four rebuild-forcing facts: popup shape, mobile behaviour, step sequence, table vs card
-- Writes all nine KICKOFF sections (`n/a — reason` is allowed, absent is not), then **stops for confirmation**
-- MODE incremental plans only the delta against `legacy/v<N-1>/`
+- Step 0 shows the eligibility table (Status `planning`) and confirms the iteration and its Baseline with AskUserQuestion (`pnpm iteration:baseline`)
+- The intake gate `pnpm iteration:intake <it> --check [--baseline <b>]` runs at Step 0; on failure the skill stops at once (writes nothing, changes no status) and prints the output
+- Every intake file is read in full and proved with a coverage matrix
+- MODE incremental, by Intake mode: full/overlay — `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ. Always the Baseline's Standing deviations; every change classified, omissions raised as findings
+- Every md ↔ prototype verdict carries file:line or selector evidence; RED questions go to AskUserQuestion and `plans/decisions.md`, never a guess
+- Writes every KICKOFF section (`n/a — reason` allowed, absent not) with the route-ordered ledger (Kind, Depends on, Skill/driver, Acceptance, Assignee, Status), then `iteration:status ready-for-approval` and stops; `approved` on the user's go-ahead
 
-**Related skills:** fe-legacy-ditto (builds the plan), fe-route-island, fe-page-scaffolding, fe-theme-axis-audit, fe-visual-regression
+**Related skills:** fe-kickoff-iteration (builds the plan), fe-design-ditto, fe-route-island, fe-page-scaffolding, fe-theme-axis-audit, fe-visual-regression
 
 ---
 
-### 6h. fe-legacy-ditto
+### 6h. fe-kickoff-iteration
 
-**Path:** `agent-os/skills/fe-legacy-ditto/SKILL.md`
+**Path:** `agent-os/skills/fe-kickoff-iteration/SKILL.md`
 
-**Purpose:** Build faithfully ("ditto") from the specs in `legacy/vN/` — preset first, then a new shell variant, then screens — and verify side by side against the source at 375px and 1440px. The build half of `fe-kickoff-planning`.
+**Purpose:** Implement an approved design iteration: confirm it (Status `approved`, Baseline `none` or done/frozen), move it to `implementing`, then follow the `KICKOFF.md` ledger one row at a time — do, verify, record in `AS-BUILT.md`, check the impact on upcoming rows, stop for review — and close with the static design gates and `iteration:status done`.
 
-**Trigger keywords:** "ditto", "same as the html", "like the legacy", "match the design exactly", "build from legacy"
+**Trigger keywords:** "kickoff", "kickoff iteration <name>", "start implementing <iteration>"
+
+**Key behaviors:**
+
+- Runs the intake gate before `implementing` (stop on failure); each screen row runs **fe-design-ditto**; each row is verified by Intake mode — side by side at 375px and 1440px per state, or the `BRIEF.md` acceptance criteria (incremental: plus the full baseline set)
+- Keeps `AS-BUILT.md` › Standing deviations: the Baseline's list, minus what this iteration resolves, plus its new ones
+- Every row gets an `AS-BUILT.md` entry: planned · built · difference · why · decision · commit
+- A scope change (row added or removed, acceptance or order changed) stops for the user, then goes to `plans/decisions.md` and AS-BUILT's revisions; KICKOFF gets only `revised → AS-BUILT #n`
+- Never pushes, opens a PR or merges
+
+**Related skills:** fe-iteration-planning (writes the plan), fe-design-ditto, fe-visual-regression, fe-route-island, fe-page-scaffolding
+
+---
+
+### 6i. fe-design-ditto
+
+**Path:** `agent-os/skills/fe-design-ditto/SKILL.md`
+
+**Purpose:** Build faithfully ("ditto") from the specs in an iteration's `intake-files/` — preset first, then a new shell variant, then screens — and verify side by side against the source at 375px and 1440px. The per-screen build skill `fe-kickoff-iteration` drives for each ledger row.
+
+**Trigger keywords:** "ditto", "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", "build from legacy"
 
 **Key behaviors:**
 
@@ -772,7 +794,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 - Project rules override the source: shadcn primitives, semantic tokens, `@/shared/icons`, i18n keys, route islands (`fe-route-island`)
 - Done means a side-by-side comparison per screen and state, not a functional check
 
-**Related skills:** fe-kickoff-planning (writes the plan), fe-route-island, fe-page-scaffolding, shadcn, frontend-design, fe-visual-regression
+**Related skills:** fe-kickoff-iteration (drives it per row), fe-iteration-planning (writes the plan), fe-route-island, fe-page-scaffolding, shadcn, frontend-design, fe-visual-regression
 
 ---
 
@@ -1147,7 +1169,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 | `catalog-info.yaml`                                   | (Backstage integration)                                                                                                                          |
 | `.vscode/`                                            | **fe-extension-settings-recommendations**                                                                                                           |
 | `docs/`, README, CLAUDE                               | **fe-documentation-maintenance**                                                                                                                    |
-| `legacy/**` (design drops)                            | **fe-kickoff-planning** (plan), **fe-legacy-ditto** (build), fe-route-island, fe-visual-regression                                                  |
+| `iterations/**` (design drops)                            | **fe-iteration-planning** (plan), **fe-kickoff-iteration** (build), **fe-design-ditto** (per screen), fe-route-island, fe-visual-regression                                                  |
 | Full project / post-change audit                      | **fe-project-health-check**, fe-lint-guard, fe-test-generation, fe-documentation-maintenance                                                                 |
 | Full code review report                               | **fe-full-code-review**                                                                                                                             |
 | Any React component                                   | react-best-practices, composition-patterns, web-design-guidelines, fe-test-generation                                                               |

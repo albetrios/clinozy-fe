@@ -46,6 +46,8 @@ The same applies to `@tabler/icons-react` (`IconLoader2`), any SDK, and any wire
 
 Digits in **values** are fine and often required — `z-[70]`, `size-8`, `MESSAGE_INTERVAL_MS = 1_600`, `h1`…`h6`, `S3`, `OAuth2` where it is the protocol's actual name, HTTP `401`. The rule is about what a thing is *called*, not what it *contains*.
 
+- **Design-iteration folders** (`iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, e.g. `feat-pharmacy-returns-2026-10-06-kqzx`): the `YYYY-MM-DD` is a value — the day the iteration was opened — so it keeps its digits. The type, the topic and the four-letter id are names and carry none; `pnpm iteration:new` rejects a topic with a digit.
+
 ## Why this is a rule and not a preference
 
 The rename that produced it was not cosmetic. `export const Building2 = makeIcon('Building2')` and a lookup table keyed `Building` are impossible to hold in your head at once — the digit is exactly the kind of detail that survives a careless find-and-replace and produces an `undefined` component at runtime, which is how it was caught. A naming scheme that cannot be renamed safely is a naming scheme that will not be renamed.

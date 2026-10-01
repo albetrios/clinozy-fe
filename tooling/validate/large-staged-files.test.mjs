@@ -46,16 +46,16 @@ test('allows a staged file exactly at the limit', () => {
   assert.equal(status, 0, output);
 });
 
-test('exempts design exports under legacy/', () => {
+test('exempts design exports under iterations/', () => {
   const { status, output } = runGateWith({
-    'legacy/v1/Prototype.html': LIMIT_BYTES * 3,
+    'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
   });
   assert.equal(status, 0, output);
 });
 
-test('the legacy/ exemption does not hide a large file elsewhere in the same commit', () => {
+test('the iterations/ exemption does not hide a large file elsewhere in the same commit', () => {
   const { status, output } = runGateWith({
-    'legacy/v1/Prototype.html': LIMIT_BYTES * 3,
+    'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
     'docs/big.bin': LIMIT_BYTES + 1,
   });
   assert.equal(status, 1, output);
@@ -63,9 +63,13 @@ test('the legacy/ exemption does not hide a large file elsewhere in the same com
   assert.doesNotMatch(output, /Prototype\.html/);
 });
 
-// Only the top-level legacy/ folder is exempt — not a path that merely
+// Only the top-level iterations/ folder is exempt — not a path that merely
 // contains the word.
-for (const path of ['docs/legacy/big.bin', 'legacy-archive/big.bin', 'legacy.bin']) {
+for (const path of [
+  'docs/iterations/big.bin',
+  'iterations-archive/big.bin',
+  'iterations.bin',
+]) {
   test(`does not exempt ${path}`, () => {
     const { status, output } = runGateWith({ [path]: LIMIT_BYTES + 1 });
     assert.equal(status, 1, output);

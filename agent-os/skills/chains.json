@@ -136,12 +136,13 @@
         "fe-documentation-maintenance"
       ]
     },
-    "legacy-build": {
-      "description": "Planning and building a design version from a legacy/vN/ drop (markdown specs + optional prototype).",
-      "trigger": "legacy/**",
+    "design-build": {
+      "description": "Planning (no code, ends at approval) and then building a design iteration from its iterations/<iteration>/intake-files/ (markdown specs + prototype), one ledger row at a time.",
+      "trigger": "iterations/**",
       "steps": [
-        "fe-kickoff-planning",
-        "fe-legacy-ditto",
+        "fe-iteration-planning",
+        "fe-kickoff-iteration",
+        "fe-design-ditto",
         "fe-route-island",
         "fe-test-generation"
       ],

@@ -87,7 +87,7 @@ if [ -n "$STAGED_FOR_CONFLICTS" ]; then
   fi
 fi
 
-# ── 10. Reject large staged files (>1MB; legacy/ design exports exempt) ──
+# ── 10. Reject large staged files (>1MB; iterations/ design exports exempt) ──
 # Measures the STAGED blob, not the working tree — see the script header.
 echo ""
 echo "10. Large staged files..."

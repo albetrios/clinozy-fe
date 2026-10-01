@@ -9,6 +9,7 @@ tooling/
 ├── agent-os/          # Derive platform wiring from agent-os/hooks + targets
 ├── dev/               # Local bootstrap (pnpm setup:local, mcp:setup)
 ├── ci/                # CI checks (patch coverage, contract drift, preload graph, …)
+├── iterations/        # Design-iteration commands (pnpm iteration:*) + the README template
 ├── setup/
 │   ├── setup.config.json
 │   └── github/        # GitHub IaC sync (pnpm github:sync)
@@ -23,13 +24,19 @@ tooling/
 
 ## Common commands
 
-| Command                  | Script                             |
-| ------------------------ | ---------------------------------- |
-| `pnpm setup:local`       | `tooling/dev/setup-local.ts`       |
-| `pnpm mcp:setup`         | `tooling/dev/setup-mcp.ts`         |
-| `pnpm agent-os:generate` | `tooling/agent-os/generate.mjs`    |
-| `pnpm health`            | `tooling/validate/health-check.sh` |
-| `pnpm github:sync`       | `tooling/setup/github/sync.mjs`    |
+| Command                   | Script                                          |
+| ------------------------- | ----------------------------------------------- |
+| `pnpm setup:local`        | `tooling/dev/setup-local.ts`                    |
+| `pnpm mcp:setup`          | `tooling/dev/setup-mcp.ts`                      |
+| `pnpm agent-os:generate`  | `tooling/agent-os/generate.mjs`                 |
+| `pnpm health`             | `tooling/validate/health-check.sh`              |
+| `pnpm github:sync`        | `tooling/setup/github/sync.mjs`                 |
+| `pnpm iteration:new`      | `tooling/iterations/new-iteration.mjs`          |
+| `pnpm iteration:intake`   | `tooling/iterations/intake-iteration.mjs`       |
+| `pnpm iteration:diff`     | `tooling/iterations/diff-iterations.mjs`        |
+| `pnpm iteration:baseline` | `tooling/iterations/set-iteration-baseline.mjs` |
+| `pnpm iteration:status`   | `tooling/iterations/set-iteration-status.mjs`   |
+| `pnpm iteration:list`     | `tooling/iterations/list-iterations.mjs`        |
 
 ## MCP templates (root + mirrors)
 

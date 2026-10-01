@@ -7,4 +7,4 @@ coverage/
 *.lock
 pnpm-lock.yaml
 # Design-tool exports (prototype HTML/JS) — reference material, never built or deployed
-legacy/
+iterations/

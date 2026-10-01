@@ -39,9 +39,9 @@ paths-ignore:
   # queries systematically mis-flag them (fs-race, temp-file, regex-sanitize).
   - agent-os/**
   # Design-tool exports: a prototype HTML/JS bundle and the specs extracted from
-  # it, one folder per version. Reference material for building src/ — never
+  # it, one folder per iteration. Reference material for building src/ — never
   # built or deployed, so outside the deployed surface this config scopes to.
-  - legacy/**
+  - iterations/**
 
 # No query-filters yet: clinozy-be suppresses three verified architectural false
 # positives (rate limiting, password-hash KDF, logger redaction) that are
