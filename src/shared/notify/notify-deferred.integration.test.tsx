@@ -65,10 +65,14 @@ describe('notifyDeferredCommit (real toast surface)', () => {
       timeout: 5000,
     });
     // These cases exercise Sonner's removal lifecycle, not the immediate host.
-    await waitFor(() =>
-      expect(
-        screen.getByTestId('toast-action').closest('[data-sonner-toast]'),
-      ).not.toBeNull(),
+    // The handoff to Sonner waits on the renderer's lazy import, which is cold in
+    // the file's first case, so it gets the same budget as the first render.
+    await waitFor(
+      () =>
+        expect(
+          screen.getByTestId('toast-action').closest('[data-sonner-toast]'),
+        ).not.toBeNull(),
+      { timeout: 5000 },
     );
     await user.click(screen.getByTestId('toast-action'));
   };
