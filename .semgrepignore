@@ -6,3 +6,5 @@ coverage/
 *.bundle.js
 *.lock
 pnpm-lock.yaml
+# Design-tool exports (prototype HTML/JS) — reference material, never built or deployed
+iterations/

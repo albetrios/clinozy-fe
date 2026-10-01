@@ -82,7 +82,7 @@ Checks run on every `git commit` via `.husky/pre-commit` and `.husky/commit-msg`
 | 1.7  | ↳ Gitleaks              | Scans staged files for secrets/API keys (step 7)                                                                            | Yes (if installed) |
 | 1.8  | ↳ Env-file guard        | Rejects any staged `.env*` except `.env.example` (step 8)                                                                   | Yes                |
 | 1.9  | ↳ Conflict markers      | Rejects files containing `<<<<<<<` or `>>>>>>>` (step 9)                                                                    | Yes                |
-| 1.10 | ↳ Large file check      | Rejects staged blobs > 1MB via `git cat-file -s` (step 10)                                                                  | Yes                |
+| 1.10 | ↳ Large file check      | Rejects staged blobs > 1MB via `git cat-file -s` (step 10); `iterations/` design exports exempt                                 | Yes                |
 | 2    | `commitlint`            | Enforces conventional commit format (`feat:`, `fix:`, etc.) via `.husky/commit-msg`                                         | Yes                |
 
 See **fe-before-commit-guard** skill (`agent-os/skills/fe-before-commit-guard/SKILL.md`) for the full step list (1–10) and failure fixes.
@@ -93,6 +93,7 @@ See **fe-before-commit-guard** skill (`agent-os/skills/fe-before-commit-guard/SK
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `.husky/pre-commit`                       | Pre-commit hook — one-liner invoking the guard (all steps live inside it, clinozy-be pattern)                          |
 | `tooling/validate/before-commit-guard.sh` | Guard script: env, public, lint-staged, vite-env, type-check, lockfile, gitleaks, env-files, conflicts, large files |
+| `tooling/validate/large-staged-files.sh`  | Guard step 10: rejects staged blobs > 1MB (`iterations/` exempt), pinned by `large-staged-files.test.mjs`               |
 | `.husky/commit-msg`                       | Commit message validation hook                                                                                      |
 | `.commitlintrc.json`                      | Conventional commit config                                                                                          |
 | `.gitleaks.toml`                          | Gitleaks secret scan allowlist                                                                                      |

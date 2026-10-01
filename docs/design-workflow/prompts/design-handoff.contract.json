@@ -1,0 +1,328 @@
+{
+  "contract": "clinozy-fe design handoff",
+  "version": "1.0.0",
+  "purpose": "A portable request/response contract for handing any product design to clinozy-fe's theming system. Send `request` to the design source; it returns `response`; clinozy-fe applies it. Works for any project, not just this one — the enums below are clinozy-fe's vocabulary, so swapping the `vocabulary` block retargets the contract at a different design system.",
+  "status": "PROPOSED — no importer exists yet. See `gaps` at the bottom.",
+
+  "howItWorks": {
+    "twoDeliveryModes": {
+      "axes": {
+        "what": "The design is expressed purely as selections from clinozy-fe's 18 orthogonal design axes, plus one seed hue.",
+        "cost": "Zero CSS. No new files. Applied at runtime by the existing generated-look engine (`customTheme`).",
+        "useWhen": "Most cases. The design is a coherent look/feel rather than a locked corporate palette.",
+        "limitation": "You get a generated palette derived from the seed hue and harmony rule — not exact brand hexes."
+      },
+      "tokens": {
+        "what": "Explicit OKLCH values per semantic token, light + dark.",
+        "cost": "One hand-authored CSS block plus registration in 4 files (see `applyTo.tokens`).",
+        "useWhen": "A brand mandates exact colors (e.g. Anthropic terracotta #c96442) that a generated palette cannot reproduce.",
+        "limitation": "Every value must pass the AA gate; brand hexes often need a darkened text variant (see `constraints.contrast`)."
+      },
+      "recommendation": "Ask for BOTH. `axes` gives an instant preview with no code; `tokens` is the exact-brand fallback. They are not exclusive — a token preset can also declare axis defaults."
+    }
+  },
+
+  "request": {
+    "instructionsForDesignSource": [
+      "Return ONE JSON object matching `response.schema` below. No prose outside it.",
+      "Every axis value MUST come from `vocabulary` — these are enums, not free text. An unlisted value is rejected by the consumer.",
+      "All colors MUST be OKLCH: `oklch(L C H)` with L in 0..1, C in 0..0.4, H in 0..360. No hex, rgb, or hsl in token values.",
+      "Provide BOTH `light` and `dark`. A design that only works in one mode is incomplete — clinozy-fe ships a mode toggle.",
+      "Every foreground/background text pair MUST meet WCAG AA 4.5:1. State the computed ratio for each in `accessibility.verifiedPairs`. If a brand color fails, keep it for non-text tokens (ring, chart) and darken/lighten the text variant — do not silently ship a failing pair.",
+      "Do not invent token names. Use only the names in `vocabulary.semanticTokens`.",
+      "If you cannot satisfy a constraint, say so explicitly in `notes` rather than approximating."
+    ],
+    "youProvide": {
+      "brand": {
+        "name": "string — product/company name",
+        "primaryHex": "string|null — the mandated brand color, if any",
+        "secondaryHex": "string|null",
+        "logoDescription": "string|null — informs neutral temperature and accent intensity",
+        "existingGuidelines": "string|null — URL or pasted excerpt"
+      },
+      "product": {
+        "domain": "string — e.g. 'B2B analytics dashboard', 'consumer social', 'clinical records'",
+        "audience": "string — who uses it, in what setting",
+        "density": "string — 'data-dense' | 'spacious' | 'mixed'; drives densityId + typeScaleId",
+        "tone": "string — e.g. 'calm and clinical', 'energetic', 'editorial', 'utilitarian'",
+        "primarySurface": "string — 'desktop app' | 'mobile web' | 'both'"
+      },
+      "constraintsFromConsumer": {
+        "note": "Send this block verbatim — it is what makes the output actually installable.",
+        "colorSpace": "OKLCH only",
+        "semanticTokensOnly": "Raw palette values may appear ONLY in token definitions, never as utility classes. Consumer enforces via `pnpm validate:tokens`.",
+        "contrastFloor": "WCAG 2.1 AA — 4.5:1 for normal text, 3:1 for large text and UI boundaries",
+        "modes": ["light", "dark"],
+        "mustNotOverride": "Font files, icon set, or component library — the consumer owns those. Reference them by axis id only."
+      }
+    }
+  },
+
+  "vocabulary": {
+    "_note": "clinozy-fe's real catalogs, read from src/shared/theme/presets.ts. Replace this block to retarget another design system.",
+    "axes": {
+      "accentColor": {
+        "options": [
+          "rose",
+          "orange",
+          "amber",
+          "lime",
+          "emerald",
+          "teal",
+          "blue",
+          "violet",
+          "pink"
+        ],
+        "default": null,
+        "drives": "seed hue for the generated palette"
+      },
+      "baseColor": {
+        "options": ["neutral", "stone", "slate", "olive", "zinc", "warm"],
+        "default": "neutral",
+        "drives": "neutral temperature of all surfaces"
+      },
+      "harmony": {
+        "options": ["monochromatic", "analogous", "complementary", "split", "triadic"],
+        "default": "triadic",
+        "drives": "how chart/secondary hues derive from the accent"
+      },
+      "intensity": {
+        "options": ["subtle", "muted", "balanced", "vibrant", "max"],
+        "default": "balanced",
+        "drives": "chroma of the accent"
+      },
+      "contrast": {
+        "options": ["normal", "soft", "crisp", "dim", "amoled"],
+        "default": "normal",
+        "drives": "surface/foreground separation"
+      },
+      "density": {
+        "options": ["compact", "cozy", "relaxed", "airy"],
+        "default": "cozy",
+        "drives": "spacing scale"
+      },
+      "typeScale": {
+        "options": ["tight", "compact", "default", "grand", "display"],
+        "default": "default",
+        "drives": "heading size ratio"
+      },
+      "headingFont": {
+        "options": ["inter", "grotesk", "geometric", "humanist", "serif", "slab", "mono"],
+        "default": "inter"
+      },
+      "bodyFont": {
+        "options": ["inter", "grotesk", "geometric", "humanist", "serif", "slab", "mono"],
+        "default": "inter"
+      },
+      "radius": {
+        "options": ["sharp", "default", "rounded", "round"],
+        "default": "default"
+      },
+      "shape": {
+        "options": ["uniform", "mixed", "pill", "sharp"],
+        "default": "uniform",
+        "drives": "per-component radius variation"
+      },
+      "elevation": {
+        "options": ["flat", "soft", "lifted", "floating"],
+        "default": "soft"
+      },
+      "separation": {
+        "options": ["border", "hairline", "shadow"],
+        "default": "border",
+        "drives": "how surfaces are delineated"
+      },
+      "focus": {
+        "options": ["ring", "glow", "offset", "underline", "inset"],
+        "default": "ring",
+        "drives": "focus-visible treatment (a11y-critical)"
+      },
+      "motion": {
+        "options": ["instant", "calm", "smooth", "snappy"],
+        "default": "smooth"
+      },
+      "menu": {
+        "options": ["default", "translucent", "glass"],
+        "default": "default"
+      },
+      "iconLibrary": {
+        "options": ["lucide", "tabler", "phosphor"],
+        "default": "lucide"
+      },
+      "iconWeight": {
+        "options": ["thin", "regular", "bold"],
+        "default": "regular"
+      },
+      "layoutWidth": {
+        "options": ["contained", "full", "reading"],
+        "default": "contained"
+      }
+    },
+    "semanticTokens": [
+      "--color-background",
+      "--color-foreground",
+      "--color-card",
+      "--color-card-foreground",
+      "--color-popover",
+      "--color-popover-foreground",
+      "--color-primary",
+      "--color-primary-foreground",
+      "--color-secondary",
+      "--color-secondary-foreground",
+      "--color-muted",
+      "--color-muted-foreground",
+      "--color-accent",
+      "--color-accent-foreground",
+      "--color-destructive",
+      "--color-destructive-foreground",
+      "--color-success",
+      "--color-warning",
+      "--color-border",
+      "--color-input",
+      "--color-ring",
+      "--color-sidebar",
+      "--color-sidebar-foreground",
+      "--color-sidebar-primary",
+      "--color-sidebar-primary-foreground",
+      "--color-sidebar-accent",
+      "--color-sidebar-accent-foreground",
+      "--color-chart-1",
+      "--color-chart-2",
+      "--color-chart-3",
+      "--color-chart-4",
+      "--color-chart-5",
+      "--radius"
+    ]
+  },
+
+  "response": {
+    "schema": {
+      "preset": {
+        "id": "string — kebab-case, unique, becomes the [data-theme='<id>'] selector",
+        "label": "string — human label for the Appearance picker",
+        "scope": "'accent-only' | 'full-surface'",
+        "rationale": "string — 1-3 sentences on why this look fits the product"
+      },
+      "axes": {
+        "_comment": "Delivery mode 1. Every key optional; omitted keys inherit the default from `vocabulary`.",
+        "accentColor": "enum",
+        "baseColor": "enum",
+        "harmony": "enum",
+        "intensity": "enum",
+        "contrast": "enum",
+        "density": "enum",
+        "typeScale": "enum",
+        "headingFont": "enum",
+        "bodyFont": "enum",
+        "radius": "enum",
+        "shape": "enum",
+        "elevation": "enum",
+        "separation": "enum",
+        "focus": "enum",
+        "motion": "enum",
+        "menu": "enum",
+        "iconLibrary": "enum",
+        "iconWeight": "enum",
+        "layoutWidth": "enum"
+      },
+      "tokens": {
+        "_comment": "Delivery mode 2. Omit entirely for an axes-only design.",
+        "light": { "<token-name>": "oklch(L C H)" },
+        "dark": { "<token-name>": "oklch(L C H)" }
+      },
+      "accessibility": {
+        "verifiedPairs": [
+          {
+            "pair": "primary / primary-foreground",
+            "mode": "light",
+            "resolvedHex": "#______ on #______",
+            "ratio": 0.0,
+            "pass": true
+          }
+        ],
+        "nonTextExemptions": {
+          "<token-name>": "reason it is exempt from 4.5:1 (decorative, non-text)"
+        }
+      },
+      "notes": "string — anything the consumer must know: unmet constraints, brand compromises, deliberate omissions."
+    },
+    "minimalExample": {
+      "preset": {
+        "id": "claude",
+        "label": "Claude",
+        "scope": "accent-only",
+        "rationale": "Warm terracotta accent on a neutral base — reads as considered and editorial without competing with dense content."
+      },
+      "axes": {
+        "baseColor": "neutral",
+        "harmony": "analogous",
+        "intensity": "balanced",
+        "radius": "default",
+        "focus": "ring"
+      },
+      "tokens": {
+        "light": {
+          "--color-primary": "oklch(0.55 0.13 40)",
+          "--color-primary-foreground": "oklch(0.985 0 0)",
+          "--color-ring": "oklch(0.617 0.138 39)"
+        },
+        "dark": {
+          "--color-primary": "oklch(0.7 0.13 40)",
+          "--color-primary-foreground": "oklch(0.205 0 0)",
+          "--color-ring": "oklch(0.672 0.131 39)"
+        }
+      },
+      "accessibility": {
+        "verifiedPairs": [
+          {
+            "pair": "primary / primary-foreground",
+            "mode": "light",
+            "resolvedHex": "#af5331 on #fafafa",
+            "ratio": 4.92,
+            "pass": true
+          },
+          {
+            "pair": "primary / primary-foreground",
+            "mode": "dark",
+            "resolvedHex": "#e2805e on #171717",
+            "ratio": 6.39,
+            "pass": true
+          }
+        ],
+        "nonTextExemptions": {
+          "--color-ring": "Focus ring — true brand #c96442 kept here; 3.74:1 is below the text floor but ring is non-text."
+        }
+      },
+      "notes": "Brand hex #c96442 fails AA for text at 3.74:1. Kept verbatim for ring and chart-1; text surfaces use a darkened L=0.55 variant."
+    }
+  },
+
+  "applyTo": {
+    "axes": {
+      "effort": "runtime only",
+      "steps": [
+        "Map each axis value onto the customTheme state in useThemeStore.",
+        "No file changes, no rebuild."
+      ]
+    },
+    "tokens": {
+      "effort": "4 files",
+      "steps": [
+        "src/index.css — add [data-theme='<id>'] and .dark[data-theme='<id>'] blocks from response.tokens.",
+        "src/index.css — add .theme-dot-<id> { background-color: <accent> } for the picker swatch.",
+        "src/shared/theme/presets.ts — add { id, label } to THEME_PRESETS.",
+        "public/theme-init.js — add <id> to PRESET_PRIMARY (light/dark [primary, primaryForeground]). Skipping this causes a flash of the default accent on every cold load.",
+        "Optional: set DEFAULT_PRESET = '<id>' to ship it out of the box."
+      ]
+    },
+    "verify": ["pnpm validate:tokens", "pnpm validate:theme-axis", "pnpm type-check"]
+  },
+
+  "gaps": {
+    "_honest": "What does not exist yet.",
+    "noImporter": "Nothing in clinozy-fe reads this JSON. Applying a response is currently manual (the 4 steps above). A `pnpm theme:import <file.json>` script would close this — it would need to write the CSS block, patch the two registries, and run the validators.",
+    "noSchemaValidation": "There is no JSON Schema file enforcing this shape at runtime. The `response.schema` block above is descriptive, not executable.",
+    "axesNotRoundTripped": "The generated-look axes are settable in the UI but there is no export path that emits this JSON from a live theme, so design↔code sync is one-way today.",
+    "contrastNotAutomated": "AA ratios are verified by hand (OKLCH→sRGB→WCAG). Worth a test that fails the build on a sub-4.5:1 text pair in any registered preset."
+  }
+}

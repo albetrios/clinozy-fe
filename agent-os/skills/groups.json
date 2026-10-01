@@ -61,7 +61,10 @@
     "workflow": [
       "fe-auto-implement",
       "fe-skill-registry",
-      "fe-agent-os-authoring"
+      "fe-agent-os-authoring",
+      "fe-iteration-planning",
+      "fe-kickoff-iteration",
+      "fe-design-ditto"
     ],
     "external": [
       "animejs",
