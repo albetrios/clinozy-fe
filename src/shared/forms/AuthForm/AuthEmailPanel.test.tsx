@@ -519,12 +519,27 @@ describe('AuthEmailPanel', () => {
       await user.click(screen.getByTestId('auth-email-submit'));
       await screen.findByTestId('auth-email-verify-panel');
       await user.type(await screen.findByTestId('auth-email-code'), '123456');
-      await waitFor(() => expect(requestFrame).toHaveBeenCalled());
-      const firstShakeFrame = requestFrame.mock.results.at(-1)?.value;
+      // The rejection handler clears the code and requests the shake frame in one
+      // synchronous block, so once the field is empty that frame has been issued.
+      // Other code requests frames too, so it is not necessarily the latest one.
+      await waitFor(() => expect(emailLogin).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(screen.getByTestId('auth-email-code')).toHaveValue(''));
+      const framesBeforeSecondCode = new Set(
+        requestFrame.mock.results.map((result) => result.value as number),
+      );
+      const cancelsBeforeSecondCode = cancelFrame.mock.calls.length;
 
       await user.type(screen.getByTestId('auth-email-code'), '654321');
       await waitFor(() => expect(emailLogin).toHaveBeenCalledTimes(2));
-      expect(cancelFrame).toHaveBeenCalledWith(firstShakeFrame);
+      // The second rejection cancels the first shake's still-held frame; its handler
+      // runs after the call, so wait for the cancel rather than asserting at once.
+      await waitFor(() =>
+        expect(
+          cancelFrame.mock.calls
+            .slice(cancelsBeforeSecondCode)
+            .some(([frame]) => framesBeforeSecondCode.has(frame)),
+        ).toBe(true),
+      );
     } finally {
       requestFrame.mockRestore();
       cancelFrame.mockRestore();
