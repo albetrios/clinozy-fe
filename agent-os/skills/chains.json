@@ -136,12 +136,12 @@
         "fe-documentation-maintenance"
       ]
     },
-    "legacy-build": {
-      "description": "Planning and building a design version from a legacy/vN/ drop (markdown specs + optional prototype).",
-      "trigger": "legacy/**",
+    "design-build": {
+      "description": "Planning and building a design iteration from an iterations/<iteration>/ folder (markdown specs + optional prototype).",
+      "trigger": "iterations/**",
       "steps": [
         "fe-kickoff-planning",
-        "fe-legacy-ditto",
+        "fe-design-ditto",
         "fe-route-island",
         "fe-test-generation"
       ],

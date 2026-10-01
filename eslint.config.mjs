@@ -52,15 +52,16 @@ const SHARED_LAYER_PATTERN = {
 };
 
 export default defineConfig([
-  // legacy/ holds design-tool exports (prototype HTML/JS + the specs extracted
-  // from it) — reference material, never built or deployed, so never linted.
+  // iterations/ holds design-tool exports (prototype HTML/JS + the specs
+  // extracted from it) — reference material, never built or deployed, so never
+  // linted.
   globalIgnores([
     'dist',
     'node_modules',
     'coverage',
     'test-results',
     '.stryker-tmp',
-    'legacy',
+    'iterations',
   ]),
   {
     files: ['**/*.{ts,tsx}'],

@@ -77,9 +77,9 @@
       "why": "Screenshot-baseline spec edits follow the fe-visual-regression skill (baseline discipline, snapshot matrix)."
     },
     {
-      "file": "legacy/v1/shell.md",
-      "expectSkills": ["fe-kickoff-planning", "fe-legacy-ditto"],
-      "why": "A legacy/vN/ design drop is planned by fe-kickoff-planning and built by fe-legacy-ditto."
+      "file": "iterations/launch-2026-09-30-jxmr/shell.md",
+      "expectSkills": ["fe-kickoff-planning", "fe-design-ditto"],
+      "why": "An iterations/<iteration>/ design drop is planned by fe-kickoff-planning and built by fe-design-ditto."
     }
   ]
 }

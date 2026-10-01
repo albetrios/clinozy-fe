@@ -1,8 +1,8 @@
 # Paste this to Claude Design
 
 Produces **one** file — `screens.md` — holding the shell, a screen index, and
-every screen spec. Save it into `clinozy-fe/legacy/`, then say **"implement from
-legacy"**. (The theme preset comes from the separate `design-brief-prompt.md` as
+every screen spec. Save it into the iteration folder,
+`clinozy-fe/iterations/<iteration>/`, then say **"kickoff <iteration>"**. (The theme preset comes from the separate `design-brief-prompt.md` as
 `preset.md`; do **not** produce a preset here.)
 
 Fill in the two lines under **SCOPE**. Everything else is paste-as-is.
@@ -355,9 +355,10 @@ template, go back and fill it before returning.
 
 ## After it returns
 
-1. Save `screens.md` directly into `clinozy-fe/legacy/` — one file, no subfolders.
+1. Save `screens.md` directly into `clinozy-fe/iterations/<iteration>/` — one
+   file, no subfolders.
    (The preset lives beside it as `preset.md` from the design-brief prompt.)
-2. Say **"implement from legacy"**.
+2. Say **"kickoff <iteration>"**.
 
 I'll score each screen against
 [the intake gate](ditto-intake-checklist.md) before writing code — anything

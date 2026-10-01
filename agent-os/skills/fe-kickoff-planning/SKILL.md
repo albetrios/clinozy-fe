@@ -1,15 +1,15 @@
 ---
 name: fe-kickoff-planning
-description: Turn a legacy/vN/ spec drop (markdown specs + optional prototype HTML/JS) into a complete, gated KICKOFF plan and delta ledger BEFORE any code — full read with a coverage matrix, evidence-backed md↔prototype reconciliation, RED gate, then a plan whose required sections make omissions impossible. Use when the user says "kickoff", "set up a kickoff", "plan v1/v2", "make a plan from legacy", or asks to review a legacy version and plan the build. Planning half of fe-legacy-ditto — this skill plans, fe-legacy-ditto builds.
+description: Turn an iterations/<iteration>/ spec drop (markdown specs + optional prototype HTML/JS) into a complete, gated KICKOFF plan and delta ledger BEFORE any code — full read with a coverage matrix, evidence-backed md↔prototype reconciliation, RED gate, then a plan whose required sections make omissions impossible. Use when the user says "kickoff", "set up a kickoff", "plan the next iteration", "make a plan from legacy", "plan from legacy", or asks to review an iteration (or a legacy design drop) and plan the build. Planning half of fe-design-ditto — this skill plans, fe-design-ditto builds.
 ---
 
-# Kickoff planning (perfect plan from `legacy/vN/`)
+# Kickoff planning (perfect plan from `iterations/<iteration>/`)
 
 The planning half of a ditto build. **This skill produces the plan; the
-`fe-legacy-ditto` skill executes it.** Its output is two artifacts inside the
-version folder, and a stop:
+`fe-design-ditto` skill executes it.** Its output is two artifacts inside the
+iteration folder, and a stop:
 
-1. `legacy/vN/KICKOFF.md` — the plan, with every required section filled
+1. `iterations/<iteration>/KICKOFF.md` — the plan, with every required section filled
 2. The **delta ledger** — one numbered row per work item, each with a status
 
 **Nothing is built until the user confirms the plan.** A kickoff that slides
@@ -18,22 +18,47 @@ into implementation has failed.
 ## Inputs and modes
 
 ```text
-legacy/vN/                 ← the version folder (v1, v2, …)
-├── *.md                   ← specs: preset, shell, screens (flat or in a subfolder)
-├── *.html, *.js           ← optional prototype — outranks the md for behaviour
-└── KICKOFF.md             ← this skill's output
+iterations/
+├── README.md                                ← the rules (no index — `pnpm iteration:list`)
+├── launch-2026-09-30-jxmr/                  ← the launch: a full snapshot → MODE initial
+│   ├── README.md                            ← Type, Topic, Owner, Opened, Branch, Baseline, Status, Summary
+│   ├── PRD.md                               ← the full product brief
+│   ├── schema-routes.md                     ← every entity and route (the same file is in clinozy-be)
+│   ├── *.md                                 ← specs: preset, shell, every screen
+│   ├── *.html, *.js                         ← the prototype — outranks the md for behaviour
+│   └── KICKOFF.md                           ← this skill's output
+└── feat-pharmacy-returns-2026-10-06-kqzx/   ← a later iteration: changes only → MODE incremental
+    ├── README.md                            ← Baseline = the latest iteration on main when it was opened
+    ├── PRD.md                               ← a feature PRD for the change
+    ├── schema-routes.md                     ← SCOPE = the changed screens
+    ├── *.md                                 ← specs for the changed screens (+ their prototype, if any)
+    └── KICKOFF.md                           ← the delta plan
 ```
 
-- **MODE initial** (v1 / first build): everything is new; read everything.
-- **MODE incremental** (v2+): plan only the delta. Requires a baseline —
-  `legacy/v<N-1>/` on disk or in git history. No baseline → **stop, tell the
-  user, run as initial.**
+The iteration rule (in full: `iterations/README.md`):
+
+- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
+  `pnpm iteration:new <type> [topic]`. The type is `launch`, `feat`, `change`
+  or `fix`; the topic is kebab-case with no digits; the date is the day it was
+  opened; the id is four random letters. There is only one launch, and it has
+  no topic.
+- The mode comes from the type. The **launch** is **MODE initial**: a full
+  snapshot, Baseline `none`; everything is new; read everything.
+- Every other iteration is **MODE incremental**: one person, one branch,
+  changes only. The folder **is** the delta — its own PRD, `schema-routes.md`
+  scoped to the changed screens, and those screens' specs. Its README names its
+  Baseline: the latest iteration on `main` when it was opened. The current state
+  it changes is the launch plus every merged iteration, in merge order. A
+  non-launch iteration with no Baseline → **stop and tell the user.**
+- Status moves `planning` → `building` → `frozen`. An iteration is frozen in
+  the last commit before it merges and never edited after; a correction is a
+  new `fix` iteration.
 
 ## Procedure
 
 ### Step 1 — Inventory, read everything, build the coverage matrix. Stop.
 
-`ls -R legacy/vN/`, then read **every** file **in full** — every `.md`, the
+`ls -R iterations/<iteration>/`, then read **every** file **in full** — every `.md`, the
 prototype HTML including any state machine embedded at the bottom, and every
 `.js` (classify each JS file: app logic to honour, or generic runtime engine to
 ignore — say which and why).
@@ -69,11 +94,11 @@ carries evidence; a verdict without a line number is an opinion:
 Probe the prototype systematically (grep, then **read the hits in context**):
 
 ```bash
-grep -nE "sheet|drawer|modal|dialog|popup|overlay" legacy/vN/*.html legacy/vN/*.js   # shapes
-grep -nE "step|stage|wizard|sequence|switch *\(" legacy/vN/*.js                      # conditional sequences
-grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" legacy/vN/*.{js,html} # timings
-grep -nE "@media|max-width|min-width" legacy/vN/*.html                               # responsive
-grep -nE "data-[a-z-]+" legacy/vN/*.html | sort -u                                   # dead CSS check
+grep -nE "sheet|drawer|modal|dialog|popup|overlay" iterations/<iteration>/*.html iterations/<iteration>/*.js   # shapes
+grep -nE "step|stage|wizard|sequence|switch *\(" iterations/<iteration>/*.js                                   # conditional sequences
+grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" iterations/<iteration>/*.{js,html}              # timings
+grep -nE "@media|max-width|min-width" iterations/<iteration>/*.html                                            # responsive
+grep -nE "data-[a-z-]+" iterations/<iteration>/*.html | sort -u                                                # dead CSS check
 ```
 
 Mandatory reconciliation coverage — each is a row, never a blank:
@@ -90,20 +115,21 @@ Mandatory reconciliation coverage — each is a row, never a blank:
 ### Step 3 — RED gate
 
 Score every screen on the intake checklist's Part B scoreboard — A1–A12 per
-screen (`docs/superpower/design/design-intake-checklist.md`), with the
-clinozy-fe rules layered on top (`docs/superpower/design/ditto-intake-checklist.md`).
+screen (`docs/design-workflow/prompts/design-intake-checklist.md`), with the
+clinozy-fe rules layered on top (`docs/design-workflow/prompts/ditto-intake-checklist.md`).
 Any RED — unknown popup
 shape, unknown mobile behaviour, unknown conditional sequence, unknown
 table-vs-card — resolves from the prototype first; if the source is genuinely
 silent, **stop and ask**. A wrong guess here is a rebuild. AMBER (missing copy,
 icon names, exact ms) goes into the ledger as a row to resolve before done.
 
-### Step 4 — Write `legacy/vN/KICKOFF.md` (required sections — all of them)
+### Step 4 — Write `iterations/<iteration>/KICKOFF.md` (required sections — all of them)
 
 A section may say `n/a — <reason>`; it may not be absent. Missing section =
 incomplete plan.
 
-1. **Header** — version, source files, date, mode, which skill drives the build.
+1. **Header** — iteration, mode, Baseline (from its README), source files,
+   date, which skill drives the build.
 2. **Locked decisions** — routing scope, data strategy (fixtures-first vs real
    API), build scope and order. Each decision one line, numbered, dated.
 3. **Foundation (before any screen)**
@@ -140,22 +166,35 @@ incomplete plan.
    per screen, per state; the static gates
    (`pnpm validate:tokens && pnpm validate:theme-axis && pnpm validate:structure
    && pnpm validate:testids && pnpm type-check && pnpm lint`); colocated Vitest
-   per unit; and the closing snapshot reminder
-   (`git add -f legacy/ && git commit -m "chore: design specs vN (as built)"`).
-9. **Delta ledger** — numbered rows, one per work item, status
+   per unit; and the freeze step — set `Status: frozen` in
+   `iterations/<iteration>/README.md` in the last commit before the branch
+   merges to `main`. After the merge the folder is never edited; a correction is
+   a new `fix` iteration.
+9. **Delta ledger** — numbered rows, one per work item, with an **Assignee**
+   (`—` until someone takes the row) and a status
    `open | in progress | done | deferred(user-OK)`. **Success may not be
    reported while any row is open.**
 
 ### Step 4-inc — MODE incremental only
 
-Don't re-read everything; establish the delta from two signals and reconcile
-them:
+The iteration folder **is** the delta — never diff two snapshots. Step 1 read
+it in full; outside it, read only what the change touches:
 
-1. The new spec's "What changed from vN-1" section (designer's stated delta).
-2. `git diff --no-index legacy/v<N-1>/ legacy/v<N>/` (works committed or not).
+1. **The change** — the iteration's own `PRD.md` (what changes and why), its
+   `schema-routes.md` (the entities and routes of the changed screens) and the
+   changed screens' specs.
+2. **The current state it changes** — the launch plus every merged iteration,
+   in merge order. For each changed screen, read its latest spec among them and
+   its current code in `src/pages/`:
 
-A diff hit the changelog omits is a **finding** — surface it. The reconciled
-delta is the work list; classify every change before building:
+   ```bash
+   git log main --reverse --diff-filter=A --name-only --format= -- 'iterations/*/README.md'   # merged iterations, in merge order
+   ```
+
+Compare each changed screen's new spec with its current one. A difference the
+PRD doesn't state is a **finding** — surface it, don't silently build it. The
+reconciled change is the work list; screens outside it are not re-read.
+Classify every change before building:
 
 | Change | Cost | Blast radius |
 | ------ | ---- | ------------ |
@@ -171,11 +210,18 @@ live) and **stop for confirmation**. Apply only the delta; verify changed
 screens **plus the full baseline set** — an unexpected diff on an untouched
 screen is a finding, not a baseline to bless.
 
+Other iterations may merge while this one is open; parallel branches are fine.
+Before this one merges, if newer iterations reached `main`, update its
+Baseline and check for overlap — the same screen, entity or route changed by
+both — and resolve it in review. With the BE touched, the same-named
+clinozy-be iteration carries the same `schema-routes.md`.
+
 ### Step 5 — Plan self-check, then stop
 
 Before presenting, confirm every box; fix before showing, never after:
 
-- [ ] Coverage matrix: every file in `legacy/vN/` read fully and owned by a plan section
+- [ ] Coverage matrix: every file in `iterations/<iteration>/` read fully and owned by a plan section
+- [ ] Mode and Baseline match the iteration's README: `launch` = initial with Baseline `none`; anything else = incremental against its Baseline, its folder holding only the change (PRD, `schema-routes.md` scoped to the changed screens, their specs)
 - [ ] Every screen in the index has spec + reconciliation rows + plan block + ledger rows
 - [ ] All four rebuild-forcing facts resolved (or RED question raised) per screen
 - [ ] Every reconciliation verdict carries file:line / selector evidence
@@ -185,11 +231,11 @@ Before presenting, confirm every box; fix before showing, never after:
 - [ ] State management mapped per screen with no rule violations
 - [ ] Every timing is a number in ms; every icon a named export; every string an i18n key
 - [ ] Deviations section names md-over-prototype and project-rules-over-source items
-- [ ] Ledger rows cover 100% of the work — nothing exists outside the ledger
+- [ ] Ledger rows cover 100% of the work — nothing exists outside the ledger — and each has an Assignee column
 
 Present: the coverage matrix, the reconciliation table, the RED/AMBER verdicts,
 the full KICKOFF.md, and the ledger. **Stop. Build only after the user confirms
-— then hand off to `fe-legacy-ditto` and the routing table below.**
+— then hand off to `fe-design-ditto` and the routing table below.**
 
 ## Project conventions the plan must encode (non-negotiable)
 
@@ -228,7 +274,7 @@ the rules a kickoff most often gets wrong:
 
 | Work item in the plan | Skill(s) |
 | --------------------- | -------- |
-| Executing the build faithfully | **fe-legacy-ditto** (this skill's other half) |
+| Executing the build faithfully | **fe-design-ditto** (this skill's other half) |
 | New page/route scaffold | **fe-page-scaffolding** → **fe-route-island** |
 | Org-scoped routes, guards, gateway, session | **fe-routing-tenancy** |
 | Backend-resource CRUD island | **fe-resource-crud** |
@@ -255,9 +301,9 @@ the rules a kickoff most often gets wrong:
 
 ## Related
 
-- `fe-legacy-ditto` — the build half; its Steps 4–6 execute this plan
-- [`kickoff-prompt.md`](../../../docs/superpower/design/kickoff-prompt.md) — the paste-prompt this skill supersedes (kept as the user-facing entry point)
-- [`design-intake-checklist.md`](../../../docs/superpower/design/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
-- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the RED/AMBER gate's clinozy-fe rules
-- `docs/superpower/process/2-initial-implementation.md` · `3-incremental-implementation.md` — the process docs
-- `legacy/v1/KICKOFF.md` — the reference example of a complete plan
+- `fe-design-ditto` — the build half; its Steps 4–6 execute this plan
+- [`kickoff-prompt.md`](../../../docs/design-workflow/prompts/kickoff-prompt.md) — the paste-prompt this skill supersedes (kept as the user-facing entry point)
+- [`design-intake-checklist.md`](../../../docs/design-workflow/prompts/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
+- [`ditto-intake-checklist.md`](../../../docs/design-workflow/prompts/ditto-intake-checklist.md) — the RED/AMBER gate's clinozy-fe rules
+- [`initial-iteration.md`](../../../docs/design-workflow/process/initial-iteration.md) · [`incremental-iteration.md`](../../../docs/design-workflow/process/incremental-iteration.md) — the process docs
+- [`iterations/README.md`](../../../iterations/README.md) — the iteration rules (`pnpm iteration:new` opens one, `pnpm iteration:list` lists them); `iterations/launch-2026-09-30-jxmr/KICKOFF.md` is the reference example of a complete plan

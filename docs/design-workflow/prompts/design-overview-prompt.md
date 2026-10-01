@@ -2,8 +2,8 @@
 
 Produces **one** file — `design-overview.md` — a complete, detailed record of the
 **current design as it exists right now** in this Claude Design project: every
-screen, every flow, every component, every decision. Save it into
-`legacy/`. This is the top-level map; the deep dives come from the other
+screen, every flow, every component, every decision. Save it into the
+iteration folder, `clinozy-fe/iterations/<iteration>/`. This is the top-level map; the deep dives come from the other
 prompts (`preset.md` for theme, `screens.md` for per-screen UI,
 `schema-routes.md` for data + routes).
 
@@ -186,9 +186,14 @@ Inconsistencies: N.`
 
 ## After it returns
 
-1. Save `design-overview.md` directly into `legacy/` — one file, beside
-   the others.
+1. Save `design-overview.md` directly into the iteration folder,
+   `clinozy-fe/iterations/<iteration>/` — one file, beside the others.
 2. Use it to sanity-check the other three files (`preset.md`, `screens.md`,
-   `schema-routes.md`) — every screen in this inventory must have a section in
-   `screens.md` and a row in the `schema-routes.md` route map. Then say
-   **"implement from legacy"**.
+   `schema-routes.md`). For the launch, every screen in this inventory must
+   have a section in `screens.md` and a row in the `schema-routes.md` route
+   map. For any later iteration, SCOPE is the changed screens: each of those
+   must have its spec and its routes, and the rest of the inventory is context,
+   not work.
+3. When the change touches the backend, copy `schema-routes.md` into the
+   same-named clinozy-be iteration, `clinozy-be/iterations/<iteration>/`, too;
+   then say **"kickoff <iteration>"**.

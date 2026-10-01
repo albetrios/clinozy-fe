@@ -1,40 +1,44 @@
-# Process 1 — Common adoption
+# Adoption
 
-**What every path uses, regardless of version.** Read this once; the Initial and
+**What every path uses, in every iteration.** Read this once; the Initial and
 Incremental processes both assume it.
 
-The one job of this document: the rules and assets that do not change between v1,
-v2, and v3.
+The one job of this document: the rules and assets that do not change from one
+iteration to the next. The iteration rule itself — folders, modes, baselines —
+is in [the process index](README.md#iterations).
 
 ---
 
-## The skill
+## The skills
 
-Everything runs through **`fe-legacy-ditto`**
-([`agent-os/skills/fe-legacy-ditto/SKILL.md`](../../../agent-os/skills/fe-legacy-ditto/SKILL.md)).
-It auto-triggers on "ditto", "same as the html", or a `legacy/` path.
+Everything runs through two skills: **`fe-kickoff-planning`** plans
+([`agent-os/skills/fe-kickoff-planning/SKILL.md`](../../../agent-os/skills/fe-kickoff-planning/SKILL.md)),
+and **`fe-design-ditto`** builds
+([`agent-os/skills/fe-design-ditto/SKILL.md`](../../../agent-os/skills/fe-design-ditto/SKILL.md)).
+They auto-trigger on "kickoff", "ditto", "same as the html", "from legacy", or
+an `iterations/` path.
 
-It enforces one loop: **read → reconcile → gate → build → verify.** You never
-run its steps by hand — you drop specs in `legacy/` and say "implement from
-legacy", and it drives.
+They enforce one loop: **read → reconcile → gate → build → verify.** You never
+run the steps by hand — you drop specs in `iterations/<iteration>/` and say
+"kickoff <iteration>", and they drive.
 
 ## The assets
 
-| Asset                                                                    | Role                                               |
-| ------------------------------------------------------------------------ | -------------------------------------------------- |
-| [`kickoff-prompt.md`](../design/kickoff-prompt.md)                       | Starts a build with the skill's stop points intact |
-| [`design-intake-checklist.md`](../design/design-intake-checklist.md)     | The portable checklist the gate scores against     |
-| [`ditto-intake-checklist.md`](../design/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate             |
-| [`design-handoff.contract.json`](../design/design-handoff.contract.json) | Preset → token mapping                             |
-| `shadcn`                                                                 | Which primitive to reach for                       |
-| `fe-route-island`                                                        | Page structure + registrations                     |
-| `frontend-design`                                                        | Craft, once fidelity is met                        |
-| `fe-visual-regression`                                                   | Baselines (the pin step)                           |
+| Asset                                                                     | Role                                               |
+| ------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`kickoff-prompt.md`](../prompts/kickoff-prompt.md)                       | Starts a build with the skill's stop points intact |
+| [`design-intake-checklist.md`](../prompts/design-intake-checklist.md)     | The portable checklist the gate scores against     |
+| [`ditto-intake-checklist.md`](../prompts/ditto-intake-checklist.md)       | The RED / AMBER / GREEN readiness gate             |
+| [`design-handoff.contract.json`](../prompts/design-handoff.contract.json) | Preset → token mapping                             |
+| `shadcn`                                                                  | Which primitive to reach for                       |
+| `fe-route-island`                                                         | Page structure + registrations                     |
+| `frontend-design`                                                         | Craft, once fidelity is met                        |
+| `fe-visual-regression`                                                    | Baselines (the pin step)                           |
 
 ## The four rules that never change
 
-Break one of these and you get a rebuild. They apply on every path, every
-version.
+Break one of these and you get a rebuild. They apply on every path, in every
+iteration.
 
 1. **Never build from a description of a source when the source is on disk.**
    Read the file. This is the single most expensive mistake available — it
@@ -97,13 +101,14 @@ say that sentence, the variant isn't live.
 looks done, the process stops half-finished.** Prevent it with a written ledger,
 kept from the first read to the last commit.
 
-**Before building** — turn the diff / spec into an explicit numbered list, one
-row per change, each with a status. Show it to the user:
+**Before building** — turn the iteration's change into an explicit numbered
+list, one row per change, each with an assignee (`—` until someone takes it)
+and a status. Show it to the user:
 
 ```text
-Delta ledger — v<N>
-[ ] 1. <change>            — <file/surface>        — not started
-[ ] 2. <change>            — <file/surface>        — not started
+Delta ledger — <iteration>
+[ ] 1. <change>            — <file/surface>        — <assignee>   — not started
+[ ] 2. <change>            — <file/surface>        — <assignee>   — not started
 ...
 ```
 
@@ -189,5 +194,6 @@ pnpm type-check && pnpm lint
 
 ---
 
-**Next:** [Process 2 — Initial](2-initial-implementation.md) for a first build,
-or [Process 3 — Incremental](3-incremental-implementation.md) for v2 onward.
+**Next:** [Initial iteration](initial-iteration.md) for the launch, or
+[Incremental iteration](incremental-iteration.md) for every `feat`, `change` or
+`fix` after it.

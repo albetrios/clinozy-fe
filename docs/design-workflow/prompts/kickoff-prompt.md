@@ -1,30 +1,43 @@
 # Kickoff prompt
 
 > **Superseded by the `fe-kickoff-planning` skill**
-> (`agent-os/skills/fe-kickoff-planning/SKILL.md`) — saying "kickoff v1" /
-> "plan from legacy" now triggers it directly; it plans and stops, then
-> `fe-legacy-ditto` builds. This prompt is kept as the explicit paste-in entry
-> point and for other projects.
+> (`agent-os/skills/fe-kickoff-planning/SKILL.md`) — saying "kickoff
+> <iteration>" / "plan from legacy" now triggers it directly; it plans and
+> stops, then `fe-design-ditto` builds. This prompt is kept as the explicit
+> paste-in entry point and for other projects.
 
 **Paste this to Claude Code (here, in clinozy-fe) to start a build**, once the specs
-are in `legacy/`. One prompt for every version — set `MODE` and `VERSION`, then
-change the `SCOPE` lines.
+are in the iteration folder. One prompt for every iteration — set `MODE` and
+`ITERATION`, then change the `SCOPE` lines.
 
-- **v1 / first build** → `MODE: initial`
-- **v2, v3, … / a design change** → `MODE: incremental`
+The iteration rule (in full: `iterations/README.md`):
+
+- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
+  `pnpm iteration:new` — e.g. `launch-2026-09-30-jxmr`,
+  `feat-pharmacy-returns-2026-10-06-kqzx`. The type is `launch`, `feat`,
+  `change` or `fix`.
+- The **launch** is the one full snapshot: `MODE: initial`, Baseline `none`.
+- Every later iteration is `MODE: incremental` and holds **only its change** —
+  a feature PRD, `schema-routes.md` scoped to the changed screens, and those
+  screens' specs. The folder is the delta; its README names its Baseline, the
+  latest iteration on `main` when it was opened.
+- An iteration is frozen once it merges; a correction is a new `fix`
+  iteration. The current state is the launch plus the merged iterations, in
+  merge order.
 
 ---
 
-Use the **`fe-legacy-ditto`** skill. Follow it in order; do not skip its stop points.
+Use the **`fe-design-ditto`** skill. Follow it in order; do not skip its stop points.
 
-**First, build a delta ledger** — one numbered row per change, each with a
-status. Show it to me. Update rows to `done` as you go. **Do not report success
-while any row is open** — an open row means the task is incomplete, not done.
+**First, build a delta ledger** — one numbered row per change, each with an
+assignee (`—` until someone takes it) and a status. Show it to me. Update rows
+to `done` as you go. **Do not report success while any row is open** — an open
+row means the task is incomplete, not done.
 
 ## SETUP
 
 - MODE: `<initial | incremental>`
-- VERSION: `<e.g. v1, v2, v3>`
+- ITERATION: `<type>-<topic>-<YYYY-MM-DD>-<id>`, created with `pnpm iteration:new`
 - Build: `<all screens | automations, contacts | just the preset | just the delta>`
 - Reference plan: `<path to plan .md, or "none">`
 
@@ -34,7 +47,7 @@ while any row is open** — an open row means the task is incomplete, not done.
 
 Everything is new; nothing exists to diff against.
 
-**1. Read everything first.** `ls -R legacy/`, then read every `.md` in full, plus
+**1. Read everything first.** `ls -R iterations/<iteration>/`, then read every `.md` in full, plus
 any prototype HTML/JS. Do not skim, do not grep-only. Report what you found —
 theme tokens, shell structure, screens, interaction shapes, step sequences,
 timings, states — **and stop for my confirmation before writing any code.**
@@ -68,23 +81,25 @@ Then go to **VERIFY & CLOSE** below.
 
 ## IF MODE = incremental
 
-Only what changed since the last version. The goal is to touch nothing else.
+Only what this iteration changes. The goal is to touch nothing else.
 
-**0. Confirm there's a baseline to diff against.** Either the previous version
-folder is still in `legacy/` (e.g. `legacy/v<N-1>/` — `git diff --no-index`
-compares folders, committed or not), **or** the previous specs are in git
-history. If neither exists, there's nothing to diff — **stop and tell me**; run
-as `initial`.
+**0. Confirm the Baseline.** Read `iterations/<iteration>/README.md`: the Type
+is `feat`, `change` or `fix`, and Baseline names an iteration. Type `launch` or
+Baseline `none` → **stop and tell me**; by the rule the launch runs as
+`initial`.
 
 **1. Establish the delta from two signals; don't re-read everything.**
 
-- Read the new spec's **"What changed from vN-1"** section — the designer's
-  stated delta.
-- Diff the previous version folder vs the new one for what actually changed:
-  `git diff --no-index legacy/v<N-1>/ legacy/v<N>/` (folder-to-folder; works
-  committed or not). Per-file also fine: `git diff --no-index legacy/v5/x.md legacy/v6/x.md`.
+- Read the iteration folder in full — the feature PRD, `schema-routes.md`
+  (SCOPE = the changed screens) and the changed screens' specs, each opening
+  with **"What changed"**. The folder **is** the delta; never diff two
+  snapshots.
+- For each changed screen, read its current spec — the latest one among the
+  launch and the merged iterations, in merge order — and its current code:
+  `git log main --reverse --diff-filter=A --name-only --format= -- 'iterations/*/README.md'`
+  lists the merged iterations in that order.
 
-If the file diff shows something the changelog omits, **that's a finding** —
+If a changed spec moves something the PRD doesn't state, **that's a finding** —
 surface it, don't silently build it. **The reconciled delta is the work list.**
 Do **not** re-read screens outside it — that re-reading is the cost we're
 avoiding.
@@ -141,10 +156,14 @@ shadow, icons, layout, states, motion) was done against the source.
 **Recap.** The closed ledger · what was built · **what still differs from the
 source and why** · what you could not verify.
 
-**Then remind me to snapshot** so the next version can be incremental:
+**Then remind me to freeze the iteration** before its branch merges: if newer
+iterations reached `main` meanwhile, update its Baseline and check for overlap
+(the same screen, entity or route changed by both); then set `Status: frozen`
+in its README in the last commit before the merge. After that the folder is
+never edited — a correction is a new `fix` iteration:
 
 ```bash
-git add -f legacy/ && git commit -m "chore: design specs <VERSION> (as built)"
+git add iterations/<iteration>/ && git commit -m "chore: freeze <iteration> (as built)"
 ```
 
 ---
@@ -171,6 +190,7 @@ several screens before checking in.
 - **Preset only:** set Build to "just the preset", MODE initial, stop after the
   preset step.
 - **Resuming a paused build:** MODE initial, but replace step 1 with _"Re-read
-  `legacy/` and the recap from last session, then continue from `<screen>`."_
+  `iterations/<iteration>/` and the recap from last session, then continue from
+  `<screen>`."_
 - **Other projects:** the same prompt works — drop the clinozy-fe specifics (hash
   modal, four registration points, the exact gate commands) and keep the shape.

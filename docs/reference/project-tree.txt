@@ -202,6 +202,26 @@ clinozy-fe/
 │   │   ├── path-to-production.md
 │   │   ├── production-readiness.md
 │   │   └── runbook-local-to-production.md
+│   ├── design-workflow/
+│   │   ├── process/
+│   │   │   ├── adoption.md
+│   │   │   ├── incremental-iteration.md
+│   │   │   ├── initial-iteration.md
+│   │   │   └── README.md
+│   │   └── prompts/
+│   │       ├── auth-public-routes-brief.md
+│   │       ├── claude-theme-preset.json
+│   │       ├── design-brief-prompt.md
+│   │       ├── design-handoff.contract.json
+│   │       ├── design-intake-checklist.md
+│   │       ├── design-overview-prompt.md
+│   │       ├── ditto-intake-checklist.md
+│   │       ├── extract-auth-screens-prompt.md
+│   │       ├── extract-screens-prompt.md
+│   │       ├── extract-system-surfaces-prompt.md
+│   │       ├── kickoff-prompt.md
+│   │       ├── README.md
+│   │       └── schema-routes-prompt.md
 │   ├── getting-started/
 │   │   ├── requirements/
 │   │   │   ├── sample-requirement.md
@@ -263,51 +283,34 @@ clinozy-fe/
 │   │   ├── 2026-06-29-codebase-audit-loop.md
 │   │   ├── 2026-09-24-production-readiness.md
 │   │   └── README.md
-│   ├── superpower/
-│   │   ├── design/
-│   │   │   ├── auth-public-routes-brief.md
-│   │   │   ├── claude-theme-preset.json
-│   │   │   ├── design-brief-prompt.md
-│   │   │   ├── design-handoff.contract.json
-│   │   │   ├── design-intake-checklist.md
-│   │   │   ├── design-overview-prompt.md
-│   │   │   ├── ditto-intake-checklist.md
-│   │   │   ├── extract-auth-screens-prompt.md
-│   │   │   ├── extract-screens-prompt.md
-│   │   │   ├── extract-system-surfaces-prompt.md
-│   │   │   ├── kickoff-prompt.md
-│   │   │   ├── README.md
-│   │   │   └── schema-routes-prompt.md
-│   │   └── process/
-│   │       ├── 1-common-adoption.md
-│   │       ├── 2-initial-implementation.md
-│   │       ├── 3-incremental-implementation.md
-│   │       └── README.md
 │   └── README.md
-├── legacy/
-│   └── v1/
-│       ├── _index.md
-│       ├── _patterns.md
-│       ├── _report.md
-│       ├── appointments.md
-│       ├── clinic-stock.md
-│       ├── Clinozy.dc.html
-│       ├── design-brief-preset.md
-│       ├── KICKOFF.md
-│       ├── leads.md
-│       ├── medical.md
-│       ├── offerings.md
-│       ├── patient-file.md
-│       ├── patients.md
-│       ├── payments.md
-│       ├── PRD.md
-│       ├── preset.md
-│       ├── shell.md
-│       ├── splash.md
-│       ├── support.js
-│       ├── tasks.md
-│       ├── today.md
-│       └── users.md
+├── iterations/
+│   ├── launch-2026-09-30-jxmr/
+│   │   ├── _index.md
+│   │   ├── _patterns.md
+│   │   ├── _report.md
+│   │   ├── appointments.md
+│   │   ├── clinic-stock.md
+│   │   ├── Clinozy.dc.html
+│   │   ├── design-brief-preset.md
+│   │   ├── KICKOFF.md
+│   │   ├── leads.md
+│   │   ├── medical.md
+│   │   ├── offerings.md
+│   │   ├── patient-file.md
+│   │   ├── patients.md
+│   │   ├── payments.md
+│   │   ├── PRD.md
+│   │   ├── preset.md
+│   │   ├── README.md
+│   │   ├── schema-routes.md
+│   │   ├── shell.md
+│   │   ├── splash.md
+│   │   ├── support.js
+│   │   ├── tasks.md
+│   │   ├── today.md
+│   │   └── users.md
+│   └── README.md
 ├── plugins/
 │   ├── csp-api-origin.ts
 │   ├── i18n-build.ts

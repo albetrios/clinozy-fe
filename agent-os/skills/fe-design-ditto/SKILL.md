@@ -1,45 +1,66 @@
 ---
-name: fe-legacy-ditto
-description: Build faithfully ("ditto") from markdown specs dropped into legacy/vN/ — a preset/theme spec plus one spec per screen, optionally alongside a prototype HTML/JS. Reads every spec first, reconciles against any prototype (prototype wins), gates on four rebuild-forcing unknowns, then verifies side-by-side at 375px and 1440px. Use when the user says ditto, "same as the html", "like the legacy", "match the design exactly", or drops specs into legacy/. Build half of fe-kickoff-planning — it executes a confirmed legacy/vN/KICKOFF.md.
+name: fe-design-ditto
+description: Build faithfully ("ditto") from the markdown specs in an iterations/<iteration>/ folder — a preset/theme spec plus one spec per screen, optionally alongside a prototype HTML/JS. Reads every spec first, reconciles against any prototype (prototype wins), gates on four rebuild-forcing unknowns, then verifies side-by-side at 375px and 1440px. Use when the user says ditto, "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", or drops specs into iterations/. Build half of fe-kickoff-planning — it executes a confirmed iterations/<iteration>/KICKOFF.md.
 ---
 
-# Legacy ditto (build faithfully from `legacy/`)
+# Design ditto (build faithfully from `iterations/<iteration>/`)
 
-For when "close enough" is a failure. The user drops specs into `legacy/` and
-wants clinozy-fe to match them — not to be inspired by them.
+For when "close enough" is a failure. The user drops specs into an iteration
+folder and wants clinozy-fe to match them — not to be inspired by them.
 
-**The one-line rule: read every file in `legacy/` before planning anything.**
-Every expensive failure in this repo's ditto work came from building against a
-summary of the source instead of the source.
+**The one-line rule: read every file in the iteration folder before planning
+anything.** Every expensive failure in this repo's ditto work came from building
+against a summary of the source instead of the source.
 
-## Expected `legacy/` layout
+## Expected iteration layout
 
-Each design version gets its own folder — `legacy/v1/`, `legacy/v2/`, … — and
-everything in it arrives as markdown, **flat in that folder**. A prototype may
-or may not be present alongside it. Below, `legacy/vN/` is the version being
-built; when `fe-kickoff-planning` has run, its `legacy/vN/KICKOFF.md` is the
-plan these steps execute.
+Each design iteration gets its own folder under `iterations/`, and everything
+in it arrives as markdown, **flat in that folder**. A prototype may or may not be
+present alongside it. Below, `iterations/<iteration>/` is the iteration being
+built; when `fe-kickoff-planning` has run, its
+`iterations/<iteration>/KICKOFF.md` is the plan these steps execute.
+
+The iteration rule (in full: `iterations/README.md`):
+
+- Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`, opened with
+  `pnpm iteration:new`; each has a `README.md` naming its Type, Owner,
+  Baseline and Status.
+- The **launch** (`launch-<YYYY-MM-DD>-<id>`, the only one) is a full
+  snapshot — **MODE initial**: every screen is built.
+- Every later iteration (`feat`, `change`, `fix`) holds **only its change** —
+  a feature PRD, `schema-routes.md` scoped to the changed screens, and those
+  screens' specs — and is **MODE incremental** against its Baseline. The folder
+  is the delta, and only the delta is built; two snapshots are never diffed.
+- An iteration is frozen once it merges to `main`; a correction is a new `fix`
+  iteration. The current state is the launch plus the merged iterations, in
+  merge order.
 
 ```text
-legacy/vN/
+iterations/<iteration>/
+├── README.md            ← Type, Topic, Owner, Opened, Branch, Baseline, Status, Summary
+├── PRD.md               ← the product brief (a feature PRD after the launch)
+├── schema-routes.md     ← entities and routes (only the changed screens' after the launch)
 ├── preset.md            ← theme: tokens, fonts, radius, density, motion
 ├── shell.md             ← header, sidebar, nav — the frame around every screen
 ├── automations.md       ← one .md per screen, named after the screen
 ├── contacts.md
 ├── dashboard.md
+├── KICKOFF.md           ← the plan (fe-kickoff-planning)
 └── (optional) *.html, *.js   ← the running prototype, if one exists
 ```
 
-Filenames vary. **Do not assume** — run `ls legacy/vN/` and read every `.md` there.
+Filenames vary. **Do not assume** — run `ls iterations/<iteration>/` and read every `.md` there.
 The preset is whichever file describes tokens/typography; the rest are screens.
-A single combined `.md` covering everything is equally valid.
+A single combined `.md` covering everything is equally valid. After the launch,
+a folder carries only the files its change touches — a `preset.md` or
+`shell.md` only when the theme or the shell changes.
 
 | Input | Role | Authority |
 | ----- | ---- | --------- |
-| `legacy/vN/preset.md` | Theme — tokens, type, radius, density, motion | Theme truth |
-| `legacy/vN/shell.md` | Header, sidebar, nav chrome | Shell truth — **see Step 4b** |
-| `legacy/vN/<screen>.md` | Per-screen structure, copy, states | Screen truth |
-| `legacy/vN/*.html`, `legacy/vN/*.js` | Prototype, when present | **Outranks the md for behaviour** |
+| `iterations/<iteration>/preset.md` | Theme — tokens, type, radius, density, motion | Theme truth |
+| `iterations/<iteration>/shell.md` | Header, sidebar, nav chrome | Shell truth — **see Step 4b** |
+| `iterations/<iteration>/<screen>.md` | Per-screen structure, copy, states | Screen truth |
+| `iterations/<iteration>/*.html`, `iterations/<iteration>/*.js` | Prototype, when present | **Outranks the md for behaviour** |
 
 **Precedence:** when a prototype exists and disagrees with the markdown, the
 prototype wins — a spec is someone's reading of it. Say so in the recap. When no
@@ -51,7 +72,7 @@ question for the user, never a guess.
 ### Step 1 — Inventory and read. Report. Stop.
 
 ```bash
-ls legacy/vN/
+ls iterations/<iteration>/
 ```
 
 Then read, in full:
@@ -72,19 +93,19 @@ Skipping this step is the single most expensive mistake available here.
 
 ```bash
 # Interaction shape — sheet or dialog?
-grep -nE "sheet|drawer|modal|dialog|popup|overlay" legacy/vN/*.html legacy/vN/*.js
+grep -nE "sheet|drawer|modal|dialog|popup|overlay" iterations/<iteration>/*.html iterations/<iteration>/*.js
 
 # Conditional step sequences (the most-missed fact)
-grep -nE "step|stage|wizard|sequence|Keys?For|switch *\(" legacy/vN/*.js
+grep -nE "step|stage|wizard|sequence|Keys?For|switch *\(" iterations/<iteration>/*.js
 
 # Timings — adjectives in a spec must resolve to numbers here
-grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" legacy/vN/*.js legacy/vN/*.html
+grep -nE "[0-9]{3,4} *(ms)?[,)]|setTimeout|duration|transition:" iterations/<iteration>/*.js iterations/<iteration>/*.html
 
 # Responsive rules the spec may have flattened
-grep -nE "@media|max-width|min-width" legacy/vN/*.html
+grep -nE "@media|max-width|min-width" iterations/<iteration>/*.html
 
 # Dead code — CSS whose markup no longer exists
-grep -nE "data-[a-z-]+" legacy/vN/*.html | sort -u
+grep -nE "data-[a-z-]+" iterations/<iteration>/*.html | sort -u
 ```
 
 Record the result:
@@ -103,8 +124,8 @@ cross-screen consistency (shared components described differently), and every
 ### Step 3 — Gate on the four blockers
 
 Score every screen on the Part B scoreboard of
-[the intake checklist](../../../docs/superpower/design/design-intake-checklist.md),
-with [the clinozy-fe rules](../../../docs/superpower/design/ditto-intake-checklist.md)
+[the intake checklist](../../../docs/design-workflow/prompts/design-intake-checklist.md),
+with [the clinozy-fe rules](../../../docs/design-workflow/prompts/ditto-intake-checklist.md)
 layered on top:
 
 | 🔴 RED — do not build | Why it blocks |
@@ -120,12 +141,12 @@ structure, resolve before done.
 
 ### Step 4 — Theme first, then screens
 
-**Apply `legacy/vN/preset.md` before building any screen.** Screens built against
+**Apply `iterations/<iteration>/preset.md` before building any screen.** Screens built against
 the wrong tokens look wrong even when their structure is right, and re-theming
 afterwards means re-screenshotting everything.
 
 Map the preset md onto the handoff contract
-([`design-handoff.contract.json`](../../../docs/superpower/design/design-handoff.contract.json)):
+([`design-handoff.contract.json`](../../../docs/design-workflow/prompts/design-handoff.contract.json)):
 
 - Colour tokens → `[data-theme='<id>']` + `.dark[data-theme='<id>']` in `src/index.css`
 - **Recompute every contrast ratio locally** — specs routinely miscalculate WCAG,
@@ -292,11 +313,11 @@ Each produced a real rebuild in this repo.
 
 ## Related
 
-- `fe-kickoff-planning` — the planning half; writes the `legacy/vN/KICKOFF.md` this skill executes
-- [`design-intake-checklist.md`](../../../docs/superpower/design/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
-- [`ditto-intake-checklist.md`](../../../docs/superpower/design/ditto-intake-checklist.md) — the gate's clinozy-fe rules
-- [`extract-screens-prompt.md`](../../../docs/superpower/design/extract-screens-prompt.md) — generates `legacy/` specs
-- [`design-handoff.contract.json`](../../../docs/superpower/design/design-handoff.contract.json) — preset mapping
+- `fe-kickoff-planning` — the planning half; writes the `iterations/<iteration>/KICKOFF.md` this skill executes
+- [`design-intake-checklist.md`](../../../docs/design-workflow/prompts/design-intake-checklist.md) — the portable checklist (Part B = the scoreboard)
+- [`ditto-intake-checklist.md`](../../../docs/design-workflow/prompts/ditto-intake-checklist.md) — the gate's clinozy-fe rules
+- [`extract-screens-prompt.md`](../../../docs/design-workflow/prompts/extract-screens-prompt.md) — generates the iteration specs
+- [`design-handoff.contract.json`](../../../docs/design-workflow/prompts/design-handoff.contract.json) — preset mapping
 - `frontend-design` — craft, once fidelity is met
 - `shadcn` — which primitive to reach for
 - `fe-route-island` — page structure and registration
