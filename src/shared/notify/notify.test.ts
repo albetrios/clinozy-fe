@@ -125,6 +125,19 @@ describe('notify', () => {
     expect(notificationBridge.getSnapshot().pending).toEqual([]);
   });
 
+  it('expires a queued message without calling into a renderer that never received it', async () => {
+    vi.useFakeTimers();
+    notify.info('Queued', { duration: 60_000 });
+    // The renderer module loads but nothing activates it, as in a page test without
+    // AppToaster mounted.
+    await vi.waitFor(() =>
+      expect(notificationBridge.getSnapshot().runtime).toBeDefined(),
+    );
+    vi.advanceTimersByTime(60_000);
+    expect(notificationBridge.getSnapshot().pending).toEqual([]);
+    expect(runtimeMock.dismiss).not.toHaveBeenCalled();
+  });
+
   it('transfers only the remaining duration and does not expire replacements early', async () => {
     vi.useFakeTimers();
     notify.info('Old', { id: 'replace', duration: 1000 });
