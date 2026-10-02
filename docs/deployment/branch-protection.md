@@ -53,6 +53,15 @@ Post-merge SBOM, release-please, and the Netlify deploys run from
 [post-merge-ci.yml](../../.github/workflows/post-merge-ci.yml) when a PR merges (not
 required PR checks — post-merge does **not** re-run the test suite).
 
+**Artifact attestations** (the post-merge source SBOM, the production bundle's build
+provenance) need **GitHub Enterprise Cloud** on a private repository — on any other plan
+GitHub refuses to store them and the job fails. There, set the repository variable
+`ARTIFACT_ATTESTATIONS=disabled`: the attest steps are skipped with a warning (the SBOM
+files are unaffected). clinozy-infra's `pnpm setup:infra:deploy` sets it from the
+organization's plan; by hand:
+`gh variable set ARTIFACT_ATTESTATIONS --body disabled --repo albetrios/clinozy-fe`.
+Delete the variable after upgrading the plan.
+
 ### Skipped PR CI jobs on docs-only pull requests
 
 When path filters detect **docs-only markdown** (`docs-only-md`), most PR CI jobs are
