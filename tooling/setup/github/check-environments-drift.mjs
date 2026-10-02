@@ -14,8 +14,47 @@ import {
   driftResultsHaveIssues,
   loadGitHubEnvironmentConfigs,
   parseGitHubEnvironmentApiResponse,
+  requiredReviewersSupport,
 } from './environments-util.mjs';
 import { getRepositoryIdentifier, requireGhAuth, runGhJson } from './github-shared.mjs';
+
+/**
+ * Can GitHub enforce required reviewers here? Reads the repository's visibility and, for a private
+ * organization repository, the organization's plan (visible to organization owners only).
+ *
+ * @param {string} repository
+ * @returns {{ support: 'supported' | 'unsupported' | 'unknown', plan: string | undefined }}
+ */
+function readRequiredReviewersSupport(repository) {
+  /** @type {{ private?: boolean, owner?: { login?: string, type?: string } }} */
+  let repositoryInfo;
+  try {
+    repositoryInfo = runGhJson(['api', `repos/${repository}`]);
+  } catch {
+    return { support: 'unknown', plan: undefined };
+  }
+  const isPrivate = repositoryInfo.private === true;
+  const ownerType = repositoryInfo.owner?.type ?? 'User';
+  /** @type {string | undefined} */
+  let ownerPlan;
+  if (isPrivate && ownerType === 'Organization' && repositoryInfo.owner?.login) {
+    try {
+      ownerPlan = runGhJson(['api', `orgs/${repositoryInfo.owner.login}`]).plan?.name;
+    } catch {
+      ownerPlan = undefined;
+    }
+  }
+  return {
+    support: requiredReviewersSupport({ isPrivate, ownerType, ownerPlan }),
+    plan: ownerPlan,
+  };
+}
+
+/** @param {{ protection?: { requiredReviewers?: { users?: string[], teams?: string[] } } }} config */
+function declaresReviewers(config) {
+  const reviewers = config.protection?.requiredReviewers;
+  return (reviewers?.users?.length ?? 0) + (reviewers?.teams?.length ?? 0) > 0;
+}
 
 /**
  * @param {{ environmentNames?: string[] }} [options]
@@ -47,6 +86,8 @@ export function validateGitHubEnvironmentsDrift(options = {}) {
 
   /** @type {Array<{ environment: string, configPath: string, issues: ReturnType<typeof compareGitHubEnvironmentToConfig> }>} */
   const results = [];
+  /** @type {ReturnType<typeof readRequiredReviewersSupport> | undefined} */
+  let reviewersProbe;
 
   for (const config of selectedConfigs) {
     const configPath = join(config.filePath);
@@ -55,7 +96,21 @@ export function validateGitHubEnvironmentsDrift(options = {}) {
       `repos/${repository}/environments/${config.name}`,
     ]);
     const live = parseGitHubEnvironmentApiResponse(apiResponse);
-    const issues = compareGitHubEnvironmentToConfig(config, live);
+    let checkReviewers = true;
+    if (declaresReviewers(config)) {
+      reviewersProbe ??= readRequiredReviewersSupport(repository);
+      if (reviewersProbe.support !== 'supported') {
+        checkReviewers = false;
+        const reason =
+          reviewersProbe.support === 'unsupported'
+            ? `GitHub needs Enterprise for them on a private repository (this account is on ${reviewersProbe.plan ?? 'a personal plan'})`
+            : "this token can't read the account's plan";
+        console.log(
+          `  ${config.name}: required reviewers not checked — ${reason}. The deployment branch policy still is.`,
+        );
+      }
+    }
+    const issues = compareGitHubEnvironmentToConfig(config, live, { checkReviewers });
     results.push({ environment: config.name, configPath, issues });
 
     if (issues.length === 0) {

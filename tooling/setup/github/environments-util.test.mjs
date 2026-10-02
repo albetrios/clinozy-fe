@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   compareGitHubEnvironmentToConfig,
   parseGitHubEnvironmentApiResponse,
+  requiredReviewersSupport,
 } from './environments-util.mjs';
 import { getRuntimeSecretNames, validateDeploySecrets } from './validate-github-env.mjs';
 
@@ -38,6 +39,70 @@ test('compareGitHubEnvironmentToConfig detects reviewer drift', () => {
 
   const issues = compareGitHubEnvironmentToConfig(config, live);
   assert.ok(issues.some((issue) => issue.kind === 'missing_in_github'));
+});
+
+// GitHub enforces required reviewers on a private repository's environments only on Enterprise,
+// so on Team they can never match the committed config and `github:sync --check` failed forever.
+test('requiredReviewersSupport: public anywhere, private only on Enterprise, unknown without the plan', () => {
+  assert.equal(
+    requiredReviewersSupport({
+      isPrivate: false,
+      ownerType: 'Organization',
+      ownerPlan: 'free',
+    }),
+    'supported',
+  );
+  assert.equal(
+    requiredReviewersSupport({
+      isPrivate: true,
+      ownerType: 'Organization',
+      ownerPlan: 'enterprise',
+    }),
+    'supported',
+  );
+  assert.equal(
+    requiredReviewersSupport({
+      isPrivate: true,
+      ownerType: 'Organization',
+      ownerPlan: 'team',
+    }),
+    'unsupported',
+  );
+  assert.equal(
+    requiredReviewersSupport({ isPrivate: true, ownerType: 'User' }),
+    'unsupported',
+  );
+  assert.equal(
+    requiredReviewersSupport({ isPrivate: true, ownerType: 'Organization' }),
+    'unknown',
+  );
+});
+
+test('compareGitHubEnvironmentToConfig skips reviewers it was told not to check, but not the branch policy', () => {
+  const config = {
+    name: 'production',
+    protection: {
+      requiredReviewers: { users: ['nikunjmavani'], teams: [], preventSelfReview: false },
+      deploymentBranchPolicy: { protectedBranches: true, customBranchPolicies: false },
+    },
+  };
+  const branchPolicyApplied = parseGitHubEnvironmentApiResponse({
+    protection_rules: [{ type: 'branch_policy' }],
+    deployment_branch_policy: { protected_branches: true, custom_branch_policies: false },
+  });
+  assert.deepEqual(
+    compareGitHubEnvironmentToConfig(config, branchPolicyApplied, {
+      checkReviewers: false,
+    }),
+    [],
+  );
+
+  const noBranchPolicy = parseGitHubEnvironmentApiResponse({ protection_rules: [] });
+  const issues = compareGitHubEnvironmentToConfig(config, noBranchPolicy, {
+    checkReviewers: false,
+  });
+  assert.ok(issues.every((issue) => issue.detail.startsWith('deploymentBranchPolicy.')));
+  assert.ok(issues.length > 0);
 });
 
 test('validateDeploySecrets fails on missing required keys only', () => {

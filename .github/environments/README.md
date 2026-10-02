@@ -145,6 +145,12 @@ When [`production.json`](production.json) specifies required reviewers or branch
 policies, apply them in **Settings → Environments → production** to match the
 committed file, then run `pnpm github:sync --check`.
 
+Required reviewers on a **private** repository's environments need **GitHub
+Enterprise** (public repositories get them on every plan). When the plan can't
+enforce them, `pnpm github:sync` and `--check` say the reviewers were not checked
+and compare only the deployment branch policy, so the check doesn't fail on a
+rule GitHub won't accept.
+
 ## CI
 
 [`reusable-netlify-deploy.yml`](../workflows/reusable-netlify-deploy.yml) runs
