@@ -12,9 +12,6 @@ import {
   shouldAttemptAutoGoogleSignIn,
   skipAutoGoogleSignIn,
 } from '@/shared/auth/auto-google-sign-in.ts';
-import { CaptchaSlot } from '@/shared/auth/captcha/CaptchaSlot.tsx';
-import { useCaptchaIntent } from '@/shared/auth/captcha/useCaptchaIntent/index.ts';
-import { useTurnstileReady } from '@/shared/auth/captcha/useTurnstileReady/index.ts';
 import type { LoginErrorCode } from '@/shared/auth/login-search.ts';
 import {
   isPasskeySignInAvailable,
@@ -27,11 +24,7 @@ import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useAuthMethods } from '@/shared/hooks/useAuthMethods/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  AUTH_FORM_TEST_IDS,
-  oauthChallengeKey,
-  sortOAuthProviders,
-} from './auth-form.constants.ts';
+import { AUTH_FORM_TEST_IDS, sortOAuthProviders } from './auth-form.constants.ts';
 import type { AuthContinuePending } from './auth-form-pending.ts';
 import { AuthEmailPanel } from './AuthEmailPanel.tsx';
 import { AuthAutoGooglePending } from './components/AuthAutoGooglePending/index.ts';
@@ -62,10 +55,9 @@ function shouldAutoStartGoogle(args: {
   googleEnabled: boolean;
   alreadyStarted: boolean;
   busy: boolean;
-  captchaReady: boolean;
 }): boolean {
   if (!(args.autoGoogleEnabled && args.googleEnabled)) return false;
-  if (args.alreadyStarted || args.busy || !args.captchaReady) return false;
+  if (args.alreadyStarted || args.busy) return false;
   return shouldAttemptAutoGoogleSignIn();
 }
 
@@ -136,7 +128,6 @@ function AuthMethodPicker({
   showPasskey,
   showEmail,
   pending,
-  challengeFor,
   onProvider,
   onPasskey,
 }: {
@@ -145,7 +136,6 @@ function AuthMethodPicker({
   showPasskey: boolean;
   showEmail: boolean;
   pending: AuthContinuePending | null;
-  challengeFor: ReturnType<typeof useCaptchaIntent>['challengeFor'];
   onProvider: (provider: string) => void;
   onPasskey: () => void;
 }) {
@@ -158,8 +148,6 @@ function AuthMethodPicker({
           providers={providers}
           showPasskey={showPasskey}
           pending={pending}
-          challengeFor={challengeFor}
-          providerChallengeKey={oauthChallengeKey}
           onProvider={onProvider}
           onPasskey={onPasskey}
           providerTestId={providerTestId}
@@ -172,7 +160,8 @@ function AuthMethodPicker({
 }
 
 /**
- * The email OTP flow — or, on an OAuth-only deployment, the form-level captcha slot in its place.
+ * The email OTP flow, when this deployment offers it. The email panel owns its own captcha
+ * slots; nothing else on the form is captcha-gated, so an OAuth-only deployment mounts none.
  */
 function AuthEmailSection({
   showEmail,
@@ -188,39 +177,29 @@ function AuthEmailSection({
   onStepChange: (step: 'email' | 'verify', email?: string) => void;
 }) {
   const { t } = useTranslation(AUTH_NS);
+  if (!showEmail) return null;
   return (
-    <>
-      {showEmail ? (
-        <div className="animate-fade-in-up">
-          {/*
-            The email OTP flow and the social methods are independent ways into
-            the same account, so they fail independently too. The page-level
-            boundary in LoginPage catches a throw anywhere in this form, but it
-            takes the WHOLE form down with it — a crash in the code input would
-            remove the working Google and GitHub buttons as well. Contained
-            here, the user keeps every method that still works.
-          */}
-          <SectionErrorBoundary
-            title={t(AUTH_KEYS.common.email)}
-            testId={AUTH_FORM_TEST_IDS.emailPanelError}
-          >
-            <AuthEmailPanel
-              pending={pending}
-              onPendingChange={onPendingChange}
-              onInteract={onInteract}
-              onStepChange={onStepChange}
-            />
-          </SectionErrorBoundary>
-        </div>
-      ) : null}
-
-      {/* The email panel owns the captcha slot (between its last field and the submit
-          button — the conventional captcha position). This form-level slot exists only for
-          OAuth-only deployments, where no email panel mounts but the provider buttons are
-          still captcha-gated. Never render both: the registry is last-mounted-wins and the
-          challenge must sit in the email flow whenever it exists. */}
-      {showEmail ? null : <CaptchaSlot testId={AUTH_FORM_TEST_IDS.captchaSlot} />}
-    </>
+    <div className="animate-fade-in-up">
+      {/*
+        The email OTP flow and the social methods are independent ways into
+        the same account, so they fail independently too. The page-level
+        boundary in LoginPage catches a throw anywhere in this form, but it
+        takes the WHOLE form down with it — a crash in the code input would
+        remove the working Google and GitHub buttons as well. Contained
+        here, the user keeps every method that still works.
+      */}
+      <SectionErrorBoundary
+        title={t(AUTH_KEYS.common.email)}
+        testId={AUTH_FORM_TEST_IDS.emailPanelError}
+      >
+        <AuthEmailPanel
+          pending={pending}
+          onPendingChange={onPendingChange}
+          onInteract={onInteract}
+          onStepChange={onStepChange}
+        />
+      </SectionErrorBoundary>
+    </div>
   );
 }
 
@@ -233,11 +212,6 @@ export function AuthForm() {
   const authMethods = useAuthMethods();
   const navigate = useNavigate();
   const location = useLocation();
-  // Only the AUTO-Google start still needs readiness up front: it fires without a
-  // click, so there is no gesture to carry the wait and no button to anchor a
-  // challenge to. Every clicked method resolves its own captcha in the handler.
-  const turnstileReady = useTurnstileReady();
-  const { challengeFor, ensureToken } = useCaptchaIntent();
   // GitHub OAuth is not provisioned for this deployment yet, so its button is
   // hidden here instead of deleted: the icon, test id, provider order and the
   // shared /callback route all stay wired up. Delete the `.filter(...)` line to
@@ -254,18 +228,14 @@ export function AuthForm() {
   // auto-start Google is knowable at first render, so it must be decided here.
   // Seeding it `false` and raising it in the effect below made the method picker
   // the first thing committed, so the whole form rendered and was then replaced
-  // by the spinner — a visible swap for as long as the captcha gate holds the
-  // effect back (LOGIN-1). `turnstileReady` is intentionally NOT part of this:
-  // it gates *starting* OAuth, not whether we intend to.
+  // by the spinner — a visible swap (LOGIN-1).
   const [autoGooglePending, setAutoGooglePending] = useState(() =>
     shouldAutoStartGoogle({
       autoGoogleEnabled: authMethods.oauthAutoGoogle,
       googleEnabled: authMethods.oauth.google,
-      // Intent only: nothing has started, nothing is busy, and the captcha gate
-      // decides when to *start*, not whether we mean to.
+      // Intent only: nothing has started and nothing is busy yet.
       alreadyStarted: false,
       busy: false,
-      captchaReady: true,
     }),
   );
   // Inline error surface for the OAuth / passkey methods — the reliable one.
@@ -343,16 +313,11 @@ export function AuthForm() {
     stashReturnTo((location.search as { redirect?: unknown }).redirect);
     try {
       /*
-       * The captcha is resolved here, inside the click, rather than by leaving
-       * this button disabled until a token exists. An auto-start has no click to
-       * absorb and no button to anchor a challenge to, so it keeps its own
-       * `captchaReady` precondition below and never reaches this branch without
-       * a token.
+       * No captcha here, by design: the provider (Google, GitHub, …) authenticates
+       * the user itself, so a Turnstile challenge in front of the redirect only
+       * slowed the click down. clinozy-be does not gate `GET /auth/oauth/:provider`
+       * on one either; the email flow keeps its captcha.
        */
-      if (!(options?.auto || (await ensureToken(oauthChallengeKey(provider))))) {
-        setPending(null);
-        return;
-      }
       captureAnalyticsEvent(ANALYTICS_EVENTS.authOauthStarted, { provider });
       const url = await authApi.oauthStart(provider);
       // Defense-in-depth: never navigate to an unvalidated backend-supplied URL.
@@ -421,7 +386,6 @@ export function AuthForm() {
       googleEnabled: authMethods.oauth.google,
       alreadyStarted: autoGoogleStartedRef.current,
       busy: Boolean(pending),
-      captchaReady: turnstileReady,
     });
     if (!canAutoStartGoogle) return;
 
@@ -436,11 +400,11 @@ export function AuthForm() {
     }, AUTO_GOOGLE_DELAY_MS);
 
     // The guard and the timer are owned together, so they are released together.
-    // If this run is torn down before the timer fires — a `pending` or
-    // `turnstileReady` change, or StrictMode's double-invoke on mount — the timer
-    // dies with it, so the guard has to come off too. Holding it left every later
-    // run bailing at `!autoGoogleStartedRef.current` while `autoGooglePending`
-    // stayed true: the spinner sat there forever and OAuth never started
+    // If this run is torn down before the timer fires — a `pending` change, or
+    // StrictMode's double-invoke on mount — the timer dies with it, so the
+    // guard has to come off too. Holding it left every later run bailing at
+    // `!autoGoogleStartedRef.current` while `autoGooglePending` stayed true:
+    // the spinner sat there forever and OAuth never started
     // (LOGIN-3). Once the timer HAS fired it nulls itself first, so the guard
     // stays held from then on and the sign-in can never start twice.
     return () => {
@@ -450,7 +414,7 @@ export function AuthForm() {
       autoGoogleStartedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- startOAuth is render-local; adding it re-arms the timer every render (LOGIN-3)
-  }, [authMethods.oauthAutoGoogle, authMethods.oauth.google, pending, turnstileReady]);
+  }, [authMethods.oauthAutoGoogle, authMethods.oauth.google, pending]);
 
   // The redirect watchdog is the one timer that can outlive this component:
   // it is armed just before the page is expected to leave, so if the form
@@ -539,7 +503,6 @@ export function AuthForm() {
           showPasskey={showPasskey}
           showEmail={showEmail}
           pending={pending}
-          challengeFor={challengeFor}
           onProvider={(provider) => void startOAuth(provider)}
           onPasskey={() => void handlePasskey()}
         />

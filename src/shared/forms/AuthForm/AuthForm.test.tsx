@@ -12,13 +12,19 @@ import { StrictMode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type * as CaptchaConfigModule from '@/shared/auth/captcha/captcha-config.ts';
+import { getCaptchaSlot, setCaptchaSlot } from '@/shared/auth/captcha/captcha-slot.ts';
+import { setTurnstileToken } from '@/shared/auth/captcha/turnstile-token-store.ts';
 import { signInWithPasskey } from '@/shared/auth/passkey-sign-in.ts';
 
 import { AuthForm } from './AuthForm.tsx';
 
-const turnstileReadyRef = vi.hoisted(() => ({ value: true }));
-vi.mock('@/shared/auth/captcha/useTurnstileReady/index.ts', () => ({
-  useTurnstileReady: () => turnstileReadyRef.value,
+// The test env switches captcha off (`VITE_CAPTCHA_DISABLED=true`). Suites that
+// need the Turnstile gate on flip this; everything else keeps the real config.
+const captchaGateRef = vi.hoisted(() => ({ active: false }));
+vi.mock('@/shared/auth/captcha/captcha-config.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof CaptchaConfigModule>()),
+  isTurnstileCaptchaGateActive: () => captchaGateRef.active,
 }));
 
 vi.mock('@/core/config/auth-methods.ts', () => ({
@@ -91,7 +97,9 @@ describe('AuthForm', () => {
     // installed, so one test leaving `emailVerificationCodeSend` pending forever, or
     // `oauthStart` rejecting, leaked into every test after it.
     vi.resetAllMocks();
-    turnstileReadyRef.value = true;
+    captchaGateRef.active = false;
+    setTurnstileToken(undefined);
+    setCaptchaSlot(null);
     authMethodsRef.value = {
       ...authMethodsRef.defaults,
       oauth: { ...authMethodsRef.defaults.oauth },
@@ -317,9 +325,7 @@ describe('AuthForm', () => {
     resolveOauth?.('https://oauth.example/redirect');
   });
 
-  it('does not spin idle OAuth buttons once another method is pending (single-use captcha)', async () => {
-    // Captcha token not yet minted (or consumed by the in-flight method).
-    turnstileReadyRef.value = false;
+  it('does not spin idle OAuth buttons once another method is pending', async () => {
     const user = userEvent.setup();
     vi.mocked(signInWithPasskey).mockImplementation(
       () => new Promise<void>(() => {}), // stays pending
@@ -394,15 +400,31 @@ describe('AuthForm', () => {
       expect(screen.queryByTestId('auth-continue-google')).not.toBeInTheDocument();
     });
 
-    it('still shows the auto-Google screen while the captcha token is minting', async () => {
-      // The gate that made the flicker long enough to see: the effect cannot start
-      // OAuth yet, but the intent to auto-start is already known.
-      turnstileReadyRef.value = false;
-      enableAutoGoogle();
-      renderForm();
+    // The auto-start used to wait for a Turnstile token before it could fire.
+    // OAuth is no longer captcha-gated, so a token that has not minted yet (or
+    // never will) must not hold the handoff back.
+    it('starts Google without waiting for a captcha token', async () => {
+      vi.useFakeTimers();
+      try {
+        captchaGateRef.active = true; // Turnstile on, no token in the store
+        const { authApi } = await import('@/shared/api/auth-api.ts');
+        vi.mocked(authApi.oauthStart).mockImplementation(
+          () => new Promise<string>(() => {}), // never settles: mid-redirect
+        );
+        enableAutoGoogle();
+        renderForm();
 
-      expect(await screen.findByTestId('auth-auto-google-pending')).toBeInTheDocument();
-      expect(screen.queryByTestId('auth-social-methods')).not.toBeInTheDocument();
+        await vi.waitFor(() =>
+          expect(screen.getByTestId('auth-auto-google-pending')).toBeInTheDocument(),
+        );
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1_000); // past AUTO_GOOGLE_DELAY_MS
+        });
+
+        expect(authApi.oauthStart).toHaveBeenCalledWith('google');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('leaves the "use email instead" escape hatch clickable', async () => {
@@ -481,11 +503,6 @@ describe('AuthForm', () => {
 
         // Started, and started exactly once — the guard still does its job.
         expect(authApi.oauthStart).toHaveBeenCalledTimes(1);
-        // The other trigger for the same teardown — the captcha token expiring
-        // inside the 800ms window — is not reachable from here: TanStack Router
-        // does not propagate a parent rerender to the route component, so the
-        // effect never actually tears down and such a test would pass against the
-        // bug. That path is covered end to end in the browser instead.
       } finally {
         vi.useRealTimers();
       }
@@ -708,6 +725,62 @@ describe('AuthForm', () => {
       } finally {
         vi.useRealTimers();
       }
+    });
+  });
+
+  // OAuth is deliberately outside the captcha: Google/GitHub authenticate the
+  // user themselves, and the challenge was the slowest part of the click. The
+  // email flow is not — it must still block on a Turnstile token.
+  describe('captcha scope (Turnstile on, no token yet)', () => {
+    beforeEach(() => {
+      captchaGateRef.active = true;
+    });
+
+    it('starts OAuth on click without raising or waiting for a challenge', async () => {
+      const user = userEvent.setup();
+      const { authApi } = await import('@/shared/api/auth-api.ts');
+      vi.mocked(authApi.oauthStart).mockImplementation(
+        () => new Promise<string>(() => {}), // never settles: mid-redirect
+      );
+
+      renderForm();
+      await user.click(await screen.findByTestId('auth-continue-google'));
+
+      await waitFor(() => expect(authApi.oauthStart).toHaveBeenCalledWith('google'));
+      expect(getCaptchaSlot()).toBeNull();
+    });
+
+    it('still holds the email code send until the captcha is solved', async () => {
+      const user = userEvent.setup();
+      const { authApi } = await import('@/shared/api/auth-api.ts');
+
+      renderForm();
+      await user.type(await screen.findByTestId('auth-email'), 'user@example.com');
+      await user.click(screen.getByTestId('auth-email-submit'));
+
+      // The challenge is revealed in the email panel, and nothing is sent yet.
+      await waitFor(() => expect(getCaptchaSlot()).not.toBeNull());
+      expect(screen.getByTestId('auth-email-panel')).toContainElement(getCaptchaSlot());
+      expect(authApi.emailVerificationCodeSend).not.toHaveBeenCalled();
+
+      act(() => setTurnstileToken('solved-token'));
+
+      await waitFor(() =>
+        expect(authApi.emailVerificationCodeSend).toHaveBeenCalledWith(
+          'user@example.com',
+        ),
+      );
+    });
+
+    it('mounts no captcha slot on an OAuth-only deployment', async () => {
+      authMethodsRef.value = { ...authMethodsRef.value, email: false };
+
+      renderForm();
+      await screen.findByTestId('auth-continue-google');
+
+      expect(screen.queryByTestId('auth-email-panel')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('auth-captcha-slot')).not.toBeInTheDocument();
+      expect(getCaptchaSlot()).toBeNull();
     });
   });
 

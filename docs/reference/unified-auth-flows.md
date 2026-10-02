@@ -50,7 +50,8 @@ new method through `AuthMethodButton` and it inherits these rules:
 - **One spinner at a time** — only the clicked method spins; every other method is **disabled
   without a spinner**. Exactly one auth action is ever in flight (`AuthContinuePending`).
 - **Captcha coupling is per-method** — pass `captchaGated` only for methods that need a Turnstile
-  token (OAuth, email send/verify — not passkey). A gated button **disables without spinning**
+  token (email send/verify — not OAuth, whose provider authenticates the user itself, and not
+  passkey). A gated button **disables without spinning**
   while a token mints. The Turnstile token is **single-use**, so submitting one method consumes it
   and the widget mints another in the background; that wait used to be drawn as a spinner on the
   button, which claimed the click was being processed when no request was in flight — after

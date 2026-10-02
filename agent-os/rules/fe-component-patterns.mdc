@@ -151,8 +151,7 @@ identically. Adding a new method = one more `<AuthMethodButton>` with its `targe
 <AuthMethodButton
   target={{ method: 'oauth', provider }}
   pending={pending}                 // the single in-flight action (AuthContinuePending | null)
-  captchaGated                      // OAuth + email need a Turnstile token; passkey does not
-  turnstileReady={turnstileReady}
+  // no captchaGated: only email needs a Turnstile token — OAuth and passkey do not
   icon={<ProviderIcon provider={provider} />}
   label={t(AUTH_KEYS.auth.continueWithProvider, { provider })}
   onClick={() => void startOAuth(provider)}

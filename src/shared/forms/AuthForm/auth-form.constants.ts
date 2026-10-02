@@ -54,16 +54,10 @@ export function sortOAuthProviders(providers: string[]): string[] {
  * control the user pressed rather than at whichever slot mounted last.
  *
  * @remarks
- * The email steps and every OAuth provider are separate targets. They are plain
- * strings rather than a union so a provider added to the deployment's auth methods
- * needs no change here.
+ * Only the email steps are gated. The OAuth provider buttons are deliberately not:
+ * the provider authenticates the user itself, so they need no challenge target.
  */
 export const AUTH_CHALLENGE_KEYS = {
   emailSend: 'email-send',
   emailVerify: 'email-verify',
 } as const;
-
-/** Challenge-target key for one OAuth provider's button. */
-export function oauthChallengeKey(provider: string): string {
-  return `oauth:${provider}`;
-}
