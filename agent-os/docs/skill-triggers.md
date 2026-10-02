@@ -81,7 +81,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | `tests/e2e/visual.e2e.test.ts` · `tests/e2e/*-snapshots/**`                                    | `fe-visual-regression`                                                                                     |
 | `tests/e2e/**`                                                                                 | `fe-playwright-e2e`, `fe-e2e-testids`                                                                      |
 | `.env.example`                                                                                 | `fe-platform-hygiene`, `fe-env-schema-add`, `fe-documentation-maintenance`                                 |
-| `package.json` · `pnpm-lock.yaml` · `pnpm.overrides`                                           | `fe-dependency-management`                                                                                 |
+| `package.json` · `pnpm-lock.yaml` · `pnpm-workspace.yaml` overrides                            | `fe-dependency-management`                                                                                 |
 | `tooling/validate/**` · `eslint.config.mjs` restrictions · `pr-ci.yml` static-sync steps       | `fe-guard-authoring` (probe both directions; wire into CI, not just health-check)                          |
 | `agent-os/skills/**` · `agent-os/rules/**`                                                     | `fe-agent-os-authoring` (eight surfaces; regenerate the tree last)                                         |
 | `iterations/**`                                                                                | `fe-iteration-planning` (plan), `fe-kickoff-iteration` (build), `fe-design-ditto` (per screen)             |

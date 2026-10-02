@@ -1,16 +1,17 @@
 ---
 name: fe-dependency-management
-description: Safely add, update, remove, or pin npm dependencies in clinozy-fe — atomic lockfile commits, pnpm.overrides for transitive pins, audit triage, and license plus bundle-impact checks. Use when acting on a fe-dependency-auditor finding or changing package.json / pnpm-lock.yaml.
+description: Safely add, update, remove, or pin npm dependencies in clinozy-fe — atomic lockfile commits, pnpm-workspace.yaml overrides for transitive pins, audit triage, and license plus bundle-impact checks. Use when acting on a fe-dependency-auditor finding or changing package.json / pnpm-lock.yaml.
 ---
 
 # Dependency management
 
 The procedural counterpart to the `fe-dependency-auditor` agent: the agent finds,
-this skill fixes. Use it whenever `package.json` or `pnpm.overrides` changes.
+this skill fixes. Use it whenever `package.json` or the `overrides` in
+`pnpm-workspace.yaml` change.
 
 ## The one hard rule — atomic lockfile
 
-A `package.json` dependency (or `pnpm.overrides`) change and its
+A `package.json` dependency (or `pnpm-workspace.yaml` `overrides`) change and its
 `pnpm-lock.yaml` regeneration are **one commit**. Run `pnpm install` and stage
 both together. A desynced lockfile fails every frozen-install CI job
 (`ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`) and reds open release-please PRs. The
@@ -20,8 +21,9 @@ before-commit guard blocks it locally via `pnpm run validate:lockfile`.
 
 1. **Add / update:** `pnpm add <pkg>` (or edit the version), then `pnpm install`
    to regenerate the lockfile. Never hand-edit `pnpm-lock.yaml`.
-2. **Pin a transitive/vulnerable dep:** add a `pnpm.overrides` entry in
-   `package.json` (not a direct dependency), then `pnpm install`. This is how a
+2. **Pin a transitive/vulnerable dep:** add an `overrides` entry in
+   `pnpm-workspace.yaml` (not a direct dependency; pnpm 11+ ignores the old
+   `pnpm.overrides` field in `package.json`), then `pnpm install`. This is how a
    CVE in a nested package is resolved without waiting on the parent.
 3. **Audit triage:** `pnpm deps:audit` (all) and `pnpm deps:audit:prod`
    (shipped). Fix high/critical; for accepted risk, document why. Vulnerability
@@ -73,15 +75,17 @@ pnpm deps:audit                 # read the advisory + the vulnerable range
 pnpm why <package>              # find which parent(s) pull it in
 ```
 
-If no parent has published a fix, pin the transitive dep with a `pnpm.overrides`
-entry — **not** a direct dependency, which would misrepresent the dependency graph:
+If no parent has published a fix, pin the transitive dep with an `overrides` entry
+in `pnpm-workspace.yaml` — **not** a direct dependency, which would misrepresent the
+dependency graph:
 
-```jsonc
-"pnpm": { "overrides": { "ip-address": ">=10.4.0 <11" } }
+```yaml
+overrides:
+  ip-address: '>=10.4.0 <11'
 ```
 
 Bound the range (`>=x <major+1`) so the override does not silently absorb a future
-breaking major. Then `pnpm install`, and commit `package.json` + `pnpm-lock.yaml`
+breaking major. Then `pnpm install`, and commit `pnpm-workspace.yaml` + `pnpm-lock.yaml`
 **in the same commit** — a desynced lockfile fails every frozen-install job and
 reds any open release-please PR.
 

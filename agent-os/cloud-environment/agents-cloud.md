@@ -43,10 +43,10 @@ Ten steps, in order:
    `$CLAUDE_ENV_FILE`. It does **not** probe for a version manager: cloud images
    ship Node 20/21/22 and no working one (`fnm` absent, the `nvm` shell function
    reports `N/A` with no `~/.nvm` tree), so probing silently leaves Node 22 in
-   place and the install step then hard-fails on `engine-strict`. `.nvmrc` pins
-   `24.19` (a major.minor), so the exact patch release is resolved from
-   `nodejs.org/dist/index.json` at install time rather than hardcoded — that
-   keeps the pin authoritative.
+   place and the install step then hard-fails on `engineStrict`. `.nvmrc` pins
+   the exact release (`24.21.0`), which is downloaded as-is; a less specific pin
+   (`24` or `24.21`) would be resolved from `nodejs.org/dist/index.json` at
+   install time rather than hardcoded — either way the pin stays authoritative.
 2. **Distro CLI tools** — `jq`, `ripgrep`, `shellcheck`, `rsvg-convert`, `xz`.
 3. **GitHub CLI** (`gh`) from the official `cli/cli` release.
 4. **gitleaks** — without it `.husky/pre-commit` silently skips the secret scan.

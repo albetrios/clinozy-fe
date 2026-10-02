@@ -59,6 +59,7 @@ jobs:
               - 'index.html'
               - 'package.json'
               - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
               - 'vite.config.ts'
               - 'vitest.config.ts'
               - 'tsconfig*.json'
@@ -75,6 +76,7 @@ jobs:
               - 'vite.config.ts'
               - 'package.json'
               - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
             ci-config:
               - '.github/**'
             agent-os:
@@ -85,7 +87,7 @@ jobs:
             deps:
               - 'package.json'
               - 'pnpm-lock.yaml'
-              - '.npmrc'
+              - 'pnpm-workspace.yaml'
               - 'tooling/ci/bulk-audit.mjs'
             iac:
               - '.github/**'

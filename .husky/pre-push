@@ -45,7 +45,7 @@ fi
 # Unit tests (matches the CI unit lane).
 # Run only when pushed commits include unit-relevant files.
 PUSHED_UNIT_RELEVANT=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E \
-  '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$)' || true)
+  '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)' || true)
 if [ -n "$PUSHED_UNIT_RELEVANT" ]; then
   pnpm test
 else

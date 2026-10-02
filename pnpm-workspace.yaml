@@ -1,0 +1,68 @@
+# pnpm 11+ (this repo pins 12 via package.json `packageManager`) reads its
+# settings ONLY from this file: the `pnpm` field of package.json and pnpm
+# settings in .npmrc are ignored (.npmrc keeps auth/registry keys only). pnpm 12
+# also fails on a key it does not recognize here, so keep spellings exact.
+
+# Refuse to install on a Node outside package.json `engines` (was engine-strict=true in .npmrc).
+engineStrict: true
+
+# pnpm 10+ blocks dependency build scripts until each one is decided here, and
+# pnpm 11+ fails the install (ERR_PNPM_IGNORED_BUILDS) on any left undecided.
+# Allow only what the toolchain needs; deny the rest explicitly.
+allowBuilds:
+  # tsx / vitest / vite plugins -> esbuild; install.js verifies the platform binary.
+  esbuild: true
+  # Each ships its native binary as an optionalDependency; the script is only a
+  # build-from-source / download fallback when optional deps are omitted.
+  '@parcel/watcher': false
+  '@sentry/cli': false
+  # Postinstall only prints a funding banner.
+  core-js: false
+  # Postinstall writes shell completion into the user's home and prints a banner.
+  netlify-cli: false
+  # Optional native addon for hot-shots (netlify-cli telemetry over a unix socket); unused.
+  unix-dgram: false
+
+# Transitive pins: patched floors for advisories upstream has not picked up yet.
+# Prefer bounded ranges (>=x.y.z <nextMajor) so patches flow while the known-CVE
+# floor holds. A change here needs a regenerated pnpm-lock.yaml in the same commit.
+overrides:
+  basic-ftp: '>=5.3.1 <6'
+  esbuild: '>=0.28.1'
+  protobufjs: '>=7.6.4 <8'
+  minimatch: '>=10.2.5 <11'
+  nanoid@3: '>=3.3.18 <4'
+  nanoid@5: '>=5.1.16 <6'
+  multiparty: '>=4.3.0'
+  tmp: '>=0.2.6'
+  dompurify: '>=3.4.7'
+  undici@7: '^7.28.0'
+  ws: '>=8.21.0'
+  http-proxy-middleware: '>=3.0.7'
+  '@modelcontextprotocol/sdk': '>=1.30.0'
+  '@opentelemetry/core': '>=2.8.0'
+  '@fastify/static': '>=10.1.2 <11'
+  brace-expansion: '>=5.0.12 <6'
+  fast-uri: '>=3.1.8 <4'
+  smol-toml: '>=1.8.0 <2'
+  find-my-way: '>=9.7.0 <10'
+  ip-address: '>=10.4.0 <11'
+  js-yaml@5: '>=5.2.2 <6'
+  postcss: '>=8.5.23 <9'
+  sharp: '>=0.35.1 <0.36'
+  svgo: '>=4.0.2 <5'
+  '@hono/node-server': '>=2.0.5 <3'
+  hono: '>=4.12.34 <5'
+  axios: '>=1.20.0 <2'
+  markdown-it@14: '>=14.3.1 <15'
+
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-jsx-a11y>eslint: '10'
+
+# pnpm 12 refuses versions published less than minimumReleaseAge (default 1440
+# minutes = 1 day) ago, both when resolving and when verifying pnpm-lock.yaml.
+# These exact versions were younger than that when they were locked. Keep each
+# entry exact, and drop it once that version is older than the window.
+minimumReleaseAgeExclude:
+  - '@types/node@24.19.1'

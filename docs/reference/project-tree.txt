@@ -1645,7 +1645,6 @@ clinozy-fe/
 ├── .mcp.example.json
 ├── .mcp.json
 ├── .node-version
-├── .npmrc
 ├── .nvmrc
 ├── .prettierignore
 ├── .prettierrc
@@ -1671,6 +1670,7 @@ clinozy-fe/
 ├── playwright.config.ts
 ├── playwright.cross-browser.config.ts
 ├── playwright.integration-cross-browser.config.ts
+├── pnpm-workspace.yaml
 ├── README.md
 ├── SECURITY.md
 ├── SETUP.md

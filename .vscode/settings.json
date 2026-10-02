@@ -114,7 +114,7 @@
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
     "tsconfig.json": "tsconfig.*.json",
-    "package.json": "pnpm-lock.yaml, .npmrc, .nvmrc, .prettierrc, .prettierignore, eslint.config.*, biome.json, components.json",
+    "package.json": "pnpm-lock.yaml, pnpm-workspace.yaml, .nvmrc, .prettierrc, .prettierignore, eslint.config.*, biome.json, components.json",
     "vite.config.ts": "vitest.config.*, playwright.config.*",
     ".env": ".env.*"
   },

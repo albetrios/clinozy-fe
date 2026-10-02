@@ -17,7 +17,7 @@ flowchart TB
 
 ## 1. Prerequisites
 
-- Node.js **24.x** (Active LTS) or newer LTS, pnpm ≥ 9
+- Node.js **24.x** (Active LTS) or newer LTS, pnpm ≥ 12.8.1
 - This repo cloned
 - (Optional) Netlify personal access token for non-interactive use: [Netlify → User settings → Applications → Personal access tokens](https://app.netlify.com/user/applications#personal-access-tokens). Create a token and set `export NETLIFY_AUTH_TOKEN=...`
 

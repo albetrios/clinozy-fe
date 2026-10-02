@@ -82,8 +82,13 @@ const config = [
      * while the same change ADDED the boot warm-up, the router pending policy
      * and the pending-revoke sign-out. Lowered per the rule above; the ~1.2 kB
      * of headroom matches what the previous limit left.
+     *
+     * 234 → 240 kB. A deliberate exception to the ratchet rule above, by the
+     * owner's decision: first paint measures 232.8 kB, so 234 kB left ~1.2 kB and
+     * the next feature would trip it. 240 kB leaves ~7 kB of headroom for the
+     * launch work; lower it again, per the rule, once that work has landed.
      */
-    limit: '234 kB',
+    limit: '240 kB',
     gzip: true,
   },
   ...(cssPaths.length

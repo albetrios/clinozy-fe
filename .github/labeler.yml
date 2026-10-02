@@ -86,12 +86,13 @@ docs:
           - 'docs/**'
           - '*.md'
 
-# dependencies — package.json / pnpm lockfile updates (also set by Dependabot)
+# dependencies — package.json / pnpm lockfile / pnpm settings updates (also set by Dependabot)
 dependencies:
   - changed-files:
       - any-glob-to-any-file:
           - 'package.json'
           - 'pnpm-lock.yaml'
+          - 'pnpm-workspace.yaml'
 
 # tooling — Dev/CI scripts, Vite build plugins, quality-gate configs
 tooling:
