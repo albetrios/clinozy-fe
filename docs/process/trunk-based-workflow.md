@@ -129,14 +129,14 @@ release-please keeps **one standing Release PR** open (`chore: release X.Y.Z`), 
 the next version + changelog from all unreleased commits. **Merging it is the ship button:**
 
 - version bump + `CHANGELOG.md` + tag `vX.Y.Z` + GitHub Release + SBOM attach, then
-- the **one human step** — run **Release deploy** from `main` with `tag=vX.Y.Z` → prod serves `vX.Y.Z`.
+- the published release's production deploy (`release-deploy.yml`) → prod serves `vX.Y.Z`.
 
 Bump rules (highest wins): `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE:` →
 major; `chore/docs/refactor/ci/test/build/style/perf` → changelog only.
 
 ### Rollback (fast) / redeploy an old tag
 
-Two paths, both run from `main` in the `production` environment:
+Two paths, both in the `production` environment:
 
 - **Instant rollback** (no rebuild): Actions → **Rollback deploy** → Run workflow.
   Restores the previous published Netlify deploy (or an explicit `deploy_id`).

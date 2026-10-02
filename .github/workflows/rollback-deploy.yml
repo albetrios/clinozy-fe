@@ -1,10 +1,9 @@
 name: Rollback deploy
 
 # Instant production rollback — restores a PREVIOUS immutable Netlify deploy
-# without a rebuild (Netlify keeps every deploy). Manual only, run from `main`. The
-# job runs in the `production` GitHub Environment (protected branches only, plus its
-# required reviewer where the plan supports it) — same governance as a forward
-# deploy, but seconds instead of a full rebuild.
+# without a rebuild (Netlify keeps every deploy). Manual only. The job runs in the
+# `production` GitHub Environment (plus its required reviewer where the plan supports
+# it) — same governance as a forward deploy, but seconds instead of a full rebuild.
 #
 # Default: restore the deploy published immediately before the current live one.
 # Pass an explicit `deploy_id` (from the Netlify UI or `netlify api

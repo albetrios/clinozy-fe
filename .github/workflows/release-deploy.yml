@@ -4,14 +4,13 @@ name: Release deploy
 # never a moving branch SHA — so it is immune to any following merge and
 # re-runnable for any tag.
 #
-# Run it FROM `main` with the tag:
+# Fires when a GitHub Release is published (release-please cuts it on the Release-PR
+# merge, attributed to the PAT, which is why the event fires): merging the Release PR
+# is the ship button. Re-deploy any tag (a failed release deploy, roll forward/back):
 #   gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z
-# The production Environment accepts deployments from protected branches only
-# (.github/environments/production.json), so the run `release: published` starts —
-# whose ref is the tag — is refused: publishing a release does not deploy by
-# itself (same as clinozy-be). That manual run is the one human gate; GitHub
-# enforces the environment's required reviewer only where the plan supports it
-# (Enterprise, for a private repository).
+# GitHub enforces the production environment's required reviewer only where the plan
+# supports it (Enterprise, for a private repository); elsewhere there is no approval
+# step between the merge and the production deploy.
 #
 # Why not deploy from post-merge-ci.yml: keying prod off `releases_created` in the
 # merge run ties it to that run's context and SHA. A tag-pinned deploy is
