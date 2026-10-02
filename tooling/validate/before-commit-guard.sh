@@ -94,6 +94,18 @@ echo ""
 echo "10. Large staged files..."
 ./tooling/validate/large-staged-files.sh
 
+# ── 11. Project structure tree (only when files are added, deleted or renamed) ──
+# docs/reference/project-tree.txt lists every tracked file (git ls-files), and CI's Static sync
+# fails when it is stale. Regenerate and stage it here, like lint-staged's fixes — the same as
+# clinozy-be's pre-commit guard. Content-only edits can't change the tree, so they skip this.
+STAGED_TREE_CHANGES=$(git diff --cached --name-only --diff-filter=ADR || true)
+if [ -n "$STAGED_TREE_CHANGES" ]; then
+  echo ""
+  echo "11. Project structure tree..."
+  pnpm run tool:project-structure-tree
+  git add docs/reference/project-tree.txt
+fi
+
 echo ""
 echo "==================="
 echo "Before-commit guard passed."
