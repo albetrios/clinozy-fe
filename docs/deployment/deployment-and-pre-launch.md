@@ -260,7 +260,7 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
 In other words:
 
 - **Push to `main`** → release-please Release-PR refresh + Netlify alias deploy to the development environment.
-- **Merge the Release PR** → tag + stable release-please, SBOM attach, gated Netlify `--prod` deploy to production.
+- **Merge the Release PR** → tag + stable release-please, SBOM attach. Then run `release-deploy.yml` from `main` with that tag for the Netlify `--prod` deploy to production.
 
 ---
 

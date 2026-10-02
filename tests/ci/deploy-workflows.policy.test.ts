@@ -35,6 +35,29 @@ describe('deploy workflows policy', () => {
     );
   });
 
+  // GitHub stores artifact attestations for a private repository only on Enterprise Cloud; on
+  // other plans every attest step fails the job. ARTIFACT_ATTESTATIONS=disabled skips them —
+  // so every attest step must honour the switch, and a disabled run must say so.
+  it('gates every attest step on ARTIFACT_ATTESTATIONS and warns when it is disabled', () => {
+    for (const name of ['post-merge-ci.yml', 'reusable-netlify-deploy.yml']) {
+      const text = workflow(name);
+      const steps: string[] = [];
+      for (const line of text.split('\n')) {
+        if (line.trimStart().startsWith('- name: ')) steps.push(line);
+        else if (steps.length > 0) steps[steps.length - 1] += `\n${line}`;
+      }
+      const attestSteps = steps.filter((step) => step.includes('uses: actions/attest-'));
+      expect(attestSteps.length, name).toBeGreaterThan(0);
+      for (const step of attestSteps) {
+        expect(step, `${name}: ${step.split('\n')[0]?.trim()}`).toContain(
+          "vars.ARTIFACT_ATTESTATIONS != 'disabled'",
+        );
+      }
+      expect(text, name).toContain("vars.ARTIFACT_ATTESTATIONS == 'disabled'");
+      expect(text, name).toContain('title=Artifact attestations skipped');
+    }
+  });
+
   it('every caller of the reusable deploy grants the permissions its jobs request', () => {
     // A reusable workflow's job permissions must be a SUBSET of the caller's
     // grant, validated statically when the run starts — a caller that grants
