@@ -127,10 +127,10 @@ first — the repo is `personal` today. Full reference:
 
 Committed environment config: [development.json](../../.github/environments/development.json), [production.json](../../.github/environments/production.json). See [.github/environments/README.md](../../.github/environments/README.md).
 
-Only the **`production`** environment is protected: it accepts deployments from protected
-branches only (`main`), so production is deployed by running `release-deploy.yml` from `main`
-with the release tag — the one human step in the model. Its required reviewer is enforced only
-where GitHub's plan supports it (Enterprise, for a private repository). `development` is ungated.
+Only the **`production`** environment carries protection: a published release deploys to it
+(`release-deploy.yml`, pinned to the tag), so merging the release-please Release PR is the one
+human step in the model. Its required reviewer is enforced only where GitHub's plan supports it
+(Enterprise, for a private repository). `development` is ungated.
 
 **Required deploy secrets** (post-merge Netlify deploy fails if missing):
 
