@@ -42,7 +42,7 @@ Useful flags:
 
 ## Prerequisites
 
-- **Node.js 24+** (Active LTS line; see `.nvmrc`) and **pnpm** (e.g. `corepack enable && corepack prepare pnpm@latest --activate`)
+- **Node.js 24+** (Active LTS line; `.nvmrc` pins `24.21.0`) and **pnpm** 12.8.1 (`corepack enable` picks up the `packageManager` pin)
 - **External CLI tools** — on **macOS**, `pnpm setup:mac-tools` installs/upgrades everything the repo needs beyond Node/pnpm, non-interactively via Homebrew: gitleaks, gh, jq, uv, ripgrep, shellcheck, librsvg (`rsvg-convert`), and a headless Docker runtime (colima) when none is present. `pnpm setup:local` runs it automatically on macOS (opt out with `--skip-mac-tools`). The list is data-driven from [`tooling/dev/setup-prerequisites-mac-tools.manifest`](../../tooling/dev/setup-prerequisites-mac-tools.manifest) — add/remove a line to change it. Non-macOS: install the equivalents with your package manager.
 - **[clinozy-be](https://github.com/albetrios/clinozy-be)** on `:3000` for auth, org, and E2E — the FE proxies `/api` there in dev. Pure UI shell work (no login/API) can run without it; anything past `/login` needs clinozy-be up (`GET /readyz`).
 

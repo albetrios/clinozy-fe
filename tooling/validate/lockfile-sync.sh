@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 # Lockfile ↔ package.json sync gate.
 #
-# A change to package.json dependencies or `pnpm.overrides` that does NOT
+# A change to package.json dependencies or to `overrides` in pnpm-workspace.yaml
+# (pnpm 11+ ignores the old `pnpm.overrides` field in package.json) that does NOT
 # regenerate pnpm-lock.yaml produces ERR_PNPM_LOCKFILE_CONFIG_MISMATCH and fails
 # EVERY frozen-install CI job — including release-please PRs, whose branch
 # inherits the mismatch and goes all-red until it is regenerated.
@@ -28,7 +29,7 @@ if printf '%s' "$output" | grep -q 'ERR_PNPM_UNSUPPORTED_ENGINE'; then
   echo "[validate-lockfile] ERROR: Node $(node -v) is too old for this dependency tree."
   echo "  The lockfile is FINE — pnpm aborted before it could compare anything."
   echo "  Fix: switch to the pinned toolchain, then re-run:  nvm use"
-  echo "  (.nvmrc pins the minor because 24.15 is the real floor, not 24.)"
+  echo "  (.nvmrc pins 24.21.0; engines.node's floor is 24.15.)"
   echo ""
   echo "  pnpm error:"
   printf '%s\n' "$output" | sed 's/^/    /'
@@ -36,8 +37,8 @@ if printf '%s' "$output" | grep -q 'ERR_PNPM_UNSUPPORTED_ENGINE'; then
 fi
 
 echo "[validate-lockfile] ERROR: pnpm-lock.yaml is out of sync with package.json."
-echo "  A dependency or pnpm.overrides changed without regenerating the lockfile."
-echo "  Fix: run 'pnpm install', then commit package.json AND pnpm-lock.yaml together."
+echo "  A dependency (package.json) or an override (pnpm-workspace.yaml) changed without regenerating the lockfile."
+echo "  Fix: run 'pnpm install', then commit the changed manifest AND pnpm-lock.yaml together."
 echo "  A desynced lockfile breaks every frozen-install CI job and must never reach main."
 echo ""
 echo "  pnpm error:"

@@ -28,7 +28,7 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 3. **lint-staged** — ESLint --fix + Prettier on staged `.ts`, `.tsx`, `.css`, `.json`, `.md`, `.yaml`, `.yml`.
 4. **validate:vite-env** — env/mode-sniffing gate: no `import.meta.env.DEV/PROD/MODE` or `platformConfig.environment === '<name>'` / `.MODE ===` outside the config-kernel allowlist. Behavior must be driven by named `platformConfig` flags.
 5. **type-check** — `tsc --noEmit` for full project.
-6. **validate:lockfile** — _only when the commit stages `package.json` or `pnpm-lock.yaml`_ — runs `pnpm install --frozen-lockfile` (the exact check CI runs) to prove the lockfile is in sync. Catches a dependency or `pnpm.overrides` change that forgot to regenerate the lockfile before it can reach main.
+6. **validate:lockfile** — _only when the commit stages `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml`_ — runs `pnpm install --frozen-lockfile` (the exact check CI runs) to prove the lockfile is in sync. Catches a dependency or `overrides` change that forgot to regenerate the lockfile before it can reach main.
 7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan (notice + skip when not installed).
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
@@ -67,9 +67,9 @@ See **fe-lint-guard** skill for full fix patterns.
 
 **Error:** "`ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` … The current "overrides" configuration doesn't match the value found in the lockfile" (or a lockfile-outdated error).
 
-**Cause:** You changed a dependency or `pnpm.overrides` in `package.json` without regenerating `pnpm-lock.yaml`. A frozen install then fails — which reds **every** CI job on the PR, and any open release-please PR inherits the mismatch and goes all-red too.
+**Cause:** You changed a dependency in `package.json` (or an `overrides` entry in `pnpm-workspace.yaml`) without regenerating `pnpm-lock.yaml`. A frozen install then fails — which reds **every** CI job on the PR, and any open release-please PR inherits the mismatch and goes all-red too.
 
-**Fix:** Run `pnpm install`, then stage `package.json` **and** `pnpm-lock.yaml` in the same commit. **Rule:** a dependency/override change and its lockfile update are one atomic change — a desynced lockfile must never reach main.
+**Fix:** Run `pnpm install`, then stage the changed manifest **and** `pnpm-lock.yaml` in the same commit. **Rule:** a dependency/override change and its lockfile update are one atomic change — a desynced lockfile must never reach main.
 
 ## Manual Run
 
@@ -115,7 +115,7 @@ Use `pnpm health` or `pnpm health:fix` for the full path-to-production flow befo
 ## Traps that make the guard look wrong when it is right
 
 **A "lockfile out of sync" error can actually be a Node version mismatch.**
-`.npmrc` sets `engine-strict=true`, and `validate:lockfile` runs
+`pnpm-workspace.yaml` sets `engineStrict: true`, and `validate:lockfile` runs
 `pnpm install --frozen-lockfile` — which fails on an engine mismatch *before* it
 checks the lockfile, while printing the lockfile message. If the lockfile is
 genuinely in sync, read the pnpm error body:

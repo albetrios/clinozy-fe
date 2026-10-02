@@ -55,15 +55,15 @@ pnpm dev
 
 ## Prerequisites
 
-| #   | Tool           | Required Version                    | Required?   | Purpose                             |
-| --- | -------------- | ----------------------------------- | ----------- | ----------------------------------- |
-| 1   | **Git**        | any recent                          | Yes         | Version control + Husky hooks       |
-| 2   | **Node.js**    | **24.x** (Active LTS; see `.nvmrc`) | Yes         | JavaScript runtime                  |
-| 3   | **Corepack**   | (ships with Node)                   | Yes         | Enables pnpm without global install |
-| 4   | **pnpm**       | >= 9.15                             | Yes         | Package manager (via Corepack)      |
-| 5   | **Gitleaks**   | any recent                          | Recommended | Pre-commit secret scanning          |
-| 6   | **Semgrep**    | any recent                          | Optional    | Static analysis security scanning   |
-| 7   | **Playwright** | (installed via pnpm)                | Optional    | E2E browser testing                 |
+| #   | Tool           | Required Version                          | Required?   | Purpose                             |
+| --- | -------------- | ----------------------------------------- | ----------- | ----------------------------------- |
+| 1   | **Git**        | any recent                                | Yes         | Version control + Husky hooks       |
+| 2   | **Node.js**    | **24.21.0** (24 Active LTS; see `.nvmrc`) | Yes         | JavaScript runtime                  |
+| 3   | **Corepack**   | (ships with Node)                         | Yes         | Enables pnpm without global install |
+| 4   | **pnpm**       | **12.8.1** (`packageManager` pin)         | Yes         | Package manager (via Corepack)      |
+| 5   | **Gitleaks**   | any recent                                | Recommended | Pre-commit secret scanning          |
+| 6   | **Semgrep**    | any recent                                | Optional    | Static analysis security scanning   |
+| 7   | **Playwright** | (installed via pnpm)                      | Optional    | E2E browser testing                 |
 
 > **macOS shortcut:** `pnpm setup:mac-tools` installs/upgrades items 2–6 above — plus `gh`, `jq`, `uv`, `ripgrep`, `shellcheck`, `librsvg` (`rsvg-convert`), and a headless Docker runtime — non-interactively via Homebrew. `pnpm setup:local` runs it for you on macOS (opt out with `--skip-mac-tools`). The list is data-driven from [`tooling/dev/setup-prerequisites-mac-tools.manifest`](../../tooling/dev/setup-prerequisites-mac-tools.manifest).
 
@@ -141,7 +141,7 @@ git --version
 
 ## Step 2 — Install Node.js (24 LTS)
 
-The project requires **Node.js 24.x** (Active LTS), aligned with `package.json` `engines` and `.nvmrc`.
+The project pins **Node.js 24.21.0** (the latest release on the 24 Active LTS line, "Krypton") in `.nvmrc` and `.node-version`; `package.json` `engines` requires `>=24.15`.
 
 <details>
 <summary><strong>macOS</strong></summary>
@@ -155,8 +155,8 @@ nvm lets you switch between Node versions per project.
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 
 # Restart your terminal (or source your profile), then:
-nvm install    # reads .nvmrc and installs Node 24
-nvm use        # activates Node 24 for the current shell
+nvm install    # reads .nvmrc and installs Node 24.21.0
+nvm use        # activates Node 24.21.0 for the current shell
 ```
 
 **Option B: Using Homebrew**
@@ -186,8 +186,8 @@ nvm-windows lets you switch between Node versions per project.
 3. Restart your terminal, then:
 
 ```powershell
-nvm install 24
-nvm use 24
+nvm install 24.21.0
+nvm use 24.21.0
 ```
 
 **Option B: Using fnm (fast alternative to nvm)**
@@ -197,8 +197,8 @@ nvm use 24
 winget install Schniz.fnm
 
 # Restart terminal, then:
-fnm install 24
-fnm use 24
+fnm install 24.21.0
+fnm use 24.21.0
 ```
 
 **Option C: Direct download**
@@ -236,7 +236,7 @@ node -v
 
 ## Step 3 — Enable pnpm via Corepack
 
-This project uses **pnpm 9.15** as its package manager (declared in `package.json` → `"packageManager": "pnpm@9.15.0"`). Corepack ships with Node.js and manages the correct pnpm version for you automatically.
+This project uses **pnpm 12.8.1** as its package manager (declared in `package.json` → `"packageManager": "pnpm@12.8.1+sha512…"`). Corepack ships with Node.js and manages the correct pnpm version for you automatically. pnpm reads its settings (overrides, allowed build scripts, `engineStrict`, release-age exclusions) only from `pnpm-workspace.yaml`.
 
 <details>
 <summary><strong>macOS</strong></summary>
@@ -266,7 +266,7 @@ corepack enable
 > **Note for nvm-windows users:** If `corepack` is not found, it may not be included in your Node installation. Install pnpm directly instead:
 >
 > ```powershell
-> npm install -g pnpm@9
+> npm install -g pnpm@12.8.1
 > ```
 
 </details>
@@ -275,7 +275,7 @@ corepack enable
 
 ```bash
 pnpm -v
-# Should output 9.15.x
+# Should output 12.8.1
 ```
 
 Corepack reads the `"packageManager"` field from `package.json` and automatically downloads and uses the exact pnpm version when you run any `pnpm` command inside this project.
@@ -510,12 +510,12 @@ sudo corepack enable
 nvm-windows may not include Corepack. Install pnpm directly:
 
 ```powershell
-npm install -g pnpm@9
+npm install -g pnpm@12.8.1
 ```
 
 ### pnpm version mismatch warning
 
-Corepack reads the `"packageManager"` field from `package.json` and enforces `pnpm@9.15.0`. If you have a different global pnpm, Corepack takes precedence inside this project.
+Corepack reads the `"packageManager"` field from `package.json` and enforces `pnpm@12.8.1`. If you have a different global pnpm, Corepack takes precedence inside this project.
 
 ### Port 5173 already in use
 
@@ -549,14 +549,14 @@ pnpm exec husky
 **macOS (nvm):**
 
 ```bash
-nvm use       # reads .nvmrc and switches to Node 24
+nvm use       # reads .nvmrc and switches to Node 24.21.0
 node -v       # verify
 ```
 
 **Windows (nvm-windows):**
 
 ```powershell
-nvm use 24
+nvm use 24.21.0
 node -v
 ```
 

@@ -39,6 +39,7 @@
 # Root configuration
 /package.json            @nikunjmavani
 /pnpm-lock.yaml          @nikunjmavani
+/pnpm-workspace.yaml     @nikunjmavani
 /tsconfig.json           @nikunjmavani
 /vite.config.ts          @nikunjmavani
 /vitest.config.ts        @nikunjmavani

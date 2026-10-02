@@ -3,9 +3,9 @@
  *
  * `pnpm audit` (pnpm ≤ 10) calls the legacy quick-audit endpoints, which the
  * npm registry retired on 2026-07-15 (HTTP 410 — "use the bulk advisory
- * endpoint instead"). pnpm ships bulk support only from v11, so until the
- * package-manager major lands this script keeps the Security-audit lane
- * working: it collects every locked package version from `pnpm-lock.yaml`
+ * endpoint instead"). pnpm ships bulk support only from v11; this script
+ * predates the repo's move to pnpm 12 and remains the Security-audit gate
+ * (swapping it for `pnpm audit` is a separate change): it collects every locked package version from `pnpm-lock.yaml`
  * (lockfile v9), asks `/-/npm/v1/security/advisories/bulk` which advisories
  * apply to those exact versions (the endpoint does the range matching), and
  * fails when any advisory at or above the threshold severity comes back.
@@ -222,7 +222,7 @@ for (const [name, entries] of Object.entries(advisories)) {
 const scope = prodOnly ? 'prod-reachable' : 'all';
 if (failures > 0) {
   console.error(
-    `[bulk-audit] ${failures} advisory(ies) at ${levelFlag}+ across ${audited.size} ${scope} packages — fix or pin (pnpm.overrides).`,
+    `[bulk-audit] ${failures} advisory(ies) at ${levelFlag}+ across ${audited.size} ${scope} packages — fix or pin (overrides in pnpm-workspace.yaml).`,
   );
   process.exit(1);
 }

@@ -36,10 +36,11 @@ echo "5. Type check..."
 pnpm type-check
 
 # ── 6. Lockfile ↔ package.json sync (only when deps/overrides change) ──
-# A package.json change (dependency or pnpm.overrides) without a regenerated
-# pnpm-lock.yaml causes ERR_PNPM_LOCKFILE_CONFIG_MISMATCH and reds every
-# frozen-install CI job. Gated on the staged file set so normal commits stay fast.
-STAGED_DEPS=$(git diff --cached --name-only --diff-filter=d | grep -E '^(package\.json|pnpm-lock\.yaml)$' || true)
+# A package.json dependency change (or an `overrides` change in
+# pnpm-workspace.yaml) without a regenerated pnpm-lock.yaml causes
+# ERR_PNPM_LOCKFILE_CONFIG_MISMATCH and reds every frozen-install CI job.
+# Gated on the staged file set so normal commits stay fast.
+STAGED_DEPS=$(git diff --cached --name-only --diff-filter=d | grep -E '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$' || true)
 if [ -n "$STAGED_DEPS" ]; then
   echo ""
   echo "6. Lockfile sync..."

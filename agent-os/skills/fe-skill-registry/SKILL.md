@@ -1007,14 +1007,14 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-dependency-management/SKILL.md`
 
-**Purpose:** Safely add / update / remove / pin npm dependencies — atomic `package.json` ↔ `pnpm-lock.yaml` commits, `pnpm.overrides` for transitive pins, `pnpm deps:audit` triage, license and bundle-impact checks. Procedural counterpart to the `fe-dependency-auditor` agent.
+**Purpose:** Safely add / update / remove / pin npm dependencies — atomic `package.json` ↔ `pnpm-lock.yaml` commits, `pnpm-workspace.yaml` overrides for transitive pins, `pnpm deps:audit` triage, license and bundle-impact checks. Procedural counterpart to the `fe-dependency-auditor` agent.
 
-**Trigger keywords:** "add dependency", "update package", "pnpm add", "pnpm.overrides", "audit fix", "lockfile", "bump version", "vulnerability", "CVE"
+**Trigger keywords:** "add dependency", "update package", "pnpm add", "pnpm.overrides", "pnpm-workspace.yaml", "audit fix", "lockfile", "bump version", "vulnerability", "CVE"
 
 **Key behaviors:**
 
 - One atomic commit for a `package.json` change + regenerated lockfile
-- Pin transitive/vulnerable deps via `pnpm.overrides`, never hand-edit the lockfile
+- Pin transitive/vulnerable deps via `overrides` in `pnpm-workspace.yaml`, never hand-edit the lockfile
 - `pnpm run validate:lockfile`, `pnpm deps:audit`, `pnpm knip` after changes
 
 **Related skills:** fe-code-quality-security, fe-platform-hygiene, fe-bundle-performance
@@ -1159,7 +1159,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 | `src/shared/store/useLocaleStore/`, `public/locale-init.js` | **fe-locale-preferences**, fe-test-generation                                                                                                    |
 | `src/lib/i18n/format.ts`, `useLocaleFormat/`          | **fe-locale-formatting**, fe-test-generation                                                                                                           |
 | `src/locales/**`                                      | **fe-i18n-constants**, fe-locale-preferences                                                                                                           |
-| `package.json`, `pnpm-lock.yaml`, `pnpm.overrides`    | **fe-dependency-management**                                                                                                                        |
+| `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml` | **fe-dependency-management**                                                                                                                        |
 | `.size-limit.json`, bundle budgets (`pnpm size`)      | **fe-bundle-performance**                                                                                                                           |
 | `eslint.config.mjs`                                   | **fe-guard-authoring**, fe-code-quality-security, fe-lint-guard                                                                                           |
 | `tooling/validate/**`                                 | **fe-guard-authoring**, fe-platform-hygiene                                                                                                            |

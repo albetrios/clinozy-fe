@@ -5,9 +5,10 @@
 # Why this exists: the cloud image ships Node 20/21/22 (under /opt/nodeXX) and
 # NO working version manager — `fnm` is absent and the `nvm` shell function is
 # non-functional (`nvm ls` reports N/A, there is no ~/.nvm/versions tree).
-# clinozy-fe sets `engine-strict=true` with `engines.node >= 24.15`, so `pnpm
-# install` HARD FAILS on the image default. Probing for a version manager
-# silently falls back to Node 22 and the whole install aborts.
+# clinozy-fe sets `engineStrict: true` (pnpm-workspace.yaml) with
+# `engines.node >= 24.15`, so `pnpm install` HARD FAILS on the image default.
+# Probing for a version manager silently falls back to Node 22 and the whole
+# install aborts.
 #
 # This installs the pinned version into /opt/node<major> — the same layout the
 # image uses and exactly where agent-os/hooks/session-start.sh looks — so the
@@ -31,7 +32,7 @@ set -euo pipefail
 
 # Fallback only — used when .nvmrc is missing or the dist index is unreachable.
 # Must satisfy engines.node in package.json.
-readonly FALLBACK_VERSION="24.19.0"
+readonly FALLBACK_VERSION="24.21.0"
 readonly DIST_INDEX="https://nodejs.org/dist/index.json"
 readonly INSTALL_PREFIX="${NODE_INSTALL_PREFIX:-/opt}"
 
@@ -39,10 +40,10 @@ repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 
 log() { printf 'install-node: %s\n' "$*" >&2; }
 
-# .nvmrc may pin a bare major (`24`), a major.minor (`24.19` — what this repo
-# pins today), or an exact major.minor.patch. Only an exact version yields a
-# tarball URL, so anything less specific is resolved against the dist index to
-# the newest matching release. This is what keeps .nvmrc authoritative instead
+# .nvmrc may pin a bare major (`24`), a major.minor (`24.19`), or an exact
+# major.minor.patch (`24.21.0` — what this repo pins today, the latest 24 LTS).
+# Only an exact version yields a tarball URL, so anything less specific is
+# resolved against the dist index to the newest matching release. This is what keeps .nvmrc authoritative instead
 # of decorative: hardcoding a version here would silently drift from the pin.
 requested=""
 if [ -f "${repository_root}/.nvmrc" ]; then

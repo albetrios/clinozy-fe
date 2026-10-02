@@ -20,7 +20,7 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 | Backend resource CRUD — list, URL dialogs, `*.resource.ts`, L7 registry | fe-resource-crud | `agent-os/skills/fe-resource-crud/SKILL.md` |
 | Form mutations, 422 field mapping, 429 rate limit, QueryBoundary error UX | fe-http-forms-errors | `agent-os/skills/fe-http-forms-errors/SKILL.md` |
 | Platform config, env read paths, knip, validate:vite-env, validate:client-env | fe-platform-hygiene | `agent-os/skills/fe-platform-hygiene/SKILL.md` |
-| Add/update/remove/pin npm deps, lockfile sync, `pnpm.overrides`, audit fix, vulnerability | fe-dependency-management | `agent-os/skills/fe-dependency-management/SKILL.md` |
+| Add/update/remove/pin npm deps, lockfile sync, `pnpm-workspace.yaml` overrides, audit fix, vulnerability | fe-dependency-management | `agent-os/skills/fe-dependency-management/SKILL.md` |
 | Bundle size budget, code splitting, dynamic import, first-paint regression, `pnpm size` | fe-bundle-performance | `agent-os/skills/fe-bundle-performance/SKILL.md` |
 | New page, route, scaffold | fe-page-scaffolding | `agent-os/skills/fe-page-scaffolding/SKILL.md` |
 | Move component to shared, promote | fe-component-promotion | `agent-os/skills/fe-component-promotion/SKILL.md` |

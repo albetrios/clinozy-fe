@@ -27,12 +27,12 @@ The approval is the manual gate — `main` requires 0 approvals (solo-maintained
 
 ## Node.js (runtime)
 
-- **`package.json` → `engines.node`:** `>=24` — **Active LTS** only (currently the **24.x** line). Do not target odd/current non-LTS releases for CI or deploy defaults.
-- **`.nvmrc` / `.node-version`:** major `24` — use `nvm install` / your version manager so local patch versions stay on that LTS line.
+- **`package.json` → `engines.node`:** `>=24.15` — **Active LTS** only (currently the **24.x** line). Do not target odd/current non-LTS releases for CI or deploy defaults.
+- **`.nvmrc` / `.node-version`:** `24.21.0` (latest 24 LTS) — use `nvm install` / your version manager so local, CI (`actions/setup-node` reads `.nvmrc`) and agent sandboxes run the same release.
 
 ## pnpm overrides (transitive CVEs)
 
-[`package.json`](../../package.json) defines `pnpm.overrides` to force patched versions where upstream has not yet bumped:
+[`pnpm-workspace.yaml`](../../pnpm-workspace.yaml) defines `overrides` to force patched versions where upstream has not yet bumped (pnpm 11+ ignores the old `pnpm.overrides` field in `package.json`):
 
 | Override                           | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

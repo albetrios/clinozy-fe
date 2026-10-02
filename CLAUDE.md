@@ -54,8 +54,9 @@ is off so a green PR merges cleanly with `gh pr merge --squash` (no bypass neede
 is intentionally absent (branch commits are unsigned — the squash-merge commit GitHub creates on `main`
 is signed regardless). The ruleset content is pinned by `tests/ci/rulesets.policy.test.ts`.
 
-**Lockfile discipline:** a `package.json` dependency or `pnpm.overrides` change and its
-`pnpm-lock.yaml` regeneration are **one atomic commit** — run `pnpm install` and stage both.
+**Lockfile discipline:** a `package.json` dependency or `pnpm-workspace.yaml` `overrides` change
+and its `pnpm-lock.yaml` regeneration are **one atomic commit** — run `pnpm install` and stage both.
+(pnpm 11+ reads settings only from `pnpm-workspace.yaml`; a `pnpm` field in `package.json` is ignored.)
 A desynced lockfile fails every frozen-install CI job (`ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`) and
 also reds any open release-please PR, so it must never reach main; the before-commit guard blocks
 it locally via `pnpm run validate:lockfile` (see `agent-os/skills/fe-platform-hygiene/SKILL.md`).

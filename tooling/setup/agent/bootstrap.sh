@@ -82,8 +82,8 @@ bash "${AGENT_DIR}/install-node.sh" >&2 || skip "install-node best-effort (using
 # SessionStart hook (agent-os/hooks/session-start.sh) does the same switch for
 # interactive sessions, but does not run when bootstrap.sh is the Setup script.
 #
-# `cut -d. -f1` is load-bearing: .nvmrc pins `24.19`, so stripping the dot would
-# yield major `2419` and look for a /opt/node2419 that never exists.
+# `cut -d. -f1` is load-bearing: .nvmrc pins `24.21.0`, so stripping the dots would
+# yield major `24210` and look for a /opt/node24210 that never exists.
 required_major="24"
 [ -f .nvmrc ] && required_major="$(tr -dc '0-9.' <.nvmrc | cut -d. -f1)"
 current_major="$(node -v 2>/dev/null | tr -dc '0-9.' | cut -d. -f1)"
