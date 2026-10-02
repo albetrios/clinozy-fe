@@ -125,10 +125,27 @@ function compareStringSets(expected, actual, label, environment, missingKind, ex
 }
 
 /**
+ * Required reviewers on a PRIVATE repository's environments need GitHub Enterprise; public
+ * repositories get them on every plan. `ownerPlan` is undefined when the token cannot read the
+ * organization's plan (only organization owners can), which leaves the answer `unknown`.
+ *
+ * @param {{ isPrivate: boolean, ownerType: string, ownerPlan?: string }} repository
+ * @returns {'supported' | 'unsupported' | 'unknown'}
+ */
+export function requiredReviewersSupport(repository) {
+  if (!repository.isPrivate) return 'supported';
+  if (repository.ownerType !== 'Organization') return 'unsupported';
+  if (repository.ownerPlan === undefined) return 'unknown';
+  return repository.ownerPlan === 'enterprise' ? 'supported' : 'unsupported';
+}
+
+/**
  * @param {ReturnType<typeof loadGitHubEnvironmentConfigs>[number]} config
  * @param {ReturnType<typeof parseGitHubEnvironmentApiResponse>} live
+ * @param {{ checkReviewers?: boolean }} [options] `checkReviewers: false` skips the reviewer
+ *   comparison — for a plan that can't enforce required reviewers (see requiredReviewersSupport).
  */
-export function compareGitHubEnvironmentToConfig(config, live) {
+export function compareGitHubEnvironmentToConfig(config, live, options = {}) {
   const environment = config.name;
   /** @type {Array<{ kind: string, environment: string, detail: string }>} */
   const issues = [];
@@ -138,7 +155,7 @@ export function compareGitHubEnvironmentToConfig(config, live) {
     return issues;
   }
 
-  if (protection.requiredReviewers) {
+  if (protection.requiredReviewers && options.checkReviewers !== false) {
     const expectedUsers = sortedUniqueNormalized(
       protection.requiredReviewers.users ?? [],
       normalizeLogin,
