@@ -43,7 +43,7 @@ flowchart LR
 
 ## Branch & environment flow
 
-Single trunk (`main`) drives both GitHub environments by **purpose**, not by branch: every push to `main` deploys to **`development`** (Netlify alias), and a **release** (release-please tag) deploys to **`production`** (Netlify `--prod`, gated by one reviewer approval).
+Single trunk (`main`) drives both GitHub environments by **purpose**, not by branch: every push to `main` deploys to **`development`** (Netlify alias), and a **release** (release-please tag) is deployed to **`production`** (Netlify `--prod`) by running `release-deploy.yml` from `main` with that tag.
 
 ### Normal flow
 
@@ -60,20 +60,20 @@ Single trunk (`main`) drives both GitHub environments by **purpose**, not by bra
 
 - **Shipping to production (a release)**
   - Merge the standing release-please **Release PR** by hand (squash) — this is the ship button.
-  - It creates a **tagged GitHub Release**, bumps the version, updates `CHANGELOG.md`, and attaches the SBOM. Publishing the release then triggers **`release-deploy.yml`**, which deploys that **tag** to production (Netlify `--prod`, `clinozy-fe.netlify.app`) gated by one reviewer approval.
+  - It creates a **tagged GitHub Release**, bumps the version, updates `CHANGELOG.md`, and attaches the SBOM. Then run **`release-deploy.yml`** from `main` with that tag (`gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z`) to deploy it to production (Netlify `--prod`, `clinozy-fe.netlify.app`). Publishing the release doesn't deploy by itself: the `production` environment accepts protected branches only, and that run's ref is the tag.
 
 ### Hotfix flow (patch an already-released version)
 
 Fix-forward on the trunk — no release branches:
 
 1. **Open a `fix:` PR to `main`** using conventional commits (e.g. `fix: handle null user on login`). PR CI + Preview run; squash-merge.
-2. **Merge the standing release-please Release PR** — the `fix:` bumps a patch; publishing it triggers `release-deploy.yml` → gated production deploy, exactly like any release.
+2. **Merge the standing release-please Release PR** — the `fix:` bumps a patch; then run `release-deploy.yml` from `main` with the new tag, exactly like any release.
 
 Because `main` deploys continuously, ship or flag any in-progress work first so a hotfix release doesn't carry it.
 
 ### Rollback
 
-Two paths, both behind the `production` reviewer:
+Two paths, both run from `main` in the `production` environment:
 
 - **Instant** (no rebuild): run **`rollback-deploy.yml`** (`workflow_dispatch`) — restores the previous published Netlify deploy, or an explicit `deploy_id`.
 - **Rebuild a tag**: run **`release-deploy.yml`** (`workflow_dispatch`) with `tag=vX.Y.Z`.
@@ -251,7 +251,7 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
    - Calculates the next version from conventional commits and keeps one standing `chore: release X.Y.Z` Release PR up to date; merging it by hand (squash) creates a tag + GitHub Release. Release PRs are **not** auto-merged (release on cadence).
 2. Deploys via the reusable Netlify workflow, split by purpose:
    - **Every push to `main`** → GitHub environment **`development`** → **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
-   - **A release** (release-please tag) → GitHub environment **`production`** → `--prod` deploy (`clinozy-fe.netlify.app`), gated by one reviewer approval.
+   - **A release** (release-please tag) → GitHub environment **`production`** → `--prod` deploy (`clinozy-fe.netlify.app`), by running `release-deploy.yml` from `main` with that tag.
    - Builds with `pnpm build`, deploys when `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, and `NETLIFY_SITE_ID` are set on that environment.
    - Post-deploy smoke checks `version.json` and `/login`.
 3. On a release: attaches the SBOM to the GitHub Release.

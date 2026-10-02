@@ -14,8 +14,9 @@ name: Reusable — Netlify deploy
 #   - workflow_call  — post-merge-ci passes github_environment (+ optional ref).
 #   - workflow_dispatch — deploy on demand: pick the `target` environment and an
 #     optional `ref` (a tag vX.Y.Z) to rebuild+republish for rollback, without
-#     the release-please pipeline. The production environment's required reviewer
-#     still gates a manual prod deploy, so governance is preserved.
+#     the release-please pipeline. A manual prod deploy still runs in the production
+#     environment (protected branches only, plus its required reviewer where the plan
+#     supports it), so governance is preserved.
 
 on:
   workflow_call:

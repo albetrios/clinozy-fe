@@ -1,16 +1,22 @@
 name: Release deploy
 
-# Production deploy, decoupled from post-merge. Fires when a GitHub Release is
-# published (release-please cuts it on the Release-PR merge, attributed to the
-# PAT, which is why the event fires) and is pinned to the RELEASE TAG — never a
-# moving branch SHA — so it is immune to any following merge and re-runnable for
-# the same tag via workflow_dispatch. The production Environment's required
-# reviewer (enforced inside reusable-netlify-deploy) is the one human gate.
+# Production deploy, decoupled from post-merge and pinned to the RELEASE TAG —
+# never a moving branch SHA — so it is immune to any following merge and
+# re-runnable for any tag.
+#
+# Run it FROM `main` with the tag:
+#   gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z
+# The production Environment accepts deployments from protected branches only
+# (.github/environments/production.json), so the run `release: published` starts —
+# whose ref is the tag — is refused: publishing a release does not deploy by
+# itself (same as clinozy-be). That manual run is the one human gate; GitHub
+# enforces the environment's required reviewer only where the plan supports it
+# (Enterprise, for a private repository).
 #
 # Why not deploy from post-merge-ci.yml: keying prod off `releases_created` in the
-# merge run ties it to that run's context and SHA. An event-driven, tag-pinned
-# deploy is re-runnable in isolation (re-publish the release, or dispatch{tag})
-# and can never deploy a SHA other than the tagged one.
+# merge run ties it to that run's context and SHA. A tag-pinned deploy is
+# re-runnable in isolation (dispatch{tag}) and can never deploy a SHA other than
+# the tagged one.
 
 on:
   release:
@@ -59,7 +65,7 @@ jobs:
     name: Deploy production
     needs: resolve
     # Rebuilds dist/ from the tagged tree (FE bakes VITE_* per build, so there is
-    # no image to promote — the tag ref is the pin). The production reviewer gate
+    # no image to promote — the tag ref is the pin). The production environment gate
     # and never-cancel concurrency both live in the reusable.
     # id-token/attestations: the reusable's run job mints the build-provenance
     # attestation for the production bundle; a reusable's permissions must be a

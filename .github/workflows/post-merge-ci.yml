@@ -19,16 +19,16 @@ name: Post-merge CI
 #     trunk HEAD even if release-please has a transient failure.
 # release-please is serialized and NEVER cancelled, so a release is never lost to
 # a following merge. The production deploy is a separate workflow, release-deploy.yml
-# (on `release: published`, pinned to the tag).
+# (run from `main` with the release tag, pinned to that tag).
 #
 # Deploy split (deploy-per-purpose, not deploy-per-branch):
 #   deploy-development → src pushes to main → Netlify --alias development (ungated)
-#   production deploy  → MOVED to release-deploy.yml (on `release: published`,
-#                        pinned to the tag) — this workflow no longer deploys prod.
+#   production deploy  → MOVED to release-deploy.yml (run from `main` with the
+#                        release tag, pinned to it) — this workflow no longer deploys prod.
 #
 # Rollback: rollback-deploy.yml (instant restore of the previous deploy). Redeploy
-# an old tag: release-deploy.yml via workflow_dispatch{tag}. Both keep the
-# production reviewer gate.
+# an old tag: release-deploy.yml via workflow_dispatch{tag}. Both run from `main`
+# in the production environment (protected branches only).
 
 on:
   push:

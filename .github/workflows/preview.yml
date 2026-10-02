@@ -7,7 +7,7 @@ name: Preview Deploy
 # `Quality gate` + `Checks`).
 #
 # Why separate from reusable-netlify-deploy.yml: that reusable is the GOVERNED
-# deploy path — fixed development/production aliases, the production reviewer
+# deploy path — fixed development/production aliases, the production environment
 # gate, per-environment never-cancel/batch concurrency, and release-artifact
 # upload. A preview differs on every one of those axes (a PR-scoped alias, no
 # gate, per-PR cancel-in-progress, no artifact), so it stays self-contained. It
