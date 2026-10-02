@@ -32,9 +32,9 @@ One config, one manifest, one changelog — all on `main`:
    Release PR** open — `chore: release X.Y.Z`. It is **not** auto-merged.
 2. **Merging that Release PR (squash, by hand) is the ship button** → it re-triggers
    post-merge CI, which cuts the tag `vX.Y.Z` + GitHub Release and attaches the SBOM.
-   Publishing the Release then fires
-   [release-deploy.yml](../../.github/workflows/release-deploy.yml), which deploys that
-   **tag** to production (Netlify `--prod`) behind the one reviewer approval.
+   Then run [release-deploy.yml](../../.github/workflows/release-deploy.yml) from `main`
+   with that tag (`gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z`) to deploy it to production (Netlify `--prod`) —
+   publishing the Release alone doesn't deploy.
 3. Meanwhile every `main` push already deploys the **development alias**
    (`development--clinozy-fe.netlify.app`) — no release needed.
 
