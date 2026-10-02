@@ -138,6 +138,12 @@ pnpm github:sync                          # apply to GitHub
 
 Full reference: [docs/reference/branch-governance.md](../../docs/reference/branch-governance.md).
 
+## Pushing only what changed
+
+`pnpm github:sync [environment...] --only KEY,KEY --yes` pushes just those keys (even one that
+equals its schema default), skips rulesets, environment shells and protection, and deletes
+nothing — instead of re-pushing every secret.
+
 ## Protection drift
 
 GitHub does not expose a full “apply protection from JSON” API for all fields.

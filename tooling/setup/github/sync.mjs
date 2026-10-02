@@ -64,11 +64,38 @@ function runNodeScript(scriptName, args) {
 }
 
 function parseArguments() {
-  const argumentsList = process.argv.slice(2);
+  const rawArguments = process.argv.slice(2);
+
+  // `--only KEY,KEY` or `--only=KEY,KEY` — taken out before the flag/environment checks below.
+  /** @type {string[] | undefined} */
+  let onlyKeys;
+  const argumentsList = [];
+  for (let index = 0; index < rawArguments.length; index += 1) {
+    const argument = rawArguments[index] ?? '';
+    if (argument === '--only' || argument.startsWith('--only=')) {
+      let value = argument.slice('--only='.length);
+      if (argument === '--only') {
+        index += 1;
+        value = rawArguments[index] ?? '';
+      }
+      onlyKeys = value
+        .split(',')
+        .map((key) => key.trim())
+        .filter(Boolean);
+      const invalid = onlyKeys.filter((key) => !/^[A-Z][A-Z0-9_]*$/.test(key));
+      if (onlyKeys.length === 0 || invalid.length > 0) {
+        throw new Error(
+          `--only needs comma-separated KEY names${invalid.length > 0 ? ` (invalid: ${invalid.join(', ')})` : ''}.`,
+        );
+      }
+      continue;
+    }
+    argumentsList.push(argument);
+  }
 
   if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
     console.log(
-      'Usage: pnpm github:sync [environment...] [--check | --dry-run | --diff] [--yes] [--prune] [--keep-schema-defaults]',
+      'Usage: pnpm github:sync [environment...] [--check | --dry-run | --diff] [--yes] [--prune] [--keep-schema-defaults] [--only KEY,KEY]',
     );
     console.log('');
     console.log(
@@ -88,6 +115,12 @@ function parseArguments() {
     console.log('  --yes, -y   Skip the values-push confirmation prompt');
     console.log(
       '  --prune     Flag/remove rulesets for branches not in config (removes with --yes)',
+    );
+    console.log(
+      '  --only KEY,KEY  Push just these values (schema defaults included): no rulesets,',
+    );
+    console.log(
+      '                  no environment shells/protection, nothing else pushed or pruned',
     );
     process.exit(0);
   }
@@ -142,11 +175,18 @@ function parseArguments() {
   const selectedEnvironments =
     environments.length === 0 ? getConfiguredEnvironmentNames() : environments;
 
+  if (onlyKeys && (mode === 'check' || mode === 'diff')) {
+    throw new Error(
+      '--only pushes values; it cannot be combined with --check or --diff.',
+    );
+  }
+
   return {
     mode,
     skipConfirmation,
     prune,
     keepSchemaDefaults,
+    onlyKeys,
     environments: selectedEnvironments,
   };
 }
@@ -174,8 +214,9 @@ async function confirmSecretsPush() {
 }
 
 async function main() {
-  const { mode, skipConfirmation, prune, keepSchemaDefaults, environments } =
+  const { mode, skipConfirmation, prune, keepSchemaDefaults, onlyKeys, environments } =
     parseArguments();
+  const valueOptions = { keepSchemaDefaults, ...(onlyKeys ? { onlyKeys } : {}) };
 
   if (mode !== 'dry-run') {
     requireGhAuth();
@@ -215,72 +256,91 @@ async function main() {
     return;
   }
 
-  if (mode === 'sync') {
+  // `--only` updates a few values: no scaffold, rulesets, environment shells or protection.
+  if (onlyKeys) {
+    console.log(`Values only — --only ${onlyKeys.join(',')}`);
+    console.log('');
+    if (mode === 'dry-run') {
+      for (const environmentName of environments) {
+        syncEnvironmentValues(environmentName, 'dry-run', valueOptions);
+      }
+      console.log('Dry run complete. No changes pushed.');
+      return;
+    }
+  } else if (mode === 'sync') {
     console.log('Step 1/4 — Scaffold local .env.<environment> files');
     scaffoldGithubEnvFiles({ dryRun: false });
     console.log('');
   }
 
-  console.log(`Step ${mode === 'sync' ? '2' : '1'}/4 — Branch rulesets`);
-  const rulesetStatus = syncRulesets(mode, { prune, skipConfirmation });
-  if (rulesetStatus !== 0) {
-    process.exit(rulesetStatus);
-  }
-  console.log('');
+  if (!onlyKeys) {
+    console.log(`Step ${mode === 'sync' ? '2' : '1'}/4 — Branch rulesets`);
+    const rulesetStatus = syncRulesets(mode, { prune, skipConfirmation });
+    if (rulesetStatus !== 0) {
+      process.exit(rulesetStatus);
+    }
+    console.log('');
 
-  console.log(`Step ${mode === 'sync' ? '3' : '2'}/4 — GitHub Environment shells`);
-  const environmentResult = ensureGitHubEnvironments(mode);
-  if (mode === 'check' && environmentResult.drift > 0) {
-    process.exit(1);
-  }
-  if (environmentResult.failures > 0) {
-    process.exit(1);
-  }
-  console.log('');
-
-  if (mode === 'check') {
-    const protectionResults = validateGitHubEnvironmentsDrift();
-    if (driftResultsHaveIssues(protectionResults)) {
+    console.log(`Step ${mode === 'sync' ? '3' : '2'}/4 — GitHub Environment shells`);
+    const environmentResult = ensureGitHubEnvironments(mode);
+    if (mode === 'check' && environmentResult.drift > 0) {
       process.exit(1);
     }
-  } else if (mode === 'dry-run') {
-    console.log('  (protection drift check skipped in dry-run — use --check)');
-  } else {
-    const protectionResults = validateGitHubEnvironmentsDrift();
-    if (driftResultsHaveIssues(protectionResults)) {
-      console.warn(
-        'Protection drift detected — update GitHub UI to match .github/environments/*.json.',
-      );
-      console.warn(
-        'Secrets will still be pushed; protection must be applied manually in GitHub.',
-      );
-    }
-  }
-  console.log('');
-
-  console.log(`Deploy values (secrets + variables)`);
-  if (mode === 'check') {
-    let totalDrift = 0;
-    for (const environmentName of environments) {
-      const result = syncEnvironmentValues(environmentName, 'check');
-      totalDrift += result.drift;
-    }
-    if (totalDrift > 0) {
+    if (environmentResult.failures > 0) {
       process.exit(1);
     }
-    console.log('GitHub sync check: OK.');
-    return;
-  }
+    console.log('');
 
-  if (mode === 'dry-run') {
-    for (const environmentName of environments) {
-      syncEnvironmentValues(environmentName, 'dry-run', { keepSchemaDefaults });
+    if (mode === 'check') {
+      const protectionResults = validateGitHubEnvironmentsDrift();
+      if (driftResultsHaveIssues(protectionResults)) {
+        process.exit(1);
+      }
+    } else if (mode === 'dry-run') {
+      console.log('  (protection drift check skipped in dry-run — use --check)');
+    } else {
+      const protectionResults = validateGitHubEnvironmentsDrift();
+      if (driftResultsHaveIssues(protectionResults)) {
+        console.warn(
+          'Protection drift detected — update GitHub UI to match .github/environments/*.json.',
+        );
+        console.warn(
+          'Secrets will still be pushed; protection must be applied manually in GitHub.',
+        );
+      }
     }
-    console.log('Dry run complete. No changes pushed.');
-    return;
+    console.log('');
+
+    console.log(`Deploy values (secrets + variables)`);
+    if (mode === 'check') {
+      let totalDrift = 0;
+      for (const environmentName of environments) {
+        const result = syncEnvironmentValues(environmentName, 'check');
+        totalDrift += result.drift;
+      }
+      if (totalDrift > 0) {
+        process.exit(1);
+      }
+      console.log('GitHub sync check: OK.');
+      return;
+    }
+
+    if (mode === 'dry-run') {
+      for (const environmentName of environments) {
+        syncEnvironmentValues(environmentName, 'dry-run', valueOptions);
+      }
+      console.log('Dry run complete. No changes pushed.');
+      return;
+    }
   }
 
-  if (!skipConfirmation) {
+  if (!skipConfirmation && onlyKeys) {
+    console.log(`  Pushes only ${onlyKeys.join(', ')}; nothing is deleted.`);
+    if (!(await confirmSecretsPush())) {
+      console.log('Values push skipped.');
+      return;
+    }
+  } else if (!skipConfirmation) {
     console.log('  Secrets are always pushed; variables are pushed only when missing or');
     console.log(
       '  changed. A variable equal to its env-schema default is NOT pushed and is',
@@ -305,7 +365,7 @@ async function main() {
   let deleted = 0;
   let schemaDefaultSkipped = 0;
   for (const environmentName of environments) {
-    const result = syncEnvironmentValues(environmentName, 'sync', { keepSchemaDefaults });
+    const result = syncEnvironmentValues(environmentName, 'sync', valueOptions);
     failures += result.failures;
     pushed += result.pushed;
     unchanged += result.unchanged;

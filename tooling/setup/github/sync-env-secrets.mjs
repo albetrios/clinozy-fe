@@ -113,16 +113,46 @@ function loadManagedState(environmentName) {
  * @param {string} environmentName
  * @param {{ keepSchemaDefaults?: boolean, fetchRemote?: boolean }} [options]
  */
+/**
+ * The declared entries `--only` pushes, plus the requested keys that are missing or blank in
+ * the local file (the caller refuses to push then, rather than silently skipping a key).
+ *
+ * @template {{ name: string, value: string }} T
+ * @param {readonly T[]} declared
+ * @param {readonly string[]} onlyKeys
+ * @returns {{ entries: T[], missing: string[] }}
+ */
+export function selectOnlyEntries(declared, onlyKeys) {
+  const wanted = new Set(onlyKeys);
+  const entries = declared.filter(
+    (entry) => wanted.has(entry.name) && entry.value !== '',
+  );
+  const present = new Set(entries.map((entry) => entry.name));
+  return { entries, missing: [...wanted].filter((key) => !present.has(key)) };
+}
+
 function buildPlan(environmentName, options = {}) {
-  const { keepSchemaDefaults = false, fetchRemote = true } = options;
-  const { declared, secretKeys, variableKeys } = loadManagedState(environmentName);
+  const { keepSchemaDefaults = false, fetchRemote = true, onlyKeys } = options;
+  const managed = loadManagedState(environmentName);
+  const { secretKeys, variableKeys } = managed;
+  let { declared } = managed;
+  if (onlyKeys) {
+    const { entries, missing } = selectOnlyEntries(declared, onlyKeys);
+    if (missing.length > 0) {
+      throw new Error(
+        `--only: not set in .env.${environmentName}: ${missing.join(', ')}`,
+      );
+    }
+    declared = entries;
+  }
   const schemaDefaults = loadSchemaDefaults();
 
   const { secrets, variables, blank, schemaDefault } = splitManagedEntries(declared, {
     secretKeys,
     variableKeys,
     schemaDefaults,
-    keepSchemaDefaults,
+    // An explicitly requested key is pushed even when it equals the schema default.
+    keepSchemaDefaults: keepSchemaDefaults || onlyKeys !== undefined,
   });
 
   const remoteSecretNames = fetchRemote
@@ -144,16 +174,21 @@ function buildPlan(environmentName, options = {}) {
       )
       .map((entry) => entry.name),
   );
-  const staleSecrets = findStaleManaged({
-    remoteKeys: [...remoteSecretNames],
-    declaredNames: declaredSecretNames,
-    managedNames,
-  });
-  const staleVariables = findStaleManaged({
-    remoteKeys: [...remoteVariables.keys()],
-    declaredNames: declaredVariableNames,
-    managedNames,
-  });
+  // `--only` declares a few keys, not the whole file — it must never prune the rest.
+  const staleSecrets = onlyKeys
+    ? []
+    : findStaleManaged({
+        remoteKeys: [...remoteSecretNames],
+        declaredNames: declaredSecretNames,
+        managedNames,
+      });
+  const staleVariables = onlyKeys
+    ? []
+    : findStaleManaged({
+        remoteKeys: [...remoteVariables.keys()],
+        declaredNames: declaredVariableNames,
+        managedNames,
+      });
 
   return {
     declared,
@@ -199,11 +234,13 @@ export function previewEnvironmentValues(environmentName, options = {}) {
  */
 export function syncEnvironmentValues(environmentName, mode, options = {}) {
   const keepSchemaDefaults = options.keepSchemaDefaults ?? false;
+  const onlyKeys = options.onlyKeys;
   // dry-run stays auth-free (no GitHub query) — it shows the local-side plan only.
   // check / sync query GitHub to diff and prune; --diff has its own preview path.
   const plan = buildPlan(environmentName, {
     keepSchemaDefaults,
     fetchRemote: mode !== 'dry-run',
+    ...(onlyKeys ? { onlyKeys } : {}),
   });
   const {
     secrets,
@@ -218,6 +255,9 @@ export function syncEnvironmentValues(environmentName, mode, options = {}) {
 
   console.log(`Environment: ${environmentName}`);
   console.log(`Source:      .env.${environmentName}`);
+  if (onlyKeys) {
+    console.log(`Only:        ${onlyKeys.join(', ')} (nothing else is pushed or pruned)`);
+  }
   console.log(
     `Plan:        push ${secrets.length} secret(s), ${variables.length} variable(s); ` +
       `${blank.length} blank; ${schemaDefault.length} schema-default; ` +
