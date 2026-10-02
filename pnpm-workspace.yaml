@@ -65,6 +65,4 @@ peerDependencyRules:
 # These exact versions were younger than that when they were locked. Keep each
 # entry exact, and drop it once that version is older than the window.
 minimumReleaseAgeExclude:
-  - '@posthog/browser-common@0.9.1'
-  - '@posthog/core@1.55.3'
   - '@types/node@24.19.1'
