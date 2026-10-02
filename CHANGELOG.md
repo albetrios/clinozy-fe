@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.9.3](https://github.com/albetrios/clinozy-fe/compare/v1.9.2...v1.9.3) (2026-10-02)
+
+
+### Fixed
+
+* **deps:** override fast-uri to 3.1.8 for two high advisories ([e75d89f](https://github.com/albetrios/clinozy-fe/commit/e75d89f811108e6d185247e937084d4932dc1160))
+* **github:** stop github:sync --check failing on reviewers the plan can't enforce ([#20](https://github.com/albetrios/clinozy-fe/issues/20)) ([a4a6148](https://github.com/albetrios/clinozy-fe/commit/a4a61482374cc27292fff87e3ee663eed34ddd7a))
+* stop two CI flakes — queued-toast expiry and the shake-frame test ([#13](https://github.com/albetrios/clinozy-fe/issues/13)) ([45513c3](https://github.com/albetrios/clinozy-fe/commit/45513c36bed68e09ab8ffe98fbe6db461d9f9837))
+
+
+### Changed
+
+* move design iterations to iterations/ and the workflow docs to docs/design-workflow/ ([f13d5be](https://github.com/albetrios/clinozy-fe/commit/f13d5be3dd9b98c6111e541ffd82eb293878d98a))
+
+
+### Documentation
+
+* add design handoff docs and v1 legacy screen specs ([c5bb7e2](https://github.com/albetrios/clinozy-fe/commit/c5bb7e28b23ea17b91cde2856e1ae7bd678ba360))
+* add design handoff docs and v1 legacy specs ([fd02854](https://github.com/albetrios/clinozy-fe/commit/fd02854edaca3ccdf9a1806829c0860d0ac379aa))
+* add intake modes, the intake gate and standing deviations ([1e1f931](https://github.com/albetrios/clinozy-fe/commit/1e1f931003c21c47186400fbac1cba588d22f068))
+* add the v1 kickoff plan and PRD, vendor the intake checklist ([f8af313](https://github.com/albetrios/clinozy-fe/commit/f8af313ac4e45f6ffb8c455425d41dc61878381a))
+* **deploy:** production is deployed by running Release deploy from main ([#21](https://github.com/albetrios/clinozy-fe/issues/21)) ([424f340](https://github.com/albetrios/clinozy-fe/commit/424f340127ad5ed7ef176136412d34e36caab2b3))
+* design iteration workflow with intake, planning and kickoff ([fa4e268](https://github.com/albetrios/clinozy-fe/commit/fa4e2688d18c04eb7681b2fd5be286e1e310225b))
+* list the new tooling gate files in the project tree ([b3984af](https://github.com/albetrios/clinozy-fe/commit/b3984af3e8f33779dfd75230c6da130dd8dc239f))
+* point CLAUDE.md and AGENTS.md at design iterations ([e8d7990](https://github.com/albetrios/clinozy-fe/commit/e8d799006e7c16ce382a9a70d7348f12e38e355d))
+* run design iterations as intake, planning and kickoff ([ca30768](https://github.com/albetrios/clinozy-fe/commit/ca3076814d324bf6cdbcfceccf716ac8cf2e7e73))
+
 ## [1.9.2](https://github.com/albetrios/core-fe/compare/v1.9.1...v1.9.2) (2026-09-22)
 
 ### Performance
