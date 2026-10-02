@@ -1,8 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/core/config/env.ts', () => ({
-  platformConfig: { apiBaseUrl: '' },
+// Mutable so the captcha suite can switch the Turnstile provider on; with no site
+// key the captcha resolves to the `dev` provider (captcha enabled, fixed token).
+const platformConfig = vi.hoisted(() => ({
+  apiBaseUrl: '',
+  turnstileSiteKey: undefined as string | undefined,
 }));
+vi.mock('@/core/config/env.ts', () => ({ platformConfig }));
+
+import {
+  CAPTCHA_TOKEN_HEADER,
+  DEV_CAPTCHA_TOKEN,
+} from '@/shared/auth/captcha/captcha.constants.ts';
+import {
+  peekTurnstileToken,
+  setTurnstileToken,
+} from '@/shared/auth/captcha/turnstile-token-store.ts';
 
 import { authApi, MfaRequiredError } from './auth-api.ts';
 
@@ -208,6 +221,65 @@ describe('authApi.oauthStart redirect URL', () => {
     await expect(authApi.oauthStart('google')).resolves.toBe(
       'https://accounts.google.com/o/oauth2/v2/auth',
     );
+  });
+});
+
+describe('authApi captcha header scope', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    platformConfig.turnstileSiteKey = undefined;
+    setTurnstileToken(undefined);
+  });
+
+  function stubFetch(body: unknown): () => Record<string, string> {
+    let headers: Record<string, string> = {};
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: unknown, init: RequestInit) => {
+        headers = init.headers as Record<string, string>;
+        return new Response(JSON.stringify(body), { status: 200 });
+      }),
+    );
+    return () => headers;
+  }
+
+  const oauthStartBody = {
+    data: { redirect_url: 'https://accounts.google.com/o/oauth2' },
+  };
+
+  // The provider authenticates the user itself, so the OAuth start carries no
+  // captcha — not even the token a configured provider would otherwise attach.
+  it('starts OAuth without an X-Captcha-Token', async () => {
+    const sentHeaders = stubFetch(oauthStartBody);
+    await authApi.oauthStart('google');
+    expect(sentHeaders()).not.toHaveProperty(CAPTCHA_TOKEN_HEADER);
+  });
+
+  it('still sends an X-Captcha-Token on the email code send and login', async () => {
+    const sendHeaders = stubFetch({ data: { message: 'sent' } });
+    await authApi.emailVerificationCodeSend('a@b.test');
+    expect(sendHeaders()).toHaveProperty(CAPTCHA_TOKEN_HEADER, DEV_CAPTCHA_TOKEN);
+
+    const loginHeaders = stubFetch({ data: { access_token: 'acc' } });
+    await authApi.emailLogin({ email: 'a@b.test', code: 'ABC123' });
+    expect(loginHeaders()).toHaveProperty(CAPTCHA_TOKEN_HEADER, DEV_CAPTCHA_TOKEN);
+  });
+
+  // Turnstile tokens are single-use: an OAuth start spending the background
+  // token would leave the email flow waiting on a fresh solve for nothing.
+  it('leaves the background Turnstile token for the email flow', async () => {
+    platformConfig.turnstileSiteKey = 'test-site-key';
+    setTurnstileToken('bg-token');
+
+    const oauthHeaders = stubFetch(oauthStartBody);
+    await authApi.oauthStart('google');
+    expect(oauthHeaders()).not.toHaveProperty(CAPTCHA_TOKEN_HEADER);
+    expect(peekTurnstileToken()).toBe('bg-token');
+
+    const sendHeaders = stubFetch({ data: { message: 'sent' } });
+    await authApi.emailVerificationCodeSend('a@b.test');
+    expect(sendHeaders()).toHaveProperty(CAPTCHA_TOKEN_HEADER, 'bg-token');
+    expect(peekTurnstileToken()).toBeUndefined();
   });
 });
 

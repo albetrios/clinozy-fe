@@ -48,12 +48,12 @@ describe('useCaptchaIntent', () => {
 
     let settled: boolean | undefined;
     act(() => {
-      void result.current.ensureToken('oauth:google').then((value) => {
+      void result.current.ensureToken('email-send').then((value) => {
         settled = value;
       });
     });
 
-    await waitFor(() => expect(result.current.challengeFor).toBe('oauth:google'));
+    await waitFor(() => expect(result.current.challengeFor).toBe('email-send'));
     expect(settled).toBeUndefined();
   });
 
@@ -104,7 +104,7 @@ describe('useCaptchaIntent', () => {
     });
     await waitFor(() => expect(result.current.challengeFor).toBe('email-send'));
 
-    await expect(result.current.ensureToken('oauth:google')).resolves.toBe(false);
+    await expect(result.current.ensureToken('email-verify')).resolves.toBe(false);
     expect(result.current.challengeFor).toBe('email-send');
   });
 });

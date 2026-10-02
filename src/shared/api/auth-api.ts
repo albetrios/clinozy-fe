@@ -19,11 +19,12 @@ const authBase = () => `${platformConfig.apiBaseUrl}${API_BASE_PATH}`;
 function mergeAuthHeaders(
   init: RequestInit,
   captchaToken?: string,
+  withCaptcha = true,
 ): Record<string, string> {
   return {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
-    ...(authCaptchaHeaders(captchaToken) ?? {}),
+    ...((withCaptcha ? authCaptchaHeaders(captchaToken) : undefined) ?? {}),
     ...(init.headers as Record<string, string> | undefined),
   };
 }
@@ -31,12 +32,16 @@ function mergeAuthHeaders(
 /**
  * Raw fetch with timeout and credentials for auth endpoints.
  * Does not use apiClient to avoid interceptor recursion.
+ *
+ * `captcha: false` sends no `X-Captcha-Token` at all, for a route clinozy-be does not
+ * captcha-gate. It also leaves the single-use background Turnstile token unspent for
+ * the flow that does need it.
  */
 async function authFetch(
   url: string,
-  init: RequestInit & { timeout?: number; captchaToken?: string } = {},
+  init: RequestInit & { timeout?: number; captchaToken?: string; captcha?: false } = {},
 ): Promise<Response> {
-  const { timeout = HTTP.TIMEOUT, captchaToken, ...rest } = init;
+  const { timeout = HTTP.TIMEOUT, captchaToken, captcha, ...rest } = init;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
   try {
@@ -44,7 +49,7 @@ async function authFetch(
       ...rest,
       credentials: 'include',
       signal: controller.signal,
-      headers: mergeAuthHeaders(rest, captchaToken),
+      headers: mergeAuthHeaders(rest, captchaToken, captcha !== false),
     });
   } finally {
     clearTimeout(timeoutId);
@@ -249,10 +254,14 @@ export const authApi = {
 
   /** List configured social providers — removed; login UI is env-only. */
 
-  oauthStart: async (provider: string, captchaToken?: string): Promise<string> => {
+  /**
+   * Ask clinozy-be for the provider's authorize URL. Not captcha-gated: the provider
+   * authenticates the user itself, so the request carries no `X-Captcha-Token`.
+   */
+  oauthStart: async (provider: string): Promise<string> => {
     const response = await authFetch(
       `${authBase()}/auth/oauth/${encodeURIComponent(provider)}`,
-      { method: 'GET', captchaToken },
+      { method: 'GET', captcha: false },
     );
     const json = (await response.json()) as unknown;
     if (!response.ok)
