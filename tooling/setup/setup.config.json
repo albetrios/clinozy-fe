@@ -52,7 +52,8 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "NETLIFY_AUTH_TOKEN",
-        "NETLIFY_SITE_ID"
+        "NETLIFY_SITE_ID",
+        "RELEASE_PLEASE_TOKEN"
       ],
       "deployVariables": [
         "VITE_CAPTCHA_DISABLED",

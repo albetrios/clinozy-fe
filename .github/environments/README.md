@@ -78,14 +78,18 @@ secret on `development`**, read by `release-please` (post-merge-ci), the
 `pat-canary` (scheduled-release-guards), and `dependabot-auto-merge`. All three
 jobs therefore declare `environment: development`:
 
+It is a **managed deploy secret on `development`** (listed in that environment's
+`deploySecrets`): clinozy-infra's `pnpm setup:infra` writes it into `.env.development`
+(from its `GITHUB_TOKEN`) and `pnpm github:sync` pushes it like every other deploy value.
+Because it is managed, a sync from a `.env.development` **without** the key deletes the
+remote secret — keep the line in the file. To set it by hand instead (it then needs the line
+in `.env.development` too, or the next sync removes it):
+
 ```bash
 gh secret set RELEASE_PLEASE_TOKEN --env development --repo albetrios/clinozy-fe
 ```
 
-Use a fine-grained PAT scoped to this repo (Contents + Pull requests + Workflows,
-read/write). `github:sync` reconciles deploy values from `.env.<environment>` and
-leaves **unmanaged keys untouched**, so a hand-added `RELEASE_PLEASE_TOKEN` on
-`development` survives a sync.
+The token needs Contents + Pull requests + Workflows (read/write) on this repo.
 
 > **`development`, never `production`.** These three are automation jobs, not
 > deploys. `development` has an empty `protection` block, so selecting it grants
