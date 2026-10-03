@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { DismissableLayer } from 'radix-ui/internal';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -142,52 +143,59 @@ function UploadTrayPanel() {
         {summary}
       </p>
       {rows.length > 0 ? (
-        <section
-          aria-label={t(KEYS.label)}
-          data-testid="upload-tray"
-          data-slot="upload-tray"
-          className={cn(
-            'bg-card text-card-foreground animate-dropdown-in fixed end-5 z-[95] flex max-h-80 w-[min(20rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-xl border shadow-(--elevation-tray)',
-            // The phone bottom stack (index.css): above the tab bar, a notice pill and a
-            // floating "New" — each publishes its height only while it shows, and only below
-            // `md`, so from `md` this is the design's 20px.
-            'bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0px)+var(--floating-notice-height,0px)+var(--floating-fab-height,0px)+1.25rem)]',
-          )}
-        >
-          <div
+        // A dismissable-layer branch, like the toasts: a press on the tray (Retry, Remove,
+        // the toggle) is never an open drawer's outside press, and the tray stays usable
+        // while a modal turns pointer events off on the body.
+        <DismissableLayer.Branch asChild>
+          <section
+            aria-label={t(KEYS.label)}
+            data-testid="upload-tray"
+            data-slot="upload-tray"
             className={cn(
-              'flex h-11 flex-none items-center gap-2 ps-3.5 pe-1.5 md:h-10',
-              !collapsed && 'border-b',
+              'bg-card text-card-foreground animate-dropdown-in pointer-events-auto fixed end-5 z-[95] flex max-h-80 w-[min(20rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-xl border shadow-(--elevation-tray)',
+              // The phone bottom stack (index.css): above the tab bar, a notice pill and a
+              // floating "New" — each publishes its height only while it shows, and only below
+              // `md`, so from `md` this is the design's 20px.
+              'bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0px)+var(--floating-notice-height,0px)+var(--floating-fab-height,0px)+1.25rem)]',
             )}
           >
-            <p className="text-detail min-w-0 flex-1 truncate font-semibold">{summary}</p>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              data-testid="upload-tray-toggle"
-              aria-expanded={!collapsed}
-              aria-controls={listId}
-              aria-label={t(collapsed ? KEYS.show : KEYS.hide)}
-              className={CONTROL_CLASS}
-              onClick={() => setCollapsed(!collapsed)}
+            <div
+              className={cn(
+                'flex h-11 flex-none items-center gap-2 ps-3.5 pe-1.5 md:h-10',
+                !collapsed && 'border-b',
+              )}
             >
-              <ChevronDown
-                className={cn('size-4 transition-transform', collapsed && 'rotate-180')}
-                aria-hidden
-              />
-            </Button>
-          </div>
-          <ul
-            id={listId}
-            hidden={collapsed}
-            className="min-h-0 flex-1 overflow-y-auto px-2 py-1.5"
-          >
-            {rows.map((row) => (
-              <UploadTrayRow key={row.id} row={row} />
-            ))}
-          </ul>
-        </section>
+              <p className="text-detail min-w-0 flex-1 truncate font-semibold">
+                {summary}
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                data-testid="upload-tray-toggle"
+                aria-expanded={!collapsed}
+                aria-controls={listId}
+                aria-label={t(collapsed ? KEYS.show : KEYS.hide)}
+                className={CONTROL_CLASS}
+                onClick={() => setCollapsed(!collapsed)}
+              >
+                <ChevronDown
+                  className={cn('size-4 transition-transform', collapsed && 'rotate-180')}
+                  aria-hidden
+                />
+              </Button>
+            </div>
+            <ul
+              id={listId}
+              hidden={collapsed}
+              className="min-h-0 flex-1 overflow-y-auto px-2 py-1.5"
+            >
+              {rows.map((row) => (
+                <UploadTrayRow key={row.id} row={row} />
+              ))}
+            </ul>
+          </section>
+        </DismissableLayer.Branch>
       ) : null}
     </>
   );

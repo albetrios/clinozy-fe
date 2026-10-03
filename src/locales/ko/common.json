@@ -431,6 +431,7 @@
     "attachFailed": "첨부하지 못함",
     "retry": "{{name}} 다시 시도",
     "remove": "{{name}} 제거",
+    "stoppedBySwitch": "업로드가 중지되었습니다 · 워크스페이스를 전환했습니다",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

@@ -436,6 +436,7 @@
     "attachFailed": "Couldn’t attach",
     "retry": "Retry {{name}}",
     "remove": "Remove {{name}}",
+    "stoppedBySwitch": "Uploads stopped · you switched workspace",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

@@ -16,6 +16,7 @@ export const UPLOAD_TRAY_KEYS = {
   attachFailed: 'uploadTray.attachFailed',
   retry: 'uploadTray.retry',
   remove: 'uploadTray.remove',
+  stoppedBySwitch: 'uploadTray.stoppedBySwitch',
   size: {
     kilobytes: 'uploadTray.size.kilobytes',
     megabytes: 'uploadTray.size.megabytes',

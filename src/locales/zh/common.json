@@ -431,6 +431,7 @@
     "attachFailed": "无法附加",
     "retry": "重试 {{name}}",
     "remove": "移除 {{name}}",
+    "stoppedBySwitch": "上传已停止 · 你已切换工作区",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

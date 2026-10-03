@@ -441,6 +441,7 @@
     "attachFailed": "No se pudo adjuntar",
     "retry": "Reintentar {{name}}",
     "remove": "Quitar {{name}}",
+    "stoppedBySwitch": "Subidas detenidas · cambiaste de espacio de trabajo",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

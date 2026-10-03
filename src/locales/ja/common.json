@@ -431,6 +431,7 @@
     "attachFailed": "添付できませんでした",
     "retry": "{{name}} を再試行",
     "remove": "{{name}} を削除",
+    "stoppedBySwitch": "アップロードを停止しました · ワークスペースを切り替えました",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

@@ -441,6 +441,7 @@
     "attachFailed": "Não foi possível anexar",
     "retry": "Tentar {{name}} novamente",
     "remove": "Remover {{name}}",
+    "stoppedBySwitch": "Envios interrompidos · você trocou de espaço de trabalho",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

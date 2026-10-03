@@ -441,6 +441,7 @@
     "attachFailed": "Échec de l’ajout",
     "retry": "Réessayer {{name}}",
     "remove": "Retirer {{name}}",
+    "stoppedBySwitch": "Envois interrompus · vous avez changé d’espace de travail",
     "size": {
       "kilobytes": "{{value}} Ko",
       "megabytes": "{{value}} Mo"

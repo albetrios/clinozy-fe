@@ -1,10 +1,17 @@
 import { act, fireEvent, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 const { uploadFileMock } = vi.hoisted(() => ({ uploadFileMock: vi.fn() }));
 vi.mock('@/shared/api/uploads-api.ts', () => ({ uploadFile: uploadFileMock }));
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/shared/components/ui/dialog.tsx';
 import {
   UPLOAD_ROW_LEAVE_MS,
   useUploadQueueStore,
@@ -241,5 +248,33 @@ describe('UploadTray', () => {
     // 320px, but never wider than the screen minus both 20px gutters.
     expect(classes).toContain('w-[min(20rem,calc(100vw-2.5rem))]');
     expect(tray()).toHaveAttribute('data-slot', 'upload-tray');
+  });
+
+  it('is usable over an open modal: a press on it is never the modal’s outside press', async () => {
+    const onOpenChange = vi.fn();
+    renderWithProviders(
+      <>
+        <Dialog open onOpenChange={onOpenChange}>
+          <DialogContent>
+            <DialogTitle>New patient</DialogTitle>
+            <DialogDescription>Drawer stand-in</DialogDescription>
+          </DialogContent>
+        </Dialog>
+        <UploadTray />
+      </>,
+    );
+    await screen.findByTestId('upload-tray-status');
+    queue([file('scalp.jpg', 'image/jpeg', 2048)]);
+    expect(tray()).toHaveClass('pointer-events-auto');
+
+    // jsdom applies no stylesheet, so it cannot see `pointer-events-auto` win over the
+    // modal's inline `pointer-events: none` on the body; the class is asserted above.
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    await user.click(screen.getByTestId('upload-tray-toggle'));
+    expect(screen.getByTestId('upload-tray-toggle')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 });

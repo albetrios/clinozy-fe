@@ -456,6 +456,7 @@
     "attachFailed": "تعذّر الإرفاق",
     "retry": "إعادة محاولة {{name}}",
     "remove": "إزالة {{name}}",
+    "stoppedBySwitch": "توقفت عمليات الرفع · انتقلت إلى مساحة عمل أخرى",
     "size": {
       "kilobytes": "{{value}} كيلوبايت",
       "megabytes": "{{value}} ميغابايت"

@@ -436,6 +436,7 @@
     "attachFailed": "संलग्न नहीं हो सका",
     "retry": "{{name}} फिर से आज़माएँ",
     "remove": "{{name}} हटाएँ",
+    "stoppedBySwitch": "अपलोड रुक गए · आपने वर्कस्पेस बदल दिया",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

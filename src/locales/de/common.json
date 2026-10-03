@@ -436,6 +436,7 @@
     "attachFailed": "Anhängen fehlgeschlagen",
     "retry": "{{name}} erneut versuchen",
     "remove": "{{name}} entfernen",
+    "stoppedBySwitch": "Uploads gestoppt · Sie haben den Arbeitsbereich gewechselt",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

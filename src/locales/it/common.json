@@ -441,6 +441,7 @@
     "attachFailed": "Allegato non riuscito",
     "retry": "Riprova {{name}}",
     "remove": "Rimuovi {{name}}",
+    "stoppedBySwitch": "Caricamenti interrotti · hai cambiato spazio di lavoro",
     "size": {
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"

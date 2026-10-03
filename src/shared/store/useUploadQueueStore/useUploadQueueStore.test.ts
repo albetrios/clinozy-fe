@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { uploadFileMock } = vi.hoisted(() => ({ uploadFileMock: vi.fn() }));
+const { uploadFileMock, notifyInfoMock } = vi.hoisted(() => ({
+  uploadFileMock: vi.fn(),
+  notifyInfoMock: vi.fn(),
+}));
 vi.mock('@/shared/api/uploads-api.ts', () => ({ uploadFile: uploadFileMock }));
+vi.mock('@/shared/notify/index.ts', () => ({ notify: { info: notifyInfoMock } }));
+
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   UPLOAD_CONCURRENCY,
@@ -298,5 +304,40 @@ describe('useUploadQueueStore', () => {
     useUploadQueueStore.getState().add([], { onUploaded: vi.fn() }, 'org_a');
     expect(rows()).toEqual([]);
     expect(uploadFileMock).not.toHaveBeenCalled();
+  });
+
+  it('drops the workspace being left on a switch, never attaching its files, and says so', async () => {
+    useOrganizationStore.setState({ organizationId: 'org_a' });
+    const onUploaded = vi.fn();
+    useUploadQueueStore.getState().add([photo('scalp.jpg')], { onUploaded }, 'org_a');
+    expect(row('scalp.jpg').status).toBe('uploading');
+
+    useOrganizationStore.setState({ organizationId: 'org_b' });
+    expect(rows()).toEqual([]);
+    expect(notifyInfoMock).toHaveBeenCalledWith(
+      'Uploads stopped · you switched workspace',
+    );
+
+    // The bytes still land, but nothing is handed over under the new workspace.
+    upload(0).succeed('k1');
+    await flush();
+    expect(onUploaded).not.toHaveBeenCalled();
+  });
+
+  it('keeps the uploads of the workspace switched to, and stays quiet for finished rows', async () => {
+    useOrganizationStore.setState({ organizationId: 'org_a' });
+    useUploadQueueStore
+      .getState()
+      .add([photo('a.jpg')], { onUploaded: vi.fn() }, 'org_a');
+    upload(0).succeed('k1');
+    await flush();
+    expect(row('a.jpg').status).toBe('done');
+    useUploadQueueStore
+      .getState()
+      .add([photo('b.jpg')], { onUploaded: vi.fn() }, 'org_b');
+
+    useOrganizationStore.setState({ organizationId: 'org_b' });
+    expect(rows().map((kept) => kept.name)).toEqual(['b.jpg']);
+    expect(notifyInfoMock).not.toHaveBeenCalled();
   });
 });

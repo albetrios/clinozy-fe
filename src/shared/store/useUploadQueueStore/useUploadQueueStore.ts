@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 
+import i18n from '@/lib/i18n/i18n.ts';
 import { uploadFile } from '@/shared/api/uploads-api.ts';
+import {
+  UPLOAD_TRAY_KEYS,
+  UPLOAD_TRAY_NS,
+} from '@/shared/components/UploadTray/upload-tray.constants.ts';
+import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** How many files move at once; the rest wait their turn at 0%. */
 export const UPLOAD_CONCURRENCY = 3;
@@ -244,6 +251,39 @@ export const useUploadQueueStore = create<UploadQueueState>((set, get) => ({
     set({ rows: [], departed: 0, collapsed: false });
   },
 }));
+
+/**
+ * Drop every row queued for another organization and say so when unfinished work went
+ * with them. A workspace switch ends the uploads of the workspace being left: their attach
+ * would run under the new workspace's token (the API scopes by its `org` claim) against a
+ * record of the old one. A dropped job is never attached — `runRow` checks its job first.
+ */
+function dropOtherOrganizations(organizationId: string | null): void {
+  const { rows } = useUploadQueueStore.getState();
+  const dropped = rows.filter(
+    (row) => jobs.get(row.id)?.organizationId !== (organizationId ?? undefined),
+  );
+  if (dropped.length === 0) return;
+  for (const row of dropped) {
+    clearTimeout(leaveTimers.get(row.id));
+    leaveTimers.delete(row.id);
+    jobs.delete(row.id);
+  }
+  const kept = rows.filter((row) => !dropped.includes(row));
+  useUploadQueueStore.setState(
+    kept.length === 0 ? { rows: kept, departed: 0, collapsed: false } : { rows: kept },
+  );
+  if (dropped.some((row) => row.status !== 'done')) {
+    notify.info(i18n.t(UPLOAD_TRAY_KEYS.stoppedBySwitch, { ns: UPLOAD_TRAY_NS }));
+  }
+}
+
+// A real switch or a sign-out — never the boot's first organization.
+useOrganizationStore.subscribe((state, previous) => {
+  if (previous.organizationId === null) return;
+  if (state.organizationId === previous.organizationId) return;
+  dropOtherOrganizations(state.organizationId);
+});
 
 /** The tray header's numbers: files still to go, the batch total, and how many failed. */
 export function uploadQueueSummary(state: Pick<UploadQueueState, 'rows' | 'departed'>): {
