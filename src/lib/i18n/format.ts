@@ -32,6 +32,13 @@ export type FormatDateMeta = {
    * cannot shift. Opt-in — absolute instants must not use this.
    */
   civilDay?: boolean;
+  /**
+   * Treat a `Date` input as a wall-clock date and time (its local fields) and
+   * show it as written, in no timezone — a clinic-local 10:30 reads "10:30 am"
+   * whatever the display timezone. Opt-in like `civilDay`; an instant never
+   * uses it.
+   */
+  wallClock?: boolean;
 };
 
 /**
@@ -64,8 +71,21 @@ export function formatDateValue(
   options?: Intl.DateTimeFormatOptions,
   meta?: FormatDateMeta,
 ): string {
-  const timeZone = resolvedTimeZone(prefs.timeZone);
-  const date = resolveFormatInstant(iso, timeZone, meta?.civilDay === true);
+  const wallClock = meta?.wallClock === true && iso instanceof Date;
+  // A wall-clock value is formatted from its own fields in UTC, so no zone moves it.
+  const timeZone = wallClock ? 'UTC' : resolvedTimeZone(prefs.timeZone);
+  const date = wallClock
+    ? new Date(
+        Date.UTC(
+          iso.getFullYear(),
+          iso.getMonth(),
+          iso.getDate(),
+          iso.getHours(),
+          iso.getMinutes(),
+          iso.getSeconds(),
+        ),
+      )
+    : resolveFormatInstant(iso, timeZone, meta?.civilDay === true);
   if (Number.isNaN(date.getTime())) return '—';
   const locale = intlLocaleFor(prefs.formatLocale);
   const baseOptions = options ?? dateFormatOptions(prefs.dateFormat, prefs.hourCycle);

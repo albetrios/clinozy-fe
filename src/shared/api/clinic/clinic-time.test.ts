@@ -8,6 +8,8 @@ import {
   clinicClockTime,
   clinicInstant,
   clinicToday,
+  clockMinutes,
+  clockOfMinutes,
   localDateOf,
 } from './clinic-time.ts';
 
@@ -25,6 +27,15 @@ describe('clinic clock (Asia/Kolkata)', () => {
 
   it('reads the clinic-local clock time of an instant', () => {
     expect(clinicClockTime(new Date('2026-10-03T04:50:00Z'))).toBe('10:20');
+  });
+
+  it('turns a clock time into minutes after midnight and back', () => {
+    expect(clockMinutes('00:00')).toBe(0);
+    expect(clockMinutes('10:30')).toBe(630);
+    expect(clockMinutes('23:45')).toBe(1425);
+    expect(clockOfMinutes(630)).toBe('10:30');
+    expect(clockOfMinutes(5)).toBe('00:05');
+    expect(clockOfMinutes(clockMinutes('19:15'))).toBe('19:15');
   });
 
   it('does calendar arithmetic across month and year ends', () => {

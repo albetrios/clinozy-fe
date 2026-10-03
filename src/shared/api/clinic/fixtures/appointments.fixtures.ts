@@ -1,3 +1,4 @@
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   PROTOTYPE_SEED_DAY,
   seedCommon,
@@ -5,9 +6,9 @@ import {
   seedInstant,
 } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import type {
-  Appointment,
   AppointmentStatus,
   AppointmentType,
+  DeliveryStatus,
   Room,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
@@ -57,6 +58,8 @@ interface AppointmentRow {
   followUp?: string;
   /** "Moved · was …" (`movedFrom`). */
   movedFrom?: string;
+  /** Confirmed by a WhatsApp "Yes" (`auto`). */
+  repliedYes?: boolean;
   room?: Room;
 }
 
@@ -228,6 +231,7 @@ const BOOKINGS: readonly AppointmentRow[] = [
     status: 'Confirmed',
     followUp: '2026-10-02 16:00',
     movedFrom: '1 Oct 4:00 pm',
+    repliedYes: true,
   },
   {
     seq: 2740,
@@ -383,8 +387,25 @@ const FLOOR_VISITS: readonly AppointmentRow[] = [
 
 const ARRIVED: ReadonlySet<AppointmentStatus> = new Set(['checked_in', 'completed']);
 
-/** Every booking: AP_INIT, the file's visits, then today's floor. */
-export function appointmentSeed(today: string = clinicToday()): Appointment[] {
+/** The prototype's reminder states by id (`MS`, H:5909); "none" is no message yet. */
+const REMINDER_CYCLE: readonly DeliveryStatus[] = ['read', 'delivered', 'sent'];
+
+/**
+ * The reminder's delivery state ("Latest update" — server data the prototype
+ * synthesises from the id, H:5909–5913; REPLACE_WITH_API): a Scheduled
+ * booking has none yet, or a failed one; the rest cycle read, delivered, sent.
+ */
+function reminderOf(seq: number, status: AppointmentStatus): DeliveryStatus | null {
+  if (status === 'scheduled') return seq % 4 === 3 ? 'failed' : null;
+  return REMINDER_CYCLE[seq % REMINDER_CYCLE.length] ?? null;
+}
+
+/**
+ * Every booking: AP_INIT, the file's visits, then today's floor — with the
+ * plan's fields (Appendix F): the reminder's state, a WhatsApp "Yes" (#2861's
+ * `auto`), the moves (`moved`) and no package session.
+ */
+export function appointmentSeed(today: string = clinicToday()): AppointmentRecord[] {
   return [...BOOKINGS, ...FILE_VISITS, ...FLOOR_VISITS].map((row) => {
     const status = must(STATUSES[row.status], `appointment status ${row.status}`);
     const start = seedInstant(row.date, row.time, today);
@@ -419,6 +440,10 @@ export function appointmentSeed(today: string = clinicToday()): Appointment[] {
       checkedInAt,
       completedAt,
       copiedFromId: null,
+      reminder: reminderOf(row.seq, status),
+      repliedYes: row.repliedYes ?? false,
+      moveCount: row.movedFrom ? 1 : 0,
+      patientPackageId: null,
     };
   });
 }

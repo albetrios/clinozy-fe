@@ -1,6 +1,6 @@
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
 import { createFixtureCollection } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import type {
-  Appointment,
   Branch,
   CheckIn,
   CreditNote,
@@ -118,7 +118,8 @@ export const clinicFixtures = {
     seed: () => leadMessageSeed(),
     sequenced: false,
   }),
-  appointments: createFixtureCollection<Appointment>({
+  // The appointments carry the plan's fields (Appendix F) — see appointments-contracts.ts.
+  appointments: createFixtureCollection<AppointmentRecord>({
     resource: 'Appointment',
     seed: () => appointmentSeed(),
   }),

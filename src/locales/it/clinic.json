@@ -75,6 +75,89 @@
       "phone_call": "Telefonata"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Programmato",
+      "confirmed": "Confermato",
+      "checked_in": "Arrivato",
+      "completed": "Completato",
+      "cancelled": "Annullato",
+      "no_show": "Non presentato"
+    },
+    "moves": {
+      "reschedule": "Sposta a un altro orario",
+      "cancelled": "Annulla"
+    },
+    "moveHints": {
+      "scheduled": "Orario riservato · richiesta di conferma inviata su WhatsApp",
+      "confirmed": "Hanno detto sì · una risposta «Sì» su WhatsApp lo imposta automaticamente",
+      "checked_in": "Sono arrivati · solo nel giorno della visita",
+      "completed": "Visita fatta · di solito impostato dalla visita",
+      "reschedule": "Sposta a un nuovo orario · stesso appuntamento, il vecchio orario resta nello storico",
+      "cancelled": "Libera l’orario e ferma i promemoria",
+      "no_show": "Solo dopo l’orario di inizio"
+    },
+    "guards": {
+      "final": "Stato finale. Usa Riprenota per creare un nuovo appuntamento.",
+      "visitDay": "Solo {{day}}",
+      "beforeStart": "Disponibile dopo le {{time}} · {{day}}",
+      "needsPatient": "Crea prima la scheda paziente · Completato richiede un paziente"
+    },
+    "nextActions": {
+      "check_in": "Registra arrivo",
+      "confirm": "Conferma",
+      "complete": "Completa",
+      "rebook": "Riprenota"
+    },
+    "tiles": {
+      "booked": "Prenotato",
+      "said_yes": "Hanno detto sì",
+      "visit_day": "Disponibile il giorno della visita",
+      "after_check_in": "Dopo l’arrivo"
+    },
+    "hints": {
+      "scheduled": "Orario riservato · WhatsApp chiede di confermare, una risposta «Sì» lo conferma",
+      "confirmed": "Già confermato al telefono · il promemoria viene inviato",
+      "checked_in": "Il paziente è in clinica · coda del medico avvisata · segna Completato quando hai finito",
+      "completed": "Visita fatta · domani parte un’attività di feedback",
+      "needs_patient": "Crea la scheda paziente per completare questa visita",
+      "cancelled": "Ripristinalo per riaverlo · nel frattempo l’orario è libero per altri",
+      "closed": "Questo appuntamento è chiuso · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "Richiesta del paziente",
+      "unreachable": "Paziente non raggiungibile",
+      "doctor_unavailable": "Medico non disponibile",
+      "resource_unavailable": "Macchinario o stanza non disponibile",
+      "other": "Altro"
+    },
+    "cancelSides": {
+      "patient": "PAZIENTE",
+      "clinic": "CLINICA"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "Il paziente ha annullato",
+      "rescheduling_later": "Da riprogrammare più avanti",
+      "doctor_unavailable": "Medico non disponibile",
+      "booked_by_mistake": "Prenotato per errore",
+      "other": "Altro"
+    },
+    "days": {
+      "today": "Oggi",
+      "tomorrow": "Domani"
+    },
+    "toasts": {
+      "booked": "Prenotato {{id}} · {{day}} {{time}} · richiesta di conferma inviata su WhatsApp",
+      "bookedQueued": "Prenotato {{id}} · {{day}} {{time}} · promemoria in coda",
+      "moved": "{{id}} spostato a {{day}} {{time}} · richiesta di conferma inviata",
+      "updated": "{{id}} aggiornato",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · promemoria in coda",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · orario liberato, promemoria fermati",
+      "cancelled": "Appuntamento {{id}} annullato",
+      "restored": "Appuntamento ripristinato · il promemoria riparte"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consulenza",

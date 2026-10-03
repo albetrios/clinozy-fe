@@ -75,6 +75,89 @@
       "phone_call": "電話"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "予定",
+      "confirmed": "確認済み",
+      "checked_in": "受付済み",
+      "completed": "完了",
+      "cancelled": "キャンセル済み",
+      "no_show": "来院なし"
+    },
+    "moves": {
+      "reschedule": "別の時間に移動",
+      "cancelled": "キャンセル"
+    },
+    "moveHints": {
+      "scheduled": "枠を確保 · WhatsAppで確認依頼を送信済み",
+      "confirmed": "承諾済み · WhatsAppで「はい」と返信があると自動で設定されます",
+      "checked_in": "来院しました · 当日のみ",
+      "completed": "受診完了 · 通常は受診画面から設定されます",
+      "reschedule": "新しい枠へ移動 · 同じ予約のまま、元の枠は履歴に残ります",
+      "cancelled": "枠を空け、リマインダーを停止します",
+      "no_show": "開始時刻を過ぎてからのみ"
+    },
+    "guards": {
+      "final": "最終ステータスです。新しい予約を作るには「再予約」を使ってください。",
+      "visitDay": "{{day}}のみ",
+      "beforeStart": "{{day}} {{time}}以降に利用可能",
+      "needsPatient": "先に患者記録を作成してください · 完了には患者が必要です"
+    },
+    "nextActions": {
+      "check_in": "受付",
+      "confirm": "確認",
+      "complete": "完了にする",
+      "rebook": "再予約"
+    },
+    "tiles": {
+      "booked": "予約済み",
+      "said_yes": "承諾済み",
+      "visit_day": "来院日に利用可能",
+      "after_check_in": "受付後"
+    },
+    "hints": {
+      "scheduled": "枠を確保 · WhatsAppで確認を依頼し、「はい」の返信で確定します",
+      "confirmed": "電話で確認済み · リマインダーを送信します",
+      "checked_in": "患者は来院中 · 医師の待ち行列に通知済み · 終わったら完了にしてください",
+      "completed": "受診完了 · 明日フィードバックのタスクが送られます",
+      "needs_patient": "この受診を完了するには患者記録を作成してください",
+      "cancelled": "戻すには復元してください · その間、枠は他の人が使えます",
+      "closed": "この予約は終了しています · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "患者の希望",
+      "unreachable": "患者に連絡がつかない",
+      "doctor_unavailable": "医師の都合がつかない",
+      "resource_unavailable": "機器または部屋が使えない",
+      "other": "その他"
+    },
+    "cancelSides": {
+      "patient": "患者",
+      "clinic": "クリニック"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "患者がキャンセル",
+      "rescheduling_later": "後日再調整",
+      "doctor_unavailable": "医師の都合がつかない",
+      "booked_by_mistake": "誤って予約",
+      "other": "その他"
+    },
+    "days": {
+      "today": "今日",
+      "tomorrow": "明日"
+    },
+    "toasts": {
+      "booked": "{{id}} を予約しました · {{day}} {{time}} · WhatsAppで確認依頼を送信しました",
+      "bookedQueued": "{{id}} を予約しました · {{day}} {{time}} · リマインダーを予約しました",
+      "moved": "{{id}} を {{day}} {{time}} に移動しました · 確認依頼を送信しました",
+      "updated": "{{id}} を更新しました",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · リマインダーを予約しました",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · 枠を解放し、リマインダーを停止しました",
+      "cancelled": "予約 {{id}} をキャンセルしました",
+      "restored": "予約を復元しました · リマインダーを再送します"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "診察",

@@ -12,6 +12,24 @@ export interface CrudMutationOptions<TData, TVars> {
 }
 
 /**
+ * The success side of a write whose toast offers Undo: `toast` raises it
+ * (`notify.undo`) unless the caller brings a `successMessage` — shown instead,
+ * without Undo; the caller's `onSuccess` runs either way.
+ */
+export function withUndoToast<TData, TVars>(
+  options: CrudMutationOptions<TData, TVars>,
+  toast: (data: TData, vars: TVars) => void,
+): CrudMutationOptions<TData, TVars> {
+  return {
+    ...options,
+    onSuccess: async (data, vars) => {
+      if (options.successMessage === undefined) toast(data, vars);
+      await options.onSuccess?.(data, vars);
+    },
+  };
+}
+
+/**
  * Create a new record. Invalidates every query for this resource on success so
  * lists refresh immediately.
  *

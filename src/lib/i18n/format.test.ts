@@ -89,6 +89,26 @@ describe('formatDateValue', () => {
     expect(withCivil).not.toBe(absolute);
   });
 
+  it('shows a wall-clock date and time as written, whatever the display timezone', () => {
+    // A clinic-local 10:30 on 3 Oct is "10:30" in Tokyo, New York or device time.
+    const slot = new Date(2026, 9, 3, 10, 30);
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    const labels = (['auto', 'Asia/Tokyo', 'America/New_York'] as const).map((timeZone) =>
+      formatDateValue(slot, prefs({ formatLocale: 'en-GB', timeZone }), options, {
+        wallClock: true,
+      }),
+    );
+    expect(new Set(labels).size).toBe(1);
+    expect(labels[0]).toMatch(/Sat,? 3 Oct,? 10:30/);
+  });
+
   it('still shifts absolute ISO instants across display timezones', () => {
     const tokyo = formatDateValue(
       '2026-06-18T00:30:00.000Z',

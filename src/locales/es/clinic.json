@@ -75,6 +75,89 @@
       "phone_call": "Llamada telefónica"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Programada",
+      "confirmed": "Confirmada",
+      "checked_in": "Llegó",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "no_show": "No asistió"
+    },
+    "moves": {
+      "reschedule": "Mover a otra hora",
+      "cancelled": "Cancelar"
+    },
+    "moveHints": {
+      "scheduled": "Hueco reservado · solicitud de confirmación enviada por WhatsApp",
+      "confirmed": "Dijeron que sí · una respuesta «Sí» en WhatsApp lo marca automáticamente",
+      "checked_in": "Han llegado · solo el día de la cita",
+      "completed": "Visita hecha · normalmente se marca desde la visita",
+      "reschedule": "Mover a un nuevo hueco · misma cita, el hueco anterior queda en el historial",
+      "cancelled": "Libera el hueco y detiene los recordatorios",
+      "no_show": "Solo después de la hora de inicio"
+    },
+    "guards": {
+      "final": "Estado final. Usa Volver a reservar para crear una nueva cita.",
+      "visitDay": "Solo {{day}}",
+      "beforeStart": "Disponible después de las {{time}} · {{day}}",
+      "needsPatient": "Crea primero la ficha del paciente · Completada requiere un paciente"
+    },
+    "nextActions": {
+      "check_in": "Registrar llegada",
+      "confirm": "Confirmar",
+      "complete": "Completar",
+      "rebook": "Volver a reservar"
+    },
+    "tiles": {
+      "booked": "Reservada",
+      "said_yes": "Dijeron que sí",
+      "visit_day": "Disponible el día de la cita",
+      "after_check_in": "Después de la llegada"
+    },
+    "hints": {
+      "scheduled": "Hueco reservado · WhatsApp les pide confirmar, una respuesta «Sí» la confirma",
+      "confirmed": "Ya confirmada por llamada · se envía el recordatorio",
+      "checked_in": "El paciente está en la clínica · cola del médico avisada · marca Completada al terminar",
+      "completed": "Visita hecha · mañana sale una tarea de opinión",
+      "needs_patient": "Crea la ficha del paciente para completar esta visita",
+      "cancelled": "Restáurala para recuperarla · mientras tanto el hueco queda libre para otros",
+      "closed": "Esta cita está cerrada · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "El paciente lo pidió",
+      "unreachable": "No se pudo contactar al paciente",
+      "doctor_unavailable": "Médico no disponible",
+      "resource_unavailable": "Máquina o sala no disponible",
+      "other": "Otro"
+    },
+    "cancelSides": {
+      "patient": "PACIENTE",
+      "clinic": "CLÍNICA"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "El paciente canceló",
+      "rescheduling_later": "Se reprogramará más tarde",
+      "doctor_unavailable": "Médico no disponible",
+      "booked_by_mistake": "Reservada por error",
+      "other": "Otro"
+    },
+    "days": {
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "toasts": {
+      "booked": "Reservada {{id}} · {{day}} {{time}} · solicitud de confirmación enviada por WhatsApp",
+      "bookedQueued": "Reservada {{id}} · {{day}} {{time}} · recordatorio programado",
+      "moved": "{{id}} movida a {{day}} {{time}} · solicitud de confirmación enviada",
+      "updated": "{{id}} actualizada",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · recordatorio programado",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · hueco liberado, recordatorios detenidos",
+      "cancelled": "Cita {{id}} cancelada",
+      "restored": "Cita restaurada · el recordatorio se envía de nuevo"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consulta",

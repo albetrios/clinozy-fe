@@ -80,9 +80,33 @@ export function useRevokeApiKey() {
 }
 ```
 
-Rollback snapshots **every matched variant**, not just one. The two configs are not
+Rollback snapshots **every matched variant**, not just one. The configs are not
 combined: `optimisticInfinite` is checked first, so a hook that sets both never
 reaches the single-key path.
+
+## The `optimisticQueries` API — one record shown in several shapes
+
+Some records are cached in more than one shape at once: an appointment sits in the
+Agenda's pages (`data.pages[].rows`), in a calendar range (a plain array) and in its
+own drawer (one record). `optimisticQueries` patches **every** cached query under a
+prefix, whatever it holds — `update` maps one cached value and returns it unchanged
+when there is nothing to patch (a day count, a slot list). Every match is snapshotted
+and restored on error, like `optimisticInfinite`; it is checked after it and before
+the single-key path, so pass one optimistic config per hook.
+
+```ts
+export function useSetAppointmentStatus() {
+  return useAppMutation({
+    mutationFn: setAppointmentStatus,
+    invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    optimisticQueries: {
+      queryKey: appointmentQueryKeys.all,
+      // (oneCachedValue, vars) => nextValue — pages, lists and the record alike
+      update: (data, { id, status }) => withAppointmentStatus(data, id, status),
+    },
+  });
+}
+```
 
 ## Single-flight: one write per set of variables
 
@@ -194,6 +218,7 @@ stored as `other` with its label leading the note.
 | Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
 | Leads         | `useDeleteLead`, `useMarkLeadRead` (silent read receipt)          | `optimisticInfinite`             |
 | Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
+| Appointments  | `useSetAppointmentStatus` (Agenda, calendars and drawer at once)  | `optimisticQueries`              |
 | Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
@@ -206,8 +231,9 @@ behind the undo toast by their panels (see above), which is why all three take a
 
 **Non-optimistic** (must show in-progress) — creates + shapes we can't safely patch:
 
-- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`
-- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch)
+- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`, `useCreateAppointment`
+- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead`, `useUpdateAppointment` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch), `useRestoreAppointment` (a cancelled booking back to Scheduled)
+- **Appointment status:** `useCancelAppointment` (`S:1611`: not optimistic) and the optimistic `useSetAppointmentStatus` answer an Undo token — their toast's Undo (`useUndoAppointmentChange`) reverts the status and every side effect (open leads → Clinic visited, the rule tasks)
 - **Lead ownership:** `useClaimLead`, `useAssignLead` (`notify.undo` — Undo puts the team back), `useReleaseLead`; a status save's "<name> → <status>" toast also carries Undo (`useUpdateLead`)
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 

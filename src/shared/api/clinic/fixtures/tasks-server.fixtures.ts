@@ -1,4 +1,5 @@
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
 import { fixtureUuid } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import {
   clinicHttpError,
@@ -10,7 +11,6 @@ import {
   validateClinicInput,
 } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import type {
-  Appointment,
   Invoice,
   LeadMessage,
   Patient,
@@ -58,6 +58,7 @@ import {
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
+import { writeAppointmentStatus } from './appointment-status.fixtures.ts';
 import { findPersonThread } from './contact-threads.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
 import {
@@ -130,9 +131,11 @@ function recordOfMatch(found: TaskRuleMatch): CreateInput<TaskRecord> {
 /**
  * Bring the stored tasks up to the rules: wake snoozes that ran out, close the
  * derived tasks whose record changed ("Done by Clinozy"), create the new
- * ones. Inside a write, `change` records it so that write's Undo reverses it.
+ * ones. Inside a write, `change` records it so that write's Undo reverses it —
+ * the appointments server runs it after every booking write, so a status's
+ * tasks (a no-show's Rebook) come and go with the status.
  */
-async function syncTaskRules(
+export async function syncTaskRules(
   now: Date,
   change: FixtureChange = recordFixtureChange(),
 ): Promise<void> {
@@ -185,7 +188,7 @@ interface Lookups {
   patients: ReadonlyMap<string, Patient>;
   leads: ReadonlyMap<string, LeadRecord>;
   staff: ReadonlyMap<string, User>;
-  appointments: ReadonlyMap<string, Appointment>;
+  appointments: ReadonlyMap<string, AppointmentRecord>;
   treatments: ReadonlyMap<string, Treatment>;
   invoices: ReadonlyMap<string, Invoice>;
 }
@@ -578,7 +581,7 @@ interface EffectContext {
   task: TaskRecord;
   text: OutcomeServerText;
   thread: LeadRecord | null;
-  visit: Appointment | null;
+  visit: AppointmentRecord | null;
   note: string | null;
   now: Date;
   today: string;
@@ -661,12 +664,10 @@ const EFFECTS: {
   },
   async appointmentStatus(effect, { change, visit, now }) {
     if (!visit) return;
-    await change.update(clinicFixtures.appointments, visit.id, {
-      status: effect.status,
-      ...(effect.status === 'cancelled'
-        ? { cancelReason: 'patient_asked' as const }
-        : {}),
-      ...(effect.status === 'checked_in' ? { checkedInAt: now.toISOString() } : {}),
+    // The same status write as Appointments: stamps, the cancel reason, open leads → Clinic visited.
+    await writeAppointmentStatus(change, visit, effect.status, {
+      now,
+      cancelReason: 'patient_asked',
     });
   },
   async sendWhatsApp(_effect, { task, change, thread, text, textContext, now }) {

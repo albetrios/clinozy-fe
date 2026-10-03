@@ -28,7 +28,10 @@ import type {
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import {
+  type CrudMutationOptions,
+  withUndoToast,
+} from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -46,24 +49,6 @@ function teamOf(lead: LeadRecord): LeadTeam {
     involvedIds: lead.involvedIds,
     touchedAt: lead.touchedAt,
     releasedAt: lead.releasedAt,
-  };
-}
-
-/**
- * The success side of a write that offers Undo: its own toast unless the
- * caller brings a `successMessage` (shown instead, without Undo); the caller's
- * `onSuccess` runs either way.
- */
-function withUndoToast<TData, TVars>(
-  options: CrudMutationOptions<TData, TVars>,
-  toast: (data: TData, vars: TVars) => void,
-): CrudMutationOptions<TData, TVars> {
-  return {
-    ...options,
-    onSuccess: async (data, vars) => {
-      if (options.successMessage === undefined) toast(data, vars);
-      await options.onSuccess?.(data, vars);
-    },
   };
 }
 

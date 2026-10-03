@@ -4,7 +4,10 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 `launch-2026-09-30-jxmr`):
 
 - `clinic.constants.ts` — the `clinic` i18n namespace's keys (section names and
-  descriptions, roles; the lead statuses and sources; the offerings domain — category,
+  descriptions, roles; the lead statuses and sources; the appointments domain — statuses,
+  the popover's moves and reason lines, the guards, the card's next steps, the
+  form's tiles and hints, the cancel reasons and the toasts `useAppointments`
+  raises; the offerings domain — category,
   offer-kind and offer-state labels and the toasts `useOfferings` / `useOffers`
   raise; the contract's enum labels the rooms share — appointment statuses,
   channels, check-in feels, review sources, payment modes, invoice types, task

@@ -22,6 +22,17 @@ export function clinicClockTime(instant: Date, timeZone = CLINIC_TIME_ZONE): str
   return `${pad(p.hour)}:${pad(p.minute)}`;
 }
 
+/** Minutes after midnight of a clock time `HH:mm` — the unit slot and overlap arithmetic runs in. */
+export function clockMinutes(time: string): number {
+  const [hours = 0, minutes = 0] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/** The clock time `HH:mm` of a count of minutes after midnight. */
+export function clockOfMinutes(minutes: number): string {
+  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
+}
+
 const DAY_MS = 86_400_000;
 
 function civilParts(date: string): [number, number, number] {

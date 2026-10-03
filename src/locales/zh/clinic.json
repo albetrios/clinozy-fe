@@ -75,6 +75,89 @@
       "phone_call": "电话"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "已排期",
+      "confirmed": "已确认",
+      "checked_in": "已签到",
+      "completed": "已完成",
+      "cancelled": "已取消",
+      "no_show": "未到诊"
+    },
+    "moves": {
+      "reschedule": "改到其他时间",
+      "cancelled": "取消"
+    },
+    "moveHints": {
+      "scheduled": "时段已预留 · 已通过 WhatsApp 发送确认请求",
+      "confirmed": "对方已同意 · 在 WhatsApp 回复“是”会自动设置",
+      "checked_in": "已到达 · 仅限当天",
+      "completed": "就诊完成 · 通常在就诊中设置",
+      "reschedule": "改到新时段 · 同一预约，旧时段保留在历史中",
+      "cancelled": "释放时段并停止提醒",
+      "no_show": "仅在开始时间过后"
+    },
+    "guards": {
+      "final": "最终状态。请使用“重新预约”创建新的预约。",
+      "visitDay": "仅限{{day}}",
+      "beforeStart": "{{day}} {{time}} 后可用",
+      "needsPatient": "请先创建患者档案 · 完成需要患者"
+    },
+    "nextActions": {
+      "check_in": "签到",
+      "confirm": "确认",
+      "complete": "完成",
+      "rebook": "重新预约"
+    },
+    "tiles": {
+      "booked": "已预约",
+      "said_yes": "对方已同意",
+      "visit_day": "就诊当天可用",
+      "after_check_in": "签到后"
+    },
+    "hints": {
+      "scheduled": "时段已预留 · WhatsApp 会请对方确认，回复“是”即确认",
+      "confirmed": "已电话确认 · 会发送提醒",
+      "checked_in": "患者已在诊所 · 已通知医生排队 · 完成后标记为已完成",
+      "completed": "就诊完成 · 明天会发出反馈任务",
+      "needs_patient": "请创建患者档案以完成此次就诊",
+      "cancelled": "恢复即可找回 · 在此期间时段可供他人使用",
+      "closed": "此预约已关闭 · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "患者要求",
+      "unreachable": "无法联系到患者",
+      "doctor_unavailable": "医生没空",
+      "resource_unavailable": "设备或房间不可用",
+      "other": "其他"
+    },
+    "cancelSides": {
+      "patient": "患者",
+      "clinic": "诊所"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "患者已取消",
+      "rescheduling_later": "稍后再改期",
+      "doctor_unavailable": "医生没空",
+      "booked_by_mistake": "误预约",
+      "other": "其他"
+    },
+    "days": {
+      "today": "今天",
+      "tomorrow": "明天"
+    },
+    "toasts": {
+      "booked": "已预约 {{id}} · {{day}} {{time}} · 已通过 WhatsApp 发送确认请求",
+      "bookedQueued": "已预约 {{id}} · {{day}} {{time}} · 提醒已排队",
+      "moved": "{{id}} 已改到 {{day}} {{time}} · 已发送确认请求",
+      "updated": "{{id}} 已更新",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · 提醒已排队",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · 时段已释放，提醒已停止",
+      "cancelled": "预约 {{id}} 已取消",
+      "restored": "预约已恢复 · 提醒将再次发送"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "问诊",

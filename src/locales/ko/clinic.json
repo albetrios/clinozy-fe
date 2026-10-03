@@ -75,6 +75,89 @@
       "phone_call": "전화"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "예정",
+      "confirmed": "확정",
+      "checked_in": "체크인",
+      "completed": "완료",
+      "cancelled": "취소됨",
+      "no_show": "미내원"
+    },
+    "moves": {
+      "reschedule": "다른 시간으로 이동",
+      "cancelled": "취소"
+    },
+    "moveHints": {
+      "scheduled": "시간 확보됨 · WhatsApp으로 확인 요청을 보냈습니다",
+      "confirmed": "응답함 · WhatsApp에서 ‘예’라고 답하면 자동으로 설정됩니다",
+      "checked_in": "도착했습니다 · 당일에만",
+      "completed": "진료 완료 · 보통 진료 화면에서 설정됩니다",
+      "reschedule": "새 시간으로 이동 · 같은 예약이며, 이전 시간은 기록에 남습니다",
+      "cancelled": "시간을 비우고 알림을 중지합니다",
+      "no_show": "시작 시간이 지난 후에만"
+    },
+    "guards": {
+      "final": "최종 상태입니다. 새 예약을 만들려면 다시 예약을 사용하세요.",
+      "visitDay": "{{day}}에만 가능",
+      "beforeStart": "{{day}} {{time}} 이후 가능",
+      "needsPatient": "먼저 환자 기록을 만드세요 · 완료하려면 환자가 필요합니다"
+    },
+    "nextActions": {
+      "check_in": "체크인",
+      "confirm": "확정",
+      "complete": "완료 처리",
+      "rebook": "다시 예약"
+    },
+    "tiles": {
+      "booked": "예약됨",
+      "said_yes": "응답함",
+      "visit_day": "방문일에 가능",
+      "after_check_in": "체크인 후"
+    },
+    "hints": {
+      "scheduled": "시간 확보됨 · WhatsApp으로 확인을 요청하며, ‘예’ 응답으로 확정됩니다",
+      "confirmed": "전화로 이미 확정 · 알림이 발송됩니다",
+      "checked_in": "환자가 클리닉에 있습니다 · 의사 대기열에 알림 · 끝나면 완료로 표시하세요",
+      "completed": "진료 완료 · 내일 피드백 작업이 발송됩니다",
+      "needs_patient": "이 방문을 완료하려면 환자 기록을 만드세요",
+      "cancelled": "되돌리려면 복원하세요 · 그동안 시간은 다른 사람이 쓸 수 있습니다",
+      "closed": "이 예약은 종료되었습니다 · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "환자 요청",
+      "unreachable": "환자와 연락 불가",
+      "doctor_unavailable": "의사 일정 불가",
+      "resource_unavailable": "장비 또는 방 사용 불가",
+      "other": "기타"
+    },
+    "cancelSides": {
+      "patient": "환자",
+      "clinic": "클리닉"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "환자가 취소함",
+      "rescheduling_later": "나중에 다시 일정 조정",
+      "doctor_unavailable": "의사 일정 불가",
+      "booked_by_mistake": "실수로 예약함",
+      "other": "기타"
+    },
+    "days": {
+      "today": "오늘",
+      "tomorrow": "내일"
+    },
+    "toasts": {
+      "booked": "{{id}} 예약됨 · {{day}} {{time}} · WhatsApp으로 확인 요청을 보냈습니다",
+      "bookedQueued": "{{id}} 예약됨 · {{day}} {{time}} · 알림 예약됨",
+      "moved": "{{id}} 이동됨 · {{day}} {{time}} · 확인 요청을 보냈습니다",
+      "updated": "{{id}} 업데이트됨",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · 알림 예약됨",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · 시간 해제, 알림 중지",
+      "cancelled": "예약 {{id}} 취소됨",
+      "restored": "예약 복원됨 · 알림이 다시 발송됩니다"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "상담",

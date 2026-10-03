@@ -75,6 +75,89 @@
       "phone_call": "Appel téléphonique"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Programmé",
+      "confirmed": "Confirmé",
+      "checked_in": "Arrivé",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "no_show": "Absent"
+    },
+    "moves": {
+      "reschedule": "Déplacer à un autre horaire",
+      "cancelled": "Annuler"
+    },
+    "moveHints": {
+      "scheduled": "Créneau réservé · demande de confirmation envoyée sur WhatsApp",
+      "confirmed": "Ils ont dit oui · une réponse « Oui » sur WhatsApp le définit automatiquement",
+      "checked_in": "Ils sont arrivés · uniquement le jour même",
+      "completed": "Visite effectuée · généralement défini depuis la visite",
+      "reschedule": "Déplacer vers un nouveau créneau · même rendez-vous, l’ancien créneau reste dans l’historique",
+      "cancelled": "Libère le créneau et arrête les rappels",
+      "no_show": "Uniquement après l’heure de début"
+    },
+    "guards": {
+      "final": "Statut final. Utilisez Réserver à nouveau pour créer un nouveau rendez-vous.",
+      "visitDay": "Uniquement {{day}}",
+      "beforeStart": "Disponible après {{time}} · {{day}}",
+      "needsPatient": "Créez d’abord le dossier patient · Terminé nécessite un patient"
+    },
+    "nextActions": {
+      "check_in": "Enregistrer l’arrivée",
+      "confirm": "Confirmer",
+      "complete": "Terminer",
+      "rebook": "Réserver à nouveau"
+    },
+    "tiles": {
+      "booked": "Réservé",
+      "said_yes": "Ils ont dit oui",
+      "visit_day": "Disponible le jour du rendez-vous",
+      "after_check_in": "Après l’arrivée"
+    },
+    "hints": {
+      "scheduled": "Créneau réservé · WhatsApp leur demande de confirmer, un « Oui » le confirme",
+      "confirmed": "Déjà confirmé par téléphone · le rappel est envoyé",
+      "checked_in": "Le patient est à la clinique · file du médecin prévenue · marquez Terminé une fois fini",
+      "completed": "Visite effectuée · une tâche de retour part demain",
+      "needs_patient": "Créez le dossier patient pour terminer cette visite",
+      "cancelled": "Restaurez-le pour le récupérer · le créneau est libre pour d’autres en attendant",
+      "closed": "Ce rendez-vous est clos · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "Demande du patient",
+      "unreachable": "Patient injoignable",
+      "doctor_unavailable": "Médecin indisponible",
+      "resource_unavailable": "Machine ou salle indisponible",
+      "other": "Autre"
+    },
+    "cancelSides": {
+      "patient": "PATIENT",
+      "clinic": "CLINIQUE"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "Annulé par le patient",
+      "rescheduling_later": "Reprogrammation plus tard",
+      "doctor_unavailable": "Médecin indisponible",
+      "booked_by_mistake": "Réservé par erreur",
+      "other": "Autre"
+    },
+    "days": {
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain"
+    },
+    "toasts": {
+      "booked": "{{id}} réservé · {{day}} {{time}} · demande de confirmation envoyée sur WhatsApp",
+      "bookedQueued": "{{id}} réservé · {{day}} {{time}} · rappel programmé",
+      "moved": "{{id}} déplacé à {{day}} {{time}} · demande de confirmation envoyée",
+      "updated": "{{id}} mis à jour",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · rappel programmé",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · créneau libéré, rappels arrêtés",
+      "cancelled": "Rendez-vous {{id}} annulé",
+      "restored": "Rendez-vous restauré · le rappel est renvoyé"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consultation",

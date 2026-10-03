@@ -75,6 +75,89 @@
       "phone_call": "Telefonanruf"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Geplant",
+      "confirmed": "Bestätigt",
+      "checked_in": "Eingecheckt",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert",
+      "no_show": "Nicht erschienen"
+    },
+    "moves": {
+      "reschedule": "Auf eine andere Zeit verschieben",
+      "cancelled": "Stornieren"
+    },
+    "moveHints": {
+      "scheduled": "Zeitfenster reserviert · Bestätigungsanfrage per WhatsApp gesendet",
+      "confirmed": "Zugesagt · eine Ja-Antwort auf WhatsApp setzt dies automatisch",
+      "checked_in": "Angekommen · nur am Termintag",
+      "completed": "Besuch erledigt · meist aus dem Besuch heraus gesetzt",
+      "reschedule": "Auf ein neues Zeitfenster verschieben · derselbe Termin, das alte bleibt im Verlauf",
+      "cancelled": "Gibt das Zeitfenster frei und stoppt Erinnerungen",
+      "no_show": "Erst nach der Startzeit möglich"
+    },
+    "guards": {
+      "final": "Endgültiger Status. Nutzen Sie „Neu buchen“, um einen neuen Termin anzulegen.",
+      "visitDay": "Nur {{day}} möglich",
+      "beforeStart": "Verfügbar ab {{time}} · {{day}}",
+      "needsPatient": "Legen Sie zuerst die Patientenakte an · Abgeschlossen erfordert einen Patienten"
+    },
+    "nextActions": {
+      "check_in": "Einchecken",
+      "confirm": "Bestätigen",
+      "complete": "Abschließen",
+      "rebook": "Neu buchen"
+    },
+    "tiles": {
+      "booked": "Gebucht",
+      "said_yes": "Zugesagt",
+      "visit_day": "Am Termintag verfügbar",
+      "after_check_in": "Nach dem Check-in"
+    },
+    "hints": {
+      "scheduled": "Zeitfenster reserviert · WhatsApp bittet um Bestätigung, eine Ja-Antwort bestätigt ihn",
+      "confirmed": "Bereits telefonisch bestätigt · Erinnerung wird gesendet",
+      "checked_in": "Patient ist in der Klinik · Wartezimmer des Arztes informiert · nach dem Besuch als Abgeschlossen markieren",
+      "completed": "Besuch erledigt · morgen wird eine Feedback-Aufgabe erstellt",
+      "needs_patient": "Legen Sie die Patientenakte an, um diesen Besuch abzuschließen",
+      "cancelled": "Stellen Sie ihn wieder her, um ihn zurückzuholen · das Zeitfenster ist inzwischen für andere frei",
+      "closed": "Dieser Termin ist geschlossen · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "Auf Wunsch des Patienten",
+      "unreachable": "Patient nicht erreichbar",
+      "doctor_unavailable": "Arzt nicht verfügbar",
+      "resource_unavailable": "Gerät oder Raum nicht verfügbar",
+      "other": "Sonstiges"
+    },
+    "cancelSides": {
+      "patient": "PATIENT",
+      "clinic": "KLINIK"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "Patient hat abgesagt",
+      "rescheduling_later": "Wird später neu geplant",
+      "doctor_unavailable": "Arzt nicht verfügbar",
+      "booked_by_mistake": "Versehentlich gebucht",
+      "other": "Sonstiges"
+    },
+    "days": {
+      "today": "Heute",
+      "tomorrow": "Morgen"
+    },
+    "toasts": {
+      "booked": "{{id}} gebucht · {{day}} {{time}} · Bestätigungsanfrage per WhatsApp gesendet",
+      "bookedQueued": "{{id}} gebucht · {{day}} {{time}} · Erinnerung eingeplant",
+      "moved": "{{id}} verschoben auf {{day}} {{time}} · Bestätigungsanfrage gesendet",
+      "updated": "{{id}} aktualisiert",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · Erinnerung eingeplant",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · Zeitfenster freigegeben, Erinnerungen gestoppt",
+      "cancelled": "Termin {{id}} storniert",
+      "restored": "Termin wiederhergestellt · Erinnerung wird erneut gesendet"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Beratung",

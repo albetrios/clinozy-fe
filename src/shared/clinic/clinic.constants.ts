@@ -132,6 +132,105 @@ export const CLINIC_KEYS = {
     done: 'taskOutcomes.done',
   },
   /**
+   * The appointments domain, shared by Appointments, Today, the patient file,
+   * Tasks and the appointment form wherever it is stacked: the status machine's
+   * words (`appointment-status.ts` — statuses, the popover's moves and reason
+   * lines, the guards, the card's next steps, the form's tiles and hint lines,
+   * the cancel reasons, `appointments.md` › Copy) and the toasts
+   * `useAppointments` raises.
+   */
+  appointments: {
+    statuses: {
+      scheduled: 'appointments.statuses.scheduled',
+      confirmed: 'appointments.statuses.confirmed',
+      checked_in: 'appointments.statuses.checked_in',
+      completed: 'appointments.statuses.completed',
+      cancelled: 'appointments.statuses.cancelled',
+      no_show: 'appointments.statuses.no_show',
+    },
+    /** The popover's two moves that are not a status label: "Move to another time", "Cancel". */
+    moves: {
+      reschedule: 'appointments.moves.reschedule',
+      cancelled: 'appointments.moves.cancelled',
+    },
+    /** Each option's reason line (`AP_WHY`, H:3423). */
+    moveHints: {
+      scheduled: 'appointments.moveHints.scheduled',
+      confirmed: 'appointments.moveHints.confirmed',
+      checked_in: 'appointments.moveHints.checked_in',
+      completed: 'appointments.moveHints.completed',
+      reschedule: 'appointments.moveHints.reschedule',
+      cancelled: 'appointments.moveHints.cancelled',
+      no_show: 'appointments.moveHints.no_show',
+    },
+    /** A guarded move's words; `{{day}}` and `{{time}}` are the booking's. */
+    guards: {
+      final: 'appointments.guards.final',
+      visitDay: 'appointments.guards.visitDay',
+      beforeStart: 'appointments.guards.beforeStart',
+      needsPatient: 'appointments.guards.needsPatient',
+    },
+    nextActions: {
+      check_in: 'appointments.nextActions.check_in',
+      confirm: 'appointments.nextActions.confirm',
+      complete: 'appointments.nextActions.complete',
+      rebook: 'appointments.nextActions.rebook',
+    },
+    /** The form tiles' tooltips when not on offer. */
+    tiles: {
+      booked: 'appointments.tiles.booked',
+      said_yes: 'appointments.tiles.said_yes',
+      visit_day: 'appointments.tiles.visit_day',
+      after_check_in: 'appointments.tiles.after_check_in',
+    },
+    /** The hint line under the tiles (`appointments.md:376`); `closed` takes `{{status}}`. */
+    hints: {
+      scheduled: 'appointments.hints.scheduled',
+      confirmed: 'appointments.hints.confirmed',
+      checked_in: 'appointments.hints.checked_in',
+      completed: 'appointments.hints.completed',
+      needs_patient: 'appointments.hints.needs_patient',
+      cancelled: 'appointments.hints.cancelled',
+      closed: 'appointments.hints.closed',
+    },
+    /** The contract's `cancel_reason` (D32), by side. */
+    cancelReasons: {
+      patient_asked: 'appointments.cancelReasons.patient_asked',
+      unreachable: 'appointments.cancelReasons.unreachable',
+      doctor_unavailable: 'appointments.cancelReasons.doctor_unavailable',
+      resource_unavailable: 'appointments.cancelReasons.resource_unavailable',
+      other: 'appointments.cancelReasons.other',
+    },
+    cancelSides: {
+      patient: 'appointments.cancelSides.patient',
+      clinic: 'appointments.cancelSides.clinic',
+    },
+    /** The form's Cancel visit reasons (`cancelReasonToContract` stores them). */
+    formCancelReasons: {
+      patient_cancelled: 'appointments.formCancelReasons.patient_cancelled',
+      rescheduling_later: 'appointments.formCancelReasons.rescheduling_later',
+      doctor_unavailable: 'appointments.formCancelReasons.doctor_unavailable',
+      booked_by_mistake: 'appointments.formCancelReasons.booked_by_mistake',
+      other: 'appointments.formCancelReasons.other',
+    },
+    /** A slot's day in a toast: "Today", "Tomorrow", else the date. */
+    days: {
+      today: 'appointments.days.today',
+      tomorrow: 'appointments.days.tomorrow',
+    },
+    toasts: {
+      booked: 'appointments.toasts.booked',
+      bookedQueued: 'appointments.toasts.bookedQueued',
+      moved: 'appointments.toasts.moved',
+      updated: 'appointments.toasts.updated',
+      statusChanged: 'appointments.toasts.statusChanged',
+      statusConfirmed: 'appointments.toasts.statusConfirmed',
+      statusCancelled: 'appointments.toasts.statusCancelled',
+      cancelled: 'appointments.toasts.cancelled',
+      restored: 'appointments.toasts.restored',
+    },
+  },
+  /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and
    * the booking drawer: the stored enums' labels (`S:1330, 1349`; the derived
    * offer state, `live` = "Running") and the toasts its writes raise

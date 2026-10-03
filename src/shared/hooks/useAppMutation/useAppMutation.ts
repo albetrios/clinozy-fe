@@ -36,6 +36,21 @@ interface OptimisticInfiniteConfig<TVars, TRow> {
   update: (rows: TRow[], vars: TVars) => TRow[];
 }
 
+/**
+ * Optimistic update for EVERY cached query under a prefix, whatever each one
+ * holds — an infinite list's pages, a plain list, one record. For a record
+ * several reads show at once (an appointment in the Agenda pages, a calendar
+ * range and its own drawer): `update` maps one cached value and returns it
+ * unchanged when it holds nothing to patch. Every match is snapshotted and
+ * restored if the write fails.
+ */
+interface OptimisticQueriesConfig<TVars> {
+  /** Prefix key matching every cached query to patch. */
+  queryKey: QueryKey;
+  /** The next value of one cached query (never called for a query with no data yet). */
+  update: (data: unknown, vars: TVars) => unknown;
+}
+
 export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unknown> {
   mutationFn: (vars: TVars) => Promise<TData>;
   /**
@@ -61,6 +76,8 @@ export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unkno
   optimistic?: OptimisticConfig<TVars, TCache>;
   /** Optimistically patch a cursor-paginated infinite list (prefix-matched). */
   optimisticInfinite?: OptimisticInfiniteConfig<TVars, TRow>;
+  /** Optimistically patch every cached query under a prefix, any shape. Pass one optimistic option. */
+  optimisticQueries?: OptimisticQueriesConfig<TVars>;
 }
 
 /**
@@ -78,7 +95,7 @@ type InfiniteListPage<TRow> = { rows: TRow[] };
 /** Rollback snapshot carried from `onMutate` to `onError`. */
 type OptimisticContext =
   | { kind: 'single'; previous: unknown }
-  | { kind: 'infinite'; snapshots: [QueryKey, unknown][] };
+  | { kind: 'many'; snapshots: [QueryKey, unknown][] };
 
 /**
  * Text identity of one call's variables — depth-first, object keys emitted in
@@ -193,7 +210,7 @@ export function useAppMutation<
   TRow = unknown,
 >(options: AppMutationOptions<TData, TVars, TCache, TRow>) {
   const queryClient = useQueryClient();
-  const { optimistic, optimisticInfinite } = options;
+  const { optimistic, optimisticInfinite, optimisticQueries } = options;
   /** In-flight requests on this hook instance, keyed by their variables. */
   const inFlightRef = useRef(new Map<string, Promise<TData>>());
   const mutation = useMutation<TData, Error, TVars, OptimisticContext | undefined>({
@@ -218,7 +235,19 @@ export function useAppMutation<
                 }
               : old,
         );
-        return { kind: 'infinite', snapshots };
+        return { kind: 'many', snapshots };
+      }
+      if (optimisticQueries) {
+        await queryClient.cancelQueries({ queryKey: optimisticQueries.queryKey });
+        const snapshots = queryClient.getQueriesData({
+          queryKey: optimisticQueries.queryKey,
+        });
+        for (const [key, data] of snapshots) {
+          if (data !== undefined) {
+            queryClient.setQueryData(key, optimisticQueries.update(data, vars));
+          }
+        }
+        return { kind: 'many', snapshots };
       }
       if (optimistic) {
         await queryClient.cancelQueries({ queryKey: optimistic.queryKey });
@@ -251,7 +280,7 @@ export function useAppMutation<
     },
     onError: (error, _vars, context) => {
       // Restore the pre-mutation snapshot(s) before surfacing the error.
-      if (context?.kind === 'infinite') {
+      if (context?.kind === 'many') {
         for (const [key, data] of context.snapshots) {
           queryClient.setQueryData(key, data);
         }

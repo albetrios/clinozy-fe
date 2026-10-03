@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { z } from 'zod';
 
+import { appointmentRecordSchema } from '@/shared/api/clinic/appointments-contracts.ts';
 import { FIXTURE_ORGANIZATION_ID } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import { invoiceBalance, invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
 import {
-  appointmentSchema,
   branchSchema,
   checkInSchema,
   creditNoteSchema,
@@ -69,7 +69,8 @@ const SCHEMAS = {
   // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).
   leads: leadRecordSchema,
   leadMessages: leadMessageSchema,
-  appointments: appointmentSchema,
+  // Appointments carry the plan's "Latest update" fields and package link (Appendix F).
+  appointments: appointmentRecordSchema,
   prescriptions: prescriptionSchema,
   treatments: treatmentSchema,
   patientImages: patientImageSchema,

@@ -75,6 +75,89 @@
       "phone_call": "مكالمة هاتفية"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "مجدول",
+      "confirmed": "مؤكَّد",
+      "checked_in": "حضر",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "no_show": "لم يحضر"
+    },
+    "moves": {
+      "reschedule": "نقل إلى وقت آخر",
+      "cancelled": "إلغاء"
+    },
+    "moveHints": {
+      "scheduled": "الموعد محجوز · أُرسل طلب التأكيد عبر واتساب",
+      "confirmed": "قالوا نعم · رد «نعم» على واتساب يضبط هذا تلقائيًا",
+      "checked_in": "وصلوا · في يوم الموعد فقط",
+      "completed": "تمت الزيارة · يُضبط عادةً من الزيارة",
+      "reschedule": "النقل إلى وقت جديد · الموعد نفسه، ويبقى الوقت القديم في السجل",
+      "cancelled": "يحرر الوقت ويوقف التذكيرات",
+      "no_show": "فقط بعد مرور وقت البدء"
+    },
+    "guards": {
+      "final": "حالة نهائية. استخدم «إعادة الحجز» لإنشاء موعد جديد.",
+      "visitDay": "فقط {{day}}",
+      "beforeStart": "متاح بعد {{time}} · {{day}}",
+      "needsPatient": "أنشئ سجل المريض أولًا · الاكتمال يتطلب مريضًا"
+    },
+    "nextActions": {
+      "check_in": "تسجيل الحضور",
+      "confirm": "تأكيد",
+      "complete": "إكمال",
+      "rebook": "إعادة الحجز"
+    },
+    "tiles": {
+      "booked": "محجوز",
+      "said_yes": "قالوا نعم",
+      "visit_day": "متاح يوم الموعد",
+      "after_check_in": "بعد تسجيل الحضور"
+    },
+    "hints": {
+      "scheduled": "الموعد محجوز · يطلب واتساب منهم التأكيد، ورد «نعم» يؤكده",
+      "confirmed": "تم التأكيد هاتفيًا بالفعل · يُرسل التذكير",
+      "checked_in": "المريض في العيادة · تم إبلاغ قائمة انتظار الطبيب · حدده مكتملًا عند الانتهاء",
+      "completed": "تمت الزيارة · تُرسل مهمة تقييم غدًا",
+      "needs_patient": "أنشئ سجل المريض لإكمال هذه الزيارة",
+      "cancelled": "استعده لإعادته · الوقت متاح للآخرين في الأثناء",
+      "closed": "هذا الموعد مغلق · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "طلب المريض",
+      "unreachable": "تعذر الوصول إلى المريض",
+      "doctor_unavailable": "الطبيب غير متاح",
+      "resource_unavailable": "الجهاز أو الغرفة غير متاحة",
+      "other": "أخرى"
+    },
+    "cancelSides": {
+      "patient": "المريض",
+      "clinic": "العيادة"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "ألغى المريض",
+      "rescheduling_later": "ستُعاد الجدولة لاحقًا",
+      "doctor_unavailable": "الطبيب غير متاح",
+      "booked_by_mistake": "حُجز بالخطأ",
+      "other": "أخرى"
+    },
+    "days": {
+      "today": "اليوم",
+      "tomorrow": "غدًا"
+    },
+    "toasts": {
+      "booked": "تم حجز {{id}} · {{day}} {{time}} · أُرسل طلب التأكيد عبر واتساب",
+      "bookedQueued": "تم حجز {{id}} · {{day}} {{time}} · التذكير في قائمة الانتظار",
+      "moved": "نُقل {{id}} إلى {{day}} {{time}} · أُرسل طلب التأكيد",
+      "updated": "تم تحديث {{id}}",
+      "statusChanged": "{{name}} ← {{status}}",
+      "statusConfirmed": "{{name}} ← {{status}} · التذكير في قائمة الانتظار",
+      "statusCancelled": "{{name}} ← {{status}} · {{reason}} · تم تحرير الوقت وإيقاف التذكيرات",
+      "cancelled": "تم إلغاء الموعد {{id}}",
+      "restored": "تمت استعادة الموعد · يُرسل التذكير مجددًا"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "استشارة",

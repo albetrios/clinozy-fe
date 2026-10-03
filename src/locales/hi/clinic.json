@@ -75,6 +75,89 @@
       "phone_call": "फ़ोन कॉल"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "निर्धारित",
+      "confirmed": "पुष्ट",
+      "checked_in": "चेक-इन हुआ",
+      "completed": "पूरा हुआ",
+      "cancelled": "रद्द",
+      "no_show": "नहीं आए"
+    },
+    "moves": {
+      "reschedule": "दूसरे समय पर ले जाएँ",
+      "cancelled": "रद्द करें"
+    },
+    "moveHints": {
+      "scheduled": "स्लॉट रोका गया · WhatsApp पर पुष्टि अनुरोध भेजा गया",
+      "confirmed": "उन्होंने हाँ कहा · WhatsApp पर हाँ का जवाब इसे अपने-आप सेट करता है",
+      "checked_in": "वे आ गए हैं · सिर्फ़ उसी दिन",
+      "completed": "विज़िट हो गई · आमतौर पर विज़िट से सेट होता है",
+      "reschedule": "नए स्लॉट पर ले जाएँ · वही अपॉइंटमेंट, पुराना स्लॉट इतिहास में रहता है",
+      "cancelled": "स्लॉट खाली करता है और रिमाइंडर रोकता है",
+      "no_show": "सिर्फ़ शुरू होने का समय बीतने के बाद"
+    },
+    "guards": {
+      "final": "अंतिम स्थिति। नया अपॉइंटमेंट बनाने के लिए फिर से बुक करें का उपयोग करें।",
+      "visitDay": "सिर्फ़ {{day}}",
+      "beforeStart": "{{day}} {{time}} के बाद उपलब्ध",
+      "needsPatient": "पहले मरीज़ का रिकॉर्ड बनाएँ · पूरा करने के लिए मरीज़ चाहिए"
+    },
+    "nextActions": {
+      "check_in": "चेक-इन करें",
+      "confirm": "पुष्टि करें",
+      "complete": "पूरा करें",
+      "rebook": "फिर से बुक करें"
+    },
+    "tiles": {
+      "booked": "बुक हुआ",
+      "said_yes": "उन्होंने हाँ कहा",
+      "visit_day": "विज़िट के दिन उपलब्ध",
+      "after_check_in": "चेक-इन के बाद"
+    },
+    "hints": {
+      "scheduled": "स्लॉट रोका गया · WhatsApp उनसे पुष्टि माँगता है, हाँ का जवाब इसे पुष्ट करता है",
+      "confirmed": "कॉल पर पहले ही पुष्टि हो गई · रिमाइंडर जाता है",
+      "checked_in": "मरीज़ क्लिनिक में है · डॉक्टर की कतार को सूचना दी गई · हो जाने पर पूरा चिह्नित करें",
+      "completed": "विज़िट हो गई · कल एक फ़ीडबैक टास्क जाएगा",
+      "needs_patient": "यह विज़िट पूरी करने के लिए मरीज़ का रिकॉर्ड बनाएँ",
+      "cancelled": "वापस लाने के लिए पुनर्स्थापित करें · तब तक स्लॉट दूसरों के लिए खाली है",
+      "closed": "यह अपॉइंटमेंट बंद है · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "मरीज़ ने कहा",
+      "unreachable": "मरीज़ से संपर्क नहीं हो सका",
+      "doctor_unavailable": "डॉक्टर उपलब्ध नहीं",
+      "resource_unavailable": "मशीन या कमरा उपलब्ध नहीं",
+      "other": "अन्य"
+    },
+    "cancelSides": {
+      "patient": "मरीज़",
+      "clinic": "क्लिनिक"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "मरीज़ ने रद्द किया",
+      "rescheduling_later": "बाद में फिर से तय करेंगे",
+      "doctor_unavailable": "डॉक्टर उपलब्ध नहीं",
+      "booked_by_mistake": "गलती से बुक हुआ",
+      "other": "अन्य"
+    },
+    "days": {
+      "today": "आज",
+      "tomorrow": "कल"
+    },
+    "toasts": {
+      "booked": "बुक हुआ {{id}} · {{day}} {{time}} · WhatsApp पर पुष्टि अनुरोध भेजा गया",
+      "bookedQueued": "बुक हुआ {{id}} · {{day}} {{time}} · रिमाइंडर कतार में",
+      "moved": "{{id}} को {{day}} {{time}} पर ले जाया गया · पुष्टि अनुरोध भेजा गया",
+      "updated": "{{id}} अपडेट हुआ",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · रिमाइंडर कतार में",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · स्लॉट खाली, रिमाइंडर रुके",
+      "cancelled": "अपॉइंटमेंट {{id}} रद्द",
+      "restored": "अपॉइंटमेंट पुनर्स्थापित · रिमाइंडर फिर से जाएगा"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "परामर्श",

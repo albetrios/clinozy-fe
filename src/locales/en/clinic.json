@@ -75,6 +75,89 @@
       "phone_call": "Phone call"
     }
   },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "checked_in": "Checked in",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No show"
+    },
+    "moves": {
+      "reschedule": "Move to another time",
+      "cancelled": "Cancel"
+    },
+    "moveHints": {
+      "scheduled": "Slot held · confirm request sent on WhatsApp",
+      "confirmed": "They said yes · a Yes reply on WhatsApp sets this automatically",
+      "checked_in": "They have arrived · only on the day",
+      "completed": "Visit done · usually set from the visit",
+      "reschedule": "Move to a new slot · same appointment, old slot kept in history",
+      "cancelled": "Frees the slot and stops reminders",
+      "no_show": "Only after the start time has passed"
+    },
+    "guards": {
+      "final": "Final status. Use Rebook to make a new appointment.",
+      "visitDay": "Only on {{day}}",
+      "beforeStart": "Available after {{time}} on {{day}}",
+      "needsPatient": "Create the patient record first · Completed needs a patient"
+    },
+    "nextActions": {
+      "check_in": "Check in",
+      "confirm": "Confirm",
+      "complete": "Complete",
+      "rebook": "Rebook"
+    },
+    "tiles": {
+      "booked": "Booked",
+      "said_yes": "They said yes",
+      "visit_day": "Available on the visit day",
+      "after_check_in": "After check-in"
+    },
+    "hints": {
+      "scheduled": "Slot held · WhatsApp asks them to confirm, a Yes reply confirms it",
+      "confirmed": "Already confirmed on a call · reminder goes out",
+      "checked_in": "Patient is at the clinic · doctor queue notified · mark Completed when done",
+      "completed": "Visit done · a feedback task goes out tomorrow",
+      "needs_patient": "Create the patient record to complete this visit",
+      "cancelled": "Restore to bring it back · the slot is free for others meanwhile",
+      "closed": "This appointment is closed · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "Patient asked",
+      "unreachable": "Could not reach patient",
+      "doctor_unavailable": "Doctor unavailable",
+      "resource_unavailable": "Machine or room unavailable",
+      "other": "Other"
+    },
+    "cancelSides": {
+      "patient": "PATIENT",
+      "clinic": "CLINIC"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "Patient cancelled",
+      "rescheduling_later": "Rescheduling later",
+      "doctor_unavailable": "Doctor unavailable",
+      "booked_by_mistake": "Booked by mistake",
+      "other": "Other"
+    },
+    "days": {
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "toasts": {
+      "booked": "Booked {{id}} · {{day}} {{time}} · confirm request sent on WhatsApp",
+      "bookedQueued": "Booked {{id}} · {{day}} {{time}} · reminder queued",
+      "moved": "{{id}} moved to {{day}} {{time}} · confirm request sent",
+      "updated": "{{id}} updated",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · reminder queued",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · slot freed, reminders stopped",
+      "cancelled": "Appointment {{id}} cancelled",
+      "restored": "Appointment restored · reminder goes out again"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consultation",
