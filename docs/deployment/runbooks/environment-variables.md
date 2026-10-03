@@ -68,7 +68,9 @@ whenever it runs in a terminal and an env file is present, and passes the answer
 variable still beats the file. Nothing is asked in CI, through a pipe or from a script — those
 builds read the files above exactly as before — and `pnpm build:bundle` is the bare chain (`tsc -b`,
 `vite build`, `strip-sourcemaps`) for callers that must never stop to ask.
-`deploy:netlify:prod` builds with `--env production`.
+`deploy:netlify:prod` builds with `--env production`. Source maps go to Sentry only when a build
+asks — the deploy workflow's `SENTRY_UPLOAD_SOURCEMAPS=true`, or `pnpm build --sentry` — never
+because an env file holds `SENTRY_AUTH_TOKEN` ([sentry-sourcemaps.md](../../integrations/sentry-sourcemaps.md)).
 
 **Not env:** live session and organization context from **`GET /auth/me/context`**.
 

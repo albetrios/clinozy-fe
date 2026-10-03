@@ -13,6 +13,11 @@
  *   pnpm build                              ask (terminal, an env file present)
  *   pnpm build --env production             no question: .env.production alone
  *   BUILD_ENVIRONMENT=local pnpm build      the same, from the shell
+ *   pnpm build --env production --sentry    also upload source maps to Sentry
+ *
+ * Source maps go to Sentry only on request — `--sentry` here, or
+ * `SENTRY_UPLOAD_SOURCEMAPS=true` as the deploy workflow sets it. A local build is a test
+ * build, so by default it creates no Sentry release, whatever its env file holds.
  *
  * Nothing is asked in CI or when stdin or stdout is not a terminal (`pnpm health`,
  * Playwright's webServer, report scripts): the build then reads Vite's default files,
@@ -28,15 +33,17 @@ import { pathToFileURL } from 'node:url';
 export const ENVIRONMENTS = ['local', 'development', 'production'];
 
 const VARIABLE = 'BUILD_ENVIRONMENT';
+const SENTRY_VARIABLE = 'SENTRY_UPLOAD_SOURCEMAPS';
 
 /**
- * Reads `--env <environment>` / `--env=<environment>` from the arguments.
+ * Reads `--env <environment>` / `--env=<environment>` and `--sentry` from the arguments.
  *
  * @param {string[]} argv
- * @returns {{ environment?: string }}
+ * @returns {{ environment?: string, sentry?: true }}
  */
 export function parseBuildArguments(argv) {
   let environment;
+  let sentry = false;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === '--env') {
@@ -47,9 +54,11 @@ export function parseBuildArguments(argv) {
       }
     } else if (argument.startsWith('--env=')) {
       environment = argument.slice('--env='.length);
+    } else if (argument === '--sentry') {
+      sentry = true;
     } else {
       throw new Error(
-        `Unknown argument "${argument}" — pnpm build takes only --env <environment>.`,
+        `Unknown argument "${argument}" — pnpm build takes --env <environment> and --sentry.`,
       );
     }
   }
@@ -58,7 +67,25 @@ export function parseBuildArguments(argv) {
       `"${environment}" is not an environment — use ${ENVIRONMENTS.join(', ')}.`,
     );
   }
-  return environment === undefined ? {} : { environment };
+  return {
+    ...(environment === undefined ? {} : { environment }),
+    ...(sentry ? { sentry: true } : {}),
+  };
+}
+
+/**
+ * The env the build chain runs with: the chosen environment as `BUILD_ENVIRONMENT`, and
+ * `SENTRY_UPLOAD_SOURCEMAPS=true` only for `--sentry` (a value already in the shell is kept).
+ *
+ * @param {{ environment?: string, sentry?: boolean, env: NodeJS.ProcessEnv }} options
+ * @returns {NodeJS.ProcessEnv}
+ */
+export function childEnvironment({ environment, sentry, env }) {
+  return {
+    ...env,
+    ...(environment === undefined ? {} : { [VARIABLE]: environment }),
+    ...(sentry ? { [SENTRY_VARIABLE]: 'true' } : {}),
+  };
 }
 
 /**
@@ -143,11 +170,14 @@ async function askInTerminal(available) {
 }
 
 async function main() {
+  const argv = process.argv.slice(2);
   let environment;
+  let sentry = false;
   let asked = false;
   try {
+    sentry = parseBuildArguments(argv).sentry === true;
     environment = await chooseEnvironment({
-      argv: process.argv.slice(2),
+      argv,
       env: process.env,
       root: process.cwd(),
       interactive: Boolean(process.stdin.isTTY && process.stdout.isTTY),
@@ -165,7 +195,7 @@ async function main() {
 
   if (environment !== undefined) {
     const hint = asked
-      ? ` (next time without asking: pnpm build --env ${environment})`
+      ? ` (next time without asking: pnpm build --env ${environment}${sentry ? ' --sentry' : ''})`
       : '';
     console.log(`pnpm build: building with .env.${environment} alone${hint}.`);
   } else if (!process.env.CI && availableEnvironments(process.cwd()).length > 0) {
@@ -174,12 +204,10 @@ async function main() {
       "pnpm build: not asked (not a terminal) — Vite's default env files: .env.local, then .env.production on top. Choose one with --env <environment>.",
     );
   }
+  if (sentry) console.log('pnpm build: uploading source maps to Sentry (--sentry).');
   const result = spawnSync('pnpm', ['run', 'build:bundle'], {
     stdio: 'inherit',
-    env:
-      environment === undefined
-        ? process.env
-        : { ...process.env, [VARIABLE]: environment },
+    env: childEnvironment({ environment, sentry, env: process.env }),
   });
   process.exit(result.status ?? 1);
 }

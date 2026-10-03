@@ -3,7 +3,7 @@
 **Client SDK (errors, replay, performance):** see **[sentry-frontend.md](./sentry-frontend.md)** for
 what is wired in the React app and how to verify events locally.
 
-The app uses **@sentry/vite-plugin** to upload source maps on **production builds** so Sentry can show original source locations in stack traces. The plugin is already configured in `vite.config.ts`; you only need to provide credentials.
+The app uses **@sentry/vite-plugin** to upload source maps so Sentry can show original source locations in stack traces. The plugin is configured in `vite.config.ts` and runs **only when a build asks for it**: the deploy workflow does on every deploy, and a local build does only with `pnpm build --sentry`. A local build is a test build, so by default it creates no Sentry release, even though the local env files carry the token.
 
 ```mermaid
 sequenceDiagram
@@ -11,8 +11,8 @@ sequenceDiagram
   participant Build
   participant Plugin
   participant Sentry
-  Dev->>Build: pnpm build (production)
-  Build->>Plugin: SENTRY_AUTH_TOKEN, ORG, PROJECT set?
+  Dev->>Build: deploy workflow, or pnpm build --sentry
+  Build->>Plugin: SENTRY_UPLOAD_SOURCEMAPS=true and SENTRY_AUTH_TOKEN, ORG, PROJECT set?
   Plugin->>Plugin: Emit source maps
   Plugin->>Sentry: Upload release + source maps
   Sentry->>Sentry: Store for stack trace resolution
@@ -43,49 +43,41 @@ You can also find them under **Settings → Organization → General** (org) and
 
 ---
 
-## 3. Provide credentials to the build
+## 3. When the upload runs
 
-The plugin runs only when **`mode === 'production'`** and **`SENTRY_AUTH_TOKEN`** is set. It reads:
+The plugin runs only in a production build (every `vite build`) where **both** the switch and the token are set:
 
-| Variable            | Required | Description                       |
-| ------------------- | -------- | --------------------------------- |
-| `SENTRY_AUTH_TOKEN` | Yes      | Token from step 2 (never commit). |
-| `SENTRY_ORG`        | Yes      | Org slug from step 1.             |
-| `SENTRY_PROJECT`    | Yes      | Project slug from step 1.         |
-| `VITE_APP_VERSION`  | Optional | Release name (defaults from CI).  |
+| Variable                   | Where it comes from                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `SENTRY_UPLOAD_SOURCEMAPS` | `true` on the deploy workflow's build step (`reusable-netlify-deploy.yml`), or `pnpm build --sentry`. Read from the process env only. |
+| `SENTRY_AUTH_TOKEN`        | Token from step 2 (never commit) — with `SENTRY_ORG` and `SENTRY_PROJECT`, from the env the build reads.                              |
+| `VITE_APP_VERSION`         | Optional — the release name (`<version>+<buildId>`; the deploy workflow sets it).                                                     |
 
-**Option A — CI / production build (recommended)**  
-Set in your CI or deployment environment:
+`SENTRY_UPLOAD_SOURCEMAPS` is read **before** any env file loads, so writing it into `.env.local`,
+`.env.development` or `.env.production` does nothing: the switch is the command, never a file.
+Asked for without a token, the build warns and uploads nothing. Pinned by
+`tests/ci/sentry-upload.policy.test.ts`.
 
-```bash
-export SENTRY_AUTH_TOKEN=sntrys_xxx...
-export SENTRY_ORG=your-org-slug
-export SENTRY_PROJECT=your-project-slug
-pnpm build
-```
+**Deploys (automatic).** The deploy workflow materializes `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and
+`SENTRY_PROJECT` from the GitHub Environment into `.env.production.local` and sets
+`SENTRY_UPLOAD_SOURCEMAPS: 'true'` on the build step. PR previews never upload.
 
-**Option B — Local production build**  
-Create a file at project root (gitignored):
-
-**`.env.sentry-build-plugin`** (already in `.gitignore`):
+**A local build, by hand.** Choose the environment whose release it is and add `--sentry`; the
+token, org and project come from that environment's env file (or the shell):
 
 ```bash
-SENTRY_AUTH_TOKEN=sntrys_xxx...
-SENTRY_ORG=your-org-slug
-SENTRY_PROJECT=your-project-slug
+pnpm build --env production --sentry
 ```
 
-Then run `pnpm build`. The plugin loads this file when present.
-
-**Option C — Environment variables only**  
-Set `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` in your shell or in `.env.local` (gitignored) before running `pnpm build`.
+Without `--sentry` — `pnpm build`, `pnpm health`, the pre-push hook — nothing is uploaded.
+`tooling/ci/strip-sourcemaps.mjs` deletes the maps from `dist/` after every build either way.
 
 ---
 
 ## 4. Verify
 
-1. Run a production build: `pnpm build`
-2. In the build output you should see Sentry plugin activity (release created, source maps uploaded).
+1. Run `pnpm build --env <environment> --sentry`.
+2. The build output shows `[sentry-vite-plugin]` activity (release created, source maps uploaded); a build without `--sentry` shows none.
 3. In Sentry: **Project → Settings → Source Maps** — you should see a release and uploaded artifacts.
 
 ---
@@ -94,4 +86,4 @@ Set `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` in your shell or in 
 
 - [Sentry: Uploading Source Maps (Vite)](https://docs.sentry.io/platforms/javascript/sourcemaps/uploading/vite/)
 - [Sentry: Auth Tokens](https://docs.sentry.io/product/accounts/auth-tokens/)
-- Plugin config: `vite.config.ts` (sentryVitePlugin, production only)
+- Plugin config: `vite.config.ts` (sentryVitePlugin — production build + `SENTRY_UPLOAD_SOURCEMAPS=true`)

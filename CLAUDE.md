@@ -7,7 +7,7 @@ This document is the single source of truth for understanding and working in thi
 ```bash
 pnpm install
 pnpm dev          # Vite dev server on port 5173
-pnpm build        # Production build — in a terminal, asks which .env.<environment> to build with (--env <environment> skips the question)
+pnpm build        # Production build — in a terminal, asks which .env.<environment> to build with (--env <environment> skips the question; --sentry also uploads source maps, off by default)
 pnpm type-check   # Type check (no emit, tsconfig.app.json)
 pnpm lint         # ESLint
 pnpm biome:check  # Biome lint lane (lint-only; Prettier owns formatting)

@@ -7,10 +7,18 @@
 /** The environments a build can read, one `.env.<environment>` file each. */
 export declare const ENVIRONMENTS: readonly string[];
 
-/** Reads `--env <environment>` / `--env=<environment>`; throws on anything else. */
+/** Reads `--env <environment>` / `--env=<environment>` and `--sentry`; throws on anything else. */
 export declare function parseBuildArguments(argv: readonly string[]): {
   environment?: string;
+  sentry?: true;
 };
+
+/** The build chain's env: `BUILD_ENVIRONMENT`, and `SENTRY_UPLOAD_SOURCEMAPS=true` for `--sentry`. */
+export declare function childEnvironment(options: {
+  environment?: string;
+  sentry?: boolean;
+  env: NodeJS.ProcessEnv;
+}): NodeJS.ProcessEnv;
 
 /** The environments whose env file exists under `root`, in {@link ENVIRONMENTS} order. */
 export declare function availableEnvironments(root: string): string[];

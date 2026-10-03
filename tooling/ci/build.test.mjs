@@ -6,6 +6,7 @@ import test from 'node:test';
 
 import {
   availableEnvironments,
+  childEnvironment,
   chooseEnvironment,
   parseBuildArguments,
   resolveAnswer,
@@ -137,5 +138,39 @@ test('never asks in CI, outside a terminal, or with no env file — Vite default
   });
   await withEnvFiles([], async (root) => {
     assert.deepEqual(await choose(root), { environment: undefined, asked: [] });
+  });
+});
+
+test('--sentry is read alongside --env, in either order', () => {
+  assert.deepEqual(parseBuildArguments(['--sentry']), { sentry: true });
+  assert.deepEqual(parseBuildArguments(['--env', 'production', '--sentry']), {
+    environment: 'production',
+    sentry: true,
+  });
+  assert.deepEqual(parseBuildArguments(['--sentry', '--env=development']), {
+    environment: 'development',
+    sentry: true,
+  });
+  assert.throws(
+    () => parseBuildArguments(['--env', '--sentry']),
+    /--env needs an environment/,
+  );
+});
+
+test('childEnvironment sets BUILD_ENVIRONMENT, and the Sentry upload only for --sentry', () => {
+  const env = { PATH: '/usr/bin' };
+  assert.deepEqual(childEnvironment({ env }), { PATH: '/usr/bin' });
+  assert.deepEqual(childEnvironment({ environment: 'production', env }), {
+    PATH: '/usr/bin',
+    BUILD_ENVIRONMENT: 'production',
+  });
+  assert.deepEqual(childEnvironment({ environment: 'production', sentry: true, env }), {
+    PATH: '/usr/bin',
+    BUILD_ENVIRONMENT: 'production',
+    SENTRY_UPLOAD_SOURCEMAPS: 'true',
+  });
+  // Without --sentry nothing is added — a value the shell set on purpose is passed through.
+  assert.deepEqual(childEnvironment({ env: { SENTRY_UPLOAD_SOURCEMAPS: 'true' } }), {
+    SENTRY_UPLOAD_SOURCEMAPS: 'true',
   });
 });

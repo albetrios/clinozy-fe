@@ -36,8 +36,19 @@ export default defineConfig(({ command, mode }) => {
   // with and passes BUILD_ENVIRONMENT, and that one file is then read alone (envDir false, its
   // values in process.env). Unasked (CI, deploys, non-interactive callers) Vite reads
   // `.env.local` with `.env.production` on top; deploys materialize `.env.production.local`.
+  //
+  // Source maps go to Sentry only when a build asks for it: the deploy workflow sets
+  // SENTRY_UPLOAD_SOURCEMAPS=true on its build step, and `pnpm build --sentry` does the same by
+  // hand. Read here, before any env file loads, so a value written in a file never turns
+  // uploads on — a local build is a test build and never creates a Sentry release.
+  const uploadSourceMaps = process.env.SENTRY_UPLOAD_SOURCEMAPS === 'true';
   const envDir = applyBuildEnvironment({ command, root: path.resolve(__dirname) });
   const env = loadEnv(mode, envDir, '');
+  if (command === 'build' && uploadSourceMaps && !env.SENTRY_AUTH_TOKEN) {
+    console.warn(
+      'SENTRY_UPLOAD_SOURCEMAPS=true, but SENTRY_AUTH_TOKEN is not set — no source maps are uploaded.',
+    );
+  }
 
   // One build id per build, shared by version.json (new-deploy detection) and the
   // Sentry release name below — so a build, its version.json, and its Sentry
@@ -120,10 +131,11 @@ export default defineConfig(({ command, mode }) => {
           ]
         : []),
 
-      // Sentry source map upload — only in production builds when credentials are present.
+      // Sentry source map upload — only in a production build that asked for it
+      // (SENTRY_UPLOAD_SOURCEMAPS=true, see above) and has credentials.
       // Source maps are uploaded then deleted from the output so they're never served publicly.
       // The plugin must be listed AFTER all other plugins.
-      ...(mode === 'production' && env.SENTRY_AUTH_TOKEN
+      ...(mode === 'production' && uploadSourceMaps && env.SENTRY_AUTH_TOKEN
         ? [
             sentryVitePlugin({
               org: env.SENTRY_ORG,
