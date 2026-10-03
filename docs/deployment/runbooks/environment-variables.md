@@ -211,6 +211,7 @@ Follow **`agent-os/skills/fe-env-schema-add/SKILL.md`** end-to-end:
 | MCP servers missing in Cursor                        | Run `pnpm setup:local --no-start` or `pnpm mcp:setup`                                                                                                                                |
 | Context7 MCP fails                                   | Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor                                                                                                                             |
 | `The dev server runs in mode "dev-server"` on start  | Vite was started bare or with `--mode`; run `pnpm dev` (see [Which env files each command reads](#which-env-files-each-command-reads))                                               |
+| Local dev errors show up in Sentry                   | `VITE_SENTRY_DSN` is set in `.env.local` — blank it ([Keeping local dev out of Sentry](../../integrations/sentry-frontend.md#keeping-local-dev-out-of-sentry))                       |
 
 ## 7. Related files
 
