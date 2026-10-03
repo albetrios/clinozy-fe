@@ -9,8 +9,9 @@
  * `.env.development` still gets them.
  *
  * Never overwrites: a key already set in `.env.local` keeps its value, so a deliberate local
- * choice survives. Only keys missing or blank locally are written. Values are never logged —
- * callers get the key names and where each came from.
+ * choice survives. Only keys missing or blank locally are written; one that no source sets is
+ * reported as missing, for the developer to fill by hand. Values are never logged — callers
+ * get the key names and where each came from.
  */
 import { parseEnv } from 'node:util';
 
@@ -26,32 +27,43 @@ export function upsertEnvAssignment(content: string, key: string, value: string)
 /** Where a filled credential came from. */
 export type CredentialSource = '.env.development' | 'environment';
 
+/** What {@link fillExternalCredentials} did, by key name. */
+export interface ExternalCredentialsResult {
+  /** The `.env.local` content with the filled keys written. */
+  content: string;
+  /** Keys written, each with its source. */
+  filled: Array<{ key: string; source: CredentialSource }>;
+  /** Keys blank locally that no source sets — left for the developer. */
+  missing: string[];
+}
+
 /**
  * Fill each of `keys` that is missing or blank in `localContent`, from `developmentContent`
  * when it sets the key, else from `environment`.
- *
- * @returns the new content and, per filled key, its source (empty when nothing changed)
  */
 export function fillExternalCredentials(
   localContent: string,
   developmentContent: string,
   keys: readonly string[],
   environment: Readonly<Record<string, string | undefined>> = {},
-): { content: string; filled: Array<{ key: string; source: CredentialSource }> } {
+): ExternalCredentialsResult {
   const local = parseEnv(localContent);
   const development = parseEnv(developmentContent);
   let content = localContent;
-  const filled: Array<{ key: string; source: CredentialSource }> = [];
+  const filled: ExternalCredentialsResult['filled'] = [];
+  const missing: string[] = [];
   for (const key of keys) {
     if (local[key]) continue;
     const fromFile = development[key];
-    const fromEnvironment = environment[key];
-    const value = fromFile || fromEnvironment;
-    if (!value) continue;
+    const value = fromFile || environment[key];
+    if (!value) {
+      missing.push(key);
+      continue;
+    }
     content = upsertEnvAssignment(content, key, value);
     filled.push({ key, source: fromFile ? '.env.development' : 'environment' });
   }
-  return { content, filled };
+  return { content, filled, missing };
 }
 
 /** "KEY (source), …" for a log line — key names and sources only, never values. */

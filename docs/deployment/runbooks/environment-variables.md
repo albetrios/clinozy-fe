@@ -61,7 +61,7 @@ localhost — today `VITE_STRIPE_PUBLISHABLE_KEY` (test mode; development forbid
 `.env.development` when that file sets it, else from the process environment (a cloud session's
 Variables, an exported shell variable): into a new file, and on later runs wherever the key is
 missing or blank — never overwriting a value already set, and printing key names and sources
-only. Keys whose local value differs on purpose stay off the list: the API base and app
+only. A key no source sets is named as a warning, for you to fill by hand. Keys whose local value differs on purpose stay off the list: the API base and app
 environment, the Sentry DSN, and the Turnstile site key (bound to its domains). Add a key there
 when a new integration's development value works locally as-is.
 
