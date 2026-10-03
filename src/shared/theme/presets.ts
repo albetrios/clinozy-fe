@@ -46,11 +46,12 @@ export const ACCENT_COLORS = [
 const DEFAULT_FONT_STACK = "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
 
 /**
- * Web-safe `--font-sans` / `--font-heading` stacks. The CSP is `font-src 'self'`,
- * so remote fonts can't load — these are families already on common OSes.
+ * `--font-sans` / `--font-heading` stacks. The CSP is `font-src 'self'`, so no
+ * font CDN can load: Inter ships self-hosted (the `@font-face` rules in
+ * `src/index.css`), and every other family here is one already on common OSes.
  */
 export const GENERATED_FONTS: Record<string, { label: string; stack: string }> = {
-  inter: { label: 'Inter / system', stack: DEFAULT_FONT_STACK },
+  inter: { label: 'Inter', stack: DEFAULT_FONT_STACK },
   grotesk: {
     label: 'Grotesk',
     stack: "'Trebuchet MS', 'Segoe UI', system-ui, sans-serif",

@@ -33,6 +33,8 @@
   "ignore": [],
   // Dependencies knip cannot see (no CSS parsing; shell-script / MCP invocation):
   //  - tailwindcss + tw-animate-css: imported in src/index.css (Tailwind v4 CSS-first)
+  //  - @fontsource/inter + @fontsource/jetbrains-mono: their woff2 files are
+  //    url()-referenced by the @font-face rules in src/index.css
   //  - lint-staged: invoked by tooling/validate/before-commit-guard.sh (pre-commit)
   //  - MCP server binaries: launched via `pnpm exec` in agent-os/mcp/mcp.json
   //    (symlinked as .mcp.json), never imported — @upstash/context7-mcp →
@@ -42,6 +44,8 @@
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",
+    "@fontsource/inter",
+    "@fontsource/jetbrains-mono",
     "lint-staged",
     "@upstash/context7-mcp",
     "shadcn",

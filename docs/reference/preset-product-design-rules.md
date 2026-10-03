@@ -199,8 +199,8 @@ interactive control. Do not `outline-none` without a replacement ring/underline.
 
 ### Typography / fonts (`bodyFontId`, `headingFontId`)
 
-**Rule TY-1 — Web-safe stacks only** (`font-src 'self'`). Use `GENERATED_FONTS`
-catalog only.
+**Rule TY-1 — Same-origin fonts only** (`font-src 'self'`). Use the `GENERATED_FONTS`
+catalog only: self-hosted Inter, or a web-safe system stack — never a font CDN.
 
 **Rule TY-2 — Max two roles:** body (`--font-sans`) + heading (`--font-heading`).
 Mono is fixed for code.

@@ -63,7 +63,7 @@ rolls on base/menu/icons. The accent drives the same tokens a preset overrides
 `--color-sidebar-ring` + foregrounds) and the chart anchor spreads into
 `--color-chart-1..5` using the active harmony rule. Everything is set **inline**
 on `<html>` so it works in both light and dark (CSP-safe — no injected `<style>`,
-and fonts are **web-safe stacks** only since the CSP is `font-src 'self'`),
+and fonts are self-hosted Inter or **web-safe stacks** only since the CSP is `font-src 'self'`),
 mutually exclusive with the `data-theme` presets. The store records it as
 `preset: 'custom'` + `customTheme: GeneratedTheme`, so it persists across reloads.
 Share via `?theme=<seed>`. Shuffle also rolls the orthogonal **icon axes**

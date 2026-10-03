@@ -138,6 +138,8 @@
     ]
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
     "@phosphor-icons/react": "^2.1.10",
     "@sentry/react": "^11.1.0",

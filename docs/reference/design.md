@@ -41,8 +41,8 @@ weight, and colour**, not from many typefaces.
 
 | Role      | Token            | Default        | Use                                                                      |
 | --------- | ---------------- | -------------- | ------------------------------------------------------------------------ |
-| Body / UI | `--font-sans`    | Inter / system | Everything by default (`GENERATED_FONTS.inter`)                          |
-| Headings  | `--font-heading` | Inter / system | `h1`–`h6` (own axis, so Shuffle can split it)                            |
+| Body / UI | `--font-sans`    | Inter          | Everything by default (`GENERATED_FONTS.inter`)                          |
+| Headings  | `--font-heading` | Inter          | `h1`–`h6` (own axis, so Shuffle can split it)                            |
 | Mono      | `--font-mono`    | JetBrains Mono | Code, IDs, keys, tabular figures (fixed stack in `@theme`, not shuffled) |
 
 Principles:
@@ -59,8 +59,10 @@ Principles:
 - **Minimum readable size.** Product UI labels and hints use at least `text-xs`
   (12px). Sub-12px arbitrary sizes are for decorative meta only — not dashboard
   stats, quick actions, or form labels.
-- **Fonts are web-safe stacks.** The CSP is `font-src 'self'`, so the Shuffle
-  catalog (`GENERATED_FONTS` in `shared/theme`) uses real system-stack families —
+- **Fonts never come from a CDN.** The CSP is `font-src 'self'`: Inter (400–700)
+  and JetBrains Mono (400–500) are self-hosted from `@fontsource` — Latin subsets
+  only, declared in `src/index.css` — and the rest of the Shuffle catalog
+  (`GENERATED_FONTS` in `shared/theme`) uses real system-stack families —
   expressive range without a network fetch.
 
 ## 3. Colour
