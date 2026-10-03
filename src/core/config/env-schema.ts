@@ -5,6 +5,7 @@
  */
 import { z } from 'zod';
 
+import { FIXTURE_BACKED_CLINIC_MODULES } from './clinic-modules.ts';
 import {
   enabledOAuthProviders,
   hasAnyAuthSurface,
@@ -136,7 +137,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_CSP_REPORT_URI:
     'CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments.',
   VITE_DISABLED_MODULES:
-    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate.',
+    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are clinic-today … clinic-users; production disables the fixture-backed ones until their API lands.',
   VITE_PERSONAL_ORGANIZATIONS:
     'Tri-state override for personal-org deployment mode (true/false/unset).',
   VITE_TEAM_ORGANIZATIONS:
@@ -497,13 +498,15 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       VITE_E2E_HOOKS: ['false'],
       VITE_VERSION_CHECK: ['true'],
     },
-    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on.
+    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on,
+    // and the fixture-backed clinic rooms switched off until their API lands (D8).
     defaults: {
       VITE_APP_ENV: 'production',
       VITE_DEBUG_LOGGING: 'false',
       VITE_DEVTOOLS: 'false',
       VITE_E2E_HOOKS: 'false',
       VITE_VERSION_CHECK: 'true',
+      VITE_DISABLED_MODULES: FIXTURE_BACKED_CLINIC_MODULES.join(','),
     },
   },
 };
