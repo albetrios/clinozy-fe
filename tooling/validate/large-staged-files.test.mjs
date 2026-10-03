@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GATE = join(ROOT, 'tooling/validate/large-staged-files.sh');
-const LIMIT_BYTES = 1024 * 1024;
+const LIMIT_BYTES = 3 * 1024 * 1024;
 
 /**
  * Stage `files` (repo-relative path → size in bytes) in a throwaway repo and run
@@ -38,7 +38,12 @@ function runGateWith(files) {
 test('rejects a staged file over the limit', () => {
   const { status, output } = runGateWith({ 'src/big.bin': LIMIT_BYTES + 1 });
   assert.equal(status, 1, output);
-  assert.match(output, /src\/big\.bin \(1048577 bytes\)/);
+  assert.ok(output.includes(`src/big.bin (${LIMIT_BYTES + 1} bytes)`), output);
+});
+
+test('allows a 2MB file — over the old 1MB limit, under 3MB', () => {
+  const { status, output } = runGateWith({ 'src/medium.bin': 2 * 1024 * 1024 });
+  assert.equal(status, 0, output);
 });
 
 test('allows a staged file exactly at the limit', () => {
@@ -73,6 +78,6 @@ for (const path of [
   test(`does not exempt ${path}`, () => {
     const { status, output } = runGateWith({ [path]: LIMIT_BYTES + 1 });
     assert.equal(status, 1, output);
-    assert.match(output, /Files exceed 1MB limit/);
+    assert.match(output, /Files exceed 3MB limit/);
   });
 }

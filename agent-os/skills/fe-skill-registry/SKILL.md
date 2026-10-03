@@ -491,7 +491,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 - Runs via `./tooling/validate/before-commit-guard.sh` on every `git commit`
 - Checks: validate:env-example, validate:public, lint-staged, type-check
-- Plus (in pre-commit): gitleaks, merge conflict markers, large file (>1MB; `iterations/` exempt)
+- Plus (in pre-commit): gitleaks, merge conflict markers, large file (>3MB; `iterations/` exempt)
 - Manual run: `pnpm run before-commit-guard`
 - Documents how to fix each failure type
 
