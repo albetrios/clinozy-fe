@@ -1,7 +1,7 @@
 import { type I18nLocale, localeDirection, type TextDirection } from './locales.ts';
 
 /** BCP 47 tags for UI languages — used as default format locale. */
-export const INTL_LOCALE: Record<I18nLocale, string> = {
+const INTL_LOCALE: Record<I18nLocale, string> = {
   en: 'en-US',
   es: 'es-ES',
   zh: 'zh-CN',
@@ -261,10 +261,6 @@ export function regionLocaleFacts(formatLocale: string): {
     firstDayOfWeek,
     measurementSystem: IMPERIAL.has(region) ? 'imperial' : 'metric',
   };
-}
-
-export function isDateFormatPreference(value: string): value is DateFormatPreference {
-  return (DATE_FORMAT_PREFERENCES as readonly string[]).includes(value);
 }
 
 export function normalizeDateFormatPreference(

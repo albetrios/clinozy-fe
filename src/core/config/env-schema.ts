@@ -341,6 +341,16 @@ export interface EnvProfile {
    * value reaches it through the env layer (`.env.<env>` / GitHub Environment).
    */
   readonly defaults?: Readonly<Record<string, string>>;
+  /**
+   * External credentials (`local` only): third-party integration keys whose development
+   * value is also right on localhost. `pnpm setup:local` fills each into `.env.local` from
+   * `.env.development`, else from the process environment (a cloud session's Variables) —
+   * new file or top-up, never overwriting a value already set
+   * (tooling/dev/external-credentials.ts). Keys whose local value differs on purpose stay off
+   * this list: the API base and app environment, the Sentry DSN (local errors stay out of
+   * Sentry unless set by hand), and the Turnstile site key (keys are bound to their domains).
+   */
+  readonly externalCredentials?: readonly string[];
 }
 
 /** Boolean flags whose allowed value differs by environment (dev: either; prod: safe). */
@@ -428,6 +438,12 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       // Multi-locale so Appearance → Language works locally; prod defaults single.
       BUILD_I18N_MODE: 'multi',
     },
+    // Test-mode Stripe (development forbids pk_live_) and PostHog work on localhost as-is.
+    externalCredentials: [
+      'VITE_STRIPE_PUBLISHABLE_KEY',
+      'VITE_POSTHOG_KEY',
+      'VITE_POSTHOG_HOST',
+    ],
   },
   development: {
     ...devLikeContract,

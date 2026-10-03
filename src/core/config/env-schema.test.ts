@@ -215,6 +215,33 @@ describe('assertAuthPlatformInvariants', () => {
   });
 });
 
+describe('envProfiles.local.externalCredentials (keys .env.local takes from development)', () => {
+  const externalCredentials = envProfiles.local.externalCredentials ?? [];
+
+  it('lists only schema keys, none of which local already defaults', () => {
+    expect(externalCredentials.length).toBeGreaterThan(0);
+    for (const key of externalCredentials) {
+      expect(envSchemaKeys, key).toContain(key);
+      expect(Object.keys(envProfiles.local.defaults ?? {}), key).not.toContain(key);
+    }
+  });
+
+  it('never takes a key whose local value differs on purpose, or a deploy secret', () => {
+    for (const key of [
+      'VITE_API_BASE_URL',
+      'VITE_DEV_API_URL',
+      'VITE_APP_ENV',
+      'VITE_SENTRY_DSN',
+      'VITE_TURNSTILE_SITE_KEY',
+      'SENTRY_AUTH_TOKEN',
+      'NETLIFY_AUTH_TOKEN',
+      'SONAR_TOKEN',
+    ]) {
+      expect(externalCredentials, key).not.toContain(key);
+    }
+  });
+});
+
 describe('envSchemaKeys', () => {
   it('includes the Stripe publishable key', () => {
     expect(envSchemaKeys).toContain('VITE_STRIPE_PUBLISHABLE_KEY');

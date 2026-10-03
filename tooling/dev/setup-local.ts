@@ -26,6 +26,11 @@ import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 
 import { type AppEnvironment, envProfiles } from '../../src/core/config/env-schema.ts';
+import {
+  describeFilled,
+  fillExternalCredentials,
+  upsertEnvAssignment,
+} from './external-credentials.ts';
 import { ensureMcpServers } from './mcp-config.js';
 
 const PROJECT_ROOT = process.cwd();
@@ -268,14 +273,6 @@ function runInstallDependencies(reports: StepReport[], options: BootstrapOptions
   reportStep(reports, 'pnpm install', 'done', startedAt);
 }
 
-function upsertEnvAssignment(content: string, key: string, value: string): string {
-  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = new RegExp(`^${escapedKey}=.*$`, 'm');
-  const line = `${key}=${value}`;
-  if (pattern.test(content)) return content.replace(pattern, line);
-  return content.endsWith('\n') ? `${content}${line}\n` : `${content}\n${line}\n`;
-}
-
 /**
  * Inject an environment's defaults into scaffolded `.env.<env>` content, from
  * `envProfiles[env].defaults` (src/core/config/env-schema.ts) — the single source
@@ -295,14 +292,46 @@ function runEnvScaffolding(reports: StepReport[], options: BootstrapOptions): vo
   logHeading('3/5 Environment (.env.local)');
   const startedAt = performance.now();
   const envLocalPath = resolve(PROJECT_ROOT, '.env.local');
+  const developmentPath = resolve(PROJECT_ROOT, '.env.development');
+  const development = existsSync(developmentPath)
+    ? readFileSync(developmentPath, 'utf8')
+    : '';
+  const externalCredentials = envProfiles.local.externalCredentials ?? [];
   if (existsSync(envLocalPath) && !options.forceEnvLocal) {
-    reportStep(
-      reports,
-      '.env.local',
-      'skipped',
-      startedAt,
-      'present (use --force-env-local to rewrite)',
+    // Top up an existing file: fill the external credentials that are missing or blank,
+    // never overwrite one already set. Key names and sources only — never values.
+    const { content, filled } = fillExternalCredentials(
+      readFileSync(envLocalPath, 'utf8'),
+      development,
+      externalCredentials,
+      process.env,
     );
+    if (filled.length === 0) {
+      reportStep(
+        reports,
+        '.env.local',
+        'skipped',
+        startedAt,
+        'present (use --force-env-local to rewrite)',
+      );
+    } else if (options.check) {
+      reportStep(
+        reports,
+        '.env.local',
+        'warning',
+        startedAt,
+        `--check mode (would fill external credentials: ${describeFilled(filled)})`,
+      );
+    } else {
+      writeFileSync(envLocalPath, content);
+      reportStep(
+        reports,
+        '.env.local',
+        'done',
+        startedAt,
+        `present — filled external credentials: ${describeFilled(filled)}`,
+      );
+    }
     return;
   }
   if (options.check) {
@@ -320,15 +349,22 @@ function runEnvScaffolding(reports: StepReport[], options: BootstrapOptions): vo
     reportStep(reports, '.env.local', 'failed', startedAt, '.env.example missing');
     process.exit(1);
   }
-  let content = readFileSync(examplePath, 'utf8');
-  content = injectEnvDefaults(content, 'local');
+  const scaffold = injectEnvDefaults(readFileSync(examplePath, 'utf8'), 'local');
+  const { content, filled } = fillExternalCredentials(
+    scaffold,
+    development,
+    externalCredentials,
+    process.env,
+  );
   writeFileSync(envLocalPath, content);
+  const credentialsNote =
+    filled.length > 0 ? ` + external credentials ${describeFilled(filled)}` : '';
   reportStep(
     reports,
     '.env.local',
     'done',
     startedAt,
-    'copied from .env.example + localhost defaults — set CONTEXT7_API_KEY for MCP',
+    `copied from .env.example + localhost defaults${credentialsNote} — set CONTEXT7_API_KEY for MCP`,
   );
 }
 

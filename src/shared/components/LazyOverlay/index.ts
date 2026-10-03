@@ -1,4 +1,4 @@
-export { useEnterAnimationProps, useSkipEnterAnimation } from './lazy-surface-context.ts';
+export { useEnterAnimationProps } from './lazy-surface-context.ts';
 export {
   LazyOverlay,
   type LazyOverlayProps,

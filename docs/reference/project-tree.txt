@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~642 src files · ~379 tests in src/ · 43 E2E specs · 23 shadcn UI primitives
+Stats: ~640 src files · ~379 tests in src/ · 43 E2E specs · 23 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -137,6 +137,7 @@ clinozy-fe/
 │   │   ├── README.md
 │   │   └── trigger-eval.ts
 │   ├── hooks/
+│   │   ├── compact-resume-card.sh
 │   │   ├── cursor-shell-guard.mjs
 │   │   ├── format-edits.sh
 │   │   ├── gate-failure-hint.sh
@@ -144,7 +145,6 @@ clinozy-fe/
 │   │   ├── guardrails.mjs
 │   │   ├── hooks.json
 │   │   ├── no-unrequested-pr.sh
-│   │   ├── pre-compact-preserve.sh
 │   │   ├── prompt-skill-router.sh
 │   │   ├── README.md
 │   │   ├── session-end.sh
@@ -367,7 +367,6 @@ clinozy-fe/
 │   │   │   ├── UnauthorizedPage.tsx
 │   │   │   └── [4 test files]
 │   │   └── version/
-│   │       ├── index.ts
 │   │       ├── show-update-available-toast.ts
 │   │       ├── version-update.constants.ts
 │   │       └── [1 test file]
@@ -413,7 +412,6 @@ clinozy-fe/
 │   │   │   ├── gate-context.ts
 │   │   │   ├── gate.types.ts
 │   │   │   ├── gateway.ts
-│   │   │   ├── index.ts
 │   │   │   └── [2 test files]
 │   │   ├── types/
 │   │   │   ├── branded.ts
@@ -1539,6 +1537,7 @@ clinozy-fe/
 │   │   └── [4 test files]
 │   ├── dev/
 │   │   ├── chrome-devtools-mcp.mjs
+│   │   ├── external-credentials.ts
 │   │   ├── mcp-config.ts
 │   │   ├── screenshot-auth-pages.mjs
 │   │   ├── setup-local.ts
@@ -1546,7 +1545,7 @@ clinozy-fe/
 │   │   ├── setup-mcp.ts
 │   │   ├── setup-prerequisites-mac-tools.manifest
 │   │   ├── sonarqube-mcp.mjs
-│   │   └── [1 test file]
+│   │   └── [2 test files]
 │   ├── env-registry/
 │   │   └── env-registry.ts
 │   ├── identity/
