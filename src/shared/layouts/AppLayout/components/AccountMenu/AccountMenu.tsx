@@ -140,11 +140,11 @@ function useRoleLine(): string | null {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { roles } = useClinicAccess();
-  const { branches } = useBranches();
+  const { openBranches } = useBranches();
   const [mainRole] = roles;
   if (!mainRole) return null;
   const role = tClinic(CLINIC_KEYS.roles[mainRole]);
-  const branch = branches.find((candidate) => candidate.isMain) ?? branches[0];
+  const branch = openBranches.find((candidate) => candidate.isMain) ?? openBranches[0];
   return branch ? t(keys.identityRole, { role, branch: branch.name }) : role;
 }
 

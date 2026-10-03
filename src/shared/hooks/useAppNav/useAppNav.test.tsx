@@ -10,6 +10,7 @@ import {
 import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { House, LayoutDashboard } from '@/shared/icons/index.ts';
@@ -20,6 +21,9 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { navCandidates, type NavRoute, useAppNav } from './useAppNav.ts';
 
 const ORG = '/organization/$organizationSlug';
+
+/** clinozy-be's org owner holds every code — the Users room needs membership:read and role:read (D17). */
+const OWNER_CODES = [...organizationPermissionSchema.options];
 
 function manifest(
   segment: string,
@@ -153,9 +157,7 @@ describe('useAppNav', () => {
   });
 
   it('gives the org owner every room the tree has', async () => {
-    useOrganizationStore
-      .getState()
-      .setPermissions(['organization:read', 'organization:delete']);
+    useOrganizationStore.getState().setPermissions(OWNER_CODES);
     renderNav();
     expect(await screen.findByText('today,leads,users')).toBeInTheDocument();
   });
@@ -167,9 +169,7 @@ describe('useAppNav', () => {
   });
 
   it('follows a View-as preview', async () => {
-    useOrganizationStore
-      .getState()
-      .setPermissions(['organization:read', 'organization:delete']);
+    useOrganizationStore.getState().setPermissions(OWNER_CODES);
     renderNav();
     await screen.findByText('today,leads,users');
     act(() => useUIStore.getState().setPreviewRole('doctor'));

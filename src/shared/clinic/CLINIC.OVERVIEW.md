@@ -34,4 +34,10 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 Access itself — the fixture matrix, the resolver and the member's clinic roles —
 is `src/shared/api/clinic/access-api.ts`, read through
 `src/shared/hooks/useClinicAccess/` (narrowed by View-as, `useUIStore.previewRole`).
+A member's clinic roles are their staff profile's (`useMyStaffProfile`, by sign-in
+email), else least privilege from their clinozy-be codes; the Users room and
+"Change roles & access" always follow those codes (D17). The Users room's data —
+members ⨝ staff profiles, roles ⨝ the matrix — is `src/shared/api/clinic/users-api.ts`,
+read through `src/shared/hooks/useTeam/` and `src/shared/hooks/useClinicRoles/`;
+`src/shared/hooks/useBranches/` says whether the clinic has several open branches.
 Data contracts and fixtures live in `src/shared/api/clinic/`.

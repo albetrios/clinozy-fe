@@ -1,6 +1,7 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
-import type { Presence, Role, Tone, User } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Presence, Role, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { staffInitials, type StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
 import { type BranchName, branchRef, weekdays } from './organization.fixtures.ts';
 import { must, ref, seedAt, seedMobile } from './refs.fixtures.ts';
@@ -396,41 +397,39 @@ const FLOOR_ROWS: readonly StaffRow[] = [
   },
 ];
 
-/** Avatar initials the way the Team table makes them (`usIni`, H:3607): "Dr." dropped, first + last word. */
-function initialsOf(first: string, last: string): string {
-  const words = `${first} ${last}`
-    .replace(/^Dr\.?\s*/, '')
-    .trim()
-    .split(/\s+/);
-  const head = words[0]?.[0] ?? '';
-  const tail = words.length > 1 ? (words[words.length - 1]?.[0] ?? '') : '';
-  return `${head}${tail}`.toUpperCase();
-}
-
-/** Every staff member: the ten Team rows, then the six floor staff. */
-export function staffSeed(today: string = clinicToday()): User[] {
-  return [...TEAM_ROWS, ...FLOOR_ROWS].map((row) => ({
-    ...seedCommon(
-      seedAt(row.since, '10:00', today),
-      ref.user(1),
-      seedAt(row.updated, '10:00', today),
-    ),
-    id: ref.user(row.seq),
-    seq: row.seq,
-    firstName: row.first,
-    lastName: row.last,
-    initials: initialsOf(row.first, row.last),
-    email: row.email,
-    phone: row.phone === null ? null : seedMobile(row.phone),
-    roles: row.roles.map((label) => must(ROLES[label], `role ${label}`)),
-    branchIds: row.branches.map(branchRef),
-    tone: row.tone,
-    workingDays: weekdays(row.days),
-    startsAt: row.from,
-    endsAt: row.to,
-    commissionPct: row.commission,
-    active: row.active,
-    presence: row.presence,
-    lastActiveAt: row.lastActive === null ? null : seedAt(row.lastActive, '10:00', today),
-  }));
+/**
+ * Every staff member's profile: the ten Team rows, then the six floor staff.
+ * No membership claims a seeded profile until one with its email joins (L-31).
+ */
+export function staffSeed(today: string = clinicToday()): StaffProfile[] {
+  return [...TEAM_ROWS, ...FLOOR_ROWS].map((row) => {
+    const roles = row.roles.map((label) => must(ROLES[label], `role ${label}`));
+    return {
+      ...seedCommon(
+        seedAt(row.since, '10:00', today),
+        ref.user(1),
+        seedAt(row.updated, '10:00', today),
+      ),
+      id: ref.user(row.seq),
+      seq: row.seq,
+      firstName: row.first,
+      lastName: row.last,
+      initials: staffInitials(`${row.first} ${row.last}`),
+      email: row.email,
+      phone: row.phone === null ? null : seedMobile(row.phone),
+      roles,
+      roleKeys: roles,
+      membershipId: null,
+      branchIds: row.branches.map(branchRef),
+      tone: row.tone,
+      workingDays: weekdays(row.days),
+      startsAt: row.from,
+      endsAt: row.to,
+      commissionPct: row.commission,
+      active: row.active,
+      presence: row.presence,
+      lastActiveAt:
+        row.lastActive === null ? null : seedAt(row.lastActive, '10:00', today),
+    };
+  });
 }

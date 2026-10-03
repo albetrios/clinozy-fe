@@ -33,7 +33,6 @@ import type {
   StockVendor,
   Supplier,
   Treatment,
-  User,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
@@ -41,6 +40,7 @@ import type {
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -98,7 +98,11 @@ export const clinicFixtures = {
     resource: 'Branch',
     seed: () => branchSeed(),
   }),
-  staff: createFixtureCollection<User>({ resource: 'User', seed: () => staffSeed() }),
+  // A staff profile carries the plan's role keys and membership link (Appendix F) — see users-contracts.ts.
+  staff: createFixtureCollection<StaffProfile>({
+    resource: 'User',
+    seed: () => staffSeed(),
+  }),
   patients: createFixtureCollection<Patient>({
     resource: 'Patient',
     seed: () => patientSeed(),

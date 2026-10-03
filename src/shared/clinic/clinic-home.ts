@@ -5,7 +5,13 @@ import {
   fetchClinicAccessMatrix,
   resolveClinicAccess,
 } from '@/shared/api/clinic/access-api.ts';
+import {
+  type ClinicRoleKey,
+  isPresetRole,
+} from '@/shared/api/clinic/access-contracts.ts';
 import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
+import { fetchMyStaffProfile } from '@/shared/api/clinic/users-api.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -37,31 +43,43 @@ const ROLE_HOME: Readonly<Partial<Record<Role, Section>>> = {
 
 /**
  * Where a member lands (D25): their main role's home — Pharmacist Medical
- * (sales), Accountant Payments, Marketing Leads, everyone else Today — or,
- * when that room is closed to them, the first open room in nav order. Null
- * when no clinic room is open at all.
+ * (sales), Accountant Payments, Marketing Leads, everyone else (a custom role
+ * included) Today — or, when that room is closed to them, the first open room
+ * in nav order. Null when no clinic room is open at all.
  */
 export function clinicHomeSection(
-  roles: readonly Role[],
+  roles: readonly ClinicRoleKey[],
   isOpen: (section: Section) => boolean,
 ): Section | null {
   const [mainRole] = roles;
-  const preferred = (mainRole && ROLE_HOME[mainRole]) ?? 'today';
+  const preferred =
+    (mainRole && isPresetRole(mainRole) && ROLE_HOME[mainRole]) || 'today';
   if (isOpen(preferred)) return preferred;
   return CLINIC_SECTION_ORDER.find(isOpen) ?? null;
 }
 
 /**
  * The signed-in member's home route in this organization — the org index and
- * an unknown in-org path send them here (`S:115`). Uses the access in force
- * (View-as included) and the deployment's enabled modules; null when no clinic
- * room is open, and the caller falls back to the dashboard.
+ * an unknown in-org path send them here (`S:115`). Uses the access in force —
+ * their staff profile's roles, View-as included, the Users room by their
+ * clinozy-be codes (D17) — and the deployment's enabled modules; null when no
+ * clinic room is open, and the caller falls back to the dashboard.
  */
 export async function clinicHomeRoute(organizationSlug: string) {
   const { permissions } = useOrganizationStore.getState();
   const { previewRole } = useUIStore.getState();
-  const roles = previewRole ? [previewRole] : clinicRolesForMember({ permissions });
-  const access = resolveClinicAccess(await fetchClinicAccessMatrix(), roles);
+  const email = useAuthStore.getState().user?.email ?? null;
+  const roles = previewRole
+    ? [previewRole]
+    : clinicRolesForMember({
+        staffRoles: (await fetchMyStaffProfile(email))?.roleKeys ?? null,
+        permissions,
+      });
+  const access = resolveClinicAccess(
+    await fetchClinicAccessMatrix(),
+    roles,
+    previewRole ? {} : { platformCodes: permissions },
+  );
   const section = clinicHomeSection(
     roles,
     (candidate) =>

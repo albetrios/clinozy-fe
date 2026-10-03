@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
+import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
+import type { AuthUser } from '@/shared/auth/types.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -14,7 +17,7 @@ vi.mock('@/core/security/gates/require-module.ts', () => ({
 const everyRoomOpen = () => true;
 
 describe('clinicHomeSection (D25)', () => {
-  it.each<[Role[], Section]>([
+  it.each<[ClinicRoleKey[], Section]>([
     [['pharmacist'], 'medical'],
     [['accountant'], 'payments'],
     [['marketing'], 'leads'],
@@ -23,6 +26,7 @@ describe('clinicHomeSection (D25)', () => {
     [['owner'], 'today'],
     [[], 'today'],
     [['accountant', 'pharmacist'], 'payments'],
+    [['rol_abcdefghijklmnopqrstu', 'pharmacist'], 'today'],
   ])('%j → %s', (roles, home) => {
     expect(clinicHomeSection(roles, everyRoomOpen)).toBe(home);
   });
@@ -45,6 +49,17 @@ describe('clinicHomeRoute', () => {
   beforeEach(() => {
     disabled.modules = new Set();
     useUIStore.getState().setPreviewRole(null);
+    useAuthStore.setState({ user: null });
+  });
+
+  it('sends a member home by their staff profile’s main role (L-31)', async () => {
+    useAuthStore.setState({
+      user: { id: 'usr_farah', email: 'farah@cresence.skin', role: 'user' } as AuthUser,
+    });
+    useOrganizationStore.getState().setPermissions(['organization:read']);
+    expect((await clinicHomeRoute('acme'))?.to).toBe(
+      '/organization/$organizationSlug/medical',
+    );
   });
 
   it('sends the org owner to Today', async () => {

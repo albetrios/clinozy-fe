@@ -22,17 +22,18 @@ const keys = LAYOUT_KEYS.app.sectionBar.branch;
 
 /**
  * Header slot 9 (`shell.md:26`; H:545): which branches the rooms show — only
- * when the clinic has more than one active branch. The selection is
+ * when the clinic has more than one open branch (`useBranches().isMultiBranch`,
+ * KICKOFF §6.12 One open branch). The selection is
  * `UserPreference.branchFilter` (empty = all, S:235) through the D32
  * preferences hook. "All branches" toggles every branch on, or back to the
  * first picked; the last branch cannot be turned off.
  */
 export function BranchPicker() {
   const { t } = useTranslation(LAYOUT_NS);
-  const { branches } = useBranches();
+  const { openBranches: branches, isMultiBranch } = useBranches();
   const { preferences, update } = usePreferences();
   const [open, setOpen] = useState(false);
-  if (branches.length <= 1) return null;
+  if (!isMultiBranch) return null;
 
   const allIds = branches.map((branch) => branch.id);
   const filter = preferences.branchFilter.filter((id) => allIds.includes(id));

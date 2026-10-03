@@ -31,6 +31,20 @@ describe('orgQueryKeys', () => {
     expect(orgQueryKeys.members('org_1').slice(0, 1)).toEqual([...orgQueryKeys.all]);
   });
 
+  it('files the whole-list reads under their resource prefix, so writes refresh them', () => {
+    expect(orgQueryKeys.membersAll('org_1')).toEqual([
+      ...orgQueryKeys.members('org_1'),
+      'all',
+    ]);
+    expect(orgQueryKeys.rolesAll('org_1')).toEqual([
+      ...orgQueryKeys.roles('org_1'),
+      'all',
+    ]);
+    expect(orgQueryKeys.membersAll('org_1')).not.toEqual(
+      orgQueryKeys.membersList('org_1', {}),
+    );
+  });
+
   it('treats personal mode (null org) as a distinct, valid scope', () => {
     expect(orgQueryKeys.members(null)).toEqual(['organization', null, 'members']);
     expect(orgQueryKeys.members(null)).not.toEqual(orgQueryKeys.members('org_1'));

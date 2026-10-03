@@ -37,7 +37,6 @@ import {
   stockVendorSchema,
   supplierSchema,
   treatmentSchema,
-  userSchema,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   addCivilDays,
@@ -50,6 +49,7 @@ import {
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
+import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
 
 import { patientRef } from './patients.fixtures.ts';
 import { readSeedLabel, seedExpiry, seedMobile } from './refs.fixtures.ts';
@@ -63,7 +63,8 @@ type CollectionKey = keyof typeof clinicFixtures;
 
 const SCHEMAS = {
   branches: branchSchema,
-  staff: userSchema,
+  // A staff profile carries the plan's role keys and membership link (Appendix F).
+  staff: staffProfileSchema,
   patients: patientSchema,
   // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).
   leads: leadRecordSchema,

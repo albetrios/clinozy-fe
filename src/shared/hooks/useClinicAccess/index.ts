@@ -1,1 +1,5 @@
-export { type ClinicAccess, useClinicAccess } from './useClinicAccess.ts';
+export {
+  type ClinicAccess,
+  useClinicAccess,
+  useClinicAccessMatrix,
+} from './useClinicAccess.ts';

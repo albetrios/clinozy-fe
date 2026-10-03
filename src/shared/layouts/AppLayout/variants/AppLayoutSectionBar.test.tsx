@@ -12,6 +12,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import { resetPresenceFixture } from '@/shared/api/clinic/presence-api.ts';
@@ -105,9 +106,10 @@ beforeEach(() => {
       role: 'user',
     } as AuthUser,
   });
+  // The org owner holds every clinozy-be code (the Users room reads them, D17).
   useOrganizationStore
     .getState()
-    .setPermissions(['organization:read', 'organization:delete']);
+    .setPermissions([...organizationPermissionSchema.options]);
   useUIStore.getState().setPreviewRole(null);
 });
 
