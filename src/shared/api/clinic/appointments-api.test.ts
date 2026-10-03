@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import {
+  APPOINTMENT_SIDE_EFFECT_KEYS,
   appointmentQueryKeys,
   cancelAppointment,
   createAppointment,
@@ -23,6 +24,7 @@ import { clinicInstant } from './clinic-time.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { staffRef } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import { messageQueryKeys } from './messages-api.ts';
 
 const TODAY = '2026-10-03';
 const DR = staffRef('DR');
@@ -733,5 +735,18 @@ describe('query keys', () => {
       status: 'active',
       doctorIds: [],
     });
+  });
+
+  it('refresh the chat column after a write — its system line, history and offered slots', () => {
+    const reads = [
+      messageQueryKeys.thread('lead:x'),
+      messageQueryKeys.history('lead:x'),
+      messageQueryKeys.templateValues('lead:x'),
+    ];
+    const refreshed = (key: readonly string[]) =>
+      APPOINTMENT_SIDE_EFFECT_KEYS.some((prefix) =>
+        prefix.every((part, index) => key[index] === part),
+      );
+    for (const key of reads) expect(refreshed(key)).toBe(true);
   });
 });

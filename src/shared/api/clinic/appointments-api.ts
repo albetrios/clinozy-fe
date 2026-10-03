@@ -92,12 +92,14 @@ export const appointmentQueryKeys = {
 /**
  * The other records an appointment write can change, by the `['clinic',
  * <domain>]` key prefix each room keeps its queries under: tasks (the rule
- * job), leads, their messages and contact threads (Clinic visited and its
- * system line), patients.
+ * job), leads and contact threads (Clinic visited), the chat column's reads
+ * (`messageQueryKeys`: the thread's system line, the contact history's
+ * booking lines, the free slots its templates offer), patients.
  */
 export const APPOINTMENT_SIDE_EFFECT_KEYS = [
   ['clinic', 'tasks'],
   ['clinic', 'leads'],
+  ['clinic', 'messages'],
   ['clinic', 'contact-threads'],
   ['clinic', 'patients'],
 ] as const;
