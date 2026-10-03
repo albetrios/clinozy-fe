@@ -85,6 +85,45 @@ export function formatDateValue(
   }
 }
 
+/** An instant's wall-clock fields in an IANA zone — numbers, ready for arithmetic. */
+export interface ZonedClockParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+/**
+ * The wall clock an IANA zone shows at `instant` — the input to timezone
+ * arithmetic (a zone's "today", its offset, a local date and time back to an
+ * instant), never a display string: what the user reads goes through
+ * {@link formatDateValue} and their own preferences.
+ */
+export function zonedClockParts(instant: Date, timeZone: string): ZonedClockParts {
+  const fields = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(instant);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(fields.find((part) => part.type === type)?.value ?? 0);
+  return {
+    year: value('year'),
+    month: value('month'),
+    day: value('day'),
+    hour: value('hour'),
+    minute: value('minute'),
+    second: value('second'),
+  };
+}
+
 export function formatNumberValue(
   value: number,
   prefs: LocaleFormatInput,

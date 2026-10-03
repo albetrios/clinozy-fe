@@ -1,3 +1,5 @@
+import { zonedClockParts } from '@/lib/i18n/format.ts';
+
 /**
  * The clinic clock. Calendar dates (`YYYY-MM-DD`) and clock times (`HH:mm`) in
  * the contract are clinic-local (`schema-routes.md` conventions); instants are
@@ -6,30 +8,18 @@
  */
 export const CLINIC_TIME_ZONE = 'Asia/Kolkata';
 
-function parts(instant: Date, timeZone: string): Record<string, string> {
-  const formatted = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(instant);
-  return Object.fromEntries(formatted.map((part) => [part.type, part.value]));
-}
+const pad = (value: number) => String(value).padStart(2, '0');
 
 /** Today's clinic-local calendar date, `YYYY-MM-DD`. */
 export function clinicToday(now: Date = new Date(), timeZone = CLINIC_TIME_ZONE): string {
-  const p = parts(now, timeZone);
-  return `${p.year}-${p.month}-${p.day}`;
+  const p = zonedClockParts(now, timeZone);
+  return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
 }
 
 /** The clinic-local `HH:mm` of an instant. */
 export function clinicClockTime(instant: Date, timeZone = CLINIC_TIME_ZONE): string {
-  const p = parts(instant, timeZone);
-  return `${p.hour}:${p.minute}`;
+  const p = zonedClockParts(instant, timeZone);
+  return `${pad(p.hour)}:${pad(p.minute)}`;
 }
 
 /** A calendar date `days` away from `date` (civil arithmetic — no timezone involved). */
@@ -41,15 +31,8 @@ export function addCivilDays(date: string, days: number): string {
 
 /** Minutes the zone is ahead of UTC at a given instant. */
 function offsetMinutes(instant: Date, timeZone: string): number {
-  const p = parts(instant, timeZone);
-  const asUtc = Date.UTC(
-    Number(p.year),
-    Number(p.month) - 1,
-    Number(p.day),
-    Number(p.hour),
-    Number(p.minute),
-    Number(p.second),
-  );
+  const p = zonedClockParts(instant, timeZone);
+  const asUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
   return Math.round((asUtc - instant.getTime()) / 60_000);
 }
 

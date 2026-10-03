@@ -54,7 +54,8 @@ const SHARED_LAYER_PATTERN = {
 export default defineConfig([
   // iterations/ holds design-tool exports (prototype HTML/JS + the specs
   // extracted from it) — reference material, never built or deployed, so never
-  // linted.
+  // linted. .claude/worktrees/ holds agents' git worktrees — whole other
+  // checkouts (gitignored, which flat config does not read), linted in their own.
   globalIgnores([
     'dist',
     'node_modules',
@@ -62,6 +63,7 @@ export default defineConfig([
     'test-results',
     '.stryker-tmp',
     'iterations',
+    '.claude/worktrees',
   ]),
   {
     files: ['**/*.{ts,tsx}'],

@@ -5,6 +5,7 @@ import {
   formatDateValue,
   formatNumberValue,
   type LocaleFormatInput,
+  zonedClockParts,
 } from '@/lib/i18n/format.ts';
 
 /** Build a full prefs object; formatting keys off `formatLocale` (region). */
@@ -171,5 +172,26 @@ describe('formatNumberValue', () => {
     expect(us).toMatch(/1/);
     expect(de).toMatch(/1/);
     expect(us).not.toBe(de);
+  });
+});
+
+describe('zonedClockParts', () => {
+  it('reads the wall clock of a zone, not the runtime one', () => {
+    // 18:45 UTC is 00:15 the next day in Kolkata (+05:30).
+    const instant = new Date('2026-10-03T18:45:30.000Z');
+    expect(zonedClockParts(instant, 'Asia/Kolkata')).toEqual({
+      year: 2026,
+      month: 10,
+      day: 4,
+      hour: 0,
+      minute: 15,
+      second: 30,
+    });
+    expect(zonedClockParts(instant, 'UTC')).toMatchObject({ day: 3, hour: 18 });
+  });
+
+  it('keeps midnight at hour 0, never 24', () => {
+    const midnight = new Date('2026-10-03T18:30:00.000Z');
+    expect(zonedClockParts(midnight, 'Asia/Kolkata')).toMatchObject({ day: 4, hour: 0 });
   });
 });

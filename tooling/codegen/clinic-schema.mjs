@@ -130,7 +130,8 @@ export function parseSchemaMarkdown(markdown) {
       current.description = line.trim();
       continue;
     }
-    if (!current || !line.startsWith('| ') || /^\| -/.test(line)) continue;
+    const tableRow = line.startsWith('| ') && !/^\| -/.test(line);
+    if (!(current && tableRow)) continue;
     const row = cells(line);
     if (current.kind === 'enum') {
       if (row[0] === 'Machine value') continue;
