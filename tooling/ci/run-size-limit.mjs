@@ -87,8 +87,28 @@ const config = [
      * owner's decision: first paint measures 232.8 kB, so 234 kB left ~1.2 kB and
      * the next feature would trip it. 240 kB leaves ~7 kB of headroom for the
      * launch work; lower it again, per the rule, once that work has landed.
+     *
+     * 240 → 241.9 kB: a declared exemption, itemised (iterations/
+     * launch-2026-09-30-jxmr, decision D48 — the JS twin of the CSS budget's
+     * D36). Attributed through the build's hidden source maps, entry +
+     * modulepreloads, 239.73 → 241.36 kB:
+     * - Route registrations and their `<page>.search.ts` validators.
+     *   `routeTree.tsx` IS the entry chunk by design, so every route block,
+     *   manifest, builder and URL reader lands in it. L-33's leads routes
+     *   (~1.7 kB) already spent most of the headroom above; L-36's appointments
+     *   routes add +0.60 kB (the create / `$appointmentId` / edit blocks, two
+     *   manifests, three builders, `appointments.search.ts`, `matchOf` and
+     *   `RECORD_ID`) — the readers stay dependency-free, no zod in the entry.
+     * - The boot splash, first paint by definition (L-52, +1.04 kB): the boot
+     *   controller's hold, offline and exit logic (`app-splash.ts`), the slot's
+     *   lazy shell (the slot itself loads on demand), `useOnlineStatus` (which
+     *   `OfflineIndicator` now shares) and the `splash.*` copy in `common` — the
+     *   offline line must not wait on a lazy namespace.
+     * Trimmed first: the shell had imported the slot's whole key and test-id
+     * table for one key (−0.16 kB); nothing else large rides the entry. Lower
+     * it again as soon as a route group can leave the entry chunk.
      */
-    limit: '240 kB',
+    limit: '241.9 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -142,8 +162,17 @@ const config = [
            * tray (+0.16) and the A4 print sheets' millimetre utilities (+1.06,
            * print-only — the first candidate to leave the first paint, into a
            * stylesheet the print host loads). Re-itemise as the screens land.
+           *
+           * 36 → 37.5 kB (same exemption, D36): measured 37.22 kB — the room
+           * toolbar (+0.62 kB, L-16: the tabs and their fold, the search, the
+           * Filters popover and its 82% sheet, the floating "New" and the view
+           * bar), the clinic command menu (+0.08, L-28) and the shared chat
+           * column (+0.68, L-34: the thread, its bubbles and history chips, the
+           * composer and its Suggestions popover). The boot splash's frames
+           * (L-52) are inline CSS in index.html, outside this stylesheet; its
+           * old breathe keyframes left it.
            */
-          limit: '36 kB',
+          limit: '37.5 kB',
           gzip: true,
         },
       ]
