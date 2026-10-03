@@ -120,3 +120,17 @@ describe('icon barrel', () => {
     },
   );
 });
+
+describe('local brand marks follow the icon axes', () => {
+  // The Icon weight / Icon colour rules in index.css target `svg.lucide`; a
+  // mark without the class kept stroke 2 beside 1.5 Lucide glyphs.
+  it.each([...LOCAL_MARKS, { name: 'GithubMark', Mark: icons.Github }])(
+    '$name carries the lucide class and keeps a caller class',
+    ({ Mark }) => {
+      const { container } = render(<Mark className="size-4" />);
+      const svg = container.querySelector('svg');
+      expect(svg).toHaveClass('lucide');
+      expect(svg).toHaveClass('size-4');
+    },
+  );
+});

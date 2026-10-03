@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils.ts';
+
 import type { IconProps } from './icon-types.ts';
 
 /**
@@ -8,7 +10,7 @@ import type { IconProps } from './icon-types.ts';
  * strokeWidth 2) so the registry treats it like any other Lucide glyph;
  * Tabler/Phosphor sets keep their own Instagram marks.
  */
-export function InstagramMark(props: IconProps) {
+export function InstagramMark({ className, ...props }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,6 +23,8 @@ export function InstagramMark(props: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      // `lucide`: the Icon weight / Icon colour axes target `svg.lucide`.
+      className={cn('lucide', className)}
       {...props}
     >
       <rect x="2" y="2" width="20" height="20" rx="5" />
