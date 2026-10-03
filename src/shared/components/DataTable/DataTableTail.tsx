@@ -5,7 +5,7 @@ import {
   TABLE_NS,
   TABLE_TEST_IDS,
 } from '@/shared/components/DataTableToolbar/data-table.constants.ts';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 
 /** Placeholder rows under the list while the next page loads (keys). */
 const LOADING_ROWS = ['first', 'second', 'third'] as const;
@@ -46,8 +46,8 @@ export function DataTableTail({
                 aria-hidden="true"
                 className="border-b-muted flex h-14 items-center gap-3 border-b px-(--table-pad-x)"
               >
-                <Skeleton className="bg-muted-strong size-8 flex-none animate-none rounded-full" />
-                <Skeleton className="bg-muted-strong h-[0.72em] w-3/5 animate-none rounded-md" />
+                <SkeletonBar shape="avatar" />
+                <SkeletonBar className="w-3/5" />
               </div>
             ))}
           </div>

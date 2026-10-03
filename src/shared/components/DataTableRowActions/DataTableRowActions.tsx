@@ -114,7 +114,7 @@ export function DataTableRowActions({
                   {labelled ? <span>{action.label}</span> : null}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="max-md:hidden">{action.label}</TooltipContent>
+              <TooltipContent>{action.label}</TooltipContent>
             </Tooltip>
           </Fragment>
         );

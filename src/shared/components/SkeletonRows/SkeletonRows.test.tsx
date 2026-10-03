@@ -18,14 +18,9 @@ describe('SkeletonRows', () => {
     expect(widths).toEqual(['w-[64%]', 'w-[48%]', 'w-[60%]', 'w-[64%]']);
   });
 
-  it('draws the picker’s four rows at 62 / 48 / 70 / 40%', () => {
-    render(<SkeletonRows pattern="picker" />);
-    expect(screen.getAllByTestId('skeleton-row')).toHaveLength(4);
-    const classes = bars().map((bar) => bar?.className ?? '');
-    expect(classes[0]).toContain('w-[62%]');
-    expect(classes[1]).toContain('w-[48%]');
-    expect(classes[2]).toContain('w-[70%]');
-    expect(classes[3]).toContain('w-[40%]');
+  it('draws one full width cycle by default', () => {
+    render(<SkeletonRows />);
+    expect(screen.getAllByTestId('skeleton-row')).toHaveLength(3);
   });
 
   it('draws flat muted-strong bars that never animate (no shimmer, reduced motion safe)', () => {
@@ -69,6 +64,12 @@ describe('SkeletonRows', () => {
 });
 
 describe('SkeletonBar', () => {
+  it('takes a host width over the cycle', () => {
+    const { container } = render(<SkeletonBar index={1} className="w-3/5" />);
+    expect(container.firstChild).toHaveClass('w-3/5');
+    expect(container.firstChild).not.toHaveClass('w-[48%]');
+  });
+
   it('turns an input into a 36px rounded-lg bar', () => {
     const { container } = render(<SkeletonBar shape="field" />);
     expect(container.firstChild).toHaveClass(
