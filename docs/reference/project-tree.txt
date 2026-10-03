@@ -1545,6 +1545,7 @@ clinozy-fe/
 │   │   ├── setup-mac-tools.sh
 │   │   ├── setup-mcp.ts
 │   │   ├── setup-prerequisites-mac-tools.manifest
+│   │   ├── sonarqube-mcp.mjs
 │   │   └── [1 test file]
 │   ├── env-registry/
 │   │   └── env-registry.ts
