@@ -111,6 +111,52 @@ skipped at the next cold load and costs the splash its flash-free palette.
 `src/shared/theme/boot-theme-vars.drift.test.ts` pins the contract: every property
 the boot script can write is either released or re-asserted.
 
+## The default look: Clinozy Zinc Pastel
+
+The named presets are `clinozy-zinc-pastel` (**Clinozy Zinc Pastel**, the default),
+`default` (**Classic** — the stock `@theme` palette) and the accent presets `violet`,
+`emerald`, `rose` and `ocean`. Two constants keep them apart: `BASE_PRESET`
+(`default`) is the one preset with no `data-theme` attribute and the fallback for an
+unknown id; `DEFAULT_PRESET` (`clinozy-zinc-pastel`) is what a fresh install starts on —
+in **light** mode, with the preset's axis defaults (icon weight `thin`, layout width
+`full`; a custom look started from it keeps accent intensity `muted`). Persist v4 moves
+anyone still on the never-picked base palette to it, and `public/theme-init.js` mirrors
+that before the bundle loads, so a cold load paints the preset from the first frame
+(`boot-theme-vars.drift.test.ts` pins every preset's pre-paint primary to its block).
+
+Unlike the accent presets it is **full-surface**: its `[data-theme]` block sets every
+surface token and sits after the base-colour blocks, so a stored `data-base` tint does
+not reach it. Dark is `@media screen` only — printing always uses the light tokens.
+Inside it, `[data-surface='light-pinned']` keeps a panel on the light ramp in dark mode
+(the bulk-actions bar, the photo viewer and its captions), with primary one step softer.
+
+Tokens the clinic screens add — all base-level, so their utilities exist under every
+preset (light values in `@theme`, dark in `.dark`; the Clinozy block sets its own neutral
+steps):
+
+| Group         | Tokens                                                                                                                                                                                         | Use                                                                                                                                                           |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Neutral steps | `canvas`, `muted-strong`, `border-strong`, `disabled`, `muted-foreground-strong`, `foreground-soft`                                                                                            | page tint under cards; skeleton / focus fill; strong border; disabled text; **text on `muted`** (never `muted-foreground` there — 4.40:1); body one step down |
+| Accents       | `brand-mark`, `brand-mark-strong`, `destructive-tint`, `destructive-border`, `highlight`, `assist`, `success-strong`, `now-indicator`, `presence-online`                                       | logo (non-text only); danger wash and border; search match; the AI "Suggest" accent; "Read" / trend up; calendar now-line; online dot                         |
+| Channels      | `channel-whatsapp`, `channel-call`, `channel-note`, `channel-instagram` (+ `-tint`, `-foreground` where the design has them)                                                                   | chat channels; the Instagram values are raised to AA                                                                                                          |
+| Section tones | `tone-<butter · lav · sky · sage · blush · mint · peach · plum · lime · slate>` + `-foreground` (ink), `-border` (line), `-dot`; `-tint` on sage, butter and lav; `tone-stone` is the fallback | one per clinic room: text in ink on the tone; selected = ink fill with `background` text; dots are decorative (always beside a label)                         |
+
+Under this preset `warning` and `info` are **pairs** — a pale fill with an ink
+(`-foreground`). Text or an icon on its own uses the ink or a tone dot, never the fill.
+`src/shared/theme/preset-contrast.test.ts` recomputes every pair's WCAG ratio from the
+stylesheet in light, dark and the light-pinned scope.
+
+Also in `index.css`: the clinic **text steps** `text-tiny` · `text-micro` ·
+`text-caption` · `text-detail` · `text-body` · `text-field` · `text-title` ·
+`text-greeting` · `text-stat` · `text-display` (10.5 → 32px, derived from the stock
+steps so the Type scale axis still moves them); the design's **motion** as
+`animate-dropdown-in`, `-dropdown-up`, `-drawer-in`, `-backdrop-in`, `-pop-in`,
+`-bulk-in`, `-reveal`, `-fade`, `-spinner`, `-sheet-up`; and the **room metrics** by
+tier — compact by default, comfortable at ≥ 1440 × 800, the phone column below `md`
+(`--room-toolbar-pad`, `--table-pad-x`, `--drawer-header-height`, …), read as
+`p-(--room-toolbar-pad)`. Theme values are tree-shaken until a utility uses them, so
+write tone classes as whole literals (a `TONE_CLASSES` map), never `bg-tone-${tone}`.
+
 ## Icon library (swappable at runtime, lazy-loaded)
 
 Every app icon flows through the `@/shared/icons` barrel (eslint-enforced — see

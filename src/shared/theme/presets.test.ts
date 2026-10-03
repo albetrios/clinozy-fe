@@ -122,6 +122,7 @@ describe('theme presets', () => {
     expect(presetAxisDefaults('clinozy-zinc-pastel')).toEqual({
       iconWeight: 'thin',
       layoutWidth: 'full',
+      intensityId: 'muted',
     });
     expect(presetAxisDefaults('violet')).toEqual({});
     expect(presetAxisDefaults('bogus')).toEqual({});

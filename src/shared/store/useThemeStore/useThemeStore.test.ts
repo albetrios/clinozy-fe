@@ -78,6 +78,16 @@ describe('useThemeStore', () => {
     expect(useThemeStore.getState().layoutWidth).toBe('full');
   });
 
+  it('a custom look started from the clinozy preset keeps its muted intensity', () => {
+    useThemeStore.getState().setPreset('clinozy-zinc-pastel');
+    useThemeStore.getState().updateLook({ radiusId: 'round' });
+    expect(useThemeStore.getState().customTheme?.intensityId).toBe('muted');
+
+    useThemeStore.getState().setPreset('violet');
+    useThemeStore.getState().updateLook({ radiusId: 'round' });
+    expect(useThemeStore.getState().customTheme?.intensityId).toBe('balanced');
+  });
+
   it('an unknown preset id falls back to the base palette', () => {
     useThemeStore.getState().setPreset('bogus');
     expect(useThemeStore.getState().preset).toBe(BASE_PRESET);

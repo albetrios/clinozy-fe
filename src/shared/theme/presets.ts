@@ -2,11 +2,16 @@ export interface ThemePreset {
   id: string;
   label: string;
   /**
-   * Orthogonal store axes the preset was designed with. Picking the preset
-   * applies them, and the default preset seeds them for a first visit; a key
+   * Axes the preset was designed with. The store axes (icon weight, layout
+   * width) apply when the preset is picked and seed a first visit; the look
+   * axis (accent intensity) seeds a custom look started from the preset. A key
    * left out keeps the user's own choice.
    */
-  axisDefaults?: Readonly<{ iconWeight?: string; layoutWidth?: LayoutWidthId }>;
+  axisDefaults?: Readonly<{
+    iconWeight?: string;
+    layoutWidth?: LayoutWidthId;
+    intensityId?: string;
+  }>;
 }
 
 /**
@@ -22,7 +27,7 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
   {
     id: 'clinozy-zinc-pastel',
     label: 'Clinozy Zinc Pastel',
-    axisDefaults: { iconWeight: 'thin', layoutWidth: 'full' },
+    axisDefaults: { iconWeight: 'thin', layoutWidth: 'full', intensityId: 'muted' },
   },
   { id: 'default', label: 'Classic' },
   { id: 'violet', label: 'Violet' },

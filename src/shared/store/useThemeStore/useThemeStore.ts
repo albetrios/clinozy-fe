@@ -180,8 +180,11 @@ export const useThemeStore = create<ThemeStore>()(
       },
       updateLook: (partial) => {
         // Change one axis of the current look and switch to custom. A hand-tweaked
-        // look no longer maps to a seed, so clear it.
-        const next = { ...normalizeLook(get().customTheme), ...partial };
+        // look no longer maps to a seed, so clear it. A look started from a named
+        // preset keeps the accent intensity that preset was designed with.
+        const { intensityId } = presetAxisDefaults(get().preset);
+        const seed = get().customTheme ?? (intensityId ? { intensityId } : null);
+        const next = { ...normalizeLook(seed), ...partial };
         applyGeneratedTheme(next);
         set({ preset: GENERATED_PRESET, customTheme: next, seed: null });
       },

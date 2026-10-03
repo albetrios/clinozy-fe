@@ -108,19 +108,27 @@ the icon barrel is allowlisted. A gate nobody has watched fail is a green checkm
 
 ### A. Mode (always available)
 
-| Setting        | Options                     | Default  | Applied via                                       |
-| -------------- | --------------------------- | -------- | ------------------------------------------------- |
-| **Color mode** | `light` · `dark` · `system` | `system` | `.dark` class on `<html>` (`useThemeStore.theme`) |
+| Setting        | Options                     | Default | Applied via                                       |
+| -------------- | --------------------------- | ------- | ------------------------------------------------- |
+| **Color mode** | `light` · `dark` · `system` | `light` | `.dark` class on `<html>` (`useThemeStore.theme`) |
 
-### B. Named accent presets (mutually exclusive with generated look)
+### B. Named presets (mutually exclusive with generated look)
 
-| Preset id | Label   | Applied via                                    |
-| --------- | ------- | ---------------------------------------------- |
-| `default` | Default | no `data-theme` (uses `@theme` in `index.css`) |
-| `violet`  | Violet  | `data-theme="violet"`                          |
-| `emerald` | Emerald | `data-theme="emerald"`                         |
-| `rose`    | Rose    | `data-theme="rose"`                            |
-| `ocean`   | Ocean   | `data-theme="ocean"`                           |
+| Preset id             | Label               | Applied via                                                        |
+| --------------------- | ------------------- | ------------------------------------------------------------------ |
+| `clinozy-zinc-pastel` | Clinozy Zinc Pastel | `data-theme="clinozy-zinc-pastel"` — **full-surface**, the default |
+| `default`             | Classic             | no `data-theme` (uses `@theme` in `index.css`) — `BASE_PRESET`     |
+| `violet`              | Violet              | `data-theme="violet"` (accent only)                                |
+| `emerald`             | Emerald             | `data-theme="emerald"` (accent only)                               |
+| `rose`                | Rose                | `data-theme="rose"` (accent only)                                  |
+| `ocean`               | Ocean               | `data-theme="ocean"` (accent only)                                 |
+
+`DEFAULT_PRESET` (a fresh install) is `clinozy-zinc-pastel`; `BASE_PRESET` is the one
+preset without an attribute and the fallback for an unknown id. The Clinozy preset owns
+its surfaces, its slot shadows (`--elevation-*`), its keyboard focus fill (plus the
+platform ring) and its scrollbars in `index.css`, and carries axis defaults (icon weight
+`thin`, layout width `full`, intensity `muted` for a look started from it) — see
+[theming.md](theming.md) › The default look.
 
 When user picks **Shuffle** or customizes any generated axis → store sets `preset: 'custom'`
 and inline vars replace `data-theme`.
@@ -274,6 +282,7 @@ Manual: Appearance → toggle axis across **all options** on:
 | `data-slot="kbd"`              | keyboard-hint `<kbd>`                                              | radius + shape axes                         |
 | `data-floating` on a `surface` | a non-modal surface pinned over the page (consent card)            | default lift; `[data-elevation]` still wins |
 | `data-slot="menu-item"`        | notification rows, command items                                   | focus + shape axes                          |
+| `data-surface="light-pinned"`  | panels that stay light in dark mode (bulk bar, photo viewer)       | the Clinozy preset's dark block             |
 
 ---
 

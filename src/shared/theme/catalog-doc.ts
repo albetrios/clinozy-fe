@@ -69,6 +69,10 @@ export const CATALOG_OPTION_IDS = {
 export const THEME_DOC_ASSERTIONS: Record<string, DocAssertion[]> = {
   'docs/reference/theming.md': [
     {
+      label: 'named presets',
+      mustInclude: CATALOG_OPTION_IDS.namedPresets,
+    },
+    {
       label: 'base colours',
       mustInclude: CATALOG_OPTION_IDS.baseColors,
     },
