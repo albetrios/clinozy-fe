@@ -13,7 +13,7 @@ import { z } from 'zod';
  * alphanumeric with internal hyphens (1–64 chars). Team orgs carry a slug;
  * personal orgs have none and live on root `/dashboard` instead (FE-22).
  */
-export const organizationSlugParamSchema = z
+const organizationSlugParamSchema = z
   .string()
   .min(1)
   .max(64)
