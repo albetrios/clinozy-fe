@@ -1,9 +1,10 @@
 # launch-2026-09-30-jxmr — as built
 
 What was actually built, ledger row by ledger row, against the approved plan in
-[`KICKOFF.md`](KICKOFF.md) §9. Started 2026-10-01, when the iteration moved to
-`implementing`. `fe-kickoff-iteration` adds one entry as each row is built and
-verified.
+[`KICKOFF.md`](KICKOFF.md) §9. Started 2026-10-03, when the re-planned iteration
+moved to `implementing` (first opened 2026-10-01; the Oct 2 drop sent it back to
+`planning` before any row was built). `fe-kickoff-iteration` adds one entry as
+each row is built and verified.
 
 ## Rows
 
