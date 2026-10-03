@@ -45,7 +45,10 @@ export interface PlainConfirmDialogProps {
  */
 export type ConfirmDialogProps = PlainConfirmDialogProps | ReasonConfirmProps;
 
-/** The centred alert dialog: title, optional description, Cancel and the action. */
+/**
+ * The centred alert dialog: title, optional description, Cancel and the action.
+ * On close it hands focus back to whatever was focused when it opened.
+ */
 function PlainConfirmDialog({
   open,
   onOpenChange,
@@ -60,6 +63,9 @@ function PlainConfirmDialog({
   const [busy, setBusy] = useState(false);
   // `busy` lands a render late; the ref drops a second click inside that frame.
   const busyRef = useRef(false);
+  // Opened from state, not a Radix trigger, so Radix has nothing to give focus
+  // back to and it fell to <body>: remember what was focused and return there.
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   const handleConfirm = async () => {
     if (busyRef.current) return;
@@ -84,7 +90,20 @@ function PlainConfirmDialog({
         if (!busyRef.current) onOpenChange(next);
       }}
     >
-      <AlertDialogContent data-testid={CONFIRM_TEST_IDS.dialog}>
+      <AlertDialogContent
+        data-testid={CONFIRM_TEST_IDS.dialog}
+        onOpenAutoFocus={() => {
+          const previous = document.activeElement;
+          returnFocusRef.current = previous instanceof HTMLElement ? previous : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          // A confirm that removed its opener (a deleted row) leaves focus to Radix.
+          const target = returnFocusRef.current;
+          if (!target?.isConnected) return;
+          event.preventDefault();
+          target.focus();
+        }}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description ? (

@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -83,6 +84,28 @@ describe('ConfirmDialog', () => {
     await act(async () => {
       release();
     });
+  });
+
+  it('returns focus to what was focused when it opened', async () => {
+    const user = userEvent.setup();
+    function Opener() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Remove member
+          </button>
+          <ConfirmDialog {...base} open={open} onOpenChange={setOpen} />
+        </>
+      );
+    }
+    render(<Opener />);
+    const opener = screen.getByRole('button', { name: 'Remove member' });
+
+    await user.click(opener);
+    await user.click(await screen.findByTestId('confirm-cancel'));
+
+    await waitFor(() => expect(opener).toHaveFocus());
   });
 
   it('has no accessibility violations', async () => {
