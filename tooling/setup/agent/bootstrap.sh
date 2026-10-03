@@ -27,6 +27,8 @@
 #   AGENT_SKIP_PLAYWRIGHT=1    skip browser provisioning
 #   AGENT_SKIP_MCP_WARM=1      install uv but do not pre-warm headroom
 #   NODE_INSTALL_PREFIX        parent dir for node<major> (default /opt)
+#   HEALTHCHECK_PORT           port for the transient dev server (default 5173; it
+#                              must be free — the check uses --strictPort)
 set -uo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.." || exit 1
@@ -59,12 +61,26 @@ ppid_of() {
   printf '%s' "${2:-}"
 }
 
+# Children of a pid: /proc on Linux (the cloud image), `pgrep -P` where there is
+# no /proc (macOS, when this is run by hand) — without the fallback the Vite child
+# survived and kept the port bound.
+children_of() {
+  local p pid
+  if [ -d /proc/self ]; then
+    for p in /proc/[0-9]*; do
+      pid="${p#/proc/}"
+      [ "${pid}" = "$$" ] && continue
+      [ "$(ppid_of "${pid}" 2>/dev/null)" = "$1" ] && printf '%s\n' "${pid}"
+    done
+  else
+    pgrep -P "$1" 2>/dev/null || true
+  fi
+}
+
 kill_tree() {
-  local root="$1" p pid
-  for p in /proc/[0-9]*; do
-    pid="${p#/proc/}"
-    [ "${pid}" = "$$" ] && continue
-    [ "$(ppid_of "${pid}" 2>/dev/null)" = "${root}" ] && kill_tree "${pid}"
+  local root="$1" pid
+  for pid in $(children_of "${root}"); do
+    kill_tree "${pid}"
   done
   kill -TERM "${root}" 2>/dev/null || true
 }
@@ -204,9 +220,12 @@ if [ "${AGENT_SKIP_HEALTHCHECK:-0}" = "1" ]; then
 else
   step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
   app_log="$(mktemp)"
-  pnpm dev >"${app_log}" 2>&1 &
+  # --strictPort: a port already in use fails at once with Vite's own message,
+  # instead of Vite drifting to the next port while the probe waits 90s on this one.
+  health_port="${HEALTHCHECK_PORT:-5173}"
+  pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
   dev_pid=$!
-  if bash "${AGENT_DIR}/healthcheck.sh"; then
+  if HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://localhost:${health_port}/}" bash "${AGENT_DIR}/healthcheck.sh"; then
     ok "[10/${TOTAL}] app shell served"
     app_ok=1
   else

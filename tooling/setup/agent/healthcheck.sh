@@ -14,7 +14,7 @@
 # before calling this). Polls until ready or the deadline passes.
 #
 # Usage:  bash tooling/setup/agent/healthcheck.sh
-# Env:    HEALTHCHECK_URL      (default http://127.0.0.1:5173/)
+# Env:    HEALTHCHECK_URL      (default http://localhost:5173/)
 #         HEALTHCHECK_TIMEOUT  seconds (default 90)
 #         HEALTHCHECK_INTERVAL seconds between polls (default 2)
 #
@@ -24,9 +24,10 @@ LOG_TAG="healthcheck"
 # shellcheck source=tooling/setup/agent/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
-# vite.config.ts sets port 5173 with strictPort:false — Vite walks to the next
-# free port if 5173 is taken, so allow the URL to be overridden.
-url="${HEALTHCHECK_URL:-http://127.0.0.1:5173/}"
+# `localhost`, not 127.0.0.1: Vite binds `localhost`, which is IPv6-only (::1) on
+# macOS, and curl tries both addresses. bootstrap.sh starts the server with
+# --strictPort on the port it then probes, so the two can never disagree.
+url="${HEALTHCHECK_URL:-http://localhost:5173/}"
 timeout="${HEALTHCHECK_TIMEOUT:-90}"
 interval="${HEALTHCHECK_INTERVAL:-2}"
 
@@ -55,5 +56,5 @@ while [ "${SECONDS}" -lt "${deadline}" ]; do
 done
 
 log "NOT healthy after ${timeout}s (${attempt} attempts) — last: ${last_status}"
-log "hint: run \`pnpm dev\` manually and check the output; the port may differ (strictPort is false)."
+log "hint: run \`pnpm dev\` manually and check the output (is the port already in use?)"
 exit 1
