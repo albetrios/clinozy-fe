@@ -54,6 +54,17 @@ loads in every mode, so the mode decides whether a deploy-env file lands on top 
 | `pnpm build` in CI (no `.env.local`)       | `production` | Vite's own files, unchanged: the deploy's materialized `.env.production.local`                                                       |
 | `pnpm test` (Vitest)                       | `test`       | none — `envDir` is the empty `tooling/test/empty-env/`                                                                               |
 
+**External credentials in `.env.local`.** `envProfiles.local.externalCredentials` in
+`env-schema.ts` lists the third-party integration keys whose development value is also right on
+localhost — today `VITE_STRIPE_PUBLISHABLE_KEY` (test mode; development forbids `pk_live_`),
+`VITE_POSTHOG_KEY` and `VITE_POSTHOG_HOST`. `pnpm setup:local` fills each into `.env.local` from
+`.env.development` when that file sets it, else from the process environment (a cloud session's
+Variables, an exported shell variable): into a new file, and on later runs wherever the key is
+missing or blank — never overwriting a value already set, and printing key names and sources
+only. Keys whose local value differs on purpose stay off the list: the API base and app
+environment, the Sentry DSN, and the Turnstile site key (bound to its domains). Add a key there
+when a new integration's development value works locally as-is.
+
 The dev server never runs in Vite's default `development` mode: there `.env.development` — the
 development deploy-env file `pnpm github:sync` pushes from — would override `.env.local`, and a
 local dev server would call the hosted API. `vite.config.ts` refuses to serve in any other mode
