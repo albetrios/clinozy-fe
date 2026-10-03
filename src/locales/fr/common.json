@@ -275,5 +275,42 @@
       "wrongItems": "Mauvais articles",
       "customerChangedMind": "Le client a changé d’avis"
     }
+  },
+  "picker": {
+    "placeholder": "Sélectionner…",
+    "search": "Rechercher {{label}}",
+    "searchDefault": "Rechercher",
+    "escKey": "Échap",
+    "options": "Options",
+    "recent": "Récents",
+    "all": "Tous",
+    "create": "Créer « {{query}} »",
+    "createNamed": "{{label}} « {{query}} »",
+    "createFull": "Nouveau : {{label}}",
+    "createFullQuery": "{{label}} · « {{query}} »",
+    "fullDetails": "tous les détails",
+    "empty": "Rien à choisir pour l’instant",
+    "noResults": "Aucun résultat pour « {{query}} »",
+    "noResultsHint": "Vérifiez l’orthographe ou essayez avec moins de lettres",
+    "noResultsRemoteHint": "Essayez un nom, un numéro de téléphone ou un identifiant",
+    "loadingMore": "Chargement de la suite",
+    "clear": "Effacer",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "Patient",
+    "patientMark": "P",
+    "date": {
+      "label": "Date",
+      "placeholder": "Choisir une date",
+      "search": "Saisissez une date · ex. 12 sept",
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain",
+      "yesterday": "Hier",
+      "comingUp": "À venir",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Heure",
+      "placeholder": "Choisir une heure"
+    }
   }
 }

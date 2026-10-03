@@ -21,11 +21,14 @@ function CommandInput({
   className,
   wrapperClassName,
   icon,
+  trailing,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input> & {
   wrapperClassName?: string;
   /** Replaces the leading search glyph (e.g. the app's swappable icon). */
   icon?: React.ReactNode;
+  /** Rendered after the input inside the row (e.g. a spinner or a key hint). */
+  trailing?: React.ReactNode;
 }) {
   return (
     <div
@@ -41,6 +44,7 @@ function CommandInput({
         )}
         {...props}
       />
+      {trailing}
     </div>
   );
 }

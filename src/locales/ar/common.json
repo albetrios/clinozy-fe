@@ -278,5 +278,42 @@
       "wrongItems": "أصناف خاطئة",
       "customerChangedMind": "غيّر العميل رأيه"
     }
+  },
+  "picker": {
+    "placeholder": "اختر…",
+    "search": "ابحث في {{label}}",
+    "searchDefault": "بحث",
+    "escKey": "Esc",
+    "options": "الخيارات",
+    "recent": "الأخيرة",
+    "all": "الكل",
+    "create": "إنشاء «{{query}}»",
+    "createNamed": "{{label}} «{{query}}»",
+    "createFull": "{{label}} جديد",
+    "createFullQuery": "{{label}} · «{{query}}»",
+    "fullDetails": "كل التفاصيل",
+    "empty": "لا شيء للاختيار بعد",
+    "noResults": "لا نتائج لـ «{{query}}»",
+    "noResultsHint": "تحقق من الإملاء أو جرّب أحرفًا أقل",
+    "noResultsRemoteHint": "جرّب اسمًا أو رقم هاتف أو معرّفًا",
+    "loadingMore": "جارٍ تحميل المزيد",
+    "clear": "مسح",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "مريض",
+    "patientMark": "م",
+    "date": {
+      "label": "التاريخ",
+      "placeholder": "اختر تاريخًا",
+      "search": "اكتب تاريخًا · مثل 12 sep",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "yesterday": "أمس",
+      "comingUp": "قريبًا",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "الوقت",
+      "placeholder": "اختر وقتًا"
+    }
   }
 }

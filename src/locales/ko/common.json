@@ -273,5 +273,42 @@
       "wrongItems": "잘못된 품목",
       "customerChangedMind": "고객 변심"
     }
+  },
+  "picker": {
+    "placeholder": "선택…",
+    "search": "{{label}} 검색",
+    "searchDefault": "검색",
+    "escKey": "Esc",
+    "options": "옵션",
+    "recent": "최근",
+    "all": "전체",
+    "create": "“{{query}}” 만들기",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "새 {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "전체 정보",
+    "empty": "아직 선택할 항목이 없습니다",
+    "noResults": "“{{query}}”에 대한 결과가 없습니다",
+    "noResultsHint": "철자를 확인하거나 더 짧게 입력해 보세요",
+    "noResultsRemoteHint": "이름, 전화번호 또는 ID로 검색해 보세요",
+    "loadingMore": "더 불러오는 중",
+    "clear": "지우기",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "환자",
+    "patientMark": "환",
+    "date": {
+      "label": "날짜",
+      "placeholder": "날짜 선택",
+      "search": "날짜 입력 · 예: 9/12",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제",
+      "comingUp": "예정",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "시간",
+      "placeholder": "시간 선택"
+    }
   }
 }

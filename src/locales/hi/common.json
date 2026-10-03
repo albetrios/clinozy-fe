@@ -274,5 +274,42 @@
       "wrongItems": "गलत आइटम",
       "customerChangedMind": "ग्राहक ने मन बदल लिया"
     }
+  },
+  "picker": {
+    "placeholder": "चुनें…",
+    "search": "{{label}} खोजें",
+    "searchDefault": "खोजें",
+    "escKey": "Esc",
+    "options": "विकल्प",
+    "recent": "हाल के",
+    "all": "सभी",
+    "create": "“{{query}}” बनाएँ",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "नया {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "पूरा विवरण",
+    "empty": "अभी चुनने के लिए कुछ नहीं है",
+    "noResults": "“{{query}}” के लिए कोई नतीजा नहीं",
+    "noResultsHint": "वर्तनी जाँचें या कम अक्षर आज़माएँ",
+    "noResultsRemoteHint": "नाम, फ़ोन नंबर या ID आज़माएँ",
+    "loadingMore": "और लोड हो रहे हैं",
+    "clear": "साफ़ करें",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "मरीज़",
+    "patientMark": "म",
+    "date": {
+      "label": "तारीख",
+      "placeholder": "तारीख चुनें",
+      "search": "तारीख लिखें · जैसे 12 sep",
+      "today": "आज",
+      "tomorrow": "आने वाला कल",
+      "yesterday": "बीता कल",
+      "comingUp": "आने वाले",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "समय",
+      "placeholder": "समय चुनें"
+    }
   }
 }

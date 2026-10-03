@@ -273,5 +273,42 @@
       "wrongItems": "商品错误",
       "customerChangedMind": "顾客改变主意"
     }
+  },
+  "picker": {
+    "placeholder": "请选择…",
+    "search": "搜索{{label}}",
+    "searchDefault": "搜索",
+    "escKey": "Esc",
+    "options": "选项",
+    "recent": "最近",
+    "all": "全部",
+    "create": "创建“{{query}}”",
+    "createNamed": "{{label}}“{{query}}”",
+    "createFull": "新建{{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "填写完整信息",
+    "empty": "暂无可选项",
+    "noResults": "没有与“{{query}}”匹配的结果",
+    "noResultsHint": "请检查拼写或减少字数",
+    "noResultsRemoteHint": "试试姓名、电话号码或 ID",
+    "loadingMore": "正在加载更多",
+    "clear": "清除",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "患者",
+    "patientMark": "患",
+    "date": {
+      "label": "日期",
+      "placeholder": "选择日期",
+      "search": "输入日期 · 例如 9/12",
+      "today": "今天",
+      "tomorrow": "明天",
+      "yesterday": "昨天",
+      "comingUp": "即将到来",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "时间",
+      "placeholder": "选择时间"
+    }
   }
 }

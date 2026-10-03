@@ -273,5 +273,42 @@
       "wrongItems": "商品の誤り",
       "customerChangedMind": "お客様の気が変わった"
     }
+  },
+  "picker": {
+    "placeholder": "選択…",
+    "search": "{{label}}を検索",
+    "searchDefault": "検索",
+    "escKey": "Esc",
+    "options": "選択肢",
+    "recent": "最近",
+    "all": "すべて",
+    "create": "「{{query}}」を作成",
+    "createNamed": "{{label}}「{{query}}」",
+    "createFull": "新しい{{label}}",
+    "createFullQuery": "{{label}} · 「{{query}}」",
+    "fullDetails": "詳細を入力",
+    "empty": "まだ選べる項目がありません",
+    "noResults": "「{{query}}」の結果はありません",
+    "noResultsHint": "つづりを確認するか、文字数を減らしてください",
+    "noResultsRemoteHint": "名前、電話番号、IDで試してください",
+    "loadingMore": "さらに読み込み中",
+    "clear": "クリア",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "患者",
+    "patientMark": "患",
+    "date": {
+      "label": "日付",
+      "placeholder": "日付を選択",
+      "search": "日付を入力 · 例: 9/12",
+      "today": "今日",
+      "tomorrow": "明日",
+      "yesterday": "昨日",
+      "comingUp": "今後",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "時刻",
+      "placeholder": "時刻を選択"
+    }
   }
 }

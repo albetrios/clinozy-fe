@@ -274,5 +274,42 @@
       "wrongItems": "Wrong items",
       "customerChangedMind": "Customer changed mind"
     }
+  },
+  "picker": {
+    "placeholder": "Select…",
+    "search": "Search {{label}}",
+    "searchDefault": "Search",
+    "escKey": "esc",
+    "options": "Options",
+    "recent": "Recent",
+    "all": "All",
+    "create": "Create “{{query}}”",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "New {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "full details",
+    "empty": "Nothing to pick yet",
+    "noResults": "No results for “{{query}}”",
+    "noResultsHint": "Check the spelling or try fewer letters",
+    "noResultsRemoteHint": "Try a name, phone number or ID",
+    "loadingMore": "Loading more",
+    "clear": "Clear",
+    "triggerLabel": "{{label}} · {{value}}",
+    "patient": "Patient",
+    "patientMark": "P",
+    "date": {
+      "label": "Date",
+      "placeholder": "Pick a date",
+      "search": "Type a date · e.g. 12 sep",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday",
+      "comingUp": "Coming up",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Time",
+      "placeholder": "Pick a time"
+    }
   }
 }
