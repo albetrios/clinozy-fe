@@ -3,22 +3,33 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { CommandItem as CommandRow } from '@/shared/components/ui/command.tsx';
+import type { AppIcon } from '@/shared/icons/index.ts';
 
+/**
+ * One command-menu row (H:2674): 40px, `rounded-lg` — a 15px muted icon, the
+ * title (13.5px / 500) and an optional sub at the inline end (12px, muted, at
+ * most 45%). The active row takes `bg-muted`. It keeps cmdk's own
+ * `command-item` slot, as the Picker's rows do: the `menu-item` slot's
+ * `--radius-md` would round it 6px, not the design's 8px.
+ */
 export function CommandItem({
   children,
   icon: Icon,
   onSelect,
-  keywords,
+  value,
+  sub,
   destructive = false,
   busy = false,
   disabled = false,
   testId,
 }: {
   children: ReactNode;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: AppIcon;
   onSelect: () => void;
-  /** Extra terms cmdk matches the search query against (beyond the label). */
-  keywords?: readonly string[];
+  /** cmdk's value — unique across the menu; the active row follows it. */
+  value?: string;
+  /** The muted text at the row's inline end ("Leads", "#3508 · •••• 3212"). */
+  sub?: string;
   destructive?: boolean;
   /** This row's own work is in flight: swaps the icon for a spinner. */
   busy?: boolean;
@@ -27,25 +38,29 @@ export function CommandItem({
 }) {
   return (
     <CommandRow
+      value={value}
       onSelect={onSelect}
-      keywords={keywords ? [...keywords] : undefined}
       disabled={disabled}
       aria-busy={busy || undefined}
       data-testid={testId}
       className={cn(
-        'flex cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors',
-        'aria-selected:bg-accent aria-selected:text-accent-foreground',
+        'text-field h-10 cursor-pointer gap-2.5 rounded-lg px-2.5 py-0 font-medium transition-colors duration-120',
+        'data-[selected=true]:bg-muted data-[selected=true]:text-foreground',
         'data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
-        destructive && 'text-destructive aria-selected:text-destructive',
+        destructive && 'text-destructive data-[selected=true]:text-destructive',
       )}
-      data-slot="menu-item"
     >
       {busy ? (
         <Spinner data-testid="command-palette-item-spinner" />
       ) : (
-        <Icon className="h-4 w-4" />
+        <Icon aria-hidden="true" className="text-muted-foreground size-3.75" />
       )}
-      {children}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {sub ? (
+        <span className="text-muted-foreground max-w-[45%] flex-none truncate text-xs font-normal tabular-nums">
+          {sub}
+        </span>
+      ) : null}
     </CommandRow>
   );
 }

@@ -62,7 +62,8 @@
       "not_interested": "関心なし",
       "invalid": "無効",
       "lost": "失注"
-    }
+    },
+    "retargeted": "再アプローチ"
   },
   "offerings": {
     "categories": {
@@ -269,5 +270,35 @@
       "notSet": "未設定",
       "range": "期間を指定"
     }
+  },
+  "commandMenu": {
+    "results": "結果",
+    "groups": {
+      "actions": "アクション",
+      "goTo": "移動",
+      "patients": "患者",
+      "leads": "リード",
+      "invoices": "請求書"
+    },
+    "actions": {
+      "newLead": "新規リード",
+      "newAppointment": "新規予約",
+      "newPatient": "新規患者",
+      "newReceipt": "新規入金",
+      "openTasks": "タスクを開く"
+    },
+    "screen": "画面",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "クリニック請求書 {{id}}",
+      "medical": "薬局請求書 {{id}}",
+      "consultation": "診察請求書 {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "移動",
+    "open": "開く",
+    "hint": "患者・リード・請求書を検索するには2文字以上入力してください",
+    "empty": "一致するものがありません。名前、電話番号、#IDで試してください。"
   }
 }

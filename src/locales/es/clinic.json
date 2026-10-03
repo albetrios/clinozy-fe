@@ -62,7 +62,8 @@
       "not_interested": "No interesado",
       "invalid": "No válido",
       "lost": "Perdido"
-    }
+    },
+    "retargeted": "Reactivado"
   },
   "offerings": {
     "categories": {
@@ -273,5 +274,35 @@
       "notSet": "Sin fecha",
       "range": "Rango personalizado"
     }
+  },
+  "commandMenu": {
+    "results": "Resultados",
+    "groups": {
+      "actions": "Acciones",
+      "goTo": "Ir a",
+      "patients": "Pacientes",
+      "leads": "Prospectos",
+      "invoices": "Facturas"
+    },
+    "actions": {
+      "newLead": "Nuevo prospecto",
+      "newAppointment": "Nueva cita",
+      "newPatient": "Nuevo paciente",
+      "newReceipt": "Nuevo cobro",
+      "openTasks": "Abrir tareas"
+    },
+    "screen": "Pantalla",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "Factura de clínica {{id}}",
+      "medical": "Factura de farmacia {{id}}",
+      "consultation": "Factura de consulta {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "moverse",
+    "open": "abrir",
+    "hint": "Escribe 2 o más letras para buscar pacientes, prospectos y facturas",
+    "empty": "Sin coincidencias. Prueba con un nombre, un teléfono o un #ID."
   }
 }

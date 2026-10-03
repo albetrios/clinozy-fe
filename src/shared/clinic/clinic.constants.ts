@@ -59,6 +59,11 @@ export const CLINIC_KEYS = {
       invalid: 'leads.statuses.invalid',
       lost: 'leads.statuses.lost',
     },
+    /**
+     * "Re-targeted": a re-target lead still New — a label, not a stored status
+     * (D22, `S:1066, 1100`); `clinicLeadStatusKey` picks it.
+     */
+    retargeted: 'leads.retargeted',
   },
   /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and

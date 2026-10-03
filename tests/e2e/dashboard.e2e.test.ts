@@ -51,7 +51,7 @@ test.describe('Dashboard', () => {
   }) => {
     await page.getByTestId('dashboard-ai-chip-appearance').click();
 
-    const search = page.getByRole('combobox', { name: 'Type a command or search...' });
+    const search = page.getByRole('combobox', { name: 'Search' });
     await expect(search).toHaveValue('theme');
     await expect(page.getByRole('option', { name: 'Light mode' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'System theme' })).toBeVisible();
@@ -63,9 +63,7 @@ test.describe('Dashboard', () => {
     await page.keyboard.press('Escape');
     await expect(search).toBeHidden();
     await page.getByTestId('dashboard-ai-prompt').click();
-    await expect(
-      page.getByRole('combobox', { name: 'Type a command or search...' }),
-    ).toHaveValue('');
+    await expect(page.getByRole('combobox', { name: 'Search' })).toHaveValue('');
   });
 
   test('a suggestion this workspace cannot honor is not offered', async ({ page }) => {
@@ -95,9 +93,9 @@ test.describe('Dashboard suggestions on a team workspace', () => {
 
     await page.getByTestId('dashboard-ai-chip-members').click();
 
-    await expect(
-      page.getByRole('combobox', { name: 'Type a command or search...' }),
-    ).toHaveValue('invitations');
+    await expect(page.getByRole('combobox', { name: 'Search' })).toHaveValue(
+      'invitations',
+    );
     await expect(page.getByRole('option', { name: 'Members' })).toBeVisible();
   });
 });

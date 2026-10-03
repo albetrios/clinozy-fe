@@ -62,7 +62,8 @@
       "not_interested": "Kein Interesse",
       "invalid": "Ungültig",
       "lost": "Verloren"
-    }
+    },
+    "retargeted": "Reaktiviert"
   },
   "offerings": {
     "categories": {
@@ -271,5 +272,35 @@
       "notSet": "Nicht festgelegt",
       "range": "Eigener Zeitraum"
     }
+  },
+  "commandMenu": {
+    "results": "Ergebnisse",
+    "groups": {
+      "actions": "Aktionen",
+      "goTo": "Gehe zu",
+      "patients": "Patienten",
+      "leads": "Leads",
+      "invoices": "Rechnungen"
+    },
+    "actions": {
+      "newLead": "Neuer Lead",
+      "newAppointment": "Neuer Termin",
+      "newPatient": "Neuer Patient",
+      "newReceipt": "Neuer Zahlungseingang",
+      "openTasks": "Aufgaben öffnen"
+    },
+    "screen": "Seite",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "Praxisrechnung {{id}}",
+      "medical": "Apothekenrechnung {{id}}",
+      "consultation": "Beratungsrechnung {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "navigieren",
+    "open": "öffnen",
+    "hint": "Geben Sie 2+ Buchstaben ein, um Patienten, Leads und Rechnungen zu suchen",
+    "empty": "Keine Treffer. Versuchen Sie einen Namen, eine Telefonnummer oder eine #ID."
   }
 }

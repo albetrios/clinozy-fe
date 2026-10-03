@@ -90,8 +90,8 @@
       "settingsLink": "알림 설정"
     },
     "commandPalette": {
-      "ariaLabel": "명령 팔레트",
-      "placeholder": "명령을 입력하거나 검색...",
+      "ariaLabel": "명령 메뉴",
+      "placeholder": "검색 또는 이동…",
       "empty": "결과가 없습니다.",
       "groups": {
         "navigation": "탐색",

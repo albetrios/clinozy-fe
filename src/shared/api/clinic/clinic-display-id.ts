@@ -17,7 +17,10 @@ export const displayId = {
   offering: (seq: number) => `#${seq}`,
   user: (seq: number) => `#${seq}`,
   payment: (seq: number) => `PAY-${seq}`,
+  /** The printed invoice number ("Invoice #:" on the A4 sheet): "INV-787". */
   invoice: (seq: number) => `INV-${seq}`,
+  /** An invoice on screen — "Clinic invoice #787", "Invoice #787 saved" (KICKOFF §6.0, §6.9). */
+  invoiceNumber: (seq: number) => `#${seq}`,
   sale: (seq: number) => `S-${seq}`,
   creditNote: (seq: number) => `CN-${padded(seq, 3)}`,
   pendingCredit: (seq: number) => `CR-${seq}`,

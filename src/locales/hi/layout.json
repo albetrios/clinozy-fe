@@ -90,8 +90,8 @@
       "settingsLink": "सूचना सेटिंग्स"
     },
     "commandPalette": {
-      "ariaLabel": "कमांड पैलेट",
-      "placeholder": "कमांड टाइप करें या खोजें...",
+      "ariaLabel": "कमांड मेनू",
+      "placeholder": "खोजें या जाएँ…",
       "empty": "कोई परिणाम नहीं मिला।",
       "groups": {
         "navigation": "नेविगेशन",

@@ -90,8 +90,8 @@
       "settingsLink": "إعدادات الإشعارات"
     },
     "commandPalette": {
-      "ariaLabel": "لوحة الأوامر",
-      "placeholder": "اكتب أمرًا أو ابحث...",
+      "ariaLabel": "قائمة الأوامر",
+      "placeholder": "ابحث أو انتقل إلى…",
       "empty": "لم يتم العثور على نتائج.",
       "groups": {
         "navigation": "التنقل",

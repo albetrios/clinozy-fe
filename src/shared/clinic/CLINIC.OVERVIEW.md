@@ -30,6 +30,18 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11).
+- `clinic-referrer.ts` — the `from` allow-list a shared drawer route keeps its
+  referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
+  on the sender's (the page a drawer opens over, when it is an allowed one).
+- `clinic-command-targets.ts` — where ⌘K's clinic rows go (`/leads/create`,
+  `/appointments/create`, `/patients/create`, `/payments/receive`, `/tasks`,
+  `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) and
+  `clinicCommandNavigation`, which fills in the record param and `from`. Several
+  of those routes land with later ledger rows; the table names which.
+- `clinic-lead-status.ts` — the label a lead's status shows under: the stored
+  status's (`CLINIC_KEYS.leads.statuses`), or "Re-targeted"
+  (`CLINIC_KEYS.leads.retargeted`) for a re-target lead still New — the
+  contract stores no such status.
 
 Access itself — the fixture matrix, the resolver and the member's clinic roles —
 is `src/shared/api/clinic/access-api.ts`, read through

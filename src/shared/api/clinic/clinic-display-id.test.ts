@@ -9,6 +9,7 @@ describe('display ids (per-org seq + the schema prefix)', () => {
     [displayId.appointment(2841), '#2841'],
     [displayId.payment(5512), 'PAY-5512'],
     [displayId.invoice(787), 'INV-787'],
+    [displayId.invoiceNumber(787), '#787'],
     [displayId.sale(983), 'S-983'],
     [displayId.creditNote(1), 'CN-001'],
     [displayId.pendingCredit(2), 'CR-2'],

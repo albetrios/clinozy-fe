@@ -8,8 +8,9 @@ import type { MeContext } from '@/shared/tenancy/me-context.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { CommandPalette, PALETTE_LOGOUT_TOAST_ID } from './CommandPalette.tsx';
+import { CommandPalette } from './CommandPalette.tsx';
 import { PALETTE_SWITCH_TOAST_ID } from './CommandPaletteOrgGroup.tsx';
+import { PALETTE_LOGOUT_TOAST_ID } from './platform-command-groups.ts';
 
 const {
   useMeContextMock,
@@ -161,10 +162,7 @@ describe('CommandPalette', () => {
     const user = userEvent.setup();
     renderWithProviders(<CommandPalette />);
 
-    await user.type(
-      await screen.findByPlaceholderText('Type a command or search...'),
-      'billing',
-    );
+    await user.type(await screen.findByPlaceholderText('Search or jump to…'), 'billing');
 
     expect(await screen.findByText('Billing')).toBeInTheDocument();
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
@@ -216,9 +214,7 @@ describe('CommandPalette', () => {
 
       expect(await screen.findByText('Billing')).toBeInTheDocument();
       expect(screen.queryByText('Profile')).not.toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Type a command or search...')).toHaveValue(
-        'usage',
-      );
+      expect(screen.getByPlaceholderText('Search or jump to…')).toHaveValue('usage');
     });
 
     it('"invitations" (Invite members) reaches Members', async () => {
@@ -248,7 +244,7 @@ describe('CommandPalette', () => {
       useUIStore.getState().openCommandPaletteWith('usage');
       renderWithProviders(<CommandPalette />);
 
-      const input = await screen.findByPlaceholderText('Type a command or search...');
+      const input = await screen.findByPlaceholderText('Search or jump to…');
       await user.clear(input);
       await user.type(input, 'roles');
 
@@ -261,7 +257,7 @@ describe('CommandPalette', () => {
       useUIStore.getState().openCommandPaletteWith('role');
       renderWithProviders(<CommandPalette />);
 
-      const input = await screen.findByPlaceholderText('Type a command or search...');
+      const input = await screen.findByPlaceholderText('Search or jump to…');
       expect(input).toHaveFocus();
       await user.keyboard('s');
 
@@ -273,7 +269,7 @@ describe('CommandPalette', () => {
       renderWithProviders(<CommandPalette />);
 
       expect(await screen.findByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Type a command or search...')).toHaveValue('');
+      expect(screen.getByPlaceholderText('Search or jump to…')).toHaveValue('');
     });
   });
 
@@ -312,7 +308,7 @@ describe('CommandPalette', () => {
       expect(document.activeElement).toBe(opener);
 
       act(() => useUIStore.getState().setCommandPaletteOpen(true));
-      await screen.findByPlaceholderText(/type a command or search/i);
+      await screen.findByPlaceholderText(/search or jump to/i);
 
       // Close exactly as the app does — the component is removed, not re-rendered.
       act(() => useUIStore.getState().setCommandPaletteOpen(false));
@@ -328,7 +324,7 @@ describe('CommandPalette', () => {
       const opener = await screen.findByTestId('opener');
       opener.focus();
       act(() => useUIStore.getState().setCommandPaletteOpen(true));
-      await screen.findByPlaceholderText(/type a command or search/i);
+      await screen.findByPlaceholderText(/search or jump to/i);
 
       // Selecting a palette item navigates away, so the trigger is gone by the
       // time the palette closes — exactly the case a naive restore would focus

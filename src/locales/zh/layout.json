@@ -90,8 +90,8 @@
       "settingsLink": "通知设置"
     },
     "commandPalette": {
-      "ariaLabel": "命令面板",
-      "placeholder": "输入命令或搜索…",
+      "ariaLabel": "命令菜单",
+      "placeholder": "搜索或跳转…",
       "empty": "未找到结果。",
       "groups": {
         "navigation": "导航",

@@ -53,3 +53,16 @@ export function isAllowedReferrer(from: string): boolean {
 export function safeReferrer(from: unknown, fallback: string): string {
   return typeof from === 'string' && isAllowedReferrer(from) ? from : fallback;
 }
+
+/** An org page's path relative to the organization: `/organization/acme/patients` → `patients`. */
+const ORGANIZATION_PAGE = /^\/organization\/[^/]+\/(.+?)\/?$/;
+
+/**
+ * The `from` a drawer opened from the page at `pathname` carries — the
+ * sender's side of {@link safeReferrer}: the page's org-relative path when a
+ * drawer may keep it behind, else null (the drawer opens over its own room).
+ */
+export function referrerFromPath(pathname: string): string | null {
+  const page = ORGANIZATION_PAGE.exec(pathname)?.[1];
+  return page && isAllowedReferrer(page) ? page : null;
+}

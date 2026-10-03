@@ -62,7 +62,8 @@
       "not_interested": "Not interested",
       "invalid": "Invalid",
       "lost": "Lost"
-    }
+    },
+    "retargeted": "Re-targeted"
   },
   "offerings": {
     "categories": {
@@ -271,5 +272,35 @@
       "notSet": "Not set",
       "range": "Custom range"
     }
+  },
+  "commandMenu": {
+    "results": "Results",
+    "groups": {
+      "actions": "Actions",
+      "goTo": "Go to",
+      "patients": "Patients",
+      "leads": "Leads",
+      "invoices": "Invoices"
+    },
+    "actions": {
+      "newLead": "New lead",
+      "newAppointment": "New appointment",
+      "newPatient": "New patient",
+      "newReceipt": "New receipt",
+      "openTasks": "Open tasks"
+    },
+    "screen": "Screen",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "Clinic invoice {{id}}",
+      "medical": "Medical invoice {{id}}",
+      "consultation": "Consultation invoice {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "move",
+    "open": "open",
+    "hint": "Type 2+ letters to search patients, leads and invoices",
+    "empty": "No matches. Try a name, phone or #ID."
   }
 }

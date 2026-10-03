@@ -90,8 +90,8 @@
       "settingsLink": "Notification settings"
     },
     "commandPalette": {
-      "ariaLabel": "Command palette",
-      "placeholder": "Type a command or search...",
+      "ariaLabel": "Command menu",
+      "placeholder": "Search or jump to…",
       "empty": "No results found.",
       "groups": {
         "navigation": "Navigation",

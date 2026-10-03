@@ -93,19 +93,23 @@ export function CommandPaletteShell({ children }: { children: ReactNode }) {
         className="text-foreground fixed inset-0 z-50 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0"
         aria-modal="true"
         aria-label={t(LAYOUT_KEYS.app.commandPalette.ariaLabel)}
+        data-testid="command-palette"
         ref={dialogRef}
       >
         <div
-          className="bg-overlay/50 fixed inset-0 backdrop-blur-sm"
+          className="bg-overlay/35 animate-fade fixed inset-0"
           aria-hidden="true"
           onClick={() => setOpen(false)}
         />
-        {/* A gutter on phones: `w-full` under `max-w-lg` ran edge to edge on
-            any screen narrower than 32rem. Roomier on big monitors. */}
-        <div className="3xl:max-w-xl fixed top-[20%] left-1/2 w-[calc(100%-1.5rem)] max-w-lg -translate-x-1/2">
+        {/* The design's frame (H:2669–2671): 12vh from the top and a 16px
+            gutter at every width — min(640px, 100% − 32px), 358px at 390 —
+            at most min(560px, 76vh) tall, content-box like the design (its
+            1px border sits outside). The dialog slot carries the command
+            menu's elevation (0 24px 64px /.22) and the theme axes. */}
+        <div className="pointer-events-none fixed inset-0 flex items-start justify-center px-4 pt-[12vh] pb-4">
           <div
-            data-slot="popover-content"
-            className="bg-popover overflow-hidden rounded-md border"
+            data-slot="dialog-content"
+            className="bg-popover text-popover-foreground animate-dropdown-in pointer-events-auto box-content flex max-h-[min(35rem,76vh)] w-full max-w-160 flex-col overflow-hidden rounded-xl border"
           >
             {children}
           </div>

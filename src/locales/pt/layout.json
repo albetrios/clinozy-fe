@@ -90,8 +90,8 @@
       "settingsLink": "Configurações de notificação"
     },
     "commandPalette": {
-      "ariaLabel": "Paleta de comandos",
-      "placeholder": "Digite um comando ou pesquise...",
+      "ariaLabel": "Menu de comandos",
+      "placeholder": "Pesquisar ou ir para…",
       "empty": "Nenhum resultado encontrado.",
       "groups": {
         "navigation": "Navegação",

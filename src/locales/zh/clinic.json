@@ -62,7 +62,8 @@
       "not_interested": "无意向",
       "invalid": "无效",
       "lost": "流失"
-    }
+    },
+    "retargeted": "重新触达"
   },
   "offerings": {
     "categories": {
@@ -269,5 +270,35 @@
       "notSet": "未设置",
       "range": "自定义范围"
     }
+  },
+  "commandMenu": {
+    "results": "结果",
+    "groups": {
+      "actions": "操作",
+      "goTo": "跳转到",
+      "patients": "患者",
+      "leads": "潜在客户",
+      "invoices": "发票"
+    },
+    "actions": {
+      "newLead": "新建潜在客户",
+      "newAppointment": "新建预约",
+      "newPatient": "新建患者",
+      "newReceipt": "新建收款",
+      "openTasks": "打开任务"
+    },
+    "screen": "页面",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "诊所发票 {{id}}",
+      "medical": "药房发票 {{id}}",
+      "consultation": "问诊发票 {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "移动",
+    "open": "打开",
+    "hint": "输入至少 2 个字符以搜索患者、潜在客户和发票",
+    "empty": "没有匹配项。试试姓名、电话或 #ID。"
   }
 }

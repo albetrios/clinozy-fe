@@ -15,21 +15,22 @@ describe('CommandPaletteShell', () => {
         <span>Content unavailable</span>
       </CommandPaletteShell>,
     );
-    expect(screen.getByRole('dialog', { name: 'Command palette' })).toHaveAttribute(
+    expect(screen.getByRole('dialog', { name: 'Command menu' })).toHaveAttribute(
       'aria-modal',
       'true',
     );
+    // The dialog slot carries the command menu's elevation and the theme axes.
     expect(screen.getByText('Content unavailable').parentElement).toHaveAttribute(
       'data-slot',
-      'popover-content',
+      'dialog-content',
     );
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(useUIStore.getState().commandPaletteOpen).toBe(false);
   });
 
-  it('keeps a gutter on phones and grows on big monitors', () => {
-    // Regression: `w-full` under `max-w-lg` ran edge to edge on any screen
-    // narrower than 32rem — the palette touched both sides of a phone.
+  it('sits 12vh from the top, min(640px, 100% − 32px) wide and at most min(560px, 76vh) tall', () => {
+    // The design's frame (H:2669–2671): a 16px gutter at every width (358px at
+    // 390) — the old `w-full` under `max-w-lg` touched both sides of a phone.
     useUIStore.setState({ commandPaletteOpen: true });
     render(
       <CommandPaletteShell>
@@ -37,9 +38,28 @@ describe('CommandPaletteShell', () => {
       </CommandPaletteShell>,
     );
 
-    const frame = screen.getByText('Content').parentElement?.parentElement;
-    expect(frame).toHaveClass('w-[calc(100%-1.5rem)]', 'max-w-lg', '3xl:max-w-xl');
-    expect(frame).not.toHaveClass('w-full');
+    const panel = screen.getByText('Content').parentElement;
+    expect(panel).toHaveClass(
+      'w-full',
+      'max-w-160',
+      'max-h-[min(35rem,76vh)]',
+      'rounded-xl',
+    );
+    expect(panel?.parentElement).toHaveClass('px-4', 'pt-[12vh]', 'items-start');
+  });
+
+  it('dims the page under the menu and closes on a tap outside', () => {
+    useUIStore.setState({ commandPaletteOpen: true });
+    render(
+      <CommandPaletteShell>
+        <span>Content</span>
+      </CommandPaletteShell>,
+    );
+
+    const backdrop = screen.getByRole('dialog').querySelector('[aria-hidden="true"]');
+    expect(backdrop).toHaveClass('bg-overlay/35', 'animate-fade');
+    fireEvent.click(backdrop!);
+    expect(useUIStore.getState().commandPaletteOpen).toBe(false);
   });
 
   it('cycles reverse Tab inside the shell while content changes', () => {

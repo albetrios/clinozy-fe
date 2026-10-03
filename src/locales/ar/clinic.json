@@ -62,7 +62,8 @@
       "not_interested": "غير مهتم",
       "invalid": "غير صالح",
       "lost": "مفقود"
-    }
+    },
+    "retargeted": "أُعيد استهدافه"
   },
   "offerings": {
     "categories": {
@@ -279,5 +280,35 @@
       "notSet": "غير محدد",
       "range": "نطاق مخصص"
     }
+  },
+  "commandMenu": {
+    "results": "النتائج",
+    "groups": {
+      "actions": "إجراءات",
+      "goTo": "انتقل إلى",
+      "patients": "المرضى",
+      "leads": "العملاء المحتملون",
+      "invoices": "الفواتير"
+    },
+    "actions": {
+      "newLead": "عميل محتمل جديد",
+      "newAppointment": "موعد جديد",
+      "newPatient": "مريض جديد",
+      "newReceipt": "تحصيل جديد",
+      "openTasks": "فتح المهام"
+    },
+    "screen": "شاشة",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "فاتورة العيادة {{id}}",
+      "medical": "فاتورة الصيدلية {{id}}",
+      "consultation": "فاتورة استشارة {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "تنقّل",
+    "open": "فتح",
+    "hint": "اكتب حرفين أو أكثر للبحث عن المرضى والعملاء المحتملين والفواتير",
+    "empty": "لا توجد نتائج مطابقة. جرّب اسمًا أو رقم هاتف أو #ID."
   }
 }

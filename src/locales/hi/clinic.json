@@ -62,7 +62,8 @@
       "not_interested": "रुचि नहीं",
       "invalid": "अमान्य",
       "lost": "खो गया"
-    }
+    },
+    "retargeted": "री-टारगेट किया"
   },
   "offerings": {
     "categories": {
@@ -271,5 +272,35 @@
       "notSet": "तय नहीं",
       "range": "कस्टम अवधि"
     }
+  },
+  "commandMenu": {
+    "results": "परिणाम",
+    "groups": {
+      "actions": "क्रियाएँ",
+      "goTo": "यहाँ जाएँ",
+      "patients": "मरीज़",
+      "leads": "लीड्स",
+      "invoices": "इनवॉइस"
+    },
+    "actions": {
+      "newLead": "नई लीड",
+      "newAppointment": "नया अपॉइंटमेंट",
+      "newPatient": "नया मरीज़",
+      "newReceipt": "नई रसीद",
+      "openTasks": "कार्य खोलें"
+    },
+    "screen": "स्क्रीन",
+    "patientSub": "{{id}} · •••• {{lastDigits}}",
+    "leadSub": "{{id}} · {{status}}",
+    "invoiceTitle": {
+      "clinic": "क्लिनिक इनवॉइस {{id}}",
+      "medical": "मेडिकल इनवॉइस {{id}}",
+      "consultation": "परामर्श इनवॉइस {{id}}"
+    },
+    "invoiceSub": "{{person}} · {{date}}",
+    "move": "चलें",
+    "open": "खोलें",
+    "hint": "मरीज़, लीड और इनवॉइस खोजने के लिए 2+ अक्षर लिखें",
+    "empty": "कोई मिलान नहीं। नाम, फ़ोन या #ID आज़माएँ।"
   }
 }

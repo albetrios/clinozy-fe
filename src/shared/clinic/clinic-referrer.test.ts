@@ -4,6 +4,7 @@ import {
   isAllowedReferrer,
   PATIENT_FILE_REFERRER,
   PATIENT_FILE_SECTIONS,
+  referrerFromPath,
   safeReferrer,
 } from './clinic-referrer.ts';
 
@@ -58,5 +59,26 @@ describe('safeReferrer', () => {
     expect(safeReferrer('//evil.example', 'payments')).toBe('payments');
     expect(safeReferrer(undefined, 'payments')).toBe('payments');
     expect(safeReferrer(42, 'payments')).toBe('payments');
+  });
+});
+
+describe('referrerFromPath', () => {
+  it.each([
+    ['/organization/acme/today', 'today'],
+    ['/organization/acme/payments/pending', 'payments/pending'],
+    ['/organization/acme/medical/sales/', 'medical/sales'],
+    [`/organization/acme/patients/${PATIENT}/invoices`, `patients/${PATIENT}/invoices`],
+  ])('sends %s as %j', (pathname, from) => {
+    expect(referrerFromPath(pathname)).toBe(from);
+  });
+
+  it.each([
+    '/organization/acme/users',
+    '/organization/acme/leads/0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c',
+    '/organization/acme',
+    '/dashboard',
+    '/',
+  ])('sends nothing from %s', (pathname) => {
+    expect(referrerFromPath(pathname)).toBeNull();
   });
 });

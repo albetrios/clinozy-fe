@@ -90,8 +90,8 @@
       "settingsLink": "Benachrichtigungseinstellungen"
     },
     "commandPalette": {
-      "ariaLabel": "Befehlspalette",
-      "placeholder": "Befehl eingeben oder suchen...",
+      "ariaLabel": "Befehlsmenü",
+      "placeholder": "Suchen oder springen zu…",
       "empty": "Keine Ergebnisse gefunden.",
       "groups": {
         "navigation": "Navigation",
