@@ -21,7 +21,7 @@ flowchart LR
 - [Production build](#production-build)
 - [Environment variables](#environment-variables)
 - [Deploy options](#deploy-options)
-- [Netlify + GitHub integration](#netlify--github-integration)
+- [Netlify hosting](#netlify-hosting)
 - [Release workflow (CI)](#release-workflow-ci)
 - [Sentry source maps](#sentry-source-maps)
 - [Pre-launch checklist](#pre-launch-checklist)
@@ -35,7 +35,7 @@ flowchart LR
 
 **Current production API:** `https://your-api-domain.com` (app uses path `/api/v1`). Set `VITE_API_BASE_URL=https://your-api-domain.com` for production builds (Netlify or other static host).
 
-**Netlify (current host):** Build and deploy via GitHub integration (push to the production branch, e.g. `main`) or CLI (`pnpm run deploy:netlify` / `pnpm run deploy:netlify:prod`). Required env: `VITE_API_BASE_URL`. See [Netlify + GitHub integration](#netlify--github-integration) and [cicd-and-netlify.md](cicd-and-netlify.md).
+**Netlify (current host):** GitHub Actions builds and Netlify only hosts — a merge to `main` deploys `development`, a published release deploys `production`, each uploaded as the CI-built `dist/` with `netlify deploy --no-build`. One-off deploys from a laptop: `pnpm run deploy:netlify` / `pnpm run deploy:netlify:prod`. Required env: `VITE_API_BASE_URL`. See [Netlify hosting](#netlify-hosting) and [cicd-and-netlify.md](cicd-and-netlify.md).
 
 **Build:** Production build runs **on GitHub** (CI and Release workflows). Netlify also builds when you push (or you can deploy the GitHub-built artifact). See [Release workflow (CI)](#release-workflow-ci).
 
@@ -89,7 +89,7 @@ pnpm build
 
 Output is in **`dist/`**: static assets (JS, CSS, `index.html`), `config.js` (from `public/`; app reads `window.__CONFIG__` or build-time env), `version.json`, **robots.txt**, and PWA assets.
 
-- **Type-check:** `pnpm build` runs `tsc -b` then `vite build` (production mode).
+- **Type-check:** `pnpm build` runs `tsc -b` then `vite build` (production mode). In a terminal it first asks which `.env.<environment>` to build with (`--env <environment>` skips the question); the build reads that one file — see the [environment-variables runbook](runbooks/environment-variables.md#which-env-files-each-command-reads).
 - **Preview locally:** `pnpm preview` serves `dist/` so you can test the production build.
 - **Public assets:** All files in **`public/`** are copied to `dist/`. See **[public/README.md](../../public/README.md)** for the full list (manifest, robots.txt, \_headers, offline.html, theme-init.js, config.js, icons). Add **pwa-192x192.png** and **pwa-512x512.png** for PWA install and to avoid icon 404s.
 
@@ -109,15 +109,15 @@ Full reference: **`.env.example`** at project root. Summary:
 | **Sentry DSN**   | `VITE_SENTRY_DSN` — optional; client error tracking.                                                                   |
 | **PostHog**      | `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST` — optional analytics.                                                          |
 
-Sentry **source map upload** (build-time only, not client): see [Sentry source maps](#sentry-source-maps). Uses `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` (see [sentry-sourcemaps.md](../integrations/sentry-sourcemaps.md)).
+Sentry **source map upload** (build-time only, not client): see [Sentry source maps](#sentry-source-maps). Uses `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT`, and runs only when a build asks — the deploy workflow, or `pnpm build --sentry` (see [sentry-sourcemaps.md](../integrations/sentry-sourcemaps.md)).
 
 ---
 
 ## Deploy options
 
-### Option A — Netlify (GitHub integration)
+### Option A — Netlify (the setup this repo uses)
 
-Use the included **Netlify + GitHub** setup for automatic deploys. See [Netlify + GitHub integration](#netlify--github-integration) below.
+GitHub Actions builds; Netlify only hosts the `dist/` it uploads. See [Netlify hosting](#netlify-hosting) below and the canonical [cicd-and-netlify.md](cicd-and-netlify.md).
 
 ### Option B — Other static hosts (Vercel, S3+CloudFront, etc.)
 
@@ -131,58 +131,46 @@ No `config.js` override unless your host supports injecting a small script; in t
 
 ---
 
-## Netlify + GitHub integration
+## Netlify hosting
 
-The repo includes **`netlify.toml`** so Netlify can build and deploy from GitHub with minimal setup.
+Netlify serves the `dist/` that GitHub Actions built; it never builds this app itself.
 
-### 1. Connect the repo in Netlify
+### 1. Create the site
 
-1. Log in to [Netlify](https://app.netlify.com).
-2. **Add new site** → **Import an existing project** → **Deploy with GitHub**.
-3. Authorize Netlify and pick this repository.
-4. Netlify will read **`netlify.toml`** and prefill:
-   - **Build command:** `pnpm build`
-   - **Publish directory:** `dist`
-   - **Node version:** 24 (from `[build.environment]`).
-5. Click **Deploy site**. The first deploy will run; fix any env or build errors in step 2.
+Create a site (in the UI, or `pnpm exec netlify init` / `netlify link` — see §6) and store its id and a
+personal access token in the GitHub Environments as `NETLIFY_SITE_ID` and `NETLIFY_AUTH_TOKEN`. That is
+all the deploy workflows need. Connecting the repository to Netlify's Git integration is optional and
+changes nothing: `netlify.toml` cancels every build it starts.
 
-### 2. Set environment variables
+### 2. Environment variables live in GitHub, not Netlify
 
-In Netlify: **Site settings** → **Environment variables** → **Add a variable** (or **Import from .env**).
+Every `VITE_*` value is baked in at build time, and builds run in GitHub Actions, so the values go into
+the GitHub Environments (`development`, `production`) with `pnpm github:sync` — never into Netlify's
+environment variables, which no build reads. The keys and how they reach the build:
+[environment-variables runbook](runbooks/environment-variables.md) and
+[cicd-and-netlify.md](cicd-and-netlify.md). Source maps go to Sentry from the deploy build only — see
+[Sentry source maps](#sentry-source-maps).
 
-Set at least:
+### 3. What deploys where
 
-| Variable            | Scope | Description                                                                          |
-| ------------------- | ----- | ------------------------------------------------------------------------------------ |
-| `VITE_API_BASE_URL` | All   | Production API base URL (e.g. `https://your-api-domain.com`). App appends `/api/v1`. |
+| Trigger           | GitHub Environment   | Netlify target                          |
+| ----------------- | -------------------- | --------------------------------------- |
+| Merge to `main`   | `development`        | `development--<site>.netlify.app`       |
+| Published release | `production`         | The live site (`netlify deploy --prod`) |
+| Pull request      | `development` values | `pr-<n>--<site>.netlify.app`            |
 
-Optional:
-
-| Variable            | Scope               | Description                      |
-| ------------------- | ------------------- | -------------------------------- |
-| `VITE_SENTRY_DSN`   | Production / Branch | Sentry DSN.                      |
-| `VITE_POSTHOG_KEY`  | Production / Branch | PostHog project API key.         |
-| `VITE_POSTHOG_HOST` | Production / Branch | e.g. `https://us.i.posthog.com`. |
-
-For **Sentry source map upload** (build-time only), add **sensitive** vars in Netlify and do not expose to the client:
-
-- `SENTRY_AUTH_TOKEN`
-- `SENTRY_ORG`
-- `SENTRY_PROJECT`
-
-See [Sentry source maps](#sentry-source-maps).
-
-### 3. Branch and production behavior
-
-- **Production branch:** In **Site settings** → **Build & deploy** → **Continuous deployment**, set **Production branch** (e.g. `main`). Pushes to this branch deploy to the main site URL.
-- **Branch deploys:** Other branches get a preview URL per push/PR (e.g. `deploy-preview-42--yoursite.netlify.app`). Use **Branch deploy contexts** in Environment variables to set different `VITE_API_BASE_URL` for previews (e.g. staging API).
+Each workflow builds once (`pnpm build`), validates the env, attests production's bytes, and uploads that
+`dist/` with `netlify deploy --no-build`.
 
 ### 4. What `netlify.toml` does
 
-- **Build:** `pnpm build` (Node **24** LTS). Netlify detects `pnpm-lock.yaml` and uses pnpm; `packageManager` in `package.json` pins the version.
+- **No build on Netlify:** `ignore = "exit 0"` cancels Git-triggered builds, and `command` fails any other
+  build (a `netlify deploy` without `--no-build`) — so only the CI-built bundle ever ships.
 - **Publish:** `dist/` is the site root.
-- **Redirects:** `/*` → `/index.html` with status 200 so client-side routing works (SPA).
-- **Headers:** Optional `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` (you can add more in Netlify UI).
+- **Redirects:** the `/assets/*` miss returns a real 404; `/*` → `/index.html` with status 200 for
+  client-side routing (SPA).
+- **Headers:** the security headers (kept in step with `public/_headers`). The CLI uploads `netlify.toml`
+  with every deploy, `--no-build` included, so redirects and headers always apply.
 
 ### 5. Custom domain and HTTPS
 
@@ -204,19 +192,12 @@ pnpm exec netlify login
 pnpm exec netlify init
 ```
 
-Choose **Create & configure a new site**, pick your team, and give the site a name. Netlify will create the site and link the current directory. Build settings are read from `netlify.toml`.
+Choose **Create & configure a new site**, pick your team, and give the site a name. Netlify will create the site and link the current directory. (`netlify.toml` declares no usable build: this app is always built before it is deployed.)
 
-**Set environment variables**
+**Environment variables**
 
-```bash
-# One by one
-pnpm exec netlify env:set VITE_API_BASE_URL "https://your-api-domain.com"
-
-# Or import from a file (e.g. .env.production — do not commit secrets)
-pnpm exec netlify env:import .env.production
-```
-
-List vars: `pnpm exec netlify env:list`. Remove: `pnpm exec netlify env:unset VAR_NAME`.
+Set them in the GitHub Environments with `pnpm github:sync`, not with `netlify env:*`: no Netlify build
+exists to read them, and a local `pnpm build` reads your `.env.<environment>` file.
 
 **Deploy**
 
@@ -238,7 +219,7 @@ pnpm exec netlify link
 
 Select your team and the site. After that, `deploy:netlify` / `deploy:netlify:prod` and `netlify env:set` apply to that site.
 
-**Note:** GitHub integration (push → auto deploy) is still configured in the Netlify UI (or via `netlify api`). The CLI is for one-off deploys, env management, and creating/linking the site without using the browser.
+**Note:** Automatic deploys come from GitHub Actions, not Netlify's Git integration. The CLI is for one-off deploys and creating or linking the site without the browser.
 
 ---
 
@@ -266,10 +247,10 @@ In other words:
 
 ## Sentry source maps
 
-To get readable stack traces in Sentry, upload source maps at build time. The app already has **@sentry/vite-plugin** configured; it runs only when **`mode === 'production'`** and **`SENTRY_AUTH_TOKEN`** is set.
+To get readable stack traces in Sentry, upload source maps at build time. The app already has **@sentry/vite-plugin** configured; it runs only in a production build that **asks** for it (`SENTRY_UPLOAD_SOURCEMAPS=true`) and has **`SENTRY_AUTH_TOKEN`**. A local build never uploads unless you run `pnpm build --env <environment> --sentry`.
 
 - **Full steps:** [sentry-sourcemaps.md](../integrations/sentry-sourcemaps.md)
-- **CI:** Add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` as repository or environment secrets, and ensure your production build runs with those set.
+- **CI:** Add `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` as GitHub Environment secrets. The deploy workflow's build step sets `SENTRY_UPLOAD_SOURCEMAPS=true` itself.
 
 ---
 

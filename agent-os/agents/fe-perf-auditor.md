@@ -24,7 +24,7 @@ Always audit the **production build via preview** — never the Vite dev server 
 
 ## Procedure
 
-1. Build and serve: `pnpm build`, then `pnpm preview` in the background (default `http://localhost:4173`). Confirm it responds before tracing.
+1. Build and serve: `pnpm build --env production` when `.env.production` exists (plain `pnpm build` from this shell is not asked and reads `.env.local`), then `pnpm preview` in the background (default `http://localhost:4173`). Confirm it responds before tracing. Never pass `--sentry`.
 2. Trace the first paint: with the chrome-devtools MCP tools, open the preview URL and capture a performance trace with a fresh page load (`performance_start_trace` with `reload: true` and `autoStop: true`). Trace `/login` (unauthenticated first paint — the cold path every user hits) and, when credentials/E2E hooks allow, one authenticated route.
 3. Extract insights: read LCP, CLS, and TBT from the trace summary; drill into the flagged insights with `performance_analyze_insight` (typically `LCPBreakdown`, `RenderBlocking`, `DocumentLatency`, `ThirdParties`).
 4. Re-trace under constraint once: emulate `Slow 4G` network + 4× CPU throttling and repeat step 2 for the same route — budgets must hold on mid-tier hardware, not just the dev machine.

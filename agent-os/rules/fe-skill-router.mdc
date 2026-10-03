@@ -141,7 +141,7 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 
 19c. **PWA manifest sync**: When changing **`app-manifest.ts`**, **`manifest.webmanifest`**, **`app-icon.svg`**, PWA PNGs, favicon, or install **`theme_color`**, read **`agent-os/skills/fe-pwa-manifest/SKILL.md`** + **`docs/reference/pwa-manifest-and-app-icon.md`**. Edit `app-manifest.ts` first; sync JSON, `index.html`, `page-head.ts`, and PNGs; run **`app-manifest.test.ts`**. See **`agent-os/rules/fe-pwa-manifest-sync.mdc`**.
 
-19d. **Local production perf**: When measuring bundle size or Lighthouse, **`pnpm build`** then **`pnpm preview`** (or static `serve dist`) — never Lighthouse on **`pnpm dev`**. See **`docs/reference/local-production-perf.md`**.
+19d. **Local production perf**: When measuring bundle size or Lighthouse, **`pnpm build`** (prefer **`--env production`** when `.env.production` exists — an agent's shell is not a terminal, so plain `pnpm build` is not asked and reads `.env.local`) then **`pnpm preview`** (or static `serve dist`) — never Lighthouse on **`pnpm dev`**. Never add `--sentry` to a measuring build. See **`docs/reference/local-production-perf.md`**.
 
 20. **UI & craft stack (precedence — no conflicting taste skills):**
     - **Default** (any UI build/style): **`shadcn`** → **`frontend-design`** → **`web-design-guidelines`**. Query **`ui-ux-pro-max`** for advisory UX/style/chart hints only; never override semantic tokens (`src/index.css`), Lucide icons, or shadcn choices.

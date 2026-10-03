@@ -142,7 +142,7 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 | format      | `pnpm format:check`            | Quality            |
 | typecheck   | `pnpm type-check`              | Quality            |
 | test        | `pnpm test:ci` (with coverage) | Quality            |
-| build       | `pnpm build`                   | Quality            |
+| build       | `pnpm build` (CI: never asked) | Quality            |
 | bundle-size | `pnpm size`                    | Performance        |
 | gitleaks    | `gitleaks detect`              | Security           |
 | semgrep     | `semgrep ci --config auto`     | Security           |
@@ -184,6 +184,8 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 | `pnpm security:secrets`   | `gitleaks detect --source . -v` | Full-repo secret scan              |
 | `pnpm security:sast`      | `semgrep --config auto .`       | Full-repo SAST scan                |
 | `pnpm size`               | `size-limit`                    | Check bundle sizes against budgets |
+| `pnpm build`              | `tooling/ci/build.mjs`          | Asks which `.env.<env>` (terminal) |
+| `pnpm build:bundle`       | `tsc -b && vite build && strip` | The build, never asking            |
 | `pnpm build:analyze`      | `ANALYZE=true vite build`       | Bundle analysis visualization      |
 | `pnpm deps:check`         | `pnpm outdated`                 | Check for outdated dependencies    |
 | `pnpm deps:audit`         | `tooling/ci/bulk-audit.mjs`     | Security audit of dependencies     |

@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   availableEnvironments,
@@ -173,4 +175,16 @@ test('childEnvironment sets BUILD_ENVIRONMENT, and the Sentry upload only for --
   assert.deepEqual(childEnvironment({ env: { SENTRY_UPLOAD_SOURCEMAPS: 'true' } }), {
     SENTRY_UPLOAD_SOURCEMAPS: 'true',
   });
+});
+
+test('the command line stops on a bad argument before anything is built', () => {
+  const script = fileURLToPath(new URL('./build.mjs', import.meta.url));
+  for (const [args, message] of [
+    [['--env', 'staging'], 'pnpm build: "staging" is not an environment'],
+    [['--mode', 'production'], 'pnpm build: Unknown argument "--mode"'],
+  ]) {
+    const result = spawnSync('node', [script, ...args], { encoding: 'utf8' });
+    assert.equal(result.status, 1, args.join(' '));
+    assert.ok(result.stderr.includes(message), result.stderr);
+  }
 });

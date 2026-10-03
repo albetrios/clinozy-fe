@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -89,4 +89,23 @@ test('the env-registry bridge emits each profile’s defaults, identity included
     );
     assert.equal(JSON.parse(output).VITE_APP_ENV, environment);
   }
+});
+
+test('the env-registry bridge refuses an unknown environment', () => {
+  const result = spawnSync(
+    'node',
+    [
+      '--import',
+      'tsx',
+      join(ROOT, 'tooling/env-registry/env-registry.ts'),
+      '--profile-defaults',
+      'staging',
+    ],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /--profile-defaults needs an environment: local, development, production/,
+  );
 });

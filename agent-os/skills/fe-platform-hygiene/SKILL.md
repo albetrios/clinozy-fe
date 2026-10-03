@@ -30,6 +30,27 @@ driven by named `platformConfig` flags; `environment` is a reported value only (
 PostHog tag). Genuine test-runner env needs come from Vite plugins (`plugins/i18n-build.ts`,
 `plugins/test-env.ts`), not app code. Enforced by `pnpm validate:vite-env`.
 
+### Which env file each command reads
+
+Vite lays `.env.<mode>` over `.env.local`, so the mode decides whether a deploy-env file
+(`.env.development` / `.env.production`, the files `pnpm github:sync` pushes from) leaks into
+local work. Each command therefore reads **one** file:
+
+| Command | Reads | Owner (pinned by) |
+| --- | --- | --- |
+| `pnpm dev` | `.env.local` only (mode `dev-server`; any other dev-server mode is refused) | `plugins/dev-server-mode.ts` (`tests/ci/dev-server-env.policy.test.ts`) |
+| `pnpm build` in a terminal / `--env <env>` / `BUILD_ENVIRONMENT` | the chosen `.env.<env>` alone; `VITE_APP_ENV` filled from the choice, a mismatch refused | `tooling/ci/build.mjs`, `plugins/build-environment.ts` (`tests/ci/build-environment.policy.test.ts`) |
+| `pnpm build` unasked (scripts, hooks, `pnpm health`) | `.env.local` alone — clinozy-be's `local` default | same |
+| CI / deploy build (no `.env.local`) | Vite's own files: the materialized `.env.production.local` | same |
+| Vitest | none (`envDir` = `tooling/test/empty-env/`) | `tests/ci/env-hermetic.policy.test.ts` |
+
+Never layer `.env.local` over a deploy environment's file (clinozy-be does, safely — its
+`.env.local` never reaches a container; a FE build ships what it reads). Source maps go to
+Sentry only on request (`SENTRY_UPLOAD_SOURCEMAPS=true` from the deploy, or `--sentry`), read
+from the process env before any file loads (`tests/ci/sentry-upload.policy.test.ts`). Netlify
+never builds: every `netlify deploy` passes `--no-build` (`tests/ci/netlify-no-build.policy.test.ts`).
+Full table: `docs/deployment/runbooks/environment-variables.md`.
+
 ---
 
 ## Checklist — platform / env change
@@ -113,6 +134,8 @@ A desynced lockfile produces `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` on `pnpm instal
 - Adding env to `.env.example` without schema field
 - Skipping `knip` after deleting modules or dependencies
 - Duplicating env parsing outside `env.config.ts`
+- Starting the dev server with a bare `vite`, or a measuring/deploy build that silently mixes env files — use `pnpm dev` / `pnpm build --env <env>`
+- `netlify deploy` without `--no-build` (it rebuilds, and ships a bundle nobody validated)
 - Changing `package.json` deps / `pnpm-workspace.yaml` overrides without regenerating `pnpm-lock.yaml` (breaks frozen-install CI — see [Dependencies & the lockfile](#dependencies--the-lockfile))
 
 ---
@@ -153,9 +176,10 @@ pnpm test -- --run src/core/config/ src/lib/i18n/build-env.test.ts
 
 ## Browser verification
 
-- Use a dedicated E2E server with the intended local environment. Vite reserves
-  `--mode local`; `--mode e2e` loads `.env.local` without `.env.development` overrides.
-  Confirm the existing E2E hooks are enabled; never add a login bypass.
+- Use a dedicated E2E server with the intended local environment: `pnpm dev` (Vite mode
+  `dev-server`) reads `.env.local` and no deploy-env file; `vite.config.ts` refuses a dev
+  server in any other mode (`plugins/dev-server-mode.ts`). Confirm the existing E2E hooks are
+  enabled; never add a login bypass.
 - The backend must allow the exact frontend origin, including its port. A local
   refresh `403` is not proof of a frontend race. Inspect sanitized response codes
   and configuration; do not disable CSRF checks to make a test pass.

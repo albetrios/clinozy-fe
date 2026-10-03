@@ -91,7 +91,10 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 6. **Types** — extend `src/vite-env.d.ts` for new `VITE_*` keys if needed.
 7. **Tests** — colocated tests in `env-schema.test.ts`, `env-resolvers.test.ts`, or `platform-config.test.ts`.
 8. **Docs** — update `docs/deployment/runbooks/environment-variables.md` if operator-facing.
-9. **GitHub** — update local `.env.<environment>`; `pnpm github:sync <env> --dry-run`.
+9. **GitHub** — update local `.env.<environment>`; `pnpm github:sync <env> --dry-run`. A key with
+   a per-environment starting value goes in `envProfiles.<env>.defaults`: `pnpm setup:local`
+   writes `local`'s into a new `.env.local`, and `pnpm github:sync` writes `development`'s /
+   `production`'s into a new `.env.<env>` (existing files are never rewritten).
 10. **PR** — include "Environment variable changes" block in description.
 
 ## Remove or rename a key
