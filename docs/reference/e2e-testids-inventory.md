@@ -75,6 +75,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `upload-tray-remove`             | Failed file: Remove                                                           | UploadTray                                            |
 | `today-page`                     | Clinic room page: Today                                                       | `pages/organization/$organizationSlug/today/`         |
 | `leads-page`                     | Clinic room page: Leads                                                       | `pages/organization/$organizationSlug/leads/`         |
+| `new-lead-drawer`                | New lead drawer — `/leads/create` opens it over the list (L-35)               | `pages/organization/$organizationSlug/leads/`         |
+| `lead-drawer`                    | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                 | `pages/organization/$organizationSlug/leads/`         |
 | `appointments-page`              | Clinic room page: Appointments                                                | `pages/organization/$organizationSlug/appointments/`  |
 | `patients-page`                  | Clinic room page: Patients                                                    | `pages/organization/$organizationSlug/patients/`      |
 | `payments-page`                  | Clinic room page: Payments                                                    | `pages/organization/$organizationSlug/payments/`      |

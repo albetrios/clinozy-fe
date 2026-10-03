@@ -1,6 +1,13 @@
+import { createMemoryHistory, createRouter, isRedirect } from '@tanstack/react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requireOrgStatus, requireSuspendedOrgStatus } from '@/app/guards/org-gates.ts';
+import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
+import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
+import {
+  validateLeadCreateSearch,
+  validateLeadsSearch,
+} from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
@@ -389,5 +396,96 @@ describe('guard wiring in beforeLoad', () => {
       preload: false,
     });
     expect(requireAuth).toHaveBeenCalledWith(href);
+  });
+});
+
+describe('the Leads dialog routes (KICKOFF §4, D24, S:22–25)', () => {
+  const LEADS = '/organization/$organizationSlug/leads';
+  type LeadRoute = {
+    options: {
+      validateSearch?: unknown;
+      staticData?: { manifest?: unknown };
+      beforeLoad?: (context: Record<string, unknown>) => unknown;
+    };
+  };
+  const routeOf = (id: string) =>
+    (router.routesById as unknown as Record<string, LeadRoute | undefined>)[id];
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('registers New lead, the lead drawer and the edit redirect under the list', () => {
+    const children = Object.keys(router.routesById)
+      .filter((id) => id.startsWith(`${LEADS}/`))
+      .sort();
+    expect(children).toEqual([
+      `${LEADS}/$leadId`,
+      `${LEADS}/$leadId/edit`,
+      `${LEADS}/create`,
+    ]);
+  });
+
+  it('validates the list’s search on the list, and the New lead prefill on create', () => {
+    expect(routeOf(LEADS)?.options.validateSearch).toBe(validateLeadsSearch);
+    expect(routeOf(`${LEADS}/create`)?.options.validateSearch).toBe(
+      validateLeadCreateSearch,
+    );
+  });
+
+  it.each([
+    [`${LEADS}/create`, leadCreateManifest],
+    [`${LEADS}/$leadId`, leadManifest],
+  ] as const)(
+    '%s runs the room gateway on its own manifest, then the status guard',
+    async (id, manifest) => {
+      await beforeLoadOf(id)({
+        location: { href: '/organization/acme/leads/create' },
+        params: { organizationSlug: 'acme', leadId: 'L1' },
+        preload: false,
+      });
+      expect(gatewayFromManifest).toHaveBeenCalledWith(manifest);
+      expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
+      expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+      expect(routeOf(id)?.options.staticData?.manifest).toBe(manifest);
+    },
+  );
+
+  it('redirects the edit URL to the lead drawer, keeping the list’s search (S:25)', () => {
+    const thrown = (() => {
+      try {
+        routeOf(`${LEADS}/$leadId/edit`)?.options.beforeLoad?.({
+          params: { organizationSlug: 'acme', leadId: 'L1' },
+          search: { view: 'all' },
+          preload: false,
+        });
+      } catch (caught) {
+        return caught;
+      }
+      return null;
+    })();
+    expect(isRedirect(thrown)).toBe(true);
+    expect((thrown as { options: unknown }).options).toMatchObject({
+      to: `${LEADS}/$leadId`,
+      params: { organizationSlug: 'acme', leadId: 'L1' },
+      search: { view: 'all' },
+    });
+  });
+
+  it('lands a typed edit URL on the drawer URL through the real tree', async () => {
+    const memoryRouter = createRouter({
+      routeTree: router.routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/organization/acme/leads/L1/edit?view=all&status=new'],
+      }),
+    });
+    await memoryRouter.load();
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe('/organization/acme/leads/L1'),
+    );
+    expect(memoryRouter.state.location.search).toEqual({ view: 'all', status: 'new' });
+    expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(`${LEADS}/$leadId`);
   });
 });

@@ -1,2 +1,8 @@
 # One path fragment per line; optional #rule suffix to scope the exemption.
 # Example: src/pages/foo/FooPage.tsx #page-root
+
+# URL-driven dialog routes (KICKOFF §4, D24): the route renders nothing — the
+# parent list page reads the URL and opens the drawer its manifest's testId
+# names, so that id lives in the parent island, never in the route's own folder.
+src/pages/organization/$organizationSlug/leads/create/ #page-root
+src/pages/organization/$organizationSlug/leads/$leadId/ #page-root

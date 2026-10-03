@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~919 src files · ~501 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~929 src files · ~506 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -812,12 +812,29 @@ clinozy-fe/
 │   │       │   │   ├── DashboardPage.tsx
 │   │       │   │   └── [1 test file]
 │   │       │   ├── leads/
+│   │       │   │   ├── $leadId/
+│   │       │   │   │   ├── lead-id.manifest.ts
+│   │       │   │   │   ├── lead-id.route.tsx
+│   │       │   │   │   ├── LEAD_ID.OVERVIEW.md
+│   │       │   │   │   ├── LeadPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── create/
+│   │       │   │   │   ├── create.manifest.ts
+│   │       │   │   │   ├── CREATE.OVERVIEW.md
+│   │       │   │   │   ├── create.route.tsx
+│   │       │   │   │   ├── NewLeadPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── hooks/
+│   │       │   │   │   └── useLeadsDialogRoute/
 │   │       │   │   ├── leads.constants.ts
 │   │       │   │   ├── leads.manifest.ts
 │   │       │   │   ├── LEADS.OVERVIEW.md
 │   │       │   │   ├── leads.route.tsx
+│   │       │   │   ├── leads.search.ts
 │   │       │   │   ├── LeadsPage.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [2 test files]
 │   │       │   ├── medical/
 │   │       │   │   ├── sales/
 │   │       │   │   │   ├── sales.constants.ts
