@@ -49,6 +49,8 @@ describe('useEnsureContactThread', () => {
     });
     expect(new Set(ids).size).toBe(1);
     expect(invalidate).toHaveBeenCalledWith({ queryKey: taskQueryKeys.details() });
+    // The chat column's threads too: a patient's thread may have just opened.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['clinic', 'messages'] });
   });
 
   it('toasts a person it cannot identify', async () => {

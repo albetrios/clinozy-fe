@@ -63,7 +63,17 @@
       "invalid": "अमान्य",
       "lost": "खो गया"
     },
-    "retargeted": "री-टारगेट किया"
+    "retargeted": "री-टारगेट किया",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "सीधे आए",
+      "referral": "रेफ़रल",
+      "retarget": "री-टारगेट",
+      "phone_call": "फ़ोन कॉल"
+    }
   },
   "offerings": {
     "categories": {
@@ -302,5 +312,229 @@
     "open": "खोलें",
     "hint": "मरीज़, लीड और इनवॉइस खोजने के लिए 2+ अक्षर लिखें",
     "empty": "कोई मिलान नहीं। नाम, फ़ोन या #ID आज़माएँ।"
+  },
+  "appointmentStatuses": {
+    "scheduled": "तय",
+    "confirmed": "पुष्ट",
+    "checked_in": "चेक-इन हुआ",
+    "completed": "पूरा",
+    "cancelled": "रद्द",
+    "no_show": "नहीं आए"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "कॉल",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "ईमेल",
+    "note": "नोट"
+  },
+  "checkInFeels": {
+    "much_better": "काफ़ी बेहतर",
+    "better": "बेहतर",
+    "same": "वैसा ही",
+    "worse": "बदतर"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "वीडियो",
+    "instagram": "Instagram",
+    "internal_form": "फ़ीडबैक फ़ॉर्म",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "नकद",
+    "upi": "UPI",
+    "card": "कार्ड",
+    "credit": "क्रेडिट"
+  },
+  "invoiceTypes": {
+    "clinic": "क्लिनिक",
+    "medical": "मेडिकल",
+    "consultation": "परामर्श"
+  },
+  "taskOutcomes": {
+    "log_check_in": "चेक-इन दर्ज करें",
+    "doing_well": "ठीक हैं",
+    "no_answer": "जवाब नहीं मिला",
+    "happy": "संतुष्ट",
+    "done": "हो गया"
+  },
+  "chatColumn": {
+    "thread": "संदेश",
+    "separator": " · ",
+    "created": {
+      "lead": "लीड बनी · {{time}} · {{source}} से",
+      "patientThread": "मरीज़ · सिर्फ़ चैट · कोई लीड नहीं",
+      "contactThread": "संपर्क · सिर्फ़ चैट · कोई लीड नहीं"
+    },
+    "when": {
+      "today": "आज",
+      "tomorrow": "कल",
+      "yesterday": "बीता कल",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "अपॉइंटमेंट #{{seq}}",
+      "reminder": "रिमाइंडर भेजा",
+      "prescription": "पर्चा #{{seq}}",
+      "session": "सत्र {{session}}",
+      "invoice": "{{type}} इनवॉइस #{{seq}}",
+      "due": "{{amount}} बाकी",
+      "paid": "भुगतान हुआ",
+      "received": "{{amount}} मिले",
+      "refund": "{{amount}} लौटाए",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "हाल-चाल",
+      "score": "{{score}}/10",
+      "after": "{{context}} के बाद",
+      "review": "{{source}} रिव्यू",
+      "rating": "{{rating}}★",
+      "task": "काम · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "भेजा जा रहा है…",
+      "sent": "भेजा गया",
+      "delivered": "पहुँचा",
+      "read": "पढ़ा गया",
+      "queued": "कतार में",
+      "notSent": "नहीं भेजा गया",
+      "retry": "फिर कोशिश करें"
+    },
+    "sender": {
+      "call": "{{name}} · कॉल",
+      "note": "{{name}} · नोट"
+    },
+    "empty": {
+      "title": "अभी कोई बातचीत नहीं",
+      "visit": "{{first}} का {{service}} {{when}} {{time}} बजे है · एक छोटा WhatsApp स्लॉट पक्का रखता है",
+      "pastVisits": "{{first}} के साथ हर WhatsApp, कॉल और नोट यहाँ दिखता है",
+      "noVisits": "एक WhatsApp से शुरू करें · जवाब यहाँ आएँगे",
+      "today": "आज",
+      "tomorrow": "कल",
+      "onDate": "{{date}} को"
+    },
+    "starters": {
+      "onTheWay": "क्या आप रास्ते में हैं?",
+      "directions": "रास्ता भेजें",
+      "newTime": "नया समय सुझाएँ",
+      "confirm": "विज़िट पक्की करें",
+      "prep": "तैयारी के निर्देश",
+      "howItWent": "पूछें कैसा रहा",
+      "nextSession": "अगला सत्र बुक करें",
+      "offer": "ऑफ़र साझा करें",
+      "hello": "नमस्ते कहें",
+      "consultation": "परामर्श का प्रस्ताव दें"
+    },
+    "sendVia": "इससे भेजें",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "कॉल लॉग",
+      "note": "नोट"
+    },
+    "noInstagram": "इस संपर्क का Instagram नहीं है",
+    "message": "संदेश",
+    "placeholder": {
+      "message": "{{channel}} पर {{first}} को संदेश",
+      "messageNoName": "{{channel}} पर लीड को संदेश",
+      "note": "टीम के लिए नोट, {{first}} को नहीं भेजा जाएगा",
+      "noteNoName": "टीम के लिए नोट, लीड को नहीं भेजा जाएगा",
+      "call": "कॉल पर क्या हुआ?"
+    },
+    "send": {
+      "whatsapp": "WhatsApp भेजें",
+      "instagram": "Instagram भेजें",
+      "call": "कॉल दर्ज करें",
+      "note": "नोट जोड़ें"
+    },
+    "replyHint": "{{first}} ने आख़िरी बार यहीं लिखा",
+    "mismatch": "{{first}} ने {{channel}} पर लिखा · बदलें",
+    "outage": "WhatsApp बंद है · जवाब कतार में रहेंगे",
+    "prefersNoCalls": "कॉल नहीं चाहते · संदेश भेजें",
+    "prefersAfterSix": "शाम 6 बजे के बाद संपर्क पसंद है",
+    "suggest": "सुझाएँ",
+    "suggestions": "सुझाव",
+    "suggestHint": "सुझाव और टेम्पलेट · या / टाइप करें",
+    "book": "अपॉइंटमेंट बुक करें",
+    "bookHint": "अपॉइंटमेंट बुक करें · कारण उनके संदेश से",
+    "suggestedFor": "{{first}} के लिए सुझाव",
+    "closeSuggestions": "सुझाव बंद करें",
+    "templatesLabel": "टेम्पलेट · खोजने के लिए बॉक्स में / टाइप करें",
+    "noTemplate": "“{{query}}” से कोई टेम्पलेट मेल नहीं खाता",
+    "fillIn": "भरें",
+    "chips": {
+      "price": "कीमत बताएँ",
+      "priceHint": "उन्होंने कीमत पूछी",
+      "slots": "2 स्लॉट सुझाएँ",
+      "slotsHint": "उन्होंने समय पूछा",
+      "location": "लोकेशन भेजें",
+      "explain": "{{term}} समझाएँ",
+      "greet": "अभिवादन",
+      "followUp": "फ़ॉलो-अप"
+    },
+    "templates": {
+      "greeting": "अभिवादन",
+      "price": "कीमत",
+      "slots": "खाली स्लॉट",
+      "location": "लोकेशन",
+      "reminder": "रिमाइंडर",
+      "aftercare": "बाद की देखभाल",
+      "followUp": "फ़ॉलो-अप",
+      "review": "रिव्यू"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "नमस्ते {{first}}, हम {{time}} बजे आपके {{service}} के लिए तैयार हैं। क्या आप रास्ते में हैं?",
+        "directionsToday": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}। {{time}} बजे मिलते हैं!",
+        "newTime": "नमस्ते {{first}}, अगर आज {{time}} बजे का समय ठीक नहीं है, तो अपनी सुविधा का समय बताएँ, हम बदल देंगे।",
+        "confirm": "नमस्ते {{first}}, याद दिला दें: आपका {{service}} {{when}} {{time}} बजे है। पक्का करने के लिए हाँ लिखें।",
+        "prep": "नमस्ते {{first}}, {{when}} आपके {{service}} से पहले: बिना मेकअप के आएँ और 24 घंटे धूप से बचें। {{time}} बजे मिलते हैं!",
+        "directionsLater": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}। {{when}} {{time}} बजे मिलते हैं।",
+        "howItWent": "नमस्ते {{first}}, पिछली विज़िट के बाद आपकी त्वचा कैसी है? डॉक्टर के लिए कोई सवाल?",
+        "nextSession": "नमस्ते {{first}}, क्या आपका अगला सत्र बुक करें? अपनी सुविधा का दिन बताएँ।",
+        "offer": "नमस्ते {{first}}, इस महीने आपके नियमित ट्रीटमेंट पर खास ऑफ़र है। जानकारी चाहिए?",
+        "hello": "नमस्ते {{first}}, मैं {{clinic}} से {{me}} बोल रही/रहा हूँ। किसी भी मदद के लिए हाज़िर हूँ।",
+        "consultation": "नमस्ते {{first}}, हमारे डॉक्टर इस हफ़्ते आपसे मिल सकते हैं। क्या परामर्श बुक कर दूँ?",
+        "directions": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}।"
+      },
+      "templates": {
+        "greeting": "नमस्ते {{first}}, मैं {{clinic}} से {{me}} हूँ 😊 आज मैं आपकी क्या मदद कर सकती/सकता हूँ?",
+        "price": "{{offering}} की कीमत {{price}} है। इसमें डॉक्टर से परामर्श शामिल है। क्या आपकी बुकिंग कर दूँ?",
+        "priceSessions": "{{offering}} की कीमत {{sessions}} सत्रों के लिए {{price}} है। इसमें डॉक्टर से परामर्श शामिल है। क्या आपकी बुकिंग कर दूँ?",
+        "slots": "{{interest}} के लिए हमारे पास {{slots}} खाली हैं। आपको कौन-सा ठीक लगेगा?",
+        "location": "हम यहाँ हैं: {{address}} · Google Maps: {{maps}}। ठीक सामने पार्किंग उपलब्ध है।",
+        "reminder": "नमस्ते {{first}}, याद दिला दें: आपकी विज़िट {{dayTime}} है। पक्का करने के लिए हाँ लिखें या बेहतर समय बताएँ।",
+        "aftercare": "नमस्ते {{first}}, आज त्वचा कैसी है? इसे नम रखें, सनस्क्रीन लगाएँ और 48 घंटे स्क्रब से बचें।",
+        "followUp": "नमस्ते {{first}}, {{interest}} के बारे में हाल-चाल पूछना था। क्या इस हफ़्ते आपके लिए एक स्लॉट रख दूँ?",
+        "review": "आने के लिए धन्यवाद, {{first}}! अगर आपको अच्छा लगा, तो एक छोटा-सा Google रिव्यू हमारी बहुत मदद करेगा: {{reviewLink}}"
+      },
+      "explain": "अच्छा सवाल! {{offering}} इसके लिए अच्छा काम करता है — ज़्यादातर लोगों को {{results}} में असर दिखता है। डॉक्टर परामर्श में जाँचकर योजना बनाएँगे।",
+      "sessions": "{{n}} सत्रों",
+      "fewWeeks": "कुछ हफ़्तों",
+      "slotPair": "{{first}} या {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}} बजे",
+      "dayTimeFallback": "कल सुबह 11 बजे",
+      "today": "आज",
+      "tomorrow": "कल",
+      "onDate": "{{date}} को",
+      "there": "जी",
+      "yourTreatment": "आपका ट्रीटमेंट",
+      "interests": {
+        "clinical": "क्लिनिकल ट्रीटमेंट",
+        "peel": "पील",
+        "lhr": "LHR",
+        "hydrafacial": "हाइड्राफ़ेशियल",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "पता",
+        "maps": "मैप्स लिंक",
+        "dayTime": "दिन और समय",
+        "reviewLink": "रिव्यू लिंक"
+      }
+    }
   }
 }

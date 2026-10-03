@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~981 src files · ~534 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~998 src files · ~542 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -937,6 +937,7 @@ clinozy-fe/
 │   │   │   │   │   ├── contact-threads.fixtures.ts
 │   │   │   │   │   ├── leads.fixtures.ts
 │   │   │   │   │   ├── medical.fixtures.ts
+│   │   │   │   │   ├── messages.fixtures.ts
 │   │   │   │   │   ├── money.fixtures.ts
 │   │   │   │   │   ├── offerings.fixtures.ts
 │   │   │   │   │   ├── organization.fixtures.ts
@@ -968,6 +969,8 @@ clinozy-fe/
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-hold.ts
+│   │   │   │   ├── messages-api.ts
+│   │   │   │   ├── messages-contracts.ts
 │   │   │   │   ├── offerings-api.ts
 │   │   │   │   ├── offerings-contracts.ts
 │   │   │   │   ├── offerings-pricing.ts
@@ -977,7 +980,7 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [24 test files]
+│   │   │   │   └── [25 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1110,6 +1113,23 @@ clinozy-fe/
 │   │   │   │   ├── cells.constants.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── ChatColumn/
+│   │   │   │   ├── ChatComposer/
+│   │   │   │   │   ├── ChatComposer.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── ChatThread/
+│   │   │   │   │   ├── ChatThread.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── chat-column.constants.ts
+│   │   │   │   ├── chat-composer.ts
+│   │   │   │   ├── chat-drafts.ts
+│   │   │   │   ├── chat-format.ts
+│   │   │   │   ├── chat-history.ts
+│   │   │   │   ├── ChatColumn.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [4 test files]
 │   │   │   ├── CommandPalette/
 │   │   │   │   ├── clinic-command-groups.ts
 │   │   │   │   ├── command-palette-context.ts
@@ -1946,6 +1966,11 @@ clinozy-fe/
 │   │   │   ├── useTeam/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useTeam.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useThread/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── thread-outbox.ts
+│   │   │   │   ├── useThread.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useUnsavedChangesGuard/
 │   │   │   │   ├── index.ts

@@ -63,7 +63,17 @@
       "invalid": "Invalide",
       "lost": "Perdu"
     },
-    "retargeted": "Réactivé"
+    "retargeted": "Réactivé",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "Visite spontanée",
+      "referral": "Recommandation",
+      "retarget": "Relance",
+      "phone_call": "Appel téléphonique"
+    }
   },
   "offerings": {
     "categories": {
@@ -304,5 +314,229 @@
     "open": "ouvrir",
     "hint": "Tapez au moins 2 lettres pour rechercher des patients, des prospects et des factures",
     "empty": "Aucun résultat. Essayez un nom, un téléphone ou un #ID."
+  },
+  "appointmentStatuses": {
+    "scheduled": "Planifié",
+    "confirmed": "Confirmé",
+    "checked_in": "Arrivé",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "no_show": "Absent"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "Appel",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "E-mail",
+    "note": "Note"
+  },
+  "checkInFeels": {
+    "much_better": "Beaucoup mieux",
+    "better": "Mieux",
+    "same": "Pareil",
+    "worse": "Moins bien"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "Vidéo",
+    "instagram": "Instagram",
+    "internal_form": "Formulaire d’avis",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "Espèces",
+    "upi": "UPI",
+    "card": "Carte",
+    "credit": "Avoir"
+  },
+  "invoiceTypes": {
+    "clinic": "Clinique",
+    "medical": "Médical",
+    "consultation": "Consultation"
+  },
+  "taskOutcomes": {
+    "log_check_in": "Saisir un suivi",
+    "doing_well": "Va bien",
+    "no_answer": "Pas de réponse",
+    "happy": "Satisfait",
+    "done": "Terminé"
+  },
+  "chatColumn": {
+    "thread": "Messages",
+    "separator": " · ",
+    "created": {
+      "lead": "Prospect créé · {{time}} · via {{source}}",
+      "patientThread": "Patient · chat uniquement · pas de prospect",
+      "contactThread": "Contact · chat uniquement · pas de prospect"
+    },
+    "when": {
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain",
+      "yesterday": "Hier",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "Rendez-vous #{{seq}}",
+      "reminder": "Rappel envoyé",
+      "prescription": "Ordonnance #{{seq}}",
+      "session": "séance {{session}}",
+      "invoice": "Facture ({{type}}) #{{seq}}",
+      "due": "{{amount}} dû",
+      "paid": "Payée",
+      "received": "{{amount}} reçu",
+      "refund": "Remboursement {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "Suivi",
+      "score": "{{score}}/10",
+      "after": "après {{context}}",
+      "review": "Avis {{source}}",
+      "rating": "{{rating}}★",
+      "task": "Tâche · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "Envoi…",
+      "sent": "Envoyé",
+      "delivered": "Distribué",
+      "read": "Lu",
+      "queued": "En attente",
+      "notSent": "Non envoyé",
+      "retry": "Réessayer"
+    },
+    "sender": {
+      "call": "{{name}} · appel",
+      "note": "{{name}} · note"
+    },
+    "empty": {
+      "title": "Pas encore de conversation",
+      "visit": "Le {{service}} de {{first}} est {{when}} à {{time}} · un petit WhatsApp garde le créneau",
+      "pastVisits": "Tous les WhatsApp, appels et notes avec {{first}} apparaissent ici",
+      "noVisits": "Commencez par un WhatsApp · les réponses arrivent ici",
+      "today": "aujourd’hui",
+      "tomorrow": "demain",
+      "onDate": "le {{date}}"
+    },
+    "starters": {
+      "onTheWay": "Êtes-vous en route ?",
+      "directions": "Envoyer l’itinéraire",
+      "newTime": "Proposer un autre horaire",
+      "confirm": "Confirmer la visite",
+      "prep": "Consignes de préparation",
+      "howItWent": "Demander comment ça s’est passé",
+      "nextSession": "Réserver la prochaine séance",
+      "offer": "Partager une offre",
+      "hello": "Dire bonjour",
+      "consultation": "Proposer une consultation"
+    },
+    "sendVia": "Envoyer via",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "Journal d’appel",
+      "note": "Note"
+    },
+    "noInstagram": "Pas d’Instagram pour ce contact",
+    "message": "Message",
+    "placeholder": {
+      "message": "Message à {{first}} sur {{channel}}",
+      "messageNoName": "Message au prospect sur {{channel}}",
+      "note": "Note pour l’équipe, non envoyée à {{first}}",
+      "noteNoName": "Note pour l’équipe, non envoyée au prospect",
+      "call": "Que s’est-il passé pendant l’appel ?"
+    },
+    "send": {
+      "whatsapp": "Envoyer WhatsApp",
+      "instagram": "Envoyer Instagram",
+      "call": "Consigner l’appel",
+      "note": "Ajouter une note"
+    },
+    "replyHint": "{{first}} a écrit ici en dernier",
+    "mismatch": "{{first}} a écrit sur {{channel}} · Changer",
+    "outage": "WhatsApp en panne · les réponses seront mises en attente",
+    "prefersNoCalls": "Préfère ne pas être appelé · écrivez plutôt",
+    "prefersAfterSix": "Préfère être contacté après 18 h",
+    "suggest": "Suggérer",
+    "suggestions": "Suggestions",
+    "suggestHint": "Suggestions et modèles · ou tapez /",
+    "book": "Prendre un rendez-vous",
+    "bookHint": "Prendre un rendez-vous · motif tiré de son message",
+    "suggestedFor": "Suggestions pour {{first}}",
+    "closeSuggestions": "Fermer les suggestions",
+    "templatesLabel": "Modèles · tapez / dans le champ pour chercher",
+    "noTemplate": "Aucun modèle ne correspond à « {{query}} »",
+    "fillIn": "Compléter",
+    "chips": {
+      "price": "Donner le prix",
+      "priceHint": "A demandé le prix",
+      "slots": "Proposer 2 créneaux",
+      "slotsHint": "A demandé un horaire",
+      "location": "Envoyer l’adresse",
+      "explain": "Expliquer {{term}}",
+      "greet": "Saluer",
+      "followUp": "Relancer"
+    },
+    "templates": {
+      "greeting": "Accueil",
+      "price": "Prix",
+      "slots": "Créneaux libres",
+      "location": "Adresse",
+      "reminder": "Rappel",
+      "aftercare": "Soins après séance",
+      "followUp": "Relance",
+      "review": "Avis"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "Bonjour {{first}}, nous sommes prêts pour votre {{service}} à {{time}}. Êtes-vous en route ?",
+        "directionsToday": "Bonjour {{first}}, voici l’adresse de la clinique : {{maps}}. À {{time}} !",
+        "newTime": "Bonjour {{first}}, si {{time}} ne vous convient pas aujourd’hui, répondez avec un horaire qui vous arrange et nous le déplacerons.",
+        "confirm": "Bonjour {{first}}, un rappel de votre {{service}} {{when}} à {{time}}. Répondez Oui pour confirmer.",
+        "prep": "Bonjour {{first}}, avant votre {{service}} {{when}} : venez sans maquillage et évitez le soleil pendant 24 heures. À {{time}} !",
+        "directionsLater": "Bonjour {{first}}, voici l’adresse de la clinique : {{maps}}. Nous vous attendons {{when}} à {{time}}.",
+        "howItWent": "Bonjour {{first}}, comment va votre peau depuis la dernière visite ? Des questions pour le médecin ?",
+        "nextSession": "Bonjour {{first}}, on réserve votre prochaine séance ? Répondez avec un jour qui vous convient.",
+        "offer": "Bonjour {{first}}, nous avons une offre sur votre soin habituel ce mois-ci. Voulez-vous les détails ?",
+        "hello": "Bonjour {{first}}, ici {{me}} de {{clinic}}. Je suis là pour vous aider.",
+        "consultation": "Bonjour {{first}}, notre médecin peut vous recevoir cette semaine. Je réserve une consultation ?",
+        "directions": "Bonjour {{first}}, voici l’adresse de la clinique : {{maps}}."
+      },
+      "templates": {
+        "greeting": "Bonjour {{first}}, ici {{me}} de {{clinic}} 😊 Comment puis-je vous aider aujourd’hui ?",
+        "price": "{{offering}} coûte {{price}}. Une consultation avec le médecin est incluse. Je vous inscris ?",
+        "priceSessions": "{{offering}} coûte {{price}} pour {{sessions}} séances. Une consultation avec le médecin est incluse. Je vous inscris ?",
+        "slots": "Nous avons {{slots}} de libre pour {{interest}}. Qu’est-ce qui vous convient ?",
+        "location": "Nous sommes au {{address}} · Google Maps : {{maps}}. Un parking est disponible juste devant.",
+        "reminder": "Bonjour {{first}}, un rappel de votre visite {{dayTime}}. Répondez Oui pour confirmer ou indiquez-nous un meilleur horaire.",
+        "aftercare": "Bonjour {{first}}, comment va la peau aujourd’hui ? Gardez-la hydratée, mettez de la crème solaire et évitez les gommages pendant 48 heures.",
+        "followUp": "Bonjour {{first}}, je reviens vers vous au sujet de {{interest}}. Voulez-vous que je vous réserve un créneau cette semaine ?",
+        "review": "Merci de votre visite, {{first}} ! Si vous avez aimé, un petit avis Google nous aide beaucoup : {{reviewLink}}"
+      },
+      "explain": "Bonne question ! {{offering}} fonctionne bien pour cela — la plupart des gens voient des résultats en {{results}}. Le médecin vérifiera et planifiera tout lors de votre consultation.",
+      "sessions": "{{n}} séances",
+      "fewWeeks": "quelques semaines",
+      "slotPair": "{{first}} ou {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} à {{time}}",
+      "dayTimeFallback": "demain à 11 h",
+      "today": "aujourd’hui",
+      "tomorrow": "demain",
+      "onDate": "le {{date}}",
+      "there": "à vous",
+      "yourTreatment": "votre soin",
+      "interests": {
+        "clinical": "Soin clinique",
+        "peel": "Peeling",
+        "lhr": "LHR",
+        "hydrafacial": "Hydrafacial",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "adresse",
+        "maps": "lien Maps",
+        "dayTime": "jour et heure",
+        "reviewLink": "lien d’avis"
+      }
+    }
   }
 }

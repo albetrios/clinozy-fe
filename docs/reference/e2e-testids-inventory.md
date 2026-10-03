@@ -250,19 +250,19 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 
 Rendered inside any room; scope them to the room's own container in a spec.
 
-| Test ID                                                                               | Element                                                              | Source                                        |
-| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
-| `empty-state`                                                                         | Empty-state root (`data-tone` on the illustrated room variant)       | `shared/components/EmptyState/EmptyState.tsx` |
-| `empty-state-illustration`                                                            | 96px dashed-ring illustration (room tone)                            | `shared/components/EmptyState/EmptyState.tsx` |
-| `empty-state-action`                                                                  | 36px primary create action (`EmptyStateAction`)                      | `shared/components/EmptyState/EmptyState.tsx` |
-| `empty-state-clear-filters`                                                           | "Clear filters" in the filtered empty state                          | `shared/components/EmptyState/EmptyState.tsx` |
-| `contact-card`                                                                        | Contact card (`role="dialog"`, "Contact")                            | `shared/components/PersonCard/ContactCard/`   |
-| `contact-card-open-file`                                                              | Patient name → patient file                                          | `shared/components/PersonCard/ContactCard/`   |
-| `contact-card-edit` · `contact-card-change` · `contact-card-claim`                    | Edit contact · Change contact (forms) · "Open · Claim"               | `shared/components/PersonCard/ContactCard/`   |
-| `contact-card-new-lead` · `contact-card-new-appointment` · `contact-card-new-patient` | Footer "+ Lead" · "+ Appointment" · "+ Patient"                      | `shared/components/PersonCard/ContactCard/`   |
-| `team-card` · `team-card-assign`                                                      | Team card (`role="dialog"`, named by the member) · its assign button | `shared/components/PersonCard/TeamCard/`      |
-| `skeleton-rows` · `skeleton-row`                                                      | Flat skeleton block · one placeholder row                            | `shared/components/SkeletonRows/`             |
-| `patient-badge` · `avatar-stack-more`                                                 | The "P" patient badge · an avatar stack's "+N" pill                  | `shared/components/Cells/`                    |
+| Test ID                                                                               | Element                                                                                                  | Source                                        |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `empty-state`                                                                         | Empty-state root (`data-tone` on the illustrated room variant; `data-variant="card"` on the dashed card) | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-illustration`                                                            | 96px dashed-ring illustration (room tone)                                                                | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-action`                                                                  | 36px primary create action (`EmptyStateAction`)                                                          | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-clear-filters`                                                           | "Clear filters" in the filtered empty state                                                              | `shared/components/EmptyState/EmptyState.tsx` |
+| `contact-card`                                                                        | Contact card (`role="dialog"`, "Contact")                                                                | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-open-file`                                                              | Patient name → patient file                                                                              | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-edit` · `contact-card-change` · `contact-card-claim`                    | Edit contact · Change contact (forms) · "Open · Claim"                                                   | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-new-lead` · `contact-card-new-appointment` · `contact-card-new-patient` | Footer "+ Lead" · "+ Appointment" · "+ Patient"                                                          | `shared/components/PersonCard/ContactCard/`   |
+| `team-card` · `team-card-assign`                                                      | Team card (`role="dialog"`, named by the member) · its assign button                                     | `shared/components/PersonCard/TeamCard/`      |
+| `skeleton-rows` · `skeleton-row`                                                      | Flat skeleton block · one placeholder row                                                                | `shared/components/SkeletonRows/`             |
+| `patient-badge` · `avatar-stack-more`                                                 | The "P" patient badge · an avatar stack's "+N" pill                                                      | `shared/components/Cells/`                    |
 
 ---
 
@@ -391,3 +391,28 @@ an `ItemsField`; the screen passes its own root id (`testId`, e.g. `invoice-item
 | `prescription-print`       | A4 prescription sheet                                                            | `shared/components/PrintTemplate/PrescriptionPrint/` |
 | `prescription-print-items` | Medicines & Dosage table                                                         | `shared/components/PrintTemplate/PrescriptionPrint/` |
 | `print-footer`             | Sheet footer: thank-you line, branch phone, GSTIN                                | `shared/components/PrintTemplate/PrintTemplate.tsx`  |
+
+## Chat column (shared, launch L-34)
+
+The conversation column of the lead drawer and the patient file (`shared/components/ChatColumn/`).
+Scope a spec to `chat-column` — a room can show one beside its list.
+
+| Test ID                                     | Element                                                                                                           | Source                      |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `chat-column`                               | Column root (`<section>`, named by the contact)                                                                   | `ChatColumn/ChatColumn.tsx` |
+| `chat-column-header`                        | Contact header: avatar, name, phone, contact-card trigger                                                         | `ChatColumn/ChatColumn.tsx` |
+| `chat-thread`                               | Thread (`role="log"`, "Messages"), newest at the bottom                                                           | `ChatColumn/ChatThread/`    |
+| `chat-thread-divider`                       | "Lead created · … · via …" / "Patient · chat only · no lead"                                                      | `ChatColumn/ChatThread/`    |
+| `chat-history-chip`                         | One contact-history line (a button when the host opens records)                                                   | `ChatColumn/ChatThread/`    |
+| `chat-system-line`                          | System line ("Status → Contacted (first reply)")                                                                  | `ChatColumn/ChatThread/`    |
+| `chat-bubble`                               | One message (`data-kind`: `in` · `out` · `call` · `note`)                                                         | `ChatColumn/ChatThread/`    |
+| `chat-bubble-retry`                         | "Retry" beside "Not sent"                                                                                         | `ChatColumn/ChatThread/`    |
+| `chat-starter`                              | One starter chip in the empty card (`empty-state`, `data-variant="card"`)                                         | `ChatColumn/ChatThread/`    |
+| `chat-composer`                             | Composer (`data-mode` = the selected tab)                                                                         | `ChatColumn/ChatComposer/`  |
+| `chat-modes` · `chat-mode-<mode>`           | "Send via" tab list · one tab (`whatsapp` · `instagram` · `call` · `note`)                                        | `ChatColumn/ChatComposer/`  |
+| `chat-textarea` · `chat-send`               | Message box · its Send button                                                                                     | `ChatColumn/ChatComposer/`  |
+| `chat-suggest` · `chat-book`                | Suggestions toggle · "Book an appointment"                                                                        | `ChatColumn/ChatComposer/`  |
+| `chat-suggestions` · `chat-suggestion-chip` | Suggestions popover (`role="dialog"`) · one smart suggestion                                                      | `ChatColumn/ChatComposer/`  |
+| `chat-template-<kind>`                      | One template row (`greeting` · `price` · `slots` · `location` · `reminder` · `aftercare` · `followUp` · `review`) | `ChatColumn/ChatComposer/`  |
+| `chat-fill-in`                              | "Fill in" row for a picked template's placeholders                                                                | `ChatColumn/ChatComposer/`  |
+| `chat-mode-mismatch`                        | "Anaya wrote on Instagram · Switch" (the contact wrote on another channel)                                        | `ChatColumn/ChatComposer/`  |

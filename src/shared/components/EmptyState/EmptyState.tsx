@@ -30,6 +30,12 @@ export interface EmptyStateProps {
    * "Clear filters" button that calls this (KICKOFF §6.0 Filtered empty).
    */
   onClearFilters?: () => void;
+  /**
+   * `card`: the dashed card a thread shows before its first message (KICKOFF
+   * §3.5 Chat column › Empty) — a 12.5px title, a 12px line and the actions
+   * in a wrapping, centred row of chips. Without it, the room or plain look.
+   */
+  variant?: 'card';
 }
 
 /** The design's 36px primary empty-state button, a 14px `Plus` before the label by default. */
@@ -55,12 +61,43 @@ export function EmptyStateAction({
   );
 }
 
+/** The dashed card variant: title, line and a centred, wrapping row of chips. */
+function EmptyStateCard({
+  title,
+  description,
+  action,
+  className,
+}: Pick<EmptyStateProps, 'description' | 'action' | 'className'> & { title: string }) {
+  return (
+    <div
+      data-testid="empty-state"
+      data-variant="card"
+      className={cn(
+        'border-border-strong bg-card flex flex-col items-center gap-2.5 rounded-xl border border-dashed px-3.5 py-4.5 text-center',
+        className,
+      )}
+    >
+      <h3 className="text-detail text-foreground-soft leading-[1.3] font-semibold">
+        {title}
+      </h3>
+      {description ? (
+        <p className="text-muted-foreground text-xs leading-[1.45] text-pretty">
+          {description}
+        </p>
+      ) : null}
+      {action ? (
+        <div className="flex flex-wrap justify-center gap-1.5 pt-0.5">{action}</div>
+      ) : null}
+    </div>
+  );
+}
+
 /**
  * Centered empty-state for lists/panels with no data yet (no members, no roles,
  * empty search). Pairs with `Skeleton` (loading) and the route error boundary
  * (error) to make every data surface cover loading / empty / error. With a
  * `tone` it is the clinic rooms' illustrated empty state; with
- * `onClearFilters` it is the filtered one.
+ * `onClearFilters` it is the filtered one; `variant="card"` is a thread's dashed starter card.
  */
 export function EmptyState({
   icon,
@@ -70,8 +107,19 @@ export function EmptyState({
   className,
   tone,
   onClearFilters,
+  variant,
 }: EmptyStateProps) {
   const { t } = useTranslation(EMPTY_STATE_NS);
+  if (variant === 'card') {
+    return (
+      <EmptyStateCard
+        title={title ?? t(EMPTY_STATE_KEYS.fallbackTitle)}
+        description={description}
+        action={action}
+        className={className}
+      />
+    );
+  }
   const filtered = onClearFilters !== undefined;
   const shownIcon = filtered ? <Search /> : icon;
   const shownTitle = filtered

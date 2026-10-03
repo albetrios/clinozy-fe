@@ -1,4 +1,9 @@
-import type { Role, Section, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  AppointmentStatus,
+  Role,
+  Section,
+  Tone,
+} from '@/shared/api/clinic/clinic-schema.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
@@ -28,6 +33,19 @@ export const ROLE_TONES: Readonly<Record<Role, Tone>> = {
   accountant: 'peach',
   owner: 'slate',
   marketing: 'plum',
+};
+
+/**
+ * Each appointment status's tone (`AP_ST`, H:3420): Scheduled butter, Confirmed
+ * sky, Checked in lav, Completed sage, Cancelled stone, No show blush.
+ */
+export const APPOINTMENT_STATUS_TONES: Readonly<Record<AppointmentStatus, Tone>> = {
+  scheduled: 'butter',
+  confirmed: 'sky',
+  checked_in: 'lav',
+  completed: 'sage',
+  cancelled: 'stone',
+  no_show: 'blush',
 };
 
 /** The utility classes one tone paints with. */

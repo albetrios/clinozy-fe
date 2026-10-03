@@ -64,6 +64,72 @@ export const CLINIC_KEYS = {
      * (D22, `S:1066, 1100`); `clinicLeadStatusKey` picks it.
      */
     retargeted: 'leads.retargeted',
+    /**
+     * Where a lead came from — the contract's seven and the plan's "Phone call"
+     * (`LEAD_RECORD_SOURCE_VALUES`): the chat column's "via <source>" line.
+     */
+    sources: {
+      instagram: 'leads.sources.instagram',
+      google: 'leads.sources.google',
+      whatsapp: 'leads.sources.whatsapp',
+      facebook: 'leads.sources.facebook',
+      walk_in: 'leads.sources.walk_in',
+      referral: 'leads.sources.referral',
+      retarget: 'leads.sources.retarget',
+      phone_call: 'leads.sources.phone_call',
+    },
+  },
+  /**
+   * The contract's enum labels the rooms share (`schema-routes.md` › Enums,
+   * labels verbatim): what the chat column's history and the rooms' pills
+   * name a stored value.
+   */
+  appointmentStatuses: {
+    scheduled: 'appointmentStatuses.scheduled',
+    confirmed: 'appointmentStatuses.confirmed',
+    checked_in: 'appointmentStatuses.checked_in',
+    completed: 'appointmentStatuses.completed',
+    cancelled: 'appointmentStatuses.cancelled',
+    no_show: 'appointmentStatuses.no_show',
+  },
+  channels: {
+    whatsapp: 'channels.whatsapp',
+    call: 'channels.call',
+    sms: 'channels.sms',
+    instagram: 'channels.instagram',
+    email: 'channels.email',
+    note: 'channels.note',
+  },
+  checkInFeels: {
+    much_better: 'checkInFeels.much_better',
+    better: 'checkInFeels.better',
+    same: 'checkInFeels.same',
+    worse: 'checkInFeels.worse',
+  },
+  reviewSources: {
+    google: 'reviewSources.google',
+    video: 'reviewSources.video',
+    instagram: 'reviewSources.instagram',
+    internal_form: 'reviewSources.internal_form',
+    whatsapp: 'reviewSources.whatsapp',
+  },
+  paymentModes: {
+    cash: 'paymentModes.cash',
+    upi: 'paymentModes.upi',
+    card: 'paymentModes.card',
+    credit: 'paymentModes.credit',
+  },
+  invoiceTypes: {
+    clinic: 'invoiceTypes.clinic',
+    medical: 'invoiceTypes.medical',
+    consultation: 'invoiceTypes.consultation',
+  },
+  taskOutcomes: {
+    log_check_in: 'taskOutcomes.log_check_in',
+    doing_well: 'taskOutcomes.doing_well',
+    no_answer: 'taskOutcomes.no_answer',
+    happy: 'taskOutcomes.happy',
+    done: 'taskOutcomes.done',
   },
   /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and

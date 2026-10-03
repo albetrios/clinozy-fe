@@ -63,7 +63,17 @@
       "invalid": "유효하지 않음",
       "lost": "이탈"
     },
-    "retargeted": "재타깃팅"
+    "retargeted": "재타깃팅",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "직접 방문",
+      "referral": "추천",
+      "retarget": "재방문 유도",
+      "phone_call": "전화"
+    }
   },
   "offerings": {
     "categories": {
@@ -300,5 +310,229 @@
     "open": "열기",
     "hint": "환자, 리드, 청구서를 검색하려면 2글자 이상 입력하세요",
     "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 #ID로 검색해 보세요."
+  },
+  "appointmentStatuses": {
+    "scheduled": "예약됨",
+    "confirmed": "확정",
+    "checked_in": "내원 확인",
+    "completed": "완료",
+    "cancelled": "취소",
+    "no_show": "노쇼"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "전화",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "이메일",
+    "note": "메모"
+  },
+  "checkInFeels": {
+    "much_better": "훨씬 좋아짐",
+    "better": "좋아짐",
+    "same": "비슷함",
+    "worse": "나빠짐"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "동영상",
+    "instagram": "Instagram",
+    "internal_form": "피드백 양식",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "현금",
+    "upi": "UPI",
+    "card": "카드",
+    "credit": "적립금"
+  },
+  "invoiceTypes": {
+    "clinic": "클리닉",
+    "medical": "약국",
+    "consultation": "상담"
+  },
+  "taskOutcomes": {
+    "log_check_in": "경과 기록",
+    "doing_well": "잘 지냄",
+    "no_answer": "응답 없음",
+    "happy": "만족",
+    "done": "완료"
+  },
+  "chatColumn": {
+    "thread": "메시지",
+    "separator": " · ",
+    "created": {
+      "lead": "리드 생성 · {{time}} · {{source}} 경유",
+      "patientThread": "환자 · 채팅만 · 리드 없음",
+      "contactThread": "연락처 · 채팅만 · 리드 없음"
+    },
+    "when": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "예약 #{{seq}}",
+      "reminder": "알림 발송됨",
+      "prescription": "처방 #{{seq}}",
+      "session": "{{session}}회차",
+      "invoice": "{{type}} 청구서 #{{seq}}",
+      "due": "{{amount}} 미납",
+      "paid": "결제 완료",
+      "received": "{{amount}} 수납",
+      "refund": "{{amount}} 환불",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "경과 확인",
+      "score": "{{score}}/10",
+      "after": "{{context}} 후",
+      "review": "{{source}} 리뷰",
+      "rating": "{{rating}}★",
+      "task": "할 일 · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "보내는 중…",
+      "sent": "보냄",
+      "delivered": "전달됨",
+      "read": "읽음",
+      "queued": "대기 중",
+      "notSent": "보내지 못함",
+      "retry": "다시 시도"
+    },
+    "sender": {
+      "call": "{{name}} · 전화",
+      "note": "{{name}} · 메모"
+    },
+    "empty": {
+      "title": "아직 대화가 없습니다",
+      "visit": "{{first}}님의 {{service}} 예약은 {{when}} {{time}}입니다 · WhatsApp을 짧게 보내 두면 예약이 유지됩니다",
+      "pastVisits": "{{first}}님과의 모든 WhatsApp, 전화, 메모가 여기에 표시됩니다",
+      "noVisits": "WhatsApp으로 시작하세요 · 답장은 여기에 표시됩니다",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "onDate": "{{date}}"
+    },
+    "starters": {
+      "onTheWay": "오시는 중인가요?",
+      "directions": "오시는 길 보내기",
+      "newTime": "다른 시간 제안",
+      "confirm": "방문 확인",
+      "prep": "사전 안내",
+      "howItWent": "경과 묻기",
+      "nextSession": "다음 회차 예약",
+      "offer": "혜택 안내",
+      "hello": "인사하기",
+      "consultation": "상담 제안"
+    },
+    "sendVia": "보낼 채널",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "통화 기록",
+      "note": "메모"
+    },
+    "noInstagram": "이 연락처에는 Instagram이 없습니다",
+    "message": "메시지",
+    "placeholder": {
+      "message": "{{channel}}으로 {{first}}님에게 메시지",
+      "messageNoName": "{{channel}}으로 리드에게 메시지",
+      "note": "팀 메모 ({{first}}님에게는 보내지 않음)",
+      "noteNoName": "팀 메모 (리드에게는 보내지 않음)",
+      "call": "통화 내용은 무엇이었나요?"
+    },
+    "send": {
+      "whatsapp": "WhatsApp 보내기",
+      "instagram": "Instagram 보내기",
+      "call": "통화 기록",
+      "note": "메모 추가"
+    },
+    "replyHint": "{{first}}님이 마지막으로 연락한 채널",
+    "mismatch": "{{first}}님은 {{channel}}으로 연락 · 전환",
+    "outage": "WhatsApp 장애 · 답장은 대기열에 쌓입니다",
+    "prefersNoCalls": "전화 원치 않음 · 메시지로 연락",
+    "prefersAfterSix": "오후 6시 이후 연락 선호",
+    "suggest": "제안",
+    "suggestions": "제안",
+    "suggestHint": "제안 및 템플릿 · 또는 / 입력",
+    "book": "예약하기",
+    "bookHint": "예약하기 · 사유는 메시지에서",
+    "suggestedFor": "{{first}}님을 위한 제안",
+    "closeSuggestions": "제안 닫기",
+    "templatesLabel": "템플릿 · 입력란에 / 를 입력해 검색",
+    "noTemplate": "“{{query}}”와 일치하는 템플릿이 없습니다",
+    "fillIn": "채우기",
+    "chips": {
+      "price": "가격 안내",
+      "priceHint": "가격을 문의함",
+      "slots": "2개 시간 제안",
+      "slotsHint": "시간을 문의함",
+      "location": "위치 보내기",
+      "explain": "{{term}} 설명",
+      "greet": "인사",
+      "followUp": "후속 연락"
+    },
+    "templates": {
+      "greeting": "인사",
+      "price": "가격",
+      "slots": "빈 시간",
+      "location": "위치",
+      "reminder": "알림",
+      "aftercare": "사후 관리",
+      "followUp": "후속 연락",
+      "review": "리뷰"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "{{first}}님, 안녕하세요. {{time}} {{service}} 준비가 되어 있습니다. 오시는 중인가요?",
+        "directionsToday": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}. {{time}}에 뵙겠습니다!",
+        "newTime": "{{first}}님, 안녕하세요. 오늘 {{time}}이 어려우시면 편하신 시간을 답장해 주세요. 옮겨 드리겠습니다.",
+        "confirm": "{{first}}님, 안녕하세요. {{when}} {{time}} {{service}} 예약 알림입니다. 확인하시려면 \"네\"라고 답장해 주세요.",
+        "prep": "{{first}}님, 안녕하세요. {{when}} {{service}} 전에: 화장하지 않고 오시고 24시간 동안 햇빛을 피해 주세요. {{time}}에 뵙겠습니다!",
+        "directionsLater": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}. {{when}} {{time}}에 뵙겠습니다.",
+        "howItWent": "{{first}}님, 안녕하세요. 지난 방문 후 피부 상태는 어떠신가요? 원장님께 궁금한 점이 있으신가요?",
+        "nextSession": "{{first}}님, 안녕하세요. 다음 회차를 예약해 드릴까요? 편하신 날짜를 답장해 주세요.",
+        "offer": "{{first}}님, 안녕하세요. 이번 달 평소 받으시는 시술에 특별 혜택이 있습니다. 자세히 알려 드릴까요?",
+        "hello": "{{first}}님, 안녕하세요. {{clinic}}의 {{me}}입니다. 필요하신 것이 있으면 무엇이든 도와드리겠습니다.",
+        "consultation": "{{first}}님, 안녕하세요. 이번 주에 원장님 진료가 가능합니다. 상담을 예약해 드릴까요?",
+        "directions": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}."
+      },
+      "templates": {
+        "greeting": "{{first}}님, 안녕하세요. {{clinic}}의 {{me}}입니다 😊 오늘 무엇을 도와드릴까요?",
+        "price": "{{offering}}은(는) {{price}}입니다. 원장님 상담이 포함됩니다. 예약해 드릴까요?",
+        "priceSessions": "{{offering}}은(는) {{sessions}}회에 {{price}}입니다. 원장님 상담이 포함됩니다. 예약해 드릴까요?",
+        "slots": "{{interest}} 예약은 {{slots}}에 가능합니다. 어느 시간이 편하신가요?",
+        "location": "저희 위치는 {{address}}입니다 · Google 지도: {{maps}}. 바로 앞에 주차하실 수 있습니다.",
+        "reminder": "{{first}}님, 안녕하세요. {{dayTime}} 방문 알림입니다. 확인하시려면 \"네\"라고 답장하시거나 더 편한 시간을 알려 주세요.",
+        "aftercare": "{{first}}님, 안녕하세요. 오늘 피부 상태는 어떠신가요? 보습을 유지하고 자외선 차단제를 바르며 48시간 동안 스크럽은 피해 주세요.",
+        "followUp": "{{first}}님, 안녕하세요. {{interest}} 관련해 연락드렸습니다. 이번 주에 시간을 잡아 둘까요?",
+        "review": "{{first}}님, 방문해 주셔서 감사합니다! 만족하셨다면 짧은 Google 리뷰가 큰 도움이 됩니다: {{reviewLink}}"
+      },
+      "explain": "좋은 질문입니다! {{offering}}이(가) 이에 효과적이며, 대부분 {{results}} 안에 효과를 보십니다. 상담 때 원장님이 확인하고 계획을 세워 드립니다.",
+      "sessions": "{{n}}회",
+      "fewWeeks": "몇 주",
+      "slotPair": "{{first}} 또는 {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}}",
+      "dayTimeFallback": "내일 오전 11시",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "onDate": "{{date}}",
+      "there": "고객",
+      "yourTreatment": "원하시는 시술",
+      "interests": {
+        "clinical": "피부과 치료",
+        "peel": "필링",
+        "lhr": "레이저 제모",
+        "hydrafacial": "하이드라페이셜",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "주소",
+        "maps": "지도 링크",
+        "dayTime": "날짜와 시간",
+        "reviewLink": "리뷰 링크"
+      }
+    }
   }
 }

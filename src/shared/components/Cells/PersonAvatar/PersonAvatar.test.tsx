@@ -65,6 +65,14 @@ describe('PersonAvatar', () => {
     );
   });
 
+  it('sizes the chat header avatar at 34px with the 14px badge (H:1830)', () => {
+    const { container } = render(
+      <PersonAvatar initials="DG" tone="sage" size="header" patient />,
+    );
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-8.5');
+    expect(screen.getByTestId('patient-badge')).toHaveClass('size-3.5');
+  });
+
   it('paints an offline dot in border-strong', () => {
     const { container } = render(
       <PersonAvatar initials="NK" tone="lav" presence="offline" />,

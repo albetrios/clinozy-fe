@@ -63,7 +63,17 @@
       "invalid": "无效",
       "lost": "流失"
     },
-    "retargeted": "重新触达"
+    "retargeted": "重新触达",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "到店咨询",
+      "referral": "推荐",
+      "retarget": "再营销",
+      "phone_call": "电话"
+    }
   },
   "offerings": {
     "categories": {
@@ -300,5 +310,229 @@
     "open": "打开",
     "hint": "输入至少 2 个字符以搜索患者、潜在客户和发票",
     "empty": "没有匹配项。试试姓名、电话或 #ID。"
+  },
+  "appointmentStatuses": {
+    "scheduled": "已预约",
+    "confirmed": "已确认",
+    "checked_in": "已到诊",
+    "completed": "已完成",
+    "cancelled": "已取消",
+    "no_show": "未到"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "电话",
+    "sms": "短信",
+    "instagram": "Instagram",
+    "email": "邮件",
+    "note": "备注"
+  },
+  "checkInFeels": {
+    "much_better": "好很多",
+    "better": "好转",
+    "same": "无变化",
+    "worse": "变差"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "视频",
+    "instagram": "Instagram",
+    "internal_form": "反馈表",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "现金",
+    "upi": "UPI",
+    "card": "银行卡",
+    "credit": "余额"
+  },
+  "invoiceTypes": {
+    "clinic": "诊所",
+    "medical": "药房",
+    "consultation": "问诊"
+  },
+  "taskOutcomes": {
+    "log_check_in": "记录回访",
+    "doing_well": "状况良好",
+    "no_answer": "无人接听",
+    "happy": "满意",
+    "done": "已完成"
+  },
+  "chatColumn": {
+    "thread": "消息",
+    "separator": " · ",
+    "created": {
+      "lead": "线索已创建 · {{time}} · 来自 {{source}}",
+      "patientThread": "患者 · 仅聊天 · 无线索",
+      "contactThread": "联系人 · 仅聊天 · 无线索"
+    },
+    "when": {
+      "today": "今天",
+      "tomorrow": "明天",
+      "yesterday": "昨天",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "预约 #{{seq}}",
+      "reminder": "已发送提醒",
+      "prescription": "处方 #{{seq}}",
+      "session": "第 {{session}} 次",
+      "invoice": "{{type}}发票 #{{seq}}",
+      "due": "待付 {{amount}}",
+      "paid": "已付清",
+      "received": "已收 {{amount}}",
+      "refund": "退款 {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "回访",
+      "score": "{{score}}/10",
+      "after": "{{context}}后",
+      "review": "{{source}} 评价",
+      "rating": "{{rating}}★",
+      "task": "任务 · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "发送中…",
+      "sent": "已发送",
+      "delivered": "已送达",
+      "read": "已读",
+      "queued": "排队中",
+      "notSent": "未发送",
+      "retry": "重试"
+    },
+    "sender": {
+      "call": "{{name}} · 电话",
+      "note": "{{name}} · 备注"
+    },
+    "empty": {
+      "title": "还没有对话",
+      "visit": "{{first}} 的 {{service}} 在 {{when}} {{time}} · 发一条 WhatsApp 可保留时段",
+      "pastVisits": "与 {{first}} 的每条 WhatsApp、电话和备注都会显示在这里",
+      "noVisits": "先发一条 WhatsApp · 回复会显示在这里",
+      "today": "今天",
+      "tomorrow": "明天",
+      "onDate": "{{date}}"
+    },
+    "starters": {
+      "onTheWay": "您在路上了吗？",
+      "directions": "发送路线",
+      "newTime": "提供其他时间",
+      "confirm": "确认到诊",
+      "prep": "术前须知",
+      "howItWent": "询问效果",
+      "nextSession": "预约下一次",
+      "offer": "分享优惠",
+      "hello": "打个招呼",
+      "consultation": "推荐问诊"
+    },
+    "sendVia": "发送方式",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "通话记录",
+      "note": "备注"
+    },
+    "noInstagram": "此联系人没有 Instagram",
+    "message": "消息",
+    "placeholder": {
+      "message": "通过 {{channel}} 给 {{first}} 发消息",
+      "messageNoName": "通过 {{channel}} 给线索发消息",
+      "note": "团队备注，不会发送给 {{first}}",
+      "noteNoName": "团队备注，不会发送给线索",
+      "call": "通话中发生了什么？"
+    },
+    "send": {
+      "whatsapp": "发送 WhatsApp",
+      "instagram": "发送 Instagram",
+      "call": "记录通话",
+      "note": "添加备注"
+    },
+    "replyHint": "{{first}} 最近在这里留言",
+    "mismatch": "{{first}} 通过 {{channel}} 联系 · 切换",
+    "outage": "WhatsApp 故障 · 回复将排队发送",
+    "prefersNoCalls": "不希望接电话 · 请发消息",
+    "prefersAfterSix": "希望下午 6 点后联系",
+    "suggest": "建议",
+    "suggestions": "建议",
+    "suggestHint": "建议和模板 · 或输入 /",
+    "book": "预约",
+    "bookHint": "预约 · 原因取自其消息",
+    "suggestedFor": "给 {{first}} 的建议",
+    "closeSuggestions": "关闭建议",
+    "templatesLabel": "模板 · 在输入框中输入 / 搜索",
+    "noTemplate": "没有与“{{query}}”匹配的模板",
+    "fillIn": "填写",
+    "chips": {
+      "price": "告知价格",
+      "priceHint": "对方询问了价格",
+      "slots": "提供 2 个时段",
+      "slotsHint": "对方询问了时间",
+      "location": "发送位置",
+      "explain": "介绍{{term}}",
+      "greet": "问候",
+      "followUp": "跟进"
+    },
+    "templates": {
+      "greeting": "问候",
+      "price": "价格",
+      "slots": "空闲时段",
+      "location": "位置",
+      "reminder": "提醒",
+      "aftercare": "术后护理",
+      "followUp": "跟进",
+      "review": "评价"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "{{first}}，您好！我们已为您 {{time}} 的 {{service}} 做好准备。您在路上了吗？",
+        "directionsToday": "{{first}}，您好！诊所位置在这里：{{maps}}。{{time}} 见！",
+        "newTime": "{{first}}，您好！如果今天 {{time}} 不方便，请回复一个合适的时间，我们帮您改约。",
+        "confirm": "{{first}}，您好！提醒您 {{when}} {{time}} 的 {{service}}。回复“是”即可确认。",
+        "prep": "{{first}}，您好！{{when}} 的 {{service}} 前：请素颜前来，并避免日晒 24 小时。{{time}} 见！",
+        "directionsLater": "{{first}}，您好！诊所位置在这里：{{maps}}。{{when}} {{time}} 见。",
+        "howItWent": "{{first}}，您好！上次就诊后皮肤感觉如何？有问题要问医生吗？",
+        "nextSession": "{{first}}，您好！要为您预约下一次吗？请回复方便的日期。",
+        "offer": "{{first}}，您好！本月您常做的项目有优惠。需要了解详情吗？",
+        "hello": "{{first}}，您好！我是 {{clinic}} 的 {{me}}，有任何需要都可以找我。",
+        "consultation": "{{first}}，您好！我们的医生本周可以为您看诊。要帮您预约问诊吗？",
+        "directions": "{{first}}，您好！诊所位置在这里：{{maps}}。"
+      },
+      "templates": {
+        "greeting": "{{first}}，您好！我是 {{clinic}} 的 {{me}} 😊 今天有什么可以帮您？",
+        "price": "{{offering}} 的价格是 {{price}}，含一次医生问诊。要为您预约吗？",
+        "priceSessions": "{{offering}} 的价格是 {{sessions}} 次 {{price}}，含一次医生问诊。要为您预约吗？",
+        "slots": "{{interest}} 在 {{slots}} 有空位。哪个时间适合您？",
+        "location": "我们在 {{address}} · Google 地图：{{maps}}。门口即可停车。",
+        "reminder": "{{first}}，您好！提醒您 {{dayTime}} 的就诊。回复“是”确认，或告诉我们更合适的时间。",
+        "aftercare": "{{first}}，您好！今天皮肤感觉如何？请注意保湿、涂防晒，48 小时内避免磨砂去角质。",
+        "followUp": "{{first}}，您好！想跟进一下 {{interest}} 的情况。需要我本周为您保留一个时段吗？",
+        "review": "感谢您的光临，{{first}}！如果您满意，在 Google 上留个评价会对我们帮助很大：{{reviewLink}}"
+      },
+      "explain": "好问题！{{offering}} 对此效果很好，大多数人在 {{results}} 内就能看到效果。医生会在问诊时为您评估并制定方案。",
+      "sessions": "{{n}} 次",
+      "fewWeeks": "几周",
+      "slotPair": "{{first}}或{{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}}",
+      "dayTimeFallback": "明天上午 11 点",
+      "today": "今天",
+      "tomorrow": "明天",
+      "onDate": "{{date}}",
+      "there": "您",
+      "yourTreatment": "您的项目",
+      "interests": {
+        "clinical": "临床治疗",
+        "peel": "刷酸焕肤",
+        "lhr": "激光脱毛",
+        "hydrafacial": "水光清洁",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "地址",
+        "maps": "地图链接",
+        "dayTime": "日期时间",
+        "reviewLink": "评价链接"
+      }
+    }
   }
 }

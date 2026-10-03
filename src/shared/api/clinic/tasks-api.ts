@@ -49,12 +49,14 @@ export const taskQueryKeys = {
 };
 
 /**
- * The other records a task write can change — leads, their messages and
- * contact threads, appointments, patients, check-ins — by the `['clinic',
- * <domain>]` key prefix each room keeps its queries under.
+ * The other records a task write can change — leads, their messages (the chat
+ * column's threads, `messageQueryKeys`) and contact threads, appointments,
+ * patients, check-ins — by the `['clinic', <domain>]` key prefix each room
+ * keeps its queries under.
  */
 export const TASK_SIDE_EFFECT_KEYS = [
   ['clinic', 'leads'],
+  ['clinic', 'messages'],
   ['clinic', 'contact-threads'],
   ['clinic', 'appointments'],
   ['clinic', 'patients'],

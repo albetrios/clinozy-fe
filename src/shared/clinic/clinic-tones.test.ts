@@ -6,7 +6,13 @@ import {
   TONE_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
 
-import { ROLE_TONES, SECTION_TONES, TONE_CLASSES, toneForLabel } from './clinic-tones.ts';
+import {
+  APPOINTMENT_STATUS_TONES,
+  ROLE_TONES,
+  SECTION_TONES,
+  TONE_CLASSES,
+  toneForLabel,
+} from './clinic-tones.ts';
 
 describe('clinic tones', () => {
   it('gives every section its own tone', () => {
@@ -17,6 +23,17 @@ describe('clinic tones', () => {
 
   it('gives every role a tone', () => {
     for (const role of ROLE_VALUES) expect(TONE_VALUES).toContain(ROLE_TONES[role]);
+  });
+
+  it('paints each appointment status as the prototype does (AP_ST, H:3420)', () => {
+    expect(APPOINTMENT_STATUS_TONES).toEqual({
+      scheduled: 'butter',
+      confirmed: 'sky',
+      checked_in: 'lav',
+      completed: 'sage',
+      cancelled: 'stone',
+      no_show: 'blush',
+    });
   });
 
   it('spells every class as a literal for its own tone', () => {

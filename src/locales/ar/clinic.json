@@ -63,7 +63,17 @@
       "invalid": "غير صالح",
       "lost": "مفقود"
     },
-    "retargeted": "أُعيد استهدافه"
+    "retargeted": "أُعيد استهدافه",
+    "sources": {
+      "instagram": "إنستغرام",
+      "google": "Google",
+      "whatsapp": "واتساب",
+      "facebook": "فيسبوك",
+      "walk_in": "زيارة مباشرة",
+      "referral": "إحالة",
+      "retarget": "إعادة استهداف",
+      "phone_call": "مكالمة هاتفية"
+    }
   },
   "offerings": {
     "categories": {
@@ -310,5 +320,229 @@
     "open": "فتح",
     "hint": "اكتب حرفين أو أكثر للبحث عن المرضى والعملاء المحتملين والفواتير",
     "empty": "لا توجد نتائج مطابقة. جرّب اسمًا أو رقم هاتف أو #ID."
+  },
+  "appointmentStatuses": {
+    "scheduled": "مجدول",
+    "confirmed": "مؤكد",
+    "checked_in": "تم تسجيل الوصول",
+    "completed": "مكتمل",
+    "cancelled": "ملغى",
+    "no_show": "لم يحضر"
+  },
+  "channels": {
+    "whatsapp": "واتساب",
+    "call": "مكالمة",
+    "sms": "رسالة نصية",
+    "instagram": "إنستغرام",
+    "email": "بريد إلكتروني",
+    "note": "ملاحظة"
+  },
+  "checkInFeels": {
+    "much_better": "أفضل بكثير",
+    "better": "أفضل",
+    "same": "كما هو",
+    "worse": "أسوأ"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "فيديو",
+    "instagram": "إنستغرام",
+    "internal_form": "نموذج الملاحظات",
+    "whatsapp": "واتساب"
+  },
+  "paymentModes": {
+    "cash": "نقدًا",
+    "upi": "UPI",
+    "card": "بطاقة",
+    "credit": "رصيد"
+  },
+  "invoiceTypes": {
+    "clinic": "العيادة",
+    "medical": "الصيدلية",
+    "consultation": "الاستشارة"
+  },
+  "taskOutcomes": {
+    "log_check_in": "تسجيل متابعة",
+    "doing_well": "بحالة جيدة",
+    "no_answer": "لا رد",
+    "happy": "راضٍ",
+    "done": "تم"
+  },
+  "chatColumn": {
+    "thread": "الرسائل",
+    "separator": " · ",
+    "created": {
+      "lead": "تم إنشاء العميل المحتمل · {{time}} · عبر {{source}}",
+      "patientThread": "مريض · دردشة فقط · بلا عميل محتمل",
+      "contactThread": "جهة اتصال · دردشة فقط · بلا عميل محتمل"
+    },
+    "when": {
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "yesterday": "أمس",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "الموعد #{{seq}}",
+      "reminder": "تم إرسال التذكير",
+      "prescription": "الوصفة #{{seq}}",
+      "session": "الجلسة {{session}}",
+      "invoice": "فاتورة {{type}} #{{seq}}",
+      "due": "{{amount}} مستحق",
+      "paid": "مدفوعة",
+      "received": "تم استلام {{amount}}",
+      "refund": "استرداد {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "متابعة",
+      "score": "{{score}}/10",
+      "after": "بعد {{context}}",
+      "review": "تقييم {{source}}",
+      "rating": "{{rating}}★",
+      "task": "مهمة · {{title}} ← {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "جارٍ الإرسال…",
+      "sent": "أُرسلت",
+      "delivered": "وصلت",
+      "read": "قُرئت",
+      "queued": "في قائمة الانتظار",
+      "notSent": "لم تُرسل",
+      "retry": "إعادة المحاولة"
+    },
+    "sender": {
+      "call": "{{name}} · مكالمة",
+      "note": "{{name}} · ملاحظة"
+    },
+    "empty": {
+      "title": "لا توجد محادثة بعد",
+      "visit": "موعد {{service}} لـ{{first}} {{when}} الساعة {{time}} · رسالة واتساب سريعة تحفظ الموعد",
+      "pastVisits": "كل رسائل واتساب والمكالمات والملاحظات مع {{first}} تظهر هنا",
+      "noVisits": "ابدأ برسالة واتساب · تظهر الردود هنا",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "onDate": "في {{date}}"
+    },
+    "starters": {
+      "onTheWay": "هل أنت في الطريق؟",
+      "directions": "إرسال الاتجاهات",
+      "newTime": "اقتراح وقت آخر",
+      "confirm": "تأكيد الزيارة",
+      "prep": "تعليمات التحضير",
+      "howItWent": "السؤال عن الزيارة",
+      "nextSession": "حجز الجلسة التالية",
+      "offer": "مشاركة عرض",
+      "hello": "إلقاء التحية",
+      "consultation": "اقتراح استشارة"
+    },
+    "sendVia": "الإرسال عبر",
+    "modes": {
+      "whatsapp": "واتساب",
+      "instagram": "إنستغرام",
+      "call": "سجل المكالمة",
+      "note": "ملاحظة"
+    },
+    "noInstagram": "لا يوجد حساب إنستغرام لجهة الاتصال هذه",
+    "message": "الرسالة",
+    "placeholder": {
+      "message": "رسالة إلى {{first}} عبر {{channel}}",
+      "messageNoName": "رسالة إلى العميل المحتمل عبر {{channel}}",
+      "note": "ملاحظة للفريق، لن تُرسل إلى {{first}}",
+      "noteNoName": "ملاحظة للفريق، لن تُرسل إلى العميل المحتمل",
+      "call": "ماذا حدث في المكالمة؟"
+    },
+    "send": {
+      "whatsapp": "إرسال واتساب",
+      "instagram": "إرسال إنستغرام",
+      "call": "تسجيل المكالمة",
+      "note": "إضافة ملاحظة"
+    },
+    "replyHint": "آخر ما كتبه {{first}} كان هنا",
+    "mismatch": "كتب {{first}} عبر {{channel}} · تبديل",
+    "outage": "واتساب متوقف · ستنتظر الردود في قائمة الانتظار",
+    "prefersNoCalls": "لا يفضّل المكالمات · أرسل رسالة بدلًا منها",
+    "prefersAfterSix": "يفضّل التواصل بعد الساعة 6 مساءً",
+    "suggest": "اقتراح",
+    "suggestions": "الاقتراحات",
+    "suggestHint": "الاقتراحات والقوالب · أو اكتب /",
+    "book": "حجز موعد",
+    "bookHint": "حجز موعد · السبب من رسالته",
+    "suggestedFor": "اقتراحات لـ{{first}}",
+    "closeSuggestions": "إغلاق الاقتراحات",
+    "templatesLabel": "القوالب · اكتب / في المربع للبحث",
+    "noTemplate": "لا يوجد قالب يطابق «{{query}}»",
+    "fillIn": "املأ",
+    "chips": {
+      "price": "مشاركة السعر",
+      "priceHint": "سأل عن السعر",
+      "slots": "اقتراح موعدين",
+      "slotsHint": "سأل عن الوقت",
+      "location": "إرسال الموقع",
+      "explain": "شرح {{term}}",
+      "greet": "تحية",
+      "followUp": "متابعة"
+    },
+    "templates": {
+      "greeting": "تحية",
+      "price": "السعر",
+      "slots": "المواعيد المتاحة",
+      "location": "الموقع",
+      "reminder": "تذكير",
+      "aftercare": "العناية بعد الجلسة",
+      "followUp": "متابعة",
+      "review": "تقييم"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "مرحبًا {{first}}، نحن جاهزون لموعد {{service}} الساعة {{time}}. هل أنت في الطريق؟",
+        "directionsToday": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}. نراك الساعة {{time}}!",
+        "newTime": "مرحبًا {{first}}، إذا لم يناسبك الساعة {{time}} اليوم، فأرسل لنا وقتًا يناسبك وسننقل الموعد.",
+        "confirm": "مرحبًا {{first}}، نذكّرك بموعد {{service}} {{when}} الساعة {{time}}. أرسل نعم للتأكيد.",
+        "prep": "مرحبًا {{first}}، قبل موعد {{service}} {{when}}: تعالَ دون مكياج وتجنّب الشمس لمدة 24 ساعة. نراك الساعة {{time}}!",
+        "directionsLater": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}. نراك {{when}} الساعة {{time}}.",
+        "howItWent": "مرحبًا {{first}}، كيف حال بشرتك بعد الزيارة الأخيرة؟ هل لديك أسئلة للطبيب؟",
+        "nextSession": "مرحبًا {{first}}، هل نحجز جلستك التالية؟ أرسل لنا يومًا يناسبك.",
+        "offer": "مرحبًا {{first}}، لدينا عرض خاص على علاجك المعتاد هذا الشهر. هل تريد التفاصيل؟",
+        "hello": "مرحبًا {{first}}، معك {{me}} من {{clinic}}. يسعدني مساعدتك في أي شيء تحتاجه.",
+        "consultation": "مرحبًا {{first}}، يمكن لطبيبنا رؤيتك هذا الأسبوع. هل أحجز لك استشارة؟",
+        "directions": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}."
+      },
+      "templates": {
+        "greeting": "مرحبًا {{first}}، معك {{me}} من {{clinic}} 😊 كيف يمكنني مساعدتك اليوم؟",
+        "price": "سعر {{offering}} هو {{price}}، ويشمل استشارة مع الطبيب. هل أحجز لك؟",
+        "priceSessions": "سعر {{offering}} هو {{price}} مقابل {{sessions}} جلسات، ويشمل استشارة مع الطبيب. هل أحجز لك؟",
+        "slots": "لدينا {{slots}} متاحان لـ{{interest}}. أيهما يناسبك؟",
+        "location": "نحن في {{address}} · خرائط Google: {{maps}}. يتوفر موقف سيارات أمام العيادة مباشرة.",
+        "reminder": "مرحبًا {{first}}، نذكّرك بزيارتك {{dayTime}}. أرسل نعم للتأكيد أو أخبرنا بوقت أنسب.",
+        "aftercare": "مرحبًا {{first}}، كيف حال البشرة اليوم؟ حافظ على ترطيبها واستخدم واقي الشمس وتجنّب المقشّرات لمدة 48 ساعة.",
+        "followUp": "مرحبًا {{first}}، أتابع معك بخصوص {{interest}}. هل تريد أن أحجز لك موعدًا هذا الأسبوع؟",
+        "review": "شكرًا لزيارتك يا {{first}}! إن أعجبتك، فتقييم سريع على Google يساعدنا كثيرًا: {{reviewLink}}"
+      },
+      "explain": "سؤال رائع! {{offering}} مناسب جدًا لهذا — يرى معظم الناس النتائج خلال {{results}}. سيفحص الطبيب ويضع الخطة في استشارتك.",
+      "sessions": "{{n}} جلسات",
+      "fewWeeks": "بضعة أسابيع",
+      "slotPair": "{{first}} أو {{second}}",
+      "slot": "{{day}} الساعة {{time}}",
+      "dayTime": "{{day}} الساعة {{time}}",
+      "dayTimeFallback": "غدًا الساعة 11 صباحًا",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "onDate": "في {{date}}",
+      "there": "بك",
+      "yourTreatment": "علاجك",
+      "interests": {
+        "clinical": "العلاج السريري",
+        "peel": "التقشير",
+        "lhr": "إزالة الشعر بالليزر",
+        "hydrafacial": "هيدرافيشل",
+        "prp": "البلازما (PRP)"
+      },
+      "fill": {
+        "address": "العنوان",
+        "maps": "رابط الخرائط",
+        "dayTime": "اليوم والوقت",
+        "reviewLink": "رابط التقييم"
+      }
+    }
   }
 }

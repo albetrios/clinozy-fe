@@ -20,6 +20,8 @@ export function useEnsureContactThread() {
     invalidateKeys: [
       contactThreadQueryKeys.all,
       ['clinic', 'leads'],
+      // A patient's chat column reads the thread this may have just opened.
+      ['clinic', 'messages'],
       taskQueryKeys.details(),
     ],
   });

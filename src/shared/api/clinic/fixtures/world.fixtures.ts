@@ -112,9 +112,11 @@ export const clinicFixtures = {
     resource: 'Lead',
     seed: () => leadSeed(),
   }),
+  // A chat line has no display id (`S:268–286`), so a send gets no `seq`.
   leadMessages: createFixtureCollection<LeadMessage>({
     resource: 'Message',
     seed: () => leadMessageSeed(),
+    sequenced: false,
   }),
   appointments: createFixtureCollection<Appointment>({
     resource: 'Appointment',

@@ -4,12 +4,17 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 `launch-2026-09-30-jxmr`):
 
 - `clinic.constants.ts` — the `clinic` i18n namespace's keys (section names and
-  descriptions, roles; the lead statuses; the offerings domain — category,
+  descriptions, roles; the lead statuses and sources; the offerings domain — category,
   offer-kind and offer-state labels and the toasts `useOfferings` / `useOffers`
-  raise; more shared statuses arrive with the rooms that need them). The namespace loads
-  with the org shell, so a shared hook's toast reads it in any room. Room-only
-  copy stays in each room's own namespace (`today`, `leads`, … `users`).
-- `clinic-tones.ts` — each section's and role's tone (the contract's `Tone`), and
+  raise; the contract's enum labels the rooms share — appointment statuses,
+  channels, check-in feels, review sources, payment modes, invoice types, task
+  outcomes). The namespace loads with the org shell, so a
+  shared hook's toast reads it in any room — and so does the shared chat
+  column, whose copy is the namespace's `chatColumn.*` (keys in
+  `shared/components/ChatColumn/chat-column.constants.ts`). Room-only copy
+  stays in each room's own namespace (`today`, `leads`, … `users`).
+- `clinic-tones.ts` — each section's, role's and appointment status's tone (the
+  contract's `Tone`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover, and a list row's active 55% and
   picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's

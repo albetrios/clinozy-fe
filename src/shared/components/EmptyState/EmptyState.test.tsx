@@ -109,6 +109,42 @@ describe('EmptyState', () => {
     });
   });
 
+  describe('as a dashed card (a thread with no conversation yet)', () => {
+    it('draws the dashed card with its title, line and a row of chips', () => {
+      render(
+        <EmptyState
+          variant="card"
+          title="No conversation yet"
+          description="Start with a WhatsApp · replies land here"
+          action={
+            <>
+              <button type="button">Say hello</button>
+              <button type="button">Send directions</button>
+            </>
+          }
+        />,
+      );
+      const card = screen.getByTestId('empty-state');
+      expect(card).toHaveAttribute('data-variant', 'card');
+      expect(card).toHaveClass('border-dashed', 'border-border-strong', 'rounded-xl');
+      expect(screen.getByRole('heading', { name: 'No conversation yet' })).toBeVisible();
+      expect(screen.getByText('Start with a WhatsApp · replies land here')).toBeVisible();
+      expect(screen.getAllByRole('button')).toHaveLength(2);
+      expect(screen.queryByTestId('empty-state-illustration')).not.toBeInTheDocument();
+    });
+
+    it('has no accessibility violations', async () => {
+      const { container } = render(
+        <EmptyState
+          variant="card"
+          title="No conversation yet"
+          action={<button type="button">Say hello</button>}
+        />,
+      );
+      expect(await axe(container)).toHaveNoViolations();
+    });
+  });
+
   describe('with filters applied', () => {
     it('says "No matches", swaps in the Search icon and clears the filters', async () => {
       const onClearFilters = vi.fn();

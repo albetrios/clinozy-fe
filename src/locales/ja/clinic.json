@@ -63,7 +63,17 @@
       "invalid": "無効",
       "lost": "失注"
     },
-    "retargeted": "再アプローチ"
+    "retargeted": "再アプローチ",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "飛び込み",
+      "referral": "紹介",
+      "retarget": "再アプローチ",
+      "phone_call": "電話"
+    }
   },
   "offerings": {
     "categories": {
@@ -300,5 +310,229 @@
     "open": "開く",
     "hint": "患者・リード・請求書を検索するには2文字以上入力してください",
     "empty": "一致するものがありません。名前、電話番号、#IDで試してください。"
+  },
+  "appointmentStatuses": {
+    "scheduled": "予約済み",
+    "confirmed": "確定",
+    "checked_in": "来院済み",
+    "completed": "完了",
+    "cancelled": "キャンセル",
+    "no_show": "無断キャンセル"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "電話",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "メール",
+    "note": "メモ"
+  },
+  "checkInFeels": {
+    "much_better": "とても良い",
+    "better": "良い",
+    "same": "変わらない",
+    "worse": "悪い"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "動画",
+    "instagram": "Instagram",
+    "internal_form": "フィードバックフォーム",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "現金",
+    "upi": "UPI",
+    "card": "カード",
+    "credit": "クレジット残高"
+  },
+  "invoiceTypes": {
+    "clinic": "クリニック",
+    "medical": "薬局",
+    "consultation": "診察"
+  },
+  "taskOutcomes": {
+    "log_check_in": "経過を記録",
+    "doing_well": "経過良好",
+    "no_answer": "応答なし",
+    "happy": "満足",
+    "done": "完了"
+  },
+  "chatColumn": {
+    "thread": "メッセージ",
+    "separator": " · ",
+    "created": {
+      "lead": "リード作成 · {{time}} · {{source}} 経由",
+      "patientThread": "患者 · チャットのみ · リードなし",
+      "contactThread": "連絡先 · チャットのみ · リードなし"
+    },
+    "when": {
+      "today": "今日",
+      "tomorrow": "明日",
+      "yesterday": "昨日",
+      "dayTime": "{{day}} {{time}}"
+    },
+    "history": {
+      "appointment": "予約 #{{seq}}",
+      "reminder": "リマインダー送信済み",
+      "prescription": "処方 #{{seq}}",
+      "session": "{{session}} 回目",
+      "invoice": "{{type}}請求書 #{{seq}}",
+      "due": "{{amount}} 未払い",
+      "paid": "支払済み",
+      "received": "{{amount}} 受領",
+      "refund": "{{amount}} 返金",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "経過確認",
+      "score": "{{score}}/10",
+      "after": "{{context}} 後",
+      "review": "{{source}} のレビュー",
+      "rating": "{{rating}}★",
+      "task": "タスク · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "送信中…",
+      "sent": "送信済み",
+      "delivered": "配信済み",
+      "read": "既読",
+      "queued": "送信待ち",
+      "notSent": "未送信",
+      "retry": "再試行"
+    },
+    "sender": {
+      "call": "{{name}} · 電話",
+      "note": "{{name}} · メモ"
+    },
+    "empty": {
+      "title": "まだ会話がありません",
+      "visit": "{{first}} さんの {{service}} は {{when}} {{time}} です · WhatsApp をひと言送ると枠を確保できます",
+      "pastVisits": "{{first}} さんとの WhatsApp・電話・メモはすべてここに表示されます",
+      "noVisits": "WhatsApp で始めましょう · 返信はここに届きます",
+      "today": "今日",
+      "tomorrow": "明日",
+      "onDate": "{{date}}"
+    },
+    "starters": {
+      "onTheWay": "向かっていますか？",
+      "directions": "道順を送る",
+      "newTime": "別の時間を提案",
+      "confirm": "来院を確認",
+      "prep": "事前の注意事項",
+      "howItWent": "様子を尋ねる",
+      "nextSession": "次回の予約",
+      "offer": "キャンペーンを案内",
+      "hello": "あいさつする",
+      "consultation": "診察を提案"
+    },
+    "sendVia": "送信方法",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "通話記録",
+      "note": "メモ"
+    },
+    "noInstagram": "この連絡先に Instagram はありません",
+    "message": "メッセージ",
+    "placeholder": {
+      "message": "{{channel}} で {{first}} さんにメッセージ",
+      "messageNoName": "{{channel}} でリードにメッセージ",
+      "note": "チーム用メモ（{{first}} さんには送信されません）",
+      "noteNoName": "チーム用メモ（リードには送信されません）",
+      "call": "通話の内容は？"
+    },
+    "send": {
+      "whatsapp": "WhatsApp を送信",
+      "instagram": "Instagram を送信",
+      "call": "通話を記録",
+      "note": "メモを追加"
+    },
+    "replyHint": "{{first}} さんの最後の連絡はここ",
+    "mismatch": "{{first}} さんは {{channel}} で連絡 · 切り替え",
+    "outage": "WhatsApp 障害中 · 返信は送信待ちになります",
+    "prefersNoCalls": "電話は希望しない · メッセージで",
+    "prefersAfterSix": "18時以降の連絡を希望",
+    "suggest": "提案",
+    "suggestions": "提案",
+    "suggestHint": "提案とテンプレート · または / を入力",
+    "book": "予約する",
+    "bookHint": "予約する · 理由はメッセージから",
+    "suggestedFor": "{{first}} さんへの提案",
+    "closeSuggestions": "提案を閉じる",
+    "templatesLabel": "テンプレート · 入力欄に / を入力して検索",
+    "noTemplate": "「{{query}}」に一致するテンプレートはありません",
+    "fillIn": "入力",
+    "chips": {
+      "price": "料金を伝える",
+      "priceHint": "料金について質問あり",
+      "slots": "2 枠を提案",
+      "slotsHint": "日時について質問あり",
+      "location": "場所を送る",
+      "explain": "{{term}} を説明",
+      "greet": "あいさつ",
+      "followUp": "フォローアップ"
+    },
+    "templates": {
+      "greeting": "あいさつ",
+      "price": "料金",
+      "slots": "空き枠",
+      "location": "所在地",
+      "reminder": "リマインダー",
+      "aftercare": "アフターケア",
+      "followUp": "フォローアップ",
+      "review": "レビュー"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "{{first}} さん、こんにちは。{{time}} の {{service}} の準備ができています。こちらに向かっていますか？",
+        "directionsToday": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。{{time}} にお待ちしています！",
+        "newTime": "{{first}} さん、こんにちは。本日 {{time}} のご都合が悪ければ、ご希望の時間を返信してください。変更いたします。",
+        "confirm": "{{first}} さん、こんにちは。{{when}} {{time}} の {{service}} のリマインダーです。確認のため「はい」と返信してください。",
+        "prep": "{{first}} さん、こんにちは。{{when}} の {{service}} の前に：メイクはせずにお越しいただき、24時間は日光を避けてください。{{time}} にお待ちしています！",
+        "directionsLater": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。{{when}} {{time}} にお待ちしています。",
+        "howItWent": "{{first}} さん、こんにちは。前回の来院後、お肌の調子はいかがですか？医師へのご質問はありますか？",
+        "nextSession": "{{first}} さん、こんにちは。次回の予約をお取りしましょうか？ご都合の良い日を返信してください。",
+        "offer": "{{first}} さん、こんにちは。今月はいつもの施術がお得になるキャンペーンがあります。詳細をお送りしましょうか？",
+        "hello": "{{first}} さん、こんにちは。{{clinic}} の {{me}} です。何でもお気軽にご相談ください。",
+        "consultation": "{{first}} さん、こんにちは。今週、医師の診察が可能です。診察のご予約をお取りしましょうか？",
+        "directions": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。"
+      },
+      "templates": {
+        "greeting": "{{first}} さん、こんにちは。{{clinic}} の {{me}} です 😊 本日はどのようなご用件でしょうか？",
+        "price": "{{offering}} は {{price}} です。医師の診察が含まれます。ご予約をお取りしましょうか？",
+        "priceSessions": "{{offering}} は {{sessions}} 回で {{price}} です。医師の診察が含まれます。ご予約をお取りしましょうか？",
+        "slots": "{{interest}} は {{slots}} に空きがあります。どちらがよろしいですか？",
+        "location": "所在地は {{address}} です · Google マップ：{{maps}}。すぐ前に駐車場があります。",
+        "reminder": "{{first}} さん、こんにちは。{{dayTime}} のご来院のリマインダーです。確認のため「はい」と返信いただくか、ご希望の時間をお知らせください。",
+        "aftercare": "{{first}} さん、こんにちは。今日のお肌の調子はいかがですか？保湿と日焼け止めを心がけ、48時間はスクラブを避けてください。",
+        "followUp": "{{first}} さん、こんにちは。{{interest}} の件でご連絡しました。今週の枠をお取りしておきましょうか？",
+        "review": "{{first}} さん、ご来院ありがとうございました！気に入っていただけたら、Google のレビューを書いていただけると大変助かります：{{reviewLink}}"
+      },
+      "explain": "良いご質問です！{{offering}} はこれに効果的で、多くの方が {{results}} で効果を実感されています。診察で医師が確認し、プランを立てます。",
+      "sessions": "{{n}} 回",
+      "fewWeeks": "数週間",
+      "slotPair": "{{first}} または {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}}",
+      "dayTimeFallback": "明日の午前11時",
+      "today": "今日",
+      "tomorrow": "明日",
+      "onDate": "{{date}}",
+      "there": "お客様",
+      "yourTreatment": "ご希望の施術",
+      "interests": {
+        "clinical": "皮膚科治療",
+        "peel": "ピーリング",
+        "lhr": "レーザー脱毛",
+        "hydrafacial": "ハイドラフェイシャル",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "住所",
+        "maps": "地図リンク",
+        "dayTime": "日時",
+        "reviewLink": "レビューリンク"
+      }
+    }
   }
 }
