@@ -117,6 +117,9 @@
       "commandPalette": "Open command palette",
       "showShortcuts": "Show keyboard shortcuts",
       "showShortcutsAlt": "Show keyboard shortcuts (alternate)",
+      "allSections": "Open or close All sections",
+      "jumpToSection": "Jump to a section",
+      "listSearch": "Search the list",
       "closeDialog": "Close dialog"
     },
     "emailVerify": {

@@ -117,6 +117,9 @@
       "commandPalette": "Befehlspalette öffnen",
       "showShortcuts": "Tastenkürzel anzeigen",
       "showShortcutsAlt": "Tastenkürzel anzeigen (Alternative)",
+      "allSections": "Alle Bereiche öffnen oder schließen",
+      "jumpToSection": "Zu einem Bereich springen",
+      "listSearch": "Liste durchsuchen",
       "closeDialog": "Dialog schließen"
     },
     "emailVerify": {

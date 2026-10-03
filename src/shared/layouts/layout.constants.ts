@@ -174,6 +174,9 @@ export const LAYOUT_KEYS = {
       showShortcuts: 'app.shortcuts.showShortcuts',
       showShortcutsAlt: 'app.shortcuts.showShortcutsAlt',
       closeDialog: 'app.shortcuts.closeDialog',
+      allSections: 'app.shortcuts.allSections',
+      jumpToSection: 'app.shortcuts.jumpToSection',
+      listSearch: 'app.shortcuts.listSearch',
     },
     emailVerify: {
       message: 'app.emailVerify.message',

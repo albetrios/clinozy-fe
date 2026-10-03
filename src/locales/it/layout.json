@@ -117,6 +117,9 @@
       "commandPalette": "Apri palette comandi",
       "showShortcuts": "Mostra scorciatoie da tastiera",
       "showShortcutsAlt": "Mostra scorciatoie da tastiera (alternativa)",
+      "allSections": "Apri o chiudi Tutte le sezioni",
+      "jumpToSection": "Vai a una sezione",
+      "listSearch": "Cerca nell’elenco",
       "closeDialog": "Chiudi finestra di dialogo"
     },
     "emailVerify": {

@@ -117,6 +117,9 @@
       "commandPalette": "कमांड पैलेट खोलें",
       "showShortcuts": "कीबोर्ड शॉर्टकट दिखाएँ",
       "showShortcutsAlt": "कीबोर्ड शॉर्टकट दिखाएँ (वैकल्पिक)",
+      "allSections": "सभी अनुभाग खोलें या बंद करें",
+      "jumpToSection": "किसी अनुभाग पर जाएँ",
+      "listSearch": "सूची में खोजें",
       "closeDialog": "डायलॉग बंद करें"
     },
     "emailVerify": {

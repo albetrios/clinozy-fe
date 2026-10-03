@@ -117,6 +117,9 @@
       "commandPalette": "명령 팔레트 열기",
       "showShortcuts": "키보드 단축키 표시",
       "showShortcutsAlt": "키보드 단축키 표시 (대체)",
+      "allSections": "모든 섹션 열기 또는 닫기",
+      "jumpToSection": "섹션으로 이동",
+      "listSearch": "목록 검색",
       "closeDialog": "대화상자 닫기"
     },
     "emailVerify": {

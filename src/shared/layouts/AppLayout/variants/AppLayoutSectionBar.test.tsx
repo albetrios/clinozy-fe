@@ -237,6 +237,63 @@ describe('SectionBarShell — phone tab bar', () => {
   });
 });
 
+describe('SectionBarShell — keyboard (shell.md:46)', () => {
+  it('toggles All sections on G', async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await screen.findByTestId('all-sections-trigger');
+    await user.keyboard('g');
+    expect(
+      await screen.findByRole('dialog', { name: /all sections/i }),
+    ).toBeInTheDocument();
+    await user.keyboard('g');
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: /all sections/i })).toBeNull(),
+    );
+  });
+
+  it('opens the 1st room on 1 and the 10th on 0, in list order', async () => {
+    const user = userEvent.setup();
+    const router = renderShell('/organization/acme/leads');
+    await screen.findByTestId('all-sections-trigger');
+    await user.keyboard('1');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/today'),
+    );
+    await user.keyboard('0');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users'),
+    );
+  });
+
+  it('is typing, not a shortcut, inside a text field', async () => {
+    const user = userEvent.setup();
+    const router = renderShell('/organization/acme/leads');
+    await screen.findByTestId('all-sections-trigger');
+    const field = document.createElement('input');
+    document.body.append(field);
+    field.focus();
+    await user.keyboard('g1');
+    expect(screen.queryByRole('dialog', { name: /all sections/i })).toBeNull();
+    expect(router.state.location.pathname).toBe('/organization/acme/leads');
+    field.remove();
+  });
+
+  it('stands down with Ctrl held and under a modal surface', async () => {
+    const user = userEvent.setup();
+    const router = renderShell('/organization/acme/leads');
+    await screen.findByTestId('all-sections-trigger');
+    await user.keyboard('{Control>}1{/Control}');
+    expect(router.state.location.pathname).toBe('/organization/acme/leads');
+    const modal = document.createElement('div');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.append(modal);
+    await user.keyboard('2');
+    expect(router.state.location.pathname).toBe('/organization/acme/leads');
+    modal.remove();
+  });
+});
+
 describe('SectionBarShell — accessibility', () => {
   // One region at a time: the header nav and the tab bar are both "Sections",
   // and below / above `md` CSS hides one of them, which jsdom does not apply.

@@ -31,8 +31,19 @@ const CONTENT_EDITABLE_SELECTOR = '[contenteditable=""],[contenteditable="true"]
  * wherever the property is missing.
  */
 export function isEditableElementFocused(): boolean {
-  const el = document.activeElement as HTMLElement | null;
-  if (!el) return false;
-  if (EDITABLE_TAGS.has(el.tagName)) return true;
-  return el.isContentEditable === true || el.closest(CONTENT_EDITABLE_SELECTOR) !== null;
+  return isEditableTarget(document.activeElement);
+}
+
+/**
+ * True when an event's target is an editable field — the same test as
+ * {@link isEditableElementFocused}, for the element a key or input event went
+ * to: its keys are typing, never a shortcut.
+ */
+export function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (EDITABLE_TAGS.has(target.tagName)) return true;
+  return (
+    target.isContentEditable === true ||
+    target.closest(CONTENT_EDITABLE_SELECTOR) !== null
+  );
 }

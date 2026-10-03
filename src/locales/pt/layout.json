@@ -117,6 +117,9 @@
       "commandPalette": "Abrir paleta de comandos",
       "showShortcuts": "Mostrar atalhos de teclado",
       "showShortcutsAlt": "Mostrar atalhos de teclado (alternativo)",
+      "allSections": "Abrir ou fechar Todas as seções",
+      "jumpToSection": "Ir para uma seção",
+      "listSearch": "Pesquisar na lista",
       "closeDialog": "Fechar diálogo"
     },
     "emailVerify": {

@@ -117,6 +117,9 @@
       "commandPalette": "فتح لوحة الأوامر",
       "showShortcuts": "إظهار اختصارات لوحة المفاتيح",
       "showShortcutsAlt": "إظهار اختصارات لوحة المفاتيح (بديل)",
+      "allSections": "فتح كل الأقسام أو إغلاقها",
+      "jumpToSection": "الانتقال إلى قسم",
+      "listSearch": "البحث في القائمة",
       "closeDialog": "إغلاق الحوار"
     },
     "emailVerify": {

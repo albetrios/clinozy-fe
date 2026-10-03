@@ -117,6 +117,9 @@
       "commandPalette": "コマンドパレットを開く",
       "showShortcuts": "キーボードショートカットを表示",
       "showShortcutsAlt": "キーボードショートカットを表示（代替）",
+      "allSections": "すべてのセクションを開く・閉じる",
+      "jumpToSection": "セクションへ移動",
+      "listSearch": "リストを検索",
       "closeDialog": "ダイアログを閉じる"
     },
     "emailVerify": {

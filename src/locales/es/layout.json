@@ -133,6 +133,9 @@
       "commandPalette": "Abrir paleta de comandos",
       "showShortcuts": "Mostrar atajos de teclado",
       "showShortcutsAlt": "Mostrar atajos (alternativo)",
+      "allSections": "Abrir o cerrar Todas las secciones",
+      "jumpToSection": "Ir a una sección",
+      "listSearch": "Buscar en la lista",
       "closeDialog": "Cerrar diálogo"
     },
     "orgCreate": {

@@ -1,9 +1,11 @@
+import { useNavigate } from '@tanstack/react-router';
 import { type RefObject, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { NotificationCenter } from '@/shared/components/NotificationCenter/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
+import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import {
   AppMain,
   BrandLogo,
@@ -22,6 +24,7 @@ import { availableTabSpace } from '@/shared/layouts/AppLayout/components/PinnedT
 import { PinnedTabs } from '@/shared/layouts/AppLayout/components/PinnedTabs/index.ts';
 import { SectionChip } from '@/shared/layouts/AppLayout/components/SectionChip/index.ts';
 import { useSectionBarNav } from '@/shared/layouts/AppLayout/section-bar-nav.ts';
+import { useSectionShortcuts } from '@/shared/layouts/AppLayout/section-bar-shortcuts.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 
 /**
@@ -105,6 +108,23 @@ export function SectionBarShell({
   const [allSectionsOpen, setAllSectionsOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const tier = useViewportTier();
+  const navigate = useNavigate();
+  // G and 1–9 / 0 (shell.md:46): All sections is the popover from `md`, the sheet below.
+  useSectionShortcuts({
+    roomCount: nav.entries.length,
+    onToggle: () =>
+      tier === 'phone'
+        ? setSheetOpen((open) => !open)
+        : setAllSectionsOpen((open) => !open),
+    onOpen: (index) => {
+      const entry = nav.entries[index];
+      if (!entry) return;
+      setAllSectionsOpen(false);
+      setSheetOpen(false);
+      void navigate({ to: entry.to, params: { organizationSlug } });
+    },
+  });
   const headerRef = useRef<HTMLElement>(null);
   const markRef = useRef<HTMLSpanElement>(null);
   const allSectionsRef = useRef<HTMLDivElement>(null);

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { isEditableElementFocused } from './editable-focus.ts';
+import { isEditableElementFocused, isEditableTarget } from './editable-focus.ts';
 
 function mountFocused(html: string): HTMLElement {
   document.body.innerHTML = html;
@@ -36,5 +36,26 @@ describe('isEditableElementFocused', () => {
   it('is false for a focused button', () => {
     mountFocused('<button type="button">go</button>');
     expect(isEditableElementFocused()).toBe(false);
+  });
+});
+
+describe('isEditableTarget', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('reads the element an event went to, focused or not', () => {
+    document.body.innerHTML =
+      '<input /><div contenteditable="true"><span>text</span></div><button>go</button>';
+    const [input, host, button] = [
+      document.querySelector('input'),
+      document.querySelector('span'),
+      document.querySelector('button'),
+    ];
+    expect(isEditableTarget(input)).toBe(true);
+    expect(isEditableTarget(host)).toBe(true);
+    expect(isEditableTarget(button)).toBe(false);
+    expect(isEditableTarget(document)).toBe(false);
+    expect(isEditableTarget(null)).toBe(false);
   });
 });
