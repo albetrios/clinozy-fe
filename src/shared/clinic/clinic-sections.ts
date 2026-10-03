@@ -17,6 +17,11 @@ export const CLINIC_SECTION_ORDER: readonly Section[] = [
   'users',
 ];
 
+/** Whether a string (a manifest's `nav.section`, say) names a clinic section. */
+export function isClinicSection(value: string): value is Section {
+  return (CLINIC_SECTION_ORDER as readonly string[]).includes(value);
+}
+
 // A Map, not an object literal: `constructor` and friends must not resolve.
 const SECTION_BY_SEGMENT: ReadonlyMap<string, Section> = new Map([
   ...CLINIC_SECTION_ORDER.map((section) => [section, section] as const),

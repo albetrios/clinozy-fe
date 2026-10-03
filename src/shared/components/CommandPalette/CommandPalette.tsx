@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,12 +14,12 @@ import {
   CommandSeparator,
 } from '@/shared/components/ui/command.tsx';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useVisibleSettingsSections } from '@/shared/hooks/useSettingsNav/index.ts';
 import {
   Building,
-  LayoutDashboard,
   LogOut,
   Monitor,
   Moon,
@@ -75,6 +75,12 @@ export function CommandPaletteContent() {
   const open = useUIStore((s) => s.commandPaletteOpen);
   const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
   const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  // The same entries as the shell's nav: manifest-driven, and narrowed by the
+  // member's clinic access and any View-as preview.
+  const { entries: navEntries } = useAppNav(
+    organizationSlug ? 'organization' : 'personal',
+  );
   const setTheme = useThemeStore((s) => s.setTheme);
   const { data: meContext } = useMeContext();
   // Organization settings only has sections for a team workspace; on a personal
@@ -119,12 +125,17 @@ export function CommandPaletteContent() {
           heading={t(cp.groups.navigation)}
           className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
         >
-          <CommandItem
-            onSelect={() => runCommand(() => navigate({ to: '/' }))}
-            icon={LayoutDashboard}
-          >
-            {t(cp.dashboard)}
-          </CommandItem>
+          {navEntries.map((entry) => (
+            <CommandItem
+              key={entry.id}
+              onSelect={() =>
+                runCommand(() => navigate({ to: entry.to, params: { organizationSlug } }))
+              }
+              icon={entry.icon}
+            >
+              {t(entry.labelKey, { ns: entry.labelNs })}
+            </CommandItem>
+          ))}
           <CommandItem
             onSelect={() =>
               runCommand(() =>

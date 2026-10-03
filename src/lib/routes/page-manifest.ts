@@ -34,6 +34,19 @@ export type PageManifest = {
    * `'unauthorized'`.
    */
   onDeny?: 'unauthorized' | 'notFound';
+  /**
+   * Primary-nav presence. The app nav (`useAppNav`) lists the routes whose
+   * manifest sets this, read off the route tree (`staticData.manifest`): a
+   * clinic room names its `section`, and its order, label, icon and View
+   * access follow the section; an entry without one is a template page (the
+   * Dashboard), listed only when the deployment enables no clinic room (D25).
+   */
+  nav?: {
+    /** The `nav-<id>` test id; a template page's presentation key. */
+    id: string;
+    /** The clinic section (`Section` in the clinic contract), for a room. */
+    section?: string;
+  };
   /** `layout` = has `<Outlet />` and `children`; `leaf` = terminal UI. */
   kind: RouteIslandKind;
   /**

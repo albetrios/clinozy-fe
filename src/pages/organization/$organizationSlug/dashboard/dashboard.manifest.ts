@@ -14,6 +14,8 @@ export const manifest = {
   permission: 'organization:read',
   /** Reference L6b module key — disabled via `VITE_DISABLED_MODULES=billing`. */
   module: 'billing',
+  /** The template home: in the nav only while the deployment enables no clinic room. */
+  nav: { id: 'dashboard' },
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

@@ -26,6 +26,10 @@ const {
   notifyErrorMock: vi.fn(),
   reportErrorMock: vi.fn(),
 }));
+vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
+  const { DASHBOARD_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => DASHBOARD_ONLY_NAV };
+});
 vi.mock('@/shared/auth/service.ts', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return { ...actual, logout: logoutMock };
@@ -56,7 +60,8 @@ vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) 
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
-  return { ...actual, useNavigate: () => navigateMock };
+  // `rerender` drops the router provider, so the palette's params read is stubbed too.
+  return { ...actual, useNavigate: () => navigateMock, useParams: () => ({}) };
 });
 
 /** The org list now comes from `GET /users/me/organizations`, not me/context. */

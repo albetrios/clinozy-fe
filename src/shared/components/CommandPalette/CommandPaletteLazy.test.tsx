@@ -13,6 +13,10 @@ const transport = vi.hoisted(() => ({
 }));
 
 // Keep the production cache and React.lazy retry behavior; delay only transport.
+vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
+  const { DASHBOARD_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => DASHBOARD_ONLY_NAV };
+});
 vi.mock('@/lib/lazy-module.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof LazyModule>();
   return {
@@ -43,6 +47,7 @@ function deferred() {
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   useNavigate: () => vi.fn(),
+  useParams: () => ({}),
 }));
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: undefined }),

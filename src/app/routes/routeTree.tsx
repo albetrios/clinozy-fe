@@ -33,6 +33,7 @@ import {
   composePageTitle,
   manifestHead,
 } from '@/lib/routes/page-head.ts';
+import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { parseInvitationIdParam, parseOAuthProviderParam } from '@/lib/routes/params.ts';
 import { manifest as acceptInviteManifest } from '@/pages/accept-invite/accept-invite.manifest.ts';
 import { manifest as callbackManifest } from '@/pages/callback/callback.manifest.ts';
@@ -127,8 +128,13 @@ const OrganizationPickerPage = lazyRouteComponent(
   ),
   'Component',
 );
+// The org shell's nav, View-as pill and ⌘K name the clinic sections, so the
+// `clinic` vocabulary loads with the shell rather than with each room.
 const OrganizationShell = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/organization-slug.route.tsx'),
+  localizedRoute(
+    [I18N_NAMESPACES.clinic],
+    () => import('@/pages/organization/$organizationSlug/organization-slug.route.tsx'),
+  ),
   'Component',
 );
 const DashboardPage = lazyRouteComponent(
@@ -466,6 +472,7 @@ const organizationDashboardRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'dashboard',
   head: manifestHead(dashboardManifest),
+  staticData: { manifest: dashboardManifest },
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(dashboardManifest)(toGateContext(location, params));
@@ -524,6 +531,7 @@ const personalDashboardRoute = createRoute({
   getParentRoute: () => personalShellRoute,
   path: '/dashboard',
   head: manifestHead(dashboardManifest),
+  staticData: { manifest: dashboardManifest },
   beforeLoad: async ({ preload, location, params }) => {
     if (preload) return;
     await gatewayFromManifest(dashboardManifest)(toGateContext(location, params));
@@ -633,5 +641,12 @@ export const router = createAppRouter();
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
+  }
+  interface StaticDataRouteOption {
+    /**
+     * The island's manifest, on manifest-backed routes — how shared code (the
+     * app nav, ⌘K) reads route metadata without importing pages.
+     */
+    manifest?: PageManifest;
   }
 }

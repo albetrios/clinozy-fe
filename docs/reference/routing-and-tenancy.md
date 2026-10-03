@@ -264,6 +264,16 @@ Builders return **`{ to, params }` objects consumed by TanStack's typed `Link`/`
 not hand-built strings — so the router's type safety stays intact. Raw-string variants only
 where the router isn't available (e2e helpers). No hand-built route strings anywhere in app code.
 
+**The primary nav is manifest-driven.** A route the nav lists carries its manifest as
+`staticData: { manifest }` in `routeTree.tsx`, and the manifest's `nav` field says how it shows:
+a clinic room names its `section` (order, label, icon and View access follow the section), a
+template page (the Dashboard) only an `id`. `useAppNav(scope)` (`shared/hooks/useAppNav/`) reads
+those routes off the tree — so shared code never imports a page — keeps the deployment's enabled
+modules, drops the template pages when any clinic room is enabled (D25: the Dashboard stays for
+personal mode), then filters by the manifest's platform permission and the member's clinic access,
+View-as included. Every shell's nav and the ⌘K nav group draw the same list; each entry links to
+its route's own path with `organizationSlug` as the only param.
+
 ## 10. Rename inventory (full-name sweep over existing code)
 
 Executed as phase 0 of the epic:

@@ -35,7 +35,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `app-layout`                    | Authenticated shell                                                           | `AppLayout.tsx`                           |
 | `focus-shell`                   | Focus layout-variant shell                                                    | `AppLayout/variants/AppLayoutFocus.tsx`   |
 | `sidebar`                       | Sidebar                                                                       | AppLayout                                 |
-| `nav-dashboard`                 | Dashboard nav link (`nav-<id>` from `NAV_ITEMS`, dual-URL)                    | `AppLayout.shared.tsx` (sidebar + mobile) |
+| `nav-dashboard`                 | Dashboard nav link (`nav-<id>` from the manifest's `nav.id`, `useAppNav`)     | `AppLayout.shared.tsx` (sidebar + mobile) |
 | `sidebar-quick-links`           | Persistent sidebar shortcuts group                                            | `AppLayout/components/SidebarQuickLinks/` |
 | `sidebar-search`                | Command palette from sidebar                                                  | SidebarQuickLinks                         |
 | `sidebar-settings`              | Settings hash modal from sidebar                                              | SidebarQuickLinks                         |

@@ -32,19 +32,9 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import type { AccessCheck } from '@/shared/hooks/useCan/index.ts';
-import {
-  Boxes,
-  LayoutDashboard,
-  LogOut,
-  Search,
-  Settings,
-} from '@/shared/icons/index.ts';
-import {
-  APP_NAV_SEGMENT_KEYS,
-  LAYOUT_KEYS,
-  LAYOUT_NS,
-} from '@/shared/layouts/layout.constants.ts';
+import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
+import { Boxes, LogOut, Search, Settings } from '@/shared/icons/index.ts';
+import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -53,64 +43,38 @@ import {
   resolveEffectiveLayoutWidth,
 } from '@/shared/theme/layout-width.ts';
 
-/**
- * Org-scoped nav entries; rendered as Links to
- * `/organization/$organizationSlug/<segment>` with the current param.
- * `id` doubles as the stable `data-testid` slug (`nav-<id>`).
- */
-// eslint-disable-next-line react-refresh/only-export-components -- static nav config colocated with the layout shell
-export const NAV_ITEMS: ({
-  id: string;
-  segment: 'dashboard';
-  icon: typeof LayoutDashboard;
-  labelKey: string;
-} & AccessCheck)[] = [
-  {
-    id: 'dashboard',
-    segment: 'dashboard',
-    icon: LayoutDashboard,
-    labelKey: APP_NAV_SEGMENT_KEYS.dashboard,
-  },
-];
-
-export type NavItems = typeof NAV_ITEMS;
+/** The nav entries a shell draws (`useAppNav`). */
+export type NavItems = readonly AppNavEntry[];
 
 /**
- * Dual-URL dashboard nav link: a team org links to its
- * `/organization/$organizationSlug/dashboard`; a personal org (no org param)
- * links to the root `/dashboard`. Styling is passed in so each shell can render
- * the nav its own way.
+ * One nav entry's link: the route's own path, with the org slug as its only
+ * param (a personal-mode route has none). Active on the route and anything
+ * under it, so a record page keeps its room lit. Styling is passed in so each
+ * shell can draw the nav its own way.
  */
-function DashboardNavLink({
+function AppNavLink({
+  entry,
   organizationSlug,
-  testId,
   activeClassName,
   inactiveClassName,
   children,
 }: {
+  entry: AppNavEntry;
   organizationSlug: string;
-  testId: string;
   activeClassName: string;
   inactiveClassName: string;
   children: ReactNode;
 }) {
-  const shared = {
-    activeOptions: { exact: true } as const,
-    activeProps: { className: activeClassName },
-    inactiveProps: { className: inactiveClassName },
-    'data-testid': testId,
-  };
-  return organizationSlug ? (
+  return (
     <Link
-      to="/organization/$organizationSlug/dashboard"
+      to={entry.to}
       params={{ organizationSlug }}
+      activeOptions={{ exact: false }}
+      activeProps={{ className: activeClassName }}
+      inactiveProps={{ className: inactiveClassName }}
       data-slot="nav-item"
-      {...shared}
+      data-testid={`nav-${entry.id}`}
     >
-      {children}
-    </Link>
-  ) : (
-    <Link to="/dashboard" data-slot="nav-item" {...shared}>
       {children}
     </Link>
   );
@@ -313,18 +277,18 @@ export function NavList({
   const style = NAV_STYLES[variant];
 
   const links = navItems.map((item) => {
-    const label = t(item.labelKey);
+    const label = t(item.labelKey, { ns: item.labelNs });
     const link = (
-      <DashboardNavLink
+      <AppNavLink
         key={item.id}
+        entry={item}
         organizationSlug={organizationSlug}
-        testId={`nav-${item.id}`}
         activeClassName={style.active}
         inactiveClassName={style.inactive}
       >
         <item.icon className={variant === 'rail' ? 'h-5 w-5' : 'h-4 w-4'} aria-hidden />
         {variant === 'rail' ? <span className="sr-only">{label}</span> : label}
-      </DashboardNavLink>
+      </AppNavLink>
     );
 
     if (variant !== 'rail') return link;
@@ -363,16 +327,16 @@ export function MobileNav({
       data-testid="mobile-bottom-bar"
     >
       {navItems.map((item) => (
-        <DashboardNavLink
+        <AppNavLink
           key={item.id}
+          entry={item}
           organizationSlug={organizationSlug}
-          testId={`nav-${item.id}`}
           activeClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-foreground bg-muted/50"
           inactiveClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         >
           <item.icon className="h-5 w-5" aria-hidden />
-          <span>{t(item.labelKey)}</span>
-        </DashboardNavLink>
+          <span>{t(item.labelKey, { ns: item.labelNs })}</span>
+        </AppNavLink>
       ))}
     </nav>
   );

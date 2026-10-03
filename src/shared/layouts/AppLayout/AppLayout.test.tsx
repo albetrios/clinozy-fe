@@ -1,6 +1,10 @@
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vitest-axe';
 
+vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
+  const { DASHBOARD_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => DASHBOARD_ONLY_NAV };
+});
 vi.mock('@/core/http/fetch-client.ts', () => ({
   apiClient: {
     get: vi.fn(async () => ({ data: [] })),

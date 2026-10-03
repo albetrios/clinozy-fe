@@ -204,6 +204,7 @@ const <name>Route = createRoute({
   getParentRoute: () => organizationShellRoute, // or rootRoute / authShellRoute
   path: '<name>',
   head: manifestHead(<name>Manifest), // document title from manifest.title
+  staticData: { manifest: <name>Manifest }, // when the manifest sets `nav` (useAppNav reads it)
   beforeLoad: async ({ location, params, preload }) => {
     if (preload) return;
     await requireAuth(location.href); // when route is protected

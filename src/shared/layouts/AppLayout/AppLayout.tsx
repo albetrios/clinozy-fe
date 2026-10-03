@@ -9,7 +9,7 @@ import { SessionTimeoutDialog } from '@/shared/components/SessionTimeoutDialog/i
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { WorkspaceSwitchOverlay } from '@/shared/components/WorkspaceSwitchOverlay/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
-import { useVisibleNav } from '@/shared/hooks/useCan/index.ts';
+import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useDeploymentFlagsState } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useOrgBrand } from '@/shared/hooks/useOrgBrand/index.ts';
 import {
@@ -20,7 +20,7 @@ import {
   preloadAllAppShellVariants,
   preloadAppShellVariant,
 } from '@/shared/layouts/AppLayout/app-layout-variants.ts';
-import { NAV_ITEMS, SkipLink } from '@/shared/layouts/AppLayout/AppLayout.shared.tsx';
+import { type NavItems, SkipLink } from '@/shared/layouts/AppLayout/AppLayout.shared.tsx';
 import {
   type AppShellVariant,
   resolveAppShellVariant,
@@ -59,7 +59,7 @@ function ShellSlot({
 }: {
   shellError: unknown;
   mounted: AppShellVariant | null;
-  navItems: typeof NAV_ITEMS;
+  navItems: NavItems;
   organizationSlug: string;
 }) {
   if (shellError !== null) throw shellError;
@@ -79,7 +79,7 @@ function AppLayoutShell({
   organizationSlug,
 }: {
   variant: AppShellVariant;
-  navItems: typeof NAV_ITEMS;
+  navItems: NavItems;
   organizationSlug: string;
 }) {
   const props = { navItems, organizationSlug };
@@ -99,8 +99,8 @@ function AppLayoutShell({
 export function Component() {
   useOrgBrand();
   const { t } = useTranslation(ERRORS_NS);
-  const navItems = useVisibleNav(NAV_ITEMS);
   const { organizationSlug = '' } = useParams({ strict: false });
+  const { entries: navItems } = useAppNav(organizationSlug ? 'organization' : 'personal');
   const themeVariant = useThemeStore((s) => s.appVariant);
   const { flags, ready } = useDeploymentFlagsState();
   // House rule 4: the shell is derived ONLY from loaded session context. Before

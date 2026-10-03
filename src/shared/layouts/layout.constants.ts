@@ -109,7 +109,6 @@ export const LAYOUT_KEYS = {
         organizations: 'app.commandPalette.groups.organizations',
         shortcuts: 'app.commandPalette.groups.shortcuts',
       },
-      dashboard: 'app.commandPalette.dashboard',
       userSettings: 'app.commandPalette.userSettings',
       organizationSettings: 'app.commandPalette.organizationSettings',
       lightMode: 'app.commandPalette.lightMode',

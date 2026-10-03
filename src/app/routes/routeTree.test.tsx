@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requireOrgStatus, requireSuspendedOrgStatus } from '@/app/guards/org-gates.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
+import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
 import {
@@ -299,6 +300,22 @@ describe('router configuration', () => {
       // Let the rejection settle: an unhandled one would fail the run.
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
+  });
+
+  it('draws every route whose manifest asks for the nav (useAppNav reads staticData)', () => {
+    const navRoutes = Object.values(router.routesById).flatMap((route) => {
+      const manifest = route.options.staticData?.manifest;
+      return manifest?.nav ? [{ fullPath: route.fullPath, manifest }] : [];
+    });
+    expect(navRoutes.map((route) => route.fullPath)).toContain(
+      '/organization/$organizationSlug/dashboard',
+    );
+    for (const route of navRoutes) {
+      const scope = route.fullPath.startsWith('/organization/')
+        ? 'organization'
+        : 'personal';
+      expect(navCandidates([route], scope, () => true)).toHaveLength(1);
+    }
   });
 
   it('wires an error component on every routed island (root handles the rest)', () => {
