@@ -10,6 +10,7 @@ import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 import { cspApiOrigin } from './plugins/csp-api-origin.ts';
+import { devServerMode } from './plugins/dev-server-mode.ts';
 import { i18nBuild } from './plugins/i18n-build.ts';
 import { productIdentityHtml } from './plugins/product-identity-html.ts';
 import { versionJson } from './plugins/version-json.ts';
@@ -25,9 +26,13 @@ export default defineConfig(({ command, mode }) => {
 
   // Env files at project root (gitignored; only .env.example is committed): .env.local
   // (local dev) · .env.development / .env.production (the two deploy envs). Vite's `mode` is a
-  // mechanism detail (dev → `development`, build → `production`); the app's environment identity
+  // mechanism detail (dev → `dev-server`, build → `production`); the app's environment identity
   // is carried by VITE_APP_ENV, not the mode — Vite 8 forbids a mode named `local`. Vite loads
-  // `.env.<mode>` (+ `.env.local` in every mode), so `.env.local` always wins for local dev.
+  // `.env.local` in every mode and `.env.<mode>` ON TOP of it, so the dev server runs in a mode
+  // no env file is named after and reads `.env.local` alone; under Vite's default
+  // `development`, `.env.development` would override it — the `devServerMode()` plugin below
+  // refuses that. A build reads `.env.production` (deploys materialize
+  // `.env.production.local`, which beats both).
   const envDir = path.resolve(__dirname);
   const env = loadEnv(mode, envDir, '');
 
@@ -40,6 +45,8 @@ export default defineConfig(({ command, mode }) => {
   return {
     envDir,
     plugins: [
+      // First: refuses a dev server in any mode but `dev-server`, before Vite reads env files.
+      devServerMode(),
       // React Compiler: automatic memoization at build time (React 19).
       // The eslint react-hooks rules already lint for compiler compatibility.
       // plugin-react 6 dropped the `babel` option — the compiler now runs via

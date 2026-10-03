@@ -420,9 +420,12 @@ The **environment identity is an env variable, not the Vite mode**: `VITE_APP_EN
 loudly at load in `env.config.ts`), and the **default is `local`** — mirroring clinozy-be's
 `NODE_ENV=local` so both repos share one env vocabulary. It is decoupled from Vite's `mode`
 because **Vite 8 forbids a mode literally named `local`**; Vite's mode is a mechanism detail
-(dev → `development`, build → `production`, Vitest → its default `test` mode). `local` is not a
-deploy target (`DeployEnvironment` stays `development | production`, while `AppEnvironment` adds
-`local` for its load-time contract). A **test run is not its own environment** — it reports
+(dev → `dev-server`, build → `production`, Vitest → its default `test` mode). The dev server
+never runs in Vite's default `development` mode, where `.env.development` would load on top of
+`.env.local`: `pnpm dev` passes `--mode dev-server`, and `vite.config.ts` refuses any other
+mode. `local` is not a deploy target (`DeployEnvironment` stays `development | production`,
+while `AppEnvironment` adds `local` for its load-time contract). A **test run is not its own
+environment** — it reports
 `local` and is marked by the **`VITE_TEST_MODE`** env variable (injected by `plugins/test-env.ts`,
 read via `platformConfig.testMode`), the single home for any test-only behavior. Vite loads
 `.env.local` in every mode, so the Vitest runner's `envDir` is pointed at an empty dir

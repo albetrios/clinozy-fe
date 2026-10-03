@@ -39,6 +39,25 @@ src/core/config/env-schema.ts   ← Zod + envSchemaKeys
 
 **Client resolution order:** `window.__CONFIG__[key]` → `import.meta.env.VITE_${key}` → Zod default.
 
+### Which env files each command reads
+
+Vite loads `.env`, `.env.local`, `.env.<mode>` and `.env.<mode>.local` from the project root, the
+later file winning key by key, and a variable already in the shell beats every file. `.env.local`
+loads in every mode, so the mode decides whether a deploy-env file lands on top of it:
+
+| Command              | Vite mode    | Env files read                                                                    |
+| -------------------- | ------------ | --------------------------------------------------------------------------------- |
+| `pnpm dev`           | `dev-server` | `.env.local` only — no file is named after this mode                              |
+| `pnpm build`         | `production` | `.env.local`, then `.env.production` on top (deploys add `.env.production.local`) |
+| `pnpm test` (Vitest) | `test`       | none — `envDir` is the empty `tooling/test/empty-env/`                            |
+
+The dev server never runs in Vite's default `development` mode: there `.env.development` — the
+development deploy-env file `pnpm github:sync` pushes from — would override `.env.local`, and a
+local dev server would call the hosted API. `vite.config.ts` refuses to serve in any other mode
+(`plugins/dev-server-mode.ts`, pinned by `tests/ci/dev-server-env.policy.test.ts`), so start the
+dev server with `pnpm dev`, never a bare `vite`. To point local dev at a hosted API on purpose,
+set `VITE_API_BASE_URL` in `.env.local` or the shell.
+
 **Not env:** live session and organization context from **`GET /auth/me/context`**.
 
 **Also not fetched at boot:** login auth surface (OAuth buttons, email OTP, passkey). Set matching `VITE_AUTH_*` on clinozy-fe and credential env on clinozy-be — no `GET /auth/oauth/providers`.
@@ -124,9 +143,9 @@ out of range — e.g. `VITE_DEBUG_LOGGING=true` in production is rejected. Devel
 either boolean (typos still rejected).
 
 The only remaining raw env read is the config bootstrap (`env.config.ts`, allowlisted by
-`pnpm validate:vite-env`). Tests are **hermetic by construction**: `test` mode loads no env
-files (each `.env.<mode>` file — `.env.local`, `.env.development`, `.env.production` — loads only
-in its own mode, and there is no catch-all `.env`), so the suite runs on schema defaults;
+`pnpm validate:vite-env`). Tests are **hermetic by construction**: the runner loads no env
+files (`vitest.config.ts` points `envDir` at the empty `tooling/test/empty-env/` — Vite would
+otherwise load `.env.local` in every mode, `test` included), so the suite runs on schema defaults;
 test-runner env is injected by Vite plugins via `test.env` —
 `i18n-build` (multi-locale) and `test-env` (`VITE_CAPTCHA_DISABLED`).
 
@@ -177,6 +196,7 @@ Follow **`agent-os/skills/fe-env-schema-add/SKILL.md`** end-to-end:
 | `validate:env-example` fails                         | Run `pnpm tool:sync-env-example --fix`                                                                                                                                               |
 | MCP servers missing in Cursor                        | Run `pnpm setup:local --no-start` or `pnpm mcp:setup`                                                                                                                                |
 | Context7 MCP fails                                   | Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor                                                                                                                             |
+| `The dev server runs in mode "dev-server"` on start  | Vite was started bare or with `--mode`; run `pnpm dev` (see [Which env files each command reads](#which-env-files-each-command-reads))                                               |
 
 ## 7. Related files
 

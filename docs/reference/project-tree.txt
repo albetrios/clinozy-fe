@@ -319,6 +319,7 @@ clinozy-fe/
 │   └── README.md
 ├── plugins/
 │   ├── csp-api-origin.ts
+│   ├── dev-server-mode.ts
 │   ├── i18n-build.ts
 │   ├── product-identity-html.ts
 │   ├── test-env.ts
@@ -1481,7 +1482,7 @@ clinozy-fe/
 │   └── vite-env.d.ts
 ├── tests/
 │   ├── ci/
-│   │   └── [29 test files]
+│   │   └── [30 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
