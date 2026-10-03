@@ -54,6 +54,8 @@ export function useCursorList<T>(args: {
   enabled?: boolean;
   /** Toast the mapped error on failure (default: true). */
   notifyOnError?: boolean;
+  /** Poll every loaded page this often, in ms, while the tab is visible (default: no polling). */
+  refetchInterval?: number;
 }): CursorListResult<T> {
   const query = useInfiniteQuery({
     queryKey: args.queryKey,
@@ -63,6 +65,9 @@ export function useCursorList<T>(args: {
     placeholderData: keepPreviousData,
     meta: { notifyOnError: args.notifyOnError ?? true },
     ...(args.enabled !== undefined ? { enabled: args.enabled } : {}),
+    ...(args.refetchInterval !== undefined
+      ? { refetchInterval: args.refetchInterval }
+      : {}),
   });
 
   const { fetchNextPage } = query;

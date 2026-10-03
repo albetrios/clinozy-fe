@@ -154,6 +154,43 @@ describe('useCursorList', () => {
     expect(seen).toEqual([true, false]);
   });
 
+  it('polls every loaded page at the given interval, and not without one', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const queryFn = vi
+        .fn<(after: string | undefined) => Promise<ListPage<Row>>>()
+        .mockResolvedValue({ rows: [{ id: 'a' }], next: null, hasMore: false });
+      const still = vi
+        .fn<(after: string | undefined) => Promise<ListPage<Row>>>()
+        .mockResolvedValue({ rows: [{ id: 'b' }], next: null, hasMore: false });
+
+      renderHook(
+        () =>
+          useCursorList<Row>({
+            queryKey: ['list', 'poll'],
+            queryFn,
+            refetchInterval: 60_000,
+          }),
+        { wrapper },
+      );
+      renderHook(
+        () => useCursorList<Row>({ queryKey: ['list', 'still'], queryFn: still }),
+        {
+          wrapper,
+        },
+      );
+      await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(1));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+      await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
+      expect(still).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('does not fetch when disabled', () => {
     const queryFn = vi
       .fn<(after: string | undefined) => Promise<ListPage<Row>>>()
