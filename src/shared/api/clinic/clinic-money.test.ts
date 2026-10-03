@@ -163,12 +163,14 @@ describe('the fixture world', () => {
     return invoiceBalance(invoice, clinicFixtures.payments.snapshot());
   };
 
-  it("matches the prototype's dues (PY_INV, H:3613–3622)", () => {
-    // INV-785: Flubolt 400 × 8 at ₹120 + 12%, Clonix-B Lotion at ₹340 + 18%; ₹600 paid.
+  it('reads the seeded dues (PY_INV, H:3613–3622) — medicine at MRP, GST included', () => {
+    // INV-785: Flubolt 400 × 8 at ₹120 and Clonix-B Lotion at ₹340, MRP with GST
+    // included (KICKOFF §6.9) — the prototype's seed added 12% / 18% on top
+    // (₹1,476.40); a standing deviation. ₹600 paid.
     expect(balanceOf(785)).toEqual({
-      bill: 147_640,
+      bill: 130_000,
       paid: 60_000,
-      due: 87_640,
+      due: 70_000,
       status: 'partial',
     });
     expect(balanceOf(787)).toMatchObject({ bill: 480_000, status: 'unpaid' });

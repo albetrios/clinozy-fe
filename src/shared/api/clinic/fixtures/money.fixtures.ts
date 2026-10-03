@@ -98,8 +98,10 @@ const INVOICE_ROWS: readonly InvoiceRow[] = [
     type: 'Medical',
     patient: 'Rhea Shah',
     lines: [
-      { name: 'Flubolt 400', qty: 8, rate: 120, disc: 0, gst: 12 },
-      { name: 'Clonix-B Lotion', qty: 1, rate: 340, disc: 0, gst: 18 },
+      // Medicines sell at MRP, which includes GST — 0% on the line (KICKOFF §6.9,
+      // H:5054); the prototype's seed added 12% / 18% on top (a standing deviation).
+      { name: 'Flubolt 400', qty: 8, rate: 120, disc: 0, gst: 0 },
+      { name: 'Clonix-B Lotion', qty: 1, rate: 340, disc: 0, gst: 0 },
     ],
     team: ['DN'],
     date: 'Today',
@@ -144,7 +146,8 @@ const INVOICE_ROWS: readonly InvoiceRow[] = [
     seq: 779,
     type: 'Medical',
     patient: 'Pooja Nair',
-    lines: [{ name: 'Sunscreen SPF 50', qty: 2, rate: 650, disc: 0, gst: 18 }],
+    // MRP includes GST: 0% on the line (KICKOFF §6.9), not the seed's 18% on top.
+    lines: [{ name: 'Sunscreen SPF 50', qty: 2, rate: 650, disc: 0, gst: 0 }],
     team: ['DD'],
     date: '26 Aug',
     at: '12:00',
@@ -200,7 +203,11 @@ const PACKAGE_INVOICE_ROWS: readonly InvoiceRow[] = PACKAGE_ROWS.filter(
   };
 });
 
-/** Every Medical sale owns its invoice (`Invoice.saleId`): the sold lines at MRP. */
+/**
+ * Every Medical sale owns its invoice (`Invoice.saleId`): the sold lines at MRP,
+ * with 0% GST — the MRP already includes it (KICKOFF §6.9, H:5054). The
+ * medicine's own rate is what a print splits out of the MRP, never added on top.
+ */
 const SALE_INVOICE_ROWS: readonly InvoiceRow[] = SALE_ROWS.map((sale) => {
   const sold = readSeedLabel(sale.at);
   return {
@@ -215,7 +222,7 @@ const SALE_INVOICE_ROWS: readonly InvoiceRow[] = SALE_ROWS.map((sale) => {
         qty,
         rate: row.mrp,
         disc: 0,
-        gst: row.gst,
+        gst: 0,
         medicine,
         batch,
       };

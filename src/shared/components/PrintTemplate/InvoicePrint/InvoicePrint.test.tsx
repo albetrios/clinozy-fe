@@ -92,21 +92,22 @@ describe('InvoicePrint', () => {
   });
 
   it('summarises the payment from the ledger (H:448–451)', () => {
+    // INV-785's medicines sell at MRP, GST included (KICKOFF §6.9).
     render(<InvoicePrint {...propsFor(785)} />);
     const summary = screen.getByTestId(PRINT_TEMPLATE_TEST_IDS.invoiceSummary);
     expect(
       within(summary).getByText('Total Amount:').nextElementSibling,
-    ).toHaveTextContent('₹1,476.40');
+    ).toHaveTextContent('₹1,300.00');
     expect(
       within(summary).getByText('Overall Discount:').nextElementSibling,
     ).toHaveTextContent('-₹0.00');
     expect(
       within(summary).getByText('Bill Amount:').nextElementSibling,
-    ).toHaveTextContent('₹1,476.40');
+    ).toHaveTextContent('₹1,300.00');
     // ₹600 received by UPI (PAY-5512).
     expect(
       within(summary).getByText('Balance Due:').nextElementSibling,
-    ).toHaveTextContent('₹876.40');
+    ).toHaveTextContent('₹700.00');
     expect(field('Status:')).toHaveTextContent('Partly paid');
   });
 
