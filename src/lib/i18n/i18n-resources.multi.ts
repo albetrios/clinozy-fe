@@ -39,6 +39,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/en/offerings.json'),
     users: () => import('@/locales/en/users.json'),
     clinic: () => import('@/locales/en/clinic.json'),
+    print: () => import('@/locales/en/print.json'),
   },
   es: {
     common: () => import('@/locales/es/common.json'),
@@ -60,6 +61,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/es/offerings.json'),
     users: () => import('@/locales/es/users.json'),
     clinic: () => import('@/locales/es/clinic.json'),
+    print: () => import('@/locales/es/print.json'),
   },
   zh: {
     common: () => import('@/locales/zh/common.json'),
@@ -81,6 +83,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/zh/offerings.json'),
     users: () => import('@/locales/zh/users.json'),
     clinic: () => import('@/locales/zh/clinic.json'),
+    print: () => import('@/locales/zh/print.json'),
   },
   fr: {
     common: () => import('@/locales/fr/common.json'),
@@ -102,6 +105,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/fr/offerings.json'),
     users: () => import('@/locales/fr/users.json'),
     clinic: () => import('@/locales/fr/clinic.json'),
+    print: () => import('@/locales/fr/print.json'),
   },
   de: {
     common: () => import('@/locales/de/common.json'),
@@ -123,6 +127,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/de/offerings.json'),
     users: () => import('@/locales/de/users.json'),
     clinic: () => import('@/locales/de/clinic.json'),
+    print: () => import('@/locales/de/print.json'),
   },
   ja: {
     common: () => import('@/locales/ja/common.json'),
@@ -144,6 +149,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/ja/offerings.json'),
     users: () => import('@/locales/ja/users.json'),
     clinic: () => import('@/locales/ja/clinic.json'),
+    print: () => import('@/locales/ja/print.json'),
   },
   pt: {
     common: () => import('@/locales/pt/common.json'),
@@ -165,6 +171,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/pt/offerings.json'),
     users: () => import('@/locales/pt/users.json'),
     clinic: () => import('@/locales/pt/clinic.json'),
+    print: () => import('@/locales/pt/print.json'),
   },
   ar: {
     common: () => import('@/locales/ar/common.json'),
@@ -186,6 +193,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/ar/offerings.json'),
     users: () => import('@/locales/ar/users.json'),
     clinic: () => import('@/locales/ar/clinic.json'),
+    print: () => import('@/locales/ar/print.json'),
   },
   hi: {
     common: () => import('@/locales/hi/common.json'),
@@ -207,6 +215,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/hi/offerings.json'),
     users: () => import('@/locales/hi/users.json'),
     clinic: () => import('@/locales/hi/clinic.json'),
+    print: () => import('@/locales/hi/print.json'),
   },
   ko: {
     common: () => import('@/locales/ko/common.json'),
@@ -228,6 +237,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/ko/offerings.json'),
     users: () => import('@/locales/ko/users.json'),
     clinic: () => import('@/locales/ko/clinic.json'),
+    print: () => import('@/locales/ko/print.json'),
   },
   it: {
     common: () => import('@/locales/it/common.json'),
@@ -249,6 +259,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     offerings: () => import('@/locales/it/offerings.json'),
     users: () => import('@/locales/it/users.json'),
     clinic: () => import('@/locales/it/clinic.json'),
+    print: () => import('@/locales/it/print.json'),
   },
 };
 

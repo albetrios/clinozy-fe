@@ -2,8 +2,12 @@ import type { ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 
+import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
+
 import {
+  PRINT_LANGUAGE,
   PRINT_OPEN_DELAY_MS,
+  PRINT_TEMPLATE_NS,
   PRINT_TEMPLATE_TEST_IDS,
 } from './print-template.constants.ts';
 
@@ -14,6 +18,8 @@ export const PRINTING_ATTRIBUTE = 'data-printing';
 const PRINT_HOST_ATTRIBUTE = 'data-print-root';
 
 let cancelCurrent: (() => void) | null = null;
+/** The newest print asked for; an older one still loading its copy is dropped. */
+let latestTicket = 0;
 
 /**
  * Print one document (KICKOFF §3.5, H:4423): render `sheet` — an
@@ -23,12 +29,17 @@ let cancelCurrent: (() => void) | null = null;
  * on A4 with no margins.
  *
  * The host is its own React root, so the sheet gets every record as props; its
- * copy and formats come from the global i18n instance and the locale store.
- * A second call replaces a print whose dialog has not opened yet, so a double
- * click prints once. Resolves when the host is gone.
+ * copy — the `print` namespace in the print language, loaded here first — and
+ * formats come from the global i18n instance and the locale store. A second
+ * call replaces a print whose dialog has not opened yet, so a double click
+ * prints once. Resolves when the host is gone.
  */
-export function printDocument(sheet: ReactNode): Promise<void> {
+export async function printDocument(sheet: ReactNode): Promise<void> {
+  const ticket = ++latestTicket;
   cancelCurrent?.();
+  await ensureNamespace(PRINT_LANGUAGE, PRINT_TEMPLATE_NS);
+  // A newer print was asked for while this one loaded its copy: it replaces this one.
+  if (ticket !== latestTicket) return;
   return new Promise((resolve) => {
     const host = document.createElement('div');
     host.setAttribute(PRINT_HOST_ATTRIBUTE, '');

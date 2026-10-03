@@ -1,4 +1,5 @@
 import { act } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import {
   afterEach,
   beforeEach,
@@ -17,6 +18,19 @@ import {
 
 const host = () =>
   document.querySelector<HTMLElement>(`[data-testid="${PRINT_TEMPLATE_TEST_IDS.root}"]`);
+
+/**
+ * Ask for a print and let it load its copy (cached in tests) and render — the
+ * render follows `ensureNamespace`'s promise by a few microtasks.
+ */
+async function startPrint(...sheets: ReactNode[]) {
+  const printed: Promise<void>[] = [];
+  await act(async () => {
+    for (const sheet of sheets) printed.push(printDocument(sheet));
+    for (let hop = 0; hop < 20; hop += 1) await Promise.resolve();
+  });
+  return printed;
+}
 
 /** Let the 260ms delay and the next frame pass. */
 async function openDialog() {
@@ -49,10 +63,8 @@ describe('printDocument', () => {
     vi.restoreAllMocks();
   });
 
-  it('mounts the sheet in the print host and marks the page as printing', () => {
-    act(() => {
-      void printDocument(<section data-testid="invoice-print">INV-787</section>);
-    });
+  it('mounts the sheet in the print host and marks the page as printing', async () => {
+    await startPrint(<section data-testid="invoice-print">INV-787</section>);
     expect(host()).toHaveAttribute('data-print-root');
     expect(host()?.parentElement).toBe(document.body);
     expect(host()).toContainElement(
@@ -62,9 +74,7 @@ describe('printDocument', () => {
   });
 
   it('opens the print dialog 260ms after the sheet renders, on the next frame', async () => {
-    act(() => {
-      void printDocument(<p>Rx #500</p>);
-    });
+    await startPrint(<p>Rx #500</p>);
     await act(async () => {
       vi.advanceTimersByTime(PRINT_OPEN_DELAY_MS - 1);
     });
@@ -76,10 +86,9 @@ describe('printDocument', () => {
 
   it('removes the sheet after printing', async () => {
     let printed = false;
-    act(() => {
-      void printDocument(<p>INV-787</p>).then(() => {
-        printed = true;
-      });
+    const [done] = await startPrint(<p>INV-787</p>);
+    void done?.then(() => {
+      printed = true;
     });
     await openDialog();
     await act(async () => {
@@ -91,10 +100,7 @@ describe('printDocument', () => {
   });
 
   it('prints once when asked twice before the dialog opens', async () => {
-    act(() => {
-      void printDocument(<p>first</p>);
-      void printDocument(<p>second</p>);
-    });
+    await startPrint(<p>first</p>, <p>second</p>);
     expect(document.querySelectorAll('[data-print-root]')).toHaveLength(1);
     await openDialog();
     expect(print).toHaveBeenCalledTimes(1);
@@ -105,9 +111,7 @@ describe('printDocument', () => {
     print.mockImplementation(() => {
       throw new Error('Not implemented: window.print');
     });
-    act(() => {
-      void printDocument(<p>INV-787</p>);
-    });
+    await startPrint(<p>INV-787</p>);
     await openDialog();
     expect(host()).toBeNull();
     expect(document.documentElement).not.toHaveAttribute(PRINTING_ATTRIBUTE);
