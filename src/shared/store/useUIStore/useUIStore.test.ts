@@ -103,3 +103,17 @@ describe('useUIStore', () => {
     });
   });
 });
+
+describe('useUIStore — clinic session state', () => {
+  it('View-as and the file Activity state start unset and are settable', () => {
+    expect(useUIStore.getState().previewRole).toBeNull();
+    expect(useUIStore.getState().fileActivityOpen).toBeNull();
+    useUIStore.getState().setPreviewRole('pharmacist');
+    useUIStore.getState().setFileActivityOpen(false);
+    expect(useUIStore.getState().previewRole).toBe('pharmacist');
+    expect(useUIStore.getState().fileActivityOpen).toBe(false);
+    useUIStore.getState().setPreviewRole(null);
+    useUIStore.getState().setFileActivityOpen(null);
+    expect(useUIStore.getState().previewRole).toBeNull();
+  });
+});

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 
 interface UIStore {
   sidebarOpen: boolean;
@@ -19,6 +20,16 @@ interface UIStore {
   shortcutsOpen: boolean;
   /** The dedicated Appearance dialog (opened by the floating handle / Customize). */
   appearanceOpen: boolean;
+  /**
+   * View-as (Users › Roles & access): the role whose access the clinic screens
+   * preview, narrowing `useClinicAccess`. Session-only — never persisted.
+   */
+  previewRole: Role | null;
+  /**
+   * The patient file's last Activity-column state, for a link that does not
+   * say; `null` = the file's own default for the viewport.
+   */
+  fileActivityOpen: boolean | null;
 
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -30,6 +41,8 @@ interface UIStore {
   setShortcutsOpen: (open: boolean) => void;
   setAppearanceOpen: (open: boolean) => void;
   toggleAppearance: () => void;
+  setPreviewRole: (role: Role | null) => void;
+  setFileActivityOpen: (open: boolean | null) => void;
 }
 
 /** Ephemeral, per-tab UI state: which overlays and the navigation drawer are open. */
@@ -49,6 +62,8 @@ export const useUIStore = create<UIStore>((set) => ({
   commandPaletteSeed: '',
   shortcutsOpen: false,
   appearanceOpen: false,
+  previewRole: null,
+  fileActivityOpen: null,
 
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
@@ -79,4 +94,6 @@ export const useUIStore = create<UIStore>((set) => ({
       if (next) captureAnalyticsEvent(ANALYTICS_EVENTS.appearanceDialogOpened);
       return { appearanceOpen: next };
     }),
+  setPreviewRole: (previewRole) => set({ previewRole }),
+  setFileActivityOpen: (fileActivityOpen) => set({ fileActivityOpen }),
 }));

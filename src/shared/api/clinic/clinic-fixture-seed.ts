@@ -72,7 +72,7 @@ function parseSeedTime(timePart: string | undefined): string | null {
   if (!timePart) return null;
   const [clock = '', meridiem] = timePart.toLowerCase().split(' ').filter(Boolean);
   const [hours = '', minutes = ''] = clock.split(':');
-  if (!/^\d{1,2}$/.test(hours) || !/^\d{2}$/.test(minutes)) return null;
+  if (!(/^\d{1,2}$/.test(hours) && /^\d{2}$/.test(minutes))) return null;
   let hour = Number(hours);
   if (meridiem === 'pm' && hour < 12) hour += 12;
   if (meridiem === 'am' && hour === 12) hour = 0;
