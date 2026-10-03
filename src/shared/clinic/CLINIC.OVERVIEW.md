@@ -7,7 +7,7 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   descriptions, roles; more shared statuses arrive with the rooms that need
   them). Room-only copy stays in each room's own namespace (`today`, `leads`, …
   `users`).
-- `clinic-tones.ts` — the eleven tones, each section's and role's tone, and
+- `clinic-tones.ts` — each section's and role's tone (the contract's `Tone`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover) — never build `bg-tone-${tone}`.
 - `clinic-section-icons.ts` — each section's icon.

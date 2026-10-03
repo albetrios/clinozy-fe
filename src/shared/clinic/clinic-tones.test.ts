@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { ROLE_VALUES, SECTION_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import {
+  ROLE_VALUES,
+  SECTION_VALUES,
+  TONE_VALUES,
+} from '@/shared/api/clinic/clinic-schema.ts';
 
-import { ROLE_TONES, SECTION_TONES, TONE_CLASSES, TONES } from './clinic-tones.ts';
+import { ROLE_TONES, SECTION_TONES, TONE_CLASSES } from './clinic-tones.ts';
 
 describe('clinic tones', () => {
   it('gives every section its own tone', () => {
@@ -12,11 +16,11 @@ describe('clinic tones', () => {
   });
 
   it('gives every role a tone', () => {
-    for (const role of ROLE_VALUES) expect(TONES).toContain(ROLE_TONES[role]);
+    for (const role of ROLE_VALUES) expect(TONE_VALUES).toContain(ROLE_TONES[role]);
   });
 
   it('spells every class as a literal for its own tone', () => {
-    for (const tone of TONES) {
+    for (const tone of TONE_VALUES) {
       for (const value of Object.values(TONE_CLASSES[tone])) {
         expect(value).toContain(`tone-${tone}`);
         expect(value).not.toContain('${');

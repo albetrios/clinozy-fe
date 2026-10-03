@@ -1,22 +1,4 @@
-import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
-
-/** The launch's eleven tones (KICKOFF §3.1, `preset.md:64–96`); stone is the fallback. */
-export const TONES = [
-  'butter',
-  'lav',
-  'sky',
-  'sage',
-  'blush',
-  'mint',
-  'peach',
-  'plum',
-  'lime',
-  'slate',
-  'stone',
-] as const;
-
-/** One tone name. */
-export type Tone = (typeof TONES)[number];
+import type { Role, Section, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
