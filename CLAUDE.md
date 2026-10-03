@@ -424,8 +424,11 @@ because **Vite 8 forbids a mode literally named `local`**; Vite's mode is a mech
 never runs in Vite's default `development` mode, where `.env.development` would load on top of
 `.env.local`: `pnpm dev` passes `--mode dev-server`, and `vite.config.ts` refuses any other
 mode. A build is mode `production`; in a terminal `pnpm build` asks which `.env.<environment>` to
-build with and reads that file alone (`--env <environment>` skips the question; CI, pipes and
-scripts are not asked and keep Vite's default files). `local` is not a deploy target (`DeployEnvironment` stays `development | production`,
+build with and reads that file alone (`--env <environment>` skips the question). Unasked —
+pipes, scripts, `pnpm health`, the pre-push hook — it reads `.env.local` alone, clinozy-be's
+`local` default; only CI (no `.env.local`) keeps Vite's default files. Unlike clinozy-be,
+`.env.local` is never layered over a deploy environment's file: a build ships what it reads.
+`local` is not a deploy target (`DeployEnvironment` stays `development | production`,
 while `AppEnvironment` adds `local` for its load-time contract). A **test run is not its own
 environment** — it reports
 `local` and is marked by the **`VITE_TEST_MODE`** env variable (injected by `plugins/test-env.ts`,

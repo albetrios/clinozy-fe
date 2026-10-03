@@ -31,15 +31,20 @@ function isBuildEnvironment(value: string): value is BuildEnvironment {
  * Points a build at one environment's env file and returns the `envDir` Vite should use.
  *
  * A build runs in mode `production`, so Vite on its own reads `.env.local` and lays
- * `.env.production` (then `.env.production.local`) over it — on a developer machine, two
- * environments mixed key by key. With {@link BUILD_ENVIRONMENT_VARIABLE} unset (CI, deploys,
- * any caller that did not choose) that is still what happens: this returns `root`. With it
- * set, `.env.<environment>` is read ALONE: its keys go into `processEnv` — a variable already
- * set in the shell keeps its value, as it would over Vite's own files — and this returns
- * `false`, so Vite reads no env file and takes every value from `processEnv`.
+ * `.env.production` (then `.env.production.local`) over it — two environments mixed key by
+ * key. Instead the build reads ONE file: `.env.<environment>` for the environment
+ * {@link BUILD_ENVIRONMENT_VARIABLE} names, or — when nothing chose one — `.env.local`, the
+ * same default clinozy-be takes for an unset `NODE_ENV`. Its keys go into `processEnv` (a
+ * variable already set in the shell keeps its value, as it would over Vite's own files) and
+ * this returns `false`, so Vite reads no env file and takes every value from `processEnv`.
  *
- * Throws on an unknown environment or a missing file, before anything is built. The dev
- * server and `vite preview` are untouched.
+ * Unlike clinozy-be, `.env.local` is never laid over a chosen deploy environment: a build
+ * bakes its env into the bundle that ships, so a machine-local override would ship with it.
+ *
+ * With nothing chosen and no `.env.local` (CI, deploys) this returns `root` and Vite's own
+ * files load — a deploy's materialized `.env.production.local` — exactly as before. Throws on
+ * an unknown environment or a missing file, before anything is built. The dev server and
+ * `vite preview` are untouched.
  */
 export function applyBuildEnvironment({
   command,
@@ -50,8 +55,12 @@ export function applyBuildEnvironment({
   root: string;
   processEnv?: NodeJS.ProcessEnv;
 }): string | false {
-  const environment = processEnv[BUILD_ENVIRONMENT_VARIABLE];
-  if (command !== 'build' || environment === undefined || environment === '') return root;
+  if (command !== 'build') return root;
+  let environment = processEnv[BUILD_ENVIRONMENT_VARIABLE] || undefined;
+  if (environment === undefined) {
+    if (!existsSync(join(root, '.env.local'))) return root;
+    environment = 'local';
+  }
   if (!isBuildEnvironment(environment)) {
     throw new Error(
       `${BUILD_ENVIRONMENT_VARIABLE}="${environment}" is not an environment — use ${BUILD_ENVIRONMENTS.join(', ')}.`,

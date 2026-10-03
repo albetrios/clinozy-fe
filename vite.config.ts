@@ -32,10 +32,10 @@ export default defineConfig(({ command, mode }) => {
   // `.env.local` in every mode and `.env.<mode>` ON TOP of it, so the dev server runs in a mode
   // no env file is named after and reads `.env.local` alone; under Vite's default
   // `development`, `.env.development` would override it — the `devServerMode()` plugin below
-  // refuses that. A build is mode `production`: `pnpm build` asks which environment to build
-  // with and passes BUILD_ENVIRONMENT, and that one file is then read alone (envDir false, its
-  // values in process.env). Unasked (CI, deploys, non-interactive callers) Vite reads
-  // `.env.local` with `.env.production` on top; deploys materialize `.env.production.local`.
+  // refuses that. A build is mode `production` and reads ONE env file (envDir false, its values
+  // in process.env): the environment `pnpm build` asked for (BUILD_ENVIRONMENT), else
+  // `.env.local` — clinozy-be's default for an unset NODE_ENV. With neither (CI, deploys) Vite's
+  // own files load; deploys materialize `.env.production.local`.
   //
   // Source maps go to Sentry only when a build asks for it: the deploy workflow sets
   // SENTRY_UPLOAD_SOURCEMAPS=true on its build step, and `pnpm build --sentry` does the same by

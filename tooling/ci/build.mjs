@@ -3,12 +3,10 @@
  * `pnpm build` — asks which environment's env file the build reads, then runs
  * `pnpm build:bundle` (tsc, vite build, strip-sourcemaps).
  *
- * A build runs in Vite mode `production`, so on its own Vite reads `.env.local` and lays
- * `.env.production` over it — on a developer machine, two environments mixed key by key.
- * When this runs in a terminal and any environment's file is present (`.env.local`,
- * `.env.development`, `.env.production`), it lists the ones that exist and asks. The answer
- * reaches `vite.config.ts` as `BUILD_ENVIRONMENT`, and that file is then read alone
- * (`plugins/build-environment.ts`).
+ * A build reads ONE env file (`plugins/build-environment.ts`). When this runs in a terminal
+ * and any environment's file is present (`.env.local`, `.env.development`, `.env.production`),
+ * it lists the ones that exist and asks; the answer reaches `vite.config.ts` as
+ * `BUILD_ENVIRONMENT`.
  *
  *   pnpm build                              ask (terminal, an env file present)
  *   pnpm build --env production             no question: .env.production alone
@@ -19,9 +17,10 @@
  * `SENTRY_UPLOAD_SOURCEMAPS=true` as the deploy workflow sets it. A local build is a test
  * build, so by default it creates no Sentry release, whatever its env file holds.
  *
- * Nothing is asked in CI or when stdin or stdout is not a terminal (`pnpm health`,
- * Playwright's webServer, report scripts): the build then reads Vite's default files,
- * exactly as before this script existed.
+ * Nothing is asked in CI or when stdin or stdout is not a terminal (`pnpm health`, the
+ * pre-push hook, Playwright's webServer, report scripts): the build then reads `.env.local`
+ * alone — the `local` default, as clinozy-be reads an unset `NODE_ENV` — or, with no
+ * `.env.local` (CI), Vite's default files, as before this script existed.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -198,10 +197,10 @@ async function main() {
       ? ` (next time without asking: pnpm build --env ${environment}${sentry ? ' --sentry' : ''})`
       : '';
     console.log(`pnpm build: building with .env.${environment} alone${hint}.`);
-  } else if (!process.env.CI && availableEnvironments(process.cwd()).length > 0) {
-    // Nobody chose and nobody could be asked (not a terminal): say what Vite will read.
+  } else if (availableEnvironments(process.cwd()).includes('local')) {
+    // Nobody chose and nobody could be asked (not a terminal): say what the build reads.
     console.log(
-      "pnpm build: not asked (not a terminal) — Vite's default env files: .env.local, then .env.production on top. Choose one with --env <environment>.",
+      'pnpm build: not asked (not a terminal) — building with .env.local alone, the local default. Choose another with --env <environment>.',
     );
   }
   if (sentry) console.log('pnpm build: uploading source maps to Sentry (--sentry).');

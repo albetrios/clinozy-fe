@@ -19,9 +19,10 @@ const ROOT = process.cwd();
  * Build-environment guard. A build is Vite mode `production`, so on its own Vite reads
  * `.env.local` and lays `.env.production` over it. `pnpm build` asks which environment to
  * build with (`tooling/ci/build.mjs`) and passes `BUILD_ENVIRONMENT`; `vite.config.ts` then
- * reads `.env.<environment>` ALONE (`plugins/build-environment.ts`). These checks pin that a
- * chosen file is the only one read, that the shell still wins, and that nothing changes for
- * a build nobody chose for (CI, deploys).
+ * reads `.env.<environment>` ALONE (`plugins/build-environment.ts`). With nothing chosen it
+ * reads `.env.local` alone — clinozy-be's default for an unset `NODE_ENV` — and only where
+ * there is no `.env.local` (CI, deploys) do Vite's own files load. These checks pin that one
+ * file is read, that the shell still wins, and that CI and deploys are unchanged.
  *
  * The probe keys carry their own prefix so the runner's real env can never answer for a file.
  */
@@ -84,15 +85,33 @@ describe('build environment', () => {
     }
   });
 
-  it("unchosen, a build keeps Vite's default files (.env.production over .env.local)", () => {
-    const processEnv: NodeJS.ProcessEnv = {};
-    expect(applyBuildEnvironment({ command: 'build', root, processEnv })).toBe(root);
-    expect(processEnv).toEqual({});
-    expect(loadEnv('production', root, PREFIX)).toMatchObject({
-      [`${PREFIX}API_BASE_URL`]: 'https://api.example.com',
-      [`${PREFIX}LOCAL_ONLY`]: 'local',
-      [`${PREFIX}PRODUCTION_ONLY`]: 'production',
-    });
+  it('unchosen, a build reads .env.local alone (the local default, as in clinozy-be)', () => {
+    for (const chosen of [undefined, '']) {
+      const processEnv: NodeJS.ProcessEnv =
+        chosen === undefined ? {} : { [BUILD_ENVIRONMENT_VARIABLE]: chosen };
+      expect(applyBuildEnvironment({ command: 'build', root, processEnv })).toBe(false);
+      expect(processEnv[`${PREFIX}LOCAL_ONLY`]).toBe('local');
+      expect(processEnv[`${PREFIX}API_BASE_URL`]).toBe('');
+      expect(processEnv[`${PREFIX}PRODUCTION_ONLY`]).toBeUndefined();
+    }
+  });
+
+  it("unchosen without a .env.local (CI, deploys), Vite's own files load as before", () => {
+    const ci = mkdtempSync(join(tmpdir(), 'clinozy-build-environment-ci-'));
+    try {
+      writeFileSync(
+        join(ci, '.env.production.local'),
+        `${PREFIX}API_BASE_URL=https://api.example.com\n`,
+      );
+      const processEnv: NodeJS.ProcessEnv = {};
+      expect(applyBuildEnvironment({ command: 'build', root: ci, processEnv })).toBe(ci);
+      expect(processEnv).toEqual({});
+      expect(loadEnv('production', ci, PREFIX)).toEqual({
+        [`${PREFIX}API_BASE_URL`]: 'https://api.example.com',
+      });
+    } finally {
+      rmSync(ci, { recursive: true, force: true });
+    }
   });
 
   it('the dev server and vite preview ignore BUILD_ENVIRONMENT', () => {
