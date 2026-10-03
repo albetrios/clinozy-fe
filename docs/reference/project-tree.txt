@@ -318,6 +318,7 @@ clinozy-fe/
 │   │   └── README.md
 │   └── README.md
 ├── plugins/
+│   ├── build-environment.ts
 │   ├── csp-api-origin.ts
 │   ├── dev-server-mode.ts
 │   ├── i18n-build.ts
@@ -1482,7 +1483,7 @@ clinozy-fe/
 │   └── vite-env.d.ts
 ├── tests/
 │   ├── ci/
-│   │   └── [30 test files]
+│   │   └── [31 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -1520,6 +1521,8 @@ clinozy-fe/
 │   │   ├── generate.ts
 │   │   └── lock.ts
 │   ├── ci/
+│   │   ├── build.d.mts
+│   │   ├── build.mjs
 │   │   ├── bulk-audit.mjs
 │   │   ├── check-api-contract-drift.mjs
 │   │   ├── check-css-sources.mjs
@@ -1533,7 +1536,7 @@ clinozy-fe/
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
 │   │   ├── strip-sourcemaps.mjs
-│   │   └── [3 test files]
+│   │   └── [4 test files]
 │   ├── dev/
 │   │   ├── chrome-devtools-mcp.mjs
 │   │   ├── mcp-config.ts

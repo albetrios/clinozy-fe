@@ -9,6 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { applyBuildEnvironment } from './plugins/build-environment.ts';
 import { cspApiOrigin } from './plugins/csp-api-origin.ts';
 import { devServerMode } from './plugins/dev-server-mode.ts';
 import { i18nBuild } from './plugins/i18n-build.ts';
@@ -31,9 +32,11 @@ export default defineConfig(({ command, mode }) => {
   // `.env.local` in every mode and `.env.<mode>` ON TOP of it, so the dev server runs in a mode
   // no env file is named after and reads `.env.local` alone; under Vite's default
   // `development`, `.env.development` would override it — the `devServerMode()` plugin below
-  // refuses that. A build reads `.env.production` (deploys materialize
-  // `.env.production.local`, which beats both).
-  const envDir = path.resolve(__dirname);
+  // refuses that. A build is mode `production`: `pnpm build` asks which environment to build
+  // with and passes BUILD_ENVIRONMENT, and that one file is then read alone (envDir false, its
+  // values in process.env). Unasked (CI, deploys, non-interactive callers) Vite reads
+  // `.env.local` with `.env.production` on top; deploys materialize `.env.production.local`.
+  const envDir = applyBuildEnvironment({ command, root: path.resolve(__dirname) });
   const env = loadEnv(mode, envDir, '');
 
   // One build id per build, shared by version.json (new-deploy detection) and the
