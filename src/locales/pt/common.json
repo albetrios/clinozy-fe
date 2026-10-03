@@ -424,5 +424,26 @@
       "added_other": "{{count}} adicionados",
       "noneYet": "Nenhum ainda"
     }
+  },
+  "uploadTray": {
+    "label": "Envios",
+    "uploading": "Enviando {{left}} de {{total}}…",
+    "complete": "Todos os envios concluídos",
+    "failed_one": "{{count}} envio falhou",
+    "failed_many": "{{count}} envios falharam",
+    "failed_other": "{{count}} envios falharam",
+    "skipped_one": "{{count}} arquivo acima de {{limit}} ignorado",
+    "skipped_many": "{{count}} arquivos acima de {{limit}} ignorados",
+    "skipped_other": "{{count}} arquivos acima de {{limit}} ignorados",
+    "show": "Mostrar envios",
+    "hide": "Ocultar envios",
+    "uploadFailed": "Não foi possível enviar",
+    "attachFailed": "Não foi possível anexar",
+    "retry": "Tentar {{name}} novamente",
+    "remove": "Remover {{name}}",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

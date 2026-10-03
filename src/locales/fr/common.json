@@ -424,5 +424,26 @@
       "added_other": "{{count}} ajoutés",
       "noneYet": "Aucun pour l’instant"
     }
+  },
+  "uploadTray": {
+    "label": "Importations",
+    "uploading": "Importation de {{left}} sur {{total}}…",
+    "complete": "Toutes les importations sont terminées",
+    "failed_one": "{{count}} importation a échoué",
+    "failed_many": "{{count}} importations ont échoué",
+    "failed_other": "{{count}} importations ont échoué",
+    "skipped_one": "{{count}} fichier de plus de {{limit}} ignoré",
+    "skipped_many": "{{count}} fichiers de plus de {{limit}} ignorés",
+    "skipped_other": "{{count}} fichiers de plus de {{limit}} ignorés",
+    "show": "Afficher les importations",
+    "hide": "Masquer les importations",
+    "uploadFailed": "Échec de l’importation",
+    "attachFailed": "Échec de l’ajout",
+    "retry": "Réessayer {{name}}",
+    "remove": "Retirer {{name}}",
+    "size": {
+      "kilobytes": "{{value}} Ko",
+      "megabytes": "{{value}} Mo"
+    }
   }
 }

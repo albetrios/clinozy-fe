@@ -6,6 +6,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { CommandPaletteLazy } from '@/shared/components/CommandPalette/index.ts';
 import { KeyboardShortcutsLazy } from '@/shared/components/KeyboardShortcutsDialog/KeyboardShortcutsLazy.tsx';
 import { SessionTimeoutDialog } from '@/shared/components/SessionTimeoutDialog/index.ts';
+import { UploadTray } from '@/shared/components/UploadTray/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { WorkspaceSwitchOverlay } from '@/shared/components/WorkspaceSwitchOverlay/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
@@ -225,6 +226,9 @@ export function Component() {
       <CommandPaletteLazy />
       <KeyboardShortcutsLazy />
       <SessionTimeoutDialog />
+      {/* Here, not in a shell variant: an upload outlives the screen that started it, and
+          every shell (section bar or any preview) must show it. Renders nothing when idle. */}
+      <UploadTray />
     </div>
   );
 }

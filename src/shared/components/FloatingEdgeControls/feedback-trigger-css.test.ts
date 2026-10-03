@@ -56,6 +56,15 @@ describe('Sentry feedback trigger placement', () => {
     );
   });
 
+  // The upload tray sits in the bottom inline-end corner at every width while files are
+  // moving; the trigger (z 100000) would otherwise cover the tray's last row.
+  it('steps aside at every width while the upload tray shows', () => {
+    const outsideMedia = rules.replace(/@media[^{]*\{[\s\S]*?\n\}/g, '');
+    expect(outsideMedia).toMatch(
+      /:root:has\(\[data-slot='upload-tray'\]\) #sentry-feedback\s*\{\s*display:\s*none/,
+    );
+  });
+
   // Pre-existing contract, asserted here so the rules above cannot be "fixed"
   // by deleting the block they share: the mobile tab bar publishes its height
   // and the trigger lifts clear of it.

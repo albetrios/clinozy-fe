@@ -418,5 +418,22 @@
       "added_other": "{{count}} 件追加",
       "noneYet": "まだありません"
     }
+  },
+  "uploadTray": {
+    "label": "アップロード",
+    "uploading": "{{total}} 件中 {{left}} 件をアップロード中…",
+    "complete": "すべてのアップロードが完了しました",
+    "failed_other": "{{count}} 件のアップロードに失敗しました",
+    "skipped_other": "{{limit}} を超える {{count}} 件のファイルをスキップしました",
+    "show": "アップロードを表示",
+    "hide": "アップロードを非表示",
+    "uploadFailed": "アップロードできませんでした",
+    "attachFailed": "添付できませんでした",
+    "retry": "{{name}} を再試行",
+    "remove": "{{name}} を削除",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

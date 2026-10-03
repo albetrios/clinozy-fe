@@ -424,5 +424,26 @@
       "added_other": "{{count}} aggiunti",
       "noneYet": "Nessuno per ora"
     }
+  },
+  "uploadTray": {
+    "label": "Caricamenti",
+    "uploading": "Caricamento di {{left}} su {{total}}…",
+    "complete": "Tutti i caricamenti completati",
+    "failed_one": "{{count}} caricamento non riuscito",
+    "failed_many": "{{count}} caricamenti non riusciti",
+    "failed_other": "{{count}} caricamenti non riusciti",
+    "skipped_one": "{{count}} file oltre {{limit}} ignorato",
+    "skipped_many": "{{count}} file oltre {{limit}} ignorati",
+    "skipped_other": "{{count}} file oltre {{limit}} ignorati",
+    "show": "Mostra caricamenti",
+    "hide": "Nascondi caricamenti",
+    "uploadFailed": "Caricamento non riuscito",
+    "attachFailed": "Allegato non riuscito",
+    "retry": "Riprova {{name}}",
+    "remove": "Rimuovi {{name}}",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

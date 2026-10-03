@@ -418,5 +418,22 @@
       "added_other": "已添加 {{count}} 项",
       "noneYet": "暂无"
     }
+  },
+  "uploadTray": {
+    "label": "上传",
+    "uploading": "正在上传 {{total}} 个中的 {{left}} 个…",
+    "complete": "全部上传完成",
+    "failed_other": "{{count}} 个上传失败",
+    "skipped_other": "已跳过 {{count}} 个超过 {{limit}} 的文件",
+    "show": "显示上传",
+    "hide": "隐藏上传",
+    "uploadFailed": "无法上传",
+    "attachFailed": "无法附加",
+    "retry": "重试 {{name}}",
+    "remove": "移除 {{name}}",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

@@ -421,5 +421,24 @@
       "added_other": "{{count}} hinzugefügt",
       "noneYet": "Noch keine"
     }
+  },
+  "uploadTray": {
+    "label": "Uploads",
+    "uploading": "{{left}} von {{total}} werden hochgeladen…",
+    "complete": "Alle Uploads abgeschlossen",
+    "failed_one": "{{count}} Upload fehlgeschlagen",
+    "failed_other": "{{count}} Uploads fehlgeschlagen",
+    "skipped_one": "{{count}} Datei über {{limit}} übersprungen",
+    "skipped_other": "{{count}} Dateien über {{limit}} übersprungen",
+    "show": "Uploads einblenden",
+    "hide": "Uploads ausblenden",
+    "uploadFailed": "Hochladen fehlgeschlagen",
+    "attachFailed": "Anhängen fehlgeschlagen",
+    "retry": "{{name}} erneut versuchen",
+    "remove": "{{name}} entfernen",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

@@ -421,5 +421,24 @@
       "added_other": "{{count}} added",
       "noneYet": "None yet"
     }
+  },
+  "uploadTray": {
+    "label": "Uploads",
+    "uploading": "Uploading {{left}} of {{total}}…",
+    "complete": "All uploads complete",
+    "failed_one": "{{count}} upload failed",
+    "failed_other": "{{count}} uploads failed",
+    "skipped_one": "{{count}} file over {{limit}} skipped",
+    "skipped_other": "{{count}} files over {{limit}} skipped",
+    "show": "Show uploads",
+    "hide": "Hide uploads",
+    "uploadFailed": "Couldn’t upload",
+    "attachFailed": "Couldn’t attach",
+    "retry": "Retry {{name}}",
+    "remove": "Remove {{name}}",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

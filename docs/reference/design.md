@@ -157,7 +157,10 @@ on its surface, in both modes.
     `wrap-anywhere`, or it runs past its card and is clipped mid-word.
   - **The end corner belongs to the feedback trigger and the edge handles.** A
     new floating surface takes the bottom-_start_ corner (`start-*`, so it
-    mirrors under RTL) — see `ConsentBanner`.
+    mirrors under RTL) — see `ConsentBanner`. The clinic bottom stack is the
+    designed exception: a floating "New" (phone) and the upload tray (every
+    width) claim the bottom-end corner while they show, and the trigger steps
+    aside for them in `index.css`.
 
 - **Not Claude-width by default.** Chat products cap ~720–768px for long answers.
   This product is a control surface — width is for tables and panels; constrain

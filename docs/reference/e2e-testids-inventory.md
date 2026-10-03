@@ -67,6 +67,12 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `account-menu-shortcuts`         | Account menu: Keyboard shortcuts row                                          | `AppLayout/components/AccountMenu/`                   |
 | `view-as-bar`                    | View-as pill ("Previewing as <role>")                                         | `AppLayout/components/NoticeStack/`                   |
 | `view-as-exit`                   | View-as pill: Exit preview                                                    | `AppLayout/components/NoticeStack/`                   |
+| `upload-tray`                    | Upload tray (bottom inline-end; shown while files upload)                     | `components/UploadTray/` (mounted by `AppLayout.tsx`) |
+| `upload-tray-status`             | Upload tray live status (always mounted, visually hidden)                     | UploadTray                                            |
+| `upload-tray-toggle`             | Upload tray: collapse / expand the file list                                  | UploadTray                                            |
+| `upload-tray-row`                | One file (`data-status`: queued, uploading, attaching, done, failed)          | UploadTray                                            |
+| `upload-tray-retry`              | Failed file: Retry (resumes at the step that failed)                          | UploadTray                                            |
+| `upload-tray-remove`             | Failed file: Remove                                                           | UploadTray                                            |
 | `today-page`                     | Clinic room page: Today                                                       | `pages/organization/$organizationSlug/today/`         |
 | `leads-page`                     | Clinic room page: Leads                                                       | `pages/organization/$organizationSlug/leads/`         |
 | `appointments-page`              | Clinic room page: Appointments                                                | `pages/organization/$organizationSlug/appointments/`  |

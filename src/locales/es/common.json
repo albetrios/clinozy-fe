@@ -424,5 +424,26 @@
       "added_other": "{{count}} añadidos",
       "noneYet": "Ninguno aún"
     }
+  },
+  "uploadTray": {
+    "label": "Subidas",
+    "uploading": "Subiendo {{left}} de {{total}}…",
+    "complete": "Todas las subidas completadas",
+    "failed_one": "{{count}} subida fallida",
+    "failed_many": "{{count}} subidas fallidas",
+    "failed_other": "{{count}} subidas fallidas",
+    "skipped_one": "{{count}} archivo de más de {{limit}} omitido",
+    "skipped_many": "{{count}} archivos de más de {{limit}} omitidos",
+    "skipped_other": "{{count}} archivos de más de {{limit}} omitidos",
+    "show": "Mostrar subidas",
+    "hide": "Ocultar subidas",
+    "uploadFailed": "No se pudo subir",
+    "attachFailed": "No se pudo adjuntar",
+    "retry": "Reintentar {{name}}",
+    "remove": "Quitar {{name}}",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

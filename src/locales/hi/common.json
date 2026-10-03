@@ -421,5 +421,24 @@
       "added_other": "{{count}} जोड़े गए",
       "noneYet": "अभी कोई नहीं"
     }
+  },
+  "uploadTray": {
+    "label": "अपलोड",
+    "uploading": "{{total}} में से {{left}} अपलोड हो रहे हैं…",
+    "complete": "सभी अपलोड पूरे हुए",
+    "failed_one": "{{count}} अपलोड विफल रहा",
+    "failed_other": "{{count}} अपलोड विफल रहे",
+    "skipped_one": "{{limit}} से बड़ी {{count}} फ़ाइल छोड़ी गई",
+    "skipped_other": "{{limit}} से बड़ी {{count}} फ़ाइलें छोड़ी गईं",
+    "show": "अपलोड दिखाएँ",
+    "hide": "अपलोड छिपाएँ",
+    "uploadFailed": "अपलोड नहीं हो सका",
+    "attachFailed": "संलग्न नहीं हो सका",
+    "retry": "{{name}} फिर से आज़माएँ",
+    "remove": "{{name}} हटाएँ",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

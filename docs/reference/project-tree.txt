@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~877 src files · ~477 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~885 src files · ~480 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1543,6 +1543,12 @@ clinozy-fe/
 │   │   │   │   ├── TotpCodeInput.tsx
 │   │   │   │   └── [1 test file]
 │   │   │   ├── ui/
+│   │   │   ├── UploadTray/
+│   │   │   │   ├── format-file-size.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── upload-tray.constants.ts
+│   │   │   │   ├── UploadTray.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── WidgetErrorBoundary/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WidgetErrorBoundary.tsx
@@ -1805,6 +1811,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useUpdateOrganization.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useUploadQueue/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useUploadQueue.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useUserAvatar/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useUserAvatar.ts
@@ -1950,6 +1960,10 @@ clinozy-fe/
 │   │   │   ├── useUIStore/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useUIStore.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useUploadQueueStore/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useUploadQueueStore.ts
 │   │   │   │   └── [1 test file]
 │   │   │   └── useWorkspaceSwitchStore/
 │   │   │       ├── index.ts

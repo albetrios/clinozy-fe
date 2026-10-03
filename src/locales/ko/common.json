@@ -418,5 +418,22 @@
       "added_other": "{{count}}개 추가됨",
       "noneYet": "아직 없음"
     }
+  },
+  "uploadTray": {
+    "label": "업로드",
+    "uploading": "{{total}}개 중 {{left}}개 업로드 중…",
+    "complete": "모든 업로드 완료",
+    "failed_other": "업로드 {{count}}개 실패",
+    "skipped_other": "{{limit}} 초과 파일 {{count}}개 건너뜀",
+    "show": "업로드 표시",
+    "hide": "업로드 숨기기",
+    "uploadFailed": "업로드하지 못함",
+    "attachFailed": "첨부하지 못함",
+    "retry": "{{name}} 다시 시도",
+    "remove": "{{name}} 제거",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
   }
 }

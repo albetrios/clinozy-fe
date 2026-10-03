@@ -433,5 +433,32 @@
       "added_other": "{{count}} مُضاف",
       "noneYet": "لا شيء بعد"
     }
+  },
+  "uploadTray": {
+    "label": "عمليات الرفع",
+    "uploading": "جارٍ رفع {{left}} من {{total}}…",
+    "complete": "اكتملت جميع عمليات الرفع",
+    "failed_zero": "لا توجد عمليات رفع فاشلة",
+    "failed_one": "فشلت عملية رفع واحدة",
+    "failed_two": "فشلت عمليتا رفع",
+    "failed_few": "فشلت {{count}} عمليات رفع",
+    "failed_many": "فشلت {{count}} عملية رفع",
+    "failed_other": "فشلت {{count}} عملية رفع",
+    "skipped_zero": "لم يُتخطَّ أي ملف",
+    "skipped_one": "تم تخطي ملف واحد يتجاوز {{limit}}",
+    "skipped_two": "تم تخطي ملفين يتجاوزان {{limit}}",
+    "skipped_few": "تم تخطي {{count}} ملفات تتجاوز {{limit}}",
+    "skipped_many": "تم تخطي {{count}} ملفًا يتجاوز {{limit}}",
+    "skipped_other": "تم تخطي {{count}} ملف يتجاوز {{limit}}",
+    "show": "إظهار عمليات الرفع",
+    "hide": "إخفاء عمليات الرفع",
+    "uploadFailed": "تعذّر الرفع",
+    "attachFailed": "تعذّر الإرفاق",
+    "retry": "إعادة محاولة {{name}}",
+    "remove": "إزالة {{name}}",
+    "size": {
+      "kilobytes": "{{value}} كيلوبايت",
+      "megabytes": "{{value}} ميغابايت"
+    }
   }
 }

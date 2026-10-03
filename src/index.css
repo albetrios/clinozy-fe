@@ -1693,6 +1693,12 @@
     display: none;
   }
 }
+/* The upload tray takes the same corner at every width while files are moving
+   (KICKOFF §3.5). It is a seconds-long state, so the trigger waits for it, as
+   it does for the consent card — otherwise it sits on the tray's last row. */
+:root:has([data-slot='upload-tray']) #sentry-feedback {
+  display: none;
+}
 /* Same rule, the other direction: a MODAL dialog owns the screen while it is
    open, and the trigger is pinned above everything the dialog dims — so it sat
    lit up over Settings, over a confirm, over the invite form, at every width.
