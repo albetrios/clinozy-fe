@@ -23,9 +23,16 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
 }));
 
+import { useDrawerItemsField } from './record-drawer-items.ts';
 import { RecordDrawer, type RecordDrawerProps } from './RecordDrawer.tsx';
 
 type HarnessProps = Partial<RecordDrawerProps> & { startOpen?: boolean };
+
+/** Stands in for an `ItemsField`: reports an item-rows table to the drawer. */
+function ItemsTableStub({ wide }: { wide: boolean }) {
+  useDrawerItemsField(wide);
+  return <p>item rows</p>;
+}
 
 /** A page with the button that opens the drawer, as a list's "New" would. */
 function Harness({ startOpen = false, onClose, ...props }: HarnessProps) {
@@ -131,6 +138,27 @@ describe('RecordDrawer — shell', () => {
     );
     expect(await screen.findByTestId('pt')).toHaveClass(
       'md:w-[min(840px,calc(100vw-56px))]',
+    );
+  });
+
+  it('takes 840px from an items table that reports itself, not from a compact one', async () => {
+    const { unmount } = renderWithProviders(
+      <Harness startOpen content={{ fieldCount: 3 }}>
+        <ItemsTableStub wide />
+      </Harness>,
+    );
+    expect(await screen.findByTestId('pt')).toHaveClass(
+      'md:w-[min(840px,calc(100vw-56px))]',
+    );
+    unmount();
+
+    renderWithProviders(
+      <Harness startOpen content={{ fieldCount: 3 }}>
+        <ItemsTableStub wide={false} />
+      </Harness>,
+    );
+    expect(await screen.findByTestId('pt')).toHaveClass(
+      'md:w-[min(560px,calc(100vw-56px))]',
     );
   });
 

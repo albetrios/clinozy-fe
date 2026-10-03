@@ -222,5 +222,15 @@
       "wrongItems": "商品错误",
       "customerChangedMind": "顾客改变主意"
     }
+  },
+  "itemsField": {
+    "addRow": "添加行",
+    "removeRow": "删除行",
+    "remove": "删除",
+    "decrease": "减少",
+    "increase": "增加",
+    "note": "备注",
+    "notePlaceholder": "说明",
+    "moneyPlaceholder": "₹ 0"
   }
 }

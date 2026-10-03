@@ -224,5 +224,15 @@
       "wrongItems": "गलत आइटम",
       "customerChangedMind": "ग्राहक ने मन बदल लिया"
     }
+  },
+  "itemsField": {
+    "addRow": "पंक्ति जोड़ें",
+    "removeRow": "पंक्ति हटाएँ",
+    "remove": "हटाएँ",
+    "decrease": "घटाएँ",
+    "increase": "बढ़ाएँ",
+    "note": "नोट",
+    "notePlaceholder": "टिप्पणियाँ",
+    "moneyPlaceholder": "₹ 0"
   }
 }

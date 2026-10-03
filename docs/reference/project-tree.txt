@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~930 src files · ~507 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~939 src files · ~511 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1490,6 +1490,7 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── RecordDrawer/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── record-drawer-items.ts
 │   │   │   │   ├── record-drawer-width.ts
 │   │   │   │   ├── record-drawer.constants.ts
 │   │   │   │   ├── RecordDrawer.tsx
@@ -1665,6 +1666,14 @@ clinozy-fe/
 │   │   │   │   ├── FormField.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── ItemsField/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── items-field-cells.tsx
+│   │   │   │   ├── items-field-number.ts
+│   │   │   │   ├── items-field.constants.ts
+│   │   │   │   ├── items-field.types.ts
+│   │   │   │   ├── ItemsField.tsx
+│   │   │   │   └── [3 test files]
 │   │   │   └── ProfileForm/
 │   │   │       ├── contracts.ts
 │   │   │       ├── index.ts
@@ -1774,6 +1783,10 @@ clinozy-fe/
 │   │   │   ├── useInvitations/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useInvitations.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useItemsTotal/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useItemsTotal.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useLeads/
 │   │   │   │   ├── index.ts

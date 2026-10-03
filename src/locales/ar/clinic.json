@@ -232,5 +232,15 @@
       "wrongItems": "أصناف خاطئة",
       "customerChangedMind": "غيّر العميل رأيه"
     }
+  },
+  "itemsField": {
+    "addRow": "إضافة صف",
+    "removeRow": "إزالة الصف",
+    "remove": "إزالة",
+    "decrease": "إنقاص",
+    "increase": "زيادة",
+    "note": "ملاحظة",
+    "notePlaceholder": "ملاحظات",
+    "moneyPlaceholder": "₹ 0"
   }
 }

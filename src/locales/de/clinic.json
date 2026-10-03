@@ -224,5 +224,15 @@
       "wrongItems": "Falsche Artikel",
       "customerChangedMind": "Kunde hat es sich anders überlegt"
     }
+  },
+  "itemsField": {
+    "addRow": "Zeile hinzufügen",
+    "removeRow": "Zeile entfernen",
+    "remove": "Entfernen",
+    "decrease": "Verringern",
+    "increase": "Erhöhen",
+    "note": "Notiz",
+    "notePlaceholder": "Anmerkungen",
+    "moneyPlaceholder": "₹ 0"
   }
 }

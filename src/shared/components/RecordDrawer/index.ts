@@ -1,3 +1,4 @@
+export { useDrawerItemsField } from './record-drawer-items.ts';
 export {
   type DrawerContentProfile,
   drawerWidthAt,

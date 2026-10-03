@@ -296,6 +296,26 @@ Below, `<d>` is that root id.
 | `<d>-not-saved`                                        | "Not saved · your changes are kept" after a failed save                    | DrawerFooter                           |
 | `confirm-dialog` / `confirm-accept` / `confirm-cancel` | "Discard changes?" prompt of a dirty drawer (Discard / Keep editing)       | `shared/hooks/useUnsavedChangesGuard/` |
 
+## Items field (shared, launch L-17a)
+
+A drawer's item rows (invoice lines, sale / PO / purchase items, Rx medicines, Mode · Amount) are
+an `ItemsField`; the screen passes its own root id (`testId`, e.g. `invoice-items`, default
+`items-field`). Every row repeats the same ids — scope a spec to one row with `nth()` /
+`within(row)`. Below, `<f>` is the root id and `<col>` a column id.
+
+| Test ID                                      | Element                                                                    | Source                             |
+| -------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------- |
+| `<f>`                                        | Field root (the optional quick line above, the frame, the array's message) | `shared/forms/ItemsField/`         |
+| `<f>-table`                                  | The rows (`role="table"`, named by the field's label)                      | ItemsField                         |
+| `<f>-header`                                 | 34px column header row (not rendered on a phone)                           | ItemsField                         |
+| `<f>-row`                                    | One item row (cells carry `data-column="<col>"`)                           | ItemsField                         |
+| `<f>-remove` / `<f>-note`                    | A row's × ("Remove row") · its dashed note input                           | ItemsField                         |
+| `<f>-add` / `<f>-total`                      | Footer "+ <add label>" · the total at the inline end                       | ItemsField                         |
+| `<f>-error`                                  | The array's own message ("Add at least one item"), `role="alert"`          | ItemsField                         |
+| `<f>-<col>`                                  | A bound cell's control: input, stepper count, or the picker trigger        | `ItemsField/items-field-cells.tsx` |
+| `<f>-<col>-decrease` / `<f>-<col>-increase`  | The quantity stepper's "−" / "+"                                           | `ItemsField/items-field-cells.tsx` |
+| `<f>-<col>-panel` / `<f>-<col>-option-<key>` | A picker cell's list and one option (the shared picker ids)                | `shared/components/Picker/`        |
+
 ## Clinic print templates (added 2026-10-03, L-22)
 
 | Test ID                    | Element                                                                          | Source                                               |

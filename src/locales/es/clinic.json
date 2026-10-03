@@ -226,5 +226,15 @@
       "wrongItems": "Artículos incorrectos",
       "customerChangedMind": "El cliente cambió de opinión"
     }
+  },
+  "itemsField": {
+    "addRow": "Añadir fila",
+    "removeRow": "Quitar fila",
+    "remove": "Quitar",
+    "decrease": "Disminuir",
+    "increase": "Aumentar",
+    "note": "Nota",
+    "notePlaceholder": "Observaciones",
+    "moneyPlaceholder": "₹ 0"
   }
 }

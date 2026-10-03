@@ -222,5 +222,15 @@
       "wrongItems": "잘못된 품목",
       "customerChangedMind": "고객 변심"
     }
+  },
+  "itemsField": {
+    "addRow": "행 추가",
+    "removeRow": "행 삭제",
+    "remove": "삭제",
+    "decrease": "줄이기",
+    "increase": "늘리기",
+    "note": "메모",
+    "notePlaceholder": "비고",
+    "moneyPlaceholder": "₹ 0"
   }
 }

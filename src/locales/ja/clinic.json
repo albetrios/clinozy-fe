@@ -222,5 +222,15 @@
       "wrongItems": "商品の誤り",
       "customerChangedMind": "お客様の気が変わった"
     }
+  },
+  "itemsField": {
+    "addRow": "行を追加",
+    "removeRow": "行を削除",
+    "remove": "削除",
+    "decrease": "減らす",
+    "increase": "増やす",
+    "note": "メモ",
+    "notePlaceholder": "備考",
+    "moneyPlaceholder": "₹ 0"
   }
 }

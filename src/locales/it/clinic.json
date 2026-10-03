@@ -226,5 +226,15 @@
       "wrongItems": "Articoli sbagliati",
       "customerChangedMind": "Il cliente ha cambiato idea"
     }
+  },
+  "itemsField": {
+    "addRow": "Aggiungi riga",
+    "removeRow": "Rimuovi riga",
+    "remove": "Rimuovi",
+    "decrease": "Diminuisci",
+    "increase": "Aumenta",
+    "note": "Nota",
+    "notePlaceholder": "Osservazioni",
+    "moneyPlaceholder": "₹ 0"
   }
 }

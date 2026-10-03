@@ -1,4 +1,4 @@
-import { type ReactNode, type Ref, useRef, useState } from 'react';
+import { type ReactNode, type Ref, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
@@ -25,6 +25,7 @@ import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { X } from '@/shared/icons/index.ts';
 
 import { RECORD_DRAWER_TEST_ID } from './record-drawer.constants.ts';
+import { DrawerItemsContext, withMountedItems } from './record-drawer-items.ts';
 import {
   DRAWER_WIDTH_CLASS,
   type DrawerContentProfile,
@@ -72,7 +73,11 @@ export interface RecordDrawerProps {
   badges?: readonly DrawerBadge[];
   /** Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer. */
   quickFill?: readonly QuickFillItem[];
-  /** The form's shape, for the automatic width (840 / 560 / 680). */
+  /**
+   * The form's shape, for the automatic width (840 / 560 / 680). A mounted
+   * `ItemsField` reports `hasItems` itself; declare it here when the items
+   * table sits in a step that starts collapsed (its fields are not mounted).
+   */
   content?: DrawerContentProfile;
   /** An explicit width; an items field still forces at least 840px. */
   width?: ExplicitDrawerWidth;
@@ -255,6 +260,17 @@ function useOpenStep({
 }
 
 /**
+ * Whether an item-rows table has reported itself since the drawer opened
+ * (`useDrawerItemsField`); a closed drawer forgets it.
+ */
+function useMountedItems(open: boolean) {
+  const [itemsMounted, setItemsMounted] = useState(false);
+  if (!open && itemsMounted) setItemsMounted(false);
+  const markItems = useCallback(() => setItemsMounted(true), []);
+  return [itemsMounted, markItems] as const;
+}
+
+/**
  * The drawer's exits and writes: every exit (×, Cancel / Back / Close,
  * backdrop, Esc) is held while the write runs (§26) and asks before
  * discarding while dirty (Q-P1, browser Back included); Save is never
@@ -337,6 +353,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
   const phone = useViewportTier() === 'phone';
   const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useTitleFocus();
   const [currentStep, selectStep] = useOpenStep(props);
+  const [itemsMounted, markItems] = useMountedItems(props.open);
   const { guardDialog, requestClose, onSave, onSaveAndAdd } = useDrawerActions(
     props,
     selectStep,
@@ -363,7 +380,9 @@ export function RecordDrawer(props: RecordDrawerProps) {
         onCloseAutoFocus={onCloseAutoFocus}
         className={cn(
           DRAWER_PANEL_CLASS,
-          DRAWER_WIDTH_CLASS[resolveDrawerWidth(props.content, props.width)],
+          DRAWER_WIDTH_CLASS[
+            resolveDrawerWidth(withMountedItems(props.content, itemsMounted), props.width)
+          ],
         )}
       >
         {phone ? null : close('floating')}
@@ -385,14 +404,16 @@ export function RecordDrawer(props: RecordDrawerProps) {
           data-testid={`${testId}-body`}
           className="flex min-h-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto p-(--drawer-body-pad)"
         >
-          {props.children}
-          <DrawerSteps
-            steps={props.steps ?? []}
-            value={currentStep}
-            onValueChange={selectStep}
-            tone={props.tone}
-            testId={testId}
-          />
+          <DrawerItemsContext.Provider value={markItems}>
+            {props.children}
+            <DrawerSteps
+              steps={props.steps ?? []}
+              value={currentStep}
+              onValueChange={selectStep}
+              tone={props.tone}
+              testId={testId}
+            />
+          </DrawerItemsContext.Provider>
         </div>
 
         <DrawerFooter

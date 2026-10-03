@@ -224,5 +224,15 @@
       "wrongItems": "Wrong items",
       "customerChangedMind": "Customer changed mind"
     }
+  },
+  "itemsField": {
+    "addRow": "Add row",
+    "removeRow": "Remove row",
+    "remove": "Remove",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "note": "Note",
+    "notePlaceholder": "Remarks",
+    "moneyPlaceholder": "₹ 0"
   }
 }
