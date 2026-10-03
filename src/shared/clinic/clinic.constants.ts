@@ -43,4 +43,41 @@ export const CLINIC_KEYS = {
     marketing: 'roles.marketing',
     owner: 'roles.owner',
   },
+  /**
+   * The offerings domain, shared by the Offerings room, the Invoice drawer and
+   * the booking drawer: the stored enums' labels (`S:1330, 1349`; the derived
+   * offer state, `live` = "Running") and the toasts its writes raise
+   * (`offerings.md` › States).
+   */
+  offerings: {
+    categories: {
+      consultation: 'offerings.categories.consultation',
+      treatment: 'offerings.categories.treatment',
+      package: 'offerings.categories.package',
+      lhr: 'offerings.categories.lhr',
+      product: 'offerings.categories.product',
+    },
+    offerKinds: {
+      percent: 'offerings.offerKinds.percent',
+      amount: 'offerings.offerKinds.amount',
+      fixed: 'offerings.offerKinds.fixed',
+      extra: 'offerings.offerKinds.extra',
+    },
+    offerStates: {
+      live: 'offerings.offerStates.live',
+      scheduled: 'offerings.offerStates.scheduled',
+      paused: 'offerings.offerStates.paused',
+      ended: 'offerings.offerStates.ended',
+    },
+    toasts: {
+      offeringCreated: 'offerings.toasts.offeringCreated',
+      offeringSaved: 'offerings.toasts.offeringSaved',
+      offeringRemoved: 'offerings.toasts.offeringRemoved',
+      offerCreated: 'offerings.toasts.offerCreated',
+      offerSaved: 'offerings.toasts.offerSaved',
+      offerRemoved: 'offerings.toasts.offerRemoved',
+      offerPaused: 'offerings.toasts.offerPaused',
+      offerResumed: 'offerings.toasts.offerResumed',
+    },
+  },
 } as const;

@@ -51,5 +51,36 @@
     "accountant": "Contabile",
     "marketing": "Marketing",
     "owner": "Titolare"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consulenza",
+      "treatment": "Trattamento",
+      "package": "Pacchetto",
+      "lhr": "LHR",
+      "product": "Prodotto"
+    },
+    "offerKinds": {
+      "percent": "% di sconto",
+      "amount": "₹ di sconto",
+      "fixed": "Prezzo fisso",
+      "extra": "Sedute extra"
+    },
+    "offerStates": {
+      "live": "Attiva",
+      "scheduled": "Programmata",
+      "paused": "In pausa",
+      "ended": "Terminata"
+    },
+    "toasts": {
+      "offeringCreated": "Servizio {{id}} creato",
+      "offeringSaved": "Servizio {{id}} salvato",
+      "offeringRemoved": "Servizio {{id}} rimosso",
+      "offerCreated": "{{name}} creata · si applica automaticamente",
+      "offerSaved": "{{name}} salvata",
+      "offerRemoved": "{{name}} rimossa",
+      "offerPaused": "{{name}} in pausa",
+      "offerResumed": "{{name}} di nuovo attiva"
+    }
   }
 }

@@ -51,5 +51,36 @@
     "accountant": "Comptable",
     "marketing": "Marketing",
     "owner": "Propriétaire"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consultation",
+      "treatment": "Soin",
+      "package": "Forfait",
+      "lhr": "LHR",
+      "product": "Produit"
+    },
+    "offerKinds": {
+      "percent": "% de remise",
+      "amount": "₹ de remise",
+      "fixed": "Prix fixe",
+      "extra": "Séances en plus"
+    },
+    "offerStates": {
+      "live": "En cours",
+      "scheduled": "Programmée",
+      "paused": "En pause",
+      "ended": "Terminée"
+    },
+    "toasts": {
+      "offeringCreated": "Prestation {{id}} créée",
+      "offeringSaved": "Prestation {{id}} enregistrée",
+      "offeringRemoved": "Prestation {{id}} supprimée",
+      "offerCreated": "{{name}} créée · s’applique automatiquement",
+      "offerSaved": "{{name}} enregistrée",
+      "offerRemoved": "{{name}} supprimée",
+      "offerPaused": "{{name}} en pause",
+      "offerResumed": "{{name}} de nouveau en cours"
+    }
   }
 }

@@ -1,3 +1,5 @@
+import type { ZodType } from 'zod';
+
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
 import type { ClinicCommon, DeleteReason } from './clinic-schema.ts';
@@ -40,6 +42,24 @@ export function clinicHttpError(
   });
 }
 
+/**
+ * Validate a write's input the way clinozy-be does: the parsed value, or a 422
+ * `validation` error whose `fields` name each failing path (`offerPrice`,
+ * `branchIds.0`) — the shape `mapValidationErrors` reads. The detail is the
+ * first message, so a toast names the first problem.
+ */
+export function validateClinicInput<T>(schema: ZodType<T>, input: unknown): T {
+  const parsed = schema.safeParse(input);
+  if (parsed.success) return parsed.data;
+  const fields: Record<string, string[]> = {};
+  for (const issue of parsed.error.issues) {
+    const path = issue.path.map(String).join('.') || 'input';
+    fields[path] = [...(fields[path] ?? []), issue.message];
+  }
+  const first = parsed.error.issues[0]?.message ?? 'Invalid input';
+  throw clinicHttpError(422, 'validation', first, fields);
+}
+
 /** A list read: server-side filter and sort, and the cursor of the page to fetch. */
 export interface ListQuery<T> {
   where?: (row: T) => boolean;
@@ -73,8 +93,14 @@ export function createFixtureCollection<T extends Row>(options: {
   resource: string;
   seed: () => readonly T[];
   now?: () => Date;
+  /**
+   * Whether a create gets the next per-org `seq` (default true). `false` for an
+   * entity whose contract has no display id (an Offer), so none is invented.
+   */
+  sequenced?: boolean;
 }): FixtureCollection<T> {
   const now = options.now ?? (() => new Date());
+  const sequenced = options.sequenced ?? true;
   let rows: T[] | null = null;
   const all = (): T[] => {
     rows ??= options.seed().map(clone);
@@ -115,7 +141,7 @@ export function createFixtureCollection<T extends Row>(options: {
       const row = {
         ...input,
         id: crypto.randomUUID(),
-        seq: Math.max(0, ...seqs) + 1,
+        ...(sequenced ? { seq: Math.max(0, ...seqs) + 1 } : {}),
         organizationId: FIXTURE_ORGANIZATION_ID,
         createdAt: stamp,
         updatedAt: stamp,

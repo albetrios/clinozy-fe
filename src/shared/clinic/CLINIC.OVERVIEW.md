@@ -4,9 +4,11 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 `launch-2026-09-30-jxmr`):
 
 - `clinic.constants.ts` — the `clinic` i18n namespace's keys (section names and
-  descriptions, roles; more shared statuses arrive with the rooms that need
-  them). Room-only copy stays in each room's own namespace (`today`, `leads`, …
-  `users`).
+  descriptions, roles; the offerings domain — category, offer-kind and
+  offer-state labels and the toasts `useOfferings` / `useOffers` raise; more
+  shared statuses arrive with the rooms that need them). The namespace loads
+  with the org shell, so a shared hook's toast reads it in any room. Room-only
+  copy stays in each room's own namespace (`today`, `leads`, … `users`).
 - `clinic-tones.ts` — each section's and role's tone (the contract's `Tone`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover) — never build `bg-tone-${tone}`.

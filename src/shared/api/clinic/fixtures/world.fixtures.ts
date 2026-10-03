@@ -16,8 +16,6 @@ import type {
   MedicalSale,
   Medicine,
   MRVisit,
-  Offer,
-  Offering,
   OfferingSuggestion,
   Organization,
   Patient,
@@ -39,6 +37,10 @@ import type {
   Treatment,
   User,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  OfferingRecord,
+  OfferRecord,
+} from '@/shared/api/clinic/offerings-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -150,11 +152,16 @@ export const clinicFixtures = {
     resource: 'Feedback action',
     seed: () => feedbackActionSeed(),
   }),
-  offerings: createFixtureCollection<Offering>({
+  // The offerings domain carries the plan's fields (Appendix F) — see offerings-contracts.ts.
+  offerings: createFixtureCollection<OfferingRecord>({
     resource: 'Offering',
     seed: () => offeringSeed(),
   }),
-  offers: createFixtureCollection<Offer>({ resource: 'Offer', seed: () => offerSeed() }),
+  offers: createFixtureCollection<OfferRecord>({
+    resource: 'Offer',
+    seed: () => offerSeed(),
+    sequenced: false,
+  }),
   invoices: createFixtureCollection<Invoice>({
     resource: 'Invoice',
     seed: () => invoiceSeed(),

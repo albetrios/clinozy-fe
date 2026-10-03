@@ -1,7 +1,5 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import type {
-  Offer,
-  Offering,
   OfferingCategory,
   OfferingSpecialty,
   OfferKind,
@@ -9,6 +7,10 @@ import type {
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type {
+  OfferingRecord,
+  OfferRecord,
+} from '@/shared/api/clinic/offerings-contracts.ts';
 
 import { type BranchName, branchRef } from './organization.fixtures.ts';
 import { must, paise, ref, seedAt, seedDay } from './refs.fixtures.ts';
@@ -64,8 +66,7 @@ interface OfferingRow {
 /**
  * `OF_SEED` (H:3550–3562), verbatim. The prototype's seventh column is unused —
  * it hard-codes GST 0 for every offering — and only #272 is inactive. The offer
- * price, branch availability and other plan-only columns are not contract
- * fields (Appendix F).
+ * price and branch availability are plan-only fields (Appendix F), below.
  */
 const OFFERING_ROWS: readonly OfferingRow[] = [
   {
@@ -239,6 +240,36 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
 const floorPrice = (price: number) =>
   price >= 1000 ? Math.round((price * 0.75) / 50) * 50 : price;
 
+/**
+ * Offer prices, rupees (H:3562 `offer`) — plan-only (Appendix F,
+ * REPLACE_WITH_API). Every other offering bills its list price.
+ */
+const OFFER_PRICES: Readonly<Record<number, number>> = {
+  274: 1200,
+  273: 7500,
+  268: 4200,
+  267: 7200,
+  264: 1500,
+};
+
+/**
+ * Where an offering is sold (H:3562 `brs`) — plan-only (Appendix F,
+ * REPLACE_WITH_API). Every other offering is sold at every branch.
+ */
+const AVAILABILITY: Readonly<Record<number, readonly BranchName[]>> = {
+  268: ['Vesu'],
+  267: ['Adajan', 'Vesu'],
+  266: ['Adajan', 'Vesu'],
+  264: ['Varachha'],
+  263: ['Varachha'],
+};
+
+/** An offering's offer price in paise, or `null` when it bills its list price. */
+function offerPriceOf(seq: number): number | null {
+  const rupees = OFFER_PRICES[seq];
+  return rupees === undefined ? null : paise(rupees);
+}
+
 /** An offering's row by its name, when the name is an offering (invoice lines name them). */
 export function findOfferingByName(name: string): OfferingRow | undefined {
   return OFFERING_ROWS.find((row) => row.name === name);
@@ -252,8 +283,12 @@ export function offeringBySeq(seq: number): OfferingRow {
   );
 }
 
-/** The offerings, as last saved (`upd` / `by`). */
-export function offeringSeed(today: string = clinicToday()): Offering[] {
+/**
+ * The offerings, as last saved (`upd` / `by`), with the plan's fields: the
+ * offer price, where each is sold, GST exclusive, and no search terms or
+ * description (the prototype seeds none).
+ */
+export function offeringSeed(today: string = clinicToday()): OfferingRecord[] {
   return OFFERING_ROWS.map((row) => ({
     ...seedCommon(seedAt(row.updated, '10:00', today), staffRef(row.by)),
     id: ref.offering(row.seq),
@@ -271,6 +306,11 @@ export function offeringSeed(today: string = clinicToday()): Offering[] {
     room: must(ROOMS[row.room], `room ${row.room}`),
     gstPct: 0,
     active: row.seq !== 272,
+    offerPrice: offerPriceOf(row.seq),
+    branchIds: (AVAILABILITY[row.seq] ?? []).map(branchRef),
+    gstInclusive: false,
+    searchTerms: [],
+    description: null,
   }));
 }
 
@@ -361,10 +401,12 @@ const OFFER_ROWS: readonly OfferRow[] = [
   },
 ];
 
-const EVERY_BRANCH: readonly BranchName[] = ['Adajan', 'Vesu', 'Varachha'];
-
-/** The offers; money values (₹ off, fixed price) in paise, percent and extra sessions as-is. */
-export function offerSeed(today: string = clinicToday()): Offer[] {
+/**
+ * The offers; money values (₹ off, fixed price) in paise, percent and extra
+ * sessions as-is. No branches stays no branches — every branch, shown "All
+ * branches" — as the plan keeps it (Appendix F; the contract stores them all).
+ */
+export function offerSeed(today: string = clinicToday()): OfferRecord[] {
   return OFFER_ROWS.map((row) => {
     const kind = must(OFFER_KINDS[row.kind], `offer kind ${row.kind}`);
     return {
@@ -375,7 +417,7 @@ export function offerSeed(today: string = clinicToday()): Offer[] {
       kind,
       value: kind === 'amount' || kind === 'fixed' ? paise(row.value) : row.value,
       offeringIds: row.offerings.map((seq) => ref.offering(seq)),
-      branchIds: (row.branches.length ? row.branches : EVERY_BRANCH).map(branchRef),
+      branchIds: row.branches.map(branchRef),
       startsOn: seedDay(row.from, today),
       endsOn: seedDay(row.to, today),
       paused: row.paused,

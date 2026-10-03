@@ -51,5 +51,36 @@
     "accountant": "محاسب",
     "marketing": "التسويق",
     "owner": "المالك"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "استشارة",
+      "treatment": "علاج",
+      "package": "باقة",
+      "lhr": "LHR",
+      "product": "منتج"
+    },
+    "offerKinds": {
+      "percent": "خصم %",
+      "amount": "خصم ₹",
+      "fixed": "سعر ثابت",
+      "extra": "جلسات إضافية"
+    },
+    "offerStates": {
+      "live": "سارٍ",
+      "scheduled": "مجدول",
+      "paused": "متوقف مؤقتًا",
+      "ended": "منتهٍ"
+    },
+    "toasts": {
+      "offeringCreated": "تم إنشاء الخدمة {{id}}",
+      "offeringSaved": "تم حفظ الخدمة {{id}}",
+      "offeringRemoved": "تمت إزالة الخدمة {{id}}",
+      "offerCreated": "تم إنشاء {{name}} · يُطبَّق تلقائيًا",
+      "offerSaved": "تم حفظ {{name}}",
+      "offerRemoved": "تمت إزالة {{name}}",
+      "offerPaused": "تم إيقاف {{name}} مؤقتًا",
+      "offerResumed": "{{name}} سارٍ من جديد"
+    }
   }
 }

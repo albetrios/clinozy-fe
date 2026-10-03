@@ -191,6 +191,8 @@ stored as `other` with its label leading the note.
 | Sessions      | `useRevokeSession`                                                | `optimistic`                     |
 | Passkeys      | `useRemovePasskey`                                                | `optimistic`                     |
 | Webhooks      | `useDeleteWebhook`                                                | `optimistic`                     |
+| Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
+| Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
 | Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
@@ -203,7 +205,8 @@ behind the undo toast by their panels (see above), which is why all three take a
 
 **Non-optimistic** (must show in-progress) — creates + shapes we can't safely patch:
 
-- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`
+- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`
+- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch)
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 
 > **Invitations ride on memberships.** clinozy-be has no invitation list: an invite is

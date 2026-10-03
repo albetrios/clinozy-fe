@@ -51,5 +51,36 @@
     "accountant": "Buchhalter",
     "marketing": "Marketing",
     "owner": "Inhaber"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Beratung",
+      "treatment": "Behandlung",
+      "package": "Paket",
+      "lhr": "LHR",
+      "product": "Produkt"
+    },
+    "offerKinds": {
+      "percent": "% Rabatt",
+      "amount": "₹ Rabatt",
+      "fixed": "Festpreis",
+      "extra": "Zusätzliche Sitzungen"
+    },
+    "offerStates": {
+      "live": "Läuft",
+      "scheduled": "Geplant",
+      "paused": "Pausiert",
+      "ended": "Beendet"
+    },
+    "toasts": {
+      "offeringCreated": "Leistung {{id}} erstellt",
+      "offeringSaved": "Leistung {{id}} gespeichert",
+      "offeringRemoved": "Leistung {{id}} entfernt",
+      "offerCreated": "{{name}} erstellt · gilt automatisch",
+      "offerSaved": "{{name}} gespeichert",
+      "offerRemoved": "{{name}} entfernt",
+      "offerPaused": "{{name}} pausiert",
+      "offerResumed": "{{name}} läuft wieder"
+    }
   }
 }

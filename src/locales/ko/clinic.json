@@ -51,5 +51,36 @@
     "accountant": "회계 담당",
     "marketing": "마케팅",
     "owner": "소유자"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "상담",
+      "treatment": "시술",
+      "package": "패키지",
+      "lhr": "LHR",
+      "product": "제품"
+    },
+    "offerKinds": {
+      "percent": "% 할인",
+      "amount": "₹ 할인",
+      "fixed": "고정 가격",
+      "extra": "추가 세션"
+    },
+    "offerStates": {
+      "live": "진행 중",
+      "scheduled": "예정",
+      "paused": "일시 중지",
+      "ended": "종료"
+    },
+    "toasts": {
+      "offeringCreated": "서비스 {{id}} 생성됨",
+      "offeringSaved": "서비스 {{id}} 저장됨",
+      "offeringRemoved": "서비스 {{id}} 삭제됨",
+      "offerCreated": "{{name}} 생성됨 · 자동으로 적용됩니다",
+      "offerSaved": "{{name}} 저장됨",
+      "offerRemoved": "{{name}} 삭제됨",
+      "offerPaused": "{{name}} 일시 중지됨",
+      "offerResumed": "{{name}} 다시 진행 중"
+    }
   }
 }

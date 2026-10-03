@@ -51,5 +51,36 @@
     "accountant": "Contador",
     "marketing": "Marketing",
     "owner": "Propietario"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consulta",
+      "treatment": "Tratamiento",
+      "package": "Paquete",
+      "lhr": "LHR",
+      "product": "Producto"
+    },
+    "offerKinds": {
+      "percent": "% de descuento",
+      "amount": "₹ de descuento",
+      "fixed": "Precio fijo",
+      "extra": "Sesiones extra"
+    },
+    "offerStates": {
+      "live": "Activa",
+      "scheduled": "Programada",
+      "paused": "En pausa",
+      "ended": "Finalizada"
+    },
+    "toasts": {
+      "offeringCreated": "Servicio {{id}} creado",
+      "offeringSaved": "Servicio {{id}} guardado",
+      "offeringRemoved": "Servicio {{id}} eliminado",
+      "offerCreated": "{{name}} creada · se aplica automáticamente",
+      "offerSaved": "{{name}} guardada",
+      "offerRemoved": "{{name}} eliminada",
+      "offerPaused": "{{name}} en pausa",
+      "offerResumed": "{{name}} activa de nuevo"
+    }
   }
 }

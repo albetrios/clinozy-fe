@@ -19,9 +19,7 @@ import {
   medicalSaleSchema,
   medicineSchema,
   mrVisitSchema,
-  offeringSchema,
   offeringSuggestionSchema,
-  offerSchema,
   organizationSchema,
   patientImageSchema,
   patientNoteSchema,
@@ -47,6 +45,10 @@ import {
   clinicClockTime,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  offeringRecordSchema,
+  offerRecordSchema,
+} from '@/shared/api/clinic/offerings-contracts.ts';
 
 import { invoiceBill } from './money.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
@@ -76,8 +78,9 @@ const SCHEMAS = {
   checkIns: checkInSchema,
   reviews: reviewSchema,
   feedbackActions: feedbackActionSchema,
-  offerings: offeringSchema,
-  offers: offerSchema,
+  // The offerings domain carries the plan's fields (Appendix F).
+  offerings: offeringRecordSchema,
+  offers: offerRecordSchema,
   invoices: invoiceSchema,
   payments: paymentSchema,
   creditNotes: creditNoteSchema,
@@ -248,7 +251,10 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['reviews', [r.reviewId]],
     ['staff', [r.byId]],
   ],
-  offerings: (r) => [['staff', [r.defaultDoctorId]]],
+  offerings: (r) => [
+    ['staff', [r.defaultDoctorId]],
+    ['branches', r.branchIds],
+  ],
   offers: (r) => [
     ['offerings', r.offeringIds],
     ['branches', r.branchIds],
@@ -472,6 +478,32 @@ describe('the clinic fixture world', () => {
         payment.amount,
       );
     }
+  });
+
+  it("carries OF_SEED's offer prices and availability, and keeps every-branch offers open", () => {
+    const offerings = clinicFixtures.offerings.snapshot();
+    const bySeq = (seq: number) => offerings.find((row) => row.seq === seq);
+    // H:3562 `offer` (₹ × 100); any other offering bills its list price.
+    expect([274, 273, 268, 267, 264, 270].map((seq) => bySeq(seq)?.offerPrice)).toEqual([
+      120000,
+      750000,
+      420000,
+      720000,
+      150000,
+      null,
+    ]);
+    const branchName = new Map(
+      clinicFixtures.branches.snapshot().map((branch) => [branch.id, branch.name]),
+    );
+    const soldAt = (seq: number) => bySeq(seq)?.branchIds.map((id) => branchName.get(id));
+    expect(soldAt(268)).toEqual(['Vesu']);
+    expect(soldAt(267)).toEqual(['Adajan', 'Vesu']);
+    expect(soldAt(274)).toEqual([]);
+    expect(
+      clinicFixtures.offers
+        .snapshot((offer) => offer.branchIds.length === 0)
+        .map((offer) => offer.name),
+    ).toEqual(['Peel pack + 1 free', 'Monsoon ₹500 off']);
   });
 
   it('pairs every Medical sale with its own invoice', () => {

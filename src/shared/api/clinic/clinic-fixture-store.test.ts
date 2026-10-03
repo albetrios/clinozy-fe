@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
@@ -7,6 +8,7 @@ import {
   createFixtureCollection,
   FIXTURE_ACTOR_ID,
   FIXTURE_ORGANIZATION_ID,
+  validateClinicInput,
 } from './clinic-fixture-store.ts';
 import type { ClinicCommon } from './clinic-schema.ts';
 
@@ -102,5 +104,52 @@ describe('fixture collection', () => {
     await collection.create({ name: 'Extra' });
     collection.reset();
     expect(collection.snapshot()).toHaveLength(120);
+  });
+
+  it('invents no seq for an entity without a display id', async () => {
+    type Plain = ClinicCommon & { id: string; name: string };
+    const plain = createFixtureCollection<Plain>({
+      resource: 'Plain',
+      seed: () => [],
+      now: () => NOW,
+      sequenced: false,
+    });
+    const created = await plain.create({ name: 'No number' });
+    expect(created).not.toHaveProperty('seq');
+    expect(created.name).toBe('No number');
+  });
+});
+
+describe('validateClinicInput', () => {
+  const schema = z
+    .object({ name: z.string().min(1, 'Add a name'), tags: z.array(z.uuid()) })
+    .strict();
+
+  it('hands back the parsed input', () => {
+    expect(validateClinicInput(schema, { name: 'Peel', tags: [] })).toEqual({
+      name: 'Peel',
+      tags: [],
+    });
+  });
+
+  it('answers a 422 naming each failing path, the first message as the detail', () => {
+    const error = (() => {
+      try {
+        validateClinicInput(schema, { name: '', tags: ['not-a-uuid'] });
+      } catch (caught) {
+        return caught;
+      }
+      return null;
+    })();
+    expect(isHttpError(error) && error.status === 422).toBe(true);
+    const body = isHttpError(error)
+      ? (error.data as { error: { code: string; detail: string; fields: object } }).error
+      : null;
+    expect(body?.code).toBe('validation');
+    expect(body?.detail).toBe('Add a name');
+    expect(body?.fields).toEqual({
+      name: ['Add a name'],
+      'tags.0': [expect.any(String)],
+    });
   });
 });

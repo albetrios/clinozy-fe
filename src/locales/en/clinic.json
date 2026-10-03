@@ -51,5 +51,36 @@
     "accountant": "Accountant",
     "marketing": "Marketing",
     "owner": "Owner"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consultation",
+      "treatment": "Treatment",
+      "package": "Package",
+      "lhr": "LHR",
+      "product": "Product"
+    },
+    "offerKinds": {
+      "percent": "% off",
+      "amount": "₹ off",
+      "fixed": "Fixed price",
+      "extra": "Extra sessions"
+    },
+    "offerStates": {
+      "live": "Running",
+      "scheduled": "Scheduled",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "toasts": {
+      "offeringCreated": "Offering {{id}} created",
+      "offeringSaved": "Offering {{id}} saved",
+      "offeringRemoved": "Offering {{id}} removed",
+      "offerCreated": "{{name}} created · applies automatically",
+      "offerSaved": "{{name}} saved",
+      "offerRemoved": "{{name}} removed",
+      "offerPaused": "{{name}} paused",
+      "offerResumed": "{{name}} running again"
+    }
   }
 }

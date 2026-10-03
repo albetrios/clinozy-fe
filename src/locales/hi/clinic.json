@@ -51,5 +51,36 @@
     "accountant": "अकाउंटेंट",
     "marketing": "मार्केटिंग",
     "owner": "मालिक"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "परामर्श",
+      "treatment": "उपचार",
+      "package": "पैकेज",
+      "lhr": "LHR",
+      "product": "उत्पाद"
+    },
+    "offerKinds": {
+      "percent": "% छूट",
+      "amount": "₹ छूट",
+      "fixed": "निश्चित मूल्य",
+      "extra": "अतिरिक्त सत्र"
+    },
+    "offerStates": {
+      "live": "चालू",
+      "scheduled": "निर्धारित",
+      "paused": "रोका गया",
+      "ended": "समाप्त"
+    },
+    "toasts": {
+      "offeringCreated": "सेवा {{id}} बनाई गई",
+      "offeringSaved": "सेवा {{id}} सहेजी गई",
+      "offeringRemoved": "सेवा {{id}} हटाई गई",
+      "offerCreated": "{{name}} बनाया गया · अपने-आप लागू होता है",
+      "offerSaved": "{{name}} सहेजा गया",
+      "offerRemoved": "{{name}} हटाया गया",
+      "offerPaused": "{{name}} रोका गया",
+      "offerResumed": "{{name}} फिर से चालू"
+    }
   }
 }

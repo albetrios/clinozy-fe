@@ -51,5 +51,36 @@
     "accountant": "会计",
     "marketing": "市场营销",
     "owner": "所有者"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "问诊",
+      "treatment": "治疗",
+      "package": "套餐",
+      "lhr": "LHR",
+      "product": "产品"
+    },
+    "offerKinds": {
+      "percent": "% 折扣",
+      "amount": "₹ 立减",
+      "fixed": "固定价格",
+      "extra": "加送疗程"
+    },
+    "offerStates": {
+      "live": "进行中",
+      "scheduled": "已排期",
+      "paused": "已暂停",
+      "ended": "已结束"
+    },
+    "toasts": {
+      "offeringCreated": "服务项目 {{id}} 已创建",
+      "offeringSaved": "服务项目 {{id}} 已保存",
+      "offeringRemoved": "服务项目 {{id}} 已删除",
+      "offerCreated": "{{name}} 已创建 · 自动生效",
+      "offerSaved": "{{name}} 已保存",
+      "offerRemoved": "{{name}} 已删除",
+      "offerPaused": "{{name}} 已暂停",
+      "offerResumed": "{{name}} 已恢复进行"
+    }
   }
 }

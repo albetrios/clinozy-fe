@@ -51,5 +51,36 @@
     "accountant": "会計担当",
     "marketing": "マーケティング",
     "owner": "オーナー"
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "診察",
+      "treatment": "施術",
+      "package": "パッケージ",
+      "lhr": "LHR",
+      "product": "商品"
+    },
+    "offerKinds": {
+      "percent": "%割引",
+      "amount": "₹割引",
+      "fixed": "固定価格",
+      "extra": "追加セッション"
+    },
+    "offerStates": {
+      "live": "実施中",
+      "scheduled": "予定",
+      "paused": "一時停止",
+      "ended": "終了"
+    },
+    "toasts": {
+      "offeringCreated": "サービス {{id}} を作成しました",
+      "offeringSaved": "サービス {{id}} を保存しました",
+      "offeringRemoved": "サービス {{id}} を削除しました",
+      "offerCreated": "{{name}} を作成しました · 自動で適用されます",
+      "offerSaved": "{{name}} を保存しました",
+      "offerRemoved": "{{name}} を削除しました",
+      "offerPaused": "{{name}} を一時停止しました",
+      "offerResumed": "{{name}} を再開しました"
+    }
   }
 }
