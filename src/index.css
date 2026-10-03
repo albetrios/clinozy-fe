@@ -15,6 +15,13 @@
    used by the shadcn overlays: dialog, dropdown, popover, tooltip, select. */
 @import 'tw-animate-css';
 
+/* `dark:` follows the APP's theme, not the operating system's. Dark mode is the
+   `.dark` class `useThemeStore` (and `theme-init.js`, pre-paint) puts on <html>;
+   left to Tailwind's default, `dark:` was `prefers-color-scheme`, so a light app
+   on a dark OS drew the shadcn primitives' dark tints (and a dark app on a
+   light OS lost them). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ── Fonts: Inter + JetBrains Mono, self-hosted ──
    The CSP is `font-src 'self'`, so a font CDN can't load: the faces ship from
    @fontsource as same-origin hashed assets (`assetsInlineLimit: 0` keeps them
