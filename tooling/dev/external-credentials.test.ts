@@ -39,11 +39,17 @@ describe('fillExternalCredentials', () => {
       VITE_POSTHOG_KEY: 'phc_cloud',
       VITE_STRIPE_PUBLISHABLE_KEY: 'pk_test_env',
     };
-    const { content, filled } = fillExternalCredentials('', '', KEYS, environment);
+    const { content, filled, missing } = fillExternalCredentials(
+      '',
+      '',
+      KEYS,
+      environment,
+    );
     assert.deepEqual(filled, [
       { key: 'VITE_STRIPE_PUBLISHABLE_KEY', source: 'environment' },
       { key: 'VITE_POSTHOG_KEY', source: 'environment' },
     ]);
+    assert.deepEqual(missing, ['VITE_POSTHOG_HOST']);
     assert.match(content, /^VITE_POSTHOG_KEY=phc_cloud$/m);
     // .env.development wins over the environment when it has the key.
     const both = fillExternalCredentials('', DEVELOPMENT, KEYS, environment);
@@ -62,11 +68,21 @@ describe('fillExternalCredentials', () => {
     assert.match(content, /^VITE_STRIPE_PUBLISHABLE_KEY=pk_test_mine$/m);
   });
 
-  it('changes nothing when no source has the key', () => {
+  it('changes nothing and reports the key missing when no source has it', () => {
     const local = 'VITE_POSTHOG_KEY=\n';
     assert.deepEqual(fillExternalCredentials(local, 'VITE_POSTHOG_KEY=\n', KEYS, {}), {
       content: local,
       filled: [],
+      missing: KEYS,
+    });
+  });
+
+  it('reports nothing missing once every key is set locally', () => {
+    const local = DEVELOPMENT;
+    assert.deepEqual(fillExternalCredentials(local, '', KEYS, {}), {
+      content: local,
+      filled: [],
+      missing: [],
     });
   });
 

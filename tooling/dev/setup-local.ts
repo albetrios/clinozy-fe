@@ -89,13 +89,21 @@ function logHeading(message: string): void {
   process.stdout.write(`\n${ANSI.bold}${ANSI.cyan}${message}${ANSI.reset}\n`);
 }
 
+const BANNER_WIDTH = 58;
+
+/** One banner row, padded to the box from the visible text — a rename can't misalign it. */
+function bannerRow(text: string, style = ''): string {
+  const padding = ' '.repeat(Math.max(0, BANNER_WIDTH - 2 - text.length));
+  return `║  ${style}${text}${style ? ANSI.reset : ''}${padding}║\n`;
+}
+
 function logBanner(): void {
-  const line = '═'.repeat(58);
+  const line = '═'.repeat(BANNER_WIDTH);
   process.stdout.write(`\n╔${line}╗\n`);
   process.stdout.write(
-    `║  ${ANSI.bold}clinozy-fe — local bootstrap (pnpm setup:local)${ANSI.reset}            ║\n`,
+    bannerRow('clinozy-fe — local bootstrap (pnpm setup:local)', ANSI.bold),
   );
-  process.stdout.write(`║  deps + .env.local + MCP + dev in one command      ║\n`);
+  process.stdout.write(bannerRow('deps + .env.local + MCP + dev in one command'));
   process.stdout.write(`╚${line}╝\n`);
 }
 
@@ -300,38 +308,32 @@ function runEnvScaffolding(reports: StepReport[], options: BootstrapOptions): vo
   if (existsSync(envLocalPath) && !options.forceEnvLocal) {
     // Top up an existing file: fill the external credentials that are missing or blank,
     // never overwrite one already set. Key names and sources only — never values.
-    const { content, filled } = fillExternalCredentials(
+    const { content, filled, missing } = fillExternalCredentials(
       readFileSync(envLocalPath, 'utf8'),
       development,
       externalCredentials,
       process.env,
     );
-    if (filled.length === 0) {
-      reportStep(
-        reports,
-        '.env.local',
-        'skipped',
-        startedAt,
-        'present (use --force-env-local to rewrite)',
-      );
-    } else if (options.check) {
-      reportStep(
-        reports,
-        '.env.local',
-        'warning',
-        startedAt,
-        `--check mode (would fill external credentials: ${describeFilled(filled)})`,
-      );
-    } else {
+    let status: StepStatus = 'skipped';
+    let detail = `present — external credentials already set: ${externalCredentials.join(', ')}`;
+    if (filled.length > 0 && options.check) {
+      status = 'warning';
+      detail = `--check mode (would fill external credentials: ${describeFilled(filled)})`;
+    } else if (filled.length > 0) {
       writeFileSync(envLocalPath, content);
-      reportStep(
-        reports,
-        '.env.local',
-        'done',
-        startedAt,
-        `present — filled external credentials: ${describeFilled(filled)}`,
-      );
+      status = 'done';
+      detail = `present — filled external credentials: ${describeFilled(filled)}`;
+    } else if (missing.length > 0) {
+      detail = 'present';
     }
+    if (missing.length > 0) status = 'warning';
+    reportStep(
+      reports,
+      '.env.local',
+      status,
+      startedAt,
+      `${detail}${missingCredentialsNote(missing)}`,
+    );
     return;
   }
   if (options.check) {
@@ -350,7 +352,7 @@ function runEnvScaffolding(reports: StepReport[], options: BootstrapOptions): vo
     process.exit(1);
   }
   const scaffold = injectEnvDefaults(readFileSync(examplePath, 'utf8'), 'local');
-  const { content, filled } = fillExternalCredentials(
+  const { content, filled, missing } = fillExternalCredentials(
     scaffold,
     development,
     externalCredentials,
@@ -362,10 +364,16 @@ function runEnvScaffolding(reports: StepReport[], options: BootstrapOptions): vo
   reportStep(
     reports,
     '.env.local',
-    'done',
+    missing.length > 0 ? 'warning' : 'done',
     startedAt,
-    `copied from .env.example + localhost defaults${credentialsNote} — set CONTEXT7_API_KEY for MCP`,
+    `copied from .env.example + localhost defaults${credentialsNote} — set CONTEXT7_API_KEY for MCP${missingCredentialsNote(missing)}`,
   );
+}
+
+/** The external credentials no source sets — named so the developer can fill them by hand. */
+function missingCredentialsNote(missing: readonly string[]): string {
+  if (missing.length === 0) return '';
+  return ` — not in .env.development or the environment, set by hand: ${missing.join(', ')}`;
 }
 
 function runCodeGraphSetup(reports: StepReport[], options: BootstrapOptions): void {
