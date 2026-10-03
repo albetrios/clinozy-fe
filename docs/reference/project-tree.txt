@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~667 src files · ~391 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
+Stats: ~672 src files · ~394 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -817,13 +817,15 @@ clinozy-fe/
 │   │   │   └── [2 test files]
 │   │   ├── api/
 │   │   │   ├── clinic/
+│   │   │   │   ├── access-api.ts
+│   │   │   │   ├── access.fixtures.ts
 │   │   │   │   ├── clinic-display-id.ts
 │   │   │   │   ├── clinic-fixture-seed.ts
 │   │   │   │   ├── clinic-fixture-store.ts
 │   │   │   │   ├── clinic-schema.ts
 │   │   │   │   ├── clinic-time.ts
 │   │   │   │   ├── preferences-api.ts
-│   │   │   │   └── [6 test files]
+│   │   │   │   └── [7 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -888,8 +890,10 @@ clinozy-fe/
 │   │   │   ├── stripe-config.ts
 │   │   │   └── [1 test file]
 │   │   ├── clinic/
+│   │   │   ├── clinic-sections.ts
 │   │   │   ├── clinic.constants.ts
-│   │   │   └── CLINIC.OVERVIEW.md
+│   │   │   ├── CLINIC.OVERVIEW.md
+│   │   │   └── [1 test file]
 │   │   ├── components/
 │   │   │   ├── AppearanceDialog/
 │   │   │   │   ├── appearance-dialog.constants.ts
@@ -1371,6 +1375,10 @@ clinozy-fe/
 │   │   │   ├── useCan/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCan.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useClinicAccess/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useClinicAccess.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useConsumedSearchToken/
 │   │   │   │   ├── index.ts
