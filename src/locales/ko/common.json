@@ -310,5 +310,35 @@
       "label": "시간",
       "placeholder": "시간 선택"
     }
+  },
+  "unsavedChanges": {
+    "title": "변경 사항을 버리시겠습니까?",
+    "description": "변경 사항이 저장되지 않았으며 사라집니다.",
+    "discard": "버리기",
+    "keepEditing": "편집 계속"
+  },
+  "recordDrawer": {
+    "cancel": "취소",
+    "back": "뒤로",
+    "close": "닫기",
+    "save": "저장",
+    "saving": "저장 중…",
+    "retrySave": "다시 저장",
+    "saveAndAdd": "저장 후 계속 추가",
+    "delete": "삭제",
+    "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
+    "readOnly": "보기 전용 · 현재 역할로는 변경할 수 없습니다",
+    "quickFill": "빠른 입력",
+    "step": {
+      "next": "다음: {{step}} →",
+      "edit": "수정",
+      "open": "열기",
+      "missing": "누락: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "비어 있음",
+      "added_other": "{{count}}개 추가됨",
+      "noneYet": "아직 없음"
+    }
   }
 }

@@ -5,9 +5,11 @@ import {
   createRouter,
   Link,
   RouterProvider,
+  useNavigate,
 } from '@tanstack/react-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import type { ReactElement } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard.tsx';
 
@@ -25,12 +27,36 @@ function GuardedPage({ dirty }: { dirty: boolean }) {
   );
 }
 
-function renderWithRouter(dirty: boolean) {
+/** A surface with its own exit (a drawer's ×): the exit leaves for `/other`. */
+function GuardedSurface({ dirty, onExit }: { dirty: boolean; onExit: () => void }) {
+  const navigate = useNavigate();
+  const { guardDialog, confirmDiscard } = useUnsavedChangesGuard({ when: dirty });
+  return (
+    <div>
+      <span data-testid="home">home</span>
+      <button
+        type="button"
+        data-testid="surface-exit"
+        onClick={() =>
+          confirmDiscard(() => {
+            onExit();
+            void navigate({ to: '/other' });
+          })
+        }
+      >
+        close
+      </button>
+      {guardDialog}
+    </div>
+  );
+}
+
+function renderWithRouter(page: ReactElement) {
   const rootRoute = createRootRoute();
   const homeRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
-    component: () => <GuardedPage dirty={dirty} />,
+    component: () => page,
   });
   const otherRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -46,7 +72,7 @@ function renderWithRouter(dirty: boolean) {
 
 describe('useUnsavedChangesGuard', () => {
   it('lets navigation through when there are no unsaved changes', async () => {
-    renderWithRouter(false);
+    renderWithRouter(<GuardedPage dirty={false} />);
     await screen.findByTestId('home');
 
     fireEvent.click(screen.getByTestId('leave-link'));
@@ -56,7 +82,7 @@ describe('useUnsavedChangesGuard', () => {
   });
 
   it('blocks navigation while dirty and opens the confirm dialog', async () => {
-    renderWithRouter(true);
+    renderWithRouter(<GuardedPage dirty />);
     await screen.findByTestId('home');
 
     fireEvent.click(screen.getByTestId('leave-link'));
@@ -68,8 +94,20 @@ describe('useUnsavedChangesGuard', () => {
     expect(screen.queryByTestId('other-page')).not.toBeInTheDocument();
   });
 
+  it('asks with the shared discard copy by default', async () => {
+    renderWithRouter(<GuardedPage dirty />);
+    await screen.findByTestId('home');
+
+    fireEvent.click(screen.getByTestId('leave-link'));
+
+    await screen.findByTestId('confirm-dialog');
+    expect(screen.getByText('Discard changes?')).toBeInTheDocument();
+    expect(screen.getByTestId('confirm-accept')).toHaveTextContent('Discard');
+    expect(screen.getByTestId('confirm-cancel')).toHaveTextContent('Keep editing');
+  });
+
   it('confirming discards the changes and completes the navigation', async () => {
-    renderWithRouter(true);
+    renderWithRouter(<GuardedPage dirty />);
     await screen.findByTestId('home');
 
     fireEvent.click(screen.getByTestId('leave-link'));
@@ -81,7 +119,7 @@ describe('useUnsavedChangesGuard', () => {
   });
 
   it('cancelling keeps the user on the page and clears the blocked state', async () => {
-    renderWithRouter(true);
+    renderWithRouter(<GuardedPage dirty />);
     await screen.findByTestId('home');
 
     fireEvent.click(screen.getByTestId('leave-link'));
@@ -94,5 +132,50 @@ describe('useUnsavedChangesGuard', () => {
     );
     expect(screen.getByTestId('home')).toBeInTheDocument();
     expect(screen.queryByTestId('other-page')).not.toBeInTheDocument();
+  });
+
+  describe('confirmDiscard (a surface’s own exits)', () => {
+    it('runs the exit at once when there is nothing to lose', async () => {
+      const onExit = vi.fn();
+      renderWithRouter(<GuardedSurface dirty={false} onExit={onExit} />);
+      await screen.findByTestId('home');
+
+      fireEvent.click(screen.getByTestId('surface-exit'));
+
+      expect(onExit).toHaveBeenCalledTimes(1);
+      expect(await screen.findByTestId('other-page')).toBeInTheDocument();
+      expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
+    });
+
+    it('asks first while dirty; Keep editing runs nothing', async () => {
+      const onExit = vi.fn();
+      renderWithRouter(<GuardedSurface dirty onExit={onExit} />);
+      await screen.findByTestId('home');
+
+      fireEvent.click(screen.getByTestId('surface-exit'));
+      await screen.findByTestId('confirm-dialog');
+      expect(onExit).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByTestId('confirm-cancel'));
+
+      await waitFor(() =>
+        expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument(),
+      );
+      expect(onExit).not.toHaveBeenCalled();
+      expect(screen.getByTestId('home')).toBeInTheDocument();
+    });
+
+    it('Discard runs the exit, and the navigation it starts is not asked about again', async () => {
+      const onExit = vi.fn();
+      renderWithRouter(<GuardedSurface dirty onExit={onExit} />);
+      await screen.findByTestId('home');
+
+      fireEvent.click(screen.getByTestId('surface-exit'));
+      await screen.findByTestId('confirm-dialog');
+      fireEvent.click(screen.getByTestId('confirm-accept'));
+
+      expect(await screen.findByTestId('other-page')).toBeInTheDocument();
+      expect(onExit).toHaveBeenCalledTimes(1);
+    });
   });
 });

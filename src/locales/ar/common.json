@@ -315,5 +315,40 @@
       "label": "الوقت",
       "placeholder": "اختر وقتًا"
     }
+  },
+  "unsavedChanges": {
+    "title": "تجاهل التغييرات؟",
+    "description": "لم تُحفظ تغييراتك وستضيع.",
+    "discard": "تجاهل",
+    "keepEditing": "متابعة التحرير"
+  },
+  "recordDrawer": {
+    "cancel": "إلغاء",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "retrySave": "إعادة محاولة الحفظ",
+    "saveAndAdd": "حفظ وإضافة آخر",
+    "delete": "حذف",
+    "notSaved": "لم يُحفظ · تغييراتك ما زالت هنا",
+    "readOnly": "للعرض فقط · لا يمكن لدورك تغيير هذا",
+    "quickFill": "تعبئة سريعة",
+    "step": {
+      "next": "التالي: {{step}} ←",
+      "edit": "تعديل",
+      "open": "فتح",
+      "missing": "ناقص: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "فارغ",
+      "added_zero": "{{count}} مُضاف",
+      "added_one": "{{count}} مُضاف",
+      "added_two": "{{count}} مُضافان",
+      "added_few": "{{count}} مُضافة",
+      "added_many": "{{count}} مُضافًا",
+      "added_other": "{{count}} مُضاف",
+      "noneYet": "لا شيء بعد"
+    }
   }
 }

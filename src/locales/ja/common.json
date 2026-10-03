@@ -310,5 +310,35 @@
       "label": "時刻",
       "placeholder": "時刻を選択"
     }
+  },
+  "unsavedChanges": {
+    "title": "変更を破棄しますか？",
+    "description": "変更は保存されておらず、失われます。",
+    "discard": "破棄",
+    "keepEditing": "編集を続ける"
+  },
+  "recordDrawer": {
+    "cancel": "キャンセル",
+    "back": "戻る",
+    "close": "閉じる",
+    "save": "保存",
+    "saving": "保存中…",
+    "retrySave": "保存を再試行",
+    "saveAndAdd": "保存して続けて追加",
+    "delete": "削除",
+    "notSaved": "未保存 · 変更は保持されています",
+    "readOnly": "閲覧のみ · あなたのロールでは変更できません",
+    "quickFill": "クイック入力",
+    "step": {
+      "next": "次へ: {{step}} →",
+      "edit": "編集",
+      "open": "開く",
+      "missing": "未入力: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "空欄",
+      "added_other": "{{count}} 件追加",
+      "noneYet": "まだありません"
+    }
   }
 }

@@ -312,5 +312,37 @@
       "label": "Hora",
       "placeholder": "Elige una hora"
     }
+  },
+  "unsavedChanges": {
+    "title": "¿Descartar los cambios?",
+    "description": "Tus cambios no se han guardado y se perderán.",
+    "discard": "Descartar",
+    "keepEditing": "Seguir editando"
+  },
+  "recordDrawer": {
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "retrySave": "Reintentar guardar",
+    "saveAndAdd": "Guardar y añadir otro",
+    "delete": "Eliminar",
+    "notSaved": "No guardado · tus cambios se conservan",
+    "readOnly": "Solo lectura · tu rol no puede cambiar esto",
+    "quickFill": "Relleno rápido",
+    "step": {
+      "next": "Siguiente: {{step}} →",
+      "edit": "Editar",
+      "open": "Abrir",
+      "missing": "Falta: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Vacío",
+      "added_one": "{{count}} añadido",
+      "added_many": "{{count}} añadidos",
+      "added_other": "{{count}} añadidos",
+      "noneYet": "Ninguno aún"
+    }
   }
 }

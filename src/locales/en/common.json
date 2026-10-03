@@ -311,5 +311,36 @@
       "label": "Time",
       "placeholder": "Pick a time"
     }
+  },
+  "unsavedChanges": {
+    "title": "Discard changes?",
+    "description": "Your changes haven’t been saved and will be lost.",
+    "discard": "Discard",
+    "keepEditing": "Keep editing"
+  },
+  "recordDrawer": {
+    "cancel": "Cancel",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "saving": "Saving…",
+    "retrySave": "Retry save",
+    "saveAndAdd": "Save & add another",
+    "delete": "Delete",
+    "notSaved": "Not saved · your changes are kept",
+    "readOnly": "View only · your role can’t change this",
+    "quickFill": "Quick fill",
+    "step": {
+      "next": "Next: {{step}} →",
+      "edit": "Edit",
+      "open": "Open",
+      "missing": "Missing: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Empty",
+      "added_one": "{{count}} added",
+      "added_other": "{{count}} added",
+      "noneYet": "None yet"
+    }
   }
 }

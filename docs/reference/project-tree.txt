@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~817 src files · ~449 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
+Stats: ~835 src files · ~458 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1207,6 +1207,21 @@ clinozy-fe/
 │   │   │   │   ├── DateTimePrefsCard.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── DrawerField/
+│   │   │   │   ├── drawer-field-controls.ts
+│   │   │   │   ├── drawer-field-layout.ts
+│   │   │   │   ├── DrawerField.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [2 test files]
+│   │   │   ├── DrawerFooter/
+│   │   │   │   ├── DrawerFooter.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── DrawerSteps/
+│   │   │   │   ├── drawer-step-status.ts
+│   │   │   │   ├── DrawerSteps.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [2 test files]
 │   │   │   ├── EmailVerificationBanner/
 │   │   │   │   ├── EmailVerificationBanner.tsx
 │   │   │   │   ├── index.ts
@@ -1350,10 +1365,20 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── QueryBoundary.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── QuickFillRow/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── QuickFillRow.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── RateLimitNotice/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RateLimitNotice.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── RecordDrawer/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── record-drawer-width.ts
+│   │   │   │   ├── record-drawer.constants.ts
+│   │   │   │   ├── RecordDrawer.tsx
+│   │   │   │   └── [2 test files]
 │   │   │   ├── RecoveryCodesPanel/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RecoveryCodesPanel.tsx
@@ -1685,12 +1710,17 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSettingsNav.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useStackedDrawer/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useStackedDrawer.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useSubscription/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSubscription.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useUnsavedChangesGuard/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── unsaved-changes.constants.ts
 │   │   │   │   ├── useUnsavedChangesGuard.tsx
 │   │   │   │   └── [2 test files]
 │   │   │   ├── useUpdate/

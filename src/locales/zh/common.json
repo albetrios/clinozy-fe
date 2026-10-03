@@ -310,5 +310,35 @@
       "label": "时间",
       "placeholder": "选择时间"
     }
+  },
+  "unsavedChanges": {
+    "title": "放弃更改？",
+    "description": "您的更改尚未保存，将会丢失。",
+    "discard": "放弃",
+    "keepEditing": "继续编辑"
+  },
+  "recordDrawer": {
+    "cancel": "取消",
+    "back": "返回",
+    "close": "关闭",
+    "save": "保存",
+    "saving": "正在保存…",
+    "retrySave": "重试保存",
+    "saveAndAdd": "保存并继续添加",
+    "delete": "删除",
+    "notSaved": "未保存 · 您的更改已保留",
+    "readOnly": "仅查看 · 您的角色无法更改此内容",
+    "quickFill": "快速填写",
+    "step": {
+      "next": "下一步：{{step}} →",
+      "edit": "编辑",
+      "open": "打开",
+      "missing": "缺少：{{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "空",
+      "added_other": "已添加 {{count}} 项",
+      "noneYet": "暂无"
+    }
   }
 }

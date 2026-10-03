@@ -17,12 +17,28 @@ const rules = readFileSync(join(root, 'src/index.css'), 'utf8').replace(
   '',
 );
 
-/** The declarations of `selector { … }`, optionally inside a given @media block. */
+/**
+ * The declarations of `selector { … }`, optionally inside a given @media block.
+ * The stylesheet holds several blocks for one query (the record drawer's lift
+ * is `min-width: 48rem` too), so the rule is looked up inside each of them —
+ * a block ends at its column-0 `}` — never in whatever follows the first.
+ */
 function declarations(selector: string, media?: string): string {
-  const scope = media ? rules.slice(rules.indexOf(`@media ${media}`)) : rules;
-  const start = scope.indexOf(`${selector} {`);
-  expect(start, `${selector} in ${media ?? 'the stylesheet'}`).toBeGreaterThan(-1);
-  return scope.slice(start, scope.indexOf('}', start));
+  if (!media) {
+    const start = rules.indexOf(`${selector} {`);
+    expect(start, `${selector} in the stylesheet`).toBeGreaterThan(-1);
+    return rules.slice(start, rules.indexOf('}', start));
+  }
+  for (
+    let from = rules.indexOf(`@media ${media}`);
+    from !== -1;
+    from = rules.indexOf(`@media ${media}`, from + 1)
+  ) {
+    const block = rules.slice(from, rules.indexOf('\n}', from));
+    const start = block.indexOf(`${selector} {`);
+    if (start !== -1) return block.slice(start, block.indexOf('}', start));
+  }
+  return expect.fail(`${selector} in @media ${media}`);
 }
 
 const PHONE = '(max-width: 47.9375rem) {\n  :root:has';

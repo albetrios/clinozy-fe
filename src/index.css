@@ -946,6 +946,13 @@
 [data-theme='clinozy-zinc-pastel'] [data-slot='floating-edge'] {
   box-shadow: var(--elevation-close);
 }
+/* Drawers (H:882) lift off the page from `md` up; below it the record drawer
+   is the full screen and casts nothing (H:26), so the rule stops there. */
+@media (min-width: 48rem) {
+  [data-theme='clinozy-zinc-pastel'] [data-slot='sheet-content'] {
+    box-shadow: var(--elevation-drawer);
+  }
+}
 /* Keyboard focus: the design's fill (muted-strong, primary text) — kept — plus
    the platform ring each control already draws, because the fill alone is
    1.15:1 against the page (WCAG 1.4.11). Controls whose own fill IS their

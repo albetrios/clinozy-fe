@@ -46,12 +46,25 @@ function AccordionTrigger({
 function AccordionContent({
   className,
   children,
+  motion = 'collapse',
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Content> & {
+  /** `collapse` animates the height open and shut (stock). `reveal` is the clinic
+   *  step body (`czacc`, H:894): no height motion — the body fades in and rises
+   *  4px over 240ms, and a closing body leaves at once. Only `collapse` clips its
+   *  overflow (the height animation needs it); a revealed body keeps its fields'
+   *  focus rings. */
+  motion?: 'collapse' | 'reveal';
+}) {
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
+      className={cn(
+        'text-sm',
+        motion === 'collapse'
+          ? 'data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden'
+          : 'data-[state=open]:animate-reveal',
+      )}
       {...props}
     >
       <div className={cn('pt-0 pb-4', className)}>{children}</div>

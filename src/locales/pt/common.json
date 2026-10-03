@@ -312,5 +312,37 @@
       "label": "Hora",
       "placeholder": "Escolha um horário"
     }
+  },
+  "unsavedChanges": {
+    "title": "Descartar alterações?",
+    "description": "Suas alterações não foram salvas e serão perdidas.",
+    "discard": "Descartar",
+    "keepEditing": "Continuar editando"
+  },
+  "recordDrawer": {
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "retrySave": "Tentar salvar de novo",
+    "saveAndAdd": "Salvar e adicionar outro",
+    "delete": "Excluir",
+    "notSaved": "Não salvo · suas alterações foram mantidas",
+    "readOnly": "Somente visualização · sua função não pode alterar isto",
+    "quickFill": "Preenchimento rápido",
+    "step": {
+      "next": "Próximo: {{step}} →",
+      "edit": "Editar",
+      "open": "Abrir",
+      "missing": "Faltando: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Vazio",
+      "added_one": "{{count}} adicionado",
+      "added_many": "{{count}} adicionados",
+      "added_other": "{{count}} adicionados",
+      "noneYet": "Nenhum ainda"
+    }
   }
 }

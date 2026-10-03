@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 const blockerState = vi.hoisted(() => ({
@@ -31,5 +31,25 @@ describe('useUnsavedChangesGuard', () => {
     const { result } = renderHook(() => useUnsavedChangesGuard({ when: true }));
     expect(result.current.isBlocked).toBe(true);
     blockerState.status = 'idle';
+  });
+
+  it('runs a guarded exit at once when there is nothing to lose', () => {
+    const { result } = renderHook(() => useUnsavedChangesGuard({ when: false }));
+    const exit = vi.fn();
+
+    act(() => result.current.confirmDiscard(exit));
+
+    expect(exit).toHaveBeenCalledTimes(1);
+    expect(result.current.isBlocked).toBe(false);
+  });
+
+  it('holds a guarded exit and opens the prompt while dirty', () => {
+    const { result } = renderHook(() => useUnsavedChangesGuard({ when: true }));
+    const exit = vi.fn();
+
+    act(() => result.current.confirmDiscard(exit));
+
+    expect(exit).not.toHaveBeenCalled();
+    expect(result.current.isBlocked).toBe(true);
   });
 });

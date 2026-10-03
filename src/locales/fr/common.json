@@ -312,5 +312,37 @@
       "label": "Heure",
       "placeholder": "Choisir une heure"
     }
+  },
+  "unsavedChanges": {
+    "title": "Abandonner les modifications ?",
+    "description": "Vos modifications n’ont pas été enregistrées et seront perdues.",
+    "discard": "Abandonner",
+    "keepEditing": "Continuer l’édition"
+  },
+  "recordDrawer": {
+    "cancel": "Annuler",
+    "back": "Retour",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "retrySave": "Réessayer l’enregistrement",
+    "saveAndAdd": "Enregistrer et ajouter un autre",
+    "delete": "Supprimer",
+    "notSaved": "Non enregistré · vos modifications sont conservées",
+    "readOnly": "Lecture seule · votre rôle ne peut pas modifier ceci",
+    "quickFill": "Remplissage rapide",
+    "step": {
+      "next": "Suivant : {{step}} →",
+      "edit": "Modifier",
+      "open": "Ouvrir",
+      "missing": "Manquant : {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Vide",
+      "added_one": "{{count}} ajouté",
+      "added_many": "{{count}} ajoutés",
+      "added_other": "{{count}} ajoutés",
+      "noneYet": "Aucun pour l’instant"
+    }
   }
 }

@@ -311,5 +311,36 @@
       "label": "Uhrzeit",
       "placeholder": "Uhrzeit wählen"
     }
+  },
+  "unsavedChanges": {
+    "title": "Änderungen verwerfen?",
+    "description": "Ihre Änderungen wurden nicht gespeichert und gehen verloren.",
+    "discard": "Verwerfen",
+    "keepEditing": "Weiter bearbeiten"
+  },
+  "recordDrawer": {
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "close": "Schließen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "retrySave": "Erneut speichern",
+    "saveAndAdd": "Speichern & weiteren hinzufügen",
+    "delete": "Löschen",
+    "notSaved": "Nicht gespeichert · Ihre Änderungen bleiben erhalten",
+    "readOnly": "Nur Ansicht · Ihre Rolle kann dies nicht ändern",
+    "quickFill": "Schnell ausfüllen",
+    "step": {
+      "next": "Weiter: {{step}} →",
+      "edit": "Bearbeiten",
+      "open": "Öffnen",
+      "missing": "Fehlt: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Leer",
+      "added_one": "{{count}} hinzugefügt",
+      "added_other": "{{count}} hinzugefügt",
+      "noneYet": "Noch keine"
+    }
   }
 }

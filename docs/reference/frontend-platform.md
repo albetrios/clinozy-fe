@@ -155,7 +155,11 @@ write path for API calls.
   `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does.
 - Users should not lose in-progress **local** drafts: onboarding uses
   `useUnsavedChangesGuard` + persisted `useOnboardingStore`; settings panels
-  register dirty state via `SettingsDirtyProvider`.
+  register dirty state via `SettingsDirtyProvider`. The record drawer
+  (`shared/components/RecordDrawer/`) routes every exit of a dirty drawer — ×,
+  Cancel, backdrop, Esc — through the guard's `confirmDiscard`, and the browser
+  Back through its route blocker, so all of them ask "Discard changes?" first;
+  while a save runs every exit is held.
 
 Do not silently drop failed writes — show error + retry affordance.
 

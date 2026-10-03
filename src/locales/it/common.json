@@ -312,5 +312,37 @@
       "label": "Ora",
       "placeholder": "Scegli un orario"
     }
+  },
+  "unsavedChanges": {
+    "title": "Scartare le modifiche?",
+    "description": "Le tue modifiche non sono state salvate e andranno perse.",
+    "discard": "Scarta",
+    "keepEditing": "Continua a modificare"
+  },
+  "recordDrawer": {
+    "cancel": "Annulla",
+    "back": "Indietro",
+    "close": "Chiudi",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "retrySave": "Riprova a salvare",
+    "saveAndAdd": "Salva e aggiungi un altro",
+    "delete": "Elimina",
+    "notSaved": "Non salvato · le tue modifiche sono conservate",
+    "readOnly": "Sola lettura · il tuo ruolo non può modificarlo",
+    "quickFill": "Compilazione rapida",
+    "step": {
+      "next": "Avanti: {{step}} →",
+      "edit": "Modifica",
+      "open": "Apri",
+      "missing": "Mancano: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Vuoto",
+      "added_one": "{{count}} aggiunto",
+      "added_many": "{{count}} aggiunti",
+      "added_other": "{{count}} aggiunti",
+      "noneYet": "Nessuno per ora"
+    }
   }
 }
