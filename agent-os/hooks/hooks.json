@@ -74,10 +74,10 @@
       }
     },
     {
-      "id": "pre-compact-preserve",
+      "id": "compact-resume-card",
       "runtime": "bash",
-      "script": "pre-compact-preserve.sh",
-      "claude": { "event": "PreCompact" }
+      "script": "compact-resume-card.sh",
+      "claude": { "event": "SessionStart", "matcher": "compact" }
     },
     {
       "id": "session-end",

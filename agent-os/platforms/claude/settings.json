@@ -24,6 +24,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/session-start.sh\""
           }
         ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/compact-resume-card.sh\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -102,16 +111,6 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/stop-gate-reminder.sh\""
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/pre-compact-preserve.sh\""
           }
         ]
       }

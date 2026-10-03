@@ -137,6 +137,7 @@ clinozy-fe/
 │   │   ├── README.md
 │   │   └── trigger-eval.ts
 │   ├── hooks/
+│   │   ├── compact-resume-card.sh
 │   │   ├── cursor-shell-guard.mjs
 │   │   ├── format-edits.sh
 │   │   ├── gate-failure-hint.sh
@@ -144,7 +145,6 @@ clinozy-fe/
 │   │   ├── guardrails.mjs
 │   │   ├── hooks.json
 │   │   ├── no-unrequested-pr.sh
-│   │   ├── pre-compact-preserve.sh
 │   │   ├── prompt-skill-router.sh
 │   │   ├── README.md
 │   │   ├── session-end.sh
