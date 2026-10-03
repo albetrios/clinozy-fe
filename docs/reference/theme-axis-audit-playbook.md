@@ -166,10 +166,10 @@ and inline vars replace `data-theme`.
 
 ### E. Toast preview (TEMP — marked for retirement in `presets.ts`)
 
-| Axis               | Store field            | Options                                                                                       | Default     |
-| ------------------ | ---------------------- | --------------------------------------------------------------------------------------------- | ----------- |
-| **Toast design**   | `toastVariant` (index) | `tint`, `solid`, `outline`, `accent`, **`minimal`**, **`glass`**                              | `0` → tint  |
-| **Toast position** | `toastPosition`        | `top-right`, `top-center`, **`top-left`**, `bottom-right`, `bottom-center`, **`bottom-left`** | `top-right` |
+| Axis               | Store field            | Options                                                                                       | Default                                                       |
+| ------------------ | ---------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Toast design**   | `toastVariant` (index) | `tint`, `solid`, `outline`, `accent`, **`minimal`**, **`glass`**                              | `0` → tint                                                    |
+| **Toast position** | `toastPosition`        | `top-right`, `top-center`, **`top-left`**, `bottom-right`, `bottom-center`, **`bottom-left`** | `bottom-center` (persist v5 moved a never-picked `top-right`) |
 
 ### F. Layout shell preview (TEMP — shuffle-gated via `SHUFFLE_TEMP`)
 

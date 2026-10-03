@@ -837,7 +837,11 @@ export const TOAST_POSITIONS = [
   'bottom-left',
 ] as const;
 export type ToastPosition = (typeof TOAST_POSITIONS)[number];
-export const DEFAULT_TOAST_POSITION: ToastPosition = 'top-right';
+/**
+ * Where toasts start: bottom-centre, the design's bar (KICKOFF L-20). It was
+ * `top-right` before persist v5, which moves anyone still on that default.
+ */
+export const DEFAULT_TOAST_POSITION: ToastPosition = 'bottom-center';
 
 /** Human labels for toast position picker (Appearance panel). */
 export const TOAST_POSITION_LABELS: Record<ToastPosition, string> = {

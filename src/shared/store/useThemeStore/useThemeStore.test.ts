@@ -4,6 +4,7 @@ import {
   DEFAULT_ICON_COLOR,
   DEFAULT_LAYOUT_WIDTH,
   DEFAULT_PRESET,
+  DEFAULT_TOAST_POSITION,
   GENERATED_PRESET,
   generateSeededTheme,
   SHUFFLE_TEMP,
@@ -473,6 +474,54 @@ describe('useThemeStore — persistence contract', () => {
   it('migrate passes non-object persisted state through untouched', () => {
     const migrate = useThemeStore.persist.getOptions().migrate;
     expect(migrate?.(null, 1)).toBeNull();
+  });
+
+  it('migrate v4 moves the never-picked top-right toasts to bottom-centre', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    expect(DEFAULT_TOAST_POSITION).toBe('bottom-center');
+
+    const moved = migrate?.(
+      { preset: DEFAULT_PRESET, toastPosition: 'top-right' },
+      4,
+    ) as Record<string, unknown>;
+    expect(moved.toastPosition).toBe('bottom-center');
+    // Older still, with no position stored at all: the new default too.
+    const unset = migrate?.({ theme: 'dark' }, 1) as Record<string, unknown>;
+    expect(unset.toastPosition).toBe('bottom-center');
+  });
+
+  it.each(['top-center', 'top-left', 'bottom-right', 'bottom-left'])(
+    'migrate v4 keeps a picked %s',
+    (picked) => {
+      const migrate = useThemeStore.persist.getOptions().migrate;
+      const kept = migrate?.({ toastPosition: picked }, 4) as Record<string, unknown>;
+      expect(kept.toastPosition).toBe(picked);
+    },
+  );
+
+  it('a v5 top-right is a choice, kept as is', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    const kept = migrate?.({ toastPosition: 'top-right' }, 5) as Record<string, unknown>;
+    expect(kept.toastPosition).toBe('top-right');
+  });
+
+  it('a stored v4 preference rehydrates onto the new toast default', async () => {
+    localStorage.setItem(
+      'theme-preference',
+      JSON.stringify({
+        state: { theme: 'light', preset: DEFAULT_PRESET, toastPosition: 'top-right' },
+        version: 4,
+      }),
+    );
+    await useThemeStore.persist.rehydrate();
+
+    expect(useThemeStore.getState().toastPosition).toBe('bottom-center');
+    const stored = JSON.parse(localStorage.getItem('theme-preference') ?? '{}');
+    expect(stored).toMatchObject({
+      version: 5,
+      state: { toastPosition: 'bottom-center' },
+    });
+    localStorage.removeItem('theme-preference');
   });
 
   it('partialize never persists the TEMP preview variants', () => {

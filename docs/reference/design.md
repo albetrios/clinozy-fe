@@ -146,7 +146,8 @@ on its surface, in both modes.
   - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`). Anything
     else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` (published by `index.css` via `:has()`), never
-    over it — the consent card and the Sentry feedback trigger both do.
+    over it — the consent card and the Sentry feedback trigger both do, and the
+    toasts sit 16px above the whole bottom stack (`AppToaster`).
   - **Overlays are a sheet on phones and a dialog from `sm`.** The `sm:` half
     has to _undo_ the sheet (`sm:w-[calc(100%-2rem)] sm:rounded-lg`), not just
     cap its width — `w-full` with only a `max-w` runs edge to edge on every

@@ -97,6 +97,24 @@ interface ThemeStore {
   shuffleTheme: () => void;
 }
 
+/** The toast default before persist v5 (`DEFAULT_TOAST_POSITION` is bottom-centre since). */
+const PREVIOUS_TOAST_POSITION_DEFAULT = 'top-right';
+
+/**
+ * Persist v5: bottom-centre became the toast default (the design's bar, L-20).
+ * As v4 did for the preset — whoever is still on the old default never picked
+ * a position, so they follow the new one; any other pick stays.
+ */
+function migrateToastDefault(persisted: Record<string, unknown>, version: number): void {
+  if (version >= 5) return;
+  if (
+    persisted.toastPosition === undefined ||
+    persisted.toastPosition === PREVIOUS_TOAST_POSITION_DEFAULT
+  ) {
+    persisted.toastPosition = DEFAULT_TOAST_POSITION;
+  }
+}
+
 /** What a fresh install starts on: the default preset's own axes over the
  *  platform defaults, light mode (the design's default — System follows the OS
  *  once chosen). */
@@ -267,7 +285,7 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'theme-preference',
-      version: 4,
+      version: 5,
       migrate: (persisted, version) => {
         if (persisted && typeof persisted === 'object') {
           const next: Record<string, unknown> = { ...persisted };
@@ -296,6 +314,7 @@ export const useThemeStore = create<ThemeStore>()(
               next.layoutWidth = FIRST_VISIT_LAYOUT_WIDTH;
             }
           }
+          migrateToastDefault(next, version);
           delete next.authVariant;
           delete next.appVariant;
           delete next.publicVariant;

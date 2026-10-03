@@ -123,6 +123,9 @@ in **light** mode, with the preset's axis defaults (icon weight `thin`, layout w
 anyone still on the never-picked base palette to it, and `public/theme-init.js` mirrors
 that before the bundle loads, so a cold load paints the preset from the first frame
 (`boot-theme-vars.drift.test.ts` pins every preset's pre-paint primary to its block).
+Persist v5 does the same for toasts: `DEFAULT_TOAST_POSITION` is `bottom-center` (the
+design's bar), and anyone still on the old `top-right` default follows it; any other
+picked position stays.
 
 Unlike the accent presets it is **full-surface**: its `[data-theme]` block sets every
 surface token and sits after the base-colour blocks, so a stored `data-base` tint does

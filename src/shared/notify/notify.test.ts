@@ -5,7 +5,12 @@ const { runtimeMock } = vi.hoisted(() => ({
 }));
 vi.mock('./notify-runtime.tsx', () => runtimeMock);
 
-import { notificationBridge, notify, UNDO_TOAST_DURATION_MS } from './notify.ts';
+import {
+  notificationBridge,
+  notify,
+  TOAST_DURATION_MS,
+  UNDO_TOAST_DURATION_MS,
+} from './notify.ts';
 
 let release: (() => void) | undefined;
 async function activate() {
@@ -74,7 +79,10 @@ describe('notify', () => {
     await activate();
     runtimeMock.show.mockClear();
     const id = notify.error('Next');
-    expect(runtimeMock.show).toHaveBeenCalledExactlyOnceWith('error', 'Next', { id });
+    expect(runtimeMock.show).toHaveBeenCalledExactlyOnceWith('error', 'Next', {
+      id,
+      duration: TOAST_DURATION_MS.error,
+    });
     notify.dismiss(id);
     expect(runtimeMock.dismiss).toHaveBeenCalledWith(id);
   });
@@ -121,7 +129,26 @@ describe('notify', () => {
     expect(notificationBridge.getSnapshot().pending.map((item) => item.message)).toEqual([
       'Default lifetime',
     ]);
-    vi.advanceTimersByTime(3000);
+    vi.advanceTimersByTime(TOAST_DURATION_MS.default - 1000);
+    expect(notificationBridge.getSnapshot().pending).toEqual([]);
+  });
+
+  it('gives a toast that names no lifetime 5.2s, and a failure 9s', () => {
+    vi.useFakeTimers();
+    expect(TOAST_DURATION_MS).toEqual({ default: 5200, error: 9000 });
+    notify.success('Saved');
+    notify.error('Couldn’t save');
+    expect(
+      notificationBridge.getSnapshot().pending.map((item) => item.options.duration),
+    ).toEqual([5200, 9000]);
+
+    vi.advanceTimersByTime(5199);
+    expect(notificationBridge.getSnapshot().pending).toHaveLength(2);
+    vi.advanceTimersByTime(1);
+    expect(notificationBridge.getSnapshot().pending.map((item) => item.message)).toEqual([
+      'Couldn’t save',
+    ]);
+    vi.advanceTimersByTime(3800);
     expect(notificationBridge.getSnapshot().pending).toEqual([]);
   });
 
@@ -204,7 +231,7 @@ describe('notify', () => {
     resolve(1);
     await value;
     expect(notificationBridge.getSnapshot().pending[0]?.message).toBe('Saved');
-    vi.advanceTimersByTime(4000);
+    vi.advanceTimersByTime(TOAST_DURATION_MS.default);
     expect(notificationBridge.getSnapshot().pending).toEqual([]);
   });
 });

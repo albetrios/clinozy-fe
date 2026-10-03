@@ -23,6 +23,13 @@ export interface NotifyOptions {
 }
 
 /**
+ * A toast's lifetime when it names none (KICKOFF §6.0 Timers, T14): 5,200ms,
+ * and 9,000ms for a failure — long enough to read and reach its "Retry".
+ * Loading toasts stay until they are replaced.
+ */
+export const TOAST_DURATION_MS = { default: 5_200, error: 9_000 } as const;
+
+/**
  * How long an Undo toast stays: the schema's restore window (`POST
  * …/restore` within 10s — `schema-routes.md:1546`, D32).
  */
@@ -89,7 +96,7 @@ function enqueue(item: QueuedToast) {
   }
   const id = item.preview.id;
   clearTimeout(queued.get(id)?.timer);
-  const duration = item.preview.options.duration ?? 4000;
+  const duration = item.preview.options.duration ?? TOAST_DURATION_MS.default;
   if (Number.isFinite(duration)) {
     item.expiresAt = Date.now() + duration;
     item.timer = setTimeout(() => expireQueued(id), duration);
@@ -112,7 +119,12 @@ function expireQueued(id: string | number) {
 
 function show(type: ToastType, message: string, options: NotifyOptions = {}) {
   const id = options.id ?? `core-toast-${++sequence}`;
-  const resolvedOptions = { ...options, id };
+  // Always explicit: the immediate host and Sonner then expire a toast at the
+  // same moment, and a same-id write still replaces a loading toast's Infinity.
+  const duration =
+    options.duration ??
+    (type === 'error' ? TOAST_DURATION_MS.error : TOAST_DURATION_MS.default);
+  const resolvedOptions = { ...options, id, duration };
   enqueue({
     preview: { id, type, message, options: resolvedOptions },
     publish: (loaded, remainingDuration) =>
