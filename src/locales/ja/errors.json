@@ -14,7 +14,9 @@
     "refresh": "ページを更新",
     "forbidden": "このページにアクセスする権限がありません。",
     "signOut": "サインアウト",
-    "signingOut": "サインアウトしています…"
+    "signingOut": "サインアウトしています…",
+    "pageNotFound": "ページが見つかりません",
+    "recordNotFound": "{{record}}が見つかりません · 削除された可能性があります"
   },
   "widget": {
     "unavailable": "{{title}} は利用できません",

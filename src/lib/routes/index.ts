@@ -1,1 +1,5 @@
-export { organizationDashboard, organizationPicker } from './builders.ts';
+export {
+  organizationDashboard,
+  organizationHome,
+  organizationPicker,
+} from './builders.ts';

@@ -14,7 +14,9 @@
     "refresh": "पृष्ठ रीफ़्रेश करें",
     "forbidden": "आपके पास इस पेज तक पहुँचने की अनुमति नहीं है।",
     "signOut": "साइन आउट",
-    "signingOut": "साइन आउट हो रहा है…"
+    "signingOut": "साइन आउट हो रहा है…",
+    "pageNotFound": "पेज नहीं मिला",
+    "recordNotFound": "{{record}} नहीं मिला · शायद इसे हटा दिया गया है"
   },
   "widget": {
     "unavailable": "{{title}} अनुपलब्ध",

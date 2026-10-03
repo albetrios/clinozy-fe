@@ -14,7 +14,9 @@
     "refresh": "Actualiser la page",
     "forbidden": "Vous n'avez pas l'autorisation d'accéder à cette page.",
     "signOut": "Se déconnecter",
-    "signingOut": "Déconnexion…"
+    "signingOut": "Déconnexion…",
+    "pageNotFound": "Page introuvable",
+    "recordNotFound": "{{record}} introuvable · il a peut-être été supprimé"
   },
   "widget": {
     "unavailable": "{{title}} indisponible",

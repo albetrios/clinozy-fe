@@ -11,6 +11,17 @@ export function organizationPicker() {
   return { to: '/organization' } as const;
 }
 
+/**
+ * An organization's index — no UI of its own: it sends the member to their
+ * role home (D25), or the dashboard when the deployment enables no clinic room.
+ */
+export function organizationHome(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug',
+    params: { organizationSlug },
+  } as const;
+}
+
 export function organizationDashboard(organizationSlug: string) {
   return {
     to: '/organization/$organizationSlug/dashboard',

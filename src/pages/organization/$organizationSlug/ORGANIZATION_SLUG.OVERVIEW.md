@@ -29,3 +29,13 @@ blocked state renders without a redirect loop. See `app/guards/GUARDS.OVERVIEW.m
 | ----------- | ------------------------------------------- | ---------- |
 | `dashboard` | `/organization/$organizationSlug/dashboard` | dashboard/ |
 | `suspended` | `/organization/$organizationSlug/suspended` | suspended/ |
+
+## Clinic rooms (iteration launch-2026-09-30-jxmr)
+
+The ten clinic rooms nest here as islands — `today/`, `leads/`, `appointments/`,
+`patients/`, `medical/` (layout; `/medical` → `medical/sales`), `stock/` (layout;
+`/stock` → `stock/items`), `payments/`, `tasks/`, `offerings/`, `users/`. Each
+gates on membership and its `clinic-*` module and carries its manifest as
+`staticData` for the nav (`useAppNav`). The org index (`/organization/<slug>`)
+redirects to the member's role home (D25, `shared/clinic/clinic-home.ts`), and
+an unknown in-org path redirects there with a "Page not found" toast (S:115).

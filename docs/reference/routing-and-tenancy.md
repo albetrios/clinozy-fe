@@ -264,6 +264,20 @@ Builders return **`{ to, params }` objects consumed by TanStack's typed `Link`/`
 not hand-built strings — so the router's type safety stays intact. Raw-string variants only
 where the router isn't available (e2e helpers). No hand-built route strings anywhere in app code.
 
+**Clinic route plumbing (L-12a).** The org index (`/organization/<slug>`) and any
+unknown path under it redirect to the member's **role home** (D25,
+`shared/clinic/clinic-home.ts`: Pharmacist Medical, Accountant Payments,
+Marketing Leads, everyone else Today; the first open room when that one is
+closed; the dashboard when no clinic module is on) — the unknown path with a
+"Page not found" toast (S:115). An unknown organization slug keeps the platform's
+404 (identical for an unknown and a non-member slug, so existence never leaks).
+A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
+that matches nothing leaves the parent page behind, toasts "<Record> not found ·
+it may have been deleted" and replaces the URL with the parent. A drawer opened
+from another room keeps that room behind it through a `from` search param that
+must match the allow-list in `shared/clinic/clinic-referrer.ts`; anything else
+falls back to the drawer's own parent.
+
 **The primary nav is manifest-driven.** A route the nav lists carries its manifest as
 `staticData: { manifest }` in `routeTree.tsx`, and the manifest's `nav` field says how it shows:
 a clinic room names its `section` (order, label, icon and View access follow the section), a

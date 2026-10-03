@@ -12,10 +12,15 @@
 // that they must never be logged or embedded in URLs, and `capture_pageview`
 // records `$current_url` before the billing panel strips them, so without this
 // they would reach PostHog/Sentry.
+// `name` and `phone` are the clinic's create-drawer prefills —
+// `leads/create?name=&phone=` and `patients/create` (S:23, S:31): a person's
+// name and mobile number must not reach pageviews or breadcrumbs.
 const SENSITIVE_QUERY_PARAMS = [
   'token',
   'payment_intent_client_secret',
   'setup_intent_client_secret',
+  'name',
+  'phone',
 ];
 
 const FILTERED = '[Filtered]';
@@ -29,6 +34,8 @@ const PARAM_PATTERNS = [
   /([?&#]token=)[^&#]*/gi,
   /([?&#]payment_intent_client_secret=)[^&#]*/gi,
   /([?&#]setup_intent_client_secret=)[^&#]*/gi,
+  /([?&#]name=)[^&#]*/gi,
+  /([?&#]phone=)[^&#]*/gi,
 ];
 
 /** Replace sensitive query-param values in a URL(-ish) string. */

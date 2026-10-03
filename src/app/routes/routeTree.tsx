@@ -27,6 +27,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
 import { I18N_NAMESPACES, type I18nNamespace } from '@/lib/i18n/namespaces.ts';
+import { organizationDashboard } from '@/lib/routes/builders.ts';
 import {
   APP_DESCRIPTION,
   APP_TITLE,
@@ -43,9 +44,21 @@ import { validateLoginSearch } from '@/pages/login/login.search.ts';
 import { manifest as mfaManifest } from '@/pages/mfa/mfa.manifest.ts';
 import { manifest as onboardingManifest } from '@/pages/onboarding/onboarding.manifest.ts';
 import { validateOnboardingSearch } from '@/pages/onboarding/onboarding.search.ts';
+import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
 import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
+import { manifest as leadsManifest } from '@/pages/organization/$organizationSlug/leads/leads.manifest.ts';
+import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
+import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
+import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
+import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
+import { manifest as paymentsManifest } from '@/pages/organization/$organizationSlug/payments/payments.manifest.ts';
+import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
+import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
+import { manifest as tasksManifest } from '@/pages/organization/$organizationSlug/tasks/tasks.manifest.ts';
+import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
+import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { ConsentBannerLazy } from '@/shared/components/ConsentBanner/index.ts';
@@ -151,6 +164,92 @@ const PersonalShell = lazyRouteComponent(
 );
 const SuspendedPage = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/suspended/suspended.route.tsx'),
+  'Component',
+);
+// Clinic rooms (KICKOFF §4): each loads its own namespace with its chunk.
+const TodayPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.today],
+    () => import('@/pages/organization/$organizationSlug/today/today.route.tsx'),
+  ),
+  'Component',
+);
+const LeadsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.leads],
+    () => import('@/pages/organization/$organizationSlug/leads/leads.route.tsx'),
+  ),
+  'Component',
+);
+const AppointmentsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.appointments],
+    () =>
+      import('@/pages/organization/$organizationSlug/appointments/appointments.route.tsx'),
+  ),
+  'Component',
+);
+const PatientsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.patients],
+    () => import('@/pages/organization/$organizationSlug/patients/patients.route.tsx'),
+  ),
+  'Component',
+);
+const PaymentsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.payments],
+    () => import('@/pages/organization/$organizationSlug/payments/payments.route.tsx'),
+  ),
+  'Component',
+);
+const TasksPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.tasks],
+    () => import('@/pages/organization/$organizationSlug/tasks/tasks.route.tsx'),
+  ),
+  'Component',
+);
+const OfferingsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.offerings],
+    () => import('@/pages/organization/$organizationSlug/offerings/offerings.route.tsx'),
+  ),
+  'Component',
+);
+const UsersPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.users],
+    () => import('@/pages/organization/$organizationSlug/users/users.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalLayout = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () => import('@/pages/organization/$organizationSlug/medical/medical.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalSalesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () => import('@/pages/organization/$organizationSlug/medical/sales/sales.route.tsx'),
+  ),
+  'Component',
+);
+const StockLayout = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.clinicStock],
+    () => import('@/pages/organization/$organizationSlug/stock/stock.route.tsx'),
+  ),
+  'Component',
+);
+const StockItemsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.clinicStock],
+    () => import('@/pages/organization/$organizationSlug/stock/items/items.route.tsx'),
+  ),
   'Component',
 );
 const NotFoundPage = lazyRouteComponent(
@@ -502,6 +601,235 @@ const organizationSuspendedRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// ── Clinic rooms (KICKOFF §4, L-12a) ──
+// The leaf pattern: gateway (session → module → permission), then the org
+// status guard; the manifest rides along as staticData for the nav (L-12).
+// The org index and an unknown in-org path go to the member's role home
+// (D25, S:115); `/medical` and `/stock` open on their first tab.
+const organizationIndexRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: '/',
+  beforeLoad: async ({ params, preload }) => {
+    if (preload) return;
+    const { clinicHomeRoute } = await import('@/shared/clinic/clinic-home.ts');
+    throw redirect(
+      (await clinicHomeRoute(params.organizationSlug)) ??
+        organizationDashboard(params.organizationSlug),
+    );
+  },
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationNotFoundRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: '$',
+  beforeLoad: async ({ params, preload }) => {
+    if (preload) return;
+    const [{ clinicHomeRoute }, { notify }] = await Promise.all([
+      import('@/shared/clinic/clinic-home.ts'),
+      import('@/shared/notify/index.ts'),
+    ]);
+    notify.info(i18n.t(ERRORS_KEYS.route.pageNotFound, { ns: ERRORS_NS }));
+    throw redirect(
+      (await clinicHomeRoute(params.organizationSlug)) ??
+        organizationDashboard(params.organizationSlug),
+    );
+  },
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationTodayRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'today',
+  head: manifestHead(todayManifest),
+  staticData: { manifest: todayManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(todayManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: TodayPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationLeadsRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'leads',
+  head: manifestHead(leadsManifest),
+  staticData: { manifest: leadsManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(leadsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: LeadsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationAppointmentsRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'appointments',
+  head: manifestHead(appointmentsManifest),
+  staticData: { manifest: appointmentsManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(appointmentsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: AppointmentsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPatientsRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'patients',
+  head: manifestHead(patientsManifest),
+  staticData: { manifest: patientsManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(patientsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PatientsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPaymentsRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'payments',
+  head: manifestHead(paymentsManifest),
+  staticData: { manifest: paymentsManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(paymentsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PaymentsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationTasksRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'tasks',
+  head: manifestHead(tasksManifest),
+  staticData: { manifest: tasksManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(tasksManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: TasksPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationOfferingsRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'offerings',
+  head: manifestHead(offeringsManifest),
+  staticData: { manifest: offeringsManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offeringsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OfferingsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationUsersRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'users',
+  head: manifestHead(usersManifest),
+  staticData: { manifest: usersManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(usersManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: UsersPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'medical',
+  head: manifestHead(medicalManifest),
+  staticData: { manifest: medicalManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(medicalManifest)(toGateContext(location, params));
+  },
+  component: MedicalLayout,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalIndexRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: '/',
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/organization/$organizationSlug/medical/sales',
+      params: { organizationSlug: params.organizationSlug },
+    });
+  },
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalSalesRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'sales',
+  head: manifestHead(medicalSalesManifest),
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(medicalSalesManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: MedicalSalesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'stock',
+  head: manifestHead(stockManifest),
+  staticData: { manifest: stockManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(stockManifest)(toGateContext(location, params));
+  },
+  component: StockLayout,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockIndexRoute = createRoute({
+  getParentRoute: () => organizationStockRoute,
+  path: '/',
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/organization/$organizationSlug/stock/items',
+      params: { organizationSlug: params.organizationSlug },
+    });
+  },
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockItemsRoute = createRoute({
+  getParentRoute: () => organizationStockRoute,
+  path: 'items',
+  head: manifestHead(stockItemsManifest),
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(stockItemsManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: StockItemsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
 // ── Personal space (/dashboard) ──
 // Personal organizations land on root URLs — no `$organizationSlug` in the path.
 // The active org comes from the session context (me/context / JWT), not the URL,
@@ -566,8 +894,26 @@ const routeTree = rootRoute.addChildren([
   ]),
   organizationPickerRoute,
   organizationShellRoute.addChildren([
+    organizationIndexRoute,
     organizationDashboardRoute,
     organizationSuspendedRoute,
+    organizationTodayRoute,
+    organizationLeadsRoute,
+    organizationAppointmentsRoute,
+    organizationPatientsRoute,
+    organizationMedicalRoute.addChildren([
+      organizationMedicalIndexRoute,
+      organizationMedicalSalesRoute,
+    ]),
+    organizationStockRoute.addChildren([
+      organizationStockIndexRoute,
+      organizationStockItemsRoute,
+    ]),
+    organizationPaymentsRoute,
+    organizationTasksRoute,
+    organizationOfferingsRoute,
+    organizationUsersRoute,
+    organizationNotFoundRoute,
   ]),
   personalShellRoute.addChildren([personalDashboardRoute]),
   notFoundRoute,

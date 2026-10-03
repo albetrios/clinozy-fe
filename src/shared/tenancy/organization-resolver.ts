@@ -1,4 +1,4 @@
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome } from '@/lib/routes/index.ts';
 
 import { type DeploymentFlags, resolveDeploymentMode } from './deployment-mode.ts';
 import { type MeContext, needsOnboarding } from './me-context.ts';
@@ -117,7 +117,7 @@ export function workspaceRedirectForTeamEntry(
 }
 
 type RootRedirect =
-  | ReturnType<typeof organizationDashboard>
+  | ReturnType<typeof organizationHome>
   | { readonly to: '/dashboard' }
   | { readonly to: '/onboarding' }
   | { readonly to: '/organization' };
@@ -132,5 +132,5 @@ export async function resolveRootRedirect(): Promise<RootRedirect> {
   if (target.to === '/onboarding') return { to: '/onboarding' } as const;
   if (target.to === '/dashboard') return { to: '/dashboard' } as const;
   if (target.to === '/organization') return { to: '/organization' } as const;
-  return organizationDashboard(target.params.organizationSlug);
+  return organizationHome(target.params.organizationSlug);
 }

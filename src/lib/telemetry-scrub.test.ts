@@ -50,6 +50,23 @@ describe('scrubSensitiveUrl', () => {
   });
 });
 
+describe('scrubSensitiveUrl — clinic create prefills', () => {
+  it('filters the name and phone a create drawer carries (S:23, S:31)', () => {
+    expect(
+      scrubSensitiveUrl(
+        'https://app.test/organization/acme/leads/create?name=Rhea%20Shah&phone=%2B919876543210&source=whatsapp',
+      ),
+    ).toBe(
+      'https://app.test/organization/acme/leads/create?name=[Filtered]&phone=[Filtered]&source=whatsapp',
+    );
+  });
+
+  it('does NOT touch params that only end in name or phone', () => {
+    const url = 'https://app.test/x?username=riya&homephone=1&q=name';
+    expect(scrubSensitiveUrl(url)).toBe(url);
+  });
+});
+
 describe('hasSensitiveParams', () => {
   it('detects token=', () => {
     expect(hasSensitiveParams('/x?token=1')).toBe(true);

@@ -81,10 +81,10 @@ describe('resolveRootRedirect (`/` → active org from me/context)', () => {
     await expect(resolveRootRedirect()).resolves.toEqual({ to: '/dashboard' });
   });
 
-  it('routes a team active org to its $organizationSlug dashboard', async () => {
+  it('routes a team active org to its index, which picks the role home (D25)', async () => {
     vi.mocked(ensureSessionContext).mockResolvedValue(meCtx(activeOrg('TEAM', 'acme')));
     await expect(resolveRootRedirect()).resolves.toEqual({
-      to: '/organization/$organizationSlug/dashboard',
+      to: '/organization/$organizationSlug',
       params: { organizationSlug: 'acme' },
     });
   });

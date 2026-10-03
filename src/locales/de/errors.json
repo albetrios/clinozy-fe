@@ -14,7 +14,9 @@
     "refresh": "Seite aktualisieren",
     "forbidden": "Sie haben keine Berechtigung für diese Seite.",
     "signOut": "Abmelden",
-    "signingOut": "Abmeldung läuft…"
+    "signingOut": "Abmeldung läuft…",
+    "pageNotFound": "Seite nicht gefunden",
+    "recordNotFound": "{{record}} nicht gefunden · möglicherweise gelöscht"
   },
   "widget": {
     "unavailable": "{{title}} nicht verfügbar",

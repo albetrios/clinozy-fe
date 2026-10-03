@@ -14,7 +14,9 @@
     "refresh": "刷新页面",
     "forbidden": "你没有访问此页面的权限。",
     "signOut": "退出登录",
-    "signingOut": "正在退出…"
+    "signingOut": "正在退出…",
+    "pageNotFound": "找不到页面",
+    "recordNotFound": "找不到{{record}} · 可能已被删除"
   },
   "widget": {
     "unavailable": "{{title}} 不可用",

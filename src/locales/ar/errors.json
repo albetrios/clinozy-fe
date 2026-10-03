@@ -14,7 +14,9 @@
     "refresh": "تحديث الصفحة",
     "forbidden": "ليس لديك إذن للوصول إلى هذه الصفحة.",
     "signOut": "تسجيل الخروج",
-    "signingOut": "جارٍ تسجيل الخروج…"
+    "signingOut": "جارٍ تسجيل الخروج…",
+    "pageNotFound": "الصفحة غير موجودة",
+    "recordNotFound": "{{record}} غير موجود · ربما تم حذفه"
   },
   "widget": {
     "unavailable": "{{title}} غير متاح",

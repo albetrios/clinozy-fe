@@ -14,7 +14,9 @@
     "refresh": "Actualizar página",
     "forbidden": "No tienes permiso para acceder a esta página.",
     "signOut": "Cerrar sesión",
-    "signingOut": "Cerrando sesión…"
+    "signingOut": "Cerrando sesión…",
+    "pageNotFound": "Página no encontrada",
+    "recordNotFound": "{{record}} no encontrado · puede que se haya eliminado"
   },
   "widget": {
     "unavailable": "{{title}} no disponible",

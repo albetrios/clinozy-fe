@@ -14,7 +14,9 @@
     "refresh": "Refresh page",
     "forbidden": "You do not have permission to access this page.",
     "signOut": "Sign out",
-    "signingOut": "Signing out…"
+    "signingOut": "Signing out…",
+    "pageNotFound": "Page not found",
+    "recordNotFound": "{{record}} not found · it may have been deleted"
   },
   "widget": {
     "unavailable": "{{title}} unavailable",

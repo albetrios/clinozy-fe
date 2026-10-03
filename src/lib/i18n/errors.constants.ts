@@ -10,6 +10,8 @@ export const ERRORS_KEYS = {
   },
   route: {
     notFound: 'route.notFound',
+    pageNotFound: 'route.pageNotFound',
+    recordNotFound: 'route.recordNotFound',
     generic: 'route.generic',
     pageTitle: 'route.pageTitle',
     pageMessage: 'route.pageMessage',

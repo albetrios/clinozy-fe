@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~710 src files · ~408 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
+Stats: ~762 src files · ~423 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -787,17 +787,101 @@ clinozy-fe/
 │   │   │   └── [3 test files]
 │   │   └── organization/
 │   │       ├── $organizationSlug/
+│   │       │   ├── appointments/
+│   │       │   │   ├── appointments.constants.ts
+│   │       │   │   ├── appointments.manifest.ts
+│   │       │   │   ├── APPOINTMENTS.OVERVIEW.md
+│   │       │   │   ├── appointments.route.tsx
+│   │       │   │   ├── AppointmentsPage.tsx
+│   │       │   │   └── [1 test file]
 │   │       │   ├── dashboard/
 │   │       │   │   ├── dashboard.manifest.ts
 │   │       │   │   ├── DASHBOARD.OVERVIEW.md
 │   │       │   │   ├── dashboard.route.tsx
 │   │       │   │   ├── DashboardPage.tsx
 │   │       │   │   └── [1 test file]
+│   │       │   ├── leads/
+│   │       │   │   ├── leads.constants.ts
+│   │       │   │   ├── leads.manifest.ts
+│   │       │   │   ├── LEADS.OVERVIEW.md
+│   │       │   │   ├── leads.route.tsx
+│   │       │   │   ├── LeadsPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── medical/
+│   │       │   │   ├── sales/
+│   │       │   │   │   ├── sales.constants.ts
+│   │       │   │   │   ├── sales.manifest.ts
+│   │       │   │   │   ├── SALES.OVERVIEW.md
+│   │       │   │   │   ├── sales.route.tsx
+│   │       │   │   │   ├── SalesPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── medical.constants.ts
+│   │       │   │   ├── medical.manifest.ts
+│   │       │   │   ├── MEDICAL.OVERVIEW.md
+│   │       │   │   ├── medical.route.tsx
+│   │       │   │   ├── MedicalLayout.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── offerings/
+│   │       │   │   ├── offerings.constants.ts
+│   │       │   │   ├── offerings.manifest.ts
+│   │       │   │   ├── OFFERINGS.OVERVIEW.md
+│   │       │   │   ├── offerings.route.tsx
+│   │       │   │   ├── OfferingsPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── patients/
+│   │       │   │   ├── patients.constants.ts
+│   │       │   │   ├── patients.manifest.ts
+│   │       │   │   ├── PATIENTS.OVERVIEW.md
+│   │       │   │   ├── patients.route.tsx
+│   │       │   │   ├── PatientsPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── payments/
+│   │       │   │   ├── payments.constants.ts
+│   │       │   │   ├── payments.manifest.ts
+│   │       │   │   ├── PAYMENTS.OVERVIEW.md
+│   │       │   │   ├── payments.route.tsx
+│   │       │   │   ├── PaymentsPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── stock/
+│   │       │   │   ├── items/
+│   │       │   │   │   ├── items.constants.ts
+│   │       │   │   │   ├── items.manifest.ts
+│   │       │   │   │   ├── ITEMS.OVERVIEW.md
+│   │       │   │   │   ├── items.route.tsx
+│   │       │   │   │   ├── ItemsPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── stock.constants.ts
+│   │       │   │   ├── stock.manifest.ts
+│   │       │   │   ├── STOCK.OVERVIEW.md
+│   │       │   │   ├── stock.route.tsx
+│   │       │   │   ├── StockLayout.tsx
+│   │       │   │   └── [1 test file]
 │   │       │   ├── suspended/
 │   │       │   │   ├── suspended.manifest.ts
 │   │       │   │   ├── SUSPENDED.OVERVIEW.md
 │   │       │   │   ├── suspended.route.tsx
 │   │       │   │   ├── SuspendedPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── tasks/
+│   │       │   │   ├── tasks.constants.ts
+│   │       │   │   ├── tasks.manifest.ts
+│   │       │   │   ├── TASKS.OVERVIEW.md
+│   │       │   │   ├── tasks.route.tsx
+│   │       │   │   ├── TasksPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── today/
+│   │       │   │   ├── today.constants.ts
+│   │       │   │   ├── today.manifest.ts
+│   │       │   │   ├── TODAY.OVERVIEW.md
+│   │       │   │   ├── today.route.tsx
+│   │       │   │   ├── TodayPage.tsx
+│   │       │   │   └── [1 test file]
+│   │       │   ├── users/
+│   │       │   │   ├── users.constants.ts
+│   │       │   │   ├── users.manifest.ts
+│   │       │   │   ├── USERS.OVERVIEW.md
+│   │       │   │   ├── users.route.tsx
+│   │       │   │   ├── UsersPage.tsx
 │   │       │   │   └── [1 test file]
 │   │       │   ├── organization-slug.manifest.ts
 │   │       │   ├── organization-slug.route.tsx
@@ -907,12 +991,14 @@ clinozy-fe/
 │   │   │   ├── stripe-config.ts
 │   │   │   └── [1 test file]
 │   │   ├── clinic/
+│   │   │   ├── clinic-home.ts
+│   │   │   ├── clinic-referrer.ts
 │   │   │   ├── clinic-section-icons.ts
 │   │   │   ├── clinic-sections.ts
 │   │   │   ├── clinic-tones.ts
 │   │   │   ├── clinic.constants.ts
 │   │   │   ├── CLINIC.OVERVIEW.md
-│   │   │   └── [2 test files]
+│   │   │   └── [4 test files]
 │   │   ├── components/
 │   │   │   ├── AppearanceDialog/
 │   │   │   │   ├── appearance-dialog.constants.ts
@@ -1442,6 +1528,10 @@ clinozy-fe/
 │   │   │   ├── useDeploymentFlags/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useDeploymentFlags.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useDialogRouteRecord/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useDialogRouteRecord.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useInvitations/
 │   │   │   │   ├── index.ts
