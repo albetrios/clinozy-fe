@@ -69,6 +69,23 @@ service is left running unless you set `KEEP_APP=1`.
 Full reference — every step, env var, and network host:
 [`tooling/setup/agent/README.md`](../../tooling/setup/agent/README.md).
 
+## Environment variables (cloud)
+
+A cloud session runs as **`local`** — the `.env.local` from step 7 — on **development** values for
+everything except the API it talks to (clinozy-be does the same with everything except its
+database and Redis; see its `docs/integrations/claude-code-web-environment.md`):
+
+- Never set `VITE_APP_ENV` or `BUILD_ENVIRONMENT`: the session is `local`.
+- Set the development `VITE_*` values you need (Turnstile site key, Stripe publishable test key,
+  PostHog, OAuth flags, …) as the environment's **Variables**. Vite gives the process env priority
+  over `.env.local`, and Node tooling (`tooling/load-env-files.mjs`) no longer lets a blank `KEY=`
+  placeholder in `.env.local` delete them.
+- Leave `VITE_API_BASE_URL` blank and `VITE_DEV_API_URL` at `http://localhost:3000`: the API is the
+  clinozy-be running in the session, on its own Postgres + Redis — the frontend's equivalent of
+  "everything except the database and Redis".
+- `pnpm dev` reads `.env.local` only; a `pnpm build` in the session is not asked and reads it too.
+  Source maps never upload unless a build passes `--sentry`.
+
 ## On-demand: Playwright e2e
 
 E2E is local/backend-coupled — CI never boots clinozy-be, and neither does the
