@@ -8,12 +8,19 @@ import {
   labelAppSplash,
   onAppSplashDismissed,
 } from '@/lib/app-splash.ts';
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { readOnline, useOnlineStatus } from '@/shared/hooks/useOnlineStatus/index.ts';
 
-import { SPLASH_KEYS, SPLASH_NS } from './app-splash.constants.ts';
+/*
+ * The one key this entry-resident shell reads (`SPLASH_KEYS.label` in `common`),
+ * declared here so the entry chunk does not carry the slot's whole key and test-id
+ * table (`app-splash.constants.ts`, which the lazy slot imports). The shell's
+ * "names the splash with the translated label" test fails if it drifts.
+ */
+const SPLASH_LABEL = { ns: I18N_NAMESPACES.common, key: 'splash.label' } as const;
 
 const loadSplashSlot = onceAsync(() => import('./AppSplashSlot.tsx'));
 
@@ -59,7 +66,7 @@ function isOrganizationLayoutPath(pathname: string): boolean {
  * with no Retry on it.
  */
 export function AppSplashSlotLazy() {
-  const { t } = useTranslation(SPLASH_NS);
+  const { t } = useTranslation(SPLASH_LABEL.ns);
   const [active, setActive] = useState(isAppSplashActive);
   // "Offline at mount" (`splash.md:45`) — this is the app's mount.
   const [offlineAtMount] = useState(() => !readOnline());
@@ -69,7 +76,7 @@ export function AppSplashSlotLazy() {
   });
 
   useLayoutEffect(() => {
-    if (active) labelAppSplash(t(SPLASH_KEYS.label));
+    if (active) labelAppSplash(t(SPLASH_LABEL.key));
   }, [active, t]);
 
   useEffect(() => {
@@ -80,7 +87,7 @@ export function AppSplashSlotLazy() {
   if (!(active && (greets || offlineAtMount || !online))) return null;
 
   return (
-    <SectionErrorBoundary title={t(SPLASH_KEYS.label)} variant="silent">
+    <SectionErrorBoundary title={t(SPLASH_LABEL.key)} variant="silent">
       <Suspense fallback={<HoldWhileLoading />}>
         <AppSplashSlot offlineAtMount={offlineAtMount} greets={greets} />
       </Suspense>

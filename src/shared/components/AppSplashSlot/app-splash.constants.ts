@@ -6,7 +6,12 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
  */
 export const SPLASH_NS = I18N_NAMESPACES.common;
 
-/** Key paths for the boot splash's copy (`splash.md:90–99`; KICKOFF §6.1). */
+/**
+ * Key paths for the boot splash's copy (`splash.md:90–99`; KICKOFF §6.1). Only
+ * the lazy slot imports this module: the entry-resident shell
+ * (`AppSplashSlotLazy`) declares its one key, `label`, itself — importing this
+ * table there would put every key and test id on the first paint.
+ */
 export const SPLASH_KEYS = {
   label: 'splash.label',
   greeting: {
