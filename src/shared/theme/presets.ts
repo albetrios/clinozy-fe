@@ -1,3 +1,5 @@
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+
 export interface ThemePreset {
   id: string;
   label: string;
@@ -26,7 +28,7 @@ export interface ThemePreset {
 export const THEME_PRESETS: readonly ThemePreset[] = [
   {
     id: 'clinozy-zinc-pastel',
-    label: 'Clinozy Zinc Pastel',
+    label: `${PRODUCT_NAME} Zinc Pastel`,
     axisDefaults: { iconWeight: 'thin', layoutWidth: 'full', intensityId: 'muted' },
   },
   { id: 'default', label: 'Classic' },

@@ -99,7 +99,7 @@
     "validate:logical": "./tooling/validate/logical-css.sh",
     "validate:no-bare-intl": "node tooling/validate/no-bare-intl.mjs",
     "validate:theme-axis": "./tooling/validate/theme-axis.sh",
-    "validate:theme-catalog": "node --import tsx tooling/validate/theme-catalog.mjs",
+    "validate:theme-catalog": "TSX_TSCONFIG_PATH=tsconfig.app.json node --import tsx tooling/validate/theme-catalog.mjs",
     "validate:testids": "node tooling/validate/test-ids.mjs",
     "validate:i18n": "node tooling/validate/i18n-keys.mjs",
     "validate:i18n-parity": "node tooling/validate/i18n-locale-parity.mjs",

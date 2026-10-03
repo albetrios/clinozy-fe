@@ -27,8 +27,9 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 /organization/$organizationSlug/dashboard
 /organization/$organizationSlug/patients
 /organization/$organizationSlug/patients/$patientId
-/organization/$organizationSlug/patients/$patientId/appointments/$appointmentId
-/organization/$organizationSlug/appointments                      org-wide calendar (list only)
+/organization/$organizationSlug/appointments                      agenda · day · week · month
+/organization/$organizationSlug/appointments/create               URL-driven dialog over the agenda
+/organization/$organizationSlug/appointments/$appointmentId       URL-driven dialog over the agenda
 /organization/$organizationSlug/billing/invoices/$invoiceId
 /organization/$organizationSlug/reports
 /organization/$organizationSlug/suspended                         blocked-state page (status guard target)
@@ -36,8 +37,10 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 
 - **Do not use:** `/o/…`, `/org/…`, `/app/…`, session-based organization, query-param organization.
 - **Canonical-URL rule:** every resource has exactly one detail URL. Appointment detail lives
-  **only** under `patients/$patientId/appointments/$appointmentId`; the org-wide appointments list
-  links into it. Never add a second detail URL for the same resource.
+  **only** at `appointments/$appointmentId` — a dialog route over the org-wide agenda, because an
+  appointment belongs to a patient **or** a lead, so it cannot nest under either. The patient
+  file and the lead drawer link into it, keeping the page they came from behind the drawer
+  (`from`). Never add a second detail URL for the same resource.
 - **`/` (root):** a resolver route — reads `me/context` and redirects. **Onboarding first:**
   a not-yet-onboarded user (`!user.onboarding_completed`) → `/onboarding` in every deployment
   mode (even personal, whose org is auto-provisioned). Once onboarded: PERSONAL → root
@@ -77,15 +80,14 @@ src/pages/
         │   ├── patients.route.tsx  patients.manifest.ts  PatientsPage.tsx
         │   └── $patientId/
         │       ├── PATIENT_ID.OVERVIEW.md
-        │       ├── patient-id.route.tsx  patient-id.manifest.ts  PatientDetailPage.tsx
-        │       └── appointments/
-        │           ├── APPOINTMENTS.OVERVIEW.md
-        │           ├── appointments.route.tsx  appointments.manifest.ts  AppointmentsPage.tsx
-        │           └── $appointmentId/
-        │               ├── APPOINTMENT_ID.OVERVIEW.md
-        │               ├── appointment-id.route.tsx  appointment-id.manifest.ts
-        │               └── AppointmentDetailPage.tsx
-        ├── appointments/                        org-wide list (4-file island)
+        │       └── patient-id.route.tsx  patient-id.manifest.ts  PatientDetailPage.tsx
+        ├── appointments/
+        │   ├── APPOINTMENTS.OVERVIEW.md
+        │   ├── appointments.route.tsx  appointments.manifest.ts  AppointmentsPage.tsx
+        │   ├── create/                          dialog route (renders null; the page opens the drawer)
+        │   └── $appointmentId/
+        │       ├── APPOINTMENT_ID.OVERVIEW.md
+        │       └── appointment-id.route.tsx  appointment-id.manifest.ts  AppointmentPage.tsx
         ├── billing/
         │   ├── BILLING.OVERVIEW.md
         │   ├── billing.route.tsx  billing.manifest.ts  BillingLayout.tsx
@@ -111,7 +113,7 @@ src/pages/
    can never be URL segments / route folders, and a folder with one of those names never contains
    a `*.route.tsx`.
 4. **Duplicate prefixes** are allowed only when the same URL segment legitimately repeats at
-   different depths (the two `appointments/` islands). The validator reports them as a notice —
+   different depths (the `create/` dialog routes under several rooms). The validator reports them as a notice —
    the full path disambiguates. Avoidable collisions (parent/child like
    `organization`/`organization-id`) are designed out by rule 2.
 5. **Every URL folder keeps the same 4-file contract** — `<prefix>.route.tsx`, `<prefix>.manifest.ts`,
