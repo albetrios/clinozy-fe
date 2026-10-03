@@ -9,6 +9,7 @@
  * entry chunk, and the generated schema module is pages of zod. The test pins
  * each list to the contract's enum.
  */
+import { listOf, oneOf, queryOf, sortOf, textOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   type FollowUpFilter,
@@ -80,51 +81,21 @@ export interface LeadsSearch {
 /** The list's state when the URL says nothing. */
 export const LEADS_SEARCH_DEFAULTS = { view: 'mine' } as const satisfies LeadsSearch;
 
-/** `value` when it is one of `values`. */
-function oneOf<T extends string>(values: readonly T[], value: unknown): T | undefined {
-  return (values as readonly unknown[]).includes(value) ? (value as T) : undefined;
-}
-
-/** A typed value as text — the router reads `?q=2363` as a number. */
-function textOf(value: unknown): string {
-  return typeof value === 'string' || typeof value === 'number'
-    ? String(value).trim()
-    : '';
-}
-
-/**
- * A multi-value param — a JSON array or a comma list (`?source=instagram,google`),
- * the entries `accept` keeps, once each; none left is no filter.
- */
-function listOf<T extends string>(
-  value: unknown,
-  accept: (entry: string) => boolean,
-): T[] | undefined {
-  const entries = Array.isArray(value) ? value : textOf(value).split(',');
-  const kept = entries.map(textOf).filter((entry) => entry && accept(entry));
-  return kept.length > 0 ? ([...new Set(kept)] as T[]) : undefined;
-}
-
 /**
  * Parse `/leads` search params. Every key is answered, `undefined` included:
  * the router keeps a raw value the schema omits, so dropping one means saying so.
  */
 export function validateLeadsSearch(search: Record<string, unknown>): LeadsSearch {
-  const sort = textOf(search.sort);
-  const [key, direction] = sort.split(':');
   return {
     view: oneOf(VIEWS, search.view),
-    q: textOf(search.q).slice(0, 80) || undefined,
+    q: queryOf(search.q, 80),
     status: oneOf(STATUSES, search.status),
     source: listOf(search.source, (entry) => oneOf(SOURCES, entry) !== undefined),
     hold: oneOf(HOLDS, search.hold),
     owner: listOf(search.owner, (entry) => UUID.test(entry)),
     created: readCreatedFilter(search.created),
     followUp: readFollowUpFilter(search.followUp),
-    sort:
-      oneOf(SORT_KEYS, key) && (direction === 'asc' || direction === 'desc')
-        ? (sort as LeadsSort)
-        : undefined,
+    sort: sortOf(SORT_KEYS, search.sort),
   };
 }
 
