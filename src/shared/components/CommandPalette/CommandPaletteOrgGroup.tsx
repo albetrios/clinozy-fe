@@ -1,7 +1,7 @@
 import type { NavigateFn } from '@tanstack/react-router';
-import { Command } from 'cmdk';
 import { useRef, useState } from 'react';
 
+import { CommandGroup, CommandSeparator } from '@/shared/components/ui/command.tsx';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
 import { Building, Check, User } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -100,8 +100,8 @@ export function CommandPaletteOrgGroup({
 
   return (
     <>
-      <Command.Separator className="bg-border my-1 h-px" />
-      <Command.Group
+      <CommandSeparator className="bg-border my-1 h-px" />
+      <CommandGroup
         heading={heading}
         className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
       >
@@ -126,7 +126,7 @@ export function CommandPaletteOrgGroup({
             </CommandItem>
           );
         })}
-      </Command.Group>
+      </CommandGroup>
     </>
   );
 }

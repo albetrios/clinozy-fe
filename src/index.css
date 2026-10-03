@@ -449,7 +449,9 @@
   --color-accent: oklch(0.269 0 0);
   --color-accent-foreground: oklch(0.985 0 0);
   --color-destructive: oklch(0.704 0.191 22.216);
-  --color-destructive-foreground: oklch(0.985 0 0);
+  /* Dark ink on the lighter dark-mode red (white on it is ~3.5:1). The button
+     and badge variants paint the token itself — no `dark:` alpha wash. */
+  --color-destructive-foreground: oklch(0.205 0 0);
   --color-success: oklch(0.765 0.177 163.223);
   --color-success-foreground: oklch(0.205 0 0);
   --color-warning: oklch(0.828 0.189 84.429);

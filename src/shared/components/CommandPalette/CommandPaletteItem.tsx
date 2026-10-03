@@ -1,8 +1,8 @@
-import { Command } from 'cmdk';
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
+import { CommandItem as CommandRow } from '@/shared/components/ui/command.tsx';
 
 export function CommandItem({
   children,
@@ -26,7 +26,7 @@ export function CommandItem({
   testId?: string;
 }) {
   return (
-    <Command.Item
+    <CommandRow
       onSelect={onSelect}
       keywords={keywords ? [...keywords] : undefined}
       disabled={disabled}
@@ -46,6 +46,6 @@ export function CommandItem({
         <Icon className="h-4 w-4" />
       )}
       {children}
-    </Command.Item>
+    </CommandRow>
   );
 }

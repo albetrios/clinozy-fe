@@ -118,8 +118,18 @@ const config = [
            * values stay tree-shaken in @theme until a screen uses them) and the
            * room metrics by tier (+0.27 kB). Lower it again as soon as anything
            * here can leave the first paint.
+           *
+           * 25.5 → 27 kB (L-07, same exemption): the eleven shadcn primitives the
+           * launch composes on — sheet, drawer, command, tabs, toggle,
+           * toggle-group, hover-card, accordion, scroll-area, radio-group,
+           * resizable — +1.4 kB measured (26.63 kB). Tailwind emits a source
+           * file's classes whether or not anything imports it yet, so the cost
+           * lands with the files, not with their first screen. Upstream variants
+           * the launch never draws (CommandDialog, drawer top / left / right,
+           * the physical sheet sides, vertical tabs and resizable groups) were
+           * trimmed first (−0.8 kB).
            */
-          limit: '25.5 kB',
+          limit: '27 kB',
           gzip: true,
         },
       ]

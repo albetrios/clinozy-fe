@@ -1,11 +1,18 @@
 import { useNavigate } from '@tanstack/react-router';
-import { Command } from 'cmdk';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { logout } from '@/shared/auth/service.ts';
 import { SETTINGS_NS } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+  CommandSeparator,
+} from '@/shared/components/ui/command.tsx';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
@@ -103,12 +110,12 @@ export function CommandPaletteContent() {
     >
       <CommandPaletteInput />
 
-      <Command.List className="max-h-[300px] overflow-y-auto p-2">
-        <Command.Empty className="text-muted-foreground py-6 text-center text-sm">
+      <CommandList className="max-h-[300px] overflow-y-auto p-2">
+        <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
           {t(cp.empty)}
-        </Command.Empty>
+        </CommandEmpty>
 
-        <Command.Group
+        <CommandGroup
           heading={t(cp.groups.navigation)}
           className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
         >
@@ -143,10 +150,10 @@ export function CommandPaletteContent() {
               {t(cp.organizationSettings)}
             </CommandItem>
           ) : null}
-        </Command.Group>
+        </CommandGroup>
 
         {settingsItems.length > 0 ? (
-          <Command.Group
+          <CommandGroup
             heading={t(cp.settings)}
             className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
           >
@@ -167,7 +174,7 @@ export function CommandPaletteContent() {
                 {tSettings(item.labelKey)}
               </CommandItem>
             ))}
-          </Command.Group>
+          </CommandGroup>
         ) : null}
 
         {meContext ? (
@@ -181,9 +188,9 @@ export function CommandPaletteContent() {
           />
         ) : null}
 
-        <Command.Separator className="bg-border my-1 h-px" />
+        <CommandSeparator className="bg-border my-1 h-px" />
 
-        <Command.Group
+        <CommandGroup
           heading={t(cp.groups.shortcuts)}
           className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
         >
@@ -193,11 +200,11 @@ export function CommandPaletteContent() {
           >
             {t(cp.openShortcuts)}
           </CommandItem>
-        </Command.Group>
+        </CommandGroup>
 
-        <Command.Separator className="bg-border my-1 h-px" />
+        <CommandSeparator className="bg-border my-1 h-px" />
 
-        <Command.Group
+        <CommandGroup
           heading={t(cp.groups.theme)}
           className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
         >
@@ -222,11 +229,11 @@ export function CommandPaletteContent() {
           >
             {t(cp.systemTheme)}
           </CommandItem>
-        </Command.Group>
+        </CommandGroup>
 
-        <Command.Separator className="bg-border my-1 h-px" />
+        <CommandSeparator className="bg-border my-1 h-px" />
 
-        <Command.Group
+        <CommandGroup
           heading={t(cp.groups.account)}
           className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
         >
@@ -250,8 +257,8 @@ export function CommandPaletteContent() {
           >
             {t(cp.logOut)}
           </CommandItem>
-        </Command.Group>
-      </Command.List>
+        </CommandGroup>
+      </CommandList>
     </Command>
   );
 }
@@ -272,23 +279,22 @@ function CommandPaletteInput() {
   }, [searchFocus]);
 
   return (
-    <div className="flex items-center border-b px-3">
-      <Search className="text-muted-foreground me-2 h-4 w-4 shrink-0" />
-      <Command.Input
-        data-slot="input"
-        placeholder={t(cp.placeholder)}
-        aria-label={t(cp.placeholder)}
-        className={COMMAND_SEARCH_CLASS}
-        ref={inputRef}
-        value={query}
-        onValueChange={setQuery}
-        onFocus={() => {
-          rememberFocus(true);
-        }}
-        onBlur={() => {
-          rememberFocus(false);
-        }}
-      />
-    </div>
+    <CommandInput
+      wrapperClassName="h-auto gap-0"
+      icon={<Search className="text-muted-foreground me-2 h-4 w-4 shrink-0" />}
+      data-slot="input"
+      placeholder={t(cp.placeholder)}
+      aria-label={t(cp.placeholder)}
+      className={COMMAND_SEARCH_CLASS}
+      ref={inputRef}
+      value={query}
+      onValueChange={setQuery}
+      onFocus={() => {
+        rememberFocus(true);
+      }}
+      onBlur={() => {
+        rememberFocus(false);
+      }}
+    />
   );
 }

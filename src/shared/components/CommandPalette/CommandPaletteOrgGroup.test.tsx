@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Command } from 'cmdk';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { Command, CommandList } from '@/shared/components/ui/command.tsx';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 
 import { CommandPaletteOrgGroup } from './CommandPaletteOrgGroup.tsx';
@@ -25,10 +25,10 @@ function renderGroup(organizations: OrgRow[]) {
     data: organizations,
     isPending: false,
   });
-  // Command.Group/Separator require a cmdk <Command> root for context.
+  // CommandGroup/Separator need a cmdk root (ui/command) for context.
   return render(
     <Command>
-      <Command.List>
+      <CommandList>
         <CommandPaletteOrgGroup
           heading="Organizations"
           currentOrganizationLabel={(name) => `Current: ${name}`}
@@ -37,7 +37,7 @@ function renderGroup(organizations: OrgRow[]) {
           navigate={navigateMock as never}
           personalOrganizationsEnabled={true}
         />
-      </Command.List>
+      </CommandList>
     </Command>,
   );
 }
