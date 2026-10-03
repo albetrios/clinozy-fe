@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { X } from '@/shared/icons/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-import type { ToastPosition } from '@/shared/theme/index.ts';
+import { TOAST_VARIANTS, type ToastPosition } from '@/shared/theme/index.ts';
 
 import { notificationBridge, notify, TOAST_DURATION_MS } from './notify.ts';
+import { ToastBar } from './ToastBar.tsx';
 
 /**
  * The stack's bottom edge: 16px above whatever a phone pins to the bottom —
@@ -36,61 +37,79 @@ function PendingToasts({
   pending,
   placement,
   dismissLabel,
+  bar,
 }: {
   pending: Pending;
   placement: string;
   dismissLabel: string;
+  /** The active design is the clinic bar — draw that, not the generic card. */
+  bar: boolean;
 }) {
   return (
     <section
       data-sonner-toaster
       className={`pointer-events-none fixed z-[999999999] flex w-[calc(100vw-1.5rem)] flex-col gap-2.5 sm:w-[min(100vw-2rem,20rem)] ${placement}`}
     >
-      {pending.slice(-4).map(({ id, type, message, options }) => (
-        <article
-          key={id}
-          data-testid="app-toast"
-          data-toast-pending
-          data-slot="card"
-          className="bg-popover text-popover-foreground border-border pointer-events-auto flex items-start gap-2.5 border px-3 py-2.5"
-        >
-          <div className="min-w-0 flex-1">
-            <output role={type === 'error' ? 'alert' : undefined} className="block">
-              <span className="block text-sm font-medium">{message}</span>
-              {options.description ? (
-                <span className="text-muted-foreground mt-0.5 block text-xs">
-                  {options.description}
-                </span>
-              ) : null}
-            </output>
-            {options.action ? (
-              <button
-                type="button"
-                data-testid="toast-action"
-                className="mt-1 text-xs underline"
-                onClick={() => {
-                  options.action?.onClick();
-                  notify.dismiss(id);
-                }}
-              >
-                {options.action.label}
-              </button>
-            ) : null}
-          </div>
-          <button
-            type="button"
-            data-testid="toast-dismiss"
-            className="flex size-6 shrink-0 items-center justify-center rounded-sm"
-            aria-label={dismissLabel}
-            onClick={() => {
-              options.onDismiss?.();
+      {pending.slice(-4).map(({ id, type, message, options }) =>
+        bar ? (
+          <ToastBar
+            key={id}
+            pending
+            alert={type === 'error'}
+            title={message}
+            description={options.description}
+            action={options.action}
+            onAction={() => {
+              options.action?.onClick();
               notify.dismiss(id);
             }}
+          />
+        ) : (
+          <article
+            key={id}
+            data-testid="app-toast"
+            data-toast-pending
+            data-slot="card"
+            className="bg-popover text-popover-foreground border-border pointer-events-auto flex items-start gap-2.5 border px-3 py-2.5"
           >
-            <X className="size-3.5" />
-          </button>
-        </article>
-      ))}
+            <div className="min-w-0 flex-1">
+              <output role={type === 'error' ? 'alert' : undefined} className="block">
+                <span className="block text-sm font-medium">{message}</span>
+                {options.description ? (
+                  <span className="text-muted-foreground mt-0.5 block text-xs">
+                    {options.description}
+                  </span>
+                ) : null}
+              </output>
+              {options.action ? (
+                <button
+                  type="button"
+                  data-testid="toast-action"
+                  className="mt-1 text-xs underline"
+                  onClick={() => {
+                    options.action?.onClick();
+                    notify.dismiss(id);
+                  }}
+                >
+                  {options.action.label}
+                </button>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              data-testid="toast-dismiss"
+              className="flex size-6 shrink-0 items-center justify-center rounded-sm"
+              aria-label={dismissLabel}
+              onClick={() => {
+                options.onDismiss?.();
+                notify.dismiss(id);
+              }}
+            >
+              <X className="size-3.5" />
+            </button>
+          </article>
+        ),
+      )}
     </section>
   );
 }
@@ -106,6 +125,7 @@ function PendingToasts({
 export function AppToaster() {
   const { t } = useTranslation(ERRORS_NS);
   const position = useThemeStore((s) => s.toastPosition) as ToastPosition;
+  const toastVariant = useThemeStore((s) => s.toastVariant);
   const state = useSyncExternalStore(
     notificationBridge.subscribe,
     notificationBridge.getSnapshot,
@@ -152,6 +172,7 @@ export function AppToaster() {
           pending={state.pending}
           placement={`${vertical} ${horizontal}`}
           dismissLabel={t(ERRORS_KEYS.toast.dismiss)}
+          bar={TOAST_VARIANTS[toastVariant % TOAST_VARIANTS.length] === 'bar'}
         />
       ) : null}
     </>

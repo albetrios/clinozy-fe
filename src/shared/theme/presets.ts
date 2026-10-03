@@ -13,6 +13,8 @@ export interface ThemePreset {
     iconWeight?: string;
     layoutWidth?: LayoutWidthId;
     intensityId?: string;
+    /** The toast design the preset was drawn with. */
+    toastVariant?: ToastVariant;
   }>;
 }
 
@@ -29,7 +31,12 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
   {
     id: 'clinozy-zinc-pastel',
     label: `${PRODUCT_NAME} Zinc Pastel`,
-    axisDefaults: { iconWeight: 'thin', layoutWidth: 'full', intensityId: 'muted' },
+    axisDefaults: {
+      iconWeight: 'thin',
+      layoutWidth: 'full',
+      intensityId: 'muted',
+      toastVariant: 'bar',
+    },
   },
   { id: 'default', label: 'Classic' },
   { id: 'violet', label: 'Violet' },
@@ -813,6 +820,9 @@ export const TOAST_VARIANTS = [
   'accent',
   'minimal',
   'glass',
+  // The clinic design's bottom bar (KICKOFF L-20): `primary` fill, an outline
+  // action, no icon — the Zinc Pastel preset's toast.
+  'bar',
 ] as const;
 export type ToastVariant = (typeof TOAST_VARIANTS)[number];
 export const DEFAULT_TOAST_VARIANT = 0;

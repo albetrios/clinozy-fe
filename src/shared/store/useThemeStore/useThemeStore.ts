@@ -36,6 +36,7 @@ import {
   releaseBootThemeVars,
   SHUFFLE_TEMP,
   shuffleIcons,
+  TOAST_VARIANTS,
 } from '@/shared/theme/index.ts';
 
 type Mode = 'light' | 'dark' | 'system';
@@ -121,6 +122,24 @@ function migrateToastDefault(persisted: Record<string, unknown>, version: number
 const FIRST_VISIT_AXES = presetAxisDefaults(DEFAULT_PRESET);
 const FIRST_VISIT_ICON_WEIGHT = FIRST_VISIT_AXES.iconWeight ?? DEFAULT_ICON_WEIGHT;
 const FIRST_VISIT_LAYOUT_WIDTH = FIRST_VISIT_AXES.layoutWidth ?? DEFAULT_LAYOUT_WIDTH;
+const FIRST_VISIT_TOAST_VARIANT = FIRST_VISIT_AXES.toastVariant
+  ? TOAST_VARIANTS.indexOf(FIRST_VISIT_AXES.toastVariant)
+  : DEFAULT_TOAST_VARIANT;
+
+/**
+ * Persist v6: the default preset brings its own toast (the design's bar).
+ * Whoever is on that preset with the old default toast never picked one, so
+ * they follow it; any other pick stays.
+ */
+function migrateToastVariant(persisted: Record<string, unknown>, version: number): void {
+  if (version >= 6 || persisted.preset !== DEFAULT_PRESET) return;
+  if (
+    persisted.toastVariant === undefined ||
+    persisted.toastVariant === DEFAULT_TOAST_VARIANT
+  ) {
+    persisted.toastVariant = FIRST_VISIT_TOAST_VARIANT;
+  }
+}
 
 function applyMode(theme: Mode) {
   const root = document.documentElement;
@@ -169,7 +188,7 @@ export const useThemeStore = create<ThemeStore>()(
       appVariant: 0,
       publicVariant: 0,
       dashboardVariant: 0,
-      toastVariant: DEFAULT_TOAST_VARIANT,
+      toastVariant: FIRST_VISIT_TOAST_VARIANT,
       toastPosition: DEFAULT_TOAST_POSITION,
       seed: null,
       layoutWidth: FIRST_VISIT_LAYOUT_WIDTH,
@@ -194,6 +213,9 @@ export const useThemeStore = create<ThemeStore>()(
           seed: null,
           ...(axes.iconWeight ? { iconWeight: axes.iconWeight } : {}),
           ...(axes.layoutWidth ? { layoutWidth: axes.layoutWidth } : {}),
+          ...(axes.toastVariant
+            ? { toastVariant: TOAST_VARIANTS.indexOf(axes.toastVariant) }
+            : {}),
         });
       },
       updateLook: (partial) => {
@@ -285,7 +307,7 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'theme-preference',
-      version: 5,
+      version: 6,
       migrate: (persisted, version) => {
         if (persisted && typeof persisted === 'object') {
           const next: Record<string, unknown> = { ...persisted };
@@ -315,6 +337,7 @@ export const useThemeStore = create<ThemeStore>()(
             }
           }
           migrateToastDefault(next, version);
+          migrateToastVariant(next, version);
           delete next.authVariant;
           delete next.appVariant;
           delete next.publicVariant;

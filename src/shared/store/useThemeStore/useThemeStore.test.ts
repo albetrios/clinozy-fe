@@ -8,6 +8,7 @@ import {
   GENERATED_PRESET,
   generateSeededTheme,
   SHUFFLE_TEMP,
+  TOAST_VARIANTS,
 } from '@/shared/theme/index.ts';
 
 import { useThemeStore } from './useThemeStore.ts';
@@ -518,10 +519,32 @@ describe('useThemeStore — persistence contract', () => {
     expect(useThemeStore.getState().toastPosition).toBe('bottom-center');
     const stored = JSON.parse(localStorage.getItem('theme-preference') ?? '{}');
     expect(stored).toMatchObject({
-      version: 5,
+      version: 6,
       state: { toastPosition: 'bottom-center' },
     });
     localStorage.removeItem('theme-preference');
+  });
+
+  it('a stored v5 preference on the default preset takes its toast bar (v6)', async () => {
+    localStorage.setItem(
+      'theme-preference',
+      JSON.stringify({
+        state: { theme: 'light', preset: DEFAULT_PRESET, toastVariant: 0 },
+        version: 5,
+      }),
+    );
+    await useThemeStore.persist.rehydrate();
+    expect(TOAST_VARIANTS[useThemeStore.getState().toastVariant]).toBe('bar');
+    localStorage.removeItem('theme-preference');
+  });
+
+  it('keeps a toast design the user picked, and other presets’ defaults', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    if (!migrate) throw new Error('the store migrates its persisted state');
+    const migrated = (state: Record<string, unknown>) =>
+      (migrate(state, 5) as unknown as { toastVariant: number }).toastVariant;
+    expect(migrated({ preset: DEFAULT_PRESET, toastVariant: 2 })).toBe(2);
+    expect(migrated({ preset: 'violet', toastVariant: 0 })).toBe(0);
   });
 
   it('partialize never persists the TEMP preview variants', () => {

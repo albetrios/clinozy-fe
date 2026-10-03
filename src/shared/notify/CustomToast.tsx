@@ -17,6 +17,8 @@ import {
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { TOAST_VARIANTS } from '@/shared/theme/index.ts';
 
+import { ToastBar } from './ToastBar.tsx';
+
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
 
 interface ToastTone {
@@ -204,6 +206,22 @@ export function CustomToast({
   const Icon = tone.icon;
   const solid = variant === 'solid';
   const isLoading = type === 'loading';
+
+  if (variant === 'bar') {
+    const barAction = isLoading ? undefined : action;
+    return (
+      <ToastBar
+        title={title}
+        description={description}
+        action={barAction}
+        onActionPointerDown={stopToastPointerBubble}
+        onAction={() => {
+          barAction?.onClick();
+          toast.dismiss(id);
+        }}
+      />
+    );
+  }
 
   return (
     <div

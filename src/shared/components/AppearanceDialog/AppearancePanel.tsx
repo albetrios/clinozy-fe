@@ -146,6 +146,7 @@ function ToastVariantSwatches({
               'bg-success text-success-foreground border-transparent',
             variant === 'outline' &&
               'bg-popover text-popover-foreground border-success/50',
+            variant === 'bar' && 'bg-primary text-primary-foreground border-transparent',
             variant === 'accent' &&
               'border-border bg-popover text-popover-foreground ps-3',
             variant === 'minimal' &&

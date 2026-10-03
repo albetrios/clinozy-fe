@@ -1,11 +1,20 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
+import { TOAST_VARIANTS } from '@/shared/theme/index.ts';
 
 import { AppToaster } from './AppToaster.tsx';
 import { notify } from './notify.ts';
 
 describe('toast dismiss integration', () => {
+  // The platform designs carry a close button; the clinic bar (the default
+  // preset's toast) has none, by design, and leaves on its timer or a swipe.
+  beforeEach(() => {
+    useThemeStore.setState({ toastVariant: TOAST_VARIANTS.indexOf('tint') });
+  });
+
   afterEach(() => {
     act(() => {
       notify.dismiss();
@@ -32,5 +41,16 @@ describe('toast dismiss integration', () => {
         timeout: 5000,
       },
     );
+  });
+
+  it('draws the clinic bar without a close button', async () => {
+    useThemeStore.setState({ toastVariant: TOAST_VARIANTS.indexOf('bar') });
+    render(<AppToaster />);
+    act(() => {
+      notify.success('Saved');
+    });
+    const toast = await screen.findByTestId('app-toast', undefined, { timeout: 5000 });
+    expect(toast).toHaveAttribute('data-toast-variant', 'bar');
+    expect(screen.queryByTestId('toast-dismiss')).toBeNull();
   });
 });
