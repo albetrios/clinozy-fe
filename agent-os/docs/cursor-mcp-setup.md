@@ -34,18 +34,18 @@ any other repo. The committed template is `.mcp.example.json`; the
 real, gitignored config is `.mcp.json` (the `.mcp.json` and
 `.cursor/mcp.json` symlinks point into it).
 
-| MCP                 | Why it's here (frontend)                                                                           | How it runs                      |
-| ------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------- |
-| **context7**        | Up-to-date library docs (React, Vite, TanStack Query, Zod, …).                                     | devDep · `pnpm exec` · API key   |
-| **shadcn**          | Browse + add shadcn/ui components via CLI.                                                         | devDep · `pnpm exec`             |
-| **tailwindcss**     | Tailwind utilities, colors, docs, CSS-to-Tailwind conversion.                                      | devDep · `pnpm exec`             |
-| **clinozy-be-api**  | Discover the backend API this UI consumes (`call_api`) — the only                                  | hosted URL · backend on `:3000`  |
-|                     | cross-service link, and only when you opt to run the backend.                                      |                                  |
-| **semgrep**         | Static security scanning (mirrors the CI semgrep lane).                                            | `uvx` (ephemeral, needs `uv`)    |
-| **sonarqube**       | Local code-quality gate (mirrors the pre-push SonarQube scan).                                     | `docker` · `SONARQUBE_TOKEN/URL` |
-| **chrome-devtools** | Live-browser perf traces (LCP/CLS insights), network + console inspection, CPU/network throttling. | devDep · Playwright Chromium     |
-| **codegraph**       | Code-graph navigation across this repo.                                                            | devDep · `pnpm exec`             |
-| **headroom**        | Context compression for long sessions.                                                             | `uvx` (ephemeral, needs `uv`)    |
+| MCP                 | Why it's here (frontend)                                                                                                                                                                                        | How it runs                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **context7**        | Up-to-date library docs (React, Vite, TanStack Query, Zod, …).                                                                                                                                                  | devDep · `pnpm exec` · API key               |
+| **shadcn**          | Browse + add shadcn/ui components via CLI.                                                                                                                                                                      | devDep · `pnpm exec`                         |
+| **tailwindcss**     | Tailwind utilities, colors, docs, CSS-to-Tailwind conversion.                                                                                                                                                   | devDep · `pnpm exec`                         |
+| **clinozy-be-api**  | Discover the backend API this UI consumes (`call_api`) — the only                                                                                                                                               | hosted URL · backend on `:3000`              |
+|                     | cross-service link, and only when you opt to run the backend.                                                                                                                                                   |                                              |
+| **semgrep**         | Static security scanning (mirrors the CI semgrep lane) — the `semgrep mcp` server built into the CLI (the old `semgrep-mcp` package is deprecated).                                                             | `uvx --from semgrep` (ephemeral, needs `uv`) |
+| **sonarqube**       | Local code-quality gate (mirrors the pre-push SonarQube scan). `tooling/dev/sonarqube-mcp.mjs` passes `SONAR_TOKEN` / `SONAR_HOST_URL` from `.env.local` (mint once with `pnpm sonar:scan`) into the container. | `docker` · `.env.local` token                |
+| **chrome-devtools** | Live-browser perf traces (LCP/CLS insights), network + console inspection, CPU/network throttling.                                                                                                              | devDep · Playwright Chromium                 |
+| **codegraph**       | Code-graph navigation across this repo.                                                                                                                                                                         | devDep · `pnpm exec`                         |
+| **headroom**        | Context compression for long sessions.                                                                                                                                                                          | `uvx` (ephemeral, needs `uv`)                |
 
 > This list is intentionally frontend-shaped — no database / cache / email /
 > deploy-platform servers (those belong to the backend). Add or remove servers in

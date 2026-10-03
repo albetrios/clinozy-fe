@@ -19,7 +19,7 @@ node||Node.js — pinned .nvmrc major; existing nvm/fnm Node left alone; pnpm vi
 brew|gitleaks|secret scan (.husky/pre-commit + CI gitleaks lane)
 brew|gh|GitHub CLI (github:sync, rulesets, PR tooling)
 brew|jq|JSON in shell/CI scripts
-brew|uv|uvx runtime for MCP servers (semgrep-mcp, headroom) — see agent-os/mcp/mcp.json
+brew|uv|uvx runtime for MCP servers (semgrep, headroom) — see agent-os/mcp/mcp.json
 brew|ripgrep|fast search used by the code-review report tooling
 brew|shellcheck|shell-script lint (parity with the CI shellcheck/actionlint lanes)
 brew|librsvg|rsvg-convert — regenerate PWA icon PNGs from public/app-icon.svg

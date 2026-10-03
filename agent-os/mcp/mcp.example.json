@@ -23,28 +23,11 @@
     "clinozy-be-api": {
       "url": "http://localhost:3000/api/v1/mcp"
     },
-    "semgrep": {
-      "command": "uvx",
-      "args": ["semgrep-mcp"]
-    },
+    "semgrep": { "command": "uvx", "args": ["--from", "semgrep", "semgrep", "mcp"] },
     "chrome-devtools": {
       "command": "node",
       "args": ["tooling/dev/chrome-devtools-mcp.mjs"]
     },
-    "sonarqube": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--init",
-        "--pull=always",
-        "--rm",
-        "-i",
-        "-e",
-        "SONARQUBE_TOKEN",
-        "-e",
-        "SONARQUBE_URL",
-        "mcp/sonarqube"
-      ]
-    }
+    "sonarqube": { "command": "node", "args": ["tooling/dev/sonarqube-mcp.mjs"] }
   }
 }
