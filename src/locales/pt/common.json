@@ -186,7 +186,51 @@
     "customWith": "Personalizado — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Pesquisar..."
+    "searchPlaceholder": "Pesquisar...",
+    "empty": "Nenhum resultado.",
+    "sortBy": "Ordenar por {{column}}",
+    "actions": "Ações",
+    "moreActions": "Mais ações",
+    "columns": {
+      "trigger": "Mostrar ou ocultar colunas",
+      "title": "Colunas · {{shown}} de {{total}} visíveis",
+      "showAll": "Mostrar todas as colunas",
+      "recommendedHides": "O conjunto recomendado oculta {{count}}",
+      "tapForRecommended": "Toque novamente para o conjunto recomendado",
+      "allShown": "Todas as {{count}} colunas visíveis",
+      "hiddenCount": "{{count}} ocultas",
+      "search": "Pesquisar colunas",
+      "noMatch": "Nenhuma coluna corresponde",
+      "shown": "{{shown}} de {{total}} visíveis"
+    },
+    "fold": {
+      "showAll_one": "{{count}} coluna nas linhas · Mostrar tudo",
+      "showAll_many": "{{count}} colunas nas linhas · Mostrar tudo",
+      "showAll_other": "{{count}} colunas nas linhas · Mostrar tudo",
+      "showAllHint": "Mostrar todas as colunas lado a lado (rola na horizontal)",
+      "fitToWidth": "Ajustar à largura",
+      "fitToWidthHint": "Recolher as colunas extras em cada linha"
+    },
+    "selection": {
+      "selectRow": "Selecionar {{name}}",
+      "selected": "{{count}} selecionados",
+      "selectAllCount": "Selecionar todos os {{count}}",
+      "clear": "Limpar seleção",
+      "clearHint": "Limpar seleção · Esc",
+      "escape": "Esc",
+      "bulkActions": "Ações em lote"
+    },
+    "length": {
+      "allLoaded": "Todos os {{records}} carregados",
+      "loadingMore": "Carregando mais {{records}}"
+    },
+    "savedViews": {
+      "label": "Visualizações salvas",
+      "apply": "Aplicar visualização",
+      "remove": "Remover visualização",
+      "removed": "Visualização removida",
+      "defaultName": "Minha visualização"
+    }
   },
   "consent": {
     "description": "Usamos cookies de análise de produto para melhorar o {{productName}}. As funções essenciais e o monitoramento de erros funcionam sem eles.",

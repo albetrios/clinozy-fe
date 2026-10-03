@@ -186,7 +186,51 @@
     "customWith": "Personalizado — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Buscar..."
+    "searchPlaceholder": "Buscar...",
+    "empty": "Sin resultados.",
+    "sortBy": "Ordenar por {{column}}",
+    "actions": "Acciones",
+    "moreActions": "Más acciones",
+    "columns": {
+      "trigger": "Mostrar u ocultar columnas",
+      "title": "Columnas · {{shown}} de {{total}} visibles",
+      "showAll": "Mostrar todas las columnas",
+      "recommendedHides": "El conjunto recomendado oculta {{count}}",
+      "tapForRecommended": "Toca de nuevo para el conjunto recomendado",
+      "allShown": "Las {{count}} columnas visibles",
+      "hiddenCount": "{{count}} ocultas",
+      "search": "Buscar columnas",
+      "noMatch": "Ninguna columna coincide",
+      "shown": "{{shown}} de {{total}} visibles"
+    },
+    "fold": {
+      "showAll_one": "{{count}} columna en filas · Mostrar todo",
+      "showAll_many": "{{count}} columnas en filas · Mostrar todo",
+      "showAll_other": "{{count}} columnas en filas · Mostrar todo",
+      "showAllHint": "Mostrar todas las columnas lado a lado (desplaza en horizontal)",
+      "fitToWidth": "Ajustar al ancho",
+      "fitToWidthHint": "Plegar las columnas extra en cada fila"
+    },
+    "selection": {
+      "selectRow": "Seleccionar {{name}}",
+      "selected": "{{count}} seleccionados",
+      "selectAllCount": "Seleccionar los {{count}}",
+      "clear": "Borrar selección",
+      "clearHint": "Borrar selección · Esc",
+      "escape": "Esc",
+      "bulkActions": "Acciones en bloque"
+    },
+    "length": {
+      "allLoaded": "Todos los {{records}} cargados",
+      "loadingMore": "Cargando más {{records}}"
+    },
+    "savedViews": {
+      "label": "Vistas guardadas",
+      "apply": "Aplicar vista",
+      "remove": "Quitar vista",
+      "removed": "Vista quitada",
+      "defaultName": "Mi vista"
+    }
   },
   "consent": {
     "description": "Usamos cookies de analítica de producto para mejorar {{productName}}. Las funciones esenciales y la supervisión de errores funcionan sin ellas.",

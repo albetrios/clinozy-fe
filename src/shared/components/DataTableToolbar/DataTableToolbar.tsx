@@ -1,20 +1,24 @@
+'use no memo';
+// TanStack Table reads live table state through its row / column methods
+// (`getIsSelected()`, `getIsSorted()`, `getIsVisible()` …) on objects that keep
+// their identity across state changes, so React Compiler memoisation would serve
+// stale answers. The table's own `useTable` re-renders us on every change.
+
 import type { ReactTable, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
-import { TABLE_KEYS } from '@/shared/components/DataTableToolbar/data-table.constants.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
+import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
+import { DataTableSavedViews } from '@/shared/components/DataTableSavedViews/index.ts';
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu.tsx';
+  TABLE_KEYS,
+  TABLE_NS,
+} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Input } from '@/shared/components/ui/input.tsx';
-import { Search, SlidersHorizontal, X } from '@/shared/icons/index.ts';
+import type { SavedViewFilters } from '@/shared/hooks/useSavedViews/index.ts';
+import { Search, X } from '@/shared/icons/index.ts';
+import type { SavedView } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 interface DataTableToolbarProps<TData extends RowData> {
   table: ReactTable<DataTableFeatures, TData>;
@@ -22,17 +26,31 @@ interface DataTableToolbarProps<TData extends RowData> {
   searchColumnId?: string;
   /** Placeholder for the search input. */
   searchPlaceholder?: string;
+  /** Persists the column choice and lists the saved views of this table. */
+  tableId?: string;
+  /** Apply a saved view; the saved-views track shows when it is given with `tableId`. */
+  onApplyView?: (view: SavedView) => void;
+  /** The filters applied now — the matching saved view shows pressed. */
+  activeFilters?: SavedViewFilters;
   /** Extra controls rendered to the right of search (e.g. filter buttons). */
   children?: React.ReactNode;
 }
 
+/**
+ * The search, filter and column controls above a `DataTable`: a search input
+ * bound to one column, the caller's own controls, Reset while filtered, the
+ * saved-views track and the Columns chooser (hidden below `md`).
+ */
 export function DataTableToolbar<TData extends RowData>({
   table,
   searchColumnId,
   searchPlaceholder,
+  tableId,
+  onApplyView,
+  activeFilters,
   children,
 }: DataTableToolbarProps<TData>) {
-  const { t } = useTranslation(LOCALE_NS);
+  const { t } = useTranslation(TABLE_NS);
   // Read the table's LIVE state every render — never memoise on `[table]`.
   // The table instance is built once and keeps its identity for the life of the
   // component, so a `useMemo` keyed on it is computed at mount and never again:
@@ -77,34 +95,16 @@ export function DataTableToolbar<TData extends RowData>({
         )}
       </div>
 
-      {/* Column visibility toggle */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="ms-auto hidden h-8 lg:flex">
-            <SlidersHorizontal className="me-2 h-4 w-4" />
-            View
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[150px]">
-          <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {table
-            .getAllColumns()
-            .filter(
-              (column) => typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-            )
-            .map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-2 sm:ms-auto">
+        {tableId && onApplyView ? (
+          <DataTableSavedViews
+            tableId={tableId}
+            activeFilters={activeFilters}
+            onApply={onApplyView}
+          />
+        ) : null}
+        <DataTableColumnChooser table={table} tableId={tableId} />
+      </div>
     </div>
   );
 }

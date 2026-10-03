@@ -186,7 +186,54 @@
     "customWith": "مخصص — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "بحث..."
+    "searchPlaceholder": "بحث...",
+    "empty": "لا توجد نتائج.",
+    "sortBy": "الترتيب حسب {{column}}",
+    "actions": "الإجراءات",
+    "moreActions": "إجراءات أخرى",
+    "columns": {
+      "trigger": "إظهار الأعمدة أو إخفاؤها",
+      "title": "الأعمدة · {{shown}} من {{total}} ظاهرة",
+      "showAll": "إظهار كل الأعمدة",
+      "recommendedHides": "المجموعة المقترحة تخفي {{count}}",
+      "tapForRecommended": "انقر مرة أخرى للمجموعة المقترحة",
+      "allShown": "كل الأعمدة ظاهرة ({{count}})",
+      "hiddenCount": "{{count}} مخفية",
+      "search": "البحث في الأعمدة",
+      "noMatch": "لا توجد أعمدة مطابقة",
+      "shown": "{{shown}} من {{total}} ظاهرة"
+    },
+    "fold": {
+      "showAll_zero": "لا أعمدة داخل الصفوف · إظهار الكل",
+      "showAll_one": "عمود واحد داخل الصفوف · إظهار الكل",
+      "showAll_two": "عمودان داخل الصفوف · إظهار الكل",
+      "showAll_few": "{{count}} أعمدة داخل الصفوف · إظهار الكل",
+      "showAll_many": "{{count}} عمودًا داخل الصفوف · إظهار الكل",
+      "showAll_other": "{{count}} عمود داخل الصفوف · إظهار الكل",
+      "showAllHint": "إظهار كل الأعمدة جنبًا إلى جنب (تمرير أفقي)",
+      "fitToWidth": "ملاءمة العرض",
+      "fitToWidthHint": "طيّ الأعمدة الزائدة داخل كل صف"
+    },
+    "selection": {
+      "selectRow": "تحديد {{name}}",
+      "selected": "تم تحديد {{count}}",
+      "selectAllCount": "تحديد الكل ({{count}})",
+      "clear": "مسح التحديد",
+      "clearHint": "مسح التحديد · Esc",
+      "escape": "Esc",
+      "bulkActions": "إجراءات جماعية"
+    },
+    "length": {
+      "allLoaded": "تم تحميل كل {{records}}",
+      "loadingMore": "جارٍ تحميل المزيد من {{records}}"
+    },
+    "savedViews": {
+      "label": "العروض المحفوظة",
+      "apply": "تطبيق العرض",
+      "remove": "إزالة العرض",
+      "removed": "تمت إزالة العرض",
+      "defaultName": "عرضي"
+    }
   },
   "consent": {
     "description": "نستخدم ملفات تعريف الارتباط لتحليلات المنتج بهدف تحسين {{productName}}. تعمل الوظائف الأساسية ومراقبة الأخطاء من دونها.",

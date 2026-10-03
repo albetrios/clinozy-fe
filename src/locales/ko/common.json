@@ -186,7 +186,49 @@
     "customWith": "사용자 지정 — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "검색..."
+    "searchPlaceholder": "검색...",
+    "empty": "결과가 없습니다.",
+    "sortBy": "{{column}} 기준 정렬",
+    "actions": "작업",
+    "moreActions": "더 보기",
+    "columns": {
+      "trigger": "열 표시 또는 숨기기",
+      "title": "열 · {{total}}개 중 {{shown}}개 표시",
+      "showAll": "모든 열 표시",
+      "recommendedHides": "추천 설정은 {{count}}개를 숨깁니다",
+      "tapForRecommended": "추천 설정으로 돌아가려면 다시 탭하세요",
+      "allShown": "{{count}}개 열 모두 표시",
+      "hiddenCount": "{{count}}개 숨김",
+      "search": "열 검색",
+      "noMatch": "일치하는 열이 없습니다",
+      "shown": "{{total}}개 중 {{shown}}개 표시"
+    },
+    "fold": {
+      "showAll_other": "{{count}}개 열이 행 안에 · 모두 표시",
+      "showAllHint": "모든 열을 나란히 표시(가로 스크롤)",
+      "fitToWidth": "너비에 맞추기",
+      "fitToWidthHint": "넘치는 열을 각 행에 접어 넣기"
+    },
+    "selection": {
+      "selectRow": "{{name}} 선택",
+      "selected": "{{count}}개 선택됨",
+      "selectAllCount": "{{count}}개 모두 선택",
+      "clear": "선택 해제",
+      "clearHint": "선택 해제 · Esc",
+      "escape": "Esc",
+      "bulkActions": "일괄 작업"
+    },
+    "length": {
+      "allLoaded": "{{records}}을(를) 모두 불러왔습니다",
+      "loadingMore": "{{records}} 더 불러오는 중"
+    },
+    "savedViews": {
+      "label": "저장된 보기",
+      "apply": "보기 적용",
+      "remove": "보기 삭제",
+      "removed": "보기를 삭제했습니다",
+      "defaultName": "내 보기"
+    }
   },
   "consent": {
     "description": "{{productName}} 개선을 위한 제품 분석에 쿠키를 사용합니다. 필수 기능과 오류 모니터링은 쿠키 없이도 작동합니다.",

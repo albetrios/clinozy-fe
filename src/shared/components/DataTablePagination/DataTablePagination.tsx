@@ -1,3 +1,9 @@
+'use no memo';
+// TanStack Table reads live table state through its row / column methods
+// (`getIsSelected()`, `getIsSorted()`, `getIsVisible()` …) on objects that keep
+// their identity across state changes, so React Compiler memoisation would serve
+// stale answers. The table's own `useTable` re-renders us on every change.
+
 import type { ReactTable, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +22,12 @@ interface DataTablePaginationProps<TData extends RowData> {
   pageSizeOptions?: number[];
 }
 
+/**
+ * Page controls for a page-based table: rows per page and first / previous /
+ * next / last. The selection count is the `DataTable` bulk bar's, not this
+ * bar's. Lists over cursor pages (D7) show no page controls at all — they
+ * scroll infinitely inside `DataTable`.
+ */
 export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = [10, 20, 30, 50],
@@ -23,16 +35,7 @@ export function DataTablePagination<TData extends RowData>({
   const { t } = useTranslation(LOCALE_NS);
 
   return (
-    <div className="flex items-center justify-between px-2 py-4">
-      <div className="text-muted-foreground flex-1 text-sm">
-        {table.getFilteredSelectedRowModel().rows.length > 0 && (
-          <span>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected
-          </span>
-        )}
-      </div>
-
+    <div className="flex items-center justify-end px-2 py-4">
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">{t(LOCALE_KEYS.rowsPerPage)}</p>

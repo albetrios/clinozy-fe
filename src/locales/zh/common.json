@@ -186,7 +186,49 @@
     "customWith": "自定义 — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "搜索..."
+    "searchPlaceholder": "搜索...",
+    "empty": "没有结果。",
+    "sortBy": "按{{column}}排序",
+    "actions": "操作",
+    "moreActions": "更多操作",
+    "columns": {
+      "trigger": "显示或隐藏列",
+      "title": "列 · 显示 {{shown}}/{{total}}",
+      "showAll": "显示所有列",
+      "recommendedHides": "推荐设置隐藏 {{count}} 列",
+      "tapForRecommended": "再次点按恢复推荐设置",
+      "allShown": "已显示全部 {{count}} 列",
+      "hiddenCount": "已隐藏 {{count}} 列",
+      "search": "搜索列",
+      "noMatch": "没有匹配的列",
+      "shown": "显示 {{shown}}/{{total}}"
+    },
+    "fold": {
+      "showAll_other": "{{count}} 列收在行内 · 全部显示",
+      "showAllHint": "并排显示所有列（可横向滚动）",
+      "fitToWidth": "适应宽度",
+      "fitToWidthHint": "将多出的列收进每一行"
+    },
+    "selection": {
+      "selectRow": "选择 {{name}}",
+      "selected": "已选 {{count}} 项",
+      "selectAllCount": "全选 {{count}} 项",
+      "clear": "清除选择",
+      "clearHint": "清除选择 · Esc",
+      "escape": "Esc",
+      "bulkActions": "批量操作"
+    },
+    "length": {
+      "allLoaded": "已加载全部{{records}}",
+      "loadingMore": "正在加载更多{{records}}"
+    },
+    "savedViews": {
+      "label": "已保存的视图",
+      "apply": "应用视图",
+      "remove": "移除视图",
+      "removed": "视图已移除",
+      "defaultName": "我的视图"
+    }
   },
   "consent": {
     "description": "我们使用 Cookie 进行产品分析，以改进 {{productName}}。基本功能和错误监控无需 Cookie 即可运行。",

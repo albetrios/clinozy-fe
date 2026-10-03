@@ -130,6 +130,28 @@ phone 16px above the bottom stack (`--floating-bottom-offset` + notice + "New" +
 
 ---
 
+## Shared data table
+
+Every list table carries these, prefixed by its `tableId` (`patients-table-row`); a table without
+one uses `data` (`data-table-row`). A control mounted per row shares one id — reach it by
+index or scope it to its row.
+
+| Test ID                                           | Element                                                         | File                      |
+| ------------------------------------------------- | --------------------------------------------------------------- | ------------------------- |
+| `<tableId>-table`                                 | Table card                                                      | `DataTable/DataTable.tsx` |
+| `<tableId>-table-header`                          | Header row (`md` and up)                                        | `DataTableHeaderRow.tsx`  |
+| `<tableId>-table-row`                             | Body row (`data-index`; `data-kfocus` under j / k)              | `DataTableRow.tsx`        |
+| `<tableId>-table-select-all` / `-select-row`      | Selection boxes (`md` and up)                                   | `DataTableRow.tsx`        |
+| `<tableId>-table-footer`                          | 44px footer (count, fold toggle, bulk bar)                      | `DataTableFooter.tsx`     |
+| `<tableId>-table-fold-toggle`                     | "<N> columns in rows · Show all" ↔ "Fit to width"               | `DataTableFooter.tsx`     |
+| `<tableId>-table-bulk-bar`                        | Bulk bar; `-bulk-select-all`, `-bulk-clear`, `-bulk-<actionId>` | `DataTableBulkBar/`       |
+| `<tableId>-table-loading-more` / `-table-end`     | "Loading more …" rows / "All … loaded" end line                 | `DataTableTail.tsx`       |
+| `<tableId>-row-action-<actionId>` / `-row-more`   | Row actions and the "More actions" menu                         | `DataTableRowActions/`    |
+| `<tableId>-columns-trigger` / `-columns-show-all` | Columns chooser; options `-columns-option-<columnId>`           | `DataTableColumnChooser/` |
+| `<tableId>-saved-views`                           | Saved views track                                               | `DataTableSavedViews/`    |
+
+---
+
 ## Dashboard (`/`)
 
 | Test ID              | Element                                                  | File                |

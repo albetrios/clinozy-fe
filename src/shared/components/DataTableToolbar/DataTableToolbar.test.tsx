@@ -2,9 +2,14 @@ import { type ColumnFiltersState, useTable } from '@tanstack/react-table';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { dataTableFeatures } from '@/shared/components/DataTable/index.ts';
+import {
+  LEAD_CHAT_WIDTH,
+  useDevicePrefsStore,
+} from '@/shared/store/useDevicePrefsStore/index.ts';
 
 import { DataTableToolbar } from './DataTableToolbar.tsx';
 
@@ -73,5 +78,39 @@ describe('DataTableToolbar', () => {
     expect(screen.getByPlaceholderText('Search...')).toHaveValue('');
     expect(screen.getByTestId('rows')).toHaveTextContent('Ada');
     expect(screen.queryByRole('button', { name: /reset/i })).not.toBeInTheDocument();
+  });
+
+  it('offers the Columns chooser in place of the old View menu', () => {
+    render(<Harness />);
+    expect(
+      screen.getByRole('button', { name: 'Show or hide columns' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^view$/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the saved views of its table and applies one', async () => {
+    const user = userEvent.setup();
+    const view = { id: 'v1', name: 'VIP', filters: { status: ['vip'] } };
+    useDevicePrefsStore.setState({
+      hiddenColumns: {},
+      savedViews: { people: [view] },
+      photoSize: 'medium',
+      leadChatWidth: LEAD_CHAT_WIDTH.initial,
+    });
+    const onApplyView = vi.fn();
+    function WithViews() {
+      const table = useTable({
+        features: dataTableFeatures,
+        data: [{ name: 'Ada' }],
+        columns: [{ accessorKey: 'name', header: 'Name' }],
+      });
+      return (
+        <DataTableToolbar table={table} tableId="people" onApplyView={onApplyView} />
+      );
+    }
+    const { container } = render(<WithViews />);
+    await user.click(screen.getByRole('button', { name: 'VIP' }));
+    expect(onApplyView).toHaveBeenCalledWith(view);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

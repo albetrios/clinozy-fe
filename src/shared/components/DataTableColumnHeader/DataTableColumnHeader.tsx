@@ -1,16 +1,19 @@
+'use no memo';
+// TanStack Table reads live table state through its row / column methods
+// (`getIsSelected()`, `getIsSorted()`, `getIsVisible()` …) on objects that keep
+// their identity across state changes, so React Compiler memoisation would serve
+// stale answers. The table's own `useTable` re-renders us on every change.
+
 import type { Column, RowData } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu.tsx';
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from '@/shared/icons/index.ts';
+  TABLE_KEYS,
+  TABLE_NS,
+} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+import { ArrowDown, ArrowUp, ArrowUpDown } from '@/shared/icons/index.ts';
 
 interface DataTableColumnHeaderProps<
   TData extends RowData,
@@ -20,56 +23,71 @@ interface DataTableColumnHeaderProps<
   title: string;
 }
 
+/**
+ * Sort cycle of a header click (KICKOFF §3.5 Header): ascending → descending
+ * → off — for every column, whatever direction TanStack would auto-pick first.
+ */
+function cycleSort<TData extends RowData, TValue>(
+  column: Column<DataTableFeatures, TData, TValue>,
+) {
+  const sorted = column.getIsSorted();
+  if (sorted === 'asc') column.toggleSorting(true);
+  else if (sorted === 'desc') column.clearSorting();
+  else column.toggleSorting(false);
+}
+
+/**
+ * A table's header label: 11px/600 uppercase. A sortable column is a 40px
+ * button whose click cycles ascending → descending → off, with `ArrowUpDown`
+ * at 45% while idle and `ArrowUp` / `ArrowDown` once sorted (H:4167). The sort
+ * state lives on the `columnheader` as `aria-sort` (set by `DataTable`).
+ */
 export function DataTableColumnHeader<TData extends RowData, TValue>({
   column,
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
+  const { t } = useTranslation(TABLE_NS);
+  const alignEnd = column.columnDef.meta?.align === 'end';
+
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>;
+    return (
+      <div
+        className={cn(
+          'flex h-10 min-w-0 items-center',
+          alignEnd && 'justify-end text-end',
+          className,
+        )}
+      >
+        <span className="truncate">{title}</span>
+      </div>
+    );
   }
 
   const sorted = column.getIsSorted();
+  let SortIcon = ArrowUpDown;
+  if (sorted === 'asc') SortIcon = ArrowUp;
+  else if (sorted === 'desc') SortIcon = ArrowDown;
 
-  let SortIcon = ChevronsUpDown;
-  if (sorted === 'desc') SortIcon = ArrowDown;
-  else if (sorted === 'asc') SortIcon = ArrowUp;
-
-  // Sort state lives on the <th> as aria-sort (set by DataTable); aria-sort is
-  // not a valid attribute on the menu-trigger button.
   return (
-    <div className={cn('flex items-center space-x-2', className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="data-[state=open]:bg-accent -ms-3 h-8"
-          >
-            <span>{title}</span>
-            <SortIcon className="ms-2 h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp className="text-muted-foreground/70 me-2 h-3.5 w-3.5" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown className="text-muted-foreground/70 me-2 h-3.5 w-3.5" />
-            Desc
-          </DropdownMenuItem>
-          {column.getCanHide() && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                <EyeOff className="text-muted-foreground/70 me-2 h-3.5 w-3.5" />
-                Hide
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <button
+      type="button"
+      title={t(TABLE_KEYS.sortBy, { column: title })}
+      onClick={() => cycleSort(column)}
+      className={cn(
+        // The 6px bleed lets the hover fill reach past the column gap (H:678).
+        '-mx-1.5 flex h-10 w-[calc(100%+0.75rem)] min-w-0 items-center gap-1 px-1.5 tracking-[inherit] uppercase transition-colors duration-120',
+        'hover:bg-muted-strong',
+        sorted ? 'bg-muted-strong text-foreground' : 'text-muted-foreground',
+        alignEnd && 'justify-end',
+        className,
+      )}
+    >
+      <span className="truncate">{title}</span>
+      <SortIcon
+        aria-hidden="true"
+        className={cn('size-3 flex-none', sorted ? 'opacity-100' : 'opacity-45')}
+      />
+    </button>
   );
 }

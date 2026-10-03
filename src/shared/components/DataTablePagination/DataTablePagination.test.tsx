@@ -38,12 +38,9 @@ describe('DataTablePagination', () => {
     vi.resetAllMocks();
   });
 
-  it('shows the selected-rows summary only when rows are selected', () => {
-    const { rerender } = render(<DataTablePagination table={fakeTable({})} />);
+  it('leaves the selection count to the table’s bulk bar', () => {
+    render(<DataTablePagination table={fakeTable({ selectedRows: 3 })} />);
     expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
-
-    rerender(<DataTablePagination table={fakeTable({ selectedRows: 3 })} />);
-    expect(screen.getByText('3 of 42 row(s) selected')).toBeInTheDocument();
   });
 
   it('renders the current page position', () => {

@@ -186,7 +186,50 @@
     "customWith": "Benutzerdefiniert — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Suchen..."
+    "searchPlaceholder": "Suchen...",
+    "empty": "Keine Ergebnisse.",
+    "sortBy": "Nach {{column}} sortieren",
+    "actions": "Aktionen",
+    "moreActions": "Weitere Aktionen",
+    "columns": {
+      "trigger": "Spalten ein- oder ausblenden",
+      "title": "Spalten · {{shown}} von {{total}} sichtbar",
+      "showAll": "Alle Spalten anzeigen",
+      "recommendedHides": "Empfohlene Auswahl blendet {{count}} aus",
+      "tapForRecommended": "Erneut tippen für die empfohlene Auswahl",
+      "allShown": "Alle {{count}} Spalten sichtbar",
+      "hiddenCount": "{{count}} ausgeblendet",
+      "search": "Spalten suchen",
+      "noMatch": "Keine passenden Spalten",
+      "shown": "{{shown}} von {{total}} sichtbar"
+    },
+    "fold": {
+      "showAll_one": "{{count}} Spalte in Zeilen · Alle anzeigen",
+      "showAll_other": "{{count}} Spalten in Zeilen · Alle anzeigen",
+      "showAllHint": "Alle Spalten nebeneinander zeigen (scrollt seitlich)",
+      "fitToWidth": "An Breite anpassen",
+      "fitToWidthHint": "Zusätzliche Spalten in jede Zeile falten"
+    },
+    "selection": {
+      "selectRow": "{{name}} auswählen",
+      "selected": "{{count}} ausgewählt",
+      "selectAllCount": "Alle {{count}} auswählen",
+      "clear": "Auswahl aufheben",
+      "clearHint": "Auswahl aufheben · Esc",
+      "escape": "Esc",
+      "bulkActions": "Sammelaktionen"
+    },
+    "length": {
+      "allLoaded": "Alle {{records}} geladen",
+      "loadingMore": "Weitere {{records}} werden geladen"
+    },
+    "savedViews": {
+      "label": "Gespeicherte Ansichten",
+      "apply": "Ansicht anwenden",
+      "remove": "Ansicht entfernen",
+      "removed": "Ansicht entfernt",
+      "defaultName": "Meine Ansicht"
+    }
   },
   "consent": {
     "description": "Wir verwenden Cookies für Produktanalysen, um {{productName}} zu verbessern. Wesentliche Funktionen und die Fehlerüberwachung funktionieren auch ohne sie.",

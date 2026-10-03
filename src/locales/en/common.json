@@ -186,7 +186,50 @@
     "customWith": "Custom — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Search..."
+    "searchPlaceholder": "Search...",
+    "empty": "No results.",
+    "sortBy": "Sort by {{column}}",
+    "actions": "Actions",
+    "moreActions": "More actions",
+    "columns": {
+      "trigger": "Show or hide columns",
+      "title": "Columns · {{shown}} of {{total}} shown",
+      "showAll": "Show all columns",
+      "recommendedHides": "Recommended set hides {{count}}",
+      "tapForRecommended": "Tap again for the recommended set",
+      "allShown": "All {{count}} columns shown",
+      "hiddenCount": "{{count}} hidden",
+      "search": "Search columns",
+      "noMatch": "No columns match",
+      "shown": "{{shown}} of {{total}} shown"
+    },
+    "fold": {
+      "showAll_one": "{{count}} column in rows · Show all",
+      "showAll_other": "{{count}} columns in rows · Show all",
+      "showAllHint": "Show every column side by side (scrolls sideways)",
+      "fitToWidth": "Fit to width",
+      "fitToWidthHint": "Fold extra columns into each row"
+    },
+    "selection": {
+      "selectRow": "Select {{name}}",
+      "selected": "{{count}} selected",
+      "selectAllCount": "Select all {{count}}",
+      "clear": "Clear selection",
+      "clearHint": "Clear selection · Esc",
+      "escape": "Esc",
+      "bulkActions": "Bulk actions"
+    },
+    "length": {
+      "allLoaded": "All {{records}} loaded",
+      "loadingMore": "Loading more {{records}}"
+    },
+    "savedViews": {
+      "label": "Saved views",
+      "apply": "Apply view",
+      "remove": "Remove view",
+      "removed": "View removed",
+      "defaultName": "My view"
+    }
   },
   "consent": {
     "description": "We use cookies for product analytics to improve {{productName}}. Essential functionality and error monitoring work without them.",

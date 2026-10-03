@@ -186,7 +186,50 @@
     "customWith": "कस्टम — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "खोजें..."
+    "searchPlaceholder": "खोजें...",
+    "empty": "कोई परिणाम नहीं।",
+    "sortBy": "{{column}} के अनुसार क्रमित करें",
+    "actions": "कार्रवाइयाँ",
+    "moreActions": "और कार्रवाइयाँ",
+    "columns": {
+      "trigger": "कॉलम दिखाएँ या छिपाएँ",
+      "title": "कॉलम · {{total}} में से {{shown}} दिख रहे हैं",
+      "showAll": "सभी कॉलम दिखाएँ",
+      "recommendedHides": "सुझाया गया सेट {{count}} छिपाता है",
+      "tapForRecommended": "सुझाए गए सेट के लिए फिर से टैप करें",
+      "allShown": "सभी {{count}} कॉलम दिख रहे हैं",
+      "hiddenCount": "{{count}} छिपे हुए",
+      "search": "कॉलम खोजें",
+      "noMatch": "कोई कॉलम मेल नहीं खाता",
+      "shown": "{{total}} में से {{shown}} दिख रहे हैं"
+    },
+    "fold": {
+      "showAll_one": "{{count}} कॉलम पंक्तियों में · सभी दिखाएँ",
+      "showAll_other": "{{count}} कॉलम पंक्तियों में · सभी दिखाएँ",
+      "showAllHint": "हर कॉलम को साथ-साथ दिखाएँ (बगल में स्क्रॉल होता है)",
+      "fitToWidth": "चौड़ाई में फ़िट करें",
+      "fitToWidthHint": "अतिरिक्त कॉलम को हर पंक्ति में समेटें"
+    },
+    "selection": {
+      "selectRow": "{{name}} चुनें",
+      "selected": "{{count}} चुने गए",
+      "selectAllCount": "सभी {{count}} चुनें",
+      "clear": "चयन हटाएँ",
+      "clearHint": "चयन हटाएँ · Esc",
+      "escape": "Esc",
+      "bulkActions": "सामूहिक कार्रवाइयाँ"
+    },
+    "length": {
+      "allLoaded": "सभी {{records}} लोड हो गए",
+      "loadingMore": "और {{records}} लोड हो रहे हैं"
+    },
+    "savedViews": {
+      "label": "सहेजे गए व्यू",
+      "apply": "व्यू लागू करें",
+      "remove": "व्यू हटाएँ",
+      "removed": "व्यू हटाया गया",
+      "defaultName": "मेरा व्यू"
+    }
   },
   "consent": {
     "description": "हम {{productName}} को बेहतर बनाने के लिए उत्पाद विश्लेषण हेतु कुकीज़ का उपयोग करते हैं। आवश्यक सुविधाएँ और त्रुटि निगरानी इनके बिना भी काम करती हैं।",

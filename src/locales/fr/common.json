@@ -186,7 +186,51 @@
     "customWith": "Personnalisé — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Rechercher..."
+    "searchPlaceholder": "Rechercher...",
+    "empty": "Aucun résultat.",
+    "sortBy": "Trier par {{column}}",
+    "actions": "Actions",
+    "moreActions": "Plus d’actions",
+    "columns": {
+      "trigger": "Afficher ou masquer des colonnes",
+      "title": "Colonnes · {{shown}} sur {{total}} affichées",
+      "showAll": "Afficher toutes les colonnes",
+      "recommendedHides": "La sélection recommandée en masque {{count}}",
+      "tapForRecommended": "Touchez à nouveau pour la sélection recommandée",
+      "allShown": "Les {{count}} colonnes affichées",
+      "hiddenCount": "{{count}} masquées",
+      "search": "Rechercher des colonnes",
+      "noMatch": "Aucune colonne ne correspond",
+      "shown": "{{shown}} sur {{total}} affichées"
+    },
+    "fold": {
+      "showAll_one": "{{count}} colonne dans les lignes · Tout afficher",
+      "showAll_many": "{{count}} colonnes dans les lignes · Tout afficher",
+      "showAll_other": "{{count}} colonnes dans les lignes · Tout afficher",
+      "showAllHint": "Afficher toutes les colonnes côte à côte (défilement horizontal)",
+      "fitToWidth": "Ajuster à la largeur",
+      "fitToWidthHint": "Replier les colonnes en trop dans chaque ligne"
+    },
+    "selection": {
+      "selectRow": "Sélectionner {{name}}",
+      "selected": "{{count}} sélectionnés",
+      "selectAllCount": "Tout sélectionner ({{count}})",
+      "clear": "Effacer la sélection",
+      "clearHint": "Effacer la sélection · Échap",
+      "escape": "Échap",
+      "bulkActions": "Actions groupées"
+    },
+    "length": {
+      "allLoaded": "Tous les {{records}} sont chargés",
+      "loadingMore": "Chargement d’autres {{records}}"
+    },
+    "savedViews": {
+      "label": "Vues enregistrées",
+      "apply": "Appliquer la vue",
+      "remove": "Supprimer la vue",
+      "removed": "Vue supprimée",
+      "defaultName": "Ma vue"
+    }
   },
   "consent": {
     "description": "Nous utilisons des cookies d’analyse produit pour améliorer {{productName}}. Les fonctions essentielles et la surveillance des erreurs fonctionnent sans eux.",

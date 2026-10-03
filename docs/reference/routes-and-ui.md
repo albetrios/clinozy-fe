@@ -82,7 +82,7 @@ The app uses **shadcn/ui** as the selected component library. Allowed sources ar
 | Separator    | `shared/components/ui/separator.tsx`     | Visual separation                                    |
 | Badge        | `shared/components/ui/badge.tsx`         | Status, counts                                       |
 | Avatar       | `shared/components/ui/avatar.tsx`        | User avatar                                          |
-| Table        | `shared/components/ui/table.tsx`         | DataTable (with TanStack Table)                      |
+| Table        | `shared/components/ui/table.tsx`         | Dashboard MembersTable                               |
 | Tabs         | `shared/components/ui/tabs.tsx`          | Settings + org management tabs, dashboard team panel |
 | Select       | `shared/components/ui/select.tsx`        | Role filters, pickers                                |
 | Switch       | `shared/components/ui/switch.tsx`        | MFA / preference toggles                             |
@@ -92,6 +92,6 @@ The app uses **shadcn/ui** as the selected component library. Allowed sources ar
 | Progress     | `shared/components/ui/progress.tsx`      | Profile completeness meter                           |
 | Textarea     | `shared/components/ui/textarea.tsx`      | Bio / multi-line inputs (forwards ref for RHF)       |
 
-Other shared pieces: **FormError**, **FormField** (forms), **FullPageSpinner**, **RetryError**, **QueryBoundary** (query loading/error wrapper), **DataTable** (and pagination/toolbar/column header), **InviteMemberDialog**, **CreateOrganizationDialog**, **OrganizationSwitcher**, **OrganizationBadges**, **SettingsModal** (global, hash-driven), **CommandPalette** (cmdk), **PermissionGuard**. Layouts: **AuthLayout** (mounted by the pathless `auth-shell` route), **AppLayout** (mounted by the `$organizationSlug` island); the root shell lives in `app/routes/routeTree.tsx`.
+Other shared pieces: **FormError**, **FormField** (forms), **FullPageSpinner**, **RetryError**, **QueryBoundary** (query loading/error wrapper), **DataTable** (rows on one CSS grid with the fold engine, phone rows, selection + bulk bar, virtualised infinite lists; plus its column header, toolbar, pagination, column chooser, saved views and row actions), **InviteMemberDialog**, **CreateOrganizationDialog**, **OrganizationSwitcher**, **OrganizationBadges**, **SettingsModal** (global, hash-driven), **CommandPalette** (cmdk), **PermissionGuard**. Layouts: **AuthLayout** (mounted by the pathless `auth-shell` route), **AppLayout** (mounted by the `$organizationSlug` island); the root shell lives in `app/routes/routeTree.tsx`.
 
 All of the above follow the selected component library (shadcn) and design system; no custom or third-party UI libraries are used for core UI.

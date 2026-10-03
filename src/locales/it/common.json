@@ -186,7 +186,51 @@
     "customWith": "Personalizzato — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "Cerca..."
+    "searchPlaceholder": "Cerca...",
+    "empty": "Nessun risultato.",
+    "sortBy": "Ordina per {{column}}",
+    "actions": "Azioni",
+    "moreActions": "Altre azioni",
+    "columns": {
+      "trigger": "Mostra o nascondi colonne",
+      "title": "Colonne · {{shown}} di {{total}} visibili",
+      "showAll": "Mostra tutte le colonne",
+      "recommendedHides": "Il set consigliato ne nasconde {{count}}",
+      "tapForRecommended": "Tocca di nuovo per il set consigliato",
+      "allShown": "Tutte le {{count}} colonne visibili",
+      "hiddenCount": "{{count}} nascoste",
+      "search": "Cerca colonne",
+      "noMatch": "Nessuna colonna corrisponde",
+      "shown": "{{shown}} di {{total}} visibili"
+    },
+    "fold": {
+      "showAll_one": "{{count}} colonna nelle righe · Mostra tutto",
+      "showAll_many": "{{count}} colonne nelle righe · Mostra tutto",
+      "showAll_other": "{{count}} colonne nelle righe · Mostra tutto",
+      "showAllHint": "Mostra tutte le colonne affiancate (scorre in orizzontale)",
+      "fitToWidth": "Adatta alla larghezza",
+      "fitToWidthHint": "Raccogli le colonne in più in ogni riga"
+    },
+    "selection": {
+      "selectRow": "Seleziona {{name}}",
+      "selected": "{{count}} selezionati",
+      "selectAllCount": "Seleziona tutti i {{count}}",
+      "clear": "Cancella selezione",
+      "clearHint": "Cancella selezione · Esc",
+      "escape": "Esc",
+      "bulkActions": "Azioni di gruppo"
+    },
+    "length": {
+      "allLoaded": "Tutti i {{records}} caricati",
+      "loadingMore": "Caricamento di altri {{records}}"
+    },
+    "savedViews": {
+      "label": "Viste salvate",
+      "apply": "Applica vista",
+      "remove": "Rimuovi vista",
+      "removed": "Vista rimossa",
+      "defaultName": "La mia vista"
+    }
   },
   "consent": {
     "description": "Utilizziamo i cookie per l’analisi del prodotto e per migliorare {{productName}}. Le funzioni essenziali e il monitoraggio degli errori funzionano anche senza.",

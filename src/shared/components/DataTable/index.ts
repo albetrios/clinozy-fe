@@ -1,2 +1,12 @@
-export { DataTable } from './DataTable.tsx';
-export { type DataTableFeatures, dataTableFeatures } from './table-features.ts';
+export {
+  DataTable,
+  type DataTablePhoneLayout,
+  type DataTableProps,
+} from './DataTable.tsx';
+export {
+  type DataTableCellKind,
+  type DataTableColumnMeta,
+  type DataTableFeatures,
+  dataTableFeatures,
+  type DataTableFoldValue,
+} from './table-features.ts';

@@ -186,7 +186,49 @@
     "customWith": "カスタム — {{look}}"
   },
   "table": {
-    "searchPlaceholder": "検索..."
+    "searchPlaceholder": "検索...",
+    "empty": "結果がありません。",
+    "sortBy": "{{column}}で並べ替え",
+    "actions": "操作",
+    "moreActions": "その他の操作",
+    "columns": {
+      "trigger": "列の表示・非表示",
+      "title": "列 · {{total}}列中{{shown}}列を表示",
+      "showAll": "すべての列を表示",
+      "recommendedHides": "おすすめ設定では{{count}}列を非表示",
+      "tapForRecommended": "もう一度タップでおすすめ設定に戻す",
+      "allShown": "全{{count}}列を表示中",
+      "hiddenCount": "{{count}}列を非表示",
+      "search": "列を検索",
+      "noMatch": "一致する列がありません",
+      "shown": "{{total}}列中{{shown}}列を表示"
+    },
+    "fold": {
+      "showAll_other": "{{count}}列を行内に表示 · すべて表示",
+      "showAllHint": "すべての列を横に並べて表示（横スクロール）",
+      "fitToWidth": "幅に合わせる",
+      "fitToWidthHint": "入りきらない列を各行に折りたたむ"
+    },
+    "selection": {
+      "selectRow": "{{name}}を選択",
+      "selected": "{{count}}件選択中",
+      "selectAllCount": "{{count}}件すべて選択",
+      "clear": "選択を解除",
+      "clearHint": "選択を解除 · Esc",
+      "escape": "Esc",
+      "bulkActions": "一括操作"
+    },
+    "length": {
+      "allLoaded": "すべての{{records}}を読み込みました",
+      "loadingMore": "{{records}}をさらに読み込み中"
+    },
+    "savedViews": {
+      "label": "保存したビュー",
+      "apply": "ビューを適用",
+      "remove": "ビューを削除",
+      "removed": "ビューを削除しました",
+      "defaultName": "マイビュー"
+    }
   },
   "consent": {
     "description": "{{productName}} の改善を目的とした製品分析に Cookie を使用します。基本機能とエラー監視は Cookie がなくても動作します。",
