@@ -50,7 +50,7 @@ function pinLightBootPalette() {
   const root = document.documentElement;
   root.style.setProperty('--color-background', 'oklch(1 0 0)');
   root.style.setProperty('--color-foreground', 'oklch(0.145 0 0)');
-  root.style.setProperty('--color-muted', 'oklch(0.97 0 0)');
+  root.style.setProperty('--color-card', 'oklch(1 0 0)');
 }
 
 /**
@@ -61,7 +61,7 @@ function pinLightBootPalette() {
 describe('useThemeStore — OS colour-scheme changes', () => {
   afterEach(() => {
     const root = document.documentElement;
-    for (const name of ['--color-background', '--color-foreground', '--color-muted']) {
+    for (const name of ['--color-background', '--color-foreground', '--color-card']) {
       root.style.removeProperty(name);
     }
     root.classList.remove('dark');
@@ -80,7 +80,7 @@ describe('useThemeStore — OS colour-scheme changes', () => {
     expect(root.classList.contains('dark')).toBe(true);
     expect(root.style.getPropertyValue('--color-background')).toBe('');
     expect(root.style.getPropertyValue('--color-foreground')).toBe('');
-    expect(root.style.getPropertyValue('--color-muted')).toBe('');
+    expect(root.style.getPropertyValue('--color-card')).toBe('');
   });
 
   it('leaves a pinned mode alone when the OS flips under it', async () => {

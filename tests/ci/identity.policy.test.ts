@@ -12,6 +12,9 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { wordmarkParts } from '@/lib/brand-wordmark.ts';
+
+import { productWordmarkHtml } from '../../plugins/product-identity-html.ts';
 import {
   backendDirEnvVar,
   derivedSurfaces,
@@ -111,8 +114,28 @@ describe('product identity', () => {
     const html = read('index.html');
     expect(html).toContain('<title>{{PRODUCT_NAME}}</title>');
     expect(html).toContain('{{PRODUCT_THEME_COLOR}}');
-    expect(html).toContain('class="app-splash-name">{{PRODUCT_NAME}}<');
+    // The boot splash: its label and its wordmark drawing.
+    expect(html).toContain('aria-label="Loading {{PRODUCT_NAME}}"');
+    expect(html).toMatch(
+      /class="app-splash-word" aria-hidden="true"\s*>\{\{PRODUCT_WORDMARK\}\}</,
+    );
     expect(html).not.toContain(`<title>${identity.productName}</title>`);
+    const { head, tail } = wordmarkParts(identity.productName);
+    expect(html).not.toContain(`${head}<svg`);
+    expect(html).not.toContain(`</svg>${tail}`);
+  });
+
+  it('draws the splash wordmark from the product name, like ProductWordmark', () => {
+    const { head, ring, tail } = wordmarkParts(identity.productName);
+    const markup = productWordmarkHtml(identity.productName);
+    expect(markup.startsWith(head)).toBe(true);
+    expect(markup.endsWith(tail)).toBe(true);
+    expect(markup.includes('<svg')).toBe(ring);
+    // A brand without an "o" is plain text — and the markup escapes the name.
+    expect(productWordmarkHtml('Acme & Co')).toBe(
+      'acme &amp; c<svg class="app-splash-ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="app-splash-ring-line" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" /><circle class="app-splash-ring-dot" cx="10" cy="10" r="3" /></svg>',
+    );
+    expect(productWordmarkHtml('Acme')).toBe('acme');
   });
 
   it('routes app code through the generated module, not a literal', () => {

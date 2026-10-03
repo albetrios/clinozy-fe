@@ -316,5 +316,22 @@
       "kilobytes": "{{value}} Ko",
       "megabytes": "{{value}} Mo"
     }
+  },
+  "splash": {
+    "label": "Chargement de {{productName}}",
+    "greeting": {
+      "morning": "Bonjour, {{name}}",
+      "afternoon": "Bon après-midi, {{name}}",
+      "evening": "Bonsoir, {{name}}"
+    },
+    "ticker": {
+      "opening": "Ouverture du planning de {{weekday}}",
+      "syncing": "Synchronisation des patients et des prospects",
+      "ready": "Tout est prêt"
+    },
+    "offline": {
+      "message": "Impossible de joindre {{productName}} · vérifiez la connexion internet",
+      "retry": "Réessayer"
+    }
   }
 }

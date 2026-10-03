@@ -1,14 +1,19 @@
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
-import { ProductMark } from '@/shared/components/ProductMark/index.ts';
+import { ProductMark, ProductWordmark } from '@/shared/components/ProductMark/index.ts';
 
 interface BrandLoaderProps {
   className?: string;
 }
 
 /**
- * The product's loading visual — a "breathing" brand tile, the wordmark, and an
- * indeterminate bar. NOT a rotating spinner. Reduced motion is honoured globally.
+ * The product's loading visual — the boot splash's resting frame (KICKOFF §6.1):
+ * the 64px mark, the wordmark at 34px, and a 180 × 2px bar that sweeps, since
+ * here nothing knows how far along the work is. NOT a rotating spinner. Reduced
+ * motion is honoured globally.
+ *
+ * It is the React side of the boot surface: when the HTML splash gives up its
+ * hold, {@link FullPageSpinner} shows this in its place, so the screen keeps the
+ * same mark and wordmark.
  *
  * This component is **in flow**: it occupies only the space it needs, so it can sit
  * inside a card or panel alongside other controls. {@link FullPageSpinner} is this
@@ -20,20 +25,14 @@ interface BrandLoaderProps {
 export function BrandLoader({ className }: BrandLoaderProps) {
   return (
     <div
-      className={cn('flex flex-col items-center gap-6', className)}
+      className={cn('flex flex-col items-center gap-5.5', className)}
       data-testid="brand-loader"
     >
-      <div className="flex flex-col items-center gap-4">
-        <span className="animate-boot-breathe flex" aria-hidden="true">
-          <ProductMark className="size-12" />
-        </span>
-        <span className="text-foreground text-base font-semibold tracking-tight">
-          {PRODUCT_NAME}
-        </span>
-      </div>
+      <ProductMark className="size-[64px]" />
+      <ProductWordmark className="text-[34px]" />
       <span
         data-slot="pill"
-        className="bg-muted block h-1 w-32 overflow-hidden rounded-full"
+        className="bg-muted-strong block h-[2px] w-[180px] overflow-hidden rounded-full"
         aria-hidden="true"
       >
         <span

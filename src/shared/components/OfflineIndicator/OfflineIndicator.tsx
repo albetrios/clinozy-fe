@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus/index.ts';
 
 /**
  * Offline indicator — shows a banner when the user loses connectivity.
@@ -6,22 +6,9 @@ import { useEffect, useState } from 'react';
  * Uses role="alert" and aria-live for screen reader announcement.
  */
 export function OfflineIndicator() {
-  const [offline, setOffline] = useState(
-    typeof navigator !== 'undefined' ? !navigator.onLine : false,
-  );
+  const online = useOnlineStatus();
 
-  useEffect(() => {
-    const goOffline = () => setOffline(true);
-    const goOnline = () => setOffline(false);
-    window.addEventListener('offline', goOffline);
-    window.addEventListener('online', goOnline);
-    return () => {
-      window.removeEventListener('offline', goOffline);
-      window.removeEventListener('online', goOnline);
-    };
-  }, []);
-
-  if (!offline) return null;
+  if (online) return null;
 
   return (
     <div

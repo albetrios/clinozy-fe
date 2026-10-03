@@ -63,12 +63,12 @@ try {
     preset = 'clinozy-zinc-pastel';
   }
 
-  // Shape language, for the boot splash only. Under Sharp nothing in the app is
-  // round — and the splash is the first thing on screen. Without this its mark
-  // and progress track stayed round until React applied the look and swapped in
-  // a square BrandLoader: a visible shape change half way through the boot.
-  // Mirrors applyDataAxis(root, 'shape', …) in shared/theme/presets.ts, which
-  // re-applies (or clears) it once the bundle loads.
+  // Shape language, for the boot surface. Under Sharp nothing in the app is
+  // round — and the splash is the first thing on screen: its progress track (a
+  // `pill` the React slot renders inside it) and the BrandLoader that takes over
+  // from it are square from their first frame, whatever order the bundle applies
+  // the look in. Mirrors applyDataAxis(root, 'shape', …) in
+  // shared/theme/presets.ts, which re-applies (or clears) it once the bundle loads.
   if (preset === 'custom' && state.customTheme && state.customTheme.shapeId === 'sharp') {
     root.dataset.shape = 'sharp';
   }
@@ -81,13 +81,29 @@ try {
   // dark one, and the splash logo flipped colour the moment React caught up.
   // Guarded on preset AND mode: a snapshot from a different look or a different
   // light/dark state is worse than the fallback.
+  //
+  // Replayed by name — the exact list presets.ts snapshots (BOOT_SPLASH_VARS),
+  // i.e. every colour and radius the splash in index.html paints from. A
+  // snapshot an older build wrote can carry names this build no longer hands
+  // back to the stylesheet; replaying one would pin it to the boot mode.
+  var BOOT_VARS = [
+    '--color-background',
+    '--color-card',
+    '--color-foreground',
+    '--color-primary',
+    '--color-primary-foreground',
+    '--color-brand-mark',
+    '--color-brand-mark-strong',
+    '--radius-lg',
+  ];
   var applied = false;
   var bootRaw = localStorage.getItem('theme-boot-vars');
   var boot = bootRaw ? JSON.parse(bootRaw) : null;
   if (boot && boot.preset === preset && boot.mode === mode && boot.vars) {
-    for (var name in boot.vars) {
-      if (Object.prototype.hasOwnProperty.call(boot.vars, name)) {
-        root.style.setProperty(name, boot.vars[name]);
+    for (var i = 0; i < BOOT_VARS.length; i++) {
+      var value = boot.vars[BOOT_VARS[i]];
+      if (typeof value === 'string' && value) {
+        root.style.setProperty(BOOT_VARS[i], value);
       }
     }
     applied = true;

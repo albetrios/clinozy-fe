@@ -310,5 +310,22 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "splash": {
+    "label": "{{productName}} 로딩 중",
+    "greeting": {
+      "morning": "좋은 아침입니다, {{name}}님",
+      "afternoon": "안녕하세요, {{name}}님",
+      "evening": "좋은 저녁입니다, {{name}}님"
+    },
+    "ticker": {
+      "opening": "{{weekday}} 일정을 여는 중",
+      "syncing": "환자와 리드를 동기화하는 중",
+      "ready": "준비 완료"
+    },
+    "offline": {
+      "message": "{{productName}}에 연결할 수 없습니다 · 인터넷 연결을 확인하세요",
+      "retry": "다시 시도"
+    }
   }
 }

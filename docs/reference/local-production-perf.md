@@ -121,6 +121,12 @@ dominate and a 500 ms minimum costs nothing once the real work takes longer than
 that. The signed-in number also assumes the session hint is present — it is
 after any interactive sign-in; without it that path is unchanged, not slower.
 
+Since the launch splash (KICKOFF §6.1) the exit also has a **design floor**: it
+never starts before the wordmark lands, 2,050ms after first paint (500ms under
+reduced motion), and the cross-fade takes 500ms. "Splash gone" therefore no
+longer drops below ≈2.55s; "Destination in DOM" is unaffected — the app renders
+underneath at opacity 0 and is ready when the splash leaves.
+
 Wall-clock numbers flake, so **CI does not assert them**. It asserts the
 invariants that made the load _feel_ slow (`tests/e2e/boot-splash.e2e.test.ts`):
 the splash fades exactly once, and the page is never blank behind it.

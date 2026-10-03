@@ -266,26 +266,43 @@ Rendered inside any room; scope them to the room's own container in a spec.
 
 ---
 
+## Boot splash (launch L-52)
+
+The HTML `#app-splash` (no test id of its own — `role="status"`, "Loading Clinozy") and the
+greeting block the React slot renders into it. Gone once the splash exits.
+
+| Test ID                                   | Element                                                               | Source                             |
+| ----------------------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| `app-splash-mark` · `app-splash-wordmark` | The 64px mark with its halo · the wordmark (frames 1–4, CSS)          | `index.html`                       |
+| `app-splash-block`                        | The greeting block (frame 5); carries `--app-splash-block-delay`      | `shared/components/AppSplashSlot/` |
+| `app-splash-greeting`                     | "Good morning, <first name>" (org layout's first load, session ready) | `shared/components/AppSplashSlot/` |
+| `app-splash-progress`                     | Bar + ticker (online)                                                 | `shared/components/AppSplashSlot/` |
+| `app-splash-bar` · `app-splash-ticker`    | The bar's fill · the ticker's moving reel                             | `shared/components/AppSplashSlot/` |
+| `app-splash-offline` · `app-splash-retry` | Offline notice (`role="alert"`) · its Retry (reloads the boot URL)    | `shared/components/AppSplashSlot/` |
+
+---
+
 ## E2E specs (existing)
 
-| Spec                                       | Test IDs used                                                                                 |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `tests/e2e/auth.e2e.test.ts`               | Unified auth + `dashboard-page`                                                               |
-| `tests/e2e/organization.e2e.test.ts`       | `organization-page`, `organization-picker-option-acme`                                        |
-| `tests/e2e/dashboard.e2e.test.ts`          | `dashboard-page`, `dashboard-greeting`, header hybrid (`search-trigger`, `user-menu-trigger`) |
-| `tests/e2e/settings.e2e.test.ts`           | `settings-modal` + `role=dialog`, nav sections, `user-menu-*`                                 |
-| `tests/e2e/edge-cases.e2e.test.ts`         | Hash fallbacks, legacy billing remap, Stripe return cleanup, auth validation edges            |
-| `tests/e2e/navigation.e2e.test.ts`         | Hybrid login guard + `not-found-page`                                                         |
-| `tests/e2e/notifications.e2e.test.ts`      | `notification-bell` hybrid + list/mark-all                                                    |
-| `tests/e2e/network-resilience.e2e.test.ts` | Hybrid login fill + `offline-indicator`                                                       |
-| `tests/e2e/accessibility.e2e.test.ts`      | login + dashboard pages (axe)                                                                 |
-| `tests/e2e/visual.e2e.test.ts`             | Screenshots                                                                                   |
-| `tests/e2e/responsive.e2e.test.ts`         | Mobile overflow + settings                                                                    |
-| `tests/e2e/org-switching.e2e.test.ts`      | Dual-URL org switcher                                                                         |
-| `tests/e2e/routes-integration.e2e.test.ts` | Full live route matrix — public shells, guards, authenticated journey, logout                 |
-| `tests/e2e/deployment-*.e2e.test.ts`       | Deployment mode matrix (personal-and-team / personal-only / team-only)                        |
-| `tests/e2e/accept-invite.e2e.test.ts`      | `accept-invite-*` (expired token → error + login)                                             |
-| `tests/e2e/onboarding.e2e.test.ts`         | `onboarding-page`, `onboarding-step-title`, `onboarding-next`                                 |
+| Spec                                       | Test IDs used                                                                                   |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `tests/e2e/auth.e2e.test.ts`               | Unified auth + `dashboard-page`                                                                 |
+| `tests/e2e/organization.e2e.test.ts`       | `organization-page`, `organization-picker-option-acme`                                          |
+| `tests/e2e/dashboard.e2e.test.ts`          | `dashboard-page`, `dashboard-greeting`, header hybrid (`search-trigger`, `user-menu-trigger`)   |
+| `tests/e2e/settings.e2e.test.ts`           | `settings-modal` + `role=dialog`, nav sections, `user-menu-*`                                   |
+| `tests/e2e/edge-cases.e2e.test.ts`         | Hash fallbacks, legacy billing remap, Stripe return cleanup, auth validation edges              |
+| `tests/e2e/navigation.e2e.test.ts`         | Hybrid login guard + `not-found-page`                                                           |
+| `tests/e2e/notifications.e2e.test.ts`      | `notification-bell` hybrid + list/mark-all                                                      |
+| `tests/e2e/network-resilience.e2e.test.ts` | Hybrid login fill + `offline-indicator`                                                         |
+| `tests/e2e/accessibility.e2e.test.ts`      | login + dashboard pages (axe)                                                                   |
+| `tests/e2e/visual.e2e.test.ts`             | Screenshots                                                                                     |
+| `tests/e2e/responsive.e2e.test.ts`         | Mobile overflow + settings                                                                      |
+| `tests/e2e/org-switching.e2e.test.ts`      | Dual-URL org switcher                                                                           |
+| `tests/e2e/routes-integration.e2e.test.ts` | Full live route matrix — public shells, guards, authenticated journey, logout                   |
+| `tests/e2e/deployment-*.e2e.test.ts`       | Deployment mode matrix (personal-and-team / personal-only / team-only)                          |
+| `tests/e2e/accept-invite.e2e.test.ts`      | `accept-invite-*` (expired token → error + login)                                               |
+| `tests/e2e/onboarding.e2e.test.ts`         | `onboarding-page`, `onboarding-step-title`, `onboarding-next`                                   |
+| `tests/e2e/boot-splash.e2e.test.ts`        | `#app-splash` + `app-splash-*` (frames, greeting → `today-page`, offline Retry, reduced motion) |
 
 **Planned E2E (testids ready):** org tabs, settings tabs, team URL `?team=`, passwordless buttons, full onboarding wizard steps.
 

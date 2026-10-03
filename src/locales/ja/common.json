@@ -310,5 +310,22 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "splash": {
+    "label": "{{productName}} を読み込み中",
+    "greeting": {
+      "morning": "おはようございます、{{name}}さん",
+      "afternoon": "こんにちは、{{name}}さん",
+      "evening": "こんばんは、{{name}}さん"
+    },
+    "ticker": {
+      "opening": "{{weekday}}の予定を開いています",
+      "syncing": "患者とリードを同期しています",
+      "ready": "準備完了"
+    },
+    "offline": {
+      "message": "{{productName}} に接続できません · インターネット接続を確認してください",
+      "retry": "再試行"
+    }
   }
 }

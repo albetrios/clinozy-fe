@@ -310,5 +310,22 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "splash": {
+    "label": "正在加载 {{productName}}",
+    "greeting": {
+      "morning": "早上好，{{name}}",
+      "afternoon": "下午好，{{name}}",
+      "evening": "晚上好，{{name}}"
+    },
+    "ticker": {
+      "opening": "正在打开{{weekday}}的日程",
+      "syncing": "正在同步患者和潜在客户",
+      "ready": "一切就绪"
+    },
+    "offline": {
+      "message": "无法连接 {{productName}} · 请检查网络连接",
+      "retry": "重试"
+    }
   }
 }

@@ -30,17 +30,22 @@ describe('theme-init.js drift', () => {
   });
 });
 
-describe('boot splash shape drift (theme-init.js ↔ index.html ↔ BrandLoader)', () => {
+describe('boot splash shape drift (theme-init.js ↔ index.html ↔ AppSplashSlot ↔ BrandLoader)', () => {
   // Under the Sharp shape nothing in the app is round, and the splash is the
-  // first thing on screen. Three files have to agree or the loader changes shape
+  // first thing on screen. The files have to agree or the loader changes shape
   // half way through the boot: theme-init.js sets `data-shape` before paint,
-  // index.html squares the HTML splash on it, and index.css squares the React
-  // BrandLoader's `icon-chip` + `pill` slots on the same attribute.
+  // and index.css squares the `pill` slots on it — the progress track and bar
+  // the React slot renders inside the splash, and BrandLoader's, which takes
+  // over from it.
   const themeInit = readFileSync(join(root, 'public/theme-init.js'), 'utf8');
   const html = readFileSync(join(root, 'index.html'), 'utf8');
   const css = readFileSync(join(root, 'src/index.css'), 'utf8');
   const loader = readFileSync(
     join(root, 'src/shared/components/BrandLoader/BrandLoader.tsx'),
+    'utf8',
+  );
+  const slot = readFileSync(
+    join(root, 'src/shared/components/AppSplashSlot/AppSplashSlot.tsx'),
     'utf8',
   );
 
@@ -49,10 +54,12 @@ describe('boot splash shape drift (theme-init.js ↔ index.html ↔ BrandLoader)
     expect(themeInit).toContain("root.dataset.shape = 'sharp'");
   });
 
-  it('index.html squares the splash track and bar under it', () => {
-    for (const part of ['.app-splash-track', '.app-splash-bar']) {
-      expect(html).toContain(`html[data-shape='sharp'] ${part}`);
+  it('the splash’s progress track and bar are pills, squared by index.css', () => {
+    for (const part of ['app-splash-track', 'app-splash-bar']) {
+      expect(slot).toMatch(new RegExp(`className="${part}[^"]*"\\s+data-slot="pill"`));
     }
+    // No Sharp override of its own: one rule (index.css) squares every pill.
+    expect(html).not.toContain("[data-shape='sharp']");
   });
 
   it('draws the same fixed-corner product mark in the HTML splash and the React loader', () => {

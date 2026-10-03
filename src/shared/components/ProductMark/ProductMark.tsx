@@ -1,3 +1,4 @@
+import { wordmarkParts } from '@/lib/brand-wordmark.ts';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 
@@ -32,12 +33,12 @@ export function ProductMark({ className }: { className?: string }) {
 
 /**
  * The wordmark: the product name in lower case, its first "o" drawn as a ring
- * with a `brand-mark-strong` centre. A brand drawing, not translated copy;
- * decorative (`aria-hidden`) — size it with the caller's font size.
+ * with a `brand-mark-strong` centre ({@link wordmarkParts} — the same split the
+ * HTML splash is drawn with). A brand drawing, not translated copy; decorative
+ * (`aria-hidden`) — size it with the caller's font size.
  */
 export function ProductWordmark({ className }: { className?: string }) {
-  const word = PRODUCT_NAME.toLowerCase();
-  const ring = word.indexOf('o');
+  const { head, ring, tail } = wordmarkParts(PRODUCT_NAME);
   return (
     <span
       aria-hidden
@@ -47,11 +48,9 @@ export function ProductWordmark({ className }: { className?: string }) {
         className,
       )}
     >
-      {ring < 0 ? (
-        word
-      ) : (
+      {ring ? (
         <>
-          {word.slice(0, ring)}
+          {head}
           <svg
             aria-hidden
             viewBox="0 0 20 20"
@@ -67,8 +66,10 @@ export function ProductWordmark({ className }: { className?: string }) {
             />
             <circle cx="10" cy="10" r="3" className="fill-brand-mark-strong" />
           </svg>
-          {word.slice(ring + 1)}
+          {tail}
         </>
+      ) : (
+        head
       )}
     </span>
   );

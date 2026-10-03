@@ -1,11 +1,52 @@
-/** HTML boot splash lives outside `#root` until React fades it out. */
+/**
+ * HTML boot splash lives outside `#root` until React fades it out.
+ *
+ * `index.html` draws it and owns every frame (KICKOFF §6.1): CSS keyframes, so
+ * the mark plays before any JS. This module owns when it LEAVES — never before
+ * the wordmark lands, never while a loader holds it, never while the device was
+ * offline at mount — and gives the React slot (`AppSplashSlot`) the splash's
+ * clock and the node it renders the greeting block into.
+ */
 
 const SPLASH_ID = 'app-splash';
 const EXIT_CLASS = 'app-splash-exiting';
+const SLOT_CLASS = 'app-splash-slot';
 const DISMISS_EVENT = 'app-splash-dismissed';
 
-/** Matches the `#app-splash` opacity/visibility transition in index.html (200ms) plus slack. */
-const EXIT_FALLBACK_MS = 360;
+/**
+ * The `#app-splash` opacity/visibility transition in index.html (500ms ease,
+ * `splash.md:75`) plus slack — the layer is removed at exit + 520ms. Keep the two
+ * in step: `transitionend` normally removes the node, this is the fallback for a
+ * tab that never fires it.
+ */
+const EXIT_FALLBACK_MS = 520;
+
+/**
+ * The same fallback under reduced motion, where every splash transition is 1ms:
+ * exit at 500ms, layer removed at 580ms (`splash.md:46`; H:4504's `+80`).
+ */
+const REDUCED_EXIT_FALLBACK_MS = 80;
+
+/**
+ * When the wordmark lands — frame 4 ends 2,050ms into the sequence (1,250ms delay
+ * + 800ms, `index.html`). The exit never starts before it, however fast the boot
+ * resolves (Q-S1): the splash leaves when boot resolves, not on the prototype's
+ * fixed 3,700ms timer.
+ */
+export const SPLASH_FRAMES_MS = 2050;
+
+/**
+ * Reduced motion: every frame is at its end state at once, and the exit may start
+ * from 500ms (`splash.md:46, 78`).
+ */
+export const SPLASH_REDUCED_FRAMES_MS = 500;
+
+/**
+ * When the greeting block rises — frame 5, 1,900ms into the sequence. The React
+ * slot renders the block whenever the session is ready and shifts its animation
+ * delays so it still rises on this beat (or at once, when the session is late).
+ */
+export const SPLASH_BLOCK_AT_MS = 1900;
 
 /**
  * Grace period between the last hold releasing and the fade actually starting.
@@ -35,13 +76,22 @@ const SETTLED_EXIT_DELAY_MS = 32;
  * Ceiling on how long holds may keep the splash up once dismissal was requested.
  * A bootstrap that never resolves must not trap the user behind an inert HTML
  * overlay — past this the splash leaves and React's own loader takes the screen,
- * because that one can surface an error and a Retry.
+ * because that one can surface an error and a Retry. Suspended while the splash
+ * is held offline: there, the splash's own Retry is the way out.
  */
 const MAX_HOLD_MS = 8000;
+
+/**
+ * The URL the app was opened at, read when this module first evaluates — before
+ * the router runs a single guard.
+ */
+const BOOT_URL = globalThis.location?.href ?? '';
 
 /** The overlay these module-level counters describe; identity change ⇒ reset. */
 let tracked: HTMLElement | null = null;
 let holdCount = 0;
+/** Holds taken because the device was offline at mount — they suspend the deadline. */
+let offlineHoldCount = 0;
 let dismissRequested = false;
 let holdDeadlineReached = false;
 /** The router has resolved: what is mounted is the destination, not a way-point. */
@@ -61,6 +111,7 @@ function currentSplash(): HTMLElement | null {
   if (splash !== tracked) {
     tracked = splash;
     holdCount = 0;
+    offlineHoldCount = 0;
     dismissRequested = false;
     holdDeadlineReached = false;
     contentSettled = false;
@@ -78,6 +129,53 @@ function currentSplash(): HTMLElement | null {
 /** True while the pre-React `#app-splash` overlay is still in the document. */
 export function isAppSplashActive(): boolean {
   return currentSplash() != null;
+}
+
+/** The node inside `#app-splash` the React slot renders the greeting block into. */
+export function appSplashSlotHost(): HTMLElement | null {
+  return currentSplash()?.querySelector<HTMLElement>(`.${SLOT_CLASS}`) ?? null;
+}
+
+/**
+ * Name the splash for assistive technology. The HTML carries the English label
+ * (`Loading {{PRODUCT_NAME}}`); the slot swaps in the translated one once i18n
+ * is up (Q-S1).
+ */
+export function labelAppSplash(label: string): void {
+  currentSplash()?.setAttribute('aria-label', label);
+}
+
+/** The OS asks for reduced motion — every frame then shows its end state at once. */
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/**
+ * Milliseconds since the splash frames started — the clock every frame's delay
+ * counts from. The frames are CSS animations that start with the first paint, so
+ * their own start time is the truth. Without the Web Animations API (jsdom, old
+ * engines) the document's time origin stands in: navigation start, never later
+ * than the first paint.
+ */
+export function appSplashElapsedMs(): number {
+  const now = performance.now();
+  const splash = currentSplash();
+  if (!(splash && typeof splash.getAnimations === 'function')) return now;
+  let start = Number.POSITIVE_INFINITY;
+  for (const animation of splash.getAnimations({ subtree: true })) {
+    const at = animation.startTime;
+    if (typeof at === 'number' && at < start) start = at;
+  }
+  return Number.isFinite(start) ? now - start : now;
+}
+
+/** How long until the exit may start: the wordmark (or, reduced, 500ms) has to land first. */
+function framesRemainingMs(): number {
+  const floor = prefersReducedMotion() ? SPLASH_REDUCED_FRAMES_MS : SPLASH_FRAMES_MS;
+  return Math.max(0, floor - appSplashElapsedMs());
 }
 
 /** Subscribe once when the boot splash finishes its exit transition (or is removed). */
@@ -110,7 +208,10 @@ function runExit(): void {
 
   exitFinish = finish;
   splash.addEventListener('transitionend', finish, { once: true });
-  exitTimer = window.setTimeout(finish, EXIT_FALLBACK_MS);
+  exitTimer = window.setTimeout(
+    finish,
+    prefersReducedMotion() ? REDUCED_EXIT_FALLBACK_MS : EXIT_FALLBACK_MS,
+  );
 }
 
 /** Put a mid-flight fade back to full opacity — the app was not ready after all. */
@@ -125,6 +226,22 @@ function cancelExit(): void {
   splash.classList.remove(EXIT_CLASS);
 }
 
+/** Nothing holds the splash and React asked it to go: exit, once the frames allow. */
+function exitIfReleased(): void {
+  if (!(holdCount === 0 && dismissRequested)) return;
+  const remaining = framesRemainingMs();
+  if (remaining <= 0) {
+    runExit();
+    return;
+  }
+  // Boot beat the wordmark: wait for it. A hold taken meanwhile clears this
+  // timer, exactly as it clears the grace window below.
+  releaseTimer = window.setTimeout(() => {
+    releaseTimer = undefined;
+    exitIfReleased();
+  }, remaining);
+}
+
 /**
  * Re-check after {@link EXIT_GRACE_MS} instead of exiting the moment a hold drops
  * to zero. StrictMode remounts an effect as setup → cleanup → setup, and a route
@@ -136,10 +253,22 @@ function scheduleExitCheck(): void {
   releaseTimer = window.setTimeout(
     () => {
       releaseTimer = undefined;
-      if (holdCount === 0 && dismissRequested) runExit();
+      exitIfReleased();
     },
     contentSettled ? SETTLED_EXIT_DELAY_MS : EXIT_GRACE_MS,
   );
+}
+
+/** Start the {@link MAX_HOLD_MS} ceiling — once, and never while held offline. */
+function armHoldDeadline(): void {
+  if (offlineHoldCount > 0) return;
+  // Late route loaders may cancel a fade, but never extend the boot deadline.
+  holdDeadline ??= window.setTimeout(() => {
+    holdDeadline = undefined;
+    holdDeadlineReached = true;
+    holdCount = 0;
+    runExit();
+  }, MAX_HOLD_MS);
 }
 
 /**
@@ -204,25 +333,63 @@ export function holdAppSplash(): () => void {
 }
 
 /**
+ * Hold the splash because the device was offline when the app mounted
+ * (`navigator.onLine === false`, `splash.md:45`). Frames 1–5 play and the slot
+ * shows the offline notice; no exit runs and the {@link MAX_HOLD_MS} hand-off is
+ * suspended — only the notice's Retry (a reload) leaves.
+ *
+ * The release exists for the slot's unmount alone (so the splash is never held
+ * with no Retry on it); it re-arms the ceiling. No-op once the splash is gone.
+ */
+export function holdAppSplashOffline(): () => void {
+  if (!isAppSplashActive() || holdDeadlineReached) return () => undefined;
+
+  offlineHoldCount += 1;
+  if (holdDeadline !== undefined) {
+    window.clearTimeout(holdDeadline);
+    holdDeadline = undefined;
+  }
+  const release = holdAppSplash();
+
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    offlineHoldCount = Math.max(0, offlineHoldCount - 1);
+    if (dismissRequested) armHoldDeadline();
+    release();
+  };
+}
+
+/**
+ * The offline splash's Retry (`splash.md:22`): load the app again, at the URL it
+ * was opened at. While the splash held, the guards may have redirected underneath
+ * it (`/` → `/login`), and offline the service worker serves the app shell for the
+ * start URL — not for every path. A plain reload when nothing moved.
+ */
+export function reloadFromAppSplash(): void {
+  const page = (href: string) => href.split('#')[0];
+  if (!BOOT_URL || page(BOOT_URL) === page(window.location.href)) {
+    window.location.reload();
+    return;
+  }
+  window.location.replace(BOOT_URL);
+}
+
+/**
  * Fade out the HTML boot loader after React has painted underneath.
  * Idempotent — safe to call multiple times.
  *
  * With holds outstanding this only *records* the request: React has painted, but
  * what it painted is another loader, so the splash stays until the last
- * {@link holdAppSplash} releases (or {@link MAX_HOLD_MS} elapses).
+ * {@link holdAppSplash} releases (or {@link MAX_HOLD_MS} elapses). Either way it
+ * never leaves before the wordmark has landed ({@link SPLASH_FRAMES_MS}).
  */
 export function dismissAppSplash(): void {
   if (!isAppSplashActive()) return;
 
   dismissRequested = true;
-
-  // Late route loaders may cancel a fade, but never extend the boot deadline.
-  holdDeadline ??= window.setTimeout(() => {
-    holdDeadline = undefined;
-    holdDeadlineReached = true;
-    holdCount = 0;
-    runExit();
-  }, MAX_HOLD_MS);
+  armHoldDeadline();
 
   if (holdCount > 0) return;
 

@@ -923,15 +923,20 @@ function applyDataAxis(
 }
 
 /**
- * The exact custom properties `index.html`'s boot splash paints from.
- * Keep in step with the `#app-splash` rules there.
+ * The exact custom properties `index.html`'s boot splash paints from — the page
+ * behind it, its `card` layer, the wordmark, the mark's tile, "C" and dot, the
+ * wordmark's ring dot and the halo's corner. Keep in step with the `#app-splash`
+ * rules there and the `BOOT_VARS` list `public/theme-init.js` replays (both
+ * drift-tested).
  */
 export const BOOT_SPLASH_VARS = [
   '--color-background',
+  '--color-card',
   '--color-foreground',
   '--color-primary',
   '--color-primary-foreground',
-  '--color-muted',
+  '--color-brand-mark',
+  '--color-brand-mark-strong',
   '--radius-lg',
 ] as const;
 

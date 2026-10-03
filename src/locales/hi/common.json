@@ -313,5 +313,22 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "splash": {
+    "label": "{{productName}} लोड हो रहा है",
+    "greeting": {
+      "morning": "सुप्रभात, {{name}}",
+      "afternoon": "शुभ दोपहर, {{name}}",
+      "evening": "शुभ संध्या, {{name}}"
+    },
+    "ticker": {
+      "opening": "{{weekday}} का शेड्यूल खोला जा रहा है",
+      "syncing": "मरीज़ और लीड्स सिंक हो रहे हैं",
+      "ready": "सब तैयार है"
+    },
+    "offline": {
+      "message": "{{productName}} से कनेक्ट नहीं हो पा रहा · इंटरनेट कनेक्शन जाँचें",
+      "retry": "फिर कोशिश करें"
+    }
   }
 }

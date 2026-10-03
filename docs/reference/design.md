@@ -213,7 +213,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   for a spinner to flash over), then settles into the in-app one (keep the
   current screen ≤ 3s, 500ms minimum). The splash leaves within frames of the
   router settling (`markAppContentSettled`) rather than after a fixed grace
-  window, and fades in 200ms. While `/auth/refresh` is in flight the boot warms
+  window — but never before its wordmark lands (2,050ms; 500ms under reduced
+  motion) — and cross-fades out over 500ms while the app comes in over 450ms.
+  Its frames are CSS keyframes in `index.html`; on the org layout's first load
+  the React slot (`AppSplashSlot`) adds the greeting, bar and ticker, and a device
+  offline at mount holds the splash on its notice until Retry (KICKOFF §6.1).
+  While `/auth/refresh` is in flight the boot warms
   the chunks the destination will need (`preloadBootRoutes`, steered by a
   session _hint_ that never authorizes anything). Invariants, proven in a browser
   by `tests/e2e/boot-splash.e2e.test.ts`: the splash fades **exactly once**, and

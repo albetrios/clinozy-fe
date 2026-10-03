@@ -301,7 +301,7 @@ describe('useThemeStore — mode application', () => {
     for (const name of [
       '--color-background',
       '--color-foreground',
-      '--color-muted',
+      '--color-card',
       '--color-primary',
       '--color-primary-foreground',
     ]) {
@@ -362,14 +362,14 @@ describe('useThemeStore — mode application', () => {
     const root = document.documentElement;
     root.style.setProperty('--color-background', 'oklch(1 0 0)');
     root.style.setProperty('--color-foreground', 'oklch(0.145 0 0)');
-    root.style.setProperty('--color-muted', 'oklch(0.97 0 0)');
+    root.style.setProperty('--color-card', 'oklch(1 0 0)');
 
     useThemeStore.getState().setTheme('dark');
 
     expect(root.classList.contains('dark')).toBe(true);
     expect(root.style.getPropertyValue('--color-background')).toBe('');
     expect(root.style.getPropertyValue('--color-foreground')).toBe('');
-    expect(root.style.getPropertyValue('--color-muted')).toBe('');
+    expect(root.style.getPropertyValue('--color-card')).toBe('');
   });
 
   it('setTheme keeps the generated accent — only the boot palette is released', () => {

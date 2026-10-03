@@ -58,8 +58,8 @@ describe('boot palette hand-off (theme-init.js ↔ shared/theme)', () => {
     expect(bootWrittenVars()).toEqual(
       expect.arrayContaining([
         '--color-background',
+        '--color-card',
         '--color-foreground',
-        '--color-muted',
       ]),
     );
   });
@@ -84,6 +84,62 @@ describe('boot palette hand-off (theme-init.js ↔ shared/theme)', () => {
       expect(pinned).toEqual([]);
     });
   }
+});
+
+/**
+ * Every colour and radius the splash shows before the bundle runs has to reach
+ * it pre-paint — "every axis that changes shape or colour applies to the HTML
+ * splash too". Three lists say so and must agree: the vars `index.html`'s splash
+ * paints from, the snapshot the app writes (`BOOT_SPLASH_VARS`), and the names
+ * `theme-init.js` replays from it.
+ */
+describe('boot splash palette (index.html ↔ BOOT_SPLASH_VARS ↔ theme-init.js)', () => {
+  const html = readFileSync(join(repoRoot, 'index.html'), 'utf8');
+  const style = html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
+  const themeInit = readFileSync(join(repoRoot, 'public/theme-init.js'), 'utf8');
+
+  it('index.html paints the splash only from vars the boot snapshot carries', () => {
+    const painted = new Set(
+      [...style.matchAll(/var\((--[\w-]+)/g)]
+        .map((match) => match[1])
+        // Set by the React slot on its own block — timing, not palette.
+        .filter((name) => name !== '--app-splash-block-delay'),
+    );
+    expect([...painted].sort()).toEqual([...BOOT_SPLASH_VARS].sort());
+  });
+
+  it('index.html gives every one of them a pre-paint fallback', () => {
+    for (const name of BOOT_SPLASH_VARS) {
+      expect(style, name).toMatch(new RegExp(`:where\\(html\\) \\{[^}]*${name}:`, 's'));
+    }
+  });
+
+  it('theme-init.js replays exactly that list, by name', () => {
+    const list = /var BOOT_VARS = \[([^\]]*)\]/s.exec(themeInit)?.[1] ?? '';
+    const names = [...list.matchAll(/'(--[\w-]+)'/g)].map((match) => match[1]);
+    expect(names).toEqual([...BOOT_SPLASH_VARS]);
+  });
+
+  it('never replays a name an older snapshot carries but this build no longer releases', () => {
+    const root = document.documentElement;
+    localStorage.setItem(
+      'theme-boot-vars',
+      JSON.stringify({
+        preset: DEFAULT_PRESET,
+        mode: 'light',
+        vars: { '--color-card': 'oklch(0.99 0 0)', '--color-muted': 'oklch(0.5 0 0)' },
+      }),
+    );
+    try {
+      runThemeInit(undefined);
+      expect(root.style.getPropertyValue('--color-card')).toBe('oklch(0.99 0 0)');
+      expect(root.style.getPropertyValue('--color-muted')).toBe('');
+    } finally {
+      localStorage.removeItem('theme-boot-vars');
+      for (const name of BOOT_SPLASH_VARS) root.style.removeProperty(name);
+      delete root.dataset.theme;
+    }
+  });
 });
 
 /** The value of `name` inside the first `selector { … }` block of index.css. */

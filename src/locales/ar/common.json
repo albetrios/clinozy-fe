@@ -325,5 +325,22 @@
       "kilobytes": "{{value}} كيلوبايت",
       "megabytes": "{{value}} ميغابايت"
     }
+  },
+  "splash": {
+    "label": "جارٍ تحميل {{productName}}",
+    "greeting": {
+      "morning": "صباح الخير، {{name}}",
+      "afternoon": "طاب يومك، {{name}}",
+      "evening": "مساء الخير، {{name}}"
+    },
+    "ticker": {
+      "opening": "جارٍ فتح جدول يوم {{weekday}}",
+      "syncing": "جارٍ مزامنة المرضى والعملاء المحتملين",
+      "ready": "كل شيء جاهز"
+    },
+    "offline": {
+      "message": "تعذّر الوصول إلى {{productName}} · تحقّق من الاتصال بالإنترنت",
+      "retry": "إعادة المحاولة"
+    }
   }
 }

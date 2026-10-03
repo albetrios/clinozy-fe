@@ -1481,24 +1481,8 @@
   }
 }
 
-/* Gentle "breathing" pulse for the branded boot loader (FullPageSpinner + HTML
-   splash). Softer scale/opacity so the HTML→React handoff never blinks. */
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(0.94);
-    opacity: 0.88;
-  }
-}
-
-.animate-boot-breathe {
-  animation: breathe 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
+/* The branded loader's bar (BrandLoader): an indeterminate sweep — the boot
+   splash's own frames live in index.html. */
 .animate-boot-progress {
   animation: route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

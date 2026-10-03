@@ -316,5 +316,22 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "splash": {
+    "label": "Caricamento di {{productName}}",
+    "greeting": {
+      "morning": "Buongiorno, {{name}}",
+      "afternoon": "Buon pomeriggio, {{name}}",
+      "evening": "Buonasera, {{name}}"
+    },
+    "ticker": {
+      "opening": "Apertura dell’agenda di {{weekday}}",
+      "syncing": "Sincronizzazione di pazienti e lead",
+      "ready": "Tutto pronto"
+    },
+    "offline": {
+      "message": "Impossibile raggiungere {{productName}} · controlla la connessione a internet",
+      "retry": "Riprova"
+    }
   }
 }

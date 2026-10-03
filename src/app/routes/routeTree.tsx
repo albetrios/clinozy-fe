@@ -67,6 +67,7 @@ import { manifest as todayManifest } from '@/pages/organization/$organizationSlu
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
+import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
 import { ConsentBannerLazy } from '@/shared/components/ConsentBanner/index.ts';
 import { FloatingEdgeControls } from '@/shared/components/FloatingEdgeControls/index.ts';
 import { FullPageSpinner } from '@/shared/components/FullPageSpinner/index.ts';
@@ -402,6 +403,9 @@ const rootRoute = createRootRoute({
           visitor ever needs the card, so it stays out of the entry chunk. */}
       <ConsentBannerLazy />
       <AppToaster />
+      {/* The boot splash's React slot (KICKOFF §6.1): the greeting block and the
+          offline hold, rendered into the HTML #app-splash. Lazy — gone with it. */}
+      <AppSplashSlotLazy />
     </>
   ),
   notFoundComponent: () => <NotFoundPage />,
