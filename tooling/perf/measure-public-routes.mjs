@@ -381,7 +381,8 @@ async function main() {
   const budgets = JSON.parse(readFileSync(budgetPath, 'utf8'));
 
   log('[perf:routes] building…');
-  execFileSync('pnpm', ['build'], {
+  // build:bundle, not build: `pnpm build` would stop to ask which env file to use.
+  execFileSync('pnpm', ['run', 'build:bundle'], {
     cwd: root,
     stdio: AS_JSON ? 'ignore' : 'inherit',
     // Relative API base so requests go through the proxy above rather than to

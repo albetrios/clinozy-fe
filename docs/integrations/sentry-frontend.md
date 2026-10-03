@@ -27,7 +27,26 @@ pnpm dev
 throw new Error('Sentry dev test');
 ```
 
-Events appear under environment **`development`** in Sentry → Issues.
+Events appear under environment **`local`** (from `VITE_APP_ENV`) in Sentry → Issues.
+
+### Keeping local dev out of Sentry
+
+With a DSN in `.env.local`, local dev reports to the **same Sentry project as the deploys**:
+its events are tagged `local`, but they still land in the project's issues, alerts and quota.
+If you don't want that, leave the DSN blank in `.env.local`:
+
+```bash
+# .env.local
+VITE_SENTRY_DSN=
+```
+
+Restart `pnpm dev` if it is running. An empty DSN is valid ("empty disables Sentry" in
+`env-schema.ts`) and makes init a no-op: nothing is sent and nothing else changes. To watch an event
+arrive, set it for one session only: `VITE_SENTRY_DSN=<dsn> pnpm dev` (a shell variable beats the
+file).
+
+This covers runtime events only. Source-map uploads are a separate switch, and a local build never
+makes one unless asked (`pnpm build --sentry` — see [sentry-sourcemaps.md](./sentry-sourcemaps.md)).
 
 ---
 
@@ -74,10 +93,13 @@ replay). It is **not** gated by the analytics cookie banner — see
 | Variable            | Where                             | Purpose                                             |
 | ------------------- | --------------------------------- | --------------------------------------------------- |
 | `VITE_SENTRY_DSN`   | GitHub Environment / `.env.local` | Client DSN — **required for any events**            |
-| `SENTRY_AUTH_TOKEN` | CI / local build only             | Upload source maps at build time                    |
+| `SENTRY_AUTH_TOKEN` | CI / local build only             | Upload source maps — only when a build asks¹        |
 | `SENTRY_ORG`        | CI / local build only             | Org slug for source map plugin                      |
 | `SENTRY_PROJECT`    | CI / local build only             | Project slug for source map plugin                  |
 | `VITE_APP_VERSION`  | Build                             | Release name in Sentry (matches source map release) |
+
+¹ The deploy workflow's `SENTRY_UPLOAD_SOURCEMAPS=true`, or `pnpm build --sentry`; a token in an
+env file alone uploads nothing ([sentry-sourcemaps.md](./sentry-sourcemaps.md)).
 
 Runtime override: `window.__CONFIG__.SENTRY_DSN` in `public/config.js` (no `VITE_`
 prefix) — same resolution order as other platform keys.
@@ -161,7 +183,8 @@ attach context to an issue. CSP already allows `*.sentry.io` and `*.ingest.sentr
 
 ### Releases & source maps
 
-Build-time `@sentry/vite-plugin` uploads maps when `SENTRY_AUTH_TOKEN` is set.
+Build-time `@sentry/vite-plugin` uploads maps when a build asks for it (deploys, or
+`pnpm build --sentry`) and `SENTRY_AUTH_TOKEN` is set.
 Issues then show **original TypeScript** stack frames. See
 [sentry-sourcemaps.md](./sentry-sourcemaps.md).
 
@@ -223,9 +246,9 @@ When creating or tuning the Sentry project for this app:
 
 | Symptom            | Likely cause                                                     |
 | ------------------ | ---------------------------------------------------------------- |
-| No events in dev   | Expected — use `pnpm preview` with DSN                           |
+| No events in dev   | `VITE_SENTRY_DSN` blank in `.env.local` — on purpose, see above  |
 | No events in prod  | Missing `VITE_SENTRY_DSN` on Netlify / GitHub env                |
-| Minified stacks    | Source maps not uploaded — check `SENTRY_AUTH_TOKEN` in CI build |
+| Minified stacks    | Maps not uploaded — check the deploy's `SENTRY_*` secrets        |
 | No replays         | Replay not enabled on Sentry plan or sample rate = 0 in non-prod |
 | CSP console errors | Check `connect-src` includes `https://*.ingest.sentry.io`        |
 

@@ -10,7 +10,9 @@
  *
  * One `.env.<NODE_ENV>` file per environment (`.env.local` locally, mirroring
  * clinozy-be). Deploys inject env from GitHub Environments (process.env), not files.
- * Empty values (`KEY=`) are stripped so optional Zod fields see `undefined`.
+ * Empty values (`KEY=`) are stripped so optional Zod fields see `undefined` — only when the
+ * value IN EFFECT is empty: a value the shell already set (a cloud environment's Variables)
+ * survives a blank placeholder in `.env.local`. Same rule as clinozy-be's loader.
  */
 import { config } from 'dotenv';
 import { existsSync } from 'node:fs';
@@ -20,15 +22,18 @@ const projectRoot = resolve(import.meta.dirname, '..');
 const SAFE_KEY = /^[A-Z][A-Z0-9_]*$/;
 
 /**
+ * Loads one env file into `process.env`, then unsets every key it names whose value in effect
+ * is empty. Without `override` the shell wins, blank file line or not.
+ *
  * @param {string} envFilePath
  * @param {boolean} [override]
  */
-function applyDotenvFile(envFilePath, override = false) {
+export function applyDotenvFile(envFilePath, override = false) {
   const result = config({ path: envFilePath, override });
   const parsed = result.parsed ?? {};
-  for (const [key, value] of Object.entries(parsed)) {
+  for (const key of Object.keys(parsed)) {
     if (!SAFE_KEY.test(key)) continue;
-    if (value === '') {
+    if (process.env[key] === '') {
       delete process.env[key];
     }
   }

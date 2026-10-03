@@ -67,7 +67,7 @@ flowchart TB
   end
 
   subgraph deploy_time["Deploy time"]
-    NetlifyCLI["netlify deploy --prod --dir=dist"]
+    NetlifyCLI["netlify deploy --prod --dir=dist --no-build"]
   end
 
   GitHubSecrets --> ViteBuild
@@ -123,7 +123,7 @@ sequenceDiagram
   GA->>GA: Checkout, pnpm install
   GA->>GA: pnpm build (env from GitHub secrets)
   GA->>GA: dist/ produced
-  GA->>Netlify: netlify deploy --prod --dir=dist
+  GA->>Netlify: netlify deploy --prod --dir=dist --no-build
   Netlify-->>GA: Deploy OK
   GA->>GH: Job success
 ```
@@ -141,12 +141,12 @@ sequenceDiagram
 
 ### Required (you do once)
 
-| What                   | Where                                               | Notes                                                                                                                                                                                                                           |
-| ---------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL`, `NODE_VERSION` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub; these are injected at build time. No build on Netlify.                                                    |
-| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information). |
-| **Netlify: no build**  | Netlify UI                                          | If the site is connected to Git, **disable the build** (e.g. set build command to a no-op or disconnect "Build" so only GitHub deploys). Deploy workflow uploads pre-built `dist/` via CLI.                                     |
-| **Backend CORS**       | Your API server                                     | Allow your Netlify site origin (or custom domain) so the browser can call the production API.                                                                                                                                   |
+| What                   | Where                                               | Notes                                                                                                                                                                                                                                                                        |
+| ---------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL`, `NODE_VERSION` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub; these are injected at build time. No build on Netlify.                                                                                                 |
+| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information).                                              |
+| **Netlify: no build**  | `netlify.toml` (enforced)                           | Nothing builds on Netlify: `ignore = "exit 0"` cancels Git-triggered builds and the `command` fails any other build. Deploys upload the pre-built `dist/` with `netlify deploy --no-build`. Disconnecting the build in the Netlify UI is still tidy, but no longer required. |
+| **Backend CORS**       | Your API server                                     | Allow your Netlify site origin (or custom domain) so the browser can call the production API.                                                                                                                                                                                |
 
 ### Optional (tokens / secrets)
 
@@ -161,7 +161,7 @@ sequenceDiagram
 - **`.env.local`** (gitignored) at project root: `VITE_DEV_API_URL` (e.g. `http://localhost:3000`) if your backend runs locally. No token needed for basic dev.
 - **Sentry (local build):** If you run `pnpm build` locally and want source maps uploaded, put `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` in `.env.sentry-build-plugin` (gitignored) or `.env.local`. Optional.
 
-**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Disable Netlify's Git build so only the workflow deploys. **Backend CORS** must allow your frontend origin.
+**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Netlify never builds (`netlify.toml` cancels or fails any build there); the workflow uploads `dist/` with `--no-build`. **Backend CORS** must allow your frontend origin.
 
 **CLI-only deploy:** You can still run `pnpm run deploy:netlify:prod` locally (build runs on your machine, then Netlify CLI uploads `dist/`). See [netlify-cli-setup.md](netlify-cli-setup.md).
 
@@ -236,7 +236,7 @@ When you add a new env var, follow **`agent-os/skills/fe-env-schema-add/SKILL.md
 | `pnpm run deploy:netlify`      | Build + deploy **draft** (preview URL). |
 | `pnpm run deploy:netlify:prod` | Build + deploy to **production**.       |
 
-Both run `pnpm build` then `netlify deploy` (with or without `--prod`).
+Both run `pnpm build` then `netlify deploy --no-build` (with or without `--prod`); `deploy:netlify:prod` builds with `--env production`. Always pass `--no-build`: netlify-cli otherwise runs the `netlify.toml` build command first, and that command now fails on purpose.
 
 ### GitHub → Netlify (deploy only; no build on Netlify)
 

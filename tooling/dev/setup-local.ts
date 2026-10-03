@@ -280,8 +280,8 @@ function upsertEnvAssignment(content: string, key: string, value: string): strin
  * Inject an environment's defaults into scaffolded `.env.<env>` content, from
  * `envProfiles[env].defaults` (src/core/config/env-schema.ts) — the single source
  * of truth for each environment's defaults, so the scaffolder and schema can never
- * drift. `setup:local` uses `'local'`; the deploy-env files keep their own
- * scaffolder, with those profiles' `defaults` as the documented spec.
+ * drift. `setup:local` uses `'local'`; `github:sync` scaffolds the deploy-env files from
+ * their own profiles' `defaults` (tooling/setup/github/scaffold-env-files.mjs).
  */
 function injectEnvDefaults(content: string, env: AppEnvironment): string {
   let updated = content;

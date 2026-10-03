@@ -45,11 +45,14 @@ Vite loads `.env`, `.env.local`, `.env.<mode>` and `.env.<mode>.local` from the 
 later file winning key by key, and a variable already in the shell beats every file. `.env.local`
 loads in every mode, so the mode decides whether a deploy-env file lands on top of it:
 
-| Command              | Vite mode    | Env files read                                                                    |
-| -------------------- | ------------ | --------------------------------------------------------------------------------- |
-| `pnpm dev`           | `dev-server` | `.env.local` only — no file is named after this mode                              |
-| `pnpm build`         | `production` | `.env.local`, then `.env.production` on top (deploys add `.env.production.local`) |
-| `pnpm test` (Vitest) | `test`       | none — `envDir` is the empty `tooling/test/empty-env/`                            |
+| Command                                    | Vite mode    | Env files read                                                                                                                       |
+| ------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                                 | `dev-server` | `.env.local` only — no file is named after this mode                                                                                 |
+| `pnpm build` in a terminal                 | `production` | asks which environment, listing every `.env.local` / `.env.development` / `.env.production` present; reads the chosen file **alone** |
+| `pnpm build --env <environment>`           | `production` | `.env.<environment>` alone, no question (`BUILD_ENVIRONMENT=<environment>` from the shell does the same)                             |
+| `pnpm build` in a pipe, a script or a hook | `production` | not asked: `.env.local` alone — the `local` default, as in clinozy-be                                                                |
+| `pnpm build` in CI (no `.env.local`)       | `production` | Vite's own files, unchanged: the deploy's materialized `.env.production.local`                                                       |
+| `pnpm test` (Vitest)                       | `test`       | none — `envDir` is the empty `tooling/test/empty-env/`                                                                               |
 
 The dev server never runs in Vite's default `development` mode: there `.env.development` — the
 development deploy-env file `pnpm github:sync` pushes from — would override `.env.local`, and a
@@ -57,6 +60,24 @@ local dev server would call the hosted API. `vite.config.ts` refuses to serve in
 (`plugins/dev-server-mode.ts`, pinned by `tests/ci/dev-server-env.policy.test.ts`), so start the
 dev server with `pnpm dev`, never a bare `vite`. To point local dev at a hosted API on purpose,
 set `VITE_API_BASE_URL` in `.env.local` or the shell.
+
+A build is always mode `production`, so left to itself Vite mixes `.env.local` and `.env.production`
+key by key. A build therefore reads **one** env file (`plugins/build-environment.ts`, pinned by
+`tests/ci/build-environment.policy.test.ts`): in a terminal, `pnpm build` (`tooling/ci/build.mjs`)
+asks which environment whenever an env file is present and passes the answer as
+`BUILD_ENVIRONMENT`; when nothing chose one — a pipe, a script, `pnpm health`, the pre-push hook —
+it reads `.env.local`, the same `local` default clinozy-be takes for an unset `NODE_ENV`. A shell
+variable still beats the file. Only where there is no `.env.local` (CI, deploys) do Vite's own
+files load, exactly as before. `pnpm build:bundle` is the bare chain (`tsc -b`, `vite build`,
+`strip-sourcemaps`) for callers that must never stop to ask.
+
+One deliberate difference from clinozy-be: clinozy-be lays `.env.local` over a deploy
+environment's file as a machine-local override (safe there — `.env.local` never exists in a
+deployed container). A FE build bakes its env into the bundle that ships, so a chosen
+environment's file is read alone and `.env.local` never rides along.
+`deploy:netlify:prod` builds with `--env production`. Source maps go to Sentry only when a build
+asks — the deploy workflow's `SENTRY_UPLOAD_SOURCEMAPS=true`, or `pnpm build --sentry` — never
+because an env file holds `SENTRY_AUTH_TOKEN` ([sentry-sourcemaps.md](../../integrations/sentry-sourcemaps.md)).
 
 **Not env:** live session and organization context from **`GET /auth/me/context`**.
 
@@ -197,6 +218,7 @@ Follow **`agent-os/skills/fe-env-schema-add/SKILL.md`** end-to-end:
 | MCP servers missing in Cursor                        | Run `pnpm setup:local --no-start` or `pnpm mcp:setup`                                                                                                                                |
 | Context7 MCP fails                                   | Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor                                                                                                                             |
 | `The dev server runs in mode "dev-server"` on start  | Vite was started bare or with `--mode`; run `pnpm dev` (see [Which env files each command reads](#which-env-files-each-command-reads))                                               |
+| Local dev errors show up in Sentry                   | `VITE_SENTRY_DSN` is set in `.env.local` — blank it ([Keeping local dev out of Sentry](../../integrations/sentry-frontend.md#keeping-local-dev-out-of-sentry))                       |
 
 ## 7. Related files
 

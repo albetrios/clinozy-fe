@@ -234,6 +234,10 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          # A deploy build is the one build that uploads source maps to Sentry. Not
+          # materialized: vite.config.ts reads it from the process env only, so no env file
+          # can turn uploads on (a local `pnpm build` opts in with --sentry).
+          SENTRY_UPLOAD_SOURCEMAPS: 'true'
 
       # Build-provenance for the exact bytes that ship to production. Package
       # dist/ into one deterministic subject and attest it BEFORE deploy, so a
@@ -283,8 +287,10 @@ jobs:
           else
             DEPLOY_FLAGS="--alias $GITHUB_ENVIRONMENT"
           fi
+          # --no-build: netlify-cli builds before every deploy by default, which shipped a SECOND
+          # build — not the one validated, attested and source-mapped above. Upload dist/ as is.
           # shellcheck disable=SC2086 # DEPLOY_FLAGS is two words by design
-          pnpm exec netlify deploy $DEPLOY_FLAGS --dir=dist --json > deploy-result.json
+          pnpm exec netlify deploy $DEPLOY_FLAGS --dir=dist --no-build --json > deploy-result.json
           DEPLOY_URL=$(node -e "const r=JSON.parse(require('fs').readFileSync('deploy-result.json','utf8')); console.log(r.url ?? r.deploy_url ?? '')")
           if [ -z "$DEPLOY_URL" ]; then
             echo "Could not read the deploy URL from netlify output:" >&2

@@ -58,7 +58,9 @@ variables verbatim. Full key catalog (kind, default, description):
 
 An unset variable falls back to the runtime schema default at build time; `VITE_APP_ENV`
 is **not** a managed variable — the workflows derive it from the resolved environment
-name. `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` is a **repository-level** variable (not
+name (and a local `pnpm build --env <environment>` fills it the same way). A new
+`.env.<environment>` scaffolded by `pnpm github:sync` starts from
+`envProfiles.<environment>.defaults`. `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` is a **repository-level** variable (not
 per-environment), so it stays hand-managed.
 
 ## Secret placement (repository vs environment)

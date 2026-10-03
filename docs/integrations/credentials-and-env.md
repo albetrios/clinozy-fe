@@ -31,11 +31,11 @@ flowchart LR
 
 ## Optional: Sentry (errors + source maps)
 
-| Variable                       | Where to get it                                                           |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| `VITE_SENTRY_DSN`              | Sentry project → Settings → Client Keys (DSN) — for client error tracking |
-| `SENTRY_AUTH_TOKEN`            | Sentry → Settings → Auth Tokens — for source map upload at build time     |
-| `SENTRY_ORG`, `SENTRY_PROJECT` | Sentry URLs: org slug and project slug                                    |
+| Variable                       | Where to get it                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_SENTRY_DSN`              | Sentry project → Settings → Client Keys (DSN) — for client error tracking                                                          |
+| `SENTRY_AUTH_TOKEN`            | Sentry → Settings → Auth Tokens — for source map upload, which only a build that asks makes (the deploy, or `pnpm build --sentry`) |
+| `SENTRY_ORG`, `SENTRY_PROJECT` | Sentry URLs: org slug and project slug                                                                                             |
 
 Set all four as **GitHub Environment secrets** (`gh secret set <NAME> --env <env>`,
 or via `.env.<environment>` + `pnpm github:sync`): the deploy workflow passes them

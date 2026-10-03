@@ -7,7 +7,7 @@ This document is the single source of truth for understanding and working in thi
 ```bash
 pnpm install
 pnpm dev          # Vite dev server on port 5173
-pnpm build        # Production build
+pnpm build        # Production build — in a terminal, asks which .env.<environment> to build with (--env <environment> skips the question; --sentry also uploads source maps, off by default)
 pnpm type-check   # Type check (no emit, tsconfig.app.json)
 pnpm lint         # ESLint
 pnpm biome:check  # Biome lint lane (lint-only; Prettier owns formatting)
@@ -423,7 +423,12 @@ because **Vite 8 forbids a mode literally named `local`**; Vite's mode is a mech
 (dev → `dev-server`, build → `production`, Vitest → its default `test` mode). The dev server
 never runs in Vite's default `development` mode, where `.env.development` would load on top of
 `.env.local`: `pnpm dev` passes `--mode dev-server`, and `vite.config.ts` refuses any other
-mode. `local` is not a deploy target (`DeployEnvironment` stays `development | production`,
+mode. A build is mode `production`; in a terminal `pnpm build` asks which `.env.<environment>` to
+build with and reads that file alone (`--env <environment>` skips the question). Unasked —
+pipes, scripts, `pnpm health`, the pre-push hook — it reads `.env.local` alone, clinozy-be's
+`local` default; only CI (no `.env.local`) keeps Vite's default files. Unlike clinozy-be,
+`.env.local` is never layered over a deploy environment's file: a build ships what it reads.
+`local` is not a deploy target (`DeployEnvironment` stays `development | production`,
 while `AppEnvironment` adds `local` for its load-time contract). A **test run is not its own
 environment** — it reports
 `local` and is marked by the **`VITE_TEST_MODE`** env variable (injected by `plugins/test-env.ts`,

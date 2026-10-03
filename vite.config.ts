@@ -9,6 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { applyBuildEnvironment } from './plugins/build-environment.ts';
 import { cspApiOrigin } from './plugins/csp-api-origin.ts';
 import { devServerMode } from './plugins/dev-server-mode.ts';
 import { i18nBuild } from './plugins/i18n-build.ts';
@@ -31,10 +32,23 @@ export default defineConfig(({ command, mode }) => {
   // `.env.local` in every mode and `.env.<mode>` ON TOP of it, so the dev server runs in a mode
   // no env file is named after and reads `.env.local` alone; under Vite's default
   // `development`, `.env.development` would override it — the `devServerMode()` plugin below
-  // refuses that. A build reads `.env.production` (deploys materialize
-  // `.env.production.local`, which beats both).
-  const envDir = path.resolve(__dirname);
+  // refuses that. A build is mode `production` and reads ONE env file (envDir false, its values
+  // in process.env): the environment `pnpm build` asked for (BUILD_ENVIRONMENT), else
+  // `.env.local` — clinozy-be's default for an unset NODE_ENV. With neither (CI, deploys) Vite's
+  // own files load; deploys materialize `.env.production.local`.
+  //
+  // Source maps go to Sentry only when a build asks for it: the deploy workflow sets
+  // SENTRY_UPLOAD_SOURCEMAPS=true on its build step, and `pnpm build --sentry` does the same by
+  // hand. Read here, before any env file loads, so a value written in a file never turns
+  // uploads on — a local build is a test build and never creates a Sentry release.
+  const uploadSourceMaps = process.env.SENTRY_UPLOAD_SOURCEMAPS === 'true';
+  const envDir = applyBuildEnvironment({ command, root: path.resolve(__dirname) });
   const env = loadEnv(mode, envDir, '');
+  if (command === 'build' && uploadSourceMaps && !env.SENTRY_AUTH_TOKEN) {
+    console.warn(
+      'SENTRY_UPLOAD_SOURCEMAPS=true, but SENTRY_AUTH_TOKEN is not set — no source maps are uploaded.',
+    );
+  }
 
   // One build id per build, shared by version.json (new-deploy detection) and the
   // Sentry release name below — so a build, its version.json, and its Sentry
@@ -117,10 +131,11 @@ export default defineConfig(({ command, mode }) => {
           ]
         : []),
 
-      // Sentry source map upload — only in production builds when credentials are present.
+      // Sentry source map upload — only in a production build that asked for it
+      // (SENTRY_UPLOAD_SOURCEMAPS=true, see above) and has credentials.
       // Source maps are uploaded then deleted from the output so they're never served publicly.
       // The plugin must be listed AFTER all other plugins.
-      ...(mode === 'production' && env.SENTRY_AUTH_TOKEN
+      ...(mode === 'production' && uploadSourceMaps && env.SENTRY_AUTH_TOKEN
         ? [
             sentryVitePlugin({
               org: env.SENTRY_ORG,

@@ -431,7 +431,7 @@ Default values in `.env.local`:
 | `VITE_POSTHOG_KEY`  | (empty)                 | PostHog analytics (optional)     |
 | `VITE_POSTHOG_HOST` | (empty)                 | PostHog host URL (optional)      |
 
-> **Tip:** Put local overrides and secrets directly in `.env.local` (gitignored). The `.env.development` / `.env.production` files are the deploy-environment files (one `.env.<NODE_ENV>` per environment), separate from your local dev file.
+> **Tip:** Put local overrides and secrets directly in `.env.local` (gitignored). The `.env.development` / `.env.production` files are the deploy-environment files (one `.env.<environment>` per environment), separate from your local dev file. `pnpm dev` reads `.env.local` only; `pnpm build` reads one file — the environment you pick when it asks, `.env.local` when it can't ask. Details: [which env files each command reads](../deployment/runbooks/environment-variables.md#which-env-files-each-command-reads).
 
 ---
 
@@ -473,23 +473,24 @@ pnpm test:e2e
 
 ## Quick Reference — All Commands
 
-| Command                 | What it does                                          |
-| ----------------------- | ----------------------------------------------------- |
-| `pnpm dev`              | Start dev server with hot reload (port 5173)          |
-| `pnpm build`            | Type-check + production build → `dist/`               |
-| `pnpm preview`          | Preview the production build locally                  |
-| `pnpm lint`             | Run ESLint on all files                               |
-| `pnpm lint:fix`         | Run ESLint with auto-fix                              |
-| `pnpm format`           | Format source files with Prettier                     |
-| `pnpm format:check`     | Check formatting (no write)                           |
-| `pnpm type-check`       | TypeScript type-check (no emit)                       |
-| `pnpm test`             | Run unit tests (Vitest)                               |
-| `pnpm test:watch`       | Run tests in watch mode                               |
-| `pnpm test:coverage`    | Run tests with coverage report                        |
-| `pnpm test:e2e`         | Run E2E tests (Playwright — requires browser install) |
-| `pnpm security:secrets` | Gitleaks full-repo secret scan                        |
-| `pnpm security:sast`    | Semgrep SAST scan                                     |
-| `pnpm clean`            | Remove `dist/`, coverage, and Vite cache              |
+| Command                 | What it does                                                                                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`              | Start dev server with hot reload (port 5173)                                                                                                                    |
+| `pnpm build`            | Type-check + production build → `dist/`; in a terminal, asks which `.env.<environment>` to use (`--env <environment>` skips it, `--sentry` uploads source maps) |
+| `pnpm build:bundle`     | The same build without the question (for scripts)                                                                                                               |
+| `pnpm preview`          | Preview the production build locally                                                                                                                            |
+| `pnpm lint`             | Run ESLint on all files                                                                                                                                         |
+| `pnpm lint:fix`         | Run ESLint with auto-fix                                                                                                                                        |
+| `pnpm format`           | Format source files with Prettier                                                                                                                               |
+| `pnpm format:check`     | Check formatting (no write)                                                                                                                                     |
+| `pnpm type-check`       | TypeScript type-check (no emit)                                                                                                                                 |
+| `pnpm test`             | Run unit tests (Vitest)                                                                                                                                         |
+| `pnpm test:watch`       | Run tests in watch mode                                                                                                                                         |
+| `pnpm test:coverage`    | Run tests with coverage report                                                                                                                                  |
+| `pnpm test:e2e`         | Run E2E tests (Playwright — requires browser install)                                                                                                           |
+| `pnpm security:secrets` | Gitleaks full-repo secret scan                                                                                                                                  |
+| `pnpm security:sast`    | Semgrep SAST scan                                                                                                                                               |
+| `pnpm clean`            | Remove `dist/`, coverage, and Vite cache                                                                                                                        |
 
 ---
 

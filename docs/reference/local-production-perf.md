@@ -19,9 +19,12 @@ extra HMR clients, and different chunking — scores are not representative.
 ## Recommended workflow (this repo)
 
 ```bash
-pnpm build
+pnpm build --env production   # the production env file alone — the closest local match to a deploy
 pnpm preview --port 5173 --strictPort
 ```
+
+Plain `pnpm build` asks which env file to use (Enter = `local`); without `.env.production`, pick
+`local`. CI measures with no env file at all, so small differences from CI's numbers are expected.
 
 In a second terminal:
 

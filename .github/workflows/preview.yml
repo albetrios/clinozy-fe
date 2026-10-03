@@ -142,7 +142,8 @@ jobs:
         run: |
           set -euo pipefail
           alias="pr-${PR_NUMBER}"
-          pnpm exec netlify deploy --alias "$alias" --dir=dist --json > deploy-result.json
+          # --no-build: upload the dist/ built above; netlify-cli would otherwise rebuild it.
+          pnpm exec netlify deploy --alias "$alias" --dir=dist --no-build --json > deploy-result.json
           # Prefer the URL that actually carries the alias (pr-<n>--…), which is
           # the reviewable preview; fall back across netlify's URL fields.
           url=$(ALIAS="$alias" node -e '
