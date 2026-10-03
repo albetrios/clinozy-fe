@@ -1,10 +1,14 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { render, renderHook, waitFor } from '@testing-library/react';
+import { createElement } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
+import type { IconName } from './icon-names.ts';
 import { initDeferredIconSets, loadIconSet, useIconSet } from './icon-registry.ts';
+import type { AppIcon } from './icon-types.ts';
+import * as icons from './index.ts';
 
 const TABLER_STUB = { Boxes: (() => null) as never };
 const PHOSPHOR_STUB = { Boxes: (() => null) as never };
@@ -14,6 +18,73 @@ vi.mock('./iconset-phosphor.ts', () => ({ iconSet: PHOSPHOR_STUB }));
 vi.mock('@/lib/app-splash.ts', () => ({
   afterPaint: (cb: () => void) => cb(),
 }));
+
+/**
+ * The clinic launch's additions (KICKOFF §3.4, L-08): 39 Lucide exports and the
+ * two local brand marks. `satisfies` makes each one a compile-time canonical name.
+ */
+const LAUNCH_ICONS = [
+  'ArrowDownLeft',
+  'ArrowUpRight',
+  'ArrowUpDown',
+  'Calendar',
+  'Camera',
+  'ChevronDown',
+  'ClipboardList',
+  'Clock',
+  'Compass',
+  'FileIcon',
+  'FolderOpen',
+  'House',
+  'ImageIcon',
+  'Info',
+  'LayoutGrid',
+  'LinkIcon',
+  'ListFilter',
+  'Lock',
+  'MapPin',
+  'Maximize',
+  'Minimize',
+  'MessageSquare',
+  'Package',
+  'PanelRightOpen',
+  'PanelRightClose',
+  'Pause',
+  'Play',
+  'PenLine',
+  'Phone',
+  'Pill',
+  'Printer',
+  'Receipt',
+  'RefreshCw',
+  'Send',
+  'SquareCheck',
+  'Star',
+  'Stethoscope',
+  'Tag',
+  'Wallet',
+  'WhatsAppMark',
+  'InstagramMark',
+] as const satisfies readonly IconName[];
+
+type IconSetModule = { iconSet: Record<IconName, AppIcon> };
+
+/** The real lazy sets — this file stubs both modules for the loader tests. */
+async function realIconSets() {
+  const [tabler, phosphor] = await Promise.all([
+    vi.importActual<IconSetModule>('./iconset-tabler.ts'),
+    vi.importActual<IconSetModule>('./iconset-phosphor.ts'),
+  ]);
+  return { tabler: tabler.iconSet, phosphor: phosphor.iconSet };
+}
+
+/** Whether an icon renders an svg with something drawn in it (not an empty box). */
+function drawsGlyph(Icon: AppIcon): boolean {
+  const svg = render(createElement(Icon)).container.querySelector('svg');
+  // childElementCount, not a `svg > *` query: under jsdom that selector
+  // matches only the first svg a test renders.
+  return (svg?.childElementCount ?? 0) > 0;
+}
 
 describe('icon-registry', () => {
   beforeEach(() => {
@@ -76,5 +147,28 @@ describe('icon-registry', () => {
 
     const { result } = renderHook(() => useIconSet('tabler'));
     await waitFor(() => expect(result.current).toBe(TABLER_STUB));
+  });
+});
+
+describe('lazy icon sets', () => {
+  it('key Tabler and Phosphor by exactly the barrel names, launch additions included', async () => {
+    const { tabler, phosphor } = await realIconSets();
+    const names = Object.keys(icons).sort();
+
+    expect(Object.keys(tabler).sort()).toEqual(names);
+    expect(Object.keys(phosphor).sort()).toEqual(names);
+    expect(names).toEqual(expect.arrayContaining([...LAUNCH_ICONS]));
+  });
+
+  it('resolve every name to a drawn glyph in both sets', async () => {
+    const sets = await realIconSets();
+
+    const blank = Object.entries(sets).flatMap(([library, set]) =>
+      Object.entries(set)
+        .filter(([, Icon]) => !drawsGlyph(Icon))
+        .map(([name]) => `${library}:${name}`),
+    );
+
+    expect(blank).toEqual([]);
   });
 });

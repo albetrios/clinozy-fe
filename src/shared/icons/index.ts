@@ -10,45 +10,79 @@ import {
   AlertCircle as LuAlertCircle,
   AlertTriangle as LuAlertTriangle,
   ArrowDown as LuArrowDown,
+  ArrowDownLeft as LuArrowDownLeft,
   ArrowUp as LuArrowUp,
+  ArrowUpDown as LuArrowUpDown,
+  ArrowUpRight as LuArrowUpRight,
   Bell as LuBell,
   BellOff as LuBellOff,
   Boxes as LuBoxes,
   Building2 as LuBuilding,
+  Calendar as LuCalendar,
   CalendarDays as LuCalendarDays,
+  Camera as LuCamera,
   Check as LuCheck,
   CheckCircle2 as LuCheckCircle,
+  ChevronDown as LuChevronDown,
   ChevronLeft as LuChevronLeft,
   ChevronRight as LuChevronRight,
   ChevronsLeft as LuChevronsLeft,
   ChevronsRight as LuChevronsRight,
   ChevronsUpDown as LuChevronsUpDown,
+  ClipboardList as LuClipboardList,
+  Clock as LuClock,
+  Compass as LuCompass,
   Copy as LuCopy,
   CreditCard as LuCreditCard,
   Download as LuDownload,
   Eye as LuEye,
   EyeOff as LuEyeOff,
+  File as LuFile,
   Fingerprint as LuFingerprint,
+  FolderOpen as LuFolderOpen,
   GitBranch as LuGitBranch,
   Globe as LuGlobe,
+  House as LuHouse,
+  Image as LuImage,
+  Info as LuInfo,
   Languages as LuLanguages,
   Laptop as LuLaptop,
   LayoutDashboard as LuLayoutDashboard,
+  LayoutGrid as LuLayoutGrid,
+  Link as LuLink,
+  ListFilter as LuListFilter,
   Loader2 as LuLoader,
+  Lock as LuLock,
   LogOut as LuLogOut,
   Mail as LuMail,
+  MapPin as LuMapPin,
+  Maximize2 as LuMaximize,
   Menu as LuMenu,
+  MessageSquare as LuMessageSquare,
+  Minimize as LuMinimize,
   Minus as LuMinus,
   Monitor as LuMonitor,
   MonitorSmartphone as LuMonitorSmartphone,
   Moon as LuMoon,
   MoreHorizontal as LuMoreHorizontal,
+  Package as LuPackage,
   Palette as LuPalette,
+  PanelRightClose as LuPanelRightClose,
+  PanelRightOpen as LuPanelRightOpen,
+  Pause as LuPause,
+  PenLine as LuPenLine,
+  Phone as LuPhone,
+  Pill as LuPill,
+  Play as LuPlay,
   Plug as LuPlug,
   Plus as LuPlus,
+  Printer as LuPrinter,
+  Receipt as LuReceipt,
+  RefreshCw as LuRefreshCw,
   Rocket as LuRocket,
   RotateCw as LuRotateCw,
   Search as LuSearch,
+  Send as LuSend,
   Settings as LuSettings,
   Shield as LuShield,
   ShieldAlert as LuShieldAlert,
@@ -56,13 +90,18 @@ import {
   SlidersHorizontal as LuSlidersHorizontal,
   Smartphone as LuSmartphone,
   Sparkles as LuSparkles,
+  SquareCheck as LuSquareCheck,
+  Star as LuStar,
+  Stethoscope as LuStethoscope,
   Sun as LuSun,
+  Tag as LuTag,
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
   User as LuUser,
   UserCog as LuUserCog,
   UserPlus as LuUserPlus,
   Users as LuUsers,
+  Wallet as LuWallet,
   X as LuX,
   XCircle as LuXCircle,
   Zap as LuZap,
@@ -71,11 +110,14 @@ import { createElement } from 'react';
 
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
-// lucide-react 1.0 removed brand icons — the GitHub mark is vendored locally.
+// lucide-react 1.0 removed brand icons — the GitHub, Instagram and WhatsApp
+// marks are vendored locally (`*-mark.tsx`).
 import { GithubMark as LuGithub } from './github-mark.tsx';
 import type { IconName } from './icon-names.ts';
 import { useIconSet } from './icon-registry.ts';
 import type { AppIcon, IconProps } from './icon-types.ts';
+import { InstagramMark as LuInstagramMark } from './instagram-mark.tsx';
+import { WhatsAppMark as LuWhatsAppMark } from './whatsapp-mark.tsx';
 
 /**
  * A swappable icon: renders the active library's version, Lucide as fallback.
@@ -104,46 +146,116 @@ export type LucideIcon = AppIcon;
 export const AlertCircle = makeIcon('AlertCircle', LuAlertCircle);
 export const AlertTriangle = makeIcon('AlertTriangle', LuAlertTriangle);
 export const ArrowDown = makeIcon('ArrowDown', LuArrowDown);
+/** Lucide `arrow-down-left`: money received. */
+export const ArrowDownLeft = makeIcon('ArrowDownLeft', LuArrowDownLeft);
 export const ArrowUp = makeIcon('ArrowUp', LuArrowUp);
+/** Lucide `arrow-up-down`: a sortable column that is not sorted. */
+export const ArrowUpDown = makeIcon('ArrowUpDown', LuArrowUpDown);
+/** Lucide `arrow-up-right`: money paid out. */
+export const ArrowUpRight = makeIcon('ArrowUpRight', LuArrowUpRight);
 export const Bell = makeIcon('Bell', LuBell);
 export const BellOff = makeIcon('BellOff', LuBellOff);
 export const Boxes = makeIcon('Boxes', LuBoxes);
 export const Building = makeIcon('Building', LuBuilding);
+/** Lucide `calendar`: appointments and dates (`CalendarDays` is another glyph). */
+export const Calendar = makeIcon('Calendar', LuCalendar);
 export const CalendarDays = makeIcon('CalendarDays', LuCalendarDays);
+/** Lucide `camera`: photos and photo uploads. */
+export const Camera = makeIcon('Camera', LuCamera);
 export const Check = makeIcon('Check', LuCheck);
 export const CheckCircle = makeIcon('CheckCircle', LuCheckCircle);
+/** Lucide `chevron-down`: a picker that opens (rotate it 180° while open). */
+export const ChevronDown = makeIcon('ChevronDown', LuChevronDown);
 export const ChevronLeft = makeIcon('ChevronLeft', LuChevronLeft);
 export const ChevronRight = makeIcon('ChevronRight', LuChevronRight);
 export const ChevronsLeft = makeIcon('ChevronsLeft', LuChevronsLeft);
 export const ChevronsRight = makeIcon('ChevronsRight', LuChevronsRight);
 export const ChevronsUpDown = makeIcon('ChevronsUpDown', LuChevronsUpDown);
+/** Lucide `clipboard-list`: reports and stock checks. */
+export const ClipboardList = makeIcon('ClipboardList', LuClipboardList);
+/** Lucide `clock`: planned and time-bound items. */
+export const Clock = makeIcon('Clock', LuClock);
+/** Lucide `compass`: all sections, the tab bar's More. */
+export const Compass = makeIcon('Compass', LuCompass);
 export const Copy = makeIcon('Copy', LuCopy);
 export const CreditCard = makeIcon('CreditCard', LuCreditCard);
 export const Download = makeIcon('Download', LuDownload);
 export const Eye = makeIcon('Eye', LuEye);
 export const EyeOff = makeIcon('EyeOff', LuEyeOff);
+/** Lucide `file`: files and uploads; named so it never shadows the DOM `File`. */
+export const FileIcon = makeIcon('FileIcon', LuFile);
 export const Fingerprint = makeIcon('Fingerprint', LuFingerprint);
+/** Lucide `folder-open`: a patient file's sections. */
+export const FolderOpen = makeIcon('FolderOpen', LuFolderOpen);
 export const GitBranch = makeIcon('GitBranch', LuGitBranch);
 export const Github = makeIcon('Github', LuGithub);
 export const Globe = makeIcon('Globe', LuGlobe);
+/** Lucide `house`: Today, walk-ins and who is in the clinic. */
+export const House = makeIcon('House', LuHouse);
+/** Lucide `image`: photos; named so it never shadows the DOM `Image`. */
+export const ImageIcon = makeIcon('ImageIcon', LuImage);
+/** Lucide `info`: hints and notes. */
+export const Info = makeIcon('Info', LuInfo);
+/** Instagram brand mark, drawn locally (lucide-react ships no brand icons). */
+export const InstagramMark = makeIcon('InstagramMark', LuInstagramMark);
 export const Laptop = makeIcon('Laptop', LuLaptop);
 export const Languages = makeIcon('Languages', LuLanguages);
 export const LayoutDashboard = makeIcon('LayoutDashboard', LuLayoutDashboard);
+/** Lucide `layout-grid`: overviews and browse panels. */
+export const LayoutGrid = makeIcon('LayoutGrid', LuLayoutGrid);
+/** Lucide `link`: links; named so it never shadows the router's `Link`. */
+export const LinkIcon = makeIcon('LinkIcon', LuLink);
+/** Lucide `list-filter`: the Filters button. */
+export const ListFilter = makeIcon('ListFilter', LuListFilter);
 export const Loader = makeIcon('Loader', LuLoader);
+/** Lucide `lock`: private and locked items. */
+export const Lock = makeIcon('Lock', LuLock);
 export const LogOut = makeIcon('LogOut', LuLogOut);
 export const Mail = makeIcon('Mail', LuMail);
+/** Lucide `map-pin`: branches, locations and pins. */
+export const MapPin = makeIcon('MapPin', LuMapPin);
+/** Lucide `maximize-2`: show every table column. */
+export const Maximize = makeIcon('Maximize', LuMaximize);
 export const Menu = makeIcon('Menu', LuMenu);
+/** Lucide `message-square`: notes, SMS and chat. */
+export const MessageSquare = makeIcon('MessageSquare', LuMessageSquare);
+/** Lucide `minimize`: fit the table to its width. */
+export const Minimize = makeIcon('Minimize', LuMinimize);
 export const Minus = makeIcon('Minus', LuMinus);
 export const Monitor = makeIcon('Monitor', LuMonitor);
 export const MonitorSmartphone = makeIcon('MonitorSmartphone', LuMonitorSmartphone);
 export const Moon = makeIcon('Moon', LuMoon);
 export const MoreHorizontal = makeIcon('MoreHorizontal', LuMoreHorizontal);
+/** Lucide `package`: clinic stock, packages and purchases. */
+export const Package = makeIcon('Package', LuPackage);
 export const Palette = makeIcon('Palette', LuPalette);
+/** Lucide `panel-right-close`: close a side panel (mirror it under RTL). */
+export const PanelRightClose = makeIcon('PanelRightClose', LuPanelRightClose);
+/** Lucide `panel-right-open`: open a side panel (mirror it under RTL). */
+export const PanelRightOpen = makeIcon('PanelRightOpen', LuPanelRightOpen);
+/** Lucide `pause`: pause something running. */
+export const Pause = makeIcon('Pause', LuPause);
+/** Lucide `pen-line`: edit. */
+export const PenLine = makeIcon('PenLine', LuPenLine);
+/** Lucide `phone`: calls. */
+export const Phone = makeIcon('Phone', LuPhone);
+/** Lucide `pill`: medicines and prescriptions. */
+export const Pill = makeIcon('Pill', LuPill);
+/** Lucide `play`: start or resume. */
+export const Play = makeIcon('Play', LuPlay);
 export const Plus = makeIcon('Plus', LuPlus);
 export const Plug = makeIcon('Plug', LuPlug);
+/** Lucide `printer`: print. */
+export const Printer = makeIcon('Printer', LuPrinter);
+/** Lucide `receipt`: invoices and sales. */
+export const Receipt = makeIcon('Receipt', LuReceipt);
+/** Lucide `refresh-cw`: redo or change (`RotateCw` is another glyph). */
+export const RefreshCw = makeIcon('RefreshCw', LuRefreshCw);
 export const Rocket = makeIcon('Rocket', LuRocket);
 export const RotateCw = makeIcon('RotateCw', LuRotateCw);
 export const Search = makeIcon('Search', LuSearch);
+/** Lucide `send`: send a message. */
+export const Send = makeIcon('Send', LuSend);
 export const Settings = makeIcon('Settings', LuSettings);
 export const ShieldAlert = makeIcon('ShieldAlert', LuShieldAlert);
 export const Shield = makeIcon('Shield', LuShield);
@@ -151,13 +263,25 @@ export const ShieldCheck = makeIcon('ShieldCheck', LuShieldCheck);
 export const SlidersHorizontal = makeIcon('SlidersHorizontal', LuSlidersHorizontal);
 export const Smartphone = makeIcon('Smartphone', LuSmartphone);
 export const Sparkles = makeIcon('Sparkles', LuSparkles);
+/** Lucide `square-check`: tasks and checked items. */
+export const SquareCheck = makeIcon('SquareCheck', LuSquareCheck);
+/** Lucide `star`: reviews. */
+export const Star = makeIcon('Star', LuStar);
+/** Lucide `stethoscope`: clinical notes. */
+export const Stethoscope = makeIcon('Stethoscope', LuStethoscope);
 export const Sun = makeIcon('Sun', LuSun);
+/** Lucide `tag`: offerings and discounts. */
+export const Tag = makeIcon('Tag', LuTag);
 export const Trash = makeIcon('Trash', LuTrash);
 export const TriangleAlert = makeIcon('TriangleAlert', LuTriangleAlert);
 export const User = makeIcon('User', LuUser);
 export const UserCog = makeIcon('UserCog', LuUserCog);
 export const UserPlus = makeIcon('UserPlus', LuUserPlus);
 export const Users = makeIcon('Users', LuUsers);
+/** Lucide `wallet`: payments and collections. */
+export const Wallet = makeIcon('Wallet', LuWallet);
+/** WhatsApp brand mark, drawn locally (lucide-react ships no brand icons). */
+export const WhatsAppMark = makeIcon('WhatsAppMark', LuWhatsAppMark);
 export const X = makeIcon('X', LuX);
 export const XCircle = makeIcon('XCircle', LuXCircle);
 export const Zap = makeIcon('Zap', LuZap);
