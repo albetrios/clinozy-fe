@@ -98,6 +98,91 @@
     "description": "إصدار جديد من التطبيق جاهز.",
     "refresh": "التحديث الآن"
   },
+  "cells": {
+    "patient": "مريض",
+    "patientMark": "م",
+    "moreCount": "{{count}} آخرون"
+  },
+  "emptyState": {
+    "fallbackTitle": "لا يوجد شيء هنا بعد",
+    "filteredTitle": "لا توجد نتائج مطابقة",
+    "filteredHint": "لا شيء يطابق هذه الفلاتر. امسحها لرؤية كل شيء مرة أخرى.",
+    "clearFilters": "مسح الفلاتر"
+  },
+  "personCard": {
+    "contactLabel": "جهة الاتصال",
+    "openPatientFile": "فتح ملف المريض",
+    "since": "منذ {{date}}",
+    "leadSince": "عميل محتمل منذ {{date}}",
+    "kind": {
+      "patient": "مريض",
+      "lead": "عميل محتمل",
+      "contact": "جهة اتصال"
+    },
+    "editContact": "تعديل جهة الاتصال",
+    "changeContact": "تغيير جهة الاتصال",
+    "changeContactHint": "اختيار جهة اتصال أخرى",
+    "reach": "وسائل التواصل",
+    "team": "الفريق",
+    "about": "نبذة",
+    "reachSub": {
+      "whatsappPrimary": "واتساب · أساسي",
+      "whatsappAlternate": "واتساب · بديل",
+      "phonePrimary": "هاتف · أساسي",
+      "phoneAlternate": "هاتف · بديل",
+      "instagram": "إنستغرام"
+    },
+    "whatsApp": "واتساب",
+    "call": "اتصال",
+    "openInstagram": "فتح إنستغرام",
+    "copy": "نسخ",
+    "copied": "تم نسخ {{value}}",
+    "noReach": "لم يُحفظ رقم هاتف أو معرّف بعد",
+    "claim": "مفتوح · استلام",
+    "claimHint": "يوجد عميل محتمل مفتوح لهذا الشخص · استلمه",
+    "gender": {
+      "female": "أنثى",
+      "male": "ذكر",
+      "other": "آخر"
+    },
+    "genderAge": "{{gender}} · {{age}} سنة",
+    "age": "{{age}} سنة",
+    "cameVia": "جاء عبر {{source}}",
+    "owedToThem": "{{amount}} مستحقة لهم",
+    "owedByThem": "{{amount}} مستحقة عليهم للعيادة",
+    "reviews_zero": "لا مراجعات · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_one": "مراجعة واحدة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_two": "مراجعتان · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_few": "{{count}} مراجعات · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_many": "{{count}} مراجعة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_other": "{{count}} مراجعة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "consent": {
+      "data": "البيانات",
+      "photos": "الصور",
+      "marketing": "التسويق",
+      "hint": "الموافقة · {{label}}",
+      "given": "{{label}}: تمت الموافقة",
+      "missing": "{{label}}: لا موافقة"
+    },
+    "newLead": "+ عميل محتمل",
+    "newLeadHint": "استفسار جديد لجهة الاتصال هذه",
+    "newAppointment": "+ موعد",
+    "newAppointmentHint": "احجز لجهة الاتصال هذه",
+    "newPatient": "+ مريض",
+    "newPatientHint": "إنشاء سجل مريض لجهة الاتصال هذه",
+    "online": "متصل الآن",
+    "offline": "غير متصل",
+    "memberKind": {
+      "assigned": "مُسنَد",
+      "sentThis": "أرسل هذا",
+      "treating": "يعالج",
+      "involved": "مشارك"
+    },
+    "assignToYourself": "إسناده إليّ",
+    "works": "يعمل {{from}} – {{to}}",
+    "updated": "آخر تحديث {{time}}",
+    "fetching": "جارٍ جلب الأحدث…"
+  },
   "a11y": {
     "close": "إغلاق",
     "loading": "جارٍ التحميل",

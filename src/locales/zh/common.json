@@ -98,6 +98,86 @@
     "description": "应用的新版本已就绪。",
     "refresh": "立即刷新"
   },
+  "cells": {
+    "patient": "患者",
+    "patientMark": "患",
+    "moreCount": "另外 {{count}} 人"
+  },
+  "emptyState": {
+    "fallbackTitle": "这里还没有内容",
+    "filteredTitle": "没有匹配项",
+    "filteredHint": "没有内容符合这些筛选条件。清除筛选即可重新查看全部。",
+    "clearFilters": "清除筛选"
+  },
+  "personCard": {
+    "contactLabel": "联系人",
+    "openPatientFile": "打开患者档案",
+    "since": "自 {{date}} 起",
+    "leadSince": "自 {{date}} 起为线索",
+    "kind": {
+      "patient": "患者",
+      "lead": "线索",
+      "contact": "联系人"
+    },
+    "editContact": "编辑联系人",
+    "changeContact": "更换联系人",
+    "changeContactHint": "选择其他联系人",
+    "reach": "联系方式",
+    "team": "团队",
+    "about": "简介",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 主要",
+      "whatsappAlternate": "WhatsApp · 备用",
+      "phonePrimary": "电话 · 主要",
+      "phoneAlternate": "电话 · 备用",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "拨打电话",
+    "openInstagram": "打开 Instagram",
+    "copy": "复制",
+    "copied": "已复制 {{value}}",
+    "noReach": "尚未保存电话或账号",
+    "claim": "待认领 · 认领",
+    "claimHint": "此人有一条未认领的线索 · 认领它",
+    "gender": {
+      "female": "女",
+      "male": "男",
+      "other": "其他"
+    },
+    "genderAge": "{{gender}} · {{age}} 岁",
+    "age": "{{age}} 岁",
+    "cameVia": "来源：{{source}}",
+    "owedToThem": "需退还 {{amount}}",
+    "owedByThem": "欠诊所 {{amount}}",
+    "reviews_other": "{{count}} 条评价 · 最新：{{source}} {{rating}}★ · {{date}}",
+    "consent": {
+      "data": "数据",
+      "photos": "照片",
+      "marketing": "营销",
+      "hint": "同意 · {{label}}",
+      "given": "{{label}}：已同意",
+      "missing": "{{label}}：未同意"
+    },
+    "newLead": "+ 线索",
+    "newLeadHint": "为此联系人新建咨询",
+    "newAppointment": "+ 预约",
+    "newAppointmentHint": "为此联系人预约",
+    "newPatient": "+ 患者",
+    "newPatientHint": "为此联系人创建患者记录",
+    "online": "当前在线",
+    "offline": "离线",
+    "memberKind": {
+      "assigned": "负责",
+      "sentThis": "发送者",
+      "treating": "治疗中",
+      "involved": "参与"
+    },
+    "assignToYourself": "分配给自己",
+    "works": "工作时间 {{from}} – {{to}}",
+    "updated": "{{time}} 更新",
+    "fetching": "正在获取最新信息…"
+  },
   "a11y": {
     "close": "关闭",
     "loading": "加载中",

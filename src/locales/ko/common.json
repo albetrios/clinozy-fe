@@ -98,6 +98,86 @@
     "description": "앱의 새 버전이 준비되었습니다.",
     "refresh": "지금 새로 고침"
   },
+  "cells": {
+    "patient": "환자",
+    "patientMark": "환",
+    "moreCount": "외 {{count}}명"
+  },
+  "emptyState": {
+    "fallbackTitle": "아직 아무것도 없습니다",
+    "filteredTitle": "일치하는 항목 없음",
+    "filteredHint": "이 필터와 일치하는 항목이 없습니다. 전체를 다시 보려면 필터를 지우세요.",
+    "clearFilters": "필터 지우기"
+  },
+  "personCard": {
+    "contactLabel": "연락처",
+    "openPatientFile": "환자 파일 열기",
+    "since": "{{date}}부터",
+    "leadSince": "{{date}}부터 리드",
+    "kind": {
+      "patient": "환자",
+      "lead": "리드",
+      "contact": "연락처"
+    },
+    "editContact": "연락처 편집",
+    "changeContact": "연락처 변경",
+    "changeContactHint": "다른 연락처 선택",
+    "reach": "연락 방법",
+    "team": "팀",
+    "about": "정보",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 기본",
+      "whatsappAlternate": "WhatsApp · 보조",
+      "phonePrimary": "전화 · 기본",
+      "phoneAlternate": "전화 · 보조",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "전화",
+    "openInstagram": "Instagram 열기",
+    "copy": "복사",
+    "copied": "{{value}} 복사됨",
+    "noReach": "저장된 전화번호나 핸들이 아직 없습니다",
+    "claim": "미배정 · 가져오기",
+    "claimHint": "이 사람의 리드가 열려 있습니다 · 가져오세요",
+    "gender": {
+      "female": "여성",
+      "male": "남성",
+      "other": "기타"
+    },
+    "genderAge": "{{gender}} · {{age}}세",
+    "age": "{{age}}세",
+    "cameVia": "{{source}} 통해 유입",
+    "owedToThem": "돌려줄 금액 {{amount}}",
+    "owedByThem": "클리닉에 갚을 금액 {{amount}}",
+    "reviews_other": "리뷰 {{count}}개 · 최근 {{source}}에서 {{rating}}★ · {{date}}",
+    "consent": {
+      "data": "데이터",
+      "photos": "사진",
+      "marketing": "마케팅",
+      "hint": "동의 · {{label}}",
+      "given": "{{label}}: 동의함",
+      "missing": "{{label}}: 동의 안 함"
+    },
+    "newLead": "+ 리드",
+    "newLeadHint": "이 연락처의 새 문의",
+    "newAppointment": "+ 예약",
+    "newAppointmentHint": "이 연락처로 예약",
+    "newPatient": "+ 환자",
+    "newPatientHint": "이 연락처의 환자 기록 만들기",
+    "online": "지금 온라인",
+    "offline": "오프라인",
+    "memberKind": {
+      "assigned": "담당",
+      "sentThis": "보낸 사람",
+      "treating": "치료 중",
+      "involved": "참여"
+    },
+    "assignToYourself": "나에게 배정",
+    "works": "근무 {{from}} – {{to}}",
+    "updated": "{{time}} 업데이트",
+    "fetching": "최신 정보를 가져오는 중…"
+  },
   "a11y": {
     "close": "닫기",
     "loading": "로딩 중",

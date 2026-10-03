@@ -191,6 +191,26 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 
 ---
 
+## Shared clinic primitives (launch L-21)
+
+Rendered inside any room; scope them to the room's own container in a spec.
+
+| Test ID                                                                               | Element                                                              | Source                                        |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
+| `empty-state`                                                                         | Empty-state root (`data-tone` on the illustrated room variant)       | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-illustration`                                                            | 96px dashed-ring illustration (room tone)                            | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-action`                                                                  | 36px primary create action (`EmptyStateAction`)                      | `shared/components/EmptyState/EmptyState.tsx` |
+| `empty-state-clear-filters`                                                           | "Clear filters" in the filtered empty state                          | `shared/components/EmptyState/EmptyState.tsx` |
+| `contact-card`                                                                        | Contact card (`role="dialog"`, "Contact")                            | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-open-file`                                                              | Patient name → patient file                                          | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-edit` · `contact-card-change` · `contact-card-claim`                    | Edit contact · Change contact (forms) · "Open · Claim"               | `shared/components/PersonCard/ContactCard/`   |
+| `contact-card-new-lead` · `contact-card-new-appointment` · `contact-card-new-patient` | Footer "+ Lead" · "+ Appointment" · "+ Patient"                      | `shared/components/PersonCard/ContactCard/`   |
+| `team-card` · `team-card-assign`                                                      | Team card (`role="dialog"`, named by the member) · its assign button | `shared/components/PersonCard/TeamCard/`      |
+| `skeleton-rows` · `skeleton-row`                                                      | Flat skeleton block · one placeholder row                            | `shared/components/SkeletonRows/`             |
+| `patient-badge` · `avatar-stack-more`                                                 | The "P" patient badge · an avatar stack's "+N" pill                  | `shared/components/Cells/`                    |
+
+---
+
 ## E2E specs (existing)
 
 | Spec                                       | Test IDs used                                                                                 |

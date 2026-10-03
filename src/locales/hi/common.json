@@ -98,6 +98,87 @@
     "description": "ऐप का नया संस्करण तैयार है।",
     "refresh": "अभी रीफ़्रेश करें"
   },
+  "cells": {
+    "patient": "मरीज़",
+    "patientMark": "म",
+    "moreCount": "{{count}} और"
+  },
+  "emptyState": {
+    "fallbackTitle": "यहाँ अभी कुछ नहीं है",
+    "filteredTitle": "कोई मेल नहीं",
+    "filteredHint": "इन फ़िल्टर से कुछ भी मेल नहीं खाता। सब कुछ फिर से देखने के लिए इन्हें हटाएँ।",
+    "clearFilters": "फ़िल्टर हटाएँ"
+  },
+  "personCard": {
+    "contactLabel": "संपर्क",
+    "openPatientFile": "मरीज़ की फ़ाइल खोलें",
+    "since": "{{date}} से",
+    "leadSince": "{{date}} से लीड",
+    "kind": {
+      "patient": "मरीज़",
+      "lead": "लीड",
+      "contact": "संपर्क"
+    },
+    "editContact": "संपर्क संपादित करें",
+    "changeContact": "संपर्क बदलें",
+    "changeContactHint": "कोई दूसरा संपर्क चुनें",
+    "reach": "संपर्क के तरीके",
+    "team": "टीम",
+    "about": "जानकारी",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · मुख्य",
+      "whatsappAlternate": "WhatsApp · वैकल्पिक",
+      "phonePrimary": "फ़ोन · मुख्य",
+      "phoneAlternate": "फ़ोन · वैकल्पिक",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "कॉल करें",
+    "openInstagram": "Instagram खोलें",
+    "copy": "कॉपी करें",
+    "copied": "{{value}} कॉपी किया गया",
+    "noReach": "अभी कोई फ़ोन या हैंडल सहेजा नहीं गया",
+    "claim": "खुला · लें",
+    "claimHint": "इस व्यक्ति की एक लीड खुली है · इसे लें",
+    "gender": {
+      "female": "महिला",
+      "male": "पुरुष",
+      "other": "अन्य"
+    },
+    "genderAge": "{{gender}} · {{age}} वर्ष",
+    "age": "{{age}} वर्ष",
+    "cameVia": "{{source}} से आए",
+    "owedToThem": "{{amount}} उन्हें लौटाने हैं",
+    "owedByThem": "{{amount}} उन पर क्लिनिक का बकाया",
+    "reviews_one": "{{count}} समीक्षा · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "reviews_other": "{{count}} समीक्षाएँ · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "consent": {
+      "data": "डेटा",
+      "photos": "फ़ोटो",
+      "marketing": "मार्केटिंग",
+      "hint": "सहमति · {{label}}",
+      "given": "{{label}}: सहमति दी गई",
+      "missing": "{{label}}: सहमति नहीं"
+    },
+    "newLead": "+ लीड",
+    "newLeadHint": "इस संपर्क के लिए नई पूछताछ",
+    "newAppointment": "+ अपॉइंटमेंट",
+    "newAppointmentHint": "इस संपर्क के लिए बुक करें",
+    "newPatient": "+ मरीज़",
+    "newPatientHint": "इस संपर्क के लिए मरीज़ रिकॉर्ड बनाएँ",
+    "online": "अभी ऑनलाइन",
+    "offline": "ऑफ़लाइन",
+    "memberKind": {
+      "assigned": "सौंपा गया",
+      "sentThis": "इन्होंने भेजा",
+      "treating": "इलाज कर रहे हैं",
+      "involved": "शामिल"
+    },
+    "assignToYourself": "ख़ुद को सौंपें",
+    "works": "काम का समय {{from}} – {{to}}",
+    "updated": "{{time}} पर अपडेट हुआ",
+    "fetching": "नवीनतम जानकारी ला रहे हैं…"
+  },
   "a11y": {
     "close": "बंद करें",
     "loading": "लोड हो रहा है",

@@ -98,6 +98,88 @@
     "description": "Ya está lista una nueva versión de la aplicación.",
     "refresh": "Actualizar ahora"
   },
+  "cells": {
+    "patient": "Paciente",
+    "patientMark": "P",
+    "moreCount": "{{count}} más"
+  },
+  "emptyState": {
+    "fallbackTitle": "Aún no hay nada aquí",
+    "filteredTitle": "Sin coincidencias",
+    "filteredHint": "Nada coincide con estos filtros. Bórralos para volver a verlo todo.",
+    "clearFilters": "Borrar filtros"
+  },
+  "personCard": {
+    "contactLabel": "Contacto",
+    "openPatientFile": "Abrir ficha del paciente",
+    "since": "Desde {{date}}",
+    "leadSince": "Lead desde {{date}}",
+    "kind": {
+      "patient": "Paciente",
+      "lead": "Lead",
+      "contact": "Contacto"
+    },
+    "editContact": "Editar contacto",
+    "changeContact": "Cambiar contacto",
+    "changeContactHint": "Elegir otro contacto",
+    "reach": "Medios de contacto",
+    "team": "Equipo",
+    "about": "Acerca de",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · principal",
+      "whatsappAlternate": "WhatsApp · alternativo",
+      "phonePrimary": "Teléfono · principal",
+      "phoneAlternate": "Teléfono · alternativo",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Llamar",
+    "openInstagram": "Abrir Instagram",
+    "copy": "Copiar",
+    "copied": "Copiado: {{value}}",
+    "noReach": "Aún no hay teléfono ni usuario guardado",
+    "claim": "Abierto · Reclamar",
+    "claimHint": "Hay un lead abierto con esta persona · reclámalo",
+    "gender": {
+      "female": "Mujer",
+      "male": "Hombre",
+      "other": "Otro"
+    },
+    "genderAge": "{{gender}} · {{age}} años",
+    "age": "{{age}} años",
+    "cameVia": "Llegó por {{source}}",
+    "owedToThem": "{{amount}} por devolverle",
+    "owedByThem": "{{amount}} que debe a la clínica",
+    "reviews_one": "{{count}} reseña · última {{rating}}★ en {{source}} · {{date}}",
+    "reviews_many": "{{count}} de reseñas · última {{rating}}★ en {{source}} · {{date}}",
+    "reviews_other": "{{count}} reseñas · última {{rating}}★ en {{source}} · {{date}}",
+    "consent": {
+      "data": "Datos",
+      "photos": "Fotos",
+      "marketing": "Marketing",
+      "hint": "Consentimiento · {{label}}",
+      "given": "{{label}}: consentimiento dado",
+      "missing": "{{label}}: sin consentimiento"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "Nueva consulta para este contacto",
+    "newAppointment": "+ Cita",
+    "newAppointmentHint": "Reservar para este contacto",
+    "newPatient": "+ Paciente",
+    "newPatientHint": "Crear una ficha de paciente para este contacto",
+    "online": "En línea ahora",
+    "offline": "Desconectado",
+    "memberKind": {
+      "assigned": "Asignado",
+      "sentThis": "Envió esto",
+      "treating": "Tratando",
+      "involved": "Participa"
+    },
+    "assignToYourself": "Asignármelo",
+    "works": "Trabaja {{from}} – {{to}}",
+    "updated": "Actualizado {{time}}",
+    "fetching": "Obteniendo lo más reciente…"
+  },
   "a11y": {
     "close": "Cerrar",
     "loading": "Cargando",

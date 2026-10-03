@@ -96,18 +96,26 @@ export function formatNumberValue(
   }).format(value);
 }
 
+/**
+ * Money from minor units (cents, paise) in the user's format locale and
+ * currency display. `options` refine the shape (e.g. no fraction digits for a
+ * whole amount); they cannot change the style, the currency or a currency
+ * display the user picked.
+ */
 export function formatCurrencyValue(
   cents: number,
   currency: string,
   prefs: LocaleFormatInput,
+  options?: Intl.NumberFormatOptions,
 ): string {
   const code = (currency || prefs.currencyCode || 'USD').toUpperCase();
   const amount = cents / 100;
   try {
     return new Intl.NumberFormat(intlLocaleFor(prefs.formatLocale), {
+      ...options,
+      ...currencyFormatOptions(prefs.currencyDisplay),
       style: 'currency',
       currency: code,
-      ...currencyFormatOptions(prefs.currencyDisplay),
     }).format(amount);
   } catch {
     // `Intl` throws `RangeError` on a malformed currency code (it validates the

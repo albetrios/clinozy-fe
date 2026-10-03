@@ -11,6 +11,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover) — never build `bg-tone-${tone}`.
 - `clinic-section-icons.ts` — each section's icon.
+- `clinic-phone.ts` — a stored E.164 mobile as the design shows it
+  (`+91 98250 44120`) and the channel links (call, WhatsApp, Instagram) the
+  person cards and the chat open.
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11).

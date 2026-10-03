@@ -36,7 +36,11 @@ export function useLocaleFormat(): {
     meta?: FormatDateMeta,
   ) => string;
   formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
-  formatCurrency: (cents: number, currency?: string) => string;
+  formatCurrency: (
+    cents: number,
+    currency?: string,
+    options?: Intl.NumberFormatOptions,
+  ) => string;
   formatRelativeTime: (iso: string | Date, base?: Date) => string;
 } {
   const locale = useLocaleStore((s) => s.locale);
@@ -83,8 +87,8 @@ export function useLocaleFormat(): {
     [prefs],
   );
   const formatCurrency = useCallback(
-    (cents: number, currency?: string) =>
-      formatCurrencyValue(cents, currency ?? currencyCode, prefs),
+    (cents: number, currency?: string, options?: Intl.NumberFormatOptions) =>
+      formatCurrencyValue(cents, currency ?? currencyCode, prefs, options),
     [prefs, currencyCode],
   );
   const formatRelativeTime = useCallback(

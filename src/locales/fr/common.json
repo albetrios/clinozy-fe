@@ -98,6 +98,88 @@
     "description": "Une nouvelle version de l’application est prête.",
     "refresh": "Actualiser maintenant"
   },
+  "cells": {
+    "patient": "Patient",
+    "patientMark": "P",
+    "moreCount": "{{count}} de plus"
+  },
+  "emptyState": {
+    "fallbackTitle": "Rien ici pour l’instant",
+    "filteredTitle": "Aucun résultat",
+    "filteredHint": "Rien ne correspond à ces filtres. Effacez-les pour tout revoir.",
+    "clearFilters": "Effacer les filtres"
+  },
+  "personCard": {
+    "contactLabel": "Contact",
+    "openPatientFile": "Ouvrir le dossier patient",
+    "since": "Depuis le {{date}}",
+    "leadSince": "Lead depuis le {{date}}",
+    "kind": {
+      "patient": "Patient",
+      "lead": "Lead",
+      "contact": "Contact"
+    },
+    "editContact": "Modifier le contact",
+    "changeContact": "Changer de contact",
+    "changeContactHint": "Choisir un autre contact",
+    "reach": "Coordonnées",
+    "team": "Équipe",
+    "about": "À propos",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · principal",
+      "whatsappAlternate": "WhatsApp · secondaire",
+      "phonePrimary": "Téléphone · principal",
+      "phoneAlternate": "Téléphone · secondaire",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Appeler",
+    "openInstagram": "Ouvrir Instagram",
+    "copy": "Copier",
+    "copied": "{{value}} copié",
+    "noReach": "Aucun numéro ni identifiant enregistré pour l’instant",
+    "claim": "Ouvert · Prendre",
+    "claimHint": "Un lead avec cette personne est ouvert · prenez-le",
+    "gender": {
+      "female": "Femme",
+      "male": "Homme",
+      "other": "Autre"
+    },
+    "genderAge": "{{gender}} · {{age}} ans",
+    "age": "{{age}} ans",
+    "cameVia": "Venu via {{source}}",
+    "owedToThem": "{{amount}} à lui rendre",
+    "owedByThem": "{{amount}} dus à la clinique",
+    "reviews_one": "{{count}} avis · dernier {{rating}}★ sur {{source}} · {{date}}",
+    "reviews_many": "{{count}} d’avis · dernier {{rating}}★ sur {{source}} · {{date}}",
+    "reviews_other": "{{count}} avis · dernier {{rating}}★ sur {{source}} · {{date}}",
+    "consent": {
+      "data": "Données",
+      "photos": "Photos",
+      "marketing": "Marketing",
+      "hint": "Consentement · {{label}}",
+      "given": "{{label}} : consentement donné",
+      "missing": "{{label}} : pas de consentement"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "Nouvelle demande pour ce contact",
+    "newAppointment": "+ Rendez-vous",
+    "newAppointmentHint": "Réserver pour ce contact",
+    "newPatient": "+ Patient",
+    "newPatientHint": "Créer un dossier patient pour ce contact",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "memberKind": {
+      "assigned": "Assigné",
+      "sentThis": "A envoyé ceci",
+      "treating": "Traite",
+      "involved": "Impliqué"
+    },
+    "assignToYourself": "Me l’assigner",
+    "works": "Travaille {{from}} – {{to}}",
+    "updated": "Mis à jour à {{time}}",
+    "fetching": "Récupération des dernières données…"
+  },
   "a11y": {
     "close": "Fermer",
     "loading": "Chargement",

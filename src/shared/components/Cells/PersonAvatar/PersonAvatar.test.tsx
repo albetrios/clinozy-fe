@@ -1,0 +1,81 @@
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { axe } from 'vitest-axe';
+
+import { personInitials, shortPersonName } from './person-name.ts';
+import { PersonAvatar } from './PersonAvatar.tsx';
+
+describe('personInitials', () => {
+  it('takes the first letter of the first two words', () => {
+    expect(personInitials('Rhea Shah')).toBe('RS');
+    expect(personInitials('  dharti   galani  ')).toBe('DG');
+    expect(personInitials('Anaya Mehta Desai')).toBe('AM');
+    expect(personInitials('Madonna')).toBe('M');
+    expect(personInitials('')).toBe('');
+  });
+});
+
+describe('shortPersonName', () => {
+  it('keeps the first name and the last initial', () => {
+    expect(shortPersonName('Riya Shah')).toBe('Riya S.');
+    expect(shortPersonName('  Nidhi   Kapoor Mehta ')).toBe('Nidhi K.');
+  });
+
+  it('keeps a doctor’s name after the title', () => {
+    expect(shortPersonName('Dr. Drashti Desai')).toBe('Dr. Drashti');
+    expect(shortPersonName('Dr.Reenal Patel')).toBe('Dr. Reenal');
+  });
+
+  it('leaves a single name alone', () => {
+    expect(shortPersonName('Madonna')).toBe('Madonna');
+    expect(shortPersonName('')).toBe('');
+  });
+});
+
+describe('PersonAvatar', () => {
+  it('draws the initials in the tone, hidden from assistive technology', () => {
+    const { container } = render(<PersonAvatar initials="RS" tone="sage" />);
+    const root = container.querySelector('[data-slot="person-avatar"]');
+    expect(root).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('RS')).toHaveClass(
+      'bg-tone-sage',
+      'text-tone-sage-foreground',
+      'text-micro',
+      'font-semibold',
+    );
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-8');
+  });
+
+  it('adds the "P" badge for a patient', () => {
+    render(<PersonAvatar initials="RS" tone="sage" patient />);
+    const badge = screen.getByTestId('patient-badge');
+    expect(badge).toHaveTextContent('P');
+    expect(badge).toHaveClass('bg-success', 'size-3.5');
+  });
+
+  it('sizes the card avatar with the 16px badge and a presence dot', () => {
+    const { container } = render(
+      <PersonAvatar initials="DR" tone="sky" size="lg" patient presence="online" />,
+    );
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-12');
+    expect(screen.getByTestId('patient-badge')).toHaveClass('size-4');
+    expect(container.querySelector('[data-presence="online"]')).toHaveClass(
+      'bg-presence-online',
+      'size-3',
+    );
+  });
+
+  it('paints an offline dot in border-strong', () => {
+    const { container } = render(
+      <PersonAvatar initials="NK" tone="lav" presence="offline" />,
+    );
+    expect(container.querySelector('[data-presence="offline"]')).toHaveClass(
+      'bg-border-strong',
+    );
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PersonAvatar initials="RS" tone="sage" patient />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});

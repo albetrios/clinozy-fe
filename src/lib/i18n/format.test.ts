@@ -139,6 +139,21 @@ describe('formatCurrencyValue', () => {
     expect(jp).toMatch(/[\d¥]/);
   });
 
+  it('takes shape options but keeps the currency and the chosen display', () => {
+    const whole = { minimumFractionDigits: 0, maximumFractionDigits: 0 };
+    expect(
+      formatCurrencyValue(12345600, 'INR', prefs({ formatLocale: 'en-IN' }), whole),
+    ).toBe('₹1,23,456');
+    // An option cannot swap the currency, the style or the user's display.
+    expect(
+      formatCurrencyValue(9900, 'INR', prefs({ currencyDisplay: 'code' }), {
+        currency: 'USD',
+        style: 'decimal',
+        currencyDisplay: 'symbol',
+      }),
+    ).toMatch(/^INR\s99\.00$/);
+  });
+
   it('does not throw on a malformed server currency code (falls back gracefully)', () => {
     // Intl.NumberFormat throws RangeError on a non-alpha-3 currency; the billing
     // UI must never crash over one bad server value.
