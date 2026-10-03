@@ -23,6 +23,9 @@ export type BuildEnvironment = (typeof BUILD_ENVIRONMENTS)[number];
  */
 export const BUILD_ENVIRONMENT_VARIABLE = 'BUILD_ENVIRONMENT';
 
+/** The variable a bundle reports its environment through (Sentry, PostHog). */
+const IDENTITY_VARIABLE = 'VITE_APP_ENV';
+
 function isBuildEnvironment(value: string): value is BuildEnvironment {
   return (BUILD_ENVIRONMENTS as readonly string[]).includes(value);
 }
@@ -40,6 +43,9 @@ function isBuildEnvironment(value: string): value is BuildEnvironment {
  *
  * Unlike clinozy-be, `.env.local` is never laid over a chosen deploy environment: a build
  * bakes its env into the bundle that ships, so a machine-local override would ship with it.
+ *
+ * `VITE_APP_ENV` follows the environment read: filled in when its file leaves it out, refused
+ * when it names a different one.
  *
  * With nothing chosen and no `.env.local` (CI, deploys) this returns `root` and Vite's own
  * files load — a deploy's materialized `.env.production.local` — exactly as before. Throws on
@@ -74,6 +80,18 @@ export function applyBuildEnvironment({
   }
   for (const [key, value] of Object.entries(parseEnv(readFileSync(file, 'utf8')))) {
     if (processEnv[key] === undefined) processEnv[key] = value;
+  }
+  // The bundle reports the environment it was built for — as the deploy workflow derives
+  // VITE_APP_ENV from the resolved environment (and clinozy-be's NODE_ENV names the file it
+  // reads). Filled in when the file leaves it out; a file or shell naming ANOTHER environment
+  // is a mistake, refused before anything is built.
+  const identity = processEnv[IDENTITY_VARIABLE];
+  if (identity === undefined || identity === '') {
+    processEnv[IDENTITY_VARIABLE] = environment;
+  } else if (identity !== environment) {
+    throw new Error(
+      `A ${environment} build reads .env.${environment}, but ${IDENTITY_VARIABLE}=${identity} — it must be ${environment} (or left out).`,
+    );
   }
   return false;
 }

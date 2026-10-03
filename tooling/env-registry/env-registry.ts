@@ -10,9 +10,12 @@
  * Modes:
  *   --catalog [--check]  (re)generate docs/reference/env-catalog.md. `--check`
  *                        fails (exit 1) on drift instead of writing.
- *   --defaults <env>     print JSON of `envProfiles.<env>.defaults` to stdout —
- *                        the bridge the Node `github:sync` reads to detect (and
- *                        prune) variables whose value equals the schema default.
+ *   --defaults           print JSON of the runtime-fallback schema defaults to
+ *                        stdout — the bridge the Node `github:sync` reads to detect
+ *                        (and prune) variables whose value equals the schema default.
+ *   --profile-defaults <env>
+ *                        print JSON of `envProfiles.<env>.defaults` — the starting
+ *                        values `github:sync` writes into a NEW `.env.<env>` file.
  *
  * Run via tsx: `node --import tsx tooling/env-registry/env-registry.ts …`.
  */
@@ -177,8 +180,28 @@ function runDefaults(): void {
   process.stdout.write(JSON.stringify(Object.fromEntries(schemaDefaults())));
 }
 
+/**
+ * Emit `envProfiles.<env>.defaults` — the SCAFFOLD values a new `.env.<env>` file starts
+ * from (`tooling/setup/github/scaffold-env-files.mjs`), as `setup:local` does for `local`.
+ */
+function runProfileDefaults(environment: string | undefined): void {
+  const known = Object.keys(envProfiles);
+  if (environment === undefined || !known.includes(environment)) {
+    console.error(`--profile-defaults needs an environment: ${known.join(', ')}.`);
+    process.exit(1);
+  }
+  process.stdout.write(
+    JSON.stringify(Object.fromEntries(profileDefaults(environment as AppEnvironment))),
+  );
+}
+
 function main(): void {
   const argv = process.argv.slice(2);
+  const profileFlag = argv.indexOf('--profile-defaults');
+  if (profileFlag !== -1) {
+    runProfileDefaults(argv[profileFlag + 1]);
+    return;
+  }
   if (argv.includes('--catalog')) {
     runCatalog(argv.includes('--check'));
     return;
@@ -187,7 +210,9 @@ function main(): void {
     runDefaults();
     return;
   }
-  console.error('Usage: env-registry.ts (--catalog [--check] | --defaults)');
+  console.error(
+    'Usage: env-registry.ts (--catalog [--check] | --defaults | --profile-defaults <env>)',
+  );
   process.exit(1);
 }
 

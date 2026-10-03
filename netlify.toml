@@ -1,8 +1,16 @@
-# Netlify build config for Clinozy Frontend
-# GitHub integration: connect the repo in Netlify → Site settings → Build & deploy
+# Netlify config for Clinozy Frontend — deploy-time only (headers, redirects).
+#
+# clinozy-fe never builds ON Netlify. GitHub Actions runs `pnpm build` — the env it bakes is
+# validated there, production's bytes are attested, and the one build that uploads source maps
+# to Sentry is the one that ships — then uploads dist/ with `netlify deploy --no-build`. So:
+#   - `ignore` exits 0, which cancels any build Netlify's Git integration starts;
+#   - `command` fails, so a build started any other way (a `netlify deploy` without
+#     --no-build) stops instead of shipping a second, unvalidated bundle.
+# Pinned by tests/ci/netlify-no-build.policy.test.ts.
 
 [build]
-  command = "pnpm build"
+  ignore = "exit 0"
+  command = "echo 'clinozy-fe does not build on Netlify: run pnpm build, then netlify deploy --no-build (docs/deployment/cicd-and-netlify.md).' >&2; exit 1"
   publish = "dist"
 
 [build.environment]

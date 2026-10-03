@@ -61,12 +61,54 @@ describe('build environment', () => {
       [BUILD_ENVIRONMENT_VARIABLE]: 'development',
       [`${PREFIX}API_BASE_URL`]: 'https://development--api.example.com',
       [`${PREFIX}FROM_SHELL`]: 'shell',
+      VITE_APP_ENV: 'development',
     });
+  });
+
+  it('the bundle reports the environment it was built for (VITE_APP_ENV)', () => {
+    // Left out of the file: filled in from the choice.
+    const filled: NodeJS.ProcessEnv = { [BUILD_ENVIRONMENT_VARIABLE]: 'production' };
+    applyBuildEnvironment({ command: 'build', root, processEnv: filled });
+    expect(filled.VITE_APP_ENV).toBe('production');
+
+    // Blank in the shell counts as left out; the same name is kept.
+    const blank: NodeJS.ProcessEnv = {
+      [BUILD_ENVIRONMENT_VARIABLE]: 'local',
+      VITE_APP_ENV: '',
+    };
+    applyBuildEnvironment({ command: 'build', root, processEnv: blank });
+    expect(blank.VITE_APP_ENV).toBe('local');
+
+    // Another environment's name — from the shell or from the file — is refused.
+    expect(() =>
+      applyBuildEnvironment({
+        command: 'build',
+        root,
+        processEnv: {
+          [BUILD_ENVIRONMENT_VARIABLE]: 'production',
+          VITE_APP_ENV: 'development',
+        },
+      }),
+    ).toThrow('VITE_APP_ENV=development — it must be production');
+    const mislabelled = mkdtempSync(join(tmpdir(), 'clinozy-build-environment-label-'));
+    try {
+      writeFileSync(join(mislabelled, '.env.production'), 'VITE_APP_ENV=local\n');
+      expect(() =>
+        applyBuildEnvironment({
+          command: 'build',
+          root: mislabelled,
+          processEnv: { [BUILD_ENVIRONMENT_VARIABLE]: 'production' },
+        }),
+      ).toThrow('VITE_APP_ENV=local — it must be production');
+    } finally {
+      rmSync(mislabelled, { recursive: true, force: true });
+    }
   });
 
   it('Vite, given envDir false, builds from exactly those values', () => {
     const keys = Object.keys(process.env).filter((key) => key.startsWith(PREFIX));
     expect(keys).toEqual([]);
+    const appEnvBefore = process.env.VITE_APP_ENV;
     try {
       process.env[BUILD_ENVIRONMENT_VARIABLE] = 'local';
       const envDir = applyBuildEnvironment({ command: 'build', root });
@@ -77,6 +119,8 @@ describe('build environment', () => {
       });
     } finally {
       delete process.env[BUILD_ENVIRONMENT_VARIABLE];
+      if (appEnvBefore === undefined) delete process.env.VITE_APP_ENV;
+      else process.env.VITE_APP_ENV = appEnvBefore;
       for (const key of Object.keys(process.env).filter((name) =>
         name.startsWith(PREFIX),
       )) {

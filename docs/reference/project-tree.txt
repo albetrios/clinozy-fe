@@ -1483,7 +1483,7 @@ clinozy-fe/
 │   └── vite-env.d.ts
 ├── tests/
 │   ├── ci/
-│   │   └── [32 test files]
+│   │   └── [33 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -1598,7 +1598,7 @@ clinozy-fe/
 │   │   │   ├── sync-rulesets.mjs
 │   │   │   ├── sync.mjs
 │   │   │   ├── validate-github-env.mjs
-│   │   │   └── [6 test files]
+│   │   │   └── [7 test files]
 │   │   └── setup.config.json
 │   ├── sonar/
 │   │   └── sonar-gate.mjs

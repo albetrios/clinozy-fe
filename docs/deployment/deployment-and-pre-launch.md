@@ -228,7 +228,7 @@ pnpm run deploy:netlify
 pnpm run deploy:netlify:prod
 ```
 
-Both scripts run `pnpm build` then deploy. You can also run `pnpm build` and `pnpm exec netlify deploy` (or `--prod`) separately.
+Both scripts run `pnpm build` then `netlify deploy --no-build`. You can also run `pnpm build` and `pnpm exec netlify deploy --no-build` (or `--prod --no-build`) separately — always with `--no-build`, since netlify-cli would otherwise rebuild, and `netlify.toml` refuses to.
 
 **Link an existing site (if you already created it in the UI)**
 

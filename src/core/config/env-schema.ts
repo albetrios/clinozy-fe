@@ -406,7 +406,10 @@ const devLikeContract: Omit<EnvProfile, 'defaults'> = {
  * checked against the resolved runtime env; `forbidden` is checked against
  * git-TRACKED `.env` + `.env.<env>` files only (gitignored local files like
  * `.env.local` are skipped), so local secrets never trip a deploy guard. `defaults`
- * are the per-env starting values `pnpm setup:local` writes into `.env.<env>`.
+ * are each environment's starting values: `pnpm setup:local` writes `local`'s into
+ * `.env.local`, and `pnpm github:sync` writes `development`'s / `production`'s into a NEW
+ * `.env.<env>` (tooling/setup/github/scaffold-env-files.mjs). Existing files are never
+ * rewritten.
  */
 export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
   local: {
