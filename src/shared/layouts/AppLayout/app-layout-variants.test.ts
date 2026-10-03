@@ -76,10 +76,10 @@ describe('app-layout-variants', () => {
   });
 
   describe('preloadSessionAppShell — the shell THIS session will mount', () => {
-    it('is the sidebar for a multi-org session on the default preview variant', async () => {
+    it('is the section bar for a multi-org session on the default variant', async () => {
       await variants.preloadSessionAppShell();
 
-      expect(fetched(variants)).toEqual(['sidebar']);
+      expect(fetched(variants)).toEqual(['sectionBar']);
     });
 
     it('is the Focus shell for a personal-only session', async () => {
@@ -93,7 +93,7 @@ describe('app-layout-variants', () => {
     });
 
     it('follows the shuffle preview variant, exactly as AppLayout does', async () => {
-      useThemeStore.setState({ appVariant: 1 });
+      useThemeStore.setState({ appVariant: 2 });
 
       await variants.preloadSessionAppShell();
 

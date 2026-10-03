@@ -77,7 +77,8 @@ describe('SHELL-2 — a shell chunk that never arrives', () => {
       isPending: false,
       isError: false,
     });
-    useThemeStore.setState({ appVariant: 0 });
+    // Variant 1 is the sidebar (0 is the section bar, the default).
+    useThemeStore.setState({ appVariant: 1 });
     // Every test starts from exactly one failed fetch. Only the retry test gets
     // as far as a second attempt, and that one is meant to succeed.
     //

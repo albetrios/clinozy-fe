@@ -90,11 +90,20 @@ describe('AppLayout', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    useThemeStore.setState({ appVariant: 0 });
+    useThemeStore.setState({ appVariant: 1 });
     useOrganizationStore.setState({ deploymentFlags: DEFAULT_DEPLOYMENT_FLAGS });
     quickLinksMock.mockReturnValue(<div data-testid="sidebar-quick-links" />);
     switcherMock.mockReturnValue(<div data-testid="organization-switcher-trigger" />);
     contextLoaded();
+  });
+
+  it('mounts the section bar for a team session on the default variant', async () => {
+    useThemeStore.setState({ appVariant: 0 });
+    const { findByTestId, container } = renderWithProviders(<AppLayout />);
+
+    expect(await findByTestId('header')).toBeInTheDocument();
+    expect(container.querySelector('[data-shell="section-bar"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="sidebar"]')).toBeNull();
   });
 
   it('renders the app layout: sidebar, header, main region, mobile nav', async () => {
@@ -126,8 +135,8 @@ describe('AppLayout', () => {
     expect(await findByTestId('main-content')).toBeInTheDocument();
   });
 
-  it('renders the top-nav preview shell (1)', async () => {
-    useThemeStore.setState({ appVariant: 1 });
+  it('renders the top-nav preview shell (2)', async () => {
+    useThemeStore.setState({ appVariant: 2 });
     const { findByTestId, findAllByTestId } = renderWithProviders(<AppLayout />);
 
     expect(await findByTestId('app-layout')).toBeInTheDocument();
@@ -137,8 +146,8 @@ describe('AppLayout', () => {
     expect((await findAllByTestId('nav-dashboard')).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders the icon-rail preview shell (2) with the profile control', async () => {
-    useThemeStore.setState({ appVariant: 2 });
+  it('renders the icon-rail preview shell (3) with the profile control', async () => {
+    useThemeStore.setState({ appVariant: 3 });
     const { findByTestId } = renderWithProviders(<AppLayout />);
 
     expect(await findByTestId('app-layout')).toBeInTheDocument();
@@ -400,10 +409,10 @@ describe('AppLayout', () => {
     // has been silently un-wrapped before. A boundary nothing asserts is a
     // boundary that quietly goes away again.
     it.each([
-      ['sidebar (desktop)', 0, 'org-switcher-error-sidebar'],
-      ['sidebar (mobile)', 0, 'org-switcher-error-mobile'],
-      ['top-nav', 1, 'org-switcher-error'],
-      ['icon-rail', 2, 'org-switcher-error'],
+      ['sidebar (desktop)', 1, 'org-switcher-error-sidebar'],
+      ['sidebar (mobile)', 1, 'org-switcher-error-mobile'],
+      ['top-nav', 2, 'org-switcher-error'],
+      ['icon-rail', 3, 'org-switcher-error'],
     ])('contains the throw in the %s shell', async (_label, appVariant, testId) => {
       useThemeStore.setState({ appVariant });
       const { findByTestId, queryByTestId } = renderWithProviders(<AppLayout />);
@@ -422,7 +431,7 @@ describe('AppLayout', () => {
       // two error controls at once. jsdom has no media queries, so assert the
       // responsive class sits on the wrapper that survives the throw. (`lg`, not
       // `md`: the sidebar is a drawer on tablets, so they use this switcher too.)
-      useThemeStore.setState({ appVariant: 0 });
+      useThemeStore.setState({ appVariant: 1 });
       const { findByTestId } = renderWithProviders(<AppLayout />);
 
       const mobile = await findByTestId('org-switcher-error-mobile');
