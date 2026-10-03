@@ -128,8 +128,22 @@ const config = [
            * the launch never draws (CommandDialog, drawer top / left / right,
            * the physical sheet sides, vertical tabs and resizable groups) were
            * trimmed first (−0.8 kB).
+           *
+           * 27 → 36 kB (L-07a … L-23, same exemption): the launch's shared
+           * clinic layer — every unit the rooms compose — measured by building
+           * each row boundary (35.74 kB at the last). The foundations (+1.78 kB:
+           * the phone bottom stack, the icon marks, and the literal tone class
+           * maps — eleven tones × ten utilities, which Tailwind can only see
+           * spelled out), the section-bar shell and the room islands (+1.63),
+           * the reason confirm and the toast bar (+0.58), the DataTable's folds,
+           * phone rows and bulk bar (+1.16), the Picker and its date / time /
+           * calendar pickers (+1.38), the record drawer and its steps and footer
+           * (+0.85), the cells, person cards and tooltip (+0.48), the upload
+           * tray (+0.16) and the A4 print sheets' millimetre utilities (+1.06,
+           * print-only — the first candidate to leave the first paint, into a
+           * stylesheet the print host loads). Re-itemise as the screens land.
            */
-          limit: '27 kB',
+          limit: '36 kB',
           gzip: true,
         },
       ]
