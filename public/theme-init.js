@@ -6,8 +6,8 @@ try {
   var state = stored.state || {};
   var theme = state.theme;
   var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  var isDark =
-    theme === 'dark' || (theme === 'system' && prefersDark) || (!theme && prefersDark);
+  // No stored mode = the store's default, light (the design's default).
+  var isDark = theme === 'dark' || (theme === 'system' && prefersDark);
 
   var root = document.documentElement;
   if (isDark) {
@@ -18,6 +18,10 @@ try {
 
   // Named preset primaries — must match index.css [data-theme] blocks.
   var PRESET_PRIMARY = {
+    'clinozy-zinc-pastel': {
+      light: ['oklch(0.21 0.006 285.9)', 'oklch(0.985 0 0)'],
+      dark: ['oklch(0.967 0.001 286.4)', 'oklch(0.165 0.004 285.9)'],
+    },
     violet: {
       light: ['oklch(0.55 0.22 290)', 'oklch(0.985 0 0)'],
       dark: ['oklch(0.62 0.19 290)', 'oklch(0.985 0 0)'],
@@ -52,7 +56,12 @@ try {
   };
 
   var mode = isDark ? 'dark' : 'light';
-  var preset = state.preset || 'default';
+  // DEFAULT_PRESET, and the store's v4 migration: a stored base palette from
+  // before v4 means the preset was never picked, so the new default applies.
+  var preset = state.preset || 'clinozy-zinc-pastel';
+  if ((stored.version || 0) < 4 && preset === 'default') {
+    preset = 'clinozy-zinc-pastel';
+  }
 
   // Shape language, for the boot splash only. Under Sharp nothing in the app is
   // round — and the splash is the first thing on screen. Without this its mark

@@ -8,6 +8,7 @@ import {
   applyIconWeight,
   applyMenuStyle,
   applyThemePreset,
+  BASE_PRESET,
   DEFAULT_BASE,
   DEFAULT_ICON_COLOR,
   DEFAULT_ICON_LIBRARY,
@@ -30,6 +31,7 @@ import {
   nextToastVariant,
   normalizeLayoutWidthId,
   normalizeLook,
+  presetAxisDefaults,
   randomSeed,
   releaseBootThemeVars,
   SHUFFLE_TEMP,
@@ -95,6 +97,13 @@ interface ThemeStore {
   shuffleTheme: () => void;
 }
 
+/** What a fresh install starts on: the default preset's own axes over the
+ *  platform defaults, light mode (the design's default — System follows the OS
+ *  once chosen). */
+const FIRST_VISIT_AXES = presetAxisDefaults(DEFAULT_PRESET);
+const FIRST_VISIT_ICON_WEIGHT = FIRST_VISIT_AXES.iconWeight ?? DEFAULT_ICON_WEIGHT;
+const FIRST_VISIT_LAYOUT_WIDTH = FIRST_VISIT_AXES.layoutWidth ?? DEFAULT_LAYOUT_WIDTH;
+
 function applyMode(theme: Mode) {
   const root = document.documentElement;
   const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -130,12 +139,12 @@ function applyActiveLook(preset: string, customTheme: GeneratedTheme | null): vo
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      theme: 'system',
+      theme: 'light',
       preset: DEFAULT_PRESET,
       customTheme: null,
       baseId: DEFAULT_BASE,
       menu: DEFAULT_MENU,
-      iconWeight: DEFAULT_ICON_WEIGHT,
+      iconWeight: FIRST_VISIT_ICON_WEIGHT,
       iconColor: DEFAULT_ICON_COLOR,
       iconLibrary: DEFAULT_ICON_LIBRARY,
       authVariant: 0,
@@ -145,7 +154,7 @@ export const useThemeStore = create<ThemeStore>()(
       toastVariant: DEFAULT_TOAST_VARIANT,
       toastPosition: DEFAULT_TOAST_POSITION,
       seed: null,
-      layoutWidth: DEFAULT_LAYOUT_WIDTH,
+      layoutWidth: FIRST_VISIT_LAYOUT_WIDTH,
       setTheme: (theme) => {
         applyMode(theme);
         // Re-taken for the new mode: the snapshot the boot script replays is
@@ -156,9 +165,18 @@ export const useThemeStore = create<ThemeStore>()(
         set({ theme });
       },
       setPreset: (preset) => {
-        const next = isThemePreset(preset) ? preset : DEFAULT_PRESET;
+        const next = isThemePreset(preset) ? preset : BASE_PRESET;
         applyThemePreset(next);
-        set({ preset: next, customTheme: null, seed: null });
+        // A preset designed with its own icon weight / layout width brings them.
+        const axes = presetAxisDefaults(next);
+        if (axes.iconWeight) applyIconWeight(axes.iconWeight);
+        set({
+          preset: next,
+          customTheme: null,
+          seed: null,
+          ...(axes.iconWeight ? { iconWeight: axes.iconWeight } : {}),
+          ...(axes.layoutWidth ? { layoutWidth: axes.layoutWidth } : {}),
+        });
       },
       updateLook: (partial) => {
         // Change one axis of the current look and switch to custom. A hand-tweaked
@@ -246,7 +264,7 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'theme-preference',
-      version: 3,
+      version: 4,
       migrate: (persisted, version) => {
         if (persisted && typeof persisted === 'object') {
           const next: Record<string, unknown> = { ...persisted };
@@ -255,6 +273,25 @@ export const useThemeStore = create<ThemeStore>()(
           }
           if (version < 3) {
             next.layoutWidth = DEFAULT_LAYOUT_WIDTH;
+          }
+          // v4 ships a named preset as the default. Whoever was still on the old
+          // default (the base palette) never picked one, so they move to the new
+          // default with its axes — unless they had changed an axis themselves.
+          // `public/theme-init.js` mirrors this for the pre-paint.
+          if (version < 4 && (next.preset === undefined || next.preset === BASE_PRESET)) {
+            next.preset = DEFAULT_PRESET;
+            if (
+              next.iconWeight === undefined ||
+              next.iconWeight === DEFAULT_ICON_WEIGHT
+            ) {
+              next.iconWeight = FIRST_VISIT_ICON_WEIGHT;
+            }
+            if (
+              next.layoutWidth === undefined ||
+              next.layoutWidth === DEFAULT_LAYOUT_WIDTH
+            ) {
+              next.layoutWidth = FIRST_VISIT_LAYOUT_WIDTH;
+            }
           }
           delete next.authVariant;
           delete next.appVariant;

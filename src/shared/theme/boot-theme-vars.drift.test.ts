@@ -1,16 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInThisContext } from 'node:vm';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   applyGeneratedTheme,
   applyThemePreset,
+  BASE_PRESET,
   BOOT_SPLASH_VARS,
   DEFAULT_PRESET,
   generateSeededTheme,
   releaseBootThemeVars,
+  THEME_PRESETS,
 } from './presets.ts';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -81,4 +84,79 @@ describe('boot palette hand-off (theme-init.js ↔ shared/theme)', () => {
       expect(pinned).toEqual([]);
     });
   }
+});
+
+/** The value of `name` inside the first `selector { … }` block of index.css. */
+function cssToken(css: string, selector: string, name: string): string | undefined {
+  const start = css.indexOf(`${selector} {`);
+  if (start === -1) return undefined;
+  const body = css.slice(start, css.indexOf('}', start));
+  return new RegExp(`${name}:\\s*([^;]+);`).exec(body)?.[1]?.trim();
+}
+
+/**
+ * Run `public/theme-init.js` the way the browser does — before any bundle —
+ * against a stored preference, and report what it left on `<html>`.
+ */
+function runThemeInit(stored: unknown) {
+  const root = document.documentElement;
+  if (stored === undefined) localStorage.removeItem('theme-preference');
+  else localStorage.setItem('theme-preference', JSON.stringify(stored));
+  const source = readFileSync(join(repoRoot, 'public/theme-init.js'), 'utf8');
+  // As a classic <script> would: in this realm, against jsdom's globals.
+  // eslint-disable-next-line sonarjs/code-eval -- the repo's own pre-paint script, under test
+  runInThisContext(source, { filename: 'public/theme-init.js' });
+  return {
+    theme: root.dataset.theme,
+    dark: root.classList.contains('dark'),
+    primary: root.style.getPropertyValue('--color-primary'),
+    primaryForeground: root.style.getPropertyValue('--color-primary-foreground'),
+  };
+}
+
+describe('pre-paint preset (theme-init.js ↔ index.css ↔ presets.ts)', () => {
+  const css = readFileSync(join(repoRoot, 'src/index.css'), 'utf8');
+
+  afterEach(() => {
+    const root = document.documentElement;
+    root.style.removeProperty('--color-primary');
+    root.style.removeProperty('--color-primary-foreground');
+    root.classList.remove('dark');
+    delete root.dataset.theme;
+    localStorage.removeItem('theme-preference');
+  });
+
+  for (const { id } of THEME_PRESETS.filter((preset) => preset.id !== BASE_PRESET)) {
+    for (const mode of ['light', 'dark'] as const) {
+      it(`paints ${id} (${mode}) with the primary its index.css block declares`, () => {
+        const painted = runThemeInit({ state: { theme: mode, preset: id }, version: 4 });
+        const selector =
+          mode === 'dark' ? `.dark[data-theme='${id}']` : `[data-theme='${id}']`;
+
+        expect(painted.theme).toBe(id);
+        expect(painted.primary).toBe(cssToken(css, selector, '--color-primary'));
+        expect(painted.primaryForeground).toBe(
+          cssToken(css, selector, '--color-primary-foreground'),
+        );
+      });
+    }
+  }
+
+  it('a first visit paints the default preset in light — no flash to the base palette', () => {
+    const painted = runThemeInit(undefined);
+    expect(painted.theme).toBe(DEFAULT_PRESET);
+    expect(painted.dark).toBe(false);
+  });
+
+  it('mirrors the v4 migration: a pre-v4 base palette was never picked', () => {
+    expect(runThemeInit({ state: { preset: BASE_PRESET }, version: 3 }).theme).toBe(
+      DEFAULT_PRESET,
+    );
+  });
+
+  it('keeps a base palette picked on v4 attribute-free', () => {
+    expect(
+      runThemeInit({ state: { preset: BASE_PRESET }, version: 4 }).theme,
+    ).toBeUndefined();
+  });
 });

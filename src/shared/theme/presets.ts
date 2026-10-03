@@ -1,25 +1,47 @@
 export interface ThemePreset {
   id: string;
   label: string;
+  /**
+   * Orthogonal store axes the preset was designed with. Picking the preset
+   * applies them, and the default preset seeds them for a first visit; a key
+   * left out keeps the user's own choice.
+   */
+  axisDefaults?: Readonly<{ iconWeight?: string; layoutWidth?: LayoutWidthId }>;
 }
 
 /**
- * Built-in accent presets. `default` uses the base `@theme` palette (no
- * `data-theme`); the others apply accent overrides via the `[data-theme='<id>']`
- * blocks in `src/index.css`, composed with `.dark`.
+ * Built-in named presets. `default` ({@link BASE_PRESET}) is the base `@theme`
+ * palette (no `data-theme`); every other one applies its `[data-theme='<id>']`
+ * blocks in `src/index.css`, composed with `.dark`. The accent presets override
+ * only the accent; `clinozy-zinc-pastel` sets every surface token.
  *
  * Product-design floors for every axis (type scale, density, motion, WCAG):
  * docs/reference/preset-product-design-rules.md
  */
 export const THEME_PRESETS: readonly ThemePreset[] = [
-  { id: 'default', label: 'Default' },
+  {
+    id: 'clinozy-zinc-pastel',
+    label: 'Clinozy Zinc Pastel',
+    axisDefaults: { iconWeight: 'thin', layoutWidth: 'full' },
+  },
+  { id: 'default', label: 'Classic' },
   { id: 'violet', label: 'Violet' },
   { id: 'emerald', label: 'Emerald' },
   { id: 'rose', label: 'Rose' },
   { id: 'ocean', label: 'Ocean' },
 ] as const;
 
-export const DEFAULT_PRESET = 'default';
+/** The stock `@theme` palette — the ONLY preset with no `data-theme` attribute,
+ *  and the reset target for an unknown preset id. */
+export const BASE_PRESET = 'default';
+
+/** The preset a fresh install starts on (free to be any named preset). */
+export const DEFAULT_PRESET = 'clinozy-zinc-pastel';
+
+/** A named preset's {@link ThemePreset.axisDefaults} — empty for none or an unknown id. */
+export function presetAxisDefaults(id: string): NonNullable<ThemePreset['axisDefaults']> {
+  return THEME_PRESETS.find((preset) => preset.id === id)?.axisDefaults ?? {};
+}
 
 /** Synthetic preset id for a shuffled/generated look (not in THEME_PRESETS). */
 export const GENERATED_PRESET = 'custom';
@@ -476,15 +498,16 @@ function clearGeneratedTheme(): void {
 }
 
 /**
- * Apply a named preset via `data-theme` (cleared for the default), clearing any
- * generated accent/font/radius/chart vars first. Unknown ids fall back to the
- * default. Pairs with the `.dark` class; orthogonal to base colour + menu.
+ * Apply a named preset via `data-theme` (cleared for {@link BASE_PRESET}),
+ * clearing any generated accent/font/radius/chart vars first. Unknown ids fall
+ * back to the base palette. Pairs with the `.dark` class; orthogonal to base
+ * colour + menu.
  */
 export function applyThemePreset(id: string): void {
   clearGeneratedTheme();
   const root = document.documentElement;
-  const preset = isThemePreset(id) ? id : DEFAULT_PRESET;
-  if (preset === DEFAULT_PRESET) {
+  const preset = isThemePreset(id) ? id : BASE_PRESET;
+  if (preset === BASE_PRESET) {
     delete root.dataset.theme;
   } else {
     root.dataset.theme = preset;

@@ -8,7 +8,9 @@ import {
   applyIconWeight,
   applyMenuStyle,
   applyThemePreset,
+  BASE_PRESET,
   BOOT_THEME_VARS_KEY,
+  DEFAULT_PRESET,
   GENERATED_FONTS,
   GENERATED_PRESET,
   GENERATED_RADII,
@@ -21,6 +23,7 @@ import {
   nextDashboardVariant,
   nextRandomHue,
   oklchToHex,
+  presetAxisDefaults,
   randomThemeHue,
   rollColour,
   rollSurface,
@@ -96,9 +99,32 @@ describe('theme presets', () => {
     expect(document.documentElement.dataset.theme).toBeUndefined();
   });
 
-  it('falls back to default for unknown ids', () => {
+  it('falls back to the base palette for unknown ids', () => {
     applyThemePreset('bogus');
     expect(document.documentElement.dataset.theme).toBeUndefined();
+  });
+
+  it('ships the full-surface clinozy preset as the default, painted by its attribute', () => {
+    expect(DEFAULT_PRESET).toBe('clinozy-zinc-pastel');
+    expect(isThemePreset(DEFAULT_PRESET)).toBe(true);
+    applyThemePreset(DEFAULT_PRESET);
+    expect(document.documentElement.dataset.theme).toBe('clinozy-zinc-pastel');
+  });
+
+  it('keeps the base palette the one preset without an attribute', () => {
+    expect(BASE_PRESET).toBe('default');
+    applyThemePreset(DEFAULT_PRESET);
+    applyThemePreset(BASE_PRESET);
+    expect(document.documentElement.dataset.theme).toBeUndefined();
+  });
+
+  it("carries a preset's own axis defaults, and nothing for the others", () => {
+    expect(presetAxisDefaults('clinozy-zinc-pastel')).toEqual({
+      iconWeight: 'thin',
+      layoutWidth: 'full',
+    });
+    expect(presetAxisDefaults('violet')).toEqual({});
+    expect(presetAxisDefaults('bogus')).toEqual({});
   });
 });
 

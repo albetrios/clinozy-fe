@@ -1,7 +1,9 @@
 import {
+  BASE_PRESET,
   BOOT_THEME_VARS_KEY,
   DEFAULT_ICON_COLOR,
   DEFAULT_LAYOUT_WIDTH,
+  DEFAULT_PRESET,
   GENERATED_PRESET,
   generateSeededTheme,
   SHUFFLE_TEMP,
@@ -56,8 +58,30 @@ describe('useThemeStore', () => {
     localStorage.removeItem(BOOT_THEME_VARS_KEY);
   });
 
-  it('initial state is system', () => {
-    expect(useThemeStore.getState().theme).toBe('system');
+  it('a first visit starts light, on the default preset and its own axes', () => {
+    const initial = useThemeStore.getInitialState();
+    expect(initial.theme).toBe('light');
+    expect(initial.preset).toBe(DEFAULT_PRESET);
+    expect(initial.iconWeight).toBe('thin');
+    expect(initial.layoutWidth).toBe('full');
+  });
+
+  it('picking a preset brings its axis defaults; picking another keeps them', () => {
+    useThemeStore.setState({ iconWeight: 'regular', layoutWidth: 'contained' });
+    useThemeStore.getState().setPreset('clinozy-zinc-pastel');
+    expect(useThemeStore.getState().iconWeight).toBe('thin');
+    expect(useThemeStore.getState().layoutWidth).toBe('full');
+    expect(document.documentElement.style.getPropertyValue('--icon-stroke')).toBe('1.5');
+
+    useThemeStore.getState().setPreset('violet');
+    expect(useThemeStore.getState().iconWeight).toBe('thin');
+    expect(useThemeStore.getState().layoutWidth).toBe('full');
+  });
+
+  it('an unknown preset id falls back to the base palette', () => {
+    useThemeStore.getState().setPreset('bogus');
+    expect(useThemeStore.getState().preset).toBe(BASE_PRESET);
+    expect(document.documentElement.dataset.theme).toBeUndefined();
   });
 
   it('setTheme("dark") updates theme', () => {
@@ -380,7 +404,9 @@ describe('useThemeStore — persistence contract', () => {
     ) as Record<string, unknown>;
 
     expect(migrated.iconColor).toBe(DEFAULT_ICON_COLOR);
-    expect(migrated.layoutWidth).toBe(DEFAULT_LAYOUT_WIDTH);
+    // No preset stored = never picked one: v4 moves it to the default and its axes.
+    expect(migrated.preset).toBe(DEFAULT_PRESET);
+    expect(migrated.layoutWidth).toBe('full');
     expect(migrated.theme).toBe('dark');
     expect(migrated).not.toHaveProperty('authVariant');
     expect(migrated).not.toHaveProperty('appVariant');
@@ -395,7 +421,43 @@ describe('useThemeStore — persistence contract', () => {
     >;
 
     expect(migrated.iconColor).toBe('accent');
-    expect(migrated.layoutWidth).toBe(DEFAULT_LAYOUT_WIDTH);
+    expect(migrated.layoutWidth).toBe('full');
+  });
+
+  it('migrate v3 moves the never-picked base palette to the default preset', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    const migrated = migrate?.(
+      { preset: BASE_PRESET, iconWeight: 'regular', layoutWidth: DEFAULT_LAYOUT_WIDTH },
+      3,
+    ) as Record<string, unknown>;
+
+    expect(migrated.preset).toBe(DEFAULT_PRESET);
+    expect(migrated.iconWeight).toBe('thin');
+    expect(migrated.layoutWidth).toBe('full');
+  });
+
+  it('migrate v3 keeps a picked preset and any axis the user changed', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    const picked = migrate?.({ preset: 'violet', iconWeight: 'regular' }, 3) as Record<
+      string,
+      unknown
+    >;
+    expect(picked.preset).toBe('violet');
+    expect(picked.iconWeight).toBe('regular');
+
+    const tuned = migrate?.(
+      { preset: BASE_PRESET, iconWeight: 'bold', layoutWidth: 'reading' },
+      3,
+    ) as Record<string, unknown>;
+    expect(tuned.preset).toBe(DEFAULT_PRESET);
+    expect(tuned.iconWeight).toBe('bold');
+    expect(tuned.layoutWidth).toBe('reading');
+  });
+
+  it('a v4 base palette is a choice, kept as is', () => {
+    const migrate = useThemeStore.persist.getOptions().migrate;
+    const kept = migrate?.({ preset: BASE_PRESET }, 4) as Record<string, unknown>;
+    expect(kept.preset).toBe(BASE_PRESET);
   });
 
   it('migrate passes non-object persisted state through untouched', () => {

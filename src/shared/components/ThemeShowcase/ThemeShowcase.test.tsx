@@ -15,7 +15,7 @@ describe('ThemeShowcase', () => {
   it('renders the theme bar with the active preset label + palette', () => {
     render(<ThemeShowcase />);
     expect(screen.getByTestId('dashboard-theme-showcase')).toBeInTheDocument();
-    expect(screen.getByTestId('dashboard-theme-label')).toHaveTextContent('Default');
+    expect(screen.getByTestId('dashboard-theme-label')).toHaveTextContent('Classic');
     expect(screen.getByTestId('dashboard-theme-palette')).toBeInTheDocument();
   });
 
