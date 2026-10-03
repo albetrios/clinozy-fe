@@ -48,6 +48,14 @@ describe('Sentry feedback trigger placement', () => {
     expect(hidingBlocks.every((block) => !block.includes('dialog-content'))).toBe(true);
   });
 
+  // A floating "New" (the clinic rooms' phone primary) owns the same bottom
+  // inline-end corner, so the trigger steps aside below `md` while one shows.
+  it('steps aside on a phone while a floating "New" is mounted', () => {
+    expect(rules).toMatch(
+      /@media \(max-width: 47\.9375rem\) \{\s*:root:has\(\[data-slot='fab'\]\) #sentry-feedback\s*\{\s*display:\s*none/,
+    );
+  });
+
   // Pre-existing contract, asserted here so the rules above cannot be "fixed"
   // by deleting the block they share: the mobile tab bar publishes its height
   // and the trigger lifts clear of it.

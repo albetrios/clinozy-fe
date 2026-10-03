@@ -1623,11 +1623,26 @@
    without a tab bar (login, onboarding) reserves nothing. The tab bar is
    `md:hidden`, so the reservation ends at the same breakpoint. */
 :root:has([data-slot='mobile-nav']) {
-  --floating-bottom-offset: 3.75rem;
+  /* The tab bar's 58px; each consumer adds env(safe-area-inset-bottom). */
+  --floating-bottom-offset: 3.625rem;
 }
 @media (min-width: 48rem) {
   :root:has([data-slot='mobile-nav']) {
     --floating-bottom-offset: 0rem;
+  }
+}
+/* The phone bottom stack (clinic screens, D30), bottom to top: tab bar →
+   notice pill (centre, +14px) → floating "New" (inline end, +16px) → upload
+   tray (inline end) → toasts (centre, top layer). A layer that is showing
+   publishes its height, and the one above adds it to its own bottom, so a
+   View-as pill never covers the "New" button and the tray never sits on
+   either. Phone only: from `md` the primary is back in the toolbar. */
+@media (max-width: 47.9375rem) {
+  :root:has([data-slot='notice-pill']) {
+    --floating-notice-height: 3.25rem;
+  }
+  :root:has([data-slot='fab']) {
+    --floating-fab-height: 3.75rem;
   }
 }
 
@@ -1655,6 +1670,13 @@
    one-off, seconds-long state: the trigger simply waits for it. */
 @media (max-width: 39.9375rem) {
   :root:has([data-slot='surface'][data-floating]) #sentry-feedback {
+    display: none;
+  }
+}
+/* A floating "New" owns the same corner on a phone (a primary action beats a
+   feedback button), so the trigger steps aside while one is mounted. */
+@media (max-width: 47.9375rem) {
+  :root:has([data-slot='fab']) #sentry-feedback {
     display: none;
   }
 }
