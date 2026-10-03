@@ -101,3 +101,6 @@ docs/api/
 # Python bytecode from the agent-os skill scripts — generated on every run.
 __pycache__/
 *.pyc
+
+# Playwright MCP scratch output (screenshots, console logs) from browser checks
+.playwright-mcp/

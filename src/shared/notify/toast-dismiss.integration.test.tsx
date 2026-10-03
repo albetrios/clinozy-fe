@@ -29,9 +29,16 @@ describe('toast dismiss integration', () => {
       notify.success('Hello');
     });
 
-    await waitFor(() => expect(screen.getByTestId('app-toast')).toBeInTheDocument(), {
-      timeout: 5000,
-    });
+    // Wait for Sonner to take the toast over from the immediate host: a click
+    // on the host's button during that handoff lands on a node being removed.
+    await waitFor(
+      () =>
+        expect(screen.getByTestId('app-toast')).toHaveAttribute(
+          'data-toast-variant',
+          'tint',
+        ),
+      { timeout: 5000 },
+    );
 
     await user.click(screen.getByTestId('toast-dismiss'));
 
