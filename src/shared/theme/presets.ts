@@ -758,7 +758,7 @@ export const DASHBOARD_VARIANTS_CATALOG = [
 ] as const;
 
 /** How many Dashboard arrangement variants exist (TEMP — see Dashboard variants). */
-export const DASHBOARD_VARIANT_COUNT = DASHBOARD_VARIANTS_CATALOG.length;
+const DASHBOARD_VARIANT_COUNT = DASHBOARD_VARIANTS_CATALOG.length;
 
 /**
  * TEMP (dashboard preview): a different arrangement index in 0..N-1. Remove

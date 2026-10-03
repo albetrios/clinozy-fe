@@ -6,7 +6,7 @@ import type { OrganizationPermission } from '@/core/rbac/policies.ts';
  * Per-action permission map for a resource. `null` means "no specific
  * permission" (auth-only). Mirrors the standard CRUD verbs.
  */
-export interface ResourcePermissions {
+interface ResourcePermissions {
   list: OrganizationPermission | null;
   show: OrganizationPermission | null;
   create: OrganizationPermission | null;
@@ -17,7 +17,7 @@ export interface ResourcePermissions {
 /**
  * Optional UI metadata used by the nav menu and breadcrumbs.
  */
-export interface ResourceUI {
+interface ResourceUI {
   /** Human-readable label (e.g. "Organizations"). */
   label: string;
   /** Lucide icon name (e.g. "Building"). */

@@ -12,7 +12,7 @@ export interface ListParams {
   pagination?: { page: number; perPage: number };
 }
 
-export interface ListResult<T> {
+interface ListResult<T> {
   data: T[];
   total: number;
 }

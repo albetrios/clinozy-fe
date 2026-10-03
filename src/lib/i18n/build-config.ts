@@ -18,8 +18,8 @@ import { DEFAULT_LOCALE, type I18nLocale, isI18nLocale } from './locales.ts';
 /** Build-time i18n bundling strategy (BUILD_I18N_MODE). */
 export type I18nBuildMode = 'single' | 'multi';
 
-export const DEFAULT_BUILD_I18N_MODE: I18nBuildMode = 'single';
-export const DEFAULT_BUILD_I18N_BCP47 = 'en-US';
+const DEFAULT_BUILD_I18N_MODE: I18nBuildMode = 'single';
+const DEFAULT_BUILD_I18N_BCP47 = 'en-US';
 
 /** Frozen regional defaults shipped with a single-locale build. */
 export type LocaleBuildProfile = {

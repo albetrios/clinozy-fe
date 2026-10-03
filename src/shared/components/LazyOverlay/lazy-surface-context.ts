@@ -19,7 +19,7 @@ import { createContext, useContext } from 'react';
 export const PlaceholderPrecededContext = createContext(false);
 
 /** Whether a pending placeholder preceded this overlay. */
-export function useSkipEnterAnimation(): boolean {
+function useSkipEnterAnimation(): boolean {
   return useContext(PlaceholderPrecededContext);
 }
 
