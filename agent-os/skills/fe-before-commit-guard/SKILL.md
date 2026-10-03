@@ -32,7 +32,7 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan (notice + skip when not installed).
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
-10. **Large staged files** — reject staged blobs > 1MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 1MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.
+10. **Large staged files** — reject staged blobs > 3MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 3MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.
 11. **Project structure tree** — _only when the commit adds, deletes or renames files_ — regenerates `docs/reference/project-tree.txt` (`pnpm tool:project-structure-tree`, from `git ls-files`) and stages it, so CI's Static sync "Project structure tree docs" step can't fail on a stale tree. Same as clinozy-be's pre-commit guard.
 
 ## How to Fix Failures
