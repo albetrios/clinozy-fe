@@ -193,5 +193,43 @@
     "privacyPolicy": "개인정보 처리방침",
     "accept": "동의",
     "decline": "거부"
+  },
+  "confirm": {
+    "accept": "확인",
+    "cancel": "취소",
+    "fallbackDescription": "이 작업을 확인해 주세요.",
+    "keep": "유지",
+    "reason": "사유",
+    "note": "메모",
+    "notePlaceholder": "메모 추가(선택)",
+    "noteRequired": "팀에 이유를 알려 주세요(필수)",
+    "hintPickReason": "계속하려면 사유를 선택하세요",
+    "hintAddNote": "“기타”에 대한 짧은 메모를 추가하세요",
+    "kinds": {
+      "delete": {
+        "action": "삭제",
+        "effect": "목록과 선택 항목에서 사라집니다. 바로 뒤에 나오는 알림에서 실행 취소할 수 있습니다."
+      },
+      "cancel": {
+        "action": "주문 취소",
+        "effect": "주문이 여기서 중단됩니다. 재고와 공급업체 미지급금은 바뀌지 않습니다."
+      },
+      "void": {
+        "action": "판매 무효화",
+        "effect": "판매가 무효화되고 송장도 취소됩니다. 재고는 돌아옵니다."
+      }
+    },
+    "reasons": {
+      "mistake": "실수로 생성",
+      "duplicate": "중복",
+      "notNeeded": "더 이상 필요 없음",
+      "other": "기타",
+      "orderedByMistake": "실수로 주문",
+      "supplierCantDeliver": "공급업체가 배송할 수 없음",
+      "priceChanged": "가격 변경",
+      "billedByMistake": "실수로 청구",
+      "wrongItems": "잘못된 품목",
+      "customerChangedMind": "고객 변심"
+    }
   }
 }

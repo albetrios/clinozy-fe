@@ -193,5 +193,43 @@
     "privacyPolicy": "Datenschutzerklärung",
     "accept": "Akzeptieren",
     "decline": "Ablehnen"
+  },
+  "confirm": {
+    "accept": "Bestätigen",
+    "cancel": "Abbrechen",
+    "fallbackDescription": "Bitte bestätigen Sie diese Aktion.",
+    "keep": "Behalten",
+    "reason": "Grund",
+    "note": "Notiz",
+    "notePlaceholder": "Notiz hinzufügen (optional)",
+    "noteRequired": "Sagen Sie dem Team, warum (erforderlich)",
+    "hintPickReason": "Wählen Sie einen Grund, um fortzufahren",
+    "hintAddNote": "Fügen Sie eine kurze Notiz zu „Sonstiges“ hinzu",
+    "kinds": {
+      "delete": {
+        "action": "Löschen",
+        "effect": "Der Eintrag verschwindet aus Listen und Auswahlfeldern. Sie können es direkt danach über die Meldung rückgängig machen."
+      },
+      "cancel": {
+        "action": "Bestellung stornieren",
+        "effect": "Die Bestellung endet hier. Bestand und Lieferantenverbindlichkeiten bleiben unverändert."
+      },
+      "void": {
+        "action": "Verkauf stornieren",
+        "effect": "Der Verkauf wird storniert und die Rechnung annulliert. Der Bestand wird zurückgebucht."
+      }
+    },
+    "reasons": {
+      "mistake": "Versehentlich erstellt",
+      "duplicate": "Duplikat",
+      "notNeeded": "Nicht mehr benötigt",
+      "other": "Sonstiges",
+      "orderedByMistake": "Versehentlich bestellt",
+      "supplierCantDeliver": "Lieferant kann nicht liefern",
+      "priceChanged": "Preis geändert",
+      "billedByMistake": "Versehentlich abgerechnet",
+      "wrongItems": "Falsche Artikel",
+      "customerChangedMind": "Kunde hat es sich anders überlegt"
+    }
   }
 }

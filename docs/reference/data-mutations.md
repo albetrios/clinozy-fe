@@ -164,6 +164,20 @@ sequence on one toast id, and takes the confirmation copy as `committedMessage`)
 nothing is awaited, the toast reports success before the request lands, and a rejection
 can never reach the rollback.
 
+## Delete with a reason, Undo through restore — the clinic rooms
+
+The clinic contract soft-deletes **at once** and restores on Undo
+(`DELETE /<resource>/:id` with `{ reason, note }`, then `POST …/restore` within 10s —
+`schema-routes.md:1546`), so it does not use `useDeferredRowRemoval`. Its confirm is
+[`ConfirmDialog`](../../src/shared/components/ConfirmDialog) with `reason`: an end panel
+from `md`, a bottom sheet below, the `delete_reason` chips and a note ("Other" needs
+one). `onConfirm({ reason, note })` runs the delete — optimistic, so the row hides at
+once — and must return its promise: a 422 on the reason or note shows at the field and
+the confirm stays open. Given `reason.undo`, a confirmed delete raises
+`notify.undo("<name> removed", { onUndo })` — "Undo" for `UNDO_TOAST_DURATION_MS`
+(10s) — and `onUndo` runs the restore. A reason the schema lacks (Leads' "Spam") is
+stored as `other` with its label leading the note.
+
 ## Current inventory (snapshot — 2026-09-24)
 
 **Optimistic** (instant, auto-rollback) — all safe removals + field-patches:

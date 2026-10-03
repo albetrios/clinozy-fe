@@ -193,5 +193,43 @@
     "privacyPolicy": "Politique de confidentialité",
     "accept": "Accepter",
     "decline": "Refuser"
+  },
+  "confirm": {
+    "accept": "Confirmer",
+    "cancel": "Annuler",
+    "fallbackDescription": "Veuillez confirmer cette action.",
+    "keep": "Conserver",
+    "reason": "Motif",
+    "note": "Note",
+    "notePlaceholder": "Ajouter une note (facultatif)",
+    "noteRequired": "Expliquez à l’équipe pourquoi (obligatoire)",
+    "hintPickReason": "Choisissez un motif pour continuer",
+    "hintAddNote": "Ajoutez une courte note pour « Autre »",
+    "kinds": {
+      "delete": {
+        "action": "Supprimer",
+        "effect": "L’élément disparaît des listes et des sélecteurs. Vous pouvez annuler depuis la notification juste après."
+      },
+      "cancel": {
+        "action": "Annuler la commande",
+        "effect": "La commande s’arrête ici. Le stock et les dettes fournisseurs ne changent pas."
+      },
+      "void": {
+        "action": "Annuler la vente",
+        "effect": "La vente est annulée, ainsi que sa facture. Le stock est réintégré."
+      }
+    },
+    "reasons": {
+      "mistake": "Créé par erreur",
+      "duplicate": "Doublon",
+      "notNeeded": "Plus nécessaire",
+      "other": "Autre",
+      "orderedByMistake": "Commandé par erreur",
+      "supplierCantDeliver": "Le fournisseur ne peut pas livrer",
+      "priceChanged": "Le prix a changé",
+      "billedByMistake": "Facturé par erreur",
+      "wrongItems": "Mauvais articles",
+      "customerChangedMind": "Le client a changé d’avis"
+    }
   }
 }

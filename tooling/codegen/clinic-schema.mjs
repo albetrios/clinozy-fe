@@ -160,7 +160,7 @@ const enumIdent = (snake) =>
 const enumSchema = (snake) => `${lowerFirst(enumIdent(snake))}Schema`;
 
 function zodForType(entity, { field, type, constraints }) {
-  let base = type.replace(/\s*\|\s*null$/, '');
+  const base = type.replace(/\s*\|\s*null$/, '');
   const nullable = /\|\s*null$/.test(type);
   let zod;
   const array = /^array<(.+)> \(max (\d+)\)$/.exec(base);

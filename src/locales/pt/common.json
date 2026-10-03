@@ -193,5 +193,43 @@
     "privacyPolicy": "Política de Privacidade",
     "accept": "Aceitar",
     "decline": "Recusar"
+  },
+  "confirm": {
+    "accept": "Confirmar",
+    "cancel": "Cancelar",
+    "fallbackDescription": "Confirme esta ação.",
+    "keep": "Manter",
+    "reason": "Motivo",
+    "note": "Nota",
+    "notePlaceholder": "Adicione uma nota (opcional)",
+    "noteRequired": "Diga à equipe o porquê (obrigatório)",
+    "hintPickReason": "Escolha um motivo para continuar",
+    "hintAddNote": "Adicione uma nota curta para “Outro”",
+    "kinds": {
+      "delete": {
+        "action": "Excluir",
+        "effect": "Some das listas e dos seletores. Você pode desfazer pelo aviso logo em seguida."
+      },
+      "cancel": {
+        "action": "Cancelar pedido",
+        "effect": "O pedido para aqui. Estoque e contas a pagar ao fornecedor não mudam."
+      },
+      "void": {
+        "action": "Anular venda",
+        "effect": "A venda é anulada e a fatura, cancelada. O estoque volta."
+      }
+    },
+    "reasons": {
+      "mistake": "Criado por engano",
+      "duplicate": "Duplicado",
+      "notNeeded": "Não é mais necessário",
+      "other": "Outro",
+      "orderedByMistake": "Pedido por engano",
+      "supplierCantDeliver": "O fornecedor não consegue entregar",
+      "priceChanged": "O preço mudou",
+      "billedByMistake": "Cobrado por engano",
+      "wrongItems": "Itens errados",
+      "customerChangedMind": "O cliente mudou de ideia"
+    }
   }
 }

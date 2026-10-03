@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -20,6 +20,23 @@ describe('ConfirmDialog', () => {
     expect(screen.getByTestId('confirm-dialog')).toBeInTheDocument();
     expect(screen.getByText('Delete role?')).toBeInTheDocument();
     expect(screen.getByText('This action cannot be undone.')).toBeInTheDocument();
+  });
+
+  it('stays the centred alert dialog without `reason`', () => {
+    render(<ConfirmDialog {...base} />);
+    const dialog = screen.getByRole('alertdialog', { name: 'Delete role?' });
+    expect(dialog).toBe(screen.getByTestId('confirm-dialog'));
+    expect(dialog).not.toHaveAttribute('data-layout');
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+  });
+
+  it('labels its buttons and fallback description from the locale', () => {
+    render(<ConfirmDialog {...base} description={undefined} />);
+    expect(screen.getByTestId('confirm-cancel')).toHaveTextContent('Cancel');
+    expect(screen.getByTestId('confirm-accept')).toHaveTextContent('Confirm');
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
+      'Please confirm this action.',
+    );
   });
 
   it('confirms and closes on success', async () => {
@@ -44,6 +61,28 @@ describe('ConfirmDialog', () => {
 
     await waitFor(() => expect(onConfirm).toHaveBeenCalled());
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
+
+  it('confirms once for a double click that lands before the re-render', async () => {
+    let release!: () => void;
+    const onConfirm = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    render(<ConfirmDialog {...base} onConfirm={onConfirm} />);
+    const accept = screen.getByTestId('confirm-accept');
+
+    await act(async () => {
+      accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      release();
+    });
   });
 
   it('has no accessibility violations', async () => {

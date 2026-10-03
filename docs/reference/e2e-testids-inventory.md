@@ -97,6 +97,26 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 
 ---
 
+## Shared confirm (`ConfirmDialog`)
+
+The plain confirm and the reason confirm (`reason` set) share the first three ids; the
+reason confirm carries `data-layout="panel"` from `md` and `data-layout="sheet"` below.
+
+| Test ID                  | Element                                                                      | File                                        |
+| ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| `confirm-dialog`         | The confirm (`role="alertdialog"`) — centred, the end panel or the sheet     | `shared/components/ConfirmDialog/`          |
+| `confirm-cancel`         | Dismiss — "Cancel" (plain) / "Keep it" (reason); initial focus on the reason | ConfirmDialog, `ReasonConfirm.tsx`          |
+| `confirm-accept`         | The action — `aria-disabled` until a reason (and an "Other" note) is in      | ConfirmDialog, `ReasonConfirm.tsx`          |
+| `confirm-close`          | × — outside the panel's start edge from `md`, inside the sheet below         | `ReasonConfirm.tsx`                         |
+| `confirm-record`         | The record pill under the title                                              | `ReasonConfirm.tsx`                         |
+| `confirm-reason-<value>` | One reason chip (radio), value kebab-cased (`confirm-reason-not-needed`)     | `ReasonConfirm.tsx` (`confirmReasonTestId`) |
+| `confirm-note`           | The note textarea                                                            | `ReasonConfirm.tsx`                         |
+| `confirm-note-error`     | The server's note message (422)                                              | `ReasonConfirm.tsx`                         |
+| `confirm-reasons-error`  | The server's reason message (422)                                            | `ReasonConfirm.tsx`                         |
+| `confirm-hint`           | Footer hint — "Pick a reason to continue" / "Add a short note for “Other”"   | `ReasonConfirm.tsx`                         |
+
+---
+
 ## Dashboard (`/`)
 
 | Test ID              | Element                                                  | File                |

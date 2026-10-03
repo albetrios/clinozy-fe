@@ -193,5 +193,43 @@
     "privacyPolicy": "隐私政策",
     "accept": "接受",
     "decline": "拒绝"
+  },
+  "confirm": {
+    "accept": "确认",
+    "cancel": "取消",
+    "fallbackDescription": "请确认此操作。",
+    "keep": "保留",
+    "reason": "原因",
+    "note": "备注",
+    "notePlaceholder": "添加备注（可选）",
+    "noteRequired": "告诉团队原因（必填）",
+    "hintPickReason": "选择一个原因以继续",
+    "hintAddNote": "为“其他”添加简短备注",
+    "kinds": {
+      "delete": {
+        "action": "删除",
+        "effect": "它会从列表和选择器中消失。之后可立即通过提示撤销。"
+      },
+      "cancel": {
+        "action": "取消订单",
+        "effect": "订单到此为止。库存和应付供应商款项不变。"
+      },
+      "void": {
+        "action": "作废销售",
+        "effect": "销售将作废，发票随之取消。库存退回。"
+      }
+    },
+    "reasons": {
+      "mistake": "误建",
+      "duplicate": "重复",
+      "notNeeded": "不再需要",
+      "other": "其他",
+      "orderedByMistake": "误下单",
+      "supplierCantDeliver": "供应商无法交货",
+      "priceChanged": "价格变动",
+      "billedByMistake": "误开账单",
+      "wrongItems": "商品错误",
+      "customerChangedMind": "顾客改变主意"
+    }
   }
 }

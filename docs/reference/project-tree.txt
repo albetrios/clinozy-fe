@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~764 src files · ~424 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
+Stats: ~767 src files · ~426 tests in src/ · 43 E2E specs · 34 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1025,9 +1025,12 @@ clinozy-fe/
 │   │   │   │   ├── preload-command-palette.ts
 │   │   │   │   └── [5 test files]
 │   │   │   ├── ConfirmDialog/
+│   │   │   │   ├── confirm-dialog.constants.ts
+│   │   │   │   ├── confirm-reasons.ts
 │   │   │   │   ├── ConfirmDialog.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   └── [1 test file]
+│   │   │   │   ├── ReasonConfirm.tsx
+│   │   │   │   └── [3 test files]
 │   │   │   ├── ConsentBanner/
 │   │   │   │   ├── ConsentBanner.tsx
 │   │   │   │   ├── ConsentBannerLazy.tsx

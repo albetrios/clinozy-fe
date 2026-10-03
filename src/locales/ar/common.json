@@ -193,5 +193,43 @@
     "privacyPolicy": "سياسة الخصوصية",
     "accept": "قبول",
     "decline": "رفض"
+  },
+  "confirm": {
+    "accept": "تأكيد",
+    "cancel": "إلغاء",
+    "fallbackDescription": "يرجى تأكيد هذا الإجراء.",
+    "keep": "الإبقاء عليه",
+    "reason": "السبب",
+    "note": "ملاحظة",
+    "notePlaceholder": "أضف ملاحظة (اختياري)",
+    "noteRequired": "أخبر الفريق بالسبب (مطلوب)",
+    "hintPickReason": "اختر سببًا للمتابعة",
+    "hintAddNote": "أضف ملاحظة قصيرة لـ «أخرى»",
+    "kinds": {
+      "delete": {
+        "action": "حذف",
+        "effect": "يختفي من القوائم وأدوات الاختيار. يمكنك التراجع من الإشعار بعد ذلك مباشرة."
+      },
+      "cancel": {
+        "action": "إلغاء الطلب",
+        "effect": "يتوقف الطلب هنا. لا يتغير المخزون ولا مستحقات المورّد."
+      },
+      "void": {
+        "action": "إبطال البيع",
+        "effect": "يُبطَل البيع وتُلغى فاتورته. تعود البضاعة إلى المخزون."
+      }
+    },
+    "reasons": {
+      "mistake": "أُنشئ بالخطأ",
+      "duplicate": "مكرر",
+      "notNeeded": "لم يعد مطلوبًا",
+      "other": "أخرى",
+      "orderedByMistake": "طُلب بالخطأ",
+      "supplierCantDeliver": "المورّد لا يستطيع التسليم",
+      "priceChanged": "تغيّر السعر",
+      "billedByMistake": "فُوتر بالخطأ",
+      "wrongItems": "أصناف خاطئة",
+      "customerChangedMind": "غيّر العميل رأيه"
+    }
   }
 }

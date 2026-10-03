@@ -5,7 +5,7 @@ const { runtimeMock } = vi.hoisted(() => ({
 }));
 vi.mock('./notify-runtime.tsx', () => runtimeMock);
 
-import { notificationBridge, notify } from './notify.ts';
+import { notificationBridge, notify, UNDO_TOAST_DURATION_MS } from './notify.ts';
 
 let release: (() => void) | undefined;
 async function activate() {
@@ -154,6 +154,42 @@ describe('notify', () => {
     runtimeMock.dismiss.mockClear();
     vi.advanceTimersByTime(5000);
     expect(runtimeMock.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('undo: an "Undo" action that stays for the 10s restore window', async () => {
+    vi.useFakeTimers();
+    const onUndo = vi.fn();
+    const id = notify.undo('Priya Shah removed', { id: 'remove-pt-1', onUndo });
+    expect(UNDO_TOAST_DURATION_MS).toBe(10_000);
+    const [pending] = notificationBridge.getSnapshot().pending;
+    expect(pending).toMatchObject({
+      id: 'remove-pt-1',
+      type: 'success',
+      message: 'Priya Shah removed',
+      options: { duration: UNDO_TOAST_DURATION_MS, action: { label: 'Undo' } },
+    });
+
+    pending?.options.action?.onClick();
+    expect(onUndo).toHaveBeenCalledOnce();
+
+    vi.advanceTimersByTime(UNDO_TOAST_DURATION_MS - 1);
+    expect(notificationBridge.getSnapshot().pending.map((item) => item.id)).toEqual([id]);
+    vi.advanceTimersByTime(1);
+    expect(notificationBridge.getSnapshot().pending).toEqual([]);
+  });
+
+  it('undo: hands the renderer the action and what is left of the window', async () => {
+    vi.useFakeTimers();
+    const onUndo = vi.fn();
+    notify.undo('Lead removed', { id: 'remove-lead', onUndo });
+    vi.advanceTimersByTime(4000);
+    const deadline = Date.now() + UNDO_TOAST_DURATION_MS - 4000;
+    await activate();
+    expect(runtimeMock.show).toHaveBeenCalledExactlyOnceWith('success', 'Lead removed', {
+      id: 'remove-lead',
+      duration: deadline - Date.now(),
+      action: { label: 'Undo', onClick: onUndo },
+    });
   });
 
   it('keeps pending promises persistent and expires settled feedback', async () => {

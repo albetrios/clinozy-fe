@@ -193,5 +193,43 @@
     "privacyPolicy": "プライバシーポリシー",
     "accept": "同意する",
     "decline": "拒否する"
+  },
+  "confirm": {
+    "accept": "確認",
+    "cancel": "キャンセル",
+    "fallbackDescription": "この操作を確認してください。",
+    "keep": "残す",
+    "reason": "理由",
+    "note": "メモ",
+    "notePlaceholder": "メモを追加（任意）",
+    "noteRequired": "チームに理由を伝えてください（必須）",
+    "hintPickReason": "続けるには理由を選んでください",
+    "hintAddNote": "「その他」には短いメモを追加してください",
+    "kinds": {
+      "delete": {
+        "action": "削除",
+        "effect": "一覧と選択肢から消えます。直後に表示される通知から元に戻せます。"
+      },
+      "cancel": {
+        "action": "注文をキャンセル",
+        "effect": "注文はここで止まります。在庫と仕入先への支払いは変わりません。"
+      },
+      "void": {
+        "action": "販売を取り消す",
+        "effect": "販売は取り消され、請求書もキャンセルされます。在庫は戻ります。"
+      }
+    },
+    "reasons": {
+      "mistake": "誤って作成",
+      "duplicate": "重複",
+      "notNeeded": "不要になった",
+      "other": "その他",
+      "orderedByMistake": "誤って発注",
+      "supplierCantDeliver": "仕入先が納品できない",
+      "priceChanged": "価格が変わった",
+      "billedByMistake": "誤って請求",
+      "wrongItems": "商品の誤り",
+      "customerChangedMind": "お客様の気が変わった"
+    }
   }
 }

@@ -1,3 +1,5 @@
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import i18n from '@/lib/i18n/i18n.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 
 import type { ToastType } from './CustomToast.tsx';
@@ -18,6 +20,18 @@ export interface NotifyOptions {
   duration?: number;
   action?: NotifyAction;
   onDismiss?: () => void;
+}
+
+/**
+ * How long an Undo toast stays: the schema's restore window (`POST
+ * …/restore` within 10s — `schema-routes.md:1546`, D32).
+ */
+export const UNDO_TOAST_DURATION_MS = 10_000;
+
+/** {@link notify.undo}'s options: everything but the action and lifetime, which it owns. */
+export interface NotifyUndoOptions extends Omit<NotifyOptions, 'action' | 'duration'> {
+  /** Puts back what the toast reports gone — runs when Undo is pressed inside the window. */
+  onUndo: () => void;
 }
 
 interface PendingToast {
@@ -157,6 +171,21 @@ export const notify = {
   warning: (message: string, opts?: NotifyOptions) => show('warning', message, opts),
   loading: (message: string, opts?: NotifyOptions) =>
     show('loading', message, { duration: Infinity, ...opts }),
+  /**
+   * "<record> removed" with an Undo button, kept up for the restore window
+   * ({@link UNDO_TOAST_DURATION_MS}). For a write that already happened and
+   * can be reversed (soft delete → restore); a write that waits for the window
+   * to close is `notifyDeferredCommit`.
+   */
+  undo: (message: string, { onUndo, ...opts }: NotifyUndoOptions) =>
+    show('success', message, {
+      ...opts,
+      duration: UNDO_TOAST_DURATION_MS,
+      action: {
+        label: i18n.t(ERRORS_KEYS.toast.undo, { ns: ERRORS_NS }),
+        onClick: onUndo,
+      },
+    }),
   promise,
   dismiss,
 };

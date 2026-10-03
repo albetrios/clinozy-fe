@@ -193,5 +193,43 @@
     "privacyPolicy": "Privacy Policy",
     "accept": "Accept",
     "decline": "Decline"
+  },
+  "confirm": {
+    "accept": "Confirm",
+    "cancel": "Cancel",
+    "fallbackDescription": "Please confirm this action.",
+    "keep": "Keep it",
+    "reason": "Reason",
+    "note": "Note",
+    "notePlaceholder": "Add a note (optional)",
+    "noteRequired": "Tell the team why (required)",
+    "hintPickReason": "Pick a reason to continue",
+    "hintAddNote": "Add a short note for “Other”",
+    "kinds": {
+      "delete": {
+        "action": "Delete",
+        "effect": "It disappears from lists and pickers. You can undo from the toast right after."
+      },
+      "cancel": {
+        "action": "Cancel order",
+        "effect": "The order stops here. Stock and supplier dues are not changed."
+      },
+      "void": {
+        "action": "Void sale",
+        "effect": "The sale is voided and its invoice is cancelled. Stock goes back."
+      }
+    },
+    "reasons": {
+      "mistake": "Created by mistake",
+      "duplicate": "Duplicate",
+      "notNeeded": "No longer needed",
+      "other": "Other",
+      "orderedByMistake": "Ordered by mistake",
+      "supplierCantDeliver": "Supplier can’t deliver",
+      "priceChanged": "Price changed",
+      "billedByMistake": "Billed by mistake",
+      "wrongItems": "Wrong items",
+      "customerChangedMind": "Customer changed mind"
+    }
   }
 }

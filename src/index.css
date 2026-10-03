@@ -937,6 +937,12 @@
   :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']) {
   box-shadow: var(--elevation-dialog);
 }
+/* The reason confirm opens as a panel at the inline end (from `md`): a
+   drawer's shadow, not a centred dialog's. */
+[data-theme='clinozy-zinc-pastel']
+  [data-slot='alert-dialog-content'][data-layout='panel'] {
+  box-shadow: var(--elevation-drawer);
+}
 [data-theme='clinozy-zinc-pastel'] [data-slot='floating-edge'] {
   box-shadow: var(--elevation-close);
 }
