@@ -138,7 +138,9 @@ export function parseSchemaMarkdown(markdown) {
     } else {
       if (row[0] === 'Field' || row.length < 8) continue;
       const [field, type, , nullable, , constraints, serverSet] = row;
-      if (type === 'n/a') continue;
+      // `n/a` rows are prototype behaviour, not fields; write-only fields (a
+      // password) are never in a response, so the read shape leaves them out.
+      if (type === 'n/a' || /write-only/.test(constraints)) continue;
       current.fields.push({
         field,
         type,

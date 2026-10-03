@@ -814,7 +814,6 @@ export const userSchema = clinicCommonSchema.extend({
   initials: z.string(),
   email: z.email(),
   phone: phoneSchema.nullable(),
-  password: z.string(),
   roles: z.array(roleSchema),
   branchIds: z.array(z.uuid()),
   tone: toneSchema,
