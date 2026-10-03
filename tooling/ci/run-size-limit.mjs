@@ -106,8 +106,20 @@ const config = [
            * (`source('../src')`, tests excluded) and `build:check` trips if it
            * ever widens again. Measured after: 22.76 kB, below main's 23.8.
            * Lowered per the ratchet rule; ~0.7 kB of headroom.
+           *
+           * 23.5 → 25.5 kB: a declared exemption, itemised — the clinic launch
+           * (iterations/launch-2026-09-30-jxmr, decision D36) makes its design
+           * the default look, and a default look is first-paint by definition.
+           * Measured 25.28 kB: the self-hosted Inter + JetBrains Mono
+           * `@font-face` rules (+0.57 kB, L-02 — the CSP forbids a font CDN),
+           * the full-surface `clinozy-zinc-pastel` preset with its dark and
+           * light-pinned blocks and slot rules (+1.12 kB, L-03), the dark values
+           * of the new base tokens and section tones (+0.67 kB; their light
+           * values stay tree-shaken in @theme until a screen uses them) and the
+           * room metrics by tier (+0.27 kB). Lower it again as soon as anything
+           * here can leave the first paint.
            */
-          limit: '23.5 kB',
+          limit: '25.5 kB',
           gzip: true,
         },
       ]

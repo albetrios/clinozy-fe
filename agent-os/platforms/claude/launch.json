@@ -12,6 +12,20 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["preview", "--port", "4173", "--strictPort"],
       "port": 4173
+    },
+    {
+      "name": "iterations-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4310",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "iterations"
+      ],
+      "port": 4310
     }
   ]
 }

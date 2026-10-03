@@ -62,7 +62,7 @@ export function SecurityOverviewCard({
             {strong ? (
               <ShieldCheck className="text-success" aria-hidden />
             ) : (
-              <ShieldAlert className="text-warning" aria-hidden />
+              <ShieldAlert className="text-tone-butter-foreground" aria-hidden />
             )}
             <CardTitle className="text-base">{t(keys.title)}</CardTitle>
           </div>
