@@ -208,16 +208,16 @@ surface the shell mounts. Re-run the audit if the shell changes:
 | ---------------- | ------------------ | -------- | ------------ |
 | Brand logo / wordmark | sidebar top / header left | all 4 | ? |
 | Primary nav items | sidebar / top bar | all 4 | ? |
-| Organization switcher | sidebar top | all 4 | ? |
+| Organization switcher | sidebar top / header | all 4 (self-hides without team orgs; Focus skips it on a personal-only deployment) | ? |
 | Global search / ⌘K trigger | header + sidebar quick links | all 4 | ? |
 | Notifications | header | all 4 | ? |
 | **Theme mode toggle (light/dark)** | header | all 4 | ? |
 | User menu — profile + **sign-out** | header right | all 4 | ? |
-| Settings entry (`#settings/*` hash modal) | sidebar quick links | Sidebar | ? |
-| **Account launcher strip** — palette, profile, security, billing, appearance, devices | under header | Focus | ? |
+| Settings entry (`#settings/*` hash modal) | `UserMenu` item; also sidebar quick links | all 4 (`UserMenu`); quick links Sidebar only | ? |
+| **Account launcher strip** — palette, profile, security, billing, appearance, keyboard shortcuts | under header | Focus | ? |
 | Email-verification banner | above content | all 4 | ? |
 | Mobile bottom nav | bottom, mobile only | all 4 | ? |
-| Mobile menu trigger | header left, mobile only | all 4 | ? |
+| Mobile menu trigger | header left, mobile only | Sidebar | ? |
 
 The bolded rows are easy to miss: the **light/dark toggle** is a shell control
 separate from the appearance picker inside settings, and the Focus shell's
