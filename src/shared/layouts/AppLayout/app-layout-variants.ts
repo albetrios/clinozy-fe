@@ -32,6 +32,10 @@ export const loadTopNavShell = onceAsync(() => import('./variants/AppLayoutTopNa
 export const loadRailShell = onceAsync(() => import('./variants/AppLayoutRail.tsx'));
 /** Focus shell chunk — what a personal-only deployment mounts. */
 export const loadFocusShell = onceAsync(() => import('./variants/AppLayoutFocus.tsx'));
+/** Section-bar shell chunk — the clinic launch's header shell (KICKOFF §3.2). */
+export const loadSectionBarShell = onceAsync(
+  () => import('./variants/AppLayoutSectionBar.tsx'),
+);
 
 /** Chunk loaders in `APP_SHELL_VARIANT` order — index-aligned with `APP_SHELLS`. */
 const APP_SHELL_LOADERS = [
@@ -39,6 +43,7 @@ const APP_SHELL_LOADERS = [
   loadTopNavShell,
   loadRailShell,
   loadFocusShell,
+  loadSectionBarShell,
 ] as const;
 
 /** Fetch one shell's chunk without mounting it. */

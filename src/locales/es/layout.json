@@ -149,6 +149,53 @@
       "dark": "Oscuro",
       "system": "Sistema",
       "shuffle": "Tema aleatorio"
+    },
+    "sectionBar": {
+      "nav": "Secciones",
+      "allSections": "Todas las secciones",
+      "allSectionsTitle": "Todas las secciones (G)",
+      "more": "Más",
+      "morePinned": "Más secciones fijadas",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Buscar o ir a (Comando K)",
+      "searchTitleMac": "Buscar o ir a… (⌘K)",
+      "searchTitleWindows": "Buscar o ir a… (Ctrl K)",
+      "searchPlaceholder": "Buscar pacientes, leads…",
+      "pin": "Fijar en la barra",
+      "unpin": "Quitar de la barra",
+      "pinAria": "Fijar en la barra · {{section}}",
+      "unpinAria": "Quitar de la barra · {{section}}",
+      "pinFooter": "Fija para mantenerla en la barra",
+      "keysHint": "G · 1–9",
+      "account": "Cuenta",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Estado",
+      "presence": {
+        "online": "En línea",
+        "away": "Ausente",
+        "busy": "Ocupado"
+      },
+      "statusToast": "Estado · {{status}}",
+      "switchClinic": "Cambiar de clínica",
+      "devices": "Dispositivos",
+      "viewAs": {
+        "previewing": "Vista previa como {{role}}",
+        "noSections": "Sin secciones",
+        "exit": "Salir de la vista previa",
+        "exitToast": "De vuelta a tu propio acceso"
+      },
+      "branch": {
+        "label": "Sucursal · {{label}}",
+        "title": "Sucursal · {{names}}",
+        "all": "Todas las sucursales",
+        "allSub": "Vista combinada · totales de {{count}}",
+        "viewGroup": "Vista",
+        "branchesGroup": "Sucursales",
+        "showingAll": "Mostrando todas las sucursales",
+        "showing": "Mostrando {{names}}",
+        "keepOne": "Deja al menos una sucursal"
+      }
     }
   },
   "public": {

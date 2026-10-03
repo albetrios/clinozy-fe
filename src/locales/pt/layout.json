@@ -149,6 +149,53 @@
       "dark": "Escuro",
       "system": "Sistema",
       "shuffle": "Tema aleatório"
+    },
+    "sectionBar": {
+      "nav": "Seções",
+      "allSections": "Todas as seções",
+      "allSectionsTitle": "Todas as seções (G)",
+      "more": "Mais",
+      "morePinned": "Mais seções fixadas",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Pesquisar ou ir para (Comando K)",
+      "searchTitleMac": "Pesquisar ou ir para… (⌘K)",
+      "searchTitleWindows": "Pesquisar ou ir para… (Ctrl K)",
+      "searchPlaceholder": "Pesquisar pacientes, leads…",
+      "pin": "Fixar na barra",
+      "unpin": "Desafixar da barra",
+      "pinAria": "Fixar na barra · {{section}}",
+      "unpinAria": "Desafixar da barra · {{section}}",
+      "pinFooter": "Fixe para manter na barra",
+      "keysHint": "G · 1–9",
+      "account": "Conta",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Ausente",
+        "busy": "Ocupado"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Trocar de clínica",
+      "devices": "Dispositivos",
+      "viewAs": {
+        "previewing": "Visualizando como {{role}}",
+        "noSections": "Nenhuma seção",
+        "exit": "Sair da visualização",
+        "exitToast": "De volta ao seu próprio acesso"
+      },
+      "branch": {
+        "label": "Unidade · {{label}}",
+        "title": "Unidade · {{names}}",
+        "all": "Todas as unidades",
+        "allSub": "Visão combinada · totais de {{count}}",
+        "viewGroup": "Visão",
+        "branchesGroup": "Unidades",
+        "showingAll": "Mostrando todas as unidades",
+        "showing": "Mostrando {{names}}",
+        "keepOne": "Mantenha pelo menos uma unidade"
+      }
     }
   },
   "public": {

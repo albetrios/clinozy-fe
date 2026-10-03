@@ -149,6 +149,53 @@
       "dark": "داكن",
       "system": "النظام",
       "shuffle": "تبديل عشوائي للسمة"
+    },
+    "sectionBar": {
+      "nav": "الأقسام",
+      "allSections": "كل الأقسام",
+      "allSectionsTitle": "كل الأقسام (G)",
+      "more": "المزيد",
+      "morePinned": "مزيد من الأقسام المثبتة",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "ابحث أو انتقل إلى (Command K)",
+      "searchTitleMac": "ابحث أو انتقل إلى… (⌘K)",
+      "searchTitleWindows": "ابحث أو انتقل إلى… (Ctrl K)",
+      "searchPlaceholder": "ابحث في المرضى والعملاء المحتملين…",
+      "pin": "تثبيت في الشريط",
+      "unpin": "إزالة التثبيت من الشريط",
+      "pinAria": "تثبيت في الشريط · {{section}}",
+      "unpinAria": "إزالة التثبيت من الشريط · {{section}}",
+      "pinFooter": "ثبّت للإبقاء في الشريط",
+      "keysHint": "G · 1–9",
+      "account": "الحساب",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "الحالة",
+      "presence": {
+        "online": "متصل",
+        "away": "بعيد",
+        "busy": "مشغول"
+      },
+      "statusToast": "الحالة · {{status}}",
+      "switchClinic": "تبديل العيادة",
+      "devices": "الأجهزة",
+      "viewAs": {
+        "previewing": "معاينة بصفة {{role}}",
+        "noSections": "لا توجد أقسام",
+        "exit": "إنهاء المعاينة",
+        "exitToast": "عدت إلى صلاحياتك"
+      },
+      "branch": {
+        "label": "الفرع · {{label}}",
+        "title": "الفرع · {{names}}",
+        "all": "كل الفروع",
+        "allSub": "عرض مجمّع · إجماليات عبر {{count}}",
+        "viewGroup": "العرض",
+        "branchesGroup": "الفروع",
+        "showingAll": "عرض كل الفروع",
+        "showing": "عرض {{names}}",
+        "keepOne": "أبقِ فرعًا واحدًا على الأقل"
+      }
     }
   },
   "public": {

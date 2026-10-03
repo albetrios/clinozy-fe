@@ -149,6 +149,53 @@
       "dark": "Dark",
       "system": "System",
       "shuffle": "Shuffle theme"
+    },
+    "sectionBar": {
+      "nav": "Sections",
+      "allSections": "All sections",
+      "allSectionsTitle": "All sections (G)",
+      "more": "More",
+      "morePinned": "More pinned sections",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Search or jump to (Command K)",
+      "searchTitleMac": "Search or jump to… (⌘K)",
+      "searchTitleWindows": "Search or jump to… (Ctrl K)",
+      "searchPlaceholder": "Search patients, leads…",
+      "pin": "Pin to bar",
+      "unpin": "Unpin from bar",
+      "pinAria": "Pin to bar · {{section}}",
+      "unpinAria": "Unpin from bar · {{section}}",
+      "pinFooter": "Pin to keep in the bar",
+      "keysHint": "G · 1–9",
+      "account": "Account",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Away",
+        "busy": "Busy"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Switch clinic",
+      "devices": "Devices",
+      "viewAs": {
+        "previewing": "Previewing as {{role}}",
+        "noSections": "No sections",
+        "exit": "Exit preview",
+        "exitToast": "Back to your own access"
+      },
+      "branch": {
+        "label": "Branch · {{label}}",
+        "title": "Branch · {{names}}",
+        "all": "All branches",
+        "allSub": "Combined view · totals across {{count}}",
+        "viewGroup": "View",
+        "branchesGroup": "Branches",
+        "showingAll": "Showing all branches",
+        "showing": "Showing {{names}}",
+        "keepOne": "Keep at least one branch"
+      }
     }
   },
   "public": {

@@ -149,6 +149,53 @@
       "dark": "डार्क",
       "system": "सिस्टम",
       "shuffle": "थीम शफ़ल करें"
+    },
+    "sectionBar": {
+      "nav": "अनुभाग",
+      "allSections": "सभी अनुभाग",
+      "allSectionsTitle": "सभी अनुभाग (G)",
+      "more": "और",
+      "morePinned": "और पिन किए गए अनुभाग",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "खोजें या जाएँ (Command K)",
+      "searchTitleMac": "खोजें या जाएँ… (⌘K)",
+      "searchTitleWindows": "खोजें या जाएँ… (Ctrl K)",
+      "searchPlaceholder": "मरीज़, लीड खोजें…",
+      "pin": "बार में पिन करें",
+      "unpin": "बार से अनपिन करें",
+      "pinAria": "बार में पिन करें · {{section}}",
+      "unpinAria": "बार से अनपिन करें · {{section}}",
+      "pinFooter": "बार में रखने के लिए पिन करें",
+      "keysHint": "G · 1–9",
+      "account": "खाता",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "स्थिति",
+      "presence": {
+        "online": "ऑनलाइन",
+        "away": "दूर",
+        "busy": "व्यस्त"
+      },
+      "statusToast": "स्थिति · {{status}}",
+      "switchClinic": "क्लिनिक बदलें",
+      "devices": "डिवाइस",
+      "viewAs": {
+        "previewing": "{{role}} के रूप में पूर्वावलोकन",
+        "noSections": "कोई अनुभाग नहीं",
+        "exit": "पूर्वावलोकन से बाहर निकलें",
+        "exitToast": "अपनी पहुँच पर वापस"
+      },
+      "branch": {
+        "label": "शाखा · {{label}}",
+        "title": "शाखा · {{names}}",
+        "all": "सभी शाखाएँ",
+        "allSub": "संयुक्त दृश्य · {{count}} का कुल",
+        "viewGroup": "दृश्य",
+        "branchesGroup": "शाखाएँ",
+        "showingAll": "सभी शाखाएँ दिख रही हैं",
+        "showing": "{{names}} दिख रही हैं",
+        "keepOne": "कम से कम एक शाखा रखें"
+      }
     }
   },
   "public": {

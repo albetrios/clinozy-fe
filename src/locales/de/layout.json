@@ -149,6 +149,53 @@
       "dark": "Dunkel",
       "system": "System",
       "shuffle": "Theme zufällig wählen"
+    },
+    "sectionBar": {
+      "nav": "Bereiche",
+      "allSections": "Alle Bereiche",
+      "allSectionsTitle": "Alle Bereiche (G)",
+      "more": "Mehr",
+      "morePinned": "Weitere angeheftete Bereiche",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Suchen oder springen zu (Befehl K)",
+      "searchTitleMac": "Suchen oder springen zu… (⌘K)",
+      "searchTitleWindows": "Suchen oder springen zu… (Strg K)",
+      "searchPlaceholder": "Patienten, Leads suchen…",
+      "pin": "An Leiste anheften",
+      "unpin": "Von Leiste lösen",
+      "pinAria": "An Leiste anheften · {{section}}",
+      "unpinAria": "Von Leiste lösen · {{section}}",
+      "pinFooter": "Anheften, um es in der Leiste zu behalten",
+      "keysHint": "G · 1–9",
+      "account": "Konto",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Abwesend",
+        "busy": "Beschäftigt"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Klinik wechseln",
+      "devices": "Geräte",
+      "viewAs": {
+        "previewing": "Vorschau als {{role}}",
+        "noSections": "Keine Bereiche",
+        "exit": "Vorschau beenden",
+        "exitToast": "Zurück zu deinem eigenen Zugriff"
+      },
+      "branch": {
+        "label": "Filiale · {{label}}",
+        "title": "Filiale · {{names}}",
+        "all": "Alle Filialen",
+        "allSub": "Gesamtansicht · Summen über {{count}}",
+        "viewGroup": "Ansicht",
+        "branchesGroup": "Filialen",
+        "showingAll": "Alle Filialen werden angezeigt",
+        "showing": "Angezeigt: {{names}}",
+        "keepOne": "Mindestens eine Filiale behalten"
+      }
     }
   },
   "public": {

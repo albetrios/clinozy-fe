@@ -149,6 +149,53 @@
       "dark": "Scuro",
       "system": "Sistema",
       "shuffle": "Tema casuale"
+    },
+    "sectionBar": {
+      "nav": "Sezioni",
+      "allSections": "Tutte le sezioni",
+      "allSectionsTitle": "Tutte le sezioni (G)",
+      "more": "Altro",
+      "morePinned": "Altre sezioni fissate",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Cerca o vai a (Comando K)",
+      "searchTitleMac": "Cerca o vai a… (⌘K)",
+      "searchTitleWindows": "Cerca o vai a… (Ctrl K)",
+      "searchPlaceholder": "Cerca pazienti, lead…",
+      "pin": "Fissa nella barra",
+      "unpin": "Rimuovi dalla barra",
+      "pinAria": "Fissa nella barra · {{section}}",
+      "unpinAria": "Rimuovi dalla barra · {{section}}",
+      "pinFooter": "Fissa per tenerla nella barra",
+      "keysHint": "G · 1–9",
+      "account": "Account",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Stato",
+      "presence": {
+        "online": "Online",
+        "away": "Assente",
+        "busy": "Occupato"
+      },
+      "statusToast": "Stato · {{status}}",
+      "switchClinic": "Cambia clinica",
+      "devices": "Dispositivi",
+      "viewAs": {
+        "previewing": "Anteprima come {{role}}",
+        "noSections": "Nessuna sezione",
+        "exit": "Esci dall’anteprima",
+        "exitToast": "Di nuovo con il tuo accesso"
+      },
+      "branch": {
+        "label": "Sede · {{label}}",
+        "title": "Sede · {{names}}",
+        "all": "Tutte le sedi",
+        "allSub": "Vista combinata · totali su {{count}}",
+        "viewGroup": "Vista",
+        "branchesGroup": "Sedi",
+        "showingAll": "Mostrate tutte le sedi",
+        "showing": "Mostrate: {{names}}",
+        "keepOne": "Tieni almeno una sede"
+      }
     }
   },
   "public": {

@@ -149,6 +149,53 @@
       "dark": "深色",
       "system": "跟随系统",
       "shuffle": "随机主题"
+    },
+    "sectionBar": {
+      "nav": "版块",
+      "allSections": "所有版块",
+      "allSectionsTitle": "所有版块 (G)",
+      "more": "更多",
+      "morePinned": "更多已固定版块",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "搜索或跳转 (Command K)",
+      "searchTitleMac": "搜索或跳转… (⌘K)",
+      "searchTitleWindows": "搜索或跳转… (Ctrl K)",
+      "searchPlaceholder": "搜索患者、线索…",
+      "pin": "固定到栏",
+      "unpin": "从栏取消固定",
+      "pinAria": "固定到栏 · {{section}}",
+      "unpinAria": "从栏取消固定 · {{section}}",
+      "pinFooter": "固定后保留在栏中",
+      "keysHint": "G · 1–9",
+      "account": "账户",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "状态",
+      "presence": {
+        "online": "在线",
+        "away": "离开",
+        "busy": "忙碌"
+      },
+      "statusToast": "状态 · {{status}}",
+      "switchClinic": "切换诊所",
+      "devices": "设备",
+      "viewAs": {
+        "previewing": "正在以{{role}}身份预览",
+        "noSections": "没有版块",
+        "exit": "退出预览",
+        "exitToast": "已恢复你自己的访问权限"
+      },
+      "branch": {
+        "label": "分院 · {{label}}",
+        "title": "分院 · {{names}}",
+        "all": "所有分院",
+        "allSub": "合并视图 · {{count}} 家分院合计",
+        "viewGroup": "视图",
+        "branchesGroup": "分院",
+        "showingAll": "正在显示所有分院",
+        "showing": "正在显示 {{names}}",
+        "keepOne": "至少保留一个分院"
+      }
     }
   },
   "public": {

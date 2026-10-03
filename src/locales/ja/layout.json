@@ -149,6 +149,53 @@
       "dark": "ダーク",
       "system": "システム",
       "shuffle": "テーマをシャッフル"
+    },
+    "sectionBar": {
+      "nav": "セクション",
+      "allSections": "すべてのセクション",
+      "allSectionsTitle": "すべてのセクション (G)",
+      "more": "その他",
+      "morePinned": "その他の固定セクション",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "検索または移動 (Command K)",
+      "searchTitleMac": "検索または移動… (⌘K)",
+      "searchTitleWindows": "検索または移動… (Ctrl K)",
+      "searchPlaceholder": "患者、リードを検索…",
+      "pin": "バーに固定",
+      "unpin": "バーから固定解除",
+      "pinAria": "バーに固定 · {{section}}",
+      "unpinAria": "バーから固定解除 · {{section}}",
+      "pinFooter": "固定するとバーに残ります",
+      "keysHint": "G · 1–9",
+      "account": "アカウント",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "ステータス",
+      "presence": {
+        "online": "オンライン",
+        "away": "離席中",
+        "busy": "取り込み中"
+      },
+      "statusToast": "ステータス · {{status}}",
+      "switchClinic": "クリニックを切り替え",
+      "devices": "デバイス",
+      "viewAs": {
+        "previewing": "{{role}} としてプレビュー中",
+        "noSections": "セクションなし",
+        "exit": "プレビューを終了",
+        "exitToast": "自分のアクセスに戻りました"
+      },
+      "branch": {
+        "label": "院 · {{label}}",
+        "title": "院 · {{names}}",
+        "all": "すべての院",
+        "allSub": "統合ビュー · {{count}}院の合計",
+        "viewGroup": "表示",
+        "branchesGroup": "院",
+        "showingAll": "すべての院を表示中",
+        "showing": "{{names}}を表示中",
+        "keepOne": "少なくとも1つの院を残してください"
+      }
     }
   },
   "public": {

@@ -15,8 +15,17 @@ import { notify } from '@/shared/notify/index.ts';
  * App-shell banner shown when the signed-in user's email is not yet verified.
  * Sends a fresh sign-in code via `POST /auth/email/send-code` (public, same flow as `/login`).
  * Renders nothing once verified — or while the session context is still loading.
+ *
+ * `pill` is the section bar's system-notice shape — the design's View-as pill
+ * ("use the same pill for system notices", `shell.md:63`): a 44px dark pill the
+ * shell stacks above the bottom tab bar, publishing its height through
+ * `data-slot="notice-pill"`.
  */
-export function EmailVerificationBanner() {
+export function EmailVerificationBanner({
+  variant = 'strip',
+}: {
+  variant?: 'strip' | 'pill';
+} = {}) {
   const { t } = useTranslation(LAYOUT_NS);
   // Rendering nothing on a failed me/context hides the prompt from exactly the
   // users who need it, and looks identical to "already verified" (X-1). The
@@ -58,6 +67,37 @@ export function EmailVerificationBanner() {
       setSending(false);
     }
   };
+
+  if (variant === 'pill') {
+    return (
+      <div className="flex max-w-full flex-col items-center gap-2">
+        <output
+          data-testid="email-verify-banner"
+          data-slot="notice-pill"
+          className="bg-primary text-primary-foreground animate-dropdown-up pointer-events-auto flex h-11 max-w-full items-center gap-2.5 rounded-full ps-3.5 pe-1.5 shadow-(--elevation-menu)"
+        >
+          <Mail className="size-3.5 flex-none opacity-70" aria-hidden="true" />
+          <span className="text-body min-w-0 truncate font-semibold">
+            {t(keys.message)}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            data-slot="pill"
+            className="bg-canvas text-foreground hover:bg-border h-8 flex-none rounded-full px-3"
+            disabled={sending || sent || !turnstileReady}
+            isLoading={sending || !turnstileReady}
+            onClick={resend}
+            data-testid="email-verify-resend"
+          >
+            {resendButtonLabel()}
+          </Button>
+        </output>
+        {/* An escalated Turnstile challenge sits under the pill, never inside it. */}
+        <CaptchaSlot testId="email-verify-captcha-slot" />
+      </div>
+    );
+  }
 
   return (
     <output

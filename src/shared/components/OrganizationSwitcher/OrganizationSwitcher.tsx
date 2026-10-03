@@ -14,6 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
@@ -54,6 +57,17 @@ interface OrganizationSwitcherProps {
   leading?: ReactNode;
   /** Second line under the organization name in the lockup (the product name). */
   caption?: string;
+  /**
+   * `submenu` renders the switcher as a row inside a parent dropdown — the
+   * section-bar Account menu's "Switch clinic" (KICKOFF §3.2) — instead of its
+   * own trigger and menu. It lists the workspaces only (no "Add"), and hides
+   * when there is nothing to switch to.
+   */
+  presentation?: 'menu' | 'submenu';
+  /** The submenu row's label (`presentation: 'submenu'`). */
+  submenuLabel?: string;
+  /** Called once a switch has landed — a parent menu closes itself. */
+  onSwitched?: () => void;
 }
 
 /**
@@ -253,23 +267,56 @@ function OrganizationMenuSections({
   );
 }
 
+/** The switcher as a row inside a parent menu: its label, the active name, the list beside it. */
+function OrganizationSubmenu({
+  open,
+  onOpenChange,
+  label,
+  activeName,
+  busy,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  label: string | undefined;
+  activeName: string;
+  busy: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <DropdownMenuSub open={open} onOpenChange={onOpenChange}>
+      <DropdownMenuSubTrigger
+        className="text-body h-9 gap-2.5 rounded-lg px-2.5 font-medium"
+        disabled={busy}
+        aria-busy={busy}
+        data-testid="organization-switcher-trigger"
+        data-layout="submenu"
+      >
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        <span className="text-muted-foreground text-caption max-w-28 truncate">
+          {activeName}
+        </span>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent className="w-64">{children}</DropdownMenuSubContent>
+    </DropdownMenuSub>
+  );
+}
+
 /**
- * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
- * organizations from `me/context`, split into **Personal** and **Organizations**
- * sections. Switching to a **team** org navigates to its
- * `/organization/$organizationSlug/dashboard` (the org guard performs the
- * switch-on-navigation); switching to the **personal** org has no URL to drive
- * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
+ * The switch itself, shared by both presentations: the controlled menu state,
+ * which row's switch is in flight, and `selectOrg` — single-flight, with the
+ * workspace-switch overlay, a reported and toasted failure, and the menu closed
+ * only once a switch has landed.
  */
-export function OrganizationSwitcher({
-  className,
-  align = 'start',
-  surface = 'default',
-  leading,
-  caption,
-}: OrganizationSwitcherProps) {
-  const { t } = useTranslation(LAYOUT_NS);
-  const [createOpen, setCreateOpen] = useState(false);
+function useOrganizationSwitch({
+  activeId,
+  personalOrganizations,
+  onSwitched,
+}: {
+  activeId: string | undefined;
+  personalOrganizations: boolean;
+  onSwitched: (() => void) | undefined;
+}) {
   /**
    * The menu is CONTROLLED so it can be closed once a switch settles.
    *
@@ -307,38 +354,10 @@ export function OrganizationSwitcher({
   const navigate = useNavigate();
   const beginSwitch = useWorkspaceSwitchStore((state) => state.beginSwitch);
   const endSwitch = useWorkspaceSwitchStore((state) => state.endSwitch);
-  // A failed me/context used to pass in silence: the trigger just read "Select
-  // organization" over an empty list, indistinguishable from a real empty
-  // account (X-1). It now raises one toast carrying a Retry that refetches.
-  // Deliberately NOT `throwOnError` — swapping the switcher for an error card
-  // reflows the header around a control the user is mid-reach for; the toast
-  // says the same thing without moving anything.
-  const { data: ctx, isLoading } = useMeContext({ notifyOnError: true });
-  const deploymentFlags = useDeploymentFlags();
-  // Above the early return below: a hook after a conditional `return` is called
-  // in a different order once the switcher is hidden, which is exactly what
-  // rules-of-hooks forbids.
-  const orgs = useMyOrganizationSummaries().data ?? [];
-
-  if (!shouldShowOrganizationSwitcher(deploymentFlags)) {
-    return null;
-  }
-
-  const mode = resolveDeploymentMode(deploymentFlags);
-  const showPersonalSection = deploymentFlags.personalOrganizations;
-  const showCreateTeam = shouldAllowCreateTeam(deploymentFlags);
-
-  const personalOrgs = showPersonalSection
-    ? orgs.filter((o) => o.type === 'PERSONAL')
-    : [];
-  const teamOrgs = orgs.filter((o) => o.type === 'TEAM');
-  const activeId = ctx?.activeOrganization?.id;
-  const activeName =
-    ctx?.activeOrganization?.name ?? t(LAYOUT_KEYS.app.orgSwitcher.selectPlaceholder);
 
   async function applySelect(org: OrganizationSummary) {
     if (org.type === 'PERSONAL') {
-      if (!deploymentFlags.personalOrganizations) return;
+      if (!personalOrganizations) return;
       await switchToPersonal();
       // Awaited, not `void`: a navigation that rejects is the other half of
       // "and on failure, nothing happens ever" — fire-and-forget put it out of
@@ -373,6 +392,7 @@ export function OrganizationSwitcher({
         // failure has somewhere to land other than a screen the user has
         // already been handed back.
         setMenuOpen(false);
+        onSwitched?.();
       })
       .catch((error: unknown) => {
         // The bare `.catch(() => undefined)` was the bug: a failed switch looked
@@ -409,6 +429,40 @@ export function OrganizationSwitcher({
       });
   }
 
+  return { menuOpen, setMenuOpen, switchingId, selectOrg };
+}
+
+/**
+ * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
+ * organizations from `me/context`, split into **Personal** and **Organizations**
+ * sections. Switching to a **team** org navigates to its
+ * `/organization/$organizationSlug/dashboard` (the org guard performs the
+ * switch-on-navigation); switching to the **personal** org has no URL to drive
+ * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
+ */
+/**
+ * What both presentations read: whether the switcher shows at all, the
+ * workspaces split into personal and team, the active one, and the switch.
+ */
+function useSwitcherModel(onSwitched: (() => void) | undefined) {
+  const { t } = useTranslation(LAYOUT_NS);
+  // A failed me/context used to pass in silence: the trigger just read "Select
+  // organization" over an empty list, indistinguishable from a real empty
+  // account (X-1). It now raises one toast carrying a Retry that refetches.
+  // Deliberately NOT `throwOnError` — swapping the switcher for an error card
+  // reflows the header around a control the user is mid-reach for; the toast
+  // says the same thing without moving anything.
+  const { data: ctx, isLoading } = useMeContext({ notifyOnError: true });
+  const deploymentFlags = useDeploymentFlags();
+  const orgs = useMyOrganizationSummaries().data ?? [];
+  const activeId = ctx?.activeOrganization?.id;
+  const switching = useOrganizationSwitch({
+    activeId,
+    personalOrganizations: deploymentFlags.personalOrganizations,
+    onSwitched,
+  });
+  const { switchingId, selectOrg } = switching;
+
   const renderOrg = (org: OrganizationSummary) => (
     <OrganizationOption
       key={org.id}
@@ -419,6 +473,100 @@ export function OrganizationSwitcher({
       onChoose={selectOrg}
     />
   );
+
+  return {
+    ...switching,
+    visible: shouldShowOrganizationSwitcher(deploymentFlags),
+    teamOnly: resolveDeploymentMode(deploymentFlags) === 'team-only',
+    showCreateTeam: shouldAllowCreateTeam(deploymentFlags),
+    personalOrgs: deploymentFlags.personalOrganizations
+      ? orgs.filter((o) => o.type === 'PERSONAL')
+      : [],
+    teamOrgs: orgs.filter((o) => o.type === 'TEAM'),
+    activeName:
+      ctx?.activeOrganization?.name ?? t(LAYOUT_KEYS.app.orgSwitcher.selectPlaceholder),
+    busy: isLoading || switchingId !== null,
+    isLoading,
+    renderOrg,
+  };
+}
+
+/**
+ * The switcher as a row of a parent menu (`presentation: 'submenu'`): the
+ * workspaces beside it, no "Add", nothing at all with one workspace.
+ */
+function OrganizationSwitcherSubmenu({
+  submenuLabel,
+  onSwitched,
+}: Pick<OrganizationSwitcherProps, 'submenuLabel' | 'onSwitched'>) {
+  const model = useSwitcherModel(onSwitched);
+  if (!model.visible || model.personalOrgs.length + model.teamOrgs.length <= 1) {
+    return null;
+  }
+  return (
+    <OrganizationSubmenu
+      open={model.menuOpen}
+      onOpenChange={model.setMenuOpen}
+      label={submenuLabel}
+      activeName={model.activeName}
+      busy={model.busy}
+    >
+      <OrganizationMenuSections
+        personalOptions={model.personalOrgs.map(model.renderOrg)}
+        teamOptions={model.teamOrgs.map(model.renderOrg)}
+        teamOnly={model.teamOnly}
+        showCreateTeam={false}
+        onCreate={() => undefined}
+      />
+    </OrganizationSubmenu>
+  );
+}
+
+/**
+ * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
+ * organizations from `me/context`, split into **Personal** and **Organizations**
+ * sections. Switching to a **team** org navigates to its
+ * `/organization/$organizationSlug/dashboard` (the org guard performs the
+ * switch-on-navigation); switching to the **personal** org has no URL to drive
+ * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
+ */
+export function OrganizationSwitcher(props: OrganizationSwitcherProps) {
+  return props.presentation === 'submenu' ? (
+    <OrganizationSwitcherSubmenu
+      submenuLabel={props.submenuLabel}
+      onSwitched={props.onSwitched}
+    />
+  ) : (
+    <OrganizationSwitcherMenu {...props} />
+  );
+}
+
+/** The switcher with its own trigger — a header field or the sidebar's brand lockup. */
+function OrganizationSwitcherMenu({
+  className,
+  align = 'start',
+  surface = 'default',
+  leading,
+  caption,
+  onSwitched,
+}: OrganizationSwitcherProps) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const [createOpen, setCreateOpen] = useState(false);
+  const {
+    visible,
+    menuOpen,
+    setMenuOpen,
+    switchingId,
+    isLoading,
+    activeName,
+    personalOrgs,
+    teamOrgs,
+    teamOnly,
+    showCreateTeam,
+    renderOrg,
+  } = useSwitcherModel(onSwitched);
+
+  if (!visible) return null;
 
   const {
     layout: triggerLayout,
@@ -466,7 +614,7 @@ export function OrganizationSwitcher({
           <OrganizationMenuSections
             personalOptions={personalOrgs.map(renderOrg)}
             teamOptions={teamOrgs.map(renderOrg)}
-            teamOnly={mode === 'team-only'}
+            teamOnly={teamOnly}
             showCreateTeam={showCreateTeam}
             onCreate={() => setCreateOpen(true)}
           />

@@ -6,6 +6,8 @@ export const APP_SHELL_VARIANT = {
   topNav: 1,
   rail: 2,
   focus: 3,
+  /** The clinic launch's one-header shell (KICKOFF §3.2). */
+  sectionBar: 4,
 } as const;
 
 export type AppShellVariant = (typeof APP_SHELL_VARIANT)[keyof typeof APP_SHELL_VARIANT];

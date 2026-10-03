@@ -149,6 +149,53 @@
       "dark": "다크",
       "system": "시스템",
       "shuffle": "테마 셔플"
+    },
+    "sectionBar": {
+      "nav": "섹션",
+      "allSections": "모든 섹션",
+      "allSectionsTitle": "모든 섹션 (G)",
+      "more": "더보기",
+      "morePinned": "고정된 섹션 더보기",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "검색 또는 이동 (Command K)",
+      "searchTitleMac": "검색 또는 이동… (⌘K)",
+      "searchTitleWindows": "검색 또는 이동… (Ctrl K)",
+      "searchPlaceholder": "환자, 리드 검색…",
+      "pin": "바에 고정",
+      "unpin": "바에서 고정 해제",
+      "pinAria": "바에 고정 · {{section}}",
+      "unpinAria": "바에서 고정 해제 · {{section}}",
+      "pinFooter": "고정하면 바에 유지됩니다",
+      "keysHint": "G · 1–9",
+      "account": "계정",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "상태",
+      "presence": {
+        "online": "온라인",
+        "away": "자리 비움",
+        "busy": "바쁨"
+      },
+      "statusToast": "상태 · {{status}}",
+      "switchClinic": "클리닉 전환",
+      "devices": "기기",
+      "viewAs": {
+        "previewing": "{{role}}(으)로 미리 보는 중",
+        "noSections": "섹션 없음",
+        "exit": "미리 보기 종료",
+        "exitToast": "내 권한으로 돌아왔습니다"
+      },
+      "branch": {
+        "label": "지점 · {{label}}",
+        "title": "지점 · {{names}}",
+        "all": "모든 지점",
+        "allSub": "통합 보기 · {{count}}개 지점 합계",
+        "viewGroup": "보기",
+        "branchesGroup": "지점",
+        "showingAll": "모든 지점 표시 중",
+        "showing": "{{names}} 표시 중",
+        "keepOne": "지점을 하나 이상 유지하세요"
+      }
     }
   },
   "public": {

@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useRef, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -11,6 +11,7 @@ import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-gr
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
@@ -209,15 +210,31 @@ export function NotificationCenter({
   surface = 'default',
   popoverSide,
   popoverAlign = 'end',
+  open: openProp,
+  onOpenChange,
+  children,
 }: {
   /** Tinted shell the bell trigger sits on (e.g. icon rail). */
   surface?: 'default' | 'sidebar';
   /** Popover side — `right` when the trigger is in a narrow left rail. */
   popoverSide?: 'top' | 'right' | 'bottom' | 'left';
   popoverAlign?: 'start' | 'center' | 'end';
+  /** Controlled open state — a shell with no bell opens the inbox from a menu row. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * The element the inbox anchors to INSTEAD of the bell (the section bar has
+   * no bell: its Account menu row opens the inbox under the avatar).
+   */
+  children?: ReactNode;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean) => {
+    if (openProp === undefined) setOpenState(next);
+    onOpenChange?.(next);
+  };
   const navigate = useNavigate();
   const {
     data: items,
@@ -252,22 +269,26 @@ export function NotificationCenter({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn('relative', triggerSurfaceClass)}
-          aria-label={
-            unread > 0
-              ? t(LAYOUT_KEYS.app.notifications.ariaWithUnread, { count: unread })
-              : t(LAYOUT_KEYS.app.notifications.ariaDefault)
-          }
-          data-testid="notification-bell"
-        >
-          <Bell className="h-4 w-4" />
-          <UnreadBadge unread={unread} />
-        </Button>
-      </PopoverTrigger>
+      {children === undefined ? (
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn('relative', triggerSurfaceClass)}
+            aria-label={
+              unread > 0
+                ? t(LAYOUT_KEYS.app.notifications.ariaWithUnread, { count: unread })
+                : t(LAYOUT_KEYS.app.notifications.ariaDefault)
+            }
+            data-testid="notification-bell"
+          >
+            <Bell className="h-4 w-4" />
+            <UnreadBadge unread={unread} />
+          </Button>
+        </PopoverTrigger>
+      ) : (
+        <PopoverAnchor asChild>{children}</PopoverAnchor>
+      )}
 
       <PopoverContent
         align={popoverAlign}

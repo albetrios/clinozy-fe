@@ -15,6 +15,7 @@ import { useOrgBrand } from '@/shared/hooks/useOrgBrand/index.ts';
 import {
   loadFocusShell,
   loadRailShell,
+  loadSectionBarShell,
   loadSidebarShell,
   loadTopNavShell,
   preloadAllAppShellVariants,
@@ -39,9 +40,18 @@ const TopNavShell = lazy(() =>
 );
 const RailShell = lazy(() => loadRailShell().then((m) => ({ default: m.RailShell })));
 const FocusShell = lazy(() => loadFocusShell().then((m) => ({ default: m.FocusShell })));
+const SectionBarShell = lazy(() =>
+  loadSectionBarShell().then((m) => ({ default: m.SectionBarShell })),
+);
 
 /** In `APP_SHELL_VARIANT` order — index-aligned with the loaders. */
-const APP_SHELLS = [SidebarShell, TopNavShell, RailShell, FocusShell] as const;
+const APP_SHELLS = [
+  SidebarShell,
+  TopNavShell,
+  RailShell,
+  FocusShell,
+  SectionBarShell,
+] as const;
 
 /**
  * What sits inside the shell boundary: the failure, the skeleton, or the shell.

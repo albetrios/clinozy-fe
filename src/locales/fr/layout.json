@@ -149,6 +149,53 @@
       "dark": "Sombre",
       "system": "Système",
       "shuffle": "Thème aléatoire"
+    },
+    "sectionBar": {
+      "nav": "Sections",
+      "allSections": "Toutes les sections",
+      "allSectionsTitle": "Toutes les sections (G)",
+      "more": "Plus",
+      "morePinned": "Autres sections épinglées",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Rechercher ou aller à (Commande K)",
+      "searchTitleMac": "Rechercher ou aller à… (⌘K)",
+      "searchTitleWindows": "Rechercher ou aller à… (Ctrl K)",
+      "searchPlaceholder": "Rechercher des patients, des prospects…",
+      "pin": "Épingler à la barre",
+      "unpin": "Désépingler de la barre",
+      "pinAria": "Épingler à la barre · {{section}}",
+      "unpinAria": "Désépingler de la barre · {{section}}",
+      "pinFooter": "Épinglez pour la garder dans la barre",
+      "keysHint": "G · 1–9",
+      "account": "Compte",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Statut",
+      "presence": {
+        "online": "En ligne",
+        "away": "Absent",
+        "busy": "Occupé"
+      },
+      "statusToast": "Statut · {{status}}",
+      "switchClinic": "Changer de clinique",
+      "devices": "Appareils",
+      "viewAs": {
+        "previewing": "Aperçu en tant que {{role}}",
+        "noSections": "Aucune section",
+        "exit": "Quitter l’aperçu",
+        "exitToast": "Retour à vos propres accès"
+      },
+      "branch": {
+        "label": "Établissement · {{label}}",
+        "title": "Établissement · {{names}}",
+        "all": "Tous les établissements",
+        "allSub": "Vue combinée · totaux sur {{count}}",
+        "viewGroup": "Vue",
+        "branchesGroup": "Établissements",
+        "showingAll": "Tous les établissements affichés",
+        "showing": "Affichage : {{names}}",
+        "keepOne": "Gardez au moins un établissement"
+      }
     }
   },
   "public": {

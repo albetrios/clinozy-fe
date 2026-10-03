@@ -238,7 +238,7 @@ describe('AppLayout', () => {
 
       // The mark now lives INSIDE the switcher (mocked away here), so the row
       // itself holds exactly one child: the switcher's boundary.
-      expect(brand.querySelector('[data-slot="icon-chip"]')).toBeNull();
+      expect(brand.querySelector('[data-testid="brand-logo"]')).toBeNull();
       expect(brand).not.toHaveTextContent(PRODUCT_NAME);
     });
 
@@ -264,7 +264,7 @@ describe('AppLayout', () => {
       );
       const brand = await findByTestId('sidebar-brand');
 
-      expect(brand.querySelector('[data-slot="icon-chip"]')).not.toBeNull();
+      expect(brand.querySelector('[data-testid="brand-logo"]')).not.toBeNull();
       expect(brand).toHaveTextContent(PRODUCT_NAME);
       expect(brand).toHaveClass('h-14');
       expect(switcherMock).not.toHaveBeenCalled();

@@ -35,6 +35,7 @@ function fetched(variants: Variants): string[] {
     ['topNav', variants.loadTopNavShell],
     ['rail', variants.loadRailShell],
     ['focus', variants.loadFocusShell],
+    ['sectionBar', variants.loadSectionBarShell],
   ]
     .filter(([, load]) => (load as Variants['loadSidebarShell']).peek() !== undefined)
     .map(([name]) => name as string);
@@ -113,6 +114,12 @@ describe('app-layout-variants', () => {
   it('preloadAllAppShellVariants warms every shell (test harness)', async () => {
     await variants.preloadAllAppShellVariants();
 
-    expect(fetched(variants)).toEqual(['sidebar', 'topNav', 'rail', 'focus']);
+    expect(fetched(variants)).toEqual([
+      'sidebar',
+      'topNav',
+      'rail',
+      'focus',
+      'sectionBar',
+    ]);
   });
 });

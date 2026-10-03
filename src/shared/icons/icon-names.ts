@@ -46,6 +46,7 @@ export type IconName =
   | 'ImageIcon'
   | 'Info'
   | 'InstagramMark'
+  | 'Keyboard'
   | 'Laptop'
   | 'Languages'
   | 'LayoutDashboard'

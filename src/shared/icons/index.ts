@@ -45,6 +45,7 @@ import {
   House as LuHouse,
   Image as LuImage,
   Info as LuInfo,
+  Keyboard as LuKeyboard,
   Languages as LuLanguages,
   Laptop as LuLaptop,
   LayoutDashboard as LuLayoutDashboard,
@@ -198,6 +199,7 @@ export const ImageIcon = makeIcon('ImageIcon', LuImage);
 export const Info = makeIcon('Info', LuInfo);
 /** Instagram brand mark, drawn locally (lucide-react ships no brand icons). */
 export const InstagramMark = makeIcon('InstagramMark', LuInstagramMark);
+export const Keyboard = makeIcon('Keyboard', LuKeyboard);
 export const Laptop = makeIcon('Laptop', LuLaptop);
 export const Languages = makeIcon('Languages', LuLanguages);
 export const LayoutDashboard = makeIcon('LayoutDashboard', LuLayoutDashboard);

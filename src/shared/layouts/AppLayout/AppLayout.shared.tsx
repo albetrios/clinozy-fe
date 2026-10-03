@@ -5,13 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { platformConfig } from '@/core/config/env.ts';
 import { PageTransition } from '@/lib/animations/PageTransition.tsx';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import {
-  iconChipClassName,
-  iconOnPrimarySurface,
-  iconOnSidebarSurface,
-} from '@/lib/icon-surface.ts';
+import { iconOnSidebarSurface } from '@/lib/icon-surface.ts';
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { logout } from '@/shared/auth/service.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
@@ -33,7 +31,11 @@ import {
 } from '@/shared/components/ui/tooltip.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
-import { Boxes, LogOut, Search, Settings } from '@/shared/icons/index.ts';
+import { Compass, LogOut, Search, Settings } from '@/shared/icons/index.ts';
+import type {
+  SectionBarEntry,
+  SectionBarNav,
+} from '@/shared/layouts/AppLayout/section-bar-nav.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
@@ -94,14 +96,73 @@ export function SkipLink() {
   );
 }
 
-export function BrandLogo() {
+/** The product name as the wordmark draws it: lower case, its first "o" a ring. */
+function Wordmark() {
+  const word = PRODUCT_NAME.toLowerCase();
+  const ring = word.indexOf('o');
   return (
-    <div
-      data-slot="icon-chip"
-      className={cn('bg-primary text-primary-foreground size-8', iconChipClassName)}
+    <span
+      aria-hidden
+      className="text-foreground inline-flex items-baseline text-[1.1875rem] leading-none font-semibold tracking-[-0.03em]"
     >
-      <Boxes className={cn('h-5 w-5', iconOnPrimarySurface)} />
-    </div>
+      {ring < 0 ? (
+        word
+      ) : (
+        <>
+          {word.slice(0, ring)}
+          <svg
+            aria-hidden
+            viewBox="0 0 20 20"
+            className="inline-block size-[0.56em] overflow-visible align-[-0.02em]"
+          >
+            <circle
+              cx="10"
+              cy="10"
+              r="7.6"
+              fill="none"
+              strokeWidth="4.2"
+              className="stroke-foreground"
+            />
+            <circle cx="10" cy="10" r="3" className="fill-brand-mark-strong" />
+          </svg>
+          {word.slice(ring + 1)}
+        </>
+      )}
+    </span>
+  );
+}
+
+/**
+ * The product mark — a 28px tile in `primary` with the "C" stroke and the
+ * `brand-mark` dot (`shell.md:18`; H:525) — and, with `wordmark`, the
+ * lower-case name beside it (from `md` up: a phone header shows the mark only).
+ * A brand asset, so its corner is fixed rather than following the radius axis.
+ */
+export function BrandLogo({ wordmark = false }: { wordmark?: boolean }) {
+  return (
+    <span
+      role="img"
+      aria-label={PRODUCT_NAME}
+      className="flex flex-none items-center gap-2.25 leading-none"
+      data-testid="brand-logo"
+    >
+      <svg viewBox="0 0 28 28" aria-hidden className="block size-7 flex-none">
+        <rect width="28" height="28" rx="8" className="fill-primary" />
+        <path
+          d="M18.6 9.1a6.4 6.4 0 1 0 0 9.8"
+          fill="none"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          className="stroke-primary-foreground"
+        />
+        <circle cx="20.2" cy="14" r="2.3" className="fill-brand-mark" />
+      </svg>
+      {wordmark ? (
+        <span className="hidden md:inline-flex">
+          <Wordmark />
+        </span>
+      ) : null}
+    </span>
   );
 }
 
@@ -109,17 +170,55 @@ export function BrandLogo() {
 export function SearchTrigger({
   iconOnly = false,
   emphasis = false,
+  sectionBar = false,
   className,
 }: {
   iconOnly?: boolean;
   /** Center-weighted search for the Focus shell. */
   emphasis?: boolean;
+  /**
+   * The section bar's slot 6 (`shell.md:23`; H:541): a 240px field from `md`,
+   * a 36px icon button on a phone.
+   */
+  sectionBar?: boolean;
   className?: string;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   const isMac =
     typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
   const open = () => useUIStore.getState().setCommandPaletteOpen(true);
+  if (sectionBar) {
+    const keys = LAYOUT_KEYS.app.sectionBar;
+    return (
+      <button
+        type="button"
+        onClick={open}
+        onMouseEnter={preloadCommandPalette}
+        onFocus={preloadCommandPalette}
+        aria-label={t(keys.searchLabel)}
+        title={t(isMac ? keys.searchTitleMac : keys.searchTitleWindows)}
+        data-testid="search-trigger"
+        className={cn(
+          'bg-card text-muted-foreground hover:bg-muted flex size-9 flex-none cursor-pointer items-center justify-center rounded-lg border transition-colors',
+          'md:bg-canvas md:hover:border-border-strong md:text-body md:h-8 md:w-auto md:min-w-8 md:flex-[0_1_15rem] md:justify-start md:gap-2 md:overflow-hidden md:ps-2.25 md:pe-1.5',
+          className,
+        )}
+      >
+        <Search className="size-3.75 flex-none" aria-hidden />
+        <span className="hidden min-w-0 flex-1 truncate text-start md:inline">
+          {t(keys.searchPlaceholder)}
+        </span>
+        <kbd
+          data-slot="kbd"
+          className="bg-card text-muted-foreground text-tiny hidden h-5 flex-none items-center rounded-sm border px-1.5 font-mono md:flex"
+        >
+          {isMac
+            ? t(LAYOUT_KEYS.app.searchShortcutMac)
+            : t(LAYOUT_KEYS.app.searchShortcutWindows)}
+        </kbd>
+      </button>
+    );
+  }
   if (iconOnly) {
     return (
       <Button
@@ -308,36 +407,159 @@ export function NavList({
   return <>{links}</>;
 }
 
-/** Bottom tab bar for mobile (shells that hide their nav on small screens). */
+const tabSlotClassName =
+  'flex min-w-0 flex-col items-center justify-center gap-0.75 rounded-lg [-webkit-tap-highlight-color:transparent]';
+const tabPillClassName =
+  'flex h-7 w-11.5 items-center justify-center rounded-full transition-colors duration-160';
+const tabLabelClassName = 'max-w-full truncate px-0.5 text-tiny leading-[1.1]';
+
+/** One tab-bar slot: a 46×28 icon pill over a 10.5px label, in the room's tone when current. */
+function TabBarItem({
+  entry,
+  current,
+  organizationSlug,
+}: {
+  entry: SectionBarEntry;
+  current: boolean;
+  organizationSlug: string;
+}) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const tone = TONE_CLASSES[entry.tone];
+  return (
+    <Link
+      to={entry.to}
+      params={{ organizationSlug }}
+      activeOptions={{ exact: true }}
+      aria-current={current ? 'page' : undefined}
+      data-slot="nav-item"
+      data-testid={`nav-${entry.id}`}
+      className={cn(
+        tabSlotClassName,
+        current ? tone.ink : 'text-muted-foreground-strong',
+      )}
+    >
+      <span
+        data-slot="pill"
+        className={cn(tabPillClassName, current ? tone.bg : 'text-muted-foreground')}
+      >
+        <entry.icon className="size-4" aria-hidden />
+      </span>
+      <span className={cn(tabLabelClassName, current ? 'font-semibold' : 'font-medium')}>
+        {t(entry.labelKey, { ns: entry.labelNs })}
+      </span>
+    </Link>
+  );
+}
+
+/** The section bar's phone tab bar: the first four pinned rooms and "More" (D30; H:4079–4082). */
+function SectionTabBar({
+  sections,
+  organizationSlug,
+}: {
+  sections: MobileNavSections;
+  organizationSlug: string;
+}) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const { nav, moreOpen, onMore } = sections;
+  const slots = nav.pinned.slice(0, 4);
+  const elsewhere =
+    nav.current !== null && !slots.includes(nav.current) ? nav.current : null;
+  const moreTone = elsewhere ? TONE_CLASSES[elsewhere.tone] : null;
+  let morePill = 'text-muted-foreground';
+  if (moreTone) morePill = moreTone.bg;
+  else if (moreOpen) morePill = 'bg-muted';
+  return (
+    <>
+      {slots.map((entry) => (
+        <TabBarItem
+          key={entry.id}
+          entry={entry}
+          current={entry === nav.current}
+          organizationSlug={organizationSlug}
+        />
+      ))}
+      <button
+        type="button"
+        onClick={onMore}
+        aria-label={t(LAYOUT_KEYS.app.sectionBar.allSections)}
+        aria-haspopup="dialog"
+        aria-current={elsewhere ? 'page' : undefined}
+        data-testid="nav-more-sections"
+        className={cn(
+          tabSlotClassName,
+          'col-start-5',
+          moreTone ? moreTone.ink : 'text-muted-foreground-strong',
+        )}
+      >
+        <span data-slot="pill" className={cn(tabPillClassName, morePill)}>
+          <Compass className="size-4.5" aria-hidden />
+        </span>
+        <span
+          className={cn(tabLabelClassName, elsewhere ? 'font-semibold' : 'font-medium')}
+        >
+          {elsewhere
+            ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
+            : t(LAYOUT_KEYS.app.sectionBar.more)}
+        </span>
+      </button>
+    </>
+  );
+}
+
+/** What the section bar hands the tab bar: its nav model and the All sections sheet's state. */
+export interface MobileNavSections {
+  nav: SectionBarNav;
+  moreOpen: boolean;
+  onMore: () => void;
+}
+
+/**
+ * Bottom tab bar on phones (shells that hide their nav below `md`): 58px plus
+ * the safe area, `bg-card` with a top hairline. Given `sections` it is the
+ * section bar's tab bar (four pins + "More", D30); otherwise it lists the
+ * shell's nav entries.
+ */
 export function MobileNav({
   navItems,
   organizationSlug,
+  sections,
 }: {
   navItems: NavItems;
   organizationSlug: string;
+  sections?: MobileNavSections;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   return (
     <nav
-      aria-label={t(LAYOUT_KEYS.a11y.mobileNavigation)}
+      aria-label={t(
+        sections ? LAYOUT_KEYS.app.sectionBar.nav : LAYOUT_KEYS.a11y.mobileNavigation,
+      )}
       // `mobile-nav` is what `index.css` looks for to lift floating corner
-      // surfaces (consent card, feedback trigger) clear of this bar.
+      // surfaces (consent card, feedback trigger, notice pills, the floating
+      // "New") clear of this bar.
       data-slot="mobile-nav"
-      className="bg-background fixed start-0 end-0 bottom-0 z-40 flex border-t md:hidden"
+      className={cn(
+        'bg-card fixed inset-x-0 bottom-0 z-40 h-[calc(3.625rem+env(safe-area-inset-bottom))] border-t px-1 pt-1 pb-[env(safe-area-inset-bottom)] md:hidden',
+        sections ? 'grid grid-cols-5' : 'flex',
+      )}
       data-testid="mobile-bottom-bar"
     >
-      {navItems.map((item) => (
-        <AppNavLink
-          key={item.id}
-          entry={item}
-          organizationSlug={organizationSlug}
-          activeClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-foreground bg-muted/50"
-          inactiveClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-        >
-          <item.icon className="h-5 w-5" aria-hidden />
-          <span>{t(item.labelKey, { ns: item.labelNs })}</span>
-        </AppNavLink>
-      ))}
+      {sections ? (
+        <SectionTabBar sections={sections} organizationSlug={organizationSlug} />
+      ) : (
+        navItems.map((item) => (
+          <AppNavLink
+            key={item.id}
+            entry={item}
+            organizationSlug={organizationSlug}
+            activeClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-foreground bg-muted/50"
+            inactiveClassName="flex min-h-[44px] min-w-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          >
+            <item.icon className="h-5 w-5" aria-hidden />
+            <span>{t(item.labelKey, { ns: item.labelNs })}</span>
+          </AppNavLink>
+        ))
+      )}
     </nav>
   );
 }
@@ -390,8 +612,19 @@ function bindScrollResetToSession(): void {
   });
 }
 
-/** The scrolling content region (email banner + routed page). */
-export function AppMain() {
+/**
+ * The scrolling content region (email banner + routed page). `flush` drops the
+ * page padding for screens that lay out their own gutters (the clinic rooms,
+ * KICKOFF §3.2) and keeps only the phone tab bar's clearance; `banner: 'none'`
+ * leaves the email notice to the shell (the section bar draws it as a pill).
+ */
+export function AppMain({
+  flush = false,
+  banner = 'strip',
+}: {
+  flush?: boolean;
+  banner?: 'strip' | 'none';
+} = {}) {
   const { t } = useTranslation(ERRORS_NS);
   const mainRef = useRef<HTMLElement>(null);
   const layoutPreference = useThemeStore((s) => s.layoutWidth);
@@ -456,13 +689,15 @@ export function AppMain() {
 
   return (
     <>
-      <SectionErrorBoundary
-        title={t(ERRORS_KEYS.widget.emailBanner)}
-        testId="email-banner-error"
-        variant="inline"
-      >
-        <EmailVerificationBanner />
-      </SectionErrorBoundary>
+      {banner === 'strip' ? (
+        <SectionErrorBoundary
+          title={t(ERRORS_KEYS.widget.emailBanner)}
+          testId="email-banner-error"
+          variant="inline"
+        >
+          <EmailVerificationBanner />
+        </SectionErrorBoundary>
+      ) : null}
       <main
         id="main-content"
         ref={mainRef}
@@ -470,11 +705,21 @@ export function AppMain() {
         // height on phones. `sm:pb-20` is not redundant — `sm:p-6` resets every
         // side, and the tab bar this padding clears stays until `md`.
         data-slot="app-main"
-        className="3xl:p-8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-20 md:pb-6"
+        className={
+          flush
+            ? 'flex min-h-0 flex-1 flex-col overflow-y-auto pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom))]'
+            : '3xl:p-8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-20 md:pb-6'
+        }
         data-testid="main-content"
         data-layout-width={layoutWidth}
+        data-flush={flush || undefined}
       >
-        <div className={layoutMainClassName(layoutWidth)}>
+        <div
+          className={cn(
+            layoutMainClassName(layoutWidth),
+            flush && 'flex min-h-0 flex-1 flex-col',
+          )}
+        >
           <SectionErrorBoundary
             title={t(ERRORS_KEYS.widget.pageContent)}
             testId="page-content-error"
