@@ -142,10 +142,6 @@
       "booked_by_mistake": "误预约",
       "other": "其他"
     },
-    "days": {
-      "today": "今天",
-      "tomorrow": "明天"
-    },
     "toasts": {
       "booked": "已预约 {{id}} · {{day}} {{time}} · 已通过 WhatsApp 发送确认请求",
       "bookedQueued": "已预约 {{id}} · {{day}} {{time}} · 提醒已排队",
@@ -394,14 +390,6 @@
     "hint": "输入至少 2 个字符以搜索患者、潜在客户和发票",
     "empty": "没有匹配项。试试姓名、电话或 #ID。"
   },
-  "appointmentStatuses": {
-    "scheduled": "已预约",
-    "confirmed": "已确认",
-    "checked_in": "已到诊",
-    "completed": "已完成",
-    "cancelled": "已取消",
-    "no_show": "未到"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "电话",
@@ -450,9 +438,6 @@
       "contactThread": "联系人 · 仅聊天 · 无线索"
     },
     "when": {
-      "today": "今天",
-      "tomorrow": "明天",
-      "yesterday": "昨天",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

@@ -10,6 +10,7 @@ import type {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-contracts.ts';
 
+import { systemLine } from './messages.fixtures.ts';
 import { clinicFixtures } from './world.fixtures.ts';
 
 const CLOSED: ReadonlySet<LeadStatus> = new Set(LEAD_CLOSED_STATUSES);
@@ -93,17 +94,10 @@ async function moveLeadsToVisited(
 ): Promise<void> {
   for (const lead of openLeadsOf(visit)) {
     await change.update(clinicFixtures.leads, lead.id, { status: 'clinic_visited' });
-    await change.create(clinicFixtures.leadMessages, {
-      leadId: lead.id,
-      channel: 'note',
-      direction: 'sent',
-      body: visitedLine(visit),
-      deliveryStatus: 'sent',
-      isSystem: true,
-      authorId: null,
-      taskId: null,
-      sentAt: now.toISOString(),
-    });
+    await change.create(
+      clinicFixtures.leadMessages,
+      systemLine(lead.id, visitedLine(visit), null, now),
+    );
   }
 }
 

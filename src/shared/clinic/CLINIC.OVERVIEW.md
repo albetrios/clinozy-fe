@@ -9,9 +9,11 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   form's tiles and hints, the cancel reasons and the toasts `useAppointments`
   raises; the offerings domain — category,
   offer-kind and offer-state labels and the toasts `useOfferings` / `useOffers`
-  raise; the contract's enum labels the rooms share — appointment statuses,
-  channels, check-in feels, review sources, payment modes, invoice types, task
-  outcomes). The namespace loads with the org shell, so a
+  raise; the contract's enum labels the rooms share — channels, check-in
+  feels, review sources, payment modes, invoice types, task outcomes). An
+  appointment's status has one label set (`appointments.statuses`) and one tone
+  map (`APPOINTMENT_STATUS_TONES`) for every room, the chat column included.
+  The namespace loads with the org shell, so a
   shared hook's toast reads it in any room — and so does the shared chat
   column, whose copy is the namespace's `chatColumn.*` (keys in
   `shared/components/ChatColumn/chat-column.constants.ts`). Room-only copy
@@ -23,9 +25,6 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's
   hash that gives an untoned label (a picker option, a tag) a stable tone.
 - `clinic-section-icons.ts` — each section's icon.
-- `clinic-phone.ts` — a stored E.164 mobile as the design shows it
-  (`+91 98250 44120`) and the channel links (call, WhatsApp, Instagram) the
-  person cards and the chat open.
 - `task-rules.constants.ts` — the task rule catalogue's copy in the `tasks`
   namespace (`TASK_RULE_KEYS`: rule names, Rules-popover lines, automations,
   how-to steps, outcome labels and effect lines, Snooze options, "What’s next"

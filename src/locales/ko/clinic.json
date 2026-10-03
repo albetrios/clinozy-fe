@@ -142,10 +142,6 @@
       "booked_by_mistake": "실수로 예약함",
       "other": "기타"
     },
-    "days": {
-      "today": "오늘",
-      "tomorrow": "내일"
-    },
     "toasts": {
       "booked": "{{id}} 예약됨 · {{day}} {{time}} · WhatsApp으로 확인 요청을 보냈습니다",
       "bookedQueued": "{{id}} 예약됨 · {{day}} {{time}} · 알림 예약됨",
@@ -394,14 +390,6 @@
     "hint": "환자, 리드, 청구서를 검색하려면 2글자 이상 입력하세요",
     "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 #ID로 검색해 보세요."
   },
-  "appointmentStatuses": {
-    "scheduled": "예약됨",
-    "confirmed": "확정",
-    "checked_in": "내원 확인",
-    "completed": "완료",
-    "cancelled": "취소",
-    "no_show": "노쇼"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "전화",
@@ -450,9 +438,6 @@
       "contactThread": "연락처 · 채팅만 · 리드 없음"
     },
     "when": {
-      "today": "오늘",
-      "tomorrow": "내일",
-      "yesterday": "어제",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

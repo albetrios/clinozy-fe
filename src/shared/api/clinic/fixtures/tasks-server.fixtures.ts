@@ -60,6 +60,7 @@ import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
 import { writeAppointmentStatus } from './appointment-status.fixtures.ts';
 import { findPersonThread } from './contact-threads.fixtures.ts';
+import { systemLine } from './messages.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
 import {
   clockLabel,
@@ -555,26 +556,6 @@ async function answer(taskId: string, change: FixtureChange): Promise<TaskChange
   const undoToken = crypto.randomUUID();
   undoLog.set(undoToken, change);
   return { task: rowOf(await clinicFixtures.tasks.get(taskId), lookups()), undoToken };
-}
-
-function systemLine(
-  leadId: string,
-  body: string,
-  taskId: string,
-  now: Date,
-  channel: LeadMessage['channel'] = 'note',
-): CreateInput<LeadMessage> {
-  return {
-    leadId,
-    channel,
-    direction: 'sent',
-    body,
-    deliveryStatus: 'sent',
-    isSystem: channel === 'note',
-    authorId: channel === 'note' ? null : FIXTURE_VIEWER_ID,
-    taskId,
-    sentAt: now.toISOString(),
-  };
 }
 
 interface EffectContext {

@@ -35,6 +35,8 @@ export const PICKER_KEYS = {
     label: 'picker.date.label',
     placeholder: 'picker.date.placeholder',
     search: 'picker.date.search',
+    // `today` / `tomorrow` / `yesterday` are the app's one set of relative-day
+    // words: the chat column's times and the appointment toasts read them too.
     today: 'picker.date.today',
     tomorrow: 'picker.date.tomorrow',
     yesterday: 'picker.date.yesterday',

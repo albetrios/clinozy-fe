@@ -142,10 +142,6 @@
       "booked_by_mistake": "誤って予約",
       "other": "その他"
     },
-    "days": {
-      "today": "今日",
-      "tomorrow": "明日"
-    },
     "toasts": {
       "booked": "{{id}} を予約しました · {{day}} {{time}} · WhatsAppで確認依頼を送信しました",
       "bookedQueued": "{{id}} を予約しました · {{day}} {{time}} · リマインダーを予約しました",
@@ -394,14 +390,6 @@
     "hint": "患者・リード・請求書を検索するには2文字以上入力してください",
     "empty": "一致するものがありません。名前、電話番号、#IDで試してください。"
   },
-  "appointmentStatuses": {
-    "scheduled": "予約済み",
-    "confirmed": "確定",
-    "checked_in": "来院済み",
-    "completed": "完了",
-    "cancelled": "キャンセル",
-    "no_show": "無断キャンセル"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "電話",
@@ -450,9 +438,6 @@
       "contactThread": "連絡先 · チャットのみ · リードなし"
     },
     "when": {
-      "today": "今日",
-      "tomorrow": "明日",
-      "yesterday": "昨日",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

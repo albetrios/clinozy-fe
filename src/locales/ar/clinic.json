@@ -142,10 +142,6 @@
       "booked_by_mistake": "حُجز بالخطأ",
       "other": "أخرى"
     },
-    "days": {
-      "today": "اليوم",
-      "tomorrow": "غدًا"
-    },
     "toasts": {
       "booked": "تم حجز {{id}} · {{day}} {{time}} · أُرسل طلب التأكيد عبر واتساب",
       "bookedQueued": "تم حجز {{id}} · {{day}} {{time}} · التذكير في قائمة الانتظار",
@@ -404,14 +400,6 @@
     "hint": "اكتب حرفين أو أكثر للبحث عن المرضى والعملاء المحتملين والفواتير",
     "empty": "لا توجد نتائج مطابقة. جرّب اسمًا أو رقم هاتف أو #ID."
   },
-  "appointmentStatuses": {
-    "scheduled": "مجدول",
-    "confirmed": "مؤكد",
-    "checked_in": "تم تسجيل الوصول",
-    "completed": "مكتمل",
-    "cancelled": "ملغى",
-    "no_show": "لم يحضر"
-  },
   "channels": {
     "whatsapp": "واتساب",
     "call": "مكالمة",
@@ -460,9 +448,6 @@
       "contactThread": "جهة اتصال · دردشة فقط · بلا عميل محتمل"
     },
     "when": {
-      "today": "اليوم",
-      "tomorrow": "غدًا",
-      "yesterday": "أمس",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

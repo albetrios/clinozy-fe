@@ -1,4 +1,8 @@
-import { organizationLead, organizationLeadCreate } from '@/lib/routes/builders.ts';
+import {
+  organizationAppointmentCreate,
+  organizationLead,
+  organizationLeadCreate,
+} from '@/lib/routes/builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
 
@@ -24,7 +28,7 @@ export type ClinicCommandTarget =
  * | Target           | Route                  | Lands with                     |
  * | ---------------- | ---------------------- | ------------------------------ |
  * | `newLead`        | `/leads/create`        | live (L-33; the form L-35)     |
- * | `newAppointment` | `/appointments/create` | L-36 (the form L-38)           |
+ * | `newAppointment` | `/appointments/create` | live (L-36; the form L-38)     |
  * | `newPatient`     | `/patients/create`     | L-32b                          |
  * | `newReceipt`     | `/payments/receive`    | L-39b                          |
  * | `openTasks`      | `/tasks`               | live                           |
@@ -39,7 +43,7 @@ export type ClinicCommandTarget =
 export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string>> = {
   // A builder's `to` is the route's path; the slug and id ride in its params.
   newLead: organizationLeadCreate('').to,
-  newAppointment: '/organization/$organizationSlug/appointments/create',
+  newAppointment: organizationAppointmentCreate('').to,
   newPatient: '/organization/$organizationSlug/patients/create',
   newReceipt: '/organization/$organizationSlug/payments/receive',
   openTasks: CLINIC_SECTION_ROUTES.tasks,

@@ -492,17 +492,8 @@ async function applySendRules(world: World, lead: LeadRecord, send: Send): Promi
     ...(line ? { status: 'contacted' as const } : {}),
   });
   if (!line) return;
-  await world.leadMessages.create({
-    leadId: lead.id,
-    channel: 'note',
-    direction: 'sent',
-    body: line,
-    deliveryStatus: 'sent',
-    isSystem: true,
-    authorId: null,
-    taskId: null,
-    sentAt: send.at,
-  });
+  const { systemLine } = await messageFixtures();
+  await world.leadMessages.create(systemLine(lead.id, line, null, new Date(send.at)));
 }
 
 /**

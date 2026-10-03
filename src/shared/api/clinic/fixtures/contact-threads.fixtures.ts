@@ -17,6 +17,7 @@ import {
 } from '@/shared/api/clinic/contact-threads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 
+import { systemLine } from './messages.fixtures.ts';
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
 import { clinicFixtures } from './world.fixtures.ts';
@@ -171,17 +172,11 @@ export async function ensureContactThreadInWorld(
     unreadCount: 0,
   });
   if (line) {
-    await change.create(clinicFixtures.leadMessages, {
-      leadId: lead.id,
-      channel: 'note',
-      direction: 'sent',
-      body: line,
-      deliveryStatus: 'sent',
-      isSystem: true,
-      authorId: null,
-      taskId: input.context?.kind === 'task' ? input.context.taskId : null,
-      sentAt: now,
-    });
+    const taskId = input.context?.kind === 'task' ? input.context.taskId : null;
+    await change.create(
+      clinicFixtures.leadMessages,
+      systemLine(lead.id, line, taskId, new Date(now)),
+    );
   }
   return { lead, created: true };
 }

@@ -142,10 +142,6 @@
       "booked_by_mistake": "Prenotato per errore",
       "other": "Altro"
     },
-    "days": {
-      "today": "Oggi",
-      "tomorrow": "Domani"
-    },
     "toasts": {
       "booked": "Prenotato {{id}} · {{day}} {{time}} · richiesta di conferma inviata su WhatsApp",
       "bookedQueued": "Prenotato {{id}} · {{day}} {{time}} · promemoria in coda",
@@ -398,14 +394,6 @@
     "hint": "Digita almeno 2 lettere per cercare pazienti, lead e fatture",
     "empty": "Nessuna corrispondenza. Prova con un nome, un telefono o un #ID."
   },
-  "appointmentStatuses": {
-    "scheduled": "Programmato",
-    "confirmed": "Confermato",
-    "checked_in": "Arrivato",
-    "completed": "Completato",
-    "cancelled": "Annullato",
-    "no_show": "Non presentato"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "Chiamata",
@@ -454,9 +442,6 @@
       "contactThread": "Contatto · solo chat · nessun lead"
     },
     "when": {
-      "today": "Oggi",
-      "tomorrow": "Domani",
-      "yesterday": "Ieri",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

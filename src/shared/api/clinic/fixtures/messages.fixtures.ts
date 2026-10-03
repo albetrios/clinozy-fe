@@ -1,5 +1,36 @@
+import type { CreateInput } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
+
 import { type BranchName, branchRef } from './organization.fixtures.ts';
+import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
 import { onClinicFixturesReset } from './world.fixtures.ts';
+
+/**
+ * A line a fixture server writes on a lead's thread (REPLACE_WITH_API: the
+ * server writes these): a system note — no author — by default, or the call
+ * note or WhatsApp a task outcome leaves, sent as the signed-in member. Every
+ * server that moves a lead or closes a task writes through this one builder:
+ * the send rules, the status writes, the task outcomes, a new contact thread.
+ */
+export function systemLine(
+  leadId: string,
+  body: string,
+  taskId: string | null,
+  now: Date,
+  channel: LeadMessage['channel'] = 'note',
+): CreateInput<LeadMessage> {
+  return {
+    leadId,
+    channel,
+    direction: 'sent',
+    body,
+    deliveryStatus: 'sent',
+    isSystem: channel === 'note',
+    authorId: channel === 'note' ? null : FIXTURE_VIEWER_ID,
+    taskId,
+    sentAt: now.toISOString(),
+  };
+}
 
 /** A branch's links for message templates: its Google Maps place and its review page. */
 export interface BranchMessageLinks {

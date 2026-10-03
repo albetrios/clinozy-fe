@@ -82,16 +82,9 @@ export const CLINIC_KEYS = {
   /**
    * The contract's enum labels the rooms share (`schema-routes.md` › Enums,
    * labels verbatim): what the chat column's history and the rooms' pills
-   * name a stored value.
+   * name a stored value. An appointment's status is the appointments domain's
+   * (`appointments.statuses`).
    */
-  appointmentStatuses: {
-    scheduled: 'appointmentStatuses.scheduled',
-    confirmed: 'appointmentStatuses.confirmed',
-    checked_in: 'appointmentStatuses.checked_in',
-    completed: 'appointmentStatuses.completed',
-    cancelled: 'appointmentStatuses.cancelled',
-    no_show: 'appointmentStatuses.no_show',
-  },
   channels: {
     whatsapp: 'channels.whatsapp',
     call: 'channels.call',
@@ -212,11 +205,6 @@ export const CLINIC_KEYS = {
       doctor_unavailable: 'appointments.formCancelReasons.doctor_unavailable',
       booked_by_mistake: 'appointments.formCancelReasons.booked_by_mistake',
       other: 'appointments.formCancelReasons.other',
-    },
-    /** A slot's day in a toast: "Today", "Tomorrow", else the date. */
-    days: {
-      today: 'appointments.days.today',
-      tomorrow: 'appointments.days.tomorrow',
     },
     toasts: {
       booked: 'appointments.toasts.booked',

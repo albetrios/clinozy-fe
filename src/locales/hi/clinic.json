@@ -142,10 +142,6 @@
       "booked_by_mistake": "गलती से बुक हुआ",
       "other": "अन्य"
     },
-    "days": {
-      "today": "आज",
-      "tomorrow": "कल"
-    },
     "toasts": {
       "booked": "बुक हुआ {{id}} · {{day}} {{time}} · WhatsApp पर पुष्टि अनुरोध भेजा गया",
       "bookedQueued": "बुक हुआ {{id}} · {{day}} {{time}} · रिमाइंडर कतार में",
@@ -396,14 +392,6 @@
     "hint": "मरीज़, लीड और इनवॉइस खोजने के लिए 2+ अक्षर लिखें",
     "empty": "कोई मिलान नहीं। नाम, फ़ोन या #ID आज़माएँ।"
   },
-  "appointmentStatuses": {
-    "scheduled": "तय",
-    "confirmed": "पुष्ट",
-    "checked_in": "चेक-इन हुआ",
-    "completed": "पूरा",
-    "cancelled": "रद्द",
-    "no_show": "नहीं आए"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "कॉल",
@@ -452,9 +440,6 @@
       "contactThread": "संपर्क · सिर्फ़ चैट · कोई लीड नहीं"
     },
     "when": {
-      "today": "आज",
-      "tomorrow": "कल",
-      "yesterday": "बीता कल",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

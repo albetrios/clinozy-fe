@@ -142,10 +142,6 @@
       "booked_by_mistake": "Réservé par erreur",
       "other": "Autre"
     },
-    "days": {
-      "today": "Aujourd’hui",
-      "tomorrow": "Demain"
-    },
     "toasts": {
       "booked": "{{id}} réservé · {{day}} {{time}} · demande de confirmation envoyée sur WhatsApp",
       "bookedQueued": "{{id}} réservé · {{day}} {{time}} · rappel programmé",
@@ -398,14 +394,6 @@
     "hint": "Tapez au moins 2 lettres pour rechercher des patients, des prospects et des factures",
     "empty": "Aucun résultat. Essayez un nom, un téléphone ou un #ID."
   },
-  "appointmentStatuses": {
-    "scheduled": "Planifié",
-    "confirmed": "Confirmé",
-    "checked_in": "Arrivé",
-    "completed": "Terminé",
-    "cancelled": "Annulé",
-    "no_show": "Absent"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "Appel",
@@ -454,9 +442,6 @@
       "contactThread": "Contact · chat uniquement · pas de prospect"
     },
     "when": {
-      "today": "Aujourd’hui",
-      "tomorrow": "Demain",
-      "yesterday": "Hier",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

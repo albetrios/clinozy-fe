@@ -142,10 +142,6 @@
       "booked_by_mistake": "Agendada por engano",
       "other": "Outro"
     },
-    "days": {
-      "today": "Hoje",
-      "tomorrow": "Amanhã"
-    },
     "toasts": {
       "booked": "Agendada {{id}} · {{day}} {{time}} · pedido de confirmação enviado no WhatsApp",
       "bookedQueued": "Agendada {{id}} · {{day}} {{time}} · lembrete na fila",
@@ -398,14 +394,6 @@
     "hint": "Digite 2 ou mais letras para pesquisar pacientes, leads e faturas",
     "empty": "Nenhuma correspondência. Tente um nome, telefone ou #ID."
   },
-  "appointmentStatuses": {
-    "scheduled": "Agendada",
-    "confirmed": "Confirmada",
-    "checked_in": "Check-in feito",
-    "completed": "Concluída",
-    "cancelled": "Cancelada",
-    "no_show": "Não compareceu"
-  },
   "channels": {
     "whatsapp": "WhatsApp",
     "call": "Ligação",
@@ -454,9 +442,6 @@
       "contactThread": "Contato · só chat · sem lead"
     },
     "when": {
-      "today": "Hoje",
-      "tomorrow": "Amanhã",
-      "yesterday": "Ontem",
       "dayTime": "{{day}} {{time}}"
     },
     "history": {

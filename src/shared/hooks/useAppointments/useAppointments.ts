@@ -34,6 +34,7 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import {
@@ -100,8 +101,9 @@ export function useAppointmentSlotLabel(): (
         { weekday: 'short', day: 'numeric', month: 'short' },
         { wallClock: true },
       );
-      if (offset === 0) dayLabel = clinicText(KEYS.days.today);
-      if (offset === 1) dayLabel = clinicText(KEYS.days.tomorrow);
+      // The app's one set of relative-day words — the date list's, in `common`.
+      if (offset === 0) dayLabel = i18n.t(PICKER_KEYS.date.today, { ns: PICKER_NS });
+      if (offset === 1) dayLabel = i18n.t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS });
       return {
         day: dayLabel,
         time: formatDate(

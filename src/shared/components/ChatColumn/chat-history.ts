@@ -10,6 +10,7 @@ import type {
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import type { OutboxMessage } from '@/shared/hooks/useThread/index.ts';
 import {
   type AppIcon,
@@ -75,6 +76,9 @@ export interface ChatFormat {
   maskMoney?: boolean;
 }
 
+/** The app's one set of relative-day words — the date list's, in `common`. */
+const DAY_WORDS = { ns: PICKER_NS } as const;
+
 /**
  * A time as the thread shows it (`_patterns.md:193`): "Today 4:00 pm",
  * "Tomorrow 11:00 am", "Yesterday 9:10 am", "9 Oct 4:00 pm" — and the day
@@ -84,9 +88,9 @@ export function chatWhenLabel(when: ChatWhen, clock: ChatClock, t: TFunction): s
   const date = when.kind === 'day' ? when.date : clock.dayOf(when.at);
   const offset = civilDayOffset(clock.today, date);
   let day: string;
-  if (offset === 0) day = t(keys.when.today);
-  else if (offset === 1) day = t(keys.when.tomorrow);
-  else if (offset === -1) day = t(keys.when.yesterday);
+  if (offset === 0) day = t(PICKER_KEYS.date.today, DAY_WORDS);
+  else if (offset === 1) day = t(PICKER_KEYS.date.tomorrow, DAY_WORDS);
+  else if (offset === -1) day = t(PICKER_KEYS.date.yesterday, DAY_WORDS);
   else day = clock.date(date);
   return when.kind === 'day'
     ? day
@@ -134,7 +138,7 @@ const HISTORY_PARTS: {
   appointment: (entry, { t }) => [
     t(keys.history.appointment, { seq: entry.seq }),
     entry.service,
-    t(CLINIC_KEYS.appointmentStatuses[entry.status]),
+    t(CLINIC_KEYS.appointments.statuses[entry.status]),
     nameOf(entry.doctorName),
   ],
   reminder: (entry, { t, clock }) => [
