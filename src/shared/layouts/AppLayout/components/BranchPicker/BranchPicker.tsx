@@ -98,7 +98,7 @@ export function BranchPicker() {
       <DropdownMenuContent
         align="end"
         sideOffset={6}
-        className="min-w-60 rounded-xl p-1.5"
+        className="data-[state=open]:animate-dropdown-in min-w-60 rounded-xl p-1.5"
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-muted-foreground text-micro px-2 font-semibold tracking-[0.05em] uppercase">
@@ -111,9 +111,9 @@ export function BranchPicker() {
             data-testid="branch-picker-all"
             className="items-start py-1.5"
           >
-            <span className="flex flex-col leading-[1.3]">
-              <span className="text-body font-medium">{t(keys.all)}</span>
-              <span className="text-muted-foreground text-caption">
+            <span className="flex flex-col">
+              <span className="text-body leading-[1.3] font-medium">{t(keys.all)}</span>
+              <span className="text-muted-foreground text-caption leading-[1.3]">
                 {t(keys.allSub, { count: allIds.length })}
               </span>
             </span>
@@ -150,9 +150,11 @@ export function BranchPicker() {
                       TONE_CLASSES[branch.tone].fill,
                     )}
                   />
-                  <span className="flex min-w-0 flex-col leading-[1.3]">
-                    <span className="text-body font-medium">{branch.name}</span>
-                    <span className="text-muted-foreground text-caption truncate">
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-body leading-[1.3] font-medium">
+                      {branch.name}
+                    </span>
+                    <span className="text-muted-foreground text-caption truncate leading-[1.3]">
                       {branch.area}
                     </span>
                   </span>

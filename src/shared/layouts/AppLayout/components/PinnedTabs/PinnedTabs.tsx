@@ -179,7 +179,7 @@ export function PinnedTabs({
           <DropdownMenuContent
             align="start"
             sideOffset={6}
-            className="min-w-50 rounded-xl p-1.5"
+            className="data-[state=open]:animate-dropdown-in min-w-50 rounded-xl p-1.5"
           >
             {fit.folded.map((index) => {
               const entry = nav.pinned[index];

@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -11,6 +12,7 @@ import {
 } from '@/shared/components/ui/drawer.tsx';
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
@@ -68,10 +70,10 @@ function SectionRow({
         >
           <entry.icon className="size-4" aria-hidden />
         </span>
-        <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-          <span className="text-body truncate font-semibold">{label}</span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="text-body truncate leading-[1.3] font-semibold">{label}</span>
           {description ? (
-            <span className="text-muted-foreground text-caption truncate">
+            <span className="text-muted-foreground text-caption truncate leading-[1.3]">
               {description}
             </span>
           ) : null}
@@ -138,47 +140,55 @@ export function AllSectionsList({
 }
 
 /**
- * Header slot 3 (`shell.md:20`; H:529–531): the compass button — tinted when
- * the current room is not pinned — and the All sections popover under it.
+ * Header slot 3 (`shell.md:20`; H:529–531): the compass button in its
+ * hairline wrapper — tinted when the current room is not pinned — and the All
+ * sections popover, which hangs from the wrapper's start edge as designed.
  */
 export function AllSectionsPopover({
   nav,
   organizationSlug,
   open,
   onOpenChange,
+  wrapperRef,
 }: {
   nav: SectionBarNav;
   organizationSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** The wrapper, which the header measures for the tab fold. */
+  wrapperRef?: Ref<HTMLDivElement>;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          aria-haspopup="dialog"
-          aria-label={t(keys.allSections)}
-          title={t(keys.allSectionsTitle)}
-          data-testid="all-sections-trigger"
-          data-current-unpinned={nav.currentUnpinned || undefined}
-          className={cn(
-            'text-foreground-soft hover:bg-muted flex size-8 flex-none items-center justify-center rounded-lg border transition-colors',
-            nav.currentUnpinned ? 'border-border-strong' : 'border-border',
-            open || nav.currentUnpinned ? 'bg-muted' : 'bg-card',
-          )}
-        >
-          <Compass className="size-4" aria-hidden />
-        </button>
-      </PopoverTrigger>
+      <PopoverAnchor asChild>
+        <div ref={wrapperRef} className="relative me-1.5 flex-none border-x px-2.5">
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-label={t(keys.allSections)}
+              title={t(keys.allSectionsTitle)}
+              data-testid="all-sections-trigger"
+              data-current-unpinned={nav.currentUnpinned || undefined}
+              className={cn(
+                'text-foreground-soft hover:bg-muted flex size-8 flex-none items-center justify-center rounded-lg border transition-colors',
+                nav.currentUnpinned ? 'border-border-strong' : 'border-border',
+                open || nav.currentUnpinned ? 'bg-muted' : 'bg-card',
+              )}
+            >
+              <Compass className="size-4" aria-hidden />
+            </button>
+          </PopoverTrigger>
+        </div>
+      </PopoverAnchor>
       <PopoverContent
         align="start"
         sideOffset={8}
         role="dialog"
         aria-label={t(keys.allSections)}
         data-testid="all-sections"
-        className="animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] origin-top-left overflow-auto rounded-xl p-2"
+        className="data-[state=open]:animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] origin-top-left overflow-auto rounded-xl p-2"
       >
         <AllSectionsList
           nav={nav}

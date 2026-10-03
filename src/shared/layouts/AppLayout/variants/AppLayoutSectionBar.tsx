@@ -127,7 +127,7 @@ export function SectionBarShell({
         ref={headerRef}
         data-slot="app-header"
         data-testid="header"
-        className="bg-card relative z-30 flex min-h-13 flex-none items-center gap-2 border-b px-(--room-header-pad-x) md:min-h-15 md:gap-2.5"
+        className="bg-card relative z-30 flex min-h-[calc(3.25rem+1px)] flex-none items-center gap-2 border-b px-(--room-header-pad-x) md:min-h-[calc(3.75rem+1px)] md:gap-2.5"
       >
         <span ref={markRef} className="flex flex-none">
           <BrandLogo wordmark />
@@ -137,14 +137,13 @@ export function SectionBarShell({
           aria-label={t(LAYOUT_KEYS.app.sectionBar.nav)}
           className="ms-1 hidden flex-none items-center gap-0.5 md:flex"
         >
-          <div ref={allSectionsRef} className="relative me-1.5 flex-none border-x px-2.5">
-            <AllSectionsPopover
-              nav={nav}
-              organizationSlug={organizationSlug}
-              open={allSectionsOpen}
-              onOpenChange={setAllSectionsOpen}
-            />
-          </div>
+          <AllSectionsPopover
+            nav={nav}
+            organizationSlug={organizationSlug}
+            open={allSectionsOpen}
+            onOpenChange={setAllSectionsOpen}
+            wrapperRef={allSectionsRef}
+          />
           <PinnedTabs
             nav={nav}
             organizationSlug={organizationSlug}

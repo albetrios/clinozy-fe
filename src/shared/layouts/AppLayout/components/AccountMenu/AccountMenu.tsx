@@ -168,15 +168,17 @@ function IdentityBlock({
       className="rounded-none border-b px-3.5 py-3"
     >
       {avatar}
-      <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-        <span className="text-field truncate font-semibold">{name}</span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="text-field truncate leading-[1.3] font-semibold">{name}</span>
         {roleLine ? (
-          <span className="text-muted-foreground-strong truncate text-xs">
+          <span className="text-muted-foreground-strong truncate text-xs leading-[1.3]">
             {roleLine}
           </span>
         ) : null}
         {email ? (
-          <span className="text-muted-foreground text-caption truncate">{email}</span>
+          <span className="text-muted-foreground text-caption truncate leading-[1.3]">
+            {email}
+          </span>
         ) : null}
       </span>
     </DropdownMenuItem>
@@ -385,7 +387,7 @@ export function AccountMenu({
         aria-labelledby={undefined}
         aria-label={t(keys.account)}
         data-testid="account-menu"
-        className="animate-dropdown-in w-65 rounded-xl p-0"
+        className="data-[state=open]:animate-dropdown-in w-65 rounded-xl p-0"
         onCloseAutoFocus={(event) => {
           if (keepFocusAway.current) {
             event.preventDefault();
