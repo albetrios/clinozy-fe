@@ -59,6 +59,8 @@
     "ci:all": "pnpm health",
     "test:ci": "vitest run --coverage",
     "contracts:drift": "node tooling/ci/check-api-contract-drift.mjs",
+    "clinic:schema": "node tooling/codegen/clinic-schema.mjs",
+    "clinic:schema:check": "node tooling/codegen/clinic-schema.mjs --check",
     "docs:staleness": "node tooling/ci/check-doc-staleness.mjs",
     "coverage:patch": "node tooling/ci/check-patch-coverage.mjs --coverage coverage/coverage-final.json",
     "deps:check": "pnpm outdated",

@@ -1,0 +1,28 @@
+/**
+ * Display ids: the contract's per-organisation `seq` with the schema's prefix
+ * (D32 — `#2841`, `PT-0412`, `PAY-`, `INV-` / `S-`, `CN-`, `CR-`, `PO #`). The
+ * primary key stays the uuid; these are labels, never lookups.
+ */
+const padded = (seq: number, width: number) => String(seq).padStart(width, '0');
+
+/** The display id of each entity, from its `seq`. */
+export const displayId = {
+  /** Lists, pills and the file header: "#3508". */
+  patient: (seq: number) => `#${seq}`,
+  /** The patient code on the Visit sheet and print: "PT-0412". */
+  patientCode: (seq: number) => `PT-${padded(seq, 4)}`,
+  lead: (seq: number) => `#${seq}`,
+  appointment: (seq: number) => `#${seq}`,
+  prescription: (seq: number) => `#${seq}`,
+  offering: (seq: number) => `#${seq}`,
+  user: (seq: number) => `#${seq}`,
+  payment: (seq: number) => `PAY-${seq}`,
+  invoice: (seq: number) => `INV-${seq}`,
+  sale: (seq: number) => `S-${seq}`,
+  creditNote: (seq: number) => `CN-${padded(seq, 3)}`,
+  pendingCredit: (seq: number) => `CR-${seq}`,
+  purchaseOrder: (seq: number) => `PO #${seq}`,
+  medicine: (seq: number) => `#${seq}`,
+  stockItem: (seq: number) => `#${seq}`,
+  stockPurchase: (seq: number) => `#${seq}`,
+} as const;
