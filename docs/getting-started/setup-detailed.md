@@ -431,7 +431,7 @@ Default values in `.env.local`:
 | `VITE_POSTHOG_KEY`  | (empty)                 | PostHog analytics (optional)     |
 | `VITE_POSTHOG_HOST` | (empty)                 | PostHog host URL (optional)      |
 
-> **Tip:** Put local overrides and secrets directly in `.env.local` (gitignored). The `.env.development` / `.env.production` files are the deploy-environment files (one `.env.<environment>` per environment), separate from your local dev file. `pnpm dev` reads `.env.local` only; `pnpm build` reads one file — the environment you pick when it asks, `.env.local` when it can't ask. Details: [which env files each command reads](../deployment/runbooks/environment-variables.md#which-env-files-each-command-reads).
+> **Tip:** Put local overrides and secrets directly in `.env.local` (gitignored). The `.env.development` / `.env.production` files are the deploy-environment files (one `.env.<environment>` per environment), separate from your local dev file. `pnpm setup:local` also fills the external credentials listed in `envProfiles.local.externalCredentials` (Stripe test key, PostHog) from `.env.development`, else from the environment, filling only blanks. `pnpm dev` reads `.env.local` only; `pnpm build` reads one file — the environment you pick when it asks, `.env.local` when it can't ask. Details: [which env files each command reads](../deployment/runbooks/environment-variables.md#which-env-files-each-command-reads).
 
 ---
 

@@ -94,7 +94,10 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 9. **GitHub** — update local `.env.<environment>`; `pnpm github:sync <env> --dry-run`. A key with
    a per-environment starting value goes in `envProfiles.<env>.defaults`: `pnpm setup:local`
    writes `local`'s into a new `.env.local`, and `pnpm github:sync` writes `development`'s /
-   `production`'s into a new `.env.<env>` (existing files are never rewritten).
+   `production`'s into a new `.env.<env>` (existing files are never rewritten). A third-party key whose
+   development value also works on localhost (a test-mode integration key) is an external
+   credential: add it to `envProfiles.local.externalCredentials`, and `pnpm setup:local` fills it
+   into `.env.local` from `.env.development` or the environment wherever it is missing or blank.
 10. **PR** — include "Environment variable changes" block in description.
 
 ## Remove or rename a key

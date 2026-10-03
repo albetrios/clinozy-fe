@@ -1537,13 +1537,14 @@ clinozy-fe/
 │   │   └── [4 test files]
 │   ├── dev/
 │   │   ├── chrome-devtools-mcp.mjs
+│   │   ├── external-credentials.ts
 │   │   ├── mcp-config.ts
 │   │   ├── screenshot-auth-pages.mjs
 │   │   ├── setup-local.ts
 │   │   ├── setup-mac-tools.sh
 │   │   ├── setup-mcp.ts
 │   │   ├── setup-prerequisites-mac-tools.manifest
-│   │   └── [1 test file]
+│   │   └── [2 test files]
 │   ├── env-registry/
 │   │   └── env-registry.ts
 │   ├── identity/
