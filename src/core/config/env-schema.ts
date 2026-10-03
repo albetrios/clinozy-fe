@@ -217,7 +217,7 @@ export const clientEnvSchema = z.object({
   // is DECOUPLED from the Vite build mode — Vite 8 forbids a mode literally named `local`, so
   // the environment name is carried by this env variable (default `local`), not by the Vite
   // MODE constant. `development` / `production` are the two DEPLOY targets (DeployEnvironment);
-  // you never deploy to `local`. Vite's own mode stays a mechanism detail (dev → `development`,
+  // you never deploy to `local`. Vite's own mode stays a mechanism detail (dev → `dev-server`,
   // build → `production`, Vitest → its default `test` mode). Reported name only, never branched
   // on — the raw Vite DEV/PROD booleans are intentionally unused (behavior is driven by named
   // flags). An out-of-enum value fails loudly at load (env.config.ts throws).
