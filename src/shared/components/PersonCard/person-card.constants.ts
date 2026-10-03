@@ -1,7 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
-/** Person-card chrome lives in `common`: any room's person can open one. */
-export const PERSON_CARD_NS = I18N_NAMESPACES.common;
+/**
+ * Person-card copy lives in `clinic`: any room's person can open one, and it
+ * loads with the org shell — off the entry bundle.
+ */
+export const PERSON_CARD_NS = I18N_NAMESPACES.clinic;
 
 /** Key paths for the contact and team cards (verbatim from `_patterns.md:209–229`). */
 export const PERSON_CARD_KEYS = {

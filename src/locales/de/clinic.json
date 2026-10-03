@@ -82,5 +82,135 @@
       "offerPaused": "{{name}} pausiert",
       "offerResumed": "{{name}} läuft wieder"
     }
+  },
+  "recordDrawer": {
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "close": "Schließen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "retrySave": "Erneut speichern",
+    "saveAndAdd": "Speichern & weiteren hinzufügen",
+    "delete": "Löschen",
+    "notSaved": "Nicht gespeichert · Ihre Änderungen bleiben erhalten",
+    "readOnly": "Nur Ansicht · Ihre Rolle kann dies nicht ändern",
+    "quickFill": "Schnell ausfüllen",
+    "step": {
+      "next": "Weiter: {{step}} →",
+      "edit": "Bearbeiten",
+      "open": "Öffnen",
+      "missing": "Fehlt: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Leer",
+      "added_one": "{{count}} hinzugefügt",
+      "added_other": "{{count}} hinzugefügt",
+      "noneYet": "Noch keine"
+    }
+  },
+  "personCard": {
+    "contactLabel": "Kontakt",
+    "openPatientFile": "Patientenakte öffnen",
+    "since": "Seit {{date}}",
+    "leadSince": "Lead seit {{date}}",
+    "kind": {
+      "patient": "Patient",
+      "lead": "Lead",
+      "contact": "Kontakt"
+    },
+    "editContact": "Kontakt bearbeiten",
+    "changeContact": "Kontakt wechseln",
+    "changeContactHint": "Einen anderen Kontakt wählen",
+    "reach": "Erreichbarkeit",
+    "team": "Team",
+    "about": "Info",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · primär",
+      "whatsappAlternate": "WhatsApp · alternativ",
+      "phonePrimary": "Telefon · primär",
+      "phoneAlternate": "Telefon · alternativ",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Anrufen",
+    "openInstagram": "Instagram öffnen",
+    "copy": "Kopieren",
+    "copied": "{{value}} kopiert",
+    "noReach": "Noch keine Nummer und kein Handle gespeichert",
+    "claim": "Offen · Übernehmen",
+    "claimHint": "Ein Lead mit dieser Person ist offen · übernimm ihn",
+    "gender": {
+      "female": "Weiblich",
+      "male": "Männlich",
+      "other": "Divers"
+    },
+    "genderAge": "{{gender}} · {{age}} J.",
+    "age": "{{age}} J.",
+    "cameVia": "Kam über {{source}}",
+    "owedToThem": "{{amount}} an sie zurückzuzahlen",
+    "owedByThem": "{{amount}} schulden sie der Klinik",
+    "reviews_one": "{{count}} Bewertung · zuletzt {{rating}}★ auf {{source}} · {{date}}",
+    "reviews_other": "{{count}} Bewertungen · zuletzt {{rating}}★ auf {{source}} · {{date}}",
+    "consent": {
+      "data": "Daten",
+      "photos": "Fotos",
+      "marketing": "Marketing",
+      "hint": "Einwilligung · {{label}}",
+      "given": "{{label}}: Einwilligung erteilt",
+      "missing": "{{label}}: keine Einwilligung"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "Neue Anfrage für diesen Kontakt",
+    "newAppointment": "+ Termin",
+    "newAppointmentHint": "Für diesen Kontakt buchen",
+    "newPatient": "+ Patient",
+    "newPatientHint": "Eine Patientenakte für diesen Kontakt anlegen",
+    "online": "Jetzt online",
+    "offline": "Offline",
+    "memberKind": {
+      "assigned": "Zugewiesen",
+      "sentThis": "Hat das gesendet",
+      "treating": "Behandelt",
+      "involved": "Beteiligt"
+    },
+    "assignToYourself": "Mir zuweisen",
+    "works": "Arbeitet {{from}} – {{to}}",
+    "updated": "Aktualisiert {{time}}",
+    "fetching": "Neueste Daten werden geladen…"
+  },
+  "reasonConfirm": {
+    "keep": "Behalten",
+    "reason": "Grund",
+    "note": "Notiz",
+    "notePlaceholder": "Notiz hinzufügen (optional)",
+    "noteRequired": "Sagen Sie dem Team, warum (erforderlich)",
+    "hintPickReason": "Wählen Sie einen Grund, um fortzufahren",
+    "hintAddNote": "Fügen Sie eine kurze Notiz zu „Sonstiges“ hinzu",
+    "kinds": {
+      "delete": {
+        "action": "Löschen",
+        "effect": "Der Eintrag verschwindet aus Listen und Auswahlfeldern. Sie können es direkt danach über die Meldung rückgängig machen."
+      },
+      "cancel": {
+        "action": "Bestellung stornieren",
+        "effect": "Die Bestellung endet hier. Bestand und Lieferantenverbindlichkeiten bleiben unverändert."
+      },
+      "void": {
+        "action": "Verkauf stornieren",
+        "effect": "Der Verkauf wird storniert und die Rechnung annulliert. Der Bestand wird zurückgebucht."
+      }
+    },
+    "reasons": {
+      "mistake": "Versehentlich erstellt",
+      "duplicate": "Duplikat",
+      "notNeeded": "Nicht mehr benötigt",
+      "other": "Sonstiges",
+      "orderedByMistake": "Versehentlich bestellt",
+      "supplierCantDeliver": "Lieferant kann nicht liefern",
+      "priceChanged": "Preis geändert",
+      "billedByMistake": "Versehentlich abgerechnet",
+      "wrongItems": "Falsche Artikel",
+      "customerChangedMind": "Kunde hat es sich anders überlegt"
+    }
   }
 }

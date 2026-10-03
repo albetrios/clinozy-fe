@@ -109,77 +109,6 @@
     "filteredHint": "Niente corrisponde a questi filtri. Cancellali per rivedere tutto.",
     "clearFilters": "Cancella filtri"
   },
-  "personCard": {
-    "contactLabel": "Contatto",
-    "openPatientFile": "Apri la scheda paziente",
-    "since": "Dal {{date}}",
-    "leadSince": "Lead dal {{date}}",
-    "kind": {
-      "patient": "Paziente",
-      "lead": "Lead",
-      "contact": "Contatto"
-    },
-    "editContact": "Modifica contatto",
-    "changeContact": "Cambia contatto",
-    "changeContactHint": "Scegli un altro contatto",
-    "reach": "Recapiti",
-    "team": "Team",
-    "about": "Informazioni",
-    "reachSub": {
-      "whatsappPrimary": "WhatsApp · principale",
-      "whatsappAlternate": "WhatsApp · alternativo",
-      "phonePrimary": "Telefono · principale",
-      "phoneAlternate": "Telefono · alternativo",
-      "instagram": "Instagram"
-    },
-    "whatsApp": "WhatsApp",
-    "call": "Chiama",
-    "openInstagram": "Apri Instagram",
-    "copy": "Copia",
-    "copied": "Copiato {{value}}",
-    "noReach": "Nessun numero o profilo salvato",
-    "claim": "Aperto · Prendi",
-    "claimHint": "C’è un lead aperto con questa persona · prendilo",
-    "gender": {
-      "female": "Donna",
-      "male": "Uomo",
-      "other": "Altro"
-    },
-    "genderAge": "{{gender}} · {{age}} anni",
-    "age": "{{age}} anni",
-    "cameVia": "Arrivato tramite {{source}}",
-    "owedToThem": "{{amount}} da restituire",
-    "owedByThem": "{{amount}} dovuti alla clinica",
-    "reviews_one": "{{count}} recensione · ultima {{rating}}★ su {{source}} · {{date}}",
-    "reviews_many": "{{count}} di recensioni · ultima {{rating}}★ su {{source}} · {{date}}",
-    "reviews_other": "{{count}} recensioni · ultima {{rating}}★ su {{source}} · {{date}}",
-    "consent": {
-      "data": "Dati",
-      "photos": "Foto",
-      "marketing": "Marketing",
-      "hint": "Consenso · {{label}}",
-      "given": "{{label}}: consenso dato",
-      "missing": "{{label}}: nessun consenso"
-    },
-    "newLead": "+ Lead",
-    "newLeadHint": "Nuova richiesta per questo contatto",
-    "newAppointment": "+ Appuntamento",
-    "newAppointmentHint": "Prenota per questo contatto",
-    "newPatient": "+ Paziente",
-    "newPatientHint": "Crea una scheda paziente per questo contatto",
-    "online": "Online ora",
-    "offline": "Offline",
-    "memberKind": {
-      "assigned": "Assegnato",
-      "sentThis": "Ha inviato questo",
-      "treating": "In cura",
-      "involved": "Coinvolto"
-    },
-    "assignToYourself": "Assegnalo a me",
-    "works": "Lavora {{from}} – {{to}}",
-    "updated": "Aggiornato alle {{time}}",
-    "fetching": "Recupero dei dati più recenti…"
-  },
   "a11y": {
     "close": "Chiudi",
     "loading": "Caricamento",
@@ -323,40 +252,7 @@
   "confirm": {
     "accept": "Conferma",
     "cancel": "Annulla",
-    "fallbackDescription": "Conferma questa azione.",
-    "keep": "Mantieni",
-    "reason": "Motivo",
-    "note": "Nota",
-    "notePlaceholder": "Aggiungi una nota (facoltativa)",
-    "noteRequired": "Spiega al team il perché (obbligatorio)",
-    "hintPickReason": "Scegli un motivo per continuare",
-    "hintAddNote": "Aggiungi una breve nota per «Altro»",
-    "kinds": {
-      "delete": {
-        "action": "Elimina",
-        "effect": "Scompare da elenchi e selettori. Puoi annullare dalla notifica subito dopo."
-      },
-      "cancel": {
-        "action": "Annulla ordine",
-        "effect": "L’ordine si ferma qui. Scorte e debiti verso il fornitore non cambiano."
-      },
-      "void": {
-        "action": "Annulla vendita",
-        "effect": "La vendita viene annullata insieme alla fattura. Le scorte rientrano."
-      }
-    },
-    "reasons": {
-      "mistake": "Creato per errore",
-      "duplicate": "Duplicato",
-      "notNeeded": "Non più necessario",
-      "other": "Altro",
-      "orderedByMistake": "Ordinato per errore",
-      "supplierCantDeliver": "Il fornitore non può consegnare",
-      "priceChanged": "Prezzo cambiato",
-      "billedByMistake": "Fatturato per errore",
-      "wrongItems": "Articoli sbagliati",
-      "customerChangedMind": "Il cliente ha cambiato idea"
-    }
+    "fallbackDescription": "Conferma questa azione."
   },
   "picker": {
     "placeholder": "Seleziona…",
@@ -398,32 +294,6 @@
     "description": "Le tue modifiche non sono state salvate e andranno perse.",
     "discard": "Scarta",
     "keepEditing": "Continua a modificare"
-  },
-  "recordDrawer": {
-    "cancel": "Annulla",
-    "back": "Indietro",
-    "close": "Chiudi",
-    "save": "Salva",
-    "saving": "Salvataggio…",
-    "retrySave": "Riprova a salvare",
-    "saveAndAdd": "Salva e aggiungi un altro",
-    "delete": "Elimina",
-    "notSaved": "Non salvato · le tue modifiche sono conservate",
-    "readOnly": "Sola lettura · il tuo ruolo non può modificarlo",
-    "quickFill": "Compilazione rapida",
-    "step": {
-      "next": "Avanti: {{step}} →",
-      "edit": "Modifica",
-      "open": "Apri",
-      "missing": "Mancano: {{fields, list(type: unit)}}"
-    },
-    "peek": {
-      "empty": "Vuoto",
-      "added_one": "{{count}} aggiunto",
-      "added_many": "{{count}} aggiunti",
-      "added_other": "{{count}} aggiunti",
-      "noneYet": "Nessuno per ora"
-    }
   },
   "uploadTray": {
     "label": "Caricamenti",

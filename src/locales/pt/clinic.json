@@ -82,5 +82,137 @@
       "offerPaused": "{{name}} pausada",
       "offerResumed": "{{name}} ativa novamente"
     }
+  },
+  "recordDrawer": {
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "retrySave": "Tentar salvar de novo",
+    "saveAndAdd": "Salvar e adicionar outro",
+    "delete": "Excluir",
+    "notSaved": "Não salvo · suas alterações foram mantidas",
+    "readOnly": "Somente visualização · sua função não pode alterar isto",
+    "quickFill": "Preenchimento rápido",
+    "step": {
+      "next": "Próximo: {{step}} →",
+      "edit": "Editar",
+      "open": "Abrir",
+      "missing": "Faltando: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Vazio",
+      "added_one": "{{count}} adicionado",
+      "added_many": "{{count}} adicionados",
+      "added_other": "{{count}} adicionados",
+      "noneYet": "Nenhum ainda"
+    }
+  },
+  "personCard": {
+    "contactLabel": "Contato",
+    "openPatientFile": "Abrir ficha do paciente",
+    "since": "Desde {{date}}",
+    "leadSince": "Lead desde {{date}}",
+    "kind": {
+      "patient": "Paciente",
+      "lead": "Lead",
+      "contact": "Contato"
+    },
+    "editContact": "Editar contato",
+    "changeContact": "Trocar contato",
+    "changeContactHint": "Escolher outro contato",
+    "reach": "Contatos",
+    "team": "Equipe",
+    "about": "Sobre",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · principal",
+      "whatsappAlternate": "WhatsApp · alternativo",
+      "phonePrimary": "Telefone · principal",
+      "phoneAlternate": "Telefone · alternativo",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Ligar",
+    "openInstagram": "Abrir Instagram",
+    "copy": "Copiar",
+    "copied": "{{value}} copiado",
+    "noReach": "Nenhum telefone ou perfil salvo ainda",
+    "claim": "Aberto · Assumir",
+    "claimHint": "Há um lead aberto com esta pessoa · assuma-o",
+    "gender": {
+      "female": "Feminino",
+      "male": "Masculino",
+      "other": "Outro"
+    },
+    "genderAge": "{{gender}} · {{age}} anos",
+    "age": "{{age}} anos",
+    "cameVia": "Veio por {{source}}",
+    "owedToThem": "{{amount}} a devolver",
+    "owedByThem": "{{amount}} devidos à clínica",
+    "reviews_one": "{{count}} avaliação · última {{rating}}★ no {{source}} · {{date}}",
+    "reviews_many": "{{count}} de avaliações · última {{rating}}★ no {{source}} · {{date}}",
+    "reviews_other": "{{count}} avaliações · última {{rating}}★ no {{source}} · {{date}}",
+    "consent": {
+      "data": "Dados",
+      "photos": "Fotos",
+      "marketing": "Marketing",
+      "hint": "Consentimento · {{label}}",
+      "given": "{{label}}: consentimento dado",
+      "missing": "{{label}}: sem consentimento"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "Nova solicitação para este contato",
+    "newAppointment": "+ Consulta",
+    "newAppointmentHint": "Agendar para este contato",
+    "newPatient": "+ Paciente",
+    "newPatientHint": "Criar uma ficha de paciente para este contato",
+    "online": "Online agora",
+    "offline": "Offline",
+    "memberKind": {
+      "assigned": "Atribuído",
+      "sentThis": "Enviou isto",
+      "treating": "Em tratamento",
+      "involved": "Envolvido"
+    },
+    "assignToYourself": "Atribuir a mim",
+    "works": "Trabalha {{from}} – {{to}}",
+    "updated": "Atualizado às {{time}}",
+    "fetching": "Buscando o mais recente…"
+  },
+  "reasonConfirm": {
+    "keep": "Manter",
+    "reason": "Motivo",
+    "note": "Nota",
+    "notePlaceholder": "Adicione uma nota (opcional)",
+    "noteRequired": "Diga à equipe o porquê (obrigatório)",
+    "hintPickReason": "Escolha um motivo para continuar",
+    "hintAddNote": "Adicione uma nota curta para “Outro”",
+    "kinds": {
+      "delete": {
+        "action": "Excluir",
+        "effect": "Some das listas e dos seletores. Você pode desfazer pelo aviso logo em seguida."
+      },
+      "cancel": {
+        "action": "Cancelar pedido",
+        "effect": "O pedido para aqui. Estoque e contas a pagar ao fornecedor não mudam."
+      },
+      "void": {
+        "action": "Anular venda",
+        "effect": "A venda é anulada e a fatura, cancelada. O estoque volta."
+      }
+    },
+    "reasons": {
+      "mistake": "Criado por engano",
+      "duplicate": "Duplicado",
+      "notNeeded": "Não é mais necessário",
+      "other": "Outro",
+      "orderedByMistake": "Pedido por engano",
+      "supplierCantDeliver": "O fornecedor não consegue entregar",
+      "priceChanged": "O preço mudou",
+      "billedByMistake": "Cobrado por engano",
+      "wrongItems": "Itens errados",
+      "customerChangedMind": "O cliente mudou de ideia"
+    }
   }
 }

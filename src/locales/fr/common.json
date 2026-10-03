@@ -109,77 +109,6 @@
     "filteredHint": "Rien ne correspond à ces filtres. Effacez-les pour tout revoir.",
     "clearFilters": "Effacer les filtres"
   },
-  "personCard": {
-    "contactLabel": "Contact",
-    "openPatientFile": "Ouvrir le dossier patient",
-    "since": "Depuis le {{date}}",
-    "leadSince": "Lead depuis le {{date}}",
-    "kind": {
-      "patient": "Patient",
-      "lead": "Lead",
-      "contact": "Contact"
-    },
-    "editContact": "Modifier le contact",
-    "changeContact": "Changer de contact",
-    "changeContactHint": "Choisir un autre contact",
-    "reach": "Coordonnées",
-    "team": "Équipe",
-    "about": "À propos",
-    "reachSub": {
-      "whatsappPrimary": "WhatsApp · principal",
-      "whatsappAlternate": "WhatsApp · secondaire",
-      "phonePrimary": "Téléphone · principal",
-      "phoneAlternate": "Téléphone · secondaire",
-      "instagram": "Instagram"
-    },
-    "whatsApp": "WhatsApp",
-    "call": "Appeler",
-    "openInstagram": "Ouvrir Instagram",
-    "copy": "Copier",
-    "copied": "{{value}} copié",
-    "noReach": "Aucun numéro ni identifiant enregistré pour l’instant",
-    "claim": "Ouvert · Prendre",
-    "claimHint": "Un lead avec cette personne est ouvert · prenez-le",
-    "gender": {
-      "female": "Femme",
-      "male": "Homme",
-      "other": "Autre"
-    },
-    "genderAge": "{{gender}} · {{age}} ans",
-    "age": "{{age}} ans",
-    "cameVia": "Venu via {{source}}",
-    "owedToThem": "{{amount}} à lui rendre",
-    "owedByThem": "{{amount}} dus à la clinique",
-    "reviews_one": "{{count}} avis · dernier {{rating}}★ sur {{source}} · {{date}}",
-    "reviews_many": "{{count}} d’avis · dernier {{rating}}★ sur {{source}} · {{date}}",
-    "reviews_other": "{{count}} avis · dernier {{rating}}★ sur {{source}} · {{date}}",
-    "consent": {
-      "data": "Données",
-      "photos": "Photos",
-      "marketing": "Marketing",
-      "hint": "Consentement · {{label}}",
-      "given": "{{label}} : consentement donné",
-      "missing": "{{label}} : pas de consentement"
-    },
-    "newLead": "+ Lead",
-    "newLeadHint": "Nouvelle demande pour ce contact",
-    "newAppointment": "+ Rendez-vous",
-    "newAppointmentHint": "Réserver pour ce contact",
-    "newPatient": "+ Patient",
-    "newPatientHint": "Créer un dossier patient pour ce contact",
-    "online": "En ligne",
-    "offline": "Hors ligne",
-    "memberKind": {
-      "assigned": "Assigné",
-      "sentThis": "A envoyé ceci",
-      "treating": "Traite",
-      "involved": "Impliqué"
-    },
-    "assignToYourself": "Me l’assigner",
-    "works": "Travaille {{from}} – {{to}}",
-    "updated": "Mis à jour à {{time}}",
-    "fetching": "Récupération des dernières données…"
-  },
   "a11y": {
     "close": "Fermer",
     "loading": "Chargement",
@@ -323,40 +252,7 @@
   "confirm": {
     "accept": "Confirmer",
     "cancel": "Annuler",
-    "fallbackDescription": "Veuillez confirmer cette action.",
-    "keep": "Conserver",
-    "reason": "Motif",
-    "note": "Note",
-    "notePlaceholder": "Ajouter une note (facultatif)",
-    "noteRequired": "Expliquez à l’équipe pourquoi (obligatoire)",
-    "hintPickReason": "Choisissez un motif pour continuer",
-    "hintAddNote": "Ajoutez une courte note pour « Autre »",
-    "kinds": {
-      "delete": {
-        "action": "Supprimer",
-        "effect": "L’élément disparaît des listes et des sélecteurs. Vous pouvez annuler depuis la notification juste après."
-      },
-      "cancel": {
-        "action": "Annuler la commande",
-        "effect": "La commande s’arrête ici. Le stock et les dettes fournisseurs ne changent pas."
-      },
-      "void": {
-        "action": "Annuler la vente",
-        "effect": "La vente est annulée, ainsi que sa facture. Le stock est réintégré."
-      }
-    },
-    "reasons": {
-      "mistake": "Créé par erreur",
-      "duplicate": "Doublon",
-      "notNeeded": "Plus nécessaire",
-      "other": "Autre",
-      "orderedByMistake": "Commandé par erreur",
-      "supplierCantDeliver": "Le fournisseur ne peut pas livrer",
-      "priceChanged": "Le prix a changé",
-      "billedByMistake": "Facturé par erreur",
-      "wrongItems": "Mauvais articles",
-      "customerChangedMind": "Le client a changé d’avis"
-    }
+    "fallbackDescription": "Veuillez confirmer cette action."
   },
   "picker": {
     "placeholder": "Sélectionner…",
@@ -398,32 +294,6 @@
     "description": "Vos modifications n’ont pas été enregistrées et seront perdues.",
     "discard": "Abandonner",
     "keepEditing": "Continuer l’édition"
-  },
-  "recordDrawer": {
-    "cancel": "Annuler",
-    "back": "Retour",
-    "close": "Fermer",
-    "save": "Enregistrer",
-    "saving": "Enregistrement…",
-    "retrySave": "Réessayer l’enregistrement",
-    "saveAndAdd": "Enregistrer et ajouter un autre",
-    "delete": "Supprimer",
-    "notSaved": "Non enregistré · vos modifications sont conservées",
-    "readOnly": "Lecture seule · votre rôle ne peut pas modifier ceci",
-    "quickFill": "Remplissage rapide",
-    "step": {
-      "next": "Suivant : {{step}} →",
-      "edit": "Modifier",
-      "open": "Ouvrir",
-      "missing": "Manquant : {{fields, list(type: unit)}}"
-    },
-    "peek": {
-      "empty": "Vide",
-      "added_one": "{{count}} ajouté",
-      "added_many": "{{count}} ajoutés",
-      "added_other": "{{count}} ajoutés",
-      "noneYet": "Aucun pour l’instant"
-    }
   },
   "uploadTray": {
     "label": "Importations",

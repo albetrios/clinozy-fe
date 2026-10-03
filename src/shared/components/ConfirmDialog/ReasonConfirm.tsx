@@ -14,7 +14,7 @@ import {
 import type { UseFormSetError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { LOCALE_KEYS } from '@/lib/i18n/locale.constants.ts';
+import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   AlertDialog,
@@ -36,12 +36,7 @@ import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { X } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  CONFIRM_KEYS,
-  CONFIRM_NS,
-  CONFIRM_TEST_IDS,
-  confirmReasonTestId,
-} from './confirm-dialog.constants.ts';
+import { CONFIRM_TEST_IDS, confirmReasonTestId } from './confirm-dialog.constants.ts';
 import {
   type ConfirmReasonChoice,
   type ConfirmReasonKind,
@@ -51,6 +46,7 @@ import {
   reasonChipTone,
   toReasonChoice,
 } from './confirm-reasons.ts';
+import { REASON_CONFIRM_KEYS, REASON_CONFIRM_NS } from './reason-confirm.constants.ts';
 
 /** The note's length cap — the design's 160 (the schema allows 280, `S:134`). */
 const NOTE_MAX_LENGTH = 160;
@@ -161,7 +157,7 @@ function useReasonDraft({
   reason,
   onConfirm,
 }: Pick<ReasonConfirmProps, 'open' | 'onOpenChange' | 'reason' | 'onConfirm'>) {
-  const { t } = useTranslation(CONFIRM_NS);
+  const { t } = useTranslation(REASON_CONFIRM_NS);
   const [picked, setPicked] = useState('');
   const [typed, setTyped] = useState('');
   const [errors, setErrors] = useState<ReasonFieldErrors>({});
@@ -186,8 +182,8 @@ function useReasonDraft({
   const missingNote =
     option !== undefined && needsNote(option.value) && typed.trim() === '';
   let hint = '';
-  if (option === undefined) hint = t(CONFIRM_KEYS.hintPickReason);
-  else if (missingNote) hint = t(CONFIRM_KEYS.hintAddNote);
+  if (option === undefined) hint = t(REASON_CONFIRM_KEYS.hintPickReason);
+  else if (missingNote) hint = t(REASON_CONFIRM_KEYS.hintAddNote);
 
   const changeOpen = (next: boolean) => {
     if (!busyRef.current) onOpenChange(next);
@@ -333,7 +329,7 @@ function FieldError({
 
 /** "Reason" chips (a radio group) and the note. */
 function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
-  const { t } = useTranslation(CONFIRM_NS);
+  const { t } = useTranslation(REASON_CONFIRM_NS);
   const { errors } = draft;
   const noteRequired = draft.picked !== '' && needsNote(draft.picked);
   const noteRef = useRef<HTMLTextAreaElement>(null);
@@ -349,7 +345,7 @@ function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
         id={ids.reasonLabel}
         className="text-micro text-muted-foreground font-semibold tracking-wider uppercase"
       >
-        {t(CONFIRM_KEYS.reason)}
+        {t(REASON_CONFIRM_KEYS.reason)}
       </span>
       <RadioGroup
         value={draft.picked}
@@ -383,12 +379,14 @@ function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
         value={draft.typed}
         onChange={(event) => draft.type(event.target.value)}
         readOnly={draft.busy}
-        aria-label={t(CONFIRM_KEYS.note)}
+        aria-label={t(REASON_CONFIRM_KEYS.note)}
         aria-required={noteRequired || undefined}
         aria-invalid={errors.note ? true : undefined}
         aria-describedby={errors.note ? ids.noteError : undefined}
         placeholder={t(
-          noteRequired ? CONFIRM_KEYS.noteRequired : CONFIRM_KEYS.notePlaceholder,
+          noteRequired
+            ? REASON_CONFIRM_KEYS.noteRequired
+            : REASON_CONFIRM_KEYS.notePlaceholder,
         )}
         data-testid={CONFIRM_TEST_IDS.note}
         // A drag that starts in the note selects text; it never pulls the sheet.
@@ -490,7 +488,7 @@ function ReasonSheet({
   keepLabel,
   actionLabel,
 }: ReasonViewProps) {
-  const { t } = useTranslation(CONFIRM_NS);
+  const { t: tShared } = useTranslation(LOCALE_NS);
   const keepRef = useRef<HTMLButtonElement>(null);
   return (
     <Drawer open={open} onOpenChange={draft.changeOpen} dismissible={!draft.busy}>
@@ -540,7 +538,7 @@ function ReasonSheet({
           type="button"
           onClick={draft.keep}
           disabled={draft.busy}
-          aria-label={t(LOCALE_KEYS.closeAria)}
+          aria-label={tShared(LOCALE_KEYS.closeAria)}
           data-testid={CONFIRM_TEST_IDS.close}
           className="text-foreground-soft hover:bg-muted absolute end-2 top-2 flex size-11 items-center justify-center rounded-lg"
         >
@@ -562,7 +560,7 @@ function ReasonPanel({
   keepLabel,
   actionLabel,
 }: ReasonViewProps) {
-  const { t } = useTranslation(CONFIRM_NS);
+  const { t: tShared } = useTranslation(LOCALE_NS);
   return (
     <AlertDialog open={open} onOpenChange={draft.changeOpen}>
       <AlertDialogPrimitive.Portal>
@@ -612,7 +610,7 @@ function ReasonPanel({
             type="button"
             onClick={draft.keep}
             disabled={draft.busy}
-            aria-label={t(LOCALE_KEYS.closeAria)}
+            aria-label={tShared(LOCALE_KEYS.closeAria)}
             data-slot="floating-edge"
             data-testid={CONFIRM_TEST_IDS.close}
             className="bg-background text-foreground-soft hover:bg-muted animate-pop-in absolute end-[calc(100%+0.625rem)] top-3.5 flex size-9 items-center justify-center rounded-lg border"
@@ -643,7 +641,7 @@ export function ReasonConfirm({
   reason,
   onConfirm,
 }: ReasonConfirmProps) {
-  const { t } = useTranslation(CONFIRM_NS);
+  const { t } = useTranslation(REASON_CONFIRM_NS);
   const tier = useViewportTier();
   const baseId = useId();
   const draft = useReasonDraft({ open, onOpenChange, reason, onConfirm });
@@ -659,7 +657,7 @@ export function ReasonConfirm({
     title,
     record: reason.record,
     effect: description ?? t(draft.kind.effectKey),
-    keepLabel: cancelLabel ?? t(CONFIRM_KEYS.keep),
+    keepLabel: cancelLabel ?? t(REASON_CONFIRM_KEYS.keep),
     actionLabel: confirmLabel ?? t(draft.kind.actionKey),
   };
   return tier === 'phone' ? <ReasonSheet {...view} /> : <ReasonPanel {...view} />;

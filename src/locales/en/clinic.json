@@ -82,5 +82,135 @@
       "offerPaused": "{{name}} paused",
       "offerResumed": "{{name}} running again"
     }
+  },
+  "recordDrawer": {
+    "cancel": "Cancel",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "saving": "Saving…",
+    "retrySave": "Retry save",
+    "saveAndAdd": "Save & add another",
+    "delete": "Delete",
+    "notSaved": "Not saved · your changes are kept",
+    "readOnly": "View only · your role can’t change this",
+    "quickFill": "Quick fill",
+    "step": {
+      "next": "Next: {{step}} →",
+      "edit": "Edit",
+      "open": "Open",
+      "missing": "Missing: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "Empty",
+      "added_one": "{{count}} added",
+      "added_other": "{{count}} added",
+      "noneYet": "None yet"
+    }
+  },
+  "personCard": {
+    "contactLabel": "Contact",
+    "openPatientFile": "Open patient file",
+    "since": "Since {{date}}",
+    "leadSince": "Lead since {{date}}",
+    "kind": {
+      "patient": "Patient",
+      "lead": "Lead",
+      "contact": "Contact"
+    },
+    "editContact": "Edit contact",
+    "changeContact": "Change contact",
+    "changeContactHint": "Pick a different contact",
+    "reach": "Reach",
+    "team": "Team",
+    "about": "About",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · primary",
+      "whatsappAlternate": "WhatsApp · alternate",
+      "phonePrimary": "Phone · primary",
+      "phoneAlternate": "Phone · alternate",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Call",
+    "openInstagram": "Open Instagram",
+    "copy": "Copy",
+    "copied": "Copied {{value}}",
+    "noReach": "No phone or handle saved yet",
+    "claim": "Open · Claim",
+    "claimHint": "A lead with this person is open · claim it",
+    "gender": {
+      "female": "Female",
+      "male": "Male",
+      "other": "Other"
+    },
+    "genderAge": "{{gender}} · {{age}} yrs",
+    "age": "{{age}} yrs",
+    "cameVia": "Came via {{source}}",
+    "owedToThem": "{{amount}} to return to them",
+    "owedByThem": "{{amount}} they owe the clinic",
+    "reviews_one": "{{count}} review · latest {{rating}}★ on {{source}} · {{date}}",
+    "reviews_other": "{{count}} reviews · latest {{rating}}★ on {{source}} · {{date}}",
+    "consent": {
+      "data": "Data",
+      "photos": "Photos",
+      "marketing": "Marketing",
+      "hint": "Consent · {{label}}",
+      "given": "{{label}}: consent given",
+      "missing": "{{label}}: no consent"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "New enquiry for this contact",
+    "newAppointment": "+ Appointment",
+    "newAppointmentHint": "Book for this contact",
+    "newPatient": "+ Patient",
+    "newPatientHint": "Create a patient record for this contact",
+    "online": "Online now",
+    "offline": "Offline",
+    "memberKind": {
+      "assigned": "Assigned",
+      "sentThis": "Sent this",
+      "treating": "Treating",
+      "involved": "Involved"
+    },
+    "assignToYourself": "Assign to yourself",
+    "works": "Works {{from}} – {{to}}",
+    "updated": "Updated {{time}}",
+    "fetching": "Fetching latest…"
+  },
+  "reasonConfirm": {
+    "keep": "Keep it",
+    "reason": "Reason",
+    "note": "Note",
+    "notePlaceholder": "Add a note (optional)",
+    "noteRequired": "Tell the team why (required)",
+    "hintPickReason": "Pick a reason to continue",
+    "hintAddNote": "Add a short note for “Other”",
+    "kinds": {
+      "delete": {
+        "action": "Delete",
+        "effect": "It disappears from lists and pickers. You can undo from the toast right after."
+      },
+      "cancel": {
+        "action": "Cancel order",
+        "effect": "The order stops here. Stock and supplier dues are not changed."
+      },
+      "void": {
+        "action": "Void sale",
+        "effect": "The sale is voided and its invoice is cancelled. Stock goes back."
+      }
+    },
+    "reasons": {
+      "mistake": "Created by mistake",
+      "duplicate": "Duplicate",
+      "notNeeded": "No longer needed",
+      "other": "Other",
+      "orderedByMistake": "Ordered by mistake",
+      "supplierCantDeliver": "Supplier can’t deliver",
+      "priceChanged": "Price changed",
+      "billedByMistake": "Billed by mistake",
+      "wrongItems": "Wrong items",
+      "customerChangedMind": "Customer changed mind"
+    }
   }
 }

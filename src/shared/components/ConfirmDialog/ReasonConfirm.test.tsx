@@ -19,12 +19,9 @@ import {
 import { AppToaster, notify } from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
-import {
-  CONFIRM_KEYS,
-  CONFIRM_TEST_IDS,
-  confirmReasonTestId,
-} from './confirm-dialog.constants.ts';
+import { CONFIRM_TEST_IDS, confirmReasonTestId } from './confirm-dialog.constants.ts';
 import { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog.tsx';
+import { REASON_CONFIRM_KEYS } from './reason-confirm.constants.ts';
 import type { ConfirmReasonConfig, ReasonConfirmProps } from './ReasonConfirm.tsx';
 
 const RECORD = 'Priya Shah · #2363';
@@ -256,11 +253,11 @@ describe('ConfirmDialog — reason variant', () => {
     renderReason({
       reason: {
         options: [
-          { value: 'mistake', labelKey: CONFIRM_KEYS.reasons.mistake },
-          { value: 'duplicate', labelKey: CONFIRM_KEYS.reasons.duplicate },
-          { value: 'wrong_items', labelKey: CONFIRM_KEYS.reasons.wrongItems },
-          { value: 'price_changed', labelKey: CONFIRM_KEYS.reasons.priceChanged },
-          { value: 'other', labelKey: CONFIRM_KEYS.reasons.other },
+          { value: 'mistake', labelKey: REASON_CONFIRM_KEYS.reasons.mistake },
+          { value: 'duplicate', labelKey: REASON_CONFIRM_KEYS.reasons.duplicate },
+          { value: 'wrong_items', labelKey: REASON_CONFIRM_KEYS.reasons.wrongItems },
+          { value: 'price_changed', labelKey: REASON_CONFIRM_KEYS.reasons.priceChanged },
+          { value: 'other', labelKey: REASON_CONFIRM_KEYS.reasons.other },
         ],
       },
     });

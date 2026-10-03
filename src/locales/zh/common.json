@@ -109,75 +109,6 @@
     "filteredHint": "没有内容符合这些筛选条件。清除筛选即可重新查看全部。",
     "clearFilters": "清除筛选"
   },
-  "personCard": {
-    "contactLabel": "联系人",
-    "openPatientFile": "打开患者档案",
-    "since": "自 {{date}} 起",
-    "leadSince": "自 {{date}} 起为线索",
-    "kind": {
-      "patient": "患者",
-      "lead": "线索",
-      "contact": "联系人"
-    },
-    "editContact": "编辑联系人",
-    "changeContact": "更换联系人",
-    "changeContactHint": "选择其他联系人",
-    "reach": "联系方式",
-    "team": "团队",
-    "about": "简介",
-    "reachSub": {
-      "whatsappPrimary": "WhatsApp · 主要",
-      "whatsappAlternate": "WhatsApp · 备用",
-      "phonePrimary": "电话 · 主要",
-      "phoneAlternate": "电话 · 备用",
-      "instagram": "Instagram"
-    },
-    "whatsApp": "WhatsApp",
-    "call": "拨打电话",
-    "openInstagram": "打开 Instagram",
-    "copy": "复制",
-    "copied": "已复制 {{value}}",
-    "noReach": "尚未保存电话或账号",
-    "claim": "待认领 · 认领",
-    "claimHint": "此人有一条未认领的线索 · 认领它",
-    "gender": {
-      "female": "女",
-      "male": "男",
-      "other": "其他"
-    },
-    "genderAge": "{{gender}} · {{age}} 岁",
-    "age": "{{age}} 岁",
-    "cameVia": "来源：{{source}}",
-    "owedToThem": "需退还 {{amount}}",
-    "owedByThem": "欠诊所 {{amount}}",
-    "reviews_other": "{{count}} 条评价 · 最新：{{source}} {{rating}}★ · {{date}}",
-    "consent": {
-      "data": "数据",
-      "photos": "照片",
-      "marketing": "营销",
-      "hint": "同意 · {{label}}",
-      "given": "{{label}}：已同意",
-      "missing": "{{label}}：未同意"
-    },
-    "newLead": "+ 线索",
-    "newLeadHint": "为此联系人新建咨询",
-    "newAppointment": "+ 预约",
-    "newAppointmentHint": "为此联系人预约",
-    "newPatient": "+ 患者",
-    "newPatientHint": "为此联系人创建患者记录",
-    "online": "当前在线",
-    "offline": "离线",
-    "memberKind": {
-      "assigned": "负责",
-      "sentThis": "发送者",
-      "treating": "治疗中",
-      "involved": "参与"
-    },
-    "assignToYourself": "分配给自己",
-    "works": "工作时间 {{from}} – {{to}}",
-    "updated": "{{time}} 更新",
-    "fetching": "正在获取最新信息…"
-  },
   "a11y": {
     "close": "关闭",
     "loading": "加载中",
@@ -319,40 +250,7 @@
   "confirm": {
     "accept": "确认",
     "cancel": "取消",
-    "fallbackDescription": "请确认此操作。",
-    "keep": "保留",
-    "reason": "原因",
-    "note": "备注",
-    "notePlaceholder": "添加备注（可选）",
-    "noteRequired": "告诉团队原因（必填）",
-    "hintPickReason": "选择一个原因以继续",
-    "hintAddNote": "为“其他”添加简短备注",
-    "kinds": {
-      "delete": {
-        "action": "删除",
-        "effect": "它会从列表和选择器中消失。之后可立即通过提示撤销。"
-      },
-      "cancel": {
-        "action": "取消订单",
-        "effect": "订单到此为止。库存和应付供应商款项不变。"
-      },
-      "void": {
-        "action": "作废销售",
-        "effect": "销售将作废，发票随之取消。库存退回。"
-      }
-    },
-    "reasons": {
-      "mistake": "误建",
-      "duplicate": "重复",
-      "notNeeded": "不再需要",
-      "other": "其他",
-      "orderedByMistake": "误下单",
-      "supplierCantDeliver": "供应商无法交货",
-      "priceChanged": "价格变动",
-      "billedByMistake": "误开账单",
-      "wrongItems": "商品错误",
-      "customerChangedMind": "顾客改变主意"
-    }
+    "fallbackDescription": "请确认此操作。"
   },
   "picker": {
     "placeholder": "请选择…",
@@ -394,30 +292,6 @@
     "description": "您的更改尚未保存，将会丢失。",
     "discard": "放弃",
     "keepEditing": "继续编辑"
-  },
-  "recordDrawer": {
-    "cancel": "取消",
-    "back": "返回",
-    "close": "关闭",
-    "save": "保存",
-    "saving": "正在保存…",
-    "retrySave": "重试保存",
-    "saveAndAdd": "保存并继续添加",
-    "delete": "删除",
-    "notSaved": "未保存 · 您的更改已保留",
-    "readOnly": "仅查看 · 您的角色无法更改此内容",
-    "quickFill": "快速填写",
-    "step": {
-      "next": "下一步：{{step}} →",
-      "edit": "编辑",
-      "open": "打开",
-      "missing": "缺少：{{fields, list(type: unit)}}"
-    },
-    "peek": {
-      "empty": "空",
-      "added_other": "已添加 {{count}} 项",
-      "noneYet": "暂无"
-    }
   },
   "uploadTray": {
     "label": "上传",

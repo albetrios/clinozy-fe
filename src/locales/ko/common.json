@@ -109,75 +109,6 @@
     "filteredHint": "이 필터와 일치하는 항목이 없습니다. 전체를 다시 보려면 필터를 지우세요.",
     "clearFilters": "필터 지우기"
   },
-  "personCard": {
-    "contactLabel": "연락처",
-    "openPatientFile": "환자 파일 열기",
-    "since": "{{date}}부터",
-    "leadSince": "{{date}}부터 리드",
-    "kind": {
-      "patient": "환자",
-      "lead": "리드",
-      "contact": "연락처"
-    },
-    "editContact": "연락처 편집",
-    "changeContact": "연락처 변경",
-    "changeContactHint": "다른 연락처 선택",
-    "reach": "연락 방법",
-    "team": "팀",
-    "about": "정보",
-    "reachSub": {
-      "whatsappPrimary": "WhatsApp · 기본",
-      "whatsappAlternate": "WhatsApp · 보조",
-      "phonePrimary": "전화 · 기본",
-      "phoneAlternate": "전화 · 보조",
-      "instagram": "Instagram"
-    },
-    "whatsApp": "WhatsApp",
-    "call": "전화",
-    "openInstagram": "Instagram 열기",
-    "copy": "복사",
-    "copied": "{{value}} 복사됨",
-    "noReach": "저장된 전화번호나 핸들이 아직 없습니다",
-    "claim": "미배정 · 가져오기",
-    "claimHint": "이 사람의 리드가 열려 있습니다 · 가져오세요",
-    "gender": {
-      "female": "여성",
-      "male": "남성",
-      "other": "기타"
-    },
-    "genderAge": "{{gender}} · {{age}}세",
-    "age": "{{age}}세",
-    "cameVia": "{{source}} 통해 유입",
-    "owedToThem": "돌려줄 금액 {{amount}}",
-    "owedByThem": "클리닉에 갚을 금액 {{amount}}",
-    "reviews_other": "리뷰 {{count}}개 · 최근 {{source}}에서 {{rating}}★ · {{date}}",
-    "consent": {
-      "data": "데이터",
-      "photos": "사진",
-      "marketing": "마케팅",
-      "hint": "동의 · {{label}}",
-      "given": "{{label}}: 동의함",
-      "missing": "{{label}}: 동의 안 함"
-    },
-    "newLead": "+ 리드",
-    "newLeadHint": "이 연락처의 새 문의",
-    "newAppointment": "+ 예약",
-    "newAppointmentHint": "이 연락처로 예약",
-    "newPatient": "+ 환자",
-    "newPatientHint": "이 연락처의 환자 기록 만들기",
-    "online": "지금 온라인",
-    "offline": "오프라인",
-    "memberKind": {
-      "assigned": "담당",
-      "sentThis": "보낸 사람",
-      "treating": "치료 중",
-      "involved": "참여"
-    },
-    "assignToYourself": "나에게 배정",
-    "works": "근무 {{from}} – {{to}}",
-    "updated": "{{time}} 업데이트",
-    "fetching": "최신 정보를 가져오는 중…"
-  },
   "a11y": {
     "close": "닫기",
     "loading": "로딩 중",
@@ -319,40 +250,7 @@
   "confirm": {
     "accept": "확인",
     "cancel": "취소",
-    "fallbackDescription": "이 작업을 확인해 주세요.",
-    "keep": "유지",
-    "reason": "사유",
-    "note": "메모",
-    "notePlaceholder": "메모 추가(선택)",
-    "noteRequired": "팀에 이유를 알려 주세요(필수)",
-    "hintPickReason": "계속하려면 사유를 선택하세요",
-    "hintAddNote": "“기타”에 대한 짧은 메모를 추가하세요",
-    "kinds": {
-      "delete": {
-        "action": "삭제",
-        "effect": "목록과 선택 항목에서 사라집니다. 바로 뒤에 나오는 알림에서 실행 취소할 수 있습니다."
-      },
-      "cancel": {
-        "action": "주문 취소",
-        "effect": "주문이 여기서 중단됩니다. 재고와 공급업체 미지급금은 바뀌지 않습니다."
-      },
-      "void": {
-        "action": "판매 무효화",
-        "effect": "판매가 무효화되고 송장도 취소됩니다. 재고는 돌아옵니다."
-      }
-    },
-    "reasons": {
-      "mistake": "실수로 생성",
-      "duplicate": "중복",
-      "notNeeded": "더 이상 필요 없음",
-      "other": "기타",
-      "orderedByMistake": "실수로 주문",
-      "supplierCantDeliver": "공급업체가 배송할 수 없음",
-      "priceChanged": "가격 변경",
-      "billedByMistake": "실수로 청구",
-      "wrongItems": "잘못된 품목",
-      "customerChangedMind": "고객 변심"
-    }
+    "fallbackDescription": "이 작업을 확인해 주세요."
   },
   "picker": {
     "placeholder": "선택…",
@@ -394,30 +292,6 @@
     "description": "변경 사항이 저장되지 않았으며 사라집니다.",
     "discard": "버리기",
     "keepEditing": "편집 계속"
-  },
-  "recordDrawer": {
-    "cancel": "취소",
-    "back": "뒤로",
-    "close": "닫기",
-    "save": "저장",
-    "saving": "저장 중…",
-    "retrySave": "다시 저장",
-    "saveAndAdd": "저장 후 계속 추가",
-    "delete": "삭제",
-    "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
-    "readOnly": "보기 전용 · 현재 역할로는 변경할 수 없습니다",
-    "quickFill": "빠른 입력",
-    "step": {
-      "next": "다음: {{step}} →",
-      "edit": "수정",
-      "open": "열기",
-      "missing": "누락: {{fields, list(type: unit)}}"
-    },
-    "peek": {
-      "empty": "비어 있음",
-      "added_other": "{{count}}개 추가됨",
-      "noneYet": "아직 없음"
-    }
   },
   "uploadTray": {
     "label": "업로드",

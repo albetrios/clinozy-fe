@@ -1,6 +1,7 @@
 import { type ReactNode, type Ref, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -23,11 +24,7 @@ import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/in
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { X } from '@/shared/icons/index.ts';
 
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-  RECORD_DRAWER_TEST_ID,
-} from './record-drawer.constants.ts';
+import { RECORD_DRAWER_TEST_ID } from './record-drawer.constants.ts';
 import {
   DRAWER_WIDTH_CLASS,
   type DrawerContentProfile,
@@ -130,8 +127,9 @@ function DrawerCloseButton({
   onClose: () => void;
   testId: string;
 }) {
-  const { t } = useTranslation(RECORD_DRAWER_NS);
-  const label = t(RECORD_DRAWER_KEYS.closeAria);
+  // The shared "Close" name every dismiss button carries.
+  const { t } = useTranslation(LOCALE_NS);
+  const label = t(LOCALE_KEYS.closeAria);
   if (placement === 'inside') {
     return (
       <button

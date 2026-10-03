@@ -1,7 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
-/** The record drawer's chrome copy lives in `common`: every room's drawer shares it. */
-export const RECORD_DRAWER_NS = I18N_NAMESPACES.common;
+/**
+ * The record drawer's chrome copy lives in `clinic`: every room's drawer shares
+ * it, and it loads with the org shell — off the entry bundle.
+ */
+export const RECORD_DRAWER_NS = I18N_NAMESPACES.clinic;
 
 /**
  * Key paths for the record drawer and its parts (footer, steps, Quick fill).
@@ -9,8 +12,6 @@ export const RECORD_DRAWER_NS = I18N_NAMESPACES.common;
  * patient" — comes from each room's namespace; these are the shared defaults.
  */
 export const RECORD_DRAWER_KEYS = {
-  /** The × button's accessible name — the shared `a11y.close`, not a new key. */
-  closeAria: 'a11y.close',
   cancel: 'recordDrawer.cancel',
   back: 'recordDrawer.back',
   close: 'recordDrawer.close',

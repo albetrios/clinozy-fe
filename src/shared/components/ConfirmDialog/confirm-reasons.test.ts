@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import i18n from '@/lib/i18n/i18n.ts';
 import { DELETE_REASON_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 
-import { CONFIRM_NS } from './confirm-dialog.constants.ts';
 import {
   needsNote,
   REASON_KINDS,
@@ -11,6 +10,7 @@ import {
   STORED_DELETE_REASONS,
   toReasonChoice,
 } from './confirm-reasons.ts';
+import { REASON_CONFIRM_NS } from './reason-confirm.constants.ts';
 
 describe('confirm reasons', () => {
   it('declares exactly the contract’s delete_reason values', () => {
@@ -74,7 +74,7 @@ describe('confirm reasons', () => {
         copy.effectKey,
         ...copy.options.map((o) => o.labelKey),
       ]) {
-        expect(i18n.exists(key, { ns: CONFIRM_NS }), key).toBe(true);
+        expect(i18n.exists(key, { ns: REASON_CONFIRM_NS }), key).toBe(true);
       }
     },
   );

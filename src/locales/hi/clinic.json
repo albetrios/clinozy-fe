@@ -82,5 +82,135 @@
       "offerPaused": "{{name}} रोका गया",
       "offerResumed": "{{name}} फिर से चालू"
     }
+  },
+  "recordDrawer": {
+    "cancel": "रद्द करें",
+    "back": "वापस",
+    "close": "बंद करें",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है…",
+    "retrySave": "फिर से सहेजें",
+    "saveAndAdd": "सहेजें और एक और जोड़ें",
+    "delete": "हटाएँ",
+    "notSaved": "सहेजा नहीं गया · आपके परिवर्तन बने हुए हैं",
+    "readOnly": "केवल देखने के लिए · आपकी भूमिका इसे बदल नहीं सकती",
+    "quickFill": "झटपट भरें",
+    "step": {
+      "next": "अगला: {{step}} →",
+      "edit": "संपादित करें",
+      "open": "खोलें",
+      "missing": "बाकी: {{fields, list(type: unit)}}"
+    },
+    "peek": {
+      "empty": "खाली",
+      "added_one": "{{count}} जोड़ा गया",
+      "added_other": "{{count}} जोड़े गए",
+      "noneYet": "अभी कोई नहीं"
+    }
+  },
+  "personCard": {
+    "contactLabel": "संपर्क",
+    "openPatientFile": "मरीज़ की फ़ाइल खोलें",
+    "since": "{{date}} से",
+    "leadSince": "{{date}} से लीड",
+    "kind": {
+      "patient": "मरीज़",
+      "lead": "लीड",
+      "contact": "संपर्क"
+    },
+    "editContact": "संपर्क संपादित करें",
+    "changeContact": "संपर्क बदलें",
+    "changeContactHint": "कोई दूसरा संपर्क चुनें",
+    "reach": "संपर्क के तरीके",
+    "team": "टीम",
+    "about": "जानकारी",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · मुख्य",
+      "whatsappAlternate": "WhatsApp · वैकल्पिक",
+      "phonePrimary": "फ़ोन · मुख्य",
+      "phoneAlternate": "फ़ोन · वैकल्पिक",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "कॉल करें",
+    "openInstagram": "Instagram खोलें",
+    "copy": "कॉपी करें",
+    "copied": "{{value}} कॉपी किया गया",
+    "noReach": "अभी कोई फ़ोन या हैंडल सहेजा नहीं गया",
+    "claim": "खुला · लें",
+    "claimHint": "इस व्यक्ति की एक लीड खुली है · इसे लें",
+    "gender": {
+      "female": "महिला",
+      "male": "पुरुष",
+      "other": "अन्य"
+    },
+    "genderAge": "{{gender}} · {{age}} वर्ष",
+    "age": "{{age}} वर्ष",
+    "cameVia": "{{source}} से आए",
+    "owedToThem": "{{amount}} उन्हें लौटाने हैं",
+    "owedByThem": "{{amount}} उन पर क्लिनिक का बकाया",
+    "reviews_one": "{{count}} समीक्षा · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "reviews_other": "{{count}} समीक्षाएँ · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "consent": {
+      "data": "डेटा",
+      "photos": "फ़ोटो",
+      "marketing": "मार्केटिंग",
+      "hint": "सहमति · {{label}}",
+      "given": "{{label}}: सहमति दी गई",
+      "missing": "{{label}}: सहमति नहीं"
+    },
+    "newLead": "+ लीड",
+    "newLeadHint": "इस संपर्क के लिए नई पूछताछ",
+    "newAppointment": "+ अपॉइंटमेंट",
+    "newAppointmentHint": "इस संपर्क के लिए बुक करें",
+    "newPatient": "+ मरीज़",
+    "newPatientHint": "इस संपर्क के लिए मरीज़ रिकॉर्ड बनाएँ",
+    "online": "अभी ऑनलाइन",
+    "offline": "ऑफ़लाइन",
+    "memberKind": {
+      "assigned": "सौंपा गया",
+      "sentThis": "इन्होंने भेजा",
+      "treating": "इलाज कर रहे हैं",
+      "involved": "शामिल"
+    },
+    "assignToYourself": "ख़ुद को सौंपें",
+    "works": "काम का समय {{from}} – {{to}}",
+    "updated": "{{time}} पर अपडेट हुआ",
+    "fetching": "नवीनतम जानकारी ला रहे हैं…"
+  },
+  "reasonConfirm": {
+    "keep": "रहने दें",
+    "reason": "कारण",
+    "note": "नोट",
+    "notePlaceholder": "नोट जोड़ें (वैकल्पिक)",
+    "noteRequired": "टीम को कारण बताएँ (आवश्यक)",
+    "hintPickReason": "जारी रखने के लिए कोई कारण चुनें",
+    "hintAddNote": "“अन्य” के लिए एक छोटा नोट जोड़ें",
+    "kinds": {
+      "delete": {
+        "action": "हटाएँ",
+        "effect": "यह सूचियों और पिकर से हट जाएगा। ठीक बाद आने वाली सूचना से आप इसे पूर्ववत कर सकते हैं।"
+      },
+      "cancel": {
+        "action": "ऑर्डर रद्द करें",
+        "effect": "ऑर्डर यहीं रुक जाता है। स्टॉक और सप्लायर का बकाया नहीं बदलता।"
+      },
+      "void": {
+        "action": "बिक्री रद्द करें",
+        "effect": "बिक्री रद्द हो जाती है और उसका इनवॉइस भी। स्टॉक वापस आ जाता है।"
+      }
+    },
+    "reasons": {
+      "mistake": "गलती से बनाया गया",
+      "duplicate": "डुप्लिकेट",
+      "notNeeded": "अब ज़रूरत नहीं",
+      "other": "अन्य",
+      "orderedByMistake": "गलती से ऑर्डर किया",
+      "supplierCantDeliver": "सप्लायर डिलीवर नहीं कर सकता",
+      "priceChanged": "कीमत बदल गई",
+      "billedByMistake": "गलती से बिल किया",
+      "wrongItems": "गलत आइटम",
+      "customerChangedMind": "ग्राहक ने मन बदल लिया"
+    }
   }
 }

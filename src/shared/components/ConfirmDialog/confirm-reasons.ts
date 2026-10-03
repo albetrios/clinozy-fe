@@ -1,6 +1,6 @@
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 
-import { CONFIRM_KEYS } from './confirm-dialog.constants.ts';
+import { REASON_CONFIRM_KEYS } from './reason-confirm.constants.ts';
 
 /**
  * The contract's `delete_reason` machine values (`schema-routes.md:1490`).
@@ -60,43 +60,46 @@ interface ReasonKindCopy {
 
 const OTHER: ConfirmReasonOption = {
   value: 'other',
-  labelKey: CONFIRM_KEYS.reasons.other,
+  labelKey: REASON_CONFIRM_KEYS.reasons.other,
 };
 
 /** Each built-in kind's copy, verbatim from the design; reasons in chip order. */
 export const REASON_KINDS: Readonly<Record<ConfirmReasonKind, ReasonKindCopy>> = {
   delete: {
-    actionKey: CONFIRM_KEYS.kinds.delete.action,
-    effectKey: CONFIRM_KEYS.kinds.delete.effect,
+    actionKey: REASON_CONFIRM_KEYS.kinds.delete.action,
+    effectKey: REASON_CONFIRM_KEYS.kinds.delete.effect,
     options: [
-      { value: 'mistake', labelKey: CONFIRM_KEYS.reasons.mistake },
-      { value: 'duplicate', labelKey: CONFIRM_KEYS.reasons.duplicate },
-      { value: 'not_needed', labelKey: CONFIRM_KEYS.reasons.notNeeded },
+      { value: 'mistake', labelKey: REASON_CONFIRM_KEYS.reasons.mistake },
+      { value: 'duplicate', labelKey: REASON_CONFIRM_KEYS.reasons.duplicate },
+      { value: 'not_needed', labelKey: REASON_CONFIRM_KEYS.reasons.notNeeded },
       OTHER,
     ],
   },
   // A purchase order's `cancelReason` is the same enum: "Ordered by mistake" is
   // `mistake`, the two the schema lacks travel as `other` + their label.
   cancel: {
-    actionKey: CONFIRM_KEYS.kinds.cancel.action,
-    effectKey: CONFIRM_KEYS.kinds.cancel.effect,
+    actionKey: REASON_CONFIRM_KEYS.kinds.cancel.action,
+    effectKey: REASON_CONFIRM_KEYS.kinds.cancel.effect,
     options: [
-      { value: 'mistake', labelKey: CONFIRM_KEYS.reasons.orderedByMistake },
+      { value: 'mistake', labelKey: REASON_CONFIRM_KEYS.reasons.orderedByMistake },
       {
         value: 'supplier_cant_deliver',
-        labelKey: CONFIRM_KEYS.reasons.supplierCantDeliver,
+        labelKey: REASON_CONFIRM_KEYS.reasons.supplierCantDeliver,
       },
-      { value: 'price_changed', labelKey: CONFIRM_KEYS.reasons.priceChanged },
+      { value: 'price_changed', labelKey: REASON_CONFIRM_KEYS.reasons.priceChanged },
       OTHER,
     ],
   },
   void: {
-    actionKey: CONFIRM_KEYS.kinds.void.action,
-    effectKey: CONFIRM_KEYS.kinds.void.effect,
+    actionKey: REASON_CONFIRM_KEYS.kinds.void.action,
+    effectKey: REASON_CONFIRM_KEYS.kinds.void.effect,
     options: [
-      { value: 'mistake', labelKey: CONFIRM_KEYS.reasons.billedByMistake },
-      { value: 'wrong_items', labelKey: CONFIRM_KEYS.reasons.wrongItems },
-      { value: 'changed_mind', labelKey: CONFIRM_KEYS.reasons.customerChangedMind },
+      { value: 'mistake', labelKey: REASON_CONFIRM_KEYS.reasons.billedByMistake },
+      { value: 'wrong_items', labelKey: REASON_CONFIRM_KEYS.reasons.wrongItems },
+      {
+        value: 'changed_mind',
+        labelKey: REASON_CONFIRM_KEYS.reasons.customerChangedMind,
+      },
       OTHER,
     ],
   },
