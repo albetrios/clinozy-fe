@@ -436,5 +436,106 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "printTemplate": {
+    "patientInformation": "患者情報",
+    "name": "氏名：",
+    "contact": "ご不明な点は {{phone}} までお問い合わせください",
+    "gstin": "GSTIN {{gstin}}",
+    "thanks": {
+      "skin": "スキンケアに{{clinic}}をお選びいただきありがとうございます",
+      "hair": "ヘアケアに{{clinic}}をお選びいただきありがとうございます",
+      "dental": "歯のケアに{{clinic}}をお選びいただきありがとうございます",
+      "gynac": "女性の健康に{{clinic}}をお選びいただきありがとうございます",
+      "physio": "理学療法に{{clinic}}をお選びいただきありがとうございます",
+      "general": "健康管理に{{clinic}}をお選びいただきありがとうございます"
+    },
+    "thanksMedicine": "お薬のご用命に{{clinic}}をお選びいただきありがとうございます",
+    "invoice": {
+      "customerInformation": "お客様情報",
+      "invoiceDetails": "請求書の詳細",
+      "saleDetails": "販売の詳細",
+      "phone": "電話：",
+      "invoiceDate": "請求日：",
+      "saleDate": "販売日：",
+      "invoiceNumber": "請求書番号：",
+      "saleNumber": "販売番号：",
+      "status": "ステータス：",
+      "statuses": {
+        "paid": "支払済み",
+        "partial": "一部支払済み",
+        "unpaid": "未払い"
+      },
+      "items": "明細",
+      "medicineItems": "医薬品の明細",
+      "item": "品目",
+      "medicineName": "医薬品名",
+      "packSize": "包装サイズ",
+      "qty": "数量",
+      "amount": "金額",
+      "discount": "割引",
+      "gst": "GST",
+      "netAmount": "正味金額",
+      "notes": "備考",
+      "noNotes": "追加の備考はありません",
+      "paymentSummary": "お支払いの概要",
+      "totalAmount": "合計金額：",
+      "overallDiscount": "全体割引：",
+      "billAmount": "請求金額：",
+      "balanceDue": "未払い残高："
+    },
+    "prescription": {
+      "patientId": "患者ID：",
+      "age": "年齢：",
+      "years_other": "{{count}}歳",
+      "details": "処方箋の詳細",
+      "date": "日付：",
+      "number": "処方箋番号：",
+      "doctor": "医師：",
+      "medicines": "薬剤と用量",
+      "medicine": "薬剤",
+      "dosage": "用量",
+      "when": "服用時",
+      "where": "部位",
+      "qty": "数量",
+      "remark": "備考",
+      "sos": "頓用",
+      "labReports": "検査報告",
+      "noLabReports": "検査報告はありません",
+      "procedures": "本日の施術",
+      "noProcedures": "施術はありません",
+      "advice": "アドバイス",
+      "noAdvice": "追加のアドバイスはありません",
+      "followUp": "フォローアップ",
+      "followUpDate": "次回予定日：",
+      "notScheduled": "未定",
+      "signature": "医師の署名",
+      "signHere": "医師の署名欄",
+      "meal": {
+        "before": "食前",
+        "after": "食後"
+      },
+      "timing": {
+        "empty_stomach": "空腹時",
+        "with_meal": "食事と一緒に",
+        "morning": "朝",
+        "night": "夜",
+        "morning_night": "朝と夜",
+        "thrice_week": "週3回",
+        "once_week": "週1回",
+        "alternate_days": "1日おき"
+      },
+      "bodyPart": {
+        "face": "顔",
+        "scalp": "頭皮",
+        "hair": "髪",
+        "body": "体",
+        "chest": "胸",
+        "back": "背中",
+        "underarm": "脇",
+        "legs": "脚",
+        "arms": "腕"
+      }
+    }
   }
 }

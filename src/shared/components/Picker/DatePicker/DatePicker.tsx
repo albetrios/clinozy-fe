@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { Picker } from '@/shared/components/Picker/Picker.tsx';
 import type {
@@ -16,7 +16,6 @@ import {
   dateOption,
   type DateOptionFormat,
   ENGLISH_MONTH_NAMES,
-  localDateOf,
   parseTypedDate,
   type TypedDateLocale,
   withinRange,

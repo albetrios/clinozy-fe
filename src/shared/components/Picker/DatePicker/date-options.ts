@@ -1,13 +1,11 @@
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { addCivilDays } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
 import type { PickerOption } from '@/shared/components/Picker/picker.types.ts';
 
 /** Days before today the date list reaches by default (H:4453). */
 export const DATE_PICKER_PAST_DAYS = 120;
 /** Days after today the date list reaches by default (H:4453). */
 export const DATE_PICKER_FUTURE_DAYS = 60;
-
-const DAY_MS = 86_400_000;
 
 /** The words and formatting a date list needs — from the locale. */
 export interface DateOptionFormat {
@@ -35,30 +33,6 @@ export interface DateOptionRange {
   max?: string;
 }
 
-function civilParts(date: string): [number, number, number] {
-  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
-  return [year, month, day];
-}
-
-/** A civil date as a local-midnight `Date` (what calendars and `civilDay` formatting take). */
-export function localDateOf(date: string): Date {
-  const [year, month, day] = civilParts(date);
-  return new Date(year, month - 1, day);
-}
-
-/** The civil date of a local `Date`, `YYYY-MM-DD`. */
-export function civilDateOf(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-/** Whole days from `from` to `to` (civil dates; negative when `to` is earlier). */
-export function civilDayOffset(from: string, to: string): number {
-  const [fy, fm, fd] = civilParts(from);
-  const [ty, tm, td] = civilParts(to);
-  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / DAY_MS);
-}
-
 function relativeWord(offset: number, format: DateOptionFormat): string {
   if (offset === 0) return format.today;
   if (offset === 1) return format.tomorrow;
@@ -84,7 +58,7 @@ export function dateOption(
   format: DateOptionFormat,
 ): PickerOption<string> {
   const offset = civilDayOffset(today, date);
-  const withYear = civilParts(date)[0] !== civilParts(today)[0];
+  const withYear = date.slice(0, 4) !== today.slice(0, 4);
   const day = format.day(date, withYear);
   const relative = relativeWord(offset, format);
   const { group, tone } = groupOf(date, offset, format);
@@ -178,7 +152,7 @@ function civilOf(year: number, month: number, day: number): string | null {
 
 /** The day-and-month in whichever of last, this or next year lies nearest today. */
 function nearestYear(today: string, month: number, day: number): string | null {
-  const [year] = civilParts(today);
+  const year = Number(today.slice(0, 4));
   let best: string | null = null;
   for (const candidate of [year - 1, year, year + 1]) {
     const date = civilOf(candidate, month, day);

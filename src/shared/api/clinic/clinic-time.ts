@@ -22,6 +22,45 @@ export function clinicClockTime(instant: Date, timeZone = CLINIC_TIME_ZONE): str
   return `${pad(p.hour)}:${pad(p.minute)}`;
 }
 
+const DAY_MS = 86_400_000;
+
+function civilParts(date: string): [number, number, number] {
+  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
+  return [year, month, day];
+}
+
+/**
+ * A calendar date as a local-midnight `Date` — what calendars take, and what
+ * `formatDate(…, { civilDay: true })` keeps on its day whatever the viewer's
+ * display timezone.
+ */
+export function localDateOf(date: string): Date {
+  const [year, month, day] = civilParts(date);
+  return new Date(year, month - 1, day);
+}
+
+/** The calendar date of a local `Date`, `YYYY-MM-DD`. */
+export function civilDateOf(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** Whole days from `from` to `to` (calendar dates; negative when `to` is earlier). */
+export function civilDayOffset(from: string, to: string): number {
+  const [fy, fm, fd] = civilParts(from);
+  const [ty, tm, td] = civilParts(to);
+  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / DAY_MS);
+}
+
+/** Whole years from one calendar date to another — an age on a given day. */
+export function civilYearsBetween(from: string, to: string): number {
+  const [fromYear = 0, fromMonth = 0, fromDay = 0] = from.split('-').map(Number);
+  const [toYear = 0, toMonth = 0, toDay = 0] = to.split('-').map(Number);
+  const beforeBirthday =
+    toMonth < fromMonth || (toMonth === fromMonth && toDay < fromDay);
+  return toYear - fromYear - (beforeBirthday ? 1 : 0);
+}
+
 /** A calendar date `days` away from `date` (civil arithmetic — no timezone involved). */
 export function addCivilDays(date: string, days: number): string {
   const [year, month, day] = date.split('-').map(Number);

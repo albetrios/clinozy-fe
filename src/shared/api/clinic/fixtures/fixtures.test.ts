@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { z } from 'zod';
 
 import { FIXTURE_ORGANIZATION_ID } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import { invoiceBalance, invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
 import {
   appointmentSchema,
   branchSchema,
@@ -50,7 +51,6 @@ import {
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 
-import { invoiceBill } from './money.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
 import { readSeedLabel, seedExpiry, seedMobile } from './refs.fixtures.ts';
 import {
@@ -470,9 +470,17 @@ describe('the clinic fixture world', () => {
       0, 0, 60000, 0, 0, 765000, 153400, 40000,
     ]);
     const bill = (seq: number) =>
-      invoiceBill(invoices.find((row) => row.seq === seq)?.items ?? []);
+      invoiceTotals({
+        items: invoices.find((row) => row.seq === seq)?.items ?? [],
+        overallDiscount: 0,
+      }).bill;
     expect(bill(781)).toBe(765000);
     expect(bill(791)).toBe(371700);
+    // The receipts added for the package and sale invoices settle them exactly.
+    for (const seq of [780, 782, 789, 790]) {
+      const invoice = invoices.find((row) => row.seq === seq);
+      expect(invoice && invoiceBalance(invoice, payments).status, `#${seq}`).toBe('paid');
+    }
     for (const payment of payments) {
       expect(payment.splits.reduce((sum, split) => sum + split.amount, 0)).toBe(
         payment.amount,

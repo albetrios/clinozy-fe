@@ -2,12 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildDateOptions,
-  civilDateOf,
-  civilDayOffset,
   dateOption,
   type DateOptionFormat,
   ENGLISH_MONTH_NAMES,
-  localDateOf,
   parseTypedDate,
   type TypedDateLocale,
   withinRange,
@@ -29,21 +26,6 @@ const DAY_FIRST: TypedDateLocale = { months: ENGLISH_MONTH_NAMES, dayFirst: true
 const MONTH_FIRST: TypedDateLocale = { months: ENGLISH_MONTH_NAMES, dayFirst: false };
 
 describe('civil date helpers', () => {
-  it('counts whole days between civil dates, across months and years', () => {
-    expect(civilDayOffset(TODAY, '2026-10-04')).toBe(1);
-    expect(civilDayOffset(TODAY, '2026-09-30')).toBe(-3);
-    expect(civilDayOffset('2026-12-31', '2027-01-01')).toBe(1);
-    expect(civilDayOffset('2026-03-28', '2026-03-30')).toBe(2);
-  });
-
-  it('round-trips a civil date through a local-midnight Date', () => {
-    const date = localDateOf('2026-02-28');
-    expect(date.getFullYear()).toBe(2026);
-    expect(date.getMonth()).toBe(1);
-    expect(date.getDate()).toBe(28);
-    expect(civilDateOf(date)).toBe('2026-02-28');
-  });
-
   it('checks the optional min / max inclusively', () => {
     expect(withinRange('2026-10-03', { min: '2026-10-03', max: '2026-10-03' })).toBe(
       true,

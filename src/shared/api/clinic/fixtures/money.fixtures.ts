@@ -1,4 +1,5 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
+import { invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
 import type {
   CreditNote,
   DayClose,
@@ -244,18 +245,6 @@ function invoiceItem(line: LineRow): InvoiceItem {
     gstPct: line.gst,
     batchNo: line.batch ?? null,
   };
-}
-
-/** An invoice's bill in paise: Σ qty × rate × (1 − discount) × (1 + GST) (`S:622`). */
-export function invoiceBill(items: readonly InvoiceItem[]): number {
-  return Math.round(
-    items.reduce(
-      (sum, item) =>
-        sum +
-        item.qty * item.rate * (1 - item.discountPct / 100) * (1 + item.gstPct / 100),
-      0,
-    ),
-  );
 }
 
 export function invoiceSeed(today: string = clinicToday()): Invoice[] {
@@ -514,7 +503,7 @@ export function paymentSeed(today: string = clinicToday()): Payment[] {
       invoices.find((candidate) => candidate.seq === row.invoice),
       `invoice #${row.invoice}`,
     );
-    const amount = invoiceBill(invoice.items);
+    const amount = invoiceTotals(invoice).bill;
     return {
       ...paymentBase(row.seq, row.at, row.by, today),
       direction: 'received',

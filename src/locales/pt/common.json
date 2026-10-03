@@ -446,5 +446,108 @@
       "kilobytes": "{{value}} KB",
       "megabytes": "{{value}} MB"
     }
+  },
+  "printTemplate": {
+    "patientInformation": "Informações do paciente",
+    "name": "Nome:",
+    "contact": "Em caso de dúvidas, fale conosco pelo {{phone}}",
+    "gstin": "GSTIN {{gstin}}",
+    "thanks": {
+      "skin": "Obrigado por escolher {{clinic}} para os cuidados com a sua pele",
+      "hair": "Obrigado por escolher {{clinic}} para os cuidados com o seu cabelo",
+      "dental": "Obrigado por escolher {{clinic}} para os seus cuidados odontológicos",
+      "gynac": "Obrigado por escolher {{clinic}} para a saúde da mulher",
+      "physio": "Obrigado por escolher {{clinic}} para a sua fisioterapia",
+      "general": "Obrigado por escolher {{clinic}} para os cuidados com a sua saúde"
+    },
+    "thanksMedicine": "Obrigado por escolher {{clinic}} para os seus medicamentos",
+    "invoice": {
+      "customerInformation": "Informações do cliente",
+      "invoiceDetails": "Detalhes da fatura",
+      "saleDetails": "Detalhes da venda",
+      "phone": "Telefone:",
+      "invoiceDate": "Data da fatura:",
+      "saleDate": "Data da venda:",
+      "invoiceNumber": "Fatura nº:",
+      "saleNumber": "Venda nº:",
+      "status": "Status:",
+      "statuses": {
+        "paid": "Paga",
+        "partial": "Paga em parte",
+        "unpaid": "Em aberto"
+      },
+      "items": "Itens",
+      "medicineItems": "Medicamentos",
+      "item": "Item",
+      "medicineName": "Medicamento",
+      "packSize": "Embalagem",
+      "qty": "Qtd.",
+      "amount": "Valor",
+      "discount": "Desconto",
+      "gst": "GST",
+      "netAmount": "Valor líquido",
+      "notes": "Observações",
+      "noNotes": "Nenhuma observação adicional",
+      "paymentSummary": "Resumo do pagamento",
+      "totalAmount": "Valor total:",
+      "overallDiscount": "Desconto geral:",
+      "billAmount": "Valor da fatura:",
+      "balanceDue": "Saldo devedor:"
+    },
+    "prescription": {
+      "patientId": "ID do paciente:",
+      "age": "Idade:",
+      "years_one": "{{count}} ano",
+      "years_many": "{{count}} anos",
+      "years_other": "{{count}} anos",
+      "details": "Detalhes da receita",
+      "date": "Data:",
+      "number": "Receita nº:",
+      "doctor": "Médico:",
+      "medicines": "Medicamentos e posologia",
+      "medicine": "Medicamento",
+      "dosage": "Posologia",
+      "when": "Quando",
+      "where": "Onde",
+      "qty": "Qtd.",
+      "remark": "Observação",
+      "sos": "Se necessário",
+      "labReports": "Exames laboratoriais",
+      "noLabReports": "Nenhum exame laboratorial",
+      "procedures": "Procedimentos de hoje",
+      "noProcedures": "Nenhum procedimento",
+      "advice": "Orientações",
+      "noAdvice": "Nenhuma orientação adicional",
+      "followUp": "Retorno",
+      "followUpDate": "Data de retorno:",
+      "notScheduled": "Não agendado",
+      "signature": "Assinatura do médico",
+      "signHere": "Assinatura do médico aqui",
+      "meal": {
+        "before": "Antes das refeições",
+        "after": "Depois das refeições"
+      },
+      "timing": {
+        "empty_stomach": "Em jejum",
+        "with_meal": "Com as refeições",
+        "morning": "De manhã",
+        "night": "À noite",
+        "morning_night": "Manhã e noite",
+        "thrice_week": "Três vezes por semana",
+        "once_week": "Uma vez por semana",
+        "alternate_days": "Em dias alternados"
+      },
+      "bodyPart": {
+        "face": "Rosto",
+        "scalp": "Couro cabeludo",
+        "hair": "Cabelo",
+        "body": "Corpo",
+        "chest": "Peito",
+        "back": "Costas",
+        "underarm": "Axilas",
+        "legs": "Pernas",
+        "arms": "Braços"
+      }
+    }
   }
 }

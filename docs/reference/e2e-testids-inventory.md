@@ -293,3 +293,15 @@ Below, `<d>` is that root id.
 | `<d>-delete` / `<d>-save-and-add` / `<d>-save`         | Delete, "Save & add another" (never on a phone), primary                   | DrawerFooter                           |
 | `<d>-not-saved`                                        | "Not saved · your changes are kept" after a failed save                    | DrawerFooter                           |
 | `confirm-dialog` / `confirm-accept` / `confirm-cancel` | "Discard changes?" prompt of a dirty drawer (Discard / Keep editing)       | `shared/hooks/useUnsavedChangesGuard/` |
+
+## Clinic print templates (added 2026-10-03, L-22)
+
+| Test ID                    | Element                                                                          | Source                                               |
+| -------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `print-root`               | Print-only host `printDocument()` mounts at the end of `<body>` until afterprint | `shared/components/PrintTemplate/print-document.ts`  |
+| `invoice-print`            | A4 invoice / sale sheet                                                          | `shared/components/PrintTemplate/InvoicePrint/`      |
+| `invoice-print-items`      | Invoice items table (lines + totals row)                                         | `shared/components/PrintTemplate/InvoicePrint/`      |
+| `invoice-print-summary`    | Payment Summary (total, overall discount, bill, balance due)                     | `shared/components/PrintTemplate/InvoicePrint/`      |
+| `prescription-print`       | A4 prescription sheet                                                            | `shared/components/PrintTemplate/PrescriptionPrint/` |
+| `prescription-print-items` | Medicines & Dosage table                                                         | `shared/components/PrintTemplate/PrescriptionPrint/` |
+| `print-footer`             | Sheet footer: thank-you line, branch phone, GSTIN                                | `shared/components/PrintTemplate/PrintTemplate.tsx`  |

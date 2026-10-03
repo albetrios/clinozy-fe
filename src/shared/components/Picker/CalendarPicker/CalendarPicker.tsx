@@ -3,12 +3,12 @@ import type { Matcher } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { LocalizedCalendar } from '@/shared/components/LocalizedCalendar/index.ts';
 import {
   civilDateOf,
+  clinicToday,
   localDateOf,
-} from '@/shared/components/Picker/DatePicker/date-options.ts';
+} from '@/shared/api/clinic/clinic-time.ts';
+import { LocalizedCalendar } from '@/shared/components/LocalizedCalendar/index.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import type { PickerSize } from '@/shared/components/Picker/picker.types.ts';
 import { PickerSheet } from '@/shared/components/Picker/PickerSheet/index.ts';

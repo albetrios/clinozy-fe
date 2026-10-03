@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~885 src files · ~480 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~895 src files · ~485 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -922,6 +922,7 @@ clinozy-fe/
 │   │   │   │   ├── clinic-display-id.ts
 │   │   │   │   ├── clinic-fixture-seed.ts
 │   │   │   │   ├── clinic-fixture-store.ts
+│   │   │   │   ├── clinic-money.ts
 │   │   │   │   ├── clinic-schema.ts
 │   │   │   │   ├── clinic-time.ts
 │   │   │   │   ├── offerings-api.ts
@@ -929,7 +930,7 @@ clinozy-fe/
 │   │   │   │   ├── offerings-pricing.ts
 │   │   │   │   ├── preferences-api.ts
 │   │   │   │   ├── presence-api.ts
-│   │   │   │   └── [11 test files]
+│   │   │   │   └── [12 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1407,6 +1408,21 @@ clinozy-fe/
 │   │   │   │   ├── Picker.tsx
 │   │   │   │   ├── picker.types.ts
 │   │   │   │   └── [4 test files]
+│   │   │   ├── PrintTemplate/
+│   │   │   │   ├── InvoicePrint/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── InvoicePrint.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── PrescriptionPrint/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── PrescriptionPrint.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── print-document.ts
+│   │   │   │   ├── print-format.ts
+│   │   │   │   ├── print-template.constants.ts
+│   │   │   │   ├── PrintTemplate.tsx
+│   │   │   │   └── [2 test files]
 │   │   │   ├── ProductMark/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── ProductMark.tsx

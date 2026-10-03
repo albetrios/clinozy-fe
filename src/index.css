@@ -1710,6 +1710,39 @@
   display: none;
 }
 
+/* ── Print documents (invoice, sale and prescription sheets — KICKOFF §3.5, L-22) ──
+   `printDocument()` (shared/components/PrintTemplate) renders one A4 sheet into
+   a `[data-print-root]` host at the end of <body> and sets `data-printing` on
+   <html> until `afterprint`. The host never shows on screen; while a document
+   prints it is the only thing that does. The page is the sheet: A4 with no
+   margins, so the sheet's own letterhead space is exact (H:434). The sheet keeps
+   the light tokens because the preset's dark block is screen-only. */
+@media screen {
+  [data-print-root] {
+    display: none;
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html[data-printing],
+  html[data-printing] body {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  html[data-printing] body > :not([data-print-root]) {
+    display: none !important;
+  }
+  [data-print-root] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 /* ── Accessibility: honour reduced-motion globally ──
    Users who set "reduce motion" get a near-instant, motion-free experience
    (page fades, overlay transitions, shimmer, and hover lifts are neutralised). */
