@@ -7,6 +7,18 @@ export const I18N_NAMESPACES = {
   errors: 'errors',
   onboarding: 'onboarding',
   auth: 'auth',
+  today: 'today',
+  leads: 'leads',
+  appointments: 'appointments',
+  patients: 'patients',
+  patientFile: 'patient-file',
+  medical: 'medical',
+  clinicStock: 'clinic-stock',
+  payments: 'payments',
+  tasks: 'tasks',
+  offerings: 'offerings',
+  users: 'users',
+  clinic: 'clinic',
 } as const;
 
 export type I18nNamespace = (typeof I18N_NAMESPACES)[keyof typeof I18N_NAMESPACES];

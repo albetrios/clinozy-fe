@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "Hoy",
+      "description": "La clínica ahora: llegadas, en espera, con el médico, salida"
+    },
+    "leads": {
+      "label": "Prospectos",
+      "description": "Consultas y sus conversaciones, hasta que se convierten en pacientes"
+    },
+    "appointments": {
+      "label": "Citas",
+      "description": "Reservas por médico, sala y equipo"
+    },
+    "patients": {
+      "label": "Pacientes",
+      "description": "Pacientes registrados, con recetas, sesiones y fotos"
+    },
+    "medical": {
+      "label": "Farmacia",
+      "description": "La farmacia: medicamentos a la venta, proveedores, visitadores, compras, ventas"
+    },
+    "stock": {
+      "label": "Inventario de la clínica",
+      "description": "Consumibles y equipos de la clínica usados en procedimientos · no se venden"
+    },
+    "payments": {
+      "label": "Pagos",
+      "description": "Cobros, facturas y saldos pendientes"
+    },
+    "tasks": {
+      "label": "Tareas",
+      "description": "Seguimientos, llamadas de opinión y recordatorios, con responsable y vencimiento"
+    },
+    "offerings": {
+      "label": "Servicios",
+      "description": "Lo que vende la clínica: servicios, paquetes, ofertas y precios"
+    },
+    "users": {
+      "label": "Usuarios",
+      "description": "Equipo, roles y acceso, sucursales"
+    }
+  },
+  "roles": {
+    "admin": "Administrador",
+    "doctor": "Médico",
+    "therapist": "Terapeuta",
+    "front_desk": "Recepción",
+    "counsellor": "Asesor",
+    "pharmacist": "Farmacéutico",
+    "accountant": "Contador",
+    "marketing": "Marketing",
+    "owner": "Propietario"
+  }
+}

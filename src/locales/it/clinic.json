@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "Oggi",
+      "description": "La clinica adesso: arrivi, in attesa, dal medico, uscita"
+    },
+    "leads": {
+      "label": "Lead",
+      "description": "Richieste e relative conversazioni, finché non diventano pazienti"
+    },
+    "appointments": {
+      "label": "Appuntamenti",
+      "description": "Prenotazioni per medico, sala e macchinario"
+    },
+    "patients": {
+      "label": "Pazienti",
+      "description": "Pazienti registrati, con prescrizioni, sedute e foto"
+    },
+    "medical": {
+      "label": "Farmacia",
+      "description": "La farmacia: farmaci in vendita, fornitori, informatori, acquisti, vendite"
+    },
+    "stock": {
+      "label": "Magazzino clinica",
+      "description": "Materiali di consumo e attrezzature della clinica usati nei trattamenti · non in vendita"
+    },
+    "payments": {
+      "label": "Pagamenti",
+      "description": "Incassi, fatture e insoluti"
+    },
+    "tasks": {
+      "label": "Attività",
+      "description": "Follow-up, chiamate di feedback e promemoria, con responsabile e scadenza"
+    },
+    "offerings": {
+      "label": "Servizi",
+      "description": "Cosa vende la clinica: servizi, pacchetti, offerte e prezzi"
+    },
+    "users": {
+      "label": "Utenti",
+      "description": "Team, ruoli e accessi, sedi"
+    }
+  },
+  "roles": {
+    "admin": "Amministratore",
+    "doctor": "Medico",
+    "therapist": "Terapista",
+    "front_desk": "Reception",
+    "counsellor": "Consulente",
+    "pharmacist": "Farmacista",
+    "accountant": "Contabile",
+    "marketing": "Marketing",
+    "owner": "Titolare"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "Heute",
+      "description": "Die Praxis jetzt: Ankünfte, Wartende, beim Arzt, Abrechnung"
+    },
+    "leads": {
+      "label": "Leads",
+      "description": "Anfragen und ihre Gespräche, bis sie Patienten werden"
+    },
+    "appointments": {
+      "label": "Termine",
+      "description": "Buchungen nach Arzt, Raum und Gerät"
+    },
+    "patients": {
+      "label": "Patienten",
+      "description": "Registrierte Patienten mit Rezepten, Sitzungen und Fotos"
+    },
+    "medical": {
+      "label": "Apotheke",
+      "description": "Die Apotheke: Medikamente im Verkauf, Lieferanten, Pharmareferenten, Einkäufe, Verkäufe"
+    },
+    "stock": {
+      "label": "Praxisbestand",
+      "description": "Verbrauchsmaterial und Geräte der Praxis für Behandlungen · nicht zum Verkauf"
+    },
+    "payments": {
+      "label": "Zahlungen",
+      "description": "Einnahmen, Rechnungen und offene Beträge"
+    },
+    "tasks": {
+      "label": "Aufgaben",
+      "description": "Nachverfolgungen, Feedback-Anrufe und Erinnerungen mit Verantwortlichem und Frist"
+    },
+    "offerings": {
+      "label": "Leistungen",
+      "description": "Was die Praxis anbietet: Leistungen, Pakete, Angebote und Preise"
+    },
+    "users": {
+      "label": "Benutzer",
+      "description": "Team, Rollen und Zugriff, Standorte"
+    }
+  },
+  "roles": {
+    "admin": "Administrator",
+    "doctor": "Arzt",
+    "therapist": "Therapeut",
+    "front_desk": "Empfang",
+    "counsellor": "Berater",
+    "pharmacist": "Apotheker",
+    "accountant": "Buchhalter",
+    "marketing": "Marketing",
+    "owner": "Inhaber"
+  }
+}

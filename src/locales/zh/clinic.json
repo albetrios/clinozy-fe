@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "今天",
+      "description": "诊所现场：到达、等候、就诊中、结账"
+    },
+    "leads": {
+      "label": "潜在客户",
+      "description": "咨询及其对话，直到转为患者"
+    },
+    "appointments": {
+      "label": "预约",
+      "description": "按医生、诊室和设备查看预约"
+    },
+    "patients": {
+      "label": "患者",
+      "description": "已登记的患者，含处方、疗程和照片"
+    },
+    "medical": {
+      "label": "药房",
+      "description": "药房：在售药品、供应商、医药代表、采购、销售"
+    },
+    "stock": {
+      "label": "诊所库存",
+      "description": "诊疗中使用的诊所耗材和设备 · 不对外销售"
+    },
+    "payments": {
+      "label": "付款",
+      "description": "收款、发票和欠款"
+    },
+    "tasks": {
+      "label": "任务",
+      "description": "跟进、回访电话和提醒，带负责人和截止时间"
+    },
+    "offerings": {
+      "label": "服务项目",
+      "description": "诊所出售的内容：服务项目、套餐、优惠和价格"
+    },
+    "users": {
+      "label": "用户",
+      "description": "团队、角色与权限、分店"
+    }
+  },
+  "roles": {
+    "admin": "管理员",
+    "doctor": "医生",
+    "therapist": "治疗师",
+    "front_desk": "前台",
+    "counsellor": "顾问",
+    "pharmacist": "药剂师",
+    "accountant": "会计",
+    "marketing": "市场营销",
+    "owner": "所有者"
+  }
+}

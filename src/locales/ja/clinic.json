@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "今日",
+      "description": "現在のクリニック：来院、待機中、診察中、会計"
+    },
+    "leads": {
+      "label": "リード",
+      "description": "問い合わせとその会話（患者になるまで）"
+    },
+    "appointments": {
+      "label": "予約",
+      "description": "医師・部屋・機器ごとの予約"
+    },
+    "patients": {
+      "label": "患者",
+      "description": "登録済みの患者（処方・施術・写真付き）"
+    },
+    "medical": {
+      "label": "薬局",
+      "description": "薬局：販売中の薬、仕入先、MR、仕入れ、販売"
+    },
+    "stock": {
+      "label": "クリニック在庫",
+      "description": "施術で使うクリニックの消耗品と機器 · 販売用ではありません"
+    },
+    "payments": {
+      "label": "支払い",
+      "description": "入金、請求書、未払い"
+    },
+    "tasks": {
+      "label": "タスク",
+      "description": "担当者と期限付きのフォローアップ、フィードバック電話、リマインダー"
+    },
+    "offerings": {
+      "label": "提供サービス",
+      "description": "クリニックの販売内容：サービス、パッケージ、オファー、価格"
+    },
+    "users": {
+      "label": "ユーザー",
+      "description": "チーム、ロールとアクセス、支店"
+    }
+  },
+  "roles": {
+    "admin": "管理者",
+    "doctor": "医師",
+    "therapist": "セラピスト",
+    "front_desk": "受付",
+    "counsellor": "カウンセラー",
+    "pharmacist": "薬剤師",
+    "accountant": "会計担当",
+    "marketing": "マーケティング",
+    "owner": "オーナー"
+  }
+}

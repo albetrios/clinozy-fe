@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "Aujourd'hui",
+      "description": "La clinique en ce moment : arrivées, en attente, avec le médecin, sortie"
+    },
+    "leads": {
+      "label": "Prospects",
+      "description": "Demandes et leurs conversations, jusqu'à ce qu'elles deviennent des patients"
+    },
+    "appointments": {
+      "label": "Rendez-vous",
+      "description": "Réservations par médecin, salle et appareil"
+    },
+    "patients": {
+      "label": "Patients",
+      "description": "Patients inscrits, avec ordonnances, séances et photos"
+    },
+    "medical": {
+      "label": "Pharmacie",
+      "description": "La pharmacie : médicaments en vente, fournisseurs, délégués, achats, ventes"
+    },
+    "stock": {
+      "label": "Stock de la clinique",
+      "description": "Consommables et équipements de la clinique utilisés lors des soins · non vendus"
+    },
+    "payments": {
+      "label": "Paiements",
+      "description": "Encaissements, factures et impayés"
+    },
+    "tasks": {
+      "label": "Tâches",
+      "description": "Suivis, appels de retour et rappels, avec un responsable et une échéance"
+    },
+    "offerings": {
+      "label": "Prestations",
+      "description": "Ce que vend la clinique : prestations, forfaits, offres et prix"
+    },
+    "users": {
+      "label": "Utilisateurs",
+      "description": "Équipe, rôles et accès, établissements"
+    }
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "doctor": "Médecin",
+    "therapist": "Thérapeute",
+    "front_desk": "Accueil",
+    "counsellor": "Conseiller",
+    "pharmacist": "Pharmacien",
+    "accountant": "Comptable",
+    "marketing": "Marketing",
+    "owner": "Propriétaire"
+  }
+}

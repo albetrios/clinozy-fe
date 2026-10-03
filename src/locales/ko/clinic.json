@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "오늘",
+      "description": "지금 클리닉: 도착, 대기, 진료 중, 수납"
+    },
+    "leads": {
+      "label": "리드",
+      "description": "환자가 될 때까지의 문의와 대화"
+    },
+    "appointments": {
+      "label": "예약",
+      "description": "의사, 진료실, 장비별 예약"
+    },
+    "patients": {
+      "label": "환자",
+      "description": "처방, 시술 회차, 사진이 있는 등록 환자"
+    },
+    "medical": {
+      "label": "약국",
+      "description": "약국: 판매 의약품, 공급업체, MR, 구매, 판매"
+    },
+    "stock": {
+      "label": "클리닉 재고",
+      "description": "시술에 쓰는 클리닉 소모품과 장비 · 판매용 아님"
+    },
+    "payments": {
+      "label": "결제",
+      "description": "수납, 청구서, 미수금"
+    },
+    "tasks": {
+      "label": "작업",
+      "description": "담당자와 기한이 있는 후속 조치, 피드백 전화, 알림"
+    },
+    "offerings": {
+      "label": "서비스",
+      "description": "클리닉 판매 항목: 서비스, 패키지, 프로모션, 가격"
+    },
+    "users": {
+      "label": "사용자",
+      "description": "팀, 역할 및 권한, 지점"
+    }
+  },
+  "roles": {
+    "admin": "관리자",
+    "doctor": "의사",
+    "therapist": "치료사",
+    "front_desk": "프런트 데스크",
+    "counsellor": "상담사",
+    "pharmacist": "약사",
+    "accountant": "회계 담당",
+    "marketing": "마케팅",
+    "owner": "소유자"
+  }
+}

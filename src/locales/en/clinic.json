@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "today": {
+      "label": "Today",
+      "description": "The clinic floor now: arrivals, waiting, with doctor, checkout"
+    },
+    "leads": {
+      "label": "Leads",
+      "description": "Enquiries and their conversations, until they become patients"
+    },
+    "appointments": {
+      "label": "Appointments",
+      "description": "Bookings by doctor, room and machine"
+    },
+    "patients": {
+      "label": "Patients",
+      "description": "Registered patients, with prescriptions, sessions and photos"
+    },
+    "medical": {
+      "label": "Medical",
+      "description": "The medicine store: medicines for sale, suppliers, MRs, purchases, sales"
+    },
+    "stock": {
+      "label": "Clinic stock",
+      "description": "Clinic consumables and equipment used in procedures · not for sale"
+    },
+    "payments": {
+      "label": "Payments",
+      "description": "Collections, invoices and dues"
+    },
+    "tasks": {
+      "label": "Tasks",
+      "description": "Follow-ups, feedback calls, reminders, with an owner and due time"
+    },
+    "offerings": {
+      "label": "Offerings",
+      "description": "What the clinic sells: offerings, packages, offers and prices"
+    },
+    "users": {
+      "label": "Users",
+      "description": "Team, roles & access, branches"
+    }
+  },
+  "roles": {
+    "admin": "Admin",
+    "doctor": "Doctor",
+    "therapist": "Therapist",
+    "front_desk": "Front desk",
+    "counsellor": "Counsellor",
+    "pharmacist": "Pharmacist",
+    "accountant": "Accountant",
+    "marketing": "Marketing",
+    "owner": "Owner"
+  }
+}
