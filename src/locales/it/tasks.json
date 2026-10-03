@@ -1,5 +1,371 @@
 {
   "manifest": {
     "title": "Attività"
+  },
+  "ruleGroups": {
+    "leads": "Lead",
+    "appointments": "Appuntamenti",
+    "feedback": "Feedback",
+    "treatments": "Trattamenti",
+    "patients": "Pazienti",
+    "team": "Team",
+    "payments": "Pagamenti"
+  },
+  "rules": {
+    "reply": {
+      "label": "Messaggi senza risposta",
+      "description": "Un lead ha scritto e nessuno ha risposto",
+      "automation": "Inviare la prima risposta con prezzi e orari liberi",
+      "how": {
+        "first": "Leggi il suo ultimo messaggio a destra",
+        "second": "Rispondi con prezzi e due orari liberi",
+        "third": "Prenota la visita se ne sceglie uno"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Visita prenotata",
+          "effect": "Si apre il modulo appuntamento · il lead passa a Ricontatto"
+        },
+        "notInterested": {
+          "label": "Non interessato",
+          "effect": "Stato del lead → Non interessato"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam o numero errato",
+          "effect": "Stato del lead → Non valido"
+        }
+      }
+    },
+    "follow": {
+      "label": "Ricontatti dei lead",
+      "description": "È arrivata la data di ricontatto",
+      "automation": "Inviare un messaggio cordiale su WhatsApp",
+      "how": {
+        "first": "Controlla cosa gli interessava",
+        "second": "Chiama o scrivi su WhatsApp con un promemoria cordiale",
+        "third": "Prenota, fissa un nuovo ricontatto o chiudi il lead"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Visita prenotata",
+          "effect": "Si apre il modulo appuntamento"
+        },
+        "callBackTomorrow": {
+          "label": "Richiamare domani",
+          "effect": "Data di ricontatto → domani 11:00"
+        },
+        "noAnswer": {
+          "label": "Nessuna risposta",
+          "effect": "Chiamata registrata · attività posticipata di 2 ore"
+        },
+        "notInterested": {
+          "label": "Non interessato",
+          "effect": "Stato del lead → Non interessato"
+        }
+      }
+    },
+    "claim": {
+      "label": "Lead da prendere in carico",
+      "description": "Il responsabile è inattivo oltre il periodo di riserva",
+      "how": {
+        "first": "Guarda la cronologia della chat",
+        "second": "Prendilo in carico se puoi seguirlo",
+        "third": "Altrimenti lascialo al team"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "Prendi in carico",
+          "effect": "Diventi il responsabile · {{owner}} resta coinvolto"
+        },
+        "leaveWithOwner": {
+          "label": "Lascia al responsabile",
+          "effect": "Nascosto fino a domani"
+        }
+      }
+    },
+    "failed": {
+      "label": "Messaggi non consegnati",
+      "description": "Il provider non è riuscito a consegnare un messaggio",
+      "automation": "Riprovare via SMS, poi segnalare per una chiamata",
+      "how": {
+        "first": "Controlla il numero di cellulare",
+        "second": "Invia di nuovo su WhatsApp o SMS",
+        "third": "Chiama se fallisce ancora"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "Riprova invio",
+          "effect": "Invia di nuovo sullo stesso canale"
+        },
+        "calledInstead": {
+          "label": "Chiamato invece",
+          "effect": "Chiamata registrata sul lead"
+        },
+        "fixTheNumber": {
+          "label": "Correggi il numero",
+          "effect": "Apre il lead per modificarlo"
+        }
+      }
+    },
+    "confirm": {
+      "label": "Conferma visite",
+      "description": "Una visita nelle prossime 48 ore non è confermata",
+      "automation": "Inviare il promemoria e confermare quando rispondono Sì",
+      "how": {
+        "first": "Invia o ripeti il promemoria",
+        "second": "Chiama se non c’è risposta entro sera",
+        "third": "Sposta l’orario se non possono venire"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "Confermata al telefono",
+          "effect": "Appuntamento → Confermato"
+        },
+        "moveToAnotherSlot": {
+          "label": "Sposta a un altro orario",
+          "effect": "Apre l’appuntamento per riprogrammarlo"
+        },
+        "cancelledByPatient": {
+          "label": "Annullata dal paziente",
+          "effect": "Appuntamento → Annullato · orario liberato"
+        },
+        "noAnswer": {
+          "label": "Nessuna risposta",
+          "effect": "Chiamata registrata · attività posticipata di 2 ore"
+        }
+      }
+    },
+    "arrive": {
+      "label": "Arrivato o assente",
+      "description": "15 minuti dopo l’inizio e nessun check-in",
+      "how": {
+        "first": "Chiama il paziente",
+        "second": "Segna il check-in quando arriva",
+        "third": "Segna Assente dopo 30 minuti"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "Check-in fatto",
+          "effect": "Appuntamento → Check-in fatto"
+        },
+        "runningLate": {
+          "label": "In ritardo",
+          "effect": "Attività posticipata di 30 minuti"
+        },
+        "noShow": {
+          "label": "Assente",
+          "effect": "Appuntamento → Assente · segue un’attività di nuova prenotazione"
+        }
+      }
+    },
+    "rebook": {
+      "label": "Riprenota gli assenti",
+      "description": "Il paziente ha saltato la visita",
+      "automation": "Offrire i prossimi due orari liberi su WhatsApp",
+      "how": {
+        "first": "Chiama o scrivi su WhatsApp con due orari liberi",
+        "second": "Prenota quello che sceglie",
+        "third": "Chiudi se non tornerà"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "Riprenotato",
+          "effect": "Si apre il modulo appuntamento con lo stesso servizio"
+        },
+        "willCallBack": {
+          "label": "Richiamerà",
+          "effect": "Attività posticipata a domani"
+        },
+        "notComingBack": {
+          "label": "Non tornerà",
+          "effect": "Chiuso con motivo"
+        }
+      }
+    },
+    "feedback": {
+      "label": "Raccogli feedback",
+      "description": "Una visita è stata completata ieri",
+      "automation": "Inviare il modulo di feedback e chiudere con 4–5★",
+      "how": {
+        "first": "Chiedi com’è andata la visita",
+        "second": "Chiedi una recensione Google con 4–5★",
+        "third": "Prenota la prossima seduta"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "Soddisfatto · 4–5★",
+          "effect": "Invia il link per la recensione Google · apre il registro recensioni"
+        },
+        "unhappy": {
+          "label": "Insoddisfatto",
+          "effect": "Crea un’attività di richiamata per {{doctor}}"
+        },
+        "logCheckIn": {
+          "label": "Registra check-in",
+          "effect": "Com’è ora · cosa ha seguito · prossimo piano"
+        },
+        "sentTheForm": {
+          "label": "Modulo inviato",
+          "effect": "Registrato · posticipato a domani"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "Chiamate post-trattamento",
+      "description": "Un trattamento ha richiesto una chiamata di controllo",
+      "automation": "Inviare il check-in post-trattamento su WhatsApp e registrare la risposta",
+      "how": {
+        "first": "Chiama e chiedi come sente la pelle",
+        "second": "Verifica che abbia seguito le indicazioni",
+        "third": "Registra un check-in con la risposta"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "Registra check-in",
+          "effect": "Come si sente · cosa ha seguito · prossimo piano"
+        },
+        "doingWell": {
+          "label": "Sta bene",
+          "effect": "Registra un rapido check-in «Meglio»"
+        },
+        "noAnswer": {
+          "label": "Nessuna risposta",
+          "effect": "Chiamata registrata · posticipata di 3 ore"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "Pazienti insoddisfatti",
+      "description": "Il feedback è stato di 3★ o meno",
+      "how": {
+        "first": "Leggi prima il feedback",
+        "second": "Il medico o il responsabile richiama",
+        "third": "Offri una visita di controllo o un credito se serve"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "Chiamato · risolto",
+          "effect": "Chiuso con la tua nota"
+        },
+        "offeredReviewVisit": {
+          "label": "Visita di controllo offerta",
+          "effect": "Si apre il modulo appuntamento"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "Prossima visita non fissata",
+      "description": "Una visita è stata completata ma non c’è una data di controllo né una prossima prenotazione",
+      "automation": "Suggerire due orari su WhatsApp e fissare il controllo quando ne sceglie uno",
+      "how": {
+        "first": "Controlla cosa ha consigliato il medico",
+        "second": "Offri due orari per la prossima visita",
+        "third": "Fissa una data di controllo se non è pronto"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "Prenota la prossima visita",
+          "effect": "Si apre il modulo appuntamento per {{first}}"
+        },
+        "setFollowUpDate": {
+          "label": "Fissa data di controllo",
+          "effect": "Fissa il controllo tra 2 settimane"
+        },
+        "noFollowUpNeeded": {
+          "label": "Nessun controllo necessario",
+          "effect": "Chiuso · trattamento completato"
+        }
+      }
+    },
+    "noreply": {
+      "label": "Pazienti abituali inattivi",
+      "description": "Un paziente abituale o con pacchetto non prenota da oltre 30 giorni e non ha risposto ai promemoria periodici",
+      "how": {
+        "first": "Guarda il pacchetto e l’ultima visita",
+        "second": "Chiama una volta, poi invia un’offerta di ritorno",
+        "third": "Chiudi se non tornerà"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "Chiama ora",
+          "effect": "Apre la cartella del paziente · registra lì la chiamata"
+        },
+        "sendOffer": {
+          "label": "Invia offerta",
+          "effect": "Invia un’offerta di ritorno su WhatsApp · posticipata di una settimana"
+        },
+        "notComingBack": {
+          "label": "Non tornerà",
+          "effect": "Chiuso con motivo"
+        }
+      }
+    },
+    "manual": {
+      "label": "Ricontatti che hai fissato",
+      "description": "Pianificato dopo la chiusura di un’altra attività",
+      "how": {
+        "first": "Fai quanto previsto",
+        "second": "Registra cosa è successo",
+        "third": "Pianifica il passo successivo se serve"
+      },
+      "outcomes": {
+        "done": {
+          "label": "Fatto",
+          "effect": "Chiuso · scegli il passo successivo"
+        },
+        "noAnswer": {
+          "label": "Nessuna risposta",
+          "effect": "Posticipata di 3 ore"
+        },
+        "bookedVisit": {
+          "label": "Visita prenotata",
+          "effect": "Si apre il modulo appuntamento"
+        }
+      }
+    },
+    "payment": {
+      "label": "Pagamento dovuto",
+      "description": "Una fattura ha un saldo da pagare",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "Incassa all’uscita",
+          "effect": "Aggiunto all’incasso di oggi"
+        },
+        "sendUpiLink": {
+          "label": "Invia link UPI",
+          "effect": "Link UPI in coda su WhatsApp"
+        },
+        "called": {
+          "label": "Chiamato",
+          "effect": "Promessa di pagamento registrata"
+        }
+      }
+    },
+    "recall": {
+      "label": "Richiamo",
+      "description": "Un paziente deve tornare per un controllo",
+      "outcomes": {
+        "booked": {
+          "label": "Prenotato",
+          "effect": "Prenotato · conferma in coda"
+        },
+        "later": {
+          "label": "Più tardi",
+          "effect": "Posticipato di 7 giorni"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1 ora",
+    "threeHours": "3 ore",
+    "tomorrow": "Domani 10:00",
+    "nextWeek": "Settimana prossima"
+  },
+  "followUpWhen": {
+    "inThreeHours": "Tra 3 ore",
+    "tomorrow": "Domani alle 11",
+    "inThreeDays": "Tra 3 giorni",
+    "nextWeek": "Settimana prossima"
   }
 }

@@ -1,5 +1,371 @@
 {
   "manifest": {
     "title": "任务"
+  },
+  "ruleGroups": {
+    "leads": "潜在客户",
+    "appointments": "预约",
+    "feedback": "反馈",
+    "treatments": "治疗",
+    "patients": "患者",
+    "team": "团队",
+    "payments": "付款"
+  },
+  "rules": {
+    "reply": {
+      "label": "未回复的消息",
+      "description": "潜在客户发来消息，但还没有人回复",
+      "automation": "发送附带价格和空闲时段的首次回复",
+      "how": {
+        "first": "在右侧阅读对方的最新消息",
+        "second": "回复价格和两个空闲时段",
+        "third": "对方选好后预约到访"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "已预约到访",
+          "effect": "打开预约表单 · 潜在客户转为跟进"
+        },
+        "notInterested": {
+          "label": "不感兴趣",
+          "effect": "潜在客户状态 → 不感兴趣"
+        },
+        "spamOrWrongNumber": {
+          "label": "垃圾信息或号码错误",
+          "effect": "潜在客户状态 → 无效"
+        }
+      }
+    },
+    "follow": {
+      "label": "潜在客户跟进",
+      "description": "跟进日期已到",
+      "automation": "通过 WhatsApp 发送一条友好的问候",
+      "how": {
+        "first": "查看对方感兴趣的项目",
+        "second": "打电话或发 WhatsApp 友好提醒",
+        "third": "预约、设置新的跟进或关闭潜在客户"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "已预约到访",
+          "effect": "打开预约表单"
+        },
+        "callBackTomorrow": {
+          "label": "明天回电",
+          "effect": "跟进日期 → 明天 11:00"
+        },
+        "noAnswer": {
+          "label": "无人接听",
+          "effect": "已记录通话 · 任务暂缓 2 小时"
+        },
+        "notInterested": {
+          "label": "不感兴趣",
+          "effect": "潜在客户状态 → 不感兴趣"
+        }
+      }
+    },
+    "claim": {
+      "label": "可认领的潜在客户",
+      "description": "负责人超过保留期仍未跟进",
+      "how": {
+        "first": "查看聊天记录",
+        "second": "能接手就认领",
+        "third": "否则留给团队"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "认领",
+          "effect": "你成为负责人 · {{owner}} 继续参与"
+        },
+        "leaveWithOwner": {
+          "label": "留给负责人",
+          "effect": "隐藏到明天"
+        }
+      }
+    },
+    "failed": {
+      "label": "未送达的消息",
+      "description": "服务商未能送达一条消息",
+      "automation": "通过短信重试，然后标记为需要打电话",
+      "how": {
+        "first": "核对手机号码",
+        "second": "通过 WhatsApp 或短信重新发送",
+        "third": "如果再次失败就打电话"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "重新发送",
+          "effect": "通过同一渠道重新发送"
+        },
+        "calledInstead": {
+          "label": "改为打电话",
+          "effect": "已在潜在客户上记录通话"
+        },
+        "fixTheNumber": {
+          "label": "修改号码",
+          "effect": "打开潜在客户进行编辑"
+        }
+      }
+    },
+    "confirm": {
+      "label": "确认到访",
+      "description": "未来 48 小时内的到访尚未确认",
+      "automation": "发送提醒，对方回复“是”后确认",
+      "how": {
+        "first": "发送或再次发送提醒",
+        "second": "到傍晚仍无回复就打电话",
+        "third": "对方来不了就改时段"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "电话确认",
+          "effect": "预约 → 已确认"
+        },
+        "moveToAnotherSlot": {
+          "label": "改到其他时段",
+          "effect": "打开预约进行改期"
+        },
+        "cancelledByPatient": {
+          "label": "患者取消",
+          "effect": "预约 → 已取消 · 时段已释放"
+        },
+        "noAnswer": {
+          "label": "无人接听",
+          "effect": "已记录通话 · 任务暂缓 2 小时"
+        }
+      }
+    },
+    "arrive": {
+      "label": "到访或爽约",
+      "description": "开始 15 分钟后仍未签到",
+      "how": {
+        "first": "给患者打电话",
+        "second": "到达时标记为已签到",
+        "third": "30 分钟后标记为爽约"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "已签到",
+          "effect": "预约 → 已签到"
+        },
+        "runningLate": {
+          "label": "会迟到",
+          "effect": "任务暂缓 30 分钟"
+        },
+        "noShow": {
+          "label": "爽约",
+          "effect": "预约 → 爽约 · 随后生成重新预约任务"
+        }
+      }
+    },
+    "rebook": {
+      "label": "爽约重新预约",
+      "description": "患者错过了到访",
+      "automation": "通过 WhatsApp 提供接下来的两个空闲时段",
+      "how": {
+        "first": "带上两个空闲时段打电话或发 WhatsApp",
+        "second": "预约对方选择的时段",
+        "third": "如果不再来就关闭"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "已重新预约",
+          "effect": "以相同服务打开预约表单"
+        },
+        "willCallBack": {
+          "label": "会回电",
+          "effect": "任务暂缓到明天"
+        },
+        "notComingBack": {
+          "label": "不再来了",
+          "effect": "附原因关闭"
+        }
+      }
+    },
+    "feedback": {
+      "label": "收集反馈",
+      "description": "昨天完成了一次到访",
+      "automation": "发送反馈表，4–5★ 时关闭",
+      "how": {
+        "first": "询问到访体验如何",
+        "second": "4–5★ 时邀请留下 Google 评价",
+        "third": "预约下一次疗程"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "满意 · 4–5★",
+          "effect": "发送 Google 评价链接 · 打开评价记录"
+        },
+        "unhappy": {
+          "label": "不满意",
+          "effect": "为 {{doctor}} 创建回电任务"
+        },
+        "logCheckIn": {
+          "label": "记录回访",
+          "effect": "现在的情况 · 遵循了什么 · 下一步计划"
+        },
+        "sentTheForm": {
+          "label": "已发送表单",
+          "effect": "已记录 · 暂缓到明天"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "术后关怀电话",
+      "description": "某次治疗需要回访电话",
+      "automation": "通过 WhatsApp 发送术后回访并记录回复",
+      "how": {
+        "first": "打电话询问皮肤感觉如何",
+        "second": "确认是否遵循了术后护理",
+        "third": "根据回答记录一次回访"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "记录回访",
+          "effect": "感觉如何 · 遵循了什么 · 下一步计划"
+        },
+        "doingWell": {
+          "label": "状况良好",
+          "effect": "记录一次快速的“好转”回访"
+        },
+        "noAnswer": {
+          "label": "无人接听",
+          "effect": "已记录通话 · 暂缓 3 小时"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "不满意的患者",
+      "description": "反馈为 3★ 或更低",
+      "how": {
+        "first": "先阅读反馈",
+        "second": "由医生或经理回电",
+        "third": "必要时提供复诊或抵用额度"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "已回电 · 已解决",
+          "effect": "附你的备注关闭"
+        },
+        "offeredReviewVisit": {
+          "label": "已提供复诊",
+          "effect": "打开预约表单"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "未设置下次到访",
+      "description": "到访已完成，但没有跟进日期，也没有下次预约",
+      "automation": "通过 WhatsApp 建议两个时段，对方选定后设置跟进",
+      "how": {
+        "first": "查看医生的建议",
+        "second": "为下次到访提供两个时段",
+        "third": "对方还没准备好就设置跟进日期"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "预约下次到访",
+          "effect": "为 {{first}} 打开预约表单"
+        },
+        "setFollowUpDate": {
+          "label": "设置跟进日期",
+          "effect": "将跟进设为两周后"
+        },
+        "noFollowUpNeeded": {
+          "label": "无需跟进",
+          "effect": "已关闭 · 治疗完成"
+        }
+      }
+    },
+    "noreply": {
+      "label": "沉寂的老患者",
+      "description": "老患者或套餐患者已超过 30 天未预约，且未回复定期提醒",
+      "how": {
+        "first": "查看套餐和上次到访",
+        "second": "先打一次电话，再发送回归优惠",
+        "third": "如果不再来就关闭"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "立即致电",
+          "effect": "打开患者档案 · 在那里记录通话"
+        },
+        "sendOffer": {
+          "label": "发送优惠",
+          "effect": "通过 WhatsApp 发送回归优惠 · 暂缓一周"
+        },
+        "notComingBack": {
+          "label": "不再来了",
+          "effect": "附原因关闭"
+        }
+      }
+    },
+    "manual": {
+      "label": "你设置的跟进",
+      "description": "在关闭另一项任务后安排",
+      "how": {
+        "first": "完成计划的事项",
+        "second": "记录发生的情况",
+        "third": "必要时安排下一步"
+      },
+      "outcomes": {
+        "done": {
+          "label": "完成",
+          "effect": "已关闭 · 选择下一步"
+        },
+        "noAnswer": {
+          "label": "无人接听",
+          "effect": "暂缓 3 小时"
+        },
+        "bookedVisit": {
+          "label": "已预约到访",
+          "effect": "打开预约表单"
+        }
+      }
+    },
+    "payment": {
+      "label": "待付款",
+      "description": "一张账单有未结余额",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "结账时收取",
+          "effect": "已加入今天的结账"
+        },
+        "sendUpiLink": {
+          "label": "发送 UPI 链接",
+          "effect": "UPI 链接已排队，将通过 WhatsApp 发送"
+        },
+        "called": {
+          "label": "已致电",
+          "effect": "已记录付款承诺"
+        }
+      }
+    },
+    "recall": {
+      "label": "复诊召回",
+      "description": "患者到了复诊时间",
+      "outcomes": {
+        "booked": {
+          "label": "已预约",
+          "effect": "已预约 · 确认待发送"
+        },
+        "later": {
+          "label": "稍后",
+          "effect": "暂缓 7 天"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1 小时",
+    "threeHours": "3 小时",
+    "tomorrow": "明天 10:00",
+    "nextWeek": "下周"
+  },
+  "followUpWhen": {
+    "inThreeHours": "3 小时后",
+    "tomorrow": "明天上午 11 点",
+    "inThreeDays": "3 天后",
+    "nextWeek": "下周"
   }
 }

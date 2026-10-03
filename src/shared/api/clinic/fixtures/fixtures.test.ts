@@ -37,7 +37,6 @@ import {
   stockPurchaseSchema,
   stockVendorSchema,
   supplierSchema,
-  taskSchema,
   treatmentSchema,
   userSchema,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -50,6 +49,7 @@ import {
   offeringRecordSchema,
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { patientRef } from './patients.fixtures.ts';
 import { readSeedLabel, seedExpiry, seedMobile } from './refs.fixtures.ts';
@@ -86,7 +86,8 @@ const SCHEMAS = {
   creditNotes: creditNoteSchema,
   pendingCredits: pendingCreditSchema,
   dayCloses: dayCloseSchema,
-  tasks: taskSchema,
+  // The contract's Task plus the plan's fields at rest (Appendix F, REPLACE_WITH_API).
+  tasks: taskRecordSchema,
   manufacturers: manufacturerSchema,
   suppliers: supplierSchema,
   medicalReps: medicalRepSchema,
@@ -291,7 +292,7 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['staff', [r.closedById]],
   ],
   tasks: (r) => [
-    ['staff', [r.ownerId]],
+    ['staff', [r.ownerId, r.resolvedById, ...r.previousOwnerIds]],
     ['patients', [r.patientId]],
     ['leads', [r.leadId]],
     [TASK_SOURCES[r.sourceType ?? 'lead'], [r.sourceId]],
@@ -564,8 +565,10 @@ describe('the fixture world on the clinic clock', () => {
     // Batch expiries move by whole months (see the seed readers below).
     const worldOn = (now: string) => {
       floorOn(now);
+      // A task's rule key names the visit slot it was derived for — an
+      // identity the rule job compares, not a calendar value.
       return leaves(Object.fromEntries(KEYS.map((key) => [key, rowsOf(key)]))).filter(
-        ([path]) => !path.endsWith('.expiry'),
+        ([path]) => !(path.endsWith('.expiry') || path.endsWith('.ruleKey')),
       );
     };
     const first = worldOn('2026-10-03T04:30:00Z');

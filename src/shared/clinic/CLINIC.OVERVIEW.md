@@ -18,6 +18,11 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `clinic-phone.ts` — a stored E.164 mobile as the design shows it
   (`+91 98250 44120`) and the channel links (call, WhatsApp, Instagram) the
   person cards and the chat open.
+- `task-rules.constants.ts` — the task rule catalogue's copy in the `tasks`
+  namespace (`TASK_RULE_KEYS`: rule names, Rules-popover lines, automations,
+  how-to steps, outcome labels and effect lines, Snooze options, "What’s next"
+  When chips). Today's work-queue aside loads `tasks` beside `today`.
+- `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11).

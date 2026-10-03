@@ -28,6 +28,14 @@ const STAFF_SEQ: Record<StaffKey, number> = {
 /** The user id behind a prototype people key. */
 export const staffRef = (key: StaffKey): string => ref.user(STAFF_SEQ[key]);
 
+/**
+ * The signed-in member as the fixture server sees them — the prototype's `ME`,
+ * Riya Shah (H:3373) — until the session carries a staff profile (L-31).
+ * "Mine", "(you)" and every owner-me rule read it (REPLACE_WITH_API: the
+ * server knows the member from the token).
+ */
+export const FIXTURE_VIEWER_ID = staffRef('RS');
+
 const ROLES: Record<string, Role> = {
   Admin: 'admin',
   Doctor: 'doctor',

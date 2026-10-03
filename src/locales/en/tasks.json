@@ -1,5 +1,371 @@
 {
   "manifest": {
     "title": "Tasks"
+  },
+  "ruleGroups": {
+    "leads": "Leads",
+    "appointments": "Appointments",
+    "feedback": "Feedback",
+    "treatments": "Treatments",
+    "patients": "Patients",
+    "team": "Team",
+    "payments": "Payments"
+  },
+  "rules": {
+    "reply": {
+      "label": "Unreplied messages",
+      "description": "A lead wrote and nobody has replied",
+      "automation": "Send the first reply with prices and free slots",
+      "how": {
+        "first": "Read their last message on the right",
+        "second": "Answer with prices and two free slots",
+        "third": "Book the visit if they pick one"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Booked a visit",
+          "effect": "Appointment form opens · lead moves to Follow-up"
+        },
+        "notInterested": {
+          "label": "Not interested",
+          "effect": "Lead status → Not interested"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam or wrong number",
+          "effect": "Lead status → Invalid"
+        }
+      }
+    },
+    "follow": {
+      "label": "Lead follow-ups",
+      "description": "The follow-up date has arrived",
+      "automation": "Send a friendly check-in on WhatsApp",
+      "how": {
+        "first": "Check what they were interested in",
+        "second": "Call or WhatsApp with a friendly nudge",
+        "third": "Book, set a new follow-up or close the lead"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Booked a visit",
+          "effect": "Appointment form opens"
+        },
+        "callBackTomorrow": {
+          "label": "Call back tomorrow",
+          "effect": "Follow-up date → tomorrow 11:00"
+        },
+        "noAnswer": {
+          "label": "No answer",
+          "effect": "Call logged · task snoozes 2 hours"
+        },
+        "notInterested": {
+          "label": "Not interested",
+          "effect": "Lead status → Not interested"
+        }
+      }
+    },
+    "claim": {
+      "label": "Leads open to claim",
+      "description": "The owner has been idle past the hold period",
+      "how": {
+        "first": "Look at the chat history",
+        "second": "Claim it if you can take it",
+        "third": "Otherwise leave it for the team"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "Claim it",
+          "effect": "You become the owner · {{owner}} stays involved"
+        },
+        "leaveWithOwner": {
+          "label": "Leave with owner",
+          "effect": "Hidden until tomorrow"
+        }
+      }
+    },
+    "failed": {
+      "label": "Messages not delivered",
+      "description": "The provider could not deliver a message",
+      "automation": "Retry on SMS, then flag for a call",
+      "how": {
+        "first": "Check the mobile number",
+        "second": "Resend on WhatsApp or SMS",
+        "third": "Call if it fails again"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "Retry send",
+          "effect": "Resends on the same channel"
+        },
+        "calledInstead": {
+          "label": "Called instead",
+          "effect": "Call logged on the lead"
+        },
+        "fixTheNumber": {
+          "label": "Fix the number",
+          "effect": "Opens the lead to edit"
+        }
+      }
+    },
+    "confirm": {
+      "label": "Confirm visits",
+      "description": "A visit in the next 48 hours has no confirmation",
+      "automation": "Send the reminder and confirm when they reply Yes",
+      "how": {
+        "first": "Send or repeat the reminder",
+        "second": "Call if there is no reply by evening",
+        "third": "Move the slot if they cannot come"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "Confirmed on call",
+          "effect": "Appointment → Confirmed"
+        },
+        "moveToAnotherSlot": {
+          "label": "Move to another slot",
+          "effect": "Opens the appointment to reschedule"
+        },
+        "cancelledByPatient": {
+          "label": "Cancelled by patient",
+          "effect": "Appointment → Cancelled · slot freed"
+        },
+        "noAnswer": {
+          "label": "No answer",
+          "effect": "Call logged · task snoozes 2 hours"
+        }
+      }
+    },
+    "arrive": {
+      "label": "Arrived or no-show",
+      "description": "15 minutes past the start and not checked in",
+      "how": {
+        "first": "Call the patient",
+        "second": "Mark Checked in when they arrive",
+        "third": "Mark No-show after 30 minutes"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "Checked in",
+          "effect": "Appointment → Checked in"
+        },
+        "runningLate": {
+          "label": "Running late",
+          "effect": "Task snoozes 30 minutes"
+        },
+        "noShow": {
+          "label": "No show",
+          "effect": "Appointment → No show · a rebook task follows"
+        }
+      }
+    },
+    "rebook": {
+      "label": "Rebook no-shows",
+      "description": "The patient missed the visit",
+      "automation": "Offer the next two free slots on WhatsApp",
+      "how": {
+        "first": "Call or WhatsApp with two free slots",
+        "second": "Book the one they pick",
+        "third": "Close if they are not coming back"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "Rebooked",
+          "effect": "Appointment form opens with the same service"
+        },
+        "willCallBack": {
+          "label": "Will call back",
+          "effect": "Task snoozes until tomorrow"
+        },
+        "notComingBack": {
+          "label": "Not coming back",
+          "effect": "Closed with reason"
+        }
+      }
+    },
+    "feedback": {
+      "label": "Collect feedback",
+      "description": "A visit was completed yesterday",
+      "automation": "Send the feedback form and close on 4–5★",
+      "how": {
+        "first": "Ask how the visit went",
+        "second": "Ask for a Google review on 4–5★",
+        "third": "Book the next session"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "Happy · 4–5★",
+          "effect": "Sends the Google review link · opens the review log"
+        },
+        "unhappy": {
+          "label": "Unhappy",
+          "effect": "Creates a call-back task for {{doctor}}"
+        },
+        "logCheckIn": {
+          "label": "Log check-in",
+          "effect": "How it is now · what they followed · next plan"
+        },
+        "sentTheForm": {
+          "label": "Sent the form",
+          "effect": "Logged · snoozes until tomorrow"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "Aftercare calls",
+      "description": "A treatment asked for a follow-up call",
+      "automation": "Send the aftercare check-in on WhatsApp and log the reply",
+      "how": {
+        "first": "Call and ask how the skin feels",
+        "second": "Check they followed the aftercare",
+        "third": "Log a check-in with the answer"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "Log check-in",
+          "effect": "How it feels · what they followed · next plan"
+        },
+        "doingWell": {
+          "label": "Doing well",
+          "effect": "Logs a quick “Better” check-in"
+        },
+        "noAnswer": {
+          "label": "No answer",
+          "effect": "Call logged · snoozes 3 hours"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "Unhappy patients",
+      "description": "Feedback was 3★ or lower",
+      "how": {
+        "first": "Read the feedback first",
+        "second": "Doctor or manager calls back",
+        "third": "Offer a review visit or credit if needed"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "Called · resolved",
+          "effect": "Closed with your note"
+        },
+        "offeredReviewVisit": {
+          "label": "Offered a review visit",
+          "effect": "Appointment form opens"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "Next visit not set",
+      "description": "A visit was completed but no follow-up date or next booking exists",
+      "automation": "Suggest two slots on WhatsApp and set the follow-up when they pick one",
+      "how": {
+        "first": "Check what the doctor advised",
+        "second": "Offer two slots for the next visit",
+        "third": "Set a follow-up date if they are not ready"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "Book next visit",
+          "effect": "Appointment form opens for {{first}}"
+        },
+        "setFollowUpDate": {
+          "label": "Set follow-up date",
+          "effect": "Sets the follow-up to 2 weeks from today"
+        },
+        "noFollowUpNeeded": {
+          "label": "No follow-up needed",
+          "effect": "Closed · treatment complete"
+        }
+      }
+    },
+    "noreply": {
+      "label": "Regulars gone quiet",
+      "description": "A regular or package patient has not booked for 30+ days and the periodic reminders got no reply",
+      "how": {
+        "first": "Look at the package and last visit",
+        "second": "Call once, then send a come-back offer",
+        "third": "Close if they are not coming back"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "Call now",
+          "effect": "Opens the patient file · log the call there"
+        },
+        "sendOffer": {
+          "label": "Send offer",
+          "effect": "Sends a come-back offer on WhatsApp · snoozes a week"
+        },
+        "notComingBack": {
+          "label": "Not coming back",
+          "effect": "Closed with reason"
+        }
+      }
+    },
+    "manual": {
+      "label": "Follow-ups you set",
+      "description": "Scheduled after closing another task",
+      "how": {
+        "first": "Do what was planned",
+        "second": "Log what happened",
+        "third": "Schedule the next step if needed"
+      },
+      "outcomes": {
+        "done": {
+          "label": "Done",
+          "effect": "Closed · pick what comes next"
+        },
+        "noAnswer": {
+          "label": "No answer",
+          "effect": "Snoozes 3 hours"
+        },
+        "bookedVisit": {
+          "label": "Booked a visit",
+          "effect": "Appointment form opens"
+        }
+      }
+    },
+    "payment": {
+      "label": "Payment due",
+      "description": "A bill has a balance due",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "Collect at checkout",
+          "effect": "Added to today’s checkout"
+        },
+        "sendUpiLink": {
+          "label": "Send UPI link",
+          "effect": "UPI link queued on WhatsApp"
+        },
+        "called": {
+          "label": "Called",
+          "effect": "Promise to pay logged"
+        }
+      }
+    },
+    "recall": {
+      "label": "Recall",
+      "description": "A patient is due back for a review",
+      "outcomes": {
+        "booked": {
+          "label": "Booked",
+          "effect": "Booked · confirmation queued"
+        },
+        "later": {
+          "label": "Later",
+          "effect": "Snoozed 7 days"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1 hour",
+    "threeHours": "3 hours",
+    "tomorrow": "Tomorrow 10:00",
+    "nextWeek": "Next week"
+  },
+  "followUpWhen": {
+    "inThreeHours": "In 3 hours",
+    "tomorrow": "Tomorrow 11 am",
+    "inThreeDays": "In 3 days",
+    "nextWeek": "Next week"
   }
 }

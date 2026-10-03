@@ -1,4 +1,4 @@
-import type { ZodType } from 'zod';
+import type { z } from 'zod';
 
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
@@ -45,15 +45,19 @@ export function clinicHttpError(
 /**
  * Validate a write's input the way clinozy-be does: the parsed value, or a 422
  * `validation` error whose `fields` name each failing path (`offerPrice`,
- * `branchIds.0`) — the shape `mapValidationErrors` reads. The detail is the
- * first message, so a toast names the first problem.
+ * `branchIds.0`; a whole-object rule under `root`, react-hook-form's form-level
+ * key) — the shape `mapValidationErrors` reads. The detail is the first
+ * message, so a toast names the first problem.
  */
-export function validateClinicInput<T>(schema: ZodType<T>, input: unknown): T {
+export function validateClinicInput<S extends z.ZodType>(
+  schema: S,
+  input: unknown,
+): z.output<S> {
   const parsed = schema.safeParse(input);
   if (parsed.success) return parsed.data;
   const fields: Record<string, string[]> = {};
   for (const issue of parsed.error.issues) {
-    const path = issue.path.map(String).join('.') || 'input';
+    const path = issue.path.map(String).join('.') || 'root';
     fields[path] = [...(fields[path] ?? []), issue.message];
   }
   const first = parsed.error.issues[0]?.message ?? 'Invalid input';
@@ -94,18 +98,21 @@ export function createFixtureCollection<T extends Row>(options: {
   seed: () => readonly T[];
   now?: () => Date;
   /**
-   * Whether a create gets the next per-org `seq` (default true). `false` for an
-   * entity whose contract has no display id (an Offer), so none is invented.
+   * Whether the entity carries a per-org `seq`, so a create numbers it.
+   * Omitted, it follows the seed — rows with a `seq` (or no rows at all) mean
+   * yes — so a created Task or LeadMessage never gains a field its contract
+   * lacks.
    */
   sequenced?: boolean;
 }): FixtureCollection<T> {
   const now = options.now ?? (() => new Date());
-  const sequenced = options.sequenced ?? true;
   let rows: T[] | null = null;
   const all = (): T[] => {
     rows ??= options.seed().map(clone);
     return rows;
   };
+  const sequenced = (): boolean =>
+    options.sequenced ?? all().every((row) => typeof row.seq === 'number');
   const find = (id: string): T => {
     const row = all().find((candidate) => candidate.id === id);
     if (!row) throw clinicHttpError(404, 'not_found', `${options.resource} not found`);
@@ -141,7 +148,7 @@ export function createFixtureCollection<T extends Row>(options: {
       const row = {
         ...input,
         id: crypto.randomUUID(),
-        ...(sequenced ? { seq: Math.max(0, ...seqs) + 1 } : {}),
+        ...(sequenced() ? { seq: Math.max(0, ...seqs) + 1 } : {}),
         organizationId: FIXTURE_ORGANIZATION_ID,
         createdAt: stamp,
         updatedAt: stamp,
@@ -182,6 +189,47 @@ export function createFixtureCollection<T extends Row>(options: {
     },
     reset() {
       rows = null;
+    },
+  };
+}
+
+/**
+ * The writes of one server operation, recorded so a single Undo reverses them
+ * all: an update restores the fields it changed, a create is soft-deleted.
+ */
+export interface FixtureChange {
+  update<T extends Row>(
+    collection: FixtureCollection<T>,
+    id: string,
+    patch: Partial<CreateInput<T>>,
+  ): Promise<T>;
+  create<T extends Row>(
+    collection: FixtureCollection<T>,
+    input: CreateInput<T>,
+  ): Promise<T>;
+  /** Reverse every recorded write, newest first. */
+  reverse(): Promise<void>;
+}
+
+/** Start recording one operation's writes. */
+export function recordFixtureChange(): FixtureChange {
+  const undo: Array<() => Promise<unknown>> = [];
+  return {
+    async update(collection, id, patch) {
+      const before = await collection.get(id);
+      const restore = Object.fromEntries(
+        Object.keys(patch).map((field) => [field, before[field as keyof typeof before]]),
+      ) as typeof patch;
+      undo.push(() => collection.update(id, restore));
+      return collection.update(id, patch);
+    },
+    async create(collection, input) {
+      const row = await collection.create(input);
+      undo.push(() => collection.remove(row.id, 'mistake', null));
+      return row;
+    },
+    async reverse() {
+      for (const step of [...undo].reverse()) await step();
     },
   };
 }

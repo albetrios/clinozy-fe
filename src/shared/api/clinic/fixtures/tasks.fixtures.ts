@@ -1,15 +1,23 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
-import type { Task, TaskKind, TaskSource } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Appointment, TaskSource } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  TASK_RULES,
+  type TaskRecord,
+  type TaskRuleId,
+} from '@/shared/api/clinic/tasks-contracts.ts';
 
+import { appointmentSeed } from './appointments.fixtures.ts';
 import { contactThreadRef } from './leads.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
-import { ref, seedAt } from './refs.fixtures.ts';
+import { must, ref, seedAt } from './refs.fixtures.ts';
 import { type StaffKey, staffRef } from './staff.fixtures.ts';
+import { taskRuleKeys } from './task-rules.fixtures.ts';
 
 interface TaskRow {
   key: string;
-  kind: TaskKind;
+  /** The rule it belongs to (Appendix F); its contract kind is the rule's. */
+  rule: TaskRuleId;
   title: string;
   why: string;
   owner: StaffKey;
@@ -23,18 +31,20 @@ interface TaskRow {
 }
 
 /**
- * Today's work queue (`TASKS` H:3460–3469), every task open. The prototype's
- * kinds map onto the contract's seven: Confirm → confirm_visit, Payment due →
- * payment_reminder, the two after-care checks → aftercare_call, and No-show,
- * Recall and the lead Call back → follow_up (their own kinds are Appendix F).
- * Titles follow the Tasks room's rule titles (H:4241–4246); "who" and "why"
- * are the seed's. Due labels resolve on the seed day ("Due 10:50", "Overdue 40
- * min" after a 09:30 no-show, "This week" → Saturday).
+ * Today's work queue (`TASKS` H:3460–3469), every task open — one task model
+ * with the Tasks room (Q-T3). Each row belongs to the rule its kind is in the
+ * Tasks room: Confirm → Confirm visits, the no-show → Rebook no-shows, the two
+ * after-care checks → Collect feedback (a completed visit) and Aftercare calls,
+ * the lead Call back → Lead follow-ups, and Payment due and Recall to the two
+ * kinds the plan adds to the catalogue (§6.2, Appendix F). Titles follow the
+ * Tasks room's rule titles (H:4241–4246); "who" and "why" are the seed's. Due
+ * labels resolve on the seed day ("Due 10:50", "Overdue 40 min" after a 09:30
+ * no-show, "This week" → Saturday).
  */
 const TASK_ROWS: readonly TaskRow[] = [
   {
     key: 'k1',
-    kind: 'confirm_visit',
+    rule: 'confirm',
     title: 'Confirm Priti’s visit',
     why: 'Laser session not confirmed. Reminder read at 08:10, no reply.',
     owner: 'RS',
@@ -45,7 +55,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k2',
-    kind: 'follow_up',
+    rule: 'rebook',
     title: 'Rebook Vikram',
     why: 'Missed consult. First no-show this year.',
     owner: 'RS',
@@ -56,7 +66,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k3',
-    kind: 'payment_reminder',
+    rule: 'payment',
     title: 'Collect ₹1,200 from Rhea',
     why: 'Balance on laser pack. She is in clinic now.',
     owner: 'RS',
@@ -66,7 +76,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k4',
-    kind: 'aftercare_call',
+    rule: 'aftercare',
     title: 'Next-day call · Pooja',
     why: 'Day-1 after-care check.',
     owner: 'KP',
@@ -76,7 +86,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k5',
-    kind: 'follow_up',
+    rule: 'recall',
     title: 'Recall Tanvi',
     why: 'Melasma review due at 12 weeks.',
     owner: 'RS',
@@ -86,7 +96,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k7',
-    kind: 'aftercare_call',
+    rule: 'feedback',
     title: 'Ask Meera how it went',
     why: 'Day-3 check after her first facial.',
     owner: 'RS',
@@ -97,7 +107,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k8',
-    kind: 'payment_reminder',
+    rule: 'payment',
     title: 'Collect ₹12,000 from Rohan',
     why: 'PRP balance, 46 days old.',
     owner: 'MJ',
@@ -108,7 +118,7 @@ const TASK_ROWS: readonly TaskRow[] = [
   },
   {
     key: 'k6',
-    kind: 'follow_up',
+    rule: 'follow',
     title: 'Call Kabir back',
     why: 'Asked for a call about hair PRP cost.',
     owner: 'NK',
@@ -124,11 +134,32 @@ function leadOf(row: TaskRow): string | null {
   return row.contact ? contactThreadRef(row.contact) : null;
 }
 
-export function taskSeed(today: string = clinicToday()): Task[] {
+/**
+ * The rule match a seeded task stands for, so the rule job counts it and never
+ * makes a second one: the confirm, rebook and feedback seeds are exactly what
+ * those rules derive for their visits. The others stay outside the job — no
+ * treatment backs Pooja's call, Kabir's lead has no follow-up date, and Payment
+ * due and Recall have no rule condition.
+ */
+function ruleKeyOf(
+  row: TaskRow,
+  visits: ReadonlyMap<string, Appointment>,
+): string | null {
+  if (row.source?.type !== 'appointment') return null;
+  const visit = must(visits.get(row.source.id), `appointment of task ${row.key}`);
+  if (row.rule === 'confirm') return taskRuleKeys.confirm(visit);
+  if (row.rule === 'rebook') return taskRuleKeys.rebook(visit);
+  if (row.rule === 'feedback') return taskRuleKeys.feedback(visit);
+  return null;
+}
+
+/** Today's work queue as task records, with the plan's fields (Appendix F) at rest. */
+export function taskSeed(today: string = clinicToday()): TaskRecord[] {
+  const visits = new Map(appointmentSeed(today).map((visit) => [visit.id, visit]));
   return TASK_ROWS.map((row) => ({
     ...seedCommon(seedAt(row.created, '08:00', today), staffRef(row.owner)),
     id: ref.task(row.key),
-    kind: row.kind,
+    kind: TASK_RULES[row.rule].kind,
     title: row.title,
     why: row.why,
     ownerId: staffRef(row.owner),
@@ -142,5 +173,14 @@ export function taskSeed(today: string = clinicToday()): Task[] {
     snoozedUntil: null,
     outcome: null,
     resolvedAt: null,
+    rule: row.rule,
+    ruleKey: ruleKeyOf(row, visits),
+    ruleOutcome: null,
+    result: null,
+    note: null,
+    resolvedBy: null,
+    resolvedById: null,
+    snoozeLabel: null,
+    previousOwnerIds: [],
   }));
 }

@@ -8,6 +8,7 @@ import {
   createFixtureCollection,
   FIXTURE_ACTOR_ID,
   FIXTURE_ORGANIZATION_ID,
+  recordFixtureChange,
   validateClinicInput,
 } from './clinic-fixture-store.ts';
 import type { ClinicCommon } from './clinic-schema.ts';
@@ -151,5 +152,69 @@ describe('validateClinicInput', () => {
       name: ['Add a name'],
       'tags.0': [expect.any(String)],
     });
+  });
+});
+
+describe('records without a seq', () => {
+  type Note = Omit<Thing, 'seq'> & { seq?: number };
+  const note = (index: number): Note => {
+    const row: Note = thing(index);
+    delete row.seq;
+    return row;
+  };
+
+  it('numbers creates only for an entity whose rows carry a seq', async () => {
+    const notes = createFixtureCollection<Note>({
+      resource: 'Note',
+      seed: () => [note(1), note(2)],
+      now: () => NOW,
+    });
+    expect(await notes.create({ name: 'New' })).not.toHaveProperty('seq');
+    const empty = createFixtureCollection<Thing>({ resource: 'Thing', seed: () => [] });
+    expect((await empty.create({ name: 'First' })).seq).toBe(1);
+    const unsequenced = createFixtureCollection<Note>({
+      resource: 'Note',
+      seed: () => [],
+      sequenced: false,
+    });
+    expect(await unsequenced.create({ name: 'First' })).not.toHaveProperty('seq');
+  });
+});
+
+describe('validateClinicInput — trimmed values, every field', () => {
+  it('answers a 422 with each field’s messages, or the parsed value', () => {
+    const schema = z.object({
+      title: z.string().trim().min(1),
+      count: z.number().max(3),
+    });
+    expect(validateClinicInput(schema, { title: ' Hi ', count: 1 })).toEqual({
+      title: 'Hi',
+      count: 1,
+    });
+    let error: unknown;
+    try {
+      validateClinicInput(schema, { title: '', count: 9 });
+    } catch (caught) {
+      error = caught;
+    }
+    expect(isHttpError(error) && error.status).toBe(422);
+    expect(
+      isHttpError(error) && (error.data as { error: { fields: object } }).error.fields,
+    ).toEqual({ title: [expect.any(String)], count: [expect.any(String)] });
+  });
+});
+
+describe('recordFixtureChange', () => {
+  it('reverses one operation’s updates and creates, newest first', async () => {
+    const collection = things();
+    const change = recordFixtureChange();
+    await change.update(collection, thing(1).id, { name: 'Renamed' });
+    await change.update(collection, thing(1).id, { name: 'Renamed again' });
+    const created = await change.create(collection, { name: 'Extra' });
+    expect(collection.snapshot()).toHaveLength(121);
+
+    await change.reverse();
+    expect((await collection.get(thing(1).id)).name).toBe('Thing 1');
+    expect(collection.snapshot((row) => row.id === created.id)).toEqual([]);
   });
 });

@@ -33,7 +33,6 @@ import type {
   StockPurchase,
   StockVendor,
   Supplier,
-  Task,
   Treatment,
   User,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -41,6 +40,7 @@ import type {
   OfferingRecord,
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -151,6 +151,7 @@ export const clinicFixtures = {
   feedbackActions: createFixtureCollection<FeedbackAction>({
     resource: 'Feedback action',
     seed: () => feedbackActionSeed(),
+    sequenced: false,
   }),
   // The offerings domain carries the plan's fields (Appendix F) — see offerings-contracts.ts.
   offerings: createFixtureCollection<OfferingRecord>({
@@ -182,7 +183,10 @@ export const clinicFixtures = {
     resource: 'Day close',
     seed: () => dayCloseSeed(),
   }),
-  tasks: createFixtureCollection<Task>({ resource: 'Task', seed: () => taskSeed() }),
+  tasks: createFixtureCollection<TaskRecord>({
+    resource: 'Task',
+    seed: () => taskSeed(),
+  }),
   manufacturers: createFixtureCollection<Manufacturer>({
     resource: 'Manufacturer',
     seed: () => manufacturerSeed(),
@@ -234,6 +238,7 @@ export const clinicFixtures = {
   stockCounts: createFixtureCollection<StockCount>({
     resource: 'Stock check',
     seed: () => stockCountSeed(),
+    sequenced: false,
   }),
 };
 
@@ -242,7 +247,18 @@ export function clinicOrganization(): Organization {
   return organizationSeed();
 }
 
+const resetHooks = new Set<() => void>();
+
+/**
+ * Register fixture-server state that lives outside the collections — the task
+ * rule settings, the Undo log — so it clears with the world.
+ */
+export function onClinicFixturesReset(hook: () => void): void {
+  resetHooks.add(hook);
+}
+
 /** Forget every change and reseed each collection on its next read (tests). */
 export function resetClinicFixtures(): void {
   for (const collection of Object.values(clinicFixtures)) collection.reset();
+  for (const hook of resetHooks) hook();
 }
