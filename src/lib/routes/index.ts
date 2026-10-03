@@ -1,4 +1,7 @@
 export {
+  organizationAppointment,
+  organizationAppointmentCreate,
+  organizationAppointments,
   organizationDashboard,
   organizationHome,
   organizationLead,

@@ -1,0 +1,151 @@
+import { useLocation, useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { organizationAppointments } from '@/lib/routes/index.ts';
+import {
+  appointmentQueryKeys,
+  fetchAppointment,
+} from '@/shared/api/clinic/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
+import { notify } from '@/shared/notify/index.ts';
+
+import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from '../../appointments.constants.ts';
+import {
+  type AppointmentCreateSearch,
+  validateAppointmentCreateSearch,
+  validateAppointmentSearch,
+  validateAppointmentsSearch,
+} from '../../appointments.search.ts';
+
+/**
+ * A booking's prefill (`S:27`): the create route's own params, and the page's
+ * day and — when Filters name exactly one — its doctor.
+ */
+export interface AppointmentPrefill extends AppointmentCreateSearch {
+  date?: string;
+  doctorId?: string;
+}
+
+/** The dialog the Appointments URL opens over the page (KICKOFF §4, D24). */
+export type AppointmentsDialogRoute =
+  | { kind: 'none' }
+  /** `/appointments/create` — the form in New mode (Copy and Rebook through `copyOf`). */
+  | { kind: 'create'; prefill: AppointmentPrefill }
+  /** `/appointments/$appointmentId` — the form in Edit mode, or Reschedule; `appointment` arrives once loaded. */
+  | {
+      kind: 'appointment';
+      appointmentId: string;
+      mode: 'edit' | 'reschedule';
+      appointment: AppointmentRow | undefined;
+      isPending: boolean;
+      /** No Edit (Therapists): a read-only drawer (Q-A16). */
+      readOnly: boolean;
+    };
+
+/** The dialog, and how it closes: back to the room it came from, else the page. */
+export interface AppointmentsDialogRouteState {
+  dialog: AppointmentsDialogRoute;
+  close: () => void;
+}
+
+const CREATE_PATH = /\/appointments\/create\/?$/;
+
+/**
+ * Which dialog the URL opens over the Appointments page — the room's dialog
+ * routes render nothing, so the page reads them here. A booking id that names
+ * no booking (a stale link, a deleted one) opens nothing: the URL goes back to
+ * `/appointments` in place, the page's filters kept, with "Appointment not
+ * found · it may have been deleted" (`S:115`). A member without Create who
+ * follows a create link lands back on the page with the permission toast.
+ * `close` returns to the referrer `from` (allow-listed rooms, A-P1), else to
+ * the page with its own params and nothing of the drawer's.
+ */
+export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
+  const { organizationSlug = '', appointmentId } = useParams({ strict: false });
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const search: Record<string, unknown> = useSearch({ strict: false });
+  const navigate = useNavigate();
+  const { t } = useTranslation([APPOINTMENTS_NS, ERRORS_NS]);
+  const access = useClinicAccess();
+
+  const backToPage = useCallback(() => {
+    void navigate({
+      ...organizationAppointments(organizationSlug),
+      // The page's own params only: the drawer's (`time`, `who`, `mode` …) close with it.
+      search: (current: Record<string, unknown>) => validateAppointmentsSearch(current),
+      hash: true,
+      replace: true,
+    });
+  }, [navigate, organizationSlug]);
+
+  const drawer = useDialogRouteRecord({
+    id: appointmentId,
+    queryKey: appointmentQueryKeys.detail,
+    fetchRecord: fetchAppointment,
+    recordLabel: t(APPOINTMENTS_KEYS.record, { ns: APPOINTMENTS_NS }),
+    onMissing: backToPage,
+  });
+
+  const isCreate = appointmentId === undefined && CREATE_PATH.test(pathname);
+  const createRefused =
+    isCreate && access.isResolved && !access.can('appointments', 'create');
+  const refusedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!createRefused || refusedFor.current === pathname) return;
+    refusedFor.current = pathname;
+    notify.info(t(ERRORS_KEYS.api.http403, { ns: ERRORS_NS }));
+    backToPage();
+  }, [createRefused, pathname, backToPage, t]);
+
+  // The drawer's params are parsed again here: from the page's own match the
+  // router hands back the URL's raw values, not the dialog route's.
+  const from = safeReferrer(
+    (appointmentId === undefined
+      ? validateAppointmentCreateSearch(search)
+      : validateAppointmentSearch(search)
+    ).from,
+    '',
+  );
+  const close = useCallback(() => {
+    if (from) {
+      void navigate({ href: `/organization/${organizationSlug}/${from}` });
+      return;
+    }
+    backToPage();
+  }, [from, navigate, organizationSlug, backToPage]);
+
+  if (appointmentId !== undefined) {
+    if (!drawer.isOpen) return { dialog: { kind: 'none' }, close };
+    return {
+      dialog: {
+        kind: 'appointment',
+        appointmentId,
+        mode: validateAppointmentSearch(search).mode ?? 'edit',
+        appointment: drawer.record,
+        isPending: drawer.isPending,
+        readOnly: access.isResolved && !access.can('appointments', 'edit'),
+      },
+      close,
+    };
+  }
+  if (isCreate && !createRefused) {
+    const page = validateAppointmentsSearch(search);
+    return {
+      dialog: {
+        kind: 'create',
+        prefill: {
+          ...validateAppointmentCreateSearch(search),
+          date: page.date,
+          doctorId: page.doctor?.length === 1 ? page.doctor[0] : undefined,
+        },
+      },
+      close,
+    };
+  }
+  return { dialog: { kind: 'none' }, close };
+}

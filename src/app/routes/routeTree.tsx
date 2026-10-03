@@ -27,7 +27,11 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
 import { I18N_NAMESPACES, type I18nNamespace } from '@/lib/i18n/namespaces.ts';
-import { organizationDashboard, organizationLead } from '@/lib/routes/builders.ts';
+import {
+  organizationAppointment,
+  organizationDashboard,
+  organizationLead,
+} from '@/lib/routes/builders.ts';
 import {
   APP_DESCRIPTION,
   APP_TITLE,
@@ -44,7 +48,14 @@ import { validateLoginSearch } from '@/pages/login/login.search.ts';
 import { manifest as mfaManifest } from '@/pages/mfa/mfa.manifest.ts';
 import { manifest as onboardingManifest } from '@/pages/onboarding/onboarding.manifest.ts';
 import { validateOnboardingSearch } from '@/pages/onboarding/onboarding.search.ts';
+import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
 import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
+import {
+  validateAppointmentCreateSearch,
+  validateAppointmentSearch,
+  validateAppointmentsSearch,
+} from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
+import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
 import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
 import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
@@ -204,6 +215,18 @@ const AppointmentsPage = lazyRouteComponent(
     () =>
       import('@/pages/organization/$organizationSlug/appointments/appointments.route.tsx'),
   ),
+  'Component',
+);
+// The Appointments room's dialog routes render nothing of their own (the page
+// opens the drawer), so they need no namespace beyond the room's.
+const AppointmentCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/appointments/create/create.route.tsx'),
+  'Component',
+);
+const AppointmentRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.route.tsx'),
   'Component',
 );
 const PatientsPage = lazyRouteComponent(
@@ -740,12 +763,60 @@ const organizationAppointmentsRoute = createRoute({
   path: 'appointments',
   head: manifestHead(appointmentsManifest),
   staticData: { manifest: appointmentsManifest },
+  validateSearch: validateAppointmentsSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(appointmentsManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: AppointmentsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialogs over the Appointments page (D24, S:27–28): each renders
+// nothing; the page reads the URL and opens the appointment form over itself.
+const organizationAppointmentCreateRoute = createRoute({
+  getParentRoute: () => organizationAppointmentsRoute,
+  path: 'create',
+  head: manifestHead(appointmentCreateManifest),
+  staticData: { manifest: appointmentCreateManifest },
+  validateSearch: validateAppointmentCreateSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(appointmentCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: AppointmentCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationAppointmentRoute = createRoute({
+  getParentRoute: () => organizationAppointmentsRoute,
+  path: '$appointmentId',
+  head: manifestHead(appointmentManifest),
+  staticData: { manifest: appointmentManifest },
+  validateSearch: validateAppointmentSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(appointmentManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: AppointmentRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+// Show is edit (S:29): the edit URL lands on the booking's, keeping the page's
+// filters and the drawer's params.
+const organizationAppointmentEditRoute = createRoute({
+  getParentRoute: () => organizationAppointmentsRoute,
+  path: '$appointmentId/edit',
+  beforeLoad: ({ params, search }) => {
+    throw redirect({
+      ...organizationAppointment(params.organizationSlug, params.appointmentId),
+      search,
+    });
+  },
+  component: () => null,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -970,7 +1041,11 @@ const routeTree = rootRoute.addChildren([
       organizationLeadRoute,
       organizationLeadEditRoute,
     ]),
-    organizationAppointmentsRoute,
+    organizationAppointmentsRoute.addChildren([
+      organizationAppointmentCreateRoute,
+      organizationAppointmentRoute,
+      organizationAppointmentEditRoute,
+    ]),
     organizationPatientsRoute,
     organizationMedicalRoute.addChildren([
       organizationMedicalIndexRoute,

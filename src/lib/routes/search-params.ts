@@ -9,6 +9,9 @@
 /** Sort direction in the URL form `key:asc` / `key:desc` (the shared table's form). */
 export type SortDirection = 'asc' | 'desc';
 
+/** A record id in the URL — a UUID, either case (`?owner=`, `?doctor=`, `?who=`). */
+export const RECORD_ID = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+
 /** A raw param as trimmed text — the router reads `?q=2363` as a number. */
 export function textOf(value: unknown): string {
   return typeof value === 'string' || typeof value === 'number'
@@ -35,6 +38,15 @@ export function listOf<T extends string>(
   const entries = Array.isArray(value) ? value : textOf(value).split(',');
   const kept = entries.map(textOf).filter((entry) => entry && accept(entry));
   return kept.length > 0 ? ([...new Set(kept)] as T[]) : undefined;
+}
+
+/**
+ * A single param in a fixed shape — a calendar day, a clock time, an id —
+ * trimmed; one that doesn't match `pattern` whole is none.
+ */
+export function matchOf(pattern: RegExp, value: unknown): string | undefined {
+  const text = textOf(value);
+  return text && pattern.test(text) ? text : undefined;
 }
 
 /** A free-text param, trimmed and cut to `max` characters; empty is none. */

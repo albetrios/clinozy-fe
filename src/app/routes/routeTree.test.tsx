@@ -2,6 +2,13 @@ import { createMemoryHistory, createRouter, isRedirect } from '@tanstack/react-r
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requireOrgStatus, requireSuspendedOrgStatus } from '@/app/guards/org-gates.ts';
+import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
+import {
+  validateAppointmentCreateSearch,
+  validateAppointmentSearch,
+  validateAppointmentsSearch,
+} from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
+import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
 import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
 import {
@@ -487,5 +494,105 @@ describe('the Leads dialog routes (KICKOFF §4, D24, S:22–25)', () => {
     );
     expect(memoryRouter.state.location.search).toEqual({ view: 'all', status: 'new' });
     expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(`${LEADS}/$leadId`);
+  });
+});
+
+describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', () => {
+  const APPOINTMENTS = '/organization/$organizationSlug/appointments';
+  type AppointmentRoute = {
+    options: {
+      validateSearch?: unknown;
+      staticData?: { manifest?: unknown };
+      beforeLoad?: (context: Record<string, unknown>) => unknown;
+    };
+  };
+  const routeOf = (id: string) =>
+    (router.routesById as unknown as Record<string, AppointmentRoute | undefined>)[id];
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('registers New appointment, the drawer and the edit redirect under the page', () => {
+    const children = Object.keys(router.routesById)
+      .filter((id) => id.startsWith(`${APPOINTMENTS}/`))
+      .sort();
+    expect(children).toEqual([
+      `${APPOINTMENTS}/$appointmentId`,
+      `${APPOINTMENTS}/$appointmentId/edit`,
+      `${APPOINTMENTS}/create`,
+    ]);
+  });
+
+  it('validates the page’s view and filters on the page, and each drawer’s own params on its route', () => {
+    expect(routeOf(APPOINTMENTS)?.options.validateSearch).toBe(
+      validateAppointmentsSearch,
+    );
+    expect(routeOf(`${APPOINTMENTS}/create`)?.options.validateSearch).toBe(
+      validateAppointmentCreateSearch,
+    );
+    expect(routeOf(`${APPOINTMENTS}/$appointmentId`)?.options.validateSearch).toBe(
+      validateAppointmentSearch,
+    );
+  });
+
+  it.each([
+    [`${APPOINTMENTS}/create`, appointmentCreateManifest],
+    [`${APPOINTMENTS}/$appointmentId`, appointmentManifest],
+  ] as const)(
+    '%s runs the room gateway on its own manifest, then the status guard',
+    async (id, manifest) => {
+      await beforeLoadOf(id)({
+        location: { href: '/organization/acme/appointments/create' },
+        params: { organizationSlug: 'acme', appointmentId: 'A1' },
+        preload: false,
+      });
+      expect(gatewayFromManifest).toHaveBeenCalledWith(manifest);
+      expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
+      expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+      expect(routeOf(id)?.options.staticData?.manifest).toBe(manifest);
+    },
+  );
+
+  it('redirects the edit URL to the drawer, keeping the search (S:29)', () => {
+    const thrown = (() => {
+      try {
+        routeOf(`${APPOINTMENTS}/$appointmentId/edit`)?.options.beforeLoad?.({
+          params: { organizationSlug: 'acme', appointmentId: 'A1' },
+          search: { view: 'day', mode: 'reschedule' },
+          preload: false,
+        });
+      } catch (caught) {
+        return caught;
+      }
+      return null;
+    })();
+    expect(isRedirect(thrown)).toBe(true);
+    expect((thrown as { options: unknown }).options).toMatchObject({
+      to: `${APPOINTMENTS}/$appointmentId`,
+      params: { organizationSlug: 'acme', appointmentId: 'A1' },
+      search: { view: 'day', mode: 'reschedule' },
+    });
+  });
+
+  it('lands a typed edit URL on the drawer URL through the real tree', async () => {
+    const memoryRouter = createRouter({
+      routeTree: router.routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/organization/acme/appointments/A1/edit?view=week&status=all'],
+      }),
+    });
+    await memoryRouter.load();
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe(
+        '/organization/acme/appointments/A1',
+      ),
+    );
+    expect(memoryRouter.state.location.search).toEqual({ view: 'week', status: 'all' });
+    expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(
+      `${APPOINTMENTS}/$appointmentId`,
+    );
   });
 });

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1006 src files · ~546 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1018 src files · ~552 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -802,12 +802,30 @@ clinozy-fe/
 │   │   └── organization/
 │   │       ├── $organizationSlug/
 │   │       │   ├── appointments/
+│   │       │   │   ├── $appointmentId/
+│   │       │   │   │   ├── appointment-id.manifest.ts
+│   │       │   │   │   ├── appointment-id.route.tsx
+│   │       │   │   │   ├── APPOINTMENT_ID.OVERVIEW.md
+│   │       │   │   │   ├── AppointmentPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── create/
+│   │       │   │   │   ├── create.manifest.ts
+│   │       │   │   │   ├── CREATE.OVERVIEW.md
+│   │       │   │   │   ├── create.route.tsx
+│   │       │   │   │   ├── NewAppointmentPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useAppointmentsDialogRoute/
+│   │       │   │   │   └── useAppointmentsView/
 │   │       │   │   ├── appointments.constants.ts
 │   │       │   │   ├── appointments.manifest.ts
 │   │       │   │   ├── APPOINTMENTS.OVERVIEW.md
 │   │       │   │   ├── appointments.route.tsx
+│   │       │   │   ├── appointments.search.ts
 │   │       │   │   ├── AppointmentsPage.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [2 test files]
 │   │       │   ├── dashboard/
 │   │       │   │   ├── dashboard.manifest.ts
 │   │       │   │   ├── DASHBOARD.OVERVIEW.md

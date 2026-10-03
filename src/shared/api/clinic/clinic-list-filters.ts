@@ -44,7 +44,8 @@ export type CreatedFilter = CreatedPreset | DateRange;
 /** A Follow-up filter: a preset or a custom range. */
 export type FollowUpFilter = FollowUpPreset | DateRange;
 
-const CALENDAR_DATE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+/** A calendar day, `YYYY-MM-DD` (clinic-local) — a range's end, a room's `?date=`. */
+export const CALENDAR_DATE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 /**
  * The two ends of a custom range — `null` for an open end — or `null` when the

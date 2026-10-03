@@ -6,3 +6,5 @@
 # names, so that id lives in the parent island, never in the route's own folder.
 src/pages/organization/$organizationSlug/leads/create/ #page-root
 src/pages/organization/$organizationSlug/leads/$leadId/ #page-root
+src/pages/organization/$organizationSlug/appointments/create/ #page-root
+src/pages/organization/$organizationSlug/appointments/$appointmentId/ #page-root

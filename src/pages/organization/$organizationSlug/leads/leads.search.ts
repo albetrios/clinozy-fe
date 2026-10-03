@@ -9,7 +9,14 @@
  * entry chunk, and the generated schema module is pages of zod. The test pins
  * each list to the contract's enum.
  */
-import { listOf, oneOf, queryOf, sortOf, textOf } from '@/lib/routes/search-params.ts';
+import {
+  listOf,
+  oneOf,
+  queryOf,
+  RECORD_ID,
+  sortOf,
+  textOf,
+} from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   type FollowUpFilter,
@@ -54,7 +61,6 @@ const SORT_KEYS = [
   'source',
   'updated',
 ] as const satisfies readonly LeadSortKey[];
-const UUID = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
 
 /** A column sort in the URL: `name:asc`, `updated:desc` (the shared table's form). */
 export type LeadsSort = `${LeadSortKey}:${'asc' | 'desc'}`;
@@ -92,7 +98,7 @@ export function validateLeadsSearch(search: Record<string, unknown>): LeadsSearc
     status: oneOf(STATUSES, search.status),
     source: listOf(search.source, (entry) => oneOf(SOURCES, entry) !== undefined),
     hold: oneOf(HOLDS, search.hold),
-    owner: listOf(search.owner, (entry) => UUID.test(entry)),
+    owner: listOf(search.owner, (entry) => RECORD_ID.test(entry)),
     created: readCreatedFilter(search.created),
     followUp: readFollowUpFilter(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),
