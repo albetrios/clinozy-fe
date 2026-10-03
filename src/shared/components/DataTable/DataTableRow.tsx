@@ -14,13 +14,9 @@ import {
   type DataTableRowAction,
   DataTableRowActions,
 } from '@/shared/components/DataTableRowActions/index.ts';
-import {
-  TABLE_KEYS,
-  TABLE_NS,
-  TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox.tsx';
 
+import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
 import { buildMetaLine, type MetaLineItem } from './data-table-fold.ts';
 import {
   type DataTablePhoneLayout,

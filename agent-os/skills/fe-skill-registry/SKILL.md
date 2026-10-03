@@ -304,7 +304,6 @@ For each common task, the skills below are required/auto-invoked. `fe-auto-imple
 **Project-specific implementations:**
 
 - `React.memo` on `DataTable` component
-- `useMemo` on `DataTableToolbar` computations
 - `preconnect`/`dns-prefetch` hints in `index.html`
 - Lazy loading via route-level code splitting
 - Bundle budgets enforced via `size-limit`

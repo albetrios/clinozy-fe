@@ -21,16 +21,16 @@ import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
+import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+
 import {
   DEFAULT_TABLE_TEST_PREFIX,
   TABLE_KEYS,
   TABLE_NS,
   TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
-import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
-import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-
+} from './data-table.constants.ts';
 import {
   type DataTablePhoneLayout,
   planTableLayout,

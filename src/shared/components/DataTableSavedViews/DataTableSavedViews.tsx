@@ -5,7 +5,7 @@ import {
   TABLE_KEYS,
   TABLE_NS,
   TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+} from '@/shared/components/DataTable/data-table.constants.ts';
 import {
   sameSavedViewFilters,
   type SavedViewFilters,
@@ -63,8 +63,8 @@ export function DataTableSavedViews({
             className={cn(
               'text-detail flex h-7 flex-none items-center gap-1 rounded-md ps-2.5 pe-1 font-medium whitespace-nowrap transition-colors duration-120',
               active
-                ? 'bg-card text-foreground ring-border-strong ring-1'
-                : 'text-foreground-soft hover:text-foreground',
+                ? 'bg-card text-foreground ring-border shadow-(--elevation-control) ring-1'
+                : 'text-muted-foreground-strong hover:text-foreground',
             )}
           >
             <button

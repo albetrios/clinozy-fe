@@ -64,6 +64,19 @@ describe('PickerSheet', () => {
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
+  it('is the 82% Filters sheet over a transparent layer as sheet="filters"', async () => {
+    tier.current = 'phone';
+    const user = userEvent.setup();
+    render(<Harness sheet="filters" />);
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    const sheet = await screen.findByTestId('sheet');
+    expect(sheet.className).toContain('data-[vaul-drawer-direction=bottom]:max-h-[82%]');
+    expect(sheet.className).not.toContain('max-h-[72%]');
+    const layer = document.querySelector('[data-slot="drawer-overlay"]')?.className;
+    expect(layer).toContain('bg-transparent');
+    expect(layer).not.toContain('bg-overlay');
+  });
+
   it('hands focus placement and Esc to the caller, and closes on Esc', async () => {
     const onOpenAutoFocus = vi.fn();
     const onEscapeKeyDown = vi.fn();

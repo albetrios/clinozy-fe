@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import {
-  TABLE_KEYS,
-  TABLE_NS,
-  TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
+
+import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
 
 /** Placeholder rows under the list while the next page loads (keys). */
 const LOADING_ROWS = ['first', 'second', 'third'] as const;

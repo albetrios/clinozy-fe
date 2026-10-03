@@ -8,11 +8,11 @@ import type { Column, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import {
   TABLE_KEYS,
   TABLE_NS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+} from '@/shared/components/DataTable/data-table.constants.ts';
+import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { ArrowDown, ArrowUp, ArrowUpDown } from '@/shared/icons/index.ts';
 
 interface DataTableColumnHeaderProps<

@@ -14,6 +14,25 @@ import {
 } from '@/shared/components/ui/popover.tsx';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
+/**
+ * The phone bottom sheets that share this surface (KICKOFF §3.5 Bottom sheet):
+ * the picker list rises to 72% over a dimmed layer; Filters to 82% over a
+ * transparent one. Either way a tap outside closes it.
+ */
+const SHEET_VARIANTS = {
+  picker: {
+    height: 'data-[vaul-drawer-direction=bottom]:max-h-[72%]',
+    layer: 'bg-overlay/40',
+  },
+  filters: {
+    height: 'data-[vaul-drawer-direction=bottom]:max-h-[82%]',
+    layer: 'bg-transparent',
+  },
+} as const;
+
+/** Which bottom sheet {@link PickerSheet} becomes below `md`. */
+type PickerSheetVariant = keyof typeof SHEET_VARIANTS;
+
 /** Props for {@link PickerSheet}. */
 export interface PickerSheetProps {
   open: boolean;
@@ -29,6 +48,8 @@ export interface PickerSheetProps {
   panelClassName?: string;
   /** Extra bottom-sheet classes. */
   sheetClassName?: string;
+  /** The phone sheet: the picker's 72% (dimmed) or Filters' 82% (default `picker`). */
+  sheet?: PickerSheetVariant;
   /** Focus placement on open (the default focuses nothing). */
   onOpenAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
@@ -40,11 +61,13 @@ export interface PickerSheetProps {
 /**
  * The picker's surface: a `popover` from `md` up, below it the 72% bottom
  * sheet (shadcn `drawer`) over a dimmed `bg-overlay/40` layer that closes on a
- * tap (H:39–40; `_patterns.md:81`). The sheet is full width with a 16px top
- * radius, no bottom border, safe-area padding and the 260ms `sheet-up` rise;
- * its title is sr-only because the design draws none. Both surfaces are
- * modal, so an outside click or tap closes the list without reaching what is
- * underneath — the design's "Close list" layer.
+ * tap (H:39–40; `_patterns.md:81`) — or, as `sheet="filters"`, the Filters
+ * sheet: 82% over a transparent layer (H:41–42; `_patterns.md:110`). The sheet
+ * is full width with a 16px top radius, no bottom border, safe-area padding
+ * and the 260ms `sheet-up` rise; its title is sr-only because the design draws
+ * none. Both surfaces are modal, so an outside click or tap closes it without
+ * reaching what is underneath — the design's "Close list" / "Close filters"
+ * layer.
  */
 export function PickerSheet({
   open,
@@ -55,6 +78,7 @@ export function PickerSheet({
   align = 'start',
   panelClassName,
   sheetClassName,
+  sheet = 'picker',
   onOpenAutoFocus,
   onEscapeKeyDown,
   testId,
@@ -79,9 +103,10 @@ export function PickerSheet({
           data-picker-surface="sheet"
           onOpenAutoFocus={handleOpenAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
-          overlayClassName="bg-overlay/40 animate-none!"
+          overlayClassName={cn(SHEET_VARIANTS[sheet].layer, 'animate-none!')}
           className={cn(
-            'data-[state=open]:animate-sheet-up! pb-[env(safe-area-inset-bottom)] data-[state=closed]:animate-none! data-[vaul-drawer-direction=bottom]:max-h-[72%] data-[vaul-drawer-direction=bottom]:rounded-t-2xl',
+            'data-[state=open]:animate-sheet-up! pb-[env(safe-area-inset-bottom)] data-[state=closed]:animate-none! data-[vaul-drawer-direction=bottom]:rounded-t-2xl',
+            SHEET_VARIANTS[sheet].height,
             sheetClassName,
           )}
         >

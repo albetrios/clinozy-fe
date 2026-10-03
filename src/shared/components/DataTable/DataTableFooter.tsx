@@ -5,11 +5,6 @@ import {
   type DataTableBulkAction,
   DataTableBulkBar,
 } from '@/shared/components/DataTableBulkBar/index.ts';
-import {
-  TABLE_KEYS,
-  TABLE_NS,
-  TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
@@ -18,6 +13,7 @@ import {
 } from '@/shared/components/ui/tooltip.tsx';
 import { Maximize, Minimize } from '@/shared/icons/index.ts';
 
+import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
 import type { TableSelection } from './useTableSelection.ts';
 
 /** "<N> columns in rows · Show all" ↔ "Fit to width" (H:4131–4132). */

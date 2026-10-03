@@ -234,5 +234,42 @@
     "note": "Notiz",
     "notePlaceholder": "Anmerkungen",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "Mehr",
+    "moreSections": "Weitere Bereiche",
+    "searchTitle": "Suchen · / drücken",
+    "moreCreate": "Weitere Aktionen zum Erstellen"
+  },
+  "filters": {
+    "title": "Filter",
+    "appliedCount": "{{count}} aktiv",
+    "clearAll": "Alle löschen",
+    "clearAllFilters": "Alle Filter löschen",
+    "apply": "Filter anwenden",
+    "saveView": "Als Ansicht speichern",
+    "savedView": "Als Ansicht gespeichert",
+    "viewSaved": "Ansicht „{{name}}“ gespeichert",
+    "any": "Alle",
+    "from": "Von",
+    "to": "Bis",
+    "created": {
+      "label": "Erstellt",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "lastSevenDays": "Letzte 7 Tage",
+      "lastThirtyDays": "Letzte 30 Tage",
+      "thisMonth": "Dieser Monat",
+      "range": "Eigener Zeitraum"
+    },
+    "followUp": {
+      "label": "Wiedervorlage",
+      "overdue": "Überfällig",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "nextSevenDays": "Nächste 7 Tage",
+      "notSet": "Nicht festgelegt",
+      "range": "Eigener Zeitraum"
+    }
   }
 }

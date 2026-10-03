@@ -1,13 +1,15 @@
+import { useSearch } from '@tanstack/react-router';
 import { type ColumnDef, useTable } from '@tanstack/react-table';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useMemo } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { DataTableColumnHeader } from '@/shared/components/DataTableColumnHeader/index.ts';
 import { DataTablePagination } from '@/shared/components/DataTablePagination/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { DataTableToolbar } from '@/shared/components/DataTableToolbar/index.ts';
+import { RoomToolbar } from '@/shared/components/RoomToolbar/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { PenLine, Receipt, Trash, Wallet } from '@/shared/icons/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -87,15 +89,27 @@ const KIT_COLUMNS: ColumnDef<DataTableFeatures, Person>[] = [
   },
 ];
 
-/** The whole kit, wired the way a list page wires it: toolbar, table, pagination. */
+/**
+ * The whole kit, wired the way a list page wires it: toolbar, table,
+ * pagination. The toolbar's search writes the URL's `q`; a list filtered on
+ * the client feeds it to the name column's filter.
+ */
 function KitHarness({ data }: Readonly<{ data: Person[] }>) {
-  const table = useTable({ features: dataTableFeatures, data, columns: KIT_COLUMNS });
+  const { q }: { q?: string } = useSearch({ strict: false });
+  // A new filter array each render would read as a filter change and reset the page.
+  const columnFilters = useMemo(() => (q ? [{ id: 'name', value: q }] : []), [q]);
+  const table = useTable({
+    features: dataTableFeatures,
+    data,
+    columns: KIT_COLUMNS,
+    state: { columnFilters },
+  });
   return (
     <>
-      <DataTableToolbar
-        table={table}
-        searchColumnId="name"
-        searchPlaceholder="Search people"
+      <RoomToolbar
+        title="People"
+        tableId="people"
+        search={{ placeholder: 'Search people', label: 'Search people' }}
       />
       <DataTable table={table} selectable />
       <DataTablePagination table={table} />
@@ -149,8 +163,9 @@ describe('DataTable kit features', () => {
     expect(renderedNames()).toEqual(['Person 02', 'Person 03', 'Person 01']);
   });
 
-  // The one comparator `table-features.ts` registers: the toolbar's search column
-  // resolves to `includesString`, and dropping it silently stops filtering.
+  // The one comparator `table-features.ts` registers: a column filter fed from the
+  // toolbar's search resolves to `includesString`, and dropping it silently stops
+  // filtering.
   it('filters rows through the toolbar search input', async () => {
     const user = userEvent.setup();
     await renderKit([person(1), person(2), person(3)]);
@@ -158,7 +173,7 @@ describe('DataTable kit features', () => {
 
     await user.type(screen.getByPlaceholderText('Search people'), 'Person 02');
 
-    expect(renderedNames()).toEqual(['Person 02']);
+    await waitFor(() => expect(renderedNames()).toEqual(['Person 02']));
   });
 
   it('paginates when rows exceed the default page size', async () => {

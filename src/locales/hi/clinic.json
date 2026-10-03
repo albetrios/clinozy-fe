@@ -234,5 +234,42 @@
     "note": "नोट",
     "notePlaceholder": "टिप्पणियाँ",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "और",
+    "moreSections": "और अनुभाग",
+    "searchTitle": "खोजें · / दबाएँ",
+    "moreCreate": "बनाने के और विकल्प"
+  },
+  "filters": {
+    "title": "फ़िल्टर",
+    "appliedCount": "{{count}} लागू",
+    "clearAll": "सब हटाएँ",
+    "clearAllFilters": "सभी फ़िल्टर हटाएँ",
+    "apply": "फ़िल्टर लागू करें",
+    "saveView": "व्यू के रूप में सहेजें",
+    "savedView": "व्यू के रूप में सहेजा गया",
+    "viewSaved": "व्यू “{{name}}” सहेजा गया",
+    "any": "कोई भी",
+    "from": "से",
+    "to": "तक",
+    "created": {
+      "label": "बनाया गया",
+      "today": "आज",
+      "yesterday": "बीता कल",
+      "lastSevenDays": "पिछले 7 दिन",
+      "lastThirtyDays": "पिछले 30 दिन",
+      "thisMonth": "इस महीने",
+      "range": "कस्टम अवधि"
+    },
+    "followUp": {
+      "label": "फ़ॉलो-अप तारीख",
+      "overdue": "बकाया",
+      "today": "आज",
+      "tomorrow": "आने वाला कल",
+      "nextSevenDays": "अगले 7 दिन",
+      "notSet": "तय नहीं",
+      "range": "कस्टम अवधि"
+    }
   }
 }

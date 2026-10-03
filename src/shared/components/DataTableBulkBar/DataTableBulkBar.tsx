@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils.ts';
 import {
   TABLE_KEYS,
   TABLE_NS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+} from '@/shared/components/DataTable/data-table.constants.ts';
 import { type AppIcon, Check, X } from '@/shared/icons/index.ts';
 
 /** One action of the bulk bar, run over the selected rows. */

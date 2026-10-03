@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -19,19 +20,9 @@ import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 
 import { fitPinnedTabs, pinnedTabWidth } from './fit-pinned-tabs.ts';
 
-let measureContext: CanvasRenderingContext2D | null | undefined;
-
 /** A label's width at the tabs' 600 13px, as the prototype measures it (H:4074). */
 function measureLabel(label: string, fontFamily: string): number {
-  if (measureContext === undefined) {
-    measureContext =
-      typeof document === 'undefined'
-        ? null
-        : document.createElement('canvas').getContext('2d');
-  }
-  if (!measureContext) return label.length * 7.5;
-  measureContext.font = `600 13px ${fontFamily}`;
-  return measureContext.measureText(label).width;
+  return measureTextWidth(label, `600 13px ${fontFamily}`);
 }
 
 /** One room's label and its "<Section> · <description>" title. */

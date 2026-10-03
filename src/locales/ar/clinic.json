@@ -242,5 +242,42 @@
     "note": "ملاحظة",
     "notePlaceholder": "ملاحظات",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "المزيد",
+    "moreSections": "مزيد من الأقسام",
+    "searchTitle": "بحث · اضغط /",
+    "moreCreate": "إجراءات إنشاء أخرى"
+  },
+  "filters": {
+    "title": "عوامل التصفية",
+    "appliedCount": "{{count}} مطبّقة",
+    "clearAll": "مسح الكل",
+    "clearAllFilters": "مسح كل عوامل التصفية",
+    "apply": "تطبيق التصفية",
+    "saveView": "حفظ كعرض",
+    "savedView": "محفوظ كعرض",
+    "viewSaved": "تم حفظ العرض «{{name}}»",
+    "any": "الكل",
+    "from": "من",
+    "to": "إلى",
+    "created": {
+      "label": "تاريخ الإنشاء",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "lastSevenDays": "آخر 7 أيام",
+      "lastThirtyDays": "آخر 30 يومًا",
+      "thisMonth": "هذا الشهر",
+      "range": "نطاق مخصص"
+    },
+    "followUp": {
+      "label": "تاريخ المتابعة",
+      "overdue": "متأخرة",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "nextSevenDays": "الأيام السبعة القادمة",
+      "notSet": "غير محدد",
+      "range": "نطاق مخصص"
+    }
   }
 }

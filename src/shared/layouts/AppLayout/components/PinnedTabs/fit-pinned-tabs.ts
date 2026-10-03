@@ -1,3 +1,5 @@
+import { fitTabs, type TabFit } from '@/lib/fit-tabs.ts';
+
 /** Space "More" keeps once pins fold (H:4089). */
 export const MORE_RESERVE = 84;
 
@@ -45,42 +47,14 @@ export function availableTabSpace(measure: HeaderMeasure): number {
   );
 }
 
-/** Which pinned tabs show and which fold into "More", as indices in pin order. */
-export interface PinnedTabFit {
-  visible: number[];
-  folded: number[];
-}
-
 /**
- * Fold the pins into the space measured (H:4087–4093). All fit → all show.
- * Otherwise "More" keeps 84px, the current tab stays, then pins are kept in
- * order until the first one that does not fit; the rest fold. Until the header
- * has been measured (`available` null) nothing folds.
+ * Fold the pins into the space measured (H:4087–4093) — {@link fitTabs} with
+ * the header's 84px "More" reserve; each pin's width already carries its gap.
  */
 export function fitPinnedTabs(
   widths: readonly number[],
   available: number | null,
   currentIndex: number,
-): PinnedTabFit {
-  const all = widths.map((_, index) => index);
-  if (available === null || widths.length === 0) return { visible: all, folded: [] };
-  if (widths.reduce((sum, width) => sum + width, 0) <= available) {
-    return { visible: all, folded: [] };
-  }
-  let budget = available - MORE_RESERVE;
-  const kept = new Set<number>();
-  const current = widths[currentIndex];
-  if (current !== undefined) {
-    kept.add(currentIndex);
-    budget -= current;
-  }
-  for (const [index, width] of widths.entries()) {
-    if (index === currentIndex) continue;
-    if (width > budget) break;
-    kept.add(index);
-    budget -= width;
-  }
-  const folded = all.filter((index) => !kept.has(index));
-  if (folded.length === 0) return { visible: all, folded: [] };
-  return { visible: all.filter((index) => kept.has(index)), folded };
+): TabFit {
+  return fitTabs(widths, available, currentIndex, { reserve: MORE_RESERVE });
 }

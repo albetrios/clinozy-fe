@@ -160,6 +160,28 @@ index or scope it to its row.
 
 ---
 
+## Room toolbar (`RoomToolbar`)
+
+A room list's toolbar, prefixed by the same `tableId` (`patients-filters-trigger`). The floating
+"New" exists only below `md` (`data-slot="fab"`, portalled to `body`); from `md` the same action
+ids sit in the toolbar.
+
+| Test ID                                            | Element                                                                     | File                          |
+| -------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
+| `<tableId>-toolbar`                                | Toolbar row (`data-layout` `default` / `leads`)                             | `RoomToolbar/RoomToolbar.tsx` |
+| `<tableId>-tabs` / `-tab-<tabId>`                  | Tab track (room tabs `nav`, or view tabs `tablist`) and each tab            | `RoomToolbar/RoomTabs/`       |
+| `<tableId>-tabs-more`                              | "More ⌄" (folded tabs); its list `-tabs-more-panel`, rows `-option-<tabId>` | `RoomToolbar/RoomTabs/`       |
+| `<tableId>-search`                                 | List search (`data-expanded`)                                               | `RoomToolbar/RoomSearch/`     |
+| `<tableId>-filters-trigger` / `-filters-clear`     | Filters button / joined × "Clear all filters"                               | `RoomToolbar/RoomFilters/`    |
+| `<tableId>-filters`                                | Filters popover (bottom sheet below `md`)                                   | `RoomToolbar/RoomFilters/`    |
+| `<tableId>-filters-clear-all` / `-save` / `-apply` | "Clear all" · "Save as view" / "Saved as view" · "Apply filter"             | `RoomToolbar/RoomFilters/`    |
+| `filter-<fieldKey>-from` / `-to`                   | A date section's custom-range pickers                                       | `RoomToolbar/RoomFilters/`    |
+| `<tableId>-<actionId>` / `<tableId>-new-menu`      | Primary action(s) (`new-patient`, `pay`) / the split "⌄" menu               | `RoomToolbar/RoomPrimary/`    |
+| `<tableId>-fab`                                    | Floating "New" group (phone)                                                | `RoomToolbar/RoomPrimary/`    |
+| `<tableId>-view-bar` / `-view-<viewId>`            | View bar under the toolbar, and each sub-view tab                           | `RoomToolbar/RoomViewBar/`    |
+
+---
+
 ## Dashboard (`/`)
 
 | Test ID              | Element                                                  | File                |

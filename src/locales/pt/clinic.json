@@ -236,5 +236,42 @@
     "note": "Nota",
     "notePlaceholder": "Observações",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "Mais",
+    "moreSections": "Mais seções",
+    "searchTitle": "Pesquisar · pressione /",
+    "moreCreate": "Mais ações de criação"
+  },
+  "filters": {
+    "title": "Filtros",
+    "appliedCount": "{{count}} aplicados",
+    "clearAll": "Limpar tudo",
+    "clearAllFilters": "Limpar todos os filtros",
+    "apply": "Aplicar filtro",
+    "saveView": "Salvar como visualização",
+    "savedView": "Salva como visualização",
+    "viewSaved": "Visualização “{{name}}” salva",
+    "any": "Qualquer",
+    "from": "De",
+    "to": "Até",
+    "created": {
+      "label": "Criado",
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "lastSevenDays": "Últimos 7 dias",
+      "lastThirtyDays": "Últimos 30 dias",
+      "thisMonth": "Este mês",
+      "range": "Período personalizado"
+    },
+    "followUp": {
+      "label": "Data de retorno",
+      "overdue": "Atrasado",
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "nextSevenDays": "Próximos 7 dias",
+      "notSet": "Não definida",
+      "range": "Período personalizado"
+    }
   }
 }

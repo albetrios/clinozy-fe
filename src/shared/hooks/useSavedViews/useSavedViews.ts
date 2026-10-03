@@ -30,11 +30,20 @@ export function sameSavedViewFilters(a: SavedViewFilters, b: SavedViewFilters): 
 
 /**
  * A new view's name (H:4171): its first two values joined by " + ", or the
- * fallback ("My view") when it has none.
+ * fallback ("My view") when it has none. `labelOf` names a value the way its
+ * chip reads ("vip" → "VIP"); a value it returns `null` for is not named (a
+ * custom range's dates).
  */
-export function savedViewName(filters: SavedViewFilters, fallback: string): string {
-  const values = Object.values(filters).flat().slice(0, 2);
-  return values.length > 0 ? values.join(' + ') : fallback;
+export function savedViewName(
+  filters: SavedViewFilters,
+  fallback: string,
+  labelOf: (key: string, value: string) => string | null = (_key, value) => value,
+): string {
+  const labels = Object.entries(filters)
+    .flatMap(([key, values]) => values.map((value) => labelOf(key, value)))
+    .filter((label): label is string => label !== null)
+    .slice(0, 2);
+  return labels.length > 0 ? labels.join(' + ') : fallback;
 }
 
 /**

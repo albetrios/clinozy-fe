@@ -46,6 +46,22 @@ describe('savedViewName (H:4171)', () => {
     );
     expect(savedViewName({}, 'My view')).toBe('My view');
   });
+
+  it('names values by their labels and skips the ones without a label', () => {
+    const labels: Record<string, string> = { female: 'Female', aesthetic: 'Aesthetic' };
+    const labelOf = (key: string, value: string) =>
+      key === 'createdFrom' ? null : (labels[value] ?? value);
+    expect(
+      savedViewName(
+        { createdFrom: ['2026-09-01'], gender: ['female'], type: ['aesthetic'] },
+        'My view',
+        labelOf,
+      ),
+    ).toBe('Female + Aesthetic');
+    expect(savedViewName({ createdFrom: ['2026-09-01'] }, 'My view', labelOf)).toBe(
+      'My view',
+    );
+  });
 });
 
 describe('useSavedViews', () => {

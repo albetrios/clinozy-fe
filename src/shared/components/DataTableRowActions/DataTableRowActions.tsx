@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils.ts';
 import {
   TABLE_KEYS,
   TABLE_NS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
+} from '@/shared/components/DataTable/data-table.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,

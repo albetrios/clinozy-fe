@@ -10,12 +10,8 @@ import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS } from '@/lib/i18n/locale.constants.ts';
 import { DataTableColumnHeader } from '@/shared/components/DataTableColumnHeader/index.ts';
-import {
-  TABLE_KEYS,
-  TABLE_NS,
-  TABLE_TEST_IDS,
-} from '@/shared/components/DataTableToolbar/data-table.constants.ts';
 
+import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
 import { columnLabel, type TableColumn } from './data-table-layout.ts';
 import { SelectionBox } from './DataTableRow.tsx';
 import type { DataTableFeatures } from './table-features.ts';

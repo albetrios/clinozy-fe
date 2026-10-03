@@ -232,5 +232,42 @@
     "note": "메모",
     "notePlaceholder": "비고",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "더보기",
+    "moreSections": "섹션 더보기",
+    "searchTitle": "검색 · / 누르기",
+    "moreCreate": "다른 만들기 작업"
+  },
+  "filters": {
+    "title": "필터",
+    "appliedCount": "{{count}}개 적용됨",
+    "clearAll": "모두 지우기",
+    "clearAllFilters": "모든 필터 지우기",
+    "apply": "필터 적용",
+    "saveView": "보기로 저장",
+    "savedView": "보기로 저장됨",
+    "viewSaved": "보기 “{{name}}” 저장됨",
+    "any": "전체",
+    "from": "시작",
+    "to": "종료",
+    "created": {
+      "label": "생성일",
+      "today": "오늘",
+      "yesterday": "어제",
+      "lastSevenDays": "최근 7일",
+      "lastThirtyDays": "최근 30일",
+      "thisMonth": "이번 달",
+      "range": "사용자 지정 기간"
+    },
+    "followUp": {
+      "label": "후속 조치일",
+      "overdue": "기한 지남",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "nextSevenDays": "다음 7일",
+      "notSet": "미설정",
+      "range": "사용자 지정 기간"
+    }
   }
 }

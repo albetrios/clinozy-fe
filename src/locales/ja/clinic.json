@@ -232,5 +232,42 @@
     "note": "メモ",
     "notePlaceholder": "備考",
     "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "その他",
+    "moreSections": "その他のセクション",
+    "searchTitle": "検索 · / キー",
+    "moreCreate": "その他の作成操作"
+  },
+  "filters": {
+    "title": "フィルター",
+    "appliedCount": "{{count}} 件適用中",
+    "clearAll": "すべてクリア",
+    "clearAllFilters": "すべてのフィルターをクリア",
+    "apply": "フィルターを適用",
+    "saveView": "ビューとして保存",
+    "savedView": "ビューとして保存済み",
+    "viewSaved": "ビュー「{{name}}」を保存しました",
+    "any": "すべて",
+    "from": "開始",
+    "to": "終了",
+    "created": {
+      "label": "作成日",
+      "today": "今日",
+      "yesterday": "昨日",
+      "lastSevenDays": "過去 7 日間",
+      "lastThirtyDays": "過去 30 日間",
+      "thisMonth": "今月",
+      "range": "期間を指定"
+    },
+    "followUp": {
+      "label": "フォローアップ日",
+      "overdue": "期限切れ",
+      "today": "今日",
+      "tomorrow": "明日",
+      "nextSevenDays": "今後 7 日間",
+      "notSet": "未設定",
+      "range": "期間を指定"
+    }
   }
 }

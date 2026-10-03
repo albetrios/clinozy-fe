@@ -74,9 +74,9 @@ export interface DataTableColumnMeta {
  * `filterFns` registers one comparator rather than the whole built-in registry:
  * registering the registry object is deprecated precisely because it opts the
  * bundle out of tree-shaking, pulling in every built-in comparator. Only
- * `includesString` is listed because only it is load-bearing — a toolbar search
- * column (`DataTableToolbar`'s `searchColumnId`) resolves to it, and dropping it
- * silently stops filtering (covered by the kit filter test in
+ * `includesString` is listed because only it is load-bearing — a column filter
+ * fed from the toolbar search (`RoomToolbar`'s URL `q`) resolves to it, and
+ * dropping it silently stops filtering (covered by the kit filter test in
  * `DataTable.test.tsx`). No `sortFns` slot is registered:
  * sorting resolves to a built-in default, verified by removing the slot and
  * confirming the sorting tests still pass. Register a comparator here the
