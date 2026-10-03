@@ -20,7 +20,6 @@ export type {
   PickerTriggerState,
 } from './picker.types.ts';
 export { filterPickerOptions } from './picker-rows.ts';
-export { PICKER_TONE_CLASSES, toneForLabel } from './picker-tone.ts';
 export { PickerSheet, type PickerSheetProps } from './PickerSheet/index.ts';
 export {
   PickerTrigger,

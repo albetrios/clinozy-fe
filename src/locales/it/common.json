@@ -378,8 +378,6 @@
     "loadingMore": "Caricamento di altri elementi",
     "clear": "Cancella",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "Paziente",
-    "patientMark": "P",
     "date": {
       "label": "Data",
       "placeholder": "Scegli una data",

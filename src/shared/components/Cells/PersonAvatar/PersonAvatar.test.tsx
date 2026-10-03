@@ -55,7 +55,7 @@ describe('PersonAvatar', () => {
 
   it('sizes the card avatar with the 16px badge and a presence dot', () => {
     const { container } = render(
-      <PersonAvatar initials="DR" tone="sky" size="lg" patient presence="online" />,
+      <PersonAvatar initials="DR" tone="sky" size="card" patient presence="online" />,
     );
     expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-12');
     expect(screen.getByTestId('patient-badge')).toHaveClass('size-4');

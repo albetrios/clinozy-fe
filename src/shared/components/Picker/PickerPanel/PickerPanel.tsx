@@ -2,6 +2,8 @@ import type { KeyboardEvent, KeyboardEventHandler, Ref, UIEventHandler } from 'r
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { CELLS_KEYS } from '@/shared/components/Cells/cells.constants.ts';
 import {
   PICKER_KEYS,
   PICKER_NS,
@@ -12,7 +14,7 @@ import type {
   PickerOptionRow,
   PickerSection,
 } from '@/shared/components/Picker/picker-rows.ts';
-import { PICKER_TONE_CLASSES } from '@/shared/components/Picker/picker-tone.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Command,
@@ -22,7 +24,6 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/shared/components/ui/command.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { Plus, Search } from '@/shared/icons/index.ts';
 
 import { PickerOptionItem } from './PickerOptionItem.tsx';
@@ -81,12 +82,10 @@ const LOADING_MORE_ROWS = [
 function SkeletonRow({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="flex h-9 shrink-0 items-center gap-2.5 px-2">
-      <Skeleton className="bg-muted size-5.5 shrink-0 animate-none rounded-full" />
+      <SkeletonBar shape="avatar" className="bg-muted size-5.5" />
       <span className="flex flex-1 flex-col gap-1.25">
-        <Skeleton
-          className={cn('bg-muted-strong h-2.25 animate-none rounded-sm', title)}
-        />
-        <Skeleton className={cn('bg-muted h-1.75 animate-none rounded-sm', sub)} />
+        <SkeletonBar className={cn('h-2.25 rounded-sm', title)} />
+        <SkeletonBar className={cn('bg-muted h-1.75 rounded-sm', sub)} />
       </span>
     </div>
   );
@@ -157,7 +156,7 @@ function PickerGroupHeading({
     <span className="text-micro text-muted-foreground flex items-center gap-1.5 px-2 pt-2 pb-1 font-semibold tracking-[0.05em] uppercase">
       <span
         aria-hidden="true"
-        className={cn('size-1.5 shrink-0 rounded-xs', PICKER_TONE_CLASSES[tone].dot)}
+        className={cn('size-1.5 shrink-0 rounded-xs', TONE_CLASSES[tone].dot)}
       />
       {label}
     </span>
@@ -290,8 +289,7 @@ export function PickerPanel<T>({
                     picked={picked.has(item.option.key)}
                     mode={mode}
                     testId={testIds.option(item.option.key)}
-                    patientLabel={t(PICKER_KEYS.patient)}
-                    patientMark={t(PICKER_KEYS.patientMark)}
+                    patientLabel={t(CELLS_KEYS.patient)}
                     onPick={onPick}
                   />
                 ),

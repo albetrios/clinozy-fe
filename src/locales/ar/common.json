@@ -384,8 +384,6 @@
     "loadingMore": "جارٍ تحميل المزيد",
     "clear": "مسح",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "مريض",
-    "patientMark": "م",
     "date": {
       "label": "التاريخ",
       "placeholder": "اختر تاريخًا",

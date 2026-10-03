@@ -1,34 +1,26 @@
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { PersonAvatar } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { keepFocus } from '@/shared/components/Picker/picker-dom.ts';
 import type { PickerOptionRow } from '@/shared/components/Picker/picker-rows.ts';
-import { PICKER_TONE_CLASSES } from '@/shared/components/Picker/picker-tone.ts';
-import {
-  PickerAvatar,
-  PickerDot,
-  PickerIconTile,
-  PickerPill,
-} from '@/shared/components/Picker/picker-visuals.tsx';
+import { PickerDot, PickerIconTile } from '@/shared/components/Picker/picker-visuals.tsx';
 import { CommandItem } from '@/shared/components/ui/command.tsx';
 import { Check } from '@/shared/icons/index.ts';
 
-function PickerOptionLeading<T>({
-  row,
-  patientMark,
-}: {
-  row: PickerOptionRow<T>;
-  patientMark: string;
-}) {
+function PickerOptionLeading<T>({ row }: { row: PickerOptionRow<T> }) {
   const leading = row.option.leading ?? { kind: 'dot' };
   switch (leading.kind) {
     case 'dot':
       return <PickerDot tone={row.tone} />;
     case 'avatar':
       return (
-        <PickerAvatar
+        <PersonAvatar
           initials={leading.initials}
           tone={row.tone}
-          patientMark={leading.patient ? patientMark : undefined}
+          size="option"
+          patient={leading.patient === true}
         />
       );
     case 'icon':
@@ -41,10 +33,15 @@ function PickerOptionLeading<T>({
 function PickerOptionLabel<T>({ row, bold }: { row: PickerOptionRow<T>; bold: boolean }) {
   const { option, match } = row;
   if (option.leading?.kind === 'pill') {
+    const Icon = option.leading.icon;
     return (
-      <PickerPill tone={row.tone} icon={option.leading.icon}>
+      <TonePill
+        tone={row.tone}
+        icon={Icon ? <Icon className="size-3.5 text-current" /> : undefined}
+        className="self-start"
+      >
         {option.label}
-      </PickerPill>
+      </TonePill>
     );
   }
   return (
@@ -72,7 +69,7 @@ function PickerOptionMark({
   picked: boolean;
   tone: Tone;
 }) {
-  const classes = PICKER_TONE_CLASSES[tone];
+  const classes = TONE_CLASSES[tone];
   if (mode === 'menu') return null;
   if (mode === 'single') {
     return (
@@ -108,7 +105,6 @@ export interface PickerOptionItemProps<T> {
   testId: string;
   /** sr-only word for the patient badge. */
   patientLabel: string;
-  patientMark: string;
   onPick: (row: PickerOptionRow<T>) => void;
 }
 
@@ -126,11 +122,10 @@ export function PickerOptionItem<T>({
   mode,
   testId,
   patientLabel,
-  patientMark,
   onPick,
 }: PickerOptionItemProps<T>) {
   const { option } = row;
-  const tone = PICKER_TONE_CLASSES[row.tone];
+  const tone = TONE_CLASSES[row.tone];
   const isPatient = option.leading?.kind === 'avatar' && option.leading.patient === true;
   return (
     <CommandItem
@@ -149,7 +144,7 @@ export function PickerOptionItem<T>({
         tone.active,
       )}
     >
-      <PickerOptionLeading row={row} patientMark={patientMark} />
+      <PickerOptionLeading row={row} />
       <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-px">
         <PickerOptionLabel row={row} bold={picked && mode === 'single'} />
         {isPatient ? <span className="sr-only">{patientLabel}</span> : null}

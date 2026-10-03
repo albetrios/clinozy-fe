@@ -374,8 +374,6 @@
     "loadingMore": "더 불러오는 중",
     "clear": "지우기",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "환자",
-    "patientMark": "환",
     "date": {
       "label": "날짜",
       "placeholder": "날짜 선택",

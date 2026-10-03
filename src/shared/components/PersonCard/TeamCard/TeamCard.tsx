@@ -86,7 +86,7 @@ function TeamHeader({ data, kind }: { data: TeamCardData; kind?: TeamCardKind })
   return (
     <div className="flex flex-none items-center gap-3 border-b p-3.5">
       <PersonAvatar
-        size="lg"
+        size="card"
         initials={data.initials ?? personInitials(data.name)}
         tone={data.tone}
         presence={data.online ? 'online' : 'offline'}

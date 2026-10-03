@@ -374,8 +374,6 @@
     "loadingMore": "正在加载更多",
     "clear": "清除",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "患者",
-    "patientMark": "患",
     "date": {
       "label": "日期",
       "placeholder": "选择日期",

@@ -80,7 +80,10 @@ describe('TeamCardContent', () => {
     ['involved', 'Involved', 'bg-muted'],
   ] as const)('draws the %s pill', (kind, label, paint) => {
     renderContent(RIYA, { kind });
-    expect(screen.getByText(label)).toHaveClass(paint, 'h-5.5');
+    expect(screen.getByText(label).closest('[data-slot="pill"]')).toHaveClass(
+      paint,
+      'h-5.5',
+    );
   });
 
   it('lists how to reach them', () => {

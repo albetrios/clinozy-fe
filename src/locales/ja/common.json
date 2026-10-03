@@ -374,8 +374,6 @@
     "loadingMore": "さらに読み込み中",
     "clear": "クリア",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "患者",
-    "patientMark": "患",
     "date": {
       "label": "日付",
       "placeholder": "日付を選択",

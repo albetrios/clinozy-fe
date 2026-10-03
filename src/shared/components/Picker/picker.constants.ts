@@ -31,8 +31,6 @@ export const PICKER_KEYS = {
   loadingMore: 'picker.loadingMore',
   clear: 'picker.clear',
   triggerLabel: 'picker.triggerLabel',
-  patient: 'picker.patient',
-  patientMark: 'picker.patientMark',
   date: {
     label: 'picker.date.label',
     placeholder: 'picker.date.placeholder',

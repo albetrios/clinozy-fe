@@ -1,17 +1,15 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
+import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { PersonAvatar } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { PICKER_TRIGGER_SIZE_CLASSES } from '@/shared/components/Picker/picker.constants.ts';
 import type {
   PickerOption,
   PickerSize,
 } from '@/shared/components/Picker/picker.types.ts';
-import { toneForLabel } from '@/shared/components/Picker/picker-tone.ts';
-import {
-  PickerAvatar,
-  PickerDot,
-  PickerPill,
-} from '@/shared/components/Picker/picker-visuals.tsx';
+import { PickerDot } from '@/shared/components/Picker/picker-visuals.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { ChevronDown, X } from '@/shared/icons/index.ts';
@@ -128,17 +126,21 @@ function PickerChip<T>({ option }: { option: PickerOption<T> }) {
         data-slot="pill"
         className="bg-background text-foreground text-detail inline-flex h-7 max-w-full min-w-0 shrink-0 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 font-medium whitespace-nowrap"
       >
-        <PickerAvatar initials={leading.initials} tone={tone} variant="chip" />
+        <PersonAvatar initials={leading.initials} tone={tone} size="chip" />
         <span className="truncate">{option.label}</span>
       </span>
     );
   }
-  const icon =
+  const Icon =
     leading?.kind === 'pill' || leading?.kind === 'icon' ? leading.icon : undefined;
   return (
-    <PickerPill tone={tone} icon={icon} variant="chip">
+    <TonePill
+      tone={tone}
+      icon={Icon ? <Icon className="size-3.5 text-current" /> : undefined}
+      className="text-detail self-start"
+    >
       {option.label}
-    </PickerPill>
+    </TonePill>
   );
 }
 

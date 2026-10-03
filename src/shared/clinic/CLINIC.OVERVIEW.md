@@ -11,7 +11,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   copy stays in each room's own namespace (`today`, `leads`, … `users`).
 - `clinic-tones.ts` — each section's and role's tone (the contract's `Tone`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
-  fill, border, dot, halo, ring, tab hover) — never build `bg-tone-${tone}`.
+  fill, border, dot, halo, ring, tab hover, and a list row's active 55% and
+  picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's
+  hash that gives an untoned label (a picker option, a tag) a stable tone.
 - `clinic-section-icons.ts` — each section's icon.
 - `clinic-phone.ts` — a stored E.164 mobile as the design shows it
   (`+91 98250 44120`) and the channel links (call, WhatsApp, Instagram) the

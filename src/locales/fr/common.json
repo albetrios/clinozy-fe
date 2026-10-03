@@ -378,8 +378,6 @@
     "loadingMore": "Chargement de la suite",
     "clear": "Effacer",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "Patient",
-    "patientMark": "P",
     "date": {
       "label": "Date",
       "placeholder": "Choisir une date",

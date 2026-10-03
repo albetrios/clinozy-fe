@@ -28,7 +28,7 @@ export interface TonePillProps extends ComponentProps<'span'> {
   size?: keyof typeof PILL_SIZES;
   /** A 6px dot in the pill's ink before the label (statuses). */
   dot?: boolean;
-  /** A leading icon (12px). */
+  /** A leading icon — 12px unless the icon carries its own `size-*`. */
   icon?: ReactNode;
 }
 
@@ -51,7 +51,7 @@ export function TonePill({
       data-slot="pill"
       data-tone={tone}
       className={cn(
-        'inline-flex w-fit shrink-0 items-center rounded-full font-medium whitespace-nowrap',
+        'inline-flex w-fit max-w-full min-w-0 shrink-0 items-center rounded-full font-medium whitespace-nowrap',
         PILL_SIZES[size],
         // After the size: a text size resets the line height (H:688, line-height 1).
         'leading-none',
@@ -64,11 +64,14 @@ export function TonePill({
         <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-current" />
       ) : null}
       {icon ? (
-        <span aria-hidden="true" className="flex shrink-0 [&_svg]:size-3">
+        <span
+          aria-hidden="true"
+          className="flex shrink-0 [&_svg:not([class*='size-'])]:size-3"
+        >
           {icon}
         </span>
       ) : null}
-      {children}
+      <span className="min-w-0 truncate">{children}</span>
     </span>
   );
 }

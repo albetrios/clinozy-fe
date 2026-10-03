@@ -63,7 +63,9 @@ describe('Cells', () => {
     const row = screen.getByRole('row');
     expect(within(row).getByText('INV-4120')).toBeInTheDocument();
     expect(within(row).getByText('Rhea Shah')).toBeInTheDocument();
-    expect(within(row).getByText('Partly paid')).toHaveClass('bg-tone-butter');
+    expect(
+      within(row).getByText('Partly paid').closest('[data-slot="pill"]'),
+    ).toHaveClass('bg-tone-butter');
     expect(within(row).getByTestId('avatar-stack-more')).toHaveTextContent('+1');
     expect(within(row).getByText('−₹12,500')).toBeInTheDocument();
   });

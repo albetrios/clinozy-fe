@@ -142,7 +142,7 @@ function ContactHeader({
       )}
     >
       <PersonAvatar
-        size="lg"
+        size="card"
         initials={data.initials ?? personInitials(data.name)}
         tone={tone}
         patient={isPatient}
@@ -238,7 +238,7 @@ function ContactTeamGroup({
             className="border-border bg-card inline-flex h-7 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 whitespace-nowrap"
           >
             <PersonAvatar
-              size="xs"
+              size="chip"
               initials={member.initials ?? personInitials(member.name)}
               tone={member.tone}
             />

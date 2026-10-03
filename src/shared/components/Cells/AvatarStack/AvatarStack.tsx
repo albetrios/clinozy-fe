@@ -79,7 +79,7 @@ export function AvatarStack({
             )}
           >
             <PersonAvatar
-              size="xs"
+              size="chip"
               initials={person.initials ?? personInitials(person.name)}
               tone={person.tone}
             />

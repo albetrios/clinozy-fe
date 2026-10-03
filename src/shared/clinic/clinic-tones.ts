@@ -50,6 +50,10 @@ export interface ToneClasses {
   ring: string;
   /** The tab-tint hover: the tone at 45% and an inset 1px ink ring at 16%. */
   hover: string;
+  /** A list row while it is the active (keyboard / pointer) row: the tone at 55%. */
+  active: string;
+  /** A picked list row: the tone at 70%. */
+  picked: string;
 }
 
 /**
@@ -68,6 +72,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-butter-foreground',
     hover:
       'hover:bg-tone-butter/45 hover:inset-ring hover:inset-ring-tone-butter-foreground/16',
+    active: 'data-[selected=true]:bg-tone-butter/55',
+    picked: 'bg-tone-butter/70',
   },
   lav: {
     bg: 'bg-tone-lav',
@@ -80,6 +86,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-lav-foreground',
     hover:
       'hover:bg-tone-lav/45 hover:inset-ring hover:inset-ring-tone-lav-foreground/16',
+    active: 'data-[selected=true]:bg-tone-lav/55',
+    picked: 'bg-tone-lav/70',
   },
   sky: {
     bg: 'bg-tone-sky',
@@ -92,6 +100,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-sky-foreground',
     hover:
       'hover:bg-tone-sky/45 hover:inset-ring hover:inset-ring-tone-sky-foreground/16',
+    active: 'data-[selected=true]:bg-tone-sky/55',
+    picked: 'bg-tone-sky/70',
   },
   sage: {
     bg: 'bg-tone-sage',
@@ -104,6 +114,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-sage-foreground',
     hover:
       'hover:bg-tone-sage/45 hover:inset-ring hover:inset-ring-tone-sage-foreground/16',
+    active: 'data-[selected=true]:bg-tone-sage/55',
+    picked: 'bg-tone-sage/70',
   },
   blush: {
     bg: 'bg-tone-blush',
@@ -116,6 +128,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-blush-foreground',
     hover:
       'hover:bg-tone-blush/45 hover:inset-ring hover:inset-ring-tone-blush-foreground/16',
+    active: 'data-[selected=true]:bg-tone-blush/55',
+    picked: 'bg-tone-blush/70',
   },
   mint: {
     bg: 'bg-tone-mint',
@@ -128,6 +142,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-mint-foreground',
     hover:
       'hover:bg-tone-mint/45 hover:inset-ring hover:inset-ring-tone-mint-foreground/16',
+    active: 'data-[selected=true]:bg-tone-mint/55',
+    picked: 'bg-tone-mint/70',
   },
   peach: {
     bg: 'bg-tone-peach',
@@ -140,6 +156,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-peach-foreground',
     hover:
       'hover:bg-tone-peach/45 hover:inset-ring hover:inset-ring-tone-peach-foreground/16',
+    active: 'data-[selected=true]:bg-tone-peach/55',
+    picked: 'bg-tone-peach/70',
   },
   plum: {
     bg: 'bg-tone-plum',
@@ -152,6 +170,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-plum-foreground',
     hover:
       'hover:bg-tone-plum/45 hover:inset-ring hover:inset-ring-tone-plum-foreground/16',
+    active: 'data-[selected=true]:bg-tone-plum/55',
+    picked: 'bg-tone-plum/70',
   },
   lime: {
     bg: 'bg-tone-lime',
@@ -164,6 +184,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-lime-foreground',
     hover:
       'hover:bg-tone-lime/45 hover:inset-ring hover:inset-ring-tone-lime-foreground/16',
+    active: 'data-[selected=true]:bg-tone-lime/55',
+    picked: 'bg-tone-lime/70',
   },
   slate: {
     bg: 'bg-tone-slate',
@@ -176,6 +198,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-slate-foreground',
     hover:
       'hover:bg-tone-slate/45 hover:inset-ring hover:inset-ring-tone-slate-foreground/16',
+    active: 'data-[selected=true]:bg-tone-slate/55',
+    picked: 'bg-tone-slate/70',
   },
   stone: {
     bg: 'bg-tone-stone',
@@ -188,5 +212,24 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     ring: 'ring-1 ring-tone-stone-foreground',
     hover:
       'hover:bg-tone-stone/45 hover:inset-ring hover:inset-ring-tone-stone-foreground/16',
+    active: 'data-[selected=true]:bg-tone-stone/55',
+    picked: 'bg-tone-stone/70',
   },
 };
+
+/** The six tones an untoned label hashes onto, in the design's order (H:3875). */
+const HASHED_TONES: readonly Tone[] = ['sky', 'sage', 'lav', 'butter', 'blush', 'mint'];
+
+/**
+ * The tone of a label without one of its own: the design's string hash
+ * (`x * 31 + code`, unsigned 32-bit) of the trimmed, lower-cased label, onto
+ * sky · sage · lav · butter · blush · mint (H:3875). Stable, so a label keeps
+ * its colour everywhere it appears.
+ */
+export function toneForLabel(label: string): Tone {
+  let hash = 0;
+  for (const char of label.trim().toLowerCase()) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return HASHED_TONES[hash % HASHED_TONES.length] ?? 'stone';
+}

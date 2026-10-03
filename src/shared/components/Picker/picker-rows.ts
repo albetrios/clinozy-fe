@@ -1,7 +1,7 @@
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 
 import type { PickerFilter, PickerOption } from './picker.types.ts';
-import { toneForLabel } from './picker-tone.ts';
 
 /** A label split around the search match (drawn on `bg-highlight`). */
 export interface PickerMatch {

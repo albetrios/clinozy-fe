@@ -376,8 +376,6 @@
     "loadingMore": "और लोड हो रहे हैं",
     "clear": "साफ़ करें",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "मरीज़",
-    "patientMark": "म",
     "date": {
       "label": "तारीख",
       "placeholder": "तारीख चुनें",

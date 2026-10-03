@@ -376,8 +376,6 @@
     "loadingMore": "Loading more",
     "clear": "Clear",
     "triggerLabel": "{{label}} · {{value}}",
-    "patient": "Patient",
-    "patientMark": "P",
     "date": {
       "label": "Date",
       "placeholder": "Pick a date",

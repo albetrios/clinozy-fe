@@ -85,8 +85,12 @@ describe('ContactCardContent — header', () => {
     expect(screen.getByText('Since 28 Jun 2026')).toBeInTheDocument();
 
     // "Patient" plus at most two tags.
-    expect(screen.getByText('Patient')).toHaveClass('bg-tone-sage');
-    expect(screen.getByText('vip')).toHaveClass('bg-tone-lav');
+    expect(screen.getByText('Patient').closest('[data-slot="pill"]')).toHaveClass(
+      'bg-tone-sage',
+    );
+    expect(screen.getByText('vip').closest('[data-slot="pill"]')).toHaveClass(
+      'bg-tone-lav',
+    );
     expect(screen.getByText('laser')).toBeInTheDocument();
     expect(screen.queryByText('peel')).toBeNull();
   });
@@ -109,7 +113,9 @@ describe('ContactCardContent — header', () => {
     );
     expect(container.querySelector('.bg-tone-lav-tint')).not.toBeNull();
     expect(screen.getByText('Lead since 16 Jun 2026')).toBeInTheDocument();
-    expect(screen.getByText('Lead')).toHaveClass('bg-tone-lav');
+    expect(screen.getByText('Lead').closest('[data-slot="pill"]')).toHaveClass(
+      'bg-tone-lav',
+    );
     expect(screen.queryByTestId('contact-card-open-file')).toBeNull();
     expect(screen.queryByTestId('patient-badge')).toBeNull();
   });
@@ -121,7 +127,9 @@ describe('ContactCardContent — header', () => {
       reach: [],
     });
     expect(container.querySelector('.bg-canvas')).not.toBeNull();
-    expect(screen.getByText('Contact')).toHaveClass('bg-tone-mint');
+    expect(screen.getByText('Contact').closest('[data-slot="pill"]')).toHaveClass(
+      'bg-tone-mint',
+    );
   });
 
   it('offers Edit contact, and Change contact only inside forms', async () => {
