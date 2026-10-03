@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.10.0](https://github.com/albetrios/clinozy-fe/compare/v1.9.3...v1.10.0) (2026-10-03)
+
+
+### Added
+
+* **env:** one env file per command, opt-in Sentry uploads, Netlify never rebuilds ([#33](https://github.com/albetrios/clinozy-fe/issues/33)) ([dc51f04](https://github.com/albetrios/clinozy-fe/commit/dc51f044f2c946f0672702591d20a60fc1086eda))
+* **github-sync:** --only KEY,KEY pushes just the values that changed ([#27](https://github.com/albetrios/clinozy-fe/issues/27)) ([d204996](https://github.com/albetrios/clinozy-fe/commit/d20499622b6d72778934a613b7a6cdf9196c073e))
+
+
+### Fixed
+
+* **auth:** start Google/GitHub sign-in without a captcha challenge ([#29](https://github.com/albetrios/clinozy-fe/issues/29)) ([98c3e0f](https://github.com/albetrios/clinozy-fe/commit/98c3e0f48a298b637548120c9cbe2ccf5886bb96))
+* **dev:** run the dev server in its own mode so .env.local is its only env file ([#31](https://github.com/albetrios/clinozy-fe/issues/31)) ([6a7b2df](https://github.com/albetrios/clinozy-fe/commit/6a7b2dfb05beb9cfee6a945d5260005de61378ff))
+
+
+### Documentation
+
+* **deploy:** a published release deploys production by itself ([#25](https://github.com/albetrios/clinozy-fe/issues/25)) ([b0aa4ed](https://github.com/albetrios/clinozy-fe/commit/b0aa4edc320185f9d2073b89a685b6726b18d408))
+* **iterations:** re-plan the launch for phone, tablet and the route schema ([#30](https://github.com/albetrios/clinozy-fe/issues/30)) ([fadf9c0](https://github.com/albetrios/clinozy-fe/commit/fadf9c09b8075205af2faa661a9fcefd2baf7e42))
+
 ## [1.9.3](https://github.com/albetrios/clinozy-fe/compare/v1.9.2...v1.9.3) (2026-10-02)
 
 
