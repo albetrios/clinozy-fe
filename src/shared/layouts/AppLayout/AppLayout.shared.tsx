@@ -12,6 +12,7 @@ import { logout } from '@/shared/auth/service.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
+import { ProductMark, ProductWordmark } from '@/shared/components/ProductMark/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -96,47 +97,9 @@ export function SkipLink() {
   );
 }
 
-/** The product name as the wordmark draws it: lower case, its first "o" a ring. */
-function Wordmark() {
-  const word = PRODUCT_NAME.toLowerCase();
-  const ring = word.indexOf('o');
-  return (
-    <span
-      aria-hidden
-      className="text-foreground inline-flex items-baseline text-[1.1875rem] leading-none font-semibold tracking-[-0.03em]"
-    >
-      {ring < 0 ? (
-        word
-      ) : (
-        <>
-          {word.slice(0, ring)}
-          <svg
-            aria-hidden
-            viewBox="0 0 20 20"
-            className="inline-block size-[0.56em] overflow-visible align-[-0.02em]"
-          >
-            <circle
-              cx="10"
-              cy="10"
-              r="7.6"
-              fill="none"
-              strokeWidth="4.2"
-              className="stroke-foreground"
-            />
-            <circle cx="10" cy="10" r="3" className="fill-brand-mark-strong" />
-          </svg>
-          {word.slice(ring + 1)}
-        </>
-      )}
-    </span>
-  );
-}
-
 /**
- * The product mark — a 28px tile in `primary` with the "C" stroke and the
- * `brand-mark` dot (`shell.md:18`; H:525) — and, with `wordmark`, the
- * lower-case name beside it (from `md` up: a phone header shows the mark only).
- * A brand asset, so its corner is fixed rather than following the radius axis.
+ * The product mark and — with `wordmark` — the lower-case name beside it (from
+ * `md` up: a phone header shows the mark only). The shell's brand slot.
  */
 export function BrandLogo({ wordmark = false }: { wordmark?: boolean }) {
   return (
@@ -146,20 +109,10 @@ export function BrandLogo({ wordmark = false }: { wordmark?: boolean }) {
       className="flex flex-none items-center gap-2.25 leading-none"
       data-testid="brand-logo"
     >
-      <svg viewBox="0 0 28 28" aria-hidden className="block size-7 flex-none">
-        <rect width="28" height="28" rx="8" className="fill-primary" />
-        <path
-          d="M18.6 9.1a6.4 6.4 0 1 0 0 9.8"
-          fill="none"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          className="stroke-primary-foreground"
-        />
-        <circle cx="20.2" cy="14" r="2.3" className="fill-brand-mark" />
-      </svg>
+      <ProductMark className="size-7" />
       {wordmark ? (
         <span className="hidden md:inline-flex">
-          <Wordmark />
+          <ProductWordmark className="text-[1.1875rem]" />
         </span>
       ) : null}
     </span>

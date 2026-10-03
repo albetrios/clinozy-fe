@@ -14,7 +14,7 @@ brand icons. Keeps the PWA manifest aligned with the default theme preset and
 ```text
 src/core/config/app-manifest.ts     ← edit here first (constants + buildWebManifest())
 public/manifest.webmanifest         ← committed JSON mirror (drift-guarded by test)
-public/app-icon.svg                 ← Lucide Boxes brand mark (#0a0a0a tile)
+public/app-icon.svg                 ← the product mark (#18181b tile)
 public/pwa-192x192.png              ← generated from SVG
 public/pwa-512x512.png              ← generated from SVG (also maskable in manifest)
 index.html                          ← favicon, theme-color, manifest link
@@ -50,17 +50,19 @@ src/lib/routes/page-head.ts         ← APP_TITLE, APP_DESCRIPTION (shared copy)
 | Field                    | Constant                               | Must match                                                               |
 | ------------------------ | -------------------------------------- | ------------------------------------------------------------------------ |
 | `background_color`       | `APP_MANIFEST_BACKGROUND_COLOR`        | Light `--color-background` in `src/index.css` (`#ffffff` / oklch(1 0 0)) |
-| `theme_color`            | `APP_MANIFEST_THEME_COLOR`             | Brand tile / shell chrome (`#0a0a0a` — same as AuthLayout / splash)      |
+| `theme_color`            | `APP_MANIFEST_THEME_COLOR`             | Brand tile / shell chrome (`#18181b` — the product mark's tile)          |
 | `index.html` theme-color | same hex as `APP_MANIFEST_THEME_COLOR` | Browser UI chrome                                                        |
 
 When default preset background or primary changes in `index.css` or
 `docs/reference/preset-product-design-rules.md`, update manifest constants in the
 **same PR**.
 
-### 3. App icon (Boxes)
+### 3. App icon (the product mark)
 
-- **SVG:** `public/app-icon.svg` — Lucide **Boxes** on `#0a0a0a` tile (matches
-  AuthLayout / FullPageSpinner brand mark).
+- **SVG:** `public/app-icon.svg` — the product mark: a `#18181b` tile (corner 8 on a
+  28 grid), the "C" stroke `#fafafa` and the `#5bbd74` dot (`brand-mark`). The same
+  drawing as `src/shared/components/ProductMark/` (shell header, AuthLayout,
+  BrandLoader) and the HTML splash; it keeps its corner under every shape.
 - **PNG regeneration** (after SVG changes):
 
 ```bash

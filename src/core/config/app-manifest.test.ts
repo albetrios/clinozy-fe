@@ -18,7 +18,7 @@ describe('app-manifest', () => {
 
   it('uses default preset shell colors and Boxes icon paths', () => {
     const manifest = buildWebManifest();
-    expect(manifest.theme_color).toBe('#0a0a0a');
+    expect(manifest.theme_color).toBe('#18181b');
     expect(manifest.background_color).toBe('#ffffff');
     expect(manifest.icons.map((i) => i.src)).toContain('/app-icon.svg');
   });

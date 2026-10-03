@@ -57,7 +57,7 @@ pnpm build
 ## Color rules
 
 - `background_color` → light `--color-background` default (`#ffffff`).
-- `theme_color` → brand shell tile (`#0a0a0a`), same as AuthLayout / splash.
+- `theme_color` → the product mark's tile (`#18181b`, the default preset's `primary`), same as AuthLayout / splash.
 - Preset changes in `src/index.css` or preset docs → update manifest constants in
   the same change.
 
@@ -65,7 +65,7 @@ pnpm build
 
 ## Icon rules
 
-- Brand mark: Lucide **Boxes** on `#0a0a0a` — `public/app-icon.svg`.
+- Brand mark: the product mark — `#18181b` tile (corner 8 on a 28 grid), the "C" stroke `#fafafa`, the dot `#5bbd74` (`brand-mark`) — `public/app-icon.svg`, the same drawing as `ProductMark` and the HTML splash.
 - No `vite.svg` for favicon or manifest.
 - Manifest lists PNG 192/512 (+ maskable 512) and SVG `purpose: any`.
 

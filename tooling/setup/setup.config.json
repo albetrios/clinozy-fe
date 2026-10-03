@@ -5,7 +5,7 @@
     "organization": "albetrios",
     "productName": "Clinozy",
     "productDescription": "Enterprise multi-tenant admin dashboard",
-    "themeColor": "#0a0a0a",
+    "themeColor": "#18181b",
     "backgroundColor": "#ffffff",
     "codeowner": "@nikunjmavani",
     "backendName": "clinozy-be",

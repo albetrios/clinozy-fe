@@ -10,8 +10,9 @@ import {
   LOCALE_NS,
 } from '@/lib/i18n/locale.constants.ts';
 import { I18N_LOCALES, isI18nLocale, LOCALE_NATIVE_LABELS } from '@/lib/i18n/locales.ts';
-import { iconOnBrandSurface, iconOnPrimarySurface } from '@/lib/icon-surface.ts';
+import { iconOnBrandSurface } from '@/lib/icon-surface.ts';
 import { cn } from '@/lib/utils.ts';
+import { ProductMark } from '@/shared/components/ProductMark/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import {
   Select,
@@ -20,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select.tsx';
-import { Boxes, ShieldCheck, Sparkles, Users, Zap } from '@/shared/icons/index.ts';
+import { ShieldCheck, Sparkles, Users, Zap } from '@/shared/icons/index.ts';
 import {
   AUTH_LAYOUT_STAT_KEYS,
   LAYOUT_KEYS,
@@ -105,12 +106,7 @@ export function BrandMark({ className }: { className?: string }) {
   const { t } = useTranslation(LAYOUT_NS);
   return (
     <Link to="/login" className={cn('flex items-center gap-2.5', className)}>
-      <div
-        data-slot="icon-chip"
-        className="bg-primary text-primary-foreground flex size-9 items-center justify-center"
-      >
-        <Boxes className={cn('h-5 w-5', iconOnPrimarySurface)} />
-      </div>
+      <ProductMark className="size-9" />
       <span className="text-lg font-semibold tracking-tight">
         {t(LAYOUT_KEYS.brand.name)}
       </span>
@@ -176,12 +172,7 @@ export function MobileBrandMark() {
       className="flex items-center gap-2 lg:hidden"
       data-testid="auth-mobile-logo"
     >
-      <div
-        data-slot="icon-chip"
-        className="bg-primary text-primary-foreground flex size-8 items-center justify-center"
-      >
-        <Boxes className={cn('h-4 w-4', iconOnPrimarySurface)} />
-      </div>
+      <ProductMark className="size-8" />
       <span className="text-sm font-semibold">{t(LAYOUT_KEYS.brand.name)}</span>
     </Link>
   );

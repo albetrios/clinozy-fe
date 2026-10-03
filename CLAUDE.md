@@ -524,7 +524,7 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 ## PWA manifest and icons
 
 - **Source of truth:** `src/core/config/app-manifest.ts` → `public/manifest.webmanifest` (drift test: `app-manifest.test.ts`).
-- **Icons:** `public/app-icon.svg` (Lucide Boxes on `#0a0a0a`); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
+- **Icons:** `public/app-icon.svg` (the product mark — `ProductMark` — on its `#18181b` tile); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
 - **Local perf audit:** `pnpm build && pnpm preview` — see `docs/reference/local-production-perf.md` (never Lighthouse on dev server).
 
 ## Testing

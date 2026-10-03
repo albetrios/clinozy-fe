@@ -1,7 +1,6 @@
-import { iconChipClassName, iconOnPrimarySurface } from '@/lib/icon-surface.ts';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
-import { Boxes } from '@/shared/icons/index.ts';
+import { ProductMark } from '@/shared/components/ProductMark/index.ts';
 
 interface BrandLoaderProps {
   className?: string;
@@ -25,15 +24,8 @@ export function BrandLoader({ className }: BrandLoaderProps) {
       data-testid="brand-loader"
     >
       <div className="flex flex-col items-center gap-4">
-        <span
-          data-slot="icon-chip"
-          className={cn(
-            'bg-primary text-primary-foreground animate-boot-breathe size-12',
-            iconChipClassName,
-          )}
-          aria-hidden="true"
-        >
-          <Boxes className={cn('size-6', iconOnPrimarySurface)} />
+        <span className="animate-boot-breathe flex" aria-hidden="true">
+          <ProductMark className="size-12" />
         </span>
         <span className="text-foreground text-base font-semibold tracking-tight">
           {PRODUCT_NAME}

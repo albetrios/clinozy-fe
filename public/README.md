@@ -7,16 +7,16 @@ All files here are copied as-is to the build output (`dist/`). Required and opti
 
 ## Required (app or build expects them)
 
-| File                     | Purpose                                                                                            | Auto-updated / maintenance                                                                  |
-| ------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **config.js**            | Runtime config placeholder. Host/entrypoint can overwrite with `window.__CONFIG__` (e.g. API URL). | No — static placeholder; overwritten at deploy if needed.                                   |
-| **theme-init.js**        | Prevents theme FOUC: reads `theme-preference` from localStorage and applies `.dark` before React.  | Update if theme key or logic changes (see `stores/useThemeStore`).                          |
-| **locale-init.js**       | Prevents locale/dir FOUC: reads `locale-preference` and sets `lang`/`dir` before React.            | Update if locale store key or RTL set changes (see `useLocaleStore` / `RTL_LOCALES`).       |
-| **app-icon.svg**         | App favicon + PWA SVG (Lucide **Boxes** brand mark on `#0a0a0a` tile).                             | Regenerate PNGs: `rsvg-convert -w 192 -h 192 public/app-icon.svg -o public/pwa-192x192.png` |
-| **manifest.webmanifest** | PWA manifest — must match `buildWebManifest()` in `src/core/config/app-manifest.ts`.               | Edit `app-manifest.ts` first; run `app-manifest.test.ts`.                                   |
-| **\_headers**            | Netlify/static host headers (e.g. Permissions-Policy). Merged with host config.                    | Update when adding new security or caching headers.                                         |
-| **offline.html**         | PWA offline fallback page (when no cache match).                                                   | Update copy or styles if branding changes.                                                  |
-| **robots.txt**           | Crawler rules.                                                                                     | Update if you add a sitemap or need to disallow paths.                                      |
+| File                     | Purpose                                                                                                                         | Auto-updated / maintenance                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **config.js**            | Runtime config placeholder. Host/entrypoint can overwrite with `window.__CONFIG__` (e.g. API URL).                              | No — static placeholder; overwritten at deploy if needed.                                   |
+| **theme-init.js**        | Prevents theme FOUC: reads `theme-preference` from localStorage and applies `.dark` before React.                               | Update if theme key or logic changes (see `stores/useThemeStore`).                          |
+| **locale-init.js**       | Prevents locale/dir FOUC: reads `locale-preference` and sets `lang`/`dir` before React.                                         | Update if locale store key or RTL set changes (see `useLocaleStore` / `RTL_LOCALES`).       |
+| **app-icon.svg**         | App favicon + PWA SVG — the product mark (`#18181b` tile, the "C" stroke, the `brand-mark` dot; same drawing as `ProductMark`). | Regenerate PNGs: `rsvg-convert -w 192 -h 192 public/app-icon.svg -o public/pwa-192x192.png` |
+| **manifest.webmanifest** | PWA manifest — must match `buildWebManifest()` in `src/core/config/app-manifest.ts`.                                            | Edit `app-manifest.ts` first; run `app-manifest.test.ts`.                                   |
+| **\_headers**            | Netlify/static host headers (e.g. Permissions-Policy). Merged with host config.                                                 | Update when adding new security or caching headers.                                         |
+| **offline.html**         | PWA offline fallback page (when no cache match).                                                                                | Update copy or styles if branding changes.                                                  |
+| **robots.txt**           | Crawler rules.                                                                                                                  | Update if you add a sitemap or need to disallow paths.                                      |
 
 ## PWA icons (required for install / no 404s)
 

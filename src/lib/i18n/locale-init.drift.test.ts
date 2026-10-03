@@ -49,10 +49,24 @@ describe('boot splash shape drift (theme-init.js ↔ index.html ↔ BrandLoader)
     expect(themeInit).toContain("root.dataset.shape = 'sharp'");
   });
 
-  it('index.html squares every rounded part of the HTML splash under it', () => {
-    for (const part of ['.app-splash-mark', '.app-splash-track', '.app-splash-bar']) {
+  it('index.html squares the splash track and bar under it', () => {
+    for (const part of ['.app-splash-track', '.app-splash-bar']) {
       expect(html).toContain(`html[data-shape='sharp'] ${part}`);
     }
+  });
+
+  it('draws the same fixed-corner product mark in the HTML splash and the React loader', () => {
+    // The mark is a brand asset (L-59): it keeps its corner under every shape,
+    // in the HTML splash and in ProductMark alike, so the handoff never changes it.
+    const mark = readFileSync(
+      join(root, 'src/shared/components/ProductMark/ProductMark.tsx'),
+      'utf8',
+    );
+    for (const source of [html, mark]) {
+      expect(source).toContain('rx="8"');
+      expect(source).toContain('M18.6 9.1a6.4 6.4 0 1 0 0 9.8');
+    }
+    expect(html).not.toContain("html[data-shape='sharp'] .app-splash-mark");
   });
 
   it('index.css squares the matching React slots', () => {
@@ -67,8 +81,8 @@ describe('boot splash shape drift (theme-init.js ↔ index.html ↔ BrandLoader)
     expect(sharpSlots).toContain("[data-slot='pill']");
   });
 
-  it('BrandLoader renders its mark and track through those slots', () => {
-    expect(loader).toContain('data-slot="icon-chip"');
+  it('BrandLoader renders the product mark and its track through the pill slots', () => {
+    expect(loader).toContain('<ProductMark');
     expect(loader.match(/data-slot="pill"/g)).toHaveLength(2);
   });
 });

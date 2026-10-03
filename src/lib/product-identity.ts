@@ -17,7 +17,7 @@ export const PRODUCT_NAME = 'Clinozy';
 export const PRODUCT_DESCRIPTION = 'Enterprise multi-tenant admin dashboard';
 
 /** Browser chrome / PWA `theme_color`. */
-export const PRODUCT_THEME_COLOR = '#0a0a0a';
+export const PRODUCT_THEME_COLOR = '#18181b';
 
 /** PWA splash `background_color`. */
 export const PRODUCT_BACKGROUND_COLOR = '#ffffff';
