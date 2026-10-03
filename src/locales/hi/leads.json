@@ -1,5 +1,15 @@
 {
   "manifest": {
     "title": "लीड्स"
+  },
+  "record": "लीड",
+  "toasts": {
+    "created": "लीड {{id}} बनाई गई",
+    "saved": "लीड सेव हुई",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "अब {{name}} आपकी है · {{owner}} जुड़े रहेंगे",
+    "claimedUnowned": "अब {{name}} आपकी है",
+    "released": "टीम के लिए खोली गई · कोई भी ले सकता है",
+    "assigned": "{{name}} अब ज़िम्मेदार हैं · सूचना भेजी गई"
   }
 }

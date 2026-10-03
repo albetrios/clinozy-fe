@@ -52,6 +52,18 @@
     "marketing": "Marketing",
     "owner": "Propietario"
   },
+  "leads": {
+    "statuses": {
+      "new": "Nuevo",
+      "contacted": "Contactado",
+      "follow_up": "Seguimiento",
+      "clinic_visited": "Visitó la clínica",
+      "no_response": "Sin respuesta",
+      "not_interested": "No interesado",
+      "invalid": "No válido",
+      "lost": "Perdido"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consulta",

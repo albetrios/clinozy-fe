@@ -1,5 +1,15 @@
 {
   "manifest": {
     "title": "リード"
+  },
+  "record": "リード",
+  "toasts": {
+    "created": "リード {{id}} を作成しました",
+    "saved": "リードを保存しました",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "{{name}} の担当になりました · {{owner}} は引き続き関与します",
+    "claimedUnowned": "{{name}} の担当になりました",
+    "released": "チームに開放しました · 誰でも引き受けられます",
+    "assigned": "{{name}} が担当になりました · 通知済み"
   }
 }

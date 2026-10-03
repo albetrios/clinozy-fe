@@ -52,6 +52,18 @@
     "marketing": "Marketing",
     "owner": "Titolare"
   },
+  "leads": {
+    "statuses": {
+      "new": "Nuovo",
+      "contacted": "Contattato",
+      "follow_up": "Follow-up",
+      "clinic_visited": "Visita in clinica",
+      "no_response": "Nessuna risposta",
+      "not_interested": "Non interessato",
+      "invalid": "Non valido",
+      "lost": "Perso"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "Consulenza",

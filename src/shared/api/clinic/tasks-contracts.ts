@@ -5,7 +5,6 @@ import {
   type AppointmentStatus,
   invoiceSchema,
   leadMessageSchema,
-  leadSchema,
   type LeadStatus,
   patientSchema,
   type TaskKind,
@@ -18,6 +17,7 @@ import {
   userSchema,
 } from './clinic-schema.ts';
 import { addCivilDays, clinicInstant, clinicToday } from './clinic-time.ts';
+import { leadRecordSchema } from './leads-contracts.ts';
 
 /**
  * The Tasks domain beyond the generated contract (KICKOFF §6.10, Q-T3): the
@@ -1033,7 +1033,7 @@ export type TaskRow = z.infer<typeof taskRowSchema>;
 /** The record a task points at (S:1723 "Task + source record"). */
 export const taskSourceRecordSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('appointment'), appointment: appointmentSchema }),
-  z.object({ kind: z.literal('lead'), lead: leadSchema }),
+  z.object({ kind: z.literal('lead'), lead: leadRecordSchema }),
   z.object({ kind: z.literal('treatment'), treatment: treatmentSchema }),
   z.object({ kind: z.literal('patient'), patient: patientSchema }),
   z.object({ kind: z.literal('invoice'), invoice: invoiceSchema }),
@@ -1053,7 +1053,7 @@ export const taskDetailSchema = z.object({
   task: taskRowSchema,
   source: taskSourceRecordSchema.nullable(),
   patient: patientSchema.nullable(),
-  thread: leadSchema.nullable(),
+  thread: leadRecordSchema.nullable(),
   activity: z.array(leadMessageSchema),
   quote: z.string().nullable(),
   suggestion: z.string().nullable(),

@@ -52,6 +52,18 @@
     "marketing": "マーケティング",
     "owner": "オーナー"
   },
+  "leads": {
+    "statuses": {
+      "new": "新規",
+      "contacted": "連絡済み",
+      "follow_up": "フォローアップ",
+      "clinic_visited": "来院済み",
+      "no_response": "応答なし",
+      "not_interested": "関心なし",
+      "invalid": "無効",
+      "lost": "失注"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "診察",

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { leadSchema, phoneSchema } from './clinic-schema.ts';
+import { phoneSchema } from './clinic-schema.ts';
+import { leadRecordSchema } from './leads-contracts.ts';
 
 /**
  * Contact threads (D32, S:251–262): a person who is not a lead still chats in
@@ -42,7 +43,7 @@ export type EnsureContactThreadInput = z.input<typeof ensureContactThreadInputSc
 
 /** The person's thread, and whether this call opened it. */
 export const ensureContactThreadResultSchema = z.object({
-  lead: leadSchema,
+  lead: leadRecordSchema,
   created: z.boolean(),
 });
 /** The person's thread, and whether this call opened it. */

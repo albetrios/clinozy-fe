@@ -12,7 +12,6 @@ import {
   feedbackActionSchema,
   invoiceSchema,
   leadMessageSchema,
-  leadSchema,
   manufacturerSchema,
   medicalContactSchema,
   medicalPurchaseOrderSchema,
@@ -45,6 +44,7 @@ import {
   clinicClockTime,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
+import { leadRecordSchema } from '@/shared/api/clinic/leads-contracts.ts';
 import {
   offeringRecordSchema,
   offerRecordSchema,
@@ -65,7 +65,8 @@ const SCHEMAS = {
   branches: branchSchema,
   staff: userSchema,
   patients: patientSchema,
-  leads: leadSchema,
+  // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).
+  leads: leadRecordSchema,
   leadMessages: leadMessageSchema,
   appointments: appointmentSchema,
   prescriptions: prescriptionSchema,

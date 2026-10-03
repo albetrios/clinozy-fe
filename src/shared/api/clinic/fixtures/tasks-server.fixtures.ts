@@ -12,7 +12,6 @@ import {
 import type {
   Appointment,
   Invoice,
-  Lead,
   LeadMessage,
   Patient,
   Treatment,
@@ -23,6 +22,8 @@ import {
   clinicInstant,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import { LEAD_HOLD_DAYS } from '@/shared/api/clinic/leads-hold.ts';
 import {
   type CreateTaskInput,
   createTaskInputSchema,
@@ -88,8 +89,6 @@ import { clinicFixtures, onClinicFixturesReset } from './world.fixtures.ts';
  * `tasks-api.ts` loads this module on demand; when the API lands, it goes.
  */
 
-/** Days an owner holds a lead before it opens to the team (H:4013, the org setting's default). */
-const LEAD_HOLD_DAYS = 3;
 /** The WhatsApp-confirmed visits the Done view lists (H:4270: "up to 4"). */
 const CONFIRMED_ENTRIES_MAX = 4;
 
@@ -184,7 +183,7 @@ async function syncTaskRules(
 
 interface Lookups {
   patients: ReadonlyMap<string, Patient>;
-  leads: ReadonlyMap<string, Lead>;
+  leads: ReadonlyMap<string, LeadRecord>;
   staff: ReadonlyMap<string, User>;
   appointments: ReadonlyMap<string, Appointment>;
   treatments: ReadonlyMap<string, Treatment>;
@@ -469,7 +468,7 @@ function quoteOf(task: TaskRecord, activity: readonly LeadMessage[]): string | n
 function suggestionOf(
   task: TaskRecord,
   person: TaskPerson,
-  thread: Lead | null,
+  thread: LeadRecord | null,
   view: Lookups,
   today: string,
 ): string | null {
@@ -494,7 +493,7 @@ function suggestionOf(
 function staffNamed(
   task: TaskRecord,
   source: TaskSourceRecord | null,
-  thread: Lead | null,
+  thread: LeadRecord | null,
   view: Lookups,
 ): TaskStaff[] {
   const ids = new Set<string | null>([
@@ -578,7 +577,7 @@ function systemLine(
 interface EffectContext {
   task: TaskRecord;
   text: OutcomeServerText;
-  thread: Lead | null;
+  thread: LeadRecord | null;
   visit: Appointment | null;
   note: string | null;
   now: Date;
@@ -605,7 +604,7 @@ function failedMessageOf(leadId: string): LeadMessage | undefined {
 }
 
 /** The lead a lead rule's task points at. */
-const sourceLeadOf = (task: TaskRecord): Lead | undefined =>
+const sourceLeadOf = (task: TaskRecord): LeadRecord | undefined =>
   task.sourceType === 'lead' && task.sourceId
     ? clinicFixtures.leads.snapshot((row) => row.id === task.sourceId)[0]
     : undefined;

@@ -4,9 +4,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 `launch-2026-09-30-jxmr`):
 
 - `clinic.constants.ts` — the `clinic` i18n namespace's keys (section names and
-  descriptions, roles; the offerings domain — category, offer-kind and
-  offer-state labels and the toasts `useOfferings` / `useOffers` raise; more
-  shared statuses arrive with the rooms that need them). The namespace loads
+  descriptions, roles; the lead statuses; the offerings domain — category,
+  offer-kind and offer-state labels and the toasts `useOfferings` / `useOffers`
+  raise; more shared statuses arrive with the rooms that need them). The namespace loads
   with the org shell, so a shared hook's toast reads it in any room. Room-only
   copy stays in each room's own namespace (`today`, `leads`, … `users`).
 - `clinic-tones.ts` — each section's and role's tone (the contract's `Tone`), and
@@ -23,6 +23,10 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   how-to steps, outcome labels and effect lines, Snooze options, "What’s next"
   When chips). Today's work-queue aside loads `tasks` beside `today`.
 - `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
+- `clinic-phone.ts` — a typed or pasted mobile as the contract stores it
+  (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
+  shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
+  Instagram) the person cards and the chat open.
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11).

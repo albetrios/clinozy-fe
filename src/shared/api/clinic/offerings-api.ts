@@ -2,7 +2,10 @@ import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import {
   clinicHttpError,
+  compareText,
   type CursorPage,
+  definedFields,
+  refuseUnknownIds,
   validateClinicInput,
 } from './clinic-fixture-store.ts';
 import type { DeleteReason } from './clinic-schema.ts';
@@ -49,29 +52,6 @@ export const offerQueryKeys = {
 };
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
-
-/** `a` before `b` → negative; plain code-point order (ISO dates, machine values). */
-const compareText = (a: string, b: string) => Number(a > b) - Number(a < b);
-
-/** The fields a caller actually set — an explicit `undefined` never wipes a default. */
-function definedFields<T extends object>(fields: T): Partial<T> {
-  return Object.fromEntries(
-    Object.entries(fields).filter(([, value]) => value !== undefined),
-  ) as Partial<T>;
-}
-
-/** A 422 on `field` when one of `ids` names no record in `known` (a foreign key). */
-function refuseUnknownIds(
-  field: 'branchIds' | 'offeringIds',
-  ids: readonly string[],
-  known: readonly { id: string }[],
-  message: string,
-): void {
-  const knownIds = new Set(known.map((row) => row.id));
-  if (ids.some((id) => !knownIds.has(id))) {
-    throw clinicHttpError(422, 'validation', message, { [field]: [message] });
-  }
-}
 
 const UNKNOWN_BRANCH = 'Pick branches the clinic has';
 

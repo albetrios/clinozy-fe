@@ -52,6 +52,18 @@
     "marketing": "التسويق",
     "owner": "المالك"
   },
+  "leads": {
+    "statuses": {
+      "new": "جديد",
+      "contacted": "تم التواصل",
+      "follow_up": "متابعة",
+      "clinic_visited": "زار العيادة",
+      "no_response": "لا رد",
+      "not_interested": "غير مهتم",
+      "invalid": "غير صالح",
+      "lost": "مفقود"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "استشارة",

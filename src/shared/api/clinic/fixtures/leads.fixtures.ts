@@ -6,13 +6,13 @@ import {
 import type {
   Channel,
   DeliveryStatus,
-  Lead,
   LeadInterest,
   LeadMessage,
   LeadSource,
   LeadStatus,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
@@ -274,6 +274,9 @@ const EMAILS: Record<number, string> = {
   2357: 'najmus@outlook.com',
 };
 
+/** `unread` (H:3384–3385): the messages nobody has read yet; every other lead is read. */
+const UNREAD: Record<number, number> = { 2365: 1, 2363: 2 };
+
 /** `COLLAB` (H:3375): who else is on the lead. */
 const INVOLVED: Record<number, readonly StaffKey[]> = {
   2363: ['NK'],
@@ -527,10 +530,24 @@ function lastTouch(seq: number, createdAt: string, messages: readonly LeadMessag
     );
 }
 
+/**
+ * The plan's fields on a seeded lead (Appendix F): no custom interests, not
+ * released, and the hold counting from creation — the prototype reads
+ * `l.touch || l.at` and no seed sets `touch` (H:3869).
+ */
+function planFields(seq: number, createdAt: string) {
+  return {
+    customInterests: [],
+    touchedAt: createdAt,
+    releasedAt: null,
+    unreadCount: UNREAD[seq] ?? 0,
+  } satisfies Partial<LeadRecord>;
+}
+
 /** The 17 leads of the Leads room, then the chat-only contact threads. */
-export function leadSeed(today: string = clinicToday()): Lead[] {
+export function leadSeed(today: string = clinicToday()): LeadRecord[] {
   const messages = leadMessageSeed(today);
-  const leads = LEAD_ROWS.map((row): Lead => {
+  const leads = LEAD_ROWS.map((row): LeadRecord => {
     const createdAt = seedAt(row.at, '10:00', today);
     return {
       ...seedCommon(
@@ -557,9 +574,10 @@ export function leadSeed(today: string = clinicToday()): Lead[] {
       kind: row.retarget ? 'retarget' : 'enquiry',
       retargetReason: row.retarget ?? null,
       notes: null,
+      ...planFields(row.seq, createdAt),
     };
   });
-  const threads = CONTACT_THREADS.map((row): Lead => {
+  const threads = CONTACT_THREADS.map((row): LeadRecord => {
     const createdAt = threadOpenedAt(row, today);
     return {
       ...seedCommon(createdAt, staffRef('RS'), lastTouch(row.seq, createdAt, messages)),
@@ -580,6 +598,7 @@ export function leadSeed(today: string = clinicToday()): Lead[] {
       kind: 'contact_thread',
       retargetReason: null,
       notes: null,
+      ...planFields(row.seq, createdAt),
     };
   });
   return [...leads, ...threads];

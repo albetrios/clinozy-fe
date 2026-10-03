@@ -6,7 +6,6 @@ import {
 } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import type {
   Appointment,
-  Lead,
   LeadInterest,
   Patient,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -16,6 +15,7 @@ import {
   ensureContactThreadInputSchema,
   type EnsureContactThreadResult,
 } from '@/shared/api/clinic/contact-threads-api.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
@@ -34,7 +34,8 @@ export interface PersonThreadLookup {
   phone: string | null;
 }
 
-const newestFirst = (a: Lead, b: Lead) => b.updatedAt.localeCompare(a.updatedAt);
+const newestFirst = (a: LeadRecord, b: LeadRecord) =>
+  b.updatedAt.localeCompare(a.updatedAt);
 
 /**
  * The person's thread (KICKOFF §6.10 chat binding, D32): the lead the record
@@ -43,9 +44,9 @@ const newestFirst = (a: Lead, b: Lead) => b.updatedAt.localeCompare(a.updatedAt)
  * thread on their mobile. Null when they have none yet.
  */
 export function findPersonThread(
-  leads: readonly Lead[],
+  leads: readonly LeadRecord[],
   person: PersonThreadLookup,
-): Lead | null {
+): LeadRecord | null {
   const live = leads.filter((lead) => lead.deletedAt === null);
   if (person.leadId) {
     const own = live.find((lead) => lead.id === person.leadId);
@@ -164,6 +165,10 @@ export async function ensureContactThreadInWorld(
     kind: 'contact_thread',
     retargetReason: null,
     notes: null,
+    customInterests: [],
+    touchedAt: now,
+    releasedAt: null,
+    unreadCount: 0,
   });
   if (line) {
     await change.create(clinicFixtures.leadMessages, {

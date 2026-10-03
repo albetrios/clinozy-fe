@@ -5,10 +5,13 @@ import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import {
   CLINIC_PAGE_SIZE,
+  compareText,
   createFixtureCollection,
+  definedFields,
   FIXTURE_ACTOR_ID,
   FIXTURE_ORGANIZATION_ID,
   recordFixtureChange,
+  refuseUnknownIds,
   validateClinicInput,
 } from './clinic-fixture-store.ts';
 import type { ClinicCommon } from './clinic-schema.ts';
@@ -93,6 +96,24 @@ describe('fixture collection', () => {
     ).toHaveProperty('note');
   });
 
+  it('stamps updatedAt on an edit, and leaves it alone for a marker that is no edit', async () => {
+    let clock = NOW;
+    const collection = createFixtureCollection<Thing>({
+      resource: 'Thing',
+      seed: () => [thing(1)],
+      now: () => clock,
+    });
+    clock = new Date('2026-10-03T06:00:00Z');
+    const marked = await collection.update(
+      thing(1).id,
+      { name: 'Read' },
+      { stamp: false },
+    );
+    expect(marked.updatedAt).toBe(NOW.toISOString());
+    const edited = await collection.update(thing(1).id, { name: 'Edited' });
+    expect(edited.updatedAt).toBe(clock.toISOString());
+  });
+
   it('never hands out its own rows (mutating a result changes nothing)', async () => {
     const collection = things();
     const row = await collection.get(thing(1).id);
@@ -118,6 +139,36 @@ describe('fixture collection', () => {
     const created = await plain.create({ name: 'No number' });
     expect(created).not.toHaveProperty('seq');
     expect(created.name).toBe('No number');
+  });
+});
+
+describe('the write helpers', () => {
+  it('keeps only the fields a caller set — an explicit undefined never wipes a default', () => {
+    expect(
+      definedFields({ name: 'Peel', note: undefined, price: 0, tags: null }),
+    ).toEqual({ name: 'Peel', price: 0, tags: null });
+  });
+
+  it('orders text by code point', () => {
+    expect(['b', 'a', 'c'].sort(compareText)).toEqual(['a', 'b', 'c']);
+    expect(compareText('2026-10-03', '2026-10-03')).toBe(0);
+  });
+
+  it('answers a 422 on the field when an id names no record', () => {
+    const known = [{ id: 'a' }, { id: 'b' }];
+    expect(() => refuseUnknownIds('ownerId', ['a', 'b'], known, 'Pick')).not.toThrow();
+    const error = (() => {
+      try {
+        refuseUnknownIds('ownerId', ['a', 'z'], known, 'Pick someone on the team');
+      } catch (caught) {
+        return caught;
+      }
+      return null;
+    })();
+    expect(isHttpError(error) && error.status === 422).toBe(true);
+    expect(isHttpError(error) && error.data).toMatchObject({
+      error: { code: 'validation', fields: { ownerId: ['Pick someone on the team'] } },
+    });
   });
 });
 

@@ -1,5 +1,15 @@
 {
   "manifest": {
     "title": "Leads"
+  },
+  "record": "Lead",
+  "toasts": {
+    "created": "Lead {{id}} erstellt",
+    "saved": "Lead gespeichert",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "{{name}} gehört jetzt dir · {{owner}} bleibt beteiligt",
+    "claimedUnowned": "{{name}} gehört jetzt dir",
+    "released": "Für das Team freigegeben · jeder kann übernehmen",
+    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt"
   }
 }

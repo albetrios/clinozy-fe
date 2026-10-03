@@ -44,6 +44,23 @@ export const CLINIC_KEYS = {
     owner: 'roles.owner',
   },
   /**
+   * The leads domain's stored statuses (`S:1063–1073`), labelled as the design
+   * shows them — the Leads room's pills and tracker, the appointment form's
+   * connected lead and the status toast `useUpdateLead` raises.
+   */
+  leads: {
+    statuses: {
+      new: 'leads.statuses.new',
+      contacted: 'leads.statuses.contacted',
+      follow_up: 'leads.statuses.follow_up',
+      clinic_visited: 'leads.statuses.clinic_visited',
+      no_response: 'leads.statuses.no_response',
+      not_interested: 'leads.statuses.not_interested',
+      invalid: 'leads.statuses.invalid',
+      lost: 'leads.statuses.lost',
+    },
+  },
+  /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and
    * the booking drawer: the stored enums' labels (`S:1330, 1349`; the derived
    * offer state, `live` = "Running") and the toasts its writes raise

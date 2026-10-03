@@ -1,5 +1,15 @@
 {
   "manifest": {
     "title": "Prospectos"
+  },
+  "record": "Prospecto",
+  "toasts": {
+    "created": "Prospecto {{id}} creado",
+    "saved": "Prospecto guardado",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "Ahora {{name}} es tuyo · {{owner}} sigue involucrado",
+    "claimedUnowned": "Ahora {{name}} es tuyo",
+    "released": "Liberado al equipo · cualquiera puede tomarlo",
+    "assigned": "{{name}} ahora es responsable · notificado"
   }
 }

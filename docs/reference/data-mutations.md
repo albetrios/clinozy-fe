@@ -192,6 +192,7 @@ stored as `other` with its label leading the note.
 | Passkeys      | `useRemovePasskey`                                                | `optimistic`                     |
 | Webhooks      | `useDeleteWebhook`                                                | `optimistic`                     |
 | Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
+| Leads         | `useDeleteLead`, `useMarkLeadRead` (silent read receipt)          | `optimisticInfinite`             |
 | Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
 | Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
 
@@ -205,8 +206,9 @@ behind the undo toast by their panels (see above), which is why all three take a
 
 **Non-optimistic** (must show in-progress) — creates + shapes we can't safely patch:
 
-- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`
-- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch)
+- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`
+- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch)
+- **Lead ownership:** `useClaimLead`, `useAssignLead` (`notify.undo` — Undo puts the team back), `useReleaseLead`; a status save's "<name> → <status>" toast also carries Undo (`useUpdateLead`)
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 
 > **Invitations ride on memberships.** clinozy-be has no invitation list: an invite is

@@ -4,10 +4,32 @@ import {
   formatClinicPhone,
   instagramHref,
   telHref,
+  toClinicPhone,
   whatsAppHref,
 } from './clinic-phone.ts';
 
 describe('clinic phones', () => {
+  it('stores a typed or pasted mobile as E.164, a pasted 91 stripped', () => {
+    expect(toClinicPhone('98250 44120')).toBe('+919825044120');
+    expect(toClinicPhone('+91 98250-44120')).toBe('+919825044120');
+    expect(toClinicPhone('919825044120')).toBe('+919825044120');
+    expect(toClinicPhone('+919825044120')).toBe('+919825044120');
+    expect(toClinicPhone(9825044120)).toBe('+919825044120');
+  });
+
+  it('refuses anything that is not a 10-digit Indian mobile', () => {
+    for (const input of [
+      '98250',
+      '5825044120',
+      '+14155550123',
+      'rhea',
+      '',
+      '0919825044120',
+    ]) {
+      expect(toClinicPhone(input), input).toBeNull();
+    }
+  });
+
   it('shows a stored mobile as the design prints it', () => {
     expect(formatClinicPhone('+919825044120')).toBe('+91 98250 44120');
   });

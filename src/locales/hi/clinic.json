@@ -52,6 +52,18 @@
     "marketing": "मार्केटिंग",
     "owner": "मालिक"
   },
+  "leads": {
+    "statuses": {
+      "new": "नया",
+      "contacted": "संपर्क किया",
+      "follow_up": "फ़ॉलो-अप",
+      "clinic_visited": "क्लिनिक आए",
+      "no_response": "कोई जवाब नहीं",
+      "not_interested": "रुचि नहीं",
+      "invalid": "अमान्य",
+      "lost": "खो गया"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "परामर्श",

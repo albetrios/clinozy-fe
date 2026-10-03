@@ -4,7 +4,6 @@ import type {
   Appointment,
   Channel,
   CheckIn,
-  Lead,
   LeadInterest,
   LeadMessage,
   LeadStatus,
@@ -21,6 +20,11 @@ import {
   clinicInstant,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  LEAD_CLOSED_STATUSES,
+  type LeadRecord,
+} from '@/shared/api/clinic/leads-contracts.ts';
+import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import {
   TASK_RULES,
   type TaskDueAnchors,
@@ -188,7 +192,7 @@ export interface TaskRuleWorld {
   holdDays: number;
   staff: readonly User[];
   patients: readonly Patient[];
-  leads: readonly Lead[];
+  leads: readonly LeadRecord[];
   messages: readonly LeadMessage[];
   appointments: readonly Appointment[];
   treatments: readonly Treatment[];
@@ -232,12 +236,7 @@ const patientName = (patient: Pick<Patient, 'firstName' | 'lastName'>) =>
   [patient.firstName, patient.lastName].filter(Boolean).join(' ');
 
 /** Statuses after which a lead needs nothing more (H:4243). */
-const CLOSED_LEAD_STATUSES: ReadonlySet<LeadStatus> = new Set([
-  'clinic_visited',
-  'not_interested',
-  'invalid',
-  'lost',
-]);
+const CLOSED_LEAD_STATUSES: ReadonlySet<LeadStatus> = new Set(LEAD_CLOSED_STATUSES);
 const FOLLOW_UP_STATUSES: ReadonlySet<LeadStatus> = new Set([
   'follow_up',
   'contacted',
@@ -249,7 +248,7 @@ interface Context {
   today: string;
   staffById: ReadonlyMap<string, User>;
   patientById: ReadonlyMap<string, Patient>;
-  leadById: ReadonlyMap<string, Lead>;
+  leadById: ReadonlyMap<string, LeadRecord>;
   messagesByLead: ReadonlyMap<string, LeadMessage[]>;
 }
 
@@ -318,19 +317,19 @@ function match(
   };
 }
 
-// ── Leads: Unreplied messages, Messages not delivered, Lead follow-ups, Leads open to claim ──
+// ── Leads: Unreplied messages, Messages not delivered, LeadRecord follow-ups, Leads open to claim ──
 
 /** What every lead rule reads about one lead. */
 interface LeadScope {
   context: Context;
-  lead: Lead;
+  lead: LeadRecord;
   /** Its messages without the system lines, oldest first. */
   real: readonly LeadMessage[];
   first: string;
   closed: boolean;
 }
 
-const leadFields = (lead: Lead) => ({
+const leadFields = (lead: LeadRecord) => ({
   patientId: lead.patientId,
   leadId: lead.id,
   sourceId: lead.id,
@@ -383,7 +382,7 @@ function failedMatch({ context, lead, real, first }: LeadScope): TaskRuleMatch |
   });
 }
 
-/** Lead follow-ups: an open follow-up whose date has come. */
+/** LeadRecord follow-ups: an open follow-up whose date has come. */
 function followMatch({ context, lead, first }: LeadScope): TaskRuleMatch | null {
   const followUpDate = lead.followUpAt ? clinicToday(new Date(lead.followUpAt)) : null;
   if (lead.status === null || !FOLLOW_UP_STATUSES.has(lead.status)) return null;
@@ -402,14 +401,17 @@ function followMatch({ context, lead, first }: LeadScope): TaskRuleMatch | null 
   });
 }
 
-/** Leads open to claim: someone else's open lead whose owner left or sat past the hold. */
-function claimMatch({ context, lead, first, closed }: LeadScope): TaskRuleMatch | null {
-  const { world, today } = context;
+/**
+ * Leads open to claim: someone else's lead the hold has opened — its owner left,
+ * released it, or sat past the hold (the same `leadHold` the Leads room reads).
+ */
+function claimMatch({ context, lead, first }: LeadScope): TaskRuleMatch | null {
+  const { world } = context;
   const owner = lead.ownerId ? context.staffById.get(lead.ownerId) : undefined;
-  if (!owner || owner.id === world.viewerId || lead.patientId !== null || closed)
-    return null;
-  const idle = civilDaysBetween(clinicToday(new Date(lead.updatedAt)), today);
-  if (owner.active && idle < world.holdDays) return null;
+  if (!owner || owner.id === world.viewerId) return null;
+  const hold = leadHold({ ...lead, ownerGone: !owner.active }, world.holdDays, world.now);
+  if (!hold.open) return null;
+  const idle = hold.idleDays;
   const ownerName = staffShortName(owner);
   return match('claim', {
     ...leadFields(lead),
@@ -423,7 +425,7 @@ function claimMatch({ context, lead, first, closed }: LeadScope): TaskRuleMatch 
   });
 }
 
-function leadMatches(context: Context, lead: Lead): TaskRuleMatch[] {
+function leadMatches(context: Context, lead: LeadRecord): TaskRuleMatch[] {
   const scope: LeadScope = {
     context,
     lead,

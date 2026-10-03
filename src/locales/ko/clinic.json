@@ -52,6 +52,18 @@
     "marketing": "마케팅",
     "owner": "소유자"
   },
+  "leads": {
+    "statuses": {
+      "new": "신규",
+      "contacted": "연락함",
+      "follow_up": "후속 조치",
+      "clinic_visited": "내원함",
+      "no_response": "응답 없음",
+      "not_interested": "관심 없음",
+      "invalid": "유효하지 않음",
+      "lost": "이탈"
+    }
+  },
   "offerings": {
     "categories": {
       "consultation": "상담",

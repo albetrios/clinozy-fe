@@ -7,7 +7,6 @@ import type {
   DayClose,
   FeedbackAction,
   Invoice,
-  Lead,
   LeadMessage,
   Manufacturer,
   MedicalContact,
@@ -36,6 +35,7 @@ import type {
   Treatment,
   User,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
@@ -103,7 +103,11 @@ export const clinicFixtures = {
     resource: 'Patient',
     seed: () => patientSeed(),
   }),
-  leads: createFixtureCollection<Lead>({ resource: 'Lead', seed: () => leadSeed() }),
+  // Leads carry the plan's hold, unread and custom-interest fields — see leads-contracts.ts.
+  leads: createFixtureCollection<LeadRecord>({
+    resource: 'Lead',
+    seed: () => leadSeed(),
+  }),
   leadMessages: createFixtureCollection<LeadMessage>({
     resource: 'Message',
     seed: () => leadMessageSeed(),

@@ -4,13 +4,13 @@ import { fixtureUuid } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import type {
   Appointment,
   CheckIn,
-  Lead,
   LeadMessage,
   Patient,
   PatientPackage,
   Treatment,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
@@ -75,7 +75,7 @@ const id = (kind: string) => {
   return fixtureUuid(`job-test-${kind}`, counter);
 };
 
-const lead = (patch: Partial<Lead> = {}): Lead => ({
+const lead = (patch: Partial<LeadRecord> = {}): LeadRecord => ({
   ...structuredClone(LEAD),
   id: id('lead'),
   name: 'Kabir Mehta',
@@ -87,6 +87,9 @@ const lead = (patch: Partial<Lead> = {}): Lead => ({
   interests: ['prp'],
   followUpAt: null,
   updatedAt: at(TODAY, '09:00'),
+  // The hold's clock: the owner's last activity (Q-L9).
+  touchedAt: at(TODAY, '09:00'),
+  releasedAt: null,
   ...patch,
 });
 const message = (leadId: string, patch: Partial<LeadMessage> = {}): LeadMessage => ({
@@ -240,10 +243,10 @@ describe('lead rules', () => {
 
   it('Leads open to claim: the owner left, or sat on it past the hold — never mine or a patient’s', () => {
     const left = lead({ name: 'Poonam Balar', ownerId: ASHA });
-    const idle = lead({ name: 'Najmus', updatedAt: at('2026-09-29', '10:00') });
-    const mine = lead({ ownerId: VIEWER, updatedAt: at('2026-09-20', '10:00') });
-    const patient = lead({ patientId: PATIENT.id, updatedAt: at('2026-09-20', '10:00') });
-    const recent = lead({ updatedAt: at('2026-10-01', '10:00') });
+    const idle = lead({ name: 'Najmus', touchedAt: at('2026-09-29', '10:00') });
+    const mine = lead({ ownerId: VIEWER, touchedAt: at('2026-09-20', '10:00') });
+    const patient = lead({ patientId: PATIENT.id, touchedAt: at('2026-09-20', '10:00') });
+    const recent = lead({ touchedAt: at('2026-10-01', '10:00') });
     const matches = deriveRuleTasks(
       world({ leads: [left, idle, mine, patient, recent], now: NOW }),
     );

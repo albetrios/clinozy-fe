@@ -64,6 +64,32 @@ export function validateClinicInput<S extends z.ZodType>(
   throw clinicHttpError(422, 'validation', first, fields);
 }
 
+/** The fields a caller actually set — an explicit `undefined` never wipes a default. */
+export function definedFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([, value]) => value !== undefined),
+  ) as Partial<T>;
+}
+
+/** `a` before `b` → negative; plain code-point order (ISO dates, machine values). */
+export const compareText = (a: string, b: string) => Number(a > b) - Number(a < b);
+
+/**
+ * A 422 on `field` when one of `ids` names no record in `known` — a foreign
+ * key the server would refuse.
+ */
+export function refuseUnknownIds(
+  field: string,
+  ids: readonly string[],
+  known: readonly { id: string }[],
+  message: string,
+): void {
+  const knownIds = new Set(known.map((row) => row.id));
+  if (ids.some((id) => !knownIds.has(id))) {
+    throw clinicHttpError(422, 'validation', message, { [field]: [message] });
+  }
+}
+
 /** A list read: server-side filter and sort, and the cursor of the page to fetch. */
 export interface ListQuery<T> {
   where?: (row: T) => boolean;
@@ -82,7 +108,15 @@ export interface FixtureCollection<T extends Row> {
   list(query?: ListQuery<T>): Promise<CursorPage<T>>;
   get(id: string): Promise<T>;
   create(input: CreateInput<T>): Promise<T>;
-  update(id: string, patch: Partial<CreateInput<T>>): Promise<T>;
+  /**
+   * Merge a patch into a live row. `stamp: false` leaves `updatedAt` alone — for
+   * a per-viewer marker (a read receipt) that is no edit of the record.
+   */
+  update(
+    id: string,
+    patch: Partial<CreateInput<T>>,
+    options?: { stamp?: boolean },
+  ): Promise<T>;
   /** Soft delete with the confirm's reason; `restore` undoes it. */
   remove(id: string, reason: DeleteReason, note: string | null): Promise<T>;
   restore(id: string): Promise<T>;
@@ -160,12 +194,12 @@ export function createFixtureCollection<T extends Row>(options: {
       all().push(row);
       return clone(row);
     },
-    async update(id, patch) {
+    async update(id, patch, { stamp = true } = {}) {
       const row = find(id);
       if (row.deletedAt !== null) {
         throw clinicHttpError(404, 'not_found', `${options.resource} not found`);
       }
-      Object.assign(row, patch, { updatedAt: now().toISOString() });
+      Object.assign(row, patch, stamp ? { updatedAt: now().toISOString() } : {});
       return clone(row);
     },
     async remove(id, reason, note) {

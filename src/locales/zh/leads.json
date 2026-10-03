@@ -1,5 +1,15 @@
 {
   "manifest": {
     "title": "潜在客户"
+  },
+  "record": "潜在客户",
+  "toasts": {
+    "created": "已创建潜在客户 {{id}}",
+    "saved": "潜在客户已保存",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "你现在负责 {{name}} · {{owner}} 仍参与其中",
+    "claimedUnowned": "你现在负责 {{name}}",
+    "released": "已释放给团队 · 任何人都可以认领",
+    "assigned": "{{name}} 现在是负责人 · 已通知"
   }
 }
