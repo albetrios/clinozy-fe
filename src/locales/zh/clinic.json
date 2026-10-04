@@ -827,5 +827,59 @@
         "other": "其他"
       }
     }
+  },
+  "contactEditor": {
+    "title": "编辑联系人",
+    "sub": "保存一次 · 用于每条线索、每位患者和每段聊天",
+    "newContact": "新联系人",
+    "steps": {
+      "identity": "身份与联系方式",
+      "preferences": "联系偏好"
+    },
+    "idHelp": "一个联系人 · 线索、患者和聊天共用",
+    "idTooltip": "联系人 ID · 点击复制",
+    "idAria": "复制联系人 ID {{id}}",
+    "idCopied": "已复制联系人 ID {{id}}",
+    "name": "姓名",
+    "namePlaceholder": "全名",
+    "mobiles": "手机号码",
+    "mobileAria": "手机 {{n}}",
+    "primary": "主号码",
+    "primaryTitle": "主号码 · 用于电话、短信和匹配",
+    "setPrimary": "设为主号码",
+    "setPrimaryTitle": "将此号码设为主号码",
+    "primaryChanged": "{{number}} 现在是主号码",
+    "whatsAppOn": "使用 WhatsApp · 点击关闭",
+    "whatsAppOff": "未使用 WhatsApp · 点击开启",
+    "removeNumber": "移除号码",
+    "addNumber": "+ 添加号码",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@账号",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "移除账号",
+    "removeHandleTitle": "移除此账号",
+    "handleRemoved": "已移除 {{handle}}",
+    "addHandle": "+ 添加账号",
+    "defaultChannel": "默认渠道",
+    "defaultChannelHint": "· 自动切换到上次使用的渠道",
+    "custom": "+ 自定义",
+    "customPlaceholder": "输入偏好",
+    "customAria": "自定义偏好",
+    "done": "完成",
+    "updated": "联系人已更新 · 所有地方生效",
+    "preferences": {
+      "noCalls": "不接电话",
+      "sundaysOnly": "仅周日",
+      "weekdaysOnly": "仅工作日",
+      "afterSix": "晚上 6 点以后",
+      "mornings": "上午",
+      "evenings": "傍晚",
+      "weekendsOnly": "仅周末",
+      "gujarati": "古吉拉特语",
+      "hindi": "印地语",
+      "english": "英语",
+      "femaleDoctor": "女医生",
+      "textFirst": "来电前先发消息"
+    }
   }
 }

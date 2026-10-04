@@ -3,15 +3,14 @@ import { type Ref, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
-import { ContactCard } from '@/shared/components/PersonCard/index.ts';
+import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
@@ -23,9 +22,18 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
 import {
+  CONTACT_EDITOR_KEYS,
+  CONTACT_EDITOR_NS,
+  ContactEditor,
+  type ContactEditorValue,
+  contactFieldsOf,
+  contactValueOf,
+} from '@/shared/forms/ContactEditor/index.ts';
+import {
   useDeleteLead,
   useOpenLeadTasks,
   useRestoreLead,
+  useUpdateLead,
 } from '@/shared/hooks/useLeads/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Copy, RefreshCw, UserPlus } from '@/shared/icons/index.ts';
@@ -36,6 +44,7 @@ import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
 import {
   LeadCard,
+  LeadContactStrip,
   LeadInterestsField,
   LeadPeopleField,
   type LeadPeopleFieldProps,
@@ -56,6 +65,8 @@ export interface LeadDetailsPaneProps {
   canDelete: boolean;
   /** "Convert to patient" — shown while it applies (§6.3 Info). */
   onConvert?: () => void;
+  /** The contact card's and the contact editor's band actions. */
+  contactActions?: ContactCardActions;
   /** The lead is gone (removed): the drawer closes. */
   onRemoved: () => void;
   titleRef: Ref<HTMLHeadingElement>;
@@ -152,45 +163,69 @@ function LeadDetailsHeader({
 }
 
 /**
- * The person's strip (H:1758–1767): 38px avatar, name 16/600 and the mobile;
- * the contact card on hover — its Call is the strip's tel link (a link inside
- * the card's trigger would nest two controls).
+ * The person's strip over the cards, and "Edit contact" (its contact card's
+ * pencil) opening the contact editor on the lead's own fields (D32): Done saves
+ * them on the lead now — "Contact updated · applies everywhere" — unless the
+ * name or the primary mobile is missing.
  */
-function LeadContactStrip({
+function LeadPerson({
   lead,
   staffById,
+  canEdit,
+  viewerId,
+  actions,
 }: {
   lead: LeadRecord;
   staffById: ReadonlyMap<string, StaffProfile>;
+  canEdit: boolean;
+  viewerId: string | null;
+  actions: ContactCardActions;
 }) {
+  const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tEditor } = useTranslation(CONTACT_EDITOR_NS);
+  const [editing, setEditing] = useState(false);
+  const save = useUpdateLead({ successMessage: tEditor(CONTACT_EDITOR_KEYS.updated) });
+  const done = (value: ContactEditorValue) => {
+    const fields = contactFieldsOf(value);
+    if (!(fields.name && fields.phone)) {
+      notify.warning(t(LEADS_KEYS.newLead.toasts.missing));
+      return;
+    }
+    setEditing(false);
+    save.mutate({
+      id: lead.id,
+      patch: { name: fields.name, phone: fields.phone, contact: fields.contact },
+      viewerId,
+    });
+  };
   return (
-    <div className="bg-canvas flex flex-none items-center gap-2 rounded-xl border p-2">
-      <ContactCard
-        data={leadContactCardData(lead, staffById, {
+    <>
+      <LeadContactStrip
+        card={leadContactCardData(lead, staffById, {
           role: (role) => tClinic(CLINIC_KEYS.roles[role]),
           source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
         })}
-        triggerClassName="max-w-85 -m-1 rounded-lg p-1 pe-3"
-      >
-        <span className="flex min-w-0 items-center gap-2.5">
-          <PersonAvatar
-            initials={personInitials(lead.name)}
-            tone={lead.patientId ? 'sage' : 'lav'}
-            size="strip"
-            patient={lead.patientId !== null}
-          />
-          <span className="flex min-w-0 flex-col leading-[1.3]">
-            <span className="truncate text-base font-semibold tracking-[-0.01em]">
-              {lead.name}
-            </span>
-            <span className="text-foreground-soft text-caption tabular-nums">
-              {formatClinicPhone(lead.phone)}
-            </span>
-          </span>
-        </span>
-      </ContactCard>
-    </div>
+        name={lead.name}
+        phone={lead.phone}
+        {...actions}
+        onEditContact={canEdit ? () => setEditing(true) : undefined}
+      />
+      <ContactEditor
+        open={editing}
+        value={contactValueOf(lead)}
+        record={{
+          kind: lead.patientId ? 'patient' : 'lead',
+          displayId: displayId.lead(lead.seq),
+        }}
+        onOpenPatientFile={actions.onOpenPatientFile}
+        onNewLead={actions.onNewLead}
+        onNewAppointment={actions.onNewAppointment}
+        onNewPatient={actions.onNewPatient}
+        onDone={done}
+        onClose={() => setEditing(false)}
+      />
+    </>
   );
 }
 
@@ -437,6 +472,7 @@ export function LeadDetailsPane({
   canEdit,
   canDelete,
   onConvert,
+  contactActions = {},
   onRemoved,
   titleRef,
   className,
@@ -454,7 +490,13 @@ export function LeadDetailsPane({
     <div data-slot="surface" className={cn('bg-card flex min-h-0 flex-col', className)}>
       <LeadDetailsHeader lead={lead} titleRef={titleRef} />
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto px-(--room-header-pad-x) pt-4 pb-6">
-        <LeadContactStrip lead={lead} staffById={staffById} />
+        <LeadPerson
+          lead={lead}
+          staffById={staffById}
+          canEdit={canEdit}
+          viewerId={people.viewer?.id ?? null}
+          actions={contactActions}
+        />
         <LeadCard
           label={t(LEADS_KEYS.drawer.cards.details)}
           number={1}

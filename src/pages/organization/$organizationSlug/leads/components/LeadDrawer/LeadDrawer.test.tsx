@@ -18,7 +18,13 @@ import { renderLeadsRoutes } from '../../__tests__/integration/leads-test-router
 import { LeadsPage } from '../../LeadsPage.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({
-  notifyMock: { info: vi.fn(), success: vi.fn(), error: vi.fn(), undo: vi.fn() },
+  notifyMock: {
+    info: vi.fn(),
+    success: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
+    undo: vi.fn(),
+  },
 }));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
@@ -123,6 +129,39 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       ),
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));
+  });
+
+  it('edits the person from the strip’s contact card: Done saves the lead', async () => {
+    const user = userEvent.setup();
+    const { drawer } = await openAnaya();
+    // The strip's own trigger — the chat header carries a contact card too.
+    const trigger = within(drawer)
+      .getAllByRole('button', { name: /Anaya Desai/ })
+      .find((button) => !button.closest('[data-testid="lead-drawer-chat"]'))!;
+    await user.hover(trigger);
+    await user.click(await screen.findByTestId('contact-card-edit'));
+
+    const editor = await screen.findByTestId('contact-editor');
+    expect(within(editor).getByTestId('contact-editor-id')).toHaveTextContent('#2363');
+    expect(within(editor).getByTestId('contact-editor-band')).toHaveClass(
+      'bg-tone-lav-tint',
+    );
+    await user.clear(within(editor).getByTestId('contact-editor-name'));
+    await user.click(within(editor).getByTestId('contact-editor-done'));
+    // A contact needs its name: the editor stays.
+    expect(notifyMock.warning).toHaveBeenCalledWith('Add a name and a 10-digit mobile');
+    await user.type(within(editor).getByTestId('contact-editor-name'), 'Anaya D. Desai');
+    await user.click(within(editor).getByTestId('contact-editor-channel-call'));
+    await user.click(within(editor).getByTestId('contact-editor-done'));
+
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Contact updated · applies everywhere',
+      ),
+    );
+    const saved = await fetchLead(ANAYA);
+    expect(saved.name).toBe('Anaya D. Desai');
+    expect(saved.contact?.defaultChannel).toBe('call');
   });
 
   it('resizes the chat with the arrow keys in the reading direction, double-click resets', async () => {

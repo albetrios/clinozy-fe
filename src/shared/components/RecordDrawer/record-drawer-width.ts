@@ -3,13 +3,16 @@
  * panel is `min(W, 100vw − 56px)`; below `md` it is the full screen.
  */
 
-/** Widths a screen may ask for explicitly (the five that occur in the specs). */
-export const EXPLICIT_DRAWER_WIDTHS = [600, 720, 820, 900, 1040] as const;
+/**
+ * Widths a screen may ask for explicitly: the five `_patterns.md:28` lists and
+ * New lead's 640 (`leads.md:21`, H:5853).
+ */
+export const EXPLICIT_DRAWER_WIDTHS = [600, 640, 720, 820, 900, 1040] as const;
 
 /** A width a screen may pass instead of the automatic one. */
 export type ExplicitDrawerWidth = (typeof EXPLICIT_DRAWER_WIDTHS)[number];
 
-/** Every width W the drawer can take: the automatic three and the explicit five. */
+/** Every width W the drawer can take: the automatic three and the explicit six. */
 export type RecordDrawerWidth = 560 | 680 | 840 | ExplicitDrawerWidth;
 
 /** What the automatic width reads from the drawer's form. */
@@ -63,6 +66,7 @@ export function drawerWidthAt(width: RecordDrawerWidth, viewportWidth: number): 
 export const DRAWER_WIDTH_CLASS: Record<RecordDrawerWidth, string> = {
   560: 'md:w-[min(560px,calc(100vw-56px))]',
   600: 'md:w-[min(600px,calc(100vw-56px))]',
+  640: 'md:w-[min(640px,calc(100vw-56px))]',
   680: 'md:w-[min(680px,calc(100vw-56px))]',
   720: 'md:w-[min(720px,calc(100vw-56px))]',
   820: 'md:w-[min(820px,calc(100vw-56px))]',

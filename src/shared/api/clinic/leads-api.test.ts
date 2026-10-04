@@ -18,6 +18,7 @@ import {
   fetchLead,
   fetchLeadViewer,
   findOpenLeadByPhone,
+  LEAD_CONTACT_SEARCH_LIMIT,
   leadQueryKeys,
   listLeads,
   markLeadRead,
@@ -25,6 +26,7 @@ import {
   restoreLead,
   restoreLeadTeam,
   saveLead,
+  searchLeadContacts,
   undoLeadChange,
   updateLead,
 } from './leads-api.ts';
@@ -220,6 +222,68 @@ describe('the Leads room’s viewer (fetchLeadViewer)', () => {
     expect((await fetchLeadViewer('someone@else.test'))?.id).toBe(RS);
     expect((await fetchLeadViewer('  '))?.id).toBe(RS);
     expect((await fetchLeadViewer(null))?.id).toBe(RS);
+  });
+});
+
+describe('New lead’s contact search (searchLeadContacts)', () => {
+  it('searches from two characters, at most five people', async () => {
+    expect(await searchLeadContacts('r')).toEqual([]);
+    expect(await searchLeadContacts(' ')).toEqual([]);
+    expect(await searchLeadContacts('a')).toHaveLength(0);
+    expect((await searchLeadContacts('sh')).length).toBeLessThanOrEqual(
+      LEAD_CONTACT_SEARCH_LIMIT,
+    );
+  });
+
+  it('finds a patient by name with their last visit, before anyone else', async () => {
+    const patient = clinicFixtures.patients.snapshot()[0]!;
+    const name = [patient.firstName, patient.lastName].filter(Boolean).join(' ');
+    const hits = await searchLeadContacts(name);
+    expect(hits[0]).toMatchObject({
+      kind: 'patient',
+      id: patient.id,
+      seq: patient.seq,
+      name,
+      phone: patient.phone,
+    });
+    const visits = clinicFixtures.appointments
+      .snapshot(
+        (visit) =>
+          visit.patientId === patient.id &&
+          ['checked_in', 'completed'].includes(visit.status) &&
+          visit.date <= '2026-10-03',
+      )
+      .map((visit) => visit.date)
+      .sort();
+    expect(hits[0]).toMatchObject({ lastVisit: visits.at(-1) ?? null });
+  });
+
+  it('finds a person known only as a lead by their mobile, once, with their contact', async () => {
+    const patientPhones = new Set(
+      clinicFixtures.patients
+        .snapshot()
+        .flatMap((patient) => [patient.phone, patient.phone2]),
+    );
+    const lead = clinicFixtures.leads
+      .snapshot((row) => row.patientId === null && !patientPhones.has(row.phone))
+      .sort((a, b) => b.seq - a.seq)[0]!;
+    const hits = await searchLeadContacts(lead.phone.slice(-6));
+    const mine = hits.filter((hit) => hit.kind === 'lead' && hit.phone === lead.phone);
+    expect(mine).toHaveLength(1);
+    expect(mine[0]).toMatchObject({
+      kind: 'lead',
+      name: lead.name,
+      contactThread: lead.isContactThread,
+    });
+  });
+
+  it('never offers a lead whose mobile is a patient’s — the patient stands for them', async () => {
+    const patient = clinicFixtures.patients.snapshot()[0]!;
+    const hits = await searchLeadContacts(patient.phone.slice(-7));
+    expect(hits.some((hit) => hit.kind === 'lead' && hit.phone === patient.phone)).toBe(
+      false,
+    );
+    expect(leadQueryKeys.contactSearch('rh').slice(0, 2)).toEqual(leadQueryKeys.all);
   });
 });
 

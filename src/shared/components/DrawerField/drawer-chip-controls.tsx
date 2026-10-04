@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -13,10 +15,21 @@ export interface DrawerChipOption<T extends string> {
   icon?: AppIcon;
 }
 
+/**
+ * How the chips look: `tone` — the drawers' 24px pills, each in its tone
+ * (H:905); `outline` — 24px pills with a dashed edge, picked on `muted` with a
+ * solid one (the contact preferences, H:1982); `button` — 32px buttons, plain
+ * until picked, then in the tone with its ink edge (the default channel, H:1975).
+ */
+export type DrawerChipsVariant = 'tone' | 'outline' | 'button';
+
 interface DrawerChipsBaseProps<T extends string> {
   /** The group's accessible name — the field's label. */
   label: string;
   options: readonly DrawerChipOption<T>[];
+  variant?: DrawerChipsVariant;
+  /** A control that flows on after the chips, in the same wrapping row ("+ Custom"). */
+  trailing?: ReactNode;
   disabled?: boolean;
   /** Base test id; each chip is `<testId>-<value>`. */
   testId?: string;
@@ -57,6 +70,35 @@ export type DrawerChipsProps<T extends string> =
 const CHIP_CLASS =
   'inline-flex h-6 max-w-full min-w-0 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs leading-none font-medium whitespace-nowrap tabular-nums transition-[color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-50';
 
+/** `button`: 32px, `rounded-lg`, 11px sides, 13px/500 (H:1975). */
+const BUTTON_CLASS =
+  'inline-flex h-8 max-w-full min-w-0 shrink-0 items-center gap-1.5 rounded-lg border px-2.75 text-body font-medium whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50';
+
+/** A chip's colours for its variant, picked or not. */
+function chipColours(
+  variant: DrawerChipsVariant,
+  tone: Tone | undefined,
+  picked: boolean,
+) {
+  if (variant === 'outline') {
+    return picked
+      ? 'bg-muted text-foreground border-foreground'
+      : 'bg-card text-foreground border-dashed border-border-strong hover:bg-muted';
+  }
+  if (variant === 'button') {
+    if (!picked) return 'bg-card text-foreground border-border hover:bg-muted';
+    return tone
+      ? cn(TONE_CLASSES[tone].surface, 'border-current')
+      : 'bg-muted text-foreground border-current';
+  }
+  return cn(
+    tone ? TONE_CLASSES[tone].surface : 'bg-muted text-foreground',
+    picked
+      ? 'border-current ring-1 ring-current'
+      : 'border-transparent hover:border-current',
+  );
+}
+
 /** The next value of a pick-any group: `value` toggled, in the options' order. */
 function toggledPicks<T extends string>(
   options: readonly DrawerChipOption<T>[],
@@ -77,7 +119,15 @@ function toggledPicks<T extends string>(
  * row a group named by the field's label.
  */
 export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
-  const { label, options, disabled, testId, className } = props;
+  const {
+    label,
+    options,
+    variant = 'tone',
+    trailing,
+    disabled,
+    testId,
+    className,
+  } = props;
 
   const isPicked = (value: T) =>
     props.multiple ? props.value.includes(value) : props.value === value;
@@ -104,22 +154,18 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
           <button
             key={option.value}
             type="button"
-            data-slot="pill"
+            // A 32px button is not a pill: the Sharp shape leaves its corners be.
+            data-slot={variant === 'button' ? 'button' : 'pill'}
             aria-pressed={picked}
             disabled={disabled}
             data-testid={testId ? `${testId}-${option.value}` : undefined}
             onClick={() => toggle(option.value)}
             className={cn(
-              CHIP_CLASS,
-              option.tone
-                ? TONE_CLASSES[option.tone].surface
-                : 'bg-muted text-foreground',
-              picked
-                ? 'border-current ring-1 ring-current'
-                : 'border-transparent hover:border-current',
+              variant === 'button' ? BUTTON_CLASS : CHIP_CLASS,
+              chipColours(variant, option.tone, picked),
             )}
           >
-            {picked && props.multiple ? (
+            {picked && props.multiple && variant === 'tone' ? (
               <Check aria-hidden="true" className="size-3 shrink-0" />
             ) : null}
             {option.icon ? (
@@ -129,6 +175,7 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
           </button>
         );
       })}
+      {trailing}
     </div>
   );
 }

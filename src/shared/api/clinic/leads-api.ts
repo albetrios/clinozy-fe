@@ -15,8 +15,10 @@ import {
   type LeadStatus,
 } from './clinic-schema.ts';
 import { addCivilDays, clinicInstant, clinicToday } from './clinic-time.ts';
+import { isCommandSearchQuery, matchesCommandSearch } from './command-search-api.ts';
 import {
   LEAD_DEFAULTS,
+  type LeadContactHit,
   type LeadCreateInput,
   type LeadFields,
   leadFieldsSchema,
@@ -53,6 +55,9 @@ export const leadQueryKeys = {
   viewer: (email: string | null) => [...leadQueryKeys.all, 'viewer', email] as const,
   /** A lead's open tasks — the drawer's Info count. */
   openTasks: (id: string) => [...leadQueryKeys.all, 'open-tasks', id] as const,
+  /** New lead's contact search, per query. */
+  contactSearch: (query: string) =>
+    [...leadQueryKeys.all, 'contact-search', query] as const,
   /** Every list variant — a write invalidates them all. */
   lists: () => [...leadQueryKeys.all, 'list'] as const,
   list: (params: LeadListParams) => [...leadQueryKeys.lists(), params] as const,
@@ -263,6 +268,83 @@ export async function findOpenLeadByPhone(
       !isLeadClosed({ status: lead.status, patientId: null }),
   );
   return match ?? null;
+}
+
+/** New lead's search returns at most this many people (`leads.md:79`). */
+export const LEAD_CONTACT_SEARCH_LIMIT = 5;
+
+/** The visits that count as "last visit": checked in or completed. */
+const VISITED = new Set(['checked_in', 'completed']);
+
+/**
+ * New lead's contact search (KICKOFF §6.3, `leads.md:79`; the plan's "contact
+ * search", REPLACE_WITH_API): from two characters, ⌘K's matching (a name, the
+ * mobile's digits, the display id), at most five people — patients first, with
+ * their last visit, then the people known only as a lead or a chat, once per
+ * mobile and never when that mobile is already a patient's. Newest first.
+ */
+export async function searchLeadContacts(query: string): Promise<LeadContactHit[]> {
+  if (!isCommandSearchQuery(query)) return [];
+  const { clinicFixtures } = await fixtureWorld();
+  const today = clinicToday();
+  const lastVisit = new Map<string, string>();
+  for (const { patientId, status, date } of clinicFixtures.appointments.snapshot()) {
+    if (patientId && VISITED.has(status) && date <= today) {
+      const known = lastVisit.get(patientId);
+      if (!known || date > known) lastVisit.set(patientId, date);
+    }
+  }
+  const allPatients = clinicFixtures.patients.snapshot();
+  const patients: LeadContactHit[] = allPatients
+    .map((patient) => ({
+      patient,
+      name: [patient.firstName, patient.lastName].filter(Boolean).join(' '),
+    }))
+    .filter(({ patient, name }) =>
+      matchesCommandSearch(
+        { names: [name], phone: patient.phone, seq: patient.seq },
+        query,
+      ),
+    )
+    .sort((a, b) => b.patient.seq - a.patient.seq)
+    .map(({ patient, name }) => ({
+      kind: 'patient',
+      id: patient.id,
+      seq: patient.seq,
+      name,
+      phone: patient.phone,
+      lastVisit: lastVisit.get(patient.id) ?? null,
+    }));
+  const patientPhones = new Set(
+    allPatients.flatMap((patient) => [patient.phone, patient.phone2]),
+  );
+  const seen = new Set<string>();
+  const people: LeadContactHit[] = clinicFixtures.leads
+    .snapshot(
+      (lead) =>
+        lead.patientId === null &&
+        !patientPhones.has(lead.phone) &&
+        matchesCommandSearch(
+          { names: [lead.name], phone: lead.phone, seq: lead.seq },
+          query,
+        ),
+    )
+    .sort((a, b) => b.seq - a.seq)
+    .filter((lead) => {
+      if (seen.has(lead.phone)) return false;
+      seen.add(lead.phone);
+      return true;
+    })
+    .map((lead) => ({
+      kind: 'lead',
+      id: lead.id,
+      seq: lead.seq,
+      name: lead.name,
+      phone: lead.phone,
+      contactThread: lead.isContactThread,
+      contact: lead.contact,
+    }));
+  return [...patients, ...people].slice(0, LEAD_CONTACT_SEARCH_LIMIT);
 }
 
 // ── Writes ──

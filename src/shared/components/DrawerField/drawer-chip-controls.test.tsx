@@ -140,6 +140,49 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     await user.click(female);
   });
 
+  it('draws the outline look: dashed until picked, then muted on a solid edge, no check', () => {
+    render(
+      <DrawerChips
+        multiple
+        variant="outline"
+        label="Contact preferences"
+        options={[
+          { value: 'no-calls', label: 'No calls' },
+          { value: 'hindi', label: 'Hindi' },
+        ]}
+        value={['hindi']}
+        onChange={() => {}}
+      />,
+    );
+    const off = screen.getByRole('button', { name: 'No calls' });
+    const on = screen.getByRole('button', { name: 'Hindi' });
+    expect(off).toHaveClass('h-6', 'border-dashed', 'bg-card');
+    expect(on).toHaveClass('bg-muted', 'border-foreground');
+    expect(on).not.toHaveClass('border-dashed');
+    expect(on.querySelector('svg')).toBeNull();
+  });
+
+  it('draws the button look: 32px and plain until picked, then in its tone', () => {
+    render(
+      <DrawerChips
+        variant="button"
+        label="Default channel"
+        options={[
+          { value: 'whatsapp', label: 'WhatsApp', tone: 'sage' },
+          { value: 'call', label: 'Call', tone: 'sky' },
+        ]}
+        value="whatsapp"
+        onChange={() => {}}
+      />,
+    );
+    const on = screen.getByRole('button', { name: 'WhatsApp' });
+    const off = screen.getByRole('button', { name: 'Call' });
+    expect(on).toHaveClass('h-8', 'rounded-lg', 'bg-tone-sage', 'border-current');
+    expect(on).toHaveAttribute('data-slot', 'button');
+    expect(off).toHaveClass('bg-card', 'border-border');
+    expect(off).not.toHaveClass('bg-tone-sky');
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<PickAny />);
     expect(await axe(container)).toHaveNoViolations();

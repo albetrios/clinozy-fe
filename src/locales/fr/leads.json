@@ -192,5 +192,52 @@
       "addedInvolved": "{{name}} ajouté comme impliqué",
       "removedInvolved": "{{name}} retiré des impliqués"
     }
+  },
+  "newLead": {
+    "title": "Nouveau lead",
+    "sub": "Le nom et le mobile suffisent pour commencer",
+    "contact": "Contact",
+    "search": "Rechercher par nom ou mobile",
+    "searchAria": "Rechercher un patient ou un contact existant",
+    "quickStart": "Démarrage rapide",
+    "presets": {
+      "walkIn": "Visite spontanée",
+      "phoneCall": "Appel téléphonique",
+      "instagramDm": "DM Instagram"
+    },
+    "presetHints": {
+      "walkIn": "À l’accueil maintenant · source Visite spontanée, statut Clinique visitée",
+      "phoneCall": "Demande par téléphone",
+      "instagramDm": "DM sur Instagram"
+    },
+    "hits": {
+      "patient": "Patient {{id}} · dernière visite {{date}}",
+      "patientNew": "Patient {{id}}",
+      "lead": "Lead {{id}} · {{phone}}",
+      "contact": "Contact · {{phone}}",
+      "recreate": "Recréer le lead",
+      "useContact": "Utiliser le contact",
+      "today": "Aujourd’hui"
+    },
+    "noMatch": "Aucune correspondance",
+    "more_one": " · +{{count}} autre",
+    "more_many": " · +{{count}} autres",
+    "more_other": " · +{{count}} autres",
+    "change": "Changer",
+    "changeTitle": "Choisir un autre contact",
+    "afterContact": "Après le contact",
+    "detailsSummary": "Source, intérêt et qui s’en occupe",
+    "footer": "Crée ou met à jour un contact",
+    "create": "Créer le lead",
+    "linked": "Lié à {{name}} · {{kind}} · canaux et préférences repris",
+    "toasts": {
+      "pickFirst": "Choisissez ou ajoutez d’abord le contact",
+      "presetApplied": "Préréglage « {{preset}} » appliqué",
+      "existingPatient": "Patient existant {{id}} · le nouveau lead y sera lié",
+      "existingContact": "Contact existant utilisé : {{name}}",
+      "missing": "Ajoutez un nom et un mobile à 10 chiffres",
+      "duplicate": "Ce mobile est déjà sur le lead {{id}}",
+      "open": "Ouvrir"
+    }
   }
 }

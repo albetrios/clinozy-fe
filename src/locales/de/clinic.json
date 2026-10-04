@@ -836,5 +836,59 @@
         "other": "Sonstiges"
       }
     }
+  },
+  "contactEditor": {
+    "title": "Kontakt bearbeiten",
+    "sub": "Einmal gespeichert · für jeden Lead, Patienten und Chat verwendet",
+    "newContact": "Neuer Kontakt",
+    "steps": {
+      "identity": "Identität & Erreichbarkeit",
+      "preferences": "Kontaktpräferenzen"
+    },
+    "idHelp": "Ein Kontakt · von Leads, Patienten und Chats gemeinsam genutzt",
+    "idTooltip": "Kontakt-ID · zum Kopieren klicken",
+    "idAria": "Kontakt-ID {{id}} kopieren",
+    "idCopied": "Kontakt-ID {{id}} kopiert",
+    "name": "Name",
+    "namePlaceholder": "Vollständiger Name",
+    "mobiles": "Mobilnummern",
+    "mobileAria": "Mobilnummer {{n}}",
+    "primary": "Hauptnummer",
+    "primaryTitle": "Hauptnummer · für Anrufe, SMS und den Abgleich verwendet",
+    "setPrimary": "Als Hauptnummer",
+    "setPrimaryTitle": "Diese Nummer zur Hauptnummer machen",
+    "primaryChanged": "{{number}} ist jetzt die Hauptnummer",
+    "whatsAppOn": "Auf WhatsApp · zum Ausschalten klicken",
+    "whatsAppOff": "Nicht auf WhatsApp · zum Einschalten klicken",
+    "removeNumber": "Nummer entfernen",
+    "addNumber": "+ Nummer hinzufügen",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@Benutzername",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "Benutzernamen entfernen",
+    "removeHandleTitle": "Diesen Benutzernamen entfernen",
+    "handleRemoved": "{{handle}} entfernt",
+    "addHandle": "+ Benutzernamen hinzufügen",
+    "defaultChannel": "Standardkanal",
+    "defaultChannelHint": "· wechselt zum zuletzt genutzten Kanal",
+    "custom": "+ Eigene",
+    "customPlaceholder": "Präferenz eingeben",
+    "customAria": "Eigene Präferenz",
+    "done": "Fertig",
+    "updated": "Kontakt aktualisiert · gilt überall",
+    "preferences": {
+      "noCalls": "Keine Anrufe",
+      "sundaysOnly": "Nur sonntags",
+      "weekdaysOnly": "Nur werktags",
+      "afterSix": "Nach 18 Uhr",
+      "mornings": "Vormittags",
+      "evenings": "Abends",
+      "weekendsOnly": "Nur am Wochenende",
+      "gujarati": "Gujarati",
+      "hindi": "Hindi",
+      "english": "Englisch",
+      "femaleDoctor": "Ärztin",
+      "textFirst": "Vor dem Anruf schreiben"
+    }
   }
 }

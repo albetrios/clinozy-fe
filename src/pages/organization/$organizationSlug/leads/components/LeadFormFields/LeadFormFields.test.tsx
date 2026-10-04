@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
 import { ASHA, NIDHI, RIYA } from '../../__tests__/integration/leads-test-data.ts';
 import {
+  LeadContactStrip,
   LeadInterestsField,
   LeadPeopleField,
   LeadProgressField,
@@ -139,5 +140,59 @@ describe('LeadPeopleField', () => {
     await user.type(within(popover).getByRole('textbox', { name: 'Search team' }), 'zzz');
     expect(within(popover).getByText('No match')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('LeadPeopleField in New lead', () => {
+  it('lets anyone be assigned there, where the rules would stop it', async () => {
+    const user = userEvent.setup();
+    const onAssign = vi.fn();
+    const field = (anyoneAssignable: boolean) => (
+      <TooltipProvider>
+        <LeadPeopleField
+          ownerId={RIYA.id}
+          involvedIds={[]}
+          staff={[RIYA, NIDHI]}
+          viewer={NIDHI}
+          anyoneAssignable={anyoneAssignable}
+          onAssign={onAssign}
+          onToggleInvolved={() => {}}
+        />
+      </TooltipProvider>
+    );
+    const { rerender } = render(field(false));
+    await user.click(
+      screen.getByRole('button', { name: 'Assigned and involved people' }),
+    );
+    const popover = await screen.findByRole('dialog');
+    expect(within(popover).getByRole('button', { name: 'Assign' })).toBeDisabled();
+
+    rerender(field(true));
+    await user.click(within(popover).getByRole('button', { name: 'Assign' }));
+    expect(onAssign).toHaveBeenCalledWith(NIDHI);
+  });
+});
+
+describe('LeadContactStrip', () => {
+  it('shows the person — a patient’s badge, the mobile, the extra reach — and its aside', () => {
+    render(
+      <TooltipProvider>
+        <LeadContactStrip
+          card={{ kind: 'patient', name: 'Dharti Galani', reach: [] }}
+          name="Dharti Galani"
+          phone="+918200603212"
+          more=" · +2 more"
+          aside={<button type="button">Change</button>}
+        />
+      </TooltipProvider>,
+    );
+    expect(screen.getByText('Dharti Galani')).toBeInTheDocument();
+    expect(screen.getByText(/\+91 82006 03212/)).toHaveTextContent(
+      '+91 82006 03212 · +2 more',
+    );
+    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument();
+    // A patient's avatar carries the "P" badge.
+    expect(screen.getByText('DG')).toBeInTheDocument();
+    expect(screen.getByText('P')).toBeInTheDocument();
   });
 });

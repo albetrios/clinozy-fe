@@ -174,5 +174,50 @@
       "addedInvolved": "{{name}} を関係者に追加しました",
       "removedInvolved": "{{name}} を関係者から外しました"
     }
+  },
+  "newLead": {
+    "title": "新しいリード",
+    "sub": "名前と携帯番号だけで始められます",
+    "contact": "連絡先",
+    "search": "名前または携帯番号で検索",
+    "searchAria": "既存の患者または連絡先を検索",
+    "quickStart": "クイックスタート",
+    "presets": {
+      "walkIn": "飛び込み",
+      "phoneCall": "電話",
+      "instagramDm": "Instagram の DM"
+    },
+    "presetHints": {
+      "walkIn": "今受付にいます · 流入元 飛び込み、ステータス 来院済み",
+      "phoneCall": "電話での問い合わせ",
+      "instagramDm": "Instagram の DM"
+    },
+    "hits": {
+      "patient": "患者 {{id}} · 最終来院 {{date}}",
+      "patientNew": "患者 {{id}}",
+      "lead": "リード {{id}} · {{phone}}",
+      "contact": "連絡先 · {{phone}}",
+      "recreate": "リードを再作成",
+      "useContact": "連絡先を使う",
+      "today": "今日"
+    },
+    "noMatch": "一致する人はいません",
+    "more_other": " · 他 +{{count}}",
+    "change": "変更",
+    "changeTitle": "別の連絡先を選ぶ",
+    "afterContact": "連絡先のあと",
+    "detailsSummary": "流入元、関心、担当者",
+    "footer": "連絡先を 1 件作成または更新します",
+    "create": "リードを作成",
+    "linked": "{{name}} にリンク · {{kind}} · チャネルと希望を引き継ぎ",
+    "toasts": {
+      "pickFirst": "先に連絡先を選ぶか追加してください",
+      "presetApplied": "プリセット「{{preset}}」を適用しました",
+      "existingPatient": "既存の患者 {{id}} · 新しいリードをリンクします",
+      "existingContact": "既存の連絡先 {{name}} を使います",
+      "missing": "名前と 10 桁の携帯番号を入力してください",
+      "duplicate": "この携帯番号はすでにリード {{id}} にあります",
+      "open": "開く"
+    }
   }
 }

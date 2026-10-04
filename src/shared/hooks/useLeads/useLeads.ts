@@ -1,8 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import { isCommandSearchQuery } from '@/shared/api/clinic/command-search-api.ts';
 import {
   assignLead,
   claimLead,
@@ -22,10 +23,12 @@ import {
   restoreLead,
   restoreLeadTeam,
   saveLead,
+  searchLeadContacts,
   undoLeadChange,
   updateLead,
 } from '@/shared/api/clinic/leads-api.ts';
 import type {
+  LeadContactHit,
   LeadCreateInput,
   LeadListParams,
   LeadPatch,
@@ -43,6 +46,7 @@ import {
   withUndoToast,
 } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -135,6 +139,37 @@ export function useLead(id: string | undefined) {
     queryFn: () => fetchLead(id ?? ''),
     enabled: Boolean(id),
   });
+}
+
+/** New lead's search waits this long after the last keystroke (as ⌘K's, KICKOFF §6.0 Timers). */
+const CONTACT_SEARCH_DEBOUNCE_MS = 250;
+
+/** New lead's contact search as the drawer reads it. */
+export interface LeadContactSearch {
+  /** The people for the query as typed — or, while it loads, for the last one asked. */
+  hits: readonly LeadContactHit[];
+  /** The query as typed has its answer and it is empty: "No existing match". */
+  noMatch: boolean;
+}
+
+/**
+ * New lead's contact search (`searchLeadContacts`): debounced 250ms, from two
+ * characters, up to five people; the previous answer stays up while the next
+ * one loads.
+ */
+export function useLeadContactSearch(query: string): LeadContactSearch {
+  const typed = query.trim();
+  const { debounced, isPending } = useDebouncedSearch(typed, CONTACT_SEARCH_DEBOUNCE_MS);
+  const live = isCommandSearchQuery(typed);
+  const search = useAppQuery({
+    queryKey: leadQueryKeys.contactSearch(debounced.toLowerCase()),
+    queryFn: () => searchLeadContacts(debounced),
+    enabled: isCommandSearchQuery(debounced),
+    placeholderData: keepPreviousData,
+  });
+  const hits = live ? (search.data ?? []) : [];
+  const settled = live && !isPending && debounced === typed && !search.isPlaceholderData;
+  return { hits, noMatch: settled && search.isSuccess && hits.length === 0 };
 }
 
 /** The Unreplied tab's count chip: the viewer's leads with unread messages; idle without a viewer. */

@@ -1,4 +1,11 @@
-import { type ReactNode, type Ref, useCallback, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  type Ref,
+  type RefObject,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
@@ -43,9 +50,13 @@ import {
 const DRAWER_OVERLAY_CLASS =
   'bg-overlay/45 data-[state=open]:animate-backdrop-in data-[state=closed]:animate-none';
 
-/** Full width below `md` with no shadow there, no start border, and the motion. */
+/**
+ * Full width below `md` with no shadow there, no start border, and the motion.
+ * The panel takes focus itself when the focused control leaves (a picked
+ * search hit): it draws no ring for that.
+ */
 const DRAWER_PANEL_CLASS =
-  'w-full gap-0 border-s-0 max-md:shadow-none sm:max-w-none data-[state=open]:animate-drawer-in data-[state=closed]:animate-none';
+  'w-full gap-0 border-s-0 outline-none max-md:shadow-none sm:max-w-none data-[state=open]:animate-drawer-in data-[state=closed]:animate-none';
 
 /** A 24px pill in the strip under the header (status, type, counts). */
 export interface DrawerBadge {
@@ -70,6 +81,16 @@ export interface RecordDrawerProps {
   tag?: string;
   /** Sub line under the title (13px, muted) and the dialog's description. */
   sub?: string;
+  /**
+   * The screen-sized header of New lead (H:1888): a 20px title over a 12.5px
+   * sub line, where the record drawers set 18px over 13px.
+   */
+  largeTitle?: boolean;
+  /**
+   * What takes focus on open instead of the title — New lead's search while it
+   * shows (`leads.md:150`); when the ref is empty the title takes it.
+   */
+  initialFocusRef?: RefObject<HTMLElement | null>;
   badges?: readonly DrawerBadge[];
   /** Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer. */
   quickFill?: readonly QuickFillItem[];
@@ -168,6 +189,7 @@ function DrawerHeader({
   title,
   tag,
   sub,
+  large,
   titleRef,
   close,
   testId,
@@ -175,6 +197,7 @@ function DrawerHeader({
   title: string;
   tag?: string;
   sub?: string;
+  large: boolean;
   titleRef: Ref<HTMLHeadingElement>;
   close: ReactNode;
   testId: string;
@@ -187,7 +210,10 @@ function DrawerHeader({
             ref={titleRef}
             tabIndex={-1}
             data-testid={`${testId}-title`}
-            className="min-w-0 truncate text-lg tracking-[-0.01em] outline-none"
+            className={cn(
+              'min-w-0 truncate tracking-[-0.01em] outline-none',
+              large ? 'text-xl leading-[1.2]' : 'text-lg',
+            )}
           >
             {title}
           </SheetTitle>
@@ -201,7 +227,11 @@ function DrawerHeader({
           ) : null}
         </div>
         {sub ? (
-          <SheetDescription className="text-body truncate">{sub}</SheetDescription>
+          <SheetDescription
+            className={cn('truncate', large ? 'text-detail' : 'text-body')}
+          >
+            {sub}
+          </SheetDescription>
         ) : null}
       </div>
       {close}
@@ -312,11 +342,11 @@ function useDrawerActions(
 }
 
 /**
- * Focus starts on the title (`_patterns.md:38`, §7.2) and goes back to whatever
- * was focused when the drawer opened — URL-driven drawers have no Radix trigger
- * for the sheet to return to.
+ * Focus starts on the title (`_patterns.md:38`, §7.2) — or on what the screen
+ * names instead — and goes back to whatever was focused when the drawer opened:
+ * URL-driven drawers have no Radix trigger for the sheet to return to.
  */
-function useTitleFocus() {
+function useTitleFocus(initialFocusRef?: RefObject<HTMLElement | null>) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   return {
@@ -325,7 +355,7 @@ function useTitleFocus() {
       const previous = document.activeElement;
       returnFocusRef.current = previous instanceof HTMLElement ? previous : null;
       event.preventDefault();
-      titleRef.current?.focus();
+      (initialFocusRef?.current ?? titleRef.current)?.focus();
     },
     onCloseAutoFocus: (event: Event) => {
       const target = returnFocusRef.current;
@@ -351,7 +381,9 @@ function useTitleFocus() {
 export function RecordDrawer(props: RecordDrawerProps) {
   const testId = props.testId ?? RECORD_DRAWER_TEST_ID;
   const phone = useViewportTier() === 'phone';
-  const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useTitleFocus();
+  const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useTitleFocus(
+    props.initialFocusRef,
+  );
   const [currentStep, selectStep] = useOpenStep(props);
   const [itemsMounted, markItems] = useMountedItems(props.open);
   const { guardDialog, requestClose, onSave, onSaveAndAdd } = useDrawerActions(
@@ -390,6 +422,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
           title={props.title}
           tag={props.tag}
           sub={props.sub}
+          large={props.largeTitle ?? false}
           titleRef={titleRef}
           testId={testId}
           close={phone ? close('inside') : null}

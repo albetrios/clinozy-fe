@@ -8,7 +8,12 @@ reopens it. `?name=&phone=` prefill the drawer (⌘K "New lead", the contact car
 (an invalid mobile is dropped; a valid one arrives E.164), and scrubbed from
 telemetry (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership
 (`organization:read`) and the `clinic-leads` module, then `requireOrgStatus`; in-room
-Create is `useClinicAccess`. The drawer itself is built with its own ledger row (L-35).
+Create is `useClinicAccess`. The drawer is `NewLeadDrawer`
+(`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (search, Quick start,
+"New contact" → the shared `ContactEditor`) and Lead details, locked until there is a contact; with
+a prefill or a picked person, the person's strip with "Change" and Lead details alone. "Create lead"
+checks for a name and a 10-digit mobile; a mobile already on an open lead toasts with "Open". The
+new lead is picked out in the list; the drawer closes to `/leads` without the prefill.
 
 ## Files
 
@@ -21,4 +26,6 @@ Create is `useClinicAccess`. The drawer itself is built with its own ledger row 
 ## Test ids
 
 `new-lead-drawer` — the drawer the Leads page opens for this URL (L-35); the route renders
-no element of its own (`tooling/validate/test-ids-allowlist.txt`).
+no element of its own (`tooling/validate/test-ids-allowlist.txt`). Its parts: the record drawer's
+(`new-lead-drawer-save` …) and `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<kind>-<seq>`,
+`new-lead-no-match`, `new-lead-new-contact`, `new-lead-change` (`../leads.constants.ts`).

@@ -174,5 +174,50 @@
       "addedInvolved": "已将 {{name}} 添加为参与者",
       "removedInvolved": "已将 {{name}} 从参与者中移除"
     }
+  },
+  "newLead": {
+    "title": "新线索",
+    "sub": "有姓名和手机号即可开始",
+    "contact": "联系人",
+    "search": "按姓名或手机号搜索",
+    "searchAria": "搜索已有患者或联系人",
+    "quickStart": "快速开始",
+    "presets": {
+      "walkIn": "到店咨询",
+      "phoneCall": "电话",
+      "instagramDm": "Instagram 私信"
+    },
+    "presetHints": {
+      "walkIn": "正在前台 · 来源到店咨询，状态已到诊",
+      "phoneCall": "电话咨询",
+      "instagramDm": "Instagram 私信"
+    },
+    "hits": {
+      "patient": "患者 {{id}} · 上次就诊 {{date}}",
+      "patientNew": "患者 {{id}}",
+      "lead": "线索 {{id}} · {{phone}}",
+      "contact": "联系人 · {{phone}}",
+      "recreate": "重新创建线索",
+      "useContact": "使用联系人",
+      "today": "今天"
+    },
+    "noMatch": "没有匹配项",
+    "more_other": " · 另 +{{count}}",
+    "change": "更换",
+    "changeTitle": "选择其他联系人",
+    "afterContact": "先填联系人",
+    "detailsSummary": "来源、意向和负责人",
+    "footer": "创建或更新一个联系人",
+    "create": "创建线索",
+    "linked": "已关联 {{name}} · {{kind}} · 沿用渠道和偏好",
+    "toasts": {
+      "pickFirst": "请先选择或添加联系人",
+      "presetApplied": "已应用“{{preset}}”预设",
+      "existingPatient": "已有患者 {{id}} · 新线索将与其关联",
+      "existingContact": "使用已有联系人 {{name}}",
+      "missing": "请填写姓名和 10 位手机号",
+      "duplicate": "该手机号已在线索 {{id}} 中",
+      "open": "打开"
+    }
   }
 }

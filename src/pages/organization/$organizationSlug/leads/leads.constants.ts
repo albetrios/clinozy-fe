@@ -189,6 +189,63 @@ export const LEADS_KEYS = {
       removedInvolved: 'drawer.toasts.removedInvolved',
     },
   },
+  /** New lead (KICKOFF §6.3; `leads.md:75–90, 138–150, 246–262`, H:1883–1961). */
+  newLead: {
+    title: 'newLead.title',
+    sub: 'newLead.sub',
+    contact: 'newLead.contact',
+    search: 'newLead.search',
+    searchAria: 'newLead.searchAria',
+    quickStart: 'newLead.quickStart',
+    presets: {
+      walkIn: 'newLead.presets.walkIn',
+      phoneCall: 'newLead.presets.phoneCall',
+      instagramDm: 'newLead.presets.instagramDm',
+    },
+    presetHints: {
+      walkIn: 'newLead.presetHints.walkIn',
+      phoneCall: 'newLead.presetHints.phoneCall',
+      instagramDm: 'newLead.presetHints.instagramDm',
+    },
+    hits: {
+      /** "Patient <id> · last visit <date>". */
+      patient: 'newLead.hits.patient',
+      /** "Patient <id>" — before the first visit. */
+      patientNew: 'newLead.hits.patientNew',
+      /** "Lead <id> · <mobile>". */
+      lead: 'newLead.hits.lead',
+      /** "Contact · <mobile>" — a chat-only person. */
+      contact: 'newLead.hits.contact',
+      /** "Today" — a last visit today. */
+      today: 'newLead.hits.today',
+      recreate: 'newLead.hits.recreate',
+      useContact: 'newLead.hits.useContact',
+    },
+    noMatch: 'newLead.noMatch',
+    /** " · +<n> more". Plural. */
+    more: 'newLead.more',
+    change: 'newLead.change',
+    changeTitle: 'newLead.changeTitle',
+    afterContact: 'newLead.afterContact',
+    detailsSummary: 'newLead.detailsSummary',
+    footer: 'newLead.footer',
+    create: 'newLead.create',
+    /** "Linked to <name> · <kind> · channels and preferences reused". */
+    linked: 'newLead.linked',
+    toasts: {
+      pickFirst: 'newLead.toasts.pickFirst',
+      /** "<preset> preset applied". */
+      presetApplied: 'newLead.toasts.presetApplied',
+      /** "Existing patient <id> · new lead will be linked". */
+      existingPatient: 'newLead.toasts.existingPatient',
+      /** "Using existing contact <name>". */
+      existingContact: 'newLead.toasts.existingContact',
+      missing: 'newLead.toasts.missing',
+      /** "This mobile is already on lead <id>" — a 409, with "Open". */
+      duplicate: 'newLead.toasts.duplicate',
+      open: 'newLead.toasts.open',
+    },
+  },
 } as const;
 
 /** The Leads room's table id — prefixes its list's and toolbar's test ids, and keys its Columns choice. */
@@ -205,4 +262,12 @@ export const LEADS_TEST_IDS = {
   drawerRemove: 'lead-drawer-remove',
   drawerPeople: 'lead-drawer-people',
   drawerResize: 'lead-drawer-resize',
+  /** New lead — the drawer's own parts derive theirs from it (`new-lead-drawer-save` …). */
+  newLead: 'new-lead-drawer',
+  newLeadSearch: 'new-lead-search',
+  newLeadPreset: 'new-lead-preset',
+  newLeadHit: 'new-lead-hit',
+  newLeadNoMatch: 'new-lead-no-match',
+  newLeadNewContact: 'new-lead-new-contact',
+  newLeadChange: 'new-lead-change',
 } as const;

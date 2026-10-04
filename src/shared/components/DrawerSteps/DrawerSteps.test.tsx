@@ -195,6 +195,70 @@ describe('DrawerSteps', () => {
     expect(circle).toHaveTextContent('1');
   });
 
+  it('keeps a locked step shut: its hint, a grey number, the attempt instead of opening', async () => {
+    const user = userEvent.setup();
+    const attempts: string[] = [];
+    const steps: DrawerStep[] = [
+      { id: 'contact', title: 'Contact', content: <p>contact body</p> },
+      {
+        id: 'details',
+        title: 'Lead details',
+        summary: 'Source, interest and who handles it',
+        locked: { hint: 'After contact', onAttempt: () => attempts.push('details') },
+        content: <p>details body</p>,
+      },
+    ];
+    render(
+      <DrawerSteps
+        steps={steps}
+        value="contact"
+        onValueChange={() => {}}
+        tone="lav"
+        testId="nl"
+      />,
+    );
+
+    const locked = screen.getByTestId('nl-step-details-trigger');
+    expect(locked).toHaveAttribute('aria-disabled', 'true');
+    expect(locked).toHaveTextContent('After contact');
+    expect(locked).toHaveTextContent('Source, interest and who handles it');
+    expect(locked.querySelector('[data-slot="pill"]')).toHaveClass(
+      'bg-border',
+      'text-disabled',
+    );
+    // The open step before it offers no "Next" into a locked one.
+    expect(screen.queryByTestId('nl-step-contact-next')).toBeNull();
+
+    await user.click(locked);
+    expect(attempts).toEqual(['details']);
+    expect(screen.getByTestId('nl-step-details')).toHaveAttribute('data-state', 'closed');
+  });
+
+  it('turns a filled-in step’s circle green, open or not', () => {
+    render(
+      <DrawerSteps
+        steps={[
+          {
+            id: 'identity',
+            title: 'Identity & reach',
+            complete: true,
+            content: <p>a</p>,
+          },
+          { id: 'preferences', title: 'Contact preferences', content: <p>b</p> },
+        ]}
+        value="identity"
+        onValueChange={() => {}}
+        tone="stone"
+        testId="ce"
+      />,
+    );
+    const circle = (id: string) =>
+      screen.getByTestId(`ce-step-${id}-trigger`).querySelector('[data-slot="pill"]');
+    expect(circle('identity')).toHaveClass('bg-success');
+    expect(circle('identity')).toHaveTextContent('1');
+    expect(circle('preferences')).not.toHaveClass('bg-success');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<Steps />);
     expect(await axe(container)).toHaveNoViolations();

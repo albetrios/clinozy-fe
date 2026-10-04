@@ -836,5 +836,59 @@
         "other": "Other"
       }
     }
+  },
+  "contactEditor": {
+    "title": "Edit contact",
+    "sub": "Saved once · used by every lead, patient and chat",
+    "newContact": "New contact",
+    "steps": {
+      "identity": "Identity & reach",
+      "preferences": "Contact preferences"
+    },
+    "idHelp": "One contact · shared by leads, patients and chats",
+    "idTooltip": "Contact ID · click to copy",
+    "idAria": "Copy contact ID {{id}}",
+    "idCopied": "Contact ID {{id}} copied",
+    "name": "Name",
+    "namePlaceholder": "Full name",
+    "mobiles": "Mobile numbers",
+    "mobileAria": "Mobile {{n}}",
+    "primary": "Primary",
+    "primaryTitle": "Primary number · used for calls, SMS and matching",
+    "setPrimary": "Set primary",
+    "setPrimaryTitle": "Make this the primary number",
+    "primaryChanged": "{{number}} is now the primary number",
+    "whatsAppOn": "On WhatsApp · click to turn off",
+    "whatsAppOff": "Not on WhatsApp · click to turn on",
+    "removeNumber": "Remove number",
+    "addNumber": "+ Add number",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@handle",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "Remove handle",
+    "removeHandleTitle": "Remove this handle",
+    "handleRemoved": "Removed {{handle}}",
+    "addHandle": "+ Add handle",
+    "defaultChannel": "Default channel",
+    "defaultChannelHint": "· switches to the last channel used",
+    "custom": "+ Custom",
+    "customPlaceholder": "Type a preference",
+    "customAria": "Custom preference",
+    "done": "Done",
+    "updated": "Contact updated · applies everywhere",
+    "preferences": {
+      "noCalls": "No calls",
+      "sundaysOnly": "Sundays only",
+      "weekdaysOnly": "Weekdays only",
+      "afterSix": "After 6 pm",
+      "mornings": "Mornings",
+      "evenings": "Evenings",
+      "weekendsOnly": "Weekends only",
+      "gujarati": "Gujarati",
+      "hindi": "Hindi",
+      "english": "English",
+      "femaleDoctor": "Female doctor",
+      "textFirst": "Text before calling"
+    }
   }
 }

@@ -1,6 +1,7 @@
 export {
   type LeadAssignVars,
   type LeadClaimVars,
+  type LeadContactSearch,
   type LeadConvertVars,
   type LeadDeleteVars,
   type LeadInvolvedVars,
@@ -12,6 +13,7 @@ export {
   useCreateLead,
   useDeleteLead,
   useLead,
+  useLeadContactSearch,
   useLeadList,
   useLeadViewer,
   useMarkLeadRead,

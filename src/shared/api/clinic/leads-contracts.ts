@@ -7,6 +7,7 @@ import {
   readFollowUpFilter,
 } from './clinic-list-filters.ts';
 import {
+  civilDateSchema,
   isoDateTimeSchema,
   LEAD_SOURCE_VALUES,
   leadInterestSchema,
@@ -192,6 +193,39 @@ export type LeadCreateInput = Pick<LeadInput, 'name' | 'phone'> & Partial<LeadIn
 
 /** An update: any of the fields; the server re-checks the merged record. */
 export type LeadPatch = Partial<LeadFields>;
+
+// ── New lead's contact search ──
+
+/**
+ * One hit of New lead's contact search (KICKOFF §6.3, the plan's "contact
+ * search" — Appendix F, REPLACE_WITH_API): a patient ("Patient #3508 · last
+ * visit 24 Sep", "Re-create lead") or a person known only as a lead or a chat
+ * ("Lead #2365 · +91 98250 11241", "Use contact") with their contact fields.
+ */
+export const leadContactHitSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('patient'),
+    id: z.uuid(),
+    seq: z.number().int().nonnegative(),
+    name: z.string(),
+    phone: phoneSchema,
+    /** The last completed or checked-in visit; null before the first. */
+    lastVisit: civilDateSchema.nullable(),
+  }),
+  z.object({
+    kind: z.literal('lead'),
+    id: z.uuid(),
+    seq: z.number().int().nonnegative(),
+    name: z.string(),
+    phone: phoneSchema,
+    /** A chat-only person (`kind = contact_thread`), not a lead of the pipeline. */
+    contactThread: z.boolean(),
+    contact: leadContactSchema.optional(),
+  }),
+]);
+
+/** One contact search hit. */
+export type LeadContactHit = z.infer<typeof leadContactHitSchema>;
 
 // ── List reads ──
 

@@ -183,5 +183,51 @@
       "addedInvolved": "{{name}} als beteiligt hinzugefügt",
       "removedInvolved": "{{name}} aus den Beteiligten entfernt"
     }
+  },
+  "newLead": {
+    "title": "Neuer Lead",
+    "sub": "Name und Mobilnummer genügen für den Anfang",
+    "contact": "Kontakt",
+    "search": "Nach Name oder Mobilnummer suchen",
+    "searchAria": "Vorhandenen Patienten oder Kontakt suchen",
+    "quickStart": "Schnellstart",
+    "presets": {
+      "walkIn": "Laufkundschaft",
+      "phoneCall": "Telefonanruf",
+      "instagramDm": "Instagram-DM"
+    },
+    "presetHints": {
+      "walkIn": "Jetzt am Empfang · Quelle Laufkundschaft, Status Klinik besucht",
+      "phoneCall": "Anfrage per Telefon",
+      "instagramDm": "DM auf Instagram"
+    },
+    "hits": {
+      "patient": "Patient {{id}} · letzter Besuch {{date}}",
+      "patientNew": "Patient {{id}}",
+      "lead": "Lead {{id}} · {{phone}}",
+      "contact": "Kontakt · {{phone}}",
+      "recreate": "Lead neu anlegen",
+      "useContact": "Kontakt verwenden",
+      "today": "Heute"
+    },
+    "noMatch": "Kein vorhandener Treffer",
+    "more_one": " · +{{count}} weitere",
+    "more_other": " · +{{count}} weitere",
+    "change": "Ändern",
+    "changeTitle": "Anderen Kontakt wählen",
+    "afterContact": "Nach dem Kontakt",
+    "detailsSummary": "Quelle, Interesse und wer sich kümmert",
+    "footer": "Legt einen Kontakt an oder aktualisiert ihn",
+    "create": "Lead anlegen",
+    "linked": "Verknüpft mit {{name}} · {{kind}} · Kanäle und Präferenzen übernommen",
+    "toasts": {
+      "pickFirst": "Wählen Sie zuerst den Kontakt oder legen Sie ihn an",
+      "presetApplied": "Vorgabe „{{preset}}“ übernommen",
+      "existingPatient": "Vorhandener Patient {{id}} · der neue Lead wird verknüpft",
+      "existingContact": "Vorhandener Kontakt {{name}} wird verwendet",
+      "missing": "Geben Sie einen Namen und eine 10-stellige Mobilnummer ein",
+      "duplicate": "Diese Mobilnummer gehört bereits zu Lead {{id}}",
+      "open": "Öffnen"
+    }
   }
 }

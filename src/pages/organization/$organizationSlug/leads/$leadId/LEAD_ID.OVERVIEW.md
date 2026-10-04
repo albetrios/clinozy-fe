@@ -10,7 +10,9 @@ deleted" (`S:115`, `S:261`). `/leads/$leadId/edit` is a redirect to this route,
 registered in `app/routes/routeTree.tsx` with no island (`S:25`). Gated like the room —
 membership (`organization:read`) and the `clinic-leads` module, then
 `requireOrgStatus`. The drawer is `pages/organization/$organizationSlug/leads/components/LeadDrawer/` (L-34b), mounted by the Leads
-page over the list.
+page over the list. The person's contact card offers "Edit contact": the shared
+`ContactEditor` (L-35) over the drawer, its "Done" saved on the lead at once
+("Contact updated · applies everywhere").
 
 ## Files
 

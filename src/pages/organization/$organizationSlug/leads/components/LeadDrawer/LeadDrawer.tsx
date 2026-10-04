@@ -16,6 +16,7 @@ import {
   type ChatContact,
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
+import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -52,6 +53,8 @@ export interface LeadDrawerProps {
   canEdit: boolean;
   canDelete: boolean;
   onConvert?: () => void;
+  /** The person's contact card actions — "+ Lead", "+ Appointment", "+ Patient", the file. */
+  contactActions?: ContactCardActions;
   /** Closing settled (nothing unsaved, or "Discard"): back to the list. */
   onClose: () => void;
   /** The phone pane — the Leads page keeps it between leads (Chat first). */
@@ -152,6 +155,7 @@ export function LeadDrawer({
   canEdit,
   canDelete,
   onConvert,
+  contactActions,
   onClose,
   pane,
   onPaneChange,
@@ -201,6 +205,7 @@ export function LeadDrawer({
       canEdit={canEdit}
       canDelete={canDelete}
       onConvert={onConvert}
+      contactActions={contactActions}
       onRemoved={onClose}
       titleRef={titleRef}
       className="h-full"

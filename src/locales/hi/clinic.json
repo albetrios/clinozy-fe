@@ -836,5 +836,59 @@
         "other": "अन्य"
       }
     }
+  },
+  "contactEditor": {
+    "title": "संपर्क संपादित करें",
+    "sub": "एक बार सेव · हर लीड, मरीज़ और चैट में इस्तेमाल",
+    "newContact": "नया संपर्क",
+    "steps": {
+      "identity": "पहचान और संपर्क के तरीके",
+      "preferences": "संपर्क की पसंद"
+    },
+    "idHelp": "एक संपर्क · लीड, मरीज़ों और चैट में साझा",
+    "idTooltip": "संपर्क ID · कॉपी करने के लिए क्लिक करें",
+    "idAria": "संपर्क ID {{id}} कॉपी करें",
+    "idCopied": "संपर्क ID {{id}} कॉपी हो गया",
+    "name": "नाम",
+    "namePlaceholder": "पूरा नाम",
+    "mobiles": "मोबाइल नंबर",
+    "mobileAria": "मोबाइल {{n}}",
+    "primary": "मुख्य",
+    "primaryTitle": "मुख्य नंबर · कॉल, SMS और मिलान के लिए",
+    "setPrimary": "मुख्य बनाएँ",
+    "setPrimaryTitle": "इसे मुख्य नंबर बनाएँ",
+    "primaryChanged": "{{number}} अब मुख्य नंबर है",
+    "whatsAppOn": "WhatsApp पर · बंद करने के लिए क्लिक करें",
+    "whatsAppOff": "WhatsApp पर नहीं · चालू करने के लिए क्लिक करें",
+    "removeNumber": "नंबर हटाएँ",
+    "addNumber": "+ नंबर जोड़ें",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@हैंडल",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "हैंडल हटाएँ",
+    "removeHandleTitle": "यह हैंडल हटाएँ",
+    "handleRemoved": "{{handle}} हटा दिया गया",
+    "addHandle": "+ हैंडल जोड़ें",
+    "defaultChannel": "डिफ़ॉल्ट चैनल",
+    "defaultChannelHint": "· आख़िरी इस्तेमाल किए गए चैनल पर बदल जाता है",
+    "custom": "+ अपनी पसंद",
+    "customPlaceholder": "पसंद लिखें",
+    "customAria": "अपनी पसंद",
+    "done": "हो गया",
+    "updated": "संपर्क अपडेट हुआ · हर जगह लागू",
+    "preferences": {
+      "noCalls": "कॉल नहीं",
+      "sundaysOnly": "सिर्फ़ रविवार",
+      "weekdaysOnly": "सिर्फ़ कार्यदिवस",
+      "afterSix": "शाम 6 बजे के बाद",
+      "mornings": "सुबह",
+      "evenings": "शाम",
+      "weekendsOnly": "सिर्फ़ सप्ताहांत",
+      "gujarati": "गुजराती",
+      "hindi": "हिंदी",
+      "english": "अंग्रेज़ी",
+      "femaleDoctor": "महिला डॉक्टर",
+      "textFirst": "कॉल से पहले मैसेज करें"
+    }
   }
 }

@@ -827,5 +827,59 @@
         "other": "기타"
       }
     }
+  },
+  "contactEditor": {
+    "title": "연락처 편집",
+    "sub": "한 번 저장 · 모든 리드, 환자, 채팅에서 사용",
+    "newContact": "새 연락처",
+    "steps": {
+      "identity": "신원 및 연락 수단",
+      "preferences": "연락 선호"
+    },
+    "idHelp": "하나의 연락처 · 리드, 환자, 채팅이 함께 사용",
+    "idTooltip": "연락처 ID · 클릭하여 복사",
+    "idAria": "연락처 ID {{id}} 복사",
+    "idCopied": "연락처 ID {{id}} 복사됨",
+    "name": "이름",
+    "namePlaceholder": "전체 이름",
+    "mobiles": "휴대폰 번호",
+    "mobileAria": "휴대폰 {{n}}",
+    "primary": "기본",
+    "primaryTitle": "기본 번호 · 전화, SMS, 대조에 사용",
+    "setPrimary": "기본으로 설정",
+    "setPrimaryTitle": "이 번호를 기본 번호로 설정",
+    "primaryChanged": "{{number}}이(가) 이제 기본 번호입니다",
+    "whatsAppOn": "WhatsApp 사용 · 클릭하여 끄기",
+    "whatsAppOff": "WhatsApp 미사용 · 클릭하여 켜기",
+    "removeNumber": "번호 삭제",
+    "addNumber": "+ 번호 추가",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@핸들",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "핸들 삭제",
+    "removeHandleTitle": "이 핸들 삭제",
+    "handleRemoved": "{{handle}} 삭제됨",
+    "addHandle": "+ 핸들 추가",
+    "defaultChannel": "기본 채널",
+    "defaultChannelHint": "· 마지막으로 사용한 채널로 바뀝니다",
+    "custom": "+ 직접 입력",
+    "customPlaceholder": "선호 사항 입력",
+    "customAria": "직접 입력한 선호 사항",
+    "done": "완료",
+    "updated": "연락처 업데이트됨 · 모든 곳에 적용",
+    "preferences": {
+      "noCalls": "전화 사절",
+      "sundaysOnly": "일요일만",
+      "weekdaysOnly": "평일만",
+      "afterSix": "오후 6시 이후",
+      "mornings": "오전",
+      "evenings": "저녁",
+      "weekendsOnly": "주말만",
+      "gujarati": "구자라트어",
+      "hindi": "힌디어",
+      "english": "영어",
+      "femaleDoctor": "여성 의사",
+      "textFirst": "전화 전에 문자"
+    }
   }
 }

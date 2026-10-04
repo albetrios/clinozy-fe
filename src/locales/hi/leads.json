@@ -183,5 +183,51 @@
       "addedInvolved": "{{name}} को शामिल व्यक्ति के रूप में जोड़ा गया",
       "removedInvolved": "{{name}} को शामिल लोगों से हटाया गया"
     }
+  },
+  "newLead": {
+    "title": "नई लीड",
+    "sub": "शुरू करने के लिए नाम और मोबाइल काफ़ी हैं",
+    "contact": "संपर्क",
+    "search": "नाम या मोबाइल से खोजें",
+    "searchAria": "मौजूदा मरीज़ या संपर्क खोजें",
+    "quickStart": "झटपट शुरुआत",
+    "presets": {
+      "walkIn": "सीधे आए",
+      "phoneCall": "फ़ोन कॉल",
+      "instagramDm": "Instagram DM"
+    },
+    "presetHints": {
+      "walkIn": "अभी डेस्क पर · स्रोत सीधे आए, स्थिति क्लिनिक आए",
+      "phoneCall": "फ़ोन पर पूछताछ",
+      "instagramDm": "Instagram पर DM"
+    },
+    "hits": {
+      "patient": "मरीज़ {{id}} · पिछली विज़िट {{date}}",
+      "patientNew": "मरीज़ {{id}}",
+      "lead": "लीड {{id}} · {{phone}}",
+      "contact": "संपर्क · {{phone}}",
+      "recreate": "लीड फिर से बनाएँ",
+      "useContact": "संपर्क इस्तेमाल करें",
+      "today": "आज"
+    },
+    "noMatch": "कोई मौजूदा मेल नहीं",
+    "more_one": " · +{{count}} और",
+    "more_other": " · +{{count}} और",
+    "change": "बदलें",
+    "changeTitle": "कोई दूसरा संपर्क चुनें",
+    "afterContact": "संपर्क के बाद",
+    "detailsSummary": "स्रोत, रुचि और कौन संभालेगा",
+    "footer": "एक संपर्क बनाता या अपडेट करता है",
+    "create": "लीड बनाएँ",
+    "linked": "{{name}} से जुड़ा · {{kind}} · चैनल और पसंद फिर से इस्तेमाल",
+    "toasts": {
+      "pickFirst": "पहले संपर्क चुनें या जोड़ें",
+      "presetApplied": "{{preset}} प्रीसेट लागू हुआ",
+      "existingPatient": "मौजूदा मरीज़ {{id}} · नई लीड जोड़ दी जाएगी",
+      "existingContact": "मौजूदा संपर्क {{name}} इस्तेमाल हो रहा है",
+      "missing": "नाम और 10 अंकों का मोबाइल नंबर जोड़ें",
+      "duplicate": "यह मोबाइल पहले से लीड {{id}} पर है",
+      "open": "खोलें"
+    }
   }
 }

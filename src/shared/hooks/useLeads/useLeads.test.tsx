@@ -19,6 +19,7 @@ import {
   useCreateLead,
   useDeleteLead,
   useLead,
+  useLeadContactSearch,
   useLeadList,
   useLeadViewer,
   useMarkLeadRead,
@@ -161,6 +162,24 @@ describe('useLead', () => {
 
     const idle = renderHook(() => useLead(undefined), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
+  });
+});
+
+describe('useLeadContactSearch', () => {
+  it('searches from two characters after the debounce, and says when nobody matches', async () => {
+    const { result, rerender } = renderHook(({ query }) => useLeadContactSearch(query), {
+      wrapper,
+      initialProps: { query: 'd' },
+    });
+    expect(result.current).toEqual({ hits: [], noMatch: false });
+
+    rerender({ query: 'Dharti' });
+    await waitFor(() => expect(result.current.hits[0]?.name).toBe('Dharti Galani'));
+    expect(result.current.noMatch).toBe(false);
+
+    rerender({ query: 'zzqx' });
+    await waitFor(() => expect(result.current.noMatch).toBe(true));
+    expect(result.current.hits).toEqual([]);
   });
 });
 

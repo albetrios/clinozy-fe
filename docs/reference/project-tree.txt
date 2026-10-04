@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1126 src files · ~601 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1146 src files · ~610 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -864,9 +864,12 @@ clinozy-fe/
 │   │       │   │   ├── __tests__/
 │   │       │   │   │   └── integration/
 │   │       │   │   ├── components/
+│   │       │   │   │   ├── LeadDrawer/
 │   │       │   │   │   ├── LeadFields/
+│   │       │   │   │   ├── LeadFormFields/
 │   │       │   │   │   ├── LeadsTable/
-│   │       │   │   │   └── LeadsToolbar/
+│   │       │   │   │   ├── LeadsToolbar/
+│   │       │   │   │   └── NewLeadDrawer/
 │   │       │   │   ├── create/
 │   │       │   │   │   ├── create.manifest.ts
 │   │       │   │   │   ├── CREATE.OVERVIEW.md
@@ -874,6 +877,7 @@ clinozy-fe/
 │   │       │   │   │   ├── NewLeadPage.tsx
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useLeadDraft/
 │   │       │   │   │   ├── useLeadsDialogRoute/
 │   │       │   │   │   └── useLeadsList/
 │   │       │   │   ├── leads.constants.ts
@@ -1821,6 +1825,13 @@ clinozy-fe/
 │   │   │   │   ├── AuthForm.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [4 test files]
+│   │   │   ├── ContactEditor/
+│   │   │   │   ├── contact-editor-fields.tsx
+│   │   │   │   ├── contact-editor-value.ts
+│   │   │   │   ├── contact-editor.constants.ts
+│   │   │   │   ├── ContactEditor.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [2 test files]
 │   │   │   ├── FormError/
 │   │   │   │   ├── FormError.tsx
 │   │   │   │   ├── index.ts

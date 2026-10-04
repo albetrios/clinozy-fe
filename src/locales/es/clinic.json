@@ -845,5 +845,59 @@
         "other": "Otro"
       }
     }
+  },
+  "contactEditor": {
+    "title": "Editar contacto",
+    "sub": "Se guarda una vez · se usa en cada lead, paciente y chat",
+    "newContact": "Nuevo contacto",
+    "steps": {
+      "identity": "Identidad y contacto",
+      "preferences": "Preferencias de contacto"
+    },
+    "idHelp": "Un contacto · compartido por leads, pacientes y chats",
+    "idTooltip": "ID del contacto · haz clic para copiar",
+    "idAria": "Copiar ID del contacto {{id}}",
+    "idCopied": "ID del contacto {{id}} copiado",
+    "name": "Nombre",
+    "namePlaceholder": "Nombre completo",
+    "mobiles": "Números de móvil",
+    "mobileAria": "Móvil {{n}}",
+    "primary": "Principal",
+    "primaryTitle": "Número principal · para llamadas, SMS y coincidencias",
+    "setPrimary": "Hacer principal",
+    "setPrimaryTitle": "Hacer de este el número principal",
+    "primaryChanged": "{{number}} es ahora el número principal",
+    "whatsAppOn": "En WhatsApp · haz clic para desactivar",
+    "whatsAppOff": "No está en WhatsApp · haz clic para activar",
+    "removeNumber": "Quitar número",
+    "addNumber": "+ Añadir número",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@usuario",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "Quitar usuario",
+    "removeHandleTitle": "Quitar este usuario",
+    "handleRemoved": "{{handle}} quitado",
+    "addHandle": "+ Añadir usuario",
+    "defaultChannel": "Canal predeterminado",
+    "defaultChannelHint": "· cambia al último canal usado",
+    "custom": "+ Personalizada",
+    "customPlaceholder": "Escribe una preferencia",
+    "customAria": "Preferencia personalizada",
+    "done": "Listo",
+    "updated": "Contacto actualizado · se aplica en todas partes",
+    "preferences": {
+      "noCalls": "Sin llamadas",
+      "sundaysOnly": "Solo domingos",
+      "weekdaysOnly": "Solo entre semana",
+      "afterSix": "Después de las 6 p. m.",
+      "mornings": "Mañanas",
+      "evenings": "Tardes",
+      "weekendsOnly": "Solo fines de semana",
+      "gujarati": "Guyaratí",
+      "hindi": "Hindi",
+      "english": "Inglés",
+      "femaleDoctor": "Doctora",
+      "textFirst": "Escribir antes de llamar"
+    }
   }
 }

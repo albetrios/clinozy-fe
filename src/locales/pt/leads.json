@@ -192,5 +192,52 @@
       "addedInvolved": "{{name}} adicionado como envolvido",
       "removedInvolved": "{{name}} removido dos envolvidos"
     }
+  },
+  "newLead": {
+    "title": "Novo lead",
+    "sub": "Nome e celular bastam para começar",
+    "contact": "Contato",
+    "search": "Pesquise por nome ou celular",
+    "searchAria": "Pesquisar paciente ou contato existente",
+    "quickStart": "Início rápido",
+    "presets": {
+      "walkIn": "Sem agendamento",
+      "phoneCall": "Ligação telefônica",
+      "instagramDm": "DM do Instagram"
+    },
+    "presetHints": {
+      "walkIn": "No balcão agora · origem Sem agendamento, status Visitou a clínica",
+      "phoneCall": "Consulta por telefone",
+      "instagramDm": "DM no Instagram"
+    },
+    "hits": {
+      "patient": "Paciente {{id}} · última visita {{date}}",
+      "patientNew": "Paciente {{id}}",
+      "lead": "Lead {{id}} · {{phone}}",
+      "contact": "Contato · {{phone}}",
+      "recreate": "Recriar lead",
+      "useContact": "Usar contato",
+      "today": "Hoje"
+    },
+    "noMatch": "Nenhuma correspondência",
+    "more_one": " · +{{count}} outro",
+    "more_many": " · +{{count}} outros",
+    "more_other": " · +{{count}} outros",
+    "change": "Trocar",
+    "changeTitle": "Escolher outro contato",
+    "afterContact": "Depois do contato",
+    "detailsSummary": "Origem, interesse e quem cuida",
+    "footer": "Cria ou atualiza um contato",
+    "create": "Criar lead",
+    "linked": "Vinculado a {{name}} · {{kind}} · canais e preferências reaproveitados",
+    "toasts": {
+      "pickFirst": "Escolha ou adicione o contato primeiro",
+      "presetApplied": "Predefinição “{{preset}}” aplicada",
+      "existingPatient": "Paciente existente {{id}} · o novo lead será vinculado",
+      "existingContact": "Usando o contato existente {{name}}",
+      "missing": "Adicione um nome e um celular de 10 dígitos",
+      "duplicate": "Este celular já está no lead {{id}}",
+      "open": "Abrir"
+    }
   }
 }

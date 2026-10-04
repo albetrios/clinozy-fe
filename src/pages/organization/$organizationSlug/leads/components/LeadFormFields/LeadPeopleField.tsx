@@ -39,6 +39,8 @@ export interface LeadPeopleFieldProps {
   onToggleInvolved: (person: StaffProfile, involved: boolean) => void;
   /** Without Edit the people only show. */
   readOnly?: boolean;
+  /** New lead: anyone can be assigned (`leads.md:84`) — the assign rules wait for the saved lead. */
+  anyoneAssignable?: boolean;
 }
 
 /** "Online" · "Away" · "Busy" · "Offline", as the row's activity. */
@@ -73,6 +75,7 @@ export function LeadPeopleField({
   onAssign,
   onToggleInvolved,
   readOnly = false,
+  anyoneAssignable = false,
 }: LeadPeopleFieldProps) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
@@ -91,10 +94,14 @@ export function LeadPeopleField({
         `${staffFullName(profile)} ${roleOf(profile)}`.toLowerCase().includes(term)),
   );
   const isOwner = viewer !== null && viewer.id === ownerId;
+  const checkAssign = (profile: StaffProfile) =>
+    anyoneAssignable
+      ? ({ ok: true } as const)
+      : canAssign(viewer?.roles ?? [], profile.roles, isOwner);
   /** The Assign button's tooltip: why it is off, or whom it assigns. */
   const assignWhy = (profile: StaffProfile) => {
     if (profile.id === ownerId) return t(LEADS_KEYS.drawer.popover.currentlyAssigned);
-    const check = canAssign(viewer?.roles ?? [], profile.roles, isOwner);
+    const check = checkAssign(profile);
     if (check.ok) {
       return t(LEADS_KEYS.drawer.popover.assignTo, { name: staffFullName(profile) });
     }
@@ -228,11 +235,7 @@ export function LeadPeopleField({
               own={profile.id === ownerId}
               involved={involvedIds.includes(profile.id)}
               why={assignWhy(profile)}
-              assignOff={
-                profile.id === ownerId ||
-                readOnly ||
-                !canAssign(viewer?.roles ?? [], profile.roles, isOwner).ok
-              }
+              assignOff={profile.id === ownerId || readOnly || !checkAssign(profile).ok}
               roleLine={t(LEADS_KEYS.drawer.popover.roleLine, {
                 role: roleOf(profile),
                 presence: t(presenceKey(profile)),

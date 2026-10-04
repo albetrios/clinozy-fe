@@ -85,6 +85,12 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `lead-drawer-remove`             | Lead drawer: "Remove lead" (opens the reason confirm)                             | `leads/components/LeadDrawer/`                        |
 | `lead-drawer-people`             | Lead drawer: "Assigned & involved" (opens "People on this lead")                  | `leads/components/LeadFormFields/`                    |
 | `lead-drawer-resize`             | Lead drawer: the chat's resize handle (`role="separator"`)                        | `leads/components/LeadDrawer/`                        |
+| `new-lead-search`                | New lead: "Search by name or mobile" (the Contact step)                           | `leads/components/NewLeadDrawer/`                     |
+| `new-lead-preset-<id>`           | New lead: Quick start chip — `walkIn`, `phoneCall`, `instagramDm`                 | `leads/components/NewLeadDrawer/`                     |
+| `new-lead-hit-<kind>-<seq>`      | New lead: a search hit — `patient-3508` ("Re-create lead"), `lead-2365`           | `leads/components/NewLeadDrawer/`                     |
+| `new-lead-no-match`              | New lead: "No existing match"                                                     | `leads/components/NewLeadDrawer/`                     |
+| `new-lead-new-contact`           | New lead: "New contact" (opens the contact editor)                                | `leads/components/NewLeadDrawer/`                     |
+| `new-lead-change`                | New lead: the person's strip — "Change"                                           | `leads/components/NewLeadDrawer/`                     |
 | `appointments-page`              | Clinic room page: Appointments                                                    | `pages/organization/$organizationSlug/appointments/`  |
 | `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)                | `pages/organization/$organizationSlug/appointments/`  |
 | `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |
@@ -388,6 +394,26 @@ New patient, Edit patient and quick-add are one `PatientDrawer`; `<d>` is `patie
 | `<d>-referred-by` / `<d>-notes` / `<d>-consent`                     | Referred by, Notes, the Consent chips                            | PatientDrawer                      |
 | `<d>-follow-up-date` / `<d>-follow-up-time` / `<d>-follow-up-<id>`  | Follow-up pickers and a quick chip (`tomorrow` … `month`)        | PatientDrawer                      |
 | `<d>-photos` / `<d>-photos-input`                                   | First photos drop zone and its file input                        | PatientDrawer                      |
+
+### Contact editor (shared, launch L-35)
+
+The contact editor is one `ContactEditor` (`shared/forms/ContactEditor/`), a child drawer over New
+lead or the lead drawer; `<c>` is `contact-editor`. Its steps are `identity` and `preferences`
+(`<c>-step-<id>`, as the drawer steps above). Rows count from 1.
+
+| Test ID                                                                 | Element                                                            | Source                        |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------- |
+| `<c>`                                                                   | The editor (`role="dialog"`, "Edit contact")                       | `shared/forms/ContactEditor/` |
+| `<c>-close` / `<c>-done`                                                | The floating × · "Done" (the only way anything is kept)            | ContactEditor                 |
+| `<c>-band` / `<c>-new-lead` / `<c>-new-appointment` / `<c>-new-patient` | The tinted band and its "+ Lead" · "+ Appointment" · "+ Patient"   | ContactEditor                 |
+| `<c>-id` / `<c>-name`                                                   | The record's ID chip (click to copy) · Name                        | ContactEditor                 |
+| `<c>-mobile-<n>` / `<c>-primary-<n>` / `<c>-whatsapp-<n>`               | A number, its "★ Primary" / "☆ Set primary", its WhatsApp checkbox | ContactEditor                 |
+| `<c>-remove-number-<n>` / `<c>-add-number`                              | "×" (two numbers or more) · "+ Add number"                         | ContactEditor                 |
+| `<c>-add-instagram` / `<c>-handle-<n>` / `<c>-add-handle`               | "+ Instagram" · a handle · "+ Add handle"                          | ContactEditor                 |
+| `<c>-channel-<channel>`                                                 | Default channel — `whatsapp`, `call`, `sms`, `instagram`           | ContactEditor                 |
+| `<c>-preferences-<slug>`                                                | A preference — `noCalls` … `textFirst`; a custom one `custom-<n>`  | ContactEditor                 |
+| `<c>-custom` / `<c>-custom-input`                                       | "+ Custom" and its "Type a preference" field                       | ContactEditor                 |
+| `<c>-linked`                                                            | "Linked to … · channels and preferences reused" with its Undo      | ContactEditor                 |
 
 ## Items field (shared, launch L-17a)
 

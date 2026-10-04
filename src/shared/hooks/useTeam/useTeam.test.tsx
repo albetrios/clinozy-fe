@@ -264,6 +264,8 @@ describe('useStaffProfiles', () => {
     const { result } = renderHook(() => useStaffProfiles(), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.some((profile) => profile.seq === 12)).toBe(true);
-    expect(client.getQueryData(['clinic', 'staff', 'profiles'])).toBe(result.current.data);
+    expect(client.getQueryData(['clinic', 'staff', 'profiles'])).toBe(
+      result.current.data,
+    );
   });
 });

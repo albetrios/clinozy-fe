@@ -39,9 +39,77 @@ import {
   useLeadsTable,
 } from './components/LeadsTable/index.ts';
 import { LeadsToolbar } from './components/LeadsToolbar/index.ts';
-import { useLeadsDialogRoute } from './hooks/useLeadsDialogRoute/index.ts';
+import {
+  NewLeadDrawer,
+  type NewLeadDrawerProps,
+} from './components/NewLeadDrawer/index.ts';
+import {
+  type LeadsDialogRoute,
+  useLeadsDialogRoute,
+} from './hooks/useLeadsDialogRoute/index.ts';
 import { useLeadsList } from './hooks/useLeadsList/index.ts';
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from './leads.constants.ts';
+
+/** New lead's prefill belongs to its own URL: the list's and a lead's drop it. */
+function withoutPrefill({
+  name: _name,
+  phone: _phone,
+  ...rest
+}: Record<string, unknown>): Record<string, unknown> {
+  return rest;
+}
+
+/** Where a person's contact card goes: their file, a new appointment, a new patient. */
+function personNavigation(
+  navigate: ReturnType<typeof useNavigate>,
+  organizationSlug: string,
+  pathname: string,
+) {
+  return {
+    patient: (recordId: string) =>
+      void navigate(clinicCommandNavigation('patient', { organizationSlug, recordId })),
+    newAppointment: (who: string) =>
+      void navigate(
+        clinicCommandNavigation('newAppointment', {
+          organizationSlug,
+          referrer: referrerFromPath(pathname),
+          search: { who },
+        }),
+      ),
+    newPatient: (lead: LeadRecord) =>
+      void navigate(
+        clinicCommandNavigation('newPatient', {
+          organizationSlug,
+          search: { name: lead.name, phone: lead.phone, fromLead: lead.id },
+        }),
+      ),
+  };
+}
+
+/** New lead over the list while the URL is `/leads/create` and the member may create. */
+function NewLeadDialog({
+  dialog,
+  canCreate,
+  ...props
+}: { dialog: LeadsDialogRoute; canCreate: boolean } & Omit<
+  NewLeadDrawerProps,
+  'prefill'
+>) {
+  if (dialog.kind !== 'create' || !canCreate) return null;
+  const { prefill } = dialog;
+  return (
+    <NewLeadDrawer
+      key={`${prefill.name ?? ''}:${prefill.phone ?? ''}`}
+      prefill={prefill}
+      {...props}
+    />
+  );
+}
+
+/** An action offered only where it applies — the contact card hides the rest. */
+function offer(allowed: boolean, action: () => void): (() => void) | undefined {
+  return allowed ? action : undefined;
+}
 
 /**
  * Leads room (KICKOFF §6.3): the toolbar — views, search, Filters, Columns,
@@ -66,6 +134,8 @@ export function LeadsPage() {
   const assign = useAssignLead();
   const setInvolved = useSetLeadInvolved();
   const convert = useConvertLead();
+  // The lead New lead just created: first in the list and picked out (D28).
+  const [createdId, setCreatedId] = useState<string | null>(null);
   const { rows } = state.list;
   // One "now" per set of rows — the hold and the "Updated" words agree — read
   // again when the rows change (the stored-previous-value pattern, keyed on
@@ -99,6 +169,7 @@ export function LeadsPage() {
     });
   const openLead = (lead: LeadRecord) => {
     if (lead.unreadCount > 0) markRead.mutate(lead.id);
+    setCreatedId(null);
     void navigate({
       ...organizationLead(organizationSlug, lead.id),
       search: true,
@@ -115,10 +186,34 @@ export function LeadsPage() {
     });
   };
 
+  /** The contact card's actions for a lead's person — the rows', the drawer's, the contact editor's. */
+  const goTo = personNavigation(navigate, organizationSlug, pathname);
+  const contactActions = (lead: LeadRecord): ContactCardActions => {
+    const hold = leadHold(
+      { ...lead, ownerGone: ownerGone(lead.ownerId) },
+      LEAD_HOLD_DAYS,
+      now,
+    );
+    const { patientId } = lead;
+    return {
+      onOpenPatientFile: patientId ? () => goTo.patient(patientId) : undefined,
+      onNewLead: offer(canCreate, () => newLead({ name: lead.name, phone: lead.phone })),
+      onNewAppointment: offer(access.can('appointments', 'create'), () =>
+        goTo.newAppointment(lead.id),
+      ),
+      onNewPatient: offer(patientId === null && access.can('patients', 'create'), () =>
+        goTo.newPatient(lead),
+      ),
+      onClaim: offer(canClaim && hold.open && lead.ownerId !== viewerId, () =>
+        claimLead(lead),
+      ),
+    };
+  };
+
   const closeDrawer = () =>
     void navigate({
       ...organizationLeads(organizationSlug),
-      search: true,
+      search: withoutPrefill,
       hash: true,
     });
   const drawerLead = dialog.kind === 'lead' ? dialog.lead : undefined;
@@ -145,6 +240,7 @@ export function LeadsPage() {
             onPaneChange={setPane}
             onClose={closeDrawer}
             onConvert={() => convert.mutate({ id: lead.id, name: lead.name })}
+            contactActions={contactActions(lead)}
             people={{
               onClaim:
                 canClaim && hold.open && !mine && viewerId !== null && state.viewer
@@ -199,42 +295,7 @@ export function LeadsPage() {
       leadHold({ ...lead, ownerGone: ownerGone(lead.ownerId) }, LEAD_HOLD_DAYS, now),
     canClaim,
     onClaim: claimLead,
-    contactActions: (lead): ContactCardActions => {
-      const hold = leadHold(
-        { ...lead, ownerGone: ownerGone(lead.ownerId) },
-        LEAD_HOLD_DAYS,
-        now,
-      );
-      return {
-        onNewLead: canCreate
-          ? () => newLead({ name: lead.name, phone: lead.phone })
-          : undefined,
-        onNewAppointment: access.can('appointments', 'create')
-          ? () =>
-              void navigate(
-                clinicCommandNavigation('newAppointment', {
-                  organizationSlug,
-                  referrer: referrerFromPath(pathname),
-                  search: { who: lead.id },
-                }),
-              )
-          : undefined,
-        onNewPatient:
-          lead.patientId === null && access.can('patients', 'create')
-            ? () =>
-                void navigate(
-                  clinicCommandNavigation('newPatient', {
-                    organizationSlug,
-                    search: { name: lead.name, phone: lead.phone, fromLead: lead.id },
-                  }),
-                )
-            : undefined,
-        onClaim:
-          canClaim && hold.open && lead.ownerId !== viewerId
-            ? () => claimLead(lead)
-            : undefined,
-      };
-    },
+    contactActions,
   };
 
   const empty = state.list.isPending ? (
@@ -284,12 +345,30 @@ export function LeadsPage() {
         table={table}
         context={context}
         list={state.list}
-        openLeadId={leadId ?? null}
+        openLeadId={leadId ?? createdId}
         onOpen={openLead}
         empty={empty}
       />
       <Outlet />
       {drawer}
+      <NewLeadDialog
+        dialog={dialog}
+        canCreate={canCreate}
+        staff={state.staff}
+        viewer={state.viewer}
+        onClose={closeDrawer}
+        onCreated={(lead) => {
+          setCreatedId(lead.id);
+          closeDrawer();
+        }}
+        onOpenLead={(id) =>
+          void navigate({
+            ...organizationLead(organizationSlug, id),
+            search: withoutPrefill,
+            hash: true,
+          })
+        }
+      />
     </section>
   );
 }

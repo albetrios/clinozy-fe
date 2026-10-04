@@ -67,11 +67,14 @@ describe('drawerWidthAt — min(W, 100vw − 56px)', () => {
     expect(drawerWidthAt(1040, 1024)).toBe(968);
     expect(drawerWidthAt(720, 768)).toBe(712);
     expect(drawerWidthAt(680, 768)).toBe(680);
+    // New lead: 640 at 1440, 584 on a 640px-wide window.
+    expect(drawerWidthAt(640, 1440)).toBe(640);
+    expect(drawerWidthAt(640, 640)).toBe(584);
   });
 });
 
 describe('DRAWER_WIDTH_CLASS — the rule as literal Tailwind classes', () => {
-  const widths: RecordDrawerWidth[] = [560, 600, 680, 720, 820, 840, 900, 1040];
+  const widths: RecordDrawerWidth[] = [560, 600, 640, 680, 720, 820, 840, 900, 1040];
 
   it.each(widths)('encodes min(%ipx, 100vw − 56px) from md up', (w) => {
     expect(DRAWER_WIDTH_CLASS[w]).toBe(

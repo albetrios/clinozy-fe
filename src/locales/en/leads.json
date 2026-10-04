@@ -183,5 +183,51 @@
       "addedInvolved": "Added {{name}} as involved",
       "removedInvolved": "Removed {{name}} from involved"
     }
+  },
+  "newLead": {
+    "title": "New lead",
+    "sub": "Name and mobile are enough to start",
+    "contact": "Contact",
+    "search": "Search by name or mobile",
+    "searchAria": "Search existing patient or contact",
+    "quickStart": "Quick start",
+    "presets": {
+      "walkIn": "Walk-in",
+      "phoneCall": "Phone call",
+      "instagramDm": "Instagram DM"
+    },
+    "presetHints": {
+      "walkIn": "At the desk now · source Walk-in, status Clinic visited",
+      "phoneCall": "Enquiry by phone",
+      "instagramDm": "DM on Instagram"
+    },
+    "hits": {
+      "patient": "Patient {{id}} · last visit {{date}}",
+      "patientNew": "Patient {{id}}",
+      "lead": "Lead {{id}} · {{phone}}",
+      "contact": "Contact · {{phone}}",
+      "recreate": "Re-create lead",
+      "useContact": "Use contact",
+      "today": "Today"
+    },
+    "noMatch": "No existing match",
+    "more_one": " · +{{count}} more",
+    "more_other": " · +{{count}} more",
+    "change": "Change",
+    "changeTitle": "Pick a different contact",
+    "afterContact": "After contact",
+    "detailsSummary": "Source, interest and who handles it",
+    "footer": "Creates or updates one contact",
+    "create": "Create lead",
+    "linked": "Linked to {{name}} · {{kind}} · channels and preferences reused",
+    "toasts": {
+      "pickFirst": "Pick or add the contact first",
+      "presetApplied": "{{preset}} preset applied",
+      "existingPatient": "Existing patient {{id}} · new lead will be linked",
+      "existingContact": "Using existing contact {{name}}",
+      "missing": "Add a name and a 10-digit mobile",
+      "duplicate": "This mobile is already on lead {{id}}",
+      "open": "Open"
+    }
   }
 }

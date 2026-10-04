@@ -49,6 +49,18 @@ export interface DrawerStep {
   peek?: readonly DrawerPeekItem[];
   /** Optional head sub line while nothing is missing (open, or without a peek). */
   summary?: string;
+  /**
+   * Not open to the user yet — New lead's "Lead details" before a contact
+   * (H:4135): a grey number, `hint` where "Open" would be, and a tap runs
+   * `onAttempt` (the screen's toast) instead of opening. The step before it
+   * offers no "Next".
+   */
+  locked?: { hint: string; onAttempt: () => void };
+  /**
+   * Its fields are filled: the circle turns green with its number, open or
+   * not (the contact editor's "Identity & reach" once a name is typed, H:4483).
+   */
+  complete?: boolean;
   /** The open step's body — the screen's fields. */
   content: ReactNode;
 }
@@ -198,22 +210,33 @@ function StepCircle({
   status,
   number,
   tone,
+  locked,
+  complete,
 }: {
   status: DrawerStepStatus;
   number: number;
   tone: Tone;
+  locked: boolean;
+  complete: boolean;
 }) {
   let mark: ReactNode = number;
   if (status === 'missing') mark = '!';
   else if (status === 'done') mark = <Check className="size-3" />;
+  let fill: string;
+  // Filled in: green, whether or not it is open.
+  if (complete && status !== 'missing') fill = CIRCLE_CLASS.done;
+  // Open: the section tone's ink as the fill, the numeral in `background`.
+  else if (status === 'open') fill = TONE_CLASSES[tone].fill;
+  // Locked: the later grey with a fainter numeral (H:4135, z200 / z400).
+  else if (locked) fill = 'bg-border text-disabled';
+  else fill = CIRCLE_CLASS[status];
   return (
     <span
       aria-hidden="true"
       data-slot="pill"
       className={cn(
         'text-micro flex size-6 shrink-0 items-center justify-center rounded-full font-semibold tabular-nums',
-        // Open: the section tone's ink as the fill, the numeral in `background`.
-        status === 'open' ? TONE_CLASSES[tone].fill : CIRCLE_CLASS[status],
+        fill,
       )}
     >
       {mark}
@@ -234,6 +257,28 @@ interface StepCardProps {
   registerTrigger: (stepId: string, node: HTMLButtonElement | null) => void;
 }
 
+/**
+ * A step head's words: the sub line — what is missing, else the step's own
+ * summary, which a collapsed card's peek replaces (H:3840–3841) — and the hint
+ * ("Edit" once reached, else "Open"; a locked step's own).
+ */
+function useStepHead(
+  step: DrawerStep,
+  status: DrawerStepStatus,
+  reached: boolean,
+  peeking: boolean,
+) {
+  const { t } = useTranslation(RECORD_DRAWER_NS);
+  let line = peeking ? undefined : step.summary;
+  if (status === 'missing') {
+    line = t(RECORD_DRAWER_KEYS.step.missing, { fields: step.missing ?? [] });
+  }
+  const hint =
+    step.locked?.hint ??
+    t(reached ? RECORD_DRAWER_KEYS.step.edit : RECORD_DRAWER_KEYS.step.open);
+  return { line, hint };
+}
+
 function StepCard({
   step,
   index,
@@ -247,16 +292,10 @@ function StepCard({
 }: StepCardProps) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
   const isOpen = status === 'open';
-  const missing = step.missing ?? [];
+  const { locked } = step;
   const peek = isOpen ? [] : (step.peek ?? []).slice(0, PEEK_LIMIT);
   const id = `${testId}-step-${step.id}`;
-
-  // The head's sub line: what is missing, else the step's own summary — which
-  // a collapsed card's peek replaces (H:3840–3841).
-  let line = isOpen || peek.length === 0 ? step.summary : undefined;
-  if (status === 'missing')
-    line = t(RECORD_DRAWER_KEYS.step.missing, { fields: missing });
-  const hintKey = reached ? RECORD_DRAWER_KEYS.step.edit : RECORD_DRAWER_KEYS.step.open;
+  const { line, hint } = useStepHead(step, status, reached, peek.length > 0);
 
   return (
     <AccordionItem
@@ -269,9 +308,22 @@ function StepCard({
       <AccordionTrigger
         ref={(node) => registerTrigger(step.id, node)}
         data-testid={`${id}-trigger`}
+        aria-disabled={locked ? true : undefined}
+        onClick={(event) => {
+          if (!locked) return;
+          // A handled click never reaches the accordion: the step stays shut.
+          event.preventDefault();
+          locked.onAttempt();
+        }}
         className="items-center justify-start gap-2.5 py-0 text-start hover:no-underline data-[state=closed]:after:absolute data-[state=closed]:after:inset-0 [&>svg]:hidden"
       >
-        <StepCircle status={status} number={index + 1} tone={tone} />
+        <StepCircle
+          status={status}
+          number={index + 1}
+          tone={tone}
+          locked={Boolean(locked)}
+          complete={Boolean(step.complete)}
+        />
         <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
           <span className="text-field text-foreground font-semibold">{step.title}</span>
           {line ? (
@@ -282,7 +334,7 @@ function StepCard({
         </span>
         {isOpen ? null : (
           <span className="text-muted-foreground shrink-0 text-xs font-normal">
-            {t(hintKey)}
+            {hint}
           </span>
         )}
       </AccordionTrigger>
@@ -300,7 +352,7 @@ function StepCard({
 
       <AccordionContent motion="reveal" className="flex flex-col gap-3 pb-0">
         {step.content}
-        {next ? (
+        {next && !next.locked ? (
           <div className="flex justify-end pt-1">
             <Button
               type="button"

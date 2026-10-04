@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-router';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
@@ -109,6 +109,14 @@ describe('RecordDrawer — shell', () => {
     expect(within(screen.getByTestId('pt-body')).getByText('fields')).toBeInTheDocument();
   });
 
+  it('sets a 20px title over a 12.5px sub line for a screen-sized header', async () => {
+    renderWithProviders(<Harness startOpen largeTitle />);
+    expect(await screen.findByTestId('pt-title')).toHaveClass('text-xl');
+    expect(screen.getByText('Add the details, then Create patient')).toHaveClass(
+      'text-detail',
+    );
+  });
+
   it('slides in from the inline end over a 45% backdrop', async () => {
     renderWithProviders(<Harness startOpen />);
 
@@ -201,6 +209,25 @@ describe('RecordDrawer — focus', () => {
 
     await waitFor(() => expect(screen.queryByTestId('pt')).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'New patient' })).toHaveFocus();
+  });
+
+  it('focuses what the screen names instead of the title, while it is there', async () => {
+    function SearchFirst({ withSearch }: { withSearch: boolean }) {
+      const searchRef = useRef<HTMLInputElement>(null);
+      return (
+        <Harness startOpen initialFocusRef={searchRef}>
+          {withSearch ? <input ref={searchRef} aria-label="Search" /> : null}
+        </Harness>
+      );
+    }
+    const { unmount } = renderWithProviders(<SearchFirst withSearch />);
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Search' })).toHaveFocus(),
+    );
+    unmount();
+
+    renderWithProviders(<SearchFirst withSearch={false} />);
+    await waitFor(() => expect(screen.getByTestId('pt-title')).toHaveFocus());
   });
 
   it('keeps Tab inside the drawer', async () => {

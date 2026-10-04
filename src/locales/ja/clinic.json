@@ -827,5 +827,59 @@
         "other": "その他"
       }
     }
+  },
+  "contactEditor": {
+    "title": "連絡先を編集",
+    "sub": "一度保存 · すべてのリード、患者、チャットで使用",
+    "newContact": "新しい連絡先",
+    "steps": {
+      "identity": "本人情報と連絡手段",
+      "preferences": "連絡の希望"
+    },
+    "idHelp": "1 つの連絡先 · リード、患者、チャットで共有",
+    "idTooltip": "連絡先 ID · クリックしてコピー",
+    "idAria": "連絡先 ID {{id}} をコピー",
+    "idCopied": "連絡先 ID {{id}} をコピーしました",
+    "name": "名前",
+    "namePlaceholder": "氏名",
+    "mobiles": "携帯番号",
+    "mobileAria": "携帯番号 {{n}}",
+    "primary": "メイン",
+    "primaryTitle": "メイン番号 · 電話、SMS、照合に使用",
+    "setPrimary": "メインにする",
+    "setPrimaryTitle": "この番号をメインにする",
+    "primaryChanged": "{{number}} をメイン番号にしました",
+    "whatsAppOn": "WhatsApp あり · クリックでオフ",
+    "whatsAppOff": "WhatsApp なし · クリックでオン",
+    "removeNumber": "番号を削除",
+    "addNumber": "+ 番号を追加",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@ユーザー名",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "ユーザー名を削除",
+    "removeHandleTitle": "このユーザー名を削除",
+    "handleRemoved": "{{handle}} を削除しました",
+    "addHandle": "+ ユーザー名を追加",
+    "defaultChannel": "既定のチャネル",
+    "defaultChannelHint": "· 最後に使ったチャネルに切り替わります",
+    "custom": "+ カスタム",
+    "customPlaceholder": "希望を入力",
+    "customAria": "カスタムの希望",
+    "done": "完了",
+    "updated": "連絡先を更新しました · すべてに反映されます",
+    "preferences": {
+      "noCalls": "電話不可",
+      "sundaysOnly": "日曜日のみ",
+      "weekdaysOnly": "平日のみ",
+      "afterSix": "午後 6 時以降",
+      "mornings": "午前中",
+      "evenings": "夕方",
+      "weekendsOnly": "週末のみ",
+      "gujarati": "グジャラート語",
+      "hindi": "ヒンディー語",
+      "english": "英語",
+      "femaleDoctor": "女性医師",
+      "textFirst": "電話の前にメッセージ"
+    }
   }
 }
