@@ -2,5 +2,142 @@
   "manifest": {
     "title": "Rendez-vous"
   },
-  "record": "Rendez-vous"
+  "record": "Rendez-vous",
+  "records": "rendez-vous",
+  "toolbar": {
+    "viewsLabel": "Vue",
+    "views": {
+      "agenda": "Agenda",
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "today": {
+      "day": "Aujourd’hui",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci"
+    },
+    "jump": {
+      "day": "Aller au jour actuel",
+      "week": "Aller à la semaine actuelle",
+      "month": "Aller au mois actuel"
+    },
+    "period": "Période",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "Jour précédent",
+      "week": "Semaine précédente",
+      "month": "Mois précédent"
+    },
+    "next": {
+      "day": "Jour suivant",
+      "week": "Semaine suivante",
+      "month": "Mois suivant"
+    },
+    "search": "Patient, téléphone ou #ID",
+    "searchLabel": "Rechercher des rendez-vous",
+    "newAppointment": "Nouveau rendez-vous"
+  },
+  "filters": {
+    "label": "Filtres des rendez-vous",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "upcoming": "À venir (par défaut)",
+    "dayBooked_one": "{{date}} · {{count}} réservé",
+    "dayBooked_many": "{{date}} · {{count}} réservés",
+    "dayBooked_other": "{{date}} · {{count}} réservés",
+    "appointedTo": "Attribué à",
+    "allDoctors": "Tous les médecins",
+    "doctors_one": "{{count}} médecin",
+    "doctors_many": "{{count}} de médecins",
+    "doctors_other": "{{count}} médecins",
+    "searchTeam": "Rechercher dans l’équipe",
+    "showAll": "Tout afficher",
+    "done": "Terminé",
+    "status": "Statut",
+    "all": "Tous",
+    "active": "Actifs (ouverts)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "Heure",
+      "contact": "Contact",
+      "service": "Prestation",
+      "doctor": "Attribué à",
+      "latest": "Dernière mise à jour",
+      "quickView": "Aperçu rapide",
+      "status": "Statut"
+    },
+    "minutes": "{{minutes}} min",
+    "empty": "Aucun rendez-vous ici · ",
+    "bookOne": "en réserver un",
+    "day": {
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain",
+      "yesterday": "Hier",
+      "inDays_one": "Dans {{count}} jour",
+      "inDays_many": "Dans {{count}} de jours",
+      "inDays_other": "Dans {{count}} jours",
+      "nextWeek": "La semaine prochaine",
+      "inWeeks_one": "Dans {{count}} semaine",
+      "inWeeks_many": "Dans {{count}} de semaines",
+      "inWeeks_other": "Dans {{count}} semaines",
+      "daysAgo_one": "Il y a {{count}} jour",
+      "daysAgo_many": "Il y a {{count}} de jours",
+      "daysAgo_other": "Il y a {{count}} jours"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> confirmé",
+      "confirmed_many": "<n>{{count}}</n> confirmés",
+      "confirmed_other": "<n>{{count}}</n> confirmés",
+      "awaiting_one": "<n>{{count}}</n> en attente de réponse",
+      "awaiting_many": "<n>{{count}}</n> en attente de réponse",
+      "awaiting_other": "<n>{{count}}</n> en attente de réponse",
+      "allSet": "· tout est prêt",
+      "confirmedHint_one": "{{count}} confirmé",
+      "confirmedHint_many": "{{count}} confirmés",
+      "confirmedHint_other": "{{count}} confirmés",
+      "waitingHint_one": "{{count}} en attente d’une réponse",
+      "waitingHint_many": "{{count}} en attente d’une réponse",
+      "waitingHint_other": "{{count}} en attente d’une réponse",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ Plan prêt",
+      "planPending": "○ Plan en attente",
+      "reminderRead": "✓ Rappel lu",
+      "reminderDelivered": "✓ Rappel remis",
+      "reminderSent": "✓ Rappel envoyé",
+      "repliedYes": "✓ A répondu Oui",
+      "moved": "✓ Déplacé",
+      "movedTimes": "✓ Déplacé ×{{times}}",
+      "checkedIn": "✓ Arrivé"
+    },
+    "latestHints": {
+      "planReady": "{{suggestions}} dans les suggestions de prestations",
+      "planPending": "Ouvrez le rendez-vous et ajoutez les suggestions de prestations",
+      "reminderRead": "Rappel lu sur WhatsApp",
+      "reminderDelivered": "Rappel remis",
+      "reminderSent": "Rappel envoyé",
+      "repliedYes": "Confirmé automatiquement par un Oui sur WhatsApp",
+      "moved": "Déplacé depuis {{day}} {{time}}",
+      "checkedIn": "Patient arrivé"
+    },
+    "changeStatus": "Changer le statut · {{status}}"
+  },
+  "status": {
+    "title": "Changer le statut",
+    "now": "Actuel : <b>{{status}}</b>",
+    "nowReason": "Actuel : <b>{{status}} · {{reason}}</b>",
+    "why": "Pourquoi est-il annulé ?",
+    "back": "Retour"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} min",
+    "noUpdate": "Aucune mise à jour pour l’instant",
+    "open": "Ouvrir",
+    "reschedule": "Reprogrammer",
+    "cancel": "Annuler",
+    "tracker": "Statut"
+  }
 }

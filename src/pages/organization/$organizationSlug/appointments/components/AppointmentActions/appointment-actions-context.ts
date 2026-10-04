@@ -1,0 +1,46 @@
+import { createContext, useContext } from 'react';
+
+import type {
+  AppointmentGuardOptions,
+  AppointmentMove,
+} from '@/shared/api/clinic/appointment-status.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { CancelReason } from '@/shared/api/clinic/clinic-schema.ts';
+
+/** What every booking surface of the room can do to a booking (the popover, the card, the blocks). */
+export interface AppointmentActionsValue {
+  /** Edit on Appointments — status moves, cancel, reschedule (Q-A16). */
+  canEdit: boolean;
+  /** Create on Appointments — "New appointment", "book one", Rebook, slot clicks. */
+  canCreate: boolean;
+  /** The guards' clock and access, read when a surface opens. */
+  guardOptions: () => AppointmentGuardOptions;
+  /**
+   * A move from the transition table: a status (optimistic, Undo for 10s) or
+   * "Move to another time" (the drawer in Reschedule). Cancel has its own write.
+   */
+  move: (
+    appointment: AppointmentRow,
+    move: Exclude<AppointmentMove, 'cancelled'>,
+  ) => void;
+  /** Cancel with one of the contract's reasons; "Other" asks for its note first (A-A3). */
+  cancel: (appointment: AppointmentRow, reason: CancelReason) => void;
+  /** The card's next step: Check in · Confirm · Complete, or Rebook — a new booking (Q-A6). */
+  runNext: (appointment: AppointmentRow) => void;
+  /** The booking's drawer. */
+  open: (appointment: AppointmentRow) => void;
+}
+
+/** The room's booking actions, provided by `AppointmentActionsProvider`. */
+export const AppointmentActionsContext = createContext<AppointmentActionsValue | null>(
+  null,
+);
+
+/** The room's booking actions — inside `AppointmentActionsProvider`. */
+export function useAppointmentActions(): AppointmentActionsValue {
+  const value = useContext(AppointmentActionsContext);
+  if (!value) {
+    throw new Error('useAppointmentActions needs an AppointmentActionsProvider');
+  }
+  return value;
+}

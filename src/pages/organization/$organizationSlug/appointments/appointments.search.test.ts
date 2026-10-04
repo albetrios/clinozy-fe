@@ -8,7 +8,6 @@ import {
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 
 import {
-  appointmentListParamsOf,
   APPOINTMENTS_SEARCH_DEFAULTS,
   validateAppointmentCreateSearch,
   validateAppointmentSearch,
@@ -161,39 +160,5 @@ describe('validateAppointmentSearch — the drawer (S:28)', () => {
       from: undefined,
     });
     expect(safeReferrer(validateAppointmentSearch({ from: '//evil' }).from, '')).toBe('');
-  });
-});
-
-describe('appointmentListParamsOf — the URL as the Agenda read', () => {
-  it('applies the defaults: from today on, Active, every doctor', () => {
-    expect(appointmentListParamsOf(validateAppointmentsSearch({}))).toEqual({
-      date: undefined,
-      status: 'active',
-      doctorIds: [],
-      q: undefined,
-      created: undefined,
-      followUp: undefined,
-      sort: undefined,
-      order: undefined,
-    });
-  });
-
-  it('hands the contract its shapes: the doctors as ids, the sort split from its direction', () => {
-    expect(
-      appointmentListParamsOf(
-        validateAppointmentsSearch({
-          date: '2026-10-05',
-          doctor: DOCTOR,
-          status: 'all',
-          sort: 'contact:asc',
-        }),
-      ),
-    ).toMatchObject({
-      date: '2026-10-05',
-      status: 'all',
-      doctorIds: [DOCTOR],
-      sort: 'contact',
-      order: 'asc',
-    });
   });
 });

@@ -2,5 +2,169 @@
   "manifest": {
     "title": "المواعيد"
   },
-  "record": "الموعد"
+  "record": "الموعد",
+  "records": "المواعيد",
+  "toolbar": {
+    "viewsLabel": "العرض",
+    "views": {
+      "agenda": "جدول المواعيد",
+      "day": "يوم",
+      "week": "أسبوع",
+      "month": "شهر"
+    },
+    "today": {
+      "day": "اليوم",
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر"
+    },
+    "jump": {
+      "day": "الانتقال إلى اليوم الحالي",
+      "week": "الانتقال إلى الأسبوع الحالي",
+      "month": "الانتقال إلى الشهر الحالي"
+    },
+    "period": "الفترة",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "اليوم السابق",
+      "week": "الأسبوع السابق",
+      "month": "الشهر السابق"
+    },
+    "next": {
+      "day": "اليوم التالي",
+      "week": "الأسبوع التالي",
+      "month": "الشهر التالي"
+    },
+    "search": "مريض أو هاتف أو #ID",
+    "searchLabel": "البحث في المواعيد",
+    "newAppointment": "موعد جديد"
+  },
+  "filters": {
+    "label": "عوامل تصفية المواعيد",
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "upcoming": "القادمة (افتراضي)",
+    "dayBooked_zero": "{{date}} · لا حجوزات",
+    "dayBooked_one": "{{date}} · حجز واحد",
+    "dayBooked_two": "{{date}} · حجزان",
+    "dayBooked_few": "{{date}} · {{count}} حجوزات",
+    "dayBooked_many": "{{date}} · {{count}} حجزًا",
+    "dayBooked_other": "{{date}} · {{count}} حجز",
+    "appointedTo": "مُسنَد إلى",
+    "allDoctors": "كل الأطباء",
+    "doctors_zero": "لا أطباء",
+    "doctors_one": "طبيب واحد",
+    "doctors_two": "طبيبان",
+    "doctors_few": "{{count}} أطباء",
+    "doctors_many": "{{count}} طبيبًا",
+    "doctors_other": "{{count}} طبيب",
+    "searchTeam": "البحث في الفريق",
+    "showAll": "عرض الكل",
+    "done": "تم",
+    "status": "الحالة",
+    "all": "الكل",
+    "active": "النشطة (المفتوحة)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "الوقت",
+      "contact": "جهة الاتصال",
+      "service": "الخدمة",
+      "doctor": "مُسنَد إلى",
+      "latest": "آخر تحديث",
+      "quickView": "عرض سريع",
+      "status": "الحالة"
+    },
+    "minutes": "{{minutes}} د",
+    "empty": "لا توجد مواعيد هنا · ",
+    "bookOne": "احجز موعدًا",
+    "day": {
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "yesterday": "أمس",
+      "inDays_zero": "بعد {{count}} يوم",
+      "inDays_one": "بعد يوم واحد",
+      "inDays_two": "بعد يومين",
+      "inDays_few": "بعد {{count}} أيام",
+      "inDays_many": "بعد {{count}} يومًا",
+      "inDays_other": "بعد {{count}} يوم",
+      "nextWeek": "الأسبوع القادم",
+      "inWeeks_zero": "بعد {{count}} أسبوع",
+      "inWeeks_one": "بعد أسبوع واحد",
+      "inWeeks_two": "بعد أسبوعين",
+      "inWeeks_few": "بعد {{count}} أسابيع",
+      "inWeeks_many": "بعد {{count}} أسبوعًا",
+      "inWeeks_other": "بعد {{count}} أسبوع",
+      "daysAgo_zero": "منذ {{count}} يوم",
+      "daysAgo_one": "منذ يوم واحد",
+      "daysAgo_two": "منذ يومين",
+      "daysAgo_few": "منذ {{count}} أيام",
+      "daysAgo_many": "منذ {{count}} يومًا",
+      "daysAgo_other": "منذ {{count}} يوم"
+    },
+    "counts": {
+      "confirmed_zero": "<n>{{count}}</n> مؤكَّد",
+      "confirmed_one": "<n>{{count}}</n> مؤكَّد",
+      "confirmed_two": "<n>{{count}}</n> مؤكَّدان",
+      "confirmed_few": "<n>{{count}}</n> مؤكَّدة",
+      "confirmed_many": "<n>{{count}}</n> مؤكَّدًا",
+      "confirmed_other": "<n>{{count}}</n> مؤكَّد",
+      "awaiting_zero": "<n>{{count}}</n> بانتظار الرد",
+      "awaiting_one": "<n>{{count}}</n> بانتظار الرد",
+      "awaiting_two": "<n>{{count}}</n> بانتظار الرد",
+      "awaiting_few": "<n>{{count}}</n> بانتظار الرد",
+      "awaiting_many": "<n>{{count}}</n> بانتظار الرد",
+      "awaiting_other": "<n>{{count}}</n> بانتظار الرد",
+      "allSet": "· كل شيء جاهز",
+      "confirmedHint_zero": "{{count}} مؤكَّد",
+      "confirmedHint_one": "{{count}} مؤكَّد",
+      "confirmedHint_two": "{{count}} مؤكَّدان",
+      "confirmedHint_few": "{{count}} مؤكَّدة",
+      "confirmedHint_many": "{{count}} مؤكَّدًا",
+      "confirmedHint_other": "{{count}} مؤكَّد",
+      "waitingHint_zero": "{{count}} بانتظار الرد",
+      "waitingHint_one": "{{count}} بانتظار الرد",
+      "waitingHint_two": "{{count}} بانتظار الرد",
+      "waitingHint_few": "{{count}} بانتظار الرد",
+      "waitingHint_many": "{{count}} بانتظار الرد",
+      "waitingHint_other": "{{count}} بانتظار الرد",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ الخطة جاهزة",
+      "planPending": "○ الخطة معلّقة",
+      "reminderRead": "✓ قُرئ التذكير",
+      "reminderDelivered": "✓ وصل التذكير",
+      "reminderSent": "✓ أُرسل التذكير",
+      "repliedYes": "✓ ردّ بنعم",
+      "moved": "✓ نُقل",
+      "movedTimes": "✓ نُقل ×{{times}}",
+      "checkedIn": "✓ حضر"
+    },
+    "latestHints": {
+      "planReady": "{{suggestions}} في اقتراحات الخدمات",
+      "planPending": "افتح الموعد وأضف اقتراحات الخدمات",
+      "reminderRead": "قُرئ التذكير على WhatsApp",
+      "reminderDelivered": "وصل التذكير",
+      "reminderSent": "أُرسل التذكير",
+      "repliedYes": "تأكّد تلقائيًا بردّ «نعم» على WhatsApp",
+      "moved": "نُقل من {{day}} {{time}}",
+      "checkedIn": "حضر المريض"
+    },
+    "changeStatus": "تغيير الحالة · {{status}}"
+  },
+  "status": {
+    "title": "تغيير الحالة",
+    "now": "الآن: <b>{{status}}</b>",
+    "nowReason": "الآن: <b>{{status}} · {{reason}}</b>",
+    "why": "ما سبب الإلغاء؟",
+    "back": "رجوع"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} د",
+    "noUpdate": "لا تحديثات بعد",
+    "open": "فتح",
+    "reschedule": "إعادة الجدولة",
+    "cancel": "إلغاء",
+    "tracker": "الحالة"
+  }
 }

@@ -372,6 +372,33 @@ describe('ConfirmDialog — reason variant', () => {
     expect(hint()).toHaveTextContent('Pick a reason to continue');
   });
 
+  it('opens on the caller’s reason, waiting for the note it needs (A-A3)', async () => {
+    const user = userEvent.setup();
+    const { onConfirm, rerender, props } = renderReason({ reason: { initial: 'other' } });
+    expect(screen.getByTestId(confirmReasonTestId('other'))).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    expect(hint()).toHaveTextContent('Add a short note for “Other”');
+
+    // A reopening starts on it again.
+    await user.click(screen.getByTestId(confirmReasonTestId('mistake')));
+    rerender(<ConfirmDialog {...props} open={false} />);
+    rerender(<ConfirmDialog {...props} open />);
+    expect(screen.getByTestId(confirmReasonTestId('other'))).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+
+    await user.type(screen.getByTestId(CONFIRM_TEST_IDS.note), 'Clinic closed early');
+    await user.click(action());
+    await waitFor(() =>
+      expect(onConfirm).toHaveBeenCalledWith(
+        expect.objectContaining({ reason: 'other', note: 'Clinic closed early' }),
+      ),
+    );
+  });
+
   it('soft-deletes through the store, then Undo restores within the window', async () => {
     const user = userEvent.setup();
     const patients = createFixtureCollection({

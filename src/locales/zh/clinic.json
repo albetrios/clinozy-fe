@@ -135,6 +135,12 @@
       "patient": "患者",
       "clinic": "诊所"
     },
+    "cancelConfirm": {
+      "title": "取消此预约？",
+      "record": "{{name}} · {{service}}",
+      "effect": "该时段将被释放，提醒也会停止。在时间过去之前，你可以恢复它。",
+      "action": "取消"
+    },
     "formCancelReasons": {
       "patient_cancelled": "患者已取消",
       "rescheduling_later": "稍后再改期",
@@ -425,6 +431,10 @@
     "open": "打开",
     "hint": "输入至少 2 个字符以搜索患者、潜在客户和发票",
     "empty": "没有匹配项。试试姓名、电话或 #ID。"
+  },
+  "lists": {
+    "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",
+    "retry": "重试"
   },
   "channels": {
     "whatsapp": "WhatsApp",

@@ -1,5 +1,7 @@
 export {
   DataTable,
+  type DataTableGroup,
+  type DataTableGroups,
   type DataTablePhoneLayout,
   type DataTableProps,
 } from './DataTable.tsx';

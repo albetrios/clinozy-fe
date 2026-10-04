@@ -38,7 +38,7 @@ function cycleSort<TData extends RowData, TValue>(
 
 /**
  * A table's header label: 11px/600 uppercase. A sortable column is a 40px
- * button whose click cycles ascending → descending → off, with `ArrowUpDown`
+ * button (the table's `--dt-head-h` when it sets one — the Agenda's 37px) whose click cycles ascending → descending → off, with `ArrowUpDown`
  * at 45% while idle and `ArrowUp` / `ArrowDown` once sorted (H:4167). The sort
  * state lives on the `columnheader` as `aria-sort` (set by `DataTable`).
  */
@@ -54,7 +54,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
     return (
       <div
         className={cn(
-          'flex h-10 min-w-0 items-center',
+          'flex h-[var(--dt-head-h,2.5rem)] min-w-0 items-center',
           alignEnd && 'justify-end text-end',
           className,
         )}
@@ -76,7 +76,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       onClick={() => cycleSort(column)}
       className={cn(
         // The 6px bleed lets the hover fill reach past the column gap (H:678).
-        '-mx-1.5 flex h-10 w-[calc(100%+0.75rem)] min-w-0 items-center gap-1 px-1.5 tracking-[inherit] uppercase transition-colors duration-120',
+        '-mx-1.5 flex h-[var(--dt-head-h,2.5rem)] w-[calc(100%+0.75rem)] min-w-0 items-center gap-1 px-1.5 tracking-[inherit] uppercase transition-colors duration-120',
         'hover:bg-muted-strong',
         sorted ? 'bg-muted-strong text-foreground' : 'text-muted-foreground',
         alignEnd && 'justify-end',

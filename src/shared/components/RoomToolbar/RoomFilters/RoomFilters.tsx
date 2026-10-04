@@ -1,4 +1,5 @@
 import {
+  type ComponentProps,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
@@ -224,22 +225,28 @@ function RangeEnd({
   );
 }
 
+/** Props for {@link RoomDateFilter}: the field, its presets and the pending values. */
+export interface RoomDateFilterProps {
+  /** The URL key the section edits (`created`, `followUp`). */
+  fieldKey: string;
+  kind: RoomDateFilterKind;
+  /** The pending values, `RoomFilterValues` shaped. */
+  values: RoomFilterValues;
+  onChange: Dispatch<SetStateAction<RoomFilterValues>>;
+}
+
 /**
  * A date section: "Any", the presets, "Custom range" — which adds the 32px
  * "From" / "To" date pickers, each bounded by the other and starting today
- * (H:4459). The URL holds a range as `from..to`, either end open.
+ * (H:4459). The URL holds a range as `from..to`, either end open. The Filters
+ * popover's own sections, and a room popover's that composes these parts.
  */
-function DateSection({
+export function RoomDateFilter({
   fieldKey,
   kind,
   values,
   onChange,
-}: {
-  fieldKey: string;
-  kind: RoomDateFilterKind;
-  values: RoomFilterValues;
-  onChange: Dispatch<SetStateAction<RoomFilterValues>>;
-}) {
+}: RoomDateFilterProps) {
   const { t } = useTranslation(ROOM_TOOLBAR_NS);
   const keys = DATE_FILTER_KEYS[kind];
   const chips = DATE_CHIPS[kind];
@@ -452,36 +459,11 @@ export function RoomFilters({
           panel?.querySelector<HTMLElement>('[data-filter-chip]')?.focus();
         }}
         trigger={
-          <button
-            type="button"
-            data-slot="filters-trigger"
+          <RoomFiltersTrigger
+            count={count}
+            open={open}
             data-testid={ids.filtersTrigger}
-            className={cn(
-              'text-body text-foreground hover:bg-muted flex flex-none items-center gap-1.5 border ps-2.5 pe-3 leading-none font-medium transition-colors duration-120',
-              count > 0
-                ? 'bg-muted border-disabled rounded-s-lg'
-                : 'bg-background rounded-lg',
-              open ? 'border-disabled' : count === 0 && 'border-border',
-            )}
-          >
-            <ListFilter aria-hidden="true" className="text-muted-foreground size-3.75" />
-            {t(ROOM_FILTERS_KEYS.title)}
-            {count > 0 ? (
-              <>
-                <span
-                  aria-hidden="true"
-                  data-slot="pill"
-                  className="bg-primary text-primary-foreground text-tiny flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-full px-1.25 font-semibold tabular-nums"
-                >
-                  {count}
-                </span>
-                {/* The space keeps "Filters" and the count apart in the accessible name. */}{' '}
-                <span className="sr-only">
-                  {t(ROOM_FILTERS_KEYS.appliedCount, { count })}
-                </span>
-              </>
-            ) : null}
-          </button>
+          />
         }
       >
         <div className="flex min-h-0 flex-1 flex-col">
@@ -506,7 +488,7 @@ export function RoomFilters({
             {Object.entries(fields).map(([key, field]) => {
               if (field.kind === 'date') {
                 return (
-                  <DateSection
+                  <RoomDateFilter
                     key={key}
                     fieldKey={key}
                     kind={field.presets}
@@ -557,18 +539,85 @@ export function RoomFilters({
         </div>
       </PickerSheet>
       {count > 0 ? (
-        <button
-          type="button"
-          aria-label={t(ROOM_FILTERS_KEYS.clearAllFilters)}
-          title={t(ROOM_FILTERS_KEYS.clearAllFilters)}
-          data-slot="filters-clear"
-          data-testid={ids.filtersClear}
-          onClick={() => apply({})}
-          className="bg-muted text-muted-foreground-strong hover:bg-border hover:text-foreground border-disabled flex w-7.5 flex-none items-center justify-center rounded-e-lg border border-s-0 transition-colors duration-120"
-        >
-          <X aria-hidden="true" className="size-3.75" />
-        </button>
+        <RoomFiltersClear onClear={() => apply({})} testId={ids.filtersClear} />
       ) : null}
     </div>
+  );
+}
+
+/** Props for {@link RoomFiltersTrigger}: the count and whether the popover is open. */
+export interface RoomFiltersTriggerProps extends ComponentProps<'button'> {
+  /** How many filters are on — the dark count pill; none at 0. */
+  count: number;
+  /** The popover is open: its border darkens. */
+  open: boolean;
+}
+
+/**
+ * The Filters button (H:1089, H:1997): `ListFilter` 15px + "Filters" + a dark
+ * 18px count pill while filters are on, when it joins the clear × at its
+ * inline end. 36px; the toolbar's phone row makes it 40px. Hand it to a
+ * `PickerSheet` as its trigger — it takes the open wiring as props.
+ */
+export function RoomFiltersTrigger({
+  count,
+  open,
+  className,
+  ...props
+}: RoomFiltersTriggerProps) {
+  const { t } = useTranslation(ROOM_TOOLBAR_NS);
+  return (
+    <button
+      type="button"
+      // The open wiring a PickerSheet hands it first: its own slot and look win.
+      {...props}
+      data-slot="filters-trigger"
+      className={cn(
+        'text-body text-foreground hover:bg-muted flex flex-none items-center gap-1.5 border ps-2.5 pe-3 leading-none font-medium transition-colors duration-120',
+        count > 0 ? 'bg-muted border-disabled rounded-s-lg' : 'bg-background rounded-lg',
+        open ? 'border-disabled' : count === 0 && 'border-border',
+        className,
+      )}
+    >
+      <ListFilter aria-hidden="true" className="text-muted-foreground size-3.75" />
+      {t(ROOM_FILTERS_KEYS.title)}
+      {count > 0 ? (
+        <>
+          <span
+            aria-hidden="true"
+            data-slot="pill"
+            className="bg-primary text-primary-foreground text-tiny flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-full px-1.25 font-semibold tabular-nums"
+          >
+            {count}
+          </span>
+          {/* The space keeps "Filters" and the count apart in the accessible name. */}{' '}
+          <span className="sr-only">{t(ROOM_FILTERS_KEYS.appliedCount, { count })}</span>
+        </>
+      ) : null}
+    </button>
+  );
+}
+
+/** The 30px × "Clear all filters" joined to the Filters button while filters are on. */
+export function RoomFiltersClear({
+  onClear,
+  testId,
+}: {
+  onClear: () => void;
+  testId: string;
+}) {
+  const { t } = useTranslation(ROOM_TOOLBAR_NS);
+  return (
+    <button
+      type="button"
+      aria-label={t(ROOM_FILTERS_KEYS.clearAllFilters)}
+      title={t(ROOM_FILTERS_KEYS.clearAllFilters)}
+      data-slot="filters-clear"
+      data-testid={testId}
+      onClick={onClear}
+      className="bg-muted text-muted-foreground-strong hover:bg-border hover:text-foreground border-disabled flex w-7.5 flex-none items-center justify-center rounded-e-lg border border-s-0 transition-colors duration-120"
+    >
+      <X aria-hidden="true" className="size-3.75" />
+    </button>
   );
 }

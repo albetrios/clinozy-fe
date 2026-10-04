@@ -2,5 +2,133 @@
   "manifest": {
     "title": "Appointments"
   },
-  "record": "Appointment"
+  "record": "Appointment",
+  "records": "appointments",
+  "toolbar": {
+    "viewsLabel": "View",
+    "views": {
+      "agenda": "Agenda",
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "today": {
+      "day": "Today",
+      "week": "This week",
+      "month": "This month"
+    },
+    "jump": {
+      "day": "Jump to the current day",
+      "week": "Jump to the current week",
+      "month": "Jump to the current month"
+    },
+    "period": "Period",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "Previous day",
+      "week": "Previous week",
+      "month": "Previous month"
+    },
+    "next": {
+      "day": "Next day",
+      "week": "Next week",
+      "month": "Next month"
+    },
+    "search": "Patient, phone or #ID",
+    "searchLabel": "Search appointments",
+    "newAppointment": "New appointment"
+  },
+  "filters": {
+    "label": "Appointment filters",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "upcoming": "Upcoming (default)",
+    "dayBooked_one": "{{date}} · {{count}} booked",
+    "dayBooked_other": "{{date}} · {{count}} booked",
+    "appointedTo": "Appointed to",
+    "allDoctors": "All doctors",
+    "doctors_one": "{{count}} doctor",
+    "doctors_other": "{{count}} doctors",
+    "searchTeam": "Search team",
+    "showAll": "Show all",
+    "done": "Done",
+    "status": "Status",
+    "all": "All",
+    "active": "Active (open)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "Time",
+      "contact": "Contact",
+      "service": "Service",
+      "doctor": "Appointed to",
+      "latest": "Latest update",
+      "quickView": "Quick view",
+      "status": "Status"
+    },
+    "minutes": "{{minutes}} min",
+    "empty": "No appointments here · ",
+    "bookOne": "book one",
+    "day": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday",
+      "inDays_one": "In {{count}} day",
+      "inDays_other": "In {{count}} days",
+      "nextWeek": "Next week",
+      "inWeeks_one": "In {{count}} week",
+      "inWeeks_other": "In {{count}} weeks",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> confirmed",
+      "confirmed_other": "<n>{{count}}</n> confirmed",
+      "awaiting_one": "<n>{{count}}</n> awaiting reply",
+      "awaiting_other": "<n>{{count}}</n> awaiting reply",
+      "allSet": "· all set",
+      "confirmedHint_one": "{{count}} confirmed",
+      "confirmedHint_other": "{{count}} confirmed",
+      "waitingHint_one": "{{count}} waiting for a reply",
+      "waitingHint_other": "{{count}} waiting for a reply",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ Plan ready",
+      "planPending": "○ Plan pending",
+      "reminderRead": "✓ Reminder read",
+      "reminderDelivered": "✓ Reminder delivered",
+      "reminderSent": "✓ Reminder sent",
+      "repliedYes": "✓ Replied Yes",
+      "moved": "✓ Moved",
+      "movedTimes": "✓ Moved ×{{times}}",
+      "checkedIn": "✓ Checked in"
+    },
+    "latestHints": {
+      "planReady": "{{suggestions}} in offering suggestions",
+      "planPending": "Open the appointment and add the offering suggestions",
+      "reminderRead": "Reminder read on WhatsApp",
+      "reminderDelivered": "Reminder delivered",
+      "reminderSent": "Reminder sent",
+      "repliedYes": "Confirmed automatically from a WhatsApp Yes",
+      "moved": "Moved from {{day}} {{time}}",
+      "checkedIn": "Patient checked in"
+    },
+    "changeStatus": "Change status · {{status}}"
+  },
+  "status": {
+    "title": "Change status",
+    "now": "Now: <b>{{status}}</b>",
+    "nowReason": "Now: <b>{{status}} · {{reason}}</b>",
+    "why": "Why is it cancelled?",
+    "back": "Back"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} min",
+    "noUpdate": "No update yet",
+    "open": "Open",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel",
+    "tracker": "Status"
+  }
 }

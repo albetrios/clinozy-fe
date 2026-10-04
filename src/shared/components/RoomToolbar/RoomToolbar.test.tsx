@@ -148,6 +148,41 @@ describe('RoomToolbar — desktop and tablet', () => {
     expect(row.querySelector('span[aria-hidden="true"].flex-1')).not.toBeNull();
   });
 
+  it('puts a period right after the tabs, which then keep their width', async () => {
+    renderToolbar({ period: <button type="button">Today</button> });
+    const row = await screen.findByTestId('patients-toolbar');
+    const tabs = within(row)
+      .getByRole('tablist')
+      .closest('[data-slot="room-toolbar-tabs"]');
+    const period = row.querySelector('[data-slot="room-toolbar-period"]');
+    expect(tabs?.nextElementSibling).toBe(period);
+    expect(period).toContainElement(within(row).getByRole('button', { name: 'Today' }));
+    expect(tabs?.className).toContain('md:max-w-max');
+    expect(tabs?.className).not.toContain('md:basis-0');
+    // The free space follows the period; on a phone it takes its own row.
+    const spacer = period?.nextElementSibling;
+    expect(spacer).toHaveAttribute('aria-hidden', 'true');
+    expect(spacer?.className).toContain('flex-1');
+    expect(period?.className).toContain('max-md:order-4');
+  });
+
+  it('puts a room’s own Filters in the Filters place, instead of the shared one', async () => {
+    tier.current = 'phone';
+    renderToolbar({ filtersSlot: <button type="button">Room filters</button> });
+    const row = await screen.findByTestId('patients-toolbar');
+    expect(screen.queryByTestId('patients-filters-trigger')).toBeNull();
+    const slot = row.querySelector('[data-slot="room-toolbar-filters"]');
+    expect(slot).toContainElement(
+      within(row).getByRole('button', { name: 'Room filters' }),
+    );
+    // The Filters' phone placement: row 1, after the search.
+    expect(slot?.className).toContain('max-md:order-2');
+    expect(
+      screen.getByTestId('patients-search').compareDocumentPosition(slot as Node) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = renderToolbar();
     await screen.findByTestId('patients-toolbar');

@@ -1,5 +1,5 @@
 import type { QueryKey } from '@tanstack/react-query';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
@@ -120,6 +120,11 @@ interface PickerBaseProps<T> {
   maxChips?: number;
   /** Replaces the default trigger; must render a focusable button that accepts props. */
   renderTrigger?: (state: PickerTriggerState<T>) => ReactElement;
+  /**
+   * A footer under the list (the Day doctor picker's "Show all" · "Done",
+   * `appointments.md:191`); `close` shuts the list and returns focus.
+   */
+  footer?: (close: () => void) => ReactNode;
   /** Notified when the list opens or closes. */
   onOpenChange?: (open: boolean) => void;
   /** Base test id (default `picker`); the panel, search and options derive from it. */

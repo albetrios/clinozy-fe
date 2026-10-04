@@ -11,7 +11,10 @@ const BADGE_TEXT = 'text-[length:calc(var(--text-xs)*2/3)]';
 
 /**
  * The avatar sizes the design draws, named for where they sit, with their
- * initials and badge geometry: `chip` 22px in team chips, stacks and picker
+ * initials and badge geometry: `disc` 16px — a calendar block's doctor
+ * initials (7px, H:2063); `line` 18px inside a line of text — the appointment
+ * card's doctor, a calendar block's person (8px, 10px badge, H:2063, H:2093);
+ * `chip` 22px in team chips, stacks and picker
  * trigger chips (9px initials, H:1741); `option` 26px in picker rows (9.5px,
  * 12px badge, H:2891); `cell` 32px in table person cells (11px, 14px "P"
  * badge, H:683); `header` 34px in the chat column's contact header (11.5px,
@@ -20,6 +23,20 @@ const BADGE_TEXT = 'text-[length:calc(var(--text-xs)*2/3)]';
  * sub-scale sizes derive from `--text-xs` so the Type scale axis moves them.
  */
 const AVATAR_SIZES = {
+  disc: {
+    root: 'size-4',
+    initials: 'text-[length:calc(var(--text-xs)*7/12)]',
+    badge:
+      'size-2.5 -end-0.75 -bottom-0.75 border-[1.5px] text-[length:calc(var(--text-xs)*11/24)]',
+    presence: 'size-2 -end-0.5 -bottom-0.5',
+  },
+  line: {
+    root: 'size-4.5',
+    initials: BADGE_TEXT,
+    badge:
+      'size-2.5 -end-0.75 -bottom-0.75 border-[1.5px] text-[length:calc(var(--text-xs)*11/24)]',
+    presence: 'size-2 -end-0.5 -bottom-0.5',
+  },
   chip: {
     root: 'size-5.5',
     initials: 'text-[length:calc(var(--text-xs)*0.75)]',
@@ -58,7 +75,7 @@ const AVATAR_SIZES = {
   },
 } as const;
 
-/** One of the design's avatar sizes: 22, 26, 32, 34, 36 or 48px. */
+/** One of the design's avatar sizes: 16, 18, 22, 26, 32, 34, 36 or 48px. */
 export type PersonAvatarSize = keyof typeof AVATAR_SIZES;
 
 /** Presence as a person card shows it (`presence-online`, else `border-strong`). */

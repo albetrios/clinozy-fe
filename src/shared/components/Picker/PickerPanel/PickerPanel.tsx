@@ -1,4 +1,10 @@
-import type { KeyboardEvent, KeyboardEventHandler, Ref, UIEventHandler } from 'react';
+import type {
+  KeyboardEvent,
+  KeyboardEventHandler,
+  ReactNode,
+  Ref,
+  UIEventHandler,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -58,6 +64,8 @@ export interface PickerPanelProps<T> {
   create?: PickerPanelAction;
   /** The footer's "<New thing> · “<query>”" · "full details". */
   createFull?: PickerPanelAction;
+  /** The caller's own footer under the list ("Show all" · "Done"). */
+  footer?: ReactNode;
   onPick: (row: PickerOptionRow<T>) => void;
   onKeyDown: KeyboardEventHandler<HTMLDivElement>;
   onScroll: UIEventHandler<HTMLDivElement>;
@@ -218,6 +226,7 @@ export function PickerPanel<T>({
   empty,
   create,
   createFull,
+  footer,
   onPick,
   onKeyDown,
   onScroll,
@@ -345,6 +354,11 @@ export function PickerPanel<T>({
               {t(PICKER_KEYS.fullDetails)}
             </span>
           </Button>
+        </div>
+      ) : null}
+      {footer ? (
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t px-2 py-1.5">
+          {footer}
         </div>
       ) : null}
     </Command>

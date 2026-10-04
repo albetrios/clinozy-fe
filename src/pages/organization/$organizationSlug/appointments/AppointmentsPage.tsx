@@ -1,33 +1,51 @@
 import { Outlet } from '@tanstack/react-router';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from './appointments.constants.ts';
+import { AppointmentActionsProvider } from './components/AppointmentActions/index.ts';
+import { AppointmentsAgenda } from './components/AppointmentsAgenda/index.ts';
+import { AppointmentsToolbar } from './components/AppointmentsToolbar/index.ts';
 import { useAppointmentsDialogRoute } from './hooks/useAppointmentsDialogRoute/index.ts';
 import { useAppointmentsView } from './hooks/useAppointmentsView/index.ts';
 
 /**
- * Appointments room. Its dialog routes — New appointment (`create/`) and the
- * appointment drawer (`$appointmentId/`) — render nothing: this page reads the
- * URL and opens the appointment form over itself (the form lands with L-38);
- * the route already answers a dead link with the page and "Appointment not
- * found". The view follows the URL (D27; Week renders Day on a phone, the URL
- * replaced to match). The views themselves are built in their own rows
- * (L-36b, L-37).
+ * Appointments room (KICKOFF §6.4). The toolbar, then the view in its card:
+ * the Agenda (L-36b) or the Day, Week and Month calendars (L-37). Its dialog
+ * routes — New appointment (`create/`) and the appointment drawer
+ * (`$appointmentId/`) — render nothing: this page reads the URL and opens the
+ * appointment form over itself (the form lands with L-38); the route already
+ * answers a dead link with the page and "Appointment not found". The view
+ * follows the URL (D27; Week renders Day on a phone, the URL replaced to
+ * match).
  */
 export function AppointmentsPage() {
   const { t } = useTranslation(APPOINTMENTS_NS);
   const view = useAppointmentsView();
+  const panelId = useId();
   useAppointmentsDialogRoute();
   return (
-    <section
-      data-testid="appointments-page"
-      data-view={view}
-      className="flex min-h-0 flex-1 flex-col"
-    >
-      <h1 className="sr-only md:not-sr-only md:px-(--room-header-pad-x) md:pt-4 md:text-xl md:font-semibold">
-        {t(APPOINTMENTS_KEYS.manifest.title)}
-      </h1>
-      <Outlet />
-    </section>
+    <AppointmentActionsProvider>
+      <TooltipProvider>
+        <section
+          data-testid="appointments-page"
+          data-view={view}
+          className="bg-canvas flex min-h-0 flex-1 flex-col"
+        >
+          <AppointmentsToolbar view={view} panelId={panelId} />
+          <div
+            id={panelId}
+            role="tabpanel"
+            aria-label={t(APPOINTMENTS_KEYS.toolbar.views[view])}
+            className="m-(--room-card-margin) flex min-h-0 flex-1 flex-col"
+          >
+            {view === 'agenda' ? <AppointmentsAgenda /> : null}
+          </div>
+          <Outlet />
+        </section>
+      </TooltipProvider>
+    </AppointmentActionsProvider>
   );
 }

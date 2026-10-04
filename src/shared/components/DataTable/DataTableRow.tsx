@@ -5,7 +5,7 @@
 // stale answers. The table's own `useTable` re-renders us on every change.
 
 import { flexRender, type RowData } from '@tanstack/react-table';
-import type { KeyboardEvent, ReactNode } from 'react';
+import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -45,9 +45,23 @@ const ROW_EDGE: Record<Tone, string> = {
 const ROW_BASE =
   'group/row bg-card text-body relative border-s-3 border-b border-b-muted py-(--table-row-pad-y) ps-(--table-pad-start) pe-(--table-pad-x) transition-colors duration-120 outline-none hover:bg-canvas data-[selected=true]:bg-muted data-[kfocus=true]:bg-canvas data-[kfocus=true]:shadow-[inset_2px_0_0_var(--color-border-strong)] rtl:data-[kfocus=true]:shadow-[inset_-2px_0_0_var(--color-border-strong)]';
 
-/** On the grid: on one grid with the header; on a phone: per layout (H:65, H:120). */
-const GRID_ROW = 'grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-3';
+/**
+ * On the grid: on one grid with the header; on a phone: per layout (H:65,
+ * H:120). The column gap is 12px unless the table sets `--dt-gap` (the
+ * Agenda's 10px, H:2032) — only on a table that never folds: the fold engine
+ * plans with 12px.
+ */
+const GRID_ROW =
+  'grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)]';
 const FLEX_ROW = 'flex flex-wrap items-center gap-x-3 gap-y-1.5';
+
+/**
+ * While the rows belong to the previous params (a search, sort or filter is
+ * loading): every text run becomes a flat bar, icons fade, clicks are off —
+ * the rows stay where they are (KICKOFF §6.0 Table refresh; H:275–280).
+ */
+const REFRESH_BARS =
+  'pointer-events-none [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:rounded-md [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:bg-muted-strong [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:text-transparent [&_svg]:opacity-0';
 
 // Sticky at the inline end with a solid background and a soft edge (H:225).
 const STICKY_ACTIONS =
@@ -82,6 +96,8 @@ export interface RowContext<TData extends RowData> {
   focusIndex: number | null;
   /** `aria-rowindex` of the first body row. */
   firstRowIndex: number;
+  /** The rows are the previous params' while new ones load: bars, no clicks. */
+  refreshing: boolean;
 }
 
 /** The folded columns under the primary cell: "<label> <value>" items (H:692). */
@@ -364,15 +380,37 @@ function RowCells<TData extends RowData>({
   return <PhoneFlowCells row={row} context={context} />;
 }
 
+/**
+ * A press on the row opens its record — but not one on a cell's own control
+ * marked `data-row-click="ignore"` (a status button, a person chip), nor one in
+ * a cell's portaled popover or hover card, whose events React bubbles through
+ * the row although they happen outside it.
+ */
+function openOnClick(event: MouseEvent<HTMLDivElement>, open: () => void) {
+  const row = event.currentTarget;
+  const target = event.target;
+  if (!(target instanceof Element && row.contains(target))) return;
+  const ignored = target.closest('[data-row-click="ignore"]');
+  if (ignored && row.contains(ignored)) return;
+  open();
+}
+
 /** One body row of a `DataTable`, in the layout of the tier. */
 export function DataTableRow<TData extends RowData>({
   row,
   index,
+  entryIndex = index,
   context,
   measureRow,
 }: {
   row: TableRow<TData>;
+  /** The row's index among the rows (selection, j / k). */
   index: number;
+  /**
+   * Its index among the body's entries — group headers included — which the
+   * virtualiser measures it by and `aria-rowindex` counts from (default `index`).
+   */
+  entryIndex?: number;
   context: RowContext<TData>;
   /** Measures the row while the list virtualises. */
   measureRow?: (node: HTMLDivElement | null) => void;
@@ -393,19 +431,23 @@ export function DataTableRow<TData extends RowData>({
       ref={measureRow}
       role="row"
       data-slot="data-table-row"
-      data-index={index}
+      data-index={entryIndex}
+      data-row-index={index}
       data-selected={(context.selection.enabled && row.getIsSelected()) || undefined}
       data-kfocus={context.focusIndex === index || undefined}
       data-testid={TABLE_TEST_IDS.row(context.prefix)}
-      aria-rowindex={index + context.firstRowIndex}
+      aria-rowindex={entryIndex + context.firstRowIndex}
       tabIndex={tabIndex}
-      onClick={onRowClick ? () => onRowClick(row) : undefined}
+      onClick={
+        onRowClick ? (event) => openOnClick(event, () => onRowClick(row)) : undefined
+      }
       onKeyDown={onRowClick ? openOnEnter : undefined}
       className={cn(
         ROW_BASE,
         rowLayoutClass(context),
         tone ? ROW_EDGE[tone] : 'border-s-transparent',
         onRowClick && 'cursor-pointer',
+        context.refreshing && REFRESH_BARS,
       )}
     >
       <RowCells row={row} index={index} context={context} />

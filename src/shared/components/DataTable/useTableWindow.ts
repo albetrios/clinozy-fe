@@ -1,8 +1,5 @@
-import type { RowData } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { type RefObject, useEffect, useEffectEvent } from 'react';
-
-import type { TableRow } from './data-table-layout.ts';
 
 /** Lists longer than this render only the visible rows (H:4117). */
 export const VIRTUALIZE_ABOVE = 60;
@@ -11,8 +8,9 @@ export const ROW_HEIGHT = 52;
 /** Rows rendered beyond the visible ones (H:4117). */
 const OVERSCAN = 10;
 
-interface TableWindowOptions<TData extends RowData> {
-  rows: readonly TableRow<TData>[];
+interface TableWindowOptions<TItem extends { id: string }> {
+  /** The body's entries in order — rows, and group headers when the table groups. */
+  items: readonly TItem[];
   scrollerRef: RefObject<HTMLDivElement | null>;
   /** On the last 80px of the list: the next page loads as it scrolls in. */
   sentinelRef: RefObject<HTMLDivElement | null>;
@@ -23,27 +21,29 @@ interface TableWindowOptions<TData extends RowData> {
   fetchNextPage: (() => void) | undefined;
 }
 
-/** The rows to render now, and what the list needs around them. */
-export interface TableWindow<TData extends RowData> {
+/** The entries to render now, and what the list needs around them. */
+export interface TableWindow<TItem extends { id: string }> {
   virtualizing: boolean;
-  /** The rows to render, with their index in the full list. */
-  windowed: readonly { row: TableRow<TData>; index: number }[];
-  /** Space above and below the rendered rows (px). */
+  /** The entries to render, with their index in the full list. */
+  windowed: readonly { item: TItem; index: number }[];
+  /** Space above and below the rendered entries (px). */
   padTop: number;
   padBottom: number;
-  /** Attach to each rendered row while virtualising (it measures the row). */
+  /** The first entry at the top of the scroller while virtualising (a pinned group header reads it). */
+  firstVisibleIndex: number | null;
+  /** Attach to each rendered entry while virtualising (it measures it). */
   measureRow: ((node: HTMLDivElement | null) => void) | undefined;
   scrollToIndex: (index: number) => void;
 }
 
 /**
- * The list's length (KICKOFF §3.5 Length; D7): above `virtualizeAbove` rows
- * only the visible rows plus 10 of overscan render, measured as they mount
+ * The list's length (KICKOFF §3.5 Length; D7): above `virtualizeAbove` entries
+ * only the visible ones plus 10 of overscan render, measured as they mount
  * (52px until then); the next cursor page loads when the end of the list
  * scrolls into view.
  */
-export function useTableWindow<TData extends RowData>({
-  rows,
+export function useTableWindow<TItem extends { id: string }>({
+  items,
   scrollerRef,
   sentinelRef,
   virtualizeAbove,
@@ -51,13 +51,13 @@ export function useTableWindow<TData extends RowData>({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
-}: TableWindowOptions<TData>): TableWindow<TData> {
-  const virtualizing = rows.length > virtualizeAbove;
+}: TableWindowOptions<TItem>): TableWindow<TItem> {
+  const virtualizing = items.length > virtualizeAbove;
   // The virtualizer re-renders this component as it scrolls; its stable
   // `measureElement` and `scrollToIndex` are all that leave the component.
   // eslint-disable-next-line react-hooks/incompatible-library -- see above
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
-    count: rows.length,
+    count: items.length,
     getScrollElement: () => scrollerRef.current,
     estimateSize: () => rowHeight,
     // An unlaid-out row reads 0 tall; keep the estimate instead.
@@ -66,23 +66,25 @@ export function useTableWindow<TData extends RowData>({
     initialRect: { width: 0, height: rowHeight * OVERSCAN },
     overscan: OVERSCAN,
     enabled: virtualizing,
-    getItemKey: (index) => rows[index]?.id ?? index,
+    getItemKey: (index) => items[index]?.id ?? index,
   });
 
-  const items = virtualizing ? virtualizer.getVirtualItems() : [];
-  let windowed = rows.map((row, index) => ({ row, index }));
+  const virtualItems = virtualizing ? virtualizer.getVirtualItems() : [];
+  let windowed = items.map((item, index) => ({ item, index }));
   if (virtualizing) {
     // A scroller with no height yet (hidden, not laid out) gets a first window
     // rather than nothing.
     windowed =
-      items.length > 0
-        ? items.flatMap((item) => {
-            const row = rows[item.index];
-            return row ? [{ row, index: item.index }] : [];
+      virtualItems.length > 0
+        ? virtualItems.flatMap((virtual) => {
+            const item = items[virtual.index];
+            return item ? [{ item, index: virtual.index }] : [];
           })
         : windowed.slice(0, OVERSCAN * 2);
   }
-  const last = items.at(-1);
+  const last = virtualItems.at(-1);
+  const offset = virtualizer.scrollOffset ?? 0;
+  const firstVisible = virtualItems.find((virtual) => virtual.end > offset);
 
   const loadMore = useEffectEvent(() => {
     if (hasNextPage && !isFetchingNextPage) fetchNextPage?.();
@@ -103,8 +105,11 @@ export function useTableWindow<TData extends RowData>({
   return {
     virtualizing,
     windowed,
-    padTop: items[0]?.start ?? 0,
+    padTop: virtualItems[0]?.start ?? 0,
     padBottom: last ? Math.max(0, virtualizer.getTotalSize() - last.end) : 0,
+    firstVisibleIndex: virtualizing
+      ? (firstVisible?.index ?? windowed[0]?.index ?? null)
+      : null,
     measureRow: virtualizing ? virtualizer.measureElement : undefined,
     scrollToIndex: (index) => {
       if (virtualizing) virtualizer.scrollToIndex(index, { align: 'auto' });

@@ -26,8 +26,11 @@ const PILL_SIZES = {
 export interface TonePillProps extends ComponentProps<'span'> {
   tone: PillTone;
   size?: keyof typeof PILL_SIZES;
-  /** A 6px dot in the pill's ink before the label (statuses). */
-  dot?: boolean;
+  /**
+   * A 6px dot before the label (statuses): in the pill's ink, or `'tone'` —
+   * the tone's own dot colour, as the Appointments status pills draw it (H:2045).
+   */
+  dot?: boolean | 'tone';
   /** A leading icon — 12px unless the icon carries its own `size-*`. */
   icon?: ReactNode;
 }
@@ -61,7 +64,15 @@ export function TonePill({
       {...props}
     >
       {dot ? (
-        <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-current" />
+        <span
+          aria-hidden="true"
+          className={cn(
+            'size-1.5 shrink-0 rounded-full',
+            dot === 'tone' && tone !== 'neutral' && tone !== 'inverse'
+              ? TONE_CLASSES[tone].dot
+              : 'bg-current',
+          )}
+        />
       ) : null}
       {icon ? (
         <span

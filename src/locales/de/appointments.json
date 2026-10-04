@@ -2,5 +2,133 @@
   "manifest": {
     "title": "Termine"
   },
-  "record": "Termin"
+  "record": "Termin",
+  "records": "Termine",
+  "toolbar": {
+    "viewsLabel": "Ansicht",
+    "views": {
+      "agenda": "Agenda",
+      "day": "Tag",
+      "week": "Woche",
+      "month": "Monat"
+    },
+    "today": {
+      "day": "Heute",
+      "week": "Diese Woche",
+      "month": "Dieser Monat"
+    },
+    "jump": {
+      "day": "Zum heutigen Tag springen",
+      "week": "Zur aktuellen Woche springen",
+      "month": "Zum aktuellen Monat springen"
+    },
+    "period": "Zeitraum",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "Vorheriger Tag",
+      "week": "Vorherige Woche",
+      "month": "Vorheriger Monat"
+    },
+    "next": {
+      "day": "Nächster Tag",
+      "week": "Nächste Woche",
+      "month": "Nächster Monat"
+    },
+    "search": "Patient, Telefon oder #ID",
+    "searchLabel": "Termine durchsuchen",
+    "newAppointment": "Neuer Termin"
+  },
+  "filters": {
+    "label": "Terminfilter",
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "upcoming": "Anstehend (Standard)",
+    "dayBooked_one": "{{date}} · {{count}} gebucht",
+    "dayBooked_other": "{{date}} · {{count}} gebucht",
+    "appointedTo": "Zugewiesen an",
+    "allDoctors": "Alle Ärzte",
+    "doctors_one": "{{count}} Arzt",
+    "doctors_other": "{{count}} Ärzte",
+    "searchTeam": "Team durchsuchen",
+    "showAll": "Alle anzeigen",
+    "done": "Fertig",
+    "status": "Status",
+    "all": "Alle",
+    "active": "Aktiv (offen)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "Uhrzeit",
+      "contact": "Kontakt",
+      "service": "Leistung",
+      "doctor": "Zugewiesen an",
+      "latest": "Letzte Aktualisierung",
+      "quickView": "Schnellansicht",
+      "status": "Status"
+    },
+    "minutes": "{{minutes}} Min.",
+    "empty": "Hier gibt es keine Termine · ",
+    "bookOne": "jetzt einen buchen",
+    "day": {
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "yesterday": "Gestern",
+      "inDays_one": "In {{count}} Tag",
+      "inDays_other": "In {{count}} Tagen",
+      "nextWeek": "Nächste Woche",
+      "inWeeks_one": "In {{count}} Woche",
+      "inWeeks_other": "In {{count}} Wochen",
+      "daysAgo_one": "Vor {{count}} Tag",
+      "daysAgo_other": "Vor {{count}} Tagen"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> bestätigt",
+      "confirmed_other": "<n>{{count}}</n> bestätigt",
+      "awaiting_one": "<n>{{count}}</n> wartet auf Antwort",
+      "awaiting_other": "<n>{{count}}</n> warten auf Antwort",
+      "allSet": "· alles bereit",
+      "confirmedHint_one": "{{count}} bestätigt",
+      "confirmedHint_other": "{{count}} bestätigt",
+      "waitingHint_one": "{{count}} wartet auf eine Antwort",
+      "waitingHint_other": "{{count}} warten auf eine Antwort",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ Plan bereit",
+      "planPending": "○ Plan ausstehend",
+      "reminderRead": "✓ Erinnerung gelesen",
+      "reminderDelivered": "✓ Erinnerung zugestellt",
+      "reminderSent": "✓ Erinnerung gesendet",
+      "repliedYes": "✓ Mit Ja geantwortet",
+      "moved": "✓ Verschoben",
+      "movedTimes": "✓ Verschoben ×{{times}}",
+      "checkedIn": "✓ Eingecheckt"
+    },
+    "latestHints": {
+      "planReady": "{{suggestions}} in den Leistungsvorschlägen",
+      "planPending": "Öffnen Sie den Termin und fügen Sie die Leistungsvorschläge hinzu",
+      "reminderRead": "Erinnerung auf WhatsApp gelesen",
+      "reminderDelivered": "Erinnerung zugestellt",
+      "reminderSent": "Erinnerung gesendet",
+      "repliedYes": "Automatisch durch ein Ja auf WhatsApp bestätigt",
+      "moved": "Verschoben von {{day}} {{time}}",
+      "checkedIn": "Patient eingecheckt"
+    },
+    "changeStatus": "Status ändern · {{status}}"
+  },
+  "status": {
+    "title": "Status ändern",
+    "now": "Aktuell: <b>{{status}}</b>",
+    "nowReason": "Aktuell: <b>{{status}} · {{reason}}</b>",
+    "why": "Warum wird der Termin storniert?",
+    "back": "Zurück"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} Min.",
+    "noUpdate": "Noch keine Aktualisierung",
+    "open": "Öffnen",
+    "reschedule": "Verschieben",
+    "cancel": "Stornieren",
+    "tracker": "Status"
+  }
 }

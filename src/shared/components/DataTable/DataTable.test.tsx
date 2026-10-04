@@ -720,3 +720,87 @@ describe('DataTable — j / k (Leads)', () => {
     expect(screen.getByTestId('patients-table-row')).not.toHaveAttribute('data-kfocus');
   });
 });
+
+describe('DataTable — row groups (the Agenda’s days)', () => {
+  const groups = {
+    keyOf: (data: Patient) => data.followUp,
+    header: ({ key, rows }: { key: string; rows: readonly Patient[] }) => (
+      <p>
+        {key} · {rows.length}
+      </p>
+    ),
+  };
+  const visits = [
+    patient(1, { followUp: 'Sat' }),
+    patient(2, { followUp: 'Sat' }),
+    patient(3, { followUp: 'Sun' }),
+  ];
+
+  it('heads each run of rows with its group, the headers sticky and in the row count', () => {
+    render(<Room data={visits} groups={groups} />);
+    // Without the column header and the "All patients loaded" line.
+    const rows = screen.getAllByRole('row').slice(1, -1);
+    expect(rows.map((row) => row.textContent)).toEqual([
+      'Sat · 2',
+      expect.stringContaining('Patient 001'),
+      expect.stringContaining('Patient 002'),
+      'Sun · 1',
+      expect.stringContaining('Patient 003'),
+    ]);
+    const headers = rows.filter((row) => row.dataset.slot === 'data-table-group');
+    expect(headers).toHaveLength(2);
+    for (const header of headers) expect(header.className).toContain('sticky');
+    // The column header, 3 rows and 2 group headers.
+    expect(screen.getByRole('table')).toHaveAttribute('aria-rowcount', '6');
+    expect(rows.map((row) => row.getAttribute('aria-rowindex'))).toEqual([
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+    ]);
+  });
+
+  it('keeps j / k on rows, skipping the headers', async () => {
+    const user = userEvent.setup();
+    render(<Room data={visits} groups={groups} keyboardNav />);
+    await user.keyboard('jjj');
+    const focused = screen
+      .getAllByTestId('patients-table-row')
+      .find((row) => row.dataset.kfocus === 'true');
+    expect(focused).toHaveTextContent('Patient 003');
+  });
+
+  it('pins the top group’s header while the list virtualises', () => {
+    const many = Array.from({ length: 80 }, (_, index) =>
+      patient(index + 1, { followUp: index < 70 ? 'Sat' : 'Sun' }),
+    );
+    const { container } = render(<Room data={many} groups={groups} />);
+    const pinned = container.querySelector('[aria-hidden="true"].sticky');
+    expect(pinned).toHaveTextContent('Sat · 70');
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<Room data={visits} groups={groups} />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('DataTable — refresh (KICKOFF §6.0)', () => {
+  it('marks the table busy and pauses clicks while the rows are the previous params’', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+    const { rerender } = render(
+      <Room data={[patient(1)]} onRowClick={onRowClick} refreshing />,
+    );
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('patients-table-row').className).toContain(
+      'pointer-events-none',
+    );
+
+    rerender(<Room data={[patient(1)]} onRowClick={onRowClick} />);
+    expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');
+    await user.click(screen.getByTestId('patients-table-row'));
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+  });
+});

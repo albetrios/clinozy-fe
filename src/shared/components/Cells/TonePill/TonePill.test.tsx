@@ -62,6 +62,17 @@ describe('TonePill', () => {
     expect(icon?.querySelector('svg')).not.toBeNull();
   });
 
+  it('draws the dot in the tone’s dot colour when asked (the status pills)', () => {
+    const { container } = render(
+      <TonePill tone="butter" dot="tone">
+        Scheduled
+      </TonePill>,
+    );
+    const dot = container.querySelector('[data-slot="pill"] > [aria-hidden="true"]');
+    expect(dot).toHaveClass('bg-tone-butter-dot');
+    expect(dot).not.toHaveClass('bg-current');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TonePill tone="lav" dot>

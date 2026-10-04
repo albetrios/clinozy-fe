@@ -135,6 +135,12 @@
       "patient": "환자",
       "clinic": "클리닉"
     },
+    "cancelConfirm": {
+      "title": "이 예약을 취소할까요?",
+      "record": "{{name}} · {{service}}",
+      "effect": "시간이 비워지고 알림이 중지됩니다. 예약 시간이 지나기 전까지 복원할 수 있습니다.",
+      "action": "취소"
+    },
     "formCancelReasons": {
       "patient_cancelled": "환자가 취소함",
       "rescheduling_later": "나중에 다시 일정 조정",
@@ -425,6 +431,10 @@
     "open": "열기",
     "hint": "환자, 리드, 청구서를 검색하려면 2글자 이상 입력하세요",
     "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 #ID로 검색해 보세요."
+  },
+  "lists": {
+    "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",
+    "retry": "다시 시도"
   },
   "channels": {
     "whatsapp": "WhatsApp",

@@ -135,6 +135,12 @@
       "patient": "患者",
       "clinic": "クリニック"
     },
+    "cancelConfirm": {
+      "title": "この予約をキャンセルしますか？",
+      "record": "{{name}} · {{service}}",
+      "effect": "枠が空き、リマインダーが停止します。時間が過ぎるまでは元に戻せます。",
+      "action": "キャンセル"
+    },
     "formCancelReasons": {
       "patient_cancelled": "患者がキャンセル",
       "rescheduling_later": "後日再調整",
@@ -425,6 +431,10 @@
     "open": "開く",
     "hint": "患者・リード・請求書を検索するには2文字以上入力してください",
     "empty": "一致するものがありません。名前、電話番号、#IDで試してください。"
+  },
+  "lists": {
+    "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",
+    "retry": "再試行"
   },
   "channels": {
     "whatsapp": "WhatsApp",

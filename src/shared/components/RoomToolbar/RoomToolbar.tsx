@@ -57,10 +57,22 @@ export interface RoomToolbarProps {
   tableId: string;
   /** The tab strip — `RoomTabs` (child routes) or `RoomViewTabs` (in-page views). */
   tabs?: ReactNode;
+  /**
+   * A period control right after the tabs (Appointments' "Today" + "‹ <period>
+   * ›", H:1994): the tabs then keep their width and the free space follows
+   * the period; on a phone it takes its own row under the tabs (H:54).
+   */
+  period?: ReactNode;
   /** The list search, writing the URL's `q`. */
   search?: { placeholder: string; label: string };
   /** The Filters popover and the saved views. */
   filters?: RoomToolbarFilters;
+  /**
+   * A room's own Filters in the Filters place, instead of `filters` — the
+   * Appointments popover with its calendar (H:1999). It takes the Filters'
+   * phone placement.
+   */
+  filtersSlot?: ReactNode;
   /** The Columns chooser — `DataTableColumnChooser` (hidden on a phone). */
   columns?: ReactNode;
   /** Room-specific buttons before the primary ("Day close"). */
@@ -77,6 +89,78 @@ export interface RoomToolbarProps {
 }
 
 /**
+ * The tabs, a period control right after them, then the free space: with a
+ * period the tabs keep their width (a tablet's at least 120px, H:142) and the
+ * space follows the period (H:1994); without one the tabs take it.
+ */
+function ToolbarViews({
+  tabs,
+  period,
+  tabsClassName,
+}: {
+  tabs: ReactNode;
+  period: ReactNode;
+  tabsClassName: string;
+}) {
+  return (
+    <>
+      {tabs ? (
+        <div
+          data-slot="room-toolbar-tabs"
+          className={cn(
+            'flex min-w-0',
+            period
+              ? 'md:max-w-max md:min-w-30 md:flex-[1_1_7.5rem] xl:min-w-0 xl:flex-initial'
+              : 'md:min-w-30 md:flex-1 md:basis-0 xl:min-w-0',
+            tabsClassName,
+          )}
+        >
+          {tabs}
+        </div>
+      ) : null}
+      {period ? (
+        <div
+          data-slot="room-toolbar-period"
+          className="flex flex-none items-center gap-1.5 max-md:order-4"
+        >
+          {period}
+        </div>
+      ) : null}
+      {!tabs || period ? (
+        <span aria-hidden="true" className="flex-1 max-md:hidden" />
+      ) : null}
+    </>
+  );
+}
+
+/** The shared Filters popover, when the room has filters and no Filters of its own. */
+function ToolbarFilters({
+  filters,
+  tableId,
+  savedViews,
+  layout,
+  className,
+}: {
+  filters: RoomToolbarFilters | undefined;
+  tableId: string;
+  savedViews: boolean;
+  layout: RoomToolbarLayout;
+  className: string;
+}) {
+  if (!filters) return null;
+  return (
+    <RoomFilters
+      fields={filters.fields}
+      copy={filters.copy}
+      savedViewsTableId={savedViews ? tableId : undefined}
+      testIdPrefix={tableId}
+      phoneRow={layout === 'leads' ? 'tabs' : 'search'}
+      className={className}
+    />
+  );
+}
+
+/**
  * A room list's toolbar (KICKOFF §3.5 List toolbar; H:1085–1090,
  * `_patterns.md:92–104`). From `md` one wrapping row, gap 10px 8px: h1 ·
  * tabs · (space) · search · saved views · Filters · Columns · actions ·
@@ -90,8 +174,10 @@ export function RoomToolbar({
   title,
   tableId,
   tabs,
+  period,
   search,
   filters,
+  filtersSlot,
   columns,
   actions,
   primary,
@@ -123,19 +209,7 @@ export function RoomToolbar({
       >
         {title}
       </h1>
-      {tabs ? (
-        <div
-          data-slot="room-toolbar-tabs"
-          className={cn(
-            'flex min-w-0 md:min-w-30 md:flex-1 md:basis-0 xl:min-w-0',
-            placement.tabs,
-          )}
-        >
-          {tabs}
-        </div>
-      ) : (
-        <span aria-hidden="true" className="flex-1 max-md:hidden" />
-      )}
+      <ToolbarViews tabs={tabs} period={period} tabsClassName={placement.tabs} />
       {search ? (
         <RoomSearch
           placeholder={search.placeholder}
@@ -152,16 +226,22 @@ export function RoomToolbar({
           className="max-md:order-4"
         />
       ) : null}
-      {filters ? (
-        <RoomFilters
-          fields={filters.fields}
-          copy={filters.copy}
-          savedViewsTableId={savedViews ? tableId : undefined}
-          testIdPrefix={tableId}
-          phoneRow={layout === 'leads' ? 'tabs' : 'search'}
+      {filtersSlot ? (
+        <div
+          data-slot="room-toolbar-filters"
+          className={cn('flex flex-none', placement.filters)}
+        >
+          {filtersSlot}
+        </div>
+      ) : (
+        <ToolbarFilters
+          filters={filters}
+          tableId={tableId}
+          savedViews={savedViews}
+          layout={layout}
           className={placement.filters}
         />
-      ) : null}
+      )}
       {columns}
       {actions ? (
         <div className="flex flex-none items-center gap-2 max-md:order-5">{actions}</div>

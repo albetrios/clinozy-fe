@@ -60,6 +60,11 @@ export interface ConfirmReasonConfig {
   /** Caller-supplied reasons (appointment cancel, photo delete, lead remove); the kind's otherwise. */
   options?: readonly ConfirmReasonOption[];
   /**
+   * The reason picked as it opens — a value of `options` (the status
+   * popover's "Other" opens it on "Other", waiting for the note; A-A3).
+   */
+  initial?: string;
+  /**
    * Once the write lands: the toast's text ("Priya Shah removed") and the
    * restore its Undo runs, offered for the schema's 10s restore window (D32).
    * `onUndo` surfaces its own failure — a `useAppMutation` write already does.
@@ -158,7 +163,7 @@ function useReasonDraft({
   onConfirm,
 }: Pick<ReasonConfirmProps, 'open' | 'onOpenChange' | 'reason' | 'onConfirm'>) {
   const { t } = useTranslation(REASON_CONFIRM_NS);
-  const [picked, setPicked] = useState('');
+  const [picked, setPicked] = useState(reason.initial ?? '');
   const [typed, setTyped] = useState('');
   const [errors, setErrors] = useState<ReasonFieldErrors>({});
   const [busy, setBusy] = useState(false);
@@ -170,7 +175,7 @@ function useReasonDraft({
   if (open !== openedAs) {
     setOpenedAs(open);
     if (open) {
-      setPicked('');
+      setPicked(reason.initial ?? '');
       setTyped('');
       setErrors({});
     }

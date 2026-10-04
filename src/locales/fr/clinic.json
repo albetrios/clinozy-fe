@@ -135,6 +135,12 @@
       "patient": "PATIENT",
       "clinic": "CLINIQUE"
     },
+    "cancelConfirm": {
+      "title": "Annuler ce rendez-vous ?",
+      "record": "{{name}} · {{service}}",
+      "effect": "Le créneau est libéré et les rappels s’arrêtent. Vous pouvez le restaurer tant que l’heure n’est pas passée.",
+      "action": "Annuler"
+    },
     "formCancelReasons": {
       "patient_cancelled": "Annulé par le patient",
       "rescheduling_later": "Reprogrammation plus tard",
@@ -429,6 +435,10 @@
     "open": "ouvrir",
     "hint": "Tapez au moins 2 lettres pour rechercher des patients, des prospects et des factures",
     "empty": "Aucun résultat. Essayez un nom, un téléphone ou un #ID."
+  },
+  "lists": {
+    "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",
+    "retry": "Réessayer"
   },
   "channels": {
     "whatsapp": "WhatsApp",

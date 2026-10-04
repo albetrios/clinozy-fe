@@ -135,6 +135,12 @@
       "patient": "PAZIENTE",
       "clinic": "CLINICA"
     },
+    "cancelConfirm": {
+      "title": "Annullare questo appuntamento?",
+      "record": "{{name}} · {{service}}",
+      "effect": "L’orario viene liberato e i promemoria si fermano. Puoi ripristinarlo finché l’orario non è passato.",
+      "action": "Annulla"
+    },
     "formCancelReasons": {
       "patient_cancelled": "Il paziente ha annullato",
       "rescheduling_later": "Da riprogrammare più avanti",
@@ -429,6 +435,10 @@
     "open": "aprire",
     "hint": "Digita almeno 2 lettere per cercare pazienti, lead e fatture",
     "empty": "Nessuna corrispondenza. Prova con un nome, un telefono o un #ID."
+  },
+  "lists": {
+    "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",
+    "retry": "Riprova"
   },
   "channels": {
     "whatsapp": "WhatsApp",

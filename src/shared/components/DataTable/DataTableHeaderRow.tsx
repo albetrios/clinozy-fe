@@ -85,7 +85,7 @@ export function DataTableHeaderRow<TData extends RowData>({
         tabIndex={-1}
         aria-rowindex={1}
         data-testid={TABLE_TEST_IDS.header(prefix)}
-        className="group/row text-micro text-muted-foreground grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-3 px-(--table-pad-x) font-semibold tracking-[0.03em] uppercase"
+        className="group/row text-micro text-muted-foreground grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)] px-(--table-pad-x) font-semibold tracking-[0.03em] uppercase"
       >
         {selection.enabled ? (
           <div

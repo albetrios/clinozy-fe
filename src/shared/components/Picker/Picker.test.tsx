@@ -396,6 +396,29 @@ describe('Picker — multi-select', () => {
     expect(onPick).toHaveBeenLastCalledWith([]);
     expect(screen.queryByTestId('branches-clear')).not.toBeInTheDocument();
   });
+
+  it('draws the caller’s footer under the list, whose close shuts it', async () => {
+    const { user } = renderWithClient(
+      <Picker
+        multiple
+        label="Doctors"
+        options={numbered(3, 'Doctor')}
+        value={[]}
+        onChange={() => {}}
+        testId="doctors"
+        footer={(close) => (
+          <button type="button" onClick={close}>
+            Done
+          </button>
+        )}
+      />,
+    );
+    await user.click(screen.getByTestId('doctors'));
+    const panel = await screen.findByTestId('doctors-panel');
+    await user.click(within(panel).getByRole('button', { name: 'Done' }));
+    await waitFor(() => expect(screen.queryByTestId('doctors-panel')).toBeNull());
+    expect(screen.getByTestId('doctors')).toHaveFocus();
+  });
 });
 
 describe('Picker — create', () => {

@@ -85,6 +85,11 @@ export const CLINIC_KEYS = {
    * name a stored value. An appointment's status is the appointments domain's
    * (`appointments.statuses`).
    */
+  /** A room list's load failure (KICKOFF §6.0 List error; `useListLoadError`). */
+  lists: {
+    loadError: 'lists.loadError',
+    retry: 'lists.retry',
+  },
   channels: {
     whatsapp: 'channels.whatsapp',
     call: 'channels.call',
@@ -197,6 +202,17 @@ export const CLINIC_KEYS = {
     cancelSides: {
       patient: 'appointments.cancelSides.patient',
       clinic: 'appointments.cancelSides.clinic',
+    },
+    /**
+     * The cancel confirm (`appointments.md:211–225`): the form's Cancel visit
+     * and the popover's "Other", which needs a note (A-A3).
+     */
+    cancelConfirm: {
+      title: 'appointments.cancelConfirm.title',
+      /** The grey record pill: "<name> · <service>". */
+      record: 'appointments.cancelConfirm.record',
+      effect: 'appointments.cancelConfirm.effect',
+      action: 'appointments.cancelConfirm.action',
     },
     /** The form's Cancel visit reasons (`cancelReasonToContract` stores them). */
     formCancelReasons: {

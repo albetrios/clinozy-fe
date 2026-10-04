@@ -135,6 +135,12 @@
       "patient": "PATIENT",
       "clinic": "CLINIC"
     },
+    "cancelConfirm": {
+      "title": "Cancel this appointment?",
+      "record": "{{name}} · {{service}}",
+      "effect": "The slot is released and reminders stop. You can restore it until the time passes.",
+      "action": "Cancel"
+    },
     "formCancelReasons": {
       "patient_cancelled": "Patient cancelled",
       "rescheduling_later": "Rescheduling later",
@@ -427,6 +433,10 @@
     "open": "open",
     "hint": "Type 2+ letters to search patients, leads and invoices",
     "empty": "No matches. Try a name, phone or #ID."
+  },
+  "lists": {
+    "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",
+    "retry": "Retry"
   },
   "channels": {
     "whatsapp": "WhatsApp",

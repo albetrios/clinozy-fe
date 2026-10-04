@@ -10,11 +10,31 @@ import {
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
 import {
   validateAppointmentCreateSearch,
   validateAppointmentSearch,
   validateAppointmentsSearch,
 } from '../../appointments.search.ts';
+import { AppointmentActionsProvider } from '../../components/AppointmentActions/index.ts';
+
+/** The Appointments page's path in the tests. */
+export const APPOINTMENTS_PAGE = '/organization/acme/appointments';
+
+/**
+ * Sign the test member in as the org's owner (every clinic action), or with no
+ * clinic role at all — `useClinicAccess` reads the platform codes.
+ */
+export function grantClinicAccess(level: 'owner' | 'none' = 'owner') {
+  useOrganizationStore.setState({
+    permissions: (level === 'owner'
+      ? ['organization:read', 'organization:delete']
+      : ['organization:read']) as never,
+    permissionsResolved: true,
+  });
+}
 
 /**
  * The Appointments family as `routeTree.tsx` registers it — the page with its
@@ -58,4 +78,16 @@ export function renderAppointmentsRoutes(url: string, Page: () => ReactNode) {
     </QueryClientProvider>,
   );
   return { ...view, router, queryClient };
+}
+
+/**
+ * Render one of the room's units on the Appointments page at `url`, inside the
+ * room's booking actions and the tooltip provider the page gives it.
+ */
+export function renderInAppointments(ui: ReactNode, url = APPOINTMENTS_PAGE) {
+  return renderAppointmentsRoutes(url, () => (
+    <AppointmentActionsProvider>
+      <TooltipProvider>{ui}</TooltipProvider>
+    </AppointmentActionsProvider>
+  ));
 }

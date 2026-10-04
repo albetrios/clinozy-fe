@@ -2,5 +2,142 @@
   "manifest": {
     "title": "Citas"
   },
-  "record": "Cita"
+  "record": "Cita",
+  "records": "registros de citas",
+  "toolbar": {
+    "viewsLabel": "Vista",
+    "views": {
+      "agenda": "Agenda",
+      "day": "Día",
+      "week": "Semana",
+      "month": "Mes"
+    },
+    "today": {
+      "day": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes"
+    },
+    "jump": {
+      "day": "Ir al día actual",
+      "week": "Ir a la semana actual",
+      "month": "Ir al mes actual"
+    },
+    "period": "Periodo",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "Día anterior",
+      "week": "Semana anterior",
+      "month": "Mes anterior"
+    },
+    "next": {
+      "day": "Día siguiente",
+      "week": "Semana siguiente",
+      "month": "Mes siguiente"
+    },
+    "search": "Paciente, teléfono o #ID",
+    "searchLabel": "Buscar citas",
+    "newAppointment": "Nueva cita"
+  },
+  "filters": {
+    "label": "Filtros de citas",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "upcoming": "Próximas (predeterminado)",
+    "dayBooked_one": "{{date}} · {{count}} reservada",
+    "dayBooked_many": "{{date}} · {{count}} de reservadas",
+    "dayBooked_other": "{{date}} · {{count}} reservadas",
+    "appointedTo": "Asignada a",
+    "allDoctors": "Todos los médicos",
+    "doctors_one": "{{count}} médico",
+    "doctors_many": "{{count}} de médicos",
+    "doctors_other": "{{count}} médicos",
+    "searchTeam": "Buscar en el equipo",
+    "showAll": "Mostrar todos",
+    "done": "Listo",
+    "status": "Estado",
+    "all": "Todas",
+    "active": "Activas (abiertas)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "Hora",
+      "contact": "Contacto",
+      "service": "Servicio",
+      "doctor": "Asignada a",
+      "latest": "Última actualización",
+      "quickView": "Vista rápida",
+      "status": "Estado"
+    },
+    "minutes": "{{minutes}} min",
+    "empty": "No hay citas aquí · ",
+    "bookOne": "reserva una",
+    "day": {
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "yesterday": "Ayer",
+      "inDays_one": "En {{count}} día",
+      "inDays_many": "En {{count}} de días",
+      "inDays_other": "En {{count}} días",
+      "nextWeek": "La próxima semana",
+      "inWeeks_one": "En {{count}} semana",
+      "inWeeks_many": "En {{count}} de semanas",
+      "inWeeks_other": "En {{count}} semanas",
+      "daysAgo_one": "Hace {{count}} día",
+      "daysAgo_many": "Hace {{count}} de días",
+      "daysAgo_other": "Hace {{count}} días"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> confirmada",
+      "confirmed_many": "<n>{{count}}</n> confirmadas",
+      "confirmed_other": "<n>{{count}}</n> confirmadas",
+      "awaiting_one": "<n>{{count}}</n> esperando respuesta",
+      "awaiting_many": "<n>{{count}}</n> esperando respuesta",
+      "awaiting_other": "<n>{{count}}</n> esperando respuesta",
+      "allSet": "· todo listo",
+      "confirmedHint_one": "{{count}} confirmada",
+      "confirmedHint_many": "{{count}} confirmadas",
+      "confirmedHint_other": "{{count}} confirmadas",
+      "waitingHint_one": "{{count}} esperando una respuesta",
+      "waitingHint_many": "{{count}} esperando una respuesta",
+      "waitingHint_other": "{{count}} esperando una respuesta",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ Plan listo",
+      "planPending": "○ Plan pendiente",
+      "reminderRead": "✓ Recordatorio leído",
+      "reminderDelivered": "✓ Recordatorio entregado",
+      "reminderSent": "✓ Recordatorio enviado",
+      "repliedYes": "✓ Respondió Sí",
+      "moved": "✓ Movida",
+      "movedTimes": "✓ Movida ×{{times}}",
+      "checkedIn": "✓ Llegó"
+    },
+    "latestHints": {
+      "planReady": "{{suggestions}} en las sugerencias de servicios",
+      "planPending": "Abre la cita y añade las sugerencias de servicios",
+      "reminderRead": "Recordatorio leído en WhatsApp",
+      "reminderDelivered": "Recordatorio entregado",
+      "reminderSent": "Recordatorio enviado",
+      "repliedYes": "Confirmada automáticamente por un Sí en WhatsApp",
+      "moved": "Movida desde {{day}} {{time}}",
+      "checkedIn": "El paciente llegó"
+    },
+    "changeStatus": "Cambiar estado · {{status}}"
+  },
+  "status": {
+    "title": "Cambiar estado",
+    "now": "Ahora: <b>{{status}}</b>",
+    "nowReason": "Ahora: <b>{{status}} · {{reason}}</b>",
+    "why": "¿Por qué se cancela?",
+    "back": "Atrás"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} min",
+    "noUpdate": "Aún sin novedades",
+    "open": "Abrir",
+    "reschedule": "Reprogramar",
+    "cancel": "Cancelar",
+    "tracker": "Estado"
+  }
 }

@@ -2,5 +2,124 @@
   "manifest": {
     "title": "예약"
   },
-  "record": "예약"
+  "record": "예약",
+  "records": "예약",
+  "toolbar": {
+    "viewsLabel": "보기",
+    "views": {
+      "agenda": "일정",
+      "day": "일",
+      "week": "주",
+      "month": "월"
+    },
+    "today": {
+      "day": "오늘",
+      "week": "이번 주",
+      "month": "이번 달"
+    },
+    "jump": {
+      "day": "오늘로 이동",
+      "week": "이번 주로 이동",
+      "month": "이번 달로 이동"
+    },
+    "period": "기간",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "이전 날",
+      "week": "이전 주",
+      "month": "이전 달"
+    },
+    "next": {
+      "day": "다음 날",
+      "week": "다음 주",
+      "month": "다음 달"
+    },
+    "search": "환자, 전화번호 또는 #ID",
+    "searchLabel": "예약 검색",
+    "newAppointment": "새 예약"
+  },
+  "filters": {
+    "label": "예약 필터",
+    "previousMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "upcoming": "예정된 예약(기본)",
+    "dayBooked_other": "{{date}} · {{count}}건 예약됨",
+    "appointedTo": "담당자",
+    "allDoctors": "모든 의사",
+    "doctors_other": "의사 {{count}}명",
+    "searchTeam": "팀 검색",
+    "showAll": "모두 보기",
+    "done": "완료",
+    "status": "상태",
+    "all": "전체",
+    "active": "활성(진행 중)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "시간",
+      "contact": "연락처",
+      "service": "서비스",
+      "doctor": "담당자",
+      "latest": "최근 업데이트",
+      "quickView": "빠른 보기",
+      "status": "상태"
+    },
+    "minutes": "{{minutes}}분",
+    "empty": "예약이 없습니다 · ",
+    "bookOne": "예약하기",
+    "day": {
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제",
+      "inDays_other": "{{count}}일 후",
+      "nextWeek": "다음 주",
+      "inWeeks_other": "{{count}}주 후",
+      "daysAgo_other": "{{count}}일 전"
+    },
+    "counts": {
+      "confirmed_other": "확정 <n>{{count}}</n>건",
+      "awaiting_other": "답장 대기 <n>{{count}}</n>건",
+      "allSet": "· 모두 준비됨",
+      "confirmedHint_other": "확정 {{count}}건",
+      "waitingHint_other": "답장 대기 중 {{count}}건",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "planReady": "✓ 플랜 준비됨",
+      "planPending": "○ 플랜 대기 중",
+      "reminderRead": "✓ 알림 읽음",
+      "reminderDelivered": "✓ 알림 전달됨",
+      "reminderSent": "✓ 알림 발송됨",
+      "repliedYes": "✓ ‘예’로 답장",
+      "moved": "✓ 일정 변경됨",
+      "movedTimes": "✓ 일정 변경됨 ×{{times}}",
+      "checkedIn": "✓ 체크인"
+    },
+    "latestHints": {
+      "planReady": "서비스 제안 {{suggestions}}개",
+      "planPending": "예약을 열어 서비스 제안을 추가하세요",
+      "reminderRead": "WhatsApp에서 알림을 읽음",
+      "reminderDelivered": "알림이 전달됨",
+      "reminderSent": "알림이 발송됨",
+      "repliedYes": "WhatsApp의 ‘예’ 답장으로 자동 확정됨",
+      "moved": "{{day}} {{time}}에서 변경됨",
+      "checkedIn": "환자 체크인 완료"
+    },
+    "changeStatus": "상태 변경 · {{status}}"
+  },
+  "status": {
+    "title": "상태 변경",
+    "now": "현재: <b>{{status}}</b>",
+    "nowReason": "현재: <b>{{status}} · {{reason}}</b>",
+    "why": "취소 사유가 무엇인가요?",
+    "back": "뒤로"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}}분",
+    "noUpdate": "아직 업데이트 없음",
+    "open": "열기",
+    "reschedule": "일정 변경",
+    "cancel": "취소",
+    "tracker": "상태"
+  }
 }

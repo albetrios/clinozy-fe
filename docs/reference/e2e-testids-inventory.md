@@ -176,7 +176,7 @@ index or scope it to its row.
 | ------------------------------------------------- | --------------------------------------------------------------- | ------------------------- |
 | `<tableId>-table`                                 | Table card                                                      | `DataTable/DataTable.tsx` |
 | `<tableId>-table-header`                          | Header row (`md` and up)                                        | `DataTableHeaderRow.tsx`  |
-| `<tableId>-table-row`                             | Body row (`data-index`; `data-kfocus` under j / k)              | `DataTableRow.tsx`        |
+| `<tableId>-table-row`                             | Body row (`data-row-index`; `data-kfocus` under j / k)          | `DataTableRow.tsx`        |
 | `<tableId>-table-select-all` / `-select-row`      | Selection boxes (`md` and up)                                   | `DataTableRow.tsx`        |
 | `<tableId>-table-footer`                          | 44px footer (count, fold toggle, bulk bar)                      | `DataTableFooter.tsx`     |
 | `<tableId>-table-fold-toggle`                     | "<N> columns in rows · Show all" ↔ "Fit to width"               | `DataTableFooter.tsx`     |
@@ -192,7 +192,8 @@ index or scope it to its row.
 
 A room list's toolbar, prefixed by the same `tableId` (`patients-filters-trigger`). The floating
 "New" exists only below `md` (`data-slot="fab"`, portalled to `body`); from `md` the same action
-ids sit in the toolbar.
+ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) keeps the
+`<tableId>-filters-trigger` / `-filters-clear` / `-filters` ids.
 
 | Test ID                                            | Element                                                                     | File                          |
 | -------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
@@ -419,3 +420,28 @@ Scope a spec to `chat-column` — a room can show one beside its list.
 | `chat-template-<kind>`                      | One template row (`greeting` · `price` · `slots` · `location` · `reminder` · `aftercare` · `followUp` · `review`) | `ChatColumn/ChatComposer/`  |
 | `chat-fill-in`                              | "Fill in" row for a picked template's placeholders                                                                | `ChatColumn/ChatComposer/`  |
 | `chat-mode-mismatch`                        | "Anaya wrote on Instagram · Switch" (the contact wrote on another channel)                                        | `ChatColumn/ChatComposer/`  |
+
+## Appointments room (launch L-36b)
+
+`pages/organization/$organizationSlug/appointments/`. The toolbar and the Agenda also carry the
+shared ids above with the `tableId` `appointments` (`appointments-toolbar`, `appointments-tab-agenda`,
+`appointments-search`, `appointments-filters-trigger`, `appointments-table-row`). An Agenda day
+header is its own row (`role="row"`, `data-slot="data-table-group"`) between the body rows.
+
+| Test ID                                                                     | Element                                                                    | Source                                 |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| `appointments-today`                                                        | "Today" · "This week" · "This month" (`aria-pressed` on the current one)   | `components/AppointmentsToolbar/`      |
+| `appointments-period-previous` · `-period-next` · `-period-label`           | Period arrows · the period's name                                          | `components/AppointmentsToolbar/`      |
+| `appointments-day-group`                                                    | Agenda day header: date tile, "Today" / weekday, sub line, counts          | `components/AppointmentsAgenda/`       |
+| `appointments-empty` · `appointments-book-one`                              | "No appointments here · book one" · its "book one" (Create only)           | `components/AppointmentsAgenda/`       |
+| `appointments-quick-view`                                                   | Row eye — pins the booking card (not on a phone)                           | `components/AppointmentsAgenda/`       |
+| `appointments-status-button`                                                | Row "Change status" button (Edit only; otherwise the status alone)         | `components/AppointmentsAgenda/`       |
+| `appointments-status-popover`                                               | Change status popover (`role="dialog"`)                                    | `components/AppointmentStatusPopover/` |
+| `appointments-status-option-<move>`                                         | One move — a status or `reschedule`; `aria-disabled` + reason when guarded | `components/AppointmentStatusPopover/` |
+| `appointments-cancel-reason-<reason>` · `appointments-status-back`          | Cancel view: one reason · Back                                             | `components/AppointmentStatusPopover/` |
+| `appointment-card`                                                          | Booking card (hover card, quick view, phone tap)                           | `components/AppointmentCard/`          |
+| `appointment-card-next` · `-open` · `-move-<move>`                          | Card: next action · Open · Reschedule / Cancel                             | `components/AppointmentCard/`          |
+| `appointments-filters-calendar` · `-filters-day`                            | Filters month calendar · one day (`aria-pressed` when picked)              | `components/AppointmentFilters/`       |
+| `appointments-filters-upcoming` · `-filters-month-previous` · `-month-next` | "Upcoming (default)" · the month arrows                                    | `components/AppointmentFilters/`       |
+| `appointments-filters-doctors`                                              | "Appointed to" doctor picker                                               | `components/DoctorPicker/`             |
+| `appointments-filters-status-<value>`                                       | Status chip (`all` · `active` · a status)                                  | `components/AppointmentFilters/`       |

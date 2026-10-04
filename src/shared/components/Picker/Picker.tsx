@@ -334,6 +334,7 @@ export function Picker<T = unknown>(props: PickerProps<T>) {
           onScroll={handleScroll}
           inputRef={inputRef}
           listRef={listRef}
+          footer={props.footer?.(() => closeList('pick'))}
         />
       </PickerSheet>
       {showClear ? (

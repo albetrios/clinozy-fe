@@ -135,6 +135,12 @@
       "patient": "PACIENTE",
       "clinic": "CLÍNICA"
     },
+    "cancelConfirm": {
+      "title": "¿Cancelar esta cita?",
+      "record": "{{name}} · {{service}}",
+      "effect": "El hueco se libera y los recordatorios se detienen. Puedes restaurarla hasta que pase la hora.",
+      "action": "Cancelar"
+    },
     "formCancelReasons": {
       "patient_cancelled": "El paciente canceló",
       "rescheduling_later": "Se reprogramará más tarde",
@@ -429,6 +435,10 @@
     "open": "abrir",
     "hint": "Escribe 2 o más letras para buscar pacientes, prospectos y facturas",
     "empty": "Sin coincidencias. Prueba con un nombre, un teléfono o un #ID."
+  },
+  "lists": {
+    "loadError": "No se pudo cargar esta lista · se perdió la conexión. Se muestra la última copia.",
+    "retry": "Reintentar"
   },
   "channels": {
     "whatsapp": "WhatsApp",

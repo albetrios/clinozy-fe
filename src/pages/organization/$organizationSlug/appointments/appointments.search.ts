@@ -25,7 +25,6 @@ import {
   textOf,
 } from '@/lib/routes/search-params.ts';
 import type {
-  AppointmentListParamsInput,
   AppointmentSortKey,
   AppointmentStatusFilter,
   AppointmentView,
@@ -162,28 +161,5 @@ export function validateAppointmentSearch(
   return {
     mode: oneOf(MODES, search.mode),
     from: textOf(search.from) || undefined,
-  };
-}
-
-/**
- * The Agenda read's params for the URL as it stands (defaults applied) — what
- * the Agenda hands `useAppointmentList` and `useAppointmentDaySummaries`.
- */
-export function appointmentListParamsOf(
-  search: AppointmentsSearch,
-): AppointmentListParamsInput {
-  const [sort, order] = (search.sort?.split(':') ?? []) as [
-    AppointmentSortKey?,
-    ('asc' | 'desc')?,
-  ];
-  return {
-    date: search.date,
-    status: search.status ?? APPOINTMENTS_SEARCH_DEFAULTS.status,
-    doctorIds: search.doctor ?? [],
-    q: search.q,
-    created: search.created,
-    followUp: search.followUp,
-    sort,
-    order,
   };
 }

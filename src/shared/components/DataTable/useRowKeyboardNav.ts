@@ -11,7 +11,7 @@ interface RowKeyboardNavOptions<TData extends RowData> {
   rows: readonly TableRow<TData>[];
   onOpen: ((row: TableRow<TData>) => void) | undefined;
   scrollerRef: RefObject<HTMLDivElement | null>;
-  /** Brings a virtualised row into the rendered window. */
+  /** Brings a virtualised row into the rendered window, by its row index. */
   scrollToIndex: (index: number) => void;
 }
 
@@ -67,7 +67,7 @@ export function useRowKeyboardNav<TData extends RowData>({
     scrollToIndex(index);
     return requestAnimationFrame(() => {
       const node = scrollerRef.current?.querySelector<HTMLElement>(
-        `[data-index="${index}"]`,
+        `[data-row-index="${index}"]`,
       );
       node?.focus({ preventScroll: true });
       node?.scrollIntoView?.({ block: 'nearest' });

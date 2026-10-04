@@ -32,6 +32,12 @@ import {
   TABLE_TEST_IDS,
 } from './data-table.constants.ts';
 import {
+  type TableEntries,
+  tableEntries,
+  type TableEntry,
+  type TableGroupEntry,
+} from './data-table-groups.ts';
+import {
   type DataTablePhoneLayout,
   planTableLayout,
   summariseRowActions,
@@ -55,6 +61,26 @@ import {
 } from './useTableWindow.ts';
 
 export type { DataTablePhoneLayout } from './data-table-layout.ts';
+
+/** One group as its header sees it: the key, its rows as loaded, and its place. */
+export interface DataTableGroup<TData extends RowData> {
+  key: string;
+  rows: readonly TData[];
+  /** 0 for the first group. */
+  index: number;
+}
+
+/**
+ * Rows grouped under sticky headers (the Agenda's days, KICKOFF §6.4): each
+ * run of consecutive rows sharing a key sits under one header, which sticks to
+ * the top of the scroller until the next group's slides over it.
+ */
+export interface DataTableGroups<TData extends RowData> {
+  /** The group a row belongs to; consecutive rows with one key share a header. */
+  keyOf: (row: TData) => string;
+  /** The group's header, spanning the row. */
+  header: (group: DataTableGroup<TData>) => ReactNode;
+}
 
 /** Props of {@link DataTable}. Everything past `table` is optional. */
 export interface DataTableProps<TData extends RowData> {
@@ -88,7 +114,11 @@ export interface DataTableProps<TData extends RowData> {
   countLabel?: string;
   /** Plural record noun for "All <records> loaded" / "Loading more <records>". */
   recordsLabel?: string;
-  /** Opens the record — a click, or Enter on the focused row. */
+  /**
+   * Opens the record — a click, or Enter on the focused row. A press inside a
+   * cell element marked `data-row-click="ignore"` (the cell's own control) or
+   * in a cell's portaled popover does not.
+   */
   onRowClick?: (row: TableRow<TData>) => void;
   /** The 3px inline-start status edge's tone. */
   getRowTone?: (row: TableRow<TData>) => Tone | undefined;
@@ -109,6 +139,14 @@ export interface DataTableProps<TData extends RowData> {
   keyboardNav?: boolean;
   /** Values the phone meta line drops — defaults to "All branches", "Active", "—". */
   phoneMetaSkip?: readonly string[];
+  /** Group the rows under sticky headers (the Agenda's days). */
+  groups?: DataTableGroups<TData>;
+  /**
+   * The rows on screen are the previous params' while new ones load (a search,
+   * sort or filter): their text turns to flat bars and clicks pause; the header
+   * stays (KICKOFF §6.0 Table refresh).
+   */
+  refreshing?: boolean;
   className?: string;
 }
 
@@ -186,36 +224,125 @@ function buildRowContext<TData extends RowData>(args: {
     keyboardNav: options.keyboardNav,
     focusIndex: args.focusIndex,
     firstRowIndex: args.isPhone ? 1 : 2,
+    refreshing: props.refreshing ?? false,
   };
 }
 
-/** The rows' rowgroup, or the empty state in a single full-width cell. */
+/** The group header row: one cell across the row, sticky at the scroller's top. */
+function GroupHeaderRow<TData extends RowData>({
+  entry,
+  entryIndex,
+  context,
+  groups,
+  columnCount,
+  measureRow,
+}: {
+  entry: TableGroupEntry<TData>;
+  entryIndex: number;
+  context: RowContext<TData>;
+  groups: DataTableGroups<TData>;
+  columnCount: number;
+  measureRow?: (node: HTMLDivElement | null) => void;
+}) {
+  return (
+    <div
+      ref={measureRow}
+      role="row"
+      data-slot="data-table-group"
+      data-index={entryIndex}
+      aria-rowindex={entryIndex + context.firstRowIndex}
+      className="sticky top-0 z-3 min-w-(--dt-min-w)"
+    >
+      <div role="cell" aria-colspan={Math.max(1, columnCount)}>
+        {groups.header({
+          key: entry.key,
+          rows: entry.rows.map((row) => row.original),
+          index: entry.groupIndex,
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * While the list virtualises, the header of the group at the top of the
+ * scroller may have scrolled out of the rendered window: this copy stays
+ * pinned under the column header (the inline headers slide over it), so the
+ * group never loses its label. Decorative — the inline header is the one read.
+ */
+function PinnedGroupHeader<TData extends RowData>({
+  body,
+  firstVisibleIndex,
+  groups,
+}: {
+  body: TableEntries<TData>;
+  firstVisibleIndex: number | null;
+  groups: DataTableGroups<TData>;
+}) {
+  const at =
+    firstVisibleIndex === null ? -1 : (body.groupOfEntry[firstVisibleIndex] ?? -1);
+  const entry = body.entries[at];
+  if (entry?.kind !== 'group') return null;
+  return (
+    <div aria-hidden="true" className="pointer-events-none sticky top-0 z-2 h-0">
+      <div className="absolute inset-x-0 top-0 min-w-(--dt-min-w)">
+        {groups.header({
+          key: entry.key,
+          rows: entry.rows.map((row) => row.original),
+          index: entry.groupIndex,
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** The rows' rowgroup — group headers among them — or the empty state in a single full-width cell. */
 function TableBody<TData extends RowData>({
   tableWindow,
   context,
+  groups,
   empty,
   emptyMessage,
   columnCount,
 }: {
-  tableWindow: TableWindow<TData>;
+  tableWindow: TableWindow<TableEntry<TData>>;
   context: RowContext<TData>;
+  groups?: DataTableGroups<TData>;
   empty?: ReactNode;
   emptyMessage?: string;
   columnCount: number;
 }) {
   const { t } = useTranslation(TABLE_NS);
+  const renderEntry = ({ item, index }: { item: TableEntry<TData>; index: number }) => {
+    if (item.kind === 'row') {
+      return (
+        <DataTableRow
+          key={item.id}
+          row={item.row}
+          index={item.rowIndex}
+          entryIndex={index}
+          context={context}
+          measureRow={tableWindow.measureRow}
+        />
+      );
+    }
+    if (!groups) return null;
+    return (
+      <GroupHeaderRow
+        key={item.id}
+        entry={item}
+        entryIndex={index}
+        context={context}
+        groups={groups}
+        columnCount={columnCount}
+        measureRow={tableWindow.measureRow}
+      />
+    );
+  };
   return (
     <div role="rowgroup" className="pt-(--dt-pad-top) pb-(--dt-pad-bottom)">
       {tableWindow.windowed.length > 0 ? (
-        tableWindow.windowed.map(({ row, index }) => (
-          <DataTableRow
-            key={row.id}
-            row={row}
-            index={index}
-            context={context}
-            measureRow={tableWindow.measureRow}
-          />
-        ))
+        tableWindow.windowed.map(renderEntry)
       ) : (
         <div role="row">
           <div role="cell" aria-colspan={Math.max(1, columnCount)}>
@@ -236,6 +363,7 @@ function TableScroller<TData extends RowData>({
   attachScroller,
   headerRef,
   sentinelRef,
+  body,
   tableWindow,
   context,
   props,
@@ -246,7 +374,8 @@ function TableScroller<TData extends RowData>({
   attachScroller: (node: HTMLDivElement | null) => () => void;
   headerRef: RefObject<HTMLDivElement | null>;
   sentinelRef: RefObject<HTMLDivElement | null>;
-  tableWindow: TableWindow<TData>;
+  body: TableEntries<TData>;
+  tableWindow: TableWindow<TableEntry<TData>>;
   context: RowContext<TData>;
   props: DataTableProps<TData>;
   options: Options;
@@ -265,9 +394,17 @@ function TableScroller<TData extends RowData>({
       onScroll={syncHeader}
       className="relative min-h-0 flex-1 [scrollbar-gutter:stable] overflow-auto overscroll-contain max-md:overflow-x-hidden"
     >
+      {props.groups && tableWindow.virtualizing ? (
+        <PinnedGroupHeader
+          body={body}
+          firstVisibleIndex={tableWindow.firstVisibleIndex}
+          groups={props.groups}
+        />
+      ) : null}
       <TableBody
         tableWindow={tableWindow}
         context={context}
+        groups={props.groups}
         empty={props.empty}
         emptyMessage={props.emptyMessage}
         columnCount={columnCount}
@@ -332,6 +469,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
   );
 
   const rows = table.getRowModel().rows;
+  const body = tableEntries(rows, props.groups?.keyOf);
   const columns = table.getVisibleLeafColumns();
   const selection = useTableSelection(table, rows, options.selectable && !isPhone);
   const actions = summariseRowActions(
@@ -351,7 +489,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
     minWidth: props.minWidth,
   });
   const tableWindow = useTableWindow({
-    rows,
+    items: body.entries,
     scrollerRef,
     sentinelRef,
     virtualizeAbove: options.virtualizeAbove,
@@ -365,7 +503,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
     rows,
     onOpen: props.onRowClick,
     scrollerRef,
-    scrollToIndex: tableWindow.scrollToIndex,
+    scrollToIndex: (index) => tableWindow.scrollToIndex(body.entryOfRow[index] ?? index),
   });
   const context = buildRowContext({
     props,
@@ -411,8 +549,10 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
           role="table"
           aria-label={props.label ?? props.recordsLabel}
           aria-rowcount={
-            options.hasNextPage ? -1 : rows.length + context.firstRowIndex - 1
+            options.hasNextPage ? -1 : body.entries.length + context.firstRowIndex - 1
           }
+          aria-busy={props.refreshing || undefined}
+          data-refreshing={props.refreshing || undefined}
           style={gridStyle}
           className="flex min-h-0 flex-1 flex-col"
         >
@@ -430,6 +570,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
             attachScroller={attachScroller}
             headerRef={headerRef}
             sentinelRef={sentinelRef}
+            body={body}
             tableWindow={tableWindow}
             context={context}
             props={props}
