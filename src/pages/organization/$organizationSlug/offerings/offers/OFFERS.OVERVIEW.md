@@ -23,7 +23,7 @@ The Offer drawer opens over the tab from its two dialog routes (`create/`, `$off
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `offers.route.tsx`            | Route marker — exports `Component` rendering `OffersPage`.                                                                                                                     |
 | `offers.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$offerId`; permission `organization:read`, module `clinic-offerings`; not in the nav.                                         |
-| `offers.search.ts`            | `validateOffersSearch` (`q`, `status`, `branch`, `created`), on the parent's readers.                                                                                          |
+| `offers.search.ts`            | `validateOffersSearch` (`q`, `status`, `branch`, `created`), on the shared URL readers.                                                                                        |
 | `offers.constants.ts`         | `OFFERS_NS` / `OFFERS_KEYS` (the tab's copy, `offers.*` in the room's namespace), `OFFERS_TABLE_ID`.                                                                           |
 | `offers.rows.ts`              | Pure: rows with their state in the tab's order, the Filters sections, filtering.                                                                                               |
 | `OffersPage.tsx`              | The Offers tab: toolbar (New offer), the shared table (folds, phone rows keyed on Type; row click and Edit open the drawer), Pause / Resume, Delete, Export, the Offer drawer. |

@@ -1,6 +1,7 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import {
   type Branch,
   OFFERING_CATEGORY_VALUES,
@@ -39,9 +40,6 @@ import {
 
 const K = OFFERING_DRAWER_KEYS.groups;
 const F = OFFERING_DRAWER_KEYS.fields;
-
-/** The "All branches" chip's value — never a branch id. */
-const ALL_BRANCHES = 'all';
 
 /** What every group of fields reads: the form and its live values, the ids' prefix. */
 interface OfferingFieldsProps {

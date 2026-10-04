@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  listIn,
   listOf,
   matchOf,
   oneOf,
@@ -28,6 +29,14 @@ describe('search-param readers', () => {
     expect(listOf(['google', 'x', 'google'], isSource)).toEqual(['google']);
     expect(listOf('instagram, google', isSource)).toEqual(['instagram', 'google']);
     expect(listOf('x,y', isSource)).toBeUndefined();
+  });
+
+  it('reads a list of the allowed values only, once each', () => {
+    const statuses = ['new', 'regular', 'vip'] as const;
+    expect(listIn(statuses, 'vip,new,vip,gold')).toEqual(['vip', 'new']);
+    expect(listIn(statuses, ['regular'])).toEqual(['regular']);
+    expect(listIn(statuses, 'gold')).toBeUndefined();
+    expect(listIn(statuses, undefined)).toBeUndefined();
   });
 
   it('keeps a single value only in its shape', () => {

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ALL_BRANCHES,
   CREATED_PRESETS,
   dateRangeOf,
   FOLLOW_UP_PRESETS,
+  readBranchFilter,
   readCreatedFilter,
   readFollowUpFilter,
   toDateRange,
@@ -57,5 +59,23 @@ describe('reading a filter from the URL or the list params', () => {
     expect(readFollowUpFilter('2026-10-10..2026-10-01')).toBeUndefined();
     expect(readCreatedFilter(7)).toBeUndefined();
     expect(readCreatedFilter(undefined)).toBeUndefined();
+  });
+});
+
+describe('reading a Branches filter from the URL', () => {
+  const BRANCH = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
+
+  it('keeps branch ids and "All branches", once each', () => {
+    expect(readBranchFilter([BRANCH, ALL_BRANCHES, BRANCH].join(','))).toEqual([
+      BRANCH,
+      ALL_BRANCHES,
+    ]);
+    expect(readBranchFilter([ALL_BRANCHES])).toEqual([ALL_BRANCHES]);
+  });
+
+  it('drops anything that is neither', () => {
+    expect(readBranchFilter('vesu')).toBeUndefined();
+    expect(readBranchFilter('')).toBeUndefined();
+    expect(readBranchFilter(undefined)).toBeUndefined();
   });
 });

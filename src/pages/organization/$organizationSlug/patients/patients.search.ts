@@ -10,7 +10,7 @@
  * each list to the contract's enum.
  */
 import {
-  listOf,
+  listIn,
   oneOf,
   queryOf,
   RECORD_ID,
@@ -93,11 +93,6 @@ export interface PatientsSearch {
 
 /** The list's state when the URL says nothing. */
 export const PATIENTS_SEARCH_DEFAULTS = { view: 'all' } as const satisfies PatientsSearch;
-
-/** Keep the entries of a URL list that `values` names. */
-function listIn<T extends string>(values: readonly T[], value: unknown): T[] | undefined {
-  return listOf<T>(value, (entry) => oneOf(values, entry) !== undefined);
-}
 
 /**
  * Parse `/patients` search params. Every key is answered, `undefined` included:

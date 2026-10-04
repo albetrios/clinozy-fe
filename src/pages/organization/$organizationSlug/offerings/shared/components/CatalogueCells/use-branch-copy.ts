@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import type { DataTableFoldValue } from '@/shared/components/DataTable/index.ts';
 import type { RoomFilterCopy } from '@/shared/components/RoomToolbar/index.ts';
 
-import { ALL_BRANCHES } from '../../../offerings.search.ts';
 import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.constants.ts';
 
 /**

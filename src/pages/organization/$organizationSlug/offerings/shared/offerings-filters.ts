@@ -1,6 +1,5 @@
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { RoomFilterField } from '@/shared/components/RoomToolbar/index.ts';
-
-import { ALL_BRANCHES } from '../offerings.search.ts';
 
 /*
  * The Offerings family's Filters (KICKOFF §6.11 Filters; `offerings.md:187`):

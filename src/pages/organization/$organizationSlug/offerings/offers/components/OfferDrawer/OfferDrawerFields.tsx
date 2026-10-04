@@ -1,6 +1,7 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import {
   type Branch,
   OFFER_KIND_VALUES,
@@ -49,9 +50,6 @@ import {
 } from './offer-form.ts';
 
 const F = OFFER_DRAWER_KEYS.fields;
-
-/** The "All branches" chip's value — never a branch id. */
-const ALL_BRANCHES = 'all';
 
 /** The date lists' window (`offerings.md:104`): today, 120 days ahead, then 60 back. */
 const DATE_WINDOW = { future: 120, past: 60 } as const;

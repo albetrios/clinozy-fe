@@ -2,7 +2,7 @@
  * URL search-param schemas for the Offerings room (consumed by routeTree's
  * `validateSearch`): the Offerings tab's search, filters and sort (KICKOFF
  * §6.11 Routes; `S:98–100`, D22), the New offering prefill on `create/`
- * (`?name=`, `S:99`), and the readers the Offers tab's schema shares. A value the URL can't
+ * (`?name=`, `S:99`). A value the URL can't
  * hold — an unknown category, a bad date range — is dropped, never an error.
  * Defaults stay out of the URL (`/offerings` is every offering, newest first).
  *
@@ -11,8 +11,8 @@
  * each list to the contract's enum.
  */
 import {
+  listIn,
   listOf,
-  oneOf,
   queryOf,
   RECORD_ID,
   sortOf,
@@ -20,6 +20,7 @@ import {
 } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
+  readBranchFilter,
   readCreatedFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
@@ -38,9 +39,6 @@ export const OFFERING_STATUS_FILTER = ['active', 'inactive'] as const;
 
 /** An offering's status in the URL. */
 export type OfferingStatusFilter = (typeof OFFERING_STATUS_FILTER)[number];
-
-/** The Branches chip for a record sold at every branch ("All branches"). */
-export const ALL_BRANCHES = 'all';
 
 /** The Offerings table's sortable columns (`offerings.md:33`). */
 export const OFFERING_SORT_KEYS = [
@@ -76,19 +74,6 @@ export interface OfferingsSearch {
   sort?: OfferingsSort;
 }
 
-/** Keep the entries of a URL list that `values` names. */
-export function listIn<T extends string>(
-  values: readonly T[],
-  value: unknown,
-): T[] | undefined {
-  return listOf<T>(value, (entry) => oneOf(values, entry) !== undefined);
-}
-
-/** A Branches filter in the URL: branch ids, or `all` ("All branches"). */
-export function branchList(value: unknown): string[] | undefined {
-  return listOf(value, (entry) => entry === ALL_BRANCHES || RECORD_ID.test(entry));
-}
-
 /**
  * Parse `/offerings` search params. Every key is answered, `undefined`
  * included: the router keeps a raw value the schema omits, so dropping one
@@ -102,7 +87,7 @@ export function validateOfferingsSearch(
     q: queryOf(search.q, 80),
     category: listIn(OFFERING_CATEGORY_FILTER, search.category),
     offer: listOf(search.offer, (entry) => RECORD_ID.test(entry)),
-    branch: branchList(search.branch),
+    branch: readBranchFilter(search.branch),
     status: listIn(OFFERING_STATUS_FILTER, search.status),
     created: readCreatedFilter(search.created),
     sort: sortOf(OFFERING_SORT_KEYS, search.sort),

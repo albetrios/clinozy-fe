@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import { OFFERING_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 
 import {
-  ALL_BRANCHES,
   OFFERING_CATEGORY_FILTER,
   OFFERING_SORT_KEYS,
   validateOfferingCreateSearch,

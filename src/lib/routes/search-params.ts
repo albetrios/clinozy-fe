@@ -40,6 +40,14 @@ export function listOf<T extends string>(
   return kept.length > 0 ? ([...new Set(kept)] as T[]) : undefined;
 }
 
+/** A multi-value param keeping only the entries `values` names, once each (`?status=new,vip`). */
+export function listIn<T extends string>(
+  values: readonly T[],
+  value: unknown,
+): T[] | undefined {
+  return listOf<T>(value, (entry) => oneOf(values, entry) !== undefined);
+}
+
 /**
  * A single param in a fixed shape — a calendar day, a clock time, an id —
  * trimmed; one that doesn't match `pattern` whole is none.

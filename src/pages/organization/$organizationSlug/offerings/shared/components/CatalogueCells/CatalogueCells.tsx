@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   AvatarStack,
@@ -9,7 +10,6 @@ import {
 } from '@/shared/components/Cells/index.ts';
 import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
 
-import { ALL_BRANCHES } from '../../../offerings.search.ts';
 import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.constants.ts';
 
 /** The value's weight in a text cell: 400 by default, 500 for names, 600 for amounts (H:1559). */
