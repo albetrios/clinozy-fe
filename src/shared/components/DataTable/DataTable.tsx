@@ -108,6 +108,13 @@ export interface DataTableProps<TData extends RowData> {
   phoneLayout?: DataTablePhoneLayout;
   /** `regrid`: the phone row's literal grid classes. */
   phoneGridClassName?: string;
+  /**
+   * Phone `fold`: the key column leads with the free width and the primary
+   * cell — its meta line under it — sits at the end (max 46%). Branches: the
+   * chip, then the address block carrying Contact · Opening hours · Status ·
+   * Default people (`users.md:92`).
+   */
+  phoneKeyFirst?: boolean;
   /** Explicit minimum width (px) of a row showing every column. */
   minWidth?: number;
   /** Footer count, e.g. "12 appointments" — never "x of N". */
@@ -215,6 +222,7 @@ function buildRowContext<TData extends RowData>(args: {
     phoneLayout: options.phoneLayout,
     phoneGridClassName: props.phoneGridClassName,
     phoneMetaSkip: props.phoneMetaSkip,
+    phoneKeyFirst: props.phoneKeyFirst ?? false,
     columns: args.columns,
     keptColumns: pickColumns(layout.plan.kept, byId),
     foldedColumns: pickColumns(layout.plan.folded, byId),

@@ -97,6 +97,10 @@ import {
 } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
+import { manifest as branchEditManifest } from '@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.manifest.ts';
+import { manifest as usersBranchesManifest } from '@/pages/organization/$organizationSlug/users/branches/branches.manifest.ts';
+import { validateBranchesSearch } from '@/pages/organization/$organizationSlug/users/branches/branches.search.ts';
+import { manifest as branchCreateManifest } from '@/pages/organization/$organizationSlug/users/branches/create/create.manifest.ts';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { manifest as usersRolesManifest } from '@/pages/organization/$organizationSlug/users/roles/roles.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
@@ -357,6 +361,25 @@ const UsersRolesPage = lazyRouteComponent(
     [I18N_NAMESPACES.users],
     () => import('@/pages/organization/$organizationSlug/users/roles/roles.route.tsx'),
   ),
+  'Component',
+);
+const UsersBranchesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.users],
+    () =>
+      import('@/pages/organization/$organizationSlug/users/branches/branches.route.tsx'),
+  ),
+  'Component',
+);
+// Branches' dialog routes render nothing of their own (the list opens the drawer).
+const BranchCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx'),
+  'Component',
+);
+const BranchEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.route.tsx'),
   'Component',
 );
 const MedicalLayout = lazyRouteComponent(
@@ -1166,6 +1189,51 @@ const organizationUsersRolesRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// Branches sits beside the Team too (`S:108`); its drawers are URL-driven
+// dialogs over the list (D24, S:109–110).
+const organizationUsersBranchesRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'users/branches',
+  head: manifestHead(usersBranchesManifest),
+  staticData: { manifest: usersBranchesManifest },
+  validateSearch: validateBranchesSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(usersBranchesManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: UsersBranchesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationUsersBranchCreateRoute = createRoute({
+  getParentRoute: () => organizationUsersBranchesRoute,
+  path: 'create',
+  head: manifestHead(branchCreateManifest),
+  staticData: { manifest: branchCreateManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(branchCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: BranchCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationUsersBranchEditRoute = createRoute({
+  getParentRoute: () => organizationUsersBranchesRoute,
+  path: '$branchId/edit',
+  head: manifestHead(branchEditManifest),
+  staticData: { manifest: branchEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(branchEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: BranchEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
 const organizationMedicalRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'medical',
@@ -1349,6 +1417,10 @@ const routeTree = rootRoute.addChildren([
       organizationUserEditRoute,
     ]),
     organizationUsersRolesRoute,
+    organizationUsersBranchesRoute.addChildren([
+      organizationUsersBranchCreateRoute,
+      organizationUsersBranchEditRoute,
+    ]),
     organizationNotFoundRoute,
   ]),
   personalShellRoute.addChildren([personalDashboardRoute]),

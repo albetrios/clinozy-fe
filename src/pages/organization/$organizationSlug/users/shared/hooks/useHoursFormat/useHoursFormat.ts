@@ -9,7 +9,7 @@ import {
 } from '@/shared/api/clinic/clinic-time.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
-import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
+import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 
 /** A Monday the weekday names are read from (any Monday reads the same). */
 const MONDAY = '2024-01-01';
@@ -24,8 +24,8 @@ const WEEK_INDEX: Readonly<Record<Weekday, number>> = {
   sun: 6,
 };
 
-/** What the Team shows of days, hours and times, in the viewer's locale. */
-export interface TeamFormat {
+/** What the Users room shows of days, hours and times, in the viewer's locale. */
+export interface HoursFormat {
   /** "Mon" — a weekday's short name. */
   weekday: (day: Weekday) => string;
   /** "Mon–Sat", "Every day", "Mon, Wed, Fri"; '' for none. */
@@ -37,11 +37,13 @@ export interface TeamFormat {
 }
 
 /**
- * The Team's words for working days and times (`usRange`, H:3608; the
- * Updated cell, `users.md:32`): weekday names from the locale, times in the
- * viewer's zone and hour cycle for an instant, clinic clock times as written.
+ * The Users room's words for days and times (`usRange`, H:3608; the Updated
+ * cell, `users.md:32`) — a member's working hours, a branch's opening hours:
+ * weekday names from the locale, times in the viewer's zone and hour cycle for
+ * an instant, clinic clock times as written. Family shared: the Team, the
+ * user drawer and the Branches tab read it.
  */
-export function useTeamFormat(): TeamFormat {
+export function useHoursFormat(): HoursFormat {
   const { t } = useTranslation(USERS_NS);
   const { formatDate, prefs } = useLocaleFormat();
 

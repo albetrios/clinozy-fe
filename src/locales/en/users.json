@@ -256,5 +256,123 @@
       "confirm": "Delete",
       "pending": "Deleting {{name}}…"
     }
+  },
+  "branches": {
+    "record": "Branch",
+    "columns": {
+      "branch": "Branch",
+      "address": "Address",
+      "contact": "Contact",
+      "hours": "Opening hours",
+      "team": "Team",
+      "defaults": "Default people",
+      "status": "Status"
+    },
+    "main": "Main",
+    "notSet": "Not set",
+    "defaults": {
+      "doctor": "Doctor · {{name}}",
+      "desk": "Desk · {{name}}",
+      "therapist": "Therapist · {{name}}",
+      "pharmacist": "Pharmacy · {{name}}"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "records": "branches",
+    "empty": "No branches yet",
+    "drawer": {
+      "title": {
+        "create": "New branch",
+        "edit": "Edit branch"
+      },
+      "sub": "Address, hours and the people who work here",
+      "summaryNew": "New branch",
+      "people_one": "{{count}} person",
+      "people_other": "{{count}} people",
+      "mainBadge": "Main branch",
+      "steps": {
+        "place": "Branch & address",
+        "contact": "Contact & opening hours",
+        "people": "People"
+      },
+      "groups": {
+        "branch": "Branch",
+        "address": "Address",
+        "contact": "Contact",
+        "hours": "Opening hours"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Colour",
+        "main": "Main branch",
+        "status": "Status",
+        "line1": "Address line 1",
+        "line2": "Address line 2",
+        "area": "Area",
+        "city": "City",
+        "pin": "PIN code",
+        "state": "State",
+        "phone": "Phone",
+        "email": "Email",
+        "gstin": "GSTIN",
+        "days": "Days",
+        "opens": "Opens",
+        "closes": "Closes",
+        "team": "Team",
+        "doctor": "Default doctor",
+        "desk": "Default front desk",
+        "therapist": "Default therapist",
+        "pharmacist": "Default pharmacist"
+      },
+      "placeholders": {
+        "name": "e.g. Vesu",
+        "line1": "Shop / floor, building",
+        "line2": "Street, landmark",
+        "area": "e.g. Vesu",
+        "city": "City",
+        "pin": "6 digits",
+        "state": "State",
+        "email": "branch@clinic.com",
+        "gstin": "15 characters",
+        "team": "Pick team"
+      },
+      "hints": {
+        "colour": "marks this branch everywhere",
+        "phone": "10 digits",
+        "team": "who works here",
+        "preselected": "preselected in forms here",
+        "addFirst": {
+          "doctor": "add a doctor to the team first",
+          "desk": "add a front desk to the team first",
+          "therapist": "add a therapist to the team first",
+          "pharmacist": "add a pharmacist to the team first"
+        }
+      },
+      "toggles": {
+        "mainOn": "Main · head office",
+        "mainOff": "Not the main branch",
+        "openOn": "Open · shown in pickers",
+        "openOff": "Closed · hidden everywhere"
+      },
+      "nobody": "Nobody",
+      "you": "{{name}} (you)",
+      "save": {
+        "create": "Add branch",
+        "edit": "Save branch"
+      },
+      "nameMissing": "Name the branch",
+      "addressMissing": "Add the address",
+      "duplicate": "A branch called {{name}} already exists",
+      "phoneInvalid": "Phone needs 10 digits",
+      "emailInvalid": "Enter a valid email address",
+      "added": "{{name}} branch added",
+      "saved": "{{name}} saved"
+    },
+    "deleteBranch": {
+      "title": "Delete this branch?",
+      "removed": "{{name}} removed"
+    }
   }
 }

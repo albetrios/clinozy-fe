@@ -196,6 +196,30 @@ export function organizationUsersRoles(organizationSlug: string) {
   } as const;
 }
 
+/** Users › Branches (`S:108`) — every branch, open and closed. */
+export function organizationUsersBranches(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/users/branches',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** The New branch drawer over Branches (`S:109`). */
+export function organizationUsersBranchCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/users/branches/create',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** A branch's drawer over Branches (`S:110`). */
+export function organizationUsersBranchEdit(organizationSlug: string, branchId: string) {
+  return {
+    to: '/organization/$organizationSlug/users/branches/$branchId/edit',
+    params: { organizationSlug, branchId },
+  } as const;
+}
+
 /** A member's drawer over the Team, keyed by membership id (`S:106`). */
 export function organizationUserEdit(organizationSlug: string, userId: string) {
   return {

@@ -17,6 +17,7 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
+import { validateBranchesSearch } from '../../branches/branches.search.ts';
 import {
   validateRolesSearch,
   validateUserEditSearch,
@@ -87,12 +88,15 @@ interface UsersRoutesOptions {
   previewRole?: Role | null;
   /** The Roles & access page's component (`/users/roles`); a marker by default. */
   Roles?: () => ReactNode;
+  /** The Branches page's component (`/users/branches`); a marker by default. */
+  Branches?: () => ReactNode;
 }
 
 /**
  * The Users family as `routeTree.tsx` registers it — the Team with its search
  * schema and its two dialog routes, which render nothing, and Roles & access
- * beside it — with `Page` as the Team's component, opened at `url`, for a
+ * and Branches (with its own two) beside it — with `Page` as the Team's
+ * component, opened at `url`, for a
  * member holding `codes` (or, with `previewRole`, previewing that role). Every
  * other path lands on a catch-all.
  */
@@ -103,6 +107,7 @@ export function renderUsersRoutes(
     codes = USERS_ADMIN_CODES,
     previewRole = null,
     Roles = () => <p>roles page</p>,
+    Branches = () => <p>branches page</p>,
   }: UsersRoutesOptions = {},
 ) {
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
@@ -139,13 +144,34 @@ export function renderUsersRoutes(
     validateSearch: validateRolesSearch,
     component: Roles,
   });
+  const branches = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/users/branches',
+    validateSearch: validateBranchesSearch,
+    component: Branches,
+  });
+  const branchCreate = createRoute({
+    getParentRoute: () => branches,
+    path: 'create',
+    component: () => null,
+  });
+  const branchEdit = createRoute({
+    getParentRoute: () => branches,
+    path: '$branchId/edit',
+    component: () => null,
+  });
   const elsewhere = createRoute({
     getParentRoute: () => root,
     path: '$',
     component: () => <p>elsewhere</p>,
   });
   const router = createRouter({
-    routeTree: root.addChildren([users.addChildren([create, edit]), roles, elsewhere]),
+    routeTree: root.addChildren([
+      users.addChildren([create, edit]),
+      roles,
+      branches.addChildren([branchCreate, branchEdit]),
+      elsewhere,
+    ]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({

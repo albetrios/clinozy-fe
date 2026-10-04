@@ -111,6 +111,9 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `user-drawer`                    | User drawer — `/users/create` (New user) and `/users/$userId/edit` (L-31b)        | `pages/organization/$organizationSlug/users/`         |
 | `users-roles-page`               | Users › Roles & access page — `/users/roles` (L-31c)                              | `pages/organization/$organizationSlug/users/roles/`   |
 | `users-roles-panel`              | Roles & access card: role list and role page (also behind a drawer opened there)  | `pages/organization/$organizationSlug/users/shared/`  |
+| `users-branches-page`            | Users › Branches page — `/users/branches` (L-31d)                                 | `pages/…/users/branches/`                             |
+| `users-branches-table`           | Users › Branches table (toolbar and table ids: the shared `users-branches-…`)     | `pages/…/users/branches/`                             |
+| `branch-drawer`                  | Branch drawer — `/users/branches/create` and `…/$branchId/edit` (L-31d)           | `pages/…/users/branches/`                             |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
 | `sidebar-toggle`                 | Menu button                                                                       | AppLayout                                             |
@@ -546,6 +549,27 @@ Its toolbar carries the shared ids with the `tableId` `users-roles` (`users-role
 | `users-role-matrix-<section>-<action>`              | One box (`role="checkbox"`, named "Front desk can view · Leads")   | `RoleMatrix`    |
 | `users-role-matrix-<section>-row`                   | The Row pill ("Full" / "Some" / "None")                            | `RoleMatrix`    |
 | `users-role-ability-<ability>`                      | A special permission's switch card (`role="switch"`)               | `RoleAbilities` |
+
+### Branch drawer (Users room, launch L-31d)
+
+New branch and Edit branch are one `BranchDrawer`
+(`pages/organization/$organizationSlug/users/branches/components/BranchDrawer/`); `<d>` is
+`branch-drawer`. Its steps are `place`, `contact` and `people`. A chip group's chips are
+`<group>-<value>` (`branch-drawer-days-sun`, `branch-drawer-colour-mint`). The list's toolbar and
+table carry the shared ids with the `tableId` `users-branches` (`users-branches-toolbar`,
+`users-branches-filters-trigger`, `users-branches-new-branch`, `users-branches-fab`,
+`users-branches-table-row`).
+
+| Test ID                                             | Element                                                                 | Source               |
+| --------------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
+| `<d>-name` / `<d>-colour` / `<d>-colour-<tone>`     | Step 1's Name and the Colour swatches                                   | `BranchDrawerFields` |
+| `<d>-main` / `<d>-status`                           | The Main branch and Status toggles (`role="switch"`)                    | `BranchDrawerFields` |
+| `<d>-line1` / `<d>-line2` / `<d>-area` / `<d>-city` | The address fields                                                      | `BranchDrawerFields` |
+| `<d>-pin` / `<d>-state`                             | PIN code (digits only) and State                                        | `BranchDrawerFields` |
+| `<d>-phone` / `<d>-email` / `<d>-gstin`             | Step 2's Phone ("+91"), Email and GSTIN (upper-cased)                   | `BranchDrawerFields` |
+| `<d>-days` / `<d>-opens` / `<d>-closes`             | The Days chips and the Opens / Closes time pickers                      | `BranchDrawerFields` |
+| `<d>-team` / `<d>-team-option-<profile id>`         | Step 3's Team picker and one person in it                               | `BranchDrawerFields` |
+| `<d>-default-<role>`                                | A default person's picker (`doctor`, `desk`, `therapist`, `pharmacist`) | `BranchDrawerFields` |
 
 ## Items field (shared, launch L-17a)
 

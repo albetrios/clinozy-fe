@@ -52,6 +52,8 @@ export interface RowContext<TData extends RowData> {
   phoneLayout: DataTablePhoneLayout;
   phoneGridClassName?: string;
   phoneMetaSkip?: readonly string[];
+  /** Phone `fold`: the key column leads and the primary block sits at the end. */
+  phoneKeyFirst: boolean;
   /** Every visible column (phone `wrap` and `regrid` rows). */
   columns: readonly TableColumn<TData>[];
   /** Columns kept side by side, in order. */
@@ -248,7 +250,9 @@ function GridCells<TData extends RowData>({
 /**
  * Phone `fold` (H:65–75, H:4112): the primary cell takes the free width with
  * its meta line, the key column sits top-end (max 46%), any locked column
- * follows, and the actions get their own end-aligned line.
+ * follows, and the actions get their own end-aligned line. With
+ * `phoneKeyFirst` the two trade places: the key column leads, centred, and
+ * the primary block — its meta line under it — sits at the end (Branches).
  */
 function PhoneFoldCells<TData extends RowData>({
   row,
@@ -261,23 +265,31 @@ function PhoneFoldCells<TData extends RowData>({
   const others = context.keptColumns.filter(
     (column) => column !== primaryColumn && column !== keyColumn,
   );
+  const keyFirst = context.phoneKeyFirst && keyColumn !== undefined;
+  const primary = primaryColumn ? (
+    <div
+      role="cell"
+      className={cn(
+        'flex min-w-0 flex-col justify-center gap-1',
+        keyFirst && 'ms-auto max-w-[46%] flex-none basis-[46%] self-start',
+        !keyFirst && (keyColumn ? 'flex-1 basis-0' : 'basis-full'),
+      )}
+    >
+      <div className="flex max-w-full min-w-0 items-center gap-1.5">
+        {renderCell(row, primaryColumn)}
+      </div>
+      <MetaLine items={metaFor(row, context)} indent={context.indentMeta} />
+    </div>
+  ) : null;
   return (
     <>
-      {primaryColumn ? (
-        <div
-          role="cell"
-          className={cn(
-            'flex min-w-0 flex-col justify-center gap-1',
-            keyColumn ? 'flex-1 basis-0' : 'basis-full',
-          )}
-        >
-          <div className="flex max-w-full min-w-0 items-center gap-1.5">
-            {renderCell(row, primaryColumn)}
-          </div>
-          <MetaLine items={metaFor(row, context)} indent={context.indentMeta} />
+      {keyFirst && keyColumn ? (
+        <div role="cell" className="flex min-w-0 flex-1 basis-0 items-center self-center">
+          {renderCell(row, keyColumn)}
         </div>
       ) : null}
-      {keyColumn ? (
+      {primary}
+      {keyColumn && !keyFirst ? (
         <div
           role="cell"
           className="ms-auto flex max-w-[46%] flex-none items-center justify-end self-start text-end"

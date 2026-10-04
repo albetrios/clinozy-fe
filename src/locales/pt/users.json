@@ -257,5 +257,124 @@
       "confirm": "Excluir",
       "pending": "Excluindo {{name}}…"
     }
+  },
+  "branches": {
+    "record": "Unidade",
+    "columns": {
+      "branch": "Unidade",
+      "address": "Endereço",
+      "contact": "Contato",
+      "hours": "Horário",
+      "team": "Equipe",
+      "defaults": "Pessoas padrão",
+      "status": "Status"
+    },
+    "main": "Principal",
+    "notSet": "Não definido",
+    "defaults": {
+      "doctor": "Médico · {{name}}",
+      "desk": "Recepção · {{name}}",
+      "therapist": "Terapeuta · {{name}}",
+      "pharmacist": "Farmácia · {{name}}"
+    },
+    "status": {
+      "open": "Aberta",
+      "closed": "Fechada"
+    },
+    "records": "unidades",
+    "empty": "Nenhuma unidade ainda",
+    "drawer": {
+      "title": {
+        "create": "Nova unidade",
+        "edit": "Editar unidade"
+      },
+      "sub": "Endereço, horário e as pessoas que trabalham aqui",
+      "summaryNew": "Nova unidade",
+      "people_one": "{{count}} pessoa",
+      "people_many": "{{count}} pessoas",
+      "people_other": "{{count}} pessoas",
+      "mainBadge": "Unidade principal",
+      "steps": {
+        "place": "Unidade e endereço",
+        "contact": "Contato e horário",
+        "people": "Pessoas"
+      },
+      "groups": {
+        "branch": "Unidade",
+        "address": "Endereço",
+        "contact": "Contato",
+        "hours": "Horário"
+      },
+      "fields": {
+        "name": "Nome",
+        "colour": "Cor",
+        "main": "Unidade principal",
+        "status": "Status",
+        "line1": "Endereço (linha 1)",
+        "line2": "Endereço (linha 2)",
+        "area": "Bairro",
+        "city": "Cidade",
+        "pin": "CEP",
+        "state": "Estado",
+        "phone": "Telefone",
+        "email": "E-mail",
+        "gstin": "GSTIN",
+        "days": "Dias",
+        "opens": "Abre",
+        "closes": "Fecha",
+        "team": "Equipe",
+        "doctor": "Médico padrão",
+        "desk": "Recepção padrão",
+        "therapist": "Terapeuta padrão",
+        "pharmacist": "Farmacêutico padrão"
+      },
+      "placeholders": {
+        "name": "ex.: Vesu",
+        "line1": "Loja / andar, prédio",
+        "line2": "Rua, ponto de referência",
+        "area": "ex.: Vesu",
+        "city": "Cidade",
+        "pin": "6 dígitos",
+        "state": "Estado",
+        "email": "unidade@clinica.com",
+        "gstin": "15 caracteres",
+        "team": "Escolha a equipe"
+      },
+      "hints": {
+        "colour": "identifica esta unidade em todo lugar",
+        "phone": "10 dígitos",
+        "team": "quem trabalha aqui",
+        "preselected": "pré-selecionado nos formulários daqui",
+        "addFirst": {
+          "doctor": "adicione primeiro um médico à equipe",
+          "desk": "adicione primeiro alguém da recepção à equipe",
+          "therapist": "adicione primeiro um terapeuta à equipe",
+          "pharmacist": "adicione primeiro um farmacêutico à equipe"
+        }
+      },
+      "toggles": {
+        "mainOn": "Principal · sede",
+        "mainOff": "Não é a unidade principal",
+        "openOn": "Aberta · aparece nas listas",
+        "openOff": "Fechada · oculta em todo lugar"
+      },
+      "nobody": "Ninguém",
+      "you": "{{name}} (você)",
+      "save": {
+        "create": "Adicionar unidade",
+        "edit": "Salvar unidade"
+      },
+      "nameMissing": "Dê um nome à unidade",
+      "addressMissing": "Adicione o endereço",
+      "duplicate": "Já existe uma unidade chamada {{name}}",
+      "phoneInvalid": "O telefone precisa de 10 dígitos",
+      "emailInvalid": "Digite um e-mail válido",
+      "added": "Unidade {{name}} adicionada",
+      "saved": "{{name}} salva"
+    },
+    "deleteBranch": {
+      "title": "Excluir esta unidade?",
+      "removed": "{{name}} removida"
+    }
   }
 }

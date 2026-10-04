@@ -257,5 +257,124 @@
       "confirm": "Eliminar",
       "pending": "Eliminando {{name}}…"
     }
+  },
+  "branches": {
+    "record": "Sucursal",
+    "columns": {
+      "branch": "Sucursal",
+      "address": "Dirección",
+      "contact": "Contacto",
+      "hours": "Horario",
+      "team": "Equipo",
+      "defaults": "Personas por defecto",
+      "status": "Estado"
+    },
+    "main": "Principal",
+    "notSet": "Sin asignar",
+    "defaults": {
+      "doctor": "Médico · {{name}}",
+      "desk": "Recepción · {{name}}",
+      "therapist": "Terapeuta · {{name}}",
+      "pharmacist": "Farmacia · {{name}}"
+    },
+    "status": {
+      "open": "Abierta",
+      "closed": "Cerrada"
+    },
+    "records": "sucursales",
+    "empty": "Aún no hay sucursales",
+    "drawer": {
+      "title": {
+        "create": "Nueva sucursal",
+        "edit": "Editar sucursal"
+      },
+      "sub": "Dirección, horario y las personas que trabajan aquí",
+      "summaryNew": "Nueva sucursal",
+      "people_one": "{{count}} persona",
+      "people_many": "{{count}} personas",
+      "people_other": "{{count}} personas",
+      "mainBadge": "Sucursal principal",
+      "steps": {
+        "place": "Sucursal y dirección",
+        "contact": "Contacto y horario",
+        "people": "Personas"
+      },
+      "groups": {
+        "branch": "Sucursal",
+        "address": "Dirección",
+        "contact": "Contacto",
+        "hours": "Horario"
+      },
+      "fields": {
+        "name": "Nombre",
+        "colour": "Color",
+        "main": "Sucursal principal",
+        "status": "Estado",
+        "line1": "Dirección (línea 1)",
+        "line2": "Dirección (línea 2)",
+        "area": "Zona",
+        "city": "Ciudad",
+        "pin": "Código postal",
+        "state": "Estado o provincia",
+        "phone": "Teléfono",
+        "email": "Correo electrónico",
+        "gstin": "GSTIN",
+        "days": "Días",
+        "opens": "Abre",
+        "closes": "Cierra",
+        "team": "Equipo",
+        "doctor": "Médico por defecto",
+        "desk": "Recepción por defecto",
+        "therapist": "Terapeuta por defecto",
+        "pharmacist": "Farmacéutico por defecto"
+      },
+      "placeholders": {
+        "name": "p. ej. Vesu",
+        "line1": "Local / planta, edificio",
+        "line2": "Calle, referencia",
+        "area": "p. ej. Vesu",
+        "city": "Ciudad",
+        "pin": "6 dígitos",
+        "state": "Estado o provincia",
+        "email": "sucursal@clinica.com",
+        "gstin": "15 caracteres",
+        "team": "Elige el equipo"
+      },
+      "hints": {
+        "colour": "identifica esta sucursal en todas partes",
+        "phone": "10 dígitos",
+        "team": "quién trabaja aquí",
+        "preselected": "preseleccionado en los formularios de aquí",
+        "addFirst": {
+          "doctor": "añade primero un médico al equipo",
+          "desk": "añade primero a alguien de recepción al equipo",
+          "therapist": "añade primero un terapeuta al equipo",
+          "pharmacist": "añade primero un farmacéutico al equipo"
+        }
+      },
+      "toggles": {
+        "mainOn": "Principal · oficina central",
+        "mainOff": "No es la sucursal principal",
+        "openOn": "Abierta · aparece en las listas",
+        "openOff": "Cerrada · oculta en todas partes"
+      },
+      "nobody": "Nadie",
+      "you": "{{name}} (tú)",
+      "save": {
+        "create": "Añadir sucursal",
+        "edit": "Guardar sucursal"
+      },
+      "nameMissing": "Ponle nombre a la sucursal",
+      "addressMissing": "Añade la dirección",
+      "duplicate": "Ya existe una sucursal llamada {{name}}",
+      "phoneInvalid": "El teléfono necesita 10 dígitos",
+      "emailInvalid": "Introduce un correo electrónico válido",
+      "added": "Sucursal {{name}} añadida",
+      "saved": "{{name}} guardada"
+    },
+    "deleteBranch": {
+      "title": "¿Eliminar esta sucursal?",
+      "removed": "{{name}} eliminada"
+    }
   }
 }

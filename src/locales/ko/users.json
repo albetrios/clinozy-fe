@@ -255,5 +255,122 @@
       "confirm": "삭제",
       "pending": "{{name}} 삭제 중…"
     }
+  },
+  "branches": {
+    "record": "지점",
+    "columns": {
+      "branch": "지점",
+      "address": "주소",
+      "contact": "연락처",
+      "hours": "운영 시간",
+      "team": "팀",
+      "defaults": "기본 담당자",
+      "status": "상태"
+    },
+    "main": "본점",
+    "notSet": "설정 안 됨",
+    "defaults": {
+      "doctor": "의사 · {{name}}",
+      "desk": "데스크 · {{name}}",
+      "therapist": "치료사 · {{name}}",
+      "pharmacist": "약국 · {{name}}"
+    },
+    "status": {
+      "open": "운영 중",
+      "closed": "닫힘"
+    },
+    "records": "지점",
+    "empty": "아직 지점이 없습니다",
+    "drawer": {
+      "title": {
+        "create": "새 지점",
+        "edit": "지점 편집"
+      },
+      "sub": "주소, 운영 시간, 이곳에서 일하는 사람",
+      "summaryNew": "새 지점",
+      "people_other": "{{count}}명",
+      "mainBadge": "본점",
+      "steps": {
+        "place": "지점 및 주소",
+        "contact": "연락처 및 운영 시간",
+        "people": "담당자"
+      },
+      "groups": {
+        "branch": "지점",
+        "address": "주소",
+        "contact": "연락처",
+        "hours": "운영 시간"
+      },
+      "fields": {
+        "name": "이름",
+        "colour": "색상",
+        "main": "본점",
+        "status": "상태",
+        "line1": "주소 1",
+        "line2": "주소 2",
+        "area": "지역",
+        "city": "도시",
+        "pin": "우편번호",
+        "state": "주",
+        "phone": "전화",
+        "email": "이메일",
+        "gstin": "GSTIN",
+        "days": "요일",
+        "opens": "여는 시간",
+        "closes": "닫는 시간",
+        "team": "팀",
+        "doctor": "기본 의사",
+        "desk": "기본 프런트 데스크",
+        "therapist": "기본 치료사",
+        "pharmacist": "기본 약사"
+      },
+      "placeholders": {
+        "name": "예: Vesu",
+        "line1": "매장 / 층, 건물",
+        "line2": "도로명, 랜드마크",
+        "area": "예: Vesu",
+        "city": "도시",
+        "pin": "6자리",
+        "state": "주",
+        "email": "branch@clinic.com",
+        "gstin": "15자",
+        "team": "팀 선택"
+      },
+      "hints": {
+        "colour": "이 지점을 어디서나 표시합니다",
+        "phone": "10자리",
+        "team": "이곳에서 일하는 사람",
+        "preselected": "이 지점 양식에서 미리 선택됨",
+        "addFirst": {
+          "doctor": "먼저 팀에 의사를 추가하세요",
+          "desk": "먼저 팀에 프런트 데스크를 추가하세요",
+          "therapist": "먼저 팀에 치료사를 추가하세요",
+          "pharmacist": "먼저 팀에 약사를 추가하세요"
+        }
+      },
+      "toggles": {
+        "mainOn": "본점 · 본사",
+        "mainOff": "본점이 아님",
+        "openOn": "운영 중 · 선택 목록에 표시",
+        "openOff": "닫힘 · 어디에도 표시 안 함"
+      },
+      "nobody": "없음",
+      "you": "{{name}} (나)",
+      "save": {
+        "create": "지점 추가",
+        "edit": "지점 저장"
+      },
+      "nameMissing": "지점 이름을 입력하세요",
+      "addressMissing": "주소를 추가하세요",
+      "duplicate": "{{name}} 지점이 이미 있습니다",
+      "phoneInvalid": "전화번호는 10자리여야 합니다",
+      "emailInvalid": "올바른 이메일 주소를 입력하세요",
+      "added": "{{name}} 지점을 추가했습니다",
+      "saved": "{{name}}을(를) 저장했습니다"
+    },
+    "deleteBranch": {
+      "title": "이 지점을 삭제할까요?",
+      "removed": "{{name}}을(를) 삭제했습니다"
+    }
   }
 }

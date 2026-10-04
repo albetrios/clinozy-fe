@@ -255,5 +255,122 @@
       "confirm": "删除",
       "pending": "正在删除 {{name}}…"
     }
+  },
+  "branches": {
+    "record": "分院",
+    "columns": {
+      "branch": "分院",
+      "address": "地址",
+      "contact": "联系方式",
+      "hours": "营业时间",
+      "team": "团队",
+      "defaults": "默认人员",
+      "status": "状态"
+    },
+    "main": "总院",
+    "notSet": "未设置",
+    "defaults": {
+      "doctor": "医生 · {{name}}",
+      "desk": "前台 · {{name}}",
+      "therapist": "治疗师 · {{name}}",
+      "pharmacist": "药房 · {{name}}"
+    },
+    "status": {
+      "open": "营业中",
+      "closed": "已关闭"
+    },
+    "records": "分院",
+    "empty": "还没有分院",
+    "drawer": {
+      "title": {
+        "create": "新建分院",
+        "edit": "编辑分院"
+      },
+      "sub": "地址、营业时间和在这里工作的人",
+      "summaryNew": "新建分院",
+      "people_other": "{{count}} 人",
+      "mainBadge": "总院",
+      "steps": {
+        "place": "分院与地址",
+        "contact": "联系方式与营业时间",
+        "people": "人员"
+      },
+      "groups": {
+        "branch": "分院",
+        "address": "地址",
+        "contact": "联系方式",
+        "hours": "营业时间"
+      },
+      "fields": {
+        "name": "名称",
+        "colour": "颜色",
+        "main": "总院",
+        "status": "状态",
+        "line1": "地址第 1 行",
+        "line2": "地址第 2 行",
+        "area": "区域",
+        "city": "城市",
+        "pin": "邮政编码",
+        "state": "邦/省",
+        "phone": "电话",
+        "email": "邮箱",
+        "gstin": "GSTIN",
+        "days": "营业日",
+        "opens": "开门",
+        "closes": "关门",
+        "team": "团队",
+        "doctor": "默认医生",
+        "desk": "默认前台",
+        "therapist": "默认治疗师",
+        "pharmacist": "默认药剂师"
+      },
+      "placeholders": {
+        "name": "例如 Vesu",
+        "line1": "店铺 / 楼层、建筑",
+        "line2": "街道、地标",
+        "area": "例如 Vesu",
+        "city": "城市",
+        "pin": "6 位数字",
+        "state": "邦/省",
+        "email": "branch@clinic.com",
+        "gstin": "15 个字符",
+        "team": "选择团队"
+      },
+      "hints": {
+        "colour": "在各处标识这个分院",
+        "phone": "10 位数字",
+        "team": "谁在这里工作",
+        "preselected": "在此处的表单中预先选中",
+        "addFirst": {
+          "doctor": "请先把一位医生加入团队",
+          "desk": "请先把一位前台加入团队",
+          "therapist": "请先把一位治疗师加入团队",
+          "pharmacist": "请先把一位药剂师加入团队"
+        }
+      },
+      "toggles": {
+        "mainOn": "总院 · 总部",
+        "mainOff": "不是总院",
+        "openOn": "营业中 · 显示在选择列表中",
+        "openOff": "已关闭 · 在各处隐藏"
+      },
+      "nobody": "无",
+      "you": "{{name}}（你）",
+      "save": {
+        "create": "添加分院",
+        "edit": "保存分院"
+      },
+      "nameMissing": "请为分院命名",
+      "addressMissing": "请添加地址",
+      "duplicate": "已存在名为 {{name}} 的分院",
+      "phoneInvalid": "电话需要 10 位数字",
+      "emailInvalid": "请输入有效的邮箱地址",
+      "added": "已添加 {{name}} 分院",
+      "saved": "已保存 {{name}}"
+    },
+    "deleteBranch": {
+      "title": "删除这个分院？",
+      "removed": "已删除 {{name}}"
+    }
   }
 }

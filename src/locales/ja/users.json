@@ -255,5 +255,122 @@
       "confirm": "削除",
       "pending": "{{name}} を削除中…"
     }
+  },
+  "branches": {
+    "record": "拠点",
+    "columns": {
+      "branch": "拠点",
+      "address": "住所",
+      "contact": "連絡先",
+      "hours": "営業時間",
+      "team": "チーム",
+      "defaults": "既定の担当者",
+      "status": "ステータス"
+    },
+    "main": "本院",
+    "notSet": "未設定",
+    "defaults": {
+      "doctor": "医師 · {{name}}",
+      "desk": "受付 · {{name}}",
+      "therapist": "セラピスト · {{name}}",
+      "pharmacist": "薬局 · {{name}}"
+    },
+    "status": {
+      "open": "営業中",
+      "closed": "閉鎖"
+    },
+    "records": "拠点",
+    "empty": "拠点はまだありません",
+    "drawer": {
+      "title": {
+        "create": "新しい拠点",
+        "edit": "拠点を編集"
+      },
+      "sub": "住所、営業時間、ここで働く人",
+      "summaryNew": "新しい拠点",
+      "people_other": "{{count}} 人",
+      "mainBadge": "本院",
+      "steps": {
+        "place": "拠点と住所",
+        "contact": "連絡先と営業時間",
+        "people": "担当者"
+      },
+      "groups": {
+        "branch": "拠点",
+        "address": "住所",
+        "contact": "連絡先",
+        "hours": "営業時間"
+      },
+      "fields": {
+        "name": "名前",
+        "colour": "色",
+        "main": "本院",
+        "status": "ステータス",
+        "line1": "住所 1",
+        "line2": "住所 2",
+        "area": "エリア",
+        "city": "市区町村",
+        "pin": "郵便番号",
+        "state": "州・県",
+        "phone": "電話",
+        "email": "メール",
+        "gstin": "GSTIN",
+        "days": "曜日",
+        "opens": "開店",
+        "closes": "閉店",
+        "team": "チーム",
+        "doctor": "既定の医師",
+        "desk": "既定の受付",
+        "therapist": "既定のセラピスト",
+        "pharmacist": "既定の薬剤師"
+      },
+      "placeholders": {
+        "name": "例: Vesu",
+        "line1": "店舗 / 階、建物",
+        "line2": "通り、目印",
+        "area": "例: Vesu",
+        "city": "市区町村",
+        "pin": "6 桁",
+        "state": "州・県",
+        "email": "branch@clinic.com",
+        "gstin": "15 文字",
+        "team": "チームを選択"
+      },
+      "hints": {
+        "colour": "この拠点をどこでも示す色です",
+        "phone": "10 桁",
+        "team": "ここで働く人",
+        "preselected": "この拠点のフォームで事前に選択されます",
+        "addFirst": {
+          "doctor": "先に医師をチームに追加してください",
+          "desk": "先に受付担当をチームに追加してください",
+          "therapist": "先にセラピストをチームに追加してください",
+          "pharmacist": "先に薬剤師をチームに追加してください"
+        }
+      },
+      "toggles": {
+        "mainOn": "本院 · 本部",
+        "mainOff": "本院ではありません",
+        "openOn": "営業中 · 選択肢に表示",
+        "openOff": "閉鎖 · どこにも表示しない"
+      },
+      "nobody": "なし",
+      "you": "{{name}}（あなた）",
+      "save": {
+        "create": "拠点を追加",
+        "edit": "拠点を保存"
+      },
+      "nameMissing": "拠点に名前を付けてください",
+      "addressMissing": "住所を追加してください",
+      "duplicate": "{{name}} という拠点はすでにあります",
+      "phoneInvalid": "電話番号は 10 桁で入力してください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "added": "拠点 {{name}} を追加しました",
+      "saved": "{{name}} を保存しました"
+    },
+    "deleteBranch": {
+      "title": "この拠点を削除しますか？",
+      "removed": "{{name}} を削除しました"
+    }
   }
 }

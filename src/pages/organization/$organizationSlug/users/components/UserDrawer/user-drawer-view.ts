@@ -16,8 +16,9 @@ import {
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 
+import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import type { TeamFormat, TeamPill } from '../TeamCells/index.ts';
+import type { TeamPill } from '../TeamCells/index.ts';
 import { missingUserFields, type UserFormValues } from './user-form.ts';
 
 const K = USERS_KEYS.drawer;
@@ -83,7 +84,7 @@ export function useUserDrawerView({
   rolePills: (keys: readonly ClinicRoleKey[]) => TeamPill[];
   branches: readonly Branch[];
   multiBranch: boolean;
-  format: TeamFormat;
+  format: HoursFormat;
 }): UserDrawerView {
   const { t } = useTranslation([USERS_NS, CLINIC_NS]);
   const roles = rolePills(values.roleKeys);

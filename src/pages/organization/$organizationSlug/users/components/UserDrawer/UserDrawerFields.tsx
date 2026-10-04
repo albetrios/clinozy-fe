@@ -21,21 +21,16 @@ import {
   DrawerToggle,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import { TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
+import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
+import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import {
-  isInvitationExpired,
-  type TeamFormat,
-  type TeamPill,
-} from '../TeamCells/index.ts';
+import { isInvitationExpired, type TeamPill } from '../TeamCells/index.ts';
 import {
   COMMISSION_QUICK,
-  nextClockTime,
   USER_FORM_LIMITS,
-  USER_TIME_RANGE,
   USER_TONES,
   type UserFormValues,
 } from './user-form.ts';
@@ -283,7 +278,7 @@ export function UserHoursFields({
   resending,
   onResend,
 }: UserFieldsProps & {
-  format: TeamFormat;
+  format: HoursFormat;
   /** The member being edited; null for a new user. */
   member: TeamMember | null;
   /** The owner's or your own status can't be flipped here. */
@@ -332,14 +327,11 @@ export function UserHoursFields({
                   control.onChange(time);
                   // To lists only later times: a From at or past it moves To on.
                   if (form.getValues('endsAt') <= time) {
-                    form.setValue('endsAt', nextClockTime(time), { shouldDirty: true });
+                    form.setValue('endsAt', nextTimeSlot(time), { shouldDirty: true });
                   }
                 }}
                 label={t(K.fields.from)}
                 placeholder={t(K.placeholders.time)}
-                from={USER_TIME_RANGE.from}
-                to={USER_TIME_RANGE.to}
-                step={USER_TIME_RANGE.step}
                 disabled={readOnly}
                 testId={`${testId}-from`}
               />
@@ -357,9 +349,7 @@ export function UserHoursFields({
                 onChange={control.onChange}
                 label={t(K.fields.to)}
                 placeholder={t(K.placeholders.time)}
-                from={nextClockTime(values.startsAt)}
-                to={USER_TIME_RANGE.to}
-                step={USER_TIME_RANGE.step}
+                from={nextTimeSlot(values.startsAt)}
                 disabled={readOnly}
                 testId={`${testId}-to`}
               />

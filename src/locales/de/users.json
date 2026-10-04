@@ -256,5 +256,123 @@
       "confirm": "Löschen",
       "pending": "{{name}} wird gelöscht…"
     }
+  },
+  "branches": {
+    "record": "Filiale",
+    "columns": {
+      "branch": "Filiale",
+      "address": "Adresse",
+      "contact": "Kontakt",
+      "hours": "Öffnungszeiten",
+      "team": "Team",
+      "defaults": "Standardpersonen",
+      "status": "Status"
+    },
+    "main": "Haupt",
+    "notSet": "Nicht festgelegt",
+    "defaults": {
+      "doctor": "Arzt · {{name}}",
+      "desk": "Empfang · {{name}}",
+      "therapist": "Therapeut · {{name}}",
+      "pharmacist": "Apotheke · {{name}}"
+    },
+    "status": {
+      "open": "Geöffnet",
+      "closed": "Geschlossen"
+    },
+    "records": "Filialen",
+    "empty": "Noch keine Filialen",
+    "drawer": {
+      "title": {
+        "create": "Neue Filiale",
+        "edit": "Filiale bearbeiten"
+      },
+      "sub": "Adresse, Öffnungszeiten und die Menschen, die hier arbeiten",
+      "summaryNew": "Neue Filiale",
+      "people_one": "{{count}} Person",
+      "people_other": "{{count}} Personen",
+      "mainBadge": "Hauptfiliale",
+      "steps": {
+        "place": "Filiale & Adresse",
+        "contact": "Kontakt & Öffnungszeiten",
+        "people": "Personen"
+      },
+      "groups": {
+        "branch": "Filiale",
+        "address": "Adresse",
+        "contact": "Kontakt",
+        "hours": "Öffnungszeiten"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Farbe",
+        "main": "Hauptfiliale",
+        "status": "Status",
+        "line1": "Adresszeile 1",
+        "line2": "Adresszeile 2",
+        "area": "Gebiet",
+        "city": "Stadt",
+        "pin": "PLZ",
+        "state": "Bundesland",
+        "phone": "Telefon",
+        "email": "E-Mail",
+        "gstin": "GSTIN",
+        "days": "Tage",
+        "opens": "Öffnet",
+        "closes": "Schließt",
+        "team": "Team",
+        "doctor": "Standardarzt",
+        "desk": "Standard-Empfang",
+        "therapist": "Standardtherapeut",
+        "pharmacist": "Standardapotheker"
+      },
+      "placeholders": {
+        "name": "z. B. Vesu",
+        "line1": "Laden / Etage, Gebäude",
+        "line2": "Straße, Orientierungspunkt",
+        "area": "z. B. Vesu",
+        "city": "Stadt",
+        "pin": "6 Ziffern",
+        "state": "Bundesland",
+        "email": "filiale@klinik.de",
+        "gstin": "15 Zeichen",
+        "team": "Team auswählen"
+      },
+      "hints": {
+        "colour": "kennzeichnet diese Filiale überall",
+        "phone": "10 Ziffern",
+        "team": "wer hier arbeitet",
+        "preselected": "in Formularen hier vorausgewählt",
+        "addFirst": {
+          "doctor": "fügen Sie zuerst einen Arzt zum Team hinzu",
+          "desk": "fügen Sie zuerst jemanden vom Empfang zum Team hinzu",
+          "therapist": "fügen Sie zuerst einen Therapeuten zum Team hinzu",
+          "pharmacist": "fügen Sie zuerst einen Apotheker zum Team hinzu"
+        }
+      },
+      "toggles": {
+        "mainOn": "Haupt · Zentrale",
+        "mainOff": "Nicht die Hauptfiliale",
+        "openOn": "Geöffnet · in Auswahllisten",
+        "openOff": "Geschlossen · überall ausgeblendet"
+      },
+      "nobody": "Niemand",
+      "you": "{{name}} (Sie)",
+      "save": {
+        "create": "Filiale hinzufügen",
+        "edit": "Filiale speichern"
+      },
+      "nameMissing": "Geben Sie der Filiale einen Namen",
+      "addressMissing": "Fügen Sie die Adresse hinzu",
+      "duplicate": "Eine Filiale namens {{name}} gibt es bereits",
+      "phoneInvalid": "Die Telefonnummer braucht 10 Ziffern",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "added": "Filiale {{name}} hinzugefügt",
+      "saved": "{{name}} gespeichert"
+    },
+    "deleteBranch": {
+      "title": "Diese Filiale löschen?",
+      "removed": "{{name}} entfernt"
+    }
   }
 }

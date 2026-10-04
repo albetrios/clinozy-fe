@@ -8,7 +8,8 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * `useClinicAccess`. In the primary nav as the `users` section. Its children:
  * the invite drawer (`create`) and the member drawer (`$userId/edit`) — URL
  * driven dialogs over the Team (D24, `S:105–106`) — and Roles & access
- * (`roles`), registered beside the Team in the route tree.
+ * (`roles`) and Branches (`branches`), registered beside the Team in the
+ * route tree.
  */
 export const manifest = {
   segment: 'users',
@@ -19,5 +20,5 @@ export const manifest = {
   module: 'clinic-users',
   nav: { id: 'users', section: 'users' },
   kind: 'layout',
-  children: ['create', '$userId', 'roles'],
+  children: ['create', '$userId', 'roles', 'branches'],
 } as const satisfies PageManifest;

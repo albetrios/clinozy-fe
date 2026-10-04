@@ -69,6 +69,15 @@ describe('UsersToolbar (users.md:17)', () => {
     );
   });
 
+  it('links Branches and marks it current on its page and its drawers', async () => {
+    renderUsersRoutes('/organization/acme/users/branches/create', vi.fn(), {
+      Branches: () => <UsersToolbar tab="branches" />,
+    });
+    const branches = await screen.findByRole('link', { name: 'Branches' });
+    expect(branches).toHaveAttribute('href', '/organization/acme/users/branches');
+    expect(branches).toHaveAttribute('aria-current', 'page');
+  });
+
   it('keeps Roles & access current behind a drawer opened from it', async () => {
     renderUsersRoutes('/organization/acme/users/mbr_riya/edit?from=roles', () => (
       <UsersToolbar tab="roles" />

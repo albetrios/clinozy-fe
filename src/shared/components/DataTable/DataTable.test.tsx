@@ -404,6 +404,17 @@ describe('DataTable — phone rows (below md)', () => {
     expect(cells[1]?.className).toContain('max-w-[46%]');
   });
 
+  it('leads with the key column and ends with the primary block when keyFirst', () => {
+    render(<Room data={[patient(8)]} fold phoneKeyFirst />);
+    const cells = within(screen.getByTestId('patients-table-row')).getAllByRole('cell');
+    expect(cells[0]).toHaveTextContent('₹2000');
+    expect(cells[0]?.className).toContain('flex-1');
+    expect(cells[1]).toHaveTextContent('Patient 008');
+    expect(cells[1]?.className).toContain('max-w-[46%]');
+    // The meta line stays with the primary cell, now at the end.
+    expect(cells[1]?.querySelector('[data-slot="data-table-meta"]')).not.toBeNull();
+  });
+
   it('caps the meta line at four, most important first, dropping "Active"', () => {
     const { unmount } = render(<Room data={[patient(8)]} fold />);
     const meta = screen.getByText('#3508').closest('[data-slot="data-table-meta"]');

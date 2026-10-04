@@ -257,5 +257,124 @@
       "confirm": "Elimina",
       "pending": "Eliminazione di {{name}}…"
     }
+  },
+  "branches": {
+    "record": "Sede",
+    "columns": {
+      "branch": "Sede",
+      "address": "Indirizzo",
+      "contact": "Contatti",
+      "hours": "Orari",
+      "team": "Team",
+      "defaults": "Persone predefinite",
+      "status": "Stato"
+    },
+    "main": "Principale",
+    "notSet": "Non impostato",
+    "defaults": {
+      "doctor": "Medico · {{name}}",
+      "desk": "Reception · {{name}}",
+      "therapist": "Terapista · {{name}}",
+      "pharmacist": "Farmacia · {{name}}"
+    },
+    "status": {
+      "open": "Aperta",
+      "closed": "Chiusa"
+    },
+    "records": "sedi",
+    "empty": "Ancora nessuna sede",
+    "drawer": {
+      "title": {
+        "create": "Nuova sede",
+        "edit": "Modifica sede"
+      },
+      "sub": "Indirizzo, orari e le persone che ci lavorano",
+      "summaryNew": "Nuova sede",
+      "people_one": "{{count}} persona",
+      "people_many": "{{count}} persone",
+      "people_other": "{{count}} persone",
+      "mainBadge": "Sede principale",
+      "steps": {
+        "place": "Sede e indirizzo",
+        "contact": "Contatti e orari",
+        "people": "Persone"
+      },
+      "groups": {
+        "branch": "Sede",
+        "address": "Indirizzo",
+        "contact": "Contatti",
+        "hours": "Orari"
+      },
+      "fields": {
+        "name": "Nome",
+        "colour": "Colore",
+        "main": "Sede principale",
+        "status": "Stato",
+        "line1": "Indirizzo (riga 1)",
+        "line2": "Indirizzo (riga 2)",
+        "area": "Zona",
+        "city": "Città",
+        "pin": "CAP",
+        "state": "Stato o regione",
+        "phone": "Telefono",
+        "email": "Email",
+        "gstin": "GSTIN",
+        "days": "Giorni",
+        "opens": "Apre",
+        "closes": "Chiude",
+        "team": "Team",
+        "doctor": "Medico predefinito",
+        "desk": "Reception predefinita",
+        "therapist": "Terapista predefinito",
+        "pharmacist": "Farmacista predefinito"
+      },
+      "placeholders": {
+        "name": "es. Vesu",
+        "line1": "Negozio / piano, edificio",
+        "line2": "Via, punto di riferimento",
+        "area": "es. Vesu",
+        "city": "Città",
+        "pin": "6 cifre",
+        "state": "Stato o regione",
+        "email": "sede@clinica.it",
+        "gstin": "15 caratteri",
+        "team": "Scegli il team"
+      },
+      "hints": {
+        "colour": "contraddistingue questa sede ovunque",
+        "phone": "10 cifre",
+        "team": "chi lavora qui",
+        "preselected": "preselezionato nei moduli qui",
+        "addFirst": {
+          "doctor": "aggiungi prima un medico al team",
+          "desk": "aggiungi prima qualcuno della reception al team",
+          "therapist": "aggiungi prima un terapista al team",
+          "pharmacist": "aggiungi prima un farmacista al team"
+        }
+      },
+      "toggles": {
+        "mainOn": "Principale · sede centrale",
+        "mainOff": "Non è la sede principale",
+        "openOn": "Aperta · visibile negli elenchi",
+        "openOff": "Chiusa · nascosta ovunque"
+      },
+      "nobody": "Nessuno",
+      "you": "{{name}} (tu)",
+      "save": {
+        "create": "Aggiungi sede",
+        "edit": "Salva sede"
+      },
+      "nameMissing": "Dai un nome alla sede",
+      "addressMissing": "Aggiungi l’indirizzo",
+      "duplicate": "Esiste già una sede chiamata {{name}}",
+      "phoneInvalid": "Il telefono deve avere 10 cifre",
+      "emailInvalid": "Inserisci un indirizzo email valido",
+      "added": "Sede {{name}} aggiunta",
+      "saved": "{{name}} salvata"
+    },
+    "deleteBranch": {
+      "title": "Eliminare questa sede?",
+      "removed": "{{name}} eliminata"
+    }
   }
 }

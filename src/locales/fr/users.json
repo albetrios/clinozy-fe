@@ -257,5 +257,124 @@
       "confirm": "Supprimer",
       "pending": "Suppression de {{name}}…"
     }
+  },
+  "branches": {
+    "record": "Établissement",
+    "columns": {
+      "branch": "Établissement",
+      "address": "Adresse",
+      "contact": "Contact",
+      "hours": "Horaires",
+      "team": "Équipe",
+      "defaults": "Personnes par défaut",
+      "status": "Statut"
+    },
+    "main": "Principal",
+    "notSet": "Non défini",
+    "defaults": {
+      "doctor": "Médecin · {{name}}",
+      "desk": "Accueil · {{name}}",
+      "therapist": "Thérapeute · {{name}}",
+      "pharmacist": "Pharmacie · {{name}}"
+    },
+    "status": {
+      "open": "Ouvert",
+      "closed": "Fermé"
+    },
+    "records": "établissements",
+    "empty": "Aucun établissement pour l’instant",
+    "drawer": {
+      "title": {
+        "create": "Nouvel établissement",
+        "edit": "Modifier l’établissement"
+      },
+      "sub": "Adresse, horaires et les personnes qui y travaillent",
+      "summaryNew": "Nouvel établissement",
+      "people_one": "{{count}} personne",
+      "people_many": "{{count}} personnes",
+      "people_other": "{{count}} personnes",
+      "mainBadge": "Établissement principal",
+      "steps": {
+        "place": "Établissement et adresse",
+        "contact": "Contact et horaires",
+        "people": "Personnes"
+      },
+      "groups": {
+        "branch": "Établissement",
+        "address": "Adresse",
+        "contact": "Contact",
+        "hours": "Horaires"
+      },
+      "fields": {
+        "name": "Nom",
+        "colour": "Couleur",
+        "main": "Établissement principal",
+        "status": "Statut",
+        "line1": "Adresse (ligne 1)",
+        "line2": "Adresse (ligne 2)",
+        "area": "Quartier",
+        "city": "Ville",
+        "pin": "Code postal",
+        "state": "État",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "gstin": "GSTIN",
+        "days": "Jours",
+        "opens": "Ouvre",
+        "closes": "Ferme",
+        "team": "Équipe",
+        "doctor": "Médecin par défaut",
+        "desk": "Accueil par défaut",
+        "therapist": "Thérapeute par défaut",
+        "pharmacist": "Pharmacien par défaut"
+      },
+      "placeholders": {
+        "name": "ex. Vesu",
+        "line1": "Boutique / étage, bâtiment",
+        "line2": "Rue, point de repère",
+        "area": "ex. Vesu",
+        "city": "Ville",
+        "pin": "6 chiffres",
+        "state": "État",
+        "email": "etablissement@clinique.fr",
+        "gstin": "15 caractères",
+        "team": "Choisir l’équipe"
+      },
+      "hints": {
+        "colour": "identifie cet établissement partout",
+        "phone": "10 chiffres",
+        "team": "qui travaille ici",
+        "preselected": "présélectionné dans les formulaires ici",
+        "addFirst": {
+          "doctor": "ajoutez d’abord un médecin à l’équipe",
+          "desk": "ajoutez d’abord une personne de l’accueil à l’équipe",
+          "therapist": "ajoutez d’abord un thérapeute à l’équipe",
+          "pharmacist": "ajoutez d’abord un pharmacien à l’équipe"
+        }
+      },
+      "toggles": {
+        "mainOn": "Principal · siège",
+        "mainOff": "Pas l’établissement principal",
+        "openOn": "Ouvert · visible dans les listes",
+        "openOff": "Fermé · masqué partout"
+      },
+      "nobody": "Personne",
+      "you": "{{name}} (vous)",
+      "save": {
+        "create": "Ajouter l’établissement",
+        "edit": "Enregistrer l’établissement"
+      },
+      "nameMissing": "Nommez l’établissement",
+      "addressMissing": "Ajoutez l’adresse",
+      "duplicate": "Un établissement nommé {{name}} existe déjà",
+      "phoneInvalid": "Le téléphone doit comporter 10 chiffres",
+      "emailInvalid": "Saisissez une adresse e-mail valide",
+      "added": "Établissement {{name}} ajouté",
+      "saved": "{{name}} enregistré"
+    },
+    "deleteBranch": {
+      "title": "Supprimer cet établissement ?",
+      "removed": "{{name}} supprimé"
+    }
   }
 }

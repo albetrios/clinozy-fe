@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 
 import {
@@ -85,6 +88,22 @@ describe('UsersPage — the Team', () => {
     expect(within(riya).getByText('Front desk')).toBeInTheDocument();
     expect(within(riya).getByText('Admin')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('shows no branch UI with one open branch: no Branches column, no Branches filter', async () => {
+    for (const branch of clinicFixtures.branches.snapshot((row) => !row.isMain)) {
+      await clinicFixtures.branches.update(branch.id, { active: false });
+    }
+    renderUsersRoutes('/organization/acme/users', UsersPage);
+    // Riya works at Adajan and Vesu; with Adajan the only open branch, no chip shows.
+    const riya = await rowOf('Riya Shah');
+    expect(within(riya).queryByText('Adajan')).toBeNull();
+    screen.getByTestId('users-team-filters-trigger').click();
+    const apply = await screen.findByTestId('users-team-filters-apply');
+    const panel = apply.closest('[data-radix-popper-content-wrapper], [role="dialog"]');
+    if (!(panel instanceof HTMLElement)) throw new Error('the Filters panel');
+    expect(within(panel).getByText('Status')).toBeInTheDocument();
+    expect(within(panel).queryByText('Branches')).toBeNull();
   });
 
   it('shows an invitation as "Invited" (its expiry is the Status cell’s, TeamCells)', async () => {

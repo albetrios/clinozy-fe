@@ -1,4 +1,5 @@
 export {
+  nextTimeSlot,
   TIME_PICKER_FROM,
   TIME_PICKER_STEP,
   TIME_PICKER_TO,

@@ -7,7 +7,6 @@ import {
   isMobileIncomplete,
   isUserEmail,
   missingUserFields,
-  nextClockTime,
   USER_QUICK_FILLS,
   userFormOf,
   userProfileInput,
@@ -112,11 +111,6 @@ describe('the user drawer’s form (users.md:99–124)', () => {
     expect(isMobileIncomplete('')).toBe(false);
     expect(isMobileIncomplete('98250')).toBe(true);
     expect(isMobileIncomplete('9825044120')).toBe(false);
-  });
-
-  it('offers To only after From', () => {
-    expect(nextClockTime('10:00')).toBe('10:30');
-    expect(nextClockTime('23:30')).toBe('23:59');
   });
 
   it('presets roles, days, hours and commission — never the colour', () => {

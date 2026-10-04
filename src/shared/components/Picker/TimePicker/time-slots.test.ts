@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { timeSlots } from './time-slots.ts';
+import { nextTimeSlot, timeSlots } from './time-slots.ts';
 
 describe('timeSlots', () => {
   it('offers 06:00 to 23:30 every 30 minutes by default (users.md:114)', () => {
@@ -21,5 +21,13 @@ describe('timeSlots', () => {
     ]);
     expect(timeSlots('10:00', '09:00')).toEqual([]);
     expect(timeSlots('10:00', '11:00', 0)).toEqual([]);
+  });
+});
+
+describe('nextTimeSlot', () => {
+  it('starts a closing time’s list after the opening one, never past the day', () => {
+    expect(nextTimeSlot('10:00')).toBe('10:30');
+    expect(nextTimeSlot('10:00', 15)).toBe('10:15');
+    expect(nextTimeSlot('23:30')).toBe('23:59');
   });
 });

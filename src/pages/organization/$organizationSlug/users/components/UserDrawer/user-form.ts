@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 import type { Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import { clockMinutes, clockOfMinutes } from '@/shared/api/clinic/clinic-time.ts';
 import {
   STAFF_PROFILE_DEFAULTS,
   type StaffProfileInput,
@@ -54,9 +53,6 @@ export const COMMISSION_QUICK = [0, 5, 10, 15] as const;
 
 /** The form's limits (`users.md:105–107`). */
 export const USER_FORM_LIMITS = { name: 60, email: 254 } as const;
-
-/** The time tiles' range: 06:00–23:30, every 30 minutes (`users.md:114`). */
-export const USER_TIME_RANGE = { from: '06:00', to: '23:30', step: 30 } as const;
 
 const MON_SAT: readonly Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const EVERY_DAY: readonly Weekday[] = [...MON_SAT, 'sun'];
@@ -189,11 +185,6 @@ export function isUserEmail(value: string): boolean {
 /** A filled mobile that is not ten digits (an empty one is fine). */
 export function isMobileIncomplete(digits: string): boolean {
   return digits.length > 0 && toClinicPhone(digits) === null;
-}
-
-/** The first `HH:mm` tile after `time` (To lists only times after From, §7.3). */
-export function nextClockTime(time: string, step = USER_TIME_RANGE.step): string {
-  return clockOfMinutes(Math.min(clockMinutes(time) + step, 24 * 60 - 1));
 }
 
 /**

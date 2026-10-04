@@ -19,9 +19,9 @@ import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { useRoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { USER_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { useTeamFormat } from '../TeamCells/index.ts';
 import { UserDeleteConfirm } from '../UserDeleteConfirm/index.ts';
 import { type UserSaveOutcome, useUserSave } from './use-user-save.ts';
 import { useUserDrawerView } from './user-drawer-view.ts';
@@ -155,7 +155,7 @@ function useDrawerData() {
   const { data: matrix } = useClinicAccessMatrix();
   const platformRoles = usePlatformRoles();
   const directory = useRoleDirectory();
-  const format = useTeamFormat();
+  const format = useHoursFormat();
   return {
     openBranches,
     isMultiBranch,

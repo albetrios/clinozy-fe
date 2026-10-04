@@ -31,8 +31,8 @@ import {
   TeamStatusCell,
   TeamTextCell,
   TeamUserCell,
-  useTeamFormat,
 } from '../../components/TeamCells/index.ts';
+import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import type { RoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { TEAM_TABLE_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamSort } from '../../users.search.ts';
@@ -72,7 +72,7 @@ function useTeamColumns({
   multiBranch,
 }: TeamColumnsInput): ColumnDef<DataTableFeatures, TeamMember>[] {
   const { t } = useTranslation(USERS_NS);
-  const format = useTeamFormat();
+  const format = useHoursFormat();
   const branchById = new Map(branches.map((branch) => [branch.id, branch]));
 
   const rolePills = (member: TeamMember) => roles.pills(member.roleKeys);
