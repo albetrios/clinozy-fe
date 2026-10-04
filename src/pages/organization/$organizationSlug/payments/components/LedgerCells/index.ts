@@ -6,6 +6,7 @@ export {
   ledgerSubLine,
   ledgerWhat,
   useLedgerSubLine,
+  useLedgerTime,
   useLedgerWhen,
 } from './ledger-cells.ts';
 export {

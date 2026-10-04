@@ -3,8 +3,10 @@ export {
   RECORD_DRAWER_PANEL_CLASS,
   RecordDrawerClose,
 } from './record-drawer-chrome.tsx';
+export { useDrawerTitleFocus } from './record-drawer-focus.ts';
 export { useDrawerItemsField } from './record-drawer-items.ts';
 export {
+  DRAWER_WIDTH_CLASS,
   type DrawerContentProfile,
   drawerWidthAt,
   EXPLICIT_DRAWER_WIDTHS,

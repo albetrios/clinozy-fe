@@ -8,7 +8,6 @@ import {
   branchSchema,
   checkInSchema,
   creditNoteSchema,
-  dayCloseSchema,
   feedbackActionSchema,
   invoiceSchema,
   leadMessageSchema,
@@ -40,6 +39,7 @@ import {
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
 import { pendingCreditRecordSchema } from '@/shared/api/clinic/credits-contracts.ts';
+import { dayCloseRecordSchema } from '@/shared/api/clinic/day-close-contracts.ts';
 import { leadRecordSchema } from '@/shared/api/clinic/leads-contracts.ts';
 import { medicineRecordSchema } from '@/shared/api/clinic/medicines-contracts.ts';
 import {
@@ -89,7 +89,7 @@ const SCHEMAS = {
   payments: paymentRecordSchema,
   creditNotes: creditNoteSchema,
   pendingCredits: pendingCreditRecordSchema,
-  dayCloses: dayCloseSchema,
+  dayCloses: dayCloseRecordSchema,
   // The contract's Task plus the plan's fields at rest (Appendix F, REPLACE_WITH_API).
   tasks: taskRecordSchema,
   manufacturers: manufacturerSchema,

@@ -828,3 +828,28 @@ on both); their fields:
 | `credit-drawer-invoice` · `-invoice-option-<invoiceId>`                                                             | For invoice (a patient with invoices) · one invoice                                 | `pending/components/CreditDrawer/` |
 | `credit-drawer-settle-by` · `-note`                                                                                 | Settle by · Note                                                                    | `pending/components/CreditDrawer/` |
 | `settle-credit-drawer-splits` · `-splits-row` · `-splits-mode` · `-splits-amount` · `-splits-add` · `-splits-total` | The Mode · Amount rows, a row, its mode and amount, "+ Add another mode", the total | `shared/forms/SplitRowsField/`     |
+
+### Day close (launch L-41)
+
+`components/DayCloseDrawer/`, opened by the ledger for `/payments/day-close`. Every id sits
+under the drawer's root, `day-close-drawer`:
+
+| Test ID                                                                                       | Element                                                                | Source                |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------- |
+| `day-close-drawer-close`                                                                      | The header's inline ×                                                  | `DayCloseDrawer.tsx`  |
+| `day-close-drawer-day` · `-day-option-<YYYY-MM-DD>`                                           | The day dropdown (`DatePicker`) · a day                                | `DayCloseBar.tsx`     |
+| `day-close-drawer-status` · `-entries`                                                        | The status pill · "6 entries on Oct 3"                                 | `DayCloseBar.tsx`     |
+| `day-close-drawer-open-day-<YYYY-MM-DD>`                                                      | Yesterday's open-day chip (while today shows)                          | `DayCloseBar.tsx`     |
+| `day-close-drawer-previous` · `-previous-list` · `-previous-<YYYY-MM-DD>`                     | "Previous closes" · its chips · one close                              | `DayCloseBar.tsx`     |
+| `day-close-drawer-close-day`                                                                  | "Close day" (the working day, `dayclose`)                              | `DayCloseBar.tsx`     |
+| `day-close-drawer-loading`                                                                    | The day's loading skeleton                                             | `DayCloseDrawer.tsx`  |
+| `day-close-drawer-gate` · `-gate-amount` · `-gate-source` · `-gate-recount` · `-gate-accept`  | The gate: card, amount, source, Recount, Accept                        | `DayCloseGate.tsx`    |
+| `day-close-drawer-strip` · `-strip-opening` · `-strip-cash` · `-strip-count` · `-strip-modes` | The working strip and its four cells                                   | `DayCloseWorking.tsx` |
+| `day-close-drawer-strip-count-input` · `-strip-difference`                                    | Counted cash · the difference pill                                     | `DayCloseWorking.tsx` |
+| `day-close-drawer-strip-mode-<mode>` · `-strip-staff-<memberId>`                              | A mode's net pill · a member's receipts chip                           | `DayCloseWorking.tsx` |
+| `day-close-drawer-report` · `-report-reopen` · `-report-strip`                                | The report card · Reopen · its strip                                   | `DayCloseReport.tsx`  |
+| `day-close-drawer-report-<opening\|collected\|paid\|counted\|difference>`                     | A report cell                                                          | `DayCloseReport.tsx`  |
+| `day-close-drawer-report-log` · `-report-log-<accepted\|reviewed\|counted\|closed>`           | "What happened" · one line                                             | `DayCloseReport.tsx`  |
+| `day-close-drawer-review` · `-review-toggle` · `-review-progress` · `-review-empty`           | "Review every entry": card, toggle, progress, "No entries on this day" | `DayCloseReview.tsx`  |
+| `day-close-drawer-review-row` · `-review-check-<paymentId>`                                   | An entry · its "Mark as checked" box                                   | `DayCloseReview.tsx`  |
+| `day-close-drawer-review-<seq>-row-action-<edit\|delete>`                                     | An open day's entry's Edit · Delete                                    | `DataTableRowActions` |

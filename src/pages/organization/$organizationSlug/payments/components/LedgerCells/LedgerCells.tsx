@@ -10,6 +10,7 @@ import {
   IdPill,
   PersonChip,
   TonePill,
+  type TonePillProps,
 } from '@/shared/components/Cells/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
@@ -28,11 +29,26 @@ export function LedgerRefCell({ seq }: { seq: number }) {
   return <IdPill>{displayId.payment(seq)}</IdPill>;
 }
 
-/** The What cell: "Received" / "Paid" in the kind's tone (`payments.md:29`). */
-export function LedgerWhatCell({ row }: { row: Pick<LedgerRow, 'direction' | 'kind'> }) {
+/**
+ * The What cell: "Received" / "Paid" in the kind's tone (`payments.md:29`) —
+ * 24px in the ledger, 22px (`sm`) in Day close's review.
+ */
+export function LedgerWhatCell({
+  row,
+  size,
+  className,
+}: {
+  row: Pick<LedgerRow, 'direction' | 'kind'>;
+  size?: TonePillProps['size'];
+  className?: string;
+}) {
   const { t } = useTranslation(PAYMENTS_NS);
   const what = ledgerWhat(row);
-  return <TonePill tone={what.tone}>{t(what.labelKey)}</TonePill>;
+  return (
+    <TonePill tone={what.tone} size={size} className={className}>
+      {t(what.labelKey)}
+    </TonePill>
+  );
 }
 
 /**
@@ -87,13 +103,19 @@ export function LedgerPartyCell({ row }: { row: LedgerRow }) {
 }
 
 /** The Mode cell: one pill in the mode's tone; splits joined, "Cash + UPI" (`payments.md:29`). */
-export function LedgerModeCell({ row }: { row: Pick<LedgerRow, 'splits'> }) {
+export function LedgerModeCell({
+  row,
+  size,
+}: {
+  row: Pick<LedgerRow, 'splits'>;
+  size?: TonePillProps['size'];
+}) {
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const modes = ledgerModes(row);
   const first = modes[0];
   if (!first) return null;
   return (
-    <TonePill tone={PAYMENT_MODE_TONES[first]}>
+    <TonePill tone={PAYMENT_MODE_TONES[first]} size={size}>
       {ledgerModesLabel(modes, tClinic)}
     </TonePill>
   );

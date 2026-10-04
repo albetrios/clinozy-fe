@@ -5,7 +5,6 @@ import {
   compareText,
   type CreateInput,
   type CursorPage,
-  FIXTURE_ACTOR_ID,
   refuseUnknownIds,
   validateClinicInput,
 } from './clinic-fixture-store.ts';
@@ -18,10 +17,9 @@ import {
   clinicToday,
 } from './clinic-time.ts';
 import { assertDayOpen, ledgerDayOf, runDayCloseJob } from './day-close-api.ts';
-import { patientName } from './patients-contracts.ts';
+import { ledgerContext, toLedgerRow } from './ledger-rows.ts';
 import {
   type LedgerListParams,
-  type LedgerPerson,
   type LedgerRow,
   type OpenInvoice,
   type OpenSupplierBill,
@@ -62,104 +60,9 @@ export const paymentQueryKeys = {
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
 const fixtureStaff = () => import('./fixtures/staff.fixtures.ts');
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
-
 const DAY_CLOSED = 'Day closed';
 const FROM_CREDIT = 'From';
 const MORE_THAN_DUE = 'More than what is due';
-
-// ── Joins (the fixture server's) ──
-
-/** What every ledger read needs beside the entries. */
-interface LedgerContext {
-  patients: ReadonlyMap<string, { name: string; seq: number }>;
-  invoices: ReadonlyMap<string, LedgerRow['invoice']>;
-  creditNotes: ReadonlyMap<string, number>;
-  purchases: ReadonlyMap<string, number>;
-  credits: ReadonlyMap<string, number>;
-  staff: ReadonlyMap<string, LedgerPerson>;
-  viewerId: string;
-}
-
-async function ledgerContext(world: FixtureWorld): Promise<LedgerContext> {
-  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
-  const payments = world.payments.snapshot();
-  const bySeq = <T extends { id: string; seq: number }>(rows: readonly T[]) =>
-    new Map(rows.map((row) => [row.id, row.seq]));
-  return {
-    patients: new Map(
-      world.patients
-        .snapshot()
-        .map((patient) => [patient.id, { name: patientName(patient), seq: patient.seq }]),
-    ),
-    invoices: new Map(
-      world.invoices.snapshot().map((invoice) => [
-        invoice.id,
-        {
-          seq: invoice.seq,
-          type: invoice.type,
-          due: invoiceBalance(invoice, payments).due,
-        },
-      ]),
-    ),
-    creditNotes: bySeq(world.creditNotes.snapshot()),
-    purchases: new Map([
-      ...bySeq(world.purchaseOrders.snapshot()),
-      ...bySeq(world.stockPurchases.snapshot()),
-    ]),
-    credits: bySeq(world.pendingCredits.snapshot()),
-    staff: new Map(
-      world.staff.snapshot().map((member) => [
-        member.id,
-        {
-          id: member.id,
-          name: [member.firstName, member.lastName].filter(Boolean).join(' '),
-          initials: member.initials,
-          tone: member.tone,
-        },
-      ]),
-    ),
-    viewerId: FIXTURE_VIEWER_ID,
-  };
-}
-
-/** The member behind an entry: the fixture actor is the signed-in viewer. */
-function byOf(payment: PaymentRecord, context: LedgerContext): LedgerPerson | null {
-  const id =
-    payment.createdById === FIXTURE_ACTOR_ID ? context.viewerId : payment.createdById;
-  return context.staff.get(id) ?? null;
-}
-
-/** The value `id` names in `map`, null when there is no id or no such entry. */
-function lookup<T>(map: ReadonlyMap<string, T>, id: string | null): T | null {
-  return id === null ? null : (map.get(id) ?? null);
-}
-
-/** The supplier bill an entry paid: its kind, the purchase's number and the bill number. */
-function billOf(payment: PaymentRecord, context: LedgerContext): LedgerRow['bill'] {
-  const { billRef } = payment;
-  if (!billRef || billRef.kind === 'other') return null;
-  return {
-    kind: billRef.kind,
-    seq: context.purchases.get(billRef.purchaseId) ?? 0,
-    billNo: billRef.billNo,
-  };
-}
-
-function toLedgerRow(payment: PaymentRecord, context: LedgerContext): LedgerRow {
-  const patient = lookup(context.patients, payment.patientId);
-  return {
-    ...payment,
-    partyName: patient?.name ?? payment.payeeName ?? '—',
-    patientSeq: patient?.seq ?? null,
-    invoice: lookup(context.invoices, payment.invoiceId),
-    creditNoteSeq: lookup(context.creditNotes, payment.creditNoteId),
-    bill: billOf(payment, context),
-    pendingCreditSeq: lookup(context.credits, payment.pendingCreditId),
-    by: byOf(payment, context),
-    locked: payment.dayCloseId !== null,
-  };
-}
 
 // ── Search and filters (the fixture server's) ──
 
@@ -224,7 +127,7 @@ export async function listLedger(
 ): Promise<CursorPage<LedgerRow>> {
   await runDayCloseJob();
   const { clinicFixtures } = await fixtureWorld();
-  const context = await ledgerContext(clinicFixtures);
+  const context = await ledgerContext();
   const today = clinicToday();
   const rows = clinicFixtures.payments
     .snapshot()
@@ -244,7 +147,7 @@ export async function fetchPayment(id: string): Promise<LedgerRow> {
   await runDayCloseJob();
   const { clinicFixtures } = await fixtureWorld();
   const payment = await clinicFixtures.payments.get(id);
-  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+  return toLedgerRow(payment, await ledgerContext());
 }
 
 /** A patient's invoices, each with its bill, what is paid and what is due — oldest first. */
@@ -434,7 +337,7 @@ export async function receivePayment(input: ReceivePaymentInput): Promise<Ledger
       note: fields.note || null,
     }),
   );
-  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+  return toLedgerRow(payment, await ledgerContext());
 }
 
 /** The paid figure of a purchase changes by `delta` paise; a Medical PO paid in full is Paid. */
@@ -508,7 +411,7 @@ export async function payExpense(input: PayExpenseInput): Promise<LedgerRow> {
     }),
   );
   if (fields.billRef) await settleBill(fields.billRef, fields.amount);
-  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+  return toLedgerRow(payment, await ledgerContext());
 }
 
 /**
@@ -650,7 +553,7 @@ export async function updatePayment(id: string, patch: PaymentPatch): Promise<Le
     ...next,
     edits: editsAfter(saved, next, FIXTURE_VIEWER_ID),
   });
-  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+  return toLedgerRow(payment, await ledgerContext());
 }
 
 /** What an uploaded bill photo files: the entry and the storage key the upload tray confirmed. */

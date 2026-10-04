@@ -305,5 +305,105 @@
       "take": "{{ref}} saved · take {{amount}} from {{name}}"
     },
     "updated": "{{ref}} updated"
+  },
+  "dayClose": {
+    "title": "Day close",
+    "day": "Day",
+    "status": {
+      "open": "Open",
+      "openAuto_one": "Open · auto-closes in {{count}} h",
+      "openAuto_other": "Open · auto-closes in {{count}} h",
+      "closedBy": "Closed by {{name}}",
+      "closed": "Closed",
+      "forceClosed": "Force-closed"
+    },
+    "entries_one": "{{count}} entry on {{day}}",
+    "entries_other": "{{count}} entries on {{day}}",
+    "openDay_one": "{{day}} not closed · {{count}} h left · Review",
+    "openDay_other": "{{day}} not closed · {{count}} h left · Review",
+    "openDayTitle": "Review the entries and close it · it closes by itself when the time runs out",
+    "previous": "Previous closes",
+    "previousCash": "Cash {{amount}}",
+    "previousAuto": "Auto-closed",
+    "previousTitle": "Review {{day}}",
+    "closeDay": "Close day",
+    "countFirst": "Count the cash first",
+    "closed": "Day closed · summary sent to admin on WhatsApp",
+    "reopened": "Day reopened",
+    "gate": {
+      "title": "Opening cash · {{day}}",
+      "sources": {
+        "default_float": "Default float",
+        "carried": "Carried from {{day}} close",
+        "recounted": "Recounted"
+      },
+      "recount": "Recount",
+      "recountLabel": "Recount opening cash",
+      "recountTitle": "Recount if it doesn’t match",
+      "accept": "Accept {{amount}}",
+      "acceptRecount": "Accept recount",
+      "starting": "You’re starting the day as {{name}} · this is stamped on the day",
+      "accepted": "Opening cash {{amount}} accepted · stamped {{time}}"
+    },
+    "strip": {
+      "opening": "Opening cash",
+      "acceptedBy": "Accepted by {{name}} · {{time}}",
+      "cashInOut": "Cash in · out",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "Expected in drawer {{amount}}",
+      "counted": "Counted now",
+      "countPlaceholder": "Count the drawer",
+      "countLabel": "Counted cash",
+      "netByMode": "Net by mode",
+      "modeTitle": "In {{in}} · out {{out}}",
+      "staffTitle_one": "{{name}} · {{count}} receipt · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} receipts · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} is closed",
+      "closedBy": "Closed by {{name}} · {{time}}",
+      "autoClosed": "Closed at {{time}} · auto-closed after the grace period",
+      "reopen": "Reopen",
+      "acceptedBy": "Accepted by {{name}}",
+      "takenAsExpected": "Taken as expected",
+      "collected": "Collected",
+      "received_one": "{{count}} received",
+      "received_other": "{{count}} received",
+      "paidOut": "Paid out",
+      "paid_one": "{{count}} paid",
+      "paid_other": "{{count}} paid",
+      "cashCounted": "Cash counted",
+      "expected": "Expected {{amount}}",
+      "difference": "Difference",
+      "matched": "Drawer matched",
+      "extra": "Extra in drawer",
+      "short": "Short in drawer",
+      "log": "What happened",
+      "logAccepted": "{{name}} accepted the opening cash {{amount}}",
+      "logRecounted": "{{name}} accepted the opening cash {{amount}} (recounted)",
+      "logReviewed_one": "{{checked}} of {{count}} entry reviewed",
+      "logReviewed_other": "{{checked}} of {{count}} entries reviewed",
+      "logMatched": "Drawer counted at {{amount}} · matched",
+      "logExtra": "Drawer counted at {{amount}} · {{diff}} extra",
+      "logShort": "Drawer counted at {{amount}} · {{diff}} short",
+      "logClosed": "{{name}} closed the day · summary sent to admin on WhatsApp",
+      "logAuto": "Auto-closed after the grace period · cash taken as expected"
+    },
+    "review": {
+      "title": "Review every entry",
+      "progress_one": "{{checked}} of {{count}} checked",
+      "progress_other": "{{checked}} of {{count}} checked",
+      "none": "No entries",
+      "empty": "No entries on this day",
+      "check": "Mark as checked",
+      "states": {
+        "canEdit": "Can edit",
+        "canEditTitle": "Can be edited or deleted until the day is closed",
+        "dayClosed": "Day closed",
+        "dayClosedTitle": "The day is closed · its entries can’t be changed",
+        "fromCredit": "From {{credit}}"
+      }
+    }
   }
 }

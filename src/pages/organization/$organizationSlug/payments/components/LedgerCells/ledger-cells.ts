@@ -142,19 +142,27 @@ export function editSideLabel(
   });
 }
 
+/** "11:05" — an instant's clock time, in the viewer's locale and hour cycle. */
+export function useLedgerTime(): (instant: string) => string {
+  const { formatDate, prefs } = useLocaleFormat();
+  return (instant) =>
+    formatDate(instant, {
+      ...dateFormatOptions('time', prefs.hourCycle),
+      hour: 'numeric',
+      second: undefined,
+    });
+}
+
 /**
  * "Today 11:05" / "27 Sep 18:40" — the day (Today on the clinic's today) and
  * the clock time, in the viewer's locale and hour cycle.
  */
 export function useLedgerWhen(): (instant: string) => string {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { formatDate, prefs } = useLocaleFormat();
+  const { formatDate } = useLocaleFormat();
+  const timeOf = useLedgerTime();
   return (instant) => {
-    const time = formatDate(instant, {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: 'numeric',
-      second: undefined,
-    });
+    const time = timeOf(instant);
     if (clinicDateOf(instant) === clinicToday()) {
       return t(PAYMENTS_KEYS.ledger.today, { time });
     }

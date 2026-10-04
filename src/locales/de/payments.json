@@ -305,5 +305,105 @@
       "take": "{{ref}} gespeichert · {{amount}} von {{name}} nehmen"
     },
     "updated": "{{ref}} aktualisiert"
+  },
+  "dayClose": {
+    "title": "Tagesabschluss",
+    "day": "Tag",
+    "status": {
+      "open": "Offen",
+      "openAuto_one": "Offen · schließt automatisch in {{count}} Std.",
+      "openAuto_other": "Offen · schließt automatisch in {{count}} Std.",
+      "closedBy": "Abgeschlossen von {{name}}",
+      "closed": "Abgeschlossen",
+      "forceClosed": "Zwangsweise abgeschlossen"
+    },
+    "entries_one": "{{count}} Buchung am {{day}}",
+    "entries_other": "{{count}} Buchungen am {{day}}",
+    "openDay_one": "{{day}} nicht abgeschlossen · noch {{count}} Std. · Prüfen",
+    "openDay_other": "{{day}} nicht abgeschlossen · noch {{count}} Std. · Prüfen",
+    "openDayTitle": "Prüfen Sie die Buchungen und schließen Sie den Tag ab · er schließt sich selbst, wenn die Zeit abläuft",
+    "previous": "Frühere Abschlüsse",
+    "previousCash": "Bar {{amount}}",
+    "previousAuto": "Automatisch abgeschlossen",
+    "previousTitle": "{{day}} prüfen",
+    "closeDay": "Tag abschließen",
+    "countFirst": "Zählen Sie zuerst das Bargeld",
+    "closed": "Tag abgeschlossen · Zusammenfassung per WhatsApp an den Admin gesendet",
+    "reopened": "Tag wieder geöffnet",
+    "gate": {
+      "title": "Anfangsbestand · {{day}}",
+      "sources": {
+        "default_float": "Standard-Wechselgeld",
+        "carried": "Übernommen vom Abschluss am {{day}}",
+        "recounted": "Neu gezählt"
+      },
+      "recount": "Neu zählen",
+      "recountLabel": "Anfangsbestand neu zählen",
+      "recountTitle": "Neu zählen, wenn es nicht stimmt",
+      "accept": "{{amount}} übernehmen",
+      "acceptRecount": "Neue Zählung übernehmen",
+      "starting": "Sie beginnen den Tag als {{name}} · das wird am Tag vermerkt",
+      "accepted": "Anfangsbestand {{amount}} übernommen · vermerkt um {{time}}"
+    },
+    "strip": {
+      "opening": "Anfangsbestand",
+      "acceptedBy": "Übernommen von {{name}} · {{time}}",
+      "cashInOut": "Bar ein · aus",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "Erwartet in der Kasse {{amount}}",
+      "counted": "Jetzt gezählt",
+      "countPlaceholder": "Kasse zählen",
+      "countLabel": "Gezähltes Bargeld",
+      "netByMode": "Netto nach Zahlart",
+      "modeTitle": "Ein {{in}} · aus {{out}}",
+      "staffTitle_one": "{{name}} · {{count}} Einnahme · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} Einnahmen · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} ist abgeschlossen",
+      "closedBy": "Abgeschlossen von {{name}} · {{time}}",
+      "autoClosed": "Abgeschlossen um {{time}} · automatisch nach der Kulanzzeit",
+      "reopen": "Wieder öffnen",
+      "acceptedBy": "Übernommen von {{name}}",
+      "takenAsExpected": "Wie erwartet übernommen",
+      "collected": "Eingenommen",
+      "received_one": "{{count}} eingenommen",
+      "received_other": "{{count}} eingenommen",
+      "paidOut": "Ausgezahlt",
+      "paid_one": "{{count}} ausgezahlt",
+      "paid_other": "{{count}} ausgezahlt",
+      "cashCounted": "Gezähltes Bargeld",
+      "expected": "Erwartet {{amount}}",
+      "difference": "Differenz",
+      "matched": "Kasse stimmt",
+      "extra": "Überschuss in der Kasse",
+      "short": "Fehlbetrag in der Kasse",
+      "log": "Was passiert ist",
+      "logAccepted": "{{name}} hat den Anfangsbestand {{amount}} übernommen",
+      "logRecounted": "{{name}} hat den Anfangsbestand {{amount}} übernommen (neu gezählt)",
+      "logReviewed_one": "{{checked}} von {{count}} Buchung geprüft",
+      "logReviewed_other": "{{checked}} von {{count}} Buchungen geprüft",
+      "logMatched": "Kasse gezählt: {{amount}} · stimmt",
+      "logExtra": "Kasse gezählt: {{amount}} · {{diff}} zu viel",
+      "logShort": "Kasse gezählt: {{amount}} · {{diff}} zu wenig",
+      "logClosed": "{{name}} hat den Tag abgeschlossen · Zusammenfassung per WhatsApp an den Admin",
+      "logAuto": "Automatisch nach der Kulanzzeit abgeschlossen · Bargeld wie erwartet übernommen"
+    },
+    "review": {
+      "title": "Jede Buchung prüfen",
+      "progress_one": "{{checked}} von {{count}} geprüft",
+      "progress_other": "{{checked}} von {{count}} geprüft",
+      "none": "Keine Buchungen",
+      "empty": "Keine Buchungen an diesem Tag",
+      "check": "Als geprüft markieren",
+      "states": {
+        "canEdit": "Bearbeitbar",
+        "canEditTitle": "Bis zum Tagesabschluss bearbeitbar oder löschbar",
+        "dayClosed": "Tag abgeschlossen",
+        "dayClosedTitle": "Der Tag ist abgeschlossen · die Buchungen lassen sich nicht ändern",
+        "fromCredit": "Aus {{credit}}"
+      }
+    }
   }
 }

@@ -299,5 +299,97 @@
       "take": "{{ref}} を保存 · {{name}} から {{amount}} を受け取る"
     },
     "updated": "{{ref}} を更新しました"
+  },
+  "dayClose": {
+    "title": "日次締め",
+    "day": "日付",
+    "status": {
+      "open": "未締め",
+      "openAuto_other": "未締め · {{count}} 時間後に自動締め",
+      "closedBy": "{{name}} が締め済み",
+      "closed": "締め済み",
+      "forceClosed": "強制締め"
+    },
+    "entries_other": "{{day}} の記録 {{count}} 件",
+    "openDay_other": "{{day}} 未締め · 残り {{count}} 時間 · 確認",
+    "openDayTitle": "記録を確認して締めてください · 時間切れで自動的に締められます",
+    "previous": "過去の締め",
+    "previousCash": "現金 {{amount}}",
+    "previousAuto": "自動締め",
+    "previousTitle": "{{day}} を確認",
+    "closeDay": "日次を締める",
+    "countFirst": "先に現金を数えてください",
+    "closed": "日次を締めました · 概要を WhatsApp で管理者に送信しました",
+    "reopened": "日次を再開しました",
+    "gate": {
+      "title": "開始時の現金 · {{day}}",
+      "sources": {
+        "default_float": "既定の釣り銭",
+        "carried": "{{day}} の締めから繰越",
+        "recounted": "再計数"
+      },
+      "recount": "再計数",
+      "recountLabel": "開始時の現金を再計数",
+      "recountTitle": "合わない場合は再計数",
+      "accept": "{{amount}} を承認",
+      "acceptRecount": "再計数を承認",
+      "starting": "{{name}} として一日を開始します · この日に記録されます",
+      "accepted": "開始時の現金 {{amount}} を承認 · {{time}} に記録"
+    },
+    "strip": {
+      "opening": "開始時の現金",
+      "acceptedBy": "{{name}} が承認 · {{time}}",
+      "cashInOut": "現金 入 · 出",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "レジの見込み額 {{amount}}",
+      "counted": "現在の計数",
+      "countPlaceholder": "レジを数える",
+      "countLabel": "数えた現金",
+      "netByMode": "方法別の差引",
+      "modeTitle": "入 {{in}} · 出 {{out}}",
+      "staffTitle_other": "{{name}} · 受領 {{count}} 件 · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} は締め済み",
+      "closedBy": "{{name}} が締め · {{time}}",
+      "autoClosed": "{{time}} に締め · 猶予期間後に自動締め",
+      "reopen": "再開",
+      "acceptedBy": "{{name}} が承認",
+      "takenAsExpected": "見込み額のまま",
+      "collected": "受領",
+      "received_other": "受領 {{count}} 件",
+      "paidOut": "支払",
+      "paid_other": "支払 {{count}} 件",
+      "cashCounted": "計数した現金",
+      "expected": "見込み {{amount}}",
+      "difference": "差額",
+      "matched": "レジ一致",
+      "extra": "レジに過剰",
+      "short": "レジに不足",
+      "log": "経過",
+      "logAccepted": "{{name}} が開始時の現金 {{amount}} を承認",
+      "logRecounted": "{{name}} が開始時の現金 {{amount}} を承認（再計数）",
+      "logReviewed_other": "{{count}} 件中 {{checked}} 件を確認",
+      "logMatched": "レジ計数 {{amount}} · 一致",
+      "logExtra": "レジ計数 {{amount}} · {{diff}} 過剰",
+      "logShort": "レジ計数 {{amount}} · {{diff}} 不足",
+      "logClosed": "{{name}} が日次を締め · 概要を WhatsApp で管理者に送信",
+      "logAuto": "猶予期間後に自動締め · 現金は見込み額のまま"
+    },
+    "review": {
+      "title": "すべての記録を確認",
+      "progress_other": "{{count}} 件中 {{checked}} 件確認済み",
+      "none": "記録なし",
+      "empty": "この日の記録はありません",
+      "check": "確認済みにする",
+      "states": {
+        "canEdit": "編集可",
+        "canEditTitle": "日次を締めるまで編集・削除できます",
+        "dayClosed": "締め済み",
+        "dayClosedTitle": "この日は締め済み · 記録は変更できません",
+        "fromCredit": "{{credit}} から"
+      }
+    }
   }
 }

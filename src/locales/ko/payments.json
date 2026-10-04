@@ -299,5 +299,97 @@
       "take": "{{ref}} 저장됨 · {{name}}에게서 {{amount}} 받기"
     },
     "updated": "{{ref}} 업데이트됨"
+  },
+  "dayClose": {
+    "title": "일일 마감",
+    "day": "날짜",
+    "status": {
+      "open": "열림",
+      "openAuto_other": "열림 · {{count}}시간 후 자동 마감",
+      "closedBy": "{{name}} 님이 마감",
+      "closed": "마감됨",
+      "forceClosed": "강제 마감"
+    },
+    "entries_other": "{{day}} 내역 {{count}}건",
+    "openDay_other": "{{day}} 미마감 · {{count}}시간 남음 · 확인",
+    "openDayTitle": "내역을 확인하고 마감하세요 · 시간이 지나면 자동으로 마감됩니다",
+    "previous": "이전 마감",
+    "previousCash": "현금 {{amount}}",
+    "previousAuto": "자동 마감",
+    "previousTitle": "{{day}} 확인",
+    "closeDay": "하루 마감",
+    "countFirst": "먼저 현금을 세세요",
+    "closed": "하루 마감 완료 · 요약을 WhatsApp으로 관리자에게 보냈습니다",
+    "reopened": "하루 다시 열림",
+    "gate": {
+      "title": "시작 현금 · {{day}}",
+      "sources": {
+        "default_float": "기본 시재",
+        "carried": "{{day}} 마감에서 이월",
+        "recounted": "재집계"
+      },
+      "recount": "재집계",
+      "recountLabel": "시작 현금 재집계",
+      "recountTitle": "맞지 않으면 다시 세세요",
+      "accept": "{{amount}} 확인",
+      "acceptRecount": "재집계 확인",
+      "starting": "{{name}}(으)로 하루를 시작합니다 · 이 날짜에 기록됩니다",
+      "accepted": "시작 현금 {{amount}} 확인 · {{time}}에 기록"
+    },
+    "strip": {
+      "opening": "시작 현금",
+      "acceptedBy": "{{name}} 님 확인 · {{time}}",
+      "cashInOut": "현금 입 · 출",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "서랍 예상액 {{amount}}",
+      "counted": "지금 집계",
+      "countPlaceholder": "서랍을 세세요",
+      "countLabel": "집계한 현금",
+      "netByMode": "수단별 순액",
+      "modeTitle": "입금 {{in}} · 출금 {{out}}",
+      "staffTitle_other": "{{name}} · 수납 {{count}}건 · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} 마감됨",
+      "closedBy": "{{name}} 님 마감 · {{time}}",
+      "autoClosed": "{{time}} 마감 · 유예 기간 후 자동 마감",
+      "reopen": "다시 열기",
+      "acceptedBy": "{{name}} 님 확인",
+      "takenAsExpected": "예상액으로 처리",
+      "collected": "수납",
+      "received_other": "수납 {{count}}건",
+      "paidOut": "지출",
+      "paid_other": "지출 {{count}}건",
+      "cashCounted": "집계 현금",
+      "expected": "예상 {{amount}}",
+      "difference": "차액",
+      "matched": "서랍 일치",
+      "extra": "서랍 초과",
+      "short": "서랍 부족",
+      "log": "진행 내역",
+      "logAccepted": "{{name}} 님이 시작 현금 {{amount}} 확인",
+      "logRecounted": "{{name}} 님이 시작 현금 {{amount}} 확인 (재집계)",
+      "logReviewed_other": "{{count}}건 중 {{checked}}건 확인",
+      "logMatched": "서랍 집계 {{amount}} · 일치",
+      "logExtra": "서랍 집계 {{amount}} · {{diff}} 초과",
+      "logShort": "서랍 집계 {{amount}} · {{diff}} 부족",
+      "logClosed": "{{name}} 님이 하루 마감 · 요약을 WhatsApp으로 관리자에게 전송",
+      "logAuto": "유예 기간 후 자동 마감 · 현금은 예상액으로 처리"
+    },
+    "review": {
+      "title": "모든 내역 확인",
+      "progress_other": "{{count}}건 중 {{checked}}건 확인",
+      "none": "내역 없음",
+      "empty": "이 날짜의 내역이 없습니다",
+      "check": "확인됨으로 표시",
+      "states": {
+        "canEdit": "수정 가능",
+        "canEditTitle": "하루를 마감할 때까지 수정하거나 삭제할 수 있습니다",
+        "dayClosed": "마감됨",
+        "dayClosedTitle": "마감된 날짜입니다 · 내역을 변경할 수 없습니다",
+        "fromCredit": "{{credit}}에서"
+      }
+    }
   }
 }

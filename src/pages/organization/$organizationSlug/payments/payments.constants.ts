@@ -328,7 +328,124 @@ export const PAYMENTS_KEYS = {
     /** "CR-1 updated". */
     updated: 'credit.updated',
   },
+  /** Day close (`payments.md:57–80, 182–194, 268–280, 326–331`; KICKOFF §6.9). */
+  dayClose: {
+    title: 'dayClose.title',
+    /** The day dropdown's name. */
+    day: 'dayClose.day',
+    /** The status pill: "Open", "Open · auto-closes in 15 h", "Closed by Riya S.", "Force-closed". */
+    status: {
+      open: 'dayClose.status.open',
+      openAuto: 'dayClose.status.openAuto',
+      closedBy: 'dayClose.status.closedBy',
+      closed: 'dayClose.status.closed',
+      forceClosed: 'dayClose.status.forceClosed',
+    },
+    /** "3 entries on 3 Oct" (plural). */
+    entries: 'dayClose.entries',
+    /** "2 Oct not closed · 15 h left · Review" (plural) and its tooltip. */
+    openDay: 'dayClose.openDay',
+    openDayTitle: 'dayClose.openDayTitle',
+    previous: 'dayClose.previous',
+    /** A previous close: "Cash ₹7,310", "Auto-closed", "Review 25 Sep". */
+    previousCash: 'dayClose.previousCash',
+    previousAuto: 'dayClose.previousAuto',
+    previousTitle: 'dayClose.previousTitle',
+    closeDay: 'dayClose.closeDay',
+    countFirst: 'dayClose.countFirst',
+    /** "Day closed · summary sent to admin on WhatsApp". */
+    closed: 'dayClose.closed',
+    reopened: 'dayClose.reopened',
+    /** The gate (H:5114–5116). */
+    gate: {
+      title: 'dayClose.gate.title',
+      sources: {
+        default_float: 'dayClose.gate.sources.default_float',
+        carried: 'dayClose.gate.sources.carried',
+        recounted: 'dayClose.gate.sources.recounted',
+      },
+      recount: 'dayClose.gate.recount',
+      recountLabel: 'dayClose.gate.recountLabel',
+      recountTitle: 'dayClose.gate.recountTitle',
+      /** "Accept ₹2,000" / "Accept recount". */
+      accept: 'dayClose.gate.accept',
+      acceptRecount: 'dayClose.gate.acceptRecount',
+      starting: 'dayClose.gate.starting',
+      /** "Opening cash ₹2,000 accepted · stamped 09:12". */
+      accepted: 'dayClose.gate.accepted',
+    },
+    /** The working day's strip (`payments.md:73–80`). */
+    strip: {
+      opening: 'dayClose.strip.opening',
+      /** "Accepted by Riya S. · 09:12". */
+      acceptedBy: 'dayClose.strip.acceptedBy',
+      cashInOut: 'dayClose.strip.cashInOut',
+      /** "+₹0" · "−₹260". */
+      cashIn: 'dayClose.strip.cashIn',
+      cashOut: 'dayClose.strip.cashOut',
+      expected: 'dayClose.strip.expected',
+      counted: 'dayClose.strip.counted',
+      countPlaceholder: 'dayClose.strip.countPlaceholder',
+      countLabel: 'dayClose.strip.countLabel',
+      netByMode: 'dayClose.strip.netByMode',
+      /** "In ₹600 · out ₹0". */
+      modeTitle: 'dayClose.strip.modeTitle',
+      /** "Farah A. · 1 receipt · ₹600" (plural). */
+      staffTitle: 'dayClose.strip.staffTitle',
+    },
+    /** The closed day's report (H:5117–5121). */
+    report: {
+      /** "Today is closed" / "25 Sep is closed". */
+      title: 'dayClose.report.title',
+      closedBy: 'dayClose.report.closedBy',
+      autoClosed: 'dayClose.report.autoClosed',
+      reopen: 'dayClose.report.reopen',
+      acceptedBy: 'dayClose.report.acceptedBy',
+      takenAsExpected: 'dayClose.report.takenAsExpected',
+      collected: 'dayClose.report.collected',
+      /** "1 received" / "2 paid" (plural). */
+      received: 'dayClose.report.received',
+      paidOut: 'dayClose.report.paidOut',
+      paid: 'dayClose.report.paid',
+      cashCounted: 'dayClose.report.cashCounted',
+      expected: 'dayClose.report.expected',
+      difference: 'dayClose.report.difference',
+      matched: 'dayClose.report.matched',
+      extra: 'dayClose.report.extra',
+      short: 'dayClose.report.short',
+      log: 'dayClose.report.log',
+      logAccepted: 'dayClose.report.logAccepted',
+      logRecounted: 'dayClose.report.logRecounted',
+      /** "3 of 3 entries reviewed" (plural on the total). */
+      logReviewed: 'dayClose.report.logReviewed',
+      logMatched: 'dayClose.report.logMatched',
+      logExtra: 'dayClose.report.logExtra',
+      logShort: 'dayClose.report.logShort',
+      logClosed: 'dayClose.report.logClosed',
+      logAuto: 'dayClose.report.logAuto',
+    },
+    /** "Review every entry" (`payments.md:57–67`). */
+    review: {
+      title: 'dayClose.review.title',
+      /** "0 of 3 checked" (plural on the total) / "No entries". */
+      progress: 'dayClose.review.progress',
+      none: 'dayClose.review.none',
+      empty: 'dayClose.review.empty',
+      check: 'dayClose.review.check',
+      /** The State pill: "Can edit", "Day closed", "From CR-2" — and the tooltips. */
+      states: {
+        canEdit: 'dayClose.review.states.canEdit',
+        canEditTitle: 'dayClose.review.states.canEditTitle',
+        dayClosed: 'dayClose.review.states.dayClosed',
+        dayClosedTitle: 'dayClose.review.states.dayClosedTitle',
+        fromCredit: 'dayClose.review.states.fromCredit',
+      },
+    },
+  },
 } as const;
+
+/** The Day close drawer's test id — the `/payments/day-close` manifest names it. */
+export const DAY_CLOSE_TEST_ID = 'day-close-drawer';
 
 /** The ledger's table id: the test-id prefix and the device prefs' key. */
 export const LEDGER_TABLE_ID = 'payments';

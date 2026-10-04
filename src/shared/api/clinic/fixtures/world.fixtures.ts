@@ -4,7 +4,6 @@ import type {
   Branch,
   CheckIn,
   CreditNote,
-  DayClose,
   FeedbackAction,
   Invoice,
   LeadMessage,
@@ -31,6 +30,7 @@ import type {
   Treatment,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
+import type { DayCloseRecord } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import type {
@@ -201,7 +201,8 @@ export const clinicFixtures = {
     resource: 'Pending credit',
     seed: () => pendingCreditSeed(),
   }),
-  dayCloses: createFixtureCollection<DayClose>({
+  // Closes carry the plan's recount, acceptor and review ticks — see day-close-contracts.ts.
+  dayCloses: createFixtureCollection<DayCloseRecord>({
     resource: 'Day close',
     seed: () => dayCloseSeed(),
   }),

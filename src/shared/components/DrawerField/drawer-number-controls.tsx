@@ -37,6 +37,8 @@ export interface DrawerNumberInputProps extends Omit<
   decimals?: number;
   /** A larger figure typed is capped to this (H:3811). */
   max?: number;
+  /** The input's own classes — its type size, weight and alignment (Day close's ₹ figures). */
+  inputClassName?: string;
 }
 
 /**
@@ -53,6 +55,7 @@ export function DrawerNumberInput({
   decimals = 2,
   max,
   className,
+  inputClassName,
   onFocus,
   ...props
 }: DrawerNumberInputProps) {
@@ -86,7 +89,7 @@ export function DrawerNumberInput({
           event.currentTarget.select();
           onFocus?.(event);
         }}
-        className={NUMBER_INPUT_CLASS}
+        className={cn(NUMBER_INPUT_CLASS, inputClassName)}
       />
       {suffix ? (
         <span

@@ -4,7 +4,6 @@ import {
   type Ref,
   type RefObject,
   useCallback,
-  useRef,
   useState,
 } from 'react';
 
@@ -35,6 +34,7 @@ import {
   RECORD_DRAWER_PANEL_CLASS,
   RecordDrawerClose,
 } from './record-drawer-chrome.tsx';
+import { useDrawerTitleFocus } from './record-drawer-focus.ts';
 import { DrawerItemsContext, withMountedItems } from './record-drawer-items.ts';
 import {
   DRAWER_WIDTH_CLASS,
@@ -347,31 +347,6 @@ function DrawerColumns({
 }
 
 /**
- * Focus starts on the title (`_patterns.md:38`, §7.2) — or on what the screen
- * names instead — and goes back to whatever was focused when the drawer opened:
- * URL-driven drawers have no Radix trigger for the sheet to return to.
- */
-function useTitleFocus(initialFocusRef?: RefObject<HTMLElement | null>) {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
-  return {
-    titleRef,
-    onOpenAutoFocus: (event: Event) => {
-      const previous = document.activeElement;
-      returnFocusRef.current = previous instanceof HTMLElement ? previous : null;
-      event.preventDefault();
-      (initialFocusRef?.current ?? titleRef.current)?.focus();
-    },
-    onCloseAutoFocus: (event: Event) => {
-      const target = returnFocusRef.current;
-      if (!target?.isConnected) return;
-      event.preventDefault();
-      target.focus();
-    },
-  };
-}
-
-/**
  * The record drawer (`mkDrawer`, H:3754–3853) on the shadcn `sheet`, anchored
  * to the inline end: `min(W, 100vw − 56px)` from `md` up with the floating ×
  * outside its edge, the full screen below `md` with the × inside the 60px
@@ -388,7 +363,7 @@ function useTitleFocus(initialFocusRef?: RefObject<HTMLElement | null>) {
 export function RecordDrawer(props: RecordDrawerProps) {
   const testId = props.testId ?? RECORD_DRAWER_TEST_ID;
   const phone = useViewportTier() === 'phone';
-  const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useTitleFocus(
+  const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useDrawerTitleFocus(
     props.initialFocusRef,
   );
   const [currentStep, selectStep] = useOpenStep(props);

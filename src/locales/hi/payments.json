@@ -305,5 +305,105 @@
       "take": "{{ref}} सहेजा गया · {{name}} से {{amount}} लेने हैं"
     },
     "updated": "{{ref}} अपडेट किया गया"
+  },
+  "dayClose": {
+    "title": "दिन का क्लोज़",
+    "day": "दिन",
+    "status": {
+      "open": "खुला",
+      "openAuto_one": "खुला · {{count}} घंटे में अपने-आप बंद होगा",
+      "openAuto_other": "खुला · {{count}} घंटे में अपने-आप बंद होगा",
+      "closedBy": "{{name}} ने बंद किया",
+      "closed": "बंद",
+      "forceClosed": "ज़बरदस्ती बंद"
+    },
+    "entries_one": "{{day}} को {{count}} एंट्री",
+    "entries_other": "{{day}} को {{count}} एंट्री",
+    "openDay_one": "{{day}} बंद नहीं · {{count}} घंटे बाकी · देखें",
+    "openDay_other": "{{day}} बंद नहीं · {{count}} घंटे बाकी · देखें",
+    "openDayTitle": "एंट्री देखें और बंद करें · समय ख़त्म होने पर यह अपने-आप बंद हो जाता है",
+    "previous": "पिछले क्लोज़",
+    "previousCash": "नकद {{amount}}",
+    "previousAuto": "अपने-आप बंद",
+    "previousTitle": "{{day}} देखें",
+    "closeDay": "दिन बंद करें",
+    "countFirst": "पहले नकद गिनें",
+    "closed": "दिन बंद · सारांश WhatsApp पर एडमिन को भेजा गया",
+    "reopened": "दिन फिर से खोला गया",
+    "gate": {
+      "title": "शुरुआती नकद · {{day}}",
+      "sources": {
+        "default_float": "डिफ़ॉल्ट फ़्लोट",
+        "carried": "{{day}} के क्लोज़ से आगे लाया गया",
+        "recounted": "दोबारा गिना गया"
+      },
+      "recount": "दोबारा गिनें",
+      "recountLabel": "शुरुआती नकद दोबारा गिनें",
+      "recountTitle": "मेल न खाए तो दोबारा गिनें",
+      "accept": "{{amount}} स्वीकारें",
+      "acceptRecount": "नई गिनती स्वीकारें",
+      "starting": "आप {{name}} के रूप में दिन शुरू कर रहे हैं · यह दिन पर दर्ज होता है",
+      "accepted": "शुरुआती नकद {{amount}} स्वीकार · {{time}} पर दर्ज"
+    },
+    "strip": {
+      "opening": "शुरुआती नकद",
+      "acceptedBy": "{{name}} ने स्वीकारा · {{time}}",
+      "cashInOut": "नकद आया · गया",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "दराज़ में अपेक्षित {{amount}}",
+      "counted": "अभी गिना",
+      "countPlaceholder": "दराज़ गिनें",
+      "countLabel": "गिना हुआ नकद",
+      "netByMode": "माध्यम के अनुसार नेट",
+      "modeTitle": "आया {{in}} · गया {{out}}",
+      "staffTitle_one": "{{name}} · {{count}} रसीद · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} रसीदें · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} बंद है",
+      "closedBy": "{{name}} ने बंद किया · {{time}}",
+      "autoClosed": "{{time}} पर बंद · छूट की अवधि के बाद अपने-आप",
+      "reopen": "फिर खोलें",
+      "acceptedBy": "{{name}} ने स्वीकारा",
+      "takenAsExpected": "अपेक्षित के रूप में लिया गया",
+      "collected": "वसूला",
+      "received_one": "{{count}} मिला",
+      "received_other": "{{count}} मिले",
+      "paidOut": "भुगतान किया",
+      "paid_one": "{{count}} भुगतान",
+      "paid_other": "{{count}} भुगतान",
+      "cashCounted": "गिना नकद",
+      "expected": "अपेक्षित {{amount}}",
+      "difference": "अंतर",
+      "matched": "दराज़ मेल खाती है",
+      "extra": "दराज़ में ज़्यादा",
+      "short": "दराज़ में कम",
+      "log": "क्या हुआ",
+      "logAccepted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा",
+      "logRecounted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा (दोबारा गिना)",
+      "logReviewed_one": "{{count}} में से {{checked}} एंट्री देखी",
+      "logReviewed_other": "{{count}} में से {{checked}} एंट्री देखी गईं",
+      "logMatched": "दराज़ {{amount}} गिनी गई · मेल खाती है",
+      "logExtra": "दराज़ {{amount}} गिनी गई · {{diff}} ज़्यादा",
+      "logShort": "दराज़ {{amount}} गिनी गई · {{diff}} कम",
+      "logClosed": "{{name}} ने दिन बंद किया · सारांश WhatsApp पर एडमिन को भेजा",
+      "logAuto": "छूट की अवधि के बाद अपने-आप बंद · नकद अपेक्षित के रूप में लिया"
+    },
+    "review": {
+      "title": "हर एंट्री देखें",
+      "progress_one": "{{count}} में से {{checked}} जाँची",
+      "progress_other": "{{count}} में से {{checked}} जाँची गईं",
+      "none": "कोई एंट्री नहीं",
+      "empty": "इस दिन कोई एंट्री नहीं",
+      "check": "जाँचा हुआ मार्क करें",
+      "states": {
+        "canEdit": "बदला जा सकता है",
+        "canEditTitle": "दिन बंद होने तक बदला या हटाया जा सकता है",
+        "dayClosed": "दिन बंद",
+        "dayClosedTitle": "दिन बंद है · इसकी एंट्री बदली नहीं जा सकतीं",
+        "fromCredit": "{{credit}} से"
+      }
+    }
   }
 }

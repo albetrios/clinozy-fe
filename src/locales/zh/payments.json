@@ -299,5 +299,97 @@
       "take": "{{ref}} 已保存 · 应收 {{name}} {{amount}}"
     },
     "updated": "{{ref}} 已更新"
+  },
+  "dayClose": {
+    "title": "日结",
+    "day": "日期",
+    "status": {
+      "open": "未结",
+      "openAuto_other": "未结 · {{count}} 小时后自动结算",
+      "closedBy": "由 {{name}} 结算",
+      "closed": "已结",
+      "forceClosed": "强制结算"
+    },
+    "entries_other": "{{day}} 共 {{count}} 笔",
+    "openDay_other": "{{day}} 未结 · 剩 {{count}} 小时 · 查看",
+    "openDayTitle": "核对记录后结算 · 时间到后会自动结算",
+    "previous": "以往日结",
+    "previousCash": "现金 {{amount}}",
+    "previousAuto": "自动结算",
+    "previousTitle": "查看 {{day}}",
+    "closeDay": "结算当天",
+    "countFirst": "请先清点现金",
+    "closed": "当天已结算 · 摘要已通过 WhatsApp 发给管理员",
+    "reopened": "当天已重新打开",
+    "gate": {
+      "title": "期初现金 · {{day}}",
+      "sources": {
+        "default_float": "默认备用金",
+        "carried": "结转自 {{day}} 日结",
+        "recounted": "已重新清点"
+      },
+      "recount": "重新清点",
+      "recountLabel": "重新清点期初现金",
+      "recountTitle": "不一致时请重新清点",
+      "accept": "确认 {{amount}}",
+      "acceptRecount": "确认重新清点",
+      "starting": "您以 {{name}} 的身份开始今天 · 这会记录在当天",
+      "accepted": "已确认期初现金 {{amount}} · 记录于 {{time}}"
+    },
+    "strip": {
+      "opening": "期初现金",
+      "acceptedBy": "{{name}} 已确认 · {{time}}",
+      "cashInOut": "现金 收 · 支",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "钱箱应有 {{amount}}",
+      "counted": "当前清点",
+      "countPlaceholder": "清点钱箱",
+      "countLabel": "清点的现金",
+      "netByMode": "按方式净额",
+      "modeTitle": "收 {{in}} · 支 {{out}}",
+      "staffTitle_other": "{{name}} · 收款 {{count}} 笔 · {{amount}}"
+    },
+    "report": {
+      "title": "{{day}} 已结算",
+      "closedBy": "由 {{name}} 结算 · {{time}}",
+      "autoClosed": "{{time}} 结算 · 宽限期后自动结算",
+      "reopen": "重新打开",
+      "acceptedBy": "{{name}} 已确认",
+      "takenAsExpected": "按应有金额计",
+      "collected": "收款",
+      "received_other": "收款 {{count}} 笔",
+      "paidOut": "支出",
+      "paid_other": "支出 {{count}} 笔",
+      "cashCounted": "清点现金",
+      "expected": "应有 {{amount}}",
+      "difference": "差额",
+      "matched": "钱箱相符",
+      "extra": "钱箱多出",
+      "short": "钱箱短少",
+      "log": "经过",
+      "logAccepted": "{{name}} 确认了期初现金 {{amount}}",
+      "logRecounted": "{{name}} 确认了期初现金 {{amount}}（重新清点）",
+      "logReviewed_other": "已核对 {{count}} 笔中的 {{checked}} 笔",
+      "logMatched": "钱箱清点 {{amount}} · 相符",
+      "logExtra": "钱箱清点 {{amount}} · 多出 {{diff}}",
+      "logShort": "钱箱清点 {{amount}} · 短少 {{diff}}",
+      "logClosed": "{{name}} 已结算当天 · 摘要已通过 WhatsApp 发给管理员",
+      "logAuto": "宽限期后自动结算 · 现金按应有金额计"
+    },
+    "review": {
+      "title": "逐笔核对",
+      "progress_other": "已核对 {{checked}}/{{count}}",
+      "none": "没有记录",
+      "empty": "这天没有记录",
+      "check": "标记为已核对",
+      "states": {
+        "canEdit": "可编辑",
+        "canEditTitle": "当天结算前可编辑或删除",
+        "dayClosed": "当天已结",
+        "dayClosedTitle": "当天已结算 · 记录不能更改",
+        "fromCredit": "来自 {{credit}}"
+      }
+    }
   }
 }

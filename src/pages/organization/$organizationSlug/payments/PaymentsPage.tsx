@@ -16,7 +16,6 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
-import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import {
   type RoomFilterCopy,
@@ -27,16 +26,10 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  FileIcon,
-  PenLine,
-  Trash,
-  Wallet,
-} from '@/shared/icons/index.ts';
+import { ArrowDownLeft, ArrowUpRight, FileIcon, Wallet } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { DayCloseDrawer } from './components/DayCloseDrawer/index.ts';
 import {
   ledgerEntryLock,
   useLedgerSubLine,
@@ -48,6 +41,7 @@ import {
 } from './components/PaymentDeleteConfirm/index.ts';
 import { ReceivePaymentDrawer } from './components/ReceivePaymentDrawer/index.ts';
 import { SendPaymentDrawer } from './components/SendPaymentDrawer/index.ts';
+import { useLedgerRowActions } from './hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from './hooks/useLedgerTable/index.ts';
 import {
   type PaymentsDialogRoute,
@@ -64,16 +58,29 @@ import { LEDGER_FILTER_VALUES, validatePaymentsSearch } from './payments.search.
 import { PaymentsToolbar } from './shared/components/PaymentsToolbar/index.ts';
 
 /**
- * The drawer the URL names (D24): Receive payment, Send payment, or an open
- * day's entry — a receipt in Receive, money out in Send.
+ * The drawer the URL names (D24): Receive payment, Send payment, an open
+ * day's entry — a receipt in Receive, money out in Send — or Day close on
+ * its day.
  */
 function PaymentsDrawers({
   dialog,
   onClose,
+  onDayChange,
 }: {
   dialog: PaymentsDialogRoute;
   onClose: () => void;
+  onDayChange: (date: string) => void;
 }) {
+  if (dialog.kind === 'dayClose') {
+    return (
+      <DayCloseDrawer
+        open
+        search={dialog.search}
+        onDayChange={onDayChange}
+        onClose={onClose}
+      />
+    );
+  }
   if (dialog.kind === 'receive') {
     return (
       <ReceivePaymentDrawer
@@ -294,34 +301,7 @@ export function PaymentsPage() {
     });
   };
 
-  const rowActions = (row: LedgerRow): DataTableRowAction[] => {
-    // Open-day entries only (`payments.md:34`): a closed day, or a credit's
-    // entry, shows no actions.
-    if (ledgerEntryLock(row, t)) return [];
-    const actions: DataTableRowAction[] = [];
-    if (can('edit')) {
-      actions.push({
-        id: 'edit',
-        label: t(PAYMENTS_KEYS.rowActions.edit),
-        icon: PenLine,
-        onSelect: () => openEntry(row),
-      });
-    }
-    if (can('delete')) {
-      actions.push({
-        id: 'delete',
-        label: t(PAYMENTS_KEYS.rowActions.delete),
-        icon: Trash,
-        destructive: true,
-        onSelect: () =>
-          setDeleting({
-            entry: row,
-            dueAfter: row.invoice ? row.invoice.due + row.amount : undefined,
-          }),
-      });
-    }
-    return actions;
-  };
+  const rowActions = useLedgerRowActions({ onEdit: openEntry, onDelete: setDeleting });
 
   const bulkActions: DataTableBulkAction<LedgerRow>[] =
     access.isResolved && access.canAbility('export')
@@ -396,7 +376,17 @@ export function PaymentsPage() {
         className="m-(--room-card-margin) flex-1"
       />
       <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
-      <PaymentsDrawers dialog={dialog} onClose={close} />
+      <PaymentsDrawers
+        dialog={dialog}
+        onClose={close}
+        onDayChange={(date) =>
+          void navigate({
+            ...organizationDayClose(organizationSlug),
+            search: (current: Record<string, unknown>) => ({ ...current, date }),
+            replace: true,
+          })
+        }
+      />
       <Outlet />
     </section>
   );

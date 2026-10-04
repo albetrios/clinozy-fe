@@ -74,8 +74,23 @@ bill" (new, while bills are open; the bill picker and "Pending longest") · "Exp
 (Category, Paid to, Note) · "Payment" (Amount, Date — never ahead, fixed on an edit — Mode,
 the bill photo through the upload tray). Quick fill and "Add & another" on a new payment;
 Delete on an edit. A day closed while either drawer is open turns it view only. The pending
-drawers live on Pending (`pending/PENDING.OVERVIEW.md`); Day close lands with L-41 — until
-then its route opens nothing.
+drawers live on Pending (`pending/PENDING.OVERVIEW.md`).
+
+**Day close** (`components/DayCloseDrawer/`, L-41) — the 1040px drawer on the canvas (full
+screen on a phone) under a sticky header with its inline ×; the ledger behind lists only its
+day. The bar picks the day (today back 120 days), shows the state ("Open", "Open ·
+auto-closes in 14 h", "Closed by Riya S.", "Force-closed"), "6 entries on Oct 3", yesterday's
+open-day chip while today shows, "Previous closes ⌄" (six chips that jump to their day) and
+"Close day". The day runs **gate → working → report**: accept the opening cash — carried
+from the last close, the ₹2,000 float, or a recount — then the strip (opening, cash in · out
+and the expected drawer, the count with its difference, the net by mode with Credit apart
+and the staff behind the receipts) and "Close day" ("Count the cash first" without a count);
+closed, the report (opening, collected, paid out, counted, difference) with "What happened"
+and Reopen inside the grace period (Q-G1). "Review every entry" ticks the day's entries (a
+progress bar over the list) with State ("Can edit", "Day closed", "From CR-2") and the row's
+Edit / Delete filled (Q-G11); it re-grids to the phone layout below a 910px card
+(`@container`). A row opens the entry's drawer over Day close. Accept, Close day, Reopen and
+the ticks need the `dayclose` ability (Q-G4); the drawer opens with Payments View.
 
 The data is the shared money domain: `@/shared/api/clinic/payments-api.ts`,
 `@/shared/api/clinic/credits-api.ts` and `@/shared/api/clinic/day-close-api.ts` (fixture
@@ -95,10 +110,13 @@ world, `REPLACE_WITH_API`), their contracts beside them, and the hooks in
 | `shared/components/PaymentsToolbar/`                 | Family-shared: the room toolbar both tabs mount — h1, the tab links, search, Filters, Columns, Day close and the tab's create actions.                                             |
 | `shared/hooks/useDayLabel/`                          | Family-shared: a day as the drawers' tiles name it — "Today", else "Oct 2" (Send's Date, Add pending's Settle by and invoice days).                                                |
 | `components/LedgerCells/`                            | The cells and their wording (`components/LedgerCells/ledger-cells.ts`): Ref, What, When with the edit line, From / to with its sub line, Mode, the signed Amount, By.              |
+| `components/DayCloseDrawer/`                         | Day close: the bar, the gate, the working strip, the report, the review, and the rules they share (`components/DayCloseDrawer/day-close-view.ts`).                                 |
 | `components/PaymentDeleteConfirm/`                   | Delete an entry: the reason confirm, the invoice sentence, the optimistic delete and its Undo.                                                                                     |
 | `components/ReceivePaymentDrawer/`                   | Receive payment / Edit payment in: the form's rules (`components/ReceivePaymentDrawer/receive-form.ts`), the fields, the save.                                                     |
 | `components/SendPaymentDrawer/`                      | Send payment / Edit payment out: the form's rules (`components/SendPaymentDrawer/send-form.ts`), the three steps' fields, the save and the photos.                                 |
 | `hooks/useLedgerTable/`                              | The columns (tracks, folds, the meta line and key column by tier), hidden columns, the row tone.                                                                                   |
+| `hooks/useLedgerRowActions/`                         | An entry's row actions — Edit, Delete; none when locked — for the ledger and Day close's review.                                                                                   |
+| `hooks/useDayClose/`                                 | Day close's read and writes: the day, accept the opening, close, reopen, tick an entry (optimistic).                                                                               |
 | `hooks/usePaymentsDialogRoute/`                      | Which dialog the URL opens, the closed-day and permission refusals, and the close back to the referrer or the ledger.                                                              |
 | `__tests__/integration/`                             | The ledger and Pending end to end; `__tests__/integration/payments-test-router.tsx` mirrors the family's routes for the tests.                                                     |
 | `receive/`, `pay/`, `$paymentId/edit/`, `day-close/` | The dialog-route islands — see their overviews.                                                                                                                                    |

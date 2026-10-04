@@ -2,7 +2,6 @@ import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import { invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
 import type {
   CreditNote,
-  DayClose,
   ExpenseCategory,
   Invoice,
   InvoiceItem,
@@ -11,6 +10,7 @@ import type {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
+import type { DayCloseRecord } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 
 import { medicineBySeq, SALE_ROWS } from './medical.fixtures.ts';
@@ -596,8 +596,11 @@ export function pendingCreditSeed(today: string = clinicToday()): PendingCreditR
   }));
 }
 
-/** The closed days, main branch: opening accepted at opening time, closed after hours. */
-export function dayCloseSeed(today: string = clinicToday()): DayClose[] {
+/**
+ * The closed days, main branch: opening accepted at opening time by the one who
+ * closed after hours, nothing ticked in the review (the plan's fields, Appendix F).
+ */
+export function dayCloseSeed(today: string = clinicToday()): DayCloseRecord[] {
   return CLOSE_ROWS.map((row, index) => {
     const previous = CLOSE_ROWS[index - 1];
     const day = readSeedLabel(row.date).date;
@@ -614,9 +617,11 @@ export function dayCloseSeed(today: string = clinicToday()): DayClose[] {
       openingCash: paise(previous ? previous.cash : DEFAULT_FLOAT),
       openingSource: previous ? 'carried' : 'default_float',
       openingAcceptedAt: seedAt(`${row.date} · 10:00`, '10:00', today),
+      openingAcceptedById: staffRef(row.by),
       countedCash: paise(row.cash),
       closedAt,
       closedById: staffRef(row.by),
+      checkedPaymentIds: [],
     };
   });
 }
