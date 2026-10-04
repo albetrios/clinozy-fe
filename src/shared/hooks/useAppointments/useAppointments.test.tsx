@@ -258,6 +258,29 @@ describe('useSetAppointmentStatus', () => {
   });
 });
 
+describe('useSetAppointmentStatus with its own words', () => {
+  it('toasts the caller’s message — Today’s check-in — still with Undo', async () => {
+    const { result } = renderHook(
+      () =>
+        useSetAppointmentStatus({
+          announce: ({ appointment }) => `${appointment.person.name} checked in`,
+        }),
+      { wrapper },
+    );
+    await act(async () => {
+      await result.current.mutateAsync({
+        id: ref.appointment(2869),
+        status: 'checked_in',
+      });
+    });
+    expect(statusOf(2869)).toBe('checked_in');
+    const undo = lastUndo();
+    expect(undo.message).toBe('Faizan Shaikh checked in');
+    act(() => undo.onUndo());
+    await waitFor(() => expect(statusOf(2869)).toBe('confirmed'));
+  });
+});
+
 describe('booking and editing', () => {
   it('books with "Booked #<seq> · <day> <time> · confirm request sent on WhatsApp"', async () => {
     const { result } = renderHook(() => useCreateAppointment(), { wrapper });

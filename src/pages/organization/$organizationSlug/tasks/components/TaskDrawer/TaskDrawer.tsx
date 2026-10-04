@@ -2,6 +2,7 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskTarget } from '@/shared/clinic/task-targets.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import {
   RECORD_DRAWER_OVERLAY_CLASS,
@@ -17,7 +18,6 @@ import type { TaskActions } from '../../hooks/useTaskActions/index.ts';
 import type { TaskAssignees } from '../../hooks/useTaskAssignees/index.ts';
 import { TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { taskDrawerColumns } from './task-drawer-columns.ts';
-import type { TaskDrawerTarget } from './task-drawer-targets.ts';
 import { TaskDrawerChat } from './TaskDrawerChat.tsx';
 import { TaskDrawerFooter } from './TaskDrawerFooter.tsx';
 import { TaskDrawerBody, TaskDrawerHeader } from './TaskDrawerSections.tsx';
@@ -34,7 +34,7 @@ export interface TaskDrawerProps {
   /** Backdrop, ×, "Close", Esc — and after an outcome, a snooze, a claim or a hand-over. */
   onClose: () => void;
   /** The source button, a follow-on, the chat's "Book". */
-  onOpenTarget: (target: TaskDrawerTarget) => void;
+  onOpenTarget: (target: TaskTarget) => void;
   /** The person's contact card actions. */
   contactActions?: ContactCardActions;
   /** The record the source button and the cards name ("Task"), while it loads. */

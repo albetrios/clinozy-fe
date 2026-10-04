@@ -41,6 +41,7 @@ import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -85,6 +86,7 @@ import {
   stockVendorSeed,
 } from './stock.fixtures.ts';
 import { taskSeed } from './tasks.fixtures.ts';
+import { visitSeed } from './visits.fixtures.ts';
 
 /**
  * The clinic fixture world (D6, D37 — REPLACE_WITH_API): one in-memory
@@ -123,6 +125,12 @@ export const clinicFixtures = {
   appointments: createFixtureCollection<AppointmentRecord>({
     resource: 'Appointment',
     seed: () => appointmentSeed(),
+  }),
+  // D18's Visit — plan-only, no display id (Appendix F); see visits-contracts.ts.
+  visits: createFixtureCollection<VisitRecord>({
+    resource: 'Visit',
+    seed: () => visitSeed(),
+    sequenced: false,
   }),
   prescriptions: createFixtureCollection<Prescription>({
     resource: 'Prescription',

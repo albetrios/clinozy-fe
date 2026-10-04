@@ -1,5 +1,84 @@
 {
   "manifest": {
     "title": "오늘"
+  },
+  "greeting": {
+    "morning": "좋은 아침이에요, {{name}}",
+    "afternoon": "안녕하세요, {{name}}",
+    "evening": "좋은 저녁이에요, {{name}}",
+    "nobody": "여러분"
+  },
+  "pulse": "원내 {{inClinic}} · 대기 {{waiting}} · 도착 예정 {{arriving}} · {{day}}, {{time}}",
+  "newBooking": "새 예약",
+  "walkIn": "직접 방문",
+  "loading": "오늘 현황을 불러오는 중",
+  "lanes": {
+    "label": "단계",
+    "names": {
+      "enquiries": "문의",
+      "arriving": "도착 예정",
+      "waiting": "대기",
+      "withDoctor": "진료 중",
+      "treatment": "시술",
+      "checkout": "수납",
+      "pharmacy": "약국"
+    },
+    "hints": {
+      "oldest": "가장 오래된 {{time}}",
+      "next": "다음 {{time}}",
+      "since": "{{time}}부터",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_other": "{{count}}명",
+    "empty": "지금은 아무도 없습니다."
+  },
+  "actions": {
+    "book": "예약",
+    "checkIn": "체크인",
+    "sendIn": "진료실로 안내",
+    "openConsult": "진료 열기",
+    "openSession": "시술 열기",
+    "checkout": "수납",
+    "dispense": "조제"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_other": "처방약 {{count}}개",
+    "rooms": {
+      "roomOne": "1번 방",
+      "roomTwo": "2번 방",
+      "laserRoom": "레이저실"
+    }
+  },
+  "flags": {
+    "newLead": "신규 리드",
+    "confirmed": "확정",
+    "unconfirmed": "미확정",
+    "firstVisit": "첫 방문",
+    "packLeft": "패키지 {{left}}회 남음",
+    "due": "미수 {{amount}}",
+    "allergy": "{{name}} 알레르기",
+    "waiting": "대기 {{minutes}}분",
+    "inRoom": "진료실 {{minutes}}분",
+    "session": "{{total}}회 중 {{number}}회차",
+    "toPay": "결제 {{amount}}",
+    "rxApproved": "처방 승인 {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} 체크인 · 의사 대기열과 진료실에 알림",
+    "sentIn": "{{name}}님을 의사에게 안내했습니다",
+    "noRecord": "{{name}}님의 환자 기록이 아직 없습니다",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "다시 알림 · {{label}}"
+  },
+  "queue": {
+    "title": "작업 대기열",
+    "sub": "열린 작업 {{open}}개 · 각각 담당자와 기한이 있습니다",
+    "scope": "누구의 작업",
+    "owner": "담당: {{name}}",
+    "you": "{{name}} (나)",
+    "closed": "✓ {{result}}"
   }
 }

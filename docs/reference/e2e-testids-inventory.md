@@ -289,6 +289,26 @@ The toolbar carries the room toolbar's ids with the `tasks` prefix (`tasks-toolb
 
 ---
 
+## Today (`/today`, L-48)
+
+The room's own layout (no room toolbar): the greeting row, the lane tiles, the selected lane's
+panel and the work queue aside. A work-queue booking follow-on opens the shared appointment
+form over the page (`appointment-form-…` ids, below).
+
+| Test ID                                     | Element                                                                                            | File                                                |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `today-greeting` / `today-pulse`            | The greeting (the page's h1) and the pulse line                                                    | `components/TodayGreeting/`                         |
+| `today-new-booking` / `today-walk-in`       | "New booking" (hidden without Leads Create) and "Walk-in" (⌘K)                                     | `components/TodayGreeting/`                         |
+| `today-lanes` / `today-lane-<lane>`         | The tiles' group; a tile (`enquiries` … `with-doctor` … `pharmacy`; `aria-pressed`, `data-dimmed`) | `components/LaneTiles/`                             |
+| `today-panel`                               | The selected lane's panel (`data-lane`)                                                            | `components/LanePanel/`                             |
+| `today-card` / `today-card-open`            | A visit card (`data-card-id`) and its name area (opens the lead or the patient file)               | `components/LanePanel/`                             |
+| `today-card-action` / `today-empty`         | The lane action (`data-action`: `book`, `checkIn`, `sendIn`, …); "No one here right now."          | `components/LanePanel/`                             |
+| `today-queue` / `today-queue-scope-<scope>` | The work queue aside; "Mine" · "Everyone" (`mine`, `everyone`)                                     | `components/WorkQueue/`                             |
+| `today-queue-card` / `today-queue-outcome`  | A task card (`data-task-id`, `data-closed`); an outcome button (`data-outcome`)                    | `components/WorkQueue/`                             |
+| `today-queue-empty` / `today-booking-error` | The To do line when nothing is left; the stacked booking form's load failure                       | `components/WorkQueue/`, `components/TodayBooking/` |
+
+---
+
 ## Dashboard (`/`)
 
 | Test ID              | Element                                                  | File                |

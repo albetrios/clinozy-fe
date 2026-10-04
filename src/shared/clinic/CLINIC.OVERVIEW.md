@@ -33,7 +33,17 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   namespace (`TASK_RULE_KEYS`: rule names, Rules-popover lines, automations,
   how-to steps, outcome labels and effect lines, Snooze options, "What’s next"
   When chips). Today's work-queue aside loads `tasks` beside `today`.
+- `task-rules.constants.ts` also keys the words the Tasks room and Today's work
+  queue share: `TASK_DUE_KEYS` (a due label, worded by
+  `src/shared/hooks/useTaskDueLabel/`) and `TASK_QUEUE_KEYS` (Mine · Everyone,
+  "Anyone", To do's empty line).
+- `task-targets.ts` — where a task's link goes (`TaskTarget`): an outcome's
+  follow-on screen (`taskFollowOnTarget`: a new booking, a rebooking, a move,
+  the person's record) and its navigation with the room kept behind
+  (`taskTargetNavigation`, `from=tasks` / `from=today`).
 - `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
+- `visit-access.ts` — who can use each Visit sheet tab (`canUseVisitTab`,
+  KICKOFF §6.13): Today hides a lane action whose tab the member can't use.
 - `clinic-phone.ts` — a typed or pasted mobile as the contract stores it
   (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
   shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
@@ -56,7 +66,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   Private album Doctor / Admin, the Owner always passing (`S:35–40`, D22).
 - `clinic-command-targets.ts` — where ⌘K's clinic rows go (`/leads/create`,
   `/appointments/create`, `/patients/create`, `/payments/receive`, `/tasks`,
-  `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) and
+  `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) — and
+  Today's lane actions (`/visits/$visitId`, `/medical/sales/create`) — and
   `clinicCommandNavigation`, which fills in the record param and `from`. Several
   of those routes land with later ledger rows; the table names which.
 - `appointment-display.ts` — how every booking surface paints a booking: a

@@ -1,5 +1,88 @@
 {
   "manifest": {
     "title": "Hoy"
+  },
+  "greeting": {
+    "morning": "Buenos días, {{name}}",
+    "afternoon": "Buenas tardes, {{name}}",
+    "evening": "Buenas noches, {{name}}",
+    "nobody": "equipo"
+  },
+  "pulse": "{{inClinic}} en la clínica · {{waiting}} esperando · {{arriving}} por llegar · {{day}}, {{time}}",
+  "newBooking": "Nueva reserva",
+  "walkIn": "Sin cita",
+  "loading": "Cargando el día de hoy",
+  "lanes": {
+    "label": "Etapas",
+    "names": {
+      "enquiries": "Consultas",
+      "arriving": "Por llegar",
+      "waiting": "En espera",
+      "withDoctor": "Con el médico",
+      "treatment": "Tratamiento",
+      "checkout": "Caja",
+      "pharmacy": "Farmacia"
+    },
+    "hints": {
+      "oldest": "la más antigua {{time}}",
+      "next": "próxima {{time}}",
+      "since": "desde {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} persona",
+    "count_many": "{{count}} personas",
+    "count_other": "{{count}} personas",
+    "empty": "No hay nadie aquí ahora mismo."
+  },
+  "actions": {
+    "book": "Reservar",
+    "checkIn": "Registrar llegada",
+    "sendIn": "Hacer pasar",
+    "openConsult": "Abrir consulta",
+    "openSession": "Abrir sesión",
+    "checkout": "Cobrar",
+    "dispense": "Dispensar"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_one": "{{count}} medicamento recetado",
+    "medicines_many": "{{count}} medicamentos recetados",
+    "medicines_other": "{{count}} medicamentos recetados",
+    "rooms": {
+      "roomOne": "Sala 1",
+      "roomTwo": "Sala 2",
+      "laserRoom": "Sala láser"
+    }
+  },
+  "flags": {
+    "newLead": "Prospecto nuevo",
+    "confirmed": "Confirmada",
+    "unconfirmed": "Sin confirmar",
+    "firstVisit": "Primera visita",
+    "packLeft": "Quedan {{left}} del paquete",
+    "due": "Debe {{amount}}",
+    "allergy": "Alergia: {{name}}",
+    "waiting": "Esperando {{minutes}} min",
+    "inRoom": "En sala {{minutes}} min",
+    "session": "Sesión {{number}} de {{total}}",
+    "toPay": "{{amount}} por pagar",
+    "rxApproved": "Receta aprobada {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} registrado · se avisó a la cola del médico y a la sala",
+    "sentIn": "{{name}} pasó con el médico",
+    "noRecord": "Aún no hay ficha de paciente de {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Pospuesta · {{label}}"
+  },
+  "queue": {
+    "title": "Cola de trabajo",
+    "sub": "{{open}} abiertas · cada una con responsable y vencimiento",
+    "scope": "De quién son las tareas",
+    "owner": "Responsable: {{name}}",
+    "you": "{{name}} (tú)",
+    "closed": "✓ {{result}}"
   }
 }

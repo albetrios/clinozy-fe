@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
   type TaskDueAt,
@@ -10,10 +9,10 @@ import {
   taskDueLabel,
 } from '@/shared/api/clinic/task-views.ts';
 import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import { TASK_DUE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/index.ts';
+import { clinicWallClock, useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-
-import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 
 /** What a due label reads of a task. */
 export type TaskDueLabelInput = Pick<
@@ -23,31 +22,6 @@ export type TaskDueLabelInput = Pick<
 
 /** A member's close reads "Done · Now" for its first minute, then the time it happened. */
 const JUST_NOW_MS = 60_000;
-
-/** A clinic-local day and clock time as a wall-clock `Date` (formatted in UTC, no zone moves it). */
-function wallClock(date: string, time: string): Date {
-  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
-  const [hours = 0, minutes = 0] = time.split(':').map(Number);
-  return new Date(year, month - 1, day, hours, minutes);
-}
-
-/** A clinic-local clock time in the viewer's Appearance hour cycle ("3:30 pm"). */
-function useClock(): (date: string, time: string) => string {
-  const { formatDate, prefs } = useLocaleFormat();
-  return useCallback(
-    (date: string, time: string) =>
-      formatDate(
-        wallClock(date, time),
-        {
-          ...dateFormatOptions('time', prefs.hourCycle),
-          hour: 'numeric',
-          second: undefined,
-        },
-        { wallClock: true },
-      ),
-    [formatDate, prefs.hourCycle],
-  );
-}
 
 /** A due day and its time as words apart: "Today", "Wed 7 Oct"; "3:30 pm". */
 export interface TaskDayTimeWords {
@@ -59,18 +33,18 @@ export interface TaskDayTimeWords {
 function useAtParts(): (label: TaskDueAt) => TaskDayTimeWords {
   const { t: tPicker } = useTranslation(PICKER_NS);
   const { formatDate } = useLocaleFormat();
-  const clock = useClock();
+  const clock = useClinicClock();
   return useCallback(
     (label: TaskDueAt) => ({
       day:
         label.day === 'date'
           ? formatDate(
-              wallClock(label.date, '00:00'),
+              clinicWallClock(label.date, '00:00'),
               { weekday: 'short', day: 'numeric', month: 'short' },
               { wallClock: true },
             )
           : tPicker(PICKER_KEYS.date[label.day]),
-      time: clock(label.date, label.time),
+      time: clock.wallTime(label.date, label.time),
     }),
     [tPicker, formatDate, clock],
   );
@@ -78,12 +52,12 @@ function useAtParts(): (label: TaskDueAt) => TaskDayTimeWords {
 
 /** "Today 11:30 am" · "Wed 7 Oct 3:30 pm" — a due day and time in words. */
 function useDueAtWords(): (label: TaskDueAt) => string {
-  const { t } = useTranslation(TASKS_NS);
+  const { t } = useTranslation(TASK_RULES_NS);
   const parts = useAtParts();
   return useCallback(
     (label: TaskDueAt) => {
       const { day, time } = parts(label);
-      return t(TASKS_KEYS.due.at, { day, time });
+      return t(TASK_DUE_KEYS.at, { day, time });
     },
     [t, parts],
   );
@@ -125,32 +99,32 @@ export function useTaskDueAtWords(): (date: string, time: string, now: Date) => 
  * Appearance hour cycle (§7.2).
  */
 export function useTaskDueLabel(): (task: TaskDueLabelInput, now: Date) => string {
-  const { t } = useTranslation(TASKS_NS);
-  const clock = useClock();
+  const { t } = useTranslation(TASK_RULES_NS);
+  const clock = useClinicClock();
   const atWords = useDueAtWords();
 
   const words = useCallback(
     (label: TaskDueLabel, now: Date): string => {
       switch (label.kind) {
         case 'overdue':
-          return t(TASKS_KEYS.due.overdue[label.unit], { count: label.count });
+          return t(TASK_DUE_KEYS.overdue[label.unit], { count: label.count });
         case 'soon':
-          return t(TASKS_KEYS.due.soon[label.unit], { count: label.count });
+          return t(TASK_DUE_KEYS.soon[label.unit], { count: label.count });
         case 'at':
           return atWords(label);
         case 'snoozed':
           return label.label
-            ? t(TASKS_KEYS.due.snoozed, { label: label.label })
-            : t(TASKS_KEYS.groups.snoozed);
+            ? t(TASK_DUE_KEYS.snoozed, { label: label.label })
+            : t(TASK_DUE_KEYS.snoozedPlain);
         case 'doneByClinozy':
-          return t(TASKS_KEYS.due.doneByClinozy);
+          return t(TASK_DUE_KEYS.doneByClinozy);
         case 'done': {
           if (!label.at || now.getTime() - Date.parse(label.at) < JUST_NOW_MS) {
-            return t(TASKS_KEYS.due.doneNow);
+            return t(TASK_DUE_KEYS.doneNow);
           }
           const at = new Date(label.at);
-          return t(TASKS_KEYS.due.done, {
-            time: clock(clinicToday(at), clinicClockTime(at)),
+          return t(TASK_DUE_KEYS.done, {
+            time: clock.wallTime(clinicToday(at), clinicClockTime(at)),
           });
         }
       }

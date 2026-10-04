@@ -1,5 +1,86 @@
 {
   "manifest": {
     "title": "Today"
+  },
+  "greeting": {
+    "morning": "Good morning, {{name}}",
+    "afternoon": "Good afternoon, {{name}}",
+    "evening": "Good evening, {{name}}",
+    "nobody": "there"
+  },
+  "pulse": "{{inClinic}} in clinic · {{waiting}} waiting · {{arriving}} arriving · {{day}}, {{time}}",
+  "newBooking": "New booking",
+  "walkIn": "Walk-in",
+  "loading": "Loading today’s floor",
+  "lanes": {
+    "label": "Lanes",
+    "names": {
+      "enquiries": "Enquiries",
+      "arriving": "Arriving",
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "treatment": "Treatment",
+      "checkout": "Checkout",
+      "pharmacy": "Pharmacy"
+    },
+    "hints": {
+      "oldest": "oldest {{time}}",
+      "next": "next {{time}}",
+      "since": "since {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} person",
+    "count_other": "{{count}} people",
+    "empty": "No one here right now."
+  },
+  "actions": {
+    "book": "Book",
+    "checkIn": "Check in",
+    "sendIn": "Send in",
+    "openConsult": "Open consult",
+    "openSession": "Open session",
+    "checkout": "Checkout",
+    "dispense": "Dispense"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_one": "{{count}} medicine prescribed",
+    "medicines_other": "{{count}} medicines prescribed",
+    "rooms": {
+      "roomOne": "Room 1",
+      "roomTwo": "Room 2",
+      "laserRoom": "Laser room"
+    }
+  },
+  "flags": {
+    "newLead": "New lead",
+    "confirmed": "Confirmed",
+    "unconfirmed": "Unconfirmed",
+    "firstVisit": "First visit",
+    "packLeft": "Pack {{left}} left",
+    "due": "Due {{amount}}",
+    "allergy": "{{name}} allergy",
+    "waiting": "Waiting {{minutes}} min",
+    "inRoom": "In room {{minutes}} min",
+    "session": "Session {{number}} of {{total}}",
+    "toPay": "{{amount}} to pay",
+    "rxApproved": "Rx approved {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} checked in · Dr. queue and room notified",
+    "sentIn": "{{name}} sent in to the doctor",
+    "noRecord": "No patient record yet for {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Snoozed · {{label}}"
+  },
+  "queue": {
+    "title": "Work queue",
+    "sub": "{{open}} open · each has an owner and a due time",
+    "scope": "Whose tasks",
+    "owner": "Owner: {{name}}",
+    "you": "{{name}} (you)",
+    "closed": "✓ {{result}}"
   }
 }

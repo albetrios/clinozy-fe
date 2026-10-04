@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1685 src files · ~840 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1719 src files · ~860 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1168,7 +1168,6 @@ clinozy-fe/
 │   │       │   │   ├── hooks/
 │   │       │   │   │   ├── useTaskActions/
 │   │       │   │   │   ├── useTaskAssignees/
-│   │       │   │   │   ├── useTaskDueLabel/
 │   │       │   │   │   └── useTasksDialogRoute/
 │   │       │   │   ├── tasks.constants.ts
 │   │       │   │   ├── tasks.display.ts
@@ -1180,12 +1179,27 @@ clinozy-fe/
 │   │       │   │   ├── TasksPage.tsx
 │   │       │   │   └── [4 test files]
 │   │       │   ├── today/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── components/
+│   │       │   │   │   ├── LanePanel/
+│   │       │   │   │   ├── LaneTiles/
+│   │       │   │   │   ├── TodayBooking/
+│   │       │   │   │   ├── TodayGreeting/
+│   │       │   │   │   └── WorkQueue/
+│   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useFloorActions/
+│   │       │   │   │   ├── useTodayFloorView/
+│   │       │   │   │   └── useWorkQueue/
 │   │       │   │   ├── today.constants.ts
+│   │       │   │   ├── today.flags.ts
+│   │       │   │   ├── today.lanes.ts
 │   │       │   │   ├── today.manifest.ts
 │   │       │   │   ├── TODAY.OVERVIEW.md
 │   │       │   │   ├── today.route.tsx
+│   │       │   │   ├── today.search.ts
 │   │       │   │   ├── TodayPage.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [4 test files]
 │   │       │   ├── users/
 │   │       │   │   ├── $userId/
 │   │       │   │   │   └── edit/
@@ -1271,6 +1285,9 @@ clinozy-fe/
 │   │   │   │   │   ├── task-rules.fixtures.ts
 │   │   │   │   │   ├── tasks-server.fixtures.ts
 │   │   │   │   │   ├── tasks.fixtures.ts
+│   │   │   │   │   ├── today-server.fixtures.ts
+│   │   │   │   │   ├── visits-server.fixtures.ts
+│   │   │   │   │   ├── visits.fixtures.ts
 │   │   │   │   │   ├── world.fixtures.ts
 │   │   │   │   │   └── [2 test files]
 │   │   │   │   ├── access-api.ts
@@ -1322,9 +1339,13 @@ clinozy-fe/
 │   │   │   │   ├── task-views.ts
 │   │   │   │   ├── tasks-api.ts
 │   │   │   │   ├── tasks-contracts.ts
+│   │   │   │   ├── today-api.ts
+│   │   │   │   ├── today-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [39 test files]
+│   │   │   │   ├── visits-api.ts
+│   │   │   │   ├── visits-contracts.ts
+│   │   │   │   └── [43 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1406,7 +1427,9 @@ clinozy-fe/
 │   │   │   ├── patient-file-sections.ts
 │   │   │   ├── task-rule-icons.ts
 │   │   │   ├── task-rules.constants.ts
-│   │   │   └── [14 test files]
+│   │   │   ├── task-targets.ts
+│   │   │   ├── visit-access.ts
+│   │   │   └── [16 test files]
 │   │   ├── components/
 │   │   │   ├── AppearanceDialog/
 │   │   │   │   ├── appearance-dialog.constants.ts
@@ -2453,6 +2476,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSubscription.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useTaskDueLabel/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useTaskDueLabel.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useTasks/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useTasks.ts
@@ -2465,6 +2492,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── thread-outbox.ts
 │   │   │   │   ├── useThread.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useTodayFloor/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useTodayFloor.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useUnsavedChangesGuard/
 │   │   │   │   ├── index.ts
@@ -2494,6 +2525,10 @@ clinozy-fe/
 │   │   │   ├── useViewportWidth/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useViewportWidth.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useVisits/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useVisits.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useWebhookEvents/
 │   │   │   │   ├── index.ts
@@ -2704,7 +2739,8 @@ clinozy-fe/
 │   │   ├── e2e-verification-code.ts
 │   │   ├── README.md
 │   │   ├── renderWithProviders.tsx
-│   │   └── setup.ts
+│   │   ├── setup.ts
+│   │   └── task-row-fixture.ts
 │   └── README.md
 ├── tooling/
 │   ├── agent-os/

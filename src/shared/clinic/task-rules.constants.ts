@@ -412,3 +412,38 @@ export const TASK_RULE_KEYS = {
   readonly snoozeOptions: Readonly<Record<TaskSnoozeOption, string>>;
   readonly followUpWhen: Readonly<Record<TaskFollowUpWhen, string>>;
 };
+
+/**
+ * A task's due label in words (`tasks.md:58, 309`), in the `tasks` namespace —
+ * the Tasks rows and drawer and Today's work queue word it alike
+ * (`useTaskDueLabel`).
+ */
+export const TASK_DUE_KEYS = {
+  overdue: {
+    minutes: 'due.overdue.minutes',
+    hours: 'due.overdue.hours',
+    days: 'due.overdue.days',
+  },
+  soon: { minutes: 'due.soon.minutes', hours: 'due.soon.hours' },
+  /** "<day> <time>" — "Today 11:30 am", "Wed 7 Oct 3:30 pm". */
+  at: 'due.at',
+  snoozed: 'due.snoozed',
+  /** A snooze with no label of its own reads the Snoozed view's name. */
+  snoozedPlain: 'groups.snoozed',
+  done: 'due.done',
+  doneNow: 'due.doneNow',
+  doneByClinozy: 'due.doneByClinozy',
+} as const;
+
+/**
+ * The work queue's words the Tasks room and Today's aside share (one task
+ * model, Q-T3), in the `tasks` namespace.
+ */
+export const TASK_QUEUE_KEYS = {
+  /** "Mine" · "Everyone". */
+  scope: { mine: 'scope.mine', everyone: 'scope.everyone' },
+  /** An unowned task's owner. */
+  anyone: 'row.anyone',
+  /** To do's empty line — Today's work queue shows it too (its design has none; AMBER). */
+  empty: 'empty.queue',
+} as const;

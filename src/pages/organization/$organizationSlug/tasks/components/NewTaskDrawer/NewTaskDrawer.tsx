@@ -15,13 +15,13 @@ import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
+import { useTaskDueAtWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
   type TaskAssignees,
   useTaskAssignees,
 } from '../../hooks/useTaskAssignees/index.ts';
-import { useTaskDueAtWords } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import type { TaskCreateSearch } from '../../tasks.search.ts';
 import {

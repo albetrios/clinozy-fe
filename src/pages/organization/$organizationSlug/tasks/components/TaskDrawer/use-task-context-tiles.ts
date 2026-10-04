@@ -7,8 +7,8 @@ import type { TaskDetail, TaskStaff } from '@/shared/api/clinic/tasks-contracts.
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { useTaskDayTimeWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
 
-import { useTaskDayTimeWords } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 
 /** A context tile's label key. */

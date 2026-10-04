@@ -23,8 +23,8 @@ import {
   type LoadMorePaging,
   useLoadMoreSentinel,
 } from '@/shared/hooks/useLoadMoreSentinel/index.ts';
+import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 
-import { useTaskDueLabel } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { TaskRow } from '../TaskRow/index.ts';
 

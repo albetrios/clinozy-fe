@@ -1,5 +1,84 @@
 {
   "manifest": {
     "title": "今日"
+  },
+  "greeting": {
+    "morning": "おはようございます、{{name}}さん",
+    "afternoon": "こんにちは、{{name}}さん",
+    "evening": "こんばんは、{{name}}さん",
+    "nobody": "皆"
+  },
+  "pulse": "院内 {{inClinic}} · 待合 {{waiting}} · 来院予定 {{arriving}} · {{day}} {{time}}",
+  "newBooking": "新規予約",
+  "walkIn": "飛び込み",
+  "loading": "本日のフロアを読み込み中",
+  "lanes": {
+    "label": "レーン",
+    "names": {
+      "enquiries": "問い合わせ",
+      "arriving": "来院予定",
+      "waiting": "待合",
+      "withDoctor": "診察中",
+      "treatment": "施術",
+      "checkout": "会計",
+      "pharmacy": "薬局"
+    },
+    "hints": {
+      "oldest": "最古 {{time}}",
+      "next": "次 {{time}}",
+      "since": "{{time}} から",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_other": "{{count}}人",
+    "empty": "今は誰もいません。"
+  },
+  "actions": {
+    "book": "予約",
+    "checkIn": "受付",
+    "sendIn": "呼び入れ",
+    "openConsult": "診察を開く",
+    "openSession": "施術を開く",
+    "checkout": "会計",
+    "dispense": "調剤"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_other": "処方薬 {{count}}件",
+    "rooms": {
+      "roomOne": "1番室",
+      "roomTwo": "2番室",
+      "laserRoom": "レーザー室"
+    }
+  },
+  "flags": {
+    "newLead": "新規リード",
+    "confirmed": "確認済み",
+    "unconfirmed": "未確認",
+    "firstVisit": "初診",
+    "packLeft": "パック残り{{left}}回",
+    "due": "未払い {{amount}}",
+    "allergy": "{{name}}アレルギー",
+    "waiting": "待ち {{minutes}}分",
+    "inRoom": "入室 {{minutes}}分",
+    "session": "{{total}}回中{{number}}回目",
+    "toPay": "支払い {{amount}}",
+    "rxApproved": "処方承認 {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}}さんを受付 · 医師の待ち行列と部屋に通知しました",
+    "sentIn": "{{name}}さんを診察へ案内しました",
+    "noRecord": "{{name}}さんの患者記録はまだありません",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "スヌーズ · {{label}}"
+  },
+  "queue": {
+    "title": "作業キュー",
+    "sub": "未完了 {{open}}件 · それぞれ担当者と期限があります",
+    "scope": "担当範囲",
+    "owner": "担当: {{name}}",
+    "you": "{{name}}（自分）",
+    "closed": "✓ {{result}}"
   }
 }

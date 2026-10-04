@@ -2,6 +2,7 @@ import {
   organizationAppointmentCreate,
   organizationLead,
   organizationLeadCreate,
+  organizationMedicalCreate,
   organizationPatientCreate,
 } from '@/lib/routes/builders.ts';
 import {
@@ -22,7 +23,9 @@ export type ClinicCommandTarget =
   | 'patient'
   | 'patientEdit'
   | 'lead'
-  | 'invoice';
+  | 'invoice'
+  | 'visit'
+  | 'newSale';
 
 /**
  * Where ⌘K's clinic rows go (KICKOFF §6.0 Command menu; D24, D19 / D26) — and
@@ -46,6 +49,8 @@ export type ClinicCommandTarget =
  * | `patientEdit`    | `/patients/$patientId/edit`    | live (L-42; the drawer L-32b)  |
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
  * | `invoice`        | `/invoices/$invoiceId`         | L-40                           |
+ * | `visit`          | `/visits/$visitId`             | L-49 (Today's lane actions)    |
+ * | `newSale`        | `/medical/sales/create`        | live (L-50; the drawer L-50c)  |
  *
  * Plain strings on purpose: a literal no registered route has yet would not
  * type-check as a `to`. When a row adds a route's builder, it swaps its
@@ -63,6 +68,8 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   patientEdit: organizationPatientEdit('', '').to,
   lead: organizationLead('', '').to,
   invoice: '/organization/$organizationSlug/invoices/$invoiceId',
+  visit: '/organization/$organizationSlug/visits/$visitId',
+  newSale: organizationMedicalCreate('', 'sales').to,
 };
 
 /** The record param of a record target's route. */
@@ -71,18 +78,20 @@ const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
   patientEdit: 'patientId',
   lead: 'leadId',
   invoice: 'invoiceId',
+  visit: 'visitId',
 };
 
 /**
  * The drawers that keep the page they open from behind them through `from`
- * (KICKOFF §4: `/invoices/*`, `/payments/receive`, `/appointments/create`);
- * the others open over their own room.
+ * (KICKOFF §4: `/invoices/*`, `/payments/receive`, `/appointments/create`,
+ * `/medical/sales/create`); the others open over their own room.
  */
 const KEEPS_REFERRER: ReadonlySet<ClinicCommandTarget> = new Set([
   'newAppointment',
   'newReceipt',
   'newInvoice',
   'invoice',
+  'newSale',
 ]);
 
 /** A ⌘K navigation: a `to` with its params and search, as `navigate()` takes it. */

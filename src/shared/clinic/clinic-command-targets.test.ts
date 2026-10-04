@@ -28,6 +28,31 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
     });
   });
 
+  it('takes Today’s lane actions to the Visit sheet and the sale drawer (§6.2)', () => {
+    expect(
+      clinicCommandNavigation('visit', {
+        organizationSlug: 'acme',
+        recordId: PATIENT,
+        search: { tab: 'consult' },
+      }),
+    ).toEqual({
+      to: `${ORG}/visits/$visitId`,
+      params: { organizationSlug: 'acme', visitId: PATIENT },
+      search: { tab: 'consult' },
+    });
+    expect(
+      clinicCommandNavigation('newSale', {
+        organizationSlug: 'acme',
+        referrer: 'today',
+        search: { prescription: PATIENT },
+      }),
+    ).toEqual({
+      to: `${ORG}/medical/sales/create`,
+      params: { organizationSlug: 'acme' },
+      search: { prescription: PATIENT, from: 'today' },
+    });
+  });
+
   it('takes the Patients row actions to the other rooms’ drawers (§6.5)', () => {
     expect(CLINIC_COMMAND_TARGETS).toMatchObject({
       newInvoice: `${ORG}/invoices/create`,
@@ -78,6 +103,7 @@ describe('clinicCommandNavigation', () => {
       'newReceipt',
       'newInvoice',
       'invoice',
+      'newSale',
     ] as const) {
       expect(
         clinicCommandNavigation(target, {

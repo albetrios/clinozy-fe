@@ -7,8 +7,8 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import { taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
-import { taskRowFixture } from '../../__tests__/integration/task-row-fixture.ts';
 import { WhatsNextSheet } from './WhatsNextSheet.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({

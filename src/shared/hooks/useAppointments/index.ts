@@ -1,6 +1,7 @@
 export {
   type AppointmentCancelOptions,
   type AppointmentQueryOptions,
+  type AppointmentStatusOptions,
   type AppointmentUpdateVars,
   useActivePackages,
   useAppointment,

@@ -7,6 +7,7 @@ import { TASK_RULES, type TaskDetail } from '@/shared/api/clinic/tasks-contracts
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TASK_RULE_ICONS } from '@/shared/clinic/task-rule-icons.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+import type { TaskTarget } from '@/shared/clinic/task-targets.ts';
 import {
   PersonAvatar,
   personFullName,
@@ -19,12 +20,12 @@ import {
 } from '@/shared/components/PersonCard/index.ts';
 import { SheetDescription, SheetTitle } from '@/shared/components/ui/sheet.tsx';
 import { Textarea } from '@/shared/components/ui/textarea.tsx';
+import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { Sparkles } from '@/shared/icons/index.ts';
 
-import { useTaskDueLabel } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { lowerFirst, taskContactCard, taskSourceId } from '../../tasks.display.ts';
-import { type TaskDrawerTarget, taskSourceTarget } from './task-drawer-targets.ts';
+import { taskSourceTarget } from './task-drawer-targets.ts';
 import { useTaskContextTiles } from './use-task-context-tiles.ts';
 
 const K = TASKS_KEYS.drawer;
@@ -150,7 +151,7 @@ function WhoRow({
 }: {
   detail: TaskDetail;
   contactActions?: ContactCardActions;
-  onOpenTarget: (target: TaskDrawerTarget) => void;
+  onOpenTarget: (target: TaskTarget) => void;
 }) {
   const { t } = useTranslation(TASKS_NS);
   const row = detail.task;
@@ -414,7 +415,7 @@ export function TaskDrawerBody({
   onNote: (note: string) => void;
   onOutcome: (outcomeId: string) => void;
   onHandOver: () => void;
-  onOpenTarget: (target: TaskDrawerTarget) => void;
+  onOpenTarget: (target: TaskTarget) => void;
   contactActions?: ContactCardActions;
 }) {
   const named = (id: string | null | undefined) => {

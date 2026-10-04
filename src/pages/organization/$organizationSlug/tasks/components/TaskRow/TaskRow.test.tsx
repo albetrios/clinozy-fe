@@ -6,12 +6,8 @@ import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import type { TaskRow as TaskRowRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
-import {
-  ASHA,
-  RIYA,
-  taskRowFixture,
-} from '../../__tests__/integration/task-row-fixture.ts';
 import { TaskRow, type TaskRowProps } from './TaskRow.tsx';
 
 vi.mock('@/shared/hooks/useCanHover/index.ts', () => ({ useCanHover: () => true }));

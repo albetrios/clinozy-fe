@@ -1,5 +1,84 @@
 {
   "manifest": {
     "title": "今天"
+  },
+  "greeting": {
+    "morning": "早上好，{{name}}",
+    "afternoon": "下午好，{{name}}",
+    "evening": "晚上好，{{name}}",
+    "nobody": "各位"
+  },
+  "pulse": "院内 {{inClinic}} · 候诊 {{waiting}} · 待到达 {{arriving}} · {{day}}，{{time}}",
+  "newBooking": "新预约",
+  "walkIn": "到店咨询",
+  "loading": "正在加载今日看板",
+  "lanes": {
+    "label": "流程",
+    "names": {
+      "enquiries": "咨询",
+      "arriving": "待到达",
+      "waiting": "候诊",
+      "withDoctor": "就诊中",
+      "treatment": "治疗",
+      "checkout": "结账",
+      "pharmacy": "药房"
+    },
+    "hints": {
+      "oldest": "最早 {{time}}",
+      "next": "下一位 {{time}}",
+      "since": "自 {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_other": "{{count}} 人",
+    "empty": "目前这里没有人。"
+  },
+  "actions": {
+    "book": "预约",
+    "checkIn": "签到",
+    "sendIn": "请进诊室",
+    "openConsult": "打开问诊",
+    "openSession": "打开疗程",
+    "checkout": "结账",
+    "dispense": "发药"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_other": "已开 {{count}} 种药",
+    "rooms": {
+      "roomOne": "1 号诊室",
+      "roomTwo": "2 号诊室",
+      "laserRoom": "激光室"
+    }
+  },
+  "flags": {
+    "newLead": "新线索",
+    "confirmed": "已确认",
+    "unconfirmed": "未确认",
+    "firstVisit": "初诊",
+    "packLeft": "疗程包剩 {{left}} 次",
+    "due": "欠款 {{amount}}",
+    "allergy": "{{name}}过敏",
+    "waiting": "已等 {{minutes}} 分钟",
+    "inRoom": "在诊室 {{minutes}} 分钟",
+    "session": "第 {{number}}/{{total}} 次",
+    "toPay": "应付 {{amount}}",
+    "rxApproved": "处方已批准 {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} 已签到 · 已通知医生队列和诊室",
+    "sentIn": "已请 {{name}} 进入诊室",
+    "noRecord": "{{name}} 还没有患者档案",
+    "outcome": "{{name}}：{{result}}",
+    "snoozed": "已推迟 · {{label}}"
+  },
+  "queue": {
+    "title": "工作队列",
+    "sub": "{{open}} 项待办 · 每项都有负责人和截止时间",
+    "scope": "谁的任务",
+    "owner": "负责人：{{name}}",
+    "you": "{{name}}（我）",
+    "closed": "✓ {{result}}"
   }
 }

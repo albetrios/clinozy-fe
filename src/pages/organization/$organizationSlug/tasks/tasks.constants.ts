@@ -5,6 +5,7 @@ import type {
   TaskPriority,
   TaskTab,
 } from '@/shared/api/clinic/tasks-contracts.ts';
+import { TASK_QUEUE_KEYS } from '@/shared/clinic/task-rules.constants.ts';
 
 /** The Tasks room's i18n namespace. */
 export const TASKS_NS = I18N_NAMESPACES.tasks;
@@ -35,7 +36,7 @@ export const TASKS_KEYS = {
     /** "<n> types" (plural). */
     count: 'type.count',
   },
-  scope: { label: 'scope.label', mine: 'scope.mine', everyone: 'scope.everyone' },
+  scope: { label: 'scope.label', ...TASK_QUEUE_KEYS.scope },
   rulesPopover: {
     button: 'rulesPopover.button',
     /** The popover's accessible name ("Task rules"). */
@@ -60,7 +61,7 @@ export const TASKS_KEYS = {
   row: {
     /** The pill on a rule handed to the product ("Clinozy can do this"). */
     automation: 'row.automation',
-    anyone: 'row.anyone',
+    anyone: TASK_QUEUE_KEYS.anyone,
     /** "<owner> · was <first name>" after a reassign. */
     was: 'row.was',
     /** "✓ <result>" on a Done row. */
@@ -75,22 +76,8 @@ export const TASKS_KEYS = {
     invoice: 'sources.invoice',
     contact: 'sources.contact',
   },
-  due: {
-    overdue: {
-      minutes: 'due.overdue.minutes',
-      hours: 'due.overdue.hours',
-      days: 'due.overdue.days',
-    },
-    soon: { minutes: 'due.soon.minutes', hours: 'due.soon.hours' },
-    /** "<day> <time>" — "Today 11:30 am", "Wed 7 Oct 3:30 pm". */
-    at: 'due.at',
-    snoozed: 'due.snoozed',
-    done: 'due.done',
-    doneNow: 'due.doneNow',
-    doneByClinozy: 'due.doneByClinozy',
-  },
   empty: {
-    queue: 'empty.queue',
+    queue: TASK_QUEUE_KEYS.empty,
     snoozed: 'empty.snoozed',
     done: 'empty.done',
   } satisfies Record<TaskTab, string>,

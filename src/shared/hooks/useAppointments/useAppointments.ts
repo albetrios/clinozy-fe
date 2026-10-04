@@ -331,15 +331,28 @@ function statusToast(row: AppointmentRow): string {
   );
 }
 
+/** Options for {@link useSetAppointmentStatus}. */
+export interface AppointmentStatusOptions extends CrudMutationOptions<
+  AppointmentChange,
+  AppointmentStatusInput
+> {
+  /**
+   * The toast's own words, still with Undo — Today's "<name> checked in · Dr.
+   * queue and room notified" (KICKOFF §6.2). Default: "<name> → <status>".
+   */
+  announce?: (change: AppointmentChange) => string;
+}
+
 /**
  * Move a status — the popover, the card's next step, Today. Optimistic: every
  * cached read shows the new status at once and goes back if the server
  * refuses (409 with the guard's words). "<name> → <status>" with Undo for 10s,
  * which reverts the status and its side effects.
  */
-export function useSetAppointmentStatus(
-  options: CrudMutationOptions<AppointmentChange, AppointmentStatusInput> = {},
-) {
+export function useSetAppointmentStatus({
+  announce,
+  ...options
+}: AppointmentStatusOptions = {}) {
   const undo = useUndoAppointmentChange();
   return useAppMutation<AppointmentChange, AppointmentStatusInput>({
     mutationFn: setAppointmentStatus,
@@ -349,7 +362,7 @@ export function useSetAppointmentStatus(
       update: (data, { id, status }) => withAppointmentStatus(data, id, status),
     },
     ...withUndoToast(options, (change) =>
-      notify.undo(statusToast(change.appointment), {
+      notify.undo(announce ? announce(change) : statusToast(change.appointment), {
         onUndo: () => undo.mutate(change.undoToken),
       }),
     ),

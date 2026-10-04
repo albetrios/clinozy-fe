@@ -6,8 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
 import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
+import { taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
-import { taskRowFixture } from '../../__tests__/integration/task-row-fixture.ts';
 import { type TaskActionsOptions, useTaskActions } from './useTaskActions.ts';
 
 const { notifyMock } = vi.hoisted(() => ({

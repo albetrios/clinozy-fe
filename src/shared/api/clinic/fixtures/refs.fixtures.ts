@@ -25,6 +25,8 @@ export const ref = {
   lead: (seq: number) => fixtureUuid('lead', seq),
   leadMessage: (key: string) => fixtureUuid('lead-message', key),
   appointment: (seq: number) => fixtureUuid('appointment', seq),
+  /** A visit, keyed by its booking's seq (D18: one visit per checked-in booking). */
+  visit: (appointmentSeq: number) => fixtureUuid('visit', appointmentSeq),
   prescription: (seq: number) => fixtureUuid('prescription', seq),
   treatment: (key: number) => fixtureUuid('treatment', key),
   patientImage: (key: number) => fixtureUuid('patient-image', key),

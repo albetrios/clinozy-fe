@@ -1,5 +1,94 @@
 {
   "manifest": {
     "title": "اليوم"
+  },
+  "greeting": {
+    "morning": "صباح الخير، {{name}}",
+    "afternoon": "نهارك سعيد، {{name}}",
+    "evening": "مساء الخير، {{name}}",
+    "nobody": "يا فريق"
+  },
+  "pulse": "{{inClinic}} في العيادة · {{waiting}} بالانتظار · {{arriving}} قادمون · {{day}}، {{time}}",
+  "newBooking": "حجز جديد",
+  "walkIn": "زيارة مباشرة",
+  "loading": "جارٍ تحميل حالة اليوم",
+  "lanes": {
+    "label": "المراحل",
+    "names": {
+      "enquiries": "الاستفسارات",
+      "arriving": "القادمون",
+      "waiting": "الانتظار",
+      "withDoctor": "عند الطبيب",
+      "treatment": "العلاج",
+      "checkout": "الدفع",
+      "pharmacy": "الصيدلية"
+    },
+    "hints": {
+      "oldest": "الأقدم {{time}}",
+      "next": "التالي {{time}}",
+      "since": "منذ {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_zero": "لا أحد",
+    "count_one": "شخص واحد",
+    "count_two": "شخصان",
+    "count_few": "{{count}} أشخاص",
+    "count_many": "{{count}} شخصًا",
+    "count_other": "{{count}} شخص",
+    "empty": "لا أحد هنا الآن."
+  },
+  "actions": {
+    "book": "احجز",
+    "checkIn": "تسجيل الحضور",
+    "sendIn": "أدخِل",
+    "openConsult": "افتح الاستشارة",
+    "openSession": "افتح الجلسة",
+    "checkout": "الدفع",
+    "dispense": "صرف الدواء"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_zero": "لا أدوية موصوفة",
+    "medicines_one": "دواء واحد موصوف",
+    "medicines_two": "دواءان موصوفان",
+    "medicines_few": "{{count}} أدوية موصوفة",
+    "medicines_many": "{{count}} دواءً موصوفًا",
+    "medicines_other": "{{count}} دواء موصوف",
+    "rooms": {
+      "roomOne": "الغرفة 1",
+      "roomTwo": "الغرفة 2",
+      "laserRoom": "غرفة الليزر"
+    }
+  },
+  "flags": {
+    "newLead": "عميل محتمل جديد",
+    "confirmed": "مؤكَّد",
+    "unconfirmed": "غير مؤكَّد",
+    "firstVisit": "الزيارة الأولى",
+    "packLeft": "متبقٍ في الباقة {{left}}",
+    "due": "مستحق {{amount}}",
+    "allergy": "حساسية {{name}}",
+    "waiting": "ينتظر {{minutes}} د",
+    "inRoom": "في الغرفة {{minutes}} د",
+    "session": "الجلسة {{number}} من {{total}}",
+    "toPay": "{{amount}} للدفع",
+    "rxApproved": "الوصفة معتمدة {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "تم تسجيل حضور {{name}} · تم إبلاغ قائمة الطبيب والغرفة",
+    "sentIn": "تم إرسال {{name}} إلى الطبيب",
+    "noRecord": "لا يوجد سجل مريض بعد لـ {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "مؤجلة · {{label}}"
+  },
+  "queue": {
+    "title": "قائمة العمل",
+    "sub": "{{open}} مفتوحة · لكل منها مسؤول وموعد",
+    "scope": "مهام مَن",
+    "owner": "المسؤول: {{name}}",
+    "you": "{{name}} (أنت)",
+    "closed": "✓ {{result}}"
   }
 }

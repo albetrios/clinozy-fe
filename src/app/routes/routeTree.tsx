@@ -143,6 +143,7 @@ import {
   validateTasksSearch,
 } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
+import { validateTodaySearch } from '@/pages/organization/$organizationSlug/today/today.search.ts';
 import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
 import { manifest as branchEditManifest } from '@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.manifest.ts';
 import { manifest as usersBranchesManifest } from '@/pages/organization/$organizationSlug/users/branches/branches.manifest.ts';
@@ -266,9 +267,10 @@ const SuspendedPage = lazyRouteComponent(
   'Component',
 );
 // Clinic rooms (KICKOFF §4): each loads its own namespace with its chunk.
+// Today's work queue reads the Tasks rule copy (one task model, Q-T3): `tasks` loads with it.
 const TodayPage = lazyRouteComponent(
   localizedRoute(
-    [I18N_NAMESPACES.today],
+    [I18N_NAMESPACES.today, I18N_NAMESPACES.tasks],
     () => import('@/pages/organization/$organizationSlug/today/today.route.tsx'),
   ),
   'Component',
@@ -1048,6 +1050,7 @@ const organizationTodayRoute = createRoute({
   path: 'today',
   head: manifestHead(todayManifest),
   staticData: { manifest: todayManifest },
+  validateSearch: validateTodaySearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(todayManifest)(toGateContext(location, params));

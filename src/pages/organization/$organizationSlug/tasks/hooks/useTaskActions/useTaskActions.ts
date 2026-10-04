@@ -11,6 +11,7 @@ import {
   type TaskSnoozeOption,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+import { taskFollowOnTarget, type TaskTarget } from '@/shared/clinic/task-targets.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import {
   useHandTaskToClinozy,
@@ -21,10 +22,6 @@ import {
 } from '@/shared/hooks/useTasks/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  type TaskDrawerTarget,
-  taskFollowOnTarget,
-} from '../../components/TaskDrawer/task-drawer-targets.ts';
 import { taskContextLead } from '../../components/TaskDrawer/use-task-context-tiles.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 import { lowerFirst } from '../../tasks.display.ts';
@@ -45,7 +42,7 @@ export interface TaskActionsOptions {
   /** Close the drawer: back to the list. */
   close: () => void;
   /** Open a follow-on screen or a record (the booking, the lead drawer, the file). */
-  openTarget: (target: TaskDrawerTarget) => void;
+  openTarget: (target: TaskTarget) => void;
   /** "What’s next for <first>?" over the list. */
   openWhatsNext: (next: WhatsNextFor) => void;
 }

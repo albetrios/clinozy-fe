@@ -13,6 +13,7 @@ import {
   type ClinicCommandNavigation,
   clinicCommandNavigation,
 } from '@/shared/clinic/clinic-command-targets.ts';
+import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
@@ -28,11 +29,7 @@ import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { type NewTaskCreated, NewTaskDrawer } from './components/NewTaskDrawer/index.ts';
-import {
-  TaskDrawer,
-  taskDrawerNavigation,
-  type TaskDrawerTarget,
-} from './components/TaskDrawer/index.ts';
+import { TaskDrawer } from './components/TaskDrawer/index.ts';
 import { TaskList } from './components/TaskList/index.ts';
 import { TasksToolbar } from './components/TasksToolbar/index.ts';
 import { WhatsNextSheet } from './components/WhatsNextSheet/index.ts';
@@ -144,8 +141,8 @@ function useTaskDrawer(organizationSlug: string, close: () => void) {
   const navigate = useNavigate();
   const assignees = useTaskAssignees();
   const [whatsNext, setWhatsNext] = useState<WhatsNextFor | null>(null);
-  const openTarget = (target: TaskDrawerTarget) =>
-    void navigate(taskDrawerNavigation(target, organizationSlug));
+  const openTarget = (target: TaskTarget) =>
+    void navigate(taskTargetNavigation(target, organizationSlug, 'tasks'));
   const actions = useTaskActions({
     assignees,
     close,

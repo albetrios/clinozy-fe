@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { taskRowFixture } from '../../__tests__/integration/task-row-fixture.ts';
+import { taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
+
 import { TaskList, type TaskListProps } from './TaskList.tsx';
 
 vi.mock('@/shared/hooks/useCanHover/index.ts', () => ({ useCanHover: () => true }));

@@ -1,5 +1,86 @@
 {
   "manifest": {
     "title": "Heute"
+  },
+  "greeting": {
+    "morning": "Guten Morgen, {{name}}",
+    "afternoon": "Guten Tag, {{name}}",
+    "evening": "Guten Abend, {{name}}",
+    "nobody": "zusammen"
+  },
+  "pulse": "{{inClinic}} in der Klinik · {{waiting}} wartend · {{arriving}} erwartet · {{day}}, {{time}}",
+  "newBooking": "Neue Buchung",
+  "walkIn": "Laufkundschaft",
+  "loading": "Der heutige Betrieb wird geladen",
+  "lanes": {
+    "label": "Bereiche",
+    "names": {
+      "enquiries": "Anfragen",
+      "arriving": "Erwartet",
+      "waiting": "Wartend",
+      "withDoctor": "Beim Arzt",
+      "treatment": "Behandlung",
+      "checkout": "Kasse",
+      "pharmacy": "Apotheke"
+    },
+    "hints": {
+      "oldest": "älteste {{time}}",
+      "next": "nächste {{time}}",
+      "since": "seit {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} Person",
+    "count_other": "{{count}} Personen",
+    "empty": "Gerade ist niemand hier."
+  },
+  "actions": {
+    "book": "Buchen",
+    "checkIn": "Einchecken",
+    "sendIn": "Hereinbitten",
+    "openConsult": "Konsultation öffnen",
+    "openSession": "Sitzung öffnen",
+    "checkout": "Kasse",
+    "dispense": "Ausgeben"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "enquiry": "{{interest}} — {{message}}",
+    "medicines_one": "{{count}} Medikament verordnet",
+    "medicines_other": "{{count}} Medikamente verordnet",
+    "rooms": {
+      "roomOne": "Raum 1",
+      "roomTwo": "Raum 2",
+      "laserRoom": "Laserraum"
+    }
+  },
+  "flags": {
+    "newLead": "Neuer Lead",
+    "confirmed": "Bestätigt",
+    "unconfirmed": "Unbestätigt",
+    "firstVisit": "Erstbesuch",
+    "packLeft": "Paket: noch {{left}}",
+    "due": "Offen {{amount}}",
+    "allergy": "{{name}}-Allergie",
+    "waiting": "Wartet {{minutes}} Min.",
+    "inRoom": "Im Raum {{minutes}} Min.",
+    "session": "Sitzung {{number}} von {{total}}",
+    "toPay": "{{amount}} zu zahlen",
+    "rxApproved": "Rezept freigegeben {{time}}"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} eingecheckt · Arztliste und Raum benachrichtigt",
+    "sentIn": "{{name}} zum Arzt geschickt",
+    "noRecord": "Noch keine Patientenakte für {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Zurückgestellt · {{label}}"
+  },
+  "queue": {
+    "title": "Arbeitsliste",
+    "sub": "{{open}} offen · jede mit Zuständigkeit und Fälligkeit",
+    "scope": "Wessen Aufgaben",
+    "owner": "Zuständig: {{name}}",
+    "you": "{{name}} (Sie)",
+    "closed": "✓ {{result}}"
   }
 }

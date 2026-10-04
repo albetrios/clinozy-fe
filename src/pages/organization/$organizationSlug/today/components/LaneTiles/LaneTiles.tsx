@@ -1,0 +1,113 @@
+import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/lib/utils.ts';
+import { TODAY_LANES, type TodayLane } from '@/shared/api/clinic/today-contracts.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+
+import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
+import {
+  isLaneInFocus,
+  LANE_TILE_TONES,
+  laneFaces,
+  laneHint,
+  TODAY_LANE_META,
+  type TodayLanes,
+} from '../../today.lanes.ts';
+
+/** Props for {@link LaneTiles}. */
+export interface LaneTilesProps {
+  lanes: TodayLanes;
+  /** The lane the panel shows (`aria-pressed`). */
+  selected: TodayLane;
+  /** The member's focus — lanes outside it sit at 60%. */
+  focus: ReadonlySet<TodayLane>;
+  /** The clinic day, for wording each hint's time. */
+  today: string;
+  onSelect: (lane: TodayLane) => void;
+}
+
+/**
+ * The lane tiles (KICKOFF §6.2 Lane tiles; `today.md:19, 31–36`; H:588–597):
+ * seven buttons in fixed order, the selected one pressed. From `md` a grid of
+ * `auto-fill` 104px tracks; below it one snap strip of 128px tiles that bleeds
+ * to the screen edges. Each tile: the label in the lane's ink, the count, up
+ * to four faces then "+N", and the hint. Lanes outside the member's focus sit
+ * at 60%; hover inks the border at once (no transition).
+ */
+export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTilesProps) {
+  const { t } = useTranslation(TODAY_NS);
+  const { formatNumber } = useLocaleFormat();
+  const clock = useClinicClock();
+
+  return (
+    <div
+      role="group"
+      aria-label={t(TODAY_KEYS.lanes.label)}
+      data-testid={TODAY_TEST_IDS.lanes}
+      className="-mx-3 flex flex-none snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(104px,1fr))] md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden"
+    >
+      {TODAY_LANES.map((lane) => {
+        const cards = lanes[lane];
+        const { tone } = TODAY_LANE_META[lane];
+        const paint = TONE_CLASSES[tone];
+        const tile = LANE_TILE_TONES[tone];
+        const pressed = lane === selected;
+        const faces = laneFaces(cards);
+        const hint = laneHint(lane, cards);
+        return (
+          <button
+            key={lane}
+            type="button"
+            aria-pressed={pressed}
+            data-testid={TODAY_TEST_IDS.lane(lane)}
+            data-dimmed={isLaneInFocus(lane, focus) ? undefined : true}
+            onClick={() => onSelect(lane)}
+            className={cn(
+              'text-foreground flex w-32 shrink-0 snap-start flex-col items-start gap-1.5 rounded-lg border-[1.5px] px-3 py-2.5 text-start md:w-auto',
+              paint.bg,
+              pressed ? tile.ink : paint.border,
+              tile.hover,
+              !isLaneInFocus(lane, focus) && 'opacity-60',
+            )}
+          >
+            <span className={cn('text-xs leading-[normal]', paint.ink)}>
+              {t(TODAY_KEYS.lanes.names[lane])}
+            </span>
+            <span className="font-heading text-stat leading-none font-semibold tabular-nums">
+              {formatNumber(cards.length)}
+            </span>
+            <span aria-hidden="true" className="flex min-h-5.5 items-center">
+              {faces.faces.map((face) => (
+                <span
+                  key={face.id}
+                  data-slot="pill"
+                  className={cn(
+                    'bg-background -me-0.5 box-content flex size-5.5 items-center justify-center rounded-full border-[1.5px] text-[length:calc(var(--text-xs)*19/24)] leading-none',
+                    tile.face,
+                    paint.ink,
+                  )}
+                >
+                  {face.initials}
+                </span>
+              ))}
+              {faces.more > 0 ? (
+                <span className="text-micro text-muted-foreground-strong ms-2.25 leading-[normal]">
+                  {t(TODAY_KEYS.lanes.more, { more: formatNumber(faces.more) })}
+                </span>
+              ) : null}
+            </span>
+            <span className="text-micro text-muted-foreground-strong leading-[normal] tabular-nums">
+              {hint
+                ? t(TODAY_KEYS.lanes.hints[hint.kind], {
+                    time: clock.wallTime(today, hint.time),
+                  })
+                : t(TODAY_KEYS.lanes.hints.none)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}

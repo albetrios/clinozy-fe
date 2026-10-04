@@ -1,1 +1,6 @@
-export { type ClinicClock, clinicDayLabel, useClinicClock } from './useClinicClock.ts';
+export {
+  type ClinicClock,
+  clinicDayLabel,
+  clinicWallClock,
+  useClinicClock,
+} from './useClinicClock.ts';
