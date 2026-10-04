@@ -1,5 +1,51 @@
 {
   "manifest": {
     "title": "환자"
+  },
+  "views": {
+    "label": "환자 보기",
+    "all": "전체",
+    "today": "오늘 내원 중",
+    "dues": "미수금 있음",
+    "follow": "후속 조치 예정",
+    "recall": "리콜"
+  },
+  "search": {
+    "placeholder": "이름, 휴대폰 또는 #ID",
+    "label": "환자 검색"
+  },
+  "primary": {
+    "newPatient": "새 환자"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "환자",
+    "gender": "성별",
+    "types": "유형",
+    "status": "상태",
+    "conversion": "전환",
+    "age": "나이",
+    "followUp": "후속 조치",
+    "due": "미수금",
+    "updated": "업데이트"
+  },
+  "table": {
+    "records": "환자",
+    "dayTime": "{{day}} · {{time}}",
+    "age_other": "{{count}}세"
+  },
+  "rowActions": {
+    "newInvoice": "새 청구서",
+    "collect": "{{amount}} 수납",
+    "edit": "편집",
+    "delete": "삭제"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "empty": {
+    "title": "일치하는 환자가 없습니다",
+    "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
   }
 }

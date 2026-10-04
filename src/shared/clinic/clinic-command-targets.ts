@@ -2,39 +2,46 @@ import {
   organizationAppointmentCreate,
   organizationLead,
   organizationLeadCreate,
+  organizationPatientCreate,
 } from '@/lib/routes/builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
 
-/** One ⌘K destination. */
+/** One clinic destination of ⌘K, or of a room's row action. */
 export type ClinicCommandTarget =
   | 'newLead'
   | 'newAppointment'
   | 'newPatient'
   | 'newReceipt'
+  | 'newInvoice'
   | 'openTasks'
   | 'patient'
+  | 'patientEdit'
   | 'lead'
   | 'invoice';
 
 /**
- * Where ⌘K's clinic rows go (KICKOFF §6.0 Command menu; D24, D19 / D26): each
- * route's full path, `organizationSlug` its first param — navigated the way
- * the nav's `AppNavEntry.to` is. A route with a builder (`src/lib/routes`)
- * takes its path from it; the others land with later ledger rows, and until
- * one does its row lands on the org's not-found route (the role home and a
- * "Page not found" toast):
+ * Where ⌘K's clinic rows go (KICKOFF §6.0 Command menu; D24, D19 / D26) — and
+ * the rooms' row actions that open another room's drawer (the Patients row's
+ * New invoice, Collect and Edit, §6.5): each route's full path,
+ * `organizationSlug` its first param — navigated the way the nav's
+ * `AppNavEntry.to` is. A route with a builder (`src/lib/routes`) takes its
+ * path from it; the others land with later ledger rows, and until one does a
+ * row lands on the org's not-found route (the role home and a "Page not
+ * found" toast):
  *
- * | Target           | Route                  | Lands with                     |
- * | ---------------- | ---------------------- | ------------------------------ |
- * | `newLead`        | `/leads/create`        | live (L-33; the form L-35)     |
- * | `newAppointment` | `/appointments/create` | live (L-36; the form L-38)     |
- * | `newPatient`     | `/patients/create`     | L-32b                          |
- * | `newReceipt`     | `/payments/receive`    | L-39b                          |
- * | `openTasks`      | `/tasks`               | live                           |
- * | `patient`        | `/patients/$patientId` | L-42                           |
- * | `lead`           | `/leads/$leadId`       | live (L-33; the drawer L-34b)  |
- * | `invoice`        | `/invoices/$invoiceId` | L-40                           |
+ * | Target           | Route                          | Lands with                     |
+ * | ---------------- | ------------------------------ | ------------------------------ |
+ * | `newLead`        | `/leads/create`                | live (L-33; the form L-35)     |
+ * | `newAppointment` | `/appointments/create`         | live (L-36; the form L-38)     |
+ * | `newPatient`     | `/patients/create`             | live (L-32; the drawer L-32b)  |
+ * | `newReceipt`     | `/payments/receive`            | L-39b                          |
+ * | `newInvoice`     | `/invoices/create`             | L-40                           |
+ * | `openTasks`      | `/tasks`                       | live                           |
+ * | `patient`        | `/patients/$patientId`         | L-42                           |
+ * | `patientEdit`    | `/patients/$patientId/edit`    | L-42 (the drawer L-32b)        |
+ * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
+ * | `invoice`        | `/invoices/$invoiceId`         | L-40                           |
  *
  * Plain strings on purpose: a literal no registered route has yet would not
  * type-check as a `to`. When a row adds a route's builder, it swaps its
@@ -44,10 +51,12 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   // A builder's `to` is the route's path; the slug and id ride in its params.
   newLead: organizationLeadCreate('').to,
   newAppointment: organizationAppointmentCreate('').to,
-  newPatient: '/organization/$organizationSlug/patients/create',
+  newPatient: organizationPatientCreate('').to,
   newReceipt: '/organization/$organizationSlug/payments/receive',
+  newInvoice: '/organization/$organizationSlug/invoices/create',
   openTasks: CLINIC_SECTION_ROUTES.tasks,
   patient: '/organization/$organizationSlug/patients/$patientId',
+  patientEdit: '/organization/$organizationSlug/patients/$patientId/edit',
   lead: organizationLead('', '').to,
   invoice: '/organization/$organizationSlug/invoices/$invoiceId',
 };
@@ -55,6 +64,7 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
 /** The record param of a record target's route. */
 const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
   patient: 'patientId',
+  patientEdit: 'patientId',
   lead: 'leadId',
   invoice: 'invoiceId',
 };
@@ -67,6 +77,7 @@ const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
 const KEEPS_REFERRER: ReadonlySet<ClinicCommandTarget> = new Set([
   'newAppointment',
   'newReceipt',
+  'newInvoice',
   'invoice',
 ]);
 

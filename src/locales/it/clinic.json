@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} di nuovo attiva"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "Estetica",
+      "clinical": "Clinica",
+      "lhr": "LHR",
+      "dental": "Dentale",
+      "physio": "Fisio",
+      "gynac": "Ginecologia"
+    },
+    "statuses": {
+      "new": "Nuovo",
+      "regular": "Abituale",
+      "vip": "VIP",
+      "inactive": "Inattivo"
+    },
+    "conversions": {
+      "converted": "T-Convertito",
+      "not_converted": "T-Non convertito"
+    },
+    "referralSources": {
+      "patient": "Paziente",
+      "doctor": "Medico",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "Senza appuntamento",
+      "other": "Altro"
+    }
+  },
+  "roomList": {
+    "loadFailed": "Impossibile caricare l’elenco · connessione interrotta. Mostriamo l’ultima copia."
+  },
+  "patientDelete": {
+    "title": "Eliminare questo paziente?",
+    "titleRecord": "Eliminare questo record?",
+    "removed": "{{name}} rimosso"
+  },
   "recordDrawer": {
     "cancel": "Annulla",
     "back": "Indietro",

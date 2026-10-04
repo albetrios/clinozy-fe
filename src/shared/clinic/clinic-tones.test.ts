@@ -8,6 +8,10 @@ import {
 
 import {
   APPOINTMENT_STATUS_TONES,
+  GENDER_TONES,
+  PATIENT_CONVERSION_TONES,
+  PATIENT_STATUS_TONES,
+  PATIENT_TYPE_TONES,
   ROLE_TONES,
   SECTION_TONES,
   TONE_CLASSES,
@@ -34,6 +38,28 @@ describe('clinic tones', () => {
       cancelled: 'stone',
       no_show: 'blush',
     });
+  });
+
+  it('paints the patient enums as the prototype does (PT_TYPES, PT_STAT, PT_CONV, H:3655)', () => {
+    expect(PATIENT_TYPE_TONES).toEqual({
+      aesthetic: 'lav',
+      clinical: 'sky',
+      lhr: 'blush',
+      dental: 'mint',
+      physio: 'sage',
+      gynac: 'butter',
+    });
+    expect(PATIENT_STATUS_TONES).toEqual({
+      new: 'sky',
+      regular: 'lav',
+      vip: 'butter',
+      inactive: 'stone',
+    });
+    expect(PATIENT_CONVERSION_TONES).toEqual({
+      converted: 'sage',
+      not_converted: 'stone',
+    });
+    expect(GENDER_TONES).toEqual({ female: 'blush', male: 'sky', other: 'stone' });
   });
 
   it('spells every class as a literal for its own tone', () => {

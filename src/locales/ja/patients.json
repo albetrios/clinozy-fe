@@ -1,5 +1,51 @@
 {
   "manifest": {
     "title": "患者"
+  },
+  "views": {
+    "label": "患者ビュー",
+    "all": "すべて",
+    "today": "本日来院中",
+    "dues": "未収金あり",
+    "follow": "フォローアップ期限",
+    "recall": "リコール"
+  },
+  "search": {
+    "placeholder": "氏名・携帯番号・#ID",
+    "label": "患者を検索"
+  },
+  "primary": {
+    "newPatient": "新規患者"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "患者",
+    "gender": "性別",
+    "types": "種別",
+    "status": "ステータス",
+    "conversion": "コンバージョン",
+    "age": "年齢",
+    "followUp": "フォローアップ",
+    "due": "未収",
+    "updated": "更新"
+  },
+  "table": {
+    "records": "患者",
+    "dayTime": "{{day}} · {{time}}",
+    "age_other": "{{count}}歳"
+  },
+  "rowActions": {
+    "newInvoice": "新規請求書",
+    "collect": "{{amount}} を回収",
+    "edit": "編集",
+    "delete": "削除"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "empty": {
+    "title": "該当する患者はいません",
+    "description": "まだ何もありません。別のタブや検索をお試しください。"
   }
 }

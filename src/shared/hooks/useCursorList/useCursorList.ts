@@ -1,5 +1,5 @@
 import { keepPreviousData, type QueryKey, useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
@@ -91,8 +91,13 @@ export function useCursorList<T>(args: {
       });
   }, [fetchNextPage]);
 
+  // One array per fetched result, not per render: a table keyed on it keeps its
+  // row model, and a screen can tell new rows from the same rows (the last copy).
+  const { data } = query;
+  const rows = useMemo(() => data?.pages.flatMap((page) => page.rows) ?? [], [data]);
+
   return {
-    rows: query.data?.pages.flatMap((page) => page.rows) ?? [],
+    rows,
     isPending: query.isPending,
     isError: query.isError,
     isFetching: query.isFetching,

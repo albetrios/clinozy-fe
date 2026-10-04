@@ -25,7 +25,6 @@ import {
   patientNoteSchema,
   patientPackageSchema,
   patientReportSchema,
-  patientSchema,
   paymentSchema,
   pendingCreditSchema,
   prescriptionSchema,
@@ -48,6 +47,7 @@ import {
   offeringRecordSchema,
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import { patientRecordSchema } from '@/shared/api/clinic/patients-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
 import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
 
@@ -65,7 +65,7 @@ const SCHEMAS = {
   branches: branchSchema,
   // A staff profile carries the plan's role keys and membership link (Appendix F).
   staff: staffProfileSchema,
-  patients: patientSchema,
+  patients: patientRecordSchema,
   // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).
   leads: leadRecordSchema,
   leadMessages: leadMessageSchema,

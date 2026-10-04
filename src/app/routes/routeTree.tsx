@@ -68,7 +68,12 @@ import { manifest as medicalManifest } from '@/pages/organization/$organizationS
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
+import { manifest as patientCreateManifest } from '@/pages/organization/$organizationSlug/patients/create/create.manifest.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
+import {
+  validatePatientCreateSearch,
+  validatePatientsSearch,
+} from '@/pages/organization/$organizationSlug/patients/patients.search.ts';
 import { manifest as paymentsManifest } from '@/pages/organization/$organizationSlug/payments/payments.manifest.ts';
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
@@ -234,6 +239,12 @@ const PatientsPage = lazyRouteComponent(
     [I18N_NAMESPACES.patients],
     () => import('@/pages/organization/$organizationSlug/patients/patients.route.tsx'),
   ),
+  'Component',
+);
+// The Patients room's dialog route renders nothing of its own (the list opens
+// the drawer), so it needs no namespace beyond the room's.
+const PatientCreateRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/patients/create/create.route.tsx'),
   'Component',
 );
 const PaymentsPage = lazyRouteComponent(
@@ -825,12 +836,30 @@ const organizationPatientsRoute = createRoute({
   path: 'patients',
   head: manifestHead(patientsManifest),
   staticData: { manifest: patientsManifest },
+  validateSearch: validatePatientsSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(patientsManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: PatientsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialog over the Patients list (D24, S:31): it renders nothing;
+// the list page reads the URL and opens the New patient drawer over itself.
+const organizationPatientCreateRoute = createRoute({
+  getParentRoute: () => organizationPatientsRoute,
+  path: 'create',
+  head: manifestHead(patientCreateManifest),
+  staticData: { manifest: patientCreateManifest },
+  validateSearch: validatePatientCreateSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(patientCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PatientCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1046,7 +1075,7 @@ const routeTree = rootRoute.addChildren([
       organizationAppointmentRoute,
       organizationAppointmentEditRoute,
     ]),
-    organizationPatientsRoute,
+    organizationPatientsRoute.addChildren([organizationPatientCreateRoute]),
     organizationMedicalRoute.addChildren([
       organizationMedicalIndexRoute,
       organizationMedicalSalesRoute,

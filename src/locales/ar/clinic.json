@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} سارٍ من جديد"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "تجميلي",
+      "clinical": "سريري",
+      "lhr": "LHR",
+      "dental": "أسنان",
+      "physio": "علاج طبيعي",
+      "gynac": "نسائية"
+    },
+    "statuses": {
+      "new": "جديد",
+      "regular": "منتظم",
+      "vip": "VIP",
+      "inactive": "غير نشط"
+    },
+    "conversions": {
+      "converted": "T-تم التحويل",
+      "not_converted": "T-لم يتم التحويل"
+    },
+    "referralSources": {
+      "patient": "مريض",
+      "doctor": "طبيب",
+      "instagram": "إنستغرام",
+      "google": "Google",
+      "walk_in": "زيارة مباشرة",
+      "other": "أخرى"
+    }
+  },
+  "roomList": {
+    "loadFailed": "تعذّر تحميل هذه القائمة · انقطع الاتصال. يتم عرض آخر نسخة."
+  },
+  "patientDelete": {
+    "title": "حذف هذا المريض؟",
+    "titleRecord": "حذف هذا السجل؟",
+    "removed": "تمت إزالة {{name}}"
+  },
   "recordDrawer": {
     "cancel": "إلغاء",
     "back": "رجوع",

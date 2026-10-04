@@ -219,6 +219,49 @@ export const CLINIC_KEYS = {
     },
   },
   /**
+   * The patients domain's stored enums (`S:1171–1204`), labelled as the design
+   * shows them (`patients.md:28`, H:3655) — the Patients room's badges and
+   * filters, the patient drawer's chips (wherever it is stacked) and the
+   * patient file. Gender and consent labels are the person card's
+   * (`PERSON_CARD_KEYS.gender` / `.consent`).
+   */
+  patients: {
+    types: {
+      aesthetic: 'patients.types.aesthetic',
+      clinical: 'patients.types.clinical',
+      lhr: 'patients.types.lhr',
+      dental: 'patients.types.dental',
+      physio: 'patients.types.physio',
+      gynac: 'patients.types.gynac',
+    },
+    statuses: {
+      new: 'patients.statuses.new',
+      regular: 'patients.statuses.regular',
+      vip: 'patients.statuses.vip',
+      inactive: 'patients.statuses.inactive',
+    },
+    conversions: {
+      converted: 'patients.conversions.converted',
+      not_converted: 'patients.conversions.not_converted',
+    },
+    /** The drawer's Referrer type chips (`referral_source`, `S:1195`). */
+    referralSources: {
+      patient: 'patients.referralSources.patient',
+      doctor: 'patients.referralSources.doctor',
+      instagram: 'patients.referralSources.instagram',
+      google: 'patients.referralSources.google',
+      walk_in: 'patients.referralSources.walk_in',
+      other: 'patients.referralSources.other',
+    },
+  },
+  /**
+   * A room list's read failing (KICKOFF §6.0 States): the toast that keeps the
+   * last copy on screen, with "Retry" (`errors` › `widget.retry`).
+   */
+  roomList: {
+    loadFailed: 'roomList.loadFailed',
+  },
+  /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and
    * the booking drawer: the stored enums' labels (`S:1330, 1349`; the derived
    * offer state, `live` = "Running") and the toasts its writes raise

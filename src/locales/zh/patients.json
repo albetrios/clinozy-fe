@@ -1,5 +1,51 @@
 {
   "manifest": {
     "title": "患者"
+  },
+  "views": {
+    "label": "患者视图",
+    "all": "全部",
+    "today": "今日到诊",
+    "dues": "有欠款",
+    "follow": "待随访",
+    "recall": "召回"
+  },
+  "search": {
+    "placeholder": "姓名、手机号或 #ID",
+    "label": "搜索患者"
+  },
+  "primary": {
+    "newPatient": "新建患者"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "患者",
+    "gender": "性别",
+    "types": "类型",
+    "status": "状态",
+    "conversion": "转化",
+    "age": "年龄",
+    "followUp": "随访",
+    "due": "欠款",
+    "updated": "更新时间"
+  },
+  "table": {
+    "records": "患者",
+    "dayTime": "{{day}} · {{time}}",
+    "age_other": "{{count}} 岁"
+  },
+  "rowActions": {
+    "newInvoice": "新建发票",
+    "collect": "收款 {{amount}}",
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "title": "没有匹配的患者",
+    "description": "这里还没有内容。试试其他标签页或搜索。"
   }
 }

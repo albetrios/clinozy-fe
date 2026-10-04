@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} läuft wieder"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "Ästhetik",
+      "clinical": "Klinisch",
+      "lhr": "LHR",
+      "dental": "Zahnmedizin",
+      "physio": "Physio",
+      "gynac": "Gynäkologie"
+    },
+    "statuses": {
+      "new": "Neu",
+      "regular": "Stamm",
+      "vip": "VIP",
+      "inactive": "Inaktiv"
+    },
+    "conversions": {
+      "converted": "T-Konvertiert",
+      "not_converted": "T-Nicht konvertiert"
+    },
+    "referralSources": {
+      "patient": "Patient",
+      "doctor": "Arzt",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "Laufkundschaft",
+      "other": "Sonstiges"
+    }
+  },
+  "roomList": {
+    "loadFailed": "Liste konnte nicht geladen werden · Verbindung unterbrochen. Letzter Stand wird angezeigt."
+  },
+  "patientDelete": {
+    "title": "Diesen Patienten löschen?",
+    "titleRecord": "Diesen Datensatz löschen?",
+    "removed": "{{name}} entfernt"
+  },
   "recordDrawer": {
     "cancel": "Abbrechen",
     "back": "Zurück",

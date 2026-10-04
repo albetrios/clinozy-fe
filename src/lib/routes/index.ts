@@ -7,5 +7,7 @@ export {
   organizationLead,
   organizationLeadCreate,
   organizationLeads,
+  organizationPatientCreate,
+  organizationPatients,
   organizationPicker,
 } from './builders.ts';

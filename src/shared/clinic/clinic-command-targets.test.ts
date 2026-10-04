@@ -27,6 +27,30 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
       invoice: `${ORG}/invoices/$invoiceId`,
     });
   });
+
+  it('takes the Patients row actions to the other rooms’ drawers (§6.5)', () => {
+    expect(CLINIC_COMMAND_TARGETS).toMatchObject({
+      newInvoice: `${ORG}/invoices/create`,
+      patientEdit: `${ORG}/patients/$patientId/edit`,
+    });
+    expect(
+      clinicCommandNavigation('patientEdit', {
+        organizationSlug: 'acme',
+        recordId: PATIENT,
+        referrer: 'patients',
+      }),
+    ).toEqual({
+      to: `${ORG}/patients/$patientId/edit`,
+      params: { organizationSlug: 'acme', patientId: PATIENT },
+    });
+    expect(
+      clinicCommandNavigation('newInvoice', {
+        organizationSlug: 'acme',
+        referrer: 'patients',
+        search: { type: 'clinic', patient: PATIENT },
+      }).search,
+    ).toEqual({ type: 'clinic', patient: PATIENT, from: 'patients' });
+  });
 });
 
 describe('clinicCommandNavigation', () => {
@@ -49,7 +73,12 @@ describe('clinicCommandNavigation', () => {
   });
 
   it('keeps the page it opens from behind the drawers that take `from`', () => {
-    for (const target of ['newAppointment', 'newReceipt', 'invoice'] as const) {
+    for (const target of [
+      'newAppointment',
+      'newReceipt',
+      'newInvoice',
+      'invoice',
+    ] as const) {
       expect(
         clinicCommandNavigation(target, {
           organizationSlug: 'acme',

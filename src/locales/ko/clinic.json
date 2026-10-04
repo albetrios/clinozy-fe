@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} 다시 진행 중"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "미용",
+      "clinical": "일반 진료",
+      "lhr": "LHR",
+      "dental": "치과",
+      "physio": "물리치료",
+      "gynac": "부인과"
+    },
+    "statuses": {
+      "new": "신규",
+      "regular": "정기",
+      "vip": "VIP",
+      "inactive": "비활성"
+    },
+    "conversions": {
+      "converted": "T-전환됨",
+      "not_converted": "T-미전환"
+    },
+    "referralSources": {
+      "patient": "환자",
+      "doctor": "의사",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "직접 방문",
+      "other": "기타"
+    }
+  },
+  "roomList": {
+    "loadFailed": "목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다."
+  },
+  "patientDelete": {
+    "title": "이 환자를 삭제할까요?",
+    "titleRecord": "이 기록을 삭제할까요?",
+    "removed": "{{name}} 삭제됨"
+  },
   "recordDrawer": {
     "cancel": "취소",
     "back": "뒤로",

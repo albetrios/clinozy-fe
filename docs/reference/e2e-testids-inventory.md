@@ -30,80 +30,81 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 
 ## App shell
 
-| Test ID                          | Element                                                                       | File                                                  |
-| -------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `app-layout`                     | Authenticated shell                                                           | `AppLayout.tsx`                                       |
-| `focus-shell`                    | Focus layout-variant shell                                                    | `AppLayout/variants/AppLayoutFocus.tsx`               |
-| `sidebar`                        | Sidebar                                                                       | AppLayout                                             |
-| `nav-dashboard`                  | Dashboard nav link (`nav-<id>` from the manifest's `nav.id`, `useAppNav`)     | `AppLayout.shared.tsx` (sidebar + mobile)             |
-| `sidebar-quick-links`            | Persistent sidebar shortcuts group                                            | `AppLayout/components/SidebarQuickLinks/`             |
-| `sidebar-search`                 | Command palette from sidebar                                                  | SidebarQuickLinks                                     |
-| `sidebar-settings`               | Settings hash modal from sidebar                                              | SidebarQuickLinks                                     |
-| `app-context-strip`              | Quick-access pill strip (settings sections + search)                          | `AppLayout/components/AppContextStrip/`               |
-| `main-content`                   | Main content region (skip-link target)                                        | `AppLayout.shared.tsx`                                |
-| `mobile-bottom-bar`              | Mobile nav bar                                                                | AppLayout                                             |
-| `header`                         | Top bar                                                                       | AppLayout                                             |
-| `brand-logo`                     | Product mark (+ wordmark in the section bar)                                  | `AppLayout.shared.tsx`                                |
-| `section-chip`                   | Phone header: the current room's name in its tone                             | `AppLayout/components/SectionChip/`                   |
-| `all-sections-trigger`           | Section bar: All sections compass (tinted when the current room is unpinned)  | `AppLayout/components/AllSections/`                   |
-| `all-sections`                   | All sections popover (dialog)                                                 | `AppLayout/components/AllSections/`                   |
-| `all-sections-sheet`             | All sections bottom sheet (phone)                                             | `AppLayout/components/AllSections/`                   |
-| `all-sections-<id>`              | All sections row link per room                                                | `AppLayout/components/AllSections/`                   |
-| `all-sections-pin-<id>`          | Pin / unpin toggle per room                                                   | `AppLayout/components/AllSections/`                   |
-| `nav-more`                       | Section bar: "More" for folded pinned tabs                                    | `AppLayout/components/PinnedTabs/`                    |
-| `nav-more-<id>`                  | A folded pinned tab inside "More"                                             | `AppLayout/components/PinnedTabs/`                    |
-| `nav-more-sections`              | Phone tab bar: "More" (opens All sections)                                    | `AppLayout.shared.tsx (MobileNav)`                    |
-| `branch-picker`                  | Header branch picker                                                          | `AppLayout/components/BranchPicker/`                  |
-| `branch-picker-all`              | Branch picker: All branches                                                   | `AppLayout/components/BranchPicker/`                  |
-| `branch-picker-<branchId>`       | Branch picker: one branch                                                     | `AppLayout/components/BranchPicker/`                  |
-| `account-menu`                   | Account menu (section bar)                                                    | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-identity`          | Account menu identity block (opens profile)                                   | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-status-<presence>` | Status radio pill (online · away · busy)                                      | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-theme-<mode>`      | Appearance radio pill (light · dark · system)                                 | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-notifications`     | Account menu: Notifications row                                               | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-security`          | Account menu: Security row                                                    | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-billing`           | Account menu: Billing row                                                     | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-devices`           | Account menu: Devices row                                                     | `AppLayout/components/AccountMenu/`                   |
-| `account-menu-shortcuts`         | Account menu: Keyboard shortcuts row                                          | `AppLayout/components/AccountMenu/`                   |
-| `view-as-bar`                    | View-as pill ("Previewing as <role>")                                         | `AppLayout/components/NoticeStack/`                   |
-| `view-as-exit`                   | View-as pill: Exit preview                                                    | `AppLayout/components/NoticeStack/`                   |
-| `upload-tray`                    | Upload tray (bottom inline-end; shown while files upload)                     | `components/UploadTray/` (mounted by `AppLayout.tsx`) |
-| `upload-tray-status`             | Upload tray live status (always mounted, visually hidden)                     | UploadTray                                            |
-| `upload-tray-toggle`             | Upload tray: collapse / expand the file list                                  | UploadTray                                            |
-| `upload-tray-row`                | One file (`data-status`: queued, uploading, attaching, done, failed)          | UploadTray                                            |
-| `upload-tray-retry`              | Failed file: Retry (resumes at the step that failed)                          | UploadTray                                            |
-| `upload-tray-remove`             | Failed file: Remove                                                           | UploadTray                                            |
-| `today-page`                     | Clinic room page: Today                                                       | `pages/organization/$organizationSlug/today/`         |
-| `leads-page`                     | Clinic room page: Leads                                                       | `pages/organization/$organizationSlug/leads/`         |
-| `new-lead-drawer`                | New lead drawer — `/leads/create` opens it over the list (L-35)               | `pages/organization/$organizationSlug/leads/`         |
-| `lead-drawer`                    | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                 | `pages/organization/$organizationSlug/leads/`         |
-| `appointments-page`              | Clinic room page: Appointments                                                | `pages/organization/$organizationSlug/appointments/`  |
-| `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |
-| `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)        | `pages/organization/$organizationSlug/appointments/`  |
-| `patients-page`                  | Clinic room page: Patients                                                    | `pages/organization/$organizationSlug/patients/`      |
-| `payments-page`                  | Clinic room page: Payments                                                    | `pages/organization/$organizationSlug/payments/`      |
-| `tasks-page`                     | Clinic room page: Tasks                                                       | `pages/organization/$organizationSlug/tasks/`         |
-| `offerings-page`                 | Clinic room page: Offerings                                                   | `pages/organization/$organizationSlug/offerings/`     |
-| `users-page`                     | Clinic room page: Users                                                       | `pages/organization/$organizationSlug/users/`         |
-| `medical-sales-page`             | Medical › Sales                                                               | `pages/organization/$organizationSlug/medical/sales/` |
-| `stock-items-page`               | Clinic stock › Items                                                          | `pages/organization/$organizationSlug/stock/items/`   |
-| `sidebar-toggle`                 | Menu button                                                                   | AppLayout                                             |
-| `search-trigger`                 | Command palette                                                               | AppLayout                                             |
-| `user-menu-trigger`              | Avatar menu                                                                   | AppLayout                                             |
-| `user-menu-settings`             | Settings item in avatar menu                                                  | `AppLayout.shared.tsx`                                |
-| `logout-button`                  | Log out                                                                       | AppLayout                                             |
-| `full-page-spinner`              | Bootstrap loading                                                             | `FullPageSpinner.tsx`                                 |
-| `organization-switcher-trigger`  | Org switcher                                                                  | `OrganizationSwitcher.tsx`                            |
-| `organization-switcher-create`   | Create org from switcher                                                      | OrganizationSwitcher                                  |
-| `organization-switcher-caption`  | Product name under the org name — sidebar brand lockup only                   | OrganizationSwitcher                                  |
-| `sidebar-brand`                  | Sidebar identity row (mark + switcher as one lockup; same height as `header`) | `AppLayoutSidebar.tsx`                                |
-| `sidebar-scrim`                  | Scrim behind the open navigation drawer (below `lg`)                          | `AppLayoutSidebar.tsx`                                |
-| `session-timeout-dialog`         | Inactivity warning (5 min idle, 90 s grace)                                   | `SessionTimeoutDialog.tsx`                            |
-| `session-signout`                | "Sign out" on the inactivity warning — revokes server-side                    | SessionTimeoutDialog                                  |
-| `session-stay`                   | "Stay signed in" — default focus; restarts the idle clock                     | SessionTimeoutDialog                                  |
-| `consent-banner`                 | Cookie-consent card (bottom-start corner; undecided only)                     | `ConsentBanner.tsx`                                   |
-| `consent-accept`                 | Grant analytics consent                                                       | ConsentBanner                                         |
-| `consent-decline`                | Decline analytics consent                                                     | ConsentBanner                                         |
+| Test ID                          | Element                                                                           | File                                                  |
+| -------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `app-layout`                     | Authenticated shell                                                               | `AppLayout.tsx`                                       |
+| `focus-shell`                    | Focus layout-variant shell                                                        | `AppLayout/variants/AppLayoutFocus.tsx`               |
+| `sidebar`                        | Sidebar                                                                           | AppLayout                                             |
+| `nav-dashboard`                  | Dashboard nav link (`nav-<id>` from the manifest's `nav.id`, `useAppNav`)         | `AppLayout.shared.tsx` (sidebar + mobile)             |
+| `sidebar-quick-links`            | Persistent sidebar shortcuts group                                                | `AppLayout/components/SidebarQuickLinks/`             |
+| `sidebar-search`                 | Command palette from sidebar                                                      | SidebarQuickLinks                                     |
+| `sidebar-settings`               | Settings hash modal from sidebar                                                  | SidebarQuickLinks                                     |
+| `app-context-strip`              | Quick-access pill strip (settings sections + search)                              | `AppLayout/components/AppContextStrip/`               |
+| `main-content`                   | Main content region (skip-link target)                                            | `AppLayout.shared.tsx`                                |
+| `mobile-bottom-bar`              | Mobile nav bar                                                                    | AppLayout                                             |
+| `header`                         | Top bar                                                                           | AppLayout                                             |
+| `brand-logo`                     | Product mark (+ wordmark in the section bar)                                      | `AppLayout.shared.tsx`                                |
+| `section-chip`                   | Phone header: the current room's name in its tone                                 | `AppLayout/components/SectionChip/`                   |
+| `all-sections-trigger`           | Section bar: All sections compass (tinted when the current room is unpinned)      | `AppLayout/components/AllSections/`                   |
+| `all-sections`                   | All sections popover (dialog)                                                     | `AppLayout/components/AllSections/`                   |
+| `all-sections-sheet`             | All sections bottom sheet (phone)                                                 | `AppLayout/components/AllSections/`                   |
+| `all-sections-<id>`              | All sections row link per room                                                    | `AppLayout/components/AllSections/`                   |
+| `all-sections-pin-<id>`          | Pin / unpin toggle per room                                                       | `AppLayout/components/AllSections/`                   |
+| `nav-more`                       | Section bar: "More" for folded pinned tabs                                        | `AppLayout/components/PinnedTabs/`                    |
+| `nav-more-<id>`                  | A folded pinned tab inside "More"                                                 | `AppLayout/components/PinnedTabs/`                    |
+| `nav-more-sections`              | Phone tab bar: "More" (opens All sections)                                        | `AppLayout.shared.tsx (MobileNav)`                    |
+| `branch-picker`                  | Header branch picker                                                              | `AppLayout/components/BranchPicker/`                  |
+| `branch-picker-all`              | Branch picker: All branches                                                       | `AppLayout/components/BranchPicker/`                  |
+| `branch-picker-<branchId>`       | Branch picker: one branch                                                         | `AppLayout/components/BranchPicker/`                  |
+| `account-menu`                   | Account menu (section bar)                                                        | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-identity`          | Account menu identity block (opens profile)                                       | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-status-<presence>` | Status radio pill (online · away · busy)                                          | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-theme-<mode>`      | Appearance radio pill (light · dark · system)                                     | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-notifications`     | Account menu: Notifications row                                                   | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-security`          | Account menu: Security row                                                        | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-billing`           | Account menu: Billing row                                                         | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-devices`           | Account menu: Devices row                                                         | `AppLayout/components/AccountMenu/`                   |
+| `account-menu-shortcuts`         | Account menu: Keyboard shortcuts row                                              | `AppLayout/components/AccountMenu/`                   |
+| `view-as-bar`                    | View-as pill ("Previewing as <role>")                                             | `AppLayout/components/NoticeStack/`                   |
+| `view-as-exit`                   | View-as pill: Exit preview                                                        | `AppLayout/components/NoticeStack/`                   |
+| `upload-tray`                    | Upload tray (bottom inline-end; shown while files upload)                         | `components/UploadTray/` (mounted by `AppLayout.tsx`) |
+| `upload-tray-status`             | Upload tray live status (always mounted, visually hidden)                         | UploadTray                                            |
+| `upload-tray-toggle`             | Upload tray: collapse / expand the file list                                      | UploadTray                                            |
+| `upload-tray-row`                | One file (`data-status`: queued, uploading, attaching, done, failed)              | UploadTray                                            |
+| `upload-tray-retry`              | Failed file: Retry (resumes at the step that failed)                              | UploadTray                                            |
+| `upload-tray-remove`             | Failed file: Remove                                                               | UploadTray                                            |
+| `today-page`                     | Clinic room page: Today                                                           | `pages/organization/$organizationSlug/today/`         |
+| `leads-page`                     | Clinic room page: Leads                                                           | `pages/organization/$organizationSlug/leads/`         |
+| `new-lead-drawer`                | New lead drawer — `/leads/create` opens it over the list (L-35)                   | `pages/organization/$organizationSlug/leads/`         |
+| `lead-drawer`                    | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                     | `pages/organization/$organizationSlug/leads/`         |
+| `appointments-page`              | Clinic room page: Appointments                                                    | `pages/organization/$organizationSlug/appointments/`  |
+| `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)                | `pages/organization/$organizationSlug/appointments/`  |
+| `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |
+| `patients-page`                  | Clinic room page: Patients (toolbar and table ids: the shared ones, `patients-…`) | `pages/organization/$organizationSlug/patients/`      |
+| `patient-drawer`                 | New patient drawer — `/patients/create` opens it over the list (L-32b)            | `pages/organization/$organizationSlug/patients/`      |
+| `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
+| `tasks-page`                     | Clinic room page: Tasks                                                           | `pages/organization/$organizationSlug/tasks/`         |
+| `offerings-page`                 | Clinic room page: Offerings                                                       | `pages/organization/$organizationSlug/offerings/`     |
+| `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
+| `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
+| `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
+| `sidebar-toggle`                 | Menu button                                                                       | AppLayout                                             |
+| `search-trigger`                 | Command palette                                                                   | AppLayout                                             |
+| `user-menu-trigger`              | Avatar menu                                                                       | AppLayout                                             |
+| `user-menu-settings`             | Settings item in avatar menu                                                      | `AppLayout.shared.tsx`                                |
+| `logout-button`                  | Log out                                                                           | AppLayout                                             |
+| `full-page-spinner`              | Bootstrap loading                                                                 | `FullPageSpinner.tsx`                                 |
+| `organization-switcher-trigger`  | Org switcher                                                                      | `OrganizationSwitcher.tsx`                            |
+| `organization-switcher-create`   | Create org from switcher                                                          | OrganizationSwitcher                                  |
+| `organization-switcher-caption`  | Product name under the org name — sidebar brand lockup only                       | OrganizationSwitcher                                  |
+| `sidebar-brand`                  | Sidebar identity row (mark + switcher as one lockup; same height as `header`)     | `AppLayoutSidebar.tsx`                                |
+| `sidebar-scrim`                  | Scrim behind the open navigation drawer (below `lg`)                              | `AppLayoutSidebar.tsx`                                |
+| `session-timeout-dialog`         | Inactivity warning (5 min idle, 90 s grace)                                       | `SessionTimeoutDialog.tsx`                            |
+| `session-signout`                | "Sign out" on the inactivity warning — revokes server-side                        | SessionTimeoutDialog                                  |
+| `session-stay`                   | "Stay signed in" — default focus; restarts the idle clock                         | SessionTimeoutDialog                                  |
+| `consent-banner`                 | Cookie-consent card (bottom-start corner; undecided only)                         | `ConsentBanner.tsx`                                   |
+| `consent-accept`                 | Grant analytics consent                                                           | ConsentBanner                                         |
+| `consent-decline`                | Decline analytics consent                                                         | ConsentBanner                                         |
 
 ---
 

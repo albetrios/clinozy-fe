@@ -41,6 +41,22 @@ describe('useCursorList', () => {
     expect(queryFn).toHaveBeenCalledWith(undefined);
   });
 
+  it('keeps one rows array per fetched result, not one per render', async () => {
+    const queryFn = vi
+      .fn<(after: string | undefined) => Promise<ListPage<Row>>>()
+      .mockResolvedValue({ rows: [{ id: 'a' }], next: null, hasMore: false });
+
+    const { result, rerender } = renderHook(
+      () => useCursorList<Row>({ queryKey: ['list', 'stable'], queryFn }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.rows).toHaveLength(1));
+    const rows = result.current.rows;
+    rerender();
+    expect(result.current.rows).toBe(rows);
+  });
+
   it('accumulates rows and passes the forward cursor as `after` on fetchNextPage', async () => {
     const queryFn = vi
       .fn<(after: string | undefined) => Promise<ListPage<Row>>>()

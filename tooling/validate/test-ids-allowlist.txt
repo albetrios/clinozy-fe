@@ -8,3 +8,4 @@ src/pages/organization/$organizationSlug/leads/create/ #page-root
 src/pages/organization/$organizationSlug/leads/$leadId/ #page-root
 src/pages/organization/$organizationSlug/appointments/create/ #page-root
 src/pages/organization/$organizationSlug/appointments/$appointmentId/ #page-root
+src/pages/organization/$organizationSlug/patients/create/ #page-root

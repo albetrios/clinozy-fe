@@ -17,7 +17,6 @@ import type {
   MRVisit,
   OfferingSuggestion,
   Organization,
-  Patient,
   PatientImage,
   PatientNote,
   PatientPackage,
@@ -39,6 +38,7 @@ import type {
   OfferingRecord,
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
@@ -103,7 +103,8 @@ export const clinicFixtures = {
     resource: 'User',
     seed: () => staffSeed(),
   }),
-  patients: createFixtureCollection<Patient>({
+  // Patients carry the plan's consent set, "Referred by" and last editor — see patients-contracts.ts.
+  patients: createFixtureCollection<PatientRecord>({
     resource: 'Patient',
     seed: () => patientSeed(),
   }),

@@ -110,7 +110,12 @@ export function DataTableRowActions({
                       : 'bg-card text-foreground-soft hover:border-primary hover:bg-muted hover:text-foreground',
                   )}
                 >
-                  <Icon aria-hidden="true" className="size-3.5" />
+                  {/* Wrapped: the shadcn Button re-pads a button whose direct
+                      child is an svg (`has-[>svg]:px-3`), which made every
+                      icon button 40px wide instead of 32 / 36 / 40 by tier. */}
+                  <span aria-hidden="true" className="flex">
+                    <Icon className="size-3.5" />
+                  </span>
                   {labelled ? <span>{action.label}</span> : null}
                 </Button>
               </TooltipTrigger>

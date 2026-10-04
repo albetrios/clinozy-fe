@@ -1,5 +1,55 @@
 {
   "manifest": {
     "title": "Pacientes"
+  },
+  "views": {
+    "label": "Vistas de pacientes",
+    "all": "Todos",
+    "today": "En la clínica hoy",
+    "dues": "Con saldo pendiente",
+    "follow": "Seguimiento pendiente",
+    "recall": "Reactivar"
+  },
+  "search": {
+    "placeholder": "Nombre, móvil o #ID",
+    "label": "Buscar pacientes"
+  },
+  "primary": {
+    "newPatient": "Nuevo paciente"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Paciente",
+    "gender": "Género",
+    "types": "Tipo",
+    "status": "Estado",
+    "conversion": "Conversión",
+    "age": "Edad",
+    "followUp": "Seguimiento",
+    "due": "Pendiente",
+    "updated": "Actualizado"
+  },
+  "table": {
+    "records": "pacientes",
+    "dayTime": "{{day}} · {{time}}",
+    "age_one": "{{count}} año",
+    "age_many": "{{count}} años",
+    "age_other": "{{count}} años"
+  },
+  "rowActions": {
+    "newInvoice": "Nueva factura",
+    "collect": "Cobrar {{amount}}",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} fila exportada como CSV",
+    "exported_many": "{{count}} filas exportadas como CSV",
+    "exported_other": "{{count}} filas exportadas como CSV"
+  },
+  "empty": {
+    "title": "Ningún paciente coincide",
+    "description": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda."
   }
 }

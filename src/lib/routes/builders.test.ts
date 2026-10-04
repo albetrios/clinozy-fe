@@ -8,6 +8,8 @@ import {
   organizationLead,
   organizationLeadCreate,
   organizationLeads,
+  organizationPatientCreate,
+  organizationPatients,
   organizationPicker,
   organizationSuspended,
 } from './builders.ts';
@@ -51,6 +53,17 @@ describe('route builders', () => {
     });
     expect(organizationAppointmentCreate('acme')).toEqual({
       to: '/organization/$organizationSlug/appointments/create',
+      params: { organizationSlug: 'acme' },
+    });
+  });
+
+  it('build the Patients room and its New patient dialog route (S:30–31)', () => {
+    expect(organizationPatients('acme')).toEqual({
+      to: '/organization/$organizationSlug/patients',
+      params: { organizationSlug: 'acme' },
+    });
+    expect(organizationPatientCreate('acme')).toEqual({
+      to: '/organization/$organizationSlug/patients/create',
       params: { organizationSlug: 'acme' },
     });
   });

@@ -1,5 +1,53 @@
 {
   "manifest": {
     "title": "Patients"
+  },
+  "views": {
+    "label": "Patient views",
+    "all": "All",
+    "today": "In clinic today",
+    "dues": "With dues",
+    "follow": "Follow-up due",
+    "recall": "Recall"
+  },
+  "search": {
+    "placeholder": "Name, mobile or #ID",
+    "label": "Search patients"
+  },
+  "primary": {
+    "newPatient": "New patient"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Patient",
+    "gender": "Gender",
+    "types": "Type",
+    "status": "Status",
+    "conversion": "Conversion",
+    "age": "Age",
+    "followUp": "Follow-up",
+    "due": "Due",
+    "updated": "Updated"
+  },
+  "table": {
+    "records": "patients",
+    "dayTime": "{{day}} · {{time}}",
+    "age_one": "{{count}} yr",
+    "age_other": "{{count}} yrs"
+  },
+  "rowActions": {
+    "newInvoice": "New invoice",
+    "collect": "Collect {{amount}}",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "title": "No patient matches",
+    "description": "Nothing here yet. Try another tab or search."
   }
 }

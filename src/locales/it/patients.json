@@ -1,5 +1,55 @@
 {
   "manifest": {
     "title": "Pazienti"
+  },
+  "views": {
+    "label": "Viste pazienti",
+    "all": "Tutti",
+    "today": "In clinica oggi",
+    "dues": "Con saldo da pagare",
+    "follow": "Follow-up da fare",
+    "recall": "Richiamo"
+  },
+  "search": {
+    "placeholder": "Nome, cellulare o #ID",
+    "label": "Cerca pazienti"
+  },
+  "primary": {
+    "newPatient": "Nuovo paziente"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Paziente",
+    "gender": "Genere",
+    "types": "Tipo",
+    "status": "Stato",
+    "conversion": "Conversione",
+    "age": "Età",
+    "followUp": "Follow-up",
+    "due": "Da pagare",
+    "updated": "Aggiornato"
+  },
+  "table": {
+    "records": "pazienti",
+    "dayTime": "{{day}} · {{time}}",
+    "age_one": "{{count}} anno",
+    "age_many": "{{count}} anni",
+    "age_other": "{{count}} anni"
+  },
+  "rowActions": {
+    "newInvoice": "Nuova fattura",
+    "collect": "Incassa {{amount}}",
+    "edit": "Modifica",
+    "delete": "Elimina"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "empty": {
+    "title": "Nessun paziente corrisponde",
+    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
   }
 }

@@ -4,12 +4,15 @@ import {
   seedInstant,
 } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import type {
-  Patient,
   PatientConversion,
   PatientStatus,
   PatientType,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type {
+  PatientConsent,
+  PatientRecord,
+} from '@/shared/api/clinic/patients-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { must, readSeedLabel, ref, seedAt, seedMobile } from './refs.fixtures.ts';
@@ -636,7 +639,10 @@ const ROSTER: readonly PatientRow[] = [...REGISTERED, ...ALSO_PATIENTS];
 /** Dharti's clinical bento (`PT_OV` H:3686), one item per line. */
 const CLINICAL_NOTES: Record<
   number,
-  Pick<Patient, 'complaints' | 'diagnosis' | 'treatmentSuggestions' | 'futureSuggestions'>
+  Pick<
+    PatientRecord,
+    'complaints' | 'diagnosis' | 'treatmentSuggestions' | 'futureSuggestions'
+  >
 > = {
   3508: {
     complaints: 'Tanning on face\nUneven skin tone',
@@ -667,14 +673,26 @@ function followUpAt(row: PatientRow, today: string): string | null {
   return seedAt(row.followUp, '11:00', today);
 }
 
-/** The one patient roster: `PT_SEED` and `PATIENTS` merged, plus everyone else treated as a patient. */
-export function patientSeed(today: string = clinicToday()): Patient[] {
+/**
+ * A signed consent in the seeds reads "Data ✓ · Photos ✓ · Marketing ✗"
+ * (`CINFO`, H:3369) — the plan's three chips (Appendix F); the contract's
+ * `consentGiven` follows the Data chip.
+ */
+const SIGNED_CONSENTS: readonly PatientConsent[] = ['data', 'photos'];
+
+/**
+ * The one patient roster: `PT_SEED` and `PATIENTS` merged, plus everyone else
+ * treated as a patient — with the plan's fields (Appendix F): the row's "by" is
+ * who last saved it.
+ */
+export function patientSeed(today: string = clinicToday()): PatientRecord[] {
   return ROSTER.map((row) => ({
     ...seedCommon(
       seedAt(row.since, '10:00', today),
       staffRef(row.by),
       seedAt(row.updated, '10:00', today),
     ),
+    updatedById: staffRef(row.by),
     id: ref.patient(row.seq),
     seq: row.seq,
     firstName: row.first,
@@ -690,8 +708,10 @@ export function patientSeed(today: string = clinicToday()): Patient[] {
     status: must(STATUSES[row.status], `patient status ${row.status}`),
     conversion: must(CONVERSIONS[row.conversion], `conversion ${row.conversion}`),
     referralSource: null,
+    referredByName: null,
     referredByPatientId: null,
     consentGiven: row.consent ?? false,
+    consents: row.consent ? [...SIGNED_CONSENTS] : [],
     doctorId: row.doctor ? staffRef(row.doctor) : null,
     followUpAt: followUpAt(row, today),
     notes: null,

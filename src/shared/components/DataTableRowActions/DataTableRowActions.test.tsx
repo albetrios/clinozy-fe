@@ -31,6 +31,24 @@ afterEach(() => {
 });
 
 describe('DataTableRowActions', () => {
+  it('keeps each icon out of the Button’s svg re-padding, so the buttons keep their tier size', () => {
+    renderActions([
+      { id: 'edit', label: 'Edit', icon: PenLine, onSelect: vi.fn() },
+      {
+        id: 'invoice',
+        label: 'New invoice',
+        icon: Receipt,
+        onSelect: vi.fn(),
+        primary: true,
+      },
+    ]);
+    // `has-[>svg]:px-3` on the stock Button made every icon button 40px wide.
+    for (const button of screen.getAllByRole('button')) {
+      expect(button.querySelector(':scope > svg')).toBeNull();
+      expect(button.querySelector('svg')).not.toBeNull();
+    }
+  });
+
   it('puts the destructive action last, after a 1px separator', () => {
     renderActions([
       {

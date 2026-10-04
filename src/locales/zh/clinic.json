@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} 已恢复进行"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "美容",
+      "clinical": "临床",
+      "lhr": "LHR",
+      "dental": "牙科",
+      "physio": "理疗",
+      "gynac": "妇科"
+    },
+    "statuses": {
+      "new": "新患者",
+      "regular": "常规",
+      "vip": "VIP",
+      "inactive": "不活跃"
+    },
+    "conversions": {
+      "converted": "T-已转化",
+      "not_converted": "T-未转化"
+    },
+    "referralSources": {
+      "patient": "患者",
+      "doctor": "医生",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "到店咨询",
+      "other": "其他"
+    }
+  },
+  "roomList": {
+    "loadFailed": "无法加载此列表 · 连接已断开。正在显示上次的副本。"
+  },
+  "patientDelete": {
+    "title": "删除此患者？",
+    "titleRecord": "删除此记录？",
+    "removed": "已移除 {{name}}"
+  },
   "recordDrawer": {
     "cancel": "取消",
     "back": "返回",

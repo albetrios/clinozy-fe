@@ -1,5 +1,55 @@
 {
   "manifest": {
     "title": "Patients"
+  },
+  "views": {
+    "label": "Vues des patients",
+    "all": "Tous",
+    "today": "À la clinique aujourd’hui",
+    "dues": "Avec impayés",
+    "follow": "Suivi à faire",
+    "recall": "Rappel"
+  },
+  "search": {
+    "placeholder": "Nom, mobile ou #ID",
+    "label": "Rechercher des patients"
+  },
+  "primary": {
+    "newPatient": "Nouveau patient"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Patient",
+    "gender": "Genre",
+    "types": "Type",
+    "status": "Statut",
+    "conversion": "Conversion",
+    "age": "Âge",
+    "followUp": "Suivi",
+    "due": "Dû",
+    "updated": "Mis à jour"
+  },
+  "table": {
+    "records": "patients",
+    "dayTime": "{{day}} · {{time}}",
+    "age_one": "{{count}} an",
+    "age_many": "{{count}} ans",
+    "age_other": "{{count}} ans"
+  },
+  "rowActions": {
+    "newInvoice": "Nouvelle facture",
+    "collect": "Encaisser {{amount}}",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "empty": {
+    "title": "Aucun patient ne correspond",
+    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
   }
 }

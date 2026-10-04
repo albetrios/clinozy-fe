@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} を再開しました"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "美容",
+      "clinical": "一般診療",
+      "lhr": "LHR",
+      "dental": "歯科",
+      "physio": "理学療法",
+      "gynac": "婦人科"
+    },
+    "statuses": {
+      "new": "新規",
+      "regular": "通常",
+      "vip": "VIP",
+      "inactive": "休眠"
+    },
+    "conversions": {
+      "converted": "T-成約",
+      "not_converted": "T-未成約"
+    },
+    "referralSources": {
+      "patient": "患者",
+      "doctor": "医師",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "飛び込み",
+      "other": "その他"
+    }
+  },
+  "roomList": {
+    "loadFailed": "リストを読み込めませんでした · 接続が切れました。前回のデータを表示しています。"
+  },
+  "patientDelete": {
+    "title": "この患者を削除しますか？",
+    "titleRecord": "このレコードを削除しますか？",
+    "removed": "{{name}} を削除しました"
+  },
   "recordDrawer": {
     "cancel": "キャンセル",
     "back": "戻る",

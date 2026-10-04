@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} फिर से चालू"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "एस्थेटिक",
+      "clinical": "क्लिनिकल",
+      "lhr": "LHR",
+      "dental": "डेंटल",
+      "physio": "फ़िज़ियो",
+      "gynac": "गायनैक"
+    },
+    "statuses": {
+      "new": "नया",
+      "regular": "नियमित",
+      "vip": "VIP",
+      "inactive": "निष्क्रिय"
+    },
+    "conversions": {
+      "converted": "T-कन्वर्टेड",
+      "not_converted": "T-नॉट कन्वर्टेड"
+    },
+    "referralSources": {
+      "patient": "मरीज़",
+      "doctor": "डॉक्टर",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "सीधे आए",
+      "other": "अन्य"
+    }
+  },
+  "roomList": {
+    "loadFailed": "यह सूची लोड नहीं हो सकी · कनेक्शन टूट गया। पिछली कॉपी दिखाई जा रही है।"
+  },
+  "patientDelete": {
+    "title": "इस मरीज़ को हटाएँ?",
+    "titleRecord": "इस रिकॉर्ड को हटाएँ?",
+    "removed": "{{name}} हटाया गया"
+  },
   "recordDrawer": {
     "cancel": "रद्द करें",
     "back": "वापस",

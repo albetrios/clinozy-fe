@@ -83,3 +83,19 @@ export function organizationAppointmentCreate(organizationSlug: string) {
     params: { organizationSlug },
   } as const;
 }
+
+/** The Patients room — the list the New patient drawer opens over. */
+export function organizationPatients(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/patients',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** The New patient drawer over the list; `?name=&phone=&fromLead=` prefill it (`S:31`). */
+export function organizationPatientCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/patients/create',
+    params: { organizationSlug },
+  } as const;
+}

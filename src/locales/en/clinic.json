@@ -185,6 +185,42 @@
       "offerResumed": "{{name}} running again"
     }
   },
+  "patients": {
+    "types": {
+      "aesthetic": "Aesthetic",
+      "clinical": "Clinical",
+      "lhr": "LHR",
+      "dental": "Dental",
+      "physio": "Physio",
+      "gynac": "Gynac"
+    },
+    "statuses": {
+      "new": "New",
+      "regular": "Regular",
+      "vip": "VIP",
+      "inactive": "Inactive"
+    },
+    "conversions": {
+      "converted": "T-Converted",
+      "not_converted": "T-Not converted"
+    },
+    "referralSources": {
+      "patient": "Patient",
+      "doctor": "Doctor",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "Walk-in",
+      "other": "Other"
+    }
+  },
+  "roomList": {
+    "loadFailed": "Couldn’t load this list · connection dropped. Showing the last copy."
+  },
+  "patientDelete": {
+    "title": "Delete this patient?",
+    "titleRecord": "Delete this record?",
+    "removed": "{{name}} removed"
+  },
   "recordDrawer": {
     "cancel": "Cancel",
     "back": "Back",

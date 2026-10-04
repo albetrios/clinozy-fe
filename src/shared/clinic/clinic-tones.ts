@@ -1,5 +1,9 @@
 import type {
   AppointmentStatus,
+  Gender,
+  PatientConversion,
+  PatientStatus,
+  PatientType,
   Role,
   Section,
   Tone,
@@ -46,6 +50,43 @@ export const APPOINTMENT_STATUS_TONES: Readonly<Record<AppointmentStatus, Tone>>
   completed: 'sage',
   cancelled: 'stone',
   no_show: 'blush',
+};
+
+/**
+ * Each patient type's tone (`PT_TYPES`, H:3655; `patients.md:28`): Aesthetic
+ * lav, Clinical sky, LHR blush, Dental mint, Physio sage, Gynac butter.
+ */
+export const PATIENT_TYPE_TONES: Readonly<Record<PatientType, Tone>> = {
+  aesthetic: 'lav',
+  clinical: 'sky',
+  lhr: 'blush',
+  dental: 'mint',
+  physio: 'sage',
+  gynac: 'butter',
+};
+
+/** Each patient status's tone (`PT_STAT`): New sky, Regular lav, VIP butter, Inactive stone. */
+export const PATIENT_STATUS_TONES: Readonly<Record<PatientStatus, Tone>> = {
+  new: 'sky',
+  regular: 'lav',
+  vip: 'butter',
+  inactive: 'stone',
+};
+
+/** Each conversion's tone (`PT_CONV`): "T-Converted" sage, "T-Not converted" stone. */
+export const PATIENT_CONVERSION_TONES: Readonly<Record<PatientConversion, Tone>> = {
+  converted: 'sage',
+  not_converted: 'stone',
+};
+
+/**
+ * Each gender's tone: Female blush, Male sky, Other stone — the list's badge and
+ * the drawer's chips alike (the quick-add's lav "Other" loses, §6.5).
+ */
+export const GENDER_TONES: Readonly<Record<Gender, Tone>> = {
+  female: 'blush',
+  male: 'sky',
+  other: 'stone',
 };
 
 /** The utility classes one tone paints with. */
