@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "支払い"
+  },
+  "tabs": {
+    "label": "支払いのセクション",
+    "ledger": "支払い",
+    "pending": "保留中"
+  },
+  "search": {
+    "placeholder": "患者、請求書、領収書",
+    "label": "支払いを検索"
+  },
+  "toolbar": {
+    "dayClose": "日締め",
+    "pay": "支払う",
+    "payTitle": "支払う · 出金(家賃、備品、業者、返金)",
+    "receive": "受け取る",
+    "receiveTitle": "受け取る · 患者からの入金",
+    "addPending": "保留中を追加",
+    "give": "支払う",
+    "giveSub": "患者や相手先に返金します",
+    "take": "受け取る",
+    "takeSub": "患者や相手先が支払います"
+  },
+  "columns": {
+    "ref": "番号",
+    "what": "種別",
+    "when": "日時",
+    "party": "相手",
+    "mode": "方法",
+    "amount": "金額",
+    "by": "担当",
+    "who": "相手",
+    "way": "方向",
+    "why": "理由",
+    "since": "発生日",
+    "state": "状態"
+  },
+  "filters": {
+    "show": "表示",
+    "all": "すべて"
+  },
+  "directions": {
+    "received": "入金",
+    "paid": "出金"
+  },
+  "kinds": {
+    "receipt": "入金",
+    "refund": "患者への返金",
+    "expense": "出金",
+    "money_back": "返金受領"
+  },
+  "ledger": {
+    "records": "記録",
+    "today": "今日 {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_other": "{{count}}回編集 · 最終 {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "請求書 #{{seq}}",
+      "sale": "販売 · 請求書 #{{seq}}",
+      "refund": "返金 · クレジットノート",
+      "refundNote": "返金 · クレジットノート {{note}}",
+      "refundFor": "請求書 #{{seq}} 分",
+      "moneyBack": "返金受領",
+      "medicalBill": "薬局発注 #{{seq}} · 請求 {{bill}}",
+      "stockBill": "在庫発注 #{{seq}} · 請求 {{bill}}",
+      "fromCredit": "{{ref}} から"
+    },
+    "dayClosed": "{{ref}} · 日締め済み",
+    "dayClosedEdited_other": "{{ref}} · 日締め済み · {{count}}回編集"
+  },
+  "rowActions": {
+    "edit": "編集",
+    "delete": "削除",
+    "giveBack": "返金する",
+    "gotBack": "回収した",
+    "useOnBill": "次回の請求に充当"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "empty": {
+    "ledgerTitle": "該当する記録はありません",
+    "pendingTitle": "保留中の項目はありません",
+    "description": "まだ何もありません。別のタブや検索をお試しください。",
+    "receive": "受け取る"
+  },
+  "deleteEntry": {
+    "title": "この支払いを削除しますか?",
+    "effect": "日締めまでは可能です。削除は監査ログに残ります。",
+    "effectInvoice": "日締めまでは可能です。請求書 #{{seq}} は未払い {{due}} に戻ります。削除は監査ログに残ります。",
+    "reasons": {
+      "twice": "二重入力",
+      "amount": "金額の誤り",
+      "party": "患者または支払先の誤り"
+    },
+    "removed": "{{ref}} を削除しました",
+    "removedInvoice": "{{ref}} を削除しました · 請求書の残高を戻しました"
+  },
+  "dialog": {
+    "record": "支払い",
+    "credit": "保留中の項目"
+  },
+  "pending": {
+    "records": "保留中の項目",
+    "patient": "患者",
+    "party": "仕入先・相手先",
+    "ways": {
+      "give": "支払う",
+      "take": "受け取る"
+    },
+    "wayTitles": {
+      "give": "こちらが返金します",
+      "take": "先方が支払います"
+    },
+    "states": {
+      "open": "未処理",
+      "given_back": "返金済み",
+      "got_back": "受領済み",
+      "used": "充当済み"
+    },
+    "settledToday": "{{state}} · 今日",
+    "adjusted": "{{amount}} 充当済み",
+    "source": "{{ref}} から · {{direction}}",
+    "invoice": "請求書 #{{seq}}",
+    "byHand": "手入力",
+    "deleteTitle": "この保留中の項目を削除しますか?",
+    "deleted": "{{ref}} を削除しました",
+    "reasons": {
+      "charged_twice": "二重請求",
+      "advance_not_used": "前受金の未使用分",
+      "package_cancelled": "パッケージ解約",
+      "overpaid": "過払い",
+      "returned_items": "返品",
+      "short_payment": "支払い不足",
+      "damaged_goods": "破損品を返品",
+      "advance_given": "前払いした",
+      "loan_to_staff": "職員への貸付",
+      "other": "その他"
+    }
   }
 }

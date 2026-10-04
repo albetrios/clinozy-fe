@@ -1,4 +1,9 @@
-import type { Invoice, InvoiceItem, Payment } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  Invoice,
+  InvoiceItem,
+  Payment,
+  PaymentMode,
+} from '@/shared/api/clinic/clinic-schema.ts';
 
 /**
  * The clinic money module (KICKOFF §3.6, §6.9 "Money math"): the values the
@@ -101,6 +106,44 @@ export interface InvoiceBalance {
   due: number;
   /** Paid when nothing is due, partial when something was paid, else unpaid. */
   status: InvoiceStatus;
+}
+
+/** Money in and out of one payment mode, in paise. */
+export interface ModeFlow {
+  in: number;
+  out: number;
+}
+
+/** A day's money by payment mode. */
+export type DayModeTotals = Readonly<Record<PaymentMode, ModeFlow>>;
+
+/**
+ * A day's entries by mode (Q-G5): each split row counts under its own mode, and
+ * Credit — a credit used on a bill — apart from the cash. Deleted entries do not
+ * count (`S:715`; the prototype dropped split entries, H:5111).
+ */
+export function dayModeTotals(
+  payments: readonly Pick<Payment, 'direction' | 'splits' | 'deletedAt'>[],
+): DayModeTotals {
+  const totals: Record<PaymentMode, ModeFlow> = {
+    cash: { in: 0, out: 0 },
+    upi: { in: 0, out: 0 },
+    card: { in: 0, out: 0 },
+    credit: { in: 0, out: 0 },
+  };
+  for (const payment of payments) {
+    if (payment.deletedAt !== null) continue;
+    for (const split of payment.splits) {
+      if (payment.direction === 'received') totals[split.mode].in += split.amount;
+      else totals[split.mode].out += split.amount;
+    }
+  }
+  return totals;
+}
+
+/** What the drawer should hold: the opening cash, plus cash in, less cash out (`S:715`). */
+export function expectedDrawerCash(openingCash: number, totals: DayModeTotals): number {
+  return openingCash + totals.cash.in - totals.cash.out;
 }
 
 /** The bill, what has been paid, what is due and the status of an invoice. */

@@ -106,7 +106,11 @@ export interface FixtureCollection<T extends Row> {
   /** Live (not deleted) rows, synchronously — for joins and derived reads. */
   snapshot(where?: (row: T) => boolean): T[];
   list(query?: ListQuery<T>): Promise<CursorPage<T>>;
-  get(id: string): Promise<T>;
+  /**
+   * One row by id — a 404 when it is unknown or deleted, unless
+   * `includeDeleted` asks for a deleted one too (a restore's own checks).
+   */
+  get(id: string, options?: { includeDeleted?: boolean }): Promise<T>;
   create(input: CreateInput<T>): Promise<T>;
   /**
    * Merge a patch into a live row. `stamp: false` leaves `updatedAt` alone — for
@@ -169,9 +173,9 @@ export function createFixtureCollection<T extends Row>(options: {
         nextCursor: end < rowsInView.length ? String(end) : null,
       };
     },
-    async get(id) {
+    async get(id, { includeDeleted = false } = {}) {
       const row = find(id);
-      if (row.deletedAt !== null) {
+      if (row.deletedAt !== null && !includeDeleted) {
         throw clinicHttpError(404, 'not_found', `${options.resource} not found`);
       }
       return clone(row);

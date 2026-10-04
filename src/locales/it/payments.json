@@ -1,5 +1,153 @@
 {
   "manifest": {
     "title": "Pagamenti"
+  },
+  "tabs": {
+    "label": "Sezioni dei pagamenti",
+    "ledger": "Pagamenti",
+    "pending": "In sospeso"
+  },
+  "search": {
+    "placeholder": "Paziente, fattura o ricevuta",
+    "label": "Cerca pagamenti"
+  },
+  "toolbar": {
+    "dayClose": "Chiusura giornata",
+    "pay": "Paga",
+    "payTitle": "Paga · uscite (affitto, forniture, fornitori, rimborsi)",
+    "receive": "Incassa",
+    "receiveTitle": "Incassa · entrata da un paziente",
+    "addPending": "Aggiungi in sospeso",
+    "give": "Dare",
+    "giveSub": "Rimborsiamo un paziente o una controparte",
+    "take": "Avere",
+    "takeSub": "Un paziente o una controparte ci paga"
+  },
+  "columns": {
+    "ref": "Rif.",
+    "what": "Tipo",
+    "when": "Quando",
+    "party": "Da / a",
+    "mode": "Modalità",
+    "amount": "Importo",
+    "by": "Da",
+    "who": "Chi",
+    "way": "Direzione",
+    "why": "Motivo",
+    "since": "Dal",
+    "state": "Stato"
+  },
+  "filters": {
+    "show": "Mostra",
+    "all": "Tutti"
+  },
+  "directions": {
+    "received": "Ricevuto",
+    "paid": "Pagato"
+  },
+  "kinds": {
+    "receipt": "Ricevuto",
+    "refund": "Rimborso al paziente",
+    "expense": "Pagato",
+    "money_back": "Rimborso ricevuto"
+  },
+  "ledger": {
+    "records": "movimenti",
+    "today": "Oggi {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "edited_many": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "edited_other": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Fattura #{{seq}}",
+      "sale": "Vendita · Fattura #{{seq}}",
+      "refund": "Rimborso · Nota di credito",
+      "refundNote": "Rimborso · Nota di credito {{note}}",
+      "refundFor": "per la fattura #{{seq}}",
+      "moneyBack": "Rimborso ricevuto",
+      "medicalBill": "Ordine medico #{{seq}} · fattura {{bill}}",
+      "stockBill": "Ordine scorte #{{seq}} · fattura {{bill}}",
+      "fromCredit": "Da {{ref}}"
+    },
+    "dayClosed": "{{ref}} · Giornata chiusa",
+    "dayClosedEdited_one": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "dayClosedEdited_many": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Giornata chiusa · modificato {{count}}×"
+  },
+  "rowActions": {
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "giveBack": "Restituisci",
+    "gotBack": "Riavuto",
+    "useOnBill": "Usa nella prossima fattura"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "empty": {
+    "ledgerTitle": "Nessun movimento corrisponde",
+    "pendingTitle": "Niente in sospeso",
+    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+    "receive": "Incassa"
+  },
+  "deleteEntry": {
+    "title": "Eliminare questo pagamento?",
+    "effect": "Consentito fino alla chiusura della giornata. L’eliminazione resta nel registro di controllo.",
+    "effectInvoice": "Consentito fino alla chiusura della giornata. La fattura #{{seq}} torna a {{due}} da pagare. L’eliminazione resta nel registro di controllo.",
+    "reasons": {
+      "twice": "Inserito due volte",
+      "amount": "Importo errato",
+      "party": "Paziente o beneficiario errato"
+    },
+    "removed": "{{ref}} rimosso",
+    "removedInvoice": "{{ref}} rimosso · saldo della fattura ripristinato"
+  },
+  "dialog": {
+    "record": "Pagamento",
+    "credit": "Elemento in sospeso"
+  },
+  "pending": {
+    "records": "elementi in sospeso",
+    "patient": "Paziente",
+    "party": "Fornitore / controparte",
+    "ways": {
+      "give": "Dare",
+      "take": "Avere"
+    },
+    "wayTitles": {
+      "give": "Li rimborsiamo noi",
+      "take": "Ci pagano loro"
+    },
+    "states": {
+      "open": "Aperto",
+      "given_back": "Restituito",
+      "got_back": "Ricevuto",
+      "used": "Compensato"
+    },
+    "settledToday": "{{state}} · Oggi",
+    "adjusted": "{{amount}} compensato",
+    "source": "Da {{ref}} · {{direction}}",
+    "invoice": "Fattura #{{seq}}",
+    "byHand": "A mano",
+    "deleteTitle": "Eliminare questo elemento in sospeso?",
+    "deleted": "{{ref}} eliminato",
+    "reasons": {
+      "charged_twice": "Addebitato due volte",
+      "advance_not_used": "Anticipo non usato",
+      "package_cancelled": "Pacchetto annullato",
+      "overpaid": "Pagato in eccesso",
+      "returned_items": "Articoli restituiti",
+      "short_payment": "Pagamento insufficiente",
+      "damaged_goods": "Merce danneggiata restituita",
+      "advance_given": "Anticipo dato",
+      "loan_to_staff": "Prestito al personale",
+      "other": "Altro"
+    }
   }
 }

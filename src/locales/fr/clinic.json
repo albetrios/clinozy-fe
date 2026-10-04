@@ -1183,5 +1183,15 @@
       "doctor": "Choisissez un médecin"
     },
     "copied": "Copié · choisissez une date et une heure"
+  },
+  "expenseCategories": {
+    "medicines": "Médicaments",
+    "consumables": "Consommables",
+    "salary": "Salaires",
+    "rent": "Loyer",
+    "marketing": "Marketing",
+    "utilities": "Charges",
+    "maintenance": "Entretien",
+    "misc": "Divers"
   }
 }

@@ -257,6 +257,24 @@ describe('RoomToolbar — phone', () => {
     expect(tabs?.className).not.toContain('[data-room-tabs-track]');
   });
 
+  it('puts the room’s actions beside the tabs on row 2 (Payments’ Day close)', async () => {
+    tier.current = 'phone';
+    renderToolbar({ layout: 'actions' });
+    const row = await screen.findByTestId('patients-toolbar');
+    expect(row).toHaveAttribute('data-layout', 'actions');
+    // The rows' 10px is the later rows' top margin, so the break's line adds none.
+    expect(row.className).toContain('max-md:gap-y-0');
+    const tabs = screen.getByRole('tablist').closest('[data-slot="room-toolbar-tabs"]');
+    expect(tabs?.className).toContain('max-md:order-4');
+    expect(tabs?.className).toContain('max-md:flex-1');
+    expect(tabs?.className).not.toContain('max-md:basis-full');
+    const actions = within(row).getByRole('button', { name: 'Day close' }).parentElement;
+    expect(actions?.className).toContain('max-md:order-4');
+    expect(actions?.className).toContain('max-md:mt-2.5');
+    // The line break ends the search row.
+    expect(row.querySelector('.max-md\\:basis-full.max-md\\:order-3')).not.toBeNull();
+  });
+
   it('puts the search alone, the views + the room’s filter, then the actions on row 3 (Tasks)', async () => {
     tier.current = 'phone';
     renderToolbar({

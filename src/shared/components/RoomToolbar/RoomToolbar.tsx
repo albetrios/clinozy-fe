@@ -14,7 +14,7 @@ import { RoomPrimary, type RoomPrimaryProps } from './RoomPrimary/index.ts';
 import { RoomSearch, type RoomSearchProps } from './RoomSearch/index.ts';
 
 /** The phone rows (H:83–93; `_patterns.md:96`). */
-type RoomToolbarLayout = 'default' | 'leads' | 'tasks';
+type RoomToolbarLayout = 'default' | 'leads' | 'actions' | 'tasks';
 
 /**
  * The search alone on row 1; row 2 the tabs, the Filters place pushed to the
@@ -39,6 +39,16 @@ const PHONE_PLACEMENT = {
   // Row 1: the search alone; row 2: the tabs at their width + a 36px Filters at
   // the inline end (H:83–88).
   leads: { ...SEARCH_ROW_FIRST, actions: 'max-md:order-5' },
+  // Row 1 as the default; a line break; row 2: the tabs, then the room's
+  // actions at the inline end ("Day close", `payments.md:17`); saved views
+  // after. The rows' 10px comes from the later rows' top margin, so the break's
+  // empty line adds no gap.
+  actions: {
+    search: 'max-md:order-1 max-md:flex-[1_1_180px]',
+    filters: 'max-md:order-2',
+    tabs: 'max-md:order-4 max-md:mt-2.5 max-md:min-w-0 max-md:flex-1',
+    actions: 'max-md:order-4 max-md:mt-2.5',
+  },
   // Tasks (H:45–49, `tasks.md:17`): the search alone; the views + "All types"
   // at the inline end; then the actions (Mine · Everyone, Rules) on row 3.
   tasks: { ...SEARCH_ROW_FIRST, actions: 'max-md:order-5 max-md:basis-full' },
@@ -92,7 +102,8 @@ export interface RoomToolbarProps {
   /**
    * The phone rows: `default` — search + Filters, then the tabs; `leads` —
    * the search alone, then the tabs + a 36px Filters (its h1 keeps 20px on a
-   * tablet, `leads.md:17`); `tasks` — the leads rows with the room's own
+   * tablet, `leads.md:17`); `actions` — search + Filters, then the tabs with
+   * the room's `actions` beside them (Payments' "Day close"); `tasks` — the leads rows with the room's own
    * filter in the Filters place and the actions on a third row (`tasks.md:17`).
    */
   layout?: RoomToolbarLayout;
@@ -207,6 +218,7 @@ export function RoomToolbar({
       data-testid={ids.toolbar}
       className={cn(
         'flex flex-none flex-wrap items-center gap-x-2 gap-y-2.5 p-(--room-toolbar-pad)',
+        layout === 'actions' && 'max-md:gap-y-0',
         className,
       )}
     >
@@ -232,7 +244,9 @@ export function RoomToolbar({
           tableId={tableId}
           activeFilters={applied}
           onApply={(view) => apply(view.filters)}
-          className="max-md:order-4"
+          className={
+            layout === 'actions' ? 'max-md:order-5 max-md:mt-2.5' : 'max-md:order-4'
+          }
         />
       ) : null}
       {filtersSlot ? (
@@ -252,6 +266,13 @@ export function RoomToolbar({
         />
       )}
       {columns}
+      {layout === 'actions' ? (
+        // Ends the phone's search row, so the tabs and the actions share the next.
+        <span
+          aria-hidden="true"
+          className="hidden max-md:order-3 max-md:block max-md:basis-full"
+        />
+      ) : null}
       {actions ? (
         <div
           data-slot="room-toolbar-actions"

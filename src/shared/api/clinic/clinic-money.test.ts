@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  dayModeTotals,
+  expectedDrawerCash,
   invoiceBalance,
   invoiceLineAmounts,
   invoicePaid,
@@ -151,6 +153,36 @@ describe('invoiceBalance', () => {
     expect(invoiceBalance({ ...invoice, items: [item({ rate: 0 })] }, []).status).toBe(
       'paid',
     );
+  });
+});
+
+describe('dayModeTotals / expectedDrawerCash (Q-G5, S:715)', () => {
+  const entry = (overrides: Partial<Payment>) =>
+    ({ direction: 'received', deletedAt: null, splits: [], ...overrides }) as Payment;
+
+  it('counts each split row under its own mode, Credit apart, deleted entries not at all', () => {
+    const totals = dayModeTotals([
+      entry({
+        splits: [
+          { mode: 'cash', amount: 30_000 },
+          { mode: 'upi', amount: 20_000 },
+        ],
+      }),
+      entry({ direction: 'paid', splits: [{ mode: 'cash', amount: 26_000 }] }),
+      entry({ splits: [{ mode: 'credit', amount: 50_000 }] }),
+      entry({
+        splits: [{ mode: 'cash', amount: 99_000 }],
+        deletedAt: '2026-10-03T05:00:00Z',
+      }),
+    ]);
+    expect(totals).toEqual({
+      cash: { in: 30_000, out: 26_000 },
+      upi: { in: 20_000, out: 0 },
+      card: { in: 0, out: 0 },
+      credit: { in: 50_000, out: 0 },
+    });
+    // The drawer: ₹2,000 opening + ₹300 in − ₹260 out.
+    expect(expectedDrawerCash(200_000, totals)).toBe(204_000);
   });
 });
 

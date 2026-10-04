@@ -1,5 +1,153 @@
 {
   "manifest": {
     "title": "Pagamentos"
+  },
+  "tabs": {
+    "label": "Seções de pagamentos",
+    "ledger": "Pagamentos",
+    "pending": "Pendentes"
+  },
+  "search": {
+    "placeholder": "Paciente, fatura ou recibo",
+    "label": "Buscar pagamentos"
+  },
+  "toolbar": {
+    "dayClose": "Fechamento do dia",
+    "pay": "Pagar",
+    "payTitle": "Pagar · saída de dinheiro (aluguel, suprimentos, fornecedores, reembolsos)",
+    "receive": "Receber",
+    "receiveTitle": "Receber · entrada de dinheiro de um paciente",
+    "addPending": "Adicionar pendente",
+    "give": "Dar",
+    "giveSub": "Devolvemos dinheiro a um paciente ou terceiro",
+    "take": "Receber",
+    "takeSub": "Um paciente ou terceiro nos paga"
+  },
+  "columns": {
+    "ref": "Ref.",
+    "what": "Tipo",
+    "when": "Quando",
+    "party": "De / para",
+    "mode": "Forma",
+    "amount": "Valor",
+    "by": "Por",
+    "who": "Quem",
+    "way": "Sentido",
+    "why": "Motivo",
+    "since": "Desde",
+    "state": "Situação"
+  },
+  "filters": {
+    "show": "Mostrar",
+    "all": "Todos"
+  },
+  "directions": {
+    "received": "Recebido",
+    "paid": "Pago"
+  },
+  "kinds": {
+    "receipt": "Recebido",
+    "refund": "Reembolso ao paciente",
+    "expense": "Pago",
+    "money_back": "Devolução"
+  },
+  "ledger": {
+    "records": "lançamentos",
+    "today": "Hoje {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "Editado {{count}}× · último {{from}} → {{to}}",
+    "edited_many": "Editado {{count}}× · último {{from}} → {{to}}",
+    "edited_other": "Editado {{count}}× · último {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Fatura #{{seq}}",
+      "sale": "Venda · Fatura #{{seq}}",
+      "refund": "Reembolso · Nota de crédito",
+      "refundNote": "Reembolso · Nota de crédito {{note}}",
+      "refundFor": "da fatura #{{seq}}",
+      "moneyBack": "Devolução",
+      "medicalBill": "Pedido médico #{{seq}} · nota {{bill}}",
+      "stockBill": "Pedido de estoque #{{seq}} · nota {{bill}}",
+      "fromCredit": "De {{ref}}"
+    },
+    "dayClosed": "{{ref}} · Dia fechado",
+    "dayClosedEdited_one": "{{ref}} · Dia fechado · editado {{count}}×",
+    "dayClosedEdited_many": "{{ref}} · Dia fechado · editado {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Dia fechado · editado {{count}}×"
+  },
+  "rowActions": {
+    "edit": "Editar",
+    "delete": "Excluir",
+    "giveBack": "Devolver",
+    "gotBack": "Recebido de volta",
+    "useOnBill": "Usar na próxima fatura"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "empty": {
+    "ledgerTitle": "Nenhum lançamento corresponde",
+    "pendingTitle": "Nada pendente",
+    "description": "Ainda não há nada aqui. Tente outra aba ou busca.",
+    "receive": "Receber"
+  },
+  "deleteEntry": {
+    "title": "Excluir este pagamento?",
+    "effect": "Permitido até o fechamento do dia. A exclusão fica no registro de auditoria.",
+    "effectInvoice": "Permitido até o fechamento do dia. A fatura #{{seq}} volta a ter {{due}} em aberto. A exclusão fica no registro de auditoria.",
+    "reasons": {
+      "twice": "Lançado duas vezes",
+      "amount": "Valor errado",
+      "party": "Paciente ou favorecido errado"
+    },
+    "removed": "{{ref}} removido",
+    "removedInvoice": "{{ref}} removido · saldo da fatura restaurado"
+  },
+  "dialog": {
+    "record": "Pagamento",
+    "credit": "Pendente"
+  },
+  "pending": {
+    "records": "pendentes",
+    "patient": "Paciente",
+    "party": "Fornecedor / terceiro",
+    "ways": {
+      "give": "Dar",
+      "take": "Receber"
+    },
+    "wayTitles": {
+      "give": "Nós devolvemos",
+      "take": "Eles nos pagam"
+    },
+    "states": {
+      "open": "Aberto",
+      "given_back": "Devolvido",
+      "got_back": "Recebido",
+      "used": "Abatido"
+    },
+    "settledToday": "{{state}} · Hoje",
+    "adjusted": "{{amount}} abatido",
+    "source": "De {{ref}} · {{direction}}",
+    "invoice": "Fatura #{{seq}}",
+    "byHand": "Manual",
+    "deleteTitle": "Excluir este pendente?",
+    "deleted": "{{ref}} excluído",
+    "reasons": {
+      "charged_twice": "Cobrado duas vezes",
+      "advance_not_used": "Adiantamento não usado",
+      "package_cancelled": "Pacote cancelado",
+      "overpaid": "Pago a mais",
+      "returned_items": "Itens devolvidos",
+      "short_payment": "Pagamento a menos",
+      "damaged_goods": "Mercadoria danificada devolvida",
+      "advance_given": "Adiantamento dado",
+      "loan_to_staff": "Empréstimo à equipe",
+      "other": "Outro"
+    }
   }
 }

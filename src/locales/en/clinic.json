@@ -1166,5 +1166,15 @@
       "doctor": "Pick a doctor"
     },
     "copied": "Copied · pick a date and time"
+  },
+  "expenseCategories": {
+    "medicines": "Medicines",
+    "consumables": "Consumables",
+    "salary": "Salary",
+    "rent": "Rent",
+    "marketing": "Marketing",
+    "utilities": "Utilities",
+    "maintenance": "Maintenance",
+    "misc": "Misc"
   }
 }

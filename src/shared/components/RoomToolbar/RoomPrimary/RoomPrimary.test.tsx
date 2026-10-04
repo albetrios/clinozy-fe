@@ -98,6 +98,59 @@ describe('RoomPrimary — in the toolbar (md and up)', () => {
     expect(receive).toHaveAccessibleName('Receive');
   });
 
+  it('carries each action’s title and its icon’s own ink (Payments’ red Pay arrow)', () => {
+    withClient(
+      <RoomPrimary
+        secondary={{
+          id: 'pay',
+          label: 'Pay',
+          title: 'Pay · money out',
+          icon: ArrowUpRight,
+          iconClassName: 'text-destructive',
+          onSelect: vi.fn(),
+        }}
+        action={{
+          id: 'receive',
+          label: 'Receive',
+          title: 'Receive · money in',
+          onSelect: vi.fn(),
+        }}
+        testIdPrefix="payments"
+      />,
+    );
+    const pay = screen.getByTestId('payments-pay');
+    expect(pay).toHaveAttribute('title', 'Pay · money out');
+    expect(pay.querySelector('svg')).toHaveClass('text-destructive');
+    expect(screen.getByTestId('payments-receive')).toHaveAttribute(
+      'title',
+      'Receive · money in',
+    );
+  });
+
+  it('gives the create menu’s rows their sub line and tone', async () => {
+    const user = userEvent.setup();
+    withClient(
+      <RoomPrimary
+        action={{ id: 'add', label: 'Add pending', onSelect: vi.fn() }}
+        menu={{
+          actions: [
+            {
+              id: 'give',
+              label: 'Give',
+              sub: 'We pay a patient or party back',
+              tone: 'blush',
+              onSelect: vi.fn(),
+            },
+          ],
+        }}
+        testIdPrefix="payments-pending"
+      />,
+    );
+    await user.click(screen.getByTestId('payments-pending-new-menu'));
+    const option = await screen.findByRole('option', { name: /Give/ });
+    expect(option).toHaveTextContent('We pay a patient or party back');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = withClient(
       <RoomPrimary

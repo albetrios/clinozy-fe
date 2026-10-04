@@ -1234,5 +1234,15 @@
       "doctor": "اختر طبيبًا"
     },
     "copied": "تم النسخ · اختر التاريخ والوقت"
+  },
+  "expenseCategories": {
+    "medicines": "أدوية",
+    "consumables": "مستهلكات",
+    "salary": "رواتب",
+    "rent": "إيجار",
+    "marketing": "تسويق",
+    "utilities": "مرافق",
+    "maintenance": "صيانة",
+    "misc": "متفرقات"
   }
 }

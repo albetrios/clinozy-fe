@@ -369,7 +369,10 @@ function TableBody<TData extends RowData>({
       role="rowgroup"
       data-slot="data-table-body"
       data-refreshing={refreshing || undefined}
-      className={cn('pt-(--dt-pad-top) pb-(--dt-pad-bottom)', refreshing && REFRESH_BARS)}
+      className={cn(
+        'shrink-0 pt-(--dt-pad-top) pb-(--dt-pad-bottom)',
+        refreshing && REFRESH_BARS,
+      )}
     >
       {tableWindow.windowed.length > 0 ? (
         tableWindow.windowed.map(renderEntry)
@@ -422,7 +425,9 @@ function TableScroller<TData extends RowData>({
     <div
       ref={attachScroller}
       onScroll={syncHeader}
-      className="relative min-h-0 flex-1 [scrollbar-gutter:stable] overflow-auto overscroll-contain max-md:overflow-x-hidden"
+      // A column, so a short list's end line keeps to the card's foot — the
+      // prototype grows a filler before it (measured side by side, L-39).
+      className="relative flex min-h-0 flex-1 [scrollbar-gutter:stable] flex-col overflow-auto overscroll-contain max-md:overflow-x-hidden"
     >
       {props.groups && tableWindow.virtualizing ? (
         <PinnedGroupHeader

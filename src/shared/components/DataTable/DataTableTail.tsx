@@ -30,7 +30,8 @@ export function DataTableTail({
   if (!(loading || ended)) return null;
   const span = Math.max(1, columnCount);
   return (
-    <div role="rowgroup">
+    // `mt-auto`: under a short list the end line keeps to the card's foot.
+    <div role="rowgroup" className="mt-auto shrink-0">
       {loading ? (
         <div role="row" tabIndex={-1} data-testid={TABLE_TEST_IDS.loadingMore(prefix)}>
           <div role="cell" aria-colspan={span}>

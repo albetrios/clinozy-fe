@@ -151,6 +151,17 @@ export const CLINIC_KEYS = {
     medical: 'invoiceTypes.medical',
     consultation: 'invoiceTypes.consultation',
   },
+  /** The contract's `expense_category` (`S:1388–1398`): the ledger's sub line, Send payment's chips. */
+  expenseCategories: {
+    medicines: 'expenseCategories.medicines',
+    consumables: 'expenseCategories.consumables',
+    salary: 'expenseCategories.salary',
+    rent: 'expenseCategories.rent',
+    marketing: 'expenseCategories.marketing',
+    utilities: 'expenseCategories.utilities',
+    maintenance: 'expenseCategories.maintenance',
+    misc: 'expenseCategories.misc',
+  },
   taskOutcomes: {
     log_check_in: 'taskOutcomes.log_check_in',
     doing_well: 'taskOutcomes.doing_well',

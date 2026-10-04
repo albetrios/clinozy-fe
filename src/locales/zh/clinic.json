@@ -1149,5 +1149,15 @@
       "doctor": "请选择医生"
     },
     "copied": "已复制 · 请选择日期和时间"
+  },
+  "expenseCategories": {
+    "medicines": "药品",
+    "consumables": "耗材",
+    "salary": "工资",
+    "rent": "租金",
+    "marketing": "营销",
+    "utilities": "水电费",
+    "maintenance": "维修保养",
+    "misc": "杂项"
   }
 }

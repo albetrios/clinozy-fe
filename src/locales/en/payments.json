@@ -1,5 +1,150 @@
 {
   "manifest": {
     "title": "Payments"
+  },
+  "tabs": {
+    "label": "Payments sections",
+    "ledger": "Payments",
+    "pending": "Pending"
+  },
+  "search": {
+    "placeholder": "Patient, invoice or receipt",
+    "label": "Search payments"
+  },
+  "toolbar": {
+    "dayClose": "Day close",
+    "pay": "Pay",
+    "payTitle": "Pay · money out (rent, supplies, vendors, refunds)",
+    "receive": "Receive",
+    "receiveTitle": "Receive · money in from a patient",
+    "addPending": "Add pending",
+    "give": "Give",
+    "giveSub": "We pay a patient or party back",
+    "take": "Take",
+    "takeSub": "A patient or party pays us"
+  },
+  "columns": {
+    "ref": "Ref",
+    "what": "What",
+    "when": "When",
+    "party": "From / to",
+    "mode": "Mode",
+    "amount": "Amount",
+    "by": "By",
+    "who": "Who",
+    "way": "Which way",
+    "why": "Why",
+    "since": "Since",
+    "state": "State"
+  },
+  "filters": {
+    "show": "Show",
+    "all": "All"
+  },
+  "directions": {
+    "received": "Received",
+    "paid": "Paid"
+  },
+  "kinds": {
+    "receipt": "Received",
+    "refund": "Refund to patient",
+    "expense": "Paid",
+    "money_back": "Money back"
+  },
+  "ledger": {
+    "records": "entries",
+    "today": "Today {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "Edited {{count}}× · last {{from}} → {{to}}",
+    "edited_other": "Edited {{count}}× · last {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Invoice #{{seq}}",
+      "sale": "Sale · Invoice #{{seq}}",
+      "refund": "Refund · Credit note",
+      "refundNote": "Refund · Credit note {{note}}",
+      "refundFor": "for Invoice #{{seq}}",
+      "moneyBack": "Money back",
+      "medicalBill": "Medical PO #{{seq}} · bill {{bill}}",
+      "stockBill": "Stock PO #{{seq}} · bill {{bill}}",
+      "fromCredit": "From {{ref}}"
+    },
+    "dayClosed": "{{ref}} · Day closed",
+    "dayClosedEdited_one": "{{ref}} · Day closed · edited {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Day closed · edited {{count}}×"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "giveBack": "Give back",
+    "gotBack": "Got it back",
+    "useOnBill": "Use on next bill"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "ledgerTitle": "No entry matches",
+    "pendingTitle": "Nothing pending",
+    "description": "Nothing here yet. Try another tab or search.",
+    "receive": "Receive"
+  },
+  "deleteEntry": {
+    "title": "Delete this payment?",
+    "effect": "Allowed until the day is closed. The deletion is kept in the audit log.",
+    "effectInvoice": "Allowed until the day is closed. Invoice #{{seq}} goes back to {{due}} due. The deletion is kept in the audit log.",
+    "reasons": {
+      "twice": "Entered twice",
+      "amount": "Wrong amount",
+      "party": "Wrong patient or payee"
+    },
+    "removed": "{{ref}} removed",
+    "removedInvoice": "{{ref}} removed · invoice balance restored"
+  },
+  "dialog": {
+    "record": "Payment",
+    "credit": "Pending"
+  },
+  "pending": {
+    "records": "pending",
+    "patient": "Patient",
+    "party": "Supplier / party",
+    "ways": {
+      "give": "Give",
+      "take": "Take"
+    },
+    "wayTitles": {
+      "give": "We pay them back",
+      "take": "They pay us"
+    },
+    "states": {
+      "open": "Open",
+      "given_back": "Returned",
+      "got_back": "Received",
+      "used": "Adjusted"
+    },
+    "settledToday": "{{state}} · Today",
+    "adjusted": "{{amount}} adjusted",
+    "source": "From {{ref}} · {{direction}}",
+    "invoice": "Invoice #{{seq}}",
+    "byHand": "By hand",
+    "deleteTitle": "Delete this pending?",
+    "deleted": "{{ref}} deleted",
+    "reasons": {
+      "charged_twice": "Charged twice",
+      "advance_not_used": "Advance not used",
+      "package_cancelled": "Package cancelled",
+      "overpaid": "Overpaid",
+      "returned_items": "Returned items",
+      "short_payment": "Short payment",
+      "damaged_goods": "Damaged goods returned",
+      "advance_given": "Advance given",
+      "loan_to_staff": "Loan to staff",
+      "other": "Other"
+    }
   }
 }

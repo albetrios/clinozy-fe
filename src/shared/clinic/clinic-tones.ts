@@ -1,7 +1,11 @@
 import type {
   AppointmentStatus,
+  CreditDirection,
+  CreditStatus,
+  ExpenseCategory,
   Gender,
   ImageAlbum,
+  InvoiceType,
   LeadInterest,
   LeadStatus,
   OfferingCategory,
@@ -9,6 +13,8 @@ import type {
   PatientConversion,
   PatientStatus,
   PatientType,
+  PaymentKind,
+  PaymentMode,
   Role,
   Section,
   Tone,
@@ -181,6 +187,73 @@ export const OFFER_STATE_TONES: Readonly<Record<OfferState, Tone>> = {
   scheduled: 'sky',
   paused: 'butter',
   ended: 'stone',
+};
+
+/**
+ * Each payment mode's tone (`PY_MODES`, H:3612): Cash butter, UPI sage, Card
+ * sky — and Credit, a credit used on a bill, lav (the credit's "Adjusted"; no
+ * mode tone in the design, AMBER).
+ */
+export const PAYMENT_MODE_TONES: Readonly<Record<PaymentMode, Tone>> = {
+  cash: 'butter',
+  upi: 'sage',
+  card: 'sky',
+  credit: 'lav',
+};
+
+/**
+ * Each ledger entry's What pill (`payments.md:29`, H:5097): a receipt is
+ * "Received" sage, a refund "Paid" blush, an expense or a supplier bill "Paid"
+ * butter, money back "Received" stone; an Undo (not in launch, Q-G10) stone.
+ */
+export const PAYMENT_KIND_TONES: Readonly<Record<PaymentKind, Tone>> = {
+  receipt: 'sage',
+  refund: 'blush',
+  expense: 'butter',
+  supplier_bill: 'butter',
+  money_back: 'stone',
+  reversal: 'stone',
+};
+
+/**
+ * Each expense category's tone (`EX_CATS`, H:3691; `payments.md:118`):
+ * Medicines blush, Consumables mint, Salary lav, Rent sky, Marketing blush,
+ * Utilities butter, Maintenance sage, Misc stone.
+ */
+export const EXPENSE_CATEGORY_TONES: Readonly<Record<ExpenseCategory, Tone>> = {
+  medicines: 'blush',
+  consumables: 'mint',
+  salary: 'lav',
+  rent: 'sky',
+  marketing: 'blush',
+  utilities: 'butter',
+  maintenance: 'sage',
+  misc: 'stone',
+};
+
+/** Each invoice type's tone (`PY_TYPES`; `payments.md:136`): Clinic sky, Medical sage, Consultation lav. */
+export const INVOICE_TYPE_TONES: Readonly<Record<InvoiceType, Tone>> = {
+  clinic: 'sky',
+  medical: 'sage',
+  consultation: 'lav',
+};
+
+/** Which way a credit goes (`payments.md:45`): Give blush, Take sky. */
+export const CREDIT_DIRECTION_TONES: Readonly<Record<CreditDirection, Tone>> = {
+  give: 'blush',
+  take: 'sky',
+};
+
+/**
+ * Each credit state's pill (`payments.md:45`): Open sky, Returned and Received
+ * sage, Adjusted lav — the stored `credit_status` shown with the design's
+ * labels (D22).
+ */
+export const CREDIT_STATUS_TONES: Readonly<Record<CreditStatus, Tone>> = {
+  open: 'sky',
+  given_back: 'sage',
+  got_back: 'sage',
+  used: 'lav',
 };
 
 /** The utility classes one tone paints with. */

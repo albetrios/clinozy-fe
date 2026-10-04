@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1388 src files · ~720 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1443 src files · ~745 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -974,12 +974,56 @@ clinozy-fe/
 │   │       │   │   ├── PatientsPage.tsx
 │   │       │   │   └── [3 test files]
 │   │       │   ├── payments/
+│   │       │   │   ├── $paymentId/
+│   │       │   │   │   └── edit/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── components/
+│   │       │   │   │   ├── LedgerCells/
+│   │       │   │   │   └── PaymentDeleteConfirm/
+│   │       │   │   ├── day-close/
+│   │       │   │   │   ├── day-close.manifest.ts
+│   │       │   │   │   ├── day-close.route.tsx
+│   │       │   │   │   ├── DAY_CLOSE.OVERVIEW.md
+│   │       │   │   │   ├── DayClosePage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useLedgerTable/
+│   │       │   │   │   └── usePaymentsDialogRoute/
+│   │       │   │   ├── pay/
+│   │       │   │   │   ├── pay.manifest.ts
+│   │       │   │   │   ├── PAY.OVERVIEW.md
+│   │       │   │   │   ├── pay.route.tsx
+│   │       │   │   │   ├── SendPaymentPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── pending/
+│   │       │   │   │   ├── $creditId/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── pending.constants.ts
+│   │       │   │   │   ├── pending.manifest.ts
+│   │       │   │   │   ├── PENDING.OVERVIEW.md
+│   │       │   │   │   ├── pending.route.tsx
+│   │       │   │   │   ├── pending.search.ts
+│   │       │   │   │   ├── PendingPage.tsx
+│   │       │   │   │   └── [2 test files]
+│   │       │   │   ├── receive/
+│   │       │   │   │   ├── receive.manifest.ts
+│   │       │   │   │   ├── RECEIVE.OVERVIEW.md
+│   │       │   │   │   ├── receive.route.tsx
+│   │       │   │   │   ├── ReceivePaymentPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── shared/
+│   │       │   │   │   └── components/
 │   │       │   │   ├── payments.constants.ts
 │   │       │   │   ├── payments.manifest.ts
 │   │       │   │   ├── PAYMENTS.OVERVIEW.md
+│   │       │   │   ├── payments.params.ts
 │   │       │   │   ├── payments.route.tsx
+│   │       │   │   ├── payments.search.ts
 │   │       │   │   ├── PaymentsPage.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [3 test files]
 │   │       │   ├── stock/
 │   │       │   │   ├── items/
 │   │       │   │   │   ├── items.constants.ts
@@ -1151,6 +1195,9 @@ clinozy-fe/
 │   │   │   │   ├── command-search-api.ts
 │   │   │   │   ├── command-search-contracts.ts
 │   │   │   │   ├── contact-threads-api.ts
+│   │   │   │   ├── credits-api.ts
+│   │   │   │   ├── credits-contracts.ts
+│   │   │   │   ├── day-close-api.ts
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-hold.ts
@@ -1161,6 +1208,8 @@ clinozy-fe/
 │   │   │   │   ├── offerings-pricing.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
+│   │   │   │   ├── payments-api.ts
+│   │   │   │   ├── payments-contracts.ts
 │   │   │   │   ├── plan-api.ts
 │   │   │   │   ├── plan-contracts.ts
 │   │   │   │   ├── preferences-api.ts
@@ -1170,7 +1219,7 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [32 test files]
+│   │   │   │   └── [35 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2080,6 +2129,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCreate.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useCredits/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useCredits.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useCursorList/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCursorList.ts
@@ -2212,6 +2265,10 @@ clinozy-fe/
 │   │   │   ├── usePatients/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatients.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── usePayments/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePayments.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── usePlan/
 │   │   │   │   ├── index.ts

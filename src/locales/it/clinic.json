@@ -1183,5 +1183,15 @@
       "doctor": "Scegli un medico"
     },
     "copied": "Copiato · scegli data e ora"
+  },
+  "expenseCategories": {
+    "medicines": "Farmaci",
+    "consumables": "Materiali di consumo",
+    "salary": "Stipendi",
+    "rent": "Affitto",
+    "marketing": "Marketing",
+    "utilities": "Utenze",
+    "maintenance": "Manutenzione",
+    "misc": "Varie"
   }
 }

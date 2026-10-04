@@ -1,5 +1,150 @@
 {
   "manifest": {
     "title": "Zahlungen"
+  },
+  "tabs": {
+    "label": "Bereiche der Zahlungen",
+    "ledger": "Zahlungen",
+    "pending": "Offen"
+  },
+  "search": {
+    "placeholder": "Patient, Rechnung oder Beleg",
+    "label": "Zahlungen durchsuchen"
+  },
+  "toolbar": {
+    "dayClose": "Tagesabschluss",
+    "pay": "Zahlen",
+    "payTitle": "Zahlen · Geld raus (Miete, Material, Lieferanten, Erstattungen)",
+    "receive": "Einnehmen",
+    "receiveTitle": "Einnehmen · Geld rein von einem Patienten",
+    "addPending": "Offenen Betrag hinzufügen",
+    "give": "Geben",
+    "giveSub": "Wir zahlen einem Patienten oder Partner zurück",
+    "take": "Nehmen",
+    "takeSub": "Ein Patient oder Partner zahlt uns"
+  },
+  "columns": {
+    "ref": "Ref.",
+    "what": "Art",
+    "when": "Wann",
+    "party": "Von / an",
+    "mode": "Zahlart",
+    "amount": "Betrag",
+    "by": "Von",
+    "who": "Wer",
+    "way": "Richtung",
+    "why": "Grund",
+    "since": "Seit",
+    "state": "Status"
+  },
+  "filters": {
+    "show": "Anzeigen",
+    "all": "Alle"
+  },
+  "directions": {
+    "received": "Erhalten",
+    "paid": "Bezahlt"
+  },
+  "kinds": {
+    "receipt": "Erhalten",
+    "refund": "Erstattung an Patienten",
+    "expense": "Bezahlt",
+    "money_back": "Rückzahlung"
+  },
+  "ledger": {
+    "records": "Buchungen",
+    "today": "Heute {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
+    "edited_other": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Rechnung #{{seq}}",
+      "sale": "Verkauf · Rechnung #{{seq}}",
+      "refund": "Erstattung · Gutschrift",
+      "refundNote": "Erstattung · Gutschrift {{note}}",
+      "refundFor": "zu Rechnung #{{seq}}",
+      "moneyBack": "Rückzahlung",
+      "medicalBill": "Medizin-Bestellung #{{seq}} · Rechnung {{bill}}",
+      "stockBill": "Lager-Bestellung #{{seq}} · Rechnung {{bill}}",
+      "fromCredit": "Aus {{ref}}"
+    },
+    "dayClosed": "{{ref}} · Tag abgeschlossen",
+    "dayClosedEdited_one": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
+    "dayClosedEdited_other": "{{ref}} · Tag abgeschlossen · {{count}}× geändert"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "giveBack": "Zurückgeben",
+    "gotBack": "Zurückerhalten",
+    "useOnBill": "Mit nächster Rechnung verrechnen"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "ledgerTitle": "Keine passende Buchung",
+    "pendingTitle": "Nichts offen",
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "receive": "Einnehmen"
+  },
+  "deleteEntry": {
+    "title": "Diese Zahlung löschen?",
+    "effect": "Möglich, bis der Tag abgeschlossen ist. Die Löschung bleibt im Prüfprotokoll.",
+    "effectInvoice": "Möglich, bis der Tag abgeschlossen ist. Rechnung #{{seq}} ist wieder mit {{due}} offen. Die Löschung bleibt im Prüfprotokoll.",
+    "reasons": {
+      "twice": "Doppelt erfasst",
+      "amount": "Falscher Betrag",
+      "party": "Falscher Patient oder Empfänger"
+    },
+    "removed": "{{ref}} entfernt",
+    "removedInvoice": "{{ref}} entfernt · Rechnungssaldo wiederhergestellt"
+  },
+  "dialog": {
+    "record": "Zahlung",
+    "credit": "Offener Betrag"
+  },
+  "pending": {
+    "records": "offenen Beträge",
+    "patient": "Patient",
+    "party": "Lieferant / Partner",
+    "ways": {
+      "give": "Geben",
+      "take": "Nehmen"
+    },
+    "wayTitles": {
+      "give": "Wir zahlen zurück",
+      "take": "Sie zahlen uns"
+    },
+    "states": {
+      "open": "Offen",
+      "given_back": "Zurückgezahlt",
+      "got_back": "Erhalten",
+      "used": "Verrechnet"
+    },
+    "settledToday": "{{state}} · Heute",
+    "adjusted": "{{amount}} verrechnet",
+    "source": "Aus {{ref}} · {{direction}}",
+    "invoice": "Rechnung #{{seq}}",
+    "byHand": "Manuell",
+    "deleteTitle": "Diesen offenen Betrag löschen?",
+    "deleted": "{{ref}} gelöscht",
+    "reasons": {
+      "charged_twice": "Doppelt berechnet",
+      "advance_not_used": "Anzahlung nicht genutzt",
+      "package_cancelled": "Paket storniert",
+      "overpaid": "Zu viel gezahlt",
+      "returned_items": "Zurückgegebene Artikel",
+      "short_payment": "Zu wenig gezahlt",
+      "damaged_goods": "Beschädigte Ware zurückgegeben",
+      "advance_given": "Vorschuss gegeben",
+      "loan_to_staff": "Darlehen an Mitarbeiter",
+      "other": "Sonstiges"
+    }
   }
 }

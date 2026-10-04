@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "付款"
+  },
+  "tabs": {
+    "label": "付款分区",
+    "ledger": "付款",
+    "pending": "待处理"
+  },
+  "search": {
+    "placeholder": "患者、发票或收据",
+    "label": "搜索付款"
+  },
+  "toolbar": {
+    "dayClose": "日结",
+    "pay": "付款",
+    "payTitle": "付款 · 支出(租金、物资、供应商、退款)",
+    "receive": "收款",
+    "receiveTitle": "收款 · 来自患者的收入",
+    "addPending": "添加待处理",
+    "give": "应付",
+    "giveSub": "我们退款给患者或对方",
+    "take": "应收",
+    "takeSub": "患者或对方付款给我们"
+  },
+  "columns": {
+    "ref": "编号",
+    "what": "类型",
+    "when": "时间",
+    "party": "来源 / 去向",
+    "mode": "方式",
+    "amount": "金额",
+    "by": "经手人",
+    "who": "对象",
+    "way": "方向",
+    "why": "原因",
+    "since": "起始",
+    "state": "状态"
+  },
+  "filters": {
+    "show": "显示",
+    "all": "全部"
+  },
+  "directions": {
+    "received": "已收",
+    "paid": "已付"
+  },
+  "kinds": {
+    "receipt": "已收",
+    "refund": "退款给患者",
+    "expense": "已付",
+    "money_back": "退回款"
+  },
+  "ledger": {
+    "records": "记录",
+    "today": "今天 {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_other": "已编辑 {{count}} 次 · 最近 {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "发票 #{{seq}}",
+      "sale": "销售 · 发票 #{{seq}}",
+      "refund": "退款 · 贷项通知单",
+      "refundNote": "退款 · 贷项通知单 {{note}}",
+      "refundFor": "对应发票 #{{seq}}",
+      "moneyBack": "退回款",
+      "medicalBill": "药房采购单 #{{seq}} · 账单 {{bill}}",
+      "stockBill": "库存采购单 #{{seq}} · 账单 {{bill}}",
+      "fromCredit": "来自 {{ref}}"
+    },
+    "dayClosed": "{{ref}} · 当日已结",
+    "dayClosedEdited_other": "{{ref}} · 当日已结 · 已编辑 {{count}} 次"
+  },
+  "rowActions": {
+    "edit": "编辑",
+    "delete": "删除",
+    "giveBack": "退还",
+    "gotBack": "已收回",
+    "useOnBill": "抵扣下一张账单"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "ledgerTitle": "没有匹配的记录",
+    "pendingTitle": "没有待处理项",
+    "description": "这里还没有内容。试试其他标签页或搜索。",
+    "receive": "收款"
+  },
+  "deleteEntry": {
+    "title": "删除这笔付款?",
+    "effect": "日结前可以删除。删除记录会保留在审计日志中。",
+    "effectInvoice": "日结前可以删除。发票 #{{seq}} 将恢复为应付 {{due}}。删除记录会保留在审计日志中。",
+    "reasons": {
+      "twice": "重复录入",
+      "amount": "金额错误",
+      "party": "患者或收款方错误"
+    },
+    "removed": "已删除 {{ref}}",
+    "removedInvoice": "已删除 {{ref}} · 发票余额已恢复"
+  },
+  "dialog": {
+    "record": "付款",
+    "credit": "待处理项"
+  },
+  "pending": {
+    "records": "待处理项",
+    "patient": "患者",
+    "party": "供应商 / 对方",
+    "ways": {
+      "give": "应付",
+      "take": "应收"
+    },
+    "wayTitles": {
+      "give": "我们退款给对方",
+      "take": "对方付款给我们"
+    },
+    "states": {
+      "open": "未结",
+      "given_back": "已退还",
+      "got_back": "已收回",
+      "used": "已抵扣"
+    },
+    "settledToday": "{{state}} · 今天",
+    "adjusted": "已抵扣 {{amount}}",
+    "source": "来自 {{ref}} · {{direction}}",
+    "invoice": "发票 #{{seq}}",
+    "byHand": "手动",
+    "deleteTitle": "删除这条待处理项?",
+    "deleted": "已删除 {{ref}}",
+    "reasons": {
+      "charged_twice": "重复收费",
+      "advance_not_used": "预付款未使用",
+      "package_cancelled": "套餐取消",
+      "overpaid": "多付",
+      "returned_items": "退回物品",
+      "short_payment": "少付",
+      "damaged_goods": "退回损坏货物",
+      "advance_given": "已付预付款",
+      "loan_to_staff": "借给员工",
+      "other": "其他"
+    }
   }
 }

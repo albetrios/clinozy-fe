@@ -1166,5 +1166,15 @@
       "doctor": "डॉक्टर चुनें"
     },
     "copied": "कॉपी हुआ · तारीख़ और समय चुनें"
+  },
+  "expenseCategories": {
+    "medicines": "दवाइयाँ",
+    "consumables": "उपभोग्य सामग्री",
+    "salary": "वेतन",
+    "rent": "किराया",
+    "marketing": "मार्केटिंग",
+    "utilities": "बिजली-पानी",
+    "maintenance": "रखरखाव",
+    "misc": "विविध"
   }
 }

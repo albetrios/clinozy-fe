@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "결제"
+  },
+  "tabs": {
+    "label": "결제 섹션",
+    "ledger": "결제",
+    "pending": "대기 중"
+  },
+  "search": {
+    "placeholder": "환자, 청구서 또는 영수증",
+    "label": "결제 검색"
+  },
+  "toolbar": {
+    "dayClose": "일일 마감",
+    "pay": "지급",
+    "payTitle": "지급 · 출금 (임대료, 물품, 거래처, 환불)",
+    "receive": "수납",
+    "receiveTitle": "수납 · 환자로부터 입금",
+    "addPending": "대기 항목 추가",
+    "give": "줄 돈",
+    "giveSub": "환자나 상대방에게 돌려줄 돈",
+    "take": "받을 돈",
+    "takeSub": "환자나 상대방이 우리에게 지급"
+  },
+  "columns": {
+    "ref": "번호",
+    "what": "구분",
+    "when": "일시",
+    "party": "보낸 곳 / 받는 곳",
+    "mode": "수단",
+    "amount": "금액",
+    "by": "담당",
+    "who": "대상",
+    "way": "방향",
+    "why": "사유",
+    "since": "발생일",
+    "state": "상태"
+  },
+  "filters": {
+    "show": "표시",
+    "all": "전체"
+  },
+  "directions": {
+    "received": "입금",
+    "paid": "출금"
+  },
+  "kinds": {
+    "receipt": "입금",
+    "refund": "환자 환불",
+    "expense": "출금",
+    "money_back": "환급 입금"
+  },
+  "ledger": {
+    "records": "내역",
+    "today": "오늘 {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_other": "{{count}}회 수정 · 최근 {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "청구서 #{{seq}}",
+      "sale": "판매 · 청구서 #{{seq}}",
+      "refund": "환불 · 대변 메모",
+      "refundNote": "환불 · 대변 메모 {{note}}",
+      "refundFor": "청구서 #{{seq}} 건",
+      "moneyBack": "환급 입금",
+      "medicalBill": "약국 발주 #{{seq}} · 청구서 {{bill}}",
+      "stockBill": "재고 발주 #{{seq}} · 청구서 {{bill}}",
+      "fromCredit": "{{ref}}에서"
+    },
+    "dayClosed": "{{ref}} · 마감된 날",
+    "dayClosedEdited_other": "{{ref}} · 마감된 날 · {{count}}회 수정"
+  },
+  "rowActions": {
+    "edit": "편집",
+    "delete": "삭제",
+    "giveBack": "돌려주기",
+    "gotBack": "돌려받음",
+    "useOnBill": "다음 청구서에 사용"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "empty": {
+    "ledgerTitle": "일치하는 내역이 없습니다",
+    "pendingTitle": "대기 중인 항목이 없습니다",
+    "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+    "receive": "수납"
+  },
+  "deleteEntry": {
+    "title": "이 결제를 삭제할까요?",
+    "effect": "마감 전까지 가능합니다. 삭제 기록은 감사 로그에 남습니다.",
+    "effectInvoice": "마감 전까지 가능합니다. 청구서 #{{seq}}의 미수금이 {{due}}로 돌아갑니다. 삭제 기록은 감사 로그에 남습니다.",
+    "reasons": {
+      "twice": "중복 입력",
+      "amount": "금액 오류",
+      "party": "환자 또는 수취인 오류"
+    },
+    "removed": "{{ref}} 삭제됨",
+    "removedInvoice": "{{ref}} 삭제됨 · 청구서 잔액 복원"
+  },
+  "dialog": {
+    "record": "결제",
+    "credit": "대기 항목"
+  },
+  "pending": {
+    "records": "대기 항목",
+    "patient": "환자",
+    "party": "공급처 / 상대방",
+    "ways": {
+      "give": "줄 돈",
+      "take": "받을 돈"
+    },
+    "wayTitles": {
+      "give": "우리가 돌려줌",
+      "take": "상대방이 지급"
+    },
+    "states": {
+      "open": "진행 중",
+      "given_back": "반환됨",
+      "got_back": "받음",
+      "used": "정산됨"
+    },
+    "settledToday": "{{state}} · 오늘",
+    "adjusted": "{{amount}} 정산됨",
+    "source": "{{ref}}에서 · {{direction}}",
+    "invoice": "청구서 #{{seq}}",
+    "byHand": "직접 입력",
+    "deleteTitle": "이 대기 항목을 삭제할까요?",
+    "deleted": "{{ref}} 삭제됨",
+    "reasons": {
+      "charged_twice": "이중 청구",
+      "advance_not_used": "선수금 미사용",
+      "package_cancelled": "패키지 취소",
+      "overpaid": "초과 결제",
+      "returned_items": "반품",
+      "short_payment": "미납액",
+      "damaged_goods": "파손품 반품",
+      "advance_given": "선지급",
+      "loan_to_staff": "직원 대여금",
+      "other": "기타"
+    }
   }
 }

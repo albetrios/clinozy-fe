@@ -84,7 +84,21 @@ import {
   validatePatientCreateSearch,
   validatePatientsSearch,
 } from '@/pages/organization/$organizationSlug/patients/patients.search.ts';
+import { manifest as paymentEditManifest } from '@/pages/organization/$organizationSlug/payments/$paymentId/edit/edit.manifest.ts';
+import { manifest as dayCloseManifest } from '@/pages/organization/$organizationSlug/payments/day-close/day-close.manifest.ts';
+import { manifest as payManifest } from '@/pages/organization/$organizationSlug/payments/pay/pay.manifest.ts';
 import { manifest as paymentsManifest } from '@/pages/organization/$organizationSlug/payments/payments.manifest.ts';
+import {
+  validateDayCloseSearch,
+  validatePaymentPaySearch,
+  validatePaymentReceiveSearch,
+  validatePaymentsSearch,
+} from '@/pages/organization/$organizationSlug/payments/payments.search.ts';
+import { manifest as creditEditManifest } from '@/pages/organization/$organizationSlug/payments/pending/$creditId/edit/edit.manifest.ts';
+import { manifest as pendingCreateManifest } from '@/pages/organization/$organizationSlug/payments/pending/create/create.manifest.ts';
+import { manifest as pendingManifest } from '@/pages/organization/$organizationSlug/payments/pending/pending.manifest.ts';
+import { validatePendingSearch } from '@/pages/organization/$organizationSlug/payments/pending/pending.search.ts';
+import { manifest as receiveManifest } from '@/pages/organization/$organizationSlug/payments/receive/receive.manifest.ts';
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
@@ -280,6 +294,45 @@ const PaymentsPage = lazyRouteComponent(
     [I18N_NAMESPACES.payments],
     () => import('@/pages/organization/$organizationSlug/payments/payments.route.tsx'),
   ),
+  'Component',
+);
+const PaymentsPendingPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.payments],
+    () =>
+      import('@/pages/organization/$organizationSlug/payments/pending/pending.route.tsx'),
+  ),
+  'Component',
+);
+// The Payments room's dialog routes render nothing of their own (the ledger or
+// Pending opens the drawer), so they need no namespace beyond the room's.
+const PaymentReceiveRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/payments/receive/receive.route.tsx'),
+  'Component',
+);
+const PaymentPayRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/payments/pay/pay.route.tsx'),
+  'Component',
+);
+const PaymentEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/payments/$paymentId/edit/edit.route.tsx'),
+  'Component',
+);
+const DayCloseRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/payments/day-close/day-close.route.tsx'),
+  'Component',
+);
+const PendingCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/payments/pending/create/create.route.tsx'),
+  'Component',
+);
+const CreditEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/payments/pending/$creditId/edit/edit.route.tsx'),
   'Component',
 );
 const TasksPage = lazyRouteComponent(
@@ -970,17 +1023,126 @@ const organizationPatientCreateRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// `/payments` is the ledger itself (D24, `S:84`); its drawers are URL-driven
+// dialogs over it — each renders nothing, the page reads the URL and opens it.
 const organizationPaymentsRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'payments',
   head: manifestHead(paymentsManifest),
   staticData: { manifest: paymentsManifest },
+  validateSearch: validatePaymentsSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(paymentsManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: PaymentsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPaymentReceiveRoute = createRoute({
+  getParentRoute: () => organizationPaymentsRoute,
+  path: 'receive',
+  head: manifestHead(receiveManifest),
+  staticData: { manifest: receiveManifest },
+  validateSearch: validatePaymentReceiveSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(receiveManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PaymentReceiveRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPaymentPayRoute = createRoute({
+  getParentRoute: () => organizationPaymentsRoute,
+  path: 'pay',
+  head: manifestHead(payManifest),
+  staticData: { manifest: payManifest },
+  validateSearch: validatePaymentPaySearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(payManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PaymentPayRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPaymentEditRoute = createRoute({
+  getParentRoute: () => organizationPaymentsRoute,
+  path: '$paymentId/edit',
+  head: manifestHead(paymentEditManifest),
+  staticData: { manifest: paymentEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(paymentEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PaymentEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationDayCloseRoute = createRoute({
+  getParentRoute: () => organizationPaymentsRoute,
+  path: 'day-close',
+  head: manifestHead(dayCloseManifest),
+  staticData: { manifest: dayCloseManifest },
+  validateSearch: validateDayCloseSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(dayCloseManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: DayCloseRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+// Payments › Pending (`S:88`): the room's second tab, a page of its own — a
+// sibling of the ledger in the tree, a child folder on disk.
+const organizationPaymentsPendingRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'payments/pending',
+  head: manifestHead(pendingManifest),
+  staticData: { manifest: pendingManifest },
+  validateSearch: validatePendingSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(pendingManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PaymentsPendingPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// Add pending's `?direction=give|take` (`S:89`) is Pending's own `direction`
+// filter (`S:88`) — one key, read by both.
+const organizationPendingCreateRoute = createRoute({
+  getParentRoute: () => organizationPaymentsPendingRoute,
+  path: 'create',
+  head: manifestHead(pendingCreateManifest),
+  staticData: { manifest: pendingCreateManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(pendingCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: PendingCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationCreditEditRoute = createRoute({
+  getParentRoute: () => organizationPaymentsPendingRoute,
+  path: '$creditId/edit',
+  head: manifestHead(creditEditManifest),
+  staticData: { manifest: creditEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(creditEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: CreditEditRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1399,7 +1561,16 @@ const routeTree = rootRoute.addChildren([
       organizationStockIndexRoute,
       organizationStockItemsRoute,
     ]),
-    organizationPaymentsRoute,
+    organizationPaymentsRoute.addChildren([
+      organizationPaymentReceiveRoute,
+      organizationPaymentPayRoute,
+      organizationPaymentEditRoute,
+      organizationDayCloseRoute,
+    ]),
+    organizationPaymentsPendingRoute.addChildren([
+      organizationPendingCreateRoute,
+      organizationCreditEditRoute,
+    ]),
     organizationTasksRoute.addChildren([
       organizationTaskCreateRoute,
       organizationTaskRoute,

@@ -58,6 +58,13 @@ export interface DataTableColumnMeta {
    * cell that folds to nothing.
    */
   foldValue?(original: unknown): DataTableFoldValue | string | null | undefined;
+  /**
+   * A primary column whose rows are not all people — a patient's chip beside a
+   * supplier's plain name (Payments' From / to, Pending's Who): whether this
+   * row's cell draws the avatar, so its meta line indents under the name as a
+   * `person` column's does on every row (H:4112).
+   */
+  drawsAvatar?(original: unknown): boolean;
   /** `regrid` phone layout: this cell's literal grid placement classes. */
   phoneClassName?: string;
   /** `regrid` phone layout: leave this cell out on a phone. */

@@ -1,0 +1,653 @@
+import { displayId } from './clinic-display-id.ts';
+import { createdFilterMatches } from './clinic-filter-match.ts';
+import {
+  clinicHttpError,
+  compareText,
+  type CreateInput,
+  type CursorPage,
+  FIXTURE_ACTOR_ID,
+  refuseUnknownIds,
+  validateClinicInput,
+} from './clinic-fixture-store.ts';
+import { invoiceBalance } from './clinic-money.ts';
+import type { DeleteReason, MedicalPurchaseOrder, PaymentMode } from './clinic-schema.ts';
+import {
+  civilDayOffset,
+  clinicClockTime,
+  clinicInstant,
+  clinicToday,
+} from './clinic-time.ts';
+import { assertDayOpen, ledgerDayOf, runDayCloseJob } from './day-close-api.ts';
+import { patientName } from './patients-contracts.ts';
+import {
+  type LedgerListParams,
+  type LedgerPerson,
+  type LedgerRow,
+  type OpenInvoice,
+  type OpenSupplierBill,
+  type PayExpenseInput,
+  payExpenseInputSchema,
+  type PaymentEdit,
+  type PaymentPatch,
+  type PaymentRecord,
+  type ReceivePaymentInput,
+  receivePaymentInputSchema,
+} from './payments-contracts.ts';
+
+/*
+ * The Payments ledger's reads and writes (`S:1699–1711`), on the fixture world
+ * until clinozy-be serves them — every call is REPLACE_WITH_API (D6). The world
+ * is imported on demand, so its seed data never lands in a route chunk. Every
+ * read and write first runs the auto-close job: an entry's lock is the
+ * server's (`dayCloseId`, `S:662`), and a write to a closed day is a 409.
+ */
+
+/** TanStack Query keys for the ledger — all under `['clinic', 'payments']`. */
+export const paymentQueryKeys = {
+  all: ['clinic', 'payments'] as const,
+  /** Every ledger variant — a write invalidates them all. */
+  lists: () => [...paymentQueryKeys.all, 'list'] as const,
+  list: (params: LedgerListParams) => [...paymentQueryKeys.lists(), params] as const,
+  detail: (id: string) => [...paymentQueryKeys.all, 'detail', id] as const,
+  /** A patient's invoices with a due — the Receive drawer's chips. */
+  openInvoices: (patientId: string) =>
+    [...paymentQueryKeys.all, 'open-invoices', patientId] as const,
+  /** The supplier bills with a balance — Send payment's first step. */
+  openBills: () => [...paymentQueryKeys.all, 'open-bills'] as const,
+};
+
+const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
+const fixtureStaff = () => import('./fixtures/staff.fixtures.ts');
+
+type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+
+const DAY_CLOSED = 'Day closed';
+const MORE_THAN_DUE = 'More than what is due';
+
+// ── Joins (the fixture server's) ──
+
+/** What every ledger read needs beside the entries. */
+interface LedgerContext {
+  patients: ReadonlyMap<string, { name: string; seq: number }>;
+  invoices: ReadonlyMap<string, LedgerRow['invoice']>;
+  creditNotes: ReadonlyMap<string, number>;
+  purchases: ReadonlyMap<string, number>;
+  credits: ReadonlyMap<string, number>;
+  staff: ReadonlyMap<string, LedgerPerson>;
+  viewerId: string;
+}
+
+async function ledgerContext(world: FixtureWorld): Promise<LedgerContext> {
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  const payments = world.payments.snapshot();
+  const bySeq = <T extends { id: string; seq: number }>(rows: readonly T[]) =>
+    new Map(rows.map((row) => [row.id, row.seq]));
+  return {
+    patients: new Map(
+      world.patients
+        .snapshot()
+        .map((patient) => [patient.id, { name: patientName(patient), seq: patient.seq }]),
+    ),
+    invoices: new Map(
+      world.invoices.snapshot().map((invoice) => [
+        invoice.id,
+        {
+          seq: invoice.seq,
+          type: invoice.type,
+          due: invoiceBalance(invoice, payments).due,
+        },
+      ]),
+    ),
+    creditNotes: bySeq(world.creditNotes.snapshot()),
+    purchases: new Map([
+      ...bySeq(world.purchaseOrders.snapshot()),
+      ...bySeq(world.stockPurchases.snapshot()),
+    ]),
+    credits: bySeq(world.pendingCredits.snapshot()),
+    staff: new Map(
+      world.staff.snapshot().map((member) => [
+        member.id,
+        {
+          id: member.id,
+          name: [member.firstName, member.lastName].filter(Boolean).join(' '),
+          initials: member.initials,
+          tone: member.tone,
+        },
+      ]),
+    ),
+    viewerId: FIXTURE_VIEWER_ID,
+  };
+}
+
+/** The member behind an entry: the fixture actor is the signed-in viewer. */
+function byOf(payment: PaymentRecord, context: LedgerContext): LedgerPerson | null {
+  const id =
+    payment.createdById === FIXTURE_ACTOR_ID ? context.viewerId : payment.createdById;
+  return context.staff.get(id) ?? null;
+}
+
+/** The value `id` names in `map`, null when there is no id or no such entry. */
+function lookup<T>(map: ReadonlyMap<string, T>, id: string | null): T | null {
+  return id === null ? null : (map.get(id) ?? null);
+}
+
+/** The supplier bill an entry paid: its kind, the purchase's number and the bill number. */
+function billOf(payment: PaymentRecord, context: LedgerContext): LedgerRow['bill'] {
+  const { billRef } = payment;
+  if (!billRef || billRef.kind === 'other') return null;
+  return {
+    kind: billRef.kind,
+    seq: context.purchases.get(billRef.purchaseId) ?? 0,
+    billNo: billRef.billNo,
+  };
+}
+
+function toLedgerRow(payment: PaymentRecord, context: LedgerContext): LedgerRow {
+  const patient = lookup(context.patients, payment.patientId);
+  return {
+    ...payment,
+    partyName: patient?.name ?? payment.payeeName ?? '—',
+    patientSeq: patient?.seq ?? null,
+    invoice: lookup(context.invoices, payment.invoiceId),
+    creditNoteSeq: lookup(context.creditNotes, payment.creditNoteId),
+    bill: billOf(payment, context),
+    pendingCreditSeq: lookup(context.credits, payment.pendingCreditId),
+    by: byOf(payment, context),
+    locked: payment.dayCloseId !== null,
+  };
+}
+
+// ── Search and filters (the fixture server's) ──
+
+const squeeze = (text: string) => text.toLowerCase().replace(/[\s#·-]/g, '');
+
+/** Whether a row matches `q`: "PAY-5512", the party, "#785" or the note (`S:1699`). */
+function matchesSearch(row: LedgerRow, query: string): boolean {
+  const needle = squeeze(query);
+  if (!needle) return true;
+  return [
+    displayId.payment(row.seq),
+    row.partyName,
+    row.invoice ? `${row.invoice.seq}` : '',
+    row.note ?? '',
+    row.reference ?? '',
+  ]
+    .map(squeeze)
+    .some((field) => field.includes(needle));
+}
+
+/** The What filter's kind for an entry: a supplier bill is an expense. */
+function whatOf(payment: PaymentRecord) {
+  return payment.kind === 'supplier_bill' ? 'expense' : payment.kind;
+}
+
+/** The list params' checks, each passing while its param is unset. */
+const LEDGER_CHECKS: readonly ((
+  row: LedgerRow,
+  params: LedgerListParams,
+  today: string,
+) => boolean)[] = [
+  (row, { direction }) => !direction || row.direction === direction,
+  (row, { kind }) => !kind?.length || (kind as readonly string[]).includes(whatOf(row)),
+  (row, { mode }) =>
+    !mode?.length || row.splits.some((split) => mode.includes(split.mode)),
+  (row, { created }, today) =>
+    !created || createdFilterMatches(row.createdAt, created, today),
+  (row, { day }) => !day || ledgerDayOf(row) === day,
+  (row, { branchIds }) => !branchIds?.length || branchIds.includes(row.branchId),
+  (row, { q }) => matchesSearch(row, q ?? ''),
+];
+
+function passesFilters(row: LedgerRow, params: LedgerListParams, today: string): boolean {
+  return LEDGER_CHECKS.every((check) => check(row, params, today));
+}
+
+/** Newest first — `paidAt`, then the newer number (`payments.md:31`). */
+const newestFirst = (a: PaymentRecord, b: PaymentRecord) =>
+  compareText(b.paidAt, a.paidAt) || b.seq - a.seq;
+
+// ── Reads ──
+
+/**
+ * One cursor page of the ledger (`listLedger`, `S:1699`; REPLACE_WITH_API):
+ * receipts, refunds and expenses merged, newest first, filtered by Show, What,
+ * Mode, Created, `q`, the reviewed day and the header branches. Each row names
+ * its party, invoice, bill, credit, author and lock.
+ */
+export async function listLedger(
+  params: LedgerListParams = {},
+  cursor: string | null = null,
+): Promise<CursorPage<LedgerRow>> {
+  await runDayCloseJob();
+  const { clinicFixtures } = await fixtureWorld();
+  const context = await ledgerContext(clinicFixtures);
+  const today = clinicToday();
+  const rows = clinicFixtures.payments
+    .snapshot()
+    .map((payment) => toLedgerRow(payment, context))
+    .filter((row) => passesFilters(row, params, today))
+    .sort(newestFirst);
+  const start = cursor ? Number(cursor) : 0;
+  const end = start + 50;
+  return {
+    items: rows.slice(start, end),
+    nextCursor: end < rows.length ? String(end) : null,
+  };
+}
+
+/** One ledger entry (REPLACE_WITH_API) — a 404 when it is unknown or deleted. */
+export async function fetchPayment(id: string): Promise<LedgerRow> {
+  await runDayCloseJob();
+  const { clinicFixtures } = await fixtureWorld();
+  const payment = await clinicFixtures.payments.get(id);
+  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+}
+
+/**
+ * A patient's invoices with something due (`listOpenInvoices`, `S:1702`;
+ * REPLACE_WITH_API), oldest first — the Receive drawer's "Against invoice".
+ */
+export async function listOpenInvoices(patientId: string): Promise<OpenInvoice[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  const payments = clinicFixtures.payments.snapshot();
+  return clinicFixtures.invoices
+    .snapshot((invoice) => invoice.patientId === patientId)
+    .map((invoice) => ({ invoice, balance: invoiceBalance(invoice, payments) }))
+    .filter(({ balance }) => balance.due > 0)
+    .sort(
+      (a, b) =>
+        compareText(a.invoice.date, b.invoice.date) || a.invoice.seq - b.invoice.seq,
+    )
+    .map(({ invoice, balance }) => ({
+      id: invoice.id,
+      seq: invoice.seq,
+      type: invoice.type,
+      date: invoice.date,
+      bill: balance.bill,
+      paid: balance.paid,
+      due: balance.due,
+    }));
+}
+
+/** A Medical PO's bill: Σ qty × rate — free units are not billed (`S:769`). */
+function purchaseOrderBill(order: MedicalPurchaseOrder): number {
+  return order.items.reduce((sum, item) => sum + item.qty * item.rate, 0);
+}
+
+/**
+ * The supplier bills with a balance (`listOpenSupplierBills`, `S:1701`;
+ * REPLACE_WITH_API): received Medical POs and Clinic stock purchases, oldest
+ * first, each with its supplier, bill number, due and age.
+ */
+export async function listOpenSupplierBills(): Promise<OpenSupplierBill[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  const today = clinicToday();
+  const suppliers = new Map(
+    clinicFixtures.suppliers.snapshot().map((supplier) => [supplier.id, supplier.name]),
+  );
+  const vendors = new Map(
+    clinicFixtures.stockVendors.snapshot().map((vendor) => [vendor.id, vendor.name]),
+  );
+  const medical = clinicFixtures.purchaseOrders
+    .snapshot((order) => order.stage === 'received')
+    .map((order): OpenSupplierBill => ({
+      kind: 'medical_po',
+      purchaseId: order.id,
+      seq: order.seq,
+      billNo: order.supplierBillNo ?? '',
+      supplierName: suppliers.get(order.supplierId) ?? '',
+      date: order.date,
+      due: Math.max(0, purchaseOrderBill(order) - order.paid),
+      daysPending: Math.max(0, civilDayOffset(order.date, today)),
+    }));
+  const stock = clinicFixtures.stockPurchases
+    .snapshot()
+    .map((purchase): OpenSupplierBill => ({
+      kind: 'stock_po',
+      purchaseId: purchase.id,
+      seq: purchase.seq,
+      billNo: purchase.billNo ?? '',
+      supplierName: vendors.get(purchase.vendorId) ?? '',
+      date: purchase.date,
+      due: Math.max(0, purchase.bill - purchase.paid),
+      daysPending: Math.max(0, civilDayOffset(purchase.date, today)),
+    }));
+  return [...medical, ...stock]
+    .filter((bill) => bill.due > 0)
+    .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq);
+}
+
+// ── Writes ──
+
+/** Σ of the split rows, in paise. */
+const splitTotal = (splits: readonly { amount: number }[]) =>
+  splits.reduce((sum, split) => sum + split.amount, 0);
+
+/** The modes of the split rows, each once, in order. */
+const modesOf = (splits: readonly { mode: PaymentMode }[]) => [
+  ...new Set(splits.map((split) => split.mode)),
+];
+
+/** A 422 on the split rows: the amount is above what the invoice still owes (`S:1708`). */
+function refuseAboveDue(): never {
+  throw clinicHttpError(422, 'validation', MORE_THAN_DUE, { splits: [MORE_THAN_DUE] });
+}
+
+/** The due on an invoice, leaving out one entry (an edit's own). */
+async function invoiceDue(invoiceId: string, exceptPaymentId: string | null) {
+  const { clinicFixtures } = await fixtureWorld();
+  const invoice = await clinicFixtures.invoices.get(invoiceId);
+  const payments = clinicFixtures.payments.snapshot(
+    (payment) => payment.id !== exceptPaymentId,
+  );
+  return { invoice, due: invoiceBalance(invoice, payments).due };
+}
+
+/** What every new entry starts from; the kind's fields come from the caller. */
+function newEntry(
+  fields: Pick<
+    CreateInput<PaymentRecord>,
+    'direction' | 'kind' | 'branchId' | 'amount' | 'splits'
+  > &
+    Partial<CreateInput<PaymentRecord>>,
+): CreateInput<PaymentRecord> {
+  return {
+    patientId: null,
+    invoiceId: null,
+    payeeName: null,
+    expenseCategory: null,
+    billRef: null,
+    creditNoteId: null,
+    pendingCreditId: null,
+    note: null,
+    dayCloseId: null,
+    reference: null,
+    edits: [],
+    attachmentKeys: [],
+    paidAt: new Date().toISOString(),
+    ...fields,
+  };
+}
+
+/**
+ * Receive payment (`receivePayment`, `S:1708`; REPLACE_WITH_API): a receipt
+ * from a patient — required — against one of their invoices or none. An amount
+ * above that invoice's due is a 422; a closed day a 409. The invoice's due
+ * follows from the receipts (`S:622`).
+ */
+export async function receivePayment(input: ReceivePaymentInput): Promise<LedgerRow> {
+  const { clinicFixtures } = await fixtureWorld();
+  const fields = validateClinicInput(receivePaymentInputSchema, input);
+  refuseUnknownIds(
+    'patientId',
+    [fields.patientId],
+    clinicFixtures.patients.snapshot(),
+    'Pick a patient',
+  );
+  const amount = splitTotal(fields.splits);
+  if (fields.invoiceId) {
+    const { invoice, due } = await invoiceDue(fields.invoiceId, null);
+    if (invoice.patientId !== fields.patientId) {
+      throw clinicHttpError(422, 'validation', 'Pick one of this patient’s invoices', {
+        invoiceId: ['Pick one of this patient’s invoices'],
+      });
+    }
+    if (amount > due) refuseAboveDue();
+  }
+  await assertDayOpen(fields.branchId, clinicToday());
+  const payment = await clinicFixtures.payments.create(
+    newEntry({
+      direction: 'received',
+      kind: 'receipt',
+      branchId: fields.branchId,
+      amount,
+      splits: fields.splits,
+      patientId: fields.patientId,
+      invoiceId: fields.invoiceId,
+      reference: fields.reference || null,
+      note: fields.note || null,
+    }),
+  );
+  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+}
+
+/** The paid figure of a purchase changes by `delta` paise; a Medical PO paid in full is Paid. */
+async function settleBill(
+  billRef: NonNullable<PaymentRecord['billRef']>,
+  delta: number,
+): Promise<void> {
+  const { clinicFixtures } = await fixtureWorld();
+  if (billRef.kind === 'medical_po') {
+    const order = await clinicFixtures.purchaseOrders.get(billRef.purchaseId);
+    const paid = Math.max(0, order.paid + delta);
+    const settled = paid >= purchaseOrderBill(order);
+    let stage = order.stage;
+    if (settled && order.stage === 'received') stage = 'paid';
+    else if (!settled && order.stage === 'paid') stage = 'received';
+    await clinicFixtures.purchaseOrders.update(order.id, { paid, stage });
+    return;
+  }
+  if (billRef.kind === 'stock_po') {
+    const purchase = await clinicFixtures.stockPurchases.get(billRef.purchaseId);
+    await clinicFixtures.stockPurchases.update(purchase.id, {
+      paid: Math.max(0, purchase.paid + delta),
+    });
+  }
+}
+
+/** The instant an expense paid on `day` is recorded at: now, or that day at the current clock time. */
+function paidAtOn(day: string): string {
+  const now = new Date();
+  if (day === clinicToday(now)) return now.toISOString();
+  return clinicInstant(day, clinicClockTime(now));
+}
+
+/**
+ * Send payment (`payExpense`, `S:1709`; REPLACE_WITH_API): clinic spend, or a
+ * payment against a supplier bill — the single PO payment path (Q-M1) — which
+ * raises that purchase's paid and moves a Medical PO paid in full to Paid. A
+ * closed day is a 409; more than the bill's due a 422.
+ */
+export async function payExpense(input: PayExpenseInput): Promise<LedgerRow> {
+  const { clinicFixtures } = await fixtureWorld();
+  const fields = validateClinicInput(payExpenseInputSchema, input);
+  if (fields.billRef) {
+    const bills = await listOpenSupplierBills();
+    const bill = bills.find((open) => open.purchaseId === fields.billRef?.purchaseId);
+    if (!bill) {
+      throw clinicHttpError(422, 'validation', 'This bill is already paid', {
+        billRef: ['This bill is already paid'],
+      });
+    }
+    if (fields.amount > bill.due) {
+      throw clinicHttpError(422, 'validation', MORE_THAN_DUE, {
+        amount: [MORE_THAN_DUE],
+      });
+    }
+  }
+  await assertDayOpen(fields.branchId, fields.paidOn);
+  const payment = await clinicFixtures.payments.create(
+    newEntry({
+      direction: 'paid',
+      kind: fields.billRef ? 'supplier_bill' : 'expense',
+      branchId: fields.branchId,
+      amount: fields.amount,
+      splits: [{ mode: fields.mode, amount: fields.amount }],
+      payeeName: fields.payeeName,
+      expenseCategory: fields.expenseCategory,
+      billRef: fields.billRef,
+      note: fields.note || null,
+      attachmentKeys: fields.attachmentKeys,
+      paidAt: paidAtOn(fields.paidOn),
+    }),
+  );
+  if (fields.billRef) await settleBill(fields.billRef, fields.amount);
+  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+}
+
+/** Refuse a change to an entry whose day is closed: "PAY-5509 · Day closed" (409). */
+async function assertEntryOpen(payment: PaymentRecord): Promise<void> {
+  await runDayCloseJob();
+  const { clinicFixtures } = await fixtureWorld();
+  const current = await clinicFixtures.payments.get(payment.id);
+  if (current.dayCloseId !== null) {
+    throw clinicHttpError(
+      409,
+      'conflict',
+      `${displayId.payment(payment.seq)} · ${DAY_CLOSED}`,
+    );
+  }
+  await assertDayOpen(
+    payment.branchId,
+    ledgerDayOf(payment),
+    `${displayId.payment(payment.seq)} · ${DAY_CLOSED}`,
+  );
+}
+
+/** A receipt's change: its split rows, Reference and Note — still at most its invoice's due. */
+async function receiptChange(
+  saved: PaymentRecord,
+  patch: PaymentPatch,
+): Promise<Partial<PaymentRecord>> {
+  const fields = validateClinicInput(receivePaymentInputSchema, {
+    branchId: saved.branchId,
+    patientId: saved.patientId,
+    invoiceId: saved.invoiceId,
+    splits: patch.splits ?? saved.splits,
+    reference: patch.reference === undefined ? saved.reference : patch.reference,
+    note: patch.note === undefined ? saved.note : patch.note,
+  });
+  const amount = splitTotal(fields.splits);
+  if (saved.invoiceId) {
+    const { due } = await invoiceDue(saved.invoiceId, saved.id);
+    if (amount > due) refuseAboveDue();
+  }
+  return {
+    amount,
+    splits: fields.splits,
+    reference: fields.reference || null,
+    note: fields.note || null,
+  };
+}
+
+/** An expense's payee, category and mode as saved — what a patch changes. */
+function savedExpense(saved: PaymentRecord) {
+  return {
+    payeeName: saved.payeeName ?? '',
+    expenseCategory: saved.expenseCategory ?? 'misc',
+    mode: saved.splits[0]?.mode ?? 'cash',
+  };
+}
+
+/**
+ * An expense's or a supplier bill's change: payee, category, amount, mode, note
+ * and photos — a bill's purchase following the new amount.
+ */
+async function expenseChange(
+  saved: PaymentRecord,
+  patch: PaymentPatch,
+): Promise<Partial<PaymentRecord>> {
+  const billRef = saved.billRef?.kind === 'other' ? null : saved.billRef;
+  const current = savedExpense(saved);
+  const fields = validateClinicInput(payExpenseInputSchema, {
+    branchId: saved.branchId,
+    billRef,
+    payeeName: patch.payeeName ?? current.payeeName,
+    expenseCategory: patch.expenseCategory ?? current.expenseCategory,
+    amount: patch.amount ?? saved.amount,
+    mode: patch.mode ?? current.mode,
+    paidOn: ledgerDayOf(saved),
+    note: patch.note === undefined ? saved.note : patch.note,
+    attachmentKeys: patch.attachmentKeys ?? saved.attachmentKeys,
+  });
+  if (billRef && fields.amount !== saved.amount) {
+    await settleBill(billRef, fields.amount - saved.amount);
+  }
+  return {
+    amount: fields.amount,
+    splits: [{ mode: fields.mode, amount: fields.amount }],
+    payeeName: fields.payeeName,
+    expenseCategory: fields.expenseCategory,
+    note: fields.note || null,
+    attachmentKeys: fields.attachmentKeys,
+  };
+}
+
+/**
+ * The entry's edit log after a change (Appendix F): a line when the amount or
+ * the modes moved — "₹600 UPI → ₹700 UPI" — the log as it was otherwise.
+ */
+function editsAfter(
+  saved: PaymentRecord,
+  next: Partial<PaymentRecord>,
+  byId: string,
+): PaymentEdit[] {
+  const from = { amount: saved.amount, modes: modesOf(saved.splits) };
+  const to = { amount: next.amount ?? saved.amount, modes: modesOf(next.splits ?? []) };
+  if (from.amount === to.amount && from.modes.join() === to.modes.join()) {
+    return saved.edits;
+  }
+  return [...saved.edits, { at: new Date().toISOString(), byId, from, to }];
+}
+
+/**
+ * Change an open-day entry (`updatePayment`, `S:1710`; REPLACE_WITH_API): a
+ * receipt's split rows, Reference and Note — still at most its invoice's due —
+ * or an expense's payee, category, amount, mode, note and photos. A change of
+ * the amount or the modes is logged on the entry (Appendix F); a closed day is
+ * a 409 and the drawer turns read-only.
+ */
+export async function updatePayment(id: string, patch: PaymentPatch): Promise<LedgerRow> {
+  const { clinicFixtures } = await fixtureWorld();
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  const saved = await clinicFixtures.payments.get(id);
+  await assertEntryOpen(saved);
+  const next =
+    saved.direction === 'received'
+      ? await receiptChange(saved, patch)
+      : await expenseChange(saved, patch);
+  const payment = await clinicFixtures.payments.update(id, {
+    ...next,
+    edits: editsAfter(saved, next, FIXTURE_VIEWER_ID),
+  });
+  return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+}
+
+/**
+ * Delete an open-day entry with the confirm's reason (`S:1546`;
+ * REPLACE_WITH_API) — "Allowed until the day is closed" (409 after). A receipt's
+ * invoice goes back to its due; a supplier bill's purchase to its balance.
+ */
+export async function deletePayment(
+  id: string,
+  reason: DeleteReason,
+  note: string | null,
+): Promise<PaymentRecord> {
+  const { clinicFixtures } = await fixtureWorld();
+  const saved = await clinicFixtures.payments.get(id);
+  await assertEntryOpen(saved);
+  const removed = await clinicFixtures.payments.remove(id, reason, note);
+  if (saved.billRef && saved.billRef.kind !== 'other') {
+    await settleBill(saved.billRef, -saved.amount);
+  }
+  return removed;
+}
+
+/**
+ * Put a deleted entry back — the Undo of its "removed" toast (`POST …/restore`,
+ * D32); a 409 once its day has closed.
+ */
+export async function restorePayment(id: string): Promise<PaymentRecord> {
+  const { clinicFixtures } = await fixtureWorld();
+  const deleted = await clinicFixtures.payments.get(id, { includeDeleted: true });
+  await assertDayOpen(
+    deleted.branchId,
+    ledgerDayOf(deleted),
+    `${displayId.payment(deleted.seq)} · ${DAY_CLOSED}`,
+  );
+  const restored = await clinicFixtures.payments.restore(id);
+  if (restored.billRef && restored.billRef.kind !== 'other') {
+    await settleBill(restored.billRef, restored.amount);
+  }
+  return restored;
+}

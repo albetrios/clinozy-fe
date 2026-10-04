@@ -97,7 +97,12 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `patients-page`                  | Clinic room page: Patients (toolbar and table ids: the shared ones, `patients-…`) | `pages/organization/$organizationSlug/patients/`      |
 | `patient-drawer`                 | New patient drawer — `/patients/create` opens it over the list (L-32b)            | `pages/organization/$organizationSlug/patients/`      |
 | `patient-quick-add`              | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)             | `shared/components/PatientDrawer/`                    |
-| `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
+| `payments-page`                  | Clinic room page: Payments (toolbar and table ids: the shared ones, `payments-…`) | `pages/organization/$organizationSlug/payments/`      |
+| `payments-pending-page`          | Payments › Pending (toolbar and table ids: the shared ones, `payments-pending-…`) | `payments/pending/`                                   |
+| `receive-drawer`                 | Receive payment — `/payments/receive` over the ledger (L-39b)                     | `pages/organization/$organizationSlug/payments/`      |
+| `pay-drawer`                     | Send payment — `/payments/pay` over the ledger (L-39b)                            | `pages/organization/$organizationSlug/payments/`      |
+| `credit-drawer`                  | Add / Edit pending — over Payments › Pending (L-39c)                              | `payments/pending/`                                   |
+| `day-close-drawer`               | Day close — `/payments/day-close` over the ledger (L-41)                          | `pages/organization/$organizationSlug/payments/`      |
 | `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)               | `pages/organization/$organizationSlug/tasks/`         |
 | `new-task-drawer`                | New task — `/tasks/create` opens it over the list (L-47d)                         | `pages/organization/$organizationSlug/tasks/`         |
 | `task-drawer`                    | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                     | `pages/organization/$organizationSlug/tasks/`         |
@@ -225,7 +230,7 @@ ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) k
 
 | Test ID                                            | Element                                                                     | File                          |
 | -------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
-| `<tableId>-toolbar`                                | Toolbar row (`data-layout` `default` / `leads` / `tasks`)                   | `RoomToolbar/RoomToolbar.tsx` |
+| `<tableId>-toolbar`                                | Toolbar row (`data-layout` `default` / `leads` / `actions` / `tasks`)       | `RoomToolbar/RoomToolbar.tsx` |
 | `<tableId>-tabs` / `-tab-<tabId>`                  | Tab track (room tabs `nav`, or view tabs `tablist`) and each tab            | `RoomToolbar/RoomTabs/`       |
 | `<tableId>-tabs-more`                              | "More ⌄" (folded tabs); its list `-tabs-more-panel`, rows `-option-<tabId>` | `RoomToolbar/RoomTabs/`       |
 | `<tableId>-search`                                 | List search (`data-expanded`)                                               | `RoomToolbar/RoomSearch/`     |
@@ -713,3 +718,20 @@ and doctor pickers the shared picker ids; Cancel visit and Delete photo the shar
 | `appointment-form-photos` · `-photos-check-in` · `-photos-upload`                      | Visit photos · "Check in now" · "Upload photos"                                   | `PatientSections.tsx`       |
 | `appointment-form-photo` · `appointment-form-photo-delete`                             | One photo tile · its Delete                                                       | `PatientSections.tsx`       |
 | `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                               | `AppointmentForm.tsx`       |
+
+---
+
+## Payments room (launch L-39)
+
+`pages/organization/$organizationSlug/payments/`. Both tabs carry the shared toolbar and table ids
+above — the ledger under the `tableId` `payments` (`payments-toolbar`, `payments-tab-ledger`,
+`payments-tab-pending`, `payments-search`, `payments-filters-trigger`, `payments-pay`,
+`payments-receive`, `payments-fab`, `payments-table-row`, `payments-row-action-<edit|delete>`,
+`payments-table-bulk-export`), Pending under `payments-pending` (`payments-pending-add`,
+`payments-pending-new-menu`, `payments-pending-table-row`). Delete uses the shared confirm's ids.
+
+| Test ID                                 | Element                                           | Source                               |
+| --------------------------------------- | ------------------------------------------------- | ------------------------------------ |
+| `payments-day-close`                    | Ledger toolbar "Day close" (row 2 on a phone)     | `shared/components/PaymentsToolbar/` |
+| `payments-pending-day-close`            | Pending toolbar "Day close"                       | `shared/components/PaymentsToolbar/` |
+| `payments-pending-new-menu-option-give` | Add pending "⌄" menu: Give · `-option-take`: Take | `RoomToolbar/RoomPrimary/`           |

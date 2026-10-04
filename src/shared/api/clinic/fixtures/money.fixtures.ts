@@ -7,11 +7,11 @@ import type {
   Invoice,
   InvoiceItem,
   InvoiceType,
-  Payment,
   PaymentMode,
-  PendingCredit,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
+import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 
 import { medicineBySeq, SALE_ROWS } from './medical.fixtures.ts';
 import { findOfferingByName, offeringBySeq } from './offerings.fixtures.ts';
@@ -483,13 +483,17 @@ const paymentBase = (seq: number, at: string, by: StaffKey, today: string) => {
     pendingCreditId: null,
     paidAt,
     dayCloseId: closeOf(at),
+    // The plan's fields (Appendix F): no seed carries a reference, an edit or a photo.
+    reference: null,
+    edits: [],
+    attachmentKeys: [],
   };
 };
 
 /** The ledger: receipts and the refund, the added receipts, then the expenses. */
-export function paymentSeed(today: string = clinicToday()): Payment[] {
+export function paymentSeed(today: string = clinicToday()): PaymentRecord[] {
   const invoices = invoiceSeed(today);
-  const receipts = RECEIPT_ROWS.map((row): Payment => {
+  const receipts = RECEIPT_ROWS.map((row): PaymentRecord => {
     const amount = paise(Math.abs(row.amount));
     const refund = row.amount < 0;
     return {
@@ -505,7 +509,7 @@ export function paymentSeed(today: string = clinicToday()): Payment[] {
       note: row.note || null,
     };
   });
-  const added = ADDED_RECEIPTS.map((row): Payment => {
+  const added = ADDED_RECEIPTS.map((row): PaymentRecord => {
     const invoice = must(
       invoices.find((candidate) => candidate.seq === row.invoice),
       `invoice #${row.invoice}`,
@@ -524,7 +528,7 @@ export function paymentSeed(today: string = clinicToday()): Payment[] {
       note: null,
     };
   });
-  const expenses = EXPENSE_ROWS.map((row): Payment => {
+  const expenses = EXPENSE_ROWS.map((row): PaymentRecord => {
     const amount = paise(row.amount);
     return {
       ...paymentBase(row.seq, row.at, row.by, today),
@@ -546,7 +550,7 @@ export function paymentSeed(today: string = clinicToday()): Payment[] {
  * `PY_CR0` (H:3683), verbatim: "them" is give (we owe them), "us" is take
  * (they owe us); "from" is the payment it came from.
  */
-export function pendingCreditSeed(today: string = clinicToday()): PendingCredit[] {
+export function pendingCreditSeed(today: string = clinicToday()): PendingCreditRecord[] {
   const rows = [
     {
       seq: 2,
@@ -581,6 +585,14 @@ export function pendingCreditSeed(today: string = clinicToday()): PendingCredit[
     sourcePaymentId: ref.payment(row.from),
     status: 'open',
     settledPaymentId: null,
+    // The plan's fields (Appendix F): the seeds' reasons are free text — no chip,
+    // no invoice, no settle-by day — and nothing is settled yet.
+    reasonKey: null,
+    note: null,
+    invoiceId: null,
+    settleBy: null,
+    adjusted: 0,
+    settledAt: null,
   }));
 }
 

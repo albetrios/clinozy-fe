@@ -1,5 +1,150 @@
 {
   "manifest": {
     "title": "भुगतान"
+  },
+  "tabs": {
+    "label": "भुगतान के अनुभाग",
+    "ledger": "भुगतान",
+    "pending": "बाकी"
+  },
+  "search": {
+    "placeholder": "मरीज़, इनवॉइस या रसीद",
+    "label": "भुगतान खोजें"
+  },
+  "toolbar": {
+    "dayClose": "दिन का हिसाब",
+    "pay": "भुगतान करें",
+    "payTitle": "भुगतान · पैसा बाहर (किराया, सामान, विक्रेता, रिफ़ंड)",
+    "receive": "प्राप्त करें",
+    "receiveTitle": "प्राप्त करें · मरीज़ से आया पैसा",
+    "addPending": "बाकी जोड़ें",
+    "give": "देना",
+    "giveSub": "हम किसी मरीज़ या पक्ष को पैसा लौटाते हैं",
+    "take": "लेना",
+    "takeSub": "कोई मरीज़ या पक्ष हमें भुगतान करता है"
+  },
+  "columns": {
+    "ref": "संदर्भ",
+    "what": "क्या",
+    "when": "कब",
+    "party": "से / को",
+    "mode": "माध्यम",
+    "amount": "राशि",
+    "by": "द्वारा",
+    "who": "कौन",
+    "way": "किस ओर",
+    "why": "क्यों",
+    "since": "कब से",
+    "state": "स्थिति"
+  },
+  "filters": {
+    "show": "दिखाएँ",
+    "all": "सभी"
+  },
+  "directions": {
+    "received": "प्राप्त",
+    "paid": "भुगतान किया"
+  },
+  "kinds": {
+    "receipt": "प्राप्त",
+    "refund": "मरीज़ को रिफ़ंड",
+    "expense": "भुगतान किया",
+    "money_back": "पैसा वापस"
+  },
+  "ledger": {
+    "records": "प्रविष्टियाँ",
+    "today": "आज {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
+    "edited_other": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "इनवॉइस #{{seq}}",
+      "sale": "बिक्री · इनवॉइस #{{seq}}",
+      "refund": "रिफ़ंड · क्रेडिट नोट",
+      "refundNote": "रिफ़ंड · क्रेडिट नोट {{note}}",
+      "refundFor": "इनवॉइस #{{seq}} के लिए",
+      "moneyBack": "पैसा वापस",
+      "medicalBill": "मेडिकल PO #{{seq}} · बिल {{bill}}",
+      "stockBill": "स्टॉक PO #{{seq}} · बिल {{bill}}",
+      "fromCredit": "{{ref}} से"
+    },
+    "dayClosed": "{{ref}} · दिन बंद",
+    "dayClosedEdited_one": "{{ref}} · दिन बंद · {{count}}× बदला गया",
+    "dayClosedEdited_other": "{{ref}} · दिन बंद · {{count}}× बदला गया"
+  },
+  "rowActions": {
+    "edit": "संपादित करें",
+    "delete": "हटाएँ",
+    "giveBack": "वापस दें",
+    "gotBack": "वापस मिला",
+    "useOnBill": "अगले बिल में इस्तेमाल करें"
+  },
+  "bulk": {
+    "export": "निर्यात करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में निर्यात हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में निर्यात हुईं"
+  },
+  "empty": {
+    "ledgerTitle": "कोई प्रविष्टि मेल नहीं खाती",
+    "pendingTitle": "कुछ भी बाकी नहीं",
+    "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+    "receive": "प्राप्त करें"
+  },
+  "deleteEntry": {
+    "title": "यह भुगतान हटाएँ?",
+    "effect": "दिन बंद होने तक अनुमति है। हटाना ऑडिट लॉग में दर्ज रहता है।",
+    "effectInvoice": "दिन बंद होने तक अनुमति है। इनवॉइस #{{seq}} पर फिर से {{due}} बाकी होगा। हटाना ऑडिट लॉग में दर्ज रहता है।",
+    "reasons": {
+      "twice": "दो बार दर्ज हुआ",
+      "amount": "गलत राशि",
+      "party": "गलत मरीज़ या प्राप्तकर्ता"
+    },
+    "removed": "{{ref}} हटाया गया",
+    "removedInvoice": "{{ref}} हटाया गया · इनवॉइस बकाया वापस आया"
+  },
+  "dialog": {
+    "record": "भुगतान",
+    "credit": "बाकी"
+  },
+  "pending": {
+    "records": "बाकी प्रविष्टियाँ",
+    "patient": "मरीज़",
+    "party": "सप्लायर / पक्ष",
+    "ways": {
+      "give": "देना",
+      "take": "लेना"
+    },
+    "wayTitles": {
+      "give": "हम उन्हें पैसा लौटाते हैं",
+      "take": "वे हमें भुगतान करते हैं"
+    },
+    "states": {
+      "open": "खुला",
+      "given_back": "लौटाया",
+      "got_back": "प्राप्त",
+      "used": "समायोजित"
+    },
+    "settledToday": "{{state}} · आज",
+    "adjusted": "{{amount}} समायोजित",
+    "source": "{{ref}} से · {{direction}}",
+    "invoice": "इनवॉइस #{{seq}}",
+    "byHand": "हाथ से",
+    "deleteTitle": "यह बाकी प्रविष्टि हटाएँ?",
+    "deleted": "{{ref}} हटाया गया",
+    "reasons": {
+      "charged_twice": "दो बार वसूला",
+      "advance_not_used": "अग्रिम इस्तेमाल नहीं हुआ",
+      "package_cancelled": "पैकेज रद्द हुआ",
+      "overpaid": "ज़्यादा भुगतान",
+      "returned_items": "लौटाया गया सामान",
+      "short_payment": "कम भुगतान",
+      "damaged_goods": "खराब सामान लौटाया",
+      "advance_given": "अग्रिम दिया",
+      "loan_to_staff": "स्टाफ़ को उधार",
+      "other": "अन्य"
+    }
   }
 }

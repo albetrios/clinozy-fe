@@ -1149,5 +1149,15 @@
       "doctor": "医師を選んでください"
     },
     "copied": "コピーしました · 日付と時刻を選んでください"
+  },
+  "expenseCategories": {
+    "medicines": "医薬品",
+    "consumables": "消耗品",
+    "salary": "給与",
+    "rent": "家賃",
+    "marketing": "マーケティング",
+    "utilities": "光熱費",
+    "maintenance": "メンテナンス",
+    "misc": "その他"
   }
 }

@@ -1,5 +1,153 @@
 {
   "manifest": {
     "title": "Paiements"
+  },
+  "tabs": {
+    "label": "Sections des paiements",
+    "ledger": "Paiements",
+    "pending": "En attente"
+  },
+  "search": {
+    "placeholder": "Patient, facture ou reçu",
+    "label": "Rechercher des paiements"
+  },
+  "toolbar": {
+    "dayClose": "Clôture du jour",
+    "pay": "Payer",
+    "payTitle": "Payer · sortie d’argent (loyer, fournitures, fournisseurs, remboursements)",
+    "receive": "Encaisser",
+    "receiveTitle": "Encaisser · argent reçu d’un patient",
+    "addPending": "Ajouter en attente",
+    "give": "Donner",
+    "giveSub": "Nous remboursons un patient ou un tiers",
+    "take": "Recevoir",
+    "takeSub": "Un patient ou un tiers nous paie"
+  },
+  "columns": {
+    "ref": "Réf.",
+    "what": "Type",
+    "when": "Quand",
+    "party": "De / à",
+    "mode": "Mode",
+    "amount": "Montant",
+    "by": "Par",
+    "who": "Qui",
+    "way": "Sens",
+    "why": "Motif",
+    "since": "Depuis",
+    "state": "État"
+  },
+  "filters": {
+    "show": "Afficher",
+    "all": "Tout"
+  },
+  "directions": {
+    "received": "Reçu",
+    "paid": "Payé"
+  },
+  "kinds": {
+    "receipt": "Reçu",
+    "refund": "Remboursement au patient",
+    "expense": "Payé",
+    "money_back": "Remboursement reçu"
+  },
+  "ledger": {
+    "records": "écritures",
+    "today": "Aujourd’hui {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_one": "Modifié {{count}}× · dernier {{from}} → {{to}}",
+    "edited_many": "Modifié {{count}}× · dernier {{from}} → {{to}}",
+    "edited_other": "Modifié {{count}}× · dernier {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Facture n° {{seq}}",
+      "sale": "Vente · Facture n° {{seq}}",
+      "refund": "Remboursement · Avoir",
+      "refundNote": "Remboursement · Avoir {{note}}",
+      "refundFor": "pour la facture n° {{seq}}",
+      "moneyBack": "Remboursement reçu",
+      "medicalBill": "BC médical n° {{seq}} · facture {{bill}}",
+      "stockBill": "BC de stock n° {{seq}} · facture {{bill}}",
+      "fromCredit": "De {{ref}}"
+    },
+    "dayClosed": "{{ref}} · Journée clôturée",
+    "dayClosedEdited_one": "{{ref}} · Journée clôturée · modifié {{count}}×",
+    "dayClosedEdited_many": "{{ref}} · Journée clôturée · modifié {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Journée clôturée · modifié {{count}}×"
+  },
+  "rowActions": {
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "giveBack": "Rembourser",
+    "gotBack": "Récupéré",
+    "useOnBill": "Utiliser sur la prochaine facture"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "empty": {
+    "ledgerTitle": "Aucune écriture ne correspond",
+    "pendingTitle": "Rien en attente",
+    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
+    "receive": "Encaisser"
+  },
+  "deleteEntry": {
+    "title": "Supprimer ce paiement ?",
+    "effect": "Autorisé jusqu’à la clôture du jour. La suppression reste dans le journal d’audit.",
+    "effectInvoice": "Autorisé jusqu’à la clôture du jour. La facture n° {{seq}} repasse à {{due}} dû. La suppression reste dans le journal d’audit.",
+    "reasons": {
+      "twice": "Saisi deux fois",
+      "amount": "Mauvais montant",
+      "party": "Mauvais patient ou bénéficiaire"
+    },
+    "removed": "{{ref}} supprimé",
+    "removedInvoice": "{{ref}} supprimé · solde de la facture rétabli"
+  },
+  "dialog": {
+    "record": "Paiement",
+    "credit": "Élément en attente"
+  },
+  "pending": {
+    "records": "éléments en attente",
+    "patient": "Patient",
+    "party": "Fournisseur / tiers",
+    "ways": {
+      "give": "Donner",
+      "take": "Recevoir"
+    },
+    "wayTitles": {
+      "give": "Nous les remboursons",
+      "take": "Ils nous paient"
+    },
+    "states": {
+      "open": "Ouvert",
+      "given_back": "Remboursé",
+      "got_back": "Reçu",
+      "used": "Imputé"
+    },
+    "settledToday": "{{state}} · Aujourd’hui",
+    "adjusted": "{{amount}} imputé",
+    "source": "De {{ref}} · {{direction}}",
+    "invoice": "Facture n° {{seq}}",
+    "byHand": "À la main",
+    "deleteTitle": "Supprimer cet élément en attente ?",
+    "deleted": "{{ref}} supprimé",
+    "reasons": {
+      "charged_twice": "Facturé deux fois",
+      "advance_not_used": "Acompte non utilisé",
+      "package_cancelled": "Forfait annulé",
+      "overpaid": "Trop-perçu",
+      "returned_items": "Articles retournés",
+      "short_payment": "Paiement insuffisant",
+      "damaged_goods": "Marchandise abîmée retournée",
+      "advance_given": "Avance versée",
+      "loan_to_staff": "Prêt au personnel",
+      "other": "Autre"
+    }
   }
 }

@@ -21,8 +21,6 @@ import type {
   PatientNote,
   PatientPackage,
   PatientReport,
-  Payment,
-  PendingCredit,
   Prescription,
   Review,
   StockCount,
@@ -33,12 +31,14 @@ import type {
   Supplier,
   Treatment,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
@@ -179,7 +179,8 @@ export const clinicFixtures = {
     resource: 'Invoice',
     seed: () => invoiceSeed(),
   }),
-  payments: createFixtureCollection<Payment>({
+  // Entries carry the plan's reference, edit log and bill photos — see payments-contracts.ts.
+  payments: createFixtureCollection<PaymentRecord>({
     resource: 'Payment',
     seed: () => paymentSeed(),
   }),
@@ -187,7 +188,8 @@ export const clinicFixtures = {
     resource: 'Credit note',
     seed: () => creditNoteSeed(),
   }),
-  pendingCredits: createFixtureCollection<PendingCredit>({
+  // Credits carry the plan's reason chip, note, invoice and settle-by day — see credits-contracts.ts.
+  pendingCredits: createFixtureCollection<PendingCreditRecord>({
     resource: 'Pending credit',
     seed: () => pendingCreditSeed(),
   }),

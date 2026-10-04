@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   ROOM_TOOLBAR_KEYS,
@@ -20,6 +21,14 @@ export interface RoomAction {
   label: string;
   /** Its 16px icon (default `Plus`). */
   icon?: AppIcon;
+  /** The icon's own ink — Payments' "Pay" arrow in `destructive` (`payments.md:17`). */
+  iconClassName?: string;
+  /** What the action does, on hover ("Pay · money out (rent, supplies, vendors, refunds)"). */
+  title?: string;
+  /** A create menu row's sub line ("We pay a patient or party back"). */
+  sub?: string;
+  /** A create menu row's icon tile tone (Give blush, Take sky). */
+  tone?: Tone;
   onSelect: () => void;
 }
 
@@ -43,11 +52,23 @@ export interface RoomPrimaryProps {
  * direct child is an `svg`, and these keep the design's own padding. A
  * `turned` chevron points up while its list is open.
  */
-function ActionIcon({ icon: Icon, turned = false }: { icon: AppIcon; turned?: boolean }) {
+function ActionIcon({
+  icon: Icon,
+  turned = false,
+  className,
+}: {
+  icon: AppIcon;
+  turned?: boolean;
+  className?: string;
+}) {
   return (
     <span aria-hidden="true" className="flex">
       <Icon
-        className={cn('size-4 transition-transform duration-150', turned && 'rotate-180')}
+        className={cn(
+          'size-4 transition-transform duration-150',
+          turned && 'rotate-180',
+          className,
+        )}
       />
     </span>
   );
@@ -75,6 +96,8 @@ function CreateMenu({
       options={menu.actions.map((action) => ({
         key: action.id,
         label: action.label,
+        sub: action.sub,
+        tone: action.tone,
         leading: { kind: 'icon', icon: action.icon ?? Plus },
       }))}
       onChange={(id) => menu.actions.find((action) => action.id === id)?.onSelect()}
@@ -123,7 +146,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
             onClick={secondary.onSelect}
             className={labelled}
           >
-            <ActionIcon icon={SecondaryIcon} />
+            <ActionIcon icon={SecondaryIcon} className={secondary.iconClassName} />
             {secondary.label}
           </Button>
         ) : null}
@@ -134,7 +157,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           onClick={action.onSelect}
           className={labelled}
         >
-          <ActionIcon icon={PrimaryIcon} />
+          <ActionIcon icon={PrimaryIcon} className={action.iconClassName} />
           {action.label}
         </Button>
         {menu ? (
@@ -167,25 +190,29 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
         <Button
           type="button"
           variant="outline"
+          title={secondary.title}
           data-testid={ids.primary(secondary.id)}
           onClick={secondary.onSelect}
-          className="text-body h-9 gap-1.5 rounded-lg ps-3 pe-3.5 shadow-none"
+          // The pair is padded 10 / 14 (H:969); a lone primary 12 / 14.
+          className="text-body h-9 gap-1.5 rounded-lg ps-2.5 pe-3.5 shadow-none"
         >
-          <ActionIcon icon={SecondaryIcon} />
+          <ActionIcon icon={SecondaryIcon} className={secondary.iconClassName} />
           {secondary.label}
         </Button>
       ) : null}
       <div className="flex h-9 flex-none items-stretch rounded-lg shadow-(--elevation-control)">
         <Button
           type="button"
+          title={action.title}
           data-testid={ids.primary(action.id)}
           onClick={action.onSelect}
           className={cn(
             'text-body h-9 gap-1.5 rounded-lg ps-3 pe-3.5',
+            secondary && 'ps-2.5',
             menu && 'rounded-e-none pe-3',
           )}
         >
-          <ActionIcon icon={PrimaryIcon} />
+          <ActionIcon icon={PrimaryIcon} className={action.iconClassName} />
           {action.label}
         </Button>
         {menu ? (

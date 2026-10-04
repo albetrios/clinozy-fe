@@ -1,5 +1,162 @@
 {
   "manifest": {
     "title": "المدفوعات"
+  },
+  "tabs": {
+    "label": "أقسام المدفوعات",
+    "ledger": "المدفوعات",
+    "pending": "معلّق"
+  },
+  "search": {
+    "placeholder": "مريض أو فاتورة أو إيصال",
+    "label": "البحث في المدفوعات"
+  },
+  "toolbar": {
+    "dayClose": "إقفال اليوم",
+    "pay": "دفع",
+    "payTitle": "دفع · أموال خارجة (إيجار، مستلزمات، موردون، مبالغ مستردة)",
+    "receive": "استلام",
+    "receiveTitle": "استلام · أموال واردة من مريض",
+    "addPending": "إضافة معلّق",
+    "give": "إعطاء",
+    "giveSub": "نردّ المال لمريض أو جهة",
+    "take": "أخذ",
+    "takeSub": "مريض أو جهة يدفع لنا"
+  },
+  "columns": {
+    "ref": "المرجع",
+    "what": "النوع",
+    "when": "الوقت",
+    "party": "من / إلى",
+    "mode": "الطريقة",
+    "amount": "المبلغ",
+    "by": "بواسطة",
+    "who": "مَن",
+    "way": "الاتجاه",
+    "why": "السبب",
+    "since": "منذ",
+    "state": "الحالة"
+  },
+  "filters": {
+    "show": "عرض",
+    "all": "الكل"
+  },
+  "directions": {
+    "received": "مستلَم",
+    "paid": "مدفوع"
+  },
+  "kinds": {
+    "receipt": "مستلَم",
+    "refund": "استرداد للمريض",
+    "expense": "مدفوع",
+    "money_back": "مبلغ مُعاد"
+  },
+  "ledger": {
+    "records": "القيود",
+    "today": "اليوم {{time}}",
+    "dayTime": "{{day}} {{time}}",
+    "edited_zero": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "edited_one": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "edited_two": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "edited_few": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "edited_many": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "edited_other": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "فاتورة #{{seq}}",
+      "sale": "بيع · فاتورة #{{seq}}",
+      "refund": "استرداد · إشعار دائن",
+      "refundNote": "استرداد · إشعار دائن {{note}}",
+      "refundFor": "عن فاتورة #{{seq}}",
+      "moneyBack": "مبلغ مُعاد",
+      "medicalBill": "أمر شراء طبي #{{seq}} · فاتورة {{bill}}",
+      "stockBill": "أمر شراء مخزون #{{seq}} · فاتورة {{bill}}",
+      "fromCredit": "من {{ref}}"
+    },
+    "dayClosed": "{{ref}} · اليوم مُقفل",
+    "dayClosedEdited_zero": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "dayClosedEdited_one": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "dayClosedEdited_two": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "dayClosedEdited_few": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "dayClosedEdited_many": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "dayClosedEdited_other": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة"
+  },
+  "rowActions": {
+    "edit": "تعديل",
+    "delete": "حذف",
+    "giveBack": "ردّ المبلغ",
+    "gotBack": "تم الاستلام",
+    "useOnBill": "استخدام في الفاتورة التالية"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "empty": {
+    "ledgerTitle": "لا يوجد قيد مطابق",
+    "pendingTitle": "لا شيء معلّق",
+    "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "receive": "استلام"
+  },
+  "deleteEntry": {
+    "title": "حذف هذه الدفعة؟",
+    "effect": "مسموح حتى إقفال اليوم. يُحفظ الحذف في سجل التدقيق.",
+    "effectInvoice": "مسموح حتى إقفال اليوم. تعود الفاتورة #{{seq}} إلى مستحق {{due}}. يُحفظ الحذف في سجل التدقيق.",
+    "reasons": {
+      "twice": "أُدخل مرتين",
+      "amount": "مبلغ خاطئ",
+      "party": "مريض أو مستفيد خاطئ"
+    },
+    "removed": "تمت إزالة {{ref}}",
+    "removedInvoice": "تمت إزالة {{ref}} · أُعيد رصيد الفاتورة"
+  },
+  "dialog": {
+    "record": "الدفعة",
+    "credit": "المعلّق"
+  },
+  "pending": {
+    "records": "العناصر المعلّقة",
+    "patient": "مريض",
+    "party": "مورّد / جهة",
+    "ways": {
+      "give": "إعطاء",
+      "take": "أخذ"
+    },
+    "wayTitles": {
+      "give": "نردّ لهم المال",
+      "take": "هم يدفعون لنا"
+    },
+    "states": {
+      "open": "مفتوح",
+      "given_back": "أُعيد",
+      "got_back": "مستلَم",
+      "used": "مُسوّى"
+    },
+    "settledToday": "{{state}} · اليوم",
+    "adjusted": "سُوّي {{amount}}",
+    "source": "من {{ref}} · {{direction}}",
+    "invoice": "فاتورة #{{seq}}",
+    "byHand": "يدويًا",
+    "deleteTitle": "حذف هذا المعلّق؟",
+    "deleted": "تم حذف {{ref}}",
+    "reasons": {
+      "charged_twice": "حُصّل مرتين",
+      "advance_not_used": "دفعة مقدمة غير مستخدمة",
+      "package_cancelled": "أُلغيت الباقة",
+      "overpaid": "دُفع زيادة",
+      "returned_items": "أصناف مُرتجعة",
+      "short_payment": "دفع ناقص",
+      "damaged_goods": "بضاعة تالفة مُرتجعة",
+      "advance_given": "دفعة مقدمة مُعطاة",
+      "loan_to_staff": "قرض لموظف",
+      "other": "أخرى"
+    }
   }
 }

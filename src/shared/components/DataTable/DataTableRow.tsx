@@ -80,6 +80,15 @@ export interface RowContext<TData extends RowData> {
   firstRowIndex: number;
 }
 
+/** Whether a row's meta line indents 42px under the primary cell's avatar. */
+function indentsMeta<TData extends RowData>(
+  row: TableRow<TData>,
+  context: RowContext<TData>,
+): boolean {
+  if (context.indentMeta) return true;
+  return context.primaryColumn?.columnDef.meta?.drawsAvatar?.(row.original) === true;
+}
+
 /** The folded columns under the primary cell: "<label> <value>" items (H:692). */
 function MetaLine({
   items,
@@ -236,7 +245,7 @@ function GridCells<TData extends RowData>({
             {renderCell(row, column)}
           </div>
           {column === primaryColumn ? (
-            <MetaLine items={metaFor(row, context)} indent={context.indentMeta} />
+            <MetaLine items={metaFor(row, context)} indent={indentsMeta(row, context)} />
           ) : null}
         </div>
       ))}
@@ -278,7 +287,7 @@ function PhoneFoldCells<TData extends RowData>({
       <div className="flex max-w-full min-w-0 items-center gap-1.5">
         {renderCell(row, primaryColumn)}
       </div>
-      <MetaLine items={metaFor(row, context)} indent={context.indentMeta} />
+      <MetaLine items={metaFor(row, context)} indent={indentsMeta(row, context)} />
     </div>
   ) : null;
   return (

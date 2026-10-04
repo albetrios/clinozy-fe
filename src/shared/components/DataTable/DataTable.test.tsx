@@ -430,6 +430,42 @@ describe('DataTable — phone rows (below md)', () => {
     expect(shorter).toHaveTextContent(/^Type Aesthetic Follow-up Sep 24 · 14:50 #3509$/);
   });
 
+  it('indents the meta line under an avatar: every row of a person column, or the rows that draw one', () => {
+    const { unmount } = render(<Room data={[patient(8)]} fold />);
+    expect(
+      screen.getByText('#3508').closest('[data-slot="data-table-meta"]'),
+    ).toHaveClass('ps-10.5');
+    unmount();
+
+    // A party column (Payments' From / to): a patient's chip, a supplier's name.
+    const columns = PATIENT_COLUMNS.map((column) =>
+      'accessorKey' in column && column.accessorKey === 'name'
+        ? {
+            ...column,
+            meta: {
+              track: 'minmax(200px,1.4fr)',
+              primary: true,
+              drawsAvatar: (row: unknown) => (row as Patient).type !== 'Supplier',
+            },
+          }
+        : column,
+    );
+    function Parties() {
+      const table = useTable({
+        features: dataTableFeatures,
+        data: [patient(8), patient(9, { type: 'Supplier' })],
+        columns,
+        getRowId: (row) => row.id,
+      });
+      return <DataTable table={table} tableId="parties" fold />;
+    }
+    render(<Parties />);
+    const metaOf = (id: string) =>
+      screen.getByText(id).closest('[data-slot="data-table-meta"]');
+    expect(metaOf('#3508')).toHaveClass('ps-10.5');
+    expect(metaOf('#3509')).not.toHaveClass('ps-10.5');
+  });
+
   it('puts the row actions on their own end-aligned line with labelled primaries', () => {
     const actions = (): DataTableRowAction[] => [
       { id: 'open', label: 'Open file', icon: PenLine, onSelect: vi.fn(), primary: true },
@@ -654,9 +690,12 @@ describe('DataTable — length (D7)', () => {
     const { rerender } = render(<Room data={many(3)} hasNextPage />);
     expect(screen.queryByTestId('patients-table-end')).not.toBeInTheDocument();
     rerender(<Room data={many(3)} />);
-    expect(screen.getByTestId('patients-table-end')).toHaveTextContent(
-      'All patients loaded',
-    );
+    const end = screen.getByTestId('patients-table-end');
+    expect(end).toHaveTextContent('All patients loaded');
+    // Under a short list it keeps to the card's foot: the scroller is a column
+    // and the end line's group takes the space left (the prototype's filler).
+    expect(end.parentElement).toHaveClass('mt-auto');
+    expect(end.parentElement?.parentElement).toHaveClass('flex', 'flex-col');
   });
 
   it('shows "Loading more" while the next page loads', () => {

@@ -25,8 +25,6 @@ import {
   patientNoteSchema,
   patientPackageSchema,
   patientReportSchema,
-  paymentSchema,
-  pendingCreditSchema,
   prescriptionSchema,
   reviewSchema,
   stockCountSchema,
@@ -42,12 +40,14 @@ import {
   clinicClockTime,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
+import { pendingCreditRecordSchema } from '@/shared/api/clinic/credits-contracts.ts';
 import { leadRecordSchema } from '@/shared/api/clinic/leads-contracts.ts';
 import {
   offeringRecordSchema,
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 import { patientRecordSchema } from '@/shared/api/clinic/patients-contracts.ts';
+import { paymentRecordSchema } from '@/shared/api/clinic/payments-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
 import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
 
@@ -85,9 +85,10 @@ const SCHEMAS = {
   offerings: offeringRecordSchema,
   offers: offerRecordSchema,
   invoices: invoiceSchema,
-  payments: paymentSchema,
+  // Entries and credits carry the plan's fields (Appendix F).
+  payments: paymentRecordSchema,
   creditNotes: creditNoteSchema,
-  pendingCredits: pendingCreditSchema,
+  pendingCredits: pendingCreditRecordSchema,
   dayCloses: dayCloseSchema,
   // The contract's Task plus the plan's fields at rest (Appendix F, REPLACE_WITH_API).
   tasks: taskRecordSchema,

@@ -1166,5 +1166,15 @@
       "doctor": "Wählen Sie einen Arzt"
     },
     "copied": "Kopiert · wählen Sie Datum und Uhrzeit"
+  },
+  "expenseCategories": {
+    "medicines": "Medikamente",
+    "consumables": "Verbrauchsmaterial",
+    "salary": "Gehalt",
+    "rent": "Miete",
+    "marketing": "Marketing",
+    "utilities": "Nebenkosten",
+    "maintenance": "Wartung",
+    "misc": "Sonstiges"
   }
 }
