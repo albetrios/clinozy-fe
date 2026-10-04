@@ -28,6 +28,11 @@ const SHEET_VARIANTS = {
     height: 'data-[vaul-drawer-direction=bottom]:max-h-[82%]',
     layer: 'bg-transparent',
   },
+  /** The patient file's sections: 85vh over a transparent layer (H:139–140). */
+  sections: {
+    height: 'data-[vaul-drawer-direction=bottom]:max-h-[85vh]',
+    layer: 'bg-transparent',
+  },
 } as const;
 
 /** Which bottom sheet {@link PickerSheet} becomes below `md`. */
@@ -48,8 +53,13 @@ export interface PickerSheetProps {
   panelClassName?: string;
   /** Extra bottom-sheet classes. */
   sheetClassName?: string;
-  /** The phone sheet: the picker's 72% (dimmed) or Filters' 82% (default `picker`). */
+  /**
+   * The phone sheet: the picker's 72% (dimmed), Filters' 82% or the patient
+   * file's sections' 85vh (both undimmed); `picker` by default.
+   */
   sheet?: PickerSheetVariant;
+  /** The popover's gap below its trigger in px (6 by default; the file's sections 8). */
+  sideOffset?: number;
   /** Focus placement on open (the default focuses nothing). */
   onOpenAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
@@ -62,7 +72,9 @@ export interface PickerSheetProps {
  * The picker's surface: a `popover` from `md` up, below it the 72% bottom
  * sheet (shadcn `drawer`) over a dimmed `bg-overlay/40` layer that closes on a
  * tap (H:39–40; `_patterns.md:81`) — or, as `sheet="filters"`, the Filters
- * sheet: 82% over a transparent layer (H:41–42; `_patterns.md:110`). The sheet
+ * sheet: 82% over a transparent layer (H:41–42; `_patterns.md:110`), and as
+ * `sheet="sections"` the patient file's sections, 85vh, also undimmed
+ * (H:139–140). The sheet
  * is full width with a 16px top radius, no bottom border, safe-area padding
  * and the 260ms `sheet-up` rise; its title is sr-only because the design draws
  * none. Both surfaces are modal, so an outside click or tap closes it without
@@ -79,6 +91,7 @@ export function PickerSheet({
   panelClassName,
   sheetClassName,
   sheet = 'picker',
+  sideOffset = 6,
   onOpenAutoFocus,
   onEscapeKeyDown,
   testId,
@@ -125,7 +138,7 @@ export function PickerSheet({
       <PopoverContent
         side="bottom"
         align={align}
-        sideOffset={6}
+        sideOffset={sideOffset}
         collisionPadding={8}
         aria-label={title}
         data-testid={testId}

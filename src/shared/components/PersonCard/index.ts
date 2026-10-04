@@ -1,4 +1,5 @@
 export {
+  ConsentChips,
   type ContactAbout,
   ContactCard,
   type ContactCardActions,
@@ -9,7 +10,12 @@ export {
   type ContactReach,
   type ContactReviews,
   type ContactTeamMember,
+  type ReachLink,
+  reachLinks,
+  ReachRow,
+  type ReachRowProps,
 } from './ContactCard/index.ts';
+export { PERSON_CARD_KEYS, PERSON_CARD_NS } from './person-card.constants.ts';
 export { PersonCard, type PersonCardProps } from './PersonCard.tsx';
 export {
   TeamCard,

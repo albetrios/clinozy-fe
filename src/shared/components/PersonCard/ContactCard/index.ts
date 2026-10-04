@@ -1,3 +1,6 @@
+export { ConsentChips } from './contact-card-about.tsx';
+export { ReachRow, type ReachRowProps } from './contact-card-reach.tsx';
+export { type ReachLink, reachLinks } from './contact-card-reach-links.tsx';
 export {
   type ContactAbout,
   ContactCard,

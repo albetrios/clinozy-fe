@@ -1,0 +1,186 @@
+import { useNavigate, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+
+import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import {
+  passesPatientFileGate,
+  type PatientFileSectionSlug,
+} from '@/shared/clinic/patient-file-sections.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import {
+  type AppIcon,
+  Calendar,
+  Camera,
+  ClipboardList,
+  FileIcon,
+  MessageSquare,
+  Receipt,
+  Sparkles,
+  Wallet,
+} from '@/shared/icons/index.ts';
+import { notify } from '@/shared/notify/index.ts';
+
+import { usePatientFileContext } from '../../patient-file-context.ts';
+import {
+  PATIENT_FILE_ACTIONS_KEYS,
+  PATIENT_FILE_ACTIONS_NS,
+} from './patient-file-actions.constants.ts';
+
+/** The Add-to-record menu's items, in its order (H:4865; `patient-file.md:267`). */
+export const PATIENT_ADD_ITEMS = [
+  'prescription',
+  'treatment',
+  'invoice',
+  'payment',
+  'photo',
+  'appointment',
+  'report',
+  'note',
+] as const;
+
+/** One Add-to-record item. */
+export type PatientAddItemId = (typeof PATIENT_ADD_ITEMS)[number];
+
+/** Each item's 26px tile: its tone and icon (H:4865; `patient-file.md:427`). */
+export const PATIENT_ADD_ITEM_LOOK: Readonly<
+  Record<PatientAddItemId, { tone: Tone; icon: AppIcon }>
+> = {
+  prescription: { tone: 'sage', icon: FileIcon },
+  treatment: { tone: 'lav', icon: Sparkles },
+  invoice: { tone: 'butter', icon: Receipt },
+  payment: { tone: 'mint', icon: Wallet },
+  photo: { tone: 'blush', icon: Camera },
+  appointment: { tone: 'sky', icon: Calendar },
+  report: { tone: 'stone', icon: ClipboardList },
+  note: { tone: 'stone', icon: MessageSquare },
+};
+
+/** An item the member may use, with what picking it does. */
+export interface PatientAddItem {
+  id: PatientAddItemId;
+  tone: Tone;
+  icon: AppIcon;
+  run: () => void;
+}
+
+/**
+ * Each section's split primary "New …" (H:4746–4764; `patient-file.md:512`):
+ * the Add-menu item it runs. Overview, Clinical notes and Team notes have
+ * none; "Add package" lands with its drawer.
+ */
+export const SECTION_PRIMARY_ITEM: Readonly<
+  Partial<Record<PatientFileSectionSlug, PatientAddItemId>>
+> = {
+  visits: 'appointment',
+  prescriptions: 'prescription',
+  treatments: 'treatment',
+  images: 'photo',
+  reports: 'report',
+  invoices: 'invoice',
+  payments: 'payment',
+};
+
+/** What the file's add actions read: the access in force and the open file. */
+export interface PatientFileActions {
+  /** The items the member may use (each checks its own permission; Q-F: none hides "+"). */
+  items: PatientAddItem[];
+  /** The item a section's "New …" runs, when the section has one the member may use. */
+  primaryFor: (section: PatientFileSectionSlug) => PatientAddItem | null;
+}
+
+/**
+ * The patient file's add actions (KICKOFF §6.6 Add-to-record menu; the
+ * sections' split "New …"): each item checks its own permission — the
+ * role-named Rx and treatment gates (`S:35, 38`), billing create for an
+ * invoice or a payment, appointments create for a booking, patients create or
+ * edit for a photo, a report or a note — and runs its action: the record's
+ * drawer, the invoice drawer or receive payment keeping the file behind them
+ * (`from`, §4), the appointment form for this patient, or the section.
+ */
+export function usePatientFileActions(): PatientFileActions {
+  const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const { patientId, file, section } = usePatientFileContext();
+  const access = useClinicAccess();
+  const referrer = section ? `patients/${patientId}/${section}` : null;
+
+  const can = (
+    area: 'patients' | 'payments' | 'appointments',
+    action: 'create' | 'edit',
+  ) => access.isResolved && access.can(area, action);
+  const passes = (gate: 'prescriptions' | 'treatments') =>
+    access.isResolved && passesPatientFileGate(access.roles, gate);
+
+  const openSection = (target: PatientFileSectionSlug) => () =>
+    void navigate(organizationPatientSection(organizationSlug, patientId, target));
+  const go = (navigation: ReturnType<typeof clinicCommandNavigation>) =>
+    void navigate(navigation);
+
+  const actions: Record<PatientAddItemId, { allowed: boolean; run: () => void }> = {
+    prescription: { allowed: passes('prescriptions'), run: openSection('prescriptions') },
+    treatment: { allowed: passes('treatments'), run: openSection('treatments') },
+    invoice: {
+      allowed: can('payments', 'create'),
+      run: () =>
+        go(
+          clinicCommandNavigation('newInvoice', {
+            organizationSlug,
+            referrer,
+            search: { type: 'clinic', patient: patientId },
+          }),
+        ),
+    },
+    payment: {
+      allowed: can('payments', 'create'),
+      run: () => {
+        if (!file || file.due === 0) {
+          notify.info(
+            t(PATIENT_FILE_ACTIONS_KEYS.nothingDue, {
+              name: file ? patientName(file.patient) : '',
+            }),
+          );
+          return;
+        }
+        go(
+          clinicCommandNavigation('newReceipt', {
+            organizationSlug,
+            referrer,
+            search: { patient: patientId },
+          }),
+        );
+      },
+    },
+    photo: { allowed: can('patients', 'create'), run: openSection('images') },
+    appointment: {
+      allowed: can('appointments', 'create'),
+      run: () =>
+        go(
+          clinicCommandNavigation('newAppointment', {
+            organizationSlug,
+            referrer,
+            search: { who: patientId },
+          }),
+        ),
+    },
+    report: { allowed: can('patients', 'edit'), run: openSection('reports') },
+    note: { allowed: can('patients', 'create'), run: openSection('notes') },
+  };
+
+  const items = PATIENT_ADD_ITEMS.filter((id) => actions[id].allowed).map((id) => ({
+    id,
+    ...PATIENT_ADD_ITEM_LOOK[id],
+    run: actions[id].run,
+  }));
+
+  return {
+    items,
+    primaryFor: (target) => {
+      const id = SECTION_PRIMARY_ITEM[target];
+      return items.find((item) => item.id === id) ?? null;
+    },
+  };
+}

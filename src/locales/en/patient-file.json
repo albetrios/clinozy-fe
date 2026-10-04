@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "Patient file"
+  },
+  "sections": {
+    "timeline": "Overview",
+    "overview": "Clinical notes",
+    "visits": "Visits",
+    "prescriptions": "Prescriptions",
+    "treatments": "Treatments",
+    "images": "Photos",
+    "reports": "Reports",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "packages": "Packages",
+    "notes": "Team notes"
+  },
+  "layout": {
+    "notFoundRecord": "Patient",
+    "loading": "Opening the patient file"
+  },
+  "fileBar": {
+    "back": "Back to patients",
+    "backHint": "Back to patients (Esc)",
+    "patients": "Patients",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Visit in progress · Resume",
+    "tabs": "Patient sections",
+    "notPinned": "Not pinned · shown while open",
+    "addToRecord": "Add to record",
+    "startVisit": "Start visit",
+    "activity": "Activity",
+    "showActivity": "Show messages & activity",
+    "hideActivity": "Hide messages & activity",
+    "unread_one": "{{count}} unread message",
+    "unread_other": "{{count}} unread messages"
+  },
+  "sectionsPopover": {
+    "trigger": "Patient file · all sections",
+    "label": "Patient file sections",
+    "title": "Patient file",
+    "groups": {
+      "clinical": "Clinical",
+      "care": "Care",
+      "billing": "Billing",
+      "team": "Team"
+    },
+    "openNow": "Open now",
+    "empty": "Empty",
+    "hasRecords": "Has records",
+    "pin": "Pin to bar",
+    "unpin": "Unpin from bar",
+    "pinAria": "Pin to bar · {{section}}",
+    "unpinAria": "Unpin from bar · {{section}}",
+    "footer": "Pinned sections stay in the bar"
+  },
+  "addMenu": {
+    "label": "Add to record",
+    "headerFile": "Add for {{name}}",
+    "headerSection": "For {{name}} · already selected"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Prescription",
+      "treatment": "Treatment",
+      "invoice": "Invoice",
+      "payment": "Payment",
+      "photo": "Photo",
+      "appointment": "Appointment",
+      "report": "Report",
+      "note": "Note"
+    },
+    "nothingDue": "Nothing due for {{name}}"
+  },
+  "section": {
+    "primary": {
+      "visits": "New appointment",
+      "prescriptions": "New prescription",
+      "treatments": "New treatment",
+      "images": "Upload images",
+      "reports": "Upload report",
+      "invoices": "New invoice",
+      "payments": "Record payment",
+      "packages": "Add package"
+    },
+    "more": "More for {{name}}"
+  },
+  "rail": {
+    "copyId": "Copy patient ID",
+    "idCopied": "Patient ID copied",
+    "since": "Since {{date}}",
+    "joinedToday": "Joined today",
+    "daysAsPatient_one": "{{count}} day as patient",
+    "daysAsPatient_other": "{{count}} days as patient",
+    "monthsAsPatient_one": "{{count}} month as patient",
+    "monthsAsPatient_other": "{{count}} months as patient",
+    "editContact": "Edit contact",
+    "reach": "Reach",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Primary",
+      "fromLead": "Mobile · From lead",
+      "mobile": "Mobile",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Show number",
+    "hideNumber": "Hide number",
+    "openWhatsApp": "Open WhatsApp chat in new tab",
+    "call": "Call",
+    "openInstagram": "Open Instagram in new tab",
+    "numberCopied": "Number copied",
+    "handleCopied": "Handle copied",
+    "about": "About",
+    "birthdayIn_one": "🎂 in {{count}} day",
+    "birthdayIn_other": "🎂 in {{count}} days",
+    "birthdayToday": "🎂 today",
+    "noAddress": "No address",
+    "upNext": "Up next",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "visitService": "{{service}} · {{minutes}} min",
+    "reschedule": "Reschedule",
+    "book": "Book",
+    "notBooked": "Not booked",
+    "noUpcoming": "No upcoming visit",
+    "maskedAmount": "₹ ••••",
+    "dueSince_one": "since {{count}} day",
+    "dueSince_other": "since {{count}} days",
+    "showAmount": "Show amount",
+    "hideAmount": "Hide amount",
+    "collect": "Collect",
+    "creditToReturn": "{{amount}} to return",
+    "allPaid": "All paid · nothing due",
+    "feedback": "Feedback",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ on {{source}}",
+    "checkIns_one": "{{count}} check-in",
+    "checkIns_other": "{{count}} check-ins",
+    "reviews_one": "{{count}} review",
+    "reviews_other": "{{count}} reviews",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "No feedback yet"
   }
 }

@@ -91,8 +91,15 @@ function useAboutRows(about: ContactAbout): AboutLine<string>[] {
   return rows.filter((row): row is AboutLine<string> => Boolean(row.text));
 }
 
-/** The three consent chips: sage "✓" when given, `bg-muted` "✕" when not (tooltip "Consent · Data"). */
-function ConsentChips({ consent }: { consent: NonNullable<ContactAbout['consent']> }) {
+/**
+ * The three consent chips: sage "✓" when given, `bg-muted` "✕" when not
+ * (tooltip "Consent · Data") — the contact card's About and the patient rail's.
+ */
+export function ConsentChips({
+  consent,
+}: {
+  consent: NonNullable<ContactAbout['consent']>;
+}) {
   const { t } = useTranslation(PERSON_CARD_NS);
   const chips = [
     { id: 'data', label: t(keys.consent.data), given: consent.data },

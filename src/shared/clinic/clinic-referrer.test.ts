@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest';
 import {
   isAllowedReferrer,
   PATIENT_FILE_REFERRER,
-  PATIENT_FILE_SECTIONS,
   referrerFromPath,
   safeReferrer,
 } from './clinic-referrer.ts';
+import { PATIENT_FILE_SECTIONS } from './patient-file-sections.ts';
 
 const PATIENT = '0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c';
 

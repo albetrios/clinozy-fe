@@ -6,25 +6,11 @@
  * match one of these exactly; anything else falls back to the route's own
  * default, so `from` can never point outside the app.
  */
-/** The patient-file sections (D26), in the file's order. */
-export const PATIENT_FILE_SECTIONS = [
-  'timeline',
-  'overview',
-  'visits',
-  'prescriptions',
-  'treatments',
-  'images',
-  'reports',
-  'invoices',
-  'payments',
-  'packages',
-  'notes',
-] as const;
 
 /**
  * A patient-file section: `patients/<uuid>/<section>`. A literal on purpose (the
- * security lint forbids built RegExps); a test pins its sections to
- * {@link PATIENT_FILE_SECTIONS}.
+ * security lint forbids built RegExps); a test pins its sections to the file's
+ * (`PATIENT_FILE_SECTIONS`, `patient-file-sections.ts`).
  */
 export const PATIENT_FILE_REFERRER =
   /^patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(?:timeline|overview|visits|prescriptions|treatments|images|reports|invoices|payments|packages|notes)$/;

@@ -84,6 +84,9 @@ export function useTableSelection<TData extends RowData>(
       return;
     }
     table.setRowSelection({});
+    // Handled: the Esc chain stops at the selection (a page's own Esc-back
+    // — the patient file's, Q-F8 — sees it taken).
+    event.preventDefault();
   });
   useEffect(() => {
     if (!hasSelection) return undefined;

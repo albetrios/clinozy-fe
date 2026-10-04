@@ -106,6 +106,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)               | `pages/organization/$organizationSlug/tasks/`                 |
 | `new-task-drawer`                | New task — `/tasks/create` opens it over the list (L-47d)                         | `pages/organization/$organizationSlug/tasks/`                 |
 | `task-drawer`                    | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                     | `pages/organization/$organizationSlug/tasks/`                 |
+| `patient-file-layout`            | Patient file — `/patients/$patientId/<section>` (L-42; ids below)                 | `pages/…/patients/$patientId/`                                |
 | `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)   | `pages/organization/$organizationSlug/offerings/`             |
 | `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c) | `pages/organization/$organizationSlug/offerings/`             |
 | `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)                      |
@@ -587,6 +588,31 @@ table carry the shared ids with the `tableId` `users-branches` (`users-branches-
 | `<d>-days` / `<d>-opens` / `<d>-closes`             | The Days chips and the Opens / Closes time pickers                      | `BranchDrawerFields` |
 | `<d>-team` / `<d>-team-option-<profile id>`         | Step 3's Team picker and one person in it                               | `BranchDrawerFields` |
 | `<d>-default-<role>`                                | A default person's picker (`doctor`, `desk`, `therapist`, `pharmacist`) | `BranchDrawerFields` |
+
+### Patient file (launch L-42)
+
+`pages/organization/$organizationSlug/patients/$patientId/`: the layout is `patient-file-layout`
+(`data-activity`: `open` · `closed`). `<s>` is a section slug (`timeline` · `overview` · `visits` ·
+`prescriptions` · `treatments` · `images` · `reports` · `invoices` · `payments` · `packages` ·
+`notes`); `<item>` an Add-to-record item (`prescription` · `treatment` · `invoice` · `payment` ·
+`photo` · `appointment` · `report` · `note`).
+
+| Test ID                                                                   | Element                                                                                  | Source                               |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------ |
+| `patient-file-back`                                                       | Back to the Patients list (Esc)                                                          | `components/PatientFileBar/`         |
+| `patient-file-tab-<s>`                                                    | A pinned section tab (`role="tab"`); the open unpinned one carries its dot               | `components/PatientFileBar/`         |
+| `patient-file-add` · `patient-file-start-visit` · `patient-file-activity` | "+" (Add to record) · "Start visit" · the Activity toggle (`aria-pressed`, unread badge) | `components/PatientFileBar/`         |
+| `patient-file-sections` · `patient-file-sections-panel`                   | The folder button · the section popover (a bottom sheet on a phone)                      | `components/PatientSectionsPopover/` |
+| `patient-file-sections-tile-<s>` · `patient-file-sections-pin-<s>`        | A section tile (`aria-current` when open) · its pin (`aria-pressed`)                     | `components/PatientSectionsPopover/` |
+| `patient-file-add-menu` · `patient-file-add-menu-<item>`                  | The Add-to-record menu ("+" and a section's "⌄") · one item                              | `shared/components/PatientAddMenu/`  |
+| `patient-file-activity-column`                                            | The Activity column's card (the `chat-…` ids inside)                                     | `components/PatientActivity/`        |
+| `patient-rail`                                                            | The rail (`<aside>`, named by the patient)                                               | `components/PatientRail/`            |
+| `patient-rail-copy-id` · `patient-rail-edit`                              | "#3508" (copies the ID) · Edit contact (Patients edit only)                              | `components/PatientRail/`            |
+| `patient-rail-book` · `patient-rail-collect` · `patient-rail-feedback`    | Up next: Book / Reschedule · Collect · the Feedback row                                  | `components/PatientRail/`            |
+| `patient-rail-due` · `patient-rail-due-eye`                               | What they owe ("₹ ••••" while masked) · its eye (`aria-pressed` when shown)              | `components/PatientRail/`            |
+| `patient-section-<s>`                                                     | A section's root (`<section>`, named by its title)                                       | `<s>/`                               |
+| `patient-section-primary` · `patient-section-more`                        | The split "New …" · its "⌄" (the Add menu for this patient)                              | `shared/components/PatientSection/`  |
+| `patient-drawer`                                                          | Edit patient — `/patients/$patientId/edit` over the `?from=` section                     | `shared/components/PatientDrawer/`   |
 
 ## Items field (shared, launch L-17a)
 

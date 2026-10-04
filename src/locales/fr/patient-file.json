@@ -1,5 +1,153 @@
 {
   "manifest": {
     "title": "Dossier patient"
+  },
+  "sections": {
+    "timeline": "Vue d’ensemble",
+    "overview": "Notes cliniques",
+    "visits": "Visites",
+    "prescriptions": "Ordonnances",
+    "treatments": "Traitements",
+    "images": "Photos",
+    "reports": "Comptes rendus",
+    "invoices": "Factures",
+    "payments": "Paiements",
+    "packages": "Forfaits",
+    "notes": "Notes d’équipe"
+  },
+  "layout": {
+    "notFoundRecord": "Patient",
+    "loading": "Ouverture du dossier patient"
+  },
+  "fileBar": {
+    "back": "Retour aux patients",
+    "backHint": "Retour aux patients (Échap)",
+    "patients": "Patients",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Visite en cours · Reprendre",
+    "tabs": "Sections du patient",
+    "notPinned": "Non épinglé · affiché tant qu’il est ouvert",
+    "addToRecord": "Ajouter au dossier",
+    "startVisit": "Démarrer la visite",
+    "activity": "Activité",
+    "showActivity": "Afficher les messages et l’activité",
+    "hideActivity": "Masquer les messages et l’activité",
+    "unread_one": "{{count}} message non lu",
+    "unread_many": "{{count}} de messages non lus",
+    "unread_other": "{{count}} messages non lus"
+  },
+  "sectionsPopover": {
+    "trigger": "Dossier patient · toutes les sections",
+    "label": "Sections du dossier patient",
+    "title": "Dossier patient",
+    "groups": {
+      "clinical": "Clinique",
+      "care": "Soins",
+      "billing": "Facturation",
+      "team": "Équipe"
+    },
+    "openNow": "Ouvert",
+    "empty": "Vide",
+    "hasRecords": "Contient des éléments",
+    "pin": "Épingler à la barre",
+    "unpin": "Retirer de la barre",
+    "pinAria": "Épingler à la barre · {{section}}",
+    "unpinAria": "Retirer de la barre · {{section}}",
+    "footer": "Les sections épinglées restent dans la barre"
+  },
+  "addMenu": {
+    "label": "Ajouter au dossier",
+    "headerFile": "Ajouter pour {{name}}",
+    "headerSection": "Pour {{name}} · déjà sélectionné"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Ordonnance",
+      "treatment": "Traitement",
+      "invoice": "Facture",
+      "payment": "Paiement",
+      "photo": "Photo",
+      "appointment": "Rendez-vous",
+      "report": "Compte rendu",
+      "note": "Note"
+    },
+    "nothingDue": "Rien à régler pour {{name}}"
+  },
+  "section": {
+    "primary": {
+      "visits": "Nouveau rendez-vous",
+      "prescriptions": "Nouvelle ordonnance",
+      "treatments": "Nouveau traitement",
+      "images": "Importer des photos",
+      "reports": "Importer un compte rendu",
+      "invoices": "Nouvelle facture",
+      "payments": "Enregistrer un paiement",
+      "packages": "Ajouter un forfait"
+    },
+    "more": "Plus pour {{name}}"
+  },
+  "rail": {
+    "copyId": "Copier l’identifiant patient",
+    "idCopied": "Identifiant patient copié",
+    "since": "Depuis le {{date}}",
+    "joinedToday": "Arrivé aujourd’hui",
+    "daysAsPatient_one": "Patient depuis {{count}} jour",
+    "daysAsPatient_many": "Patient depuis {{count}} de jours",
+    "daysAsPatient_other": "Patient depuis {{count}} jours",
+    "monthsAsPatient_one": "Patient depuis {{count}} mois",
+    "monthsAsPatient_many": "Patient depuis {{count}} de mois",
+    "monthsAsPatient_other": "Patient depuis {{count}} mois",
+    "editContact": "Modifier le contact",
+    "reach": "Coordonnées",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Principal",
+      "fromLead": "Mobile · Du prospect",
+      "mobile": "Mobile",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Afficher le numéro",
+    "hideNumber": "Masquer le numéro",
+    "openWhatsApp": "Ouvrir la discussion WhatsApp dans un nouvel onglet",
+    "call": "Appeler",
+    "openInstagram": "Ouvrir Instagram dans un nouvel onglet",
+    "numberCopied": "Numéro copié",
+    "handleCopied": "Identifiant copié",
+    "about": "À propos",
+    "birthdayIn_one": "🎂 dans {{count}} jour",
+    "birthdayIn_many": "🎂 dans {{count}} de jours",
+    "birthdayIn_other": "🎂 dans {{count}} jours",
+    "birthdayToday": "🎂 aujourd’hui",
+    "noAddress": "Aucune adresse",
+    "upNext": "À venir",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "Aujourd’hui",
+    "tomorrow": "Demain",
+    "visitService": "{{service}} · {{minutes}} min",
+    "reschedule": "Reprogrammer",
+    "book": "Réserver",
+    "notBooked": "Non réservé",
+    "noUpcoming": "Aucune visite à venir",
+    "maskedAmount": "₹ ••••",
+    "dueSince_one": "depuis {{count}} jour",
+    "dueSince_many": "depuis {{count}} de jours",
+    "dueSince_other": "depuis {{count}} jours",
+    "showAmount": "Afficher le montant",
+    "hideAmount": "Masquer le montant",
+    "collect": "Encaisser",
+    "creditToReturn": "{{amount}} à rendre",
+    "allPaid": "Tout est réglé · rien à payer",
+    "feedback": "Avis",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ sur {{source}}",
+    "checkIns_one": "{{count}} suivi",
+    "checkIns_many": "{{count}} de suivis",
+    "checkIns_other": "{{count}} suivis",
+    "reviews_one": "{{count}} avis",
+    "reviews_many": "{{count}} d’avis",
+    "reviews_other": "{{count}} avis",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "Pas encore d’avis"
   }
 }

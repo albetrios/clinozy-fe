@@ -591,10 +591,19 @@ describe('DataTable — selection and the bulk bar (from md, D31)', () => {
     await user.click(screen.getByTestId('patients-table-bulk-export'));
     expect(exportRows).toHaveBeenCalledWith(three);
 
+    // The Esc that clears the selection is handled: a page's own Esc (the
+    // patient file going back, Q-F8) sees it taken.
+    let escapeHandled: boolean | null = null;
+    const watch = (event: KeyboardEvent) => {
+      escapeHandled = event.defaultPrevented;
+    };
+    window.addEventListener('keydown', watch);
     await user.keyboard('{Escape}');
+    window.removeEventListener('keydown', watch);
     expect(
       screen.queryByRole('toolbar', { name: 'Bulk actions' }),
     ).not.toBeInTheDocument();
+    expect(escapeHandled).toBe(true);
 
     await user.click(screen.getByRole('checkbox', { name: 'Select Patient 002' }));
     await user.click(screen.getByRole('button', { name: 'Clear selection' }));

@@ -1,0 +1,303 @@
+import { type ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/lib/utils.ts';
+import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
+import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip.tsx';
+import {
+  ChevronLeft,
+  FolderOpen,
+  PanelRightClose,
+  PanelRightOpen,
+  Play,
+  Plus,
+} from '@/shared/icons/index.ts';
+
+import { PatientAddMenu } from '../../shared/components/PatientAddMenu/index.ts';
+import type { PatientAddItem } from '../../shared/hooks/usePatientFileActions/index.ts';
+import { patientFileTabs } from '../../shared/patient-file-nav.ts';
+import { lastFourDigits } from '../PatientRail/patient-rail.ts';
+import {
+  PATIENT_SECTIONS_POPOVER_KEYS,
+  PATIENT_SECTIONS_POPOVER_NS,
+  PATIENT_SECTIONS_TEST_ID,
+  PatientSectionsPopover,
+} from '../PatientSectionsPopover/index.ts';
+import { FileBarTabs } from './file-bar-tabs.tsx';
+import {
+  PATIENT_FILE_BAR_KEYS,
+  PATIENT_FILE_BAR_NS,
+  PATIENT_FILE_BAR_TEST_IDS,
+} from './patient-file-bar.constants.ts';
+
+const K = PATIENT_FILE_BAR_KEYS;
+const ids = PATIENT_FILE_BAR_TEST_IDS;
+
+/** Props of {@link PatientFileBar}. */
+export interface PatientFileBarProps {
+  file: PatientFile;
+  section: PatientFileSectionSlug | null;
+  viewable: readonly PatientFileSectionSlug[];
+  pins: readonly PatientFilePin[];
+  onTogglePin: (section: PatientFileSectionSlug) => void;
+  onOpenSection: (section: PatientFileSectionSlug) => void;
+  onBack: () => void;
+  /** The Add-to-record items the member may use; none hides "+". */
+  addItems: readonly PatientAddItem[];
+  activityOpen: boolean;
+  onToggleActivity: () => void;
+  /** "Start visit" — hidden while a Visit is open (H:711 `notVisit`) or without it. */
+  onStartVisit?: () => void;
+  /** "Visit in progress · Resume" — while the patient has an open Visit away from its flow (A-F4). */
+  onResumeVisit?: () => void;
+}
+
+/** A control with the app's tooltip (never on a phone). */
+function Tip({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+/** The Activity toggle (H:711, H:5001): sage while open, the unread badge while closed; icon-only on a phone. */
+function ActivityToggle({
+  open,
+  unread,
+  onToggle,
+}: {
+  open: boolean;
+  unread: number;
+  onToggle: () => void;
+}) {
+  const { t } = useTranslation(PATIENT_FILE_BAR_NS);
+  const label = t(open ? K.hideActivity : K.showActivity);
+  const Icon = open ? PanelRightClose : PanelRightOpen;
+  return (
+    <Tip label={label}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={open}
+        aria-label={label}
+        data-testid={ids.activity}
+        data-slot="button"
+        className={cn(
+          'text-body relative flex h-9 flex-none items-center justify-center gap-1.5 rounded-lg border font-medium whitespace-nowrap transition-colors max-md:w-9 md:ps-2.5 md:pe-3',
+          open
+            ? 'bg-tone-sage text-tone-sage-foreground border-tone-sage-border hover:bg-tone-sage/80'
+            : 'bg-card text-foreground hover:bg-muted',
+        )}
+      >
+        <Icon aria-hidden="true" className="size-4 rtl:-scale-x-100" />
+        <span className="max-md:sr-only">{t(K.activity)}</span>
+        {!open && unread > 0 ? (
+          <span
+            data-slot="pill"
+            className="bg-success text-success-foreground text-tiny inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1.25 font-semibold tabular-nums max-md:absolute max-md:-end-1 max-md:-top-1"
+          >
+            <span aria-hidden="true">{unread}</span>
+            <span className="sr-only">{t(K.unread, { count: unread })}</span>
+          </span>
+        ) : null}
+      </button>
+    </Tip>
+  );
+}
+
+/**
+ * The patient file's bar (KICKOFF §6.6 File bar; H:703–711): from `md` one
+ * row — Back, the breadcrumb while the rail shows or the identity block
+ * otherwise, the visit pill, the folder button and the pinned tabs, then "+",
+ * "Start visit" and "Activity". Below `md` a 3-column grid: Back · the name
+ * over "#3508 · +91 ••••• •3212" · the end cluster, then the folder and the
+ * tabs across, then the visit pill (H:102–116). The identity line is always
+ * masked.
+ */
+export function PatientFileBar({
+  file,
+  section,
+  viewable,
+  pins,
+  onTogglePin,
+  onOpenSection,
+  onBack,
+  addItems,
+  activityOpen,
+  onToggleActivity,
+  onStartVisit,
+  onResumeVisit,
+}: PatientFileBarProps) {
+  const { t } = useTranslation([PATIENT_FILE_BAR_NS, PATIENT_SECTIONS_POPOVER_NS]);
+  const [sectionsOpen, setSectionsOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const { patient } = file;
+  const name = patientName(patient);
+  const identity = t(K.identity, {
+    id: displayId.patient(patient.seq),
+    phone: t(K.maskedPhone, { last4: lastFourDigits(patient.phone) }),
+  });
+  const tabs = patientFileTabs(pins, section, viewable);
+
+  return (
+    <div
+      data-slot="file-bar"
+      className="grid flex-none grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 p-(--room-toolbar-pad) md:flex md:flex-nowrap md:gap-2.5"
+    >
+      <Tip label={t(K.backHint)}>
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label={t(K.back)}
+          data-testid={ids.back}
+          data-slot="button"
+          className="bg-card text-foreground-soft hover:bg-muted col-start-1 row-start-1 flex size-9 flex-none items-center justify-center rounded-lg border transition-colors"
+        >
+          <ChevronLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" />
+        </button>
+      </Tip>
+
+      {/* While the rail shows: "Patients / <name>" (H:703 `crumbDisp`). */}
+      <span className="hidden min-w-0 items-baseline gap-2 border-e pe-2.5 lg:group-data-[activity=closed]/file:flex xl:flex">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-muted-foreground hover:text-foreground text-xl leading-[1.2] font-semibold tracking-[-0.015em] transition-colors"
+        >
+          {t(K.patients)}
+        </button>
+        <span aria-hidden="true" className="text-border-strong text-xl leading-[1.2]">
+          /
+        </span>
+        <h1 className="min-w-0 truncate text-xl leading-[1.2] font-semibold tracking-[-0.015em]">
+          {name}
+        </h1>
+      </span>
+
+      {/* Otherwise the identity block; the avatar from `md` (H:4942 `idDisp`, H:110). */}
+      <span className="col-start-2 row-start-1 flex min-w-0 items-center gap-2.5 lg:group-data-[activity=closed]/file:hidden xl:hidden">
+        <PersonAvatar
+          size="cell"
+          tone="sage"
+          initials={personInitials(name)}
+          className="max-md:hidden"
+        />
+        <span className="flex min-w-0 flex-col leading-[1.3]">
+          {/* The page's heading wherever the breadcrumb's is hidden. */}
+          <h1 className="truncate text-sm leading-[1.3] font-semibold whitespace-nowrap">
+            {name}
+          </h1>
+          <span className="text-caption text-muted-foreground truncate whitespace-nowrap tabular-nums">
+            {identity}
+          </span>
+        </span>
+      </span>
+
+      {onResumeVisit ? (
+        <button
+          type="button"
+          onClick={onResumeVisit}
+          data-slot="pill"
+          className="bg-tone-sage text-tone-sage-foreground col-start-1 row-start-3 inline-flex h-6 max-w-full flex-none items-center gap-1.5 justify-self-start rounded-full px-2.5 text-xs font-medium whitespace-nowrap"
+        >
+          <span aria-hidden="true" className="bg-success size-1.75 rounded-full" />
+          {t(K.visitPill)}
+        </button>
+      ) : null}
+
+      <div className="col-span-3 row-start-2 flex min-w-0 items-center gap-2 md:flex-1 md:gap-0.5">
+        <div className="flex-none md:me-1.5 md:border-e md:pe-2">
+          <PatientSectionsPopover
+            open={sectionsOpen}
+            onOpenChange={setSectionsOpen}
+            patientName={name}
+            current={section}
+            viewable={viewable}
+            counts={file.counts}
+            pins={pins}
+            onTogglePin={onTogglePin}
+            onPick={(picked) => {
+              setSectionsOpen(false);
+              onOpenSection(picked);
+            }}
+            trigger={
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                aria-label={t(PATIENT_SECTIONS_POPOVER_KEYS.trigger, {
+                  ns: PATIENT_SECTIONS_POPOVER_NS,
+                })}
+                title={t(PATIENT_SECTIONS_POPOVER_KEYS.trigger, {
+                  ns: PATIENT_SECTIONS_POPOVER_NS,
+                })}
+                data-testid={PATIENT_SECTIONS_TEST_ID}
+                data-slot="button"
+                className={cn(
+                  'text-foreground-soft hover:bg-muted flex size-9 items-center justify-center rounded-lg border transition-colors md:size-8',
+                  sectionsOpen ? 'bg-muted border-border-strong' : 'bg-card',
+                )}
+              >
+                <FolderOpen aria-hidden="true" className="size-4" />
+              </button>
+            }
+          />
+        </div>
+        <FileBarTabs tabs={tabs} current={section} onOpen={onOpenSection} />
+      </div>
+
+      <div className="col-start-3 row-start-1 flex flex-none items-center gap-2">
+        {addItems.length > 0 ? (
+          <PatientAddMenu
+            variant="file"
+            firstName={patient.firstName}
+            items={addItems}
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            trigger={
+              <button
+                type="button"
+                aria-label={t(K.addToRecord)}
+                title={t(K.addToRecord)}
+                data-testid={ids.add}
+                data-slot="button"
+                className="bg-card text-foreground hover:bg-muted flex size-9 flex-none items-center justify-center rounded-lg border transition-colors"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+              </button>
+            }
+          />
+        ) : null}
+        {onStartVisit ? (
+          <button
+            type="button"
+            onClick={onStartVisit}
+            data-testid={ids.startVisit}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 text-body flex h-9 flex-none items-center gap-1.5 rounded-lg ps-2 pe-2.5 font-medium whitespace-nowrap transition-colors md:ps-3 md:pe-3.5"
+          >
+            <Play aria-hidden="true" className="size-3.25 rtl:-scale-x-100" />
+            {t(K.startVisit)}
+          </button>
+        ) : null}
+        <ActivityToggle
+          open={activityOpen}
+          unread={file.unread}
+          onToggle={onToggleActivity}
+        />
+      </div>
+    </div>
+  );
+}

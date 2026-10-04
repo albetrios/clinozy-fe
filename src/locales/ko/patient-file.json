@@ -1,5 +1,139 @@
 {
   "manifest": {
     "title": "환자 파일"
+  },
+  "sections": {
+    "timeline": "개요",
+    "overview": "진료 메모",
+    "visits": "방문",
+    "prescriptions": "처방전",
+    "treatments": "시술",
+    "images": "사진",
+    "reports": "검사 결과",
+    "invoices": "청구서",
+    "payments": "결제",
+    "packages": "패키지",
+    "notes": "팀 메모"
+  },
+  "layout": {
+    "notFoundRecord": "환자",
+    "loading": "환자 파일을 여는 중"
+  },
+  "fileBar": {
+    "back": "환자 목록으로 돌아가기",
+    "backHint": "환자 목록으로 돌아가기 (Esc)",
+    "patients": "환자",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "방문 진행 중 · 계속하기",
+    "tabs": "환자 섹션",
+    "notPinned": "고정되지 않음 · 열려 있는 동안 표시",
+    "addToRecord": "기록에 추가",
+    "startVisit": "방문 시작",
+    "activity": "활동",
+    "showActivity": "메시지 및 활동 보기",
+    "hideActivity": "메시지 및 활동 숨기기",
+    "unread_other": "읽지 않은 메시지 {{count}}개"
+  },
+  "sectionsPopover": {
+    "trigger": "환자 파일 · 모든 섹션",
+    "label": "환자 파일 섹션",
+    "title": "환자 파일",
+    "groups": {
+      "clinical": "진료",
+      "care": "케어",
+      "billing": "청구",
+      "team": "팀"
+    },
+    "openNow": "열려 있음",
+    "empty": "비어 있음",
+    "hasRecords": "기록 있음",
+    "pin": "바에 고정",
+    "unpin": "바에서 고정 해제",
+    "pinAria": "바에 고정 · {{section}}",
+    "unpinAria": "바에서 고정 해제 · {{section}}",
+    "footer": "고정한 섹션은 바에 남습니다"
+  },
+  "addMenu": {
+    "label": "기록에 추가",
+    "headerFile": "{{name}}님에게 추가",
+    "headerSection": "{{name}}님 · 이미 선택됨"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "처방전",
+      "treatment": "시술",
+      "invoice": "청구서",
+      "payment": "결제",
+      "photo": "사진",
+      "appointment": "예약",
+      "report": "검사 결과",
+      "note": "메모"
+    },
+    "nothingDue": "{{name}}님의 미납 금액이 없습니다"
+  },
+  "section": {
+    "primary": {
+      "visits": "새 예약",
+      "prescriptions": "새 처방전",
+      "treatments": "새 시술",
+      "images": "이미지 업로드",
+      "reports": "검사 결과 업로드",
+      "invoices": "새 청구서",
+      "payments": "결제 기록",
+      "packages": "패키지 추가"
+    },
+    "more": "{{name}}님 더 보기"
+  },
+  "rail": {
+    "copyId": "환자 ID 복사",
+    "idCopied": "환자 ID를 복사했습니다",
+    "since": "{{date}}부터",
+    "joinedToday": "오늘 등록",
+    "daysAsPatient_other": "환자로 {{count}}일",
+    "monthsAsPatient_other": "환자로 {{count}}개월",
+    "editContact": "연락처 편집",
+    "reach": "연락 방법",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 기본",
+      "fromLead": "휴대폰 · 리드에서",
+      "mobile": "휴대폰",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "번호 보기",
+    "hideNumber": "번호 숨기기",
+    "openWhatsApp": "새 탭에서 WhatsApp 채팅 열기",
+    "call": "전화",
+    "openInstagram": "새 탭에서 Instagram 열기",
+    "numberCopied": "번호를 복사했습니다",
+    "handleCopied": "사용자 이름을 복사했습니다",
+    "about": "정보",
+    "birthdayIn_other": "🎂 {{count}}일 후",
+    "birthdayToday": "🎂 오늘",
+    "noAddress": "주소 없음",
+    "upNext": "다음 일정",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "오늘",
+    "tomorrow": "내일",
+    "visitService": "{{service}} · {{minutes}}분",
+    "reschedule": "일정 변경",
+    "book": "예약",
+    "notBooked": "예약 없음",
+    "noUpcoming": "예정된 방문 없음",
+    "maskedAmount": "₹ ••••",
+    "dueSince_other": "{{count}}일째 미납",
+    "showAmount": "금액 보기",
+    "hideAmount": "금액 숨기기",
+    "collect": "수납",
+    "creditToReturn": "돌려줄 금액 {{amount}}",
+    "allPaid": "모두 결제됨 · 미납 없음",
+    "feedback": "피드백",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}} {{rating}}★",
+    "checkIns_other": "경과 확인 {{count}}건",
+    "reviews_other": "리뷰 {{count}}건",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "아직 피드백이 없습니다"
   }
 }

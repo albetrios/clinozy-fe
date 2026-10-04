@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "Patientenakte"
+  },
+  "sections": {
+    "timeline": "Übersicht",
+    "overview": "Klinische Notizen",
+    "visits": "Besuche",
+    "prescriptions": "Rezepte",
+    "treatments": "Behandlungen",
+    "images": "Fotos",
+    "reports": "Befunde",
+    "invoices": "Rechnungen",
+    "payments": "Zahlungen",
+    "packages": "Pakete",
+    "notes": "Teamnotizen"
+  },
+  "layout": {
+    "notFoundRecord": "Patient",
+    "loading": "Patientenakte wird geöffnet"
+  },
+  "fileBar": {
+    "back": "Zurück zu den Patienten",
+    "backHint": "Zurück zu den Patienten (Esc)",
+    "patients": "Patienten",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Besuch läuft · Fortsetzen",
+    "tabs": "Bereiche des Patienten",
+    "notPinned": "Nicht angeheftet · nur sichtbar, solange geöffnet",
+    "addToRecord": "Zur Akte hinzufügen",
+    "startVisit": "Besuch starten",
+    "activity": "Aktivität",
+    "showActivity": "Nachrichten & Aktivität anzeigen",
+    "hideActivity": "Nachrichten & Aktivität ausblenden",
+    "unread_one": "{{count}} ungelesene Nachricht",
+    "unread_other": "{{count}} ungelesene Nachrichten"
+  },
+  "sectionsPopover": {
+    "trigger": "Patientenakte · alle Bereiche",
+    "label": "Bereiche der Patientenakte",
+    "title": "Patientenakte",
+    "groups": {
+      "clinical": "Klinisch",
+      "care": "Versorgung",
+      "billing": "Abrechnung",
+      "team": "Team"
+    },
+    "openNow": "Jetzt geöffnet",
+    "empty": "Leer",
+    "hasRecords": "Mit Einträgen",
+    "pin": "An die Leiste heften",
+    "unpin": "Von der Leiste lösen",
+    "pinAria": "An die Leiste heften · {{section}}",
+    "unpinAria": "Von der Leiste lösen · {{section}}",
+    "footer": "Angeheftete Bereiche bleiben in der Leiste"
+  },
+  "addMenu": {
+    "label": "Zur Akte hinzufügen",
+    "headerFile": "Hinzufügen für {{name}}",
+    "headerSection": "Für {{name}} · bereits ausgewählt"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Rezept",
+      "treatment": "Behandlung",
+      "invoice": "Rechnung",
+      "payment": "Zahlung",
+      "photo": "Foto",
+      "appointment": "Termin",
+      "report": "Befund",
+      "note": "Notiz"
+    },
+    "nothingDue": "Für {{name}} ist nichts offen"
+  },
+  "section": {
+    "primary": {
+      "visits": "Neuer Termin",
+      "prescriptions": "Neues Rezept",
+      "treatments": "Neue Behandlung",
+      "images": "Bilder hochladen",
+      "reports": "Befund hochladen",
+      "invoices": "Neue Rechnung",
+      "payments": "Zahlung erfassen",
+      "packages": "Paket hinzufügen"
+    },
+    "more": "Mehr für {{name}}"
+  },
+  "rail": {
+    "copyId": "Patienten-ID kopieren",
+    "idCopied": "Patienten-ID kopiert",
+    "since": "Seit {{date}}",
+    "joinedToday": "Heute hinzugekommen",
+    "daysAsPatient_one": "Seit {{count}} Tag Patient",
+    "daysAsPatient_other": "Seit {{count}} Tagen Patient",
+    "monthsAsPatient_one": "Seit {{count}} Monat Patient",
+    "monthsAsPatient_other": "Seit {{count}} Monaten Patient",
+    "editContact": "Kontakt bearbeiten",
+    "reach": "Erreichbarkeit",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Primär",
+      "fromLead": "Mobil · Aus dem Lead",
+      "mobile": "Mobil",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Nummer anzeigen",
+    "hideNumber": "Nummer ausblenden",
+    "openWhatsApp": "WhatsApp-Chat in neuem Tab öffnen",
+    "call": "Anrufen",
+    "openInstagram": "Instagram in neuem Tab öffnen",
+    "numberCopied": "Nummer kopiert",
+    "handleCopied": "Benutzername kopiert",
+    "about": "Info",
+    "birthdayIn_one": "🎂 in {{count}} Tag",
+    "birthdayIn_other": "🎂 in {{count}} Tagen",
+    "birthdayToday": "🎂 heute",
+    "noAddress": "Keine Adresse",
+    "upNext": "Als Nächstes",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "visitService": "{{service}} · {{minutes}} Min.",
+    "reschedule": "Verschieben",
+    "book": "Buchen",
+    "notBooked": "Nicht gebucht",
+    "noUpcoming": "Kein anstehender Besuch",
+    "maskedAmount": "₹ ••••",
+    "dueSince_one": "seit {{count}} Tag",
+    "dueSince_other": "seit {{count}} Tagen",
+    "showAmount": "Betrag anzeigen",
+    "hideAmount": "Betrag ausblenden",
+    "collect": "Kassieren",
+    "creditToReturn": "{{amount}} zurückzuzahlen",
+    "allPaid": "Alles bezahlt · nichts offen",
+    "feedback": "Feedback",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ auf {{source}}",
+    "checkIns_one": "{{count}} Check-in",
+    "checkIns_other": "{{count}} Check-ins",
+    "reviews_one": "{{count}} Bewertung",
+    "reviews_other": "{{count}} Bewertungen",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "Noch kein Feedback"
   }
 }

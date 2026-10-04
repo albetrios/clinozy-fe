@@ -1,5 +1,139 @@
 {
   "manifest": {
     "title": "患者ファイル"
+  },
+  "sections": {
+    "timeline": "概要",
+    "overview": "診療メモ",
+    "visits": "来院",
+    "prescriptions": "処方箋",
+    "treatments": "施術",
+    "images": "写真",
+    "reports": "検査報告",
+    "invoices": "請求書",
+    "payments": "支払い",
+    "packages": "パッケージ",
+    "notes": "チームメモ"
+  },
+  "layout": {
+    "notFoundRecord": "患者",
+    "loading": "患者ファイルを開いています"
+  },
+  "fileBar": {
+    "back": "患者一覧に戻る",
+    "backHint": "患者一覧に戻る (Esc)",
+    "patients": "患者",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "来院対応中 · 再開",
+    "tabs": "患者のセクション",
+    "notPinned": "未固定 · 開いている間だけ表示",
+    "addToRecord": "記録に追加",
+    "startVisit": "来院を開始",
+    "activity": "アクティビティ",
+    "showActivity": "メッセージとアクティビティを表示",
+    "hideActivity": "メッセージとアクティビティを隠す",
+    "unread_other": "未読メッセージ{{count}}件"
+  },
+  "sectionsPopover": {
+    "trigger": "患者ファイル · すべてのセクション",
+    "label": "患者ファイルのセクション",
+    "title": "患者ファイル",
+    "groups": {
+      "clinical": "診療",
+      "care": "ケア",
+      "billing": "会計",
+      "team": "チーム"
+    },
+    "openNow": "表示中",
+    "empty": "空",
+    "hasRecords": "記録あり",
+    "pin": "バーに固定",
+    "unpin": "バーから外す",
+    "pinAria": "バーに固定 · {{section}}",
+    "unpinAria": "バーから外す · {{section}}",
+    "footer": "固定したセクションはバーに残ります"
+  },
+  "addMenu": {
+    "label": "記録に追加",
+    "headerFile": "{{name}}さんに追加",
+    "headerSection": "{{name}}さん · 選択済み"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "処方箋",
+      "treatment": "施術",
+      "invoice": "請求書",
+      "payment": "支払い",
+      "photo": "写真",
+      "appointment": "予約",
+      "report": "検査報告",
+      "note": "メモ"
+    },
+    "nothingDue": "{{name}}さんの未払いはありません"
+  },
+  "section": {
+    "primary": {
+      "visits": "新しい予約",
+      "prescriptions": "新しい処方箋",
+      "treatments": "新しい施術",
+      "images": "画像をアップロード",
+      "reports": "検査報告をアップロード",
+      "invoices": "新しい請求書",
+      "payments": "支払いを記録",
+      "packages": "パッケージを追加"
+    },
+    "more": "{{name}}さんのその他"
+  },
+  "rail": {
+    "copyId": "患者IDをコピー",
+    "idCopied": "患者IDをコピーしました",
+    "since": "{{date}}から",
+    "joinedToday": "本日登録",
+    "daysAsPatient_other": "患者になって{{count}}日",
+    "monthsAsPatient_other": "患者になって{{count}}か月",
+    "editContact": "連絡先を編集",
+    "reach": "連絡手段",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · メイン",
+      "fromLead": "携帯 · リードから",
+      "mobile": "携帯",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "番号を表示",
+    "hideNumber": "番号を隠す",
+    "openWhatsApp": "WhatsAppのチャットを新しいタブで開く",
+    "call": "電話する",
+    "openInstagram": "Instagramを新しいタブで開く",
+    "numberCopied": "番号をコピーしました",
+    "handleCopied": "ユーザー名をコピーしました",
+    "about": "概要",
+    "birthdayIn_other": "🎂 あと{{count}}日",
+    "birthdayToday": "🎂 今日",
+    "noAddress": "住所なし",
+    "upNext": "次の予定",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "今日",
+    "tomorrow": "明日",
+    "visitService": "{{service}} · {{minutes}}分",
+    "reschedule": "日時を変更",
+    "book": "予約",
+    "notBooked": "未予約",
+    "noUpcoming": "今後の来院なし",
+    "maskedAmount": "₹ ••••",
+    "dueSince_other": "{{count}}日前から",
+    "showAmount": "金額を表示",
+    "hideAmount": "金額を隠す",
+    "collect": "集金",
+    "creditToReturn": "返金予定 {{amount}}",
+    "allPaid": "支払い済み · 未払いなし",
+    "feedback": "フィードバック",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}}で{{rating}}★",
+    "checkIns_other": "経過確認{{count}}件",
+    "reviews_other": "レビュー{{count}}件",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "フィードバックはまだありません"
   }
 }

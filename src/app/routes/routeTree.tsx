@@ -104,6 +104,12 @@ import { manifest as offerCreateManifest } from '@/pages/organization/$organizat
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
+import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
+import {
+  type PatientFileSearch,
+  validatePatientFileDialogSearch,
+  validatePatientFileSearch,
+} from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
 import { manifest as patientCreateManifest } from '@/pages/organization/$organizationSlug/patients/create/create.manifest.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
 import {
@@ -150,6 +156,7 @@ import {
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
+import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
 import { ConsentBannerLazy } from '@/shared/components/ConsentBanner/index.ts';
@@ -315,6 +322,32 @@ const PatientCreateRoute = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/patients/create/create.route.tsx'),
   'Component',
 );
+// The patient file (KICKOFF §6.6, L-42): its layout and every section and
+// dialog route come through ONE lazy module, so this entry chunk carries one
+// import for all of them. Each route's own chunk is preloaded right after the
+// module, so a navigation never suspends on the second hop.
+const loadPatientFile = localizedRoute(
+  [I18N_NAMESPACES.patientFile],
+  () =>
+    import('@/pages/organization/$organizationSlug/patients/$patientId/patient-id.sections.ts'),
+);
+type PatientFileRoutes = Omit<
+  Awaited<ReturnType<typeof loadPatientFile>>,
+  'PATIENT_FILE_SECTION_PAGES'
+>;
+const patientFileComponent = (name: keyof PatientFileRoutes) =>
+  lazyRouteComponent(async () => {
+    const module = await loadPatientFile();
+    await module[name].preload?.();
+    return module;
+  }, name);
+// A section's page, from the same module (its own chunk preloaded the same way).
+const patientFileSection = (section: PatientFileSectionSlug) =>
+  lazyRouteComponent(async () => {
+    const page = (await loadPatientFile()).PATIENT_FILE_SECTION_PAGES[section];
+    await page.preload?.();
+    return { Component: page };
+  }, 'Component');
 const PaymentsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.payments],
@@ -1178,6 +1211,92 @@ const organizationPatientCreateRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// The patient file (KICKOFF §4, §6.6): a layout of its own beside the list,
+// gated like the room; its sections and dialog routes inherit the gate, and
+// in-room access is `useClinicAccess` (D9).
+const organizationPatientFileRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'patients/$patientId',
+  head: manifestHead(patientFileManifest),
+  staticData: { manifest: patientFileManifest },
+  validateSearch: validatePatientFileSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(patientFileManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: patientFileComponent('PatientFileLayout'),
+  errorComponent: RouteErrorBoundary,
+});
+
+// `/patients/$patientId` and an unknown section open the Overview (D19; S:33),
+// the search kept — the Patients row's and ⌘K's `activity`.
+function toPatientFileDefault({
+  params,
+  search,
+}: {
+  params: { organizationSlug: string; patientId: string };
+  search: PatientFileSearch;
+}): never {
+  throw redirect({
+    to: '/organization/$organizationSlug/patients/$patientId/timeline',
+    params,
+    search,
+  });
+}
+
+const organizationPatientFileIndexRoute = createRoute({
+  getParentRoute: () => organizationPatientFileRoute,
+  path: '/',
+  beforeLoad: toPatientFileDefault,
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPatientFileUnknownRoute = createRoute({
+  getParentRoute: () => organizationPatientFileRoute,
+  path: '$',
+  beforeLoad: toPatientFileDefault,
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
+});
+
+// A section of the file under its layout (KICKOFF §6.6, S:33). One call per
+// section keeps each route's literal path for the typed links, and the entry
+// chunk small.
+function patientFileSectionRoute<const Section extends PatientFileSectionSlug>(
+  path: Section,
+) {
+  return createRoute({
+    getParentRoute: () => organizationPatientFileRoute,
+    path,
+    component: patientFileSection(path),
+    errorComponent: RouteErrorBoundary,
+  });
+}
+
+const organizationPatientTimelineRoute = patientFileSectionRoute('timeline');
+const organizationPatientOverviewRoute = patientFileSectionRoute('overview');
+const organizationPatientVisitsRoute = patientFileSectionRoute('visits');
+const organizationPatientPrescriptionsRoute = patientFileSectionRoute('prescriptions');
+const organizationPatientTreatmentsRoute = patientFileSectionRoute('treatments');
+const organizationPatientImagesRoute = patientFileSectionRoute('images');
+const organizationPatientReportsRoute = patientFileSectionRoute('reports');
+const organizationPatientInvoicesRoute = patientFileSectionRoute('invoices');
+const organizationPatientPaymentsRoute = patientFileSectionRoute('payments');
+const organizationPatientPackagesRoute = patientFileSectionRoute('packages');
+const organizationPatientNotesRoute = patientFileSectionRoute('notes');
+
+// URL-driven dialog over the section it opened from (S:34, A-F1): the drawer
+// route renders that section and the patient drawer over it.
+const organizationPatientEditRoute = createRoute({
+  getParentRoute: () => organizationPatientFileRoute,
+  path: 'edit',
+  validateSearch: validatePatientFileDialogSearch,
+  component: patientFileComponent('PatientFileEdit'),
+  errorComponent: RouteErrorBoundary,
+});
+
 // `/payments` is the ledger itself (D24, `S:84`); its drawers are URL-driven
 // dialogs over it — each renders nothing, the page reads the URL and opens it.
 const organizationPaymentsRoute = createRoute({
@@ -1935,6 +2054,22 @@ const routeTree = rootRoute.addChildren([
       organizationAppointmentEditRoute,
     ]),
     organizationPatientsRoute.addChildren([organizationPatientCreateRoute]),
+    organizationPatientFileRoute.addChildren([
+      organizationPatientFileIndexRoute,
+      organizationPatientTimelineRoute,
+      organizationPatientOverviewRoute,
+      organizationPatientVisitsRoute,
+      organizationPatientPrescriptionsRoute,
+      organizationPatientTreatmentsRoute,
+      organizationPatientImagesRoute,
+      organizationPatientReportsRoute,
+      organizationPatientInvoicesRoute,
+      organizationPatientPaymentsRoute,
+      organizationPatientPackagesRoute,
+      organizationPatientNotesRoute,
+      organizationPatientEditRoute,
+      organizationPatientFileUnknownRoute,
+    ]),
     organizationMedicalRoute.addChildren([
       organizationMedicalIndexRoute,
       organizationMedicalSalesRoute.addChildren([

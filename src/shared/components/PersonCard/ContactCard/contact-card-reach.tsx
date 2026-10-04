@@ -5,12 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  formatClinicPhone,
-  instagramHref,
-  telHref,
-  whatsAppHref,
-} from '@/shared/clinic/clinic-phone.ts';
+import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   type ContactReach,
@@ -25,6 +20,8 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { Copy, InstagramMark, Phone, WhatsAppMark } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { type ReachLink, reachLinks } from './contact-card-reach-links.tsx';
+
 /** WhatsApp mark on sage, `Phone` on sky, Instagram mark on blush (H:5692). */
 const REACH_TILE: Readonly<
   Record<ContactReach['channel'], { tone: Tone; icon: ReactNode }>
@@ -34,73 +31,71 @@ const REACH_TILE: Readonly<
   instagram: { tone: 'blush', icon: <InstagramMark /> },
 };
 
-interface ReachLink {
-  href: string;
-  label: string;
-  icon: ReactNode;
-  /** Opens in a new tab (WhatsApp, Instagram); a call does not. */
-  external: boolean;
-}
-
-/** What one reach row shows: the value, its sub line and its channel links. */
+/** What one contact-card reach row shows: the value, its sub line and its channel links. */
 function describeReach(
   reach: ContactReach,
   primary: boolean,
   t: TFunction,
 ): { value: string; sub: string; links: ReachLink[] } {
   const keys = PERSON_CARD_KEYS;
+  const links = reachLinks(reach, {
+    whatsApp: t(keys.whatsApp),
+    call: t(keys.call),
+    instagram: t(keys.openInstagram),
+  });
   if (reach.channel === 'instagram') {
-    return {
-      value: reach.handle,
-      sub: t(keys.reachSub.instagram),
-      links: [
-        {
-          href: instagramHref(reach.handle),
-          label: t(keys.openInstagram),
-          icon: <InstagramMark className="size-3.5" />,
-          external: true,
-        },
-      ],
-    };
+    return { value: reach.handle, sub: t(keys.reachSub.instagram), links };
   }
-  const call: ReachLink = {
-    href: telHref(reach.phone),
-    label: t(keys.call),
-    icon: <Phone className="size-3.5" />,
-    external: false,
-  };
   if (reach.channel === 'phone') {
     return {
       value: formatClinicPhone(reach.phone),
       sub: t(primary ? keys.reachSub.phonePrimary : keys.reachSub.phoneAlternate),
-      links: [call],
+      links,
     };
   }
   return {
     value: formatClinicPhone(reach.phone),
     sub: t(primary ? keys.reachSub.whatsappPrimary : keys.reachSub.whatsappAlternate),
-    links: [
-      {
-        href: whatsAppHref(reach.phone),
-        label: t(keys.whatsApp),
-        icon: <WhatsAppMark className="size-3.5" />,
-        external: true,
-      },
-      call,
-    ],
+    links,
   };
 }
 
-/** One 32px-tile row per number or handle, with its links and "Copy" (H:2736). */
-function ReachRow({ reach, primary }: { reach: ContactReach; primary: boolean }) {
-  const { t } = useTranslation(PERSON_CARD_NS);
-  const tile = REACH_TILE[reach.channel];
-  const { value, sub, links } = describeReach(reach, primary, t);
+/** Props of {@link ReachRow}. */
+export interface ReachRowProps {
+  channel: ContactReach['channel'];
+  /** The value as shown — a number, a masked number, a handle. */
+  value: string;
+  sub: string;
+  links: readonly ReachLink[];
+  /** What "Copy" puts on the clipboard, and the toast that says so. */
+  copy: { text: string; message: string };
+  /** Before the links — the patient rail's eye. */
+  extra?: ReactNode;
+  /** The value's type size (13px by default). */
+  valueClassName?: string;
+}
 
-  const copy = async () => {
+/**
+ * One 32px-tile row per number or handle, with its links and "Copy" (H:2736;
+ * the patient rail's Reach, H:719): the contact card's and the rail's, which
+ * also masks the number behind an eye.
+ */
+export function ReachRow({
+  channel,
+  value,
+  sub,
+  links,
+  copy,
+  extra,
+  valueClassName = 'text-body',
+}: ReachRowProps) {
+  const { t } = useTranslation(PERSON_CARD_NS);
+  const tile = REACH_TILE[channel];
+
+  const copyValue = async () => {
     try {
-      await navigator.clipboard.writeText(value);
-      notify.success(t(PERSON_CARD_KEYS.copied, { value }));
+      await navigator.clipboard.writeText(copy.text);
+      notify.success(copy.message);
     } catch {
       notify.error(t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
     }
@@ -121,7 +116,14 @@ function ReachRow({ reach, primary }: { reach: ContactReach; primary: boolean })
         {tile.icon}
       </span>
       <span className="flex min-w-0 flex-col gap-px">
-        <span className="text-body truncate leading-[1.2] font-semibold tabular-nums">
+        <span
+          className={cn(
+            'truncate font-semibold tabular-nums',
+            valueClassName,
+            // After the size: a type-size class would drop an earlier leading (cn).
+            'leading-[1.2]',
+          )}
+        >
           {value}
         </span>
         <span className="text-micro text-muted-foreground truncate leading-[1.2]">
@@ -129,6 +131,7 @@ function ReachRow({ reach, primary }: { reach: ContactReach; primary: boolean })
         </span>
       </span>
       <span className="flex">
+        {extra}
         {links.map((link) => (
           <Hint key={link.href} label={link.label}>
             <Button asChild variant="ghost" size="icon" className={ICON_ACTION}>
@@ -151,7 +154,7 @@ function ReachRow({ reach, primary }: { reach: ContactReach; primary: boolean })
             size="icon"
             aria-label={t(PERSON_CARD_KEYS.copy)}
             className={ICON_ACTION}
-            onClick={() => void copy()}
+            onClick={() => void copyValue()}
           >
             <Copy className="size-3.5" />
           </Button>
@@ -169,13 +172,19 @@ export function ContactReachGroup({ reach }: { reach: readonly ContactReach[] })
   return (
     <CardGroup label={t(PERSON_CARD_KEYS.reach)} className="gap-2 px-3.5 pt-3.5 pb-1.5">
       {reach.length ? (
-        reach.map((item, index) => (
-          <ReachRow
-            key={`${item.channel}-${item.channel === 'instagram' ? item.handle : item.phone}`}
-            reach={item}
-            primary={index === firstPhone}
-          />
-        ))
+        reach.map((item, index) => {
+          const { value, sub, links } = describeReach(item, index === firstPhone, t);
+          return (
+            <ReachRow
+              key={`${item.channel}-${item.channel === 'instagram' ? item.handle : item.phone}`}
+              channel={item.channel}
+              value={value}
+              sub={sub}
+              links={links}
+              copy={{ text: value, message: t(PERSON_CARD_KEYS.copied, { value }) }}
+            />
+          );
+        })
       ) : (
         <span className="text-muted-foreground text-xs">
           {t(PERSON_CARD_KEYS.noReach)}

@@ -1,5 +1,153 @@
 {
   "manifest": {
     "title": "Cartella paziente"
+  },
+  "sections": {
+    "timeline": "Panoramica",
+    "overview": "Note cliniche",
+    "visits": "Visite",
+    "prescriptions": "Prescrizioni",
+    "treatments": "Trattamenti",
+    "images": "Foto",
+    "reports": "Referti",
+    "invoices": "Fatture",
+    "payments": "Pagamenti",
+    "packages": "Pacchetti",
+    "notes": "Note del team"
+  },
+  "layout": {
+    "notFoundRecord": "Paziente",
+    "loading": "Apertura della cartella paziente"
+  },
+  "fileBar": {
+    "back": "Torna ai pazienti",
+    "backHint": "Torna ai pazienti (Esc)",
+    "patients": "Pazienti",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Visita in corso · Riprendi",
+    "tabs": "Sezioni del paziente",
+    "notPinned": "Non fissata · visibile finché è aperta",
+    "addToRecord": "Aggiungi alla cartella",
+    "startVisit": "Avvia visita",
+    "activity": "Attività",
+    "showActivity": "Mostra messaggi e attività",
+    "hideActivity": "Nascondi messaggi e attività",
+    "unread_one": "{{count}} messaggio non letto",
+    "unread_many": "{{count}} di messaggi non letti",
+    "unread_other": "{{count}} messaggi non letti"
+  },
+  "sectionsPopover": {
+    "trigger": "Cartella paziente · tutte le sezioni",
+    "label": "Sezioni della cartella paziente",
+    "title": "Cartella paziente",
+    "groups": {
+      "clinical": "Clinica",
+      "care": "Assistenza",
+      "billing": "Fatturazione",
+      "team": "Team"
+    },
+    "openNow": "Aperta ora",
+    "empty": "Vuota",
+    "hasRecords": "Con dati",
+    "pin": "Fissa nella barra",
+    "unpin": "Rimuovi dalla barra",
+    "pinAria": "Fissa nella barra · {{section}}",
+    "unpinAria": "Rimuovi dalla barra · {{section}}",
+    "footer": "Le sezioni fissate restano nella barra"
+  },
+  "addMenu": {
+    "label": "Aggiungi alla cartella",
+    "headerFile": "Aggiungi per {{name}}",
+    "headerSection": "Per {{name}} · già selezionato"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Prescrizione",
+      "treatment": "Trattamento",
+      "invoice": "Fattura",
+      "payment": "Pagamento",
+      "photo": "Foto",
+      "appointment": "Appuntamento",
+      "report": "Referto",
+      "note": "Nota"
+    },
+    "nothingDue": "Niente da saldare per {{name}}"
+  },
+  "section": {
+    "primary": {
+      "visits": "Nuovo appuntamento",
+      "prescriptions": "Nuova prescrizione",
+      "treatments": "Nuovo trattamento",
+      "images": "Carica immagini",
+      "reports": "Carica referto",
+      "invoices": "Nuova fattura",
+      "payments": "Registra pagamento",
+      "packages": "Aggiungi pacchetto"
+    },
+    "more": "Altro per {{name}}"
+  },
+  "rail": {
+    "copyId": "Copia ID paziente",
+    "idCopied": "ID paziente copiato",
+    "since": "Dal {{date}}",
+    "joinedToday": "Arrivato oggi",
+    "daysAsPatient_one": "Paziente da {{count}} giorno",
+    "daysAsPatient_many": "Paziente da {{count}} di giorni",
+    "daysAsPatient_other": "Paziente da {{count}} giorni",
+    "monthsAsPatient_one": "Paziente da {{count}} mese",
+    "monthsAsPatient_many": "Paziente da {{count}} di mesi",
+    "monthsAsPatient_other": "Paziente da {{count}} mesi",
+    "editContact": "Modifica contatto",
+    "reach": "Recapiti",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Principale",
+      "fromLead": "Cellulare · Dal lead",
+      "mobile": "Cellulare",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Mostra numero",
+    "hideNumber": "Nascondi numero",
+    "openWhatsApp": "Apri la chat WhatsApp in una nuova scheda",
+    "call": "Chiama",
+    "openInstagram": "Apri Instagram in una nuova scheda",
+    "numberCopied": "Numero copiato",
+    "handleCopied": "Nome utente copiato",
+    "about": "Informazioni",
+    "birthdayIn_one": "🎂 tra {{count}} giorno",
+    "birthdayIn_many": "🎂 tra {{count}} di giorni",
+    "birthdayIn_other": "🎂 tra {{count}} giorni",
+    "birthdayToday": "🎂 oggi",
+    "noAddress": "Nessun indirizzo",
+    "upNext": "Prossimamente",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "Oggi",
+    "tomorrow": "Domani",
+    "visitService": "{{service}} · {{minutes}} min",
+    "reschedule": "Riprogramma",
+    "book": "Prenota",
+    "notBooked": "Non prenotato",
+    "noUpcoming": "Nessuna visita in programma",
+    "maskedAmount": "₹ ••••",
+    "dueSince_one": "da {{count}} giorno",
+    "dueSince_many": "da {{count}} di giorni",
+    "dueSince_other": "da {{count}} giorni",
+    "showAmount": "Mostra importo",
+    "hideAmount": "Nascondi importo",
+    "collect": "Incassa",
+    "creditToReturn": "{{amount}} da restituire",
+    "allPaid": "Tutto pagato · niente da saldare",
+    "feedback": "Feedback",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ su {{source}}",
+    "checkIns_one": "{{count}} controllo",
+    "checkIns_many": "{{count}} di controlli",
+    "checkIns_other": "{{count}} controlli",
+    "reviews_one": "{{count}} recensione",
+    "reviews_many": "{{count}} di recensioni",
+    "reviews_other": "{{count}} recensioni",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "Ancora nessun feedback"
   }
 }

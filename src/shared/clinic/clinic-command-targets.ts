@@ -4,6 +4,10 @@ import {
   organizationLeadCreate,
   organizationPatientCreate,
 } from '@/lib/routes/builders.ts';
+import {
+  organizationPatient,
+  organizationPatientEdit,
+} from '@/lib/routes/patient-file-builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
 
@@ -38,8 +42,8 @@ export type ClinicCommandTarget =
  * | `newReceipt`     | `/payments/receive`            | L-39b                          |
  * | `newInvoice`     | `/invoices/create`             | L-40                           |
  * | `openTasks`      | `/tasks`                       | live                           |
- * | `patient`        | `/patients/$patientId`         | L-42                           |
- * | `patientEdit`    | `/patients/$patientId/edit`    | L-42 (the drawer L-32b)        |
+ * | `patient`        | `/patients/$patientId`         | live (L-42; lands on Overview) |
+ * | `patientEdit`    | `/patients/$patientId/edit`    | live (L-42; the drawer L-32b)  |
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
  * | `invoice`        | `/invoices/$invoiceId`         | L-40                           |
  *
@@ -55,8 +59,8 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   newReceipt: '/organization/$organizationSlug/payments/receive',
   newInvoice: '/organization/$organizationSlug/invoices/create',
   openTasks: CLINIC_SECTION_ROUTES.tasks,
-  patient: '/organization/$organizationSlug/patients/$patientId',
-  patientEdit: '/organization/$organizationSlug/patients/$patientId/edit',
+  patient: organizationPatient('', '').to,
+  patientEdit: organizationPatientEdit('', '').to,
   lead: organizationLead('', '').to,
   invoice: '/organization/$organizationSlug/invoices/$invoiceId',
 };

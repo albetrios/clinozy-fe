@@ -1,5 +1,139 @@
 {
   "manifest": {
     "title": "患者档案"
+  },
+  "sections": {
+    "timeline": "概览",
+    "overview": "临床笔记",
+    "visits": "就诊",
+    "prescriptions": "处方",
+    "treatments": "治疗",
+    "images": "照片",
+    "reports": "报告",
+    "invoices": "发票",
+    "payments": "付款",
+    "packages": "套餐",
+    "notes": "团队笔记"
+  },
+  "layout": {
+    "notFoundRecord": "患者",
+    "loading": "正在打开患者档案"
+  },
+  "fileBar": {
+    "back": "返回患者列表",
+    "backHint": "返回患者列表 (Esc)",
+    "patients": "患者",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "就诊进行中 · 继续",
+    "tabs": "患者分区",
+    "notPinned": "未固定 · 打开时显示",
+    "addToRecord": "添加到档案",
+    "startVisit": "开始就诊",
+    "activity": "动态",
+    "showActivity": "显示消息和动态",
+    "hideActivity": "隐藏消息和动态",
+    "unread_other": "{{count}} 条未读消息"
+  },
+  "sectionsPopover": {
+    "trigger": "患者档案 · 全部分区",
+    "label": "患者档案分区",
+    "title": "患者档案",
+    "groups": {
+      "clinical": "临床",
+      "care": "护理",
+      "billing": "账务",
+      "team": "团队"
+    },
+    "openNow": "当前打开",
+    "empty": "空",
+    "hasRecords": "有记录",
+    "pin": "固定到栏",
+    "unpin": "从栏中取消固定",
+    "pinAria": "固定到栏 · {{section}}",
+    "unpinAria": "从栏中取消固定 · {{section}}",
+    "footer": "固定的分区会保留在栏中"
+  },
+  "addMenu": {
+    "label": "添加到档案",
+    "headerFile": "为 {{name}} 添加",
+    "headerSection": "为 {{name}} · 已选择"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "处方",
+      "treatment": "治疗",
+      "invoice": "发票",
+      "payment": "付款",
+      "photo": "照片",
+      "appointment": "预约",
+      "report": "报告",
+      "note": "笔记"
+    },
+    "nothingDue": "{{name}} 没有待付款项"
+  },
+  "section": {
+    "primary": {
+      "visits": "新建预约",
+      "prescriptions": "新建处方",
+      "treatments": "新建治疗",
+      "images": "上传图片",
+      "reports": "上传报告",
+      "invoices": "新建发票",
+      "payments": "记录付款",
+      "packages": "添加套餐"
+    },
+    "more": "{{name}} 的更多操作"
+  },
+  "rail": {
+    "copyId": "复制患者 ID",
+    "idCopied": "已复制患者 ID",
+    "since": "自 {{date}} 起",
+    "joinedToday": "今天加入",
+    "daysAsPatient_other": "成为患者 {{count}} 天",
+    "monthsAsPatient_other": "成为患者 {{count}} 个月",
+    "editContact": "编辑联系人",
+    "reach": "联系方式",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 主要",
+      "fromLead": "手机 · 来自线索",
+      "mobile": "手机",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "显示号码",
+    "hideNumber": "隐藏号码",
+    "openWhatsApp": "在新标签页中打开 WhatsApp 聊天",
+    "call": "拨打电话",
+    "openInstagram": "在新标签页中打开 Instagram",
+    "numberCopied": "已复制号码",
+    "handleCopied": "已复制账号",
+    "about": "简介",
+    "birthdayIn_other": "🎂 {{count}} 天后",
+    "birthdayToday": "🎂 今天",
+    "noAddress": "无地址",
+    "upNext": "即将到来",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "今天",
+    "tomorrow": "明天",
+    "visitService": "{{service}} · {{minutes}} 分钟",
+    "reschedule": "改期",
+    "book": "预约",
+    "notBooked": "未预约",
+    "noUpcoming": "暂无即将到来的就诊",
+    "maskedAmount": "₹ ••••",
+    "dueSince_other": "已欠 {{count}} 天",
+    "showAmount": "显示金额",
+    "hideAmount": "隐藏金额",
+    "collect": "收款",
+    "creditToReturn": "待退还 {{amount}}",
+    "allPaid": "已全部付清 · 无欠款",
+    "feedback": "反馈",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}} 上 {{rating}}★",
+    "checkIns_other": "{{count}} 次回访",
+    "reviews_other": "{{count}} 条评价",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "暂无反馈"
   }
 }

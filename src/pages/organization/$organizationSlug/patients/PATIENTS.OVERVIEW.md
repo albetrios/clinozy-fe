@@ -23,9 +23,9 @@ Collect · Edit · Delete; infinite scroll over cursor pages, "All patients load
 The view, search, filters and sort live in the URL (`patients.search.ts`); the list read
 follows them — a view or sort change keeps the rows until the new page arrives, a search
 or "Apply filter" shows the skeleton over the rows. A failed read keeps the last copy and
-toasts "Retry". A row click opens the patient file (`activity` open from `md`, closed on a
-phone); the file, its Edit patient drawer route, the Invoice drawer and Receive land with their own
-rows (L-42, L-40, L-39b) — until then those targets land on the org's not-found route.
+toasts "Retry". A row click opens the patient file (`$patientId/`, `activity` open from
+`md`, closed on a phone); the Invoice drawer and Receive land with their own rows (L-40,
+L-39b) — until then those targets land on the org's not-found route.
 
 ## Dialog route
 
@@ -36,7 +36,7 @@ from `?name=&phone=&fromLead=`. On create the drawer closes, the list stays and 
 and the toast "Patient #3509 created · onboarding task added" offers "Open file" (D28,
 Q-P6); "Create & add another" saves and restarts it empty. A member without Create who
 follows the link lands back on the list with the permission toast. The same drawer is Edit
-patient on the file's edit route (L-42) and quick-add on the invoice and appointment pickers
+patient on the file's edit route (`$patientId/edit/`) and quick-add on the invoice and appointment pickers
 (Q-P2).
 
 The data is the shared patients domain: `@/shared/api/clinic/patients-api.ts` (fixture
@@ -59,6 +59,7 @@ world, `REPLACE_WITH_API`), its contracts beside it, and the hooks in
 | `hooks/usePatientsDialogRoute/` | Which dialog the URL opens (New patient and its prefill), the permission refusal, and the close back onto the list.                                                                                      |
 | `__tests__/integration/`        | The room end to end; `__tests__/integration/patients-test-router.tsx` mirrors the family's routes for the tests.                                                                                         |
 | `create/`                       | The New patient dialog-route island — see its overview.                                                                                                                                                  |
+| `$patientId/`                   | The patient file — a layout island of its own (its sections, Edit patient) — see its overview.                                                                                                           |
 
 ## Test ids
 

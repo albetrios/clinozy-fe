@@ -49,6 +49,11 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `clinic-referrer.ts` — the `from` allow-list a shared drawer route keeps its
   referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
   on the sender's (the page a drawer opens over, when it is an allowed one).
+- `patient-file-sections.ts` — the patient file's eleven section slugs (its
+  URL segments, `timeline` the Overview it lands on), the billing ones, the
+  sections a member may open (Q-F1: billing alone for an Accountant) and the
+  role-named gates — Rx Doctor / Admin, treatments Doctor / Therapist, the
+  Private album Doctor / Admin, the Owner always passing (`S:35–40`, D22).
 - `clinic-command-targets.ts` — where ⌘K's clinic rows go (`/leads/create`,
   `/appointments/create`, `/patients/create`, `/payments/receive`, `/tasks`,
   `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) and

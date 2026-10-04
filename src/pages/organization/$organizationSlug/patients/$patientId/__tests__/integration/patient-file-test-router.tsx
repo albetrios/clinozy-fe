@@ -1,0 +1,213 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  redirect,
+  RouterProvider,
+} from '@tanstack/react-router';
+import { render } from '@testing-library/react';
+import type { ReactNode } from 'react';
+
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import {
+  PATIENT_FILE_SECTIONS,
+  type PatientFileSectionSlug,
+} from '@/shared/clinic/patient-file-sections.ts';
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+
+import { PatientEditPage } from '../../edit/PatientEditPage.tsx';
+import { PatientImagesPage } from '../../images/PatientImagesPage.tsx';
+import { PatientInvoicesPage } from '../../invoices/PatientInvoicesPage.tsx';
+import { PatientNotesPage } from '../../notes/PatientNotesPage.tsx';
+import { PatientOverviewPage } from '../../overview/PatientOverviewPage.tsx';
+import { PatientPackagesPage } from '../../packages/PatientPackagesPage.tsx';
+import {
+  validatePatientFileDialogSearch,
+  validatePatientFileSearch,
+} from '../../patient-id.search.ts';
+import { PatientFileLayout } from '../../PatientFileLayout.tsx';
+import { PatientPaymentsPage } from '../../payments/PatientPaymentsPage.tsx';
+import { PatientPrescriptionsPage } from '../../prescriptions/PatientPrescriptionsPage.tsx';
+import { PatientReportsPage } from '../../reports/PatientReportsPage.tsx';
+import { PatientFileContext } from '../../shared/patient-file-context.ts';
+import { PatientTimelinePage } from '../../timeline/PatientTimelinePage.tsx';
+import { PatientTreatmentsPage } from '../../treatments/PatientTreatmentsPage.tsx';
+import { PatientVisitsPage } from '../../visits/PatientVisitsPage.tsx';
+
+/** The file's URL for a patient in the `acme` clinic. */
+export function patientFileUrl(patientId: string, rest = ''): string {
+  return `/organization/acme/patients/${patientId}${rest}`;
+}
+
+/**
+ * The patient file as `routeTree.tsx` registers it — the layout with its
+ * search schema, the eleven sections, Edit patient, the index and unknown
+ * sections going to the Overview — opened at `url`, for a member previewed as
+ * `role` (View-as narrows the clinic access to that role's matrix). The
+ * Patients list and every other path land on stand-ins, so a test can read
+ * where a link went.
+ */
+export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role } = {}) {
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+
+  const root = createRootRoute({ component: () => <Outlet /> });
+  const file = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/patients/$patientId',
+    validateSearch: validatePatientFileSearch,
+    component: PatientFileLayout,
+  });
+  const toDefault = ({
+    params,
+    search,
+  }: {
+    params: { organizationSlug: string; patientId: string };
+    search: Record<string, unknown>;
+  }) => {
+    throw redirect({
+      to: '/organization/$organizationSlug/patients/$patientId/timeline',
+      params,
+      search,
+    });
+  };
+  const index = createRoute({
+    getParentRoute: () => file,
+    path: '/',
+    beforeLoad: toDefault,
+  });
+  const unknown = createRoute({
+    getParentRoute: () => file,
+    path: '$',
+    beforeLoad: toDefault,
+  });
+  // Each section's page, as `routeTree.tsx` registers them (through the sections module).
+  const sections = Object.entries({
+    timeline: PatientTimelinePage,
+    overview: PatientOverviewPage,
+    visits: PatientVisitsPage,
+    prescriptions: PatientPrescriptionsPage,
+    treatments: PatientTreatmentsPage,
+    images: PatientImagesPage,
+    reports: PatientReportsPage,
+    invoices: PatientInvoicesPage,
+    payments: PatientPaymentsPage,
+    packages: PatientPackagesPage,
+    notes: PatientNotesPage,
+  }).map(([path, component]) =>
+    createRoute({ getParentRoute: () => file, path, component }),
+  );
+  const edit = createRoute({
+    getParentRoute: () => file,
+    path: 'edit',
+    validateSearch: validatePatientFileDialogSearch,
+    component: PatientEditPage,
+  });
+  const list = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/patients',
+    component: () => <p>patients list</p>,
+  });
+  const elsewhere = createRoute({
+    getParentRoute: () => root,
+    path: '$',
+    component: () => <p>elsewhere</p>,
+  });
+  const router = createRouter({
+    routeTree: root.addChildren([
+      file.addChildren([index, unknown, ...sections, edit]),
+      list,
+      elsewhere,
+    ]),
+    history: createMemoryHistory({ initialEntries: [url] }),
+  });
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const view = render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { ...view, router, queryClient };
+}
+
+/** What {@link renderInPatientFile} puts in the file's context. */
+export interface InPatientFileOptions {
+  role?: Role;
+  /** The file's read (`fetchPatientFile`); undefined while "loading". */
+  file?: PatientFile;
+  section?: PatientFileSectionSlug | null;
+  viewable?: readonly PatientFileSectionSlug[];
+  masked?: boolean;
+  toggleMasked?: () => void;
+}
+
+/**
+ * One part of the file — a section, a hook's probe — rendered inside the
+ * file's context at `…/patients/<file's patient>/<section>`, for a member
+ * previewed as `role`. Any other URL lands on a stand-in, so a test can read
+ * where a link went from `router.state.location`.
+ */
+export function renderInPatientFile(
+  ui: ReactNode,
+  {
+    role = 'admin',
+    file,
+    section = 'visits',
+    viewable = PATIENT_FILE_SECTIONS,
+    masked = true,
+    toggleMasked = () => undefined,
+  }: InPatientFileOptions = {},
+) {
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+  const patientId = file?.patient.id ?? 'patient';
+
+  const root = createRootRoute({ component: () => <Outlet /> });
+  const host = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/patients/$patientId/$',
+    component: () => (
+      <TooltipProvider>
+        <PatientFileContext.Provider
+          value={{ patientId, file, section, viewable, masked, toggleMasked }}
+        >
+          {ui}
+        </PatientFileContext.Provider>
+      </TooltipProvider>
+    ),
+  });
+  const elsewhere = createRoute({
+    getParentRoute: () => root,
+    path: '$',
+    component: () => <p>elsewhere</p>,
+  });
+  const router = createRouter({
+    routeTree: root.addChildren([host, elsewhere]),
+    history: createMemoryHistory({
+      initialEntries: [patientFileUrl(patientId, `/${section ?? 'visits'}`)],
+    }),
+  });
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const view = render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { ...view, router, queryClient };
+}
+
+/** Put the stores the harness touched back as they were. */
+export function resetPatientFile() {
+  useUIStore.setState({ previewRole: null, fileActivityOpen: null });
+  useOrganizationStore.getState().clearPermissions();
+}

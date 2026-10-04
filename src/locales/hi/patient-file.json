@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "मरीज़ की फ़ाइल"
+  },
+  "sections": {
+    "timeline": "अवलोकन",
+    "overview": "क्लिनिकल नोट्स",
+    "visits": "विज़िट",
+    "prescriptions": "पर्चे",
+    "treatments": "उपचार",
+    "images": "फ़ोटो",
+    "reports": "रिपोर्ट",
+    "invoices": "इनवॉइस",
+    "payments": "भुगतान",
+    "packages": "पैकेज",
+    "notes": "टीम नोट्स"
+  },
+  "layout": {
+    "notFoundRecord": "मरीज़",
+    "loading": "मरीज़ की फ़ाइल खुल रही है"
+  },
+  "fileBar": {
+    "back": "मरीज़ों पर वापस जाएँ",
+    "backHint": "मरीज़ों पर वापस जाएँ (Esc)",
+    "patients": "मरीज़",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "विज़िट जारी है · फिर से शुरू करें",
+    "tabs": "मरीज़ के सेक्शन",
+    "notPinned": "पिन नहीं · खुला रहने तक दिखता है",
+    "addToRecord": "रिकॉर्ड में जोड़ें",
+    "startVisit": "विज़िट शुरू करें",
+    "activity": "गतिविधि",
+    "showActivity": "संदेश और गतिविधि दिखाएँ",
+    "hideActivity": "संदेश और गतिविधि छिपाएँ",
+    "unread_one": "{{count}} अपठित संदेश",
+    "unread_other": "{{count}} अपठित संदेश"
+  },
+  "sectionsPopover": {
+    "trigger": "मरीज़ की फ़ाइल · सभी सेक्शन",
+    "label": "मरीज़ की फ़ाइल के सेक्शन",
+    "title": "मरीज़ की फ़ाइल",
+    "groups": {
+      "clinical": "क्लिनिकल",
+      "care": "देखभाल",
+      "billing": "बिलिंग",
+      "team": "टीम"
+    },
+    "openNow": "अभी खुला",
+    "empty": "खाली",
+    "hasRecords": "रिकॉर्ड हैं",
+    "pin": "बार में पिन करें",
+    "unpin": "बार से हटाएँ",
+    "pinAria": "बार में पिन करें · {{section}}",
+    "unpinAria": "बार से हटाएँ · {{section}}",
+    "footer": "पिन किए गए सेक्शन बार में रहते हैं"
+  },
+  "addMenu": {
+    "label": "रिकॉर्ड में जोड़ें",
+    "headerFile": "{{name}} के लिए जोड़ें",
+    "headerSection": "{{name}} के लिए · पहले से चुना गया"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "पर्चा",
+      "treatment": "उपचार",
+      "invoice": "इनवॉइस",
+      "payment": "भुगतान",
+      "photo": "फ़ोटो",
+      "appointment": "अपॉइंटमेंट",
+      "report": "रिपोर्ट",
+      "note": "नोट"
+    },
+    "nothingDue": "{{name}} का कुछ भी बकाया नहीं है"
+  },
+  "section": {
+    "primary": {
+      "visits": "नया अपॉइंटमेंट",
+      "prescriptions": "नया पर्चा",
+      "treatments": "नया उपचार",
+      "images": "इमेज अपलोड करें",
+      "reports": "रिपोर्ट अपलोड करें",
+      "invoices": "नया इनवॉइस",
+      "payments": "भुगतान दर्ज करें",
+      "packages": "पैकेज जोड़ें"
+    },
+    "more": "{{name}} के लिए और"
+  },
+  "rail": {
+    "copyId": "मरीज़ ID कॉपी करें",
+    "idCopied": "मरीज़ ID कॉपी हो गई",
+    "since": "{{date}} से",
+    "joinedToday": "आज जुड़े",
+    "daysAsPatient_one": "{{count}} दिन से मरीज़",
+    "daysAsPatient_other": "{{count}} दिनों से मरीज़",
+    "monthsAsPatient_one": "{{count}} महीने से मरीज़",
+    "monthsAsPatient_other": "{{count}} महीनों से मरीज़",
+    "editContact": "संपर्क संपादित करें",
+    "reach": "संपर्क के तरीके",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · मुख्य",
+      "fromLead": "मोबाइल · लीड से",
+      "mobile": "मोबाइल",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "नंबर दिखाएँ",
+    "hideNumber": "नंबर छिपाएँ",
+    "openWhatsApp": "WhatsApp चैट नए टैब में खोलें",
+    "call": "कॉल करें",
+    "openInstagram": "Instagram नए टैब में खोलें",
+    "numberCopied": "नंबर कॉपी हो गया",
+    "handleCopied": "हैंडल कॉपी हो गया",
+    "about": "जानकारी",
+    "birthdayIn_one": "🎂 {{count}} दिन में",
+    "birthdayIn_other": "🎂 {{count}} दिनों में",
+    "birthdayToday": "🎂 आज",
+    "noAddress": "कोई पता नहीं",
+    "upNext": "आगे",
+    "visitWhen": "{{day}} · {{time}}",
+    "today": "आज",
+    "tomorrow": "कल",
+    "visitService": "{{service}} · {{minutes}} मिनट",
+    "reschedule": "समय बदलें",
+    "book": "बुक करें",
+    "notBooked": "बुक नहीं",
+    "noUpcoming": "कोई आगामी विज़िट नहीं",
+    "maskedAmount": "₹ ••••",
+    "dueSince_one": "{{count}} दिन से",
+    "dueSince_other": "{{count}} दिनों से",
+    "showAmount": "राशि दिखाएँ",
+    "hideAmount": "राशि छिपाएँ",
+    "collect": "वसूलें",
+    "creditToReturn": "{{amount}} लौटाने हैं",
+    "allPaid": "सब भुगतान हो गया · कुछ बकाया नहीं",
+    "feedback": "फ़ीडबैक",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}} पर {{rating}}★",
+    "checkIns_one": "{{count}} हाल-चाल",
+    "checkIns_other": "{{count}} हाल-चाल",
+    "reviews_one": "{{count}} समीक्षा",
+    "reviews_other": "{{count}} समीक्षाएँ",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "अभी कोई फ़ीडबैक नहीं"
   }
 }

@@ -15,6 +15,11 @@ import {
   validateLeadCreateSearch,
   validateLeadsSearch,
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
+import {
+  validatePatientFileDialogSearch,
+  validatePatientFileSearch,
+} from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
@@ -653,5 +658,97 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
     expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
     expect(requireOrgStatus).toHaveBeenCalledTimes(1);
     expect(routeOf(`${TASKS}/$taskId`)?.options.staticData?.manifest).toBe(taskManifest);
+  });
+});
+
+describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
+  const FILE = '/organization/$organizationSlug/patients/$patientId';
+  type FileRoute = {
+    options: {
+      validateSearch?: unknown;
+      staticData?: { manifest?: unknown };
+      beforeLoad?: (context: Record<string, unknown>) => unknown;
+      errorComponent?: unknown;
+    };
+  };
+  const routeOf = (id: string) =>
+    (router.routesById as unknown as Record<string, FileRoute | undefined>)[id];
+  const fileRouter = (url: string) =>
+    createRouter({
+      routeTree: router.routeTree,
+      history: createMemoryHistory({ initialEntries: [url] }),
+    });
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('registers the eleven sections, Edit patient, the index and the unknown section', () => {
+    const children = Object.keys(router.routesById)
+      .filter((id) => id.startsWith(`${FILE}/`))
+      .sort();
+    expect(children).toEqual(
+      [
+        '$',
+        'edit',
+        'images',
+        'invoices',
+        'notes',
+        'overview',
+        'packages',
+        'payments',
+        'prescriptions',
+        'reports',
+        'timeline',
+        'treatments',
+        'visits',
+        '',
+      ]
+        .map((segment) => `${FILE}/${segment}`)
+        .sort(),
+    );
+  });
+
+  it('validates `activity` on the file and `from` on Edit patient', () => {
+    expect(routeOf(FILE)?.options.validateSearch).toBe(validatePatientFileSearch);
+    expect(routeOf(`${FILE}/edit`)?.options.validateSearch).toBe(
+      validatePatientFileDialogSearch,
+    );
+  });
+
+  it('runs the room gateway on the file’s manifest, then the status guard', async () => {
+    await beforeLoadOf(FILE)({
+      location: { href: '/organization/acme/patients/P1/visits' },
+      params: { organizationSlug: 'acme', patientId: 'P1' },
+      preload: false,
+    });
+    expect(gatewayFromManifest).toHaveBeenCalledWith(patientFileManifest);
+    expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
+    expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+    expect(routeOf(FILE)?.options.staticData?.manifest).toBe(patientFileManifest);
+  });
+
+  it('opens the Overview from the bare URL, keeping the Patients row’s `activity`', async () => {
+    const memoryRouter = fileRouter('/organization/acme/patients/P1?activity=open');
+    await memoryRouter.load();
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe(
+        '/organization/acme/patients/P1/timeline',
+      ),
+    );
+    expect(memoryRouter.state.location.search).toEqual({ activity: 'open' });
+    expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(`${FILE}/timeline`);
+  });
+
+  it('sends an unknown section to the Overview', async () => {
+    const memoryRouter = fileRouter('/organization/acme/patients/P1/secret/deeper');
+    await memoryRouter.load();
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe(
+        '/organization/acme/patients/P1/timeline',
+      ),
+    );
   });
 });
