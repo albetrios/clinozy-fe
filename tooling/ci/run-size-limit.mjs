@@ -206,8 +206,20 @@ const config = [
            * drawer's chip and "+91" fields (+0.12, L-32b) and the Patients list
            * (+0.02, L-32). Trimmed first: the Agenda header's band map spelled
            * all eleven tones for the six a day takes (−0.09 kB).
+           *
+           * 39.5 → 40.8 kB (same exemption, D36): measured 40.34 kB (39.06
+           * before the Leads rows), each row boundary built: the lead drawer
+           * (+0.80 kB, L-34b: its two panes sized by CSS variables, the chat's
+           * resize handle, the cards, the progress track's tinted tiles, the
+           * people popover, the copy-ID hover, the phone bar), the Leads list
+           * (+0.40, L-33b: the in-place refresh bars as one rowgroup rule, the
+           * hold dot, the claim pill, the team cell) and New lead with the
+           * shared contact editor (+0.07, L-35: the 640px record drawer, the
+           * 560px editor and its outside ×). Nothing here is unused; the next
+           * trim is one in-place skeleton — the calendars still spell L-37's
+           * `SKELETON_IN_PLACE` classes beside the table's rule.
            */
-          limit: '39.5 kB',
+          limit: '40.8 kB',
           gzip: true,
         },
       ]
