@@ -182,9 +182,9 @@ function CommandMenu({
       loop
       value={selection.value}
       onValueChange={selection.onValueChange}
+      // Esc belongs to the shell's dialog — the top-most layer takes it.
       onKeyDown={(event) => {
-        if (event.key === 'Escape') setOpen(false);
-        else if (isSelectionMove(event)) selection.markMoved();
+        if (isSelectionMove(event)) selection.markMoved();
       }}
       className="flex min-h-0 flex-1 flex-col rounded-none bg-transparent"
     >

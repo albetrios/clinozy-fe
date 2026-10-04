@@ -1,5 +1,5 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as LazyModule from '@/lib/lazy-module.ts';
@@ -107,11 +107,15 @@ describe('CommandPaletteLazy', () => {
     expect(trigger).toHaveFocus();
   });
 
-  it('dismisses using the scrim while the list is loading', () => {
+  it('dismisses using the scrim while the list is loading', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
     useUIStore.setState({ commandPaletteOpen: true });
     render(<CommandPaletteLazy />);
-    fireEvent.click(screen.getByRole('dialog').querySelector('[aria-hidden="true"]')!);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await screen.findByTestId('command-palette-pending');
+    await user.click(
+      document.querySelector<HTMLElement>('[data-slot="dialog-overlay"]')!,
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('hands typed query, focus and selection to cmdk without replacing the dialog', async () => {
