@@ -1,4 +1,5 @@
 import { Outlet, useSearch } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -8,19 +9,29 @@ import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { Package, PenLine } from '@/shared/icons/index.ts';
+import { Package, PenLine, Trash } from '@/shared/icons/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
 import { validateMedicalSearch } from '../medical.search.ts';
+import {
+  MedicalDeleteConfirm,
+  type MedicalDeleteTarget,
+} from '../shared/components/MedicalDeleteConfirm/index.ts';
+import { MedicalStackHost } from '../shared/components/MedicalStackHost/index.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
+import { SupplierDrawer } from '../shared/components/SupplierDrawer/index.ts';
+import { useMedicalDialogRoute } from '../shared/hooks/useMedicalDialogRoute/index.ts';
 import {
   useManufacturerCatalogue,
   useMedicalSummary,
   useSupplierList,
 } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
+import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
+import { fetchSupplier, medicalQueryKeys } from '../shared/medical-api.ts';
 import type { SupplierRow } from '../shared/medical-contracts.ts';
+import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import { filtersOf, recordSection } from '../shared/medical-filters.ts';
 import { supplierAgeingTone } from '../shared/medical-tones.ts';
 import { useSupplierColumns } from './hooks/useSupplierColumns/index.ts';
@@ -31,8 +42,10 @@ const TABLE_ID = MEDICAL_TABLE_IDS.suppliers;
 /**
  * Medical › Suppliers (KICKOFF §6.7; `medical.md:73–87`): the Medical toolbar
  * over the suppliers — a row opens Edit supplier; "New purchase order" opens
- * one on that supplier. The footer counts the suppliers and what they are
- * owed; the row edge shows how long while money is due.
+ * one on that supplier; Delete, with nothing due and no order to settle, asks
+ * for a reason. The footer counts the suppliers and what they are owed; the
+ * row edge shows how long while money is due. This page opens the Supplier
+ * drawer for the `create/` and `$supplierId/edit/` routes.
  */
 export function SuppliersPage() {
   const { t } = useTranslation(MEDICAL_NS);
@@ -47,6 +60,15 @@ export function SuppliersPage() {
     manufacturer: recordSection(t(MEDICAL_KEYS.filters.manufacturers), makers),
   });
   const filters = useRoomFilters(fields);
+  const stack = useMedicalStack();
+  const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
+  const { dialog, close } = useMedicalDialogRoute({
+    tab: 'suppliers',
+    param: 'supplierId',
+    queryKey: medicalQueryKeys.supplier,
+    fetchRecord: fetchSupplier,
+    recordLabel: t(MEDICAL_DRAWER_KEYS.records.supplier),
+  });
 
   const list = useSupplierList(params);
   const { rows, loading } = useRoomList(list, TABLE_ID, supplierFilterKey(params));
@@ -60,6 +82,7 @@ export function SuppliersPage() {
   });
 
   const canCreate = access.isResolved && access.can('medical', 'create');
+  const canDelete = access.isResolved && access.can('medical', 'delete');
   const keys = MEDICAL_KEYS.suppliers;
 
   const rowActions = (supplier: SupplierRow): DataTableRowAction[] => [
@@ -79,6 +102,19 @@ export function SuppliersPage() {
       icon: PenLine,
       onSelect: () => nav.supplierEdit(supplier.id),
     },
+    // Only with nothing due and no order left to settle (`medical.md:84`).
+    ...(canDelete && supplier.payable === 0 && !supplier.hasOpenOrder
+      ? [
+          {
+            id: 'delete',
+            label: t(keys.rowActions.delete),
+            icon: Trash,
+            destructive: true,
+            onSelect: () =>
+              setDeleting({ kind: 'supplier', id: supplier.id, name: supplier.name }),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -123,6 +159,21 @@ export function SuppliersPage() {
         exportName="suppliers.csv"
         avatar
       />
+      <SupplierDrawer
+        {...(dialog.kind === 'record'
+          ? { mode: 'edit' as const, supplier: dialog.record }
+          : {
+              mode: 'create' as const,
+              prefill:
+                dialog.kind === 'create' ? { name: dialog.prefill.name } : undefined,
+            })}
+        open={dialog.kind !== 'none'}
+        onClose={close}
+        openChild={stack.open}
+        onNewOrder={(supplierId) => nav.create('purchases', { supplier: supplierId })}
+      />
+      <MedicalStackHost stack={stack} />
+      <MedicalDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
       <Outlet />
     </section>
   );

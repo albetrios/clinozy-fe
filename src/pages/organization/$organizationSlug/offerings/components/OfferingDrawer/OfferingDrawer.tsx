@@ -9,7 +9,10 @@ import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
-import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import {
+  RecordDrawer,
+  RecordDrawerPending,
+} from '@/shared/components/RecordDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -17,7 +20,6 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
 import { CatalogueDeleteConfirm } from '../../shared/components/CatalogueDeleteConfirm/index.ts';
-import { CatalogueDrawerPending } from '../../shared/components/CatalogueDrawerPending/index.ts';
 import type { OfferingsCatalogue } from '../../shared/hooks/useOfferingsCatalogue/index.ts';
 import {
   type StepMemory,
@@ -347,7 +349,7 @@ export function OfferingDrawer(props: OfferingDrawerProps) {
   const { open, onClose, catalogue } = props;
   if (props.mode === 'edit' && !props.offering) {
     return (
-      <CatalogueDrawerPending
+      <RecordDrawerPending
         open={open}
         onClose={onClose}
         title={t(K.title.edit)}

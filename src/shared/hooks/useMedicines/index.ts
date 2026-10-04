@@ -1,8 +1,15 @@
 export {
   MEDICINE_WRITE_KEYS,
+  type MedicineDeleteVars,
+  type MedicineUpdateVars,
   type NearExpiryDiscountVars,
+  useCreateMedicine,
+  useDeleteMedicine,
   useMedicine,
   useMedicineCatalogue,
   useMedicineList,
+  useQuickCreateMedicine,
+  useRestoreMedicine,
   useSetNearExpiryDiscount,
+  useUpdateMedicine,
 } from './useMedicines.ts';

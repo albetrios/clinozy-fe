@@ -11,6 +11,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -94,6 +95,39 @@ export function renderMedicalRoutes(
     </QueryClientProvider>,
   );
   return { ...view, router, queryClient };
+}
+
+/** A query client for one test: no retries, nothing cached between tests. */
+const testQueryClient = () =>
+  new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 }, mutations: { retry: false } },
+  });
+
+/**
+ * One Medical drawer (or any part of the room outside a tab's route) for a
+ * member previewed as `role`, with the router, query client and tooltips the
+ * room's shell provides — a drawer's dirty guard reads the router.
+ */
+export function renderMedicalDrawer(
+  ui: ReactNode,
+  { role = 'admin' }: { role?: Role } = {},
+) {
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+  const queryClient = testQueryClient();
+  const root = createRootRoute({
+    component: () => <TooltipProvider>{ui}</TooltipProvider>,
+  });
+  const router = createRouter({
+    routeTree: root,
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  });
+  const view = render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { ...view, queryClient, router };
 }
 
 /** Put the stores the harness touched back as they were. */

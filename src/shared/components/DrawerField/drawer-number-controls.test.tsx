@@ -98,6 +98,24 @@ describe('DrawerStepper (H:1593)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('names its buttons for the field when "Decrease" alone is too vague', () => {
+    render(
+      <DrawerStepper
+        value={2}
+        onValueChange={vi.fn()}
+        aria-label="Reorder at"
+        decreaseLabel="Decrease reorder level"
+        increaseLabel="Increase reorder level"
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: 'Decrease reorder level' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Increase reorder level' }),
+    ).toBeInTheDocument();
+  });
+
   it('takes a typed figure, capped, and reads an empty box as the minimum on blur', async () => {
     const user = userEvent.setup();
     render(<Stepped />);

@@ -220,5 +220,247 @@
   "payments": {
     "records": "薬局の支払い",
     "empty": "薬局の支払いはまだありません"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "医薬品",
+      "supplier": "仕入先",
+      "manufacturer": "メーカー",
+      "mr": "MR"
+    },
+    "saveChanges": "変更を保存",
+    "addName": "名前を入力してください",
+    "pickers": {
+      "searchManufacturer": "メーカーを検索",
+      "searchManufacturers": "メーカーを検索",
+      "searchSupplier": "仕入先を検索",
+      "searchSuppliers": "仕入先を検索",
+      "searchMrs": "MR を検索",
+      "medicineCount_other": "{{count}} 品目",
+      "noPhone": "電話番号未登録",
+      "distributes": "{{maker}} を扱う",
+      "otherSuppliers": "その他の仕入先",
+      "addManufacturer": "メーカーを追加",
+      "newManufacturer": "新しいメーカー",
+      "addSupplier": "仕入先を追加",
+      "newSupplier": "新しい仕入先",
+      "addMr": "MR を追加",
+      "newMr": "新しい MR"
+    },
+    "quick": {
+      "manufacturer": "メーカー {{name}} を追加しました",
+      "supplier": "仕入先 {{name}} を追加しました · 電話と GST は後で追加",
+      "mr": "MR {{name}} を追加しました",
+      "medicine": "{{name}} を追加しました · 希望小売価格は後で在庫で設定"
+    },
+    "deleteConfirm": {
+      "medicine": "この医薬品を削除しますか？",
+      "supplier": "この仕入先を削除しますか？",
+      "manufacturer": "このメーカーを削除しますか？",
+      "mr": "この MR を削除しますか？",
+      "deleted": "{{name}} を削除しました"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "新しいメーカー",
+        "edit": "メーカーを編集"
+      },
+      "sub": "パッケージのブランド · 仕入先と MR をつなぐ",
+      "steps": {
+        "maker": "メーカー",
+        "connections": "つながり"
+      },
+      "fields": {
+        "name": "名前",
+        "colour": "色",
+        "suppliers": "仕入先",
+        "suppliersHint": "取り扱う仕入先",
+        "mrs": "MR",
+        "mrsHint": "担当の MR",
+        "medicines": "医薬品",
+        "medicineCount_other": "在庫に {{count}} 品目",
+        "noMedicines": "まだありません · 在庫から追加"
+      },
+      "summary": {
+        "suppliers_other": "仕入先 {{count}} 社",
+        "mrs_other": "MR {{count}} 名"
+      },
+      "save": "メーカーを追加",
+      "saved": "メーカーを保存しました · つながりを更新しました"
+    },
+    "supplier": {
+      "title": {
+        "create": "新しい仕入先",
+        "edit": "仕入先を編集"
+      },
+      "sub": "仕入れ先の卸業者",
+      "steps": {
+        "supplier": "仕入先",
+        "distributes": "取扱メーカー",
+        "account": "取引"
+      },
+      "fields": {
+        "name": "卸業者名",
+        "phone": "電話",
+        "phoneHint": "10 桁",
+        "gst": "GST 番号",
+        "manufacturers": "メーカー",
+        "manufacturersHint": "いくつでも",
+        "payable": "未払い",
+        "payableValue_other": "{{amount}} · {{count}} 日",
+        "nothingDue": "未払いなし",
+        "orders": "発注",
+        "ordersValue_other": "発注 {{count}} 件 · {{amount}}",
+        "noOrders": "まだ発注はありません"
+      },
+      "account": {
+        "label": "取引",
+        "reference": "参照",
+        "date": "日付",
+        "stage": "段階",
+        "amount": "金額",
+        "balance": "残高",
+        "notBilled": "未請求",
+        "due": "未払い {{amount}}",
+        "paid": "支払済み",
+        "credit": "クレジット · {{batch}}",
+        "creditStage": "クレジット",
+        "adjusted": "相殺済み"
+      },
+      "quickFill": {
+        "newOrder": "新しい発注"
+      },
+      "save": "仕入先を追加",
+      "saved": "仕入先を保存しました"
+    },
+    "mr": {
+      "title": {
+        "create": "新しい MR",
+        "edit": "MR を編集"
+      },
+      "sub": "医薬情報担当者",
+      "steps": {
+        "mr": "MR",
+        "represents": "担当メーカー"
+      },
+      "fields": {
+        "name": "名前",
+        "phone": "電話",
+        "phoneHint": "10 桁",
+        "nextVisit": "次回の訪問",
+        "manufacturers": "メーカー",
+        "manufacturersHint": "1 人で複数を担当可"
+      },
+      "save": "MR を追加",
+      "saved": "MR を保存しました"
+    },
+    "visit": {
+      "title": "MR の訪問を記録",
+      "steps": {
+        "visit": "訪問",
+        "details": "詳細",
+        "notes": "メモ"
+      },
+      "fields": {
+        "date": "日付",
+        "nextVisit": "次回の訪問",
+        "twoWeeks": "2 週間",
+        "oneMonth": "1 か月",
+        "samples": "受け取ったサンプル",
+        "samplesPlaceholder": "例：Azelan 4 本",
+        "note": "メモ"
+      },
+      "summary": "次回の訪問 {{date}}",
+      "save": "訪問を記録",
+      "saved": "訪問を記録しました · {{date}} にリマインダー設定",
+      "savedNoReminder": "訪問を記録しました"
+    },
+    "medicine": {
+      "title": {
+        "create": "新しい医薬品",
+        "edit": "医薬品を編集"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · 成分未設定",
+      "steps": {
+        "main": "医薬品・価格・在庫",
+        "batches": "ロットと仕入先価格"
+      },
+      "groups": {
+        "medicine": "医薬品",
+        "price": "価格と在庫"
+      },
+      "fields": {
+        "name": "名前",
+        "manufacturer": "メーカー",
+        "composition": "成分",
+        "compositionHint": "代替品の提案に使用",
+        "compositionPlaceholder": "例：トレチノイン 0.025%",
+        "soldWith": "販売区分",
+        "prescriptionOnly": "処方箋のみ",
+        "overTheCounter": "市販"
+      },
+      "price": {
+        "mrp": "希望小売価格",
+        "inclGst": "GST 込み",
+        "gst": "GST",
+        "beforeGst": "GST 抜き",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "最安仕入値",
+        "addSupplierPrice": "仕入先価格を追加",
+        "margin": "利益率"
+      },
+      "stock": {
+        "title": "在庫レベル",
+        "now": "在庫 {{count}} · {{state}}",
+        "states": {
+          "healthy": "適正",
+          "reorder": "要発注",
+          "overstocked": "過剰在庫",
+          "out": "切れ"
+        },
+        "reorderAt": "発注点",
+        "fillUpTo": "補充上限",
+        "decreaseReorder": "発注点を下げる",
+        "increaseReorder": "発注点を上げる",
+        "decreaseFill": "補充上限を下げる",
+        "increaseFill": "補充上限を上げる",
+        "hintAlert": "在庫が {{count}} になると発注アラート。",
+        "hintOrder": "{{qty}} 個発注して {{max}} まで補充。在庫 › 在庫少 に表示。"
+      },
+      "batches": {
+        "title": "ロット",
+        "batch": "ロット",
+        "expiry": "有効期限",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "数量",
+        "rate": "単価",
+        "add": "ロットを追加",
+        "total": "在庫 {{count}}",
+        "expiryInvalid": "有効期限を MM/YY で入力してください",
+        "batchMissing": "ロット番号を入力してください"
+      },
+      "rates": {
+        "title": "仕入先価格",
+        "supplier": "仕入先",
+        "rate": "単価",
+        "free": "無償",
+        "leadDays": "リードタイム（日）",
+        "add": "仕入先価格を追加",
+        "rateMissing": "この仕入先の単価を入力してください"
+      },
+      "badges": {
+        "inStock": "在庫 {{count}}",
+        "best": "最安 {{rate}} · {{supplier}}"
+      },
+      "save": "医薬品を追加",
+      "toasts": {
+        "added": "{{name}} を追加しました",
+        "saved": "{{name}} を保存しました",
+        "enterMrp": "希望小売価格を入力してください",
+        "enterRates": "すべての仕入先価格に単価を入力してください",
+        "pickManufacturer": "メーカーを選択してください"
+      }
+    }
   }
 }

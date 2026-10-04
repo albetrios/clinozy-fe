@@ -230,5 +230,253 @@
   "payments": {
     "records": "Apothekenzahlungen",
     "empty": "Noch keine Apothekenzahlungen"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "Arzneimittel",
+      "supplier": "Lieferant",
+      "manufacturer": "Hersteller",
+      "mr": "Pharmareferent"
+    },
+    "saveChanges": "Änderungen speichern",
+    "addName": "Geben Sie einen Namen ein",
+    "pickers": {
+      "searchManufacturer": "Hersteller suchen",
+      "searchManufacturers": "Hersteller suchen",
+      "searchSupplier": "Lieferant suchen",
+      "searchSuppliers": "Lieferanten suchen",
+      "searchMrs": "Pharmareferenten suchen",
+      "medicineCount_one": "{{count}} Arzneimittel",
+      "medicineCount_other": "{{count}} Arzneimittel",
+      "noPhone": "Noch kein Telefon",
+      "distributes": "Vertreibt {{maker}}",
+      "otherSuppliers": "Andere Lieferanten",
+      "addManufacturer": "Hersteller hinzufügen",
+      "newManufacturer": "Neuer Hersteller",
+      "addSupplier": "Lieferant hinzufügen",
+      "newSupplier": "Neuer Lieferant",
+      "addMr": "Pharmareferent hinzufügen",
+      "newMr": "Neuer Pharmareferent"
+    },
+    "quick": {
+      "manufacturer": "Hersteller {{name}} hinzugefügt",
+      "supplier": "Lieferant {{name}} hinzugefügt · Telefon und GST später ergänzen",
+      "mr": "Pharmareferent {{name}} hinzugefügt",
+      "medicine": "{{name}} hinzugefügt · UVP später unter Bestand setzen"
+    },
+    "deleteConfirm": {
+      "medicine": "Dieses Arzneimittel löschen?",
+      "supplier": "Diesen Lieferanten löschen?",
+      "manufacturer": "Diesen Hersteller löschen?",
+      "mr": "Diesen Pharmareferenten löschen?",
+      "deleted": "{{name}} gelöscht"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "Neuer Hersteller",
+        "edit": "Hersteller bearbeiten"
+      },
+      "sub": "Die Marke auf der Packung · verknüpft Lieferanten und Pharmareferenten",
+      "steps": {
+        "maker": "Hersteller",
+        "connections": "Verknüpfungen"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Farbe",
+        "suppliers": "Lieferanten",
+        "suppliersHint": "wer vertreibt",
+        "mrs": "Pharmareferenten",
+        "mrsHint": "wer vertritt",
+        "medicines": "Arzneimittel",
+        "medicineCount_one": "{{count}} Arzneimittel im Bestand",
+        "medicineCount_other": "{{count}} Arzneimittel im Bestand",
+        "noMedicines": "Noch keine · fügen Sie sie unter Bestand hinzu"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} Lieferant",
+        "suppliers_other": "{{count}} Lieferanten",
+        "mrs_one": "{{count}} Pharmareferent",
+        "mrs_other": "{{count}} Pharmareferenten"
+      },
+      "save": "Hersteller hinzufügen",
+      "saved": "Hersteller gespeichert · Verknüpfungen aktualisiert"
+    },
+    "supplier": {
+      "title": {
+        "create": "Neuer Lieferant",
+        "edit": "Lieferant bearbeiten"
+      },
+      "sub": "Großhändler, bei dem Sie einkaufen",
+      "steps": {
+        "supplier": "Lieferant",
+        "distributes": "Vertreibt",
+        "account": "Konto"
+      },
+      "fields": {
+        "name": "Firmenname",
+        "phone": "Telefon",
+        "phoneHint": "10 Ziffern",
+        "gst": "GST-Nummer",
+        "manufacturers": "Hersteller",
+        "manufacturersHint": "beliebig viele",
+        "payable": "Offen",
+        "payableValue_one": "{{amount}} · {{count}} Tag",
+        "payableValue_other": "{{amount}} · {{count}} Tage",
+        "nothingDue": "Nichts offen",
+        "orders": "Bestellungen",
+        "ordersValue_one": "{{count}} Bestellung · {{amount}}",
+        "ordersValue_other": "{{count}} Bestellungen · {{amount}}",
+        "noOrders": "Noch keine Bestellungen"
+      },
+      "account": {
+        "label": "Konto",
+        "reference": "Referenz",
+        "date": "Datum",
+        "stage": "Phase",
+        "amount": "Betrag",
+        "balance": "Saldo",
+        "notBilled": "Nicht berechnet",
+        "due": "{{amount}} offen",
+        "paid": "Bezahlt",
+        "credit": "Gutschrift · {{batch}}",
+        "creditStage": "Gutschrift",
+        "adjusted": "Verrechnet"
+      },
+      "quickFill": {
+        "newOrder": "Neue Bestellung"
+      },
+      "save": "Lieferant hinzufügen",
+      "saved": "Lieferant gespeichert"
+    },
+    "mr": {
+      "title": {
+        "create": "Neuer Pharmareferent",
+        "edit": "Pharmareferent bearbeiten"
+      },
+      "sub": "Pharmareferent",
+      "steps": {
+        "mr": "Pharmareferent",
+        "represents": "Vertritt"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Telefon",
+        "phoneHint": "10 Ziffern",
+        "nextVisit": "Nächster Besuch",
+        "manufacturers": "Hersteller",
+        "manufacturersHint": "einer kann viele vertreten"
+      },
+      "save": "Pharmareferent hinzufügen",
+      "saved": "Pharmareferent gespeichert"
+    },
+    "visit": {
+      "title": "Besuch erfassen",
+      "steps": {
+        "visit": "Besuch",
+        "details": "Details",
+        "notes": "Notizen"
+      },
+      "fields": {
+        "date": "Datum",
+        "nextVisit": "Nächster Besuch",
+        "twoWeeks": "2 Wochen",
+        "oneMonth": "1 Monat",
+        "samples": "Abgegebene Muster",
+        "samplesPlaceholder": "z. B. 4 Tuben Azelan",
+        "note": "Notiz"
+      },
+      "summary": "Nächster Besuch {{date}}",
+      "save": "Besuch erfassen",
+      "saved": "Besuch erfasst · Erinnerung für {{date}} gesetzt",
+      "savedNoReminder": "Besuch erfasst"
+    },
+    "medicine": {
+      "title": {
+        "create": "Neues Arzneimittel",
+        "edit": "Arzneimittel bearbeiten"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · Wirkstoff nicht angegeben",
+      "steps": {
+        "main": "Arzneimittel, Preis & Bestand",
+        "batches": "Chargen & Lieferantenpreise"
+      },
+      "groups": {
+        "medicine": "Arzneimittel",
+        "price": "Preis & Bestand"
+      },
+      "fields": {
+        "name": "Name",
+        "manufacturer": "Hersteller",
+        "composition": "Wirkstoff",
+        "compositionHint": "für Ersatzpräparate",
+        "compositionPlaceholder": "z. B. Tretinoin 0,025 %",
+        "soldWith": "Abgabe",
+        "prescriptionOnly": "Nur auf Rezept",
+        "overTheCounter": "Rezeptfrei"
+      },
+      "price": {
+        "mrp": "UVP",
+        "inclGst": "inkl. GST",
+        "gst": "GST",
+        "beforeGst": "Vor GST",
+        "gstAmount": "GST {{pct}} %",
+        "bestBuyRate": "Bester Einkaufspreis",
+        "addSupplierPrice": "Lieferantenpreis hinzufügen",
+        "margin": "Marge"
+      },
+      "stock": {
+        "title": "Bestandsstufen",
+        "now": "{{count}} auf Lager · {{state}}",
+        "states": {
+          "healthy": "Ausreichend",
+          "reorder": "Nachbestellen",
+          "overstocked": "Überbestand",
+          "out": "Leer"
+        },
+        "reorderAt": "Nachbestellen bei",
+        "fillUpTo": "Auffüllen auf",
+        "decreaseReorder": "Nachbestellstufe verringern",
+        "increaseReorder": "Nachbestellstufe erhöhen",
+        "decreaseFill": "Auffüllstufe verringern",
+        "increaseFill": "Auffüllstufe erhöhen",
+        "hintAlert": "Hinweis zum Nachbestellen, wenn der Bestand auf {{count}} fällt.",
+        "hintOrder": "{{qty}} bestellen, um auf {{max}} aufzufüllen. Erscheint unter Bestand › Niedriger Bestand."
+      },
+      "batches": {
+        "title": "Chargen",
+        "batch": "Charge",
+        "expiry": "Ablauf",
+        "expiryPlaceholder": "MM/JJ",
+        "qty": "Menge",
+        "rate": "Preis",
+        "add": "Charge hinzufügen",
+        "total": "{{count}} auf Lager",
+        "expiryInvalid": "Geben Sie den Ablauf als MM/JJ ein",
+        "batchMissing": "Geben Sie die Charge ein"
+      },
+      "rates": {
+        "title": "Lieferantenpreise",
+        "supplier": "Lieferant",
+        "rate": "Preis",
+        "free": "Gratis",
+        "leadDays": "Lieferzeit (Tage)",
+        "add": "Lieferantenpreis hinzufügen",
+        "rateMissing": "Geben Sie den Preis dieses Lieferanten ein"
+      },
+      "badges": {
+        "inStock": "{{count}} auf Lager",
+        "best": "Bester {{rate}} · {{supplier}}"
+      },
+      "save": "Arzneimittel hinzufügen",
+      "toasts": {
+        "added": "{{name}} hinzugefügt",
+        "saved": "{{name}} gespeichert",
+        "enterMrp": "Geben Sie die UVP ein",
+        "enterRates": "Geben Sie für jeden Lieferantenpreis einen Preis ein",
+        "pickManufacturer": "Wählen Sie einen Hersteller"
+      }
+    }
   }
 }

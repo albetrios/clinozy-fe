@@ -12,7 +12,7 @@ A failed read keeps the last copy and toasts "Retry".
 ## Dialog routes
 
 `create/` (New manufacturer) · `$manufacturerId/edit/` (Edit manufacturer) — each renders nothing; this page reads the URL and opens the drawer over the
-list (D24; the drawers land with L-50b).
+list (D24): the Manufacturer drawer (`../shared/components/ManufacturerDrawer/`), with a supplier or MR stacked on it. Delete, only while no medicine names the maker, asks for a reason.
 
 ## Files
 

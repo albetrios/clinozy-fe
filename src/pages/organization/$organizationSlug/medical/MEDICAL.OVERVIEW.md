@@ -29,24 +29,48 @@ renders the family's Medical toolbar and its table:
   drawers read them) with their stock rules in `@/shared/api/clinic/medicine-stock.ts`; the
   rest is the family's `shared/medical-api.ts` over the fixture world (`REPLACE_WITH_API`).
 
+## The drawers (L-50b)
+
+Each tab page reads its dialog routes (`shared/hooks/useMedicalDialogRoute/`: a create with its
+prefill, or a record — an unknown id goes back to the list with "<Record> not found") and opens
+its drawer over the list, on the shared record drawer:
+
+- **Medicine** (`shared/components/MedicineDrawer/`, 840px): "Medicine, price & stock" — Name,
+  Manufacturer, Composition, Sold with; the price panel (MRP incl. GST, the GST rate, the live
+  split and margin) and the stock levels — then "Batches & supplier prices".
+- **Supplier** (560px new, 840px editing with its Account), **Manufacturer** (560px; its links are
+  written on the suppliers and MRs), **MR** (560px), and Log MR visit (the MRs tab's own).
+- **Stacked children** (`shared/hooks/useMedicalStack/`, `shared/components/MedicalStackHost/`):
+  a picker's "New <thing> · “q”" + "full details" opens that record's drawer on top, named from
+  the picker; Esc, Back, × and the backdrop close only the child; its save picks the new record.
+  The pickers (`shared/components/MedicalPartnerPicker/`, `shared/hooks/useMedicalPickers/`) also
+  quick-add a record from their create row.
+- **Delete** (`shared/components/MedicalDeleteConfirm/`): the shared reason confirm; "<name>
+  deleted" offers Undo.
+
+The partners' writes are `shared/medical-partners-api.ts` (contracts in
+`shared/medical-partners-contracts.ts`; hooks in `shared/hooks/useMedicalPartners/`); a medicine's
+are the shared `useMedicines` hooks. The purchase-order, sale and return drawers are L-50c.
+
 The search, filters and sort of every tab live in the URL (`medical.search.ts`, one reader for
 all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`.
 
 ## Files
 
-| File                     | Responsibility                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `medical.route.tsx`      | Route marker — exports `Component` rendering `MedicalLayout`.                                        |
-| `medical.manifest.ts`    | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.     |
-| `medical.constants.ts`   | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                     |
-| `medical.search.ts`      | The tabs' URL reader (`validateMedicalSearch`) and the dialog routes' prefills.                      |
-| `MedicalLayout.tsx`      | Layout over the tab routes (`<Outlet />`).                                                           |
-| `shared/`                | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the list hooks. |
-| `__tests__/integration/` | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.    |
+| File                     | Responsibility                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `medical.route.tsx`      | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                  |
+| `medical.manifest.ts`    | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                               |
+| `medical.constants.ts`   | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                               |
+| `medical.search.ts`      | The tabs' URL reader (`validateMedicalSearch`) and the dialog routes' prefills.                                                                                                |
+| `MedicalLayout.tsx`      | Layout over the tab routes (`<Outlet />`).                                                                                                                                     |
+| `shared/`                | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the drawers, pickers, stack and delete confirm; the list, partner and dialog-route hooks. |
+| `__tests__/integration/` | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.                                                                              |
 
 ## Test ids
 
 `medical-page`; each tab's `medical-<tab>-page` and the shared toolbar and table ids prefixed
 `medical-<tab>` (`medical-sales-toolbar`, `medical-sales-tab-medicines`, `medical-sales-new`,
 `medical-sales-new-menu`, `medical-sales-table-row`); the view action
-`medical-<tab>-view-action-<id>`.
+`medical-<tab>-view-action-<id>`; the drawers `medicine-drawer`, `supplier-drawer`,
+`manufacturer-drawer`, `mr-drawer`, `mr-visit-drawer` (a stacked child adds `-stacked`).

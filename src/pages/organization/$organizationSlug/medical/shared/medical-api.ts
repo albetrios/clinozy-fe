@@ -37,6 +37,7 @@ import {
   type SupplierListParams,
   type SupplierRow,
 } from './medical-contracts.ts';
+import type { SupplierAccountRow } from './medical-partners-contracts.ts';
 
 /*
  * The Medical family's reads and writes (`S:1655–1677`), on the fixture world
@@ -57,6 +58,8 @@ export const medicalQueryKeys = {
   suppliers: (params: SupplierListParams) =>
     [...medicalQueryKeys.all, 'suppliers', params] as const,
   supplier: (id: string) => [...medicalQueryKeys.all, 'supplier', id] as const,
+  supplierAccount: (id: string) =>
+    [...medicalQueryKeys.all, 'supplier-account', id] as const,
   manufacturers: (params: ManufacturerListParams) =>
     [...medicalQueryKeys.all, 'manufacturers', params] as const,
   manufacturer: (id: string) => [...medicalQueryKeys.all, 'manufacturer', id] as const,
@@ -405,6 +408,28 @@ export async function fetchSupplier(id: string): Promise<SupplierRow> {
   return row;
 }
 
+/**
+ * A supplier's Account (`medical.md:200`): every live order, latest first —
+ * its stage, total and what is still owed on it. Credits from returned stock
+ * join it with Return expiring stock (L-50c; REPLACE_WITH_API).
+ */
+export async function fetchSupplierAccount(id: string): Promise<SupplierAccountRow[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  return purchaseOrderRows(clinicFixtures)
+    .filter((order) => order.supplierId === id)
+    .sort((a, b) => compareText(b.date, a.date) || b.seq - a.seq)
+    .map((order) => ({
+      kind: 'order' as const,
+      id: order.id,
+      seq: order.seq,
+      billNo: order.supplierBillNo,
+      date: order.date,
+      stage: order.stage,
+      amount: order.total,
+      due: order.due,
+    }));
+}
+
 // ── Manufacturers ──
 
 /** Every live manufacturer as its row: its medicines, suppliers and MRs. */
@@ -455,6 +480,14 @@ export function fetchAllManufacturers(params: ManufacturerListParams = {}) {
   return manufacturersFor(params);
 }
 
+/** One manufacturer as its row — a 404 when it is unknown or deleted. */
+export async function fetchManufacturer(id: string): Promise<ManufacturerRow> {
+  const { clinicFixtures } = await fixtureWorld();
+  const [row] = manufacturerRows(clinicFixtures).filter((maker) => maker.id === id);
+  if (!row) throw clinicHttpError(404, 'not_found', 'Manufacturer not found');
+  return row;
+}
+
 // ── MRs ──
 
 /** Every live MR as their row: the makers they represent and their last visit. */
@@ -497,6 +530,14 @@ export async function listMedicalReps(
 /** Every live MR as their row — the pickers' list. */
 export function fetchAllMedicalReps(params: MrListParams = {}) {
   return mrsFor(params);
+}
+
+/** One MR as their row — a 404 when they are unknown or deleted. */
+export async function fetchMedicalRep(id: string): Promise<MrRow> {
+  const { clinicFixtures } = await fixtureWorld();
+  const [row] = mrRows(clinicFixtures).filter((rep) => rep.id === id);
+  if (!row) throw clinicHttpError(404, 'not_found', 'MR not found');
+  return row;
 }
 
 // ── Footer figures ──

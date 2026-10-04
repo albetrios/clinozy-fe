@@ -240,5 +240,259 @@
   "payments": {
     "records": "paiements pharmacie",
     "empty": "Aucun paiement pharmacie pour l’instant"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "Médicament",
+      "supplier": "Fournisseur",
+      "manufacturer": "Fabricant",
+      "mr": "Délégué"
+    },
+    "saveChanges": "Enregistrer",
+    "addName": "Ajoutez un nom",
+    "pickers": {
+      "searchManufacturer": "Rechercher un fabricant",
+      "searchManufacturers": "Rechercher des fabricants",
+      "searchSupplier": "Rechercher un fournisseur",
+      "searchSuppliers": "Rechercher des fournisseurs",
+      "searchMrs": "Rechercher des délégués",
+      "medicineCount_one": "{{count}} médicament",
+      "medicineCount_many": "{{count}} médicaments",
+      "medicineCount_other": "{{count}} médicaments",
+      "noPhone": "Pas encore de téléphone",
+      "distributes": "Distribue {{maker}}",
+      "otherSuppliers": "Autres fournisseurs",
+      "addManufacturer": "Ajouter le fabricant",
+      "newManufacturer": "Nouveau fabricant",
+      "addSupplier": "Ajouter le fournisseur",
+      "newSupplier": "Nouveau fournisseur",
+      "addMr": "Ajouter le délégué",
+      "newMr": "Nouveau délégué"
+    },
+    "quick": {
+      "manufacturer": "Fabricant {{name}} ajouté",
+      "supplier": "Fournisseur {{name}} ajouté · téléphone et GST plus tard",
+      "mr": "Délégué {{name}} ajouté",
+      "medicine": "{{name}} ajouté · fixez le prix max. plus tard dans Stock"
+    },
+    "deleteConfirm": {
+      "medicine": "Supprimer ce médicament ?",
+      "supplier": "Supprimer ce fournisseur ?",
+      "manufacturer": "Supprimer ce fabricant ?",
+      "mr": "Supprimer ce délégué ?",
+      "deleted": "{{name}} supprimé"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "Nouveau fabricant",
+        "edit": "Modifier le fabricant"
+      },
+      "sub": "La marque sur la boîte · relie fournisseurs et délégués",
+      "steps": {
+        "maker": "Fabricant",
+        "connections": "Liens"
+      },
+      "fields": {
+        "name": "Nom",
+        "colour": "Couleur",
+        "suppliers": "Fournisseurs",
+        "suppliersHint": "qui le distribue",
+        "mrs": "Délégués",
+        "mrsHint": "qui le représente",
+        "medicines": "Médicaments",
+        "medicineCount_one": "{{count}} médicament dans Stock",
+        "medicineCount_many": "{{count}} médicaments dans Stock",
+        "medicineCount_other": "{{count}} médicaments dans Stock",
+        "noMedicines": "Aucun pour l’instant · ajoutez-les depuis Stock"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} fournisseur",
+        "suppliers_many": "{{count}} fournisseurs",
+        "suppliers_other": "{{count}} fournisseurs",
+        "mrs_one": "{{count}} délégué",
+        "mrs_many": "{{count}} délégués",
+        "mrs_other": "{{count}} délégués"
+      },
+      "save": "Ajouter le fabricant",
+      "saved": "Fabricant enregistré · liens mis à jour"
+    },
+    "supplier": {
+      "title": {
+        "create": "Nouveau fournisseur",
+        "edit": "Modifier le fournisseur"
+      },
+      "sub": "Grossiste auprès de qui vous achetez",
+      "steps": {
+        "supplier": "Fournisseur",
+        "distributes": "Distribue",
+        "account": "Compte"
+      },
+      "fields": {
+        "name": "Nom du grossiste",
+        "phone": "Téléphone",
+        "phoneHint": "10 chiffres",
+        "gst": "Numéro GST",
+        "manufacturers": "Fabricants",
+        "manufacturersHint": "au choix",
+        "payable": "À payer",
+        "payableValue_one": "{{amount}} · {{count}} jour",
+        "payableValue_many": "{{amount}} · {{count}} jours",
+        "payableValue_other": "{{amount}} · {{count}} jours",
+        "nothingDue": "Rien à payer",
+        "orders": "Commandes",
+        "ordersValue_one": "{{count}} commande · {{amount}}",
+        "ordersValue_many": "{{count}} commandes · {{amount}}",
+        "ordersValue_other": "{{count}} commandes · {{amount}}",
+        "noOrders": "Aucune commande pour l’instant"
+      },
+      "account": {
+        "label": "Compte",
+        "reference": "Référence",
+        "date": "Date",
+        "stage": "Étape",
+        "amount": "Montant",
+        "balance": "Solde",
+        "notBilled": "Non facturé",
+        "due": "{{amount}} à payer",
+        "paid": "Payé",
+        "credit": "Avoir · {{batch}}",
+        "creditStage": "Avoir",
+        "adjusted": "Imputé"
+      },
+      "quickFill": {
+        "newOrder": "Nouveau bon de commande"
+      },
+      "save": "Ajouter le fournisseur",
+      "saved": "Fournisseur enregistré"
+    },
+    "mr": {
+      "title": {
+        "create": "Nouveau délégué",
+        "edit": "Modifier le délégué"
+      },
+      "sub": "Délégué médical",
+      "steps": {
+        "mr": "Délégué",
+        "represents": "Représente"
+      },
+      "fields": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "phoneHint": "10 chiffres",
+        "nextVisit": "Prochaine visite",
+        "manufacturers": "Fabricants",
+        "manufacturersHint": "un délégué peut en représenter plusieurs"
+      },
+      "save": "Ajouter le délégué",
+      "saved": "Délégué enregistré"
+    },
+    "visit": {
+      "title": "Noter une visite",
+      "steps": {
+        "visit": "Visite",
+        "details": "Détails",
+        "notes": "Notes"
+      },
+      "fields": {
+        "date": "Date",
+        "nextVisit": "Prochaine visite",
+        "twoWeeks": "2 semaines",
+        "oneMonth": "1 mois",
+        "samples": "Échantillons laissés",
+        "samplesPlaceholder": "ex. 4 tubes d’Azelan",
+        "note": "Note"
+      },
+      "summary": "Prochaine visite {{date}}",
+      "save": "Noter la visite",
+      "saved": "Visite notée · rappel le {{date}}",
+      "savedNoReminder": "Visite notée"
+    },
+    "medicine": {
+      "title": {
+        "create": "Nouveau médicament",
+        "edit": "Modifier le médicament"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · composition non renseignée",
+      "steps": {
+        "main": "Médicament, prix et stock",
+        "batches": "Lots et prix fournisseurs"
+      },
+      "groups": {
+        "medicine": "Médicament",
+        "price": "Prix et stock"
+      },
+      "fields": {
+        "name": "Nom",
+        "manufacturer": "Fabricant",
+        "composition": "Composition",
+        "compositionHint": "pour les substituts",
+        "compositionPlaceholder": "ex. Trétinoïne 0,025 %",
+        "soldWith": "Délivrance",
+        "prescriptionOnly": "Sur ordonnance",
+        "overTheCounter": "Sans ordonnance"
+      },
+      "price": {
+        "mrp": "Prix max.",
+        "inclGst": "GST incluse",
+        "gst": "GST",
+        "beforeGst": "Hors GST",
+        "gstAmount": "GST {{pct}} %",
+        "bestBuyRate": "Meilleur prix d’achat",
+        "addSupplierPrice": "Ajoutez un prix fournisseur",
+        "margin": "Marge"
+      },
+      "stock": {
+        "title": "Niveaux de stock",
+        "now": "{{count}} en stock · {{state}}",
+        "states": {
+          "healthy": "Correct",
+          "reorder": "À commander",
+          "overstocked": "Surstock",
+          "out": "Épuisé"
+        },
+        "reorderAt": "Commander à",
+        "fillUpTo": "Remplir jusqu’à",
+        "decreaseReorder": "Baisser le seuil de commande",
+        "increaseReorder": "Augmenter le seuil de commande",
+        "decreaseFill": "Baisser le niveau de remplissage",
+        "increaseFill": "Augmenter le niveau de remplissage",
+        "hintAlert": "Alerte de commande quand le stock tombe à {{count}}.",
+        "hintOrder": "Commandez {{qty}} pour atteindre {{max}}. Apparaît dans Stock › Stock faible."
+      },
+      "batches": {
+        "title": "Lots",
+        "batch": "Lot",
+        "expiry": "Expiration",
+        "expiryPlaceholder": "MM/AA",
+        "qty": "Qté",
+        "rate": "Tarif",
+        "add": "Ajouter un lot",
+        "total": "{{count}} en stock",
+        "expiryInvalid": "Saisissez l’expiration au format MM/AA",
+        "batchMissing": "Saisissez le lot"
+      },
+      "rates": {
+        "title": "Prix fournisseurs",
+        "supplier": "Fournisseur",
+        "rate": "Tarif",
+        "free": "Gratuit",
+        "leadDays": "Délai (jours)",
+        "add": "Ajouter un prix fournisseur",
+        "rateMissing": "Saisissez le tarif de ce fournisseur"
+      },
+      "badges": {
+        "inStock": "{{count}} en stock",
+        "best": "Meilleur {{rate}} · {{supplier}}"
+      },
+      "save": "Ajouter le médicament",
+      "toasts": {
+        "added": "{{name}} ajouté",
+        "saved": "{{name}} enregistré",
+        "enterMrp": "Saisissez le prix max.",
+        "enterRates": "Saisissez un tarif pour chaque prix fournisseur",
+        "pickManufacturer": "Choisissez un fabricant"
+      }
+    }
   }
 }

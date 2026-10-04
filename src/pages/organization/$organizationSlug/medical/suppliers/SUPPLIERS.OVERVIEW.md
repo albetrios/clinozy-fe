@@ -12,7 +12,7 @@ A failed read keeps the last copy and toasts "Retry".
 ## Dialog routes
 
 `create/` (New supplier) · `$supplierId/edit/` (Edit supplier) — each renders nothing; this page reads the URL and opens the drawer over the
-list (D24; the drawers land with L-50b).
+list (D24): the Supplier drawer (`../shared/components/SupplierDrawer/`) — 560px new, 840px editing with its Account — with a manufacturer stacked on it; its Quick fill "New purchase order" opens one on that supplier. Delete, only with nothing due and no order to settle, asks for a reason.
 
 ## Files
 

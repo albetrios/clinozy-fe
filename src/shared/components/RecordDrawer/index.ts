@@ -6,6 +6,10 @@ export {
 export { useDrawerTitleFocus } from './record-drawer-focus.ts';
 export { useDrawerItemsField } from './record-drawer-items.ts';
 export {
+  RecordDrawerPending,
+  type RecordDrawerPendingProps,
+} from './record-drawer-pending.tsx';
+export {
   DRAWER_WIDTH_CLASS,
   type DrawerContentProfile,
   drawerWidthAt,

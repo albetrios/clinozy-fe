@@ -183,6 +183,10 @@ export interface DrawerStepperProps extends Omit<
   quick?: readonly DrawerQuickOption[];
   /** The field's name, for the quick picks' group. */
   label?: string;
+  /** The "−" button's name, when "Decrease" alone is too vague ("Decrease reorder level"). */
+  decreaseLabel?: string;
+  /** The "+" button's name ("Increase reorder level"). */
+  increaseLabel?: string;
   /** Base test id: the input, `-decrease`, `-increase` and `-quick-<value>`. */
   testId?: string;
 }
@@ -201,6 +205,8 @@ export function DrawerStepper({
   suffix,
   quick,
   label,
+  decreaseLabel,
+  increaseLabel,
   disabled,
   testId,
   className,
@@ -210,13 +216,15 @@ export function DrawerStepper({
   const { t } = useTranslation(RECORD_DRAWER_NS);
   const [draft, setDraft] = useState<string | null>(null);
   const set = (next: number) => onValueChange(clampNumber(next, min, max));
+  const decrease = decreaseLabel ?? t(RECORD_DRAWER_KEYS.stepper.decrease);
+  const increase = increaseLabel ?? t(RECORD_DRAWER_KEYS.stepper.increase);
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
       <div data-slot="stepper" className={cn(NUMBER_BOX_CLASS, className)}>
         <button
           type="button"
-          aria-label={t(RECORD_DRAWER_KEYS.stepper.decrease)}
+          aria-label={decrease}
           title={t(RECORD_DRAWER_KEYS.stepper.decrease)}
           disabled={disabled || value <= min}
           data-testid={testId ? `${testId}-decrease` : undefined}
@@ -260,7 +268,7 @@ export function DrawerStepper({
         ) : null}
         <button
           type="button"
-          aria-label={t(RECORD_DRAWER_KEYS.stepper.increase)}
+          aria-label={increase}
           title={t(RECORD_DRAWER_KEYS.stepper.increase)}
           disabled={disabled || value >= max}
           data-testid={testId ? `${testId}-increase` : undefined}

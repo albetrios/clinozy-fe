@@ -230,5 +230,253 @@
   "payments": {
     "records": "मेडिकल भुगतान",
     "empty": "अभी कोई मेडिकल भुगतान नहीं"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "दवा",
+      "supplier": "सप्लायर",
+      "manufacturer": "निर्माता",
+      "mr": "एमआर"
+    },
+    "saveChanges": "बदलाव सहेजें",
+    "addName": "नाम जोड़ें",
+    "pickers": {
+      "searchManufacturer": "निर्माता खोजें",
+      "searchManufacturers": "निर्माता खोजें",
+      "searchSupplier": "सप्लायर खोजें",
+      "searchSuppliers": "सप्लायर खोजें",
+      "searchMrs": "एमआर खोजें",
+      "medicineCount_one": "{{count}} दवा",
+      "medicineCount_other": "{{count}} दवाइयाँ",
+      "noPhone": "अभी फ़ोन नहीं",
+      "distributes": "{{maker}} के वितरक",
+      "otherSuppliers": "अन्य सप्लायर",
+      "addManufacturer": "निर्माता जोड़ें",
+      "newManufacturer": "नया निर्माता",
+      "addSupplier": "सप्लायर जोड़ें",
+      "newSupplier": "नया सप्लायर",
+      "addMr": "एमआर जोड़ें",
+      "newMr": "नया एमआर"
+    },
+    "quick": {
+      "manufacturer": "निर्माता {{name}} जोड़ा गया",
+      "supplier": "सप्लायर {{name}} जोड़ा गया · फ़ोन और जीएसटी बाद में जोड़ें",
+      "mr": "एमआर {{name}} जोड़ा गया",
+      "medicine": "{{name}} जोड़ा गया · एमआरपी बाद में स्टॉक में भरें"
+    },
+    "deleteConfirm": {
+      "medicine": "यह दवा हटाएँ?",
+      "supplier": "यह सप्लायर हटाएँ?",
+      "manufacturer": "यह निर्माता हटाएँ?",
+      "mr": "यह एमआर हटाएँ?",
+      "deleted": "{{name}} हटाया गया"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "नया निर्माता",
+        "edit": "निर्माता संपादित करें"
+      },
+      "sub": "पैक पर ब्रांड · सप्लायर और एमआर को जोड़ता है",
+      "steps": {
+        "maker": "निर्माता",
+        "connections": "जुड़ाव"
+      },
+      "fields": {
+        "name": "नाम",
+        "colour": "रंग",
+        "suppliers": "सप्लायर",
+        "suppliersHint": "कौन बाँटता है",
+        "mrs": "एमआर",
+        "mrsHint": "कौन प्रतिनिधित्व करता है",
+        "medicines": "दवाइयाँ",
+        "medicineCount_one": "स्टॉक में {{count}} दवा",
+        "medicineCount_other": "स्टॉक में {{count}} दवाइयाँ",
+        "noMedicines": "अभी कोई नहीं · स्टॉक से जोड़ें"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} सप्लायर",
+        "suppliers_other": "{{count}} सप्लायर",
+        "mrs_one": "{{count}} एमआर",
+        "mrs_other": "{{count}} एमआर"
+      },
+      "save": "निर्माता जोड़ें",
+      "saved": "निर्माता सहेजा गया · जुड़ाव अपडेट हुए"
+    },
+    "supplier": {
+      "title": {
+        "create": "नया सप्लायर",
+        "edit": "सप्लायर संपादित करें"
+      },
+      "sub": "जिस एजेंसी से आप खरीदते हैं",
+      "steps": {
+        "supplier": "सप्लायर",
+        "distributes": "वितरण",
+        "account": "खाता"
+      },
+      "fields": {
+        "name": "एजेंसी का नाम",
+        "phone": "फ़ोन",
+        "phoneHint": "10 अंक",
+        "gst": "जीएसटी नंबर",
+        "manufacturers": "निर्माता",
+        "manufacturersHint": "कितने भी चुनें",
+        "payable": "देय",
+        "payableValue_one": "{{amount}} · {{count}} दिन",
+        "payableValue_other": "{{amount}} · {{count}} दिन",
+        "nothingDue": "कुछ देय नहीं",
+        "orders": "ऑर्डर",
+        "ordersValue_one": "{{count}} ऑर्डर · {{amount}}",
+        "ordersValue_other": "{{count}} ऑर्डर · {{amount}}",
+        "noOrders": "अभी कोई ऑर्डर नहीं"
+      },
+      "account": {
+        "label": "खाता",
+        "reference": "संदर्भ",
+        "date": "तारीख",
+        "stage": "चरण",
+        "amount": "राशि",
+        "balance": "बकाया",
+        "notBilled": "बिल नहीं हुआ",
+        "due": "{{amount}} देय",
+        "paid": "भुगतान हो गया",
+        "credit": "क्रेडिट · {{batch}}",
+        "creditStage": "क्रेडिट",
+        "adjusted": "समायोजित"
+      },
+      "quickFill": {
+        "newOrder": "नया परचेज़ ऑर्डर"
+      },
+      "save": "सप्लायर जोड़ें",
+      "saved": "सप्लायर सहेजा गया"
+    },
+    "mr": {
+      "title": {
+        "create": "नया एमआर",
+        "edit": "एमआर संपादित करें"
+      },
+      "sub": "मेडिकल रिप्रेज़ेंटेटिव",
+      "steps": {
+        "mr": "एमआर",
+        "represents": "प्रतिनिधित्व"
+      },
+      "fields": {
+        "name": "नाम",
+        "phone": "फ़ोन",
+        "phoneHint": "10 अंक",
+        "nextVisit": "अगली मुलाक़ात",
+        "manufacturers": "निर्माता",
+        "manufacturersHint": "एक एमआर कई का प्रतिनिधित्व कर सकता है"
+      },
+      "save": "एमआर जोड़ें",
+      "saved": "एमआर सहेजा गया"
+    },
+    "visit": {
+      "title": "एमआर मुलाक़ात दर्ज करें",
+      "steps": {
+        "visit": "मुलाक़ात",
+        "details": "विवरण",
+        "notes": "नोट्स"
+      },
+      "fields": {
+        "date": "तारीख",
+        "nextVisit": "अगली मुलाक़ात",
+        "twoWeeks": "2 हफ़्ते",
+        "oneMonth": "1 महीना",
+        "samples": "दिए गए सैंपल",
+        "samplesPlaceholder": "जैसे 4 ट्यूब Azelan",
+        "note": "नोट"
+      },
+      "summary": "अगली मुलाक़ात {{date}}",
+      "save": "मुलाक़ात दर्ज करें",
+      "saved": "मुलाक़ात दर्ज · {{date}} का रिमाइंडर सेट",
+      "savedNoReminder": "मुलाक़ात दर्ज की गई"
+    },
+    "medicine": {
+      "title": {
+        "create": "नई दवा",
+        "edit": "दवा संपादित करें"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · कंपोज़िशन नहीं दी गई",
+      "steps": {
+        "main": "दवा, कीमत और स्टॉक",
+        "batches": "बैच और सप्लायर रेट"
+      },
+      "groups": {
+        "medicine": "दवा",
+        "price": "कीमत और स्टॉक"
+      },
+      "fields": {
+        "name": "नाम",
+        "manufacturer": "निर्माता",
+        "composition": "कंपोज़िशन",
+        "compositionHint": "विकल्पों के लिए",
+        "compositionPlaceholder": "जैसे Tretinoin 0.025%",
+        "soldWith": "किस तरह बिकती है",
+        "prescriptionOnly": "सिर्फ़ प्रिस्क्रिप्शन पर",
+        "overTheCounter": "बिना प्रिस्क्रिप्शन"
+      },
+      "price": {
+        "mrp": "एमआरपी",
+        "inclGst": "जीएसटी सहित",
+        "gst": "जीएसटी",
+        "beforeGst": "जीएसटी से पहले",
+        "gstAmount": "जीएसटी {{pct}}%",
+        "bestBuyRate": "सबसे अच्छा खरीद रेट",
+        "addSupplierPrice": "सप्लायर रेट जोड़ें",
+        "margin": "मार्जिन"
+      },
+      "stock": {
+        "title": "स्टॉक लेवल",
+        "now": "{{count}} स्टॉक में · {{state}}",
+        "states": {
+          "healthy": "ठीक",
+          "reorder": "फिर से मँगाएँ",
+          "overstocked": "ज़रूरत से ज़्यादा",
+          "out": "खत्म"
+        },
+        "reorderAt": "इस पर मँगाएँ",
+        "fillUpTo": "इतने तक भरें",
+        "decreaseReorder": "रीऑर्डर लेवल घटाएँ",
+        "increaseReorder": "रीऑर्डर लेवल बढ़ाएँ",
+        "decreaseFill": "भरने का लेवल घटाएँ",
+        "increaseFill": "भरने का लेवल बढ़ाएँ",
+        "hintAlert": "स्टॉक {{count}} रहने पर रीऑर्डर अलर्ट।",
+        "hintOrder": "{{max}} तक भरने के लिए {{qty}} मँगाएँ। स्टॉक › कम स्टॉक में दिखता है।"
+      },
+      "batches": {
+        "title": "बैच",
+        "batch": "बैच",
+        "expiry": "एक्सपायरी",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "मात्रा",
+        "rate": "रेट",
+        "add": "बैच जोड़ें",
+        "total": "{{count}} स्टॉक में",
+        "expiryInvalid": "एक्सपायरी MM/YY में लिखें",
+        "batchMissing": "बैच लिखें"
+      },
+      "rates": {
+        "title": "सप्लायर रेट",
+        "supplier": "सप्लायर",
+        "rate": "रेट",
+        "free": "मुफ़्त",
+        "leadDays": "डिलीवरी दिन",
+        "add": "सप्लायर रेट जोड़ें",
+        "rateMissing": "इस सप्लायर का रेट लिखें"
+      },
+      "badges": {
+        "inStock": "{{count}} स्टॉक में",
+        "best": "सबसे अच्छा {{rate}} · {{supplier}}"
+      },
+      "save": "दवा जोड़ें",
+      "toasts": {
+        "added": "{{name}} जोड़ी गई",
+        "saved": "{{name}} सहेजी गई",
+        "enterMrp": "एमआरपी लिखें",
+        "enterRates": "हर सप्लायर रेट में रेट लिखें",
+        "pickManufacturer": "निर्माता चुनें"
+      }
+    }
   }
 }

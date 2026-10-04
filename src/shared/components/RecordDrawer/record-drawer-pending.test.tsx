@@ -5,14 +5,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { CatalogueDrawerPending } from './CatalogueDrawerPending.tsx';
+import { RecordDrawerPending } from './record-drawer-pending.tsx';
 
-describe('CatalogueDrawerPending', () => {
+describe('RecordDrawerPending', () => {
   it('shows the drawer’s shell over a skeleton, with nothing to save', async () => {
     const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
     const onClose = vi.fn();
     renderWithProviders(
-      <CatalogueDrawerPending
+      <RecordDrawerPending
         open
         onClose={onClose}
         title="Edit offering"

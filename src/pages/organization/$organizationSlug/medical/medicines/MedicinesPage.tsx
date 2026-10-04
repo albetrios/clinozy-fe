@@ -1,10 +1,12 @@
 import { Outlet, useSearch } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
   MEDICINE_STOCK_TONES,
   medicineStockLevel,
 } from '@/shared/api/clinic/medicine-stock.ts';
+import { fetchMedicine, medicineQueryKeys } from '@/shared/api/clinic/medicines-api.ts';
 import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
@@ -16,7 +18,7 @@ import {
 } from '@/shared/hooks/useMedicines/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { Package, PenLine, Tag } from '@/shared/icons/index.ts';
+import { Package, PenLine, Tag, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
@@ -25,13 +27,22 @@ import {
   MEDICINE_STOCK_FILTERS,
   validateMedicalSearch,
 } from '../medical.search.ts';
+import {
+  MedicalDeleteConfirm,
+  type MedicalDeleteTarget,
+} from '../shared/components/MedicalDeleteConfirm/index.ts';
+import { MedicalStackHost } from '../shared/components/MedicalStackHost/index.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import {
   MedicalToolbar,
   MedicalViewAction,
 } from '../shared/components/MedicalToolbar/index.ts';
+import { MedicineDrawer } from '../shared/components/MedicineDrawer/index.ts';
+import { useMedicalDialogRoute } from '../shared/hooks/useMedicalDialogRoute/index.ts';
 import { useManufacturerCatalogue } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
+import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
+import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import { filtersOf, recordSection } from '../shared/medical-filters.ts';
 import { useMedicineColumns } from './hooks/useMedicineColumns/index.ts';
 import { medicineFilterKey, medicineParamsOf } from './medicines.params.ts';
@@ -114,7 +125,10 @@ function useDiscountToggle() {
  * toolbar — "Reorder low stock" with Low stock on, "Sell all at 20% off" /
  * "Remove near-expiry discount" with a Nearest expiry window — over the
  * medicines table. A row opens Edit medicine; a batch expiring within 90 days
- * adds the discount toggle. The search, filters and sort live in the URL.
+ * adds the discount toggle; Delete asks for a reason. The search, filters and
+ * sort live in the URL. The dialog routes render nothing: this page opens the
+ * Medicine drawer for `create/` (`?name=`) and `$medicineId/edit/`, with any
+ * child stacked on it.
  */
 export function MedicinesPage() {
   const { t } = useTranslation(MEDICAL_NS);
@@ -126,6 +140,15 @@ export function MedicinesPage() {
   const { fields, copy } = useMedicineFilters();
   const filters = useRoomFilters(fields);
   const toggleDiscount = useDiscountToggle();
+  const stack = useMedicalStack();
+  const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
+  const { dialog, close } = useMedicalDialogRoute({
+    tab: 'medicines',
+    param: 'medicineId',
+    queryKey: medicineQueryKeys.detail,
+    fetchRecord: fetchMedicine,
+    recordLabel: t(MEDICAL_DRAWER_KEYS.records.medicine),
+  });
 
   const list = useMedicineList(params);
   const { rows, loading } = useRoomList(list, TABLE_ID, medicineFilterKey(params));
@@ -139,6 +162,7 @@ export function MedicinesPage() {
 
   const canEdit = access.isResolved && access.can('medical', 'edit');
   const canCreate = access.isResolved && access.can('medical', 'create');
+  const canDelete = access.isResolved && access.can('medical', 'delete');
   const keys = MEDICAL_KEYS.medicines.rowActions;
 
   const rowActions = (row: MedicineRow): DataTableRowAction[] => {
@@ -160,6 +184,15 @@ export function MedicinesPage() {
       icon: PenLine,
       onSelect: () => nav.medicineEdit(row.id),
     });
+    if (canDelete) {
+      actions.push({
+        id: 'delete',
+        label: t(keys.delete),
+        icon: Trash,
+        destructive: true,
+        onSelect: () => setDeleting({ kind: 'medicine', id: row.id, name: row.name }),
+      });
+    }
     return actions;
   };
 
@@ -229,6 +262,20 @@ export function MedicinesPage() {
         rowActions={rowActions}
         exportName="medicines.csv"
       />
+      <MedicineDrawer
+        {...(dialog.kind === 'record'
+          ? { mode: 'edit' as const, medicine: dialog.record }
+          : {
+              mode: 'create' as const,
+              prefill:
+                dialog.kind === 'create' ? { name: dialog.prefill.name } : undefined,
+            })}
+        open={dialog.kind !== 'none'}
+        onClose={close}
+        openChild={stack.open}
+      />
+      <MedicalStackHost stack={stack} />
+      <MedicalDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
       <Outlet />
     </section>
   );

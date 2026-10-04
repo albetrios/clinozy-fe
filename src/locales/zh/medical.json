@@ -220,5 +220,247 @@
   "payments": {
     "records": "药房付款",
     "empty": "暂无药房付款"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "药品",
+      "supplier": "供应商",
+      "manufacturer": "生产商",
+      "mr": "医药代表"
+    },
+    "saveChanges": "保存更改",
+    "addName": "请添加名称",
+    "pickers": {
+      "searchManufacturer": "搜索生产商",
+      "searchManufacturers": "搜索生产商",
+      "searchSupplier": "搜索供应商",
+      "searchSuppliers": "搜索供应商",
+      "searchMrs": "搜索医药代表",
+      "medicineCount_other": "{{count}} 种药品",
+      "noPhone": "暂无电话",
+      "distributes": "经销 {{maker}}",
+      "otherSuppliers": "其他供应商",
+      "addManufacturer": "添加生产商",
+      "newManufacturer": "新建生产商",
+      "addSupplier": "添加供应商",
+      "newSupplier": "新建供应商",
+      "addMr": "添加医药代表",
+      "newMr": "新建医药代表"
+    },
+    "quick": {
+      "manufacturer": "已添加生产商 {{name}}",
+      "supplier": "已添加供应商 {{name}} · 稍后补充电话和 GST",
+      "mr": "已添加医药代表 {{name}}",
+      "medicine": "已添加 {{name}} · 稍后在库存中设置零售价"
+    },
+    "deleteConfirm": {
+      "medicine": "删除此药品？",
+      "supplier": "删除此供应商？",
+      "manufacturer": "删除此生产商？",
+      "mr": "删除此医药代表？",
+      "deleted": "已删除 {{name}}"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "新建生产商",
+        "edit": "编辑生产商"
+      },
+      "sub": "包装上的品牌 · 关联供应商和医药代表",
+      "steps": {
+        "maker": "生产商",
+        "connections": "关联"
+      },
+      "fields": {
+        "name": "名称",
+        "colour": "颜色",
+        "suppliers": "供应商",
+        "suppliersHint": "由谁经销",
+        "mrs": "医药代表",
+        "mrsHint": "由谁代表",
+        "medicines": "药品",
+        "medicineCount_other": "库存中有 {{count}} 种药品",
+        "noMedicines": "暂无 · 从库存中添加"
+      },
+      "summary": {
+        "suppliers_other": "{{count}} 家供应商",
+        "mrs_other": "{{count}} 名医药代表"
+      },
+      "save": "添加生产商",
+      "saved": "已保存生产商 · 关联已更新"
+    },
+    "supplier": {
+      "title": {
+        "create": "新建供应商",
+        "edit": "编辑供应商"
+      },
+      "sub": "您采购的经销商",
+      "steps": {
+        "supplier": "供应商",
+        "distributes": "经销",
+        "account": "账户"
+      },
+      "fields": {
+        "name": "经销商名称",
+        "phone": "电话",
+        "phoneHint": "10 位数字",
+        "gst": "GST 编号",
+        "manufacturers": "生产商",
+        "manufacturersHint": "可多选",
+        "payable": "应付",
+        "payableValue_other": "{{amount}} · {{count}} 天",
+        "nothingDue": "无应付款",
+        "orders": "订单",
+        "ordersValue_other": "{{count}} 张订单 · {{amount}}",
+        "noOrders": "暂无订单"
+      },
+      "account": {
+        "label": "账户",
+        "reference": "参考号",
+        "date": "日期",
+        "stage": "阶段",
+        "amount": "金额",
+        "balance": "余额",
+        "notBilled": "未开票",
+        "due": "应付 {{amount}}",
+        "paid": "已付款",
+        "credit": "抵扣 · {{batch}}",
+        "creditStage": "抵扣",
+        "adjusted": "已抵扣"
+      },
+      "quickFill": {
+        "newOrder": "新建采购单"
+      },
+      "save": "添加供应商",
+      "saved": "已保存供应商"
+    },
+    "mr": {
+      "title": {
+        "create": "新建医药代表",
+        "edit": "编辑医药代表"
+      },
+      "sub": "医药代表",
+      "steps": {
+        "mr": "医药代表",
+        "represents": "代表"
+      },
+      "fields": {
+        "name": "名称",
+        "phone": "电话",
+        "phoneHint": "10 位数字",
+        "nextVisit": "下次拜访",
+        "manufacturers": "生产商",
+        "manufacturersHint": "一人可代表多家"
+      },
+      "save": "添加医药代表",
+      "saved": "已保存医药代表"
+    },
+    "visit": {
+      "title": "记录医药代表拜访",
+      "steps": {
+        "visit": "拜访",
+        "details": "详情",
+        "notes": "备注"
+      },
+      "fields": {
+        "date": "日期",
+        "nextVisit": "下次拜访",
+        "twoWeeks": "2 周",
+        "oneMonth": "1 个月",
+        "samples": "收到的样品",
+        "samplesPlaceholder": "例如 4 支 Azelan",
+        "note": "备注"
+      },
+      "summary": "下次拜访 {{date}}",
+      "save": "记录拜访",
+      "saved": "已记录拜访 · 已设 {{date}} 提醒",
+      "savedNoReminder": "已记录拜访"
+    },
+    "medicine": {
+      "title": {
+        "create": "新建药品",
+        "edit": "编辑药品"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · 未设置成分",
+      "steps": {
+        "main": "药品、价格和库存",
+        "batches": "批次和供应商价格"
+      },
+      "groups": {
+        "medicine": "药品",
+        "price": "价格和库存"
+      },
+      "fields": {
+        "name": "名称",
+        "manufacturer": "生产商",
+        "composition": "成分",
+        "compositionHint": "用于替代品",
+        "compositionPlaceholder": "例如 维 A 酸 0.025%",
+        "soldWith": "销售方式",
+        "prescriptionOnly": "仅凭处方",
+        "overTheCounter": "非处方"
+      },
+      "price": {
+        "mrp": "零售价",
+        "inclGst": "含 GST",
+        "gst": "商品及服务税",
+        "beforeGst": "税前",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "最低进价",
+        "addSupplierPrice": "添加供应商价格",
+        "margin": "利润率"
+      },
+      "stock": {
+        "title": "库存水平",
+        "now": "库存 {{count}} · {{state}}",
+        "states": {
+          "healthy": "充足",
+          "reorder": "需补货",
+          "overstocked": "库存过多",
+          "out": "缺货"
+        },
+        "reorderAt": "补货点",
+        "fillUpTo": "补至",
+        "decreaseReorder": "降低补货点",
+        "increaseReorder": "提高补货点",
+        "decreaseFill": "降低补货上限",
+        "increaseFill": "提高补货上限",
+        "hintAlert": "库存降至 {{count}} 时提醒补货。",
+        "hintOrder": "订购 {{qty}} 补至 {{max}}。显示在 库存 › 低库存。"
+      },
+      "batches": {
+        "title": "批次",
+        "batch": "批次",
+        "expiry": "有效期",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "数量",
+        "rate": "单价",
+        "add": "添加批次",
+        "total": "库存 {{count}}",
+        "expiryInvalid": "请按 MM/YY 填写有效期",
+        "batchMissing": "请填写批次"
+      },
+      "rates": {
+        "title": "供应商价格",
+        "supplier": "供应商",
+        "rate": "单价",
+        "free": "赠品",
+        "leadDays": "交货天数",
+        "add": "添加供应商价格",
+        "rateMissing": "请填写此供应商的单价"
+      },
+      "badges": {
+        "inStock": "库存 {{count}}",
+        "best": "最低 {{rate}} · {{supplier}}"
+      },
+      "save": "添加药品",
+      "toasts": {
+        "added": "已添加 {{name}}",
+        "saved": "已保存 {{name}}",
+        "enterMrp": "请填写零售价",
+        "enterRates": "请为每个供应商价格填写单价",
+        "pickManufacturer": "请选择生产商"
+      }
+    }
   }
 }

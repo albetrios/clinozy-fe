@@ -230,5 +230,253 @@
   "payments": {
     "records": "Medical payments",
     "empty": "No Medical payments yet"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "Medicine",
+      "supplier": "Supplier",
+      "manufacturer": "Manufacturer",
+      "mr": "MR"
+    },
+    "saveChanges": "Save changes",
+    "addName": "Add a name",
+    "pickers": {
+      "searchManufacturer": "Search manufacturer",
+      "searchManufacturers": "Search manufacturers",
+      "searchSupplier": "Search supplier",
+      "searchSuppliers": "Search suppliers",
+      "searchMrs": "Search MRs",
+      "medicineCount_one": "{{count}} medicine",
+      "medicineCount_other": "{{count}} medicines",
+      "noPhone": "No phone yet",
+      "distributes": "Distributes {{maker}}",
+      "otherSuppliers": "Other suppliers",
+      "addManufacturer": "Add manufacturer",
+      "newManufacturer": "New manufacturer",
+      "addSupplier": "Add supplier",
+      "newSupplier": "New supplier",
+      "addMr": "Add MR",
+      "newMr": "New MR"
+    },
+    "quick": {
+      "manufacturer": "Manufacturer {{name}} added",
+      "supplier": "Supplier {{name}} added · add phone and GST later",
+      "mr": "MR {{name}} added",
+      "medicine": "{{name}} added · set MRP later in Stock"
+    },
+    "deleteConfirm": {
+      "medicine": "Delete this medicine?",
+      "supplier": "Delete this supplier?",
+      "manufacturer": "Delete this manufacturer?",
+      "mr": "Delete this MR?",
+      "deleted": "{{name}} deleted"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "New manufacturer",
+        "edit": "Edit manufacturer"
+      },
+      "sub": "The brand on the pack · links suppliers and MRs",
+      "steps": {
+        "maker": "Manufacturer",
+        "connections": "Connections"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Colour",
+        "suppliers": "Suppliers",
+        "suppliersHint": "who distributes it",
+        "mrs": "MRs",
+        "mrsHint": "who represents it",
+        "medicines": "Medicines",
+        "medicineCount_one": "{{count}} medicine in Stock",
+        "medicineCount_other": "{{count}} medicines in Stock",
+        "noMedicines": "None yet · add them from Stock"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} supplier",
+        "suppliers_other": "{{count}} suppliers",
+        "mrs_one": "{{count}} MR",
+        "mrs_other": "{{count}} MRs"
+      },
+      "save": "Add manufacturer",
+      "saved": "Manufacturer saved · connections updated"
+    },
+    "supplier": {
+      "title": {
+        "create": "New supplier",
+        "edit": "Edit supplier"
+      },
+      "sub": "Agency you buy from",
+      "steps": {
+        "supplier": "Supplier",
+        "distributes": "Distributes",
+        "account": "Account"
+      },
+      "fields": {
+        "name": "Agency name",
+        "phone": "Phone",
+        "phoneHint": "10 digits",
+        "gst": "GST number",
+        "manufacturers": "Manufacturers",
+        "manufacturersHint": "pick any",
+        "payable": "Payable",
+        "payableValue_one": "{{amount}} · {{count}} day",
+        "payableValue_other": "{{amount}} · {{count}} days",
+        "nothingDue": "Nothing due",
+        "orders": "Orders",
+        "ordersValue_one": "{{count}} order · {{amount}}",
+        "ordersValue_other": "{{count}} orders · {{amount}}",
+        "noOrders": "No orders yet"
+      },
+      "account": {
+        "label": "Account",
+        "reference": "Reference",
+        "date": "Date",
+        "stage": "Stage",
+        "amount": "Amount",
+        "balance": "Balance",
+        "notBilled": "Not billed",
+        "due": "{{amount}} due",
+        "paid": "Paid",
+        "credit": "Credit · {{batch}}",
+        "creditStage": "Credit",
+        "adjusted": "Adjusted"
+      },
+      "quickFill": {
+        "newOrder": "New purchase order"
+      },
+      "save": "Add supplier",
+      "saved": "Supplier saved"
+    },
+    "mr": {
+      "title": {
+        "create": "New MR",
+        "edit": "Edit MR"
+      },
+      "sub": "Medical representative",
+      "steps": {
+        "mr": "MR",
+        "represents": "Represents"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "phoneHint": "10 digits",
+        "nextVisit": "Next visit",
+        "manufacturers": "Manufacturers",
+        "manufacturersHint": "one MR can represent many"
+      },
+      "save": "Add MR",
+      "saved": "MR saved"
+    },
+    "visit": {
+      "title": "Log MR visit",
+      "steps": {
+        "visit": "Visit",
+        "details": "Details",
+        "notes": "Notes"
+      },
+      "fields": {
+        "date": "Date",
+        "nextVisit": "Next visit",
+        "twoWeeks": "2 weeks",
+        "oneMonth": "1 month",
+        "samples": "Samples given",
+        "samplesPlaceholder": "e.g. 4 tubes Azelan",
+        "note": "Note"
+      },
+      "summary": "Next visit {{date}}",
+      "save": "Log visit",
+      "saved": "Visit logged · reminder set for {{date}}",
+      "savedNoReminder": "Visit logged"
+    },
+    "medicine": {
+      "title": {
+        "create": "New medicine",
+        "edit": "Edit medicine"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · composition not set",
+      "steps": {
+        "main": "Medicine, price & stock",
+        "batches": "Batches & supplier prices"
+      },
+      "groups": {
+        "medicine": "Medicine",
+        "price": "Price & stock"
+      },
+      "fields": {
+        "name": "Name",
+        "manufacturer": "Manufacturer",
+        "composition": "Composition",
+        "compositionHint": "used for substitutes",
+        "compositionPlaceholder": "e.g. Tretinoin 0.025%",
+        "soldWith": "Sold with",
+        "prescriptionOnly": "Prescription only",
+        "overTheCounter": "Over the counter"
+      },
+      "price": {
+        "mrp": "MRP",
+        "inclGst": "incl. GST",
+        "gst": "GST",
+        "beforeGst": "Before GST",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "Best buy rate",
+        "addSupplierPrice": "Add a supplier price",
+        "margin": "Margin"
+      },
+      "stock": {
+        "title": "Stock levels",
+        "now": "{{count}} in stock · {{state}}",
+        "states": {
+          "healthy": "Healthy",
+          "reorder": "Reorder",
+          "overstocked": "Overstocked",
+          "out": "Out"
+        },
+        "reorderAt": "Reorder at",
+        "fillUpTo": "Fill up to",
+        "decreaseReorder": "Decrease reorder level",
+        "increaseReorder": "Increase reorder level",
+        "decreaseFill": "Decrease fill level",
+        "increaseFill": "Increase fill level",
+        "hintAlert": "Reorder alert when stock falls to {{count}}.",
+        "hintOrder": "Order {{qty}} to fill up to {{max}}. Shows under Stock › Low stock."
+      },
+      "batches": {
+        "title": "Batches",
+        "batch": "Batch",
+        "expiry": "Expiry",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "Qty",
+        "rate": "Rate",
+        "add": "Add batch",
+        "total": "{{count}} in stock",
+        "expiryInvalid": "Enter the expiry as MM/YY",
+        "batchMissing": "Enter the batch"
+      },
+      "rates": {
+        "title": "Supplier prices",
+        "supplier": "Supplier",
+        "rate": "Rate",
+        "free": "Free",
+        "leadDays": "Lead days",
+        "add": "Add supplier price",
+        "rateMissing": "Enter this supplier’s rate"
+      },
+      "badges": {
+        "inStock": "{{count}} in stock",
+        "best": "Best {{rate}} · {{supplier}}"
+      },
+      "save": "Add medicine",
+      "toasts": {
+        "added": "Added {{name}}",
+        "saved": "Saved {{name}}",
+        "enterMrp": "Enter the MRP",
+        "enterRates": "Enter a rate for every supplier price",
+        "pickManufacturer": "Pick a manufacturer"
+      }
+    }
   }
 }
