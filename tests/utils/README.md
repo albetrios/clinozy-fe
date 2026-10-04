@@ -61,7 +61,8 @@ Requires **clinozy-be** on `:3000` — Vite proxies `/api` in dev.
 | `registerNewUserAndGoToDashboard(page)`    | UI email-code login + onboarding when needed → dashboard                                  |
 | `loginViaEmailCodeUI(page)`                | Email-code login via `/login` UI only (needs `DATABASE_URL`)                              |
 | `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate (needs `DATABASE_URL`)                                 |
-| `createTeamOrgViaSwitcher(page)`           | Create team org via org switcher dialog                                                   |
+| `createTeamOrgViaApi(page)`                | Create a team org through the API (cookie refresh → token); skips when team orgs are off  |
+| `createTeamOrgAndOpenDashboard(page)`      | `createTeamOrgViaApi`, then open that org's dashboard in the app                          |
 | `selectOrganizationInSwitcher(page, slug)` | Switch active org in the header switcher                                                  |
 
 ### `e2e-tenancy.ts`

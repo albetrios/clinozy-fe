@@ -2,13 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import {
   completeOnboardingWizard,
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   loginViaEmailCodeUI,
   navigateInApp,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import {
-  byTestId,
   clickTestId,
   expectAppHeaderReady,
   expectLoginFormReady,
@@ -121,9 +120,7 @@ test.describe('Product journeys', () => {
 
   test('suspended page renders for authenticated team member', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    const { slug } = await createTeamOrgViaSwitcher(page);
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
     await navigateAuthenticated(page, `/organization/${slug}/suspended`);
     await expect(page.getByTestId('suspended-page')).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('suspended-switch-organization')).toBeVisible();
@@ -154,23 +151,18 @@ test.describe('Product journeys', () => {
       await expect(page.getByTestId(panel)).toBeVisible({ timeout: 10000 });
     }
 
-    // The modal's overlay (correctly) swallows clicks on the shell behind it, so
-    // leave settings before reaching for the switcher. Not with Escape: closing
-    // is `history.back()`, and each deep link above PUSHED an entry, so one
-    // Escape only steps back to the previous section. (In-app section switches
-    // `replace`, which is why a real user needs just one.) Drop the hash instead.
+    // Leave settings before entering the new organization. Not with Escape:
+    // closing is `history.back()`, and each deep link above PUSHED an entry, so
+    // one Escape only steps back to the previous section. (In-app section
+    // switches `replace`, which is why a real user needs just one.) Drop the
+    // hash instead.
     const withoutHash = new URL(page.url());
     withoutHash.hash = '';
     await page.goto(withoutHash.toString());
     await expect(page.getByTestId('settings-modal')).toHaveCount(0);
-    // `isVisible()` below is an instantaneous feature check, not a wait — make
-    // sure the shell is back first, or a slow paint reads as "no switcher" and
-    // the rest of this test skips without anyone noticing.
     await expectAppHeaderReady(page);
 
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    await createTeamOrgViaSwitcher(page);
+    await createTeamOrgAndOpenDashboard(page);
 
     // Regression: deep-linking to an organization section the instant the org
     // exists used to land on Account · Profile. Entering an org clears the store's

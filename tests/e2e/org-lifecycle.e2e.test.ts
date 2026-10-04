@@ -2,7 +2,7 @@ import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import { openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
@@ -38,8 +38,9 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       .waitFor({ state: 'visible', timeout: 10_000 })
       .then(() => true)
       .catch(() => false);
-    test.skip(!switcherShown, 'org switcher hidden (team orgs disabled)');
-    const { slug } = await createTeamOrgViaSwitcher(page);
+    // The switcher is what this test reads the new name from.
+    test.skip(!switcherShown, 'org switcher hidden');
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
 
     await openSettingsHash(page, 'organization', 'general');
     await expect(page.getByTestId('settings-section-org-general')).toBeVisible({
@@ -68,13 +69,7 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     // while the dashboard one click away still showed it as Active.
     test.setTimeout(150_000);
     await registerNewUserAndGoToDashboard(page);
-    const switcher = page.getByTestId('organization-switcher-trigger').first();
-    const switcherShown = await switcher
-      .waitFor({ state: 'visible', timeout: 10_000 })
-      .then(() => true)
-      .catch(() => false);
-    test.skip(!switcherShown, 'org switcher hidden (team orgs disabled)');
-    const { slug } = await createTeamOrgViaSwitcher(page);
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
 
     await page.goto(`/organization/${slug}/suspended`);
 
@@ -95,13 +90,7 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
 
     try {
       await registerNewUserAndGoToDashboard(page);
-      const switcher = page.getByTestId('organization-switcher-trigger').first();
-      const switcherShown = await switcher
-        .waitFor({ state: 'visible', timeout: 10_000 })
-        .then(() => true)
-        .catch(() => false);
-      test.skip(!switcherShown, 'org switcher hidden (team orgs disabled)');
-      await createTeamOrgViaSwitcher(page);
+      await createTeamOrgAndOpenDashboard(page);
 
       // Invite through the real dialog.
       await openSettingsHash(page, 'organization', 'members');

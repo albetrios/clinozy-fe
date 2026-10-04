@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import { expectAppHeaderReady } from '@/tests/utils/e2e-hybrid.ts';
@@ -89,7 +89,7 @@ test.describe('Dashboard', () => {
 test.describe('Dashboard suggestions on a team workspace', () => {
   test('"Invite members" reaches the Members section', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
-    await createTeamOrgViaSwitcher(page);
+    await createTeamOrgAndOpenDashboard(page);
 
     await page.getByTestId('dashboard-ai-chip-members').click();
 

@@ -2,10 +2,12 @@ import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
 import { SPLASH_FRAMES_MS, SPLASH_REDUCED_FRAMES_MS } from '@/lib/app-splash.ts';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import {
+  createTeamOrgViaApi,
+  registerNewUserAndGoToDashboard,
+} from '@/tests/utils/e2e-auth.ts';
 import { byTestId, clickTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
-import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * The cold load is ONE continuous screen: splash → content.
@@ -305,15 +307,8 @@ async function serveShellWhileOffline(
  */
 async function signInToNewTeamOrganization(page: Page): Promise<string> {
   await registerNewUserAndGoToDashboard(page);
-  // A cookie-authenticated POST: sent with the app's own origin, as the app does.
-  const refresh = await page.request.post('/api/v1/auth/refresh', {
-    headers: { origin: new URL(page.url()).origin },
-  });
-  expect(refresh.ok(), `refresh failed: ${refresh.status()}`).toBeTruthy();
-  const { data } = (await refresh.json()) as { data: { access_token: string } };
-  const { org } = await createTeamOrganization(page.request, data.access_token);
-  expect(org?.slug, 'team organization created').toBeTruthy();
-  return org?.slug ?? '';
+  const { slug } = await createTeamOrgViaApi(page);
+  return slug;
 }
 
 test.describe('Splash — frames, slot, offline hold, reduced motion', () => {

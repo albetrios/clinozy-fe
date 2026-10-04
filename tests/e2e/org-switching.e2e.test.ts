@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
@@ -28,7 +28,7 @@ test.describe('Organization switching (dual-URL)', () => {
     const switcher = byTestId(page, 'organization-switcher-trigger');
     test.skip(!(await switcher.isVisible()), 'org switcher hidden for deployment mode');
 
-    const { slug: teamSlug } = await createTeamOrgViaSwitcher(page);
+    const { slug: teamSlug } = await createTeamOrgAndOpenDashboard(page);
     await expect(page).toHaveURL(new RegExp(`/organization/${teamSlug}/dashboard`));
 
     await byTestId(page, 'organization-switcher-trigger').click();

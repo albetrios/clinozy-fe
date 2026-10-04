@@ -1,12 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import { uniqueE2eEmail } from '@/tests/utils/e2e-faker.ts';
 import {
-  byTestId,
   clickTestId,
   fillTestId,
   gotoApp,
@@ -204,9 +203,7 @@ test.describe('Edge cases — billing Stripe return', () => {
     // spec (it was skipping by accident), which is how that shipped. The last
     // assertion is the one that matters: the billing panel is still there.
     await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'team billing requires switcher');
-    await createTeamOrgViaSwitcher(page);
+    await createTeamOrgAndOpenDashboard(page);
 
     // A Stripe return is a full page LOAD of `…?redirect_status=…#settings/…`,
     // so load it. The router is the source of truth for location

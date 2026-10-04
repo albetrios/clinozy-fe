@@ -1,10 +1,10 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import {
   e2eDisplayName,
   e2eOrganizationName,
-  e2eTeamOrgProfile,
   uniqueE2eEmail,
 } from '@/tests/utils/e2e-faker.ts';
 import {
@@ -20,6 +20,7 @@ import {
   pollVerificationCodeFromMailOutbox,
   requireDatabaseUrl,
 } from '@/tests/utils/e2e-session.ts';
+import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 type ClinozyFeRouter = {
   navigate: (opts: { to: string }) => Promise<void> | void;
@@ -214,26 +215,53 @@ export async function authenticateViaEmailCodeAndLand(
 }
 
 /**
- * Creates a team org through the in-app switcher (requires an authenticated AppLayout session).
+ * Creates a team organization the signed-in user owns, through the API — the
+ * clinic shell has no create-organization switcher (personal workspaces are out
+ * of scope, D44). A cookie-authenticated refresh mints the token, sent with the
+ * app's own origin as the app sends it; the page stays where it is. Skips the
+ * test when the live clinozy-be has team organizations turned off.
  */
-export async function createTeamOrgViaSwitcher(
+export async function createTeamOrgViaApi(
   page: Page,
   opts?: { name?: string; slug?: string },
 ): Promise<{ slug: string }> {
-  const { name, slug } = e2eTeamOrgProfile({ label: 'team-e2e', ...opts });
-
-  await clickTestId(page, 'organization-switcher-trigger');
-  await clickTestId(page, 'organization-switcher-create');
-  await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible({
-    timeout: 10000,
+  const refresh = await page.request.post('/api/v1/auth/refresh', {
+    headers: { origin: new URL(page.url()).origin },
   });
-  await fillTestId(page, 'create-organization-dialog-name', name);
-  await fillTestId(page, 'create-organization-dialog-slug', slug);
-  await clickTestId(page, 'create-organization-dialog-submit');
+  expect(refresh.ok(), `refresh failed: ${refresh.status()}`).toBeTruthy();
+  const { data } = (await refresh.json()) as { data: { access_token: string } };
+
+  const { flags } = await probeLiveDeployment(page.request, data.access_token);
+  test.skip(
+    !flags.teamOrganizations,
+    'team organizations are off on this clinozy-be (TEAM_ORGANIZATION_ENABLED=false)',
+  );
+
+  const { createStatus, org } = await createTeamOrganization(
+    page.request,
+    data.access_token,
+    opts,
+  );
+  expect(org?.slug, `team organization not created (${createStatus})`).toBeTruthy();
+  return { slug: org?.slug ?? '' };
+}
+
+/**
+ * {@link createTeamOrgViaApi}, then opens the new organization's dashboard in
+ * the app — where creating one from the old switcher landed. The navigation is
+ * client-side, so the in-memory session carries over (a reload would need the
+ * refresh cookie).
+ */
+export async function createTeamOrgAndOpenDashboard(
+  page: Page,
+  opts?: { name?: string; slug?: string },
+): Promise<{ slug: string }> {
+  const { slug } = await createTeamOrgViaApi(page, opts);
+  await navigateInApp(page, `/organization/${slug}/dashboard`);
   await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
     timeout: 15000,
   });
-  await expect(page.getByTestId('dashboard-page')).toBeVisible();
+  await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
   return { slug };
 }
 

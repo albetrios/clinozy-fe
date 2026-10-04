@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
@@ -96,7 +96,7 @@ test.describe('Organization picker', () => {
     await registerNewUserAndGoToDashboard(page);
     const switcher = byTestId(page, 'organization-switcher-trigger');
     test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    const { slug } = await createTeamOrgViaSwitcher(page);
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
     await byTestId(page, 'organization-switcher-trigger').click();
     await expect(page.getByTestId(`organization-switcher-option-${slug}`)).toBeVisible({
       timeout: 10000,
