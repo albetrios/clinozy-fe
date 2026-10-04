@@ -38,4 +38,22 @@ describe('useListLoadError (KICKOFF §6.0 List error)', () => {
     rerender({ isError: true });
     expect(notifyMock.error).toHaveBeenCalledTimes(2);
   });
+
+  it('keeps showing the last copy when a read fails with nothing to show', () => {
+    const refetch = vi.fn();
+    const first = ['Rebook Vikram', 'Recall Tanvi'];
+    const { result, rerender } = renderHook(
+      (state: { rows: readonly string[]; isError: boolean; isPending: boolean }) =>
+        useListLoadError({ ...state, refetch }, 'tasks'),
+      { initialProps: { rows: first, isError: false, isPending: false } },
+    );
+    expect(result.current).toBe(first);
+    // A new view loads, then its first page fails: the last rows stay.
+    rerender({ rows: [], isError: false, isPending: true });
+    rerender({ rows: [], isError: true, isPending: false });
+    expect(result.current).toBe(first);
+    // A read that answers, even empty, is what shows.
+    rerender({ rows: [], isError: false, isPending: false });
+    expect(result.current).toEqual([]);
+  });
 });

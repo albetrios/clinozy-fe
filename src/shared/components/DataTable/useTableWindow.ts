@@ -1,5 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { type RefObject, useEffect, useEffectEvent } from 'react';
+import type { RefObject } from 'react';
+
+import { useLoadMoreSentinel } from '@/shared/hooks/useLoadMoreSentinel/index.ts';
 
 /** Lists longer than this render only the visible rows (H:4117). */
 export const VIRTUALIZE_ABOVE = 60;
@@ -86,21 +88,7 @@ export function useTableWindow<TItem extends { id: string }>({
   const offset = virtualizer.scrollOffset ?? 0;
   const firstVisible = virtualItems.find((virtual) => virtual.end > offset);
 
-  const loadMore = useEffectEvent(() => {
-    if (hasNextPage && !isFetchingNextPage) fetchNextPage?.();
-  });
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!(sentinel && hasNextPage) || isFetchingNextPage) return undefined;
-    if (typeof IntersectionObserver === 'undefined') return undefined;
-    // A fresh observer each time a page lands (isFetchingNextPage → false): its
-    // first report re-checks a list that still does not fill the scroller.
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) loadMore();
-    });
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, sentinelRef]);
+  useLoadMoreSentinel(sentinelRef, { hasNextPage, isFetchingNextPage, fetchNextPage });
 
   return {
     virtualizing,

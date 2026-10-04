@@ -367,5 +367,93 @@
     "tomorrow": "Domani alle 11",
     "inThreeDays": "Tra 3 giorni",
     "nextWeek": "Settimana prossima"
+  },
+  "record": "Attività",
+  "views": {
+    "label": "Vista attività",
+    "queue": "Da fare",
+    "snoozed": "Posticipate",
+    "done": "Completate"
+  },
+  "search": {
+    "placeholder": "Cerca attività o persone",
+    "label": "Cerca attività"
+  },
+  "type": {
+    "label": "Tipo di attività",
+    "all": "Tutti i tipi",
+    "count_one": "{{count}} tipo",
+    "count_many": "{{count}} tipi",
+    "count_other": "{{count}} tipi"
+  },
+  "scope": {
+    "label": "Ambito",
+    "mine": "Mie",
+    "everyone": "Tutti"
+  },
+  "rulesPopover": {
+    "button": "Regole",
+    "label": "Regole delle attività",
+    "title": "Cosa crea le attività",
+    "description": "{{productName}} controlla lead, appuntamenti e feedback e crea un’attività quando qualcuno deve intervenire. Un’attività si chiude da sola quando il record cambia.",
+    "line": "{{source}} · {{description}}",
+    "handle": "Lascia fare a {{productName}}",
+    "handled": "Se ne occupa {{productName}}",
+    "readOnly": "Solo il titolare o un amministratore può modificare queste regole"
+  },
+  "primary": {
+    "newTask": "Nuova attività"
+  },
+  "groups": {
+    "overdue": "In ritardo",
+    "today": "In scadenza oggi",
+    "later": "In arrivo",
+    "snoozed": "Posticipate",
+    "done": "Risolte"
+  },
+  "row": {
+    "automation": "{{productName}} può farlo",
+    "anyone": "Chiunque",
+    "was": "{{name}} · prima {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Lead {{id}}",
+    "appointment": "App. {{id}}",
+    "treatment": "Trattamento",
+    "patient": "Paziente {{id}}",
+    "invoice": "Fattura {{id}}",
+    "contact": "Contatto"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Posticipata · {{label}}",
+    "done": "Fatta · {{time}}",
+    "doneNow": "Fatta · Ora",
+    "doneByClinozy": "Fatta da {{productName}}",
+    "overdue": {
+      "minutes_one": "{{count}} min di ritardo",
+      "minutes_many": "{{count}} min di ritardo",
+      "minutes_other": "{{count}} min di ritardo",
+      "hours_one": "{{count}} h di ritardo",
+      "hours_many": "{{count}} h di ritardo",
+      "hours_other": "{{count}} h di ritardo",
+      "days_one": "{{count}} g di ritardo",
+      "days_many": "{{count}} g di ritardo",
+      "days_other": "{{count}} g di ritardo"
+    },
+    "soon": {
+      "minutes_one": "tra {{count}} min",
+      "minutes_many": "tra {{count}} min",
+      "minutes_other": "tra {{count}} min",
+      "hours_one": "tra {{count}} h",
+      "hours_many": "tra {{count}} h",
+      "hours_other": "tra {{count}} h"
+    }
+  },
+  "empty": {
+    "queue": "Al momento non c’è nulla per te. Le nuove attività compaiono qui quando i lead scrivono, le visite si avvicinano e arriva un feedback.",
+    "snoozed": "Nessuna attività posticipata",
+    "done": "Ancora nulla di risolto oggi"
   }
 }

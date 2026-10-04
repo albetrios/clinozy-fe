@@ -367,5 +367,81 @@
     "tomorrow": "明日 午前11時",
     "inThreeDays": "3日後",
     "nextWeek": "来週"
+  },
+  "record": "タスク",
+  "views": {
+    "label": "タスクの表示",
+    "queue": "未対応",
+    "snoozed": "スヌーズ中",
+    "done": "完了"
+  },
+  "search": {
+    "placeholder": "タスクや人を検索",
+    "label": "タスクを検索"
+  },
+  "type": {
+    "label": "タスクの種類",
+    "all": "すべての種類",
+    "count_other": "{{count}} 種類"
+  },
+  "scope": {
+    "label": "範囲",
+    "mine": "自分",
+    "everyone": "全員"
+  },
+  "rulesPopover": {
+    "button": "ルール",
+    "label": "タスクのルール",
+    "title": "タスクが作られる条件",
+    "description": "{{productName}} はリード、予約、フィードバックを見守り、誰かの対応が必要になるとタスクを作成します。記録が変わるとタスクは自動で閉じます。",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}} に任せる",
+    "handled": "{{productName}} が対応中",
+    "readOnly": "これらのルールを変更できるのはオーナーまたは管理者のみです"
+  },
+  "primary": {
+    "newTask": "新しいタスク"
+  },
+  "groups": {
+    "overdue": "期限切れ",
+    "today": "今日が期限",
+    "later": "今後",
+    "snoozed": "スヌーズ中",
+    "done": "解決済み"
+  },
+  "row": {
+    "automation": "{{productName}} が対応できます",
+    "anyone": "誰でも",
+    "was": "{{name}} · 以前は{{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "リード {{id}}",
+    "appointment": "予約 {{id}}",
+    "treatment": "施術",
+    "patient": "患者 {{id}}",
+    "invoice": "請求書 {{id}}",
+    "contact": "連絡先"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "スヌーズ · {{label}}",
+    "done": "完了 · {{time}}",
+    "doneNow": "完了 · たった今",
+    "doneByClinozy": "{{productName}} が完了",
+    "overdue": {
+      "minutes_other": "{{count}}分超過",
+      "hours_other": "{{count}}時間超過",
+      "days_other": "{{count}}日超過"
+    },
+    "soon": {
+      "minutes_other": "{{count}}分後",
+      "hours_other": "{{count}}時間後"
+    }
+  },
+  "empty": {
+    "queue": "今対応が必要なものはありません。リードからの連絡、近づく来院、届いたフィードバックに応じて新しいタスクがここに表示されます。",
+    "snoozed": "スヌーズ中のタスクはありません",
+    "done": "今日はまだ解決済みのものはありません"
   }
 }

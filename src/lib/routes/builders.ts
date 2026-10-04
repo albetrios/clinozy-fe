@@ -147,3 +147,19 @@ export function organizationPatientCreate(organizationSlug: string) {
     params: { organizationSlug },
   } as const;
 }
+
+/** The Tasks room — the list the task drawer opens over (To do, Mine by default). */
+export function organizationTasks(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/tasks',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** One task's drawer over the list — show is edit (`S:97`). */
+export function organizationTask(organizationSlug: string, taskId: string) {
+  return {
+    to: '/organization/$organizationSlug/tasks/$taskId',
+    params: { organizationSlug, taskId },
+  } as const;
+}

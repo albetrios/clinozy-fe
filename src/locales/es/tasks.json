@@ -367,5 +367,93 @@
     "tomorrow": "Mañana a las 11",
     "inThreeDays": "En 3 días",
     "nextWeek": "La próxima semana"
+  },
+  "record": "Tarea",
+  "views": {
+    "label": "Vista de tareas",
+    "queue": "Pendientes",
+    "snoozed": "Pospuestas",
+    "done": "Hechas"
+  },
+  "search": {
+    "placeholder": "Buscar tareas o personas",
+    "label": "Buscar tareas"
+  },
+  "type": {
+    "label": "Tipo de tarea",
+    "all": "Todos los tipos",
+    "count_one": "{{count}} tipo",
+    "count_many": "{{count}} tipos",
+    "count_other": "{{count}} tipos"
+  },
+  "scope": {
+    "label": "Alcance",
+    "mine": "Mías",
+    "everyone": "Todos"
+  },
+  "rulesPopover": {
+    "button": "Reglas",
+    "label": "Reglas de tareas",
+    "title": "Qué crea tareas",
+    "description": "{{productName}} vigila prospectos, citas y opiniones y crea una tarea cuando alguien tiene que actuar. Una tarea se cierra sola cuando cambia el registro.",
+    "line": "{{source}} · {{description}}",
+    "handle": "Que lo haga {{productName}}",
+    "handled": "Lo hace {{productName}}",
+    "readOnly": "Solo el propietario o un administrador puede cambiar estas reglas"
+  },
+  "primary": {
+    "newTask": "Nueva tarea"
+  },
+  "groups": {
+    "overdue": "Vencidas",
+    "today": "Vencen hoy",
+    "later": "Próximas",
+    "snoozed": "Pospuestas",
+    "done": "Resueltas"
+  },
+  "row": {
+    "automation": "{{productName}} puede hacerlo",
+    "anyone": "Cualquiera",
+    "was": "{{name}} · antes {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Prospecto {{id}}",
+    "appointment": "Cita {{id}}",
+    "treatment": "Tratamiento",
+    "patient": "Paciente {{id}}",
+    "invoice": "Factura {{id}}",
+    "contact": "Contacto"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Pospuesta · {{label}}",
+    "done": "Hecha · {{time}}",
+    "doneNow": "Hecha · Ahora",
+    "doneByClinozy": "Hecha por {{productName}}",
+    "overdue": {
+      "minutes_one": "{{count}} min de retraso",
+      "minutes_many": "{{count}} min de retraso",
+      "minutes_other": "{{count}} min de retraso",
+      "hours_one": "{{count}} h de retraso",
+      "hours_many": "{{count}} h de retraso",
+      "hours_other": "{{count}} h de retraso",
+      "days_one": "{{count}} d de retraso",
+      "days_many": "{{count}} d de retraso",
+      "days_other": "{{count}} d de retraso"
+    },
+    "soon": {
+      "minutes_one": "en {{count}} min",
+      "minutes_many": "en {{count}} min",
+      "minutes_other": "en {{count}} min",
+      "hours_one": "en {{count}} h",
+      "hours_many": "en {{count}} h",
+      "hours_other": "en {{count}} h"
+    }
+  },
+  "empty": {
+    "queue": "Nada te necesita ahora. Las tareas nuevas aparecen aquí cuando escriben los prospectos, se acercan las visitas y llegan opiniones.",
+    "snoozed": "No hay tareas pospuestas",
+    "done": "Nada resuelto hoy todavía"
   }
 }

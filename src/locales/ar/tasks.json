@@ -367,5 +367,111 @@
     "tomorrow": "غدًا 11 صباحًا",
     "inThreeDays": "بعد 3 أيام",
     "nextWeek": "الأسبوع القادم"
+  },
+  "record": "مهمة",
+  "views": {
+    "label": "عرض المهام",
+    "queue": "للتنفيذ",
+    "snoozed": "مؤجلة",
+    "done": "منجزة"
+  },
+  "search": {
+    "placeholder": "ابحث في المهام أو الأشخاص",
+    "label": "ابحث في المهام"
+  },
+  "type": {
+    "label": "نوع المهمة",
+    "all": "كل الأنواع",
+    "count_zero": "{{count}} نوع",
+    "count_one": "{{count}} نوع",
+    "count_two": "نوعان",
+    "count_few": "{{count}} أنواع",
+    "count_many": "{{count}} نوعًا",
+    "count_other": "{{count}} نوع"
+  },
+  "scope": {
+    "label": "النطاق",
+    "mine": "مهامي",
+    "everyone": "الجميع"
+  },
+  "rulesPopover": {
+    "button": "القواعد",
+    "label": "قواعد المهام",
+    "title": "ما الذي ينشئ المهام",
+    "description": "يراقب {{productName}} العملاء المحتملين والمواعيد والآراء وينشئ مهمة عندما يحتاج أحد إلى التصرف. تُغلق المهمة نفسها عندما يتغير السجل.",
+    "line": "{{source}} · {{description}}",
+    "handle": "دع {{productName}} يتولّاها",
+    "handled": "يتولّاها {{productName}}",
+    "readOnly": "يمكن للمالك أو المسؤول فقط تغيير هذه القواعد"
+  },
+  "primary": {
+    "newTask": "مهمة جديدة"
+  },
+  "groups": {
+    "overdue": "متأخرة",
+    "today": "مستحقة اليوم",
+    "later": "قادمة",
+    "snoozed": "مؤجلة",
+    "done": "تم حلها"
+  },
+  "row": {
+    "automation": "يستطيع {{productName}} القيام بهذا",
+    "anyone": "أي شخص",
+    "was": "{{name}} · كان {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "عميل محتمل {{id}}",
+    "appointment": "موعد {{id}}",
+    "treatment": "علاج",
+    "patient": "مريض {{id}}",
+    "invoice": "فاتورة {{id}}",
+    "contact": "جهة اتصال"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "مؤجلة · {{label}}",
+    "done": "تمت · {{time}}",
+    "doneNow": "تمت · الآن",
+    "doneByClinozy": "أنجزها {{productName}}",
+    "overdue": {
+      "minutes_zero": "متأخرة {{count}} دقيقة",
+      "minutes_one": "متأخرة {{count}} دقيقة",
+      "minutes_two": "متأخرة {{count}} دقيقة",
+      "minutes_few": "متأخرة {{count}} دقائق",
+      "minutes_many": "متأخرة {{count}} دقيقة",
+      "minutes_other": "متأخرة {{count}} دقيقة",
+      "hours_zero": "متأخرة {{count}} ساعة",
+      "hours_one": "متأخرة {{count}} ساعة",
+      "hours_two": "متأخرة {{count}} ساعة",
+      "hours_few": "متأخرة {{count}} ساعات",
+      "hours_many": "متأخرة {{count}} ساعة",
+      "hours_other": "متأخرة {{count}} ساعة",
+      "days_zero": "متأخرة {{count}} يوم",
+      "days_one": "متأخرة {{count}} يوم",
+      "days_two": "متأخرة {{count}} يوم",
+      "days_few": "متأخرة {{count}} أيام",
+      "days_many": "متأخرة {{count}} يومًا",
+      "days_other": "متأخرة {{count}} يوم"
+    },
+    "soon": {
+      "minutes_zero": "خلال {{count}} دقيقة",
+      "minutes_one": "خلال {{count}} دقيقة",
+      "minutes_two": "خلال {{count}} دقيقة",
+      "minutes_few": "خلال {{count}} دقائق",
+      "minutes_many": "خلال {{count}} دقيقة",
+      "minutes_other": "خلال {{count}} دقيقة",
+      "hours_zero": "خلال {{count}} ساعة",
+      "hours_one": "خلال {{count}} ساعة",
+      "hours_two": "خلال {{count}} ساعة",
+      "hours_few": "خلال {{count}} ساعات",
+      "hours_many": "خلال {{count}} ساعة",
+      "hours_other": "خلال {{count}} ساعة"
+    }
+  },
+  "empty": {
+    "queue": "لا شيء يحتاجك الآن. تظهر المهام الجديدة هنا عندما يراسل العملاء المحتملون وتقترب الزيارات وتصل الآراء.",
+    "snoozed": "لا توجد مهام مؤجلة",
+    "done": "لم يُحَلّ شيء اليوم بعد"
   }
 }

@@ -367,5 +367,87 @@
     "tomorrow": "Morgen 11 Uhr",
     "inThreeDays": "In 3 Tagen",
     "nextWeek": "Nächste Woche"
+  },
+  "record": "Aufgabe",
+  "views": {
+    "label": "Aufgabenansicht",
+    "queue": "Zu erledigen",
+    "snoozed": "Zurückgestellt",
+    "done": "Erledigt"
+  },
+  "search": {
+    "placeholder": "Aufgaben oder Personen suchen",
+    "label": "Aufgaben suchen"
+  },
+  "type": {
+    "label": "Aufgabentyp",
+    "all": "Alle Typen",
+    "count_one": "{{count}} Typ",
+    "count_other": "{{count}} Typen"
+  },
+  "scope": {
+    "label": "Umfang",
+    "mine": "Meine",
+    "everyone": "Alle"
+  },
+  "rulesPopover": {
+    "button": "Regeln",
+    "label": "Aufgabenregeln",
+    "title": "Was Aufgaben erstellt",
+    "description": "{{productName}} beobachtet Leads, Termine und Feedback und erstellt eine Aufgabe, sobald jemand handeln muss. Eine Aufgabe schließt sich selbst, wenn sich der Datensatz ändert.",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}} übernehmen lassen",
+    "handled": "{{productName}} übernimmt das",
+    "readOnly": "Nur Inhaber oder Admins können diese Regeln ändern"
+  },
+  "primary": {
+    "newTask": "Neue Aufgabe"
+  },
+  "groups": {
+    "overdue": "Überfällig",
+    "today": "Heute fällig",
+    "later": "Demnächst",
+    "snoozed": "Zurückgestellt",
+    "done": "Erledigt"
+  },
+  "row": {
+    "automation": "{{productName}} kann das erledigen",
+    "anyone": "Beliebig",
+    "was": "{{name}} · vorher {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Lead {{id}}",
+    "appointment": "Termin {{id}}",
+    "treatment": "Behandlung",
+    "patient": "Patient {{id}}",
+    "invoice": "Rechnung {{id}}",
+    "contact": "Kontakt"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Zurückgestellt · {{label}}",
+    "done": "Erledigt · {{time}}",
+    "doneNow": "Erledigt · Jetzt",
+    "doneByClinozy": "Von {{productName}} erledigt",
+    "overdue": {
+      "minutes_one": "{{count}} Min. überfällig",
+      "minutes_other": "{{count}} Min. überfällig",
+      "hours_one": "{{count}} Std. überfällig",
+      "hours_other": "{{count}} Std. überfällig",
+      "days_one": "{{count}} Tag überfällig",
+      "days_other": "{{count}} Tage überfällig"
+    },
+    "soon": {
+      "minutes_one": "in {{count}} Min.",
+      "minutes_other": "in {{count}} Min.",
+      "hours_one": "in {{count}} Std.",
+      "hours_other": "in {{count}} Std."
+    }
+  },
+  "empty": {
+    "queue": "Gerade braucht Sie nichts. Neue Aufgaben erscheinen hier, sobald Leads schreiben, Besuche anstehen und Feedback eintrifft.",
+    "snoozed": "Keine zurückgestellten Aufgaben",
+    "done": "Heute noch nichts erledigt"
   }
 }

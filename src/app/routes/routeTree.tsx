@@ -88,7 +88,9 @@ import { manifest as paymentsManifest } from '@/pages/organization/$organization
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
+import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as tasksManifest } from '@/pages/organization/$organizationSlug/tasks/tasks.manifest.ts';
+import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
@@ -269,6 +271,12 @@ const TasksPage = lazyRouteComponent(
     [I18N_NAMESPACES.tasks],
     () => import('@/pages/organization/$organizationSlug/tasks/tasks.route.tsx'),
   ),
+  'Component',
+);
+// The Tasks room's dialog route renders nothing of its own (the list opens the
+// drawer), so it needs no namespace beyond the room's.
+const TaskRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/tasks/$taskId/task-id.route.tsx'),
   'Component',
 );
 const OfferingsPage = lazyRouteComponent(
@@ -924,12 +932,29 @@ const organizationTasksRoute = createRoute({
   path: 'tasks',
   head: manifestHead(tasksManifest),
   staticData: { manifest: tasksManifest },
+  validateSearch: validateTasksSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(tasksManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: TasksPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialog over the Tasks list (D24, S:97): it renders nothing; the
+// list page reads the URL and opens the task drawer over itself.
+const organizationTaskRoute = createRoute({
+  getParentRoute: () => organizationTasksRoute,
+  path: '$taskId',
+  head: manifestHead(taskManifest),
+  staticData: { manifest: taskManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(taskManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: TaskRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1206,7 +1231,7 @@ const routeTree = rootRoute.addChildren([
       organizationStockItemsRoute,
     ]),
     organizationPaymentsRoute,
-    organizationTasksRoute,
+    organizationTasksRoute.addChildren([organizationTaskRoute]),
     organizationOfferingsRoute.addChildren([
       organizationOfferingCreateRoute,
       organizationOfferingEditRoute,

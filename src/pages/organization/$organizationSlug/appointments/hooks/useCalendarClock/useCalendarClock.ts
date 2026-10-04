@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
-
 import {
   clinicClockTime,
   clinicToday,
   clockMinutes,
 } from '@/shared/api/clinic/clinic-time.ts';
+import { useNow } from '@/shared/hooks/useNow/index.ts';
 
 /** The clinic's clock as the calendars read it. */
 export interface CalendarClock {
@@ -14,9 +13,6 @@ export interface CalendarClock {
   minutes: number;
 }
 
-/** How often the calendars' clock moves on. */
-const TICK_MS = 60_000;
-
 /**
  * The clinic's clock for the calendars (H:5925): today and the minutes after
  * midnight in the clinic's timezone — the real clock, never the prototype's
@@ -24,10 +20,6 @@ const TICK_MS = 60_000;
  * veil follow it.
  */
 export function useCalendarClock(): CalendarClock {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), TICK_MS);
-    return () => window.clearInterval(timer);
-  }, []);
+  const now = useNow();
   return { today: clinicToday(now), minutes: clockMinutes(clinicClockTime(now)) };
 }

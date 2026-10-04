@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   type DataTableRowAction,
   DataTableRowActions,
@@ -25,21 +26,6 @@ import {
   type TableRow,
 } from './data-table-layout.ts';
 import type { TableSelection } from './useTableSelection.ts';
-
-/** The 3px inline-start status edge, by tone (literal classes for Tailwind). */
-const ROW_EDGE: Record<Tone, string> = {
-  butter: 'border-s-tone-butter-dot',
-  lav: 'border-s-tone-lav-dot',
-  sky: 'border-s-tone-sky-dot',
-  sage: 'border-s-tone-sage-dot',
-  blush: 'border-s-tone-blush-dot',
-  mint: 'border-s-tone-mint-dot',
-  peach: 'border-s-tone-peach-dot',
-  plum: 'border-s-tone-plum-dot',
-  lime: 'border-s-tone-lime-dot',
-  slate: 'border-s-tone-slate-dot',
-  stone: 'border-s-tone-stone-dot',
-};
 
 // Hover `bg-canvas` 120ms, a muted hairline, the j / k focus bar (H:267, H:683).
 const ROW_BASE =
@@ -438,7 +424,7 @@ export function DataTableRow<TData extends RowData>({
       className={cn(
         ROW_BASE,
         rowLayoutClass(context),
-        tone ? ROW_EDGE[tone] : 'border-s-transparent',
+        tone ? TONE_CLASSES[tone].edge : 'border-s-transparent',
         onRowClick && 'cursor-pointer',
       )}
     >

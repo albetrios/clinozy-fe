@@ -94,19 +94,6 @@ function TableEmpty({
 }
 
 /**
- * The last rows the list loaded, kept while a read fails — "Showing the last
- * copy" (KICKOFF §6.0 List error) — under the rooms' one list-error toast
- * with "Retry" (`useListLoadError`).
- */
-function useLastCopy(list: ReturnType<typeof usePatientList>): readonly PatientRow[] {
-  const [lastCopy, setLastCopy] = useState<readonly PatientRow[]>(list.rows);
-  const settled = !(list.isError || list.isPending);
-  if (settled && list.rows !== lastCopy) setLastCopy(list.rows);
-  useListLoadError(list, PATIENTS_TABLE_ID);
-  return list.isError && list.rows.length === 0 ? lastCopy : list.rows;
-}
-
-/**
  * The filter part of the list's params — a change to it (a search, "Apply
  * filter") shows the skeleton over the rows; a view or sort change keeps the
  * rows until the new page arrives (`patients.md:253`).
@@ -147,7 +134,9 @@ export function PatientsPage() {
   const { dialog, close } = usePatientsDialogRoute();
 
   const list = usePatientList(params);
-  const rows = useLastCopy(list);
+  // While a read fails, the last rows it loaded — "Showing the last copy"
+  // (KICKOFF §6.0 List error) — under the one list-error toast with Retry.
+  const rows = useListLoadError(list, PATIENTS_TABLE_ID);
   const filterKey = filterKeyOf(params);
   const [settledFilterKey, setSettledFilterKey] = useState(filterKey);
   if (!(list.isPending || list.isRefreshing) && settledFilterKey !== filterKey) {

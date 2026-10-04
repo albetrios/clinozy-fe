@@ -367,5 +367,93 @@
     "tomorrow": "Amanhã às 11h",
     "inThreeDays": "Em 3 dias",
     "nextWeek": "Próxima semana"
+  },
+  "record": "Tarefa",
+  "views": {
+    "label": "Visualização de tarefas",
+    "queue": "A fazer",
+    "snoozed": "Adiadas",
+    "done": "Concluídas"
+  },
+  "search": {
+    "placeholder": "Pesquisar tarefas ou pessoas",
+    "label": "Pesquisar tarefas"
+  },
+  "type": {
+    "label": "Tipo de tarefa",
+    "all": "Todos os tipos",
+    "count_one": "{{count}} tipo",
+    "count_many": "{{count}} tipos",
+    "count_other": "{{count}} tipos"
+  },
+  "scope": {
+    "label": "Escopo",
+    "mine": "Minhas",
+    "everyone": "Todos"
+  },
+  "rulesPopover": {
+    "button": "Regras",
+    "label": "Regras de tarefas",
+    "title": "O que cria tarefas",
+    "description": "O {{productName}} acompanha leads, consultas e feedback e cria uma tarefa quando alguém precisa agir. A tarefa se fecha sozinha quando o registro muda.",
+    "line": "{{source}} · {{description}}",
+    "handle": "Deixar com o {{productName}}",
+    "handled": "O {{productName}} cuida disso",
+    "readOnly": "Somente o proprietário ou um administrador pode alterar estas regras"
+  },
+  "primary": {
+    "newTask": "Nova tarefa"
+  },
+  "groups": {
+    "overdue": "Atrasadas",
+    "today": "Vencem hoje",
+    "later": "Próximas",
+    "snoozed": "Adiadas",
+    "done": "Resolvidas"
+  },
+  "row": {
+    "automation": "O {{productName}} pode fazer isso",
+    "anyone": "Qualquer pessoa",
+    "was": "{{name}} · antes {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Lead {{id}}",
+    "appointment": "Consulta {{id}}",
+    "treatment": "Tratamento",
+    "patient": "Paciente {{id}}",
+    "invoice": "Fatura {{id}}",
+    "contact": "Contato"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Adiada · {{label}}",
+    "done": "Concluída · {{time}}",
+    "doneNow": "Concluída · Agora",
+    "doneByClinozy": "Concluída pelo {{productName}}",
+    "overdue": {
+      "minutes_one": "{{count}} min atrasada",
+      "minutes_many": "{{count}} min atrasada",
+      "minutes_other": "{{count}} min atrasada",
+      "hours_one": "{{count}} h atrasada",
+      "hours_many": "{{count}} h atrasada",
+      "hours_other": "{{count}} h atrasada",
+      "days_one": "{{count}} d atrasada",
+      "days_many": "{{count}} d atrasada",
+      "days_other": "{{count}} d atrasada"
+    },
+    "soon": {
+      "minutes_one": "em {{count}} min",
+      "minutes_many": "em {{count}} min",
+      "minutes_other": "em {{count}} min",
+      "hours_one": "em {{count}} h",
+      "hours_many": "em {{count}} h",
+      "hours_other": "em {{count}} h"
+    }
+  },
+  "empty": {
+    "queue": "Nada precisa de você agora. Novas tarefas aparecem aqui quando leads escrevem, visitas se aproximam e chega feedback.",
+    "snoozed": "Nenhuma tarefa adiada",
+    "done": "Nada resolvido hoje ainda"
   }
 }

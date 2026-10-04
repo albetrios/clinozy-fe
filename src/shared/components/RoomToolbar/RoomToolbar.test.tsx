@@ -257,6 +257,51 @@ describe('RoomToolbar — phone', () => {
     expect(tabs?.className).not.toContain('[data-room-tabs-track]');
   });
 
+  it('puts the search alone, the views + the room’s filter, then the actions on row 3 (Tasks)', async () => {
+    tier.current = 'phone';
+    renderToolbar({
+      layout: 'tasks',
+      filters: undefined,
+      filtersSlot: <button type="button">All types</button>,
+      search: {
+        placeholder: 'Search tasks or people',
+        label: 'Search tasks',
+        width: 'wide',
+        keyHint: false,
+      },
+    });
+    const row = await screen.findByTestId('patients-toolbar');
+    expect(row).toHaveAttribute('data-layout', 'tasks');
+    // The h1 keeps the default sizes (18px on a tablet, `tasks.md:17`).
+    expect(within(row).getByRole('heading', { level: 1 }).className).toContain('text-lg');
+    expect(screen.getByTestId('patients-search').className).toContain(
+      'max-md:basis-full',
+    );
+    const slot = screen.getByRole('button', { name: 'All types' }).parentElement;
+    expect(slot?.className).toContain('max-md:order-3');
+    const actions = screen
+      .getByRole('button', { name: 'Day close' })
+      .closest('[data-slot="room-toolbar-actions"]');
+    expect(actions?.className).toContain('max-md:order-5');
+    expect(actions?.className).toContain('max-md:basis-full');
+  });
+
+  it('opens the Tasks search 220px wide with no key hint (H:2133)', async () => {
+    renderToolbar({
+      search: {
+        placeholder: 'Search tasks or people',
+        label: 'Search tasks',
+        width: 'wide',
+        keyHint: false,
+      },
+    });
+    const search = await screen.findByTestId('patients-search');
+    await userEvent.setup().click(screen.getByRole('searchbox'));
+    expect(search.className).toContain('md:flex-[0_1_220px]');
+    expect(search.className).toContain('md:max-w-none');
+    expect(search.textContent).not.toContain('/');
+  });
+
   it('opens Filters as the bottom sheet', async () => {
     tier.current = 'phone';
     const user = userEvent.setup();

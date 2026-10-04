@@ -966,7 +966,11 @@ export const taskRecordSchema = taskSchema.extend({
 /** A stored task. */
 export type TaskRecord = z.infer<typeof taskRecordSchema>;
 
-/** The person a task is about: a patient, a lead, or a chat-only contact. */
+/**
+ * The person a task is about: a patient, a lead, or a chat-only contact — with
+ * what their contact card reads (REPLACE_WITH_API: the schema's `contactCard`,
+ * S:1566).
+ */
 export const taskPersonSchema = z.object({
   name: z.string(),
   firstName: z.string(),
@@ -974,6 +978,12 @@ export const taskPersonSchema = z.object({
   leadId: z.uuid().nullable(),
   /** A registered patient (sage avatar with the "P" badge; lav otherwise). */
   isPatient: z.boolean(),
+  /** What the contact card reads them as: a patient, a lead, or a chat-only contact. */
+  kind: z.enum(['patient', 'lead', 'contact']),
+  /** Their patient `seq` — else their lead's; null for a chat-only contact. */
+  seq: z.number().int().nonnegative().nullable(),
+  /** Their mobile, E.164 (the card's WhatsApp row). */
+  phone: z.string().nullable(),
 });
 /** A task's person. */
 export type TaskPerson = z.infer<typeof taskPersonSchema>;
@@ -997,7 +1007,10 @@ export const taskSourceRefSchema = z.object({
 /** A source chip. */
 export type TaskSourceRef = z.infer<typeof taskSourceRefSchema>;
 
-/** A staff member as a task row shows them (owner pills, "was …"). */
+/**
+ * A staff member as a task row shows them — owner pills, "was …" — and as
+ * their team card reads them ("Assigned": roles, presence, phone, email).
+ */
 export const taskStaffSchema = userSchema.pick({
   id: true,
   firstName: true,
@@ -1005,6 +1018,10 @@ export const taskStaffSchema = userSchema.pick({
   initials: true,
   tone: true,
   active: true,
+  roles: true,
+  presence: true,
+  phone: true,
+  email: true,
 });
 /** A row's staff member. */
 export type TaskStaff = z.infer<typeof taskStaffSchema>;

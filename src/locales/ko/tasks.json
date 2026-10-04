@@ -367,5 +367,81 @@
     "tomorrow": "내일 오전 11시",
     "inThreeDays": "3일 후",
     "nextWeek": "다음 주"
+  },
+  "record": "작업",
+  "views": {
+    "label": "작업 보기",
+    "queue": "할 일",
+    "snoozed": "다시 알림",
+    "done": "완료"
+  },
+  "search": {
+    "placeholder": "작업 또는 사람 검색",
+    "label": "작업 검색"
+  },
+  "type": {
+    "label": "작업 유형",
+    "all": "모든 유형",
+    "count_other": "{{count}}개 유형"
+  },
+  "scope": {
+    "label": "범위",
+    "mine": "내 작업",
+    "everyone": "모두"
+  },
+  "rulesPopover": {
+    "button": "규칙",
+    "label": "작업 규칙",
+    "title": "작업이 만들어지는 조건",
+    "description": "{{productName}}이(가) 리드, 예약, 피드백을 지켜보다가 누군가 조치해야 할 때 작업을 만듭니다. 기록이 바뀌면 작업은 자동으로 닫힙니다.",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}}에 맡기기",
+    "handled": "{{productName}}이(가) 처리 중",
+    "readOnly": "소유자 또는 관리자만 이 규칙을 바꿀 수 있습니다"
+  },
+  "primary": {
+    "newTask": "새 작업"
+  },
+  "groups": {
+    "overdue": "기한 지남",
+    "today": "오늘 마감",
+    "later": "예정",
+    "snoozed": "다시 알림",
+    "done": "해결됨"
+  },
+  "row": {
+    "automation": "{{productName}}이(가) 할 수 있음",
+    "anyone": "누구나",
+    "was": "{{name}} · 이전 {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "리드 {{id}}",
+    "appointment": "예약 {{id}}",
+    "treatment": "시술",
+    "patient": "환자 {{id}}",
+    "invoice": "청구서 {{id}}",
+    "contact": "연락처"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "다시 알림 · {{label}}",
+    "done": "완료 · {{time}}",
+    "doneNow": "완료 · 방금",
+    "doneByClinozy": "{{productName}}이(가) 완료",
+    "overdue": {
+      "minutes_other": "{{count}}분 지남",
+      "hours_other": "{{count}}시간 지남",
+      "days_other": "{{count}}일 지남"
+    },
+    "soon": {
+      "minutes_other": "{{count}}분 후",
+      "hours_other": "{{count}}시간 후"
+    }
+  },
+  "empty": {
+    "queue": "지금은 처리할 일이 없습니다. 리드가 연락하거나 방문이 다가오거나 피드백이 오면 새 작업이 여기에 표시됩니다.",
+    "snoozed": "다시 알림 작업이 없습니다",
+    "done": "오늘 아직 해결된 작업이 없습니다"
   }
 }

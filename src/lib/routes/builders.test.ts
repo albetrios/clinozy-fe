@@ -18,6 +18,8 @@ import {
   organizationPatients,
   organizationPicker,
   organizationSuspended,
+  organizationTask,
+  organizationTasks,
 } from './builders.ts';
 
 describe('route builders', () => {
@@ -98,6 +100,17 @@ describe('route builders', () => {
     expect(organizationPatientCreate('acme')).toEqual({
       to: '/organization/$organizationSlug/patients/create',
       params: { organizationSlug: 'acme' },
+    });
+  });
+
+  it('build the Tasks room and its task drawer route (S:95, S:97)', () => {
+    expect(organizationTasks('acme')).toEqual({
+      to: '/organization/$organizationSlug/tasks',
+      params: { organizationSlug: 'acme' },
+    });
+    expect(organizationTask('acme', 'T1')).toEqual({
+      to: '/organization/$organizationSlug/tasks/$taskId',
+      params: { organizationSlug: 'acme', taskId: 'T1' },
     });
   });
 });

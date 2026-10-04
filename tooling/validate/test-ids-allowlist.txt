@@ -13,3 +13,4 @@ src/pages/organization/$organizationSlug/offerings/$offeringId/edit/ #page-root
 src/pages/organization/$organizationSlug/offerings/offers/create/ #page-root
 src/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/ #page-root
 src/pages/organization/$organizationSlug/patients/create/ #page-root
+src/pages/organization/$organizationSlug/tasks/$taskId/ #page-root

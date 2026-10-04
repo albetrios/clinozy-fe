@@ -367,5 +367,87 @@
     "tomorrow": "कल सुबह 11 बजे",
     "inThreeDays": "3 दिन में",
     "nextWeek": "अगले हफ़्ते"
+  },
+  "record": "कार्य",
+  "views": {
+    "label": "कार्य दृश्य",
+    "queue": "करने हैं",
+    "snoozed": "स्थगित",
+    "done": "पूरे हुए"
+  },
+  "search": {
+    "placeholder": "कार्य या लोग खोजें",
+    "label": "कार्य खोजें"
+  },
+  "type": {
+    "label": "कार्य का प्रकार",
+    "all": "सभी प्रकार",
+    "count_one": "{{count}} प्रकार",
+    "count_other": "{{count}} प्रकार"
+  },
+  "scope": {
+    "label": "दायरा",
+    "mine": "मेरे",
+    "everyone": "सभी"
+  },
+  "rulesPopover": {
+    "button": "नियम",
+    "label": "कार्य नियम",
+    "title": "कार्य कैसे बनते हैं",
+    "description": "{{productName}} लीड्स, अपॉइंटमेंट और फ़ीडबैक पर नज़र रखता है और जब किसी को कदम उठाना हो तो कार्य बनाता है। रिकॉर्ड बदलने पर कार्य अपने आप बंद हो जाता है।",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}} को संभालने दें",
+    "handled": "{{productName}} संभाल रहा है",
+    "readOnly": "केवल मालिक या एडमिन ये नियम बदल सकते हैं"
+  },
+  "primary": {
+    "newTask": "नया कार्य"
+  },
+  "groups": {
+    "overdue": "समय निकल गया",
+    "today": "आज तक",
+    "later": "आने वाले",
+    "snoozed": "स्थगित",
+    "done": "हल हो गए"
+  },
+  "row": {
+    "automation": "{{productName}} यह कर सकता है",
+    "anyone": "कोई भी",
+    "was": "{{name}} · पहले {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "लीड {{id}}",
+    "appointment": "अपॉइंटमेंट {{id}}",
+    "treatment": "ट्रीटमेंट",
+    "patient": "मरीज़ {{id}}",
+    "invoice": "इनवॉइस {{id}}",
+    "contact": "संपर्क"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "स्थगित · {{label}}",
+    "done": "पूरा · {{time}}",
+    "doneNow": "पूरा · अभी",
+    "doneByClinozy": "{{productName}} ने पूरा किया",
+    "overdue": {
+      "minutes_one": "{{count}} मिनट देर",
+      "minutes_other": "{{count}} मिनट देर",
+      "hours_one": "{{count}} घंटे देर",
+      "hours_other": "{{count}} घंटे देर",
+      "days_one": "{{count}} दिन देर",
+      "days_other": "{{count}} दिन देर"
+    },
+    "soon": {
+      "minutes_one": "{{count}} मिनट में",
+      "minutes_other": "{{count}} मिनट में",
+      "hours_one": "{{count}} घंटे में",
+      "hours_other": "{{count}} घंटे में"
+    }
+  },
+  "empty": {
+    "queue": "अभी आपके लिए कुछ नहीं है। जैसे-जैसे लीड्स लिखते हैं, विज़िट नज़दीक आती हैं और फ़ीडबैक आता है, नए कार्य यहाँ दिखते हैं।",
+    "snoozed": "कोई स्थगित कार्य नहीं",
+    "done": "आज अभी तक कुछ हल नहीं हुआ"
   }
 }

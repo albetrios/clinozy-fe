@@ -367,5 +367,93 @@
     "tomorrow": "Demain 11 h",
     "inThreeDays": "Dans 3 jours",
     "nextWeek": "La semaine prochaine"
+  },
+  "record": "Tâche",
+  "views": {
+    "label": "Vue des tâches",
+    "queue": "À faire",
+    "snoozed": "Reportées",
+    "done": "Terminées"
+  },
+  "search": {
+    "placeholder": "Rechercher des tâches ou des personnes",
+    "label": "Rechercher des tâches"
+  },
+  "type": {
+    "label": "Type de tâche",
+    "all": "Tous les types",
+    "count_one": "{{count}} type",
+    "count_many": "{{count}} types",
+    "count_other": "{{count}} types"
+  },
+  "scope": {
+    "label": "Portée",
+    "mine": "Les miennes",
+    "everyone": "Tout le monde"
+  },
+  "rulesPopover": {
+    "button": "Règles",
+    "label": "Règles des tâches",
+    "title": "Ce qui crée des tâches",
+    "description": "{{productName}} surveille les prospects, les rendez-vous et les avis, et crée une tâche quand quelqu’un doit agir. Une tâche se ferme d’elle-même quand la fiche change.",
+    "line": "{{source}} · {{description}}",
+    "handle": "Confier à {{productName}}",
+    "handled": "{{productName}} s’en charge",
+    "readOnly": "Seul le propriétaire ou un administrateur peut modifier ces règles"
+  },
+  "primary": {
+    "newTask": "Nouvelle tâche"
+  },
+  "groups": {
+    "overdue": "En retard",
+    "today": "À faire aujourd’hui",
+    "later": "À venir",
+    "snoozed": "Reportées",
+    "done": "Résolues"
+  },
+  "row": {
+    "automation": "{{productName}} peut s’en charger",
+    "anyone": "N’importe qui",
+    "was": "{{name}} · avant {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Prospect {{id}}",
+    "appointment": "RDV {{id}}",
+    "treatment": "Soin",
+    "patient": "Patient {{id}}",
+    "invoice": "Facture {{id}}",
+    "contact": "Contact"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Reportée · {{label}}",
+    "done": "Terminée · {{time}}",
+    "doneNow": "Terminée · Maintenant",
+    "doneByClinozy": "Terminée par {{productName}}",
+    "overdue": {
+      "minutes_one": "{{count}} min de retard",
+      "minutes_many": "{{count}} min de retard",
+      "minutes_other": "{{count}} min de retard",
+      "hours_one": "{{count}} h de retard",
+      "hours_many": "{{count}} h de retard",
+      "hours_other": "{{count}} h de retard",
+      "days_one": "{{count}} j de retard",
+      "days_many": "{{count}} j de retard",
+      "days_other": "{{count}} j de retard"
+    },
+    "soon": {
+      "minutes_one": "dans {{count}} min",
+      "minutes_many": "dans {{count}} min",
+      "minutes_other": "dans {{count}} min",
+      "hours_one": "dans {{count}} h",
+      "hours_many": "dans {{count}} h",
+      "hours_other": "dans {{count}} h"
+    }
+  },
+  "empty": {
+    "queue": "Rien ne vous attend pour l’instant. Les nouvelles tâches apparaissent ici quand les prospects écrivent, que des visites approchent et que des avis arrivent.",
+    "snoozed": "Aucune tâche reportée",
+    "done": "Rien de résolu aujourd’hui pour l’instant"
   }
 }

@@ -11,10 +11,20 @@ import {
   useRoomFilters,
 } from './RoomFilters/index.ts';
 import { RoomPrimary, type RoomPrimaryProps } from './RoomPrimary/index.ts';
-import { RoomSearch } from './RoomSearch/index.ts';
+import { RoomSearch, type RoomSearchProps } from './RoomSearch/index.ts';
 
 /** The phone rows (H:83–93; `_patterns.md:96`). */
-type RoomToolbarLayout = 'default' | 'leads';
+type RoomToolbarLayout = 'default' | 'leads' | 'tasks';
+
+/**
+ * The search alone on row 1; row 2 the tabs, the Filters place pushed to the
+ * inline end (H:83–88, H:45–49).
+ */
+const SEARCH_ROW_FIRST = {
+  search: 'max-md:order-1 max-md:basis-full',
+  filters: 'max-md:order-3',
+  tabs: 'max-md:order-2 max-md:min-w-0 max-md:flex-1',
+} as const;
 
 /** Where each slot sits on a phone, per layout — row by row, through `order`. */
 const PHONE_PLACEMENT = {
@@ -24,14 +34,14 @@ const PHONE_PLACEMENT = {
     search: 'max-md:order-1 max-md:flex-[1_1_180px]',
     filters: 'max-md:order-2',
     tabs: 'max-md:order-3 max-md:basis-full max-md:[&_[data-room-tabs-track]]:w-full',
+    actions: 'max-md:order-5',
   },
   // Row 1: the search alone; row 2: the tabs at their width + a 36px Filters at
   // the inline end (H:83–88).
-  leads: {
-    search: 'max-md:order-1 max-md:basis-full',
-    filters: 'max-md:order-3',
-    tabs: 'max-md:order-2 max-md:min-w-0 max-md:flex-1',
-  },
+  leads: { ...SEARCH_ROW_FIRST, actions: 'max-md:order-5' },
+  // Tasks (H:45–49, `tasks.md:17`): the search alone; the views + "All types"
+  // at the inline end; then the actions (Mine · Everyone, Rules) on row 3.
+  tasks: { ...SEARCH_ROW_FIRST, actions: 'max-md:order-5 max-md:basis-full' },
 } as const satisfies Record<RoomToolbarLayout, Record<string, string>>;
 
 const NO_FILTERS: RoomFilterFields = {};
@@ -63,8 +73,8 @@ export interface RoomToolbarProps {
    * the period; on a phone it takes its own row under the tabs (H:54).
    */
   period?: ReactNode;
-  /** The list search, writing the URL's `q`. */
-  search?: { placeholder: string; label: string };
+  /** The list search, writing the URL's `q` (its open width and key hint per room). */
+  search?: Pick<RoomSearchProps, 'placeholder' | 'label' | 'width' | 'keyHint'>;
   /** The Filters popover and the saved views. */
   filters?: RoomToolbarFilters;
   /**
@@ -82,7 +92,8 @@ export interface RoomToolbarProps {
   /**
    * The phone rows: `default` — search + Filters, then the tabs; `leads` —
    * the search alone, then the tabs + a 36px Filters (its h1 keeps 20px on a
-   * tablet, `leads.md:17`).
+   * tablet, `leads.md:17`); `tasks` — the leads rows with the room's own
+   * filter in the Filters place and the actions on a third row (`tasks.md:17`).
    */
   layout?: RoomToolbarLayout;
   className?: string;
@@ -204,6 +215,8 @@ export function RoomToolbar({
           'text-foreground flex-none border-e font-semibold tracking-[-0.015em] whitespace-nowrap max-md:sr-only',
           // Leads: 20px at every width, 6px before the divider + 2px after (H:1681).
           layout === 'leads' ? 'me-0.5 pe-1.5 text-xl' : 'pe-2.5 text-lg xl:text-xl',
+          // The Tasks h1 keeps 2px more before its views (H:2130).
+          layout === 'tasks' && 'me-0.5',
           // After the size: a later font size would drop an earlier line height.
           'leading-[1.2]',
         )}
@@ -212,12 +225,7 @@ export function RoomToolbar({
       </h1>
       <ToolbarViews tabs={tabs} period={period} tabsClassName={placement.tabs} />
       {search ? (
-        <RoomSearch
-          placeholder={search.placeholder}
-          label={search.label}
-          testIdPrefix={tableId}
-          className={placement.search}
-        />
+        <RoomSearch {...search} testIdPrefix={tableId} className={placement.search} />
       ) : null}
       {savedViews ? (
         <DataTableSavedViews
@@ -245,7 +253,12 @@ export function RoomToolbar({
       )}
       {columns}
       {actions ? (
-        <div className="flex flex-none items-center gap-2 max-md:order-5">{actions}</div>
+        <div
+          data-slot="room-toolbar-actions"
+          className={cn('flex flex-none items-center gap-2', placement.actions)}
+        >
+          {actions}
+        </div>
       ) : null}
       {primary ? <RoomPrimary {...primary} testIdPrefix={tableId} /> : null}
     </div>

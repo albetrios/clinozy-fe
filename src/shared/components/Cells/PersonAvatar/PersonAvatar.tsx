@@ -17,7 +17,8 @@ const BADGE_TEXT = 'text-[length:calc(var(--text-xs)*2/3)]';
  * and stacked in the Leads Team filter's trigger (H:1712); `chip` 22px in team
  * chips, stacks and picker trigger chips (9px initials, a 7px presence dot,
  * H:1741); `option` 26px in picker rows (9.5px, 12px badge, H:2891); `list`
- * 28px in the Team filter's rows (10px, H:1714); `roster` 30px in the people
+ * 28px in the Team filter's rows and the Tasks rows' contact (10px, 14px
+ * badge, H:1714, H:2148); `roster` 30px in the people
  * popover's rows (10.5px, H:1786); `cell` 32px in table person cells (11px, 14px "P"
  * badge, H:683); `header` 34px in the chat column's contact header (11.5px,
  * 14px badge, H:1830); `strip` 38px in the lead drawer's contact strip (12px,

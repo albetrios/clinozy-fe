@@ -131,4 +131,10 @@ describe('list-row states', () => {
       expect(TONE_CLASSES[tone].picked).toBe(`bg-tone-${tone}/70`);
     }
   });
+
+  it('draws a row’s inline-start status edge in the tone’s dot colour', () => {
+    for (const tone of TONE_VALUES) {
+      expect(TONE_CLASSES[tone].edge).toBe(`border-s-tone-${tone}-dot`);
+    }
+  });
 });

@@ -29,6 +29,13 @@ export interface RoomSearchProps {
   label: string;
   /** Test-id prefix — the room's table id. */
   testIdPrefix: string;
+  /**
+   * Open, the field is 200px (150–220) — or `wide`, the Tasks room's 220px
+   * with no upper bound (H:2133).
+   */
+  width?: 'default' | 'wide';
+  /** The "/" key hint inside the open field (default on; the Tasks field draws none, H:2133). */
+  keyHint?: boolean;
   /** Placement classes from the toolbar (the phone row's flex and order). */
   className?: string;
 }
@@ -52,6 +59,8 @@ export function RoomSearch({
   placeholder,
   label,
   testIdPrefix,
+  width = 'default',
+  keyHint = true,
   className,
 }: RoomSearchProps) {
   const { t } = useTranslation(ROOM_TOOLBAR_NS);
@@ -118,6 +127,7 @@ export function RoomSearch({
         'focus-within:border-disabled focus-within:ring-ring/50 focus-within:ring-[3px]',
         '[transition:flex-basis_220ms_cubic-bezier(.2,.8,.2,1),max-width_220ms_cubic-bezier(.2,.8,.2,1),min-width_220ms_cubic-bezier(.2,.8,.2,1),background-color_120ms_ease]',
         'md:h-9 md:max-w-55 md:min-w-37.5 md:flex-[0_1_200px] md:px-2.5',
+        width === 'wide' && 'md:max-w-none md:flex-[0_1_220px]',
         // Folded to the 36px square (the hover fill and pointer as the design's, H:296).
         !expanded &&
           'hover:bg-muted cursor-pointer md:max-w-9 md:min-w-9 md:flex-[0_0_36px] md:justify-center md:px-0',
@@ -148,15 +158,17 @@ export function RoomSearch({
         )}
       />
       {/* The "/" key hint — the title says it for everyone else. */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          'border-border bg-canvas text-micro text-muted-foreground flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-sm border px-1 leading-none font-normal max-md:hidden',
-          !expanded && 'md:hidden',
-        )}
-      >
-        /
-      </span>
+      {keyHint ? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            'border-border bg-canvas text-micro text-muted-foreground flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-sm border px-1 leading-none font-normal max-md:hidden',
+            !expanded && 'md:hidden',
+          )}
+        >
+          /
+        </span>
+      ) : null}
     </Label>
   );
 }

@@ -367,5 +367,87 @@
     "tomorrow": "Tomorrow 11 am",
     "inThreeDays": "In 3 days",
     "nextWeek": "Next week"
+  },
+  "record": "Task",
+  "views": {
+    "label": "Task view",
+    "queue": "To do",
+    "snoozed": "Snoozed",
+    "done": "Done"
+  },
+  "search": {
+    "placeholder": "Search tasks or people",
+    "label": "Search tasks"
+  },
+  "type": {
+    "label": "Task type",
+    "all": "All types",
+    "count_one": "{{count}} type",
+    "count_other": "{{count}} types"
+  },
+  "scope": {
+    "label": "Scope",
+    "mine": "Mine",
+    "everyone": "Everyone"
+  },
+  "rulesPopover": {
+    "button": "Rules",
+    "label": "Task rules",
+    "title": "What creates tasks",
+    "description": "{{productName}} watches leads, appointments and feedback and creates a task when someone needs to act. A task closes itself when the record changes.",
+    "line": "{{source}} · {{description}}",
+    "handle": "Let {{productName}} handle",
+    "handled": "{{productName}} handles it",
+    "readOnly": "Only an owner or admin can change these rules"
+  },
+  "primary": {
+    "newTask": "New task"
+  },
+  "groups": {
+    "overdue": "Overdue",
+    "today": "Due today",
+    "later": "Coming up",
+    "snoozed": "Snoozed",
+    "done": "Resolved"
+  },
+  "row": {
+    "automation": "{{productName}} can do this",
+    "anyone": "Anyone",
+    "was": "{{name}} · was {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Lead {{id}}",
+    "appointment": "Appt {{id}}",
+    "treatment": "Treatment",
+    "patient": "Patient {{id}}",
+    "invoice": "Invoice {{id}}",
+    "contact": "Contact"
+  },
+  "due": {
+    "at": "{{day}} {{time}}",
+    "snoozed": "Snoozed · {{label}}",
+    "done": "Done · {{time}}",
+    "doneNow": "Done · Now",
+    "doneByClinozy": "Done by {{productName}}",
+    "overdue": {
+      "minutes_one": "{{count}} min overdue",
+      "minutes_other": "{{count}} min overdue",
+      "hours_one": "{{count}} h overdue",
+      "hours_other": "{{count}} h overdue",
+      "days_one": "{{count}} d overdue",
+      "days_other": "{{count}} d overdue"
+    },
+    "soon": {
+      "minutes_one": "in {{count}} min",
+      "minutes_other": "in {{count}} min",
+      "hours_one": "in {{count}} h",
+      "hours_other": "in {{count}} h"
+    }
+  },
+  "empty": {
+    "queue": "Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.",
+    "snoozed": "No snoozed tasks",
+    "done": "Nothing resolved yet today"
   }
 }

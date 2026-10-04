@@ -16,6 +16,8 @@ import {
   validateLeadsSearch,
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
+import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
+import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
@@ -594,5 +596,42 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
     expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(
       `${APPOINTMENTS}/$appointmentId`,
     );
+  });
+});
+
+describe('the Tasks dialog route (KICKOFF §4, D24, S:95–97)', () => {
+  const TASKS = '/organization/$organizationSlug/tasks';
+  type TaskRoute = {
+    options: {
+      validateSearch?: unknown;
+      staticData?: { manifest?: unknown };
+    };
+  };
+  const routeOf = (id: string) =>
+    (router.routesById as unknown as Record<string, TaskRoute | undefined>)[id];
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('registers the task drawer under the list, which validates its own search', () => {
+    expect(
+      Object.keys(router.routesById).filter((id) => id.startsWith(`${TASKS}/`)),
+    ).toEqual([`${TASKS}/$taskId`]);
+    expect(routeOf(TASKS)?.options.validateSearch).toBe(validateTasksSearch);
+  });
+
+  it('runs the room gateway on the drawer’s own manifest, then the status guard', async () => {
+    await beforeLoadOf(`${TASKS}/$taskId`)({
+      location: { href: '/organization/acme/tasks/T1' },
+      params: { organizationSlug: 'acme', taskId: 'T1' },
+      preload: false,
+    });
+    expect(gatewayFromManifest).toHaveBeenCalledWith(taskManifest);
+    expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
+    expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+    expect(routeOf(`${TASKS}/$taskId`)?.options.staticData?.manifest).toBe(taskManifest);
   });
 });

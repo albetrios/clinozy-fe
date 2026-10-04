@@ -212,6 +212,25 @@ const fullName = (patient: Pick<Patient, 'firstName' | 'lastName'>) =>
   [patient.firstName, patient.lastName].filter(Boolean).join(' ');
 const firstWord = (name: string) => name.trim().split(/\s+/)[0] ?? '';
 
+/**
+ * What the person's contact card reads (REPLACE_WITH_API: the schema's
+ * `contactCard`): a lead who became a patient reads as that patient; a lead
+ * as a lead; a chat-only contact thread as a contact.
+ */
+function contactOf(
+  patient: Patient | undefined,
+  lead: LeadRecord | undefined,
+  view: Lookups,
+): Pick<TaskPerson, 'kind' | 'seq' | 'phone'> {
+  const record =
+    patient ?? (lead?.patientId ? view.patients.get(lead.patientId) : undefined);
+  if (record) return { kind: 'patient', seq: record.seq, phone: record.phone };
+  if (lead && !lead.isContactThread) {
+    return { kind: 'lead', seq: lead.seq, phone: lead.phone };
+  }
+  return { kind: 'contact', seq: null, phone: lead?.phone ?? null };
+}
+
 function personOf(
   task: Pick<TaskRecord, 'patientId' | 'leadId'>,
   view: Lookups,
@@ -225,6 +244,7 @@ function personOf(
     patientId: task.patientId,
     leadId: task.leadId,
     isPatient: patient !== undefined || Boolean(lead?.patientId),
+    ...contactOf(patient, lead, view),
   };
 }
 
@@ -262,6 +282,10 @@ function staffOf(user: User): TaskStaff {
     initials: user.initials,
     tone: user.tone,
     active: user.active,
+    roles: user.roles,
+    presence: user.presence,
+    phone: user.phone,
+    email: user.email,
   };
 }
 

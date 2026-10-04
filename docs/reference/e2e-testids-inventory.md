@@ -98,7 +98,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `patient-drawer`                 | New patient drawer — `/patients/create` opens it over the list (L-32b)            | `pages/organization/$organizationSlug/patients/`      |
 | `patient-quick-add`              | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)             | `shared/components/PatientDrawer/`                    |
 | `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
-| `tasks-page`                     | Clinic room page: Tasks                                                           | `pages/organization/$organizationSlug/tasks/`         |
+| `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)               | `pages/organization/$organizationSlug/tasks/`         |
+| `task-drawer`                    | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                     | `pages/organization/$organizationSlug/tasks/`         |
 | `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)   | `pages/organization/$organizationSlug/offerings/`     |
 | `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c) | `pages/organization/$organizationSlug/offerings/`     |
 | `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)              |
@@ -216,7 +217,7 @@ ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) k
 
 | Test ID                                            | Element                                                                     | File                          |
 | -------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
-| `<tableId>-toolbar`                                | Toolbar row (`data-layout` `default` / `leads`)                             | `RoomToolbar/RoomToolbar.tsx` |
+| `<tableId>-toolbar`                                | Toolbar row (`data-layout` `default` / `leads` / `tasks`)                   | `RoomToolbar/RoomToolbar.tsx` |
 | `<tableId>-tabs` / `-tab-<tabId>`                  | Tab track (room tabs `nav`, or view tabs `tablist`) and each tab            | `RoomToolbar/RoomTabs/`       |
 | `<tableId>-tabs-more`                              | "More ⌄" (folded tabs); its list `-tabs-more-panel`, rows `-option-<tabId>` | `RoomToolbar/RoomTabs/`       |
 | `<tableId>-search`                                 | List search (`data-expanded`)                                               | `RoomToolbar/RoomSearch/`     |
@@ -227,6 +228,25 @@ ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) k
 | `<tableId>-<actionId>` / `<tableId>-new-menu`      | Primary action(s) (`new-patient`, `pay`) / the split "⌄" menu               | `RoomToolbar/RoomPrimary/`    |
 | `<tableId>-fab`                                    | Floating "New" group (phone)                                                | `RoomToolbar/RoomPrimary/`    |
 | `<tableId>-view-bar` / `-view-<viewId>`            | View bar under the toolbar, and each sub-view tab                           | `RoomToolbar/RoomViewBar/`    |
+
+---
+
+## Tasks room (`/tasks`, L-47b)
+
+The toolbar carries the room toolbar's ids with the `tasks` prefix (`tasks-toolbar` with
+`data-layout="tasks"`, `tasks-tab-queue` / `-snoozed` / `-done`, `tasks-search`, `tasks-new`,
+`tasks-fab`). The list is the room's own grouped list, not the shared table.
+
+| Test ID                                        | Element                                                                              | File                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------ |
+| `tasks-scope-tabs` / `tasks-scope-tab-<scope>` | "Mine · Everyone" (`mine`, `everyone`)                                               | `components/TasksToolbar/`     |
+| `tasks-type-trigger` / `-clear` / `-panel`     | Type dropdown ("All types" · a rule · "<n> types"), its clear ×, its list            | `components/TaskTypePicker/`   |
+| `tasks-rules-trigger` / `tasks-rules`          | "Rules" and the Task rules popover (bottom sheet below `md`)                         | `components/TaskRulesPopover/` |
+| `tasks-rule-<rule>` / `-switch` / `-handle`    | One rule's line (`data-on`), its switch, "Let Clinozy handle" ↔ "Clinozy handles it" | `components/TaskRulesPopover/` |
+| `tasks-list`                                   | The list (`role="table"`, `data-tab`; `aria-busy` while a new view loads)            | `components/TaskList/`         |
+| `tasks-group-<group>`                          | A group: `overdue`, `today`, `later` (To do), `snoozed`, `done`                      | `components/TaskList/`         |
+| `tasks-row`                                    | A task row (`data-task-id`, `data-overdue`)                                          | `components/TaskRow/`          |
+| `tasks-empty` / `tasks-empty-new`              | A view's empty line; To do's "New task"                                              | `components/TaskList/`         |
 
 ---
 
