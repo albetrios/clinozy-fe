@@ -897,13 +897,26 @@ export async function reassignTask(raw: ReassignTaskInput): Promise<TaskChange> 
  * "What’s next" — its source copied from the task it follows — or a New task.
  */
 export async function createTask(raw: CreateTaskInput): Promise<TaskChange> {
+  const change = recordFixtureChange();
+  const created = await createTaskIn(change, raw);
+  return answer(created.id, change);
+}
+
+/**
+ * {@link createTask}'s write inside another operation's `change` — a lead's
+ * status side effects open their task this way, so one Undo takes the status
+ * and its task back together.
+ */
+export async function createTaskIn(
+  change: FixtureChange,
+  raw: CreateTaskInput,
+): Promise<TaskRecord> {
   const input = validateClinicInput(createTaskInputSchema, raw);
   if (input.ownerId) activeStaff(input.ownerId);
   const followed = input.followsTaskId
     ? await clinicFixtures.tasks.get(input.followsTaskId)
     : null;
-  const change = recordFixtureChange();
-  const created = await change.create(clinicFixtures.tasks, {
+  return change.create(clinicFixtures.tasks, {
     kind: input.kind ?? TASK_RULES[input.rule].kind,
     title: input.title,
     why: input.why || null,
@@ -917,7 +930,6 @@ export async function createTask(raw: CreateTaskInput): Promise<TaskChange> {
     ...OPEN_TASK,
     rule: input.rule,
   });
-  return answer(created.id, change);
 }
 
 /**

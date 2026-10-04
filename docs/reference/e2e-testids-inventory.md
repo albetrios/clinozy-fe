@@ -80,6 +80,11 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `leads-empty`                    | Leads list: "No leads match" (+ "Clear filters" / "New lead")                     | `pages/organization/$organizationSlug/leads/`         |
 | `leads-claim`                    | Leads row: "Open to team · Claim / Join" (claims from the row)                    | `leads/components/LeadsTable/`                        |
 | `leads-hold-dot`                 | Leads row: the hold's release-today / tomorrow dot on the owner                   | `leads/components/LeadsTable/`                        |
+| `lead-drawer-chat`               | Lead drawer: the chat pane (the phone's Chat pane)                                | `leads/components/LeadDrawer/`                        |
+| `lead-drawer-save`               | Lead drawer: "Save lead" (disabled until the draft changes)                       | `leads/components/LeadDrawer/`                        |
+| `lead-drawer-remove`             | Lead drawer: "Remove lead" (opens the reason confirm)                             | `leads/components/LeadDrawer/`                        |
+| `lead-drawer-people`             | Lead drawer: "Assigned & involved" (opens "People on this lead")                  | `leads/components/LeadFormFields/`                    |
+| `lead-drawer-resize`             | Lead drawer: the chat's resize handle (`role="separator"`)                        | `leads/components/LeadDrawer/`                        |
 | `appointments-page`              | Clinic room page: Appointments                                                    | `pages/organization/$organizationSlug/appointments/`  |
 | `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)                | `pages/organization/$organizationSlug/appointments/`  |
 | `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |

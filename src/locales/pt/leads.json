@@ -10,7 +10,9 @@
     "claimed": "Agora {{name}} é seu · {{owner}} continua envolvido",
     "claimedUnowned": "Agora {{name}} é seu",
     "released": "Liberado para a equipe · qualquer pessoa pode assumir",
-    "assigned": "{{name}} agora é responsável · notificado"
+    "assigned": "{{name}} agora é responsável · notificado",
+    "followUpTask": " · tarefa de acompanhamento para amanhã",
+    "converted": "Ficha de paciente criada para {{name}} · o lead continua vinculado"
   },
   "list": {
     "records": "leads",
@@ -91,6 +93,104 @@
       "count_other": "{{count}} pessoas",
       "search": "Buscar na equipe",
       "noMatch": "Nenhum resultado"
+    }
+  },
+  "drawer": {
+    "title": "Editar lead",
+    "sub": "Faça suas alterações e depois salve o lead",
+    "idTooltip": "Lead #{{seq}} · criado {{created}} · clique para copiar",
+    "idAria": "Copiar ID do lead #{{seq}}",
+    "idCopied": "ID do lead #{{seq}} copiado",
+    "retarget": "Retargeting",
+    "close": "Fechar lead",
+    "panels": "Painéis do lead",
+    "details": "Detalhes",
+    "chat": "Chat",
+    "chatCount": "{{n}} novas",
+    "resize": "Redimensionar painel",
+    "resizeHint": "Arraste para redimensionar · clique duas vezes para redefinir",
+    "cards": {
+      "details": "Detalhes do lead",
+      "progress": "Progresso",
+      "info": "Informações"
+    },
+    "source": "Origem",
+    "interests": "Interessado em",
+    "addInterest": "Adicionar interesse",
+    "people": "Responsável e envolvidos",
+    "peopleAria": "Pessoas responsáveis e envolvidas",
+    "addInvolved": "+ Adicionar envolvido",
+    "claim": "Assumir",
+    "release": "Liberar",
+    "releaseHint": "Deixe qualquer pessoa da equipe assumir",
+    "progressAria": "Progresso do lead",
+    "steps": {
+      "done": "Concluído",
+      "current": "Atual",
+      "next": "Próximo"
+    },
+    "stepTips": {
+      "done": "{{status}} · concluído",
+      "current": "{{status}} · etapa atual",
+      "next": "Mover para {{status}}"
+    },
+    "closeAs": "Encerrar como",
+    "info": {
+      "created": "Criado",
+      "lastMessage": "Última mensagem",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "Nenhuma ainda",
+      "patient": "Paciente",
+      "linked": "Vinculado",
+      "notYet": "Ainda não",
+      "convert": "Converter em paciente",
+      "openTasks": "Tarefas abertas",
+      "retargetReason": "Motivo do retargeting"
+    },
+    "footer": {
+      "remove": "Remover lead",
+      "discard": "Descartar",
+      "save": "Salvar lead"
+    },
+    "popover": {
+      "title": "Pessoas neste lead",
+      "search": "Buscar na equipe",
+      "assignedTo": "Responsável · quem cuida deste lead agora",
+      "assign": "Atribuir",
+      "assigned": "Atribuído",
+      "currentlyAssigned": "Atribuído atualmente",
+      "assignTo": "Atribuir a {{name}}",
+      "onlyAssignee": "Só o responsável ({{name}}) pode reatribuir",
+      "cantAssign": "{{role}} não pode atribuir a {{other}}",
+      "involved": "Envolvido · trabalhou neste lead",
+      "noMatch": "Nenhum resultado",
+      "note": "✓ Envolvidos = todos que trabalharam neste lead. Adicionados automaticamente ao responder, ligar, anotar ou agendar · você também pode adicionar alguém",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "Online",
+      "away": "Ausente",
+      "busy": "Ocupado",
+      "offline": "Offline"
+    },
+    "remove": {
+      "title": "Remover este lead?",
+      "effect": "O lead sai de todas as listas e da fila do responsável. O histórico do chat é mantido. Você pode desfazer pelo aviso logo depois.",
+      "reasons": {
+        "duplicate": "Duplicado",
+        "testEntry": "Registro de teste",
+        "spam": "Spam",
+        "other": "Outro"
+      },
+      "removed": "Lead #{{seq}} removido · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_one": "Assumido por {{me}} após {{count}} dia sem atividade · {{owner}} continua envolvido",
+      "claimedAfter_many": "Assumido por {{me}} após {{count}} dias sem atividade · {{owner}} continua envolvido",
+      "claimedAfter_other": "Assumido por {{me}} após {{count}} dias sem atividade · {{owner}} continua envolvido",
+      "releasedOpen": "{{name}} está livre para qualquer pessoa assumir",
+      "addedInvolved": "{{name}} adicionado como envolvido",
+      "removedInvolved": "{{name}} removido dos envolvidos"
     }
   }
 }

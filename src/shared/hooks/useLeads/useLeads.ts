@@ -2,21 +2,27 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { DeleteReason, LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   assignLead,
   claimLead,
+  convertLead,
+  countOpenLeadTasks,
   countUnrepliedLeads,
   createLead,
   deleteLead,
   fetchLead,
   fetchLeadViewer,
+  type LeadConversion,
   leadQueryKeys,
+  type LeadSave,
   listLeads,
   markLeadRead,
   releaseLead,
   restoreLead,
   restoreLeadTeam,
+  saveLead,
+  undoLeadChange,
   updateLead,
 } from '@/shared/api/clinic/leads-api.ts';
 import type {
@@ -26,6 +32,9 @@ import type {
   LeadRecord,
   LeadTeam,
 } from '@/shared/api/clinic/leads-contracts.ts';
+import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
+import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -96,6 +105,15 @@ export function useLeadList(
   return list;
 }
 
+/** A lead's open tasks — the drawer's Info count; idle without an id. */
+export function useOpenLeadTasks(id: string | undefined) {
+  return useAppQuery({
+    queryKey: leadQueryKeys.openTasks(id ?? ''),
+    queryFn: () => countOpenLeadTasks(id ?? ''),
+    enabled: id !== undefined,
+  });
+}
+
 /**
  * The signed-in member as the Leads room reads them (`fetchLeadViewer`): the
  * owner "Mine" and "Unreplied" mean, the claimer, the releaser. `null` until
@@ -152,37 +170,69 @@ export interface LeadUpdateVars {
   patch: LeadPatch;
   /** The signed-in member's staff id: a save by the owner counts as their activity (Q-L9). */
   viewerId?: string | null;
-  /** The status the drawer opened with — when the save moves it, the toast names the move and offers Undo. */
-  previousStatus?: LeadStatus | null;
 }
 
 /**
- * Save a lead — not optimistic. "Lead saved", or "<name> → <status>" with
- * Undo when the status moved (Undo puts the status back). The status's side
- * effects, and their undoing, are the lead drawer's (KICKOFF §6.3, L-34b).
+ * Save a lead from its drawer (`saveLead`) — not optimistic. "Lead saved", or
+ * "<name> → <status>" with Undo when the status moved (" · follow-up task for
+ * tomorrow" after Follow-up); Undo reverses the status and its side effects
+ * together (KICKOFF §6.3 Save, §7.3).
  */
 export function useUpdateLead(
-  options: CrudMutationOptions<LeadRecord, LeadUpdateVars> = {},
+  options: CrudMutationOptions<LeadSave, LeadUpdateVars> = {},
 ) {
-  const revert = useAppMutation<LeadRecord, { id: string; status: LeadStatus }>({
-    mutationFn: ({ id, status }) => updateLead(id, { status }),
-    invalidateKeys: [leadQueryKeys.all],
-  });
-  return useAppMutation<LeadRecord, LeadUpdateVars>({
-    mutationFn: ({ id, patch, viewerId }) => updateLead(id, patch, viewerId ?? null),
-    invalidateKeys: [leadQueryKeys.all],
-    ...withUndoToast(options, (lead, { previousStatus }) => {
-      if (!(previousStatus && lead.status) || lead.status === previousStatus) {
+  const undo = useUndoLeadChange();
+  return useAppMutation<LeadSave, LeadUpdateVars>({
+    mutationFn: ({ id, patch, viewerId }) => saveLead(id, patch, viewerId ?? null),
+    invalidateKeys: [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all],
+    ...withUndoToast(options, ({ lead, undoToken, statusMoved, followUpTask }) => {
+      if (!(statusMoved && lead.status)) {
         notify.success(leadToast(LEAD_TOASTS_KEYS.saved));
         return;
       }
       const status = i18n.t(CLINIC_KEYS.leads.statuses[lead.status], { ns: CLINIC_NS });
+      const message = leadToast(LEAD_TOASTS_KEYS.statusChanged, {
+        name: lead.name,
+        status,
+      });
       notify.undo(
-        leadToast(LEAD_TOASTS_KEYS.statusChanged, { name: lead.name, status }),
-        {
-          onUndo: () => revert.mutate({ id: lead.id, status: previousStatus }),
-        },
+        followUpTask ? `${message}${leadToast(LEAD_TOASTS_KEYS.followUpTask)}` : message,
+        { onUndo: () => undo.mutate(undoToken) },
       );
+    }),
+  });
+}
+
+/** Undo a drawer save or a conversion (`undoLeadChange`) — silent; the lists refetch. */
+function useUndoLeadChange() {
+  return useAppMutation<void, string>({
+    mutationFn: undoLeadChange,
+    invalidateKeys: [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all],
+  });
+}
+
+/** What a conversion sends. */
+export interface LeadConvertVars {
+  id: string;
+  /** The person's name for the toast. */
+  name: string;
+}
+
+/**
+ * "Convert to patient" — "Patient record created for <name> · lead stays
+ * linked" with Undo, which removes the patient and puts the lead back.
+ */
+export function useConvertLead(
+  options: CrudMutationOptions<LeadConversion, LeadConvertVars> = {},
+) {
+  const undo = useUndoLeadChange();
+  return useAppMutation<LeadConversion, LeadConvertVars>({
+    mutationFn: ({ id }) => convertLead(id),
+    invalidateKeys: [leadQueryKeys.all, patientQueryKeys.all, messageQueryKeys.all],
+    ...withUndoToast(options, ({ undoToken }, { name }) => {
+      notify.undo(leadToast(LEAD_TOASTS_KEYS.converted, { name }), {
+        onUndo: () => undo.mutate(undoToken),
+      });
     }),
   });
 }
@@ -195,6 +245,8 @@ export interface LeadClaimVars {
   viewerId: string;
   /** The previous owner's name for the toast; `null` when nobody held it. */
   ownerName: string | null;
+  /** The drawer's own words ("Claimed by <me> after <n> idle days …"), still with Undo. */
+  message?: string;
 }
 
 /**
@@ -209,10 +261,11 @@ export function useClaimLead(
   return useAppMutation<LeadRecord, LeadClaimVars>({
     mutationFn: ({ lead, viewerId }) => claimLead(lead.id, viewerId),
     invalidateKeys: [leadQueryKeys.all],
-    ...withUndoToast(options, (_claimed, { lead, ownerName }) => {
-      const message = ownerName
+    ...withUndoToast(options, (_claimed, { lead, ownerName, message: given }) => {
+      const fallback = ownerName
         ? leadToast(LEAD_TOASTS_KEYS.claimed, { name: lead.name, owner: ownerName })
         : leadToast(LEAD_TOASTS_KEYS.claimedUnowned, { name: lead.name });
+      const message = given ?? fallback;
       notify.undo(message, {
         onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
       });
@@ -264,6 +317,24 @@ export function useReleaseLead(
     invalidateKeys: [leadQueryKeys.all],
     successMessage: () => leadToast(LEAD_TOASTS_KEYS.released),
     ...options,
+  });
+}
+
+/** What an involved change sends: the new list and the toast that names it. */
+export interface LeadInvolvedVars {
+  id: string;
+  involvedIds: readonly string[];
+  /** "Added <name> as involved" / "Removed <name> from involved". */
+  message: string;
+}
+
+/** Add or remove someone involved — the people popover's toggle; applies at once. */
+export function useSetLeadInvolved() {
+  return useAppMutation<LeadRecord, LeadInvolvedVars>({
+    mutationFn: ({ id, involvedIds }) =>
+      updateLead(id, { involvedIds: [...involvedIds] }),
+    invalidateKeys: [leadQueryKeys.all],
+    successMessage: (_lead, { message }) => message,
   });
 }
 

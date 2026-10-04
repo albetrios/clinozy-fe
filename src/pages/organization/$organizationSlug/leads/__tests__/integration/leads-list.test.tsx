@@ -137,9 +137,8 @@ describe('the Leads list (KICKOFF §6.3)', () => {
     const name = await screen.findByText('Anaya Desai');
     expect(name).toHaveClass('font-semibold');
     await userEvent.setup().click(name);
-    await waitFor(() =>
-      expect(screen.getByText('Anaya Desai')).toHaveClass('font-medium'),
-    );
+    // The drawer opens over the list; the row's name drops to 500.
+    await waitFor(() => expect(name).toHaveClass('font-medium'));
   });
 
   it('sorts from the headers through the URL — Updated newest first, then off', async () => {

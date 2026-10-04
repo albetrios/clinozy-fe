@@ -4,6 +4,7 @@ import {
   compareText,
   type CursorPage,
   definedFields,
+  recordFixtureChange,
   refuseUnknownIds,
   validateClinicInput,
 } from './clinic-fixture-store.ts';
@@ -11,8 +12,9 @@ import {
   type DeleteReason,
   LEAD_INTEREST_VALUES,
   LEAD_STATUS_VALUES,
+  type LeadStatus,
 } from './clinic-schema.ts';
-import { clinicToday } from './clinic-time.ts';
+import { addCivilDays, clinicInstant, clinicToday } from './clinic-time.ts';
 import {
   LEAD_DEFAULTS,
   type LeadCreateInput,
@@ -49,6 +51,8 @@ export const leadQueryKeys = {
   all: ['clinic', 'leads'] as const,
   /** The signed-in member as the Leads room reads them, by sign-in email. */
   viewer: (email: string | null) => [...leadQueryKeys.all, 'viewer', email] as const,
+  /** A lead's open tasks — the drawer's Info count. */
+  openTasks: (id: string) => [...leadQueryKeys.all, 'open-tasks', id] as const,
   /** Every list variant — a write invalidates them all. */
   lists: () => [...leadQueryKeys.all, 'list'] as const,
   list: (params: LeadListParams) => [...leadQueryKeys.lists(), params] as const,
@@ -216,6 +220,17 @@ export async function fetchLeadViewer(
     clinicFixtures.staff.snapshot((profile) => profile.id === FIXTURE_VIEWER_ID)[0] ??
     null
   );
+}
+
+/**
+ * How many of a lead's tasks are still open — the drawer's Info "Open tasks"
+ * (a backend request: the contract's task list filters by lead, `S:1724`).
+ */
+export async function countOpenLeadTasks(id: string): Promise<number> {
+  const { clinicFixtures } = await fixtureWorld();
+  return clinicFixtures.tasks.snapshot(
+    (task) => task.leadId === id && task.status !== 'done',
+  ).length;
 }
 
 /**
@@ -391,6 +406,19 @@ export async function updateLead(
 ): Promise<LeadRecord> {
   const { clinicFixtures } = await fixtureWorld();
   const saved = await clinicFixtures.leads.get(id);
+  return clinicFixtures.leads.update(id, await leadWriteOf(saved, patch, viewerId));
+}
+
+/**
+ * The fields an update writes: the patch merged into the saved record and the
+ * whole checked again (a 422 / 409 refuses it), the hold restarted on a
+ * handover or the owner's own save (Q-L9).
+ */
+async function leadWriteOf(
+  saved: LeadRecord,
+  patch: LeadPatch,
+  viewerId: string | null,
+): Promise<LeadFields & Partial<Pick<LeadRecord, 'touchedAt' | 'releasedAt'>>> {
   const patched = definedFields(patch);
   const merged = { ...saved, ...patched };
   const handover = merged.ownerId !== saved.ownerId;
@@ -406,12 +434,195 @@ export async function updateLead(
       patched,
     ),
   );
-  await checkLead(fields, { exceptId: id, phoneChanged: fields.phone !== saved.phone });
+  await checkLead(fields, {
+    exceptId: saved.id,
+    phoneChanged: fields.phone !== saved.phone,
+  });
   const touched = handover || (viewerId !== null && viewerId === fields.ownerId);
-  return clinicFixtures.leads.update(
+  return touched ? { ...fields, touchedAt: nowIso(), releasedAt: null } : fields;
+}
+
+/** What the lead drawer's save answers (KICKOFF §6.3 Save). */
+export interface LeadSave {
+  lead: LeadRecord;
+  /** Undoes the save together with its status's side effects (`undoLeadChange`). */
+  undoToken: string;
+  /** The save moved the status — its toast names the move and offers Undo. */
+  statusMoved: boolean;
+  /** The status moved to Follow-up: a follow-up task is due tomorrow. */
+  followUpTask: boolean;
+}
+
+/** The English status names a system line writes ("Status → Follow-up"). */
+const STATUS_LINE_LABELS: Readonly<Record<LeadStatus, string>> = {
+  new: 'New',
+  contacted: 'Contacted',
+  follow_up: 'Follow-up',
+  clinic_visited: 'Clinic visited',
+  no_response: 'No response',
+  not_interested: 'Not interested',
+  invalid: 'Invalid',
+  lost: 'Lost',
+};
+
+/** Where a follow-up lands: tomorrow at 11:00, clinic time (H:5634). */
+const FOLLOW_UP_TIME = '11:00';
+
+/** The Call back task's title — one open per lead (H:5633). */
+const CALL_BACK_TITLE = 'Call back';
+
+/** What one Undo reverses. */
+interface LeadUndo {
+  reverse(): Promise<void>;
+}
+
+const leadUndoLog = new Map<string, LeadUndo>();
+let leadUndoLogHooked = false;
+
+/** The open saves' undo records — emptied with the fixture world. */
+async function leadUndoRecords(): Promise<Map<string, LeadUndo>> {
+  const { onClinicFixturesReset } = await fixtureWorld();
+  if (!leadUndoLogHooked) {
+    onClinicFixturesReset(() => leadUndoLog.clear());
+    leadUndoLogHooked = true;
+  }
+  return leadUndoLog;
+}
+
+/**
+ * The lead drawer's save (`updateLead`, `S:1594`; REPLACE_WITH_API) with the
+ * status's server rules (Q-T3; `leads.md:275–283`, H:5633–5634), recorded so
+ * one Undo reverses them all (§7.3 — the prototype reverts only the status):
+ * a moved status writes "Status → <status>" into the chat; Follow-up opens a
+ * "Follow-up" task due tomorrow for the member saving and sets `followUpAt`
+ * to it; No response opens a "Call back" task due tomorrow unless one is open
+ * (both task kind `follow_up`, A-L5).
+ */
+export async function saveLead(
+  id: string,
+  patch: LeadPatch,
+  viewerId: string | null = null,
+): Promise<LeadSave> {
+  const [{ clinicFixtures }, { createTaskIn }, { systemLine }] = await Promise.all([
+    fixtureWorld(),
+    import('./fixtures/tasks-server.fixtures.ts'),
+    import('./fixtures/messages.fixtures.ts'),
+  ]);
+  const saved = await clinicFixtures.leads.get(id);
+  const change = recordFixtureChange();
+  let lead = await change.update(
+    clinicFixtures.leads,
     id,
-    touched ? { ...fields, touchedAt: nowIso(), releasedAt: null } : fields,
+    await leadWriteOf(saved, patch, viewerId),
   );
+  const moved = lead.status !== null && lead.status !== saved.status;
+  const now = new Date();
+  const due = clinicInstant(addCivilDays(clinicToday(now), 1), FOLLOW_UP_TIME);
+  if (moved && lead.status) {
+    await change.create(
+      clinicFixtures.leadMessages,
+      systemLine(id, `Status → ${STATUS_LINE_LABELS[lead.status]}`, null, now),
+    );
+  }
+  const followUpTask = moved && lead.status === 'follow_up';
+  if (followUpTask) {
+    await createTaskIn(change, {
+      title: 'Follow-up',
+      why: 'Follow up',
+      ownerId: viewerId ?? lead.ownerId,
+      leadId: id,
+      dueAt: due,
+      kind: 'follow_up',
+    });
+    lead = await change.update(clinicFixtures.leads, id, { followUpAt: due });
+  }
+  const callBackOpen =
+    clinicFixtures.tasks.snapshot(
+      (task) =>
+        task.leadId === id && task.status !== 'done' && task.title === CALL_BACK_TITLE,
+    ).length > 0;
+  if (moved && lead.status === 'no_response' && !callBackOpen) {
+    await createTaskIn(change, {
+      title: CALL_BACK_TITLE,
+      why: 'Status moved to No response. Follow up with the lead.',
+      ownerId: lead.ownerId ?? viewerId,
+      leadId: id,
+      dueAt: due,
+      kind: 'follow_up',
+    });
+  }
+  const undoToken = crypto.randomUUID();
+  (await leadUndoRecords()).set(undoToken, change);
+  return { lead, undoToken, statusMoved: moved, followUpTask };
+}
+
+/**
+ * Undo a drawer save (`saveLead`): the fields it wrote, its system line and
+ * the task it opened. A 409 once the token is gone (already undone, or the
+ * world reset).
+ */
+export async function undoLeadChange(undoToken: string): Promise<void> {
+  const log = await leadUndoRecords();
+  const change = log.get(undoToken);
+  if (!change) {
+    const message = 'This change can no longer be undone';
+    throw clinicHttpError(409, 'conflict', message, { undoToken: [message] });
+  }
+  log.delete(undoToken);
+  await change.reverse();
+}
+
+/** What "Convert to patient" answers. */
+export interface LeadConversion {
+  lead: LeadRecord;
+  patientId: string;
+  /** Undoes the conversion: the patient removed, the lead as it was (`undoLeadChange`). */
+  undoToken: string;
+}
+
+/**
+ * "Convert to patient" (KICKOFF §6.3 Status side effects; REPLACE_WITH_API —
+ * `createPatient` takes no lead, `S:1623`, so the link is a backend request):
+ * a patient from the lead's name and mobile, linked both ways; the lead moves
+ * to Clinic visited and its chat reads "Converted to patient". One Undo takes
+ * the patient and the lead's move back.
+ */
+export async function convertLead(id: string): Promise<LeadConversion> {
+  const [{ clinicFixtures }, { createPatient, deletePatient }, { systemLine }] =
+    await Promise.all([
+      fixtureWorld(),
+      import('./patients-api.ts'),
+      import('./fixtures/messages.fixtures.ts'),
+    ]);
+  const lead = await pipelineLead(id);
+  if (lead.patientId !== null) {
+    const message = 'This lead is already a patient';
+    throw clinicHttpError(409, 'conflict', message, { patientId: [message] });
+  }
+  const [firstName = lead.name, ...rest] = lead.name.trim().split(/\s+/);
+  const { patient } = await createPatient({
+    firstName,
+    lastName: rest.join(' ') || null,
+    phone: lead.phone,
+    leadId: id,
+  });
+  const change = recordFixtureChange();
+  const converted = await change.update(clinicFixtures.leads, id, {
+    patientId: patient.id,
+    status: 'clinic_visited',
+  });
+  await change.create(
+    clinicFixtures.leadMessages,
+    systemLine(id, 'Converted to patient', null, new Date()),
+  );
+  const undoToken = crypto.randomUUID();
+  (await leadUndoRecords()).set(undoToken, {
+    reverse: async () => {
+      await change.reverse();
+      await deletePatient(patient.id, 'mistake', null);
+    },
+  });
+  return { lead: converted, patientId: patient.id, undoToken };
 }
 
 /** Assign a lead (`updateLead({ ownerId })`): the previous owner stays involved. */

@@ -20,7 +20,8 @@ const BADGE_TEXT = 'text-[length:calc(var(--text-xs)*2/3)]';
  * 28px in the Team filter's rows (10px, H:1714); `roster` 30px in the people
  * popover's rows (10.5px, H:1786); `cell` 32px in table person cells (11px, 14px "P"
  * badge, H:683); `header` 34px in the chat column's contact header (11.5px,
- * 14px badge, H:1830); `field` 36px in form pickers (12px, H:2756); `card` 48px in
+ * 14px badge, H:1830); `strip` 38px in the lead drawer's contact strip (12px,
+ * H:1759); `field` 36px in form pickers (12px, H:2756); `card` 48px in
  * person cards (15px, 16px badge, 12px presence dot; H:2731, H:2872). The
  * sub-scale sizes derive from `--text-xs` so the Type scale axis moves them.
  */
@@ -75,6 +76,12 @@ const AVATAR_SIZES = {
     badge: cn('size-3.5 -end-0.75 -bottom-0.75', BADGE_TEXT),
     presence: 'size-2.5 end-0 bottom-0',
   },
+  strip: {
+    root: 'size-9.5',
+    initials: 'text-xs',
+    badge: cn('size-3.5 -end-0.75 -bottom-0.75', BADGE_TEXT),
+    presence: 'size-2.5 end-0 bottom-0',
+  },
   field: {
     root: 'size-9',
     initials: 'text-xs',
@@ -89,7 +96,7 @@ const AVATAR_SIZES = {
   },
 } as const;
 
-/** One of the design's avatar sizes: 16, 18, 22, 26, 28, 30, 32, 34, 36 or 48px. */
+/** One of the design's avatar sizes: 16, 18, 22, 26, 28, 30, 32, 34, 36, 38 or 48px. */
 export type PersonAvatarSize = keyof typeof AVATAR_SIZES;
 
 /** Presence as a person card shows it (`presence-online`, else `border-strong`). */

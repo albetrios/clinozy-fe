@@ -10,7 +10,9 @@
     "claimed": "You now own {{name}} · {{owner}} stays involved",
     "claimedUnowned": "You now own {{name}}",
     "released": "Released to the team · anyone can claim",
-    "assigned": "{{name}} is now assigned · notified"
+    "assigned": "{{name}} is now assigned · notified",
+    "followUpTask": " · follow-up task for tomorrow",
+    "converted": "Patient record created for {{name}} · lead stays linked"
   },
   "list": {
     "records": "leads",
@@ -83,6 +85,103 @@
       "count_other": "{{count}} people",
       "search": "Search team",
       "noMatch": "No match"
+    }
+  },
+  "drawer": {
+    "title": "Edit lead",
+    "sub": "Make your changes, then Save lead",
+    "idTooltip": "Lead #{{seq}} · created {{created}} · click to copy",
+    "idAria": "Copy lead ID #{{seq}}",
+    "idCopied": "Lead ID #{{seq}} copied",
+    "retarget": "Re-target",
+    "close": "Close lead",
+    "panels": "Lead panels",
+    "details": "Details",
+    "chat": "Chat",
+    "chatCount": "{{n}} new",
+    "resize": "Resize panel",
+    "resizeHint": "Drag to resize · double-click to reset",
+    "cards": {
+      "details": "Lead details",
+      "progress": "Progress",
+      "info": "Info"
+    },
+    "source": "Source",
+    "interests": "Interested in",
+    "addInterest": "Add interest",
+    "people": "Assigned & involved",
+    "peopleAria": "Assigned and involved people",
+    "addInvolved": "+ Add involved",
+    "claim": "Claim",
+    "release": "Release",
+    "releaseHint": "Let anyone on the team take it",
+    "progressAria": "Lead progress",
+    "steps": {
+      "done": "Done",
+      "current": "Current",
+      "next": "Next"
+    },
+    "stepTips": {
+      "done": "{{status}} · completed",
+      "current": "{{status}} · current step",
+      "next": "Move to {{status}}"
+    },
+    "closeAs": "Close as",
+    "info": {
+      "created": "Created",
+      "lastMessage": "Last message",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "None yet",
+      "patient": "Patient",
+      "linked": "Linked",
+      "notYet": "Not yet",
+      "convert": "Convert to patient",
+      "openTasks": "Open tasks",
+      "retargetReason": "Re-target reason"
+    },
+    "footer": {
+      "remove": "Remove lead",
+      "discard": "Discard",
+      "save": "Save lead"
+    },
+    "popover": {
+      "title": "People on this lead",
+      "search": "Search team",
+      "assignedTo": "Assigned to · who handles this lead now",
+      "assign": "Assign",
+      "assigned": "Assigned",
+      "currentlyAssigned": "Currently assigned",
+      "assignTo": "Assign to {{name}}",
+      "onlyAssignee": "Only the assignee ({{name}}) can reassign",
+      "cantAssign": "{{role}} can’t assign to {{other}}",
+      "involved": "Involved · worked on this lead",
+      "noMatch": "No match",
+      "note": "✓ Involved = everyone who worked on this lead. Added automatically when they reply, call, note or book · you can add someone too",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "Online",
+      "away": "Away",
+      "busy": "Busy",
+      "offline": "Offline"
+    },
+    "remove": {
+      "title": "Remove this lead?",
+      "effect": "The lead leaves every list and the owner’s queue. Chat history is kept. You can undo from the toast right after.",
+      "reasons": {
+        "duplicate": "Duplicate",
+        "testEntry": "Test entry",
+        "spam": "Spam",
+        "other": "Other"
+      },
+      "removed": "Lead #{{seq}} removed · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_one": "Claimed by {{me}} after {{count}} idle day · {{owner}} stays involved",
+      "claimedAfter_other": "Claimed by {{me}} after {{count}} idle days · {{owner}} stays involved",
+      "releasedOpen": "{{name}} is open for anyone to claim",
+      "addedInvolved": "Added {{name}} as involved",
+      "removedInvolved": "Removed {{name}} from involved"
     }
   }
 }

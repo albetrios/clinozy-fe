@@ -22,4 +22,8 @@ export const LEAD_TOASTS_KEYS = {
   released: 'toasts.released',
   /** "<name> is now assigned · notified", with Undo. */
   assigned: 'toasts.assigned',
+  /** " · follow-up task for tomorrow", after a move to Follow-up. */
+  followUpTask: 'toasts.followUpTask',
+  /** "Patient record created for <name> · lead stays linked", with Undo. */
+  converted: 'toasts.converted',
 } as const;

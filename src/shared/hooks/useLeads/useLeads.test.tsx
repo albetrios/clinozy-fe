@@ -7,7 +7,7 @@ import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import { countOpenLeadTasks, fetchLead } from '@/shared/api/clinic/leads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -205,30 +205,28 @@ describe('useUpdateLead', () => {
       result.current.mutateAsync({
         id: ref.lead(2363),
         patch: { interests: ['clinical', 'peel'] },
-        previousStatus: 'new',
       }),
     );
     expect(notify.success).toHaveBeenCalledWith('Lead saved');
     expect(notify.undo).not.toHaveBeenCalled();
   });
 
-  it('names a status move with Undo, which puts the status back', async () => {
+  it('names a status move with Undo, which takes the status and its task back', async () => {
     const { result } = renderHook(() => useUpdateLead(), { wrapper });
     await act(() =>
-      result.current.mutateAsync({
-        id: ref.lead(2363),
-        patch: { status: 'follow_up' },
-        previousStatus: 'new',
-      }),
+      result.current.mutateAsync({ id: ref.lead(2363), patch: { status: 'follow_up' } }),
     );
     const undo = lastUndo();
-    expect(undo.message).toBe('Anaya Desai → Follow-up');
+    expect(undo.message).toBe('Anaya Desai → Follow-up · follow-up task for tomorrow');
     expect(notify.success).not.toHaveBeenCalled();
+    expect(await countOpenLeadTasks(ref.lead(2363))).toBe(1);
 
     act(() => undo.onUndo());
     await waitFor(async () =>
       expect((await fetchLead(ref.lead(2363))).status).toBe('new'),
     );
+    expect((await fetchLead(ref.lead(2363))).followUpAt).toBeNull();
+    expect(await countOpenLeadTasks(ref.lead(2363))).toBe(0);
   });
 
   it('takes the caller’s message instead, and runs the caller’s onSuccess either way', async () => {

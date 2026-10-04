@@ -10,7 +10,9 @@
     "claimed": "이제 {{name}} 담당입니다 · {{owner}} 님은 계속 참여합니다",
     "claimedUnowned": "이제 {{name}} 담당입니다",
     "released": "팀에 공개됨 · 누구나 가져갈 수 있습니다",
-    "assigned": "{{name}} 님이 이제 담당자입니다 · 알림 전송됨"
+    "assigned": "{{name}} 님이 이제 담당자입니다 · 알림 전송됨",
+    "followUpTask": " · 내일 후속 작업",
+    "converted": "{{name}}님의 환자 기록을 만들었습니다 · 리드는 연결된 상태로 유지됩니다"
   },
   "list": {
     "records": "리드",
@@ -75,6 +77,102 @@
       "count_other": "{{count}}명",
       "search": "팀 검색",
       "noMatch": "일치 항목 없음"
+    }
+  },
+  "drawer": {
+    "title": "리드 편집",
+    "sub": "변경한 다음 리드를 저장하세요",
+    "idTooltip": "리드 #{{seq}} · {{created}} 생성 · 클릭하여 복사",
+    "idAria": "리드 ID #{{seq}} 복사",
+    "idCopied": "리드 ID #{{seq}} 복사됨",
+    "retarget": "리타겟",
+    "close": "리드 닫기",
+    "panels": "리드 패널",
+    "details": "세부정보",
+    "chat": "채팅",
+    "chatCount": "새 메시지 {{n}}개",
+    "resize": "패널 크기 조정",
+    "resizeHint": "드래그하여 크기 조정 · 더블 클릭하여 초기화",
+    "cards": {
+      "details": "리드 세부정보",
+      "progress": "진행 상황",
+      "info": "정보"
+    },
+    "source": "유입 경로",
+    "interests": "관심 분야",
+    "addInterest": "관심 추가",
+    "people": "담당자 및 참여자",
+    "peopleAria": "담당자 및 참여자",
+    "addInvolved": "+ 참여자 추가",
+    "claim": "가져오기",
+    "release": "놓아주기",
+    "releaseHint": "팀원 누구나 가져갈 수 있게 합니다",
+    "progressAria": "리드 진행 상황",
+    "steps": {
+      "done": "완료",
+      "current": "현재",
+      "next": "다음"
+    },
+    "stepTips": {
+      "done": "{{status}} · 완료",
+      "current": "{{status}} · 현재 단계",
+      "next": "{{status}}(으)로 이동"
+    },
+    "closeAs": "종료 사유",
+    "info": {
+      "created": "생성일",
+      "lastMessage": "마지막 메시지",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "아직 없음",
+      "patient": "환자",
+      "linked": "연결됨",
+      "notYet": "아직 아님",
+      "convert": "환자로 전환",
+      "openTasks": "열린 작업",
+      "retargetReason": "리타겟 사유"
+    },
+    "footer": {
+      "remove": "리드 삭제",
+      "discard": "취소",
+      "save": "리드 저장"
+    },
+    "popover": {
+      "title": "이 리드의 담당자",
+      "search": "팀 검색",
+      "assignedTo": "담당자 · 지금 이 리드를 처리하는 사람",
+      "assign": "배정",
+      "assigned": "배정됨",
+      "currentlyAssigned": "현재 담당자",
+      "assignTo": "{{name}}에게 배정",
+      "onlyAssignee": "담당자({{name}})만 재배정할 수 있습니다",
+      "cantAssign": "{{role}}은(는) {{other}}에게 배정할 수 없습니다",
+      "involved": "참여자 · 이 리드를 담당한 적 있음",
+      "noMatch": "일치 항목 없음",
+      "note": "✓ 참여자 = 이 리드를 담당한 모든 사람. 답장, 통화, 메모, 예약 시 자동으로 추가됩니다 · 직접 추가할 수도 있습니다",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "온라인",
+      "away": "자리 비움",
+      "busy": "바쁨",
+      "offline": "오프라인"
+    },
+    "remove": {
+      "title": "이 리드를 삭제할까요?",
+      "effect": "리드가 모든 목록과 담당자의 대기열에서 빠집니다. 채팅 기록은 유지됩니다. 바로 알림에서 실행을 취소할 수 있습니다.",
+      "reasons": {
+        "duplicate": "중복",
+        "testEntry": "테스트 항목",
+        "spam": "스팸",
+        "other": "기타"
+      },
+      "removed": "리드 #{{seq}} 삭제됨 · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_other": "{{count}}일 동안 활동이 없어 {{me}}님이 가져왔습니다 · {{owner}}님은 참여자로 남습니다",
+      "releasedOpen": "{{name}}은(는) 이제 누구나 가져갈 수 있습니다",
+      "addedInvolved": "{{name}}님을 참여자로 추가했습니다",
+      "removedInvolved": "{{name}}님을 참여자에서 제외했습니다"
     }
   }
 }

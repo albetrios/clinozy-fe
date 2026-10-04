@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { Check } from '@/shared/icons/index.ts';
+import { type AppIcon, Check } from '@/shared/icons/index.ts';
 
 /** One chip of a {@link DrawerChips} group. */
 export interface DrawerChipOption<T extends string> {
@@ -9,6 +9,8 @@ export interface DrawerChipOption<T extends string> {
   label: string;
   /** The chip's tone; an untoned chip sits on `muted` in the text ink. */
   tone?: Tone;
+  /** A 13px glyph before the label (the lead sources, H:1770). */
+  icon?: AppIcon;
 }
 
 interface DrawerChipsBaseProps<T extends string> {
@@ -119,6 +121,9 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
           >
             {picked && props.multiple ? (
               <Check aria-hidden="true" className="size-3 shrink-0" />
+            ) : null}
+            {option.icon ? (
+              <option.icon aria-hidden="true" className="size-3.25 shrink-0" />
             ) : null}
             <span className="min-w-0 truncate">{option.label}</span>
           </button>

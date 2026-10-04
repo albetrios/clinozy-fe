@@ -10,6 +10,8 @@ import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.t
 import {
   assignLead,
   claimLead,
+  convertLead,
+  countOpenLeadTasks,
   countUnrepliedLeads,
   createLead,
   deleteLead,
@@ -22,6 +24,8 @@ import {
   releaseLead,
   restoreLead,
   restoreLeadTeam,
+  saveLead,
+  undoLeadChange,
   updateLead,
 } from './leads-api.ts';
 import type { LeadListParams } from './leads-contracts.ts';
@@ -422,6 +426,63 @@ describe('updateLead (S:1594)', () => {
 
   it('answers 404 for a lead that is gone', async () => {
     expect((await failureOf(updateLead(ref.lead(1), { notes: 'x' }))).status).toBe(404);
+  });
+});
+
+describe('the drawer’s save and its side effects (saveLead, Q-T3)', () => {
+  const messagesOf = (id: string) =>
+    clinicFixtures.leadMessages.snapshot((message) => message.leadId === id);
+
+  it('opens a follow-up task due tomorrow on Follow-up, and Undo takes it all back', async () => {
+    const id = ref.lead(2363);
+    const before = messagesOf(id).length;
+    const saved = await saveLead(id, { status: 'follow_up' }, RS);
+    expect(saved).toMatchObject({ statusMoved: true, followUpTask: true });
+    expect(saved.lead.status).toBe('follow_up');
+    expect(saved.lead.followUpAt).toBe('2026-10-04T05:30:00.000Z');
+    expect(await countOpenLeadTasks(id)).toBe(1);
+    expect(messagesOf(id).at(-1)?.body).toBe('Status → Follow-up');
+
+    await undoLeadChange(saved.undoToken);
+    const back = await fetchLead(id);
+    expect(back).toMatchObject({ status: 'new', followUpAt: null });
+    expect(await countOpenLeadTasks(id)).toBe(0);
+    expect(messagesOf(id)).toHaveLength(before);
+    expect((await failureOf(undoLeadChange(saved.undoToken))).status).toBe(409);
+  });
+
+  it('opens one Call back on No response, never a second while it is open', async () => {
+    const id = ref.lead(2363);
+    await saveLead(id, { status: 'no_response' }, RS);
+    expect(await countOpenLeadTasks(id)).toBe(1);
+    await saveLead(id, { status: 'contacted' }, RS);
+    await saveLead(id, { status: 'no_response' }, RS);
+    expect(await countOpenLeadTasks(id)).toBe(1);
+  });
+
+  it('says nothing moved when the status stays', async () => {
+    const saved = await saveLead(ref.lead(2363), { interests: ['peel'] }, RS);
+    expect(saved).toMatchObject({ statusMoved: false, followUpTask: false });
+  });
+});
+
+describe('convertLead', () => {
+  it('creates a linked patient and moves the lead to Clinic visited; Undo removes them', async () => {
+    const id = ref.lead(2363);
+    const converted = await convertLead(id);
+    expect(converted.lead).toMatchObject({
+      status: 'clinic_visited',
+      patientId: converted.patientId,
+    });
+    const patient = await clinicFixtures.patients.get(converted.patientId);
+    expect(patient).toMatchObject({ firstName: 'Anaya', lastName: 'Desai', leadId: id });
+    expect((await failureOf(convertLead(id))).status).toBe(409);
+
+    await undoLeadChange(converted.undoToken);
+    expect(await fetchLead(id)).toMatchObject({ status: 'new', patientId: null });
+    expect(
+      clinicFixtures.patients.snapshot((row) => row.id === converted.patientId),
+    ).toHaveLength(0);
   });
 });
 

@@ -10,7 +10,9 @@
     "claimed": "{{name}} の担当になりました · {{owner}} は引き続き関与します",
     "claimedUnowned": "{{name}} の担当になりました",
     "released": "チームに開放しました · 誰でも引き受けられます",
-    "assigned": "{{name}} が担当になりました · 通知済み"
+    "assigned": "{{name}} が担当になりました · 通知済み",
+    "followUpTask": " · 明日のフォローアップタスク",
+    "converted": "{{name}} の患者記録を作成しました · リードはリンクされたままです"
   },
   "list": {
     "records": "リード",
@@ -75,6 +77,102 @@
       "count_other": "{{count}} 人",
       "search": "チームを検索",
       "noMatch": "一致なし"
+    }
+  },
+  "drawer": {
+    "title": "リードを編集",
+    "sub": "変更してから「リードを保存」を押してください",
+    "idTooltip": "リード #{{seq}} · {{created}} 作成 · クリックしてコピー",
+    "idAria": "リード ID #{{seq}} をコピー",
+    "idCopied": "リード ID #{{seq}} をコピーしました",
+    "retarget": "リターゲット",
+    "close": "リードを閉じる",
+    "panels": "リードのパネル",
+    "details": "詳細",
+    "chat": "チャット",
+    "chatCount": "新着 {{n}} 件",
+    "resize": "パネルのサイズを変更",
+    "resizeHint": "ドラッグでサイズ変更 · ダブルクリックでリセット",
+    "cards": {
+      "details": "リードの詳細",
+      "progress": "進捗",
+      "info": "情報"
+    },
+    "source": "流入元",
+    "interests": "関心のある施術",
+    "addInterest": "関心を追加",
+    "people": "担当者と関係者",
+    "peopleAria": "担当者と関係者",
+    "addInvolved": "+ 関係者を追加",
+    "claim": "引き取る",
+    "release": "手放す",
+    "releaseHint": "チームの誰でも引き取れるようにする",
+    "progressAria": "リードの進捗",
+    "steps": {
+      "done": "完了",
+      "current": "現在",
+      "next": "次"
+    },
+    "stepTips": {
+      "done": "{{status}} · 完了",
+      "current": "{{status}} · 現在のステップ",
+      "next": "{{status}} に進める"
+    },
+    "closeAs": "終了理由",
+    "info": {
+      "created": "作成日",
+      "lastMessage": "最後のメッセージ",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "まだありません",
+      "patient": "患者",
+      "linked": "リンク済み",
+      "notYet": "まだ",
+      "convert": "患者に変換",
+      "openTasks": "未完了のタスク",
+      "retargetReason": "リターゲットの理由"
+    },
+    "footer": {
+      "remove": "リードを削除",
+      "discard": "破棄",
+      "save": "リードを保存"
+    },
+    "popover": {
+      "title": "このリードの担当者",
+      "search": "チームを検索",
+      "assignedTo": "担当者 · 今このリードを対応している人",
+      "assign": "担当にする",
+      "assigned": "担当中",
+      "currentlyAssigned": "現在の担当者",
+      "assignTo": "{{name}} を担当にする",
+      "onlyAssignee": "担当者（{{name}}）のみが担当を変更できます",
+      "cantAssign": "{{role}} は {{other}} に割り当てられません",
+      "involved": "関係者 · このリードを対応した人",
+      "noMatch": "該当なし",
+      "note": "✓ 関係者 = このリードを対応したすべての人。返信・通話・メモ・予約で自動的に追加されます · 手動で追加することもできます",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "オンライン",
+      "away": "離席中",
+      "busy": "取り込み中",
+      "offline": "オフライン"
+    },
+    "remove": {
+      "title": "このリードを削除しますか？",
+      "effect": "リードはすべての一覧と担当者のキューから外れます。チャット履歴は残ります。直後に通知から元に戻せます。",
+      "reasons": {
+        "duplicate": "重複",
+        "testEntry": "テスト入力",
+        "spam": "スパム",
+        "other": "その他"
+      },
+      "removed": "リード #{{seq}} を削除しました · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_other": "{{count}} 日間動きがなかったため {{me}} が引き取りました · {{owner}} は関係者として残ります",
+      "releasedOpen": "{{name}} は誰でも引き取れるようになりました",
+      "addedInvolved": "{{name}} を関係者に追加しました",
+      "removedInvolved": "{{name}} を関係者から外しました"
     }
   }
 }

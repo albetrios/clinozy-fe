@@ -9,7 +9,8 @@ the list in place, without a drawer, and toasts "Lead not found · it may have b
 deleted" (`S:115`, `S:261`). `/leads/$leadId/edit` is a redirect to this route,
 registered in `app/routes/routeTree.tsx` with no island (`S:25`). Gated like the room —
 membership (`organization:read`) and the `clinic-leads` module, then
-`requireOrgStatus`. The drawer itself is built with its own ledger row (L-34b).
+`requireOrgStatus`. The drawer is `pages/organization/$organizationSlug/leads/components/LeadDrawer/` (L-34b), mounted by the Leads
+page over the list.
 
 ## Files
 

@@ -7,7 +7,11 @@ import { Outlet, useLocation, useNavigate, useParams } from '@tanstack/react-rou
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationLead, organizationLeadCreate } from '@/lib/routes/index.ts';
+import {
+  organizationLead,
+  organizationLeadCreate,
+  organizationLeads,
+} from '@/lib/routes/index.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { LEAD_HOLD_DAYS, leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
@@ -18,8 +22,16 @@ import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClaimLead, useMarkLeadRead } from '@/shared/hooks/useLeads/index.ts';
+import {
+  useAssignLead,
+  useClaimLead,
+  useConvertLead,
+  useMarkLeadRead,
+  useReleaseLead,
+  useSetLeadInvolved,
+} from '@/shared/hooks/useLeads/index.ts';
 
+import { LeadDrawer, type LeadDrawerPane } from './components/LeadDrawer/index.ts';
 import { staffFullName } from './components/LeadFields/index.ts';
 import {
   LeadsTable,
@@ -40,14 +52,20 @@ import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from './leads.constants.ts';
  */
 export function LeadsPage() {
   const { t } = useTranslation(LEADS_NS);
-  useLeadsDialogRoute();
+  const dialog = useLeadsDialogRoute();
   const state = useLeadsList();
+  // The phone's pane — Chat first, kept between leads (KICKOFF §6.3).
+  const [pane, setPane] = useState<LeadDrawerPane>('chat');
   const access = useClinicAccess();
   const navigate = useNavigate();
   const { organizationSlug = '', leadId } = useParams({ strict: false });
   const pathname = useLocation({ select: (location) => location.pathname });
   const markRead = useMarkLeadRead();
   const claim = useClaimLead();
+  const release = useReleaseLead();
+  const assign = useAssignLead();
+  const setInvolved = useSetLeadInvolved();
+  const convert = useConvertLead();
   const { rows } = state.list;
   // One "now" per set of rows — the hold and the "Updated" words agree — read
   // again when the rows change (the stored-previous-value pattern, keyed on
@@ -96,6 +114,82 @@ export function LeadsPage() {
       ownerName: owner ? shortPersonName(staffFullName(owner)) : null,
     });
   };
+
+  const closeDrawer = () =>
+    void navigate({
+      ...organizationLeads(organizationSlug),
+      search: true,
+      hash: true,
+    });
+  const drawerLead = dialog.kind === 'lead' ? dialog.lead : undefined;
+  const drawer = drawerLead
+    ? (() => {
+        const lead = drawerLead;
+        const owner = lead.ownerId ? state.staffById.get(lead.ownerId) : undefined;
+        const hold = leadHold(
+          { ...lead, ownerGone: ownerGone(lead.ownerId) },
+          LEAD_HOLD_DAYS,
+          now,
+        );
+        const mine = viewerId !== null && lead.ownerId === viewerId;
+        const ownerShort = owner ? shortPersonName(staffFullName(owner)) : null;
+        return (
+          <LeadDrawer
+            lead={lead}
+            staff={state.staff}
+            staffById={state.staffById}
+            viewer={state.viewer}
+            canEdit={access.can('leads', 'edit')}
+            canDelete={access.can('leads', 'delete')}
+            pane={pane}
+            onPaneChange={setPane}
+            onClose={closeDrawer}
+            onConvert={() => convert.mutate({ id: lead.id, name: lead.name })}
+            people={{
+              onClaim:
+                canClaim && hold.open && !mine && viewerId !== null && state.viewer
+                  ? () =>
+                      claim.mutate({
+                        lead,
+                        viewerId,
+                        ownerName: ownerShort,
+                        message: ownerShort
+                          ? t(LEADS_KEYS.drawer.toasts.claimedAfter, {
+                              me: shortPersonName(staffFullName(state.viewer!)),
+                              count: hold.idleDays,
+                              owner: ownerShort,
+                            })
+                          : undefined,
+                      })
+                  : undefined,
+              onRelease:
+                mine && !hold.open && !hold.closed && viewerId !== null
+                  ? () => release.mutate({ id: lead.id, viewerId })
+                  : undefined,
+              onAssign: (person) =>
+                assign.mutate({
+                  lead,
+                  ownerId: person.id,
+                  ownerName: staffFullName(person),
+                }),
+              onToggleInvolved: (person, involved) =>
+                setInvolved.mutate({
+                  id: lead.id,
+                  involvedIds: involved
+                    ? [...lead.involvedIds, person.id]
+                    : lead.involvedIds.filter((id) => id !== person.id),
+                  message: t(
+                    involved
+                      ? LEADS_KEYS.drawer.toasts.addedInvolved
+                      : LEADS_KEYS.drawer.toasts.removedInvolved,
+                    { name: staffFullName(person) },
+                  ),
+                }),
+            }}
+          />
+        );
+      })()
+    : null;
 
   const context: LeadsTableContextValue = {
     staffById: state.staffById,
@@ -195,6 +289,7 @@ export function LeadsPage() {
         empty={empty}
       />
       <Outlet />
+      {drawer}
     </section>
   );
 }

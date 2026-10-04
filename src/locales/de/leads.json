@@ -10,7 +10,9 @@
     "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
     "claimedUnowned": "{{name}} gehört jetzt Ihnen",
     "released": "Für das Team freigegeben · jeder kann übernehmen",
-    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt"
+    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt",
+    "followUpTask": " · Nachfass-Aufgabe für morgen",
+    "converted": "Patientenakte für {{name}} angelegt · der Lead bleibt verknüpft"
   },
   "list": {
     "records": "Leads",
@@ -83,6 +85,103 @@
       "count_other": "{{count}} Personen",
       "search": "Team durchsuchen",
       "noMatch": "Kein Treffer"
+    }
+  },
+  "drawer": {
+    "title": "Lead bearbeiten",
+    "sub": "Nehmen Sie Ihre Änderungen vor und speichern Sie dann den Lead",
+    "idTooltip": "Lead #{{seq}} · erstellt {{created}} · zum Kopieren klicken",
+    "idAria": "Lead-ID #{{seq}} kopieren",
+    "idCopied": "Lead-ID #{{seq}} kopiert",
+    "retarget": "Re-Targeting",
+    "close": "Lead schließen",
+    "panels": "Lead-Bereiche",
+    "details": "Details",
+    "chat": "Chat",
+    "chatCount": "{{n}} neu",
+    "resize": "Bereichsgröße ändern",
+    "resizeHint": "Ziehen zum Ändern · Doppelklick zum Zurücksetzen",
+    "cards": {
+      "details": "Lead-Details",
+      "progress": "Fortschritt",
+      "info": "Info"
+    },
+    "source": "Quelle",
+    "interests": "Interessiert an",
+    "addInterest": "Interesse hinzufügen",
+    "people": "Zugewiesen & beteiligt",
+    "peopleAria": "Zugewiesene und beteiligte Personen",
+    "addInvolved": "+ Beteiligte hinzufügen",
+    "claim": "Übernehmen",
+    "release": "Freigeben",
+    "releaseHint": "Jede Person im Team darf ihn übernehmen",
+    "progressAria": "Lead-Fortschritt",
+    "steps": {
+      "done": "Erledigt",
+      "current": "Aktuell",
+      "next": "Als Nächstes"
+    },
+    "stepTips": {
+      "done": "{{status}} · abgeschlossen",
+      "current": "{{status}} · aktueller Schritt",
+      "next": "Zu {{status}} wechseln"
+    },
+    "closeAs": "Schließen als",
+    "info": {
+      "created": "Erstellt",
+      "lastMessage": "Letzte Nachricht",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "Noch keine",
+      "patient": "Patient",
+      "linked": "Verknüpft",
+      "notYet": "Noch nicht",
+      "convert": "In Patient umwandeln",
+      "openTasks": "Offene Aufgaben",
+      "retargetReason": "Re-Targeting-Grund"
+    },
+    "footer": {
+      "remove": "Lead entfernen",
+      "discard": "Verwerfen",
+      "save": "Lead speichern"
+    },
+    "popover": {
+      "title": "Personen bei diesem Lead",
+      "search": "Team durchsuchen",
+      "assignedTo": "Zugewiesen an · wer diesen Lead jetzt betreut",
+      "assign": "Zuweisen",
+      "assigned": "Zugewiesen",
+      "currentlyAssigned": "Derzeit zugewiesen",
+      "assignTo": "{{name}} zuweisen",
+      "onlyAssignee": "Nur die zugewiesene Person ({{name}}) kann neu zuweisen",
+      "cantAssign": "{{role}} kann nicht an {{other}} zuweisen",
+      "involved": "Beteiligt · hat an diesem Lead gearbeitet",
+      "noMatch": "Kein Treffer",
+      "note": "✓ Beteiligt = alle, die an diesem Lead gearbeitet haben. Automatisch hinzugefügt, wenn sie antworten, anrufen, eine Notiz schreiben oder buchen · Sie können auch selbst jemanden hinzufügen",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "Online",
+      "away": "Abwesend",
+      "busy": "Beschäftigt",
+      "offline": "Offline"
+    },
+    "remove": {
+      "title": "Diesen Lead entfernen?",
+      "effect": "Der Lead verschwindet aus allen Listen und aus der Warteschlange der zuständigen Person. Der Chatverlauf bleibt erhalten. Sie können es direkt danach in der Meldung rückgängig machen.",
+      "reasons": {
+        "duplicate": "Duplikat",
+        "testEntry": "Testeintrag",
+        "spam": "Spam",
+        "other": "Sonstiges"
+      },
+      "removed": "Lead #{{seq}} entfernt · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_one": "Von {{me}} übernommen nach {{count}} inaktivem Tag · {{owner}} bleibt beteiligt",
+      "claimedAfter_other": "Von {{me}} übernommen nach {{count}} inaktiven Tagen · {{owner}} bleibt beteiligt",
+      "releasedOpen": "{{name}} kann jetzt von allen übernommen werden",
+      "addedInvolved": "{{name}} als beteiligt hinzugefügt",
+      "removedInvolved": "{{name}} aus den Beteiligten entfernt"
     }
   }
 }

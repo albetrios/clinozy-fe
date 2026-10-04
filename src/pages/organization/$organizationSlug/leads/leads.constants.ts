@@ -85,6 +85,110 @@ export const LEADS_KEYS = {
       noMatch: 'filters.team.noMatch',
     },
   },
+  /** The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867). */
+  drawer: {
+    title: 'drawer.title',
+    sub: 'drawer.sub',
+    /** "Lead #<seq> · created <created> · click to copy". */
+    idTooltip: 'drawer.idTooltip',
+    idAria: 'drawer.idAria',
+    idCopied: 'drawer.idCopied',
+    retarget: 'drawer.retarget',
+    close: 'drawer.close',
+    panels: 'drawer.panels',
+    details: 'drawer.details',
+    chat: 'drawer.chat',
+    /** "<n> new" — the Chat segment's count while Details shows. */
+    chatCount: 'drawer.chatCount',
+    resize: 'drawer.resize',
+    resizeHint: 'drawer.resizeHint',
+    cards: {
+      details: 'drawer.cards.details',
+      progress: 'drawer.cards.progress',
+      info: 'drawer.cards.info',
+    },
+    source: 'drawer.source',
+    interests: 'drawer.interests',
+    addInterest: 'drawer.addInterest',
+    people: 'drawer.people',
+    peopleAria: 'drawer.peopleAria',
+    addInvolved: 'drawer.addInvolved',
+    claim: 'drawer.claim',
+    release: 'drawer.release',
+    releaseHint: 'drawer.releaseHint',
+    progressAria: 'drawer.progressAria',
+    steps: {
+      done: 'drawer.steps.done',
+      current: 'drawer.steps.current',
+      next: 'drawer.steps.next',
+    },
+    stepTips: {
+      done: 'drawer.stepTips.done',
+      current: 'drawer.stepTips.current',
+      next: 'drawer.stepTips.next',
+    },
+    closeAs: 'drawer.closeAs',
+    info: {
+      created: 'drawer.info.created',
+      lastMessage: 'drawer.info.lastMessage',
+      /** "<channel> · <at>". */
+      lastMessageValue: 'drawer.info.lastMessageValue',
+      none: 'drawer.info.none',
+      patient: 'drawer.info.patient',
+      linked: 'drawer.info.linked',
+      notYet: 'drawer.info.notYet',
+      convert: 'drawer.info.convert',
+      openTasks: 'drawer.info.openTasks',
+      retargetReason: 'drawer.info.retargetReason',
+    },
+    footer: {
+      remove: 'drawer.footer.remove',
+      discard: 'drawer.footer.discard',
+      save: 'drawer.footer.save',
+    },
+    popover: {
+      title: 'drawer.popover.title',
+      search: 'drawer.popover.search',
+      assignedTo: 'drawer.popover.assignedTo',
+      assign: 'drawer.popover.assign',
+      assigned: 'drawer.popover.assigned',
+      currentlyAssigned: 'drawer.popover.currentlyAssigned',
+      assignTo: 'drawer.popover.assignTo',
+      onlyAssignee: 'drawer.popover.onlyAssignee',
+      cantAssign: 'drawer.popover.cantAssign',
+      involved: 'drawer.popover.involved',
+      noMatch: 'drawer.popover.noMatch',
+      note: 'drawer.popover.note',
+      /** "<role> · <presence>". */
+      roleLine: 'drawer.popover.roleLine',
+    },
+    presence: {
+      online: 'drawer.presence.online',
+      away: 'drawer.presence.away',
+      busy: 'drawer.presence.busy',
+      offline: 'drawer.presence.offline',
+    },
+    remove: {
+      title: 'drawer.remove.title',
+      effect: 'drawer.remove.effect',
+      reasons: {
+        duplicate: 'drawer.remove.reasons.duplicate',
+        testEntry: 'drawer.remove.reasons.testEntry',
+        spam: 'drawer.remove.reasons.spam',
+        other: 'drawer.remove.reasons.other',
+      },
+      /** "Lead #<seq> removed · <reason>". */
+      removed: 'drawer.remove.removed',
+    },
+    toasts: {
+      /** "Claimed by <me> after <n> idle days · <owner> stays involved". Plural. */
+      claimedAfter: 'drawer.toasts.claimedAfter',
+      /** "<name> is open for anyone to claim". */
+      releasedOpen: 'drawer.toasts.releasedOpen',
+      addedInvolved: 'drawer.toasts.addedInvolved',
+      removedInvolved: 'drawer.toasts.removedInvolved',
+    },
+  },
 } as const;
 
 /** The Leads room's table id — prefixes its list's and toolbar's test ids, and keys its Columns choice. */
@@ -95,4 +199,10 @@ export const LEADS_TEST_IDS = {
   empty: 'leads-empty',
   claim: 'leads-claim',
   holdDot: 'leads-hold-dot',
+  drawer: 'lead-drawer',
+  drawerChat: 'lead-drawer-chat',
+  drawerSave: 'lead-drawer-save',
+  drawerRemove: 'lead-drawer-remove',
+  drawerPeople: 'lead-drawer-people',
+  drawerResize: 'lead-drawer-resize',
 } as const;

@@ -10,7 +10,9 @@
     "claimed": "你现在负责 {{name}} · {{owner}} 仍参与其中",
     "claimedUnowned": "你现在负责 {{name}}",
     "released": "已释放给团队 · 任何人都可以认领",
-    "assigned": "{{name}} 现在是负责人 · 已通知"
+    "assigned": "{{name}} 现在是负责人 · 已通知",
+    "followUpTask": " · 明天的跟进任务",
+    "converted": "已为 {{name}} 创建患者档案 · 线索保持关联"
   },
   "list": {
     "records": "潜在客户",
@@ -75,6 +77,102 @@
       "count_other": "{{count}} 人",
       "search": "搜索团队",
       "noMatch": "无匹配"
+    }
+  },
+  "drawer": {
+    "title": "编辑线索",
+    "sub": "完成修改后，保存线索",
+    "idTooltip": "线索 #{{seq}} · 创建于 {{created}} · 点击复制",
+    "idAria": "复制线索 ID #{{seq}}",
+    "idCopied": "已复制线索 ID #{{seq}}",
+    "retarget": "再营销",
+    "close": "关闭线索",
+    "panels": "线索面板",
+    "details": "详情",
+    "chat": "聊天",
+    "chatCount": "{{n}} 条新消息",
+    "resize": "调整面板大小",
+    "resizeHint": "拖动调整大小 · 双击重置",
+    "cards": {
+      "details": "线索详情",
+      "progress": "进度",
+      "info": "信息"
+    },
+    "source": "来源",
+    "interests": "感兴趣的项目",
+    "addInterest": "添加兴趣",
+    "people": "负责人与参与者",
+    "peopleAria": "负责人与参与者",
+    "addInvolved": "+ 添加参与者",
+    "claim": "认领",
+    "release": "释放",
+    "releaseHint": "让团队中的任何人都可以接手",
+    "progressAria": "线索进度",
+    "steps": {
+      "done": "已完成",
+      "current": "当前",
+      "next": "下一步"
+    },
+    "stepTips": {
+      "done": "{{status}} · 已完成",
+      "current": "{{status}} · 当前步骤",
+      "next": "移至{{status}}"
+    },
+    "closeAs": "关闭为",
+    "info": {
+      "created": "创建时间",
+      "lastMessage": "最后一条消息",
+      "lastMessageValue": "{{channel}} · {{at}}",
+      "none": "暂无",
+      "patient": "患者",
+      "linked": "已关联",
+      "notYet": "尚未",
+      "convert": "转为患者",
+      "openTasks": "待办任务",
+      "retargetReason": "再营销原因"
+    },
+    "footer": {
+      "remove": "移除线索",
+      "discard": "放弃",
+      "save": "保存线索"
+    },
+    "popover": {
+      "title": "此线索的相关人员",
+      "search": "搜索团队",
+      "assignedTo": "负责人 · 当前处理此线索的人",
+      "assign": "指派",
+      "assigned": "已指派",
+      "currentlyAssigned": "当前负责人",
+      "assignTo": "指派给{{name}}",
+      "onlyAssignee": "只有负责人（{{name}}）可以重新指派",
+      "cantAssign": "{{role}}无法指派给{{other}}",
+      "involved": "参与者 · 处理过此线索",
+      "noMatch": "无匹配结果",
+      "note": "✓ 参与者 = 处理过此线索的所有人。回复、通话、记录或预约时会自动加入 · 你也可以手动添加",
+      "roleLine": "{{role}} · {{presence}}"
+    },
+    "presence": {
+      "online": "在线",
+      "away": "离开",
+      "busy": "忙碌",
+      "offline": "离线"
+    },
+    "remove": {
+      "title": "移除此线索？",
+      "effect": "该线索会从所有列表和负责人的队列中移除。聊天记录会保留。之后可立即在提示中撤销。",
+      "reasons": {
+        "duplicate": "重复",
+        "testEntry": "测试条目",
+        "spam": "垃圾信息",
+        "other": "其他"
+      },
+      "removed": "已移除线索 #{{seq}} · {{reason}}"
+    },
+    "toasts": {
+      "claimedAfter_other": "闲置 {{count}} 天后由 {{me}} 认领 · {{owner}} 仍为参与者",
+      "releasedOpen": "{{name}} 现在任何人都可以认领",
+      "addedInvolved": "已将 {{name}} 添加为参与者",
+      "removedInvolved": "已将 {{name}} 从参与者中移除"
     }
   }
 }

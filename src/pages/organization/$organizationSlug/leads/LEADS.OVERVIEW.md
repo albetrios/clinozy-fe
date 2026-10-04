@@ -46,24 +46,27 @@ The data is the shared leads domain: `@/shared/api/clinic/leads-api.ts` (fixture
 
 ## Files
 
-| File                         | Responsibility                                                                                                                                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `leads.route.tsx`            | Route marker — exports `Component` rendering `LeadsPage`.                                                                                                                                            |
-| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `clinic-leads`, nav section `leads`.                                                                 |
-| `leads.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `status`, `source`, `hold`, `owner`, `created`, `followUp`, `sort`; the New lead prefill.                                                    |
-| `leads.constants.ts`         | `LEADS_NS` / `LEADS_KEYS` (the `leads` namespace).                                                                                                                                                   |
-| `LeadsPage.tsx`              | Room page — the toolbar over the list; claims, opens (marking read) and starts New lead; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="leads-page"`.                          |
-| `components/LeadFields/`     | A lead's pills (status, source, interests "+N"), the source icons and order, the people (`staffPerson`, the team card) and the person card's data (`leadContactCardData`).                           |
-| `components/LeadsTable/`     | The list's columns (`useLeadsTable`), cells (person, team with the hold dot, "Updated"), the claim pill and the table itself — the shared `DataTable`.                                               |
-| `components/LeadsToolbar/`   | Views, search, Filters (`components/LeadsToolbar/leads-filter-fields.ts`), Columns and "New lead".                                                                                                   |
-| `hooks/useLeadsList/`        | The URL's view, search, filters and sort read against the viewer (`hooks/useLeadsList/lead-list-params.ts`, kept off the entry chunk); the list, the team, the Unreplied count; the URL writes.      |
-| `hooks/useLeadsDialogRoute/` | Which dialog the URL opens: none, New lead with its prefill, or the lead (resolved by `useDialogRouteRecord`).                                                                                       |
-| `__tests__/integration/`     | The list and the dialog routes end to end on the page; `__tests__/integration/leads-test-router.tsx` mirrors the family's routes, `__tests__/integration/leads-test-data.ts` builds staff and leads. |
-| `create/`, `$leadId/`        | The dialog-route islands — see their overviews.                                                                                                                                                      |
+| File                         | Responsibility                                                                                                                                                                                                        |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `leads.route.tsx`            | Route marker — exports `Component` rendering `LeadsPage`.                                                                                                                                                             |
+| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `clinic-leads`, nav section `leads`.                                                                                  |
+| `leads.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `status`, `source`, `hold`, `owner`, `created`, `followUp`, `sort`; the New lead prefill.                                                                     |
+| `leads.constants.ts`         | `LEADS_NS` / `LEADS_KEYS` (the `leads` namespace).                                                                                                                                                                    |
+| `LeadsPage.tsx`              | Room page — the toolbar over the list; claims, opens (marking read) and starts New lead; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="leads-page"`.                                           |
+| `components/LeadFields/`     | A lead's pills (status, source, interests "+N"), the source icons and order, the people (`staffPerson`, the team card) and the person card's data (`leadContactCardData`).                                            |
+| `components/LeadsTable/`     | The list's columns (`useLeadsTable`), cells (person, team with the hold dot, "Updated"), the claim pill and the table itself — the shared `DataTable`.                                                                |
+| `components/LeadsToolbar/`   | Views, search, Filters (`components/LeadsToolbar/leads-filter-fields.ts`), Columns and "New lead".                                                                                                                    |
+| `components/LeadDrawer/`     | The lead drawer (L-34b): the two panes and their widths (`components/LeadDrawer/lead-drawer-widths.ts`), the chat's resize handle, the details pane (header, strip, cards, footer, remove confirm) and the phone bar. |
+| `components/LeadFormFields/` | The drawer's fields, shared with New lead (L-35): source and interest chips, the progress track, "Assigned & involved" with its people popover and the assign rules (`components/LeadFormFields/lead-assign.ts`).     |
+| `hooks/useLeadDraft/`        | The drawer's draft — source, interests, status — its dirty check, save and discard.                                                                                                                                   |
+| `hooks/useLeadsList/`        | The URL's view, search, filters and sort read against the viewer (`hooks/useLeadsList/lead-list-params.ts`, kept off the entry chunk); the list, the team, the Unreplied count; the URL writes.                       |
+| `hooks/useLeadsDialogRoute/` | Which dialog the URL opens: none, New lead with its prefill, or the lead (resolved by `useDialogRouteRecord`).                                                                                                        |
+| `__tests__/integration/`     | The list and the dialog routes end to end on the page; `__tests__/integration/leads-test-router.tsx` mirrors the family's routes, `__tests__/integration/leads-test-data.ts` builds staff and leads.                  |
+| `create/`, `$leadId/`        | The dialog-route islands — see their overviews.                                                                                                                                                                       |
 
 ## Test ids
 
-`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the shared toolbar's and
+`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the drawer's `lead-drawer-chat`, `lead-drawer-save`, `lead-drawer-remove`, `lead-drawer-people`, `lead-drawer-resize`; the shared toolbar's and
 table's under the `leads` table id (`leads-toolbar`, `leads-tab-<view>`, `leads-search`,
 `leads-filters-trigger`, `leads-columns-trigger`, `leads-new-lead`, `leads-fab`,
 `leads-table-row` …); the drawers the dialog routes open: `new-lead-drawer` (L-35),
