@@ -25,7 +25,8 @@ function subscribe(onChange: () => void): () => void {
 /**
  * The viewport's width, re-read 120ms after a resize settles (the prototype's
  * re-measure, H:4522) — for a layout whose widths are arithmetic on `vw`, like
- * the appointment form's form + chat rule. Layout that only switches at a tier
+ * the appointment form's form + chat rule and the lead drawer's two panes.
+ * Layout that only switches at a tier
  * uses Tailwind (`md:`, `xl:`) or `useViewportTier` instead.
  */
 export function useViewportWidth(): number {

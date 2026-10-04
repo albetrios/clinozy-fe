@@ -31,6 +31,7 @@ import {
 import { useThread } from '@/shared/hooks/useThread/index.ts';
 import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
 import { ChevronLeft, Users, WhatsAppMark, X } from '@/shared/icons/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -162,9 +163,7 @@ export function LeadDrawer({
   const tier = useViewportTier();
   const phone = tier === 'phone';
   const chatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
-  const [viewport] = useState(() =>
-    typeof window === 'undefined' ? 1440 : window.innerWidth,
-  );
+  const viewport = useViewportWidth();
   const widths = leadDrawerWidths(viewport, chatWidth);
   const draft = useLeadDraft(lead, viewer?.id ?? null);
   const guard = useUnsavedChangesGuard({ when: draft.dirty });
