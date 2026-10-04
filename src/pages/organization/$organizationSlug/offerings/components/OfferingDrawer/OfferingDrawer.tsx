@@ -148,7 +148,7 @@ function stepOfField(
   if (field === 'searchTerms' || field === 'description' || field === 'active') {
     return threeSteps ? 'details' : 'time';
   }
-  return 'main';
+  return 'offering';
 }
 
 /** What the step bodies read beside the form. */
@@ -175,7 +175,7 @@ function stepBodies({
 }: StepBodiesInput): Record<OfferingStepId, ReactNode> {
   const threeSteps = view.offersOnThis.length > 0;
   return {
-    main: (
+    offering: (
       <>
         <OfferingIdentityFields {...fields} branches={branches} />
         <OfferingPriceFields
@@ -211,7 +211,7 @@ function drawerSteps(
   t: TFunction,
 ): DrawerStep[] {
   const titles: Record<OfferingStepId, string> = {
-    main: t(K.steps.main),
+    offering: t(K.steps.main),
     time: t(view.offersOnThis.length > 0 ? K.steps.offersTime : K.steps.timeDetails),
     details: t(K.steps.details),
   };

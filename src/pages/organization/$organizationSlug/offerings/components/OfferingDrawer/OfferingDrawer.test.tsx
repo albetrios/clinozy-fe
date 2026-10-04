@@ -120,8 +120,10 @@ describe('OfferingDrawer — New offering (KICKOFF §6.11)', () => {
         .getAllByRole('button')
         .map((chip) => chip.textContent),
     ).toEqual(['Single session', '6-session pack', 'LHR 10-pack', 'Consultation']);
-    expect(within(stepOf('main')).getByText('Offering, price & sessions')).toBeVisible();
-    expect(stepOf('main')).toHaveTextContent('Treatment · All branches · 1 · 0%');
+    expect(
+      within(stepOf('offering')).getByText('Offering, price & sessions'),
+    ).toBeVisible();
+    expect(stepOf('offering')).toHaveTextContent('Treatment · All branches · 1 · 0%');
     expect(within(stepOf('time')).getByText('Time, validity & details')).toBeVisible();
     expect(part('summary')).toHaveTextContent('Untitled · Treatment');
     expect(part('save')).toHaveTextContent('Create offering');
@@ -150,7 +152,7 @@ describe('OfferingDrawer — New offering (KICKOFF §6.11)', () => {
     await user.click(part('step-time-trigger'));
     await user.click(part('save'));
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Add a name');
-    expect(stepOf('main')).toHaveAttribute('data-status', 'open');
+    expect(stepOf('offering')).toHaveAttribute('data-status', 'open');
     await user.type(part('name'), 'Hydra facial');
     await user.click(part('save'));
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Add a price');
@@ -162,8 +164,8 @@ describe('OfferingDrawer — New offering (KICKOFF §6.11)', () => {
     await openList('admin', `${OFFERINGS_URL}/create`);
     await drawer();
     await user.click(part('step-time-trigger'));
-    expect(stepOf('main')).toHaveAttribute('data-status', 'missing');
-    expect(stepOf('main')).toHaveTextContent('Missing: Name, Price');
+    expect(stepOf('offering')).toHaveAttribute('data-status', 'missing');
+    expect(stepOf('offering')).toHaveTextContent('Missing: Name, Price');
   });
 
   it('prices the draft live: the Offer price hint, Billed today, the badges and the footer', async () => {
@@ -317,7 +319,7 @@ describe('OfferingDrawer — Edit offering', () => {
       within(stepOf('time')).getByText('Offers on this, time & validity'),
     ).toBeVisible();
     expect(within(stepOf('details')).getByText('Details')).toBeVisible();
-    await user.click(part('step-main-next'));
+    await user.click(part('step-offering-next'));
     expect(within(panel).getByTestId(`${D}-offer-${ref.offer(29)}`)).toHaveTextContent(
       /^\+1 session · Running · till \S/,
     );
@@ -368,7 +370,7 @@ describe('OfferingDrawer — Edit offering', () => {
 
     await user.click(within(rowOf('#272')).getByText('Underarm Peel'));
     await drawer();
-    expect(stepOf('main')).toHaveAttribute('data-status', 'open');
+    expect(stepOf('offering')).toHaveAttribute('data-status', 'open');
   });
 
   it('deletes from the drawer through the reason confirm, and closes', async () => {

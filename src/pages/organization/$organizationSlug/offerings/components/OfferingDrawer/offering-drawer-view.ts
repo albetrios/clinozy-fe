@@ -49,11 +49,11 @@ export interface OfferOnThis {
 
 /**
  * The drawer's step cards (`offerings.md:237–244`): "Offering, price &
- * sessions" (`main`) then "Time, validity & details" (`time`) — or, while an
+ * sessions" (`offering`) then "Time, validity & details" (`time`) — or, while an
  * offer that has not ended names the offering, "Offers on this, time &
  * validity" (`time`) and "Details" (`details`).
  */
-export type OfferingStepId = 'main' | 'time' | 'details';
+export type OfferingStepId = 'offering' | 'time' | 'details';
 
 /** A step card's head: what it peeks while closed, its sub line, and its gaps. */
 export interface OfferingStepView {
@@ -210,7 +210,7 @@ function mainStepOf(
   ];
 
   return {
-    id: 'main',
+    id: 'offering',
     peek,
     // The head names values, never the colour (H:3840).
     summary: stepSummary(
