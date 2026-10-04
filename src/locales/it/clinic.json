@@ -1193,5 +1193,13 @@
     "utilities": "Utenze",
     "maintenance": "Manutenzione",
     "misc": "Varie"
+  },
+  "patientPicker": {
+    "label": "Paziente",
+    "placeholder": "Cerca pazienti",
+    "hint": "si possono scegliere solo pazienti",
+    "due": "{{amount}} da saldare",
+    "nothingDue": "Niente da saldare",
+    "lead": "Lead {{id}} · non ancora paziente"
   }
 }

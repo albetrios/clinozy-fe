@@ -71,7 +71,8 @@
       "fromCredit": "{{ref}}에서"
     },
     "dayClosed": "{{ref}} · 마감된 날",
-    "dayClosedEdited_other": "{{ref}} · 마감된 날 · {{count}}회 수정"
+    "dayClosedEdited_other": "{{ref}} · 마감된 날 · {{count}}회 수정",
+    "creditEntry": "{{ref}} · {{credit}}에서"
   },
   "rowActions": {
     "edit": "편집",
@@ -104,7 +105,8 @@
   },
   "dialog": {
     "record": "결제",
-    "credit": "대기 항목"
+    "credit": "대기 항목",
+    "dayClosed": "마감된 날 · 지금은 저장할 수 없음"
   },
   "pending": {
     "records": "대기 항목",
@@ -143,5 +145,99 @@
       "loan_to_staff": "직원 대여금",
       "other": "기타"
     }
+  },
+  "receive": {
+    "title": "수납하기",
+    "titleEdit": "수납 수정",
+    "sub": "영수증은 WhatsApp으로 환자에게 전송됩니다",
+    "subEdit": "마감 전까지 수정 가능 · 모든 변경이 기록됩니다",
+    "section": "결제하는 사람",
+    "branch": "지점",
+    "invoice": "청구서 대상",
+    "invoiceOpen_other": "미결 {{count}}건",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "먼저 환자를 선택하세요",
+    "nothingDue": "미수 없음",
+    "amount": "수납 금액",
+    "mode": "수단",
+    "amountColumn": "금액",
+    "split": "분할 · 수단 추가",
+    "total": "합계 {{total}}",
+    "totalDue": "합계 {{total}} · 미수 {{due}}",
+    "reference": "참조 번호",
+    "referenceHint": "UPI 참조 / 카드 끝 4자리",
+    "referencePlaceholder": "예: 4321",
+    "note": "메모",
+    "notePlaceholder": "선택 사항",
+    "quickFill": {
+      "full": "전액 · {{amount}}",
+      "half": "절반 · {{amount}}",
+      "cashUpi": "현금 + UPI"
+    },
+    "save": "{{amount}} 기록",
+    "saveEdit": "{{amount}} 저장",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{name}}에게서 {{amount}} 수납",
+    "updated": "{{ref}} 업데이트됨 · 변경 기록됨",
+    "enterAmount": "금액을 입력하세요",
+    "pickPatient": "환자를 선택하세요",
+    "aboveDue": "미수 {{due}}보다 많음"
+  },
+  "send": {
+    "title": "지급하기",
+    "titleEdit": "지급 수정",
+    "sub": "클리닉 지출 · 일 마감에 표시",
+    "steps": {
+      "bill": "청구서 대금 지급",
+      "expense": "지출",
+      "payment": "지급"
+    },
+    "bill": "공급처 청구서",
+    "billHint_other": "미결 {{count}}건 · 발주 번호, 공급처, 청구 번호로 검색",
+    "billPlaceholder": "발주 번호, 공급처, 청구 번호로 검색",
+    "otherSpend": "기타 지출",
+    "otherSpendSub": "발주서와 무관",
+    "groups": {
+      "other": "기타",
+      "medical": "약국 발주",
+      "stock": "원내 재고 발주"
+    },
+    "billLabel": {
+      "medical": "약국 발주 #{{seq}} · {{supplier}}",
+      "stock": "재고 발주 #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "약국 발주 #{{seq}}",
+      "stock": "재고 발주 #{{seq}}"
+    },
+    "billNo": "청구서 {{bill}}",
+    "daysPending_other": "{{count}}일 미결",
+    "pendingToday": "오늘",
+    "oldest": "가장 오래 미결",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "분류",
+    "paidTo": "지급처",
+    "paidToPlaceholder": "거래처 또는 개인",
+    "note": "메모",
+    "notePlaceholder": "구입한 항목",
+    "amount": "금액",
+    "date": "날짜",
+    "mode": "수단",
+    "files": "청구서 / 영수증",
+    "filesDrop": "청구서 사진을 놓거나 찾아보기",
+    "filesHint": "선택 사항 · JPG, PNG 또는 PDF",
+    "filesRemove": "{{name}} 제거",
+    "electricity": "전기 요금",
+    "presets": {
+      "tea": "차와 간식",
+      "courier": "퀵서비스"
+    },
+    "save": "지출 추가",
+    "saveEdit": "변경 사항 저장",
+    "another": "추가 후 계속",
+    "added": "지출 {{ref}} 추가됨",
+    "paidBill": "{{bill}}에 {{amount}} 지급",
+    "saved": "{{ref}} 저장됨 · 변경 기록됨",
+    "missing": "지급처와 금액을 입력하세요"
   }
 }

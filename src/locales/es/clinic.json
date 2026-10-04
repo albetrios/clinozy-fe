@@ -1193,5 +1193,13 @@
     "utilities": "Servicios",
     "maintenance": "Mantenimiento",
     "misc": "Varios"
+  },
+  "patientPicker": {
+    "label": "Paciente",
+    "placeholder": "Buscar pacientes",
+    "hint": "solo se pueden elegir pacientes",
+    "due": "{{amount}} pendiente",
+    "nothingDue": "Nada pendiente",
+    "lead": "Lead {{id}} · aún no es paciente"
   }
 }

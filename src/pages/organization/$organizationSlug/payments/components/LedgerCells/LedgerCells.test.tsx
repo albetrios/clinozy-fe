@@ -13,6 +13,7 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import { PAYMENTS_NS } from '../../payments.constants.ts';
 import {
   editSideLabel,
+  ledgerEntryLock,
   ledgerModes,
   ledgerModesLabel,
   ledgerSubLine,
@@ -123,6 +124,23 @@ describe('the ledger’s wording (payments.md:29)', () => {
         note: 'Gloves returned',
       }),
     ).toBe('Money back · From CR-1 · Gloves returned');
+  });
+
+  it('says why an entry can’t change: the credit it settled, else its closed day', () => {
+    expect(ledgerEntryLock(entry(310), t)).toBeNull();
+    expect(ledgerEntryLock(entry(305), t)).toBe('PAY-305 · Day closed');
+    const edit = {
+      at: NOW.toISOString(),
+      byId: null,
+      from: { amount: 1, modes: ['cash' as const] },
+      to: { amount: 2, modes: ['cash' as const] },
+    };
+    expect(ledgerEntryLock({ ...entry(305), edits: [edit, edit] }, t)).toBe(
+      'PAY-305 · Day closed · edited 2×',
+    );
+    expect(ledgerEntryLock({ ...entry(310), pendingCreditSeq: 2 }, t)).toBe(
+      'PAY-310 · From CR-2',
+    );
   });
 
   it('words one side of a logged edit: "₹600 UPI"', () => {

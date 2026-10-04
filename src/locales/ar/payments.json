@@ -81,7 +81,8 @@
     "dayClosedEdited_two": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
     "dayClosedEdited_few": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
     "dayClosedEdited_many": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
-    "dayClosedEdited_other": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة"
+    "dayClosedEdited_other": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
+    "creditEntry": "{{ref}} · من {{credit}}"
   },
   "rowActions": {
     "edit": "تعديل",
@@ -119,7 +120,8 @@
   },
   "dialog": {
     "record": "الدفعة",
-    "credit": "المعلّق"
+    "credit": "المعلّق",
+    "dayClosed": "اليوم مُقفل · لا يمكن الحفظ الآن"
   },
   "pending": {
     "records": "العناصر المعلّقة",
@@ -158,5 +160,114 @@
       "loan_to_staff": "قرض لموظف",
       "other": "أخرى"
     }
+  },
+  "receive": {
+    "title": "استلام دفعة",
+    "titleEdit": "تعديل دفعة واردة",
+    "sub": "يُرسل الإيصال إلى المريض عبر واتساب",
+    "subEdit": "متاح حتى إقفال اليوم · كل تغيير يُسجَّل",
+    "section": "من يدفع",
+    "branch": "الفرع",
+    "invoice": "مقابل الفاتورة",
+    "invoiceOpen_zero": "لا فواتير مفتوحة",
+    "invoiceOpen_one": "فاتورة مفتوحة",
+    "invoiceOpen_two": "فاتورتان مفتوحتان",
+    "invoiceOpen_few": "{{count}} فواتير مفتوحة",
+    "invoiceOpen_many": "{{count}} فاتورة مفتوحة",
+    "invoiceOpen_other": "{{count}} فاتورة مفتوحة",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "اختر المريض أولًا",
+    "nothingDue": "لا مستحقات",
+    "amount": "المبلغ المستلم",
+    "mode": "الطريقة",
+    "amountColumn": "المبلغ",
+    "split": "تقسيم · أضف طريقة",
+    "total": "الإجمالي {{total}}",
+    "totalDue": "الإجمالي {{total}} · المستحق {{due}}",
+    "reference": "المرجع",
+    "referenceHint": "مرجع UPI / آخر 4 أرقام من البطاقة",
+    "referencePlaceholder": "مثال: 4321",
+    "note": "ملاحظة",
+    "notePlaceholder": "اختياري",
+    "quickFill": {
+      "full": "كامل · {{amount}}",
+      "half": "النصف · {{amount}}",
+      "cashUpi": "نقدًا + UPI"
+    },
+    "save": "تسجيل {{amount}}",
+    "saveEdit": "حفظ {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "تم استلام {{amount}} من {{name}}",
+    "updated": "تم تحديث {{ref}} · سُجّل التغيير",
+    "enterAmount": "أدخل مبلغًا",
+    "pickPatient": "اختر مريضًا",
+    "aboveDue": "أكثر من المستحق {{due}}"
+  },
+  "send": {
+    "title": "إرسال دفعة",
+    "titleEdit": "تعديل دفعة صادرة",
+    "sub": "مصروف العيادة · يظهر في إقفال اليوم",
+    "steps": {
+      "bill": "الدفع مقابل فاتورة",
+      "expense": "المصروف",
+      "payment": "الدفع"
+    },
+    "bill": "فاتورة المورّد",
+    "billHint_zero": "لا فواتير مفتوحة · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billHint_one": "فاتورة مفتوحة · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billHint_two": "فاتورتان مفتوحتان · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billHint_few": "{{count}} فواتير مفتوحة · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billHint_many": "{{count}} فاتورة مفتوحة · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billHint_other": "{{count}} فاتورة مفتوحة · ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "billPlaceholder": "ابحث برقم أمر الشراء أو المورّد أو الفاتورة",
+    "otherSpend": "مصروف آخر",
+    "otherSpendSub": "ليس مقابل أمر شراء",
+    "groups": {
+      "other": "أخرى",
+      "medical": "أوامر الشراء الطبية",
+      "stock": "أوامر شراء مخزون العيادة"
+    },
+    "billLabel": {
+      "medical": "أمر شراء طبي #{{seq}} · {{supplier}}",
+      "stock": "أمر شراء مخزون #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "أمر شراء طبي #{{seq}}",
+      "stock": "أمر شراء مخزون #{{seq}}"
+    },
+    "billNo": "فاتورة {{bill}}",
+    "daysPending_zero": "معلّق اليوم",
+    "daysPending_one": "معلّق منذ يوم",
+    "daysPending_two": "معلّق منذ يومين",
+    "daysPending_few": "معلّق منذ {{count}} أيام",
+    "daysPending_many": "معلّق منذ {{count}} يومًا",
+    "daysPending_other": "معلّق منذ {{count}} يوم",
+    "pendingToday": "اليوم",
+    "oldest": "الأطول انتظارًا",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "الفئة",
+    "paidTo": "مدفوع إلى",
+    "paidToPlaceholder": "مورّد أو شخص",
+    "note": "ملاحظة",
+    "notePlaceholder": "ما الذي اشتُري",
+    "amount": "المبلغ",
+    "date": "التاريخ",
+    "mode": "الطريقة",
+    "files": "الفاتورة / الإيصال",
+    "filesDrop": "أفلت صورة الفاتورة أو تصفّح",
+    "filesHint": "اختياري · JPG أو PNG أو PDF",
+    "filesRemove": "إزالة {{name}}",
+    "electricity": "الكهرباء",
+    "presets": {
+      "tea": "شاي ووجبات خفيفة",
+      "courier": "التوصيل"
+    },
+    "save": "إضافة مصروف",
+    "saveEdit": "حفظ التغييرات",
+    "another": "إضافة وأخرى",
+    "added": "تمت إضافة المصروف {{ref}}",
+    "paidBill": "تم دفع {{amount}} مقابل {{bill}}",
+    "saved": "تم حفظ {{ref}} · سُجّل التغيير",
+    "missing": "أضف المستفيد والمبلغ"
   }
 }

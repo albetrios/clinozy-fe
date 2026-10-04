@@ -75,7 +75,8 @@
     "dayClosed": "{{ref}} · Día cerrado",
     "dayClosedEdited_one": "{{ref}} · Día cerrado · editado {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Día cerrado · editado {{count}}×",
-    "dayClosedEdited_other": "{{ref}} · Día cerrado · editado {{count}}×"
+    "dayClosedEdited_other": "{{ref}} · Día cerrado · editado {{count}}×",
+    "creditEntry": "{{ref}} · De {{credit}}"
   },
   "rowActions": {
     "edit": "Editar",
@@ -110,7 +111,8 @@
   },
   "dialog": {
     "record": "Pago",
-    "credit": "Pendiente"
+    "credit": "Pendiente",
+    "dayClosed": "Día cerrado · ya no se puede guardar"
   },
   "pending": {
     "records": "pendientes",
@@ -149,5 +151,105 @@
       "loan_to_staff": "Préstamo al personal",
       "other": "Otro"
     }
+  },
+  "receive": {
+    "title": "Cobrar pago",
+    "titleEdit": "Editar cobro",
+    "sub": "El recibo se envía al paciente por WhatsApp",
+    "subEdit": "Abierto hasta cerrar el día · cada cambio queda registrado",
+    "section": "Quién paga",
+    "branch": "Sucursal",
+    "invoice": "Contra factura",
+    "invoiceOpen_one": "{{count}} abierta",
+    "invoiceOpen_many": "{{count}} abiertas",
+    "invoiceOpen_other": "{{count}} abiertas",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Elige primero al paciente",
+    "nothingDue": "Nada pendiente",
+    "amount": "Importe cobrado",
+    "mode": "Forma",
+    "amountColumn": "Importe",
+    "split": "Dividir · añadir una forma",
+    "total": "Total {{total}}",
+    "totalDue": "Total {{total}} · pendiente {{due}}",
+    "reference": "Referencia",
+    "referenceHint": "Ref. UPI / últimos 4 de la tarjeta",
+    "referencePlaceholder": "p. ej. 4321",
+    "note": "Nota",
+    "notePlaceholder": "Opcional",
+    "quickFill": {
+      "full": "Completo · {{amount}}",
+      "half": "Mitad · {{amount}}",
+      "cashUpi": "Efectivo + UPI"
+    },
+    "save": "Registrar {{amount}}",
+    "saveEdit": "Guardar {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} cobrados a {{name}}",
+    "updated": "{{ref}} actualizado · cambio registrado",
+    "enterAmount": "Introduce un importe",
+    "pickPatient": "Elige un paciente",
+    "aboveDue": "Más que los {{due}} pendientes"
+  },
+  "send": {
+    "title": "Registrar pago",
+    "titleEdit": "Editar pago",
+    "sub": "Gasto de la clínica · aparece en el cierre del día",
+    "steps": {
+      "bill": "Pagar una factura",
+      "expense": "Gasto",
+      "payment": "Pago"
+    },
+    "bill": "Factura del proveedor",
+    "billHint_one": "{{count}} abierta · busca OC, proveedor o n.º de factura",
+    "billHint_many": "{{count}} abiertas · busca OC, proveedor o n.º de factura",
+    "billHint_other": "{{count}} abiertas · busca OC, proveedor o n.º de factura",
+    "billPlaceholder": "Busca OC, proveedor o n.º de factura",
+    "otherSpend": "Otro gasto",
+    "otherSpendSub": "Sin orden de compra",
+    "groups": {
+      "other": "Otro",
+      "medical": "Órdenes de compra médicas",
+      "stock": "Órdenes de compra de inventario"
+    },
+    "billLabel": {
+      "medical": "OC médica #{{seq}} · {{supplier}}",
+      "stock": "OC de inventario #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "OC médica #{{seq}}",
+      "stock": "OC de inventario #{{seq}}"
+    },
+    "billNo": "Factura {{bill}}",
+    "daysPending_one": "{{count}} día pendiente",
+    "daysPending_many": "{{count}} días pendiente",
+    "daysPending_other": "{{count}} días pendiente",
+    "pendingToday": "Hoy",
+    "oldest": "Pendientes hace más tiempo",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Categoría",
+    "paidTo": "Pagado a",
+    "paidToPlaceholder": "Proveedor o persona",
+    "note": "Nota",
+    "notePlaceholder": "Qué se compró",
+    "amount": "Importe",
+    "date": "Fecha",
+    "mode": "Forma",
+    "files": "Factura / recibo",
+    "filesDrop": "Suelta la foto de la factura o busca",
+    "filesHint": "Opcional · JPG, PNG o PDF",
+    "filesRemove": "Quitar {{name}}",
+    "electricity": "Electricidad",
+    "presets": {
+      "tea": "Té y snacks",
+      "courier": "Mensajería"
+    },
+    "save": "Añadir gasto",
+    "saveEdit": "Guardar cambios",
+    "another": "Añadir y otro",
+    "added": "Gasto {{ref}} añadido",
+    "paidBill": "{{amount}} pagados a {{bill}}",
+    "saved": "{{ref}} guardado · cambio registrado",
+    "missing": "Indica a quién se pagó y el importe"
   }
 }

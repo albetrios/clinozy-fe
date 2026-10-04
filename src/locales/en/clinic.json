@@ -1176,5 +1176,13 @@
     "utilities": "Utilities",
     "maintenance": "Maintenance",
     "misc": "Misc"
+  },
+  "patientPicker": {
+    "label": "Patient",
+    "placeholder": "Search patients",
+    "hint": "only patients can be picked",
+    "due": "{{amount}} due",
+    "nothingDue": "Nothing due",
+    "lead": "Lead {{id}} · not a patient yet"
   }
 }

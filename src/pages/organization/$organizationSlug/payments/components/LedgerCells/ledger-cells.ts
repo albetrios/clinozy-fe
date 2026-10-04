@@ -107,6 +107,28 @@ export function ledgerSubLine(
   return parts.join(' · ');
 }
 
+/**
+ * Why an entry can't be changed, or null while it can: a pending credit
+ * settled it — "PAY-5601 · From CR-2", it is the credit's (H:5105) — or its
+ * day is closed — "PAY-5509 · Day closed" (+ " · edited 2×", `S:87`).
+ */
+export function ledgerEntryLock(
+  row: Pick<LedgerRow, 'seq' | 'locked' | 'pendingCreditSeq' | 'edits'>,
+  t: TFunction,
+): string | null {
+  const ref = displayId.payment(row.seq);
+  if (row.pendingCreditSeq !== null) {
+    return t(PAYMENTS_KEYS.ledger.creditEntry, {
+      ref,
+      credit: displayId.pendingCredit(row.pendingCreditSeq),
+    });
+  }
+  if (!row.locked) return null;
+  return row.edits.length > 0
+    ? t(PAYMENTS_KEYS.ledger.dayClosedEdited, { ref, count: row.edits.length })
+    : t(PAYMENTS_KEYS.ledger.dayClosed, { ref });
+}
+
 /** "₹600 UPI" — one side of a logged edit. */
 export function editSideLabel(
   side: PaymentEditSide,

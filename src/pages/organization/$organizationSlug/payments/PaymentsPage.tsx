@@ -37,13 +37,22 @@ import {
 } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { useLedgerSubLine, useLedgerWhen } from './components/LedgerCells/index.ts';
+import {
+  ledgerEntryLock,
+  useLedgerSubLine,
+  useLedgerWhen,
+} from './components/LedgerCells/index.ts';
 import {
   PaymentDeleteConfirm,
   type PaymentDeleteTarget,
 } from './components/PaymentDeleteConfirm/index.ts';
+import { ReceivePaymentDrawer } from './components/ReceivePaymentDrawer/index.ts';
+import { SendPaymentDrawer } from './components/SendPaymentDrawer/index.ts';
 import { ledgerRowTone, useLedgerTable } from './hooks/useLedgerTable/index.ts';
-import { usePaymentsDialogRoute } from './hooks/usePaymentsDialogRoute/index.ts';
+import {
+  type PaymentsDialogRoute,
+  usePaymentsDialogRoute,
+} from './hooks/usePaymentsDialogRoute/index.ts';
 import {
   LEDGER_FILTER_FIELDS,
   LEDGER_TABLE_ID,
@@ -53,6 +62,58 @@ import {
 import { ledgerListParamsOf } from './payments.params.ts';
 import { LEDGER_FILTER_VALUES, validatePaymentsSearch } from './payments.search.ts';
 import { PaymentsToolbar } from './shared/components/PaymentsToolbar/index.ts';
+
+/**
+ * The drawer the URL names (D24): Receive payment, Send payment, or an open
+ * day's entry — a receipt in Receive, money out in Send.
+ */
+function PaymentsDrawers({
+  dialog,
+  onClose,
+}: {
+  dialog: PaymentsDialogRoute;
+  onClose: () => void;
+}) {
+  if (dialog.kind === 'receive') {
+    return (
+      <ReceivePaymentDrawer
+        open
+        mode="create"
+        prefill={dialog.prefill}
+        onClose={onClose}
+      />
+    );
+  }
+  if (dialog.kind === 'pay') {
+    return (
+      <SendPaymentDrawer
+        open
+        mode="create"
+        bill={dialog.prefill.bill}
+        onClose={onClose}
+      />
+    );
+  }
+  if (dialog.kind !== 'edit' || !dialog.payment) return null;
+  const entry = dialog.payment;
+  return entry.direction === 'received' ? (
+    <ReceivePaymentDrawer
+      open
+      mode="edit"
+      entry={entry}
+      readOnly={dialog.readOnly}
+      onClose={onClose}
+    />
+  ) : (
+    <SendPaymentDrawer
+      open
+      mode="edit"
+      entry={entry}
+      readOnly={dialog.readOnly}
+      onClose={onClose}
+    />
+  );
+}
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'payments.csv';
@@ -203,7 +264,7 @@ export function PaymentsPage() {
   const filterCopy = useLedgerFilterCopy();
   const csv = useLedgerCsv();
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
-  const { dialog } = usePaymentsDialogRoute();
+  const { dialog, close } = usePaymentsDialogRoute();
 
   const reviewDay =
     dialog.kind === 'dayClose' ? (dialog.search.date ?? clinicToday()) : undefined;
@@ -222,13 +283,9 @@ export function PaymentsPage() {
   const openPay = () =>
     void navigate({ ...organizationPaymentPay(organizationSlug), search: {} });
   const openEntry = (row: LedgerRow) => {
-    if (row.locked) {
-      const ref = displayId.payment(row.seq);
-      notify.info(
-        row.edits.length > 0
-          ? t(PAYMENTS_KEYS.ledger.dayClosedEdited, { ref, count: row.edits.length })
-          : t(PAYMENTS_KEYS.ledger.dayClosed, { ref }),
-      );
+    const lock = ledgerEntryLock(row, t);
+    if (lock) {
+      notify.info(lock);
       return;
     }
     void navigate({
@@ -238,8 +295,9 @@ export function PaymentsPage() {
   };
 
   const rowActions = (row: LedgerRow): DataTableRowAction[] => {
-    // Open-day entries only (`payments.md:34`): a closed day shows no actions.
-    if (row.locked) return [];
+    // Open-day entries only (`payments.md:34`): a closed day, or a credit's
+    // entry, shows no actions.
+    if (ledgerEntryLock(row, t)) return [];
     const actions: DataTableRowAction[] = [];
     if (can('edit')) {
       actions.push({
@@ -338,6 +396,7 @@ export function PaymentsPage() {
         className="m-(--room-card-margin) flex-1"
       />
       <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <PaymentsDrawers dialog={dialog} onClose={close} />
       <Outlet />
     </section>
   );

@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -6,18 +5,19 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { patientName, type PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
 import { UPLOAD_MAX_BYTES } from '@/shared/api/uploads-api.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  DrawerFilesField,
+  type PickedFile,
+} from '@/shared/components/DrawerField/index.ts';
 import { formatFileSize } from '@/shared/components/UploadTray/format-file-size.ts';
 import { UPLOAD_TRAY_NS } from '@/shared/components/UploadTray/upload-tray.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { TriangleAlert, X } from '@/shared/icons/index.ts';
+import { TriangleAlert } from '@/shared/icons/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
 
 /** A photo picked for filing: the file, and an id for its chip. */
-export interface PickedPhoto {
-  id: string;
-  file: File;
-}
+export type PickedPhoto = PickedFile;
 
 /** The one size limit a clinic upload carries (Q-P5: 10 MB everywhere). */
 const PHOTO_LIMIT_BYTES = UPLOAD_MAX_BYTES['organization-file'];
@@ -68,11 +68,11 @@ export function PatientDuplicateNotice({
 }
 
 /**
- * The First photos field (Q-P2; `patients.md:84`): a 96px dashed zone — "Take
- * or drop photos", "JPG or PNG · up to 10 MB each" — that takes images by
- * click (a phone offers its camera) or drop, then the picks as 24px chips,
- * each removable. The drawer files them after the save, through the upload
- * tray, which skips a file over the limit with its own toast.
+ * The First photos field (Q-P2; `patients.md:84`): the shared upload zone —
+ * "Take or drop photos", "JPG or PNG · up to 10 MB each" — taking images only,
+ * by click (a phone offers its camera) or drop. The drawer files them after
+ * the save, through the upload tray, which skips a file over the limit with
+ * its own toast.
  */
 export function PatientPhotosField({
   id,
@@ -90,77 +90,20 @@ export function PatientPhotosField({
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { t: tTray } = useTranslation(UPLOAD_TRAY_NS);
   const { formatNumber } = useLocaleFormat();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const add = (list: FileList | null) => {
-    const images = Array.from(list ?? []).filter((file) =>
-      file.type.startsWith('image/'),
-    );
-    if (images.length > 0) {
-      onChange([...files, ...images.map((file) => ({ id: crypto.randomUUID(), file }))]);
-    }
-  };
-
   return (
-    <div className="flex flex-col gap-1.5">
-      <button
-        id={id}
-        type="button"
-        disabled={disabled}
-        data-testid={`${testId}-photos`}
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(event) => event.preventDefault()}
-        onDrop={(event) => {
-          event.preventDefault();
-          if (!disabled) add(event.dataTransfer.files);
-        }}
-        className="border-border-strong bg-canvas text-body text-muted-foreground-strong hover:border-muted-foreground hover:bg-muted flex h-24 flex-col items-center justify-center gap-1 rounded-xl border-[1.5px] border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
-      >
-        <span className="font-medium">{t(PATIENT_DRAWER_KEYS.fields.photosDrop)}</span>
-        <span className="text-caption text-muted-foreground">
-          {t(PATIENT_DRAWER_KEYS.fields.photosLimit, {
-            limit: formatFileSize(PHOTO_LIMIT_BYTES, { t: tTray, formatNumber }),
-          })}
-        </span>
-      </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        tabIndex={-1}
-        data-testid={`${testId}-photos-input`}
-        onChange={(event) => {
-          add(event.currentTarget.files);
-          event.currentTarget.value = '';
-        }}
-      />
-      {files.length > 0 ? (
-        <ul className="flex flex-wrap gap-1.5">
-          {files.map(({ id: photoId, file }) => (
-            <li
-              key={photoId}
-              data-slot="pill"
-              className="bg-muted text-muted-foreground-strong inline-flex h-6 max-w-full min-w-0 items-center gap-1 rounded-full ps-2.5 pe-1 text-xs font-medium tabular-nums"
-            >
-              <span className="min-w-0 truncate">{file.name}</span>
-              <button
-                type="button"
-                disabled={disabled}
-                aria-label={t(PATIENT_DRAWER_KEYS.fields.photosRemove, {
-                  name: file.name,
-                })}
-                onClick={() => onChange(files.filter((photo) => photo.id !== photoId))}
-                data-slot="pill"
-                className="hover:bg-muted-strong flex size-4.5 shrink-0 items-center justify-center rounded-full"
-              >
-                <X aria-hidden="true" className="size-3" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </div>
+    <DrawerFilesField
+      id={id}
+      files={files}
+      onChange={onChange}
+      accept="image/*"
+      takes={(file) => file.type.startsWith('image/')}
+      title={t(PATIENT_DRAWER_KEYS.fields.photosDrop)}
+      hint={t(PATIENT_DRAWER_KEYS.fields.photosLimit, {
+        limit: formatFileSize(PHOTO_LIMIT_BYTES, { t: tTray, formatNumber }),
+      })}
+      removeLabel={(name) => t(PATIENT_DRAWER_KEYS.fields.photosRemove, { name })}
+      disabled={disabled}
+      testId={`${testId}-photos`}
+    />
   );
 }

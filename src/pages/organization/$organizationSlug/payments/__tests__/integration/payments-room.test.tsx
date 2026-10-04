@@ -182,14 +182,33 @@ describe('the Payments ledger (KICKOFF §6.9)', () => {
     await waitFor(() => expect(rows()).toHaveLength(16));
     await user.click(screen.getByTestId('payments-receive'));
     await waitFor(() => expect(router.state.location.pathname).toBe(`${LEDGER}/receive`));
-    await router.navigate({ to: LEDGER });
+    expect(await screen.findByTestId('receive-drawer')).toHaveTextContent(
+      'Receive payment',
+    );
+    await user.click(screen.getByTestId('receive-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(LEDGER));
     await user.click(screen.getByTestId('payments-pay'));
     await waitFor(() => expect(router.state.location.pathname).toBe(`${LEDGER}/pay`));
+    expect(await screen.findByTestId('pay-drawer')).toHaveTextContent('Send payment');
     await router.navigate({ to: LEDGER });
     await user.click(screen.getByTestId('payments-day-close'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${LEDGER}/day-close`),
     );
+  });
+
+  it('opens an open day’s receipt in Receive and its expense in Send, each as an edit', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPaymentsRoutes(LEDGER);
+    await waitFor(() => expect(rows()).toHaveLength(16));
+    await user.click(within(rowOf('PAY-5512')).getByText('Rhea Shah'));
+    const receive = await screen.findByTestId('receive-drawer');
+    expect(within(receive).getByText('Edit payment in')).toBeInTheDocument();
+    await user.click(screen.getByTestId('receive-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(LEDGER));
+    await user.click(within(rowOf('PAY-310')).getByText('Tea & snacks'));
+    const send = await screen.findByTestId('pay-drawer');
+    expect(within(send).getByText('Edit payment out')).toBeInTheDocument();
   });
 
   it('lists only the reviewed day while Day close is open', async () => {

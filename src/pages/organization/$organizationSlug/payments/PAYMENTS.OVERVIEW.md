@@ -51,15 +51,30 @@ over the ledger:
 
 - `receive/` — Receive payment, prefilled from `?patient=&invoice=`; `from` keeps the room
   it came from behind it and is where it closes to (A-P1, `safeReferrer`).
-- `pay/` — Send payment, on `?bill=md:<poId>|is:<purchaseId>`.
-- `$paymentId/edit/` — the entry's drawer while its day is open; a closed day's entry goes
-  back to the ledger with "PAY-5509 · Day closed", an unknown one with "Payment not found ·
-  it may have been deleted" (`S:115`).
+- `pay/` — Send payment, on `?bill=md:<poId>` or `?bill=is:<purchaseId>`.
+- `$paymentId/edit/` — the entry's drawer while its day is open: a receipt in Receive, money
+  out in Send. A closed day's entry goes back to the ledger with "PAY-5509 · Day closed", a
+  pending credit's ("PAY-5601 · From CR-2", it is the credit's), an unknown one with
+  "Payment not found · it may have been deleted" (`S:115`).
 - `day-close/` — Day close on `?date=` (default today) and `?branch=`.
 
 A member without Create who follows a Receive or Pay link lands back on the ledger with
-the permission toast. The drawers land with their rows — Receive and Send payment
-(L-39b), the pending drawers (L-39c), Day close (L-41); until then the routes open nothing.
+the permission toast.
+
+**Receive payment** (`components/ReceivePaymentDrawer/`, L-39b) — 560px, one section, "Who
+is paying": Branch (two or more open branches) · Patient (the shared `PatientPicker`; leads
+shown, never taken) · Against invoice (the open ones; picking a patient takes the oldest
+and its due) · the Mode · Amount rows (compact `ItemsField`, "+ Split · add a mode") ·
+Reference · Note; Quick fill Full / Half / Cash + UPI once an invoice is picked. Save checks
+a patient, then an amount, then at most the invoice's due. An edit keeps the entry's
+patient and invoice and logs a change of the amount or the modes.
+
+**Send payment** (`components/SendPaymentDrawer/`, L-39b) — 680px in steps: "Pay against a
+bill" (new, while bills are open; the bill picker and "Pending longest") · "Expense"
+(Category, Paid to, Note) · "Payment" (Amount, Date — never ahead, fixed on an edit — Mode,
+the bill photo through the upload tray). Quick fill and "Add & another" on a new payment;
+Delete on an edit. A day closed while either drawer is open turns it view only. The pending
+drawers land with L-39c, Day close with L-41; until then those routes open nothing.
 
 The data is the shared money domain: `@/shared/api/clinic/payments-api.ts`,
 `@/shared/api/clinic/credits-api.ts` and `@/shared/api/clinic/day-close-api.ts` (fixture
@@ -79,6 +94,8 @@ world, `REPLACE_WITH_API`), their contracts beside them, and the hooks in
 | `shared/components/PaymentsToolbar/`                 | Family-shared: the room toolbar both tabs mount — h1, the tab links, search, Filters, Columns, Day close and the tab's create actions.                                             |
 | `components/LedgerCells/`                            | The cells and their wording (`components/LedgerCells/ledger-cells.ts`): Ref, What, When with the edit line, From / to with its sub line, Mode, the signed Amount, By.              |
 | `components/PaymentDeleteConfirm/`                   | Delete an entry: the reason confirm, the invoice sentence, the optimistic delete and its Undo.                                                                                     |
+| `components/ReceivePaymentDrawer/`                   | Receive payment / Edit payment in: the form's rules (`components/ReceivePaymentDrawer/receive-form.ts`), the fields, the save.                                                     |
+| `components/SendPaymentDrawer/`                      | Send payment / Edit payment out: the form's rules (`components/SendPaymentDrawer/send-form.ts`), the three steps' fields, the save and the photos.                                 |
 | `hooks/useLedgerTable/`                              | The columns (tracks, folds, the meta line and key column by tier), hidden columns, the row tone.                                                                                   |
 | `hooks/usePaymentsDialogRoute/`                      | Which dialog the URL opens, the closed-day and permission refusals, and the close back to the referrer or the ledger.                                                              |
 | `__tests__/integration/`                             | The ledger and Pending end to end; `__tests__/integration/payments-test-router.tsx` mirrors the family's routes for the tests.                                                     |

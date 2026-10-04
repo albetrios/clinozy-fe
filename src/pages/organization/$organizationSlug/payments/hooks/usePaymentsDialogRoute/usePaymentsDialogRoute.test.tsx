@@ -3,9 +3,13 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { settleCredit } from '@/shared/api/clinic/credits-api.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 
 import {
   renderPaymentsRoutes,
@@ -113,6 +117,19 @@ describe('usePaymentsDialogRoute (KICKOFF §4, D24)', () => {
     expect(router.state.location.search).toEqual({ direction: 'paid' });
     expect(notifyMock.info).toHaveBeenCalledWith('PAY-305 · Day closed');
     expect(read()).toEqual({ kind: 'none' });
+  });
+
+  it('sends a pending credit’s entry back, named as the credit’s', async () => {
+    const { paymentSeq } = await settleCredit(ref.pendingCredit(2), {
+      action: 'give_back',
+      splits: [{ mode: 'cash', amount: 50_000 }],
+    });
+    const settled = clinicFixtures.payments.snapshot((row) => row.seq === paymentSeq)[0];
+    const { router } = renderPaymentsRoutes(`${LEDGER}/${settled?.id ?? ''}/edit`, {
+      ledger: Probe,
+    });
+    await waitFor(() => expect(router.state.location.pathname).toBe(LEDGER));
+    expect(notifyMock.info).toHaveBeenCalledWith(`PAY-${paymentSeq} · From CR-2`);
   });
 
   it('sends an unknown entry back with "Payment not found" (S:115)', async () => {

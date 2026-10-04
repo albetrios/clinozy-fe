@@ -62,6 +62,12 @@ export interface ItemsFieldProps<
    * `newRow()` instead (Invoice and Rx keep one row, H:4807, H:5059).
    */
   minRows?: number;
+  /**
+   * What the × on a kept row clears it to, when that is not a new row:
+   * Receive's last Mode · Amount row goes back to UPI while "+ Split" adds the
+   * next mode unused (H:5070).
+   */
+  clearRow?: () => FieldArray<TForm, TName>;
   /** False drops the × column (a sale return's rows). */
   removable?: boolean;
   /** The footer's figure at the inline end, 13px/600: a `MoneyCell`, "8 in stock". */
@@ -437,9 +443,10 @@ export function ItemsField<
     ...(removable ? [REMOVE_TRACK] : []),
   ].join(' ');
 
+  const blankRow = props.clearRow ?? newRow;
   const removeRow = (index: number) => {
     focusAfterRemove(index);
-    if (fields.length <= minRows && newRow) update(index, newRow());
+    if (fields.length <= minRows && blankRow) update(index, blankRow());
     else remove(index);
   };
 

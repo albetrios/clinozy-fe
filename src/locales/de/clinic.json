@@ -1176,5 +1176,13 @@
     "utilities": "Nebenkosten",
     "maintenance": "Wartung",
     "misc": "Sonstiges"
+  },
+  "patientPicker": {
+    "label": "Patient",
+    "placeholder": "Patienten suchen",
+    "hint": "nur Patienten wählbar",
+    "due": "{{amount}} offen",
+    "nothingDue": "Nichts offen",
+    "lead": "Lead {{id}} · noch kein Patient"
   }
 }

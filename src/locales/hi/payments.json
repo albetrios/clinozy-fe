@@ -73,7 +73,8 @@
     },
     "dayClosed": "{{ref}} · दिन बंद",
     "dayClosedEdited_one": "{{ref}} · दिन बंद · {{count}}× बदला गया",
-    "dayClosedEdited_other": "{{ref}} · दिन बंद · {{count}}× बदला गया"
+    "dayClosedEdited_other": "{{ref}} · दिन बंद · {{count}}× बदला गया",
+    "creditEntry": "{{ref}} · {{credit}} से"
   },
   "rowActions": {
     "edit": "संपादित करें",
@@ -107,7 +108,8 @@
   },
   "dialog": {
     "record": "भुगतान",
-    "credit": "बाकी"
+    "credit": "बाकी",
+    "dayClosed": "दिन बंद · अब सहेजा नहीं जा सकता"
   },
   "pending": {
     "records": "बाकी प्रविष्टियाँ",
@@ -146,5 +148,102 @@
       "loan_to_staff": "स्टाफ़ को उधार",
       "other": "अन्य"
     }
+  },
+  "receive": {
+    "title": "भुगतान प्राप्त करें",
+    "titleEdit": "आया भुगतान बदलें",
+    "sub": "रसीद मरीज़ को WhatsApp पर जाती है",
+    "subEdit": "दिन बंद होने तक खुला · हर बदलाव दर्ज होता है",
+    "section": "कौन भुगतान कर रहा है",
+    "branch": "शाखा",
+    "invoice": "इनवॉइस के बदले",
+    "invoiceOpen_one": "{{count}} खुला",
+    "invoiceOpen_other": "{{count}} खुले",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "पहले मरीज़ चुनें",
+    "nothingDue": "कोई बकाया नहीं",
+    "amount": "प्राप्त राशि",
+    "mode": "माध्यम",
+    "amountColumn": "राशि",
+    "split": "बाँटें · माध्यम जोड़ें",
+    "total": "कुल {{total}}",
+    "totalDue": "कुल {{total}} · बकाया {{due}}",
+    "reference": "रेफ़रेंस",
+    "referenceHint": "UPI रेफ़ / कार्ड के आख़िरी 4",
+    "referencePlaceholder": "जैसे 4321",
+    "note": "नोट",
+    "notePlaceholder": "वैकल्पिक",
+    "quickFill": {
+      "full": "पूरा · {{amount}}",
+      "half": "आधा · {{amount}}",
+      "cashUpi": "नकद + UPI"
+    },
+    "save": "{{amount}} दर्ज करें",
+    "saveEdit": "{{amount}} सहेजें",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{name}} से {{amount}} प्राप्त",
+    "updated": "{{ref}} अपडेट · बदलाव दर्ज",
+    "enterAmount": "राशि दर्ज करें",
+    "pickPatient": "मरीज़ चुनें",
+    "aboveDue": "{{due}} बकाया से ज़्यादा"
+  },
+  "send": {
+    "title": "भुगतान भेजें",
+    "titleEdit": "गया भुगतान बदलें",
+    "sub": "क्लिनिक का ख़र्च · दिन बंद करने में दिखता है",
+    "steps": {
+      "bill": "बिल के बदले भुगतान",
+      "expense": "ख़र्च",
+      "payment": "भुगतान"
+    },
+    "bill": "सप्लायर का बिल",
+    "billHint_one": "{{count}} खुला · PO #, सप्लायर या बिल नं. खोजें",
+    "billHint_other": "{{count}} खुले · PO #, सप्लायर या बिल नं. खोजें",
+    "billPlaceholder": "PO #, सप्लायर या बिल नं. खोजें",
+    "otherSpend": "अन्य ख़र्च",
+    "otherSpendSub": "किसी PO के बदले नहीं",
+    "groups": {
+      "other": "अन्य",
+      "medical": "मेडिकल परचेज़ ऑर्डर",
+      "stock": "क्लिनिक स्टॉक परचेज़ ऑर्डर"
+    },
+    "billLabel": {
+      "medical": "मेडिकल PO #{{seq}} · {{supplier}}",
+      "stock": "स्टॉक PO #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "मेडिकल PO #{{seq}}",
+      "stock": "स्टॉक PO #{{seq}}"
+    },
+    "billNo": "बिल {{bill}}",
+    "daysPending_one": "{{count}} दिन से बाकी",
+    "daysPending_other": "{{count}} दिनों से बाकी",
+    "pendingToday": "आज",
+    "oldest": "सबसे पुराने बाकी",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "श्रेणी",
+    "paidTo": "किसे दिया",
+    "paidToPlaceholder": "विक्रेता या व्यक्ति",
+    "note": "नोट",
+    "notePlaceholder": "क्या ख़रीदा गया",
+    "amount": "राशि",
+    "date": "तारीख़",
+    "mode": "माध्यम",
+    "files": "बिल / रसीद",
+    "filesDrop": "बिल की फ़ोटो छोड़ें या चुनें",
+    "filesHint": "वैकल्पिक · JPG, PNG या PDF",
+    "filesRemove": "{{name}} हटाएँ",
+    "electricity": "बिजली",
+    "presets": {
+      "tea": "चाय और नाश्ता",
+      "courier": "कूरियर"
+    },
+    "save": "ख़र्च जोड़ें",
+    "saveEdit": "बदलाव सहेजें",
+    "another": "जोड़ें और एक और",
+    "added": "ख़र्च {{ref}} जोड़ा गया",
+    "paidBill": "{{bill}} के बदले {{amount}} दिए गए",
+    "saved": "{{ref}} सहेजा गया · बदलाव दर्ज",
+    "missing": "किसे दिया और कितना, यह जोड़ें"
   }
 }

@@ -83,6 +83,8 @@ export const PAYMENTS_KEYS = {
     /** A closed day's row click: "PAY-5509 · Day closed" (+ " · edited 2×"). */
     dayClosed: 'ledger.dayClosed',
     dayClosedEdited: 'ledger.dayClosedEdited',
+    /** A settled credit's entry: "PAY-5601 · From CR-2" — it is the credit's (H:5105). */
+    creditEntry: 'ledger.creditEntry',
   },
   rowActions: {
     edit: 'rowActions.edit',
@@ -117,7 +119,114 @@ export const PAYMENTS_KEYS = {
     removedInvoice: 'deleteEntry.removedInvoice',
   },
   /** A dialog route's record, as "<Record> not found · it may have been deleted" names it (`S:115`). */
-  dialog: { record: 'dialog.record', credit: 'dialog.credit' },
+  dialog: {
+    record: 'dialog.record',
+    credit: 'dialog.credit',
+    /** A save the closed day refused: the drawer turns read-only (`S:1708–1710`). */
+    dayClosed: 'dialog.dayClosed',
+  },
+  /** Receive payment (`payments.md:95–110, 198–210`). */
+  receive: {
+    title: 'receive.title',
+    titleEdit: 'receive.titleEdit',
+    sub: 'receive.sub',
+    subEdit: 'receive.subEdit',
+    /** The one section: "Who is paying". */
+    section: 'receive.section',
+    branch: 'receive.branch',
+    invoice: 'receive.invoice',
+    /** "2 open" — the invoice field's hint while more than one is open (plural). */
+    invoiceOpen: 'receive.invoiceOpen',
+    /** "#784 · ₹8,550". */
+    invoiceChip: 'receive.invoiceChip',
+    pickPatientFirst: 'receive.pickPatientFirst',
+    nothingDue: 'receive.nothingDue',
+    amount: 'receive.amount',
+    mode: 'receive.mode',
+    amountColumn: 'receive.amountColumn',
+    /** "Split · add a mode" — the field draws the "+". */
+    split: 'receive.split',
+    /** "Total ₹8,550" / "Total ₹8,550 · due ₹8,550". */
+    total: 'receive.total',
+    totalDue: 'receive.totalDue',
+    reference: 'receive.reference',
+    referenceHint: 'receive.referenceHint',
+    referencePlaceholder: 'receive.referencePlaceholder',
+    note: 'receive.note',
+    notePlaceholder: 'receive.notePlaceholder',
+    quickFill: {
+      full: 'receive.quickFill.full',
+      half: 'receive.quickFill.half',
+      cashUpi: 'receive.quickFill.cashUpi',
+    },
+    /** "Record ₹8,550" / "Save ₹600". */
+    save: 'receive.save',
+    saveEdit: 'receive.saveEdit',
+    /** "UPI · ₹8,550". */
+    summary: 'receive.summary',
+    received: 'receive.received',
+    updated: 'receive.updated',
+    enterAmount: 'receive.enterAmount',
+    pickPatient: 'receive.pickPatient',
+    /** "More than the ₹8,550 due" (AMBER copy, KICKOFF §6.9). */
+    aboveDue: 'receive.aboveDue',
+  },
+  /** Send payment (`payments.md:112–130, 212–224`). */
+  send: {
+    title: 'send.title',
+    titleEdit: 'send.titleEdit',
+    sub: 'send.sub',
+    steps: {
+      bill: 'send.steps.bill',
+      expense: 'send.steps.expense',
+      payment: 'send.steps.payment',
+    },
+    bill: 'send.bill',
+    /** "3 open · search PO #, supplier or bill no" (plural). */
+    billHint: 'send.billHint',
+    billPlaceholder: 'send.billPlaceholder',
+    otherSpend: 'send.otherSpend',
+    otherSpendSub: 'send.otherSpendSub',
+    groups: {
+      other: 'send.groups.other',
+      medical: 'send.groups.medical',
+      stock: 'send.groups.stock',
+    },
+    /** "Medical PO #431 · Shree Ramdev Medical Agency" / "Stock PO #15 · Cranix Pharma". */
+    billLabel: { medical: 'send.billLabel.medical', stock: 'send.billLabel.stock' },
+    /** "Medical PO #431" / "Stock PO #15" — the paid toast's bill. */
+    billRef: { medical: 'send.billRef.medical', stock: 'send.billRef.stock' },
+    /** "Bill 1631" — before the age on a bill's sub line ("Bill 1631 · 8 days pending"). */
+    billNo: 'send.billNo',
+    /** "8 days pending" (plural) / "Today". */
+    daysPending: 'send.daysPending',
+    pendingToday: 'send.pendingToday',
+    oldest: 'send.oldest',
+    /** "#15 · Cranix · ₹1,710 · 12 days pending". */
+    oldestChip: 'send.oldestChip',
+    category: 'send.category',
+    paidTo: 'send.paidTo',
+    paidToPlaceholder: 'send.paidToPlaceholder',
+    note: 'send.note',
+    notePlaceholder: 'send.notePlaceholder',
+    amount: 'send.amount',
+    date: 'send.date',
+    mode: 'send.mode',
+    files: 'send.files',
+    filesDrop: 'send.filesDrop',
+    filesHint: 'send.filesHint',
+    filesRemove: 'send.filesRemove',
+    /** The quick "Paid to" chip that is a word, not a name: "Electricity". */
+    electricity: 'send.electricity',
+    presets: { tea: 'send.presets.tea', courier: 'send.presets.courier' },
+    save: 'send.save',
+    saveEdit: 'send.saveEdit',
+    another: 'send.another',
+    added: 'send.added',
+    paidBill: 'send.paidBill',
+    saved: 'send.saved',
+    missing: 'send.missing',
+  },
   pending: {
     /** "All pending loaded". */
     records: 'pending.records',

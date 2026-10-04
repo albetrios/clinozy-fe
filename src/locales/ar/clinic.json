@@ -1244,5 +1244,13 @@
     "utilities": "مرافق",
     "maintenance": "صيانة",
     "misc": "متفرقات"
+  },
+  "patientPicker": {
+    "label": "المريض",
+    "placeholder": "ابحث عن المرضى",
+    "hint": "يمكن اختيار المرضى فقط",
+    "due": "مستحق {{amount}}",
+    "nothingDue": "لا مستحقات",
+    "lead": "عميل محتمل {{id}} · ليس مريضًا بعد"
   }
 }

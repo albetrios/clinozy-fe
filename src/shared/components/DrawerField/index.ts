@@ -23,6 +23,11 @@ export {
   layoutDrawerFields,
 } from './drawer-field-layout.ts';
 export {
+  DrawerFilesField,
+  type DrawerFilesFieldProps,
+  type PickedFile,
+} from './drawer-files-field.tsx';
+export {
   DrawerNumberInput,
   type DrawerNumberInputProps,
   DrawerQuickChips,

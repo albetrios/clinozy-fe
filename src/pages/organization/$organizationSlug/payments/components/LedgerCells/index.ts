@@ -1,5 +1,6 @@
 export {
   editSideLabel,
+  ledgerEntryLock,
   ledgerModes,
   ledgerModesLabel,
   ledgerSubLine,

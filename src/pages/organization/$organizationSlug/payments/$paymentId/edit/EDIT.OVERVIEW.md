@@ -1,7 +1,7 @@
 # `pages/organization/$organizationSlug/payments/$paymentId/edit` — Edit payment
 
 Route: `/organization/$organizationSlug/payments/$paymentId/edit` (`S:87`) — a URL-driven dialog over the Payments ledger (KICKOFF §4, D24).
-The route renders nothing: the Payments ledger reads the URL and opens the entry's drawer over itself — Receive payment for money in, Send payment (`pay-drawer`) for money out — only while its day is open: a closed day sends the URL back to the ledger with "PAY-5509 · Day closed". An unknown or deleted id opens nothing: the URL goes back to `/payments`, the ledger's filters kept, with "Payment not found · it may have been deleted" (`S:115`).
+The route renders nothing: the Payments ledger reads the URL and opens the entry's drawer over itself — Receive payment for money in, Send payment (`pay-drawer`) for money out — only while its day is open: a closed day sends the URL back to the ledger with "PAY-5509 · Day closed", and an entry a pending credit settled with "PAY-5601 · From CR-2" — it is the credit's. An unknown or deleted id opens nothing: the URL goes back to `/payments`, the ledger's filters kept, with "Payment not found · it may have been deleted" (`S:115`).
 Gated like the room — membership (`organization:read`) and the `clinic-payments` module, then
 `requireOrgStatus`; in-room access is `useClinicAccess`.
 

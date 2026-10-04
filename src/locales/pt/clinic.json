@@ -1193,5 +1193,13 @@
     "utilities": "Contas de consumo",
     "maintenance": "Manutenção",
     "misc": "Diversos"
+  },
+  "patientPicker": {
+    "label": "Paciente",
+    "placeholder": "Buscar pacientes",
+    "hint": "só é possível escolher pacientes",
+    "due": "{{amount}} em aberto",
+    "nothingDue": "Nada em aberto",
+    "lead": "Lead {{id}} · ainda não é paciente"
   }
 }

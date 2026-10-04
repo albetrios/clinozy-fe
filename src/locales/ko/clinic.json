@@ -1159,5 +1159,13 @@
     "utilities": "공과금",
     "maintenance": "유지보수",
     "misc": "기타"
+  },
+  "patientPicker": {
+    "label": "환자",
+    "placeholder": "환자 검색",
+    "hint": "환자만 선택할 수 있음",
+    "due": "미수 {{amount}}",
+    "nothingDue": "미수 없음",
+    "lead": "리드 {{id}} · 아직 환자 아님"
   }
 }

@@ -62,6 +62,7 @@ const fixtureStaff = () => import('./fixtures/staff.fixtures.ts');
 type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
 
 const DAY_CLOSED = 'Day closed';
+const FROM_CREDIT = 'From';
 const MORE_THAN_DUE = 'More than what is due';
 
 // ── Joins (the fixture server's) ──
@@ -274,6 +275,12 @@ function purchaseOrderBill(order: MedicalPurchaseOrder): number {
   return order.items.reduce((sum, item) => sum + item.qty * item.rate, 0);
 }
 
+/** On the same day a Medical PO comes before a Clinic stock purchase, as the picker groups them. */
+const BILL_KIND_ORDER: Readonly<Record<OpenSupplierBill['kind'], number>> = {
+  medical_po: 0,
+  stock_po: 1,
+};
+
 /**
  * The supplier bills with a balance (`listOpenSupplierBills`, `S:1701`;
  * REPLACE_WITH_API): received Medical POs and Clinic stock purchases, oldest
@@ -314,7 +321,12 @@ export async function listOpenSupplierBills(): Promise<OpenSupplierBill[]> {
     }));
   return [...medical, ...stock]
     .filter((bill) => bill.due > 0)
-    .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq);
+    .sort(
+      (a, b) =>
+        compareText(a.date, b.date) ||
+        BILL_KIND_ORDER[a.kind] - BILL_KIND_ORDER[b.kind] ||
+        a.seq - b.seq,
+    );
 }
 
 // ── Writes ──
@@ -485,11 +497,25 @@ export async function payExpense(input: PayExpenseInput): Promise<LedgerRow> {
   return toLedgerRow(payment, await ledgerContext(clinicFixtures));
 }
 
-/** Refuse a change to an entry whose day is closed: "PAY-5509 · Day closed" (409). */
+/**
+ * Refuse a change to an entry a pending credit settled — it is the credit's
+ * now, "PAY-5601 · From CR-2" (409; H:5105) — or whose day is closed:
+ * "PAY-5509 · Day closed" (409).
+ */
 async function assertEntryOpen(payment: PaymentRecord): Promise<void> {
   await runDayCloseJob();
   const { clinicFixtures } = await fixtureWorld();
   const current = await clinicFixtures.payments.get(payment.id);
+  if (current.pendingCreditId !== null) {
+    const credit = await clinicFixtures.pendingCredits.get(current.pendingCreditId, {
+      includeDeleted: true,
+    });
+    throw clinicHttpError(
+      409,
+      'conflict',
+      `${displayId.payment(payment.seq)} · ${FROM_CREDIT} ${displayId.pendingCredit(credit.seq)}`,
+    );
+  }
   if (current.dayCloseId !== null) {
     throw clinicHttpError(
       409,
@@ -611,6 +637,27 @@ export async function updatePayment(id: string, patch: PaymentPatch): Promise<Le
     edits: editsAfter(saved, next, FIXTURE_VIEWER_ID),
   });
   return toLedgerRow(payment, await ledgerContext(clinicFixtures));
+}
+
+/** What an uploaded bill photo files: the entry and the storage key the upload tray confirmed. */
+export interface PaymentFileInput {
+  paymentId: string;
+  key: string;
+}
+
+/**
+ * File an uploaded bill or receipt on its entry (`payExpense`'s attachments,
+ * plan-only — Appendix F; REPLACE_WITH_API): the key joins the entry's
+ * `attachmentKeys`. It files after the save, so the day's lock does not apply.
+ */
+export async function attachPaymentFile(input: PaymentFileInput): Promise<PaymentRecord> {
+  const { clinicFixtures } = await fixtureWorld();
+  const payment = await clinicFixtures.payments.get(input.paymentId);
+  return clinicFixtures.payments.update(
+    payment.id,
+    { attachmentKeys: [...payment.attachmentKeys, input.key] },
+    { stamp: false },
+  );
 }
 
 /**

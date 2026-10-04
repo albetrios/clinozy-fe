@@ -75,7 +75,8 @@
     "dayClosed": "{{ref}} · Journée clôturée",
     "dayClosedEdited_one": "{{ref}} · Journée clôturée · modifié {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Journée clôturée · modifié {{count}}×",
-    "dayClosedEdited_other": "{{ref}} · Journée clôturée · modifié {{count}}×"
+    "dayClosedEdited_other": "{{ref}} · Journée clôturée · modifié {{count}}×",
+    "creditEntry": "{{ref}} · Issu de {{credit}}"
   },
   "rowActions": {
     "edit": "Modifier",
@@ -110,7 +111,8 @@
   },
   "dialog": {
     "record": "Paiement",
-    "credit": "Élément en attente"
+    "credit": "Élément en attente",
+    "dayClosed": "Journée clôturée · impossible d’enregistrer"
   },
   "pending": {
     "records": "éléments en attente",
@@ -149,5 +151,105 @@
       "loan_to_staff": "Prêt au personnel",
       "other": "Autre"
     }
+  },
+  "receive": {
+    "title": "Encaisser un paiement",
+    "titleEdit": "Modifier l’encaissement",
+    "sub": "Le reçu part au patient par WhatsApp",
+    "subEdit": "Modifiable jusqu’à la clôture · chaque modification est tracée",
+    "section": "Qui paie",
+    "branch": "Site",
+    "invoice": "Sur la facture",
+    "invoiceOpen_one": "{{count}} ouverte",
+    "invoiceOpen_many": "{{count}} ouvertes",
+    "invoiceOpen_other": "{{count}} ouvertes",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Choisissez d’abord le patient",
+    "nothingDue": "Rien de dû",
+    "amount": "Montant reçu",
+    "mode": "Mode",
+    "amountColumn": "Montant",
+    "split": "Fractionner · ajouter un mode",
+    "total": "Total {{total}}",
+    "totalDue": "Total {{total}} · dû {{due}}",
+    "reference": "Référence",
+    "referenceHint": "Réf. UPI / 4 derniers chiffres",
+    "referencePlaceholder": "ex. 4321",
+    "note": "Note",
+    "notePlaceholder": "Facultatif",
+    "quickFill": {
+      "full": "Total · {{amount}}",
+      "half": "Moitié · {{amount}}",
+      "cashUpi": "Espèces + UPI"
+    },
+    "save": "Enregistrer {{amount}}",
+    "saveEdit": "Enregistrer {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} reçus de {{name}}",
+    "updated": "{{ref}} mis à jour · modification tracée",
+    "enterAmount": "Saisissez un montant",
+    "pickPatient": "Choisissez un patient",
+    "aboveDue": "Plus que les {{due}} dus"
+  },
+  "send": {
+    "title": "Envoyer un paiement",
+    "titleEdit": "Modifier la dépense",
+    "sub": "Dépense de la clinique · visible à la clôture",
+    "steps": {
+      "bill": "Payer une facture",
+      "expense": "Dépense",
+      "payment": "Paiement"
+    },
+    "bill": "Facture fournisseur",
+    "billHint_one": "{{count}} ouverte · cherchez n° de BC, fournisseur ou facture",
+    "billHint_many": "{{count}} ouvertes · cherchez n° de BC, fournisseur ou facture",
+    "billHint_other": "{{count}} ouvertes · cherchez n° de BC, fournisseur ou facture",
+    "billPlaceholder": "Cherchez n° de BC, fournisseur ou facture",
+    "otherSpend": "Autre dépense",
+    "otherSpendSub": "Hors bon de commande",
+    "groups": {
+      "other": "Autre",
+      "medical": "Bons de commande médicaux",
+      "stock": "Bons de commande du stock"
+    },
+    "billLabel": {
+      "medical": "BC médical n° {{seq}} · {{supplier}}",
+      "stock": "BC stock n° {{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "BC médical n° {{seq}}",
+      "stock": "BC stock n° {{seq}}"
+    },
+    "billNo": "Facture {{bill}}",
+    "daysPending_one": "en attente depuis {{count}} jour",
+    "daysPending_many": "en attente depuis {{count}} jours",
+    "daysPending_other": "en attente depuis {{count}} jours",
+    "pendingToday": "Aujourd’hui",
+    "oldest": "En attente depuis le plus longtemps",
+    "oldestChip": "n° {{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Catégorie",
+    "paidTo": "Payé à",
+    "paidToPlaceholder": "Fournisseur ou personne",
+    "note": "Note",
+    "notePlaceholder": "Ce qui a été acheté",
+    "amount": "Montant",
+    "date": "Date",
+    "mode": "Mode",
+    "files": "Facture / reçu",
+    "filesDrop": "Déposez la photo de la facture ou parcourez",
+    "filesHint": "Facultatif · JPG, PNG ou PDF",
+    "filesRemove": "Retirer {{name}}",
+    "electricity": "Électricité",
+    "presets": {
+      "tea": "Thé et en-cas",
+      "courier": "Coursier"
+    },
+    "save": "Ajouter la dépense",
+    "saveEdit": "Enregistrer",
+    "another": "Ajouter et continuer",
+    "added": "Dépense {{ref}} ajoutée",
+    "paidBill": "{{amount}} payés sur {{bill}}",
+    "saved": "{{ref}} enregistré · modification tracée",
+    "missing": "Indiquez qui a été payé et le montant"
   }
 }

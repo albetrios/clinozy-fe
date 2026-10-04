@@ -75,7 +75,8 @@
     "dayClosed": "{{ref}} · Dia fechado",
     "dayClosedEdited_one": "{{ref}} · Dia fechado · editado {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Dia fechado · editado {{count}}×",
-    "dayClosedEdited_other": "{{ref}} · Dia fechado · editado {{count}}×"
+    "dayClosedEdited_other": "{{ref}} · Dia fechado · editado {{count}}×",
+    "creditEntry": "{{ref}} · De {{credit}}"
   },
   "rowActions": {
     "edit": "Editar",
@@ -110,7 +111,8 @@
   },
   "dialog": {
     "record": "Pagamento",
-    "credit": "Pendente"
+    "credit": "Pendente",
+    "dayClosed": "Dia fechado · não é mais possível salvar"
   },
   "pending": {
     "records": "pendentes",
@@ -149,5 +151,105 @@
       "loan_to_staff": "Empréstimo à equipe",
       "other": "Outro"
     }
+  },
+  "receive": {
+    "title": "Receber pagamento",
+    "titleEdit": "Editar recebimento",
+    "sub": "O recibo vai para o paciente pelo WhatsApp",
+    "subEdit": "Aberto até o fechamento do dia · cada mudança é registrada",
+    "section": "Quem está pagando",
+    "branch": "Unidade",
+    "invoice": "Referente à fatura",
+    "invoiceOpen_one": "{{count}} em aberto",
+    "invoiceOpen_many": "{{count}} em aberto",
+    "invoiceOpen_other": "{{count}} em aberto",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Escolha o paciente primeiro",
+    "nothingDue": "Nada em aberto",
+    "amount": "Valor recebido",
+    "mode": "Forma",
+    "amountColumn": "Valor",
+    "split": "Dividir · adicionar forma",
+    "total": "Total {{total}}",
+    "totalDue": "Total {{total}} · em aberto {{due}}",
+    "reference": "Referência",
+    "referenceHint": "Ref. UPI / 4 últimos do cartão",
+    "referencePlaceholder": "ex.: 4321",
+    "note": "Observação",
+    "notePlaceholder": "Opcional",
+    "quickFill": {
+      "full": "Integral · {{amount}}",
+      "half": "Metade · {{amount}}",
+      "cashUpi": "Dinheiro + UPI"
+    },
+    "save": "Registrar {{amount}}",
+    "saveEdit": "Salvar {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} recebidos de {{name}}",
+    "updated": "{{ref}} atualizado · mudança registrada",
+    "enterAmount": "Informe um valor",
+    "pickPatient": "Escolha um paciente",
+    "aboveDue": "Mais que os {{due}} em aberto"
+  },
+  "send": {
+    "title": "Registrar pagamento",
+    "titleEdit": "Editar pagamento",
+    "sub": "Gasto da clínica · aparece no fechamento",
+    "steps": {
+      "bill": "Pagar uma conta",
+      "expense": "Despesa",
+      "payment": "Pagamento"
+    },
+    "bill": "Conta do fornecedor",
+    "billHint_one": "{{count}} em aberto · busque pedido, fornecedor ou nº da nota",
+    "billHint_many": "{{count}} em aberto · busque pedido, fornecedor ou nº da nota",
+    "billHint_other": "{{count}} em aberto · busque pedido, fornecedor ou nº da nota",
+    "billPlaceholder": "Busque pedido, fornecedor ou nº da nota",
+    "otherSpend": "Outro gasto",
+    "otherSpendSub": "Sem pedido de compra",
+    "groups": {
+      "other": "Outro",
+      "medical": "Pedidos médicos",
+      "stock": "Pedidos de estoque"
+    },
+    "billLabel": {
+      "medical": "Pedido médico #{{seq}} · {{supplier}}",
+      "stock": "Pedido de estoque #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Pedido médico #{{seq}}",
+      "stock": "Pedido de estoque #{{seq}}"
+    },
+    "billNo": "Nota {{bill}}",
+    "daysPending_one": "{{count}} dia pendente",
+    "daysPending_many": "{{count}} dias pendente",
+    "daysPending_other": "{{count}} dias pendente",
+    "pendingToday": "Hoje",
+    "oldest": "Pendentes há mais tempo",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Categoria",
+    "paidTo": "Pago a",
+    "paidToPlaceholder": "Fornecedor ou pessoa",
+    "note": "Observação",
+    "notePlaceholder": "O que foi comprado",
+    "amount": "Valor",
+    "date": "Data",
+    "mode": "Forma",
+    "files": "Nota / recibo",
+    "filesDrop": "Solte a foto da nota ou procure",
+    "filesHint": "Opcional · JPG, PNG ou PDF",
+    "filesRemove": "Remover {{name}}",
+    "electricity": "Energia elétrica",
+    "presets": {
+      "tea": "Chá e lanches",
+      "courier": "Entregador"
+    },
+    "save": "Adicionar despesa",
+    "saveEdit": "Salvar alterações",
+    "another": "Adicionar e outro",
+    "added": "Despesa {{ref}} adicionada",
+    "paidBill": "{{amount}} pagos para {{bill}}",
+    "saved": "{{ref}} salvo · mudança registrada",
+    "missing": "Informe quem recebeu e o valor"
   }
 }

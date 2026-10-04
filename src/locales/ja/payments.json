@@ -71,7 +71,8 @@
       "fromCredit": "{{ref}} から"
     },
     "dayClosed": "{{ref}} · 日締め済み",
-    "dayClosedEdited_other": "{{ref}} · 日締め済み · {{count}}回編集"
+    "dayClosedEdited_other": "{{ref}} · 日締め済み · {{count}}回編集",
+    "creditEntry": "{{ref}} · {{credit}} から"
   },
   "rowActions": {
     "edit": "編集",
@@ -104,7 +105,8 @@
   },
   "dialog": {
     "record": "支払い",
-    "credit": "保留中の項目"
+    "credit": "保留中の項目",
+    "dayClosed": "日締め済み · 保存できません"
   },
   "pending": {
     "records": "保留中の項目",
@@ -143,5 +145,99 @@
       "loan_to_staff": "職員への貸付",
       "other": "その他"
     }
+  },
+  "receive": {
+    "title": "入金を受け取る",
+    "titleEdit": "入金を編集",
+    "sub": "領収書は WhatsApp で患者に送られます",
+    "subEdit": "日締めまで編集可 · 変更はすべて記録されます",
+    "section": "支払う人",
+    "branch": "店舗",
+    "invoice": "対象の請求書",
+    "invoiceOpen_other": "未払い {{count}} 件",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "先に患者を選んでください",
+    "nothingDue": "未払いなし",
+    "amount": "受取額",
+    "mode": "方法",
+    "amountColumn": "金額",
+    "split": "分割 · 方法を追加",
+    "total": "合計 {{total}}",
+    "totalDue": "合計 {{total}} · 未払い {{due}}",
+    "reference": "参照番号",
+    "referenceHint": "UPI 参照 / カード下4桁",
+    "referencePlaceholder": "例: 4321",
+    "note": "メモ",
+    "notePlaceholder": "任意",
+    "quickFill": {
+      "full": "全額 · {{amount}}",
+      "half": "半額 · {{amount}}",
+      "cashUpi": "現金 + UPI"
+    },
+    "save": "{{amount}} を記録",
+    "saveEdit": "{{amount}} を保存",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{name}} から {{amount}} を受け取りました",
+    "updated": "{{ref}} を更新 · 変更を記録しました",
+    "enterAmount": "金額を入力してください",
+    "pickPatient": "患者を選んでください",
+    "aboveDue": "未払い {{due}} を超えています"
+  },
+  "send": {
+    "title": "支払いを記録",
+    "titleEdit": "出金を編集",
+    "sub": "クリニックの支出 · 日締めに表示",
+    "steps": {
+      "bill": "請求書の支払い",
+      "expense": "支出",
+      "payment": "支払い"
+    },
+    "bill": "仕入先の請求",
+    "billHint_other": "未払い {{count}} 件 · 発注番号、仕入先、請求番号で検索",
+    "billPlaceholder": "発注番号、仕入先、請求番号で検索",
+    "otherSpend": "その他の支出",
+    "otherSpendSub": "発注書以外",
+    "groups": {
+      "other": "その他",
+      "medical": "薬局の発注",
+      "stock": "院内在庫の発注"
+    },
+    "billLabel": {
+      "medical": "薬局発注 #{{seq}} · {{supplier}}",
+      "stock": "在庫発注 #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "薬局発注 #{{seq}}",
+      "stock": "在庫発注 #{{seq}}"
+    },
+    "billNo": "請求 {{bill}}",
+    "daysPending_other": "{{count}} 日未払い",
+    "pendingToday": "今日",
+    "oldest": "最も長く未払い",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "カテゴリ",
+    "paidTo": "支払先",
+    "paidToPlaceholder": "業者または個人",
+    "note": "メモ",
+    "notePlaceholder": "購入したもの",
+    "amount": "金額",
+    "date": "日付",
+    "mode": "方法",
+    "files": "請求書 / 領収書",
+    "filesDrop": "請求書の写真をドロップまたは選択",
+    "filesHint": "任意 · JPG、PNG、PDF",
+    "filesRemove": "{{name}} を削除",
+    "electricity": "電気代",
+    "presets": {
+      "tea": "お茶と軽食",
+      "courier": "宅配便"
+    },
+    "save": "支出を追加",
+    "saveEdit": "変更を保存",
+    "another": "追加して続ける",
+    "added": "支出 {{ref}} を追加しました",
+    "paidBill": "{{bill}} に {{amount}} を支払いました",
+    "saved": "{{ref}} を保存 · 変更を記録しました",
+    "missing": "支払先と金額を入力してください"
   }
 }

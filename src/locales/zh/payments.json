@@ -71,7 +71,8 @@
       "fromCredit": "来自 {{ref}}"
     },
     "dayClosed": "{{ref}} · 当日已结",
-    "dayClosedEdited_other": "{{ref}} · 当日已结 · 已编辑 {{count}} 次"
+    "dayClosedEdited_other": "{{ref}} · 当日已结 · 已编辑 {{count}} 次",
+    "creditEntry": "{{ref}} · 来自 {{credit}}"
   },
   "rowActions": {
     "edit": "编辑",
@@ -104,7 +105,8 @@
   },
   "dialog": {
     "record": "付款",
-    "credit": "待处理项"
+    "credit": "待处理项",
+    "dayClosed": "当日已结账 · 无法保存"
   },
   "pending": {
     "records": "待处理项",
@@ -143,5 +145,99 @@
       "loan_to_staff": "借给员工",
       "other": "其他"
     }
+  },
+  "receive": {
+    "title": "收款",
+    "titleEdit": "编辑收款",
+    "sub": "收据会通过 WhatsApp 发给患者",
+    "subEdit": "结账前可修改 · 每次更改都会记录",
+    "section": "付款人",
+    "branch": "分店",
+    "invoice": "对应发票",
+    "invoiceOpen_other": "{{count}} 张未结",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "请先选择患者",
+    "nothingDue": "无欠款",
+    "amount": "收款金额",
+    "mode": "方式",
+    "amountColumn": "金额",
+    "split": "拆分 · 添加方式",
+    "total": "合计 {{total}}",
+    "totalDue": "合计 {{total}} · 欠款 {{due}}",
+    "reference": "参考号",
+    "referenceHint": "UPI 参考号 / 卡号后4位",
+    "referencePlaceholder": "例如 4321",
+    "note": "备注",
+    "notePlaceholder": "选填",
+    "quickFill": {
+      "full": "全额 · {{amount}}",
+      "half": "一半 · {{amount}}",
+      "cashUpi": "现金 + UPI"
+    },
+    "save": "记录 {{amount}}",
+    "saveEdit": "保存 {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "已向 {{name}} 收款 {{amount}}",
+    "updated": "{{ref}} 已更新 · 已记录更改",
+    "enterAmount": "请输入金额",
+    "pickPatient": "请选择患者",
+    "aboveDue": "超过欠款 {{due}}"
+  },
+  "send": {
+    "title": "付款",
+    "titleEdit": "编辑付款",
+    "sub": "诊所支出 · 显示在当日结账中",
+    "steps": {
+      "bill": "支付账单",
+      "expense": "支出",
+      "payment": "付款"
+    },
+    "bill": "供应商账单",
+    "billHint_other": "{{count}} 张未结 · 搜索采购单号、供应商或账单号",
+    "billPlaceholder": "搜索采购单号、供应商或账单号",
+    "otherSpend": "其他支出",
+    "otherSpendSub": "不对应采购单",
+    "groups": {
+      "other": "其他",
+      "medical": "药房采购单",
+      "stock": "诊所库存采购单"
+    },
+    "billLabel": {
+      "medical": "药房采购单 #{{seq}} · {{supplier}}",
+      "stock": "库存采购单 #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "药房采购单 #{{seq}}",
+      "stock": "库存采购单 #{{seq}}"
+    },
+    "billNo": "账单 {{bill}}",
+    "daysPending_other": "已待付 {{count}} 天",
+    "pendingToday": "今天",
+    "oldest": "待付最久",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "类别",
+    "paidTo": "收款方",
+    "paidToPlaceholder": "供应商或个人",
+    "note": "备注",
+    "notePlaceholder": "购买了什么",
+    "amount": "金额",
+    "date": "日期",
+    "mode": "方式",
+    "files": "账单 / 收据",
+    "filesDrop": "拖入账单照片或浏览",
+    "filesHint": "选填 · JPG、PNG 或 PDF",
+    "filesRemove": "移除 {{name}}",
+    "electricity": "电费",
+    "presets": {
+      "tea": "茶点",
+      "courier": "快递"
+    },
+    "save": "添加支出",
+    "saveEdit": "保存更改",
+    "another": "添加并继续",
+    "added": "已添加支出 {{ref}}",
+    "paidBill": "已为 {{bill}} 支付 {{amount}}",
+    "saved": "{{ref}} 已保存 · 已记录更改",
+    "missing": "请填写收款方和金额"
   }
 }

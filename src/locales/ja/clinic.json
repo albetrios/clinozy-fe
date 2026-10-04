@@ -1159,5 +1159,13 @@
     "utilities": "光熱費",
     "maintenance": "メンテナンス",
     "misc": "その他"
+  },
+  "patientPicker": {
+    "label": "患者",
+    "placeholder": "患者を検索",
+    "hint": "選べるのは患者のみ",
+    "due": "未払い {{amount}}",
+    "nothingDue": "未払いなし",
+    "lead": "リード {{id}} · まだ患者ではありません"
   }
 }

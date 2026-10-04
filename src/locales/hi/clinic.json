@@ -1176,5 +1176,13 @@
     "utilities": "बिजली-पानी",
     "maintenance": "रखरखाव",
     "misc": "विविध"
+  },
+  "patientPicker": {
+    "label": "मरीज़",
+    "placeholder": "मरीज़ खोजें",
+    "hint": "सिर्फ़ मरीज़ चुने जा सकते हैं",
+    "due": "{{amount}} बकाया",
+    "nothingDue": "कोई बकाया नहीं",
+    "lead": "लीड {{id}} · अभी मरीज़ नहीं"
   }
 }

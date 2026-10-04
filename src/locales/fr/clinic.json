@@ -1193,5 +1193,13 @@
     "utilities": "Charges",
     "maintenance": "Entretien",
     "misc": "Divers"
+  },
+  "patientPicker": {
+    "label": "Patient",
+    "placeholder": "Rechercher des patients",
+    "hint": "seuls les patients peuvent être choisis",
+    "due": "{{amount}} dû",
+    "nothingDue": "Rien de dû",
+    "lead": "Prospect {{id}} · pas encore patient"
   }
 }

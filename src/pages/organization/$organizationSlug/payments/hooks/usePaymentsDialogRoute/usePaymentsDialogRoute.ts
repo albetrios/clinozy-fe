@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPayments } from '@/lib/routes/index.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
@@ -12,6 +11,7 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { ledgerEntryLock } from '../../components/LedgerCells/index.ts';
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import {
   type DayCloseSearch,
@@ -78,7 +78,7 @@ function useLockedEntryRefusal(entry: LedgerRow | null, back: () => void) {
   useEffect(() => {
     if (!entry || refusedFor.current === entry.id) return;
     refusedFor.current = entry.id;
-    notify.info(t(PAYMENTS_KEYS.ledger.dayClosed, { ref: displayId.payment(entry.seq) }));
+    notify.info(ledgerEntryLock(entry, t) ?? '');
     back();
   }, [entry, back, t]);
 }
@@ -132,7 +132,8 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
     onMissing: backToLedger,
   });
 
-  const lockedEntry = entry.record?.locked ? entry.record : null;
+  const lockedEntry =
+    entry.record && ledgerEntryLock(entry.record, t) !== null ? entry.record : null;
   useLockedEntryRefusal(lockedEntry, backToLedger);
 
   const isReceive = RECEIVE_PATH.test(pathname);

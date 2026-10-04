@@ -1159,5 +1159,13 @@
     "utilities": "水电费",
     "maintenance": "维修保养",
     "misc": "杂项"
+  },
+  "patientPicker": {
+    "label": "患者",
+    "placeholder": "搜索患者",
+    "hint": "只能选择患者",
+    "due": "欠款 {{amount}}",
+    "nothingDue": "无欠款",
+    "lead": "线索 {{id}} · 还不是患者"
   }
 }

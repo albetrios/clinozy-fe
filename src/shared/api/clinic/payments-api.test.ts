@@ -3,12 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import { invoiceBalance } from './clinic-money.ts';
+import { settleCredit } from './credits-api.ts';
 import { branchRef, MAIN_BRANCH } from './fixtures/organization.fixtures.ts';
 import { patientRef } from './fixtures/patients.fixtures.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { staffRef } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
 import {
+  attachPaymentFile,
   deletePayment,
   fetchPayment,
   listLedger,
@@ -306,9 +308,9 @@ describe('Send payment (payExpense, S:1709)', () => {
     const bills = await listOpenSupplierBills();
     expect(bills.map((open) => [open.kind, open.seq, open.due])).toEqual([
       ['stock_po', 15, 171_000],
-      // The same day: the lower number first.
-      ['stock_po', 16, 60_000],
+      // The same day: a Medical PO before a Clinic stock purchase, as drawn.
       ['medical_po', 431, 298_000],
+      ['stock_po', 16, 60_000],
     ]);
     const failure = await failureOf(
       payExpense({
@@ -387,6 +389,39 @@ describe('changing and deleting an entry (S:1710, S:1546)', () => {
     expect(edit).toMatchObject({ status: 409, detail: 'PAY-305 · Day closed' });
     const removal = await failureOf(deletePayment(ref.payment(305), 'mistake', null));
     expect(removal.status).toBe(409);
+  });
+
+  it('refuses to touch an entry a pending credit settled: it is the credit’s', async () => {
+    const { paymentSeq } = await settleCredit(ref.pendingCredit(2), {
+      action: 'give_back',
+      splits: [{ mode: 'cash', amount: 50_000 }],
+    });
+    const settled = clinicFixtures.payments.snapshot((row) => row.seq === paymentSeq)[0];
+    if (!settled) throw new Error('the settlement wrote an entry');
+    const edit = await failureOf(updatePayment(settled.id, { note: 'Changed' }));
+    expect(edit).toMatchObject({ status: 409, detail: `PAY-${paymentSeq} · From CR-2` });
+    const removal = await failureOf(deletePayment(settled.id, 'mistake', null));
+    expect(removal.status).toBe(409);
+  });
+
+  it('files an uploaded bill photo on its entry, after the save', async () => {
+    const row = await payExpense({
+      branchId: MAIN,
+      billRef: null,
+      payeeName: 'Courier',
+      expenseCategory: 'misc',
+      amount: 15_000,
+      mode: 'cash',
+      paidOn: '2026-10-03',
+      note: null,
+      attachmentKeys: [],
+    });
+    await attachPaymentFile({ paymentId: row.id, key: 'org/bills/bill-1.jpg' });
+    await attachPaymentFile({ paymentId: row.id, key: 'org/bills/bill-2.jpg' });
+    expect((await clinicFixtures.payments.get(row.id)).attachmentKeys).toEqual([
+      'org/bills/bill-1.jpg',
+      'org/bills/bill-2.jpg',
+    ]);
   });
 
   it('deletes an open-day entry and restores it, a supplier bill’s purchase following', async () => {

@@ -794,3 +794,20 @@ above — the ledger under the `tableId` `payments` (`payments-toolbar`, `paymen
 | `payments-day-close`                    | Ledger toolbar "Day close" (row 2 on a phone)     | `shared/components/PaymentsToolbar/` |
 | `payments-pending-day-close`            | Pending toolbar "Day close"                       | `shared/components/PaymentsToolbar/` |
 | `payments-pending-new-menu-option-give` | Add pending "⌄" menu: Give · `-option-take`: Take | `RoomToolbar/RoomPrimary/`           |
+
+Receive payment (`receive-drawer`, L-39b) and Send payment (`pay-drawer`) carry the record
+drawer's ids under their root (`-title`, `-tag`, `-badges`, `-quick-fill-<id>`, `-save`,
+`-save-and-add`, `-delete`, `-step-<id>`); their fields:
+
+| Test ID                                                                      | Element                                                               | Source                             |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| `receive-drawer-branch-<branchId>`                                           | Branch chip (two or more open branches)                               | `components/ReceivePaymentDrawer/` |
+| `receive-drawer-patient`                                                     | Patient field (`PatientPicker`; options `-option-<id>`)               | `shared/components/PatientPicker/` |
+| `receive-drawer-invoice` · `-invoice-<invoiceId>`                            | Against invoice: the inert chip, or one open invoice's chip           | `components/ReceivePaymentDrawer/` |
+| `receive-drawer-splits` · `-splits-row` · `-splits-amount` · `-splits-total` | The Mode · Amount rows (`ItemsField`), one row, its amount, the total | `components/ReceivePaymentDrawer/` |
+| `receive-drawer-reference` · `-note`                                         | Reference · Note                                                      | `components/ReceivePaymentDrawer/` |
+| `pay-drawer-bill` · `-oldest-<md\|is>:<id>`                                  | Supplier bill picker · a "Pending longest" chip                       | `components/SendPaymentDrawer/`    |
+| `pay-drawer-category-<category>` · `-mode-<mode>`                            | Category chip · Mode chip                                             | `components/SendPaymentDrawer/`    |
+| `pay-drawer-paid-to` · `-paid-to-quick-<name>`                               | Paid to · a quick name                                                | `components/SendPaymentDrawer/`    |
+| `pay-drawer-amount` · `-amount-quick-<rupees>`                               | Amount · a quick amount                                               | `components/SendPaymentDrawer/`    |
+| `pay-drawer-date` · `-note` · `-files` · `-files-input`                      | Date · Note · the bill photo zone and its file input                  | `components/SendPaymentDrawer/`    |

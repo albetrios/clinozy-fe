@@ -73,7 +73,8 @@
     },
     "dayClosed": "{{ref}} · Day closed",
     "dayClosedEdited_one": "{{ref}} · Day closed · edited {{count}}×",
-    "dayClosedEdited_other": "{{ref}} · Day closed · edited {{count}}×"
+    "dayClosedEdited_other": "{{ref}} · Day closed · edited {{count}}×",
+    "creditEntry": "{{ref}} · From {{credit}}"
   },
   "rowActions": {
     "edit": "Edit",
@@ -107,7 +108,8 @@
   },
   "dialog": {
     "record": "Payment",
-    "credit": "Pending"
+    "credit": "Pending",
+    "dayClosed": "Day closed · this can’t be saved now"
   },
   "pending": {
     "records": "pending",
@@ -146,5 +148,102 @@
       "loan_to_staff": "Loan to staff",
       "other": "Other"
     }
+  },
+  "receive": {
+    "title": "Receive payment",
+    "titleEdit": "Edit payment in",
+    "sub": "Receipt goes to the patient on WhatsApp",
+    "subEdit": "Open until the day is closed · every change is logged",
+    "section": "Who is paying",
+    "branch": "Branch",
+    "invoice": "Against invoice",
+    "invoiceOpen_one": "{{count}} open",
+    "invoiceOpen_other": "{{count}} open",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Pick the patient first",
+    "nothingDue": "Nothing due",
+    "amount": "Amount received",
+    "mode": "Mode",
+    "amountColumn": "Amount",
+    "split": "Split · add a mode",
+    "total": "Total {{total}}",
+    "totalDue": "Total {{total}} · due {{due}}",
+    "reference": "Reference",
+    "referenceHint": "UPI ref / card last 4",
+    "referencePlaceholder": "e.g. 4321",
+    "note": "Note",
+    "notePlaceholder": "Optional",
+    "quickFill": {
+      "full": "Full · {{amount}}",
+      "half": "Half · {{amount}}",
+      "cashUpi": "Cash + UPI"
+    },
+    "save": "Record {{amount}}",
+    "saveEdit": "Save {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} received from {{name}}",
+    "updated": "{{ref}} updated · change logged",
+    "enterAmount": "Enter an amount",
+    "pickPatient": "Pick a patient",
+    "aboveDue": "More than the {{due}} due"
+  },
+  "send": {
+    "title": "Send payment",
+    "titleEdit": "Edit payment out",
+    "sub": "Clinic spend · shows in day close",
+    "steps": {
+      "bill": "Pay against a bill",
+      "expense": "Expense",
+      "payment": "Payment"
+    },
+    "bill": "Supplier bill",
+    "billHint_one": "{{count}} open · search PO #, supplier or bill no",
+    "billHint_other": "{{count}} open · search PO #, supplier or bill no",
+    "billPlaceholder": "Search PO #, supplier or bill no",
+    "otherSpend": "Other spend",
+    "otherSpendSub": "Not against a purchase order",
+    "groups": {
+      "other": "Other",
+      "medical": "Medical purchase orders",
+      "stock": "Clinic stock purchase orders"
+    },
+    "billLabel": {
+      "medical": "Medical PO #{{seq}} · {{supplier}}",
+      "stock": "Stock PO #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Medical PO #{{seq}}",
+      "stock": "Stock PO #{{seq}}"
+    },
+    "billNo": "Bill {{bill}}",
+    "daysPending_one": "{{count}} day pending",
+    "daysPending_other": "{{count}} days pending",
+    "pendingToday": "Today",
+    "oldest": "Pending longest",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Category",
+    "paidTo": "Paid to",
+    "paidToPlaceholder": "Vendor or person",
+    "note": "Note",
+    "notePlaceholder": "What was bought",
+    "amount": "Amount",
+    "date": "Date",
+    "mode": "Mode",
+    "files": "Bill / receipt",
+    "filesDrop": "Drop the bill photo or browse",
+    "filesHint": "Optional · JPG, PNG or PDF",
+    "filesRemove": "Remove {{name}}",
+    "electricity": "Electricity",
+    "presets": {
+      "tea": "Tea & snacks",
+      "courier": "Courier"
+    },
+    "save": "Add expense",
+    "saveEdit": "Save changes",
+    "another": "Add & another",
+    "added": "Expense {{ref}} added",
+    "paidBill": "{{amount}} paid against {{bill}}",
+    "saved": "{{ref}} saved · change logged",
+    "missing": "Add who was paid and the amount"
   }
 }

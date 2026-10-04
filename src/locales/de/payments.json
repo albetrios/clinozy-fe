@@ -73,7 +73,8 @@
     },
     "dayClosed": "{{ref}} · Tag abgeschlossen",
     "dayClosedEdited_one": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
-    "dayClosedEdited_other": "{{ref}} · Tag abgeschlossen · {{count}}× geändert"
+    "dayClosedEdited_other": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
+    "creditEntry": "{{ref}} · Aus {{credit}}"
   },
   "rowActions": {
     "edit": "Bearbeiten",
@@ -107,7 +108,8 @@
   },
   "dialog": {
     "record": "Zahlung",
-    "credit": "Offener Betrag"
+    "credit": "Offener Betrag",
+    "dayClosed": "Tag abgeschlossen · speichern ist nicht mehr möglich"
   },
   "pending": {
     "records": "offenen Beträge",
@@ -146,5 +148,102 @@
       "loan_to_staff": "Darlehen an Mitarbeiter",
       "other": "Sonstiges"
     }
+  },
+  "receive": {
+    "title": "Zahlung einnehmen",
+    "titleEdit": "Einnahme bearbeiten",
+    "sub": "Der Beleg geht per WhatsApp an den Patienten",
+    "subEdit": "Offen bis zum Tagesabschluss · jede Änderung wird protokolliert",
+    "section": "Wer zahlt",
+    "branch": "Filiale",
+    "invoice": "Auf Rechnung",
+    "invoiceOpen_one": "{{count}} offen",
+    "invoiceOpen_other": "{{count}} offen",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Zuerst den Patienten wählen",
+    "nothingDue": "Nichts offen",
+    "amount": "Erhaltener Betrag",
+    "mode": "Zahlart",
+    "amountColumn": "Betrag",
+    "split": "Aufteilen · Zahlart hinzufügen",
+    "total": "Gesamt {{total}}",
+    "totalDue": "Gesamt {{total}} · offen {{due}}",
+    "reference": "Referenz",
+    "referenceHint": "UPI-Ref. / letzte 4 der Karte",
+    "referencePlaceholder": "z. B. 4321",
+    "note": "Notiz",
+    "notePlaceholder": "Optional",
+    "quickFill": {
+      "full": "Voll · {{amount}}",
+      "half": "Hälfte · {{amount}}",
+      "cashUpi": "Bar + UPI"
+    },
+    "save": "{{amount}} erfassen",
+    "saveEdit": "{{amount}} speichern",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} von {{name}} eingenommen",
+    "updated": "{{ref}} aktualisiert · Änderung protokolliert",
+    "enterAmount": "Geben Sie einen Betrag ein",
+    "pickPatient": "Wählen Sie einen Patienten",
+    "aboveDue": "Mehr als die offenen {{due}}"
+  },
+  "send": {
+    "title": "Zahlung leisten",
+    "titleEdit": "Ausgabe bearbeiten",
+    "sub": "Praxisausgabe · erscheint im Tagesabschluss",
+    "steps": {
+      "bill": "Gegen eine Rechnung zahlen",
+      "expense": "Ausgabe",
+      "payment": "Zahlung"
+    },
+    "bill": "Lieferantenrechnung",
+    "billHint_one": "{{count}} offen · Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "billHint_other": "{{count}} offen · Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "billPlaceholder": "Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "otherSpend": "Sonstige Ausgabe",
+    "otherSpendSub": "Nicht zu einer Bestellung",
+    "groups": {
+      "other": "Sonstiges",
+      "medical": "Medizin-Bestellungen",
+      "stock": "Bestellungen Praxisbestand"
+    },
+    "billLabel": {
+      "medical": "Medizin-Bestellung #{{seq}} · {{supplier}}",
+      "stock": "Bestand-Bestellung #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Medizin-Bestellung #{{seq}}",
+      "stock": "Bestand-Bestellung #{{seq}}"
+    },
+    "billNo": "Rechnung {{bill}}",
+    "daysPending_one": "seit {{count}} Tag offen",
+    "daysPending_other": "seit {{count}} Tagen offen",
+    "pendingToday": "Heute",
+    "oldest": "Am längsten offen",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Kategorie",
+    "paidTo": "Bezahlt an",
+    "paidToPlaceholder": "Lieferant oder Person",
+    "note": "Notiz",
+    "notePlaceholder": "Was gekauft wurde",
+    "amount": "Betrag",
+    "date": "Datum",
+    "mode": "Zahlart",
+    "files": "Rechnung / Beleg",
+    "filesDrop": "Foto der Rechnung ablegen oder auswählen",
+    "filesHint": "Optional · JPG, PNG oder PDF",
+    "filesRemove": "{{name}} entfernen",
+    "electricity": "Strom",
+    "presets": {
+      "tea": "Tee & Snacks",
+      "courier": "Kurier"
+    },
+    "save": "Ausgabe hinzufügen",
+    "saveEdit": "Änderungen speichern",
+    "another": "Hinzufügen & weitere",
+    "added": "Ausgabe {{ref}} hinzugefügt",
+    "paidBill": "{{amount}} auf {{bill}} gezahlt",
+    "saved": "{{ref}} gespeichert · Änderung protokolliert",
+    "missing": "Geben Sie Empfänger und Betrag an"
   }
 }

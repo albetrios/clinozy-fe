@@ -75,7 +75,8 @@
     "dayClosed": "{{ref}} · Giornata chiusa",
     "dayClosedEdited_one": "{{ref}} · Giornata chiusa · modificato {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Giornata chiusa · modificato {{count}}×",
-    "dayClosedEdited_other": "{{ref}} · Giornata chiusa · modificato {{count}}×"
+    "dayClosedEdited_other": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "creditEntry": "{{ref}} · Da {{credit}}"
   },
   "rowActions": {
     "edit": "Modifica",
@@ -110,7 +111,8 @@
   },
   "dialog": {
     "record": "Pagamento",
-    "credit": "Elemento in sospeso"
+    "credit": "Elemento in sospeso",
+    "dayClosed": "Giornata chiusa · non si può più salvare"
   },
   "pending": {
     "records": "elementi in sospeso",
@@ -149,5 +151,105 @@
       "loan_to_staff": "Prestito al personale",
       "other": "Altro"
     }
+  },
+  "receive": {
+    "title": "Incassa pagamento",
+    "titleEdit": "Modifica incasso",
+    "sub": "La ricevuta va al paziente su WhatsApp",
+    "subEdit": "Aperto fino alla chiusura · ogni modifica è registrata",
+    "section": "Chi paga",
+    "branch": "Sede",
+    "invoice": "Su fattura",
+    "invoiceOpen_one": "{{count}} aperta",
+    "invoiceOpen_many": "{{count}} aperte",
+    "invoiceOpen_other": "{{count}} aperte",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Scegli prima il paziente",
+    "nothingDue": "Niente da saldare",
+    "amount": "Importo incassato",
+    "mode": "Modalità",
+    "amountColumn": "Importo",
+    "split": "Dividi · aggiungi una modalità",
+    "total": "Totale {{total}}",
+    "totalDue": "Totale {{total}} · da saldare {{due}}",
+    "reference": "Riferimento",
+    "referenceHint": "Rif. UPI / ultime 4 della carta",
+    "referencePlaceholder": "es. 4321",
+    "note": "Nota",
+    "notePlaceholder": "Facoltativa",
+    "quickFill": {
+      "full": "Intero · {{amount}}",
+      "half": "Metà · {{amount}}",
+      "cashUpi": "Contanti + UPI"
+    },
+    "save": "Registra {{amount}}",
+    "saveEdit": "Salva {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} incassati da {{name}}",
+    "updated": "{{ref}} aggiornato · modifica registrata",
+    "enterAmount": "Inserisci un importo",
+    "pickPatient": "Scegli un paziente",
+    "aboveDue": "Più dei {{due}} da saldare"
+  },
+  "send": {
+    "title": "Registra pagamento",
+    "titleEdit": "Modifica uscita",
+    "sub": "Spesa della clinica · compare nella chiusura",
+    "steps": {
+      "bill": "Paga una fattura",
+      "expense": "Spesa",
+      "payment": "Pagamento"
+    },
+    "bill": "Fattura fornitore",
+    "billHint_one": "{{count}} aperta · cerca n° ordine, fornitore o fattura",
+    "billHint_many": "{{count}} aperte · cerca n° ordine, fornitore o fattura",
+    "billHint_other": "{{count}} aperte · cerca n° ordine, fornitore o fattura",
+    "billPlaceholder": "Cerca n° ordine, fornitore o fattura",
+    "otherSpend": "Altra spesa",
+    "otherSpendSub": "Non legata a un ordine",
+    "groups": {
+      "other": "Altro",
+      "medical": "Ordini medici",
+      "stock": "Ordini di magazzino"
+    },
+    "billLabel": {
+      "medical": "Ordine medico #{{seq}} · {{supplier}}",
+      "stock": "Ordine magazzino #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Ordine medico #{{seq}}",
+      "stock": "Ordine magazzino #{{seq}}"
+    },
+    "billNo": "Fattura {{bill}}",
+    "daysPending_one": "in sospeso da {{count}} giorno",
+    "daysPending_many": "in sospeso da {{count}} giorni",
+    "daysPending_other": "in sospeso da {{count}} giorni",
+    "pendingToday": "Oggi",
+    "oldest": "In sospeso da più tempo",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Categoria",
+    "paidTo": "Pagato a",
+    "paidToPlaceholder": "Fornitore o persona",
+    "note": "Nota",
+    "notePlaceholder": "Cosa è stato acquistato",
+    "amount": "Importo",
+    "date": "Data",
+    "mode": "Modalità",
+    "files": "Fattura / ricevuta",
+    "filesDrop": "Trascina la foto della fattura o sfoglia",
+    "filesHint": "Facoltativo · JPG, PNG o PDF",
+    "filesRemove": "Rimuovi {{name}}",
+    "electricity": "Elettricità",
+    "presets": {
+      "tea": "Tè e snack",
+      "courier": "Corriere"
+    },
+    "save": "Aggiungi spesa",
+    "saveEdit": "Salva modifiche",
+    "another": "Aggiungi e un altro",
+    "added": "Spesa {{ref}} aggiunta",
+    "paidBill": "{{amount}} pagati su {{bill}}",
+    "saved": "{{ref}} salvato · modifica registrata",
+    "missing": "Indica chi è stato pagato e l’importo"
   }
 }

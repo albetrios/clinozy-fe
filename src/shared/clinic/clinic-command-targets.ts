@@ -4,6 +4,7 @@ import {
   organizationLeadCreate,
   organizationMedicalCreate,
   organizationPatientCreate,
+  organizationPaymentReceive,
 } from '@/lib/routes/builders.ts';
 import {
   organizationPatient,
@@ -42,7 +43,7 @@ export type ClinicCommandTarget =
  * | `newLead`        | `/leads/create`                | live (L-33; the form L-35)     |
  * | `newAppointment` | `/appointments/create`         | live (L-36; the form L-38)     |
  * | `newPatient`     | `/patients/create`             | live (L-32; the drawer L-32b)  |
- * | `newReceipt`     | `/payments/receive`            | L-39b                          |
+ * | `newReceipt`     | `/payments/receive`            | live (L-39; the drawer L-39b)  |
  * | `newInvoice`     | `/invoices/create`             | L-40                           |
  * | `openTasks`      | `/tasks`                       | live                           |
  * | `patient`        | `/patients/$patientId`         | live (L-42; lands on Overview) |
@@ -61,7 +62,7 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   newLead: organizationLeadCreate('').to,
   newAppointment: organizationAppointmentCreate('').to,
   newPatient: organizationPatientCreate('').to,
-  newReceipt: '/organization/$organizationSlug/payments/receive',
+  newReceipt: organizationPaymentReceive('').to,
   newInvoice: '/organization/$organizationSlug/invoices/create',
   openTasks: CLINIC_SECTION_ROUTES.tasks,
   patient: organizationPatient('', '').to,

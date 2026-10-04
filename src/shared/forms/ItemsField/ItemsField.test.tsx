@@ -262,6 +262,20 @@ describe('ItemsField — add and remove rows', () => {
     expect(screen.getByTestId('lines-remove')).toHaveFocus();
   });
 
+  it('clears a kept row to its own blank when it has one (Receive’s last row back to UPI)', async () => {
+    const { user } = renderWithClient(
+      <LinesHarness minRows={1} clearRow={() => ({ ...BLANK, name: 'Cleared' })} />,
+    );
+    await user.click(screen.getByTestId('lines-remove'));
+    expect(rows()).toHaveLength(1);
+    expect(
+      within(rows()[0] as HTMLElement).getByRole('textbox', { name: 'Item' }),
+    ).toHaveValue('Cleared');
+    // "+ Add item" still appends a new row.
+    await user.click(screen.getByTestId('lines-add'));
+    expect(rows()).toHaveLength(2);
+  });
+
   it('drops the × column when rows cannot be removed, and both actions when read-only', () => {
     const { unmount } = renderWithClient(<LinesHarness removable={false} />);
     expect(screen.getByRole('table')).toHaveStyle({
