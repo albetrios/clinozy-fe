@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "الخدمات"
+  },
+  "offerLabels": {
+    "percentOff": "خصم {{value}}%",
+    "amountOff": "خصم {{amount}}",
+    "fixedAt": "بسعر {{amount}}",
+    "extraSessions_zero": "+{{count}} جلسة",
+    "extraSessions_one": "+{{count}} جلسة",
+    "extraSessions_two": "+{{count}} جلستان",
+    "extraSessions_few": "+{{count}} جلسات",
+    "extraSessions_many": "+{{count}} جلسة",
+    "extraSessions_other": "+{{count}} جلسة"
+  },
+  "toolbar": {
+    "tabsLabel": "أقسام الخدمات",
+    "tabOfferings": "الخدمات",
+    "tabOffers": "العروض",
+    "searchOfferings": "ابحث بالاسم أو بكلمة بحث",
+    "searchOffers": "ابحث في العروض أو الرموز",
+    "searchLabel": "البحث في الخدمات",
+    "newOffering": "خدمة جديدة",
+    "newOffer": "عرض جديد"
+  },
+  "catalogueCells": {
+    "allBranches": "كل الفروع"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "حذف هذه الخدمة؟",
+    "offerTitle": "حذف هذا العرض؟"
+  },
+  "columns": {
+    "seq": "المعرّف",
+    "name": "الخدمة",
+    "category": "الفئة",
+    "price": "السعر",
+    "offer": "العرض",
+    "branches": "الفروع",
+    "duration": "المدة",
+    "sessions": "الجلسات",
+    "status": "الحالة",
+    "updated": "آخر تحديث"
+  },
+  "table": {
+    "records": "الخدمات"
+  },
+  "cells": {
+    "validDays_zero": "صالح لمدة {{count}} يوم",
+    "validDays_one": "صالح لمدة يوم واحد",
+    "validDays_two": "صالح لمدة يومين",
+    "validDays_few": "صالح لمدة {{count}} أيام",
+    "validDays_many": "صالح لمدة {{count}} يومًا",
+    "validDays_other": "صالح لمدة {{count}} يوم",
+    "validFor_zero": "صالح لمدة {{count}} يوم",
+    "validFor_one": "صالح لمدة يوم واحد",
+    "validFor_two": "صالح لمدة يومين",
+    "validFor_few": "صالح لمدة {{count}} أيام",
+    "validFor_many": "صالح لمدة {{count}} يومًا",
+    "validFor_other": "صالح لمدة {{count}} يوم",
+    "wasPrice": "كان {{price}} · خصم {{percent}}%",
+    "listPrice": "السعر الأساسي",
+    "minutes": "{{minutes}} د",
+    "sessions_zero": "{{count}} جلسة",
+    "sessions_one": "{{count}} جلسة",
+    "sessions_two": "{{count}} جلستان",
+    "sessions_few": "{{count}} جلسات",
+    "sessions_many": "{{count}} جلسة",
+    "sessions_other": "{{count}} جلسة",
+    "sessionsFree_zero": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_one": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_two": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_few": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_many": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_other": "{{sessions}} + {{count}} مجانًا",
+    "active": "نشطة",
+    "inactive": "غير نشطة"
+  },
+  "rowActions": {
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "empty": {
+    "title": "لا توجد خدمات بعد",
+    "description": "أضف العلاجات والباقات مع أسعارها ليمكن حجزها وإصدار فواتيرها.",
+    "noMatchTitle": "لا توجد خدمة مطابقة",
+    "noMatchDescription": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+  },
+  "offers": {
+    "columns": {
+      "offer": "العرض",
+      "type": "النوع",
+      "appliesTo": "ينطبق على",
+      "branches": "الفروع",
+      "valid": "الصلاحية",
+      "status": "الحالة",
+      "updated": "آخر تحديث"
+    },
+    "table": {
+      "records": "العروض"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "الآن",
+      "noEnd": "بلا نهاية",
+      "endsToday": "ينتهي اليوم",
+      "endsTomorrow": "ينتهي غدًا",
+      "endsIn_zero": "ينتهي خلال {{count}} يوم",
+      "endsIn_one": "ينتهي خلال يوم واحد",
+      "endsIn_two": "ينتهي خلال يومين",
+      "endsIn_few": "ينتهي خلال {{count}} أيام",
+      "endsIn_many": "ينتهي خلال {{count}} يومًا",
+      "endsIn_other": "ينتهي خلال {{count}} يوم",
+      "startsOn": "يبدأ {{date}}",
+      "over": "انتهى"
+    },
+    "rowActions": {
+      "edit": "تعديل",
+      "pause": "إيقاف مؤقت",
+      "resume": "استئناف",
+      "delete": "حذف"
+    },
+    "bulk": {
+      "export": "تصدير",
+      "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+      "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+      "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+      "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+      "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+      "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+    },
+    "empty": {
+      "title": "لا توجد عروض بعد",
+      "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+    }
   }
 }

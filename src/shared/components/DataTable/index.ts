@@ -1,3 +1,4 @@
+export { exportTableCsv, type TableCsvExport } from './data-table-csv.ts';
 export {
   DataTable,
   type DataTableGroup,

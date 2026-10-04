@@ -34,6 +34,7 @@ import {
   sortingFromSearch,
   sortingToSearch,
 } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
@@ -48,7 +49,6 @@ import {
   PatientIdCell,
   PatientNameCell,
   PatientUpdatedCell,
-  useDayTime,
 } from '../../components/PatientCells/index.ts';
 import {
   PATIENTS_KEYS,

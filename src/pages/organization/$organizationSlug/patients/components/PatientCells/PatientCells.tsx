@@ -19,11 +19,11 @@ import {
   type ContactCardActions,
   type ContactCardData,
 } from '@/shared/components/PersonCard/index.ts';
+import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENTS_KEYS, PATIENTS_NS } from '../../patients.constants.ts';
 import { FOLLOW_UP_TONES, followUpWhen, patientAge } from './patient-cells.ts';
-import { useDayTime } from './use-day-time.ts';
 
 /** The ID cell: "#3508" on the 22px grey pill. */
 export function PatientIdCell({ seq }: { seq: number }) {

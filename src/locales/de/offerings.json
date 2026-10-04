@@ -1,5 +1,115 @@
 {
   "manifest": {
     "title": "Leistungen"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}} % Rabatt",
+    "amountOff": "{{amount}} Rabatt",
+    "fixedAt": "für {{amount}}",
+    "extraSessions_one": "+{{count}} Sitzung",
+    "extraSessions_other": "+{{count}} Sitzungen"
+  },
+  "toolbar": {
+    "tabsLabel": "Leistungsbereiche",
+    "tabOfferings": "Leistungen",
+    "tabOffers": "Angebote",
+    "searchOfferings": "Name oder Suchbegriff suchen",
+    "searchOffers": "Angebote oder Codes suchen",
+    "searchLabel": "Leistungen suchen",
+    "newOffering": "Neue Leistung",
+    "newOffer": "Neues Angebot"
+  },
+  "catalogueCells": {
+    "allBranches": "Alle Filialen"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Diese Leistung löschen?",
+    "offerTitle": "Dieses Angebot löschen?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Leistung",
+    "category": "Kategorie",
+    "price": "Preis",
+    "offer": "Angebot",
+    "branches": "Filialen",
+    "duration": "Dauer",
+    "sessions": "Sitzungen",
+    "status": "Status",
+    "updated": "Aktualisiert"
+  },
+  "table": {
+    "records": "Leistungen"
+  },
+  "cells": {
+    "validDays_one": "{{count}} Tag gültig",
+    "validDays_other": "{{count}} Tage gültig",
+    "validFor_one": "{{count}} Tag gültig",
+    "validFor_other": "{{count}} Tage gültig",
+    "wasPrice": "statt {{price}} · {{percent}} % Rabatt",
+    "listPrice": "Listenpreis",
+    "minutes": "{{minutes}} Min.",
+    "sessions_one": "{{count}} Sitzung",
+    "sessions_other": "{{count}} Sitzungen",
+    "sessionsFree_one": "{{sessions}} + {{count}} gratis",
+    "sessionsFree_other": "{{sessions}} + {{count}} gratis",
+    "active": "Aktiv",
+    "inactive": "Inaktiv"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "title": "Noch keine Leistungen",
+    "description": "Fügen Sie Behandlungen und Pakete mit Preisen hinzu, damit sie gebucht und abgerechnet werden können.",
+    "noMatchTitle": "Keine passende Leistung",
+    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+  },
+  "offers": {
+    "columns": {
+      "offer": "Angebot",
+      "type": "Art",
+      "appliesTo": "Gilt für",
+      "branches": "Filialen",
+      "valid": "Gültig",
+      "status": "Status",
+      "updated": "Aktualisiert"
+    },
+    "table": {
+      "records": "Angebote"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Ab sofort",
+      "noEnd": "ohne Ende",
+      "endsToday": "Endet heute",
+      "endsTomorrow": "Endet morgen",
+      "endsIn_one": "Endet in {{count}} Tag",
+      "endsIn_other": "Endet in {{count}} Tagen",
+      "startsOn": "Beginnt am {{date}}",
+      "over": "Vorbei"
+    },
+    "rowActions": {
+      "edit": "Bearbeiten",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "delete": "Löschen"
+    },
+    "bulk": {
+      "export": "Exportieren",
+      "exported_one": "{{count}} Zeile als CSV exportiert",
+      "exported_other": "{{count}} Zeilen als CSV exportiert"
+    },
+    "empty": {
+      "title": "Noch keine Angebote",
+      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+    }
   }
 }

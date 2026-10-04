@@ -31,7 +31,6 @@
   },
   "table": {
     "records": "मरीज़",
-    "dayTime": "{{day}} · {{time}}",
     "age_one": "{{count}} वर्ष",
     "age_other": "{{count}} वर्ष"
   },

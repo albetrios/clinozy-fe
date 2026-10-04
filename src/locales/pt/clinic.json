@@ -527,7 +527,8 @@
   },
   "lists": {
     "loadError": "Não foi possível carregar esta lista · conexão perdida. Mostrando a última cópia.",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

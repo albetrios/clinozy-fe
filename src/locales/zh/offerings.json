@@ -1,5 +1,107 @@
 {
   "manifest": {
     "title": "服务项目"
+  },
+  "offerLabels": {
+    "percentOff": "优惠 {{value}}%",
+    "amountOff": "立减 {{amount}}",
+    "fixedAt": "仅 {{amount}}",
+    "extraSessions_other": "+{{count}} 次"
+  },
+  "toolbar": {
+    "tabsLabel": "服务项目分区",
+    "tabOfferings": "服务项目",
+    "tabOffers": "优惠活动",
+    "searchOfferings": "搜索名称或搜索词",
+    "searchOffers": "搜索优惠活动或代码",
+    "searchLabel": "搜索服务项目",
+    "newOffering": "新建服务项目",
+    "newOffer": "新建优惠活动"
+  },
+  "catalogueCells": {
+    "allBranches": "所有分院"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "删除此服务项目？",
+    "offerTitle": "删除此优惠活动？"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "服务项目",
+    "category": "类别",
+    "price": "价格",
+    "offer": "优惠活动",
+    "branches": "分院",
+    "duration": "时长",
+    "sessions": "疗程数",
+    "status": "状态",
+    "updated": "更新时间"
+  },
+  "table": {
+    "records": "服务项目"
+  },
+  "cells": {
+    "validDays_other": "有效期 {{count}} 天",
+    "validFor_other": "有效期 {{count}} 天",
+    "wasPrice": "原价 {{price}} · 优惠 {{percent}}%",
+    "listPrice": "标价",
+    "minutes": "{{minutes}} 分钟",
+    "sessions_other": "{{count}} 次",
+    "sessionsFree_other": "{{sessions}} + 赠送 {{count}} 次",
+    "active": "启用",
+    "inactive": "停用"
+  },
+  "rowActions": {
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "title": "还没有服务项目",
+    "description": "添加带价格的治疗和套餐，即可用于预约和开票。",
+    "noMatchTitle": "没有匹配的服务项目",
+    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。"
+  },
+  "offers": {
+    "columns": {
+      "offer": "优惠活动",
+      "type": "类型",
+      "appliesTo": "适用于",
+      "branches": "分院",
+      "valid": "有效期",
+      "status": "状态",
+      "updated": "更新时间"
+    },
+    "table": {
+      "records": "优惠活动"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "即日起",
+      "noEnd": "无结束日期",
+      "endsToday": "今天结束",
+      "endsTomorrow": "明天结束",
+      "endsIn_other": "{{count}} 天后结束",
+      "startsOn": "{{date}} 开始",
+      "over": "已结束"
+    },
+    "rowActions": {
+      "edit": "编辑",
+      "pause": "暂停",
+      "resume": "恢复",
+      "delete": "删除"
+    },
+    "bulk": {
+      "export": "导出",
+      "exported_other": "已将 {{count}} 行导出为 CSV"
+    },
+    "empty": {
+      "title": "还没有优惠活动",
+      "description": "这里还没有内容。试试其他标签页或搜索。"
+    }
   }
 }

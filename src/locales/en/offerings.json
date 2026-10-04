@@ -1,5 +1,115 @@
 {
   "manifest": {
     "title": "Offerings"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}}% off",
+    "amountOff": "{{amount}} off",
+    "fixedAt": "at {{amount}}",
+    "extraSessions_one": "+{{count}} session",
+    "extraSessions_other": "+{{count}} sessions"
+  },
+  "toolbar": {
+    "tabsLabel": "Offerings sections",
+    "tabOfferings": "Offerings",
+    "tabOffers": "Offers",
+    "searchOfferings": "Search name or search term",
+    "searchOffers": "Search offers or codes",
+    "searchLabel": "Search offerings",
+    "newOffering": "New offering",
+    "newOffer": "New offer"
+  },
+  "catalogueCells": {
+    "allBranches": "All branches"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Delete this offering?",
+    "offerTitle": "Delete this offer?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Offering",
+    "category": "Category",
+    "price": "Price",
+    "offer": "Offer",
+    "branches": "Branches",
+    "duration": "Duration",
+    "sessions": "Sessions",
+    "status": "Status",
+    "updated": "Updated"
+  },
+  "table": {
+    "records": "offerings"
+  },
+  "cells": {
+    "validDays_one": "Valid {{count}} day",
+    "validDays_other": "Valid {{count}} days",
+    "validFor_one": "valid {{count}} day",
+    "validFor_other": "valid {{count}} days",
+    "wasPrice": "was {{price}} · {{percent}}% off",
+    "listPrice": "list price",
+    "minutes": "{{minutes}} min",
+    "sessions_one": "{{count}} session",
+    "sessions_other": "{{count}} sessions",
+    "sessionsFree_one": "{{sessions}} + {{count}} free",
+    "sessionsFree_other": "{{sessions}} + {{count}} free",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "title": "No offerings yet",
+    "description": "Add treatments and packages with prices so they can be booked and billed.",
+    "noMatchTitle": "No offering matches",
+    "noMatchDescription": "Nothing here yet. Try another tab or search."
+  },
+  "offers": {
+    "columns": {
+      "offer": "Offer",
+      "type": "Type",
+      "appliesTo": "Applies to",
+      "branches": "Branches",
+      "valid": "Valid",
+      "status": "Status",
+      "updated": "Updated"
+    },
+    "table": {
+      "records": "offers"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Now",
+      "noEnd": "no end",
+      "endsToday": "Ends today",
+      "endsTomorrow": "Ends tomorrow",
+      "endsIn_one": "Ends in {{count}} day",
+      "endsIn_other": "Ends in {{count}} days",
+      "startsOn": "Starts {{date}}",
+      "over": "Over"
+    },
+    "rowActions": {
+      "edit": "Edit",
+      "pause": "Pause",
+      "resume": "Resume",
+      "delete": "Delete"
+    },
+    "bulk": {
+      "export": "Export",
+      "exported_one": "{{count}} row exported as CSV",
+      "exported_other": "{{count}} rows exported as CSV"
+    },
+    "empty": {
+      "title": "No offers yet",
+      "description": "Nothing here yet. Try another tab or search."
+    }
   }
 }

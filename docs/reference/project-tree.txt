@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1147 src files · ~612 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1184 src files · ~630 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -365,7 +365,7 @@ clinozy-fe/
 │   │   │   ├── NotFoundPage.tsx
 │   │   │   ├── routeTree.tsx
 │   │   │   ├── UnauthorizedPage.tsx
-│   │   │   └── [4 test files]
+│   │   │   └── [5 test files]
 │   │   └── version/
 │   │       ├── show-update-available-toast.ts
 │   │       ├── version-update.constants.ts
@@ -902,12 +902,36 @@ clinozy-fe/
 │   │       │   │   ├── MedicalLayout.tsx
 │   │       │   │   └── [1 test file]
 │   │       │   ├── offerings/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── components/
+│   │       │   │   │   └── OfferingCells/
+│   │       │   │   ├── hooks/
+│   │       │   │   │   └── useOfferingsTable/
+│   │       │   │   ├── offers/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── offers.constants.ts
+│   │       │   │   │   ├── offers.manifest.ts
+│   │       │   │   │   ├── OFFERS.OVERVIEW.md
+│   │       │   │   │   ├── offers.route.tsx
+│   │       │   │   │   ├── offers.rows.ts
+│   │       │   │   │   ├── offers.search.ts
+│   │       │   │   │   ├── OffersPage.tsx
+│   │       │   │   │   └── [3 test files]
+│   │       │   │   ├── shared/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── offerings-filters.ts
+│   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── offerings.constants.ts
 │   │       │   │   ├── offerings.manifest.ts
 │   │       │   │   ├── OFFERINGS.OVERVIEW.md
 │   │       │   │   ├── offerings.route.tsx
+│   │       │   │   ├── offerings.rows.ts
+│   │       │   │   ├── offerings.search.ts
 │   │       │   │   ├── OfferingsPage.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [3 test files]
 │   │       │   ├── patients/
 │   │       │   │   ├── __tests__/
 │   │       │   │   │   └── integration/
@@ -1359,6 +1383,7 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [4 test files]
 │   │   │   ├── DataTable/
+│   │   │   │   ├── data-table-csv.ts
 │   │   │   │   ├── data-table-fold.ts
 │   │   │   │   ├── data-table-groups.ts
 │   │   │   │   ├── data-table-layout.ts
@@ -1373,7 +1398,7 @@ clinozy-fe/
 │   │   │   │   ├── useRowKeyboardNav.ts
 │   │   │   │   ├── useTableSelection.ts
 │   │   │   │   ├── useTableWindow.ts
-│   │   │   │   └── [5 test files]
+│   │   │   │   └── [6 test files]
 │   │   │   ├── DataTableBulkBar/
 │   │   │   │   ├── DataTableBulkBar.tsx
 │   │   │   │   ├── index.ts
@@ -1938,6 +1963,10 @@ clinozy-fe/
 │   │   │   ├── useDataTableUrlState/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useDataTableUrlState.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useDayTime/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useDayTime.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useDebouncedValue/
 │   │   │   │   ├── index.ts

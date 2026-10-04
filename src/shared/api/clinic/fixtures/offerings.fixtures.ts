@@ -284,9 +284,9 @@ export function offeringBySeq(seq: number): OfferingRow {
 }
 
 /**
- * The offerings, as last saved (`upd` / `by`), with the plan's fields: the
- * offer price, where each is sold, GST exclusive, and no search terms or
- * description (the prototype seeds none).
+ * The offerings, as last saved (`upd` / `by`, also who saved them), with the
+ * plan's fields: the offer price, where each is sold, GST exclusive, and no
+ * search terms or description (the prototype seeds none).
  */
 export function offeringSeed(today: string = clinicToday()): OfferingRecord[] {
   return OFFERING_ROWS.map((row) => ({
@@ -311,6 +311,7 @@ export function offeringSeed(today: string = clinicToday()): OfferingRecord[] {
     gstInclusive: false,
     searchTerms: [],
     description: null,
+    updatedById: staffRef(row.by),
   }));
 }
 
@@ -423,6 +424,7 @@ export function offerSeed(today: string = clinicToday()): OfferRecord[] {
       paused: row.paused,
       tone: row.tone,
       note: row.note || null,
+      updatedById: staffRef(row.by),
     };
   });
 }

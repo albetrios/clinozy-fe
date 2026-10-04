@@ -1,5 +1,107 @@
 {
   "manifest": {
     "title": "서비스"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}}% 할인",
+    "amountOff": "{{amount}} 할인",
+    "fixedAt": "{{amount}}에 제공",
+    "extraSessions_other": "+{{count}}회"
+  },
+  "toolbar": {
+    "tabsLabel": "서비스 섹션",
+    "tabOfferings": "서비스",
+    "tabOffers": "프로모션",
+    "searchOfferings": "이름 또는 검색어로 검색",
+    "searchOffers": "프로모션 또는 코드 검색",
+    "searchLabel": "서비스 검색",
+    "newOffering": "새 서비스",
+    "newOffer": "새 프로모션"
+  },
+  "catalogueCells": {
+    "allBranches": "모든 지점"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "이 서비스를 삭제할까요?",
+    "offerTitle": "이 프로모션을 삭제할까요?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "서비스",
+    "category": "카테고리",
+    "price": "가격",
+    "offer": "프로모션",
+    "branches": "지점",
+    "duration": "소요 시간",
+    "sessions": "세션",
+    "status": "상태",
+    "updated": "업데이트"
+  },
+  "table": {
+    "records": "서비스"
+  },
+  "cells": {
+    "validDays_other": "{{count}}일간 유효",
+    "validFor_other": "{{count}}일간 유효",
+    "wasPrice": "정가 {{price}} · {{percent}}% 할인",
+    "listPrice": "정가",
+    "minutes": "{{minutes}}분",
+    "sessions_other": "{{count}}회",
+    "sessionsFree_other": "{{sessions}} + {{count}}회 무료",
+    "active": "활성",
+    "inactive": "비활성"
+  },
+  "rowActions": {
+    "edit": "편집",
+    "delete": "삭제"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "empty": {
+    "title": "아직 서비스가 없습니다",
+    "description": "가격과 함께 시술과 패키지를 추가하면 예약하고 청구할 수 있습니다.",
+    "noMatchTitle": "일치하는 서비스가 없습니다",
+    "noMatchDescription": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+  },
+  "offers": {
+    "columns": {
+      "offer": "프로모션",
+      "type": "유형",
+      "appliesTo": "적용 대상",
+      "branches": "지점",
+      "valid": "유효 기간",
+      "status": "상태",
+      "updated": "업데이트"
+    },
+    "table": {
+      "records": "프로모션"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "지금",
+      "noEnd": "종료일 없음",
+      "endsToday": "오늘 종료",
+      "endsTomorrow": "내일 종료",
+      "endsIn_other": "{{count}}일 후 종료",
+      "startsOn": "{{date}} 시작",
+      "over": "종료됨"
+    },
+    "rowActions": {
+      "edit": "편집",
+      "pause": "일시 중지",
+      "resume": "재개",
+      "delete": "삭제"
+    },
+    "bulk": {
+      "export": "내보내기",
+      "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+    },
+    "empty": {
+      "title": "아직 프로모션이 없습니다",
+      "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+    }
   }
 }

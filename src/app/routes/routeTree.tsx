@@ -67,6 +67,9 @@ import {
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
+import { validateOfferingsSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
+import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
 import { manifest as patientCreateManifest } from '@/pages/organization/$organizationSlug/patients/create/create.manifest.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
@@ -265,6 +268,15 @@ const OfferingsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.offerings],
     () => import('@/pages/organization/$organizationSlug/offerings/offerings.route.tsx'),
+  ),
+  'Component',
+);
+// The Offers tab is the room's second page (D24): its own chunk, the room's namespace.
+const OffersPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.offerings],
+    () =>
+      import('@/pages/organization/$organizationSlug/offerings/offers/offers.route.tsx'),
   ),
   'Component',
 );
@@ -896,12 +908,30 @@ const organizationOfferingsRoute = createRoute({
   path: 'offerings',
   head: manifestHead(offeringsManifest),
   staticData: { manifest: offeringsManifest },
+  validateSearch: validateOfferingsSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(offeringsManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: OfferingsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// The room's tabs are literal child URLs (D24, S:101). The Offers tab is a page
+// of its own, so it sits beside the Offerings tab rather than inside its outlet.
+const organizationOffersRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'offerings/offers',
+  head: manifestHead(offersManifest),
+  staticData: { manifest: offersManifest },
+  validateSearch: validateOffersSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offersManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OffersPage,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1087,6 +1117,7 @@ const routeTree = rootRoute.addChildren([
     organizationPaymentsRoute,
     organizationTasksRoute,
     organizationOfferingsRoute,
+    organizationOffersRoute,
     organizationUsersRoute,
     organizationNotFoundRoute,
   ]),

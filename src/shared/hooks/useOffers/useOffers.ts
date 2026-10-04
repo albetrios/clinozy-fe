@@ -19,6 +19,7 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import type { CatalogueReadOptions } from '@/shared/hooks/useOfferings/index.ts';
 
 /** "Navratri glow saved" and its kin — the offer's name in the clinic vocabulary. */
 function offerToast(key: string, offer: OfferRecord): string {
@@ -30,10 +31,11 @@ function offerToast(key: string, offer: OfferRecord): string {
  * every billed price (`effectivePrice`) read this one cache entry. Their state
  * is derived on the clinic's today (`offerState`), never stored.
  */
-export function useOffers() {
+export function useOffers({ notifyOnError = true }: CatalogueReadOptions = {}) {
   return useAppQuery({
     queryKey: offerQueryKeys.list(),
     queryFn: () => fetchAllOffers(),
+    notifyOnError,
   });
 }
 

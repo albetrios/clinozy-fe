@@ -31,7 +31,6 @@
   },
   "table": {
     "records": "pazienti",
-    "dayTime": "{{day}} · {{time}}",
     "age_one": "{{count}} anno",
     "age_many": "{{count}} anni",
     "age_other": "{{count}} anni"

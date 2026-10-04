@@ -1,5 +1,123 @@
 {
   "manifest": {
     "title": "Servizi"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}}% di sconto",
+    "amountOff": "{{amount}} di sconto",
+    "fixedAt": "a {{amount}}",
+    "extraSessions_one": "+{{count}} seduta",
+    "extraSessions_many": "+{{count}} sedute",
+    "extraSessions_other": "+{{count}} sedute"
+  },
+  "toolbar": {
+    "tabsLabel": "Sezioni dei servizi",
+    "tabOfferings": "Servizi",
+    "tabOffers": "Offerte",
+    "searchOfferings": "Cerca nome o termine",
+    "searchOffers": "Cerca offerte o codici",
+    "searchLabel": "Cerca servizi",
+    "newOffering": "Nuovo servizio",
+    "newOffer": "Nuova offerta"
+  },
+  "catalogueCells": {
+    "allBranches": "Tutte le sedi"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Eliminare questo servizio?",
+    "offerTitle": "Eliminare questa offerta?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Servizio",
+    "category": "Categoria",
+    "price": "Prezzo",
+    "offer": "Offerta",
+    "branches": "Sedi",
+    "duration": "Durata",
+    "sessions": "Sedute",
+    "status": "Stato",
+    "updated": "Aggiornato"
+  },
+  "table": {
+    "records": "servizi"
+  },
+  "cells": {
+    "validDays_one": "Valido {{count}} giorno",
+    "validDays_many": "Valido {{count}} giorni",
+    "validDays_other": "Valido {{count}} giorni",
+    "validFor_one": "valido {{count}} giorno",
+    "validFor_many": "valido {{count}} giorni",
+    "validFor_other": "valido {{count}} giorni",
+    "wasPrice": "prima {{price}} · {{percent}}% di sconto",
+    "listPrice": "prezzo di listino",
+    "minutes": "{{minutes}} min",
+    "sessions_one": "{{count}} seduta",
+    "sessions_many": "{{count}} sedute",
+    "sessions_other": "{{count}} sedute",
+    "sessionsFree_one": "{{sessions}} + {{count}} in omaggio",
+    "sessionsFree_many": "{{sessions}} + {{count}} in omaggio",
+    "sessionsFree_other": "{{sessions}} + {{count}} in omaggio",
+    "active": "Attivo",
+    "inactive": "Inattivo"
+  },
+  "rowActions": {
+    "edit": "Modifica",
+    "delete": "Elimina"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "empty": {
+    "title": "Ancora nessun servizio",
+    "description": "Aggiungi trattamenti e pacchetti con i prezzi per poterli prenotare e fatturare.",
+    "noMatchTitle": "Nessun servizio corrisponde",
+    "noMatchDescription": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
+  },
+  "offers": {
+    "columns": {
+      "offer": "Offerta",
+      "type": "Tipo",
+      "appliesTo": "Si applica a",
+      "branches": "Sedi",
+      "valid": "Validità",
+      "status": "Stato",
+      "updated": "Aggiornato"
+    },
+    "table": {
+      "records": "offerte"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Da subito",
+      "noEnd": "senza scadenza",
+      "endsToday": "Termina oggi",
+      "endsTomorrow": "Termina domani",
+      "endsIn_one": "Termina tra {{count}} giorno",
+      "endsIn_many": "Termina tra {{count}} giorni",
+      "endsIn_other": "Termina tra {{count}} giorni",
+      "startsOn": "Inizia il {{date}}",
+      "over": "Terminata"
+    },
+    "rowActions": {
+      "edit": "Modifica",
+      "pause": "Metti in pausa",
+      "resume": "Riprendi",
+      "delete": "Elimina"
+    },
+    "bulk": {
+      "export": "Esporta",
+      "exported_one": "{{count}} riga esportata in CSV",
+      "exported_many": "{{count}} righe esportate in CSV",
+      "exported_other": "{{count}} righe esportate in CSV"
+    },
+    "empty": {
+      "title": "Ancora nessuna offerta",
+      "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
+    }
   }
 }

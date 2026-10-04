@@ -96,6 +96,8 @@ export const CLINIC_KEYS = {
   lists: {
     loadError: 'lists.loadError',
     retry: 'lists.retry',
+    /** "Sep 24 · 14:50" — a day and a time (`useDayTime`). */
+    dayTime: 'lists.dayTime',
   },
   /**
    * The contract's enum labels the rooms share (`schema-routes.md` › Enums,

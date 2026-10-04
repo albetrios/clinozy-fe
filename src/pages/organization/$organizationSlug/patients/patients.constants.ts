@@ -40,8 +40,6 @@ export const PATIENTS_KEYS = {
   table: {
     /** "All patients loaded" — the plural noun the table's end line names. */
     records: 'table.records',
-    /** "Sep 24 · 14:50" — a day and a time in the Follow-up and Updated cells. */
-    dayTime: 'table.dayTime',
     /** "28 yrs" — the Age cell (plural). */
     age: 'table.age',
   },

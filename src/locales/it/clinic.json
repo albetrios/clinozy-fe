@@ -527,7 +527,8 @@
   },
   "lists": {
     "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

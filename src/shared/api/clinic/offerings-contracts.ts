@@ -39,6 +39,8 @@ export const offeringRecordSchema = offeringSchema.extend({
   description: z.string().nullable(),
   /** GST as a number (Appendix F) — the contract's five whole rates, or any other. */
   gstPct: z.number().nonnegative(),
+  /** Who last saved it — the "Updated" cell (`updatedById` on `_Common`, Appendix F). */
+  updatedById: z.uuid(),
 });
 
 /** An offering record — the contract's fields and the plan's. */
@@ -46,12 +48,14 @@ export type OfferingRecord = z.infer<typeof offeringRecordSchema>;
 
 /**
  * An offer as the rooms read it: the contract's `Offer` (`S:579–600`) with the
- * plan's open start ("Now") and open end ("no end"); `branchIds` empty = every
- * branch (Appendix F, REPLACE_WITH_API).
+ * plan's open start ("Now") and open end ("no end"), and who last saved it;
+ * `branchIds` empty = every branch (Appendix F, REPLACE_WITH_API).
  */
 export const offerRecordSchema = offerSchema.extend({
   startsOn: civilDateSchema.nullable(),
   endsOn: civilDateSchema.nullable(),
+  /** Who last saved it — the "Updated" cell (`updatedById` on `_Common`, Appendix F). */
+  updatedById: z.uuid(),
 });
 
 /** An offer record — the contract's fields with the plan's open dates. */
@@ -79,6 +83,7 @@ const SERVER_SET = {
   createdAt: true,
   updatedAt: true,
   createdById: true,
+  updatedById: true,
   deletedAt: true,
   deleteReason: true,
   deleteNote: true,

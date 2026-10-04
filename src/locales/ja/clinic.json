@@ -521,7 +521,8 @@
   },
   "lists": {
     "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

@@ -3,6 +3,8 @@ import type {
   Gender,
   LeadInterest,
   LeadStatus,
+  OfferingCategory,
+  OfferKind,
   PatientConversion,
   PatientStatus,
   PatientType,
@@ -11,6 +13,7 @@ import type {
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecordSource } from '@/shared/api/clinic/leads-contracts.ts';
+import type { OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
@@ -135,6 +138,41 @@ export const LEAD_INTEREST_TONES: Readonly<Record<LeadInterest, Tone>> = {
   lhr: 'lav',
   hydrafacial: 'mint',
   prp: 'blush',
+};
+
+/**
+ * Each offering category's tone (`OF_CATS`, H:3546): Consultation sky,
+ * Treatment sage, Package lav, LHR blush, Product butter — the Offerings
+ * table's pill, the drawers' chips and the invoice line picker's groups.
+ */
+export const OFFERING_CATEGORY_TONES: Readonly<Record<OfferingCategory, Tone>> = {
+  consultation: 'sky',
+  treatment: 'sage',
+  package: 'lav',
+  lhr: 'blush',
+  product: 'butter',
+};
+
+/**
+ * Each offer kind's tone (`OFX_KINDS`, H:3580): "% off" lav, "₹ off" sky,
+ * "Fixed price" butter, "Extra sessions" sage — the Offer drawer's Type chips.
+ */
+export const OFFER_KIND_TONES: Readonly<Record<OfferKind, Tone>> = {
+  percent: 'lav',
+  amount: 'sky',
+  fixed: 'butter',
+  extra: 'sage',
+};
+
+/**
+ * Each derived offer state's tone (`ST_T`, H:5474): Running sage, Scheduled
+ * sky, Paused butter, Ended stone.
+ */
+export const OFFER_STATE_TONES: Readonly<Record<OfferState, Tone>> = {
+  live: 'sage',
+  scheduled: 'sky',
+  paused: 'butter',
+  ended: 'stone',
 };
 
 /** The utility classes one tone paints with. */

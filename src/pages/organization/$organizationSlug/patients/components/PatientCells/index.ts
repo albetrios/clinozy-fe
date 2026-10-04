@@ -8,4 +8,3 @@ export {
   PatientNameCell,
   PatientUpdatedCell,
 } from './PatientCells.tsx';
-export { useDayTime } from './use-day-time.ts';

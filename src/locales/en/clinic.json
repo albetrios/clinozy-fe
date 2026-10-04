@@ -524,7 +524,8 @@
   },
   "lists": {
     "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

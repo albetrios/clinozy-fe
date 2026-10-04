@@ -31,7 +31,6 @@
   },
   "table": {
     "records": "환자",
-    "dayTime": "{{day}} · {{time}}",
     "age_other": "{{count}}세"
   },
   "rowActions": {

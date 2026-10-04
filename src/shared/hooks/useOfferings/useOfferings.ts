@@ -25,16 +25,26 @@ function offeringToast(key: string, offering: OfferingRecord): string {
   return i18n.t(key, { ns: CLINIC_NS, id: displayId.offering(offering.seq) });
 }
 
+/** How a catalogue read reports its own failure. */
+export interface CatalogueReadOptions {
+  /**
+   * Toast a failed read (default true). The Offerings room passes `false`: it
+   * shows the list error itself — the last copy and a Retry (KICKOFF §6.0).
+   */
+  notifyOnError?: boolean;
+}
+
 /**
  * The whole offerings catalogue, every cursor page (KICKOFF §6.11 Lists): the
  * Offerings room, the Invoice drawer and the booking drawer share this one
  * cache entry and search, filter and sort it in place. Prices come from
  * `effectivePrice` over {@link useOffers}' offers.
  */
-export function useOfferings() {
+export function useOfferings({ notifyOnError = true }: CatalogueReadOptions = {}) {
   return useAppQuery({
     queryKey: offeringQueryKeys.list(),
     queryFn: () => fetchAllOfferings(),
+    notifyOnError,
   });
 }
 

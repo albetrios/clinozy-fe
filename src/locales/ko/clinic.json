@@ -521,7 +521,8 @@
   },
   "lists": {
     "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",
-    "retry": "다시 시도"
+    "retry": "다시 시도",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

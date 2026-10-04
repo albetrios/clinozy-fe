@@ -2,7 +2,6 @@ import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-route
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { downloadCsv, toCsv } from '@/lib/csv.ts';
 import { organizationPatientCreate } from '@/lib/routes/index.ts';
 import type { PatientRow, PatientView } from '@/shared/api/clinic/patients-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
@@ -12,7 +11,7 @@ import {
 } from '@/shared/clinic/clinic-command-targets.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { PATIENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
-import { DataTable } from '@/shared/components/DataTable/index.ts';
+import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
@@ -269,22 +268,15 @@ export function PatientsPage() {
             label: t(PATIENTS_KEYS.bulk.export),
             icon: FileIcon,
             onSelect: (selected) => {
-              const columns = table.getVisibleLeafColumns();
-              const headers = columns.map((column) =>
-                typeof column.columnDef.header === 'string'
-                  ? column.columnDef.header
-                  : column.id,
-              );
-              const records = selected.map((patient) =>
-                columns.map((column) => {
-                  if (column.id === 'name') {
-                    return `${patientName(patient)} · ${formatClinicPhone(patient.phone)}`;
-                  }
-                  const fold = column.columnDef.meta?.foldValue?.(patient);
-                  return typeof fold === 'string' ? fold : (fold?.value ?? '');
-                }),
-              );
-              downloadCsv(EXPORT_FILE_NAME, toCsv(headers, records));
+              exportTableCsv({
+                table,
+                rows: selected,
+                fileName: EXPORT_FILE_NAME,
+                cell: (columnId, patient) =>
+                  columnId === 'name'
+                    ? `${patientName(patient)} · ${formatClinicPhone(patient.phone)}`
+                    : undefined,
+              });
               notify.success(t(PATIENTS_KEYS.bulk.exported, { count: selected.length }));
             },
           },

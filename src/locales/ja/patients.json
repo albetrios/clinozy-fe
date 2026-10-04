@@ -31,7 +31,6 @@
   },
   "table": {
     "records": "患者",
-    "dayTime": "{{day}} · {{time}}",
     "age_other": "{{count}}歳"
   },
   "rowActions": {

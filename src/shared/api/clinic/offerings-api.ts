@@ -52,6 +52,7 @@ export const offerQueryKeys = {
 };
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
+const fixtureStaff = () => import('./fixtures/staff.fixtures.ts');
 
 const UNKNOWN_BRANCH = 'Pick branches the clinic has';
 
@@ -212,7 +213,8 @@ export async function createOffering(
     }),
   );
   await checkOffering(fields, null);
-  return clinicFixtures.offerings.create(fields);
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  return clinicFixtures.offerings.create({ ...fields, updatedById: FIXTURE_VIEWER_ID });
 }
 
 /**
@@ -231,7 +233,11 @@ export async function updateOffering(
     offeringDraft({ ...saved, ...definedFields(patch) }),
   );
   await checkOffering(fields, id);
-  return clinicFixtures.offerings.update(id, fields);
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  return clinicFixtures.offerings.update(id, {
+    ...fields,
+    updatedById: FIXTURE_VIEWER_ID,
+  });
 }
 
 /**
@@ -342,7 +348,8 @@ export async function createOffer(input: OfferCreateInput): Promise<OfferRecord>
     offerDraft({ ...OFFER_DEFAULTS, ...definedFields(input) }),
   );
   await checkOffer(fields, null);
-  return clinicFixtures.offers.create(fields);
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  return clinicFixtures.offers.create({ ...fields, updatedById: FIXTURE_VIEWER_ID });
 }
 
 /**
@@ -357,7 +364,8 @@ export async function updateOffer(id: string, patch: OfferPatch): Promise<OfferR
     offerDraft({ ...saved, ...definedFields(patch) }),
   );
   await checkOffer(fields, id);
-  return clinicFixtures.offers.update(id, fields);
+  const { FIXTURE_VIEWER_ID } = await fixtureStaff();
+  return clinicFixtures.offers.update(id, { ...fields, updatedById: FIXTURE_VIEWER_ID });
 }
 
 /** Pause or resume an offer — the row's immediate Pause / Resume (`updateOffer({ paused })`, H:5483). */

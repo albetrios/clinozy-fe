@@ -99,7 +99,9 @@ export interface RoomTabsProps {
 /**
  * A room's tabs (KICKOFF §3.5 List toolbar; H:1086, H:4000–4010): links to the
  * room's literal child routes on the segmented track, the current one marked
- * `aria-current="page"` — its create / edit children keep it current. With
+ * `aria-current="page"` — its create / edit children keep it current, and a
+ * tab nested under another's URL wins over it (the bare `/offerings` tab
+ * beside `/offerings/offers`). With
  * `overflow="fold"` the tabs that do not fit fold from the inline end into a
  * 28px "More ⌄" (a 200px list); the current tab always stays. Otherwise the
  * track scrolls sideways without a scrollbar. Fills the space
@@ -117,9 +119,15 @@ export function RoomTabs({
   const navigate = useNavigate();
   const [measureRef, width] = useElementWidth<HTMLElement>();
 
-  const currentIndex = tabs.findIndex(
-    (tab) => matchRoute({ to: tab.to, params: tab.params, fuzzy: true }) !== false,
-  );
+  // The deepest tab the URL is under: a room whose first tab is its bare URL
+  // (`/offerings` beside `/offerings/offers`) matches both on the second.
+  const currentIndex = tabs.reduce((current, tab, index) => {
+    if (matchRoute({ to: tab.to, params: tab.params, fuzzy: true }) === false) {
+      return current;
+    }
+    const best = tabs[current];
+    return best && best.to.length >= tab.to.length ? current : index;
+  }, -1);
   const folding = overflow === 'fold' && width > 0;
   // Keyed on the labels' text: a re-render with the same tabs measures nothing.
   const labelsKey = tabs.map((tab) => `${tab.icon ? '+' : '-'}${tab.label}`).join('\n');
@@ -149,6 +157,9 @@ export function RoomTabs({
               key={tab.id}
               to={tab.to}
               params={tab.params}
+              // The Link's own fuzzy match would mark the bare `/offerings` tab
+              // current on `/offerings/offers` too: `current` decides instead.
+              activeOptions={{ exact: true }}
               aria-current={current ? 'page' : undefined}
               data-testid={ids.tab(tab.id)}
               data-slot="room-tab"

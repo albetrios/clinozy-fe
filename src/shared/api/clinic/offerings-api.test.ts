@@ -5,6 +5,7 @@ import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { clinicToday } from './clinic-time.ts';
 import { branchRef } from './fixtures/organization.fixtures.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
+import { FIXTURE_VIEWER_ID, staffRef } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
 import {
   compareOffersForList,
@@ -480,17 +481,33 @@ describe('the fixture world behind it', () => {
     );
   });
 
-  it('seeds only records the save rules accept — each saves unchanged', async () => {
+  it('seeds only records the save rules accept — each saves unchanged, by the viewer', async () => {
     for (const offering of clinicFixtures.offerings.snapshot()) {
       const saved = await updateOffering(offering.id, {});
       expect(saved, `#${offering.seq}`).toEqual({
         ...offering,
         updatedAt: saved.updatedAt,
+        updatedById: FIXTURE_VIEWER_ID,
       });
     }
     for (const offer of clinicFixtures.offers.snapshot()) {
       const saved = await updateOffer(offer.id, {});
-      expect(saved, offer.name).toEqual({ ...offer, updatedAt: saved.updatedAt });
+      expect(saved, offer.name).toEqual({
+        ...offer,
+        updatedAt: saved.updatedAt,
+        updatedById: FIXTURE_VIEWER_ID,
+      });
     }
+  });
+
+  it('seeds who last saved each record (the prototype’s `by`)', () => {
+    const navratri = clinicFixtures.offers
+      .snapshot()
+      .find((offer) => offer.name === 'Navratri glow');
+    expect(navratri?.updatedById).toBe(staffRef('RS'));
+    const facial = clinicFixtures.offerings
+      .snapshot()
+      .find((offering) => offering.seq === 274);
+    expect(facial?.updatedById).toBe(staffRef('DD'));
   });
 });

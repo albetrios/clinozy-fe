@@ -1,4 +1,5 @@
 export {
+  type CatalogueReadOptions,
   type OfferingDeleteVars,
   type OfferingUpdateVars,
   useCreateOffering,

@@ -132,7 +132,8 @@ export function usePlatformRoles(): PlatformRolesResult {
 /**
  * Every live staff profile (fixture, REPLACE_WITH_API) — one cache entry with
  * the Team's join: the person pickers, the Leads room's team column, its Team
- * filter and the people popover read it.
+ * filter and the people popover read it, and the rooms' "Updated" cells for
+ * who saved a record (its name, initials and tone).
  */
 export function useStaffProfiles() {
   return useAppQuery({

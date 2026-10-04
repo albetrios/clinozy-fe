@@ -31,7 +31,6 @@
   },
   "table": {
     "records": "المرضى",
-    "dayTime": "{{day}} · {{time}}",
     "age_zero": "{{count}} سنة",
     "age_one": "{{count}} سنة",
     "age_two": "{{count}} سنتان",

@@ -521,7 +521,8 @@
   },
   "lists": {
     "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",
-    "retry": "重试"
+    "retry": "重试",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

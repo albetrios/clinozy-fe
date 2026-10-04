@@ -103,6 +103,53 @@ describe('RoomTabs', () => {
     expect(screen.getByTestId('medical-tab-sales')).toBe(sales);
   });
 
+  it('marks the deepest tab current when one tab’s URL holds another’s (Offerings)', async () => {
+    const tabs: RoomLinkTab[] = [
+      { id: 'offerings', label: 'Offerings', to: '/offerings' },
+      { id: 'offers', label: 'Offers', to: '/offerings/offers' },
+    ];
+    const rootRoute = createRootRoute({
+      component: () => (
+        <>
+          <RoomTabs label="Offerings views" tabs={tabs} testIdPrefix="offerings" />
+          <Outlet />
+        </>
+      ),
+    });
+    const routes = ['/offerings', '/offerings/offers', '/offerings/offers/create'].map(
+      (path) =>
+        createRoute({
+          getParentRoute: () => rootRoute,
+          path,
+          component: () => <p>{path}</p>,
+        }),
+    );
+    const router = createRouter({
+      routeTree: rootRoute.addChildren(routes),
+      history: createMemoryHistory({ initialEntries: ['/offerings/offers/create'] }),
+    });
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    const offers = await screen.findByRole('link', { name: 'Offers' });
+    expect(offers).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Offerings' })).not.toHaveAttribute(
+      'aria-current',
+    );
+    await router.navigate({ to: '/offerings' });
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'Offerings' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      ),
+    );
+    expect(screen.getByRole('link', { name: 'Offers' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('moves the current tab when another is followed', async () => {
     const user = userEvent.setup();
     const { router } = renderRoom('/medical/sales', medical());

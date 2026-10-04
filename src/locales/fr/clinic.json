@@ -527,7 +527,8 @@
   },
   "lists": {
     "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",

@@ -99,7 +99,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `patient-quick-add`              | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)             | `shared/components/PatientDrawer/`                    |
 | `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
 | `tasks-page`                     | Clinic room page: Tasks                                                           | `pages/organization/$organizationSlug/tasks/`         |
-| `offerings-page`                 | Clinic room page: Offerings                                                       | `pages/organization/$organizationSlug/offerings/`     |
+| `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)   | `pages/organization/$organizationSlug/offerings/`     |
+| `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)              |
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |

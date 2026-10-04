@@ -524,7 +524,8 @@
   },
   "lists": {
     "loadError": "Diese Liste konnte nicht geladen werden · Verbindung unterbrochen. Die letzte Version wird angezeigt.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "dayTime": "{{day}} · {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
