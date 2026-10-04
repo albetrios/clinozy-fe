@@ -195,7 +195,7 @@ function purchaseOf(line: PlanPurchase, f: Formatters): SuggestionPurchase {
     sessions: line.sessions,
     invoice: {
       label: `#${line.invoiceSeq}`,
-      status: t(KEYS.invoiceStatuses[line.invoiceStatus]),
+      status: t(CLINIC_KEYS.invoiceStatuses[line.invoiceStatus], { ns: CLINIC_NS }),
       tone: INVOICE_STATUS_TONES[line.invoiceStatus],
     },
   };

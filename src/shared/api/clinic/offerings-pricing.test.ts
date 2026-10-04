@@ -9,6 +9,7 @@ import {
   basePrice,
   clampToFloor,
   effectivePrice,
+  invoiceLineRate,
   offerAppliesAt,
   offerPreview,
   offerState,
@@ -549,6 +550,14 @@ describe('the pricing helpers', () => {
     expect(offerAppliesAt(vesuOnly, branchRef('Vesu'))).toBe(true);
     expect(offerAppliesAt(vesuOnly, branchRef('Adajan'))).toBe(false);
     expect(offerAppliesAt({ branchIds: [] }, branchRef('Varachha'))).toBe(true);
+  });
+
+  it('bills an inclusive price with its GST back-computed out of the rate (Q-O3)', () => {
+    expect(invoiceLineRate(118_000, 18, false)).toBe(118_000);
+    expect(invoiceLineRate(118_000, 18, true)).toBe(100_000);
+    // ₹999 inclusive of 18%: the rate to the paisa, the line still ₹999.
+    expect(invoiceLineRate(99_900, 18, true)).toBe(84_661);
+    expect(invoiceLineRate(99_900, 0, true)).toBe(99_900);
   });
 
   it('prices for the header branch only when exactly one is picked (H:5453)', () => {

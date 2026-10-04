@@ -155,9 +155,9 @@ export function ItemsNumberInput({
 
   const change = (typed: string) => {
     const text = sanitizeNumberText(typed, places);
-    const next = numberFromText(text, scale);
+    const next = numberFromText(text, scale, money ? 0 : places);
     if (max !== undefined && next > max) {
-      setDraft(textFromNumber(max, scale));
+      setDraft(textFromNumber(max, scale, places));
       onValueChange(max);
       return;
     }
@@ -173,7 +173,7 @@ export function ItemsNumberInput({
           type="text"
           inputMode={places > 0 ? 'decimal' : 'numeric'}
           autoComplete="off"
-          value={draft ?? textFromNumber(value, scale)}
+          value={draft ?? textFromNumber(value, scale, places)}
           placeholder={
             placeholder ?? (money ? t(ITEMS_FIELD_KEYS.moneyPlaceholder) : '0')
           }

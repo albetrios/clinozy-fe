@@ -272,8 +272,12 @@ async function invoiceDue(invoiceId: string, exceptPaymentId: string | null) {
   return { invoice, due: invoiceBalance(invoice, payments).due };
 }
 
-/** What every new entry starts from; the kind's fields come from the caller. */
-function newEntry(
+/**
+ * What every new ledger entry starts from — a receipt, an expense, an
+ * invoice's "Paid now" (`invoices-server.fixtures.ts`); the kind's fields come
+ * from the caller.
+ */
+export function newLedgerEntry(
   fields: Pick<
     CreateInput<PaymentRecord>,
     'direction' | 'kind' | 'branchId' | 'amount' | 'splits'
@@ -325,7 +329,7 @@ export async function receivePayment(input: ReceivePaymentInput): Promise<Ledger
   }
   await assertDayOpen(fields.branchId, clinicToday());
   const payment = await clinicFixtures.payments.create(
-    newEntry({
+    newLedgerEntry({
       direction: 'received',
       kind: 'receipt',
       branchId: fields.branchId,
@@ -396,7 +400,7 @@ export async function payExpense(input: PayExpenseInput): Promise<LedgerRow> {
   }
   await assertDayOpen(fields.branchId, fields.paidOn);
   const payment = await clinicFixtures.payments.create(
-    newEntry({
+    newLedgerEntry({
       direction: 'paid',
       kind: fields.billRef ? 'supplier_bill' : 'expense',
       branchId: fields.branchId,

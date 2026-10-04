@@ -179,6 +179,19 @@ export function effectivePrice<O extends PricedOffer>(
   };
 }
 
+/**
+ * An offering's price as an invoice line's rate (Q-O3): an exclusive price is
+ * the rate, GST charged on top; an inclusive one has its GST back-computed out
+ * of it, to the paisa, so the line still comes to the price.
+ */
+export function invoiceLineRate(
+  price: number,
+  gstPct: number,
+  gstInclusive: boolean,
+): number {
+  return gstInclusive && gstPct > 0 ? Math.round(price / (1 + gstPct / 100)) : price;
+}
+
 /** One Offer-drawer preview box: the price before → after, or the sessions before → after. */
 export interface OfferPreview {
   unit: 'price' | 'sessions';

@@ -7,6 +7,10 @@ import {
   organizationPaymentReceive,
 } from '@/lib/routes/builders.ts';
 import {
+  organizationInvoice,
+  organizationInvoiceCreate,
+} from '@/lib/routes/invoice-builders.ts';
+import {
   organizationPatient,
   organizationPatientEdit,
 } from '@/lib/routes/patient-file-builders.ts';
@@ -44,12 +48,12 @@ export type ClinicCommandTarget =
  * | `newAppointment` | `/appointments/create`         | live (L-36; the form L-38)     |
  * | `newPatient`     | `/patients/create`             | live (L-32; the drawer L-32b)  |
  * | `newReceipt`     | `/payments/receive`            | live (L-39; the drawer L-39b)  |
- * | `newInvoice`     | `/invoices/create`             | L-40                           |
+ * | `newInvoice`     | `/invoices/create`             | live (L-40)                    |
  * | `openTasks`      | `/tasks`                       | live                           |
  * | `patient`        | `/patients/$patientId`         | live (L-42; lands on Overview) |
  * | `patientEdit`    | `/patients/$patientId/edit`    | live (L-42; the drawer L-32b)  |
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
- * | `invoice`        | `/invoices/$invoiceId`         | L-40                           |
+ * | `invoice`        | `/invoices/$invoiceId`         | live (L-40; the preview)       |
  * | `visit`          | `/visits/$visitId`             | L-49 (Today's lane actions)    |
  * | `newSale`        | `/medical/sales/create`        | live (L-50; the drawer L-50c)  |
  *
@@ -63,12 +67,12 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   newAppointment: organizationAppointmentCreate('').to,
   newPatient: organizationPatientCreate('').to,
   newReceipt: organizationPaymentReceive('').to,
-  newInvoice: '/organization/$organizationSlug/invoices/create',
+  newInvoice: organizationInvoiceCreate('').to,
   openTasks: CLINIC_SECTION_ROUTES.tasks,
   patient: organizationPatient('', '').to,
   patientEdit: organizationPatientEdit('', '').to,
   lead: organizationLead('', '').to,
-  invoice: '/organization/$organizationSlug/invoices/$invoiceId',
+  invoice: organizationInvoice('', '').to,
   visit: '/organization/$organizationSlug/visits/$visitId',
   newSale: organizationMedicalCreate('', 'sales').to,
 };

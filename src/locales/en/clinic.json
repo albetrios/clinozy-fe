@@ -598,6 +598,11 @@
     "medical": "Medical",
     "consultation": "Consultation"
   },
+  "invoiceStatuses": {
+    "paid": "Paid",
+    "partial": "Partly paid",
+    "unpaid": "Due"
+  },
   "taskOutcomes": {
     "log_check_in": "Log check-in",
     "doing_well": "Doing well",
@@ -898,11 +903,6 @@
     "purchaseKinds": {
       "medicine": "Medicine",
       "item": "Item"
-    },
-    "invoiceStatuses": {
-      "paid": "Paid",
-      "partial": "Partly paid",
-      "unpaid": "Due"
     },
     "delivery": {
       "queued": "Queued",
@@ -1218,5 +1218,194 @@
       "give": "{{amount}} given back to {{name}} · Out entry added",
       "take": "{{amount}} got back from {{name}} · In entry added"
     }
+  },
+  "quickLine": {
+    "label": "Quick add",
+    "enter": "↵ add",
+    "matches": "Matches",
+    "suggested": "Suggested · click to add",
+    "typed": "Not in the list · add as typed",
+    "noMatch": "No match. Check the spelling or try fewer letters.",
+    "keys": "↑↓ choose · ↵ add · Esc clear",
+    "browse": "Browse",
+    "browseAll": "Browse all",
+    "groups": "Group",
+    "closeBrowse": "Close browse",
+    "added_one": "{{count}} added",
+    "added_other": "{{count}} added",
+    "tapToAdd": "Tap a tile to add",
+    "showing": "Showing {{shown}} of {{total}} · type to narrow",
+    "done": "Done",
+    "emptyGroup": "Nothing in this group matches.",
+    "addOne": "Add one",
+    "removeOne": "Remove one",
+    "addNew": "Add new"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "New invoice",
+      "edit": "Edit invoice",
+      "createSale": "New sale",
+      "editSale": "Edit sale"
+    },
+    "sub": {
+      "create": "Pick the type, then add items",
+      "edit": "Changes are logged on the invoice",
+      "sale": "Medical invoice · stock updates by earliest expiry"
+    },
+    "type": "Type",
+    "steps": {
+      "party": "Patient & team",
+      "items": "Items",
+      "medicines": "Medicines",
+      "payment": "Payment"
+    },
+    "fields": {
+      "branch": "Branch",
+      "newPatient": "New patient",
+      "customer": "Customer",
+      "customerHint": "patient or any contact · new names are saved as a Medical contact",
+      "customerPlaceholder": "Search patients, leads or medical contacts",
+      "addContact": "Add contact",
+      "mobile": "Mobile",
+      "mobileHint": "saved on the contact",
+      "mobilePlaceholder": "98765 43210",
+      "team": "Team",
+      "prescribedBy": "Prescribed by",
+      "teamPlaceholder": "Pick team",
+      "teamHint": "doctor, therapist, counsellor",
+      "teamFrom": "from {{name}}’s team",
+      "overallDiscount": "Overall discount",
+      "quickFill": "Quick fill",
+      "paidNow": "Paid now",
+      "remark": "Remark",
+      "remarkPlaceholder": "Shown on the printed invoice"
+    },
+    "customerGroups": {
+      "patient": "Patients",
+      "lead": "Leads",
+      "contact": "Medical contacts"
+    },
+    "customerSub": {
+      "noMobile": "No mobile yet"
+    },
+    "items": {
+      "quickLine": "Type offering, qty, discount · e.g. lhr face 1 10%",
+      "quickLineMedical": "Type medicine and qty · e.g. sun 2",
+      "hint": "2 = qty · 10% = discount · @500 = rate",
+      "oftenBilled": "Often billed",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}}% off"
+      },
+      "browse": {
+        "all": "All",
+        "oral": "Oral",
+        "topical": "Topical"
+      },
+      "columns": {
+        "offering": "Offering",
+        "medicine": "Medicine",
+        "qty": "Qty",
+        "rate": "Rate",
+        "discount": "Disc %",
+        "gst": "GST",
+        "final": "Final"
+      },
+      "pickItem": "Pick item",
+      "selectOffering": "Select offering…",
+      "selectMedicine": "Select medicine…",
+      "newOffering": "New offering",
+      "addItem": "Add item",
+      "addMedicine": "Add medicine",
+      "total": "Total",
+      "sessions_one": "{{count}} session",
+      "sessions_other": "{{count}} sessions",
+      "inStock": "{{count}} in stock",
+      "outOfStock": "Out of stock",
+      "belowFloor": "Below the lowest price {{amount}} for {{name}}",
+      "tooMuchDiscount": "Too much discount on {{name}} · ask an admin"
+    },
+    "payment": {
+      "full": "Full · {{amount}} in {{mode}}",
+      "split": "Split cash + UPI",
+      "nothing": "Nothing now",
+      "mode": "Mode",
+      "amount": "Amount",
+      "addMode": "Add another mode",
+      "paidTotal": "Paid {{paid}} · due {{due}}"
+    },
+    "totals": {
+      "label": "Totals",
+      "subtotal": "Subtotal",
+      "discountGst": "Discount + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "Bill",
+      "dueAfter": "Due after this"
+    },
+    "badges": {
+      "bill": "Bill {{amount}}",
+      "sessions_one": "Covers {{count}} session",
+      "sessions_other": "Covers {{count}} sessions",
+      "draft": "Draft",
+      "due": "{{amount}} due",
+      "paid": "Fully paid"
+    },
+    "presets": {
+      "print": "Print invoice",
+      "plan": "Plan · {{name}}",
+      "planQty": "Plan · {{name}} ×{{count}}",
+      "package": "Package · {{name}}",
+      "repeat": "Repeat #{{seq}}",
+      "consultation": "New consultation · {{amount}}",
+      "rx": "From Rx #{{seq}}"
+    },
+    "save": {
+      "clinic": "Create clinic invoice",
+      "medical": "Create medical invoice",
+      "consultation": "Create consultation invoice",
+      "edit": "Save changes"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} item",
+    "summaryItems_other": "{{count}} items",
+    "noPatient": "No patient",
+    "errors": {
+      "pickPatient": "Pick a patient",
+      "pickCustomer": "Pick a customer",
+      "addItem": "Add at least one item",
+      "paidAboveBill": "Paid {{paid}} is more than the bill {{bill}}",
+      "stock": "Only {{count}} of {{name}} in stock",
+      "belowFloor": "{{name}} is below its lowest price {{amount}} · raise the final price",
+      "tooMuchDiscount": "{{name}} has more discount than allowed · raise the final price or ask an admin"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "Clinic invoice #{{seq}} created",
+        "medical": "Medical invoice #{{seq}} created",
+        "consultation": "Consultation invoice #{{seq}} created"
+      },
+      "createdPlan_one": "{{created}} · {{count}} offering suggestions item marked invoiced",
+      "createdPlan_other": "{{created}} · {{count}} offering suggestions items marked invoiced",
+      "saved": "Invoice #{{seq}} saved",
+      "savedPlan": "Invoice #{{seq}} saved · offering suggestions updated",
+      "promo": "{{offer}} applied to {{offering}}",
+      "contactSaved": "{{name}} saved as a Medical contact · add a mobile below",
+      "rxUnmatched": "{{name}} not in the medicine list · add from the quick line",
+      "deleted": "Invoice #{{seq}} deleted"
+    },
+    "deleteTitle": "Delete this invoice?",
+    "previewTitle": {
+      "clinic": "Invoice #{{seq}}",
+      "medical": "Medical invoice #{{seq}}",
+      "consultation": "Consultation invoice #{{seq}}"
+    },
+    "record": "Invoice"
+  },
+  "printPreview": {
+    "title": "Print preview · {{title}}",
+    "close": "Close",
+    "print": "Print / Save PDF"
   }
 }

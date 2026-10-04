@@ -87,6 +87,17 @@ export interface RecordDrawerProps {
   /** Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer. */
   quickFill?: readonly QuickFillItem[];
   /**
+   * A strip under the Quick fill row that stays put while the body scrolls —
+   * the drawer's type switch (H:1024 `switchOpts`; the Invoice drawer's Clinic
+   * · Medical · Consultation).
+   */
+  headerStrip?: ReactNode;
+  /**
+   * A strip between the body and the footer that stays put while the body
+   * scrolls — the Invoice drawer's totals (KICKOFF §6.9).
+   */
+  footerStrip?: ReactNode;
+  /**
    * The form's shape, for the automatic width (840 / 560 / 680). A mounted
    * `ItemsField` reports `hasItems` itself; declare it here when the items
    * table sits in a step that starts collapsed (its fields are not mounted).
@@ -373,6 +384,24 @@ function DrawerColumns({
   );
 }
 
+/** A strip of the drawer that stays put while the body scrolls; nothing without content. */
+function DrawerStrip({
+  testId,
+  className,
+  children,
+}: {
+  testId: string;
+  className?: string;
+  children?: ReactNode;
+}) {
+  if (!children) return null;
+  return (
+    <div data-testid={testId} className={cn('shrink-0', className)}>
+      {children}
+    </div>
+  );
+}
+
 /**
  * The record drawer (`mkDrawer`, H:3754–3853) on the shadcn `sheet`, anchored
  * to the inline end: `min(W, 100vw − 56px)` from `md` up with the floating ×
@@ -427,6 +456,9 @@ export function RecordDrawer(props: RecordDrawerProps) {
         items={props.readOnly ? [] : (props.quickFill ?? [])}
         testId={testId}
       />
+      <DrawerStrip testId={`${testId}-header-strip`} className="px-(--drawer-pad-x) pt-3">
+        {props.headerStrip}
+      </DrawerStrip>
 
       <div
         data-testid={`${testId}-body`}
@@ -447,6 +479,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
         </DrawerItemsContext.Provider>
       </div>
 
+      <DrawerStrip testId={`${testId}-footer-strip`}>{props.footerStrip}</DrawerStrip>
       <DrawerFooter
         summary={props.summary}
         readOnly={props.readOnly}

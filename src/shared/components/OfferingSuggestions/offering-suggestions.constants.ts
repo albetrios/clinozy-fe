@@ -96,12 +96,6 @@ export const OFFERING_SUGGESTIONS_KEYS = {
     medicine: 'offeringSuggestions.purchaseKinds.medicine',
     item: 'offeringSuggestions.purchaseKinds.item',
   },
-  /** A purchase's invoice pill (`pyStatus`, H:3633). */
-  invoiceStatuses: {
-    paid: 'offeringSuggestions.invoiceStatuses.paid',
-    partial: 'offeringSuggestions.invoiceStatuses.partial',
-    unpaid: 'offeringSuggestions.invoiceStatuses.unpaid',
-  },
   /** A message's status in "Contact activity" (H:4372). */
   delivery: {
     queued: 'offeringSuggestions.delivery.queued',

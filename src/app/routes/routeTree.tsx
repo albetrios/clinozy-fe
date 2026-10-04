@@ -57,6 +57,14 @@ import {
 } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
 import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
+import { manifest as invoiceEditManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.manifest.ts';
+import { manifest as invoiceManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/invoice-id.manifest.ts';
+import { manifest as invoiceCreateManifest } from '@/pages/organization/$organizationSlug/invoices/create/create.manifest.ts';
+import { manifest as invoicesManifest } from '@/pages/organization/$organizationSlug/invoices/invoices.manifest.ts';
+import {
+  validateInvoiceCreateSearch,
+  validateInvoiceSearch,
+} from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
 import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
 import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
 import { manifest as leadsManifest } from '@/pages/organization/$organizationSlug/leads/leads.manifest.ts';
@@ -1522,6 +1530,74 @@ const organizationCreditEditRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// The shared Invoice drawer (`S:92–94`, D24; KICKOFF §4, §6.9). Its routes are
+// dialogs over a referrer: the Payments ledger — the island's default
+// referrer — stands behind them, its outlet holding the dialog routes (which
+// render nothing), and the island's host opens each dialog over it; `from`
+// takes the drawer back to the room that opened it.
+const InvoicesHost = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx'),
+  'Component',
+);
+const InvoiceCreateRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/invoices/create/create.route.tsx'),
+  'Component',
+);
+const InvoiceRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/invoices/$invoiceId/invoice-id.route.tsx'),
+  'Component',
+);
+const InvoiceEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.route.tsx'),
+  'Component',
+);
+
+const organizationInvoicesRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'invoices',
+  head: manifestHead(invoicesManifest),
+  validateSearch: validateInvoiceSearch,
+  beforeLoad: roomLeafGate(invoicesManifest),
+  // The Payments ledger behind, the island's dialog host over it.
+  component: () => (
+    <>
+      <PaymentsPage />
+      <InvoicesHost />
+    </>
+  ),
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationInvoiceCreateRoute = createRoute({
+  getParentRoute: () => organizationInvoicesRoute,
+  path: 'create',
+  head: manifestHead(invoiceCreateManifest),
+  validateSearch: validateInvoiceCreateSearch,
+  beforeLoad: roomLeafGate(invoiceCreateManifest),
+  component: InvoiceCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationInvoiceRoute = createRoute({
+  getParentRoute: () => organizationInvoicesRoute,
+  path: '$invoiceId',
+  head: manifestHead(invoiceManifest),
+  beforeLoad: roomLeafGate(invoiceManifest),
+  component: InvoiceRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationInvoiceEditRoute = createRoute({
+  getParentRoute: () => organizationInvoiceRoute,
+  path: 'edit',
+  head: manifestHead(invoiceEditManifest),
+  beforeLoad: roomLeafGate(invoiceEditManifest),
+  component: InvoiceEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
 const organizationTasksRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'tasks',
@@ -2329,6 +2405,10 @@ const routeTree = rootRoute.addChildren([
     organizationPaymentsPendingRoute.addChildren([
       organizationPendingCreateRoute,
       organizationCreditEditRoute,
+    ]),
+    organizationInvoicesRoute.addChildren([
+      organizationInvoiceCreateRoute,
+      organizationInvoiceRoute.addChildren([organizationInvoiceEditRoute]),
     ]),
     organizationTasksRoute.addChildren([
       organizationTaskCreateRoute,

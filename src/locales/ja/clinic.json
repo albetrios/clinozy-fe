@@ -595,6 +595,11 @@
     "medical": "薬局",
     "consultation": "診察"
   },
+  "invoiceStatuses": {
+    "paid": "支払い済み",
+    "partial": "一部支払い",
+    "unpaid": "未払い"
+  },
   "taskOutcomes": {
     "log_check_in": "経過を記録",
     "doing_well": "経過良好",
@@ -886,11 +891,6 @@
     "purchaseKinds": {
       "medicine": "薬",
       "item": "商品"
-    },
-    "invoiceStatuses": {
-      "paid": "支払い済み",
-      "partial": "一部支払い",
-      "unpaid": "未払い"
     },
     "delivery": {
       "queued": "送信待ち",
@@ -1201,5 +1201,189 @@
       "give": "{{name}} に {{amount}} を返金 · 出金を追加しました",
       "take": "{{name}} から {{amount}} を回収 · 入金を追加しました"
     }
+  },
+  "quickLine": {
+    "label": "クイック追加",
+    "enter": "↵ 追加",
+    "matches": "候補",
+    "suggested": "おすすめ · クリックで追加",
+    "typed": "リストにありません · 入力どおりに追加",
+    "noMatch": "一致するものがありません。綴りを確認するか、文字数を減らしてください。",
+    "keys": "↑↓ 選択 · ↵ 追加 · Esc クリア",
+    "browse": "一覧から選ぶ",
+    "browseAll": "すべて表示",
+    "groups": "グループ",
+    "closeBrowse": "一覧を閉じる",
+    "added_other": "{{count}}件追加済み",
+    "tapToAdd": "タイルをタップして追加",
+    "showing": "{{total}}件中{{shown}}件を表示 · 入力して絞り込み",
+    "done": "完了",
+    "emptyGroup": "このグループに一致するものはありません。",
+    "addOne": "1つ追加",
+    "removeOne": "1つ減らす",
+    "addNew": "新規追加"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "新しい請求書",
+      "edit": "請求書を編集",
+      "createSale": "新しい販売",
+      "editSale": "販売を編集"
+    },
+    "sub": {
+      "create": "種類を選んでから項目を追加",
+      "edit": "変更は請求書に記録されます",
+      "sale": "医薬品の請求書 · 在庫は期限の近いものから減ります"
+    },
+    "type": "種類",
+    "steps": {
+      "party": "患者とチーム",
+      "items": "項目",
+      "medicines": "医薬品",
+      "payment": "支払い"
+    },
+    "fields": {
+      "branch": "店舗",
+      "newPatient": "新しい患者",
+      "customer": "顧客",
+      "customerHint": "患者または任意の連絡先 · 新しい名前は薬局の連絡先として保存されます",
+      "customerPlaceholder": "患者・リード・薬局の連絡先を検索",
+      "addContact": "連絡先を追加",
+      "mobile": "携帯番号",
+      "mobileHint": "連絡先に保存されます",
+      "mobilePlaceholder": "98765 43210",
+      "team": "チーム",
+      "prescribedBy": "処方者",
+      "teamPlaceholder": "チームを選択",
+      "teamHint": "医師・セラピスト・カウンセラー",
+      "teamFrom": "{{name}} さんのチームから",
+      "overallDiscount": "全体割引",
+      "quickFill": "クイック入力",
+      "paidNow": "今回の支払い",
+      "remark": "備考",
+      "remarkPlaceholder": "印刷した請求書に表示されます"
+    },
+    "customerGroups": {
+      "patient": "患者",
+      "lead": "リード",
+      "contact": "薬局の連絡先"
+    },
+    "customerSub": {
+      "noMobile": "携帯番号はまだありません"
+    },
+    "items": {
+      "quickLine": "サービス・数量・割引を入力 · 例: lhr face 1 10%",
+      "quickLineMedical": "医薬品と数量を入力 · 例: sun 2",
+      "hint": "2 = 数量 · 10% = 割引 · @500 = 単価",
+      "oftenBilled": "よく請求する項目",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}}% オフ"
+      },
+      "browse": {
+        "all": "すべて",
+        "oral": "内服",
+        "topical": "外用"
+      },
+      "columns": {
+        "offering": "サービス",
+        "medicine": "医薬品",
+        "qty": "数量",
+        "rate": "単価",
+        "discount": "割引 %",
+        "gst": "GST",
+        "final": "最終"
+      },
+      "pickItem": "項目を選択",
+      "selectOffering": "サービスを選択…",
+      "selectMedicine": "医薬品を選択…",
+      "newOffering": "新しいサービス",
+      "addItem": "項目を追加",
+      "addMedicine": "医薬品を追加",
+      "total": "合計",
+      "sessions_other": "{{count}} 回",
+      "inStock": "在庫 {{count}}",
+      "outOfStock": "在庫切れ",
+      "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
+      "tooMuchDiscount": "{{name}} の割引が大きすぎます · 管理者に確認してください"
+    },
+    "payment": {
+      "full": "全額 · {{mode}} で {{amount}}",
+      "split": "現金 + UPI に分割",
+      "nothing": "今は支払わない",
+      "mode": "方法",
+      "amount": "金額",
+      "addMode": "別の方法を追加",
+      "paidTotal": "支払済み {{paid}} · 未払い {{due}}"
+    },
+    "totals": {
+      "label": "合計",
+      "subtotal": "小計",
+      "discountGst": "割引 + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "請求額",
+      "dueAfter": "この後の未払い"
+    },
+    "badges": {
+      "bill": "請求額 {{amount}}",
+      "sessions_other": "{{count}} 回分",
+      "draft": "下書き",
+      "due": "未払い {{amount}}",
+      "paid": "支払済み"
+    },
+    "presets": {
+      "print": "請求書を印刷",
+      "plan": "プラン · {{name}}",
+      "planQty": "プラン · {{name}} ×{{count}}",
+      "package": "パッケージ · {{name}}",
+      "repeat": "#{{seq}} を繰り返す",
+      "consultation": "新規診察 · {{amount}}",
+      "rx": "処方箋 #{{seq}} から"
+    },
+    "save": {
+      "clinic": "クリニックの請求書を作成",
+      "medical": "医薬品の請求書を作成",
+      "consultation": "診察の請求書を作成",
+      "edit": "変更を保存"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_other": "{{count}} 項目",
+    "noPatient": "患者なし",
+    "errors": {
+      "pickPatient": "患者を選んでください",
+      "pickCustomer": "顧客を選んでください",
+      "addItem": "項目を1つ以上追加してください",
+      "paidAboveBill": "支払額 {{paid}} が請求額 {{bill}} を超えています",
+      "stock": "{{name}} の在庫は {{count}} のみです",
+      "belowFloor": "{{name}} が最低価格 {{amount}} を下回っています · 最終価格を上げてください",
+      "tooMuchDiscount": "{{name}} の割引が許可を超えています · 最終価格を上げるか管理者に確認してください"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "クリニックの請求書 #{{seq}} を作成しました",
+        "medical": "医薬品の請求書 #{{seq}} を作成しました",
+        "consultation": "診察の請求書 #{{seq}} を作成しました"
+      },
+      "createdPlan_other": "{{created}} · 提案 {{count}} 件を請求済みにしました",
+      "saved": "請求書 #{{seq}} を保存しました",
+      "savedPlan": "請求書 #{{seq}} を保存しました · 提案を更新しました",
+      "promo": "{{offering}} に {{offer}} を適用しました",
+      "contactSaved": "{{name}} を薬局の連絡先として保存しました · 下に携帯番号を追加",
+      "rxUnmatched": "{{name}} は医薬品リストにありません · クイック追加から追加してください",
+      "deleted": "請求書 #{{seq}} を削除しました"
+    },
+    "deleteTitle": "この請求書を削除しますか?",
+    "previewTitle": {
+      "clinic": "請求書 #{{seq}}",
+      "medical": "医薬品の請求書 #{{seq}}",
+      "consultation": "診察の請求書 #{{seq}}"
+    },
+    "record": "請求書"
+  },
+  "printPreview": {
+    "title": "印刷プレビュー · {{title}}",
+    "close": "閉じる",
+    "print": "印刷 / PDF保存"
   }
 }

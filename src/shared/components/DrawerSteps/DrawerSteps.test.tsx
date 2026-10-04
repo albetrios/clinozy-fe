@@ -134,6 +134,46 @@ describe('DrawerSteps', () => {
     expect(within(notes).getByText('Photos · None yet')).toBeInTheDocument();
   });
 
+  it('keeps every pill when values repeat — two rows of one offering, two members of one name', () => {
+    const repeats: DrawerStep[] = [
+      { id: 'open', title: 'Open', content: <p>open body</p> },
+      {
+        id: 'items',
+        title: 'Items',
+        peek: [
+          { kind: 'items', label: 'Offering', names: ['Corn Removal', 'Corn Removal'] },
+        ],
+        content: null,
+      },
+      {
+        id: 'team',
+        title: 'Team',
+        peek: [
+          {
+            kind: 'multi',
+            label: 'Team',
+            values: [{ label: 'Riya S.' }, { label: 'Riya S.' }, { label: 'Kiran P.' }],
+          },
+        ],
+        content: null,
+      },
+    ];
+    const { rerender } = render(
+      <DrawerSteps steps={repeats} value="open" onValueChange={() => {}} testId="pt" />,
+    );
+    const pills = () => [
+      ...within(screen.getByTestId('pt-step-items-peek')).getAllByText('Corn Removal'),
+      ...within(screen.getByTestId('pt-step-team-peek')).getAllByText(
+        /Riya S\.|Kiran P\./,
+      ),
+    ];
+    expect(pills()).toHaveLength(5);
+    rerender(
+      <DrawerSteps steps={repeats} value="open" onValueChange={() => {}} testId="pt" />,
+    );
+    expect(pills()).toHaveLength(5);
+  });
+
   it('"Next" opens the next step, marks the one left done and moves focus to it', async () => {
     const user = userEvent.setup();
     render(<Steps />);

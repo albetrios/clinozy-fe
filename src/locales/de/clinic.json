@@ -598,6 +598,11 @@
     "medical": "Medizin",
     "consultation": "Beratung"
   },
+  "invoiceStatuses": {
+    "paid": "Bezahlt",
+    "partial": "Teilweise bezahlt",
+    "unpaid": "Offen"
+  },
   "taskOutcomes": {
     "log_check_in": "Check-in erfassen",
     "doing_well": "Geht gut",
@@ -898,11 +903,6 @@
     "purchaseKinds": {
       "medicine": "Medikament",
       "item": "Artikel"
-    },
-    "invoiceStatuses": {
-      "paid": "Bezahlt",
-      "partial": "Teilweise bezahlt",
-      "unpaid": "Offen"
     },
     "delivery": {
       "queued": "In Warteschlange",
@@ -1218,5 +1218,194 @@
       "give": "{{amount}} an {{name}} zurückgegeben · Ausgabe erfasst",
       "take": "{{amount}} von {{name}} zurückerhalten · Einnahme erfasst"
     }
+  },
+  "quickLine": {
+    "label": "Schnell hinzufügen",
+    "enter": "↵ hinzufügen",
+    "matches": "Treffer",
+    "suggested": "Vorschläge · zum Hinzufügen klicken",
+    "typed": "Nicht in der Liste · wie eingegeben hinzufügen",
+    "noMatch": "Kein Treffer. Prüfen Sie die Schreibweise oder geben Sie weniger Buchstaben ein.",
+    "keys": "↑↓ auswählen · ↵ hinzufügen · Esc leeren",
+    "browse": "Durchsuchen",
+    "browseAll": "Alle durchsuchen",
+    "groups": "Gruppe",
+    "closeBrowse": "Durchsuchen schließen",
+    "added_one": "{{count}} hinzugefügt",
+    "added_other": "{{count}} hinzugefügt",
+    "tapToAdd": "Tippen Sie auf eine Kachel, um sie hinzuzufügen",
+    "showing": "{{shown}} von {{total}} · zum Eingrenzen tippen",
+    "done": "Fertig",
+    "emptyGroup": "Nichts in dieser Gruppe passt.",
+    "addOne": "Eins hinzufügen",
+    "removeOne": "Eins entfernen",
+    "addNew": "Neu hinzufügen"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "Neue Rechnung",
+      "edit": "Rechnung bearbeiten",
+      "createSale": "Neuer Verkauf",
+      "editSale": "Verkauf bearbeiten"
+    },
+    "sub": {
+      "create": "Wählen Sie den Typ und fügen Sie dann Positionen hinzu",
+      "edit": "Änderungen werden an der Rechnung protokolliert",
+      "sale": "Medizinische Rechnung · der Bestand wird nach frühestem Verfallsdatum abgebucht"
+    },
+    "type": "Typ",
+    "steps": {
+      "party": "Patient & Team",
+      "items": "Positionen",
+      "medicines": "Medikamente",
+      "payment": "Zahlung"
+    },
+    "fields": {
+      "branch": "Filiale",
+      "newPatient": "Neuer Patient",
+      "customer": "Kunde",
+      "customerHint": "Patient oder ein Kontakt · neue Namen werden als Medizinkontakt gespeichert",
+      "customerPlaceholder": "Patienten, Leads oder Medizinkontakte suchen",
+      "addContact": "Kontakt hinzufügen",
+      "mobile": "Mobilnummer",
+      "mobileHint": "wird am Kontakt gespeichert",
+      "mobilePlaceholder": "98765 43210",
+      "team": "Team",
+      "prescribedBy": "Verordnet von",
+      "teamPlaceholder": "Team wählen",
+      "teamHint": "Arzt, Therapeut, Berater",
+      "teamFrom": "aus dem Team von {{name}}",
+      "overallDiscount": "Gesamtrabatt",
+      "quickFill": "Schnell ausfüllen",
+      "paidNow": "Jetzt bezahlt",
+      "remark": "Bemerkung",
+      "remarkPlaceholder": "Erscheint auf der gedruckten Rechnung"
+    },
+    "customerGroups": {
+      "patient": "Patienten",
+      "lead": "Leads",
+      "contact": "Medizinkontakte"
+    },
+    "customerSub": {
+      "noMobile": "Noch keine Handynummer"
+    },
+    "items": {
+      "quickLine": "Leistung, Menge, Rabatt eingeben · z. B. lhr face 1 10%",
+      "quickLineMedical": "Medikament und Menge eingeben · z. B. sun 2",
+      "hint": "2 = Menge · 10% = Rabatt · @500 = Preis",
+      "oftenBilled": "Häufig abgerechnet",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}} % Rabatt"
+      },
+      "browse": {
+        "all": "Alle",
+        "oral": "Oral",
+        "topical": "Topisch"
+      },
+      "columns": {
+        "offering": "Leistung",
+        "medicine": "Medikament",
+        "qty": "Menge",
+        "rate": "Preis",
+        "discount": "Rabatt %",
+        "gst": "GST",
+        "final": "Endpreis"
+      },
+      "pickItem": "Position wählen",
+      "selectOffering": "Leistung wählen…",
+      "selectMedicine": "Medikament wählen…",
+      "newOffering": "Neue Leistung",
+      "addItem": "Position hinzufügen",
+      "addMedicine": "Medikament hinzufügen",
+      "total": "Summe",
+      "sessions_one": "{{count}} Sitzung",
+      "sessions_other": "{{count}} Sitzungen",
+      "inStock": "{{count}} auf Lager",
+      "outOfStock": "Nicht auf Lager",
+      "belowFloor": "Unter dem Mindestpreis {{amount}} für {{name}}",
+      "tooMuchDiscount": "Zu viel Rabatt auf {{name}} · fragen Sie einen Admin"
+    },
+    "payment": {
+      "full": "Voll · {{amount}} per {{mode}}",
+      "split": "Aufteilen Bar + UPI",
+      "nothing": "Jetzt nichts",
+      "mode": "Zahlart",
+      "amount": "Betrag",
+      "addMode": "Weitere Zahlart hinzufügen",
+      "paidTotal": "Bezahlt {{paid}} · offen {{due}}"
+    },
+    "totals": {
+      "label": "Summen",
+      "subtotal": "Zwischensumme",
+      "discountGst": "Rabatt + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "Rechnungsbetrag",
+      "dueAfter": "Danach offen"
+    },
+    "badges": {
+      "bill": "Betrag {{amount}}",
+      "sessions_one": "Umfasst {{count}} Sitzung",
+      "sessions_other": "Umfasst {{count}} Sitzungen",
+      "draft": "Entwurf",
+      "due": "{{amount}} offen",
+      "paid": "Vollständig bezahlt"
+    },
+    "presets": {
+      "print": "Rechnung drucken",
+      "plan": "Plan · {{name}}",
+      "planQty": "Plan · {{name}} ×{{count}}",
+      "package": "Paket · {{name}}",
+      "repeat": "#{{seq}} wiederholen",
+      "consultation": "Neue Konsultation · {{amount}}",
+      "rx": "Aus Rezept #{{seq}}"
+    },
+    "save": {
+      "clinic": "Praxisrechnung erstellen",
+      "medical": "Medizinrechnung erstellen",
+      "consultation": "Konsultationsrechnung erstellen",
+      "edit": "Änderungen speichern"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} Position",
+    "summaryItems_other": "{{count}} Positionen",
+    "noPatient": "Kein Patient",
+    "errors": {
+      "pickPatient": "Wählen Sie einen Patienten",
+      "pickCustomer": "Wählen Sie einen Kunden",
+      "addItem": "Fügen Sie mindestens eine Position hinzu",
+      "paidAboveBill": "Bezahlt {{paid}} ist mehr als der Rechnungsbetrag {{bill}}",
+      "stock": "Nur {{count}} von {{name}} auf Lager",
+      "belowFloor": "{{name}} liegt unter dem Mindestpreis {{amount}} · erhöhen Sie den Endpreis",
+      "tooMuchDiscount": "{{name}} hat mehr Rabatt als erlaubt · erhöhen Sie den Endpreis oder fragen Sie einen Admin"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "Praxisrechnung #{{seq}} erstellt",
+        "medical": "Medizinrechnung #{{seq}} erstellt",
+        "consultation": "Konsultationsrechnung #{{seq}} erstellt"
+      },
+      "createdPlan_one": "{{created}} · {{count}} Vorschlag als abgerechnet markiert",
+      "createdPlan_other": "{{created}} · {{count}} Vorschläge als abgerechnet markiert",
+      "saved": "Rechnung #{{seq}} gespeichert",
+      "savedPlan": "Rechnung #{{seq}} gespeichert · Vorschläge aktualisiert",
+      "promo": "{{offer}} auf {{offering}} angewendet",
+      "contactSaved": "{{name}} als Medizinkontakt gespeichert · fügen Sie unten eine Handynummer hinzu",
+      "rxUnmatched": "{{name}} ist nicht in der Medikamentenliste · fügen Sie es über „Schnell hinzufügen“ hinzu",
+      "deleted": "Rechnung #{{seq}} gelöscht"
+    },
+    "deleteTitle": "Diese Rechnung löschen?",
+    "previewTitle": {
+      "clinic": "Rechnung #{{seq}}",
+      "medical": "Medizinrechnung #{{seq}}",
+      "consultation": "Konsultationsrechnung #{{seq}}"
+    },
+    "record": "Rechnung"
+  },
+  "printPreview": {
+    "title": "Druckvorschau · {{title}}",
+    "close": "Schließen",
+    "print": "Drucken / Als PDF speichern"
   }
 }

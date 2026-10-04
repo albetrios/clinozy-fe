@@ -18,6 +18,9 @@ import type {
  * is rounded once, to the paisa (Q-X3).
  */
 
+/** A line's fields the money module reads. */
+type LineFields = Pick<InvoiceItem, 'qty' | 'rate' | 'discountPct' | 'gstPct'>;
+
 /** One invoice line's amounts, in paise — unrounded; round where it is shown. */
 export interface InvoiceLineAmounts {
   /** Quantity × rate, before any discount. */
@@ -31,9 +34,7 @@ export interface InvoiceLineAmounts {
 }
 
 /** A line's amounts: the discount comes off the base, GST is charged on the rest. */
-export function invoiceLineAmounts(
-  item: Pick<InvoiceItem, 'qty' | 'rate' | 'discountPct' | 'gstPct'>,
-): InvoiceLineAmounts {
+export function invoiceLineAmounts(item: LineFields): InvoiceLineAmounts {
   const base = item.qty * item.rate;
   const discount = (base * item.discountPct) / 100;
   const gst = ((base - discount) * item.gstPct) / 100;
@@ -56,10 +57,11 @@ export interface InvoiceTotals {
   bill: number;
 }
 
-/** The subtotal, discounts, GST and bill of an invoice. */
-export function invoiceTotals(
-  invoice: Pick<Invoice, 'items' | 'overallDiscount'>,
-): InvoiceTotals {
+/** The subtotal, discounts, GST and bill of an invoice — or of the drawer's draft. */
+export function invoiceTotals(invoice: {
+  items: readonly LineFields[];
+  overallDiscount: Invoice['overallDiscount'];
+}): InvoiceTotals {
   let subtotal = 0;
   let lineDiscount = 0;
   let gst = 0;
@@ -147,18 +149,105 @@ export function expectedDrawerCash(openingCash: number, totals: DayModeTotals): 
   return openingCash + totals.cash.in - totals.cash.out;
 }
 
-/** The bill, what has been paid, what is due and the status of an invoice. */
-export function invoiceBalance(
-  invoice: Pick<Invoice, 'id' | 'items' | 'overallDiscount'>,
-  payments: readonly Payment[],
-): InvoiceBalance {
-  const { bill } = invoiceTotals(invoice);
-  const paid = invoicePaid(invoice.id, payments);
+/**
+ * A bill against what has been paid on it (H:3633): what is still due — never
+ * below zero — and the status, "Paid" once nothing is due, "Partly paid" once
+ * something was paid, else "Due". The invoice drawer's draft reads it too.
+ */
+export function balanceOf(bill: number, paid: number): InvoiceBalance {
   const due = Math.max(0, bill - paid);
   let status: InvoiceStatus = 'unpaid';
   if (due === 0) status = 'paid';
   else if (paid > 0) status = 'partial';
   return { bill, paid, due, status };
+}
+
+/** The bill, what has been paid, what is due and the status of an invoice. */
+export function invoiceBalance(
+  invoice: Pick<Invoice, 'id' | 'items' | 'overallDiscount'>,
+  payments: readonly Payment[],
+): InvoiceBalance {
+  return balanceOf(invoiceTotals(invoice).bill, invoicePaid(invoice.id, payments));
+}
+
+// ── The invoice drawer's figures (KICKOFF §6.9 Invoice drawer) ──
+
+const roundTo2 = (value: number) => Math.round(value * 100) / 100;
+
+/** What the overall discount percent is taken of (Q-G7): the subtotal after the line discounts, before tax. */
+export function discountableSubtotal(items: readonly LineFields[]): number {
+  const { subtotal, lineDiscount } = invoiceTotals({ items, overallDiscount: 0 });
+  return subtotal - lineDiscount;
+}
+
+/**
+ * The overall discount a percent asks for, in paise (Q-G7): before tax, off
+ * the subtotal after the line discounts, to the paisa. The drawer keeps the %
+ * field; the contract stores this amount (`S:616`). The percent is held to
+ * 0–100, so the discount never passes the subtotal.
+ */
+export function overallDiscountFromPercent(
+  items: readonly LineFields[],
+  percent: number,
+): number {
+  const share = Math.min(100, Math.max(0, percent));
+  return Math.round((discountableSubtotal(items) * share) / 100);
+}
+
+/**
+ * The percent a stored overall discount is of the subtotal after the line
+ * discounts — the drawer's field when an invoice opens for an edit — to two
+ * decimals; 0 when there is nothing to discount.
+ */
+export function overallDiscountPercent(
+  items: readonly LineFields[],
+  overallDiscount: number,
+): number {
+  const base = discountableSubtotal(items);
+  if (base <= 0 || overallDiscount <= 0) return 0;
+  return Math.min(100, roundTo2((overallDiscount / base) * 100));
+}
+
+/** A line's Final — what it comes to, to the paisa: the drawer's editable cell. */
+export function lineFinal(item: LineFields): number {
+  return Math.round(invoiceLineAmounts(item).net);
+}
+
+/**
+ * The Disc % that brings a line to `final` (the Final cell's back-solve,
+ * H:5059): measured against the line before any discount, the final held to
+ * between nothing and that. Kept exact, so the typed Final is what the line
+ * comes to — the cell and the print show it to two decimals; the contract's
+ * whole percent can't hold it (Appendix F).
+ */
+export function discountForFinal(item: LineFields, final: number): number {
+  const full = invoiceLineAmounts({ ...item, discountPct: 0 }).net;
+  if (full <= 0) return 0;
+  const wanted = Math.min(full, Math.max(0, final));
+  return Math.max(0, Math.min(100, (1 - wanted / full) * 100));
+}
+
+/**
+ * The lowest Final a line may come to (H:5059): its floor per unit times the
+ * quantity, with the line's GST on top unless the floor already includes it
+ * (a GST-inclusive offering, Q-O3). `null` when the line has no floor.
+ */
+export function lineFloor(
+  line: Pick<InvoiceItem, 'qty' | 'gstPct'>,
+  floorPerUnit: number | null,
+  gstInclusive = false,
+): number | null {
+  if (floorPerUnit === null || floorPerUnit <= 0) return null;
+  const base = floorPerUnit * line.qty;
+  return gstInclusive ? base : base * (1 + line.gstPct / 100);
+}
+
+/** Half a rupee: a Final that rounds to its floor is not below it (H:5059). */
+const FLOOR_TOLERANCE = 50;
+
+/** Whether a line comes to less than its floor ({@link lineFloor}). */
+export function belowFloor(item: LineFields, floor: number | null): boolean {
+  return floor !== null && invoiceLineAmounts(item).net + FLOOR_TOLERANCE < floor;
 }
 
 /**

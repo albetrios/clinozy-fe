@@ -13,7 +13,10 @@ import {
   offerState,
 } from '@/shared/api/clinic/offerings-pricing.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
-import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerPeekItem,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -36,9 +39,6 @@ import {
 
 const K = OFFERING_DRAWER_KEYS;
 const F = K.fields;
-
-/** How many values a step head's sub line names (H:3840). */
-const SUMMARY_LIMIT = 4;
 
 /** One offer that has not ended on this offering — a read-only "Offers on this" box. */
 export interface OfferOnThis {
@@ -98,16 +98,6 @@ export interface OfferingDrawerViewInput {
   /** The header's pricing branch (`pricingBranch`). */
   pricingBranchId: string | null;
   today: string;
-}
-
-/** The first four filled values, " · "-joined, else "Not filled yet" (H:3840). */
-function stepSummary(parts: readonly (string | null | undefined)[], empty: string) {
-  return (
-    parts
-      .filter((part): part is string => Boolean(part))
-      .slice(0, SUMMARY_LIMIT)
-      .join(' · ') || empty
-  );
 }
 
 /** The offers on this offering that have not ended, Running first (H:5499). */
@@ -213,7 +203,7 @@ function mainStepOf(
     id: 'offering',
     peek,
     // The head names values, never the colour (H:3840).
-    summary: stepSummary(
+    summary: drawerStepSummary(
       [
         values.name.trim(),
         category,
@@ -274,7 +264,7 @@ function stepOf(
   return {
     id,
     peek: parts.flatMap((part) => part.peek),
-    summary: stepSummary(
+    summary: drawerStepSummary(
       parts.flatMap((part) => part.values),
       words.tClinic(RECORD_DRAWER_KEYS.step.notFilled),
     ),

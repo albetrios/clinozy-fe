@@ -268,6 +268,28 @@ describe('RecordDrawer — shell', () => {
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSave).not.toHaveBeenCalled();
   });
+
+  it('keeps a strip under Quick fill and one above the footer out of the scrolling body', async () => {
+    const { drawer } = await openDrawer({
+      headerStrip: <p>type switch</p>,
+      footerStrip: <p>totals</p>,
+      children: <p>fields</p>,
+    });
+    const body = within(drawer).getByTestId('pt-body');
+    const header = within(drawer).getByTestId('pt-header-strip');
+    const footer = within(drawer).getByTestId('pt-footer-strip');
+    expect(header).toHaveTextContent('type switch');
+    expect(footer).toHaveTextContent('totals');
+    expect(body).not.toContainElement(header);
+    expect(body).not.toContainElement(footer);
+    // Header strip, body, footer strip, footer — in that order.
+    expect(header.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(body.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
 });
 
 describe('RecordDrawer — focus', () => {

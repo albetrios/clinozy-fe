@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next';
 
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
-import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerPeekItem,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -18,16 +21,6 @@ import {
 import { type BranchFormValues, missingBranchFields } from './branch-form.ts';
 
 const K = USERS_KEYS.branches.drawer;
-
-/** The first four filled values of a step, " · "-joined — its head's sub line. */
-function stepSummary(parts: readonly (string | undefined)[], empty: string): string {
-  return (
-    parts
-      .filter((part): part is string => Boolean(part))
-      .slice(0, 4)
-      .join(' · ') || empty
-  );
-}
 
 /** What the drawer shows of its form outside the fields: header, footer and step heads. */
 export interface BranchDrawerView {
@@ -102,7 +95,7 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.pin), value: values.pin },
       ],
       // The first four filled values in the fields' order (H:5225).
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [
           name,
           mainLabel,
@@ -137,7 +130,7 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.opens), value: values.opensAt },
         { kind: 'value', label: t(K.fields.closes), value: values.closesAt },
       ],
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [
           phone,
           values.email.trim(),
@@ -163,7 +156,7 @@ export function useBranchDrawerView({
         })),
       ],
       // The team, then each default or "Nobody" (H:5229).
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [
           team.map((member) => member.name).join(', '),
           ...BRANCH_DEFAULT_ROLES.map((role) => defaultName(role) ?? nobody),

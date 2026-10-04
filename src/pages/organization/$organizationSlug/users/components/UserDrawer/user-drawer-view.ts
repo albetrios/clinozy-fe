@@ -9,7 +9,10 @@ import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
-import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerPeekItem,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -35,16 +38,6 @@ export interface UserDrawerView {
   summary: string;
   profile: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
   hours: { peek: DrawerPeekItem[]; summary: string };
-}
-
-/** The first four filled values of a step, " · "-joined — its head's sub line. */
-function stepSummary(parts: readonly (string | undefined)[], empty: string): string {
-  return (
-    parts
-      .filter((part): part is string => Boolean(part))
-      .slice(0, 4)
-      .join(' · ') || empty
-  );
 }
 
 /**
@@ -158,7 +151,7 @@ export function useUserDrawerView({
       .join(' · '),
     profile: {
       peek: profilePeek,
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [roles.map((role) => role.label).join(' · '), access, branchNames.join(' · ')],
         notFilled,
       ),
@@ -168,7 +161,7 @@ export function useUserDrawerView({
     },
     hours: {
       peek: hoursPeek,
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [
           hours,
           t(USERS_KEYS.table.commission, { value: values.commissionPct }),

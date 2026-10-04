@@ -60,10 +60,11 @@ afterEach(() => {
 });
 
 describe('MONEY_WRITE_KEYS', () => {
-  it('refreshes the ledger, the credits and the patients’ dues', () => {
+  it('refreshes the ledger, the credits, the patients’ dues and the invoices', () => {
     expect(MONEY_WRITE_KEYS).toContainEqual(paymentQueryKeys.all);
     expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'credits']);
     expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'patients']);
+    expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'invoices']);
   });
 });
 

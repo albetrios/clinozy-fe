@@ -12,7 +12,10 @@ import {
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
 } from '@/shared/clinic/clinic-tones.ts';
-import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerPeekItem,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import { PERSON_CARD_KEYS } from '@/shared/components/PersonCard/person-card.constants.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
@@ -92,16 +95,6 @@ function patientFormLabels(
     consents: values.consents.map((consent) => t(PERSON_CARD_KEYS.consent[consent])),
     age: dateOfBirth ? civilYearsBetween(dateOfBirth, today) : null,
   };
-}
-
-/** The first four filled values of a step, " · "-joined — its head's sub line. */
-function stepSummary(parts: readonly (string | undefined)[], empty: string): string {
-  return (
-    parts
-      .filter((part): part is string => Boolean(part))
-      .slice(0, 4)
-      .join(' · ') || empty
-  );
 }
 
 function contactPeekOf(
@@ -238,7 +231,7 @@ export function usePatientDrawerView({
     badges: drawerBadges(values, labels, t),
     contact: {
       peek: contactPeek,
-      summary: stepSummary(
+      summary: drawerStepSummary(
         contactPeek.map((item) => (item.kind === 'value' ? item.value : undefined)),
         notFilled,
       ),
@@ -248,7 +241,7 @@ export function usePatientDrawerView({
     },
     clinic: {
       peek: clinicPeek,
-      summary: stepSummary(
+      summary: drawerStepSummary(
         [
           labels.types.join(', '),
           labels.status,

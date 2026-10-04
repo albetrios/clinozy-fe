@@ -595,6 +595,11 @@
     "medical": "약국",
     "consultation": "상담"
   },
+  "invoiceStatuses": {
+    "paid": "결제 완료",
+    "partial": "일부 결제",
+    "unpaid": "미결제"
+  },
   "taskOutcomes": {
     "log_check_in": "경과 기록",
     "doing_well": "잘 지냄",
@@ -886,11 +891,6 @@
     "purchaseKinds": {
       "medicine": "약",
       "item": "품목"
-    },
-    "invoiceStatuses": {
-      "paid": "결제 완료",
-      "partial": "일부 결제",
-      "unpaid": "미결제"
     },
     "delivery": {
       "queued": "대기 중",
@@ -1201,5 +1201,189 @@
       "give": "{{name}}에게 {{amount}} 돌려줌 · 출금 항목 추가됨",
       "take": "{{name}}에게서 {{amount}} 돌려받음 · 입금 항목 추가됨"
     }
+  },
+  "quickLine": {
+    "label": "빠른 추가",
+    "enter": "↵ 추가",
+    "matches": "검색 결과",
+    "suggested": "추천 · 클릭해서 추가",
+    "typed": "목록에 없음 · 입력한 대로 추가",
+    "noMatch": "일치하는 항목이 없습니다. 철자를 확인하거나 더 적게 입력하세요.",
+    "keys": "↑↓ 선택 · ↵ 추가 · Esc 지우기",
+    "browse": "둘러보기",
+    "browseAll": "전체 둘러보기",
+    "groups": "그룹",
+    "closeBrowse": "둘러보기 닫기",
+    "added_other": "{{count}}개 추가됨",
+    "tapToAdd": "타일을 눌러 추가하세요",
+    "showing": "{{total}}개 중 {{shown}}개 표시 · 입력해서 좁히기",
+    "done": "완료",
+    "emptyGroup": "이 그룹에 일치하는 항목이 없습니다.",
+    "addOne": "하나 추가",
+    "removeOne": "하나 빼기",
+    "addNew": "새로 추가"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "새 청구서",
+      "edit": "청구서 수정",
+      "createSale": "새 판매",
+      "editSale": "판매 수정"
+    },
+    "sub": {
+      "create": "유형을 고른 뒤 항목을 추가하세요",
+      "edit": "변경 사항은 청구서에 기록됩니다",
+      "sale": "의약품 청구서 · 재고는 유효기한이 가까운 순으로 차감됩니다"
+    },
+    "type": "유형",
+    "steps": {
+      "party": "환자 및 팀",
+      "items": "항목",
+      "medicines": "의약품",
+      "payment": "결제"
+    },
+    "fields": {
+      "branch": "지점",
+      "newPatient": "새 환자",
+      "customer": "고객",
+      "customerHint": "환자 또는 아무 연락처 · 새 이름은 약국 연락처로 저장됩니다",
+      "customerPlaceholder": "환자, 리드 또는 약국 연락처 검색",
+      "addContact": "연락처 추가",
+      "mobile": "휴대폰",
+      "mobileHint": "연락처에 저장됨",
+      "mobilePlaceholder": "98765 43210",
+      "team": "팀",
+      "prescribedBy": "처방자",
+      "teamPlaceholder": "팀 선택",
+      "teamHint": "의사, 치료사, 상담사",
+      "teamFrom": "{{name}}님의 팀에서",
+      "overallDiscount": "전체 할인",
+      "quickFill": "빠른 입력",
+      "paidNow": "지금 결제",
+      "remark": "비고",
+      "remarkPlaceholder": "인쇄된 청구서에 표시됩니다"
+    },
+    "customerGroups": {
+      "patient": "환자",
+      "lead": "리드",
+      "contact": "약국 연락처"
+    },
+    "customerSub": {
+      "noMobile": "아직 휴대폰 없음"
+    },
+    "items": {
+      "quickLine": "서비스, 수량, 할인 입력 · 예: lhr face 1 10%",
+      "quickLineMedical": "의약품과 수량 입력 · 예: sun 2",
+      "hint": "2 = 수량 · 10% = 할인 · @500 = 단가",
+      "oftenBilled": "자주 청구",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}}% 할인"
+      },
+      "browse": {
+        "all": "전체",
+        "oral": "경구",
+        "topical": "외용"
+      },
+      "columns": {
+        "offering": "서비스",
+        "medicine": "의약품",
+        "qty": "수량",
+        "rate": "단가",
+        "discount": "할인 %",
+        "gst": "GST",
+        "final": "최종"
+      },
+      "pickItem": "항목 선택",
+      "selectOffering": "서비스 선택…",
+      "selectMedicine": "의약품 선택…",
+      "newOffering": "새 서비스",
+      "addItem": "항목 추가",
+      "addMedicine": "의약품 추가",
+      "total": "합계",
+      "sessions_other": "{{count}}회",
+      "inStock": "재고 {{count}}",
+      "outOfStock": "재고 없음",
+      "belowFloor": "{{name}}의 최저가 {{amount}}보다 낮습니다",
+      "tooMuchDiscount": "{{name}} 할인이 너무 큽니다 · 관리자에게 문의하세요"
+    },
+    "payment": {
+      "full": "전액 · {{mode}}로 {{amount}}",
+      "split": "현금 + UPI 분할",
+      "nothing": "지금은 없음",
+      "mode": "수단",
+      "amount": "금액",
+      "addMode": "다른 수단 추가",
+      "paidTotal": "결제 {{paid}} · 미수 {{due}}"
+    },
+    "totals": {
+      "label": "합계",
+      "subtotal": "소계",
+      "discountGst": "할인 + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "청구액",
+      "dueAfter": "이후 미수"
+    },
+    "badges": {
+      "bill": "청구액 {{amount}}",
+      "sessions_other": "{{count}}회 포함",
+      "draft": "임시",
+      "due": "미수 {{amount}}",
+      "paid": "전액 결제"
+    },
+    "presets": {
+      "print": "청구서 인쇄",
+      "plan": "플랜 · {{name}}",
+      "planQty": "플랜 · {{name}} ×{{count}}",
+      "package": "패키지 · {{name}}",
+      "repeat": "#{{seq}} 반복",
+      "consultation": "신규 상담 · {{amount}}",
+      "rx": "처방전 #{{seq}}에서"
+    },
+    "save": {
+      "clinic": "클리닉 청구서 만들기",
+      "medical": "의약품 청구서 만들기",
+      "consultation": "상담 청구서 만들기",
+      "edit": "변경 사항 저장"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_other": "항목 {{count}}개",
+    "noPatient": "환자 없음",
+    "errors": {
+      "pickPatient": "환자를 선택하세요",
+      "pickCustomer": "고객을 선택하세요",
+      "addItem": "항목을 하나 이상 추가하세요",
+      "paidAboveBill": "결제액 {{paid}}이(가) 청구액 {{bill}}보다 많습니다",
+      "stock": "{{name}} 재고가 {{count}}개뿐입니다",
+      "belowFloor": "{{name}}이(가) 최저가 {{amount}}보다 낮습니다 · 최종 가격을 올리세요",
+      "tooMuchDiscount": "{{name}}의 할인이 허용치를 넘습니다 · 최종 가격을 올리거나 관리자에게 문의하세요"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "클리닉 청구서 #{{seq}} 생성됨",
+        "medical": "의약품 청구서 #{{seq}} 생성됨",
+        "consultation": "상담 청구서 #{{seq}} 생성됨"
+      },
+      "createdPlan_other": "{{created}} · 제안 {{count}}건을 청구 완료로 표시함",
+      "saved": "청구서 #{{seq}} 저장됨",
+      "savedPlan": "청구서 #{{seq}} 저장됨 · 제안 업데이트됨",
+      "promo": "{{offering}}에 {{offer}} 적용됨",
+      "contactSaved": "{{name}}을(를) 약국 연락처로 저장함 · 아래에 휴대폰 추가",
+      "rxUnmatched": "{{name}}은(는) 의약품 목록에 없습니다 · 빠른 추가에서 추가하세요",
+      "deleted": "청구서 #{{seq}} 삭제됨"
+    },
+    "deleteTitle": "이 청구서를 삭제할까요?",
+    "previewTitle": {
+      "clinic": "청구서 #{{seq}}",
+      "medical": "의약품 청구서 #{{seq}}",
+      "consultation": "상담 청구서 #{{seq}}"
+    },
+    "record": "청구서"
+  },
+  "printPreview": {
+    "title": "인쇄 미리보기 · {{title}}",
+    "close": "닫기",
+    "print": "인쇄 / PDF 저장"
   }
 }

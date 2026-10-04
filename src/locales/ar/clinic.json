@@ -610,6 +610,11 @@
     "medical": "الصيدلية",
     "consultation": "الاستشارة"
   },
+  "invoiceStatuses": {
+    "paid": "مدفوعة",
+    "partial": "مدفوعة جزئيًا",
+    "unpaid": "مستحقة"
+  },
   "taskOutcomes": {
     "log_check_in": "تسجيل متابعة",
     "doing_well": "بحالة جيدة",
@@ -947,11 +952,6 @@
       "medicine": "دواء",
       "item": "منتج"
     },
-    "invoiceStatuses": {
-      "paid": "مدفوعة",
-      "partial": "مدفوعة جزئيًا",
-      "unpaid": "مستحقة"
-    },
     "delivery": {
       "queued": "في الانتظار",
       "sent": "أُرسلت",
@@ -1286,5 +1286,214 @@
       "give": "رُدّ {{amount}} إلى {{name}} · أُضيف قيد صادر",
       "take": "استُلم {{amount}} من {{name}} · أُضيف قيد وارد"
     }
+  },
+  "quickLine": {
+    "label": "إضافة سريعة",
+    "enter": "↵ إضافة",
+    "matches": "النتائج",
+    "suggested": "مقترحات · انقر للإضافة",
+    "typed": "ليس في القائمة · أضِف كما كُتب",
+    "noMatch": "لا نتائج. تحقق من الإملاء أو اكتب أحرفًا أقل.",
+    "keys": "↑↓ اختيار · ↵ إضافة · Esc مسح",
+    "browse": "تصفح",
+    "browseAll": "تصفح الكل",
+    "groups": "المجموعة",
+    "closeBrowse": "إغلاق التصفح",
+    "added_zero": "لم يُضَف شيء",
+    "added_one": "أُضيف عنصر واحد",
+    "added_two": "أُضيف عنصران",
+    "added_few": "أُضيفت {{count}} عناصر",
+    "added_many": "أُضيف {{count}} عنصرًا",
+    "added_other": "أُضيف {{count}} عنصر",
+    "tapToAdd": "انقر على مربع لإضافته",
+    "showing": "يُعرض {{shown}} من {{total}} · اكتب للتضييق",
+    "done": "تم",
+    "emptyGroup": "لا شيء في هذه المجموعة يطابق.",
+    "addOne": "إضافة واحد",
+    "removeOne": "إزالة واحد",
+    "addNew": "إضافة جديد"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "فاتورة جديدة",
+      "edit": "تعديل الفاتورة",
+      "createSale": "بيع جديد",
+      "editSale": "تعديل البيع"
+    },
+    "sub": {
+      "create": "اختر النوع، ثم أضف البنود",
+      "edit": "تُسجَّل التغييرات على الفاتورة",
+      "sale": "فاتورة طبية · يُحدَّث المخزون حسب أقرب انتهاء صلاحية"
+    },
+    "type": "النوع",
+    "steps": {
+      "party": "المريض والفريق",
+      "items": "البنود",
+      "medicines": "الأدوية",
+      "payment": "الدفع"
+    },
+    "fields": {
+      "branch": "الفرع",
+      "newPatient": "مريض جديد",
+      "customer": "العميل",
+      "customerHint": "مريض أو أي جهة اتصال · تُحفظ الأسماء الجديدة كجهة اتصال طبية",
+      "customerPlaceholder": "ابحث عن المرضى أو العملاء المحتملين أو جهات الاتصال الطبية",
+      "addContact": "إضافة جهة اتصال",
+      "mobile": "الجوال",
+      "mobileHint": "يُحفظ في جهة الاتصال",
+      "mobilePlaceholder": "98765 43210",
+      "team": "الفريق",
+      "prescribedBy": "وصفه",
+      "teamPlaceholder": "اختر الفريق",
+      "teamHint": "طبيب، معالج، مستشار",
+      "teamFrom": "من فريق {{name}}",
+      "overallDiscount": "الخصم الإجمالي",
+      "quickFill": "تعبئة سريعة",
+      "paidNow": "المدفوع الآن",
+      "remark": "ملاحظة",
+      "remarkPlaceholder": "تظهر على الفاتورة المطبوعة"
+    },
+    "customerGroups": {
+      "patient": "المرضى",
+      "lead": "العملاء المحتملون",
+      "contact": "جهات الاتصال الطبية"
+    },
+    "customerSub": {
+      "noMobile": "لا رقم جوال بعد"
+    },
+    "items": {
+      "quickLine": "اكتب الخدمة والكمية والخصم · مثال: lhr face 1 10%",
+      "quickLineMedical": "اكتب الدواء والكمية · مثال: sun 2",
+      "hint": "2 = الكمية · 10% = الخصم · @500 = السعر",
+      "oftenBilled": "الأكثر فوترة",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "خصم {{percent}}%"
+      },
+      "browse": {
+        "all": "الكل",
+        "oral": "فموي",
+        "topical": "موضعي"
+      },
+      "columns": {
+        "offering": "الخدمة",
+        "medicine": "الدواء",
+        "qty": "الكمية",
+        "rate": "السعر",
+        "discount": "خصم %",
+        "gst": "GST",
+        "final": "النهائي"
+      },
+      "pickItem": "اختر بندًا",
+      "selectOffering": "اختر الخدمة…",
+      "selectMedicine": "اختر الدواء…",
+      "newOffering": "خدمة جديدة",
+      "addItem": "إضافة بند",
+      "addMedicine": "إضافة دواء",
+      "total": "الإجمالي",
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "جلسة واحدة",
+      "sessions_two": "جلستان",
+      "sessions_few": "{{count}} جلسات",
+      "sessions_many": "{{count}} جلسة",
+      "sessions_other": "{{count}} جلسة",
+      "inStock": "متوفر {{count}}",
+      "outOfStock": "غير متوفر",
+      "belowFloor": "أقل من أدنى سعر {{amount}} لـ {{name}}",
+      "tooMuchDiscount": "خصم كبير جدًا على {{name}} · اسأل المسؤول"
+    },
+    "payment": {
+      "full": "كامل · {{amount}} عبر {{mode}}",
+      "split": "تقسيم نقدًا + UPI",
+      "nothing": "لا شيء الآن",
+      "mode": "الطريقة",
+      "amount": "المبلغ",
+      "addMode": "أضف طريقة أخرى",
+      "paidTotal": "المدفوع {{paid}} · المستحق {{due}}"
+    },
+    "totals": {
+      "label": "الإجماليات",
+      "subtotal": "المجموع الفرعي",
+      "discountGst": "الخصم + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "الفاتورة",
+      "dueAfter": "المستحق بعد هذا"
+    },
+    "badges": {
+      "bill": "الفاتورة {{amount}}",
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "يشمل جلسة واحدة",
+      "sessions_two": "يشمل جلستين",
+      "sessions_few": "يشمل {{count}} جلسات",
+      "sessions_many": "يشمل {{count}} جلسة",
+      "sessions_other": "يشمل {{count}} جلسة",
+      "draft": "مسودة",
+      "due": "مستحق {{amount}}",
+      "paid": "مدفوعة بالكامل"
+    },
+    "presets": {
+      "print": "طباعة الفاتورة",
+      "plan": "الخطة · {{name}}",
+      "planQty": "الخطة · {{name}} ×{{count}}",
+      "package": "باقة · {{name}}",
+      "repeat": "تكرار #{{seq}}",
+      "consultation": "استشارة جديدة · {{amount}}",
+      "rx": "من الوصفة #{{seq}}"
+    },
+    "save": {
+      "clinic": "إنشاء فاتورة العيادة",
+      "medical": "إنشاء فاتورة طبية",
+      "consultation": "إنشاء فاتورة استشارة",
+      "edit": "حفظ التغييرات"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_zero": "لا بنود",
+    "summaryItems_one": "بند واحد",
+    "summaryItems_two": "بندان",
+    "summaryItems_few": "{{count}} بنود",
+    "summaryItems_many": "{{count}} بندًا",
+    "summaryItems_other": "{{count}} بند",
+    "noPatient": "لا مريض",
+    "errors": {
+      "pickPatient": "اختر مريضًا",
+      "pickCustomer": "اختر عميلًا",
+      "addItem": "أضف بندًا واحدًا على الأقل",
+      "paidAboveBill": "المدفوع {{paid}} أكثر من الفاتورة {{bill}}",
+      "stock": "لا يتوفر من {{name}} سوى {{count}}",
+      "belowFloor": "{{name}} أقل من أدنى سعر له {{amount}} · ارفع السعر النهائي",
+      "tooMuchDiscount": "{{name}} عليه خصم أكبر من المسموح · ارفع السعر النهائي أو اسأل المسؤول"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "أُنشئت فاتورة العيادة #{{seq}}",
+        "medical": "أُنشئت الفاتورة الطبية #{{seq}}",
+        "consultation": "أُنشئت فاتورة الاستشارة #{{seq}}"
+      },
+      "createdPlan_zero": "{{created}} · لم يُعلَّم أي بند من الاقتراحات",
+      "createdPlan_one": "{{created}} · عُلّم بند واحد من الاقتراحات كمُفوتَر",
+      "createdPlan_two": "{{created}} · عُلّم بندان من الاقتراحات كمُفوتَرين",
+      "createdPlan_few": "{{created}} · عُلّمت {{count}} بنود من الاقتراحات كمُفوتَرة",
+      "createdPlan_many": "{{created}} · عُلّم {{count}} بندًا من الاقتراحات كمُفوتَر",
+      "createdPlan_other": "{{created}} · عُلّم {{count}} بند من الاقتراحات كمُفوتَر",
+      "saved": "حُفظت الفاتورة #{{seq}}",
+      "savedPlan": "حُفظت الفاتورة #{{seq}} · حُدّثت الاقتراحات",
+      "promo": "طُبّق {{offer}} على {{offering}}",
+      "contactSaved": "حُفظ {{name}} كجهة اتصال طبية · أضف رقم الجوال أدناه",
+      "rxUnmatched": "{{name}} غير موجود في قائمة الأدوية · أضفه من الإضافة السريعة",
+      "deleted": "حُذفت الفاتورة #{{seq}}"
+    },
+    "deleteTitle": "حذف هذه الفاتورة؟",
+    "previewTitle": {
+      "clinic": "الفاتورة #{{seq}}",
+      "medical": "الفاتورة الطبية #{{seq}}",
+      "consultation": "فاتورة الاستشارة #{{seq}}"
+    },
+    "record": "الفاتورة"
+  },
+  "printPreview": {
+    "title": "معاينة الطباعة · {{title}}",
+    "close": "إغلاق",
+    "print": "طباعة / حفظ PDF"
   }
 }

@@ -5,7 +5,10 @@ import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { offerPreview } from '@/shared/api/clinic/offerings-pricing.ts';
 import { OFFER_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
-import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerPeekItem,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -27,9 +30,6 @@ import {
 
 const K = OFFER_DRAWER_KEYS;
 const F = K.fields;
-
-/** How many values a step head's sub line names (H:3840). */
-const SUMMARY_LIMIT = 4;
 
 /** The drawer's three step cards (`offerings.md:246–253`). */
 export type OfferStepId = 'offer' | 'where' | 'notes';
@@ -68,16 +68,6 @@ export interface OfferDrawerViewInput {
   offerings: readonly OfferingRecord[];
   /** The open branches; Branches shows with two or more. */
   branches: readonly Branch[];
-}
-
-/** The first four filled values, " · "-joined, else "Not filled yet" (H:3840). */
-function stepSummary(parts: readonly (string | null | undefined)[], empty: string) {
-  return (
-    parts
-      .filter((part): part is string => Boolean(part))
-      .slice(0, SUMMARY_LIMIT)
-      .join(' · ') || empty
-  );
 }
 
 /** The words the view puts together, from the room's and the clinic's copy. */
@@ -127,7 +117,7 @@ function offerStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
       },
     ],
     // The head names values, never the colour (H:3840).
-    summary: stepSummary(
+    summary: drawerStepSummary(
       [values.name.trim(), values.code, kind, value],
       tClinic(RECORD_DRAWER_KEYS.step.notFilled),
     ),
@@ -177,7 +167,7 @@ function whereStepOf(
       { kind: 'value', label: t(F.starts), value: starts },
       { kind: 'value', label: t(F.ends), value: ends },
     ],
-    summary: stepSummary(
+    summary: drawerStepSummary(
       [
         picked.map((offering) => offering.name).join(', '),
         branchesShown
@@ -203,7 +193,10 @@ function notesStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
       { kind: 'value', label: t(F.note), value: note },
       { kind: 'value', label: t(F.status), value: status },
     ],
-    summary: stepSummary([note, status], tClinic(RECORD_DRAWER_KEYS.step.notFilled)),
+    summary: drawerStepSummary(
+      [note, status],
+      tClinic(RECORD_DRAWER_KEYS.step.notFilled),
+    ),
     missing: [],
   };
 }

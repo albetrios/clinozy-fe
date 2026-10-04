@@ -24,18 +24,31 @@ export function sanitizeNumberText(text: string, decimals: number): string {
   return `${kept.slice(0, point)}.${fraction}`;
 }
 
-/** The value typed text stands for, in the field's unit (`scale` × the figure, whole): '' is 0. */
-export function numberFromText(text: string, scale: number): number {
+/** `value` rounded to `places` decimals. */
+const roundTo = (value: number, places: number) => {
+  const factor = 10 ** places;
+  return Math.round(value * factor) / factor;
+};
+
+/**
+ * The value typed text stands for, in the field's unit (`scale` × the figure):
+ * '' is 0. Whole by default — money is whole paise — or kept to `places`
+ * decimals of the unit (a 12.5 Disc %).
+ */
+export function numberFromText(text: string, scale: number, places = 0): number {
   const parsed = Number.parseFloat(text);
-  return Number.isFinite(parsed) ? Math.round(parsed * scale) : 0;
+  return Number.isFinite(parsed) ? roundTo(parsed * scale, places) : 0;
 }
 
 /**
  * What a number cell shows at rest: nothing for 0, so the placeholder ("0",
- * "₹ 0") reads instead; otherwise the plain figure, without grouping.
+ * "₹ 0") reads instead; otherwise the plain figure, without grouping — to at
+ * most `places` decimals when given (a back-solved 11.7232…% reads 11.72).
  */
-export function textFromNumber(value: number, scale: number): string {
-  return value === 0 ? '' : String(value / scale);
+export function textFromNumber(value: number, scale: number, places?: number): string {
+  if (value === 0) return '';
+  const figure = value / scale;
+  return String(places === undefined ? figure : roundTo(figure, places));
 }
 
 /** A form value as a number: anything that is not a finite number counts as 0. */

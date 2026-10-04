@@ -595,6 +595,11 @@
     "medical": "药房",
     "consultation": "问诊"
   },
+  "invoiceStatuses": {
+    "paid": "已付款",
+    "partial": "部分付款",
+    "unpaid": "待付款"
+  },
   "taskOutcomes": {
     "log_check_in": "记录回访",
     "doing_well": "状况良好",
@@ -886,11 +891,6 @@
     "purchaseKinds": {
       "medicine": "药品",
       "item": "商品"
-    },
-    "invoiceStatuses": {
-      "paid": "已付款",
-      "partial": "部分付款",
-      "unpaid": "待付款"
     },
     "delivery": {
       "queued": "排队中",
@@ -1201,5 +1201,189 @@
       "give": "已退还 {{amount}} 给 {{name}} · 已新增支出",
       "take": "已从 {{name}} 收回 {{amount}} · 已新增收入"
     }
+  },
+  "quickLine": {
+    "label": "快速添加",
+    "enter": "↵ 添加",
+    "matches": "匹配项",
+    "suggested": "推荐 · 点击添加",
+    "typed": "不在列表中 · 按输入添加",
+    "noMatch": "没有匹配项。请检查拼写或少输入几个字母。",
+    "keys": "↑↓ 选择 · ↵ 添加 · Esc 清除",
+    "browse": "浏览",
+    "browseAll": "浏览全部",
+    "groups": "分组",
+    "closeBrowse": "关闭浏览",
+    "added_other": "已添加 {{count}} 个",
+    "tapToAdd": "点击方块即可添加",
+    "showing": "显示 {{total}} 个中的 {{shown}} 个 · 输入以缩小范围",
+    "done": "完成",
+    "emptyGroup": "此分组中没有匹配项。",
+    "addOne": "加一个",
+    "removeOne": "减一个",
+    "addNew": "新增"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "新建发票",
+      "edit": "编辑发票",
+      "createSale": "新建销售",
+      "editSale": "编辑销售"
+    },
+    "sub": {
+      "create": "先选择类型，再添加项目",
+      "edit": "更改会记录在发票上",
+      "sale": "药品发票 · 按最早到期扣减库存"
+    },
+    "type": "类型",
+    "steps": {
+      "party": "患者与团队",
+      "items": "项目",
+      "medicines": "药品",
+      "payment": "付款"
+    },
+    "fields": {
+      "branch": "分店",
+      "newPatient": "新患者",
+      "customer": "顾客",
+      "customerHint": "患者或任何联系人 · 新名字会保存为药房联系人",
+      "customerPlaceholder": "搜索患者、线索或药房联系人",
+      "addContact": "添加联系人",
+      "mobile": "手机号",
+      "mobileHint": "保存到联系人",
+      "mobilePlaceholder": "98765 43210",
+      "team": "团队",
+      "prescribedBy": "开方人",
+      "teamPlaceholder": "选择团队",
+      "teamHint": "医生、治疗师、咨询师",
+      "teamFrom": "来自 {{name}} 的团队",
+      "overallDiscount": "整单折扣",
+      "quickFill": "快速填写",
+      "paidNow": "本次已付",
+      "remark": "备注",
+      "remarkPlaceholder": "显示在打印的发票上"
+    },
+    "customerGroups": {
+      "patient": "患者",
+      "lead": "线索",
+      "contact": "药房联系人"
+    },
+    "customerSub": {
+      "noMobile": "暂无手机号"
+    },
+    "items": {
+      "quickLine": "输入项目、数量、折扣 · 例如 lhr face 1 10%",
+      "quickLineMedical": "输入药品和数量 · 例如 sun 2",
+      "hint": "2 = 数量 · 10% = 折扣 · @500 = 单价",
+      "oftenBilled": "常开项目",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "减 {{percent}}%"
+      },
+      "browse": {
+        "all": "全部",
+        "oral": "口服",
+        "topical": "外用"
+      },
+      "columns": {
+        "offering": "项目",
+        "medicine": "药品",
+        "qty": "数量",
+        "rate": "单价",
+        "discount": "折扣 %",
+        "gst": "GST",
+        "final": "最终"
+      },
+      "pickItem": "选择项目",
+      "selectOffering": "选择项目…",
+      "selectMedicine": "选择药品…",
+      "newOffering": "新项目",
+      "addItem": "添加项目",
+      "addMedicine": "添加药品",
+      "total": "合计",
+      "sessions_other": "{{count}} 次疗程",
+      "inStock": "库存 {{count}}",
+      "outOfStock": "缺货",
+      "belowFloor": "低于 {{name}} 的最低价 {{amount}}",
+      "tooMuchDiscount": "{{name}} 折扣过大 · 请询问管理员"
+    },
+    "payment": {
+      "full": "全额 · {{mode}} {{amount}}",
+      "split": "现金 + UPI 拆分",
+      "nothing": "暂不付款",
+      "mode": "方式",
+      "amount": "金额",
+      "addMode": "添加其他方式",
+      "paidTotal": "已付 {{paid}} · 欠款 {{due}}"
+    },
+    "totals": {
+      "label": "合计",
+      "subtotal": "小计",
+      "discountGst": "折扣 + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "账单",
+      "dueAfter": "本次后欠款"
+    },
+    "badges": {
+      "bill": "账单 {{amount}}",
+      "sessions_other": "含 {{count}} 次疗程",
+      "draft": "草稿",
+      "due": "欠款 {{amount}}",
+      "paid": "已付清"
+    },
+    "presets": {
+      "print": "打印发票",
+      "plan": "方案 · {{name}}",
+      "planQty": "方案 · {{name}} ×{{count}}",
+      "package": "套餐 · {{name}}",
+      "repeat": "重复 #{{seq}}",
+      "consultation": "新问诊 · {{amount}}",
+      "rx": "来自处方 #{{seq}}"
+    },
+    "save": {
+      "clinic": "创建诊所发票",
+      "medical": "创建药品发票",
+      "consultation": "创建问诊发票",
+      "edit": "保存更改"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_other": "{{count}} 项",
+    "noPatient": "无患者",
+    "errors": {
+      "pickPatient": "请选择患者",
+      "pickCustomer": "请选择顾客",
+      "addItem": "请至少添加一个项目",
+      "paidAboveBill": "已付 {{paid}} 超过账单 {{bill}}",
+      "stock": "{{name}} 仅剩 {{count}}",
+      "belowFloor": "{{name}} 低于最低价 {{amount}} · 请提高最终价格",
+      "tooMuchDiscount": "{{name}} 折扣超出允许范围 · 请提高最终价格或询问管理员"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "已创建诊所发票 #{{seq}}",
+        "medical": "已创建药品发票 #{{seq}}",
+        "consultation": "已创建问诊发票 #{{seq}}"
+      },
+      "createdPlan_other": "{{created}} · 已将 {{count}} 条建议标记为已开票",
+      "saved": "发票 #{{seq}} 已保存",
+      "savedPlan": "发票 #{{seq}} 已保存 · 建议已更新",
+      "promo": "已对 {{offering}} 应用 {{offer}}",
+      "contactSaved": "已将 {{name}} 保存为药房联系人 · 请在下方添加手机号",
+      "rxUnmatched": "{{name}} 不在药品列表中 · 请通过快速添加加入",
+      "deleted": "发票 #{{seq}} 已删除"
+    },
+    "deleteTitle": "删除此发票？",
+    "previewTitle": {
+      "clinic": "发票 #{{seq}}",
+      "medical": "药品发票 #{{seq}}",
+      "consultation": "问诊发票 #{{seq}}"
+    },
+    "record": "发票"
+  },
+  "printPreview": {
+    "title": "打印预览 · {{title}}",
+    "close": "关闭",
+    "print": "打印 / 保存 PDF"
   }
 }

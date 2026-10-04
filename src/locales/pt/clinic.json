@@ -601,6 +601,11 @@
     "medical": "Médica",
     "consultation": "Consulta"
   },
+  "invoiceStatuses": {
+    "paid": "Paga",
+    "partial": "Paga em parte",
+    "unpaid": "Em aberto"
+  },
   "taskOutcomes": {
     "log_check_in": "Registrar acompanhamento",
     "doing_well": "Está bem",
@@ -910,11 +915,6 @@
     "purchaseKinds": {
       "medicine": "Medicamento",
       "item": "Item"
-    },
-    "invoiceStatuses": {
-      "paid": "Paga",
-      "partial": "Paga em parte",
-      "unpaid": "Em aberto"
     },
     "delivery": {
       "queued": "Na fila",
@@ -1235,5 +1235,199 @@
       "give": "{{amount}} devolvidos a {{name}} · saída adicionada",
       "take": "{{amount}} recebidos de volta de {{name}} · entrada adicionada"
     }
+  },
+  "quickLine": {
+    "label": "Adicionar rápido",
+    "enter": "↵ adicionar",
+    "matches": "Resultados",
+    "suggested": "Sugestões · clique para adicionar",
+    "typed": "Fora da lista · adicionar como digitado",
+    "noMatch": "Nenhum resultado. Confira a grafia ou digite menos letras.",
+    "keys": "↑↓ escolher · ↵ adicionar · Esc limpar",
+    "browse": "Explorar",
+    "browseAll": "Explorar tudo",
+    "groups": "Grupo",
+    "closeBrowse": "Fechar explorar",
+    "added_one": "{{count}} adicionado",
+    "added_many": "{{count}} adicionados",
+    "added_other": "{{count}} adicionados",
+    "tapToAdd": "Toque em um bloco para adicionar",
+    "showing": "Mostrando {{shown}} de {{total}} · digite para filtrar",
+    "done": "Concluir",
+    "emptyGroup": "Nada neste grupo corresponde.",
+    "addOne": "Adicionar um",
+    "removeOne": "Remover um",
+    "addNew": "Adicionar novo"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "Nova fatura",
+      "edit": "Editar fatura",
+      "createSale": "Nova venda",
+      "editSale": "Editar venda"
+    },
+    "sub": {
+      "create": "Escolha o tipo e adicione os itens",
+      "edit": "As mudanças ficam registradas na fatura",
+      "sale": "Fatura médica · o estoque baixa pela validade mais próxima"
+    },
+    "type": "Tipo",
+    "steps": {
+      "party": "Paciente e equipe",
+      "items": "Itens",
+      "medicines": "Medicamentos",
+      "payment": "Pagamento"
+    },
+    "fields": {
+      "branch": "Unidade",
+      "newPatient": "Novo paciente",
+      "customer": "Cliente",
+      "customerHint": "paciente ou qualquer contato · nomes novos são salvos como contato médico",
+      "customerPlaceholder": "Buscar pacientes, leads ou contatos médicos",
+      "addContact": "Adicionar contato",
+      "mobile": "Celular",
+      "mobileHint": "salvo no contato",
+      "mobilePlaceholder": "98765 43210",
+      "team": "Equipe",
+      "prescribedBy": "Prescrito por",
+      "teamPlaceholder": "Escolha a equipe",
+      "teamHint": "médico, terapeuta, consultor",
+      "teamFrom": "da equipe de {{name}}",
+      "overallDiscount": "Desconto geral",
+      "quickFill": "Preenchimento rápido",
+      "paidNow": "Pago agora",
+      "remark": "Observação",
+      "remarkPlaceholder": "Aparece na fatura impressa"
+    },
+    "customerGroups": {
+      "patient": "Pacientes",
+      "lead": "Leads",
+      "contact": "Contatos médicos"
+    },
+    "customerSub": {
+      "noMobile": "Ainda sem celular"
+    },
+    "items": {
+      "quickLine": "Digite serviço, quantidade, desconto · ex.: lhr face 1 10%",
+      "quickLineMedical": "Digite medicamento e quantidade · ex.: sun 2",
+      "hint": "2 = quantidade · 10% = desconto · @500 = preço",
+      "oftenBilled": "Faturados com frequência",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}}% de desconto"
+      },
+      "browse": {
+        "all": "Todos",
+        "oral": "Oral",
+        "topical": "Tópico"
+      },
+      "columns": {
+        "offering": "Serviço",
+        "medicine": "Medicamento",
+        "qty": "Qtd.",
+        "rate": "Preço",
+        "discount": "Desc. %",
+        "gst": "GST",
+        "final": "Final"
+      },
+      "pickItem": "Escolha o item",
+      "selectOffering": "Selecione o serviço…",
+      "selectMedicine": "Selecione o medicamento…",
+      "newOffering": "Novo serviço",
+      "addItem": "Adicionar item",
+      "addMedicine": "Adicionar medicamento",
+      "total": "Total",
+      "sessions_one": "{{count}} sessão",
+      "sessions_many": "{{count}} sessões",
+      "sessions_other": "{{count}} sessões",
+      "inStock": "{{count}} em estoque",
+      "outOfStock": "Sem estoque",
+      "belowFloor": "Abaixo do preço mínimo de {{amount}} para {{name}}",
+      "tooMuchDiscount": "Desconto demais em {{name}} · fale com um admin"
+    },
+    "payment": {
+      "full": "Integral · {{amount}} em {{mode}}",
+      "split": "Dividir dinheiro + UPI",
+      "nothing": "Nada agora",
+      "mode": "Forma",
+      "amount": "Valor",
+      "addMode": "Adicionar outra forma",
+      "paidTotal": "Pago {{paid}} · em aberto {{due}}"
+    },
+    "totals": {
+      "label": "Totais",
+      "subtotal": "Subtotal",
+      "discountGst": "Desconto + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "Total",
+      "dueAfter": "Em aberto depois"
+    },
+    "badges": {
+      "bill": "Total {{amount}}",
+      "sessions_one": "Cobre {{count}} sessão",
+      "sessions_many": "Cobre {{count}} sessões",
+      "sessions_other": "Cobre {{count}} sessões",
+      "draft": "Rascunho",
+      "due": "{{amount}} em aberto",
+      "paid": "Totalmente paga"
+    },
+    "presets": {
+      "print": "Imprimir fatura",
+      "plan": "Plano · {{name}}",
+      "planQty": "Plano · {{name}} ×{{count}}",
+      "package": "Pacote · {{name}}",
+      "repeat": "Repetir #{{seq}}",
+      "consultation": "Nova consulta · {{amount}}",
+      "rx": "Da receita #{{seq}}"
+    },
+    "save": {
+      "clinic": "Criar fatura da clínica",
+      "medical": "Criar fatura médica",
+      "consultation": "Criar fatura de consulta",
+      "edit": "Salvar alterações"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} item",
+    "summaryItems_many": "{{count}} itens",
+    "summaryItems_other": "{{count}} itens",
+    "noPatient": "Sem paciente",
+    "errors": {
+      "pickPatient": "Escolha um paciente",
+      "pickCustomer": "Escolha um cliente",
+      "addItem": "Adicione pelo menos um item",
+      "paidAboveBill": "O pago ({{paid}}) é maior que a fatura de {{bill}}",
+      "stock": "Só há {{count}} de {{name}} em estoque",
+      "belowFloor": "{{name}} está abaixo do preço mínimo de {{amount}} · aumente o preço final",
+      "tooMuchDiscount": "{{name}} tem mais desconto que o permitido · aumente o preço final ou fale com um admin"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "Fatura da clínica #{{seq}} criada",
+        "medical": "Fatura médica #{{seq}} criada",
+        "consultation": "Fatura de consulta #{{seq}} criada"
+      },
+      "createdPlan_one": "{{created}} · {{count}} sugestão marcada como faturada",
+      "createdPlan_many": "{{created}} · {{count}} sugestões marcadas como faturadas",
+      "createdPlan_other": "{{created}} · {{count}} sugestões marcadas como faturadas",
+      "saved": "Fatura #{{seq}} salva",
+      "savedPlan": "Fatura #{{seq}} salva · sugestões atualizadas",
+      "promo": "{{offer}} aplicado a {{offering}}",
+      "contactSaved": "{{name}} salvo como contato médico · adicione um celular abaixo",
+      "rxUnmatched": "{{name}} não está na lista de medicamentos · adicione pela adição rápida",
+      "deleted": "Fatura #{{seq}} excluída"
+    },
+    "deleteTitle": "Excluir esta fatura?",
+    "previewTitle": {
+      "clinic": "Fatura #{{seq}}",
+      "medical": "Fatura médica #{{seq}}",
+      "consultation": "Fatura de consulta #{{seq}}"
+    },
+    "record": "Fatura"
+  },
+  "printPreview": {
+    "title": "Pré-visualização · {{title}}",
+    "close": "Fechar",
+    "print": "Imprimir / Salvar PDF"
   }
 }

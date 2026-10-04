@@ -49,6 +49,15 @@ src/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/ #page
 src/pages/organization/$organizationSlug/stock/vendors/create/ #page-root
 src/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/ #page-root
 
+# The shared Invoice drawer's island (KICKOFF §4, §6.9): no page of its own —
+# its routes open, over the Payments ledger, the shared drawer (`invoice-drawer`,
+# set in `src/shared/components/InvoiceDrawer/`) or the shared print preview
+# (`invoice-preview`, handed to `src/shared/components/PrintPreview/` as its
+# `testId`); its dialog routes render nothing.
+src/pages/organization/$organizationSlug/invoices/invoices.manifest.ts #page-root
+src/pages/organization/$organizationSlug/invoices/create/ #page-root
+src/pages/organization/$organizationSlug/invoices/$invoiceId/ #page-root
+
 # A patient file's file-level drawer route (KICKOFF §6.6, `S:34`): it renders the
 # section it opened over and a shared drawer whose testId lives in that shared
 # component (`patient-drawer`, `src/shared/components/PatientDrawer/`).

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1900 src files · ~941 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1951 src files · ~957 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -459,12 +459,13 @@ clinozy-fe/
 │   │   ├── routes/
 │   │   │   ├── builders.ts
 │   │   │   ├── index.ts
+│   │   │   ├── invoice-builders.ts
 │   │   │   ├── page-head.ts
 │   │   │   ├── page-manifest.ts
 │   │   │   ├── params.ts
 │   │   │   ├── patient-file-builders.ts
 │   │   │   ├── search-params.ts
-│   │   │   └── [6 test files]
+│   │   │   └── [7 test files]
 │   │   ├── app-splash.ts
 │   │   ├── appearance-surface.ts
 │   │   ├── brand-wordmark.ts
@@ -861,6 +862,30 @@ clinozy-fe/
 │   │       │   │       ├── index.ts
 │   │       │   │       ├── useRoomLanding.ts
 │   │       │   │       └── [1 test file]
+│   │       │   ├── invoices/
+│   │       │   │   ├── $invoiceId/
+│   │       │   │   │   ├── edit/
+│   │       │   │   │   ├── invoice-id.manifest.ts
+│   │       │   │   │   ├── invoice-id.route.tsx
+│   │       │   │   │   ├── INVOICE_ID.OVERVIEW.md
+│   │       │   │   │   ├── InvoicePreviewPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── create/
+│   │       │   │   │   ├── create.manifest.ts
+│   │       │   │   │   ├── CREATE.OVERVIEW.md
+│   │       │   │   │   ├── create.route.tsx
+│   │       │   │   │   ├── NewInvoicePage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── hooks/
+│   │       │   │   │   └── useInvoicesDialogRoute/
+│   │       │   │   ├── invoices.manifest.ts
+│   │       │   │   ├── INVOICES.OVERVIEW.md
+│   │       │   │   ├── invoices.route.tsx
+│   │       │   │   ├── invoices.search.ts
+│   │       │   │   ├── InvoicesLayout.tsx
+│   │       │   │   └── [2 test files]
 │   │       │   ├── leads/
 │   │       │   │   ├── $leadId/
 │   │       │   │   │   ├── lead-id.manifest.ts
@@ -1325,6 +1350,7 @@ clinozy-fe/
 │   │   │   │   │   ├── appointments-server.fixtures.ts
 │   │   │   │   │   ├── appointments.fixtures.ts
 │   │   │   │   │   ├── contact-threads.fixtures.ts
+│   │   │   │   │   ├── invoices-server.fixtures.ts
 │   │   │   │   │   ├── leads.fixtures.ts
 │   │   │   │   │   ├── medical.fixtures.ts
 │   │   │   │   │   ├── messages.fixtures.ts
@@ -1371,6 +1397,8 @@ clinozy-fe/
 │   │   │   │   ├── credits-contracts.ts
 │   │   │   │   ├── day-close-api.ts
 │   │   │   │   ├── day-close-contracts.ts
+│   │   │   │   ├── invoices-api.ts
+│   │   │   │   ├── invoices-contracts.ts
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-hold.ts
@@ -1404,7 +1432,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [44 test files]
+│   │   │   │   └── [45 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1788,9 +1816,10 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── DrawerSteps/
 │   │   │   │   ├── drawer-step-status.ts
+│   │   │   │   ├── drawer-step-summary.ts
 │   │   │   │   ├── DrawerSteps.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   └── [2 test files]
+│   │   │   │   └── [3 test files]
 │   │   │   ├── EmailVerificationBanner/
 │   │   │   │   ├── EmailVerificationBanner.tsx
 │   │   │   │   ├── index.ts
@@ -1825,6 +1854,27 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── InviteMemberDialog.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── InvoiceDrawer/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── invoice-drawer-view.ts
+│   │   │   │   ├── invoice-drawer.constants.ts
+│   │   │   │   ├── invoice-form.ts
+│   │   │   │   ├── invoice-lines.ts
+│   │   │   │   ├── invoice-presets.ts
+│   │   │   │   ├── invoice-quick-line.ts
+│   │   │   │   ├── invoice-rows.ts
+│   │   │   │   ├── invoice-sheet.tsx
+│   │   │   │   ├── InvoiceDrawer.tsx
+│   │   │   │   ├── InvoiceItemsField.tsx
+│   │   │   │   ├── InvoicePartyFields.tsx
+│   │   │   │   ├── InvoicePaymentFields.tsx
+│   │   │   │   ├── InvoiceTotals.tsx
+│   │   │   │   ├── InvoiceTypeSwitch.tsx
+│   │   │   │   ├── quick-line-match.ts
+│   │   │   │   ├── use-invoice-catalog.ts
+│   │   │   │   ├── use-invoice-drawer.ts
+│   │   │   │   ├── use-invoice-save.ts
+│   │   │   │   └── [4 test files]
 │   │   │   ├── KeyboardShortcutsDialog/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── KeyboardShortcutsDialog.tsx
@@ -1976,6 +2026,11 @@ clinozy-fe/
 │   │   │   │   ├── Picker.tsx
 │   │   │   │   ├── picker.types.ts
 │   │   │   │   └── [4 test files]
+│   │   │   ├── PrintPreview/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── print-preview.constants.ts
+│   │   │   │   ├── PrintPreview.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── PrintTemplate/
 │   │   │   │   ├── InvoicePrint/
 │   │   │   │   │   ├── index.ts
@@ -2006,6 +2061,14 @@ clinozy-fe/
 │   │   │   ├── QuickFillRow/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── QuickFillRow.tsx
+│   │   │   │   └── [1 test file]
+│   │   │   ├── QuickLine/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── quick-line-state.ts
+│   │   │   │   ├── quick-line.constants.ts
+│   │   │   │   ├── quick-line.types.ts
+│   │   │   │   ├── QuickLine.tsx
+│   │   │   │   ├── QuickLineBrowse.tsx
 │   │   │   │   └── [1 test file]
 │   │   │   ├── RateLimitNotice/
 │   │   │   │   ├── index.ts
@@ -2423,6 +2486,10 @@ clinozy-fe/
 │   │   │   ├── useInvitations/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useInvitations.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useInvoices/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useInvoices.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useItemsTotal/
 │   │   │   │   ├── index.ts

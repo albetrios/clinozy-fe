@@ -132,6 +132,19 @@ function ValueTile({
   );
 }
 
+/**
+ * React keys for peek values that may repeat — two rows of one offering, two
+ * members with one short name: the value, then "·2", "·3" for its repeats.
+ */
+function occurrenceKeys(values: readonly string[]): string[] {
+  const seen = new Map<string, number>();
+  return values.map((value) => {
+    const count = (seen.get(value) ?? 0) + 1;
+    seen.set(value, count);
+    return count === 1 ? value : `${value}·${count}`;
+  });
+}
+
 function MultiTile({
   label,
   values,
@@ -145,13 +158,14 @@ function MultiTile({
   }
   const shown = values.slice(0, MULTI_LIMIT);
   const more = values.length - shown.length;
+  const keys = occurrenceKeys(shown.map((pill) => pill.label));
   return (
     <div className={TILE_CLASS}>
       <span className={TILE_LABEL_CLASS}>{label}</span>
       <span className="flex flex-wrap gap-1">
-        {shown.map((pill) => (
+        {shown.map((pill, index) => (
           <span
-            key={pill.label}
+            key={keys[index]}
             data-slot="pill"
             className={cn(
               'text-caption inline-block h-5 max-w-40 truncate rounded-full px-2 leading-5 font-semibold',
@@ -173,6 +187,7 @@ function ItemsTile({ label, names }: { label: string; names: readonly string[] }
   const { t } = useTranslation(RECORD_DRAWER_NS);
   const shown = names.slice(0, ITEMS_LIMIT);
   const more = names.length - shown.length;
+  const keys = occurrenceKeys(shown);
   const count =
     names.length > 0
       ? t(RECORD_DRAWER_KEYS.peek.added, { count: names.length })
@@ -182,10 +197,10 @@ function ItemsTile({ label, names }: { label: string; names: readonly string[] }
       <span className="text-tiny text-muted-foreground me-0.5 font-semibold tracking-[0.04em] uppercase">
         {label} · {count}
       </span>
-      {shown.map((name) => (
+      {shown.map((name, index) => (
         // Added items are sage chips in the design (H:893, `--k9` / `--k10`).
         <span
-          key={name}
+          key={keys[index]}
           data-slot="pill"
           className={cn(
             'inline-block h-5.5 max-w-50 truncate rounded-full px-2 text-xs leading-5.5 font-medium',

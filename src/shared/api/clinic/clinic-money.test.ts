@@ -1,12 +1,20 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  balanceOf as billBalance,
+  belowFloor,
   dayModeTotals,
+  discountableSubtotal,
+  discountForFinal,
   expectedDrawerCash,
   invoiceBalance,
   invoiceLineAmounts,
   invoicePaid,
   invoiceTotals,
+  lineFinal,
+  lineFloor,
+  overallDiscountFromPercent,
+  overallDiscountPercent,
 } from '@/shared/api/clinic/clinic-money.ts';
 import type { InvoiceItem, Payment } from '@/shared/api/clinic/clinic-schema.ts';
 import {
@@ -207,5 +215,88 @@ describe('the fixture world', () => {
     });
     expect(balanceOf(787)).toMatchObject({ bill: 480_000, status: 'unpaid' });
     expect(balanceOf(781)).toMatchObject({ bill: 765_000, due: 0, status: 'paid' });
+  });
+});
+
+describe('the invoice drawer’s figures (KICKOFF §6.9)', () => {
+  // ₹4,800 + ₹2,500 × 2, 10% off the second line, 18% GST on both.
+  const lines = [
+    item({ rate: 480_000, gstPct: 18 }),
+    item({ qty: 2, rate: 250_000, discountPct: 10, gstPct: 18 }),
+  ];
+
+  it('takes the overall percent off the subtotal after line discounts, before tax (Q-G7)', () => {
+    // ₹9,800 − ₹500 of line discount = ₹9,300.
+    expect(discountableSubtotal(lines)).toBe(930_000);
+    // 5% of ₹9,300 — not of the ₹10,974 after GST, as the prototype did (H:3632).
+    expect(overallDiscountFromPercent(lines, 5)).toBe(46_500);
+    const totals = invoiceTotals({ items: lines, overallDiscount: 46_500 });
+    // ₹9,300 + ₹1,674 GST − ₹465.
+    expect(totals.bill).toBe(1_050_900);
+  });
+
+  it('rounds the overall discount to the paisa and holds the percent to 0–100', () => {
+    expect(overallDiscountFromPercent([item({ rate: 33_333 })], 10)).toBe(3_333);
+    expect(overallDiscountFromPercent(lines, 140)).toBe(930_000);
+    expect(overallDiscountFromPercent(lines, -5)).toBe(0);
+  });
+
+  it('reads a stored overall discount back as the drawer’s percent', () => {
+    expect(overallDiscountPercent(lines, 46_500)).toBe(5);
+    expect(overallDiscountPercent([item({ rate: 30_000 })], 1_000)).toBeCloseTo(3.33, 2);
+    expect(overallDiscountPercent([], 1_000)).toBe(0);
+  });
+
+  it('back-solves the Disc % from a typed Final, which then holds to the paisa', () => {
+    const line = item({ qty: 2, rate: 480_000, gstPct: 18 });
+    expect(lineFinal(line)).toBe(1_132_800);
+    const discountPct = discountForFinal(line, 1_000_000);
+    expect(discountPct).toBeCloseTo(11.7232, 4);
+    expect(lineFinal({ ...line, discountPct })).toBe(1_000_000);
+  });
+
+  it('holds a typed Final between nothing and the undiscounted line', () => {
+    const line = item({ rate: 100_000, discountPct: 30 });
+    expect(discountForFinal(line, 150_000)).toBe(0);
+    expect(discountForFinal(line, -5)).toBe(100);
+    expect(discountForFinal(item({ rate: 0 }), 5_000)).toBe(0);
+  });
+
+  it('floors a line at its floor per unit × the quantity, GST on top unless included (H:5059)', () => {
+    const line = { qty: 2, gstPct: 18 };
+    expect(lineFloor(line, 400_000)).toBe(944_000);
+    expect(lineFloor(line, 400_000, true)).toBe(800_000);
+    expect(lineFloor(line, 0)).toBeNull();
+    expect(lineFloor(line, null)).toBeNull();
+  });
+
+  it('flags a Final below its floor, half a rupee of rounding allowed', () => {
+    // LHR Full Face · B4G7 — ₹4,800, lowest price ₹4,000.
+    const floor = lineFloor({ qty: 1, gstPct: 0 }, 400_000);
+    // 16% off: ₹4,032. 17% off: ₹3,984.
+    expect(belowFloor(item({ rate: 480_000, discountPct: 16 }), floor)).toBe(false);
+    expect(belowFloor(item({ rate: 480_000, discountPct: 17 }), floor)).toBe(true);
+    expect(
+      belowFloor(
+        item({
+          rate: 480_000,
+          discountPct: discountForFinal(item({ rate: 480_000 }), 399_960),
+        }),
+        floor,
+      ),
+    ).toBe(false);
+    expect(belowFloor(item({ rate: 480_000, discountPct: 90 }), null)).toBe(false);
+  });
+
+  it('weighs a draft bill against what is paid: due, and Paid / Partly paid / Due (H:3633)', () => {
+    expect(billBalance(32_400, 32_400)).toEqual({
+      bill: 32_400,
+      paid: 32_400,
+      due: 0,
+      status: 'paid',
+    });
+    expect(billBalance(32_400, 10_000)).toMatchObject({ due: 22_400, status: 'partial' });
+    expect(billBalance(32_400, 0)).toMatchObject({ due: 32_400, status: 'unpaid' });
+    expect(billBalance(0, 0).status).toBe('paid');
   });
 });

@@ -151,6 +151,12 @@ export const CLINIC_KEYS = {
     medical: 'invoiceTypes.medical',
     consultation: 'invoiceTypes.consultation',
   },
+  /** An invoice's status pill (`S:621`, `pyStatus` H:3633): "Paid", "Partly paid", "Due". */
+  invoiceStatuses: {
+    paid: 'invoiceStatuses.paid',
+    partial: 'invoiceStatuses.partial',
+    unpaid: 'invoiceStatuses.unpaid',
+  },
   /** The contract's `expense_category` (`S:1388–1398`): the ledger's sub line, Send payment's chips. */
   expenseCategories: {
     medicines: 'expenseCategories.medicines',

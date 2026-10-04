@@ -598,6 +598,11 @@
     "medical": "मेडिकल",
     "consultation": "परामर्श"
   },
+  "invoiceStatuses": {
+    "paid": "चुकाया",
+    "partial": "आंशिक भुगतान",
+    "unpaid": "बकाया"
+  },
   "taskOutcomes": {
     "log_check_in": "चेक-इन दर्ज करें",
     "doing_well": "ठीक हैं",
@@ -898,11 +903,6 @@
     "purchaseKinds": {
       "medicine": "दवा",
       "item": "सामान"
-    },
-    "invoiceStatuses": {
-      "paid": "चुकाया",
-      "partial": "आंशिक भुगतान",
-      "unpaid": "बकाया"
     },
     "delivery": {
       "queued": "कतार में",
@@ -1218,5 +1218,194 @@
       "give": "{{name}} को {{amount}} लौटाए · जावक एंट्री जुड़ी",
       "take": "{{name}} से {{amount}} वापस मिले · आवक एंट्री जुड़ी"
     }
+  },
+  "quickLine": {
+    "label": "जल्दी जोड़ें",
+    "enter": "↵ जोड़ें",
+    "matches": "मिलान",
+    "suggested": "सुझाव · जोड़ने के लिए क्लिक करें",
+    "typed": "सूची में नहीं · जैसा लिखा वैसा जोड़ें",
+    "noMatch": "कोई मिलान नहीं। वर्तनी जाँचें या कम अक्षर लिखें।",
+    "keys": "↑↓ चुनें · ↵ जोड़ें · Esc साफ़ करें",
+    "browse": "ब्राउज़ करें",
+    "browseAll": "सब ब्राउज़ करें",
+    "groups": "समूह",
+    "closeBrowse": "ब्राउज़ बंद करें",
+    "added_one": "{{count}} जोड़ा गया",
+    "added_other": "{{count}} जोड़े गए",
+    "tapToAdd": "जोड़ने के लिए किसी टाइल पर टैप करें",
+    "showing": "{{total}} में से {{shown}} दिख रहे हैं · सीमित करने के लिए लिखें",
+    "done": "हो गया",
+    "emptyGroup": "इस समूह में कुछ मेल नहीं खाता।",
+    "addOne": "एक जोड़ें",
+    "removeOne": "एक हटाएँ",
+    "addNew": "नया जोड़ें"
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "नया इनवॉइस",
+      "edit": "इनवॉइस बदलें",
+      "createSale": "नई बिक्री",
+      "editSale": "बिक्री बदलें"
+    },
+    "sub": {
+      "create": "पहले प्रकार चुनें, फिर आइटम जोड़ें",
+      "edit": "बदलाव इनवॉइस पर दर्ज होते हैं",
+      "sale": "मेडिकल इनवॉइस · स्टॉक सबसे पहले ख़त्म होने वाले से घटता है"
+    },
+    "type": "प्रकार",
+    "steps": {
+      "party": "मरीज़ और टीम",
+      "items": "आइटम",
+      "medicines": "दवाइयाँ",
+      "payment": "भुगतान"
+    },
+    "fields": {
+      "branch": "शाखा",
+      "newPatient": "नया मरीज़",
+      "customer": "ग्राहक",
+      "customerHint": "मरीज़ या कोई भी संपर्क · नए नाम मेडिकल संपर्क के रूप में सहेजे जाते हैं",
+      "customerPlaceholder": "मरीज़, लीड या मेडिकल संपर्क खोजें",
+      "addContact": "संपर्क जोड़ें",
+      "mobile": "मोबाइल",
+      "mobileHint": "संपर्क पर सहेजा जाता है",
+      "mobilePlaceholder": "98765 43210",
+      "team": "टीम",
+      "prescribedBy": "किसने लिखा",
+      "teamPlaceholder": "टीम चुनें",
+      "teamHint": "डॉक्टर, थेरेपिस्ट, काउंसलर",
+      "teamFrom": "{{name}} की टीम से",
+      "overallDiscount": "कुल छूट",
+      "quickFill": "झटपट भरें",
+      "paidNow": "अभी भुगतान",
+      "remark": "टिप्पणी",
+      "remarkPlaceholder": "प्रिंट इनवॉइस पर दिखती है"
+    },
+    "customerGroups": {
+      "patient": "मरीज़",
+      "lead": "लीड",
+      "contact": "मेडिकल संपर्क"
+    },
+    "customerSub": {
+      "noMobile": "अभी मोबाइल नहीं"
+    },
+    "items": {
+      "quickLine": "सर्विस, मात्रा, छूट लिखें · जैसे lhr face 1 10%",
+      "quickLineMedical": "दवा और मात्रा लिखें · जैसे sun 2",
+      "hint": "2 = मात्रा · 10% = छूट · @500 = रेट",
+      "oftenBilled": "अक्सर बिल होने वाले",
+      "tags": {
+        "qty": "×{{count}}",
+        "rate": "@ {{amount}}",
+        "discount": "{{percent}}% छूट"
+      },
+      "browse": {
+        "all": "सभी",
+        "oral": "खाने वाली",
+        "topical": "लगाने वाली"
+      },
+      "columns": {
+        "offering": "सर्विस",
+        "medicine": "दवा",
+        "qty": "मात्रा",
+        "rate": "रेट",
+        "discount": "छूट %",
+        "gst": "GST",
+        "final": "फ़ाइनल"
+      },
+      "pickItem": "आइटम चुनें",
+      "selectOffering": "सर्विस चुनें…",
+      "selectMedicine": "दवा चुनें…",
+      "newOffering": "नई सर्विस",
+      "addItem": "आइटम जोड़ें",
+      "addMedicine": "दवा जोड़ें",
+      "total": "कुल",
+      "sessions_one": "{{count}} सेशन",
+      "sessions_other": "{{count}} सेशन",
+      "inStock": "स्टॉक में {{count}}",
+      "outOfStock": "स्टॉक ख़त्म",
+      "belowFloor": "{{name}} के न्यूनतम मूल्य {{amount}} से कम",
+      "tooMuchDiscount": "{{name}} पर बहुत ज़्यादा छूट · एडमिन से पूछें"
+    },
+    "payment": {
+      "full": "पूरा · {{amount}} {{mode}} में",
+      "split": "नकद + UPI में बाँटें",
+      "nothing": "अभी कुछ नहीं",
+      "mode": "माध्यम",
+      "amount": "राशि",
+      "addMode": "दूसरा माध्यम जोड़ें",
+      "paidTotal": "भुगतान {{paid}} · बकाया {{due}}"
+    },
+    "totals": {
+      "label": "कुल",
+      "subtotal": "उप-योग",
+      "discountGst": "छूट + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "बिल",
+      "dueAfter": "इसके बाद बकाया"
+    },
+    "badges": {
+      "bill": "बिल {{amount}}",
+      "sessions_one": "{{count}} सेशन शामिल",
+      "sessions_other": "{{count}} सेशन शामिल",
+      "draft": "ड्राफ़्ट",
+      "due": "{{amount}} बकाया",
+      "paid": "पूरा भुगतान"
+    },
+    "presets": {
+      "print": "इनवॉइस प्रिंट करें",
+      "plan": "प्लान · {{name}}",
+      "planQty": "प्लान · {{name}} ×{{count}}",
+      "package": "पैकेज · {{name}}",
+      "repeat": "#{{seq}} दोहराएँ",
+      "consultation": "नया कंसल्टेशन · {{amount}}",
+      "rx": "पर्चा #{{seq}} से"
+    },
+    "save": {
+      "clinic": "क्लिनिक इनवॉइस बनाएँ",
+      "medical": "मेडिकल इनवॉइस बनाएँ",
+      "consultation": "कंसल्टेशन इनवॉइस बनाएँ",
+      "edit": "बदलाव सहेजें"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} आइटम",
+    "summaryItems_other": "{{count}} आइटम",
+    "noPatient": "कोई मरीज़ नहीं",
+    "errors": {
+      "pickPatient": "मरीज़ चुनें",
+      "pickCustomer": "ग्राहक चुनें",
+      "addItem": "कम से कम एक आइटम जोड़ें",
+      "paidAboveBill": "भुगतान {{paid}} बिल {{bill}} से ज़्यादा है",
+      "stock": "{{name}} के सिर्फ़ {{count}} स्टॉक में हैं",
+      "belowFloor": "{{name}} अपने न्यूनतम मूल्य {{amount}} से कम है · फ़ाइनल कीमत बढ़ाएँ",
+      "tooMuchDiscount": "{{name}} पर अनुमति से ज़्यादा छूट है · फ़ाइनल कीमत बढ़ाएँ या एडमिन से पूछें"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "क्लिनिक इनवॉइस #{{seq}} बनाया गया",
+        "medical": "मेडिकल इनवॉइस #{{seq}} बनाया गया",
+        "consultation": "कंसल्टेशन इनवॉइस #{{seq}} बनाया गया"
+      },
+      "createdPlan_one": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुआ",
+      "createdPlan_other": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुए",
+      "saved": "इनवॉइस #{{seq}} सहेजा गया",
+      "savedPlan": "इनवॉइस #{{seq}} सहेजा गया · सुझाव अपडेट हुए",
+      "promo": "{{offering}} पर {{offer}} लागू",
+      "contactSaved": "{{name}} मेडिकल संपर्क के रूप में सहेजा गया · नीचे मोबाइल जोड़ें",
+      "rxUnmatched": "{{name}} दवा सूची में नहीं है · क्विक ऐड से जोड़ें",
+      "deleted": "इनवॉइस #{{seq}} हटाया गया"
+    },
+    "deleteTitle": "यह इनवॉइस हटाएँ?",
+    "previewTitle": {
+      "clinic": "इनवॉइस #{{seq}}",
+      "medical": "मेडिकल इनवॉइस #{{seq}}",
+      "consultation": "कंसल्टेशन इनवॉइस #{{seq}}"
+    },
+    "record": "इनवॉइस"
+  },
+  "printPreview": {
+    "title": "प्रिंट प्रीव्यू · {{title}}",
+    "close": "बंद करें",
+    "print": "प्रिंट करें / PDF सहेजें"
   }
 }

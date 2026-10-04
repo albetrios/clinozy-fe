@@ -34,6 +34,20 @@ describe('numberFromText — the value in the field’s own unit', () => {
     expect(numberFromText('', 1)).toBe(0);
     expect(numberFromText('.', MONEY_SCALE)).toBe(0);
   });
+
+  it('keeps a plain number’s decimals to its places, whole by default', () => {
+    expect(numberFromText('12.5', 1)).toBe(13);
+    expect(numberFromText('12.5', 1, 2)).toBeCloseTo(12.5, 2);
+    expect(numberFromText('12.345', 1, 2)).toBeCloseTo(12.35, 2);
+  });
+});
+
+describe('textFromNumber — to its places', () => {
+  it('shows at most the places given', () => {
+    expect(textFromNumber(11.723163841807903, 1, 2)).toBe('11.72');
+    expect(textFromNumber(10, 1, 2)).toBe('10');
+    expect(textFromNumber(500_017, MONEY_SCALE, 2)).toBe('5000.17');
+  });
 });
 
 describe('textFromNumber — the cell at rest', () => {

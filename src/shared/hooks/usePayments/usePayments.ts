@@ -4,6 +4,7 @@ import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.ts';
 import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
 import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
+import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import {
   deletePayment,
@@ -33,14 +34,15 @@ import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 
 /**
  * What a money write refreshes (KICKOFF §6.9 Data): the ledger, the credits,
- * every patient read (their dues), ⌘K's invoice results — an entry moves an
- * invoice's balance — and Day close (its entries, totals and locks). Invoice
- * reads join as their rows land.
+ * every patient read (their dues), the invoices and ⌘K's invoice results — an
+ * entry moves an invoice's balance — and Day close (its entries, totals and
+ * locks).
  */
 export const MONEY_WRITE_KEYS: readonly QueryKey[] = [
   paymentQueryKeys.all,
   creditQueryKeys.all,
   patientQueryKeys.all,
+  invoiceQueryKeys.all,
   commandSearchQueryKeys.all,
   dayCloseQueryKeys.all,
 ];

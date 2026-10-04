@@ -104,6 +104,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `credit-drawer`                  | Add / Edit pending — over Payments › Pending (L-39c)                                                | `payments/pending/`                                           |
 | `settle-credit-drawer`           | Give back / Got it back — stacked, no URL (L-39c)                                                   | `shared/components/SettleCreditDrawer/`                       |
 | `day-close-drawer`               | Day close — `/payments/day-close` over the ledger (L-41)                                            | `pages/organization/$organizationSlug/payments/`              |
+| `invoice-drawer`                 | New / Edit invoice — `/invoices/create` · `/invoices/$invoiceId/edit` (L-40)                        | `shared/components/InvoiceDrawer/`                            |
+| `invoice-preview`                | Print preview — `/invoices/$invoiceId` (L-40; `-close`, `-print`)                                   | `shared/components/PrintPreview/`                             |
 | `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)                                 | `pages/organization/$organizationSlug/tasks/`                 |
 | `new-task-drawer`                | New task — `/tasks/create` opens it over the list (L-47d)                                           | `pages/organization/$organizationSlug/tasks/`                 |
 | `task-drawer`                    | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                                       | `pages/organization/$organizationSlug/tasks/`                 |
@@ -795,6 +797,33 @@ and doctor pickers the shared picker ids; Cancel visit and Delete photo the shar
 | `appointment-form-photos` · `-photos-check-in` · `-photos-upload`                      | Visit photos · "Check in now" · "Upload photos"                                   | `PatientSections.tsx`       |
 | `appointment-form-photo` · `appointment-form-photo-delete`                             | One photo tile · its Delete                                                       | `PatientSections.tsx`       |
 | `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                               | `AppointmentForm.tsx`       |
+
+---
+
+## Invoice drawer (shared, launch L-40)
+
+`shared/components/InvoiceDrawer/` on the record drawer, root `invoice-drawer` — New invoice, New
+sale (Medical) and Edit invoice — with the drawer's derived ids (`invoice-drawer-title`, `-tag`,
+`-close`, `-save`, `-delete`, `-dismiss`, `-badges`, `-footer`, `-header-strip`, `-footer-strip`),
+the step ids (`invoice-drawer-step-<party|items|payment>` and its `-trigger`) and the quick-fill
+chips (`invoice-drawer-quick-fill-<repeat|consultation|rx|print>`). The items and "Paid now" rows
+are `ItemsField`s (ids above); the pickers carry the shared picker ids; Delete is the shared reason
+confirm.
+
+| Test ID                                                                   | Element                                                                   | Source                            |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------- |
+| `invoice-drawer-type` · `-type-<clinic\|medical\|consultation>`           | The type switch (`role="radiogroup"`, New invoice only) · one type        | `InvoiceTypeSwitch.tsx`           |
+| `invoice-drawer-branch` · `-patient` · `-customer` · `-team`              | Branch · Patient (the patient picker) · Medical's Customer · Team pickers | `InvoicePartyFields.tsx`          |
+| `invoice-drawer-mobile`                                                   | A walk-in customer's mobile                                               | `InvoicePartyFields.tsx`          |
+| `invoice-drawer-quick-line` · `-input` · `-option` · `-typed`             | The quick line ("corn 2 10%") · its input · a match · the typed line      | `shared/components/QuickLine/`    |
+| `invoice-drawer-quick-line-browse` · `-browse-panel` · `-browse-tile`     | Browse · its panel (All · Often billed · groups) · one item               | `shared/components/QuickLine/`    |
+| `invoice-drawer-items` · `-items-<item\|qty\|rate\|discount\|gst\|final>` | The item rows (`ItemsField`) · one cell's control                         | `InvoiceItemsField.tsx`           |
+| `invoice-drawer-overall-discount` · `-decrease` · `-increase`             | Overall discount % — the shared stepper (Q-G7)                            | `InvoicePaymentFields.tsx`        |
+| `invoice-drawer-payment-fill`                                             | "Paid now" quick fill: Full · Split · None                                | `InvoicePaymentFields.tsx`        |
+| `invoice-drawer-paid-now` · `-paid-now-<mode\|amount>`                    | "Paid now" Mode · Amount rows (`ItemsField`)                              | `InvoicePaymentFields.tsx`        |
+| `invoice-drawer-remark`                                                   | Remark — the one note that prints                                         | `InvoicePaymentFields.tsx`        |
+| `invoice-drawer-totals` · `-totals-<subtotal\|discount-gst\|bill\|due>`   | The totals strip · one figure                                             | `InvoiceTotals.tsx`               |
+| `invoice-preview` · `-close` · `-print`                                   | Print preview (820) · Close · "Print / Save PDF"                          | `shared/components/PrintPreview/` |
 
 ---
 
