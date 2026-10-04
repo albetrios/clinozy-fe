@@ -157,7 +157,7 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
       'Search patient or lead by name, phone, ID',
     );
     expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'true');
-    expect(within(panel).getByTestId(IDS.quickDate('today'))).toHaveAttribute(
+    expect(within(panel).getByTestId(`${IDS.quickDate}-today`)).toHaveAttribute(
       'aria-pressed',
       'true',
     );

@@ -20,6 +20,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
+import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -370,19 +371,15 @@ function AppointmentFormSession(props: SessionProps) {
  * a closed form renders nothing and loads nothing.
  */
 export function AppointmentForm(props: AppointmentFormProps) {
-  const [opening, setOpening] = useState(0);
-  const [wasOpen, setWasOpen] = useState(props.open);
-  const [copyOf, setCopyOf] = useState<AppointmentRow | null>(null);
-  if (props.open !== wasOpen) {
-    setWasOpen(props.open);
-    if (props.open) {
-      setOpening((current) => current + 1);
-      setCopyOf(null);
-    }
-  }
+  const { session } = useDrawerSession(props.open);
+  // A Copy made in this opening turns it into that New form; the next opening forgets it.
+  const [copied, setCopied] = useState<{ session: number; row: AppointmentRow } | null>(
+    null,
+  );
   if (!props.open) return null;
+  const copyOf = copied?.session === session ? copied.row : null;
   const sessionKey = [
-    opening,
+    session,
     copyOf?.id ?? props.mode,
     props.appointmentId ??
       props.appointment?.id ??
@@ -401,7 +398,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
             appointment: undefined,
           }
         : {})}
-      onCopyHere={setCopyOf}
+      onCopyHere={(row) => setCopied({ session, row })}
     />
   );
 }

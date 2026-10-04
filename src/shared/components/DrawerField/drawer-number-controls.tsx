@@ -108,8 +108,9 @@ export interface DrawerQuickOption<T extends string | number = number> {
 
 /**
  * The quick picks under a field (H:1602) — a stepper's figures, the
- * follow-up's presets: 24px outline pills, 12px/500, the one matching the
- * value on `muted`.
+ * follow-up's presets, the booking's "Today · Tomorrow · Next week": 24px
+ * outline pills, 12px/500, the one matching the value on `muted` — its edge
+ * in the text ink too where the screen marks it (`pickedEdge`, H:6005).
  */
 export function DrawerQuickChips<T extends string | number>({
   label,
@@ -117,6 +118,7 @@ export function DrawerQuickChips<T extends string | number>({
   value,
   onChange,
   disabled,
+  pickedEdge = false,
   testId,
 }: {
   /** The group's accessible name — the field's label. */
@@ -126,6 +128,8 @@ export function DrawerQuickChips<T extends string | number>({
   value: T | null;
   onChange: (value: T) => void;
   disabled?: boolean;
+  /** The picked chip's edge in the text ink (the appointment form's quick dates). */
+  pickedEdge?: boolean;
   /** Base test id; each chip is `<testId>-<value>`. */
   testId?: string;
 }) {
@@ -142,7 +146,9 @@ export function DrawerQuickChips<T extends string | number>({
           data-slot="pill"
           className={cn(
             'text-foreground hover:bg-muted h-6 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap tabular-nums transition-colors disabled:pointer-events-none disabled:opacity-50',
-            option.value === value ? 'bg-muted' : 'bg-background',
+            option.value === value
+              ? cn('bg-muted', pickedEdge && 'border-foreground')
+              : 'bg-background',
           )}
         >
           {option.label}

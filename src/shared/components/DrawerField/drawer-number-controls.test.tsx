@@ -145,4 +145,26 @@ describe('DrawerQuickChips', () => {
     await user.click(screen.getByRole('button', { name: '3 mo' }));
     expect(onChange).toHaveBeenCalledWith(90);
   });
+
+  it('edges the picked chip in the text ink where the screen asks (the quick dates)', () => {
+    render(
+      <DrawerQuickChips
+        label="Date & time"
+        options={[
+          { label: 'Today', value: 'today' },
+          { label: 'Tomorrow', value: 'tomorrow' },
+        ]}
+        value="today"
+        onChange={() => undefined}
+        pickedEdge
+        testId="quick"
+      />,
+    );
+    expect(screen.getByTestId('quick-today')).toHaveClass(
+      'bg-muted',
+      'border-foreground',
+    );
+    expect(screen.getByTestId('quick-today')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('quick-tomorrow')).not.toHaveClass('border-foreground');
+  });
 });

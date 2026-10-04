@@ -14,6 +14,10 @@ import {
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  DrawerQuickChips,
+  type DrawerQuickOption,
+} from '@/shared/components/DrawerField/index.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/index.ts';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -77,35 +81,26 @@ function QuickDates({
   onPick: (date: string) => void;
 }) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, PICKER_NS]);
-  const chips = [
-    { id: 'today', label: t(PICKER_KEYS.date.today, { ns: PICKER_NS }), days: 0 },
-    { id: 'tomorrow', label: t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS }), days: 1 },
-    { id: 'next-week', label: t(K.nextWeek), days: 7 },
+  const days = { today: 0, tomorrow: 1, 'next-week': 7 } as const;
+  type QuickDate = keyof typeof days;
+  const options: DrawerQuickOption<QuickDate>[] = [
+    { value: 'today', label: t(PICKER_KEYS.date.today, { ns: PICKER_NS }) },
+    { value: 'tomorrow', label: t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS }) },
+    { value: 'next-week', label: t(K.nextWeek) },
   ];
+  const picked =
+    options.find((option) => addCivilDays(today, days[option.value]) === draft.date)
+      ?.value ?? null;
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {chips.map((chip) => {
-        const date = addCivilDays(today, chip.days);
-        const on = draft.date === date;
-        return (
-          <button
-            key={chip.id}
-            type="button"
-            aria-pressed={on}
-            disabled={disabled}
-            data-slot="pill"
-            data-testid={IDS.quickDate(chip.id)}
-            onClick={() => onPick(date)}
-            className={cn(
-              'h-6 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap transition-colors disabled:opacity-50',
-              on ? 'bg-muted border-foreground' : 'bg-card',
-            )}
-          >
-            {chip.label}
-          </button>
-        );
-      })}
-    </div>
+    <DrawerQuickChips
+      label={t(K.title)}
+      options={options}
+      value={picked}
+      onChange={(quick) => onPick(addCivilDays(today, days[quick]))}
+      disabled={disabled}
+      pickedEdge
+      testId={IDS.quickDate}
+    />
   );
 }
 

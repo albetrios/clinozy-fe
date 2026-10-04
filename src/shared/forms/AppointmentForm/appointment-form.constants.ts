@@ -243,7 +243,8 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   notes: 'appointment-form-notes',
   slot: 'appointment-form-slot',
   slotToggle: 'appointment-form-slot-toggle',
-  quickDate: (id: string) => `appointment-form-quick-${id}`,
+  /** The quick dates; each chip is `<id>-today` · `-tomorrow` · `-next-week`. */
+  quickDate: 'appointment-form-quick',
   calendar: 'appointment-form-calendar',
   calendarDay: 'appointment-form-calendar-day',
   calendarPrevious: 'appointment-form-calendar-previous',
