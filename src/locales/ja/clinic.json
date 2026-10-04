@@ -730,5 +730,94 @@
         "reviewLink": "レビューリンク"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "サービスの提案",
+    "suggested_other": "提案 {{count}} 件",
+    "planned_other": "予定 {{count}} 件",
+    "accepted_other": "承諾 {{count}} 件",
+    "pastPurchases_other": "過去の購入 {{count}} 件",
+    "ideas_other": "アイデア {{count}} 件",
+    "nothingSuggested": "まだ提案はありません",
+    "noSuggestions": "まだ提案はありません",
+    "pricesHidden": "価格は非表示",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "価格は非表示 · 目のアイコンで表示",
+    "showPrices": "価格を表示",
+    "hidePrices": "価格を非表示",
+    "savesOnList": "定価より {{amount}} お得",
+    "invoicedAmount": "{{amount}} 請求済み",
+    "atListPrice": "定価",
+    "columns": {
+      "suggested": "提案",
+      "qty": "数量",
+      "price": "価格",
+      "status": "ステータス"
+    },
+    "less": "減らす",
+    "more": "増やす",
+    "quantity": "数量",
+    "finalPrice": "最終価格",
+    "belowFloor": "最低価格 {{price}} を下回っています",
+    "tooMuchDiscount": "割引が大きすぎます · 管理者に確認してください",
+    "details": "サービスの詳細",
+    "statuses": {
+      "planned": "予定",
+      "accepted": "承諾",
+      "next_time": "次回",
+      "declined": "辞退"
+    },
+    "statusHints": {
+      "planned": "提案済み · まだ未定",
+      "accepted": "同意済み · 実施時に請求",
+      "next_time": "関心あり · 次回の来院で話す",
+      "declined": "関心なし · 記録として保持"
+    },
+    "statusLabel": "ステータス · {{status}}",
+    "invoiced": "請求済み",
+    "invoicedOf": "請求済み · {{total}} 件中 {{done}} 件",
+    "linkInvoice": "請求書を紐づける",
+    "linkInvoiceHint": "請求書を手動で紐づける",
+    "remove": "削除",
+    "empty": "{{first}} さんへの提案はまだありません。",
+    "whyIdea": "このアイデアの理由",
+    "idea": "アイデア",
+    "add": "+ 追加",
+    "addNamed": "{{name}} を追加",
+    "addHint": "提案に追加",
+    "addOffering": "サービスを追加",
+    "purchasesTitle": "{{first}} さんの最近の購入",
+    "purchasesSummary_other": "{{count}} 件 · これまでの支払い {{paid}}",
+    "purchaseColumns": {
+      "date": "日付",
+      "bought": "購入品",
+      "qty": "数量",
+      "paid": "支払額",
+      "sessions": "回数",
+      "invoice": "請求書"
+    },
+    "sessionsUsed": "{{total}} 回中 {{used}} 回使用",
+    "activityTitle": "連絡先のアクティビティ",
+    "openChat": "チャットを開く",
+    "activityColumns": {
+      "when": "日時",
+      "channel": "チャネル",
+      "message": "メッセージ",
+      "status": "ステータス"
+    },
+    "sent": "送信",
+    "got": "受信",
+    "removeConfirm": {
+      "title": "この記録を削除しますか？",
+      "record": "提案から {{name}}",
+      "effect": "{{first}} さんのサービス提案から外れます。提案した記録を残すには「辞退」を使ってください。",
+      "reasons": {
+        "addedByMistake": "誤って追加",
+        "duplicate": "重複",
+        "planChanged": "計画が変わった",
+        "other": "その他"
+      }
+    }
   }
 }

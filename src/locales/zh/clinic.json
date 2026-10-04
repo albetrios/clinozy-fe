@@ -730,5 +730,94 @@
         "reviewLink": "评价链接"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "服务建议",
+    "suggested_other": "已建议 {{count}} 项",
+    "planned_other": "计划中 {{count}} 项",
+    "accepted_other": "已接受 {{count}} 项",
+    "pastPurchases_other": "过往购买 {{count}} 笔",
+    "ideas_other": "{{count}} 个想法",
+    "nothingSuggested": "暂无建议",
+    "noSuggestions": "暂无建议",
+    "pricesHidden": "价格已隐藏",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "价格已隐藏 · 点击眼睛图标显示",
+    "showPrices": "显示价格",
+    "hidePrices": "隐藏价格",
+    "savesOnList": "比标价节省 {{amount}}",
+    "invoicedAmount": "已开票 {{amount}}",
+    "atListPrice": "按标价",
+    "columns": {
+      "suggested": "建议项",
+      "qty": "数量",
+      "price": "价格",
+      "status": "状态"
+    },
+    "less": "减少",
+    "more": "增加",
+    "quantity": "数量",
+    "finalPrice": "最终价格",
+    "belowFloor": "低于最低价 {{price}}",
+    "tooMuchDiscount": "折扣过多 · 请咨询管理员",
+    "details": "服务详情",
+    "statuses": {
+      "planned": "计划中",
+      "accepted": "已接受",
+      "next_time": "下次再说",
+      "declined": "已拒绝"
+    },
+    "statusHints": {
+      "planned": "已建议 · 尚未决定",
+      "accepted": "已同意 · 发生时开票",
+      "next_time": "有兴趣 · 下次就诊时再提",
+      "declined": "不感兴趣 · 留作记录"
+    },
+    "statusLabel": "状态 · {{status}}",
+    "invoiced": "已开票",
+    "invoicedOf": "已开票 · {{done}}/{{total}}",
+    "linkInvoice": "关联发票",
+    "linkInvoiceHint": "手动关联发票",
+    "remove": "移除",
+    "empty": "还没有给 {{first}} 的建议。",
+    "whyIdea": "为什么推荐",
+    "idea": "想法",
+    "add": "+ 添加",
+    "addNamed": "添加 {{name}}",
+    "addHint": "添加到建议",
+    "addOffering": "添加服务",
+    "purchasesTitle": "{{first}} 的最近购买",
+    "purchasesSummary_other": "{{count}} 行 · 已付 {{paid}}",
+    "purchaseColumns": {
+      "date": "日期",
+      "bought": "购买项",
+      "qty": "数量",
+      "paid": "已付",
+      "sessions": "次数",
+      "invoice": "发票"
+    },
+    "sessionsUsed": "已用 {{used}}/{{total}} 次",
+    "activityTitle": "联系人动态",
+    "openChat": "打开聊天",
+    "activityColumns": {
+      "when": "时间",
+      "channel": "渠道",
+      "message": "消息",
+      "status": "状态"
+    },
+    "sent": "发出",
+    "got": "收到",
+    "removeConfirm": {
+      "title": "移除这条记录？",
+      "record": "建议中的 {{name}}",
+      "effect": "它将从 {{first}} 的服务建议中移除。如需保留曾经推荐过的记录，请改用“已拒绝”。",
+      "reasons": {
+        "addedByMistake": "误加",
+        "duplicate": "重复",
+        "planChanged": "计划有变",
+        "other": "其他"
+      }
+    }
   }
 }

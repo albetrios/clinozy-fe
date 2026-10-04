@@ -736,5 +736,106 @@
         "reviewLink": "lien d’avis"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "Suggestions de prestations",
+    "suggested_one": "{{count}} suggérée",
+    "suggested_many": "{{count}} suggérées",
+    "suggested_other": "{{count}} suggérées",
+    "planned_one": "{{count}} prévue",
+    "planned_many": "{{count}} prévues",
+    "planned_other": "{{count}} prévues",
+    "accepted_one": "{{count}} acceptée",
+    "accepted_many": "{{count}} acceptées",
+    "accepted_other": "{{count}} acceptées",
+    "pastPurchases_one": "{{count}} achat passé",
+    "pastPurchases_many": "{{count}} achats passés",
+    "pastPurchases_other": "{{count}} achats passés",
+    "ideas_one": "{{count}} idée",
+    "ideas_many": "{{count}} idées",
+    "ideas_other": "{{count}} idées",
+    "nothingSuggested": "Rien de suggéré pour l’instant",
+    "noSuggestions": "Pas encore de suggestions",
+    "pricesHidden": "Prix masqués",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "Prix masqués · utilisez l’œil pour les afficher",
+    "showPrices": "Afficher les prix",
+    "hidePrices": "Masquer les prix",
+    "savesOnList": "Économise {{amount}} sur le prix catalogue",
+    "invoicedAmount": "{{amount}} facturé",
+    "atListPrice": "Au prix catalogue",
+    "columns": {
+      "suggested": "Suggéré",
+      "qty": "Qté",
+      "price": "Prix",
+      "status": "Statut"
+    },
+    "less": "Moins",
+    "more": "Plus",
+    "quantity": "Quantité",
+    "finalPrice": "Prix final",
+    "belowFloor": "Sous le prix minimum {{price}}",
+    "tooMuchDiscount": "Remise trop élevée · demandez à un administrateur",
+    "details": "Détails de la prestation",
+    "statuses": {
+      "planned": "Prévu",
+      "accepted": "Accepté",
+      "next_time": "La prochaine fois",
+      "declined": "Refusé"
+    },
+    "statusHints": {
+      "planned": "Suggéré · pas encore décidé",
+      "accepted": "Accord donné · facturer le moment venu",
+      "next_time": "Intéressé · à reparler à la prochaine visite",
+      "declined": "Pas intéressé · conservé pour mémoire"
+    },
+    "statusLabel": "Statut · {{status}}",
+    "invoiced": "Facturé",
+    "invoicedOf": "Facturé · {{done}} sur {{total}}",
+    "linkInvoice": "Lier une facture",
+    "linkInvoiceHint": "Lier une facture manuellement",
+    "remove": "Retirer",
+    "empty": "Rien de suggéré pour {{first}} pour l’instant.",
+    "whyIdea": "Pourquoi cette idée",
+    "idea": "Idée",
+    "add": "+ Ajouter",
+    "addNamed": "Ajouter {{name}}",
+    "addHint": "Ajouter aux suggestions",
+    "addOffering": "Ajouter une prestation",
+    "purchasesTitle": "Derniers achats de {{first}}",
+    "purchasesSummary_one": "{{count}} ligne · {{paid}} payé à ce jour",
+    "purchasesSummary_many": "{{count}} lignes · {{paid}} payé à ce jour",
+    "purchasesSummary_other": "{{count}} lignes · {{paid}} payé à ce jour",
+    "purchaseColumns": {
+      "date": "Date",
+      "bought": "Acheté",
+      "qty": "Qté",
+      "paid": "Payé",
+      "sessions": "Séances",
+      "invoice": "Facture"
+    },
+    "sessionsUsed": "{{used}} sur {{total}} utilisées",
+    "activityTitle": "Activité du contact",
+    "openChat": "Ouvrir le chat",
+    "activityColumns": {
+      "when": "Quand",
+      "channel": "Canal",
+      "message": "Message",
+      "status": "Statut"
+    },
+    "sent": "Envoyé",
+    "got": "Reçu",
+    "removeConfirm": {
+      "title": "Retirer cet élément ?",
+      "record": "{{name}} des suggestions",
+      "effect": "Il quitte les suggestions de prestations de {{first}}. Utilisez plutôt « Refusé » pour garder une trace de la proposition.",
+      "reasons": {
+        "addedByMistake": "Ajouté par erreur",
+        "duplicate": "Doublon",
+        "planChanged": "Plan modifié",
+        "other": "Autre"
+      }
+    }
   }
 }

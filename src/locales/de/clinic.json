@@ -733,5 +733,100 @@
         "reviewLink": "Bewertungslink"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "Leistungsvorschläge",
+    "suggested_one": "{{count}} vorgeschlagen",
+    "suggested_other": "{{count}} vorgeschlagen",
+    "planned_one": "{{count}} geplant",
+    "planned_other": "{{count}} geplant",
+    "accepted_one": "{{count}} angenommen",
+    "accepted_other": "{{count}} angenommen",
+    "pastPurchases_one": "{{count}} früherer Kauf",
+    "pastPurchases_other": "{{count}} frühere Käufe",
+    "ideas_one": "{{count}} Idee",
+    "ideas_other": "{{count}} Ideen",
+    "nothingSuggested": "Noch nichts vorgeschlagen",
+    "noSuggestions": "Noch keine Vorschläge",
+    "pricesHidden": "Preise ausgeblendet",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "Preise ausgeblendet · mit dem Auge einblenden",
+    "showPrices": "Preise anzeigen",
+    "hidePrices": "Preise ausblenden",
+    "savesOnList": "Spart {{amount}} gegenüber dem Listenpreis",
+    "invoicedAmount": "{{amount}} abgerechnet",
+    "atListPrice": "Zum Listenpreis",
+    "columns": {
+      "suggested": "Vorgeschlagen",
+      "qty": "Menge",
+      "price": "Preis",
+      "status": "Status"
+    },
+    "less": "Weniger",
+    "more": "Mehr",
+    "quantity": "Menge",
+    "finalPrice": "Endpreis",
+    "belowFloor": "Unter dem niedrigsten Preis {{price}}",
+    "tooMuchDiscount": "Zu viel Rabatt · fragen Sie einen Administrator",
+    "details": "Leistungsdetails",
+    "statuses": {
+      "planned": "Geplant",
+      "accepted": "Angenommen",
+      "next_time": "Nächstes Mal",
+      "declined": "Abgelehnt"
+    },
+    "statusHints": {
+      "planned": "Vorgeschlagen · noch nicht entschieden",
+      "accepted": "Zugestimmt · abrechnen, wenn es so weit ist",
+      "next_time": "Interessiert · beim nächsten Besuch ansprechen",
+      "declined": "Kein Interesse · als Nachweis behalten"
+    },
+    "statusLabel": "Status · {{status}}",
+    "invoiced": "Abgerechnet",
+    "invoicedOf": "Abgerechnet · {{done}} von {{total}}",
+    "linkInvoice": "Rechnung verknüpfen",
+    "linkInvoiceHint": "Rechnung manuell verknüpfen",
+    "remove": "Entfernen",
+    "empty": "Für {{first}} wurde noch nichts vorgeschlagen.",
+    "whyIdea": "Warum diese Idee",
+    "idea": "Idee",
+    "add": "+ Hinzufügen",
+    "addNamed": "{{name}} hinzufügen",
+    "addHint": "Zu den Vorschlägen hinzufügen",
+    "addOffering": "Leistung hinzufügen",
+    "purchasesTitle": "Letzte Käufe von {{first}}",
+    "purchasesSummary_one": "{{count}} Position · {{paid}} bisher bezahlt",
+    "purchasesSummary_other": "{{count}} Positionen · {{paid}} bisher bezahlt",
+    "purchaseColumns": {
+      "date": "Datum",
+      "bought": "Gekauft",
+      "qty": "Menge",
+      "paid": "Bezahlt",
+      "sessions": "Sitzungen",
+      "invoice": "Rechnung"
+    },
+    "sessionsUsed": "{{used}} von {{total}} genutzt",
+    "activityTitle": "Kontaktaktivität",
+    "openChat": "Chat öffnen",
+    "activityColumns": {
+      "when": "Wann",
+      "channel": "Kanal",
+      "message": "Nachricht",
+      "status": "Status"
+    },
+    "sent": "Gesendet",
+    "got": "Erhalten",
+    "removeConfirm": {
+      "title": "Diesen Eintrag entfernen?",
+      "record": "{{name}} aus den Vorschlägen",
+      "effect": "Er verschwindet aus den Leistungsvorschlägen von {{first}}. Wählen Sie stattdessen „Abgelehnt“, um festzuhalten, dass er angeboten wurde.",
+      "reasons": {
+        "addedByMistake": "Versehentlich hinzugefügt",
+        "duplicate": "Duplikat",
+        "planChanged": "Plan geändert",
+        "other": "Sonstiges"
+      }
+    }
   }
 }

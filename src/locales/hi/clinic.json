@@ -733,5 +733,100 @@
         "reviewLink": "रिव्यू लिंक"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "सेवा सुझाव",
+    "suggested_one": "{{count}} सुझाए गए",
+    "suggested_other": "{{count}} सुझाए गए",
+    "planned_one": "{{count}} योजना में",
+    "planned_other": "{{count}} योजना में",
+    "accepted_one": "{{count}} स्वीकार",
+    "accepted_other": "{{count}} स्वीकार",
+    "pastPurchases_one": "{{count}} पिछली खरीद",
+    "pastPurchases_other": "{{count}} पिछली खरीद",
+    "ideas_one": "{{count}} आइडिया",
+    "ideas_other": "{{count}} आइडिया",
+    "nothingSuggested": "अभी कुछ सुझाया नहीं गया",
+    "noSuggestions": "अभी कोई सुझाव नहीं",
+    "pricesHidden": "कीमतें छिपी हैं",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "कीमतें छिपी हैं · दिखाने के लिए आँख का उपयोग करें",
+    "showPrices": "कीमतें दिखाएँ",
+    "hidePrices": "कीमतें छिपाएँ",
+    "savesOnList": "सूची मूल्य पर {{amount}} की बचत",
+    "invoicedAmount": "{{amount}} का इनवॉइस बना",
+    "atListPrice": "सूची मूल्य पर",
+    "columns": {
+      "suggested": "सुझाया गया",
+      "qty": "मात्रा",
+      "price": "कीमत",
+      "status": "स्थिति"
+    },
+    "less": "कम",
+    "more": "ज़्यादा",
+    "quantity": "मात्रा",
+    "finalPrice": "अंतिम कीमत",
+    "belowFloor": "न्यूनतम कीमत {{price}} से कम",
+    "tooMuchDiscount": "बहुत ज़्यादा छूट · किसी एडमिन से पूछें",
+    "details": "सेवा का विवरण",
+    "statuses": {
+      "planned": "योजना में",
+      "accepted": "स्वीकार",
+      "next_time": "अगली बार",
+      "declined": "अस्वीकार"
+    },
+    "statusHints": {
+      "planned": "सुझाया गया · अभी तय नहीं",
+      "accepted": "वे मान गए · होने पर इनवॉइस बनाएँ",
+      "next_time": "रुचि है · अगली विज़िट पर बात करें",
+      "declined": "रुचि नहीं · रिकॉर्ड के तौर पर रखा गया"
+    },
+    "statusLabel": "स्थिति · {{status}}",
+    "invoiced": "इनवॉइस बना",
+    "invoicedOf": "इनवॉइस बना · {{total}} में से {{done}}",
+    "linkInvoice": "इनवॉइस जोड़ें",
+    "linkInvoiceHint": "इनवॉइस हाथ से जोड़ें",
+    "remove": "हटाएँ",
+    "empty": "{{first}} के लिए अभी कुछ सुझाया नहीं गया।",
+    "whyIdea": "यह आइडिया क्यों",
+    "idea": "आइडिया",
+    "add": "+ जोड़ें",
+    "addNamed": "{{name}} जोड़ें",
+    "addHint": "सुझावों में जोड़ें",
+    "addOffering": "सेवा जोड़ें",
+    "purchasesTitle": "{{first}} की पिछली खरीद",
+    "purchasesSummary_one": "{{count}} लाइन · अब तक {{paid}} भुगतान",
+    "purchasesSummary_other": "{{count}} लाइन · अब तक {{paid}} भुगतान",
+    "purchaseColumns": {
+      "date": "तारीख",
+      "bought": "खरीदा",
+      "qty": "मात्रा",
+      "paid": "भुगतान",
+      "sessions": "सत्र",
+      "invoice": "इनवॉइस"
+    },
+    "sessionsUsed": "{{total}} में से {{used}} इस्तेमाल",
+    "activityTitle": "संपर्क गतिविधि",
+    "openChat": "चैट खोलें",
+    "activityColumns": {
+      "when": "कब",
+      "channel": "चैनल",
+      "message": "संदेश",
+      "status": "स्थिति"
+    },
+    "sent": "भेजा",
+    "got": "मिला",
+    "removeConfirm": {
+      "title": "यह रिकॉर्ड हटाएँ?",
+      "record": "सुझावों से {{name}}",
+      "effect": "यह {{first}} के सेवा सुझावों से हट जाएगा। ऑफ़र किए जाने का रिकॉर्ड रखने के लिए इसके बजाय “अस्वीकार” चुनें।",
+      "reasons": {
+        "addedByMistake": "गलती से जोड़ा गया",
+        "duplicate": "डुप्लिकेट",
+        "planChanged": "योजना बदल गई",
+        "other": "अन्य"
+      }
+    }
   }
 }

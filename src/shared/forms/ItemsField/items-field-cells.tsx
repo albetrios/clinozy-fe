@@ -101,6 +101,11 @@ export interface ItemsNumberInputProps {
   onBlur?: () => void;
   ref?: Ref<HTMLInputElement>;
   testId?: string;
+  /**
+   * Classes for the input, over the 32px cell's — a host that sizes the cell to
+   * its own row (the suggestions card's 112×30 price box, H:2809).
+   */
+  className?: string;
 }
 
 /**
@@ -126,6 +131,7 @@ export function ItemsNumberInput({
   onBlur,
   ref,
   testId,
+  className,
 }: ItemsNumberInputProps) {
   const { t } = useTranslation(ITEMS_FIELD_NS);
   const errorId = useId();
@@ -169,7 +175,7 @@ export function ItemsNumberInput({
             setDraft(null);
             onBlur?.();
           }}
-          className={cn(CELL_INPUT_CLASS, align === 'end' && 'text-end')}
+          className={cn(CELL_INPUT_CLASS, align === 'end' && 'text-end', className)}
         />
       </CellMessage>
       <CellMessageText id={errorId} message={error} />

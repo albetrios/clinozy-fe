@@ -733,5 +733,100 @@
         "reviewLink": "review link"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "Offering suggestions",
+    "suggested_one": "{{count}} suggested",
+    "suggested_other": "{{count}} suggested",
+    "planned_one": "{{count}} planned",
+    "planned_other": "{{count}} planned",
+    "accepted_one": "{{count}} accepted",
+    "accepted_other": "{{count}} accepted",
+    "pastPurchases_one": "{{count}} past purchase",
+    "pastPurchases_other": "{{count}} past purchases",
+    "ideas_one": "{{count}} idea",
+    "ideas_other": "{{count}} ideas",
+    "nothingSuggested": "Nothing suggested yet",
+    "noSuggestions": "No suggestions yet",
+    "pricesHidden": "Prices hidden",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "Prices hidden · use the eye to show",
+    "showPrices": "Show prices",
+    "hidePrices": "Hide prices",
+    "savesOnList": "Saves {{amount}} on list",
+    "invoicedAmount": "{{amount}} invoiced",
+    "atListPrice": "At list price",
+    "columns": {
+      "suggested": "Suggested",
+      "qty": "Qty",
+      "price": "Price",
+      "status": "Status"
+    },
+    "less": "Less",
+    "more": "More",
+    "quantity": "Quantity",
+    "finalPrice": "Final price",
+    "belowFloor": "Below the lowest price {{price}}",
+    "tooMuchDiscount": "Too much discount · ask an admin",
+    "details": "Offering details",
+    "statuses": {
+      "planned": "Planned",
+      "accepted": "Accepted",
+      "next_time": "Next time",
+      "declined": "Declined"
+    },
+    "statusHints": {
+      "planned": "Suggested · not decided yet",
+      "accepted": "They agreed · invoice when it happens",
+      "next_time": "Interested · bring it up at the next visit",
+      "declined": "Not interested · kept as a record"
+    },
+    "statusLabel": "Status · {{status}}",
+    "invoiced": "Invoiced",
+    "invoicedOf": "Invoiced · {{done}} of {{total}}",
+    "linkInvoice": "Link an invoice",
+    "linkInvoiceHint": "Link an invoice by hand",
+    "remove": "Remove",
+    "empty": "Nothing suggested for {{first}} yet.",
+    "whyIdea": "Why this idea",
+    "idea": "Idea",
+    "add": "+ Add",
+    "addNamed": "Add {{name}}",
+    "addHint": "Add to suggestions",
+    "addOffering": "Add offering",
+    "purchasesTitle": "{{first}}’s last purchases",
+    "purchasesSummary_one": "{{count}} line · {{paid}} paid so far",
+    "purchasesSummary_other": "{{count}} lines · {{paid}} paid so far",
+    "purchaseColumns": {
+      "date": "Date",
+      "bought": "Bought",
+      "qty": "Qty",
+      "paid": "Paid",
+      "sessions": "Sessions",
+      "invoice": "Invoice"
+    },
+    "sessionsUsed": "{{used}} of {{total}} used",
+    "activityTitle": "Contact activity",
+    "openChat": "Open chat",
+    "activityColumns": {
+      "when": "When",
+      "channel": "Channel",
+      "message": "Message",
+      "status": "Status"
+    },
+    "sent": "Sent",
+    "got": "Got",
+    "removeConfirm": {
+      "title": "Remove this record?",
+      "record": "{{name}} from suggestions",
+      "effect": "It leaves {{first}}’s offering suggestions. Use Declined instead to keep a record that it was offered.",
+      "reasons": {
+        "addedByMistake": "Added by mistake",
+        "duplicate": "Duplicate",
+        "planChanged": "Plan changed",
+        "other": "Other"
+      }
+    }
   }
 }

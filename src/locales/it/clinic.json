@@ -736,5 +736,106 @@
         "reviewLink": "link recensione"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "Suggerimenti di servizi",
+    "suggested_one": "{{count}} suggerito",
+    "suggested_many": "{{count}} suggeriti",
+    "suggested_other": "{{count}} suggeriti",
+    "planned_one": "{{count}} pianificato",
+    "planned_many": "{{count}} pianificati",
+    "planned_other": "{{count}} pianificati",
+    "accepted_one": "{{count}} accettato",
+    "accepted_many": "{{count}} accettati",
+    "accepted_other": "{{count}} accettati",
+    "pastPurchases_one": "{{count}} acquisto precedente",
+    "pastPurchases_many": "{{count}} acquisti precedenti",
+    "pastPurchases_other": "{{count}} acquisti precedenti",
+    "ideas_one": "{{count}} idea",
+    "ideas_many": "{{count}} idee",
+    "ideas_other": "{{count}} idee",
+    "nothingSuggested": "Ancora nessun suggerimento",
+    "noSuggestions": "Nessun suggerimento",
+    "pricesHidden": "Prezzi nascosti",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "Prezzi nascosti · usa l’occhio per mostrarli",
+    "showPrices": "Mostra prezzi",
+    "hidePrices": "Nascondi prezzi",
+    "savesOnList": "Risparmia {{amount}} sul listino",
+    "invoicedAmount": "{{amount}} fatturato",
+    "atListPrice": "A prezzo di listino",
+    "columns": {
+      "suggested": "Suggerito",
+      "qty": "Qtà",
+      "price": "Prezzo",
+      "status": "Stato"
+    },
+    "less": "Meno",
+    "more": "Più",
+    "quantity": "Quantità",
+    "finalPrice": "Prezzo finale",
+    "belowFloor": "Sotto il prezzo minimo {{price}}",
+    "tooMuchDiscount": "Sconto eccessivo · chiedi a un amministratore",
+    "details": "Dettagli del servizio",
+    "statuses": {
+      "planned": "Pianificato",
+      "accepted": "Accettato",
+      "next_time": "La prossima volta",
+      "declined": "Rifiutato"
+    },
+    "statusHints": {
+      "planned": "Suggerito · non ancora deciso",
+      "accepted": "Hanno accettato · fattura quando avviene",
+      "next_time": "Interessati · riparlarne alla prossima visita",
+      "declined": "Non interessati · conservato come traccia"
+    },
+    "statusLabel": "Stato · {{status}}",
+    "invoiced": "Fatturato",
+    "invoicedOf": "Fatturato · {{done}} di {{total}}",
+    "linkInvoice": "Collega una fattura",
+    "linkInvoiceHint": "Collega una fattura a mano",
+    "remove": "Rimuovi",
+    "empty": "Ancora nessun suggerimento per {{first}}.",
+    "whyIdea": "Perché questa idea",
+    "idea": "Idea",
+    "add": "+ Aggiungi",
+    "addNamed": "Aggiungi {{name}}",
+    "addHint": "Aggiungi ai suggerimenti",
+    "addOffering": "Aggiungi servizio",
+    "purchasesTitle": "Ultimi acquisti di {{first}}",
+    "purchasesSummary_one": "{{count}} riga · {{paid}} pagato finora",
+    "purchasesSummary_many": "{{count}} righe · {{paid}} pagato finora",
+    "purchasesSummary_other": "{{count}} righe · {{paid}} pagato finora",
+    "purchaseColumns": {
+      "date": "Data",
+      "bought": "Acquistato",
+      "qty": "Qtà",
+      "paid": "Pagato",
+      "sessions": "Sedute",
+      "invoice": "Fattura"
+    },
+    "sessionsUsed": "{{used}} di {{total}} usate",
+    "activityTitle": "Attività del contatto",
+    "openChat": "Apri chat",
+    "activityColumns": {
+      "when": "Quando",
+      "channel": "Canale",
+      "message": "Messaggio",
+      "status": "Stato"
+    },
+    "sent": "Inviato",
+    "got": "Ricevuto",
+    "removeConfirm": {
+      "title": "Rimuovere questa voce?",
+      "record": "{{name}} dai suggerimenti",
+      "effect": "Esce dai suggerimenti di servizi di {{first}}. Usa «Rifiutato» per conservare traccia che è stato proposto.",
+      "reasons": {
+        "addedByMistake": "Aggiunto per errore",
+        "duplicate": "Duplicato",
+        "planChanged": "Piano cambiato",
+        "other": "Altro"
+      }
+    }
   }
 }

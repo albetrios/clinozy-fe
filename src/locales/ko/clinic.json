@@ -730,5 +730,94 @@
         "reviewLink": "리뷰 링크"
       }
     }
+  },
+  "offeringSuggestions": {
+    "title": "서비스 제안",
+    "suggested_other": "{{count}}개 제안",
+    "planned_other": "{{count}}개 예정",
+    "accepted_other": "{{count}}개 수락",
+    "pastPurchases_other": "이전 구매 {{count}}건",
+    "ideas_other": "아이디어 {{count}}개",
+    "nothingSuggested": "아직 제안이 없습니다",
+    "noSuggestions": "아직 제안이 없습니다",
+    "pricesHidden": "가격 숨김",
+    "masked": "₹ ••••",
+    "currency": "₹",
+    "pricesHiddenHint": "가격 숨김 · 눈 아이콘으로 표시",
+    "showPrices": "가격 표시",
+    "hidePrices": "가격 숨기기",
+    "savesOnList": "정가 대비 {{amount}} 절약",
+    "invoicedAmount": "{{amount}} 청구됨",
+    "atListPrice": "정가",
+    "columns": {
+      "suggested": "제안",
+      "qty": "수량",
+      "price": "가격",
+      "status": "상태"
+    },
+    "less": "줄이기",
+    "more": "늘리기",
+    "quantity": "수량",
+    "finalPrice": "최종 가격",
+    "belowFloor": "최저가 {{price}} 미만",
+    "tooMuchDiscount": "할인이 너무 큽니다 · 관리자에게 문의하세요",
+    "details": "서비스 정보",
+    "statuses": {
+      "planned": "예정",
+      "accepted": "수락",
+      "next_time": "다음에",
+      "declined": "거절"
+    },
+    "statusHints": {
+      "planned": "제안함 · 아직 결정 전",
+      "accepted": "동의함 · 진행 시 청구",
+      "next_time": "관심 있음 · 다음 방문 때 다시 언급",
+      "declined": "관심 없음 · 기록으로 보관"
+    },
+    "statusLabel": "상태 · {{status}}",
+    "invoiced": "청구됨",
+    "invoicedOf": "청구됨 · {{total}}개 중 {{done}}개",
+    "linkInvoice": "청구서 연결",
+    "linkInvoiceHint": "청구서 직접 연결",
+    "remove": "삭제",
+    "empty": "{{first}} 님에게 아직 제안된 것이 없습니다.",
+    "whyIdea": "이 아이디어를 제안하는 이유",
+    "idea": "아이디어",
+    "add": "+ 추가",
+    "addNamed": "{{name}} 추가",
+    "addHint": "제안에 추가",
+    "addOffering": "서비스 추가",
+    "purchasesTitle": "{{first}} 님의 최근 구매",
+    "purchasesSummary_other": "{{count}}개 항목 · 지금까지 {{paid}} 결제",
+    "purchaseColumns": {
+      "date": "날짜",
+      "bought": "구매 항목",
+      "qty": "수량",
+      "paid": "결제액",
+      "sessions": "회차",
+      "invoice": "청구서"
+    },
+    "sessionsUsed": "{{total}}회 중 {{used}}회 사용",
+    "activityTitle": "연락처 활동",
+    "openChat": "채팅 열기",
+    "activityColumns": {
+      "when": "시간",
+      "channel": "채널",
+      "message": "메시지",
+      "status": "상태"
+    },
+    "sent": "보냄",
+    "got": "받음",
+    "removeConfirm": {
+      "title": "이 기록을 삭제할까요?",
+      "record": "제안에서 {{name}}",
+      "effect": "{{first}} 님의 서비스 제안에서 빠집니다. 제안했던 기록을 남기려면 대신 ‘거절’을 사용하세요.",
+      "reasons": {
+        "addedByMistake": "실수로 추가",
+        "duplicate": "중복",
+        "planChanged": "계획 변경",
+        "other": "기타"
+      }
+    }
   }
 }

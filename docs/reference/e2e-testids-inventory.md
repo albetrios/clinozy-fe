@@ -438,6 +438,23 @@ Scope a spec to `chat-column` — a room can show one beside its list.
 | `chat-fill-in`                              | "Fill in" row for a picked template's placeholders                                                                | `ChatColumn/ChatComposer/`  |
 | `chat-mode-mismatch`                        | "Anaya wrote on Instagram · Switch" (the contact wrote on another channel)                                        | `ChatColumn/ChatComposer/`  |
 
+## Offering suggestions (shared, launch L-37b)
+
+The plan card of the appointment form and the patient file (`shared/components/OfferingSuggestions/`).
+A row's status picker carries the shared picker ids; Remove opens the shared reason confirm
+(`confirm-*`, reasons `mistake` · `duplicate` · `plan-changed` · `other`).
+
+| Test ID                         | Element                                                                   | Source                    |
+| ------------------------------- | ------------------------------------------------------------------------- | ------------------------- |
+| `offering-suggestions`          | Card root (`<section>`, "Offering suggestions") — a size container        | `OfferingSuggestions.tsx` |
+| `offering-suggestions-toggle`   | Header: title, sub line, chevron (`aria-expanded`)                        | `OfferingSuggestions.tsx` |
+| `offering-suggestions-prices`   | The 32px price eye ("Show prices" / "Hide prices", `aria-pressed`)        | `OfferingSuggestions.tsx` |
+| `offering-suggestions-row`      | One suggested offering (`data-status`): stepper, price, status, by, links | `SuggestionRows.tsx`      |
+| `offering-suggestions-idea`     | One idea row with its "+ Add"                                             | `SuggestionRows.tsx`      |
+| `offering-suggestions-add`      | The dashed "Add offering" (edit only)                                     | `OfferingSuggestions.tsx` |
+| `offering-suggestions-purchase` | One "<first>’s last purchases" line                                       | `SuggestionTables.tsx`    |
+| `offering-suggestions-activity` | One "Contact activity" line                                               | `SuggestionTables.tsx`    |
+
 ## Appointments room (launch L-36b, L-37)
 
 `pages/organization/$organizationSlug/appointments/`. The toolbar and the Agenda also carry the
