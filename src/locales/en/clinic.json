@@ -1184,5 +1184,39 @@
     "due": "{{amount}} due",
     "nothingDue": "Nothing due",
     "lead": "Lead {{id}} · not a patient yet"
+  },
+  "splitRows": {
+    "mode": "Mode",
+    "amount": "Amount"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Give back",
+      "take": "Got it back"
+    },
+    "sub": {
+      "give": "To {{name}} · {{reason}} · adds an Out entry to Payments",
+      "take": "From {{name}} · {{reason}} · adds an In entry to Payments"
+    },
+    "section": {
+      "give": "How it goes back",
+      "take": "How it came in"
+    },
+    "rows": {
+      "give": "Paid back by",
+      "take": "Received as"
+    },
+    "add": "Add another mode",
+    "total": "Total {{total}} · of {{owed}}",
+    "save": {
+      "give": "Return {{amount}}",
+      "take": "Record {{amount}}"
+    },
+    "enterAmount": "Enter the amount",
+    "moreThanOwed": "More than the {{amount}} owed",
+    "done": {
+      "give": "{{amount}} given back to {{name}} · Out entry added",
+      "take": "{{amount}} got back from {{name}} · In entry added"
+    }
   }
 }

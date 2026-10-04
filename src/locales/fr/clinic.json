@@ -1201,5 +1201,39 @@
     "due": "{{amount}} dû",
     "nothingDue": "Rien de dû",
     "lead": "Prospect {{id}} · pas encore patient"
+  },
+  "splitRows": {
+    "mode": "Mode",
+    "amount": "Montant"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Rembourser",
+      "take": "Récupéré"
+    },
+    "sub": {
+      "give": "À {{name}} · {{reason}} · ajoute une sortie aux Paiements",
+      "take": "De {{name}} · {{reason}} · ajoute une entrée aux Paiements"
+    },
+    "section": {
+      "give": "Comment c’est rendu",
+      "take": "Comment c’est rentré"
+    },
+    "rows": {
+      "give": "Remboursé par",
+      "take": "Reçu en"
+    },
+    "add": "Ajouter un autre mode",
+    "total": "Total {{total}} · sur {{owed}}",
+    "save": {
+      "give": "Rembourser {{amount}}",
+      "take": "Enregistrer {{amount}}"
+    },
+    "enterAmount": "Saisissez le montant",
+    "moreThanOwed": "Plus que les {{amount}} dus",
+    "done": {
+      "give": "{{amount}} rendus à {{name}} · sortie ajoutée",
+      "take": "{{amount}} récupérés auprès de {{name}} · entrée ajoutée"
+    }
   }
 }

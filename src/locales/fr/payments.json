@@ -150,7 +150,10 @@
       "advance_given": "Avance versée",
       "loan_to_staff": "Prêt au personnel",
       "other": "Autre"
-    }
+    },
+    "settledInvoice": "{{state}} · Facture n° {{seq}}",
+    "adjustedOn": "{{amount}} de {{ref}} imputés sur la facture n° {{seq}}",
+    "nothingDue": "Rien de dû par {{name}} pour l’imputer"
   },
   "receive": {
     "title": "Encaisser un paiement",
@@ -167,8 +170,6 @@
     "pickPatientFirst": "Choisissez d’abord le patient",
     "nothingDue": "Rien de dû",
     "amount": "Montant reçu",
-    "mode": "Mode",
-    "amountColumn": "Montant",
     "split": "Fractionner · ajouter un mode",
     "total": "Total {{total}}",
     "totalDue": "Total {{total}} · dû {{due}}",
@@ -251,5 +252,64 @@
     "paidBill": "{{amount}} payés sur {{bill}}",
     "saved": "{{ref}} enregistré · modification tracée",
     "missing": "Indiquez qui a été payé et le montant"
+  },
+  "credit": {
+    "title": "Ajouter en attente",
+    "titleEdit": "Modifier l’attente",
+    "sub": "Argent que la clinique doit rendre ou récupérer · à régler plus tard depuis En attente",
+    "subEdit": "Modifiable tant qu’il est ouvert · les modifications sont tracées",
+    "steps": {
+      "way": "Sens",
+      "why": "Pourquoi"
+    },
+    "way": "Sens",
+    "who": "Qui",
+    "whoPlaceholder": "Rechercher patients, contacts ou fournisseurs",
+    "add": "Ajouter",
+    "groups": {
+      "patients": "Patients",
+      "contacts": "Contacts",
+      "suppliers": "Fournisseurs et vendeurs"
+    },
+    "parties": {
+      "patient": "Patient · {{id}}",
+      "contact": "Contact",
+      "contactPhone": "Contact · {{phone}}",
+      "vendor": "Fournisseur de la clinique",
+      "supplier": "Fournisseur médical"
+    },
+    "amount": "Montant",
+    "reason": "Motif",
+    "invoice": "Pour la facture",
+    "invoiceHint": "facultatif · lie le montant à une facture",
+    "noInvoice": "Aucune facture",
+    "invoicePaid": "{{bill}} · payée",
+    "invoiceDue": "{{bill}} · {{due}} dû",
+    "settleBy": "À régler avant le",
+    "note": "Note",
+    "notePlaceholder": {
+      "give": "ex. Remboursement sur le même identifiant UPI",
+      "take": "ex. Le fournisseur le déduira sur la prochaine facture"
+    },
+    "problems": {
+      "who": "Choisissez qui",
+      "amount": "Saisissez le montant",
+      "reason": "Choisissez un motif",
+      "otherNote": "Ajoutez une note pour « Autre »"
+    },
+    "save": {
+      "give": "Enregistrer · donner plus tard",
+      "take": "Enregistrer · recevoir plus tard"
+    },
+    "saveEdit": "Enregistrer",
+    "summary": {
+      "give": "Rendre {{amount}} à {{name}}",
+      "take": "Récupérer {{amount}} auprès de {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} enregistré · donner {{amount}} à {{name}}",
+      "take": "{{ref}} enregistré · recevoir {{amount}} de {{name}}"
+    },
+    "updated": "{{ref}} mis à jour"
   }
 }

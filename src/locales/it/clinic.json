@@ -1201,5 +1201,39 @@
     "due": "{{amount}} da saldare",
     "nothingDue": "Niente da saldare",
     "lead": "Lead {{id}} · non ancora paziente"
+  },
+  "splitRows": {
+    "mode": "Modalità",
+    "amount": "Importo"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Restituisci",
+      "take": "Riavuto"
+    },
+    "sub": {
+      "give": "A {{name}} · {{reason}} · aggiunge un’uscita ai Pagamenti",
+      "take": "Da {{name}} · {{reason}} · aggiunge un’entrata ai Pagamenti"
+    },
+    "section": {
+      "give": "Come viene restituito",
+      "take": "Come è entrato"
+    },
+    "rows": {
+      "give": "Restituito con",
+      "take": "Ricevuto come"
+    },
+    "add": "Aggiungi un’altra modalità",
+    "total": "Totale {{total}} · di {{owed}}",
+    "save": {
+      "give": "Restituisci {{amount}}",
+      "take": "Registra {{amount}}"
+    },
+    "enterAmount": "Inserisci l’importo",
+    "moreThanOwed": "Più dei {{amount}} dovuti",
+    "done": {
+      "give": "{{amount}} restituiti a {{name}} · uscita aggiunta",
+      "take": "{{amount}} riavuti da {{name}} · entrata aggiunta"
+    }
   }
 }

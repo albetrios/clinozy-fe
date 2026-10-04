@@ -10,6 +10,7 @@ import {
   listLedger,
   listOpenInvoices,
   listOpenSupplierBills,
+  listPatientInvoices,
   payExpense,
   paymentQueryKeys,
   receivePayment,
@@ -79,6 +80,15 @@ export function useOpenInvoices(patientId: string | null) {
   return useAppQuery({
     queryKey: paymentQueryKeys.openInvoices(patientId ?? ''),
     queryFn: () => listOpenInvoices(patientId ?? ''),
+    enabled: patientId !== null,
+  });
+}
+
+/** Every invoice of a patient, newest first — idle without a patient (Add pending's "For invoice"). */
+export function usePatientInvoices(patientId: string | null) {
+  return useAppQuery({
+    queryKey: paymentQueryKeys.patientInvoices(patientId ?? ''),
+    queryFn: () => listPatientInvoices(patientId ?? ''),
     enabled: patientId !== null,
   });
 }

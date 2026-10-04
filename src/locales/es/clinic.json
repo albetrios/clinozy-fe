@@ -1201,5 +1201,39 @@
     "due": "{{amount}} pendiente",
     "nothingDue": "Nada pendiente",
     "lead": "Lead {{id}} · aún no es paciente"
+  },
+  "splitRows": {
+    "mode": "Forma",
+    "amount": "Importe"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Devolver",
+      "take": "Recuperado"
+    },
+    "sub": {
+      "give": "A {{name}} · {{reason}} · añade una salida a Pagos",
+      "take": "De {{name}} · {{reason}} · añade una entrada a Pagos"
+    },
+    "section": {
+      "give": "Cómo se devuelve",
+      "take": "Cómo entró"
+    },
+    "rows": {
+      "give": "Devuelto con",
+      "take": "Recibido como"
+    },
+    "add": "Añadir otra forma",
+    "total": "Total {{total}} · de {{owed}}",
+    "save": {
+      "give": "Devolver {{amount}}",
+      "take": "Registrar {{amount}}"
+    },
+    "enterAmount": "Introduce el importe",
+    "moreThanOwed": "Más de los {{amount}} adeudados",
+    "done": {
+      "give": "{{amount}} devueltos a {{name}} · salida añadida",
+      "take": "{{amount}} recuperados de {{name}} · entrada añadida"
+    }
   }
 }

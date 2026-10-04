@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1734 src files · ~867 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1751 src files · ~876 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1114,7 +1114,8 @@ clinozy-fe/
 │   │       │   │   │   ├── ReceivePaymentPage.tsx
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── shared/
-│   │       │   │   │   └── components/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   └── hooks/
 │   │       │   │   ├── payments.constants.ts
 │   │       │   │   ├── payments.manifest.ts
 │   │       │   │   ├── PAYMENTS.OVERVIEW.md
@@ -2068,6 +2069,12 @@ clinozy-fe/
 │   │   │   │   ├── SettingsNav.tsx
 │   │   │   │   ├── SettingsPanelShell.tsx
 │   │   │   │   └── [13 test files]
+│   │   │   ├── SettleCreditDrawer/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── settle-credit.constants.ts
+│   │   │   │   ├── settle-credit.ts
+│   │   │   │   ├── SettleCreditDrawer.tsx
+│   │   │   │   └── [2 test files]
 │   │   │   ├── SkeletonRows/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── skeleton-in-place.ts
@@ -2195,10 +2202,16 @@ clinozy-fe/
 │   │   │   │   ├── items-field.types.ts
 │   │   │   │   ├── ItemsField.tsx
 │   │   │   │   └── [2 test files]
-│   │   │   └── ProfileForm/
-│   │   │       ├── contracts.ts
+│   │   │   ├── ProfileForm/
+│   │   │   │   ├── contracts.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── ProfileForm.tsx
+│   │   │   │   └── [2 test files]
+│   │   │   └── SplitRowsField/
 │   │   │       ├── index.ts
-│   │   │       ├── ProfileForm.tsx
+│   │   │       ├── split-rows-field.constants.ts
+│   │   │       ├── split-rows.ts
+│   │   │       ├── SplitRowsField.tsx
 │   │   │       └── [2 test files]
 │   │   ├── hooks/
 │   │   │   ├── useApiKeys/

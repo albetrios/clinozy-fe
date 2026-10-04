@@ -147,7 +147,10 @@
       "advance_given": "अग्रिम दिया",
       "loan_to_staff": "स्टाफ़ को उधार",
       "other": "अन्य"
-    }
+    },
+    "settledInvoice": "{{state}} · इनवॉइस #{{seq}}",
+    "adjustedOn": "{{ref}} के {{amount}} इनवॉइस #{{seq}} में समायोजित",
+    "nothingDue": "{{name}} का कोई बकाया नहीं जिसमें समायोजित करें"
   },
   "receive": {
     "title": "भुगतान प्राप्त करें",
@@ -163,8 +166,6 @@
     "pickPatientFirst": "पहले मरीज़ चुनें",
     "nothingDue": "कोई बकाया नहीं",
     "amount": "प्राप्त राशि",
-    "mode": "माध्यम",
-    "amountColumn": "राशि",
     "split": "बाँटें · माध्यम जोड़ें",
     "total": "कुल {{total}}",
     "totalDue": "कुल {{total}} · बकाया {{due}}",
@@ -245,5 +246,64 @@
     "paidBill": "{{bill}} के बदले {{amount}} दिए गए",
     "saved": "{{ref}} सहेजा गया · बदलाव दर्ज",
     "missing": "किसे दिया और कितना, यह जोड़ें"
+  },
+  "credit": {
+    "title": "बाकी जोड़ें",
+    "titleEdit": "बाकी बदलें",
+    "sub": "क्लिनिक को लौटाना या लेना बाकी पैसा · बाद में बाकी से निपटाएँ",
+    "subEdit": "खुला रहने तक बदल सकते हैं · बदलाव दर्ज होते हैं",
+    "steps": {
+      "way": "किस तरफ़",
+      "why": "क्यों"
+    },
+    "way": "किस तरफ़",
+    "who": "कौन",
+    "whoPlaceholder": "मरीज़, संपर्क या सप्लायर खोजें",
+    "add": "जोड़ें",
+    "groups": {
+      "patients": "मरीज़",
+      "contacts": "संपर्क",
+      "suppliers": "सप्लायर और वेंडर"
+    },
+    "parties": {
+      "patient": "मरीज़ · {{id}}",
+      "contact": "संपर्क",
+      "contactPhone": "संपर्क · {{phone}}",
+      "vendor": "क्लिनिक वेंडर",
+      "supplier": "मेडिकल सप्लायर"
+    },
+    "amount": "राशि",
+    "reason": "वजह",
+    "invoice": "इनवॉइस के लिए",
+    "invoiceHint": "वैकल्पिक · रकम को एक बिल से जोड़ता है",
+    "noInvoice": "कोई इनवॉइस नहीं",
+    "invoicePaid": "{{bill}} · चुकाया",
+    "invoiceDue": "{{bill}} · {{due}} बकाया",
+    "settleBy": "कब तक निपटाएँ",
+    "note": "नोट",
+    "notePlaceholder": {
+      "give": "जैसे उसी UPI आईडी पर रिफ़ंड",
+      "take": "जैसे सप्लायर अगले बिल में समायोजित करेगा"
+    },
+    "problems": {
+      "who": "चुनें कौन",
+      "amount": "राशि डालें",
+      "reason": "वजह चुनें",
+      "otherNote": "“अन्य” के लिए नोट जोड़ें"
+    },
+    "save": {
+      "give": "सहेजें · बाद में दें",
+      "take": "सहेजें · बाद में लें"
+    },
+    "saveEdit": "बदलाव सहेजें",
+    "summary": {
+      "give": "{{name}} को {{amount}} लौटाने हैं",
+      "take": "{{name}} से {{amount}} लेने हैं"
+    },
+    "saved": {
+      "give": "{{ref}} सहेजा गया · {{name}} को {{amount}} देने हैं",
+      "take": "{{ref}} सहेजा गया · {{name}} से {{amount}} लेने हैं"
+    },
+    "updated": "{{ref}} अपडेट किया गया"
   }
 }

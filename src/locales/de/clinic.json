@@ -1184,5 +1184,39 @@
     "due": "{{amount}} offen",
     "nothingDue": "Nichts offen",
     "lead": "Lead {{id}} · noch kein Patient"
+  },
+  "splitRows": {
+    "mode": "Zahlart",
+    "amount": "Betrag"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Zurückgeben",
+      "take": "Zurückerhalten"
+    },
+    "sub": {
+      "give": "An {{name}} · {{reason}} · fügt den Zahlungen eine Ausgabe hinzu",
+      "take": "Von {{name}} · {{reason}} · fügt den Zahlungen eine Einnahme hinzu"
+    },
+    "section": {
+      "give": "Wie es zurückgeht",
+      "take": "Wie es eingegangen ist"
+    },
+    "rows": {
+      "give": "Zurückgezahlt per",
+      "take": "Erhalten als"
+    },
+    "add": "Weitere Zahlart hinzufügen",
+    "total": "Gesamt {{total}} · von {{owed}}",
+    "save": {
+      "give": "{{amount}} zurückgeben",
+      "take": "{{amount}} erfassen"
+    },
+    "enterAmount": "Geben Sie den Betrag ein",
+    "moreThanOwed": "Mehr als die geschuldeten {{amount}}",
+    "done": {
+      "give": "{{amount}} an {{name}} zurückgegeben · Ausgabe erfasst",
+      "take": "{{amount}} von {{name}} zurückerhalten · Einnahme erfasst"
+    }
   }
 }

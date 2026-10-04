@@ -71,8 +71,10 @@ export type PendingCreditRecord = z.infer<typeof pendingCreditRecordSchema>;
 
 /**
  * A Pending row: the credit and what its cells name — the patient's display id,
- * the ledger entry it came from ("From PAY-5466 · Received"), and the invoice
- * it is for ("Invoice #785"). REPLACE_WITH_API: embed these in `listPendingCredits`.
+ * the ledger entry it came from ("From PAY-5466 · Received"), the invoice it is
+ * for ("Invoice #785"), and the invoice a use on the next bill settled it on
+ * ("Adjusted · Invoice #785", Q-G9). REPLACE_WITH_API: embed these in
+ * `listPendingCredits`.
  */
 export const creditRowSchema = pendingCreditRecordSchema.extend({
   patientSeq: z.number().int().nonnegative().nullable(),
@@ -84,10 +86,23 @@ export const creditRowSchema = pendingCreditRecordSchema.extend({
     })
     .nullable(),
   invoiceSeq: z.number().int().nonnegative().nullable(),
+  settledInvoiceSeq: z.number().int().nonnegative().nullable(),
 });
 
 /** A Pending table row. */
 export type CreditRow = z.infer<typeof creditRowSchema>;
+
+/**
+ * Who a credit can be with — one row of Add pending's Who picker
+ * (`payments.md:157`): a patient; a contact — a lead that never became a
+ * patient, or a Medical walk-in (there is no Contact entity, D32); or a
+ * supplier — a Clinic stock vendor or a Medical supplier. REPLACE_WITH_API: the
+ * party search clinozy-be serves.
+ */
+export type CreditPartyRow =
+  | { kind: 'patient'; id: string; seq: number; name: string; phone: string | null }
+  | { kind: 'contact'; id: string; name: string; phone: string | null }
+  | { kind: 'vendor' | 'supplier'; id: string; name: string };
 
 // ── Writes ──
 

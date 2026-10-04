@@ -144,7 +144,10 @@
       "advance_given": "선지급",
       "loan_to_staff": "직원 대여금",
       "other": "기타"
-    }
+    },
+    "settledInvoice": "{{state}} · 청구서 #{{seq}}",
+    "adjustedOn": "{{ref}}의 {{amount}}을(를) 청구서 #{{seq}}에 정산했습니다",
+    "nothingDue": "{{name}}에게 정산할 미수금이 없습니다"
   },
   "receive": {
     "title": "수납하기",
@@ -159,8 +162,6 @@
     "pickPatientFirst": "먼저 환자를 선택하세요",
     "nothingDue": "미수 없음",
     "amount": "수납 금액",
-    "mode": "수단",
-    "amountColumn": "금액",
     "split": "분할 · 수단 추가",
     "total": "합계 {{total}}",
     "totalDue": "합계 {{total}} · 미수 {{due}}",
@@ -239,5 +240,64 @@
     "paidBill": "{{bill}}에 {{amount}} 지급",
     "saved": "{{ref}} 저장됨 · 변경 기록됨",
     "missing": "지급처와 금액을 입력하세요"
+  },
+  "credit": {
+    "title": "대기 항목 추가",
+    "titleEdit": "대기 항목 수정",
+    "sub": "클리닉이 돌려주거나 받아야 할 돈 · 나중에 대기 항목에서 정산",
+    "subEdit": "진행 중에는 수정 가능 · 변경 사항이 기록됩니다",
+    "steps": {
+      "way": "방향",
+      "why": "이유"
+    },
+    "way": "방향",
+    "who": "대상",
+    "whoPlaceholder": "환자, 연락처 또는 공급업체 검색",
+    "add": "추가",
+    "groups": {
+      "patients": "환자",
+      "contacts": "연락처",
+      "suppliers": "공급업체 및 거래처"
+    },
+    "parties": {
+      "patient": "환자 · {{id}}",
+      "contact": "연락처",
+      "contactPhone": "연락처 · {{phone}}",
+      "vendor": "클리닉 거래처",
+      "supplier": "의약품 공급업체"
+    },
+    "amount": "금액",
+    "reason": "사유",
+    "invoice": "대상 청구서",
+    "invoiceHint": "선택 · 금액을 청구서에 연결합니다",
+    "noInvoice": "청구서 없음",
+    "invoicePaid": "{{bill}} · 결제 완료",
+    "invoiceDue": "{{bill}} · 미수 {{due}}",
+    "settleBy": "정산 기한",
+    "note": "메모",
+    "notePlaceholder": {
+      "give": "예: 같은 UPI ID로 환불",
+      "take": "예: 공급업체가 다음 청구서에서 정산"
+    },
+    "problems": {
+      "who": "대상을 선택하세요",
+      "amount": "금액을 입력하세요",
+      "reason": "사유를 선택하세요",
+      "otherNote": "“기타”에는 메모를 입력하세요"
+    },
+    "save": {
+      "give": "저장 · 나중에 주기",
+      "take": "저장 · 나중에 받기"
+    },
+    "saveEdit": "변경 사항 저장",
+    "summary": {
+      "give": "{{name}}에게 {{amount}} 돌려주기",
+      "take": "{{name}}에게서 {{amount}} 받기"
+    },
+    "saved": {
+      "give": "{{ref}} 저장됨 · {{name}}에게 {{amount}} 주기",
+      "take": "{{ref}} 저장됨 · {{name}}에게서 {{amount}} 받기"
+    },
+    "updated": "{{ref}} 업데이트됨"
   }
 }

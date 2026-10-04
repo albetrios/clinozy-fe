@@ -147,7 +147,10 @@
       "advance_given": "Vorschuss gegeben",
       "loan_to_staff": "Darlehen an Mitarbeiter",
       "other": "Sonstiges"
-    }
+    },
+    "settledInvoice": "{{state}} · Rechnung #{{seq}}",
+    "adjustedOn": "{{amount}} aus {{ref}} mit Rechnung #{{seq}} verrechnet",
+    "nothingDue": "Bei {{name}} ist nichts offen, womit verrechnet werden kann"
   },
   "receive": {
     "title": "Zahlung einnehmen",
@@ -163,8 +166,6 @@
     "pickPatientFirst": "Zuerst den Patienten wählen",
     "nothingDue": "Nichts offen",
     "amount": "Erhaltener Betrag",
-    "mode": "Zahlart",
-    "amountColumn": "Betrag",
     "split": "Aufteilen · Zahlart hinzufügen",
     "total": "Gesamt {{total}}",
     "totalDue": "Gesamt {{total}} · offen {{due}}",
@@ -245,5 +246,64 @@
     "paidBill": "{{amount}} auf {{bill}} gezahlt",
     "saved": "{{ref}} gespeichert · Änderung protokolliert",
     "missing": "Geben Sie Empfänger und Betrag an"
+  },
+  "credit": {
+    "title": "Offenen Betrag hinzufügen",
+    "titleEdit": "Offenen Betrag bearbeiten",
+    "sub": "Geld, das die Praxis zurückgeben oder bekommen muss · später unter Offen ausgleichen",
+    "subEdit": "Bearbeitbar, solange offen · Änderungen werden protokolliert",
+    "steps": {
+      "way": "Richtung",
+      "why": "Warum"
+    },
+    "way": "Richtung",
+    "who": "Wer",
+    "whoPlaceholder": "Patienten, Kontakte oder Lieferanten suchen",
+    "add": "Hinzufügen",
+    "groups": {
+      "patients": "Patienten",
+      "contacts": "Kontakte",
+      "suppliers": "Lieferanten & Händler"
+    },
+    "parties": {
+      "patient": "Patient · {{id}}",
+      "contact": "Kontakt",
+      "contactPhone": "Kontakt · {{phone}}",
+      "vendor": "Praxislieferant",
+      "supplier": "Medizinlieferant"
+    },
+    "amount": "Betrag",
+    "reason": "Grund",
+    "invoice": "Zur Rechnung",
+    "invoiceHint": "optional · verknüpft den Betrag mit einer Rechnung",
+    "noInvoice": "Keine Rechnung",
+    "invoicePaid": "{{bill}} · bezahlt",
+    "invoiceDue": "{{bill}} · {{due}} offen",
+    "settleBy": "Ausgleichen bis",
+    "note": "Notiz",
+    "notePlaceholder": {
+      "give": "z. B. Erstattung an dieselbe UPI-ID",
+      "take": "z. B. Lieferant verrechnet es mit der nächsten Rechnung"
+    },
+    "problems": {
+      "who": "Wählen Sie, wer",
+      "amount": "Geben Sie den Betrag ein",
+      "reason": "Wählen Sie einen Grund",
+      "otherNote": "Fügen Sie für „Sonstiges“ eine Notiz hinzu"
+    },
+    "save": {
+      "give": "Speichern · später geben",
+      "take": "Speichern · später nehmen"
+    },
+    "saveEdit": "Änderungen speichern",
+    "summary": {
+      "give": "{{amount}} an {{name}} zurückgeben",
+      "take": "{{amount}} von {{name}} bekommen"
+    },
+    "saved": {
+      "give": "{{ref}} gespeichert · {{amount}} an {{name}} geben",
+      "take": "{{ref}} gespeichert · {{amount}} von {{name}} nehmen"
+    },
+    "updated": "{{ref}} aktualisiert"
   }
 }

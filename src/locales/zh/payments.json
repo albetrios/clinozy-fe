@@ -144,7 +144,10 @@
       "advance_given": "已付预付款",
       "loan_to_staff": "借给员工",
       "other": "其他"
-    }
+    },
+    "settledInvoice": "{{state}} · 发票 #{{seq}}",
+    "adjustedOn": "{{ref}} 的 {{amount}} 已抵扣发票 #{{seq}}",
+    "nothingDue": "{{name}} 没有可抵扣的欠款"
   },
   "receive": {
     "title": "收款",
@@ -159,8 +162,6 @@
     "pickPatientFirst": "请先选择患者",
     "nothingDue": "无欠款",
     "amount": "收款金额",
-    "mode": "方式",
-    "amountColumn": "金额",
     "split": "拆分 · 添加方式",
     "total": "合计 {{total}}",
     "totalDue": "合计 {{total}} · 欠款 {{due}}",
@@ -239,5 +240,64 @@
     "paidBill": "已为 {{bill}} 支付 {{amount}}",
     "saved": "{{ref}} 已保存 · 已记录更改",
     "missing": "请填写收款方和金额"
+  },
+  "credit": {
+    "title": "添加待处理",
+    "titleEdit": "编辑待处理",
+    "sub": "诊所需要退还或收回的钱 · 稍后在待处理中结清",
+    "subEdit": "未结期间可编辑 · 更改会被记录",
+    "steps": {
+      "way": "方向",
+      "why": "原因"
+    },
+    "way": "方向",
+    "who": "对象",
+    "whoPlaceholder": "搜索患者、联系人或供应商",
+    "add": "添加",
+    "groups": {
+      "patients": "患者",
+      "contacts": "联系人",
+      "suppliers": "供应商和商家"
+    },
+    "parties": {
+      "patient": "患者 · {{id}}",
+      "contact": "联系人",
+      "contactPhone": "联系人 · {{phone}}",
+      "vendor": "诊所供应商",
+      "supplier": "药品供应商"
+    },
+    "amount": "金额",
+    "reason": "原因",
+    "invoice": "对应发票",
+    "invoiceHint": "可选 · 将此款项关联到账单",
+    "noInvoice": "无发票",
+    "invoicePaid": "{{bill}} · 已付清",
+    "invoiceDue": "{{bill}} · 欠款 {{due}}",
+    "settleBy": "结清期限",
+    "note": "备注",
+    "notePlaceholder": {
+      "give": "例如：退回同一个 UPI 账号",
+      "take": "例如：供应商会在下张账单中抵扣"
+    },
+    "problems": {
+      "who": "请选择对象",
+      "amount": "请输入金额",
+      "reason": "请选择原因",
+      "otherNote": "选择“其他”时请添加备注"
+    },
+    "save": {
+      "give": "保存 · 稍后支付",
+      "take": "保存 · 稍后收取"
+    },
+    "saveEdit": "保存更改",
+    "summary": {
+      "give": "退还 {{amount}} 给 {{name}}",
+      "take": "向 {{name}} 收取 {{amount}}"
+    },
+    "saved": {
+      "give": "{{ref}} 已保存 · 应付 {{name}} {{amount}}",
+      "take": "{{ref}} 已保存 · 应收 {{name}} {{amount}}"
+    },
+    "updated": "{{ref}} 已更新"
   }
 }

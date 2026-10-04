@@ -1167,5 +1167,39 @@
     "due": "欠款 {{amount}}",
     "nothingDue": "无欠款",
     "lead": "线索 {{id}} · 还不是患者"
+  },
+  "splitRows": {
+    "mode": "方式",
+    "amount": "金额"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "退还",
+      "take": "已收回"
+    },
+    "sub": {
+      "give": "退给 {{name}} · {{reason}} · 在收付款中新增一笔支出",
+      "take": "来自 {{name}} · {{reason}} · 在收付款中新增一笔收入"
+    },
+    "section": {
+      "give": "退还方式",
+      "take": "收回方式"
+    },
+    "rows": {
+      "give": "退款方式",
+      "take": "收款方式"
+    },
+    "add": "添加其他方式",
+    "total": "合计 {{total}} · 共 {{owed}}",
+    "save": {
+      "give": "退还 {{amount}}",
+      "take": "记录 {{amount}}"
+    },
+    "enterAmount": "请输入金额",
+    "moreThanOwed": "超过应结的 {{amount}}",
+    "done": {
+      "give": "已退还 {{amount}} 给 {{name}} · 已新增支出",
+      "take": "已从 {{name}} 收回 {{amount}} · 已新增收入"
+    }
   }
 }

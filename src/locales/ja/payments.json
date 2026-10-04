@@ -144,7 +144,10 @@
       "advance_given": "前払いした",
       "loan_to_staff": "職員への貸付",
       "other": "その他"
-    }
+    },
+    "settledInvoice": "{{state}} · 請求書 #{{seq}}",
+    "adjustedOn": "{{ref}} の {{amount}} を請求書 #{{seq}} に充当しました",
+    "nothingDue": "{{name}} には充当できる未払いがありません"
   },
   "receive": {
     "title": "入金を受け取る",
@@ -159,8 +162,6 @@
     "pickPatientFirst": "先に患者を選んでください",
     "nothingDue": "未払いなし",
     "amount": "受取額",
-    "mode": "方法",
-    "amountColumn": "金額",
     "split": "分割 · 方法を追加",
     "total": "合計 {{total}}",
     "totalDue": "合計 {{total}} · 未払い {{due}}",
@@ -239,5 +240,64 @@
     "paidBill": "{{bill}} に {{amount}} を支払いました",
     "saved": "{{ref}} を保存 · 変更を記録しました",
     "missing": "支払先と金額を入力してください"
+  },
+  "credit": {
+    "title": "保留中を追加",
+    "titleEdit": "保留中を編集",
+    "sub": "クリニックが返す・受け取るお金 · 後で保留中から精算します",
+    "subEdit": "未処理の間は編集可 · 変更は記録されます",
+    "steps": {
+      "way": "方向",
+      "why": "理由"
+    },
+    "way": "方向",
+    "who": "相手",
+    "whoPlaceholder": "患者・連絡先・仕入先を検索",
+    "add": "追加",
+    "groups": {
+      "patients": "患者",
+      "contacts": "連絡先",
+      "suppliers": "仕入先・取引業者"
+    },
+    "parties": {
+      "patient": "患者 · {{id}}",
+      "contact": "連絡先",
+      "contactPhone": "連絡先 · {{phone}}",
+      "vendor": "院内の取引業者",
+      "supplier": "医薬品の仕入先"
+    },
+    "amount": "金額",
+    "reason": "理由",
+    "invoice": "対象の請求書",
+    "invoiceHint": "任意 · 請求書にひも付けます",
+    "noInvoice": "請求書なし",
+    "invoicePaid": "{{bill}} · 支払済み",
+    "invoiceDue": "{{bill}} · 未払い {{due}}",
+    "settleBy": "精算期限",
+    "note": "メモ",
+    "notePlaceholder": {
+      "give": "例: 同じ UPI ID に返金",
+      "take": "例: 仕入先が次回の請求で調整"
+    },
+    "problems": {
+      "who": "相手を選んでください",
+      "amount": "金額を入力してください",
+      "reason": "理由を選んでください",
+      "otherNote": "「その他」にはメモを入力してください"
+    },
+    "save": {
+      "give": "保存 · 後で支払う",
+      "take": "保存 · 後で受け取る"
+    },
+    "saveEdit": "変更を保存",
+    "summary": {
+      "give": "{{name}} に {{amount}} を返す",
+      "take": "{{name}} から {{amount}} を受け取る"
+    },
+    "saved": {
+      "give": "{{ref}} を保存 · {{name}} に {{amount}} を支払う",
+      "take": "{{ref}} を保存 · {{name}} から {{amount}} を受け取る"
+    },
+    "updated": "{{ref}} を更新しました"
   }
 }

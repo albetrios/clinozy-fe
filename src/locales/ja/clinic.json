@@ -1167,5 +1167,39 @@
     "due": "未払い {{amount}}",
     "nothingDue": "未払いなし",
     "lead": "リード {{id}} · まだ患者ではありません"
+  },
+  "splitRows": {
+    "mode": "方法",
+    "amount": "金額"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "返金する",
+      "take": "回収した"
+    },
+    "sub": {
+      "give": "{{name}} へ · {{reason}} · 支払いに出金を追加します",
+      "take": "{{name}} から · {{reason}} · 支払いに入金を追加します"
+    },
+    "section": {
+      "give": "返金の方法",
+      "take": "受け取った方法"
+    },
+    "rows": {
+      "give": "返金方法",
+      "take": "受取方法"
+    },
+    "add": "別の方法を追加",
+    "total": "合計 {{total}} · {{owed}} 中",
+    "save": {
+      "give": "{{amount}} を返金",
+      "take": "{{amount}} を記録"
+    },
+    "enterAmount": "金額を入力してください",
+    "moreThanOwed": "未精算の {{amount}} を超えています",
+    "done": {
+      "give": "{{name}} に {{amount}} を返金 · 出金を追加しました",
+      "take": "{{name}} から {{amount}} を回収 · 入金を追加しました"
+    }
   }
 }

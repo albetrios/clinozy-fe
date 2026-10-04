@@ -4,6 +4,7 @@ import {
   isCommandSearchQuery,
   matchesCommandSearch,
 } from './command-search-api.ts';
+import type { LeadRecord } from './leads-contracts.ts';
 import { listPatients } from './patients-api.ts';
 import { patientName } from './patients-contracts.ts';
 
@@ -36,15 +37,22 @@ export const patientPickerQueryKeys = {
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
 
+/** A lead that never became a patient — a person, never a contact thread (H:4606). */
+export function isLeadNotPatient(
+  lead: Pick<LeadRecord, 'kind' | 'isContactThread' | 'patientId'>,
+): boolean {
+  return (
+    lead.kind !== 'contact_thread' && !lead.isContactThread && lead.patientId === null
+  );
+}
+
 /** The leads `query` finds that never became patients — ten at most, newest first. */
 async function leadsNotPatients(query: string): Promise<PatientPickRow[]> {
   const { clinicFixtures } = await fixtureWorld();
   return clinicFixtures.leads
     .snapshot(
       (lead) =>
-        lead.kind !== 'contact_thread' &&
-        !lead.isContactThread &&
-        lead.patientId === null &&
+        isLeadNotPatient(lead) &&
         matchesCommandSearch(
           { names: [lead.name], phone: lead.phone, seq: lead.seq },
           query,

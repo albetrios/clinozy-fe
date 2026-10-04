@@ -11,10 +11,12 @@ import {
 import { invoiceBalance } from './clinic-money.ts';
 import type { DeleteReason } from './clinic-schema.ts';
 import { clinicInstant, clinicToday } from './clinic-time.ts';
+import { COMMAND_SEARCH_PER_TYPE } from './command-search-api.ts';
 import {
   type CreditInput,
   creditInputSchema,
   type CreditListParams,
+  type CreditPartyRow,
   type CreditReasonKey,
   type CreditRow,
   type CreditSettlement,
@@ -22,6 +24,9 @@ import {
   type PendingCreditRecord,
 } from './credits-contracts.ts';
 import { assertDayOpen } from './day-close-api.ts';
+import { isLeadNotPatient } from './patient-search-api.ts';
+import { listPatients } from './patients-api.ts';
+import { patientName } from './patients-contracts.ts';
 import type { PaymentRecord } from './payments-contracts.ts';
 import { createTask } from './tasks-api.ts';
 
@@ -40,6 +45,8 @@ export const creditQueryKeys = {
   lists: () => [...creditQueryKeys.all, 'list'] as const,
   list: (params: CreditListParams) => [...creditQueryKeys.lists(), params] as const,
   detail: (id: string) => [...creditQueryKeys.all, 'detail', id] as const,
+  /** Add pending's Who picker — its pages, by the text searched. */
+  parties: () => [...creditQueryKeys.all, 'parties'] as const,
 };
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
@@ -90,7 +97,22 @@ function toCreditRow(credit: PendingCreditRecord, world: FixtureWorld): CreditRo
       ? { seq: source.seq, direction: source.direction, kind: source.kind }
       : null,
     invoiceSeq: invoice?.seq ?? null,
+    settledInvoiceSeq: credit.status === 'used' ? settledInvoiceSeq(credit, world) : null,
   };
+}
+
+/** The invoice the entry that settled a credit went to — a use on the next bill's (Q-G9). */
+function settledInvoiceSeq(
+  credit: PendingCreditRecord,
+  world: FixtureWorld,
+): number | null {
+  const entry = credit.settledPaymentId
+    ? world.payments.snapshot((row) => row.id === credit.settledPaymentId)[0]
+    : undefined;
+  const invoice = entry?.invoiceId
+    ? world.invoices.snapshot((row) => row.id === entry.invoiceId)[0]
+    : undefined;
+  return invoice?.seq ?? null;
 }
 
 // ── Search and filters (the fixture server's) ──
@@ -140,6 +162,92 @@ export async function listPendingCredits(
     items: page.items.map((credit) => toCreditRow(credit, clinicFixtures)),
     nextCursor: page.nextCursor,
   };
+}
+
+const nameKey = (name: string) => name.trim().toLowerCase();
+
+/** Whether a party matches the Who search: its name, or (three digits or more) its phone. */
+function partyMatches(name: string, phone: string | null, query: string): boolean {
+  const text = query.trim().toLowerCase();
+  if (!text) return true;
+  const digits = text.replace(/\D/g, '');
+  return (
+    name.toLowerCase().includes(text) ||
+    (digits.length >= 3 && !!phone && phone.replace(/\D/g, '').includes(digits))
+  );
+}
+
+/**
+ * The contacts and suppliers `query` finds (`payments.md:157`): the leads that
+ * never became patients and the Medical walk-ins, then the Clinic stock
+ * vendors and the Medical suppliers — ten of each group, each name once, and
+ * never a patient's name (the Patients group has them).
+ */
+async function partiesBeyondPatients(query: string): Promise<CreditPartyRow[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  const seen = new Set(
+    clinicFixtures.patients.snapshot().map((patient) => nameKey(patientName(patient))),
+  );
+  const firstTime = (name: string) => {
+    if (seen.has(nameKey(name))) return false;
+    seen.add(nameKey(name));
+    return true;
+  };
+  const contacts: CreditPartyRow[] = [
+    ...clinicFixtures.leads
+      .snapshot((lead) => isLeadNotPatient(lead))
+      .sort((a, b) => b.seq - a.seq)
+      .map((lead) => ({ id: lead.id, name: lead.name, phone: lead.phone })),
+    ...clinicFixtures.medicalContacts
+      .snapshot()
+      .map((contact) => ({ id: contact.id, name: contact.name, phone: contact.phone })),
+  ]
+    .filter(
+      (party) => partyMatches(party.name, party.phone, query) && firstTime(party.name),
+    )
+    .slice(0, COMMAND_SEARCH_PER_TYPE)
+    .map((party) => ({ kind: 'contact', ...party }));
+  const suppliers: CreditPartyRow[] = [
+    ...clinicFixtures.stockVendors
+      .snapshot()
+      .map((vendor) => ({ kind: 'vendor' as const, vendor })),
+    ...clinicFixtures.suppliers
+      .snapshot()
+      .map((supplier) => ({ kind: 'supplier' as const, vendor: supplier })),
+  ]
+    .filter(
+      ({ vendor }) =>
+        partyMatches(vendor.name, vendor.phone, query) && firstTime(vendor.name),
+    )
+    .slice(0, COMMAND_SEARCH_PER_TYPE)
+    .map(({ kind, vendor }) => ({ kind, id: vendor.id, name: vendor.name }));
+  return [...contacts, ...suppliers];
+}
+
+/**
+ * One page of Add pending's Who picker (`payments.md:157`; REPLACE_WITH_API):
+ * patients A–Z by name, mobile or id (`listPatients`, `S:1619`) — all of them
+ * for an empty search — then, on the last page, the contacts and the suppliers
+ * the same text finds.
+ */
+export async function searchCreditParties(
+  query: string,
+  cursor: string | null = null,
+): Promise<CursorPage<CreditPartyRow>> {
+  const text = query.trim();
+  const page = await listPatients(
+    { q: text || undefined, sort: 'name', order: 'asc' },
+    cursor,
+  );
+  const patients: CreditPartyRow[] = page.items.map((row) => ({
+    kind: 'patient',
+    id: row.id,
+    seq: row.seq,
+    name: patientName(row),
+    phone: row.phone,
+  }));
+  const others = page.nextCursor === null ? await partiesBeyondPatients(text) : [];
+  return { items: [...patients, ...others], nextCursor: page.nextCursor };
 }
 
 /** One credit (REPLACE_WITH_API) — a 404 when it is unknown or deleted. */
@@ -272,10 +380,26 @@ export async function restoreCredit(id: string): Promise<PendingCreditRecord> {
   return clinicFixtures.pendingCredits.restore(id);
 }
 
+/**
+ * The invoice a patient's money goes back against: the credit's own, else the
+ * one its source entry was for (the prototype's `src.inv`, H:4037).
+ */
+function creditInvoiceId(
+  credit: PendingCreditRecord,
+  world: FixtureWorld,
+): string | null {
+  if (credit.invoiceId) return credit.invoiceId;
+  const source = credit.sourcePaymentId
+    ? world.payments.snapshot((row) => row.id === credit.sourcePaymentId)[0]
+    : undefined;
+  return source?.invoiceId ?? null;
+}
+
 /** The ledger entry a give-back or a get-back writes, by who the party is. */
 function settlementEntry(
   credit: PendingCreditRecord,
   action: 'give_back' | 'got_back',
+  invoiceId: string | null,
 ): Pick<
   CreateInput<PaymentRecord>,
   'direction' | 'kind' | 'patientId' | 'payeeName' | 'expenseCategory' | 'invoiceId'
@@ -289,7 +413,7 @@ function settlementEntry(
           patientId: credit.patientId,
           payeeName: null,
           expenseCategory: null,
-          invoiceId: credit.invoiceId,
+          invoiceId,
         }
       : {
           direction: 'paid',
@@ -307,7 +431,7 @@ function settlementEntry(
         patientId: credit.patientId,
         payeeName: null,
         expenseCategory: null,
-        invoiceId: credit.invoiceId,
+        invoiceId,
       }
     : {
         direction: 'received',
@@ -426,11 +550,15 @@ export async function settleCredit(
         splits: [MORE_THAN_OWED],
       });
     }
-    const entry = settlementEntry(credit, settlement.action);
+    const entry = settlementEntry(
+      credit,
+      settlement.action,
+      creditInvoiceId(credit, clinicFixtures),
+    );
     let creditNoteId: string | null = null;
-    if (entry.kind === 'refund' && credit.invoiceId) {
+    if (entry.kind === 'refund' && entry.invoiceId) {
       const note = await clinicFixtures.creditNotes.create({
-        invoiceId: credit.invoiceId,
+        invoiceId: entry.invoiceId,
         amount,
         reason: credit.reason,
       });

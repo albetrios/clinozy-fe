@@ -64,7 +64,7 @@ the permission toast.
 **Receive payment** (`components/ReceivePaymentDrawer/`, L-39b) — 560px, one section, "Who
 is paying": Branch (two or more open branches) · Patient (the shared `PatientPicker`; leads
 shown, never taken) · Against invoice (the open ones; picking a patient takes the oldest
-and its due) · the Mode · Amount rows (compact `ItemsField`, "+ Split · add a mode") ·
+and its due) · the Mode · Amount rows (the shared `SplitRowsField`, compact, "+ Split · add a mode") ·
 Reference · Note; Quick fill Full / Half / Cash + UPI once an invoice is picked. Save checks
 a patient, then an amount, then at most the invoice's due. An edit keeps the entry's
 patient and invoice and logs a change of the amount or the modes.
@@ -74,7 +74,8 @@ bill" (new, while bills are open; the bill picker and "Pending longest") · "Exp
 (Category, Paid to, Note) · "Payment" (Amount, Date — never ahead, fixed on an edit — Mode,
 the bill photo through the upload tray). Quick fill and "Add & another" on a new payment;
 Delete on an edit. A day closed while either drawer is open turns it view only. The pending
-drawers land with L-39c, Day close with L-41; until then those routes open nothing.
+drawers live on Pending (`pending/PENDING.OVERVIEW.md`); Day close lands with L-41 — until
+then its route opens nothing.
 
 The data is the shared money domain: `@/shared/api/clinic/payments-api.ts`,
 `@/shared/api/clinic/credits-api.ts` and `@/shared/api/clinic/day-close-api.ts` (fixture
@@ -92,6 +93,7 @@ world, `REPLACE_WITH_API`), their contracts beside them, and the hooks in
 | `payments.constants.ts`                              | `PAYMENTS_NS` / `PAYMENTS_KEYS` (the `payments` namespace), both table ids and the ledger's Filters fields.                                                                        |
 | `PaymentsPage.tsx`                                   | The ledger — toolbar, table, states, row and bulk actions, the delete confirm; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="payments-page"`.               |
 | `shared/components/PaymentsToolbar/`                 | Family-shared: the room toolbar both tabs mount — h1, the tab links, search, Filters, Columns, Day close and the tab's create actions.                                             |
+| `shared/hooks/useDayLabel/`                          | Family-shared: a day as the drawers' tiles name it — "Today", else "Oct 2" (Send's Date, Add pending's Settle by and invoice days).                                                |
 | `components/LedgerCells/`                            | The cells and their wording (`components/LedgerCells/ledger-cells.ts`): Ref, What, When with the edit line, From / to with its sub line, Mode, the signed Amount, By.              |
 | `components/PaymentDeleteConfirm/`                   | Delete an entry: the reason confirm, the invoice sentence, the optimistic delete and its Undo.                                                                                     |
 | `components/ReceivePaymentDrawer/`                   | Receive payment / Edit payment in: the form's rules (`components/ReceivePaymentDrawer/receive-form.ts`), the fields, the save.                                                     |

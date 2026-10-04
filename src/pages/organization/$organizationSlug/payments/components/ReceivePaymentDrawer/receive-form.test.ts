@@ -6,14 +6,11 @@ import {
   emptyReceiveForm,
   halfOf,
   modesTone,
-  nextSplitMode,
   quickFillSplits,
   receiveFormOf,
   receiveInputOf,
   receivePatchOf,
   receiveProblem,
-  splitsModes,
-  splitsTotal,
   withPatient,
 } from './receive-form.ts';
 
@@ -74,16 +71,7 @@ describe('the receive form', () => {
     ]);
   });
 
-  it('reads the rows: their total, their modes once each, the next mode free', () => {
-    const rows = [
-      { mode: 'cash' as const, amount: 50_000 },
-      { mode: 'upi' as const, amount: 20_000 },
-    ];
-    expect(splitsTotal(rows)).toBe(70_000);
-    expect(splitsModes(rows)).toEqual(['cash', 'upi']);
-    expect(splitsModes([{ mode: 'card', amount: 0 }])).toEqual(['card']);
-    expect(nextSplitMode(rows)).toBe('card');
-    expect(nextSplitMode([...rows, { mode: 'card', amount: 1 }])).toBeNull();
+  it('tones the mode badge: one mode in its own tone, a split in stone', () => {
     expect(modesTone(['upi'])).toBe('sage');
     expect(modesTone(['cash', 'upi'])).toBe('stone');
   });

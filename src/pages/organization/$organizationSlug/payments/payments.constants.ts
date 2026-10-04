@@ -142,8 +142,6 @@ export const PAYMENTS_KEYS = {
     pickPatientFirst: 'receive.pickPatientFirst',
     nothingDue: 'receive.nothingDue',
     amount: 'receive.amount',
-    mode: 'receive.mode',
-    amountColumn: 'receive.amountColumn',
     /** "Split · add a mode" — the field draws the "+". */
     split: 'receive.split',
     /** "Total ₹8,550" / "Total ₹8,550 · due ₹8,550". */
@@ -242,6 +240,12 @@ export const PAYMENTS_KEYS = {
     },
     /** "Returned · Today". */
     settledToday: 'pending.settledToday',
+    /** "Adjusted · Invoice #785" — a credit used on a bill in full (Q-G9). */
+    settledInvoice: 'pending.settledInvoice',
+    /** "₹500 of CR-2 adjusted on invoice #785" — Use on next bill (Q-G9). */
+    adjustedOn: 'pending.adjustedOn',
+    /** "Nothing due for Tanvi Shah to adjust against". */
+    nothingDue: 'pending.nothingDue',
     /** "₹200 adjusted". */
     adjusted: 'pending.adjusted',
     /** "From PAY-5466 · Received". */
@@ -264,6 +268,65 @@ export const PAYMENTS_KEYS = {
       loan_to_staff: 'pending.reasons.loan_to_staff',
       other: 'pending.reasons.other',
     },
+  },
+  /** Add pending / Edit pending (`payments.md:152–168, 240–252`). */
+  credit: {
+    title: 'credit.title',
+    titleEdit: 'credit.titleEdit',
+    sub: 'credit.sub',
+    subEdit: 'credit.subEdit',
+    /** The two steps: "Which way" · "Why". */
+    steps: { way: 'credit.steps.way', why: 'credit.steps.why' },
+    way: 'credit.way',
+    who: 'credit.who',
+    /** "Search patients, contacts or suppliers". */
+    whoPlaceholder: 'credit.whoPlaceholder',
+    /** "Add" — the create row reads "Add “q”" and keeps the typed name. */
+    add: 'credit.add',
+    groups: {
+      patients: 'credit.groups.patients',
+      contacts: 'credit.groups.contacts',
+      suppliers: 'credit.groups.suppliers',
+    },
+    /** Each party's line: "Patient · #3441", "Contact · +91 …", "Clinic vendor", "Medical supplier". */
+    parties: {
+      patient: 'credit.parties.patient',
+      contact: 'credit.parties.contact',
+      contactPhone: 'credit.parties.contactPhone',
+      vendor: 'credit.parties.vendor',
+      supplier: 'credit.parties.supplier',
+    },
+    amount: 'credit.amount',
+    reason: 'credit.reason',
+    invoice: 'credit.invoice',
+    /** "optional · links the credit to a bill". */
+    invoiceHint: 'credit.invoiceHint',
+    noInvoice: 'credit.noInvoice',
+    /** "₹1,534 · paid" / "₹1,000 · ₹600 due". */
+    invoicePaid: 'credit.invoicePaid',
+    invoiceDue: 'credit.invoiceDue',
+    settleBy: 'credit.settleBy',
+    note: 'credit.note',
+    notePlaceholder: {
+      give: 'credit.notePlaceholder.give',
+      take: 'credit.notePlaceholder.take',
+    },
+    /** The save's checks, in order (`payments.md:164`). */
+    problems: {
+      who: 'credit.problems.who',
+      amount: 'credit.problems.amount',
+      reason: 'credit.problems.reason',
+      otherNote: 'credit.problems.otherNote',
+    },
+    /** "Save · give later" / "Save · take later". */
+    save: { give: 'credit.save.give', take: 'credit.save.take' },
+    saveEdit: 'credit.saveEdit',
+    /** "Give ₹500 back to Tanvi Shah" / "Take ₹800 from Medline Surgicals". */
+    summary: { give: 'credit.summary.give', take: 'credit.summary.take' },
+    /** "CR-3 saved · give ₹500 to Tanvi Shah". */
+    saved: { give: 'credit.saved.give', take: 'credit.saved.take' },
+    /** "CR-1 updated". */
+    updated: 'credit.updated',
   },
 } as const;
 

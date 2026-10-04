@@ -52,6 +52,9 @@ export const paymentQueryKeys = {
   /** A patient's invoices with a due — the Receive drawer's chips. */
   openInvoices: (patientId: string) =>
     [...paymentQueryKeys.all, 'open-invoices', patientId] as const,
+  /** Every invoice of a patient, paid ones too — Add pending's "For invoice". */
+  patientInvoices: (patientId: string) =>
+    [...paymentQueryKeys.all, 'patient-invoices', patientId] as const,
   /** The supplier bills with a balance — Send payment's first step. */
   openBills: () => [...paymentQueryKeys.all, 'open-bills'] as const,
 };
@@ -244,30 +247,41 @@ export async function fetchPayment(id: string): Promise<LedgerRow> {
   return toLedgerRow(payment, await ledgerContext(clinicFixtures));
 }
 
+/** A patient's invoices, each with its bill, what is paid and what is due — oldest first. */
+async function patientInvoiceRows(patientId: string): Promise<OpenInvoice[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  const payments = clinicFixtures.payments.snapshot();
+  return clinicFixtures.invoices
+    .snapshot((invoice) => invoice.patientId === patientId)
+    .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq)
+    .map((invoice) => {
+      const balance = invoiceBalance(invoice, payments);
+      return {
+        id: invoice.id,
+        seq: invoice.seq,
+        type: invoice.type,
+        date: invoice.date,
+        bill: balance.bill,
+        paid: balance.paid,
+        due: balance.due,
+      };
+    });
+}
+
 /**
  * A patient's invoices with something due (`listOpenInvoices`, `S:1702`;
  * REPLACE_WITH_API), oldest first — the Receive drawer's "Against invoice".
  */
 export async function listOpenInvoices(patientId: string): Promise<OpenInvoice[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const payments = clinicFixtures.payments.snapshot();
-  return clinicFixtures.invoices
-    .snapshot((invoice) => invoice.patientId === patientId)
-    .map((invoice) => ({ invoice, balance: invoiceBalance(invoice, payments) }))
-    .filter(({ balance }) => balance.due > 0)
-    .sort(
-      (a, b) =>
-        compareText(a.invoice.date, b.invoice.date) || a.invoice.seq - b.invoice.seq,
-    )
-    .map(({ invoice, balance }) => ({
-      id: invoice.id,
-      seq: invoice.seq,
-      type: invoice.type,
-      date: invoice.date,
-      bill: balance.bill,
-      paid: balance.paid,
-      due: balance.due,
-    }));
+  return (await patientInvoiceRows(patientId)).filter((invoice) => invoice.due > 0);
+}
+
+/**
+ * Every invoice of a patient, paid ones too (REPLACE_WITH_API), newest first —
+ * Add pending's "For invoice" ("Invoice #772", "₹1,000 · ₹600 due").
+ */
+export async function listPatientInvoices(patientId: string): Promise<OpenInvoice[]> {
+  return (await patientInvoiceRows(patientId)).reverse();
 }
 
 /** A Medical PO's bill: Σ qty × rate — free units are not billed (`S:769`). */

@@ -147,7 +147,10 @@
       "advance_given": "Advance given",
       "loan_to_staff": "Loan to staff",
       "other": "Other"
-    }
+    },
+    "settledInvoice": "{{state}} · Invoice #{{seq}}",
+    "adjustedOn": "{{amount}} of {{ref}} adjusted on invoice #{{seq}}",
+    "nothingDue": "Nothing due for {{name}} to adjust against"
   },
   "receive": {
     "title": "Receive payment",
@@ -163,8 +166,6 @@
     "pickPatientFirst": "Pick the patient first",
     "nothingDue": "Nothing due",
     "amount": "Amount received",
-    "mode": "Mode",
-    "amountColumn": "Amount",
     "split": "Split · add a mode",
     "total": "Total {{total}}",
     "totalDue": "Total {{total}} · due {{due}}",
@@ -245,5 +246,64 @@
     "paidBill": "{{amount}} paid against {{bill}}",
     "saved": "{{ref}} saved · change logged",
     "missing": "Add who was paid and the amount"
+  },
+  "credit": {
+    "title": "Add pending",
+    "titleEdit": "Edit pending",
+    "sub": "Money the clinic has to give back or take · settle it later from Pending",
+    "subEdit": "Editable while it is open · changes are logged",
+    "steps": {
+      "way": "Which way",
+      "why": "Why"
+    },
+    "way": "Which way",
+    "who": "Who",
+    "whoPlaceholder": "Search patients, contacts or suppliers",
+    "add": "Add",
+    "groups": {
+      "patients": "Patients",
+      "contacts": "Contacts",
+      "suppliers": "Suppliers & vendors"
+    },
+    "parties": {
+      "patient": "Patient · {{id}}",
+      "contact": "Contact",
+      "contactPhone": "Contact · {{phone}}",
+      "vendor": "Clinic vendor",
+      "supplier": "Medical supplier"
+    },
+    "amount": "Amount",
+    "reason": "Reason",
+    "invoice": "For invoice",
+    "invoiceHint": "optional · links the credit to a bill",
+    "noInvoice": "No invoice",
+    "invoicePaid": "{{bill}} · paid",
+    "invoiceDue": "{{bill}} · {{due}} due",
+    "settleBy": "Settle by",
+    "note": "Note",
+    "notePlaceholder": {
+      "give": "e.g. Refund to the same UPI id",
+      "take": "e.g. Supplier will adjust in the next bill"
+    },
+    "problems": {
+      "who": "Pick who",
+      "amount": "Enter the amount",
+      "reason": "Pick a reason",
+      "otherNote": "Add a note for “Other”"
+    },
+    "save": {
+      "give": "Save · give later",
+      "take": "Save · take later"
+    },
+    "saveEdit": "Save changes",
+    "summary": {
+      "give": "Give {{amount}} back to {{name}}",
+      "take": "Take {{amount}} from {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} saved · give {{amount}} to {{name}}",
+      "take": "{{ref}} saved · take {{amount}} from {{name}}"
+    },
+    "updated": "{{ref}} updated"
   }
 }

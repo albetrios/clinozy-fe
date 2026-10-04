@@ -1167,5 +1167,39 @@
     "due": "미수 {{amount}}",
     "nothingDue": "미수 없음",
     "lead": "리드 {{id}} · 아직 환자 아님"
+  },
+  "splitRows": {
+    "mode": "수단",
+    "amount": "금액"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "돌려주기",
+      "take": "돌려받음"
+    },
+    "sub": {
+      "give": "{{name}}에게 · {{reason}} · 결제에 출금 항목이 추가됩니다",
+      "take": "{{name}}에게서 · {{reason}} · 결제에 입금 항목이 추가됩니다"
+    },
+    "section": {
+      "give": "돌려주는 방법",
+      "take": "받은 방법"
+    },
+    "rows": {
+      "give": "돌려준 수단",
+      "take": "받은 수단"
+    },
+    "add": "다른 수단 추가",
+    "total": "합계 {{total}} · {{owed}} 중",
+    "save": {
+      "give": "{{amount}} 돌려주기",
+      "take": "{{amount}} 기록"
+    },
+    "enterAmount": "금액을 입력하세요",
+    "moreThanOwed": "남은 {{amount}}보다 많습니다",
+    "done": {
+      "give": "{{name}}에게 {{amount}} 돌려줌 · 출금 항목 추가됨",
+      "take": "{{name}}에게서 {{amount}} 돌려받음 · 입금 항목 추가됨"
+    }
   }
 }

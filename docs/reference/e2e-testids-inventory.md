@@ -102,6 +102,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `receive-drawer`                 | Receive payment — `/payments/receive` over the ledger (L-39b)                     | `pages/organization/$organizationSlug/payments/`              |
 | `pay-drawer`                     | Send payment — `/payments/pay` over the ledger (L-39b)                            | `pages/organization/$organizationSlug/payments/`              |
 | `credit-drawer`                  | Add / Edit pending — over Payments › Pending (L-39c)                              | `payments/pending/`                                           |
+| `settle-credit-drawer`           | Give back / Got it back — stacked, no URL (L-39c)                                 | `shared/components/SettleCreditDrawer/`                       |
 | `day-close-drawer`               | Day close — `/payments/day-close` over the ledger (L-41)                          | `pages/organization/$organizationSlug/payments/`              |
 | `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)               | `pages/organization/$organizationSlug/tasks/`                 |
 | `new-task-drawer`                | New task — `/tasks/create` opens it over the list (L-47d)                         | `pages/organization/$organizationSlug/tasks/`                 |
@@ -787,7 +788,9 @@ above — the ledger under the `tableId` `payments` (`payments-toolbar`, `paymen
 `payments-tab-pending`, `payments-search`, `payments-filters-trigger`, `payments-pay`,
 `payments-receive`, `payments-fab`, `payments-table-row`, `payments-row-action-<edit|delete>`,
 `payments-table-bulk-export`), Pending under `payments-pending` (`payments-pending-add`,
-`payments-pending-new-menu`, `payments-pending-table-row`). Delete uses the shared confirm's ids.
+`payments-pending-new-menu`, `payments-pending-table-row`,
+`payments-pending-row-action-<settle|use-on-bill|edit|delete>` — `settle` reads Give back or
+Got it back). Delete uses the shared confirm's ids.
 
 | Test ID                                 | Element                                           | Source                               |
 | --------------------------------------- | ------------------------------------------------- | ------------------------------------ |
@@ -799,15 +802,29 @@ Receive payment (`receive-drawer`, L-39b) and Send payment (`pay-drawer`) carry 
 drawer's ids under their root (`-title`, `-tag`, `-badges`, `-quick-fill-<id>`, `-save`,
 `-save-and-add`, `-delete`, `-step-<id>`); their fields:
 
-| Test ID                                                                      | Element                                                               | Source                             |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
-| `receive-drawer-branch-<branchId>`                                           | Branch chip (two or more open branches)                               | `components/ReceivePaymentDrawer/` |
-| `receive-drawer-patient`                                                     | Patient field (`PatientPicker`; options `-option-<id>`)               | `shared/components/PatientPicker/` |
-| `receive-drawer-invoice` · `-invoice-<invoiceId>`                            | Against invoice: the inert chip, or one open invoice's chip           | `components/ReceivePaymentDrawer/` |
-| `receive-drawer-splits` · `-splits-row` · `-splits-amount` · `-splits-total` | The Mode · Amount rows (`ItemsField`), one row, its amount, the total | `components/ReceivePaymentDrawer/` |
-| `receive-drawer-reference` · `-note`                                         | Reference · Note                                                      | `components/ReceivePaymentDrawer/` |
-| `pay-drawer-bill` · `-oldest-<md\|is>:<id>`                                  | Supplier bill picker · a "Pending longest" chip                       | `components/SendPaymentDrawer/`    |
-| `pay-drawer-category-<category>` · `-mode-<mode>`                            | Category chip · Mode chip                                             | `components/SendPaymentDrawer/`    |
-| `pay-drawer-paid-to` · `-paid-to-quick-<name>`                               | Paid to · a quick name                                                | `components/SendPaymentDrawer/`    |
-| `pay-drawer-amount` · `-amount-quick-<rupees>`                               | Amount · a quick amount                                               | `components/SendPaymentDrawer/`    |
-| `pay-drawer-date` · `-note` · `-files` · `-files-input`                      | Date · Note · the bill photo zone and its file input                  | `components/SendPaymentDrawer/`    |
+| Test ID                                                                      | Element                                                                 | Source                             |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------- |
+| `receive-drawer-branch-<branchId>`                                           | Branch chip (two or more open branches)                                 | `components/ReceivePaymentDrawer/` |
+| `receive-drawer-patient`                                                     | Patient field (`PatientPicker`; options `-option-<id>`)                 | `shared/components/PatientPicker/` |
+| `receive-drawer-invoice` · `-invoice-<invoiceId>`                            | Against invoice: the inert chip, or one open invoice's chip             | `components/ReceivePaymentDrawer/` |
+| `receive-drawer-splits` · `-splits-row` · `-splits-amount` · `-splits-total` | The Mode · Amount rows (`SplitRowsField`), a row, its amount, the total | `shared/forms/SplitRowsField/`     |
+| `receive-drawer-reference` · `-note`                                         | Reference · Note                                                        | `components/ReceivePaymentDrawer/` |
+| `pay-drawer-bill` · `-oldest-<md\|is>:<id>`                                  | Supplier bill picker · a "Pending longest" chip                         | `components/SendPaymentDrawer/`    |
+| `pay-drawer-category-<category>` · `-mode-<mode>`                            | Category chip · Mode chip                                               | `components/SendPaymentDrawer/`    |
+| `pay-drawer-paid-to` · `-paid-to-quick-<name>`                               | Paid to · a quick name                                                  | `components/SendPaymentDrawer/`    |
+| `pay-drawer-amount` · `-amount-quick-<rupees>`                               | Amount · a quick amount                                                 | `components/SendPaymentDrawer/`    |
+| `pay-drawer-date` · `-note` · `-files` · `-files-input`                      | Date · Note · the bill photo zone and its file input                    | `components/SendPaymentDrawer/`    |
+
+Add / Edit pending (`credit-drawer`, L-39c) and Give back / Got it back
+(`settle-credit-drawer`) carry the record drawer's ids the same way (`-dismiss` reads "Back"
+on both); their fields:
+
+| Test ID                                                                                                             | Element                                                                             | Source                             |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------- |
+| `credit-drawer-way-<give\|take>`                                                                                    | Which way chip                                                                      | `pending/components/CreditDrawer/` |
+| `credit-drawer-who` · `-who-search` · `-who-option-<key>` · `-who-create`                                           | Who: the picker, its search, a row (`patient:<id>` or `name:<slug>`), "Add “q”"     | `pending/components/CreditDrawer/` |
+| `credit-drawer-amount`                                                                                              | Amount                                                                              | `pending/components/CreditDrawer/` |
+| `credit-drawer-reason-<reason>`                                                                                     | A Reason chip (`charged_twice` … `other`)                                           | `pending/components/CreditDrawer/` |
+| `credit-drawer-invoice` · `-invoice-option-<invoiceId>`                                                             | For invoice (a patient with invoices) · one invoice                                 | `pending/components/CreditDrawer/` |
+| `credit-drawer-settle-by` · `-note`                                                                                 | Settle by · Note                                                                    | `pending/components/CreditDrawer/` |
+| `settle-credit-drawer-splits` · `-splits-row` · `-splits-mode` · `-splits-amount` · `-splits-add` · `-splits-total` | The Mode · Amount rows, a row, its mode and amount, "+ Add another mode", the total | `shared/forms/SplitRowsField/`     |

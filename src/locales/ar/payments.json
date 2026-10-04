@@ -159,7 +159,10 @@
       "advance_given": "دفعة مقدمة مُعطاة",
       "loan_to_staff": "قرض لموظف",
       "other": "أخرى"
-    }
+    },
+    "settledInvoice": "{{state}} · فاتورة #{{seq}}",
+    "adjustedOn": "سُوّي {{amount}} من {{ref}} على الفاتورة #{{seq}}",
+    "nothingDue": "لا مستحقات على {{name}} للتسوية"
   },
   "receive": {
     "title": "استلام دفعة",
@@ -179,8 +182,6 @@
     "pickPatientFirst": "اختر المريض أولًا",
     "nothingDue": "لا مستحقات",
     "amount": "المبلغ المستلم",
-    "mode": "الطريقة",
-    "amountColumn": "المبلغ",
     "split": "تقسيم · أضف طريقة",
     "total": "الإجمالي {{total}}",
     "totalDue": "الإجمالي {{total}} · المستحق {{due}}",
@@ -269,5 +270,64 @@
     "paidBill": "تم دفع {{amount}} مقابل {{bill}}",
     "saved": "تم حفظ {{ref}} · سُجّل التغيير",
     "missing": "أضف المستفيد والمبلغ"
+  },
+  "credit": {
+    "title": "إضافة معلّق",
+    "titleEdit": "تعديل المعلّق",
+    "sub": "مال على العيادة أن تردّه أو تأخذه · سوِّه لاحقًا من المعلّقات",
+    "subEdit": "قابل للتعديل ما دام مفتوحًا · التغييرات تُسجَّل",
+    "steps": {
+      "way": "الاتجاه",
+      "why": "السبب"
+    },
+    "way": "الاتجاه",
+    "who": "مَن",
+    "whoPlaceholder": "ابحث عن المرضى أو جهات الاتصال أو الموردين",
+    "add": "إضافة",
+    "groups": {
+      "patients": "المرضى",
+      "contacts": "جهات الاتصال",
+      "suppliers": "الموردون والبائعون"
+    },
+    "parties": {
+      "patient": "مريض · {{id}}",
+      "contact": "جهة اتصال",
+      "contactPhone": "جهة اتصال · {{phone}}",
+      "vendor": "بائع العيادة",
+      "supplier": "مورد طبي"
+    },
+    "amount": "المبلغ",
+    "reason": "السبب",
+    "invoice": "للفاتورة",
+    "invoiceHint": "اختياري · يربط المبلغ بفاتورة",
+    "noInvoice": "بلا فاتورة",
+    "invoicePaid": "{{bill}} · مدفوعة",
+    "invoiceDue": "{{bill}} · المستحق {{due}}",
+    "settleBy": "التسوية قبل",
+    "note": "ملاحظة",
+    "notePlaceholder": {
+      "give": "مثال: الردّ إلى معرّف UPI نفسه",
+      "take": "مثال: سيسوّيه المورد في الفاتورة القادمة"
+    },
+    "problems": {
+      "who": "اختر الطرف",
+      "amount": "أدخل المبلغ",
+      "reason": "اختر سببًا",
+      "otherNote": "أضف ملاحظة لـ «أخرى»"
+    },
+    "save": {
+      "give": "حفظ · الردّ لاحقًا",
+      "take": "حفظ · الأخذ لاحقًا"
+    },
+    "saveEdit": "حفظ التغييرات",
+    "summary": {
+      "give": "ردّ {{amount}} إلى {{name}}",
+      "take": "أخذ {{amount}} من {{name}}"
+    },
+    "saved": {
+      "give": "حُفظ {{ref}} · ردّ {{amount}} إلى {{name}}",
+      "take": "حُفظ {{ref}} · أخذ {{amount}} من {{name}}"
+    },
+    "updated": "حُدّث {{ref}}"
   }
 }

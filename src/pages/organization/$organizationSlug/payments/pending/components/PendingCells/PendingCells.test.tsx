@@ -70,14 +70,27 @@ describe('the Pending wording (payments.md:45)', () => {
     );
   });
 
-  it('labels the state, "· Today" once settled today', () => {
-    expect(creditStateLabel({ status: 'open', settledAt: null }, t)).toBe('Open');
+  it('labels the state, "· Today" once settled today, the invoice a credit went on', () => {
+    const settled = { settledAt: null, settledInvoiceSeq: null };
+    expect(creditStateLabel({ ...settled, status: 'open' }, t)).toBe('Open');
     expect(
-      creditStateLabel({ status: 'given_back', settledAt: '2026-10-03T05:00:00Z' }, t),
+      creditStateLabel(
+        { ...settled, status: 'given_back', settledAt: '2026-10-03T05:00:00Z' },
+        t,
+      ),
     ).toBe('Returned · Today');
     expect(
-      creditStateLabel({ status: 'used', settledAt: '2026-09-28T05:00:00Z' }, t),
+      creditStateLabel(
+        { ...settled, status: 'used', settledAt: '2026-09-28T05:00:00Z' },
+        t,
+      ),
     ).toBe('Adjusted');
+    expect(
+      creditStateLabel(
+        { status: 'used', settledAt: '2026-10-03T05:00:00Z', settledInvoiceSeq: 785 },
+        t,
+      ),
+    ).toBe('Adjusted · Invoice #785');
     expect(isOpenCredit({ status: 'open' })).toBe(true);
     expect(isOpenCredit({ status: 'got_back' })).toBe(false);
   });

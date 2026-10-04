@@ -4,7 +4,7 @@ import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { ledgerDayOf } from '@/shared/api/clinic/day-close-api.ts';
 import { attachPaymentFile } from '@/shared/api/clinic/payments-api.ts';
 import type {
@@ -23,7 +23,6 @@ import {
   type PickedFile,
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
-import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
@@ -34,7 +33,6 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
   useOpenSupplierBills,
@@ -46,6 +44,7 @@ import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
+import { useDayLabel } from '../../shared/hooks/useDayLabel/index.ts';
 import { PaymentDeleteConfirm } from '../PaymentDeleteConfirm/index.ts';
 import {
   amountText,
@@ -147,21 +146,6 @@ function quickFillItems(
         ),
     };
   });
-}
-
-/** "Today", or the day as "2 Oct" — the Payment step's Date tile. */
-function useDayLabel(): (day: string) => string {
-  const { t } = useTranslation(PICKER_NS);
-  const { formatDate } = useLocaleFormat();
-  const [today] = useState(() => clinicToday());
-  return (day) =>
-    day === today
-      ? t(PICKER_KEYS.date.today)
-      : formatDate(
-          localDateOf(day),
-          { day: 'numeric', month: 'short' },
-          { civilDay: true },
-        );
 }
 
 /** The step cards: each step's heads (peek, summary, what is missing) and its body. */

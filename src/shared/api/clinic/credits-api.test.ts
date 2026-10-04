@@ -10,6 +10,7 @@ import {
   fetchCredit,
   listPendingCredits,
   restoreCredit,
+  searchCreditParties,
   settleCredit,
   updateCredit,
 } from './credits-api.ts';
@@ -91,6 +92,45 @@ describe('Pending (listPendingCredits, S:1700)', () => {
     expect(await seqsOf({ status: ['used'] })).toEqual([]);
     expect(await seqsOf({ q: 'CR-1' })).toEqual([1]);
     expect(await seqsOf({ q: 'gloves' })).toEqual([1]);
+  });
+});
+
+describe('the Who picker (searchCreditParties, payments.md:157)', () => {
+  it('lists every patient A–Z for an empty search, then the contacts and suppliers', async () => {
+    let cursor: string | null = null;
+    const rows = [];
+    do {
+      const page = await searchCreditParties('', cursor);
+      rows.push(...page.items);
+      cursor = page.nextCursor;
+    } while (cursor !== null);
+    const patients = rows.filter((row) => row.kind === 'patient');
+    expect(patients).toHaveLength(clinicFixtures.patients.snapshot().length);
+    const names = patients.map((row) => row.name);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+    // Patients first, then contacts, then suppliers and vendors.
+    const kinds = rows.map((row) => row.kind);
+    expect(kinds.indexOf('contact')).toBeGreaterThan(kinds.lastIndexOf('patient'));
+    expect(kinds.indexOf('vendor')).toBeGreaterThan(kinds.lastIndexOf('contact'));
+  });
+
+  it('finds contacts — leads and Medical walk-ins — and suppliers by name or mobile, never a patient twice', async () => {
+    expect((await searchCreditParties('viral')).items).toEqual([
+      expect.objectContaining({ kind: 'contact', name: 'Viral Sheth' }),
+    ]);
+    expect((await searchCreditParties('Ankur')).items).toEqual([
+      expect.objectContaining({ kind: 'vendor', name: 'Ankur Pharma' }),
+    ]);
+    expect((await searchCreditParties('99706')).items).toEqual([
+      expect.objectContaining({ kind: 'vendor', name: 'Ankur Pharma' }),
+    ]);
+    expect((await searchCreditParties('NH Pharma')).items).toEqual([
+      expect.objectContaining({ kind: 'supplier', name: 'NH Pharma' }),
+    ]);
+    const rhea = (await searchCreditParties('Rhea')).items;
+    expect(rhea.filter((row) => row.name === 'Rhea Shah')).toEqual([
+      expect.objectContaining({ kind: 'patient', id: RHEA }),
+    ]);
   });
 });
 
@@ -203,6 +243,24 @@ describe('settling a credit (settleCredit, S:1713)', () => {
     expect(note).toMatchObject({ invoiceId: ref.invoice(785), amount: 50_000 });
   });
 
+  it('refunds against the invoice of the entry a credit came from', async () => {
+    const credit = await createCredit({ ...GIVE, invoiceId: null });
+    await clinicFixtures.pendingCredits.update(credit.id, {
+      sourcePaymentId: ref.payment(5512),
+    });
+    const result = await settleCredit(credit.id, {
+      action: 'give_back',
+      splits: [{ mode: 'cash', amount: 50_000 }],
+    });
+    expect(result.creditNoteSeq).toBe(1);
+    expect(clinicFixtures.creditNotes.snapshot()[0]?.invoiceId).toBe(ref.invoice(785));
+    const entry = clinicFixtures.payments.snapshot(
+      (row) => row.seq === result.paymentSeq,
+    )[0];
+    expect(entry).toMatchObject({ kind: 'refund', invoiceId: ref.invoice(785) });
+    expect((await fetchCredit(credit.id)).settledInvoiceSeq).toBeNull();
+  });
+
   it('takes a party’s money in as money back', async () => {
     const result = await settleCredit(CR_ONE, {
       action: 'got_back',
@@ -240,6 +298,8 @@ describe('settling a credit (settleCredit, S:1713)', () => {
     // Tanvi's INV-772 owes ₹600; the credit is ₹500 — all of it is used.
     expect(result).toMatchObject({ amount: 50_000, invoiceSeq: 772 });
     expect(result.credit).toMatchObject({ status: 'used', adjusted: 50_000 });
+    // The row names the invoice it went on: "Adjusted · Invoice #772".
+    expect((await fetchCredit(CR_TWO)).settledInvoiceSeq).toBe(772);
     const invoice = await clinicFixtures.invoices.get(ref.invoice(772));
     expect(invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due).toBe(10_000);
     const entry = clinicFixtures.payments.snapshot(

@@ -118,7 +118,7 @@ export function PendingSinceCell({ credit }: { credit: Pick<CreditRow, 'createdA
 export function PendingStateCell({
   credit,
 }: {
-  credit: Pick<CreditRow, 'status' | 'settledAt'>;
+  credit: Pick<CreditRow, 'status' | 'settledAt' | 'settledInvoiceSeq'>;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   return (

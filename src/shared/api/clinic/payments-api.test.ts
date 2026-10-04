@@ -16,6 +16,7 @@ import {
   listLedger,
   listOpenInvoices,
   listOpenSupplierBills,
+  listPatientInvoices,
   payExpense,
   paymentQueryKeys,
   receivePayment,
@@ -454,5 +455,15 @@ describe('listOpenInvoices (S:1702)', () => {
       expect.objectContaining({ seq: 785, type: 'medical', bill: 130_000, due: 70_000 }),
     ]);
     expect(await listOpenInvoices(DHRUV)).toEqual([]);
+  });
+
+  it('lists every invoice of a patient for Add pending, paid ones too, newest first', async () => {
+    const dhruv = await listPatientInvoices(DHRUV);
+    expect(dhruv.length).toBeGreaterThan(0);
+    expect(dhruv.every((invoice) => invoice.due === 0)).toBe(true);
+    const tanvi = await listPatientInvoices(patientRef('Tanvi Shah'));
+    expect(tanvi[0]).toMatchObject({ seq: 772, bill: 100_000, due: 60_000 });
+    const days = tanvi.map((invoice) => invoice.date);
+    expect(days).toEqual([...days].sort().reverse());
   });
 });

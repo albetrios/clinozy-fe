@@ -23,17 +23,23 @@ import {
   type RoomFilterCopy,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
+import { SettleCreditDrawer } from '@/shared/components/SettleCreditDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useCreditList } from '@/shared/hooks/useCredits/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { PenLine, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
+import { PenLine, Receipt, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS, PENDING_TABLE_ID } from '../payments.constants.ts';
 import { PaymentsToolbar } from '../shared/components/PaymentsToolbar/index.ts';
 import { CreditDeleteConfirm } from './components/CreditDeleteConfirm/index.ts';
-import { isOpenCredit } from './components/PendingCells/index.ts';
-import { usePendingDialogRoute } from './hooks/usePendingDialogRoute/index.ts';
+import { CreditDrawer } from './components/CreditDrawer/index.ts';
+import { creditReason, isOpenCredit } from './components/PendingCells/index.ts';
+import { canUseOnBill, useCreditOnBill } from './hooks/useCreditOnBill/index.ts';
+import {
+  type PendingDialogRoute,
+  usePendingDialogRoute,
+} from './hooks/usePendingDialogRoute/index.ts';
 import { pendingRowTone, usePendingTable } from './hooks/usePendingTable/index.ts';
 import { PENDING_FILTER_FIELDS } from './pending.constants.ts';
 import {
@@ -82,6 +88,36 @@ function usePendingFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
       ),
     },
   };
+}
+
+/** The drawer the URL opens over Pending: Add pending, or an open credit's Edit pending. */
+function PendingDrawers({
+  dialog,
+  onClose,
+}: {
+  dialog: PendingDialogRoute;
+  onClose: () => void;
+}) {
+  if (dialog.kind === 'create') {
+    return (
+      <CreditDrawer
+        open
+        mode="create"
+        direction={dialog.prefill.direction}
+        onClose={onClose}
+      />
+    );
+  }
+  if (dialog.kind !== 'edit' || !dialog.credit) return null;
+  return (
+    <CreditDrawer
+      open
+      mode="edit"
+      credit={dialog.credit}
+      readOnly={dialog.readOnly}
+      onClose={onClose}
+    />
+  );
 }
 
 /** The skeleton, the empty state ("Nothing pending" + Add pending) or the filtered one. */
@@ -143,7 +179,9 @@ export function PendingPage() {
   const filters = useRoomFilters(PENDING_FILTER_FIELDS);
   const filterCopy = usePendingFilterCopy();
   const [deleting, setDeleting] = useState<CreditRow | null>(null);
-  usePendingDialogRoute();
+  const [settling, setSettling] = useState<CreditRow | null>(null);
+  const adjustOnBill = useCreditOnBill();
+  const { dialog, close } = usePendingDialogRoute();
 
   const params = creditListParamsOf(search);
   const list = useCreditList(params);
@@ -170,10 +208,35 @@ export function PendingPage() {
     });
   };
 
+  // Give back writes money out to them: the `refund` ability (Q-U8).
+  const canSettle = (credit: CreditRow) =>
+    access.isResolved &&
+    (credit.direction === 'give' ? access.canAbility('refund') : can('create'));
+
   const rowActions = (credit: CreditRow): DataTableRowAction[] => {
     // Open credits only (`payments.md:50`).
     if (!isOpenCredit(credit)) return [];
     const actions: DataTableRowAction[] = [];
+    if (canSettle(credit)) {
+      actions.push({
+        id: 'settle',
+        label: t(
+          credit.direction === 'give'
+            ? PAYMENTS_KEYS.rowActions.giveBack
+            : PAYMENTS_KEYS.rowActions.gotBack,
+        ),
+        icon: Wallet,
+        onSelect: () => setSettling(credit),
+      });
+    }
+    if (canUseOnBill(credit) && can('create')) {
+      actions.push({
+        id: 'use-on-bill',
+        label: t(PAYMENTS_KEYS.rowActions.useOnBill),
+        icon: Receipt,
+        onSelect: () => void adjustOnBill(credit),
+      });
+    }
     if (can('edit')) {
       actions.push({
         id: 'edit',
@@ -261,6 +324,12 @@ export function PendingPage() {
         className="m-(--room-card-margin) flex-1"
       />
       <CreditDeleteConfirm credit={deleting} onClose={() => setDeleting(null)} />
+      <SettleCreditDrawer
+        credit={settling}
+        reasonLabel={settling ? creditReason(settling, t) : undefined}
+        onClose={() => setSettling(null)}
+      />
+      <PendingDrawers dialog={dialog} onClose={close} />
       <Outlet />
     </section>
   );

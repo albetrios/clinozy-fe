@@ -13,6 +13,7 @@ import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import type { PatientPick } from '@/shared/components/PatientPicker/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { splitsModes, splitsTotal } from '@/shared/forms/SplitRowsField/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
@@ -41,8 +42,6 @@ import {
   receivePatchOf,
   type ReceiveProblem,
   receiveProblem,
-  splitsModes,
-  splitsTotal,
   withPatient,
 } from './receive-form.ts';
 import { ReceiveFields } from './ReceiveFields.tsx';

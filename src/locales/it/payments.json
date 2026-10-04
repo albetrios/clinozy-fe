@@ -150,7 +150,10 @@
       "advance_given": "Anticipo dato",
       "loan_to_staff": "Prestito al personale",
       "other": "Altro"
-    }
+    },
+    "settledInvoice": "{{state}} · Fattura #{{seq}}",
+    "adjustedOn": "{{amount}} di {{ref}} compensati sulla fattura #{{seq}}",
+    "nothingDue": "{{name}} non ha nulla da saldare su cui compensare"
   },
   "receive": {
     "title": "Incassa pagamento",
@@ -167,8 +170,6 @@
     "pickPatientFirst": "Scegli prima il paziente",
     "nothingDue": "Niente da saldare",
     "amount": "Importo incassato",
-    "mode": "Modalità",
-    "amountColumn": "Importo",
     "split": "Dividi · aggiungi una modalità",
     "total": "Totale {{total}}",
     "totalDue": "Totale {{total}} · da saldare {{due}}",
@@ -251,5 +252,64 @@
     "paidBill": "{{amount}} pagati su {{bill}}",
     "saved": "{{ref}} salvato · modifica registrata",
     "missing": "Indica chi è stato pagato e l’importo"
+  },
+  "credit": {
+    "title": "Aggiungi in sospeso",
+    "titleEdit": "Modifica in sospeso",
+    "sub": "Denaro che la clinica deve restituire o avere · da saldare poi da In sospeso",
+    "subEdit": "Modificabile finché è aperto · le modifiche sono registrate",
+    "steps": {
+      "way": "Direzione",
+      "why": "Perché"
+    },
+    "way": "Direzione",
+    "who": "Chi",
+    "whoPlaceholder": "Cerca pazienti, contatti o fornitori",
+    "add": "Aggiungi",
+    "groups": {
+      "patients": "Pazienti",
+      "contacts": "Contatti",
+      "suppliers": "Fornitori e venditori"
+    },
+    "parties": {
+      "patient": "Paziente · {{id}}",
+      "contact": "Contatto",
+      "contactPhone": "Contatto · {{phone}}",
+      "vendor": "Fornitore della clinica",
+      "supplier": "Fornitore medico"
+    },
+    "amount": "Importo",
+    "reason": "Motivo",
+    "invoice": "Per la fattura",
+    "invoiceHint": "facoltativo · collega l’importo a una fattura",
+    "noInvoice": "Nessuna fattura",
+    "invoicePaid": "{{bill}} · pagata",
+    "invoiceDue": "{{bill}} · {{due}} da saldare",
+    "settleBy": "Da saldare entro",
+    "note": "Nota",
+    "notePlaceholder": {
+      "give": "es. Rimborso sullo stesso ID UPI",
+      "take": "es. Il fornitore lo scalerà nella prossima fattura"
+    },
+    "problems": {
+      "who": "Scegli chi",
+      "amount": "Inserisci l’importo",
+      "reason": "Scegli un motivo",
+      "otherNote": "Aggiungi una nota per «Altro»"
+    },
+    "save": {
+      "give": "Salva · dare dopo",
+      "take": "Salva · avere dopo"
+    },
+    "saveEdit": "Salva modifiche",
+    "summary": {
+      "give": "Restituire {{amount}} a {{name}}",
+      "take": "Avere {{amount}} da {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} salvato · dare {{amount}} a {{name}}",
+      "take": "{{ref}} salvato · avere {{amount}} da {{name}}"
+    },
+    "updated": "{{ref}} aggiornato"
   }
 }

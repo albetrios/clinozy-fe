@@ -1,7 +1,7 @@
 # `pages/organization/$organizationSlug/payments/pending/create` — Add pending
 
 Route: `/organization/$organizationSlug/payments/pending/create` (`S:89`) — a URL-driven dialog over Payments › Pending (KICKOFF §4, D24).
-The route renders nothing: the Pending page reads the URL and opens the Add pending drawer over itself. `?direction=give|take` picks Which way (the "⌄" menu's Give and Take): it is Pending's own `direction` filter (`S:88`), parsed by `validatePendingSearch` in the parent's `../pending.search.ts` — one key, read by both, so naming exactly one way prefills the drawer.
+The route renders nothing: the Pending page reads the URL and opens the Add pending drawer (`../components/CreditDrawer/`) over itself. `?direction=give|take` picks Which way (the "⌄" menu's Give and Take): it is Pending's own `direction` filter (`S:88`), parsed by `validatePendingSearch` in the parent's `../pending.search.ts` — one key, read by both, so naming exactly one way prefills the drawer.
 Gated like the room — membership (`organization:read`) and the `clinic-payments` module, then
 `requireOrgStatus`; in-room access is `useClinicAccess`.
 

@@ -1,4 +1,4 @@
-import type { PaymentMode, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   LedgerRow,
   OpenInvoice,
@@ -6,39 +6,29 @@ import type {
   ReceivePaymentInput,
 } from '@/shared/api/clinic/payments-contracts.ts';
 import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  FIRST_SPLIT_MODE,
+  isSplitMode,
+  paidSplits,
+  type SplitMode,
+  type SplitRow,
+  splitsTotal,
+} from '@/shared/forms/SplitRowsField/index.ts';
 
 /*
  * Receive payment's form (`payments.md:95–110`; H:5069–5073) — pure, so the
  * drawer, its badges, its footer and its checks read one set of rules.
  */
 
-/** The modes a receipt's rows offer (`PY_MODES`): Cash, UPI, Card — "Credit" is only ever a credit's. */
-export const RECEIVE_MODES = ['cash', 'upi', 'card'] as const;
-
-/** One of the receipt's modes. */
-export type ReceiveMode = (typeof RECEIVE_MODES)[number];
-
-/** One Mode · Amount row: the mode, and the amount in paise (0 while empty). */
-export interface ReceiveSplitRow {
-  mode: ReceiveMode | null;
-  amount: number;
-}
-
-/** The drawer's form: who pays, against what, how — and the plan's Reference and Note. */
+/** The drawer's form: who pays, against what, how (the Mode · Amount rows) — and the plan's Reference and Note. */
 export interface ReceiveFormValues {
   branchId: string | null;
   patientId: string | null;
   invoiceId: string | null;
-  splits: ReceiveSplitRow[];
+  splits: SplitRow[];
   reference: string;
   note: string;
 }
-
-/** An empty row starts in UPI (H:5070). */
-const FIRST_MODE: ReceiveMode = 'upi';
-
-const isReceiveMode = (mode: PaymentMode): mode is ReceiveMode =>
-  (RECEIVE_MODES as readonly string[]).includes(mode);
 
 /** A new receipt: no patient yet, one empty UPI row. */
 export function emptyReceiveForm(branchId: string | null): ReceiveFormValues {
@@ -46,7 +36,7 @@ export function emptyReceiveForm(branchId: string | null): ReceiveFormValues {
     branchId,
     patientId: null,
     invoiceId: null,
-    splits: [{ mode: FIRST_MODE, amount: 0 }],
+    splits: [{ mode: FIRST_SPLIT_MODE, amount: 0 }],
     reference: '',
     note: '',
   };
@@ -59,7 +49,7 @@ export function receiveFormOf(entry: LedgerRow): ReceiveFormValues {
     patientId: entry.patientId,
     invoiceId: entry.invoiceId,
     splits: entry.splits.map((split) => ({
-      mode: isReceiveMode(split.mode) ? split.mode : null,
+      mode: isSplitMode(split.mode) ? split.mode : null,
       amount: split.amount,
     })),
     reference: entry.reference ?? '',
@@ -83,7 +73,9 @@ export function withPatient(
     ...values,
     patientId,
     invoiceId: invoice?.id ?? null,
-    splits: [{ mode: values.splits[0]?.mode ?? FIRST_MODE, amount: invoice?.due ?? 0 }],
+    splits: [
+      { mode: values.splits[0]?.mode ?? FIRST_SPLIT_MODE, amount: invoice?.due ?? 0 },
+    ],
   };
 }
 
@@ -106,7 +98,7 @@ export type ReceiveQuickFillId = (typeof RECEIVE_QUICK_FILLS)[number]['id'];
  * The rows a preset fills for an invoice's due: "Full" — the due in UPI;
  * "Half" — half of it in UPI; "Cash + UPI" — half in cash, the rest in UPI.
  */
-export function quickFillSplits(id: ReceiveQuickFillId, due: number): ReceiveSplitRow[] {
+export function quickFillSplits(id: ReceiveQuickFillId, due: number): SplitRow[] {
   if (id === 'full') return [{ mode: 'upi', amount: due }];
   if (id === 'half') return [{ mode: 'upi', amount: halfOf(due) }];
   const cash = halfOf(due);
@@ -116,37 +108,10 @@ export function quickFillSplits(id: ReceiveQuickFillId, due: number): ReceiveSpl
   ];
 }
 
-/** Σ of the rows, in paise. */
-export function splitsTotal(splits: readonly ReceiveSplitRow[]): number {
-  return splits.reduce((sum, row) => sum + row.amount, 0);
-}
-
-/**
- * The modes the receipt pays in, each once — the rows with an amount, else
- * the first row's (a fresh form reads "UPI").
- */
-export function splitsModes(splits: readonly ReceiveSplitRow[]): ReceiveMode[] {
-  const paid = splits.filter((row) => row.amount > 0).map((row) => row.mode);
-  const modes = paid.length > 0 ? paid : splits.slice(0, 1).map((row) => row.mode);
-  return [...new Set(modes.filter((mode): mode is ReceiveMode => mode !== null))];
-}
-
-/** The mode a "+ Split" row takes — the first one not used yet; none once all three are. */
-export function nextSplitMode(splits: readonly ReceiveSplitRow[]): ReceiveMode | null {
-  return RECEIVE_MODES.find((mode) => !splits.some((row) => row.mode === mode)) ?? null;
-}
-
 /** The mode badge's tone: one mode's own, a split's stone (H:5073). */
-export function modesTone(modes: readonly ReceiveMode[]): Tone {
+export function modesTone(modes: readonly SplitMode[]): Tone {
   const [only] = modes;
   return modes.length === 1 && only ? PAYMENT_MODE_TONES[only] : 'stone';
-}
-
-/** The rows the server takes: a mode and an amount above zero. */
-function paidSplits(splits: readonly ReceiveSplitRow[]) {
-  return splits.flatMap((row) =>
-    row.mode && row.amount > 0 ? [{ mode: row.mode, amount: row.amount }] : [],
-  );
 }
 
 /** What Receive payment sends (`receivePayment`, `S:1708`). */

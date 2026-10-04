@@ -6,6 +6,7 @@ export {
   useLedgerList,
   useOpenInvoices,
   useOpenSupplierBills,
+  usePatientInvoices,
   usePayExpense,
   usePayment,
   useReceivePayment,

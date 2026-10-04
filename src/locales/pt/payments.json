@@ -150,7 +150,10 @@
       "advance_given": "Adiantamento dado",
       "loan_to_staff": "Empréstimo à equipe",
       "other": "Outro"
-    }
+    },
+    "settledInvoice": "{{state}} · Fatura #{{seq}}",
+    "adjustedOn": "{{amount}} de {{ref}} abatidos na fatura #{{seq}}",
+    "nothingDue": "{{name}} não tem nada em aberto para abater"
   },
   "receive": {
     "title": "Receber pagamento",
@@ -167,8 +170,6 @@
     "pickPatientFirst": "Escolha o paciente primeiro",
     "nothingDue": "Nada em aberto",
     "amount": "Valor recebido",
-    "mode": "Forma",
-    "amountColumn": "Valor",
     "split": "Dividir · adicionar forma",
     "total": "Total {{total}}",
     "totalDue": "Total {{total}} · em aberto {{due}}",
@@ -251,5 +252,64 @@
     "paidBill": "{{amount}} pagos para {{bill}}",
     "saved": "{{ref}} salvo · mudança registrada",
     "missing": "Informe quem recebeu e o valor"
+  },
+  "credit": {
+    "title": "Adicionar pendente",
+    "titleEdit": "Editar pendente",
+    "sub": "Dinheiro que a clínica deve devolver ou receber · acerte depois em Pendentes",
+    "subEdit": "Editável enquanto estiver aberto · as mudanças são registradas",
+    "steps": {
+      "way": "Sentido",
+      "why": "Por quê"
+    },
+    "way": "Sentido",
+    "who": "Quem",
+    "whoPlaceholder": "Buscar pacientes, contatos ou fornecedores",
+    "add": "Adicionar",
+    "groups": {
+      "patients": "Pacientes",
+      "contacts": "Contatos",
+      "suppliers": "Fornecedores e vendedores"
+    },
+    "parties": {
+      "patient": "Paciente · {{id}}",
+      "contact": "Contato",
+      "contactPhone": "Contato · {{phone}}",
+      "vendor": "Fornecedor da clínica",
+      "supplier": "Fornecedor médico"
+    },
+    "amount": "Valor",
+    "reason": "Motivo",
+    "invoice": "Para a fatura",
+    "invoiceHint": "opcional · vincula o valor a uma fatura",
+    "noInvoice": "Sem fatura",
+    "invoicePaid": "{{bill}} · paga",
+    "invoiceDue": "{{bill}} · {{due}} em aberto",
+    "settleBy": "Acertar até",
+    "note": "Observação",
+    "notePlaceholder": {
+      "give": "ex.: Reembolso para o mesmo ID UPI",
+      "take": "ex.: O fornecedor vai abater na próxima fatura"
+    },
+    "problems": {
+      "who": "Escolha quem",
+      "amount": "Informe o valor",
+      "reason": "Escolha um motivo",
+      "otherNote": "Adicione uma observação para “Outro”"
+    },
+    "save": {
+      "give": "Salvar · dar depois",
+      "take": "Salvar · receber depois"
+    },
+    "saveEdit": "Salvar alterações",
+    "summary": {
+      "give": "Devolver {{amount}} a {{name}}",
+      "take": "Receber {{amount}} de {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} salvo · dar {{amount}} a {{name}}",
+      "take": "{{ref}} salvo · receber {{amount}} de {{name}}"
+    },
+    "updated": "{{ref}} atualizado"
   }
 }

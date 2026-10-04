@@ -5,7 +5,6 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -19,24 +18,11 @@ import {
   type PatientPick,
   PatientPicker,
 } from '@/shared/components/PatientPicker/index.ts';
-import type { PickerOption } from '@/shared/components/Picker/index.ts';
-import {
-  type ItemsColumn,
-  ItemsField,
-  ItemsNumberCell,
-  ItemsPickerCell,
-} from '@/shared/forms/ItemsField/index.ts';
+import { SplitRowsField, splitsTotal } from '@/shared/forms/SplitRowsField/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
-import {
-  nextSplitMode,
-  RECEIVE_MODES,
-  type ReceiveFormValues,
-  type ReceiveMode,
-  type ReceiveSplitRow,
-  splitsTotal,
-} from './receive-form.ts';
+import type { ReceiveFormValues } from './receive-form.ts';
 
 const K = PAYMENTS_KEYS.receive;
 
@@ -60,45 +46,6 @@ export interface ReceiveFieldsProps {
   readOnly: boolean;
   onPatient: (patient: PatientPick | null) => void;
   onInvoice: (invoice: OpenInvoice) => void;
-}
-
-/** Cash, UPI, Card — each on its tone's dot. */
-function useModeOptions(): PickerOption[] {
-  const { t } = useTranslation(CLINIC_NS);
-  return RECEIVE_MODES.map((mode) => ({
-    key: mode,
-    label: t(CLINIC_KEYS.paymentModes[mode]),
-    tone: PAYMENT_MODE_TONES[mode],
-  }));
-}
-
-/** The Mode · Amount rows (`payments.md:103`; H:5071): `minmax(0,1fr) 150px` + the ×. */
-function useSplitColumns(): ItemsColumn<ReceiveFormValues, 'splits'>[] {
-  const { t } = useTranslation(PAYMENTS_NS);
-  const modes = useModeOptions();
-  return [
-    {
-      id: 'mode',
-      header: t(K.mode),
-      track: 'minmax(0,1fr)',
-      cell: (row) => (
-        <ItemsPickerCell
-          {...row.bind('mode')}
-          options={modes}
-          placeholder={t(K.mode)}
-          searchable={false}
-          minWidth={180}
-        />
-      ),
-    },
-    {
-      id: 'amount',
-      header: t(K.amountColumn),
-      track: '150px',
-      align: 'end',
-      cell: (row) => <ItemsNumberCell {...row.bind('amount')} money />,
-    },
-  ];
 }
 
 /** "Pick the patient first" / "Nothing due": the inert chip the invoice field shows instead. */
@@ -184,9 +131,7 @@ export function ReceiveFields({
   const patient = field('patientId');
   const reference = field('reference');
   const note = field('note');
-  const columns = useSplitColumns();
   const total = splitsTotal(values.splits);
-  const next = nextSplitMode(values.splits);
   const openCount = invoices?.length ?? 0;
 
   return (
@@ -246,25 +191,12 @@ export function ReceiveFields({
         />
       </DrawerField>
       <DrawerField label={t(K.amount)} required>
-        <ItemsField
+        <SplitRowsField
           control={form.control}
-          name="splits"
           label={t(K.amount)}
-          columns={columns}
+          rows={values.splits}
+          limit={due}
           compact
-          minRows={1}
-          newRow={
-            next
-              ? (): ReceiveSplitRow => ({
-                  mode: next,
-                  amount: due === null ? 0 : Math.max(0, due - total),
-                })
-              : undefined
-          }
-          clearRow={(): ReceiveSplitRow => ({
-            mode: 'upi' satisfies ReceiveMode,
-            amount: 0,
-          })}
           addLabel={t(K.split)}
           total={
             due === null

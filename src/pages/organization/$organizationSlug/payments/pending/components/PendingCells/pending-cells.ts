@@ -44,12 +44,19 @@ export function creditSource(credit: CreditRow, t: TFunction): string {
   return t(K.byHand);
 }
 
-/** The State pill's label: "Open", "Returned", "Received", "Adjusted" — "· Today" once settled today. */
+/**
+ * The State pill's label: "Open", "Returned", "Received", "Adjusted" — a
+ * credit used on a bill names it ("Adjusted · Invoice #785", Q-G9), any other
+ * settled today says so ("Returned · Today").
+ */
 export function creditStateLabel(
-  credit: Pick<CreditRow, 'status' | 'settledAt'>,
+  credit: Pick<CreditRow, 'status' | 'settledAt' | 'settledInvoiceSeq'>,
   t: TFunction,
 ): string {
   const label = t(K.states[credit.status]);
+  if (credit.status === 'used' && credit.settledInvoiceSeq !== null) {
+    return t(K.settledInvoice, { state: label, seq: credit.settledInvoiceSeq });
+  }
   if (credit.settledAt && clinicDateOf(credit.settledAt) === clinicToday()) {
     return t(K.settledToday, { state: label });
   }

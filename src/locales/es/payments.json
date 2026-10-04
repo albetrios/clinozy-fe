@@ -150,7 +150,10 @@
       "advance_given": "Anticipo entregado",
       "loan_to_staff": "Préstamo al personal",
       "other": "Otro"
-    }
+    },
+    "settledInvoice": "{{state}} · Factura #{{seq}}",
+    "adjustedOn": "{{amount}} de {{ref}} aplicados a la factura #{{seq}}",
+    "nothingDue": "{{name}} no tiene nada pendiente para aplicarlo"
   },
   "receive": {
     "title": "Cobrar pago",
@@ -167,8 +170,6 @@
     "pickPatientFirst": "Elige primero al paciente",
     "nothingDue": "Nada pendiente",
     "amount": "Importe cobrado",
-    "mode": "Forma",
-    "amountColumn": "Importe",
     "split": "Dividir · añadir una forma",
     "total": "Total {{total}}",
     "totalDue": "Total {{total}} · pendiente {{due}}",
@@ -251,5 +252,64 @@
     "paidBill": "{{amount}} pagados a {{bill}}",
     "saved": "{{ref}} guardado · cambio registrado",
     "missing": "Indica a quién se pagó y el importe"
+  },
+  "credit": {
+    "title": "Añadir pendiente",
+    "titleEdit": "Editar pendiente",
+    "sub": "Dinero que la clínica debe devolver o cobrar · liquídalo luego desde Pendientes",
+    "subEdit": "Editable mientras esté abierto · los cambios quedan registrados",
+    "steps": {
+      "way": "Sentido",
+      "why": "Por qué"
+    },
+    "way": "Sentido",
+    "who": "Quién",
+    "whoPlaceholder": "Buscar pacientes, contactos o proveedores",
+    "add": "Añadir",
+    "groups": {
+      "patients": "Pacientes",
+      "contacts": "Contactos",
+      "suppliers": "Proveedores y vendedores"
+    },
+    "parties": {
+      "patient": "Paciente · {{id}}",
+      "contact": "Contacto",
+      "contactPhone": "Contacto · {{phone}}",
+      "vendor": "Proveedor de la clínica",
+      "supplier": "Proveedor médico"
+    },
+    "amount": "Importe",
+    "reason": "Motivo",
+    "invoice": "Para la factura",
+    "invoiceHint": "opcional · vincula el saldo a una factura",
+    "noInvoice": "Sin factura",
+    "invoicePaid": "{{bill}} · pagada",
+    "invoiceDue": "{{bill}} · {{due}} pendiente",
+    "settleBy": "Liquidar antes del",
+    "note": "Nota",
+    "notePlaceholder": {
+      "give": "p. ej. Reembolso al mismo ID de UPI",
+      "take": "p. ej. El proveedor lo descontará en la próxima factura"
+    },
+    "problems": {
+      "who": "Elige quién",
+      "amount": "Introduce el importe",
+      "reason": "Elige un motivo",
+      "otherNote": "Añade una nota para «Otro»"
+    },
+    "save": {
+      "give": "Guardar · dar después",
+      "take": "Guardar · recibir después"
+    },
+    "saveEdit": "Guardar cambios",
+    "summary": {
+      "give": "Devolver {{amount}} a {{name}}",
+      "take": "Recibir {{amount}} de {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} guardado · dar {{amount}} a {{name}}",
+      "take": "{{ref}} guardado · recibir {{amount}} de {{name}}"
+    },
+    "updated": "{{ref}} actualizado"
   }
 }

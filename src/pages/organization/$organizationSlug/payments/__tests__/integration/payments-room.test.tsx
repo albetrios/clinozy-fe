@@ -291,6 +291,93 @@ describe('Payments › Pending (KICKOFF §6.9)', () => {
     expect(router.state.location.search).toMatchObject({ direction: ['give'] });
   });
 
+  it('opens Add pending and Edit pending by their routes, and Back closes them', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPaymentsRoutes(`${PENDING}/create?direction=take`);
+    const drawer = await screen.findByTestId('credit-drawer');
+    expect(within(drawer).getByText('Add pending')).toBeInTheDocument();
+    expect(screen.getByTestId('credit-drawer-save')).toHaveTextContent(
+      'Save · take later',
+    );
+    await user.click(screen.getByTestId('credit-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(PENDING));
+    await waitFor(() => expect(screen.queryByTestId('credit-drawer')).toBeNull());
+
+    await router.navigate({ to: `${PENDING}/${ref.pendingCredit(2)}/edit` });
+    expect(await screen.findByText('Edit pending')).toBeInTheDocument();
+    expect(screen.getByTestId('credit-drawer-tag')).toHaveTextContent('CR-2');
+  });
+
+  it('gives back from the row — a stacked drawer with no URL — and the row reads Returned', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPaymentsRoutes(PENDING);
+    await waitFor(() => expect(rows('payments-pending')).toHaveLength(2));
+    expect(
+      within(rowOf('CR-1', 'payments-pending')).getByTestId(
+        'payments-pending-row-action-settle',
+      ),
+    ).toHaveAccessibleName('Got it back');
+    expect(
+      within(rowOf('CR-1', 'payments-pending')).queryByTestId(
+        'payments-pending-row-action-use-on-bill',
+      ),
+    ).toBeNull();
+    const settle = within(rowOf('CR-2', 'payments-pending')).getByTestId(
+      'payments-pending-row-action-settle',
+    );
+    expect(settle).toHaveAccessibleName('Give back');
+    await user.click(settle);
+    const drawer = await screen.findByTestId('settle-credit-drawer');
+    expect(router.state.location.pathname).toBe(PENDING);
+    expect(within(drawer).getByText('Give back')).toBeInTheDocument();
+    await user.click(screen.getByTestId('settle-credit-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        '₹500 given back to Tanvi Shah · Out entry added',
+      ),
+    );
+    await waitFor(() =>
+      expect(rowOf('CR-2', 'payments-pending')).toHaveTextContent('Returned · Today'),
+    );
+  });
+
+  it('uses a give credit on the next bill: "Adjusted · Invoice #772"', async () => {
+    const user = userEvent.setup();
+    renderPaymentsRoutes(PENDING);
+    await waitFor(() => expect(rows('payments-pending')).toHaveLength(2));
+    const use = within(rowOf('CR-2', 'payments-pending')).getByTestId(
+      'payments-pending-row-action-use-on-bill',
+    );
+    expect(use).toHaveAccessibleName('Use on next bill');
+    await user.click(use);
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        '₹500 of CR-2 adjusted on invoice #772',
+      ),
+    );
+    await waitFor(() =>
+      expect(rowOf('CR-2', 'payments-pending')).toHaveTextContent(
+        'Adjusted · Invoice #772',
+      ),
+    );
+  });
+
+  it('keeps Give back from a role without the refund ability (Q-U8)', async () => {
+    // A counsellor writes payments but holds no `refund`.
+    renderPaymentsRoutes(PENDING, { role: 'counsellor' });
+    await waitFor(() => expect(rows('payments-pending')).toHaveLength(2));
+    expect(
+      within(rowOf('CR-2', 'payments-pending')).queryByTestId(
+        'payments-pending-row-action-settle',
+      ),
+    ).toBeNull();
+    expect(
+      within(rowOf('CR-1', 'payments-pending')).getByTestId(
+        'payments-pending-row-action-settle',
+      ),
+    ).toHaveAccessibleName('Got it back');
+  });
+
   it('deletes a credit with the reason confirm, offering Undo', async () => {
     const user = userEvent.setup();
     renderPaymentsRoutes(PENDING);

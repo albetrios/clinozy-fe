@@ -1201,5 +1201,39 @@
     "due": "{{amount}} em aberto",
     "nothingDue": "Nada em aberto",
     "lead": "Lead {{id}} · ainda não é paciente"
+  },
+  "splitRows": {
+    "mode": "Forma",
+    "amount": "Valor"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Devolver",
+      "take": "Recebido de volta"
+    },
+    "sub": {
+      "give": "Para {{name}} · {{reason}} · adiciona uma saída em Pagamentos",
+      "take": "De {{name}} · {{reason}} · adiciona uma entrada em Pagamentos"
+    },
+    "section": {
+      "give": "Como é devolvido",
+      "take": "Como entrou"
+    },
+    "rows": {
+      "give": "Devolvido via",
+      "take": "Recebido como"
+    },
+    "add": "Adicionar outra forma",
+    "total": "Total {{total}} · de {{owed}}",
+    "save": {
+      "give": "Devolver {{amount}}",
+      "take": "Registrar {{amount}}"
+    },
+    "enterAmount": "Informe o valor",
+    "moreThanOwed": "Mais do que os {{amount}} devidos",
+    "done": {
+      "give": "{{amount}} devolvidos a {{name}} · saída adicionada",
+      "take": "{{amount}} recebidos de volta de {{name}} · entrada adicionada"
+    }
   }
 }
