@@ -136,6 +136,7 @@
       "allSections": "打开或关闭所有版块",
       "jumpToSection": "跳转到版块",
       "listSearch": "搜索列表",
+      "leadRows": "下一个或上一个潜在客户（在潜在客户中）",
       "closeDialog": "关闭对话框"
     },
     "orgCreate": {

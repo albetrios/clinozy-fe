@@ -120,6 +120,7 @@
       "allSections": "모든 섹션 열기 또는 닫기",
       "jumpToSection": "섹션으로 이동",
       "listSearch": "목록 검색",
+      "leadRows": "다음 또는 이전 리드 (리드에서)",
       "closeDialog": "대화상자 닫기"
     },
     "emailVerify": {

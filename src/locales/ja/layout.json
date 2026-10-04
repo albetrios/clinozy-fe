@@ -120,6 +120,7 @@
       "allSections": "すべてのセクションを開く・閉じる",
       "jumpToSection": "セクションへ移動",
       "listSearch": "リストを検索",
+      "leadRows": "次または前のリード（リード内）",
       "closeDialog": "ダイアログを閉じる"
     },
     "emailVerify": {

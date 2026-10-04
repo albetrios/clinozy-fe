@@ -120,6 +120,7 @@
       "allSections": "Alle Bereiche öffnen oder schließen",
       "jumpToSection": "Zu einem Bereich springen",
       "listSearch": "Liste durchsuchen",
+      "leadRows": "Nächster oder vorheriger Lead (in Leads)",
       "closeDialog": "Dialog schließen"
     },
     "emailVerify": {

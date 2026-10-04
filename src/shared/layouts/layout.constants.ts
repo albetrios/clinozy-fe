@@ -177,6 +177,7 @@ export const LAYOUT_KEYS = {
       allSections: 'app.shortcuts.allSections',
       jumpToSection: 'app.shortcuts.jumpToSection',
       listSearch: 'app.shortcuts.listSearch',
+      leadRows: 'app.shortcuts.leadRows',
     },
     emailVerify: {
       message: 'app.emailVerify.message',

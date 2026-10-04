@@ -120,6 +120,7 @@
       "allSections": "Abrir ou fechar Todas as seções",
       "jumpToSection": "Ir para uma seção",
       "listSearch": "Pesquisar na lista",
+      "leadRows": "Lead seguinte ou anterior (em Leads)",
       "closeDialog": "Fechar diálogo"
     },
     "emailVerify": {

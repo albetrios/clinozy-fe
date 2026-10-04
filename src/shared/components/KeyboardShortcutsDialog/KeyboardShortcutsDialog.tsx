@@ -34,6 +34,7 @@ export function KeyboardShortcutsDialog() {
     { labelKey: sk.allSections, keys: 'G' },
     { labelKey: sk.jumpToSection, keys: '1–9 · 0' },
     { labelKey: sk.listSearch, keys: '/' },
+    { labelKey: sk.leadRows, keys: 'j · k' },
     { labelKey: sk.closeDialog, keys: 'Esc' },
   ];
 
