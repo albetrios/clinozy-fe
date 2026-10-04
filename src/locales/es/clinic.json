@@ -197,6 +197,14 @@
       "offerRemoved": "{{name}} eliminada",
       "offerPaused": "{{name}} en pausa",
       "offerResumed": "{{name}} activa de nuevo"
+    },
+    "specialties": {
+      "skin": "Piel",
+      "hair": "Cabello",
+      "dental": "Dental",
+      "gynac": "Ginecología",
+      "physio": "Fisio",
+      "general": "General"
     }
   },
   "patients": {
@@ -859,7 +867,51 @@
         "planChanged": "Cambió el plan",
         "other": "Otro"
       }
-    }
+    },
+    "searchOfferings": "Buscar servicios",
+    "single": "Individual",
+    "minPrice": "mín. {{price}}",
+    "added": "{{name}} añadido a las sugerencias de {{first}}",
+    "removed": "{{name}} quitado de las sugerencias",
+    "offeringRemoved": "Servicio eliminado",
+    "info": {
+      "sessions_one": "{{count}} sesión",
+      "sessions_many": "{{count}} sesiones",
+      "sessions_other": "{{count}} sesiones",
+      "visits_one": "{{count}} visita",
+      "visits_many": "{{count}} visitas",
+      "visits_other": "{{count}} visitas",
+      "list": "Lista {{price}}",
+      "lowest": "mínimo {{price}}"
+    },
+    "ideaReasons": {
+      "history": "Idea del historial",
+      "note": "Nota del médico · «{{text}}»",
+      "complaint": "Queja · {{text}}",
+      "visits_one": "{{count}} visita hasta ahora · un paquete ahorra en cada sesión",
+      "visits_many": "{{count}} visitas hasta ahora · un paquete ahorra en cada sesión",
+      "visits_other": "{{count}} visitas hasta ahora · un paquete ahorra en cada sesión",
+      "renew": "Paquete casi agotado · renovar",
+      "first": "Primera visita · empieza con una consulta"
+    },
+    "purchaseKinds": {
+      "medicine": "Medicamento",
+      "item": "Artículo"
+    },
+    "invoiceStatuses": {
+      "paid": "Pagada",
+      "partial": "Pagada en parte",
+      "unpaid": "Pendiente"
+    },
+    "delivery": {
+      "queued": "En cola",
+      "sent": "Enviado",
+      "delivered": "Entregado",
+      "read": "Leído",
+      "failed": "No entregado",
+      "received": "Recibido"
+    },
+    "activityLead": "Prospecto {{id}}"
   },
   "contactEditor": {
     "title": "Editar contacto",
@@ -938,5 +990,185 @@
       "price": "Introduce el precio",
       "added": "Servicio {{name}} añadido"
     }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "Cita",
+      "create": "Nueva cita",
+      "edit": "Cita {{id}}",
+      "reschedule": "Reprogramar {{id}}"
+    },
+    "sub": "Solo se ofrecen horarios libres · las horas pasadas están bloqueadas",
+    "who": {
+      "search": "Busca paciente o prospecto por nombre, teléfono, ID",
+      "searchLabel": "Buscar persona",
+      "useContact": "Usar contacto",
+      "patient": "Paciente",
+      "patientCare": "Paciente · {{care}}",
+      "lead": "Prospecto {{id}} · {{phone}}",
+      "createContact": "+ Crear contacto «{{query}}»",
+      "newContact": "Contacto nuevo · añade el móvil al llegar",
+      "mobile": "Número de móvil",
+      "name": "Nombre",
+      "mobileLabel": "Móvil",
+      "save": "Guardar",
+      "addName": "Añade un nombre",
+      "mobileDigits": "El móvil necesita 10 dígitos"
+    },
+    "links": {
+      "connected": "Prospecto vinculado",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "Prospecto {{id}} · {{source}} · responsable {{owner}}",
+      "movesAtCheckIn": "· pasa a Visitó la clínica al registrar la llegada",
+      "lead": "Prospecto",
+      "leadOption": "Prospecto {{id}}"
+    },
+    "status": {
+      "section": "Estado de la visita",
+      "group": "Estado",
+      "copy": "Copiar",
+      "copyHint": "Copiar · mismo servicio, médico, motivo y notas",
+      "cancelVisit": "Cancelar visita",
+      "cancelHint": "Cancelar esta cita",
+      "cancelledReason": "{{reason}} · hueco liberado · recordatorios detenidos",
+      "cancelledNoReason": "Hueco liberado · recordatorios detenidos",
+      "restore": "Restaurar",
+      "rescheduledConfirm": "Reprogramada · era {{day}} {{time}} · hay que confirmarla de nuevo · al guardar sale un nuevo recordatorio",
+      "rescheduled": "Reprogramada · era {{day}} {{time}} · al guardar sale un nuevo recordatorio",
+      "planReady_one": "Plan listo · {{count}} servicio",
+      "planReady_many": "Plan listo · {{count}} servicios",
+      "planReady_other": "Plan listo · {{count}} servicios",
+      "planNotPrepared": "Plan sin preparar",
+      "planVisit_one": "{{count}} planificado para esta visita",
+      "planVisit_many": "{{count}} planificados para esta visita",
+      "planVisit_other": "{{count}} planificados para esta visita",
+      "planEarlier_one": "{{count}} de visitas anteriores",
+      "planEarlier_many": "{{count}} de visitas anteriores",
+      "planEarlier_other": "{{count}} de visitas anteriores",
+      "planOpen": "abrir sugerencias",
+      "planEmpty": "Aún no hay sugerencias · abre Sugerencias de servicios para prepararlas",
+      "createPatient": "Crear ficha de paciente"
+    },
+    "details": {
+      "title": "Cita",
+      "notFilled": "Aún sin rellenar",
+      "open": "Abrir",
+      "type": "Tipo",
+      "typeGroup": "Tipo de cita",
+      "types": {
+        "consultation": "Consulta",
+        "follow_up": "Seguimiento",
+        "treatment": "Tratamiento",
+        "package_session": "Sesión de paquete",
+        "other": "Otro"
+      },
+      "typeHints": {
+        "consultation": "Primera visita o revisión médica",
+        "follow_up": "Revisión breve tras un tratamiento o receta",
+        "treatment": "Una sola sesión, cobrada en la visita",
+        "package_session": "Usa una sesión de un paquete pagado",
+        "other": "Cualquier cosa que no sea lo anterior"
+      },
+      "typeLines": {
+        "consultation": "La tarifa de consulta se añade a la factura al cobrar",
+        "follow_up": "Normalmente gratis · sin factura salvo que se añada algo",
+        "package_session": "Sin cargo · se usa la sesión {{next}} de {{total}} al completar la visita",
+        "other": "Indica qué es en Notas, abajo"
+      },
+      "treatment": "Tratamiento",
+      "pickTreatment": "Elige un tratamiento",
+      "searchTreatments": "Buscar tratamientos",
+      "common": "Habituales",
+      "fromOfferings": "De los servicios",
+      "package": "Paquete",
+      "packageNext": "Siguiente: sesión {{next}} de {{total}} · válido hasta {{date}}",
+      "packageLeft": "Quedan {{count}}",
+      "noPackage": "{{name}} no tiene ningún paquete activo",
+      "pickContactPackages": "Elige un contacto para ver sus paquetes",
+      "asTreatment": "Reservar como tratamiento",
+      "doctor": "Médico",
+      "pickDoctor": "Elige un médico",
+      "searchDoctors": "Buscar médicos y terapeutas",
+      "length": "Duración",
+      "minutes": "{{minutes}} min",
+      "minutesHint": "{{minutes}} minutos",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Lo que pidió · p. ej. pigmentación en las mejillas",
+      "notes": "Notas",
+      "notesPlaceholder": "Lo que el médico o recepción deban saber"
+    },
+    "slot": {
+      "title": "Fecha y hora",
+      "nextWeek": "Próxima semana",
+      "calendar": "Calendario",
+      "previousMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "step": "Intervalo",
+      "stepOption": "{{minutes}} min",
+      "time": "Hora",
+      "pickDate": "Elige una fecha para ver horarios",
+      "am": "a. m.",
+      "pm": "p. m.",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · libre",
+      "booked": "{{time}} · reservado",
+      "locked": "Bloqueado",
+      "lockedSummary": "{{day}} · {{time}} · bloqueado tras registrar la llegada",
+      "lockedToast": "La fecha y la hora se bloquean cuando el paciente ha llegado"
+    },
+    "notPatient": {
+      "section": "Siguiente paso · ficha de paciente",
+      "title": "Aún no es paciente",
+      "body": "Crea la ficha de paciente para continuar · desbloquea fotos, sugerencias de servicios, opiniones y Completada",
+      "action": "Crear ficha de paciente",
+      "done": "{{name}} ya es paciente · puedes marcar Completada"
+    },
+    "photos": {
+      "title": "Fotos de esta visita",
+      "section": "Fotos de la visita",
+      "locked": "Las fotos se abren cuando el paciente está en la clínica · registra primero su llegada",
+      "checkIn": "Registrar llegada",
+      "album": "Álbum",
+      "albums": {
+        "general": "General",
+        "private": "Privado",
+        "lhr": "LHR"
+      },
+      "upload": "Subir fotos",
+      "add": "Añadir",
+      "open": "Abrir {{name}}",
+      "edit": "Editar detalles",
+      "delete": "Eliminar foto",
+      "count_one": "{{count}} foto · aparece en la ficha de {{first}} bajo esta visita",
+      "count_many": "{{count}} fotos · aparecen en la ficha de {{first}} bajo esta visita",
+      "count_other": "{{count}} fotos · aparecen en la ficha de {{first}} bajo esta visita",
+      "empty": "Haz fotos de antes / después mientras {{first}} está en la clínica · se archivan en esta visita",
+      "attached_one": "{{count}} foto añadida a esta visita",
+      "attached_many": "{{count}} fotos añadidas a esta visita",
+      "attached_other": "{{count}} fotos añadidas a esta visita",
+      "deleteTitle": "¿Eliminar esta foto?",
+      "deleted": "Foto eliminada",
+      "reasons": {
+        "wrongPatient": "Paciente equivocado",
+        "blurry": "Borrosa / repetir",
+        "duplicate": "Duplicada",
+        "other": "Otro"
+      }
+    },
+    "footer": {
+      "pickTime": "Elige una hora",
+      "book": "Reservar {{day}}, {{time}}",
+      "move": "Mover a {{day}}, {{time}}",
+      "saveChanges": "Guardar cambios",
+      "minutes": "{{minutes}} min"
+    },
+    "validation": {
+      "who": "Elige para quién es la cita",
+      "slot": "Elige fecha y hora",
+      "passed": "Esa hora ya pasó · elige un horario futuro",
+      "taken": "Acaba de ocuparse · elige otro horario",
+      "doctor": "Elige un médico"
+    },
+    "copied": "Copiada · elige fecha y hora"
   }
 }

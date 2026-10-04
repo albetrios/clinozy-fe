@@ -7,6 +7,7 @@ import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import { APPOINTMENT_FORM_TEST_IDS } from '@/shared/forms/AppointmentForm/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import {
@@ -191,6 +192,35 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       await screen.findByRole('region', { name: 'Lead details' }),
     ).toBeInTheDocument();
     expect(screen.queryByTestId('lead-drawer-chat')).toBeNull();
+  });
+
+  it('books from the composer: the appointment form stacked over the lead, the URL kept', async () => {
+    const user = userEvent.setup();
+    const { drawer, router } = await openAnaya();
+    await user.click(
+      within(within(drawer).getByTestId('lead-drawer-chat')).getByRole('button', {
+        name: 'Book an appointment',
+      }),
+    );
+    const booking = await screen.findByTestId(APPOINTMENT_FORM_TEST_IDS.createDrawer);
+    const form = await within(booking).findByTestId(APPOINTMENT_FORM_TEST_IDS.form);
+    expect(within(form).getByTestId(APPOINTMENT_FORM_TEST_IDS.whoCard)).toHaveTextContent(
+      'Anaya Desai',
+    );
+    expect(within(form).getByTestId(APPOINTMENT_FORM_TEST_IDS.details)).toHaveAttribute(
+      'data-open',
+      'false',
+    );
+    expect(router.state.location.pathname).toBe(`${LEADS}/${ANAYA}`);
+    await user.click(
+      within(booking).getByTestId(`${APPOINTMENT_FORM_TEST_IDS.createDrawer}-dismiss`),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId(APPOINTMENT_FORM_TEST_IDS.createDrawer),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('lead-drawer')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

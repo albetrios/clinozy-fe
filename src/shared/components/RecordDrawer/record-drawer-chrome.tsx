@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import { cn } from '@/lib/utils.ts';
 import { X } from '@/shared/icons/index.ts';
 
 /**
@@ -22,18 +23,30 @@ export const RECORD_DRAWER_PANEL_CLASS =
   'w-full gap-0 border-s-0 outline-none max-md:shadow-none sm:max-w-none data-[state=open]:animate-drawer-in data-[state=closed]:animate-none';
 
 /**
+ * Where the floating × sits and how it is drawn, per `closeStyle`: the record
+ * drawers' 14px outside the edge, `rounded-xl`, no border (`_patterns.md:30`);
+ * the form drawers' 10px outside, `rounded-lg` with a hairline (H:2742).
+ */
+const FLOATING_CLOSE_CLASS: Record<'record' | 'form', string> = {
+  record: '-start-[3.125rem] rounded-xl text-foreground',
+  form: '-start-[2.875rem] rounded-lg border text-foreground-soft',
+};
+
+/**
  * A drawer's × — the record drawer's, and any drawer frame of the same family
- * (the task drawer). From `md` up it floats 14px outside the drawer's
- * inline-start edge (36×36, `rounded-xl`, the close elevation, popping in
- * after 200ms); on a phone it sits inside the header's inline-end corner
- * (44×44, transparent).
+ * (the task drawer). From `md` up it floats outside the drawer's inline-start
+ * edge (36×36, the close elevation, popping in after 200ms) in the record
+ * drawers' or the form drawers' style (`closeStyle`); on a phone it sits
+ * inside the header's inline-end corner (44×44, transparent).
  */
 export function RecordDrawerClose({
   placement,
+  closeStyle = 'record',
   onClose,
   testId,
 }: {
   placement: 'floating' | 'inside';
+  closeStyle?: 'record' | 'form';
   onClose: () => void;
   testId: string;
 }) {
@@ -61,7 +74,10 @@ export function RecordDrawerClose({
       aria-label={label}
       data-testid={`${testId}-close`}
       data-slot="floating-edge"
-      className="bg-background text-foreground hover:bg-muted animate-pop-in absolute -start-[3.125rem] top-[0.875rem] flex size-9 items-center justify-center rounded-xl transition-colors"
+      className={cn(
+        'bg-background hover:bg-muted animate-pop-in absolute top-[0.875rem] flex size-9 items-center justify-center transition-colors',
+        FLOATING_CLOSE_CLASS[closeStyle],
+      )}
     >
       <X aria-hidden="true" className="size-4.5" />
     </button>

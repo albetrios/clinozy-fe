@@ -13,6 +13,8 @@ export interface DrawerChipOption<T extends string> {
   tone?: Tone;
   /** A 13px glyph before the label (the lead sources, H:1770). */
   icon?: AppIcon;
+  /** The chip's hint on hover — "20 minutes", "First visit or doctor review" (the design's `title`). */
+  hint?: string;
 }
 
 /**
@@ -158,6 +160,7 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
             data-slot={variant === 'button' ? 'button' : 'pill'}
             aria-pressed={picked}
             disabled={disabled}
+            title={option.hint}
             data-testid={testId ? `${testId}-${option.value}` : undefined}
             onClick={() => toggle(option.value)}
             className={cn(

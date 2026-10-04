@@ -66,6 +66,53 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   addNamed: 'offeringSuggestions.addNamed',
   addHint: 'offeringSuggestions.addHint',
   addOffering: 'offeringSuggestions.addOffering',
+  /** "Add offering"'s list (`addDD`, H:4373): its search, a row's "Single" or "<n> sessions" and " · min <₹>". */
+  searchOfferings: 'offeringSuggestions.searchOfferings',
+  single: 'offeringSuggestions.single',
+  minPrice: 'offeringSuggestions.minPrice',
+  /** The add toast (H:4336) and the remove toast with its Undo (H:4353). */
+  added: 'offeringSuggestions.added',
+  removed: 'offeringSuggestions.removed',
+  /** A line whose offering is gone. */
+  offeringRemoved: 'offeringSuggestions.offeringRemoved',
+  /** A line's details tooltip (H:4351): "<category> · <n> sessions · List <₹> · lowest <₹> · <why>". */
+  info: {
+    sessions: 'offeringSuggestions.info.sessions',
+    visits: 'offeringSuggestions.info.visits',
+    list: 'offeringSuggestions.info.list',
+    lowest: 'offeringSuggestions.info.lowest',
+  },
+  /** An idea's tooltip (H:4355–4366): "Idea from history · <why> · <category> · <n> sessions". */
+  ideaReasons: {
+    history: 'offeringSuggestions.ideaReasons.history',
+    note: 'offeringSuggestions.ideaReasons.note',
+    complaint: 'offeringSuggestions.ideaReasons.complaint',
+    visits: 'offeringSuggestions.ideaReasons.visits',
+    renew: 'offeringSuggestions.ideaReasons.renew',
+    first: 'offeringSuggestions.ideaReasons.first',
+  },
+  /** A purchase line with no offering: a medicine or another item (H:4369). */
+  purchaseKinds: {
+    medicine: 'offeringSuggestions.purchaseKinds.medicine',
+    item: 'offeringSuggestions.purchaseKinds.item',
+  },
+  /** A purchase's invoice pill (`pyStatus`, H:3633). */
+  invoiceStatuses: {
+    paid: 'offeringSuggestions.invoiceStatuses.paid',
+    partial: 'offeringSuggestions.invoiceStatuses.partial',
+    unpaid: 'offeringSuggestions.invoiceStatuses.unpaid',
+  },
+  /** A message's status in "Contact activity" (H:4372). */
+  delivery: {
+    queued: 'offeringSuggestions.delivery.queued',
+    sent: 'offeringSuggestions.delivery.sent',
+    delivered: 'offeringSuggestions.delivery.delivered',
+    read: 'offeringSuggestions.delivery.read',
+    failed: 'offeringSuggestions.delivery.failed',
+    received: 'offeringSuggestions.delivery.received',
+  },
+  /** "Contact activity · Lead #<seq> · <status>". */
+  activityLead: 'offeringSuggestions.activityLead',
   purchasesTitle: 'offeringSuggestions.purchasesTitle',
   /** "<n> lines · <₹> paid so far". */
   purchasesSummary: 'offeringSuggestions.purchasesSummary',

@@ -16,6 +16,7 @@ import {
 import { notify } from '@/shared/notify/index.ts';
 
 import {
+  useActivePackages,
   useAppointment,
   useAppointmentDaySummaries,
   useAppointmentList,
@@ -23,11 +24,16 @@ import {
   useAppointmentSlotLabel,
   useAvailableSlots,
   useBookableStaff,
+  useBookingPerson,
   useCancelAppointment,
+  useConnectedLeads,
   useCreateAppointment,
+  useDeleteVisitPhoto,
   useRestoreAppointment,
+  useRestoreVisitPhoto,
   useSetAppointmentStatus,
   useUpdateAppointment,
+  useVisitPhotos,
   withAppointmentStatus,
 } from './useAppointments.ts';
 
@@ -338,5 +344,73 @@ describe('cancel and restore', () => {
       'Appointment restored · reminder goes out again',
     );
     expect(statusOf(2858)).toBe('scheduled');
+  });
+});
+
+describe('the appointment form’s reads and the visit’s photos', () => {
+  const dharti = () =>
+    clinicFixtures.patients.snapshot((row) => row.firstName === 'Dharti')[0]?.id ?? '';
+
+  it('reads the prefill’s person, their leads, a patient’s packages and a visit’s photos', async () => {
+    const patientId = dharti();
+    const { result } = renderHook(
+      () => ({
+        person: useBookingPerson(patientId),
+        leads: useConnectedLeads({ patientId, leadId: null, phone: null }),
+        packages: useActivePackages(patientId),
+        photos: useVisitPhotos(ref.appointment(2790)),
+      }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.photos.data).toBeDefined());
+    await waitFor(() => expect(result.current.packages.data).toBeDefined());
+    await waitFor(() => expect(result.current.leads.data).toBeDefined());
+    await waitFor(() => expect(result.current.person.data).toBeDefined());
+    expect(result.current.person.data).toMatchObject({ kind: 'patient', patientId });
+    expect(result.current.packages.data?.length).toBeGreaterThan(0);
+    expect(result.current.photos.data).toHaveLength(3);
+  });
+
+  it('stays idle without a person, a patient or a visit', () => {
+    const { result } = renderHook(
+      () => ({
+        person: useBookingPerson(undefined),
+        leads: useConnectedLeads(null),
+        packages: useActivePackages(null),
+        photos: useVisitPhotos(null),
+      }),
+      { wrapper },
+    );
+    expect(result.current.person.fetchStatus).toBe('idle');
+    expect(result.current.leads.fetchStatus).toBe('idle');
+    expect(result.current.packages.fetchStatus).toBe('idle');
+    expect(result.current.photos.fetchStatus).toBe('idle');
+  });
+
+  it('deletes a visit photo, and its Undo brings it back', async () => {
+    const visit = ref.appointment(2790);
+    const { result } = renderHook(
+      () => ({
+        photos: useVisitPhotos(visit),
+        remove: useDeleteVisitPhoto(),
+        restore: useRestoreVisitPhoto(),
+      }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.photos.data).toHaveLength(3));
+    const photo = result.current.photos.data?.[0];
+    if (!photo) throw new Error('no photo');
+    await act(async () => {
+      await result.current.remove.mutateAsync({
+        id: photo.id,
+        reason: 'duplicate',
+        note: null,
+      });
+    });
+    await waitFor(() => expect(result.current.photos.data).toHaveLength(2));
+    await act(async () => {
+      await result.current.restore.mutateAsync(photo.id);
+    });
+    await waitFor(() => expect(result.current.photos.data).toHaveLength(3));
   });
 });

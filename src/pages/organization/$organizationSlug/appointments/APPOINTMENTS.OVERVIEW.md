@@ -9,11 +9,15 @@ need Edit, Therapists read only (Q-A16).
 
 A layout over two URL-driven dialogs (D24, `S:26–29`): `create/` (New appointment) and
 `$appointmentId/` (the appointment form — show is edit) render nothing; this page reads the URL
-(`useAppointmentsDialogRoute`) and opens the form over itself (the form lands with L-38).
-`/appointments/$appointmentId/edit` is a `@/app/routes/routeTree.tsx` redirect to the drawer, search kept. A
-dead id stays on the page with "Appointment not found · it may have been deleted" (`S:115`);
-a drawer closes to the referrer `from` (allow-listed rooms, A-P1) or back to the page with the
-page's own params.
+(`useAppointmentsDialogRoute`) and opens the shared appointment form over itself
+(`@/shared/forms/AppointmentForm/`, L-38): `create/` in New mode — a chat or task `source`
+starts step 1 collapsed — and `$appointmentId/` in Edit or Reschedule, the id passed before the
+booking loads so the same drawer fills in. Copy opens `create/?copyOf=`, a chat's
+"Appointment #…" chip that booking. `/appointments/$appointmentId/edit` is a
+`@/app/routes/routeTree.tsx` redirect to the drawer, search kept. A dead id stays on the page
+with "Appointment not found · it may have been deleted" (`S:115`); a drawer closes to the
+referrer `from` (allow-listed rooms, A-P1) or back to the page with the page's own params — a
+new booking moves the page's `date` to its day (H:6051, D28).
 
 The URL (`appointments.search.ts`, D27): `view` — Agenda (default) · Day · Week · Month, Week
 rendering Day on a phone with the URL replaced (`useAppointmentsView`); `date` (the Agenda's one

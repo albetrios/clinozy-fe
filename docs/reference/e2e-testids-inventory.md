@@ -611,3 +611,33 @@ header is its own row (`role="row"`, `data-slot="data-table-group"`) between the
 | `appointments-week-day`                                                     | A Week day header (`data-date`) — opens the day in Day                     | `components/AppointmentsWeek/`         |
 | `appointments-month-cell` · `appointments-month-more`                       | A Month cell (`data-date`) · its "+<n> more"                               | `components/AppointmentsMonth/`        |
 | `appointments-month-popover` · `appointments-month-open-day`                | The Month day popover (`role="dialog"`) · its "Open day"                   | `components/AppointmentsMonth/`        |
+
+## Appointment form (shared, launch L-38)
+
+`shared/forms/AppointmentForm/` on the record drawer: `new-appointment-drawer` (New, a stacked
+booking) or `appointment-drawer` (Edit, Reschedule), with the drawer's derived ids (`<drawer>-title`,
+`-close`, `-save` — `data-incomplete` while who, date or time is missing — `-dismiss`, `-summary`,
+`-main`, `-aside`). The type, length and status chips carry `<id>-<value>`; the treatment, package
+and doctor pickers the shared picker ids; Cancel visit and Delete photo the shared reason confirm.
+
+| Test ID                                                                                | Element                                                                           | Source                      |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------- |
+| `appointment-form`                                                                     | The form's sections (a size container — under 520px the fields stack)             | `AppointmentForm.tsx`       |
+| `appointment-form-who-search` · `-who-hit` · `-who-create`                             | Person search · one hit · "+ Create contact “<query>”"                            | `WhoSection.tsx`            |
+| `appointment-form-who-card` · `-who-mobile`                                            | The person's card · a new contact's "+91" mobile                                  | `WhoSection.tsx`            |
+| `appointment-form-who-edit` · `-who-edit-name` · `-who-edit-mobile` · `-who-edit-save` | The inline Name · Mobile editor ("Edit" on the contact card) and its Save         | `WhoSection.tsx`            |
+| `appointment-form-connected-lead` · `appointment-form-lead-option`                     | A "Connected lead" chip · a "Lead" radio (two or more open leads)                 | `WhoSection.tsx`            |
+| `appointment-form-status` · `-status-<status>` · `-status-hint`                        | Visit status (Edit): the section · one tile (`data-step`) · the hint line         | `VisitStatusSection.tsx`    |
+| `appointment-form-cancelled` · `-restore` · `-rescheduled`                             | Cancelled banner · its Restore · the "Rescheduled · was …" note                   | `VisitStatusSection.tsx`    |
+| `appointment-form-plan` · `-copy` · `-rebook` · `-cancel-visit`                        | Plan flag · Copy (Rebook for a No-show) · Cancel visit                            | `VisitStatusSection.tsx`    |
+| `appointment-form-details` · `-details-toggle`                                         | Step 1 Appointment (`data-open`) · its head                                       | `AppointmentFormBlocks.tsx` |
+| `appointment-form-type` · `-treatment` · `-package` · `-package-as-treatment`          | Type chips · treatment picker · package radios · "Book as treatment"              | `AppointmentDetails.tsx`    |
+| `appointment-form-doctor` · `-length` · `-reason` · `-notes`                           | Doctor picker · length chips · Reason · Notes                                     | `AppointmentDetails.tsx`    |
+| `appointment-form-slot` · `-slot-toggle`                                               | Step 2 Date & time (`data-open`; locked after check-in) · its head                | `AppointmentFormBlocks.tsx` |
+| `appointment-form-quick-<today\|tomorrow\|next-week>`                                  | Quick dates (`aria-pressed`)                                                      | `DateTimeStep.tsx`          |
+| `appointment-form-calendar` · `-calendar-day` · `-calendar-previous` · `-next`         | Month calendar · one day (`data-day`, `aria-pressed`) · the month arrows          | `DateTimeStep.tsx`          |
+| `appointment-form-slot-step` · `-slot-hour` · `-slot-time`                             | "30 min" · "15 min" · one hour row · one start (`data-time`; disabled when taken) | `DateTimeStep.tsx`          |
+| `appointment-form-not-patient` · `-create-patient`                                     | Step 3 "Not a patient yet" · "Create patient record" (stacks `patient-quick-add`) | `PatientSections.tsx`       |
+| `appointment-form-photos` · `-photos-check-in` · `-photos-upload`                      | Visit photos · "Check in now" · "Upload photos"                                   | `PatientSections.tsx`       |
+| `appointment-form-photo` · `appointment-form-photo-delete`                             | One photo tile · its Delete                                                       | `PatientSections.tsx`       |
+| `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                               | `AppointmentForm.tsx`       |

@@ -23,6 +23,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import {
+  AppointmentForm,
+  type AppointmentFormPrefill,
+  leadBookingPrefill,
+} from '@/shared/forms/AppointmentForm/index.ts';
 import { useThread } from '@/shared/hooks/useThread/index.ts';
 import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -52,6 +57,12 @@ export interface LeadDrawerProps {
   people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'staff' | 'viewer'>;
   canEdit: boolean;
   canDelete: boolean;
+  /**
+   * The composer's "Book an appointment" — the member may create
+   * appointments: the appointment form opens stacked over the drawer, the URL
+   * staying `/leads/$leadId` (KICKOFF §6.3, A-L7).
+   */
+  canBook?: boolean;
   onConvert?: () => void;
   /** The person's contact card actions — "+ Lead", "+ Appointment", "+ Patient", the file. */
   contactActions?: ContactCardActions;
@@ -139,6 +150,7 @@ export function LeadDrawer({
   people,
   canEdit,
   canDelete,
+  canBook = false,
   onConvert,
   contactActions,
   onClose,
@@ -159,6 +171,7 @@ export function LeadDrawer({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const thread = useThread({ kind: 'lead', leadId: lead.id });
   const close = () => guard.confirmDiscard(onClose);
+  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
 
   const style = {
     '--lead-total': `${widths.total}px`,
@@ -177,6 +190,9 @@ export function LeadDrawer({
           source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
         }),
       }}
+      onBookAppointment={
+        canBook ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason)) : undefined
+      }
     />
   );
   const details = (
@@ -301,6 +317,12 @@ export function LeadDrawer({
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
       {guard.guardDialog}
+      <AppointmentForm
+        open={booking !== null}
+        mode="create"
+        prefill={booking ?? undefined}
+        onClose={() => setBooking(null)}
+      />
     </DialogPrimitive.Root>
   );
 }

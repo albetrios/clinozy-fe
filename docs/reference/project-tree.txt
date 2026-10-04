@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1283 src files · ~675 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1306 src files · ~682 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1077,6 +1077,7 @@ clinozy-fe/
 │   │   │   │   │   ├── organization.fixtures.ts
 │   │   │   │   │   ├── patient-records.fixtures.ts
 │   │   │   │   │   ├── patients.fixtures.ts
+│   │   │   │   │   ├── plan-server.fixtures.ts
 │   │   │   │   │   ├── refs.fixtures.ts
 │   │   │   │   │   ├── staff.fixtures.ts
 │   │   │   │   │   ├── stock.fixtures.ts
@@ -1114,6 +1115,8 @@ clinozy-fe/
 │   │   │   │   ├── offerings-pricing.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
+│   │   │   │   ├── plan-api.ts
+│   │   │   │   ├── plan-contracts.ts
 │   │   │   │   ├── preferences-api.ts
 │   │   │   │   ├── presence-api.ts
 │   │   │   │   ├── task-views.ts
@@ -1121,7 +1124,7 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [30 test files]
+│   │   │   │   └── [31 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1569,6 +1572,7 @@ clinozy-fe/
 │   │   │   │   ├── OfferingSuggestions.tsx
 │   │   │   │   ├── SuggestionRows.tsx
 │   │   │   │   ├── SuggestionTables.tsx
+│   │   │   │   ├── use-plan-card.ts
 │   │   │   │   └── [2 test files]
 │   │   │   ├── OfflineIndicator/
 │   │   │   │   ├── index.ts
@@ -1878,6 +1882,23 @@ clinozy-fe/
 │   │   │   ├── rate-limit.ts
 │   │   │   └── [6 test files]
 │   │   ├── forms/
+│   │   │   ├── AppointmentForm/
+│   │   │   │   ├── appointment-form-model.ts
+│   │   │   │   ├── appointment-form-widths.ts
+│   │   │   │   ├── appointment-form-words.ts
+│   │   │   │   ├── appointment-form.constants.ts
+│   │   │   │   ├── AppointmentDetails.tsx
+│   │   │   │   ├── AppointmentForm.tsx
+│   │   │   │   ├── AppointmentFormBlocks.tsx
+│   │   │   │   ├── AppointmentStep.tsx
+│   │   │   │   ├── DateTimeStep.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── PatientSections.tsx
+│   │   │   │   ├── use-appointment-form-state.ts
+│   │   │   │   ├── use-appointment-save.ts
+│   │   │   │   ├── VisitStatusSection.tsx
+│   │   │   │   ├── WhoSection.tsx
+│   │   │   │   └── [4 test files]
 │   │   │   ├── AuthForm/
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── AuthAutoGooglePending/
@@ -2144,6 +2165,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatients.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── usePlan/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePlan.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── usePreferences/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePreferences.ts
@@ -2217,6 +2242,10 @@ clinozy-fe/
 │   │   │   ├── useViewportTier/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useViewportTier.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useViewportWidth/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useViewportWidth.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useWebhookEvents/
 │   │   │   │   ├── index.ts

@@ -236,6 +236,7 @@ export function LeadsPage() {
             viewer={state.viewer}
             canEdit={access.can('leads', 'edit')}
             canDelete={access.can('leads', 'delete')}
+            canBook={access.can('appointments', 'create')}
             pane={pane}
             onPaneChange={setPane}
             onClose={closeDrawer}

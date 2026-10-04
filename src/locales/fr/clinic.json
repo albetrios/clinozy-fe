@@ -197,6 +197,14 @@
       "offerRemoved": "{{name}} supprimée",
       "offerPaused": "{{name}} en pause",
       "offerResumed": "{{name}} de nouveau en cours"
+    },
+    "specialties": {
+      "skin": "Peau",
+      "hair": "Cheveux",
+      "dental": "Dentaire",
+      "gynac": "Gynécologie",
+      "physio": "Kiné",
+      "general": "Général"
     }
   },
   "patients": {
@@ -859,7 +867,51 @@
         "planChanged": "Plan modifié",
         "other": "Autre"
       }
-    }
+    },
+    "searchOfferings": "Rechercher des prestations",
+    "single": "À l’unité",
+    "minPrice": "min. {{price}}",
+    "added": "{{name}} ajouté aux suggestions de {{first}}",
+    "removed": "{{name}} retiré des suggestions",
+    "offeringRemoved": "Prestation supprimée",
+    "info": {
+      "sessions_one": "{{count}} séance",
+      "sessions_many": "{{count}} séances",
+      "sessions_other": "{{count}} séances",
+      "visits_one": "{{count}} visite",
+      "visits_many": "{{count}} visites",
+      "visits_other": "{{count}} visites",
+      "list": "Prix catalogue {{price}}",
+      "lowest": "minimum {{price}}"
+    },
+    "ideaReasons": {
+      "history": "Idée tirée de l’historique",
+      "note": "Note du médecin · « {{text}} »",
+      "complaint": "Motif de plainte · {{text}}",
+      "visits_one": "{{count}} visite jusqu’ici · un forfait fait économiser à chaque séance",
+      "visits_many": "{{count}} visites jusqu’ici · un forfait fait économiser à chaque séance",
+      "visits_other": "{{count}} visites jusqu’ici · un forfait fait économiser à chaque séance",
+      "renew": "Forfait presque épuisé · renouveler",
+      "first": "Première visite · commencer par une consultation"
+    },
+    "purchaseKinds": {
+      "medicine": "Médicament",
+      "item": "Article"
+    },
+    "invoiceStatuses": {
+      "paid": "Payée",
+      "partial": "Payée en partie",
+      "unpaid": "À régler"
+    },
+    "delivery": {
+      "queued": "En file",
+      "sent": "Envoyé",
+      "delivered": "Distribué",
+      "read": "Lu",
+      "failed": "Non distribué",
+      "received": "Reçu"
+    },
+    "activityLead": "Prospect {{id}}"
   },
   "contactEditor": {
     "title": "Modifier le contact",
@@ -938,5 +990,185 @@
       "price": "Saisissez le prix",
       "added": "Prestation {{name}} ajoutée"
     }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "Rendez-vous",
+      "create": "Nouveau rendez-vous",
+      "edit": "Rendez-vous {{id}}",
+      "reschedule": "Déplacer {{id}}"
+    },
+    "sub": "Seuls les créneaux libres sont proposés · les heures passées sont verrouillées",
+    "who": {
+      "search": "Rechercher un patient ou un prospect par nom, téléphone, ID",
+      "searchLabel": "Rechercher une personne",
+      "useContact": "Utiliser le contact",
+      "patient": "Patient",
+      "patientCare": "Patient · {{care}}",
+      "lead": "Prospect {{id}} · {{phone}}",
+      "createContact": "+ Créer le contact « {{query}} »",
+      "newContact": "Nouveau contact · ajoutez le mobile à l’arrivée",
+      "mobile": "Numéro de mobile",
+      "name": "Nom",
+      "mobileLabel": "Mobile",
+      "save": "Enregistrer",
+      "addName": "Ajoutez un nom",
+      "mobileDigits": "Le mobile doit compter 10 chiffres"
+    },
+    "links": {
+      "connected": "Prospect lié",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "Prospect {{id}} · {{source}} · responsable {{owner}}",
+      "movesAtCheckIn": "· passe à « Clinique visitée » à l’arrivée",
+      "lead": "Prospect",
+      "leadOption": "Prospect {{id}}"
+    },
+    "status": {
+      "section": "Statut de la visite",
+      "group": "Statut",
+      "copy": "Copier",
+      "copyHint": "Copier · même prestation, médecin, motif et notes",
+      "cancelVisit": "Annuler la visite",
+      "cancelHint": "Annuler ce rendez-vous",
+      "cancelledReason": "{{reason}} · créneau libéré · rappels arrêtés",
+      "cancelledNoReason": "Créneau libéré · rappels arrêtés",
+      "restore": "Restaurer",
+      "rescheduledConfirm": "Déplacé · était le {{day}} à {{time}} · à confirmer à nouveau · un nouveau rappel part à l’enregistrement",
+      "rescheduled": "Déplacé · était le {{day}} à {{time}} · un nouveau rappel part à l’enregistrement",
+      "planReady_one": "Plan prêt · {{count}} prestation",
+      "planReady_many": "Plan prêt · {{count}} prestations",
+      "planReady_other": "Plan prêt · {{count}} prestations",
+      "planNotPrepared": "Plan non préparé",
+      "planVisit_one": "{{count}} prévue pour cette visite",
+      "planVisit_many": "{{count}} prévues pour cette visite",
+      "planVisit_other": "{{count}} prévues pour cette visite",
+      "planEarlier_one": "{{count}} de visites précédentes",
+      "planEarlier_many": "{{count}} de visites précédentes",
+      "planEarlier_other": "{{count}} de visites précédentes",
+      "planOpen": "ouvrir les suggestions",
+      "planEmpty": "Rien de suggéré · ouvrez les suggestions de prestations pour préparer",
+      "createPatient": "Créer le dossier patient"
+    },
+    "details": {
+      "title": "Rendez-vous",
+      "notFilled": "Pas encore rempli",
+      "open": "Ouvrir",
+      "type": "Type",
+      "typeGroup": "Type de rendez-vous",
+      "types": {
+        "consultation": "Consultation",
+        "follow_up": "Suivi",
+        "treatment": "Soin",
+        "package_session": "Séance de forfait",
+        "other": "Autre"
+      },
+      "typeHints": {
+        "consultation": "Première visite ou bilan médical",
+        "follow_up": "Bref contrôle après un soin ou une ordonnance",
+        "treatment": "Une séance unique, facturée à la visite",
+        "package_session": "Utilise une séance d’un forfait payé",
+        "other": "Tout ce qui n’entre pas dans les cas ci-dessus"
+      },
+      "typeLines": {
+        "consultation": "Les honoraires de consultation sont ajoutés à la facture au paiement",
+        "follow_up": "Généralement gratuit · pas de facture sauf ajout",
+        "package_session": "Sans frais · la séance {{next}} sur {{total}} est utilisée quand la visite est terminée",
+        "other": "Précisez dans les notes ci-dessous"
+      },
+      "treatment": "Soin",
+      "pickTreatment": "Choisir un soin",
+      "searchTreatments": "Rechercher des soins",
+      "common": "Courants",
+      "fromOfferings": "Parmi les prestations",
+      "package": "Forfait",
+      "packageNext": "Prochaine : séance {{next}} sur {{total}} · valable jusqu’au {{date}}",
+      "packageLeft": "{{count}} restantes",
+      "noPackage": "{{name}} n’a aucun forfait actif",
+      "pickContactPackages": "Choisissez un contact pour voir ses forfaits",
+      "asTreatment": "Réserver comme soin",
+      "doctor": "Médecin",
+      "pickDoctor": "Choisir un médecin",
+      "searchDoctors": "Rechercher des médecins et thérapeutes",
+      "length": "Durée",
+      "minutes": "{{minutes}} min",
+      "minutesHint": "{{minutes}} minutes",
+      "reason": "Motif",
+      "reasonPlaceholder": "Ce qui a été demandé · ex. pigmentation sur les joues",
+      "notes": "Notes",
+      "notesPlaceholder": "Ce que le médecin ou l’accueil doivent savoir"
+    },
+    "slot": {
+      "title": "Date et heure",
+      "nextWeek": "Semaine prochaine",
+      "calendar": "Calendrier",
+      "previousMonth": "Mois précédent",
+      "nextMonth": "Mois suivant",
+      "step": "Pas des créneaux",
+      "stepOption": "{{minutes}} min",
+      "time": "Heure",
+      "pickDate": "Choisissez une date pour voir les heures",
+      "am": "AM",
+      "pm": "PM",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · libre",
+      "booked": "{{time}} · réservé",
+      "locked": "Verrouillé",
+      "lockedSummary": "{{day}} · {{time}} · verrouillé après l’arrivée",
+      "lockedToast": "La date et l’heure sont verrouillées une fois le patient arrivé"
+    },
+    "notPatient": {
+      "section": "Étape suivante · dossier patient",
+      "title": "Pas encore patient",
+      "body": "Créez le dossier patient pour continuer · débloque les photos, les suggestions de prestations, les avis et « Terminé »",
+      "action": "Créer le dossier patient",
+      "done": "{{name}} est maintenant patient · vous pouvez marquer « Terminé »"
+    },
+    "photos": {
+      "title": "Photos de cette visite",
+      "section": "Photos de la visite",
+      "locked": "Les photos s’ouvrent quand le patient est à la clinique · enregistrez d’abord son arrivée",
+      "checkIn": "Enregistrer l’arrivée",
+      "album": "Album",
+      "albums": {
+        "general": "Général",
+        "private": "Privé",
+        "lhr": "LHR"
+      },
+      "upload": "Importer des photos",
+      "add": "Ajouter",
+      "open": "Ouvrir {{name}}",
+      "edit": "Modifier les détails",
+      "delete": "Supprimer la photo",
+      "count_one": "{{count}} photo · visible dans le dossier de {{first}} sous cette visite",
+      "count_many": "{{count}} photos · visibles dans le dossier de {{first}} sous cette visite",
+      "count_other": "{{count}} photos · visibles dans le dossier de {{first}} sous cette visite",
+      "empty": "Prenez des photos avant / après pendant que {{first}} est à la clinique · elles sont classées sous cette visite",
+      "attached_one": "{{count}} photo ajoutée à cette visite",
+      "attached_many": "{{count}} photos ajoutées à cette visite",
+      "attached_other": "{{count}} photos ajoutées à cette visite",
+      "deleteTitle": "Supprimer cette photo ?",
+      "deleted": "Photo supprimée",
+      "reasons": {
+        "wrongPatient": "Mauvais patient",
+        "blurry": "Floue / à refaire",
+        "duplicate": "Doublon",
+        "other": "Autre"
+      }
+    },
+    "footer": {
+      "pickTime": "Choisir une heure",
+      "book": "Réserver {{day}}, {{time}}",
+      "move": "Déplacer au {{day}}, {{time}}",
+      "saveChanges": "Enregistrer les modifications",
+      "minutes": "{{minutes}} min"
+    },
+    "validation": {
+      "who": "Choisissez pour qui est le rendez-vous",
+      "slot": "Choisissez une date et une heure",
+      "passed": "Cette heure est passée · choisissez un créneau à venir",
+      "taken": "Créneau tout juste pris · choisissez-en un autre",
+      "doctor": "Choisissez un médecin"
+    },
+    "copied": "Copié · choisissez une date et une heure"
   }
 }

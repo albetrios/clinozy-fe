@@ -299,6 +299,15 @@ export const CLINIC_KEYS = {
       lhr: 'offerings.categories.lhr',
       product: 'offerings.categories.product',
     },
+    /** The stored specialties (`OF_SPECS`, H:3547; Q-O6) — the booking's "From offerings" rows. */
+    specialties: {
+      skin: 'offerings.specialties.skin',
+      hair: 'offerings.specialties.hair',
+      dental: 'offerings.specialties.dental',
+      gynac: 'offerings.specialties.gynac',
+      physio: 'offerings.specialties.physio',
+      general: 'offerings.specialties.general',
+    },
     offerKinds: {
       percent: 'offerings.offerKinds.percent',
       amount: 'offerings.offerKinds.amount',

@@ -197,6 +197,14 @@
       "offerRemoved": "تمت إزالة {{name}}",
       "offerPaused": "تم إيقاف {{name}} مؤقتًا",
       "offerResumed": "{{name}} سارٍ من جديد"
+    },
+    "specialties": {
+      "skin": "الجلدية",
+      "hair": "الشعر",
+      "dental": "الأسنان",
+      "gynac": "النسائية",
+      "physio": "العلاج الطبيعي",
+      "general": "عام"
     }
   },
   "patients": {
@@ -886,7 +894,60 @@
         "planChanged": "تغيّرت الخطة",
         "other": "أخرى"
       }
-    }
+    },
+    "searchOfferings": "البحث في الخدمات",
+    "single": "مفردة",
+    "minPrice": "الحد الأدنى {{price}}",
+    "added": "تمت إضافة {{name}} إلى اقتراحات {{first}}",
+    "removed": "تمت إزالة {{name}} من الاقتراحات",
+    "offeringRemoved": "تمت إزالة الخدمة",
+    "info": {
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "جلسة واحدة",
+      "sessions_two": "جلستان",
+      "sessions_few": "{{count}} جلسات",
+      "sessions_many": "{{count}} جلسة",
+      "sessions_other": "{{count}} جلسة",
+      "visits_zero": "لا زيارات",
+      "visits_one": "زيارة واحدة",
+      "visits_two": "زيارتان",
+      "visits_few": "{{count}} زيارات",
+      "visits_many": "{{count}} زيارة",
+      "visits_other": "{{count}} زيارة",
+      "list": "السعر المعلن {{price}}",
+      "lowest": "الأدنى {{price}}"
+    },
+    "ideaReasons": {
+      "history": "فكرة من السجل",
+      "note": "ملاحظة الطبيب · «{{text}}»",
+      "complaint": "الشكوى · {{text}}",
+      "visits_zero": "لا زيارات حتى الآن · الباقة توفّر في كل جلسة",
+      "visits_one": "زيارة واحدة حتى الآن · الباقة توفّر في كل جلسة",
+      "visits_two": "زيارتان حتى الآن · الباقة توفّر في كل جلسة",
+      "visits_few": "{{count}} زيارات حتى الآن · الباقة توفّر في كل جلسة",
+      "visits_many": "{{count}} زيارة حتى الآن · الباقة توفّر في كل جلسة",
+      "visits_other": "{{count}} زيارة حتى الآن · الباقة توفّر في كل جلسة",
+      "renew": "الباقة على وشك النفاد · جدّدها",
+      "first": "الزيارة الأولى · ابدأ باستشارة"
+    },
+    "purchaseKinds": {
+      "medicine": "دواء",
+      "item": "منتج"
+    },
+    "invoiceStatuses": {
+      "paid": "مدفوعة",
+      "partial": "مدفوعة جزئيًا",
+      "unpaid": "مستحقة"
+    },
+    "delivery": {
+      "queued": "في الانتظار",
+      "sent": "أُرسلت",
+      "delivered": "وصلت",
+      "read": "قُرئت",
+      "failed": "لم تصل",
+      "received": "مستلمة"
+    },
+    "activityLead": "عميل محتمل {{id}}"
   },
   "contactEditor": {
     "title": "تعديل جهة الاتصال",
@@ -965,5 +1026,200 @@
       "price": "أدخل السعر",
       "added": "تمت إضافة الخدمة {{name}}"
     }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "موعد",
+      "create": "موعد جديد",
+      "edit": "الموعد {{id}}",
+      "reschedule": "تغيير موعد {{id}}"
+    },
+    "sub": "تُعرض الأوقات المتاحة فقط · الأوقات الماضية مقفلة",
+    "who": {
+      "search": "ابحث عن مريض أو عميل محتمل بالاسم أو الهاتف أو المعرّف",
+      "searchLabel": "البحث عن شخص",
+      "useContact": "استخدام جهة الاتصال",
+      "patient": "مريض",
+      "patientCare": "مريض · {{care}}",
+      "lead": "عميل محتمل {{id}} · {{phone}}",
+      "createContact": "+ إنشاء جهة اتصال «{{query}}»",
+      "newContact": "جهة اتصال جديدة · أضف الجوال عند تسجيل الحضور",
+      "mobile": "رقم الجوال",
+      "name": "الاسم",
+      "mobileLabel": "الجوال",
+      "save": "حفظ",
+      "addName": "أضف اسمًا",
+      "mobileDigits": "يجب أن يتكوّن الجوال من 10 أرقام"
+    },
+    "links": {
+      "connected": "العميل المحتمل المرتبط",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "عميل محتمل {{id}} · {{source}} · المسؤول {{owner}}",
+      "movesAtCheckIn": "· ينتقل إلى «زار العيادة» عند تسجيل الحضور",
+      "lead": "عميل محتمل",
+      "leadOption": "عميل محتمل {{id}}"
+    },
+    "status": {
+      "section": "حالة الزيارة",
+      "group": "الحالة",
+      "copy": "نسخ",
+      "copyHint": "نسخ · الخدمة والطبيب والسبب والملاحظات نفسها",
+      "cancelVisit": "إلغاء الزيارة",
+      "cancelHint": "إلغاء هذا الموعد",
+      "cancelledReason": "{{reason}} · تم تحرير الوقت · توقفت التذكيرات",
+      "cancelledNoReason": "تم تحرير الوقت · توقفت التذكيرات",
+      "restore": "استعادة",
+      "rescheduledConfirm": "تم تغيير الموعد · كان {{day}} {{time}} · يحتاج إلى تأكيد من جديد · يُرسل تذكير جديد عند الحفظ",
+      "rescheduled": "تم تغيير الموعد · كان {{day}} {{time}} · يُرسل تذكير جديد عند الحفظ",
+      "planReady_zero": "الخطة جاهزة · لا خدمات",
+      "planReady_one": "الخطة جاهزة · خدمة واحدة",
+      "planReady_two": "الخطة جاهزة · خدمتان",
+      "planReady_few": "الخطة جاهزة · {{count}} خدمات",
+      "planReady_many": "الخطة جاهزة · {{count}} خدمة",
+      "planReady_other": "الخطة جاهزة · {{count}} خدمة",
+      "planNotPrepared": "الخطة غير جاهزة",
+      "planVisit_zero": "لا شيء مخطط لهذه الزيارة",
+      "planVisit_one": "خدمة واحدة مخططة لهذه الزيارة",
+      "planVisit_two": "خدمتان مخططتان لهذه الزيارة",
+      "planVisit_few": "{{count}} خدمات مخططة لهذه الزيارة",
+      "planVisit_many": "{{count}} خدمة مخططة لهذه الزيارة",
+      "planVisit_other": "{{count}} خدمة مخططة لهذه الزيارة",
+      "planEarlier_zero": "لا شيء من زيارات سابقة",
+      "planEarlier_one": "خدمة واحدة من زيارات سابقة",
+      "planEarlier_two": "خدمتان من زيارات سابقة",
+      "planEarlier_few": "{{count}} خدمات من زيارات سابقة",
+      "planEarlier_many": "{{count}} خدمة من زيارات سابقة",
+      "planEarlier_other": "{{count}} خدمة من زيارات سابقة",
+      "planOpen": "فتح الاقتراحات",
+      "planEmpty": "لا اقتراحات بعد · افتح اقتراحات الخدمات للتحضير",
+      "createPatient": "إنشاء سجل المريض"
+    },
+    "details": {
+      "title": "الموعد",
+      "notFilled": "لم يُملأ بعد",
+      "open": "فتح",
+      "type": "النوع",
+      "typeGroup": "نوع الموعد",
+      "types": {
+        "consultation": "استشارة",
+        "follow_up": "متابعة",
+        "treatment": "علاج",
+        "package_session": "جلسة من باقة",
+        "other": "أخرى"
+      },
+      "typeHints": {
+        "consultation": "زيارة أولى أو مراجعة لدى الطبيب",
+        "follow_up": "مراجعة قصيرة بعد علاج أو وصفة",
+        "treatment": "جلسة واحدة تُحاسب في الزيارة",
+        "package_session": "يستخدم جلسة واحدة من باقة مدفوعة",
+        "other": "أي شيء ليس مما سبق"
+      },
+      "typeLines": {
+        "consultation": "تُضاف رسوم الاستشارة إلى الفاتورة عند الدفع",
+        "follow_up": "مجانية عادةً · لا فاتورة ما لم يُضف شيء",
+        "package_session": "دون رسوم · تُستخدم الجلسة {{next}} من {{total}} عند اكتمال الزيارة",
+        "other": "اذكر ما هو في الملاحظات أدناه"
+      },
+      "treatment": "العلاج",
+      "pickTreatment": "اختر علاجًا",
+      "searchTreatments": "البحث في العلاجات",
+      "common": "الأكثر استخدامًا",
+      "fromOfferings": "من الخدمات",
+      "package": "الباقة",
+      "packageNext": "التالية: الجلسة {{next}} من {{total}} · صالحة حتى {{date}}",
+      "packageLeft": "المتبقي {{count}}",
+      "noPackage": "لا توجد باقة نشطة لدى {{name}}",
+      "pickContactPackages": "اختر جهة اتصال لعرض باقاتها",
+      "asTreatment": "الحجز كعلاج",
+      "doctor": "الطبيب",
+      "pickDoctor": "اختر طبيبًا",
+      "searchDoctors": "البحث عن الأطباء والمعالجين",
+      "length": "المدة",
+      "minutes": "{{minutes}} د",
+      "minutesHint": "{{minutes}} دقيقة",
+      "reason": "السبب",
+      "reasonPlaceholder": "ما طلبه · مثل التصبغ على الخدين",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "أي شيء يجب أن يعرفه الطبيب أو الاستقبال"
+    },
+    "slot": {
+      "title": "التاريخ والوقت",
+      "nextWeek": "الأسبوع القادم",
+      "calendar": "التقويم",
+      "previousMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي",
+      "step": "الفاصل الزمني",
+      "stepOption": "{{minutes}} د",
+      "time": "الوقت",
+      "pickDate": "اختر تاريخًا لعرض الأوقات",
+      "am": "ص",
+      "pm": "م",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · متاح",
+      "booked": "{{time}} · محجوز",
+      "locked": "مقفل",
+      "lockedSummary": "{{day}} · {{time}} · مقفل بعد تسجيل الحضور",
+      "lockedToast": "يُقفل التاريخ والوقت بعد تسجيل حضور المريض"
+    },
+    "notPatient": {
+      "section": "الخطوة التالية · سجل المريض",
+      "title": "ليس مريضًا بعد",
+      "body": "أنشئ سجل المريض للمتابعة · يتيح الصور واقتراحات الخدمات والتقييم و«مكتمل»",
+      "action": "إنشاء سجل المريض",
+      "done": "أصبح {{name}} مريضًا · يمكنك تحديد «مكتمل»"
+    },
+    "photos": {
+      "title": "صور هذه الزيارة",
+      "section": "صور الزيارة",
+      "locked": "تُتاح الصور عندما يكون المريض في العيادة · سجّل حضوره أولًا",
+      "checkIn": "تسجيل الحضور الآن",
+      "album": "الألبوم",
+      "albums": {
+        "general": "عام",
+        "private": "خاص",
+        "lhr": "LHR"
+      },
+      "upload": "رفع الصور",
+      "add": "إضافة",
+      "open": "فتح {{name}}",
+      "edit": "تعديل التفاصيل",
+      "delete": "حذف الصورة",
+      "count_zero": "لا صور · تظهر الصور في ملف {{first}} ضمن هذه الزيارة",
+      "count_one": "صورة واحدة · تظهر في ملف {{first}} ضمن هذه الزيارة",
+      "count_two": "صورتان · تظهران في ملف {{first}} ضمن هذه الزيارة",
+      "count_few": "{{count}} صور · تظهر في ملف {{first}} ضمن هذه الزيارة",
+      "count_many": "{{count}} صورة · تظهر في ملف {{first}} ضمن هذه الزيارة",
+      "count_other": "{{count}} صورة · تظهر في ملف {{first}} ضمن هذه الزيارة",
+      "empty": "التقط صور قبل / بعد أثناء وجود {{first}} في العيادة · تُحفظ ضمن هذه الزيارة",
+      "attached_zero": "لم تُرفق صور بهذه الزيارة",
+      "attached_one": "أُرفقت صورة واحدة بهذه الزيارة",
+      "attached_two": "أُرفقت صورتان بهذه الزيارة",
+      "attached_few": "أُرفقت {{count}} صور بهذه الزيارة",
+      "attached_many": "أُرفقت {{count}} صورة بهذه الزيارة",
+      "attached_other": "أُرفقت {{count}} صورة بهذه الزيارة",
+      "deleteTitle": "حذف هذه الصورة؟",
+      "deleted": "تم حذف الصورة",
+      "reasons": {
+        "wrongPatient": "مريض خاطئ",
+        "blurry": "غير واضحة / إعادة التصوير",
+        "duplicate": "مكررة",
+        "other": "أخرى"
+      }
+    },
+    "footer": {
+      "pickTime": "اختر وقتًا",
+      "book": "حجز {{day}}، {{time}}",
+      "move": "نقل إلى {{day}}، {{time}}",
+      "saveChanges": "حفظ التغييرات",
+      "minutes": "{{minutes}} د"
+    },
+    "validation": {
+      "who": "اختر لمن هذا الموعد",
+      "slot": "اختر التاريخ والوقت",
+      "passed": "مضى هذا الوقت · اختر وقتًا قادمًا",
+      "taken": "حُجز للتو · اختر وقتًا آخر",
+      "doctor": "اختر طبيبًا"
+    },
+    "copied": "تم النسخ · اختر التاريخ والوقت"
   }
 }

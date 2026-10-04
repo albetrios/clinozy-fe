@@ -26,3 +26,10 @@ export {
   OfferingSuggestions,
   type OfferingSuggestionsProps,
 } from './OfferingSuggestions.tsx';
+export {
+  ideaReasonText,
+  type PlanCard,
+  type PlanCardHost,
+  type PlanCardProps,
+  usePlanCard,
+} from './use-plan-card.ts';

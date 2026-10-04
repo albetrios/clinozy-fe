@@ -197,6 +197,14 @@
       "offerRemoved": "{{name}} removed",
       "offerPaused": "{{name}} paused",
       "offerResumed": "{{name}} running again"
+    },
+    "specialties": {
+      "skin": "Skin",
+      "hair": "Hair",
+      "dental": "Dental",
+      "gynac": "Gynac",
+      "physio": "Physio",
+      "general": "General"
     }
   },
   "patients": {
@@ -850,7 +858,48 @@
         "planChanged": "Plan changed",
         "other": "Other"
       }
-    }
+    },
+    "searchOfferings": "Search offerings",
+    "single": "Single",
+    "minPrice": "min {{price}}",
+    "added": "{{name}} added to {{first}}’s suggestions",
+    "removed": "{{name}} removed from suggestions",
+    "offeringRemoved": "Offering removed",
+    "info": {
+      "sessions_one": "{{count}} session",
+      "sessions_other": "{{count}} sessions",
+      "visits_one": "{{count}} visit",
+      "visits_other": "{{count}} visits",
+      "list": "List {{price}}",
+      "lowest": "lowest {{price}}"
+    },
+    "ideaReasons": {
+      "history": "Idea from history",
+      "note": "Doctor’s note · “{{text}}”",
+      "complaint": "Complaint · {{text}}",
+      "visits_one": "{{count}} visit so far · a package saves on each session",
+      "visits_other": "{{count}} visits so far · a package saves on each session",
+      "renew": "Package almost used up · renew",
+      "first": "First visit · start with a consultation"
+    },
+    "purchaseKinds": {
+      "medicine": "Medicine",
+      "item": "Item"
+    },
+    "invoiceStatuses": {
+      "paid": "Paid",
+      "partial": "Partly paid",
+      "unpaid": "Due"
+    },
+    "delivery": {
+      "queued": "Queued",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "read": "Read",
+      "failed": "Not delivered",
+      "received": "Received"
+    },
+    "activityLead": "Lead {{id}}"
   },
   "contactEditor": {
     "title": "Edit contact",
@@ -929,5 +978,180 @@
       "price": "Enter the price",
       "added": "Offering {{name}} added"
     }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "Appointment",
+      "create": "New appointment",
+      "edit": "Appointment {{id}}",
+      "reschedule": "Reschedule {{id}}"
+    },
+    "sub": "Only free slots are offered · past times are locked",
+    "who": {
+      "search": "Search patient or lead by name, phone, ID",
+      "searchLabel": "Search person",
+      "useContact": "Use contact",
+      "patient": "Patient",
+      "patientCare": "Patient · {{care}}",
+      "lead": "Lead {{id}} · {{phone}}",
+      "createContact": "+ Create contact “{{query}}”",
+      "newContact": "New contact · add mobile at check-in",
+      "mobile": "Mobile number",
+      "name": "Name",
+      "mobileLabel": "Mobile",
+      "save": "Save",
+      "addName": "Add a name",
+      "mobileDigits": "Mobile needs 10 digits"
+    },
+    "links": {
+      "connected": "Connected lead",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "Lead {{id}} · {{source}} · owner {{owner}}",
+      "movesAtCheckIn": "· moves to Clinic visited at check-in",
+      "lead": "Lead",
+      "leadOption": "Lead {{id}}"
+    },
+    "status": {
+      "section": "Visit status",
+      "group": "Status",
+      "copy": "Copy",
+      "copyHint": "Copy · same service, doctor, reason and notes",
+      "cancelVisit": "Cancel visit",
+      "cancelHint": "Cancel this appointment",
+      "cancelledReason": "{{reason}} · slot released · reminders stopped",
+      "cancelledNoReason": "Slot released · reminders stopped",
+      "restore": "Restore",
+      "rescheduledConfirm": "Rescheduled · was {{day}} {{time}} · needs confirming again · a new reminder goes out on save",
+      "rescheduled": "Rescheduled · was {{day}} {{time}} · a new reminder goes out on save",
+      "planReady_one": "Plan ready · {{count}} offering",
+      "planReady_other": "Plan ready · {{count}} offerings",
+      "planNotPrepared": "Plan not prepared",
+      "planVisit_one": "{{count}} planned for this visit",
+      "planVisit_other": "{{count}} planned for this visit",
+      "planEarlier_one": "{{count}} from earlier visits",
+      "planEarlier_other": "{{count}} from earlier visits",
+      "planOpen": "open suggestions",
+      "planEmpty": "Nothing suggested yet · open Offering suggestions to prepare",
+      "createPatient": "Create patient record"
+    },
+    "details": {
+      "title": "Appointment",
+      "notFilled": "Not filled yet",
+      "open": "Open",
+      "type": "Type",
+      "typeGroup": "Appointment type",
+      "types": {
+        "consultation": "Consultation",
+        "follow_up": "Follow-up",
+        "treatment": "Treatment",
+        "package_session": "Package session",
+        "other": "Other"
+      },
+      "typeHints": {
+        "consultation": "First visit or doctor review",
+        "follow_up": "Short review after a treatment or Rx",
+        "treatment": "A single session, billed on the visit",
+        "package_session": "Uses one session from a paid package",
+        "other": "Anything that is not one of the above"
+      },
+      "typeLines": {
+        "consultation": "Consultation fee is added to the invoice at checkout",
+        "follow_up": "Usually free · no invoice unless something is added",
+        "package_session": "No charge · session {{next}} of {{total}} is used when the visit is completed",
+        "other": "Say what it is in Notes below"
+      },
+      "treatment": "Treatment",
+      "pickTreatment": "Pick a treatment",
+      "searchTreatments": "Search treatments",
+      "common": "Common",
+      "fromOfferings": "From offerings",
+      "package": "Package",
+      "packageNext": "Next is session {{next}} of {{total}} · valid till {{date}}",
+      "packageLeft": "{{count}} left",
+      "noPackage": "{{name}} has no active package",
+      "pickContactPackages": "Pick a contact to see their packages",
+      "asTreatment": "Book as treatment",
+      "doctor": "Doctor",
+      "pickDoctor": "Pick a doctor",
+      "searchDoctors": "Search doctors and therapists",
+      "length": "Length",
+      "minutes": "{{minutes}} min",
+      "minutesHint": "{{minutes}} minutes",
+      "reason": "Reason",
+      "reasonPlaceholder": "What they asked for · e.g. pigmentation on cheeks",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything the doctor or desk should know"
+    },
+    "slot": {
+      "title": "Date & time",
+      "nextWeek": "Next week",
+      "calendar": "Calendar",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "step": "Slot step",
+      "stepOption": "{{minutes}} min",
+      "time": "Time",
+      "pickDate": "Pick a date to see times",
+      "am": "AM",
+      "pm": "PM",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · free",
+      "booked": "{{time}} · booked",
+      "locked": "Locked",
+      "lockedSummary": "{{day}} · {{time}} · locked after check-in",
+      "lockedToast": "Date & time are locked once the patient is checked in"
+    },
+    "notPatient": {
+      "section": "Next step · patient record",
+      "title": "Not a patient yet",
+      "body": "Create the patient record to continue · unlocks photos, offering suggestions, feedback and Completed",
+      "action": "Create patient record",
+      "done": "{{name}} is now a patient · you can mark Completed"
+    },
+    "photos": {
+      "title": "Photos from this visit",
+      "section": "Visit photos",
+      "locked": "Photos open once the patient is at the clinic · check them in first",
+      "checkIn": "Check in now",
+      "album": "Album",
+      "albums": {
+        "general": "General",
+        "private": "Private",
+        "lhr": "LHR"
+      },
+      "upload": "Upload photos",
+      "add": "Add",
+      "open": "Open {{name}}",
+      "edit": "Edit details",
+      "delete": "Delete photo",
+      "count_one": "{{count}} photo · they show in {{first}}’s file under this visit",
+      "count_other": "{{count}} photos · they show in {{first}}’s file under this visit",
+      "empty": "Take before / after photos while {{first}} is at the clinic · they file under this visit",
+      "attached_one": "{{count}} photo attached to this visit",
+      "attached_other": "{{count}} photos attached to this visit",
+      "deleteTitle": "Delete this photo?",
+      "deleted": "Photo deleted",
+      "reasons": {
+        "wrongPatient": "Wrong patient",
+        "blurry": "Blurry / retake",
+        "duplicate": "Duplicate",
+        "other": "Other"
+      }
+    },
+    "footer": {
+      "pickTime": "Pick a time",
+      "book": "Book {{day}}, {{time}}",
+      "move": "Move to {{day}}, {{time}}",
+      "saveChanges": "Save changes",
+      "minutes": "{{minutes}} min"
+    },
+    "validation": {
+      "who": "Pick who the appointment is for",
+      "slot": "Pick a date and time",
+      "passed": "That time has passed · pick a future slot",
+      "taken": "Just taken · pick another slot",
+      "doctor": "Pick a doctor"
+    },
+    "copied": "Copied · pick a date and time"
   }
 }

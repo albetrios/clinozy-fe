@@ -14,6 +14,7 @@ import {
   CONFIRM_TEST_IDS,
   confirmReasonTestId,
 } from '@/shared/components/ConfirmDialog/index.ts';
+import type { PickerOption } from '@/shared/components/Picker/index.ts';
 
 import { OFFERING_SUGGESTIONS_TEST_IDS as IDS } from './offering-suggestions.constants.ts';
 import type {
@@ -132,6 +133,12 @@ const ACTIVITY: SuggestionActivityLine[] = [
   },
 ];
 
+/** The host's "Search offerings" list: one already suggested (disabled), one to add. */
+const OFFERINGS: PickerOption[] = [
+  { key: 'lhr', label: 'LHR Full Face · B4G7', group: 'Package', disabled: true },
+  { key: 'prp', label: 'PRP Hair', group: 'Treatment', meta: '₹6,000' },
+];
+
 type Props = Partial<OfferingSuggestionsProps>;
 
 /** The card with its own price eye, as a host keeps it. */
@@ -157,10 +164,11 @@ function Card({ pricesShown: initialShown = true, ...props }: Props) {
 function renderCard(ui: ReactElement) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const user = userEvent.setup();
-  return {
-    user,
-    ...render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>),
-  };
+  const wrap = (node: ReactElement) => (
+    <QueryClientProvider client={client}>{node}</QueryClientProvider>
+  );
+  const view = render(wrap(ui));
+  return { user, ...view, rerender: (node: ReactElement) => view.rerender(wrap(node)) };
 }
 
 const card = () => screen.getByTestId(IDS.card);
@@ -358,7 +366,7 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
         canEdit={false}
         ideas={IDEAS}
         onLinkInvoice={vi.fn()}
-        onAddOffering={vi.fn()}
+        addOffering={{ options: OFFERINGS, onPick: vi.fn() }}
         onAddIdea={vi.fn()}
       />,
     );
@@ -428,11 +436,33 @@ describe('OfferingSuggestions — ideas and Add offering (H:2814–2818)', () =>
     expect(onAddIdea).toHaveBeenCalledWith(IDEAS[0]);
   });
 
-  it('opens the host’s offering search from the dashed "Add offering"', async () => {
-    const onAddOffering = vi.fn();
-    const { user } = renderCard(<Card onAddOffering={onAddOffering} />);
+  it('searches the host’s offerings from the dashed "Add offering" and hands the pick over', async () => {
+    const onPick = vi.fn();
+    const { user } = renderCard(<Card addOffering={{ options: OFFERINGS, onPick }} />);
     await user.click(screen.getByTestId(IDS.addOffering));
-    expect(onAddOffering).toHaveBeenCalledOnce();
+    const search = await screen.findByPlaceholderText('Search offerings');
+    expect(screen.getByTestId(`${IDS.addOffering}-option-lhr`)).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    await user.type(search, 'PRP');
+    await user.click(await screen.findByTestId(`${IDS.addOffering}-option-prp`));
+    expect(onPick).toHaveBeenCalledExactlyOnceWith('prp');
+  });
+});
+
+describe('OfferingSuggestions — open or collapsed', () => {
+  it('follows the host when it holds the open state', async () => {
+    const onOpenChange = vi.fn();
+    const { user, rerender } = renderCard(
+      <Card open={false} onOpenChange={onOpenChange} />,
+    );
+    expect(screen.queryByText('Hydrafacial')).not.toBeInTheDocument();
+    await user.click(toggle());
+    expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(true);
+    expect(screen.queryByText('Hydrafacial')).not.toBeInTheDocument();
+    rerender(<Card open onOpenChange={onOpenChange} />);
+    expect(screen.getByText('Hydrafacial')).toBeInTheDocument();
   });
 });
 
@@ -514,7 +544,7 @@ describe('OfferingSuggestions — accessibility', () => {
         activity={{ summary: 'Lead #2363', lines: ACTIVITY, onOpenChat: vi.fn() }}
         onLinkInvoice={vi.fn()}
         onAddIdea={vi.fn()}
-        onAddOffering={vi.fn()}
+        addOffering={{ options: OFFERINGS, onPick: vi.fn() }}
       />,
     );
     expect(await axe(container)).toHaveNoViolations();

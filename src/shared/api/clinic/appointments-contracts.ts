@@ -16,13 +16,19 @@ import {
   civilDateSchema,
   clockTimeSchema,
   deliveryStatusSchema,
+  type ImageAlbum,
   isoDateTimeSchema,
+  type LeadKind,
+  type LeadStatus,
+  type PatientType,
   phoneSchema,
   presenceSchema,
   roleSchema,
   roomSchema,
+  type Tone,
   toneSchema,
 } from './clinic-schema.ts';
+import type { LeadRecordSource } from './leads-contracts.ts';
 
 /*
  * The Appointments domain beyond the generated contract (KICKOFF §6.4, D22):
@@ -116,6 +122,18 @@ export const APPOINTMENT_TYPE_MINUTES: Readonly<Record<AppointmentType, number>>
   treatment: 60,
   package_session: 45,
   other: 30,
+};
+
+/**
+ * A booking's service when neither an offering nor a label names one: its
+ * type's (`AP_TYPE`, H:3418) — stored text, as the design writes it.
+ */
+export const APPOINTMENT_TYPE_SERVICES: Readonly<Record<AppointmentType, string>> = {
+  consultation: 'Consultation',
+  follow_up: 'Follow-up',
+  treatment: 'Treatment',
+  package_session: 'Package session',
+  other: 'Other',
 };
 
 /** The form's length chips, in minutes (`appointments.md:76`). */
@@ -308,17 +326,28 @@ export const appointmentInputSchema = appointmentFieldsSchema.refine(
 );
 
 /**
+ * A person the search did not find (`createAppointment`, `S:1609`: "new contact
+ * name+phone → contact-thread Lead"): booking them opens their contact thread
+ * — or finds the one already on that mobile.
+ */
+export interface AppointmentNewContact {
+  name: string;
+  /** E.164 — the contract's Lead needs a mobile. */
+  phone: string;
+}
+
+/**
  * A new booking (`createAppointment`, `S:1609`): who, the doctor and the slot
  * are required; the type defaults to Consultation and its length, the service
- * to the offering's name, the branch to the member's. `copyOf` names the
- * booking a Copy or Rebook starts from (the server sets `copiedFromId`).
- * It saves as Scheduled.
+ * to the offering's name, the branch to the member's. Who is a patient, a lead
+ * or `newContact`. `copyOf` names the booking a Copy or Rebook starts from (the
+ * server sets `copiedFromId`). It saves as Scheduled.
  */
 export type AppointmentCreateInput = Pick<
   AppointmentFields,
   'doctorId' | 'date' | 'startTime'
 > &
-  Partial<AppointmentFields> & { copyOf?: string };
+  Partial<AppointmentFields> & { copyOf?: string; newContact?: AppointmentNewContact };
 
 /**
  * An edit (`updateAppointment`, `S:1610`): any field, and the status the
@@ -378,4 +407,75 @@ export interface AppointmentChange {
 export interface AppointmentUpdate {
   appointment: AppointmentRow;
   moved: boolean;
+}
+
+// ── The appointment form's reads ──
+
+/**
+ * The person a booking prefill names (`create/?who=<patientId|leadId>`, `S:27`)
+ * — the booked person, plus what the form defaults from them: the patient's
+ * usual doctor (`Patient.doctorId`, `S:335`) and their care types ("Patient ·
+ * <care>").
+ */
+export interface AppointmentBookingPerson extends AppointmentPerson {
+  usualDoctorId: string | null;
+  types: readonly PatientType[];
+}
+
+/**
+ * Whom a read is about: any of the person's ids and their mobile — a patient,
+ * a lead, a contact thread, or someone found by phone.
+ */
+export interface AppointmentPersonLookup {
+  patientId: string | null;
+  leadId: string | null;
+  /** E.164. */
+  phone: string | null;
+}
+
+/**
+ * A lead connected to the booked person (`getAppointment`'s "connected leads",
+ * `S:1604`): their own, the leads on their patient record and the enquiries on
+ * their mobile — the form's "Connected lead" chips and its "Lead" radios. Never
+ * a contact thread.
+ */
+export interface AppointmentConnectedLead {
+  id: string;
+  seq: number;
+  status: LeadStatus | null;
+  kind: LeadKind;
+  source: LeadRecordSource | null;
+  /** The contract's interests' values and the custom ones, as typed. */
+  interests: readonly string[];
+  ownerName: string | null;
+  patientId: string | null;
+  /** ISO instant the lead came in. */
+  createdAt: string;
+}
+
+/**
+ * A paid package a Package session can use a session of (C19, Appendix F):
+ * its offering, the sessions used of the total and the last day it is valid.
+ */
+export interface AppointmentPackageOption {
+  id: string;
+  offeringId: string;
+  name: string;
+  tone: Tone;
+  /** The offering's session length — what picking the package sets the length to. */
+  durationMin: number;
+  sessionsTotal: number;
+  sessionsUsed: number;
+  validUntil: string;
+}
+
+/**
+ * A photo to file under a visit (`uploadVisitPhotos`, `S:1613`): the booking,
+ * the album and the storage key the upload tray confirmed.
+ */
+export interface VisitPhotoInput {
+  appointmentId: string;
+  album: ImageAlbum;
+  key: string;
+  fileName: string;
 }

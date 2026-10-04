@@ -9,16 +9,23 @@ import {
 import {
   APPOINTMENT_RANGE_MAX_DAYS,
   APPOINTMENT_TYPE_MINUTES,
+  APPOINTMENT_TYPE_SERVICES,
+  type AppointmentBookingPerson,
   type AppointmentCancelInput,
   appointmentCancelInputSchema,
   type AppointmentChange,
+  type AppointmentConnectedLead,
   type AppointmentCreateInput,
   type AppointmentDaySummary,
   type AppointmentFields,
+  appointmentFieldsSchema,
   appointmentInputSchema,
   appointmentListParamsSchema,
+  type AppointmentNewContact,
+  type AppointmentPackageOption,
   type AppointmentPatch,
   type AppointmentPerson,
+  type AppointmentPersonLookup,
   appointmentRangeParamsSchema,
   type AppointmentRecord,
   type AppointmentRow,
@@ -30,6 +37,7 @@ import {
   type AppointmentUpdate,
   availableSlotsParamsSchema,
   statusesForFilter,
+  type VisitPhotoInput,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   createdFilterMatches,
@@ -47,10 +55,13 @@ import {
   APPOINTMENT_STATUS_VALUES,
   type AppointmentStatus,
   appointmentStatusSchema,
-  type AppointmentType,
   type Branch,
+  type DeleteReason,
+  imageAlbumSchema,
   type OfferingSuggestion,
   type Patient,
+  type PatientImage,
+  phoneSchema,
   type User,
   WEEKDAY_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -66,6 +77,7 @@ import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
 import { writeAppointmentStatus } from './appointment-status.fixtures.ts';
+import { ensureContactThreadInWorld } from './contact-threads.fixtures.ts';
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { clockLabel, dayLabel } from './task-rules.fixtures.ts';
 import { syncTaskRules } from './tasks-server.fixtures.ts';
@@ -94,15 +106,6 @@ const STATUS_TEXT: Readonly<Record<AppointmentStatus, string>> = {
   completed: 'Completed',
   cancelled: 'Cancelled',
   no_show: 'No show',
-};
-
-/** A booking's service when neither an offering nor a label names one: its type (`AP_TYPE`, H:3418). */
-const TYPE_SERVICE: Readonly<Record<AppointmentType, string>> = {
-  consultation: 'Consultation',
-  follow_up: 'Follow-up',
-  treatment: 'Treatment',
-  package_session: 'Package session',
-  other: 'Other',
 };
 
 const SLOT_TAKEN = 'Just taken · pick another slot';
@@ -461,6 +464,120 @@ export async function listAvailableSlots(raw: unknown): Promise<AppointmentSlot[
   return slots;
 }
 
+// ── The appointment form's reads ──
+
+/**
+ * The person a booking prefill names (`who=<patientId|leadId>`, `S:27`): the
+ * patient, or the lead — a converted lead reads as its patient — with the
+ * patient's usual doctor and care types; 404 when the id names neither.
+ */
+export async function getBookingPerson(id: string): Promise<AppointmentBookingPerson> {
+  const view = lookups();
+  const lead = view.leads.get(id);
+  const patient =
+    view.patients.get(id) ??
+    (lead?.patientId ? view.patients.get(lead.patientId) : undefined);
+  if (patient) {
+    return {
+      ...patientPerson(patient, lead?.id ?? null),
+      usualDoctorId: patient.doctorId,
+      types: patient.types,
+    };
+  }
+  if (!lead) throw clinicHttpError(404, 'not_found', 'Patient or lead not found');
+  return {
+    kind: lead.isContactThread ? 'contact' : 'lead',
+    name: lead.name,
+    phone: lead.phone,
+    patientId: null,
+    leadId: lead.id,
+    seq: lead.isContactThread ? null : lead.seq,
+    usualDoctorId: null,
+    types: [],
+  };
+}
+
+const newestLeadFirst = (a: LeadRecord, b: LeadRecord) =>
+  b.createdAt.localeCompare(a.createdAt) || b.seq - a.seq;
+
+/**
+ * The leads connected to a person (`getAppointment`'s "connected leads",
+ * `S:1604`): the one named, the ones on their patient record and the
+ * enquiries on their mobile — never a contact thread — newest first.
+ */
+export async function listConnectedLeads(
+  person: AppointmentPersonLookup,
+): Promise<AppointmentConnectedLead[]> {
+  const view = lookups();
+  return clinicFixtures.leads
+    .snapshot(
+      (lead) =>
+        !lead.isContactThread &&
+        (lead.id === person.leadId ||
+          (person.patientId !== null && lead.patientId === person.patientId) ||
+          (person.phone !== null && lead.phone === person.phone)),
+    )
+    .sort(newestLeadFirst)
+    .map((lead) => {
+      const owner = lead.ownerId ? view.staff.get(lead.ownerId) : undefined;
+      return {
+        id: lead.id,
+        seq: lead.seq,
+        status: lead.status,
+        kind: lead.kind,
+        source: lead.source,
+        interests: [...lead.interests, ...lead.customInterests],
+        ownerName: owner ? fullName(owner) : null,
+        patientId: lead.patientId,
+        createdAt: lead.createdAt,
+      };
+    });
+}
+
+/**
+ * A patient's packages with a session left and still valid today (C19,
+ * Appendix F) — what a Package session can use — the soonest to expire first.
+ */
+export async function listActivePackages(
+  patientId: string,
+): Promise<AppointmentPackageOption[]> {
+  const today = clinicToday(new Date());
+  const offerings = new Map(
+    clinicFixtures.offerings.snapshot().map((offering) => [offering.id, offering]),
+  );
+  return clinicFixtures.patientPackages
+    .snapshot(
+      (pack) =>
+        pack.patientId === patientId &&
+        pack.sessionsUsed < pack.sessionsTotal &&
+        pack.validUntil >= today,
+    )
+    .flatMap((pack) => {
+      const offering = offerings.get(pack.offeringId);
+      if (!offering) return [];
+      return [
+        {
+          id: pack.id,
+          offeringId: offering.id,
+          name: offering.name,
+          tone: offering.tone,
+          durationMin: offering.durationMin || APPOINTMENT_TYPE_MINUTES.package_session,
+          sessionsTotal: pack.sessionsTotal,
+          sessionsUsed: pack.sessionsUsed,
+          validUntil: pack.validUntil,
+        },
+      ];
+    })
+    .sort((a, b) => compareText(a.validUntil, b.validUntil));
+}
+
+/** The photos filed under a visit (`PatientImage` by `appointmentId`), newest first. */
+export async function listVisitPhotos(appointmentId: string): Promise<PatientImage[]> {
+  return clinicFixtures.patientImages
+    .snapshot((image) => image.appointmentId === appointmentId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 // ── Writes: the rules ──
 
 /** A 422 on one field. */
@@ -606,19 +723,23 @@ function fieldsOf(visit: AppointmentRecord): AppointmentFields {
  * branch's hours and free for the doctor; the type defaults to Consultation
  * and its length, the service to the offering's name (else the type's), the
  * branch to the member's; Reason and Notes are kept (Q-A9). It saves as Scheduled — the
- * confirm request goes out, and the rule job may raise "Confirm visits".
+ * confirm request goes out, and the rule job may raise "Confirm visits". A
+ * new contact is the contract's contact-thread lead (`S:1609`) — or the lead
+ * already on that mobile — written in the same change as the booking.
  */
 export async function createAppointment(
   input: AppointmentCreateInput,
 ): Promise<AppointmentRow> {
   const now = new Date();
-  const { copyOf, ...given } = input;
+  const { copyOf, newContact, ...given } = input;
   const type = given.type ?? 'consultation';
   const offering = given.offeringId
     ? clinicFixtures.offerings.snapshot((row) => row.id === given.offeringId)[0]
     : undefined;
+  const contact =
+    newContact && !given.patientId && !given.leadId ? newContactOf(newContact) : null;
   const fields = draftOf(
-    validateClinicInput(appointmentInputSchema, {
+    validateClinicInput(contact ? appointmentFieldsSchema : appointmentInputSchema, {
       patientId: null,
       leadId: null,
       branchId: branchRef(MAIN_BRANCH),
@@ -631,7 +752,7 @@ export async function createAppointment(
       patientPackageId: null,
       type,
       durationMin: APPOINTMENT_TYPE_MINUTES[type],
-      serviceLabel: offering?.name ?? TYPE_SERVICE[type],
+      serviceLabel: offering?.name ?? APPOINTMENT_TYPE_SERVICES[type],
       ...definedFields(given),
     }),
   );
@@ -642,8 +763,12 @@ export async function createAppointment(
     : undefined;
   if (copyOf && !source) refuse('copyOf', 'Appointment not found');
   const change = recordFixtureChange();
+  const leadId = contact
+    ? (await ensureContactThreadInWorld(contact, change)).lead.id
+    : fields.leadId;
   const created = await change.create(clinicFixtures.appointments, {
     ...fields,
+    leadId,
     status: 'scheduled',
     cancelReason: null,
     cancelNote: null,
@@ -657,6 +782,16 @@ export async function createAppointment(
   });
   await syncTaskRules(now, change);
   return rowOf(created, lookups());
+}
+
+/** A new contact's name and mobile as the contract's Lead takes them — 422 otherwise. */
+function newContactOf(contact: AppointmentNewContact): AppointmentNewContact {
+  const name = contact.name.trim();
+  if (!name || name.length > 120) refuse('name', 'Add a name');
+  if (!phoneSchema.safeParse(contact.phone).success) {
+    refuse('phone', 'Mobile needs 10 digits');
+  }
+  return { name, phone: contact.phone };
 }
 
 /** The status an edit lands on: a move returns the booking to Scheduled (`S:1610`). */
@@ -819,4 +954,45 @@ export async function undoAppointmentChange(undoToken: string): Promise<void> {
     conflict('undo_unavailable', 'This change can no longer be undone', 'undoToken');
   undoLog.delete(undoToken);
   await change.reverse();
+}
+
+// ── Visit photos ──
+
+/**
+ * File a photo under a visit (`uploadVisitPhotos`, `S:1613`): the visit must
+ * be checked in or completed (409) and booked for a patient (409) — the
+ * photo lands in that patient's file, in the album picked, dated the visit.
+ */
+export async function attachVisitPhoto(input: VisitPhotoInput): Promise<PatientImage> {
+  const visit = await clinicFixtures.appointments.get(input.appointmentId);
+  const album = validateClinicInput(imageAlbumSchema, input.album);
+  if (!isAppointmentSlotLocked(visit.status)) {
+    conflict('not_checked_in', 'Check the patient in first', 'appointmentId');
+  }
+  const patientId = personOf(visit, lookups()).patientId;
+  if (!patientId) conflict('needs_patient', NEEDS_PATIENT, 'appointmentId');
+  return clinicFixtures.patientImages.create({
+    patientId,
+    appointmentId: visit.id,
+    album,
+    fileUrl: input.key,
+    fileName: input.fileName,
+    bodyPart: null,
+    takenOn: visit.date,
+    caption: null,
+  });
+}
+
+/** Delete a visit photo with the confirm's reason (soft — the Undo restores it). */
+export async function deleteVisitPhoto(
+  id: string,
+  reason: DeleteReason,
+  note: string | null,
+): Promise<PatientImage> {
+  return clinicFixtures.patientImages.remove(id, reason, note);
+}
+
+/** Bring a deleted visit photo back — the Undo of its "deleted" toast. */
+export async function restoreVisitPhoto(id: string): Promise<PatientImage> {
+  return clinicFixtures.patientImages.restore(id);
 }

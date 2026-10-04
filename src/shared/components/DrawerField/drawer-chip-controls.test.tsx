@@ -183,6 +183,23 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     expect(off).not.toHaveClass('bg-tone-sky');
   });
 
+  it('names a chip’s hint on hover — "20 minutes", "First visit or doctor review"', () => {
+    render(
+      <DrawerChips
+        label="Length"
+        options={[
+          { value: '20', label: '20 min', hint: '20 minutes' },
+          { value: '30', label: '30 min' },
+        ]}
+        value="20"
+        onChange={() => undefined}
+        testId="length"
+      />,
+    );
+    expect(screen.getByTestId('length-20')).toHaveAttribute('title', '20 minutes');
+    expect(screen.getByTestId('length-30')).not.toHaveAttribute('title');
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<PickAny />);
     expect(await axe(container)).toHaveNoViolations();

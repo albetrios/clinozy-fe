@@ -7,14 +7,20 @@ import {
   appointmentQueryKeys,
   cancelAppointment,
   createAppointment,
+  deleteVisitPhoto,
+  fetchActivePackages,
   fetchAppointment,
   fetchAppointmentDaySummaries,
   fetchAppointmentPage,
   fetchAppointmentRange,
   fetchAvailableSlots,
   fetchBookableStaff,
+  fetchBookingPerson,
+  fetchConnectedLeads,
+  fetchVisitPhotos,
   normalizeAppointmentListParams,
   restoreAppointment,
+  restoreVisitPhoto,
   setAppointmentStatus,
   undoAppointmentChange,
   updateAppointment,
@@ -25,6 +31,7 @@ import type {
   AppointmentCreateInput,
   AppointmentListParamsInput,
   AppointmentPatch,
+  AppointmentPersonLookup,
   AppointmentRangeParamsInput,
   AppointmentRow,
   AppointmentStatusInput,
@@ -32,7 +39,11 @@ import type {
   AvailableSlotsParamsInput,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  AppointmentStatus,
+  DeleteReason,
+  PatientImage,
+} from '@/shared/api/clinic/clinic-schema.ts';
 import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
@@ -394,6 +405,84 @@ export function useRestoreAppointment(
     mutationFn: restoreAppointment,
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: () => clinicText(KEYS.toasts.restored),
+    ...options,
+  });
+}
+
+// ── The appointment form's reads and the visit's photos ──
+
+/**
+ * The person a booking prefill names (`who=<patientId|leadId>`, `S:27`) — the
+ * patient or the lead, with the patient's usual doctor; idle without an id.
+ */
+export function useBookingPerson(id: string | undefined) {
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.person(id ?? ''),
+    queryFn: () => fetchBookingPerson(id ?? ''),
+    enabled: Boolean(id),
+  });
+}
+
+/** A person's connected leads — the form's "Connected lead" chips and "Lead" radios; idle without one. */
+export function useConnectedLeads(person: AppointmentPersonLookup | null) {
+  return useAppQuery({
+    queryKey: person
+      ? appointmentQueryKeys.connectedLeads(person)
+      : [...appointmentQueryKeys.all, 'connected-leads', 'none'],
+    queryFn: () => (person ? fetchConnectedLeads(person) : Promise.resolve([])),
+    enabled: person !== null,
+  });
+}
+
+/** A patient's packages with a session left — the Package session radios; idle without a patient. */
+export function useActivePackages(patientId: string | null) {
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.packages(patientId ?? ''),
+    queryFn: () => fetchActivePackages(patientId ?? ''),
+    enabled: patientId !== null,
+  });
+}
+
+/** The photos filed under a visit; idle without one. */
+export function useVisitPhotos(appointmentId: string | null) {
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.photos(appointmentId ?? ''),
+    queryFn: () => fetchVisitPhotos(appointmentId ?? ''),
+    enabled: appointmentId !== null,
+  });
+}
+
+/** What a confirmed photo delete sends: the photo and the reason confirm's choice. */
+export interface VisitPhotoDeleteVars {
+  id: string;
+  reason: DeleteReason;
+  note: string | null;
+}
+
+/** What a visit photo write may have changed: the visit's photos and the patient file. */
+export const VISIT_PHOTO_WRITE_KEYS = [appointmentQueryKeys.all, ['clinic', 'patients']];
+
+/**
+ * Delete a visit photo — no toast of its own: the reason confirm's `undo`
+ * shows "Photo deleted" with Undo, which runs {@link useRestoreVisitPhoto}.
+ */
+export function useDeleteVisitPhoto(
+  options: CrudMutationOptions<PatientImage, VisitPhotoDeleteVars> = {},
+) {
+  return useAppMutation<PatientImage, VisitPhotoDeleteVars>({
+    mutationFn: ({ id, reason, note }) => deleteVisitPhoto(id, reason, note),
+    invalidateKeys: VISIT_PHOTO_WRITE_KEYS,
+    ...options,
+  });
+}
+
+/** Put a deleted visit photo back — the Undo of its toast; silent on success. */
+export function useRestoreVisitPhoto(
+  options: CrudMutationOptions<PatientImage, string> = {},
+) {
+  return useAppMutation<PatientImage, string>({
+    mutationFn: restoreVisitPhoto,
+    invalidateKeys: VISIT_PHOTO_WRITE_KEYS,
     ...options,
   });
 }

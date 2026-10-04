@@ -11,21 +11,29 @@ import { invoiceSchema, leadSchema, patientSchema } from './clinic-schema.ts';
  * shows no Appointments group (KICKOFF §6.0), so none is returned.
  */
 
-/** A patient hit: "Dharti Galani" · "#3508 · •••• 3212". */
+/**
+ * A patient hit: "Dharti Galani" · "#3508 · •••• 3212" — and, for the
+ * appointment form's person search, "Patient · <care>" from their types.
+ */
 const commandSearchPatientSchema = patientSchema
-  .pick({ id: true, seq: true, phone: true })
+  .pick({ id: true, seq: true, phone: true, types: true })
   .extend({ name: z.string() });
 
 /** A patient hit. */
 export type CommandSearchPatient = z.infer<typeof commandSearchPatientSchema>;
 
-/** A lead hit: "Dharti Galani" · "#2352 · Clinic visited" — never a contact thread. */
+/**
+ * A lead hit: "Dharti Galani" · "#2352 · Clinic visited" — never a contact
+ * thread — and, for the appointment form's person search, "Lead #2352 ·
+ * <mobile>".
+ */
 const commandSearchLeadSchema = leadSchema.pick({
   id: true,
   seq: true,
   name: true,
   status: true,
   kind: true,
+  phone: true,
 });
 
 /** A lead hit. */

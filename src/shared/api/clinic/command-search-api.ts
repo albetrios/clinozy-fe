@@ -109,6 +109,7 @@ export async function searchClinicCommands(query: string): Promise<CommandSearch
       id: patient.id,
       seq: patient.seq,
       phone: patient.phone,
+      types: patient.types,
       name: fullName(patient),
     }));
 
@@ -122,7 +123,14 @@ export async function searchClinicCommands(query: string): Promise<CommandSearch
     )
     .sort(newestFirst)
     .slice(0, COMMAND_SEARCH_PER_TYPE)
-    .map(({ id, seq, name, status, kind }) => ({ id, seq, name, status, kind }));
+    .map(({ id, seq, name, status, kind, phone }) => ({
+      id,
+      seq,
+      name,
+      status,
+      kind,
+      phone,
+    }));
 
   const patientNames = new Map(
     patients.map((patient) => [patient.id, fullName(patient)]),

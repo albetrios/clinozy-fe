@@ -5,16 +5,23 @@ import { isHttpError } from '@/shared/errors/HttpError.ts';
 import {
   APPOINTMENT_SIDE_EFFECT_KEYS,
   appointmentQueryKeys,
+  attachVisitPhoto,
   cancelAppointment,
   createAppointment,
+  deleteVisitPhoto,
+  fetchActivePackages,
   fetchAppointment,
   fetchAppointmentDaySummaries,
   fetchAppointmentPage,
   fetchAppointmentRange,
   fetchAvailableSlots,
   fetchBookableStaff,
+  fetchBookingPerson,
+  fetchConnectedLeads,
+  fetchVisitPhotos,
   normalizeAppointmentListParams,
   restoreAppointment,
+  restoreVisitPhoto,
   setAppointmentStatus,
   undoAppointmentChange,
   updateAppointment,
@@ -24,6 +31,7 @@ import { clinicInstant } from './clinic-time.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { staffRef } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import type { LeadRecord } from './leads-contracts.ts';
 import { messageQueryKeys } from './messages-api.ts';
 
 const TODAY = '2026-10-03';
@@ -718,6 +726,157 @@ describe('cancel and restore (S:1611–1612)', () => {
       status: 409,
       detail: 'Only a cancelled appointment can be restored',
     });
+  });
+});
+
+describe('the appointment form’s reads (S:27, S:1604)', () => {
+  const lead = (where: (row: LeadRecord) => boolean) => {
+    const found = clinicFixtures.leads.snapshot(where)[0];
+    if (!found) throw new Error('no such lead');
+    return found;
+  };
+
+  it('reads the person a prefill names — a patient with their usual doctor and care types', async () => {
+    const dharti = clinicFixtures.patients.snapshot(
+      (row) => row.firstName === 'Dharti',
+    )[0];
+    if (!dharti) throw new Error('no Dharti');
+    expect(await fetchBookingPerson(dharti.id)).toMatchObject({
+      kind: 'patient',
+      name: 'Dharti Galani',
+      patientId: dharti.id,
+      usualDoctorId: dharti.doctorId,
+      types: dharti.types,
+    });
+  });
+
+  it('reads a lead as a lead, and a converted lead as its patient', async () => {
+    const open = lead((row) => !row.isContactThread && row.patientId === null);
+    expect(await fetchBookingPerson(open.id)).toMatchObject({
+      kind: 'lead',
+      leadId: open.id,
+      seq: open.seq,
+      patientId: null,
+      usualDoctorId: null,
+      types: [],
+    });
+    const converted = lead((row) => !row.isContactThread && row.patientId !== null);
+    expect(await fetchBookingPerson(converted.id)).toMatchObject({
+      kind: 'patient',
+      patientId: converted.patientId,
+      leadId: converted.id,
+    });
+    expect(await failureOf(fetchBookingPerson(ref.lead(1)))).toMatchObject({
+      status: 404,
+    });
+  });
+
+  it('lists a person’s connected leads — theirs and their mobile’s, never a contact thread — newest first', async () => {
+    const converted = lead((row) => !row.isContactThread && row.patientId !== null);
+    const leads = await fetchConnectedLeads({
+      patientId: converted.patientId,
+      leadId: null,
+      phone: converted.phone,
+    });
+    const expected = clinicFixtures.leads
+      .snapshot(
+        (row) =>
+          !row.isContactThread &&
+          (row.patientId === converted.patientId || row.phone === converted.phone),
+      )
+      .map((row) => row.id);
+    expect(leads.map((row) => row.id)).toContain(converted.id);
+    expect(leads.map((row) => row.id).sort()).toEqual([...expected].sort());
+    const created = leads.map((row) => row.createdAt);
+    expect(created).toEqual([...created].sort().reverse());
+    expect(
+      await fetchConnectedLeads({
+        patientId: null,
+        leadId: null,
+        phone: '+910000000000',
+      }),
+    ).toEqual([]);
+  });
+
+  it('lists a patient’s packages with a session left, the soonest to expire first', async () => {
+    const packages = await fetchActivePackages(patientId('Dharti'));
+    expect(packages.length).toBeGreaterThan(0);
+    for (const option of packages) {
+      expect(option.sessionsUsed).toBeLessThan(option.sessionsTotal);
+      expect(option.validUntil >= TODAY).toBe(true);
+    }
+    const until = packages.map((option) => option.validUntil);
+    expect(until).toEqual([...until].sort());
+    expect(await fetchActivePackages(patientId('Priti'))).toEqual([]);
+  });
+});
+
+describe('a new contact on a booking (S:1609)', () => {
+  it('books them as their contact thread, in the same change', async () => {
+    const booked = await createAppointment({
+      doctorId: DR,
+      date: '2026-10-05',
+      startTime: '12:00',
+      newContact: { name: 'Kavya Mehta', phone: '+919811122233' },
+    });
+    expect(booked.person).toMatchObject({ kind: 'contact', name: 'Kavya Mehta' });
+    expect(booked.leadId).not.toBeNull();
+    const thread = clinicFixtures.leads.snapshot((row) => row.id === booked.leadId)[0];
+    expect(thread).toMatchObject({ isContactThread: true, phone: '+919811122233' });
+  });
+
+  it('refuses a new contact without a name or a ten-digit mobile (422)', async () => {
+    const base = { doctorId: DR, date: '2026-10-05', startTime: '12:00' };
+    expect(
+      await failureOf(
+        createAppointment({ ...base, newContact: { name: ' ', phone: '+919811122233' } }),
+      ),
+    ).toMatchObject({ status: 422, fields: { name: ['Add a name'] } });
+    expect(
+      await failureOf(
+        createAppointment({ ...base, newContact: { name: 'Kavya', phone: '98111' } }),
+      ),
+    ).toMatchObject({ status: 422, fields: { phone: ['Mobile needs 10 digits'] } });
+  });
+});
+
+describe('visit photos (S:1613)', () => {
+  it('lists a visit’s photos, newest first', async () => {
+    const photos = await fetchVisitPhotos(ref.appointment(2790));
+    expect(photos).toHaveLength(3);
+    const created = photos.map((photo) => photo.createdAt);
+    expect(created).toEqual([...created].sort().reverse());
+    expect(await fetchVisitPhotos(ref.appointment(2861))).toEqual([]);
+  });
+
+  it('files a photo only once the patient is in — then deletes it and brings it back', async () => {
+    expect(
+      await failureOf(
+        attachVisitPhoto({
+          appointmentId: ref.appointment(2859),
+          album: 'general',
+          key: 'uploads/before.jpg',
+          fileName: 'before.jpg',
+        }),
+      ),
+    ).toMatchObject({ status: 409, code: 'not_checked_in' });
+    const photo = await attachVisitPhoto({
+      appointmentId: ref.appointment(2790),
+      album: 'lhr',
+      key: 'uploads/after.jpg',
+      fileName: 'after.jpg',
+    });
+    expect(photo).toMatchObject({
+      appointmentId: ref.appointment(2790),
+      patientId: patientId('Dharti'),
+      album: 'lhr',
+      takenOn: visit(2790).date,
+    });
+    expect((await fetchVisitPhotos(ref.appointment(2790)))[0]?.id).toBe(photo.id);
+    await deleteVisitPhoto(photo.id, 'duplicate', null);
+    expect(await fetchVisitPhotos(ref.appointment(2790))).toHaveLength(3);
+    await restoreVisitPhoto(photo.id);
+    expect(await fetchVisitPhotos(ref.appointment(2790))).toHaveLength(4);
   });
 });
 

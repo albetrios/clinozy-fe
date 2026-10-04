@@ -1,10 +1,10 @@
 # `pages/organization/$organizationSlug/appointments/$appointmentId` — Appointment
 
 Route: `/organization/$organizationSlug/appointments/$appointmentId` (`S:28`). A URL-driven dialog
-over the Appointments page (KICKOFF §4, D24): show is edit (the form with its status strip and
-chat column, L-38). The route renders nothing; the page reads the id
+over the Appointments page (KICKOFF §4, D24): show is edit (`@/shared/forms/AppointmentForm/`
+with its status tiles and chat column, L-38). The route renders nothing; the page reads the id
 (`useAppointmentsDialogRoute`), resolves the booking with `useDialogRouteRecord` and opens the
-drawer over itself. An unknown or deleted id opens nothing: the URL goes back to `/appointments`
+drawer over itself — its skeleton at once, the booking filling the same drawer once read. An unknown or deleted id opens nothing: the URL goes back to `/appointments`
 in place, the page's filters kept, with "Appointment not found · it may have been deleted"
 (`S:115`).
 

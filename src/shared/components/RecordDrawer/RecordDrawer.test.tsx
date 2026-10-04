@@ -184,6 +184,54 @@ describe('RecordDrawer — shell', () => {
     );
   });
 
+  it('takes a width the screen measures, with a column at the inline end (the form’s chat)', async () => {
+    renderWithProviders(
+      <Harness
+        startOpen
+        panelWidth={1180}
+        aside={{ width: 420, content: <p>the chat</p> }}
+        closeStyle="form"
+      />,
+    );
+    const drawer = await screen.findByTestId('pt');
+    expect(drawer).toHaveClass('md:w-(--drawer-panel-width)');
+    expect(drawer.style.getPropertyValue('--drawer-panel-width')).toBe('1180px');
+    expect(drawer.style.getPropertyValue('--drawer-aside-width')).toBe('420px');
+    expect(within(screen.getByTestId('pt-aside')).getByText('the chat')).toBeVisible();
+    expect(within(screen.getByTestId('pt-main')).getByTestId('pt-body')).toBeVisible();
+    expect(screen.getByTestId('pt-close')).toHaveClass(
+      '-start-[2.875rem]',
+      'rounded-lg',
+      'border',
+    );
+  });
+
+  it('leaves the column out on a phone', async () => {
+    viewport.tier = 'phone';
+    renderWithProviders(
+      <Harness startOpen panelWidth={375} aside={{ width: 420, content: <p>chat</p> }} />,
+    );
+    await screen.findByTestId('pt');
+    expect(screen.queryByTestId('pt-aside')).not.toBeInTheDocument();
+    expect(screen.queryByText('chat')).not.toBeInTheDocument();
+  });
+
+  it('holds the primary until the first change, and dims it while incomplete', async () => {
+    const { unmount } = renderWithProviders(<Harness startOpen saveDisabled />);
+    expect(await screen.findByTestId('pt-save')).toBeDisabled();
+    unmount();
+    const onSave = vi.fn();
+    const u = user();
+    renderWithProviders(
+      <Harness startOpen saveIncomplete compactFooter onSave={onSave} />,
+    );
+    const save = await screen.findByTestId('pt-save');
+    expect(save).toHaveAttribute('data-incomplete', 'true');
+    expect(save).toHaveClass('opacity-50', 'md:h-8');
+    await u.click(save);
+    expect(onSave).toHaveBeenCalledOnce();
+  });
+
   it('shows Quick fill presets, which run without saving', async () => {
     const onSelect = vi.fn();
     const onSave = vi.fn();

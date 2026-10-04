@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   type ReactNode,
   type Ref,
   type RefObject,
@@ -86,6 +87,25 @@ export interface RecordDrawerProps {
   content?: DrawerContentProfile;
   /** An explicit width; an items field still forces at least 840px. */
   width?: ExplicitDrawerWidth;
+  /**
+   * The width from `md`, in px, when the screen measures it itself — the
+   * appointment form's `min(760, max(560, vw − 56))` and its form + chat rule
+   * (KICKOFF §6.4). It replaces `width` and the automatic width.
+   */
+  panelWidth?: number;
+  /**
+   * A column at the drawer's inline end from `md` — the appointment form's
+   * chat (KICKOFF §6.4): its content and its width in px, inside `panelWidth`.
+   * The form keeps the rest behind a hairline. Not rendered on a phone.
+   */
+  aside?: { content: ReactNode; width: number };
+  /**
+   * The floating ×: the record drawers' (`record`, 14px outside, `rounded-xl`,
+   * no border — `_patterns.md:30`) or the form drawers' (`form`, 10px outside,
+   * `rounded-lg` with a hairline — the appointment form and the lead forms,
+   * H:2742, H:1886).
+   */
+  closeStyle?: 'record' | 'form';
   /** The room's section tone (the open step's number circle). */
   tone?: Tone;
   /** Step cards, in order; without them the body is just `children`. */
@@ -113,6 +133,12 @@ export interface RecordDrawerProps {
   saveLabel?: string;
   onSave?: () => void;
   saveState?: DrawerSaveState;
+  /** Nothing to save yet (an edit before its first change, Q-P1): the primary is disabled. */
+  saveDisabled?: boolean;
+  /** Not complete yet: the primary at 50%, still clickable — the screen names what is missing. */
+  saveIncomplete?: boolean;
+  /** The form drawers' footer: 32px buttons and a 13px summary (H:2831). */
+  compactFooter?: boolean;
   saveAndAddLabel?: string;
   /** Offered where the screen passes it, never on a phone. */
   onSaveAndAdd?: () => void;
@@ -282,6 +308,44 @@ function useDrawerActions(
   };
 }
 
+/** The widths a screen measured itself, as the panel's CSS variables. */
+function panelStyle(
+  panelWidth: number | undefined,
+  aside: { width: number } | undefined,
+): CSSProperties | undefined {
+  if (panelWidth === undefined && !aside) return undefined;
+  return {
+    ...(panelWidth === undefined ? {} : { '--drawer-panel-width': `${panelWidth}px` }),
+    ...(aside ? { '--drawer-aside-width': `${aside.width}px` } : {}),
+  } as CSSProperties;
+}
+
+/** The drawer's content: the form alone, or the form and the column at its inline end. */
+function DrawerColumns({
+  main,
+  aside,
+  testId,
+}: {
+  main: ReactNode;
+  aside: ReactNode | undefined;
+  testId: string;
+}) {
+  if (aside === undefined) return main;
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_var(--drawer-aside-width)]">
+      <div
+        data-testid={`${testId}-main`}
+        className="flex min-h-0 min-w-0 flex-col border-e"
+      >
+        {main}
+      </div>
+      <div data-testid={`${testId}-aside`} className="flex min-h-0 min-w-0 flex-col">
+        {aside}
+      </div>
+    </div>
+  );
+}
+
 /**
  * Focus starts on the title (`_patterns.md:38`, §7.2) — or on what the screen
  * names instead — and goes back to whatever was focused when the drawer opened:
@@ -317,7 +381,9 @@ function useTitleFocus(initialFocusRef?: RefObject<HTMLElement | null>) {
  * browser Back — asks before discarding a dirty drawer (Q-P1) and is held while
  * a save runs (§26). Focus starts on the title and returns to whatever opened
  * the drawer. Screens supply the fields; stacked children are component state
- * ({@link RecordDrawerProps.stacked}).
+ * ({@link RecordDrawerProps.stacked}). A screen that measures its own width
+ * (`panelWidth`) can add a column at the inline end from `md` (`aside`) — the
+ * appointment form's chat.
  */
 export function RecordDrawer(props: RecordDrawerProps) {
   const testId = props.testId ?? RECORD_DRAWER_TEST_ID;
@@ -332,7 +398,67 @@ export function RecordDrawer(props: RecordDrawerProps) {
     selectStep,
   );
   const close = (placement: 'floating' | 'inside') => (
-    <RecordDrawerClose placement={placement} onClose={requestClose} testId={testId} />
+    <RecordDrawerClose
+      placement={placement}
+      closeStyle={props.closeStyle}
+      onClose={requestClose}
+      testId={testId}
+    />
+  );
+  const aside = phone ? undefined : props.aside;
+
+  const main = (
+    <>
+      <DrawerHeader
+        title={props.title}
+        tag={props.tag}
+        sub={props.sub}
+        large={props.largeTitle ?? false}
+        titleRef={titleRef}
+        testId={testId}
+        close={phone ? close('inside') : null}
+      />
+      <DrawerBadges badges={props.badges ?? []} testId={testId} />
+      <QuickFillRow
+        items={props.readOnly ? [] : (props.quickFill ?? [])}
+        testId={testId}
+      />
+
+      <div
+        data-testid={`${testId}-body`}
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto p-(--drawer-body-pad)"
+      >
+        <DrawerItemsContext.Provider value={markItems}>
+          {props.children}
+          <DrawerSteps
+            steps={props.steps ?? []}
+            value={currentStep}
+            onValueChange={selectStep}
+            tone={props.tone}
+            testId={testId}
+          />
+        </DrawerItemsContext.Provider>
+      </div>
+
+      <DrawerFooter
+        summary={props.summary}
+        readOnly={props.readOnly}
+        stacked={props.stacked}
+        onDismiss={requestClose}
+        dismissLabel={props.dismissLabel}
+        saveLabel={props.saveLabel}
+        onSave={onSave}
+        saveState={props.saveState}
+        saveDisabled={props.saveDisabled}
+        saveIncomplete={props.saveIncomplete}
+        compact={props.compactFooter}
+        saveAndAddLabel={props.saveAndAddLabel}
+        onSaveAndAdd={onSaveAndAdd}
+        deleteLabel={props.deleteLabel}
+        onDelete={props.onDelete}
+        testId={testId}
+      />
+    </>
   );
 
   return (
@@ -351,60 +477,21 @@ export function RecordDrawer(props: RecordDrawerProps) {
         {...(props.sub ? {} : { 'aria-describedby': undefined })}
         onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
+        style={panelStyle(props.panelWidth, aside)}
         className={cn(
           RECORD_DRAWER_PANEL_CLASS,
-          DRAWER_WIDTH_CLASS[
-            resolveDrawerWidth(withMountedItems(props.content, itemsMounted), props.width)
-          ],
+          props.panelWidth === undefined
+            ? DRAWER_WIDTH_CLASS[
+                resolveDrawerWidth(
+                  withMountedItems(props.content, itemsMounted),
+                  props.width,
+                )
+              ]
+            : 'md:w-(--drawer-panel-width)',
         )}
       >
         {phone ? null : close('floating')}
-        <DrawerHeader
-          title={props.title}
-          tag={props.tag}
-          sub={props.sub}
-          large={props.largeTitle ?? false}
-          titleRef={titleRef}
-          testId={testId}
-          close={phone ? close('inside') : null}
-        />
-        <DrawerBadges badges={props.badges ?? []} testId={testId} />
-        <QuickFillRow
-          items={props.readOnly ? [] : (props.quickFill ?? [])}
-          testId={testId}
-        />
-
-        <div
-          data-testid={`${testId}-body`}
-          className="flex min-h-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto p-(--drawer-body-pad)"
-        >
-          <DrawerItemsContext.Provider value={markItems}>
-            {props.children}
-            <DrawerSteps
-              steps={props.steps ?? []}
-              value={currentStep}
-              onValueChange={selectStep}
-              tone={props.tone}
-              testId={testId}
-            />
-          </DrawerItemsContext.Provider>
-        </div>
-
-        <DrawerFooter
-          summary={props.summary}
-          readOnly={props.readOnly}
-          stacked={props.stacked}
-          onDismiss={requestClose}
-          dismissLabel={props.dismissLabel}
-          saveLabel={props.saveLabel}
-          onSave={onSave}
-          saveState={props.saveState}
-          saveAndAddLabel={props.saveAndAddLabel}
-          onSaveAndAdd={onSaveAndAdd}
-          deleteLabel={props.deleteLabel}
-          onDelete={props.onDelete}
-          testId={testId}
-        />
+        <DrawerColumns main={main} aside={aside?.content} testId={testId} />
         {guardDialog}
       </SheetContent>
     </Sheet>

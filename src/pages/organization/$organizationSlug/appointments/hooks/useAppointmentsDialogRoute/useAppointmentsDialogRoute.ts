@@ -50,7 +50,11 @@ export type AppointmentsDialogRoute =
 /** The dialog, and how it closes: back to the room it came from, else the page. */
 export interface AppointmentsDialogRouteState {
   dialog: AppointmentsDialogRoute;
-  close: () => void;
+  /**
+   * Close it; `date` — a new booking's day — moves the page behind it to that
+   * day (H:6051, D28).
+   */
+  close: (options?: { date?: string }) => void;
 }
 
 const CREATE_PATH = /\/appointments\/create\/?$/;
@@ -63,7 +67,8 @@ const CREATE_PATH = /\/appointments\/create\/?$/;
  * found · it may have been deleted" (`S:115`). A member without Create who
  * follows a create link lands back on the page with the permission toast.
  * `close` returns to the referrer `from` (allow-listed rooms, A-P1), else to
- * the page with its own params and nothing of the drawer's.
+ * the page with its own params and nothing of the drawer's — on the new
+ * booking's day after a create (H:6051).
  */
 export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   const { organizationSlug = '', appointmentId } = useParams({ strict: false });
@@ -73,22 +78,29 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   const { t } = useTranslation([APPOINTMENTS_NS, ERRORS_NS]);
   const access = useClinicAccess();
 
-  const backToPage = useCallback(() => {
-    void navigate({
-      ...organizationAppointments(organizationSlug),
-      // The page's own params only: the drawer's (`time`, `who`, `mode` …) close with it.
-      search: (current: Record<string, unknown>) => validateAppointmentsSearch(current),
-      hash: true,
-      replace: true,
-    });
-  }, [navigate, organizationSlug]);
+  const backToPage = useCallback(
+    (date?: string) => {
+      void navigate({
+        ...organizationAppointments(organizationSlug),
+        // The page's own params only: the drawer's (`time`, `who`, `mode` …) close with it.
+        search: (current: Record<string, unknown>) => ({
+          ...validateAppointmentsSearch(current),
+          ...(date ? { date } : {}),
+        }),
+        hash: true,
+        replace: true,
+      });
+    },
+    [navigate, organizationSlug],
+  );
+  const leaveDeadLink = useCallback(() => backToPage(), [backToPage]);
 
   const drawer = useDialogRouteRecord({
     id: appointmentId,
     queryKey: appointmentQueryKeys.detail,
     fetchRecord: fetchAppointment,
     recordLabel: t(APPOINTMENTS_KEYS.record, { ns: APPOINTMENTS_NS }),
-    onMissing: backToPage,
+    onMissing: leaveDeadLink,
   });
 
   const isCreate = appointmentId === undefined && CREATE_PATH.test(pathname);
@@ -111,13 +123,16 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
     ).from,
     '',
   );
-  const close = useCallback(() => {
-    if (from) {
-      void navigate({ href: `/organization/${organizationSlug}/${from}` });
-      return;
-    }
-    backToPage();
-  }, [from, navigate, organizationSlug, backToPage]);
+  const close = useCallback(
+    (options?: { date?: string }) => {
+      if (from) {
+        void navigate({ href: `/organization/${organizationSlug}/${from}` });
+        return;
+      }
+      backToPage(options?.date);
+    },
+    [from, navigate, organizationSlug, backToPage],
+  );
 
   if (appointmentId !== undefined) {
     if (!drawer.isOpen) return { dialog: { kind: 'none' }, close };

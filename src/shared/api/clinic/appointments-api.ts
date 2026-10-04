@@ -2,14 +2,18 @@ import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
 import {
   APPOINTMENT_SEARCH_MAX,
+  type AppointmentBookingPerson,
   type AppointmentCancelInput,
   type AppointmentChange,
+  type AppointmentConnectedLead,
   type AppointmentCreateInput,
   type AppointmentDaySummary,
   type AppointmentListParams,
   type AppointmentListParamsInput,
   appointmentListParamsSchema,
+  type AppointmentPackageOption,
   type AppointmentPatch,
+  type AppointmentPersonLookup,
   type AppointmentRangeParams,
   type AppointmentRangeParamsInput,
   appointmentRangeParamsSchema,
@@ -20,7 +24,9 @@ import {
   type AppointmentUpdate,
   type AvailableSlotsParamsInput,
   availableSlotsParamsSchema,
+  type VisitPhotoInput,
 } from './appointments-contracts.ts';
+import type { DeleteReason, PatientImage } from './clinic-schema.ts';
 
 /*
  * The Appointments API (KICKOFF §6.4; `schema-routes.md` S:1582, 1600–1612,
@@ -87,6 +93,23 @@ export const appointmentQueryKeys = {
       availableSlotsParamsSchema.parse(params),
     ] as const,
   staff: () => [...appointmentQueryKeys.all, 'staff'] as const,
+  /** The person a booking prefill names (`who=`). */
+  person: (id: string) => [...appointmentQueryKeys.all, 'person', id] as const,
+  /** A person's connected leads — the form's chips and Lead radios. */
+  connectedLeads: (person: AppointmentPersonLookup) =>
+    [
+      ...appointmentQueryKeys.all,
+      'connected-leads',
+      person.patientId,
+      person.leadId,
+      person.phone,
+    ] as const,
+  /** A patient's active packages — the Package session radios. */
+  packages: (patientId: string) =>
+    [...appointmentQueryKeys.all, 'packages', patientId] as const,
+  /** The photos filed under one visit. */
+  photos: (appointmentId: string) =>
+    [...appointmentQueryKeys.all, 'photos', appointmentId] as const,
 };
 
 /**
@@ -182,4 +205,49 @@ export async function restoreAppointment(id: string): Promise<AppointmentRow> {
 /** Undo a status write by the token it answered — its side effects included. */
 export async function undoAppointmentChange(undoToken: string): Promise<void> {
   return (await server()).undoAppointmentChange(undoToken);
+}
+
+// ── The appointment form's reads and the visit's photos ──
+
+/** The person a booking prefill names (`who=<patientId|leadId>`, `S:27`) — a 404 when it names neither. */
+export async function fetchBookingPerson(id: string): Promise<AppointmentBookingPerson> {
+  return (await server()).getBookingPerson(id);
+}
+
+/** A person's connected leads (`getAppointment`'s "connected leads", `S:1604`). */
+export async function fetchConnectedLeads(
+  person: AppointmentPersonLookup,
+): Promise<AppointmentConnectedLead[]> {
+  return (await server()).listConnectedLeads(person);
+}
+
+/** A patient's packages with a session left (C19, Appendix F). */
+export async function fetchActivePackages(
+  patientId: string,
+): Promise<AppointmentPackageOption[]> {
+  return (await server()).listActivePackages(patientId);
+}
+
+/** The photos filed under a visit, newest first. */
+export async function fetchVisitPhotos(appointmentId: string): Promise<PatientImage[]> {
+  return (await server()).listVisitPhotos(appointmentId);
+}
+
+/** File an uploaded photo under a visit (`uploadVisitPhotos`, `S:1613`) — 409 before check-in. */
+export async function attachVisitPhoto(input: VisitPhotoInput): Promise<PatientImage> {
+  return (await server()).attachVisitPhoto(input);
+}
+
+/** Delete a visit photo with the reason confirm's choice. */
+export async function deleteVisitPhoto(
+  id: string,
+  reason: DeleteReason,
+  note: string | null,
+): Promise<PatientImage> {
+  return (await server()).deleteVisitPhoto(id, reason, note);
+}
+
+/** Bring a deleted visit photo back (the Undo). */
+export async function restoreVisitPhoto(id: string): Promise<PatientImage> {
+  return (await server()).restoreVisitPhoto(id);
 }

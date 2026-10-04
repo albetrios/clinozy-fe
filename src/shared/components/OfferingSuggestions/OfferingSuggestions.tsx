@@ -7,6 +7,7 @@ import {
   type ConfirmReasonChoice,
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
+import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { ChevronDown, Eye, EyeOff, Plus } from '@/shared/icons/index.ts';
@@ -136,8 +137,18 @@ export interface OfferingSuggestionsProps {
    */
   onRemove?: (line: SuggestionLine, choice: ConfirmReasonChoice) => void | Promise<void>;
   onAddIdea?: (idea: SuggestionIdea) => void;
-  /** The dashed "Add offering" — the host opens its "Search offerings" picker. */
-  onAddOffering?: () => void;
+  /**
+   * The dashed "Add offering" — the trigger of a "Search offerings" list
+   * (`addDD`, H:4373): the host's offerings, grouped by category, an offering
+   * already suggested disabled; picking one hands its key to `onPick`.
+   */
+  addOffering?: { options: readonly PickerOption[]; onPick: (key: string) => void };
+  /**
+   * Open or collapsed — controlled when the host passes it (the appointment
+   * form's plan flag opens it); the card's own otherwise, starting by `variant`.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /** The open header's end (H:2803): the plan total, the line under it and the 32px price eye. */
@@ -193,7 +204,7 @@ type PlanBodyProps = Pick<
   | 'onChange'
   | 'onLinkInvoice'
   | 'onAddIdea'
-  | 'onAddOffering'
+  | 'addOffering'
 > & {
   ideas: readonly SuggestionIdea[];
   /** Remove opens the reason confirm the card owns. */
@@ -217,7 +228,7 @@ function PlanBody({
   onChange,
   onLinkInvoice,
   onAddIdea,
-  onAddOffering,
+  addOffering,
   onAskRemove,
 }: PlanBodyProps) {
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
@@ -259,18 +270,35 @@ function PlanBody({
           onAdd={canEdit && onAddIdea ? () => onAddIdea(idea) : undefined}
         />
       ))}
-      {canEdit && onAddOffering ? (
+      {canEdit && addOffering ? (
         <div className="border-border border-b px-3.5 py-2">
-          <button
-            type="button"
-            data-testid={OFFERING_SUGGESTIONS_TEST_IDS.addOffering}
-            onClick={onAddOffering}
-            data-slot="button"
-            className="border-border-strong bg-card hover:bg-muted text-detail inline-flex h-7.5 items-center gap-1.5 rounded-lg border border-dashed ps-2.5 pe-3 font-medium transition-colors"
-          >
-            <Plus aria-hidden="true" className="text-muted-foreground-strong size-3.5" />
-            {t(KEYS.addOffering)}
-          </button>
+          <Picker
+            label={t(KEYS.addOffering)}
+            options={addOffering.options}
+            value={null}
+            onChange={(key) => {
+              if (key) addOffering.onPick(key);
+            }}
+            searchable
+            searchPlaceholder={t(KEYS.searchOfferings)}
+            minWidth={340}
+            testId={OFFERING_SUGGESTIONS_TEST_IDS.addOffering}
+            className="w-auto"
+            renderTrigger={() => (
+              <button
+                type="button"
+                data-testid={OFFERING_SUGGESTIONS_TEST_IDS.addOffering}
+                data-slot="button"
+                className="border-border-strong bg-card hover:bg-muted text-detail inline-flex h-7.5 items-center gap-1.5 rounded-lg border border-dashed ps-2.5 pe-3 font-medium transition-colors"
+              >
+                <Plus
+                  aria-hidden="true"
+                  className="text-muted-foreground-strong size-3.5"
+                />
+                {t(KEYS.addOffering)}
+              </button>
+            )}
+          />
         </div>
       ) : null}
       {purchases && purchases.lines.length > 0 ? (
@@ -306,12 +334,19 @@ export function OfferingSuggestions({
   variant,
   onPricesShownChange,
   onRemove,
+  open: openProp,
+  onOpenChange,
   ...props
 }: OfferingSuggestionsProps) {
   const { firstName, lines, pricesShown } = props;
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
   const money = usePaiseFormat();
-  const [open, setOpen] = useState(variant === 'form');
+  const [ownOpen, setOwnOpen] = useState(variant === 'form');
+  const open = openProp ?? ownOpen;
+  const setOpen = (next: boolean) => {
+    if (openProp === undefined) setOwnOpen(next);
+    onOpenChange?.(next);
+  };
   const [removing, setRemoving] = useState<SuggestionLine | null>(null);
   const totals = suggestionTotals(lines);
   const sub = headerSub({
@@ -340,7 +375,7 @@ export function OfferingSuggestions({
             type="button"
             aria-expanded={open}
             data-testid={OFFERING_SUGGESTIONS_TEST_IDS.toggle}
-            onClick={() => setOpen((current) => !current)}
+            onClick={() => setOpen(!open)}
             className="hover:bg-canvas flex min-w-0 flex-1 items-center gap-2.5 px-3.5 py-3 text-start transition-colors"
           >
             <span className="flex min-w-0 flex-1 flex-col">
