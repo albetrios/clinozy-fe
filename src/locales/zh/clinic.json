@@ -227,9 +227,6 @@
       "other": "其他"
     }
   },
-  "roomList": {
-    "loadFailed": "无法加载此列表 · 连接已断开。正在显示上次的副本。"
-  },
   "patientDelete": {
     "title": "删除此患者？",
     "titleRecord": "删除此记录？",

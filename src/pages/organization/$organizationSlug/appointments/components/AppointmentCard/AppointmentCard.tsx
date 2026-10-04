@@ -42,7 +42,12 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import { latestEvent, PERSON_TONES, serviceTone } from '../../appointments.display.ts';
+import {
+  latestEvent,
+  PERSON_TONES,
+  serviceTone,
+  staffName,
+} from '../../appointments.display.ts';
 import { useLatestUpdateWords } from '../../hooks/useLatestUpdateWords/index.ts';
 import { useAppointmentActions } from '../AppointmentActions/index.ts';
 import { AppointmentStatusPill } from '../AppointmentStatusPill/index.ts';
@@ -171,9 +176,7 @@ export function AppointmentCardContent({
   const moves = allowedNext(status).filter((move) => move !== stepMove);
   const closed = status === 'cancelled' || status === 'no_show';
   const event = latestEvent(appointment);
-  const doctorName = doctor
-    ? shortPersonName([doctor.firstName, doctor.lastName].filter(Boolean).join(' '))
-    : '';
+  const doctorName = doctor ? shortPersonName(staffName(doctor)) : '';
   const run = (action: () => void) => () => {
     close();
     action();

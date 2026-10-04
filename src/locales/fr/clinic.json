@@ -227,9 +227,6 @@
       "other": "Autre"
     }
   },
-  "roomList": {
-    "loadFailed": "Impossible de charger la liste · connexion perdue. Affichage de la dernière copie."
-  },
   "patientDelete": {
     "title": "Supprimer ce patient ?",
     "titleRecord": "Supprimer cet enregistrement ?",

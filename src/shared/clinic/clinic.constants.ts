@@ -89,16 +89,20 @@ export const CLINIC_KEYS = {
     },
   },
   /**
+   * A room list's load failure (KICKOFF §6.0 List error): the toast that keeps
+   * the last copy on screen, with "Retry" — every room's, through
+   * `useListLoadError`.
+   */
+  lists: {
+    loadError: 'lists.loadError',
+    retry: 'lists.retry',
+  },
+  /**
    * The contract's enum labels the rooms share (`schema-routes.md` › Enums,
    * labels verbatim): what the chat column's history and the rooms' pills
    * name a stored value. An appointment's status is the appointments domain's
    * (`appointments.statuses`).
    */
-  /** A room list's load failure (KICKOFF §6.0 List error; `useListLoadError`). */
-  lists: {
-    loadError: 'lists.loadError',
-    retry: 'lists.retry',
-  },
   channels: {
     whatsapp: 'channels.whatsapp',
     call: 'channels.call',
@@ -278,13 +282,6 @@ export const CLINIC_KEYS = {
       walk_in: 'patients.referralSources.walk_in',
       other: 'patients.referralSources.other',
     },
-  },
-  /**
-   * A room list's read failing (KICKOFF §6.0 States): the toast that keeps the
-   * last copy on screen, with "Retry" (`errors` › `widget.retry`).
-   */
-  roomList: {
-    loadFailed: 'roomList.loadFailed',
   },
   /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and

@@ -1,13 +1,11 @@
 import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { downloadCsv, toCsv } from '@/lib/csv.ts';
-import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPatientCreate } from '@/lib/routes/index.ts';
 import type { PatientRow, PatientView } from '@/shared/api/clinic/patients-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   type ClinicCommandNavigation,
   clinicCommandNavigation,
@@ -28,6 +26,7 @@ import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -52,9 +51,6 @@ import {
 } from './patients.constants.ts';
 import { patientListParamsOf } from './patients.params.ts';
 import { PATIENTS_SEARCH_DEFAULTS, validatePatientsSearch } from './patients.search.ts';
-
-/** One toast id: a second failure replaces the first instead of stacking. */
-const LIST_ERROR_TOAST_ID = 'patients-list-error';
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'patients.csv';
@@ -100,27 +96,14 @@ function TableEmpty({
 
 /**
  * The last rows the list loaded, kept while a read fails — "Showing the last
- * copy" (KICKOFF §6.0 List error) — and a 9s toast with "Retry".
+ * copy" (KICKOFF §6.0 List error) — under the rooms' one list-error toast
+ * with "Retry" (`useListLoadError`).
  */
 function useLastCopy(list: ReturnType<typeof usePatientList>): readonly PatientRow[] {
-  const { t } = useTranslation([CLINIC_NS, ERRORS_NS]);
   const [lastCopy, setLastCopy] = useState<readonly PatientRow[]>(list.rows);
   const settled = !(list.isError || list.isPending);
   if (settled && list.rows !== lastCopy) setLastCopy(list.rows);
-
-  const raiseError = useEffectEvent(() => {
-    notify.error(t(CLINIC_KEYS.roomList.loadFailed, { ns: CLINIC_NS }), {
-      id: LIST_ERROR_TOAST_ID,
-      action: {
-        label: t(ERRORS_KEYS.widget.retry, { ns: ERRORS_NS }),
-        onClick: list.refetch,
-      },
-    });
-  });
-  useEffect(() => {
-    if (list.isError) raiseError();
-  }, [list.isError]);
-
+  useListLoadError(list, PATIENTS_TABLE_ID);
   return list.isError && list.rows.length === 0 ? lastCopy : list.rows;
 }
 

@@ -25,7 +25,10 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
-vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: notifyMock,
+  TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
+}));
 
 const PATIENTS = '/organization/acme/patients';
 

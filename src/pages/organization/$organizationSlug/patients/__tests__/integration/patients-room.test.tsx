@@ -27,7 +27,10 @@ const { notifyMock } = vi.hoisted(() => ({
     dismiss: vi.fn(),
   },
 }));
-vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: notifyMock,
+  TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
+}));
 
 const csv = vi.hoisted(() => ({ downloadCsv: vi.fn() }));
 vi.mock('@/lib/csv.ts', async (importOriginal) => ({
@@ -309,7 +312,10 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith(
         'Couldn’t load this list · connection dropped. Showing the last copy.',
-        expect.objectContaining({ action: expect.objectContaining({ label: 'Retry' }) }),
+        expect.objectContaining({
+          duration: 9_000,
+          action: expect.objectContaining({ label: 'Retry' }),
+        }),
       ),
     );
     expect(rows()).toHaveLength(30);

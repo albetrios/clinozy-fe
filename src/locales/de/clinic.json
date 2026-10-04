@@ -227,9 +227,6 @@
       "other": "Sonstiges"
     }
   },
-  "roomList": {
-    "loadFailed": "Liste konnte nicht geladen werden · Verbindung unterbrochen. Letzter Stand wird angezeigt."
-  },
   "patientDelete": {
     "title": "Diesen Patienten löschen?",
     "titleRecord": "Diesen Datensatz löschen?",

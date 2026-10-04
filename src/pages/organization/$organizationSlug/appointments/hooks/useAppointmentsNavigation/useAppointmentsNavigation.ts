@@ -10,7 +10,11 @@ import {
   appointmentViewRange,
 } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  addCivilDays,
+  addCivilMonths,
+  clinicToday,
+} from '@/shared/api/clinic/clinic-time.ts';
 
 import {
   type AppointmentsSearch,
@@ -53,24 +57,16 @@ export interface AppointmentsNavigation {
   openAppointment: (id: string, mode?: 'reschedule') => void;
 }
 
-/** A month later or earlier, kept inside the month (31 Jan + 1 month → 28 Feb). */
-function shiftMonth(date: string, months: number): string {
-  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
-  const target = new Date(Date.UTC(year, month - 1 + months, 1));
-  const last = new Date(
-    Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0),
-  ).getUTCDate();
-  target.setUTCDate(Math.min(day, last));
-  return target.toISOString().slice(0, 10);
-}
-
-/** The calendars' anchor one period away (`shiftPeriod`). */
+/**
+ * The calendars' anchor one period away (`shiftPeriod`); a month keeps its day
+ * inside the month (31 Jan + 1 month → 28 Feb).
+ */
 export function shiftAnchor(
   anchor: string,
   view: Exclude<AppointmentView, 'agenda'>,
   direction: -1 | 1,
 ): string {
-  if (view === 'month') return shiftMonth(anchor, direction);
+  if (view === 'month') return addCivilMonths(anchor, direction);
   return addCivilDays(anchor, view === 'week' ? 7 * direction : direction);
 }
 

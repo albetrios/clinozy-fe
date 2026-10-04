@@ -227,9 +227,6 @@
       "other": "Outro"
     }
   },
-  "roomList": {
-    "loadFailed": "Não foi possível carregar a lista · conexão perdida. Mostrando a última cópia."
-  },
   "patientDelete": {
     "title": "Excluir este paciente?",
     "titleRecord": "Excluir este registro?",

@@ -227,9 +227,6 @@
       "other": "Other"
     }
   },
-  "roomList": {
-    "loadFailed": "Couldn’t load this list · connection dropped. Showing the last copy."
-  },
   "patientDelete": {
     "title": "Delete this patient?",
     "titleRecord": "Delete this record?",

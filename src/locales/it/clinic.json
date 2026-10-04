@@ -227,9 +227,6 @@
       "other": "Altro"
     }
   },
-  "roomList": {
-    "loadFailed": "Impossibile caricare l’elenco · connessione interrotta. Mostriamo l’ultima copia."
-  },
   "patientDelete": {
     "title": "Eliminare questo paziente?",
     "titleRecord": "Eliminare questo record?",

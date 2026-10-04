@@ -227,9 +227,6 @@
       "other": "기타"
     }
   },
-  "roomList": {
-    "loadFailed": "목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다."
-  },
   "patientDelete": {
     "title": "이 환자를 삭제할까요?",
     "titleRecord": "이 기록을 삭제할까요?",
