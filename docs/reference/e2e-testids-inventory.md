@@ -102,6 +102,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)   | `pages/organization/$organizationSlug/offerings/`     |
 | `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c) | `pages/organization/$organizationSlug/offerings/`     |
 | `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)              |
+| `offer-drawer`                   | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)    | `offerings/offers/` (child of the above)              |
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
@@ -435,6 +436,23 @@ chip group's chips are `<group>-<value>` (`offering-drawer-category-lhr`,
 | `<d>-duration` / `<d>-validity`                             | Duration and Validity steppers                                                 | OfferingDrawer                         |
 | `<d>-search-terms` / `<d>-description` / `<d>-status`       | Search terms, Description, the Status toggle                                   | OfferingDrawer                         |
 | `<d>-skeleton`                                              | Edit offering while a deep-linked offering loads                               | OfferingDrawer                         |
+
+### Offer drawer (Offerings room, launch L-30d)
+
+New offer and Edit offer are one `OfferDrawer`; `<o>` is `offer-drawer`. Its steps are `offer`,
+`where` and `notes`. The Type chips are `<o>-kind-<kind>` (`percent`, `amount`, `fixed`, `extra`),
+a swatch is `<o>-colour-<tone>`, the Offerings picker's options `<o>-offerings-option-<offeringId>`
+(its list `<o>-offerings-panel`), and a stepper's quick picks `<o>-value-quick-<value>`. The Offers
+tab's rows add `offers-row-action-edit` / `-pause` / `-resume` beside `-delete`.
+
+| Test ID                                                           | Element                                                                | Source                           |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------- |
+| `<o>-name` / `<o>-code` / `<o>-kind` / `<o>-value` / `<o>-colour` | Step 1: Name, Code, Type chips, the value (stepper or ₹ field), Colour | `offers/components/OfferDrawer/` |
+| `<o>-offerings` / `<o>-branches`                                  | Step 2: the Offerings picker, Branches chips (several branches)        | OfferDrawer                      |
+| `<o>-starts` / `<o>-ends`                                         | Starts and Ends date pickers (empty = "Now" / "no end")                | OfferDrawer                      |
+| `<o>-preview-<offeringId>`                                        | One picked offering's preview box ("₹1,200 → ₹1,080")                  | OfferDrawer                      |
+| `<o>-note` / `<o>-status`                                         | Step 3: Note and the Live / Paused toggle                              | OfferDrawer                      |
+| `<o>-skeleton`                                                    | Edit offer while a deep-linked offer loads                             | OfferDrawer                      |
 
 ## Items field (shared, launch L-17a)
 

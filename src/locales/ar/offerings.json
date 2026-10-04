@@ -142,8 +142,10 @@
     },
     "empty": {
       "title": "لا توجد عروض بعد",
-      "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
-    }
+      "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+      "newOffer": "عرض جديد"
+    },
+    "record": "عرض"
   },
   "record": "خدمة",
   "offeringDrawer": {
@@ -241,6 +243,77 @@
       "addPrice": "أضف سعرًا",
       "offerAbovePrice": "لا يمكن أن يزيد سعر العرض على السعر",
       "floorAboveOffer": "لا يمكن أن يزيد أدنى سعر على سعر العرض"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "عرض جديد",
+      "edit": "تعديل العرض"
+    },
+    "sub": "سعر لفترة محدودة على خدمة أو أكثر · يُطبَّق تلقائيًا",
+    "untitled": "عرض جديد",
+    "steps": {
+      "offer": "العرض",
+      "where": "أين يُطبَّق",
+      "notes": "ملاحظات"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: توهّج ديوالي",
+      "code": "الرمز",
+      "codeHint": "اختياري · للإعلانات",
+      "codePlaceholder": "GLOW20",
+      "type": "النوع",
+      "value": {
+        "percent": "الخصم",
+        "amount": "مبلغ الخصم",
+        "fixed": "سعر العرض",
+        "extra": "جلسات مجانية"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "جلسات",
+      "colour": "اللون",
+      "colourHint": "يميّز هذا العرض على الخدمات والفواتير",
+      "offerings": "الخدمات",
+      "offeringsHint": "اختر واحدة أو أكثر",
+      "offeringsSearch": "ابحث في الخدمات",
+      "branches": "الفروع",
+      "branchesHint": "حيث يمكن للاستقبال استخدامه",
+      "starts": "يبدأ",
+      "ends": "ينتهي",
+      "previewPrice": "{{before}} ← {{after}}",
+      "previewSessions_zero": "{{before}} ← {{count}} جلسة",
+      "previewSessions_one": "{{before}} ← جلسة واحدة",
+      "previewSessions_two": "{{before}} ← جلستان",
+      "previewSessions_few": "{{before}} ← {{count}} جلسات",
+      "previewSessions_many": "{{before}} ← {{count}} جلسة",
+      "previewSessions_other": "{{before}} ← {{count}} جلسة",
+      "note": "ملاحظة",
+      "notePlaceholder": "لمن هو، وكيف يذكره الاستقبال",
+      "status": "الحالة",
+      "live": "مفعّل · يُطبَّق تلقائيًا",
+      "paused": "متوقف مؤقتًا"
+    },
+    "offeringCount_zero": "{{count}} خدمة",
+    "offeringCount_one": "خدمة واحدة",
+    "offeringCount_two": "خدمتان",
+    "offeringCount_few": "{{count}} خدمات",
+    "offeringCount_many": "{{count}} خدمة",
+    "offeringCount_other": "{{count}} خدمة",
+    "save": {
+      "create": "إنشاء العرض",
+      "edit": "حفظ العرض"
+    },
+    "toasts": {
+      "name": "سمِّ العرض",
+      "offerings": "اختر خدمة واحدة على الأقل",
+      "value": {
+        "percent": "حدّد الخصم",
+        "amount": "حدّد المبلغ",
+        "fixed": "حدّد المبلغ",
+        "extra": "حدّد الجلسات المجانية"
+      },
+      "endsBeforeStart": "ينتهي قبل أن يبدأ"
     }
   }
 }

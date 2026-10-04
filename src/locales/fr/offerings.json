@@ -118,8 +118,10 @@
     },
     "empty": {
       "title": "Aucune offre pour l’instant",
-      "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
-    }
+      "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
+      "newOffer": "Nouvelle offre"
+    },
+    "record": "Offre"
   },
   "record": "Prestation",
   "offeringDrawer": {
@@ -211,6 +213,71 @@
       "addPrice": "Ajoutez un prix",
       "offerAbovePrice": "Le prix proposé ne peut pas dépasser le prix",
       "floorAboveOffer": "Le prix plancher ne peut pas dépasser le prix proposé"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Nouvelle offre",
+      "edit": "Modifier l’offre"
+    },
+    "sub": "Un prix limité dans le temps sur une ou plusieurs prestations · s’applique tout seul",
+    "untitled": "Nouvelle offre",
+    "steps": {
+      "offer": "Offre",
+      "where": "Où elle s’applique",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "ex. Éclat de Diwali",
+      "code": "Code",
+      "codeHint": "facultatif · pour les annonces",
+      "codePlaceholder": "GLOW20",
+      "type": "Type",
+      "value": {
+        "percent": "Remise",
+        "amount": "Montant de la remise",
+        "fixed": "Prix de l’offre",
+        "extra": "Séances offertes"
+      },
+      "percentQuick": "{{value}} %",
+      "sessionsUnit": "séances",
+      "colour": "Couleur",
+      "colourHint": "signale cette offre sur les prestations et les factures",
+      "offerings": "Prestations",
+      "offeringsHint": "choisissez-en une ou plusieurs",
+      "offeringsSearch": "Rechercher des prestations",
+      "branches": "Établissements",
+      "branchesHint": "où l’accueil peut l’utiliser",
+      "starts": "Début",
+      "ends": "Fin",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} séance",
+      "previewSessions_many": "{{before}} → {{count}} séances",
+      "previewSessions_other": "{{before}} → {{count}} séances",
+      "note": "Note",
+      "notePlaceholder": "À qui elle s’adresse, comment l’accueil doit en parler",
+      "status": "Statut",
+      "live": "Active · s’applique automatiquement",
+      "paused": "En pause"
+    },
+    "offeringCount_one": "{{count}} prestation",
+    "offeringCount_many": "{{count}} prestations",
+    "offeringCount_other": "{{count}} prestations",
+    "save": {
+      "create": "Créer l’offre",
+      "edit": "Enregistrer l’offre"
+    },
+    "toasts": {
+      "name": "Nommez l’offre",
+      "offerings": "Choisissez au moins une prestation",
+      "value": {
+        "percent": "Indiquez la remise",
+        "amount": "Indiquez le montant",
+        "fixed": "Indiquez le montant",
+        "extra": "Indiquez les séances offertes"
+      },
+      "endsBeforeStart": "Se termine avant de commencer"
     }
   }
 }

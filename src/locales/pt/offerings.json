@@ -118,8 +118,10 @@
     },
     "empty": {
       "title": "Ainda não há ofertas",
-      "description": "Ainda não há nada aqui. Tente outra aba ou busca."
-    }
+      "description": "Ainda não há nada aqui. Tente outra aba ou busca.",
+      "newOffer": "Nova oferta"
+    },
+    "record": "Oferta"
   },
   "record": "Serviço",
   "offeringDrawer": {
@@ -211,6 +213,71 @@
       "addPrice": "Adicione um preço",
       "offerAbovePrice": "O preço da oferta não pode ser maior que o preço",
       "floorAboveOffer": "O preço mínimo não pode ser maior que o preço da oferta"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Nova oferta",
+      "edit": "Editar oferta"
+    },
+    "sub": "Um preço por tempo limitado em um ou mais serviços · aplica-se sozinho",
+    "untitled": "Nova oferta",
+    "steps": {
+      "offer": "Oferta",
+      "where": "Onde se aplica",
+      "notes": "Notas"
+    },
+    "fields": {
+      "name": "Nome",
+      "namePlaceholder": "ex.: Brilho de Diwali",
+      "code": "Código",
+      "codeHint": "opcional · para anúncios",
+      "codePlaceholder": "GLOW20",
+      "type": "Tipo",
+      "value": {
+        "percent": "Desconto",
+        "amount": "Valor do desconto",
+        "fixed": "Preço da oferta",
+        "extra": "Sessões grátis"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "sessões",
+      "colour": "Cor",
+      "colourHint": "marca esta oferta nos serviços e nas contas",
+      "offerings": "Serviços",
+      "offeringsHint": "escolha um ou mais",
+      "offeringsSearch": "Buscar serviços",
+      "branches": "Unidades",
+      "branchesHint": "onde a recepção pode usá-la",
+      "starts": "Início",
+      "ends": "Fim",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} sessão",
+      "previewSessions_many": "{{before}} → {{count}} sessões",
+      "previewSessions_other": "{{before}} → {{count}} sessões",
+      "note": "Nota",
+      "notePlaceholder": "Para quem é e como a recepção deve mencioná-la",
+      "status": "Status",
+      "live": "Ativa · aplica-se sozinha",
+      "paused": "Pausada"
+    },
+    "offeringCount_one": "{{count}} serviço",
+    "offeringCount_many": "{{count}} serviços",
+    "offeringCount_other": "{{count}} serviços",
+    "save": {
+      "create": "Criar oferta",
+      "edit": "Salvar oferta"
+    },
+    "toasts": {
+      "name": "Dê um nome à oferta",
+      "offerings": "Escolha pelo menos um serviço",
+      "value": {
+        "percent": "Defina o desconto",
+        "amount": "Defina o valor",
+        "fixed": "Defina o valor",
+        "extra": "Defina as sessões grátis"
+      },
+      "endsBeforeStart": "Termina antes de começar"
     }
   }
 }

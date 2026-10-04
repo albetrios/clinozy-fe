@@ -110,8 +110,10 @@
     },
     "empty": {
       "title": "No offers yet",
-      "description": "Nothing here yet. Try another tab or search."
-    }
+      "description": "Nothing here yet. Try another tab or search.",
+      "newOffer": "New offer"
+    },
+    "record": "Offer"
   },
   "record": "Offering",
   "offeringDrawer": {
@@ -201,6 +203,69 @@
       "addPrice": "Add a price",
       "offerAbovePrice": "Offer price can’t be above the price",
       "floorAboveOffer": "Lowest price can’t be above the offer price"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "New offer",
+      "edit": "Edit offer"
+    },
+    "sub": "A limited-time price on one or more offerings · applies by itself",
+    "untitled": "New offer",
+    "steps": {
+      "offer": "Offer",
+      "where": "Where it applies",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Diwali glow",
+      "code": "Code",
+      "codeHint": "optional · for ads",
+      "codePlaceholder": "GLOW20",
+      "type": "Type",
+      "value": {
+        "percent": "Discount",
+        "amount": "Amount off",
+        "fixed": "Offer price",
+        "extra": "Free sessions"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "sessions",
+      "colour": "Colour",
+      "colourHint": "marks this offer on offerings and bills",
+      "offerings": "Offerings",
+      "offeringsHint": "pick one or more",
+      "offeringsSearch": "Search offerings",
+      "branches": "Branches",
+      "branchesHint": "where the desk can use it",
+      "starts": "Starts",
+      "ends": "Ends",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} session",
+      "previewSessions_other": "{{before}} → {{count}} sessions",
+      "note": "Note",
+      "notePlaceholder": "Who it is for, how the desk should mention it",
+      "status": "Status",
+      "live": "Live · applies automatically",
+      "paused": "Paused"
+    },
+    "offeringCount_one": "{{count}} offering",
+    "offeringCount_other": "{{count}} offerings",
+    "save": {
+      "create": "Create offer",
+      "edit": "Save offer"
+    },
+    "toasts": {
+      "name": "Name the offer",
+      "offerings": "Pick at least one offering",
+      "value": {
+        "percent": "Set the discount",
+        "amount": "Set the amount",
+        "fixed": "Set the amount",
+        "extra": "Set the free sessions"
+      },
+      "endsBeforeStart": "Ends before it starts"
     }
   }
 }

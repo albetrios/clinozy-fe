@@ -29,8 +29,9 @@ export const OFFERS_URL = '/organization/acme/offerings/offers';
 
 /**
  * The Offerings family as `routeTree.tsx` registers it — the Offerings tab
- * with its two dialog routes (`create`, `$offeringId/edit`, rendering
- * nothing) and, beside it, the Offers tab, each with its search schema —
+ * and, beside it, the Offers tab, each with its search schema and its two
+ * dialog routes (`create`, `$offeringId/edit` / `$offerId/edit`, rendering
+ * nothing) —
  * opened at `url` for a member previewed as `role` (View-as narrows the
  * clinic access to that role's matrix). Every other path lands on a catch-all.
  */
@@ -65,6 +66,16 @@ export function renderOfferingsRoutes(
     validateSearch: validateOffersSearch,
     component: OffersPage,
   });
+  const offerCreate = createRoute({
+    getParentRoute: () => offers,
+    path: 'create',
+    component: () => null,
+  });
+  const offerEdit = createRoute({
+    getParentRoute: () => offers,
+    path: '$offerId/edit',
+    component: () => null,
+  });
   const elsewhere = createRoute({
     getParentRoute: () => root,
     path: '$',
@@ -73,7 +84,7 @@ export function renderOfferingsRoutes(
   const router = createRouter({
     routeTree: root.addChildren([
       offerings.addChildren([create, edit]),
-      offers,
+      offers.addChildren([offerCreate, offerEdit]),
       elsewhere,
     ]),
     history: createMemoryHistory({ initialEntries: [url] }),

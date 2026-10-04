@@ -8,23 +8,34 @@ own; the room's toolbar (family-shared, `../shared/components/OfferingsToolbar/`
 Every offer is read up front and searched (name, code, an offering's name), filtered (Branches · Status
 sections built from the rows, then Created) and kept in the tab's fixed order — Running → Scheduled →
 Paused → Ended, newest first in each (H:5477). No column sorts. Same gates as the room; in-room access is
-`useClinicAccess`.
+`useClinicAccess` — an offer is a price, so writing one (New offer, an editable drawer, Pause / Resume)
+also needs the `prices` ability (Q-U8).
+
+The Offer drawer opens over the tab from its two dialog routes (`create/`, `$offerId/edit/`, D24):
+"New offer" (toolbar, phone pill, empty list), a row click or a row's Edit. Always three steps — "Offer"
+→ "Where it applies" → "Notes" — with one preview per picked offering; a save closes it onto the list
+(D28). A row's Pause / Resume (never on an ended offer) writes at once, with "Navratri glow paused" /
+"… running again".
 
 ## Files
 
-| File                     | Responsibility                                                                                        |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| `offers.route.tsx`       | Route marker — exports `Component` rendering `OffersPage`.                                            |
-| `offers.manifest.ts`     | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-offerings`; not in the nav. |
-| `offers.search.ts`       | `validateOffersSearch` (`q`, `status`, `branch`, `created`), on the parent's readers.                 |
-| `offers.constants.ts`    | `OFFERS_NS` / `OFFERS_KEYS` (the tab's copy, `offers.*` in the room's namespace), `OFFERS_TABLE_ID`.  |
-| `offers.rows.ts`         | Pure: rows with their state in the tab's order, the Filters sections, filtering.                      |
-| `OffersPage.tsx`         | The Offers tab: toolbar, the shared table (folds, phone rows keyed on Type), row Delete, Export.      |
-| `components/OfferCells/` | The tab's cells (Offer, Type, Applies to, Valid, Status) and `useOfferText`.                          |
-| `hooks/useOffersTable/`  | The table instance: columns, tracks, folds, hidden columns (Updated).                                 |
+| File                          | Responsibility                                                                                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `offers.route.tsx`            | Route marker — exports `Component` rendering `OffersPage`.                                                                                                                     |
+| `offers.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$offerId`; permission `organization:read`, module `clinic-offerings`; not in the nav.                                         |
+| `offers.search.ts`            | `validateOffersSearch` (`q`, `status`, `branch`, `created`), on the parent's readers.                                                                                          |
+| `offers.constants.ts`         | `OFFERS_NS` / `OFFERS_KEYS` (the tab's copy, `offers.*` in the room's namespace), `OFFERS_TABLE_ID`.                                                                           |
+| `offers.rows.ts`              | Pure: rows with their state in the tab's order, the Filters sections, filtering.                                                                                               |
+| `OffersPage.tsx`              | The Offers tab: toolbar (New offer), the shared table (folds, phone rows keyed on Type; row click and Edit open the drawer), Pause / Resume, Delete, Export, the Offer drawer. |
+| `create/`                     | Dialog route — New offer (renders nothing; this page opens the drawer). See `create/CREATE.OVERVIEW.md`.                                                                       |
+| `$offerId/edit/`              | Dialog route — Edit offer; the `$offerId` segment has no page of its own. See `$offerId/edit/EDIT.OVERVIEW.md`.                                                                |
+| `components/OfferCells/`      | The tab's cells (Offer, Type, Applies to, Valid, Status) and `useOfferText`.                                                                                                   |
+| `components/OfferDrawer/`     | The Offer drawer: the form (`components/OfferDrawer/offer-form.ts`), its view — badges, previews, step heads — the fields and the save.                                        |
+| `hooks/useOffersTable/`       | The table instance: columns, tracks, folds, hidden columns (Updated).                                                                                                          |
+| `hooks/useOffersDialogRoute/` | Which drawer the URL opens over the tab (`create` / `edit` / none) and how it closes.                                                                                          |
 
 ## Test ids
 
 `offers-page` (root), `offers-table` and the shared table's ids prefixed `offers-…`, the toolbar's
 (`offers-toolbar`, `offers-search`, `offers-filters-trigger` …) and `offers-new-button`; the tabs keep
-the room's `offerings-tab-…` ids. Listed in `docs/reference/e2e-testids-inventory.md`.
+the room's `offerings-tab-…` ids. The drawer is `offer-drawer` with its parts (`offer-drawer-name` …). Listed in `docs/reference/e2e-testids-inventory.md`.

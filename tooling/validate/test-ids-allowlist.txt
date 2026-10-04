@@ -10,4 +10,6 @@ src/pages/organization/$organizationSlug/appointments/create/ #page-root
 src/pages/organization/$organizationSlug/appointments/$appointmentId/ #page-root
 src/pages/organization/$organizationSlug/offerings/create/ #page-root
 src/pages/organization/$organizationSlug/offerings/$offeringId/edit/ #page-root
+src/pages/organization/$organizationSlug/offerings/offers/create/ #page-root
+src/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/ #page-root
 src/pages/organization/$organizationSlug/patients/create/ #page-root

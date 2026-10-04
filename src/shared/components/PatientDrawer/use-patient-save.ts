@@ -1,21 +1,13 @@
-import { useState } from 'react';
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { attachPatientPhoto } from '@/shared/api/clinic/patients-api.ts';
 import type {
   PatientCreateInput,
   PatientRecord,
 } from '@/shared/api/clinic/patients-contracts.ts';
-import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
+import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreatePatient, useUpdatePatient } from '@/shared/hooks/usePatients/index.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -78,14 +70,12 @@ export interface UsePatientSaveOptions {
 }
 
 /**
- * The patient drawer's write and its outcomes (KICKOFF §6.0 States, §6.5).
- * A filled mobile that is not ten digits stops the save on step 1 with
- * "Enter a 10-digit mobile". A `validation` error outlines its fields, opens
- * the first one's step and toasts its message; a `conflict` shows the
- * duplicate notice and keeps the draft; a refusal toasts the server's reason.
- * A dropped connection (or a server failure) keeps the draft with "Not saved ·
- * your changes are kept", "Retry save", and a toast whose "Retry" saves again.
- * A create files its photos through the upload tray, which outlives the drawer.
+ * The patient drawer's write and its outcomes (KICKOFF §6.0 States, §6.5) on
+ * the shared drawer save (`useDrawerSave`). A filled mobile that is not ten
+ * digits stops the save on step 1 with "Enter a 10-digit mobile"; a
+ * `conflict` (the mobile is taken) shows the duplicate notice and keeps the
+ * draft. A create files its photos through the upload tray, which outlives
+ * the drawer.
  */
 export function usePatientSave({
   form,
@@ -96,63 +86,33 @@ export function usePatientSave({
   onConflict,
   onDone,
 }: UsePatientSaveOptions) {
-  const { t } = useTranslation([PATIENT_DRAWER_NS, ERRORS_NS]);
-  const [saveState, setSaveState] = useState<DrawerSaveState>('idle');
+  const { t } = useTranslation(PATIENT_DRAWER_NS);
   const create = useCreatePatient({ notifyOnError: false });
   const update = useUpdatePatient({ notifyOnError: false });
   const { enqueue } = useUploadQueue();
 
-  const failed = (error: unknown, retry: () => void) => {
-    if (isHttpError(error) && error.status === 409) {
-      setSaveState('idle');
+  return useDrawerSave<PatientFormValues, PatientSaveOutcome>({
+    form,
+    fieldOrder: FIELD_ORDER,
+    serverFields: SERVER_FIELDS,
+    toastId: 'patient-save-failed',
+    check: (values) => {
+      const invalid = invalidPatientPhones(values);
+      return invalid.length > 0
+        ? { fields: invalid, message: t(PATIENT_DRAWER_KEYS.mobileInvalid) }
+        : null;
+    },
+    onConflict: (error) => {
       onStep('contact');
       onConflict();
       notify.error(mapApiError(error));
-      return;
-    }
-    const named: (keyof PatientFormValues)[] = [];
-    const applied = mapValidationErrors<PatientFormValues>(error, (name, option) => {
-      const field = SERVER_FIELDS[name] ?? (name as keyof PatientFormValues);
-      form.setError(field as FieldPath<PatientFormValues>, option);
-      named.push(field);
-    });
-    if (applied) {
-      setSaveState('idle');
-      const first = FIELD_ORDER.find((field) => named.includes(field));
-      if (first) onStep(FIELD_STEPS[first]);
-      const message = first ? form.getFieldState(first).error?.message : undefined;
-      notify.error(message ?? mapApiError(error));
-      return;
-    }
-    if (isHttpError(error) && error.status < 500) {
-      setSaveState('idle');
-      notify.error(mapApiError(error));
-      return;
-    }
-    setSaveState('failed');
-    notify.error(t(RECORD_DRAWER_KEYS.saveFailed, { ns: RECORD_DRAWER_NS }), {
-      id: 'patient-save-failed',
-      action: { label: t(ERRORS_KEYS.widget.retry, { ns: ERRORS_NS }), onClick: retry },
-    });
-  };
-
-  const save = async (another: boolean): Promise<void> => {
-    const invalid = invalidPatientPhones(form.getValues());
-    if (invalid.length > 0) {
-      const message = t(PATIENT_DRAWER_KEYS.mobileInvalid);
-      for (const field of invalid) form.setError(field, { type: 'client', message });
-      onStep('contact');
-      notify.warning(message);
-      return;
-    }
-    form.clearErrors();
-    setSaveState('saving');
-    try {
+    },
+    onField: (field: FieldPath<PatientFormValues>) =>
+      onStep(FIELD_STEPS[field as keyof PatientFormValues] ?? 'contact'),
+    write: async () => {
       if (patientId) {
         const patient = await update.mutateAsync({ id: patientId, patch: input() });
-        // The drawer closes on this outcome: "Saving…" holds every exit until it has.
-        onDone({ kind: 'saved', patient }, false);
-        return;
+        return { kind: 'saved', patient };
       }
       const { patient } = await create.mutateAsync(input());
       const filed =
@@ -167,11 +127,8 @@ export function usePatientSave({
               },
             }).accepted
           : 0;
-      onDone({ kind: 'created', patient, filed }, another);
-    } catch (error) {
-      failed(error, () => void save(another));
-    }
-  };
-
-  return { saveState, save };
+      return { kind: 'created', patient, filed };
+    },
+    onDone,
+  });
 }

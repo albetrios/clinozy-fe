@@ -116,6 +116,22 @@ export function organizationOffers(organizationSlug: string) {
   } as const;
 }
 
+/** The New offer drawer over the Offers tab (`S:102`). */
+export function organizationOfferCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings/offers/create',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** One offer's drawer over the Offers tab — Edit offer, view only without Edit (`S:103`). */
+export function organizationOfferEdit(organizationSlug: string, offerId: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings/offers/$offerId/edit',
+    params: { organizationSlug, offerId },
+  } as const;
+}
+
 /** The Patients room — the list the New patient drawer opens over. */
 export function organizationPatients(organizationSlug: string) {
   return {

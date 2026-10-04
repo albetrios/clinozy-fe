@@ -110,8 +110,10 @@
     },
     "empty": {
       "title": "अभी कोई ऑफ़र नहीं",
-      "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।"
-    }
+      "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+      "newOffer": "नया ऑफ़र"
+    },
+    "record": "ऑफ़र"
   },
   "record": "सेवा",
   "offeringDrawer": {
@@ -201,6 +203,69 @@
       "addPrice": "कीमत जोड़ें",
       "offerAbovePrice": "ऑफ़र कीमत कीमत से ज़्यादा नहीं हो सकती",
       "floorAboveOffer": "न्यूनतम कीमत ऑफ़र कीमत से ज़्यादा नहीं हो सकती"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "नया ऑफ़र",
+      "edit": "ऑफ़र संपादित करें"
+    },
+    "sub": "एक या अधिक सेवाओं पर सीमित समय की कीमत · अपने आप लागू",
+    "untitled": "नया ऑफ़र",
+    "steps": {
+      "offer": "ऑफ़र",
+      "where": "कहाँ लागू होगा",
+      "notes": "नोट्स"
+    },
+    "fields": {
+      "name": "नाम",
+      "namePlaceholder": "जैसे दिवाली ग्लो",
+      "code": "कोड",
+      "codeHint": "वैकल्पिक · विज्ञापनों के लिए",
+      "codePlaceholder": "GLOW20",
+      "type": "प्रकार",
+      "value": {
+        "percent": "छूट",
+        "amount": "छूट राशि",
+        "fixed": "ऑफ़र कीमत",
+        "extra": "मुफ़्त सेशन"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "सेशन",
+      "colour": "रंग",
+      "colourHint": "सेवाओं और बिलों पर इस ऑफ़र की पहचान",
+      "offerings": "सेवाएँ",
+      "offeringsHint": "एक या अधिक चुनें",
+      "offeringsSearch": "सेवाएँ खोजें",
+      "branches": "शाखाएँ",
+      "branchesHint": "जहाँ डेस्क इसका उपयोग कर सके",
+      "starts": "शुरू",
+      "ends": "समाप्त",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} सेशन",
+      "previewSessions_other": "{{before}} → {{count}} सेशन",
+      "note": "नोट",
+      "notePlaceholder": "यह किसके लिए है, डेस्क इसे कैसे बताए",
+      "status": "स्थिति",
+      "live": "लाइव · अपने आप लागू",
+      "paused": "रुका हुआ"
+    },
+    "offeringCount_one": "{{count}} सेवा",
+    "offeringCount_other": "{{count}} सेवाएँ",
+    "save": {
+      "create": "ऑफ़र बनाएँ",
+      "edit": "ऑफ़र सहेजें"
+    },
+    "toasts": {
+      "name": "ऑफ़र का नाम दें",
+      "offerings": "कम से कम एक सेवा चुनें",
+      "value": {
+        "percent": "छूट तय करें",
+        "amount": "राशि तय करें",
+        "fixed": "राशि तय करें",
+        "extra": "मुफ़्त सेशन तय करें"
+      },
+      "endsBeforeStart": "शुरू होने से पहले खत्म होता है"
     }
   }
 }

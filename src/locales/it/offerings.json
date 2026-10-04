@@ -118,8 +118,10 @@
     },
     "empty": {
       "title": "Ancora nessuna offerta",
-      "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
-    }
+      "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+      "newOffer": "Nuova offerta"
+    },
+    "record": "Offerta"
   },
   "record": "Servizio",
   "offeringDrawer": {
@@ -211,6 +213,71 @@
       "addPrice": "Aggiungi un prezzo",
       "offerAbovePrice": "Il prezzo offerta non può superare il prezzo",
       "floorAboveOffer": "Il prezzo minimo non può superare il prezzo offerta"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Nuova offerta",
+      "edit": "Modifica offerta"
+    },
+    "sub": "Un prezzo a tempo su uno o più servizi · si applica da solo",
+    "untitled": "Nuova offerta",
+    "steps": {
+      "offer": "Offerta",
+      "where": "Dove si applica",
+      "notes": "Note"
+    },
+    "fields": {
+      "name": "Nome",
+      "namePlaceholder": "es. Glow di Diwali",
+      "code": "Codice",
+      "codeHint": "facoltativo · per gli annunci",
+      "codePlaceholder": "GLOW20",
+      "type": "Tipo",
+      "value": {
+        "percent": "Sconto",
+        "amount": "Importo dello sconto",
+        "fixed": "Prezzo offerta",
+        "extra": "Sedute gratuite"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "sedute",
+      "colour": "Colore",
+      "colourHint": "segna questa offerta su servizi e conti",
+      "offerings": "Servizi",
+      "offeringsHint": "scegline uno o più",
+      "offeringsSearch": "Cerca servizi",
+      "branches": "Sedi",
+      "branchesHint": "dove la reception può usarla",
+      "starts": "Inizio",
+      "ends": "Fine",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} seduta",
+      "previewSessions_many": "{{before}} → {{count}} sedute",
+      "previewSessions_other": "{{before}} → {{count}} sedute",
+      "note": "Nota",
+      "notePlaceholder": "Per chi è, come deve parlarne la reception",
+      "status": "Stato",
+      "live": "Attiva · si applica da sola",
+      "paused": "In pausa"
+    },
+    "offeringCount_one": "{{count}} servizio",
+    "offeringCount_many": "{{count}} servizi",
+    "offeringCount_other": "{{count}} servizi",
+    "save": {
+      "create": "Crea offerta",
+      "edit": "Salva offerta"
+    },
+    "toasts": {
+      "name": "Dai un nome all’offerta",
+      "offerings": "Scegli almeno un servizio",
+      "value": {
+        "percent": "Imposta lo sconto",
+        "amount": "Imposta l’importo",
+        "fixed": "Imposta l’importo",
+        "extra": "Imposta le sedute gratuite"
+      },
+      "endsBeforeStart": "Finisce prima di iniziare"
     }
   }
 }

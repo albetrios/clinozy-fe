@@ -102,8 +102,10 @@
     },
     "empty": {
       "title": "还没有优惠活动",
-      "description": "这里还没有内容。试试其他标签页或搜索。"
-    }
+      "description": "这里还没有内容。试试其他标签页或搜索。",
+      "newOffer": "新建优惠"
+    },
+    "record": "优惠"
   },
   "record": "服务项目",
   "offeringDrawer": {
@@ -191,6 +193,67 @@
       "addPrice": "请填写价格",
       "offerAbovePrice": "优惠价不能高于价格",
       "floorAboveOffer": "最低价不能高于优惠价"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "新建优惠",
+      "edit": "编辑优惠"
+    },
+    "sub": "一个或多个服务项目的限时价格 · 自动适用",
+    "untitled": "新建优惠",
+    "steps": {
+      "offer": "优惠",
+      "where": "适用范围",
+      "notes": "备注"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例如：排灯节焕彩",
+      "code": "代码",
+      "codeHint": "可选 · 用于广告",
+      "codePlaceholder": "GLOW20",
+      "type": "类型",
+      "value": {
+        "percent": "折扣",
+        "amount": "减免金额",
+        "fixed": "优惠价",
+        "extra": "赠送次数"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "次",
+      "colour": "颜色",
+      "colourHint": "在服务项目和账单上标记此优惠",
+      "offerings": "服务项目",
+      "offeringsHint": "选择一个或多个",
+      "offeringsSearch": "搜索服务项目",
+      "branches": "分院",
+      "branchesHint": "前台可使用的分院",
+      "starts": "开始",
+      "ends": "结束",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_other": "{{before}} → {{count}} 次",
+      "note": "备注",
+      "notePlaceholder": "适用人群，以及前台如何介绍",
+      "status": "状态",
+      "live": "生效中 · 自动适用",
+      "paused": "已暂停"
+    },
+    "offeringCount_other": "{{count}} 个服务项目",
+    "save": {
+      "create": "创建优惠",
+      "edit": "保存优惠"
+    },
+    "toasts": {
+      "name": "请为优惠命名",
+      "offerings": "请至少选择一个服务项目",
+      "value": {
+        "percent": "请设置折扣",
+        "amount": "请设置金额",
+        "fixed": "请设置金额",
+        "extra": "请设置赠送次数"
+      },
+      "endsBeforeStart": "结束日期早于开始日期"
     }
   }
 }

@@ -8,15 +8,20 @@ import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts'
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
-import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
 import { CatalogueDeleteConfirm } from '../../shared/components/CatalogueDeleteConfirm/index.ts';
+import { CatalogueDrawerPending } from '../../shared/components/CatalogueDrawerPending/index.ts';
 import type { OfferingsCatalogue } from '../../shared/hooks/useOfferingsCatalogue/index.ts';
+import {
+  type StepMemory,
+  useRememberedStep,
+} from '../../shared/hooks/useRememberedStep/index.ts';
 import {
   OFFERING_DRAWER_KEYS,
   OFFERING_DRAWER_NS,
@@ -79,12 +84,6 @@ export interface OfferingEditDrawerProps extends OfferingDrawerBaseProps {
 /** Props of {@link OfferingDrawer}. */
 export type OfferingDrawerProps = OfferingCreateDrawerProps | OfferingEditDrawerProps;
 
-/** The step a record's drawer had open last, and whose ('new' for New offering). */
-interface StepMemory {
-  key: string;
-  step: OfferingStepId;
-}
-
 /** One opening of the drawer. */
 interface SessionProps extends OfferingDrawerBaseProps {
   /** The saved offering; `null` for a new one. */
@@ -92,8 +91,8 @@ interface SessionProps extends OfferingDrawerBaseProps {
   /** The URL's `?name=` — none after "Create & add another". */
   prefill: { name?: string } | undefined;
   /** The step this record had open last — reopening it returns there. */
-  memory: StepMemory | null;
-  onRemember: (memory: StepMemory) => void;
+  memory: StepMemory<OfferingStepId> | null;
+  onRemember: (memory: StepMemory<OfferingStepId>) => void;
   /** "Create & add another" saved: start again, blank. */
   onAnother: () => void;
 }
@@ -150,32 +149,6 @@ function stepOfField(
     return threeSteps ? 'details' : 'time';
   }
   return 'main';
-}
-
-/** The step a session opens on: the one this record had open last, if it still has it. */
-function initialStep(
-  memory: StepMemory | null,
-  key: string,
-  steps: readonly { id: OfferingStepId }[],
-): OfferingStepId {
-  const remembered = memory?.key === key ? memory.step : undefined;
-  return steps.some((step) => step.id === remembered) && remembered ? remembered : 'main';
-}
-
-/** The open step, remembered for the record as it changes (reopening returns there). */
-function useOpenStep(
-  props: Pick<SessionProps, 'memory' | 'onRemember'>,
-  key: string,
-  steps: readonly { id: OfferingStepId }[],
-) {
-  const [openStep, setOpenStep] = useState<string>(() =>
-    initialStep(props.memory, key, steps),
-  );
-  const selectStep = (stepId: string) => {
-    setOpenStep(stepId);
-    if (stepId) props.onRemember({ key, step: stepId as OfferingStepId });
-  };
-  return [openStep, selectStep] as const;
 }
 
 /** What the step bodies read beside the form. */
@@ -294,7 +267,12 @@ function OfferingDrawerSession(props: SessionProps) {
   const [deleting, setDeleting] = useState(false);
 
   const view = useOfferingDrawerView({ values, offering, ...catalogue });
-  const [openStep, selectStep] = useOpenStep(props, offering?.id ?? 'new', view.steps);
+  const [openStep, selectStep] = useRememberedStep({
+    memory: props.memory,
+    onRemember: props.onRemember,
+    key: offering?.id ?? 'new',
+    steps: view.steps.map((step) => step.id),
+  });
   const { saveState, save } = useOfferingSave({
     form,
     offeringId: offering?.id ?? null,
@@ -351,33 +329,6 @@ function OfferingDrawerSession(props: SessionProps) {
   );
 }
 
-/** Edit offering while its record loads: the shell over a skeleton, nothing to save. */
-function PendingOfferingDrawer({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation(OFFERING_DRAWER_NS);
-  const { t: tRoom } = useTranslation(OFFERINGS_NS);
-  return (
-    <RecordDrawer
-      open={open}
-      onClose={onClose}
-      title={t(K.title.edit)}
-      sub={t(K.sub)}
-      content={CONTENT_PROFILE}
-      testId={OFFERING_DRAWER_TEST_ID}
-    >
-      <PanelSkeleton
-        name={tRoom(OFFERINGS_KEYS.record)}
-        testId={`${OFFERING_DRAWER_TEST_ID}-skeleton`}
-      />
-    </RecordDrawer>
-  );
-}
-
 /**
  * The Offering drawer (KICKOFF §6.11; `offerings.md:59–89, 131–143, 237–244`)
  * on the shared record drawer: New offering over the list — with the Quick
@@ -393,21 +344,23 @@ function PendingOfferingDrawer({
  * Every opening starts a fresh form.
  */
 export function OfferingDrawer(props: OfferingDrawerProps) {
-  const [session, setSession] = useState(0);
-  const [fresh, setFresh] = useState(false);
-  const [memory, setMemory] = useState<StepMemory | null>(null);
-  const [wasOpen, setWasOpen] = useState(props.open);
-  if (props.open !== wasOpen) {
-    setWasOpen(props.open);
-    if (props.open) {
-      setSession((current) => current + 1);
-      setFresh(false);
-    }
-  }
+  const { session, fresh, restart } = useDrawerSession(props.open);
+  const [memory, setMemory] = useState<StepMemory<OfferingStepId> | null>(null);
+  const { t } = useTranslation(OFFERING_DRAWER_NS);
+  const { t: tRoom } = useTranslation(OFFERINGS_NS);
 
   const { open, onClose, catalogue } = props;
   if (props.mode === 'edit' && !props.offering) {
-    return <PendingOfferingDrawer open={open} onClose={onClose} />;
+    return (
+      <CatalogueDrawerPending
+        open={open}
+        onClose={onClose}
+        title={t(K.title.edit)}
+        sub={t(K.sub)}
+        recordLabel={tRoom(OFFERINGS_KEYS.record)}
+        testId={OFFERING_DRAWER_TEST_ID}
+      />
+    );
   }
   const offering = props.mode === 'edit' ? (props.offering ?? null) : null;
   return (
@@ -420,10 +373,7 @@ export function OfferingDrawer(props: OfferingDrawerProps) {
       prefill={props.mode === 'create' && !fresh ? props.prefill : undefined}
       memory={memory}
       onRemember={setMemory}
-      onAnother={() => {
-        setSession((current) => current + 1);
-        setFresh(true);
-      }}
+      onAnother={restart}
     />
   );
 }

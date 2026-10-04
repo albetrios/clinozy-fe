@@ -102,8 +102,10 @@
     },
     "empty": {
       "title": "まだオファーがありません",
-      "description": "まだ何もありません。別のタブや検索をお試しください。"
-    }
+      "description": "まだ何もありません。別のタブや検索をお試しください。",
+      "newOffer": "新しいオファー"
+    },
+    "record": "オファー"
   },
   "record": "サービス",
   "offeringDrawer": {
@@ -191,6 +193,67 @@
       "addPrice": "料金を入力してください",
       "offerAbovePrice": "提供価格は料金を超えられません",
       "floorAboveOffer": "最低価格は提供価格を超えられません"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "新しいオファー",
+      "edit": "オファーを編集"
+    },
+    "sub": "1つ以上のサービスに期間限定の価格・自動で適用",
+    "untitled": "新しいオファー",
+    "steps": {
+      "offer": "オファー",
+      "where": "適用範囲",
+      "notes": "メモ"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例：ディワリ・グロウ",
+      "code": "コード",
+      "codeHint": "任意・広告用",
+      "codePlaceholder": "GLOW20",
+      "type": "種類",
+      "value": {
+        "percent": "割引",
+        "amount": "割引額",
+        "fixed": "オファー価格",
+        "extra": "無料回数"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "回",
+      "colour": "カラー",
+      "colourHint": "サービスと請求書でこのオファーを示します",
+      "offerings": "サービス",
+      "offeringsHint": "1つ以上選択",
+      "offeringsSearch": "サービスを検索",
+      "branches": "院",
+      "branchesHint": "受付が使える院",
+      "starts": "開始日",
+      "ends": "終了日",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_other": "{{before}} → {{count}}回",
+      "note": "メモ",
+      "notePlaceholder": "対象者と、受付での案内のしかた",
+      "status": "ステータス",
+      "live": "公開中・自動で適用",
+      "paused": "一時停止中"
+    },
+    "offeringCount_other": "{{count}}件のサービス",
+    "save": {
+      "create": "オファーを作成",
+      "edit": "オファーを保存"
+    },
+    "toasts": {
+      "name": "オファー名を入力してください",
+      "offerings": "サービスを1つ以上選択してください",
+      "value": {
+        "percent": "割引を設定してください",
+        "amount": "金額を設定してください",
+        "fixed": "金額を設定してください",
+        "extra": "無料回数を設定してください"
+      },
+      "endsBeforeStart": "開始日より前に終了しています"
     }
   }
 }

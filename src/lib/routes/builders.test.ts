@@ -8,6 +8,8 @@ import {
   organizationLead,
   organizationLeadCreate,
   organizationLeads,
+  organizationOfferCreate,
+  organizationOfferEdit,
   organizationOfferingCreate,
   organizationOfferingEdit,
   organizationOfferings,
@@ -77,6 +79,14 @@ describe('route builders', () => {
     expect(organizationOffers('acme')).toEqual({
       to: '/organization/$organizationSlug/offerings/offers',
       params: { organizationSlug: 'acme' },
+    });
+    expect(organizationOfferCreate('acme')).toEqual({
+      to: '/organization/$organizationSlug/offerings/offers/create',
+      params: { organizationSlug: 'acme' },
+    });
+    expect(organizationOfferEdit('acme', 'X1')).toEqual({
+      to: '/organization/$organizationSlug/offerings/offers/$offerId/edit',
+      params: { organizationSlug: 'acme', offerId: 'X1' },
     });
   });
 

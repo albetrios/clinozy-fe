@@ -7,6 +7,8 @@ export {
   organizationLead,
   organizationLeadCreate,
   organizationLeads,
+  organizationOfferCreate,
+  organizationOfferEdit,
   organizationOfferingCreate,
   organizationOfferingEdit,
   organizationOfferings,

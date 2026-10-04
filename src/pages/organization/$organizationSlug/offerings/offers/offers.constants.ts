@@ -9,6 +9,8 @@ export const OFFERS_NS = I18N_NAMESPACES.offerings;
  */
 export const OFFERS_KEYS = {
   manifest: { title: 'manifest.title' },
+  /** "Offer" — the record a stale link names: "Offer not found · it may have been deleted". */
+  record: 'offers.record',
   columns: {
     offer: 'offers.columns.offer',
     type: 'offers.columns.type',
@@ -54,6 +56,8 @@ export const OFFERS_KEYS = {
   empty: {
     title: 'offers.empty.title',
     description: 'offers.empty.description',
+    /** The empty list's action. */
+    newOffer: 'offers.empty.newOffer',
   },
 } as const;
 

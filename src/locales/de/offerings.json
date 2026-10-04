@@ -110,8 +110,10 @@
     },
     "empty": {
       "title": "Noch keine Angebote",
-      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
-    }
+      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+      "newOffer": "Neues Angebot"
+    },
+    "record": "Angebot"
   },
   "record": "Leistung",
   "offeringDrawer": {
@@ -201,6 +203,69 @@
       "addPrice": "Geben Sie einen Preis ein",
       "offerAbovePrice": "Der Angebotspreis darf nicht über dem Preis liegen",
       "floorAboveOffer": "Der Mindestpreis darf nicht über dem Angebotspreis liegen"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Neues Angebot",
+      "edit": "Angebot bearbeiten"
+    },
+    "sub": "Ein befristeter Preis für eine oder mehrere Leistungen · gilt von selbst",
+    "untitled": "Neues Angebot",
+    "steps": {
+      "offer": "Angebot",
+      "where": "Wo es gilt",
+      "notes": "Notizen"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Diwali-Glow",
+      "code": "Code",
+      "codeHint": "optional · für Werbung",
+      "codePlaceholder": "GLOW20",
+      "type": "Art",
+      "value": {
+        "percent": "Rabatt",
+        "amount": "Rabattbetrag",
+        "fixed": "Angebotspreis",
+        "extra": "Gratissitzungen"
+      },
+      "percentQuick": "{{value}} %",
+      "sessionsUnit": "Sitzungen",
+      "colour": "Farbe",
+      "colourHint": "markiert dieses Angebot bei Leistungen und Rechnungen",
+      "offerings": "Leistungen",
+      "offeringsHint": "eine oder mehrere wählen",
+      "offeringsSearch": "Leistungen suchen",
+      "branches": "Filialen",
+      "branchesHint": "wo die Rezeption es nutzen kann",
+      "starts": "Beginnt",
+      "ends": "Endet",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} Sitzung",
+      "previewSessions_other": "{{before}} → {{count}} Sitzungen",
+      "note": "Notiz",
+      "notePlaceholder": "Für wen es ist und wie die Rezeption es erwähnen soll",
+      "status": "Status",
+      "live": "Aktiv · gilt automatisch",
+      "paused": "Pausiert"
+    },
+    "offeringCount_one": "{{count}} Leistung",
+    "offeringCount_other": "{{count}} Leistungen",
+    "save": {
+      "create": "Angebot anlegen",
+      "edit": "Angebot speichern"
+    },
+    "toasts": {
+      "name": "Geben Sie dem Angebot einen Namen",
+      "offerings": "Wählen Sie mindestens eine Leistung",
+      "value": {
+        "percent": "Legen Sie den Rabatt fest",
+        "amount": "Legen Sie den Betrag fest",
+        "fixed": "Legen Sie den Betrag fest",
+        "extra": "Legen Sie die Gratissitzungen fest"
+      },
+      "endsBeforeStart": "Endet vor dem Beginn"
     }
   }
 }

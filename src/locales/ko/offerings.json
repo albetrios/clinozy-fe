@@ -102,8 +102,10 @@
     },
     "empty": {
       "title": "아직 프로모션이 없습니다",
-      "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
-    }
+      "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+      "newOffer": "새 할인"
+    },
+    "record": "할인"
   },
   "record": "서비스",
   "offeringDrawer": {
@@ -191,6 +193,67 @@
       "addPrice": "가격을 입력하세요",
       "offerAbovePrice": "판매가는 가격보다 높을 수 없습니다",
       "floorAboveOffer": "최저가는 판매가보다 높을 수 없습니다"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "새 할인",
+      "edit": "할인 편집"
+    },
+    "sub": "하나 이상의 서비스에 적용되는 기간 한정 가격 · 자동 적용",
+    "untitled": "새 할인",
+    "steps": {
+      "offer": "할인",
+      "where": "적용 범위",
+      "notes": "메모"
+    },
+    "fields": {
+      "name": "이름",
+      "namePlaceholder": "예: 디왈리 글로우",
+      "code": "코드",
+      "codeHint": "선택 · 광고용",
+      "codePlaceholder": "GLOW20",
+      "type": "유형",
+      "value": {
+        "percent": "할인율",
+        "amount": "할인 금액",
+        "fixed": "할인가",
+        "extra": "무료 회차"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "회",
+      "colour": "색상",
+      "colourHint": "서비스와 청구서에 이 할인을 표시합니다",
+      "offerings": "서비스",
+      "offeringsHint": "하나 이상 선택",
+      "offeringsSearch": "서비스 검색",
+      "branches": "지점",
+      "branchesHint": "데스크에서 사용할 수 있는 곳",
+      "starts": "시작",
+      "ends": "종료",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_other": "{{before}} → {{count}}회",
+      "note": "메모",
+      "notePlaceholder": "대상과 데스크에서 안내할 방법",
+      "status": "상태",
+      "live": "진행 중 · 자동 적용",
+      "paused": "일시 중지됨"
+    },
+    "offeringCount_other": "서비스 {{count}}개",
+    "save": {
+      "create": "할인 생성",
+      "edit": "할인 저장"
+    },
+    "toasts": {
+      "name": "할인 이름을 입력하세요",
+      "offerings": "서비스를 하나 이상 선택하세요",
+      "value": {
+        "percent": "할인율을 입력하세요",
+        "amount": "금액을 입력하세요",
+        "fixed": "금액을 입력하세요",
+        "extra": "무료 회차를 입력하세요"
+      },
+      "endsBeforeStart": "시작 전에 종료됩니다"
     }
   }
 }

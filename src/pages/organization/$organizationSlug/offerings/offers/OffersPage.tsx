@@ -1,12 +1,13 @@
-import { Outlet, useSearch } from '@tanstack/react-router';
+import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { organizationOfferCreate, organizationOfferEdit } from '@/lib/routes/index.ts';
 import { OFFER_STATE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import {
   type RoomFilterCopy,
   type RoomFilterFields,
@@ -15,7 +16,8 @@ import {
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { FileIcon, Sparkles, Trash } from '@/shared/icons/index.ts';
+import { useSetOfferPaused } from '@/shared/hooks/useOffers/index.ts';
+import { FileIcon, Pause, PenLine, Play, Sparkles, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useBranchFilterCopy } from '../shared/components/CatalogueCells/index.ts';
@@ -29,6 +31,8 @@ import {
   useOfferingsCatalogue,
 } from '../shared/hooks/useOfferingsCatalogue/index.ts';
 import { useOfferLabels } from '../shared/hooks/useOfferLabels/index.ts';
+import { OfferDrawer } from './components/OfferDrawer/index.ts';
+import { useOffersDialogRoute } from './hooks/useOffersDialogRoute/index.ts';
 import { useOffersTable } from './hooks/useOffersTable/index.ts';
 import { OFFERS_KEYS, OFFERS_NS, OFFERS_TABLE_ID } from './offers.constants.ts';
 import {
@@ -53,10 +57,13 @@ function TableEmpty({
   loading,
   filtered,
   onClearFilters,
+  onNew,
 }: {
   loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
+  /** "New offer" under the empty list — absent without the right access. */
+  onNew?: () => void;
 }) {
   const { t } = useTranslation(OFFERS_NS);
   if (loading) {
@@ -75,6 +82,13 @@ function TableEmpty({
       icon={<Sparkles />}
       title={t(OFFERS_KEYS.empty.title)}
       description={t(OFFERS_KEYS.empty.description)}
+      action={
+        onNew ? (
+          <EmptyStateAction onClick={onNew}>
+            {t(OFFERS_KEYS.empty.newOffer)}
+          </EmptyStateAction>
+        ) : undefined
+      }
     />
   );
 }
@@ -142,26 +156,71 @@ function useOfferingNames(
  * name, filtered (sections built from the rows) and kept in the tab's fixed
  * order: Running → Scheduled → Paused → Ended, newest first in each. Folded
  * columns on a tablet, rows with Type as the key on a phone, selection and
- * Export from `md`, row actions, "All offers loaded". Its dialog routes
- * render nothing: this page reads the URL and opens the drawer.
+ * Export from `md`, row actions (Edit · Pause / Resume · Delete), "All offers
+ * loaded". Its dialog routes render nothing: this page reads the URL and
+ * opens the Offer drawer — "New offer" (the toolbar, the phone's floating
+ * pill, the empty list) opens `create/`, a row click or its Edit opens
+ * `$offerId/edit/` — and closing it comes back to the list as it was (D28).
  */
 export function OffersPage() {
   const { t } = useTranslation(OFFERS_NS);
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
   const access = useClinicAccess();
   const catalogue = useOfferingsCatalogue();
   useListLoadError(catalogue, OFFERS_TABLE_ID);
   const { fields, filters, rows } = useOfferRows(catalogue);
   const copy = useFilterCopy(catalogue);
   const nameOf = useOfferingNames(catalogue);
+  const { dialog, close } = useOffersDialogRoute();
+  const setPaused = useSetOfferPaused();
   const [deleting, setDeleting] = useState<CatalogueDeleteTarget | null>(null);
 
-  const can = (action: 'delete') => access.isResolved && access.can('offerings', action);
+  const can = (action: 'create' | 'edit' | 'delete') =>
+    access.isResolved && access.can('offerings', action);
+  // Offers are prices: writing one needs the `prices` ability too (Q-U8).
+  const canPrice = access.isResolved && access.canAbility('prices');
   const loading = catalogue.isPending && catalogue.offers.length === 0;
 
   const table = useOffersTable({ rows: loading ? [] : rows, catalogue, nameOf });
 
-  const rowActions = (offer: OfferRow): DataTableRowAction[] =>
-    can('delete')
+  // The drawers open over the list with its search and filters kept.
+  const openCreate = () =>
+    void navigate({ ...organizationOfferCreate(organizationSlug), search: true });
+  const openOffer = (offerId: string) =>
+    void navigate({ ...organizationOfferEdit(organizationSlug, offerId), search: true });
+  const onNew = can('create') && canPrice ? openCreate : undefined;
+
+  const rowActions = (offer: OfferRow): DataTableRowAction[] => [
+    ...(can('edit')
+      ? [
+          {
+            id: 'edit',
+            label: t(OFFERS_KEYS.rowActions.edit),
+            icon: PenLine,
+            onSelect: () => openOffer(offer.id),
+          },
+        ]
+      : []),
+    // Pause / Resume — never on an ended offer (H:4566, H:5483).
+    ...(can('edit') && canPrice && offer.state !== 'ended'
+      ? [
+          offer.paused
+            ? {
+                id: 'resume',
+                label: t(OFFERS_KEYS.rowActions.resume),
+                icon: Play,
+                onSelect: () => setPaused.mutate({ id: offer.id, paused: false }),
+              }
+            : {
+                id: 'pause',
+                label: t(OFFERS_KEYS.rowActions.pause),
+                icon: Pause,
+                onSelect: () => setPaused.mutate({ id: offer.id, paused: true }),
+              },
+        ]
+      : []),
+    ...(can('delete')
       ? [
           {
             id: 'delete',
@@ -170,14 +229,15 @@ export function OffersPage() {
             destructive: true,
             onSelect: () =>
               setDeleting({
-                kind: 'offer',
+                kind: 'offer' as const,
                 id: offer.id,
                 name: offer.name,
                 record: offer.name,
               }),
           },
         ]
-      : [];
+      : []),
+  ];
 
   const bulkActions: DataTableBulkAction<OfferRow>[] =
     access.isResolved && access.canAbility('export')
@@ -209,6 +269,7 @@ export function OffersPage() {
         tableId={OFFERS_TABLE_ID}
         table={table}
         filters={{ fields, copy }}
+        onNew={onNew}
       />
       <DataTable
         table={table}
@@ -219,6 +280,7 @@ export function OffersPage() {
         selectable
         minWidth={MIN_ROW_WIDTH}
         getRowTone={(row) => row.original.tone}
+        onRowClick={(row) => openOffer(row.original.id)}
         rowActions={(row) => rowActions(row.original)}
         bulkActions={bulkActions}
         empty={
@@ -226,11 +288,26 @@ export function OffersPage() {
             loading={loading}
             filtered={filters.count > 0}
             onClearFilters={() => filters.apply({})}
+            onNew={onNew}
           />
         }
         className="m-(--room-card-margin) flex-1"
       />
       <CatalogueDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <OfferDrawer
+        {...(dialog.kind === 'edit'
+          ? {
+              mode: 'edit' as const,
+              // The list already holds it; a deep link waits for its own read.
+              offer:
+                dialog.offer ??
+                catalogue.offers.find((offer) => offer.id === dialog.offerId),
+            }
+          : { mode: 'create' as const })}
+        open={dialog.kind !== 'none'}
+        catalogue={catalogue}
+        onClose={close}
+      />
       <Outlet />
     </section>
   );

@@ -18,6 +18,7 @@ import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { usePatientByPhone } from '@/shared/hooks/usePatients/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -390,25 +391,8 @@ function PatientDrawerSession(props: SessionProps) {
  * Every opening starts a fresh form.
  */
 export function PatientDrawer(props: PatientDrawerProps) {
-  const [session, setSession] = useState(0);
-  const [fresh, setFresh] = useState(false);
-  const [wasOpen, setWasOpen] = useState(props.open);
-  if (props.open !== wasOpen) {
-    setWasOpen(props.open);
-    if (props.open) {
-      setSession((current) => current + 1);
-      setFresh(false);
-    }
-  }
+  const { session, fresh, restart } = useDrawerSession(props.open);
   return (
-    <PatientDrawerSession
-      key={session}
-      {...props}
-      fresh={fresh}
-      onAnother={() => {
-        setSession((current) => current + 1);
-        setFresh(true);
-      }}
-    />
+    <PatientDrawerSession key={session} {...props} fresh={fresh} onAnother={restart} />
   );
 }

@@ -73,6 +73,8 @@ import {
   validateOfferingCreateSearch,
   validateOfferingsSearch,
 } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import { manifest as offerEditManifest } from '@/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/edit.manifest.ts';
+import { manifest as offerCreateManifest } from '@/pages/organization/$organizationSlug/offerings/offers/create/create.manifest.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
@@ -295,6 +297,17 @@ const OffersPage = lazyRouteComponent(
     () =>
       import('@/pages/organization/$organizationSlug/offerings/offers/offers.route.tsx'),
   ),
+  'Component',
+);
+// The Offer drawer's dialog routes render nothing of their own either.
+const OfferCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/offerings/offers/create/create.route.tsx'),
+  'Component',
+);
+const OfferEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/edit.route.tsx'),
   'Component',
 );
 const UsersPage = lazyRouteComponent(
@@ -983,6 +996,36 @@ const organizationOffersRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// URL-driven dialogs over the Offers tab (D24, S:102–103): they render nothing;
+// the Offers page reads the URL and opens the Offer drawer over itself.
+const organizationOfferCreateRoute = createRoute({
+  getParentRoute: () => organizationOffersRoute,
+  path: 'create',
+  head: manifestHead(offerCreateManifest),
+  staticData: { manifest: offerCreateManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offerCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OfferCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationOfferEditRoute = createRoute({
+  getParentRoute: () => organizationOffersRoute,
+  path: '$offerId/edit',
+  head: manifestHead(offerEditManifest),
+  staticData: { manifest: offerEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offerEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OfferEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
 const organizationUsersRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'users',
@@ -1168,7 +1211,10 @@ const routeTree = rootRoute.addChildren([
       organizationOfferingCreateRoute,
       organizationOfferingEditRoute,
     ]),
-    organizationOffersRoute,
+    organizationOffersRoute.addChildren([
+      organizationOfferCreateRoute,
+      organizationOfferEditRoute,
+    ]),
     organizationUsersRoute,
     organizationNotFoundRoute,
   ]),
