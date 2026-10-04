@@ -62,12 +62,6 @@ export const PATIENT_RAIL_KEYS = {
   feedbackScore: 'rail.feedbackScore',
   /** "5★ on Google". */
   feedbackReview: 'rail.feedbackReview',
-  /** "2 check-ins" (plural). */
-  checkIns: 'rail.checkIns',
-  /** "1 review" (plural). */
-  reviews: 'rail.reviews',
-  /** "2 check-ins · 1 review". */
-  feedbackCounts: 'rail.feedbackCounts',
   noFeedback: 'rail.noFeedback',
 } as const;
 

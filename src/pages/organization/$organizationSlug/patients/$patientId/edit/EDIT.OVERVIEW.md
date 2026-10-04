@@ -4,10 +4,11 @@ Route: `/organization/$organizationSlug/patients/$patientId/edit` — a URL-driv
 the patient file (KICKOFF §6.6, D24; `S:34`). It renders the section it opened from —
 `?from=<section>` (AMBER A-F1: the rail's "Edit contact" is on every section), Clinical notes
 when `from` names none, as the schema has it — taken from the file's sections module
-(`../patient-id.sections.ts`), and the shared patient drawer in its edit mode over it
+(`../patient-id.sections.ts`) through `../shared/hooks/usePatientFileDialog/`, and the shared
+patient drawer in its edit mode over it
 (`@/shared/components/PatientDrawer/`). Saving or closing goes back to that section; the
 drawer's Delete ("Delete this record?", 10s Undo) goes back to the Patients list. `from` is
-parsed by `validatePatientFileDialogSearch` in `../patient-id.search.ts` and checked here.
+parsed by `validatePatientFileDialogSearch` in `../patient-id.search.ts` and checked by the hook.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); without
 Patients edit the drawer opens read-only ("View only · your role can’t change this").

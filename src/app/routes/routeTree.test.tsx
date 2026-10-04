@@ -18,6 +18,7 @@ import {
 import { validatePatientImagesSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/images/images.search.ts';
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
 import {
+  validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
   validatePatientFileSearch,
 } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
@@ -686,14 +687,19 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
     vi.mocked(requireOrgStatus).mockClear();
   });
 
-  it('registers the eleven sections, their record dialogs, Edit patient, the index and the unknown section', () => {
+  it('registers the eleven sections, their record dialogs, the file-level drawers, the index and the unknown section', () => {
     const children = Object.keys(router.routesById)
       .filter((id) => id.startsWith(`${FILE}/`))
       .sort();
     expect(children).toEqual(
       [
         '$',
+        // The drawers over the whole file (S:34, 44–47): Edit patient, check-ins, reviews.
         'edit',
+        'check-ins/create',
+        'check-ins/$checkInId/edit',
+        'reviews/create',
+        'reviews/$reviewId/edit',
         'images',
         'images/$imageId',
         'images/$imageId/edit',
@@ -722,11 +728,21 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
     );
   });
 
-  it('validates `activity` on the file, `from` on Edit patient, the album and filter on Photos', () => {
+  it('validates `activity` on the file, `from` on Edit patient, the feedback drawers’ params, the album and filter on Photos', () => {
     expect(routeOf(FILE)?.options.validateSearch).toBe(validatePatientFileSearch);
     expect(routeOf(`${FILE}/edit`)?.options.validateSearch).toBe(
       validatePatientFileDialogSearch,
     );
+    for (const drawer of [
+      'check-ins/create',
+      'check-ins/$checkInId/edit',
+      'reviews/create',
+      'reviews/$reviewId/edit',
+    ]) {
+      expect(routeOf(`${FILE}/${drawer}`)?.options.validateSearch).toBe(
+        validatePatientFeedbackSearch,
+      );
+    }
     expect(routeOf(`${FILE}/images`)?.options.validateSearch).toBe(
       validatePatientImagesSearch,
     );

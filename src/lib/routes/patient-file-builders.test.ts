@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  organizationCheckInCreate,
+  organizationCheckInEdit,
   organizationPatient,
   organizationPatientEdit,
   organizationPatientPhoto,
   organizationPatientPhotoEdit,
   organizationPatientSection,
+  organizationReviewCreate,
+  organizationReviewEdit,
 } from './patient-file-builders.ts';
 
 const PARAMS = { organizationSlug: 'acme', patientId: 'P1' };
@@ -43,5 +47,23 @@ describe('patient-file route builders (KICKOFF §6.6)', () => {
     expect(organizationPatientPhotoEdit('acme', 'P1', 'I1').to).toBe(
       '/organization/$organizationSlug/patients/$patientId/images/$imageId/edit',
     );
+  });
+
+  it('build the check-in and review drawers over the file (S:44–47)', () => {
+    expect(organizationCheckInCreate('acme', 'P1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/check-ins/create',
+      params: PARAMS,
+    });
+    expect(organizationCheckInEdit('acme', 'P1', 'C1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/check-ins/$checkInId/edit',
+      params: { ...PARAMS, checkInId: 'C1' },
+    });
+    expect(organizationReviewCreate('acme', 'P1').to).toBe(
+      '/organization/$organizationSlug/patients/$patientId/reviews/create',
+    );
+    expect(organizationReviewEdit('acme', 'P1', 'R1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit',
+      params: { ...PARAMS, reviewId: 'R1' },
+    });
   });
 });

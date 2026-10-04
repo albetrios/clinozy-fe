@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { revealInScroller } from '@/lib/reveal-in-scroller.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   ConfirmDialog,
@@ -342,10 +343,13 @@ export function OfferingSuggestions({
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
   const money = usePaiseFormat();
   const [ownOpen, setOwnOpen] = useState(variant === 'form');
+  const sectionRef = useRef<HTMLElement>(null);
   const open = openProp ?? ownOpen;
   const setOpen = (next: boolean) => {
     if (openProp === undefined) setOwnOpen(next);
     onOpenChange?.(next);
+    // Opened past the scroller's edge: bring it into view (H:4016 `accReveal`).
+    if (next) revealInScroller(sectionRef.current);
   };
   const [removing, setRemoving] = useState<SuggestionLine | null>(null);
   const totals = suggestionTotals(lines);
@@ -360,6 +364,7 @@ export function OfferingSuggestions({
   return (
     <TooltipProvider>
       <section
+        ref={sectionRef}
         aria-label={t(KEYS.title)}
         data-slot="card"
         data-testid={OFFERING_SUGGESTIONS_TEST_IDS.card}

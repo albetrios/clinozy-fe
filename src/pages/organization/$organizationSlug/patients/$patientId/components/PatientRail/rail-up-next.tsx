@@ -26,6 +26,7 @@ import {
   Wallet,
 } from '@/shared/icons/index.ts';
 
+import { feedbackCountsText } from '../../shared/patient-feedback.ts';
 import { PATIENT_RAIL_KEYS, PATIENT_RAIL_NS } from './patient-rail.constants.ts';
 
 const K = PATIENT_RAIL_KEYS;
@@ -309,10 +310,7 @@ export function RailUpNext({
             {feedbackValue}
           </span>
           <span className="text-caption text-muted-foreground truncate">
-            {t(K.feedbackCounts, {
-              checkIns: t(K.checkIns, { count: feedback.checkIns }),
-              reviews: t(K.reviews, { count: feedback.reviews }),
-            })}
+            {feedbackCountsText(t, feedback)}
           </span>
         </span>
         <ChevronRight

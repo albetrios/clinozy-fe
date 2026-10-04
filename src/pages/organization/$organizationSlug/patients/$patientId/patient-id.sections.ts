@@ -31,6 +31,30 @@ export const PatientFileEdit = lazyRouteComponent(
   'Component',
 );
 
+/** A new check-in — the check-in drawer over the section it opened from (`S:44`). */
+export const PatientCheckInCreate = lazyRouteComponent(
+  () => import('./check-ins/create/create.route.tsx'),
+  'Component',
+);
+
+/** A check-in's edit — the check-in drawer over the section it opened from (`S:45`). */
+export const PatientCheckInEdit = lazyRouteComponent(
+  () => import('./check-ins/$checkInId/edit/edit.route.tsx'),
+  'Component',
+);
+
+/** Log a review — the review drawer over the section it opened from (`S:46`). */
+export const PatientReviewCreate = lazyRouteComponent(
+  () => import('./reviews/create/create.route.tsx'),
+  'Component',
+);
+
+/** A review's edit — the review drawer over the section it opened from (`S:47`). */
+export const PatientReviewEdit = lazyRouteComponent(
+  () => import('./reviews/$reviewId/edit/edit.route.tsx'),
+  'Component',
+);
+
 /** The photo viewer — a dialog over Photos (`S:41`). */
 export const PatientPhotoViewer = lazyRouteComponent(
   () => import('./images/$imageId/image-id.route.tsx'),

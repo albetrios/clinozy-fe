@@ -5,7 +5,9 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * (`/organization/$organizationSlug/patients/$patientId`; KICKOFF §6.6, §4,
  * D19, D26): the file bar, the main card (rail + the open section) and the
  * Activity column over eleven section folders with the schema's slugs, plus
- * Edit patient (`edit`, `S:34`). Its index — and any unknown section — goes
+ * the drawers over the whole file — Edit patient (`edit`, `S:34`) and the
+ * check-in and review drawers (`check-ins`, `reviews`, `S:44–47`), each over
+ * the section it opened from. Its index — and any unknown section — goes
  * to `timeline`, the Overview (D19; the schema says `overview`, `S:32`).
  * Gated like the Patients room (membership, the `clinic-patients` module, the
  * org status); its children inherit the gate, and in-room access — the billing
@@ -34,5 +36,7 @@ export const manifest = {
     'packages',
     'notes',
     'edit',
+    'check-ins',
+    'reviews',
   ],
 } as const satisfies PageManifest;

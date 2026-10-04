@@ -65,6 +65,13 @@ src/pages/organization/$organizationSlug/patients/$patientId/edit/ #page-root
 # Photo details (`S:41`) renders the shared RecordDrawer, which takes its root
 # id (`patient-photo-details`) as the `testId` prop.
 src/pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edit/ #page-root
+# The check-in and review drawers (`S:44–47`) render the section they opened over
+# and a family-shared drawer that passes its root id (`check-in-drawer`,
+# `review-drawer`) to the shared RecordDrawer as a constant.
+src/pages/organization/$organizationSlug/patients/$patientId/check-ins/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/check-ins/$checkInId/edit/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reviews/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit/ #page-root
 
 # A form on the record drawer: its root is `appointment-form`, its submit is the
 # drawer's primary, which the drawer derives from its own id

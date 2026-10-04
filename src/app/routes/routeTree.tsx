@@ -117,6 +117,7 @@ import { validatePatientImagesSearch } from '@/pages/organization/$organizationS
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
 import {
   type PatientFileSearch,
+  validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
   validatePatientFileSearch,
 } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
@@ -1395,15 +1396,48 @@ const organizationPatientPaymentsRoute = patientFileSectionRoute('payments');
 const organizationPatientPackagesRoute = patientFileSectionRoute('packages');
 const organizationPatientNotesRoute = patientFileSectionRoute('notes');
 
-// URL-driven dialog over the section it opened from (S:34, A-F1): the drawer
-// route renders that section and the patient drawer over it.
-const organizationPatientEditRoute = createRoute({
-  getParentRoute: () => organizationPatientFileRoute,
-  path: 'edit',
-  validateSearch: validatePatientFileDialogSearch,
-  component: patientFileComponent('PatientFileEdit'),
-  errorComponent: RouteErrorBoundary,
-});
+// URL-driven dialogs over the section they opened from (S:34, 44–47; A-F1):
+// each drawer route renders that section (`?from=`) and its drawer over it —
+// Edit patient, and the check-in and review drawers.
+function patientFileDrawerRoute<const Path extends string, Search>(
+  path: Path,
+  component: keyof PatientFileRoutes,
+  validateSearch: (search: Record<string, unknown>) => Search,
+) {
+  return createRoute({
+    getParentRoute: () => organizationPatientFileRoute,
+    path,
+    validateSearch,
+    component: patientFileComponent(component),
+    errorComponent: RouteErrorBoundary,
+  });
+}
+
+const organizationPatientEditRoute = patientFileDrawerRoute(
+  'edit',
+  'PatientFileEdit',
+  validatePatientFileDialogSearch,
+);
+const organizationCheckInCreateRoute = patientFileDrawerRoute(
+  'check-ins/create',
+  'PatientCheckInCreate',
+  validatePatientFeedbackSearch,
+);
+const organizationCheckInEditRoute = patientFileDrawerRoute(
+  'check-ins/$checkInId/edit',
+  'PatientCheckInEdit',
+  validatePatientFeedbackSearch,
+);
+const organizationReviewCreateRoute = patientFileDrawerRoute(
+  'reviews/create',
+  'PatientReviewCreate',
+  validatePatientFeedbackSearch,
+);
+const organizationReviewEditRoute = patientFileDrawerRoute(
+  'reviews/$reviewId/edit',
+  'PatientReviewEdit',
+  validatePatientFeedbackSearch,
+);
 
 // The photo viewer and Photo details, dialogs over Photos (S:41–42).
 const organizationPatientPhotoRoute = createRoute({
@@ -2414,6 +2448,10 @@ const routeTree = rootRoute.addChildren([
       organizationPatientPackagesRoute,
       organizationPatientNotesRoute,
       organizationPatientEditRoute,
+      organizationCheckInCreateRoute,
+      organizationCheckInEditRoute,
+      organizationReviewCreateRoute,
+      organizationReviewEditRoute,
       organizationPatientFileUnknownRoute,
     ]),
     organizationMedicalRoute.addChildren([

@@ -1,12 +1,10 @@
-import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { useNavigate, useParams } from '@tanstack/react-router';
 
 import { organizationPatients } from '@/lib/routes/index.ts';
-import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
-import { isPatientFileSection } from '@/shared/clinic/patient-file-sections.ts';
 import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 
-import type { PatientFileDialogSearch } from '../patient-id.search.ts';
 import { PATIENT_FILE_SECTION_PAGES } from '../patient-id.sections.ts';
+import { usePatientFileDialog } from '../shared/hooks/usePatientFileDialog/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 
 /**
@@ -18,17 +16,11 @@ import { usePatientFileContext } from '../shared/patient-file-context.ts';
  * opens read-only.
  */
 export function PatientEditPage() {
-  const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
-  const search: PatientFileDialogSearch = useSearch({ strict: false });
+  const { organizationSlug = '' } = useParams({ strict: false });
   const navigate = useNavigate();
   const { file } = usePatientFileContext();
-  const behind = isPatientFileSection(search.from) ? search.from : 'overview';
+  const { behind, back } = usePatientFileDialog();
   const Section = PATIENT_FILE_SECTION_PAGES[behind];
-  const back = () =>
-    void navigate({
-      ...organizationPatientSection(organizationSlug, patientId, behind),
-      replace: true,
-    });
 
   return (
     <>

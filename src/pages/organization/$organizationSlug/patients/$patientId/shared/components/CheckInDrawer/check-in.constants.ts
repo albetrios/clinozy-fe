@@ -1,0 +1,56 @@
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+
+/** The check-in drawer reads the patient file's namespace. */
+export const CHECK_IN_NS = I18N_NAMESPACES.patientFile;
+
+/** The check-in drawer's copy (`patient-file.md:171–187, 383–390`; KICKOFF §6.6), verbatim. */
+export const CHECK_IN_KEYS = {
+  titles: {
+    visit: 'checkIn.titles.visit',
+    aftercare: 'checkIn.titles.aftercare',
+  },
+  /** "last check-in 24 Sep: Same". */
+  last: 'checkIn.last',
+  steps: {
+    now: 'checkIn.steps.now',
+    followed: 'checkIn.steps.followed',
+    next: 'checkIn.steps.next',
+  },
+  feel: 'checkIn.feel',
+  score: 'checkIn.score',
+  scoreHint: 'checkIn.scoreHint',
+  words: 'checkIn.words',
+  wordsLast: 'checkIn.wordsLast',
+  wordsPlaceholder: 'checkIn.wordsPlaceholder',
+  /** "Followed the advice"; its values are `followedLabel` (`../../patient-feedback.ts`). */
+  followed: 'checkIn.followed',
+  details: 'checkIn.details',
+  detailsLast: 'checkIn.detailsLast',
+  detailsPlaceholder: 'checkIn.detailsPlaceholder',
+  plan: 'checkIn.plan',
+  planPlaceholder: 'checkIn.planPlaceholder',
+  offerings: 'checkIn.offerings',
+  offeringsHint: 'checkIn.offeringsHint',
+  offeringsPlaceholder: 'checkIn.offeringsPlaceholder',
+  /** An offering's sub line: "₹4,800 · 7 sessions" (plural). */
+  offeringSessions: 'checkIn.offeringSessions',
+  /** The stored `context` (`S:510`): "Visit check-in", "… · Appt #2790", "Aftercare after LHR Full Face". */
+  contextVisit: 'checkIn.contextVisit',
+  contextAppointment: 'checkIn.contextAppointment',
+  contextAftercare: 'checkIn.contextAftercare',
+  save: 'checkIn.save',
+  saveEdit: 'checkIn.saveEdit',
+  noFeel: 'checkIn.noFeel',
+  /** "Check-in saved for Dharti Galani". */
+  saved: 'checkIn.saved',
+  /** " · 2 added to suggestions". */
+  added: 'checkIn.added',
+  /** " · doctor call-back task created". */
+  callBack: 'checkIn.callBack',
+  updated: 'checkIn.updated',
+  /** The record's name in "Check-in not found · it may have been deleted". */
+  record: 'checkIn.record',
+} as const;
+
+/** The drawer's root test id. */
+export const CHECK_IN_TEST_ID = 'check-in-drawer';

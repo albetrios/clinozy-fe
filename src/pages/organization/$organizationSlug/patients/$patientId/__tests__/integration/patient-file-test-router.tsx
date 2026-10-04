@@ -21,6 +21,8 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
+import { EditCheckInPage } from '../../check-ins/$checkInId/edit/EditCheckInPage.tsx';
+import { NewCheckInPage } from '../../check-ins/create/NewCheckInPage.tsx';
 import { PatientEditPage } from '../../edit/PatientEditPage.tsx';
 import { PatientPhotoDetailsPage } from '../../images/$imageId/edit/PatientPhotoDetailsPage.tsx';
 import { PatientPhotoViewerPage } from '../../images/$imageId/PatientPhotoViewerPage.tsx';
@@ -31,6 +33,7 @@ import { PatientNotesPage } from '../../notes/PatientNotesPage.tsx';
 import { PatientOverviewPage } from '../../overview/PatientOverviewPage.tsx';
 import { PatientPackagesPage } from '../../packages/PatientPackagesPage.tsx';
 import {
+  validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
   validatePatientFileSearch,
 } from '../../patient-id.search.ts';
@@ -38,6 +41,8 @@ import { PatientFileLayout } from '../../PatientFileLayout.tsx';
 import { PatientPaymentsPage } from '../../payments/PatientPaymentsPage.tsx';
 import { PatientPrescriptionsPage } from '../../prescriptions/PatientPrescriptionsPage.tsx';
 import { PatientReportsPage } from '../../reports/PatientReportsPage.tsx';
+import { EditReviewPage } from '../../reviews/$reviewId/edit/EditReviewPage.tsx';
+import { NewReviewPage } from '../../reviews/create/NewReviewPage.tsx';
 import type { PatientPhotoUploads } from '../../shared/hooks/usePatientPhotoUpload/index.ts';
 import { PatientFileContext } from '../../shared/patient-file-context.ts';
 import { PatientTimelinePage } from '../../timeline/PatientTimelinePage.tsx';
@@ -146,6 +151,20 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
     validateSearch: validatePatientFileDialogSearch,
     component: PatientEditPage,
   });
+  // The check-in and review drawers over the section they opened from (S:44–47).
+  const feedbackDrawers = Object.entries({
+    'check-ins/create': NewCheckInPage,
+    'check-ins/$checkInId/edit': EditCheckInPage,
+    'reviews/create': NewReviewPage,
+    'reviews/$reviewId/edit': EditReviewPage,
+  }).map(([path, component]) =>
+    createRoute({
+      getParentRoute: () => file,
+      path,
+      validateSearch: validatePatientFeedbackSearch,
+      component,
+    }),
+  );
   const list = createRoute({
     getParentRoute: () => root,
     path: '/organization/$organizationSlug/patients',
@@ -164,6 +183,7 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
         ...sections,
         images.addChildren([photo, photoEdit]),
         edit,
+        ...feedbackDrawers,
       ]),
       list,
       elsewhere,

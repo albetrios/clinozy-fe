@@ -89,3 +89,47 @@ export function organizationReportCreate(organizationSlug: string, patientId: st
     params: { organizationSlug, patientId },
   } as const;
 }
+
+/**
+ * A new check-in — the check-in drawer over the file (`S:44`); `?treatment=`
+ * makes it an aftercare one, `?appointment=` ties it to a visit, `?from=`
+ * keeps the section behind it (A-F1).
+ */
+export function organizationCheckInCreate(organizationSlug: string, patientId: string) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/check-ins/create',
+    params: { organizationSlug, patientId },
+  } as const;
+}
+
+/** A check-in's edit — the check-in drawer over the file (`S:45`). */
+export function organizationCheckInEdit(
+  organizationSlug: string,
+  patientId: string,
+  checkInId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/check-ins/$checkInId/edit',
+    params: { organizationSlug, patientId, checkInId },
+  } as const;
+}
+
+/** Log a review — the review drawer over the file (`S:46`); `?source=` picks where it was left. */
+export function organizationReviewCreate(organizationSlug: string, patientId: string) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/reviews/create',
+    params: { organizationSlug, patientId },
+  } as const;
+}
+
+/** A review's edit — the review drawer over the file (`S:47`). */
+export function organizationReviewEdit(
+  organizationSlug: string,
+  patientId: string,
+  reviewId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit',
+    params: { organizationSlug, patientId, reviewId },
+  } as const;
+}

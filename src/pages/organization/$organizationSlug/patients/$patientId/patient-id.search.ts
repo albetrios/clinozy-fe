@@ -43,3 +43,38 @@ export function validatePatientFileDialogSearch(
 ): PatientFileDialogSearch {
   return { from: textOf(search.from) || undefined };
 }
+
+/**
+ * Where a review was left (`review_source`, `S:1314`) — declared here rather
+ * than read from the schema module, which this entry-chunk module must not
+ * pull in; `patient-id.search.test.ts` pins it to `REVIEW_SOURCE_VALUES`.
+ */
+export const PATIENT_REVIEW_SOURCES = [
+  'google',
+  'video',
+  'instagram',
+  'internal_form',
+  'whatsapp',
+] as const;
+
+/** Validated `?…` params of the check-in and review drawers (`S:44–47`). */
+export interface PatientFeedbackDialogSearch extends PatientFileDialogSearch {
+  /** The visit it follows. */
+  appointment?: string;
+  /** The treatment an aftercare check-in follows. */
+  treatment?: string;
+  /** Where a new review was left; Google when none. */
+  source?: (typeof PATIENT_REVIEW_SOURCES)[number];
+}
+
+/** Parse the check-in and review drawers' params; an unknown `source` is dropped. */
+export function validatePatientFeedbackSearch(
+  search: Record<string, unknown>,
+): PatientFeedbackDialogSearch {
+  return {
+    ...validatePatientFileDialogSearch(search),
+    appointment: textOf(search.appointment) || undefined,
+    treatment: textOf(search.treatment) || undefined,
+    source: oneOf(PATIENT_REVIEW_SOURCES, search.source),
+  };
+}

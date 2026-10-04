@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { kebabCase } from '@/lib/kebab-case.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
@@ -45,8 +46,7 @@ interface FieldProps {
 
 /** A param's test id: `skinType` → `<testId>-skin-type`. */
 function paramTestId(testId: string, param: string): string {
-  const kebab = param.replaceAll(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-  return `${testId}-${kebab}`;
+  return `${testId}-${kebabCase(param)}`;
 }
 
 /** One-pick chips that store their option's value in `params[param]`. */

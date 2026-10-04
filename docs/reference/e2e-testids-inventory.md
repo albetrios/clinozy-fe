@@ -693,6 +693,30 @@ route). Paths are under `pages/organization/$organizationSlug/patients/$patientI
 | `report-view-<field>`                                                            | Report view (560, read only; "Download" is `report-view-save`): `type` · `date` · `added-by` · `file` · `notes` | `reports/components/ReportView/`                |
 | `package-drawer-offering-<offeringId>` · `package-drawer-empty`                  | Add package (560): one chip per multi-session offering · "No multi-session offerings yet"                       | `packages/components/AddPackageDrawer/`         |
 
+### Patient file feedback (launch L-43)
+
+Clinical notes (`overview/`) and the check-in and review drawers over the file. The drawers
+and the picker are `RecordDrawer`s — their parts take the Record drawer ids above, `<d>` being
+the root: `check-in-drawer`, `review-drawer`, `log-feedback-picker`. Their routes render the
+section behind and the drawer. Paths are under
+`pages/organization/$organizationSlug/patients/$patientId/`.
+
+| Test ID                                                                                | Element                                                                                  | Source                                   |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `clinical-card-<field>`                                                                | A chip card: `complaints` · `diagnosis` · `treatment-suggestions` · `future-suggestions` | `overview/components/ClinicalChipCard/`  |
+| `clinical-card-<field>-chip` · `-new` · `-input`                                       | Its chips (`data-fresh` when added this visit) · the "1 new" pill · the dashed input     | ClinicalChipCard                         |
+| `feedback-card` · `-toggle` · `-log`                                                   | The Feedback card · its header (expands) · "Log feedback ⌄"                              | `overview/components/FeedbackCard/`      |
+| `feedback-card-type-<type>`                                                            | A type chip: `all` · `visit` · `treatment` · a review source                             | FeedbackCard                             |
+| `feedback-card-item` · `-item-edit` · `-item-remove`                                   | A card · its Edit · Remove                                                               | `FeedbackCard/FeedbackItemCard.tsx`      |
+| `feedback-card-item-log-action` · `-item-action-<kind>` · `-item-action`               | "Log action ⌄" · a follow-up (`doctor_called` …) · the logged "✓ …" pill                 | `FeedbackCard/FeedbackItemCard.tsx`      |
+| `feedback-card-previous` · `-next` · `-load-more` · `-empty`                           | The carousel's ‹ › · "Load more" · "No feedback yet"                                     | FeedbackCard                             |
+| `log-feedback-picker-check-in-visit` · `-treatment-<treatmentId>` · `-review-<source>` | Log feedback (560, stacked): Consultation · "After …" · a review source                  | `overview/components/LogFeedbackPicker/` |
+| `check-in-drawer-feel-<feel>` · `-score-<n>` · `-now`                                  | Visit / Aftercare check-in (680), step 1: the feel chips, the score 1–10, In their words | `shared/components/CheckInDrawer/`       |
+| `check-in-drawer-followed-<followed>` · `-details`                                     | Step 2: Followed the advice, Details                                                     | CheckInDrawer                            |
+| `check-in-drawer-plan` · `-offerings`                                                  | Step 3: Plan, Add to offering suggestions (a Picker: `-offerings-option-<offeringId>`)   | CheckInDrawer                            |
+| `review-drawer-where-<source>` · `-rating-<n>`                                         | Log a review (560), step 1: Where, Rating 5 … 1                                          | `shared/components/ReviewDrawer/`        |
+| `review-drawer-link` · `-files` · `-files-input` · `-attached` · `-text`               | Link · the drop zone · its picker · a saved review's files · What they said              | ReviewDrawer                             |
+
 ## Quick line (shared, launch L-45)
 
 `shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a

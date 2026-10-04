@@ -1,5 +1,7 @@
 import type {
   AppointmentStatus,
+  CheckinFeel,
+  CheckinFollowed,
   CreditDirection,
   CreditStatus,
   ExpenseCategory,
@@ -15,6 +17,7 @@ import type {
   PatientType,
   PaymentKind,
   PaymentMode,
+  ReviewSource,
   Role,
   Section,
   Tone,
@@ -254,6 +257,37 @@ export const CREDIT_STATUS_TONES: Readonly<Record<CreditStatus, Tone>> = {
   given_back: 'sage',
   got_back: 'sage',
   used: 'lav',
+};
+
+/**
+ * How a check-in compares with the last visit (`CK_FEEL`, H:3680; `patient-file.md:175`):
+ * Much better sage, Better mint, Same stone, Worse blush.
+ */
+export const CHECKIN_FEEL_TONES: Readonly<Record<CheckinFeel, Tone>> = {
+  much_better: 'sage',
+  better: 'mint',
+  same: 'stone',
+  worse: 'blush',
+};
+
+/** Whether the advice was followed (`CK_FOL`, H:3680): Fully sage, Mostly mint, Partly butter, Not at all blush. */
+export const CHECKIN_FOLLOWED_TONES: Readonly<Record<CheckinFollowed, Tone>> = {
+  fully: 'sage',
+  mostly: 'mint',
+  partly: 'butter',
+  not_at_all: 'blush',
+};
+
+/**
+ * Where a review was left (`RV_SRC`, H:3684; the Feedback card's type chips):
+ * Google butter, Video lav, Instagram blush, Feedback form sky, WhatsApp sage.
+ */
+export const REVIEW_SOURCE_TONES: Readonly<Record<ReviewSource, Tone>> = {
+  google: 'butter',
+  video: 'lav',
+  instagram: 'blush',
+  internal_form: 'sky',
+  whatsapp: 'sage',
 };
 
 /** The utility classes one tone paints with. */
