@@ -261,6 +261,17 @@ describe('RolesAccess — the role list and page (users.md:42–77)', () => {
       `Previewing ${PRODUCT_NAME} as Counsellor`,
     );
   });
+
+  it('previews a custom role too — by its clinozy-be id (L-31e)', async () => {
+    const user = userEvent.setup();
+    renderRoles(`/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`);
+    const page = await rolePage();
+    await user.click(within(page).getByTestId('users-role-preview'));
+    expect(useUIStore.getState().previewRole).toBe(PLATFORM_ROLES.senior.id);
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      `Previewing ${PRODUCT_NAME} as Senior desk`,
+    );
+  });
 });
 
 describe('RolesAccess — who may change what (Q-U6, D47)', () => {

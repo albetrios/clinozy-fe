@@ -286,7 +286,10 @@ those routes off the tree — so shared code never imports a page — keeps the 
 modules, drops the template pages when any clinic room is enabled (D25: the Dashboard stays for
 personal mode), then filters by the manifest's platform permission and the member's clinic access,
 View-as included. Every shell's nav and the ⌘K nav group draw the same list; each entry links to
-its route's own path with `organizationSlug` as the only param.
+its route's own path with `organizationSlug` as the only param. A clinic room in the URL that the
+access in force can't view — a role previewed from Users › Roles & access, or the member's own
+access after "Exit preview" — is replaced (history `replace`, hash kept) by the first viewable
+room in nav order after Today: `useRoomLanding` in the org layout (Q-U11).
 
 ## 10. Rename inventory (full-name sweep over existing code)
 

@@ -19,15 +19,16 @@ export interface RolesNavigation {
   select: (role: ClinicRoleKey) => void;
   /** A "People with this role" pill: the member's drawer over this page (`?from=roles`, H:5188). */
   openMember: (member: TeamMember, role: ClinicRoleKey) => void;
-  /** "Preview as <role>": View-as for the role (§3.7, H:4441). */
+  /** "Preview as <role>": View-as for the role, a custom one too (§3.7, H:4441). */
   preview: (role: ClinicRoleView, label: string) => void;
 }
 
 /**
  * The Roles page's moves (KICKOFF §6.12 Routes): the selected role lives in the
  * URL (`role`, default Front desk), a member opens in their drawer with the
- * page kept behind it, and "Preview as" narrows the app to the role — the
- * contract's roles today; a custom role's preview arrives with View-as (L-31e).
+ * page kept behind it, and "Preview as" narrows the app to the role — any role
+ * but Admin. A role that can't view Users is then taken to its first room by
+ * the org layout (Q-U11).
  */
 export function useRolesNavigation(): RolesNavigation {
   const navigate = useNavigate();
@@ -58,8 +59,8 @@ export function useRolesNavigation(): RolesNavigation {
 
   const preview = useCallback(
     (role: ClinicRoleView, label: string) => {
-      if (role.locked || role.preset === null) return;
-      setPreviewRole(role.preset);
+      if (role.locked) return;
+      setPreviewRole(role.key);
       notify.success(t(USERS_KEYS.roles.previewing, { role: label }));
     },
     [setPreviewRole, t],

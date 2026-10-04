@@ -8,11 +8,12 @@ permissions on change. Spec: `docs/reference/routing-and-tenancy.md`.
 
 ## Files
 
-| File                            | Responsibility                                                        |
-| ------------------------------- | --------------------------------------------------------------------- |
-| `organization-slug.route.tsx`   | Route marker — exports `Component` rendering `OrganizationLayout`.    |
-| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `dashboard`, `suspended`.       |
-| `OrganizationLayout.tsx`        | Thin wrapper mounting the shared AppLayout (sidebar/header/`Outlet`). |
+| File                            | Responsibility                                                                    |
+| ------------------------------- | --------------------------------------------------------------------------------- |
+| `organization-slug.route.tsx`   | Route marker — exports `Component` rendering `OrganizationLayout`.                |
+| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `dashboard`, `suspended`.                   |
+| `OrganizationLayout.tsx`        | Thin wrapper mounting the shared AppLayout (sidebar/header/`Outlet`).             |
+| `hooks/useRoomLanding/`         | Takes the member off a clinic room the access in force can't view (Q-U11, below). |
 
 ## Guard chain (routeTree `beforeLoad`)
 
@@ -39,3 +40,14 @@ gates on membership and its `clinic-*` module and carries its manifest as
 `staticData` for the nav (`useAppNav`). The org index (`/organization/<slug>`)
 redirects to the member's role home (D25, `shared/clinic/clinic-home.ts`), and
 an unknown in-org path redirects there with a "Page not found" toast (S:115).
+
+**Room landing (View-as, Q-U11).** The nav, ⌘K and the rooms follow
+`useClinicAccess` — the member's own access, or the role View-as previews
+(`useUIStore.previewRole`, a contract role or a custom role's id, never
+persisted). When the room in the URL isn't viewable under it, `useRoomLanding`
+replaces the URL with the first viewable room in nav order after Today (a Doctor
+previewed from Users › Roles & access lands on Leads), skipping a room whose
+module is off. The same rule places "Exit preview": it stays on a room the
+member's own access views, else moves on. Non-room paths (`dashboard`,
+`suspended`) and an unresolved access never move, and the Settings hash rides
+along.

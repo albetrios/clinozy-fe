@@ -1694,10 +1694,14 @@
    tray (inline end) → toasts (centre, top layer). A layer that is showing
    publishes its height, and the one above adds it to its own bottom, so a
    View-as pill never covers the "New" button and the tray never sits on
-   either. Phone only: from `md` the primary is back in the toolbar. */
+   either. Two notices (an unverified email over View-as) publish both
+   heights. Phone only: from `md` the primary is back in the toolbar. */
 @media (max-width: 47.9375rem) {
   :root:has([data-slot='notice-pill']) {
     --floating-notice-height: 3.25rem;
+  }
+  :root:has([data-slot='notice-pill'] ~ [data-slot='notice-pill']) {
+    --floating-notice-height: 6.5rem;
   }
   :root:has([data-slot='fab']) {
     --floating-fab-height: 3.75rem;

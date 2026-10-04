@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 
 interface UIStore {
   sidebarOpen: boolean;
@@ -22,9 +22,10 @@ interface UIStore {
   appearanceOpen: boolean;
   /**
    * View-as (Users › Roles & access): the role whose access the clinic screens
-   * preview, narrowing `useClinicAccess`. Session-only — never persisted.
+   * preview, narrowing `useClinicAccess` — a contract role, or a custom role's
+   * clinozy-be id. Session-only — never persisted.
    */
-  previewRole: Role | null;
+  previewRole: ClinicRoleKey | null;
   /**
    * The patient file's last Activity-column state, for a link that does not
    * say; `null` = the file's own default for the viewport.
@@ -41,7 +42,7 @@ interface UIStore {
   setShortcutsOpen: (open: boolean) => void;
   setAppearanceOpen: (open: boolean) => void;
   toggleAppearance: () => void;
-  setPreviewRole: (role: Role | null) => void;
+  setPreviewRole: (role: ClinicRoleKey | null) => void;
   setFileActivityOpen: (open: boolean | null) => void;
 }
 

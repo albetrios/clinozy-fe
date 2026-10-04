@@ -11,7 +11,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 import type { Member, RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -84,8 +84,8 @@ export const SELF = { userId: 'usr_riya', email: 'riya@cresence.skin' };
 interface UsersRoutesOptions {
   /** The member's clinozy-be codes. */
   codes?: OrganizationPermission[];
-  /** A role to preview (View-as). */
-  previewRole?: Role | null;
+  /** A role to preview (View-as) — a contract role or a custom role's id. */
+  previewRole?: ClinicRoleKey | null;
   /** The Roles & access page's component (`/users/roles`); a marker by default. */
   Roles?: () => ReactNode;
   /** The Branches page's component (`/users/branches`); a marker by default. */

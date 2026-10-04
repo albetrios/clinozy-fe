@@ -7,7 +7,10 @@ import {
   type OrganizationPermission,
   organizationPermissionSchema,
 } from '@/core/types/permissions.ts';
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
+import {
+  resetClinicAccessFixture,
+  saveRoleMatrixChange,
+} from '@/shared/api/clinic/access-api.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -24,6 +27,8 @@ const MEMBER_CODES: OrganizationPermission[] = [
   'role:read',
 ];
 const VIEWER_CODES: OrganizationPermission[] = ['organization:read', 'membership:read'];
+/** A custom role's clinozy-be id (Appendix F). */
+const CUSTOM_ROLE = 'rol_customaaaaaaaaaaaaaaa';
 
 function renderAccess() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -101,6 +106,31 @@ describe('useClinicAccess', () => {
     act(() => useUIStore.getState().setPreviewRole(null));
     expect(result.current.roles).toEqual(['owner']);
     expect(result.current.can('users', 'view')).toBe(true);
+  });
+
+  it('narrows to a custom role’s own matrix rows (L-31e)', async () => {
+    await saveRoleMatrixChange({ kind: 'addCustom', key: CUSTOM_ROLE, tone: 'lime' });
+    await saveRoleMatrixChange({
+      kind: 'section',
+      key: CUSTOM_ROLE,
+      section: 'leads',
+      grants: { view: true, create: true, edit: false, delete: false },
+    });
+    signIn('owner@elsewhere.com', OWNER_CODES);
+    const { result } = renderAccess();
+    await waitFor(() => expect(result.current.isResolved).toBe(true));
+
+    act(() => useUIStore.getState().setPreviewRole(CUSTOM_ROLE));
+    await waitFor(() =>
+      expect(result.current.viewableSections).toEqual(['today', 'leads']),
+    );
+    expect(result.current.previewRole).toBe(CUSTOM_ROLE);
+    // A custom role has no contract role: it counts in `can` alone.
+    expect(result.current.roles).toEqual([]);
+    expect(result.current.can('leads', 'create')).toBe(true);
+    expect(result.current.can('leads', 'edit')).toBe(false);
+    expect(result.current.can('users', 'view')).toBe(false);
+    expect(result.current.canAbility('perms')).toBe(false);
   });
 });
 

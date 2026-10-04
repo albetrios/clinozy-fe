@@ -44,7 +44,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   which the URL readers bring onto the entry chunk.
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
-  view sends the member (first viewable after Today; Q-U11).
+  view sends the member (first viewable after Today; Q-U11) — the org layout's
+  `useRoomLanding` applies it on every access change, View-as and its Exit too.
 - `clinic-referrer.ts` — the `from` allow-list a shared drawer route keeps its
   referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
   on the sender's (the page a drawer opens over, when it is an allowed one).
@@ -68,7 +69,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 
 Access itself — the fixture matrix, the resolver and the member's clinic roles —
 is `src/shared/api/clinic/access-api.ts`, read through
-`src/shared/hooks/useClinicAccess/` (narrowed by View-as, `useUIStore.previewRole`).
+`src/shared/hooks/useClinicAccess/` (narrowed by View-as, `useUIStore.previewRole` —
+a contract role or a custom role's id, which the View-as pill names from the
+clinozy-be roles and tones from the matrix).
 A member's clinic roles are their staff profile's (`useMyStaffProfile`, by sign-in
 email), else least privilege from their clinozy-be codes; the Users room and
 "Change roles & access" always follow those codes (D17). The Users room's data —

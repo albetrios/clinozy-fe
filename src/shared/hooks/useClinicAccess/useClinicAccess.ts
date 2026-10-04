@@ -9,6 +9,7 @@ import {
 import {
   type ClinicAbility,
   type ClinicAction,
+  type ClinicRoleKey,
   isPresetRole,
 } from '@/shared/api/clinic/access-contracts.ts';
 import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
@@ -24,7 +25,8 @@ export interface ClinicAccess {
    * View-as runs. A custom role counts in `can` but has no contract role.
    */
   roles: Role[];
-  previewRole: Role | null;
+  /** The role View-as previews — a contract role or a custom role's id — else null. */
+  previewRole: ClinicRoleKey | null;
   can: (section: Section, action: ClinicAction) => boolean;
   canAbility: (ability: ClinicAbility) => boolean;
   /** Sections with View, in nav order; Today always. Empty until resolved. */

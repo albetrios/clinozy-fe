@@ -106,11 +106,12 @@ export interface PlatformRolesResult {
  * Every clinozy-be role — all pages, under the `roles` key prefix, so every
  * role write refreshes it — for a viewer holding `role:read`; nothing (and
  * never pending) for anyone else. The Team reads it for each platform role's
- * system flag, Roles & access for the roles themselves.
+ * system flag, Roles & access for the roles themselves, and the View-as pill a
+ * custom role's name — only while it previews one (`enabled`).
  */
-export function usePlatformRoles(): PlatformRolesResult {
+export function usePlatformRoles(enabled = true): PlatformRolesResult {
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const canReadRoles = useCan({ permission: 'role:read' });
+  const canReadRoles = useCan({ permission: 'role:read' }) && enabled;
   const query = useAppQuery({
     queryKey: orgQueryKeys.rolesAll(organizationId),
     queryFn: fetchAllRoles,

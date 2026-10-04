@@ -62,6 +62,15 @@ describe('phone bottom stack (index.css)', () => {
     );
   });
 
+  it('two notice pills — the email notice over View-as — publish both heights (L-31e)', () => {
+    expect(
+      declarations(
+        ":root:has([data-slot='notice-pill'] ~ [data-slot='notice-pill'])",
+        PHONE,
+      ),
+    ).toContain('--floating-notice-height: 6.5rem');
+  });
+
   it('nothing outside a phone media query publishes the pill or the "New" height', () => {
     const outsidePhone = rules.replace(
       /@media \(max-width: 47\.9375rem\) \{[\s\S]*?\n\}/g,
