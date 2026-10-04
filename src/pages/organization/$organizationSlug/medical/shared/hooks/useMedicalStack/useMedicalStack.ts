@@ -1,12 +1,13 @@
-import { useState } from 'react';
-
 import type {
   Manufacturer,
   MedicalRep,
   Supplier,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
-import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
+import {
+  type StackedRequests,
+  useStackedRequest,
+} from '@/shared/hooks/useStackedDrawer/index.ts';
 
 /**
  * A parent's "New <thing> · “q”" + "full details" (`medical.md:319, 343–355`):
@@ -35,46 +36,15 @@ export type MedicalStackRecord = Manufacturer | Supplier | MedicalRep | Medicine
 export type OpenMedicalChild = (request: MedicalStackRequest) => void;
 
 /** What {@link useMedicalStack} hands the page that hosts the drawers. */
-export interface MedicalStack {
-  /** The child open on top, or `null`. */
-  child: MedicalStackRequest | null;
-  /**
-   * The last child asked for, open or not — the host keeps its drawer mounted
-   * closed, so the sheet closes the way every drawer does.
-   */
-  last: MedicalStackRequest | null;
-  open: OpenMedicalChild;
-  /** Back, ×, the backdrop or Esc: only the child closes, nothing is selected. */
-  close: () => void;
-  /** The child saved: it closes and its record lands in the parent's field. */
-  complete: (record: MedicalStackRecord) => void;
-}
-
-/** Hand a saved record to the field that asked — the request names its kind. */
-function deliver(request: MedicalStackRequest, record: MedicalStackRecord) {
-  (request.onCreated as (saved: MedicalStackRecord) => void)(record);
-}
+export type MedicalStack = StackedRequests<MedicalStackRequest, MedicalStackRecord>;
 
 /**
  * The Medical drawers' stacked child (KICKOFF §6.7 Stacked child drawers;
- * `S:116` — component state, no URL), on the shared {@link useStackedDrawer}:
+ * `S:116` — component state, no URL), on the shared {@link useStackedRequest}:
  * one child at a time over the open drawer — a manufacturer, supplier, MR or
  * medicine — named from the picker's text; its save selects the new record in
  * the field that asked.
  */
 export function useMedicalStack(): MedicalStack {
-  const [request, setRequest] = useState<MedicalStackRequest | null>(null);
-  const stacked = useStackedDrawer<MedicalStackRecord>((record) => {
-    if (request) deliver(request, record);
-  });
-  return {
-    child: stacked.isOpen ? request : null,
-    last: request,
-    open: (next) => {
-      setRequest(next);
-      stacked.open(next.query);
-    },
-    close: stacked.close,
-    complete: stacked.complete,
-  };
+  return useStackedRequest<MedicalStackRequest, MedicalStackRecord>();
 }

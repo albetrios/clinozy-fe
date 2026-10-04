@@ -27,4 +27,4 @@ list (D24): the MR drawer (`../shared/components/MrDrawer/`), with a manufacture
 
 ## Test ids
 
-`medical-mrs-page`; the shared toolbar and table ids prefixed `medical-mrs`; `mr-drawer`, `mr-visit-drawer`.
+`medical-mrs-page`; the shared toolbar and table ids prefixed `medical-mrs`; `rep-drawer`, `rep-visit-drawer`.

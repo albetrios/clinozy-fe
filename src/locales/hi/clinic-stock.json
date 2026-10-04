@@ -104,7 +104,12 @@
     "subContents": "प्रति {{unit}} ({{contents}}) · उपयोग ~{{usage}}/हफ़्ता",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "संपादित करें"
+      "use": "उपयोग करें",
+      "receive": "स्टॉक प्राप्त करें",
+      "log": "उपयोग दर्ज करें…",
+      "adjust": "गिनती समायोजित करें",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
     }
   },
   "purchases": {
@@ -126,7 +131,8 @@
       "unpaid": "बकाया"
     },
     "rowActions": {
-      "edit": "संपादित करें"
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
     }
   },
   "movements": {
@@ -152,7 +158,10 @@
     "reverted": "पलटा गया",
     "purchase": "ख़रीद #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "उलटें"
+    }
   },
   "vendors": {
     "records": "वेंडर",
@@ -168,7 +177,217 @@
     "purchases_other": "{{count}} ख़रीद",
     "noPurchases": "कोई ख़रीद नहीं",
     "rowActions": {
-      "edit": "संपादित करें"
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "आइटम",
+      "purchase": "ख़रीद",
+      "vendor": "वेंडर"
+    },
+    "saveChanges": "बदलाव सेव करें",
+    "addName": "नाम जोड़ें",
+    "pickers": {
+      "searchVendors": "क्लिनिक वेंडर खोजें",
+      "vendorsHint": "क्लिनिक वेंडर",
+      "newVendor": "नया क्लिनिक वेंडर",
+      "selectItem": "आइटम चुनें…",
+      "newItem": "नया क्लिनिक आइटम",
+      "inStock": "स्टॉक में {{quantity}}"
+    },
+    "treatments": {
+      "lhr": "एलएचआर",
+      "peel": "पील",
+      "facial": "फ़ेशियल",
+      "mole": "मस्सा हटाना",
+      "general": "सामान्य"
+    },
+    "item": {
+      "title": {
+        "create": "नया आइटम",
+        "edit": "आइटम संपादित करें"
+      },
+      "sub": "क्लिनिक का उपभोग्य सामान या उपकरण",
+      "steps": {
+        "item": "आइटम",
+        "levels": "स्तर",
+        "vendor": "सप्लायर"
+      },
+      "fields": {
+        "name": "नाम",
+        "category": "कैटेगरी",
+        "unit": "यूनिट",
+        "contents": "प्रति {{unit}} मात्रा",
+        "contentsHint": "वैकल्पिक · टीम एक {{unit}} का हिस्सा इस्तेमाल कर सकती है",
+        "measure": "इसमें मापा",
+        "inStock": "स्टॉक में",
+        "decimals": "दशमलव मान्य",
+        "usage": "प्रति सप्ताह उपयोग",
+        "min": "न्यूनतम",
+        "max": "अधिकतम",
+        "vendor": "सप्लायर"
+      },
+      "save": "आइटम जोड़ें",
+      "saved": "आइटम सेव हो गया"
+    },
+    "quickItem": {
+      "title": "नया क्लिनिक आइटम",
+      "sub": "प्रक्रियाओं में उपयोग · बिक्री के लिए नहीं",
+      "steps": {
+        "item": "आइटम",
+        "details": "विवरण"
+      },
+      "added": "{{name}} क्लिनिक आइटम में जोड़ा गया"
+    },
+    "vendor": {
+      "title": {
+        "create": "नया क्लिनिक वेंडर",
+        "edit": "क्लिनिक वेंडर संपादित करें"
+      },
+      "sub": "प्रक्रियाओं के लिए उपभोग्य सामान देता है · दवाइयाँ नहीं",
+      "fields": {
+        "name": "नाम",
+        "phone": "फ़ोन",
+        "phoneHint": "10 अंक"
+      },
+      "save": "वेंडर जोड़ें",
+      "added": "वेंडर {{name}} जोड़ा गया",
+      "saved": "वेंडर सेव हो गया"
+    },
+    "movement": {
+      "title": {
+        "used": "उपयोग दर्ज करें",
+        "received": "स्टॉक प्राप्त करें",
+        "adjust": "स्टॉक समायोजित करें"
+      },
+      "sub": "{{name}} · अभी {{quantity}}",
+      "after": "बाद में: {{quantity}}",
+      "steps": {
+        "movement": "मूवमेंट",
+        "details": "विवरण",
+        "notes": "नोट्स"
+      },
+      "fields": {
+        "type": "प्रकार",
+        "quantity": "मात्रा",
+        "counted": "गिनी गई मात्रा",
+        "decimals": "दशमलव मान्य",
+        "measureIn": "इसमें मापें",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "किसके लिए",
+        "optional": "वैकल्पिक",
+        "remark": "टिप्पणी",
+        "remarkPlaceholder": "मरीज़, बैच या कारण"
+      },
+      "save": "मूवमेंट सेव करें",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "मात्रा दर्ज करें",
+      "onlyInStock": "स्टॉक में सिर्फ़ {{quantity}}",
+      "saved": "{{type}} सेव हुआ · {{quantity}} बचा"
+    },
+    "use": {
+      "label": "{{name}} उपयोग करें",
+      "inStock": "स्टॉक में · {{quantity}}",
+      "measureIn": "इसमें मापें",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "मात्रा",
+      "less": "कम",
+      "more": "ज़्यादा",
+      "usedFor": "किसके लिए",
+      "after": "बाद में · {{quantity}}",
+      "moreDetails": "और विवरण",
+      "save": "{{quantity}} उपयोग करें",
+      "used": "{{name}} का {{quantity}} उपयोग हुआ · {{left}} बचा",
+      "outOfStock": "{{name}} स्टॉक में नहीं है"
+    },
+    "purchase": {
+      "title": {
+        "create": "नई ख़रीद",
+        "edit": "ख़रीद संपादित करें"
+      },
+      "sub": "प्राप्त आइटम स्टॉक में जुड़ते हैं",
+      "reorder": "कम आइटम फिर मँगाएँ",
+      "noSupplier": "कोई सप्लायर नहीं",
+      "bill": "बिल {{amount}}",
+      "due": "{{amount}} बकाया",
+      "paid": "भुगतान हो गया",
+      "steps": {
+        "bill": "बिल",
+        "items": "प्राप्त आइटम",
+        "payment": "भुगतान"
+      },
+      "fields": {
+        "vendor": "सप्लायर",
+        "billNo": "इनवॉइस नं.",
+        "date": "बिल की तारीख",
+        "items": "प्राप्त आइटम",
+        "item": "आइटम",
+        "qty": "मात्रा",
+        "rate": "दर",
+        "amount": "राशि",
+        "addItem": "आइटम जोड़ें",
+        "total": "कुल",
+        "billAmount": "बिल राशि",
+        "paid": "भुगतान हो गया",
+        "full": "पूरा",
+        "nothing": "कुछ नहीं",
+        "enterRate": "दर दर्ज करें",
+        "peek_one": "{{count}} आइटम · {{amount}}",
+        "peek_other": "{{count}} आइटम · {{amount}}"
+      },
+      "save": "ख़रीद बनाएँ",
+      "pickSupplier": "सप्लायर चुनें",
+      "saved": "ख़रीद सेव हो गई",
+      "savedStock": "ख़रीद सेव हुई · स्टॉक अपडेट हुआ"
+    },
+    "check": {
+      "title": "स्टॉक जाँच",
+      "sub": "शेल्फ़ पर जो है वह लिखें। सिर्फ़ अलग आइटम सेव होते हैं, हर एक समायोजन के रूप में।",
+      "counted": "{{total}} में से {{counted}} गिने गए",
+      "allItems": "सभी आइटम",
+      "fillRest": "बाकी को मेल खाता भरें",
+      "heads": {
+        "item": "आइटम",
+        "inSystem": "सिस्टम में",
+        "counted": "गिना गया",
+        "difference": "अंतर"
+      },
+      "inSystem": "सिस्टम में · {{quantity}}",
+      "countedLabel": "{{name}} की गिनती",
+      "same": "सिस्टम जैसा",
+      "measured": "= {{quantity}}",
+      "notCounted": "नहीं गिना",
+      "matches": "मेल खाता है",
+      "willChange_one": "{{count}} आइटम बदलेगा",
+      "willChange_other": "{{count}} आइटम बदलेंगे",
+      "nothing": "अभी कुछ नहीं बदलेगा",
+      "save": "गिनती सेव करें",
+      "failed": "सेव नहीं हुआ · आपकी गिनती रखी गई है",
+      "saved_one": "स्टॉक जाँच सेव हुई · {{count}} आइटम अपडेट हुआ",
+      "saved_other": "स्टॉक जाँच सेव हुई · {{count}} आइटम अपडेट हुए"
+    },
+    "confirm": {
+      "deleteItem": "यह आइटम हटाएँ?",
+      "deletePurchase": "यह ख़रीद हटाएँ?",
+      "deleteVendor": "यह क्लिनिक वेंडर हटाएँ?",
+      "removed": "{{name}} हटाया गया",
+      "deleted": "{{name}} हटा दिया गया",
+      "purchaseDeleted": "ख़रीद #{{seq}} हटाई गई",
+      "revert": {
+        "title": "यह मूवमेंट उलटें?",
+        "record": "{{name}} {{quantity}} · {{type}}",
+        "body": "स्टॉक इस एंट्री से पहले जैसा हो जाता है। दोनों एंट्री इतिहास में रहती हैं।",
+        "action": "उलटें",
+        "reasons": {
+          "mistake": "गलती से दर्ज",
+          "wrongItem": "गलत आइटम",
+          "wrongQty": "गलत मात्रा"
+        },
+        "done": "{{type}} उलटा गया · {{name}} फिर {{quantity}}",
+        "note": "{{when}} का {{type}} उलटा · {{reason}}"
+      }
     }
   }
 }

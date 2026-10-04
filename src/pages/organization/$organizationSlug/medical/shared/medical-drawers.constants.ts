@@ -289,8 +289,8 @@ export const MEDICAL_DRAWER_TEST_IDS = {
   medicine: 'medicine-drawer',
   supplier: 'supplier-drawer',
   manufacturer: 'manufacturer-drawer',
-  mr: 'mr-drawer',
-  visit: 'mr-visit-drawer',
+  mr: 'rep-drawer',
+  visit: 'rep-visit-drawer',
 } as const;
 
 /** A drawer stacked on another takes its kind's id with this suffix (`supplier-drawer-stacked`). */

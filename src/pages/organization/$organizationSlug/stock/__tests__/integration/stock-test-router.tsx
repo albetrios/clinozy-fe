@@ -14,6 +14,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { validateStockCreateSearch, validateStockSearch } from '../../stock.search.ts';
 
@@ -94,6 +95,21 @@ export function renderStockRoutes(
     </QueryClientProvider>,
   );
   return { ...view, router, queryClient };
+}
+
+/**
+ * One Clinic stock drawer, popover or confirm (any part of the room outside a
+ * tab's route) for a member previewed as `role`, with the router, query client
+ * and tooltips the room's shell provides — a drawer's dirty guard reads the
+ * router.
+ */
+export function renderStockDrawer(
+  ui: ReactNode,
+  { role = 'admin' }: { role?: Role } = {},
+) {
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+  return renderWithProviders(<TooltipProvider>{ui}</TooltipProvider>);
 }
 
 /** Put the stores the harness touched back as they were. */

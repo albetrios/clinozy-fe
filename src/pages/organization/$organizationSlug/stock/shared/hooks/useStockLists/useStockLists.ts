@@ -3,6 +3,8 @@ import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 
 import {
+  fetchAllStockItems,
+  fetchAllStockVendors,
   listStockItems,
   listStockMovements,
   listStockPurchases,
@@ -87,6 +89,29 @@ export function useStockFacets(tab: StockFacetTab) {
   return useAppQuery({
     queryKey: stockQueryKeys.facets(tab),
     queryFn: () => stockFacets(tab),
+    notifyOnError: false,
+  });
+}
+
+/*
+ * The whole lists the pickers, the Low stock chips, "Reorder low items" and
+ * Stock check read: the clinic's items and vendors are few (H:3723–3724).
+ */
+
+/** Every live item, the latest first. */
+export function useStockItemCatalogue() {
+  return useAppQuery({
+    queryKey: stockQueryKeys.catalogue('items'),
+    queryFn: fetchAllStockItems,
+    notifyOnError: false,
+  });
+}
+
+/** Every live clinic vendor, by name. */
+export function useStockVendorCatalogue() {
+  return useAppQuery({
+    queryKey: stockQueryKeys.catalogue('vendors'),
+    queryFn: fetchAllStockVendors,
     notifyOnError: false,
   });
 }

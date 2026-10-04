@@ -46,6 +46,8 @@ export interface DrawerFooterProps {
   /** "Save & add another", where the screen offers it — never on a phone. */
   onSaveAndAdd?: () => void;
   saveAndAddLabel?: string;
+  /** The failed save's note — "Not saved · your changes are kept" by default. */
+  notSavedLabel?: string;
   /** Shown only when the record can be deleted; the caller opens the confirm. */
   onDelete?: () => void;
   deleteLabel?: string;
@@ -115,6 +117,7 @@ function EditActions({
   compact,
   onSaveAndAdd,
   saveAndAddLabel,
+  notSavedLabel,
   onDelete,
   deleteLabel,
   testId,
@@ -176,7 +179,9 @@ function EditActions({
             aria-hidden="true"
             className="bg-destructive size-1.5 shrink-0 rounded-full"
           />
-          <span className="truncate">{t(RECORD_DRAWER_KEYS.notSaved)}</span>
+          <span className="truncate">
+            {notSavedLabel ?? t(RECORD_DRAWER_KEYS.notSaved)}
+          </span>
         </span>
       ) : null}
 

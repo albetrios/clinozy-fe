@@ -5,6 +5,11 @@ import { useTranslation } from 'react-i18next';
 import type { MedicalRep } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import {
+  phoneDigitsOf,
+  phoneIsInvalid,
+  storedPhoneOf,
+} from '@/shared/clinic/clinic-phone-field.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerField,
@@ -30,6 +35,7 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -42,13 +48,7 @@ import {
 } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
 import type { MrRow } from '../../medical-contracts.ts';
-import {
-  phoneDigitsOf,
-  phoneIsInvalid,
-  storedPhoneOf,
-  useLiveValues,
-  useMedicalDrawerAccess,
-} from '../../medical-drawer-form.ts';
+import { useMedicalDrawerAccess } from '../../medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -349,7 +349,7 @@ function MrSession({
   const form = useForm<MrFormValues>({
     defaultValues: mr ? formOf(mr) : emptyForm(prefill),
   });
-  const values = useLiveValues(form);
+  const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('mr');
   const [deleting, setDeleting] = useState(false);
@@ -365,7 +365,7 @@ function MrSession({
   const { saveState, save } = useDrawerSave<MrFormValues, MedicalRep>({
     form,
     fieldOrder: ['name', 'phone', 'nextVisitOn', 'manufacturerIds'],
-    toastId: 'mr-save-failed',
+    toastId: 'rep-save-failed',
     check: (current) =>
       phoneIsInvalid(current.phone)
         ? { fields: ['phone'], message: tPatient(PATIENT_DRAWER_KEYS.mobileInvalid) }

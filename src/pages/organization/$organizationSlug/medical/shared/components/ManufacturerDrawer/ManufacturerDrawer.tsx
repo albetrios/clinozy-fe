@@ -25,6 +25,7 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -37,7 +38,7 @@ import {
 } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
 import type { ManufacturerRow } from '../../medical-contracts.ts';
-import { useLiveValues, useMedicalDrawerAccess } from '../../medical-drawer-form.ts';
+import { useMedicalDrawerAccess } from '../../medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -348,7 +349,7 @@ function ManufacturerSession({
   const form = useForm<ManufacturerFormValues>({
     defaultValues: maker ? formOf(maker) : emptyForm(prefill),
   });
-  const values = useLiveValues(form);
+  const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('maker');
   const [deleting, setDeleting] = useState(false);

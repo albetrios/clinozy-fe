@@ -104,7 +104,12 @@
     "subContents": "per {{unit}} of {{contents}} · uses ~{{usage}}/week",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "Edit"
+      "use": "Use",
+      "receive": "Receive stock",
+      "log": "Log usage…",
+      "adjust": "Adjust count",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "purchases": {
@@ -126,7 +131,8 @@
       "unpaid": "Unpaid"
     },
     "rowActions": {
-      "edit": "Edit"
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "movements": {
@@ -152,7 +158,10 @@
     "reverted": "Reverted",
     "purchase": "Purchase #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "Revert"
+    }
   },
   "vendors": {
     "records": "vendors",
@@ -168,7 +177,217 @@
     "purchases_other": "{{count}} purchases",
     "noPurchases": "No purchases",
     "rowActions": {
-      "edit": "Edit"
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "Item",
+      "purchase": "Purchase",
+      "vendor": "Vendor"
+    },
+    "saveChanges": "Save changes",
+    "addName": "Add a name",
+    "pickers": {
+      "searchVendors": "Search clinic vendors",
+      "vendorsHint": "clinic vendors",
+      "newVendor": "New clinic vendor",
+      "selectItem": "Select item…",
+      "newItem": "New clinic item",
+      "inStock": "{{quantity}} in stock"
+    },
+    "treatments": {
+      "lhr": "LHR",
+      "peel": "Peel",
+      "facial": "Facial",
+      "mole": "Mole removal",
+      "general": "General"
+    },
+    "item": {
+      "title": {
+        "create": "New item",
+        "edit": "Edit item"
+      },
+      "sub": "Clinic consumable or equipment",
+      "steps": {
+        "item": "Item",
+        "levels": "Levels",
+        "vendor": "Supplier"
+      },
+      "fields": {
+        "name": "Name",
+        "category": "Category",
+        "unit": "Unit",
+        "contents": "Contents per {{unit}}",
+        "contentsHint": "optional · lets the team use part of a {{unit}}",
+        "measure": "Measured in",
+        "inStock": "In stock",
+        "decimals": "decimals allowed",
+        "usage": "Usage per week",
+        "min": "Minimum",
+        "max": "Maximum",
+        "vendor": "Supplier"
+      },
+      "save": "Add item",
+      "saved": "Item saved"
+    },
+    "quickItem": {
+      "title": "New clinic item",
+      "sub": "Used in procedures · not for sale",
+      "steps": {
+        "item": "Item",
+        "details": "Details"
+      },
+      "added": "{{name}} added to clinic items"
+    },
+    "vendor": {
+      "title": {
+        "create": "New clinic vendor",
+        "edit": "Edit clinic vendor"
+      },
+      "sub": "Supplies consumables for procedures · not medicines",
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "phoneHint": "10 digits"
+      },
+      "save": "Add vendor",
+      "added": "Vendor {{name}} added",
+      "saved": "Vendor saved"
+    },
+    "movement": {
+      "title": {
+        "used": "Log usage",
+        "received": "Receive stock",
+        "adjust": "Adjust stock"
+      },
+      "sub": "{{name}} · {{quantity}} now",
+      "after": "After: {{quantity}}",
+      "steps": {
+        "movement": "Movement",
+        "details": "Details",
+        "notes": "Notes"
+      },
+      "fields": {
+        "type": "Type",
+        "quantity": "Quantity",
+        "counted": "Counted quantity",
+        "decimals": "decimals allowed",
+        "measureIn": "Measure in",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "Used for",
+        "optional": "optional",
+        "remark": "Remark",
+        "remarkPlaceholder": "Patient, batch or reason"
+      },
+      "save": "Save movement",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "Enter a quantity",
+      "onlyInStock": "Only {{quantity}} in stock",
+      "saved": "{{type}} saved · {{quantity}} left"
+    },
+    "use": {
+      "label": "Use {{name}}",
+      "inStock": "In stock · {{quantity}}",
+      "measureIn": "Measure in",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "Quantity",
+      "less": "Less",
+      "more": "More",
+      "usedFor": "Used for",
+      "after": "After · {{quantity}}",
+      "moreDetails": "More details",
+      "save": "Use {{quantity}}",
+      "used": "{{quantity}} of {{name}} used · {{left}} left",
+      "outOfStock": "{{name}} is out of stock"
+    },
+    "purchase": {
+      "title": {
+        "create": "New purchase",
+        "edit": "Edit purchase"
+      },
+      "sub": "Items received are added to stock",
+      "reorder": "Reorder low items",
+      "noSupplier": "No supplier",
+      "bill": "Bill {{amount}}",
+      "due": "{{amount}} due",
+      "paid": "Paid",
+      "steps": {
+        "bill": "Bill",
+        "items": "Items received",
+        "payment": "Payment"
+      },
+      "fields": {
+        "vendor": "Supplier",
+        "billNo": "Invoice no.",
+        "date": "Bill date",
+        "items": "Items received",
+        "item": "Item",
+        "qty": "Qty",
+        "rate": "Rate",
+        "amount": "Amount",
+        "addItem": "Add item",
+        "total": "Total",
+        "billAmount": "Bill amount",
+        "paid": "Paid",
+        "full": "Full",
+        "nothing": "Nothing",
+        "enterRate": "Enter the rate",
+        "peek_one": "{{count}} item · {{amount}}",
+        "peek_other": "{{count}} items · {{amount}}"
+      },
+      "save": "Create purchase",
+      "pickSupplier": "Pick a supplier",
+      "saved": "Purchase saved",
+      "savedStock": "Purchase saved · stock updated"
+    },
+    "check": {
+      "title": "Stock check",
+      "sub": "Type what is on the shelf. Only items that differ are saved, each as an Adjust entry.",
+      "counted": "{{counted}} of {{total}} counted",
+      "allItems": "All items",
+      "fillRest": "Fill rest as matching",
+      "heads": {
+        "item": "Item",
+        "inSystem": "In system",
+        "counted": "Counted",
+        "difference": "Difference"
+      },
+      "inSystem": "In system · {{quantity}}",
+      "countedLabel": "Counted {{name}}",
+      "same": "Same as system",
+      "measured": "= {{quantity}}",
+      "notCounted": "Not counted",
+      "matches": "Matches",
+      "willChange_one": "{{count}} item will change",
+      "willChange_other": "{{count}} items will change",
+      "nothing": "Nothing changes yet",
+      "save": "Save count",
+      "failed": "Not saved · your counts are kept",
+      "saved_one": "Stock check saved · {{count}} item updated",
+      "saved_other": "Stock check saved · {{count}} items updated"
+    },
+    "confirm": {
+      "deleteItem": "Delete this item?",
+      "deletePurchase": "Delete this purchase?",
+      "deleteVendor": "Delete this clinic vendor?",
+      "removed": "{{name}} removed",
+      "deleted": "{{name}} deleted",
+      "purchaseDeleted": "Purchase #{{seq}} deleted",
+      "revert": {
+        "title": "Revert this movement?",
+        "record": "{{type}} of {{quantity}} {{name}}",
+        "body": "Stock goes back to what it was before this entry. Both entries stay in the history.",
+        "action": "Revert",
+        "reasons": {
+          "mistake": "Logged by mistake",
+          "wrongItem": "Wrong item",
+          "wrongQty": "Wrong quantity"
+        },
+        "done": "{{type}} reverted · {{name}} back to {{quantity}}",
+        "note": "Reverts {{type}} of {{when}} · {{reason}}"
+      }
     }
   }
 }

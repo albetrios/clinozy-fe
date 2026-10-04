@@ -1,4 +1,5 @@
 import { Outlet, useSearch } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -10,19 +11,29 @@ import {
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { PenLine } from '@/shared/icons/index.ts';
+import { PenLine, Trash } from '@/shared/icons/index.ts';
 
+import {
+  StockDeleteConfirm,
+  type StockDeleteTarget,
+} from '../shared/components/StockDeleteConfirm/index.ts';
+import { StockPurchaseDrawer } from '../shared/components/StockPurchaseDrawer/index.ts';
+import { StockStackHost } from '../shared/components/StockStackHost/index.ts';
 import { StockTable } from '../shared/components/StockTable/index.ts';
 import { StockToolbar } from '../shared/components/StockToolbar/index.ts';
 import { useStockAccess } from '../shared/hooks/useStockAccess/index.ts';
+import { useStockDialogRoute } from '../shared/hooks/useStockDialogRoute/index.ts';
 import {
   useStockFacets,
   useStockPurchaseList,
   useStockSummary,
 } from '../shared/hooks/useStockLists/index.ts';
 import { useStockNav } from '../shared/hooks/useStockNav/index.ts';
+import { useStockStack } from '../shared/hooks/useStockStack/index.ts';
 import { useStockWords } from '../shared/hooks/useStockWords/index.ts';
+import { fetchStockPurchase, stockQueryKeys } from '../shared/stock-api.ts';
 import type { StockPurchaseRow } from '../shared/stock-contracts.ts';
+import { STOCK_DRAWER_KEYS } from '../shared/stock-drawers.constants.ts';
 import { facetValues, sectionValue } from '../shared/stock-filters.ts';
 import { STOCK_PURCHASE_STATUS_TONES } from '../shared/stock-units.ts';
 import { STOCK_KEYS, STOCK_NS, STOCK_TABLE_IDS } from '../stock.constants.ts';
@@ -59,9 +70,10 @@ function usePurchaseFilters() {
  * bills from clinic vendors: ID, Supplier, Invoice (hidden), Date, Bill, Due
  * and Status, the row's edge in its status. A row opens Edit purchase. The
  * footer counts the purchases and what is due on them. The dialog routes
- * (`create/` — `?reorder=low` presets "Reorder low items" — and
- * `$purchaseId/edit/`) render nothing: the drawer mounts here (L-51b); "Pay
- * ₹X" waits on the Payments pay route (L-50c, Q-M1).
+ * render nothing: this page opens the Purchase drawer for `create/` —
+ * `?reorder=low` presets "Reorder low items" — and `$purchaseId/edit/`, with
+ * a vendor or an item stacked on it; Delete asks for a reason. "Pay ₹X" waits
+ * on the Payments pay route (L-50c, Q-M1).
  */
 export function PurchasesPage() {
   const { t } = useTranslation(STOCK_NS);
@@ -73,6 +85,15 @@ export function PurchasesPage() {
   const { formatPaise } = useStockWords();
   const { fields, copy } = usePurchaseFilters();
   const filters = useRoomFilters(fields);
+  const stack = useStockStack();
+  const [deleting, setDeleting] = useState<StockDeleteTarget | null>(null);
+  const { dialog, close } = useStockDialogRoute({
+    tab: 'purchases',
+    param: 'purchaseId',
+    queryKey: stockQueryKeys.purchase,
+    fetchRecord: fetchStockPurchase,
+    recordLabel: t(STOCK_DRAWER_KEYS.records.purchase),
+  });
 
   const list = useStockPurchaseList(params);
   const { rows, loading } = useRoomList(list, TABLE_ID, purchaseFilterKey(params));
@@ -85,14 +106,33 @@ export function PurchasesPage() {
     onSortChange: (sort) => patchSearch({ sort }),
   });
 
-  const rowActions = (purchase: StockPurchaseRow): DataTableRowAction[] => [
-    {
-      id: 'edit',
-      label: t(STOCK_KEYS.purchases.rowActions.edit),
-      icon: PenLine,
-      onSelect: () => nav.purchaseEdit(purchase.id),
-    },
-  ];
+  const rowActions = (purchase: StockPurchaseRow): DataTableRowAction[] => {
+    const actions: DataTableRowAction[] = [
+      {
+        id: 'edit',
+        label: t(STOCK_KEYS.purchases.rowActions.edit),
+        icon: PenLine,
+        onSelect: () => nav.purchaseEdit(purchase.id),
+      },
+    ];
+    if (access.canDelete) {
+      actions.push({
+        id: 'delete',
+        label: t(STOCK_KEYS.purchases.rowActions.delete),
+        icon: Trash,
+        destructive: true,
+        onSelect: () =>
+          setDeleting({
+            kind: 'purchase',
+            id: purchase.id,
+            name: `#${purchase.seq}`,
+            seq: purchase.seq,
+            record: purchase.vendor?.name,
+          }),
+      });
+    }
+    return actions;
+  };
 
   return (
     <section data-testid="stock-purchases-page" className="flex min-h-0 flex-1 flex-col">
@@ -129,6 +169,22 @@ export function PurchasesPage() {
         exportName="clinic-stock-purchases.csv"
         avatar
       />
+      <StockPurchaseDrawer
+        {...(dialog.kind === 'record'
+          ? { mode: 'edit' as const, purchase: dialog.record }
+          : {
+              mode: 'create' as const,
+              prefill:
+                dialog.kind === 'create'
+                  ? { reorder: dialog.prefill.reorder }
+                  : undefined,
+            })}
+        open={dialog.kind !== 'none'}
+        onClose={close}
+        openChild={stack.open}
+      />
+      <StockStackHost stack={stack} />
+      <StockDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
       <Outlet />
     </section>
   );

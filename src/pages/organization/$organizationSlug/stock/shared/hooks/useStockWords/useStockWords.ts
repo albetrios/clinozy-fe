@@ -83,6 +83,11 @@ export function useStockWords() {
     figure,
     unit,
     measure,
+    /** A figure with its label: "1.5 tube", "30 g". */
+    amount,
+    /** A stock in units alone: "6 tube" — the toasts' "… left". */
+    units: (item: Pick<StockItem, 'unit'>, qtyMilli: number) =>
+      amount(fromMilli(qtyMilli), unit(item.unit)),
     quantity,
     category: (value: StockCategory): StockLabel => ({
       label: t(STOCK_KEYS.categories[value]),

@@ -101,7 +101,12 @@
     "subContents": "每{{unit}} {{contents}} · 每周约用 {{usage}}",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "编辑"
+      "use": "使用",
+      "receive": "入库",
+      "log": "记录使用…",
+      "adjust": "调整数量",
+      "edit": "编辑",
+      "delete": "删除"
     }
   },
   "purchases": {
@@ -122,7 +127,8 @@
       "unpaid": "未付款"
     },
     "rowActions": {
-      "edit": "编辑"
+      "edit": "编辑",
+      "delete": "删除"
     }
   },
   "movements": {
@@ -147,7 +153,10 @@
     "reverted": "已撤销",
     "purchase": "采购 #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "撤销"
+    }
   },
   "vendors": {
     "records": "供应商",
@@ -161,7 +170,214 @@
     "purchases_other": "{{count}} 笔采购",
     "noPurchases": "无采购",
     "rowActions": {
-      "edit": "编辑"
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "物品",
+      "purchase": "采购",
+      "vendor": "供应商"
+    },
+    "saveChanges": "保存更改",
+    "addName": "请输入名称",
+    "pickers": {
+      "searchVendors": "搜索诊所供应商",
+      "vendorsHint": "诊所供应商",
+      "newVendor": "新建诊所供应商",
+      "selectItem": "选择物品…",
+      "newItem": "新建诊所物品",
+      "inStock": "库存 {{quantity}}"
+    },
+    "treatments": {
+      "lhr": "激光脱毛",
+      "peel": "换肤",
+      "facial": "面部护理",
+      "mole": "祛痣",
+      "general": "常规"
+    },
+    "item": {
+      "title": {
+        "create": "新建物品",
+        "edit": "编辑物品"
+      },
+      "sub": "诊所耗材或设备",
+      "steps": {
+        "item": "物品",
+        "levels": "库存水平",
+        "vendor": "供应商"
+      },
+      "fields": {
+        "name": "名称",
+        "category": "类别",
+        "unit": "单位",
+        "contents": "每{{unit}}含量",
+        "contentsHint": "可选 · 便于团队使用部分{{unit}}",
+        "measure": "计量单位",
+        "inStock": "库存",
+        "decimals": "可输入小数",
+        "usage": "每周用量",
+        "min": "最少",
+        "max": "最多",
+        "vendor": "供应商"
+      },
+      "save": "添加物品",
+      "saved": "物品已保存"
+    },
+    "quickItem": {
+      "title": "新建诊所物品",
+      "sub": "用于治疗 · 不对外销售",
+      "steps": {
+        "item": "物品",
+        "details": "详情"
+      },
+      "added": "已将 {{name}} 添加到诊所物品"
+    },
+    "vendor": {
+      "title": {
+        "create": "新建诊所供应商",
+        "edit": "编辑诊所供应商"
+      },
+      "sub": "供应治疗耗材 · 不含药品",
+      "fields": {
+        "name": "名称",
+        "phone": "电话",
+        "phoneHint": "10 位数字"
+      },
+      "save": "添加供应商",
+      "added": "已添加供应商 {{name}}",
+      "saved": "供应商已保存"
+    },
+    "movement": {
+      "title": {
+        "used": "记录使用",
+        "received": "入库",
+        "adjust": "调整库存"
+      },
+      "sub": "{{name}} · 当前 {{quantity}}",
+      "after": "之后：{{quantity}}",
+      "steps": {
+        "movement": "出入库",
+        "details": "详情",
+        "notes": "备注"
+      },
+      "fields": {
+        "type": "类型",
+        "quantity": "数量",
+        "counted": "盘点数量",
+        "decimals": "可输入小数",
+        "measureIn": "计量单位",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "用于",
+        "optional": "可选",
+        "remark": "备注",
+        "remarkPlaceholder": "患者、批次或原因"
+      },
+      "save": "保存出入库",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "请输入数量",
+      "onlyInStock": "库存仅有 {{quantity}}",
+      "saved": "已保存{{type}} · 剩余 {{quantity}}"
+    },
+    "use": {
+      "label": "使用 {{name}}",
+      "inStock": "库存 · {{quantity}}",
+      "measureIn": "计量单位",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "数量",
+      "less": "减少",
+      "more": "增加",
+      "usedFor": "用于",
+      "after": "使用后 · {{quantity}}",
+      "moreDetails": "更多详情",
+      "save": "使用 {{quantity}}",
+      "used": "已使用 {{name}} {{quantity}} · 剩余 {{left}}",
+      "outOfStock": "{{name}} 已缺货"
+    },
+    "purchase": {
+      "title": {
+        "create": "新建采购",
+        "edit": "编辑采购"
+      },
+      "sub": "收到的物品会计入库存",
+      "reorder": "补货低库存物品",
+      "noSupplier": "无供应商",
+      "bill": "账单 {{amount}}",
+      "due": "待付 {{amount}}",
+      "paid": "已付款",
+      "steps": {
+        "bill": "账单",
+        "items": "已收物品",
+        "payment": "付款"
+      },
+      "fields": {
+        "vendor": "供应商",
+        "billNo": "发票号",
+        "date": "账单日期",
+        "items": "已收物品",
+        "item": "物品",
+        "qty": "数量",
+        "rate": "单价",
+        "amount": "金额",
+        "addItem": "添加物品",
+        "total": "合计",
+        "billAmount": "账单金额",
+        "paid": "已付款",
+        "full": "全额",
+        "nothing": "无",
+        "enterRate": "请输入单价",
+        "peek_other": "{{count}} 件物品 · {{amount}}"
+      },
+      "save": "创建采购",
+      "pickSupplier": "请选择供应商",
+      "saved": "采购已保存",
+      "savedStock": "采购已保存 · 库存已更新"
+    },
+    "check": {
+      "title": "库存盘点",
+      "sub": "填写货架上的实际数量。只保存有差异的物品，每项记为一次调整。",
+      "counted": "已盘点 {{counted}}/{{total}}",
+      "allItems": "全部物品",
+      "fillRest": "其余按一致填写",
+      "heads": {
+        "item": "物品",
+        "inSystem": "系统",
+        "counted": "盘点",
+        "difference": "差异"
+      },
+      "inSystem": "系统 · {{quantity}}",
+      "countedLabel": "{{name}} 盘点数量",
+      "same": "与系统一致",
+      "measured": "= {{quantity}}",
+      "notCounted": "未盘点",
+      "matches": "一致",
+      "willChange_other": "{{count}} 件物品将变更",
+      "nothing": "暂无变更",
+      "save": "保存盘点",
+      "failed": "未保存 · 已保留你的盘点",
+      "saved_other": "盘点已保存 · 已更新 {{count}} 件物品"
+    },
+    "confirm": {
+      "deleteItem": "删除此物品？",
+      "deletePurchase": "删除此采购？",
+      "deleteVendor": "删除此诊所供应商？",
+      "removed": "已移除 {{name}}",
+      "deleted": "已删除 {{name}}",
+      "purchaseDeleted": "已删除采购 #{{seq}}",
+      "revert": {
+        "title": "撤销此出入库记录？",
+        "record": "{{name}} {{quantity}} · {{type}}",
+        "body": "库存恢复到这条记录之前的数量。两条记录都会保留在历史中。",
+        "action": "撤销",
+        "reasons": {
+          "mistake": "误记",
+          "wrongItem": "物品错误",
+          "wrongQty": "数量错误"
+        },
+        "done": "已撤销{{type}} · {{name}} 恢复为 {{quantity}}",
+        "note": "撤销 {{when}} 的{{type}} · {{reason}}"
+      }
     }
   }
 }

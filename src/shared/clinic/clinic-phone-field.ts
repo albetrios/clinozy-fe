@@ -1,3 +1,5 @@
+import { toClinicPhone } from './clinic-phone.ts';
+
 /**
  * A clinic mobile field as it is typed (the drawers' "+91" box, H:3761). Kept
  * apart from `clinic-phone.ts`, which the URL readers bring onto the entry
@@ -30,3 +32,15 @@ export function clinicPhoneDigits(input: string): string {
 export function formatClinicPhoneDigits(digits: string): string {
   return digits.length > 5 ? `${digits.slice(0, 5)} ${digits.slice(5)}` : digits;
 }
+
+/** A stored mobile as the "+91" field types it: its ten digits, or nothing. */
+export const phoneDigitsOf = (phone: string | null): string =>
+  phone ? clinicPhoneDigits(phone) : '';
+
+/** The typed digits as the contract stores them (`+919825044120`); empty is none. */
+export const storedPhoneOf = (digits: string): string | null =>
+  digits ? toClinicPhone(digits) : null;
+
+/** Typed digits that are not a 10-digit Indian mobile ("Enter a 10-digit mobile"). */
+export const phoneIsInvalid = (digits: string): boolean =>
+  digits !== '' && toClinicPhone(digits) === null;

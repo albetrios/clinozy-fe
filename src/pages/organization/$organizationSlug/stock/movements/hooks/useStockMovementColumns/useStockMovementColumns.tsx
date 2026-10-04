@@ -1,15 +1,32 @@
 import type { ColumnDef } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { RevertReason } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { AvatarStack, TextCell, TonePill } from '@/shared/components/Cells/index.ts';
+import {
+  REASON_CONFIRM_KEYS,
+  REASON_CONFIRM_NS,
+} from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 
 import { useStockWords } from '../../../shared/hooks/useStockWords/index.ts';
-import type { StockMovementRow } from '../../../shared/stock-contracts.ts';
+import type {
+  StockChangeRow,
+  StockMovementRow,
+} from '../../../shared/stock-contracts.ts';
+import { STOCK_DRAWER_KEYS } from '../../../shared/stock-drawers.constants.ts';
 import { STOCK_KEYS } from '../../../stock.constants.ts';
 
 const rowOf = (original: unknown) => original as StockMovementRow;
+
+/** The `revert_reason` words the confirm offered, but "Other" — that one says what was typed. */
+const REVERT_REASON_KEYS: Record<Exclude<RevertReason, 'other'>, string> = {
+  mistake: STOCK_DRAWER_KEYS.confirm.revert.reasons.mistake,
+  wrong_item: STOCK_DRAWER_KEYS.confirm.revert.reasons.wrongItem,
+  wrong_qty: STOCK_DRAWER_KEYS.confirm.revert.reasons.wrongQty,
+};
 
 /** A reverted stock change — struck through in grey (`clinic-stock.md:61`). */
 const isReverted = (row: StockMovementRow) => row.kind !== 'payment' && row.reverted;
@@ -26,11 +43,25 @@ export function useStockMovementColumns(): ColumnDef<
 >[] {
   const words = useStockWords();
   const { t } = words;
+  const { i18n } = useTranslation();
   const keys = STOCK_KEYS.movements;
+
+  /** A Reverted entry's note: "Reverts used of Today 11:05 · Logged by mistake" (H:5264). */
+  const revertNote = (row: StockChangeRow) => {
+    if (!row.reverts) return row.note;
+    const { kind, at, reason } = row.reverts;
+    let why = row.note ?? t(REASON_CONFIRM_KEYS.reasons.other, { ns: REASON_CONFIRM_NS });
+    if (reason && reason !== 'other') why = t(REVERT_REASON_KEYS[reason]);
+    return t(STOCK_DRAWER_KEYS.confirm.revert.note, {
+      type: words.movementType(kind).label.toLocaleLowerCase(i18n.language),
+      when: words.when(at),
+      reason: why,
+    });
+  };
 
   /** The party line and its note: the item, or the purchase a payment settles. */
   const party = (row: StockMovementRow) => {
-    if (row.kind !== 'payment') return { name: row.item.name, sub: row.note };
+    if (row.kind !== 'payment') return { name: row.item.name, sub: revertNote(row) };
     const purchase = t(keys.purchase, { seq: row.purchase.seq });
     return {
       name: row.vendorName,

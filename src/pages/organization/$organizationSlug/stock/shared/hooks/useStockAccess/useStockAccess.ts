@@ -36,3 +36,20 @@ export function useStockAccess(): StockAccess {
     canDelete: can('delete'),
   };
 }
+
+/** A record drawer's gates: view only, and whether its red Delete shows. */
+export interface StockDrawerAccess {
+  readOnly: boolean;
+  canDelete: boolean;
+}
+
+/**
+ * Who may do what in a Clinic stock drawer (`clinic-stock.md:7`): a new record
+ * takes keeping the stock, a saved one Edit — else "View only · your role
+ * can’t change this"; Delete with Stock Delete on a saved one.
+ */
+export function useStockDrawerAccess(editing: boolean): StockDrawerAccess {
+  const access = useStockAccess();
+  const readOnly = access.resolved && !(editing ? access.canEdit : access.canManage);
+  return { readOnly, canDelete: editing && !readOnly && access.canDelete };
+}

@@ -16,5 +16,5 @@ in place with "<Record> not found" (`S:115`). Gated like the room — membership
 
 ## Test ids
 
-`mr-visit-drawer` — the drawer the MRs page opens for this URL; the route renders no element
+`rep-visit-drawer` — the drawer the MRs page opens for this URL; the route renders no element
 of its own (`tooling/validate/test-ids-allowlist.txt`).

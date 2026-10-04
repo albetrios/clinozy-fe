@@ -30,11 +30,12 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
 import { useLogMrVisit } from '../../../shared/hooks/useMedicalPartners/index.ts';
 import type { MrRow } from '../../../shared/medical-contracts.ts';
-import { textOrNull, useLiveValues } from '../../../shared/medical-drawer-form.ts';
+import { textOrNull } from '../../../shared/medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -257,7 +258,7 @@ function VisitSession({
       notes: '',
     },
   });
-  const values = useLiveValues(form);
+  const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('visit');
   const log = useLogMrVisit({
@@ -270,7 +271,7 @@ function VisitSession({
   const { saveState, save } = useDrawerSave<VisitFormValues, MRVisit>({
     form,
     fieldOrder: ['date', 'nextVisitOn', 'samples', 'notes'],
-    toastId: 'mr-visit-save-failed',
+    toastId: 'rep-visit-save-failed',
     onField: (field) => {
       if (field === 'date') setOpenStep('visit');
       else setOpenStep(field === 'notes' ? 'notes' : 'details');

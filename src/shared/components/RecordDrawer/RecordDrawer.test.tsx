@@ -117,6 +117,29 @@ describe('RecordDrawer — shell', () => {
     );
   });
 
+  it('carries a counter at the header’s end, and lays edge-to-edge rows in a flush body', async () => {
+    renderWithProviders(
+      <Harness startOpen headerEnd={<span>2 of 10 counted</span>} flushBody>
+        <p>count rows</p>
+      </Harness>,
+    );
+    expect(await screen.findByTestId('pt-header-end')).toHaveTextContent(
+      '2 of 10 counted',
+    );
+    const body = screen.getByTestId('pt-body');
+    expect(body).not.toHaveClass('p-(--drawer-body-pad)');
+    expect(body).not.toHaveClass('gap-3');
+  });
+
+  it('keeps the sub line as the description while a phone hides it', async () => {
+    renderWithProviders(<Harness startOpen hideSubOnPhone />);
+    const dialog = await screen.findByRole('dialog', { name: 'New patient' });
+    expect(dialog).toHaveAccessibleDescription('Add the details, then Create patient');
+    expect(screen.getByText('Add the details, then Create patient')).toHaveClass(
+      'max-md:sr-only',
+    );
+  });
+
   it('slides in from the inline end over a 45% backdrop', async () => {
     renderWithProviders(<Harness startOpen />);
 
@@ -454,6 +477,19 @@ describe('RecordDrawer — saving', () => {
     expect(await screen.findByTestId('pt-save')).toHaveTextContent('Retry save');
     expect(screen.getByTestId('pt-not-saved')).toHaveTextContent(
       'Not saved · your changes are kept',
+    );
+  });
+
+  it('names what a failed save kept in the screen’s own words', async () => {
+    renderWithProviders(
+      <Harness
+        startOpen
+        saveState="failed"
+        notSavedLabel="Not saved · your counts are kept"
+      />,
+    );
+    expect(await screen.findByTestId('pt-not-saved')).toHaveTextContent(
+      'Not saved · your counts are kept',
     );
   });
 

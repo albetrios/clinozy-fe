@@ -107,7 +107,12 @@
     "subContents": "par {{unit}} de {{contents}} · utilise ~{{usage}}/semaine",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "Modifier"
+      "use": "Utiliser",
+      "receive": "Réceptionner du stock",
+      "log": "Enregistrer une utilisation…",
+      "adjust": "Ajuster le compte",
+      "edit": "Modifier",
+      "delete": "Supprimer"
     }
   },
   "purchases": {
@@ -130,7 +135,8 @@
       "unpaid": "Non payé"
     },
     "rowActions": {
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "delete": "Supprimer"
     }
   },
   "movements": {
@@ -157,7 +163,10 @@
     "reverted": "Annulé",
     "purchase": "Achat #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "Annuler"
+    }
   },
   "vendors": {
     "records": "fournisseurs",
@@ -175,7 +184,220 @@
     "purchases_other": "{{count}} achats",
     "noPurchases": "Aucun achat",
     "rowActions": {
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "Article",
+      "purchase": "Achat",
+      "vendor": "Fournisseur"
+    },
+    "saveChanges": "Enregistrer les modifications",
+    "addName": "Ajoutez un nom",
+    "pickers": {
+      "searchVendors": "Rechercher un fournisseur de la clinique",
+      "vendorsHint": "fournisseurs de la clinique",
+      "newVendor": "Nouveau fournisseur de la clinique",
+      "selectItem": "Choisir un article…",
+      "newItem": "Nouvel article de la clinique",
+      "inStock": "{{quantity}} en stock"
+    },
+    "treatments": {
+      "lhr": "Épilation laser",
+      "peel": "Peeling",
+      "facial": "Soin du visage",
+      "mole": "Ablation de grain de beauté",
+      "general": "Général"
+    },
+    "item": {
+      "title": {
+        "create": "Nouvel article",
+        "edit": "Modifier l’article"
+      },
+      "sub": "Consommable ou équipement de la clinique",
+      "steps": {
+        "item": "Article",
+        "levels": "Niveaux",
+        "vendor": "Fournisseur"
+      },
+      "fields": {
+        "name": "Nom",
+        "category": "Catégorie",
+        "unit": "Unité",
+        "contents": "Contenu par {{unit}}",
+        "contentsHint": "facultatif · permet à l’équipe d’utiliser une partie d’un {{unit}}",
+        "measure": "Mesuré en",
+        "inStock": "En stock",
+        "decimals": "décimales autorisées",
+        "usage": "Utilisation par semaine",
+        "min": "Minimum",
+        "max": "Maximum",
+        "vendor": "Fournisseur"
+      },
+      "save": "Ajouter l’article",
+      "saved": "Article enregistré"
+    },
+    "quickItem": {
+      "title": "Nouvel article de la clinique",
+      "sub": "Utilisé lors des soins · non vendu",
+      "steps": {
+        "item": "Article",
+        "details": "Détails"
+      },
+      "added": "{{name}} ajouté aux articles de la clinique"
+    },
+    "vendor": {
+      "title": {
+        "create": "Nouveau fournisseur de la clinique",
+        "edit": "Modifier le fournisseur de la clinique"
+      },
+      "sub": "Fournit des consommables pour les soins · pas de médicaments",
+      "fields": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "phoneHint": "10 chiffres"
+      },
+      "save": "Ajouter le fournisseur",
+      "added": "Fournisseur {{name}} ajouté",
+      "saved": "Fournisseur enregistré"
+    },
+    "movement": {
+      "title": {
+        "used": "Enregistrer une utilisation",
+        "received": "Réceptionner du stock",
+        "adjust": "Ajuster le stock"
+      },
+      "sub": "{{name}} · {{quantity}} actuellement",
+      "after": "Après : {{quantity}}",
+      "steps": {
+        "movement": "Mouvement",
+        "details": "Détails",
+        "notes": "Notes"
+      },
+      "fields": {
+        "type": "Type",
+        "quantity": "Quantité",
+        "counted": "Quantité comptée",
+        "decimals": "décimales autorisées",
+        "measureIn": "Mesurer en",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "Utilisé pour",
+        "optional": "facultatif",
+        "remark": "Remarque",
+        "remarkPlaceholder": "Patient, lot ou motif"
+      },
+      "save": "Enregistrer le mouvement",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "Saisissez une quantité",
+      "onlyInStock": "Seulement {{quantity}} en stock",
+      "saved": "{{type}} enregistré · reste {{quantity}}"
+    },
+    "use": {
+      "label": "Utiliser {{name}}",
+      "inStock": "En stock · {{quantity}}",
+      "measureIn": "Mesurer en",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "Quantité",
+      "less": "Moins",
+      "more": "Plus",
+      "usedFor": "Utilisé pour",
+      "after": "Après · {{quantity}}",
+      "moreDetails": "Plus de détails",
+      "save": "Utiliser {{quantity}}",
+      "used": "{{quantity}} de {{name}} utilisé · reste {{left}}",
+      "outOfStock": "{{name}} est en rupture de stock"
+    },
+    "purchase": {
+      "title": {
+        "create": "Nouvel achat",
+        "edit": "Modifier l’achat"
+      },
+      "sub": "Les articles reçus sont ajoutés au stock",
+      "reorder": "Réapprovisionner les articles en baisse",
+      "noSupplier": "Aucun fournisseur",
+      "bill": "Facture {{amount}}",
+      "due": "{{amount}} dû",
+      "paid": "Payé",
+      "steps": {
+        "bill": "Facture",
+        "items": "Articles reçus",
+        "payment": "Paiement"
+      },
+      "fields": {
+        "vendor": "Fournisseur",
+        "billNo": "N° de facture",
+        "date": "Date de facture",
+        "items": "Articles reçus",
+        "item": "Article",
+        "qty": "Qté",
+        "rate": "Prix",
+        "amount": "Montant",
+        "addItem": "Ajouter l’article",
+        "total": "Total",
+        "billAmount": "Montant de la facture",
+        "paid": "Payé",
+        "full": "Totalité",
+        "nothing": "Rien",
+        "enterRate": "Saisissez le prix",
+        "peek_one": "{{count}} article · {{amount}}",
+        "peek_many": "{{count}} d’articles · {{amount}}",
+        "peek_other": "{{count}} articles · {{amount}}"
+      },
+      "save": "Créer l’achat",
+      "pickSupplier": "Choisissez un fournisseur",
+      "saved": "Achat enregistré",
+      "savedStock": "Achat enregistré · stock mis à jour"
+    },
+    "check": {
+      "title": "Inventaire",
+      "sub": "Saisissez ce qui est en rayon. Seuls les articles différents sont enregistrés, chacun comme un ajustement.",
+      "counted": "{{counted}} sur {{total}} comptés",
+      "allItems": "Tous les articles",
+      "fillRest": "Compléter le reste comme conforme",
+      "heads": {
+        "item": "Article",
+        "inSystem": "Dans le système",
+        "counted": "Compté",
+        "difference": "Écart"
+      },
+      "inSystem": "Dans le système · {{quantity}}",
+      "countedLabel": "{{name}} compté",
+      "same": "Comme le système",
+      "measured": "= {{quantity}}",
+      "notCounted": "Non compté",
+      "matches": "Conforme",
+      "willChange_one": "{{count}} article va changer",
+      "willChange_many": "{{count}} d’articles vont changer",
+      "willChange_other": "{{count}} articles vont changer",
+      "nothing": "Rien ne change pour l’instant",
+      "save": "Enregistrer le comptage",
+      "failed": "Non enregistré · vos comptages sont conservés",
+      "saved_one": "Inventaire enregistré · {{count}} article mis à jour",
+      "saved_many": "Inventaire enregistré · {{count}} d’articles mis à jour",
+      "saved_other": "Inventaire enregistré · {{count}} articles mis à jour"
+    },
+    "confirm": {
+      "deleteItem": "Supprimer cet article ?",
+      "deletePurchase": "Supprimer cet achat ?",
+      "deleteVendor": "Supprimer ce fournisseur de la clinique ?",
+      "removed": "{{name}} retiré",
+      "deleted": "{{name}} supprimé",
+      "purchaseDeleted": "Achat #{{seq}} supprimé",
+      "revert": {
+        "title": "Annuler ce mouvement ?",
+        "record": "{{type}} de {{quantity}} {{name}}",
+        "body": "Le stock revient à son niveau d’avant cette entrée. Les deux entrées restent dans l’historique.",
+        "action": "Annuler",
+        "reasons": {
+          "mistake": "Saisi par erreur",
+          "wrongItem": "Mauvais article",
+          "wrongQty": "Mauvaise quantité"
+        },
+        "done": "{{type}} annulé · {{name}} revient à {{quantity}}",
+        "note": "Annule {{type}} du {{when}} · {{reason}}"
+      }
     }
   }
 }

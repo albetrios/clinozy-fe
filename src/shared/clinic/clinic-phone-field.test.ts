@@ -4,6 +4,9 @@ import {
   CLINIC_PHONE_PREFIX,
   clinicPhoneDigits,
   formatClinicPhoneDigits,
+  phoneDigitsOf,
+  phoneIsInvalid,
+  storedPhoneOf,
 } from './clinic-phone-field.ts';
 
 describe('a clinic mobile field', () => {
@@ -24,5 +27,15 @@ describe('a clinic mobile field', () => {
     expect(formatClinicPhoneDigits('982504')).toBe('98250 4');
     expect(formatClinicPhoneDigits('9825044120')).toBe('98250 44120');
     expect(CLINIC_PHONE_PREFIX).toBe('+91');
+  });
+
+  it('reads a stored mobile into the field, and the field back into the contract', () => {
+    expect(phoneDigitsOf('+919825044120')).toBe('9825044120');
+    expect(phoneDigitsOf(null)).toBe('');
+    expect(storedPhoneOf('9825044120')).toBe('+919825044120');
+    expect(storedPhoneOf('')).toBeNull();
+    expect(phoneIsInvalid('98250')).toBe(true);
+    expect(phoneIsInvalid('')).toBe(false);
+    expect(phoneIsInvalid('9825044120')).toBe(false);
   });
 });

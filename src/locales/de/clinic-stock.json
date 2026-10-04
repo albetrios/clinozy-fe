@@ -104,7 +104,12 @@
     "subContents": "pro {{unit}} zu {{contents}} · Verbrauch ~{{usage}}/Woche",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "Bearbeiten"
+      "use": "Verbrauchen",
+      "receive": "Ware einbuchen",
+      "log": "Verbrauch erfassen…",
+      "adjust": "Bestand korrigieren",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
     }
   },
   "purchases": {
@@ -126,7 +131,8 @@
       "unpaid": "Unbezahlt"
     },
     "rowActions": {
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
     }
   },
   "movements": {
@@ -152,7 +158,10 @@
     "reverted": "Storniert",
     "purchase": "Einkauf #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "Rückgängig machen"
+    }
   },
   "vendors": {
     "records": "Händler",
@@ -168,7 +177,217 @@
     "purchases_other": "{{count}} Einkäufe",
     "noPurchases": "Keine Einkäufe",
     "rowActions": {
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "Artikel",
+      "purchase": "Einkauf",
+      "vendor": "Händler"
+    },
+    "saveChanges": "Änderungen speichern",
+    "addName": "Geben Sie einen Namen ein",
+    "pickers": {
+      "searchVendors": "Praxishändler suchen",
+      "vendorsHint": "Praxishändler",
+      "newVendor": "Neuer Praxishändler",
+      "selectItem": "Artikel wählen…",
+      "newItem": "Neuer Praxisartikel",
+      "inStock": "{{quantity}} auf Lager"
+    },
+    "treatments": {
+      "lhr": "LHR",
+      "peel": "Peeling",
+      "facial": "Gesichtsbehandlung",
+      "mole": "Muttermalentfernung",
+      "general": "Allgemein"
+    },
+    "item": {
+      "title": {
+        "create": "Neuer Artikel",
+        "edit": "Artikel bearbeiten"
+      },
+      "sub": "Verbrauchsmaterial oder Ausstattung der Praxis",
+      "steps": {
+        "item": "Artikel",
+        "levels": "Bestände",
+        "vendor": "Lieferant"
+      },
+      "fields": {
+        "name": "Name",
+        "category": "Kategorie",
+        "unit": "Einheit",
+        "contents": "Inhalt pro {{unit}}",
+        "contentsHint": "optional · so kann das Team einen Teil einer {{unit}} verwenden",
+        "measure": "Gemessen in",
+        "inStock": "Auf Lager",
+        "decimals": "Dezimalstellen erlaubt",
+        "usage": "Verbrauch pro Woche",
+        "min": "Minimum",
+        "max": "Maximum",
+        "vendor": "Lieferant"
+      },
+      "save": "Artikel hinzufügen",
+      "saved": "Artikel gespeichert"
+    },
+    "quickItem": {
+      "title": "Neuer Praxisartikel",
+      "sub": "Für Behandlungen · nicht zum Verkauf",
+      "steps": {
+        "item": "Artikel",
+        "details": "Details"
+      },
+      "added": "{{name}} zu den Praxisartikeln hinzugefügt"
+    },
+    "vendor": {
+      "title": {
+        "create": "Neuer Praxishändler",
+        "edit": "Praxishändler bearbeiten"
+      },
+      "sub": "Liefert Verbrauchsmaterial für Behandlungen · keine Arzneimittel",
+      "fields": {
+        "name": "Name",
+        "phone": "Telefon",
+        "phoneHint": "10 Ziffern"
+      },
+      "save": "Händler hinzufügen",
+      "added": "Händler {{name}} hinzugefügt",
+      "saved": "Händler gespeichert"
+    },
+    "movement": {
+      "title": {
+        "used": "Verbrauch erfassen",
+        "received": "Ware einbuchen",
+        "adjust": "Bestand korrigieren"
+      },
+      "sub": "{{name}} · jetzt {{quantity}}",
+      "after": "Danach: {{quantity}}",
+      "steps": {
+        "movement": "Bewegung",
+        "details": "Details",
+        "notes": "Notizen"
+      },
+      "fields": {
+        "type": "Art",
+        "quantity": "Menge",
+        "counted": "Gezählte Menge",
+        "decimals": "Dezimalstellen erlaubt",
+        "measureIn": "Messen in",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "Verwendet für",
+        "optional": "optional",
+        "remark": "Bemerkung",
+        "remarkPlaceholder": "Patient, Charge oder Grund"
+      },
+      "save": "Bewegung speichern",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "Geben Sie eine Menge ein",
+      "onlyInStock": "Nur {{quantity}} auf Lager",
+      "saved": "{{type}} gespeichert · noch {{quantity}}"
+    },
+    "use": {
+      "label": "{{name}} verbrauchen",
+      "inStock": "Auf Lager · {{quantity}}",
+      "measureIn": "Messen in",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "Menge",
+      "less": "Weniger",
+      "more": "Mehr",
+      "usedFor": "Verwendet für",
+      "after": "Danach · {{quantity}}",
+      "moreDetails": "Weitere Details",
+      "save": "{{quantity}} verbrauchen",
+      "used": "{{quantity}} {{name}} verbraucht · noch {{left}}",
+      "outOfStock": "{{name}} ist nicht auf Lager"
+    },
+    "purchase": {
+      "title": {
+        "create": "Neuer Einkauf",
+        "edit": "Einkauf bearbeiten"
+      },
+      "sub": "Erhaltene Artikel werden dem Bestand zugebucht",
+      "reorder": "Knappe Artikel nachbestellen",
+      "noSupplier": "Kein Lieferant",
+      "bill": "Rechnung {{amount}}",
+      "due": "{{amount}} offen",
+      "paid": "Bezahlt",
+      "steps": {
+        "bill": "Rechnung",
+        "items": "Erhaltene Artikel",
+        "payment": "Zahlung"
+      },
+      "fields": {
+        "vendor": "Lieferant",
+        "billNo": "Rechnungsnr.",
+        "date": "Rechnungsdatum",
+        "items": "Erhaltene Artikel",
+        "item": "Artikel",
+        "qty": "Menge",
+        "rate": "Preis",
+        "amount": "Betrag",
+        "addItem": "Artikel hinzufügen",
+        "total": "Summe",
+        "billAmount": "Rechnungsbetrag",
+        "paid": "Bezahlt",
+        "full": "Vollständig",
+        "nothing": "Nichts",
+        "enterRate": "Geben Sie den Preis ein",
+        "peek_one": "{{count}} Artikel · {{amount}}",
+        "peek_other": "{{count}} Artikel · {{amount}}"
+      },
+      "save": "Einkauf anlegen",
+      "pickSupplier": "Wählen Sie einen Lieferanten",
+      "saved": "Einkauf gespeichert",
+      "savedStock": "Einkauf gespeichert · Bestand aktualisiert"
+    },
+    "check": {
+      "title": "Inventur",
+      "sub": "Tragen Sie ein, was im Regal steht. Nur abweichende Artikel werden gespeichert, jeweils als Korrektur.",
+      "counted": "{{counted}} von {{total}} gezählt",
+      "allItems": "Alle Artikel",
+      "fillRest": "Rest als übereinstimmend füllen",
+      "heads": {
+        "item": "Artikel",
+        "inSystem": "Im System",
+        "counted": "Gezählt",
+        "difference": "Differenz"
+      },
+      "inSystem": "Im System · {{quantity}}",
+      "countedLabel": "{{name}} gezählt",
+      "same": "Wie im System",
+      "measured": "= {{quantity}}",
+      "notCounted": "Nicht gezählt",
+      "matches": "Stimmt",
+      "willChange_one": "{{count}} Artikel ändert sich",
+      "willChange_other": "{{count}} Artikel ändern sich",
+      "nothing": "Noch keine Änderung",
+      "save": "Zählung speichern",
+      "failed": "Nicht gespeichert · Ihre Zählung bleibt erhalten",
+      "saved_one": "Inventur gespeichert · {{count}} Artikel aktualisiert",
+      "saved_other": "Inventur gespeichert · {{count}} Artikel aktualisiert"
+    },
+    "confirm": {
+      "deleteItem": "Diesen Artikel löschen?",
+      "deletePurchase": "Diesen Einkauf löschen?",
+      "deleteVendor": "Diesen Praxishändler löschen?",
+      "removed": "{{name}} entfernt",
+      "deleted": "{{name}} gelöscht",
+      "purchaseDeleted": "Einkauf #{{seq}} gelöscht",
+      "revert": {
+        "title": "Diese Bewegung rückgängig machen?",
+        "record": "{{type}}: {{quantity}} {{name}}",
+        "body": "Der Bestand wird auf den Stand vor diesem Eintrag zurückgesetzt. Beide Einträge bleiben im Verlauf.",
+        "action": "Rückgängig machen",
+        "reasons": {
+          "mistake": "Versehentlich erfasst",
+          "wrongItem": "Falscher Artikel",
+          "wrongQty": "Falsche Menge"
+        },
+        "done": "{{type}} rückgängig gemacht · {{name}} wieder bei {{quantity}}",
+        "note": "Hebt „{{type}}“ ({{when}}) auf · {{reason}}"
+      }
     }
   }
 }

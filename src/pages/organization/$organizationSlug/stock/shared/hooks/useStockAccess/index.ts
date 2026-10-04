@@ -1,1 +1,6 @@
-export { type StockAccess, useStockAccess } from './useStockAccess.ts';
+export {
+  type StockAccess,
+  type StockDrawerAccess,
+  useStockAccess,
+  useStockDrawerAccess,
+} from './useStockAccess.ts';

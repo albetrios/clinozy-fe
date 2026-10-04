@@ -31,8 +31,9 @@ renders the family's Medical toolbar and its table:
 
 ## The drawers (L-50b)
 
-Each tab page reads its dialog routes (`shared/hooks/useMedicalDialogRoute/`: a create with its
-prefill, or a record — an unknown id goes back to the list with "<Record> not found") and opens
+Each tab page reads its dialog routes (`shared/hooks/useMedicalDialogRoute/`, the shared
+`useRoomDialogRoute` over the Medical section: a create with its prefill, or a record — an unknown id
+goes back to the list with "<Record> not found") and opens
 its drawer over the list, on the shared record drawer:
 
 - **Medicine** (`shared/components/MedicineDrawer/`, 840px): "Medicine, price & stock" — Name,
@@ -73,4 +74,4 @@ all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`
 `medical-<tab>` (`medical-sales-toolbar`, `medical-sales-tab-medicines`, `medical-sales-new`,
 `medical-sales-new-menu`, `medical-sales-table-row`); the view action
 `medical-<tab>-view-action-<id>`; the drawers `medicine-drawer`, `supplier-drawer`,
-`manufacturer-drawer`, `mr-drawer`, `mr-visit-drawer` (a stacked child adds `-stacked`).
+`manufacturer-drawer`, `rep-drawer`, `rep-visit-drawer` (a stacked child adds `-stacked`).

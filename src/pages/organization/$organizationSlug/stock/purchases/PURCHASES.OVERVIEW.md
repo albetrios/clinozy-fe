@@ -15,8 +15,9 @@ The search, filters and sort live in the URL (`../stock.search.ts`).
 ## Dialog routes
 
 `create/` (New purchase; `?reorder=low` presets "Reorder low items") · `$purchaseId/edit/` (Edit purchase)
-— each renders nothing; this page opens the drawer over the list (D24) with L-51b. "Pay ₹X" waits on the
-Payments pay route (L-50c, Q-M1).
+— each renders nothing; this page opens the Purchase drawer over the list (D24), a clinic vendor or
+item stacked on it from its pickers. A row's Delete asks for a reason — "Purchase #15 deleted" + Undo.
+"Pay ₹X" waits on the Payments pay route (L-50c, Q-M1).
 
 ## Files
 

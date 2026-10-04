@@ -17,19 +17,26 @@ keeps the last copy and toasts "Retry".
 
 ## Dialog routes
 
-`create/` (New item) · `$itemId/edit/` (Edit item) · `check/` (Stock check) — each renders nothing; this
-page reads the URL and opens the drawer over the list (D24). The drawers, the Use popover and the row's
-movement actions arrive with L-51b.
+`create/` (New item, `?name=`) · `$itemId/edit/` (Edit item) · `check/` (Stock check) — each renders
+nothing; this page reads the URL (`useStockDialogRoute`) and opens the drawer over the list (D24), with a
+clinic vendor stacked on it from the Supplier picker. A create or Stock check takes keeping the stock;
+an unknown id goes back to the list with "Item not found".
+
+## Row actions
+
+Use (the Use popover at the row's button; out of stock: "D-Tan Mask is out of stock") and Log usage…
+for whoever uses stock; Receive stock and Adjust count for those who keep it — each opens the movement
+drawer on its type, with no URL; Edit; Delete (Stock Delete) asks for a reason, then "… removed" + Undo.
 
 ## Files
 
-| File                         | Responsibility                                                                                |
-| ---------------------------- | --------------------------------------------------------------------------------------------- |
-| `items.route.tsx`            | Route marker — exports `Component` rendering `ItemsPage`.                                     |
-| `items.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-stock`.                    |
-| `items.params.ts`            | The list read from the URL (the tab's own sort keys) and its filter key.                      |
-| `ItemsPage.tsx`              | The tab: the Clinic stock toolbar, the table, its row actions and states; hosts the `Outlet`. |
-| `hooks/useStockItemColumns/` | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.  |
+| File                         | Responsibility                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| `items.route.tsx`            | Route marker — exports `Component` rendering `ItemsPage`.                                      |
+| `items.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-stock`.                     |
+| `items.params.ts`            | The list read from the URL (the tab's own sort keys) and its filter key.                       |
+| `ItemsPage.tsx`              | The tab: the toolbar, the table, its row actions and states; the drawers, popover and confirm. |
+| `hooks/useStockItemColumns/` | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.   |
 
 ## Test ids
 

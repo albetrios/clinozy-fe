@@ -28,7 +28,11 @@ export interface DataTableRowAction {
   /** The tooltip and the accessible name. */
   label: string;
   icon: AppIcon;
-  onSelect: () => void;
+  /**
+   * Runs the action. An inline button passes itself — the anchor of a popover
+   * the action opens (Clinic stock's Use); a "More actions" item passes none.
+   */
+  onSelect: (trigger?: HTMLElement) => void;
   /**
    * Destructive: shown last, after a separator, on the destructive tint. The
    * caller routes it through the delete confirm — never a direct delete.
@@ -99,7 +103,7 @@ export function DataTableRowActions({
                   data-testid={`${testIdPrefix}-row-action-${action.id}`}
                   onClick={(event) => {
                     stop(event);
-                    action.onSelect();
+                    action.onSelect(event.currentTarget);
                   }}
                   className={cn(
                     BUTTON_SIZE,

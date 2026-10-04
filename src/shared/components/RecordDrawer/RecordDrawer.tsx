@@ -64,8 +64,15 @@ export interface RecordDrawerProps {
   title: string;
   /** Grey tag pill beside the title, e.g. the record's "#273". */
   tag?: string;
+  /** At the header's inline end: Stock check's "2 of 10 counted". */
+  headerEnd?: ReactNode;
   /** Sub line under the title (13px, muted) and the dialog's description. */
   sub?: string;
+  /**
+   * Below `md` the sub line is only read out, not shown — Stock check keeps
+   * its title and counter on a phone (`clinic-stock.md:263`).
+   */
+  hideSubOnPhone?: boolean;
   /**
    * The screen-sized header of New lead (H:1888): a 20px title over a 12.5px
    * sub line, where the record drawers set 18px over 13px.
@@ -122,6 +129,11 @@ export interface RecordDrawerProps {
   onMissing?: (stepId: string, missing: readonly string[]) => void;
   /** Body content above the steps (a notice), or the whole body without steps. */
   children?: ReactNode;
+  /**
+   * The body without its padding and gap, for content that runs edge to edge
+   * and pads its own rows — Stock check's count grid (`clinic-stock.md:78`).
+   */
+  flushBody?: boolean;
   /** Footer summary (ellipsis; a phone gives it its own last row). */
   summary?: string;
   /** View only: "Close", no Save / Delete / Quick fill, and the read-only note. */
@@ -145,6 +157,8 @@ export interface RecordDrawerProps {
   deleteLabel?: string;
   /** Shown when the record can be deleted; the screen opens its confirm. */
   onDelete?: () => void;
+  /** The failed save's note in the screen's words ("Not saved · your counts are kept"). */
+  notSavedLabel?: string;
   /** Unsaved edits: every exit and the browser Back ask before discarding. */
   dirty?: boolean;
   /** Root test id; the parts derive theirs (`<testId>-save`, `-close` …). */
@@ -156,6 +170,8 @@ function DrawerHeader({
   title,
   tag,
   sub,
+  hideSubOnPhone,
+  end,
   large,
   titleRef,
   close,
@@ -164,6 +180,8 @@ function DrawerHeader({
   title: string;
   tag?: string;
   sub?: string;
+  hideSubOnPhone: boolean;
+  end?: ReactNode;
   large: boolean;
   titleRef: Ref<HTMLHeadingElement>;
   close: ReactNode;
@@ -195,12 +213,21 @@ function DrawerHeader({
         </div>
         {sub ? (
           <SheetDescription
-            className={cn('truncate', large ? 'text-detail' : 'text-body')}
+            className={cn(
+              'truncate',
+              large ? 'text-detail' : 'text-body',
+              hideSubOnPhone && 'max-md:sr-only',
+            )}
           >
             {sub}
           </SheetDescription>
         ) : null}
       </div>
+      {end ? (
+        <div data-testid={`${testId}-header-end`} className="ms-3 shrink-0">
+          {end}
+        </div>
+      ) : null}
       {close}
     </div>
   );
@@ -387,7 +414,9 @@ export function RecordDrawer(props: RecordDrawerProps) {
       <DrawerHeader
         title={props.title}
         tag={props.tag}
+        end={props.headerEnd}
         sub={props.sub}
+        hideSubOnPhone={props.hideSubOnPhone ?? false}
         large={props.largeTitle ?? false}
         titleRef={titleRef}
         testId={testId}
@@ -401,7 +430,10 @@ export function RecordDrawer(props: RecordDrawerProps) {
 
       <div
         data-testid={`${testId}-body`}
-        className="flex min-h-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto p-(--drawer-body-pad)"
+        className={cn(
+          'flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto',
+          !props.flushBody && 'gap-3 p-(--drawer-body-pad)',
+        )}
       >
         <DrawerItemsContext.Provider value={markItems}>
           {props.children}
@@ -431,6 +463,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
         onSaveAndAdd={onSaveAndAdd}
         deleteLabel={props.deleteLabel}
         onDelete={props.onDelete}
+        notSavedLabel={props.notSavedLabel}
         testId={testId}
       />
     </>

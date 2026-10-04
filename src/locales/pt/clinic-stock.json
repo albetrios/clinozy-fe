@@ -107,7 +107,12 @@
     "subContents": "por {{unit}} de {{contents}} · usa ~{{usage}}/semana",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "Editar"
+      "use": "Usar",
+      "receive": "Receber estoque",
+      "log": "Registrar uso…",
+      "adjust": "Ajustar contagem",
+      "edit": "Editar",
+      "delete": "Excluir"
     }
   },
   "purchases": {
@@ -130,7 +135,8 @@
       "unpaid": "Não pago"
     },
     "rowActions": {
-      "edit": "Editar"
+      "edit": "Editar",
+      "delete": "Excluir"
     }
   },
   "movements": {
@@ -157,7 +163,10 @@
     "reverted": "Revertido",
     "purchase": "Compra #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "Reverter"
+    }
   },
   "vendors": {
     "records": "fornecedores",
@@ -175,7 +184,220 @@
     "purchases_other": "{{count}} compras",
     "noPurchases": "Nenhuma compra",
     "rowActions": {
-      "edit": "Editar"
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "Item",
+      "purchase": "Compra",
+      "vendor": "Fornecedor"
+    },
+    "saveChanges": "Salvar alterações",
+    "addName": "Adicione um nome",
+    "pickers": {
+      "searchVendors": "Buscar fornecedores da clínica",
+      "vendorsHint": "fornecedores da clínica",
+      "newVendor": "Novo fornecedor da clínica",
+      "selectItem": "Selecione um item…",
+      "newItem": "Novo item da clínica",
+      "inStock": "{{quantity}} em estoque"
+    },
+    "treatments": {
+      "lhr": "Depilação a laser",
+      "peel": "Peeling",
+      "facial": "Limpeza facial",
+      "mole": "Remoção de pinta",
+      "general": "Geral"
+    },
+    "item": {
+      "title": {
+        "create": "Novo item",
+        "edit": "Editar item"
+      },
+      "sub": "Consumível ou equipamento da clínica",
+      "steps": {
+        "item": "Item",
+        "levels": "Níveis",
+        "vendor": "Fornecedor"
+      },
+      "fields": {
+        "name": "Nome",
+        "category": "Categoria",
+        "unit": "Unidade",
+        "contents": "Conteúdo por {{unit}}",
+        "contentsHint": "opcional · permite que a equipe use parte de um {{unit}}",
+        "measure": "Medido em",
+        "inStock": "Em estoque",
+        "decimals": "decimais permitidos",
+        "usage": "Uso por semana",
+        "min": "Mínimo",
+        "max": "Máximo",
+        "vendor": "Fornecedor"
+      },
+      "save": "Adicionar item",
+      "saved": "Item salvo"
+    },
+    "quickItem": {
+      "title": "Novo item da clínica",
+      "sub": "Usado em procedimentos · não é vendido",
+      "steps": {
+        "item": "Item",
+        "details": "Detalhes"
+      },
+      "added": "{{name}} adicionado aos itens da clínica"
+    },
+    "vendor": {
+      "title": {
+        "create": "Novo fornecedor da clínica",
+        "edit": "Editar fornecedor da clínica"
+      },
+      "sub": "Fornece consumíveis para procedimentos · não medicamentos",
+      "fields": {
+        "name": "Nome",
+        "phone": "Telefone",
+        "phoneHint": "10 dígitos"
+      },
+      "save": "Adicionar fornecedor",
+      "added": "Fornecedor {{name}} adicionado",
+      "saved": "Fornecedor salvo"
+    },
+    "movement": {
+      "title": {
+        "used": "Registrar uso",
+        "received": "Receber estoque",
+        "adjust": "Ajustar estoque"
+      },
+      "sub": "{{name}} · {{quantity}} agora",
+      "after": "Depois: {{quantity}}",
+      "steps": {
+        "movement": "Movimentação",
+        "details": "Detalhes",
+        "notes": "Notas"
+      },
+      "fields": {
+        "type": "Tipo",
+        "quantity": "Quantidade",
+        "counted": "Quantidade contada",
+        "decimals": "decimais permitidos",
+        "measureIn": "Medir em",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "Usado para",
+        "optional": "opcional",
+        "remark": "Observação",
+        "remarkPlaceholder": "Paciente, lote ou motivo"
+      },
+      "save": "Salvar movimentação",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "Informe uma quantidade",
+      "onlyInStock": "Apenas {{quantity}} em estoque",
+      "saved": "{{type}} salvo · restam {{quantity}}"
+    },
+    "use": {
+      "label": "Usar {{name}}",
+      "inStock": "Em estoque · {{quantity}}",
+      "measureIn": "Medir em",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "Quantidade",
+      "less": "Menos",
+      "more": "Mais",
+      "usedFor": "Usado para",
+      "after": "Depois · {{quantity}}",
+      "moreDetails": "Mais detalhes",
+      "save": "Usar {{quantity}}",
+      "used": "{{quantity}} de {{name}} usado · restam {{left}}",
+      "outOfStock": "{{name}} está esgotado"
+    },
+    "purchase": {
+      "title": {
+        "create": "Nova compra",
+        "edit": "Editar compra"
+      },
+      "sub": "Os itens recebidos entram no estoque",
+      "reorder": "Repor itens baixos",
+      "noSupplier": "Sem fornecedor",
+      "bill": "Nota {{amount}}",
+      "due": "{{amount}} pendente",
+      "paid": "Pago",
+      "steps": {
+        "bill": "Nota",
+        "items": "Itens recebidos",
+        "payment": "Pagamento"
+      },
+      "fields": {
+        "vendor": "Fornecedor",
+        "billNo": "Nº da nota",
+        "date": "Data da nota",
+        "items": "Itens recebidos",
+        "item": "Item",
+        "qty": "Qtd.",
+        "rate": "Preço",
+        "amount": "Valor",
+        "addItem": "Adicionar item",
+        "total": "Total",
+        "billAmount": "Valor da nota",
+        "paid": "Pago",
+        "full": "Integral",
+        "nothing": "Nada",
+        "enterRate": "Informe o preço",
+        "peek_one": "{{count}} item · {{amount}}",
+        "peek_many": "{{count}} de itens · {{amount}}",
+        "peek_other": "{{count}} itens · {{amount}}"
+      },
+      "save": "Criar compra",
+      "pickSupplier": "Escolha um fornecedor",
+      "saved": "Compra salva",
+      "savedStock": "Compra salva · estoque atualizado"
+    },
+    "check": {
+      "title": "Contagem de estoque",
+      "sub": "Digite o que está na prateleira. Só os itens diferentes são salvos, cada um como um ajuste.",
+      "counted": "{{counted}} de {{total}} contados",
+      "allItems": "Todos os itens",
+      "fillRest": "Preencher o resto como igual",
+      "heads": {
+        "item": "Item",
+        "inSystem": "No sistema",
+        "counted": "Contado",
+        "difference": "Diferença"
+      },
+      "inSystem": "No sistema · {{quantity}}",
+      "countedLabel": "{{name}} contado",
+      "same": "Igual ao sistema",
+      "measured": "= {{quantity}}",
+      "notCounted": "Não contado",
+      "matches": "Confere",
+      "willChange_one": "{{count}} item vai mudar",
+      "willChange_many": "{{count}} de itens vão mudar",
+      "willChange_other": "{{count}} itens vão mudar",
+      "nothing": "Nada muda ainda",
+      "save": "Salvar contagem",
+      "failed": "Não salvo · suas contagens foram mantidas",
+      "saved_one": "Contagem salva · {{count}} item atualizado",
+      "saved_many": "Contagem salva · {{count}} de itens atualizados",
+      "saved_other": "Contagem salva · {{count}} itens atualizados"
+    },
+    "confirm": {
+      "deleteItem": "Excluir este item?",
+      "deletePurchase": "Excluir esta compra?",
+      "deleteVendor": "Excluir este fornecedor da clínica?",
+      "removed": "{{name}} removido",
+      "deleted": "{{name}} excluído",
+      "purchaseDeleted": "Compra #{{seq}} excluída",
+      "revert": {
+        "title": "Reverter esta movimentação?",
+        "record": "{{type}} de {{quantity}} {{name}}",
+        "body": "O estoque volta ao que era antes deste registro. Os dois registros ficam no histórico.",
+        "action": "Reverter",
+        "reasons": {
+          "mistake": "Registrado por engano",
+          "wrongItem": "Item errado",
+          "wrongQty": "Quantidade errada"
+        },
+        "done": "{{type}} revertido · {{name}} volta a {{quantity}}",
+        "note": "Reverte {{type}} de {{when}} · {{reason}}"
+      }
     }
   }
 }

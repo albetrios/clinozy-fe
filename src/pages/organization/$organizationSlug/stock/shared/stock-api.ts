@@ -10,9 +10,10 @@ import {
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 
 import type {
+  StockChangeRow,
   StockItemListParams,
   StockItemRow,
   StockListSummary,
@@ -64,6 +65,9 @@ export const stockQueryKeys = {
     [...stockQueryKeys.all, 'summary', tab, params] as const,
   /** A tab's automatic Filters sections — the values its whole list holds. */
   facets: (tab: StockFacetTab) => [...stockQueryKeys.all, 'facets', tab] as const,
+  /** A whole list the pickers, chips and Stock check read. */
+  catalogue: (kind: 'items' | 'vendors') =>
+    [...stockQueryKeys.all, 'catalogue', kind] as const,
 };
 
 const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
@@ -92,14 +96,12 @@ function vendorRefs(world: FixtureWorld): Map<string, StockVendorRef> {
 
 /** Every member as the Movements "By" cell shows them. */
 function staffRefs(world: FixtureWorld): Map<string, StockStaffRef> {
-  const name = (profile: StaffProfile) =>
-    [profile.firstName, profile.lastName].filter(Boolean).join(' ');
   return new Map(
     world.staff.snapshot().map((profile) => [
       profile.id,
       {
         id: profile.id,
-        name: name(profile),
+        name: personFullName(profile),
         initials: profile.initials,
         tone: profile.tone,
       },
@@ -168,6 +170,12 @@ export async function listStockItems(
   cursor: string | null = null,
 ): Promise<CursorPage<StockItemRow>> {
   return cursorPageOf(await itemsFor(params), cursor);
+}
+
+/** Every live item as its row, in inventory order (the latest first) — the pickers and Stock check. */
+export async function fetchAllStockItems(): Promise<StockItemRow[]> {
+  const { clinicFixtures } = await fixtureWorld();
+  return itemRows(clinicFixtures).sort((a, b) => b.seq - a.seq);
 }
 
 /** One item as its row — a 404 when it is unknown or deleted. */
@@ -254,9 +262,12 @@ function movementRows(world: FixtureWorld): StockMovementRow[] {
   const staff = staffRefs(world);
   const items = new Map(world.stockItems.snapshot().map((item) => [item.id, item]));
   const vendors = vendorRefs(world);
-  const movements = world.stockMovements.snapshot().flatMap((movement) => {
+  const all = world.stockMovements.snapshot();
+  const byId = new Map(all.map((movement) => [movement.id, movement]));
+  const movements = all.flatMap((movement) => {
     const item = items.get(movement.itemId);
     if (!item) return [];
+    const original = movement.revertsId ? byId.get(movement.revertsId) : undefined;
     return [
       {
         id: movement.id,
@@ -274,7 +285,15 @@ function movementRows(world: FixtureWorld): StockMovementRow[] {
         by: staff.get(movement.createdById) ?? null,
         deltaMilli: movement.deltaMilli,
         reverted: movement.revertedById !== null,
-      } satisfies StockMovementRow,
+        reverts:
+          original && original.type !== 'reverted'
+            ? {
+                kind: original.type,
+                at: original.createdAt,
+                reason: movement.revertReason,
+              }
+            : null,
+      } satisfies StockChangeRow,
     ];
   });
   const payments = world.stockPurchases
@@ -368,6 +387,11 @@ export async function listStockVendors(
   cursor: string | null = null,
 ): Promise<CursorPage<StockVendorRow>> {
   return cursorPageOf(await vendorsFor(params), cursor);
+}
+
+/** Every live vendor as their row, by name — the pickers' list. */
+export function fetchAllStockVendors(): Promise<StockVendorRow[]> {
+  return vendorsFor({});
 }
 
 /** One vendor as their row — a 404 when they are unknown or deleted. */

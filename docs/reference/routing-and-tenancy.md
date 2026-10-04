@@ -279,7 +279,12 @@ closed; the dashboard when no clinic module is on) — the unknown path with a
 404 (identical for an unknown and a non-member slug, so existence never leaks).
 A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
 that matches nothing leaves the parent page behind, toasts "<Record> not found ·
-it may have been deleted" and replaces the URL with the parent. A drawer opened
+it may have been deleted" and replaces the URL with the parent. A room tab reads all
+of its dialog routes through `useRoomDialogRoute` (`shared/hooks/useRoomDialogRoute/`):
+a create with its prefill — read from the same location as the path, so the drawer's
+opening render already has it — a tab's own action route (Stock check's
+`items/check`), or a record route; a create or an action the member's access does
+not allow goes back to the list with the permission toast. A drawer opened
 from another room keeps that room behind it through a `from` search param that
 must match the allow-list in `shared/clinic/clinic-referrer.ts`; anything else
 falls back to the drawer's own parent.

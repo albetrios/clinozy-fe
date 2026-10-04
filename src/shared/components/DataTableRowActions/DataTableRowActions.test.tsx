@@ -76,6 +76,8 @@ describe('DataTableRowActions', () => {
     const stopped = watchClickPropagation();
     await user.click(screen.getByTestId('patients-row-action-edit'));
     expect(onSelect).toHaveBeenCalledTimes(1);
+    // The button pressed is the anchor of whatever the action opens.
+    expect(onSelect).toHaveBeenCalledWith(screen.getByTestId('patients-row-action-edit'));
     expect(stopped()).toBe(true);
   });
 

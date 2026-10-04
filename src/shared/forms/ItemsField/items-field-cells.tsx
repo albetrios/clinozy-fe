@@ -1,5 +1,5 @@
 import { type ReactElement, type Ref, useId, useState } from 'react';
-import { type FieldValues, useController } from 'react-hook-form';
+import { type FieldError, type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -65,6 +65,20 @@ function CellMessage({
       {message ? <TooltipContent>{message}</TooltipContent> : null}
     </Tooltip>
   );
+}
+
+/**
+ * A cell's stored message — a save's "Enter the rate" (`setError`) or a 422
+ * mapped onto the row — until that cell is edited: fixing the figure takes the
+ * red edge away, and the next failed save sets, and shows, a fresh one.
+ */
+function useCellError(stored: FieldError | undefined) {
+  const [edited, setEdited] = useState<FieldError | undefined>(undefined);
+  return {
+    message: stored && stored !== edited ? stored.message : undefined,
+    /** The cell changed: its stored message no longer describes it. */
+    edit: () => setEdited(stored),
+  };
 }
 
 /** The message, spoken with the control it describes (`aria-describedby`). */
@@ -206,6 +220,7 @@ export function ItemsNumberCell<TForm extends FieldValues>({
     field: { ref, value, onChange, onBlur },
     fieldState,
   } = useController({ control, name });
+  const stored = useCellError(fieldState.error);
   return (
     <ItemsNumberInput
       {...shape}
@@ -213,9 +228,12 @@ export function ItemsNumberCell<TForm extends FieldValues>({
       label={label}
       testId={testId}
       value={cellNumber(value)}
-      onValueChange={onChange}
+      onValueChange={(next) => {
+        stored.edit();
+        onChange(next);
+      }}
       onBlur={onBlur}
-      error={error ?? fieldState.error?.message}
+      error={error ?? stored.message}
     />
   );
 }
@@ -250,7 +268,8 @@ export function ItemsTextCell<TForm extends FieldValues>({
     fieldState,
   } = useController({ control, name });
   const errorId = useId();
-  const message = error ?? fieldState.error?.message;
+  const stored = useCellError(fieldState.error);
+  const message = error ?? stored.message;
   return (
     <>
       <CellMessage message={message}>
@@ -267,7 +286,10 @@ export function ItemsTextCell<TForm extends FieldValues>({
           aria-invalid={message ? true : undefined}
           aria-describedby={message ? errorId : undefined}
           data-testid={testId}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            stored.edit();
+            onChange(event.target.value);
+          }}
           onBlur={onBlur}
           className={cn(CELL_INPUT_CLASS, align === 'end' && 'text-end')}
         />
@@ -315,14 +337,17 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   const errorId = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const value = cellNumber(stored);
-  const message = error ?? fieldState.error?.message;
+  const storedError = useCellError(fieldState.error);
+  const message = error ?? storedError.message;
 
   const step = (next: number) => {
+    storedError.edit();
     setDraft(null);
     onChange(clampNumber(next, min, max));
   };
 
   const type = (typed: string) => {
+    storedError.edit();
     const text = typed.replace(/\D/g, '');
     if (text === '') {
       setDraft('');
@@ -449,7 +474,8 @@ export function ItemsPickerCell<TForm extends FieldValues, TOption = unknown>({
     fieldState,
   } = useController({ control, name });
   const errorId = useId();
-  const message = error ?? fieldState.error?.message;
+  const stored = useCellError(fieldState.error);
+  const message = error ?? stored.message;
   // RHF focuses a field through its ref (a new row, the first error on submit):
   // point it at the picker's trigger.
   const registerFocus = (node: HTMLDivElement | null) => {
@@ -469,6 +495,7 @@ export function ItemsPickerCell<TForm extends FieldValues, TOption = unknown>({
             invalid={Boolean(message)}
             aria-describedby={message ? errorId : undefined}
             onChange={(key, option) => {
+              stored.edit();
               onChange(key);
               onBlur();
               onPick?.(option);

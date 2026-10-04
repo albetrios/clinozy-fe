@@ -5,6 +5,11 @@ import { useTranslation } from 'react-i18next';
 
 import type { Supplier } from '@/shared/api/clinic/clinic-schema.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import {
+  phoneDigitsOf,
+  phoneIsInvalid,
+  storedPhoneOf,
+} from '@/shared/clinic/clinic-phone-field.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerField,
@@ -31,6 +36,7 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -45,14 +51,7 @@ import {
 } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
 import type { SupplierRow } from '../../medical-contracts.ts';
-import {
-  phoneDigitsOf,
-  phoneIsInvalid,
-  storedPhoneOf,
-  textOrNull,
-  useLiveValues,
-  useMedicalDrawerAccess,
-} from '../../medical-drawer-form.ts';
+import { textOrNull, useMedicalDrawerAccess } from '../../medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -398,7 +397,7 @@ function SupplierSession({
   const form = useForm<SupplierFormValues>({
     defaultValues: supplier ? formOf(supplier) : emptyForm(prefill),
   });
-  const values = useLiveValues(form);
+  const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('supplier');
   const [deleting, setDeleting] = useState(false);

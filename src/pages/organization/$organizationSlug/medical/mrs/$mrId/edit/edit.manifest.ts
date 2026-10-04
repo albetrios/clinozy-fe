@@ -11,7 +11,7 @@ export const manifest = {
   segment: 'edit',
   path: '/organization/$organizationSlug/medical/mrs/$mrId/edit',
   title: 'Edit MR',
-  testId: 'mr-drawer',
+  testId: 'rep-drawer',
   permission: 'organization:read',
   module: 'clinic-medical',
   kind: 'leaf',

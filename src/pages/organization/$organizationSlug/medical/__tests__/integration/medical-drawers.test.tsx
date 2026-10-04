@@ -166,13 +166,13 @@ describe('Medical drawers over their tabs (KICKOFF §6.7, D24)', () => {
     const { router } = renderMedicalRoutes(`${ROOM}/mrs`, PAGES);
     const row = await rowOf('mrs', 'Alvio Pharma · Rakesh');
     await user.click(within(row).getByRole('button', { name: 'Log visit' }));
-    const visit = await screen.findByTestId('mr-visit-drawer');
+    const visit = await screen.findByTestId('rep-visit-drawer');
     await waitFor(() => expect(visit).toHaveTextContent('Alvio Pharma · Rakesh'));
-    await user.click(within(visit).getByTestId('mr-visit-drawer-dismiss'));
+    await user.click(within(visit).getByTestId('rep-visit-drawer-dismiss'));
     await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/mrs`));
 
     await user.click(await rowOf('mrs', 'Atopic Dermocare · Meet'));
-    const edit = await screen.findByTestId('mr-drawer');
+    const edit = await screen.findByTestId('rep-drawer');
     await waitFor(() => expect(edit).toHaveTextContent('Edit MR'));
   });
 

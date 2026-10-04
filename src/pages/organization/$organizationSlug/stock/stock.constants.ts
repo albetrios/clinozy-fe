@@ -115,7 +115,14 @@ export const STOCK_KEYS = {
     subContents: 'items.subContents',
     /** "3 tube · 90 g · OK". */
     stockLine: 'items.stockLine',
-    rowActions: { edit: 'items.rowActions.edit' },
+    rowActions: {
+      use: 'items.rowActions.use',
+      receive: 'items.rowActions.receive',
+      log: 'items.rowActions.log',
+      adjust: 'items.rowActions.adjust',
+      edit: 'items.rowActions.edit',
+      delete: 'items.rowActions.delete',
+    },
   },
   purchases: {
     records: 'purchases.records',
@@ -135,7 +142,10 @@ export const STOCK_KEYS = {
       partly: 'purchases.statuses.partly',
       unpaid: 'purchases.statuses.unpaid',
     },
-    rowActions: { edit: 'purchases.rowActions.edit' },
+    rowActions: {
+      edit: 'purchases.rowActions.edit',
+      delete: 'purchases.rowActions.delete',
+    },
   },
   movements: {
     records: 'movements.records',
@@ -165,6 +175,7 @@ export const STOCK_KEYS = {
     paymentSub: 'movements.paymentSub',
     /** "− 1 tube", "+ 24 bottle" — the sign, then the amount. */
     change: 'movements.change',
+    rowActions: { revert: 'movements.rowActions.revert' },
   },
   vendors: {
     records: 'vendors.records',
@@ -179,7 +190,10 @@ export const STOCK_KEYS = {
     /** "1 purchase" (plural). */
     purchases: 'vendors.purchases',
     noPurchases: 'vendors.noPurchases',
-    rowActions: { edit: 'vendors.rowActions.edit' },
+    rowActions: {
+      edit: 'vendors.rowActions.edit',
+      delete: 'vendors.rowActions.delete',
+    },
   },
 } as const;
 

@@ -1,7 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useStackedDrawer } from './useStackedDrawer.ts';
+import {
+  type StackedRequest,
+  useStackedDrawer,
+  useStackedRequest,
+} from './useStackedDrawer.ts';
 
 describe('useStackedDrawer', () => {
   it('starts closed with no query', () => {
@@ -40,5 +44,37 @@ describe('useStackedDrawer', () => {
     expect(result.current.isOpen).toBe(false);
     expect(result.current.query).toBe('');
     expect(onCreated).toHaveBeenCalledWith({ id: 'off_1' });
+  });
+});
+
+describe('useStackedRequest', () => {
+  type Request = StackedRequest<{ id: string }> & { kind: 'vendor' | 'item' };
+
+  it('opens one child with its request, Back selects nothing', () => {
+    const onCreated = vi.fn();
+    const { result } = renderHook(() => useStackedRequest<Request, { id: string }>());
+    expect(result.current.child).toBeNull();
+
+    act(() => result.current.open({ kind: 'vendor', query: 'Ankit Traders', onCreated }));
+    expect(result.current.child).toMatchObject({
+      kind: 'vendor',
+      query: 'Ankit Traders',
+    });
+
+    act(() => result.current.close());
+    expect(result.current.child).toBeNull();
+    expect(result.current.last).toMatchObject({ kind: 'vendor' });
+    expect(onCreated).not.toHaveBeenCalled();
+  });
+
+  it('a save closes the child and hands its record to the field that asked', () => {
+    const onCreated = vi.fn();
+    const { result } = renderHook(() => useStackedRequest<Request, { id: string }>());
+
+    act(() => result.current.open({ kind: 'item', query: 'Cotton', onCreated }));
+    act(() => result.current.complete({ id: 'i9' }));
+
+    expect(result.current.child).toBeNull();
+    expect(onCreated).toHaveBeenCalledWith({ id: 'i9' });
   });
 });

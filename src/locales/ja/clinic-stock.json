@@ -101,7 +101,12 @@
     "subContents": "{{contents}}の{{unit}}あたり · 週あたり約{{usage}}使用",
     "stockLine": "{{quantity}} · {{level}}",
     "rowActions": {
-      "edit": "編集"
+      "use": "使用",
+      "receive": "入荷を記録",
+      "log": "使用を記録…",
+      "adjust": "数量を調整",
+      "edit": "編集",
+      "delete": "削除"
     }
   },
   "purchases": {
@@ -122,7 +127,8 @@
       "unpaid": "未払い"
     },
     "rowActions": {
-      "edit": "編集"
+      "edit": "編集",
+      "delete": "削除"
     }
   },
   "movements": {
@@ -147,7 +153,10 @@
     "reverted": "取り消し済み",
     "purchase": "仕入れ #{{seq}}",
     "paymentSub": "{{purchase}} · {{billNo}}",
-    "change": "{{sign}} {{amount}}"
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "取り消す"
+    }
   },
   "vendors": {
     "records": "取引先",
@@ -161,7 +170,214 @@
     "purchases_other": "仕入れ {{count}} 件",
     "noPurchases": "仕入れなし",
     "rowActions": {
-      "edit": "編集"
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "drawers": {
+    "records": {
+      "item": "品目",
+      "purchase": "仕入れ",
+      "vendor": "取引先"
+    },
+    "saveChanges": "変更を保存",
+    "addName": "名前を入力してください",
+    "pickers": {
+      "searchVendors": "クリニックの取引先を検索",
+      "vendorsHint": "クリニックの取引先",
+      "newVendor": "新しいクリニック取引先",
+      "selectItem": "品目を選択…",
+      "newItem": "新しいクリニック品目",
+      "inStock": "在庫 {{quantity}}"
+    },
+    "treatments": {
+      "lhr": "レーザー脱毛",
+      "peel": "ピーリング",
+      "facial": "フェイシャル",
+      "mole": "ほくろ除去",
+      "general": "一般"
+    },
+    "item": {
+      "title": {
+        "create": "新しい品目",
+        "edit": "品目を編集"
+      },
+      "sub": "クリニックの消耗品・備品",
+      "steps": {
+        "item": "品目",
+        "levels": "在庫レベル",
+        "vendor": "仕入先"
+      },
+      "fields": {
+        "name": "名前",
+        "category": "カテゴリ",
+        "unit": "単位",
+        "contents": "1 {{unit}}あたりの内容量",
+        "contentsHint": "任意 · {{unit}}の一部だけを使えるようにします",
+        "measure": "計量単位",
+        "inStock": "在庫",
+        "decimals": "小数可",
+        "usage": "週あたりの使用量",
+        "min": "最小",
+        "max": "最大",
+        "vendor": "仕入先"
+      },
+      "save": "品目を追加",
+      "saved": "品目を保存しました"
+    },
+    "quickItem": {
+      "title": "新しいクリニック品目",
+      "sub": "施術で使用 · 販売しません",
+      "steps": {
+        "item": "品目",
+        "details": "詳細"
+      },
+      "added": "{{name}} をクリニック品目に追加しました"
+    },
+    "vendor": {
+      "title": {
+        "create": "新しいクリニック取引先",
+        "edit": "クリニック取引先を編集"
+      },
+      "sub": "施術用の消耗品を納入 · 医薬品ではありません",
+      "fields": {
+        "name": "名前",
+        "phone": "電話",
+        "phoneHint": "10桁"
+      },
+      "save": "取引先を追加",
+      "added": "取引先 {{name}} を追加しました",
+      "saved": "取引先を保存しました"
+    },
+    "movement": {
+      "title": {
+        "used": "使用を記録",
+        "received": "入荷を記録",
+        "adjust": "在庫を調整"
+      },
+      "sub": "{{name}} · 現在 {{quantity}}",
+      "after": "変更後: {{quantity}}",
+      "steps": {
+        "movement": "入出庫",
+        "details": "詳細",
+        "notes": "メモ"
+      },
+      "fields": {
+        "type": "種類",
+        "quantity": "数量",
+        "counted": "実数",
+        "decimals": "小数可",
+        "measureIn": "計量単位",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "用途",
+        "optional": "任意",
+        "remark": "備考",
+        "remarkPlaceholder": "患者・ロット・理由"
+      },
+      "save": "入出庫を保存",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "数量を入力してください",
+      "onlyInStock": "在庫は {{quantity}} のみです",
+      "saved": "{{type}}を保存しました · 残り {{quantity}}"
+    },
+    "use": {
+      "label": "{{name}} を使用",
+      "inStock": "在庫 · {{quantity}}",
+      "measureIn": "計量単位",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "数量",
+      "less": "減らす",
+      "more": "増やす",
+      "usedFor": "用途",
+      "after": "使用後 · {{quantity}}",
+      "moreDetails": "詳細を入力",
+      "save": "{{quantity}} を使用",
+      "used": "{{name}} を {{quantity}} 使用 · 残り {{left}}",
+      "outOfStock": "{{name}} は在庫切れです"
+    },
+    "purchase": {
+      "title": {
+        "create": "新しい仕入れ",
+        "edit": "仕入れを編集"
+      },
+      "sub": "受け取った品目は在庫に加算されます",
+      "reorder": "在庫少の品目を再注文",
+      "noSupplier": "仕入先なし",
+      "bill": "請求 {{amount}}",
+      "due": "未払い {{amount}}",
+      "paid": "支払済み",
+      "steps": {
+        "bill": "請求書",
+        "items": "受け取った品目",
+        "payment": "支払い"
+      },
+      "fields": {
+        "vendor": "仕入先",
+        "billNo": "請求書番号",
+        "date": "請求日",
+        "items": "受け取った品目",
+        "item": "品目",
+        "qty": "数量",
+        "rate": "単価",
+        "amount": "金額",
+        "addItem": "品目を追加",
+        "total": "合計",
+        "billAmount": "請求額",
+        "paid": "支払済み",
+        "full": "全額",
+        "nothing": "なし",
+        "enterRate": "単価を入力してください",
+        "peek_other": "{{count}} 品目 · {{amount}}"
+      },
+      "save": "仕入れを作成",
+      "pickSupplier": "仕入先を選択してください",
+      "saved": "仕入れを保存しました",
+      "savedStock": "仕入れを保存しました · 在庫を更新しました"
+    },
+    "check": {
+      "title": "棚卸し",
+      "sub": "棚にある数を入力してください。差異のある品目だけが調整として保存されます。",
+      "counted": "{{total}} 件中 {{counted}} 件を計数",
+      "allItems": "すべての品目",
+      "fillRest": "残りを一致で入力",
+      "heads": {
+        "item": "品目",
+        "inSystem": "システム上",
+        "counted": "実数",
+        "difference": "差異"
+      },
+      "inSystem": "システム上 · {{quantity}}",
+      "countedLabel": "{{name}} の実数",
+      "same": "システムと同じ",
+      "measured": "= {{quantity}}",
+      "notCounted": "未計数",
+      "matches": "一致",
+      "willChange_other": "{{count}} 品目が変わります",
+      "nothing": "まだ変更はありません",
+      "save": "棚卸しを保存",
+      "failed": "保存されていません · 入力した数は残っています",
+      "saved_other": "棚卸しを保存しました · {{count}} 品目を更新"
+    },
+    "confirm": {
+      "deleteItem": "この品目を削除しますか？",
+      "deletePurchase": "この仕入れを削除しますか？",
+      "deleteVendor": "このクリニック取引先を削除しますか？",
+      "removed": "{{name}} を削除しました",
+      "deleted": "{{name}} を削除しました",
+      "purchaseDeleted": "仕入れ #{{seq}} を削除しました",
+      "revert": {
+        "title": "この入出庫を取り消しますか？",
+        "record": "{{name}} {{quantity}} · {{type}}",
+        "body": "在庫はこの記録の前の状態に戻ります。どちらの記録も履歴に残ります。",
+        "action": "取り消す",
+        "reasons": {
+          "mistake": "誤って記録",
+          "wrongItem": "品目違い",
+          "wrongQty": "数量違い"
+        },
+        "done": "{{type}}を取り消しました · {{name}} は {{quantity}} に戻りました",
+        "note": "{{when}} の{{type}}を取り消し · {{reason}}"
+      }
     }
   }
 }

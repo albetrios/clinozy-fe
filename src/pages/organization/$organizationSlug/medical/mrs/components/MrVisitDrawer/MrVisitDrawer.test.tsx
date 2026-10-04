@@ -43,7 +43,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-const D = 'mr-visit-drawer';
+const D = 'rep-visit-drawer';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 

@@ -353,6 +353,41 @@ describe('ItemsField — validation at the cell (fe-http-forms-errors)', () => {
     expect(rate).toHaveAccessibleDescription('Enter the rate');
   });
 
+  it('takes a stored message off its cell once that cell is edited; a fresh one shows again', async () => {
+    const formRef: { current: UseFormReturn<LinesForm> | null } = { current: null };
+    const { user } = renderWithClient(
+      <LinesHarness initial={[GLOVES, GAUZE]} formRef={formRef} />,
+    );
+    const flag = () =>
+      act(() => {
+        for (const field of ['lines.0.name', 'lines.0.qty', 'lines.1.rate'] as const) {
+          formRef.current?.setError(field, { type: 'client', message: 'Check this' });
+        }
+      });
+    flag();
+    const name = within(rows()[0] as HTMLElement).getByRole('textbox', { name: 'Item' });
+    const qty = within(rows()[0] as HTMLElement).getByRole('spinbutton', { name: 'Qty' });
+    const rate = within(rows()[1] as HTMLElement).getByRole('textbox', { name: 'Rate' });
+    for (const cell of [name, qty, rate]) {
+      expect(cell).toHaveAttribute('aria-invalid', 'true');
+    }
+
+    await user.type(name, 's');
+    await user.type(qty, '3');
+    await user.type(rate, '5');
+    for (const cell of [name, qty, rate])
+      expect(cell).not.toHaveAttribute('aria-invalid');
+    // The other rows' cells were never flagged.
+    expect(
+      within(rows()[1] as HTMLElement).getByRole('textbox', { name: 'Item' }),
+    ).not.toHaveAttribute('aria-invalid');
+
+    flag();
+    for (const cell of [name, qty, rate]) {
+      expect(cell).toHaveAttribute('aria-invalid', 'true');
+    }
+  });
+
   it('shows the array’s own message under the table', async () => {
     const { user } = renderWithClient(<LinesHarness validate initial={[]} />);
 

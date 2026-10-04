@@ -9,7 +9,10 @@ Item / party (and its note, or "Purchase #16 · SW-77") · When ("Today 11:05", 
 ("− 1 tube", "+ 24 bottle", "− ₹600"; grey once reverted). One Payment row per purchase with money paid
 — derived by the fixture until `listMovements` serves them (Appendix F). Nothing sorts, no row opens and
 there is no create; the footer reads "7 entries". On a phone the Item / party leads with the Change as
-its key. Filters: the automatic Type section · Created. "Revert" and its confirm arrive with L-51b.
+its key. Filters: the automatic Type section · Created. "Revert" — on a
+stock change neither reverted nor itself a revert, for whoever may delete stock — asks "Revert this
+movement?" for a reason; the new Reverted row reads "Reverts used of Today 11:05 · Logged by mistake" and
+the original turns grey with its "Reverted" pill.
 
 ## Files
 

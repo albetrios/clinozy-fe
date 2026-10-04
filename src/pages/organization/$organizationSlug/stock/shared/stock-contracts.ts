@@ -1,6 +1,7 @@
 import type { SortDirection } from '@/lib/routes/search-params.ts';
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type {
+  RevertReason,
   StockCategory,
   StockItem,
   StockMovement,
@@ -97,38 +98,52 @@ export interface StockMovementItem {
 }
 
 /**
- * One Movements row (`clinic-stock.md:61`): a stock change — its type, item,
- * note and signed change, struck through once reverted — or a payment on a
- * purchase, derived from it (Appendix F).
+ * A Movements row that is a stock change (`clinic-stock.md:61`): its type,
+ * item, note and signed change, struck through once reverted.
  */
-export type StockMovementRow =
-  | {
-      id: string;
-      kind: Exclude<StockMovementKind, 'payment'>;
-      movement: StockMovement;
-      item: StockMovementItem;
-      /** Its "used for" — "LHR · Dharti Galani", a bill number. */
-      note: string | null;
-      /** When it happened (the movement's `createdAt`). */
-      at: string;
-      by: StockStaffRef | null;
-      deltaMilli: number;
-      /** A later movement reverted this one. */
-      reverted: boolean;
-    }
-  | {
-      id: string;
-      kind: 'payment';
-      purchase: { id: string; seq: number; billNo: string | null };
-      vendorName: string;
-      /** The purchase's bill date. */
-      date: string;
-      /** When the purchase was recorded — the row's place in the newest-first order. */
-      createdAt: string;
-      by: StockStaffRef | null;
-      /** What was paid, paise. */
-      amount: number;
-    };
+export interface StockChangeRow {
+  id: string;
+  kind: Exclude<StockMovementKind, 'payment'>;
+  movement: StockMovement;
+  item: StockMovementItem;
+  /** Its "used for" — "LHR · Dharti Galani", a bill number. */
+  note: string | null;
+  /** When it happened (the movement's `createdAt`). */
+  at: string;
+  by: StockStaffRef | null;
+  deltaMilli: number;
+  /** A later movement reverted this one. */
+  reverted: boolean;
+  /** A Reverted entry's original — "Reverts used of Today 11:05 · Logged by mistake". */
+  reverts: {
+    kind: Exclude<StockMovementKind, 'payment'>;
+    /** When the original happened. */
+    at: string;
+    reason: RevertReason | null;
+  } | null;
+}
+
+/**
+ * A Movements row for a payment on a purchase — one per purchase with money
+ * paid (`clinic-stock.md:71`), derived from it until `listMovements` serves
+ * them (Appendix F).
+ */
+export interface StockPaymentRow {
+  id: string;
+  kind: 'payment';
+  purchase: { id: string; seq: number; billNo: string | null };
+  vendorName: string;
+  /** The purchase's bill date. */
+  date: string;
+  /** When the purchase was recorded — the row's place in the newest-first order. */
+  createdAt: string;
+  by: StockStaffRef | null;
+  /** What was paid, paise. */
+  amount: number;
+}
+
+/** One Movements row: a stock change or a payment. */
+export type StockMovementRow = StockChangeRow | StockPaymentRow;
 
 /** `listMovements`' params (`S:1681`): search, types, one item, Created; newest first. */
 export interface StockMovementListParams {

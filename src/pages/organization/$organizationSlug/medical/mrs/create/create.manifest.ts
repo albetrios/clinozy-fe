@@ -11,7 +11,7 @@ export const manifest = {
   segment: 'create',
   path: '/organization/$organizationSlug/medical/mrs/create',
   title: 'New MR',
-  testId: 'mr-drawer',
+  testId: 'rep-drawer',
   permission: 'organization:read',
   module: 'clinic-medical',
   kind: 'leaf',
