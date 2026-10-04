@@ -119,6 +119,23 @@ const DAY_WORDS: Readonly<Record<number, 'today' | 'tomorrow' | 'yesterday'>> = 
   [-1]: 'yesterday',
 };
 
+/** A due label on a day at a clock time. */
+export type TaskDueAt = Extract<TaskDueLabel, { kind: 'at' }>;
+
+/**
+ * A clinic-local day and clock time as a due label read at `now`: "Today",
+ * "Tomorrow", "Yesterday" or the date, and the time (New task's toast names
+ * a picked due this way).
+ */
+export function taskDueAt(date: string, time: string, now: Date): TaskDueAt {
+  return {
+    kind: 'at',
+    day: DAY_WORDS[civilDayOffset(clinicToday(now), date)] ?? 'date',
+    date,
+    time,
+  };
+}
+
 /**
  * One row's due label at `now`, in the clinic's timezone (KICKOFF §6.10 Due
  * labels): a done task reads who closed it, a snoozed one its snooze; an open
@@ -142,11 +159,5 @@ export function taskDueLabel(task: TaskTiming, now: Date): TaskDueLabel {
       count: span.count,
     };
   }
-  const date = clinicToday(due);
-  return {
-    kind: 'at',
-    day: DAY_WORDS[civilDayOffset(clinicToday(now), date)] ?? 'date',
-    date,
-    time: clinicClockTime(due),
-  };
+  return taskDueAt(clinicToday(due), clinicClockTime(due), now);
 }

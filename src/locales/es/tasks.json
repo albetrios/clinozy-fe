@@ -455,5 +455,63 @@
     "queue": "Nada te necesita ahora. Las tareas nuevas aparecen aquí cuando escriben los prospectos, se acercan las visitas y llegan opiniones.",
     "snoozed": "No hay tareas pospuestas",
     "done": "Nada resuelto hoy todavía"
+  },
+  "newTask": {
+    "title": "Nueva tarea",
+    "sub": "Para {{person}} · aparece en Tareas y en la cronología de esta persona",
+    "subNoPerson": "Aparece en Tareas y en la cronología de la persona",
+    "steps": {
+      "what": "Qué hay que hacer",
+      "when": "Cuándo y quién",
+      "how": "Cómo y notas"
+    },
+    "forField": {
+      "label": "Para",
+      "placeholder": "Elige un paciente o prospecto",
+      "search": "Busca por nombre, móvil o número",
+      "empty": "Escribe un nombre, un móvil o un número de paciente",
+      "missing": "Elige para quién es la tarea"
+    },
+    "type": {
+      "label": "Tipo",
+      "callBack": "Devolver la llamada",
+      "followUp": "Seguimiento",
+      "sendPrice": "Enviar precio",
+      "askForPhotos": "Pedir fotos",
+      "feedback": "Opinión",
+      "paymentReminder": "Recordatorio de pago"
+    },
+    "titleField": {
+      "label": "Título",
+      "placeholder": "Qué hay que hacer",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Vence",
+      "today": "Hoy a las 17",
+      "tomorrow": "Mañana a las 11",
+      "inThreeDays": "En 3 días",
+      "nextWeek": "La próxima semana",
+      "date": "Fecha de vencimiento",
+      "time": "Hora de vencimiento"
+    },
+    "owner": {
+      "label": "Asignar a",
+      "you": "Tú",
+      "missing": "Elige quién la hace"
+    },
+    "priority": {
+      "label": "Prioridad",
+      "normal": "Normal",
+      "high": "Alta"
+    },
+    "remind": "Recordar {{minutes}} min antes",
+    "notes": {
+      "label": "Notas de la tarea",
+      "placeholder": "Notas (opcional)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Añadir tarea",
+    "added": "Tarea añadida para {{owner}} · {{due}}"
   }
 }

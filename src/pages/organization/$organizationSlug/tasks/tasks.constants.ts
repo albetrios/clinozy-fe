@@ -1,6 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { TaskGroupId } from '@/shared/api/clinic/task-views.ts';
-import type { TaskTab } from '@/shared/api/clinic/tasks-contracts.ts';
+import type {
+  ManualTaskType,
+  TaskPriority,
+  TaskTab,
+} from '@/shared/api/clinic/tasks-contracts.ts';
 
 /** The Tasks room's i18n namespace. */
 export const TASKS_NS = I18N_NAMESPACES.tasks;
@@ -90,6 +94,71 @@ export const TASKS_KEYS = {
     snoozed: 'empty.snoozed',
     done: 'empty.done',
   } satisfies Record<TaskTab, string>,
+  /** New task (KICKOFF §6.10 New task, H:1869–1882; Q-T4 — the plan's where the design has none). */
+  newTask: {
+    title: 'newTask.title',
+    /** "For <person> · shows in Tasks and on this person’s timeline". */
+    sub: 'newTask.sub',
+    /** The sub line before anyone is picked (a plan addition). */
+    subNoPerson: 'newTask.subNoPerson',
+    steps: {
+      what: 'newTask.steps.what',
+      when: 'newTask.steps.when',
+      how: 'newTask.steps.how',
+    },
+    forField: {
+      label: 'newTask.forField.label',
+      placeholder: 'newTask.forField.placeholder',
+      search: 'newTask.forField.search',
+      /** The list before a search is typed. */
+      empty: 'newTask.forField.empty',
+      /** Whom New task cannot save without. */
+      missing: 'newTask.forField.missing',
+    },
+    type: {
+      label: 'newTask.type.label',
+      call_back: 'newTask.type.callBack',
+      follow_up: 'newTask.type.followUp',
+      send_price: 'newTask.type.sendPrice',
+      ask_for_photos: 'newTask.type.askForPhotos',
+      feedback: 'newTask.type.feedback',
+      payment_reminder: 'newTask.type.paymentReminder',
+    } satisfies Record<ManualTaskType | 'label', string>,
+    titleField: {
+      label: 'newTask.titleField.label',
+      placeholder: 'newTask.titleField.placeholder',
+      /** An empty title saves as "<type> · <first name>" (H:6072). */
+      fallback: 'newTask.titleField.fallback',
+    },
+    due: {
+      label: 'newTask.due.label',
+      today: 'newTask.due.today',
+      tomorrow: 'newTask.due.tomorrow',
+      inThreeDays: 'newTask.due.inThreeDays',
+      nextWeek: 'newTask.due.nextWeek',
+      date: 'newTask.due.date',
+      time: 'newTask.due.time',
+    },
+    owner: {
+      label: 'newTask.owner.label',
+      /** The signed-in member's row in the team picker. */
+      you: 'newTask.owner.you',
+      missing: 'newTask.owner.missing',
+    },
+    priority: {
+      label: 'newTask.priority.label',
+      normal: 'newTask.priority.normal',
+      high: 'newTask.priority.high',
+    } satisfies Record<TaskPriority | 'label', string>,
+    /** "Remind 15 min before". */
+    remind: 'newTask.remind',
+    notes: { label: 'newTask.notes.label', placeholder: 'newTask.notes.placeholder' },
+    /** "↔ <person>". */
+    footer: 'newTask.footer',
+    save: 'newTask.save',
+    /** "Task added for <owner> · <due>" with Undo (D28). */
+    added: 'newTask.added',
+  },
 } as const;
 
 /** The room's list id: the toolbar's test-id prefix and the list error's toast id. */
@@ -111,4 +180,23 @@ export const TASKS_TEST_IDS = {
   rule: (rule: string) => `tasks-rule-${rule}`,
   ruleSwitch: (rule: string) => `tasks-rule-${rule}-switch`,
   ruleHandle: (rule: string) => `tasks-rule-${rule}-handle`,
+  /** New task's drawer (the record drawer derives `-save`, `-close`, `-step-<id>` …) and fields. */
+  newTask: {
+    drawer: 'new-task-drawer',
+    /** The "For" picker (`-trigger`, `-panel`, `-search` …). */
+    person: 'new-task-for',
+    /** Type chips: `new-task-type-<type>`. */
+    type: 'new-task-type',
+    title: 'new-task-title',
+    /** Due chips: `new-task-due-<preset>`. */
+    due: 'new-task-due',
+    dueDate: 'new-task-due-date',
+    dueTime: 'new-task-due-time',
+    /** The team picker (`-trigger`, `-panel` …). */
+    owner: 'new-task-owner',
+    /** Priority chips: `new-task-priority-<priority>`. */
+    priority: 'new-task-priority',
+    remind: 'new-task-remind',
+    notes: 'new-task-notes',
+  },
 } as const;

@@ -455,5 +455,63 @@
     "queue": "Al momento non c’è nulla per te. Le nuove attività compaiono qui quando i lead scrivono, le visite si avvicinano e arriva un feedback.",
     "snoozed": "Nessuna attività posticipata",
     "done": "Ancora nulla di risolto oggi"
+  },
+  "newTask": {
+    "title": "Nuova attività",
+    "sub": "Per {{person}} · compare in Attività e nella cronologia di questa persona",
+    "subNoPerson": "Compare in Attività e nella cronologia della persona",
+    "steps": {
+      "what": "Cosa c’è da fare",
+      "when": "Quando e chi",
+      "how": "Come e note"
+    },
+    "forField": {
+      "label": "Per",
+      "placeholder": "Scegli un paziente o un lead",
+      "search": "Cerca per nome, cellulare o numero",
+      "empty": "Scrivi un nome, un cellulare o un numero paziente",
+      "missing": "Scegli per chi è l’attività"
+    },
+    "type": {
+      "label": "Tipo",
+      "callBack": "Richiamare",
+      "followUp": "Follow-up",
+      "sendPrice": "Inviare il prezzo",
+      "askForPhotos": "Chiedere foto",
+      "feedback": "Feedback",
+      "paymentReminder": "Promemoria di pagamento"
+    },
+    "titleField": {
+      "label": "Titolo",
+      "placeholder": "Cosa c’è da fare",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Scadenza",
+      "today": "Oggi alle 17",
+      "tomorrow": "Domani alle 11",
+      "inThreeDays": "Tra 3 giorni",
+      "nextWeek": "Settimana prossima",
+      "date": "Data di scadenza",
+      "time": "Ora di scadenza"
+    },
+    "owner": {
+      "label": "Assegna a",
+      "you": "Tu",
+      "missing": "Scegli chi se ne occupa"
+    },
+    "priority": {
+      "label": "Priorità",
+      "normal": "Normale",
+      "high": "Alta"
+    },
+    "remind": "Ricorda {{minutes}} min prima",
+    "notes": {
+      "label": "Note dell’attività",
+      "placeholder": "Note (facoltative)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Aggiungi attività",
+    "added": "Attività aggiunta per {{owner}} · {{due}}"
   }
 }

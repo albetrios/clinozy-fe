@@ -4,7 +4,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
-import { type TaskDueLabelInput, useTaskDueLabel } from './useTaskDueLabel.ts';
+import {
+  type TaskDueLabelInput,
+  useTaskDueAtWords,
+  useTaskDueLabel,
+} from './useTaskDueLabel.ts';
 
 /** 10:30 in the clinic (Asia/Kolkata) on Sun 4 Oct 2026. */
 const NOW = new Date('2026-10-04T05:00:00.000Z');
@@ -73,5 +77,17 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
         resolvedAt: at(-90),
       }),
     ).toBe('Done · 09:00');
+  });
+});
+
+describe('useTaskDueAtWords', () => {
+  it('words a picked day and time the way the due label does', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDueAtWords());
+    expect(result.current('2026-10-04', '17:00', NOW)).toBe('Today 17:00');
+    expect(result.current('2026-10-05', '11:00', NOW)).toBe('Tomorrow 11:00');
+    expect(result.current('2026-10-07', '15:30', NOW)).toMatch(
+      /^Wed,? (Oct 7|7 Oct) 15:30$/,
+    );
   });
 });

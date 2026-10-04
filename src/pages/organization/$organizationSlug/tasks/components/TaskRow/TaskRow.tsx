@@ -9,7 +9,6 @@ import {
   TASK_RULES,
   type TaskRow as TaskRowRecord,
   type TaskSourceRef,
-  type TaskStaff,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -28,6 +27,7 @@ import {
 } from '@/shared/components/PersonCard/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
+import { staffName } from '../../tasks.display.ts';
 
 /**
  * The row (`tasks.md:24–38`; H:2144–2149): one grid, 56px, 10px over a 3px
@@ -66,10 +66,6 @@ function sourceId(source: TaskSourceRef): string {
     ? displayId.invoiceNumber(source.seq)
     : displayId.lead(source.seq);
 }
-
-/** The full name a staff member goes by on cards ("Riya Shah", "Dr. Drashti Desai"). */
-const staffName = (staff: Pick<TaskStaff, 'firstName' | 'lastName'>) =>
-  [staff.firstName, staff.lastName].filter(Boolean).join(' ');
 
 /** The row's person as their contact card reads them (D32 — a patient, a lead or a contact). */
 function contactCardOf(row: TaskRowRecord): ContactCardData {

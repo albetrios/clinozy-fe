@@ -443,5 +443,63 @@
     "queue": "今対応が必要なものはありません。リードからの連絡、近づく来院、届いたフィードバックに応じて新しいタスクがここに表示されます。",
     "snoozed": "スヌーズ中のタスクはありません",
     "done": "今日はまだ解決済みのものはありません"
+  },
+  "newTask": {
+    "title": "新しいタスク",
+    "sub": "{{person}} 向け · タスクとこの人のタイムラインに表示されます",
+    "subNoPerson": "タスクとその人のタイムラインに表示されます",
+    "steps": {
+      "what": "やること",
+      "when": "いつ・誰が",
+      "how": "方法とメモ"
+    },
+    "forField": {
+      "label": "対象",
+      "placeholder": "患者またはリードを選択",
+      "search": "名前、携帯番号、番号で検索",
+      "empty": "名前、携帯番号、患者番号を入力してください",
+      "missing": "タスクの対象者を選んでください"
+    },
+    "type": {
+      "label": "種類",
+      "callBack": "折り返し電話",
+      "followUp": "フォローアップ",
+      "sendPrice": "料金を送る",
+      "askForPhotos": "写真を依頼",
+      "feedback": "フィードバック",
+      "paymentReminder": "支払いリマインダー"
+    },
+    "titleField": {
+      "label": "タイトル",
+      "placeholder": "やること",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "期限",
+      "today": "今日 午後5時",
+      "tomorrow": "明日 午前11時",
+      "inThreeDays": "3日後",
+      "nextWeek": "来週",
+      "date": "期限日",
+      "time": "期限時刻"
+    },
+    "owner": {
+      "label": "担当者",
+      "you": "自分",
+      "missing": "担当者を選んでください"
+    },
+    "priority": {
+      "label": "優先度",
+      "normal": "通常",
+      "high": "高"
+    },
+    "remind": "{{minutes}}分前に通知",
+    "notes": {
+      "label": "タスクのメモ",
+      "placeholder": "メモ（任意）"
+    },
+    "footer": "↔ {{person}}",
+    "save": "タスクを追加",
+    "added": "{{owner}} にタスクを追加しました · {{due}}"
   }
 }

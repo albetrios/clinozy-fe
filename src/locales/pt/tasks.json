@@ -455,5 +455,63 @@
     "queue": "Nada precisa de você agora. Novas tarefas aparecem aqui quando leads escrevem, visitas se aproximam e chega feedback.",
     "snoozed": "Nenhuma tarefa adiada",
     "done": "Nada resolvido hoje ainda"
+  },
+  "newTask": {
+    "title": "Nova tarefa",
+    "sub": "Para {{person}} · aparece em Tarefas e na linha do tempo desta pessoa",
+    "subNoPerson": "Aparece em Tarefas e na linha do tempo da pessoa",
+    "steps": {
+      "what": "O que precisa ser feito",
+      "when": "Quando e quem",
+      "how": "Como e notas"
+    },
+    "forField": {
+      "label": "Para",
+      "placeholder": "Escolha um paciente ou lead",
+      "search": "Busque por nome, celular ou número",
+      "empty": "Digite um nome, celular ou número do paciente",
+      "missing": "Escolha para quem é a tarefa"
+    },
+    "type": {
+      "label": "Tipo",
+      "callBack": "Retornar ligação",
+      "followUp": "Acompanhamento",
+      "sendPrice": "Enviar preço",
+      "askForPhotos": "Pedir fotos",
+      "feedback": "Feedback",
+      "paymentReminder": "Lembrete de pagamento"
+    },
+    "titleField": {
+      "label": "Título",
+      "placeholder": "O que precisa ser feito",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Prazo",
+      "today": "Hoje às 17h",
+      "tomorrow": "Amanhã às 11h",
+      "inThreeDays": "Em 3 dias",
+      "nextWeek": "Próxima semana",
+      "date": "Data do prazo",
+      "time": "Hora do prazo"
+    },
+    "owner": {
+      "label": "Atribuir a",
+      "you": "Você",
+      "missing": "Escolha quem vai fazer"
+    },
+    "priority": {
+      "label": "Prioridade",
+      "normal": "Normal",
+      "high": "Alta"
+    },
+    "remind": "Lembrar {{minutes}} min antes",
+    "notes": {
+      "label": "Notas da tarefa",
+      "placeholder": "Notas (opcional)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Adicionar tarefa",
+    "added": "Tarefa adicionada para {{owner}} · {{due}}"
   }
 }

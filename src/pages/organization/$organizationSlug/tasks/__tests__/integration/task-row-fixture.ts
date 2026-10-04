@@ -64,6 +64,9 @@ export function taskRowFixture(overrides: Partial<TaskRow> = {}): TaskRow {
     resolvedById: null,
     snoozeLabel: null,
     previousOwnerIds: [],
+    manualType: null,
+    priority: 'normal',
+    remindMinutesBefore: null,
     person: {
       name: 'Priti Soni',
       firstName: 'Priti',

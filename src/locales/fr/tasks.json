@@ -455,5 +455,63 @@
     "queue": "Rien ne vous attend pour l’instant. Les nouvelles tâches apparaissent ici quand les prospects écrivent, que des visites approchent et que des avis arrivent.",
     "snoozed": "Aucune tâche reportée",
     "done": "Rien de résolu aujourd’hui pour l’instant"
+  },
+  "newTask": {
+    "title": "Nouvelle tâche",
+    "sub": "Pour {{person}} · visible dans Tâches et sur la chronologie de cette personne",
+    "subNoPerson": "Visible dans Tâches et sur la chronologie de la personne",
+    "steps": {
+      "what": "Ce qu’il faut faire",
+      "when": "Quand et qui",
+      "how": "Comment et notes"
+    },
+    "forField": {
+      "label": "Pour",
+      "placeholder": "Choisissez un patient ou un prospect",
+      "search": "Rechercher par nom, mobile ou numéro",
+      "empty": "Saisissez un nom, un mobile ou un numéro de patient",
+      "missing": "Choisissez pour qui est la tâche"
+    },
+    "type": {
+      "label": "Type",
+      "callBack": "Rappeler",
+      "followUp": "Relance",
+      "sendPrice": "Envoyer le prix",
+      "askForPhotos": "Demander des photos",
+      "feedback": "Avis",
+      "paymentReminder": "Rappel de paiement"
+    },
+    "titleField": {
+      "label": "Titre",
+      "placeholder": "Ce qu’il faut faire",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Échéance",
+      "today": "Aujourd’hui 17 h",
+      "tomorrow": "Demain 11 h",
+      "inThreeDays": "Dans 3 jours",
+      "nextWeek": "La semaine prochaine",
+      "date": "Date d’échéance",
+      "time": "Heure d’échéance"
+    },
+    "owner": {
+      "label": "Attribuer à",
+      "you": "Vous",
+      "missing": "Choisissez qui s’en charge"
+    },
+    "priority": {
+      "label": "Priorité",
+      "normal": "Normale",
+      "high": "Haute"
+    },
+    "remind": "Rappeler {{minutes}} min avant",
+    "notes": {
+      "label": "Notes de la tâche",
+      "placeholder": "Notes (facultatif)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Ajouter la tâche",
+    "added": "Tâche ajoutée pour {{owner}} · {{due}}"
   }
 }

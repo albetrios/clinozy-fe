@@ -1,1 +1,5 @@
-export { type TaskDueLabelInput, useTaskDueLabel } from './useTaskDueLabel.ts';
+export {
+  type TaskDueLabelInput,
+  useTaskDueAtWords,
+  useTaskDueLabel,
+} from './useTaskDueLabel.ts';

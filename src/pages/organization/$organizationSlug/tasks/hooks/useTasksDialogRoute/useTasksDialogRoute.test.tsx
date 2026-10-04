@@ -31,6 +31,7 @@ function Probe() {
           kind: dialog.kind,
           taskId: dialog.kind === 'task' ? dialog.taskId : null,
           title: dialog.kind === 'task' ? (dialog.detail?.task.title ?? null) : null,
+          ...(dialog.kind === 'create' ? { prefill: dialog.prefill } : {}),
         })}
       </output>
       <button type="button" onClick={close}>
@@ -90,5 +91,36 @@ describe('useTasksDialogRoute (D24, S:97, S:115)', () => {
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(TASKS));
     expect(router.state.location.search).toEqual({ scope: 'everyone' });
+  });
+
+  it('opens New task, with the lead or patient the URL names', async () => {
+    renderTasksRoutes(`${TASKS}/create?lead=${UNKNOWN}&scope=everyone`, Probe);
+    await waitFor(() =>
+      expect(read()).toEqual({
+        kind: 'create',
+        taskId: null,
+        title: null,
+        prefill: { lead: UNKNOWN },
+      }),
+    );
+  });
+
+  it('closes New task onto the list, its prefill dropped', async () => {
+    const user = userEvent.setup();
+    const { router } = renderTasksRoutes(
+      `${TASKS}/create?patient=${UNKNOWN}&tab=done`,
+      Probe,
+    );
+    await waitFor(() => expect(read()).toMatchObject({ kind: 'create' }));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe(TASKS));
+    expect(router.state.location.search).toEqual({ tab: 'done' });
+  });
+
+  it('sends a member without Create back to the list with the permission toast', async () => {
+    const { router } = renderTasksRoutes(`${TASKS}/create`, Probe, { role: 'therapist' });
+    await waitFor(() => expect(router.state.location.pathname).toBe(TASKS));
+    expect(notifyMock.info).toHaveBeenCalledOnce();
+    expect(read()).toMatchObject({ kind: 'none' });
   });
 });

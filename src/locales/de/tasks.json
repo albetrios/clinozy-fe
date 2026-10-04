@@ -449,5 +449,63 @@
     "queue": "Gerade braucht Sie nichts. Neue Aufgaben erscheinen hier, sobald Leads schreiben, Besuche anstehen und Feedback eintrifft.",
     "snoozed": "Keine zurückgestellten Aufgaben",
     "done": "Heute noch nichts erledigt"
+  },
+  "newTask": {
+    "title": "Neue Aufgabe",
+    "sub": "Für {{person}} · erscheint in Aufgaben und in der Zeitleiste dieser Person",
+    "subNoPerson": "Erscheint in Aufgaben und in der Zeitleiste der Person",
+    "steps": {
+      "what": "Was zu tun ist",
+      "when": "Wann & wer",
+      "how": "Wie & Notizen"
+    },
+    "forField": {
+      "label": "Für",
+      "placeholder": "Patient oder Lead wählen",
+      "search": "Nach Name, Mobilnummer oder Nummer suchen",
+      "empty": "Geben Sie einen Namen, eine Mobilnummer oder eine Patientennummer ein",
+      "missing": "Wählen Sie, für wen die Aufgabe ist"
+    },
+    "type": {
+      "label": "Art",
+      "callBack": "Rückruf",
+      "followUp": "Nachfassen",
+      "sendPrice": "Preis senden",
+      "askForPhotos": "Fotos anfragen",
+      "feedback": "Feedback",
+      "paymentReminder": "Zahlungserinnerung"
+    },
+    "titleField": {
+      "label": "Titel",
+      "placeholder": "Was zu tun ist",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Fällig",
+      "today": "Heute 17 Uhr",
+      "tomorrow": "Morgen 11 Uhr",
+      "inThreeDays": "In 3 Tagen",
+      "nextWeek": "Nächste Woche",
+      "date": "Fälligkeitsdatum",
+      "time": "Fälligkeitszeit"
+    },
+    "owner": {
+      "label": "Zuweisen an",
+      "you": "Sie",
+      "missing": "Wählen Sie, wer sie erledigt"
+    },
+    "priority": {
+      "label": "Priorität",
+      "normal": "Normal",
+      "high": "Hoch"
+    },
+    "remind": "{{minutes}} Min. vorher erinnern",
+    "notes": {
+      "label": "Aufgabennotizen",
+      "placeholder": "Notizen (optional)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Aufgabe hinzufügen",
+    "added": "Aufgabe für {{owner}} hinzugefügt · {{due}}"
   }
 }

@@ -1,7 +1,8 @@
 import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { organizationTask } from '@/lib/routes/index.ts';
+import { organizationTask, organizationTaskCreate } from '@/lib/routes/index.ts';
 import type {
   TaskRow,
   TaskRuleId,
@@ -21,14 +22,16 @@ import {
   useSaveTaskRuleSetting,
   useTaskList,
   useTaskRuleSettings,
+  useUndoTaskChange,
 } from '@/shared/hooks/useTasks/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { type NewTaskCreated, NewTaskDrawer } from './components/NewTaskDrawer/index.ts';
 import { TaskList } from './components/TaskList/index.ts';
 import { TasksToolbar } from './components/TasksToolbar/index.ts';
 import { useTasksDialogRoute } from './hooks/useTasksDialogRoute/index.ts';
-import { TASKS_TABLE_ID } from './tasks.constants.ts';
+import { TASKS_KEYS, TASKS_NS, TASKS_TABLE_ID } from './tasks.constants.ts';
 import {
   taskListQueryOf,
   TASKS_SEARCH_DEFAULTS,
@@ -47,13 +50,43 @@ function useShownView(view: TaskTab, settled: boolean): TaskTab {
 }
 
 /**
+ * New task's way in and out: "New task" (toolbar, phone pill, the empty To do)
+ * opens `/tasks/create` over the list for a member with Create; a created task
+ * closes it, the list stays, and "Task added for <owner> · <due>" offers Undo
+ * (D28).
+ */
+function useNewTask(organizationSlug: string, close: () => void) {
+  const { t } = useTranslation(TASKS_NS);
+  const navigate = useNavigate();
+  const access = useClinicAccess();
+  const undo = useUndoTaskChange();
+  const open =
+    access.isResolved && access.can('tasks', 'create')
+      ? () =>
+          void navigate({
+            ...organizationTaskCreate(organizationSlug),
+            search: true,
+            hash: true,
+          })
+      : undefined;
+  const onCreated = ({ change, owner, due }: NewTaskCreated) => {
+    close();
+    notify.undo(t(TASKS_KEYS.newTask.added, { owner, due }), {
+      onUndo: () => undo.mutate(change.undoToken),
+    });
+  };
+  return { open, onCreated };
+}
+
+/**
  * Tasks room (KICKOFF §6.10; `tasks.md`): the toolbar — "To do · Snoozed ·
  * Done", search, type, "Mine · Everyone", Rules and "New task" (a floating pill
  * on a phone) — over the grouped list, polled every 60s, 50 a page. The view,
  * search, type and scope live in the URL; the list read follows them. A row
- * opens the task drawer's dialog route (`$taskId/`), which renders nothing:
- * this page reads it. A Done entry with no task behind it — a visit a WhatsApp
- * "Yes" confirmed — toasts its result instead (H:4270).
+ * opens the task drawer's dialog route (`$taskId/`) and "New task" its own
+ * (`create/`); both render nothing: this page reads them. A Done entry with no
+ * task behind it — a visit a WhatsApp "Yes" confirmed — toasts its result
+ * instead (H:4270).
  */
 export function TasksPage() {
   const navigate = useNavigate();
@@ -63,7 +96,8 @@ export function TasksPage() {
   const access = useClinicAccess();
   const tier = useViewportTier();
   const now = useNow();
-  useTasksDialogRoute();
+  const { dialog, close } = useTasksDialogRoute();
+  const newTask = useNewTask(organizationSlug, close);
 
   const query = taskListQueryOf(search);
   const list = useTaskList(query, { notifyOnError: false });
@@ -153,6 +187,7 @@ export function TasksPage() {
         ruleSettings={ruleSettings.data}
         canEditRules={canEditRules}
         onRuleChange={(rule, patch) => saveRule.mutate({ rule, ...patch })}
+        onNewTask={newTask.open}
       />
       <TaskList
         tab={shownView}
@@ -166,7 +201,15 @@ export function TasksPage() {
         hasNextPage={list.hasNextPage}
         isFetchingNextPage={list.isFetchingNextPage}
         fetchNextPage={list.fetchNextPage}
+        onNewTask={newTask.open}
       />
+      {dialog.kind === 'create' ? (
+        <NewTaskDrawer
+          prefill={dialog.prefill}
+          onClose={close}
+          onCreated={newTask.onCreated}
+        />
+      ) : null}
       <Outlet />
     </section>
   );

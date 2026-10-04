@@ -901,6 +901,50 @@ export const TASK_FOLLOW_UP_SPANS: Readonly<Record<TaskFollowUpWhen, TaskTimeSpa
   nextWeek: { kind: 'days', days: 7 },
 };
 
+// ── New task ──
+
+/**
+ * New task's Type chips (KICKOFF §6.10 New task, H:6055): a plan-only field
+ * (Appendix F "New task type", REPLACE_WITH_API) — the contract's `task_kind`
+ * names only some of them ({@link MANUAL_TASK_TYPE_KINDS}).
+ */
+export const MANUAL_TASK_TYPES = [
+  'call_back',
+  'follow_up',
+  'send_price',
+  'ask_for_photos',
+  'feedback',
+  'payment_reminder',
+] as const;
+/** Zod enum of the New task types. */
+export const manualTaskTypeSchema = z.enum(MANUAL_TASK_TYPES);
+/** One New task type. */
+export type ManualTaskType = z.infer<typeof manualTaskTypeSchema>;
+
+/**
+ * The contract kind a New task type stores (H:6073 maps the same way): a
+ * callback, a follow-up, a review request for feedback, a payment reminder —
+ * and `manual` for the two the contract has no kind for.
+ */
+export const MANUAL_TASK_TYPE_KINDS: Readonly<Record<ManualTaskType, TaskKind>> = {
+  call_back: 'callback',
+  follow_up: 'follow_up',
+  send_price: 'manual',
+  ask_for_photos: 'manual',
+  feedback: 'review_request',
+  payment_reminder: 'payment_reminder',
+};
+
+/** New task's priority, "Normal · High" (plan-only, Appendix F). */
+export const TASK_PRIORITIES = ['normal', 'high'] as const;
+/** Zod enum of the priorities. */
+export const taskPrioritySchema = z.enum(TASK_PRIORITIES);
+/** One priority. */
+export type TaskPriority = z.infer<typeof taskPrioritySchema>;
+
+/** "Remind 15 min before" — the one reminder New task offers (plan-only, Appendix F). */
+export const TASK_REMIND_MINUTES = 15;
+
 /** How long the server keeps the list and the drawer fresh (S:1722; Today and Tasks, §3.6). */
 export const TASKS_REFETCH_MS = 60_000;
 
@@ -949,8 +993,9 @@ export const TASK_NOTE_MAX = 200;
  * A task as the fixture server stores it: the contract's `Task` plus the
  * plan-only fields (Appendix F, REPLACE_WITH_API) — its rule, the rule match it
  * was derived for (server-internal), the rule outcome that closed or snoozed
- * it, the result text, the note, who resolved it, the snooze label and the
- * owners it was moved from.
+ * it, the result text, the note, who resolved it, the snooze label, the
+ * owners it was moved from, and what New task sets — its type, priority and
+ * reminder.
  */
 export const taskRecordSchema = taskSchema.extend({
   rule: taskRuleIdSchema,
@@ -962,6 +1007,11 @@ export const taskRecordSchema = taskSchema.extend({
   resolvedById: z.uuid().nullable(),
   snoozeLabel: z.string().nullable(),
   previousOwnerIds: z.array(z.uuid()),
+  /** New task's Type; null for a task a rule or "What’s next" created. */
+  manualType: manualTaskTypeSchema.nullable(),
+  priority: taskPrioritySchema,
+  /** Minutes before due to remind the owner ("Remind 15 min before"); null for none. */
+  remindMinutesBefore: z.number().int().positive().nullable(),
 });
 /** A stored task. */
 export type TaskRecord = z.infer<typeof taskRecordSchema>;
@@ -1106,14 +1156,21 @@ export const reassignTaskInputSchema = z.object({
 /** A reassign write. */
 export type ReassignTaskInput = z.infer<typeof reassignTaskInputSchema>;
 
+/** A task title's limit (New task's Title, the schema's). */
+export const TASK_TITLE_MAX = 120;
+
+/** A task's why line — New task's Notes (the schema's `why`). */
+export const TASK_WHY_MAX = 280;
+
 /**
  * Create a task (`createTask`, S:1727): the contract's fields, plus the rule
  * (default "Follow-ups you set") and the task it follows — its source is
- * copied, the way "What’s next" chains (`tasks.md:56`).
+ * copied, the way "What’s next" chains (`tasks.md:56`) — and New task's type,
+ * priority and reminder (plan-only; the type picks the kind unless one is given).
  */
 export const createTaskInputSchema = z.object({
-  title: z.string().trim().min(1).max(120),
-  why: z.string().trim().max(280).nullable().default(null),
+  title: z.string().trim().min(1).max(TASK_TITLE_MAX),
+  why: z.string().trim().max(TASK_WHY_MAX).nullable().default(null),
   ownerId: z.uuid().nullable(),
   ownerRole: taskSchema.shape.ownerRole.default(null),
   patientId: z.uuid().nullable().default(null),
@@ -1122,6 +1179,9 @@ export const createTaskInputSchema = z.object({
   rule: taskRuleIdSchema.default('manual'),
   kind: taskKindSchema.optional(),
   followsTaskId: z.uuid().nullable().default(null),
+  manualType: manualTaskTypeSchema.nullable().default(null),
+  priority: taskPrioritySchema.default('normal'),
+  remindMinutesBefore: z.number().int().positive().nullable().default(null),
 });
 /** A create as callers write it. */
 export type CreateTaskInput = z.input<typeof createTaskInputSchema>;

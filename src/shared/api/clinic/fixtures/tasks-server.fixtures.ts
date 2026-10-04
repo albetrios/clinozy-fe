@@ -28,6 +28,7 @@ import {
   type CreateTaskInput,
   createTaskInputSchema,
   findTaskOutcome,
+  MANUAL_TASK_TYPE_KINDS,
   type ReassignTaskInput,
   reassignTaskInputSchema,
   type RecordTaskOutcomeInput,
@@ -121,6 +122,9 @@ const OPEN_TASK = {
   resolvedById: null,
   snoozeLabel: null,
   previousOwnerIds: [],
+  manualType: null,
+  priority: 'normal',
+  remindMinutesBefore: null,
 } as const satisfies Partial<TaskRecord>;
 
 // ── The rule job ──
@@ -364,6 +368,9 @@ function confirmedByWhatsApp(now: Date, view: Lookups): TaskRow[] {
         resolvedById: null,
         snoozeLabel: null,
         previousOwnerIds: [],
+        manualType: null,
+        priority: 'normal',
+        remindMinutesBefore: null,
       };
       return rowOf(record, view, false);
     });
@@ -927,6 +934,26 @@ export async function createTask(raw: CreateTaskInput): Promise<TaskChange> {
 }
 
 /**
+ * Where a created task points: the task it follows' source; else, for a New
+ * task about a pipeline lead (not a patient), that lead — its chip reads
+ * "Lead #…"; else nothing (a patient's chip names the patient).
+ */
+function createdSourceOf(
+  followed: TaskRecord | null,
+  patientId: string | null,
+  leadId: string | null,
+): Pick<TaskRecord, 'sourceType' | 'sourceId'> {
+  if (followed) return { sourceType: followed.sourceType, sourceId: followed.sourceId };
+  const lead =
+    leadId && !patientId
+      ? clinicFixtures.leads.snapshot((row) => row.id === leadId)[0]
+      : undefined;
+  return lead && !lead.isContactThread
+    ? { sourceType: 'lead', sourceId: lead.id }
+    : { sourceType: null, sourceId: null };
+}
+
+/**
  * {@link createTask}'s write inside another operation's `change` — a lead's
  * status side effects open their task this way, so one Undo takes the status
  * and its task back together.
@@ -940,19 +967,24 @@ export async function createTaskIn(
   const followed = input.followsTaskId
     ? await clinicFixtures.tasks.get(input.followsTaskId)
     : null;
+  const patientId = input.patientId ?? followed?.patientId ?? null;
+  const leadId = input.leadId ?? followed?.leadId ?? null;
+  const typeKind = input.manualType ? MANUAL_TASK_TYPE_KINDS[input.manualType] : null;
   return change.create(clinicFixtures.tasks, {
-    kind: input.kind ?? TASK_RULES[input.rule].kind,
+    kind: input.kind ?? typeKind ?? TASK_RULES[input.rule].kind,
     title: input.title,
     why: input.why || null,
     ownerId: input.ownerId,
     ownerRole: input.ownerRole,
-    patientId: input.patientId ?? followed?.patientId ?? null,
-    leadId: input.leadId ?? followed?.leadId ?? null,
-    sourceType: followed?.sourceType ?? null,
-    sourceId: followed?.sourceId ?? null,
+    patientId,
+    leadId,
+    ...createdSourceOf(followed, patientId, leadId),
     dueAt: input.dueAt,
     ...OPEN_TASK,
     rule: input.rule,
+    manualType: input.manualType,
+    priority: input.priority,
+    remindMinutesBefore: input.remindMinutesBefore,
   });
 }
 

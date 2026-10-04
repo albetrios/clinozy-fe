@@ -443,5 +443,63 @@
     "queue": "지금은 처리할 일이 없습니다. 리드가 연락하거나 방문이 다가오거나 피드백이 오면 새 작업이 여기에 표시됩니다.",
     "snoozed": "다시 알림 작업이 없습니다",
     "done": "오늘 아직 해결된 작업이 없습니다"
+  },
+  "newTask": {
+    "title": "새 작업",
+    "sub": "{{person}} 대상 · 작업과 이 사람의 타임라인에 표시됩니다",
+    "subNoPerson": "작업과 해당 사람의 타임라인에 표시됩니다",
+    "steps": {
+      "what": "할 일",
+      "when": "언제·누가",
+      "how": "방법·메모"
+    },
+    "forField": {
+      "label": "대상",
+      "placeholder": "환자 또는 리드 선택",
+      "search": "이름, 휴대폰 또는 번호로 검색",
+      "empty": "이름, 휴대폰 또는 환자 번호를 입력하세요",
+      "missing": "작업 대상을 선택하세요"
+    },
+    "type": {
+      "label": "유형",
+      "callBack": "다시 전화",
+      "followUp": "후속 조치",
+      "sendPrice": "가격 보내기",
+      "askForPhotos": "사진 요청",
+      "feedback": "피드백",
+      "paymentReminder": "결제 알림"
+    },
+    "titleField": {
+      "label": "제목",
+      "placeholder": "할 일",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "기한",
+      "today": "오늘 오후 5시",
+      "tomorrow": "내일 오전 11시",
+      "inThreeDays": "3일 후",
+      "nextWeek": "다음 주",
+      "date": "기한 날짜",
+      "time": "기한 시간"
+    },
+    "owner": {
+      "label": "담당자 지정",
+      "you": "나",
+      "missing": "담당자를 선택하세요"
+    },
+    "priority": {
+      "label": "우선순위",
+      "normal": "보통",
+      "high": "높음"
+    },
+    "remind": "{{minutes}}분 전에 알림",
+    "notes": {
+      "label": "작업 메모",
+      "placeholder": "메모(선택)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "작업 추가",
+    "added": "{{owner}}에게 작업 추가됨 · {{due}}"
   }
 }

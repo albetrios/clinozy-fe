@@ -182,5 +182,8 @@ export function taskSeed(today: string = clinicToday()): TaskRecord[] {
     resolvedById: null,
     snoozeLabel: null,
     previousOwnerIds: [],
+    manualType: null,
+    priority: 'normal',
+    remindMinutesBefore: null,
   }));
 }

@@ -14,14 +14,15 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { validateTasksSearch } from '../../tasks.search.ts';
+import { validateTaskCreateSearch, validateTasksSearch } from '../../tasks.search.ts';
 
 /**
  * The Tasks family as `routeTree.tsx` registers it — the list with its search
- * schema and the task drawer's dialog route, which renders nothing — with
- * `Page` as the list's component, opened at `url`, for a member previewed as
- * `role` (View-as narrows the clinic access to that role's matrix). Every
- * other path lands on a catch-all, so a test can read where a link went.
+ * schema and its two dialog routes, New task and the task drawer, which render
+ * nothing — with `Page` as the list's component, opened at `url`, for a member
+ * previewed as `role` (View-as narrows the clinic access to that role's
+ * matrix). Every other path lands on a catch-all, so a test can read where a
+ * link went.
  */
 export function renderTasksRoutes(
   url: string,
@@ -38,6 +39,12 @@ export function renderTasksRoutes(
     validateSearch: validateTasksSearch,
     component: Page,
   });
+  const create = createRoute({
+    getParentRoute: () => tasks,
+    path: 'create',
+    validateSearch: validateTaskCreateSearch,
+    component: () => null,
+  });
   const task = createRoute({
     getParentRoute: () => tasks,
     path: '$taskId',
@@ -49,7 +56,7 @@ export function renderTasksRoutes(
     component: () => <p>elsewhere</p>,
   });
   const router = createRouter({
-    routeTree: root.addChildren([tasks.addChildren([task]), elsewhere]),
+    routeTree: root.addChildren([tasks.addChildren([create, task]), elsewhere]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({

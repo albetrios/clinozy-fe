@@ -259,6 +259,9 @@ describe('the task record', () => {
     resolvedById: '5f0c8a43-5e8e-4f45-9f8a-0d0b7d6c1a11',
     snoozeLabel: null,
     previousOwnerIds: [],
+    manualType: null,
+    priority: 'normal',
+    remindMinutesBefore: null,
   };
 
   it('is the contract’s Task plus the plan’s fields', () => {

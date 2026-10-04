@@ -474,6 +474,42 @@ describe('snooze, reassign, create, hand to the automation', () => {
     expect(titles(await rowsOf())).not.toContain('Call again · Priti');
   });
 
+  it('creates a New task: its type picks the kind, a lead sources it, the plan fields kept', async () => {
+    const { task } = await createTask({
+      title: 'Send the laser price',
+      ownerId: FIXTURE_VIEWER_ID,
+      leadId: ref.lead(2370),
+      dueAt: at(TODAY, '17:00'),
+      manualType: 'payment_reminder',
+      priority: 'high',
+      remindMinutesBefore: 15,
+    });
+    expect(task).toMatchObject({
+      rule: 'manual',
+      kind: 'payment_reminder',
+      manualType: 'payment_reminder',
+      priority: 'high',
+      remindMinutesBefore: 15,
+      sourceType: 'lead',
+      sourceId: ref.lead(2370),
+      source: { kind: 'lead', seq: 2370 },
+    });
+    const { task: priti } = await createTask({
+      title: 'Ask for photos · Priti',
+      ownerId: FIXTURE_VIEWER_ID,
+      patientId: (await taskTitled('Confirm Priti’s visit')).patientId,
+      dueAt: at(TODAY, '17:00'),
+      manualType: 'ask_for_photos',
+    });
+    expect(priti).toMatchObject({
+      kind: 'manual',
+      priority: 'normal',
+      remindMinutesBefore: null,
+      sourceType: null,
+      source: { kind: 'patient' },
+    });
+  });
+
   it('refuses a task with no title, field by field', async () => {
     const error = await failure(
       createTask({ title: '  ', ownerId: null, dueAt: at(TODAY, '13:00') }),

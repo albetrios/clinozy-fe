@@ -181,6 +181,23 @@ describe('the Tasks room (KICKOFF §6.10)', () => {
     expect(router.state.location.search).toEqual({ scope: 'everyone' });
   });
 
+  it('opens New task over the list for a member with Create, keeping its params', async () => {
+    const user = userEvent.setup();
+    const { router } = renderTasksRoutes(`${TASKS}?scope=everyone`, TasksPage, {
+      role: 'front_desk',
+    });
+    await user.click(await screen.findByTestId('tasks-new'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${TASKS}/create`));
+    expect(router.state.location.search).toEqual({ scope: 'everyone' });
+    expect(await screen.findByTestId('new-task-drawer')).toBeInTheDocument();
+  });
+
+  it('offers no New task without Create', async () => {
+    renderTasksRoutes(TASKS, TasksPage, { role: 'therapist' });
+    await waitFor(() => expect(rows().length).toBeGreaterThan(0));
+    expect(screen.queryByTestId('tasks-new')).not.toBeInTheDocument();
+  });
+
   it('toasts the result of a Done entry with no task behind it (H:4270)', async () => {
     const user = userEvent.setup();
     const { router } = renderTasksRoutes(`${TASKS}?tab=done`, TasksPage);

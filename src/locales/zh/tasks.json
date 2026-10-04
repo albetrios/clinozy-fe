@@ -443,5 +443,63 @@
     "queue": "目前没有需要你处理的事。潜在客户来信、就诊临近或收到反馈时，新任务会显示在这里。",
     "snoozed": "没有已推迟的任务",
     "done": "今天还没有已解决的任务"
+  },
+  "newTask": {
+    "title": "新建任务",
+    "sub": "为 {{person}} · 显示在任务和此人的时间线上",
+    "subNoPerson": "显示在任务和此人的时间线上",
+    "steps": {
+      "what": "要做什么",
+      "when": "时间与负责人",
+      "how": "方式与备注"
+    },
+    "forField": {
+      "label": "对象",
+      "placeholder": "选择患者或潜在客户",
+      "search": "按姓名、手机号或编号搜索",
+      "empty": "输入姓名、手机号或患者编号",
+      "missing": "请选择任务对象"
+    },
+    "type": {
+      "label": "类型",
+      "callBack": "回电",
+      "followUp": "跟进",
+      "sendPrice": "发送价格",
+      "askForPhotos": "索取照片",
+      "feedback": "反馈",
+      "paymentReminder": "付款提醒"
+    },
+    "titleField": {
+      "label": "标题",
+      "placeholder": "要做什么",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "截止",
+      "today": "今天下午 5 点",
+      "tomorrow": "明天上午 11 点",
+      "inThreeDays": "3 天后",
+      "nextWeek": "下周",
+      "date": "截止日期",
+      "time": "截止时间"
+    },
+    "owner": {
+      "label": "指派给",
+      "you": "我",
+      "missing": "请选择负责人"
+    },
+    "priority": {
+      "label": "优先级",
+      "normal": "普通",
+      "high": "高"
+    },
+    "remind": "提前 {{minutes}} 分钟提醒",
+    "notes": {
+      "label": "任务备注",
+      "placeholder": "备注（可选）"
+    },
+    "footer": "↔ {{person}}",
+    "save": "添加任务",
+    "added": "已为 {{owner}} 添加任务 · {{due}}"
   }
 }

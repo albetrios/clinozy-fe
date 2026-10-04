@@ -4,6 +4,7 @@ import {
   groupTasks,
   isTaskOverdue,
   TASK_GROUP_TONES,
+  taskDueAt,
   taskDueLabel,
 } from './task-views.ts';
 
@@ -189,5 +190,19 @@ describe('groupTasks (tasks.md:19, 30)', () => {
       snoozed: null,
       done: null,
     });
+  });
+});
+
+describe('taskDueAt', () => {
+  it('names a picked day and time against the clinic’s today', () => {
+    expect(taskDueAt('2026-10-04', '17:00', NOW)).toEqual({
+      kind: 'at',
+      day: 'today',
+      date: '2026-10-04',
+      time: '17:00',
+    });
+    expect(taskDueAt('2026-10-05', '11:00', NOW).day).toBe('tomorrow');
+    expect(taskDueAt('2026-10-03', '11:00', NOW).day).toBe('yesterday');
+    expect(taskDueAt('2026-10-11', '11:00', NOW).day).toBe('date');
   });
 });

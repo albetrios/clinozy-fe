@@ -449,5 +449,63 @@
     "queue": "Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.",
     "snoozed": "No snoozed tasks",
     "done": "Nothing resolved yet today"
+  },
+  "newTask": {
+    "title": "New task",
+    "sub": "For {{person}} · shows in Tasks and on this person’s timeline",
+    "subNoPerson": "Shows in Tasks and on the person’s timeline",
+    "steps": {
+      "what": "What needs doing",
+      "when": "When & who",
+      "how": "How & notes"
+    },
+    "forField": {
+      "label": "For",
+      "placeholder": "Pick a patient or lead",
+      "search": "Search by name, mobile or number",
+      "empty": "Type a name, mobile or patient number",
+      "missing": "Pick whom the task is for"
+    },
+    "type": {
+      "label": "Type",
+      "callBack": "Call back",
+      "followUp": "Follow-up",
+      "sendPrice": "Send price",
+      "askForPhotos": "Ask for photos",
+      "feedback": "Feedback",
+      "paymentReminder": "Payment reminder"
+    },
+    "titleField": {
+      "label": "Title",
+      "placeholder": "What needs doing",
+      "fallback": "{{type}} · {{first}}"
+    },
+    "due": {
+      "label": "Due",
+      "today": "Today 5 pm",
+      "tomorrow": "Tomorrow 11 am",
+      "inThreeDays": "In 3 days",
+      "nextWeek": "Next week",
+      "date": "Due date",
+      "time": "Due time"
+    },
+    "owner": {
+      "label": "Assign to",
+      "you": "You",
+      "missing": "Pick who does it"
+    },
+    "priority": {
+      "label": "Priority",
+      "normal": "Normal",
+      "high": "High"
+    },
+    "remind": "Remind {{minutes}} min before",
+    "notes": {
+      "label": "Task notes",
+      "placeholder": "Notes (optional)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Add task",
+    "added": "Task added for {{owner}} · {{due}}"
   }
 }

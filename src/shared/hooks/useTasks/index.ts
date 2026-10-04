@@ -1,4 +1,5 @@
 export {
+  type CreateTaskOptions,
   type TaskQueryOptions,
   useCreateTask,
   useHandTaskToClinozy,

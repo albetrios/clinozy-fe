@@ -163,3 +163,11 @@ export function organizationTask(organizationSlug: string, taskId: string) {
     params: { organizationSlug, taskId },
   } as const;
 }
+
+/** New task over the list; `?lead=` / `?patient=` name whom it is for (KICKOFF §6.10). */
+export function organizationTaskCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/tasks/create',
+    params: { organizationSlug },
+  } as const;
+}

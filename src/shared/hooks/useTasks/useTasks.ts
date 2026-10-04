@@ -125,11 +125,18 @@ export function useReassignTask() {
   });
 }
 
+/** Options for {@link useCreateTask}. */
+export interface CreateTaskOptions {
+  /** Toast a failed create (default: true); off when the drawer raises its own. */
+  notifyOnError?: boolean;
+}
+
 /** Create a task — "What’s next" or New task. */
-export function useCreateTask() {
+export function useCreateTask(options: CreateTaskOptions = {}) {
   return useAppMutation<TaskChange, CreateTaskInput>({
     mutationFn: createTask,
     invalidateKeys: TASK_WRITE_KEYS,
+    notifyOnError: options.notifyOnError ?? true,
   });
 }
 

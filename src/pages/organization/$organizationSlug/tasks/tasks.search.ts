@@ -9,7 +9,13 @@
  * entry chunk, and the tasks contract module is pages of zod. The test pins
  * each list to the contract's.
  */
-import { listOf, oneOf, queryOf } from '@/lib/routes/search-params.ts';
+import {
+  listOf,
+  matchOf,
+  oneOf,
+  queryOf,
+  RECORD_ID,
+} from '@/lib/routes/search-params.ts';
 import type {
   TaskListQuery,
   TaskRuleId,
@@ -88,5 +94,24 @@ export function taskListQueryOf(search: TasksSearch): TaskListQuery {
     scope: search.scope ?? TASKS_SEARCH_DEFAULTS.scope,
     type: search.type ?? [],
     q: search.q ?? '',
+  };
+}
+
+/**
+ * `/tasks/create`'s prefill: the lead or patient New task is for, when it was
+ * opened from one (`?lead=` / `?patient=`, KICKOFF §6.10 New task; AMBER).
+ */
+export interface TaskCreateSearch {
+  lead?: string;
+  patient?: string;
+}
+
+/** Parse `/tasks/create`'s prefill — a record id, else nothing. */
+export function validateTaskCreateSearch(
+  search: Record<string, unknown>,
+): TaskCreateSearch {
+  return {
+    lead: matchOf(RECORD_ID, search.lead),
+    patient: matchOf(RECORD_ID, search.patient),
   };
 }

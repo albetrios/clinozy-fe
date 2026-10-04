@@ -89,8 +89,12 @@ import { manifest as stockItemsManifest } from '@/pages/organization/$organizati
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
+import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
 import { manifest as tasksManifest } from '@/pages/organization/$organizationSlug/tasks/tasks.manifest.ts';
-import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import {
+  validateTaskCreateSearch,
+  validateTasksSearch,
+} from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
@@ -273,8 +277,12 @@ const TasksPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Tasks room's dialog route renders nothing of its own (the list opens the
-// drawer), so it needs no namespace beyond the room's.
+// The Tasks room's dialog routes render nothing of their own (the list opens the
+// drawers), so they need no namespace beyond the room's.
+const TaskCreateRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/tasks/create/create.route.tsx'),
+  'Component',
+);
 const TaskRoute = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/tasks/$taskId/task-id.route.tsx'),
   'Component',
@@ -942,6 +950,23 @@ const organizationTasksRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// URL-driven dialog over the Tasks list (D24, S:96, Q-T4): it renders nothing;
+// the list page reads the URL and opens the New task drawer over itself.
+const organizationTaskCreateRoute = createRoute({
+  getParentRoute: () => organizationTasksRoute,
+  path: 'create',
+  head: manifestHead(taskCreateManifest),
+  staticData: { manifest: taskCreateManifest },
+  validateSearch: validateTaskCreateSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(taskCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: TaskCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
 // URL-driven dialog over the Tasks list (D24, S:97): it renders nothing; the
 // list page reads the URL and opens the task drawer over itself.
 const organizationTaskRoute = createRoute({
@@ -1231,7 +1256,10 @@ const routeTree = rootRoute.addChildren([
       organizationStockItemsRoute,
     ]),
     organizationPaymentsRoute,
-    organizationTasksRoute.addChildren([organizationTaskRoute]),
+    organizationTasksRoute.addChildren([
+      organizationTaskCreateRoute,
+      organizationTaskRoute,
+    ]),
     organizationOfferingsRoute.addChildren([
       organizationOfferingCreateRoute,
       organizationOfferingEditRoute,

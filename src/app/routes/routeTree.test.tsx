@@ -17,7 +17,11 @@ import {
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
-import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
+import {
+  validateTaskCreateSearch,
+  validateTasksSearch,
+} from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
@@ -599,7 +603,7 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
   });
 });
 
-describe('the Tasks dialog route (KICKOFF §4, D24, S:95–97)', () => {
+describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
   const TASKS = '/organization/$organizationSlug/tasks';
   type TaskRoute = {
     options: {
@@ -616,11 +620,27 @@ describe('the Tasks dialog route (KICKOFF §4, D24, S:95–97)', () => {
     vi.mocked(requireOrgStatus).mockClear();
   });
 
-  it('registers the task drawer under the list, which validates its own search', () => {
+  it('registers New task and the task drawer under the list, which validates its own search', () => {
     expect(
       Object.keys(router.routesById).filter((id) => id.startsWith(`${TASKS}/`)),
-    ).toEqual([`${TASKS}/$taskId`]);
+    ).toEqual([`${TASKS}/create`, `${TASKS}/$taskId`]);
     expect(routeOf(TASKS)?.options.validateSearch).toBe(validateTasksSearch);
+    expect(routeOf(`${TASKS}/create`)?.options.validateSearch).toBe(
+      validateTaskCreateSearch,
+    );
+  });
+
+  it('gates New task on its own manifest, then the status guard', async () => {
+    await beforeLoadOf(`${TASKS}/create`)({
+      location: { href: '/organization/acme/tasks/create' },
+      params: { organizationSlug: 'acme' },
+      preload: false,
+    });
+    expect(gatewayFromManifest).toHaveBeenCalledWith(taskCreateManifest);
+    expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+    expect(routeOf(`${TASKS}/create`)?.options.staticData?.manifest).toBe(
+      taskCreateManifest,
+    );
   });
 
   it('runs the room gateway on the drawer’s own manifest, then the status guard', async () => {

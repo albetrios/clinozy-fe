@@ -19,6 +19,7 @@ import {
   organizationPicker,
   organizationSuspended,
   organizationTask,
+  organizationTaskCreate,
   organizationTasks,
 } from './builders.ts';
 
@@ -111,6 +112,10 @@ describe('route builders', () => {
     expect(organizationTask('acme', 'T1')).toEqual({
       to: '/organization/$organizationSlug/tasks/$taskId',
       params: { organizationSlug: 'acme', taskId: 'T1' },
+    });
+    expect(organizationTaskCreate('acme')).toEqual({
+      to: '/organization/$organizationSlug/tasks/create',
+      params: { organizationSlug: 'acme' },
     });
   });
 });
