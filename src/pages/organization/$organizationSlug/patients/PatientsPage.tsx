@@ -14,20 +14,19 @@ import { PATIENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
   PatientDeleteConfirm,
   type PatientDeleteTarget,
 } from '@/shared/components/PatientDeleteConfirm/index.ts';
 import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
+import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
+import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import {
   FileIcon,
@@ -53,45 +52,6 @@ import { PATIENTS_SEARCH_DEFAULTS, validatePatientsSearch } from './patients.sea
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'patients.csv';
-
-/** How many placeholder rows stand in for the list while it loads. */
-const SKELETON_ROWS = 8;
-
-/**
- * What the table shows while the list is loading, empty or failed — the
- * in-place skeleton (first load; a new search or filter), the room's empty
- * state, or the filtered one (KICKOFF §6.5 States).
- */
-function TableEmpty({
-  loading,
-  filtered,
-  onClearFilters,
-}: {
-  loading: boolean;
-  filtered: boolean;
-  onClearFilters: () => void;
-}) {
-  const { t } = useTranslation(PATIENTS_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        avatar
-        label={t(PATIENTS_KEYS.manifest.title)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
-  if (filtered) return <EmptyState tone="sage" onClearFilters={onClearFilters} />;
-  return (
-    <EmptyState
-      tone="sage"
-      icon={<Users />}
-      title={t(PATIENTS_KEYS.empty.title)}
-      description={t(PATIENTS_KEYS.empty.description)}
-    />
-  );
-}
 
 /**
  * The filter part of the list's params — a change to it (a search, "Apply
@@ -134,15 +94,7 @@ export function PatientsPage() {
   const { dialog, close } = usePatientsDialogRoute();
 
   const list = usePatientList(params);
-  // While a read fails, the last rows it loaded — "Showing the last copy"
-  // (KICKOFF §6.0 List error) — under the one list-error toast with Retry.
-  const rows = useListLoadError(list, PATIENTS_TABLE_ID);
-  const filterKey = filterKeyOf(params);
-  const [settledFilterKey, setSettledFilterKey] = useState(filterKey);
-  if (!(list.isPending || list.isRefreshing) && settledFilterKey !== filterKey) {
-    setSettledFilterKey(filterKey);
-  }
-  const loading = list.isPending || (list.isRefreshing && settledFilterKey !== filterKey);
+  const { rows, loading } = useRoomList(list, PATIENTS_TABLE_ID, filterKeyOf(params));
 
   const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
   const can = (action: 'create' | 'edit' | 'delete') =>
@@ -298,10 +250,16 @@ export function PatientsPage() {
         isFetchingNextPage={list.isFetchingNextPage}
         fetchNextPage={list.fetchNextPage}
         empty={
-          <TableEmpty
+          <RoomTableEmpty
             loading={loading}
             filtered={filters.count > 0}
             onClearFilters={() => filters.apply({})}
+            tone="sage"
+            icon={<Users />}
+            title={t(PATIENTS_KEYS.empty.title)}
+            description={t(PATIENTS_KEYS.empty.description)}
+            label={t(PATIENTS_KEYS.manifest.title)}
+            avatar
           />
         }
         className="m-(--room-card-margin) flex-1"

@@ -1,0 +1,129 @@
+import { Outlet, useSearch } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+
+import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
+import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
+import { Package, PenLine } from '@/shared/icons/index.ts';
+
+import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
+import { validateMedicalSearch } from '../medical.search.ts';
+import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
+import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
+import {
+  useManufacturerCatalogue,
+  useMedicalSummary,
+  useSupplierList,
+} from '../shared/hooks/useMedicalLists/index.ts';
+import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
+import type { SupplierRow } from '../shared/medical-contracts.ts';
+import { filtersOf, recordSection } from '../shared/medical-filters.ts';
+import { supplierAgeingTone } from '../shared/medical-tones.ts';
+import { useSupplierColumns } from './hooks/useSupplierColumns/index.ts';
+import { supplierFilterKey, supplierParamsOf } from './suppliers.params.ts';
+
+const TABLE_ID = MEDICAL_TABLE_IDS.suppliers;
+
+/**
+ * Medical › Suppliers (KICKOFF §6.7; `medical.md:73–87`): the Medical toolbar
+ * over the suppliers — a row opens Edit supplier; "New purchase order" opens
+ * one on that supplier. The footer counts the suppliers and what they are
+ * owed; the row edge shows how long while money is due.
+ */
+export function SuppliersPage() {
+  const { t } = useTranslation(MEDICAL_NS);
+  const search = validateMedicalSearch(useSearch({ strict: false }));
+  const params = supplierParamsOf(search);
+  const { patchSearch } = useDataTableUrlState(true);
+  const access = useClinicAccess();
+  const nav = useMedicalNav();
+  const formatPaise = usePaiseFormat();
+  const makers = useManufacturerCatalogue().data ?? [];
+  const { fields, copy } = filtersOf({
+    manufacturer: recordSection(t(MEDICAL_KEYS.filters.manufacturers), makers),
+  });
+  const filters = useRoomFilters(fields);
+
+  const list = useSupplierList(params);
+  const { rows, loading } = useRoomList(list, TABLE_ID, supplierFilterKey(params));
+  const summary = useMedicalSummary('suppliers', params).data;
+  const table = useRoomTable({
+    tableId: TABLE_ID,
+    columns: useSupplierColumns(),
+    rows: loading ? [] : rows,
+    sort: search.sort,
+    onSortChange: (sort) => patchSearch({ sort }),
+  });
+
+  const canCreate = access.isResolved && access.can('medical', 'create');
+  const keys = MEDICAL_KEYS.suppliers;
+
+  const rowActions = (supplier: SupplierRow): DataTableRowAction[] => [
+    ...(canCreate
+      ? [
+          {
+            id: 'new-order',
+            label: t(keys.rowActions.newOrder),
+            icon: Package,
+            onSelect: () => nav.create('purchases', { supplier: supplier.id }),
+          },
+        ]
+      : []),
+    {
+      id: 'edit',
+      label: t(keys.rowActions.edit),
+      icon: PenLine,
+      onSelect: () => nav.supplierEdit(supplier.id),
+    },
+  ];
+
+  return (
+    <section
+      data-testid="medical-suppliers-page"
+      className="flex min-h-0 flex-1 flex-col"
+    >
+      <MedicalToolbar tab="suppliers" table={table} filters={{ fields, copy }} />
+      <MedicalTable
+        tab="suppliers"
+        table={table}
+        list={list}
+        loading={loading}
+        filtered={filters.count > 0}
+        onClearFilters={() => filters.apply({})}
+        emptyTitle={t(keys.empty)}
+        emptyAction={
+          canCreate
+            ? {
+                label: t(MEDICAL_KEYS.create.supplier),
+                onSelect: () => nav.create('suppliers'),
+              }
+            : undefined
+        }
+        recordsLabel={t(keys.records)}
+        countLabel={
+          summary
+            ? t(keys.count, {
+                count: summary.total,
+                payable: formatPaise(summary.payable),
+              })
+            : undefined
+        }
+        minWidth={980}
+        onRowClick={(supplier) => nav.supplierEdit(supplier.id)}
+        rowTone={(supplier) =>
+          supplier.ageingDays === null
+            ? undefined
+            : supplierAgeingTone(supplier.ageingDays)
+        }
+        rowActions={rowActions}
+        exportName="suppliers.csv"
+        avatar
+      />
+      <Outlet />
+    </section>
+  );
+}

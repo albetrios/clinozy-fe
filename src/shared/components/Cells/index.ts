@@ -15,4 +15,5 @@ export {
 } from './PersonAvatar/index.ts';
 export { PersonChip, type PersonChipProps } from './PersonChip/index.ts';
 export { StatusEdge, type StatusEdgeProps } from './StatusEdge/index.ts';
+export { StockBarCell, type StockBarCellProps } from './StockBarCell/index.ts';
 export { type PillTone, TonePill, type TonePillProps } from './TonePill/index.ts';

@@ -1,5 +1,274 @@
 {
   "manifest": {
     "title": "الصيدلية"
+  },
+  "tabs": {
+    "label": "أقسام الصيدلية",
+    "sales": "المبيعات",
+    "medicines": "الأدوية",
+    "purchases": "المشتريات",
+    "suppliers": "الموردون",
+    "manufacturers": "الشركات المصنّعة",
+    "mrs": "المندوبون",
+    "payments": "المدفوعات",
+    "groups": {
+      "selling": "البيع",
+      "stock": "المخزون",
+      "buying": "الشراء",
+      "money": "المال"
+    }
+  },
+  "search": {
+    "placeholder": "ابحث بالاسم أو التركيب أو المورد…",
+    "label": "البحث في الصيدلية"
+  },
+  "create": {
+    "sale": "بيع جديد",
+    "medicine": "دواء جديد",
+    "purchaseOrder": "أمر شراء جديد",
+    "supplier": "مورد جديد",
+    "manufacturer": "شركة مصنّعة جديدة",
+    "mr": "مندوب جديد",
+    "menu": "إنشاء شيء آخر"
+  },
+  "viewActions": {
+    "reorderLow": "إعادة طلب المخزون المنخفض",
+    "sellAllDiscount": "بيع الكل بخصم 20%",
+    "removeDiscount": "إزالة خصم قرب انتهاء الصلاحية",
+    "prescriptions": "وصفات بانتظار الصرف",
+    "payAllReceived": "ادفع كل المستلم · {{amount}}"
+  },
+  "filters": {
+    "all": "الكل",
+    "any": "أي",
+    "stock": "المخزون",
+    "lowStock": "مخزون منخفض",
+    "expiry": "أقرب انتهاء صلاحية",
+    "within30": "خلال 30 يومًا",
+    "within60": "خلال 60 يومًا",
+    "within90": "خلال 90 يومًا",
+    "status": "الحالة",
+    "stage": "المرحلة",
+    "manufacturer": "الشركة المصنّعة",
+    "manufacturers": "الشركات المصنّعة",
+    "suppliers": "الموردون",
+    "mrs": "المندوبون"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}٪",
+    "addPhone": "إضافة هاتف",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "store": "لا شيء في الصيدلية"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "toasts": {
+    "discountOn": "خصم 20% على الأدوية القريبة من انتهاء الصلاحية",
+    "discountOnOne": "تم تطبيق خصم 20% على {{name}}",
+    "discountOff": "تمت إزالة الخصم"
+  },
+  "sales": {
+    "records": "المبيعات",
+    "count_zero": "{{count}} مبيعات",
+    "count_one": "{{count}} عملية بيع",
+    "count_two": "{{count}} عمليتا بيع",
+    "count_few": "{{count}} عمليات بيع",
+    "count_many": "{{count}} عملية بيع",
+    "count_other": "{{count}} عملية بيع",
+    "columns": {
+      "seq": "البيع",
+      "customer": "العميل",
+      "medicines": "الأدوية",
+      "bill": "الفاتورة",
+      "margin": "الهامش",
+      "status": "الحالة",
+      "when": "متى"
+    },
+    "patient": "مريض",
+    "contact": "جهة اتصال الصيدلية",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "التشغيلات: {{batches}}",
+    "returned": "− {{amount}} مُرتجع",
+    "refunded": "تم رد {{amount}}",
+    "statuses": {
+      "paid": "مدفوع",
+      "unpaid": "غير مدفوع",
+      "returned": "مُرتجع"
+    },
+    "rowActions": {
+      "collect": "تحصيل {{amount}}",
+      "return": "إرجاع الأدوية",
+      "print": "طباعة",
+      "void": "إلغاء البيع"
+    }
+  },
+  "medicines": {
+    "records": "الأدوية",
+    "empty": "لا يوجد دواء مطابق",
+    "columns": {
+      "seq": "المعرّف",
+      "name": "الدواء",
+      "manufacturer": "الشركة المصنّعة",
+      "stock": "المخزون",
+      "expiry": "أقرب انتهاء صلاحية",
+      "mrp": "السعر الأقصى",
+      "bestRate": "أفضل سعر",
+      "margin": "الهامش"
+    },
+    "needsMrp": "يلزم السعر الأقصى والتركيب",
+    "stockLine": "{{count}} في المخزون · {{level}}",
+    "levels": {
+      "ok": "جيد",
+      "low": "منخفض",
+      "out": "نفد"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "لا مخزون",
+    "discount": "−{{pct}}٪ لقرب الانتهاء",
+    "rowActions": {
+      "returnExpiring": "إرجاع المخزون القريب من انتهاء الصلاحية إلى المورد",
+      "discount": "بيع بخصم 20% (قريب من الانتهاء)",
+      "removeDiscount": "إزالة خصم قرب انتهاء الصلاحية",
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "purchases": {
+    "records": "أوامر الشراء",
+    "count_zero": "{{count}} أوامر",
+    "count_one": "{{count}} أمر",
+    "count_two": "{{count}} أمران",
+    "count_few": "{{count}} أوامر",
+    "count_many": "{{count}} أمرًا",
+    "count_other": "{{count}} أمر",
+    "columns": {
+      "seq": "أمر الشراء",
+      "supplier": "المورد",
+      "items": "الأصناف",
+      "date": "التاريخ",
+      "total": "الإجمالي",
+      "stage": "المرحلة"
+    },
+    "items_zero": "{{count}} أصناف",
+    "items_one": "{{count}} صنف",
+    "items_two": "{{count}} صنفان",
+    "items_few": "{{count}} أصناف",
+    "items_many": "{{count}} صنفًا",
+    "items_other": "{{count}} صنف",
+    "free": "{{count}} مجانًا",
+    "partPaid": "مدفوع {{amount}}",
+    "stages": {
+      "ordered": "تم الطلب",
+      "received": "مستلم",
+      "paid": "مدفوع",
+      "cancelled": "ملغى"
+    },
+    "rowActions": {
+      "receive": "استلام البضاعة",
+      "edit": "تعديل",
+      "cancel": "إلغاء الطلب",
+      "pay": "ادفع {{amount}}",
+      "view": "عرض"
+    }
+  },
+  "suppliers": {
+    "records": "الموردون",
+    "empty": "لا يوجد مورد مطابق",
+    "count_zero": "{{count}} موردين · {{payable}} مستحق",
+    "count_one": "{{count}} مورد · {{payable}} مستحق",
+    "count_two": "{{count}} موردان · {{payable}} مستحق",
+    "count_few": "{{count}} موردين · {{payable}} مستحق",
+    "count_many": "{{count}} موردًا · {{payable}} مستحق",
+    "count_other": "{{count}} مورد · {{payable}} مستحق",
+    "columns": {
+      "name": "المورد",
+      "manufacturers": "الشركات المصنّعة",
+      "orders": "الطلبات",
+      "payable": "المستحق",
+      "ageing": "مدة الاستحقاق"
+    },
+    "orders_zero": "{{count}} طلبات",
+    "orders_one": "{{count}} طلب",
+    "orders_two": "{{count}} طلبان",
+    "orders_few": "{{count}} طلبات",
+    "orders_many": "{{count}} طلبًا",
+    "orders_other": "{{count}} طلب",
+    "noOrders": "لا طلبات",
+    "ageing_zero": "{{count}} أيام",
+    "ageing_one": "{{count}} يوم",
+    "ageing_two": "{{count}} يومان",
+    "ageing_few": "{{count}} أيام",
+    "ageing_many": "{{count}} يومًا",
+    "ageing_other": "{{count}} يوم",
+    "rowActions": {
+      "pay": "ادفع {{amount}}",
+      "newOrder": "أمر شراء جديد",
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "manufacturers": {
+    "records": "الشركات المصنّعة",
+    "empty": "لا توجد شركة مصنّعة مطابقة",
+    "count_zero": "{{count}} شركات",
+    "count_one": "{{count}} شركة",
+    "count_two": "{{count}} شركتان",
+    "count_few": "{{count}} شركات",
+    "count_many": "{{count}} شركة",
+    "count_other": "{{count}} شركة",
+    "columns": {
+      "name": "الشركة المصنّعة",
+      "medicines": "الأدوية",
+      "suppliers": "الموردون",
+      "mrs": "المندوبون"
+    },
+    "medicines_zero": "{{count}} أدوية",
+    "medicines_one": "{{count}} دواء",
+    "medicines_two": "{{count}} دواءان",
+    "medicines_few": "{{count}} أدوية",
+    "medicines_many": "{{count}} دواءً",
+    "medicines_other": "{{count}} دواء",
+    "noMedicines": "لا شيء بعد",
+    "rowActions": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "mrs": {
+    "records": "المندوبون",
+    "empty": "لا يوجد مندوب مطابق",
+    "count_zero": "{{count}} مندوبين",
+    "count_one": "{{count}} مندوب",
+    "count_two": "{{count}} مندوبان",
+    "count_few": "{{count}} مندوبين",
+    "count_many": "{{count}} مندوبًا",
+    "count_other": "{{count}} مندوب",
+    "columns": {
+      "name": "المندوب",
+      "represents": "يمثّل",
+      "lastVisit": "آخر زيارة",
+      "nextVisit": "الزيارة القادمة",
+      "samples": "العينات"
+    },
+    "rowActions": {
+      "logVisit": "تسجيل زيارة",
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "payments": {
+    "records": "مدفوعات الصيدلية",
+    "empty": "لا توجد مدفوعات للصيدلية بعد"
   }
 }

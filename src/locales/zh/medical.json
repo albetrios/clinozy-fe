@@ -1,5 +1,224 @@
 {
   "manifest": {
     "title": "药房"
+  },
+  "tabs": {
+    "label": "药房分区",
+    "sales": "销售",
+    "medicines": "药品",
+    "purchases": "采购",
+    "suppliers": "供应商",
+    "manufacturers": "生产商",
+    "mrs": "医药代表",
+    "payments": "付款",
+    "groups": {
+      "selling": "销售",
+      "stock": "库存",
+      "buying": "采购",
+      "money": "资金"
+    }
+  },
+  "search": {
+    "placeholder": "搜索名称、成分、供应商…",
+    "label": "搜索药房"
+  },
+  "create": {
+    "sale": "新建销售",
+    "medicine": "新建药品",
+    "purchaseOrder": "新建采购单",
+    "supplier": "新建供应商",
+    "manufacturer": "新建生产商",
+    "mr": "新建医药代表",
+    "menu": "新建其他内容"
+  },
+  "viewActions": {
+    "reorderLow": "补货低库存",
+    "sellAllDiscount": "全部八折出售",
+    "removeDiscount": "取消临期折扣",
+    "prescriptions": "待配处方",
+    "payAllReceived": "支付全部已收货 · {{amount}}"
+  },
+  "filters": {
+    "all": "全部",
+    "any": "任意",
+    "stock": "库存",
+    "lowStock": "库存不足",
+    "expiry": "最近到期",
+    "within30": "30 天内",
+    "within60": "60 天内",
+    "within90": "90 天内",
+    "status": "状态",
+    "stage": "阶段",
+    "manufacturer": "生产商",
+    "manufacturers": "生产商",
+    "suppliers": "供应商",
+    "mrs": "医药代表"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}%",
+    "addPhone": "添加电话",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "这里还没有内容。试试其他标签页或搜索。",
+    "store": "药房里还没有内容"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "toasts": {
+    "discountOn": "临期药品八折",
+    "discountOnOne": "已对 {{name}} 打八折",
+    "discountOff": "已取消折扣"
+  },
+  "sales": {
+    "records": "销售",
+    "count_other": "{{count}} 笔销售",
+    "columns": {
+      "seq": "销售",
+      "customer": "顾客",
+      "medicines": "药品",
+      "bill": "账单",
+      "margin": "利润率",
+      "status": "状态",
+      "when": "时间"
+    },
+    "patient": "患者",
+    "contact": "药房联系人",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "批次：{{batches}}",
+    "returned": "− {{amount}} 已退货",
+    "refunded": "已退款 {{amount}}",
+    "statuses": {
+      "paid": "已付款",
+      "unpaid": "未付款",
+      "returned": "已退货"
+    },
+    "rowActions": {
+      "collect": "收取 {{amount}}",
+      "return": "退回药品",
+      "print": "打印",
+      "void": "作废销售"
+    }
+  },
+  "medicines": {
+    "records": "药品",
+    "empty": "没有匹配的药品",
+    "columns": {
+      "seq": "ID",
+      "name": "药品",
+      "manufacturer": "生产商",
+      "stock": "库存",
+      "expiry": "最近到期",
+      "mrp": "建议零售价",
+      "bestRate": "最优进价",
+      "margin": "利润率"
+    },
+    "needsMrp": "需填写零售价和成分",
+    "stockLine": "库存 {{count}} · {{level}}",
+    "levels": {
+      "ok": "正常",
+      "low": "偏低",
+      "out": "缺货"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "无库存",
+    "discount": "临期 −{{pct}}%",
+    "rowActions": {
+      "returnExpiring": "将临期库存退回供应商",
+      "discount": "八折出售（临期）",
+      "removeDiscount": "取消临期折扣",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "purchases": {
+    "records": "采购单",
+    "count_other": "{{count}} 张订单",
+    "columns": {
+      "seq": "采购单",
+      "supplier": "供应商",
+      "items": "物品",
+      "date": "日期",
+      "total": "合计",
+      "stage": "阶段"
+    },
+    "items_other": "{{count}} 件物品",
+    "free": "赠品 {{count}}",
+    "partPaid": "已付 {{amount}}",
+    "stages": {
+      "ordered": "已下单",
+      "received": "已收货",
+      "paid": "已付款",
+      "cancelled": "已取消"
+    },
+    "rowActions": {
+      "receive": "收货",
+      "edit": "编辑",
+      "cancel": "取消订单",
+      "pay": "支付 {{amount}}",
+      "view": "查看"
+    }
+  },
+  "suppliers": {
+    "records": "供应商",
+    "empty": "没有匹配的供应商",
+    "count_other": "{{count}} 家供应商 · 应付 {{payable}}",
+    "columns": {
+      "name": "供应商",
+      "manufacturers": "生产商",
+      "orders": "订单",
+      "payable": "应付",
+      "ageing": "账龄"
+    },
+    "orders_other": "{{count}} 张订单",
+    "noOrders": "无订单",
+    "ageing_other": "{{count}} 天",
+    "rowActions": {
+      "pay": "支付 {{amount}}",
+      "newOrder": "新建采购单",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "manufacturers": {
+    "records": "生产商",
+    "empty": "没有匹配的生产商",
+    "count_other": "{{count}} 家生产商",
+    "columns": {
+      "name": "生产商",
+      "medicines": "药品",
+      "suppliers": "供应商",
+      "mrs": "医药代表"
+    },
+    "medicines_other": "{{count}} 种药品",
+    "noMedicines": "暂无",
+    "rowActions": {
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "mrs": {
+    "records": "医药代表",
+    "empty": "没有匹配的医药代表",
+    "count_other": "{{count}} 位医药代表",
+    "columns": {
+      "name": "医药代表",
+      "represents": "代理",
+      "lastVisit": "上次拜访",
+      "nextVisit": "下次拜访",
+      "samples": "样品"
+    },
+    "rowActions": {
+      "logVisit": "记录拜访",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "payments": {
+    "records": "药房付款",
+    "empty": "暂无药房付款"
   }
 }

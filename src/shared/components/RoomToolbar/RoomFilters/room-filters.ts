@@ -33,6 +33,16 @@ export type RoomFilterField =
    */
   | { readonly kind: 'people' };
 
+/**
+ * An "automatic" options section — the values a list happens to hold (a
+ * manufacturer, a category, a payment mode) — shows only while it has 2 to 10
+ * distinct values (`_patterns.md` Filters; KICKOFF §6.7–§6.9): one value
+ * filters nothing, and more than ten is a picker's job.
+ */
+export function showsAutomaticSection(distinctValues: number): boolean {
+  return distinctValues >= 2 && distinctValues <= 10;
+}
+
 /** A room's filters by URL key, in the order the popover shows them. */
 export type RoomFilterFields = Readonly<Record<string, RoomFilterField>>;
 

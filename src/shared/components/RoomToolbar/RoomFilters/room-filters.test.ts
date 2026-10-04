@@ -9,6 +9,7 @@ import {
   roomFilterSearchPatch,
   roomFilterValues,
   setRoomDateFilter,
+  showsAutomaticSection,
   toggleRoomFilterOption,
   withDateRangeEnd,
 } from './room-filters.ts';
@@ -153,5 +154,14 @@ describe('a people filter (the Leads "Team")', () => {
     expect(clearRoomFilter({ owner: [RIYA], gender: ['female'] }, 'owner')).toEqual({
       gender: ['female'],
     });
+  });
+});
+
+describe('showsAutomaticSection', () => {
+  it('shows a section of 2 to 10 distinct values only', () => {
+    expect(showsAutomaticSection(1)).toBe(false);
+    expect(showsAutomaticSection(2)).toBe(true);
+    expect(showsAutomaticSection(10)).toBe(true);
+    expect(showsAutomaticSection(11)).toBe(false);
   });
 });

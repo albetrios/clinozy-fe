@@ -1,5 +1,224 @@
 {
   "manifest": {
     "title": "薬局"
+  },
+  "tabs": {
+    "label": "薬局のセクション",
+    "sales": "販売",
+    "medicines": "医薬品",
+    "purchases": "仕入れ",
+    "suppliers": "仕入先",
+    "manufacturers": "メーカー",
+    "mrs": "MR",
+    "payments": "支払い",
+    "groups": {
+      "selling": "販売",
+      "stock": "在庫",
+      "buying": "仕入れ",
+      "money": "お金"
+    }
+  },
+  "search": {
+    "placeholder": "名前・成分・仕入先を検索…",
+    "label": "薬局を検索"
+  },
+  "create": {
+    "sale": "新しい販売",
+    "medicine": "新しい医薬品",
+    "purchaseOrder": "新しい発注",
+    "supplier": "新しい仕入先",
+    "manufacturer": "新しいメーカー",
+    "mr": "新しい MR",
+    "menu": "別のものを作成"
+  },
+  "viewActions": {
+    "reorderLow": "在庫少を再発注",
+    "sellAllDiscount": "すべて 20% オフで販売",
+    "removeDiscount": "期限間近の割引を解除",
+    "prescriptions": "未調剤の処方",
+    "payAllReceived": "受領分をすべて支払う · {{amount}}"
+  },
+  "filters": {
+    "all": "すべて",
+    "any": "指定なし",
+    "stock": "在庫",
+    "lowStock": "在庫少",
+    "expiry": "最短の使用期限",
+    "within30": "30 日以内",
+    "within60": "60 日以内",
+    "within90": "90 日以内",
+    "status": "ステータス",
+    "stage": "段階",
+    "manufacturer": "メーカー",
+    "manufacturers": "メーカー",
+    "suppliers": "仕入先",
+    "mrs": "MR"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}%",
+    "addPhone": "電話番号を追加",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "まだ何もありません。別のタブや検索をお試しください。",
+    "store": "薬局にはまだ何もありません"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "toasts": {
+    "discountOn": "期限間近の医薬品を 20% オフ",
+    "discountOnOne": "{{name}} に 20% オフを適用",
+    "discountOff": "割引を解除しました"
+  },
+  "sales": {
+    "records": "販売",
+    "count_other": "{{count}} 件の販売",
+    "columns": {
+      "seq": "販売",
+      "customer": "顧客",
+      "medicines": "医薬品",
+      "bill": "請求額",
+      "margin": "利益率",
+      "status": "ステータス",
+      "when": "日時"
+    },
+    "patient": "患者",
+    "contact": "薬局の連絡先",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "ロット: {{batches}}",
+    "returned": "− {{amount}} 返品",
+    "refunded": "{{amount}} 返金済み",
+    "statuses": {
+      "paid": "支払済み",
+      "unpaid": "未払い",
+      "returned": "返品済み"
+    },
+    "rowActions": {
+      "collect": "{{amount}} を回収",
+      "return": "医薬品を返品",
+      "print": "印刷",
+      "void": "販売を取り消す"
+    }
+  },
+  "medicines": {
+    "records": "医薬品",
+    "empty": "該当する医薬品はありません",
+    "columns": {
+      "seq": "ID",
+      "name": "医薬品",
+      "manufacturer": "メーカー",
+      "stock": "在庫",
+      "expiry": "最短の使用期限",
+      "mrp": "希望小売価格",
+      "bestRate": "最安仕入値",
+      "margin": "利益率"
+    },
+    "needsMrp": "希望小売価格と成分が未入力",
+    "stockLine": "在庫 {{count}} · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "少",
+      "out": "切れ"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "在庫なし",
+    "discount": "期限間近 −{{pct}}%",
+    "rowActions": {
+      "returnExpiring": "期限間近の在庫を仕入先へ返品",
+      "discount": "20% オフで販売（期限間近）",
+      "removeDiscount": "期限間近の割引を解除",
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "purchases": {
+    "records": "発注",
+    "count_other": "{{count}} 件の発注",
+    "columns": {
+      "seq": "発注",
+      "supplier": "仕入先",
+      "items": "品目",
+      "date": "日付",
+      "total": "合計",
+      "stage": "段階"
+    },
+    "items_other": "{{count}} 品目",
+    "free": "無償 {{count}}",
+    "partPaid": "{{amount}} 支払済み",
+    "stages": {
+      "ordered": "発注済み",
+      "received": "受領済み",
+      "paid": "支払済み",
+      "cancelled": "キャンセル済み"
+    },
+    "rowActions": {
+      "receive": "入荷を記録",
+      "edit": "編集",
+      "cancel": "発注をキャンセル",
+      "pay": "{{amount}} を支払う",
+      "view": "表示"
+    }
+  },
+  "suppliers": {
+    "records": "仕入先",
+    "empty": "該当する仕入先はありません",
+    "count_other": "{{count}} 社の仕入先 · 未払い {{payable}}",
+    "columns": {
+      "name": "仕入先",
+      "manufacturers": "メーカー",
+      "orders": "発注",
+      "payable": "未払い",
+      "ageing": "経過日数"
+    },
+    "orders_other": "発注 {{count}} 件",
+    "noOrders": "発注なし",
+    "ageing_other": "{{count}} 日",
+    "rowActions": {
+      "pay": "{{amount}} を支払う",
+      "newOrder": "新しい発注",
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "manufacturers": {
+    "records": "メーカー",
+    "empty": "該当するメーカーはありません",
+    "count_other": "{{count}} 社のメーカー",
+    "columns": {
+      "name": "メーカー",
+      "medicines": "医薬品",
+      "suppliers": "仕入先",
+      "mrs": "MR"
+    },
+    "medicines_other": "{{count}} 品目",
+    "noMedicines": "まだありません",
+    "rowActions": {
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "mrs": {
+    "records": "MR",
+    "empty": "該当する MR はいません",
+    "count_other": "MR {{count}} 名",
+    "columns": {
+      "name": "MR",
+      "represents": "担当",
+      "lastVisit": "前回の訪問",
+      "nextVisit": "次回の訪問",
+      "samples": "サンプル"
+    },
+    "rowActions": {
+      "logVisit": "訪問を記録",
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "payments": {
+    "records": "薬局の支払い",
+    "empty": "薬局の支払いはまだありません"
   }
 }

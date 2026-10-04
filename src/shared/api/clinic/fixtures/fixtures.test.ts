@@ -17,7 +17,6 @@ import {
   medicalPurchaseOrderSchema,
   medicalRepSchema,
   medicalSaleSchema,
-  medicineSchema,
   mrVisitSchema,
   offeringSuggestionSchema,
   organizationSchema,
@@ -42,6 +41,7 @@ import {
 } from '@/shared/api/clinic/clinic-time.ts';
 import { pendingCreditRecordSchema } from '@/shared/api/clinic/credits-contracts.ts';
 import { leadRecordSchema } from '@/shared/api/clinic/leads-contracts.ts';
+import { medicineRecordSchema } from '@/shared/api/clinic/medicines-contracts.ts';
 import {
   offeringRecordSchema,
   offerRecordSchema,
@@ -96,7 +96,8 @@ const SCHEMAS = {
   suppliers: supplierSchema,
   medicalReps: medicalRepSchema,
   mrVisits: mrVisitSchema,
-  medicines: medicineSchema,
+  // The contract's Medicine plus the plan's "Sold with" and near-expiry discount (Appendix F).
+  medicines: medicineRecordSchema,
   purchaseOrders: medicalPurchaseOrderSchema,
   medicalContacts: medicalContactSchema,
   medicalSales: medicalSaleSchema,

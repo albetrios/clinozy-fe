@@ -1,5 +1,244 @@
 {
   "manifest": {
     "title": "Farmacia"
+  },
+  "tabs": {
+    "label": "Secciones de farmacia",
+    "sales": "Ventas",
+    "medicines": "Medicamentos",
+    "purchases": "Compras",
+    "suppliers": "Proveedores",
+    "manufacturers": "Fabricantes",
+    "mrs": "Visitadores",
+    "payments": "Pagos",
+    "groups": {
+      "selling": "Venta",
+      "stock": "Existencias",
+      "buying": "Compra",
+      "money": "Dinero"
+    }
+  },
+  "search": {
+    "placeholder": "Buscar nombre, composición, proveedor…",
+    "label": "Buscar en farmacia"
+  },
+  "create": {
+    "sale": "Nueva venta",
+    "medicine": "Nuevo medicamento",
+    "purchaseOrder": "Nueva orden de compra",
+    "supplier": "Nuevo proveedor",
+    "manufacturer": "Nuevo fabricante",
+    "mr": "Nuevo visitador",
+    "menu": "Crear otra cosa"
+  },
+  "viewActions": {
+    "reorderLow": "Reponer existencias bajas",
+    "sellAllDiscount": "Vender todo con 20 % de descuento",
+    "removeDiscount": "Quitar el descuento por caducidad",
+    "prescriptions": "Recetas por surtir",
+    "payAllReceived": "Pagar todo lo recibido · {{amount}}"
+  },
+  "filters": {
+    "all": "Todos",
+    "any": "Cualquiera",
+    "stock": "Existencias",
+    "lowStock": "Existencias bajas",
+    "expiry": "Caducidad más próxima",
+    "within30": "En 30 días",
+    "within60": "En 60 días",
+    "within90": "En 90 días",
+    "status": "Estado",
+    "stage": "Etapa",
+    "manufacturer": "Fabricante",
+    "manufacturers": "Fabricantes",
+    "suppliers": "Proveedores",
+    "mrs": "Visitadores"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}} %",
+    "addPhone": "Añadir teléfono",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda.",
+    "store": "No hay nada en la farmacia"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} fila exportada como CSV",
+    "exported_many": "{{count}} filas exportadas como CSV",
+    "exported_other": "{{count}} filas exportadas como CSV"
+  },
+  "toasts": {
+    "discountOn": "20 % de descuento en medicamentos por caducar",
+    "discountOnOne": "20 % de descuento aplicado a {{name}}",
+    "discountOff": "Descuento quitado"
+  },
+  "sales": {
+    "records": "ventas",
+    "count_one": "{{count}} venta",
+    "count_many": "{{count}} ventas",
+    "count_other": "{{count}} ventas",
+    "columns": {
+      "seq": "Venta",
+      "customer": "Cliente",
+      "medicines": "Medicamentos",
+      "bill": "Importe",
+      "margin": "Margen",
+      "status": "Estado",
+      "when": "Cuándo"
+    },
+    "patient": "Paciente",
+    "contact": "Contacto de farmacia",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Lotes: {{batches}}",
+    "returned": "− {{amount}} devuelto",
+    "refunded": "{{amount}} reembolsado",
+    "statuses": {
+      "paid": "Pagado",
+      "unpaid": "Pendiente",
+      "returned": "Devuelto"
+    },
+    "rowActions": {
+      "collect": "Cobrar {{amount}}",
+      "return": "Devolver medicamentos",
+      "print": "Imprimir",
+      "void": "Anular venta"
+    }
+  },
+  "medicines": {
+    "records": "medicamentos",
+    "empty": "Ningún medicamento coincide",
+    "columns": {
+      "seq": "ID",
+      "name": "Medicamento",
+      "manufacturer": "Fabricante",
+      "stock": "Existencias",
+      "expiry": "Caducidad más próxima",
+      "mrp": "PVP",
+      "bestRate": "Mejor precio",
+      "margin": "Margen"
+    },
+    "needsMrp": "Falta PVP y composición",
+    "stockLine": "{{count}} en existencia · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Bajo",
+      "out": "Agotado"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "Sin existencias",
+    "discount": "−{{pct}} % por caducidad",
+    "rowActions": {
+      "returnExpiring": "Devolver existencias por caducar al proveedor",
+      "discount": "Vender con 20 % de descuento (por caducar)",
+      "removeDiscount": "Quitar el descuento por caducidad",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "purchases": {
+    "records": "órdenes de compra",
+    "count_one": "{{count}} orden",
+    "count_many": "{{count}} órdenes",
+    "count_other": "{{count}} órdenes",
+    "columns": {
+      "seq": "Orden",
+      "supplier": "Proveedor",
+      "items": "Artículos",
+      "date": "Fecha",
+      "total": "Total",
+      "stage": "Etapa"
+    },
+    "items_one": "{{count}} artículo",
+    "items_many": "{{count}} artículos",
+    "items_other": "{{count}} artículos",
+    "free": "{{count}} gratis",
+    "partPaid": "{{amount}} pagado",
+    "stages": {
+      "ordered": "Pedido",
+      "received": "Recibido",
+      "paid": "Pagado",
+      "cancelled": "Cancelado"
+    },
+    "rowActions": {
+      "receive": "Recibir mercancía",
+      "edit": "Editar",
+      "cancel": "Cancelar orden",
+      "pay": "Pagar {{amount}}",
+      "view": "Ver"
+    }
+  },
+  "suppliers": {
+    "records": "proveedores",
+    "empty": "Ningún proveedor coincide",
+    "count_one": "{{count}} proveedor · {{payable}} por pagar",
+    "count_many": "{{count}} proveedores · {{payable}} por pagar",
+    "count_other": "{{count}} proveedores · {{payable}} por pagar",
+    "columns": {
+      "name": "Proveedor",
+      "manufacturers": "Fabricantes",
+      "orders": "Órdenes",
+      "payable": "Por pagar",
+      "ageing": "Antigüedad"
+    },
+    "orders_one": "{{count}} orden",
+    "orders_many": "{{count}} órdenes",
+    "orders_other": "{{count}} órdenes",
+    "noOrders": "Sin órdenes",
+    "ageing_one": "{{count}} día",
+    "ageing_many": "{{count}} días",
+    "ageing_other": "{{count}} días",
+    "rowActions": {
+      "pay": "Pagar {{amount}}",
+      "newOrder": "Nueva orden de compra",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "manufacturers": {
+    "records": "fabricantes",
+    "empty": "Ningún fabricante coincide",
+    "count_one": "{{count}} fabricante",
+    "count_many": "{{count}} fabricantes",
+    "count_other": "{{count}} fabricantes",
+    "columns": {
+      "name": "Fabricante",
+      "medicines": "Medicamentos",
+      "suppliers": "Proveedores",
+      "mrs": "Visitadores"
+    },
+    "medicines_one": "{{count}} medicamento",
+    "medicines_many": "{{count}} medicamentos",
+    "medicines_other": "{{count}} medicamentos",
+    "noMedicines": "Aún ninguno",
+    "rowActions": {
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "mrs": {
+    "records": "Visitadores",
+    "empty": "Ningún visitador coincide",
+    "count_one": "{{count}} visitador",
+    "count_many": "{{count}} visitadores",
+    "count_other": "{{count}} visitadores",
+    "columns": {
+      "name": "Visitador",
+      "represents": "Representa",
+      "lastVisit": "Última visita",
+      "nextVisit": "Próxima visita",
+      "samples": "Muestras"
+    },
+    "rowActions": {
+      "logVisit": "Registrar visita",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "payments": {
+    "records": "pagos de farmacia",
+    "empty": "Aún no hay pagos de farmacia"
   }
 }

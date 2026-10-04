@@ -3,6 +3,7 @@ import type {
   InvoiceItem,
   Payment,
   PaymentMode,
+  PurchaseItem,
 } from '@/shared/api/clinic/clinic-schema.ts';
 
 /**
@@ -158,4 +159,14 @@ export function invoiceBalance(
   if (due === 0) status = 'paid';
   else if (paid > 0) status = 'partial';
   return { bill, paid, due, status };
+}
+
+/**
+ * A Medical purchase order's bill, in paise (`S:830`, "bill → Σ qty × rate"):
+ * free units cost nothing. What is due is this less the order's `paid`.
+ */
+export function purchaseOrderTotal(
+  items: readonly Pick<PurchaseItem, 'qty' | 'rate'>[],
+): number {
+  return items.reduce((sum, item) => sum + item.qty * item.rate, 0);
 }

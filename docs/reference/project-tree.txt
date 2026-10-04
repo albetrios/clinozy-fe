@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1443 src files · ~745 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1559 src files · ~789 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -894,17 +894,88 @@ clinozy-fe/
 │   │       │   │   ├── LeadsPage.tsx
 │   │       │   │   └── [2 test files]
 │   │       │   ├── medical/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── manufacturers/
+│   │       │   │   │   ├── $manufacturerId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── manufacturers.manifest.ts
+│   │       │   │   │   ├── MANUFACTURERS.OVERVIEW.md
+│   │       │   │   │   ├── manufacturers.params.ts
+│   │       │   │   │   ├── manufacturers.route.tsx
+│   │       │   │   │   ├── ManufacturersPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── medicines/
+│   │       │   │   │   ├── $medicineId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── medicines.manifest.ts
+│   │       │   │   │   ├── MEDICINES.OVERVIEW.md
+│   │       │   │   │   ├── medicines.params.ts
+│   │       │   │   │   ├── medicines.route.tsx
+│   │       │   │   │   ├── MedicinesPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── mrs/
+│   │       │   │   │   ├── $mrId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── mrs.manifest.ts
+│   │       │   │   │   ├── MRS.OVERVIEW.md
+│   │       │   │   │   ├── mrs.params.ts
+│   │       │   │   │   ├── mrs.route.tsx
+│   │       │   │   │   ├── MrsPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── payments/
+│   │       │   │   │   ├── MedicalPaymentsPage.tsx
+│   │       │   │   │   ├── payments.manifest.ts
+│   │       │   │   │   ├── PAYMENTS.OVERVIEW.md
+│   │       │   │   │   ├── payments.route.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── purchases/
+│   │       │   │   │   ├── $purchaseOrderId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── purchases.manifest.ts
+│   │       │   │   │   ├── PURCHASES.OVERVIEW.md
+│   │       │   │   │   ├── purchases.params.ts
+│   │       │   │   │   ├── purchases.route.tsx
+│   │       │   │   │   ├── PurchasesPage.tsx
+│   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── sales/
-│   │       │   │   │   ├── sales.constants.ts
+│   │       │   │   │   ├── $saleId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── sales.manifest.ts
 │   │       │   │   │   ├── SALES.OVERVIEW.md
+│   │       │   │   │   ├── sales.params.ts
 │   │       │   │   │   ├── sales.route.tsx
 │   │       │   │   │   ├── SalesPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── shared/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── medical-api.ts
+│   │       │   │   │   ├── medical-contracts.ts
+│   │       │   │   │   ├── medical-filters.ts
+│   │       │   │   │   ├── medical-params.ts
+│   │       │   │   │   ├── medical-tones.ts
+│   │       │   │   │   └── [2 test files]
+│   │       │   │   ├── suppliers/
+│   │       │   │   │   ├── $supplierId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── suppliers.manifest.ts
+│   │       │   │   │   ├── SUPPLIERS.OVERVIEW.md
+│   │       │   │   │   ├── suppliers.params.ts
+│   │       │   │   │   ├── suppliers.route.tsx
+│   │       │   │   │   ├── SuppliersPage.tsx
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── medical.constants.ts
 │   │       │   │   ├── medical.manifest.ts
 │   │       │   │   ├── MEDICAL.OVERVIEW.md
 │   │       │   │   ├── medical.route.tsx
+│   │       │   │   ├── medical.search.ts
 │   │       │   │   ├── MedicalLayout.tsx
 │   │       │   │   └── [1 test file]
 │   │       │   ├── offerings/
@@ -1201,6 +1272,9 @@ clinozy-fe/
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-hold.ts
+│   │   │   │   ├── medicine-stock.ts
+│   │   │   │   ├── medicines-api.ts
+│   │   │   │   ├── medicines-contracts.ts
 │   │   │   │   ├── messages-api.ts
 │   │   │   │   ├── messages-contracts.ts
 │   │   │   │   ├── offerings-api.ts
@@ -1219,7 +1293,7 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [35 test files]
+│   │   │   │   └── [37 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1347,6 +1421,10 @@ clinozy-fe/
 │   │   │   │   ├── StatusEdge/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── StatusEdge.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── StockBarCell/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── StockBarCell.tsx
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── TonePill/
 │   │   │   │   │   ├── index.ts
@@ -1823,6 +1901,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RetryError.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── RoomTableEmpty/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── RoomTableEmpty.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── RoomToolbar/
 │   │   │   │   ├── RoomFilters/
 │   │   │   │   │   ├── index.ts
@@ -2105,6 +2187,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicAccess.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useClinicClock/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useClinicClock.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useClinicRoles/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicRoles.ts
@@ -2214,6 +2300,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useMeContext.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useMedicines/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useMedicines.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useMembers/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useMembers.ts
@@ -2289,6 +2379,14 @@ clinozy-fe/
 │   │   │   ├── useRoles/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useRoles.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useRoomList/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useRoomList.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useRoomTable/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useRoomTable.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useSavedViews/
 │   │   │   │   ├── index.ts

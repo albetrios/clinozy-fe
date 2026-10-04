@@ -1,5 +1,234 @@
 {
   "manifest": {
     "title": "Apotheke"
+  },
+  "tabs": {
+    "label": "Apothekenbereiche",
+    "sales": "Verkäufe",
+    "medicines": "Arzneimittel",
+    "purchases": "Einkäufe",
+    "suppliers": "Lieferanten",
+    "manufacturers": "Hersteller",
+    "mrs": "Pharmareferenten",
+    "payments": "Zahlungen",
+    "groups": {
+      "selling": "Verkauf",
+      "stock": "Bestand",
+      "buying": "Einkauf",
+      "money": "Geld"
+    }
+  },
+  "search": {
+    "placeholder": "Name, Wirkstoff, Lieferant suchen…",
+    "label": "Apotheke durchsuchen"
+  },
+  "create": {
+    "sale": "Neuer Verkauf",
+    "medicine": "Neues Arzneimittel",
+    "purchaseOrder": "Neue Bestellung",
+    "supplier": "Neuer Lieferant",
+    "manufacturer": "Neuer Hersteller",
+    "mr": "Neuer Pharmareferent",
+    "menu": "Etwas anderes erstellen"
+  },
+  "viewActions": {
+    "reorderLow": "Niedrigen Bestand nachbestellen",
+    "sellAllDiscount": "Alle mit 20 % Rabatt verkaufen",
+    "removeDiscount": "Ablaufrabatt entfernen",
+    "prescriptions": "Offene Rezepte",
+    "payAllReceived": "Alle erhaltenen zahlen · {{amount}}"
+  },
+  "filters": {
+    "all": "Alle",
+    "any": "Beliebig",
+    "stock": "Bestand",
+    "lowStock": "Niedriger Bestand",
+    "expiry": "Nächster Ablauf",
+    "within30": "Innerhalb von 30 Tagen",
+    "within60": "Innerhalb von 60 Tagen",
+    "within90": "Innerhalb von 90 Tagen",
+    "status": "Status",
+    "stage": "Phase",
+    "manufacturer": "Hersteller",
+    "manufacturers": "Hersteller",
+    "suppliers": "Lieferanten",
+    "mrs": "Pharmareferenten"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}} %",
+    "addPhone": "Telefon hinzufügen",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "store": "Nichts im Apothekenlager"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "toasts": {
+    "discountOn": "20 % Rabatt auf ablaufende Arzneimittel",
+    "discountOnOne": "20 % Rabatt auf {{name}}",
+    "discountOff": "Rabatt entfernt"
+  },
+  "sales": {
+    "records": "Verkäufe",
+    "count_one": "{{count}} Verkauf",
+    "count_other": "{{count}} Verkäufe",
+    "columns": {
+      "seq": "Verkauf",
+      "customer": "Kunde",
+      "medicines": "Arzneimittel",
+      "bill": "Rechnung",
+      "margin": "Marge",
+      "status": "Status",
+      "when": "Wann"
+    },
+    "patient": "Patient",
+    "contact": "Apothekenkontakt",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Chargen: {{batches}}",
+    "returned": "− {{amount}} zurückgegeben",
+    "refunded": "{{amount}} erstattet",
+    "statuses": {
+      "paid": "Bezahlt",
+      "unpaid": "Offen",
+      "returned": "Zurückgegeben"
+    },
+    "rowActions": {
+      "collect": "{{amount}} kassieren",
+      "return": "Arzneimittel zurücknehmen",
+      "print": "Drucken",
+      "void": "Verkauf stornieren"
+    }
+  },
+  "medicines": {
+    "records": "Arzneimittel",
+    "empty": "Kein passendes Arzneimittel",
+    "columns": {
+      "seq": "ID",
+      "name": "Arzneimittel",
+      "manufacturer": "Hersteller",
+      "stock": "Bestand",
+      "expiry": "Nächster Ablauf",
+      "mrp": "UVP",
+      "bestRate": "Bester Preis",
+      "margin": "Marge"
+    },
+    "needsMrp": "UVP und Wirkstoff fehlen",
+    "stockLine": "{{count}} auf Lager · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Niedrig",
+      "out": "Leer"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "Kein Bestand",
+    "discount": "−{{pct}} % vor Ablauf",
+    "rowActions": {
+      "returnExpiring": "Ablaufenden Bestand an Lieferanten zurückgeben",
+      "discount": "Mit 20 % Rabatt verkaufen (bald ablaufend)",
+      "removeDiscount": "Ablaufrabatt entfernen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "purchases": {
+    "records": "Bestellungen",
+    "count_one": "{{count}} Bestellung",
+    "count_other": "{{count}} Bestellungen",
+    "columns": {
+      "seq": "Bestellung",
+      "supplier": "Lieferant",
+      "items": "Positionen",
+      "date": "Datum",
+      "total": "Summe",
+      "stage": "Phase"
+    },
+    "items_one": "{{count}} Position",
+    "items_other": "{{count}} Positionen",
+    "free": "{{count}} gratis",
+    "partPaid": "{{amount}} bezahlt",
+    "stages": {
+      "ordered": "Bestellt",
+      "received": "Erhalten",
+      "paid": "Bezahlt",
+      "cancelled": "Storniert"
+    },
+    "rowActions": {
+      "receive": "Ware annehmen",
+      "edit": "Bearbeiten",
+      "cancel": "Bestellung stornieren",
+      "pay": "{{amount}} zahlen",
+      "view": "Ansehen"
+    }
+  },
+  "suppliers": {
+    "records": "Lieferanten",
+    "empty": "Kein passender Lieferant",
+    "count_one": "{{count}} Lieferant · {{payable}} offen",
+    "count_other": "{{count}} Lieferanten · {{payable}} offen",
+    "columns": {
+      "name": "Lieferant",
+      "manufacturers": "Hersteller",
+      "orders": "Bestellungen",
+      "payable": "Offen",
+      "ageing": "Alter"
+    },
+    "orders_one": "{{count}} Bestellung",
+    "orders_other": "{{count}} Bestellungen",
+    "noOrders": "Keine Bestellungen",
+    "ageing_one": "{{count}} Tag",
+    "ageing_other": "{{count}} Tage",
+    "rowActions": {
+      "pay": "{{amount}} zahlen",
+      "newOrder": "Neue Bestellung",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "manufacturers": {
+    "records": "Hersteller",
+    "empty": "Kein passender Hersteller",
+    "count_one": "{{count}} Hersteller",
+    "count_other": "{{count}} Hersteller",
+    "columns": {
+      "name": "Hersteller",
+      "medicines": "Arzneimittel",
+      "suppliers": "Lieferanten",
+      "mrs": "Pharmareferenten"
+    },
+    "medicines_one": "{{count}} Arzneimittel",
+    "medicines_other": "{{count}} Arzneimittel",
+    "noMedicines": "Noch keine",
+    "rowActions": {
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "mrs": {
+    "records": "Pharmareferenten",
+    "empty": "Kein passender Pharmareferent",
+    "count_one": "{{count}} Pharmareferent",
+    "count_other": "{{count}} Pharmareferenten",
+    "columns": {
+      "name": "Pharmareferent",
+      "represents": "Vertritt",
+      "lastVisit": "Letzter Besuch",
+      "nextVisit": "Nächster Besuch",
+      "samples": "Muster"
+    },
+    "rowActions": {
+      "logVisit": "Besuch erfassen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "payments": {
+    "records": "Apothekenzahlungen",
+    "empty": "Noch keine Apothekenzahlungen"
   }
 }

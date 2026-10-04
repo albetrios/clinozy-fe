@@ -23,6 +23,7 @@ export {
   RoomFiltersTrigger,
   type RoomFiltersTriggerProps,
   type RoomFilterValues,
+  showsAutomaticSection,
   useRoomFilters,
 } from './RoomFilters/index.ts';
 export {

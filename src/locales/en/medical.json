@@ -1,5 +1,234 @@
 {
   "manifest": {
     "title": "Medical"
+  },
+  "tabs": {
+    "label": "Medical sections",
+    "sales": "Sales",
+    "medicines": "Medicines",
+    "purchases": "Purchases",
+    "suppliers": "Suppliers",
+    "manufacturers": "Manufacturers",
+    "mrs": "MRs",
+    "payments": "Payments",
+    "groups": {
+      "selling": "Selling",
+      "stock": "Stock",
+      "buying": "Buying",
+      "money": "Money"
+    }
+  },
+  "search": {
+    "placeholder": "Search name, composition, supplier…",
+    "label": "Search medical"
+  },
+  "create": {
+    "sale": "New sale",
+    "medicine": "New medicine",
+    "purchaseOrder": "New purchase order",
+    "supplier": "New supplier",
+    "manufacturer": "New manufacturer",
+    "mr": "New MR",
+    "menu": "Create something else"
+  },
+  "viewActions": {
+    "reorderLow": "Reorder low stock",
+    "sellAllDiscount": "Sell all at 20% off",
+    "removeDiscount": "Remove near-expiry discount",
+    "prescriptions": "Prescriptions to fill",
+    "payAllReceived": "Pay all received · {{amount}}"
+  },
+  "filters": {
+    "all": "All",
+    "any": "Any",
+    "stock": "Stock",
+    "lowStock": "Low stock",
+    "expiry": "Nearest expiry",
+    "within30": "Within 30 days",
+    "within60": "Within 60 days",
+    "within90": "Within 90 days",
+    "status": "Status",
+    "stage": "Stage",
+    "manufacturer": "Manufacturer",
+    "manufacturers": "Manufacturers",
+    "suppliers": "Suppliers",
+    "mrs": "MRs"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}%",
+    "addPhone": "Add phone",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Nothing here yet. Try another tab or search.",
+    "store": "Nothing in the medicine store"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "toasts": {
+    "discountOn": "20% off on expiring medicines",
+    "discountOnOne": "20% off applied to {{name}}",
+    "discountOff": "Discount removed"
+  },
+  "sales": {
+    "records": "sales",
+    "count_one": "{{count}} sale",
+    "count_other": "{{count}} sales",
+    "columns": {
+      "seq": "Sale",
+      "customer": "Customer",
+      "medicines": "Medicines",
+      "bill": "Bill",
+      "margin": "Margin",
+      "status": "Status",
+      "when": "When"
+    },
+    "patient": "Patient",
+    "contact": "Medical contact",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Batches: {{batches}}",
+    "returned": "− {{amount}} returned",
+    "refunded": "{{amount}} refunded",
+    "statuses": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "returned": "Returned"
+    },
+    "rowActions": {
+      "collect": "Collect {{amount}}",
+      "return": "Return medicines",
+      "print": "Print",
+      "void": "Void sale"
+    }
+  },
+  "medicines": {
+    "records": "medicines",
+    "empty": "No medicine matches",
+    "columns": {
+      "seq": "ID",
+      "name": "Medicine",
+      "manufacturer": "Manufacturer",
+      "stock": "Stock",
+      "expiry": "Nearest expiry",
+      "mrp": "MRP",
+      "bestRate": "Best rate",
+      "margin": "Margin"
+    },
+    "needsMrp": "Needs MRP and composition",
+    "stockLine": "{{count}} in stock · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Low",
+      "out": "Out"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "No stock",
+    "discount": "−{{pct}}% near expiry",
+    "rowActions": {
+      "returnExpiring": "Return expiring stock to supplier",
+      "discount": "Sell at 20% off (near expiry)",
+      "removeDiscount": "Remove near-expiry discount",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "purchases": {
+    "records": "purchase orders",
+    "count_one": "{{count}} order",
+    "count_other": "{{count}} orders",
+    "columns": {
+      "seq": "PO",
+      "supplier": "Supplier",
+      "items": "Items",
+      "date": "Date",
+      "total": "Total",
+      "stage": "Stage"
+    },
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "free": "{{count}} free",
+    "partPaid": "{{amount}} paid",
+    "stages": {
+      "ordered": "Ordered",
+      "received": "Received",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "rowActions": {
+      "receive": "Receive goods",
+      "edit": "Edit",
+      "cancel": "Cancel order",
+      "pay": "Pay {{amount}}",
+      "view": "View"
+    }
+  },
+  "suppliers": {
+    "records": "suppliers",
+    "empty": "No supplier matches",
+    "count_one": "{{count}} supplier · {{payable}} payable",
+    "count_other": "{{count}} suppliers · {{payable}} payable",
+    "columns": {
+      "name": "Supplier",
+      "manufacturers": "Manufacturers",
+      "orders": "Orders",
+      "payable": "Payable",
+      "ageing": "Ageing"
+    },
+    "orders_one": "{{count}} order",
+    "orders_other": "{{count}} orders",
+    "noOrders": "No orders",
+    "ageing_one": "{{count}} day",
+    "ageing_other": "{{count}} days",
+    "rowActions": {
+      "pay": "Pay {{amount}}",
+      "newOrder": "New purchase order",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "manufacturers": {
+    "records": "manufacturers",
+    "empty": "No manufacturer matches",
+    "count_one": "{{count}} manufacturer",
+    "count_other": "{{count}} manufacturers",
+    "columns": {
+      "name": "Manufacturer",
+      "medicines": "Medicines",
+      "suppliers": "Suppliers",
+      "mrs": "MRs"
+    },
+    "medicines_one": "{{count}} medicine",
+    "medicines_other": "{{count}} medicines",
+    "noMedicines": "None yet",
+    "rowActions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "mrs": {
+    "records": "MRs",
+    "empty": "No MR matches",
+    "count_one": "{{count}} MR",
+    "count_other": "{{count}} MRs",
+    "columns": {
+      "name": "MR",
+      "represents": "Represents",
+      "lastVisit": "Last visit",
+      "nextVisit": "Next visit",
+      "samples": "Samples"
+    },
+    "rowActions": {
+      "logVisit": "Log visit",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "payments": {
+    "records": "Medical payments",
+    "empty": "No Medical payments yet"
   }
 }

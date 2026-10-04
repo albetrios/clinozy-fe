@@ -21,6 +21,12 @@ const measured = vi.hoisted(() => ({ width: 0 }));
 vi.mock('@/shared/hooks/useElementWidth/index.ts', () => ({
   useElementWidth: () => [() => undefined, measured.width],
 }));
+const viewport = vi.hoisted(() => ({
+  tier: 'desktop' as 'phone' | 'tablet' | 'desktop',
+}));
+vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
+  useViewportTier: () => viewport.tier,
+}));
 
 /** Medical's tabs (H:4155); without a canvas each label measures 7.5px a character. */
 const MEDICAL_TABS: RoomLinkTab[] = [
@@ -88,6 +94,7 @@ const medical = (overflow?: 'scroll' | 'fold') => (
 
 beforeEach(() => {
   measured.width = 0;
+  viewport.tier = 'desktop';
 });
 
 describe('RoomTabs', () => {
@@ -267,6 +274,19 @@ describe('RoomTabs', () => {
       'aria-current',
       'page',
     );
+  });
+
+  it('keeps the current tab alone beside "More" on a phone (`medical.md:17`)', async () => {
+    measured.width = 351;
+    viewport.tier = 'phone';
+    renderRoom('/medical/purchases', medical('fold'));
+    const nav = await screen.findByRole('navigation', { name: 'Medical sections' });
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Purchases']);
+    expect(within(nav).getByRole('button', { name: 'More sections' })).toBeVisible();
   });
 
   it('shows every tab when they fit, and never folds a scrolling row', async () => {

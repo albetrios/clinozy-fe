@@ -1,5 +1,244 @@
 {
   "manifest": {
     "title": "Farmácia"
+  },
+  "tabs": {
+    "label": "Seções da farmácia",
+    "sales": "Vendas",
+    "medicines": "Medicamentos",
+    "purchases": "Compras",
+    "suppliers": "Fornecedores",
+    "manufacturers": "Fabricantes",
+    "mrs": "Representantes",
+    "payments": "Pagamentos",
+    "groups": {
+      "selling": "Venda",
+      "stock": "Estoque",
+      "buying": "Compra",
+      "money": "Dinheiro"
+    }
+  },
+  "search": {
+    "placeholder": "Buscar nome, composição, fornecedor…",
+    "label": "Buscar na farmácia"
+  },
+  "create": {
+    "sale": "Nova venda",
+    "medicine": "Novo medicamento",
+    "purchaseOrder": "Novo pedido de compra",
+    "supplier": "Novo fornecedor",
+    "manufacturer": "Novo fabricante",
+    "mr": "Novo representante",
+    "menu": "Criar outra coisa"
+  },
+  "viewActions": {
+    "reorderLow": "Repor estoque baixo",
+    "sellAllDiscount": "Vender tudo com 20% de desconto",
+    "removeDiscount": "Remover desconto por validade",
+    "prescriptions": "Receitas a atender",
+    "payAllReceived": "Pagar todo o recebido · {{amount}}"
+  },
+  "filters": {
+    "all": "Todos",
+    "any": "Qualquer",
+    "stock": "Estoque",
+    "lowStock": "Estoque baixo",
+    "expiry": "Validade mais próxima",
+    "within30": "Em 30 dias",
+    "within60": "Em 60 dias",
+    "within90": "Em 90 dias",
+    "status": "Status",
+    "stage": "Etapa",
+    "manufacturer": "Fabricante",
+    "manufacturers": "Fabricantes",
+    "suppliers": "Fornecedores",
+    "mrs": "Representantes"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}%",
+    "addPhone": "Adicionar telefone",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Ainda não há nada aqui. Tente outra aba ou busca.",
+    "store": "Nada na farmácia"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "toasts": {
+    "discountOn": "20% de desconto em medicamentos perto do vencimento",
+    "discountOnOne": "20% de desconto aplicado a {{name}}",
+    "discountOff": "Desconto removido"
+  },
+  "sales": {
+    "records": "vendas",
+    "count_one": "{{count}} venda",
+    "count_many": "{{count}} vendas",
+    "count_other": "{{count}} vendas",
+    "columns": {
+      "seq": "Venda",
+      "customer": "Cliente",
+      "medicines": "Medicamentos",
+      "bill": "Valor",
+      "margin": "Margem",
+      "status": "Status",
+      "when": "Quando"
+    },
+    "patient": "Paciente",
+    "contact": "Contato da farmácia",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Lotes: {{batches}}",
+    "returned": "− {{amount}} devolvido",
+    "refunded": "{{amount}} reembolsado",
+    "statuses": {
+      "paid": "Pago",
+      "unpaid": "Em aberto",
+      "returned": "Devolvido"
+    },
+    "rowActions": {
+      "collect": "Receber {{amount}}",
+      "return": "Devolver medicamentos",
+      "print": "Imprimir",
+      "void": "Anular venda"
+    }
+  },
+  "medicines": {
+    "records": "medicamentos",
+    "empty": "Nenhum medicamento corresponde",
+    "columns": {
+      "seq": "ID",
+      "name": "Medicamento",
+      "manufacturer": "Fabricante",
+      "stock": "Estoque",
+      "expiry": "Validade mais próxima",
+      "mrp": "PMC",
+      "bestRate": "Melhor preço",
+      "margin": "Margem"
+    },
+    "needsMrp": "Faltam PMC e composição",
+    "stockLine": "{{count}} em estoque · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Baixo",
+      "out": "Esgotado"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "Sem estoque",
+    "discount": "−{{pct}}% por validade",
+    "rowActions": {
+      "returnExpiring": "Devolver ao fornecedor o estoque perto do vencimento",
+      "discount": "Vender com 20% de desconto (perto do vencimento)",
+      "removeDiscount": "Remover desconto por validade",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "purchases": {
+    "records": "pedidos de compra",
+    "count_one": "{{count}} pedido",
+    "count_many": "{{count}} pedidos",
+    "count_other": "{{count}} pedidos",
+    "columns": {
+      "seq": "Pedido",
+      "supplier": "Fornecedor",
+      "items": "Itens",
+      "date": "Data",
+      "total": "Total",
+      "stage": "Etapa"
+    },
+    "items_one": "{{count}} item",
+    "items_many": "{{count}} itens",
+    "items_other": "{{count}} itens",
+    "free": "{{count}} grátis",
+    "partPaid": "{{amount}} pago",
+    "stages": {
+      "ordered": "Pedido",
+      "received": "Recebido",
+      "paid": "Pago",
+      "cancelled": "Cancelado"
+    },
+    "rowActions": {
+      "receive": "Receber mercadoria",
+      "edit": "Editar",
+      "cancel": "Cancelar pedido",
+      "pay": "Pagar {{amount}}",
+      "view": "Ver"
+    }
+  },
+  "suppliers": {
+    "records": "fornecedores",
+    "empty": "Nenhum fornecedor corresponde",
+    "count_one": "{{count}} fornecedor · {{payable}} a pagar",
+    "count_many": "{{count}} fornecedores · {{payable}} a pagar",
+    "count_other": "{{count}} fornecedores · {{payable}} a pagar",
+    "columns": {
+      "name": "Fornecedor",
+      "manufacturers": "Fabricantes",
+      "orders": "Pedidos",
+      "payable": "A pagar",
+      "ageing": "Atraso"
+    },
+    "orders_one": "{{count}} pedido",
+    "orders_many": "{{count}} pedidos",
+    "orders_other": "{{count}} pedidos",
+    "noOrders": "Sem pedidos",
+    "ageing_one": "{{count}} dia",
+    "ageing_many": "{{count}} dias",
+    "ageing_other": "{{count}} dias",
+    "rowActions": {
+      "pay": "Pagar {{amount}}",
+      "newOrder": "Novo pedido de compra",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "manufacturers": {
+    "records": "fabricantes",
+    "empty": "Nenhum fabricante corresponde",
+    "count_one": "{{count}} fabricante",
+    "count_many": "{{count}} fabricantes",
+    "count_other": "{{count}} fabricantes",
+    "columns": {
+      "name": "Fabricante",
+      "medicines": "Medicamentos",
+      "suppliers": "Fornecedores",
+      "mrs": "Representantes"
+    },
+    "medicines_one": "{{count}} medicamento",
+    "medicines_many": "{{count}} medicamentos",
+    "medicines_other": "{{count}} medicamentos",
+    "noMedicines": "Nenhum ainda",
+    "rowActions": {
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "mrs": {
+    "records": "Representantes",
+    "empty": "Nenhum representante corresponde",
+    "count_one": "{{count}} representante",
+    "count_many": "{{count}} representantes",
+    "count_other": "{{count}} representantes",
+    "columns": {
+      "name": "Representante",
+      "represents": "Representa",
+      "lastVisit": "Última visita",
+      "nextVisit": "Próxima visita",
+      "samples": "Amostras"
+    },
+    "rowActions": {
+      "logVisit": "Registrar visita",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "payments": {
+    "records": "pagamentos da farmácia",
+    "empty": "Ainda não há pagamentos da farmácia"
   }
 }

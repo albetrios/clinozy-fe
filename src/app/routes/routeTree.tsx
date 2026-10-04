@@ -64,8 +64,34 @@ import {
   validateLeadCreateSearch,
   validateLeadsSearch,
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { manifest as manufacturerEditManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/edit/edit.manifest.ts';
+import { manifest as manufacturerCreateManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/create/create.manifest.ts';
+import { manifest as medicalManufacturersManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.manifest.ts';
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
+import {
+  validateMedicalCreateSearch,
+  validateMedicalSearch,
+} from '@/pages/organization/$organizationSlug/medical/medical.search.ts';
+import { manifest as medicineEditManifest } from '@/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/edit.manifest.ts';
+import { manifest as medicineCreateManifest } from '@/pages/organization/$organizationSlug/medical/medicines/create/create.manifest.ts';
+import { manifest as medicalMedicinesManifest } from '@/pages/organization/$organizationSlug/medical/medicines/medicines.manifest.ts';
+import { manifest as mrEditManifest } from '@/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/edit.manifest.ts';
+import { manifest as mrVisitCreateManifest } from '@/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/create.manifest.ts';
+import { manifest as mrCreateManifest } from '@/pages/organization/$organizationSlug/medical/mrs/create/create.manifest.ts';
+import { manifest as medicalMrsManifest } from '@/pages/organization/$organizationSlug/medical/mrs/mrs.manifest.ts';
+import { manifest as medicalPaymentsManifest } from '@/pages/organization/$organizationSlug/medical/payments/payments.manifest.ts';
+import { manifest as purchaseOrderEditManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/edit/edit.manifest.ts';
+import { manifest as purchaseOrderManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/purchase-order-id.manifest.ts';
+import { manifest as purchaseOrderReceiveManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/receive/receive.manifest.ts';
+import { manifest as purchaseOrderCreateManifest } from '@/pages/organization/$organizationSlug/medical/purchases/create/create.manifest.ts';
+import { manifest as medicalPurchasesManifest } from '@/pages/organization/$organizationSlug/medical/purchases/purchases.manifest.ts';
+import { manifest as saleReturnManifest } from '@/pages/organization/$organizationSlug/medical/sales/$saleId/return/return.manifest.ts';
+import { manifest as saleManifest } from '@/pages/organization/$organizationSlug/medical/sales/$saleId/sale-id.manifest.ts';
+import { manifest as saleCreateManifest } from '@/pages/organization/$organizationSlug/medical/sales/create/create.manifest.ts';
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
+import { manifest as supplierEditManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/$supplierId/edit/edit.manifest.ts';
+import { manifest as supplierCreateManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/create/create.manifest.ts';
+import { manifest as medicalSuppliersManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/suppliers.manifest.ts';
 import { manifest as offeringEditManifest } from '@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.manifest.ts';
 import { manifest as offeringCreateManifest } from '@/pages/organization/$organizationSlug/offerings/create/create.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
@@ -447,6 +473,135 @@ const MedicalSalesPage = lazyRouteComponent(
     [I18N_NAMESPACES.medical],
     () => import('@/pages/organization/$organizationSlug/medical/sales/sales.route.tsx'),
   ),
+  'Component',
+);
+const MedicalMedicinesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () =>
+      import('@/pages/organization/$organizationSlug/medical/medicines/medicines.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalPurchasesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () =>
+      import('@/pages/organization/$organizationSlug/medical/purchases/purchases.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalSuppliersPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () =>
+      import('@/pages/organization/$organizationSlug/medical/suppliers/suppliers.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalManufacturersPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () =>
+      import('@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalMrsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () => import('@/pages/organization/$organizationSlug/medical/mrs/mrs.route.tsx'),
+  ),
+  'Component',
+);
+const MedicalPaymentsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.medical],
+    () =>
+      import('@/pages/organization/$organizationSlug/medical/payments/payments.route.tsx'),
+  ),
+  'Component',
+);
+// The Medical dialog routes render nothing of their own (each tab page opens
+// the drawer), so they need no namespace beyond the room's.
+const SaleCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/sales/create/create.route.tsx'),
+  'Component',
+);
+const SaleRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/sales/$saleId/sale-id.route.tsx'),
+  'Component',
+);
+const SaleReturnRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/sales/$saleId/return/return.route.tsx'),
+  'Component',
+);
+const MedicineCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/medicines/create/create.route.tsx'),
+  'Component',
+);
+const MedicineEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/edit.route.tsx'),
+  'Component',
+);
+const PurchaseOrderCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/purchases/create/create.route.tsx'),
+  'Component',
+);
+const PurchaseOrderRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/purchase-order-id.route.tsx'),
+  'Component',
+);
+const PurchaseOrderEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/edit/edit.route.tsx'),
+  'Component',
+);
+const PurchaseOrderReceiveRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/receive/receive.route.tsx'),
+  'Component',
+);
+const SupplierCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/suppliers/create/create.route.tsx'),
+  'Component',
+);
+const SupplierEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/suppliers/$supplierId/edit/edit.route.tsx'),
+  'Component',
+);
+const ManufacturerCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/manufacturers/create/create.route.tsx'),
+  'Component',
+);
+const ManufacturerEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/edit/edit.route.tsx'),
+  'Component',
+);
+const MrCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/mrs/create/create.route.tsx'),
+  'Component',
+);
+const MrEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/edit.route.tsx'),
+  'Component',
+);
+const MrVisitCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/create.route.tsx'),
   'Component',
 );
 const StockLayout = lazyRouteComponent(
@@ -1422,16 +1577,243 @@ const organizationMedicalIndexRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+/**
+ * A clinic leaf's gate (KICKOFF §4): the manifest's gateway (session → module
+ * → permission), then the org status guard — one function for the Medical and
+ * Clinic stock tabs and dialog routes.
+ */
+function roomLeafGate(manifest: PageManifest) {
+  return async ({
+    params,
+    preload,
+    location,
+  }: {
+    params: Record<string, string>;
+    preload: boolean;
+    location: Parameters<typeof toGateContext>[0];
+  }) => {
+    if (preload) return;
+    await gatewayFromManifest(manifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  };
+}
+
+// The Medical tabs (D24, S:49–71): each a page; its dialogs below.
 const organizationMedicalSalesRoute = createRoute({
   getParentRoute: () => organizationMedicalRoute,
   path: 'sales',
   head: manifestHead(medicalSalesManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(medicalSalesManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalSalesManifest),
   component: MedicalSalesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalMedicinesRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'medicines',
+  head: manifestHead(medicalMedicinesManifest),
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalMedicinesManifest),
+  component: MedicalMedicinesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalPurchasesRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'purchases',
+  head: manifestHead(medicalPurchasesManifest),
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalPurchasesManifest),
+  component: MedicalPurchasesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalSuppliersRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'suppliers',
+  head: manifestHead(medicalSuppliersManifest),
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalSuppliersManifest),
+  component: MedicalSuppliersPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalManufacturersRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'manufacturers',
+  head: manifestHead(medicalManufacturersManifest),
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalManufacturersManifest),
+  component: MedicalManufacturersPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalMrsRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'mrs',
+  head: manifestHead(medicalMrsManifest),
+  validateSearch: validateMedicalSearch,
+  beforeLoad: roomLeafGate(medicalMrsManifest),
+  component: MedicalMrsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicalPaymentsRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'payments',
+  head: manifestHead(medicalPaymentsManifest),
+  beforeLoad: roomLeafGate(medicalPaymentsManifest),
+  component: MedicalPaymentsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialogs over the Medical tabs (D24, S:50–70): each renders
+// nothing; the tab page reads the URL and opens the drawer over itself.
+const organizationSaleCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalSalesRoute,
+  path: 'create',
+  head: manifestHead(saleCreateManifest),
+  validateSearch: validateMedicalCreateSearch,
+  beforeLoad: roomLeafGate(saleCreateManifest),
+  component: SaleCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationSaleRoute = createRoute({
+  getParentRoute: () => organizationMedicalSalesRoute,
+  path: '$saleId',
+  head: manifestHead(saleManifest),
+  beforeLoad: roomLeafGate(saleManifest),
+  component: SaleRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationSaleReturnRoute = createRoute({
+  getParentRoute: () => organizationSaleRoute,
+  path: 'return',
+  head: manifestHead(saleReturnManifest),
+  beforeLoad: roomLeafGate(saleReturnManifest),
+  component: SaleReturnRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicineCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalMedicinesRoute,
+  path: 'create',
+  head: manifestHead(medicineCreateManifest),
+  validateSearch: validateMedicalCreateSearch,
+  beforeLoad: roomLeafGate(medicineCreateManifest),
+  component: MedicineCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMedicineEditRoute = createRoute({
+  getParentRoute: () => organizationMedicalMedicinesRoute,
+  path: '$medicineId/edit',
+  head: manifestHead(medicineEditManifest),
+  beforeLoad: roomLeafGate(medicineEditManifest),
+  component: MedicineEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPurchaseOrderCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalPurchasesRoute,
+  path: 'create',
+  head: manifestHead(purchaseOrderCreateManifest),
+  validateSearch: validateMedicalCreateSearch,
+  beforeLoad: roomLeafGate(purchaseOrderCreateManifest),
+  component: PurchaseOrderCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPurchaseOrderRoute = createRoute({
+  getParentRoute: () => organizationMedicalPurchasesRoute,
+  path: '$purchaseOrderId',
+  head: manifestHead(purchaseOrderManifest),
+  beforeLoad: roomLeafGate(purchaseOrderManifest),
+  component: PurchaseOrderRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPurchaseOrderEditRoute = createRoute({
+  getParentRoute: () => organizationPurchaseOrderRoute,
+  path: 'edit',
+  head: manifestHead(purchaseOrderEditManifest),
+  beforeLoad: roomLeafGate(purchaseOrderEditManifest),
+  component: PurchaseOrderEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPurchaseOrderReceiveRoute = createRoute({
+  getParentRoute: () => organizationPurchaseOrderRoute,
+  path: 'receive',
+  head: manifestHead(purchaseOrderReceiveManifest),
+  beforeLoad: roomLeafGate(purchaseOrderReceiveManifest),
+  component: PurchaseOrderReceiveRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationSupplierCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalSuppliersRoute,
+  path: 'create',
+  head: manifestHead(supplierCreateManifest),
+  beforeLoad: roomLeafGate(supplierCreateManifest),
+  component: SupplierCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationSupplierEditRoute = createRoute({
+  getParentRoute: () => organizationMedicalSuppliersRoute,
+  path: '$supplierId/edit',
+  head: manifestHead(supplierEditManifest),
+  beforeLoad: roomLeafGate(supplierEditManifest),
+  component: SupplierEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationManufacturerCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalManufacturersRoute,
+  path: 'create',
+  head: manifestHead(manufacturerCreateManifest),
+  beforeLoad: roomLeafGate(manufacturerCreateManifest),
+  component: ManufacturerCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationManufacturerEditRoute = createRoute({
+  getParentRoute: () => organizationMedicalManufacturersRoute,
+  path: '$manufacturerId/edit',
+  head: manifestHead(manufacturerEditManifest),
+  beforeLoad: roomLeafGate(manufacturerEditManifest),
+  component: ManufacturerEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMrCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalMrsRoute,
+  path: 'create',
+  head: manifestHead(mrCreateManifest),
+  beforeLoad: roomLeafGate(mrCreateManifest),
+  component: MrCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMrEditRoute = createRoute({
+  getParentRoute: () => organizationMedicalMrsRoute,
+  path: '$mrId/edit',
+  head: manifestHead(mrEditManifest),
+  beforeLoad: roomLeafGate(mrEditManifest),
+  component: MrEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationMrVisitCreateRoute = createRoute({
+  getParentRoute: () => organizationMedicalMrsRoute,
+  path: '$mrId/visits/create',
+  head: manifestHead(mrVisitCreateManifest),
+  beforeLoad: roomLeafGate(mrVisitCreateManifest),
+  component: MrVisitCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1555,7 +1937,35 @@ const routeTree = rootRoute.addChildren([
     organizationPatientsRoute.addChildren([organizationPatientCreateRoute]),
     organizationMedicalRoute.addChildren([
       organizationMedicalIndexRoute,
-      organizationMedicalSalesRoute,
+      organizationMedicalSalesRoute.addChildren([
+        organizationSaleCreateRoute,
+        organizationSaleRoute.addChildren([organizationSaleReturnRoute]),
+      ]),
+      organizationMedicalMedicinesRoute.addChildren([
+        organizationMedicineCreateRoute,
+        organizationMedicineEditRoute,
+      ]),
+      organizationMedicalPurchasesRoute.addChildren([
+        organizationPurchaseOrderCreateRoute,
+        organizationPurchaseOrderRoute.addChildren([
+          organizationPurchaseOrderEditRoute,
+          organizationPurchaseOrderReceiveRoute,
+        ]),
+      ]),
+      organizationMedicalSuppliersRoute.addChildren([
+        organizationSupplierCreateRoute,
+        organizationSupplierEditRoute,
+      ]),
+      organizationMedicalManufacturersRoute.addChildren([
+        organizationManufacturerCreateRoute,
+        organizationManufacturerEditRoute,
+      ]),
+      organizationMedicalMrsRoute.addChildren([
+        organizationMrCreateRoute,
+        organizationMrEditRoute,
+        organizationMrVisitCreateRoute,
+      ]),
+      organizationMedicalPaymentsRoute,
     ]),
     organizationStockRoute.addChildren([
       organizationStockIndexRoute,

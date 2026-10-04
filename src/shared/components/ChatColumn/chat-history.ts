@@ -1,7 +1,6 @@
 import type { TFunction } from 'i18next';
 
 import type { LeadMessage, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   ChatThread,
   ChatWhen,
@@ -10,7 +9,7 @@ import type {
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
-import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
+import { type ClinicClock, clinicDayLabel } from '@/shared/hooks/useClinicClock/index.ts';
 import type { OutboxMessage } from '@/shared/hooks/useThread/index.ts';
 import {
   type AppIcon,
@@ -48,22 +47,8 @@ export interface HistoryChip {
   target: ChatHistoryTarget | null;
 }
 
-/**
- * How a chat reads dates: today's calendar date and the zone's day of an
- * instant, with the viewer's clock time and short date (`useLocaleFormat`).
- */
-export interface ChatClock {
-  /** Today, `YYYY-MM-DD`, where the times are read (clinic-local unless the viewer set a zone). */
-  today: string;
-  /** The calendar date of an instant in that zone. */
-  dayOf: (instant: string) => string;
-  /** "4:00 pm" — an instant's clock time. */
-  time: (instant: string) => string;
-  /** "4 pm" on the hour, else "12:30 pm" — a slot as a message offers it (H:5741). */
-  shortTime: (instant: string) => string;
-  /** "9 Oct" — a calendar date ("9 Oct 2025" in another year). */
-  date: (date: string) => string;
-}
+/** How a chat reads dates — the clinic clock (`useClinicClock`). */
+export type ChatClock = ClinicClock;
 
 /** What the thread's strings need: the `clinic` translator, money and time. */
 export interface ChatFormat {
@@ -76,9 +61,6 @@ export interface ChatFormat {
   maskMoney?: boolean;
 }
 
-/** The app's one set of relative-day words — the date list's, in `common`. */
-const DAY_WORDS = { ns: PICKER_NS } as const;
-
 /**
  * A time as the thread shows it (`_patterns.md:193`): "Today 4:00 pm",
  * "Tomorrow 11:00 am", "Yesterday 9:10 am", "9 Oct 4:00 pm" — and the day
@@ -86,12 +68,7 @@ const DAY_WORDS = { ns: PICKER_NS } as const;
  */
 export function chatWhenLabel(when: ChatWhen, clock: ChatClock, t: TFunction): string {
   const date = when.kind === 'day' ? when.date : clock.dayOf(when.at);
-  const offset = civilDayOffset(clock.today, date);
-  let day: string;
-  if (offset === 0) day = t(PICKER_KEYS.date.today, DAY_WORDS);
-  else if (offset === 1) day = t(PICKER_KEYS.date.tomorrow, DAY_WORDS);
-  else if (offset === -1) day = t(PICKER_KEYS.date.yesterday, DAY_WORDS);
-  else day = clock.date(date);
+  const day = clinicDayLabel(date, clock, t);
   return when.kind === 'day'
     ? day
     : t(keys.when.dayTime, { day, time: clock.time(when.at) });

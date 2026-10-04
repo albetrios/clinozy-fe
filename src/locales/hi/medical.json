@@ -1,5 +1,234 @@
 {
   "manifest": {
     "title": "मेडिकल"
+  },
+  "tabs": {
+    "label": "मेडिकल के सेक्शन",
+    "sales": "बिक्री",
+    "medicines": "दवाइयाँ",
+    "purchases": "खरीद",
+    "suppliers": "सप्लायर",
+    "manufacturers": "निर्माता",
+    "mrs": "एमआर",
+    "payments": "भुगतान",
+    "groups": {
+      "selling": "बिक्री",
+      "stock": "स्टॉक",
+      "buying": "खरीद",
+      "money": "पैसा"
+    }
+  },
+  "search": {
+    "placeholder": "नाम, कंपोज़िशन, सप्लायर खोजें…",
+    "label": "मेडिकल में खोजें"
+  },
+  "create": {
+    "sale": "नई बिक्री",
+    "medicine": "नई दवा",
+    "purchaseOrder": "नया परचेज़ ऑर्डर",
+    "supplier": "नया सप्लायर",
+    "manufacturer": "नया निर्माता",
+    "mr": "नया एमआर",
+    "menu": "कुछ और बनाएँ"
+  },
+  "viewActions": {
+    "reorderLow": "कम स्टॉक फिर से मँगाएँ",
+    "sellAllDiscount": "सब 20% छूट पर बेचें",
+    "removeDiscount": "एक्सपायरी छूट हटाएँ",
+    "prescriptions": "भरने वाले प्रिस्क्रिप्शन",
+    "payAllReceived": "सभी प्राप्त का भुगतान · {{amount}}"
+  },
+  "filters": {
+    "all": "सभी",
+    "any": "कोई भी",
+    "stock": "स्टॉक",
+    "lowStock": "कम स्टॉक",
+    "expiry": "नज़दीकी एक्सपायरी",
+    "within30": "30 दिनों में",
+    "within60": "60 दिनों में",
+    "within90": "90 दिनों में",
+    "status": "स्थिति",
+    "stage": "चरण",
+    "manufacturer": "निर्माता",
+    "manufacturers": "निर्माता",
+    "suppliers": "सप्लायर",
+    "mrs": "एमआर"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "percent": "{{value}}%",
+    "addPhone": "फ़ोन जोड़ें",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+    "store": "मेडिकल स्टोर में कुछ नहीं"
+  },
+  "bulk": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं"
+  },
+  "toasts": {
+    "discountOn": "एक्सपायर होने वाली दवाइयों पर 20% छूट",
+    "discountOnOne": "{{name}} पर 20% छूट लागू",
+    "discountOff": "छूट हटा दी गई"
+  },
+  "sales": {
+    "records": "बिक्री",
+    "count_one": "{{count}} बिक्री",
+    "count_other": "{{count}} बिक्रियाँ",
+    "columns": {
+      "seq": "बिक्री",
+      "customer": "ग्राहक",
+      "medicines": "दवाइयाँ",
+      "bill": "बिल",
+      "margin": "मार्जिन",
+      "status": "स्थिति",
+      "when": "कब"
+    },
+    "patient": "मरीज़",
+    "contact": "मेडिकल संपर्क",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "बैच: {{batches}}",
+    "returned": "− {{amount}} लौटाया गया",
+    "refunded": "{{amount}} रिफ़ंड किया गया",
+    "statuses": {
+      "paid": "भुगतान हो गया",
+      "unpaid": "बकाया",
+      "returned": "लौटाया गया"
+    },
+    "rowActions": {
+      "collect": "{{amount}} वसूलें",
+      "return": "दवाइयाँ वापस लें",
+      "print": "प्रिंट करें",
+      "void": "बिक्री रद्द करें"
+    }
+  },
+  "medicines": {
+    "records": "दवाइयाँ",
+    "empty": "कोई दवा मेल नहीं खाती",
+    "columns": {
+      "seq": "ID",
+      "name": "दवा",
+      "manufacturer": "निर्माता",
+      "stock": "स्टॉक",
+      "expiry": "नज़दीकी एक्सपायरी",
+      "mrp": "एमआरपी",
+      "bestRate": "सबसे अच्छा रेट",
+      "margin": "मार्जिन"
+    },
+    "needsMrp": "एमआरपी और कंपोज़िशन चाहिए",
+    "stockLine": "{{count}} स्टॉक में · {{level}}",
+    "levels": {
+      "ok": "ठीक",
+      "low": "कम",
+      "out": "खत्म"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "स्टॉक नहीं",
+    "discount": "एक्सपायरी पर −{{pct}}%",
+    "rowActions": {
+      "returnExpiring": "एक्सपायर होने वाला स्टॉक सप्लायर को लौटाएँ",
+      "discount": "20% छूट पर बेचें (एक्सपायरी पास)",
+      "removeDiscount": "एक्सपायरी छूट हटाएँ",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "purchases": {
+    "records": "परचेज़ ऑर्डर",
+    "count_one": "{{count}} ऑर्डर",
+    "count_other": "{{count}} ऑर्डर",
+    "columns": {
+      "seq": "पीओ",
+      "supplier": "सप्लायर",
+      "items": "आइटम",
+      "date": "तारीख",
+      "total": "कुल",
+      "stage": "चरण"
+    },
+    "items_one": "{{count}} आइटम",
+    "items_other": "{{count}} आइटम",
+    "free": "{{count}} मुफ़्त",
+    "partPaid": "{{amount}} भुगतान",
+    "stages": {
+      "ordered": "ऑर्डर किया",
+      "received": "प्राप्त",
+      "paid": "भुगतान हो गया",
+      "cancelled": "रद्द"
+    },
+    "rowActions": {
+      "receive": "सामान प्राप्त करें",
+      "edit": "संपादित करें",
+      "cancel": "ऑर्डर रद्द करें",
+      "pay": "{{amount}} का भुगतान करें",
+      "view": "देखें"
+    }
+  },
+  "suppliers": {
+    "records": "सप्लायर",
+    "empty": "कोई सप्लायर मेल नहीं खाता",
+    "count_one": "{{count}} सप्लायर · {{payable}} देय",
+    "count_other": "{{count}} सप्लायर · {{payable}} देय",
+    "columns": {
+      "name": "सप्लायर",
+      "manufacturers": "निर्माता",
+      "orders": "ऑर्डर",
+      "payable": "देय",
+      "ageing": "उम्र"
+    },
+    "orders_one": "{{count}} ऑर्डर",
+    "orders_other": "{{count}} ऑर्डर",
+    "noOrders": "कोई ऑर्डर नहीं",
+    "ageing_one": "{{count}} दिन",
+    "ageing_other": "{{count}} दिन",
+    "rowActions": {
+      "pay": "{{amount}} का भुगतान करें",
+      "newOrder": "नया परचेज़ ऑर्डर",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "manufacturers": {
+    "records": "निर्माता",
+    "empty": "कोई निर्माता मेल नहीं खाता",
+    "count_one": "{{count}} निर्माता",
+    "count_other": "{{count}} निर्माता",
+    "columns": {
+      "name": "निर्माता",
+      "medicines": "दवाइयाँ",
+      "suppliers": "सप्लायर",
+      "mrs": "एमआर"
+    },
+    "medicines_one": "{{count}} दवा",
+    "medicines_other": "{{count}} दवाइयाँ",
+    "noMedicines": "अभी कोई नहीं",
+    "rowActions": {
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "mrs": {
+    "records": "एमआर",
+    "empty": "कोई एमआर मेल नहीं खाता",
+    "count_one": "{{count}} एमआर",
+    "count_other": "{{count}} एमआर",
+    "columns": {
+      "name": "एमआर",
+      "represents": "प्रतिनिधित्व",
+      "lastVisit": "पिछली मुलाक़ात",
+      "nextVisit": "अगली मुलाक़ात",
+      "samples": "सैंपल"
+    },
+    "rowActions": {
+      "logVisit": "मुलाक़ात दर्ज करें",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "payments": {
+    "records": "मेडिकल भुगतान",
+    "empty": "अभी कोई मेडिकल भुगतान नहीं"
   }
 }

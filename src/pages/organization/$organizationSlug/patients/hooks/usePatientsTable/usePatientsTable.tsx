@@ -1,11 +1,4 @@
-import {
-  type ColumnDef,
-  functionalUpdate,
-  type OnChangeFn,
-  type SortingState,
-  useTable,
-} from '@tanstack/react-table';
-import { useMemo } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
@@ -20,23 +13,18 @@ import {
   PATIENT_TYPE_TONES,
   TONE_CLASSES,
 } from '@/shared/clinic/clinic-tones.ts';
-import {
-  type DataTableFeatures,
-  dataTableFeatures,
-  type DataTableFoldValue,
+import type {
+  DataTableFeatures,
+  DataTableFoldValue,
 } from '@/shared/components/DataTable/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import {
   PERSON_CARD_KEYS,
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
-import {
-  sortingFromSearch,
-  sortingToSearch,
-} from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
-import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 
 import {
   FOLLOW_UP_TONES,
@@ -268,11 +256,10 @@ export interface PatientsTableInput {
 }
 
 /**
- * The Patients table instance (KICKOFF §6.5): the server sorts — the header
- * cycles ascending → descending → off and writes the URL's `sort`, which the
- * list read follows (`manualSorting`); the Columns choice is a device pref
- * (`useHiddenColumns`, recommended set: Gender, Conversion and Age hidden); the
- * rows are the loaded cursor pages, keyed by the patient's id.
+ * The Patients table instance (KICKOFF §6.5) on the shared room table: the
+ * server sorts through the URL's `sort`; the Columns choice is a device pref
+ * (recommended set: Gender, Conversion and Age hidden); the rows are the
+ * loaded cursor pages, keyed by the patient's id.
  */
 export function usePatientsTable({
   rows,
@@ -280,21 +267,11 @@ export function usePatientsTable({
   onSortChange,
   contactActions,
 }: PatientsTableInput) {
-  const columns = usePatientColumns(contactActions);
-  const visibility = useHiddenColumns(PATIENTS_TABLE_ID, columns);
-  const sorting = useMemo<SortingState>(() => sortingFromSearch(sort), [sort]);
-  const onSortingChange: OnChangeFn<SortingState> = (updater) =>
-    onSortChange(sortingToSearch(functionalUpdate(updater, sorting)));
-
-  return useTable({
-    features: dataTableFeatures,
-    data: rows as PatientRow[],
-    columns,
-    manualPagination: true,
-    manualSorting: true,
-    getRowId: (patient) => patient.id,
-    state: { sorting, columnVisibility: visibility.columnVisibility },
-    onSortingChange,
-    onColumnVisibilityChange: visibility.onColumnVisibilityChange,
+  return useRoomTable({
+    tableId: PATIENTS_TABLE_ID,
+    columns: usePatientColumns(contactActions),
+    rows,
+    sort,
+    onSortChange,
   });
 }

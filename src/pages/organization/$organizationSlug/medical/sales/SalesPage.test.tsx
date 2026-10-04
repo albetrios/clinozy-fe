@@ -1,14 +1,37 @@
-import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { axe } from 'vitest-axe';
 
-import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 
+import {
+  renderMedicalRoutes,
+  resetMedicalRoutes,
+} from '../__tests__/integration/medical-test-router.tsx';
 import { SalesPage } from './SalesPage.tsx';
 
+beforeEach(() => resetClinicFixtures());
+afterEach(() => {
+  resetMedicalRoutes();
+  resetClinicFixtures();
+});
+
 describe('SalesPage', () => {
-  it('renders the tab with the room title', async () => {
-    renderWithProviders(<SalesPage />);
-    expect(await screen.findByTestId('medical-sales-page')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+  it('lists the tab under the Medical toolbar, ending with "All sales loaded"', async () => {
+    const { container } = renderMedicalRoutes('/organization/acme/medical/sales', {
+      sales: SalesPage,
+    });
+    await waitFor(() =>
+      expect(screen.getAllByTestId('medical-sales-table-row')).toHaveLength(3),
+    );
+    expect(screen.getByTestId('medical-sales-page')).toHaveTextContent('Rhea Shah');
+    expect(screen.getByTestId('medical-sales-table-end')).toHaveTextContent(
+      'All sales loaded',
+    );
+    expect(screen.getByRole('link', { current: 'page' })).toHaveAttribute(
+      'data-testid',
+      'medical-sales-tab-sales',
+    );
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

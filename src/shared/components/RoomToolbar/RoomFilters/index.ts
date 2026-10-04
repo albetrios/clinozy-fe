@@ -1,8 +1,9 @@
-export type {
-  RoomDateFilterKind,
-  RoomFilterField,
-  RoomFilterFields,
-  RoomFilterValues,
+export {
+  type RoomDateFilterKind,
+  type RoomFilterField,
+  type RoomFilterFields,
+  type RoomFilterValues,
+  showsAutomaticSection,
 } from './room-filters.ts';
 export {
   FilterChip,

@@ -13,7 +13,6 @@ import type {
   MedicalPurchaseOrder,
   MedicalRep,
   MedicalSale,
-  Medicine,
   MRVisit,
   OfferingSuggestion,
   Organization,
@@ -33,6 +32,7 @@ import type {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
@@ -217,7 +217,8 @@ export const clinicFixtures = {
     resource: 'MR visit',
     seed: () => mrVisitSeed(),
   }),
-  medicines: createFixtureCollection<Medicine>({
+  // Medicines carry the plan's "Sold with" and near-expiry discount — see medicines-contracts.ts.
+  medicines: createFixtureCollection<MedicineRecord>({
     resource: 'Medicine',
     seed: () => medicineSeed(),
   }),

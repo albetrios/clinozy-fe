@@ -5,13 +5,13 @@ import type {
   MedicalPurchaseOrder,
   MedicalRep,
   MedicalSale,
-  Medicine,
   MRVisit,
   PoStage,
   Supplier,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 
 import { patientRef } from './patients.fixtures.ts';
 import {
@@ -297,8 +297,11 @@ export function medicineBySeq(seq: number): MedicineRow {
   );
 }
 
-/** The store's medicines; batch expiries move with the seed day. */
-export function medicineSeed(today: string = clinicToday()): Medicine[] {
+/**
+ * The store's medicines; batch expiries move with the seed day. Every seed
+ * sells over the counter (`rx: false`) with no near-expiry discount on.
+ */
+export function medicineSeed(today: string = clinicToday()): MedicineRecord[] {
   return MEDICINE_ROWS.map((row) => ({
     ...masterCommon(today),
     id: ref.medicine(row.seq),
@@ -323,6 +326,8 @@ export function medicineSeed(today: string = clinicToday()): Medicine[] {
       leadDays,
     })),
     isQuick: false,
+    prescriptionOnly: false,
+    nearExpiryDiscountPct: 0,
   }));
 }
 

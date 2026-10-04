@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { Picker } from '@/shared/components/Picker/index.ts';
+import { Picker, type PickerMinWidthValue } from '@/shared/components/Picker/index.ts';
 import {
   ROOM_TOOLBAR_KEYS,
   ROOM_TOOLBAR_NS,
@@ -29,6 +29,8 @@ export interface RoomAction {
   sub?: string;
   /** A create menu row's icon tile tone (Give blush, Take sky). */
   tone?: Tone;
+  /** Its group heading in the "⌄" menu ("Selling", "Buying"; Medical's Create menu, H:5432). */
+  group?: string;
   onSelect: () => void;
 }
 
@@ -38,9 +40,14 @@ export interface RoomPrimaryProps {
   action: RoomAction;
   /**
    * Other create actions behind a "⌄" segment joined to the primary (the
-   * split button); `label` names it (default "More create actions").
+   * split button); `label` names it (default "More create actions") and
+   * `minWidth` widens its list (default 200px).
    */
-  menu?: { label?: string; actions: readonly RoomAction[] };
+  menu?: {
+    label?: string;
+    actions: readonly RoomAction[];
+    minWidth?: PickerMinWidthValue;
+  };
   /** An outline action paired before the primary (Payments "Pay" + "Receive"). */
   secondary?: RoomAction;
   /** Test-id prefix — the room's table id. */
@@ -98,11 +105,12 @@ function CreateMenu({
         label: action.label,
         sub: action.sub,
         tone: action.tone,
+        group: action.group,
         leading: { kind: 'icon', icon: action.icon ?? Plus },
       }))}
       onChange={(id) => menu.actions.find((action) => action.id === id)?.onSelect()}
       align="end"
-      minWidth={200}
+      minWidth={menu.minWidth ?? 200}
       testId={testId}
       className={cn('flex', side === 'fab' ? 'flex-none' : 'items-stretch')}
       renderTrigger={({ open }) => trigger(open, label)}

@@ -12,6 +12,7 @@ import {
   roomToolbarTestIds,
 } from '@/shared/components/RoomToolbar/room-toolbar.constants.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
+import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { type AppIcon, ChevronDown } from '@/shared/icons/index.ts';
 
 /**
@@ -106,11 +107,11 @@ export interface RoomTabsProps {
  * room's literal child routes on the segmented track, the current one marked
  * `aria-current="page"` — its create / edit children keep it current, and a
  * tab nested under another's URL wins over it (the bare `/offerings` tab
- * beside `/offerings/offers`). With
- * `overflow="fold"` the tabs that do not fit fold from the inline end into a
- * 28px "More ⌄" (a 200px list); the current tab always stays. Otherwise the
- * track scrolls sideways without a scrollbar. Fills the space
- * {@link RoomToolbar} gives it.
+ * beside `/offerings/offers`). With `overflow="fold"` the tabs that do not
+ * fit fold from the inline end into a 28px "More ⌄" (a 200px list; a bottom
+ * sheet on a phone); the current tab always stays, and on a phone it stays
+ * alone. Otherwise the track scrolls sideways without a scrollbar. Fills the
+ * space {@link RoomToolbar} gives it.
  */
 export function RoomTabs({
   label,
@@ -125,6 +126,7 @@ export function RoomTabs({
   const navigate = useNavigate();
   const [measureRef, width] = useElementWidth<HTMLElement>();
 
+  const phone = useViewportTier() === 'phone';
   // The deepest tab the URL is under: a room whose first tab is its bare URL
   // (`/offerings` beside `/offerings/offers`) matches both on the second.
   const deepestIndex = tabs.reduce((found, tab, index) => {
@@ -147,7 +149,10 @@ export function RoomTabs({
       .split('\n')
       .map((entry) => tabWidth(entry.slice(1), entry.startsWith('+'), fontFamily));
   }, [folding, labelsKey]);
-  const fit = fitTabs(widths, folding ? width : null, currentIndex, TRACK_FIT);
+  // A phone row keeps the current tab alone beside "More" (`medical.md:17`,
+  // `payments.md:17`): the rest of the row belongs to the tab-row buttons.
+  const available = phone ? 0 : width;
+  const fit = fitTabs(widths, folding ? available : null, currentIndex, TRACK_FIT);
   const visible = folding ? fit.visible.flatMap((index) => tabs[index] ?? []) : tabs;
   const folded = folding ? fit.folded.flatMap((index) => tabs[index] ?? []) : [];
 

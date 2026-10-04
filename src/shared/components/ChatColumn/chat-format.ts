@@ -3,19 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { dateFormatOptions, resolvedTimeZone } from '@/lib/i18n/intl-config.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
-import {
-  CLINIC_TIME_ZONE,
-  clinicClockTime,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
 import type { ChatPerson } from '@/shared/api/clinic/messages-contracts.ts';
 import { basePrice } from '@/shared/api/clinic/offerings-pricing.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useTemplateValues } from '@/shared/hooks/useThread/index.ts';
@@ -38,51 +31,11 @@ import {
 } from './chat-composer.ts';
 import type { ChatClock, ChatFormat } from './chat-history.ts';
 
-/**
- * The chat's clock (`useLocaleFormat`): days are the clinic's — or the
- * viewer's chosen zone — and times follow the viewer's format and hour cycle.
- */
-function useChatClock(): ChatClock {
-  const { formatDate, prefs } = useLocaleFormat();
-  return useMemo(() => {
-    const zone = resolvedTimeZone(prefs.timeZone) ?? CLINIC_TIME_ZONE;
-    const today = clinicToday(new Date(), zone);
-    const clockOptions: Intl.DateTimeFormatOptions = {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: 'numeric',
-      second: undefined,
-      timeZone: zone,
-    };
-    return {
-      today,
-      dayOf: (instant) => clinicToday(new Date(instant), zone),
-      time: (instant) => formatDate(instant, clockOptions),
-      shortTime: (instant) =>
-        formatDate(
-          instant,
-          clinicClockTime(new Date(instant), zone).endsWith(':00')
-            ? { ...clockOptions, minute: undefined }
-            : clockOptions,
-        ),
-      date: (date) =>
-        formatDate(
-          localDateOf(date),
-          {
-            day: 'numeric',
-            month: 'short',
-            ...(date.slice(0, 4) === today.slice(0, 4) ? {} : { year: 'numeric' }),
-          },
-          { civilDay: true },
-        ),
-    };
-  }, [formatDate, prefs]);
-}
-
 /** Everything the thread's strings need, in the screen's language. */
 export function useChatFormat(maskMoney: boolean): ChatFormat {
   const { t } = useTranslation(CHAT_COLUMN_NS);
   const money = usePaiseFormat();
-  const clock = useChatClock();
+  const clock = useClinicClock();
   return useMemo(() => ({ t, money, clock, maskMoney }), [t, money, clock, maskMoney]);
 }
 
