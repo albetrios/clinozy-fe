@@ -58,7 +58,8 @@
   },
   "rowActions": {
     "edit": "编辑",
-    "delete": "删除"
+    "delete": "删除",
+    "leave": "退出诊所"
   },
   "bulk": {
     "export": "导出",
@@ -142,6 +143,15 @@
   "deleteUser": {
     "title": "删除此用户?",
     "removed": "已移除 {{name}}"
+  },
+  "leave": {
+    "title": "退出{{clinic}}？",
+    "description": "你将无法再访问{{clinic}}的各版块、记录和团队，并返回你的诊所列表。确认后几秒内可撤销。",
+    "confirm": "退出诊所",
+    "stay": "留下",
+    "pending": "正在退出{{clinic}}…",
+    "done": "你已退出{{clinic}}",
+    "clinicFallback": "此诊所"
   },
   "roles": {
     "label": "角色",

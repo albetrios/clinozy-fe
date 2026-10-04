@@ -11,20 +11,29 @@ import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-const { listMembers, updateMemberRole, removeMember, updateMemberStatus } = vi.hoisted(
-  () => ({
-    listMembers: vi.fn(),
-    updateMemberRole: vi.fn(),
-    removeMember: vi.fn(),
-    updateMemberStatus: vi.fn(),
-  }),
-);
+const {
+  listMembers,
+  updateMemberRole,
+  removeMember,
+  updateMemberStatus,
+  leaveOrganization,
+  invalidateSessionContext,
+} = vi.hoisted(() => ({
+  listMembers: vi.fn(),
+  updateMemberRole: vi.fn(),
+  removeMember: vi.fn(),
+  updateMemberStatus: vi.fn(),
+  leaveOrganization: vi.fn(),
+  invalidateSessionContext: vi.fn(),
+}));
 vi.mock('@/shared/api/organization-api.ts', () => ({
   listMembers,
   updateMemberRole,
   removeMember,
   updateMemberStatus,
+  leaveOrganization,
 }));
+vi.mock('@/shared/tenancy/session-context.ts', () => ({ invalidateSessionContext }));
 
 const { notifySuccess, notifyError } = vi.hoisted(() => ({
   notifySuccess: vi.fn(),
@@ -35,6 +44,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 import {
+  useLeaveOrganization,
   useMembers,
   useRemoveMember,
   useUpdateMemberRole,
@@ -165,6 +175,24 @@ describe('useRemoveMember', () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(ids(client)).toEqual(['m_1', 'm_2']);
     expect(notifyError).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useLeaveOrganization', () => {
+  it('leaves, then drops the session context so the next guard reads it afresh', async () => {
+    leaveOrganization.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useLeaveOrganization(), { wrapper });
+    await result.current.mutateAsync();
+    expect(leaveOrganization).toHaveBeenCalledTimes(1);
+    expect(invalidateSessionContext).toHaveBeenCalledTimes(1);
+    expect(notifySuccess).not.toHaveBeenCalled();
+  });
+
+  it('keeps the session when clinozy-be refuses — the owner must transfer first', async () => {
+    leaveOrganization.mockRejectedValue(new Error('owner cannot leave'));
+    const { result } = renderHook(() => useLeaveOrganization(), { wrapper });
+    await expect(result.current.mutateAsync()).rejects.toThrow('owner cannot leave');
+    expect(invalidateSessionContext).not.toHaveBeenCalled();
   });
 });
 

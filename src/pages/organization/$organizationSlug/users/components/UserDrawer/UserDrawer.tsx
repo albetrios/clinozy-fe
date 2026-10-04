@@ -23,6 +23,7 @@ import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { useRoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { USER_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import { UserDeleteConfirm } from '../UserDeleteConfirm/index.ts';
+import { UserLeaveConfirm } from '../UserLeaveConfirm/index.ts';
 import { type UserSaveOutcome, useUserSave } from './use-user-save.ts';
 import { useUserDrawerView } from './user-drawer-view.ts';
 import {
@@ -53,6 +54,8 @@ export interface UserDrawerAccess {
   canWrite: boolean;
   /** Delete on an edit (never the owner's or your own row). */
   canDelete: boolean;
+  /** "Leave clinic" in its place on your own drawer — never the owner's (D17). */
+  canLeave: boolean;
   /** "Resend invitation" on an invited member. */
   canResend: boolean;
 }
@@ -237,6 +240,59 @@ function userDrawerSteps({
   ];
 }
 
+/** Which of the footer's destructive confirms is open. */
+type DrawerExit = 'delete' | 'leave' | null;
+
+/**
+ * The footer's destructive button — Delete on someone else's drawer, "Leave
+ * clinic" on your own (never the owner's, D17) — and which confirm it opened.
+ */
+function useDrawerExit(access: UserDrawerAccess, member: TeamMember | null) {
+  const { t } = useTranslation(USERS_NS);
+  const [open, setOpen] = useState<DrawerExit>(null);
+  let kind: DrawerExit = null;
+  if (member && access.canDelete) kind = 'delete';
+  else if (member && access.canLeave) kind = 'leave';
+  return {
+    open,
+    close: () => setOpen(null),
+    onDelete: kind ? () => setOpen(kind) : undefined,
+    deleteLabel: kind === 'leave' ? t(USERS_KEYS.rowActions.leave) : undefined,
+  };
+}
+
+/** The Delete and Leave clinic confirms behind the footer's destructive button. */
+function DrawerExitConfirms({
+  open,
+  member,
+  record,
+  onClose,
+  onDone,
+}: {
+  open: DrawerExit;
+  member: TeamMember | null;
+  /** The drawer's summary line, in the delete confirm's pill. */
+  record: string | undefined;
+  onClose: () => void;
+  /** The removal or the leave is scheduled: the drawer closes. */
+  onDone: () => void;
+}) {
+  return (
+    <>
+      <UserDeleteConfirm
+        target={open === 'delete' && member ? { member, record } : null}
+        onClose={onClose}
+        onDeleted={onDone}
+      />
+      <UserLeaveConfirm
+        member={open === 'leave' ? member : null}
+        onClose={onClose}
+        onScheduled={onDone}
+      />
+    </>
+  );
+}
+
 /** One opening of the drawer: the form, its checks and its save. */
 function UserDrawerSession(props: SessionProps) {
   const { t } = useTranslation(USERS_NS);
@@ -251,7 +307,7 @@ function UserDrawerSession(props: SessionProps) {
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<UserDrawerStepId>('profile');
-  const [deleting, setDeleting] = useState(false);
+  const exit = useDrawerExit(props.access, member);
   const resend = useResendInvitation();
   const view = useUserDrawerView({
     values,
@@ -273,7 +329,6 @@ function UserDrawerSession(props: SessionProps) {
   const readouts = chrome.loading
     ? { badges: [], summary: undefined }
     : { badges: view.badges, summary: view.summary };
-  const canDelete = member !== null && props.access.canDelete;
   const steps = chrome.loading
     ? []
     : userDrawerSteps({
@@ -311,7 +366,8 @@ function UserDrawerSession(props: SessionProps) {
         saveState={saveState}
         saveAndAddLabel={t(K.save.createAnother)}
         onSaveAndAdd={chrome.create ? () => void save(true) : undefined}
-        onDelete={canDelete ? () => setDeleting(true) : undefined}
+        onDelete={exit.onDelete}
+        deleteLabel={exit.deleteLabel}
         dirty={isDirty}
         testId={USER_DRAWER_TEST_ID}
       >
@@ -319,11 +375,13 @@ function UserDrawerSession(props: SessionProps) {
           <SkeletonRows rows={6} label={chrome.title} rowClassName="h-12" />
         ) : null}
       </RecordDrawer>
-      <UserDeleteConfirm
-        target={deleting && member ? { member, record: readouts.summary } : null}
-        onClose={() => setDeleting(false)}
-        onDeleted={() => {
-          setDeleting(false);
+      <DrawerExitConfirms
+        open={exit.open}
+        member={member}
+        record={readouts.summary}
+        onClose={exit.close}
+        onDone={() => {
+          exit.close();
           if (props.mode === 'edit') props.onDeleted();
         }}
       />

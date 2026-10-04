@@ -24,6 +24,7 @@ import {
   getMyPermissions,
   getRolePermissions,
   inviteMember,
+  leaveOrganization,
   listApiKeys,
   listMembers,
   listPermissionCatalog,
@@ -153,6 +154,15 @@ describe('organization-api memberships (live)', () => {
     expect(await removeMember('mem_x')).toEqual({ id: 'mem_x' });
     expect(deleteMock).toHaveBeenCalledWith(
       expect.stringContaining('/memberships/mem_x'),
+    );
+  });
+
+  it('leaveOrganization posts to the self-service /organization/leave', async () => {
+    postMock.mockResolvedValue({ data: null });
+    await expect(leaveOrganization()).resolves.toBeUndefined();
+    expect(postMock).toHaveBeenCalledWith(
+      expect.stringMatching(/\/tenancy\/organization\/leave$/),
+      {},
     );
   });
 

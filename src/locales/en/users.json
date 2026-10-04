@@ -58,7 +58,8 @@
   },
   "rowActions": {
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "leave": "Leave clinic"
   },
   "bulk": {
     "export": "Export",
@@ -143,6 +144,15 @@
   "deleteUser": {
     "title": "Delete this user?",
     "removed": "{{name}} removed"
+  },
+  "leave": {
+    "title": "Leave {{clinic}}?",
+    "description": "You’ll lose access to {{clinic}} — its rooms, records and team — and go back to your clinics. You can undo for a few seconds after confirming.",
+    "confirm": "Leave clinic",
+    "stay": "Stay",
+    "pending": "Leaving {{clinic}}…",
+    "done": "You left {{clinic}}",
+    "clinicFallback": "this clinic"
   },
   "roles": {
     "label": "Roles",

@@ -77,7 +77,12 @@ export const USERS_KEYS = {
     branches: 'filters.branches',
     status: 'filters.status',
   },
-  rowActions: { edit: 'rowActions.edit', delete: 'rowActions.delete' },
+  rowActions: {
+    edit: 'rowActions.edit',
+    delete: 'rowActions.delete',
+    /** "Leave clinic" — your own row and drawer, never the owner's (D17, Settings' self-removal). */
+    leave: 'rowActions.leave',
+  },
   bulk: {
     export: 'bulk.export',
     /** "3 rows exported as CSV" (plural). */
@@ -164,6 +169,19 @@ export const USERS_KEYS = {
     title: 'deleteUser.title',
     /** "Dr. Reenal Chaniyara removed", with Undo. */
     removed: 'deleteUser.removed',
+  },
+  /** Leave clinic — `{{clinic}}` is the organisation's name, else `clinicFallback`. */
+  leave: {
+    title: 'leave.title',
+    description: 'leave.description',
+    confirm: 'leave.confirm',
+    /** The confirm's cancel: "Stay". */
+    stay: 'leave.stay',
+    /** "Leaving <clinic>…", with Undo. */
+    pending: 'leave.pending',
+    /** "You left <clinic>". */
+    done: 'leave.done',
+    clinicFallback: 'leave.clinicFallback',
   },
   /** Roles & access (`users.md:42–77`; H:1117–1146, H:5179–5194). */
   roles: {

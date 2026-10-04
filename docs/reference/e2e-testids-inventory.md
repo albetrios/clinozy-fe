@@ -530,6 +530,7 @@ The Team's toolbar and table carry the shared ids with the `tableId` `users-team
 | `<d>-days` / `<d>-from` / `<d>-to`             | Step 2's Days chips and the From / To time pickers                  | `UserDrawerFields` |
 | `<d>-commission` / `<d>-commission-quick-<n>`  | Commission stepper (`-decrease`, `-increase`) and its quick picks   | `UserDrawerFields` |
 | `<d>-status` / `<d>-invitation` / `<d>-resend` | Status toggle; an invited member's expiry and "Resend invitation"   | `UserDrawerFields` |
+| `<d>-delete` · `users-team-row-action-leave`   | On your own drawer and row (never the owner's): "Leave clinic"      | `UserDrawer`       |
 
 ### Roles & access (Users room, launch L-31c)
 

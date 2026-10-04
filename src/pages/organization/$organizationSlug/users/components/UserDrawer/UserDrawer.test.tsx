@@ -29,7 +29,13 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...api,
 }));
 
-const ACCESS = { resolved: true, canWrite: true, canDelete: false, canResend: false };
+const ACCESS = {
+  resolved: true,
+  canWrite: true,
+  canDelete: false,
+  canLeave: false,
+  canResend: false,
+};
 
 beforeEach(() => {
   viewport.tier = 'desktop';

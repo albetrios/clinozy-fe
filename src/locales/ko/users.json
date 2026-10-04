@@ -58,7 +58,8 @@
   },
   "rowActions": {
     "edit": "편집",
-    "delete": "삭제"
+    "delete": "삭제",
+    "leave": "클리닉 나가기"
   },
   "bulk": {
     "export": "내보내기",
@@ -142,6 +143,15 @@
   "deleteUser": {
     "title": "이 사용자를 삭제할까요?",
     "removed": "{{name}} 삭제됨"
+  },
+  "leave": {
+    "title": "{{clinic}}에서 나갈까요?",
+    "description": "{{clinic}}의 섹션, 기록, 팀에 더 이상 접근할 수 없으며 내 클리닉 목록으로 돌아갑니다. 확인 후 몇 초 동안 취소할 수 있습니다.",
+    "confirm": "클리닉 나가기",
+    "stay": "머무르기",
+    "pending": "{{clinic}}에서 나가는 중…",
+    "done": "{{clinic}}에서 나갔습니다",
+    "clinicFallback": "이 클리닉"
   },
   "roles": {
     "label": "역할",

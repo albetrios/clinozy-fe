@@ -58,7 +58,8 @@
   },
   "rowActions": {
     "edit": "Modifica",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "leave": "Lascia la clinica"
   },
   "bulk": {
     "export": "Esporta",
@@ -144,6 +145,15 @@
   "deleteUser": {
     "title": "Eliminare questo utente?",
     "removed": "{{name}} rimosso"
+  },
+  "leave": {
+    "title": "Lasciare {{clinic}}?",
+    "description": "Perderai l’accesso a {{clinic}} — le sue sezioni, i dati e il team — e tornerai alle tue cliniche. Potrai annullare per alcuni secondi dopo la conferma.",
+    "confirm": "Lascia la clinica",
+    "stay": "Resta",
+    "pending": "Uscita da {{clinic}}…",
+    "done": "Hai lasciato {{clinic}}",
+    "clinicFallback": "questa clinica"
   },
   "roles": {
     "label": "Ruoli",

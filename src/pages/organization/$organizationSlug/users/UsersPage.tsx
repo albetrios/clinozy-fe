@@ -31,7 +31,7 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
-import { FileIcon, PenLine, Shield, Trash } from '@/shared/icons/index.ts';
+import { FileIcon, LogOut, PenLine, Shield, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -39,6 +39,7 @@ import {
   type UserDeleteTarget,
 } from './components/UserDeleteConfirm/index.ts';
 import { UserDrawer } from './components/UserDrawer/index.ts';
+import { UserLeaveConfirm } from './components/UserLeaveConfirm/index.ts';
 import { useTeamTable } from './hooks/useTeamTable/index.ts';
 import { useUsersDialogRoute } from './hooks/useUsersDialogRoute/index.ts';
 import { RolesAccess } from './shared/components/RolesAccess/index.ts';
@@ -207,6 +208,12 @@ function useTeamAccess() {
       !(member.isSelf || member.isOwner) &&
       (can('delete') || (member.status === 'invited' && can('create'))),
     canResend: can('create'),
+    /**
+     * "Leave clinic" on your own row and drawer — Settings' self-removal,
+     * relocated (D17). Self-service, so no code gates it; never the owner, whom
+     * clinozy-be makes transfer ownership first.
+     */
+    canLeave: (member: TeamMember) => member.isSelf && !member.isOwner,
     canExport: access.isResolved && access.canAbility('export'),
   };
 }
@@ -240,6 +247,7 @@ export function UsersPage() {
   const filterCopy = useTeamFilterCopy(roles, openBranches);
   const rows = useTeamRows(team.members, search, roles);
   const [deleting, setDeleting] = useState<UserDeleteTarget | null>(null);
+  const [leaving, setLeaving] = useState<TeamMember | null>(null);
   const { dialog, close } = useUsersDialogRoute(team, {
     canInvite: access.canInvite,
     accessResolved: access.isResolved,
@@ -282,6 +290,15 @@ export function UsersPage() {
         icon: Trash,
         destructive: true,
         onSelect: () => setDeleting({ member }),
+      });
+    }
+    if (access.canLeave(member)) {
+      actions.push({
+        id: 'leave',
+        label: t(USERS_KEYS.rowActions.leave),
+        icon: LogOut,
+        destructive: true,
+        onSelect: () => setLeaving(member),
       });
     }
     return actions;
@@ -364,6 +381,11 @@ export function UsersPage() {
         </>
       )}
       <UserDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <UserLeaveConfirm
+        member={leaving}
+        onClose={() => setLeaving(null)}
+        onScheduled={() => setLeaving(null)}
+      />
       <UserDrawer
         mode="create"
         open={dialog.kind === 'create'}
@@ -371,6 +393,7 @@ export function UsersPage() {
           resolved: access.isResolved,
           canWrite: access.canInvite,
           canDelete: false,
+          canLeave: false,
           canResend: false,
         }}
         onClose={close}
@@ -388,6 +411,10 @@ export function UsersPage() {
             dialog.kind === 'edit' &&
             dialog.member !== undefined &&
             access.canDeleteMember(dialog.member),
+          canLeave:
+            dialog.kind === 'edit' &&
+            dialog.member !== undefined &&
+            access.canLeave(dialog.member),
           canResend: access.canResend,
         }}
         onClose={close}

@@ -112,15 +112,20 @@ describe('UsersPage — the Team', () => {
     expect(within(invited).getByText('Invited')).toBeInTheDocument();
   });
 
-  it('offers no Delete on your own row or the owner’s', async () => {
+  it('offers no Delete on your own row or the owner’s — your own row offers Leave clinic', async () => {
     renderUsersRoutes('/organization/acme/users', UsersPage);
     const self = await rowOf('Riya Shah');
     expect(within(self).getByRole('button', { name: 'Edit' })).toBeInTheDocument();
     expect(within(self).queryByRole('button', { name: 'Delete' })).toBeNull();
+    expect(
+      within(self).getByRole('button', { name: 'Leave clinic' }),
+    ).toBeInTheDocument();
     const owner = await rowOf('Owen Owner');
     expect(within(owner).queryByRole('button', { name: 'Delete' })).toBeNull();
+    expect(within(owner).queryByRole('button', { name: 'Leave clinic' })).toBeNull();
     const doctor = await rowOf('Dr. Reenal Chaniyara');
     expect(within(doctor).getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    expect(within(doctor).queryByRole('button', { name: 'Leave clinic' })).toBeNull();
   });
 
   it('filters by the URL’s role and searches in place', async () => {

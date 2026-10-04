@@ -13,14 +13,17 @@ Gated on `membership:read` and the `clinic-users` module, then `requireOrgStatus
 Users section follows the member's clinozy-be codes (D17): "New user" needs `invitation:manage`
 and `membership:manage` (clinozy-be's invite asks for the second, D47); edit, status and
 remove need `membership:manage`. View-as narrows it to the previewed role's matrix. Never a
-Delete on your own row or the owner's.
+Delete on your own row or the owner's: your own row and drawer offer **Leave clinic** instead
+(`components/UserLeaveConfirm/`) — any member but the owner, through clinozy-be's self-service
+`POST /organization/leave`; the row leaves at once, the membership after the 10s Undo, then the
+session context is dropped and you land on your clinics (`/organization`).
 
 It is the single members surface (D17): where the room is open to the member, Settings › Members
 and Settings › Roles render a link here (`shared/components/SettingsModal/organization/UsersRoomLink.tsx`) instead
 of their panels. Each Settings capability has its place: invite → "New user"; resend / cancel an
 invitation → the drawer's invitation line / Delete; change role, suspend → the drawer's Roles and
-Status; remove → Delete; create, rename, describe, set the permissions of and delete a role →
-Roles & access. Where the room is off or shut to the member, Settings keeps its panels.
+Status; remove → Delete; leave the clinic yourself → Leave clinic; create, rename, describe, set
+the permissions of and delete a role → Roles & access. Where the room is off or shut to the member, Settings keeps its panels.
 
 The toolbar (h1, the tab links, search, Filters, Columns, "New user" — the floating pill on a
 phone) is family-shared in `shared/components/UsersToolbar/`, with the role directory

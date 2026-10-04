@@ -58,7 +58,8 @@
   },
   "rowActions": {
     "edit": "編集",
-    "delete": "削除"
+    "delete": "削除",
+    "leave": "クリニックを退出"
   },
   "bulk": {
     "export": "エクスポート",
@@ -142,6 +143,15 @@
   "deleteUser": {
     "title": "このユーザーを削除しますか?",
     "removed": "{{name}} を削除しました"
+  },
+  "leave": {
+    "title": "{{clinic}} を退出しますか？",
+    "description": "{{clinic}} のセクション、記録、チームにアクセスできなくなり、クリニックの一覧に戻ります。確認後数秒間は元に戻せます。",
+    "confirm": "クリニックを退出",
+    "stay": "とどまる",
+    "pending": "{{clinic}} を退出しています…",
+    "done": "{{clinic}} を退出しました",
+    "clinicFallback": "このクリニック"
   },
   "roles": {
     "label": "ロール",

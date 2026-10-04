@@ -19,6 +19,7 @@ import {
   useCursorList,
 } from '@/shared/hooks/useCursorList/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { invalidateSessionContext } from '@/shared/tenancy/session-context.ts';
 
 /** Server-side query params for the members list (search + sort). */
 export type MembersListParams = OrgListKeyParams;
@@ -84,6 +85,22 @@ export function useRemoveMember(options?: { suppressSuccessToast?: boolean }) {
     successMessage: options?.suppressSuccessToast
       ? undefined
       : i18n.t(ERRORS_KEYS.frontend.hooks.members.removeSuccess, { ns: ERRORS_NS }),
+  });
+}
+
+/**
+ * Leave the active organization — your own membership, revoked
+ * (`POST /organization/leave`; any member but the owner, no permission code).
+ * Once it lands the session context and the organization list are dropped, so
+ * the next guard reads both afresh — without the organization just left.
+ * Silent: the caller's deferred toast owns the messages (SET-7).
+ */
+export function useLeaveOrganization() {
+  return useAppMutation<void, void>({
+    mutationFn: async () => {
+      await orgApi.leaveOrganization();
+      invalidateSessionContext();
+    },
   });
 }
 

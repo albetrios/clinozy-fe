@@ -56,10 +56,15 @@ const api = vi.hoisted(() => ({
   resendInvitation: vi.fn(),
   revokeInvitation: vi.fn(),
   getRolePermissions: vi.fn(),
+  leaveOrganization: vi.fn(),
 }));
 vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
   ...api,
+}));
+// The clinic's name, as me/context reports the active organisation.
+vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
+  useMeContext: () => ({ data: { activeOrganization: { name: 'Cresence Skin' } } }),
 }));
 
 const IN_A_WEEK = new Date(Date.now() + 7 * 86_400_000).toISOString();
@@ -108,6 +113,7 @@ beforeEach(() => {
   api.removeMember.mockResolvedValue(undefined);
   api.revokeInvitation.mockResolvedValue(undefined);
   api.resendInvitation.mockResolvedValue({ email: 'new@clinic.com' });
+  api.leaveOrganization.mockResolvedValue(undefined);
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -222,7 +228,10 @@ describe('Users › the user drawer (L-31b)', () => {
     const panel = await drawer();
     await user.click(await within(panel).findByTestId('user-drawer-step-hours-trigger'));
     expect(within(panel).getByTestId('user-drawer-status')).toBeDisabled();
-    expect(within(panel).queryByTestId('user-drawer-delete')).toBeNull();
+    // Its destructive button is Leave clinic, never Delete.
+    expect(within(panel).getByTestId('user-drawer-delete')).toHaveTextContent(
+      'Leave clinic',
+    );
   });
 
   it('shows an invited member’s expiry with "Resend invitation"', async () => {
@@ -379,5 +388,71 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     await vi.advanceTimersByTimeAsync(10_000);
     await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_new'));
     expect(api.revokeInvitation).not.toHaveBeenCalled();
+  });
+});
+
+describe('Users › leave the clinic (D17 — Settings’ self-removal)', () => {
+  /** The Team's row for `name`, once the Team is up. */
+  async function rowFor(name: string) {
+    await waitFor(() =>
+      expect(screen.getAllByTestId('users-team-table-row')).toHaveLength(3),
+    );
+    const row = screen
+      .getAllByTestId('users-team-table-row')
+      .find((candidate) => within(candidate).queryByText(name));
+    if (!row) throw new Error(`no row for ${name}`);
+    return row;
+  }
+
+  it('leaves from your own row after the 10s Undo window, then lands on your clinics', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { router } = renderUsersRoutes('/organization/acme/users', UsersPage);
+    const own = await rowFor('Riya Shah');
+    await user.click(within(own).getByRole('button', { name: 'Leave clinic' }));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    expect(within(dialog).getByText('Leave Cresence Skin?')).toBeInTheDocument();
+    expect(await axeForDialog(dialog)).toHaveNoViolations();
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+
+    await waitFor(() =>
+      expect(screen.getAllByTestId('users-team-table-row')).toHaveLength(2),
+    );
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      'Leaving Cresence Skin…',
+      expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
+    );
+    expect(api.leaveOrganization).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() => expect(api.leaveOrganization).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/organization'));
+    expect(api.removeMember).not.toHaveBeenCalled();
+  });
+
+  it('offers it in Delete’s place on your own drawer', async () => {
+    const user = userEvent.setup();
+    renderUsersRoutes('/organization/acme/users/mbr_riya/edit', UsersPage);
+    const panel = await drawer();
+    await user.click(within(panel).getByTestId('user-drawer-delete'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    expect(within(dialog).getByText('Leave Cresence Skin?')).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Stay' }));
+    expect(api.leaveOrganization).not.toHaveBeenCalled();
+  });
+
+  it('never offers it to the owner — clinozy-be makes them transfer ownership first', async () => {
+    api.listMembers.mockResolvedValue({
+      rows: [
+        member('riya', SELF.email, PLATFORM_ROLES.owner, { userId: SELF.userId }),
+        ...ROSTER.slice(1),
+      ],
+      next: null,
+      hasMore: false,
+    });
+    renderUsersRoutes('/organization/acme/users/mbr_riya/edit', UsersPage);
+    const panel = await drawer();
+    expect(within(panel).queryByTestId('user-drawer-delete')).toBeNull();
+    const own = await rowFor('Riya Shah');
+    expect(within(own).queryByRole('button', { name: 'Leave clinic' })).toBeNull();
   });
 });

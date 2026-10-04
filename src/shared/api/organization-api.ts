@@ -195,6 +195,15 @@ export async function removeMember(membershipId: string): Promise<{ id: string }
 }
 
 /**
+ * Leave the active organization — the caller's own membership, revoked
+ * (`POST /organization/leave`, 204). Self-service: no permission code needed;
+ * clinozy-be refuses the owner, who must transfer ownership first.
+ */
+export async function leaveOrganization(): Promise<void> {
+  await apiClient.post<unknown>(`${ORG_API}/leave`, {});
+}
+
+/**
  * Invite a member by email (clinozy-be REQ-1). There is no separate "invitation"
  * resource: `POST /organization/memberships` provisions/resolves the user and
  * creates an **INVITED** membership with the given role, emailing an invite
