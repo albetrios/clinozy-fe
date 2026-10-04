@@ -8,7 +8,8 @@ import {
   RouterProvider,
 } from '@tanstack/react-router';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -17,6 +18,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import { resetPresenceFixture } from '@/shared/api/clinic/presence-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -67,7 +69,10 @@ function Shell() {
   return <SectionBarShell navItems={entries} organizationSlug="acme" />;
 }
 
-function renderShell(path = '/organization/acme/leads') {
+/** What a room renders instead of its heading — e.g. a drawer open over it. */
+type RoomContent = Partial<Record<(typeof ROOMS)[number], () => ReactNode>>;
+
+function renderShell(path = '/organization/acme/leads', content: RoomContent = {}) {
   const root = createRootRoute({ component: () => <Outlet /> });
   const org = createRoute({ getParentRoute: () => root, path: ORG, component: Shell });
   const rooms = ROOMS.map((section) =>
@@ -75,7 +80,7 @@ function renderShell(path = '/organization/acme/leads') {
       getParentRoute: () => org,
       path: section,
       staticData: { manifest: roomManifest(section) },
-      component: () => <h1>{section}</h1>,
+      component: content[section] ?? (() => <h1>{section}</h1>),
     }),
   );
   const router = createRouter({
@@ -293,6 +298,54 @@ describe('SectionBarShell — keyboard (shell.md:46)', () => {
     await user.keyboard('2');
     expect(router.state.location.pathname).toBe('/organization/acme/leads');
     modal.remove();
+  });
+
+  it('stands down while a drawer holds focus — a room never switches out from under it', async () => {
+    // Radix drawers carry no `aria-modal`: the key is the drawer's because it
+    // was pressed inside it, as "/" and j / k read it.
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const router = renderShell('/organization/acme/leads', {
+      leads: () => <RecordDrawer open title="New lead" testId="ld" onClose={() => {}} />,
+    });
+    await waitFor(() => expect(screen.getByTestId('ld-title')).toHaveFocus());
+
+    await user.keyboard('g');
+    expect(
+      screen.queryByRole('dialog', { name: /all sections/i, hidden: true }),
+    ).toBeNull();
+
+    await user.keyboard('1');
+    expect(router.state.location.pathname).toBe('/organization/acme/leads');
+    expect(screen.getByTestId('ld')).toBeInTheDocument();
+  });
+
+  it('from md up, G closes All sections from inside it, and a number pressed there opens a room', async () => {
+    // The popover takes focus as it opens, so the keys come from inside it:
+    // the bar's own surface, not another layer's (setup's matchMedia says phone).
+    const matchMedia = window.matchMedia;
+    window.matchMedia = (query: string) => ({ ...matchMedia(query), matches: true });
+    try {
+      const user = userEvent.setup();
+      const router = renderShell('/organization/acme/leads');
+      await screen.findByTestId('all-sections-trigger');
+
+      await user.keyboard('g');
+      const popover = await screen.findByTestId('all-sections');
+      await waitFor(() =>
+        expect(popover).toContainElement(document.activeElement as HTMLElement),
+      );
+      await user.keyboard('g');
+      await waitFor(() => expect(screen.queryByTestId('all-sections')).toBeNull());
+
+      await user.keyboard('g');
+      await screen.findByTestId('all-sections');
+      await user.keyboard('1');
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe('/organization/acme/today'),
+      );
+    } finally {
+      window.matchMedia = matchMedia;
+    }
   });
 });
 
