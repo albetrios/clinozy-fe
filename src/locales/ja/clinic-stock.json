@@ -1,5 +1,167 @@
 {
   "manifest": {
     "title": "クリニック在庫"
+  },
+  "tabs": {
+    "label": "クリニック在庫のセクション",
+    "items": "品目",
+    "purchases": "仕入れ",
+    "movements": "入出庫",
+    "vendors": "取引先"
+  },
+  "search": {
+    "placeholder": "品目・カテゴリ・仕入先を検索…",
+    "label": "在庫内を検索"
+  },
+  "create": {
+    "item": "新しい品目",
+    "purchase": "新しい仕入れ",
+    "vendor": "新しいクリニック取引先"
+  },
+  "check": "棚卸し",
+  "filters": {
+    "all": "すべて",
+    "stock": "在庫",
+    "lowStock": "在庫少",
+    "category": "カテゴリ",
+    "lasts": "持ち",
+    "status": "ステータス",
+    "type": "種類"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "電話番号を追加",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "まだ何もありません。別のタブや検索をお試しください。",
+    "stock": "ここに在庫品目はありません"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "categories": {
+    "creams_serums": "クリーム・美容液",
+    "peels": "ピーリング・中和剤",
+    "masks": "マスク",
+    "consumables": "消耗品",
+    "equipment": "機器",
+    "other": "その他のクリニック在庫"
+  },
+  "units": {
+    "piece": "個",
+    "tube": "本",
+    "bottle": "ボトル",
+    "kit": "キット",
+    "pack": "パック",
+    "box": "箱",
+    "vial": "バイアル",
+    "ampoule": "アンプル",
+    "sachet": "袋",
+    "jar": "ジャー",
+    "roll": "ロール",
+    "pair": "組",
+    "ml": "ml",
+    "g": "g",
+    "litre": "リットル"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "個",
+    "units": "単位"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "OK",
+    "low": "少",
+    "out": "切れ"
+  },
+  "runway": {
+    "days_other": "約{{count}}日",
+    "weeks_other": "約{{count}}週間",
+    "none": "使用なし"
+  },
+  "items": {
+    "records": "品目",
+    "empty": "一致する品目はありません",
+    "columns": {
+      "seq": "ID",
+      "name": "品目",
+      "category": "カテゴリ",
+      "stock": "在庫",
+      "lasts": "持ち",
+      "vendor": "仕入先"
+    },
+    "sub": "{{unit}}あたり · 週あたり約{{usage}}使用",
+    "subContents": "{{contents}}の{{unit}}あたり · 週あたり約{{usage}}使用",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "編集"
+    }
+  },
+  "purchases": {
+    "records": "仕入れ",
+    "count_other": "仕入れ {{count}} 件 · 未払い {{due}}",
+    "columns": {
+      "seq": "ID",
+      "vendor": "仕入先",
+      "billNo": "請求書",
+      "date": "日付",
+      "bill": "請求額",
+      "due": "未払い",
+      "status": "ステータス"
+    },
+    "statuses": {
+      "paid": "支払済み",
+      "partly": "一部支払済み",
+      "unpaid": "未払い"
+    },
+    "rowActions": {
+      "edit": "編集"
+    }
+  },
+  "movements": {
+    "records": "入出庫",
+    "count_other": "{{count}} 件",
+    "columns": {
+      "type": "種類",
+      "party": "品目 / 相手先",
+      "when": "日時",
+      "by": "担当",
+      "change": "増減"
+    },
+    "types": {
+      "used": "使用",
+      "received": "入荷",
+      "adjust": "調整",
+      "damaged": "破損",
+      "returned": "返品",
+      "reverted": "取り消し",
+      "payment": "支払い"
+    },
+    "reverted": "取り消し済み",
+    "purchase": "仕入れ #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "取引先",
+    "empty": "一致する取引先はありません",
+    "count_other": "取引先 {{count}} 社 · 未払い {{payable}}",
+    "columns": {
+      "name": "取引先",
+      "purchases": "仕入れ",
+      "payable": "未払い"
+    },
+    "purchases_other": "仕入れ {{count}} 件",
+    "noPurchases": "仕入れなし",
+    "rowActions": {
+      "edit": "編集"
+    }
   }
 }

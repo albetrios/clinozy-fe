@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { RoomViewAction } from '@/shared/components/RoomToolbar/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { Tag } from '@/shared/icons/index.ts';
 
@@ -10,7 +11,7 @@ import {
   renderMedicalRoutes,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import { MedicalToolbar, MedicalViewAction } from './MedicalToolbar.tsx';
+import { MedicalToolbar } from './MedicalToolbar.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
@@ -30,7 +31,7 @@ function Toolbar() {
     <MedicalToolbar
       tab="medicines"
       viewAction={
-        <MedicalViewAction
+        <RoomViewAction
           actionId="discount"
           tableId="medical-medicines"
           icon={Tag}

@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
+import {
+  automaticSection,
+  roomFiltersOf,
+  useRoomFilters,
+} from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -32,7 +36,6 @@ import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
 import { fetchSupplier, medicalQueryKeys } from '../shared/medical-api.ts';
 import type { SupplierRow } from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
-import { filtersOf, recordSection } from '../shared/medical-filters.ts';
 import { supplierAgeingTone } from '../shared/medical-tones.ts';
 import { useSupplierColumns } from './hooks/useSupplierColumns/index.ts';
 import { supplierFilterKey, supplierParamsOf } from './suppliers.params.ts';
@@ -56,8 +59,8 @@ export function SuppliersPage() {
   const nav = useMedicalNav();
   const formatPaise = usePaiseFormat();
   const makers = useManufacturerCatalogue().data ?? [];
-  const { fields, copy } = filtersOf({
-    manufacturer: recordSection(t(MEDICAL_KEYS.filters.manufacturers), makers),
+  const { fields, copy } = roomFiltersOf({
+    manufacturer: automaticSection(t(MEDICAL_KEYS.filters.manufacturers), makers),
   });
   const filters = useRoomFilters(fields);
   const stack = useMedicalStack();

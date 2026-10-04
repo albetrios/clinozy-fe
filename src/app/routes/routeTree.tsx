@@ -132,8 +132,22 @@ import { manifest as pendingCreateManifest } from '@/pages/organization/$organiz
 import { manifest as pendingManifest } from '@/pages/organization/$organizationSlug/payments/pending/pending.manifest.ts';
 import { validatePendingSearch } from '@/pages/organization/$organizationSlug/payments/pending/pending.search.ts';
 import { manifest as receiveManifest } from '@/pages/organization/$organizationSlug/payments/receive/receive.manifest.ts';
+import { manifest as stockItemEditManifest } from '@/pages/organization/$organizationSlug/stock/items/$itemId/edit/edit.manifest.ts';
+import { manifest as stockCheckManifest } from '@/pages/organization/$organizationSlug/stock/items/check/check.manifest.ts';
+import { manifest as stockItemCreateManifest } from '@/pages/organization/$organizationSlug/stock/items/create/create.manifest.ts';
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
+import { manifest as stockMovementsManifest } from '@/pages/organization/$organizationSlug/stock/movements/movements.manifest.ts';
+import { manifest as stockPurchaseEditManifest } from '@/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/edit.manifest.ts';
+import { manifest as stockPurchaseCreateManifest } from '@/pages/organization/$organizationSlug/stock/purchases/create/create.manifest.ts';
+import { manifest as stockPurchasesManifest } from '@/pages/organization/$organizationSlug/stock/purchases/purchases.manifest.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
+import {
+  validateStockCreateSearch,
+  validateStockSearch,
+} from '@/pages/organization/$organizationSlug/stock/stock.search.ts';
+import { manifest as stockVendorEditManifest } from '@/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/edit.manifest.ts';
+import { manifest as stockVendorCreateManifest } from '@/pages/organization/$organizationSlug/stock/vendors/create/create.manifest.ts';
+import { manifest as stockVendorsManifest } from '@/pages/organization/$organizationSlug/stock/vendors/vendors.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
@@ -652,6 +666,67 @@ const StockItemsPage = lazyRouteComponent(
     [I18N_NAMESPACES.clinicStock],
     () => import('@/pages/organization/$organizationSlug/stock/items/items.route.tsx'),
   ),
+  'Component',
+);
+const StockPurchasesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.clinicStock],
+    () =>
+      import('@/pages/organization/$organizationSlug/stock/purchases/purchases.route.tsx'),
+  ),
+  'Component',
+);
+const StockMovementsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.clinicStock],
+    () =>
+      import('@/pages/organization/$organizationSlug/stock/movements/movements.route.tsx'),
+  ),
+  'Component',
+);
+const StockVendorsPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.clinicStock],
+    () =>
+      import('@/pages/organization/$organizationSlug/stock/vendors/vendors.route.tsx'),
+  ),
+  'Component',
+);
+// The Clinic stock dialog routes render nothing of their own (each tab page
+// opens the drawer), so they need no namespace beyond the room's.
+const StockItemCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/items/create/create.route.tsx'),
+  'Component',
+);
+const StockItemEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/items/$itemId/edit/edit.route.tsx'),
+  'Component',
+);
+const StockCheckRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/items/check/check.route.tsx'),
+  'Component',
+);
+const StockPurchaseCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/purchases/create/create.route.tsx'),
+  'Component',
+);
+const StockPurchaseEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/edit.route.tsx'),
+  'Component',
+);
+const StockVendorCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/vendors/create/create.route.tsx'),
+  'Component',
+);
+const StockVendorEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/edit.route.tsx'),
   'Component',
 );
 const NotFoundPage = lazyRouteComponent(
@@ -1989,16 +2064,112 @@ const organizationStockIndexRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// The Clinic stock tabs (D24, S:72–83): each a page; its dialogs below.
 const organizationStockItemsRoute = createRoute({
   getParentRoute: () => organizationStockRoute,
   path: 'items',
   head: manifestHead(stockItemsManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(stockItemsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  validateSearch: validateStockSearch,
+  beforeLoad: roomLeafGate(stockItemsManifest),
   component: StockItemsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockPurchasesRoute = createRoute({
+  getParentRoute: () => organizationStockRoute,
+  path: 'purchases',
+  head: manifestHead(stockPurchasesManifest),
+  validateSearch: validateStockSearch,
+  beforeLoad: roomLeafGate(stockPurchasesManifest),
+  component: StockPurchasesPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockMovementsRoute = createRoute({
+  getParentRoute: () => organizationStockRoute,
+  path: 'movements',
+  head: manifestHead(stockMovementsManifest),
+  validateSearch: validateStockSearch,
+  beforeLoad: roomLeafGate(stockMovementsManifest),
+  component: StockMovementsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockVendorsRoute = createRoute({
+  getParentRoute: () => organizationStockRoute,
+  path: 'vendors',
+  head: manifestHead(stockVendorsManifest),
+  validateSearch: validateStockSearch,
+  beforeLoad: roomLeafGate(stockVendorsManifest),
+  component: StockVendorsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialogs over the Clinic stock tabs (D24, S:74–83): each renders
+// nothing; the tab page reads the URL and opens the drawer over itself.
+const organizationStockItemCreateRoute = createRoute({
+  getParentRoute: () => organizationStockItemsRoute,
+  path: 'create',
+  head: manifestHead(stockItemCreateManifest),
+  validateSearch: validateStockCreateSearch,
+  beforeLoad: roomLeafGate(stockItemCreateManifest),
+  component: StockItemCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockItemEditRoute = createRoute({
+  getParentRoute: () => organizationStockItemsRoute,
+  path: '$itemId/edit',
+  head: manifestHead(stockItemEditManifest),
+  beforeLoad: roomLeafGate(stockItemEditManifest),
+  component: StockItemEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockCheckRoute = createRoute({
+  getParentRoute: () => organizationStockItemsRoute,
+  path: 'check',
+  head: manifestHead(stockCheckManifest),
+  beforeLoad: roomLeafGate(stockCheckManifest),
+  component: StockCheckRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockPurchaseCreateRoute = createRoute({
+  getParentRoute: () => organizationStockPurchasesRoute,
+  path: 'create',
+  head: manifestHead(stockPurchaseCreateManifest),
+  validateSearch: validateStockCreateSearch,
+  beforeLoad: roomLeafGate(stockPurchaseCreateManifest),
+  component: StockPurchaseCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockPurchaseEditRoute = createRoute({
+  getParentRoute: () => organizationStockPurchasesRoute,
+  path: '$purchaseId/edit',
+  head: manifestHead(stockPurchaseEditManifest),
+  beforeLoad: roomLeafGate(stockPurchaseEditManifest),
+  component: StockPurchaseEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockVendorCreateRoute = createRoute({
+  getParentRoute: () => organizationStockVendorsRoute,
+  path: 'create',
+  head: manifestHead(stockVendorCreateManifest),
+  validateSearch: validateStockCreateSearch,
+  beforeLoad: roomLeafGate(stockVendorCreateManifest),
+  component: StockVendorCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationStockVendorEditRoute = createRoute({
+  getParentRoute: () => organizationStockVendorsRoute,
+  path: '$vendorId/edit',
+  head: manifestHead(stockVendorEditManifest),
+  beforeLoad: roomLeafGate(stockVendorEditManifest),
+  component: StockVendorEditRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -2134,7 +2305,20 @@ const routeTree = rootRoute.addChildren([
     ]),
     organizationStockRoute.addChildren([
       organizationStockIndexRoute,
-      organizationStockItemsRoute,
+      organizationStockItemsRoute.addChildren([
+        organizationStockItemCreateRoute,
+        organizationStockItemEditRoute,
+        organizationStockCheckRoute,
+      ]),
+      organizationStockPurchasesRoute.addChildren([
+        organizationStockPurchaseCreateRoute,
+        organizationStockPurchaseEditRoute,
+      ]),
+      organizationStockMovementsRoute,
+      organizationStockVendorsRoute.addChildren([
+        organizationStockVendorCreateRoute,
+        organizationStockVendorEditRoute,
+      ]),
     ]),
     organizationPaymentsRoute.addChildren([
       organizationPaymentReceiveRoute,

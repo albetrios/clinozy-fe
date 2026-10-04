@@ -12,8 +12,6 @@ import {
   validateMedicalCreateSearch,
   validateMedicalSearch,
 } from '../medical.search.ts';
-import { filtersOf, recordSection } from './medical-filters.ts';
-import { sortParamsOf } from './medical-params.ts';
 import {
   nextVisitTone,
   PURCHASE_STAGE_TONES,
@@ -81,29 +79,6 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
 });
 
 describe('the family’s rules', () => {
-  it('reads a tab’s own sort keys only', () => {
-    expect(sortParamsOf('bill:desc', ['seq', 'bill'])).toEqual({
-      sort: 'bill',
-      order: 'desc',
-    });
-    expect(sortParamsOf('bill:asc', ['name'])).toEqual({});
-    expect(sortParamsOf(undefined, ['name'])).toEqual({});
-  });
-
-  it('shows an automatic section for 2 to 10 records, then Created', () => {
-    const makers = [
-      { id: 'a', name: 'ALVI', tone: 'lav' as const },
-      { id: 'b', name: 'DERM', tone: 'sky' as const },
-    ];
-    expect(recordSection('Manufacturer', makers.slice(0, 1))).toBeNull();
-    const section = recordSection('Manufacturer', makers);
-    expect(section?.field).toEqual({ kind: 'options', values: ['a', 'b'] });
-    expect(section?.copy.options.a).toEqual({ label: 'ALVI', tone: 'lav' });
-    const { fields, copy } = filtersOf({ manufacturer: section, mrs: null });
-    expect(Object.keys(fields)).toEqual(['manufacturer', 'created']);
-    expect(Object.keys(copy)).toEqual(['manufacturer']);
-  });
-
   it('tones the stages, statuses, ageing and next visits', () => {
     expect(PURCHASE_STAGE_TONES).toMatchObject({
       ordered: 'sky',

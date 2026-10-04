@@ -1,4 +1,10 @@
 export {
+  automaticSection,
+  type AutomaticSectionValue,
+  type RoomFilterSection,
+  roomFiltersOf,
+} from './room-filter-sections.ts';
+export {
   type RoomDateFilterKind,
   type RoomFilterField,
   type RoomFilterFields,

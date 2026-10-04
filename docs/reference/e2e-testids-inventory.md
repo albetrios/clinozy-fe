@@ -128,14 +128,18 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `medical-manufacturers-page`     | Medical › Manufacturers (`medical-manufacturers-…`)                                        | `pages/organization/$organizationSlug/medical/manufacturers/` |
 | `medical-mrs-page`               | Medical › MRs (`medical-mrs-…`)                                                            | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `medical-payments-page`          | Medical › Payments (`medical-payments-…`)                                                  | `pages/organization/$organizationSlug/medical/payments/`      |
-| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`                                        | `pages/organization/$organizationSlug/medical/shared/`        |
+| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`                                        | `shared/components/RoomToolbar/RoomViewAction/`               |
 | `medicine-drawer`                | Medicine drawer — `/medical/medicines/create`, `…/$medicineId/edit` over the list (L-50b)  | `pages/organization/$organizationSlug/medical/shared/`        |
 | `supplier-drawer`                | Supplier drawer — `/medical/suppliers/create`, `…/$supplierId/edit` (L-50b)                | `pages/organization/$organizationSlug/medical/shared/`        |
 | `manufacturer-drawer`            | Manufacturer drawer — `/medical/manufacturers/create`, `…/$manufacturerId/edit` (L-50b)    | `pages/organization/$organizationSlug/medical/shared/`        |
 | `mr-drawer`                      | MR drawer — `/medical/mrs/create`, `…/$mrId/edit` (L-50b)                                  | `pages/organization/$organizationSlug/medical/shared/`        |
 | `mr-visit-drawer`                | Log MR visit — `/medical/mrs/$mrId/visits/create` (L-50b)                                  | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `<kind>-drawer-stacked`          | A Medical drawer stacked on another — `manufacturer`, `supplier`, `mr`, `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
-| `stock-items-page`               | Clinic stock › Items                                                                       | `pages/organization/$organizationSlug/stock/items/`           |
+| `stock-items-page`               | Clinic stock › Items (`stock-items-…`)                                                     | `pages/organization/$organizationSlug/stock/items/`           |
+| `stock-purchases-page`           | Clinic stock › Purchases (`stock-purchases-…`)                                             | `pages/organization/$organizationSlug/stock/purchases/`       |
+| `stock-movements-page`           | Clinic stock › Movements (`stock-movements-…`)                                             | `pages/organization/$organizationSlug/stock/movements/`       |
+| `stock-vendors-page`             | Clinic stock › Vendors (`stock-vendors-…`; Q-K1)                                           | `pages/organization/$organizationSlug/stock/vendors/`         |
+| `stock-items-view-action-check`  | Clinic stock › Items — "Stock check"                                                       | `shared/components/RoomToolbar/RoomViewAction/`               |
 | `sidebar-toggle`                 | Menu button                                                                                | AppLayout                                                     |
 | `search-trigger`                 | Command palette                                                                            | AppLayout                                                     |
 | `user-menu-trigger`              | Avatar menu                                                                                | AppLayout                                                     |

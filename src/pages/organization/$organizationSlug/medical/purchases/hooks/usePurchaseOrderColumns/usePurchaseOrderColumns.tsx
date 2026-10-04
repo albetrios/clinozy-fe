@@ -2,15 +2,12 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { MoneyCell, TonePill } from '@/shared/components/Cells/index.ts';
+import { MoneyCell, TextCell, TonePill } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
-import {
-  TextCell,
-  useMedicalDates,
-} from '../../../shared/components/MedicalCells/index.ts';
+import { useMedicalDates } from '../../../shared/components/MedicalCells/index.ts';
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
 import { PURCHASE_STAGE_TONES } from '../../../shared/medical-tones.ts';
 

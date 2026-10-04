@@ -2,9 +2,9 @@ import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import { createdFilterMatches } from './clinic-filter-match.ts';
 import {
-  CLINIC_PAGE_SIZE,
   clinicHttpError,
   type CursorPage,
+  cursorPageOf,
   definedFields,
   refuseUnknownIds,
   validateClinicInput,
@@ -189,12 +189,7 @@ export async function listMedicines(
   const key = params.sort ?? 'name';
   const direction = params.order === 'desc' ? -1 : 1;
   rows.sort((a, b) => direction * ORDER[key](a, b) || b.seq - a.seq);
-  const start = cursor ? Number(cursor) : 0;
-  const end = start + CLINIC_PAGE_SIZE;
-  return {
-    items: rows.slice(start, end),
-    nextCursor: end < rows.length ? String(end) : null,
-  };
+  return cursorPageOf(rows, cursor);
 }
 
 /** Every live medicine matching `params` — each cursor page in turn (the pickers' catalogue). */

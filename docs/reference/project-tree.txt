@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1767 src files · ~880 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1863 src files · ~922 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -919,6 +919,7 @@ clinozy-fe/
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── mrs/
 │   │       │   │   │   ├── $mrId/
+│   │       │   │   │   ├── components/
 │   │       │   │   │   ├── create/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── mrs.manifest.ts
@@ -958,8 +959,10 @@ clinozy-fe/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── medical-api.ts
 │   │       │   │   │   ├── medical-contracts.ts
-│   │       │   │   │   ├── medical-filters.ts
-│   │       │   │   │   ├── medical-params.ts
+│   │       │   │   │   ├── medical-drawer-form.ts
+│   │       │   │   │   ├── medical-drawers.constants.ts
+│   │       │   │   │   ├── medical-partners-api.ts
+│   │       │   │   │   ├── medical-partners-contracts.ts
 │   │       │   │   │   ├── medical-tones.ts
 │   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── suppliers/
@@ -1128,19 +1131,62 @@ clinozy-fe/
 │   │       │   │   ├── PaymentsPage.tsx
 │   │       │   │   └── [3 test files]
 │   │       │   ├── stock/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
 │   │       │   │   ├── items/
-│   │       │   │   │   ├── items.constants.ts
+│   │       │   │   │   ├── $itemId/
+│   │       │   │   │   ├── check/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── items.manifest.ts
 │   │       │   │   │   ├── ITEMS.OVERVIEW.md
+│   │       │   │   │   ├── items.params.ts
 │   │       │   │   │   ├── items.route.tsx
 │   │       │   │   │   ├── ItemsPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── movements/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── movements.manifest.ts
+│   │       │   │   │   ├── MOVEMENTS.OVERVIEW.md
+│   │       │   │   │   ├── movements.params.ts
+│   │       │   │   │   ├── movements.route.tsx
+│   │       │   │   │   ├── MovementsPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── purchases/
+│   │       │   │   │   ├── $purchaseId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── purchases.manifest.ts
+│   │       │   │   │   ├── PURCHASES.OVERVIEW.md
+│   │       │   │   │   ├── purchases.params.ts
+│   │       │   │   │   ├── purchases.route.tsx
+│   │       │   │   │   ├── PurchasesPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── shared/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── stock-api.ts
+│   │       │   │   │   ├── stock-contracts.ts
+│   │       │   │   │   ├── stock-filters.ts
+│   │       │   │   │   ├── stock-units.ts
+│   │       │   │   │   └── [2 test files]
+│   │       │   │   ├── vendors/
+│   │       │   │   │   ├── $vendorId/
+│   │       │   │   │   ├── create/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── vendors.manifest.ts
+│   │       │   │   │   ├── VENDORS.OVERVIEW.md
+│   │       │   │   │   ├── vendors.params.ts
+│   │       │   │   │   ├── vendors.route.tsx
+│   │       │   │   │   ├── VendorsPage.tsx
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── stock.constants.ts
 │   │       │   │   ├── stock.manifest.ts
 │   │       │   │   ├── STOCK.OVERVIEW.md
 │   │       │   │   ├── stock.route.tsx
+│   │       │   │   ├── stock.search.ts
 │   │       │   │   ├── StockLayout.tsx
-│   │       │   │   └── [1 test file]
+│   │       │   │   └── [2 test files]
 │   │       │   ├── suspended/
 │   │       │   │   ├── suspended.manifest.ts
 │   │       │   │   ├── SUSPENDED.OVERVIEW.md
@@ -1489,6 +1535,10 @@ clinozy-fe/
 │   │   │   │   ├── StockBarCell/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── StockBarCell.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── TextCell/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── TextCell.tsx
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── TonePill/
 │   │   │   │   │   ├── index.ts
@@ -1962,10 +2012,11 @@ clinozy-fe/
 │   │   │   │   ├── record-drawer-chrome.tsx
 │   │   │   │   ├── record-drawer-focus.ts
 │   │   │   │   ├── record-drawer-items.ts
+│   │   │   │   ├── record-drawer-pending.tsx
 │   │   │   │   ├── record-drawer-width.ts
 │   │   │   │   ├── record-drawer.constants.ts
 │   │   │   │   ├── RecordDrawer.tsx
-│   │   │   │   └── [3 test files]
+│   │   │   │   └── [4 test files]
 │   │   │   ├── RecoveryCodesPanel/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RecoveryCodesPanel.tsx
@@ -1974,6 +2025,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RetryError.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── RoomTable/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── RoomTable.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── RoomTableEmpty/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RoomTableEmpty.tsx
@@ -1981,10 +2036,11 @@ clinozy-fe/
 │   │   │   ├── RoomToolbar/
 │   │   │   │   ├── RoomFilters/
 │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── room-filter-sections.ts
 │   │   │   │   │   ├── room-filters.ts
 │   │   │   │   │   ├── RoomFilters.tsx
 │   │   │   │   │   ├── useRoomFilters.ts
-│   │   │   │   │   └── [2 test files]
+│   │   │   │   │   └── [3 test files]
 │   │   │   │   ├── RoomPrimary/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── RoomPrimary.tsx
@@ -1996,6 +2052,10 @@ clinozy-fe/
 │   │   │   │   ├── RoomTabs/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── RoomTabs.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── RoomViewAction/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── RoomViewAction.tsx
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── RoomViewBar/
 │   │   │   │   │   ├── index.ts

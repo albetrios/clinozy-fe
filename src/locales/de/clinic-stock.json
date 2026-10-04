@@ -1,5 +1,174 @@
 {
   "manifest": {
     "title": "Praxisbestand"
+  },
+  "tabs": {
+    "label": "Bereiche des Praxisbestands",
+    "items": "Artikel",
+    "purchases": "Einkäufe",
+    "movements": "Bewegungen",
+    "vendors": "Händler"
+  },
+  "search": {
+    "placeholder": "Artikel, Kategorie oder Lieferant suchen…",
+    "label": "Im Bestand suchen"
+  },
+  "create": {
+    "item": "Neuer Artikel",
+    "purchase": "Neuer Einkauf",
+    "vendor": "Neuer Praxishändler"
+  },
+  "check": "Inventur",
+  "filters": {
+    "all": "Alle",
+    "stock": "Bestand",
+    "lowStock": "Niedriger Bestand",
+    "category": "Kategorie",
+    "lasts": "Reicht",
+    "status": "Status",
+    "type": "Typ"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "Telefon hinzufügen",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "stock": "Hier sind keine Bestandsartikel"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "categories": {
+    "creams_serums": "Cremes & Seren",
+    "peels": "Peelings & Neutralisatoren",
+    "masks": "Masken",
+    "consumables": "Verbrauchsmaterial",
+    "equipment": "Geräte",
+    "other": "Sonstiger Praxisbestand"
+  },
+  "units": {
+    "piece": "Stück",
+    "tube": "Tube",
+    "bottle": "Flasche",
+    "kit": "Set",
+    "pack": "Packung",
+    "box": "Schachtel",
+    "vial": "Fläschchen",
+    "ampoule": "Ampulle",
+    "sachet": "Beutel",
+    "jar": "Tiegel",
+    "roll": "Rolle",
+    "pair": "Paar",
+    "ml": "ml",
+    "g": "g",
+    "litre": "Liter"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "Stk.",
+    "units": "Einheiten"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "OK",
+    "low": "Niedrig",
+    "out": "Leer"
+  },
+  "runway": {
+    "days_one": "~{{count}} Tag",
+    "days_other": "~{{count}} Tage",
+    "weeks_one": "~{{count}} Woche",
+    "weeks_other": "~{{count}} Wochen",
+    "none": "Kein Verbrauch"
+  },
+  "items": {
+    "records": "Artikel",
+    "empty": "Kein Artikel passt",
+    "columns": {
+      "seq": "ID",
+      "name": "Artikel",
+      "category": "Kategorie",
+      "stock": "Bestand",
+      "lasts": "Reicht",
+      "vendor": "Lieferant"
+    },
+    "sub": "pro {{unit}} · Verbrauch ~{{usage}}/Woche",
+    "subContents": "pro {{unit}} zu {{contents}} · Verbrauch ~{{usage}}/Woche",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "Bearbeiten"
+    }
+  },
+  "purchases": {
+    "records": "Einkäufe",
+    "count_one": "{{count}} Einkauf · {{due}} offen",
+    "count_other": "{{count}} Einkäufe · {{due}} offen",
+    "columns": {
+      "seq": "ID",
+      "vendor": "Lieferant",
+      "billNo": "Rechnung",
+      "date": "Datum",
+      "bill": "Rechnungsbetrag",
+      "due": "Offen",
+      "status": "Status"
+    },
+    "statuses": {
+      "paid": "Bezahlt",
+      "partly": "Teilweise bezahlt",
+      "unpaid": "Unbezahlt"
+    },
+    "rowActions": {
+      "edit": "Bearbeiten"
+    }
+  },
+  "movements": {
+    "records": "Bewegungen",
+    "count_one": "{{count}} Eintrag",
+    "count_other": "{{count}} Einträge",
+    "columns": {
+      "type": "Typ",
+      "party": "Artikel / Partei",
+      "when": "Wann",
+      "by": "Von",
+      "change": "Änderung"
+    },
+    "types": {
+      "used": "Verbraucht",
+      "received": "Eingegangen",
+      "adjust": "Korrektur",
+      "damaged": "Beschädigt",
+      "returned": "Zurückgegeben",
+      "reverted": "Storniert",
+      "payment": "Zahlung"
+    },
+    "reverted": "Storniert",
+    "purchase": "Einkauf #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "Händler",
+    "empty": "Kein Händler passt",
+    "count_one": "{{count}} Händler · {{payable}} offen",
+    "count_other": "{{count}} Händler · {{payable}} offen",
+    "columns": {
+      "name": "Händler",
+      "purchases": "Einkäufe",
+      "payable": "Offen"
+    },
+    "purchases_one": "{{count}} Einkauf",
+    "purchases_other": "{{count}} Einkäufe",
+    "noPurchases": "Keine Einkäufe",
+    "rowActions": {
+      "edit": "Bearbeiten"
+    }
   }
 }

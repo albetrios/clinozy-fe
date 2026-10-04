@@ -3,9 +3,10 @@
  * `medical.search.ts`, which rides the entry chunk; this module loads with the
  * tab.
  */
+import { sortParamsOf } from '@/lib/routes/search-params.ts';
+
 import type { MedicalSearch } from '../medical.search.ts';
 import type { MrListParams } from '../shared/medical-contracts.ts';
-import { sortParamsOf } from '../shared/medical-params.ts';
 
 /** The list read's params for the URL as it stands — what the tab hands `useMrList`. */
 export function mrParamsOf(search: MedicalSearch): MrListParams {

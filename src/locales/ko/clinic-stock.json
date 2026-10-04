@@ -1,5 +1,167 @@
 {
   "manifest": {
     "title": "클리닉 재고"
+  },
+  "tabs": {
+    "label": "클리닉 재고 섹션",
+    "items": "품목",
+    "purchases": "구매",
+    "movements": "입출고",
+    "vendors": "거래처"
+  },
+  "search": {
+    "placeholder": "품목, 카테고리 또는 공급업체 검색…",
+    "label": "재고 내 검색"
+  },
+  "create": {
+    "item": "새 품목",
+    "purchase": "새 구매",
+    "vendor": "새 클리닉 거래처"
+  },
+  "check": "재고 점검",
+  "filters": {
+    "all": "전체",
+    "stock": "재고",
+    "lowStock": "재고 부족",
+    "category": "카테고리",
+    "lasts": "사용 가능 기간",
+    "status": "상태",
+    "type": "유형"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "전화번호 추가",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+    "stock": "여기에 재고 품목이 없습니다"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "categories": {
+    "creams_serums": "크림 및 세럼",
+    "peels": "필링 및 중화제",
+    "masks": "마스크",
+    "consumables": "소모품",
+    "equipment": "장비",
+    "other": "기타 클리닉 재고"
+  },
+  "units": {
+    "piece": "개",
+    "tube": "튜브",
+    "bottle": "병",
+    "kit": "키트",
+    "pack": "팩",
+    "box": "상자",
+    "vial": "바이알",
+    "ampoule": "앰플",
+    "sachet": "포",
+    "jar": "용기",
+    "roll": "롤",
+    "pair": "켤레",
+    "ml": "ml",
+    "g": "g",
+    "litre": "리터"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "개",
+    "units": "단위"
+  },
+  "quantity": {
+    "amount": "{{value}}{{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "양호",
+    "low": "부족",
+    "out": "품절"
+  },
+  "runway": {
+    "days_other": "약 {{count}}일",
+    "weeks_other": "약 {{count}}주",
+    "none": "사용 없음"
+  },
+  "items": {
+    "records": "품목",
+    "empty": "일치하는 품목이 없습니다",
+    "columns": {
+      "seq": "ID",
+      "name": "품목",
+      "category": "카테고리",
+      "stock": "재고",
+      "lasts": "사용 가능 기간",
+      "vendor": "공급업체"
+    },
+    "sub": "{{unit}}당 · 주당 약 {{usage}} 사용",
+    "subContents": "{{contents}} {{unit}}당 · 주당 약 {{usage}} 사용",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "편집"
+    }
+  },
+  "purchases": {
+    "records": "구매",
+    "count_other": "구매 {{count}}건 · 미지급 {{due}}",
+    "columns": {
+      "seq": "ID",
+      "vendor": "공급업체",
+      "billNo": "청구서",
+      "date": "날짜",
+      "bill": "청구액",
+      "due": "미지급",
+      "status": "상태"
+    },
+    "statuses": {
+      "paid": "결제 완료",
+      "partly": "부분 결제",
+      "unpaid": "미결제"
+    },
+    "rowActions": {
+      "edit": "편집"
+    }
+  },
+  "movements": {
+    "records": "입출고",
+    "count_other": "{{count}}건",
+    "columns": {
+      "type": "유형",
+      "party": "품목 / 거래 상대",
+      "when": "일시",
+      "by": "담당",
+      "change": "변동"
+    },
+    "types": {
+      "used": "사용",
+      "received": "입고",
+      "adjust": "조정",
+      "damaged": "파손",
+      "returned": "반품",
+      "reverted": "되돌림",
+      "payment": "결제"
+    },
+    "reverted": "되돌림",
+    "purchase": "구매 #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "거래처",
+    "empty": "일치하는 거래처가 없습니다",
+    "count_other": "거래처 {{count}}곳 · 미지급 {{payable}}",
+    "columns": {
+      "name": "거래처",
+      "purchases": "구매",
+      "payable": "미지급"
+    },
+    "purchases_other": "구매 {{count}}건",
+    "noPurchases": "구매 없음",
+    "rowActions": {
+      "edit": "편집"
+    }
   }
 }

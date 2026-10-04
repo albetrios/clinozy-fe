@@ -4,11 +4,10 @@
 // stale answers (see `DataTable.tsx`).
 
 import type { ReactTable, RowData } from '@tanstack/react-table';
-import type { ComponentProps, ReactNode, Ref } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { type MedicalTab, organizationMedicalTab } from '@/lib/routes/index.ts';
-import { cn } from '@/lib/utils.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
@@ -17,12 +16,6 @@ import {
   RoomToolbar,
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import {
@@ -93,54 +86,6 @@ const PRIMARY_CREATE: Readonly<Record<MedicalTab, MedicalCreate['id']>> = {
   payments: 'sale',
 };
 
-/** Props of {@link MedicalViewAction}. */
-export interface MedicalViewActionProps extends ComponentProps<'button'> {
-  /** Stable id — the test id (`<table id>-view-action-<id>`). */
-  actionId: string;
-  icon: AppIcon;
-  label: string;
-  /** The tab's table id — the test-id prefix. */
-  tableId: string;
-  ref?: Ref<HTMLButtonElement>;
-}
-
-/**
- * A tab's view action (`medical.md:17`; H:5438–5443): a 36px outline button,
- * its 14px icon and label from `xl`, the icon alone (named by its tooltip and
- * accessible name) where the toolbar is short.
- */
-export function MedicalViewAction({
-  actionId,
-  icon: Icon,
-  label,
-  tableId,
-  className,
-  ...props
-}: MedicalViewActionProps) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label={label}
-            data-testid={`${tableId}-view-action-${actionId}`}
-            {...props}
-            className={cn(
-              'text-body text-foreground bg-background hover:bg-muted border-border flex h-9 flex-none items-center justify-center gap-1.5 rounded-lg border leading-none font-medium transition-colors duration-120 max-xl:w-9 xl:ps-2.5 xl:pe-3',
-              className,
-            )}
-          >
-            <Icon aria-hidden="true" className="size-3.5 flex-none" />
-            <span className="max-xl:sr-only">{label}</span>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent className="xl:hidden">{label}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
 /** Props of {@link MedicalToolbar}. */
 export interface MedicalToolbarProps<TRow extends RowData> {
   /** The tab on screen. */
@@ -149,7 +94,7 @@ export interface MedicalToolbarProps<TRow extends RowData> {
   table?: ReactTable<DataTableFeatures, TRow>;
   /** The tab's Filters. */
   filters?: RoomToolbarFilters;
-  /** The tab's view action for its filter state (`MedicalViewAction`), if any. */
+  /** The tab's view action for its filter state (`RoomViewAction`), if any. */
   viewAction?: ReactNode;
 }
 

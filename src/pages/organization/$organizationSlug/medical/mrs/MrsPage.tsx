@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
+import { roomFiltersOf, useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
@@ -27,7 +27,6 @@ import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
 import { fetchMedicalRep, medicalQueryKeys } from '../shared/medical-api.ts';
 import type { MrRow } from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
-import { filtersOf } from '../shared/medical-filters.ts';
 import { MrVisitDrawer } from './components/MrVisitDrawer/index.ts';
 import { useMrColumns } from './hooks/useMrColumns/index.ts';
 import { mrFilterKey, mrParamsOf } from './mrs.params.ts';
@@ -35,7 +34,7 @@ import { mrFilterKey, mrParamsOf } from './mrs.params.ts';
 const TABLE_ID = MEDICAL_TABLE_IDS.mrs;
 
 /** The MRs Filters (`medical.md:119`): Created alone. */
-const { fields: MR_FILTER_FIELDS } = filtersOf({});
+const { fields: MR_FILTER_FIELDS } = roomFiltersOf({});
 
 /**
  * Medical › MRs (KICKOFF §6.7; `medical.md:105–119`): the Medical toolbar over

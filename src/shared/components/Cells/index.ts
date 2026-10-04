@@ -17,4 +17,5 @@ export {
 export { PersonChip, type PersonChipProps } from './PersonChip/index.ts';
 export { StatusEdge, type StatusEdgeProps } from './StatusEdge/index.ts';
 export { StockBarCell, type StockBarCellProps } from './StockBarCell/index.ts';
+export { TextCell, type TextCellProps } from './TextCell/index.ts';
 export { type PillTone, TonePill, type TonePillProps } from './TonePill/index.ts';

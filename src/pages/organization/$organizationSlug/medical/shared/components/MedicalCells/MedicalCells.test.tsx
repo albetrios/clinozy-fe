@@ -1,23 +1,12 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { axe } from 'vitest-axe';
 
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 
 import { useMedicalDates } from './medical-dates.ts';
-import { MakerPills, NamePills, TextCell } from './MedicalCells.tsx';
+import { MakerPills, NamePills } from './MedicalCells.tsx';
 
 describe('MedicalCells', () => {
-  it('draws a two-line cell with a toned sub line', async () => {
-    const { container } = render(
-      <TextCell text="Glycolac Cream" sub="Needs MRP and composition" subTone="butter" />,
-    );
-    expect(screen.getByText('Needs MRP and composition')).toHaveClass(
-      'text-tone-butter-foreground',
-    );
-    expect(await axe(container)).toHaveNoViolations();
-  });
-
   it('draws makers in their tones and names as grey or toned pills', () => {
     render(
       <>

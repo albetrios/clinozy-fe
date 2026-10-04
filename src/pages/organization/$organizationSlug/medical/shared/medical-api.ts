@@ -1,9 +1,11 @@
 import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
 import {
-  CLINIC_PAGE_SIZE,
   clinicHttpError,
   compareText,
   type CursorPage,
+  cursorPageOf,
+  directedCompare,
+  searchMatches,
 } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import {
   invoiceBalance,
@@ -33,7 +35,6 @@ import {
   type SaleCustomer,
   type SaleListParams,
   type SaleRow,
-  type SortOrder,
   type SupplierListParams,
   type SupplierRow,
 } from './medical-contracts.ts';
@@ -76,30 +77,6 @@ export const medicalQueryKeys = {
 const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
 
 type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
-
-/** One cursor page of already-ordered rows — the fixture cursor is an offset. */
-function pageOf<T>(rows: readonly T[], cursor: string | null): CursorPage<T> {
-  const start = cursor ? Number(cursor) : 0;
-  const end = start + CLINIC_PAGE_SIZE;
-  return {
-    items: rows.slice(start, end),
-    nextCursor: end < rows.length ? String(end) : null,
-  };
-}
-
-/** `compare` run in the asked direction, ascending by default. */
-function directed<T>(compare: (a: T, b: T) => number, order: SortOrder | undefined) {
-  const direction = order === 'desc' ? -1 : 1;
-  return (a: T, b: T) => direction * compare(a, b);
-}
-
-const lower = (text: string) => text.trim().toLowerCase();
-
-/** Whether any of `fields` contains the search `q` (case folded); an empty search matches. */
-function matches(q: string | undefined, fields: readonly string[]): boolean {
-  const needle = lower(q ?? '');
-  return !needle || fields.some((field) => field.toLowerCase().includes(needle));
-}
 
 /** Whether `createdAt` passes the Created filter (none set passes). */
 function createdOk(
@@ -223,7 +200,7 @@ async function salesFor(params: SaleListParams): Promise<SaleRow[]> {
   const today = clinicToday();
   const rows = saleRows(clinicFixtures).filter(
     (row) =>
-      matches(params.q, [row.customer?.name ?? '', `#${row.seq}`]) &&
+      searchMatches(params.q, [row.customer?.name ?? '', `#${row.seq}`]) &&
       (params.status !== 'unpaid' || row.status === 'unpaid') &&
       (params.status !== 'returned' || row.returns.length > 0) &&
       createdOk(row.createdAt, params.created, today),
@@ -231,7 +208,7 @@ async function salesFor(params: SaleListParams): Promise<SaleRow[]> {
   // The contract's default is the newest sale first (`S:1657`).
   return rows.sort(
     params.sort
-      ? (a, b) => directed(SALE_ORDER[params.sort ?? 'seq'], params.order)(a, b)
+      ? (a, b) => directedCompare(SALE_ORDER[params.sort ?? 'seq'], params.order)(a, b)
       : (a, b) => compareText(b.soldAt, a.soldAt),
   );
 }
@@ -241,7 +218,7 @@ export async function listMedicalSales(
   params: SaleListParams = {},
   cursor: string | null = null,
 ): Promise<CursorPage<SaleRow>> {
-  return pageOf(await salesFor(params), cursor);
+  return cursorPageOf(await salesFor(params), cursor);
 }
 
 /** One sale as its row — a 404 when it is unknown, deleted or voided. */
@@ -304,14 +281,19 @@ async function purchaseOrdersFor(
   const today = clinicToday();
   const rows = purchaseOrderRows(clinicFixtures).filter(
     (row) =>
-      matches(params.q, [`#${row.seq}`, row.supplierBillNo ?? '', row.supplierName]) &&
+      searchMatches(params.q, [
+        `#${row.seq}`,
+        row.supplierBillNo ?? '',
+        row.supplierName,
+      ]) &&
       (!params.stage || row.stage === params.stage) &&
       createdOk(row.createdAt, params.created, today),
   );
   // The contract's default is the latest order date first (`S:1661`).
   return rows.sort((a, b) =>
     params.sort
-      ? directed(PURCHASE_ORDER_ORDER[params.sort], params.order)(a, b) || b.seq - a.seq
+      ? directedCompare(PURCHASE_ORDER_ORDER[params.sort], params.order)(a, b) ||
+        b.seq - a.seq
       : compareText(b.date, a.date) || b.seq - a.seq,
   );
 }
@@ -321,7 +303,7 @@ export async function listPurchaseOrders(
   params: PurchaseOrderListParams = {},
   cursor: string | null = null,
 ): Promise<CursorPage<PurchaseOrderRow>> {
-  return pageOf(await purchaseOrdersFor(params), cursor);
+  return cursorPageOf(await purchaseOrdersFor(params), cursor);
 }
 
 /** One purchase order as its row — a 404 when it is unknown or deleted. */
@@ -379,12 +361,12 @@ async function suppliersFor(params: SupplierListParams): Promise<SupplierRow[]> 
   return supplierRows(clinicFixtures)
     .filter(
       (row) =>
-        matches(params.q, [row.name]) &&
+        searchMatches(params.q, [row.name]) &&
         (!params.manufacturer?.length ||
           row.manufacturerIds.some((id) => params.manufacturer?.includes(id))) &&
         createdOk(row.createdAt, params.created, today),
     )
-    .sort(directed(SUPPLIER_ORDER[params.sort ?? 'name'], params.order));
+    .sort(directedCompare(SUPPLIER_ORDER[params.sort ?? 'name'], params.order));
 }
 
 /** One cursor page of suppliers (`listSuppliers`, `S:1662`; REPLACE_WITH_API). */
@@ -392,7 +374,7 @@ export async function listSuppliers(
   params: SupplierListParams = {},
   cursor: string | null = null,
 ): Promise<CursorPage<SupplierRow>> {
-  return pageOf(await suppliersFor(params), cursor);
+  return cursorPageOf(await suppliersFor(params), cursor);
 }
 
 /** Every live supplier as its row — the pickers' list. */
@@ -458,13 +440,13 @@ async function manufacturersFor(
   return manufacturerRows(clinicFixtures)
     .filter(
       (row) =>
-        matches(params.q, [row.name]) &&
+        searchMatches(params.q, [row.name]) &&
         (!params.suppliers?.length ||
           row.suppliers.some((supplier) => params.suppliers?.includes(supplier.id))) &&
         (!params.mrs?.length || row.mrs.some((mr) => params.mrs?.includes(mr.id))) &&
         createdOk(row.createdAt, params.created, today),
     )
-    .sort(directed((a, b) => a.name.localeCompare(b.name), params.order));
+    .sort(directedCompare((a, b) => a.name.localeCompare(b.name), params.order));
 }
 
 /** One cursor page of manufacturers (`listManufacturers`, `S:1662`; REPLACE_WITH_API). */
@@ -472,7 +454,7 @@ export async function listManufacturers(
   params: ManufacturerListParams = {},
   cursor: string | null = null,
 ): Promise<CursorPage<ManufacturerRow>> {
-  return pageOf(await manufacturersFor(params), cursor);
+  return cursorPageOf(await manufacturersFor(params), cursor);
 }
 
 /** Every live manufacturer as its row — the pickers' list. */
@@ -514,9 +496,10 @@ async function mrsFor(params: MrListParams): Promise<MrRow[]> {
   return mrRows(clinicFixtures)
     .filter(
       (row) =>
-        matches(params.q, [row.name]) && createdOk(row.createdAt, params.created, today),
+        searchMatches(params.q, [row.name]) &&
+        createdOk(row.createdAt, params.created, today),
     )
-    .sort(directed((a, b) => a.name.localeCompare(b.name), params.order));
+    .sort(directedCompare((a, b) => a.name.localeCompare(b.name), params.order));
 }
 
 /** One cursor page of MRs (`listMRs`, `S:1662`; REPLACE_WITH_API). */
@@ -524,7 +507,7 @@ export async function listMedicalReps(
   params: MrListParams = {},
   cursor: string | null = null,
 ): Promise<CursorPage<MrRow>> {
-  return pageOf(await mrsFor(params), cursor);
+  return cursorPageOf(await mrsFor(params), cursor);
 }
 
 /** Every live MR as their row — the pickers' list. */

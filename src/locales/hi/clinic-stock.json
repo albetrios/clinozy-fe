@@ -1,5 +1,174 @@
 {
   "manifest": {
     "title": "क्लिनिक स्टॉक"
+  },
+  "tabs": {
+    "label": "क्लिनिक स्टॉक के सेक्शन",
+    "items": "आइटम",
+    "purchases": "ख़रीद",
+    "movements": "मूवमेंट",
+    "vendors": "वेंडर"
+  },
+  "search": {
+    "placeholder": "आइटम, कैटेगरी या सप्लायर खोजें…",
+    "label": "स्टॉक में खोजें"
+  },
+  "create": {
+    "item": "नया आइटम",
+    "purchase": "नई ख़रीद",
+    "vendor": "नया क्लिनिक वेंडर"
+  },
+  "check": "स्टॉक जाँच",
+  "filters": {
+    "all": "सभी",
+    "stock": "स्टॉक",
+    "lowStock": "कम स्टॉक",
+    "category": "कैटेगरी",
+    "lasts": "चलेगा",
+    "status": "स्थिति",
+    "type": "प्रकार"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "फ़ोन जोड़ें",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+    "stock": "यहाँ कोई स्टॉक आइटम नहीं है"
+  },
+  "bulk": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं"
+  },
+  "categories": {
+    "creams_serums": "क्रीम और सीरम",
+    "peels": "पील और न्यूट्रलाइज़र",
+    "masks": "मास्क",
+    "consumables": "उपभोग्य सामग्री",
+    "equipment": "उपकरण",
+    "other": "अन्य क्लिनिक स्टॉक"
+  },
+  "units": {
+    "piece": "पीस",
+    "tube": "ट्यूब",
+    "bottle": "बोतल",
+    "kit": "किट",
+    "pack": "पैक",
+    "box": "बॉक्स",
+    "vial": "वायल",
+    "ampoule": "एम्प्यूल",
+    "sachet": "सैशे",
+    "jar": "जार",
+    "roll": "रोल",
+    "pair": "जोड़ी",
+    "ml": "ml",
+    "g": "g",
+    "litre": "लीटर"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "पीस",
+    "units": "यूनिट"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "ठीक",
+    "low": "कम",
+    "out": "खत्म"
+  },
+  "runway": {
+    "days_one": "~{{count}} दिन",
+    "days_other": "~{{count}} दिन",
+    "weeks_one": "~{{count}} हफ़्ता",
+    "weeks_other": "~{{count}} हफ़्ते",
+    "none": "उपयोग नहीं"
+  },
+  "items": {
+    "records": "आइटम",
+    "empty": "कोई आइटम मेल नहीं खाता",
+    "columns": {
+      "seq": "ID",
+      "name": "आइटम",
+      "category": "कैटेगरी",
+      "stock": "स्टॉक",
+      "lasts": "चलेगा",
+      "vendor": "सप्लायर"
+    },
+    "sub": "प्रति {{unit}} · उपयोग ~{{usage}}/हफ़्ता",
+    "subContents": "प्रति {{unit}} ({{contents}}) · उपयोग ~{{usage}}/हफ़्ता",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "संपादित करें"
+    }
+  },
+  "purchases": {
+    "records": "ख़रीद",
+    "count_one": "{{count}} ख़रीद · {{due}} बकाया",
+    "count_other": "{{count}} ख़रीद · {{due}} बकाया",
+    "columns": {
+      "seq": "ID",
+      "vendor": "सप्लायर",
+      "billNo": "इनवॉइस",
+      "date": "तारीख",
+      "bill": "बिल",
+      "due": "बकाया",
+      "status": "स्थिति"
+    },
+    "statuses": {
+      "paid": "भुगतान हो गया",
+      "partly": "आंशिक भुगतान",
+      "unpaid": "बकाया"
+    },
+    "rowActions": {
+      "edit": "संपादित करें"
+    }
+  },
+  "movements": {
+    "records": "मूवमेंट",
+    "count_one": "{{count}} एंट्री",
+    "count_other": "{{count}} एंट्री",
+    "columns": {
+      "type": "प्रकार",
+      "party": "आइटम / पक्ष",
+      "when": "कब",
+      "by": "किसने",
+      "change": "बदलाव"
+    },
+    "types": {
+      "used": "उपयोग",
+      "received": "प्राप्त",
+      "adjust": "समायोजन",
+      "damaged": "क्षतिग्रस्त",
+      "returned": "वापस",
+      "reverted": "पलटा गया",
+      "payment": "भुगतान"
+    },
+    "reverted": "पलटा गया",
+    "purchase": "ख़रीद #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "वेंडर",
+    "empty": "कोई वेंडर मेल नहीं खाता",
+    "count_one": "{{count}} वेंडर · {{payable}} देय",
+    "count_other": "{{count}} वेंडर · {{payable}} देय",
+    "columns": {
+      "name": "वेंडर",
+      "purchases": "ख़रीद",
+      "payable": "देय"
+    },
+    "purchases_one": "{{count}} ख़रीद",
+    "purchases_other": "{{count}} ख़रीद",
+    "noPurchases": "कोई ख़रीद नहीं",
+    "rowActions": {
+      "edit": "संपादित करें"
+    }
   }
 }

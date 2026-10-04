@@ -6,6 +6,7 @@ import {
   IdPill,
   MoneyCell,
   PersonChip,
+  TextCell,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
@@ -18,10 +19,7 @@ import {
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
-import {
-  TextCell,
-  useMedicalDates,
-} from '../../../shared/components/MedicalCells/index.ts';
+import { useMedicalDates } from '../../../shared/components/MedicalCells/index.ts';
 import type { SaleRow } from '../../../shared/medical-contracts.ts';
 import { SALE_STATUS_TONES } from '../../../shared/medical-tones.ts';
 

@@ -297,6 +297,22 @@ describe('RoomTabs', () => {
     expect(within(nav).queryByRole('button', { name: 'More sections' })).toBeNull();
   });
 
+  it('scrolls a scrolling row to the current tab, and again when it moves', async () => {
+    const user = userEvent.setup();
+    const scrolled: string[] = [];
+    const scrollIntoView = vi
+      .spyOn(HTMLElement.prototype, 'scrollIntoView')
+      .mockImplementation(function record(this: HTMLElement) {
+        scrolled.push(this.textContent ?? '');
+      });
+    renderRoom('/medical/payments', medical('scroll'));
+    await waitFor(() => expect(scrolled).toContain('Payments'));
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+    await user.click(screen.getByRole('link', { name: 'Sales' }));
+    await waitFor(() => expect(scrolled.at(-1)).toBe('Sales'));
+    scrollIntoView.mockRestore();
+  });
+
   it('folds nothing before the row is measured', async () => {
     renderRoom('/medical/sales', medical('fold'));
     const nav = await screen.findByRole('navigation', { name: 'Medical sections' });

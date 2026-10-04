@@ -1,5 +1,202 @@
 {
   "manifest": {
     "title": "مخزون العيادة"
+  },
+  "tabs": {
+    "label": "أقسام مخزون العيادة",
+    "items": "الأصناف",
+    "purchases": "المشتريات",
+    "movements": "الحركات",
+    "vendors": "الموردون"
+  },
+  "search": {
+    "placeholder": "ابحث عن صنف أو فئة أو مورد…",
+    "label": "البحث في المخزون"
+  },
+  "create": {
+    "item": "صنف جديد",
+    "purchase": "مشتريات جديدة",
+    "vendor": "مورد عيادة جديد"
+  },
+  "check": "جرد المخزون",
+  "filters": {
+    "all": "الكل",
+    "stock": "المخزون",
+    "lowStock": "مخزون منخفض",
+    "category": "الفئة",
+    "lasts": "يكفي",
+    "status": "الحالة",
+    "type": "النوع"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "إضافة هاتف",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "stock": "لا توجد أصناف مخزون هنا"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "categories": {
+    "creams_serums": "الكريمات والأمصال",
+    "peels": "التقشير والمعادِلات",
+    "masks": "الأقنعة",
+    "consumables": "المستهلكات",
+    "equipment": "المعدات",
+    "other": "مخزون عيادة آخر"
+  },
+  "units": {
+    "piece": "قطعة",
+    "tube": "أنبوب",
+    "bottle": "زجاجة",
+    "kit": "طقم",
+    "pack": "عبوة",
+    "box": "علبة",
+    "vial": "قارورة",
+    "ampoule": "أمبولة",
+    "sachet": "كيس",
+    "jar": "برطمان",
+    "roll": "لفة",
+    "pair": "زوج",
+    "ml": "ml",
+    "g": "g",
+    "litre": "لتر"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "قطع",
+    "units": "وحدات"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "جيد",
+    "low": "منخفض",
+    "out": "نفد"
+  },
+  "runway": {
+    "days_zero": "~{{count}} يوم",
+    "days_one": "~{{count}} يوم",
+    "days_two": "~{{count}} يومان",
+    "days_few": "~{{count}} أيام",
+    "days_many": "~{{count}} يومًا",
+    "days_other": "~{{count}} يوم",
+    "weeks_zero": "~{{count}} أسبوع",
+    "weeks_one": "~{{count}} أسبوع",
+    "weeks_two": "~{{count}} أسبوعان",
+    "weeks_few": "~{{count}} أسابيع",
+    "weeks_many": "~{{count}} أسبوعًا",
+    "weeks_other": "~{{count}} أسبوع",
+    "none": "لا استخدام"
+  },
+  "items": {
+    "records": "الأصناف",
+    "empty": "لا يوجد صنف مطابق",
+    "columns": {
+      "seq": "ID",
+      "name": "الصنف",
+      "category": "الفئة",
+      "stock": "المخزون",
+      "lasts": "يكفي",
+      "vendor": "المورد"
+    },
+    "sub": "لكل {{unit}} · استخدام ~{{usage}}/أسبوع",
+    "subContents": "لكل {{unit}} من {{contents}} · استخدام ~{{usage}}/أسبوع",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "تعديل"
+    }
+  },
+  "purchases": {
+    "records": "المشتريات",
+    "count_zero": "{{count}} مشتريات · {{due}} مستحق",
+    "count_one": "{{count}} عملية شراء · {{due}} مستحق",
+    "count_two": "{{count}} عمليتا شراء · {{due}} مستحق",
+    "count_few": "{{count}} عمليات شراء · {{due}} مستحق",
+    "count_many": "{{count}} عملية شراء · {{due}} مستحق",
+    "count_other": "{{count}} عملية شراء · {{due}} مستحق",
+    "columns": {
+      "seq": "ID",
+      "vendor": "المورد",
+      "billNo": "الفاتورة",
+      "date": "التاريخ",
+      "bill": "المبلغ",
+      "due": "المستحق",
+      "status": "الحالة"
+    },
+    "statuses": {
+      "paid": "مدفوع",
+      "partly": "مدفوع جزئيًا",
+      "unpaid": "غير مدفوع"
+    },
+    "rowActions": {
+      "edit": "تعديل"
+    }
+  },
+  "movements": {
+    "records": "الحركات",
+    "count_zero": "{{count}} قيود",
+    "count_one": "{{count}} قيد",
+    "count_two": "{{count}} قيدان",
+    "count_few": "{{count}} قيود",
+    "count_many": "{{count}} قيدًا",
+    "count_other": "{{count}} قيد",
+    "columns": {
+      "type": "النوع",
+      "party": "الصنف / الطرف",
+      "when": "متى",
+      "by": "بواسطة",
+      "change": "التغيير"
+    },
+    "types": {
+      "used": "مستخدم",
+      "received": "مستلم",
+      "adjust": "تعديل",
+      "damaged": "تالف",
+      "returned": "مُرتجع",
+      "reverted": "مُلغى",
+      "payment": "دفعة"
+    },
+    "reverted": "مُلغى",
+    "purchase": "مشتريات #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "الموردون",
+    "empty": "لا يوجد مورد مطابق",
+    "count_zero": "{{count}} موردين · {{payable}} مستحق",
+    "count_one": "{{count}} مورد · {{payable}} مستحق",
+    "count_two": "{{count}} موردان · {{payable}} مستحق",
+    "count_few": "{{count}} موردين · {{payable}} مستحق",
+    "count_many": "{{count}} موردًا · {{payable}} مستحق",
+    "count_other": "{{count}} مورد · {{payable}} مستحق",
+    "columns": {
+      "name": "المورد",
+      "purchases": "المشتريات",
+      "payable": "المستحق"
+    },
+    "purchases_zero": "{{count}} مشتريات",
+    "purchases_one": "{{count}} عملية شراء",
+    "purchases_two": "{{count}} عمليتا شراء",
+    "purchases_few": "{{count}} عمليات شراء",
+    "purchases_many": "{{count}} عملية شراء",
+    "purchases_other": "{{count}} عملية شراء",
+    "noPurchases": "لا مشتريات",
+    "rowActions": {
+      "edit": "تعديل"
+    }
   }
 }

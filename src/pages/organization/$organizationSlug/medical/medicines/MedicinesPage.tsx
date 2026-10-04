@@ -9,7 +9,12 @@ import {
 import { fetchMedicine, medicineQueryKeys } from '@/shared/api/clinic/medicines-api.ts';
 import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
+import {
+  automaticSection,
+  roomFiltersOf,
+  RoomViewAction,
+  useRoomFilters,
+} from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import {
@@ -33,17 +38,13 @@ import {
 } from '../shared/components/MedicalDeleteConfirm/index.ts';
 import { MedicalStackHost } from '../shared/components/MedicalStackHost/index.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
-import {
-  MedicalToolbar,
-  MedicalViewAction,
-} from '../shared/components/MedicalToolbar/index.ts';
+import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
 import { MedicineDrawer } from '../shared/components/MedicineDrawer/index.ts';
 import { useMedicalDialogRoute } from '../shared/hooks/useMedicalDialogRoute/index.ts';
 import { useManufacturerCatalogue } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
-import { filtersOf, recordSection } from '../shared/medical-filters.ts';
 import { useMedicineColumns } from './hooks/useMedicineColumns/index.ts';
 import { medicineFilterKey, medicineParamsOf } from './medicines.params.ts';
 
@@ -64,7 +65,7 @@ function useMedicineFilters() {
   const { t } = useTranslation(MEDICAL_NS);
   const makers = useManufacturerCatalogue().data ?? [];
   const keys = MEDICAL_KEYS.filters;
-  return filtersOf({
+  return roomFiltersOf({
     stock: {
       field: { kind: 'options', values: MEDICINE_STOCK_FILTERS, single: true },
       copy: {
@@ -85,7 +86,7 @@ function useMedicineFilters() {
         },
       },
     },
-    manufacturer: recordSection(t(keys.manufacturer), makers),
+    manufacturer: automaticSection(t(keys.manufacturer), makers),
   });
 }
 
@@ -202,7 +203,7 @@ export function MedicinesPage() {
   if (search.expiry && canEdit && rows.length > 0) {
     const allOn = rows.every((row) => row.nearExpiryDiscountPct > 0);
     viewAction = (
-      <MedicalViewAction
+      <RoomViewAction
         actionId="discount"
         tableId={TABLE_ID}
         icon={Tag}
@@ -216,7 +217,7 @@ export function MedicinesPage() {
     );
   } else if (search.stock === 'low' && canCreate && rows.length > 0) {
     viewAction = (
-      <MedicalViewAction
+      <RoomViewAction
         actionId="reorder"
         tableId={TABLE_ID}
         icon={Package}

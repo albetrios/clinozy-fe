@@ -15,5 +15,5 @@ export const manifest = {
   module: 'clinic-stock',
   nav: { id: 'stock', section: 'stock' },
   kind: 'layout',
-  children: ['items'],
+  children: ['items', 'purchases', 'movements', 'vendors'],
 } as const satisfies PageManifest;

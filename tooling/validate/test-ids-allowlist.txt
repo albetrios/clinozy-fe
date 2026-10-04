@@ -41,6 +41,13 @@ src/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/e
 src/pages/organization/$organizationSlug/medical/mrs/create/ #page-root
 src/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/ #page-root
 src/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/ #page-root
+src/pages/organization/$organizationSlug/stock/items/create/ #page-root
+src/pages/organization/$organizationSlug/stock/items/$itemId/edit/ #page-root
+src/pages/organization/$organizationSlug/stock/items/check/ #page-root
+src/pages/organization/$organizationSlug/stock/purchases/create/ #page-root
+src/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/ #page-root
+src/pages/organization/$organizationSlug/stock/vendors/create/ #page-root
+src/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/ #page-root
 
 # A patient file's file-level drawer route (KICKOFF §6.6, `S:34`): it renders the
 # section it opened over and a shared drawer whose testId lives in that shared

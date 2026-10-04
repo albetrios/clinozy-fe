@@ -1,5 +1,181 @@
 {
   "manifest": {
     "title": "Magazzino clinica"
+  },
+  "tabs": {
+    "label": "Sezioni del magazzino",
+    "items": "Articoli",
+    "purchases": "Acquisti",
+    "movements": "Movimenti",
+    "vendors": "Fornitori"
+  },
+  "search": {
+    "placeholder": "Cerca articolo, categoria o fornitore…",
+    "label": "Cerca nel magazzino"
+  },
+  "create": {
+    "item": "Nuovo articolo",
+    "purchase": "Nuovo acquisto",
+    "vendor": "Nuovo fornitore della clinica"
+  },
+  "check": "Inventario",
+  "filters": {
+    "all": "Tutti",
+    "stock": "Scorte",
+    "lowStock": "Scorte basse",
+    "category": "Categoria",
+    "lasts": "Durata",
+    "status": "Stato",
+    "type": "Tipo"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "Aggiungi telefono",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+    "stock": "Nessun articolo di magazzino qui"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} di righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "categories": {
+    "creams_serums": "Creme e sieri",
+    "peels": "Peeling e neutralizzanti",
+    "masks": "Maschere",
+    "consumables": "Materiali di consumo",
+    "equipment": "Attrezzature",
+    "other": "Altro magazzino della clinica"
+  },
+  "units": {
+    "piece": "pezzo",
+    "tube": "tubetto",
+    "bottle": "flacone",
+    "kit": "kit",
+    "pack": "confezione",
+    "box": "scatola",
+    "vial": "fiala",
+    "ampoule": "ampolla",
+    "sachet": "bustina",
+    "jar": "vasetto",
+    "roll": "rotolo",
+    "pair": "paio",
+    "ml": "ml",
+    "g": "g",
+    "litre": "litro"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "pz",
+    "units": "unità"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "OK",
+    "low": "Basso",
+    "out": "Esaurito"
+  },
+  "runway": {
+    "days_one": "~{{count}} giorno",
+    "days_many": "~{{count}} di giorni",
+    "days_other": "~{{count}} giorni",
+    "weeks_one": "~{{count}} settimana",
+    "weeks_many": "~{{count}} di settimane",
+    "weeks_other": "~{{count}} settimane",
+    "none": "Nessun consumo"
+  },
+  "items": {
+    "records": "articoli",
+    "empty": "Nessun articolo corrisponde",
+    "columns": {
+      "seq": "ID",
+      "name": "Articolo",
+      "category": "Categoria",
+      "stock": "Scorte",
+      "lasts": "Durata",
+      "vendor": "Fornitore"
+    },
+    "sub": "per {{unit}} · usa ~{{usage}}/settimana",
+    "subContents": "per {{unit}} da {{contents}} · usa ~{{usage}}/settimana",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "Modifica"
+    }
+  },
+  "purchases": {
+    "records": "acquisti",
+    "count_one": "{{count}} acquisto · {{due}} da pagare",
+    "count_many": "{{count}} di acquisti · {{due}} da pagare",
+    "count_other": "{{count}} acquisti · {{due}} da pagare",
+    "columns": {
+      "seq": "ID",
+      "vendor": "Fornitore",
+      "billNo": "Fattura",
+      "date": "Data",
+      "bill": "Importo",
+      "due": "Da pagare",
+      "status": "Stato"
+    },
+    "statuses": {
+      "paid": "Pagato",
+      "partly": "Pagato in parte",
+      "unpaid": "Non pagato"
+    },
+    "rowActions": {
+      "edit": "Modifica"
+    }
+  },
+  "movements": {
+    "records": "movimenti",
+    "count_one": "{{count}} voce",
+    "count_many": "{{count}} di voci",
+    "count_other": "{{count}} voci",
+    "columns": {
+      "type": "Tipo",
+      "party": "Articolo / controparte",
+      "when": "Quando",
+      "by": "Da",
+      "change": "Variazione"
+    },
+    "types": {
+      "used": "Usato",
+      "received": "Ricevuto",
+      "adjust": "Rettifica",
+      "damaged": "Danneggiato",
+      "returned": "Reso",
+      "reverted": "Annullato",
+      "payment": "Pagamento"
+    },
+    "reverted": "Annullato",
+    "purchase": "Acquisto #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "fornitori",
+    "empty": "Nessun fornitore corrisponde",
+    "count_one": "{{count}} fornitore · {{payable}} da pagare",
+    "count_many": "{{count}} di fornitori · {{payable}} da pagare",
+    "count_other": "{{count}} fornitori · {{payable}} da pagare",
+    "columns": {
+      "name": "Fornitore",
+      "purchases": "Acquisti",
+      "payable": "Da pagare"
+    },
+    "purchases_one": "{{count}} acquisto",
+    "purchases_many": "{{count}} di acquisti",
+    "purchases_other": "{{count}} acquisti",
+    "noPurchases": "Nessun acquisto",
+    "rowActions": {
+      "edit": "Modifica"
+    }
   }
 }

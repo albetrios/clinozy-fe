@@ -1,6 +1,1 @@
-export {
-  MedicalToolbar,
-  type MedicalToolbarProps,
-  MedicalViewAction,
-  type MedicalViewActionProps,
-} from './MedicalToolbar.tsx';
+export { MedicalToolbar, type MedicalToolbarProps } from './MedicalToolbar.tsx';

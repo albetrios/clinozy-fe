@@ -8,6 +8,7 @@ import {
   queryOf,
   RECORD_ID,
   sortOf,
+  sortParamsOf,
   textOf,
 } from './search-params.ts';
 
@@ -62,5 +63,15 @@ describe('search-param readers', () => {
     expect(sortOf(['name', 'updated'] as const, 'updated:desc')).toBe('updated:desc');
     expect(sortOf(['name'] as const, 'status:asc')).toBeUndefined();
     expect(sortOf(['name'] as const, 'name:up')).toBeUndefined();
+  });
+
+  it('reads a tab’s own sort keys only into the list read’s params', () => {
+    expect(sortParamsOf('bill:desc', ['seq', 'bill'])).toEqual({
+      sort: 'bill',
+      order: 'desc',
+    });
+    expect(sortParamsOf('seq:asc', ['seq'])).toEqual({ sort: 'seq', order: 'asc' });
+    expect(sortParamsOf('bill:asc', ['name'])).toEqual({});
+    expect(sortParamsOf(undefined, ['name'])).toEqual({});
   });
 });

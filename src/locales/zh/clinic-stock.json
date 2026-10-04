@@ -1,5 +1,167 @@
 {
   "manifest": {
     "title": "诊所库存"
+  },
+  "tabs": {
+    "label": "诊所库存分区",
+    "items": "物品",
+    "purchases": "采购",
+    "movements": "出入库",
+    "vendors": "供应商"
+  },
+  "search": {
+    "placeholder": "搜索物品、类别或供应商…",
+    "label": "在库存中搜索"
+  },
+  "create": {
+    "item": "新建物品",
+    "purchase": "新建采购",
+    "vendor": "新建诊所供应商"
+  },
+  "check": "库存盘点",
+  "filters": {
+    "all": "全部",
+    "stock": "库存",
+    "lowStock": "库存不足",
+    "category": "类别",
+    "lasts": "可用",
+    "status": "状态",
+    "type": "类型"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "添加电话",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "这里还没有内容。试试其他标签页或搜索。",
+    "stock": "这里没有库存物品"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "categories": {
+    "creams_serums": "面霜和精华",
+    "peels": "焕肤剂和中和剂",
+    "masks": "面膜",
+    "consumables": "耗材",
+    "equipment": "设备",
+    "other": "其他诊所库存"
+  },
+  "units": {
+    "piece": "件",
+    "tube": "支",
+    "bottle": "瓶",
+    "kit": "套",
+    "pack": "包",
+    "box": "盒",
+    "vial": "小瓶",
+    "ampoule": "安瓿",
+    "sachet": "小袋",
+    "jar": "罐",
+    "roll": "卷",
+    "pair": "双",
+    "ml": "ml",
+    "g": "g",
+    "litre": "升"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "件",
+    "units": "单位"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "正常",
+    "low": "偏低",
+    "out": "缺货"
+  },
+  "runway": {
+    "days_other": "约 {{count}} 天",
+    "weeks_other": "约 {{count}} 周",
+    "none": "无用量"
+  },
+  "items": {
+    "records": "物品",
+    "empty": "没有匹配的物品",
+    "columns": {
+      "seq": "ID",
+      "name": "物品",
+      "category": "类别",
+      "stock": "库存",
+      "lasts": "可用",
+      "vendor": "供应商"
+    },
+    "sub": "每{{unit}} · 每周约用 {{usage}}",
+    "subContents": "每{{unit}} {{contents}} · 每周约用 {{usage}}",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "编辑"
+    }
+  },
+  "purchases": {
+    "records": "采购",
+    "count_other": "{{count}} 笔采购 · 应付 {{due}}",
+    "columns": {
+      "seq": "ID",
+      "vendor": "供应商",
+      "billNo": "发票",
+      "date": "日期",
+      "bill": "账单",
+      "due": "应付",
+      "status": "状态"
+    },
+    "statuses": {
+      "paid": "已付款",
+      "partly": "部分付款",
+      "unpaid": "未付款"
+    },
+    "rowActions": {
+      "edit": "编辑"
+    }
+  },
+  "movements": {
+    "records": "出入库记录",
+    "count_other": "{{count}} 条记录",
+    "columns": {
+      "type": "类型",
+      "party": "物品 / 对方",
+      "when": "时间",
+      "by": "操作人",
+      "change": "变动"
+    },
+    "types": {
+      "used": "已用",
+      "received": "入库",
+      "adjust": "调整",
+      "damaged": "损坏",
+      "returned": "退回",
+      "reverted": "已撤销",
+      "payment": "付款"
+    },
+    "reverted": "已撤销",
+    "purchase": "采购 #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "供应商",
+    "empty": "没有匹配的供应商",
+    "count_other": "{{count}} 家供应商 · 应付 {{payable}}",
+    "columns": {
+      "name": "供应商",
+      "purchases": "采购",
+      "payable": "应付"
+    },
+    "purchases_other": "{{count}} 笔采购",
+    "noPurchases": "无采购",
+    "rowActions": {
+      "edit": "编辑"
+    }
   }
 }

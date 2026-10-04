@@ -73,3 +73,17 @@ export function sortOf<K extends string>(
     ? (sort as `${K}:${SortDirection}`)
     : undefined;
 }
+
+/**
+ * A list read's column sort from the URL's `key:direction` — only `keys`, the
+ * tab's own sortable columns (a room's reader accepts every tab's), else none.
+ */
+export function sortParamsOf<K extends string>(
+  sort: string | undefined,
+  keys: readonly K[],
+): { sort?: K; order?: SortDirection } {
+  const [name, direction] = sort?.split(':') ?? [];
+  const key = keys.find((candidate) => candidate === name);
+  if (!key) return {};
+  return { sort: key, order: direction === 'desc' ? 'desc' : 'asc' };
+}

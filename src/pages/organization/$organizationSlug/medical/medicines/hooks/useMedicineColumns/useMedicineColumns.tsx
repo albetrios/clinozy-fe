@@ -16,13 +16,13 @@ import {
   IdPill,
   MoneyCell,
   StockBarCell,
+  TextCell,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
-import { TextCell } from '../../../shared/components/MedicalCells/index.ts';
 
 const rowOf = (original: unknown) => original as MedicineRow;
 

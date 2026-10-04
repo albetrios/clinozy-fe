@@ -1,5 +1,174 @@
 {
   "manifest": {
     "title": "Clinic stock"
+  },
+  "tabs": {
+    "label": "Clinic stock sections",
+    "items": "Items",
+    "purchases": "Purchases",
+    "movements": "Movements",
+    "vendors": "Vendors"
+  },
+  "search": {
+    "placeholder": "Search item, category or supplier…",
+    "label": "Search inside stock"
+  },
+  "create": {
+    "item": "New item",
+    "purchase": "New purchase",
+    "vendor": "New clinic vendor"
+  },
+  "check": "Stock check",
+  "filters": {
+    "all": "All",
+    "stock": "Stock",
+    "lowStock": "Low stock",
+    "category": "Category",
+    "lasts": "Lasts",
+    "status": "Status",
+    "type": "Type"
+  },
+  "table": {
+    "when": "{{day}} {{time}}",
+    "addPhone": "Add phone",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Nothing here yet. Try another tab or search.",
+    "stock": "No stock items here"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "categories": {
+    "creams_serums": "Creams & Serums",
+    "peels": "Peels & Neutralisers",
+    "masks": "Masks",
+    "consumables": "Consumables",
+    "equipment": "Equipment",
+    "other": "Other clinic stock"
+  },
+  "units": {
+    "piece": "piece",
+    "tube": "tube",
+    "bottle": "bottle",
+    "kit": "kit",
+    "pack": "pack",
+    "box": "box",
+    "vial": "vial",
+    "ampoule": "ampoule",
+    "sachet": "sachet",
+    "jar": "jar",
+    "roll": "roll",
+    "pair": "pair",
+    "ml": "ml",
+    "g": "g",
+    "litre": "litre"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "pcs",
+    "units": "units"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "OK",
+    "low": "Low",
+    "out": "Out"
+  },
+  "runway": {
+    "days_one": "~{{count}} day",
+    "days_other": "~{{count}} days",
+    "weeks_one": "~{{count}} week",
+    "weeks_other": "~{{count}} weeks",
+    "none": "No usage"
+  },
+  "items": {
+    "records": "items",
+    "empty": "No item matches",
+    "columns": {
+      "seq": "ID",
+      "name": "Item",
+      "category": "Category",
+      "stock": "Stock",
+      "lasts": "Lasts",
+      "vendor": "Supplier"
+    },
+    "sub": "per {{unit}} · uses ~{{usage}}/week",
+    "subContents": "per {{unit}} of {{contents}} · uses ~{{usage}}/week",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "edit": "Edit"
+    }
+  },
+  "purchases": {
+    "records": "purchases",
+    "count_one": "{{count}} purchase · {{due}} due",
+    "count_other": "{{count}} purchases · {{due}} due",
+    "columns": {
+      "seq": "ID",
+      "vendor": "Supplier",
+      "billNo": "Invoice",
+      "date": "Date",
+      "bill": "Bill",
+      "due": "Due",
+      "status": "Status"
+    },
+    "statuses": {
+      "paid": "Paid",
+      "partly": "Partly paid",
+      "unpaid": "Unpaid"
+    },
+    "rowActions": {
+      "edit": "Edit"
+    }
+  },
+  "movements": {
+    "records": "movements",
+    "count_one": "{{count}} entry",
+    "count_other": "{{count}} entries",
+    "columns": {
+      "type": "Type",
+      "party": "Item / party",
+      "when": "When",
+      "by": "By",
+      "change": "Change"
+    },
+    "types": {
+      "used": "Used",
+      "received": "Received",
+      "adjust": "Adjust",
+      "damaged": "Damaged",
+      "returned": "Returned",
+      "reverted": "Reverted",
+      "payment": "Payment"
+    },
+    "reverted": "Reverted",
+    "purchase": "Purchase #{{seq}}",
+    "paymentSub": "{{purchase}} · {{billNo}}",
+    "change": "{{sign}} {{amount}}"
+  },
+  "vendors": {
+    "records": "vendors",
+    "empty": "No vendor matches",
+    "count_one": "{{count}} vendor · {{payable}} payable",
+    "count_other": "{{count}} vendors · {{payable}} payable",
+    "columns": {
+      "name": "Vendor",
+      "purchases": "Purchases",
+      "payable": "Payable"
+    },
+    "purchases_one": "{{count}} purchase",
+    "purchases_other": "{{count}} purchases",
+    "noPurchases": "No purchases",
+    "rowActions": {
+      "edit": "Edit"
+    }
   }
 }

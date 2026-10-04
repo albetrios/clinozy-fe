@@ -1,6 +1,6 @@
 import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router';
 import { Tabs as TabsPrimitive } from 'radix-ui';
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { fitTabs, measureTextWidth } from '@/lib/fit-tabs.ts';
@@ -155,6 +155,14 @@ export function RoomTabs({
   const fit = fitTabs(widths, folding ? available : null, currentIndex, TRACK_FIT);
   const visible = folding ? fit.visible.flatMap((index) => tabs[index] ?? []) : tabs;
   const folded = folding ? fit.folded.flatMap((index) => tabs[index] ?? []) : [];
+  // A track that scrolls keeps the current tab in view — a phone's fourth
+  // Clinic stock tab would open half off the row (H:93).
+  const currentTabRef = useRef<HTMLAnchorElement | null>(null);
+  const currentTabId = tabs[currentIndex]?.id;
+  useEffect(() => {
+    if (folding || currentTabId === undefined) return;
+    currentTabRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [folding, currentTabId]);
 
   return (
     <nav
@@ -169,6 +177,7 @@ export function RoomTabs({
           return (
             <Link
               key={tab.id}
+              ref={isCurrent ? currentTabRef : undefined}
               to={tab.to}
               params={tab.params}
               // The Link's own fuzzy match would mark the bare `/offerings` tab

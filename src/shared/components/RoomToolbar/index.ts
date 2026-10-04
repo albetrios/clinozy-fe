@@ -5,6 +5,8 @@ export {
   roomToolbarTestIds,
 } from './room-toolbar.constants.ts';
 export {
+  automaticSection,
+  type AutomaticSectionValue,
   FilterChip,
   type FilterChipProps,
   RoomDateFilter,
@@ -18,6 +20,8 @@ export {
   type RoomFilterPerson,
   RoomFilters,
   RoomFiltersClear,
+  type RoomFilterSection,
+  roomFiltersOf,
   type RoomFiltersProps,
   type RoomFiltersState,
   RoomFiltersTrigger,
@@ -45,6 +49,7 @@ export {
   type RoomToolbarFilters,
   type RoomToolbarProps,
 } from './RoomToolbar.tsx';
+export { RoomViewAction, type RoomViewActionProps } from './RoomViewAction/index.ts';
 export {
   type RoomView,
   RoomViewBar,
