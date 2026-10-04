@@ -73,7 +73,7 @@ export function useBranchDrawerView({
   return {
     badges: [
       { id: 'name', label: name || t(K.summaryNew), tone: values.tone },
-      ...(values.isMain ? [{ id: 'main', label: t(K.mainBadge) }] : []),
+      ...(values.isMain ? [{ id: 'isMain', label: t(K.mainBadge) }] : []),
     ],
     summary: [
       name || t(K.summaryNew),
