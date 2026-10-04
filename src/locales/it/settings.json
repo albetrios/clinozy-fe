@@ -150,7 +150,10 @@
       "cancelInviteDescription": "Il link nell'email smetterà di funzionare. Potrai annullare per alcuni secondi dopo la conferma o invitare di nuovo più tardi.",
       "cancelInviteConfirm": "Annulla l'invito",
       "cancelInviteKeep": "Mantieni l'invito",
-      "cancelInvitePending": "Annullamento dell'invito a {{email}}…"
+      "cancelInvitePending": "Annullamento dell'invito a {{email}}…",
+      "movedTitle": "I membri ora sono in Utenti",
+      "movedBody": "Invita persone, cambia i loro ruoli, sospendile o rimuovile, e invia di nuovo o annulla gli inviti — tutto dal Team.",
+      "open": "Apri Utenti"
     },
     "roles": {
       "title": "Ruoli",
@@ -178,7 +181,10 @@
       "create": "Nuovo ruolo",
       "roleFallback": "questo ruolo",
       "permissionsLoading": "Caricamento autorizzazioni…",
-      "permissionsLoadFailed": "Impossibile caricare l'elenco delle autorizzazioni. Riprova."
+      "permissionsLoadFailed": "Impossibile caricare l'elenco delle autorizzazioni. Riprova.",
+      "movedTitle": "I ruoli ora sono in Utenti",
+      "movedBody": "Aggiungi, rinomina ed elimina ruoli, e scegli cosa può fare ciascuno — le sezioni della clinica, Utenti e i permessi dell’area di lavoro — in Ruoli e accesso.",
+      "open": "Apri Ruoli e accesso"
     },
     "listSort": {
       "label": "Ordina per",

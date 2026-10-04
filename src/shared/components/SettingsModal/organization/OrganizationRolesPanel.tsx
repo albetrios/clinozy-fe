@@ -39,6 +39,8 @@ import {
   orgListSortToParams,
 } from './org-list-sort.ts';
 import { OrgListControls } from './OrgListControls.tsx';
+import { useUsersRoomOpen } from './users-room-open.ts';
+import { UsersRoomLink } from './UsersRoomLink.tsx';
 
 /** Per-role actions menu (custom roles only): edit or delete. */
 function RoleRowActions({
@@ -198,10 +200,19 @@ function RolesResults({
 }
 
 /**
- * Roles panel — permission sets assignable to members. System roles are read-only;
- * custom roles can be deleted with undo-capable deferred commit.
+ * Roles panel — a link into Users › Roles & access where the Users room is
+ * this member's members surface (D17, {@link useUsersRoomOpen}); everywhere
+ * else the roles list itself ({@link RolesManager}).
  */
 export function OrganizationRolesPanel() {
+  return useUsersRoomOpen() ? <UsersRoomLink section="roles" /> : <RolesManager />;
+}
+
+/**
+ * Permission sets assignable to members. System roles are read-only;
+ * custom roles can be deleted with undo-capable deferred commit.
+ */
+function RolesManager() {
   const { t } = useTranslation(SETTINGS_NS);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<OrgListSortPreset>(DEFAULT_ORG_LIST_SORT);

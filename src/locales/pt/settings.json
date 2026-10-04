@@ -150,7 +150,10 @@
       "cancelInviteDescription": "O link no e-mail deixará de funcionar. Você pode desfazer por alguns segundos após confirmar ou enviar um novo convite mais tarde.",
       "cancelInviteConfirm": "Cancelar convite",
       "cancelInviteKeep": "Manter convite",
-      "cancelInvitePending": "Cancelando o convite para {{email}}…"
+      "cancelInvitePending": "Cancelando o convite para {{email}}…",
+      "movedTitle": "Os membros agora ficam em Usuários",
+      "movedBody": "Convide pessoas, altere as funções delas, pause ou remova, e reenvie ou cancele convites — tudo pela Equipe.",
+      "open": "Abrir Usuários"
     },
     "roles": {
       "title": "Funções",
@@ -178,7 +181,10 @@
       "create": "Nova função",
       "roleFallback": "esta função",
       "permissionsLoading": "Carregando permissões…",
-      "permissionsLoadFailed": "Não foi possível carregar a lista de permissões. Tente novamente."
+      "permissionsLoadFailed": "Não foi possível carregar a lista de permissões. Tente novamente.",
+      "movedTitle": "As funções agora ficam em Usuários",
+      "movedBody": "Adicione, renomeie e exclua funções, e escolha o que cada uma pode fazer — as seções da clínica, Usuários e as permissões do espaço de trabalho — em Funções e acesso.",
+      "open": "Abrir Funções e acesso"
     },
     "listSort": {
       "label": "Ordenar por",

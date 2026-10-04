@@ -147,7 +147,10 @@
       "cancelInviteDescription": "邮件中的链接将失效。确认后几秒内可撤销，也可以稍后重新邀请。",
       "cancelInviteConfirm": "取消邀请",
       "cancelInviteKeep": "保留邀请",
-      "cancelInvitePending": "正在取消发送给 {{email}} 的邀请…"
+      "cancelInvitePending": "正在取消发送给 {{email}} 的邀请…",
+      "movedTitle": "成员已移至“用户”",
+      "movedBody": "邀请成员、更改角色、暂停或移除成员，以及重新发送或取消邀请，都可以在“团队”中完成。",
+      "open": "打开用户"
     },
     "roles": {
       "title": "角色",
@@ -174,7 +177,10 @@
       "create": "新建角色",
       "roleFallback": "该角色",
       "permissionsLoading": "正在加载权限…",
-      "permissionsLoadFailed": "无法加载权限列表。请重试。"
+      "permissionsLoadFailed": "无法加载权限列表。请重试。",
+      "movedTitle": "角色已移至“用户”",
+      "movedBody": "在“角色与权限”中添加、重命名和删除角色，并设置每个角色能做什么——诊所各版块、用户和工作区权限。",
+      "open": "打开角色与权限"
     },
     "listSort": {
       "label": "排序方式",

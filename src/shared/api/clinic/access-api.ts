@@ -363,8 +363,12 @@ export const USERS_ROW_PLATFORM_CODES: Readonly<
 /** The code behind "Change roles & access" (the `perms` ability, D17). */
 export const PERMS_PLATFORM_CODE: OrganizationPermission = 'role:manage';
 
-/** Every code the matrix maps, in a fixed order. */
-const MAPPED_CODES: readonly OrganizationPermission[] = [
+/**
+ * Every code the matrix maps — the Users row and "Change roles & access" — in
+ * a fixed order. A role page shows every other code it may give as a
+ * workspace permission (D17: Settings' role dialog, relocated).
+ */
+export const MATRIX_PLATFORM_CODES: readonly OrganizationPermission[] = [
   ...new Set([...CLINIC_ACTIONS.flatMap((action) => USERS_ROW_PLATFORM_CODES[action])]),
   PERMS_PLATFORM_CODE,
 ];
@@ -406,8 +410,8 @@ export function platformCodesWithUsersAccess(
     ),
   );
   if (perms) wanted.add(PERMS_PLATFORM_CODE);
-  const kept = codes.filter((code) => !MAPPED_CODES.includes(code));
-  return [...new Set(kept), ...MAPPED_CODES.filter((code) => wanted.has(code))];
+  const kept = codes.filter((code) => !MATRIX_PLATFORM_CODES.includes(code));
+  return [...new Set(kept), ...MATRIX_PLATFORM_CODES.filter((code) => wanted.has(code))];
 }
 
 /** A clinozy-be role as the mapping reads it (`isSystem` unknown when the viewer can't read roles). */

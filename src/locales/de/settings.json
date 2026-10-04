@@ -148,7 +148,10 @@
       "cancelInviteDescription": "Der Link in der E-Mail funktioniert dann nicht mehr. Sie können kurz nach der Bestätigung rückgängig machen oder die Person später erneut einladen.",
       "cancelInviteConfirm": "Einladung zurückziehen",
       "cancelInviteKeep": "Einladung behalten",
-      "cancelInvitePending": "Einladung an {{email}} wird zurückgezogen…"
+      "cancelInvitePending": "Einladung an {{email}} wird zurückgezogen…",
+      "movedTitle": "Mitglieder finden Sie jetzt unter Benutzer",
+      "movedBody": "Laden Sie Personen ein, ändern Sie ihre Rollen, pausieren oder entfernen Sie sie und senden Sie Einladungen erneut oder widerrufen Sie sie — alles im Team.",
+      "open": "Benutzer öffnen"
     },
     "roles": {
       "title": "Rollen",
@@ -175,7 +178,10 @@
       "create": "Neue Rolle",
       "roleFallback": "diese Rolle",
       "permissionsLoading": "Berechtigungen werden geladen…",
-      "permissionsLoadFailed": "Die Berechtigungsliste konnte nicht geladen werden. Bitte erneut versuchen."
+      "permissionsLoadFailed": "Die Berechtigungsliste konnte nicht geladen werden. Bitte erneut versuchen.",
+      "movedTitle": "Rollen finden Sie jetzt unter Benutzer",
+      "movedBody": "Legen Sie Rollen an, benennen oder löschen Sie sie und bestimmen Sie, was jede darf — Klinikbereiche, Benutzer und Arbeitsbereich-Rechte — unter Rollen & Zugriff.",
+      "open": "Rollen & Zugriff öffnen"
     },
     "listSort": {
       "label": "Sortieren nach",

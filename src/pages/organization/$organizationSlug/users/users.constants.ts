@@ -186,6 +186,8 @@ export const USERS_KEYS = {
     },
     /** The custom role name box's accessible name. */
     nameLabel: 'roles.nameLabel',
+    /** The custom role description box's accessible name (Settings' role dialog, relocated — D17). */
+    descriptionLabel: 'roles.descriptionLabel',
     copyFrom: 'roles.copyFrom',
     /** "Front desk now has the same access as Counsellor". */
     copied: 'roles.copied',
@@ -297,6 +299,19 @@ export const USERS_KEYS = {
       description: 'roles.deleteRole.description',
       confirm: 'roles.deleteRole.confirm',
       pending: 'roles.deleteRole.pending',
+    },
+    /**
+     * Workspace permissions — the clinozy-be codes the matrix doesn't map,
+     * named by the catalog (Settings' role dialog, relocated — D17).
+     */
+    workspace: {
+      title: 'roles.workspace.title',
+      hint: 'roles.workspace.hint',
+      /** The viewer can give none of them. */
+      none: 'roles.workspace.none',
+      loadFailed: 'roles.workspace.loadFailed',
+      /** A role clinozy-be keeps as a system role: its codes are the platform's (D47). */
+      locked: 'roles.workspace.locked',
     },
   },
   /** Branches (`users.md:79–95, 176–198`; H:5196–5222). */

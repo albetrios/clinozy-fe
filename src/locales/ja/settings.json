@@ -147,7 +147,10 @@
       "cancelInviteDescription": "メールのリンクは使えなくなります。確認後数秒間は元に戻せます。後から再度招待することもできます。",
       "cancelInviteConfirm": "招待を取り消す",
       "cancelInviteKeep": "招待を残す",
-      "cancelInvitePending": "{{email}} への招待を取り消し中…"
+      "cancelInvitePending": "{{email}} への招待を取り消し中…",
+      "movedTitle": "メンバーは「ユーザー」に移動しました",
+      "movedBody": "ユーザーの招待、ロールの変更、一時停止や削除、招待の再送や取り消しは、すべて「チーム」から行えます。",
+      "open": "ユーザーを開く"
     },
     "roles": {
       "title": "ロール",
@@ -174,7 +177,10 @@
       "create": "新しいロール",
       "roleFallback": "このロール",
       "permissionsLoading": "権限を読み込み中…",
-      "permissionsLoadFailed": "権限リストを読み込めませんでした。もう一度お試しください。"
+      "permissionsLoadFailed": "権限リストを読み込めませんでした。もう一度お試しください。",
+      "movedTitle": "ロールは「ユーザー」に移動しました",
+      "movedBody": "ロールの追加・名前の変更・削除や、各ロールにできること（クリニックの各セクション、ユーザー、ワークスペースの権限）の設定は「ロールとアクセス」で行えます。",
+      "open": "ロールとアクセスを開く"
     },
     "listSort": {
       "label": "並び替え",

@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { cn } from '@/lib/utils.ts';
 import type { ClinicRoleView } from '@/shared/api/clinic/access-contracts.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
@@ -20,6 +21,7 @@ import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { RoleAbilities } from './RoleAbilities.tsx';
 import { RoleMatrix } from './RoleMatrix.tsx';
 import { rolePurposeKey } from './roles-access.ts';
+import { RoleWorkspace } from './RoleWorkspace.tsx';
 import type { RoleAccessWrites } from './use-role-access-writes.ts';
 
 /** The 11px uppercase heading every role section opens with (H:1128). */
@@ -43,9 +45,14 @@ export interface RolePageProps {
   /** A holder's other roles, " + "-joined ("Admin"). */
   alsoOf: (member: TeamMember) => string;
   writes: RoleAccessWrites;
-  /** A custom role the viewer may edit: its name is a box. */
+  /** A custom role the viewer may edit: its name and its description are boxes. */
   renamable: boolean;
   onRename: (name: string) => void;
+  /** A custom role's own description — its purpose line — or null for the default. */
+  description: string | null;
+  onDescribe: (description: string) => void;
+  /** The role's clinozy-be codes when the platform backs it: its workspace permissions show. */
+  codes?: readonly OrganizationPermission[];
   /** Shown for a custom role nobody holds (the Settings capability, relocated). */
   onDelete?: () => void;
   onOpenMember: (member: TeamMember) => void;
@@ -55,53 +62,71 @@ export interface RolePageProps {
 }
 
 /**
- * The custom role's name box (H:1125): 30px, 16px/600, at most 24
- * characters; the name commits on Enter or leaving the box, Escape puts it back.
+ * A custom role's inline box — its name (H:1125: 30px, 16px/600, at most 24
+ * characters) or its description: the text commits on Enter or leaving the
+ * box, Escape puts it back. An empty name puts the old one back; an empty
+ * description commits, and the page reads it as the default.
  */
-function RoleNameBox({
-  name,
+function RoleTextBox({
+  value,
   label,
-  onRename,
+  maxLength,
+  placeholder,
+  allowEmpty = false,
+  onCommit,
+  testId,
+  className,
 }: {
-  name: string;
+  value: string;
   label: string;
-  onRename: (name: string) => void;
+  maxLength: number;
+  placeholder?: string;
+  allowEmpty?: boolean;
+  onCommit: (value: string) => void;
+  testId: string;
+  className: string;
 }) {
-  const [draft, setDraft] = useState(name);
-  const [was, setWas] = useState(name);
-  if (name !== was) {
-    setWas(name);
-    setDraft(name);
+  const [draft, setDraft] = useState(value);
+  const [was, setWas] = useState(value);
+  if (value !== was) {
+    setWas(value);
+    setDraft(value);
   }
   const commit = () => {
     const next = draft.trim();
-    if (next && next !== name) onRename(next);
-    else setDraft(name);
+    if ((next || allowEmpty) && next !== value) onCommit(next);
+    else setDraft(value);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') event.currentTarget.blur();
-    if (event.key === 'Escape') setDraft(name);
+    if (event.key === 'Escape') setDraft(value);
   };
   return (
     <input
       value={draft}
-      maxLength={24}
+      maxLength={maxLength}
       aria-label={label}
+      placeholder={placeholder}
       onChange={(event) => setDraft(event.target.value)}
       onBlur={commit}
       onKeyDown={onKeyDown}
-      data-testid="users-role-name"
-      className="bg-background focus-visible:border-ring -ms-2 h-7.5 max-w-70 rounded-md border px-2 text-base font-semibold outline-none"
+      data-testid={testId}
+      className={cn(
+        'bg-background focus-visible:border-ring placeholder:text-muted-foreground -ms-2 rounded-md border px-2 outline-none',
+        className,
+      )}
     />
   );
 }
 
 /**
  * One role's page (`users.md:55–77`; H:1123–1144): the head row — a 40px tile
- * in the role's tone, the name (a box for a custom role), its purpose, "Copy
- * access from" (editable roles) and "Preview as <role>" (never Admin) — then
- * "People with this role", the matrix, the eleven special permissions and the
- * note. On a phone it starts with "Back to roles" and the head row wraps.
+ * in the role's tone, the name and its purpose (a custom role's own
+ * description; both boxes when it is editable), "Copy access from" (editable
+ * roles) and "Preview as <role>" (never Admin) — then "People with this role",
+ * the matrix, the eleven special permissions, the workspace permissions of a
+ * role clinozy-be backs (Settings' role dialog, relocated — D17) and the note.
+ * On a phone it starts with "Back to roles" and the head row wraps.
  */
 export function RolePage(props: RolePageProps) {
   const { t } = useTranslation(USERS_NS);
@@ -139,21 +164,38 @@ export function RolePage(props: RolePageProps) {
         </span>
         <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-0.5">
           {props.renamable ? (
-            <RoleNameBox
-              name={label}
-              label={t(USERS_KEYS.roles.nameLabel)}
-              onRename={props.onRename}
-            />
+            <>
+              <RoleTextBox
+                value={label}
+                label={t(USERS_KEYS.roles.nameLabel)}
+                maxLength={24}
+                onCommit={props.onRename}
+                testId="users-role-name"
+                className="h-7.5 max-w-70 text-base font-semibold"
+              />
+              <RoleTextBox
+                value={props.description ?? ''}
+                label={t(USERS_KEYS.roles.descriptionLabel)}
+                placeholder={t(rolePurposeKey(role, true))}
+                maxLength={160}
+                allowEmpty
+                onCommit={props.onDescribe}
+                testId="users-role-description"
+                className="text-detail text-muted-foreground-strong h-7 w-full max-w-120 leading-[1.45]"
+              />
+            </>
           ) : (
-            <h2 className="text-[17px] leading-tight font-semibold tracking-[-0.01em]">
-              {label}
-            </h2>
+            <>
+              <h2 className="text-[17px] leading-tight font-semibold tracking-[-0.01em]">
+                {label}
+              </h2>
+              <span className="text-detail text-muted-foreground-strong leading-[1.45] text-pretty">
+                {props.description ?? t(rolePurposeKey(role, true))}
+              </span>
+            </>
           )}
-          <span className="text-detail text-muted-foreground-strong leading-[1.45] text-pretty">
-            {t(rolePurposeKey(role, true))}
-          </span>
         </div>
-        <div className="flex flex-none flex-wrap gap-2">
+        <div className="flex min-w-0 flex-wrap gap-2">
           {props.onDelete ? (
             <Button
               type="button"
@@ -270,6 +312,16 @@ export function RolePage(props: RolePageProps) {
           <SectionTitle>{t(USERS_KEYS.roles.abilities.title)}</SectionTitle>
           <RoleAbilities role={role} writes={writes} />
         </section>
+
+        {props.codes ? (
+          <section className="flex flex-col gap-2">
+            <SectionTitle>{t(USERS_KEYS.roles.workspace.title)}</SectionTitle>
+            <span className="text-caption text-muted-foreground text-pretty">
+              {t(USERS_KEYS.roles.workspace.hint)}
+            </span>
+            <RoleWorkspace role={role} codes={props.codes} writes={writes} />
+          </section>
+        ) : null}
 
         <span className="text-muted-foreground text-xs leading-normal text-pretty">
           {t(note)}

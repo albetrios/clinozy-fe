@@ -35,6 +35,8 @@ export interface RoleAccessWrites {
   toggleCell: (section: MatrixSection, action: ClinicAction) => void;
   toggleRow: (section: MatrixSection) => void;
   toggleAbility: (ability: ClinicAbility) => void;
+  /** A workspace permission — one clinozy-be code the matrix doesn't map — on or off. */
+  toggleCode: (code: OrganizationPermission) => void;
   copyFrom: (source: ClinicRoleView, sourceLabel: string, label: string) => void;
 }
 
@@ -44,7 +46,8 @@ export interface RoleAccessWrites {
  * toast when refused. The fixture matrix holds the clinic sections and the
  * abilities (REPLACE_WITH_API); a role clinozy-be backs keeps its Users row and
  * "Change roles & access" as its permission codes (D17) — written there and
- * mirrored on the matrix, so a View-as preview reads the same row. Admin, and
+ * mirrored on the matrix, so a View-as preview reads the same row — and its
+ * workspace permissions are its other codes, written the same way. Admin, and
  * a viewer without "Change roles & access", get the lock's toast instead; a
  * role clinozy-be keeps as a system role has its codes read-only (D47).
  */
@@ -120,6 +123,21 @@ export function useRoleAccessWrites(
           );
       if (ability === 'perms' && !writeCodes(role.grants.users, !on)) return;
       updateMatrix.mutate({ kind: 'abilities', key: role.key, abilities });
+    },
+    toggleCode: (code) => {
+      if (!role?.platformBacked || refused()) return;
+      if (platformLocked) {
+        notify.info(t(USERS_KEYS.roles.workspace.locked));
+        return;
+      }
+      const platformRole = role.platformRole;
+      if (!(platformRole && codes)) return;
+      updateCodes.mutate({
+        role: platformRole,
+        codes: codes.includes(code)
+          ? codes.filter((held) => held !== code)
+          : [...codes, code],
+      });
     },
     copyFrom: (source, sourceLabel, label) => {
       if (!role || refused()) return;

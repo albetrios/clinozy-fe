@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { AuthUser } from '@/shared/auth/types.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -64,7 +67,35 @@ function teamMember(overrides: Partial<TeamMember> = {}): TeamMember {
 beforeEach(() => {
   scheduled.schedule.mockReset();
   for (const fn of Object.values(writes)) fn.mockReset();
+  useAuthStore.setState({
+    user: { id: 'usr_riya', email: 'riya@cresence.skin', role: 'user' } as AuthUser,
+  });
+  useOrganizationStore
+    .getState()
+    .setPermissions(['membership:read', 'membership:manage', 'invitation:manage']);
 });
+
+/** An invited member, deleted with a reason: the scheduled removal's commit. */
+async function deleteInvited(user: ReturnType<typeof userEvent.setup>) {
+  renderWithProviders(
+    <UserDeleteConfirm
+      target={{
+        member: teamMember({
+          status: 'invited',
+          invitation: { id: 'inv_1', expiresAt: '2026-10-10T00:00:00.000Z' },
+          profile: null,
+        }),
+      }}
+      onClose={vi.fn()}
+    />,
+  );
+  const dialog = await screen.findByTestId('confirm-dialog');
+  await user.click(within(dialog).getByTestId('confirm-reason-mistake'));
+  await user.click(within(dialog).getByTestId('confirm-accept'));
+  await waitFor(() => expect(scheduled.schedule).toHaveBeenCalledTimes(1));
+  const [input] = scheduled.schedule.mock.calls[0] as [{ commit: () => Promise<void> }];
+  await input.commit();
+}
 
 describe('UserDeleteConfirm (users.md:238–252)', () => {
   it('asks "Delete this user?" with the name — or the drawer’s summary — in the pill', async () => {
@@ -121,28 +152,19 @@ describe('UserDeleteConfirm (users.md:238–252)', () => {
   });
 
   it('cancels an invited member’s invitation instead', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(
-      <UserDeleteConfirm
-        target={{
-          member: teamMember({
-            status: 'invited',
-            invitation: { id: 'inv_1', expiresAt: '2026-10-10T00:00:00.000Z' },
-            profile: null,
-          }),
-        }}
-        onClose={vi.fn()}
-      />,
-    );
-    const dialog = await screen.findByTestId('confirm-dialog');
-    await user.click(within(dialog).getByTestId('confirm-reason-mistake'));
-    await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() => expect(scheduled.schedule).toHaveBeenCalledTimes(1));
-    const [input] = scheduled.schedule.mock.calls[0] as [{ commit: () => Promise<void> }];
-    await input.commit();
+    await deleteInvited(userEvent.setup());
     expect(writes.revokeInvitation).toHaveBeenCalledWith('inv_1');
     expect(writes.removeMember).not.toHaveBeenCalled();
     expect(writes.removeProfile).not.toHaveBeenCalled();
+  });
+
+  it('removes the invited membership for a viewer who may not manage invitations (D17)', async () => {
+    useOrganizationStore
+      .getState()
+      .setPermissions(['membership:read', 'membership:manage']);
+    await deleteInvited(userEvent.setup());
+    expect(writes.removeMember).toHaveBeenCalledWith('mbr_reenal');
+    expect(writes.revokeInvitation).not.toHaveBeenCalled();
   });
 
   it('keeps everyone on "Keep it"', async () => {

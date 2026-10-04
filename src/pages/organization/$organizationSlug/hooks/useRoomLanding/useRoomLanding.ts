@@ -35,7 +35,7 @@ export function useRoomLanding(): void {
       : null;
 
   useEffect(() => {
-    if (!landing || !organizationSlug) return;
+    if (!(landing && organizationSlug)) return;
     void navigate({
       to: CLINIC_SECTION_ROUTES[landing],
       params: { organizationSlug },

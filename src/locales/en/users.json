@@ -159,6 +159,7 @@
       "customPage": "Custom role · set what it can do below"
     },
     "nameLabel": "Role name",
+    "descriptionLabel": "Role description",
     "copyFrom": "Copy access from",
     "copied": "{{role}} now has the same access as {{from}}",
     "preview": "Preview as {{role}}",
@@ -255,6 +256,13 @@
       "description": "Members with this role will need a new one assigned. You can undo for a few seconds after confirming.",
       "confirm": "Delete",
       "pending": "Deleting {{name}}…"
+    },
+    "workspace": {
+      "title": "Workspace permissions",
+      "hint": "Settings, integrations, billing and the audit log — beyond the sections above. You can only give what you have yourself.",
+      "none": "There’s nothing else you can give this role.",
+      "loadFailed": "Couldn’t load the workspace permissions.",
+      "locked": "{{productName}} keeps this role’s workspace permissions · they can’t be changed here"
     }
   },
   "branches": {

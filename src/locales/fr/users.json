@@ -160,6 +160,7 @@
       "customPage": "Rôle personnalisé · définissez ci-dessous ce qu’il peut faire"
     },
     "nameLabel": "Nom du rôle",
+    "descriptionLabel": "Description du rôle",
     "copyFrom": "Copier l’accès de",
     "copied": "{{role}} a désormais le même accès que {{from}}",
     "preview": "Aperçu en tant que {{role}}",
@@ -256,6 +257,13 @@
       "description": "Les membres avec ce rôle devront en recevoir un nouveau. Vous pourrez annuler pendant quelques secondes après confirmation.",
       "confirm": "Supprimer",
       "pending": "Suppression de {{name}}…"
+    },
+    "workspace": {
+      "title": "Autorisations de l’espace de travail",
+      "hint": "Paramètres, intégrations, facturation et journal d’audit — au-delà des sections ci-dessus. Vous ne pouvez accorder que ce que vous avez vous-même.",
+      "none": "Vous n’avez rien d’autre à accorder à ce rôle.",
+      "loadFailed": "Impossible de charger les autorisations de l’espace de travail.",
+      "locked": "{{productName}} gère les autorisations de l’espace de travail de ce rôle · elles ne peuvent pas être modifiées ici"
     }
   },
   "branches": {

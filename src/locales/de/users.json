@@ -159,6 +159,7 @@
       "customPage": "Eigene Rolle · legen Sie unten fest, was sie darf"
     },
     "nameLabel": "Rollenname",
+    "descriptionLabel": "Rollenbeschreibung",
     "copyFrom": "Zugriff kopieren von",
     "copied": "{{role}} hat jetzt denselben Zugriff wie {{from}}",
     "preview": "Vorschau als {{role}}",
@@ -255,6 +256,13 @@
       "description": "Mitglieder mit dieser Rolle benötigen eine neue Zuweisung. Sie können kurz nach der Bestätigung rückgängig machen.",
       "confirm": "Löschen",
       "pending": "{{name}} wird gelöscht…"
+    },
+    "workspace": {
+      "title": "Arbeitsbereich-Rechte",
+      "hint": "Einstellungen, Integrationen, Abrechnung und Audit-Protokoll — über die Bereiche oben hinaus. Sie können nur vergeben, was Sie selbst haben.",
+      "none": "Mehr können Sie dieser Rolle nicht geben.",
+      "loadFailed": "Die Arbeitsbereich-Rechte konnten nicht geladen werden.",
+      "locked": "{{productName}} legt die Arbeitsbereich-Rechte dieser Rolle fest · sie lassen sich hier nicht ändern"
     }
   },
   "branches": {

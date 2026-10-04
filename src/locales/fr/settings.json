@@ -150,7 +150,10 @@
       "cancelInviteDescription": "Le lien reçu par e-mail ne fonctionnera plus. Vous pourrez annuler pendant quelques secondes après confirmation, ou renvoyer une invitation plus tard.",
       "cancelInviteConfirm": "Annuler l'invitation",
       "cancelInviteKeep": "Conserver l'invitation",
-      "cancelInvitePending": "Annulation de l'invitation envoyée à {{email}}…"
+      "cancelInvitePending": "Annulation de l'invitation envoyée à {{email}}…",
+      "movedTitle": "Les membres sont désormais dans Utilisateurs",
+      "movedBody": "Invitez des personnes, changez leurs rôles, mettez-les en pause ou retirez-les, et renvoyez ou annulez les invitations — le tout depuis l’Équipe.",
+      "open": "Ouvrir Utilisateurs"
     },
     "roles": {
       "title": "Rôles",
@@ -178,7 +181,10 @@
       "create": "Nouveau rôle",
       "roleFallback": "ce rôle",
       "permissionsLoading": "Chargement des autorisations…",
-      "permissionsLoadFailed": "Impossible de charger la liste des autorisations. Veuillez réessayer."
+      "permissionsLoadFailed": "Impossible de charger la liste des autorisations. Veuillez réessayer.",
+      "movedTitle": "Les rôles sont désormais dans Utilisateurs",
+      "movedBody": "Ajoutez, renommez et supprimez des rôles, et choisissez ce que chacun peut faire — les sections de la clinique, Utilisateurs et les autorisations de l’espace de travail — dans Rôles et accès.",
+      "open": "Ouvrir Rôles et accès"
     },
     "listSort": {
       "label": "Trier par",

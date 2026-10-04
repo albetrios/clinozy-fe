@@ -148,7 +148,10 @@
       "cancelInviteDescription": "The link in their email will stop working. You can undo for a few seconds after confirming, or invite them again later.",
       "cancelInviteConfirm": "Cancel invitation",
       "cancelInviteKeep": "Keep invitation",
-      "cancelInvitePending": "Cancelling the invitation to {{email}}…"
+      "cancelInvitePending": "Cancelling the invitation to {{email}}…",
+      "movedTitle": "Members now live in Users",
+      "movedBody": "Invite people, change their roles, pause or remove them, and resend or cancel invitations — all from the Team.",
+      "open": "Open Users"
     },
     "roles": {
       "title": "Roles",
@@ -175,7 +178,10 @@
       "create": "New role",
       "roleFallback": "this role",
       "permissionsLoading": "Loading permissions…",
-      "permissionsLoadFailed": "Couldn't load the permission list. Please try again."
+      "permissionsLoadFailed": "Couldn't load the permission list. Please try again.",
+      "movedTitle": "Roles now live in Users",
+      "movedBody": "Add, rename and delete roles, and choose what each can do — the clinic sections, Users and workspace permissions — in Roles & access.",
+      "open": "Open Roles & access"
     },
     "listSort": {
       "label": "Sort by",

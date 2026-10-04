@@ -15,6 +15,8 @@ import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
+import type * as UsersRoomLinkModule from './UsersRoomLink.tsx';
+
 /**
  * The panel schedules its deferred removal through the query cache now, so it
  * needs a client. Kept local (rather than renderWithProviders) so these stay
@@ -83,6 +85,13 @@ vi.mock('@/shared/hooks/useInvitations/index.ts', () => ({
     revokeInvitationOptions.push(options);
     return { mutateAsync: revokeMutateAsync };
   },
+}));
+// The Users room's link has its own suite; here only which surface the panel shows.
+vi.mock('./UsersRoomLink.tsx', async (importOriginal) => ({
+  ...(await importOriginal<typeof UsersRoomLinkModule>()),
+  UsersRoomLink: ({ section }: { section: string }) => (
+    <p data-testid={`users-room-link-${section}`}>{section}</p>
+  ),
 }));
 vi.mock('@/shared/components/InviteMemberDialog/index.ts', () => ({
   InviteMemberDialog: () => (
@@ -262,6 +271,24 @@ async function confirmRemoval(user: ReturnType<typeof userEvent.setup>) {
   await user.click(await screen.findByTestId('member-remove-mem_1'));
   await user.click(await screen.findByTestId('confirm-accept'));
 }
+
+describe('OrganizationMembersPanel — the Users room (D17)', () => {
+  it('links into the Team when the member can open the Users room', () => {
+    setPermissions(['membership:read', 'role:read', 'membership:manage']);
+    render(<OrganizationMembersPanel />);
+    expect(screen.getByTestId('users-room-link-members')).toBeInTheDocument();
+    expect(screen.queryByTestId('members-list')).toBeNull();
+    expect(useMembersMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the members list for a member the room is shut to — no role:read', () => {
+    useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
+    setPermissions(['membership:read']);
+    render(<OrganizationMembersPanel />);
+    expect(screen.queryByTestId('users-room-link-members')).toBeNull();
+    expect(screen.getByTestId('members-list')).toBeInTheDocument();
+  });
+});
 
 describe('OrganizationMembersPanel', () => {
   it('shows an empty state when there are no members', () => {

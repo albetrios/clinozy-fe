@@ -150,7 +150,10 @@
       "cancelInviteDescription": "El enlace de su correo dejará de funcionar. Puedes deshacerlo durante unos segundos tras confirmar o enviar una nueva invitación más tarde.",
       "cancelInviteConfirm": "Cancelar invitación",
       "cancelInviteKeep": "Mantener invitación",
-      "cancelInvitePending": "Cancelando la invitación a {{email}}…"
+      "cancelInvitePending": "Cancelando la invitación a {{email}}…",
+      "movedTitle": "Los miembros ahora están en Usuarios",
+      "movedBody": "Invita a personas, cambia sus roles, pausa o quítalas, y reenvía o cancela invitaciones — todo desde el Equipo.",
+      "open": "Abrir Usuarios"
     },
     "roles": {
       "title": "Roles y permisos",
@@ -178,7 +181,10 @@
       "create": "Nuevo rol",
       "roleFallback": "este rol",
       "permissionsLoading": "Cargando permisos…",
-      "permissionsLoadFailed": "No se pudo cargar la lista de permisos. Inténtalo de nuevo."
+      "permissionsLoadFailed": "No se pudo cargar la lista de permisos. Inténtalo de nuevo.",
+      "movedTitle": "Los roles ahora están en Usuarios",
+      "movedBody": "Añade, renombra y elimina roles, y elige qué puede hacer cada uno — las secciones de la clínica, Usuarios y los permisos del espacio de trabajo — en Roles y acceso.",
+      "open": "Abrir Roles y acceso"
     },
     "listSort": {
       "label": "Ordenar por",

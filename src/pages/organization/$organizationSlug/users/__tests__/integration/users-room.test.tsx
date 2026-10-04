@@ -2,6 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
 import {
   clinicFixtures,
@@ -18,6 +19,7 @@ import {
   renderUsersRoutes,
   resetUsersRoutes,
   SELF,
+  USERS_ADMIN_CODES,
 } from './users-test-router.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -297,10 +299,10 @@ describe('Users › a member opened from Roles & access (H:5188)', () => {
 });
 
 describe('Users › removing a member (deferred, with Undo)', () => {
-  async function confirmDelete(name: string) {
+  async function confirmDelete(name: string, codes = USERS_ADMIN_CODES) {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderUsersRoutes('/organization/acme/users', UsersPage);
+    renderUsersRoutes('/organization/acme/users', UsersPage, { codes });
     await waitFor(() =>
       expect(screen.getAllByTestId('users-team-table-row')).toHaveLength(3),
     );
@@ -354,5 +356,28 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     await vi.advanceTimersByTimeAsync(10_000);
     await waitFor(() => expect(api.revokeInvitation).toHaveBeenCalledWith('inv_new'));
     expect(api.removeMember).not.toHaveBeenCalled();
+  });
+
+  /** Codes without one of the member writes, the way a custom role might hold them. */
+  const without = (code: OrganizationPermission) =>
+    USERS_ADMIN_CODES.filter((held) => held !== code);
+
+  it('lets a viewer who may manage invitations only cancel one — as Settings did (D17)', async () => {
+    await confirmDelete('new@clinic.com', without('membership:manage'));
+    // Joined members keep no Delete without membership:manage.
+    const reenal = screen
+      .getAllByTestId('users-team-table-row')
+      .find((row) => within(row).queryByText('Dr. Reenal Chaniyara'));
+    expect(reenal && within(reenal).queryByRole('button', { name: 'Delete' })).toBeNull();
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() => expect(api.revokeInvitation).toHaveBeenCalledWith('inv_new'));
+    expect(api.removeMember).not.toHaveBeenCalled();
+  });
+
+  it('removes an invited membership for a viewer who may not manage invitations', async () => {
+    await confirmDelete('new@clinic.com', without('invitation:manage'));
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_new'));
+    expect(api.revokeInvitation).not.toHaveBeenCalled();
   });
 });

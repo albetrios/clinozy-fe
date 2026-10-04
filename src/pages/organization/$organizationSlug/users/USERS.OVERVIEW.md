@@ -15,6 +15,13 @@ and `membership:manage` (clinozy-be's invite asks for the second, D47); edit, st
 remove need `membership:manage`. View-as narrows it to the previewed role's matrix. Never a
 Delete on your own row or the owner's.
 
+It is the single members surface (D17): where the room is open to the member, Settings › Members
+and Settings › Roles render a link here (`shared/components/SettingsModal/organization/UsersRoomLink.tsx`) instead
+of their panels. Each Settings capability has its place: invite → "New user"; resend / cancel an
+invitation → the drawer's invitation line / Delete; change role, suspend → the drawer's Roles and
+Status; remove → Delete; create, rename, describe, set the permissions of and delete a role →
+Roles & access. Where the room is off or shut to the member, Settings keeps its panels.
+
 The toolbar (h1, the tab links, search, Filters, Columns, "New user" — the floating pill on a
 phone) is family-shared in `shared/components/UsersToolbar/`, with the role directory
 (`shared/hooks/useRoleDirectory/`, each role's name and tone), Roles & access itself

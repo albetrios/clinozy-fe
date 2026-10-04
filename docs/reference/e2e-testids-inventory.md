@@ -386,6 +386,8 @@ greeting block the React slot renders into it. Gone once the splash exits.
 | `suspended-switch-organization`     | Switch-organization button                                    | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
 | `settings-modal`                    | Global settings modal (hash-driven)                           | `shared/components/SettingsModal/SettingsModal.tsx`                |
 | `settings-nav-<scope>-<section>`    | Settings nav items (e.g. `settings-nav-organization-members`) | `shared/components/SettingsModal/SettingsNav.tsx`                  |
+| `settings-members-open-users`       | Settings › Members' link to the Team once Users holds it      | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
+| `settings-roles-open-users`         | Settings › Roles' link to Users › Roles & access (D17)        | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
 
 ## Shared pickers (`shared/components/Picker/`)
 
@@ -549,6 +551,8 @@ Its toolbar carries the shared ids with the `tableId` `users-roles` (`users-role
 | `users-role-matrix-<section>-<action>`              | One box (`role="checkbox"`, named "Front desk can view · Leads")   | `RoleMatrix`    |
 | `users-role-matrix-<section>-row`                   | The Row pill ("Full" / "Some" / "None")                            | `RoleMatrix`    |
 | `users-role-ability-<ability>`                      | A special permission's switch card (`role="switch"`)               | `RoleAbilities` |
+| `users-role-description`                            | A custom role's description box (Settings' role dialog, relocated) | `RolePage`      |
+| `users-role-workspace` / `users-role-code-<code>`   | Workspace permissions; one clinozy-be code's switch card (L-31f)   | `RoleWorkspace` |
 
 ### Branch drawer (Users room, launch L-31d)
 

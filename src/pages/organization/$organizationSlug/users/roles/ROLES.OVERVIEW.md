@@ -13,6 +13,14 @@ narrowed. The clinic rows and the special permissions live on the fixture matrix
 (`REPLACE_WITH_API`); a bound role's Users row and "Change roles & access" are its clinozy-be
 permission codes (D17) — read-only for a role bound to a clinozy-be system role (D47).
 
+Settings › Roles links here when the Users room is open to the member (D17, L-31f), so what
+Settings' role dialog did lives on the role page too: a custom role's description is a box under
+its name (an emptied box saves the default, "Custom role"), and **Workspace permissions** lists
+every clinozy-be code the matrix doesn't map — settings, integrations, billing, the audit log,
+uploads — as switch cards named by the catalog, for a role clinozy-be backs. The viewer gives only
+what they hold (`useAssignablePermissions`); each switch is a full replace of the role's codes,
+optimistic like a box (`useUpdateRoleCodes`). Delete role is the third relocated capability.
+
 "Preview as <role>" starts View-as for any role but Admin, a custom role included (by its
 clinozy-be id): `useUIStore.previewRole` narrows `useClinicAccess` everywhere, the shell's pill
 names the role, and a role that can't view Users is taken to its first room by the org layout

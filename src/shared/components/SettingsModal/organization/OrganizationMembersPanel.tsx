@@ -61,6 +61,8 @@ import {
   orgListSortToParams,
 } from './org-list-sort.ts';
 import { OrgListControls } from './OrgListControls.tsx';
+import { useUsersRoomOpen } from './users-room-open.ts';
+import { UsersRoomLink } from './UsersRoomLink.tsx';
 
 function initials(name: string): string {
   const letters = name
@@ -521,13 +523,23 @@ function MembersList({
 }
 
 /**
- * Members panel — the active organization's people. Lists members with their
+ * Members panel — a link into the Users room's Team where the room is this
+ * member's members surface (D17, {@link useUsersRoomOpen}); everywhere else the
+ * members list itself ({@link MembersManager}), so no deployment and no
+ * permission set loses what it could do here.
+ */
+export function OrganizationMembersPanel() {
+  return useUsersRoomOpen() ? <UsersRoomLink section="members" /> : <MembersManager />;
+}
+
+/**
+ * The active organization's people. Lists members with their
  * role + status; removal is gated on the membership:manage permission (team
  * orgs only) and confirmed via undo-capable deferred commit. An invited row shows
  * when its invitation expires, and `invitation:manage` can resend or cancel it —
  * cancel through the same confirm + undo flow as removal.
  */
-export function OrganizationMembersPanel() {
+function MembersManager() {
   const { t } = useTranslation(SETTINGS_NS);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<OrgListSortPreset>(DEFAULT_ORG_LIST_SORT);

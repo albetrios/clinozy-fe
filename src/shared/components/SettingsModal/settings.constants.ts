@@ -177,6 +177,10 @@ export const SETTINGS_KEYS = {
       cancelInviteConfirm: 'panels.members.cancelInviteConfirm',
       cancelInviteKeep: 'panels.members.cancelInviteKeep',
       cancelInvitePending: 'panels.members.cancelInvitePending',
+      /** The section once the Users room holds it (D17): what moved, and "Open Users". */
+      movedTitle: 'panels.members.movedTitle',
+      movedBody: 'panels.members.movedBody',
+      open: 'panels.members.open',
     },
     roles: {
       title: 'panels.roles.title',
@@ -204,6 +208,10 @@ export const SETTINGS_KEYS = {
       roleFallback: 'panels.roles.roleFallback',
       permissionsLoading: 'panels.roles.permissionsLoading',
       permissionsLoadFailed: 'panels.roles.permissionsLoadFailed',
+      /** The section once Users › Roles & access holds it (D17): what moved, and the link. */
+      movedTitle: 'panels.roles.movedTitle',
+      movedBody: 'panels.roles.movedBody',
+      open: 'panels.roles.open',
     },
     listSort: {
       label: 'panels.listSort.label',

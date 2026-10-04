@@ -4,8 +4,11 @@ import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+import type * as UsersRoomLinkModule from './UsersRoomLink.tsx';
 
 /**
  * The panel schedules its deferred removal through the query cache now, so it
@@ -36,6 +39,13 @@ vi.mock('@/shared/hooks/useRoles/index.ts', () => ({
     deleteRoleOptions.push(options);
     return { mutate: deleteMutateSync, mutateAsync: deleteMutate };
   },
+}));
+// The Users room's link has its own suite; here only which surface the panel shows.
+vi.mock('./UsersRoomLink.tsx', async (importOriginal) => ({
+  ...(await importOriginal<typeof UsersRoomLinkModule>()),
+  UsersRoomLink: ({ section }: { section: string }) => (
+    <p data-testid={`users-room-link-${section}`}>{section}</p>
+  ),
 }));
 // CreateRoleDialog has its own suite; here we only assert the panel renders it
 // (create trigger + controlled edit instance), so stub it to reflect its mode.
@@ -147,6 +157,37 @@ async function confirmDeletion(user: ReturnType<typeof userEvent.setup>) {
   await user.click(await screen.findByTestId('role-delete-rol_1'));
   await user.click(await screen.findByTestId('confirm-accept'));
 }
+
+/** A resolved TEAM session holding exactly these codes. */
+function holdCodes(permissions: OrganizationPermission[]) {
+  useAuthStore.setState({
+    user: { id: 'u', email: 'a@b.test', role: 'user' },
+    isAuthenticated: true,
+  });
+  useOrganizationStore.setState({
+    organizationType: 'TEAM',
+    permissions,
+    permissionsResolved: true,
+  });
+}
+
+describe('OrganizationRolesPanel — the Users room (D17)', () => {
+  it('links into Roles & access when the member can open the Users room', () => {
+    holdCodes(['membership:read', 'role:read', 'role:manage']);
+    render(<OrganizationRolesPanel />);
+    expect(screen.getByTestId('users-room-link-roles')).toBeInTheDocument();
+    expect(screen.queryByTestId('roles-list')).toBeNull();
+    expect(useRolesMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the roles list for a member the room is shut to — no membership:read', () => {
+    useRolesMock.mockReturnValue(rolesQueryResult({ rows: [CUSTOM_ROLE] }));
+    holdCodes(['role:read', 'role:manage']);
+    render(<OrganizationRolesPanel />);
+    expect(screen.queryByTestId('users-room-link-roles')).toBeNull();
+    expect(screen.getByTestId('roles-list')).toBeInTheDocument();
+  });
+});
 
 describe('OrganizationRolesPanel', () => {
   it('shows an empty state when there are no roles', () => {

@@ -160,6 +160,7 @@
       "customPage": "Ruolo personalizzato · scegli qui sotto cosa può fare"
     },
     "nameLabel": "Nome del ruolo",
+    "descriptionLabel": "Descrizione del ruolo",
     "copyFrom": "Copia accesso da",
     "copied": "{{role}} ora ha lo stesso accesso di {{from}}",
     "preview": "Anteprima come {{role}}",
@@ -256,6 +257,13 @@
       "description": "I membri con questo ruolo dovranno riceverne uno nuovo. Potrai annullare per alcuni secondi dopo la conferma.",
       "confirm": "Elimina",
       "pending": "Eliminazione di {{name}}…"
+    },
+    "workspace": {
+      "title": "Permessi dell’area di lavoro",
+      "hint": "Impostazioni, integrazioni, fatturazione e registro di audit — oltre le sezioni qui sopra. Puoi dare solo ciò che hai tu.",
+      "none": "Non c’è nient’altro che puoi dare a questo ruolo.",
+      "loadFailed": "Impossibile caricare i permessi dell’area di lavoro.",
+      "locked": "{{productName}} gestisce i permessi dell’area di lavoro di questo ruolo · non si possono cambiare qui"
     }
   },
   "branches": {

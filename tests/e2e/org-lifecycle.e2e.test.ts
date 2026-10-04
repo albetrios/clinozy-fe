@@ -3,9 +3,10 @@ import { expect, test } from '@playwright/test';
 
 import {
   createTeamOrgAndOpenDashboard,
+  navigateInApp,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
-import { openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
+import { byTestId, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   pollInvitationTokenFromMailOutbox,
@@ -90,19 +91,18 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
 
     try {
       await registerNewUserAndGoToDashboard(page);
-      await createTeamOrgAndOpenDashboard(page);
+      const { slug } = await createTeamOrgAndOpenDashboard(page);
 
-      // Invite through the real dialog.
-      await openSettingsHash(page, 'organization', 'members');
-      await expect(page.getByTestId('settings-organization-members')).toBeVisible({
-        timeout: 10_000,
-      });
-      await page.getByTestId('invite-member-open').click();
-      await page.getByTestId('invite-member-email').fill(inviteeEmail);
-      await page.getByTestId('invite-member-submit').click();
-      await expect(page.getByTestId('members-list').getByText(inviteeEmail)).toBeVisible({
-        timeout: 15_000,
-      });
+      // Invite through the Users room's "New user" — the members surface (D17).
+      await navigateInApp(page, `/organization/${slug}/users/create`);
+      await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
+      await byTestId(page, 'user-drawer-name').fill('Lifecycle Invitee');
+      await byTestId(page, 'user-drawer-email').fill(inviteeEmail);
+      await byTestId(page, 'user-drawer-save').click();
+      const row = page
+        .getByTestId('users-team-table-row')
+        .filter({ hasText: 'Lifecycle Invitee' });
+      await expect(row).toHaveCount(1, { timeout: 15_000 });
 
       // Accept via API as the invitee — both the invitation id and the raw
       // token live only in the emailed accept link.
@@ -119,30 +119,22 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       );
       expect(accept.ok(), `accept failed: ${accept.status()}`).toBe(true);
 
-      // Owner promotes the member to admin. Close and reopen the panel instead
-      // of reloading: an authenticated reload currently trips the
+      // Owner promotes the member to Admin from their drawer. Navigate away and
+      // back instead of reloading: an authenticated reload currently trips the
       // double-refresh CSRF race (see cross-tab/locale-rtl fixmes), and a
       // remount refetches the roster just as well.
-      await page.keyboard.press('Escape');
-      await expect(page.getByTestId('settings-organization-members')).toBeHidden();
-      await openSettingsHash(page, 'organization', 'members');
-      await expect(page.getByTestId('settings-organization-members')).toBeVisible({
-        timeout: 10_000,
-      });
-      const membersList = page.getByTestId('members-list');
-      const row = membersList.getByRole('listitem').filter({ hasText: inviteeEmail });
-      const actions = page.getByRole('button', {
-        name: `Actions for ${inviteeEmail}`,
-      });
-
-      await actions.click();
-      await page.getByRole('menuitemradio', { name: /admin/i }).click();
+      await navigateInApp(page, `/organization/${slug}/users/roles`);
+      await navigateInApp(page, `/organization/${slug}/users`);
+      await row.click();
+      await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
+      await byTestId(page, 'user-drawer-roles-admin').click();
+      await byTestId(page, 'user-drawer-save').click();
       await expect(row).toContainText(/admin/i, { timeout: 15_000 });
 
-      // And removes them; the row disappears.
-      await actions.click();
-      await page.getByRole('menuitem', { name: /remove/i }).click();
-      // Removal always routes through the shared ConfirmDialog.
+      // And removes them; the row leaves at once (the write runs after Undo).
+      await row.getByRole('button', { name: 'Delete' }).click();
+      // Removal always routes through the shared reason confirm.
+      await byTestId(page, 'confirm-reason-not-needed').click();
       await page.getByTestId('confirm-accept').click({ timeout: 10_000 });
       await expect(row).toHaveCount(0, { timeout: 15_000 });
     } finally {

@@ -198,7 +198,14 @@ function useTeamAccess() {
     // clinozy-be's invite needs `membership:manage` as well as `invitation:manage` (D47).
     canInvite: can('create') && (access.previewRole !== null || canManageMembers),
     canEdit: can('edit'),
-    canDelete: can('delete'),
+    /**
+     * Delete on a row — never your own or the owner's. A joined member's needs
+     * Delete (`membership:manage`); an invited one's is its invitation's cancel,
+     * which Create (`invitation:manage`) may do too, as Settings allowed (D17).
+     */
+    canDeleteMember: (member: TeamMember) =>
+      !(member.isSelf || member.isOwner) &&
+      (can('delete') || (member.status === 'invited' && can('create'))),
     canResend: can('create'),
     canExport: access.isResolved && access.canAbility('export'),
   };
@@ -268,7 +275,7 @@ export function UsersPage() {
       },
     ];
     // No Delete on your own row or the owner's (`OrganizationMembersPanel`, §7.3).
-    if (access.canDelete && !member.isSelf && !member.isOwner) {
+    if (access.canDeleteMember(member)) {
       actions.push({
         id: 'delete',
         label: t(USERS_KEYS.rowActions.delete),
@@ -378,10 +385,9 @@ export function UsersPage() {
           resolved: access.isResolved,
           canWrite: access.canEdit,
           canDelete:
-            access.canDelete &&
             dialog.kind === 'edit' &&
-            !dialog.member?.isSelf &&
-            !dialog.member?.isOwner,
+            dialog.member !== undefined &&
+            access.canDeleteMember(dialog.member),
           canResend: access.canResend,
         }}
         onClose={close}

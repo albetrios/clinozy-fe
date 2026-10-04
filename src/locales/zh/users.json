@@ -158,6 +158,7 @@
       "customPage": "自定义角色 · 在下方设置它能做什么"
     },
     "nameLabel": "角色名称",
+    "descriptionLabel": "角色说明",
     "copyFrom": "复制权限自",
     "copied": "{{role}} 现在拥有与 {{from}} 相同的权限",
     "preview": "以{{role}}身份预览",
@@ -254,6 +255,13 @@
       "description": "使用此角色的成员需要重新分配角色。确认后几秒内可撤销。",
       "confirm": "删除",
       "pending": "正在删除 {{name}}…"
+    },
+    "workspace": {
+      "title": "工作区权限",
+      "hint": "设置、集成、账单和审计日志 — 上方版块之外的权限。你只能授予自己拥有的权限。",
+      "none": "没有其他可以授予此角色的权限。",
+      "loadFailed": "无法加载工作区权限。",
+      "locked": "此角色的工作区权限由 {{productName}} 管理 · 无法在此修改"
     }
   },
   "branches": {

@@ -241,6 +241,12 @@ is the separate `AppearanceDialog` on the root route.)
 - **Escape hatch:** members / roles / billing / integrations may later be promoted to real pages
   (they are table-heavy admin surfaces — expect it). When promoted, keep a
   `#settings/organization/members` → path redirect shim so old links survive.
+- **Members and Roles live in the Users room (D17).** Where the room is open to the member — the
+  `clinic-users` module is on and their codes view Users (`membership:read` + `role:read`,
+  `useUsersRoomOpen`) — `#settings/organization/members` and `…/roles` keep their nav entries
+  and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
+  that drops the hash, closing the modal. Everywhere else (production keeps the room off
+  until its API lands, D8; a Viewer without `role:read`) the panels stay as they were.
 
 ## 8. IDs and route params
 

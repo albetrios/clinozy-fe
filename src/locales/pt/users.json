@@ -160,6 +160,7 @@
       "customPage": "Função personalizada · defina abaixo o que ela pode fazer"
     },
     "nameLabel": "Nome da função",
+    "descriptionLabel": "Descrição da função",
     "copyFrom": "Copiar acesso de",
     "copied": "{{role}} agora tem o mesmo acesso que {{from}}",
     "preview": "Visualizar como {{role}}",
@@ -256,6 +257,13 @@
       "description": "Membros com esta função precisarão de uma nova. Você pode desfazer por alguns segundos após confirmar.",
       "confirm": "Excluir",
       "pending": "Excluindo {{name}}…"
+    },
+    "workspace": {
+      "title": "Permissões do espaço de trabalho",
+      "hint": "Configurações, integrações, cobrança e registro de auditoria — além das seções acima. Você só pode dar o que você mesmo tem.",
+      "none": "Não há mais nada que você possa dar a esta função.",
+      "loadFailed": "Não foi possível carregar as permissões do espaço de trabalho.",
+      "locked": "O {{productName}} controla as permissões do espaço de trabalho desta função · não dá para alterar aqui"
     }
   },
   "branches": {

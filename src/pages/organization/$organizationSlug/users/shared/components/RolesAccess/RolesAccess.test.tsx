@@ -54,6 +54,7 @@ vi.mock('@/shared/notify/notify.ts', () => ({
 const api = vi.hoisted(() => ({
   listMembers: vi.fn(),
   listRoles: vi.fn(),
+  listPermissionCatalog: vi.fn(),
   getRolePermissions: vi.fn(),
   createRole: vi.fn(),
   updateRole: vi.fn(),
@@ -76,6 +77,14 @@ vi.mock('@/shared/api/clinic/access-api.ts', async (importOriginal) => {
         : actual.saveRoleMatrixChange(change),
   };
 });
+
+/** clinozy-be's permission catalog, as `listPermissionCatalog` maps it. */
+const CATALOG = [
+  { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
+  { code: 'membership:read', name: 'View Members', category: 'tenancy' },
+  { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
+  { code: 'audit-log:read', name: 'View Audit Log', category: 'audit' },
+];
 
 const ROSTER = [
   member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
@@ -116,6 +125,7 @@ beforeEach(() => {
   for (const fn of Object.values(api)) fn.mockReset();
   platformRoles = Object.values(PLATFORM_ROLES);
   api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
+  api.listPermissionCatalog.mockResolvedValue(CATALOG);
   api.listRoles.mockImplementation(() =>
     Promise.resolve({ rows: platformRoles, next: null, hasMore: false }),
   );
@@ -344,6 +354,108 @@ describe('RolesAccess — who may change what (Q-U6, D47)', () => {
     // Its clinic rows stay the fixture's, and writable.
     await user.click(box('medical', 'view'));
     expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'true');
+  });
+});
+
+describe('RolesAccess — Settings’ role dialog, relocated (D17)', () => {
+  const SENIOR = `/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`;
+
+  it('gives a custom role a workspace permission the viewer holds', async () => {
+    const user = userEvent.setup();
+    renderRoles(SENIOR, [...USERS_ADMIN_CODES, 'webhook:manage']);
+    const page = await rolePage();
+    const workspace = await within(page).findByTestId('users-role-workspace');
+    // The catalog's codes the matrix doesn't map — only those the viewer holds.
+    expect(
+      within(workspace)
+        .getAllByRole('switch')
+        .map((card) => card.textContent),
+    ).toEqual(['View Organization', 'Manage Webhooks']);
+    expect(
+      within(workspace).getByTestId('users-role-code-organization:read'),
+    ).toHaveAttribute('aria-checked', 'true');
+    const webhooks = within(workspace).getByTestId('users-role-code-webhook:manage');
+    expect(webhooks).toHaveAttribute('aria-checked', 'false');
+    expect(webhooks).toHaveAttribute('title', 'webhook:manage');
+
+    await user.click(webhooks);
+    await waitFor(() =>
+      expect(api.updateRole).toHaveBeenCalledWith({
+        id: PLATFORM_ROLES.senior.id,
+        name: 'Senior desk',
+        description: '',
+        permissions: ['organization:read', 'webhook:manage'],
+      }),
+    );
+    expect(webhooks).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('reads the workspace permissions only, without "Change roles & access"', async () => {
+    const user = userEvent.setup();
+    renderRoles(
+      SENIOR,
+      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
+    );
+    const card = await screen.findByTestId('users-role-code-organization:read');
+    expect(card).toHaveAttribute('aria-disabled', 'true');
+    await user.click(card);
+    expect(notifyMock.info).toHaveBeenCalledWith('You can’t change roles · ask an admin');
+    expect(api.updateRole).not.toHaveBeenCalled();
+  });
+
+  it('keeps a system-bound role’s workspace permissions the platform’s', async () => {
+    const user = userEvent.setup();
+    platformRoles = [...platformRoles, platformRole('doctor', 'Doctor', true)];
+    renderRoles('/organization/acme/users/roles?role=doctor');
+    const card = await screen.findByTestId('users-role-code-organization:read');
+    await user.click(card);
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      `${PRODUCT_NAME} keeps this role’s workspace permissions · they can’t be changed here`,
+    );
+    expect(api.updateRole).not.toHaveBeenCalled();
+  });
+
+  it('shows no workspace permissions for a role clinozy-be doesn’t back', async () => {
+    renderRoles('/organization/acme/users/roles?role=front_desk');
+    const page = await rolePage();
+    expect(within(page).queryByTestId('users-role-workspace')).toBeNull();
+    expect(within(page).queryByText('Workspace permissions')).toBeNull();
+  });
+
+  it('describes a custom role in place — an emptied box is the default', async () => {
+    const user = userEvent.setup();
+    renderRoles(SENIOR);
+    const page = await rolePage();
+    const description = within(page).getByTestId('users-role-description');
+    expect(description).toHaveValue('');
+    expect(description).toHaveAttribute(
+      'placeholder',
+      'Custom role · set what it can do below',
+    );
+    await user.type(description, 'Runs the evening desk{Enter}');
+    await waitFor(() =>
+      expect(api.updateRole).toHaveBeenCalledWith({
+        id: PLATFORM_ROLES.senior.id,
+        name: 'Senior desk',
+        description: 'Runs the evening desk',
+        permissions: ['organization:read'],
+      }),
+    );
+  });
+
+  it('shows a custom role’s own description to a viewer who can’t edit it', async () => {
+    platformRoles = platformRoles.map((role) =>
+      role.id === PLATFORM_ROLES.senior.id
+        ? { ...role, description: 'Runs the evening desk' }
+        : role,
+    );
+    renderRoles(
+      SENIOR,
+      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
+    );
+    const page = await rolePage();
+    expect(await within(page).findByText('Runs the evening desk')).toBeInTheDocument();
+    expect(within(page).queryByTestId('users-role-description')).toBeNull();
   });
 });
 

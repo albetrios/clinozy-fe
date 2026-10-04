@@ -4,6 +4,7 @@ import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { useCan } from '@/shared/hooks/useCan/index.ts';
 import { useDeferredRowRemoval } from '@/shared/hooks/useDeferredRowRemoval/index.ts';
 import { useRevokeInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { useRemoveMember } from '@/shared/hooks/useMembers/index.ts';
@@ -40,8 +41,9 @@ export interface UserDeleteConfirmProps {
  * reason confirm titled "Delete this user?", the name (or the drawer's
  * summary) in its pill. The row leaves the Team at once and "<name> removed"
  * offers Undo for 10s; only then does the membership go — `useRemoveMember`,
- * or, for an invited member, `useRevokeInvitation` (the invitation cancelled)
- * — and the staff profile with the reason picked (clinozy-be keeps no reason
+ * or, for an invited member, `useRevokeInvitation` (the invitation cancelled;
+ * a viewer who may manage members but not invitations removes the membership,
+ * Settings' fallback — D17) — and the staff profile with the reason picked (clinozy-be keeps no reason
  * for a membership, Appendix F). Never the owner's or your own row: the
  * screens offer no Delete there.
  */
@@ -59,6 +61,7 @@ export function UserDeleteConfirm({
   const removeMember = useRemoveMember({ suppressSuccessToast: true });
   const revokeInvitation = useRevokeInvitation({ suppressSuccessToast: true });
   const removeProfile = useRemoveStaffProfile();
+  const canRevoke = useCan({ permission: 'invitation:manage' });
 
   return (
     <ConfirmDialog
@@ -78,7 +81,8 @@ export function UserDeleteConfirm({
           toastId: `remove-user-${member.membershipId}`,
           delayMs: UNDO_MS,
           commit: async () => {
-            if (invitation) await revokeInvitation.mutateAsync(invitation.id);
+            if (invitation && canRevoke)
+              await revokeInvitation.mutateAsync(invitation.id);
             else await removeMember.mutateAsync(member.membershipId);
             if (member.profile) {
               await removeProfile.mutateAsync({ id: member.profile.id, reason, note });

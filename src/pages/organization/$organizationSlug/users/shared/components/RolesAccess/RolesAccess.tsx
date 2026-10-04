@@ -42,7 +42,19 @@ export interface RolesAccessProps {
   selected: string | undefined;
 }
 
-/** A role's rename and, for an unheld custom role, its delete (the Settings capabilities, D17). */
+/** A custom role's own description, or null while it has the default one "New role" gave it. */
+function customDescription(
+  role: ClinicRoleView | null,
+  defaultDescription: string,
+): string | null {
+  const description = role?.preset === null ? role.platformRole?.description.trim() : '';
+  return description && description !== defaultDescription ? description : null;
+}
+
+/**
+ * A role's rename and description and, for an unheld custom role, its delete
+ * — the Settings capabilities, relocated (D17).
+ */
 function useRoleAdmin(role: ClinicRoleView | null, directory: RoleDirectory) {
   const { t } = useTranslation([USERS_NS, ERRORS_NS]);
   const organizationId = useOrganizationStore((state) => state.organizationId);
@@ -56,8 +68,25 @@ function useRoleAdmin(role: ClinicRoleView | null, directory: RoleDirectory) {
     orgQueryKeys.roles(organizationId),
   );
 
+  /** Save the role's name and description over its codes as they are (a full replace). */
+  const save = (name: string, description: string) => {
+    const platformRole = role?.platformRole;
+    if (!(platformRole && codes.data)) return;
+    rename.mutate({ id: platformRole.id, name, description, permissions: codes.data });
+  };
+
   return {
     codes: codes.data,
+    description: customDescription(role, t(USERS_KEYS.roles.purposes.custom)),
+    describe: (description: string) => {
+      const platformRole = role?.platformRole;
+      if (!platformRole) return;
+      // clinozy-be needs two characters at least; an emptied box is the default.
+      save(
+        platformRole.name,
+        description.length >= 2 ? description : t(USERS_KEYS.roles.purposes.custom),
+      );
+    },
     rename: (name: string) => {
       const platformRole = role?.platformRole;
       if (!(role && platformRole && codes.data)) return;
@@ -70,12 +99,7 @@ function useRoleAdmin(role: ClinicRoleView | null, directory: RoleDirectory) {
         notify.error(t(USERS_KEYS.roles.duplicateName, { name }));
         return;
       }
-      rename.mutate({
-        id: platformRole.id,
-        name,
-        description: platformRole.description || t(USERS_KEYS.roles.purposes.custom),
-        permissions: codes.data,
-      });
+      save(name, platformRole.description || t(USERS_KEYS.roles.purposes.custom));
     },
     remove: (onScheduled: () => void) => {
       const platformRole = role?.platformRole;
@@ -165,6 +189,9 @@ function RolePane({
       writes={writes}
       renamable={role.preset === null && writes.lock === null}
       onRename={screen.admin.rename}
+      description={screen.admin.description}
+      onDescribe={screen.admin.describe}
+      codes={role.platformBacked ? screen.admin.codes : undefined}
       onDelete={screen.deletable ? onDelete : undefined}
       onOpenMember={(member) => navigation.openMember(member, role.key)}
       onPreview={() => navigation.preview(role, label)}

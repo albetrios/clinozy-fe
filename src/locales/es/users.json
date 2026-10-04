@@ -160,6 +160,7 @@
       "customPage": "Rol personalizado · define abajo qué puede hacer"
     },
     "nameLabel": "Nombre del rol",
+    "descriptionLabel": "Descripción del rol",
     "copyFrom": "Copiar acceso de",
     "copied": "{{role}} ahora tiene el mismo acceso que {{from}}",
     "preview": "Vista previa como {{role}}",
@@ -256,6 +257,13 @@
       "description": "Los miembros con este rol necesitarán que se les asigne uno nuevo. Puedes deshacerlo durante unos segundos tras confirmar.",
       "confirm": "Eliminar",
       "pending": "Eliminando {{name}}…"
+    },
+    "workspace": {
+      "title": "Permisos del espacio de trabajo",
+      "hint": "Ajustes, integraciones, facturación y registro de auditoría — más allá de las secciones de arriba. Solo puedes dar lo que tú tienes.",
+      "none": "No hay nada más que puedas dar a este rol.",
+      "loadFailed": "No se pudieron cargar los permisos del espacio de trabajo.",
+      "locked": "{{productName}} gestiona los permisos del espacio de trabajo de este rol · no se pueden cambiar aquí"
     }
   },
   "branches": {
