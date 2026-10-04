@@ -4,11 +4,11 @@ import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 
 import {
-  defaultHomeBranchId,
   emptyPatientForm,
   followUpPresets,
   invalidPatientPhones,
   missingPatientFields,
+  PATIENT_FORM_LIMITS,
   PATIENT_QUICK_FILLS,
   patientFormName,
   patientFormOf,
@@ -44,6 +44,19 @@ describe('the patient form', () => {
       followUpDate: null,
     });
     expect(emptyPatientForm().firstName).toBe('');
+  });
+
+  it('takes a booking’s care types and reason as the types and notes it starts with', () => {
+    const form = emptyPatientForm({
+      name: 'Riya',
+      types: ['lhr', 'clinical'],
+      notes: 'x'.repeat(1200),
+    });
+    expect(form.types).toEqual(['lhr', 'clinical']);
+    expect(form.notes).toHaveLength(PATIENT_FORM_LIMITS.notes);
+    expect(emptyPatientForm({ notes: 'Pigmentation on cheeks' }).notes).toBe(
+      'Pigmentation on cheeks',
+    );
   });
 
   it('reads a saved patient back, the follow-up as its clinic-local day and time', () => {
@@ -158,17 +171,5 @@ describe('the patient form', () => {
       followUpTime: null,
     });
     expect(PATIENT_QUICK_FILLS[3]?.values).toEqual({ types: ['lhr'], status: 'new' });
-  });
-
-  it('starts at the header’s one branch, else the main one', () => {
-    const branches = [
-      { id: 'adajan', isMain: true },
-      { id: 'vesu', isMain: false },
-    ];
-    expect(defaultHomeBranchId(branches, [])).toBe('adajan');
-    expect(defaultHomeBranchId(branches, ['vesu'])).toBe('vesu');
-    expect(defaultHomeBranchId(branches, ['vesu', 'adajan'])).toBe('adajan');
-    expect(defaultHomeBranchId(branches, ['gone'])).toBe('adajan');
-    expect(defaultHomeBranchId([], [])).toBeNull();
   });
 });

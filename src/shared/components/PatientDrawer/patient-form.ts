@@ -1,5 +1,4 @@
 import type {
-  Branch,
   Gender,
   PatientConversion,
   PatientStatus,
@@ -61,6 +60,10 @@ export interface PatientDrawerPrefill {
   phone?: string;
   /** The lead the patient comes from — saved as `leadId` (`S:317`). */
   leadId?: string;
+  /** Their care types instead of Aesthetic — the booking's "Create patient record" (H:6039). */
+  types?: readonly PatientType[];
+  /** Notes to start with — the booking's Reason (H:6039). */
+  notes?: string;
 }
 
 /** The form's own limits (`patients.md:44–58`): the contract allows more for address and notes. */
@@ -87,7 +90,10 @@ export function splitPatientName(name: string): { firstName: string; lastName: s
   return { firstName, lastName: rest.join(' ') };
 }
 
-/** A new patient's form: New and Aesthetic, nothing else picked, the prefill's name and mobile. */
+/**
+ * A new patient's form: New and Aesthetic, nothing else picked, the prefill's
+ * name and mobile — and its types and notes when a booking prefills them.
+ */
 export function emptyPatientForm(prefill: PatientDrawerPrefill = {}): PatientFormValues {
   const { firstName, lastName } = splitPatientName(prefill.name ?? '');
   return {
@@ -99,14 +105,14 @@ export function emptyPatientForm(prefill: PatientDrawerPrefill = {}): PatientFor
     homeBranchId: null,
     gender: null,
     dateOfBirth: null,
-    types: [...NEW_PATIENT_TYPES],
+    types: [...(prefill.types ?? NEW_PATIENT_TYPES)],
     status: 'new',
     conversion: null,
     referredByName: '',
     referralSource: null,
     followUpDate: null,
     followUpTime: null,
-    notes: '',
+    notes: prefill.notes?.slice(0, PATIENT_FORM_LIMITS.notes) ?? '',
     consents: [],
   };
 }
@@ -247,18 +253,4 @@ export function followUpPresets(today: string): FollowUpPreset[] {
     { id: 'twentyDays', date: addCivilDays(today, 20), time: FOLLOW_UP_HOUR },
     { id: 'month', date: addCivilMonths(today, 1), time: FOLLOW_UP_HOUR },
   ];
-}
-
-/**
- * The home branch a new patient starts with: the header's branch when it shows
- * exactly one, else the main branch (`patients.md:49`).
- */
-export function defaultHomeBranchId(
-  branches: readonly Pick<Branch, 'id' | 'isMain'>[],
-  branchFilter: readonly string[],
-): string | null {
-  const open = new Set(branches.map((branch) => branch.id));
-  const shown = branchFilter.filter((id) => open.has(id));
-  if (shown.length === 1) return shown[0] ?? null;
-  return branches.find((branch) => branch.isMain)?.id ?? branches[0]?.id ?? null;
 }

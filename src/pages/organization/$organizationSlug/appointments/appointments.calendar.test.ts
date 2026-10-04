@@ -8,8 +8,6 @@ import {
   doubleBookedIds,
   laneLayout,
   loadDots,
-  monthCells,
-  monthDays,
   monthFit,
   nowLineTop,
   pastVeil,
@@ -242,25 +240,6 @@ describe('slotFromPointer (H:5952)', () => {
 });
 
 describe('the Month board (H:5936)', () => {
-  it('lays out a month’s days', () => {
-    const days = monthDays('2026-02-01');
-    expect(days).toHaveLength(28);
-    expect(days.at(-1)).toBe('2026-02-28');
-    expect(monthDays('2026-12-01').at(-1)).toBe('2026-12-31');
-  });
-
-  it('puts the first under its weekday, Sunday first, and fills the last row', () => {
-    const cells = monthCells('2026-10-17');
-    // 1 Oct 2026 is a Thursday: four blanks before it.
-    expect(cells.slice(0, 5)).toEqual([null, null, null, null, '2026-10-01']);
-    expect(cells).toHaveLength(35);
-    expect(cells.at(-1)).toBe('2026-10-31');
-    // February 2026 starts on a Sunday and fills four rows exactly.
-    expect(monthCells('2026-02-01')).toHaveLength(28);
-    // August 2026 starts on a Saturday: six rows.
-    expect(monthCells('2026-08-01')).toHaveLength(42);
-  });
-
   it('dots a day by its load: one up to 6, two to 12, three above (H:5923)', () => {
     expect([0, 1, 6, 7, 12, 13].map(loadDots)).toEqual([0, 1, 1, 2, 2, 3]);
   });

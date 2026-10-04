@@ -15,6 +15,7 @@ import {
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { serviceTone, staffName } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -42,12 +43,7 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import {
-  latestEvent,
-  PERSON_TONES,
-  serviceTone,
-  staffName,
-} from '../../appointments.display.ts';
+import { latestEvent, PERSON_TONES } from '../../appointments.display.ts';
 import { useLatestUpdateWords } from '../../hooks/useLatestUpdateWords/index.ts';
 import { useAppointmentActions } from '../AppointmentActions/index.ts';
 import { AppointmentStatusPill } from '../AppointmentStatusPill/index.ts';

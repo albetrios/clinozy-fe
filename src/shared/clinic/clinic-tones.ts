@@ -1,6 +1,7 @@
 import type {
   AppointmentStatus,
   Gender,
+  ImageAlbum,
   LeadInterest,
   LeadStatus,
   OfferingCategory,
@@ -56,6 +57,13 @@ export const APPOINTMENT_STATUS_TONES: Readonly<Record<AppointmentStatus, Tone>>
   completed: 'sage',
   cancelled: 'stone',
   no_show: 'blush',
+};
+
+/** Each photo album's tone (H:4526): General stone, Private lav, LHR blush. */
+export const IMAGE_ALBUM_TONES: Readonly<Record<ImageAlbum, Tone>> = {
+  general: 'stone',
+  private: 'lav',
+  lhr: 'blush',
 };
 
 /**

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
+import { staffName } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import {
@@ -14,7 +15,6 @@ import { useBookableStaff } from '@/shared/hooks/useAppointments/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from '../../appointments.constants.ts';
-import { staffName } from '../../appointments.display.ts';
 
 /** Props for {@link DoctorPicker}. */
 export interface DoctorPickerProps {

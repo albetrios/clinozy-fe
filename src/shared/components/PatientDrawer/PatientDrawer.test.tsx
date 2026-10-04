@@ -539,4 +539,37 @@ describe('PatientDrawer — quick-add (Q-P2)', () => {
     await user.click(action);
     expect(onPick).toHaveBeenCalledWith(expect.objectContaining({ id: DHARTI }));
   });
+
+  it('starts from a booking’s prefill and raises the booking’s own toast (H:6039)', async () => {
+    const user = setUser();
+    const onPick = vi.fn();
+    renderWithProviders(
+      <PatientDrawer
+        mode="quick"
+        open
+        prefill={{
+          name: 'Riya Patel',
+          phone: '+919876500004',
+          types: ['lhr'],
+          notes: 'Upper lip and chin',
+        }}
+        createdMessage={(patient) => `${patient.firstName} is now a patient`}
+        onClose={vi.fn()}
+        onPick={onPick}
+      />,
+    );
+    const panel = await drawer('patient-quick-add');
+    expect(within(panel).getByTestId('patient-quick-add-first-name')).toHaveValue('Riya');
+    expect(within(panel).getByTestId('patient-quick-add-mobile')).toHaveValue(
+      '98765 00004',
+    );
+    expect(within(panel).getByTestId('patient-quick-add-badges')).toHaveTextContent(
+      'LHR',
+    );
+    await user.click(within(panel).getByTestId('patient-quick-add-save'));
+    await waitFor(() => expect(onPick).toHaveBeenCalledTimes(1));
+    expect(notifyMock.success).toHaveBeenCalledWith('Riya is now a patient');
+    const created = onPick.mock.calls[0]?.[0] as PatientRecord;
+    expect(created).toMatchObject({ types: ['lhr'], notes: 'Upper lip and chin' });
+  });
 });

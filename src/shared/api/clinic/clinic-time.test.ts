@@ -5,6 +5,7 @@ import {
   addCivilMonths,
   civilDateOf,
   civilDayOffset,
+  civilMonthStart,
   civilYearsBetween,
   clinicClockTime,
   clinicInstant,
@@ -51,6 +52,11 @@ describe('clinic clock (Asia/Kolkata)', () => {
     expect(addCivilMonths('2027-01-31', 1)).toBe('2027-02-28');
     expect(addCivilMonths('2028-01-31', 1)).toBe('2028-02-29');
     expect(addCivilMonths('2026-10-31', -1)).toBe('2026-09-30');
+  });
+
+  it('names the first day of a date’s month', () => {
+    expect(civilMonthStart('2026-10-17')).toBe('2026-10-01');
+    expect(civilMonthStart('2026-10-01')).toBe('2026-10-01');
   });
 
   it('counts whole days between civil dates, across months and years', () => {

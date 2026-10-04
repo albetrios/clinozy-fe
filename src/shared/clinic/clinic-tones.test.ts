@@ -12,9 +12,11 @@ import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-contracts.t
 import {
   APPOINTMENT_STATUS_TONES,
   GENDER_TONES,
+  IMAGE_ALBUM_TONES,
   LEAD_INTEREST_TONES,
   LEAD_SOURCE_TONES,
   LEAD_STATUS_TONES,
+  OFFERING_CATEGORY_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
@@ -44,6 +46,18 @@ describe('clinic tones', () => {
       cancelled: 'stone',
       no_show: 'blush',
     });
+  });
+
+  it('paints offering categories and photo albums as the prototype does', () => {
+    // OF_CATS (H:3546), the visit photos' album tags (H:4526).
+    expect(OFFERING_CATEGORY_TONES).toEqual({
+      consultation: 'sky',
+      treatment: 'sage',
+      package: 'lav',
+      lhr: 'blush',
+      product: 'butter',
+    });
+    expect(IMAGE_ALBUM_TONES).toEqual({ general: 'stone', private: 'lav', lhr: 'blush' });
   });
 
   it('paints the patient enums as the prototype does (PT_TYPES, PT_STAT, PT_CONV, H:3655)', () => {

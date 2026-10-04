@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { monthDays } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   addCivilDays,
+  civilMonthStart,
   clinicToday,
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
@@ -12,7 +14,7 @@ import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { ChevronLeft, ChevronRight } from '@/shared/icons/index.ts';
 
-import { loadDots, monthDays } from '../../appointments.calendar.ts';
+import { loadDots } from '../../appointments.calendar.ts';
 import {
   APPOINTMENTS_KEYS,
   APPOINTMENTS_NS,
@@ -21,7 +23,6 @@ import {
 import { shiftAnchor } from '../../hooks/useAppointmentsNavigation/index.ts';
 
 /** A calendar month's first day, `YYYY-MM-01`. */
-const monthOf = (date: string) => `${date.slice(0, 7)}-01`;
 
 /** The first day's column, Sunday first (H:5920) — literal classes for Tailwind. */
 const FIRST_COLUMN = [
@@ -70,7 +71,7 @@ export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarP
   const { t } = useTranslation(APPOINTMENTS_NS);
   const { formatDate } = useLocaleFormat();
   const today = clinicToday();
-  const [month, setMonth] = useState(() => monthOf(value ?? today));
+  const [month, setMonth] = useState(() => civilMonthStart(value ?? today));
   const days = monthDays(month);
   const firstColumn = FIRST_COLUMN[localDateOf(month).getDay()];
   const range = useAppointmentRange(

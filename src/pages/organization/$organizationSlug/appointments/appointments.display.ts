@@ -1,25 +1,17 @@
 /**
  * How the Appointments room paints and words a booking (KICKOFF §6.4): the
- * person's avatar tone, the service tone, the Agenda's day-group words and
- * tone, and the "Latest update" pills. Pure — every view (Agenda, the card,
- * the calendar blocks) reads these, and the tests pin them.
+ * person's avatar tone, the Agenda's day-group words and tone, and the
+ * "Latest update" pills. Pure — every view (Agenda, the card, the calendar
+ * blocks) reads these, and the tests pin them. The doctor's name and the
+ * service tone are shared with the appointment form
+ * (`@/shared/clinic/appointment-display.ts`).
  */
 import type {
   AppointmentPersonKind,
   AppointmentRow,
-  AppointmentStaff,
 } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { AppointmentType, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
-
-// ── Names ──
-
-/** A staff member's name as written ("Dr. Drashti Desai"). */
-export function staffName(
-  staff: Pick<AppointmentStaff, 'firstName' | 'lastName'>,
-): string {
-  return [staff.firstName, staff.lastName].filter(Boolean).join(' ');
-}
 
 // ── Tones ──
 
@@ -33,40 +25,6 @@ export const PERSON_TONES: Readonly<Record<AppointmentPersonKind, Tone>> = {
 /** A calendar block's avatar tone: patients sage, everyone else lav (`avTone`, H:5892). */
 export function blockPersonTone(kind: AppointmentPersonKind): Tone {
   return kind === 'patient' ? 'sage' : 'lav';
-}
-
-/**
- * The services the design names, by label (`AP_SVC`, H:3416): Consultation
- * sky, Follow-up mint, Treatment sage, LHR Treatment lav, Peel blush,
- * Hydrafacial mint, Other stone.
- */
-const SERVICE_TONES: Readonly<Record<string, Tone>> = {
-  consultation: 'sky',
-  'follow-up': 'mint',
-  treatment: 'sage',
-  'lhr treatment': 'lav',
-  peel: 'blush',
-  hydrafacial: 'mint',
-  other: 'stone',
-};
-
-/** Each type's tone (`AP_TYPE`, H:3418) — a service the design does not name takes its type's. */
-const TYPE_TONES: Readonly<Record<AppointmentType, Tone>> = {
-  consultation: 'sky',
-  follow_up: 'mint',
-  treatment: 'sage',
-  package_session: 'lav',
-  other: 'stone',
-};
-
-/** A booking's service tone: the design's for its label, else its type's. */
-export function serviceTone(
-  appointment: Pick<AppointmentRow, 'serviceLabel' | 'type'>,
-): Tone {
-  return (
-    SERVICE_TONES[appointment.serviceLabel.trim().toLowerCase()] ??
-    TYPE_TONES[appointment.type]
-  );
 }
 
 // ── The Agenda's day groups ──

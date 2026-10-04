@@ -8,8 +8,6 @@ import {
   dayGroupTone,
   latestEvent,
   latestUpdates,
-  serviceTone,
-  staffName,
 } from './appointments.display.ts';
 
 /** Just the fields the display helpers read. */
@@ -27,43 +25,11 @@ function booking(overrides: Partial<AppointmentRow> = {}): AppointmentRow {
   } as AppointmentRow;
 }
 
-describe('staffName', () => {
-  it('writes the name in full, without a missing last name', () => {
-    expect(staffName({ firstName: 'Dr. Drashti', lastName: 'Desai' })).toBe(
-      'Dr. Drashti Desai',
-    );
-    expect(staffName({ firstName: 'Meera', lastName: '' })).toBe('Meera');
-  });
-});
-
 describe('blockPersonTone (avTone, H:5892)', () => {
   it('paints a patient sage and everyone else lav on a calendar block', () => {
     expect(blockPersonTone('patient')).toBe('sage');
     expect(blockPersonTone('lead')).toBe('lav');
     expect(blockPersonTone('contact')).toBe('lav');
-  });
-});
-
-describe('serviceTone', () => {
-  it('paints the design’s services by label (AP_SVC, H:3416)', () => {
-    expect(serviceTone(booking({ serviceLabel: 'Hydrafacial', type: 'treatment' }))).toBe(
-      'mint',
-    );
-    expect(
-      serviceTone(booking({ serviceLabel: 'LHR Treatment', type: 'treatment' })),
-    ).toBe('lav');
-    expect(serviceTone(booking({ serviceLabel: ' peel ', type: 'treatment' }))).toBe(
-      'blush',
-    );
-  });
-
-  it('falls back to the type’s tone for a service the design does not name', () => {
-    expect(
-      serviceTone(booking({ serviceLabel: 'Melasma consult', type: 'consultation' })),
-    ).toBe('sky');
-    expect(
-      serviceTone(booking({ serviceLabel: 'Laser session', type: 'package_session' })),
-    ).toBe('lav');
   });
 });
 

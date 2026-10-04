@@ -21,7 +21,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   stays in each room's own namespace (`today`, `leads`, … `users`).
 - `clinic-tones.ts` — each section's, role's and appointment status's tone, and
   a lead's status, source and interest tones (`LEAD_STATUS_TONES`,
-  `LEAD_SOURCE_TONES`, `LEAD_INTEREST_TONES` — the contract's `Tone`), and
+  `LEAD_SOURCE_TONES`, `LEAD_INTEREST_TONES` — the contract's `Tone`), an
+  offering category's and a photo album's (`OFFERING_CATEGORY_TONES`,
+  `IMAGE_ALBUM_TONES`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover, and a list row's active 55% and
   picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's
@@ -51,6 +53,14 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) and
   `clinicCommandNavigation`, which fills in the record param and `from`. Several
   of those routes land with later ledger rows; the table names which.
+- `appointment-display.ts` — how every booking surface names and paints a
+  booking: the doctor's name (`staffName`), a service's tone
+  (`serviceTone`, `APPOINTMENT_TYPE_TONES`) and the person's contact card
+  (`appointmentContactCard`) — the Appointments room and the shared
+  appointment form read the same rules.
+- `clinic-branch.ts` — the branch a new record files under
+  (`defaultBranchId`): the header's one open branch, else the main one — a
+  new patient's home branch, a new booking's branch.
 - `clinic-lead-status.ts` — the label a lead's status shows under: the stored
   status's (`CLINIC_KEYS.leads.statuses`), or "Re-targeted"
   (`CLINIC_KEYS.leads.retargeted`) for a re-target lead still New — the

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import { serviceTone, staffName } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -19,7 +20,7 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import { blockPersonTone, serviceTone, staffName } from '../../appointments.display.ts';
+import { blockPersonTone } from '../../appointments.display.ts';
 import { useAppointmentActions } from '../AppointmentActions/index.ts';
 import { AppointmentHoverCard } from '../AppointmentCard/index.ts';
 import { AppointmentStatusPill } from '../AppointmentStatusPill/index.ts';

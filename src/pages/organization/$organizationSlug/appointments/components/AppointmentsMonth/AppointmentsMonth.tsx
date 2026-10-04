@@ -2,14 +2,17 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { appointmentViewRange } from '@/shared/api/clinic/appointment-views.ts';
+import {
+  appointmentViewRange,
+  monthCells,
+} from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { addCivilDays, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
-import { doubleBooked, monthCells, monthFit } from '../../appointments.calendar.ts';
+import { doubleBooked, monthFit } from '../../appointments.calendar.ts';
 import {
   APPOINTMENTS_KEYS,
   APPOINTMENTS_NS,

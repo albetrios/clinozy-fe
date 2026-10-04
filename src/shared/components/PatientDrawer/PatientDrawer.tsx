@@ -10,6 +10,7 @@ import {
   patientName,
   type PatientRecord,
 } from '@/shared/api/clinic/patients-contracts.ts';
+import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
@@ -31,7 +32,6 @@ import {
 } from './patient-drawer.constants.ts';
 import { usePatientDrawerView } from './patient-drawer-view.ts';
 import {
-  defaultHomeBranchId,
   emptyPatientForm,
   PATIENT_QUICK_FILLS,
   type PatientDrawerPrefill,
@@ -64,6 +64,16 @@ export interface PatientQuickAddProps extends PatientDrawerBaseProps {
   mode: 'quick';
   /** What was typed in the picker: the first word fills First name, the rest Last name. */
   query?: string;
+  /**
+   * More to start with — the appointment form's "Create patient record"
+   * prefills the mobile, the types and the notes, and links the lead (H:6039).
+   */
+  prefill?: PatientDrawerPrefill;
+  /**
+   * The toast a create raises instead of "Patient #<id> registered…" — the
+   * appointment form's "<name> is now a patient · you can mark Completed".
+   */
+  createdMessage?: (patient: PatientRecord) => string;
   /**
    * The parent field takes this patient — the one just created, or the one
    * already on the same mobile ("Use existing", Q-P7).
@@ -103,7 +113,7 @@ const CONTENT_PROFILE = { fieldCount: 17, hasHeavyField: true } as const;
 function sessionPrefill(props: SessionProps): PatientDrawerPrefill | undefined {
   if (props.fresh) return undefined;
   if (props.mode === 'create') return props.prefill;
-  if (props.mode === 'quick') return { name: props.query };
+  if (props.mode === 'quick') return { name: props.query, ...props.prefill };
   return undefined;
 }
 
@@ -219,11 +229,12 @@ function useSaveOutcome(props: SessionProps) {
     }
     const id = displayId.patient(outcome.patient.seq);
     if (props.mode === 'quick') {
-      notify.success(
-        outcome.filed > 0
-          ? t(K.registeredPhotos, { name, id, count: outcome.filed })
-          : t(K.registered, { name, id }),
-      );
+      let message = t(K.registered, { name, id });
+      if (props.createdMessage) message = props.createdMessage(outcome.patient);
+      else if (outcome.filed > 0) {
+        message = t(K.registeredPhotos, { name, id, count: outcome.filed });
+      }
+      notify.success(message);
       props.onPick(outcome.patient);
       return;
     }
@@ -267,8 +278,8 @@ function PatientDrawerSession(props: SessionProps) {
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
   const [deleting, setDeleting] = useState(false);
 
-  const defaultBranchId = defaultHomeBranchId(openBranches, preferences.branchFilter);
-  const homeBranchId = values.homeBranchId ?? defaultBranchId;
+  const startingBranchId = defaultBranchId(openBranches, preferences.branchFilter);
+  const homeBranchId = values.homeBranchId ?? startingBranchId;
   const view = usePatientDrawerView({
     values,
     today,
@@ -281,7 +292,10 @@ function PatientDrawerSession(props: SessionProps) {
     form,
     patientId: editing?.id ?? null,
     input: () =>
-      patientInputOf(form.getValues(), { defaultBranchId, leadId: prefill?.leadId }),
+      patientInputOf(form.getValues(), {
+        defaultBranchId: startingBranchId,
+        leadId: prefill?.leadId,
+      }),
     photos: photos.map((photo) => photo.file),
     onStep: setOpenStep,
     onConflict: () => duplicate.check(form.getValues('phone')),

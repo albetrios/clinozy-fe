@@ -7,11 +7,14 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type {
-  AppointmentPerson,
   AppointmentRow,
   AppointmentStaff,
 } from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import {
+  appointmentContactCard,
+  serviceTone,
+  staffName,
+} from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import {
@@ -23,7 +26,6 @@ import {
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import {
   ContactCard,
-  type ContactCardData,
   TeamCard,
   type TeamCardData,
 } from '@/shared/components/PersonCard/index.ts';
@@ -39,12 +41,7 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import {
-  latestUpdates,
-  PERSON_TONES,
-  serviceTone,
-  staffName,
-} from '../../appointments.display.ts';
+import { latestUpdates, PERSON_TONES } from '../../appointments.display.ts';
 import { useLatestUpdateWords } from '../../hooks/useLatestUpdateWords/index.ts';
 import { AppointmentQuickView } from '../AppointmentCard/index.ts';
 import { AppointmentStatusPill } from '../AppointmentStatusPill/index.ts';
@@ -52,23 +49,6 @@ import { AppointmentStatusPopover } from '../AppointmentStatusPopover/index.ts';
 import { useAgendaCells } from './agenda-cells-context.ts';
 
 type AgendaCell = CellContext<DataTableFeatures, AppointmentRow, unknown>;
-
-/** The person as the contact card reads them (D32 — a patient, a lead or a contact thread). */
-function contactCardOf(person: AppointmentPerson): ContactCardData {
-  let id: string | null = null;
-  if (person.seq !== null) {
-    id =
-      person.kind === 'patient'
-        ? displayId.patient(person.seq)
-        : displayId.lead(person.seq);
-  }
-  return {
-    kind: person.kind,
-    name: person.name,
-    displayId: id,
-    reach: person.phone ? [{ channel: 'whatsapp', phone: person.phone }] : [],
-  };
-}
 
 /** The doctor as the team card reads them — presence, real roles (§7.3). */
 function teamCardOf(doctor: AppointmentStaff, t: TFunction): TeamCardData {
@@ -106,7 +86,7 @@ export function ContactCell({ row }: AgendaCell) {
   const { person } = row.original;
   return (
     <ContactCard
-      data={contactCardOf(person)}
+      data={appointmentContactCard(person)}
       onNewLead={onNewLead ? () => onNewLead(person) : undefined}
       onNewAppointment={onNewAppointment ? () => onNewAppointment(person) : undefined}
     >

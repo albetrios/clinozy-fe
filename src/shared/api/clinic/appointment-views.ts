@@ -3,7 +3,7 @@ import type {
   AppointmentRow,
   AppointmentView,
 } from './appointments-contracts.ts';
-import { addCivilDays } from './clinic-time.ts';
+import { addCivilDays, civilMonthStart } from './clinic-time.ts';
 
 /*
  * What each view reads (KICKOFF §6.4): the Agenda pages from today on and
@@ -19,14 +19,41 @@ export function sundayOffset(date: string): number {
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 }
 
+/** The first day of the month after a date's (`YYYY-MM-01`). */
+function nextMonthStart(date: string): string {
+  const [year = 1970, month = 1] = date.split('-').map(Number);
+  return month === 12
+    ? `${year + 1}-01-01`
+    : `${year}-${String(month + 1).padStart(2, '0')}-01`;
+}
+
 /** The last day of a date's calendar month. */
 function monthEnd(date: string): string {
-  const [year = 1970, month = 1] = date.split('-').map(Number);
-  const next =
-    month === 12
-      ? `${year + 1}-01-01`
-      : `${year}-${String(month + 1).padStart(2, '0')}-01`;
-  return addCivilDays(next, -1);
+  return addCivilDays(nextMonthStart(date), -1);
+}
+
+/** The days of a month (`YYYY-MM-01`), in order (`YYYY-MM-DD`). */
+export function monthDays(month: string): string[] {
+  const next = nextMonthStart(month);
+  const days: string[] = [];
+  for (let day = month; day < next; day = addCivilDays(day, 1)) days.push(day);
+  return days;
+}
+
+/**
+ * A month as calendar cells (H:5936) — the Month board's and the booking
+ * calendar's: the month's days under Sun–Sat (Q-A10), `null` before the first
+ * and after the last so every row has seven.
+ */
+export function monthCells(anchor: string): (string | null)[] {
+  const days = monthDays(civilMonthStart(anchor));
+  const first = days[0] ?? anchor;
+  const cells: (string | null)[] = [
+    ...Array.from({ length: sundayOffset(first) }, () => null),
+    ...days,
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+  return cells;
 }
 
 /**
@@ -43,7 +70,7 @@ export function appointmentViewRange(
     const from = addCivilDays(anchor, -sundayOffset(anchor));
     return { from, to: addCivilDays(from, 6) };
   }
-  return { from: `${anchor.slice(0, 7)}-01`, to: monthEnd(anchor) };
+  return { from: civilMonthStart(anchor), to: monthEnd(anchor) };
 }
 
 /** One Agenda day: its rows in the read's order, and its header's counts. */

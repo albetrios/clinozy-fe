@@ -79,6 +79,11 @@ export function addCivilDays(date: string, days: number): string {
   return next.toISOString().slice(0, 10);
 }
 
+/** The first day of a date's calendar month: `2026-10-17` → `2026-10-01`. */
+export function civilMonthStart(date: string): string {
+  return `${date.slice(0, 7)}-01`;
+}
+
 /**
  * The same day `months` calendar months away (civil arithmetic), held to the
  * last day of a shorter month: 31 Jan + 1 → 28 or 29 Feb.

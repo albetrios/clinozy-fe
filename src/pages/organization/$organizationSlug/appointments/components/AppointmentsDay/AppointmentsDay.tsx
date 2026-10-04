@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { staffName } from '@/shared/clinic/appointment-display.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
@@ -22,7 +23,6 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import { staffName } from '../../appointments.display.ts';
 import { useAppointmentsNavigation } from '../../hooks/useAppointmentsNavigation/index.ts';
 import { useCalendarClock } from '../../hooks/useCalendarClock/index.ts';
 import { useCalendarRange } from '../../hooks/useCalendarRange/index.ts';

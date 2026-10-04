@@ -5,13 +5,8 @@
  * the now line and the slot an empty-column press books. Pure — the views
  * read them and the tests pin them.
  */
-import { sundayOffset } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import {
-  addCivilDays,
-  clockMinutes,
-  clockOfMinutes,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { clockMinutes, clockOfMinutes } from '@/shared/api/clinic/clinic-time.ts';
 
 // ── The hour rail ──
 
@@ -276,31 +271,4 @@ export function monthFit(cellHeight: number, count: number): number {
   const room = cellHeight - 12 - 18 - 4;
   if (count * MONTH_CHIP_HEIGHT <= room) return count;
   return Math.max(0, Math.floor((room - 24) / MONTH_CHIP_HEIGHT));
-}
-
-/** The days of a month (`YYYY-MM-01`), in order (`YYYY-MM-DD`). */
-export function monthDays(month: string): string[] {
-  const [year = 1970, monthIndex = 1] = month.split('-').map(Number);
-  const next =
-    monthIndex === 12
-      ? `${year + 1}-01-01`
-      : `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`;
-  const days: string[] = [];
-  for (let day = month; day < next; day = addCivilDays(day, 1)) days.push(day);
-  return days;
-}
-
-/**
- * The Month board's cells (H:5936): the month's days under Sun–Sat, `null`
- * before the first and after the last so every row has seven.
- */
-export function monthCells(anchor: string): (string | null)[] {
-  const days = monthDays(`${anchor.slice(0, 7)}-01`);
-  const first = days[0] ?? anchor;
-  const cells: (string | null)[] = [
-    ...Array.from({ length: sundayOffset(first) }, () => null),
-    ...days,
-  ];
-  while (cells.length % 7 !== 0) cells.push(null);
-  return cells;
 }
