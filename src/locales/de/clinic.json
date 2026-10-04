@@ -227,6 +227,88 @@
     "titleRecord": "Diesen Datensatz löschen?",
     "removed": "{{name}} entfernt"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "Neuer Patient",
+      "edit": "Patient bearbeiten"
+    },
+    "sub": {
+      "full": "Erstellt oder aktualisiert auch den Kontakt",
+      "quick": "Was die Klinik vor Abschluss eines Besuchs braucht"
+    },
+    "quickFill": {
+      "walkIn": "Heute ohne Termin",
+      "referred": "Von Patient empfohlen",
+      "instagram": "Über Instagram",
+      "lhr": "LHR-Patient"
+    },
+    "steps": {
+      "contact": "Kontakt & Persönliches",
+      "clinic": "Klinik, Empfehlung & Wiedervorlage",
+      "notFilled": "Noch nicht ausgefüllt"
+    },
+    "groups": {
+      "contact": "Kontakt",
+      "personal": "Persönliches",
+      "clinic": "Klinik",
+      "referral": "Empfehlung & Wiedervorlage"
+    },
+    "fields": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "mobile": "Mobilnummer",
+      "mobileHint": "primär · WhatsApp",
+      "phone2": "Zweite Mobilnummer",
+      "phone2Hint": "10 Ziffern",
+      "address": "Adresse",
+      "addressPlaceholder": "Stadtteil, Stadt",
+      "homeBranch": "Stammfiliale",
+      "gender": "Geschlecht",
+      "birthDate": "Geburtsdatum",
+      "age": "Alter {{age}}",
+      "types": "Patiententyp",
+      "typesHint": "beliebig viele",
+      "status": "Status",
+      "conversion": "Konversion",
+      "referredBy": "Empfohlen von",
+      "referredByPlaceholder": "Name",
+      "referrerType": "Art der Empfehlung",
+      "followUp": "Wiedervorlage",
+      "followUpDate": "Datum der Wiedervorlage",
+      "followUpTime": "Uhrzeit der Wiedervorlage",
+      "notes": "Notizen",
+      "notesPlaceholder": "Was das Team wissen sollte",
+      "consent": "Einwilligung",
+      "consentHint": "was unterschrieben wurde",
+      "photos": "Erste Fotos",
+      "photosHint": "Vorher-Fotos · beim heutigen Besuch abgelegt",
+      "photosDrop": "Fotos aufnehmen oder ablegen",
+      "photosLimit": "JPG oder PNG · bis {{limit}} pro Datei",
+      "photosRemove": "{{name}} entfernen"
+    },
+    "followUpQuick": {
+      "tomorrow": "Morgen {{time}}",
+      "week": "In 1 Woche",
+      "twentyDays": "20 Tage",
+      "month": "1 Monat"
+    },
+    "save": {
+      "create": "Patient anlegen",
+      "edit": "Änderungen speichern",
+      "createAnother": "Anlegen & weiteren hinzufügen"
+    },
+    "missing": "Geben Sie Name und Mobilnummer ein",
+    "mobileInvalid": "Geben Sie eine 10-stellige Mobilnummer ein",
+    "created": "Patient {{id}} angelegt · Onboarding-Aufgabe hinzugefügt",
+    "openFile": "Akte öffnen",
+    "saved": "{{name}} gespeichert",
+    "registered": "{{name}} als Patient {{id}} registriert",
+    "registeredPhotos_one": "{{name}} als Patient {{id}} registriert · {{count}} Foto abgelegt",
+    "registeredPhotos_other": "{{name}} als Patient {{id}} registriert · {{count}} Fotos abgelegt",
+    "duplicate": "Gleiche Mobilnummer wie {{name}} · {{id}}",
+    "useExisting": "Vorhandenen verwenden",
+    "summaryEmpty": "Neuer Patient"
+  },
   "recordDrawer": {
     "cancel": "Abbrechen",
     "back": "Zurück",
@@ -237,6 +319,7 @@
     "saveAndAdd": "Speichern & weiteren hinzufügen",
     "delete": "Löschen",
     "notSaved": "Nicht gespeichert · Ihre Änderungen bleiben erhalten",
+    "saveFailed": "Speichern nicht möglich · Verbindung unterbrochen. Alle Ihre Eingaben sind noch da.",
     "readOnly": "Nur Ansicht · Ihre Rolle kann dies nicht ändern",
     "quickFill": "Schnell ausfüllen",
     "step": {

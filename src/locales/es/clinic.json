@@ -227,6 +227,89 @@
     "titleRecord": "¿Eliminar este registro?",
     "removed": "{{name}} eliminado"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "Nuevo paciente",
+      "edit": "Editar paciente"
+    },
+    "sub": {
+      "full": "También crea o actualiza el contacto",
+      "quick": "Lo que la clínica necesita antes de completar una visita"
+    },
+    "quickFill": {
+      "walkIn": "Sin cita hoy",
+      "referred": "Referido por paciente",
+      "instagram": "Desde Instagram",
+      "lhr": "Paciente LHR"
+    },
+    "steps": {
+      "contact": "Contacto y datos personales",
+      "clinic": "Clínica, referencia y seguimiento",
+      "notFilled": "Aún sin completar"
+    },
+    "groups": {
+      "contact": "Contacto",
+      "personal": "Datos personales",
+      "clinic": "Clínica",
+      "referral": "Referencia y seguimiento"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "mobile": "Móvil",
+      "mobileHint": "principal · WhatsApp",
+      "phone2": "Móvil secundario",
+      "phone2Hint": "10 dígitos",
+      "address": "Dirección",
+      "addressPlaceholder": "Zona, ciudad",
+      "homeBranch": "Sede principal",
+      "gender": "Género",
+      "birthDate": "Fecha de nacimiento",
+      "age": "Edad {{age}}",
+      "types": "Tipo de paciente",
+      "typesHint": "elige los que quieras",
+      "status": "Estado",
+      "conversion": "Conversión",
+      "referredBy": "Referido por",
+      "referredByPlaceholder": "Nombre",
+      "referrerType": "Tipo de referencia",
+      "followUp": "Seguimiento",
+      "followUpDate": "Fecha de seguimiento",
+      "followUpTime": "Hora de seguimiento",
+      "notes": "Notas",
+      "notesPlaceholder": "Lo que el equipo debería saber",
+      "consent": "Consentimiento",
+      "consentHint": "lo que se firmó",
+      "photos": "Primeras fotos",
+      "photosHint": "fotos de antes · archivadas en la visita de hoy",
+      "photosDrop": "Toma o suelta fotos",
+      "photosLimit": "JPG o PNG · hasta {{limit}} cada una",
+      "photosRemove": "Quitar {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "Mañana {{time}}",
+      "week": "En 1 semana",
+      "twentyDays": "20 días",
+      "month": "1 mes"
+    },
+    "save": {
+      "create": "Crear paciente",
+      "edit": "Guardar cambios",
+      "createAnother": "Crear y añadir otro"
+    },
+    "missing": "Añade nombre y móvil",
+    "mobileInvalid": "Introduce un móvil de 10 dígitos",
+    "created": "Paciente {{id}} creado · tarea de bienvenida añadida",
+    "openFile": "Abrir ficha",
+    "saved": "Se guardó {{name}}",
+    "registered": "Se registró a {{name}} como paciente {{id}}",
+    "registeredPhotos_one": "Se registró a {{name}} como paciente {{id}} · {{count}} foto archivada",
+    "registeredPhotos_many": "Se registró a {{name}} como paciente {{id}} · {{count}} fotos archivadas",
+    "registeredPhotos_other": "Se registró a {{name}} como paciente {{id}} · {{count}} fotos archivadas",
+    "duplicate": "Mismo móvil que {{name}} · {{id}}",
+    "useExisting": "Usar el existente",
+    "summaryEmpty": "Nuevo paciente"
+  },
   "recordDrawer": {
     "cancel": "Cancelar",
     "back": "Atrás",
@@ -237,6 +320,7 @@
     "saveAndAdd": "Guardar y añadir otro",
     "delete": "Eliminar",
     "notSaved": "No guardado · tus cambios se conservan",
+    "saveFailed": "No se pudo guardar · se perdió la conexión. Todo lo que escribiste sigue aquí.",
     "readOnly": "Solo lectura · tu rol no puede cambiar esto",
     "quickFill": "Relleno rápido",
     "step": {

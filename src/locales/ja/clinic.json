@@ -227,6 +227,87 @@
     "titleRecord": "このレコードを削除しますか？",
     "removed": "{{name}} を削除しました"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "新規患者",
+      "edit": "患者を編集"
+    },
+    "sub": {
+      "full": "連絡先も作成・更新されます",
+      "quick": "来院を完了する前にクリニックが必要とする情報"
+    },
+    "quickFill": {
+      "walkIn": "本日の飛び込み",
+      "referred": "患者からの紹介",
+      "instagram": "Instagram から",
+      "lhr": "LHR 患者"
+    },
+    "steps": {
+      "contact": "連絡先・個人情報",
+      "clinic": "クリニック・紹介・フォローアップ",
+      "notFilled": "未入力"
+    },
+    "groups": {
+      "contact": "連絡先",
+      "personal": "個人情報",
+      "clinic": "クリニック",
+      "referral": "紹介・フォローアップ"
+    },
+    "fields": {
+      "firstName": "名",
+      "lastName": "姓",
+      "mobile": "携帯番号",
+      "mobileHint": "メイン · WhatsApp",
+      "phone2": "サブの携帯番号",
+      "phone2Hint": "10桁",
+      "address": "住所",
+      "addressPlaceholder": "地域、市区町村",
+      "homeBranch": "所属院",
+      "gender": "性別",
+      "birthDate": "生年月日",
+      "age": "{{age}}歳",
+      "types": "患者の種別",
+      "typesHint": "複数選択可",
+      "status": "ステータス",
+      "conversion": "コンバージョン",
+      "referredBy": "紹介者",
+      "referredByPlaceholder": "氏名",
+      "referrerType": "紹介元の種類",
+      "followUp": "フォローアップ",
+      "followUpDate": "フォローアップ日",
+      "followUpTime": "フォローアップ時刻",
+      "notes": "メモ",
+      "notesPlaceholder": "チームに共有すべきこと",
+      "consent": "同意",
+      "consentHint": "署名済みの内容",
+      "photos": "初回の写真",
+      "photosHint": "ビフォー写真 · 本日の来院に保存",
+      "photosDrop": "写真を撮影またはドロップ",
+      "photosLimit": "JPG または PNG · 1枚あたり {{limit}} まで",
+      "photosRemove": "{{name}} を削除"
+    },
+    "followUpQuick": {
+      "tomorrow": "明日 {{time}}",
+      "week": "1週間後",
+      "twentyDays": "20日後",
+      "month": "1か月後"
+    },
+    "save": {
+      "create": "患者を作成",
+      "edit": "変更を保存",
+      "createAnother": "作成して続けて追加"
+    },
+    "missing": "氏名と携帯番号を入力してください",
+    "mobileInvalid": "10桁の携帯番号を入力してください",
+    "created": "患者 {{id}} を作成しました · オンボーディングのタスクを追加しました",
+    "openFile": "ファイルを開く",
+    "saved": "{{name}} を保存しました",
+    "registered": "{{name}} を患者 {{id}} として登録しました",
+    "registeredPhotos_other": "{{name}} を患者 {{id}} として登録しました · 写真 {{count}} 枚を保存",
+    "duplicate": "{{name}} と同じ携帯番号 · {{id}}",
+    "useExisting": "既存の患者を使う",
+    "summaryEmpty": "新規患者"
+  },
   "recordDrawer": {
     "cancel": "キャンセル",
     "back": "戻る",
@@ -237,6 +318,7 @@
     "saveAndAdd": "保存して続けて追加",
     "delete": "削除",
     "notSaved": "未保存 · 変更は保持されています",
+    "saveFailed": "保存できませんでした · 接続が切れました。入力した内容はすべて残っています。",
     "readOnly": "閲覧のみ · あなたのロールでは変更できません",
     "quickFill": "クイック入力",
     "step": {

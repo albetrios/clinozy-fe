@@ -59,10 +59,13 @@ export function DrawerField({
   return (
     <div data-testid={testId} className={cn('flex min-w-0 flex-col gap-1.5', className)}>
       {label ? (
+        // The design's label row sits at the font's own line height (CSS
+        // `normal`, ≈15px at 12px), not Tailwind's `leading-normal` (1.5, 18px):
+        // three extra pixels per field add up down a long form.
         <div className="flex min-w-0 items-baseline gap-1.5 whitespace-nowrap">
           <Label
             htmlFor={htmlFor}
-            className="text-muted-foreground-strong shrink-0 gap-0.5 text-xs leading-normal font-medium"
+            className="text-muted-foreground-strong shrink-0 gap-0.5 text-xs leading-[normal] font-medium"
           >
             {label}
             {required ? (
@@ -74,7 +77,7 @@ export function DrawerField({
           {hint ? (
             <span
               title={hint}
-              className="text-muted-foreground min-w-0 flex-1 truncate text-xs"
+              className="text-muted-foreground min-w-0 flex-1 truncate text-xs leading-[normal]"
             >
               {hint}
             </span>

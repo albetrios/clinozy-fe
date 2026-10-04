@@ -21,6 +21,11 @@ export const RECORD_DRAWER_KEYS = {
   saveAndAdd: 'recordDrawer.saveAndAdd',
   delete: 'recordDrawer.delete',
   notSaved: 'recordDrawer.notSaved',
+  /**
+   * The failed save's toast (KICKOFF §6.0 Save, network): "Couldn’t save ·
+   * connection dropped. Everything you entered is still here." with "Retry".
+   */
+  saveFailed: 'recordDrawer.saveFailed',
   readOnly: 'recordDrawer.readOnly',
   quickFill: 'recordDrawer.quickFill',
   step: {

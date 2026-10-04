@@ -227,6 +227,88 @@
     "titleRecord": "Delete this record?",
     "removed": "{{name}} removed"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "New patient",
+      "edit": "Edit patient"
+    },
+    "sub": {
+      "full": "Creates or updates the contact too",
+      "quick": "What the clinic needs before a visit is completed"
+    },
+    "quickFill": {
+      "walkIn": "Walk-in today",
+      "referred": "Referred by patient",
+      "instagram": "From Instagram",
+      "lhr": "LHR patient"
+    },
+    "steps": {
+      "contact": "Contact & personal",
+      "clinic": "Clinic, referral & follow-up",
+      "notFilled": "Not filled yet"
+    },
+    "groups": {
+      "contact": "Contact",
+      "personal": "Personal",
+      "clinic": "Clinic",
+      "referral": "Referral & follow-up"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "mobile": "Mobile",
+      "mobileHint": "primary · WhatsApp",
+      "phone2": "Secondary mobile",
+      "phone2Hint": "10 digits",
+      "address": "Address",
+      "addressPlaceholder": "Area, city",
+      "homeBranch": "Home branch",
+      "gender": "Gender",
+      "birthDate": "Birth date",
+      "age": "Age {{age}}",
+      "types": "Patient type",
+      "typesHint": "pick any",
+      "status": "Status",
+      "conversion": "Conversion",
+      "referredBy": "Referred by",
+      "referredByPlaceholder": "Name",
+      "referrerType": "Referrer type",
+      "followUp": "Follow-up",
+      "followUpDate": "Follow-up date",
+      "followUpTime": "Follow-up time",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything the team should know",
+      "consent": "Consent",
+      "consentHint": "what was signed",
+      "photos": "First photos",
+      "photosHint": "before photos · filed under today’s visit",
+      "photosDrop": "Take or drop photos",
+      "photosLimit": "JPG or PNG · up to {{limit}} each",
+      "photosRemove": "Remove {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "Tomorrow {{time}}",
+      "week": "In 1 week",
+      "twentyDays": "20 days",
+      "month": "1 month"
+    },
+    "save": {
+      "create": "Create patient",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "missing": "Add name and mobile",
+    "mobileInvalid": "Enter a 10-digit mobile",
+    "created": "Patient {{id}} created · onboarding task added",
+    "openFile": "Open file",
+    "saved": "{{name}} saved",
+    "registered": "{{name}} registered as patient {{id}}",
+    "registeredPhotos_one": "{{name}} registered as patient {{id}} · {{count}} photo filed",
+    "registeredPhotos_other": "{{name}} registered as patient {{id}} · {{count}} photos filed",
+    "duplicate": "Same mobile as {{name}} · {{id}}",
+    "useExisting": "Use existing",
+    "summaryEmpty": "New patient"
+  },
   "recordDrawer": {
     "cancel": "Cancel",
     "back": "Back",
@@ -237,6 +319,7 @@
     "saveAndAdd": "Save & add another",
     "delete": "Delete",
     "notSaved": "Not saved · your changes are kept",
+    "saveFailed": "Couldn’t save · connection dropped. Everything you entered is still here.",
     "readOnly": "View only · your role can’t change this",
     "quickFill": "Quick fill",
     "step": {

@@ -30,8 +30,14 @@ rows (L-42, L-40, L-39b) — until then those targets land on the org's not-foun
 ## Dialog route
 
 A layout island over one URL-driven dialog (D24, `S:31`): `create/` — New patient — whose
-route renders nothing; this page reads the URL and opens the drawer over the list. The
-drawer lands with its own row (L-32b).
+route renders nothing; this page reads the URL (`hooks/usePatientsDialogRoute/`) and opens
+the shared `PatientDrawer` (`@/shared/components/PatientDrawer/`) over the list, prefilled
+from `?name=&phone=&fromLead=`. On create the drawer closes, the list stays and refetches,
+and the toast "Patient #3509 created · onboarding task added" offers "Open file" (D28,
+Q-P6); "Create & add another" saves and restarts it empty. A member without Create who
+follows the link lands back on the list with the permission toast. The same drawer is Edit
+patient on the file's edit route (L-42) and quick-add on the invoice and appointment pickers
+(Q-P2).
 
 The data is the shared patients domain: `@/shared/api/clinic/patients-api.ts` (fixture
 world, `REPLACE_WITH_API`), its contracts beside it, and the hooks in
@@ -39,22 +45,24 @@ world, `REPLACE_WITH_API`), its contracts beside it, and the hooks in
 
 ## Files
 
-| File                          | Responsibility                                                                                                                                                                                           |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `patients.route.tsx`          | Route marker — exports `Component` rendering `PatientsPage`.                                                                                                                                             |
-| `patients.manifest.ts`        | Manifest — `kind: 'layout'` over `create`, permission `organization:read`, module `clinic-patients`, nav section `patients`.                                                                             |
-| `patients.search.ts`          | URL schemas (`validateSearch`): the list's `view`, `q`, `types`, `status`, `gender`, `conversion`, `created`, `followUp`, `sort`; the New patient prefill; `patientListParamsOf`. Rides the entry chunk. |
-| `patients.constants.ts`       | `PATIENTS_NS` / `PATIENTS_KEYS` (the `patients` namespace), the table id and the Filters fields (room-only, kept off the entry).                                                                         |
-| `PatientsPage.tsx`            | Room page — toolbar, table, states, row and bulk actions, the delete confirm; hosts the dialog route's `Outlet`. Owns `data-testid="patients-page"`.                                                     |
-| `components/PatientsToolbar/` | The room toolbar's configuration: view tabs and their icons, the Filters copy and tones, Columns, "New patient".                                                                                         |
-| `components/PatientCells/`    | The cells: ID pill, the patient chip with its contact card, badges, age, follow-up, due, updated.                                                                                                        |
-| `hooks/usePatientsTable/`     | The columns (tracks, folds, the recommended set), sorting through the URL, hidden columns.                                                                                                               |
-| `__tests__/integration/`      | The room end to end; `__tests__/integration/patients-test-router.tsx` mirrors the family's routes for the tests.                                                                                         |
-| `create/`                     | The New patient dialog-route island — see its overview.                                                                                                                                                  |
+| File                            | Responsibility                                                                                                                                                                                           |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `patients.route.tsx`            | Route marker — exports `Component` rendering `PatientsPage`.                                                                                                                                             |
+| `patients.manifest.ts`          | Manifest — `kind: 'layout'` over `create`, permission `organization:read`, module `clinic-patients`, nav section `patients`.                                                                             |
+| `patients.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `types`, `status`, `gender`, `conversion`, `created`, `followUp`, `sort`; the New patient prefill; `patientListParamsOf`. Rides the entry chunk. |
+| `patients.constants.ts`         | `PATIENTS_NS` / `PATIENTS_KEYS` (the `patients` namespace), the table id and the Filters fields (room-only, kept off the entry).                                                                         |
+| `PatientsPage.tsx`              | Room page — toolbar, table, states, row and bulk actions, the delete confirm, the New patient drawer; hosts the dialog route's `Outlet`. Owns `data-testid="patients-page"`.                             |
+| `components/PatientsToolbar/`   | The room toolbar's configuration: view tabs and their icons, the Filters copy and tones, Columns, "New patient".                                                                                         |
+| `components/PatientCells/`      | The cells: ID pill, the patient chip with its contact card, badges, age, follow-up, due, updated.                                                                                                        |
+| `hooks/usePatientsTable/`       | The columns (tracks, folds, the recommended set), sorting through the URL, hidden columns.                                                                                                               |
+| `hooks/usePatientsDialogRoute/` | Which dialog the URL opens (New patient and its prefill), the permission refusal, and the close back onto the list.                                                                                      |
+| `__tests__/integration/`        | The room end to end; `__tests__/integration/patients-test-router.tsx` mirrors the family's routes for the tests.                                                                                         |
+| `create/`                       | The New patient dialog-route island — see its overview.                                                                                                                                                  |
 
 ## Test ids
 
 `patients-page`; the shared toolbar's and table's, prefixed `patients` — `patients-toolbar`,
 `patients-tab-<view>`, `patients-new` (the toolbar button and the phone pill),
 `patients-table`, `patients-table-row`, `patients-row-action-<new-invoice|collect|edit|delete>`,
-`patients-table-bulk-export`; the drawer the dialog route opens: `patient-drawer` (L-32b).
+`patients-table-bulk-export`; the drawer the dialog route opens: `patient-drawer` and its
+parts (`docs/reference/e2e-testids-inventory.md` › Patient drawer).

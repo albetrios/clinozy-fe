@@ -82,6 +82,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |
 | `patients-page`                  | Clinic room page: Patients (toolbar and table ids: the shared ones, `patients-…`) | `pages/organization/$organizationSlug/patients/`      |
 | `patient-drawer`                 | New patient drawer — `/patients/create` opens it over the list (L-32b)            | `pages/organization/$organizationSlug/patients/`      |
+| `patient-quick-add`              | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)             | `shared/components/PatientDrawer/`                    |
 | `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
 | `tasks-page`                     | Clinic room page: Tasks                                                           | `pages/organization/$organizationSlug/tasks/`         |
 | `offerings-page`                 | Clinic room page: Offerings                                                       | `pages/organization/$organizationSlug/offerings/`     |
@@ -363,6 +364,22 @@ Below, `<d>` is that root id.
 | `<d>-delete` / `<d>-save-and-add` / `<d>-save`         | Delete, "Save & add another" (never on a phone), primary                   | DrawerFooter                           |
 | `<d>-not-saved`                                        | "Not saved · your changes are kept" after a failed save                    | DrawerFooter                           |
 | `confirm-dialog` / `confirm-accept` / `confirm-cancel` | "Discard changes?" prompt of a dirty drawer (Discard / Keep editing)       | `shared/hooks/useUnsavedChangesGuard/` |
+
+### Patient drawer (shared, launch L-32b)
+
+New patient, Edit patient and quick-add are one `PatientDrawer`; `<d>` is `patient-drawer`
+(quick-add: `patient-quick-add`). Its steps are `contact` and `clinic`. A chip group's chips are
+`<group>-<value>` (`patient-drawer-types-lhr`, `patient-drawer-status-new`).
+
+| Test ID                                                             | Element                                                          | Source                             |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------- |
+| `<d>-first-name` / `<d>-last-name` / `<d>-mobile` / `<d>-phone2`    | Step 1's name and mobile fields                                  | `shared/components/PatientDrawer/` |
+| `<d>-address` / `<d>-home-branch` / `<d>-gender` / `<d>-birth-date` | Address, Home branch chips (several branches only), Gender, date | PatientDrawer                      |
+| `<d>-duplicate` / `<d>-duplicate-action`                            | "Same mobile as … · #…" and its "Open file" / "Use existing"     | PatientDrawer                      |
+| `<d>-types` / `<d>-status` / `<d>-conversion` / `<d>-referrer-type` | Step 2's chip groups                                             | PatientDrawer                      |
+| `<d>-referred-by` / `<d>-notes` / `<d>-consent`                     | Referred by, Notes, the Consent chips                            | PatientDrawer                      |
+| `<d>-follow-up-date` / `<d>-follow-up-time` / `<d>-follow-up-<id>`  | Follow-up pickers and a quick chip (`tomorrow` … `month`)        | PatientDrawer                      |
+| `<d>-photos` / `<d>-photos-input`                                   | First photos drop zone and its file input                        | PatientDrawer                      |
 
 ## Items field (shared, launch L-17a)
 

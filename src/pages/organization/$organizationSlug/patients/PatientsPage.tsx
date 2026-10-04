@@ -22,6 +22,7 @@ import {
   PatientDeleteConfirm,
   type PatientDeleteTarget,
 } from '@/shared/components/PatientDeleteConfirm/index.ts';
+import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
@@ -41,6 +42,7 @@ import {
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientsToolbar } from './components/PatientsToolbar/index.ts';
+import { usePatientsDialogRoute } from './hooks/usePatientsDialogRoute/index.ts';
 import { usePatientsTable } from './hooks/usePatientsTable/index.ts';
 import {
   PATIENT_FILTER_FIELDS,
@@ -163,6 +165,7 @@ export function PatientsPage() {
   const formatPaise = usePaiseFormat();
   const filters = useRoomFilters(PATIENT_FILTER_FIELDS);
   const [deleting, setDeleting] = useState<PatientDeleteTarget | null>(null);
+  const { dialog, close } = usePatientsDialogRoute();
 
   const list = usePatientList(params);
   const rows = useLastCopy(list);
@@ -343,6 +346,14 @@ export function PatientsPage() {
         className="m-(--room-card-margin) flex-1"
       />
       <PatientDeleteConfirm patient={deleting} onClose={() => setDeleting(null)} />
+      <PatientDrawer
+        mode="create"
+        open={dialog.kind === 'create'}
+        prefill={dialog.kind === 'create' ? dialog.prefill : undefined}
+        onClose={close}
+        // The list stays and refetches with the new patient first (D28).
+        onCreated={close}
+      />
       <Outlet />
     </section>
   );

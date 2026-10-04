@@ -227,6 +227,87 @@
     "titleRecord": "删除此记录？",
     "removed": "已移除 {{name}}"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "新建患者",
+      "edit": "编辑患者"
+    },
+    "sub": {
+      "full": "同时创建或更新联系人",
+      "quick": "完成就诊前诊所需要的信息"
+    },
+    "quickFill": {
+      "walkIn": "今日到店",
+      "referred": "患者推荐",
+      "instagram": "来自 Instagram",
+      "lhr": "LHR 患者"
+    },
+    "steps": {
+      "contact": "联系方式与个人信息",
+      "clinic": "诊所、推荐与随访",
+      "notFilled": "尚未填写"
+    },
+    "groups": {
+      "contact": "联系方式",
+      "personal": "个人信息",
+      "clinic": "诊所",
+      "referral": "推荐与随访"
+    },
+    "fields": {
+      "firstName": "名",
+      "lastName": "姓",
+      "mobile": "手机号",
+      "mobileHint": "主要 · WhatsApp",
+      "phone2": "备用手机号",
+      "phone2Hint": "10 位数字",
+      "address": "地址",
+      "addressPlaceholder": "区域、城市",
+      "homeBranch": "所属分店",
+      "gender": "性别",
+      "birthDate": "出生日期",
+      "age": "{{age}} 岁",
+      "types": "患者类型",
+      "typesHint": "可多选",
+      "status": "状态",
+      "conversion": "转化",
+      "referredBy": "推荐人",
+      "referredByPlaceholder": "姓名",
+      "referrerType": "推荐类型",
+      "followUp": "随访",
+      "followUpDate": "随访日期",
+      "followUpTime": "随访时间",
+      "notes": "备注",
+      "notesPlaceholder": "团队需要知道的事项",
+      "consent": "同意书",
+      "consentHint": "已签署的内容",
+      "photos": "首批照片",
+      "photosHint": "术前照片 · 归入今天的就诊",
+      "photosDrop": "拍摄或拖放照片",
+      "photosLimit": "JPG 或 PNG · 每张最大 {{limit}}",
+      "photosRemove": "移除 {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "明天 {{time}}",
+      "week": "1 周后",
+      "twentyDays": "20 天后",
+      "month": "1 个月后"
+    },
+    "save": {
+      "create": "创建患者",
+      "edit": "保存更改",
+      "createAnother": "创建并继续添加"
+    },
+    "missing": "请填写姓名和手机号",
+    "mobileInvalid": "请输入 10 位手机号",
+    "created": "已创建患者 {{id}} · 已添加建档任务",
+    "openFile": "打开档案",
+    "saved": "已保存 {{name}}",
+    "registered": "已将 {{name}} 登记为患者 {{id}}",
+    "registeredPhotos_other": "已将 {{name}} 登记为患者 {{id}} · 已归档 {{count}} 张照片",
+    "duplicate": "与 {{name}} 的手机号相同 · {{id}}",
+    "useExisting": "使用已有患者",
+    "summaryEmpty": "新建患者"
+  },
   "recordDrawer": {
     "cancel": "取消",
     "back": "返回",
@@ -237,6 +318,7 @@
     "saveAndAdd": "保存并继续添加",
     "delete": "删除",
     "notSaved": "未保存 · 您的更改已保留",
+    "saveFailed": "无法保存 · 连接已断开。您输入的内容都还在。",
     "readOnly": "仅查看 · 您的角色无法更改此内容",
     "quickFill": "快速填写",
     "step": {

@@ -187,6 +187,55 @@ describe('the Patients room (KICKOFF §6.5)', () => {
       expect(router.state.location.pathname).toBe(`${PATIENTS}/create`),
     );
     expect(router.state.location.search).toMatchObject({ view: 'dues' });
+    const drawer = await screen.findByTestId('patient-drawer');
+    expect(within(drawer).getByTestId('patient-drawer-title')).toHaveTextContent(
+      'New patient',
+    );
+    // Cancel closes it back onto the same list.
+    await user.click(within(drawer).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
+    expect(router.state.location.search).toEqual({ view: 'dues' });
+  });
+
+  it('creates a patient in the drawer: the list stays and refetches with them (D28)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientsRoutes(
+      `${PATIENTS}/create?name=Priya%20Shah&phone=9876500009`,
+      PatientsPage,
+    );
+    const drawer = await screen.findByTestId('patient-drawer');
+    expect(within(drawer).getByTestId('patient-drawer-first-name')).toHaveValue('Priya');
+    expect(within(drawer).getByTestId('patient-drawer-mobile')).toHaveValue(
+      '98765 00009',
+    );
+    await waitFor(() => expect(rows().length).toBeGreaterThan(0));
+    await user.click(within(drawer).getByTestId('patient-drawer-save'));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
+    // The prefill's name and mobile leave the URL with the drawer.
+    expect(router.state.location.search).toEqual({});
+    await waitFor(() => expect(rowOf('Priya Shah')).toHaveTextContent('+91 98765 00009'));
+    expect(screen.queryByTestId('patient-drawer')).not.toBeInTheDocument();
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      expect.stringMatching(/^Patient #\d+ created · onboarding task added$/),
+      { action: { label: 'Open file', onClick: expect.any(Function) } },
+    );
+  });
+
+  it('sends a create link without Create back to the list with the permission toast', async () => {
+    const { router } = renderPatientsRoutes(
+      `${PATIENTS}/create?view=dues`,
+      PatientsPage,
+      {
+        role: 'therapist',
+      },
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
+    expect(router.state.location.search).toEqual({ view: 'dues' });
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'You do not have permission to perform this action.',
+    );
+    expect(screen.queryByTestId('patient-drawer')).not.toBeInTheDocument();
   });
 
   it('removes a patient through the reason confirm, with Undo (D32)', async () => {

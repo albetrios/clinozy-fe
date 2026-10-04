@@ -93,4 +93,15 @@ describe('the Patients room with only its route’s namespaces loaded', () => {
     expect(screen.getByRole('columnheader', { name: /Conversion/ })).toBeInTheDocument();
     expect(document.body.textContent).not.toMatch(RAW_KEY);
   });
+
+  it('opens the New patient drawer with every label in place', async () => {
+    renderPatientsRoutes(`${PATIENTS}/create`, PatientsPage, { i18n: routeI18n });
+    const drawer = await screen.findByTestId('patient-drawer');
+    // The drawer's copy is `clinic` (it is shared — quick-add stacks it on other rooms).
+    expect(drawer).toHaveTextContent('New patient');
+    expect(drawer).toHaveTextContent('Contact & personal');
+    expect(drawer).toHaveTextContent('primary · WhatsApp');
+    expect(drawer).toHaveTextContent('Walk-in today');
+    expect(drawer.textContent).not.toMatch(RAW_KEY);
+  });
 });

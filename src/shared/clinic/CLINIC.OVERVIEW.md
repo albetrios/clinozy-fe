@@ -34,6 +34,10 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
   shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
   Instagram) the person cards and the chat open.
+- `clinic-phone-field.ts` — a drawer's mobile field: its ten digits as typed
+  (`clinicPhoneDigits`) and shown (`formatClinicPhoneDigits`, `98250 44120`)
+  behind the "+91" box (`CLINIC_PHONE_PREFIX`); apart from `clinic-phone.ts`,
+  which the URL readers bring onto the entry chunk.
 - `clinic-sections.ts` — the sections in nav order, the section a URL is in
   (`/visits/…` belongs to Today), and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11).

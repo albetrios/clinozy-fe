@@ -79,6 +79,20 @@ export function addCivilDays(date: string, days: number): string {
   return next.toISOString().slice(0, 10);
 }
 
+/**
+ * The same day `months` calendar months away (civil arithmetic), held to the
+ * last day of a shorter month: 31 Jan + 1 → 28 or 29 Feb.
+ */
+export function addCivilMonths(date: string, months: number): string {
+  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
+  const first = new Date(Date.UTC(year, month - 1 + months, 1));
+  const lastDay = new Date(
+    Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  first.setUTCDate(Math.min(day, lastDay));
+  return first.toISOString().slice(0, 10);
+}
+
 /** Minutes the zone is ahead of UTC at a given instant. */
 function offsetMinutes(instant: Date, timeZone: string): number {
   const p = zonedClockParts(instant, timeZone);

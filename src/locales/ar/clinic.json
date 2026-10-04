@@ -227,6 +227,92 @@
     "titleRecord": "حذف هذا السجل؟",
     "removed": "تمت إزالة {{name}}"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "مريض جديد",
+      "edit": "تعديل المريض"
+    },
+    "sub": {
+      "full": "ينشئ جهة الاتصال أو يحدّثها أيضًا",
+      "quick": "ما تحتاجه العيادة قبل إتمام الزيارة"
+    },
+    "quickFill": {
+      "walkIn": "زيارة مباشرة اليوم",
+      "referred": "بإحالة من مريض",
+      "instagram": "من إنستغرام",
+      "lhr": "مريض LHR"
+    },
+    "steps": {
+      "contact": "الاتصال والبيانات الشخصية",
+      "clinic": "العيادة والإحالة والمتابعة",
+      "notFilled": "لم يُملأ بعد"
+    },
+    "groups": {
+      "contact": "الاتصال",
+      "personal": "البيانات الشخصية",
+      "clinic": "العيادة",
+      "referral": "الإحالة والمتابعة"
+    },
+    "fields": {
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "mobile": "الجوال",
+      "mobileHint": "أساسي · واتساب",
+      "phone2": "جوال ثانوي",
+      "phone2Hint": "10 أرقام",
+      "address": "العنوان",
+      "addressPlaceholder": "المنطقة، المدينة",
+      "homeBranch": "الفرع الأساسي",
+      "gender": "الجنس",
+      "birthDate": "تاريخ الميلاد",
+      "age": "العمر {{age}}",
+      "types": "نوع المريض",
+      "typesHint": "اختر ما تشاء",
+      "status": "الحالة",
+      "conversion": "التحويل",
+      "referredBy": "أحاله",
+      "referredByPlaceholder": "الاسم",
+      "referrerType": "نوع الإحالة",
+      "followUp": "المتابعة",
+      "followUpDate": "تاريخ المتابعة",
+      "followUpTime": "وقت المتابعة",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "ما يجب أن يعرفه الفريق",
+      "consent": "الموافقة",
+      "consentHint": "ما تم توقيعه",
+      "photos": "الصور الأولى",
+      "photosHint": "صور قبل · تُحفظ في زيارة اليوم",
+      "photosDrop": "التقط الصور أو أفلتها هنا",
+      "photosLimit": "JPG أو PNG · حتى {{limit}} لكل صورة",
+      "photosRemove": "إزالة {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "غدًا {{time}}",
+      "week": "بعد أسبوع",
+      "twentyDays": "بعد 20 يومًا",
+      "month": "بعد شهر"
+    },
+    "save": {
+      "create": "إنشاء المريض",
+      "edit": "حفظ التغييرات",
+      "createAnother": "إنشاء وإضافة آخر"
+    },
+    "missing": "أضف الاسم والجوال",
+    "mobileInvalid": "أدخل رقم جوال من 10 أرقام",
+    "created": "تم إنشاء المريض {{id}} · أُضيفت مهمة الاستقبال",
+    "openFile": "فتح الملف",
+    "saved": "تم حفظ {{name}}",
+    "registered": "تم تسجيل {{name}} كمريض {{id}}",
+    "registeredPhotos_zero": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_one": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_two": "تم تسجيل {{name}} كمريض {{id}} · صورتان محفوظتان",
+    "registeredPhotos_few": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صور محفوظة",
+    "registeredPhotos_many": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_other": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "duplicate": "نفس رقم الجوال لدى {{name}} · {{id}}",
+    "useExisting": "استخدام الموجود",
+    "summaryEmpty": "مريض جديد"
+  },
   "recordDrawer": {
     "cancel": "إلغاء",
     "back": "رجوع",
@@ -237,6 +323,7 @@
     "saveAndAdd": "حفظ وإضافة آخر",
     "delete": "حذف",
     "notSaved": "لم يُحفظ · تغييراتك ما زالت هنا",
+    "saveFailed": "تعذّر الحفظ · انقطع الاتصال. كل ما أدخلته ما زال هنا.",
     "readOnly": "للعرض فقط · لا يمكن لدورك تغيير هذا",
     "quickFill": "تعبئة سريعة",
     "step": {

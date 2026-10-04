@@ -227,6 +227,87 @@
     "titleRecord": "이 기록을 삭제할까요?",
     "removed": "{{name}} 삭제됨"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "새 환자",
+      "edit": "환자 수정"
+    },
+    "sub": {
+      "full": "연락처도 함께 생성하거나 업데이트합니다",
+      "quick": "방문을 마치기 전에 클리닉에 필요한 정보"
+    },
+    "quickFill": {
+      "walkIn": "오늘 직접 방문",
+      "referred": "환자 소개",
+      "instagram": "Instagram 유입",
+      "lhr": "LHR 환자"
+    },
+    "steps": {
+      "contact": "연락처 및 개인 정보",
+      "clinic": "클리닉, 소개 및 후속 조치",
+      "notFilled": "아직 입력되지 않음"
+    },
+    "groups": {
+      "contact": "연락처",
+      "personal": "개인 정보",
+      "clinic": "클리닉",
+      "referral": "소개 및 후속 조치"
+    },
+    "fields": {
+      "firstName": "이름",
+      "lastName": "성",
+      "mobile": "휴대폰",
+      "mobileHint": "기본 · WhatsApp",
+      "phone2": "보조 휴대폰",
+      "phone2Hint": "10자리",
+      "address": "주소",
+      "addressPlaceholder": "지역, 도시",
+      "homeBranch": "소속 지점",
+      "gender": "성별",
+      "birthDate": "생년월일",
+      "age": "{{age}}세",
+      "types": "환자 유형",
+      "typesHint": "여러 개 선택 가능",
+      "status": "상태",
+      "conversion": "전환",
+      "referredBy": "소개한 사람",
+      "referredByPlaceholder": "이름",
+      "referrerType": "소개 유형",
+      "followUp": "후속 조치",
+      "followUpDate": "후속 조치 날짜",
+      "followUpTime": "후속 조치 시간",
+      "notes": "메모",
+      "notesPlaceholder": "팀이 알아야 할 내용",
+      "consent": "동의",
+      "consentHint": "서명한 항목",
+      "photos": "첫 사진",
+      "photosHint": "시술 전 사진 · 오늘 방문에 저장",
+      "photosDrop": "사진을 찍거나 끌어다 놓기",
+      "photosLimit": "JPG 또는 PNG · 장당 {{limit}}까지",
+      "photosRemove": "{{name}} 삭제"
+    },
+    "followUpQuick": {
+      "tomorrow": "내일 {{time}}",
+      "week": "1주 후",
+      "twentyDays": "20일 후",
+      "month": "1개월 후"
+    },
+    "save": {
+      "create": "환자 생성",
+      "edit": "변경 사항 저장",
+      "createAnother": "생성 후 계속 추가"
+    },
+    "missing": "이름과 휴대폰 번호를 입력하세요",
+    "mobileInvalid": "10자리 휴대폰 번호를 입력하세요",
+    "created": "환자 {{id}} 생성됨 · 온보딩 작업 추가됨",
+    "openFile": "파일 열기",
+    "saved": "{{name}} 저장됨",
+    "registered": "{{name}} 님이 환자 {{id}}(으)로 등록됨",
+    "registeredPhotos_other": "{{name}} 님이 환자 {{id}}(으)로 등록됨 · 사진 {{count}}장 저장됨",
+    "duplicate": "{{name}} 님과 같은 휴대폰 번호 · {{id}}",
+    "useExisting": "기존 환자 사용",
+    "summaryEmpty": "새 환자"
+  },
   "recordDrawer": {
     "cancel": "취소",
     "back": "뒤로",
@@ -237,6 +318,7 @@
     "saveAndAdd": "저장 후 계속 추가",
     "delete": "삭제",
     "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
+    "saveFailed": "저장하지 못했습니다 · 연결이 끊겼습니다. 입력한 내용은 모두 그대로 있습니다.",
     "readOnly": "보기 전용 · 현재 역할로는 변경할 수 없습니다",
     "quickFill": "빠른 입력",
     "step": {

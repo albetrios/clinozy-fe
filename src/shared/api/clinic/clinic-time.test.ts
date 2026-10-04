@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   addCivilDays,
+  addCivilMonths,
   civilDateOf,
   civilDayOffset,
   civilYearsBetween,
@@ -42,6 +43,14 @@ describe('clinic clock (Asia/Kolkata)', () => {
     expect(addCivilDays('2026-10-31', 1)).toBe('2026-11-01');
     expect(addCivilDays('2027-01-01', -1)).toBe('2026-12-31');
     expect(addCivilDays('2026-10-03', 0)).toBe('2026-10-03');
+  });
+
+  it('moves by calendar months, held to the last day of a shorter month', () => {
+    expect(addCivilMonths('2026-09-28', 1)).toBe('2026-10-28');
+    expect(addCivilMonths('2026-12-15', 1)).toBe('2027-01-15');
+    expect(addCivilMonths('2027-01-31', 1)).toBe('2027-02-28');
+    expect(addCivilMonths('2028-01-31', 1)).toBe('2028-02-29');
+    expect(addCivilMonths('2026-10-31', -1)).toBe('2026-09-30');
   });
 
   it('counts whole days between civil dates, across months and years', () => {

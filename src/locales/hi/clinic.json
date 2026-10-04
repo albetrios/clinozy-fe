@@ -227,6 +227,88 @@
     "titleRecord": "इस रिकॉर्ड को हटाएँ?",
     "removed": "{{name}} हटाया गया"
   },
+  "patientDrawer": {
+    "title": {
+      "create": "नया मरीज़",
+      "edit": "मरीज़ संपादित करें"
+    },
+    "sub": {
+      "full": "संपर्क भी बनाता या अपडेट करता है",
+      "quick": "विज़िट पूरी होने से पहले क्लिनिक को क्या चाहिए"
+    },
+    "quickFill": {
+      "walkIn": "आज सीधे आए",
+      "referred": "मरीज़ ने भेजा",
+      "instagram": "Instagram से",
+      "lhr": "LHR मरीज़"
+    },
+    "steps": {
+      "contact": "संपर्क और व्यक्तिगत",
+      "clinic": "क्लिनिक, रेफ़रल और फ़ॉलो-अप",
+      "notFilled": "अभी भरा नहीं गया"
+    },
+    "groups": {
+      "contact": "संपर्क",
+      "personal": "व्यक्तिगत",
+      "clinic": "क्लिनिक",
+      "referral": "रेफ़रल और फ़ॉलो-अप"
+    },
+    "fields": {
+      "firstName": "पहला नाम",
+      "lastName": "उपनाम",
+      "mobile": "मोबाइल",
+      "mobileHint": "मुख्य · WhatsApp",
+      "phone2": "दूसरा मोबाइल",
+      "phone2Hint": "10 अंक",
+      "address": "पता",
+      "addressPlaceholder": "इलाका, शहर",
+      "homeBranch": "मुख्य शाखा",
+      "gender": "लिंग",
+      "birthDate": "जन्म तिथि",
+      "age": "उम्र {{age}}",
+      "types": "मरीज़ का प्रकार",
+      "typesHint": "कितने भी चुनें",
+      "status": "स्थिति",
+      "conversion": "कन्वर्ज़न",
+      "referredBy": "किसने भेजा",
+      "referredByPlaceholder": "नाम",
+      "referrerType": "रेफ़रल का प्रकार",
+      "followUp": "फ़ॉलो-अप",
+      "followUpDate": "फ़ॉलो-अप की तारीख",
+      "followUpTime": "फ़ॉलो-अप का समय",
+      "notes": "नोट्स",
+      "notesPlaceholder": "टीम को जो जानना चाहिए",
+      "consent": "सहमति",
+      "consentHint": "किस पर हस्ताक्षर हुए",
+      "photos": "पहली तस्वीरें",
+      "photosHint": "पहले की तस्वीरें · आज की विज़िट में रखी जाएँगी",
+      "photosDrop": "तस्वीरें लें या यहाँ छोड़ें",
+      "photosLimit": "JPG या PNG · हर एक {{limit}} तक",
+      "photosRemove": "{{name}} हटाएँ"
+    },
+    "followUpQuick": {
+      "tomorrow": "कल {{time}}",
+      "week": "1 हफ़्ते में",
+      "twentyDays": "20 दिन",
+      "month": "1 महीना"
+    },
+    "save": {
+      "create": "मरीज़ बनाएँ",
+      "edit": "बदलाव सहेजें",
+      "createAnother": "बनाएँ और एक और जोड़ें"
+    },
+    "missing": "नाम और मोबाइल जोड़ें",
+    "mobileInvalid": "10 अंकों का मोबाइल नंबर डालें",
+    "created": "मरीज़ {{id}} बनाया गया · ऑनबोर्डिंग कार्य जोड़ा गया",
+    "openFile": "फ़ाइल खोलें",
+    "saved": "{{name}} सहेजा गया",
+    "registered": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया",
+    "registeredPhotos_one": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया · {{count}} तस्वीर रखी गई",
+    "registeredPhotos_other": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया · {{count}} तस्वीरें रखी गईं",
+    "duplicate": "{{name}} जैसा ही मोबाइल · {{id}}",
+    "useExisting": "मौजूदा इस्तेमाल करें",
+    "summaryEmpty": "नया मरीज़"
+  },
   "recordDrawer": {
     "cancel": "रद्द करें",
     "back": "वापस",
@@ -237,6 +319,7 @@
     "saveAndAdd": "सहेजें और एक और जोड़ें",
     "delete": "हटाएँ",
     "notSaved": "सहेजा नहीं गया · आपके परिवर्तन बने हुए हैं",
+    "saveFailed": "सहेजा नहीं जा सका · कनेक्शन टूट गया। आपने जो भी भरा है, वह अब भी यहीं है।",
     "readOnly": "केवल देखने के लिए · आपकी भूमिका इसे बदल नहीं सकती",
     "quickFill": "झटपट भरें",
     "step": {
