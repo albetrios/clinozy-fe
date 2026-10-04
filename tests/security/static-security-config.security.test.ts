@@ -13,6 +13,7 @@ import netlifyToml from '../../netlify.toml?raw';
 import pkg from '../../package.json';
 import pnpmWorkspace from '../../pnpm-workspace.yaml?raw';
 import headers from '../../public/_headers?raw';
+import offlineHtml from '../../public/offline.html?raw';
 import viteConfig from '../../vite.config.ts?raw';
 
 /** Lowest version a semver range like `^7.3.6` / `>=3.4.7` can resolve to. */
@@ -230,6 +231,61 @@ describe('content security policy (meta ↔ canonical header parity)', () => {
     for (const origin of META_CONNECT_SRC_GAP) {
       expect(canonicalConnectSrc.has(origin)).toBe(true);
     }
+  });
+});
+
+/**
+ * Every static page ships under the same header CSP, whose `script-src` has no
+ * `'unsafe-inline'`: an inline `onclick="…"` or an inline `<script>` body is
+ * blocked there, silently. The offline page's Retry was exactly that — an
+ * inline `onclick` that did nothing in production.
+ */
+describe('static pages run under the CSP (no inline script)', () => {
+  /** The inside of each tag — its name and attributes, without `<` and `>`. */
+  const tags = (html: string) =>
+    html
+      .split('<')
+      .slice(1)
+      .map((chunk) => chunk.split('>', 1)[0] ?? '');
+
+  /** A tag whose attribute runs script: `onclick=`, `onload=` … or a `javascript:` URL. */
+  const runsScript = (tag: string) =>
+    tag
+      .split(/\s+/)
+      .some(
+        (token) => /^on[a-z]+=/i.test(token) || /^[a-z-]+=["']?javascript:/i.test(token),
+      );
+
+  /** Every `<script …>…</script>` element: its attributes and its body. */
+  const scripts = (html: string) =>
+    [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].map(
+      ([, attributes = '', body = '']) => ({ attributes, body }),
+    );
+
+  it.each([
+    ['index.html', indexHtml],
+    ['public/offline.html', offlineHtml],
+  ])(
+    '%s carries no inline event handlers, inline scripts or javascript: URLs',
+    (_page, html) => {
+      expect(tags(html).filter(runsScript)).toEqual([]);
+      for (const script of scripts(html)) {
+        expect(script.attributes).toMatch(/\bsrc=/);
+        expect(script.body.trim()).toBe('');
+      }
+    },
+  );
+
+  it('catches what the offline page used to carry (guards the check above)', () => {
+    const old = '<button onclick="window.location.reload()">Retry</button>';
+    expect(tags(old).filter(runsScript)).toHaveLength(1);
+    expect(
+      tags('<a href="javascript:location.reload()">').filter(runsScript),
+    ).toHaveLength(1);
+  });
+
+  it("the offline page's Retry reloads without script: a link to the page itself", () => {
+    expect(offlineHtml).toContain('<a class="retry" href="">Retry</a>');
   });
 });
 
