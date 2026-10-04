@@ -188,6 +188,14 @@ export function organizationUserCreate(organizationSlug: string) {
   } as const;
 }
 
+/** Users › Roles & access (`S:107`); `?role=` names the role on screen. */
+export function organizationUsersRoles(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/users/roles',
+    params: { organizationSlug },
+  } as const;
+}
+
 /** A member's drawer over the Team, keyed by membership id (`S:106`). */
 export function organizationUserEdit(organizationSlug: string, userId: string) {
   return {

@@ -41,6 +41,7 @@ import {
 import { UserDrawer } from './components/UserDrawer/index.ts';
 import { useTeamTable } from './hooks/useTeamTable/index.ts';
 import { useUsersDialogRoute } from './hooks/useUsersDialogRoute/index.ts';
+import { RolesAccess } from './shared/components/RolesAccess/index.ts';
 import { UsersToolbar } from './shared/components/UsersToolbar/index.ts';
 import {
   type RoleDirectory,
@@ -51,6 +52,7 @@ import {
   TEAM_STATUS_VALUES,
   type TeamSortColumn,
   type UsersSearch,
+  validateUserEditSearch,
   validateUsersSearch,
 } from './users.search.ts';
 
@@ -210,13 +212,16 @@ function useTeamAccess() {
  * searched, filtered and sorted in place, folded on a tablet, rows with the
  * Roles pills as the key column on a phone. Its dialog routes render nothing:
  * this page reads the URL and opens the user drawer — New user (an
- * invitation) or the member's.
+ * invitation) or the member's; a member opened from a role page
+ * (`?from=roles`) keeps Roles & access behind the drawer instead (H:5188).
  */
 export function UsersPage() {
   const { t } = useTranslation(USERS_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
-  const search = validateUsersSearch(useSearch({ strict: false }));
+  const rawSearch = useSearch({ strict: false });
+  const search = validateUsersSearch(rawSearch);
+  const { from } = validateUserEditSearch(rawSearch);
   const { patchSearch } = useDataTableUrlState(true);
   const access = useTeamAccess();
   const team = useTeam();
@@ -231,6 +236,8 @@ export function UsersPage() {
   const { dialog, close } = useUsersDialogRoute(team, {
     canInvite: access.canInvite,
     accessResolved: access.isResolved,
+    from,
+    role: search.role,
   });
   const loading = team.isPending && team.members.length === 0;
 
@@ -307,42 +314,48 @@ export function UsersPage() {
 
   return (
     <section data-testid="users-page" className="flex min-h-0 flex-1 flex-col">
-      <UsersToolbar
-        tab="team"
-        search
-        filters={{ fields: filterFields, copy: filterCopy }}
-        columns={<DataTableColumnChooser table={table} tableId={TEAM_TABLE_ID} />}
-        primary={
-          access.canInvite
-            ? {
-                id: 'new-user',
-                label: t(USERS_KEYS.primary.newUser),
-                onSelect: openCreate,
-              }
-            : undefined
-        }
-      />
-      <DataTable
-        table={table}
-        tableId={TEAM_TABLE_ID}
-        label={t(USERS_KEYS.tabs.team)}
-        recordsLabel={t(USERS_KEYS.table.records)}
-        fold
-        selectable
-        minWidth={isMultiBranch ? 1340 : 1210}
-        onRowClick={(row) => openEdit(row.original)}
-        getRowTone={(row) => row.original.tone}
-        rowActions={(row) => rowActions(row.original)}
-        bulkActions={bulkActions}
-        empty={
-          <TeamEmpty
-            loading={loading}
-            filtered={filters.count > 0}
-            onClearFilters={() => filters.apply({})}
+      {from === 'roles' ? (
+        <RolesAccess selected={search.role} />
+      ) : (
+        <>
+          <UsersToolbar
+            tab="team"
+            search
+            filters={{ fields: filterFields, copy: filterCopy }}
+            columns={<DataTableColumnChooser table={table} tableId={TEAM_TABLE_ID} />}
+            primary={
+              access.canInvite
+                ? {
+                    id: 'new-user',
+                    label: t(USERS_KEYS.primary.newUser),
+                    onSelect: openCreate,
+                  }
+                : undefined
+            }
           />
-        }
-        className="m-(--room-card-margin) flex-1"
-      />
+          <DataTable
+            table={table}
+            tableId={TEAM_TABLE_ID}
+            label={t(USERS_KEYS.tabs.team)}
+            recordsLabel={t(USERS_KEYS.table.records)}
+            fold
+            selectable
+            minWidth={isMultiBranch ? 1340 : 1210}
+            onRowClick={(row) => openEdit(row.original)}
+            getRowTone={(row) => row.original.tone}
+            rowActions={(row) => rowActions(row.original)}
+            bulkActions={bulkActions}
+            empty={
+              <TeamEmpty
+                loading={loading}
+                filtered={filters.count > 0}
+                onClearFilters={() => filters.apply({})}
+              />
+            }
+            className="m-(--room-card-margin) flex-1"
+          />
+        </>
+      )}
       <UserDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
       <UserDrawer
         mode="create"

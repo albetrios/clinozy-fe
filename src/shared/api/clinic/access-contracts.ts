@@ -209,7 +209,8 @@ export const clinicRoleViewSchema = z.object({
   locked: z.boolean(),
   /**
    * Whether its Users row and "Change roles & access" are clinozy-be permission
-   * codes (D17) — a bound role the API lets a client edit (not a system role).
+   * codes (D17) — every bound role but Admin. A role bound to a clinozy-be
+   * system role keeps them read-only: the API refuses to edit one (D47).
    */
   platformBacked: z.boolean(),
   /** The members holding it (membership ids), main role or not — "People with this role". */

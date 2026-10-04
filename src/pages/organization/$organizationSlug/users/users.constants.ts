@@ -165,6 +165,140 @@ export const USERS_KEYS = {
     /** "Dr. Reenal Chaniyara removed", with Undo. */
     removed: 'deleteUser.removed',
   },
+  /** Roles & access (`users.md:42–77`; H:1117–1146, H:5179–5194). */
+  roles: {
+    /** The role list's label ("Roles", 11px uppercase). */
+    label: 'roles.label',
+    /** Each preset's one-line purpose (`users.md:50`); a custom role's lines. */
+    purposes: {
+      admin: 'roles.purposes.admin',
+      doctor: 'roles.purposes.doctor',
+      therapist: 'roles.purposes.therapist',
+      front_desk: 'roles.purposes.front_desk',
+      counsellor: 'roles.purposes.counsellor',
+      pharmacist: 'roles.purposes.pharmacist',
+      accountant: 'roles.purposes.accountant',
+      marketing: 'roles.purposes.marketing',
+      /** "Custom role" — a custom role in the list. */
+      custom: 'roles.purposes.custom',
+      /** "Custom role · set what it can do below" — a custom role's page. */
+      customPage: 'roles.purposes.customPage',
+    },
+    /** The custom role name box's accessible name. */
+    nameLabel: 'roles.nameLabel',
+    copyFrom: 'roles.copyFrom',
+    /** "Front desk now has the same access as Counsellor". */
+    copied: 'roles.copied',
+    /** "Preview as Front desk". */
+    preview: 'roles.preview',
+    /** The preview button's tooltip. */
+    previewHint: 'roles.previewHint',
+    /** "Previewing Clinozy as Doctor". */
+    previewing: 'roles.previewing',
+    back: 'roles.back',
+    people: 'roles.people',
+    /** A member pill's tooltip: "Open Riya Shah". */
+    openPerson: 'roles.openPerson',
+    /** "+ Admin" — the other roles a member holds. */
+    also: 'roles.also',
+    nobody: 'roles.nobody',
+    matrix: {
+      title: 'roles.matrix.title',
+      section: 'roles.matrix.section',
+      view: 'roles.matrix.view',
+      create: 'roles.matrix.create',
+      edit: 'roles.matrix.edit',
+      delete: 'roles.matrix.delete',
+      row: 'roles.matrix.row',
+      full: 'roles.matrix.full',
+      some: 'roles.matrix.some',
+      none: 'roles.matrix.none',
+      rowHint: 'roles.matrix.rowHint',
+      /** A box's name: "Front desk can view · Leads". */
+      cell: {
+        view: 'roles.matrix.cell.view',
+        create: 'roles.matrix.cell.create',
+        edit: 'roles.matrix.cell.edit',
+        delete: 'roles.matrix.cell.delete',
+      },
+    },
+    abilities: {
+      title: 'roles.abilities.title',
+      disc: {
+        label: 'roles.abilities.disc.label',
+        description: 'roles.abilities.disc.description',
+      },
+      floor: {
+        label: 'roles.abilities.floor.label',
+        description: 'roles.abilities.floor.description',
+      },
+      prices: {
+        label: 'roles.abilities.prices.label',
+        description: 'roles.abilities.prices.description',
+      },
+      dayclose: {
+        label: 'roles.abilities.dayclose.label',
+        description: 'roles.abilities.dayclose.description',
+      },
+      reverse: {
+        label: 'roles.abilities.reverse.label',
+        description: 'roles.abilities.reverse.description',
+      },
+      refund: {
+        label: 'roles.abilities.refund.label',
+        description: 'roles.abilities.refund.description',
+      },
+      void: {
+        label: 'roles.abilities.void.label',
+        description: 'roles.abilities.void.description',
+      },
+      allbr: {
+        label: 'roles.abilities.allbr.label',
+        description: 'roles.abilities.allbr.description',
+      },
+      clinical: {
+        label: 'roles.abilities.clinical.label',
+        description: 'roles.abilities.clinical.description',
+      },
+      export: {
+        label: 'roles.abilities.export.label',
+        description: 'roles.abilities.export.description',
+      },
+      perms: {
+        label: 'roles.abilities.perms.label',
+        description: 'roles.abilities.perms.description',
+      },
+    },
+    notes: {
+      admin: 'roles.notes.admin',
+      readOnly: 'roles.notes.readOnly',
+      live: 'roles.notes.live',
+    },
+    locked: {
+      /** "Admins always have full access". */
+      admin: 'roles.locked.admin',
+      /** "You can’t change roles · ask an admin". */
+      noPerms: 'roles.locked.noPerms',
+      /** "You can’t add roles · ask an admin". */
+      noAdd: 'roles.locked.noAdd',
+      /** A role clinozy-be keeps as a system role: its Users row is the platform's (D47). */
+      platform: 'roles.locked.platform',
+    },
+    /** "Role added · name it and pick what it can do". */
+    added: 'roles.added',
+    /** A new role's name: "New role", then "New role 2" … */
+    newRoleName: 'roles.newRoleName',
+    /** "A role called {{name}} already exists" (§7.3: a rename can't duplicate). */
+    duplicateName: 'roles.duplicateName',
+    /** Delete role — the Settings capability, relocated (D17, Q-U6). */
+    deleteRole: {
+      action: 'roles.deleteRole.action',
+      title: 'roles.deleteRole.title',
+      description: 'roles.deleteRole.description',
+      confirm: 'roles.deleteRole.confirm',
+      pending: 'roles.deleteRole.pending',
+    },
+  },
 } as const;
 
 /** The Team table's id: the test-id prefix (`users-team-table`) and the device prefs' key. */

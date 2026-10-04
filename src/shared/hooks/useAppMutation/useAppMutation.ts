@@ -51,6 +51,18 @@ interface OptimisticQueriesConfig<TVars> {
   update: (data: unknown, vars: TVars) => unknown;
 }
 
+/**
+ * How a domain write hook reports itself when a screen reports the write in
+ * its own words — one "<name> saved" for a whole drawer save, a failure shown
+ * in place (the Users room's drawer, Roles & access).
+ */
+export interface WriteReportOptions {
+  /** No success toast of the hook's own. */
+  suppressSuccessToast?: boolean;
+  /** Toast a failure (default true); off when the caller shows it in place. */
+  notifyOnError?: boolean;
+}
+
 export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unknown> {
   mutationFn: (vars: TVars) => Promise<TData>;
   /**

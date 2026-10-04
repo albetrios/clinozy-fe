@@ -53,6 +53,7 @@ const api = vi.hoisted(() => ({
   removeMember: vi.fn(),
   resendInvitation: vi.fn(),
   revokeInvitation: vi.fn(),
+  getRolePermissions: vi.fn(),
 }));
 vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
@@ -269,6 +270,29 @@ describe('Users › the user drawer (L-31b)', () => {
       expect(router.state.location.pathname).toBe('/organization/acme/users'),
     );
     expect(screen.queryByTestId('user-drawer')).toBeNull();
+  });
+});
+
+describe('Users › a member opened from Roles & access (H:5188)', () => {
+  it('keeps the role page behind the drawer and returns to it on close', async () => {
+    const user = userEvent.setup();
+    api.getRolePermissions.mockResolvedValue(['organization:read']);
+    const { router } = renderUsersRoutes(
+      '/organization/acme/users/mbr_reenal/edit?from=roles&role=doctor',
+      UsersPage,
+    );
+    const panel = await drawer();
+    expect(screen.getByTestId('users-roles-panel')).toBeInTheDocument();
+    expect(screen.queryByTestId('users-team-table')).toBeNull();
+    // Behind the modal drawer, so out of the accessibility tree.
+    expect(
+      screen.getByRole('link', { name: 'Roles & access', hidden: true }),
+    ).toHaveAttribute('aria-current', 'page');
+    await user.click(within(panel).getByTestId('user-drawer-close'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users/roles'),
+    );
+    expect(router.state.location.search).toEqual({ role: 'doctor' });
   });
 });
 

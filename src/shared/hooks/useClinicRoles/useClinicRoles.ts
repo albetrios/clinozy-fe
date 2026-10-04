@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import {
   applyRoleMatrixChange,
   type ClinicAccessMatrix,
@@ -10,13 +11,18 @@ import {
 import type {
   ClinicRoleKey,
   ClinicRoleView,
+  PlatformRoleRef,
 } from '@/shared/api/clinic/access-contracts.ts';
 import { joinClinicRoles, withPlatformAccess } from '@/shared/api/clinic/users-api.ts';
+import * as orgApi from '@/shared/api/organization-api.ts';
+import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
+import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useClinicAccessMatrix } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { useRolePermissions } from '@/shared/hooks/useRoles/index.ts';
+import { rolePermissionsKey, useRolePermissions } from '@/shared/hooks/useRoles/index.ts';
 import { usePlatformRoles, useTeam } from '@/shared/hooks/useTeam/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The roles and the state of their reads. */
 export interface ClinicRolesResult {
@@ -122,5 +128,38 @@ export function useUpdateRoleMatrix(
     // Boxes are clicked in runs; one error toast replaces the last.
     toastId: 'role-matrix',
     ...options,
+  });
+}
+
+/** What a code write sends: the clinozy-be role and its whole new permission set. */
+export interface RoleCodesWrite {
+  role: PlatformRoleRef;
+  codes: OrganizationPermission[];
+}
+
+/**
+ * Write a clinozy-be role's permission codes — its Users row and "Change roles
+ * & access" on the matrix (D17) — as a full replace through the roles API.
+ * Optimistic like every matrix box (Q-U6): the role's codes change at once, so
+ * the page (`useClinicRole`) reads the new row; a refused or failed write rolls
+ * back with the save-error toast. One hook per role page (`roleId`).
+ */
+export function useUpdateRoleCodes(roleId: string | undefined) {
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  return useAppMutation<RoleSummary, RoleCodesWrite, OrganizationPermission[]>({
+    mutationFn: ({ role, codes }) =>
+      orgApi.updateRole({
+        id: role.id,
+        name: role.name,
+        description: role.description,
+        permissions: codes,
+      }),
+    invalidateKeys: [orgQueryKeys.roles(organizationId)],
+    optimistic: {
+      queryKey: rolePermissionsKey(organizationId, roleId),
+      update: (_previous, { codes }) => codes,
+    },
+    // Boxes are clicked in runs; one error toast replaces the last.
+    toastId: 'role-matrix',
   });
 }

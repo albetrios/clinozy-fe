@@ -3,8 +3,10 @@ import i18n from '@/lib/i18n/i18n.ts';
 import * as orgApi from '@/shared/api/organization-api.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
-import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
-import type { MemberWriteOptions } from '@/shared/hooks/useMembers/index.ts';
+import {
+  useAppMutation,
+  type WriteReportOptions,
+} from '@/shared/hooks/useAppMutation/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
@@ -13,7 +15,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  * the MEMBERS list — invalidate that, not a separate invitations list. Resend
  * and revoke act on the invitation that INVITED row carries (below).
  */
-export function useInviteMember(options?: MemberWriteOptions) {
+export function useInviteMember(options?: WriteReportOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { email: string; roleId: string }) => orgApi.inviteMember(input),

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1334 src files · ~699 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1348 src files · ~702 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1057,6 +1057,12 @@ clinozy-fe/
 │   │       │   │   ├── hooks/
 │   │       │   │   │   ├── useTeamTable/
 │   │       │   │   │   └── useUsersDialogRoute/
+│   │       │   │   ├── roles/
+│   │       │   │   │   ├── roles.manifest.ts
+│   │       │   │   │   ├── ROLES.OVERVIEW.md
+│   │       │   │   │   ├── roles.route.tsx
+│   │       │   │   │   ├── RolesPage.tsx
+│   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── shared/
 │   │       │   │   │   ├── components/
 │   │       │   │   │   └── hooks/

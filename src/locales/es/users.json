@@ -144,5 +144,118 @@
   "deleteUser": {
     "title": "¿Eliminar este usuario?",
     "removed": "{{name}} eliminado"
+  },
+  "roles": {
+    "label": "Roles",
+    "purposes": {
+      "admin": "Dirige la clínica: precios, equipo, sucursales y todas las pantallas.",
+      "doctor": "Atiende consultas, receta y planifica el tratamiento de cada paciente.",
+      "therapist": "Realiza sesiones y llamadas de seguimiento.",
+      "front_desk": "La primera cara de la clínica: prospectos, reservas, registro de llegada y cobros.",
+      "counsellor": "Convierte consultas en planes y paquetes.",
+      "pharmacist": "Lleva el mostrador de medicamentos y su inventario.",
+      "accountant": "Revisa las entradas y salidas de dinero y cierra los días.",
+      "marketing": "Atrae prospectos y les da seguimiento.",
+      "custom": "Rol personalizado",
+      "customPage": "Rol personalizado · define abajo qué puede hacer"
+    },
+    "nameLabel": "Nombre del rol",
+    "copyFrom": "Copiar acceso de",
+    "copied": "{{role}} ahora tiene el mismo acceso que {{from}}",
+    "preview": "Vista previa como {{role}}",
+    "previewHint": "Ve {{productName}} como lo ve este rol",
+    "previewing": "Vista previa de {{productName}} como {{role}}",
+    "back": "Volver a los roles",
+    "people": "Personas con este rol",
+    "openPerson": "Abrir {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Nadie tiene este rol todavía · asígnalo a alguien desde su ficha de usuario.",
+    "matrix": {
+      "title": "Qué puede ver y hacer",
+      "section": "Sección",
+      "view": "Ver",
+      "create": "Crear",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "row": "Fila",
+      "full": "Total",
+      "some": "Parcial",
+      "none": "Ninguno",
+      "rowHint": "Activa o desactiva toda la fila",
+      "cell": {
+        "view": "{{role}} puede ver · {{section}}",
+        "create": "{{role}} puede crear · {{section}}",
+        "edit": "{{role}} puede editar · {{section}}",
+        "delete": "{{role}} puede eliminar · {{section}}"
+      }
+    },
+    "abilities": {
+      "title": "Permisos especiales",
+      "disc": {
+        "label": "Cobrar por debajo del precio de oferta",
+        "description": "Descuento más allá del precio de oferta, nunca por debajo del precio mínimo"
+      },
+      "floor": {
+        "label": "Ver el precio mínimo",
+        "description": "Muestra el precio mínimo oculto en servicios y facturas"
+      },
+      "prices": {
+        "label": "Cambiar precios y ofertas",
+        "description": "Editar precios de lista y de oferta y crear ofertas"
+      },
+      "dayclose": {
+        "label": "Cerrar el día",
+        "description": "Contar el efectivo y bloquear el día en Pagos"
+      },
+      "reverse": {
+        "label": "Revertir pagos liquidados",
+        "description": "Deshacer un cobro después de cerrar su día"
+      },
+      "refund": {
+        "label": "Reembolsos y notas de crédito",
+        "description": "Devolver dinero a un paciente o emitir una nota de crédito"
+      },
+      "void": {
+        "label": "Anular ventas y eliminar facturas",
+        "description": "Cancelar una venta de Farmacia o eliminar una factura sin pagar"
+      },
+      "allbr": {
+        "label": "Ver todas las sucursales",
+        "description": "Cambiar el encabezado a otras sucursales y a Todas las sucursales"
+      },
+      "clinical": {
+        "label": "Leer notas clínicas",
+        "description": "Abrir motivos de consulta, diagnósticos, recetas y fotos"
+      },
+      "export": {
+        "label": "Exportar listas",
+        "description": "Descargar cualquier tabla"
+      },
+      "perms": {
+        "label": "Cambiar roles y acceso",
+        "description": "Editar roles, acceso y sucursales"
+      }
+    },
+    "notes": {
+      "admin": "Los administradores pueden hacerlo todo · este rol no se puede limitar.",
+      "readOnly": "Aquí puedes ver los roles. Para cambiarlos necesitas «Cambiar roles y acceso».",
+      "live": "Los cambios se aplican al instante a todas las personas con este rol. Quien tiene dos roles obtiene todo lo que permita cualquiera de ellos."
+    },
+    "locked": {
+      "admin": "Los administradores siempre tienen acceso total",
+      "noPerms": "No puedes cambiar roles · pídeselo a un administrador",
+      "noAdd": "No puedes añadir roles · pídeselo a un administrador",
+      "platform": "{{productName}} gestiona el acceso a Usuarios de este rol · no se puede cambiar aquí"
+    },
+    "added": "Rol añadido · ponle nombre y elige qué puede hacer",
+    "newRoleName": "Nuevo rol",
+    "duplicateName": "Ya existe un rol llamado {{name}}",
+    "deleteRole": {
+      "action": "Eliminar rol",
+      "title": "¿Eliminar {{name}}?",
+      "description": "Los miembros con este rol necesitarán que se les asigne uno nuevo. Puedes deshacerlo durante unos segundos tras confirmar.",
+      "confirm": "Eliminar",
+      "pending": "Eliminando {{name}}…"
+    }
   }
 }

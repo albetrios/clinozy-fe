@@ -81,6 +81,24 @@ describe('useUsersDialogRoute (KICKOFF §4, D24)', () => {
     );
   });
 
+  it('returns a dead member link opened from a role page to that role', async () => {
+    function FromRoles() {
+      useUsersDialogRoute(
+        { members: [REENAL], isPending: false },
+        { canInvite: true, accessResolved: true, from: 'roles', role: 'doctor' },
+      );
+      return null;
+    }
+    const { router } = renderUsersRoutes(
+      '/organization/acme/users/mbr_gone/edit?from=roles&role=doctor',
+      FromRoles,
+    );
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users/roles'),
+    );
+    expect(router.state.location.search).toEqual({ role: 'doctor' });
+  });
+
   it('sends a create link back with the permission toast to a member who may not invite', async () => {
     const { router } = renderUsersRoutes(
       '/organization/acme/users/create?q=riya',

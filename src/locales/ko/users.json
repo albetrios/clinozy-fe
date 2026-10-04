@@ -142,5 +142,118 @@
   "deleteUser": {
     "title": "이 사용자를 삭제할까요?",
     "removed": "{{name}} 삭제됨"
+  },
+  "roles": {
+    "label": "역할",
+    "purposes": {
+      "admin": "클리닉 운영 — 가격, 팀, 지점, 모든 화면.",
+      "doctor": "진료하고 처방하며 환자별 치료를 계획합니다.",
+      "therapist": "시술과 사후 관리 통화를 맡습니다.",
+      "front_desk": "클리닉의 첫 얼굴 — 리드, 예약, 체크인, 수납.",
+      "counsellor": "문의를 플랜과 패키지로 연결합니다.",
+      "pharmacist": "약 판매 창구와 재고를 맡습니다.",
+      "accountant": "입출금을 확인하고 하루를 마감합니다.",
+      "marketing": "리드를 모으고 후속 연락을 합니다.",
+      "custom": "사용자 지정 역할",
+      "customPage": "사용자 지정 역할 · 아래에서 할 수 있는 일을 정하세요"
+    },
+    "nameLabel": "역할 이름",
+    "copyFrom": "권한 복사해 오기",
+    "copied": "{{role}} 역할이 이제 {{from}} 역할과 같은 권한을 가집니다",
+    "preview": "{{role}}(으)로 미리 보기",
+    "previewHint": "이 역할이 보는 그대로 {{productName}}을(를) 봅니다",
+    "previewing": "{{productName}}을(를) {{role}}(으)로 미리 보는 중",
+    "back": "역할 목록으로",
+    "people": "이 역할을 가진 사람",
+    "openPerson": "{{name}} 열기",
+    "also": "+ {{roles}}",
+    "nobody": "아직 이 역할을 가진 사람이 없습니다 · 사용자 상세 화면에서 역할을 부여하세요.",
+    "matrix": {
+      "title": "보고 할 수 있는 일",
+      "section": "섹션",
+      "view": "보기",
+      "create": "만들기",
+      "edit": "편집",
+      "delete": "삭제",
+      "row": "행",
+      "full": "전체",
+      "some": "일부",
+      "none": "없음",
+      "rowHint": "행 전체를 켜거나 끕니다",
+      "cell": {
+        "view": "{{role}}: 볼 수 있음 · {{section}}",
+        "create": "{{role}}: 만들 수 있음 · {{section}}",
+        "edit": "{{role}}: 편집할 수 있음 · {{section}}",
+        "delete": "{{role}}: 삭제할 수 있음 · {{section}}"
+      }
+    },
+    "abilities": {
+      "title": "특별 권한",
+      "disc": {
+        "label": "제안가보다 낮게 청구",
+        "description": "제안가를 넘어 할인하되 최저가 아래로는 내리지 않습니다"
+      },
+      "floor": {
+        "label": "최저가 보기",
+        "description": "서비스와 청구서에 숨겨진 최저가를 표시합니다"
+      },
+      "prices": {
+        "label": "가격 및 할인 변경",
+        "description": "정가·제안가를 편집하고 할인을 만듭니다"
+      },
+      "dayclose": {
+        "label": "하루 마감",
+        "description": "현금을 세고 결제에서 하루를 잠급니다"
+      },
+      "reverse": {
+        "label": "정산된 결제 되돌리기",
+        "description": "마감된 날의 결제를 취소합니다"
+      },
+      "refund": {
+        "label": "환불 및 대변표",
+        "description": "환자에게 돈을 돌려주거나 대변표를 발행합니다"
+      },
+      "void": {
+        "label": "판매 취소 및 청구서 삭제",
+        "description": "약국 판매를 취소하거나 미결제 청구서를 삭제합니다"
+      },
+      "allbr": {
+        "label": "모든 지점 보기",
+        "description": "헤더에서 다른 지점과 전체 지점으로 전환합니다"
+      },
+      "clinical": {
+        "label": "임상 메모 읽기",
+        "description": "주호소, 진단, 처방, 사진을 엽니다"
+      },
+      "export": {
+        "label": "목록 내보내기",
+        "description": "모든 표를 다운로드합니다"
+      },
+      "perms": {
+        "label": "역할 및 권한 변경",
+        "description": "역할, 권한, 지점을 편집합니다"
+      }
+    },
+    "notes": {
+      "admin": "관리자는 모든 것을 할 수 있습니다 · 이 역할은 제한할 수 없습니다.",
+      "readOnly": "여기에서 역할을 볼 수 있습니다. 변경하려면 ‘역할 및 권한 변경’이 필요합니다.",
+      "live": "변경 사항은 이 역할을 가진 모든 사람에게 바로 적용됩니다. 역할이 두 개인 사람은 두 역할 중 하나라도 허용하는 모든 것을 할 수 있습니다."
+    },
+    "locked": {
+      "admin": "관리자는 항상 전체 권한을 가집니다",
+      "noPerms": "역할을 변경할 수 없습니다 · 관리자에게 요청하세요",
+      "noAdd": "역할을 추가할 수 없습니다 · 관리자에게 요청하세요",
+      "platform": "이 역할의 사용자 권한은 {{productName}}에서 관리합니다 · 여기에서 변경할 수 없습니다"
+    },
+    "added": "역할을 추가했습니다 · 이름을 정하고 할 수 있는 일을 고르세요",
+    "newRoleName": "새 역할",
+    "duplicateName": "{{name}} 역할이 이미 있습니다",
+    "deleteRole": {
+      "action": "역할 삭제",
+      "title": "{{name}}을(를) 삭제하시겠습니까?",
+      "description": "이 역할의 멤버에게는 새 역할이 필요합니다. 확인 후 몇 초 동안 취소할 수 있습니다.",
+      "confirm": "삭제",
+      "pending": "{{name}} 삭제 중…"
+    }
   }
 }

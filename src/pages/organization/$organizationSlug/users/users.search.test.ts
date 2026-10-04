@@ -3,7 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { CLINIC_ROLE_CATALOG } from '@/shared/api/clinic/access-contracts.ts';
 import { TEAM_SORT_KEYS as CONTRACT_SORT_KEYS } from '@/shared/api/clinic/users-contracts.ts';
 
-import { TEAM_SORT_KEYS, validateUsersSearch } from './users.search.ts';
+import {
+  TEAM_SORT_KEYS,
+  validateRolesSearch,
+  validateUserEditSearch,
+  validateUsersSearch,
+} from './users.search.ts';
 
 const ID = '7d3f5a8e-1b2c-4d5e-8f90-123456789abc';
 
@@ -64,5 +69,24 @@ describe('validateUsersSearch', () => {
 
   it('sorts by exactly the Team contract’s keys', () => {
     expect([...TEAM_SORT_KEYS]).toEqual([...CONTRACT_SORT_KEYS]);
+  });
+});
+
+describe('validateRolesSearch', () => {
+  it('keeps a role the page can show and drops anything else', () => {
+    expect(validateRolesSearch({ role: 'counsellor' })).toEqual({ role: 'counsellor' });
+    expect(validateRolesSearch({ role: 'rol_abcdefghij0123456789k' })).toEqual({
+      role: 'rol_abcdefghij0123456789k',
+    });
+    expect(validateRolesSearch({ role: 'owner' })).toEqual({ role: undefined });
+    expect(validateRolesSearch({})).toEqual({ role: undefined });
+  });
+});
+
+describe('validateUserEditSearch', () => {
+  it('reads where the drawer was opened from, never a stray origin', () => {
+    expect(validateUserEditSearch({ from: 'roles' })).toEqual({ from: 'roles' });
+    expect(validateUserEditSearch({ from: 'invoices' })).toEqual({ from: undefined });
+    expect(validateUserEditSearch({})).toEqual({ from: undefined });
   });
 });

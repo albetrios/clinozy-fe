@@ -10,7 +10,10 @@ import {
   type OrgListKeyParams,
   orgQueryKeys,
 } from '@/shared/api/organization-query-keys.ts';
-import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
+import {
+  useAppMutation,
+  type WriteReportOptions,
+} from '@/shared/hooks/useAppMutation/index.ts';
 import {
   type CursorListResult,
   useCursorList,
@@ -19,17 +22,6 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 
 /** Server-side query params for the members list (search + sort). */
 export type MembersListParams = OrgListKeyParams;
-
-/**
- * Options of a member write a screen reports itself (the Users room's user
- * drawer: one "<name> saved" for the whole save, its own failure states).
- */
-export interface MemberWriteOptions {
-  /** No success toast of the hook's own. */
-  suppressSuccessToast?: boolean;
-  /** Toast a failure (default true); off when the caller shows it in place. */
-  notifyOnError?: boolean;
-}
 
 /**
  * Members of the active organization — windowed list query + role/status/removal
@@ -55,7 +47,7 @@ export function useMembers(params: MembersListParams = {}): CursorListResult<Mem
  * `suppressSuccessToast`: the caller reports the whole save itself (the Users
  * room's user drawer, "<name> saved").
  */
-export function useUpdateMemberRole(options?: MemberWriteOptions) {
+export function useUpdateMemberRole(options?: WriteReportOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { membershipId: string; role: OrgRole; roleId?: string }) =>
@@ -99,7 +91,7 @@ export function useRemoveMember(options?: { suppressSuccessToast?: boolean }) {
  * Suspend or reactivate a member — optimistically flips the status badge.
  * `suppressSuccessToast`: as {@link useUpdateMemberRole}.
  */
-export function useUpdateMemberStatus(options?: MemberWriteOptions) {
+export function useUpdateMemberStatus(options?: WriteReportOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { membershipId: string; status: MembershipStatus }) =>

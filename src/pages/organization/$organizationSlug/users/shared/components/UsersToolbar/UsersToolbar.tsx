@@ -9,21 +9,23 @@ import {
   RoomToolbar,
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { type AppIcon, Users } from '@/shared/icons/index.ts';
+import { type AppIcon, Shield, Users } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 
 /** The Users room's tabs, in the design's order (H:1086). */
-export type UsersTab = 'team';
+export type UsersTab = 'team' | 'roles';
 
 /** Each tab's route and 14px icon. */
 const TABS: readonly { id: UsersTab; to: string; icon: AppIcon }[] = [
   { id: 'team', to: '/organization/$organizationSlug/users', icon: Users },
+  { id: 'roles', to: '/organization/$organizationSlug/users/roles', icon: Shield },
 ];
 
 /** Each tab's toolbar id — its test-id prefix and its saved views' key. */
 const TOOLBAR_IDS: Readonly<Record<UsersTab, string>> = {
   team: 'users-team',
+  roles: 'users-roles',
 };
 
 /** Props of {@link UsersToolbar}. */

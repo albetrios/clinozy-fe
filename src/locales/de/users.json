@@ -143,5 +143,118 @@
   "deleteUser": {
     "title": "Diesen Benutzer löschen?",
     "removed": "{{name}} entfernt"
+  },
+  "roles": {
+    "label": "Rollen",
+    "purposes": {
+      "admin": "Führt die Klinik — Preise, Team, Filialen und jede Ansicht.",
+      "doctor": "Berät, verordnet und plant die Behandlung jedes Patienten.",
+      "therapist": "Führt Sitzungen und Nachsorge-Anrufe durch.",
+      "front_desk": "Das erste Gesicht der Klinik — Leads, Buchungen, Check-in und Abrechnung.",
+      "counsellor": "Macht aus Anfragen Pläne und Pakete.",
+      "pharmacist": "Führt die Medikamentenausgabe und ihren Bestand.",
+      "accountant": "Prüft Ein- und Ausgänge und schließt die Tage ab.",
+      "marketing": "Gewinnt Leads und fasst bei ihnen nach.",
+      "custom": "Eigene Rolle",
+      "customPage": "Eigene Rolle · legen Sie unten fest, was sie darf"
+    },
+    "nameLabel": "Rollenname",
+    "copyFrom": "Zugriff kopieren von",
+    "copied": "{{role}} hat jetzt denselben Zugriff wie {{from}}",
+    "preview": "Vorschau als {{role}}",
+    "previewHint": "{{productName}} so sehen, wie diese Rolle es sieht",
+    "previewing": "Vorschau von {{productName}} als {{role}}",
+    "back": "Zurück zu den Rollen",
+    "people": "Personen mit dieser Rolle",
+    "openPerson": "{{name}} öffnen",
+    "also": "+ {{roles}}",
+    "nobody": "Noch niemand hat diese Rolle · weisen Sie sie in den Benutzerdetails einer Person zu.",
+    "matrix": {
+      "title": "Was sie sehen und tun kann",
+      "section": "Bereich",
+      "view": "Ansehen",
+      "create": "Erstellen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "row": "Zeile",
+      "full": "Voll",
+      "some": "Teils",
+      "none": "Keine",
+      "rowHint": "Die ganze Zeile ein- oder ausschalten",
+      "cell": {
+        "view": "{{role}} darf ansehen · {{section}}",
+        "create": "{{role}} darf erstellen · {{section}}",
+        "edit": "{{role}} darf bearbeiten · {{section}}",
+        "delete": "{{role}} darf löschen · {{section}}"
+      }
+    },
+    "abilities": {
+      "title": "Sonderrechte",
+      "disc": {
+        "label": "Unter dem Angebotspreis abrechnen",
+        "description": "Rabatt über den Angebotspreis hinaus, nie unter den Mindestpreis"
+      },
+      "floor": {
+        "label": "Mindestpreis sehen",
+        "description": "Zeigt den verborgenen Mindestpreis bei Leistungen und Rechnungen"
+      },
+      "prices": {
+        "label": "Preise & Angebote ändern",
+        "description": "Listen- und Angebotspreise bearbeiten und Angebote anlegen"
+      },
+      "dayclose": {
+        "label": "Tag abschließen",
+        "description": "Bargeld zählen und den Tag in Zahlungen sperren"
+      },
+      "reverse": {
+        "label": "Abgeschlossene Zahlungen stornieren",
+        "description": "Geld zurücknehmen, nachdem sein Tag abgeschlossen ist"
+      },
+      "refund": {
+        "label": "Erstattungen & Gutschriften",
+        "description": "Einem Patienten Geld zurückgeben oder eine Gutschrift ausstellen"
+      },
+      "void": {
+        "label": "Verkäufe stornieren & Rechnungen löschen",
+        "description": "Einen Apotheken-Verkauf stornieren oder eine unbezahlte Rechnung löschen"
+      },
+      "allbr": {
+        "label": "Alle Filialen sehen",
+        "description": "Im Kopfbereich zu anderen Filialen und zu Alle Filialen wechseln"
+      },
+      "clinical": {
+        "label": "Klinische Notizen lesen",
+        "description": "Beschwerden, Diagnosen, Rezepte und Fotos öffnen"
+      },
+      "export": {
+        "label": "Listen exportieren",
+        "description": "Jede Tabelle herunterladen"
+      },
+      "perms": {
+        "label": "Rollen & Zugriff ändern",
+        "description": "Rollen, Zugriff und Filialen bearbeiten"
+      }
+    },
+    "notes": {
+      "admin": "Administratoren dürfen alles · diese Rolle lässt sich nicht einschränken.",
+      "readOnly": "Sie sehen hier die Rollen. Um sie zu ändern, brauchen Sie „Rollen & Zugriff ändern“.",
+      "live": "Änderungen gelten sofort für alle mit dieser Rolle. Wer zwei Rollen hat, bekommt alles, was eine der beiden erlaubt."
+    },
+    "locked": {
+      "admin": "Administratoren haben immer vollen Zugriff",
+      "noPerms": "Sie können Rollen nicht ändern · fragen Sie einen Administrator",
+      "noAdd": "Sie können keine Rollen hinzufügen · fragen Sie einen Administrator",
+      "platform": "{{productName}} legt den Benutzer-Zugriff dieser Rolle fest · er lässt sich hier nicht ändern"
+    },
+    "added": "Rolle hinzugefügt · geben Sie ihr einen Namen und legen Sie fest, was sie darf",
+    "newRoleName": "Neue Rolle",
+    "duplicateName": "Eine Rolle namens {{name}} gibt es bereits",
+    "deleteRole": {
+      "action": "Rolle löschen",
+      "title": "{{name}} löschen?",
+      "description": "Mitglieder mit dieser Rolle benötigen eine neue Zuweisung. Sie können kurz nach der Bestätigung rückgängig machen.",
+      "confirm": "Löschen",
+      "pending": "{{name}} wird gelöscht…"
+    }
   }
 }

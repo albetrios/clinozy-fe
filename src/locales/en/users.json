@@ -143,5 +143,118 @@
   "deleteUser": {
     "title": "Delete this user?",
     "removed": "{{name}} removed"
+  },
+  "roles": {
+    "label": "Roles",
+    "purposes": {
+      "admin": "Runs the clinic — prices, team, branches and every screen.",
+      "doctor": "Consults, prescribes and plans each patient’s treatment.",
+      "therapist": "Runs sessions and aftercare calls.",
+      "front_desk": "First face of the clinic — leads, bookings, check-in and billing.",
+      "counsellor": "Turns enquiries into plans and packages.",
+      "pharmacist": "Runs the medicine counter and its stock.",
+      "accountant": "Checks money in and out and closes the days.",
+      "marketing": "Brings in leads and follows them up.",
+      "custom": "Custom role",
+      "customPage": "Custom role · set what it can do below"
+    },
+    "nameLabel": "Role name",
+    "copyFrom": "Copy access from",
+    "copied": "{{role}} now has the same access as {{from}}",
+    "preview": "Preview as {{role}}",
+    "previewHint": "See {{productName}} the way this role sees it",
+    "previewing": "Previewing {{productName}} as {{role}}",
+    "back": "Back to roles",
+    "people": "People with this role",
+    "openPerson": "Open {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Nobody has this role yet · give it to someone from their user drawer.",
+    "matrix": {
+      "title": "What it can see and do",
+      "section": "Section",
+      "view": "View",
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "row": "Row",
+      "full": "Full",
+      "some": "Some",
+      "none": "None",
+      "rowHint": "Turn the whole row on or off",
+      "cell": {
+        "view": "{{role}} can view · {{section}}",
+        "create": "{{role}} can create · {{section}}",
+        "edit": "{{role}} can edit · {{section}}",
+        "delete": "{{role}} can delete · {{section}}"
+      }
+    },
+    "abilities": {
+      "title": "Special permissions",
+      "disc": {
+        "label": "Bill below the offer price",
+        "description": "Discount past the offer price, never below the lowest price"
+      },
+      "floor": {
+        "label": "See the lowest price",
+        "description": "Shows the hidden floor price on offerings and invoices"
+      },
+      "prices": {
+        "label": "Change prices & offers",
+        "description": "Edit list / offer prices and create offers"
+      },
+      "dayclose": {
+        "label": "Close the day",
+        "description": "Count cash and lock the day in Payments"
+      },
+      "reverse": {
+        "label": "Reverse settled payments",
+        "description": "Undo money after its day is closed"
+      },
+      "refund": {
+        "label": "Give refunds & credit notes",
+        "description": "Return money to a patient or issue a credit note"
+      },
+      "void": {
+        "label": "Void sales & delete invoices",
+        "description": "Cancel a Medical sale or delete an unpaid invoice"
+      },
+      "allbr": {
+        "label": "See every branch",
+        "description": "Switch the header to other branches and All branches"
+      },
+      "clinical": {
+        "label": "Read clinical notes",
+        "description": "Open complaints, diagnosis, prescriptions and photos"
+      },
+      "export": {
+        "label": "Export lists",
+        "description": "Download any table"
+      },
+      "perms": {
+        "label": "Change roles & access",
+        "description": "Edit roles, access and branches"
+      }
+    },
+    "notes": {
+      "admin": "Admins can do everything · this role can’t be narrowed.",
+      "readOnly": "You can see roles here. Changing them needs “Change roles & access”.",
+      "live": "Changes apply right away to everyone with this role. Someone with two roles gets everything either role allows."
+    },
+    "locked": {
+      "admin": "Admins always have full access",
+      "noPerms": "You can’t change roles · ask an admin",
+      "noAdd": "You can’t add roles · ask an admin",
+      "platform": "{{productName}} keeps this role’s Users access · it can’t be changed here"
+    },
+    "added": "Role added · name it and pick what it can do",
+    "newRoleName": "New role",
+    "duplicateName": "A role called {{name}} already exists",
+    "deleteRole": {
+      "action": "Delete role",
+      "title": "Delete {{name}}?",
+      "description": "Members with this role will need a new one assigned. You can undo for a few seconds after confirming.",
+      "confirm": "Delete",
+      "pending": "Deleting {{name}}…"
+    }
   }
 }

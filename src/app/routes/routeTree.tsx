@@ -98,8 +98,13 @@ import {
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
+import { manifest as usersRolesManifest } from '@/pages/organization/$organizationSlug/users/roles/roles.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
-import { validateUsersSearch } from '@/pages/organization/$organizationSlug/users/users.search.ts';
+import {
+  validateRolesSearch,
+  validateUserEditSearch,
+  validateUsersSearch,
+} from '@/pages/organization/$organizationSlug/users/users.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
@@ -345,6 +350,13 @@ const UserCreateRoute = lazyRouteComponent(
 const UserEditRoute = lazyRouteComponent(
   () =>
     import('@/pages/organization/$organizationSlug/users/$userId/edit/edit.route.tsx'),
+  'Component',
+);
+const UsersRolesPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.users],
+    () => import('@/pages/organization/$organizationSlug/users/roles/roles.route.tsx'),
+  ),
   'Component',
 );
 const MedicalLayout = lazyRouteComponent(
@@ -1126,12 +1138,31 @@ const organizationUserEditRoute = createRoute({
   path: '$userId/edit',
   head: manifestHead(userEditManifest),
   staticData: { manifest: userEditManifest },
+  // `?from=roles` keeps Roles & access behind the drawer (H:5188).
+  validateSearch: validateUserEditSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(userEditManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: UserEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+// Roles & access sits beside the Team, not under it: the Team route renders
+// the Team, and this tab is a page of its own (`S:107`).
+const organizationUsersRolesRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'users/roles',
+  head: manifestHead(usersRolesManifest),
+  staticData: { manifest: usersRolesManifest },
+  validateSearch: validateRolesSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(usersRolesManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: UsersRolesPage,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1317,6 +1348,7 @@ const routeTree = rootRoute.addChildren([
       organizationUserCreateRoute,
       organizationUserEditRoute,
     ]),
+    organizationUsersRolesRoute,
     organizationNotFoundRoute,
   ]),
   personalShellRoute.addChildren([personalDashboardRoute]),

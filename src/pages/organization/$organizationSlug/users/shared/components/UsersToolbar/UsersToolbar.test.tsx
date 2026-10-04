@@ -57,6 +57,28 @@ describe('UsersToolbar (users.md:17)', () => {
     );
   });
 
+  it('links Roles & access and marks it current on its page', async () => {
+    renderUsersRoutes('/organization/acme/users/roles', vi.fn(), {
+      Roles: () => <UsersToolbar tab="roles" />,
+    });
+    const roles = await screen.findByRole('link', { name: 'Roles & access' });
+    expect(roles).toHaveAttribute('href', '/organization/acme/users/roles');
+    expect(roles).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Team' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
+  it('keeps Roles & access current behind a drawer opened from it', async () => {
+    renderUsersRoutes('/organization/acme/users/mbr_riya/edit?from=roles', () => (
+      <UsersToolbar tab="roles" />
+    ));
+    expect(await screen.findByRole('link', { name: 'Roles & access' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
   it('has no search without the Team and no "New …" without the right to create', async () => {
     renderUsersRoutes('/organization/acme/users', () => <UsersToolbar tab="team" />);
     await screen.findByRole('heading', { level: 1, name: 'Users' });

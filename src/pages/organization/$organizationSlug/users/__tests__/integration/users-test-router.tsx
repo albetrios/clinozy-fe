@@ -17,7 +17,11 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { validateUsersSearch } from '../../users.search.ts';
+import {
+  validateRolesSearch,
+  validateUserEditSearch,
+  validateUsersSearch,
+} from '../../users.search.ts';
 
 /** Every code the Users room maps (D17): read, invite, manage members and roles. */
 export const USERS_ADMIN_CODES: OrganizationPermission[] = [
@@ -75,11 +79,22 @@ export function member(
 /** The signed-in member of the harness: Riya (#12) on the seeded profiles. */
 export const SELF = { userId: 'usr_riya', email: 'riya@cresence.skin' };
 
+/** What a harness run is set up with besides the Team's component. */
+interface UsersRoutesOptions {
+  /** The member's clinozy-be codes. */
+  codes?: OrganizationPermission[];
+  /** A role to preview (View-as). */
+  previewRole?: Role | null;
+  /** The Roles & access page's component (`/users/roles`); a marker by default. */
+  Roles?: () => ReactNode;
+}
+
 /**
  * The Users family as `routeTree.tsx` registers it — the Team with its search
- * schema and its two dialog routes, which render nothing — with `Page` as the
- * Team's component, opened at `url`, for a member holding `codes` (or, with
- * `previewRole`, previewing that role). Every other path lands on a catch-all.
+ * schema and its two dialog routes, which render nothing, and Roles & access
+ * beside it — with `Page` as the Team's component, opened at `url`, for a
+ * member holding `codes` (or, with `previewRole`, previewing that role). Every
+ * other path lands on a catch-all.
  */
 export function renderUsersRoutes(
   url: string,
@@ -87,7 +102,8 @@ export function renderUsersRoutes(
   {
     codes = USERS_ADMIN_CODES,
     previewRole = null,
-  }: { codes?: OrganizationPermission[]; previewRole?: Role | null } = {},
+    Roles = () => <p>roles page</p>,
+  }: UsersRoutesOptions = {},
 ) {
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
   useOrganizationStore.getState().setPermissions(codes);
@@ -114,7 +130,14 @@ export function renderUsersRoutes(
   const edit = createRoute({
     getParentRoute: () => users,
     path: '$userId/edit',
+    validateSearch: validateUserEditSearch,
     component: () => null,
+  });
+  const roles = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/users/roles',
+    validateSearch: validateRolesSearch,
+    component: Roles,
   });
   const elsewhere = createRoute({
     getParentRoute: () => root,
@@ -122,7 +145,7 @@ export function renderUsersRoutes(
     component: () => <p>elsewhere</p>,
   });
   const router = createRouter({
-    routeTree: root.addChildren([users.addChildren([create, edit]), elsewhere]),
+    routeTree: root.addChildren([users.addChildren([create, edit]), roles, elsewhere]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({

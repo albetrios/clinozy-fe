@@ -3,12 +3,12 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationUsers } from '@/lib/routes/index.ts';
+import { organizationUsers, organizationUsersRoles } from '@/lib/routes/index.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { validateUsersSearch } from '../../users.search.ts';
+import { type UserEditSearch, validateUsersSearch } from '../../users.search.ts';
 
 /** The drawer the Users URL opens over its page (KICKOFF §4, D24). */
 export type UsersDialog =
@@ -18,7 +18,7 @@ export type UsersDialog =
   /** `/users/$userId/edit` — the member drawer, keyed by membership id (`S:106`, AMBER). */
   | { kind: 'edit'; membershipId: string; member: TeamMember | undefined };
 
-/** The dialog, and how it closes: back to the Team with the Team's own params. */
+/** The dialog, and how it closes: back to the page behind it with its own params. */
 export interface UsersDialogRouteState {
   dialog: UsersDialog;
   close: () => void;
@@ -26,6 +26,16 @@ export interface UsersDialogRouteState {
 
 const CREATE_PATH = /\/users\/create\/?$/;
 const EDIT_PATH = /\/users\/([^/]+)\/edit\/?$/;
+
+/** What the hook is told of the viewer and the page behind the drawer. */
+interface UsersDialogOptions {
+  canInvite: boolean;
+  accessResolved: boolean;
+  /** `roles` — the member was opened from a role page, which is behind the drawer. */
+  from?: UserEditSearch['from'];
+  /** The role page's role, to return to (`?role=`). */
+  role?: string;
+}
 
 /** What the hook reads of the Team. */
 interface TeamState {
@@ -39,11 +49,12 @@ interface TeamState {
  * follows a create link lands back on the list with the permission toast; a
  * member id the Team doesn't have — a stale link, someone removed — leaves the
  * page with "User not found · it may have been deleted" (`S:115`). `close`
- * returns to the Team with its search, filters and sort.
+ * returns to the Team with its search, filters and sort — or, for a member
+ * opened from a role page, to that role (H:5188).
  */
 export function useUsersDialogRoute(
   team: TeamState,
-  options: { canInvite: boolean; accessResolved: boolean },
+  options: UsersDialogOptions,
 ): UsersDialogRouteState {
   const { organizationSlug = '' } = useParams({ strict: false });
   const pathname = useLocation({ select: (location) => location.pathname });
@@ -51,14 +62,24 @@ export function useUsersDialogRoute(
   const { t } = useTranslation([ERRORS_NS, USERS_NS]);
   const edit = EDIT_PATH.exec(pathname);
 
+  const { from, role } = options;
   const close = useCallback(() => {
+    if (from === 'roles') {
+      void navigate({
+        ...organizationUsersRoles(organizationSlug),
+        search: { role },
+        hash: true,
+        replace: true,
+      });
+      return;
+    }
     void navigate({
       ...organizationUsers(organizationSlug),
       search: (current: Record<string, unknown>) => validateUsersSearch(current),
       hash: true,
       replace: true,
     });
-  }, [navigate, organizationSlug]);
+  }, [navigate, organizationSlug, from, role]);
 
   const isCreate = CREATE_PATH.test(pathname);
   const refused = isCreate && options.accessResolved && !options.canInvite;

@@ -109,6 +109,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
 | `users-team-table`               | Users › Team table (toolbar and table ids: the shared ones, `users-team-…`)       | `pages/organization/$organizationSlug/users/`         |
 | `user-drawer`                    | User drawer — `/users/create` (New user) and `/users/$userId/edit` (L-31b)        | `pages/organization/$organizationSlug/users/`         |
+| `users-roles-page`               | Users › Roles & access page — `/users/roles` (L-31c)                              | `pages/organization/$organizationSlug/users/roles/`   |
+| `users-roles-panel`              | Roles & access card: role list and role page (also behind a drawer opened there)  | `pages/organization/$organizationSlug/users/shared/`  |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
 | `sidebar-toggle`                 | Menu button                                                                       | AppLayout                                             |
@@ -523,6 +525,27 @@ The Team's toolbar and table carry the shared ids with the `tableId` `users-team
 | `<d>-days` / `<d>-from` / `<d>-to`             | Step 2's Days chips and the From / To time pickers                  | `UserDrawerFields` |
 | `<d>-commission` / `<d>-commission-quick-<n>`  | Commission stepper (`-decrease`, `-increase`) and its quick picks   | `UserDrawerFields` |
 | `<d>-status` / `<d>-invitation` / `<d>-resend` | Status toggle; an invited member's expiry and "Resend invitation"   | `UserDrawerFields` |
+
+### Roles & access (Users room, launch L-31c)
+
+The family-shared `RolesAccess` (`pages/organization/$organizationSlug/users/shared/components/RolesAccess/`).
+Its toolbar carries the shared ids with the `tableId` `users-roles` (`users-roles-toolbar`,
+`users-roles-new-role`, `users-roles-fab`). `<section>` is a matrix section (`leads` … `users`),
+`<action>` one of `view`, `create`, `edit`, `delete`, `<ability>` a special permission (`disc` … `perms`).
+
+| Test ID                                             | Element                                                            | Source          |
+| --------------------------------------------------- | ------------------------------------------------------------------ | --------------- |
+| `users-roles-list` / `users-roles-item-<role>`      | The role list and one role (`aria-current` when on screen)         | `RoleList`      |
+| `users-role-page` / `users-roles-back`              | The role page; "Back to roles" (a phone only)                      | `RolePage`      |
+| `users-role-name`                                   | A custom role's name box (Enter or leaving it renames)             | `RolePage`      |
+| `users-role-copy` / `users-role-copy-option-<role>` | "Copy access from" and one of its roles                            | `RolePage`      |
+| `users-role-preview` / `users-role-delete`          | "Preview as <role>"; "Delete role" (a custom role nobody holds)    | `RolePage`      |
+| `users-role-person`                                 | A "People with this role" pill — the member's drawer over the page | `RolePage`      |
+| `users-role-matrix`                                 | The matrix's bordered, sideways-scrolling box                      | `RoleMatrix`    |
+| `users-role-matrix-<section>`                       | One section row                                                    | `RoleMatrix`    |
+| `users-role-matrix-<section>-<action>`              | One box (`role="checkbox"`, named "Front desk can view · Leads")   | `RoleMatrix`    |
+| `users-role-matrix-<section>-row`                   | The Row pill ("Full" / "Some" / "None")                            | `RoleMatrix`    |
+| `users-role-ability-<ability>`                      | A special permission's switch card (`role="switch"`)               | `RoleAbilities` |
 
 ## Items field (shared, launch L-17a)
 

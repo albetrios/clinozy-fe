@@ -6,7 +6,10 @@ import {
   type OrgListKeyParams,
   orgQueryKeys,
 } from '@/shared/api/organization-query-keys.ts';
-import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
+import {
+  useAppMutation,
+  type WriteReportOptions,
+} from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import {
@@ -17,6 +20,14 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 
 /** Server-side query params for the roles list (search + sort). */
 export type RolesListParams = OrgListKeyParams;
+
+/** The query key of one role's permission codes (`useRolePermissions`). */
+export function rolePermissionsKey(
+  organizationId: string | null,
+  roleId: string | undefined,
+) {
+  return [...orgQueryKeys.roles(organizationId), 'permissions', roleId] as const;
+}
 
 /**
  * Roles of the active organization — windowed list query + create/update/delete
@@ -49,28 +60,31 @@ export function useRoles(params: RolesListParams = {}): CursorListResult<RoleSum
 export function useRolePermissions(roleId: string | undefined) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppQuery({
-    queryKey: [...orgQueryKeys.roles(orgId), 'permissions', roleId],
+    queryKey: rolePermissionsKey(orgId, roleId),
     queryFn: () => orgApi.getRolePermissions(roleId ?? ''),
     enabled: roleId !== undefined,
   });
 }
 
 /** Create a custom role, then refresh the roles list. */
-export function useCreateRole() {
+export function useCreateRole(options?: WriteReportOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: RoleInput) => orgApi.createRole(input),
     invalidateKeys: [orgQueryKeys.roles(orgId)],
-    successMessage: (role) =>
-      i18n.t(ERRORS_KEYS.frontend.hooks.roles.createSuccess, {
-        ns: ERRORS_NS,
-        name: role.name,
-      }),
+    successMessage: options?.suppressSuccessToast
+      ? undefined
+      : (role) =>
+          i18n.t(ERRORS_KEYS.frontend.hooks.roles.createSuccess, {
+            ns: ERRORS_NS,
+            name: role.name,
+          }),
+    notifyOnError: options?.notifyOnError ?? true,
   });
 }
 
 /** Update a custom role — optimistically patches the renamed row. */
-export function useUpdateRole() {
+export function useUpdateRole(options?: WriteReportOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: RoleInput & { id: string }) => orgApi.updateRole(input),
@@ -80,11 +94,14 @@ export function useUpdateRole() {
       update: (rows: RoleSummary[], input) =>
         rows.map((role) => (role.id === input.id ? { ...role, name: input.name } : role)),
     },
-    successMessage: (role) =>
-      i18n.t(ERRORS_KEYS.frontend.hooks.roles.updateSuccess, {
-        ns: ERRORS_NS,
-        name: role.name,
-      }),
+    successMessage: options?.suppressSuccessToast
+      ? undefined
+      : (role) =>
+          i18n.t(ERRORS_KEYS.frontend.hooks.roles.updateSuccess, {
+            ns: ERRORS_NS,
+            name: role.name,
+          }),
+    notifyOnError: options?.notifyOnError ?? true,
   });
 }
 

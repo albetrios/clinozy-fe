@@ -144,5 +144,118 @@
   "deleteUser": {
     "title": "Excluir este usuário?",
     "removed": "{{name}} removido"
+  },
+  "roles": {
+    "label": "Funções",
+    "purposes": {
+      "admin": "Comanda a clínica — preços, equipe, unidades e todas as telas.",
+      "doctor": "Atende, prescreve e planeja o tratamento de cada paciente.",
+      "therapist": "Conduz sessões e ligações de acompanhamento.",
+      "front_desk": "A primeira cara da clínica — leads, agendamentos, check-in e cobrança.",
+      "counsellor": "Transforma consultas em planos e pacotes.",
+      "pharmacist": "Cuida do balcão de medicamentos e do estoque.",
+      "accountant": "Confere entradas e saídas de dinheiro e fecha os dias.",
+      "marketing": "Traz leads e faz o acompanhamento.",
+      "custom": "Função personalizada",
+      "customPage": "Função personalizada · defina abaixo o que ela pode fazer"
+    },
+    "nameLabel": "Nome da função",
+    "copyFrom": "Copiar acesso de",
+    "copied": "{{role}} agora tem o mesmo acesso que {{from}}",
+    "preview": "Visualizar como {{role}}",
+    "previewHint": "Veja o {{productName}} como esta função vê",
+    "previewing": "Visualizando o {{productName}} como {{role}}",
+    "back": "Voltar às funções",
+    "people": "Pessoas com esta função",
+    "openPerson": "Abrir {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Ninguém tem esta função ainda · atribua-a a alguém pela ficha de usuário.",
+    "matrix": {
+      "title": "O que pode ver e fazer",
+      "section": "Seção",
+      "view": "Ver",
+      "create": "Criar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "row": "Linha",
+      "full": "Total",
+      "some": "Parcial",
+      "none": "Nenhum",
+      "rowHint": "Ativar ou desativar a linha inteira",
+      "cell": {
+        "view": "{{role}} pode ver · {{section}}",
+        "create": "{{role}} pode criar · {{section}}",
+        "edit": "{{role}} pode editar · {{section}}",
+        "delete": "{{role}} pode excluir · {{section}}"
+      }
+    },
+    "abilities": {
+      "title": "Permissões especiais",
+      "disc": {
+        "label": "Cobrar abaixo do preço da oferta",
+        "description": "Desconto além do preço da oferta, nunca abaixo do preço mínimo"
+      },
+      "floor": {
+        "label": "Ver o preço mínimo",
+        "description": "Mostra o preço mínimo oculto em serviços e faturas"
+      },
+      "prices": {
+        "label": "Alterar preços e ofertas",
+        "description": "Editar preços de tabela e de oferta e criar ofertas"
+      },
+      "dayclose": {
+        "label": "Fechar o dia",
+        "description": "Contar o dinheiro e bloquear o dia em Pagamentos"
+      },
+      "reverse": {
+        "label": "Estornar pagamentos liquidados",
+        "description": "Desfazer um valor depois que o dia foi fechado"
+      },
+      "refund": {
+        "label": "Reembolsos e notas de crédito",
+        "description": "Devolver dinheiro a um paciente ou emitir uma nota de crédito"
+      },
+      "void": {
+        "label": "Anular vendas e excluir faturas",
+        "description": "Cancelar uma venda da Farmácia ou excluir uma fatura não paga"
+      },
+      "allbr": {
+        "label": "Ver todas as unidades",
+        "description": "Trocar o cabeçalho para outras unidades e Todas as unidades"
+      },
+      "clinical": {
+        "label": "Ler notas clínicas",
+        "description": "Abrir queixas, diagnósticos, receitas e fotos"
+      },
+      "export": {
+        "label": "Exportar listas",
+        "description": "Baixar qualquer tabela"
+      },
+      "perms": {
+        "label": "Alterar funções e acesso",
+        "description": "Editar funções, acesso e unidades"
+      }
+    },
+    "notes": {
+      "admin": "Administradores podem fazer tudo · esta função não pode ser limitada.",
+      "readOnly": "Você pode ver as funções aqui. Para alterá-las, é preciso “Alterar funções e acesso”.",
+      "live": "As mudanças valem na hora para todos com esta função. Quem tem duas funções recebe tudo o que qualquer uma delas permite."
+    },
+    "locked": {
+      "admin": "Administradores sempre têm acesso total",
+      "noPerms": "Você não pode alterar funções · peça a um administrador",
+      "noAdd": "Você não pode adicionar funções · peça a um administrador",
+      "platform": "O {{productName}} controla o acesso a Usuários desta função · não dá para alterar aqui"
+    },
+    "added": "Função adicionada · dê um nome e escolha o que ela pode fazer",
+    "newRoleName": "Nova função",
+    "duplicateName": "Já existe uma função chamada {{name}}",
+    "deleteRole": {
+      "action": "Excluir função",
+      "title": "Excluir {{name}}?",
+      "description": "Membros com esta função precisarão de uma nova. Você pode desfazer por alguns segundos após confirmar.",
+      "confirm": "Excluir",
+      "pending": "Excluindo {{name}}…"
+    }
   }
 }
