@@ -72,10 +72,23 @@ export function serviceTone(
 // ── The Agenda's day groups ──
 
 /** The tones day tiles cycle through after today's sage (H:5906). */
-const DAY_TONES: readonly Tone[] = ['sky', 'lav', 'blush', 'butter', 'mint'];
+const DAY_TONES = [
+  'sky',
+  'lav',
+  'blush',
+  'butter',
+  'mint',
+] as const satisfies readonly Tone[];
+
+/** The tones a day group can take: today's sage and the five of the cycle. */
+export type DayGroupTone = 'sage' | (typeof DAY_TONES)[number];
 
 /** A day group's tone: sage for today, else the cycle by the group's place. */
-export function dayGroupTone(date: string, today: string, groupIndex: number): Tone {
+export function dayGroupTone(
+  date: string,
+  today: string,
+  groupIndex: number,
+): DayGroupTone {
   if (date === today) return 'sage';
   return DAY_TONES[groupIndex % DAY_TONES.length] ?? 'sky';
 }

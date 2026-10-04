@@ -2,7 +2,6 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentDaySummary } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -15,22 +14,22 @@ import {
 import {
   agendaGroupLabel,
   type DayGroupSub,
+  type DayGroupTone,
   dayGroupTone,
 } from '../../appointments.display.ts';
 
-/** The header's band: the day's tone at 55% over the card, so rows never show through (H:5906). */
-const BAND: Readonly<Record<Tone, string>> = {
-  butter: 'bg-tone-butter/55',
-  lav: 'bg-tone-lav/55',
-  sky: 'bg-tone-sky/55',
+/**
+ * The header's band: the day's tone at 55% over the card, so rows never show
+ * through (H:5906). Only the six day tones: Tailwind emits every class spelled
+ * here into the first-paint stylesheet, used or not.
+ */
+const BAND: Readonly<Record<DayGroupTone, string>> = {
   sage: 'bg-tone-sage/55',
+  sky: 'bg-tone-sky/55',
+  lav: 'bg-tone-lav/55',
   blush: 'bg-tone-blush/55',
+  butter: 'bg-tone-butter/55',
   mint: 'bg-tone-mint/55',
-  peach: 'bg-tone-peach/55',
-  plum: 'bg-tone-plum/55',
-  lime: 'bg-tone-lime/55',
-  slate: 'bg-tone-slate/55',
-  stone: 'bg-tone-stone/55',
 };
 
 /** Props for {@link AgendaDayHeader}. */
