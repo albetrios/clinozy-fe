@@ -9,6 +9,7 @@ import { CHAT_COLUMN_NS } from './chat-column.constants.ts';
 import {
   bookingReason,
   type ChatContact,
+  chatContactOfLead,
   composerModes,
   composerShowsLabels,
   composerSuggestions,
@@ -506,5 +507,28 @@ describe('the record’s interest and offering', () => {
     expect(offeringFor(catalogue, 'LHR')?.name).toBe('LHR Full Face');
     expect(offeringFor(catalogue, 'your treatment')?.name).toBe('B1G1 D-Tan Facial');
     expect(offeringFor([], 'LHR')).toBeNull();
+  });
+});
+
+describe('chatContactOfLead (D32)', () => {
+  it('reads the lead’s contact fields, or its one mobile on WhatsApp', () => {
+    expect(
+      chatContactOfLead({
+        name: 'Kabir Mehta',
+        phone: '+919812345678',
+        patientId: null,
+        contact: undefined,
+        interests: ['lhr'],
+      }),
+    ).toEqual({
+      name: 'Kabir Mehta',
+      phone: '+919812345678',
+      isPatient: false,
+      onWhatsApp: true,
+      instagram: null,
+      defaultChannel: null,
+      preferences: [],
+      interests: ['lhr'],
+    });
   });
 });

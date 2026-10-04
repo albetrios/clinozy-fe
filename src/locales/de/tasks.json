@@ -491,7 +491,6 @@
     },
     "owner": {
       "label": "Zuweisen an",
-      "you": "Sie",
       "missing": "Wählen Sie, wer sie erledigt"
     },
     "priority": {
@@ -507,5 +506,92 @@
     "footer": "↔ {{person}}",
     "save": "Aufgabe hinzufügen",
     "added": "Aufgabe für {{owner}} hinzugefügt · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (Sie)"
+  },
+  "drawer": {
+    "sub": "Erstellt von {{productName}} · {{rule}}",
+    "assignedTo": "Zugewiesen an",
+    "sections": {
+      "what": "1 · Was",
+      "how": "2 · Wie",
+      "close": "3 · Abschließen mit · dann das Nächste wählen"
+    },
+    "quote": "„{{message}}“",
+    "source": {
+      "appointment": "Termin öffnen · {{record}}",
+      "lead": "Lead öffnen · {{record}}",
+      "treatment": "Patient öffnen · {{record}}",
+      "patient": "Patient öffnen · {{record}}",
+      "invoice": "Rechnung öffnen · {{record}}"
+    },
+    "tiles": {
+      "visit": "Besuch",
+      "service": "Leistung",
+      "doctor": "Arzt",
+      "status": "Status",
+      "treatment": "Behandlung",
+      "doneOn": "Durchgeführt am",
+      "session": "Sitzung",
+      "therapist": "Therapeut",
+      "source": "Quelle",
+      "interestedIn": "Interessiert an",
+      "owner": "Zuständig",
+      "mobile": "Mobil"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} Min.",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "{{productName}} kann das erledigen",
+      "action": "{{productName}} erledigen lassen"
+    },
+    "outcomeNote": {
+      "label": "Notiz zum Ergebnis",
+      "placeholder": "Notiz zum Ergebnis hinzufügen (optional)"
+    },
+    "snooze": "Zurückstellen",
+    "assigned": "Zugewiesen",
+    "assignTip": "Diese Aufgabe jemand anderem geben · die bisherige Person bleibt beteiligt",
+    "searchTeam": "Team durchsuchen",
+    "was": "Vorher {{names}}",
+    "close": "Schließen"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "Zurückgestellt · {{label}}",
+    "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
+    "claimedUnowned": "{{name}} gehört jetzt Ihnen",
+    "moved": "{{title}} → {{name}} · {{previous}} bleibt beteiligt",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}} kümmert sich darum · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "Wie geht es mit {{first}} weiter?",
+    "sub": "Abgeschlossen · {{title}} · {{result}}",
+    "section": "Nächste Aufgabe",
+    "step": {
+      "label": "Nächster Schritt",
+      "callAgain": "Erneut anrufen",
+      "sendWhatsApp": "WhatsApp senden",
+      "bookVisit": "Besuch buchen",
+      "collectPayment": "Zahlung einziehen",
+      "sendOffer": "Angebot senden"
+    },
+    "when": "Wann",
+    "owner": "Zugewiesen an",
+    "note": {
+      "label": "Notiz",
+      "placeholder": "z. B. Nach dem Peeling-Preis fragen"
+    },
+    "nothingNext": "Nichts weiter",
+    "create": "Aufgabe erstellen",
+    "pickStep": "Wählen Sie den nächsten Schritt",
+    "pickWhen": "Wählen Sie, wann",
+    "created": "Nächste Aufgabe gesetzt · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "Geplant nach: {{after}}"
   }
 }

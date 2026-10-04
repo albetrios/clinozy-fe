@@ -491,7 +491,6 @@
     },
     "owner": {
       "label": "Assign to",
-      "you": "You",
       "missing": "Pick who does it"
     },
     "priority": {
@@ -507,5 +506,92 @@
     "footer": "↔ {{person}}",
     "save": "Add task",
     "added": "Task added for {{owner}} · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (you)"
+  },
+  "drawer": {
+    "sub": "Created by {{productName}} · {{rule}}",
+    "assignedTo": "Assigned to",
+    "sections": {
+      "what": "1 · What",
+      "how": "2 · How",
+      "close": "3 · Close with · then pick what’s next"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "Open appointment · {{record}}",
+      "lead": "Open lead · {{record}}",
+      "treatment": "Open patient · {{record}}",
+      "patient": "Open patient · {{record}}",
+      "invoice": "Open invoice · {{record}}"
+    },
+    "tiles": {
+      "visit": "Visit",
+      "service": "Service",
+      "doctor": "Doctor",
+      "status": "Status",
+      "treatment": "Treatment",
+      "doneOn": "Done on",
+      "session": "Session",
+      "therapist": "Therapist",
+      "source": "Source",
+      "interestedIn": "Interested in",
+      "owner": "Owner",
+      "mobile": "Mobile"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} min",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "{{productName}} can do this",
+      "action": "Let {{productName}} do it"
+    },
+    "outcomeNote": {
+      "label": "Outcome note",
+      "placeholder": "Add a note to the outcome (optional)"
+    },
+    "snooze": "Snooze",
+    "assigned": "Assigned",
+    "assignTip": "Move this task to someone else · the previous person stays on it",
+    "searchTeam": "Search team",
+    "was": "Was {{names}}",
+    "close": "Close"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "Snoozed · {{label}}",
+    "claimed": "You now own {{name}} · {{owner}} stays involved",
+    "claimedUnowned": "You now own {{name}}",
+    "moved": "{{title}} → {{name}} · {{previous}} stays on it",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}} is on it · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "What’s next for {{first}}?",
+    "sub": "Closed · {{title}} · {{result}}",
+    "section": "Next task",
+    "step": {
+      "label": "Next step",
+      "callAgain": "Call again",
+      "sendWhatsApp": "Send WhatsApp",
+      "bookVisit": "Book a visit",
+      "collectPayment": "Collect payment",
+      "sendOffer": "Send offer"
+    },
+    "when": "When",
+    "owner": "Assigned to",
+    "note": {
+      "label": "Note",
+      "placeholder": "e.g. Ask about the peel price"
+    },
+    "nothingNext": "Nothing next",
+    "create": "Create task",
+    "pickStep": "Pick the next step",
+    "pickWhen": "Pick when",
+    "created": "Next task set · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "Planned after: {{after}}"
   }
 }

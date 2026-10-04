@@ -232,30 +232,40 @@ ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) k
 
 ---
 
-## Tasks room (`/tasks`, L-47b · New task L-47d)
+## Tasks room (`/tasks`, L-47b · New task L-47d · task drawer L-47c)
 
 The toolbar carries the room toolbar's ids with the `tasks` prefix (`tasks-toolbar` with
 `data-layout="tasks"`, `tasks-tab-queue` / `-snoozed` / `-done`, `tasks-search`, `tasks-new`,
 `tasks-fab`). The list is the room's own grouped list, not the shared table.
 
-| Test ID                                            | Element                                                                                                 | File                           |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `tasks-scope-tabs` / `tasks-scope-tab-<scope>`     | "Mine · Everyone" (`mine`, `everyone`)                                                                  | `components/TasksToolbar/`     |
-| `tasks-type-trigger` / `-clear` / `-panel`         | Type dropdown ("All types" · a rule · "<n> types"), its clear ×, its list                               | `components/TaskTypePicker/`   |
-| `tasks-rules-trigger` / `tasks-rules`              | "Rules" and the Task rules popover (bottom sheet below `md`)                                            | `components/TaskRulesPopover/` |
-| `tasks-rule-<rule>` / `-switch` / `-handle`        | One rule's line (`data-on`), its switch, "Let Clinozy handle" ↔ "Clinozy handles it"                    | `components/TaskRulesPopover/` |
-| `tasks-list`                                       | The list (`role="table"`, `data-tab`; `aria-busy` while a new view loads)                               | `components/TaskList/`         |
-| `tasks-group-<group>`                              | A group: `overdue`, `today`, `later` (To do), `snoozed`, `done`                                         | `components/TaskList/`         |
-| `tasks-row`                                        | A task row (`data-task-id`, `data-overdue`)                                                             | `components/TaskRow/`          |
-| `tasks-empty` / `tasks-empty-new`                  | A view's empty line; To do's "New task"                                                                 | `components/TaskList/`         |
-| `new-task-drawer-…`                                | New task's record drawer parts (`-title`, `-step-<what\|when\|how>`, `-save`, `-dismiss`, `-summary` …) | `components/NewTaskDrawer/`    |
-| `new-task-for`                                     | "For" — the picker over patients and leads (`-trigger`, `-panel`, `-search`)                            | `components/NewTaskDrawer/`    |
-| `new-task-type-<type>`                             | Type chips (`call_back`, `follow_up`, `send_price`, `ask_for_photos`, `feedback`, `payment_reminder`)   | `components/NewTaskDrawer/`    |
-| `new-task-title` / `new-task-notes`                | Title and Notes                                                                                         | `components/NewTaskDrawer/`    |
-| `new-task-due-<preset>`                            | Due chips (`today`, `tomorrow`, `inThreeDays`, `nextWeek`)                                              | `components/NewTaskDrawer/`    |
-| `new-task-due-date` / `new-task-due-time`          | The due date and "Due time" pickers                                                                     | `components/NewTaskDrawer/`    |
-| `new-task-owner`                                   | "Assign to" — the team picker                                                                           | `components/NewTaskDrawer/`    |
-| `new-task-priority-<priority>` / `new-task-remind` | Normal · High chips; "Remind 15 min before"                                                             | `components/NewTaskDrawer/`    |
+| Test ID                                                | Element                                                                                                 | File                           |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `tasks-scope-tabs` / `tasks-scope-tab-<scope>`         | "Mine · Everyone" (`mine`, `everyone`)                                                                  | `components/TasksToolbar/`     |
+| `tasks-type-trigger` / `-clear` / `-panel`             | Type dropdown ("All types" · a rule · "<n> types"), its clear ×, its list                               | `components/TaskTypePicker/`   |
+| `tasks-rules-trigger` / `tasks-rules`                  | "Rules" and the Task rules popover (bottom sheet below `md`)                                            | `components/TaskRulesPopover/` |
+| `tasks-rule-<rule>` / `-switch` / `-handle`            | One rule's line (`data-on`), its switch, "Let Clinozy handle" ↔ "Clinozy handles it"                    | `components/TaskRulesPopover/` |
+| `tasks-list`                                           | The list (`role="table"`, `data-tab`; `aria-busy` while a new view loads)                               | `components/TaskList/`         |
+| `tasks-group-<group>`                                  | A group: `overdue`, `today`, `later` (To do), `snoozed`, `done`                                         | `components/TaskList/`         |
+| `tasks-row`                                            | A task row (`data-task-id`, `data-overdue`)                                                             | `components/TaskRow/`          |
+| `tasks-empty` / `tasks-empty-new`                      | A view's empty line; To do's "New task"                                                                 | `components/TaskList/`         |
+| `new-task-drawer-…`                                    | New task's record drawer parts (`-title`, `-step-<what\|when\|how>`, `-save`, `-dismiss`, `-summary` …) | `components/NewTaskDrawer/`    |
+| `new-task-for`                                         | "For" — the picker over patients and leads (`-trigger`, `-panel`, `-search`)                            | `components/NewTaskDrawer/`    |
+| `new-task-type-<type>`                                 | Type chips (`call_back`, `follow_up`, `send_price`, `ask_for_photos`, `feedback`, `payment_reminder`)   | `components/NewTaskDrawer/`    |
+| `new-task-title` / `new-task-notes`                    | Title and Notes                                                                                         | `components/NewTaskDrawer/`    |
+| `new-task-due-<preset>`                                | Due chips (`today`, `tomorrow`, `inThreeDays`, `nextWeek`)                                              | `components/NewTaskDrawer/`    |
+| `new-task-due-date` / `new-task-due-time`              | The due date and "Due time" pickers                                                                     | `components/NewTaskDrawer/`    |
+| `new-task-owner`                                       | "Assign to" — the team picker                                                                           | `components/NewTaskDrawer/`    |
+| `new-task-priority-<priority>` / `new-task-remind`     | Normal · High chips; "Remind 15 min before"                                                             | `components/NewTaskDrawer/`    |
+| `task-drawer-title` / `-due` / `-owner`                | The task drawer's header: title (focused on open), due label, "Assigned to" chip                        | `components/TaskDrawer/`       |
+| `task-drawer-person` / `-source`                       | Who: the person under the contact card; the source button ("Open appointment · Appt #…")                | `components/TaskDrawer/`       |
+| `task-drawer-quote` / `-tiles` / `-how`                | The quoted message, the context tiles, "2 · How"                                                        | `components/TaskDrawer/`       |
+| `task-drawer-automation` / `-automation-action`        | "Clinozy can do this" and "Let Clinozy do it"                                                           | `components/TaskDrawer/`       |
+| `task-drawer-outcome-<outcome>` / `task-drawer-note`   | An outcome button (the rule's outcome id); the outcome note                                             | `components/TaskDrawer/`       |
+| `task-drawer-snooze` / `-assign` / `-was` / `-dismiss` | Footer: Snooze menu, Assigned picker (`-panel`, `-option-<id>`), "Was A → B", Close                     | `components/TaskDrawer/`       |
+| `task-drawer-chat` / `task-drawer-close`               | The chat column (not on a phone); the ×                                                                 | `components/TaskDrawer/`       |
+| `whats-next-drawer` (`-save`, `-dismiss` …)            | "What’s next for <first>?" over the list after a closing outcome                                        | `components/WhatsNextSheet/`   |
+| `whats-next-step-<step>` / `whats-next-when-<when>`    | Next step chips (`callAgain` …) and When chips (`inThreeHours` …)                                       | `components/WhatsNextSheet/`   |
+| `whats-next-owner` / `whats-next-note`                 | "Assigned to" and Note                                                                                  | `components/WhatsNextSheet/`   |
 
 ---
 

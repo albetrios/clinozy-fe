@@ -86,6 +86,11 @@ describe('DrawerFooter', () => {
     expect(screen.getByTestId('pt-dismiss')).toHaveTextContent('Back');
   });
 
+  it('reads the screen’s own dismiss words when it has them ("Nothing next")', () => {
+    renderFooter({ stacked: true, dismissLabel: 'Nothing next' });
+    expect(screen.getByTestId('pt-dismiss')).toHaveTextContent('Nothing next');
+  });
+
   it('is view only when read-only: "Close" and the role note, nothing to save or delete', () => {
     renderFooter({ readOnly: true });
 

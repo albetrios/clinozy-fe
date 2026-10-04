@@ -485,7 +485,6 @@
     },
     "owner": {
       "label": "担当者",
-      "you": "自分",
       "missing": "担当者を選んでください"
     },
     "priority": {
@@ -501,5 +500,92 @@
     "footer": "↔ {{person}}",
     "save": "タスクを追加",
     "added": "{{owner}} にタスクを追加しました · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}}（自分）"
+  },
+  "drawer": {
+    "sub": "{{productName}} が作成 · {{rule}}",
+    "assignedTo": "担当者",
+    "sections": {
+      "what": "1 · 内容",
+      "how": "2 · 方法",
+      "close": "3 · 完了の仕方 · 次の手を選ぶ"
+    },
+    "quote": "「{{message}}」",
+    "source": {
+      "appointment": "予約を開く · {{record}}",
+      "lead": "リードを開く · {{record}}",
+      "treatment": "患者を開く · {{record}}",
+      "patient": "患者を開く · {{record}}",
+      "invoice": "請求書を開く · {{record}}"
+    },
+    "tiles": {
+      "visit": "来院",
+      "service": "サービス",
+      "doctor": "医師",
+      "status": "ステータス",
+      "treatment": "施術",
+      "doneOn": "実施日",
+      "session": "回数",
+      "therapist": "セラピスト",
+      "source": "流入元",
+      "interestedIn": "関心",
+      "owner": "担当",
+      "mobile": "携帯"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}}分",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "{{productName}} が対応できます",
+      "action": "{{productName}} に任せる"
+    },
+    "outcomeNote": {
+      "label": "結果メモ",
+      "placeholder": "結果にメモを追加（任意）"
+    },
+    "snooze": "スヌーズ",
+    "assigned": "担当",
+    "assignTip": "このタスクを別の人に移す · 前の担当者も関わり続けます",
+    "searchTeam": "チームを検索",
+    "was": "以前 {{names}}",
+    "close": "閉じる"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "スヌーズ · {{label}}",
+    "claimed": "{{name}} の担当になりました · {{owner}} も関わり続けます",
+    "claimedUnowned": "{{name}} の担当になりました",
+    "moved": "{{title}} → {{name}} · {{previous}} も関わり続けます",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}} が対応中 · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "{{first}} さんの次は？",
+    "sub": "完了 · {{title}} · {{result}}",
+    "section": "次のタスク",
+    "step": {
+      "label": "次のステップ",
+      "callAgain": "もう一度電話",
+      "sendWhatsApp": "WhatsAppを送る",
+      "bookVisit": "来院を予約",
+      "collectPayment": "支払いを回収",
+      "sendOffer": "オファーを送る"
+    },
+    "when": "いつ",
+    "owner": "担当者",
+    "note": {
+      "label": "メモ",
+      "placeholder": "例：ピーリングの料金を確認する"
+    },
+    "nothingNext": "次はなし",
+    "create": "タスクを作成",
+    "pickStep": "次のステップを選んでください",
+    "pickWhen": "いつかを選んでください",
+    "created": "次のタスクを設定しました · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "次の後に予定: {{after}}"
   }
 }

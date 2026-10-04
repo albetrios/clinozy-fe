@@ -7,18 +7,19 @@ import {
   TASK_REMIND_MINUTES,
   type TaskChange,
 } from '@/shared/api/clinic/tasks-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { firstNameOf } from '@/shared/components/ChatColumn/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
-import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useLead, useLeadViewer } from '@/shared/hooks/useLeads/index.ts';
+import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
-import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import {
+  type TaskAssignees,
+  useTaskAssignees,
+} from '../../hooks/useTaskAssignees/index.ts';
 import { useTaskDueAtWords } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { staffName } from '../../tasks.display.ts';
@@ -29,7 +30,6 @@ import {
   newTaskInputOf,
   newTaskOwnerId,
   type NewTaskPerson,
-  personFirstName,
 } from './new-task-form.ts';
 import {
   personOfLead,
@@ -89,29 +89,6 @@ function usePrefilledPerson(prefill: TaskCreateSearch): NewTaskPerson | null {
   return null;
 }
 
-/** The team picker's rows: every active member, the signed-in one first as "You". */
-function useOwnerOptions(viewerId: string | null): PickerOption<StaffProfile>[] {
-  const { t } = useTranslation([TASKS_NS, CLINIC_NS]);
-  const staff = useStaffProfiles();
-  const people = (staff.data ?? []).filter((profile) => profile.active);
-  const ordered = [
-    ...people.filter((profile) => profile.id === viewerId),
-    ...people.filter((profile) => profile.id !== viewerId),
-  ];
-  return ordered.map((profile) => ({
-    key: profile.id,
-    label: staffName(profile),
-    sub: profile.roles
-      .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
-      .join(' · '),
-    meta: profile.id === viewerId ? t(K.owner.you, { ns: TASKS_NS }) : undefined,
-    tone: profile.tone,
-    leading: { kind: 'avatar', initials: profile.initials },
-    keywords: [profile.initials],
-    data: profile,
-  }));
-}
-
 /** The form's values as they stand, every key present (the form starts with all of them). */
 function useFormValues(form: UseFormReturn<NewTaskForm>): NewTaskForm {
   const watched = useWatch({ control: form.control });
@@ -132,22 +109,18 @@ function useNewTaskWords({
   values,
   person,
   ownerId,
-  ownerOptions,
-  viewer,
+  assignees,
   now,
 }: {
   values: NewTaskForm;
   person: NewTaskPerson | null;
   ownerId: string | null;
-  ownerOptions: PickerOption<StaffProfile>[];
-  viewer: StaffProfile | null;
+  assignees: TaskAssignees;
   now: Date;
 }): NewTaskWords {
   const { t } = useTranslation(TASKS_NS);
   const dueAtWords = useTaskDueAtWords();
-  const owner =
-    ownerOptions.find((option) => option.key === ownerId)?.data ??
-    (viewer?.id === ownerId ? viewer : undefined);
+  const owner = ownerId ? assignees.byId.get(ownerId) : undefined;
   const typeLabel = t(K.type[values.type]);
   return {
     typeLabel,
@@ -156,7 +129,7 @@ function useNewTaskWords({
       ? t(K.due[values.duePreset])
       : dueAtWords(values.dueDate, values.dueTime, now),
     fallbackTitle: person
-      ? t(K.titleField.fallback, { type: typeLabel, first: personFirstName(person) })
+      ? t(K.titleField.fallback, { type: typeLabel, first: firstNameOf(person.name) })
       : typeLabel,
   };
 }
@@ -221,14 +194,14 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('what');
   const prefilled = usePrefilledPerson(prefill);
-  const viewer = useLeadViewer().data ?? null;
-  const ownerOptions = useOwnerOptions(viewer?.id ?? null);
+  const assignees = useTaskAssignees();
+  const viewer = assignees.viewer;
   const recordLabel = usePersonRecordLabel();
 
   // The URL's person arrives after the drawer opens; it holds until another is picked.
   const person = values.person ?? prefilled;
   const ownerId = newTaskOwnerId({ ...values, person }, viewer?.id ?? null);
-  const words = useNewTaskWords({ values, person, ownerId, ownerOptions, viewer, now });
+  const words = useNewTaskWords({ values, person, ownerId, assignees, now });
   const heads = useStepHeads({ values, person, ownerId, openStep, words });
   const { saveState, save } = useNewTaskSave({
     form,
@@ -255,7 +228,7 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
         <NewTaskWhenFields
           {...fields}
           ownerId={ownerId}
-          ownerOptions={ownerOptions}
+          ownerOptions={assignees.options}
           today={clinicToday(now)}
         />
       ),

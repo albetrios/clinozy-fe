@@ -25,6 +25,8 @@ export interface DrawerFooterProps {
   stacked?: boolean;
   /** Cancel / Back / Close — the caller guards it like every other exit. */
   onDismiss: () => void;
+  /** The dismiss button's own words ("Nothing next"), in place of Cancel / Back. */
+  dismissLabel?: string;
   /** Primary label (the screen's own, e.g. "Create patient"); "Save" by default. */
   saveLabel?: string;
   onSave?: () => void;
@@ -53,6 +55,7 @@ type EditActionsProps = Omit<DrawerFooterProps, 'summary' | 'readOnly'>;
 function EditActions({
   stacked,
   onDismiss,
+  dismissLabel,
   saveLabel,
   onSave,
   saveState,
@@ -94,7 +97,7 @@ function EditActions({
         data-testid={`${testId}-dismiss`}
         className={FOOTER_BUTTON}
       >
-        {t(stacked ? RECORD_DRAWER_KEYS.back : RECORD_DRAWER_KEYS.cancel)}
+        {dismissLabel ?? t(stacked ? RECORD_DRAWER_KEYS.back : RECORD_DRAWER_KEYS.cancel)}
       </Button>
 
       {onSaveAndAdd && tier !== 'phone' ? (

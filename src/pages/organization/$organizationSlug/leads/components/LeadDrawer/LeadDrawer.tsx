@@ -13,7 +13,7 @@ import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   ChatColumn,
-  type ChatContact,
+  chatContactOfLead,
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
@@ -60,21 +60,6 @@ export interface LeadDrawerProps {
   /** The phone pane — the Leads page keeps it between leads (Chat first). */
   pane: LeadDrawerPane;
   onPaneChange: (pane: LeadDrawerPane) => void;
-}
-
-/** The person the chat column writes to, from the lead's contact fields. */
-function chatContactOf(lead: LeadRecord): ChatContact {
-  const phones = lead.contact?.phones ?? [{ phone: lead.phone, whatsapp: true }];
-  return {
-    name: lead.name,
-    phone: lead.phone,
-    isPatient: lead.patientId !== null,
-    onWhatsApp: phones.some((entry) => entry.whatsapp),
-    instagram: lead.contact?.instagram[0] ?? null,
-    defaultChannel: lead.contact?.defaultChannel ?? null,
-    preferences: lead.contact?.preferences ?? [],
-    interests: lead.interests,
-  };
 }
 
 /**
@@ -184,7 +169,7 @@ export function LeadDrawer({
   const chat = (
     <ChatColumn
       person={{ kind: 'lead', leadId: lead.id }}
-      contact={chatContactOf(lead)}
+      contact={chatContactOfLead(lead)}
       showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
       contactCard={{
         data: leadContactCardData(lead, staffById, {

@@ -6,6 +6,7 @@ import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import {
   type TaskDueLabelInput,
+  useTaskDayTimeWords,
   useTaskDueAtWords,
   useTaskDueLabel,
 } from './useTaskDueLabel.ts';
@@ -89,5 +90,16 @@ describe('useTaskDueAtWords', () => {
     expect(result.current('2026-10-07', '15:30', NOW)).toMatch(
       /^Wed,? (Oct 7|7 Oct) 15:30$/,
     );
+  });
+});
+
+describe('useTaskDayTimeWords', () => {
+  it('words the day and the time apart', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDayTimeWords());
+    expect(result.current('2026-10-04', '11:30', NOW)).toEqual({
+      day: 'Today',
+      time: '11:30',
+    });
   });
 });

@@ -515,7 +515,6 @@
     },
     "owner": {
       "label": "إسناد إلى",
-      "you": "أنت",
       "missing": "اختر من سينفذها"
     },
     "priority": {
@@ -531,5 +530,92 @@
     "footer": "↔ {{person}}",
     "save": "إضافة المهمة",
     "added": "أُضيفت مهمة لـ {{owner}} · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (أنت)"
+  },
+  "drawer": {
+    "sub": "أنشأها {{productName}} · {{rule}}",
+    "assignedTo": "مُسندة إلى",
+    "sections": {
+      "what": "1 · ماذا",
+      "how": "2 · كيف",
+      "close": "3 · أغلقها بـ · ثم اختر الخطوة التالية"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "فتح الموعد · {{record}}",
+      "lead": "فتح العميل المحتمل · {{record}}",
+      "treatment": "فتح ملف المريض · {{record}}",
+      "patient": "فتح ملف المريض · {{record}}",
+      "invoice": "فتح الفاتورة · {{record}}"
+    },
+    "tiles": {
+      "visit": "الزيارة",
+      "service": "الخدمة",
+      "doctor": "الطبيب",
+      "status": "الحالة",
+      "treatment": "العلاج",
+      "doneOn": "تم في",
+      "session": "الجلسة",
+      "therapist": "المعالج",
+      "source": "المصدر",
+      "interestedIn": "مهتم بـ",
+      "owner": "المسؤول",
+      "mobile": "الجوال"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} دقيقة",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "يستطيع {{productName}} القيام بهذا",
+      "action": "دع {{productName}} يقوم بها"
+    },
+    "outcomeNote": {
+      "label": "ملاحظة النتيجة",
+      "placeholder": "أضف ملاحظة إلى النتيجة (اختياري)"
+    },
+    "snooze": "تأجيل",
+    "assigned": "مُسندة",
+    "assignTip": "انقل هذه المهمة إلى شخص آخر · يبقى الشخص السابق مشاركًا فيها",
+    "searchTeam": "ابحث في الفريق",
+    "was": "كانت {{names}}",
+    "close": "إغلاق"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "مؤجلة · {{label}}",
+    "claimed": "أصبحت مسؤولًا عن {{name}} · يبقى {{owner}} مشاركًا",
+    "claimedUnowned": "أصبحت مسؤولًا عن {{name}}",
+    "moved": "{{title}} ← {{name}} · يبقى {{previous}} مشاركًا فيها",
+    "movedUnowned": "{{title}} ← {{name}}",
+    "automation": "يتولى {{productName}} الأمر · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "ما الخطوة التالية مع {{first}}؟",
+    "sub": "أُغلقت · {{title}} · {{result}}",
+    "section": "المهمة التالية",
+    "step": {
+      "label": "الخطوة التالية",
+      "callAgain": "الاتصال مجددًا",
+      "sendWhatsApp": "إرسال واتساب",
+      "bookVisit": "حجز زيارة",
+      "collectPayment": "تحصيل الدفعة",
+      "sendOffer": "إرسال عرض"
+    },
+    "when": "متى",
+    "owner": "مُسندة إلى",
+    "note": {
+      "label": "ملاحظة",
+      "placeholder": "مثال: اسأل عن سعر التقشير"
+    },
+    "nothingNext": "لا شيء بعد ذلك",
+    "create": "إنشاء المهمة",
+    "pickStep": "اختر الخطوة التالية",
+    "pickWhen": "اختر الموعد",
+    "created": "تم تحديد المهمة التالية · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "مُخطط لها بعد: {{after}}"
   }
 }

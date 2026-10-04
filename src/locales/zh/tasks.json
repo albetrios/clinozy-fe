@@ -485,7 +485,6 @@
     },
     "owner": {
       "label": "指派给",
-      "you": "我",
       "missing": "请选择负责人"
     },
     "priority": {
@@ -501,5 +500,92 @@
     "footer": "↔ {{person}}",
     "save": "添加任务",
     "added": "已为 {{owner}} 添加任务 · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}}（我）"
+  },
+  "drawer": {
+    "sub": "由 {{productName}} 创建 · {{rule}}",
+    "assignedTo": "负责人",
+    "sections": {
+      "what": "1 · 内容",
+      "how": "2 · 做法",
+      "close": "3 · 以此关闭 · 然后选择下一步"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "打开预约 · {{record}}",
+      "lead": "打开潜在客户 · {{record}}",
+      "treatment": "打开患者 · {{record}}",
+      "patient": "打开患者 · {{record}}",
+      "invoice": "打开发票 · {{record}}"
+    },
+    "tiles": {
+      "visit": "就诊",
+      "service": "服务",
+      "doctor": "医生",
+      "status": "状态",
+      "treatment": "治疗",
+      "doneOn": "完成于",
+      "session": "疗程",
+      "therapist": "治疗师",
+      "source": "来源",
+      "interestedIn": "感兴趣",
+      "owner": "负责人",
+      "mobile": "手机"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} 分钟",
+      "session": "第 {{number}} 次"
+    },
+    "automation": {
+      "title": "{{productName}} 可以处理",
+      "action": "交给 {{productName}} 处理"
+    },
+    "outcomeNote": {
+      "label": "结果备注",
+      "placeholder": "为结果添加备注（可选）"
+    },
+    "snooze": "推迟",
+    "assigned": "负责人",
+    "assignTip": "将此任务转给其他人 · 之前的负责人仍会参与",
+    "searchTeam": "搜索团队",
+    "was": "之前 {{names}}",
+    "close": "关闭"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "已推迟 · {{label}}",
+    "claimed": "{{name}} 现在由你负责 · {{owner}} 仍会参与",
+    "claimedUnowned": "{{name}} 现在由你负责",
+    "moved": "{{title}} → {{name}} · {{previous}} 仍会参与",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}} 正在处理 · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "{{first}} 的下一步是什么？",
+    "sub": "已关闭 · {{title}} · {{result}}",
+    "section": "下一个任务",
+    "step": {
+      "label": "下一步",
+      "callAgain": "再次致电",
+      "sendWhatsApp": "发送 WhatsApp",
+      "bookVisit": "预约就诊",
+      "collectPayment": "收款",
+      "sendOffer": "发送优惠"
+    },
+    "when": "时间",
+    "owner": "负责人",
+    "note": {
+      "label": "备注",
+      "placeholder": "例如：询问焕肤价格"
+    },
+    "nothingNext": "没有下一步",
+    "create": "创建任务",
+    "pickStep": "请选择下一步",
+    "pickWhen": "请选择时间",
+    "created": "已设定下一个任务 · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "计划于此之后：{{after}}"
   }
 }

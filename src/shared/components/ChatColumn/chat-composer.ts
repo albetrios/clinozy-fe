@@ -11,6 +11,7 @@ import {
   civilDayOffset,
   clinicInstant,
 } from '@/shared/api/clinic/clinic-time.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
   ChatSlot,
   ComposerMode,
@@ -67,6 +68,27 @@ export const CONTACT_PREFERENCES = {
 /** A person's first name, as messages and hints address them. */
 export function firstNameOf(name: string): string {
   return name.trim().split(/\s+/)[0] ?? '';
+}
+
+/**
+ * The person a lead thread writes to, from the lead's contact fields (D32): its
+ * mobiles' WhatsApp marks, its Instagram, default channel, preferences and
+ * interests — the lead drawer's and the task drawer's chat columns read it.
+ */
+export function chatContactOfLead(
+  lead: Pick<LeadRecord, 'name' | 'phone' | 'patientId' | 'contact' | 'interests'>,
+): ChatContact {
+  const phones = lead.contact?.phones ?? [{ phone: lead.phone, whatsapp: true }];
+  return {
+    name: lead.name,
+    phone: lead.phone,
+    isPatient: lead.patientId !== null,
+    onWhatsApp: phones.some((entry) => entry.whatsapp),
+    instagram: lead.contact?.instagram[0] ?? null,
+    defaultChannel: lead.contact?.defaultChannel ?? null,
+    preferences: lead.contact?.preferences ?? [],
+    interests: lead.interests,
+  };
 }
 
 // ── "Send via" ──

@@ -102,11 +102,6 @@ export function newTaskOwnerId(
   return form.ownerId ?? form.person?.ownerId ?? viewerId;
 }
 
-/** The person's first name, for the title an empty Title saves as. */
-export function personFirstName(person: Pick<NewTaskPerson, 'name'>): string {
-  return person.name.trim().split(/\s+/)[0] ?? '';
-}
-
 /**
  * The create the form asks for — null until it has a person and an assignee.
  * An empty Title saves as `fallbackTitle` ("Call back · Priti", H:6072).

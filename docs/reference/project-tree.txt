@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1265 src files · ~666 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1281 src files · ~673 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1006,11 +1006,13 @@ clinozy-fe/
 │   │       │   │   │   └── integration/
 │   │       │   │   ├── components/
 │   │       │   │   │   ├── NewTaskDrawer/
+│   │       │   │   │   ├── TaskDrawer/
 │   │       │   │   │   ├── TaskList/
 │   │       │   │   │   ├── TaskRow/
 │   │       │   │   │   ├── TaskRulesPopover/
 │   │       │   │   │   ├── TasksToolbar/
-│   │       │   │   │   └── TaskTypePicker/
+│   │       │   │   │   ├── TaskTypePicker/
+│   │       │   │   │   └── WhatsNextSheet/
 │   │       │   │   ├── create/
 │   │       │   │   │   ├── create.manifest.ts
 │   │       │   │   │   ├── CREATE.OVERVIEW.md
@@ -1018,6 +1020,8 @@ clinozy-fe/
 │   │       │   │   │   ├── NewTaskPage.tsx
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useTaskActions/
+│   │       │   │   │   ├── useTaskAssignees/
 │   │       │   │   │   ├── useTaskDueLabel/
 │   │       │   │   │   └── useTasksDialogRoute/
 │   │       │   │   ├── tasks.constants.ts
@@ -1704,6 +1708,7 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── RecordDrawer/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── record-drawer-chrome.tsx
 │   │   │   │   ├── record-drawer-items.ts
 │   │   │   │   ├── record-drawer-width.ts
 │   │   │   │   ├── record-drawer.constants.ts

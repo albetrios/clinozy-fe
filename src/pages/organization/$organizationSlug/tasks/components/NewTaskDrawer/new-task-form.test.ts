@@ -7,7 +7,6 @@ import {
   newTaskInputOf,
   newTaskOwnerId,
   type NewTaskPerson,
-  personFirstName,
   withDuePreset,
 } from './new-task-form.ts';
 
@@ -71,13 +70,6 @@ describe('newTaskOwnerId', () => {
     expect(newTaskOwnerId(form, ME)).toBe(KABIR.ownerId);
     expect(newTaskOwnerId(newTaskForm(TODAY, PRITI), ME)).toBe(ME);
     expect(newTaskOwnerId(newTaskForm(TODAY), null)).toBeNull();
-  });
-});
-
-describe('personFirstName', () => {
-  it('reads the first word of the name', () => {
-    expect(personFirstName(PRITI)).toBe('Priti');
-    expect(personFirstName({ name: '  Kabir  Mehta ' })).toBe('Kabir');
   });
 });
 

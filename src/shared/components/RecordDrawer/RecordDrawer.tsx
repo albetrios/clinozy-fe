@@ -6,9 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useTranslation } from 'react-i18next';
 
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -29,9 +27,13 @@ import {
 } from '@/shared/components/ui/sheet.tsx';
 import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { X } from '@/shared/icons/index.ts';
 
 import { RECORD_DRAWER_TEST_ID } from './record-drawer.constants.ts';
+import {
+  RECORD_DRAWER_OVERLAY_CLASS,
+  RECORD_DRAWER_PANEL_CLASS,
+  RecordDrawerClose,
+} from './record-drawer-chrome.tsx';
 import { DrawerItemsContext, withMountedItems } from './record-drawer-items.ts';
 import {
   DRAWER_WIDTH_CLASS,
@@ -39,24 +41,6 @@ import {
   type ExplicitDrawerWidth,
   resolveDrawerWidth,
 } from './record-drawer-width.ts';
-
-/**
- * The drawer's motion (H:1754, `czdrawer` / `czbd`): the panel slides in over
- * 340ms on cubic-bezier(.32,.72,0,1) — `animate-drawer-in`, mirrored under RTL
- * through `--drawer-enter-from` — while the backdrop rises to 45%; neither has
- * an exit motion. They REPLACE the sheet's stock `animate-in` / `animate-out`:
- * `cn()` knows the theme's animations.
- */
-const DRAWER_OVERLAY_CLASS =
-  'bg-overlay/45 data-[state=open]:animate-backdrop-in data-[state=closed]:animate-none';
-
-/**
- * Full width below `md` with no shadow there, no start border, and the motion.
- * The panel takes focus itself when the focused control leaves (a picked
- * search hit): it draws no ring for that.
- */
-const DRAWER_PANEL_CLASS =
-  'w-full gap-0 border-s-0 outline-none max-md:shadow-none sm:max-w-none data-[state=open]:animate-drawer-in data-[state=closed]:animate-none';
 
 /** A 24px pill in the strip under the header (status, type, counts). */
 export interface DrawerBadge {
@@ -124,6 +108,8 @@ export interface RecordDrawerProps {
   readOnly?: boolean;
   /** A child stacked on a parent drawer: the close button reads "Back". */
   stacked?: boolean;
+  /** The close button's own words ("Nothing next"), in place of Cancel / Back. */
+  dismissLabel?: string;
   saveLabel?: string;
   onSave?: () => void;
   saveState?: DrawerSaveState;
@@ -137,51 +123,6 @@ export interface RecordDrawerProps {
   dirty?: boolean;
   /** Root test id; the parts derive theirs (`<testId>-save`, `-close` …). */
   testId?: string;
-}
-
-/**
- * The ×. From `md` up it floats 14px outside the drawer's inline-start edge
- * (36×36, `rounded-xl`, the close elevation, popping in after 200ms); on a
- * phone it sits inside the header's inline-end corner (44×44, transparent).
- */
-function DrawerCloseButton({
-  placement,
-  onClose,
-  testId,
-}: {
-  placement: 'floating' | 'inside';
-  onClose: () => void;
-  testId: string;
-}) {
-  // The shared "Close" name every dismiss button carries.
-  const { t } = useTranslation(LOCALE_NS);
-  const label = t(LOCALE_KEYS.closeAria);
-  if (placement === 'inside') {
-    return (
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={label}
-        data-testid={`${testId}-close`}
-        data-slot="button"
-        className="text-foreground hover:bg-muted absolute end-2 top-2 flex size-11 items-center justify-center rounded-lg transition-colors"
-      >
-        <X aria-hidden="true" className="size-5.5" />
-      </button>
-    );
-  }
-  return (
-    <button
-      type="button"
-      onClick={onClose}
-      aria-label={label}
-      data-testid={`${testId}-close`}
-      data-slot="floating-edge"
-      className="bg-background text-foreground hover:bg-muted animate-pop-in absolute -start-[3.125rem] top-[0.875rem] flex size-9 items-center justify-center rounded-xl transition-colors"
-    >
-      <X aria-hidden="true" className="size-4.5" />
-    </button>
-  );
 }
 
 /** Title (focused on open) with its tag pill, the sub line, and the phone ×. */
@@ -391,7 +332,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
     selectStep,
   );
   const close = (placement: 'floating' | 'inside') => (
-    <DrawerCloseButton placement={placement} onClose={requestClose} testId={testId} />
+    <RecordDrawerClose placement={placement} onClose={requestClose} testId={testId} />
   );
 
   return (
@@ -404,14 +345,14 @@ export function RecordDrawer(props: RecordDrawerProps) {
       <SheetContent
         side="end"
         showCloseButton={false}
-        overlayClassName={DRAWER_OVERLAY_CLASS}
+        overlayClassName={RECORD_DRAWER_OVERLAY_CLASS}
         data-testid={testId}
         // Without a sub line there is no description to point at.
         {...(props.sub ? {} : { 'aria-describedby': undefined })}
         onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
         className={cn(
-          DRAWER_PANEL_CLASS,
+          RECORD_DRAWER_PANEL_CLASS,
           DRAWER_WIDTH_CLASS[
             resolveDrawerWidth(withMountedItems(props.content, itemsMounted), props.width)
           ],
@@ -454,6 +395,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
           readOnly={props.readOnly}
           stacked={props.stacked}
           onDismiss={requestClose}
+          dismissLabel={props.dismissLabel}
           saveLabel={props.saveLabel}
           onSave={onSave}
           saveState={props.saveState}

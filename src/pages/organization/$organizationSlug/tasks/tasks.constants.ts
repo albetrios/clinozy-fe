@@ -141,8 +141,6 @@ export const TASKS_KEYS = {
     },
     owner: {
       label: 'newTask.owner.label',
-      /** The signed-in member's row in the team picker. */
-      you: 'newTask.owner.you',
       missing: 'newTask.owner.missing',
     },
     priority: {
@@ -158,6 +156,105 @@ export const TASKS_KEYS = {
     save: 'newTask.save',
     /** "Task added for <owner> · <due>" with Undo (D28). */
     added: 'newTask.added',
+  },
+  /** The team pickers' row for the signed-in member: "<name> (you)". */
+  assignee: { you: 'assignee.you' },
+  /** The task drawer (KICKOFF §6.10 Task drawer; `tasks.md:103–132`). */
+  drawer: {
+    /** "Created by <product> · <rule description, lower-case>". */
+    sub: 'drawer.sub',
+    /** The header chip's name ("Assigned to"). */
+    assignedTo: 'drawer.assignedTo',
+    sections: {
+      what: 'drawer.sections.what',
+      how: 'drawer.sections.how',
+      close: 'drawer.sections.close',
+    },
+    /** The quoted message: "“<message>”". */
+    quote: 'drawer.quote',
+    /** The source button: "Open appointment · Appt #2848" … */
+    source: {
+      appointment: 'drawer.source.appointment',
+      lead: 'drawer.source.lead',
+      treatment: 'drawer.source.treatment',
+      patient: 'drawer.source.patient',
+      invoice: 'drawer.source.invoice',
+    },
+    tiles: {
+      visit: 'drawer.tiles.visit',
+      service: 'drawer.tiles.service',
+      doctor: 'drawer.tiles.doctor',
+      status: 'drawer.tiles.status',
+      treatment: 'drawer.tiles.treatment',
+      doneOn: 'drawer.tiles.doneOn',
+      session: 'drawer.tiles.session',
+      therapist: 'drawer.tiles.therapist',
+      source: 'drawer.tiles.source',
+      interestedIn: 'drawer.tiles.interestedIn',
+      owner: 'drawer.tiles.owner',
+      mobile: 'drawer.tiles.mobile',
+    },
+    /** Tile values: "<day> · <time> · <n> min", "#<n>". */
+    tileValues: {
+      visit: 'drawer.tileValues.visit',
+      session: 'drawer.tileValues.session',
+    },
+    automation: {
+      title: 'drawer.automation.title',
+      action: 'drawer.automation.action',
+    },
+    outcomeNote: {
+      label: 'drawer.outcomeNote.label',
+      placeholder: 'drawer.outcomeNote.placeholder',
+    },
+    snooze: 'drawer.snooze',
+    assigned: 'drawer.assigned',
+    /** The Assigned button's tooltip. */
+    assignTip: 'drawer.assignTip',
+    searchTeam: 'drawer.searchTeam',
+    /** "Was <A> → <B>" after a reassign. */
+    was: 'drawer.was',
+    close: 'drawer.close',
+  },
+  /** The drawer's toasts (`tasks.md:180–233`), each with Undo. */
+  toasts: {
+    closed: 'toasts.closed',
+    snoozed: 'toasts.snoozed',
+    claimed: 'toasts.claimed',
+    claimedUnowned: 'toasts.claimedUnowned',
+    moved: 'toasts.moved',
+    movedUnowned: 'toasts.movedUnowned',
+    automation: 'toasts.automation',
+  },
+  /** "What’s next for <first>?" (KICKOFF §6.10; `tasks.md:86–99, 134–146`). */
+  whatsNext: {
+    title: 'whatsNext.title',
+    sub: 'whatsNext.sub',
+    section: 'whatsNext.section',
+    step: {
+      label: 'whatsNext.step.label',
+      callAgain: 'whatsNext.step.callAgain',
+      sendWhatsApp: 'whatsNext.step.sendWhatsApp',
+      bookVisit: 'whatsNext.step.bookVisit',
+      collectPayment: 'whatsNext.step.collectPayment',
+      sendOffer: 'whatsNext.step.sendOffer',
+    },
+    when: 'whatsNext.when',
+    owner: 'whatsNext.owner',
+    note: {
+      label: 'whatsNext.note.label',
+      placeholder: 'whatsNext.note.placeholder',
+    },
+    nothingNext: 'whatsNext.nothingNext',
+    create: 'whatsNext.create',
+    pickStep: 'whatsNext.pickStep',
+    pickWhen: 'whatsNext.pickWhen',
+    /** "Next task set · <step> · <when, lower-case>". */
+    created: 'whatsNext.created',
+    /** The new task's title: "<step> · <first name>". */
+    taskTitle: 'whatsNext.taskTitle',
+    /** Its why line without a note: "Planned after: <task title> · <result>". */
+    plannedAfter: 'whatsNext.plannedAfter',
   },
 } as const;
 
@@ -198,5 +295,38 @@ export const TASKS_TEST_IDS = {
     priority: 'new-task-priority',
     remind: 'new-task-remind',
     notes: 'new-task-notes',
+  },
+  /** The task drawer's parts (its root is the manifest's `task-drawer`). */
+  drawer: {
+    root: 'task-drawer',
+    title: 'task-drawer-title',
+    due: 'task-drawer-due',
+    owner: 'task-drawer-owner',
+    person: 'task-drawer-person',
+    source: 'task-drawer-source',
+    quote: 'task-drawer-quote',
+    tiles: 'task-drawer-tiles',
+    how: 'task-drawer-how',
+    automation: 'task-drawer-automation',
+    automationAction: 'task-drawer-automation-action',
+    outcome: (outcome: string) => `task-drawer-outcome-${outcome}`,
+    note: 'task-drawer-note',
+    /** The Snooze menu (`-panel`, `-option-<option>`). */
+    snooze: 'task-drawer-snooze',
+    /** The Assigned picker (`-panel`, `-option-<id>`). */
+    assign: 'task-drawer-assign',
+    was: 'task-drawer-was',
+    dismiss: 'task-drawer-dismiss',
+    chat: 'task-drawer-chat',
+  },
+  /** "What’s next" (the record drawer derives `-save`, `-dismiss` …). */
+  whatsNext: {
+    drawer: 'whats-next-drawer',
+    /** Next step chips: `whats-next-step-<step>`. */
+    step: 'whats-next-step',
+    /** When chips: `whats-next-when-<when>`. */
+    when: 'whats-next-when',
+    owner: 'whats-next-owner',
+    note: 'whats-next-note',
   },
 } as const;

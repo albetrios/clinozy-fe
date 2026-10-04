@@ -28,8 +28,16 @@ import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { type NewTaskCreated, NewTaskDrawer } from './components/NewTaskDrawer/index.ts';
+import {
+  TaskDrawer,
+  taskDrawerNavigation,
+  type TaskDrawerTarget,
+} from './components/TaskDrawer/index.ts';
 import { TaskList } from './components/TaskList/index.ts';
 import { TasksToolbar } from './components/TasksToolbar/index.ts';
+import { WhatsNextSheet } from './components/WhatsNextSheet/index.ts';
+import { useTaskActions, type WhatsNextFor } from './hooks/useTaskActions/index.ts';
+import { useTaskAssignees } from './hooks/useTaskAssignees/index.ts';
 import { useTasksDialogRoute } from './hooks/useTasksDialogRoute/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TABLE_ID } from './tasks.constants.ts';
 import {
@@ -79,56 +87,18 @@ function useNewTask(organizationSlug: string, close: () => void) {
 }
 
 /**
- * Tasks room (KICKOFF §6.10; `tasks.md`): the toolbar — "To do · Snoozed ·
- * Done", search, type, "Mine · Everyone", Rules and "New task" (a floating pill
- * on a phone) — over the grouped list, polled every 60s, 50 a page. The view,
- * search, type and scope live in the URL; the list read follows them. A row
- * opens the task drawer's dialog route (`$taskId/`) and "New task" its own
- * (`create/`); both render nothing: this page reads them. A Done entry with no
- * task behind it — a visit a WhatsApp "Yes" confirmed — toasts its result
- * instead (H:4270).
+ * The person's contact card actions on a row and in the drawer: their patient
+ * file, "+ Lead" and "+ Appointment" (kept behind by `from=tasks`) — each
+ * offered only with its Create.
  */
-export function TasksPage() {
+function useTaskContactActions(organizationSlug: string) {
   const navigate = useNavigate();
-  const { organizationSlug = '' } = useParams({ strict: false });
-  const search = validateTasksSearch(useSearch({ strict: false }));
-  const { patchSearch } = useDataTableUrlState(true);
   const access = useClinicAccess();
   const tier = useViewportTier();
-  const now = useNow();
-  const { dialog, close } = useTasksDialogRoute();
-  const newTask = useNewTask(organizationSlug, close);
-
-  const query = taskListQueryOf(search);
-  const list = useTaskList(query, { notifyOnError: false });
-  // A failed read with nothing to show keeps the last copy — and its view.
-  const rows = useListLoadError(list, TASKS_TABLE_ID);
-  const lastCopy = list.isError && list.rows.length === 0;
-  const shownView = useShownView(
-    query.tab,
-    !(list.isPending || list.isRefreshing || lastCopy),
-  );
-
-  const ruleSettings = useTaskRuleSettings();
-  const saveRule = useSaveTaskRuleSetting();
-  const canEditRules = access.roles.some((role) => role === 'owner' || role === 'admin');
   const can = (section: 'leads' | 'appointments', action: 'create') =>
     access.isResolved && access.can(section, action);
-
   const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
-  const openTask = (row: TaskRow) => {
-    if (!row.exists) {
-      if (row.result) notify.info(row.result);
-      return;
-    }
-    void navigate({
-      ...organizationTask(organizationSlug, row.id),
-      search: true,
-      hash: true,
-    });
-  };
-
-  const contactActions = (row: TaskRow): ContactCardActions => {
+  return (row: TaskRow): ContactCardActions => {
     const { person } = row;
     const who = person.patientId ?? person.leadId;
     return {
@@ -165,6 +135,82 @@ export function TasksPage() {
               )
           : undefined,
     };
+  };
+}
+
+/**
+ * The task drawer's team, writes and "What’s next" (KICKOFF §6.10): a link
+ * goes to its record or follow-on screen; a closing outcome opens "What’s
+ * next for <first>?" over the list.
+ */
+function useTaskDrawer(organizationSlug: string, close: () => void) {
+  const navigate = useNavigate();
+  const assignees = useTaskAssignees();
+  const [whatsNext, setWhatsNext] = useState<WhatsNextFor | null>(null);
+  const openTarget = (target: TaskDrawerTarget) =>
+    void navigate(taskDrawerNavigation(target, organizationSlug));
+  const actions = useTaskActions({
+    assignees,
+    close,
+    openTarget,
+    openWhatsNext: setWhatsNext,
+  });
+  return {
+    assignees,
+    actions,
+    openTarget,
+    whatsNext,
+    closeWhatsNext: () => setWhatsNext(null),
+  };
+}
+
+/**
+ * Tasks room (KICKOFF §6.10; `tasks.md`): the toolbar — "To do · Snoozed ·
+ * Done", search, type, "Mine · Everyone", Rules and "New task" (a floating pill
+ * on a phone) — over the grouped list, polled every 60s, 50 a page. The view,
+ * search, type and scope live in the URL; the list read follows them. A row
+ * opens the task drawer's dialog route (`$taskId/`) and "New task" its own
+ * (`create/`); both render nothing: this page reads them. A Done entry with no
+ * task behind it — a visit a WhatsApp "Yes" confirmed — toasts its result
+ * instead (H:4270).
+ */
+export function TasksPage() {
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const search = validateTasksSearch(useSearch({ strict: false }));
+  const { patchSearch } = useDataTableUrlState(true);
+  const access = useClinicAccess();
+  const { t } = useTranslation(TASKS_NS);
+  const now = useNow();
+  const { dialog, close } = useTasksDialogRoute();
+  const newTask = useNewTask(organizationSlug, close);
+
+  const query = taskListQueryOf(search);
+  const list = useTaskList(query, { notifyOnError: false });
+  // A failed read with nothing to show keeps the last copy — and its view.
+  const rows = useListLoadError(list, TASKS_TABLE_ID);
+  const lastCopy = list.isError && list.rows.length === 0;
+  const shownView = useShownView(
+    query.tab,
+    !(list.isPending || list.isRefreshing || lastCopy),
+  );
+
+  const ruleSettings = useTaskRuleSettings();
+  const saveRule = useSaveTaskRuleSetting();
+  const canEditRules = access.roles.some((role) => role === 'owner' || role === 'admin');
+  const contactActions = useTaskContactActions(organizationSlug);
+  const drawer = useTaskDrawer(organizationSlug, close);
+
+  const openTask = (row: TaskRow) => {
+    if (!row.exists) {
+      if (row.result) notify.info(row.result);
+      return;
+    }
+    void navigate({
+      ...organizationTask(organizationSlug, row.id),
+      search: true,
+      hash: true,
+    });
   };
 
   return (
@@ -208,6 +254,26 @@ export function TasksPage() {
           prefill={dialog.prefill}
           onClose={close}
           onCreated={newTask.onCreated}
+        />
+      ) : null}
+      {dialog.kind === 'task' ? (
+        <TaskDrawer
+          key={dialog.taskId}
+          detail={dialog.detail}
+          now={now}
+          actions={drawer.actions}
+          assignees={drawer.assignees}
+          onClose={close}
+          onOpenTarget={drawer.openTarget}
+          contactActions={dialog.detail ? contactActions(dialog.detail.task) : undefined}
+          pendingTitle={t(TASKS_KEYS.record)}
+        />
+      ) : null}
+      {drawer.whatsNext ? (
+        <WhatsNextSheet
+          task={drawer.whatsNext.task}
+          result={drawer.whatsNext.result}
+          onClose={drawer.closeWhatsNext}
         />
       ) : null}
       <Outlet />

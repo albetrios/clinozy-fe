@@ -1,3 +1,8 @@
+export {
+  RECORD_DRAWER_OVERLAY_CLASS,
+  RECORD_DRAWER_PANEL_CLASS,
+  RecordDrawerClose,
+} from './record-drawer-chrome.tsx';
 export { useDrawerItemsField } from './record-drawer-items.ts';
 export {
   type DrawerContentProfile,

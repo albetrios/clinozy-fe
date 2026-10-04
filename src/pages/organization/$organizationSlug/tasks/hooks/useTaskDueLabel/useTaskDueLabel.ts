@@ -49,25 +49,59 @@ function useClock(): (date: string, time: string) => string {
   );
 }
 
-/** "Today 11:30 am" · "Wed 7 Oct 3:30 pm" — a due day and time in words. */
-function useDueAtWords(): (label: TaskDueAt) => string {
-  const { t } = useTranslation(TASKS_NS);
+/** A due day and its time as words apart: "Today", "Wed 7 Oct"; "3:30 pm". */
+export interface TaskDayTimeWords {
+  day: string;
+  time: string;
+}
+
+/** The day and the time of a due label, worded. */
+function useAtParts(): (label: TaskDueAt) => TaskDayTimeWords {
   const { t: tPicker } = useTranslation(PICKER_NS);
   const { formatDate } = useLocaleFormat();
   const clock = useClock();
   return useCallback(
-    (label: TaskDueAt) => {
-      const day =
+    (label: TaskDueAt) => ({
+      day:
         label.day === 'date'
           ? formatDate(
               wallClock(label.date, '00:00'),
               { weekday: 'short', day: 'numeric', month: 'short' },
               { wallClock: true },
             )
-          : tPicker(PICKER_KEYS.date[label.day]);
-      return t(TASKS_KEYS.due.at, { day, time: clock(label.date, label.time) });
+          : tPicker(PICKER_KEYS.date[label.day]),
+      time: clock(label.date, label.time),
+    }),
+    [tPicker, formatDate, clock],
+  );
+}
+
+/** "Today 11:30 am" · "Wed 7 Oct 3:30 pm" — a due day and time in words. */
+function useDueAtWords(): (label: TaskDueAt) => string {
+  const { t } = useTranslation(TASKS_NS);
+  const parts = useAtParts();
+  return useCallback(
+    (label: TaskDueAt) => {
+      const { day, time } = parts(label);
+      return t(TASKS_KEYS.due.at, { day, time });
     },
-    [t, tPicker, formatDate, clock],
+    [t, parts],
+  );
+}
+
+/**
+ * A clinic-local day and time as the due label words them, apart, read at
+ * `now` — "Today" · "11:30 am" (the task drawer's Visit tile).
+ */
+export function useTaskDayTimeWords(): (
+  date: string,
+  time: string,
+  now: Date,
+) => TaskDayTimeWords {
+  const parts = useAtParts();
+  return useCallback(
+    (date: string, time: string, now: Date) => parts(taskDueAt(date, time, now)),
+    [parts],
   );
 }
 

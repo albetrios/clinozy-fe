@@ -485,7 +485,6 @@
     },
     "owner": {
       "label": "담당자 지정",
-      "you": "나",
       "missing": "담당자를 선택하세요"
     },
     "priority": {
@@ -501,5 +500,92 @@
     "footer": "↔ {{person}}",
     "save": "작업 추가",
     "added": "{{owner}}에게 작업 추가됨 · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (나)"
+  },
+  "drawer": {
+    "sub": "{{productName}}이(가) 만듦 · {{rule}}",
+    "assignedTo": "담당자",
+    "sections": {
+      "what": "1 · 무엇",
+      "how": "2 · 방법",
+      "close": "3 · 이렇게 마무리 · 다음 할 일 선택"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "예약 열기 · {{record}}",
+      "lead": "리드 열기 · {{record}}",
+      "treatment": "환자 열기 · {{record}}",
+      "patient": "환자 열기 · {{record}}",
+      "invoice": "청구서 열기 · {{record}}"
+    },
+    "tiles": {
+      "visit": "방문",
+      "service": "서비스",
+      "doctor": "의사",
+      "status": "상태",
+      "treatment": "시술",
+      "doneOn": "시술일",
+      "session": "회차",
+      "therapist": "치료사",
+      "source": "유입 경로",
+      "interestedIn": "관심 항목",
+      "owner": "담당",
+      "mobile": "휴대폰"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}}분",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "{{productName}}이(가) 할 수 있음",
+      "action": "{{productName}}에 맡기기"
+    },
+    "outcomeNote": {
+      "label": "결과 메모",
+      "placeholder": "결과에 메모 추가(선택)"
+    },
+    "snooze": "다시 알림",
+    "assigned": "담당",
+    "assignTip": "이 작업을 다른 사람에게 넘기기 · 이전 담당자도 계속 참여합니다",
+    "searchTeam": "팀 검색",
+    "was": "이전 {{names}}",
+    "close": "닫기"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "다시 알림 · {{label}}",
+    "claimed": "이제 {{name}} 담당입니다 · {{owner}}도 계속 참여합니다",
+    "claimedUnowned": "이제 {{name}} 담당입니다",
+    "moved": "{{title}} → {{name}} · {{previous}}도 계속 참여합니다",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}}이(가) 처리 중 · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "{{first}} 님의 다음 할 일은?",
+    "sub": "완료 · {{title}} · {{result}}",
+    "section": "다음 작업",
+    "step": {
+      "label": "다음 단계",
+      "callAgain": "다시 전화",
+      "sendWhatsApp": "WhatsApp 보내기",
+      "bookVisit": "방문 예약",
+      "collectPayment": "결제 받기",
+      "sendOffer": "오퍼 보내기"
+    },
+    "when": "언제",
+    "owner": "담당자",
+    "note": {
+      "label": "메모",
+      "placeholder": "예: 필링 가격 문의"
+    },
+    "nothingNext": "다음 없음",
+    "create": "작업 만들기",
+    "pickStep": "다음 단계를 선택하세요",
+    "pickWhen": "언제인지 선택하세요",
+    "created": "다음 작업 설정됨 · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "다음 후 계획: {{after}}"
   }
 }

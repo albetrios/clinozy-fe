@@ -2,7 +2,6 @@ import type { KeyboardEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
 import {
@@ -21,13 +20,12 @@ import {
 import {
   ContactCard,
   type ContactCardActions,
-  type ContactCardData,
   TeamCard,
   type TeamCardData,
 } from '@/shared/components/PersonCard/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { staffName } from '../../tasks.display.ts';
+import { staffName, taskContactCard, taskSourceId } from '../../tasks.display.ts';
 
 /**
  * The row (`tasks.md:24–38`; H:2144–2149): one grid, 56px, 10px over a 3px
@@ -58,32 +56,6 @@ const SOURCE_TONES: Readonly<Record<TaskSourceRef['kind'], Tone>> = {
   // The prototype's other sources fall back to sky (H:4275).
   invoice: 'sky',
 };
-
-/** A source's display id ("#2363"), or nothing where the contract has no `seq`. */
-function sourceId(source: TaskSourceRef): string {
-  if (source.seq === null) return '';
-  return source.kind === 'invoice'
-    ? displayId.invoiceNumber(source.seq)
-    : displayId.lead(source.seq);
-}
-
-/** The row's person as their contact card reads them (D32 — a patient, a lead or a contact). */
-function contactCardOf(row: TaskRowRecord): ContactCardData {
-  const { person } = row;
-  let id: string | null = null;
-  if (person.seq !== null) {
-    id =
-      person.kind === 'patient'
-        ? displayId.patient(person.seq)
-        : displayId.lead(person.seq);
-  }
-  return {
-    kind: person.kind,
-    name: person.name,
-    displayId: id,
-    reach: person.phone ? [{ channel: 'whatsapp', phone: person.phone }] : [],
-  };
-}
 
 /** Props for {@link TaskRow}. */
 export interface TaskRowProps {
@@ -179,7 +151,9 @@ export function TaskRow({
   if (overdue) dueInk = 'text-destructive font-semibold';
   else if (row.status !== 'open') dueInk = 'text-muted-foreground font-medium';
   const { person, source } = row;
-  const sourceLabel = t(TASKS_KEYS.sources[source.kind], { id: sourceId(source) }).trim();
+  const sourceLabel = t(TASKS_KEYS.sources[source.kind], {
+    id: taskSourceId(source),
+  }).trim();
 
   const open = () => onOpen(row);
   const openOnKey = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -247,7 +221,7 @@ export function TaskRow({
       </span>
       <span role="cell" className={cn('flex min-w-0 items-center', PHONE_CELL.contact)}>
         <ContactCard
-          data={contactCardOf(row)}
+          data={taskContactCard(row)}
           {...contactActions}
           triggerClassName="max-w-full w-max gap-2"
         >

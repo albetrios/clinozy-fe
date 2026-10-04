@@ -491,7 +491,6 @@
     },
     "owner": {
       "label": "इन्हें सौंपें",
-      "you": "आप",
       "missing": "चुनें कि इसे कौन करेगा"
     },
     "priority": {
@@ -507,5 +506,92 @@
     "footer": "↔ {{person}}",
     "save": "कार्य जोड़ें",
     "added": "{{owner}} के लिए कार्य जोड़ा गया · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (आप)"
+  },
+  "drawer": {
+    "sub": "{{productName}} द्वारा बनाया गया · {{rule}}",
+    "assignedTo": "सौंपा गया",
+    "sections": {
+      "what": "1 · क्या",
+      "how": "2 · कैसे",
+      "close": "3 · इसके साथ बंद करें · फिर आगे क्या है चुनें"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "अपॉइंटमेंट खोलें · {{record}}",
+      "lead": "लीड खोलें · {{record}}",
+      "treatment": "मरीज़ खोलें · {{record}}",
+      "patient": "मरीज़ खोलें · {{record}}",
+      "invoice": "इनवॉइस खोलें · {{record}}"
+    },
+    "tiles": {
+      "visit": "विज़िट",
+      "service": "सेवा",
+      "doctor": "डॉक्टर",
+      "status": "स्थिति",
+      "treatment": "ट्रीटमेंट",
+      "doneOn": "किया गया",
+      "session": "सेशन",
+      "therapist": "थेरेपिस्ट",
+      "source": "स्रोत",
+      "interestedIn": "रुचि",
+      "owner": "ज़िम्मेदार",
+      "mobile": "मोबाइल"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} मिनट",
+      "session": "#{{number}}"
+    },
+    "automation": {
+      "title": "{{productName}} यह कर सकता है",
+      "action": "{{productName}} को करने दें"
+    },
+    "outcomeNote": {
+      "label": "परिणाम नोट",
+      "placeholder": "परिणाम में नोट जोड़ें (वैकल्पिक)"
+    },
+    "snooze": "स्थगित करें",
+    "assigned": "सौंपा गया",
+    "assignTip": "यह कार्य किसी और को सौंपें · पिछला व्यक्ति इसमें शामिल रहता है",
+    "searchTeam": "टीम में खोजें",
+    "was": "पहले {{names}}",
+    "close": "बंद करें"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "स्थगित · {{label}}",
+    "claimed": "अब {{name}} आपके हैं · {{owner}} शामिल रहते हैं",
+    "claimedUnowned": "अब {{name}} आपके हैं",
+    "moved": "{{title}} → {{name}} · {{previous}} इसमें शामिल रहते हैं",
+    "movedUnowned": "{{title}} → {{name}}",
+    "automation": "{{productName}} इस पर काम कर रहा है · {{automation}}"
+  },
+  "whatsNext": {
+    "title": "{{first}} के लिए आगे क्या?",
+    "sub": "बंद · {{title}} · {{result}}",
+    "section": "अगला कार्य",
+    "step": {
+      "label": "अगला कदम",
+      "callAgain": "फिर से कॉल करें",
+      "sendWhatsApp": "WhatsApp भेजें",
+      "bookVisit": "विज़िट बुक करें",
+      "collectPayment": "भुगतान लें",
+      "sendOffer": "ऑफ़र भेजें"
+    },
+    "when": "कब",
+    "owner": "सौंपा गया",
+    "note": {
+      "label": "नोट",
+      "placeholder": "जैसे पील की कीमत पूछें"
+    },
+    "nothingNext": "आगे कुछ नहीं",
+    "create": "कार्य बनाएँ",
+    "pickStep": "अगला कदम चुनें",
+    "pickWhen": "कब चुनें",
+    "created": "अगला कार्य तय · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "इसके बाद तय: {{after}}"
   }
 }
