@@ -30,18 +30,12 @@ export function useRoomList<T>(
   listId: string,
   filterKey: string,
 ): RoomListView<T> {
-  const [lastCopy, setLastCopy] = useState<readonly T[]>(list.rows);
-  const settled = !(list.isError || list.isPending);
-  if (settled && list.rows !== lastCopy) setLastCopy(list.rows);
-  useListLoadError(list, listId);
+  const rows = useListLoadError(list, listId);
 
   const [settledFilterKey, setSettledFilterKey] = useState(filterKey);
   if (!(list.isPending || list.isRefreshing) && settledFilterKey !== filterKey) {
     setSettledFilterKey(filterKey);
   }
   const loading = list.isPending || (list.isRefreshing && settledFilterKey !== filterKey);
-  return {
-    rows: list.isError && list.rows.length === 0 ? lastCopy : list.rows,
-    loading,
-  };
+  return { rows, loading };
 }

@@ -10,10 +10,5 @@ export {
   type LeadInterestView,
   leadInterestViews,
 } from './lead-display.ts';
-export {
-  staffFullName,
-  staffPerson,
-  staffRoleLine,
-  teamCardDataOf,
-} from './lead-people.ts';
+export { staffPerson, staffRoleLine, teamCardDataOf } from './lead-people.ts';
 export { LeadInterestPills, LeadSourcePill, LeadStatusPill } from './LeadFields.tsx';

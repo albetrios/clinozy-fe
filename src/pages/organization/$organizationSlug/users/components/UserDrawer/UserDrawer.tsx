@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
@@ -14,6 +14,7 @@ import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccessMatrix } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useResendInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
@@ -92,12 +93,6 @@ type SessionProps = UserDrawerProps & {
   ready: boolean;
   onAnother: () => void;
 };
-
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<UserFormValues>): UserFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as UserFormValues;
-}
 
 /** The Quick fill chips (new only): each sets roles, days, hours and commission — never the colour. */
 function quickFillItems(

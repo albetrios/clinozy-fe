@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -19,6 +19,7 @@ import {
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useCreateTask } from '@/shared/hooks/useTasks/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -51,12 +52,6 @@ export interface WhatsNextSheetProps {
   result: string;
   /** "Nothing next", ×, the backdrop, Esc — and after "Create task". */
   onClose: () => void;
-}
-
-/** The form's values as they stand. */
-function useFormValues(form: UseFormReturn<WhatsNextForm>): WhatsNextForm {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as WhatsNextForm;
 }
 
 /**

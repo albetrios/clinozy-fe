@@ -5,7 +5,11 @@ import { cn } from '@/lib/utils.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
+import {
+  PersonAvatar,
+  personFullName,
+  shortPersonName,
+} from '@/shared/components/Cells/index.ts';
 import {
   Popover,
   PopoverContent,
@@ -19,7 +23,6 @@ import {
 import { ChevronDown, Search, X } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
-import { staffFullName } from '../LeadFields/lead-people.ts';
 import { canAssign } from './lead-assign.ts';
 import { LeadField } from './LeadFormFields.tsx';
 
@@ -91,7 +94,7 @@ export function LeadPeopleField({
     (profile) =>
       profile.active &&
       (!term ||
-        `${staffFullName(profile)} ${roleOf(profile)}`.toLowerCase().includes(term)),
+        `${personFullName(profile)} ${roleOf(profile)}`.toLowerCase().includes(term)),
   );
   const isOwner = viewer !== null && viewer.id === ownerId;
   const checkAssign = (profile: StaffProfile) =>
@@ -103,11 +106,11 @@ export function LeadPeopleField({
     if (profile.id === ownerId) return t(LEADS_KEYS.drawer.popover.currentlyAssigned);
     const check = checkAssign(profile);
     if (check.ok) {
-      return t(LEADS_KEYS.drawer.popover.assignTo, { name: staffFullName(profile) });
+      return t(LEADS_KEYS.drawer.popover.assignTo, { name: personFullName(profile) });
     }
     if (check.reason === 'notAssignee') {
       return t(LEADS_KEYS.drawer.popover.onlyAssignee, {
-        name: owner ? staffFullName(owner) : '—',
+        name: owner ? personFullName(owner) : '—',
       });
     }
     return t(LEADS_KEYS.drawer.popover.cantAssign, {
@@ -170,7 +173,7 @@ export function LeadPeopleField({
                   presence={owner.presence === 'online' ? 'online' : 'offline'}
                 />
                 <span className="text-detail min-w-0 truncate font-medium">
-                  {shortPersonName(staffFullName(owner))}
+                  {shortPersonName(personFullName(owner))}
                 </span>
               </span>
             ) : null}
@@ -180,7 +183,7 @@ export function LeadPeopleField({
                   <span
                     key={profile.id}
                     data-slot="pill"
-                    title={staffFullName(profile)}
+                    title={personFullName(profile)}
                     className="bg-card inline-flex h-7 min-w-7 items-center justify-center rounded-full border px-0.5"
                   >
                     <PersonAvatar
@@ -296,7 +299,7 @@ function PersonRow({
         selected={own}
       />
       <span className="flex min-w-0 flex-col leading-tight">
-        <span className="text-body font-medium">{staffFullName(profile)}</span>
+        <span className="text-body font-medium">{personFullName(profile)}</span>
         <span className="text-muted-foreground text-micro truncate">{roleLine}</span>
       </span>
       <button

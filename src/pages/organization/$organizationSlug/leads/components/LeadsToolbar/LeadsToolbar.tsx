@@ -5,6 +5,7 @@ import type { LeadView } from '@/shared/api/clinic/leads-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
   type RoomFilterCopy,
@@ -13,11 +14,7 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TABLE_ID } from '../../leads.constants.ts';
-import {
-  LEAD_SOURCE_ICONS,
-  LEAD_SOURCE_ORDER,
-  staffFullName,
-} from '../LeadFields/index.ts';
+import { LEAD_SOURCE_ICONS, LEAD_SOURCE_ORDER } from '../LeadFields/index.ts';
 import type { LeadsTableInstance } from '../LeadsTable/index.ts';
 import { LEADS_FILTER_FIELDS } from './leads-filter-fields.ts';
 
@@ -97,7 +94,7 @@ function useFilterCopy(staff: readonly StaffProfile[]): Record<string, RoomFilte
           const [role] = profile.roles;
           return {
             id: profile.id,
-            name: staffFullName(profile),
+            name: personFullName(profile),
             initials: profile.initials,
             tone: profile.tone,
             role: role ? tClinic(CLINIC_KEYS.roles[role]) : '',

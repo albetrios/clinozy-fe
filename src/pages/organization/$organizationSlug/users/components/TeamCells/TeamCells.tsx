@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { isInvitationExpired } from '@/shared/api/organization-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import {
@@ -13,7 +14,7 @@ import {
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { isInvitationExpired, type TeamPill } from './team-cells.ts';
+import type { TeamPill } from './team-cells.ts';
 
 /** The ID cell: "#12" on the grey pill; nothing for a member without a staff profile. */
 export function TeamIdCell({ label }: { label: string | null }) {

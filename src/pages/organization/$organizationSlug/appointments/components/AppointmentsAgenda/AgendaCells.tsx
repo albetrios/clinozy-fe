@@ -13,13 +13,13 @@ import type {
 import {
   appointmentContactCard,
   serviceTone,
-  staffName,
 } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import {
   PersonAvatar,
   PersonChip,
+  personFullName,
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
@@ -53,7 +53,7 @@ type AgendaCell = CellContext<DataTableFeatures, AppointmentRow, unknown>;
 /** The doctor as the team card reads them — presence, real roles (§7.3). */
 function teamCardOf(doctor: AppointmentStaff, t: TFunction): TeamCardData {
   return {
-    name: staffName(doctor),
+    name: personFullName(doctor),
     initials: doctor.initials,
     tone: doctor.tone,
     role: doctor.roles
@@ -132,7 +132,7 @@ export function DoctorCell({ row }: AgendaCell) {
             presence={doctor.presence === 'online' ? 'online' : 'offline'}
           />
           <span className="text-detail min-w-0 truncate font-medium">
-            {shortPersonName(staffName(doctor))}
+            {shortPersonName(personFullName(doctor))}
           </span>
         </span>
       </TeamCard>

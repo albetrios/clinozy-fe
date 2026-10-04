@@ -11,7 +11,7 @@ import {
   type TaskSnoozeOption,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import {
   useHandTaskToClinozy,
   useReassignTask,
@@ -27,7 +27,7 @@ import {
 } from '../../components/TaskDrawer/task-drawer-targets.ts';
 import { taskContextLead } from '../../components/TaskDrawer/use-task-context-tiles.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
-import { lowerFirst, staffName } from '../../tasks.display.ts';
+import { lowerFirst } from '../../tasks.display.ts';
 import type { TaskAssignees } from '../useTaskAssignees/index.ts';
 
 /** "What’s next" opens this long after a closing outcome (`tasks.md:180–233`, H:4293). */
@@ -102,7 +102,7 @@ export function useTaskActions({
     notify.undo(message, { onUndo: () => undo.mutate(change.undoToken) });
   const shortName = (id: string | null) => {
     const staff = id ? assignees.byId.get(id) : undefined;
-    return staff ? shortPersonName(staffName(staff)) : null;
+    return staff ? shortPersonName(personFullName(staff)) : null;
   };
   /** Run a write; a failure has already toasted (the hooks' error toast), so it ends there. */
   const attempt = async (write: () => Promise<TaskChange>) => {

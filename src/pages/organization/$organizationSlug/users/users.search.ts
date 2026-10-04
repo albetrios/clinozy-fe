@@ -10,6 +10,7 @@
  * keys are declared here, not imported (the test pins them to the catalog).
  */
 import {
+  listIn,
   listOf,
   matchOf,
   oneOf,
@@ -75,10 +76,7 @@ export function validateUsersSearch(search: Record<string, unknown>): UsersSearc
     q: queryOf(search.q, 80),
     role: matchOf(ROLE_KEY, search.role),
     branch: listOf(search.branch, (entry) => RECORD_ID.test(entry)),
-    status: listOf<TeamStatusValue>(
-      search.status,
-      (entry) => oneOf(TEAM_STATUS_VALUES, entry) !== undefined,
-    ),
+    status: listIn(TEAM_STATUS_VALUES, search.status),
     created: readCreatedFilter(search.created),
     sort: sortOf(TEAM_SORT_KEYS, search.sort),
   };

@@ -4,13 +4,12 @@ import type {
   LeadRecordSource,
 } from '@/shared/api/clinic/leads-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 import type {
   ContactCardData,
   ContactReach,
   ContactTeamMember,
 } from '@/shared/components/PersonCard/index.ts';
-
-import { staffFullName } from './lead-people.ts';
 
 /** What the contact card's words need from the room's vocabulary. */
 export interface LeadContactLabels {
@@ -57,7 +56,7 @@ export function leadContactCardData(
     return [
       {
         id: profile.id,
-        name: staffFullName(profile),
+        name: personFullName(profile),
         initials: profile.initials,
         tone: profile.tone,
         role: role ? labels.role(role) : '',

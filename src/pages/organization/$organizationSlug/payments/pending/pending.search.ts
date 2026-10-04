@@ -5,7 +5,7 @@
  * contract's values are declared here, not imported — `routeTree.tsx` is the
  * entry chunk; the test pins each list to the contract's enum.
  */
-import { listOf, oneOf, queryOf } from '@/lib/routes/search-params.ts';
+import { listIn, queryOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   readCreatedFilter,
@@ -30,11 +30,6 @@ export interface PendingSearch {
   created?: CreatedFilter;
   /** A CR- number, the party or the reason (≤ 80 characters). */
   q?: string;
-}
-
-/** Keep the entries of a URL list that `values` names. */
-function listIn<T extends string>(values: readonly T[], value: unknown): T[] | undefined {
-  return listOf<T>(value, (entry) => oneOf(values, entry) !== undefined);
 }
 
 /** Parse `/payments/pending` search params; every key is answered. */

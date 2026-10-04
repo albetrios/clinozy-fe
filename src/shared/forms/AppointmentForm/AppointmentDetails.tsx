@@ -12,11 +12,10 @@ import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts'
 import {
   APPOINTMENT_TYPE_TONES,
   serviceTone,
-  staffName,
 } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { PersonAvatar } from '@/shared/components/Cells/index.ts';
+import { PersonAvatar, personFullName } from '@/shared/components/Cells/index.ts';
 import {
   DrawerChips,
   DrawerInput,
@@ -299,7 +298,7 @@ function DoctorField({
   const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS, PICKER_NS]);
   const options: PickerOption<AppointmentStaff>[] = staff.map((person) => ({
     key: person.id,
-    label: staffName(person),
+    label: personFullName(person),
     sub: person.roles
       .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
       .join(' · '),
@@ -309,7 +308,7 @@ function DoctorField({
     data: person,
   }));
   const picked = staff.find((person) => person.id === draft.doctorId);
-  const name = picked ? staffName(picked) : t(K.pickDoctor);
+  const name = picked ? personFullName(picked) : t(K.pickDoctor);
   return (
     <StepField label={t(K.doctor)} align="picker">
       <Picker

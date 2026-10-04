@@ -15,12 +15,13 @@ import {
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { serviceTone, staffName } from '@/shared/clinic/appointment-display.ts';
+import { serviceTone } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   PersonAvatar,
+  personFullName,
   personInitials,
   shortPersonName,
   TonePill,
@@ -172,7 +173,7 @@ export function AppointmentCardContent({
   const moves = allowedNext(status).filter((move) => move !== stepMove);
   const closed = status === 'cancelled' || status === 'no_show';
   const event = latestEvent(appointment);
-  const doctorName = doctor ? shortPersonName(staffName(doctor)) : '';
+  const doctorName = doctor ? shortPersonName(personFullName(doctor)) : '';
   const run = (action: () => void) => () => {
     close();
     action();

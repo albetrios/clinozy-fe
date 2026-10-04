@@ -1,12 +1,8 @@
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import type { AvatarStackPerson } from '@/shared/components/Cells/index.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 import type { TeamCardData } from '@/shared/components/PersonCard/index.ts';
-
-/** A staff member's full name ("Riya Shah", "Dr. Reenal Patel"). */
-export function staffFullName(profile: Pick<StaffProfile, 'firstName' | 'lastName'>) {
-  return [profile.firstName, profile.lastName].filter(Boolean).join(' ');
-}
 
 /** A staff member's roles as the team shows them ("Front desk · Admin"). */
 export function staffRoleLine(
@@ -23,7 +19,7 @@ export function staffPerson(
 ): AvatarStackPerson {
   return {
     id: profile.id,
-    name: staffFullName(profile),
+    name: personFullName(profile),
     initials: profile.initials,
     tone: profile.tone,
     ...(options.presence
@@ -43,7 +39,7 @@ export function teamCardDataOf(
   updatedAt: string | null = null,
 ): TeamCardData {
   return {
-    name: staffFullName(profile),
+    name: personFullName(profile),
     initials: profile.initials,
     tone: profile.tone,
     role: staffRoleLine(profile, roleLabel),

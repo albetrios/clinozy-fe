@@ -8,6 +8,7 @@ import {
   WEEKDAY_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { isInvitationExpired } from '@/shared/api/organization-contracts.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -27,7 +28,7 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { isInvitationExpired, type TeamPill } from '../TeamCells/index.ts';
+import type { TeamPill } from '../TeamCells/index.ts';
 import {
   COMMISSION_QUICK,
   USER_FORM_LIMITS,

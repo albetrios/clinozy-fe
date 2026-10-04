@@ -6,7 +6,6 @@ import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {
-  isInvitationExpired,
   TeamIdCell,
   TeamRolesCell,
   TeamStatusCell,
@@ -107,11 +106,6 @@ describe('the Team cells (users.md:32)', () => {
   it('shows "—" for an empty text cell', async () => {
     renderWithProviders(<TeamTextCell value={null} />);
     expect(await screen.findByText('—')).toBeInTheDocument();
-  });
-
-  it('knows when an invitation has expired', () => {
-    expect(isInvitationExpired({ expiresAt: '2026-10-03T04:29:00.000Z' })).toBe(true);
-    expect(isInvitationExpired({ expiresAt: '2026-10-03T04:31:00.000Z' })).toBe(false);
   });
 
   it('has no axe violations', async () => {

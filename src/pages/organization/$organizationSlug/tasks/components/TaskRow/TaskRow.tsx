@@ -14,6 +14,7 @@ import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TASK_RULE_ICONS } from '@/shared/clinic/task-rule-icons.ts';
 import {
   PersonAvatar,
+  personFullName,
   personInitials,
   shortPersonName,
 } from '@/shared/components/Cells/index.ts';
@@ -25,7 +26,7 @@ import {
 } from '@/shared/components/PersonCard/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { staffName, taskContactCard, taskSourceId } from '../../tasks.display.ts';
+import { taskContactCard, taskSourceId } from '../../tasks.display.ts';
 
 /**
  * The row (`tasks.md:24–38`; H:2144–2149): one grid, 56px, 10px over a 3px
@@ -90,10 +91,10 @@ function OwnerCell({ row }: { row: TaskRowRecord }) {
       </span>
     );
   }
-  const name = shortPersonName(staffName(owner));
+  const name = shortPersonName(personFullName(owner));
   const previous = row.previousOwners.at(-1);
   const card: TeamCardData = {
-    name: staffName(owner),
+    name: personFullName(owner),
     initials: owner.initials,
     tone: owner.tone,
     role: owner.roles.map((role) => tClinic(CLINIC_KEYS.roles[role])).join(' · '),

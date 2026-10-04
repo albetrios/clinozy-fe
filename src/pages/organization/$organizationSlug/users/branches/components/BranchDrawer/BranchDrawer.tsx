@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
@@ -8,6 +8,7 @@ import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -84,12 +85,6 @@ export interface BranchEditDrawerProps extends BranchDrawerBaseProps {
 
 /** Props of {@link BranchDrawer}. */
 export type BranchDrawerProps = BranchCreateDrawerProps | BranchEditDrawerProps;
-
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<BranchFormValues>): BranchFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as BranchFormValues;
-}
 
 /** The branch an edit shows, else null (a new branch, or the list still loading). */
 const editedRow = (props: BranchDrawerProps): BranchRow | null =>

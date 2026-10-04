@@ -6,11 +6,10 @@ import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { TaskDetail, TaskStaff } from '@/shared/api/clinic/tasks-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 
 import { useTaskDayTimeWords } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
-import { staffName } from '../../tasks.display.ts';
 
 /** A context tile's label key. */
 export type TaskContextTileKey = keyof typeof TASKS_KEYS.drawer.tiles;
@@ -49,7 +48,7 @@ export function useTaskContextTiles(detail: TaskDetail, now: Date): TaskContextT
   };
   const named = (id: string | null) => {
     const staff = id ? detail.staff.find((member: TaskStaff) => member.id === id) : null;
-    return staff ? shortPersonName(staffName(staff)) : null;
+    return staff ? shortPersonName(personFullName(staff)) : null;
   };
 
   const visit = (appointment: Appointment) => {

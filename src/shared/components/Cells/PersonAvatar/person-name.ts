@@ -1,3 +1,11 @@
+/** A person record's full name, first and last as stored ("Dr. Drashti Desai", "Riya Shah"). */
+export function personFullName(person: {
+  firstName: string;
+  lastName?: string | null;
+}): string {
+  return [person.firstName, person.lastName].filter(Boolean).join(' ');
+}
+
 /** Up to two initials from a display name — the first letter of the first two words. */
 export function personInitials(name: string): string {
   return name

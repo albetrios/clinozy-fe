@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { staffName } from '@/shared/clinic/appointment-display.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import {
   useAppointmentSlotLabel,
@@ -166,7 +165,7 @@ export function AppointmentsDay() {
               },
               ...people.map((person) => ({
                 value: person.id,
-                label: shortPersonName(staffName(person)),
+                label: shortPersonName(personFullName(person)),
                 tone: person.tone,
                 count: bookedBy(person.id),
               })),

@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
-import { serviceTone, staffName } from '@/shared/clinic/appointment-display.ts';
+import { serviceTone } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   PersonAvatar,
+  personFullName,
   personInitials,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
@@ -122,7 +123,7 @@ export function CalendarBlock({
   const statusLabel = t(CLINIC_KEYS.appointments.statuses[appointment.status], {
     ns: CLINIC_NS,
   });
-  const doctorName = doctor ? staffName(doctor) : '';
+  const doctorName = doctor ? personFullName(doctor) : '';
   const title = t(
     clash ? APPOINTMENTS_KEYS.calendar.blockClash : APPOINTMENTS_KEYS.calendar.block,
     {

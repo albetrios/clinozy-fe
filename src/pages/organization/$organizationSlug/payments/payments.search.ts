@@ -10,7 +10,7 @@
  * each list to the contract's enum.
  */
 import {
-  listOf,
+  listIn,
   matchOf,
   oneOf,
   queryOf,
@@ -47,11 +47,6 @@ export interface PaymentsSearch {
   created?: CreatedFilter;
   /** A PAY- number, the party or an invoice number (≤ 80 characters). */
   q?: string;
-}
-
-/** Keep the entries of a URL list that `values` names. */
-function listIn<T extends string>(values: readonly T[], value: unknown): T[] | undefined {
-  return listOf<T>(value, (entry) => oneOf(values, entry) !== undefined);
 }
 
 /**

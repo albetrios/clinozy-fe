@@ -16,7 +16,7 @@ import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { LEAD_HOLD_DAYS, leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { referrerFromPath } from '@/shared/clinic/clinic-referrer.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
@@ -32,7 +32,6 @@ import {
 } from '@/shared/hooks/useLeads/index.ts';
 
 import { LeadDrawer, type LeadDrawerPane } from './components/LeadDrawer/index.ts';
-import { staffFullName } from './components/LeadFields/index.ts';
 import {
   LeadsTable,
   type LeadsTableContextValue,
@@ -182,7 +181,7 @@ export function LeadsPage() {
     claim.mutate({
       lead,
       viewerId,
-      ownerName: owner ? shortPersonName(staffFullName(owner)) : null,
+      ownerName: owner ? shortPersonName(personFullName(owner)) : null,
     });
   };
 
@@ -227,7 +226,7 @@ export function LeadsPage() {
           now,
         );
         const mine = viewerId !== null && lead.ownerId === viewerId;
-        const ownerShort = owner ? shortPersonName(staffFullName(owner)) : null;
+        const ownerShort = owner ? shortPersonName(personFullName(owner)) : null;
         return (
           <LeadDrawer
             lead={lead}
@@ -252,7 +251,7 @@ export function LeadsPage() {
                         ownerName: ownerShort,
                         message: ownerShort
                           ? t(LEADS_KEYS.drawer.toasts.claimedAfter, {
-                              me: shortPersonName(staffFullName(state.viewer!)),
+                              me: shortPersonName(personFullName(state.viewer!)),
                               count: hold.idleDays,
                               owner: ownerShort,
                             })
@@ -267,7 +266,7 @@ export function LeadsPage() {
                 assign.mutate({
                   lead,
                   ownerId: person.id,
-                  ownerName: staffFullName(person),
+                  ownerName: personFullName(person),
                 }),
               onToggleInvolved: (person, involved) =>
                 setInvolved.mutate({
@@ -279,7 +278,7 @@ export function LeadsPage() {
                     involved
                       ? LEADS_KEYS.drawer.toasts.addedInvolved
                       : LEADS_KEYS.drawer.toasts.removedInvolved,
-                    { name: staffFullName(person) },
+                    { name: personFullName(person) },
                   ),
                 }),
             }}

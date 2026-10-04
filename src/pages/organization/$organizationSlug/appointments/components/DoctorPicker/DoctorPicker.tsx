@@ -2,9 +2,12 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
-import { staffName } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
+import {
+  PersonAvatar,
+  personFullName,
+  shortPersonName,
+} from '@/shared/components/Cells/index.ts';
 import {
   Picker,
   PICKER_KEYS,
@@ -57,7 +60,7 @@ export function DoctorPicker({
   const people = staff.data ?? [];
   const options: PickerOption<AppointmentStaff>[] = people.map((person) => ({
     key: person.id,
-    label: staffName(person),
+    label: personFullName(person),
     sub: person.roles
       .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
       .join(' · '),
@@ -69,7 +72,8 @@ export function DoctorPicker({
   }));
   const picked = people.filter((person) => value.includes(person.id));
   let label = t(keys.allDoctors);
-  if (picked.length === 1 && picked[0]) label = shortPersonName(staffName(picked[0]));
+  if (picked.length === 1 && picked[0])
+    label = shortPersonName(personFullName(picked[0]));
   else if (picked.length > 1) label = t(keys.doctors, { count: picked.length });
 
   return (

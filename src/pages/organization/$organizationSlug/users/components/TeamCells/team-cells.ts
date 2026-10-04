@@ -6,11 +6,3 @@ export interface TeamPill {
   label: string;
   tone: Tone;
 }
-
-/** Whether an invitation's link has expired (clinozy-be then refuses a resend). */
-export function isInvitationExpired(
-  invitation: { expiresAt: string },
-  now: number = Date.now(),
-): boolean {
-  return Date.parse(invitation.expiresAt) <= now;
-}

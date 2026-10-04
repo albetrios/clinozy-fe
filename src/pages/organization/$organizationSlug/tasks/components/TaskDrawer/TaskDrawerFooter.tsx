@@ -7,14 +7,13 @@ import {
   type TaskSnoozeOption,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import type { TaskAssignees } from '../../hooks/useTaskAssignees/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { staffName } from '../../tasks.display.ts';
 
 const K = TASKS_KEYS.drawer;
 const IDS = TASKS_TEST_IDS.drawer;
@@ -62,9 +61,9 @@ export function TaskDrawerFooter({
   const { t: tRules } = useTranslation(TASK_RULES_NS);
   const open = row.status !== 'done';
   const owner = row.owner
-    ? shortPersonName(staffName(row.owner))
+    ? shortPersonName(personFullName(row.owner))
     : t(TASKS_KEYS.row.anyone);
-  const was = row.previousOwners.map((staff) => shortPersonName(staffName(staff)));
+  const was = row.previousOwners.map((staff) => shortPersonName(personFullName(staff)));
   return (
     <div className="flex flex-none flex-wrap items-center gap-2 border-t p-(--drawer-footer-pad)">
       {open ? (

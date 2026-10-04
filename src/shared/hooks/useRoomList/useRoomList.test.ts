@@ -29,7 +29,11 @@ function listOf(
   };
 }
 
-beforeEach(() => loadError.mockClear());
+beforeEach(() => {
+  loadError.mockReset();
+  // The load-error hook answers the rows to show — the read's own here.
+  loadError.mockImplementation((list: CursorListResult<string>) => list.rows);
+});
 
 describe('useRoomList', () => {
   it('shows the skeleton on the first load, then the rows', () => {
@@ -61,10 +65,13 @@ describe('useRoomList', () => {
     expect(result.current).toEqual({ rows: ['azelan'], loading: false });
   });
 
-  it('keeps the last copy while a read fails with nothing loaded', () => {
+  it('shows the last copy the load-error hook keeps while a read fails', () => {
     const { result, rerender } = renderHook(
       ({ list }) => useRoomList(list, 'medicines', 'q='),
       { initialProps: { list: listOf(['a', 'b']) } },
+    );
+    loadError.mockImplementation((list: CursorListResult<string>) =>
+      list.isError ? ['a', 'b'] : list.rows,
     );
     rerender({ list: listOf([], { isError: true }) });
     expect(result.current.rows).toEqual(['a', 'b']);

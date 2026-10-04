@@ -6,7 +6,6 @@ import {
   APPOINTMENT_TYPE_TONES,
   appointmentContactCard,
   serviceTone,
-  staffName,
 } from './appointment-display.ts';
 
 const person = (overrides: Partial<AppointmentPerson>): AppointmentPerson => ({
@@ -17,15 +16,6 @@ const person = (overrides: Partial<AppointmentPerson>): AppointmentPerson => ({
   leadId: null,
   seq: 3508,
   ...overrides,
-});
-
-describe('staffName', () => {
-  it('writes the name in full, without a missing last name', () => {
-    expect(staffName({ firstName: 'Dr. Drashti', lastName: 'Desai' })).toBe(
-      'Dr. Drashti Desai',
-    );
-    expect(staffName({ firstName: 'Meera', lastName: '' })).toBe('Meera');
-  });
 });
 
 describe('serviceTone', () => {

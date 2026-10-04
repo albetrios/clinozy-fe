@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useLeadViewer } from '@/shared/hooks/useLeads/index.ts';
 import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
-import { staffName } from '../../tasks.display.ts';
 
 /** Who a task can go to, as the pickers offer them. */
 export interface TaskAssignees {
@@ -47,14 +47,14 @@ export function useTaskAssignees(): TaskAssignees {
         key: profile.id,
         label:
           profile.id === viewerId
-            ? t(TASKS_KEYS.assignee.you, { ns: TASKS_NS, name: staffName(profile) })
-            : staffName(profile),
+            ? t(TASKS_KEYS.assignee.you, { ns: TASKS_NS, name: personFullName(profile) })
+            : personFullName(profile),
         sub: profile.roles
           .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
           .join(' · '),
         tone: profile.tone,
         leading: { kind: 'avatar', initials: profile.initials },
-        keywords: [profile.initials, staffName(profile)],
+        keywords: [profile.initials, personFullName(profile)],
         data: profile,
       })),
     };

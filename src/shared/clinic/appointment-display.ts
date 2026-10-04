@@ -1,7 +1,6 @@
 import type {
   AppointmentPerson,
   AppointmentRow,
-  AppointmentStaff,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { AppointmentType, Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -10,16 +9,9 @@ import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 /*
  * How every surface paints and names a booking — the Appointments room's
  * views and card, and the appointment form wherever it is stacked (KICKOFF
- * §6.4): the doctor's name, the service tone and the person as the contact
- * card reads them. Pure.
+ * §6.4): the service tone and the person as the contact card reads them. A
+ * doctor's name is `personFullName` (the Cells' name helpers). Pure.
  */
-
-/** A staff member's name as written ("Dr. Drashti Desai"). */
-export function staffName(
-  staff: Pick<AppointmentStaff, 'firstName' | 'lastName'>,
-): string {
-  return [staff.firstName, staff.lastName].filter(Boolean).join(' ');
-}
 
 /**
  * Each type's tone (`AP_TYPE`, H:3418): Consultation sky, Follow-up mint,

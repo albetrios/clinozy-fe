@@ -59,9 +59,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) and
   `clinicCommandNavigation`, which fills in the record param and `from`. Several
   of those routes land with later ledger rows; the table names which.
-- `appointment-display.ts` — how every booking surface names and paints a
-  booking: the doctor's name (`staffName`), a service's tone
-  (`serviceTone`, `APPOINTMENT_TYPE_TONES`) and the person's contact card
+- `appointment-display.ts` — how every booking surface paints a booking: a
+  service's tone (`serviceTone`, `APPOINTMENT_TYPE_TONES`) and the person's contact card
   (`appointmentContactCard`) — the Appointments room and the shared
   appointment form read the same rules.
 - `clinic-branch.ts` — the branch a new record files under

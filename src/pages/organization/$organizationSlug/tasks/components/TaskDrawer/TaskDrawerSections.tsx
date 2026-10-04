@@ -9,6 +9,7 @@ import { TASK_RULE_ICONS } from '@/shared/clinic/task-rule-icons.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import {
   PersonAvatar,
+  personFullName,
   personInitials,
   shortPersonName,
 } from '@/shared/components/Cells/index.ts';
@@ -22,12 +23,7 @@ import { Sparkles } from '@/shared/icons/index.ts';
 
 import { useTaskDueLabel } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import {
-  lowerFirst,
-  staffName,
-  taskContactCard,
-  taskSourceId,
-} from '../../tasks.display.ts';
+import { lowerFirst, taskContactCard, taskSourceId } from '../../tasks.display.ts';
 import { type TaskDrawerTarget, taskSourceTarget } from './task-drawer-targets.ts';
 import { useTaskContextTiles } from './use-task-context-tiles.ts';
 
@@ -125,7 +121,9 @@ export function TaskDrawerHeader({
             />
           ) : null}
           <span className="truncate">
-            {row.owner ? shortPersonName(staffName(row.owner)) : t(TASKS_KEYS.row.anyone)}
+            {row.owner
+              ? shortPersonName(personFullName(row.owner))
+              : t(TASKS_KEYS.row.anyone)}
           </span>
         </span>
       </div>
@@ -421,7 +419,7 @@ export function TaskDrawerBody({
 }) {
   const named = (id: string | null | undefined) => {
     const staff = id ? detail.staff.find((member) => member.id === id) : undefined;
-    return staff ? shortPersonName(staffName(staff)) : '';
+    return staff ? shortPersonName(personFullName(staff)) : '';
   };
   const lead = detail.source?.kind === 'lead' ? detail.source.lead : detail.thread;
   const visit = detail.source?.kind === 'appointment' ? detail.source.appointment : null;

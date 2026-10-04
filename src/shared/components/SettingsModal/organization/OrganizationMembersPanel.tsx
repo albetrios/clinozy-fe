@@ -5,10 +5,11 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { isListStale, listRefreshClass } from '@/lib/list-refresh.ts';
 import { cn } from '@/lib/utils.ts';
-import type {
-  Member,
-  MemberInvitation,
-  OrgRole,
+import {
+  isInvitationExpired,
+  type Member,
+  type MemberInvitation,
+  type OrgRole,
 } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
@@ -88,16 +89,6 @@ function MembersLoading() {
 }
 
 /**
- * Whether the invitation's link has expired. clinozy-be refuses to resend it after
- * that, so the row offers Cancel only. Read at render: an invitation that expires
- * while the panel is open keeps its Resend until the list refreshes, and clinozy-be
- * then answers the resend with its own "expired" reason.
- */
-function isInvitationExpired(invitation: MemberInvitation): boolean {
-  return Date.parse(invitation.expiresAt) <= Date.now();
-}
-
-/**
  * The live invitation behind an invited row, or `null` for everyone else
  * (including an invited row clinozy-be reported without one).
  */
@@ -145,6 +136,10 @@ function MemberRowEndItems({
   if (canManageInvitations && invitation) {
     return (
       <>
+        {/* An expired link offers Cancel only: clinozy-be refuses to resend it.
+            Read at render — one that expires while the panel is open keeps its
+            Resend until the list refreshes, and clinozy-be then answers the
+            resend with its own "expired" reason. */}
         {isInvitationExpired(invitation) ? null : (
           <DropdownMenuItem
             disabled={isWriting}

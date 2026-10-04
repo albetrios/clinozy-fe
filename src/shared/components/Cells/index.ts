@@ -9,6 +9,7 @@ export {
   PersonAvatar,
   type PersonAvatarProps,
   type PersonAvatarSize,
+  personFullName,
   personInitials,
   type PersonPresence,
   shortPersonName,

@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
@@ -7,10 +7,11 @@ import {
   TASK_REMIND_MINUTES,
   type TaskChange,
 } from '@/shared/api/clinic/tasks-contracts.ts';
-import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { firstNameOf } from '@/shared/components/ChatColumn/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
@@ -22,7 +23,6 @@ import {
 } from '../../hooks/useTaskAssignees/index.ts';
 import { useTaskDueAtWords } from '../../hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { staffName } from '../../tasks.display.ts';
 import type { TaskCreateSearch } from '../../tasks.search.ts';
 import {
   type NewTaskForm,
@@ -89,12 +89,6 @@ function usePrefilledPerson(prefill: TaskCreateSearch): NewTaskPerson | null {
   return null;
 }
 
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<NewTaskForm>): NewTaskForm {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as NewTaskForm;
-}
-
 /** The words the step heads, the footer and the toast read. */
 interface NewTaskWords {
   typeLabel: string;
@@ -124,7 +118,7 @@ function useNewTaskWords({
   const typeLabel = t(K.type[values.type]);
   return {
     typeLabel,
-    owner: owner ? shortPersonName(staffName(owner)) : '',
+    owner: owner ? shortPersonName(personFullName(owner)) : '',
     due: values.duePreset
       ? t(K.due[values.duePreset])
       : dueAtWords(values.dueDate, values.dueTime, now),

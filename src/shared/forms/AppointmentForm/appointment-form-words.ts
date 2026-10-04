@@ -3,8 +3,8 @@ import type {
   AppointmentStaff,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { staffName } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 
 import { APPOINTMENT_FORM_KEYS } from './appointment-form.constants.ts';
 import type {
@@ -47,7 +47,7 @@ export function footerSummary(
     draft.who?.name,
     draft.serviceLabel,
     t(K.footer.minutes, { minutes: draft.durationMin }),
-    doctor ? staffName(doctor) : '',
+    doctor ? personFullName(doctor) : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -72,7 +72,7 @@ export function detailsSummaryText(
   const reason = draft.reason.trim();
   const parts = [
     draft.serviceLabel,
-    doctor ? staffName(doctor) : '',
+    doctor ? personFullName(doctor) : '',
     t(K.footer.minutes, { minutes: draft.durationMin }),
     reason ? `“${reason.slice(0, 40)}”` : '',
   ].filter(Boolean);

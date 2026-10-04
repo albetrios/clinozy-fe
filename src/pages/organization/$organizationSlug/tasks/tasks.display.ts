@@ -6,14 +6,6 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { TaskRow, TaskSourceRef } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 
-/** A staff member's full name as their cards write it ("Riya Shah", "Dr. Drashti Desai"). */
-export function staffName(staff: {
-  firstName: string;
-  lastName?: string | null;
-}): string {
-  return [staff.firstName, staff.lastName].filter(Boolean).join(' ');
-}
-
 /** A source's display id ("#2363"), or nothing where the contract has no `seq`. */
 export function taskSourceId(source: Pick<TaskSourceRef, 'kind' | 'seq'>): string {
   if (source.seq === null) return '';

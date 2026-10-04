@@ -1,4 +1,4 @@
-export { isInvitationExpired, type TeamPill } from './team-cells.ts';
+export type { TeamPill } from './team-cells.ts';
 export {
   TeamBranchesCell,
   TeamIdCell,

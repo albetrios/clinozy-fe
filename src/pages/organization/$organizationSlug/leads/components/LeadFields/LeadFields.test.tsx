@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-contracts.ts';
+import { personFullName } from '@/shared/components/Cells/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
 import { leadRecord, NIDHI, RIYA } from '../../__tests__/integration/leads-test-data.ts';
@@ -12,7 +13,7 @@ import {
   LEAD_SOURCE_ORDER,
   leadInterestViews,
 } from './lead-display.ts';
-import { staffFullName, staffPerson, teamCardDataOf } from './lead-people.ts';
+import { staffPerson, teamCardDataOf } from './lead-people.ts';
 import { LeadInterestPills, LeadSourcePill, LeadStatusPill } from './LeadFields.tsx';
 
 describe('lead display', () => {
@@ -46,7 +47,7 @@ describe('lead display', () => {
 
 describe('lead people and contact', () => {
   it('names staff and builds their team card', () => {
-    expect(staffFullName(RIYA)).toBe('Riya Shah');
+    expect(personFullName(RIYA)).toBe('Riya Shah');
     expect(staffPerson(RIYA, { presence: true })).toMatchObject({
       name: 'Riya Shah',
       initials: 'RS',
