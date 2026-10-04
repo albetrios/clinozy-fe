@@ -107,8 +107,28 @@ const config = [
      * Trimmed first: the shell had imported the slot's whole key and test-id
      * table for one key (−0.16 kB); nothing else large rides the entry. Lower
      * it again as soon as a route group can leave the entry chunk.
+     *
+     * 241.9 → 243.9 kB (same exemption, D48): measured 243.39 kB after the
+     * Patients and Appointments screen rows (241.36 kB before them), each row
+     * boundary built and attributed through the hidden source maps:
+     * - L-32, the Patients room (+1.88 kB). The entry +1.08: the room's URL
+     *   readers (`patients.search.ts` — view, filters, sort and the New
+     *   patient prefill, whose mobile check brings `toClinicPhone` along), the
+     *   `create` route block and manifest, two builders and the route's
+     *   preload list. The shared `icons` chunk +0.79: the WhatsApp and
+     *   Instagram marks and five Lucide glyphs this room draws first — the
+     *   icon barrel puts every glyph any screen draws into that
+     *   entry-preloaded chunk, so splitting the clinic's marks off it is the
+     *   next lever.
+     * - L-32b +0.15 (the patients route's preload list names four more shared
+     *   chunks, and the `organizationPatients` builder joins the entry with
+     *   its first caller), L-36b +0.08 (the appointments route's preload list,
+     *   the `Clock` glyph), L-37 +0.03 (`common`'s `cells.leadMark`), L-37b
+     *   nothing (its card is not mounted yet).
+     * Trimmed first: the Patients list read moved off the entry into
+     * `patients.params.ts`, as `appointments.params.ts` had (−0.07 kB).
      */
-    limit: '241.9 kB',
+    limit: '243.9 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -171,8 +191,23 @@ const config = [
            * composer and its Suggestions popover). The boot splash's frames
            * (L-52) are inline CSS in index.html, outside this stylesheet; its
            * old breathe keyframes left it.
+           *
+           * 37.5 → 39.5 kB (same exemption, D36): measured 39.06 kB (37.22
+           * before the Patients and Appointments screen rows), each row boundary
+           * built: the Agenda (+0.73 kB, L-36b: the sticky day groups and their
+           * tone bands, the DataTable's group rows and refresh bars, the phone
+           * re-grid, the 560px Filters popover with its month calendar, the
+           * booking card and the status popover), the Day / Week / Month
+           * calendars (+0.49, L-37: blocks placed by CSS variables, the rails,
+           * the now line and past veil, the week's load bars, the status
+           * edges), the shared Offering suggestions card (+0.57, L-37b: its
+           * container queries and row grids — emitted although nothing mounts
+           * it before the appointment form and the patient file), the patient
+           * drawer's chip and "+91" fields (+0.12, L-32b) and the Patients list
+           * (+0.02, L-32). Trimmed first: the Agenda header's band map spelled
+           * all eleven tones for the six a day takes (−0.09 kB).
            */
-          limit: '37.5 kB',
+          limit: '39.5 kB',
           gzip: true,
         },
       ]
