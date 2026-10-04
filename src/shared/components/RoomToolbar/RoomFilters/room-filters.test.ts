@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  clearRoomFilter,
   countRoomFilters,
   dateRangeEnds,
   isDateRange,
@@ -125,5 +126,32 @@ describe('editing the pending set', () => {
       '2026-09-10..2026-09-30',
     );
     expect(withDateRangeEnd('2026-09-01..2026-09-30', 'to', null)).toBe('2026-09-01..');
+  });
+});
+
+describe('a people filter (the Leads "Team")', () => {
+  const PEOPLE = { owner: { kind: 'people' } } as const satisfies RoomFilterFields;
+  const RIYA = '00000000-0000-4000-8000-000000000012';
+  const NIDHI = '00000000-0000-4000-8000-000000000013';
+
+  it('reads record ids from the URL and drops anything else', () => {
+    expect(roomFilterValues(PEOPLE, { owner: [RIYA, 'riya', NIDHI] })).toEqual({
+      owner: [RIYA, NIDHI],
+    });
+    expect(roomFilterValues(PEOPLE, { owner: 'nobody' })).toEqual({});
+  });
+
+  it('writes the picked ids as a list and counts each person', () => {
+    expect(roomFilterSearchPatch(PEOPLE, { owner: [RIYA, NIDHI] })).toEqual({
+      owner: [RIYA, NIDHI],
+    });
+    expect(roomFilterSearchPatch(PEOPLE, {})).toEqual({ owner: undefined });
+    expect(countRoomFilters(PEOPLE, { owner: [RIYA, NIDHI] })).toBe(2);
+  });
+
+  it('clears one section with "Clear", the others kept', () => {
+    expect(clearRoomFilter({ owner: [RIYA], gender: ['female'] }, 'owner')).toEqual({
+      gender: ['female'],
+    });
   });
 });

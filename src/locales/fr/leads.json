@@ -11,5 +11,86 @@
     "claimedUnowned": "{{name}} est maintenant à vous",
     "released": "Libéré pour l’équipe · tout le monde peut le prendre",
     "assigned": "{{name}} est maintenant responsable · notifié"
+  },
+  "list": {
+    "records": "prospects",
+    "views": {
+      "label": "Vues des prospects",
+      "mine": "Les miens",
+      "unread": "Sans réponse",
+      "all": "Tous",
+      "unreadCount_one": "{{count}} sans réponse",
+      "unreadCount_many": "{{count}} sans réponse",
+      "unreadCount_other": "{{count}} sans réponse"
+    },
+    "search": {
+      "placeholder": "Rechercher nom, téléphone, #ID",
+      "label": "Rechercher des prospects"
+    },
+    "newLead": "Nouveau prospect",
+    "columns": {
+      "lead": "Prospect",
+      "status": "Statut",
+      "source": "Source",
+      "interests": "Intéressé par",
+      "team": "Équipe",
+      "updated": "Mis à jour"
+    },
+    "empty": "Aucun prospect ne correspond",
+    "clearFilters": "Effacer les filtres",
+    "moreInterests_one": "{{count}} de plus : {{list}}",
+    "moreInterests_many": "{{count}} de plus : {{list}}",
+    "moreInterests_other": "{{count}} de plus : {{list}}",
+    "updated": {
+      "justNow": "À l’instant",
+      "minutes_one": "il y a {{count}} min",
+      "minutes_many": "il y a {{count}} min",
+      "minutes_other": "il y a {{count}} min",
+      "hours_one": "il y a {{count}} h",
+      "hours_many": "il y a {{count}} h",
+      "hours_other": "il y a {{count}} h",
+      "yesterday": "Hier",
+      "days_one": "il y a {{count}} jour",
+      "days_many": "il y a {{count}} jours",
+      "days_other": "il y a {{count}} jours",
+      "weeks_one": "il y a {{count}} semaine",
+      "weeks_many": "il y a {{count}} semaines",
+      "weeks_other": "il y a {{count}} semaines"
+    }
+  },
+  "team": {
+    "claim": "Ouvert · Prendre",
+    "join": "Ouvert à l’équipe · Rejoindre",
+    "openMine": "Ouvert à l’équipe",
+    "claimHint_one": "Aucune activité depuis {{count}} jour · tout le monde peut le prendre",
+    "claimHint_many": "Aucune activité depuis {{count}} jours · tout le monde peut le prendre",
+    "claimHint_other": "Aucune activité depuis {{count}} jours · tout le monde peut le prendre",
+    "joinHint": "{{name}} a quitté la clinique · n’importe qui dans l’équipe peut le rejoindre et le prendre",
+    "releasesToday": "Libéré pour l’équipe aujourd’hui si personne ne relance",
+    "releasesTomorrow": "Libéré pour l’équipe demain si personne ne relance",
+    "claimFirst": "Prendre {{first}}",
+    "joinTake": "Rejoindre · prendre {{first}}",
+    "takeOver": "Reprendre à {{first}}"
+  },
+  "filters": {
+    "status": "Statut",
+    "source": "Source · au choix",
+    "clear": "Effacer",
+    "hold": {
+      "label": "Propriété · réservation après jours d’inactivité",
+      "any": "Tous",
+      "open": "Ouverts à la prise",
+      "soon": "Libérés aujourd’hui",
+      "held": "Réservés"
+    },
+    "team": {
+      "label": "Équipe · responsable ou impliqué",
+      "anyone": "N’importe qui dans l’équipe",
+      "count_one": "{{count}} personne",
+      "count_many": "{{count}} personnes",
+      "count_other": "{{count}} personnes",
+      "search": "Rechercher dans l’équipe",
+      "noMatch": "Aucun résultat"
+    }
   }
 }

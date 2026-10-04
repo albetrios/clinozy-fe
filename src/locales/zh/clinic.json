@@ -73,6 +73,14 @@
       "referral": "推荐",
       "retarget": "再营销",
       "phone_call": "电话"
+    },
+    "interests": {
+      "others": "其他",
+      "clinical": "临床",
+      "peel": "换肤",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

@@ -1,4 +1,4 @@
-import { listOf, oneOf } from '@/lib/routes/search-params.ts';
+import { listOf, oneOf, RECORD_ID } from '@/lib/routes/search-params.ts';
 import {
   readCreatedFilter,
   readFollowUpFilter,
@@ -10,8 +10,8 @@ import {
  * keys it edits and how, read from and written to the search the room's own
  * `validateSearch` parses with the shared readers (`lib/routes/search-params`,
  * `clinic-list-filters`). The URL form is theirs: an options filter is a list
- * (a single pick, a plain value) and a date filter its preset or a custom range
- * `YYYY-MM-DD..YYYY-MM-DD`.
+ * (a single pick, a plain value), a people filter a list of record ids and a
+ * date filter its preset or a custom range `YYYY-MM-DD..YYYY-MM-DD`.
  */
 
 /** A date section of the popover: "Created" or "Follow-up date" (S:1541–1542). */
@@ -26,7 +26,12 @@ export type RoomFilterField =
       readonly single?: boolean;
     }
   /** A date section: its presets, or a custom range. */
-  | { readonly kind: 'date'; readonly presets: RoomDateFilterKind };
+  | { readonly kind: 'date'; readonly presets: RoomDateFilterKind }
+  /**
+   * Team members by id, any number — a picker that expands a searchable list
+   * (the Leads "Team · assigned or involved", H:1711–1718).
+   */
+  | { readonly kind: 'people' };
 
 /** A room's filters by URL key, in the order the popover shows them. */
 export type RoomFilterFields = Readonly<Record<string, RoomFilterField>>;
@@ -42,9 +47,14 @@ function paramOf(field: RoomFilterField, raw: unknown): string | string[] | unde
   if (field.kind === 'date') {
     return field.presets === 'created' ? readCreatedFilter(raw) : readFollowUpFilter(raw);
   }
+  if (field.kind === 'people') return listOf(raw, (entry) => RECORD_ID.test(entry));
   if (field.single) return oneOf(field.values, Array.isArray(raw) ? raw[0] : raw);
   return listOf(raw, (entry) => field.values.includes(entry));
 }
+
+/** Whether a field's URL value is a list (many options, people), not one value. */
+const isListField = (field: RoomFilterField) =>
+  field.kind === 'people' || (field.kind === 'options' && !field.single);
 
 /** The filter values a search applies — the room's own keys, read with the shared readers. */
 export function roomFilterValues(
@@ -72,17 +82,14 @@ export function roomFilterSearchPatch(
   return Object.fromEntries(
     Object.entries(fields).map(([key, field]) => {
       const picked = values[key];
-      return [
-        key,
-        paramOf(field, field.kind === 'options' && !field.single ? picked : picked?.[0]),
-      ];
+      return [key, paramOf(field, isListField(field) ? picked : picked?.[0])];
     }),
   );
 }
 
 /**
- * How many filters are on (H:4170): one per picked option, one per date
- * section set — the Filters button's count.
+ * How many filters are on (H:4170): one per picked option or person, one per
+ * date section set — the Filters button's count.
  */
 export function countRoomFilters(
   fields: RoomFilterFields,
@@ -90,9 +97,14 @@ export function countRoomFilters(
 ): number {
   return Object.entries(fields).reduce((count, [key, field]) => {
     const picked = values[key]?.length ?? 0;
-    if (field.kind === 'options') return count + picked;
-    return count + (picked > 0 ? 1 : 0);
+    if (field.kind === 'date') return count + (picked > 0 ? 1 : 0);
+    return count + picked;
   }, 0);
+}
+
+/** `values` with `key` emptied — a section's "Clear". */
+export function clearRoomFilter(values: RoomFilterValues, key: string): RoomFilterValues {
+  return withValues(values, key, []);
 }
 
 /** `values` with `key` set to `next` — in place when it was there, gone when empty. */

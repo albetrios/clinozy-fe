@@ -1,6 +1,8 @@
 import type {
   AppointmentStatus,
   Gender,
+  LeadInterest,
+  LeadStatus,
   PatientConversion,
   PatientStatus,
   PatientType,
@@ -8,6 +10,7 @@ import type {
   Section,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import type { LeadRecordSource } from '@/shared/api/clinic/leads-contracts.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
@@ -87,6 +90,51 @@ export const GENDER_TONES: Readonly<Record<Gender, Tone>> = {
   female: 'blush',
   male: 'sky',
   other: 'stone',
+};
+
+/**
+ * Each lead status's tone (`LSTAT`, H:3346): New sky, Contacted lav, Follow-up
+ * butter, Clinic visited sage, No response and Invalid stone, Not interested
+ * and Lost blush — the status pills, the row's 3px edge and the progress
+ * track. A re-target lead still New ("Re-targeted") keeps New's sky.
+ */
+export const LEAD_STATUS_TONES: Readonly<Record<LeadStatus, Tone>> = {
+  new: 'sky',
+  contacted: 'lav',
+  follow_up: 'butter',
+  clinic_visited: 'sage',
+  no_response: 'stone',
+  not_interested: 'blush',
+  invalid: 'stone',
+  lost: 'blush',
+};
+
+/**
+ * Each lead source's tone (`LSRC` / `SRC_SK`, H:3348, H:3360) and the plan's
+ * "Phone call", sky like its `Phone` icon (Q-L6, AMBER A-L4).
+ */
+export const LEAD_SOURCE_TONES: Readonly<Record<LeadRecordSource, Tone>> = {
+  instagram: 'blush',
+  google: 'butter',
+  whatsapp: 'sage',
+  facebook: 'sky',
+  walk_in: 'lav',
+  referral: 'mint',
+  retarget: 'mint',
+  phone_call: 'sky',
+};
+
+/**
+ * Each interest's tone (`INTK`, H:3358). An interest typed into "Add
+ * interest" takes {@link toneForLabel}.
+ */
+export const LEAD_INTEREST_TONES: Readonly<Record<LeadInterest, Tone>> = {
+  others: 'stone',
+  clinical: 'sky',
+  peel: 'butter',
+  lhr: 'lav',
+  hydrafacial: 'mint',
+  prp: 'blush',
 };
 
 /** The utility classes one tone paints with. */

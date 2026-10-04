@@ -9,7 +9,9 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
 import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
 import {
   useAssignLead,
@@ -18,6 +20,7 @@ import {
   useDeleteLead,
   useLead,
   useLeadList,
+  useLeadViewer,
   useMarkLeadRead,
   useReleaseLead,
   useRestoreLead,
@@ -26,7 +29,7 @@ import {
 } from './useLeads.ts';
 
 /** Holds a write until a test lets it land, so the optimistic patch can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
+const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null, failList: false }));
 
 vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof LeadsApiModule>();
@@ -36,13 +39,18 @@ vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
       await gate.hold;
       return actual.deleteLead(...args);
     },
+    listLeads: async (...args: Parameters<typeof actual.listLeads>) => {
+      if (gate.failList) throw new Error('connection dropped');
+      return actual.listLeads(...args);
+    },
     markLeadRead: async (...args: Parameters<typeof actual.markLeadRead>) => {
       await gate.hold;
       return actual.markLeadRead(...args);
     },
   };
 });
-vi.mock('@/shared/notify/index.ts', () => ({
+vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof NotifyModule>()),
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 
@@ -77,6 +85,7 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-10-03T06:30:00Z'));
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   gate.hold = null;
+  gate.failList = false;
   for (const fn of Object.values(notify)) vi.mocked(fn).mockClear();
   resetClinicFixtures();
 });
@@ -100,6 +109,47 @@ describe('useLeadList', () => {
     expect(seqsOf(mine.result.current.rows)).toEqual([
       2363, 2365, 2356, 2355, 2354, 2353,
     ]);
+  });
+
+  it('waits while told to — "Mine" reads nothing before the viewer is known', () => {
+    const { result } = renderHook(
+      () => useLeadList({ view: 'mine', viewerId: null }, { enabled: false }),
+      { wrapper },
+    );
+    expect(result.current.isPending).toBe(true);
+    expect(client.isFetching()).toBe(0);
+  });
+
+  it('says once that the list failed, with Retry, and keeps the toast to one', async () => {
+    gate.failList = true;
+    const { result } = renderHook(() => useLeadList({ view: 'all' }), { wrapper });
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    const [message, options] = vi.mocked(notify.error).mock.lastCall ?? [];
+    expect(message).toBe(
+      'Couldn’t load this list · connection dropped. Showing the last copy.',
+    );
+    expect(options).toMatchObject({ id: 'list-error:leads', action: { label: 'Retry' } });
+    gate.failList = false;
+    act(() => options?.action?.onClick?.());
+    await waitFor(() => expect(result.current.rows).toHaveLength(17));
+  });
+});
+
+describe('useLeadViewer', () => {
+  afterEach(() => useAuthStore.setState({ user: null }));
+
+  it('reads the signed-in member by their email', async () => {
+    useAuthStore.setState({
+      user: { id: 'u', email: 'nidhi@cresence.skin', role: 'user' },
+    });
+    const { result } = renderHook(() => useLeadViewer(), { wrapper });
+    await waitFor(() => expect(result.current.data?.id).toBe(NK));
+  });
+
+  it('reads the fixture server’s own member before anyone is signed in', async () => {
+    const { result } = renderHook(() => useLeadViewer(), { wrapper });
+    await waitFor(() => expect(result.current.data?.id).toBe(RS));
   });
 });
 

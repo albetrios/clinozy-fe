@@ -26,11 +26,18 @@ interface DataTableColumnHeaderProps<
 /**
  * Sort cycle of a header click (KICKOFF §3.5 Header): ascending → descending
  * → off — for every column, whatever direction TanStack would auto-pick first.
+ * A `sortStartsDescending` column runs descending → off ("newest first",
+ * H:6147).
  */
 function cycleSort<TData extends RowData, TValue>(
   column: Column<DataTableFeatures, TData, TValue>,
 ) {
   const sorted = column.getIsSorted();
+  if (column.columnDef.meta?.sortStartsDescending) {
+    if (sorted) column.clearSorting();
+    else column.toggleSorting(true);
+    return;
+  }
   if (sorted === 'asc') column.toggleSorting(true);
   else if (sorted === 'desc') column.clearSorting();
   else column.toggleSorting(false);

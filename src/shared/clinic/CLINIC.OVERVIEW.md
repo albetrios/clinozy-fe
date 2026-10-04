@@ -4,7 +4,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 `launch-2026-09-30-jxmr`):
 
 - `clinic.constants.ts` — the `clinic` i18n namespace's keys (section names and
-  descriptions, roles; the lead statuses and sources; the appointments domain — statuses,
+  descriptions, roles; the lead statuses, sources and interests; the list error
+  toast `lists.loadFailed`; the appointments domain — statuses,
   the popover's moves and reason lines, the guards, the card's next steps, the
   form's tiles and hints, the cancel reasons and the toasts `useAppointments`
   raises; the offerings domain — category,
@@ -18,8 +19,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   column, whose copy is the namespace's `chatColumn.*` (keys in
   `shared/components/ChatColumn/chat-column.constants.ts`). Room-only copy
   stays in each room's own namespace (`today`, `leads`, … `users`).
-- `clinic-tones.ts` — each section's, role's and appointment status's tone (the
-  contract's `Tone`), and
+- `clinic-tones.ts` — each section's, role's and appointment status's tone, and
+  a lead's status, source and interest tones (`LEAD_STATUS_TONES`,
+  `LEAD_SOURCE_TONES`, `LEAD_INTEREST_TONES` — the contract's `Tone`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
   fill, border, dot, halo, ring, tab hover, and a list row's active 55% and
   picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's

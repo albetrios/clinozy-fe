@@ -201,8 +201,9 @@ export function RoomToolbar({
     >
       <h1
         className={cn(
-          'text-foreground flex-none border-e pe-2.5 font-semibold tracking-[-0.015em] whitespace-nowrap max-md:sr-only',
-          layout === 'leads' ? 'text-xl' : 'text-lg xl:text-xl',
+          'text-foreground flex-none border-e font-semibold tracking-[-0.015em] whitespace-nowrap max-md:sr-only',
+          // Leads: 20px at every width, 6px before the divider + 2px after (H:1681).
+          layout === 'leads' ? 'me-0.5 pe-1.5 text-xl' : 'pe-2.5 text-lg xl:text-xl',
           // After the size: a later font size would drop an earlier line height.
           'leading-[1.2]',
         )}

@@ -32,6 +32,20 @@ describe('PersonChip', () => {
     expect(screen.getByText(', Patient')).toHaveClass('sr-only');
   });
 
+  it('sets an unread name at 600 and the Leads 11.5px sub line', () => {
+    render(
+      <PersonChip
+        name="Anaya Desai"
+        sub="+91 98795 21034"
+        tone="lav"
+        emphasis
+        subSize="caption"
+      />,
+    );
+    expect(screen.getByText('Anaya Desai')).toHaveClass('font-semibold');
+    expect(screen.getByText('+91 98795 21034')).toHaveClass('text-caption');
+  });
+
   it('uses the record initials when given', () => {
     render(<PersonChip name="Dr. Rakesh Patel" initials="RP" tone="sky" />);
     expect(screen.getByText('RP')).toBeInTheDocument();

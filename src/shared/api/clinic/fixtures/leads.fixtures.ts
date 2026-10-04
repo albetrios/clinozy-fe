@@ -12,7 +12,11 @@ import type {
   LeadStatus,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type {
+  ContactChannel,
+  LeadContact,
+  LeadRecord,
+} from '@/shared/api/clinic/leads-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
@@ -277,6 +281,51 @@ const EMAILS: Record<number, string> = {
 /** `unread` (H:3384–3385): the messages nobody has read yet; every other lead is read. */
 const UNREAD: Record<number, number> = { 2365: 1, 2363: 2 };
 
+/** The contact fields a seed sets beyond the lead's own mobile on WhatsApp. */
+interface ContactRow {
+  /** Every number, the primary first, and whether they are on WhatsApp on it. */
+  phones?: readonly (readonly [string, boolean])[];
+  instagram?: readonly string[];
+  defaultChannel?: ContactChannel;
+  preferences?: readonly string[];
+}
+
+/**
+ * The contact fields the prototype seeds: #2365's two numbers and handles and
+ * #2210's handle (H:3379–3380), the default channels (`LDEF`, H:3366) and the
+ * preferences (`LPREF`, H:3367).
+ */
+const CONTACTS: Partial<Record<number, ContactRow>> = {
+  2365: {
+    phones: [
+      ['+91 98250 11241', true],
+      ['+91 90990 55120', true],
+    ],
+    instagram: ['@rhea', '@rheashah.skin'],
+  },
+  2210: { instagram: ['@rhea'] },
+  2364: { defaultChannel: 'instagram' },
+  2357: { defaultChannel: 'call' },
+  2363: { preferences: ['Sundays only'] },
+  2360: { preferences: ['No calls', 'After 6 pm'] },
+  2352: { preferences: ['Gujarati'] },
+};
+
+/** A seeded lead's contact fields, when its seed sets any. */
+function contactOf(seq: number, phone: string): LeadContact | undefined {
+  const row = CONTACTS[seq];
+  if (!row) return undefined;
+  return {
+    phones: (row.phones ?? [[phone, true] as const]).map(([number, whatsapp]) => ({
+      phone: seedMobile(number),
+      whatsapp,
+    })),
+    instagram: [...(row.instagram ?? [])],
+    defaultChannel: row.defaultChannel ?? 'whatsapp',
+    preferences: [...(row.preferences ?? [])],
+  };
+}
+
 /** `COLLAB` (H:3375): who else is on the lead. */
 const INVOLVED: Record<number, readonly StaffKey[]> = {
   2363: ['NK'],
@@ -533,14 +582,17 @@ function lastTouch(seq: number, createdAt: string, messages: readonly LeadMessag
 /**
  * The plan's fields on a seeded lead (Appendix F): no custom interests, not
  * released, and the hold counting from creation — the prototype reads
- * `l.touch || l.at` and no seed sets `touch` (H:3869).
+ * `l.touch || l.at` and no seed sets `touch` (H:3869) — and the contact
+ * fields its seed sets.
  */
-function planFields(seq: number, createdAt: string) {
+function planFields(seq: number, createdAt: string, phone: string) {
+  const contact = contactOf(seq, phone);
   return {
     customInterests: [],
     touchedAt: createdAt,
     releasedAt: null,
     unreadCount: UNREAD[seq] ?? 0,
+    ...(contact ? { contact } : {}),
   } satisfies Partial<LeadRecord>;
 }
 
@@ -574,7 +626,7 @@ export function leadSeed(today: string = clinicToday()): LeadRecord[] {
       kind: row.retarget ? 'retarget' : 'enquiry',
       retargetReason: row.retarget ?? null,
       notes: null,
-      ...planFields(row.seq, createdAt),
+      ...planFields(row.seq, createdAt, row.phone),
     };
   });
   const threads = CONTACT_THREADS.map((row): LeadRecord => {
@@ -598,7 +650,7 @@ export function leadSeed(today: string = clinicToday()): LeadRecord[] {
       kind: 'contact_thread',
       retargetReason: null,
       notes: null,
-      ...planFields(row.seq, createdAt),
+      ...planFields(row.seq, createdAt, row.phone),
     };
   });
   return [...leads, ...threads];

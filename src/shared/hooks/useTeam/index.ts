@@ -6,5 +6,6 @@ export {
   usePlatformRoles,
   useRemoveStaffProfile,
   useSaveStaffProfile,
+  useStaffProfiles,
   useTeam,
 } from './useTeam.ts';

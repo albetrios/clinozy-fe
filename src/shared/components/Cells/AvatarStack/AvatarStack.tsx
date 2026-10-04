@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -7,6 +7,7 @@ import { CELLS_KEYS, CELLS_NS } from '@/shared/components/Cells/cells.constants.
 import {
   PersonAvatar,
   personInitials,
+  type PersonPresence,
   shortPersonName,
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -19,6 +20,8 @@ export interface AvatarStackPerson {
   /** Defaults to the name's initials. */
   initials?: string;
   tone: Tone;
+  /** The 7px presence dot on the avatar (the Leads owner chip, H:1739). */
+  presence?: PersonPresence;
 }
 
 /** Props for {@link AvatarStack}: the people, how many show before "+N", and the first one's name. */
@@ -28,10 +31,15 @@ export interface AvatarStackProps extends Omit<ComponentProps<'span'>, 'children
   max?: number;
   /**
    * Shows the first person's short name in their pill ("Riya S.", "Dr.
-   * Drashti") — the tables' people cells (H:3747). The Leads team column
-   * shows avatars only (H:1741).
+   * Drashti") — the tables' people cells (H:3747) and the Leads owner chip;
+   * the Leads involved people are avatars only (H:1741).
    */
   nameFirst?: boolean;
+  /**
+   * Wraps each person's pill — the hover or tap trigger of their team card
+   * (the Leads Team column, H:1739–1741).
+   */
+  wrapPerson?: (person: AvatarStackPerson, pill: ReactNode) => ReactNode;
 }
 
 /**
@@ -52,6 +60,7 @@ export function AvatarStack({
   people,
   max = 3,
   nameFirst = false,
+  wrapPerson,
   className,
   ...props
 }: AvatarStackProps) {
@@ -67,11 +76,11 @@ export function AvatarStack({
     >
       {shown.map((person, index) => {
         const named = nameFirst && index === 0;
-        return (
+        const pill = (
           <span
             key={person.id}
             data-slot="pill"
-            title={person.name}
+            title={wrapPerson ? undefined : person.name}
             className={cn(
               SLOT_PILL,
               'rounded-full',
@@ -82,6 +91,7 @@ export function AvatarStack({
               size="chip"
               initials={person.initials ?? personInitials(person.name)}
               tone={person.tone}
+              presence={person.presence}
             />
             {named ? (
               <span
@@ -92,6 +102,12 @@ export function AvatarStack({
               </span>
             ) : null}
             <span className="sr-only">{person.name}</span>
+          </span>
+        );
+        if (!wrapPerson) return pill;
+        return (
+          <span key={person.id} className="flex max-w-full min-w-0">
+            {wrapPerson(person, pill)}
           </span>
         );
       })}

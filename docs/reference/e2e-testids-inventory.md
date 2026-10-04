@@ -77,6 +77,9 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `leads-page`                     | Clinic room page: Leads                                                           | `pages/organization/$organizationSlug/leads/`         |
 | `new-lead-drawer`                | New lead drawer — `/leads/create` opens it over the list (L-35)                   | `pages/organization/$organizationSlug/leads/`         |
 | `lead-drawer`                    | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                     | `pages/organization/$organizationSlug/leads/`         |
+| `leads-empty`                    | Leads list: "No leads match" (+ "Clear filters" / "New lead")                     | `pages/organization/$organizationSlug/leads/`         |
+| `leads-claim`                    | Leads row: "Open to team · Claim / Join" (claims from the row)                    | `leads/components/LeadsTable/`                        |
+| `leads-hold-dot`                 | Leads row: the hold's release-today / tomorrow dot on the owner                   | `leads/components/LeadsTable/`                        |
 | `appointments-page`              | Clinic room page: Appointments                                                    | `pages/organization/$organizationSlug/appointments/`  |
 | `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)                | `pages/organization/$organizationSlug/appointments/`  |
 | `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)            | `pages/organization/$organizationSlug/appointments/`  |

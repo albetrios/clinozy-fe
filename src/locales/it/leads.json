@@ -11,5 +11,86 @@
     "claimedUnowned": "Ora {{name}} è tuo",
     "released": "Rilasciato al team · chiunque può prenderlo",
     "assigned": "{{name}} ora è responsabile · notificato"
+  },
+  "list": {
+    "records": "lead",
+    "views": {
+      "label": "Viste dei lead",
+      "mine": "Miei",
+      "unread": "Senza risposta",
+      "all": "Tutti",
+      "unreadCount_one": "{{count}} senza risposta",
+      "unreadCount_many": "{{count}} senza risposta",
+      "unreadCount_other": "{{count}} senza risposta"
+    },
+    "search": {
+      "placeholder": "Cerca nome, telefono, #ID",
+      "label": "Cerca lead"
+    },
+    "newLead": "Nuovo lead",
+    "columns": {
+      "lead": "Lead",
+      "status": "Stato",
+      "source": "Fonte",
+      "interests": "Interessato a",
+      "team": "Team",
+      "updated": "Aggiornato"
+    },
+    "empty": "Nessun lead corrisponde",
+    "clearFilters": "Cancella filtri",
+    "moreInterests_one": "Altro {{count}}: {{list}}",
+    "moreInterests_many": "Altri {{count}}: {{list}}",
+    "moreInterests_other": "Altri {{count}}: {{list}}",
+    "updated": {
+      "justNow": "Proprio ora",
+      "minutes_one": "{{count}} min fa",
+      "minutes_many": "{{count}} min fa",
+      "minutes_other": "{{count}} min fa",
+      "hours_one": "{{count}} h fa",
+      "hours_many": "{{count}} h fa",
+      "hours_other": "{{count}} h fa",
+      "yesterday": "Ieri",
+      "days_one": "{{count}} giorno fa",
+      "days_many": "{{count}} giorni fa",
+      "days_other": "{{count}} giorni fa",
+      "weeks_one": "{{count}} settimana fa",
+      "weeks_many": "{{count}} settimane fa",
+      "weeks_other": "{{count}} settimane fa"
+    }
+  },
+  "team": {
+    "claim": "Aperto · Prendi",
+    "join": "Aperto al team · Unisciti",
+    "openMine": "Aperto al team",
+    "claimHint_one": "Nessuna attività da {{count}} giorno · chiunque può prenderlo",
+    "claimHint_many": "Nessuna attività da {{count}} giorni · chiunque può prenderlo",
+    "claimHint_other": "Nessuna attività da {{count}} giorni · chiunque può prenderlo",
+    "joinHint": "{{name}} ha lasciato la clinica · chiunque del team può unirsi e prenderlo",
+    "releasesToday": "Rilasciato al team oggi se nessuno lo segue",
+    "releasesTomorrow": "Rilasciato al team domani se nessuno lo segue",
+    "claimFirst": "Prendi {{first}}",
+    "joinTake": "Unisciti · prendi {{first}}",
+    "takeOver": "Subentra a {{first}}"
+  },
+  "filters": {
+    "status": "Stato",
+    "source": "Fonte · scegli quelle che vuoi",
+    "clear": "Cancella",
+    "hold": {
+      "label": "Proprietà · trattenuto dopo giorni di inattività",
+      "any": "Qualsiasi",
+      "open": "Disponibili da prendere",
+      "soon": "Rilasciati oggi",
+      "held": "Trattenuti"
+    },
+    "team": {
+      "label": "Team · responsabile o coinvolto",
+      "anyone": "Chiunque nel team",
+      "count_one": "{{count}} persona",
+      "count_many": "{{count}} persone",
+      "count_other": "{{count}} persone",
+      "search": "Cerca nel team",
+      "noMatch": "Nessun risultato"
+    }
   }
 }

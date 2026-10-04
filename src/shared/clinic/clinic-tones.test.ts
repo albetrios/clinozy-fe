@@ -1,14 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  LEAD_INTEREST_VALUES,
+  LEAD_STATUS_VALUES,
   ROLE_VALUES,
   SECTION_VALUES,
   TONE_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-contracts.ts';
 
 import {
   APPOINTMENT_STATUS_TONES,
   GENDER_TONES,
+  LEAD_INTEREST_TONES,
+  LEAD_SOURCE_TONES,
+  LEAD_STATUS_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
@@ -60,6 +66,29 @@ describe('clinic tones', () => {
       not_converted: 'stone',
     });
     expect(GENDER_TONES).toEqual({ female: 'blush', male: 'sky', other: 'stone' });
+  });
+
+  it('paints each lead status, source and interest as the prototype does', () => {
+    // LSTAT (H:3346), LSRC / SRC_SK (H:3348, H:3360) + Phone call (Q-L6), INTK (H:3358).
+    expect(LEAD_STATUS_TONES).toEqual({
+      new: 'sky',
+      contacted: 'lav',
+      follow_up: 'butter',
+      clinic_visited: 'sage',
+      no_response: 'stone',
+      not_interested: 'blush',
+      invalid: 'stone',
+      lost: 'blush',
+    });
+    for (const status of LEAD_STATUS_VALUES)
+      expect(TONE_VALUES).toContain(LEAD_STATUS_TONES[status]);
+    for (const source of LEAD_RECORD_SOURCE_VALUES)
+      expect(TONE_VALUES).toContain(LEAD_SOURCE_TONES[source]);
+    expect(LEAD_SOURCE_TONES.retarget).toBe('mint');
+    expect(LEAD_SOURCE_TONES.phone_call).toBe('sky');
+    for (const interest of LEAD_INTEREST_VALUES)
+      expect(TONE_VALUES).toContain(LEAD_INTEREST_TONES[interest]);
+    expect(LEAD_INTEREST_TONES.lhr).toBe('lav');
   });
 
   it('spells every class as a literal for its own tone', () => {

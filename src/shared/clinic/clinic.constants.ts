@@ -78,6 +78,15 @@ export const CLINIC_KEYS = {
       retarget: 'leads.sources.retarget',
       phone_call: 'leads.sources.phone_call',
     },
+    /** What a lead is interested in — the contract's six (`S:1086–1094`); "Others" is no chip. */
+    interests: {
+      others: 'leads.interests.others',
+      clinical: 'leads.interests.clinical',
+      peel: 'leads.interests.peel',
+      lhr: 'leads.interests.lhr',
+      hydrafacial: 'leads.interests.hydrafacial',
+      prp: 'leads.interests.prp',
+    },
   },
   /**
    * The contract's enum labels the rooms share (`schema-routes.md` › Enums,

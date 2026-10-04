@@ -239,9 +239,11 @@ describe('RoomToolbar — phone', () => {
     renderToolbar({ layout: 'leads' });
     const row = await screen.findByTestId('patients-toolbar');
     expect(row).toHaveAttribute('data-layout', 'leads');
-    expect(within(row).getByRole('heading', { level: 1 }).className).not.toContain(
-      'text-lg',
-    );
+    const heading = within(row).getByRole('heading', { level: 1 });
+    expect(heading.className).not.toContain('text-lg');
+    // 6px before the divider and 2px after it (H:1681).
+    expect(heading).toHaveClass('pe-1.5', 'me-0.5');
+    expect(heading).not.toHaveClass('pe-2.5');
     expect(screen.getByTestId('patients-search').className).toContain(
       'max-md:basis-full',
     );

@@ -60,10 +60,7 @@ export function useTeam(): TeamResult {
   // The roles only say which platform roles are custom; without `role:read`
   // the Team still renders, with presets matched by name (least privilege).
   const platformRoles = usePlatformRoles();
-  const profiles = useAppQuery({
-    queryKey: staffQueryKeys.profiles(),
-    queryFn: fetchStaffProfiles,
-  });
+  const profiles = useStaffProfiles();
 
   const team = useMemo(
     () =>
@@ -130,6 +127,18 @@ export function usePlatformRoles(): PlatformRolesResult {
     error: query.error,
     refetch,
   };
+}
+
+/**
+ * Every live staff profile (fixture, REPLACE_WITH_API) — one cache entry with
+ * the Team's join: the person pickers, the Leads room's team column, its Team
+ * filter and the people popover read it.
+ */
+export function useStaffProfiles() {
+  return useAppQuery({
+    queryKey: staffQueryKeys.profiles(),
+    queryFn: fetchStaffProfiles,
+  });
 }
 
 /**

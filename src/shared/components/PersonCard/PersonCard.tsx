@@ -40,8 +40,15 @@ const POPOVER_HEIGHT =
  * wash and a hairline that bleed 4px past the chip, H:683); `bare` adds
  * nothing (avatars, names inside running text).
  */
+/*
+ * `chip` pads the hover plate past the chip (4px before, 10px after) and pulls
+ * it back with negative margins, so its border box may be 14px wider than the
+ * cell — a plain `max-w-full` would take those 14px from the chip and cut a
+ * name or a mobile short of the cell's edge (the prototype sizes its trigger's
+ * content box, so the chip reaches the edge).
+ */
 const TRIGGER_VARIANTS = {
-  chip: '-my-1 -ms-1 -me-2.5 py-1 ps-1 pe-2.5 hover:bg-muted hover:inset-ring hover:inset-ring-border transition-[background-color,box-shadow] duration-150',
+  chip: '-my-1 -ms-1 -me-2.5 py-1 ps-1 pe-2.5 max-w-[calc(100%+0.875rem)] hover:bg-muted hover:inset-ring hover:inset-ring-border transition-[background-color,box-shadow] duration-150',
   bare: '',
 } as const;
 

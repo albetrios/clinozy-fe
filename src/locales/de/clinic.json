@@ -73,6 +73,14 @@
       "referral": "Empfehlung",
       "retarget": "Reaktivierung",
       "phone_call": "Telefonanruf"
+    },
+    "interests": {
+      "others": "Sonstiges",
+      "clinical": "Klinisch",
+      "peel": "Peeling",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

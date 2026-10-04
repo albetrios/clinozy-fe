@@ -73,6 +73,14 @@
       "referral": "Referral",
       "retarget": "Re-target",
       "phone_call": "Phone call"
+    },
+    "interests": {
+      "others": "Others",
+      "clinical": "Clinical",
+      "peel": "Peel",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

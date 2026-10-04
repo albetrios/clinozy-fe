@@ -11,5 +11,110 @@
     "claimedUnowned": "أصبحت مسؤولاً عن {{name}}",
     "released": "أُتيح للفريق · يمكن لأي شخص استلامه",
     "assigned": "{{name}} هو المسؤول الآن · تم إرسال إشعار"
+  },
+  "list": {
+    "records": "العملاء المحتملين",
+    "views": {
+      "label": "عروض العملاء المحتملين",
+      "mine": "لي",
+      "unread": "بلا رد",
+      "all": "الكل",
+      "unreadCount_zero": "لا شيء بلا رد",
+      "unreadCount_one": "واحد بلا رد",
+      "unreadCount_two": "اثنان بلا رد",
+      "unreadCount_few": "{{count}} بلا رد",
+      "unreadCount_many": "{{count}} بلا رد",
+      "unreadCount_other": "{{count}} بلا رد"
+    },
+    "search": {
+      "placeholder": "ابحث بالاسم أو الهاتف أو #المعرّف",
+      "label": "البحث في العملاء المحتملين"
+    },
+    "newLead": "عميل محتمل جديد",
+    "columns": {
+      "lead": "العميل المحتمل",
+      "status": "الحالة",
+      "source": "المصدر",
+      "interests": "مهتم بـ",
+      "team": "الفريق",
+      "updated": "آخر تحديث"
+    },
+    "empty": "لا يوجد عملاء محتملون مطابقون",
+    "clearFilters": "مسح عوامل التصفية",
+    "moreInterests_zero": "{{list}}",
+    "moreInterests_one": "واحد آخر: {{list}}",
+    "moreInterests_two": "اثنان آخران: {{list}}",
+    "moreInterests_few": "{{count}} أخرى: {{list}}",
+    "moreInterests_many": "{{count}} أخرى: {{list}}",
+    "moreInterests_other": "{{count}} أخرى: {{list}}",
+    "updated": {
+      "justNow": "الآن",
+      "minutes_zero": "قبل {{count}} دقيقة",
+      "minutes_one": "قبل دقيقة",
+      "minutes_two": "قبل دقيقتين",
+      "minutes_few": "قبل {{count}} دقائق",
+      "minutes_many": "قبل {{count}} دقيقة",
+      "minutes_other": "قبل {{count}} دقيقة",
+      "hours_zero": "قبل {{count}} ساعة",
+      "hours_one": "قبل ساعة",
+      "hours_two": "قبل ساعتين",
+      "hours_few": "قبل {{count}} ساعات",
+      "hours_many": "قبل {{count}} ساعة",
+      "hours_other": "قبل {{count}} ساعة",
+      "yesterday": "أمس",
+      "days_zero": "قبل {{count}} يوم",
+      "days_one": "قبل يوم",
+      "days_two": "قبل يومين",
+      "days_few": "قبل {{count}} أيام",
+      "days_many": "قبل {{count}} يومًا",
+      "days_other": "قبل {{count}} يوم",
+      "weeks_zero": "قبل {{count}} أسبوع",
+      "weeks_one": "قبل أسبوع",
+      "weeks_two": "قبل أسبوعين",
+      "weeks_few": "قبل {{count}} أسابيع",
+      "weeks_many": "قبل {{count}} أسبوعًا",
+      "weeks_other": "قبل {{count}} أسبوع"
+    }
+  },
+  "team": {
+    "claim": "مفتوح · استلم",
+    "join": "مفتوح للفريق · انضم",
+    "openMine": "مفتوح للفريق",
+    "claimHint_zero": "لا نشاط منذ {{count}} يوم · يمكن لأي شخص استلامه",
+    "claimHint_one": "لا نشاط منذ يوم · يمكن لأي شخص استلامه",
+    "claimHint_two": "لا نشاط منذ يومين · يمكن لأي شخص استلامه",
+    "claimHint_few": "لا نشاط منذ {{count}} أيام · يمكن لأي شخص استلامه",
+    "claimHint_many": "لا نشاط منذ {{count}} يومًا · يمكن لأي شخص استلامه",
+    "claimHint_other": "لا نشاط منذ {{count}} يوم · يمكن لأي شخص استلامه",
+    "joinHint": "غادر {{name}} العيادة · يمكن لأي شخص في الفريق الانضمام واستلامه",
+    "releasesToday": "يُتاح للفريق اليوم إذا لم يتابعه أحد",
+    "releasesTomorrow": "يُتاح للفريق غدًا إذا لم يتابعه أحد",
+    "claimFirst": "استلم {{first}}",
+    "joinTake": "انضم · استلم {{first}}",
+    "takeOver": "تولَّ المسؤولية بدلًا من {{first}}"
+  },
+  "filters": {
+    "status": "الحالة",
+    "source": "المصدر · اختر أيًّا منها",
+    "clear": "مسح",
+    "hold": {
+      "label": "الملكية · الاحتفاظ بعد أيام الخمول",
+      "any": "الكل",
+      "open": "متاح للاستلام",
+      "soon": "يُتاح اليوم",
+      "held": "محتفظ به"
+    },
+    "team": {
+      "label": "الفريق · المسؤول أو المشارك",
+      "anyone": "أي شخص في الفريق",
+      "count_zero": "لا أحد",
+      "count_one": "شخص واحد",
+      "count_two": "شخصان",
+      "count_few": "{{count}} أشخاص",
+      "count_many": "{{count}} شخصًا",
+      "count_other": "{{count}} شخص",
+      "search": "ابحث في الفريق",
+      "noMatch": "لا تطابق"
+    }
   }
 }

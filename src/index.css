@@ -1507,6 +1507,60 @@
   background-size: 200% 100%;
 }
 
+/* A table refreshing in place (KICKOFF §3.5 Skeletons, §6.0 "Table refresh";
+   the prototype's `[data-fetch~="table"]` rows, H:269): inside the rows every
+   leaf text run (screen-reader text aside) becomes a flat `muted-strong` bar
+   0.72em tall, `rounded-md`, its width cycling 64 / 48 / 60% down the rows; an
+   icon nothing; an avatar a plain disc without its badge. Group headers stay,
+   like the column header. `data-refreshing` is `DataTable`'s rowgroup alone,
+   so every room's table shares the rule — kept short: it ships in the
+   first-paint CSS. */
+[data-refreshing] > [data-slot='data-table-row'] {
+  --refresh-bar: 64%;
+}
+[data-refreshing] > [data-slot='data-table-row']:nth-child(3n + 2) {
+  --refresh-bar: 48%;
+}
+[data-refreshing] > [data-slot='data-table-row']:nth-child(3n) {
+  --refresh-bar: 60%;
+}
+[data-refreshing]
+  > [data-slot='data-table-row']
+  :where(span, a, button, p, time):not(:has(:not(.sr-only))):not(:empty):not(
+    .sr-only,
+    [data-slot='avatar-fallback']
+  ) {
+  display: inline-block;
+  width: var(--refresh-bar);
+  min-width: 18px;
+  max-width: calc(100% - 4px);
+  height: 0.72em;
+  margin-block: 0.28em;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-muted-strong);
+  color: transparent;
+  line-height: 0.72em;
+  white-space: nowrap;
+  text-decoration-color: transparent;
+  vertical-align: middle;
+}
+[data-refreshing] > [data-slot='data-table-row'] svg {
+  opacity: 0;
+}
+[data-refreshing] > [data-slot='data-table-row'] [data-slot='avatar-fallback'] {
+  background-color: var(--color-muted-strong);
+  color: transparent;
+}
+[data-refreshing]
+  > [data-slot='data-table-row']
+  [data-slot='person-avatar']
+  [data-slot='pill'] {
+  visibility: hidden;
+}
+
 /* Elevation shown under a sticky header once content scrolls beneath it.
    Mode-aware via `--color-foreground` (which flips with .dark): a soft dark
    shadow on the light surface, and a faint light separator on the dark surface —

@@ -18,6 +18,7 @@ import {
   usePlatformRoles,
   useRemoveStaffProfile,
   useSaveStaffProfile,
+  useStaffProfiles,
   useTeam,
 } from './useTeam.ts';
 
@@ -255,5 +256,14 @@ describe('useMyStaffProfile', () => {
     const { result } = renderHook(() => useMyStaffProfile(), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toBeNull();
+  });
+});
+
+describe('useStaffProfiles', () => {
+  it('reads every live staff profile into the one cache entry the Team joins', async () => {
+    const { result } = renderHook(() => useStaffProfiles(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.some((profile) => profile.seq === 12)).toBe(true);
+    expect(client.getQueryData(['clinic', 'staff', 'profiles'])).toBe(result.current.data);
   });
 });

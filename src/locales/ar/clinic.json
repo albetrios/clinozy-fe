@@ -73,6 +73,14 @@
       "referral": "إحالة",
       "retarget": "إعادة استهداف",
       "phone_call": "مكالمة هاتفية"
+    },
+    "interests": {
+      "others": "أخرى",
+      "clinical": "علاجي",
+      "peel": "تقشير",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

@@ -47,6 +47,12 @@ export interface DataTableColumnMeta {
   /** Hidden by default — the column chooser's recommended set hides it. */
   defaultHidden?: boolean;
   /**
+   * The header's first click sorts descending and the next clears it —
+   * "newest first → off" (Leads' Updated, H:6147) — instead of ascending →
+   * descending → off.
+   */
+  sortStartsDescending?: boolean;
+  /**
    * The cell's text for the meta line and the phone key. Defaults to the
    * accessor value (a string, number or list of strings); return `null` for a
    * cell that folds to nothing.

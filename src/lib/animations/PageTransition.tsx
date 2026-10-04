@@ -1,10 +1,17 @@
 import { useLocation } from '@tanstack/react-router';
 import { type ReactNode, useRef } from 'react';
 
+import { cn } from '@/lib/utils.ts';
+
 import { useReplayedAnimation } from './useReplayedAnimation.ts';
 
 interface PageTransitionProps {
   children: ReactNode;
+  /**
+   * Extra classes for the wrapper — a flush room's main passes a bounded flex
+   * column, so the room's own list scrolls inside it (its header stays).
+   */
+  className?: string;
 }
 
 /** The keyframe class. Added imperatively so React never fights over it. */
@@ -18,14 +25,14 @@ const ROUTE_ANIMATION_CLASS = 'animate-fade-in-up';
  * The animation restarts on the SAME element — see {@link useReplayedAnimation}
  * for why a `key` is the wrong tool and what it used to cost here (SHELL-6).
  */
-export function PageTransition({ children }: PageTransitionProps) {
+export function PageTransition({ children, className }: PageTransitionProps) {
   const { pathname } = useLocation();
   const ref = useRef<HTMLDivElement>(null);
 
   useReplayedAnimation(ref, ROUTE_ANIMATION_CLASS, pathname);
 
   return (
-    <div ref={ref} data-route={pathname} className="text-foreground">
+    <div ref={ref} data-route={pathname} className={cn('text-foreground', className)}>
       {children}
     </div>
   );

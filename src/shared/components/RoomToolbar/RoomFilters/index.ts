@@ -11,6 +11,8 @@ export {
   type RoomDateFilterProps,
   type RoomFilterCopy,
   type RoomFilterOption,
+  type RoomFilterPeopleCopy,
+  type RoomFilterPerson,
   RoomFilters,
   RoomFiltersClear,
   type RoomFiltersProps,

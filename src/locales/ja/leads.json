@@ -11,5 +11,70 @@
     "claimedUnowned": "{{name}} の担当になりました",
     "released": "チームに開放しました · 誰でも引き受けられます",
     "assigned": "{{name}} が担当になりました · 通知済み"
+  },
+  "list": {
+    "records": "リード",
+    "views": {
+      "label": "リードの表示",
+      "mine": "自分",
+      "unread": "未返信",
+      "all": "すべて",
+      "unreadCount_other": "未返信 {{count}} 件"
+    },
+    "search": {
+      "placeholder": "名前・電話番号・#ID で検索",
+      "label": "リードを検索"
+    },
+    "newLead": "新規リード",
+    "columns": {
+      "lead": "リード",
+      "status": "ステータス",
+      "source": "流入元",
+      "interests": "関心",
+      "team": "チーム",
+      "updated": "更新"
+    },
+    "empty": "一致するリードはありません",
+    "clearFilters": "フィルターをクリア",
+    "moreInterests_other": "他 {{count}} 件: {{list}}",
+    "updated": {
+      "justNow": "たった今",
+      "minutes_other": "{{count}} 分前",
+      "hours_other": "{{count}} 時間前",
+      "yesterday": "昨日",
+      "days_other": "{{count}} 日前",
+      "weeks_other": "{{count}} 週間前"
+    }
+  },
+  "team": {
+    "claim": "開放中 · 引き受ける",
+    "join": "チームに開放 · 参加",
+    "openMine": "チームに開放",
+    "claimHint_other": "{{count}} 日間動きなし · 誰でも引き受けられます",
+    "joinHint": "{{name}} はクリニックを離れました · チームの誰でも参加して引き受けられます",
+    "releasesToday": "誰もフォローしなければ今日チームに開放されます",
+    "releasesTomorrow": "誰もフォローしなければ明日チームに開放されます",
+    "claimFirst": "{{first}} を引き受ける",
+    "joinTake": "参加 · {{first}} を引き受ける",
+    "takeOver": "{{first}} から引き継ぐ"
+  },
+  "filters": {
+    "status": "ステータス",
+    "source": "流入元 · 複数選択可",
+    "clear": "クリア",
+    "hold": {
+      "label": "担当 · 無活動日数後の保持",
+      "any": "すべて",
+      "open": "引き受け可能",
+      "soon": "今日開放",
+      "held": "保持中"
+    },
+    "team": {
+      "label": "チーム · 担当または関与",
+      "anyone": "チームの誰でも",
+      "count_other": "{{count}} 人",
+      "search": "チームを検索",
+      "noMatch": "一致なし"
+    }
   }
 }

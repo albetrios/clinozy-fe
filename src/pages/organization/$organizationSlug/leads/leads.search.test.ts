@@ -12,7 +12,6 @@ import {
 } from '@/shared/api/clinic/leads-contracts.ts';
 
 import {
-  leadListParamsOf,
   LEADS_SEARCH_DEFAULTS,
   validateLeadCreateSearch,
   validateLeadsSearch,
@@ -134,44 +133,5 @@ describe('validateLeadCreateSearch — the New lead prefill (S:23)', () => {
       phone: undefined,
     });
     expect(validateLeadCreateSearch({})).toEqual({ name: undefined, phone: undefined });
-  });
-});
-
-describe('leadListParamsOf — the URL as the list read', () => {
-  it('applies the defaults: the viewer’s own leads, newest first', () => {
-    expect(leadListParamsOf(validateLeadsSearch({}), STAFF)).toEqual({
-      view: 'mine',
-      viewerId: STAFF,
-      q: undefined,
-      status: undefined,
-      source: undefined,
-      hold: undefined,
-      owner: undefined,
-      created: undefined,
-      followUp: undefined,
-      sort: undefined,
-      order: undefined,
-    });
-  });
-
-  it('hands the contract its shapes: one status as a list, the sort split from its direction', () => {
-    expect(
-      leadListParamsOf(
-        validateLeadsSearch({
-          view: 'all',
-          status: 'new',
-          sort: 'status:desc',
-          q: 'rhea',
-        }),
-        null,
-      ),
-    ).toMatchObject({
-      view: 'all',
-      viewerId: null,
-      status: ['new'],
-      sort: 'status',
-      order: 'desc',
-      q: 'rhea',
-    });
   });
 });

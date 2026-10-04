@@ -14,6 +14,7 @@ import {
   createLead,
   deleteLead,
   fetchLead,
+  fetchLeadViewer,
   findOpenLeadByPhone,
   leadQueryKeys,
   listLeads,
@@ -203,6 +204,21 @@ describe('the Unreplied count', () => {
   });
 });
 
+describe('the Leads room’s viewer (fetchLeadViewer)', () => {
+  it('reads the member by sign-in email, ignoring case and spaces', async () => {
+    expect((await fetchLeadViewer(' Nidhi@Cresence.SKIN '))?.id).toBe(NK);
+    expect(leadQueryKeys.viewer('nidhi@cresence.skin').slice(0, 2)).toEqual(
+      leadQueryKeys.all,
+    );
+  });
+
+  it('falls back to the fixture server’s own member — never nobody', async () => {
+    expect((await fetchLeadViewer('someone@else.test'))?.id).toBe(RS);
+    expect((await fetchLeadViewer('  '))?.id).toBe(RS);
+    expect((await fetchLeadViewer(null))?.id).toBe(RS);
+  });
+});
+
 describe('createLead (S:1593)', () => {
   it('creates from a name and a mobile — New, from WhatsApp, its hold starting now', async () => {
     const created = await createLead({ name: '  Hetal Parmar ', phone: '+919898012345' });
@@ -251,6 +267,28 @@ describe('createLead (S:1593)', () => {
       involvedIds: [NK],
       interests: ['lhr'],
       customInterests: ['Acne scars', 'Under-eye'],
+    });
+  });
+
+  it('keeps the contact’s numbers and handles, its first number the lead’s mobile', async () => {
+    const created = await createLead({
+      name: 'Rhea Shah',
+      phone: '+919898012345',
+      contact: {
+        phones: [
+          { phone: '+919712300001', whatsapp: true },
+          { phone: '+919712300002', whatsapp: false },
+        ],
+        instagram: ['@rhea'],
+        defaultChannel: 'call',
+        preferences: ['No calls'],
+      },
+    });
+    expect(created.phone).toBe('+919712300001');
+    expect(created.contact).toMatchObject({
+      phones: [{ whatsapp: true }, { phone: '+919712300002', whatsapp: false }],
+      instagram: ['@rhea'],
+      defaultChannel: 'call',
     });
   });
 
@@ -364,6 +402,22 @@ describe('updateLead (S:1594)', () => {
       status: null,
       isContactThread: true,
     });
+  });
+
+  it('keeps the mobile and the contact’s first number one number, either way in', async () => {
+    // #2365 is Rhea's, on two numbers (H:3382).
+    const moved = await updateLead(ref.lead(2365), { phone: '+919712300003' });
+    expect(moved.contact?.phones.map((entry) => entry.phone)).toEqual([
+      '+919712300003',
+      '+919099055120',
+    ]);
+    const edited = await updateLead(ref.lead(2365), {
+      contact: {
+        ...moved.contact!,
+        phones: [{ phone: '+919712300004', whatsapp: true }],
+      },
+    });
+    expect(edited.phone).toBe('+919712300004');
   });
 
   it('answers 404 for a lead that is gone', async () => {

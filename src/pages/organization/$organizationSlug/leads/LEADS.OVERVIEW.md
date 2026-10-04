@@ -4,7 +4,28 @@ Route: `/organization/$organizationSlug/leads`. Enquiries and their conversation
 
 Gated like every clinic room: membership (`organization:read`) and the `clinic-leads`
 module, then `requireOrgStatus`; in-room View / Create / Edit / Delete come from
-`useClinicAccess` (KICKOFF §3.7). The list screen is built in its own ledger row (L-33b).
+`useClinicAccess` (KICKOFF §3.7).
+
+## The list (L-33b)
+
+The toolbar (`RoomToolbar`, layout `leads`) over the shared `DataTable`:
+
+- **Views** Mine · Unreplied · All — Mine first and the default (kept out of the URL);
+  Unreplied carries the viewer's unread count. "Mine" is the signed-in member as
+  `useLeadViewer` reads them, and the list waits for them.
+- **Search** name, phone, `#ID`; **Filters** Status · Source · Ownership (the hold:
+  open, releasing today, held) · Team (a people picker — owner or involved) · Created ·
+  Follow-up date, applied on "Apply filter" to the URL; Leads keeps no saved views;
+  **Columns** Lead (always shown) · Status · Source · Interests · Team · Updated.
+- **Rows** (53px; the phone `wrap` layout below `md`): the person card on the name
+  (bold while unread), the status/source/interest pills, the owner with presence and
+  the hold dot, the involved people, "Updated" in words. An open lead's row offers
+  "Open to team · Claim" (or "Join" when the owner is gone) — the claim lands with
+  Undo; the open lead's row stays marked. j/k walk the rows; 50 at a time with
+  infinite scroll; the text turns to bars while a new query loads, and a failed page
+  says so ("Couldn’t load this list …" + "Retry"), its rows kept.
+- **Sort** from the headers through the URL (`sort=<column>:<direction>`); "Updated"
+  starts newest first.
 
 ## Dialog routes
 
@@ -25,18 +46,25 @@ The data is the shared leads domain: `@/shared/api/clinic/leads-api.ts` (fixture
 
 ## Files
 
-| File                         | Responsibility                                                                                                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `leads.route.tsx`            | Route marker — exports `Component` rendering `LeadsPage`.                                                                                                                               |
-| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `clinic-leads`, nav section `leads`.                                                    |
-| `leads.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `status`, `source`, `hold`, `owner`, `created`, `followUp`, `sort`; the New lead prefill; `leadListParamsOf` for the list read. |
-| `leads.constants.ts`         | `LEADS_NS` / `LEADS_KEYS` (the `leads` namespace).                                                                                                                                      |
-| `LeadsPage.tsx`              | Room page — reads the dialog routes, hosts their `Outlet`. Owns `data-testid="leads-page"`.                                                                                             |
-| `hooks/useLeadsDialogRoute/` | Which dialog the URL opens: none, New lead with its prefill, or the lead (resolved by `useDialogRouteRecord`).                                                                          |
-| `__tests__/integration/`     | The dialog routes end to end on the page; `__tests__/integration/leads-test-router.tsx` mirrors the family's routes for the tests.                                                      |
-| `create/`, `$leadId/`        | The dialog-route islands — see their overviews.                                                                                                                                         |
+| File                         | Responsibility                                                                                                                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `leads.route.tsx`            | Route marker — exports `Component` rendering `LeadsPage`.                                                                                                                                            |
+| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `clinic-leads`, nav section `leads`.                                                                 |
+| `leads.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `status`, `source`, `hold`, `owner`, `created`, `followUp`, `sort`; the New lead prefill.                                                    |
+| `leads.constants.ts`         | `LEADS_NS` / `LEADS_KEYS` (the `leads` namespace).                                                                                                                                                   |
+| `LeadsPage.tsx`              | Room page — the toolbar over the list; claims, opens (marking read) and starts New lead; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="leads-page"`.                          |
+| `components/LeadFields/`     | A lead's pills (status, source, interests "+N"), the source icons and order, the people (`staffPerson`, the team card) and the person card's data (`leadContactCardData`).                           |
+| `components/LeadsTable/`     | The list's columns (`useLeadsTable`), cells (person, team with the hold dot, "Updated"), the claim pill and the table itself — the shared `DataTable`.                                               |
+| `components/LeadsToolbar/`   | Views, search, Filters (`components/LeadsToolbar/leads-filter-fields.ts`), Columns and "New lead".                                                                                                   |
+| `hooks/useLeadsList/`        | The URL's view, search, filters and sort read against the viewer (`hooks/useLeadsList/lead-list-params.ts`, kept off the entry chunk); the list, the team, the Unreplied count; the URL writes.      |
+| `hooks/useLeadsDialogRoute/` | Which dialog the URL opens: none, New lead with its prefill, or the lead (resolved by `useDialogRouteRecord`).                                                                                       |
+| `__tests__/integration/`     | The list and the dialog routes end to end on the page; `__tests__/integration/leads-test-router.tsx` mirrors the family's routes, `__tests__/integration/leads-test-data.ts` builds staff and leads. |
+| `create/`, `$leadId/`        | The dialog-route islands — see their overviews.                                                                                                                                                      |
 
 ## Test ids
 
-`leads-page`; the drawers the dialog routes open: `new-lead-drawer` (L-35), `lead-drawer`
-(L-34b).
+`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the shared toolbar's and
+table's under the `leads` table id (`leads-toolbar`, `leads-tab-<view>`, `leads-search`,
+`leads-filters-trigger`, `leads-columns-trigger`, `leads-new-lead`, `leads-fab`,
+`leads-table-row` …); the drawers the dialog routes open: `new-lead-drawer` (L-35),
+`lead-drawer` (L-34b).

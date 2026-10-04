@@ -73,6 +73,14 @@
       "referral": "추천",
       "retarget": "재방문 유도",
       "phone_call": "전화"
+    },
+    "interests": {
+      "others": "기타",
+      "clinical": "임상",
+      "peel": "필링",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

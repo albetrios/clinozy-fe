@@ -65,6 +65,24 @@ describe('DataTable', () => {
     rerender(<Empty empty={<p>No patients match</p>} />);
     expect(screen.getByText('No patients match')).toBeInTheDocument();
   });
+
+  it("keeps the open record's row on the muted fill", () => {
+    function Active() {
+      const table = useTable({
+        features: dataTableFeatures,
+        data: DATA,
+        columns: COLUMNS,
+      });
+      return (
+        <DataTable table={table} isRowActive={(row) => row.original.name === 'Grace'} />
+      );
+    }
+    render(<Active />);
+    const rows = screen.getAllByTestId('data-table-row');
+    expect(rows[1]).toHaveAttribute('data-active', 'true');
+    expect(rows[1]?.className).toContain('data-[active=true]:bg-muted');
+    expect(rows[0]).not.toHaveAttribute('data-active');
+  });
 });
 
 interface Person {
@@ -794,9 +812,12 @@ describe('DataTable — refresh (KICKOFF §6.0)', () => {
       <Room data={[patient(1)]} onRowClick={onRowClick} refreshing />,
     );
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByTestId('patients-table-row').className).toContain(
-      'pointer-events-none',
-    );
+    // The rows' rowgroup carries the pause and the bars (one `index.css` rule).
+    const rowgroup = screen
+      .getByTestId('patients-table-row')
+      .closest('[data-slot="data-table-body"]');
+    expect(rowgroup).toHaveAttribute('data-refreshing', 'true');
+    expect(rowgroup?.className).toContain('pointer-events-none');
 
     rerender(<Room data={[patient(1)]} onRowClick={onRowClick} />);
     expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');

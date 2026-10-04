@@ -152,6 +152,10 @@ describe('PersonCard on a pointer that hovers', () => {
     render(<Card data={{ name: 'Rhea Shah' }} />);
     expect(trigger()).toHaveAttribute('data-slot', 'person-card-trigger');
     expect(trigger()).toHaveClass('hover:bg-muted', 'rounded-lg');
+    // The plate's 14px of padding never comes out of the chip: a name or a
+    // mobile runs to the cell's edge before it is cut.
+    expect(trigger()).toHaveClass('max-w-[calc(100%+0.875rem)]');
+    expect(trigger()).not.toHaveClass('max-w-full');
   });
 
   it('has no accessibility violations when open', async () => {

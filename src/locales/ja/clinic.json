@@ -73,6 +73,14 @@
       "referral": "紹介",
       "retarget": "再アプローチ",
       "phone_call": "電話"
+    },
+    "interests": {
+      "others": "その他",
+      "clinical": "クリニカル",
+      "peel": "ピーリング",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
     }
   },
   "appointments": {

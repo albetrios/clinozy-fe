@@ -20,6 +20,10 @@ export interface PersonChipProps extends Omit<ComponentProps<'span'>, 'children'
   tone: Tone;
   /** Adds the 14px "P" badge (and says "Patient" to a screen reader). */
   patient?: boolean;
+  /** An unread record: the name at 600 (the Leads list, `leads.md:32`). */
+  emphasis?: boolean;
+  /** The sub line's size: 12px (default) or 11.5px (`caption`, the Leads mobile, H:1734). */
+  subSize?: 'xs' | 'caption';
 }
 
 /**
@@ -33,6 +37,8 @@ export function PersonChip({
   initials,
   tone,
   patient = false,
+  emphasis = false,
+  subSize = 'xs',
   className,
   ...props
 }: PersonChipProps) {
@@ -49,12 +55,22 @@ export function PersonChip({
         patient={patient}
       />
       <span className="flex min-w-0 flex-col text-start">
-        <span className="text-body truncate leading-[1.3] font-medium">
+        <span
+          className={cn(
+            'text-body truncate leading-[1.3]',
+            emphasis ? 'font-semibold' : 'font-medium',
+          )}
+        >
           {name}
           {patient ? <span className="sr-only">, {t(CELLS_KEYS.patient)}</span> : null}
         </span>
         {sub ? (
-          <span className="text-muted-foreground truncate text-xs leading-[1.3] tabular-nums">
+          <span
+            className={cn(
+              'text-muted-foreground truncate leading-[1.3] tabular-nums',
+              subSize === 'caption' ? 'text-caption' : 'text-xs',
+            )}
+          >
             {sub}
           </span>
         ) : null}

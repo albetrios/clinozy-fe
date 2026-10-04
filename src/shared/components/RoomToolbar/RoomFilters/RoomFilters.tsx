@@ -19,7 +19,11 @@ import {
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { TONE_CLASSES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
-import { TonePill } from '@/shared/components/Cells/index.ts';
+import {
+  PersonAvatar,
+  personInitials,
+  TonePill,
+} from '@/shared/components/Cells/index.ts';
 import {
   TABLE_KEYS,
   TABLE_NS,
@@ -34,10 +38,18 @@ import {
 } from '@/shared/components/RoomToolbar/room-toolbar.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { savedViewName, useSavedViews } from '@/shared/hooks/useSavedViews/index.ts';
-import { type AppIcon, ListFilter, X } from '@/shared/icons/index.ts';
+import {
+  type AppIcon,
+  Check,
+  ChevronDown,
+  ListFilter,
+  Search,
+  X,
+} from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
+  clearRoomFilter,
   dateRangeEnds,
   isDateRange,
   type RoomDateFilterKind,
@@ -61,14 +73,43 @@ export interface RoomFilterOption {
   icon?: AppIcon;
 }
 
-/** An options filter's copy: the section label and each value's chip. */
+/** One team member a `people` filter lists. */
+export interface RoomFilterPerson {
+  /** The record id the URL holds. */
+  id: string;
+  name: string;
+  /** Defaults to the name's initials. */
+  initials?: string;
+  tone: Tone;
+  /** Their role, as shown under the name ("Front desk"). */
+  role: string;
+}
+
+/** A `people` filter's team and words (the Leads "Team", H:1711–1718). */
+export interface RoomFilterPeopleCopy {
+  members: readonly RoomFilterPerson[];
+  /** The picker with nobody picked ("Anyone on the team"). */
+  anyone: string;
+  /** The picker with two or more picked ("3 people"). */
+  count: (count: number) => string;
+  /** The list's search field ("Search team"). */
+  search: string;
+  /** The list when the search matches nobody ("No match"). */
+  noMatch: string;
+}
+
+/** A filter's copy: the section label, each value's chip, or a people filter's team. */
 export interface RoomFilterCopy {
   /** The section label ("Status"; shown uppercase). */
   label: string;
-  /** Each value's chip, by value. */
+  /** Each value's chip, by value (`{}` for a people filter). */
   options: Readonly<Record<string, RoomFilterOption>>;
   /** A single-pick filter's default chip ("All", "Any"), picked while nothing is. */
   anyLabel?: string;
+  /** A "Clear" link at the section label's end while the section has picks. */
+  clearLabel?: string;
+  /** A `people` filter's team and words. */
+  people?: RoomFilterPeopleCopy;
 }
 
 /** Props for {@link RoomFilters}. */
@@ -130,25 +171,45 @@ export function FilterChip({
   );
 }
 
-/** A section: its 11px uppercase label over a wrapping row of chips. */
+/**
+ * A section: its 11px uppercase label — with a "Clear" link at its end while
+ * the section has picks — over a wrapping row of chips.
+ */
 function FilterSection({
   label,
   children,
   after,
+  onClear,
+  clearLabel,
 }: {
   label: string;
   children: ReactNode;
   after?: ReactNode;
+  /** The section has picks; its copy names the "Clear" link. */
+  onClear?: () => void;
+  clearLabel?: string;
 }) {
   const labelId = useId();
   return (
     <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
-      <span
-        id={labelId}
-        className="text-micro text-muted-foreground leading-[1.2] font-semibold tracking-[0.05em] uppercase"
-      >
-        {label}
-      </span>
+      <div className="flex items-center justify-between gap-2">
+        <span
+          id={labelId}
+          className="text-micro text-muted-foreground leading-[1.2] font-semibold tracking-[0.05em] uppercase"
+        >
+          {label}
+        </span>
+        {onClear && clearLabel ? (
+          <button
+            type="button"
+            data-slot="filters-section-clear"
+            onClick={onClear}
+            className="text-caption text-muted-foreground hover:text-foreground rounded-sm leading-tight transition-colors"
+          >
+            {clearLabel}
+          </button>
+        ) : null}
+      </div>
       <div className="flex flex-wrap gap-1.5">{children}</div>
       {after}
     </div>
@@ -339,7 +400,15 @@ function OptionsSection({
 }) {
   const picked = values[fieldKey] ?? [];
   return (
-    <FilterSection label={copy?.label ?? fieldKey}>
+    <FilterSection
+      label={copy?.label ?? fieldKey}
+      clearLabel={copy?.clearLabel}
+      onClear={
+        picked.length > 0
+          ? () => onChange((pending) => clearRoomFilter(pending, fieldKey))
+          : undefined
+      }
+    >
       {field.single && copy?.anyLabel ? (
         <FilterChip
           label={copy.anyLabel}
@@ -374,6 +443,188 @@ function OptionsSection({
           />
         );
       })}
+    </FilterSection>
+  );
+}
+
+/** The picker's label: anyone, the one person picked, or how many. */
+function peopleLabel(
+  copy: RoomFilterPeopleCopy,
+  picked: readonly RoomFilterPerson[],
+  pickedCount: number,
+): string {
+  if (pickedCount === 0) return copy.anyone;
+  if (pickedCount === 1 && picked[0]) return picked[0].name;
+  return copy.count(pickedCount);
+}
+
+/** One team member's row: the 28px avatar, name and role, the 24px check box. */
+function PersonRow({
+  person,
+  picked,
+  onToggle,
+}: {
+  person: RoomFilterPerson;
+  picked: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={picked}
+      data-slot="filters-person"
+      onClick={onToggle}
+      className={cn(
+        'text-foreground hover:bg-muted grid grid-cols-[1.75rem_minmax(0,1fr)_1.5rem] items-center gap-2 rounded-lg px-1.5 py-1.25 text-start transition-colors duration-120',
+        picked && 'bg-canvas',
+      )}
+    >
+      <PersonAvatar
+        size="list"
+        initials={person.initials ?? personInitials(person.name)}
+        tone={person.tone}
+        selected={picked}
+      />
+      <span className="flex min-w-0 flex-col leading-[1.25]">
+        <span className="text-body truncate font-medium">{person.name}</span>
+        {/* The space keeps the name and the role apart in the accessible name. */}{' '}
+        <span className="text-micro text-muted-foreground truncate">{person.role}</span>
+      </span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'flex size-6 items-center justify-center rounded-md border',
+          picked
+            ? 'bg-primary border-primary text-primary-foreground'
+            : 'bg-background border-border-strong',
+        )}
+      >
+        {picked ? <Check className="size-3" /> : null}
+      </span>
+    </button>
+  );
+}
+
+/**
+ * A people section (the Leads "Team · assigned or involved", H:1711–1718): a
+ * 36px picker — the picked people's 18px avatars and "Anyone on the team",
+ * the one name or "<n> people" — that expands an inline list: a "Search team"
+ * field, then each member with a 24px check box, "No match" when the search
+ * finds nobody. Any number may be picked; "Clear" empties the section.
+ */
+function PeopleSection({
+  fieldKey,
+  copy,
+  values,
+  onChange,
+}: {
+  fieldKey: string;
+  copy: RoomFilterCopy | undefined;
+  values: RoomFilterValues;
+  onChange: Dispatch<SetStateAction<RoomFilterValues>>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const listId = useId();
+  const people = copy?.people;
+  if (!(copy && people)) return null;
+  const picked = values[fieldKey] ?? [];
+  const pickedPeople = people.members.filter((member) => picked.includes(member.id));
+  const needle = query.trim().toLowerCase();
+  const listed = needle
+    ? people.members.filter((member) =>
+        `${member.name} ${member.role}`.toLowerCase().includes(needle),
+      )
+    : people.members;
+  const toggle = (id: string) =>
+    onChange((pending) => toggleRoomFilterOption(pending, fieldKey, id));
+
+  return (
+    <FilterSection
+      label={copy.label}
+      clearLabel={copy.clearLabel}
+      onClear={
+        picked.length > 0
+          ? () => onChange((pending) => clearRoomFilter(pending, fieldKey))
+          : undefined
+      }
+    >
+      <div className="flex w-full min-w-0 flex-col">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={listId}
+          data-slot="filters-people-trigger"
+          onClick={() => setOpen((current) => !current)}
+          className="bg-background text-body hover:bg-canvas flex h-9 w-full min-w-0 items-center gap-1.5 rounded-lg border ps-1.5 pe-2.5 text-start shadow-(--elevation-control) transition-colors"
+        >
+          {pickedPeople.length > 0 ? (
+            <span className="flex flex-none items-center ps-0.5">
+              {pickedPeople.slice(0, 3).map((member) => (
+                <PersonAvatar
+                  key={member.id}
+                  size="line"
+                  initials={member.initials ?? personInitials(member.name)}
+                  tone={member.tone}
+                  className="-me-1.5"
+                />
+              ))}
+            </span>
+          ) : null}
+          <span
+            className={cn(
+              'min-w-0 truncate',
+              pickedPeople.length > 0
+                ? 'text-foreground ms-2'
+                : 'text-muted-foreground ms-1',
+            )}
+          >
+            {peopleLabel(people, pickedPeople, picked.length)}
+          </span>
+          <ChevronDown
+            aria-hidden="true"
+            className={cn(
+              'text-muted-foreground ms-auto size-3.5 flex-none transition-transform duration-150',
+              open && 'rotate-180',
+            )}
+          />
+        </button>
+        {open ? (
+          <div
+            id={listId}
+            data-slot="filters-people-list"
+            className="bg-background mt-1.5 flex flex-col overflow-hidden rounded-lg border"
+          >
+            <div className="text-muted-foreground flex h-8.5 items-center gap-2 border-b px-2.5">
+              <Search aria-hidden="true" className="size-3.75 flex-none" />
+              <input
+                type="search"
+                value={query}
+                maxLength={80}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={people.search}
+                aria-label={people.search}
+                className="text-body text-foreground placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent outline-none"
+              />
+            </div>
+            <div className="flex max-h-55 flex-col gap-0.5 overflow-auto p-1">
+              {listed.map((member) => (
+                <PersonRow
+                  key={member.id}
+                  person={member}
+                  picked={picked.includes(member.id)}
+                  onToggle={() => toggle(member.id)}
+                />
+              ))}
+              {listed.length === 0 ? (
+                <span className="text-detail text-muted-foreground p-2">
+                  {people.noMatch}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </div>
     </FilterSection>
   );
 }
@@ -418,6 +669,11 @@ export function RoomFilters({
     const field = fields[key];
     if (!field) return null;
     if (field.kind === 'options') return copy[key]?.options[value]?.label ?? value;
+    if (field.kind === 'people') {
+      return (
+        copy[key]?.people?.members.find((member) => member.id === value)?.name ?? null
+      );
+    }
     const keys = DATE_FILTER_KEYS[field.presets];
     if (isDateRange(value)) return t(keys.range);
     const presetKeys: Readonly<Record<string, string>> = keys.presets;
@@ -492,6 +748,17 @@ export function RoomFilters({
                     key={key}
                     fieldKey={key}
                     kind={field.presets}
+                    values={pending}
+                    onChange={setPending}
+                  />
+                );
+              }
+              if (field.kind === 'people') {
+                return (
+                  <PeopleSection
+                    key={key}
+                    fieldKey={key}
+                    copy={copy[key]}
                     values={pending}
                     onChange={setPending}
                   />

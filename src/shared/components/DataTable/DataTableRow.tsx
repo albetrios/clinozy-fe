@@ -14,7 +14,6 @@ import {
   type DataTableRowAction,
   DataTableRowActions,
 } from '@/shared/components/DataTableRowActions/index.ts';
-import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox.tsx';
 
 import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
@@ -44,7 +43,7 @@ const ROW_EDGE: Record<Tone, string> = {
 
 // Hover `bg-canvas` 120ms, a muted hairline, the j / k focus bar (H:267, H:683).
 const ROW_BASE =
-  'group/row bg-card text-body relative border-s-3 border-b border-b-muted py-(--table-row-pad-y) ps-(--table-pad-start) pe-(--table-pad-x) transition-colors duration-120 outline-none hover:bg-canvas data-[selected=true]:bg-muted data-[kfocus=true]:bg-canvas data-[kfocus=true]:shadow-[inset_2px_0_0_var(--color-border-strong)] rtl:data-[kfocus=true]:shadow-[inset_-2px_0_0_var(--color-border-strong)]';
+  'group/row bg-card text-body relative border-s-3 border-b border-b-muted py-(--table-row-pad-y) ps-(--table-pad-start) pe-(--table-pad-x) transition-colors duration-120 outline-none hover:bg-canvas data-[selected=true]:bg-muted data-[active=true]:bg-muted data-[kfocus=true]:bg-canvas data-[kfocus=true]:shadow-[inset_2px_0_0_var(--color-border-strong)] rtl:data-[kfocus=true]:shadow-[inset_-2px_0_0_var(--color-border-strong)]';
 
 /**
  * On the grid: on one grid with the header; on a phone: per layout (H:65,
@@ -85,12 +84,12 @@ export interface RowContext<TData extends RowData> {
   selection: TableSelection<TData>;
   onRowClick?: (row: TableRow<TData>) => void;
   getRowTone?: (row: TableRow<TData>) => Tone | undefined;
+  /** The open record's row keeps the `muted` fill. */
+  isRowActive?: (row: TableRow<TData>) => boolean;
   keyboardNav: boolean;
   focusIndex: number | null;
   /** `aria-rowindex` of the first body row. */
   firstRowIndex: number;
-  /** The rows are the previous params' while new ones load: bars, no clicks. */
-  refreshing: boolean;
 }
 
 /** The folded columns under the primary cell: "<label> <value>" items (H:692). */
@@ -427,6 +426,7 @@ export function DataTableRow<TData extends RowData>({
       data-index={entryIndex}
       data-row-index={index}
       data-selected={(context.selection.enabled && row.getIsSelected()) || undefined}
+      data-active={context.isRowActive?.(row) || undefined}
       data-kfocus={context.focusIndex === index || undefined}
       data-testid={TABLE_TEST_IDS.row(context.prefix)}
       aria-rowindex={entryIndex + context.firstRowIndex}
@@ -440,7 +440,6 @@ export function DataTableRow<TData extends RowData>({
         rowLayoutClass(context),
         tone ? ROW_EDGE[tone] : 'border-s-transparent',
         onRowClick && 'cursor-pointer',
-        context.refreshing && SKELETON_IN_PLACE,
       )}
     >
       <RowCells row={row} index={index} context={context} />

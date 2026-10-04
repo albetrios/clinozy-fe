@@ -32,6 +32,8 @@ import {
   type LeadHold,
   leadHold,
 } from './leads-hold.ts';
+import { fetchMyStaffProfile } from './users-api.ts';
+import type { StaffProfile } from './users-contracts.ts';
 
 /*
  * The Leads domain's reads and writes (`S:1584–1597`), on the fixture world
@@ -45,6 +47,8 @@ import {
 /** TanStack Query keys for the leads. */
 export const leadQueryKeys = {
   all: ['clinic', 'leads'] as const,
+  /** The signed-in member as the Leads room reads them, by sign-in email. */
+  viewer: (email: string | null) => [...leadQueryKeys.all, 'viewer', email] as const,
   /** Every list variant — a write invalidates them all. */
   lists: () => [...leadQueryKeys.all, 'list'] as const,
   list: (params: LeadListParams) => [...leadQueryKeys.lists(), params] as const,
@@ -192,6 +196,29 @@ export function fetchLead(id: string): Promise<LeadRecord> {
 }
 
 /**
+ * The signed-in member as the Leads room reads them — whose leads "Mine" and
+ * "Unreplied" list, who claims, releases and assigns (REPLACE_WITH_API: the
+ * server knows the member from the token). Their staff profile by sign-in
+ * email (`fetchMyStaffProfile`); else the fixture server's own member, so the
+ * room and the fixture server — which sends, claims and moves leads as that
+ * member — agree on "me". Null only when the clinic has neither.
+ */
+export async function fetchLeadViewer(
+  email: string | null,
+): Promise<StaffProfile | null> {
+  const mine = await fetchMyStaffProfile(email);
+  if (mine) return mine;
+  const [{ clinicFixtures }, { FIXTURE_VIEWER_ID }] = await Promise.all([
+    fixtureWorld(),
+    import('./fixtures/staff.fixtures.ts'),
+  ]);
+  return (
+    clinicFixtures.staff.snapshot((profile) => profile.id === FIXTURE_VIEWER_ID)[0] ??
+    null
+  );
+}
+
+/**
  * The Unreplied tab's count chip: the viewer's leads with unread messages (a
  * backend request — the contract has no totals, C31).
  */
@@ -228,11 +255,32 @@ export async function findOpenLeadByPhone(
 const INTEREST_VALUES = new Set<string>(LEAD_INTEREST_VALUES);
 
 /**
+ * The lead's mobile and its contact's first number are one number: a contact
+ * that comes in (`patched`) sets the mobile; a mobile that comes in alone
+ * moves the contact's first number with it.
+ */
+function primaryPhoneAgreed<T extends LeadFields>(
+  fields: T,
+  patched: { contact?: unknown },
+): T {
+  const { contact } = fields;
+  const [first, ...rest] = contact?.phones ?? [];
+  if (!(contact && first)) return fields;
+  if (patched.contact !== undefined) return { ...fields, phone: first.phone };
+  return {
+    ...fields,
+    contact: { ...contact, phones: [{ ...first, phone: fields.phone }, ...rest] },
+  };
+}
+
+/**
  * The plan's save rules: interests once each; custom interests trimmed and
  * once each ignoring case, never one of the six chips again (`leads.md:64`);
- * the owner never also involved; blank notes as none.
+ * the owner never also involved; blank notes as none; the mobile and the
+ * contact's first number one number ({@link primaryPhoneAgreed}).
  */
-function leadDraft<T extends LeadFields>(fields: T): T {
+function leadDraft<T extends LeadFields>(draft: T, patched: { contact?: unknown }): T {
+  const fields = primaryPhoneAgreed(draft, patched);
   const seen = new Set<string>();
   const customInterests = fields.customInterests
     .map((interest) => interest.trim())
@@ -305,12 +353,15 @@ export async function createLead(input: LeadCreateInput): Promise<LeadRecord> {
   const { clinicFixtures } = await fixtureWorld();
   const fields = validateClinicInput(
     leadInputSchema,
-    leadDraft({
-      ...LEAD_DEFAULTS,
-      name: input.name,
-      phone: input.phone,
-      ...definedFields(input),
-    }),
+    leadDraft(
+      {
+        ...LEAD_DEFAULTS,
+        name: input.name,
+        phone: input.phone,
+        ...definedFields(input),
+      },
+      input,
+    ),
   );
   await checkLead(fields, { exceptId: null, phoneChanged: true });
   return clinicFixtures.leads.create({
@@ -340,16 +391,20 @@ export async function updateLead(
 ): Promise<LeadRecord> {
   const { clinicFixtures } = await fixtureWorld();
   const saved = await clinicFixtures.leads.get(id);
-  const merged = { ...saved, ...definedFields(patch) };
+  const patched = definedFields(patch);
+  const merged = { ...saved, ...patched };
   const handover = merged.ownerId !== saved.ownerId;
   const fields = validateClinicInput(
     saved.isContactThread ? leadFieldsSchema : leadInputSchema,
-    leadDraft({
-      ...merged,
-      involvedIds: handover
-        ? involvedAfterHandover(merged.involvedIds, saved.ownerId, merged.ownerId)
-        : merged.involvedIds,
-    }),
+    leadDraft(
+      {
+        ...merged,
+        involvedIds: handover
+          ? involvedAfterHandover(merged.involvedIds, saved.ownerId, merged.ownerId)
+          : merged.involvedIds,
+      },
+      patched,
+    ),
   );
   await checkLead(fields, { exceptId: id, phoneChanged: fields.phone !== saved.phone });
   const touched = handover || (viewerId !== null && viewerId === fields.ownerId);

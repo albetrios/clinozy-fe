@@ -41,6 +41,39 @@ export type LeadRecordSource = z.infer<typeof leadRecordSourceSchema>;
 /** An interest typed into "Add interest" — at most 30 characters (`leads.md:64`). */
 export const customInterestSchema = z.string().trim().min(1).max(30);
 
+/** One of the person's numbers: E.164, and whether they are on WhatsApp on it. */
+export const leadContactPhoneSchema = z.object({
+  phone: phoneSchema,
+  whatsapp: z.boolean(),
+});
+
+/** One of the person's numbers. */
+export type LeadContactPhone = z.infer<typeof leadContactPhoneSchema>;
+
+/** The channels a contact may prefer (`CHS`, H:3362): WhatsApp · Call · SMS · Instagram. */
+export const CONTACT_CHANNEL_VALUES = ['whatsapp', 'call', 'sms', 'instagram'] as const;
+
+/** One default channel. */
+export type ContactChannel = (typeof CONTACT_CHANNEL_VALUES)[number];
+
+/**
+ * The contact editor's fields (`leads.md:92–107`) — not in the contract (C16;
+ * Appendix F, REPLACE_WITH_API): every number, the primary first (it is the
+ * lead's `phone`), each on WhatsApp or not; the Instagram handles; the
+ * default channel; the contact preferences ("No calls", a custom one ≤ 40).
+ * Absent on a record nobody has edited — then the lead's own mobile on
+ * WhatsApp, no handle, WhatsApp, none.
+ */
+export const leadContactSchema = z.object({
+  phones: z.array(leadContactPhoneSchema).min(1).max(5),
+  instagram: z.array(z.string().trim().min(1).max(30)).max(5),
+  defaultChannel: z.enum(CONTACT_CHANNEL_VALUES),
+  preferences: z.array(z.string().trim().min(1).max(40)).max(20),
+});
+
+/** A person's contact fields. */
+export type LeadContact = z.infer<typeof leadContactSchema>;
+
 /**
  * A lead as the rooms read it: the contract's `Lead` (`S:242–266`) plus the
  * plan's fields (Appendix F, REPLACE_WITH_API).
@@ -61,6 +94,8 @@ export const leadRecordSchema = leadSchema.extend({
    * and per-viewer unread"); the fixture keeps one viewer's count.
    */
   unreadCount: z.number().int().nonnegative(),
+  /** The person's contact fields, once someone has edited them (C16). */
+  contact: leadContactSchema.optional(),
 });
 
 /** A lead record — the contract's fields and the plan's. */
@@ -107,6 +142,7 @@ export const leadFieldsSchema = leadRecordSchema
     followUpAt: true,
     branchId: true,
     patientId: true,
+    contact: true,
   })
   .extend({
     name: z.string().trim().min(1, 'Add a name').max(120),

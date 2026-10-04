@@ -85,6 +85,44 @@ describe('PersonAvatar', () => {
     expect(screen.getByTestId('patient-badge')).toHaveClass('size-3.5');
   });
 
+  it('draws the team chip with the 7px presence dot (H:1741)', () => {
+    const { container } = render(
+      <PersonAvatar initials="RS" tone="blush" size="chip" presence="online" />,
+    );
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-5.5');
+    const dot = container.querySelector('[data-presence="online"]');
+    expect(dot).toHaveClass('size-1.75', 'border-[1.5px]');
+    expect(dot).not.toHaveClass('border-2');
+  });
+
+  it('sizes the Leads filter and people-popover avatars at 18, 28 and 30px', () => {
+    const sizes = [
+      ['line', 'size-4.5'],
+      ['list', 'size-7'],
+      ['roster', 'size-7.5'],
+    ] as const;
+    for (const [size, root] of sizes) {
+      const { container, unmount } = render(
+        <PersonAvatar initials="NK" tone="sage" size={size} />,
+      );
+      expect(container.querySelector('[data-slot="avatar"]')).toHaveClass(root);
+      unmount();
+    }
+  });
+
+  it('rings a picked person in the tone ink, 2px off the disc', () => {
+    const { container } = render(
+      <PersonAvatar initials="NK" tone="sage" size="list" selected />,
+    );
+    const disc = container.querySelector('[data-slot="avatar"]');
+    expect(disc).toHaveClass(
+      'ring-[1.5px]',
+      'ring-offset-2',
+      'ring-tone-sage-foreground',
+    );
+    expect(disc).not.toHaveClass('ring-1');
+  });
+
   it('paints an offline dot in border-strong', () => {
     const { container } = render(
       <PersonAvatar initials="NK" tone="lav" presence="offline" />,

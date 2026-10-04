@@ -132,6 +132,22 @@ describe('PageTransition', () => {
       expect(screen.getByTestId('counter')).toHaveTextContent('1');
     });
 
+    it('takes extra classes — a flush room becomes a bounded column', () => {
+      locationMock.mockReturnValue({ pathname: '/a' });
+      render(
+        <PageTransition className="flex min-h-0 flex-1 flex-col">
+          <p data-testid="copy">copy</p>
+        </PageTransition>,
+      );
+      expect(screen.getByTestId('copy').parentElement).toHaveClass(
+        'text-foreground',
+        'flex',
+        'min-h-0',
+        'flex-1',
+        'flex-col',
+      );
+    });
+
     it('still re-applies the animation class on a path change', () => {
       locationMock.mockReturnValue({ pathname: '/a' });
       const { rerender } = render(

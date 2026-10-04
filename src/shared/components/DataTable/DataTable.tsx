@@ -122,6 +122,11 @@ export interface DataTableProps<TData extends RowData> {
   onRowClick?: (row: TableRow<TData>) => void;
   /** The 3px inline-start status edge's tone. */
   getRowTone?: (row: TableRow<TData>) => Tone | undefined;
+  /**
+   * The row whose record is open in a drawer over the list: it keeps the
+   * `muted` fill (`leads.md:35`).
+   */
+  isRowActive?: (row: TableRow<TData>) => boolean;
   /** The row's actions, sticky at the inline end (their own line on a phone). */
   rowActions?: (row: TableRow<TData>) => readonly DataTableRowAction[];
   /** Row selection with a bulk bar — from `md` only (D31). */
@@ -143,8 +148,9 @@ export interface DataTableProps<TData extends RowData> {
   groups?: DataTableGroups<TData>;
   /**
    * The rows on screen are the previous params' while new ones load (a search,
-   * sort or filter): their text turns to flat bars and clicks pause; the header
-   * stays (KICKOFF §6.0 Table refresh).
+   * sort or filter): they stay, their text and avatars turn to flat bars and
+   * clicks pause; the header and the group headers stay, and the table is
+   * `aria-busy` (KICKOFF §6.0 Table refresh).
    */
   refreshing?: boolean;
   className?: string;
@@ -221,10 +227,10 @@ function buildRowContext<TData extends RowData>(args: {
     selection: args.selection,
     onRowClick: props.onRowClick,
     getRowTone: props.getRowTone,
+    isRowActive: props.isRowActive,
     keyboardNav: options.keyboardNav,
     focusIndex: args.focusIndex,
     firstRowIndex: args.isPhone ? 1 : 2,
-    refreshing: props.refreshing ?? false,
   };
 }
 
@@ -296,6 +302,15 @@ function PinnedGroupHeader<TData extends RowData>({
   );
 }
 
+/**
+ * The refresh state (H:275): clicks are off until the new rows land; the bars
+ * themselves — every leaf text in a row a flat `muted-strong` bar, an avatar a
+ * plain disc without its badge, an icon nothing; group headers kept — are one
+ * rule in `index.css` keyed on the rowgroup's `data-refreshing`, not long
+ * arbitrary variants in every page's CSS.
+ */
+const REFRESH_BARS = 'pointer-events-none cursor-progress';
+
 /** The rows' rowgroup — group headers among them — or the empty state in a single full-width cell. */
 function TableBody<TData extends RowData>({
   tableWindow,
@@ -304,6 +319,7 @@ function TableBody<TData extends RowData>({
   empty,
   emptyMessage,
   columnCount,
+  refreshing,
 }: {
   tableWindow: TableWindow<TableEntry<TData>>;
   context: RowContext<TData>;
@@ -311,6 +327,7 @@ function TableBody<TData extends RowData>({
   empty?: ReactNode;
   emptyMessage?: string;
   columnCount: number;
+  refreshing: boolean;
 }) {
   const { t } = useTranslation(TABLE_NS);
   const renderEntry = ({ item, index }: { item: TableEntry<TData>; index: number }) => {
@@ -340,7 +357,12 @@ function TableBody<TData extends RowData>({
     );
   };
   return (
-    <div role="rowgroup" className="pt-(--dt-pad-top) pb-(--dt-pad-bottom)">
+    <div
+      role="rowgroup"
+      data-slot="data-table-body"
+      data-refreshing={refreshing || undefined}
+      className={cn('pt-(--dt-pad-top) pb-(--dt-pad-bottom)', refreshing && REFRESH_BARS)}
+    >
       {tableWindow.windowed.length > 0 ? (
         tableWindow.windowed.map(renderEntry)
       ) : (
@@ -408,6 +430,7 @@ function TableScroller<TData extends RowData>({
         empty={props.empty}
         emptyMessage={props.emptyMessage}
         columnCount={columnCount}
+        refreshing={props.refreshing === true && tableWindow.windowed.length > 0}
       />
       {options.hasNextPage ? (
         // The last 80px of the list: the next page loads as it scrolls in.
@@ -552,7 +575,6 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
             options.hasNextPage ? -1 : body.entries.length + context.firstRowIndex - 1
           }
           aria-busy={props.refreshing || undefined}
-          data-refreshing={props.refreshing || undefined}
           style={gridStyle}
           className="flex min-h-0 flex-1 flex-col"
         >

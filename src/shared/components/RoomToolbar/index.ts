@@ -14,6 +14,8 @@ export {
   type RoomFilterField,
   type RoomFilterFields,
   type RoomFilterOption,
+  type RoomFilterPeopleCopy,
+  type RoomFilterPerson,
   RoomFilters,
   RoomFiltersClear,
   type RoomFiltersProps,

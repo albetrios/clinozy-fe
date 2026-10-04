@@ -10,6 +10,7 @@ import {
   createLead,
   deleteLead,
   fetchLead,
+  fetchLeadViewer,
   leadQueryKeys,
   listLeads,
   markLeadRead,
@@ -33,7 +34,9 @@ import {
   withUndoToast,
 } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
 import { LEAD_TOASTS_KEYS, LEAD_TOASTS_NS } from './leads-toasts.constants.ts';
 
@@ -65,10 +68,18 @@ function useRestoreLeadTeam() {
 /**
  * The pipeline, a cursor page of 50 at a time (D7, `S:1588`) — the Leads list's
  * infinite scroll. The params come from the URL (`leadListParamsOf`); while
- * new ones load the previous rows stay on screen (`isRefreshing`).
+ * new ones load the previous rows stay on screen (`isRefreshing`). A failed
+ * page keeps the last rows and says so (`useListLoadError`, KICKOFF §6.0 List
+ * error).
  */
-export function useLeadList(params: LeadListParams) {
-  return useCursorList<LeadRecord>({
+export function useLeadList(
+  params: LeadListParams,
+  options: {
+    /** Read only once the params are known — "Mine" waits for the viewer. */
+    enabled?: boolean;
+  } = {},
+) {
+  const list = useCursorList<LeadRecord>({
     queryKey: leadQueryKeys.list(params),
     queryFn: async (after) => {
       const page = await listLeads(params, after ?? null);
@@ -78,6 +89,24 @@ export function useLeadList(params: LeadListParams) {
         hasMore: page.nextCursor !== null,
       };
     },
+    notifyOnError: false,
+    ...(options.enabled === undefined ? {} : { enabled: options.enabled }),
+  });
+  useListLoadError(list, 'leads');
+  return list;
+}
+
+/**
+ * The signed-in member as the Leads room reads them (`fetchLeadViewer`): the
+ * owner "Mine" and "Unreplied" mean, the claimer, the releaser. `null` until
+ * known.
+ */
+export function useLeadViewer() {
+  const email = useAuthStore((state) => state.user?.email ?? null);
+  return useAppQuery({
+    queryKey: leadQueryKeys.viewer(email),
+    queryFn: () => fetchLeadViewer(email),
+    staleTime: 5 * 60_000,
   });
 }
 

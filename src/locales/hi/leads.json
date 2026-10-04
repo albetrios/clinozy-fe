@@ -11,5 +11,78 @@
     "claimedUnowned": "अब {{name}} आपकी है",
     "released": "टीम के लिए खोली गई · कोई भी ले सकता है",
     "assigned": "{{name}} अब ज़िम्मेदार हैं · सूचना भेजी गई"
+  },
+  "list": {
+    "records": "लीड्स",
+    "views": {
+      "label": "लीड व्यू",
+      "mine": "मेरी",
+      "unread": "बिना जवाब",
+      "all": "सभी",
+      "unreadCount_one": "{{count}} बिना जवाब",
+      "unreadCount_other": "{{count}} बिना जवाब"
+    },
+    "search": {
+      "placeholder": "नाम, फ़ोन, #ID खोजें",
+      "label": "लीड्स खोजें"
+    },
+    "newLead": "नई लीड",
+    "columns": {
+      "lead": "लीड",
+      "status": "स्थिति",
+      "source": "स्रोत",
+      "interests": "रुचि",
+      "team": "टीम",
+      "updated": "अपडेट"
+    },
+    "empty": "कोई मेल खाती लीड नहीं",
+    "clearFilters": "फ़िल्टर हटाएँ",
+    "moreInterests_one": "{{count}} और: {{list}}",
+    "moreInterests_other": "{{count}} और: {{list}}",
+    "updated": {
+      "justNow": "अभी",
+      "minutes_one": "{{count}} मिनट पहले",
+      "minutes_other": "{{count}} मिनट पहले",
+      "hours_one": "{{count}} घंटा पहले",
+      "hours_other": "{{count}} घंटे पहले",
+      "yesterday": "कल",
+      "days_one": "{{count}} दिन पहले",
+      "days_other": "{{count}} दिन पहले",
+      "weeks_one": "{{count}} हफ़्ता पहले",
+      "weeks_other": "{{count}} हफ़्ते पहले"
+    }
+  },
+  "team": {
+    "claim": "खुली · लें",
+    "join": "टीम के लिए खुली · जुड़ें",
+    "openMine": "टीम के लिए खुली",
+    "claimHint_one": "{{count}} दिन से कोई गतिविधि नहीं · कोई भी इसे ले सकता है",
+    "claimHint_other": "{{count}} दिन से कोई गतिविधि नहीं · कोई भी इसे ले सकता है",
+    "joinHint": "{{name}} क्लिनिक छोड़ चुके हैं · टीम का कोई भी जुड़कर इसे ले सकता है",
+    "releasesToday": "अगर कोई फ़ॉलो-अप न करे तो आज टीम के लिए खुल जाएगी",
+    "releasesTomorrow": "अगर कोई फ़ॉलो-अप न करे तो कल टीम के लिए खुल जाएगी",
+    "claimFirst": "{{first}} को लें",
+    "joinTake": "जुड़ें · {{first}} को लें",
+    "takeOver": "{{first}} से ज़िम्मेदारी लें"
+  },
+  "filters": {
+    "status": "स्थिति",
+    "source": "स्रोत · कोई भी चुनें",
+    "clear": "हटाएँ",
+    "hold": {
+      "label": "स्वामित्व · निष्क्रिय दिनों के बाद होल्ड",
+      "any": "कोई भी",
+      "open": "लेने के लिए खुली",
+      "soon": "आज खुलेंगी",
+      "held": "होल्ड पर"
+    },
+    "team": {
+      "label": "टीम · ज़िम्मेदार या जुड़े हुए",
+      "anyone": "टीम में कोई भी",
+      "count_one": "{{count}} व्यक्ति",
+      "count_other": "{{count}} लोग",
+      "search": "टीम खोजें",
+      "noMatch": "कोई मेल नहीं"
+    }
   }
 }

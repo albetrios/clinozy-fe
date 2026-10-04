@@ -7,9 +7,82 @@
     "created": "Lead {{id}} erstellt",
     "saved": "Lead gespeichert",
     "statusChanged": "{{name}} → {{status}}",
-    "claimed": "{{name}} gehört jetzt dir · {{owner}} bleibt beteiligt",
-    "claimedUnowned": "{{name}} gehört jetzt dir",
+    "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
+    "claimedUnowned": "{{name}} gehört jetzt Ihnen",
     "released": "Für das Team freigegeben · jeder kann übernehmen",
     "assigned": "{{name}} ist jetzt zuständig · benachrichtigt"
+  },
+  "list": {
+    "records": "Leads",
+    "views": {
+      "label": "Lead-Ansichten",
+      "mine": "Meine",
+      "unread": "Unbeantwortet",
+      "all": "Alle",
+      "unreadCount_one": "{{count}} unbeantwortet",
+      "unreadCount_other": "{{count}} unbeantwortet"
+    },
+    "search": {
+      "placeholder": "Name, Telefon, #ID suchen",
+      "label": "Leads durchsuchen"
+    },
+    "newLead": "Neuer Lead",
+    "columns": {
+      "lead": "Lead",
+      "status": "Status",
+      "source": "Quelle",
+      "interests": "Interessiert an",
+      "team": "Team",
+      "updated": "Aktualisiert"
+    },
+    "empty": "Keine passenden Leads",
+    "clearFilters": "Filter löschen",
+    "moreInterests_one": "{{count}} weiteres: {{list}}",
+    "moreInterests_other": "{{count}} weitere: {{list}}",
+    "updated": {
+      "justNow": "Gerade eben",
+      "minutes_one": "vor {{count}} Min.",
+      "minutes_other": "vor {{count}} Min.",
+      "hours_one": "vor {{count}} Std.",
+      "hours_other": "vor {{count}} Std.",
+      "yesterday": "Gestern",
+      "days_one": "vor {{count}} Tag",
+      "days_other": "vor {{count}} Tagen",
+      "weeks_one": "vor {{count}} Woche",
+      "weeks_other": "vor {{count}} Wochen"
+    }
+  },
+  "team": {
+    "claim": "Offen · Übernehmen",
+    "join": "Offen fürs Team · Beitreten",
+    "openMine": "Offen fürs Team",
+    "claimHint_one": "Seit {{count}} Tag keine Aktivität · jeder kann ihn übernehmen",
+    "claimHint_other": "Seit {{count}} Tagen keine Aktivität · jeder kann ihn übernehmen",
+    "joinHint": "{{name}} hat die Klinik verlassen · jeder im Team kann beitreten und ihn übernehmen",
+    "releasesToday": "Wird heute fürs Team freigegeben, wenn niemand nachfasst",
+    "releasesTomorrow": "Wird morgen fürs Team freigegeben, wenn niemand nachfasst",
+    "claimFirst": "{{first}} übernehmen",
+    "joinTake": "Beitreten · {{first}} übernehmen",
+    "takeOver": "Von {{first}} übernehmen"
+  },
+  "filters": {
+    "status": "Status",
+    "source": "Quelle · beliebig wählen",
+    "clear": "Löschen",
+    "hold": {
+      "label": "Zuständigkeit · Halten nach inaktiven Tagen",
+      "any": "Alle",
+      "open": "Zur Übernahme offen",
+      "soon": "Wird heute frei",
+      "held": "Gehalten"
+    },
+    "team": {
+      "label": "Team · zuständig oder beteiligt",
+      "anyone": "Jeder im Team",
+      "count_one": "{{count}} Person",
+      "count_other": "{{count}} Personen",
+      "search": "Team durchsuchen",
+      "noMatch": "Kein Treffer"
+    }
   }
 }

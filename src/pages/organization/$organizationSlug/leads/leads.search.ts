@@ -26,7 +26,6 @@ import {
 import type { LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   LeadHoldFilter,
-  LeadListParams,
   LeadRecordSource,
   LeadSortKey,
   LeadView,
@@ -126,32 +125,5 @@ export function validateLeadCreateSearch(
   return {
     name: name && name.length <= 120 ? name : undefined,
     phone: (phone && toClinicPhone(phone)) || undefined,
-  };
-}
-
-/**
- * The list read's params for the URL as it stands (defaults applied, the view
- * read against the viewer) — what the Leads list hands `useLeadList`.
- */
-export function leadListParamsOf(
-  search: LeadsSearch,
-  viewerId: string | null,
-): LeadListParams {
-  const [sort, order] = (search.sort?.split(':') ?? []) as [
-    LeadSortKey?,
-    ('asc' | 'desc')?,
-  ];
-  return {
-    view: search.view ?? LEADS_SEARCH_DEFAULTS.view,
-    viewerId,
-    q: search.q,
-    status: search.status ? [search.status] : undefined,
-    source: search.source,
-    hold: search.hold,
-    owner: search.owner,
-    created: search.created,
-    followUp: search.followUp,
-    sort,
-    order,
   };
 }

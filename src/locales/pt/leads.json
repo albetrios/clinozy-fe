@@ -11,5 +11,86 @@
     "claimedUnowned": "Agora {{name}} é seu",
     "released": "Liberado para a equipe · qualquer pessoa pode assumir",
     "assigned": "{{name}} agora é responsável · notificado"
+  },
+  "list": {
+    "records": "leads",
+    "views": {
+      "label": "Visualizações de leads",
+      "mine": "Meus",
+      "unread": "Sem resposta",
+      "all": "Todos",
+      "unreadCount_one": "{{count}} sem resposta",
+      "unreadCount_many": "{{count}} sem resposta",
+      "unreadCount_other": "{{count}} sem resposta"
+    },
+    "search": {
+      "placeholder": "Buscar nome, telefone, #ID",
+      "label": "Buscar leads"
+    },
+    "newLead": "Novo lead",
+    "columns": {
+      "lead": "Lead",
+      "status": "Status",
+      "source": "Origem",
+      "interests": "Interessado em",
+      "team": "Equipe",
+      "updated": "Atualizado"
+    },
+    "empty": "Nenhum lead corresponde",
+    "clearFilters": "Limpar filtros",
+    "moreInterests_one": "Mais {{count}}: {{list}}",
+    "moreInterests_many": "Mais {{count}}: {{list}}",
+    "moreInterests_other": "Mais {{count}}: {{list}}",
+    "updated": {
+      "justNow": "Agora mesmo",
+      "minutes_one": "há {{count}} min",
+      "minutes_many": "há {{count}} min",
+      "minutes_other": "há {{count}} min",
+      "hours_one": "há {{count}} h",
+      "hours_many": "há {{count}} h",
+      "hours_other": "há {{count}} h",
+      "yesterday": "Ontem",
+      "days_one": "há {{count}} dia",
+      "days_many": "há {{count}} dias",
+      "days_other": "há {{count}} dias",
+      "weeks_one": "há {{count}} semana",
+      "weeks_many": "há {{count}} semanas",
+      "weeks_other": "há {{count}} semanas"
+    }
+  },
+  "team": {
+    "claim": "Aberto · Assumir",
+    "join": "Aberto para a equipe · Entrar",
+    "openMine": "Aberto para a equipe",
+    "claimHint_one": "Sem atividade há {{count}} dia · qualquer pessoa pode assumir",
+    "claimHint_many": "Sem atividade há {{count}} dias · qualquer pessoa pode assumir",
+    "claimHint_other": "Sem atividade há {{count}} dias · qualquer pessoa pode assumir",
+    "joinHint": "{{name}} saiu da clínica · qualquer pessoa da equipe pode entrar e assumir",
+    "releasesToday": "Liberado para a equipe hoje se ninguém fizer o acompanhamento",
+    "releasesTomorrow": "Liberado para a equipe amanhã se ninguém fizer o acompanhamento",
+    "claimFirst": "Assumir {{first}}",
+    "joinTake": "Entrar · assumir {{first}}",
+    "takeOver": "Assumir no lugar de {{first}}"
+  },
+  "filters": {
+    "status": "Status",
+    "source": "Origem · escolha qualquer",
+    "clear": "Limpar",
+    "hold": {
+      "label": "Responsável · retenção após dias inativos",
+      "any": "Qualquer",
+      "open": "Disponíveis para assumir",
+      "soon": "Liberados hoje",
+      "held": "Retidos"
+    },
+    "team": {
+      "label": "Equipe · responsável ou envolvido",
+      "anyone": "Qualquer pessoa da equipe",
+      "count_one": "{{count}} pessoa",
+      "count_many": "{{count}} pessoas",
+      "count_other": "{{count}} pessoas",
+      "search": "Buscar na equipe",
+      "noMatch": "Nenhum resultado"
+    }
   }
 }

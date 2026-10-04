@@ -9,7 +9,15 @@ import { dataTableFeatures } from '@/shared/components/DataTable/index.ts';
 
 import { DataTableColumnHeader } from './DataTableColumnHeader.tsx';
 
-function Harness({ sortable = true, align }: { sortable?: boolean; align?: 'end' }) {
+function Harness({
+  sortable = true,
+  align,
+  startsDescending,
+}: {
+  sortable?: boolean;
+  align?: 'end';
+  startsDescending?: boolean;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useTable({
     features: dataTableFeatures,
@@ -19,7 +27,7 @@ function Harness({ sortable = true, align }: { sortable?: boolean; align?: 'end'
         accessorKey: 'amount',
         header: 'Amount',
         enableSorting: sortable,
-        meta: { align },
+        meta: { align, sortStartsDescending: startsDescending },
       },
     ],
     state: { sorting },
@@ -46,6 +54,17 @@ describe('DataTableColumnHeader', () => {
 
     await user.click(button);
     expect(sorting()).toBe('[{"id":"amount","desc":false}]');
+    await user.click(button);
+    expect(sorting()).toBe('[{"id":"amount","desc":true}]');
+    await user.click(button);
+    expect(sorting()).toBe('[]');
+  });
+
+  it('runs newest first → off for a column that starts descending (H:6147)', async () => {
+    const user = userEvent.setup();
+    render(<Harness startsDescending />);
+    const button = screen.getByRole('button', { name: 'Amount' });
+
     await user.click(button);
     expect(sorting()).toBe('[{"id":"amount","desc":true}]');
     await user.click(button);

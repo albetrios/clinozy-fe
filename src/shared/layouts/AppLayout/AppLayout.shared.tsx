@@ -677,7 +677,9 @@ export function AppMain({
             title={t(ERRORS_KEYS.widget.pageContent)}
             testId="page-content-error"
           >
-            <PageTransition>
+            <PageTransition
+              className={flush ? 'flex min-h-0 flex-1 flex-col' : undefined}
+            >
               <Outlet />
             </PageTransition>
           </SectionErrorBoundary>

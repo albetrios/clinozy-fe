@@ -50,6 +50,24 @@ describe('AvatarStack', () => {
     expect(screen.getByTitle('Nidhi Kapoor')).not.toHaveTextContent('Nidhi K.');
   });
 
+  it('wraps each pill for its card and puts the presence dot on the avatar', () => {
+    const { container } = render(
+      <AvatarStack
+        people={[{ ...TEAM[0]!, presence: 'online' }]}
+        nameFirst
+        wrapPerson={(person, pill) => (
+          <button type="button" aria-label={`Card of ${person.name}`}>
+            {pill}
+          </button>
+        )}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Card of Riya Shah' })).toBeInTheDocument();
+    expect(container.querySelector('[data-presence="online"]')).toBeInTheDocument();
+    // The card names the person; the pill drops its own title.
+    expect(screen.queryByTitle('Riya Shah')).toBeNull();
+  });
+
   it('draws the 22px avatar in a 28px bordered pill', () => {
     const { container } = render(<AvatarStack people={TEAM.slice(0, 1)} />);
     const pill = container.querySelector('[title="Riya Shah"]');

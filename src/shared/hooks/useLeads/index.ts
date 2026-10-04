@@ -10,6 +10,7 @@ export {
   useDeleteLead,
   useLead,
   useLeadList,
+  useLeadViewer,
   useMarkLeadRead,
   useReleaseLead,
   useRestoreLead,

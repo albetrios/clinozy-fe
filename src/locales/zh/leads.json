@@ -11,5 +11,70 @@
     "claimedUnowned": "你现在负责 {{name}}",
     "released": "已释放给团队 · 任何人都可以认领",
     "assigned": "{{name}} 现在是负责人 · 已通知"
+  },
+  "list": {
+    "records": "潜在客户",
+    "views": {
+      "label": "潜在客户视图",
+      "mine": "我的",
+      "unread": "未回复",
+      "all": "全部",
+      "unreadCount_other": "{{count}} 个未回复"
+    },
+    "search": {
+      "placeholder": "搜索姓名、电话、#ID",
+      "label": "搜索潜在客户"
+    },
+    "newLead": "新建潜在客户",
+    "columns": {
+      "lead": "潜在客户",
+      "status": "状态",
+      "source": "来源",
+      "interests": "感兴趣",
+      "team": "团队",
+      "updated": "更新时间"
+    },
+    "empty": "没有匹配的潜在客户",
+    "clearFilters": "清除筛选",
+    "moreInterests_other": "另外 {{count}} 项：{{list}}",
+    "updated": {
+      "justNow": "刚刚",
+      "minutes_other": "{{count}} 分钟前",
+      "hours_other": "{{count}} 小时前",
+      "yesterday": "昨天",
+      "days_other": "{{count}} 天前",
+      "weeks_other": "{{count}} 周前"
+    }
+  },
+  "team": {
+    "claim": "开放 · 认领",
+    "join": "向团队开放 · 加入",
+    "openMine": "向团队开放",
+    "claimHint_other": "{{count}} 天无动态 · 任何人都可以认领",
+    "joinHint": "{{name}} 已离开诊所 · 团队中任何人都可以加入并接手",
+    "releasesToday": "如无人跟进，今天将释放给团队",
+    "releasesTomorrow": "如无人跟进，明天将释放给团队",
+    "claimFirst": "认领 {{first}}",
+    "joinTake": "加入 · 认领 {{first}}",
+    "takeOver": "从 {{first}} 接手"
+  },
+  "filters": {
+    "status": "状态",
+    "source": "来源 · 可多选",
+    "clear": "清除",
+    "hold": {
+      "label": "归属 · 闲置天数后保留",
+      "any": "不限",
+      "open": "可认领",
+      "soon": "今天释放",
+      "held": "保留中"
+    },
+    "team": {
+      "label": "团队 · 负责或参与",
+      "anyone": "团队中任何人",
+      "count_other": "{{count}} 人",
+      "search": "搜索团队",
+      "noMatch": "无匹配"
+    }
   }
 }
