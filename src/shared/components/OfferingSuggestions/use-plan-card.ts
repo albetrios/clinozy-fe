@@ -62,6 +62,7 @@ const INVOICE_STATUS_TONES = {
 
 /** What the host says about where the card sits. */
 export interface PlanCardHost {
+  /** The patient whose plan it is; empty while there is none — the card reads nothing. */
   patientId: string;
   firstName: string;
   /** Where a suggestion added here is made ("Appt #2861 · Hydrafacial", "Patient file"). */
@@ -247,7 +248,8 @@ export function usePlanCard(host: PlanCardHost): PlanCard {
   const money = usePaiseFormat();
   const { formatDate } = useLocaleFormat();
   const access = useClinicAccess();
-  const plan = usePlan(host.patientId);
+  // No patient yet (a lead's booking, a New form): nothing to read.
+  const plan = usePlan(host.patientId || null);
   const offerings = useOfferings();
   const update = useUpdateSuggestion();
   const add = useAddSuggestion();
