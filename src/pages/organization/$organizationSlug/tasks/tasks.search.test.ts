@@ -10,7 +10,6 @@ import {
   TASK_SCOPE_VALUES,
   TASK_TYPE_VALUES,
   TASK_VIEWS,
-  taskListQueryOf,
   validateTaskCreateSearch,
   validateTasksSearch,
 } from './tasks.search.ts';
@@ -53,18 +52,6 @@ describe('validateTasksSearch (S:95)', () => {
 
   it('cuts the search to 80 characters (`tasks.md:66`)', () => {
     expect(validateTasksSearch({ q: 'x'.repeat(100) }).q).toHaveLength(80);
-  });
-});
-
-describe('taskListQueryOf', () => {
-  it('reads To do, Mine, every rule and no search when the URL says nothing', () => {
-    expect(taskListQueryOf({})).toEqual({ tab: 'queue', scope: 'mine', type: [], q: '' });
-  });
-
-  it('hands the URL’s view, scope, rules and search to the list read', () => {
-    expect(
-      taskListQueryOf({ tab: 'done', scope: 'everyone', type: ['manual'], q: 'Rhea' }),
-    ).toEqual({ tab: 'done', scope: 'everyone', type: ['manual'], q: 'Rhea' });
   });
 });
 

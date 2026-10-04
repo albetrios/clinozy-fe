@@ -40,11 +40,8 @@ import { useTaskActions, type WhatsNextFor } from './hooks/useTaskActions/index.
 import { useTaskAssignees } from './hooks/useTaskAssignees/index.ts';
 import { useTasksDialogRoute } from './hooks/useTasksDialogRoute/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TABLE_ID } from './tasks.constants.ts';
-import {
-  taskListQueryOf,
-  TASKS_SEARCH_DEFAULTS,
-  validateTasksSearch,
-} from './tasks.search.ts';
+import { taskListQueryOf } from './tasks.params.ts';
+import { TASKS_SEARCH_DEFAULTS, validateTasksSearch } from './tasks.search.ts';
 
 /**
  * The view the rows on screen belong to: the URL's once its read has settled,

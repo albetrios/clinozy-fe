@@ -17,7 +17,6 @@ import {
   RECORD_ID,
 } from '@/lib/routes/search-params.ts';
 import type {
-  TaskListQuery,
   TaskRuleId,
   TaskScope,
   TaskTab,
@@ -84,16 +83,6 @@ export function validateTasksSearch(search: Record<string, unknown>): TasksSearc
     q: queryOf(search.q, SEARCH_MAX),
     type: listOf(search.type, (entry) => oneOf(TASK_TYPE_VALUES, entry) !== undefined),
     scope: oneOf(TASK_SCOPE_VALUES, search.scope),
-  };
-}
-
-/** The list read's query for the URL as it stands — what the room hands `useTaskList`. */
-export function taskListQueryOf(search: TasksSearch): TaskListQuery {
-  return {
-    tab: search.tab ?? TASKS_SEARCH_DEFAULTS.tab,
-    scope: search.scope ?? TASKS_SEARCH_DEFAULTS.scope,
-    type: search.type ?? [],
-    q: search.q ?? '',
   };
 }
 
