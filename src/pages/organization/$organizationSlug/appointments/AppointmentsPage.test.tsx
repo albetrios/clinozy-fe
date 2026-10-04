@@ -77,7 +77,7 @@ describe('AppointmentsPage — the appointment form over it (L-38)', () => {
     await user.click(chip);
     await waitFor(() => expect(router.state.location.href).not.toBe(before));
     expect(router.state.location.pathname).toMatch(
-      new RegExp(String.raw`^${APPOINTMENTS_PAGE}/[^/]+$`),
+      new RegExp(`^${APPOINTMENTS_PAGE}/[^/]+$`),
     );
   });
 });

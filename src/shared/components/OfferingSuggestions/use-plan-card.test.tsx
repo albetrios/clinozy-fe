@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { findPersonThread } from '@/shared/api/clinic/fixtures/contact-threads.fixtures.ts';
 import {
   clinicFixtures,
   resetClinicFixtures,
@@ -34,6 +35,26 @@ function wrapper({ children }: { children: ReactNode }) {
 
 const dharti = () =>
   clinicFixtures.patients.snapshot((row) => row.firstName === 'Dharti')[0]?.id ?? '';
+
+/** A patient whose thread has messages — the card's contact activity. */
+function patientWithActivity() {
+  const leads = clinicFixtures.leads.snapshot();
+  const spoken = new Set(
+    clinicFixtures.leadMessages
+      .snapshot((message) => !message.isSystem)
+      .map((message) => message.leadId),
+  );
+  const patient = clinicFixtures.patients.snapshot((row) => {
+    const thread = findPersonThread(leads, {
+      leadId: row.leadId,
+      patientId: row.id,
+      phone: row.phone,
+    });
+    return thread !== null && spoken.has(thread.id);
+  })[0];
+  if (!patient) throw new Error('no patient with a thread');
+  return patient;
+}
 
 function renderCard(host: Partial<PlanCardHost> = {}) {
   const onOpenChat = vi.fn();
@@ -107,21 +128,40 @@ describe('usePlanCard — the plan bound to the card', () => {
     expect(props.purchases?.lines.length).toBeGreaterThan(0);
   });
 
-  it('words the contact activity, and greys the offerings already suggested', async () => {
-    const { result, onOpenChat } = renderCard();
-    await waitFor(() => expect(result.current.props).not.toBeNull());
-    const props = result.current.props!;
-    const activity = props.activity;
-    for (const line of activity?.lines ?? []) {
+  it('words the contact activity of the patient’s thread, and opens its chat', async () => {
+    const patient = patientWithActivity();
+    const { result, onOpenChat } = renderCard({
+      patientId: patient.id,
+      firstName: patient.firstName,
+    });
+    await waitFor(() => expect(result.current.props?.activity).toBeDefined());
+    const activity = result.current.props!.activity!;
+    expect(activity.lines.length).toBeGreaterThan(0);
+    for (const line of activity.lines) {
       expect(line.status).toMatch(
         /^(Received|Read|Not delivered|Queued|Delivered|Sent)$/,
       );
     }
-    if (activity) {
-      expect(activity.summary).toMatch(/^Lead #\d+/);
-      activity.onOpenChat?.();
-      expect(onOpenChat).toHaveBeenCalledWith(result.current.plan?.lead?.id);
-    }
+    expect(activity.summary).toMatch(/^Lead #\d+/);
+    activity.onOpenChat?.();
+    expect(onOpenChat).toHaveBeenCalledWith(result.current.plan?.lead?.id);
+  });
+
+  it('says the plan could not be read, and Retry reads it again', async () => {
+    const { result } = renderCard({ patientId: '00000000-0000-4000-8000-000000000000' });
+    await waitFor(() => expect(result.current.status).toBe('error'));
+    expect(result.current.props).toBeNull();
+    const read = () =>
+      client.getQueryCache().findAll({ queryKey: ['clinic', 'plan'] })[0];
+    expect(read()?.state.errorUpdateCount).toBe(1);
+    act(() => result.current.retry());
+    await waitFor(() => expect(read()?.state.errorUpdateCount).toBe(2));
+  });
+
+  it('greys the offerings already suggested', async () => {
+    const { result } = renderCard();
+    await waitFor(() => expect(result.current.props).not.toBeNull());
+    const props = result.current.props!;
     const taken = new Set(
       result.current.plan?.suggestions
         .filter((row) => row.status !== 'declined')
