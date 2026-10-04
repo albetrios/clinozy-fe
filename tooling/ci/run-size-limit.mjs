@@ -170,8 +170,34 @@ const config = [
      * registration — manifests, builders and validators of dialog routes
      * that render nothing on their own; L-54 moves that weight off the entry
      * chunk once the builders stop editing `routeTree.tsx`, then lowers this.
+     *
+     * 253.1 → 255.1 kB (same exemption, D48): measured 254.67 kB after the
+     * Today, Payments drawer, Day close, Medical drawer and Clinic stock rows
+     * (252.65 kB before them), each row boundary built on this tree and
+     * attributed through the hidden source maps:
+     * - L-51, the Clinic stock room (+1.33 kB), all entry: its ten route
+     *   blocks — three more tabs and seven dialog routes — their ten
+     *   manifests, the room's builders (+1.06 kB of minified `builders.ts`),
+     *   `stock.search.ts` (one dependency-free reader for every tab and the
+     *   dialog prefills) and the new chunks' names in Vite's preload map.
+     * - L-48, Today (+0.38 kB): its URL reader (`today.search.ts`: `lane`,
+     *   `queue`) and `validateSearch`, the `tasks` copy on its loader, and
+     *   the preload lists naming the chunks Today now shares with Tasks.
+     * - L-51b +0.20, L-50b +0.07, L-39b +0.06: no route changes — the rooms'
+     *   lazy imports name the shared chunks their drawers split off (the
+     *   patient picker, the stacked-drawer host, the room dialog-route
+     *   reader); L-39c −0.01, L-41 nothing.
+     * Trimmed first: nothing obvious is left outside the registrations —
+     * every reader these rows added is already dependency-free (no zod in
+     * the entry) and each tab's list read loads with its tab. The L-54 plan
+     * is expected to take ~6–7 kB gzipped off the entry chunk and lower this
+     * budget: a lazy `dialogRoute()` factory for the ~44 dialog routes that
+     * render nothing (the manifest and validators load with the route,
+     * `beforeLoad` awaits the manifest before the gateway), the builders
+     * split per room, and a `build:check` tripwire for dialog manifests and
+     * room builders in the entry.
      */
-    limit: '253.1 kB',
+    limit: '255.1 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -271,8 +297,26 @@ const config = [
            * (+0.18 together, L-31b … L-31f), Medical (+0.07, L-50) and Payments
            * (+0.03, L-39); L-47d nothing. They sum to +2.36; the tree measures
            * +2.23.
+           *
+           * 43.1 → 43.7 kB (same exemption, D36): measured 43.31 kB (42.61
+           * before these rows), each row boundary built on this tree: Today
+           * (+0.35 kB, L-48: the floor's two columns with the 312px aside,
+           * the lane tiles' grid and the phone snap strip, the cards' grid,
+           * the lane tones' borders, the greeting and pulse figures), the
+           * stock drawers (+0.20, L-51b: Stock check's four-column grid and
+           * its phone cards, the Use popover's toggles and focus ring), the
+           * Medical drawers (+0.16, L-50b: the medicine's stock-level track
+           * placed by CSS variables, the price panel's cells, the GST
+           * toggle's on state) and Day close (+0.07, L-41: the display
+           * figure, the strips' auto-fit grid, the review rows' 910px
+           * container re-grid). The Clinic stock room took 0.08 off (L-51:
+           * the placeholder Items page's own heading gave way to the room
+           * toolbar's); L-39b and L-39c nothing. L-54 lowers this with the
+           * JS budget — the print sheets' millimetre utilities and the
+           * calendars' second in-place skeleton look, named above, are the
+           * candidates.
            */
-          limit: '43.1 kB',
+          limit: '43.7 kB',
           gzip: true,
         },
       ]
