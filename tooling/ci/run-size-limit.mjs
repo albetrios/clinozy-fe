@@ -127,8 +127,25 @@ const config = [
      *   nothing (its card is not mounted yet).
      * Trimmed first: the Patients list read moved off the entry into
      * `patients.params.ts`, as `appointments.params.ts` had (−0.07 kB).
+     *
+     * 243.9 → 245.5 kB (same exemption, D48): measured 244.97 kB after the
+     * Offerings rows and L-29 (243.76 kB before them), each commit built and
+     * attributed through the hidden source maps:
+     * - L-30b, the Offerings and Offers tabs (+0.91 kB): the Offers route
+     *   block, its manifest and `offers.search.ts`, the Offerings tab's
+     *   validators (`offerings.search.ts`), and the router's `useMatchRoute`
+     *   (+0.08 in the vendor chunk), first used by RoomTabs' deepest match.
+     * - L-30c +0.34 (the `create` and `$offeringId/edit` dialog routes, their
+     *   manifests, the room's six builders, the `Minus` glyph), L-30d +0.27
+     *   (the Offer drawer's two dialog routes and manifests, two builders, the
+     *   `Pause` and `Play` glyphs), L-29 +0.05 (the shortcuts dialog's j · k
+     *   row in the entry's English copy), L-30e nothing.
+     * Trimmed first: once the Offers schema imported the Offerings one, the
+     * bundler split the shared URL readers (`search-params.ts`,
+     * `clinic-list-filters.ts`) into two more first-paint chunks; reading them
+     * from the shared modules keeps them in the entry (−0.35 kB).
      */
-    limit: '243.9 kB',
+    limit: '245.5 kB',
     gzip: true,
   },
   ...(cssPaths.length
