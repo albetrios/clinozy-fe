@@ -30,7 +30,6 @@ import type {
   PatientType,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  PatientListParams,
   PatientSortKey,
   PatientView,
 } from '@/shared/api/clinic/patients-contracts.ts';
@@ -143,25 +142,5 @@ export function validatePatientCreateSearch(
     name: name && name.length <= 120 ? name : undefined,
     phone: (phone && toClinicPhone(phone)) || undefined,
     fromLead: RECORD_ID.test(fromLead) ? fromLead : undefined,
-  };
-}
-
-/** The list read's params for the URL as it stands (defaults applied) — what the room hands `usePatientList`. */
-export function patientListParamsOf(search: PatientsSearch): PatientListParams {
-  const [sort, order] = (search.sort?.split(':') ?? []) as [
-    PatientSortKey?,
-    ('asc' | 'desc')?,
-  ];
-  return {
-    view: search.view ?? PATIENTS_SEARCH_DEFAULTS.view,
-    q: search.q,
-    types: search.types,
-    status: search.status,
-    gender: search.gender,
-    conversion: search.conversion,
-    created: search.created,
-    followUp: search.followUp,
-    sort,
-    order,
   };
 }

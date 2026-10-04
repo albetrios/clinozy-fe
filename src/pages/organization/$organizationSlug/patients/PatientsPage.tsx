@@ -50,11 +50,8 @@ import {
   PATIENTS_NS,
   PATIENTS_TABLE_ID,
 } from './patients.constants.ts';
-import {
-  patientListParamsOf,
-  PATIENTS_SEARCH_DEFAULTS,
-  validatePatientsSearch,
-} from './patients.search.ts';
+import { patientListParamsOf } from './patients.params.ts';
+import { PATIENTS_SEARCH_DEFAULTS, validatePatientsSearch } from './patients.search.ts';
 
 /** One toast id: a second failure replaces the first instead of stacking. */
 const LIST_ERROR_TOAST_ID = 'patients-list-error';

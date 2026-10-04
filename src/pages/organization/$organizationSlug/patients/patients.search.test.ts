@@ -16,7 +16,6 @@ import { PATIENT_FILTER_FIELDS } from './patients.constants.ts';
 import {
   PATIENT_FILTER_VALUES,
   PATIENT_VIEWS,
-  patientListParamsOf,
   validatePatientCreateSearch,
   validatePatientsSearch,
 } from './patients.search.ts';
@@ -125,16 +124,5 @@ describe('validatePatientCreateSearch (S:31)', () => {
         fromLead: '42',
       }),
     ).toEqual({ name: undefined, phone: undefined, fromLead: undefined });
-  });
-});
-
-describe('patientListParamsOf', () => {
-  it('applies the All view and splits the sort for the list read', () => {
-    expect(patientListParamsOf({})).toMatchObject({ view: 'all', sort: undefined });
-    expect(
-      patientListParamsOf(
-        validatePatientsSearch({ view: 'follow', sort: 'followUp:desc' }),
-      ),
-    ).toMatchObject({ view: 'follow', sort: 'followUp', order: 'desc' });
   });
 });
