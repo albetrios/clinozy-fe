@@ -63,7 +63,8 @@
     "title": "还没有服务项目",
     "description": "添加带价格的治疗和套餐，即可用于预约和开票。",
     "noMatchTitle": "没有匹配的服务项目",
-    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。"
+    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。",
+    "newOffering": "新建服务项目"
   },
   "offers": {
     "columns": {
@@ -102,6 +103,94 @@
     "empty": {
       "title": "还没有优惠活动",
       "description": "这里还没有内容。试试其他标签页或搜索。"
+    }
+  },
+  "record": "服务项目",
+  "offeringDrawer": {
+    "title": {
+      "create": "新建服务项目",
+      "edit": "编辑服务项目"
+    },
+    "sub": "用于预约、发票和套餐",
+    "quickFill": {
+      "single": "单次疗程",
+      "pack": "6 次疗程套餐",
+      "lhr": "激光脱毛 10 次套餐",
+      "consultation": "问诊"
+    },
+    "steps": {
+      "main": "服务项目、价格与次数",
+      "timeDetails": "时长、有效期与详情",
+      "offersTime": "相关优惠、时长与有效期",
+      "details": "详情"
+    },
+    "groups": {
+      "offering": "服务项目",
+      "price": "价格与次数",
+      "offers": "相关优惠",
+      "time": "时长与有效期",
+      "details": "详情"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例如：全脸激光脱毛",
+      "category": "类别",
+      "colour": "颜色",
+      "colourHint": "在所有地方用于此服务项目",
+      "availableAt": "适用分院",
+      "availableAtHint": "其他分院的预约和账单中不显示",
+      "price": "价格",
+      "priceHint": "标价 · 显示在发票上",
+      "offerPrice": "优惠价",
+      "offerPriceHint": "实收金额 · 留空即按标价",
+      "offerPriceBelow": "实收金额 · 低于标价 {{percent}}%",
+      "sessions": "次数",
+      "sessionsHint": "一张发票可做的疗程数",
+      "gstRate": "GST 税率",
+      "gst": "GST",
+      "gstInclusive": "含税",
+      "gstExclusive": "不含税",
+      "floor": "最低价",
+      "floorShown": "已显示 · 仅您可见",
+      "floorHidden": "已隐藏 · 点按设置",
+      "floorHint": "前台收费不能低于此价",
+      "billedToday": "今日实收",
+      "freeSessions_other": "+赠送 {{count}} 次",
+      "belowList": "低于标价 {{percent}}%",
+      "duration": "时长",
+      "durationQuick": "{{minutes}} 分钟",
+      "minutesUnit": "分钟",
+      "validity": "有效期",
+      "validityHint": "0 = 永久有效 · 到期后剩余次数作废",
+      "daysUnit": "天",
+      "days_other": "{{count}} 天",
+      "validityQuick": {
+        "none": "无",
+        "quarter": "3 个月",
+        "half": "6 个月",
+        "year": "1 年"
+      },
+      "searchTerms": "搜索词",
+      "searchTermsHint": "用逗号分隔",
+      "searchTermsPlaceholder": "激光, 面部, 脱毛",
+      "description": "说明",
+      "descriptionPlaceholder": "包含哪些内容",
+      "status": "状态",
+      "active": "启用 · 可预约",
+      "inactive": "停用 · 已隐藏"
+    },
+    "offerTill": "至 {{date}}",
+    "untitled": "未命名",
+    "save": {
+      "create": "创建服务项目",
+      "edit": "保存更改",
+      "createAnother": "创建并继续添加"
+    },
+    "toasts": {
+      "addName": "请填写名称",
+      "addPrice": "请填写价格",
+      "offerAbovePrice": "优惠价不能高于价格",
+      "floorAboveOffer": "最低价不能高于优惠价"
     }
   }
 }

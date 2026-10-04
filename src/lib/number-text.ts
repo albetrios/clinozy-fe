@@ -1,7 +1,8 @@
 /*
- * The text of a number cell (H:3811): what may be typed, what it stands for in
- * the field's own unit, and what the cell shows at rest. A money cell types
- * rupees and stores integer paise (S:4).
+ * The text of a typed number (H:3811): what may be typed, what it stands for in
+ * the field's own unit, and what the field shows at rest — the items rows'
+ * cells and the drawers' number fields alike. A money field types rupees and
+ * stores integer paise (S:4).
  */
 
 /** Paise in a rupee — the scale of a money cell. */

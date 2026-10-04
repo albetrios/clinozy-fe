@@ -69,7 +69,8 @@
     "title": "No offerings yet",
     "description": "Add treatments and packages with prices so they can be booked and billed.",
     "noMatchTitle": "No offering matches",
-    "noMatchDescription": "Nothing here yet. Try another tab or search."
+    "noMatchDescription": "Nothing here yet. Try another tab or search.",
+    "newOffering": "New offering"
   },
   "offers": {
     "columns": {
@@ -110,6 +111,96 @@
     "empty": {
       "title": "No offers yet",
       "description": "Nothing here yet. Try another tab or search."
+    }
+  },
+  "record": "Offering",
+  "offeringDrawer": {
+    "title": {
+      "create": "New offering",
+      "edit": "Edit offering"
+    },
+    "sub": "Used in bookings, invoices and packages",
+    "quickFill": {
+      "single": "Single session",
+      "pack": "6-session pack",
+      "lhr": "LHR 10-pack",
+      "consultation": "Consultation"
+    },
+    "steps": {
+      "main": "Offering, price & sessions",
+      "timeDetails": "Time, validity & details",
+      "offersTime": "Offers on this, time & validity",
+      "details": "Details"
+    },
+    "groups": {
+      "offering": "Offering",
+      "price": "Price & sessions",
+      "offers": "Offers on this",
+      "time": "Time & validity",
+      "details": "Details"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. LHR Full Face",
+      "category": "Category",
+      "colour": "Colour",
+      "colourHint": "used for this offering everywhere",
+      "availableAt": "Available at",
+      "availableAtHint": "hidden from bookings and bills elsewhere",
+      "price": "Price",
+      "priceHint": "list price · shown on the invoice",
+      "offerPrice": "Offer price",
+      "offerPriceHint": "what you bill · leave empty = list price",
+      "offerPriceBelow": "what you bill · {{percent}}% below list",
+      "sessions": "Sessions",
+      "sessionsHint": "treatments allowed against one invoice",
+      "gstRate": "GST rate",
+      "gst": "GST",
+      "gstInclusive": "Inclusive",
+      "gstExclusive": "Exclusive",
+      "floor": "Lowest price",
+      "floorShown": "Shown · only you can see it",
+      "floorHidden": "Hidden · tap to set",
+      "floorHint": "the desk can never bill below this",
+      "billedToday": "Billed today",
+      "freeSessions_one": "+{{count}} free session",
+      "freeSessions_other": "+{{count}} free sessions",
+      "belowList": "{{percent}}% below list",
+      "duration": "Duration",
+      "durationQuick": "{{minutes}}m",
+      "minutesUnit": "min",
+      "validity": "Validity",
+      "validityHint": "0 = no expiry · sessions left after this are lost",
+      "daysUnit": "days",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "validityQuick": {
+        "none": "None",
+        "quarter": "3 mo",
+        "half": "6 mo",
+        "year": "1 yr"
+      },
+      "searchTerms": "Search terms",
+      "searchTermsHint": "comma separated",
+      "searchTermsPlaceholder": "laser, face, hair removal",
+      "description": "Description",
+      "descriptionPlaceholder": "What is included",
+      "status": "Status",
+      "active": "Active · bookable",
+      "inactive": "Inactive · hidden"
+    },
+    "offerTill": "till {{date}}",
+    "untitled": "Untitled",
+    "save": {
+      "create": "Create offering",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "toasts": {
+      "addName": "Add a name",
+      "addPrice": "Add a price",
+      "offerAbovePrice": "Offer price can’t be above the price",
+      "floorAboveOffer": "Lowest price can’t be above the offer price"
     }
   }
 }

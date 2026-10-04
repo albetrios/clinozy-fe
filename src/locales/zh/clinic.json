@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "联系方式与个人信息",
-      "clinic": "诊所、推荐与随访",
-      "notFilled": "尚未填写"
+      "clinic": "诊所、推荐与随访"
     },
     "groups": {
       "contact": "联系方式",
@@ -330,13 +329,32 @@
       "next": "下一步：{{step}} →",
       "edit": "编辑",
       "open": "打开",
-      "missing": "缺少：{{fields, list(type: unit)}}"
+      "missing": "缺少：{{fields, list(type: unit)}}",
+      "notFilled": "尚未填写"
     },
     "peek": {
       "empty": "空",
       "added_other": "已添加 {{count}} 项",
       "noneYet": "暂无"
-    }
+    },
+    "stepper": {
+      "decrease": "减少",
+      "increase": "增加"
+    },
+    "colours": {
+      "butter": "奶油黄",
+      "lav": "薰衣草紫",
+      "sky": "天空蓝",
+      "sage": "鼠尾草绿",
+      "blush": "腮红粉",
+      "mint": "薄荷绿",
+      "peach": "桃粉",
+      "plum": "梅子紫",
+      "lime": "青柠绿",
+      "slate": "石板灰",
+      "stone": "石灰色"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "联系人",
@@ -748,7 +766,6 @@
     "noSuggestions": "暂无建议",
     "pricesHidden": "价格已隐藏",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "价格已隐藏 · 点击眼睛图标显示",
     "showPrices": "显示价格",
     "hidePrices": "隐藏价格",

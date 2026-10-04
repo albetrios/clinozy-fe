@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "Contact & personal",
-      "clinic": "Clinic, referral & follow-up",
-      "notFilled": "Not filled yet"
+      "clinic": "Clinic, referral & follow-up"
     },
     "groups": {
       "contact": "Contact",
@@ -331,14 +330,33 @@
       "next": "Next: {{step}} →",
       "edit": "Edit",
       "open": "Open",
-      "missing": "Missing: {{fields, list(type: unit)}}"
+      "missing": "Missing: {{fields, list(type: unit)}}",
+      "notFilled": "Not filled yet"
     },
     "peek": {
       "empty": "Empty",
       "added_one": "{{count}} added",
       "added_other": "{{count}} added",
       "noneYet": "None yet"
-    }
+    },
+    "stepper": {
+      "decrease": "Decrease",
+      "increase": "Increase"
+    },
+    "colours": {
+      "butter": "Butter",
+      "lav": "Lavender",
+      "sky": "Sky",
+      "sage": "Sage",
+      "blush": "Blush",
+      "mint": "Mint",
+      "peach": "Peach",
+      "plum": "Plum",
+      "lime": "Lime",
+      "slate": "Slate",
+      "stone": "Stone"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "Contact",
@@ -756,7 +774,6 @@
     "noSuggestions": "No suggestions yet",
     "pricesHidden": "Prices hidden",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "Prices hidden · use the eye to show",
     "showPrices": "Show prices",
     "hidePrices": "Hide prices",

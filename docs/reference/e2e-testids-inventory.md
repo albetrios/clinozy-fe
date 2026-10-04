@@ -100,6 +100,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `payments-page`                  | Clinic room page: Payments                                                        | `pages/organization/$organizationSlug/payments/`      |
 | `tasks-page`                     | Clinic room page: Tasks                                                           | `pages/organization/$organizationSlug/tasks/`         |
 | `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)   | `pages/organization/$organizationSlug/offerings/`     |
+| `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c) | `pages/organization/$organizationSlug/offerings/`     |
 | `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)              |
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
@@ -415,6 +416,25 @@ lead or the lead drawer; `<c>` is `contact-editor`. Its steps are `identity` and
 | `<c>-preferences-<slug>`                                                | A preference — `noCalls` … `textFirst`; a custom one `custom-<n>`  | ContactEditor                 |
 | `<c>-custom` / `<c>-custom-input`                                       | "+ Custom" and its "Type a preference" field                       | ContactEditor                 |
 | `<c>-linked`                                                            | "Linked to … · channels and preferences reused" with its Undo      | ContactEditor                 |
+
+### Offering drawer (Offerings room, launch L-30c)
+
+New offering and Edit offering are one `OfferingDrawer`; `<d>` is `offering-drawer`. Its steps
+are `main` and `time`, plus `details` while an offer that has not ended names the offering. A
+chip group's chips are `<group>-<value>` (`offering-drawer-category-lhr`,
+`offering-drawer-branches-all`), a swatch is `<d>-colour-<tone>`, and a stepper's parts are
+`<field>-decrease` / `-increase` / `-quick-<value>` (`offering-drawer-sessions-quick-6`).
+
+| Test ID                                                     | Element                                                                        | Source                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------- |
+| `<d>-name` / `<d>-category` / `<d>-colour` / `<d>-branches` | Step 1: Name, Category chips, Colour swatches, Available at (several branches) | `offerings/components/OfferingDrawer/` |
+| `<d>-price` / `<d>-offer-price` / `<d>-sessions`            | Price and Offer price (₹ fields), the Sessions stepper                         | OfferingDrawer                         |
+| `<d>-gst-rate` / `<d>-gst`                                  | GST rate ("%") and the Inclusive / Exclusive toggle                            | OfferingDrawer                         |
+| `<d>-floor-toggle` / `<d>-floor`                            | Lowest price toggle (`floor` ability) and its ₹ field while Shown              | OfferingDrawer                         |
+| `<d>-billed-today` / `<d>-offer-<offerId>`                  | "Billed today" and one "Offers on this" box                                    | OfferingDrawer                         |
+| `<d>-duration` / `<d>-validity`                             | Duration and Validity steppers                                                 | OfferingDrawer                         |
+| `<d>-search-terms` / `<d>-description` / `<d>-status`       | Search terms, Description, the Status toggle                                   | OfferingDrawer                         |
+| `<d>-skeleton`                                              | Edit offering while a deep-linked offering loads                               | OfferingDrawer                         |
 
 ## Items field (shared, launch L-17a)
 

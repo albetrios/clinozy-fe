@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "連絡先・個人情報",
-      "clinic": "クリニック・紹介・フォローアップ",
-      "notFilled": "未入力"
+      "clinic": "クリニック・紹介・フォローアップ"
     },
     "groups": {
       "contact": "連絡先",
@@ -330,13 +329,32 @@
       "next": "次へ: {{step}} →",
       "edit": "編集",
       "open": "開く",
-      "missing": "未入力: {{fields, list(type: unit)}}"
+      "missing": "未入力: {{fields, list(type: unit)}}",
+      "notFilled": "未入力"
     },
     "peek": {
       "empty": "空欄",
       "added_other": "{{count}} 件追加",
       "noneYet": "まだありません"
-    }
+    },
+    "stepper": {
+      "decrease": "減らす",
+      "increase": "増やす"
+    },
+    "colours": {
+      "butter": "バター",
+      "lav": "ラベンダー",
+      "sky": "スカイ",
+      "sage": "セージ",
+      "blush": "ブラッシュ",
+      "mint": "ミント",
+      "peach": "ピーチ",
+      "plum": "プラム",
+      "lime": "ライム",
+      "slate": "スレート",
+      "stone": "ストーン"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "連絡先",
@@ -748,7 +766,6 @@
     "noSuggestions": "まだ提案はありません",
     "pricesHidden": "価格は非表示",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "価格は非表示 · 目のアイコンで表示",
     "showPrices": "価格を表示",
     "hidePrices": "価格を非表示",

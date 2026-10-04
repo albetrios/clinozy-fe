@@ -13,7 +13,10 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { validateOfferingsSearch } from '../../offerings.search.ts';
+import {
+  validateOfferingCreateSearch,
+  validateOfferingsSearch,
+} from '../../offerings.search.ts';
 import { OfferingsPage } from '../../OfferingsPage.tsx';
 import { validateOffersSearch } from '../../offers/offers.search.ts';
 import { OffersPage } from '../../offers/OffersPage.tsx';
@@ -26,9 +29,10 @@ export const OFFERS_URL = '/organization/acme/offerings/offers';
 
 /**
  * The Offerings family as `routeTree.tsx` registers it — the Offerings tab
- * and, beside it, the Offers tab, each with its search schema — opened at
- * `url` for a member previewed as `role` (View-as narrows the clinic access to
- * that role's matrix). Every other path lands on a catch-all.
+ * with its two dialog routes (`create`, `$offeringId/edit`, rendering
+ * nothing) and, beside it, the Offers tab, each with its search schema —
+ * opened at `url` for a member previewed as `role` (View-as narrows the
+ * clinic access to that role's matrix). Every other path lands on a catch-all.
  */
 export function renderOfferingsRoutes(
   url: string,
@@ -44,6 +48,17 @@ export function renderOfferingsRoutes(
     validateSearch: validateOfferingsSearch,
     component: OfferingsPage,
   });
+  const create = createRoute({
+    getParentRoute: () => offerings,
+    path: 'create',
+    validateSearch: validateOfferingCreateSearch,
+    component: () => null,
+  });
+  const edit = createRoute({
+    getParentRoute: () => offerings,
+    path: '$offeringId/edit',
+    component: () => null,
+  });
   const offers = createRoute({
     getParentRoute: () => root,
     path: '/organization/$organizationSlug/offerings/offers',
@@ -56,7 +71,11 @@ export function renderOfferingsRoutes(
     component: () => <p>elsewhere</p>,
   });
   const router = createRouter({
-    routeTree: root.addChildren([offerings, offers, elsewhere]),
+    routeTree: root.addChildren([
+      offerings.addChildren([create, edit]),
+      offers,
+      elsewhere,
+    ]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({

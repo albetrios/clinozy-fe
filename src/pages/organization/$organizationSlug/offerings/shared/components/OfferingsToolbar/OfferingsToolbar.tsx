@@ -7,6 +7,7 @@ import { useParams } from '@tanstack/react-router';
 import type { ReactTable, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
+import { organizationOfferings, organizationOffers } from '@/lib/routes/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
@@ -44,21 +45,18 @@ export interface OfferingsToolbarProps<TRow extends RowData> {
 /** The two tabs as links (`Tag` / `Sparkles`, 14px; H:5522). */
 function useTabs(organizationSlug: string): RoomLinkTab[] {
   const { t } = useTranslation(OFFERINGS_TOOLBAR_NS);
-  const params = { organizationSlug };
   return [
     {
       id: 'offerings',
       label: t(OFFERINGS_TOOLBAR_KEYS.tabOfferings),
       icon: Tag,
-      to: '/organization/$organizationSlug/offerings',
-      params,
+      ...organizationOfferings(organizationSlug),
     },
     {
       id: 'offers',
       label: t(OFFERINGS_TOOLBAR_KEYS.tabOffers),
       icon: Sparkles,
-      to: '/organization/$organizationSlug/offerings/offers',
-      params,
+      ...organizationOffers(organizationSlug),
     },
   ];
 }

@@ -2,6 +2,14 @@ import { type ReactElement, type Ref, useId, useState } from 'react';
 import { type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import {
+  cellNumber,
+  clampNumber,
+  MONEY_SCALE,
+  numberFromText,
+  sanitizeNumberText,
+  textFromNumber,
+} from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   Picker,
@@ -18,14 +26,6 @@ import { Minus, Plus } from '@/shared/icons/index.ts';
 
 import { ITEMS_FIELD_KEYS, ITEMS_FIELD_NS } from './items-field.constants.ts';
 import type { ItemsCellBinding } from './items-field.types.ts';
-import {
-  cellNumber,
-  clampNumber,
-  MONEY_SCALE,
-  numberFromText,
-  sanitizeNumberText,
-  textFromNumber,
-} from './items-field-number.ts';
 
 /*
  * The cells of an items row (H:924, the prototype's `qty` · `input` · `pick`

@@ -30,8 +30,6 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   pricesHidden: 'offeringSuggestions.pricesHidden',
   /** "₹ ••••" while prices hide. */
   masked: 'offeringSuggestions.masked',
-  /** The price box's "₹" before the figure (H:2809). */
-  currency: 'offeringSuggestions.currency',
   pricesHiddenHint: 'offeringSuggestions.pricesHiddenHint',
   showPrices: 'offeringSuggestions.showPrices',
   hidePrices: 'offeringSuggestions.hidePrices',

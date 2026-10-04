@@ -27,4 +27,10 @@ describe('useOfferLabels (H:5460)', () => {
     expect(result.current.state('live')).toBe('Running');
     expect(result.current.state('ended')).toBe('Ended');
   });
+
+  it('writes a day as a civil date in the viewer’s locale', () => {
+    useLocaleStore.setState({ formatLocale: 'en-GB' });
+    const { result } = renderHook(() => useOfferLabels());
+    expect(result.current.date('2026-10-31')).toBe('31 Oct 2026');
+  });
 });

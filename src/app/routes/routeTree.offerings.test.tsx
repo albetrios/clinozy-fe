@@ -2,8 +2,13 @@ import { createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requireOrgStatus } from '@/app/guards/org-gates.ts';
+import { manifest as offeringEditManifest } from '@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.manifest.ts';
+import { manifest as offeringCreateManifest } from '@/pages/organization/$organizationSlug/offerings/create/create.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
-import { validateOfferingsSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import {
+  validateOfferingCreateSearch,
+  validateOfferingsSearch,
+} from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 
@@ -52,6 +57,8 @@ vi.mock('@/shared/tenancy/organization-resolver.ts', () => ({
 
 const OFFERINGS = '/organization/$organizationSlug/offerings';
 const OFFERS = `${OFFERINGS}/offers`;
+const OFFERING_CREATE = `${OFFERINGS}/create`;
+const OFFERING_EDIT = `${OFFERINGS}/$offeringId/edit`;
 
 type OfferingsRoute = {
   options: {
@@ -70,21 +77,26 @@ beforeEach(() => {
 });
 
 describe('the Offerings room’s routes (KICKOFF §4, D24, S:98–103)', () => {
-  it('registers the Offerings tab and, beside it, the Offers tab', () => {
+  it('registers the Offerings tab with its dialog routes and, beside it, the Offers tab', () => {
     const ids = Object.keys(router.routesById)
       .filter((id) => id === OFFERINGS || id.startsWith(`${OFFERINGS}/`))
       .sort();
-    expect(ids).toEqual([OFFERINGS, OFFERS]);
+    expect(ids).toEqual([OFFERINGS, OFFERING_EDIT, OFFERING_CREATE, OFFERS]);
   });
 
-  it('validates each tab’s own search', () => {
+  it('validates each tab’s own search, and the New offering prefill', () => {
     expect(routeOf(OFFERINGS)?.options.validateSearch).toBe(validateOfferingsSearch);
     expect(routeOf(OFFERS)?.options.validateSearch).toBe(validateOffersSearch);
+    expect(routeOf(OFFERING_CREATE)?.options.validateSearch).toBe(
+      validateOfferingCreateSearch,
+    );
   });
 
   it.each([
     [OFFERINGS, offeringsManifest],
     [OFFERS, offersManifest],
+    [OFFERING_CREATE, offeringCreateManifest],
+    [OFFERING_EDIT, offeringEditManifest],
   ] as const)(
     '%s runs the room gateway on its own manifest, then the status guard',
     async (id, manifest) => {
@@ -100,9 +112,24 @@ describe('the Offerings room’s routes (KICKOFF §4, D24, S:98–103)', () => {
     },
   );
 
-  it('puts only the room in the nav, never its Offers tab', () => {
+  it('puts only the room in the nav, never its Offers tab or its dialogs', () => {
     expect(routeOf(OFFERINGS)?.options.staticData?.manifest?.nav).toBeDefined();
-    expect(routeOf(OFFERS)?.options.staticData?.manifest?.nav).toBeUndefined();
+    for (const id of [OFFERS, OFFERING_CREATE, OFFERING_EDIT]) {
+      expect(routeOf(id)?.options.staticData?.manifest?.nav).toBeUndefined();
+    }
+  });
+
+  it('matches an offering’s edit URL to its dialog route, over the Offerings tab', async () => {
+    const memoryRouter = createRouter({
+      routeTree: router.routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/organization/acme/offerings/O1/edit?q=peel'],
+      }),
+    });
+    await memoryRouter.load();
+    expect(memoryRouter.state.matches.map((match) => match.routeId)).toContain(OFFERINGS);
+    expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(OFFERING_EDIT);
+    expect(memoryRouter.state.matches.at(-1)?.params).toMatchObject({ offeringId: 'O1' });
   });
 
   it('matches the Offers URL to the Offers tab, not the Offerings tab', async () => {

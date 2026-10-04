@@ -93,7 +93,8 @@
     "title": "لا توجد خدمات بعد",
     "description": "أضف العلاجات والباقات مع أسعارها ليمكن حجزها وإصدار فواتيرها.",
     "noMatchTitle": "لا توجد خدمة مطابقة",
-    "noMatchDescription": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+    "noMatchDescription": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "newOffering": "خدمة جديدة"
   },
   "offers": {
     "columns": {
@@ -142,6 +143,104 @@
     "empty": {
       "title": "لا توجد عروض بعد",
       "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+    }
+  },
+  "record": "خدمة",
+  "offeringDrawer": {
+    "title": {
+      "create": "خدمة جديدة",
+      "edit": "تعديل الخدمة"
+    },
+    "sub": "تُستخدم في المواعيد والفواتير والباقات",
+    "quickFill": {
+      "single": "جلسة واحدة",
+      "pack": "باقة 6 جلسات",
+      "lhr": "باقة 10 جلسات ليزر",
+      "consultation": "استشارة"
+    },
+    "steps": {
+      "main": "الخدمة والسعر والجلسات",
+      "timeDetails": "المدة والصلاحية والتفاصيل",
+      "offersTime": "العروض عليها والمدة والصلاحية",
+      "details": "التفاصيل"
+    },
+    "groups": {
+      "offering": "الخدمة",
+      "price": "السعر والجلسات",
+      "offers": "العروض عليها",
+      "time": "المدة والصلاحية",
+      "details": "التفاصيل"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: ليزر الوجه كاملًا",
+      "category": "الفئة",
+      "colour": "اللون",
+      "colourHint": "يُستخدم لهذه الخدمة في كل مكان",
+      "availableAt": "متاحة في",
+      "availableAtHint": "تُخفى من المواعيد والفواتير في غيرها",
+      "price": "السعر",
+      "priceHint": "السعر الأساسي · يظهر على الفاتورة",
+      "offerPrice": "سعر العرض",
+      "offerPriceHint": "ما تُحصّله · اتركه فارغًا = السعر الأساسي",
+      "offerPriceBelow": "ما تُحصّله · أقل من الأساسي بـ {{percent}}%",
+      "sessions": "الجلسات",
+      "sessionsHint": "الجلسات المسموح بها مقابل فاتورة واحدة",
+      "gstRate": "نسبة GST",
+      "gst": "GST",
+      "gstInclusive": "شامل",
+      "gstExclusive": "غير شامل",
+      "floor": "أدنى سعر",
+      "floorShown": "ظاهر · تراه أنت فقط",
+      "floorHidden": "مخفي · اضغط للتعيين",
+      "floorHint": "لا يمكن للاستقبال الفوترة بأقل منه",
+      "billedToday": "المُحصّل اليوم",
+      "freeSessions_zero": "+{{count}} جلسة مجانية",
+      "freeSessions_one": "+{{count}} جلسة مجانية",
+      "freeSessions_two": "+{{count}} جلستان مجانيتان",
+      "freeSessions_few": "+{{count}} جلسات مجانية",
+      "freeSessions_many": "+{{count}} جلسة مجانية",
+      "freeSessions_other": "+{{count}} جلسة مجانية",
+      "belowList": "أقل من الأساسي بـ {{percent}}%",
+      "duration": "المدة",
+      "durationQuick": "{{minutes}} د",
+      "minutesUnit": "د",
+      "validity": "الصلاحية",
+      "validityHint": "0 = بلا انتهاء · تضيع الجلسات المتبقية بعدها",
+      "daysUnit": "يوم",
+      "days_zero": "{{count}} يوم",
+      "days_one": "يوم واحد",
+      "days_two": "يومان",
+      "days_few": "{{count}} أيام",
+      "days_many": "{{count}} يومًا",
+      "days_other": "{{count}} يوم",
+      "validityQuick": {
+        "none": "بلا",
+        "quarter": "3 أشهر",
+        "half": "6 أشهر",
+        "year": "سنة"
+      },
+      "searchTerms": "كلمات البحث",
+      "searchTermsHint": "مفصولة بفواصل",
+      "searchTermsPlaceholder": "ليزر، وجه، إزالة الشعر",
+      "description": "الوصف",
+      "descriptionPlaceholder": "ما الذي تشمله",
+      "status": "الحالة",
+      "active": "نشطة · قابلة للحجز",
+      "inactive": "غير نشطة · مخفية"
+    },
+    "offerTill": "حتى {{date}}",
+    "untitled": "بلا اسم",
+    "save": {
+      "create": "إنشاء الخدمة",
+      "edit": "حفظ التغييرات",
+      "createAnother": "إنشاء وإضافة أخرى"
+    },
+    "toasts": {
+      "addName": "أضف اسمًا",
+      "addPrice": "أضف سعرًا",
+      "offerAbovePrice": "لا يمكن أن يزيد سعر العرض على السعر",
+      "floorAboveOffer": "لا يمكن أن يزيد أدنى سعر على سعر العرض"
     }
   }
 }

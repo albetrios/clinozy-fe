@@ -69,7 +69,8 @@
     "title": "Noch keine Leistungen",
     "description": "Fügen Sie Behandlungen und Pakete mit Preisen hinzu, damit sie gebucht und abgerechnet werden können.",
     "noMatchTitle": "Keine passende Leistung",
-    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "newOffering": "Neue Leistung"
   },
   "offers": {
     "columns": {
@@ -110,6 +111,96 @@
     "empty": {
       "title": "Noch keine Angebote",
       "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+    }
+  },
+  "record": "Leistung",
+  "offeringDrawer": {
+    "title": {
+      "create": "Neue Leistung",
+      "edit": "Leistung bearbeiten"
+    },
+    "sub": "Wird in Terminen, Rechnungen und Paketen verwendet",
+    "quickFill": {
+      "single": "Einzelsitzung",
+      "pack": "6er-Paket",
+      "lhr": "Laser-10er-Paket",
+      "consultation": "Beratung"
+    },
+    "steps": {
+      "main": "Leistung, Preis & Sitzungen",
+      "timeDetails": "Dauer, Gültigkeit & Details",
+      "offersTime": "Angebote dazu, Dauer & Gültigkeit",
+      "details": "Details"
+    },
+    "groups": {
+      "offering": "Leistung",
+      "price": "Preis & Sitzungen",
+      "offers": "Angebote dazu",
+      "time": "Dauer & Gültigkeit",
+      "details": "Details"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Laser Gesicht komplett",
+      "category": "Kategorie",
+      "colour": "Farbe",
+      "colourHint": "gilt überall für diese Leistung",
+      "availableAt": "Verfügbar in",
+      "availableAtHint": "anderswo in Terminen und Rechnungen ausgeblendet",
+      "price": "Preis",
+      "priceHint": "Listenpreis · steht auf der Rechnung",
+      "offerPrice": "Angebotspreis",
+      "offerPriceHint": "was Sie berechnen · leer = Listenpreis",
+      "offerPriceBelow": "was Sie berechnen · {{percent}} % unter Liste",
+      "sessions": "Sitzungen",
+      "sessionsHint": "Behandlungen pro Rechnung",
+      "gstRate": "GST-Satz",
+      "gst": "GST",
+      "gstInclusive": "Inklusive",
+      "gstExclusive": "Exklusive",
+      "floor": "Mindestpreis",
+      "floorShown": "Sichtbar · nur Sie sehen ihn",
+      "floorHidden": "Ausgeblendet · zum Festlegen tippen",
+      "floorHint": "die Rezeption kann nie darunter abrechnen",
+      "billedToday": "Heute berechnet",
+      "freeSessions_one": "+{{count}} Gratissitzung",
+      "freeSessions_other": "+{{count}} Gratissitzungen",
+      "belowList": "{{percent}} % unter Liste",
+      "duration": "Dauer",
+      "durationQuick": "{{minutes}} Min.",
+      "minutesUnit": "Min.",
+      "validity": "Gültigkeit",
+      "validityHint": "0 = unbegrenzt · danach verfallen offene Sitzungen",
+      "daysUnit": "Tage",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "validityQuick": {
+        "none": "Keine",
+        "quarter": "3 Mon.",
+        "half": "6 Mon.",
+        "year": "1 Jahr"
+      },
+      "searchTerms": "Suchbegriffe",
+      "searchTermsHint": "durch Kommas getrennt",
+      "searchTermsPlaceholder": "Laser, Gesicht, Haarentfernung",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Was enthalten ist",
+      "status": "Status",
+      "active": "Aktiv · buchbar",
+      "inactive": "Inaktiv · ausgeblendet"
+    },
+    "offerTill": "bis {{date}}",
+    "untitled": "Ohne Namen",
+    "save": {
+      "create": "Leistung anlegen",
+      "edit": "Änderungen speichern",
+      "createAnother": "Anlegen & weitere hinzufügen"
+    },
+    "toasts": {
+      "addName": "Geben Sie einen Namen ein",
+      "addPrice": "Geben Sie einen Preis ein",
+      "offerAbovePrice": "Der Angebotspreis darf nicht über dem Preis liegen",
+      "floorAboveOffer": "Der Mindestpreis darf nicht über dem Angebotspreis liegen"
     }
   }
 }

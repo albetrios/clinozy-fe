@@ -7,7 +7,7 @@ import {
   numberFromText,
   sanitizeNumberText,
   textFromNumber,
-} from './items-field-number.ts';
+} from './number-text.ts';
 
 describe('sanitizeNumberText — what a number cell takes (H:3811)', () => {
   it('keeps digits only for a whole number', () => {

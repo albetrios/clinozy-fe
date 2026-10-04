@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "연락처 및 개인 정보",
-      "clinic": "클리닉, 소개 및 후속 조치",
-      "notFilled": "아직 입력되지 않음"
+      "clinic": "클리닉, 소개 및 후속 조치"
     },
     "groups": {
       "contact": "연락처",
@@ -330,13 +329,32 @@
       "next": "다음: {{step}} →",
       "edit": "수정",
       "open": "열기",
-      "missing": "누락: {{fields, list(type: unit)}}"
+      "missing": "누락: {{fields, list(type: unit)}}",
+      "notFilled": "아직 입력되지 않음"
     },
     "peek": {
       "empty": "비어 있음",
       "added_other": "{{count}}개 추가됨",
       "noneYet": "아직 없음"
-    }
+    },
+    "stepper": {
+      "decrease": "줄이기",
+      "increase": "늘리기"
+    },
+    "colours": {
+      "butter": "버터",
+      "lav": "라벤더",
+      "sky": "하늘색",
+      "sage": "세이지",
+      "blush": "블러시",
+      "mint": "민트",
+      "peach": "피치",
+      "plum": "자두색",
+      "lime": "라임",
+      "slate": "슬레이트",
+      "stone": "스톤"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "연락처",
@@ -748,7 +766,6 @@
     "noSuggestions": "아직 제안이 없습니다",
     "pricesHidden": "가격 숨김",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "가격 숨김 · 눈 아이콘으로 표시",
     "showPrices": "가격 표시",
     "hidePrices": "가격 숨기기",

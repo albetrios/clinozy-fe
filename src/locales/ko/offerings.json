@@ -63,7 +63,8 @@
     "title": "아직 서비스가 없습니다",
     "description": "가격과 함께 시술과 패키지를 추가하면 예약하고 청구할 수 있습니다.",
     "noMatchTitle": "일치하는 서비스가 없습니다",
-    "noMatchDescription": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+    "noMatchDescription": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+    "newOffering": "새 서비스"
   },
   "offers": {
     "columns": {
@@ -102,6 +103,94 @@
     "empty": {
       "title": "아직 프로모션이 없습니다",
       "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+    }
+  },
+  "record": "서비스",
+  "offeringDrawer": {
+    "title": {
+      "create": "새 서비스",
+      "edit": "서비스 편집"
+    },
+    "sub": "예약, 청구서, 패키지에 사용됩니다",
+    "quickFill": {
+      "single": "1회 세션",
+      "pack": "6회 패키지",
+      "lhr": "레이저 제모 10회",
+      "consultation": "상담"
+    },
+    "steps": {
+      "main": "서비스, 가격 및 회차",
+      "timeDetails": "시간, 유효 기간 및 세부 정보",
+      "offersTime": "적용 중인 할인, 시간 및 유효 기간",
+      "details": "세부 정보"
+    },
+    "groups": {
+      "offering": "서비스",
+      "price": "가격 및 회차",
+      "offers": "적용 중인 할인",
+      "time": "시간 및 유효 기간",
+      "details": "세부 정보"
+    },
+    "fields": {
+      "name": "이름",
+      "namePlaceholder": "예: 얼굴 전체 레이저 제모",
+      "category": "카테고리",
+      "colour": "색상",
+      "colourHint": "이 서비스의 모든 화면에 사용됩니다",
+      "availableAt": "이용 가능 지점",
+      "availableAtHint": "다른 지점의 예약과 청구서에는 표시되지 않습니다",
+      "price": "가격",
+      "priceHint": "정가 · 청구서에 표시",
+      "offerPrice": "판매가",
+      "offerPriceHint": "청구 금액 · 비워 두면 정가",
+      "offerPriceBelow": "청구 금액 · 정가보다 {{percent}}% 낮음",
+      "sessions": "회차",
+      "sessionsHint": "청구서 1건당 가능한 시술 횟수",
+      "gstRate": "GST 세율",
+      "gst": "GST",
+      "gstInclusive": "포함",
+      "gstExclusive": "별도",
+      "floor": "최저가",
+      "floorShown": "표시됨 · 나만 볼 수 있음",
+      "floorHidden": "숨김 · 눌러서 설정",
+      "floorHint": "데스크는 이보다 낮게 청구할 수 없습니다",
+      "billedToday": "오늘 청구액",
+      "freeSessions_other": "+무료 {{count}}회",
+      "belowList": "정가보다 {{percent}}% 낮음",
+      "duration": "소요 시간",
+      "durationQuick": "{{minutes}}분",
+      "minutesUnit": "분",
+      "validity": "유효 기간",
+      "validityHint": "0 = 만료 없음 · 이후 남은 회차는 소멸",
+      "daysUnit": "일",
+      "days_other": "{{count}}일",
+      "validityQuick": {
+        "none": "없음",
+        "quarter": "3개월",
+        "half": "6개월",
+        "year": "1년"
+      },
+      "searchTerms": "검색어",
+      "searchTermsHint": "쉼표로 구분",
+      "searchTermsPlaceholder": "레이저, 얼굴, 제모",
+      "description": "설명",
+      "descriptionPlaceholder": "포함 내용",
+      "status": "상태",
+      "active": "활성 · 예약 가능",
+      "inactive": "비활성 · 숨김"
+    },
+    "offerTill": "{{date}}까지",
+    "untitled": "이름 없음",
+    "save": {
+      "create": "서비스 생성",
+      "edit": "변경 사항 저장",
+      "createAnother": "생성 후 계속 추가"
+    },
+    "toasts": {
+      "addName": "이름을 입력하세요",
+      "addPrice": "가격을 입력하세요",
+      "offerAbovePrice": "판매가는 가격보다 높을 수 없습니다",
+      "floorAboveOffer": "최저가는 판매가보다 높을 수 없습니다"
     }
   }
 }

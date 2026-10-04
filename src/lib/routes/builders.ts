@@ -84,6 +84,38 @@ export function organizationAppointmentCreate(organizationSlug: string) {
   } as const;
 }
 
+/** The Offerings room's Offerings tab — the list the Offering drawer opens over. */
+export function organizationOfferings(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** The New offering drawer over the list; `?name=` prefills it (`S:99`). */
+export function organizationOfferingCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings/create',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** One offering's drawer over the list — Edit offering, view only without Edit (`S:100`). */
+export function organizationOfferingEdit(organizationSlug: string, offeringId: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings/$offeringId/edit',
+    params: { organizationSlug, offeringId },
+  } as const;
+}
+
+/** The Offerings room's Offers tab — a page of its own beside the Offerings tab (`S:101`). */
+export function organizationOffers(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/offerings/offers',
+    params: { organizationSlug },
+  } as const;
+}
+
 /** The Patients room — the list the New patient drawer opens over. */
 export function organizationPatients(organizationSlug: string) {
   return {

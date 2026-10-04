@@ -20,8 +20,6 @@ export const PATIENT_DRAWER_KEYS = {
   steps: {
     contact: 'patientDrawer.steps.contact',
     clinic: 'patientDrawer.steps.clinic',
-    /** A step head's sub line before any of its fields is filled. */
-    notFilled: 'patientDrawer.steps.notFilled',
   },
   /** The 11px section labels inside the steps (H:894). */
   groups: {

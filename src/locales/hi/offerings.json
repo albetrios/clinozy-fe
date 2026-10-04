@@ -69,7 +69,8 @@
     "title": "अभी कोई सेवा नहीं",
     "description": "उपचार और पैकेज कीमतों के साथ जोड़ें ताकि उन्हें बुक और बिल किया जा सके।",
     "noMatchTitle": "कोई मेल खाती सेवा नहीं",
-    "noMatchDescription": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।"
+    "noMatchDescription": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+    "newOffering": "नई सेवा"
   },
   "offers": {
     "columns": {
@@ -110,6 +111,96 @@
     "empty": {
       "title": "अभी कोई ऑफ़र नहीं",
       "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।"
+    }
+  },
+  "record": "सेवा",
+  "offeringDrawer": {
+    "title": {
+      "create": "नई सेवा",
+      "edit": "सेवा संपादित करें"
+    },
+    "sub": "बुकिंग, बिल और पैकेज में इस्तेमाल होती है",
+    "quickFill": {
+      "single": "एकल सेशन",
+      "pack": "6 सेशन पैक",
+      "lhr": "LHR 10 पैक",
+      "consultation": "परामर्श"
+    },
+    "steps": {
+      "main": "सेवा, कीमत और सेशन",
+      "timeDetails": "समय, वैधता और विवरण",
+      "offersTime": "इस पर ऑफ़र, समय और वैधता",
+      "details": "विवरण"
+    },
+    "groups": {
+      "offering": "सेवा",
+      "price": "कीमत और सेशन",
+      "offers": "इस पर ऑफ़र",
+      "time": "समय और वैधता",
+      "details": "विवरण"
+    },
+    "fields": {
+      "name": "नाम",
+      "namePlaceholder": "जैसे LHR फ़ुल फ़ेस",
+      "category": "श्रेणी",
+      "colour": "रंग",
+      "colourHint": "इस सेवा के लिए हर जगह इस्तेमाल होता है",
+      "availableAt": "उपलब्ध",
+      "availableAtHint": "बाकी जगह बुकिंग और बिल में छिपी रहती है",
+      "price": "कीमत",
+      "priceHint": "सूची मूल्य · बिल पर दिखता है",
+      "offerPrice": "ऑफ़र कीमत",
+      "offerPriceHint": "जो आप लेते हैं · खाली = सूची मूल्य",
+      "offerPriceBelow": "जो आप लेते हैं · सूची से {{percent}}% कम",
+      "sessions": "सेशन",
+      "sessionsHint": "एक बिल पर अनुमत उपचार",
+      "gstRate": "GST दर",
+      "gst": "GST",
+      "gstInclusive": "शामिल",
+      "gstExclusive": "अतिरिक्त",
+      "floor": "न्यूनतम कीमत",
+      "floorShown": "दिख रही · सिर्फ़ आप देख सकते हैं",
+      "floorHidden": "छिपी · सेट करने के लिए टैप करें",
+      "floorHint": "डेस्क इससे कम बिल नहीं कर सकता",
+      "billedToday": "आज का बिल",
+      "freeSessions_one": "+{{count}} मुफ़्त सेशन",
+      "freeSessions_other": "+{{count}} मुफ़्त सेशन",
+      "belowList": "सूची से {{percent}}% कम",
+      "duration": "अवधि",
+      "durationQuick": "{{minutes}} मि",
+      "minutesUnit": "मिनट",
+      "validity": "वैधता",
+      "validityHint": "0 = कोई समाप्ति नहीं · इसके बाद बचे सेशन खत्म",
+      "daysUnit": "दिन",
+      "days_one": "{{count}} दिन",
+      "days_other": "{{count}} दिन",
+      "validityQuick": {
+        "none": "कोई नहीं",
+        "quarter": "3 माह",
+        "half": "6 माह",
+        "year": "1 साल"
+      },
+      "searchTerms": "खोज शब्द",
+      "searchTermsHint": "कॉमा से अलग करें",
+      "searchTermsPlaceholder": "लेज़र, चेहरा, हेयर रिमूवल",
+      "description": "विवरण",
+      "descriptionPlaceholder": "क्या शामिल है",
+      "status": "स्थिति",
+      "active": "सक्रिय · बुक हो सकती है",
+      "inactive": "निष्क्रिय · छिपी"
+    },
+    "offerTill": "{{date}} तक",
+    "untitled": "बिना नाम",
+    "save": {
+      "create": "सेवा बनाएँ",
+      "edit": "बदलाव सहेजें",
+      "createAnother": "बनाएँ और एक और जोड़ें"
+    },
+    "toasts": {
+      "addName": "नाम जोड़ें",
+      "addPrice": "कीमत जोड़ें",
+      "offerAbovePrice": "ऑफ़र कीमत कीमत से ज़्यादा नहीं हो सकती",
+      "floorAboveOffer": "न्यूनतम कीमत ऑफ़र कीमत से ज़्यादा नहीं हो सकती"
     }
   }
 }

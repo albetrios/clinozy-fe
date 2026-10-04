@@ -11,6 +11,8 @@ export const OFFERINGS_NS = I18N_NAMESPACES.offerings;
  */
 export const OFFERINGS_KEYS = {
   manifest: { title: 'manifest.title' },
+  /** "Offering" — the record a stale link names: "Offering not found · it may have been deleted". */
+  record: 'record',
   /** Column headers — also the meta line's labels and the Filters sections'. */
   columns: {
     seq: 'columns.seq',
@@ -59,6 +61,8 @@ export const OFFERINGS_KEYS = {
     /** A search with no hit. */
     noMatchTitle: 'empty.noMatchTitle',
     noMatchDescription: 'empty.noMatchDescription',
+    /** The empty catalogue's action (PRD.md:232, B.13 R26). */
+    newOffering: 'empty.newOffering',
   },
 } as const;
 

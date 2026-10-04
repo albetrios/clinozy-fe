@@ -75,7 +75,8 @@
     "title": "Ancora nessun servizio",
     "description": "Aggiungi trattamenti e pacchetti con i prezzi per poterli prenotare e fatturare.",
     "noMatchTitle": "Nessun servizio corrisponde",
-    "noMatchDescription": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
+    "noMatchDescription": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+    "newOffering": "Nuovo servizio"
   },
   "offers": {
     "columns": {
@@ -118,6 +119,98 @@
     "empty": {
       "title": "Ancora nessuna offerta",
       "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
+    }
+  },
+  "record": "Servizio",
+  "offeringDrawer": {
+    "title": {
+      "create": "Nuovo servizio",
+      "edit": "Modifica servizio"
+    },
+    "sub": "Usato in prenotazioni, fatture e pacchetti",
+    "quickFill": {
+      "single": "Seduta singola",
+      "pack": "Pacchetto 6 sedute",
+      "lhr": "Pacchetto laser 10",
+      "consultation": "Consulenza"
+    },
+    "steps": {
+      "main": "Servizio, prezzo e sedute",
+      "timeDetails": "Durata, validità e dettagli",
+      "offersTime": "Offerte attive, durata e validità",
+      "details": "Dettagli"
+    },
+    "groups": {
+      "offering": "Servizio",
+      "price": "Prezzo e sedute",
+      "offers": "Offerte attive",
+      "time": "Durata e validità",
+      "details": "Dettagli"
+    },
+    "fields": {
+      "name": "Nome",
+      "namePlaceholder": "es. Laser viso completo",
+      "category": "Categoria",
+      "colour": "Colore",
+      "colourHint": "usato ovunque per questo servizio",
+      "availableAt": "Disponibile in",
+      "availableAtHint": "nascosto da prenotazioni e conti altrove",
+      "price": "Prezzo",
+      "priceHint": "prezzo di listino · mostrato in fattura",
+      "offerPrice": "Prezzo offerta",
+      "offerPriceHint": "quanto fatturi · vuoto = prezzo di listino",
+      "offerPriceBelow": "quanto fatturi · {{percent}}% sotto listino",
+      "sessions": "Sedute",
+      "sessionsHint": "trattamenti consentiti per una fattura",
+      "gstRate": "Aliquota GST",
+      "gst": "GST",
+      "gstInclusive": "Inclusa",
+      "gstExclusive": "Esclusa",
+      "floor": "Prezzo minimo",
+      "floorShown": "Visibile · solo tu lo vedi",
+      "floorHidden": "Nascosto · tocca per impostarlo",
+      "floorHint": "la reception non può mai fatturare meno",
+      "billedToday": "Fatturato oggi",
+      "freeSessions_one": "+{{count}} seduta gratuita",
+      "freeSessions_many": "+{{count}} sedute gratuite",
+      "freeSessions_other": "+{{count}} sedute gratuite",
+      "belowList": "{{percent}}% sotto listino",
+      "duration": "Durata",
+      "durationQuick": "{{minutes}} min",
+      "minutesUnit": "min",
+      "validity": "Validità",
+      "validityHint": "0 = nessuna scadenza · poi le sedute rimaste si perdono",
+      "daysUnit": "giorni",
+      "days_one": "{{count}} giorno",
+      "days_many": "{{count}} giorni",
+      "days_other": "{{count}} giorni",
+      "validityQuick": {
+        "none": "Nessuna",
+        "quarter": "3 mesi",
+        "half": "6 mesi",
+        "year": "1 anno"
+      },
+      "searchTerms": "Parole chiave",
+      "searchTermsHint": "separate da virgole",
+      "searchTermsPlaceholder": "laser, viso, epilazione",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Cosa è incluso",
+      "status": "Stato",
+      "active": "Attivo · prenotabile",
+      "inactive": "Inattivo · nascosto"
+    },
+    "offerTill": "fino al {{date}}",
+    "untitled": "Senza nome",
+    "save": {
+      "create": "Crea servizio",
+      "edit": "Salva modifiche",
+      "createAnother": "Crea e aggiungi un altro"
+    },
+    "toasts": {
+      "addName": "Aggiungi un nome",
+      "addPrice": "Aggiungi un prezzo",
+      "offerAbovePrice": "Il prezzo offerta non può superare il prezzo",
+      "floorAboveOffer": "Il prezzo minimo non può superare il prezzo offerta"
     }
   }
 }

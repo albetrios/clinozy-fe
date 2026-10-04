@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1184 src files · ~630 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1203 src files · ~638 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -477,6 +477,7 @@ clinozy-fe/
 │   │   ├── icon-surface.ts
 │   │   ├── lazy-module.ts
 │   │   ├── list-refresh.ts
+│   │   ├── number-text.ts
 │   │   ├── onboarding-defaults.ts
 │   │   ├── parse-list-tolerant.ts
 │   │   ├── password-breach.ts
@@ -487,7 +488,7 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [23 test files]
+│   │   └── [24 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── appointments.json
@@ -902,11 +903,21 @@ clinozy-fe/
 │   │       │   │   ├── MedicalLayout.tsx
 │   │       │   │   └── [1 test file]
 │   │       │   ├── offerings/
+│   │       │   │   ├── $offeringId/
+│   │       │   │   │   └── edit/
 │   │       │   │   ├── __tests__/
 │   │       │   │   │   └── integration/
 │   │       │   │   ├── components/
-│   │       │   │   │   └── OfferingCells/
+│   │       │   │   │   ├── OfferingCells/
+│   │       │   │   │   └── OfferingDrawer/
+│   │       │   │   ├── create/
+│   │       │   │   │   ├── create.manifest.ts
+│   │       │   │   │   ├── CREATE.OVERVIEW.md
+│   │       │   │   │   ├── create.route.tsx
+│   │       │   │   │   ├── NewOfferingPage.tsx
+│   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useOfferingsDialogRoute/
 │   │       │   │   │   └── useOfferingsTable/
 │   │       │   │   ├── offers/
 │   │       │   │   │   ├── components/
@@ -1430,13 +1441,17 @@ clinozy-fe/
 │   │   │   ├── DrawerField/
 │   │   │   │   ├── auto-capitalize.ts
 │   │   │   │   ├── drawer-chip-controls.tsx
+│   │   │   │   ├── drawer-choice-controls.tsx
 │   │   │   │   ├── drawer-field-controls.ts
 │   │   │   │   ├── drawer-field-layout.ts
+│   │   │   │   ├── drawer-number-controls.tsx
 │   │   │   │   ├── drawer-phone-input.tsx
+│   │   │   │   ├── drawer-step-body.tsx
 │   │   │   │   ├── drawer-text-controls.tsx
 │   │   │   │   ├── DrawerField.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   └── [5 test files]
+│   │   │   │   ├── use-drawer-field-ids.ts
+│   │   │   │   └── [8 test files]
 │   │   │   ├── DrawerFooter/
 │   │   │   │   ├── DrawerFooter.tsx
 │   │   │   │   ├── index.ts
@@ -1869,11 +1884,10 @@ clinozy-fe/
 │   │   │   ├── ItemsField/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── items-field-cells.tsx
-│   │   │   │   ├── items-field-number.ts
 │   │   │   │   ├── items-field.constants.ts
 │   │   │   │   ├── items-field.types.ts
 │   │   │   │   ├── ItemsField.tsx
-│   │   │   │   └── [3 test files]
+│   │   │   │   └── [2 test files]
 │   │   │   └── ProfileForm/
 │   │   │       ├── contracts.ts
 │   │   │       ├── index.ts

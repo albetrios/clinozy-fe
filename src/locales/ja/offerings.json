@@ -63,7 +63,8 @@
     "title": "まだサービスがありません",
     "description": "料金付きで施術やパッケージを追加すると、予約や請求に使えるようになります。",
     "noMatchTitle": "一致するサービスはありません",
-    "noMatchDescription": "まだ何もありません。別のタブや検索をお試しください。"
+    "noMatchDescription": "まだ何もありません。別のタブや検索をお試しください。",
+    "newOffering": "新しいサービス"
   },
   "offers": {
     "columns": {
@@ -102,6 +103,94 @@
     "empty": {
       "title": "まだオファーがありません",
       "description": "まだ何もありません。別のタブや検索をお試しください。"
+    }
+  },
+  "record": "サービス",
+  "offeringDrawer": {
+    "title": {
+      "create": "新しいサービス",
+      "edit": "サービスを編集"
+    },
+    "sub": "予約・請求書・パッケージで使用します",
+    "quickFill": {
+      "single": "単回セッション",
+      "pack": "6回パック",
+      "lhr": "レーザー脱毛10回パック",
+      "consultation": "診察"
+    },
+    "steps": {
+      "main": "サービス・料金・回数",
+      "timeDetails": "時間・有効期間・詳細",
+      "offersTime": "適用中のオファー・時間・有効期間",
+      "details": "詳細"
+    },
+    "groups": {
+      "offering": "サービス",
+      "price": "料金と回数",
+      "offers": "適用中のオファー",
+      "time": "時間と有効期間",
+      "details": "詳細"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例：全顔レーザー脱毛",
+      "category": "カテゴリ",
+      "colour": "カラー",
+      "colourHint": "このサービスの表示色として全体で使用",
+      "availableAt": "提供する院",
+      "availableAtHint": "ほかの院では予約・請求に表示されません",
+      "price": "料金",
+      "priceHint": "定価・請求書に表示",
+      "offerPrice": "提供価格",
+      "offerPriceHint": "請求額・空欄なら定価",
+      "offerPriceBelow": "請求額・定価より{{percent}}%安い",
+      "sessions": "回数",
+      "sessionsHint": "1枚の請求書で受けられる施術回数",
+      "gstRate": "GST税率",
+      "gst": "GST",
+      "gstInclusive": "税込",
+      "gstExclusive": "税抜",
+      "floor": "最低価格",
+      "floorShown": "表示中・あなただけに表示",
+      "floorHidden": "非表示・タップして設定",
+      "floorHint": "受付はこれより安く請求できません",
+      "billedToday": "本日の請求額",
+      "freeSessions_other": "+無料{{count}}回",
+      "belowList": "定価より{{percent}}%安い",
+      "duration": "所要時間",
+      "durationQuick": "{{minutes}}分",
+      "minutesUnit": "分",
+      "validity": "有効期間",
+      "validityHint": "0 = 無期限・期限後の残り回数は失効",
+      "daysUnit": "日",
+      "days_other": "{{count}}日",
+      "validityQuick": {
+        "none": "なし",
+        "quarter": "3か月",
+        "half": "6か月",
+        "year": "1年"
+      },
+      "searchTerms": "検索キーワード",
+      "searchTermsHint": "カンマ区切り",
+      "searchTermsPlaceholder": "レーザー, 顔, 脱毛",
+      "description": "説明",
+      "descriptionPlaceholder": "含まれる内容",
+      "status": "ステータス",
+      "active": "有効・予約可",
+      "inactive": "無効・非表示"
+    },
+    "offerTill": "{{date}}まで",
+    "untitled": "名称未設定",
+    "save": {
+      "create": "サービスを作成",
+      "edit": "変更を保存",
+      "createAnother": "作成して続けて追加"
+    },
+    "toasts": {
+      "addName": "名称を入力してください",
+      "addPrice": "料金を入力してください",
+      "offerAbovePrice": "提供価格は料金を超えられません",
+      "floorAboveOffer": "最低価格は提供価格を超えられません"
     }
   }
 }

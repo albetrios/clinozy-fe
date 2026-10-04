@@ -75,7 +75,8 @@
     "title": "Aún no hay servicios",
     "description": "Añade tratamientos y paquetes con precios para poder reservarlos y facturarlos.",
     "noMatchTitle": "Ningún servicio coincide",
-    "noMatchDescription": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda."
+    "noMatchDescription": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda.",
+    "newOffering": "Nuevo servicio"
   },
   "offers": {
     "columns": {
@@ -118,6 +119,98 @@
     "empty": {
       "title": "Aún no hay ofertas",
       "description": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda."
+    }
+  },
+  "record": "Servicio",
+  "offeringDrawer": {
+    "title": {
+      "create": "Nuevo servicio",
+      "edit": "Editar servicio"
+    },
+    "sub": "Se usa en citas, facturas y paquetes",
+    "quickFill": {
+      "single": "Sesión única",
+      "pack": "Pack de 6 sesiones",
+      "lhr": "Pack láser de 10",
+      "consultation": "Consulta"
+    },
+    "steps": {
+      "main": "Servicio, precio y sesiones",
+      "timeDetails": "Duración, validez y detalles",
+      "offersTime": "Ofertas, duración y validez",
+      "details": "Detalles"
+    },
+    "groups": {
+      "offering": "Servicio",
+      "price": "Precio y sesiones",
+      "offers": "Ofertas aplicadas",
+      "time": "Duración y validez",
+      "details": "Detalles"
+    },
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Láser rostro completo",
+      "category": "Categoría",
+      "colour": "Color",
+      "colourHint": "se usa para este servicio en todas partes",
+      "availableAt": "Disponible en",
+      "availableAtHint": "oculto en citas y facturas de otras sedes",
+      "price": "Precio",
+      "priceHint": "precio de lista · aparece en la factura",
+      "offerPrice": "Precio de oferta",
+      "offerPriceHint": "lo que cobra · vacío = precio de lista",
+      "offerPriceBelow": "lo que cobra · {{percent}} % bajo lista",
+      "sessions": "Sesiones",
+      "sessionsHint": "tratamientos permitidos por factura",
+      "gstRate": "Tasa de GST",
+      "gst": "GST",
+      "gstInclusive": "Incluido",
+      "gstExclusive": "No incluido",
+      "floor": "Precio mínimo",
+      "floorShown": "Visible · solo usted lo ve",
+      "floorHidden": "Oculto · toque para fijarlo",
+      "floorHint": "recepción nunca puede cobrar menos",
+      "billedToday": "Se cobra hoy",
+      "freeSessions_one": "+{{count}} sesión gratis",
+      "freeSessions_many": "+{{count}} sesiones gratis",
+      "freeSessions_other": "+{{count}} sesiones gratis",
+      "belowList": "{{percent}} % bajo lista",
+      "duration": "Duración",
+      "durationQuick": "{{minutes}} min",
+      "minutesUnit": "min",
+      "validity": "Validez",
+      "validityHint": "0 = sin caducidad · luego se pierden las sesiones que queden",
+      "daysUnit": "días",
+      "days_one": "{{count}} día",
+      "days_many": "{{count}} días",
+      "days_other": "{{count}} días",
+      "validityQuick": {
+        "none": "Ninguna",
+        "quarter": "3 meses",
+        "half": "6 meses",
+        "year": "1 año"
+      },
+      "searchTerms": "Términos de búsqueda",
+      "searchTermsHint": "separados por comas",
+      "searchTermsPlaceholder": "láser, rostro, depilación",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Qué incluye",
+      "status": "Estado",
+      "active": "Activo · reservable",
+      "inactive": "Inactivo · oculto"
+    },
+    "offerTill": "hasta el {{date}}",
+    "untitled": "Sin nombre",
+    "save": {
+      "create": "Crear servicio",
+      "edit": "Guardar cambios",
+      "createAnother": "Crear y añadir otro"
+    },
+    "toasts": {
+      "addName": "Añade un nombre",
+      "addPrice": "Añade un precio",
+      "offerAbovePrice": "El precio de oferta no puede superar el precio",
+      "floorAboveOffer": "El precio mínimo no puede superar el precio de oferta"
     }
   }
 }

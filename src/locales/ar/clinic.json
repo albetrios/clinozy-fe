@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "الاتصال والبيانات الشخصية",
-      "clinic": "العيادة والإحالة والمتابعة",
-      "notFilled": "لم يُملأ بعد"
+      "clinic": "العيادة والإحالة والمتابعة"
     },
     "groups": {
       "contact": "الاتصال",
@@ -335,7 +334,8 @@
       "next": "التالي: {{step}} ←",
       "edit": "تعديل",
       "open": "فتح",
-      "missing": "ناقص: {{fields, list(type: unit)}}"
+      "missing": "ناقص: {{fields, list(type: unit)}}",
+      "notFilled": "لم يُملأ بعد"
     },
     "peek": {
       "empty": "فارغ",
@@ -346,7 +346,25 @@
       "added_many": "{{count}} مُضافًا",
       "added_other": "{{count}} مُضاف",
       "noneYet": "لا شيء بعد"
-    }
+    },
+    "stepper": {
+      "decrease": "إنقاص",
+      "increase": "زيادة"
+    },
+    "colours": {
+      "butter": "زبدي",
+      "lav": "لافندر",
+      "sky": "سماوي",
+      "sage": "أخضر مريمي",
+      "blush": "وردي فاتح",
+      "mint": "نعناعي",
+      "peach": "خوخي",
+      "plum": "برقوقي",
+      "lime": "ليموني",
+      "slate": "رمادي أردوازي",
+      "stone": "حجري"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "جهة الاتصال",
@@ -788,7 +806,6 @@
     "noSuggestions": "لا اقتراحات بعد",
     "pricesHidden": "الأسعار مخفية",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "الأسعار مخفية · استخدم العين لإظهارها",
     "showPrices": "إظهار الأسعار",
     "hidePrices": "إخفاء الأسعار",

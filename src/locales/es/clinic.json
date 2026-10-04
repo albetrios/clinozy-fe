@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "Contacto y datos personales",
-      "clinic": "Clínica, referencia y seguimiento",
-      "notFilled": "Aún sin completar"
+      "clinic": "Clínica, referencia y seguimiento"
     },
     "groups": {
       "contact": "Contacto",
@@ -332,7 +331,8 @@
       "next": "Siguiente: {{step}} →",
       "edit": "Editar",
       "open": "Abrir",
-      "missing": "Falta: {{fields, list(type: unit)}}"
+      "missing": "Falta: {{fields, list(type: unit)}}",
+      "notFilled": "Aún sin completar"
     },
     "peek": {
       "empty": "Vacío",
@@ -340,7 +340,25 @@
       "added_many": "{{count}} añadidos",
       "added_other": "{{count}} añadidos",
       "noneYet": "Ninguno aún"
-    }
+    },
+    "stepper": {
+      "decrease": "Disminuir",
+      "increase": "Aumentar"
+    },
+    "colours": {
+      "butter": "Mantequilla",
+      "lav": "Lavanda",
+      "sky": "Celeste",
+      "sage": "Salvia",
+      "blush": "Rosa palo",
+      "mint": "Menta",
+      "peach": "Melocotón",
+      "plum": "Ciruela",
+      "lime": "Lima",
+      "slate": "Pizarra",
+      "stone": "Piedra"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "Contacto",
@@ -764,7 +782,6 @@
     "noSuggestions": "Aún no hay sugerencias",
     "pricesHidden": "Precios ocultos",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "Precios ocultos · usa el ojo para mostrarlos",
     "showPrices": "Mostrar precios",
     "hidePrices": "Ocultar precios",

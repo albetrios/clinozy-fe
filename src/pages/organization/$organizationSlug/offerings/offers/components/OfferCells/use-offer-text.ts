@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import { civilDayOffset, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
 import type { OfferRecord, OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
+import { useOfferLabels } from '../../../shared/hooks/useOfferLabels/index.ts';
 import { OFFERS_KEYS, OFFERS_NS } from '../../offers.constants.ts';
 
 const K = OFFERS_KEYS.cells;
@@ -13,8 +13,6 @@ const NAMED_OFFERINGS = 2;
 
 /** How the Offers tab words a row's values — its cells and its meta line alike. */
 export interface OfferText {
-  /** "22 Sep 2026" — a civil date, day month year. */
-  date: (date: string) => string;
   /**
    * "B1G1 D-Tan Facial, Back Peeling +1" — the offerings the catalogue still
    * holds (a deleted one is left out).
@@ -40,15 +38,8 @@ export interface OfferText {
 /** The Offers tab's words for a row (`offerings.md:47`; H:5479–5481). */
 export function useOfferText(): OfferText {
   const { t } = useTranslation(OFFERS_NS);
-  const { formatDate } = useLocaleFormat();
-  const date = (day: string) =>
-    formatDate(
-      localDateOf(day),
-      { day: 'numeric', month: 'short', year: 'numeric' },
-      { civilDay: true },
-    );
+  const { date } = useOfferLabels();
   return {
-    date,
     appliesTo: ({ offeringIds }, nameOf) => {
       const names = offeringIds.flatMap((id) => nameOf(id) ?? []);
       const shown = names.slice(0, NAMED_OFFERINGS).join(', ');

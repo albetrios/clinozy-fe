@@ -66,8 +66,13 @@ import {
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
+import { manifest as offeringEditManifest } from '@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.manifest.ts';
+import { manifest as offeringCreateManifest } from '@/pages/organization/$organizationSlug/offerings/create/create.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
-import { validateOfferingsSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import {
+  validateOfferingCreateSearch,
+  validateOfferingsSearch,
+} from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
@@ -269,6 +274,18 @@ const OfferingsPage = lazyRouteComponent(
     [I18N_NAMESPACES.offerings],
     () => import('@/pages/organization/$organizationSlug/offerings/offerings.route.tsx'),
   ),
+  'Component',
+);
+// The Offering drawer's dialog routes render nothing of their own (the list
+// opens the drawer), so they need no namespace beyond the room's.
+const OfferingCreateRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/offerings/create/create.route.tsx'),
+  'Component',
+);
+const OfferingEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.route.tsx'),
   'Component',
 );
 // The Offers tab is the room's second page (D24): its own chunk, the room's namespace.
@@ -918,6 +935,37 @@ const organizationOfferingsRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// URL-driven dialogs over the Offerings tab (D24, S:99–100): they render
+// nothing; the list page reads the URL and opens the Offering drawer over itself.
+const organizationOfferingCreateRoute = createRoute({
+  getParentRoute: () => organizationOfferingsRoute,
+  path: 'create',
+  head: manifestHead(offeringCreateManifest),
+  staticData: { manifest: offeringCreateManifest },
+  validateSearch: validateOfferingCreateSearch,
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offeringCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OfferingCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationOfferingEditRoute = createRoute({
+  getParentRoute: () => organizationOfferingsRoute,
+  path: '$offeringId/edit',
+  head: manifestHead(offeringEditManifest),
+  staticData: { manifest: offeringEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(offeringEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: OfferingEditRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
 // The room's tabs are literal child URLs (D24, S:101). The Offers tab is a page
 // of its own, so it sits beside the Offerings tab rather than inside its outlet.
 const organizationOffersRoute = createRoute({
@@ -1116,7 +1164,10 @@ const routeTree = rootRoute.addChildren([
     ]),
     organizationPaymentsRoute,
     organizationTasksRoute,
-    organizationOfferingsRoute,
+    organizationOfferingsRoute.addChildren([
+      organizationOfferingCreateRoute,
+      organizationOfferingEditRoute,
+    ]),
     organizationOffersRoute,
     organizationUsersRoute,
     organizationNotFoundRoute,

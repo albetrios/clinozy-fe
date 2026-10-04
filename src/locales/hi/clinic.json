@@ -249,8 +249,7 @@
     },
     "steps": {
       "contact": "संपर्क और व्यक्तिगत",
-      "clinic": "क्लिनिक, रेफ़रल और फ़ॉलो-अप",
-      "notFilled": "अभी भरा नहीं गया"
+      "clinic": "क्लिनिक, रेफ़रल और फ़ॉलो-अप"
     },
     "groups": {
       "contact": "संपर्क",
@@ -331,14 +330,33 @@
       "next": "अगला: {{step}} →",
       "edit": "संपादित करें",
       "open": "खोलें",
-      "missing": "बाकी: {{fields, list(type: unit)}}"
+      "missing": "बाकी: {{fields, list(type: unit)}}",
+      "notFilled": "अभी भरा नहीं गया"
     },
     "peek": {
       "empty": "खाली",
       "added_one": "{{count}} जोड़ा गया",
       "added_other": "{{count}} जोड़े गए",
       "noneYet": "अभी कोई नहीं"
-    }
+    },
+    "stepper": {
+      "decrease": "घटाएँ",
+      "increase": "बढ़ाएँ"
+    },
+    "colours": {
+      "butter": "मक्खनी",
+      "lav": "लैवेंडर",
+      "sky": "आसमानी",
+      "sage": "सेज हरा",
+      "blush": "हल्का गुलाबी",
+      "mint": "पुदीना",
+      "peach": "आड़ू",
+      "plum": "बेर",
+      "lime": "नींबू हरा",
+      "slate": "स्लेटी",
+      "stone": "पत्थर"
+    },
+    "currency": "₹"
   },
   "personCard": {
     "contactLabel": "संपर्क",
@@ -756,7 +774,6 @@
     "noSuggestions": "अभी कोई सुझाव नहीं",
     "pricesHidden": "कीमतें छिपी हैं",
     "masked": "₹ ••••",
-    "currency": "₹",
     "pricesHiddenHint": "कीमतें छिपी हैं · दिखाने के लिए आँख का उपयोग करें",
     "showPrices": "कीमतें दिखाएँ",
     "hidePrices": "कीमतें छिपाएँ",

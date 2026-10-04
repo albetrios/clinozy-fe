@@ -33,11 +33,34 @@ export const RECORD_DRAWER_KEYS = {
     edit: 'recordDrawer.step.edit',
     open: 'recordDrawer.step.open',
     missing: 'recordDrawer.step.missing',
+    /** A step head's sub line before any of its fields is filled. */
+    notFilled: 'recordDrawer.step.notFilled',
   },
   peek: {
     empty: 'recordDrawer.peek.empty',
     added: 'recordDrawer.peek.added',
     noneYet: 'recordDrawer.peek.noneYet',
+  },
+  /** The clinic currency's sign before a typed amount — a money field's "₹" tile. */
+  currency: 'recordDrawer.currency',
+  /** A stepper's "−" and "+" (`DrawerStepper`). */
+  stepper: {
+    decrease: 'recordDrawer.stepper.decrease',
+    increase: 'recordDrawer.stepper.increase',
+  },
+  /** Each tone's colour name — what a swatch announces (`DrawerSwatches`) and its peek shows. */
+  colours: {
+    butter: 'recordDrawer.colours.butter',
+    lav: 'recordDrawer.colours.lav',
+    sky: 'recordDrawer.colours.sky',
+    sage: 'recordDrawer.colours.sage',
+    blush: 'recordDrawer.colours.blush',
+    mint: 'recordDrawer.colours.mint',
+    peach: 'recordDrawer.colours.peach',
+    plum: 'recordDrawer.colours.plum',
+    lime: 'recordDrawer.colours.lime',
+    slate: 'recordDrawer.colours.slate',
+    stone: 'recordDrawer.colours.stone',
   },
 } as const;
 

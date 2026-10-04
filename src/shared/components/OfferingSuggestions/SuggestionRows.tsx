@@ -8,6 +8,7 @@ import {
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -295,7 +296,8 @@ export function SuggestionRow({
               aria-hidden="true"
               className="text-muted-foreground pointer-events-none absolute start-2 top-1/2 -translate-y-1/2 text-xs"
             >
-              {t(KEYS.currency)}
+              {/* The price box's "₹" before the figure (H:2809). */}
+              {t(RECORD_DRAWER_KEYS.currency)}
             </span>
             <ItemsNumberInput
               money

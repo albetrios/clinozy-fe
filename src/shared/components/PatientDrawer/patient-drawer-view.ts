@@ -15,6 +15,7 @@ import {
 import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import { PERSON_CARD_KEYS } from '@/shared/components/PersonCard/person-card.constants.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
+import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
@@ -212,7 +213,7 @@ export function usePatientDrawerView({
   const { formatDate } = useLocaleFormat();
   const labels = patientFormLabels(values, today, t, formatDate);
   const storedPhone = toClinicPhone(values.phone);
-  const notFilled = t(K.steps.notFilled);
+  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled);
 
   const contactPeek = contactPeekOf(
     values,

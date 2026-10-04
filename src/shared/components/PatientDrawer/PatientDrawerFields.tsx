@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { Controller, type UseFormReturn, useFormState } from 'react-hook-form';
+import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { cn } from '@/lib/utils.ts';
 import {
   type Branch,
   GENDER_VALUES,
@@ -27,11 +26,13 @@ import {
 import {
   DrawerChips,
   DrawerField,
-  drawerFieldErrorId,
   DrawerFieldGrid,
   DrawerInput,
   DrawerPhoneInput,
+  DrawerQuickChips,
+  DrawerStepBody,
   DrawerTextarea,
+  useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import {
   PERSON_CARD_KEYS,
@@ -71,36 +72,6 @@ interface PatientFieldsProps {
   readOnly: boolean;
 }
 
-/** A control's id, its error's id when it has one, and `aria-invalid`. */
-function useFieldIds(form: UseFormReturn<PatientFormValues>, idPrefix: string) {
-  const { errors } = useFormState({ control: form.control });
-  return (name: keyof PatientFormValues) => {
-    const id = `${idPrefix}-${name}`;
-    const error = errors[name]?.message;
-    return {
-      id,
-      error: typeof error === 'string' ? error : undefined,
-      control: {
-        id,
-        'aria-invalid': error ? true : undefined,
-        'aria-describedby': error ? drawerFieldErrorId(id) : undefined,
-      },
-    };
-  };
-}
-
-/** A step's fields under a view-only drawer: every control inside is disabled at once. */
-function StepBody({ readOnly, children }: { readOnly: boolean; children: ReactNode }) {
-  return (
-    <fieldset
-      disabled={readOnly}
-      className="m-0 flex min-w-0 flex-col gap-4 border-0 p-0"
-    >
-      {children}
-    </fieldset>
-  );
-}
-
 /**
  * Step 1, "Contact & personal" (KICKOFF §6.5): Contact — First name*, Last
  * name, Mobile* with the duplicate notice, Secondary mobile, Address, Home
@@ -132,7 +103,7 @@ export function PatientContactFields({
 }) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
-  const field = useFieldIds(form, idPrefix);
+  const field = useDrawerFieldIds(form, idPrefix);
   const { dateOfBirth } = values;
   const first = field('firstName');
   const last = field('lastName');
@@ -142,7 +113,7 @@ export function PatientContactFields({
   const birth = field('dateOfBirth');
 
   return (
-    <StepBody readOnly={readOnly}>
+    <DrawerStepBody readOnly={readOnly}>
       <DrawerFieldGrid title={t(PATIENT_DRAWER_KEYS.groups.contact)}>
         <DrawerField
           span="half"
@@ -299,7 +270,7 @@ export function PatientContactFields({
           />
         </DrawerField>
       </DrawerFieldGrid>
-    </StepBody>
+    </DrawerStepBody>
   );
 }
 
@@ -312,7 +283,7 @@ function FollowUpField({
   today,
 }: Omit<PatientFieldsProps, 'readOnly'> & { today: string }) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
-  const field = useFieldIds(form, idPrefix);
+  const field = useDrawerFieldIds(form, idPrefix);
   const followUp = field('followUpDate');
   const { followUpDate: date, followUpTime: time } = values;
   const presets = followUpPresets(today);
@@ -347,27 +318,22 @@ function FollowUpField({
           testId={`${testId}-follow-up-time`}
         />
       </div>
-      <div className="flex flex-wrap gap-1.5">
-        {presets.map((preset) => {
-          const picked = preset.date === date && preset.time === time;
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              data-slot="pill"
-              aria-pressed={picked}
-              data-testid={`${testId}-follow-up-${preset.id}`}
-              onClick={() => pick(preset.date, preset.time)}
-              className={cn(
-                'text-foreground h-6 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap tabular-nums transition-colors',
-                picked ? 'bg-muted' : 'bg-background hover:bg-muted',
-              )}
-            >
-              {t(PATIENT_DRAWER_KEYS.followUpQuick[preset.id], { time: preset.time })}
-            </button>
-          );
-        })}
-      </div>
+      <DrawerQuickChips
+        label={t(K.followUp)}
+        options={presets.map((preset) => ({
+          value: preset.id,
+          label: t(PATIENT_DRAWER_KEYS.followUpQuick[preset.id], { time: preset.time }),
+        }))}
+        value={
+          presets.find((preset) => preset.date === date && preset.time === time)?.id ??
+          null
+        }
+        onChange={(id) => {
+          const preset = presets.find((candidate) => candidate.id === id);
+          if (preset) pick(preset.date, preset.time);
+        }}
+        testId={`${testId}-follow-up`}
+      />
     </DrawerField>
   );
 }
@@ -394,13 +360,13 @@ export function PatientClinicFields({
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
-  const field = useFieldIds(form, idPrefix);
+  const field = useDrawerFieldIds(form, idPrefix);
   const referred = field('referredByName');
   const notes = field('notes');
   const photosId = `${idPrefix}-photos`;
 
   return (
-    <StepBody readOnly={readOnly}>
+    <DrawerStepBody readOnly={readOnly}>
       <DrawerFieldGrid title={t(PATIENT_DRAWER_KEYS.groups.clinic)}>
         <DrawerField label={t(K.types)} hint={t(K.typesHint)}>
           <Controller
@@ -542,6 +508,6 @@ export function PatientClinicFields({
           />
         </DrawerField>
       </DrawerFieldGrid>
-    </StepBody>
+    </DrawerStepBody>
   );
 }

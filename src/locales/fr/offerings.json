@@ -75,7 +75,8 @@
     "title": "Aucune prestation pour l’instant",
     "description": "Ajoutez des soins et des forfaits avec leurs prix pour pouvoir les réserver et les facturer.",
     "noMatchTitle": "Aucune prestation ne correspond",
-    "noMatchDescription": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
+    "noMatchDescription": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
+    "newOffering": "Nouvelle prestation"
   },
   "offers": {
     "columns": {
@@ -118,6 +119,98 @@
     "empty": {
       "title": "Aucune offre pour l’instant",
       "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
+    }
+  },
+  "record": "Prestation",
+  "offeringDrawer": {
+    "title": {
+      "create": "Nouvelle prestation",
+      "edit": "Modifier la prestation"
+    },
+    "sub": "Utilisée dans les rendez-vous, les factures et les forfaits",
+    "quickFill": {
+      "single": "Séance unique",
+      "pack": "Forfait 6 séances",
+      "lhr": "Forfait laser 10 séances",
+      "consultation": "Consultation"
+    },
+    "steps": {
+      "main": "Prestation, prix et séances",
+      "timeDetails": "Durée, validité et détails",
+      "offersTime": "Offres associées, durée et validité",
+      "details": "Détails"
+    },
+    "groups": {
+      "offering": "Prestation",
+      "price": "Prix et séances",
+      "offers": "Offres associées",
+      "time": "Durée et validité",
+      "details": "Détails"
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "ex. Laser visage complet",
+      "category": "Catégorie",
+      "colour": "Couleur",
+      "colourHint": "utilisée partout pour cette prestation",
+      "availableAt": "Disponible dans",
+      "availableAtHint": "masquée des rendez-vous et factures ailleurs",
+      "price": "Prix",
+      "priceHint": "prix catalogue · affiché sur la facture",
+      "offerPrice": "Prix proposé",
+      "offerPriceHint": "ce que vous facturez · vide = prix catalogue",
+      "offerPriceBelow": "ce que vous facturez · {{percent}} % sous le catalogue",
+      "sessions": "Séances",
+      "sessionsHint": "soins autorisés pour une facture",
+      "gstRate": "Taux de GST",
+      "gst": "GST",
+      "gstInclusive": "Inclus",
+      "gstExclusive": "Non inclus",
+      "floor": "Prix plancher",
+      "floorShown": "Affiché · vous seul le voyez",
+      "floorHidden": "Masqué · touchez pour le définir",
+      "floorHint": "l’accueil ne peut jamais facturer moins",
+      "billedToday": "Facturé aujourd’hui",
+      "freeSessions_one": "+{{count}} séance offerte",
+      "freeSessions_many": "+{{count}} séances offertes",
+      "freeSessions_other": "+{{count}} séances offertes",
+      "belowList": "{{percent}} % sous le catalogue",
+      "duration": "Durée",
+      "durationQuick": "{{minutes}} min",
+      "minutesUnit": "min",
+      "validity": "Validité",
+      "validityHint": "0 = sans expiration · les séances restantes sont ensuite perdues",
+      "daysUnit": "jours",
+      "days_one": "{{count}} jour",
+      "days_many": "{{count}} jours",
+      "days_other": "{{count}} jours",
+      "validityQuick": {
+        "none": "Aucune",
+        "quarter": "3 mois",
+        "half": "6 mois",
+        "year": "1 an"
+      },
+      "searchTerms": "Mots-clés",
+      "searchTermsHint": "séparés par des virgules",
+      "searchTermsPlaceholder": "laser, visage, épilation",
+      "description": "Description",
+      "descriptionPlaceholder": "Ce qui est inclus",
+      "status": "Statut",
+      "active": "Active · réservable",
+      "inactive": "Inactive · masquée"
+    },
+    "offerTill": "jusqu’au {{date}}",
+    "untitled": "Sans nom",
+    "save": {
+      "create": "Créer la prestation",
+      "edit": "Enregistrer les modifications",
+      "createAnother": "Créer et en ajouter une autre"
+    },
+    "toasts": {
+      "addName": "Ajoutez un nom",
+      "addPrice": "Ajoutez un prix",
+      "offerAbovePrice": "Le prix proposé ne peut pas dépasser le prix",
+      "floorAboveOffer": "Le prix plancher ne peut pas dépasser le prix proposé"
     }
   }
 }

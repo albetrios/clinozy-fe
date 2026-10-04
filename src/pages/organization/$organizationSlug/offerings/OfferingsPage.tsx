@@ -1,13 +1,17 @@
-import { Outlet, useSearch } from '@tanstack/react-router';
+import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import {
+  organizationOfferingCreate,
+  organizationOfferingEdit,
+} from '@/lib/routes/index.ts';
 import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import {
   type RoomFilterCopy,
   type RoomFilterFields,
@@ -17,10 +21,12 @@ import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { FileIcon, Tag, Trash } from '@/shared/icons/index.ts';
+import { FileIcon, PenLine, Tag, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useOfferingText } from './components/OfferingCells/index.ts';
+import { OfferingDrawer } from './components/OfferingDrawer/index.ts';
+import { useOfferingsDialogRoute } from './hooks/useOfferingsDialogRoute/index.ts';
 import { useOfferingsTable } from './hooks/useOfferingsTable/index.ts';
 import {
   OFFERINGS_KEYS,
@@ -66,11 +72,14 @@ function TableEmpty({
   filtered,
   searched,
   onClearFilters,
+  onNew,
 }: {
   loading: boolean;
   filtered: boolean;
   searched: boolean;
   onClearFilters: () => void;
+  /** "New offering" under the empty catalogue — absent without Create. */
+  onNew?: () => void;
 }) {
   const { t } = useTranslation(OFFERINGS_NS);
   if (loading) {
@@ -93,6 +102,13 @@ function TableEmpty({
           ? OFFERINGS_KEYS.empty.noMatchDescription
           : OFFERINGS_KEYS.empty.description,
       )}
+      action={
+        !searched && onNew ? (
+          <EmptyStateAction onClick={onNew}>
+            {t(OFFERINGS_KEYS.empty.newOffering)}
+          </EmptyStateAction>
+        ) : undefined
+      }
     />
   );
 }
@@ -173,22 +189,38 @@ function useOfferingRows(catalogue: OfferingsCatalogue) {
  * the shared table — every offering, priced for the header's branch, searched,
  * filtered (sections built from the rows) and sorted in place; folded columns
  * on a tablet, rows with Price as the key on a phone, selection and Export
- * from `md`, row actions, "All offerings loaded". The search, filters and
- * sort live in the URL. Its dialog routes render nothing: this page reads the
- * URL and opens the drawer.
+ * from `md`, row actions (Edit · Delete), "All offerings loaded". The search,
+ * filters and sort live in the URL. Its dialog routes render nothing: this
+ * page reads the URL and opens the Offering drawer — "New offering" (the
+ * toolbar, the phone's floating pill, the empty catalogue) opens `create/`, a
+ * row click or its Edit opens `$offeringId/edit/` — and closing it comes back
+ * to the list as it was (D28).
  */
 export function OfferingsPage() {
   const { t } = useTranslation(OFFERINGS_NS);
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
   const { patchSearch } = useDataTableUrlState(true);
   const access = useClinicAccess();
   const catalogue = useOfferingsCatalogue();
   useListLoadError(catalogue, OFFERINGS_TABLE_ID);
   const { search, fields, filters, rows } = useOfferingRows(catalogue);
   const copy = useFilterCopy(catalogue.offers, catalogue);
+  const { dialog, close } = useOfferingsDialogRoute();
   const [deleting, setDeleting] = useState<CatalogueDeleteTarget | null>(null);
 
-  const can = (action: 'delete') => access.isResolved && access.can('offerings', action);
+  const can = (action: 'create' | 'edit' | 'delete') =>
+    access.isResolved && access.can('offerings', action);
   const loading = catalogue.isPending && catalogue.offerings.length === 0;
+
+  // The drawers open over the list with its search, filters and sort kept.
+  const openCreate = () =>
+    void navigate({ ...organizationOfferingCreate(organizationSlug), search: true });
+  const openOffering = (offeringId: string) =>
+    void navigate({
+      ...organizationOfferingEdit(organizationSlug, offeringId),
+      search: true,
+    });
 
   const table = useOfferingsTable({
     rows: loading ? [] : rows,
@@ -197,8 +229,18 @@ export function OfferingsPage() {
     catalogue,
   });
 
-  const rowActions = (offering: OfferingRow): DataTableRowAction[] =>
-    can('delete')
+  const rowActions = (offering: OfferingRow): DataTableRowAction[] => [
+    ...(can('edit')
+      ? [
+          {
+            id: 'edit',
+            label: t(OFFERINGS_KEYS.rowActions.edit),
+            icon: PenLine,
+            onSelect: () => openOffering(offering.id),
+          },
+        ]
+      : []),
+    ...(can('delete')
       ? [
           {
             id: 'delete',
@@ -214,7 +256,8 @@ export function OfferingsPage() {
               }),
           },
         ]
-      : [];
+      : []),
+  ];
 
   const bulkActions: DataTableBulkAction<OfferingRow>[] =
     access.isResolved && access.canAbility('export')
@@ -238,6 +281,7 @@ export function OfferingsPage() {
         tableId={OFFERINGS_TABLE_ID}
         table={table}
         filters={{ fields, copy }}
+        onNew={can('create') ? openCreate : undefined}
       />
       <DataTable
         table={table}
@@ -248,6 +292,7 @@ export function OfferingsPage() {
         selectable
         minWidth={MIN_ROW_WIDTH}
         getRowTone={(row) => row.original.tone}
+        onRowClick={(row) => openOffering(row.original.id)}
         rowActions={(row) => rowActions(row.original)}
         bulkActions={bulkActions}
         empty={
@@ -256,11 +301,29 @@ export function OfferingsPage() {
             filtered={filters.count > 0}
             searched={Boolean(search.q)}
             onClearFilters={() => filters.apply({})}
+            onNew={can('create') ? openCreate : undefined}
           />
         }
         className="m-(--room-card-margin) flex-1"
       />
       <CatalogueDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <OfferingDrawer
+        {...(dialog.kind === 'edit'
+          ? {
+              mode: 'edit' as const,
+              // The catalogue already holds it; a deep link waits for its own read.
+              offering:
+                dialog.offering ??
+                catalogue.offerings.find((offering) => offering.id === dialog.offeringId),
+            }
+          : {
+              mode: 'create' as const,
+              prefill: dialog.kind === 'create' ? dialog.prefill : undefined,
+            })}
+        open={dialog.kind !== 'none'}
+        catalogue={catalogue}
+        onClose={close}
+      />
       <Outlet />
     </section>
   );
