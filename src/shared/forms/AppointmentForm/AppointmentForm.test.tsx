@@ -1,7 +1,11 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  cancelAppointment,
+  setAppointmentStatus,
+} from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
@@ -425,6 +429,165 @@ describe('AppointmentForm — after the person (H:2795–2826)', () => {
     expect(notifyMock.info).toHaveBeenCalledWith(
       'Date & time are locked once the patient is checked in',
     );
+  });
+});
+
+describe('AppointmentForm — writes beside the save', () => {
+  /** A lead's booking today, checked in: Completed waits for a patient record. */
+  async function leadInClinic() {
+    const booking = clinicFixtures.appointments.snapshot(
+      (row) =>
+        row.patientId === null &&
+        row.date === TODAY &&
+        (row.status === 'scheduled' || row.status === 'confirmed'),
+    )[0];
+    if (!booking) throw new Error('no lead booking today');
+    await setAppointmentStatus({ id: booking.id, status: 'checked_in' });
+    return booking;
+  }
+
+  /** Hover the who card and press one of its contact card's actions. */
+  async function cardAction(
+    user: ReturnType<typeof setUser>,
+    panel: HTMLElement,
+    name: string,
+  ) {
+    const card = within(panel).getByTestId(IDS.whoCard);
+    await user.hover(within(card).getAllByRole('button')[0]!);
+    const contact = await screen.findByRole('dialog', { name: 'Contact' });
+    await user.click(within(contact).getByRole('button', { name }));
+  }
+
+  it('saves the person’s name inline on their patient record — "applies everywhere"', async () => {
+    const user = setUser();
+    renderBooking(2859);
+    const panel = await form(EDIT);
+    await cardAction(user, panel, 'Edit contact');
+    const name = within(panel).getByTestId(IDS.whoEditName);
+    await user.clear(name);
+    await user.type(name, 'Dharti Patel');
+    await user.click(within(panel).getByTestId(IDS.whoEditSave));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Contact updated · applies everywhere',
+      ),
+    );
+    const patientId = visit(2859).patientId;
+    expect(
+      clinicFixtures.patients.snapshot((row) => row.id === patientId)[0],
+    ).toMatchObject({ firstName: 'Dharti', lastName: 'Patel' });
+    expect(within(panel).getByTestId(IDS.whoCard)).toHaveTextContent('Dharti Patel');
+  });
+
+  it('saves a lead’s name on the lead', async () => {
+    const user = setUser();
+    const booking = clinicFixtures.appointments.snapshot(
+      (row) => row.patientId === null && row.leadId !== null && row.date >= TODAY,
+    )[0];
+    if (!booking) throw new Error('no lead booking');
+    renderBooking(booking.seq);
+    const panel = await form(EDIT);
+    await cardAction(user, panel, 'Edit contact');
+    const name = within(panel).getByTestId(IDS.whoEditName);
+    await user.clear(name);
+    await user.type(name, 'Kavya Mehta');
+    await user.click(within(panel).getByTestId(IDS.whoEditSave));
+    await waitFor(() =>
+      expect(
+        clinicFixtures.leads.snapshot((row) => row.id === booking.leadId)[0]?.name,
+      ).toBe('Kavya Mehta'),
+    );
+  });
+
+  it('asks a lead’s visit for a patient record before Completed — the new record is linked', async () => {
+    const user = setUser();
+    const booking = await leadInClinic();
+    renderBooking(booking.seq);
+    const panel = await form(EDIT);
+    await user.click(within(panel).getByTestId(IDS.statusTile('completed')));
+    expect(notifyMock.warning).toHaveBeenCalledWith(
+      'Create the patient record first · Completed needs a patient',
+      expect.objectContaining({
+        action: expect.objectContaining({ label: 'Create patient record' }),
+      }),
+    );
+    const [, options] = notifyMock.warning.mock.lastCall ?? [];
+    act(() => options.action.onClick());
+    const quick = await screen.findByTestId('patient-quick-add');
+    await user.click(within(quick).getByTestId('patient-quick-add-save'));
+    await waitFor(() => expect(visit(booking.seq).patientId).not.toBeNull());
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      expect.stringMatching(/is now a patient · you can mark Completed$/),
+    );
+  });
+
+  it('checks a booking in from the tiles on its day — step 1 folds, the save writes it', async () => {
+    const user = setUser();
+    const booking = clinicFixtures.appointments.snapshot(
+      (row) =>
+        row.patientId !== null &&
+        row.date === TODAY &&
+        (row.status === 'scheduled' || row.status === 'confirmed'),
+    )[0];
+    if (!booking) throw new Error('no patient booking today');
+    const { onSaved } = renderBooking(booking.seq);
+    const panel = await form(EDIT);
+    expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'true');
+    await user.click(within(panel).getByTestId(IDS.statusTile('checked_in')));
+    expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'false');
+    await user.click(within(panel).getByTestId(IDS.detailsToggle));
+    expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'true');
+    await user.click(within(panel).getByTestId(`${EDIT}-save`));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+    expect(visit(booking.seq).status).toBe('checked_in');
+  });
+
+  it('restores a cancelled booking while its time is ahead', async () => {
+    const user = setUser();
+    await cancelAppointment({
+      id: ref.appointment(2859),
+      reason: 'patient_asked',
+      note: null,
+    });
+    renderBooking(2859);
+    const panel = await form(EDIT);
+    await user.click(within(panel).getByTestId(IDS.restore));
+    await waitFor(() => expect(visit(2859).status).toBe('scheduled'));
+  });
+
+  it('opens the offering suggestions from the plan flag', async () => {
+    const user = setUser();
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    renderBooking(2859);
+    const panel = await form(EDIT);
+    const flag = await within(panel).findByTestId(IDS.plan);
+    await user.click(flag);
+    await waitFor(() => expect(scroll).toHaveBeenCalled());
+  });
+
+  it('opens a booking from the chat’s "Appointment #…" chip', async () => {
+    const user = setUser();
+    const onOpenAppointment = vi.fn();
+    renderBooking(2861, { onOpenAppointment });
+    const panel = await form(EDIT);
+    const chat = within(panel).getByTestId(IDS.chat);
+    const chip = (await within(chat).findAllByTestId('chat-history-chip')).find((item) =>
+      /Appointment #/.test(item.textContent ?? ''),
+    );
+    if (!chip) throw new Error('no appointment chip');
+    await user.click(chip);
+    expect(onOpenAppointment).toHaveBeenCalledOnce();
+  });
+
+  it('closes into the patient file from a photo', async () => {
+    const user = setUser();
+    const onClose = vi.fn();
+    renderWithProviders(<BookingForm seq={2790} onClose={onClose} />);
+    const panel = await form(EDIT);
+    const tiles = await within(panel).findAllByTestId(IDS.photoTile);
+    await user.click(within(tiles[0]!).getByRole('button', { name: /^Open / }));
+    expect(onClose).toHaveBeenCalledOnce();
   });
 });
 

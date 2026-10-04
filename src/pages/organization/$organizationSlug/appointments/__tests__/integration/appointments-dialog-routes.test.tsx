@@ -133,6 +133,49 @@ describe('the Appointments dialog routes (D24, S:26–29)', () => {
     expect(router.state.location.search).toEqual({ view: 'day', date: '2026-11-02' });
   });
 
+  it('closes create/ without booking, the view and its day kept', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const { router } = renderAppointmentsRoutes(
+      `${PAGE}/create?view=month&date=2026-10-05`,
+      AppointmentsPage,
+    );
+    const drawer = await screen.findByTestId(APPOINTMENT_FORM_TEST_IDS.createDrawer);
+    await user.click(
+      within(drawer).getByTestId(`${APPOINTMENT_FORM_TEST_IDS.createDrawer}-close`),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
+    expect(router.state.location.search).toEqual({ view: 'month', date: '2026-10-05' });
+  });
+
+  it('saves an edit and closes onto the page; × closes without one', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const id = ref.appointment(2859);
+    const { router } = renderAppointmentsRoutes(
+      `${PAGE}/${id}?view=month`,
+      AppointmentsPage,
+    );
+    let drawer = await screen.findByTestId(APPOINTMENT_FORM_TEST_IDS.drawer);
+    await within(drawer).findByTestId(APPOINTMENT_FORM_TEST_IDS.form);
+    await user.type(
+      within(drawer).getByTestId(APPOINTMENT_FORM_TEST_IDS.notes),
+      ' · prefers mornings',
+    );
+    await user.click(
+      within(drawer).getByTestId(`${APPOINTMENT_FORM_TEST_IDS.drawer}-save`),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
+    expect(router.state.location.search).toEqual({ view: 'month' });
+    expect(
+      clinicFixtures.appointments.snapshot((row) => row.id === id)[0]?.notes,
+    ).toMatch(/prefers mornings$/);
+    await router.navigate({ to: `${PAGE}/${id}`, search: { view: 'month' } });
+    drawer = await screen.findByTestId(APPOINTMENT_FORM_TEST_IDS.drawer);
+    await user.click(
+      within(drawer).getByTestId(`${APPOINTMENT_FORM_TEST_IDS.drawer}-close`),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
+  });
+
   it('copies a booking into create/?copyOf=, the page kept behind', async () => {
     const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
     const { router } = renderAppointmentsRoutes(

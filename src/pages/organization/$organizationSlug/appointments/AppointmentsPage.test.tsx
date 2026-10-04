@@ -1,9 +1,12 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { APPOINTMENT_FORM_TEST_IDS } from '@/shared/forms/AppointmentForm/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {
@@ -54,4 +57,27 @@ describe('AppointmentsPage', () => {
       expect(screen.queryByTestId('appointments-table')).toBeNull();
     },
   );
+});
+
+describe('AppointmentsPage — the appointment form over it (L-38)', () => {
+  it('opens the booking a chat’s "Appointment #…" chip names', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const id = ref.appointment(2861);
+    const { router } = renderAppointmentsRoutes(
+      `${APPOINTMENTS_PAGE}/${id}`,
+      AppointmentsPage,
+    );
+    const drawer = await screen.findByTestId(APPOINTMENT_FORM_TEST_IDS.drawer);
+    const chat = await within(drawer).findByTestId(APPOINTMENT_FORM_TEST_IDS.chat);
+    const chip = (await within(chat).findAllByTestId('chat-history-chip')).find((item) =>
+      /Appointment #/.test(item.textContent ?? ''),
+    );
+    if (!chip) throw new Error('no appointment chip');
+    const before = router.state.location.href;
+    await user.click(chip);
+    await waitFor(() => expect(router.state.location.href).not.toBe(before));
+    expect(router.state.location.pathname).toMatch(
+      new RegExp(String.raw`^${APPOINTMENTS_PAGE}/[^/]+$`),
+    );
+  });
 });
