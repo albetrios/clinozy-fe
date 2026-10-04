@@ -905,5 +905,29 @@
       "femaleDoctor": "Ärztin",
       "textFirst": "Vor dem Anruf schreiben"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "Neue Leistung",
+    "sub": "Leistung, Behandlung oder Paket, das Sie abrechnen",
+    "steps": {
+      "offering": "Leistung",
+      "details": "Details",
+      "payment": "Zahlung"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Laser Gesicht komplett",
+      "duration": "Dauer",
+      "minutesUnit": "Min.",
+      "minutes": "{{minutes}} Min.",
+      "category": "Kategorie",
+      "price": "Preis"
+    },
+    "save": "Leistung hinzufügen",
+    "toasts": {
+      "name": "Geben Sie einen Namen ein",
+      "price": "Geben Sie den Preis ein",
+      "added": "Leistung {{name}} hinzugefügt"
+    }
   }
 }

@@ -914,5 +914,29 @@
       "femaleDoctor": "Doctora",
       "textFirst": "Escribir antes de llamar"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "Nuevo servicio",
+    "sub": "Servicio, tratamiento o paquete que facturas",
+    "steps": {
+      "offering": "Servicio",
+      "details": "Detalles",
+      "payment": "Pago"
+    },
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Láser rostro completo",
+      "duration": "Duración",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Categoría",
+      "price": "Precio"
+    },
+    "save": "Añadir servicio",
+    "toasts": {
+      "name": "Añade un nombre",
+      "price": "Introduce el precio",
+      "added": "Servicio {{name}} añadido"
+    }
   }
 }

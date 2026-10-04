@@ -914,5 +914,29 @@
       "femaleDoctor": "Médecin femme",
       "textFirst": "Écrire avant d’appeler"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "Nouvelle prestation",
+    "sub": "Service, soin ou forfait que vous facturez",
+    "steps": {
+      "offering": "Prestation",
+      "details": "Détails",
+      "payment": "Paiement"
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "ex. Laser visage complet",
+      "duration": "Durée",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Catégorie",
+      "price": "Prix"
+    },
+    "save": "Ajouter la prestation",
+    "toasts": {
+      "name": "Ajoutez un nom",
+      "price": "Saisissez le prix",
+      "added": "Prestation {{name}} ajoutée"
+    }
   }
 }

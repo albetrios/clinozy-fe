@@ -914,5 +914,29 @@
       "femaleDoctor": "Médica",
       "textFirst": "Mensagem antes de ligar"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "Novo serviço",
+    "sub": "Serviço, tratamento ou pacote que você cobra",
+    "steps": {
+      "offering": "Serviço",
+      "details": "Detalhes",
+      "payment": "Pagamento"
+    },
+    "fields": {
+      "name": "Nome",
+      "namePlaceholder": "ex.: Laser rosto inteiro",
+      "duration": "Duração",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Categoria",
+      "price": "Preço"
+    },
+    "save": "Adicionar serviço",
+    "toasts": {
+      "name": "Adicione um nome",
+      "price": "Informe o preço",
+      "added": "Serviço {{name}} adicionado"
+    }
   }
 }

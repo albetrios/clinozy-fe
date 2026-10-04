@@ -905,5 +905,29 @@
       "femaleDoctor": "Female doctor",
       "textFirst": "Text before calling"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "New offering",
+    "sub": "Service, treatment or package you bill",
+    "steps": {
+      "offering": "Offering",
+      "details": "Details",
+      "payment": "Payment"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. LHR Full Face",
+      "duration": "Duration",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Category",
+      "price": "Price"
+    },
+    "save": "Add offering",
+    "toasts": {
+      "name": "Add a name",
+      "price": "Enter the price",
+      "added": "Offering {{name}} added"
+    }
   }
 }

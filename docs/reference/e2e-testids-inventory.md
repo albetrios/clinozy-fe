@@ -103,6 +103,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c) | `pages/organization/$organizationSlug/offerings/`     |
 | `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)            | `offerings/offers/` (child of the above)              |
 | `offer-drawer`                   | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)    | `offerings/offers/` (child of the above)              |
+| `offering-quick-create`          | Stacked "New offering" — over the Invoice drawer's line picker (L-30e, L-40)      | `shared/components/OfferingQuickCreate/`              |
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
@@ -453,6 +454,16 @@ tab's rows add `offers-row-action-edit` / `-pause` / `-resume` beside `-delete`.
 | `<o>-preview-<offeringId>`                                        | One picked offering's preview box ("₹1,200 → ₹1,080")                  | OfferDrawer                      |
 | `<o>-note` / `<o>-status`                                         | Step 3: Note and the Live / Paused toggle                              | OfferDrawer                      |
 | `<o>-skeleton`                                                    | Edit offer while a deep-linked offer loads                             | OfferDrawer                      |
+
+### Stacked New offering (shared, launch L-30e)
+
+The Invoice drawer's line picker stacks one `OfferingQuickCreate` (component state, no URL); `<n>` is
+`offering-quick-create` and its steps are `offering`, `details` and `payment`. The Category chips are
+`<n>-category-<category>`.
+
+| Test ID                                                    | Element                                                                 | Source                                   |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
+| `<n>-name` / `<n>-duration` / `<n>-category` / `<n>-price` | Name (prefilled from the picker), the Duration stepper, Category, Price | `shared/components/OfferingQuickCreate/` |
 
 ## Items field (shared, launch L-17a)
 

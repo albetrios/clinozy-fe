@@ -905,5 +905,29 @@
       "femaleDoctor": "महिला डॉक्टर",
       "textFirst": "कॉल से पहले मैसेज करें"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "नई सेवा",
+    "sub": "सेवा, उपचार या पैकेज जिसका आप बिल बनाते हैं",
+    "steps": {
+      "offering": "सेवा",
+      "details": "विवरण",
+      "payment": "भुगतान"
+    },
+    "fields": {
+      "name": "नाम",
+      "namePlaceholder": "जैसे LHR फ़ुल फ़ेस",
+      "duration": "अवधि",
+      "minutesUnit": "मिनट",
+      "minutes": "{{minutes}} मिनट",
+      "category": "श्रेणी",
+      "price": "कीमत"
+    },
+    "save": "सेवा जोड़ें",
+    "toasts": {
+      "name": "नाम जोड़ें",
+      "price": "कीमत दर्ज करें",
+      "added": "सेवा {{name}} जोड़ी गई"
+    }
   }
 }

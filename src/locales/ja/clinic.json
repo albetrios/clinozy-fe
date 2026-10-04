@@ -896,5 +896,29 @@
       "femaleDoctor": "女性医師",
       "textFirst": "電話の前にメッセージ"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "新しいサービス",
+    "sub": "請求するサービス・施術・パッケージ",
+    "steps": {
+      "offering": "サービス",
+      "details": "詳細",
+      "payment": "支払い"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例：全顔レーザー脱毛",
+      "duration": "所要時間",
+      "minutesUnit": "分",
+      "minutes": "{{minutes}}分",
+      "category": "カテゴリ",
+      "price": "料金"
+    },
+    "save": "サービスを追加",
+    "toasts": {
+      "name": "名称を入力してください",
+      "price": "料金を入力してください",
+      "added": "サービス「{{name}}」を追加しました"
+    }
   }
 }

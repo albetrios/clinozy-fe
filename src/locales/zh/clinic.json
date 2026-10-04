@@ -896,5 +896,29 @@
       "femaleDoctor": "女医生",
       "textFirst": "来电前先发消息"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "新建服务项目",
+    "sub": "您收费的服务、疗程或套餐",
+    "steps": {
+      "offering": "服务项目",
+      "details": "详情",
+      "payment": "付款"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例如：全脸激光脱毛",
+      "duration": "时长",
+      "minutesUnit": "分钟",
+      "minutes": "{{minutes}} 分钟",
+      "category": "类别",
+      "price": "价格"
+    },
+    "save": "添加服务项目",
+    "toasts": {
+      "name": "请填写名称",
+      "price": "请输入价格",
+      "added": "已添加服务项目 {{name}}"
+    }
   }
 }

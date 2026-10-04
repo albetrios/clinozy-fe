@@ -941,5 +941,29 @@
       "femaleDoctor": "طبيبة",
       "textFirst": "رسالة قبل الاتصال"
     }
+  },
+  "offeringQuickCreate": {
+    "title": "خدمة جديدة",
+    "sub": "خدمة أو علاج أو باقة تُفوترها",
+    "steps": {
+      "offering": "الخدمة",
+      "details": "التفاصيل",
+      "payment": "الدفع"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: ليزر الوجه كاملًا",
+      "duration": "المدة",
+      "minutesUnit": "د",
+      "minutes": "{{minutes}} د",
+      "category": "الفئة",
+      "price": "السعر"
+    },
+    "save": "إضافة الخدمة",
+    "toasts": {
+      "name": "أضف اسمًا",
+      "price": "أدخل السعر",
+      "added": "تمت إضافة الخدمة {{name}}"
+    }
   }
 }
