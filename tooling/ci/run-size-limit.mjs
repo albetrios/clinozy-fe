@@ -144,8 +144,34 @@ const config = [
      * bundler split the shared URL readers (`search-params.ts`,
      * `clinic-list-filters.ts`) into two more first-paint chunks; reading them
      * from the shared modules keeps them in the entry (−0.35 kB).
+     *
+     * 245.5 → 253.1 kB (same exemption, D48): measured 252.65 kB after the
+     * Tasks, appointment form, Users, Payments, Medical and patient-file rows
+     * (244.97 kB before them). Each row's own measure, from its builder (the
+     * rows landed in parallel, so no per-commit build of this tree):
+     * - L-50, the Medical room (+2.89 kB), all entry: its 23 route blocks —
+     *   seven tabs and sixteen dialog routes — their manifests and builders.
+     * - L-42 + L-44, the patient file and its photos (+1.68 kB): +1.01 the
+     *   section and photo route registrations (the routes themselves load
+     *   through one lazy module), +0.66 the shared icons chunk — the glyphs
+     *   the file draws first.
+     * - L-31b … L-31f, the Users room (+1.39 kB): the Team, Roles and
+     *   Branches routes with their four dialog routes, manifests, builders
+     *   and `users.search.ts` (L-31b +0.64 and L-31c +0.28 on their own,
+     *   L-31f's "Leave clinic" +0.02).
+     * - L-39, Payments (+1.31 kB): seven route blocks, eight manifests, two
+     *   URL readers, eight builders and the preload lists.
+     * - L-47b +0.58 and L-47d +0.11 (the task routes, their readers and
+     *   manifests), L-47c nothing, L-38 +0.05.
+     * The rows sum to +8.01; the tree measures +7.68, the difference being
+     * their different bases and the integration's dedupe. Trimmed first: the
+     * Tasks list read left `tasks.search.ts` for `tasks.params.ts`, which
+     * loads with the room (≈ −0.06 kB). Almost all of it is route
+     * registration — manifests, builders and validators of dialog routes
+     * that render nothing on their own; L-54 moves that weight off the entry
+     * chunk once the builders stop editing `routeTree.tsx`, then lowers this.
      */
-    limit: '245.5 kB',
+    limit: '253.1 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -235,8 +261,18 @@ const config = [
            * 560px editor and its outside ×). Nothing here is unused; the next
            * trim is one in-place skeleton — the calendars still spell L-37's
            * `SKELETON_IN_PLACE` classes beside the table's rule.
+           *
+           * 40.8 → 43.1 kB (same exemption, D36): measured 42.61 kB (40.38
+           * before these rows), each row's own measure from its builder: the
+           * patient file and its photos (+1.32 kB, L-42 + L-44: the file's
+           * frame by tier and the photo grid and viewer), the appointment form
+           * (+0.42, L-38), the Tasks list
+           * (+0.21, L-47b) and the task drawer (+0.13, L-47c), the Users rooms
+           * (+0.18 together, L-31b … L-31f), Medical (+0.07, L-50) and Payments
+           * (+0.03, L-39); L-47d nothing. They sum to +2.36; the tree measures
+           * +2.23.
            */
-          limit: '40.8 kB',
+          limit: '43.1 kB',
           gzip: true,
         },
       ]
