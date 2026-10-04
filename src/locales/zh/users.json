@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "用户"
+  },
+  "record": "用户",
+  "tabs": {
+    "label": "用户视图",
+    "team": "团队",
+    "roles": "角色与权限",
+    "branches": "分院"
+  },
+  "search": {
+    "placeholder": "姓名、邮箱、手机号或 #ID",
+    "label": "搜索用户"
+  },
+  "primary": {
+    "newUser": "新建用户",
+    "newRole": "新建角色",
+    "newBranch": "新建分院"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "用户",
+    "email": "邮箱",
+    "roles": "角色",
+    "branches": "分院",
+    "hours": "工作时间",
+    "commission": "提成",
+    "status": "状态",
+    "updated": "更新于"
+  },
+  "table": {
+    "records": "用户",
+    "mainRole": "主要角色",
+    "alsoRole": "兼任",
+    "today": "今天 · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "启用",
+    "inactive": "停用",
+    "invited": "已邀请",
+    "expires": "邀请将于 {{date}} 过期",
+    "expired": "邀请已过期"
+  },
+  "hours": {
+    "everyDay": "每天",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "角色",
+    "all": "全部",
+    "branches": "分院",
+    "status": "状态"
+  },
+  "rowActions": {
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "title": "没有匹配的用户",
+    "description": "这里还没有内容。试试其他标签页或搜索。"
+  },
+  "drawer": {
+    "title": {
+      "create": "新建用户",
+      "edit": "编辑用户"
+    },
+    "sub": "登录、角色、分院和工作时间",
+    "steps": {
+      "profile": "资料、角色与分院",
+      "hours": "工作时间与薪酬"
+    },
+    "groups": {
+      "profile": "资料",
+      "rolesBranches": "角色与分院",
+      "hours": "工作时间",
+      "pay": "薪酬"
+    },
+    "fields": {
+      "name": "姓名",
+      "mobile": "手机号",
+      "email": "邮箱",
+      "colour": "颜色",
+      "roles": "角色",
+      "access": "可访问",
+      "branches": "分院",
+      "days": "工作日",
+      "from": "从",
+      "to": "到",
+      "commission": "提成 / 奖励",
+      "status": "状态"
+    },
+    "hints": {
+      "mobile": "10 位数字",
+      "colour": "用于其标记",
+      "roles": "选择一个或多个 · 权限叠加",
+      "branches": "工作地点",
+      "days": "预约仅提供这些日子"
+    },
+    "placeholders": {
+      "name": "全名,例如 Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "选择时间",
+      "commission": "0"
+    },
+    "commissionSuffix": "账单金额的 %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "减少",
+    "increase": "增加",
+    "pickRole": "选择角色",
+    "statusOn": "启用 · 可登录",
+    "statusOff": "停用 · 已登出",
+    "resend": "重新发送邀请",
+    "quickFill": {
+      "doctor": "医生 · 10:00–19:00",
+      "therapist": "治疗师 · 10:00–19:00",
+      "front_desk": "前台 · 09:30–19:30",
+      "pharmacist": "药剂师 · 09:00–21:00"
+    },
+    "summaryNew": "新建用户",
+    "save": {
+      "create": "创建用户",
+      "edit": "保存更改",
+      "createAnother": "创建并继续添加"
+    },
+    "missing": "请填写姓名和邮箱",
+    "noRole": "请至少选择一个角色",
+    "emailInvalid": "请输入有效的邮箱地址",
+    "mobileInvalid": "手机号需要 10 位数字",
+    "noPlatformRole": "暂无可分配的角色 · 请联系管理员",
+    "added": "已添加 {{name}}",
+    "saved": "已保存 {{name}}"
+  },
+  "deleteUser": {
+    "title": "删除此用户?",
+    "removed": "已移除 {{name}}"
   }
 }

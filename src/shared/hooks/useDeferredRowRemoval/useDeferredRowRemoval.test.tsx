@@ -325,4 +325,81 @@ describe('useDeferredRowRemoval', () => {
       expect.objectContaining({ queryKey: QUERY_KEY }),
     );
   });
+
+  describe('a list read whole (a flat array of rows)', () => {
+    const ALL_KEY = [...QUERY_KEY, 'all'] as const;
+
+    function setupFlat() {
+      const client = makeClient();
+      client.setQueryData(ALL_KEY, [
+        { id: 'a', name: 'Ada' },
+        { id: 'b', name: 'Bob' },
+        { id: 'c', name: 'Cy' },
+      ]);
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      );
+      const view = renderHook(() => useDeferredRowRemoval<Row>(QUERY_KEY), { wrapper });
+      return { client, view };
+    }
+
+    const flatIds = (client: QueryClient) =>
+      (client.getQueryData(ALL_KEY) as Row[] | undefined)?.map((row) => row.id) ?? [];
+
+    it('drops the row from the flat array at schedule time, as from the pages', () => {
+      const { client, view } = setupFlat();
+      remove(view.result.current, 'b');
+      expect(flatIds(client)).toEqual(['a', 'c']);
+      expect(rowIds(client)).toEqual(['a']);
+    });
+
+    it('puts the row back where it sat on undo', () => {
+      const { client, view } = setupFlat();
+      remove(view.result.current, 'b');
+      act(() => captured().onCancel());
+      expect(flatIds(client)).toEqual(['a', 'b', 'c']);
+      expect(rowIds(client)).toEqual(['a', 'b']);
+    });
+
+    it('puts the row back when the commit fails', () => {
+      const { client, view } = setupFlat();
+      remove(view.result.current, 'a');
+      act(() => captured().onCommitError(new Error('offline')));
+      expect(flatIds(client)).toEqual(['a', 'b', 'c']);
+    });
+
+    it('never duplicates a row the array already has back', () => {
+      const { client, view } = setupFlat();
+      remove(view.result.current, 'c');
+      client.setQueryData(ALL_KEY, [
+        { id: 'a', name: 'Ada' },
+        { id: 'b', name: 'Bob' },
+        { id: 'c', name: 'Cy' },
+      ]);
+      act(() => captured().onCancel());
+      expect(flatIds(client)).toEqual(['a', 'b', 'c']);
+    });
+  });
+
+  it('passes a longer undo window through to the toast', () => {
+    const { view } = setup();
+    act(() => {
+      view.result.current({
+        id: 'a',
+        pendingMessage: 'Ada removed',
+        toastId: 'remove-a',
+        commit: () => Promise.resolve(),
+        delayMs: 10_000,
+      });
+    });
+    expect(notifyDeferredCommit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ delayMs: 10_000 }),
+    );
+  });
+
+  it('keeps the toast on its own default window when none is asked for', () => {
+    const { view } = setup();
+    remove(view.result.current, 'a');
+    expect(captured()).not.toHaveProperty('delayMs');
+  });
 });

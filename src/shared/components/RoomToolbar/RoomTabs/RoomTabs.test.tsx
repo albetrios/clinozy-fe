@@ -166,6 +166,67 @@ describe('RoomTabs', () => {
     );
   });
 
+  it('marks the most specific tab when one tab’s route sits under another’s (Users)', async () => {
+    const tabs: RoomLinkTab[] = [
+      { id: 'team', label: 'Team', to: '/users' },
+      { id: 'roles', label: 'Roles & access', to: '/users/roles' },
+      { id: 'branches', label: 'Branches', to: '/users/branches' },
+    ];
+    const rootRoute = createRootRoute({
+      component: () => (
+        <>
+          <RoomTabs label="Users views" tabs={tabs} testIdPrefix="users" />
+          <Outlet />
+        </>
+      ),
+    });
+    const routes = ['/users', '/users/roles', '/users/branches', '/users/create'].map(
+      (path) =>
+        createRoute({ getParentRoute: () => rootRoute, path, component: () => null }),
+    );
+    const at = (path: string) =>
+      createRouter({
+        routeTree: rootRoute.addChildren(routes),
+        history: createMemoryHistory({ initialEntries: [path] }),
+      });
+    const view = render(<RouterProvider router={at('/users/roles')} />);
+    expect(await screen.findByRole('link', { name: 'Roles & access' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Team' })).not.toHaveAttribute(
+      'aria-current',
+    );
+    view.unmount();
+
+    render(<RouterProvider router={at('/users/create')} />);
+    expect(await screen.findByRole('link', { name: 'Team' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('takes the current tab from `current` when the URL alone can’t say', async () => {
+    // A drawer route rendering another tab's page behind it (Users' member
+    // drawer over Roles): the URL sits under one tab, the page is another's.
+    renderRoom(
+      '/medical/sales/create',
+      <RoomTabs
+        label="Medical sections"
+        tabs={MEDICAL_TABS}
+        testIdPrefix="medical"
+        current="payments"
+      />,
+    );
+    expect(await screen.findByRole('link', { name: 'Payments' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Sales' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('folds what does not fit into "More", keeping the current tab (H:4003–4007)', async () => {
     // 380px: budget 380 − 8 − 78 = 294 → Medicines 91.5 · Sales 63.5 · Purchases 93.5; Suppliers stops it.
     measured.width = 380;

@@ -1,7 +1,11 @@
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import type { ListPage, ListPageParams } from '@/shared/api/fetch-list-page.ts';
 import * as orgApi from '@/shared/api/organization-api.ts';
-import type { Member, RoleSummary } from '@/shared/api/organization-contracts.ts';
+import type {
+  Member,
+  OrgRole,
+  RoleSummary,
+} from '@/shared/api/organization-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { ROLE_TONES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 
@@ -11,6 +15,7 @@ import {
   clinicRolesForMember,
   isFullAccessRole,
   matrixGrantsFor,
+  membershipRoleIdFor,
   permsFromPlatformCodes,
   platformRoleForClinicRole,
   presetForPlatformRole,
@@ -26,7 +31,9 @@ import {
   type PlatformRoleRef,
 } from './access-contracts.ts';
 import { displayId } from './clinic-display-id.ts';
+import { createdFilterMatches } from './clinic-filter-match.ts';
 import { clinicHttpError, validateClinicInput } from './clinic-fixture-store.ts';
+import type { CreatedFilter } from './clinic-list-filters.ts';
 import type { DeleteReason, Role, Tone } from './clinic-schema.ts';
 import {
   splitStaffName,
@@ -91,6 +98,56 @@ export function fetchAllMembers(): Promise<Member[]> {
 /** Every role of the active organisation, page after page. Requires `role:read`. */
 export function fetchAllRoles(): Promise<RoleSummary[]> {
   return everyPage(orgApi.listRoles, 'roles');
+}
+
+// ── The one clinozy-be role a membership holds (D17, D47) ──
+
+/** The Owner role is never an invite target — an org has exactly one owner. */
+export function isInvitableRole(role: Pick<RoleSummary, 'name'>): boolean {
+  return role.name.trim().toLowerCase() !== 'owner';
+}
+
+/**
+ * Least privilege first: the well-known roles every TEAM organisation is
+ * provisioned with, which a new member may hold without anyone choosing more.
+ */
+const LEAST_PRIVILEGE_ROLE_NAMES = ['member', 'viewer'] as const;
+
+/**
+ * The least-privileged well-known role the organisation still has — Member,
+ * then Viewer — or undefined. Never a custom role: the roles list carries no
+ * permission set to rank one by, and a wrong guess here is a privilege grant.
+ */
+export function leastPrivilegeRoleId(
+  roles: readonly Pick<RoleSummary, 'id' | 'name'>[],
+): string | undefined {
+  for (const name of LEAST_PRIVILEGE_ROLE_NAMES) {
+    const match = roles.find((role) => role.name.trim().toLowerCase() === name);
+    if (match) return match.id;
+  }
+  return undefined;
+}
+
+/**
+ * The clinozy-be role a membership takes for a member's clinic roles (KICKOFF
+ * §6.12 Save; D47): Admin when Admin is picked, else the main role's backend
+ * role — and while clinozy-be has no role for it yet (it seeds Owner, Admin,
+ * Member and Viewer today; Appendix F asks for the clinic roles), the
+ * least-privileged well-known role. Every clinic role still lives on the staff
+ * profile, which is what the clinic screens read. Undefined when the
+ * organisation has none of these.
+ */
+export function membershipRoleIdForClinicRoles(
+  keys: readonly ClinicRoleKey[],
+  roles: readonly RoleSummary[],
+): string | undefined {
+  return membershipRoleIdFor(keys, roles) ?? leastPrivilegeRoleId(roles);
+}
+
+/** The coarse platform bucket a role name falls in — the members list's optimistic label only. */
+export function orgRoleOfName(name: string): OrgRole {
+  const role = name.trim().toLowerCase();
+  return role === 'owner' || role === 'admin' || role === 'viewer' ? role : 'member';
 }
 
 // ── Staff profiles (fixture) ──
@@ -319,6 +376,51 @@ export function teamMemberMatchesSearch(
   const phone = member.phone ? `${member.phone} ${formatClinicPhone(member.phone)}` : '';
   const id = member.seq === null ? '' : displayId.user(member.seq);
   return `${member.name} ${member.email} ${phone} ${id}`.toLowerCase().includes(needle);
+}
+
+/** When a member was added: their profile's creation, else when they joined; null for neither. */
+export function teamMemberCreatedAt(member: TeamMember): string | null {
+  return member.profile?.createdAt ?? member.joinedAt;
+}
+
+/** The Team's Status filter: Active, or Inactive (a suspended membership). */
+export type TeamStatusFilter = 'active' | 'inactive';
+
+/** The Team's Filters (`users.md:204`), as the URL holds them. */
+export interface TeamFilters {
+  /** One clinic role — the member holds it, main role or not. */
+  role?: ClinicRoleKey;
+  /** Any of these branches. */
+  branch?: readonly string[];
+  /** Either status; an invited member is neither. */
+  status?: readonly TeamStatusFilter[];
+  created?: CreatedFilter;
+}
+
+/** A membership status as the Status filter reads it — an invitation is neither. */
+const STATUS_FILTER_OF: Readonly<Record<TeamMember['status'], TeamStatusFilter | null>> =
+  { active: 'active', suspended: 'inactive', invited: null };
+
+/** Whether a member passes the Team's Filters on the clinic's `today` (`YYYY-MM-DD`). */
+export function teamMemberMatchesFilters(
+  member: TeamMember,
+  filters: TeamFilters,
+  today: string,
+): boolean {
+  if (filters.role && !member.roleKeys.includes(filters.role)) return false;
+  const { branch, status, created } = filters;
+  if (branch?.length && !branch.some((id) => member.branchIds.includes(id))) {
+    return false;
+  }
+  if (status?.length) {
+    const memberStatus = STATUS_FILTER_OF[member.status];
+    if (memberStatus === null || !status.includes(memberStatus)) return false;
+  }
+  if (created) {
+    const at = teamMemberCreatedAt(member);
+    if (!(at && createdFilterMatches(at, created, today))) return false;
+  }
+  return true;
 }
 
 const STATUS_ORDER = { active: 0, invited: 1, suspended: 2 } as const;

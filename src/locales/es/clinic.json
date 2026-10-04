@@ -41,6 +41,19 @@
       "description": "Equipo, roles y acceso, sucursales"
     }
   },
+  "tones": {
+    "butter": "Mantequilla",
+    "lav": "Lavanda",
+    "sky": "Cielo",
+    "sage": "Salvia",
+    "blush": "Rubor",
+    "mint": "Menta",
+    "peach": "Melocotón",
+    "plum": "Ciruela",
+    "lime": "Lima",
+    "slate": "Pizarra",
+    "stone": "Piedra"
+  },
   "roles": {
     "admin": "Administrador",
     "doctor": "Médico",

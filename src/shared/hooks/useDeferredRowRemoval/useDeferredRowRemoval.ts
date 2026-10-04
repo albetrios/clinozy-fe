@@ -14,13 +14,22 @@ import {
 type ListPage<TRow> = { rows: TRow[] };
 
 /**
+ * One cached variant of the list: a cursor list's accumulated pages, or a flat
+ * array of rows (a list read whole, every page up front — the Users Team).
+ */
+type ListCache<TRow> = InfiniteData<ListPage<TRow>> | TRow[] | undefined;
+
+/** The `pageIndex` a site in a flat-array variant carries. */
+const FLAT = -1;
+
+/**
  * Where one row sat in ONE cached list variant, so undo can put that row — and
  * nothing else — back. Point 4 below is why this is not a whole-cache snapshot.
  */
 interface RowSite<TRow> {
   /** The cached variant this site was read from. */
   key: QueryKey;
-  /** Index of the accumulated page the row was on. */
+  /** Index of the accumulated page the row was on; {@link FLAT} for a flat array. */
   pageIndex: number;
   /** The row as it was cached at schedule time. */
   row: TRow;
@@ -28,66 +37,99 @@ interface RowSite<TRow> {
   followerIds: Set<string>;
 }
 
-/** Drop one row from every accumulated page of a cursor list. */
+const isPaged = <TRow>(data: ListCache<TRow>): data is InfiniteData<ListPage<TRow>> =>
+  Boolean(data) &&
+  !Array.isArray(data) &&
+  Array.isArray((data as { pages?: unknown }).pages);
+
+/** Drop one row from every accumulated page of a cursor list, or from a flat array. */
 function withoutRow<TRow extends { id: string }>(
-  old: InfiniteData<ListPage<TRow>> | undefined,
+  old: ListCache<TRow>,
   id: string,
-): InfiniteData<ListPage<TRow>> | undefined {
-  if (!(old && Array.isArray(old.pages))) return old;
+): ListCache<TRow> {
   const dropId = (rows: TRow[]) => rows.filter((row) => row.id !== id);
+  if (Array.isArray(old)) return dropId(old);
+  if (!isPaged(old)) return old;
   return {
     ...old,
     pages: old.pages.map((page) => ({ ...page, rows: dropId(page.rows) })),
   };
 }
 
+/** Where `id` sits in one array of rows, as a site of the variant `key`. */
+function siteIn<TRow extends { id: string }>(
+  key: QueryKey,
+  rows: readonly TRow[],
+  pageIndex: number,
+  id: string,
+): RowSite<TRow> | null {
+  const row = rows.find((candidate) => candidate.id === id);
+  if (!row) return null;
+  return {
+    key,
+    pageIndex,
+    row,
+    followerIds: new Set(rows.slice(rows.indexOf(row) + 1).map((next) => next.id)),
+  };
+}
+
 /** Record where `id` sits in every cached variant of the list, before removal. */
 function sitesOf<TRow extends { id: string }>(
-  entries: [QueryKey, InfiniteData<ListPage<TRow>> | undefined][],
+  entries: [QueryKey, ListCache<TRow>][],
   id: string,
 ): RowSite<TRow>[] {
   const sites: RowSite<TRow>[] = [];
   for (const [key, data] of entries) {
-    if (!(data && Array.isArray(data.pages))) continue;
+    if (Array.isArray(data)) {
+      const site = siteIn(key, data, FLAT, id);
+      if (site) sites.push(site);
+      continue;
+    }
+    if (!isPaged(data)) continue;
     data.pages.forEach((page, pageIndex) => {
       if (!Array.isArray(page.rows)) return;
-      const row = page.rows.find((candidate) => candidate.id === id);
-      if (!row) return;
-      sites.push({
-        key,
-        pageIndex,
-        row,
-        followerIds: new Set(
-          page.rows.slice(page.rows.indexOf(row) + 1).map((next) => next.id),
-        ),
-      });
+      const site = siteIn(key, page.rows, pageIndex, id);
+      if (site) sites.push(site);
     });
   }
   return sites;
 }
 
+/** `rows` with the recorded row back before its nearest surviving follower; null when it is already there. */
+function rowsWith<TRow extends { id: string }>(
+  rows: readonly TRow[],
+  site: RowSite<TRow>,
+): TRow[] | null {
+  // Idempotent — never duplicate a row the cache has already got back.
+  if (rows.some((row) => row.id === site.row.id)) return null;
+  const next = [...rows];
+  const follower = next.findIndex((row) => site.followerIds.has(row.id));
+  next.splice(follower === -1 ? next.length : follower, 0, site.row);
+  return next;
+}
+
 /**
- * Put one recorded row back on its own page, touching no other row.
+ * Put one recorded row back on its own page (or in its flat array), touching
+ * no other row.
  *
  * It goes in just before its nearest surviving follower, so it lands where it
  * was even though the rows around it have since moved; when every follower has
  * gone (a refetch, or another removal still pending) it is appended instead.
  */
 function withRow<TRow extends { id: string }>(
-  old: InfiniteData<ListPage<TRow>> | undefined,
+  old: ListCache<TRow>,
   site: RowSite<TRow>,
-): InfiniteData<ListPage<TRow>> | undefined {
+): ListCache<TRow> {
   // A variant the cache has since dropped stays dropped: returning `undefined`
   // makes `setQueryData` a no-op rather than resurrecting a whole stale list.
-  if (!(old && Array.isArray(old.pages))) return old;
+  if (site.pageIndex === FLAT) {
+    return Array.isArray(old) ? (rowsWith(old, site) ?? old) : old;
+  }
+  if (!isPaged(old)) return old;
   const page = old.pages.at(site.pageIndex);
   if (!(page && Array.isArray(page.rows))) return old;
-  // Idempotent — never duplicate a row the cache has already got back.
-  if (page.rows.some((row) => row.id === site.row.id)) return old;
-
-  const rows = [...page.rows];
-  const follower = rows.findIndex((row) => site.followerIds.has(row.id));
-  rows.splice(follower === -1 ? rows.length : follower, 0, site.row);
+  const rows = rowsWith(page.rows, site);
+  if (!rows) return old;
   return {
     ...old,
     pages: old.pages.map((candidate, index) =>
@@ -107,6 +149,8 @@ export interface DeferredRowRemovalInput {
   toastId: string;
   /** The write itself. Return the promise so a failure can roll the row back. */
   commit: () => Promise<unknown>;
+  /** The undo window (default 5s); the clinic rooms' Undo toasts run 10s (D32). */
+  delayMs?: number;
 }
 
 /**
@@ -212,16 +256,16 @@ export function useDeferredRowRemoval<TRow extends { id: string }>(queryKey: Que
       });
 
       const sites = sitesOf<TRow>(
-        queryClient.getQueriesData<InfiniteData<ListPage<TRow>>>({ queryKey }),
+        queryClient.getQueriesData<ListCache<TRow>>({ queryKey }),
         input.id,
       );
-      queryClient.setQueriesData<InfiniteData<ListPage<TRow>>>({ queryKey }, (old) =>
+      queryClient.setQueriesData<ListCache<TRow>>({ queryKey }, (old) =>
         withoutRow(old, input.id),
       );
 
       const restore = () => {
         for (const site of sites)
-          queryClient.setQueryData<InfiniteData<ListPage<TRow>>>(site.key, (old) =>
+          queryClient.setQueryData<ListCache<TRow>>(site.key, (old) =>
             withRow(old, site),
           );
       };
@@ -231,6 +275,7 @@ export function useDeferredRowRemoval<TRow extends { id: string }>(queryKey: Que
         pendingMessage: input.pendingMessage,
         committedMessage: input.committedMessage,
         toastId: input.toastId,
+        ...(input.delayMs === undefined ? {} : { delayMs: input.delayMs }),
         onCommit: async () => {
           settle();
           await input.commit();

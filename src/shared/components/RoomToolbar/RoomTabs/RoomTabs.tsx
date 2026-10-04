@@ -94,6 +94,11 @@ export interface RoomTabsProps {
   overflow?: 'scroll' | 'fold';
   /** Test-id prefix — the room's table id. */
   testIdPrefix: string;
+  /**
+   * The current tab's id, when the URL alone can't say — a drawer route that
+   * renders another tab's page behind it (Users' member drawer over Roles).
+   */
+  current?: string;
 }
 
 /**
@@ -112,6 +117,7 @@ export function RoomTabs({
   tabs,
   overflow = 'scroll',
   testIdPrefix,
+  current,
 }: RoomTabsProps) {
   const { t } = useTranslation(ROOM_TOOLBAR_NS);
   const ids = roomToolbarTestIds(testIdPrefix);
@@ -121,13 +127,16 @@ export function RoomTabs({
 
   // The deepest tab the URL is under: a room whose first tab is its bare URL
   // (`/offerings` beside `/offerings/offers`) matches both on the second.
-  const currentIndex = tabs.reduce((current, tab, index) => {
+  const deepestIndex = tabs.reduce((found, tab, index) => {
     if (matchRoute({ to: tab.to, params: tab.params, fuzzy: true }) === false) {
-      return current;
+      return found;
     }
-    const best = tabs[current];
-    return best && best.to.length >= tab.to.length ? current : index;
+    const best = tabs[found];
+    return best && best.to.length >= tab.to.length ? found : index;
   }, -1);
+  // A drawer route may render another tab's page behind it: the page says which.
+  const currentIndex =
+    current === undefined ? deepestIndex : tabs.findIndex((tab) => tab.id === current);
   const folding = overflow === 'fold' && width > 0;
   // Keyed on the labels' text: a re-render with the same tabs measures nothing.
   const labelsKey = tabs.map((tab) => `${tab.icon ? '+' : '-'}${tab.label}`).join('\n');
@@ -151,21 +160,21 @@ export function RoomTabs({
     >
       <div data-room-tabs-track="" className={cn(TRACK, 'w-max')}>
         {visible.map((tab) => {
-          const current = tab === tabs[currentIndex];
+          const isCurrent = tab === tabs[currentIndex];
           return (
             <Link
               key={tab.id}
               to={tab.to}
               params={tab.params}
               // The Link's own fuzzy match would mark the bare `/offerings` tab
-              // current on `/offerings/offers` too: `current` decides instead.
+              // current on `/offerings/offers` too: `isCurrent` decides instead.
               activeOptions={{ exact: true }}
-              aria-current={current ? 'page' : undefined}
+              aria-current={isCurrent ? 'page' : undefined}
               data-testid={ids.tab(tab.id)}
               data-slot="room-tab"
               className={cn(
                 SEGMENT,
-                current ? SEGMENT_STATE.selected : SEGMENT_STATE.idle,
+                isCurrent ? SEGMENT_STATE.selected : SEGMENT_STATE.idle,
               )}
             >
               <SegmentLabel icon={tab.icon} label={tab.label} badge={tab.badge} />

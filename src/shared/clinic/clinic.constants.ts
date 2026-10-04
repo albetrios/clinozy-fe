@@ -32,6 +32,20 @@ export const CLINIC_KEYS = {
     },
     users: { label: 'sections.users.label', description: 'sections.users.description' },
   },
+  /** Each tone's name — a colour swatch's accessible name (the drawers' Colour fields). */
+  tones: {
+    butter: 'tones.butter',
+    lav: 'tones.lav',
+    sky: 'tones.sky',
+    sage: 'tones.sage',
+    blush: 'tones.blush',
+    mint: 'tones.mint',
+    peach: 'tones.peach',
+    plum: 'tones.plum',
+    lime: 'tones.lime',
+    slate: 'tones.slate',
+    stone: 'tones.stone',
+  },
   roles: {
     admin: 'roles.admin',
     doctor: 'roles.doctor',

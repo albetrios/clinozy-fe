@@ -15,6 +15,8 @@ src/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/ #page-r
 src/pages/organization/$organizationSlug/patients/create/ #page-root
 src/pages/organization/$organizationSlug/tasks/$taskId/ #page-root
 src/pages/organization/$organizationSlug/tasks/create/ #page-root
+src/pages/organization/$organizationSlug/users/create/ #page-root
+src/pages/organization/$organizationSlug/users/$userId/edit/ #page-root
 
 # A form on the record drawer: its root is `appointment-form`, its submit is the
 # drawer's primary, which the drawer derives from its own id

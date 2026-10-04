@@ -41,6 +41,19 @@
       "description": "Team, roles & access, branches"
     }
   },
+  "tones": {
+    "butter": "Butter",
+    "lav": "Lavender",
+    "sky": "Sky",
+    "sage": "Sage",
+    "blush": "Blush",
+    "mint": "Mint",
+    "peach": "Peach",
+    "plum": "Plum",
+    "lime": "Lime",
+    "slate": "Slate",
+    "stone": "Stone"
+  },
   "roles": {
     "admin": "Admin",
     "doctor": "Doctor",

@@ -107,6 +107,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `offer-drawer`                   | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)    | `offerings/offers/` (child of the above)              |
 | `offering-quick-create`          | Stacked "New offering" — over the Invoice drawer's line picker (L-30e, L-40)      | `shared/components/OfferingQuickCreate/`              |
 | `users-page`                     | Clinic room page: Users                                                           | `pages/organization/$organizationSlug/users/`         |
+| `users-team-table`               | Users › Team table (toolbar and table ids: the shared ones, `users-team-…`)       | `pages/organization/$organizationSlug/users/`         |
+| `user-drawer`                    | User drawer — `/users/create` (New user) and `/users/$userId/edit` (L-31b)        | `pages/organization/$organizationSlug/users/`         |
 | `medical-sales-page`             | Medical › Sales                                                                   | `pages/organization/$organizationSlug/medical/sales/` |
 | `stock-items-page`               | Clinic stock › Items                                                              | `pages/organization/$organizationSlug/stock/items/`   |
 | `sidebar-toggle`                 | Menu button                                                                       | AppLayout                                             |
@@ -503,6 +505,24 @@ The Invoice drawer's line picker stacks one `OfferingQuickCreate` (component sta
 | Test ID                                                    | Element                                                                 | Source                                   |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
 | `<n>-name` / `<n>-duration` / `<n>-category` / `<n>-price` | Name (prefilled from the picker), the Duration stepper, Category, Price | `shared/components/OfferingQuickCreate/` |
+
+### User drawer (Users room, launch L-31b)
+
+New user and Edit user are one `UserDrawer` (`pages/organization/$organizationSlug/users/components/UserDrawer/`);
+`<d>` is `user-drawer`. Its steps are `profile` and `hours`. A chip group's chips are
+`<group>-<value>` (`user-drawer-roles-front_desk`, `user-drawer-days-sat`, `user-drawer-colour-sky`).
+The Team's toolbar and table carry the shared ids with the `tableId` `users-team` (`users-team-toolbar`,
+`users-team-search`, `users-team-filters-trigger`, `users-team-new-user`, `users-team-fab`,
+`users-team-table-row`); the room's tabs are `users-tabs` and `users-tab-<tab>`.
+
+| Test ID                                        | Element                                                             | Source             |
+| ---------------------------------------------- | ------------------------------------------------------------------- | ------------------ |
+| `<d>-name` / `<d>-mobile` / `<d>-email`        | Step 1's Name, Mobile ("+91") and Email (read-only once joined)     | `UserDrawerFields` |
+| `<d>-colour` / `<d>-colour-<tone>`             | Colour swatches (`DrawerSwatches`); the picked one shows initials   | `UserDrawerFields` |
+| `<d>-roles` / `<d>-access` / `<d>-branches`    | Roles chips (pick order), "Gets access to", Branches (several only) | `UserDrawerFields` |
+| `<d>-days` / `<d>-from` / `<d>-to`             | Step 2's Days chips and the From / To time pickers                  | `UserDrawerFields` |
+| `<d>-commission` / `<d>-commission-quick-<n>`  | Commission stepper (`-decrease`, `-increase`) and its quick picks   | `UserDrawerFields` |
+| `<d>-status` / `<d>-invitation` / `<d>-resend` | Status toggle; an invited member's expiry and "Resend invitation"   | `UserDrawerFields` |
 
 ## Items field (shared, launch L-17a)
 

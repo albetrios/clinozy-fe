@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
-import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
+import { isInvitableRole, leastPrivilegeRoleId } from '@/shared/api/clinic/users-api.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
@@ -40,43 +40,6 @@ const inviteSchema = z.object({
 });
 
 type InviteInput = z.infer<typeof inviteSchema>;
-
-/** The Owner role is never an invite target — an org has exactly one owner. */
-function isInvitableRole(role: RoleSummary): boolean {
-  return role.name.toLowerCase() !== 'owner';
-}
-
-/**
- * Preselection order for the Role field, least privilege first. Every TEAM
- * organization is provisioned with Admin / Member / Viewer, so one of these two
- * is present unless someone has deleted it.
- */
-const LEAST_PRIVILEGE_ROLE_NAMES = ['member', 'viewer'] as const;
-
-/**
- * The role an invite should OPEN on: the least-privileged well-known role the
- * organization still has, or nothing.
- *
- * The field used to open on `invitableRoles[0]`, which is whatever the roster
- * sorts first — `Admin`, alphabetically, in every organization this app
- * provisions. So the quiet path through the dialog (type an address, press
- * send) handed a new teammate the second-most-powerful role in the
- * organization, and the only thing standing between that and a real invite was
- * the inviter noticing a select they never had to touch.
- *
- * A custom role is never preselected. The list carries no permission set to
- * rank it by (`useRoles` omits permissions), so preselecting one would be a
- * guess at how powerful it is — and a wrong guess here is a privilege grant.
- * Returning `undefined` leaves the placeholder showing and makes the inviter
- * choose, which the Role error below now says out loud.
- */
-function leastPrivilegeRoleId(invitableRoles: RoleSummary[]): string | undefined {
-  for (const name of LEAST_PRIVILEGE_ROLE_NAMES) {
-    const match = invitableRoles.find((role) => role.name.toLowerCase() === name);
-    if (match) return match.id;
-  }
-  return undefined;
-}
 
 /**
  * Dialog + form for inviting a new member to the active organization. Roles come

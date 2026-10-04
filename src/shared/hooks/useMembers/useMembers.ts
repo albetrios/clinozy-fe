@@ -21,6 +21,17 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 export type MembersListParams = OrgListKeyParams;
 
 /**
+ * Options of a member write a screen reports itself (the Users room's user
+ * drawer: one "<name> saved" for the whole save, its own failure states).
+ */
+export interface MemberWriteOptions {
+  /** No success toast of the hook's own. */
+  suppressSuccessToast?: boolean;
+  /** Toast a failure (default true); off when the caller shows it in place. */
+  notifyOnError?: boolean;
+}
+
+/**
  * Members of the active organization — windowed list query + role/status/removal
  * mutations. Server state only — never mirrored into Zustand (fe-file-structure.mdc).
  * The list is cursor-paginated server-side (search `q`, sort, + `Load more`);
@@ -39,8 +50,12 @@ export function useMembers(params: MembersListParams = {}): CursorListResult<Mem
   });
 }
 
-/** Update a member's role with optimistic UI, then refresh the members list. */
-export function useUpdateMemberRole() {
+/**
+ * Update a member's role with optimistic UI, then refresh the members list.
+ * `suppressSuccessToast`: the caller reports the whole save itself (the Users
+ * room's user drawer, "<name> saved").
+ */
+export function useUpdateMemberRole(options?: MemberWriteOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { membershipId: string; role: OrgRole; roleId?: string }) =>
@@ -51,10 +66,12 @@ export function useUpdateMemberRole() {
       update: (rows: Member[], { membershipId, role }) =>
         rows.map((m) => (m.id === membershipId ? { ...m, role } : m)),
     },
-    successMessage: i18n.t(ERRORS_KEYS.frontend.hooks.members.updateRoleSuccess, {
-      ns: ERRORS_NS,
-    }),
-    notifyOnError: true,
+    successMessage: options?.suppressSuccessToast
+      ? undefined
+      : i18n.t(ERRORS_KEYS.frontend.hooks.members.updateRoleSuccess, {
+          ns: ERRORS_NS,
+        }),
+    notifyOnError: options?.notifyOnError ?? true,
   });
 }
 
@@ -78,8 +95,11 @@ export function useRemoveMember(options?: { suppressSuccessToast?: boolean }) {
   });
 }
 
-/** Suspend or reactivate a member — optimistically flips the status badge. */
-export function useUpdateMemberStatus() {
+/**
+ * Suspend or reactivate a member — optimistically flips the status badge.
+ * `suppressSuccessToast`: as {@link useUpdateMemberRole}.
+ */
+export function useUpdateMemberStatus(options?: MemberWriteOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { membershipId: string; status: MembershipStatus }) =>
@@ -92,12 +112,15 @@ export function useUpdateMemberStatus() {
           member.id === membershipId ? { ...member, status } : member,
         ),
     },
-    successMessage: (member) =>
-      i18n.t(
-        member.status === 'suspended'
-          ? ERRORS_KEYS.frontend.hooks.members.suspendSuccess
-          : ERRORS_KEYS.frontend.hooks.members.reactivateSuccess,
-        { ns: ERRORS_NS },
-      ),
+    successMessage: options?.suppressSuccessToast
+      ? undefined
+      : (member) =>
+          i18n.t(
+            member.status === 'suspended'
+              ? ERRORS_KEYS.frontend.hooks.members.suspendSuccess
+              : ERRORS_KEYS.frontend.hooks.members.reactivateSuccess,
+            { ns: ERRORS_NS },
+          ),
+    notifyOnError: options?.notifyOnError ?? true,
   });
 }

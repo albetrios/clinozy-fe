@@ -55,8 +55,16 @@ export interface DrawerChipsMultipleProps<
 > extends DrawerChipsBaseProps<T> {
   multiple: true;
   value: readonly T[];
-  /** The picks in the options' order, whatever order they were tapped in. */
+  /**
+   * The picks in the options' order, whatever order they were tapped in — or,
+   * `ordered`, in the order they were picked (a new pick goes last).
+   */
   onChange: (value: T[]) => void;
+  /**
+   * Keep the picks in pick order: the first one picked leads (the user
+   * drawer's Roles, whose first pick is the main role).
+   */
+  ordered?: boolean;
 }
 
 /** Props of {@link DrawerChips}. */
@@ -101,12 +109,21 @@ function chipColours(
   );
 }
 
-/** The next value of a pick-any group: `value` toggled, in the options' order. */
+/**
+ * The next value of a pick-any group: `value` toggled, in the options' order —
+ * or in pick order when `ordered` (a new pick goes last).
+ */
 function toggledPicks<T extends string>(
   options: readonly DrawerChipOption<T>[],
   picks: readonly T[],
   value: T,
+  ordered = false,
 ): T[] {
+  if (ordered) {
+    return picks.includes(value)
+      ? picks.filter((pick) => pick !== value)
+      : [...picks, value];
+  }
   const next = new Set(picks);
   if (next.has(value)) next.delete(value);
   else next.add(value);
@@ -136,7 +153,7 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
 
   const toggle = (value: T) => {
     if (props.multiple) {
-      props.onChange(toggledPicks(options, props.value, value));
+      props.onChange(toggledPicks(options, props.value, value, props.ordered));
       return;
     }
     if (props.value !== value) props.onChange(value);

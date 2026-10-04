@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "Users"
+  },
+  "record": "User",
+  "tabs": {
+    "label": "Users views",
+    "team": "Team",
+    "roles": "Roles & access",
+    "branches": "Branches"
+  },
+  "search": {
+    "placeholder": "Name, email, mobile or #ID",
+    "label": "Search users"
+  },
+  "primary": {
+    "newUser": "New user",
+    "newRole": "New role",
+    "newBranch": "New branch"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "User",
+    "email": "Email",
+    "roles": "Roles",
+    "branches": "Branches",
+    "hours": "Working hours",
+    "commission": "Commission",
+    "status": "Status",
+    "updated": "Updated"
+  },
+  "table": {
+    "records": "users",
+    "mainRole": "Main role",
+    "alsoRole": "Also",
+    "today": "Today · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "invited": "Invited",
+    "expires": "Invitation expires {{date}}",
+    "expired": "Invitation expired"
+  },
+  "hours": {
+    "everyDay": "Every day",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Roles",
+    "all": "All",
+    "branches": "Branches",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "title": "No user matches",
+    "description": "Nothing here yet. Try another tab or search."
+  },
+  "drawer": {
+    "title": {
+      "create": "New user",
+      "edit": "Edit user"
+    },
+    "sub": "Sign-in, roles, branches and working hours",
+    "steps": {
+      "profile": "Profile, roles & branches",
+      "hours": "Working hours & pay"
+    },
+    "groups": {
+      "profile": "Profile",
+      "rolesBranches": "Roles & branches",
+      "hours": "Working hours",
+      "pay": "Pay"
+    },
+    "fields": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "colour": "Colour",
+      "roles": "Roles",
+      "access": "Gets access to",
+      "branches": "Branches",
+      "days": "Days",
+      "from": "From",
+      "to": "To",
+      "commission": "Commission / incentive",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 digits",
+      "colour": "used on their badges",
+      "roles": "pick one or more · access adds up",
+      "branches": "where they work",
+      "days": "Appointments only offer these days"
+    },
+    "placeholders": {
+      "name": "Full name, e.g. Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Pick a time",
+      "commission": "0"
+    },
+    "commissionSuffix": "% of billed",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "pickRole": "Pick a role",
+    "statusOn": "Active · can sign in",
+    "statusOff": "Inactive · signed out",
+    "resend": "Resend invitation",
+    "quickFill": {
+      "doctor": "Doctor · 10:00–19:00",
+      "therapist": "Therapist · 10:00–19:00",
+      "front_desk": "Front desk · 09:30–19:30",
+      "pharmacist": "Pharmacist · 09:00–21:00"
+    },
+    "summaryNew": "New user",
+    "save": {
+      "create": "Create user",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "missing": "Add name and email",
+    "noRole": "Pick at least one role",
+    "emailInvalid": "Enter a valid email address",
+    "mobileInvalid": "Mobile needs 10 digits",
+    "noPlatformRole": "There’s no role to give them yet · ask an admin",
+    "added": "{{name}} added",
+    "saved": "{{name}} saved"
+  },
+  "deleteUser": {
+    "title": "Delete this user?",
+    "removed": "{{name}} removed"
   }
 }

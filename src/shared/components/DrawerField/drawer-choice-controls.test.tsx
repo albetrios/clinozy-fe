@@ -42,6 +42,33 @@ describe('DrawerSwatches (H:1600)', () => {
   });
 });
 
+describe('DrawerSwatches — a mark', () => {
+  it('shows the screen’s mark on the picked swatch, "✓" without one', () => {
+    const { rerender } = render(
+      <DrawerSwatches
+        label="Colour"
+        tones={['sky']}
+        value="sky"
+        onChange={vi.fn()}
+        mark="RS"
+        testId="colour"
+      />,
+    );
+    expect(screen.getByTestId('colour-sky')).toHaveTextContent('RS');
+    rerender(
+      <DrawerSwatches
+        label="Colour"
+        tones={['sky']}
+        value="sky"
+        onChange={vi.fn()}
+        mark=""
+        testId="colour"
+      />,
+    );
+    expect(screen.getByTestId('colour-sky')).toHaveTextContent('✓');
+  });
+});
+
 describe('DrawerToggle (H:1601)', () => {
   it('is a switch that says its state', async () => {
     const user = userEvent.setup();

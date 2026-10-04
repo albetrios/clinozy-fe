@@ -1,5 +1,7 @@
 import { zonedClockParts } from '@/lib/i18n/format.ts';
 
+import type { Weekday } from './clinic-schema.ts';
+
 /**
  * The clinic clock. Calendar dates (`YYYY-MM-DD`) and clock times (`HH:mm`) in
  * the contract are clinic-local (`schema-routes.md` conventions); instants are
@@ -122,4 +124,32 @@ export function clinicInstant(
   );
   const offset = offsetMinutes(new Date(naive), timeZone);
   return new Date(naive - offset * 60_000).toISOString();
+}
+
+/** The week in the contract's order, Monday first (`S:` `weekday`). */
+const WEEK: readonly Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+/**
+ * How a working week reads (`usRange`, H:3608): "Every day" for all seven, a
+ * run "Mon–Sat" for two or more days in a row, else the days listed — in week
+ * order whatever order they were picked in. The screen words each kind.
+ */
+export type WorkingDaysPattern =
+  | { kind: 'none' }
+  | { kind: 'everyDay' }
+  | { kind: 'run'; from: Weekday; to: Weekday }
+  | { kind: 'list'; days: Weekday[] };
+
+/** The reading of a set of working days — see {@link WorkingDaysPattern}. */
+export function workingDaysPattern(days: readonly Weekday[]): WorkingDaysPattern {
+  const sorted = WEEK.filter((day) => days.includes(day));
+  const first = sorted[0];
+  const last = sorted.at(-1);
+  if (first === undefined || last === undefined) return { kind: 'none' };
+  if (sorted.length === WEEK.length) return { kind: 'everyDay' };
+  const contiguous =
+    sorted.length > 1 && WEEK.indexOf(last) - WEEK.indexOf(first) === sorted.length - 1;
+  return contiguous
+    ? { kind: 'run', from: first, to: last }
+    : { kind: 'list', days: sorted };
 }

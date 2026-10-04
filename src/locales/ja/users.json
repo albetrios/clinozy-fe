@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "ユーザー"
+  },
+  "record": "ユーザー",
+  "tabs": {
+    "label": "ユーザーの表示",
+    "team": "チーム",
+    "roles": "ロールとアクセス",
+    "branches": "拠点"
+  },
+  "search": {
+    "placeholder": "名前、メール、携帯番号、#ID",
+    "label": "ユーザーを検索"
+  },
+  "primary": {
+    "newUser": "新しいユーザー",
+    "newRole": "新しいロール",
+    "newBranch": "新しい拠点"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "ユーザー",
+    "email": "メール",
+    "roles": "ロール",
+    "branches": "拠点",
+    "hours": "勤務時間",
+    "commission": "歩合",
+    "status": "ステータス",
+    "updated": "更新"
+  },
+  "table": {
+    "records": "ユーザー",
+    "mainRole": "メインのロール",
+    "alsoRole": "兼任",
+    "today": "今日 · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "有効",
+    "inactive": "無効",
+    "invited": "招待中",
+    "expires": "招待の期限 {{date}}",
+    "expired": "招待の期限切れ"
+  },
+  "hours": {
+    "everyDay": "毎日",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "ロール",
+    "all": "すべて",
+    "branches": "拠点",
+    "status": "ステータス"
+  },
+  "rowActions": {
+    "edit": "編集",
+    "delete": "削除"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "empty": {
+    "title": "該当するユーザーはいません",
+    "description": "まだ何もありません。別のタブや検索をお試しください。"
+  },
+  "drawer": {
+    "title": {
+      "create": "新しいユーザー",
+      "edit": "ユーザーを編集"
+    },
+    "sub": "サインイン、ロール、拠点、勤務時間",
+    "steps": {
+      "profile": "プロフィール、ロール、拠点",
+      "hours": "勤務時間と報酬"
+    },
+    "groups": {
+      "profile": "プロフィール",
+      "rolesBranches": "ロールと拠点",
+      "hours": "勤務時間",
+      "pay": "報酬"
+    },
+    "fields": {
+      "name": "名前",
+      "mobile": "携帯番号",
+      "email": "メール",
+      "colour": "カラー",
+      "roles": "ロール",
+      "access": "アクセスできる画面",
+      "branches": "拠点",
+      "days": "曜日",
+      "from": "開始",
+      "to": "終了",
+      "commission": "歩合 / インセンティブ",
+      "status": "ステータス"
+    },
+    "hints": {
+      "mobile": "10桁",
+      "colour": "バッジに使われます",
+      "roles": "1つ以上選択 · アクセスは合算されます",
+      "branches": "勤務する拠点",
+      "days": "予約ではこの曜日だけが選べます"
+    },
+    "placeholders": {
+      "name": "フルネーム(例: Dr. Nisha Mavani)",
+      "email": "name@clinic.com",
+      "time": "時刻を選択",
+      "commission": "0"
+    },
+    "commissionSuffix": "請求額の %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "減らす",
+    "increase": "増やす",
+    "pickRole": "ロールを選択",
+    "statusOn": "有効 · サインインできます",
+    "statusOff": "無効 · サインアウト済み",
+    "resend": "招待を再送",
+    "quickFill": {
+      "doctor": "医師 · 10:00–19:00",
+      "therapist": "セラピスト · 10:00–19:00",
+      "front_desk": "受付 · 09:30–19:30",
+      "pharmacist": "薬剤師 · 09:00–21:00"
+    },
+    "summaryNew": "新しいユーザー",
+    "save": {
+      "create": "ユーザーを作成",
+      "edit": "変更を保存",
+      "createAnother": "作成して続けて追加"
+    },
+    "missing": "名前とメールを入力してください",
+    "noRole": "ロールを1つ以上選んでください",
+    "emailInvalid": "有効なメールアドレスを入力してください",
+    "mobileInvalid": "携帯番号は10桁で入力してください",
+    "noPlatformRole": "まだ割り当てられるロールがありません · 管理者に依頼してください",
+    "added": "{{name}} を追加しました",
+    "saved": "{{name}} を保存しました"
+  },
+  "deleteUser": {
+    "title": "このユーザーを削除しますか?",
+    "removed": "{{name}} を削除しました"
   }
 }

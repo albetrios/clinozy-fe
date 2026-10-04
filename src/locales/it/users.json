@@ -1,5 +1,148 @@
 {
   "manifest": {
     "title": "Utenti"
+  },
+  "record": "Utente",
+  "tabs": {
+    "label": "Viste utenti",
+    "team": "Team",
+    "roles": "Ruoli e accesso",
+    "branches": "Sedi"
+  },
+  "search": {
+    "placeholder": "Nome, email, cellulare o #ID",
+    "label": "Cerca utenti"
+  },
+  "primary": {
+    "newUser": "Nuovo utente",
+    "newRole": "Nuovo ruolo",
+    "newBranch": "Nuova sede"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Utente",
+    "email": "Email",
+    "roles": "Ruoli",
+    "branches": "Sedi",
+    "hours": "Orario",
+    "commission": "Provvigione",
+    "status": "Stato",
+    "updated": "Aggiornato"
+  },
+  "table": {
+    "records": "utenti",
+    "mainRole": "Ruolo principale",
+    "alsoRole": "Anche",
+    "today": "Oggi · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Attivo",
+    "inactive": "Inattivo",
+    "invited": "Invitato",
+    "expires": "L’invito scade il {{date}}",
+    "expired": "Invito scaduto"
+  },
+  "hours": {
+    "everyDay": "Tutti i giorni",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Ruoli",
+    "all": "Tutti",
+    "branches": "Sedi",
+    "status": "Stato"
+  },
+  "rowActions": {
+    "edit": "Modifica",
+    "delete": "Elimina"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "empty": {
+    "title": "Nessun utente corrisponde",
+    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
+  },
+  "drawer": {
+    "title": {
+      "create": "Nuovo utente",
+      "edit": "Modifica utente"
+    },
+    "sub": "Accesso, ruoli, sedi e orario",
+    "steps": {
+      "profile": "Profilo, ruoli e sedi",
+      "hours": "Orario e compenso"
+    },
+    "groups": {
+      "profile": "Profilo",
+      "rolesBranches": "Ruoli e sedi",
+      "hours": "Orario",
+      "pay": "Compenso"
+    },
+    "fields": {
+      "name": "Nome",
+      "mobile": "Cellulare",
+      "email": "Email",
+      "colour": "Colore",
+      "roles": "Ruoli",
+      "access": "Ha accesso a",
+      "branches": "Sedi",
+      "days": "Giorni",
+      "from": "Dalle",
+      "to": "Alle",
+      "commission": "Provvigione / incentivo",
+      "status": "Stato"
+    },
+    "hints": {
+      "mobile": "10 cifre",
+      "colour": "usato sui suoi badge",
+      "roles": "scegline uno o più · gli accessi si sommano",
+      "branches": "dove lavora",
+      "days": "Gli appuntamenti offrono solo questi giorni"
+    },
+    "placeholders": {
+      "name": "Nome completo, es. Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Scegli un orario",
+      "commission": "0"
+    },
+    "commissionSuffix": "% del fatturato",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Diminuisci",
+    "increase": "Aumenta",
+    "pickRole": "Scegli un ruolo",
+    "statusOn": "Attivo · può accedere",
+    "statusOff": "Inattivo · disconnesso",
+    "resend": "Invia di nuovo l’invito",
+    "quickFill": {
+      "doctor": "Medico · 10:00–19:00",
+      "therapist": "Terapista · 10:00–19:00",
+      "front_desk": "Reception · 09:30–19:30",
+      "pharmacist": "Farmacista · 09:00–21:00"
+    },
+    "summaryNew": "Nuovo utente",
+    "save": {
+      "create": "Crea utente",
+      "edit": "Salva modifiche",
+      "createAnother": "Crea e aggiungi un altro"
+    },
+    "missing": "Aggiungi nome ed email",
+    "noRole": "Scegli almeno un ruolo",
+    "emailInvalid": "Inserisci un indirizzo email valido",
+    "mobileInvalid": "Il cellulare deve avere 10 cifre",
+    "noPlatformRole": "Non c’è ancora un ruolo da assegnare · chiedi a un amministratore",
+    "added": "{{name}} aggiunto",
+    "saved": "{{name}} salvato"
+  },
+  "deleteUser": {
+    "title": "Eliminare questo utente?",
+    "removed": "{{name}} rimosso"
   }
 }

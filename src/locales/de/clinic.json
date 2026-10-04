@@ -41,6 +41,19 @@
       "description": "Team, Rollen und Zugriff, Standorte"
     }
   },
+  "tones": {
+    "butter": "Butter",
+    "lav": "Lavendel",
+    "sky": "Himmelblau",
+    "sage": "Salbei",
+    "blush": "Rosé",
+    "mint": "Minze",
+    "peach": "Pfirsich",
+    "plum": "Pflaume",
+    "lime": "Limette",
+    "slate": "Schiefer",
+    "stone": "Stein"
+  },
   "roles": {
     "admin": "Administrator",
     "doctor": "Arzt",

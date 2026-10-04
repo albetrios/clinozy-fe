@@ -1,5 +1,148 @@
 {
   "manifest": {
     "title": "Utilisateurs"
+  },
+  "record": "Utilisateur",
+  "tabs": {
+    "label": "Vues des utilisateurs",
+    "team": "Équipe",
+    "roles": "Rôles et accès",
+    "branches": "Établissements"
+  },
+  "search": {
+    "placeholder": "Nom, e-mail, mobile ou #ID",
+    "label": "Rechercher des utilisateurs"
+  },
+  "primary": {
+    "newUser": "Nouvel utilisateur",
+    "newRole": "Nouveau rôle",
+    "newBranch": "Nouvel établissement"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Utilisateur",
+    "email": "E-mail",
+    "roles": "Rôles",
+    "branches": "Établissements",
+    "hours": "Horaires",
+    "commission": "Commission",
+    "status": "Statut",
+    "updated": "Mis à jour"
+  },
+  "table": {
+    "records": "utilisateurs",
+    "mainRole": "Rôle principal",
+    "alsoRole": "Aussi",
+    "today": "Aujourd’hui · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "invited": "Invité",
+    "expires": "L’invitation expire le {{date}}",
+    "expired": "Invitation expirée"
+  },
+  "hours": {
+    "everyDay": "Tous les jours",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Rôles",
+    "all": "Tous",
+    "branches": "Établissements",
+    "status": "Statut"
+  },
+  "rowActions": {
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "empty": {
+    "title": "Aucun utilisateur ne correspond",
+    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
+  },
+  "drawer": {
+    "title": {
+      "create": "Nouvel utilisateur",
+      "edit": "Modifier l’utilisateur"
+    },
+    "sub": "Connexion, rôles, établissements et horaires",
+    "steps": {
+      "profile": "Profil, rôles et établissements",
+      "hours": "Horaires et rémunération"
+    },
+    "groups": {
+      "profile": "Profil",
+      "rolesBranches": "Rôles et établissements",
+      "hours": "Horaires",
+      "pay": "Rémunération"
+    },
+    "fields": {
+      "name": "Nom",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "colour": "Couleur",
+      "roles": "Rôles",
+      "access": "A accès à",
+      "branches": "Établissements",
+      "days": "Jours",
+      "from": "De",
+      "to": "À",
+      "commission": "Commission / prime",
+      "status": "Statut"
+    },
+    "hints": {
+      "mobile": "10 chiffres",
+      "colour": "utilisée sur ses badges",
+      "roles": "un ou plusieurs · les accès s’additionnent",
+      "branches": "où il ou elle travaille",
+      "days": "Les rendez-vous ne proposent que ces jours"
+    },
+    "placeholders": {
+      "name": "Nom complet, p. ex. Dr Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Choisir une heure",
+      "commission": "0"
+    },
+    "commissionSuffix": "% du facturé",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Diminuer",
+    "increase": "Augmenter",
+    "pickRole": "Choisir un rôle",
+    "statusOn": "Actif · peut se connecter",
+    "statusOff": "Inactif · déconnecté",
+    "resend": "Renvoyer l’invitation",
+    "quickFill": {
+      "doctor": "Médecin · 10:00–19:00",
+      "therapist": "Thérapeute · 10:00–19:00",
+      "front_desk": "Accueil · 09:30–19:30",
+      "pharmacist": "Pharmacien · 09:00–21:00"
+    },
+    "summaryNew": "Nouvel utilisateur",
+    "save": {
+      "create": "Créer l’utilisateur",
+      "edit": "Enregistrer les modifications",
+      "createAnother": "Créer et en ajouter un autre"
+    },
+    "missing": "Ajoutez un nom et un e-mail",
+    "noRole": "Choisissez au moins un rôle",
+    "emailInvalid": "Saisissez une adresse e-mail valide",
+    "mobileInvalid": "Le mobile doit comporter 10 chiffres",
+    "noPlatformRole": "Aucun rôle à attribuer pour l’instant · demandez à un administrateur",
+    "added": "{{name}} ajouté",
+    "saved": "{{name}} enregistré"
+  },
+  "deleteUser": {
+    "title": "Supprimer cet utilisateur ?",
+    "removed": "{{name}} supprimé"
   }
 }

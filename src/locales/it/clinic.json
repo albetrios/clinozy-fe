@@ -41,6 +41,19 @@
       "description": "Team, ruoli e accessi, sedi"
     }
   },
+  "tones": {
+    "butter": "Burro",
+    "lav": "Lavanda",
+    "sky": "Cielo",
+    "sage": "Salvia",
+    "blush": "Cipria",
+    "mint": "Menta",
+    "peach": "Pesca",
+    "plum": "Prugna",
+    "lime": "Lime",
+    "slate": "Ardesia",
+    "stone": "Pietra"
+  },
   "roles": {
     "admin": "Amministratore",
     "doctor": "Medico",

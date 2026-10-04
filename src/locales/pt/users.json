@@ -1,5 +1,148 @@
 {
   "manifest": {
     "title": "Usuários"
+  },
+  "record": "Usuário",
+  "tabs": {
+    "label": "Visualizações de usuários",
+    "team": "Equipe",
+    "roles": "Funções e acesso",
+    "branches": "Unidades"
+  },
+  "search": {
+    "placeholder": "Nome, e-mail, celular ou #ID",
+    "label": "Buscar usuários"
+  },
+  "primary": {
+    "newUser": "Novo usuário",
+    "newRole": "Nova função",
+    "newBranch": "Nova unidade"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Usuário",
+    "email": "E-mail",
+    "roles": "Funções",
+    "branches": "Unidades",
+    "hours": "Horário",
+    "commission": "Comissão",
+    "status": "Status",
+    "updated": "Atualizado"
+  },
+  "table": {
+    "records": "usuários",
+    "mainRole": "Função principal",
+    "alsoRole": "Também",
+    "today": "Hoje · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "invited": "Convidado",
+    "expires": "O convite expira em {{date}}",
+    "expired": "Convite expirado"
+  },
+  "hours": {
+    "everyDay": "Todos os dias",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Funções",
+    "all": "Todos",
+    "branches": "Unidades",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Editar",
+    "delete": "Excluir"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "empty": {
+    "title": "Nenhum usuário corresponde",
+    "description": "Ainda não há nada aqui. Tente outra aba ou busca."
+  },
+  "drawer": {
+    "title": {
+      "create": "Novo usuário",
+      "edit": "Editar usuário"
+    },
+    "sub": "Acesso, funções, unidades e horário",
+    "steps": {
+      "profile": "Perfil, funções e unidades",
+      "hours": "Horário e pagamento"
+    },
+    "groups": {
+      "profile": "Perfil",
+      "rolesBranches": "Funções e unidades",
+      "hours": "Horário",
+      "pay": "Pagamento"
+    },
+    "fields": {
+      "name": "Nome",
+      "mobile": "Celular",
+      "email": "E-mail",
+      "colour": "Cor",
+      "roles": "Funções",
+      "access": "Tem acesso a",
+      "branches": "Unidades",
+      "days": "Dias",
+      "from": "Das",
+      "to": "Até",
+      "commission": "Comissão / incentivo",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 dígitos",
+      "colour": "usada nos seus selos",
+      "roles": "escolha uma ou mais · os acessos se somam",
+      "branches": "onde trabalha",
+      "days": "Os agendamentos só oferecem estes dias"
+    },
+    "placeholders": {
+      "name": "Nome completo, ex.: Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Escolha um horário",
+      "commission": "0"
+    },
+    "commissionSuffix": "% do faturado",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Diminuir",
+    "increase": "Aumentar",
+    "pickRole": "Escolha uma função",
+    "statusOn": "Ativo · pode entrar",
+    "statusOff": "Inativo · desconectado",
+    "resend": "Reenviar convite",
+    "quickFill": {
+      "doctor": "Médico · 10:00–19:00",
+      "therapist": "Terapeuta · 10:00–19:00",
+      "front_desk": "Recepção · 09:30–19:30",
+      "pharmacist": "Farmacêutico · 09:00–21:00"
+    },
+    "summaryNew": "Novo usuário",
+    "save": {
+      "create": "Criar usuário",
+      "edit": "Salvar alterações",
+      "createAnother": "Criar e adicionar outro"
+    },
+    "missing": "Adicione nome e e-mail",
+    "noRole": "Escolha pelo menos uma função",
+    "emailInvalid": "Informe um e-mail válido",
+    "mobileInvalid": "O celular precisa de 10 dígitos",
+    "noPlatformRole": "Ainda não há uma função para atribuir · peça a um administrador",
+    "added": "{{name}} adicionado",
+    "saved": "{{name}} salvo"
+  },
+  "deleteUser": {
+    "title": "Excluir este usuário?",
+    "removed": "{{name}} removido"
   }
 }

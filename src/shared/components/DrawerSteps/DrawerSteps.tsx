@@ -315,7 +315,7 @@ function StepCard({
           event.preventDefault();
           locked.onAttempt();
         }}
-        className="items-center justify-start gap-2.5 py-0 text-start hover:no-underline data-[state=closed]:after:absolute data-[state=closed]:after:inset-0 [&>svg]:hidden"
+        className="min-w-0 items-center justify-start gap-2.5 py-0 text-start hover:no-underline data-[state=closed]:after:absolute data-[state=closed]:after:inset-0 [&>svg]:hidden"
       >
         <StepCircle
           status={status}

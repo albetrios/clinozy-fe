@@ -1,5 +1,151 @@
 {
   "manifest": {
     "title": "المستخدمون"
+  },
+  "record": "المستخدم",
+  "tabs": {
+    "label": "طرق عرض المستخدمين",
+    "team": "الفريق",
+    "roles": "الأدوار والصلاحيات",
+    "branches": "الفروع"
+  },
+  "search": {
+    "placeholder": "الاسم أو البريد أو الجوال أو #المعرّف",
+    "label": "ابحث في المستخدمين"
+  },
+  "primary": {
+    "newUser": "مستخدم جديد",
+    "newRole": "دور جديد",
+    "newBranch": "فرع جديد"
+  },
+  "columns": {
+    "seq": "المعرّف",
+    "user": "المستخدم",
+    "email": "البريد الإلكتروني",
+    "roles": "الأدوار",
+    "branches": "الفروع",
+    "hours": "ساعات العمل",
+    "commission": "العمولة",
+    "status": "الحالة",
+    "updated": "آخر تحديث"
+  },
+  "table": {
+    "records": "المستخدمين",
+    "mainRole": "الدور الرئيسي",
+    "alsoRole": "أيضًا",
+    "today": "اليوم · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "invited": "تمت دعوته",
+    "expires": "تنتهي الدعوة في {{date}}",
+    "expired": "انتهت صلاحية الدعوة"
+  },
+  "hours": {
+    "everyDay": "كل يوم",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "الأدوار",
+    "all": "الكل",
+    "branches": "الفروع",
+    "status": "الحالة"
+  },
+  "rowActions": {
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "empty": {
+    "title": "لا يوجد مستخدم مطابق",
+    "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+  },
+  "drawer": {
+    "title": {
+      "create": "مستخدم جديد",
+      "edit": "تعديل المستخدم"
+    },
+    "sub": "تسجيل الدخول والأدوار والفروع وساعات العمل",
+    "steps": {
+      "profile": "الملف الشخصي والأدوار والفروع",
+      "hours": "ساعات العمل والأجر"
+    },
+    "groups": {
+      "profile": "الملف الشخصي",
+      "rolesBranches": "الأدوار والفروع",
+      "hours": "ساعات العمل",
+      "pay": "الأجر"
+    },
+    "fields": {
+      "name": "الاسم",
+      "mobile": "الجوال",
+      "email": "البريد الإلكتروني",
+      "colour": "اللون",
+      "roles": "الأدوار",
+      "access": "يحصل على صلاحية",
+      "branches": "الفروع",
+      "days": "الأيام",
+      "from": "من",
+      "to": "إلى",
+      "commission": "العمولة / الحافز",
+      "status": "الحالة"
+    },
+    "hints": {
+      "mobile": "10 أرقام",
+      "colour": "يُستخدم على شاراته",
+      "roles": "اختر دورًا أو أكثر · تُجمع الصلاحيات",
+      "branches": "أين يعمل",
+      "days": "تعرض المواعيد هذه الأيام فقط"
+    },
+    "placeholders": {
+      "name": "الاسم الكامل، مثل د. نيشا مافاني",
+      "email": "name@clinic.com",
+      "time": "اختر وقتًا",
+      "commission": "0"
+    },
+    "commissionSuffix": "% من المفوتر",
+    "commissionQuick": "{{value}}%",
+    "decrease": "إنقاص",
+    "increase": "زيادة",
+    "pickRole": "اختر دورًا",
+    "statusOn": "نشط · يمكنه تسجيل الدخول",
+    "statusOff": "غير نشط · تم تسجيل خروجه",
+    "resend": "إعادة إرسال الدعوة",
+    "quickFill": {
+      "doctor": "طبيب · 10:00–19:00",
+      "therapist": "معالج · 10:00–19:00",
+      "front_desk": "الاستقبال · 09:30–19:30",
+      "pharmacist": "صيدلي · 09:00–21:00"
+    },
+    "summaryNew": "مستخدم جديد",
+    "save": {
+      "create": "إنشاء المستخدم",
+      "edit": "حفظ التغييرات",
+      "createAnother": "إنشاء وإضافة آخر"
+    },
+    "missing": "أضف الاسم والبريد الإلكتروني",
+    "noRole": "اختر دورًا واحدًا على الأقل",
+    "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+    "mobileInvalid": "يجب أن يتكون الجوال من 10 أرقام",
+    "noPlatformRole": "لا يوجد دور لمنحه بعد · اسأل المسؤول",
+    "added": "تمت إضافة {{name}}",
+    "saved": "تم حفظ {{name}}"
+  },
+  "deleteUser": {
+    "title": "حذف هذا المستخدم؟",
+    "removed": "تمت إزالة {{name}}"
   }
 }

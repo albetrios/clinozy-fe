@@ -41,6 +41,19 @@
       "description": "Equipe, funções e acesso, unidades"
     }
   },
+  "tones": {
+    "butter": "Manteiga",
+    "lav": "Lavanda",
+    "sky": "Céu",
+    "sage": "Sálvia",
+    "blush": "Rosado",
+    "mint": "Menta",
+    "peach": "Pêssego",
+    "plum": "Ameixa",
+    "lime": "Lima",
+    "slate": "Ardósia",
+    "stone": "Pedra"
+  },
   "roles": {
     "admin": "Administrador",
     "doctor": "Médico",

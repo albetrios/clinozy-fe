@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "Benutzer"
+  },
+  "record": "Benutzer",
+  "tabs": {
+    "label": "Benutzeransichten",
+    "team": "Team",
+    "roles": "Rollen & Zugriff",
+    "branches": "Filialen"
+  },
+  "search": {
+    "placeholder": "Name, E-Mail, Mobilnummer oder #ID",
+    "label": "Benutzer suchen"
+  },
+  "primary": {
+    "newUser": "Neuer Benutzer",
+    "newRole": "Neue Rolle",
+    "newBranch": "Neue Filiale"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Benutzer",
+    "email": "E-Mail",
+    "roles": "Rollen",
+    "branches": "Filialen",
+    "hours": "Arbeitszeiten",
+    "commission": "Provision",
+    "status": "Status",
+    "updated": "Aktualisiert"
+  },
+  "table": {
+    "records": "Benutzer",
+    "mainRole": "Hauptrolle",
+    "alsoRole": "Außerdem",
+    "today": "Heute · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "invited": "Eingeladen",
+    "expires": "Einladung läuft am {{date}} ab",
+    "expired": "Einladung abgelaufen"
+  },
+  "hours": {
+    "everyDay": "Jeden Tag",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Rollen",
+    "all": "Alle",
+    "branches": "Filialen",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "title": "Kein passender Benutzer",
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+  },
+  "drawer": {
+    "title": {
+      "create": "Neuer Benutzer",
+      "edit": "Benutzer bearbeiten"
+    },
+    "sub": "Anmeldung, Rollen, Filialen und Arbeitszeiten",
+    "steps": {
+      "profile": "Profil, Rollen & Filialen",
+      "hours": "Arbeitszeiten & Vergütung"
+    },
+    "groups": {
+      "profile": "Profil",
+      "rolesBranches": "Rollen & Filialen",
+      "hours": "Arbeitszeiten",
+      "pay": "Vergütung"
+    },
+    "fields": {
+      "name": "Name",
+      "mobile": "Mobilnummer",
+      "email": "E-Mail",
+      "colour": "Farbe",
+      "roles": "Rollen",
+      "access": "Erhält Zugriff auf",
+      "branches": "Filialen",
+      "days": "Tage",
+      "from": "Von",
+      "to": "Bis",
+      "commission": "Provision / Bonus",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 Ziffern",
+      "colour": "für ihre Abzeichen",
+      "roles": "eine oder mehrere wählen · Zugriffe addieren sich",
+      "branches": "wo sie arbeiten",
+      "days": "Termine bieten nur diese Tage an"
+    },
+    "placeholders": {
+      "name": "Vollständiger Name, z. B. Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Uhrzeit wählen",
+      "commission": "0"
+    },
+    "commissionSuffix": "% des Umsatzes",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Verringern",
+    "increase": "Erhöhen",
+    "pickRole": "Rolle wählen",
+    "statusOn": "Aktiv · kann sich anmelden",
+    "statusOff": "Inaktiv · abgemeldet",
+    "resend": "Einladung erneut senden",
+    "quickFill": {
+      "doctor": "Arzt · 10:00–19:00",
+      "therapist": "Therapeut · 10:00–19:00",
+      "front_desk": "Empfang · 09:30–19:30",
+      "pharmacist": "Apotheker · 09:00–21:00"
+    },
+    "summaryNew": "Neuer Benutzer",
+    "save": {
+      "create": "Benutzer anlegen",
+      "edit": "Änderungen speichern",
+      "createAnother": "Anlegen & weiteren hinzufügen"
+    },
+    "missing": "Name und E-Mail angeben",
+    "noRole": "Mindestens eine Rolle wählen",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+    "mobileInvalid": "Die Mobilnummer braucht 10 Ziffern",
+    "noPlatformRole": "Es gibt noch keine Rolle, die vergeben werden kann · fragen Sie einen Administrator",
+    "added": "{{name}} hinzugefügt",
+    "saved": "{{name}} gespeichert"
+  },
+  "deleteUser": {
+    "title": "Diesen Benutzer löschen?",
+    "removed": "{{name}} entfernt"
   }
 }

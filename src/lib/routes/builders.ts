@@ -171,3 +171,27 @@ export function organizationTaskCreate(organizationSlug: string) {
     params: { organizationSlug },
   } as const;
 }
+
+/** The Users room — its first tab, the Team, which the user drawers open over. */
+export function organizationUsers(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/users',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** The New user drawer (an invitation, D17) over the Team (`S:105`). */
+export function organizationUserCreate(organizationSlug: string) {
+  return {
+    to: '/organization/$organizationSlug/users/create',
+    params: { organizationSlug },
+  } as const;
+}
+
+/** A member's drawer over the Team, keyed by membership id (`S:106`). */
+export function organizationUserEdit(organizationSlug: string, userId: string) {
+  return {
+    to: '/organization/$organizationSlug/users/$userId/edit',
+    params: { organizationSlug, userId },
+  } as const;
+}

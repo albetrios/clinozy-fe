@@ -13,9 +13,10 @@ import {
 /**
  * A drawer's colour field (the design's `swatch` kind, H:1600): one 30px
  * circle per tone, 8px apart, filled with the tone and edged in its line; the
- * picked one carries "✓" in the tone's ink and a 1.5px ring of it. A radio
- * group — one colour is always picked; each swatch is named by its colour
- * ("Sage"), aloud and as its tooltip.
+ * picked one carries "✓" in the tone's ink — or the screen's `mark`, the
+ * person's initials on the user drawer (`users.md:109`) — and a 1.5px ring of
+ * it. A radio group — one colour is always picked; each swatch is named by its
+ * colour ("Sage"), aloud and as its tooltip.
  */
 export function DrawerSwatches({
   label,
@@ -23,6 +24,7 @@ export function DrawerSwatches({
   value,
   onChange,
   disabled,
+  mark,
   testId,
 }: {
   /** The group's accessible name — the field's label. */
@@ -32,6 +34,8 @@ export function DrawerSwatches({
   value: Tone;
   onChange: (tone: Tone) => void;
   disabled?: boolean;
+  /** What the picked swatch shows instead of "✓" (initials); empty keeps "✓". */
+  mark?: string;
   /** Base test id; each swatch is `<testId>-<tone>`. */
   testId?: string;
 }) {
@@ -69,7 +73,7 @@ export function DrawerSwatches({
                 : 'hover:ring-1 hover:ring-current',
             )}
           >
-            {picked ? <span aria-hidden="true">✓</span> : null}
+            {picked ? <span aria-hidden="true">{mark || '✓'}</span> : null}
           </button>
         );
       })}

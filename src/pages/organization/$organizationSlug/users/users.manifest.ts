@@ -2,9 +2,12 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 
 /**
  * Users room island manifest (`/organization/$organizationSlug/users`) —
- * Team, roles & access, branches (KICKOFF §6.12). The route gates on membership and the clinic module
- * (D8, D9); in-room access is `useClinicAccess`. In the primary nav as the
- * `users` section.
+ * Team, roles & access, branches (KICKOFF §6.12). The bare URL is its first
+ * tab, the Team. The route gates on `membership:read` and the clinic module
+ * (D8, D17); in-room writes on the member's clinozy-be codes through
+ * `useClinicAccess`. In the primary nav as the `users` section. Its children:
+ * the invite drawer (`create`) and the member drawer (`$userId/edit`) — URL
+ * driven dialogs over the Team (D24, `S:105–106`).
  */
 export const manifest = {
   segment: 'users',
@@ -14,6 +17,6 @@ export const manifest = {
   permission: 'membership:read',
   module: 'clinic-users',
   nav: { id: 'users', section: 'users' },
-  kind: 'leaf',
-  children: [],
+  kind: 'layout',
+  children: ['create', '$userId'],
 } as const satisfies PageManifest;

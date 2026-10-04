@@ -13,6 +13,7 @@ import {
   clockMinutes,
   clockOfMinutes,
   localDateOf,
+  workingDaysPattern,
 } from './clinic-time.ts';
 
 describe('clinic clock (Asia/Kolkata)', () => {
@@ -86,5 +87,38 @@ describe('clinic clock (Asia/Kolkata)', () => {
     expect(civilYearsBetween('1997-09-17', '2026-09-17')).toBe(29);
     expect(civilYearsBetween('1997-09-18', '2026-09-17')).toBe(28);
     expect(civilYearsBetween('1997-10-01', '2026-09-30')).toBe(28);
+  });
+});
+
+describe('workingDaysPattern (usRange, H:3608)', () => {
+  it('reads all seven days as every day', () => {
+    expect(workingDaysPattern(['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'])).toEqual(
+      { kind: 'everyDay' },
+    );
+  });
+
+  it('reads two or more days in a row as a run, in week order', () => {
+    expect(workingDaysPattern(['sat', 'mon', 'tue', 'wed', 'thu', 'fri'])).toEqual({
+      kind: 'run',
+      from: 'mon',
+      to: 'sat',
+    });
+    expect(workingDaysPattern(['tue', 'wed'])).toEqual({
+      kind: 'run',
+      from: 'tue',
+      to: 'wed',
+    });
+  });
+
+  it('lists the days when they are not one run, and one day alone', () => {
+    expect(workingDaysPattern(['fri', 'mon', 'wed'])).toEqual({
+      kind: 'list',
+      days: ['mon', 'wed', 'fri'],
+    });
+    expect(workingDaysPattern(['thu'])).toEqual({ kind: 'list', days: ['thu'] });
+  });
+
+  it('reads no days as none', () => {
+    expect(workingDaysPattern([])).toEqual({ kind: 'none' });
   });
 });

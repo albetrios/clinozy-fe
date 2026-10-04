@@ -37,12 +37,13 @@ function OnePick({ clearable = false }: { clearable?: boolean }) {
   );
 }
 
-function PickAny() {
+function PickAny({ ordered = false }: { ordered?: boolean }) {
   const [value, setValue] = useState<Type[]>([]);
   return (
     <>
       <DrawerChips
         multiple
+        ordered={ordered}
         label="Patient type"
         options={TYPES}
         value={value}
@@ -100,6 +101,17 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     ).toBeNull();
     await user.click(lhr);
     expect(screen.getByRole('status')).toHaveTextContent('aesthetic');
+  });
+
+  it('keeps the picks in pick order when ordered — the first pick leads', async () => {
+    const user = userEvent.setup();
+    render(<PickAny ordered />);
+    await user.click(screen.getByRole('button', { name: 'LHR' }));
+    await user.click(screen.getByRole('button', { name: 'Aesthetic' }));
+    expect(screen.getByRole('status')).toHaveTextContent('lhr,aesthetic');
+    await user.click(screen.getByRole('button', { name: 'LHR' }));
+    await user.click(screen.getByRole('button', { name: 'Clinical' }));
+    expect(screen.getByRole('status')).toHaveTextContent('aesthetic,clinical');
   });
 
   it('marks a pick with its ink edge and ring, and draws an untoned chip on muted', () => {

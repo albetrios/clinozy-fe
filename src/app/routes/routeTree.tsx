@@ -96,7 +96,10 @@ import {
   validateTasksSearch,
 } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
+import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
+import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
+import { validateUsersSearch } from '@/pages/organization/$organizationSlug/users/users.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
@@ -331,6 +334,17 @@ const UsersPage = lazyRouteComponent(
     [I18N_NAMESPACES.users],
     () => import('@/pages/organization/$organizationSlug/users/users.route.tsx'),
   ),
+  'Component',
+);
+// The Users room's dialog routes render nothing of their own (the Team opens
+// the drawer), so they need no namespace beyond the room's.
+const UserCreateRoute = lazyRouteComponent(
+  () => import('@/pages/organization/$organizationSlug/users/create/create.route.tsx'),
+  'Component',
+);
+const UserEditRoute = lazyRouteComponent(
+  () =>
+    import('@/pages/organization/$organizationSlug/users/$userId/edit/edit.route.tsx'),
   'Component',
 );
 const MedicalLayout = lazyRouteComponent(
@@ -1081,12 +1095,43 @@ const organizationUsersRoute = createRoute({
   path: 'users',
   head: manifestHead(usersManifest),
   staticData: { manifest: usersManifest },
+  validateSearch: validateUsersSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(usersManifest)(toGateContext(location, params));
     requireOrgStatus({ params });
   },
   component: UsersPage,
+  errorComponent: RouteErrorBoundary,
+});
+
+// URL-driven dialogs over the Team (D24, S:105–106): each renders nothing; the
+// Users page reads the URL and opens the user drawer over itself.
+const organizationUserCreateRoute = createRoute({
+  getParentRoute: () => organizationUsersRoute,
+  path: 'create',
+  head: manifestHead(userCreateManifest),
+  staticData: { manifest: userCreateManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(userCreateManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: UserCreateRoute,
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationUserEditRoute = createRoute({
+  getParentRoute: () => organizationUsersRoute,
+  path: '$userId/edit',
+  head: manifestHead(userEditManifest),
+  staticData: { manifest: userEditManifest },
+  beforeLoad: async ({ params, preload, location }) => {
+    if (preload) return;
+    await gatewayFromManifest(userEditManifest)(toGateContext(location, params));
+    requireOrgStatus({ params });
+  },
+  component: UserEditRoute,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1268,7 +1313,10 @@ const routeTree = rootRoute.addChildren([
       organizationOfferCreateRoute,
       organizationOfferEditRoute,
     ]),
-    organizationUsersRoute,
+    organizationUsersRoute.addChildren([
+      organizationUserCreateRoute,
+      organizationUserEditRoute,
+    ]),
     organizationNotFoundRoute,
   ]),
   personalShellRoute.addChildren([personalDashboardRoute]),

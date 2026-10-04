@@ -41,6 +41,19 @@
       "description": "团队、角色与权限、分店"
     }
   },
+  "tones": {
+    "butter": "黄油色",
+    "lav": "薰衣草紫",
+    "sky": "天蓝",
+    "sage": "鼠尾草绿",
+    "blush": "腮红粉",
+    "mint": "薄荷绿",
+    "peach": "桃色",
+    "plum": "梅紫",
+    "lime": "青柠绿",
+    "slate": "石板灰",
+    "stone": "石色"
+  },
   "roles": {
     "admin": "管理员",
     "doctor": "医生",

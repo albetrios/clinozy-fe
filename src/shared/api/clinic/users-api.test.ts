@@ -25,10 +25,16 @@ import {
   fetchAllRoles,
   fetchMyStaffProfile,
   fetchStaffProfiles,
+  isInvitableRole,
   joinClinicRoles,
   joinTeam,
+  leastPrivilegeRoleId,
+  membershipRoleIdForClinicRoles,
+  orgRoleOfName,
   removeStaffProfile,
   saveStaffProfile,
+  teamMemberCreatedAt,
+  teamMemberMatchesFilters,
   teamMemberMatchesSearch,
   withPlatformAccess,
 } from './users-api.ts';
@@ -692,5 +698,127 @@ describe('withPlatformAccess — the Users row and perms from clinozy-be codes (
     if (!(admin && therapist)) throw new Error('both are listed');
     expect(withPlatformAccess(admin, [])).toBe(admin);
     expect(withPlatformAccess(therapist, ['membership:manage'])).toBe(therapist);
+  });
+});
+
+describe('the one clinozy-be role a membership holds (D47)', () => {
+  it('never offers Owner as an invite target', () => {
+    expect(isInvitableRole(ROLES.owner)).toBe(false);
+    expect(isInvitableRole({ name: ' owner ' })).toBe(false);
+    expect(isInvitableRole(ROLES.admin)).toBe(true);
+    expect(isInvitableRole(ROLES.senior)).toBe(true);
+  });
+
+  it('opens on Member, then Viewer — never a custom role', () => {
+    expect(leastPrivilegeRoleId(PLATFORM_ROLES)).toBe(ROLES.member.id);
+    expect(leastPrivilegeRoleId([ROLES.admin, ROLES.viewer, ROLES.senior])).toBe(
+      ROLES.viewer.id,
+    );
+    expect(leastPrivilegeRoleId([ROLES.admin, ROLES.senior])).toBeUndefined();
+  });
+
+  it('takes Admin when Admin is picked, wherever it sits among the picks', () => {
+    expect(membershipRoleIdForClinicRoles(['front_desk', 'admin'], PLATFORM_ROLES)).toBe(
+      ROLES.admin.id,
+    );
+  });
+
+  it('takes the main role’s clinozy-be role when there is one — a seeded preset or a custom role', () => {
+    expect(membershipRoleIdForClinicRoles(['doctor', 'therapist'], PLATFORM_ROLES)).toBe(
+      ROLES.doctor.id,
+    );
+    expect(membershipRoleIdForClinicRoles([ROLES.senior.id], PLATFORM_ROLES)).toBe(
+      ROLES.senior.id,
+    );
+  });
+
+  it('falls back to the least-privileged role while clinozy-be lacks the main role', () => {
+    expect(membershipRoleIdForClinicRoles(['front_desk'], PLATFORM_ROLES)).toBe(
+      ROLES.member.id,
+    );
+    expect(membershipRoleIdForClinicRoles(['pharmacist'], [ROLES.admin])).toBeUndefined();
+  });
+
+  it('labels a role name with its coarse platform bucket (the optimistic patch only)', () => {
+    expect(orgRoleOfName('Admin')).toBe('admin');
+    expect(orgRoleOfName('Viewer')).toBe('viewer');
+    expect(orgRoleOfName('Front desk')).toBe('member');
+  });
+});
+
+describe('the Team’s Filters', () => {
+  const TODAY = '2026-10-03';
+
+  async function team(): Promise<TeamMember[]> {
+    return joinTeam({
+      members: [
+        member('riya', 'riya@cresence.skin', ROLES.admin),
+        member('samya', 'samya@cresence.skin', ROLES.member, { status: 'suspended' }),
+        member('new', 'new@clinic.com', ROLES.member, {
+          status: 'invited',
+          joinedAt: '',
+          invitation: { id: 'inv_1', expiresAt: '2026-10-10T00:00:00.000Z' },
+        }),
+        member('kavya', 'kavya@clinic.com', ROLES.member, {
+          name: 'Kavya Mehta',
+          joinedAt: '2026-10-03T03:00:00.000Z',
+        }),
+      ],
+      profiles: await fetchStaffProfiles(),
+      platformRoles: PLATFORM_ROLES,
+    });
+  }
+
+  const ids = (rows: TeamMember[]) => rows.map((row) => row.membershipId.slice(4));
+
+  it('passes everyone without a filter', async () => {
+    const rows = await team();
+    expect(ids(rows.filter((row) => teamMemberMatchesFilters(row, {}, TODAY)))).toEqual(
+      ids(rows),
+    );
+  });
+
+  it('keeps the holders of a role, main role or not', async () => {
+    const rows = await team();
+    expect(
+      ids(rows.filter((row) => teamMemberMatchesFilters(row, { role: 'admin' }, TODAY))),
+    ).toEqual(['riya']);
+    expect(
+      ids(
+        rows.filter((row) =>
+          teamMemberMatchesFilters(row, { role: 'front_desk' }, TODAY),
+        ),
+      ),
+    ).toEqual(['riya']);
+  });
+
+  it('keeps the people of any picked branch', async () => {
+    const rows = await team();
+    const vesu = branchRef('Vesu');
+    expect(
+      ids(rows.filter((row) => teamMemberMatchesFilters(row, { branch: [vesu] }, TODAY))),
+    ).toEqual(['riya', 'samya']);
+  });
+
+  it('reads Active and Inactive — an invited member is neither', async () => {
+    const rows = await team();
+    const by = (status: ('active' | 'inactive')[]) =>
+      ids(rows.filter((row) => teamMemberMatchesFilters(row, { status }, TODAY)));
+    expect(by(['active'])).toEqual(['riya', 'kavya']);
+    expect(by(['inactive'])).toEqual(['samya']);
+    expect(by(['active', 'inactive'])).toEqual(['riya', 'samya', 'kavya']);
+  });
+
+  it('dates a member by the profile’s creation, else by when they joined', async () => {
+    const rows = await team();
+    const kavya = rows.find((row) => row.email === 'kavya@clinic.com');
+    expect(kavya && teamMemberCreatedAt(kavya)).toBe('2026-10-03T03:00:00.000Z');
+    const invited = rows.find((row) => row.status === 'invited');
+    expect(invited && teamMemberCreatedAt(invited)).toBeNull();
+    expect(
+      ids(
+        rows.filter((row) => teamMemberMatchesFilters(row, { created: 'today' }, TODAY)),
+      ),
+    ).toEqual(['kavya']);
   });
 });

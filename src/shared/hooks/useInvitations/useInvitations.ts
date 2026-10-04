@@ -4,6 +4,7 @@ import * as orgApi from '@/shared/api/organization-api.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
+import type { MemberWriteOptions } from '@/shared/hooks/useMembers/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
@@ -12,16 +13,21 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  * the MEMBERS list — invalidate that, not a separate invitations list. Resend
  * and revoke act on the invitation that INVITED row carries (below).
  */
-export function useInviteMember() {
+export function useInviteMember(options?: MemberWriteOptions) {
   const orgId = useOrganizationStore((s) => s.organizationId);
   return useAppMutation({
     mutationFn: (input: { email: string; roleId: string }) => orgApi.inviteMember(input),
     invalidateKeys: [orgQueryKeys.members(orgId)],
-    successMessage: (member) =>
-      i18n.t(ERRORS_KEYS.frontend.hooks.invitations.sendSuccess, {
-        ns: ERRORS_NS,
-        email: member.email,
-      }),
+    // The Users room's user drawer names the person once the profile is saved
+    // too ("<name> added", D28) — one toast for the whole save.
+    successMessage: options?.suppressSuccessToast
+      ? undefined
+      : (member) =>
+          i18n.t(ERRORS_KEYS.frontend.hooks.invitations.sendSuccess, {
+            ns: ERRORS_NS,
+            email: member.email,
+          }),
+    notifyOnError: options?.notifyOnError ?? true,
   });
 }
 

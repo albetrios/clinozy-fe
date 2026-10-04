@@ -1,5 +1,147 @@
 {
   "manifest": {
     "title": "उपयोगकर्ता"
+  },
+  "record": "उपयोगकर्ता",
+  "tabs": {
+    "label": "उपयोगकर्ता दृश्य",
+    "team": "टीम",
+    "roles": "भूमिकाएँ और पहुँच",
+    "branches": "शाखाएँ"
+  },
+  "search": {
+    "placeholder": "नाम, ईमेल, मोबाइल या #ID",
+    "label": "उपयोगकर्ता खोजें"
+  },
+  "primary": {
+    "newUser": "नया उपयोगकर्ता",
+    "newRole": "नई भूमिका",
+    "newBranch": "नई शाखा"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "उपयोगकर्ता",
+    "email": "ईमेल",
+    "roles": "भूमिकाएँ",
+    "branches": "शाखाएँ",
+    "hours": "काम के घंटे",
+    "commission": "कमीशन",
+    "status": "स्थिति",
+    "updated": "अपडेट"
+  },
+  "table": {
+    "records": "उपयोगकर्ता",
+    "mainRole": "मुख्य भूमिका",
+    "alsoRole": "साथ में",
+    "today": "आज · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "invited": "आमंत्रित",
+    "expires": "आमंत्रण {{date}} को समाप्त होगा",
+    "expired": "आमंत्रण समाप्त हो गया"
+  },
+  "hours": {
+    "everyDay": "हर दिन",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "भूमिकाएँ",
+    "all": "सभी",
+    "branches": "शाखाएँ",
+    "status": "स्थिति"
+  },
+  "rowActions": {
+    "edit": "संपादित करें",
+    "delete": "हटाएँ"
+  },
+  "bulk": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं"
+  },
+  "empty": {
+    "title": "कोई उपयोगकर्ता मेल नहीं खाता",
+    "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।"
+  },
+  "drawer": {
+    "title": {
+      "create": "नया उपयोगकर्ता",
+      "edit": "उपयोगकर्ता संपादित करें"
+    },
+    "sub": "साइन-इन, भूमिकाएँ, शाखाएँ और काम के घंटे",
+    "steps": {
+      "profile": "प्रोफ़ाइल, भूमिकाएँ और शाखाएँ",
+      "hours": "काम के घंटे और भुगतान"
+    },
+    "groups": {
+      "profile": "प्रोफ़ाइल",
+      "rolesBranches": "भूमिकाएँ और शाखाएँ",
+      "hours": "काम के घंटे",
+      "pay": "भुगतान"
+    },
+    "fields": {
+      "name": "नाम",
+      "mobile": "मोबाइल",
+      "email": "ईमेल",
+      "colour": "रंग",
+      "roles": "भूमिकाएँ",
+      "access": "इन तक पहुँच मिलेगी",
+      "branches": "शाखाएँ",
+      "days": "दिन",
+      "from": "से",
+      "to": "तक",
+      "commission": "कमीशन / प्रोत्साहन",
+      "status": "स्थिति"
+    },
+    "hints": {
+      "mobile": "10 अंक",
+      "colour": "उनके बैज पर दिखता है",
+      "roles": "एक या अधिक चुनें · पहुँच जुड़ती है",
+      "branches": "जहाँ वे काम करते हैं",
+      "days": "अपॉइंटमेंट में केवल ये दिन मिलेंगे"
+    },
+    "placeholders": {
+      "name": "पूरा नाम, जैसे Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "समय चुनें",
+      "commission": "0"
+    },
+    "commissionSuffix": "बिल का %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "घटाएँ",
+    "increase": "बढ़ाएँ",
+    "pickRole": "कोई भूमिका चुनें",
+    "statusOn": "सक्रिय · साइन इन कर सकते हैं",
+    "statusOff": "निष्क्रिय · साइन आउट",
+    "resend": "आमंत्रण फिर भेजें",
+    "quickFill": {
+      "doctor": "डॉक्टर · 10:00–19:00",
+      "therapist": "थेरेपिस्ट · 10:00–19:00",
+      "front_desk": "फ्रंट डेस्क · 09:30–19:30",
+      "pharmacist": "फ़ार्मासिस्ट · 09:00–21:00"
+    },
+    "summaryNew": "नया उपयोगकर्ता",
+    "save": {
+      "create": "उपयोगकर्ता बनाएँ",
+      "edit": "बदलाव सहेजें",
+      "createAnother": "बनाएँ और दूसरा जोड़ें"
+    },
+    "missing": "नाम और ईमेल जोड़ें",
+    "noRole": "कम से कम एक भूमिका चुनें",
+    "emailInvalid": "मान्य ईमेल पता दर्ज करें",
+    "mobileInvalid": "मोबाइल में 10 अंक होने चाहिए",
+    "noPlatformRole": "अभी देने के लिए कोई भूमिका नहीं है · किसी एडमिन से पूछें",
+    "added": "{{name}} जोड़े गए",
+    "saved": "{{name}} सहेजे गए"
+  },
+  "deleteUser": {
+    "title": "इस उपयोगकर्ता को हटाएँ?",
+    "removed": "{{name}} हटाए गए"
   }
 }

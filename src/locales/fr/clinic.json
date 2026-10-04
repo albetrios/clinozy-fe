@@ -41,6 +41,19 @@
       "description": "Équipe, rôles et accès, établissements"
     }
   },
+  "tones": {
+    "butter": "Beurre",
+    "lav": "Lavande",
+    "sky": "Ciel",
+    "sage": "Sauge",
+    "blush": "Rose poudré",
+    "mint": "Menthe",
+    "peach": "Pêche",
+    "plum": "Prune",
+    "lime": "Citron vert",
+    "slate": "Ardoise",
+    "stone": "Pierre"
+  },
   "roles": {
     "admin": "Administrateur",
     "doctor": "Médecin",

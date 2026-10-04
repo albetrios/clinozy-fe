@@ -41,6 +41,19 @@
       "description": "팀, 역할 및 권한, 지점"
     }
   },
+  "tones": {
+    "butter": "버터",
+    "lav": "라벤더",
+    "sky": "스카이",
+    "sage": "세이지",
+    "blush": "블러시",
+    "mint": "민트",
+    "peach": "피치",
+    "plum": "플럼",
+    "lime": "라임",
+    "slate": "슬레이트",
+    "stone": "스톤"
+  },
   "roles": {
     "admin": "관리자",
     "doctor": "의사",

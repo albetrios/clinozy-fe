@@ -1,5 +1,146 @@
 {
   "manifest": {
     "title": "사용자"
+  },
+  "record": "사용자",
+  "tabs": {
+    "label": "사용자 보기",
+    "team": "팀",
+    "roles": "역할 및 권한",
+    "branches": "지점"
+  },
+  "search": {
+    "placeholder": "이름, 이메일, 휴대폰 또는 #ID",
+    "label": "사용자 검색"
+  },
+  "primary": {
+    "newUser": "새 사용자",
+    "newRole": "새 역할",
+    "newBranch": "새 지점"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "사용자",
+    "email": "이메일",
+    "roles": "역할",
+    "branches": "지점",
+    "hours": "근무 시간",
+    "commission": "수수료",
+    "status": "상태",
+    "updated": "업데이트"
+  },
+  "table": {
+    "records": "사용자",
+    "mainRole": "주 역할",
+    "alsoRole": "추가",
+    "today": "오늘 · {{time}}",
+    "dayTime": "{{day}} · {{time}}",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "활성",
+    "inactive": "비활성",
+    "invited": "초대됨",
+    "expires": "초대 만료 {{date}}",
+    "expired": "초대 만료됨"
+  },
+  "hours": {
+    "everyDay": "매일",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "역할",
+    "all": "전체",
+    "branches": "지점",
+    "status": "상태"
+  },
+  "rowActions": {
+    "edit": "편집",
+    "delete": "삭제"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "empty": {
+    "title": "일치하는 사용자가 없습니다",
+    "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+  },
+  "drawer": {
+    "title": {
+      "create": "새 사용자",
+      "edit": "사용자 편집"
+    },
+    "sub": "로그인, 역할, 지점, 근무 시간",
+    "steps": {
+      "profile": "프로필, 역할 및 지점",
+      "hours": "근무 시간 및 급여"
+    },
+    "groups": {
+      "profile": "프로필",
+      "rolesBranches": "역할 및 지점",
+      "hours": "근무 시간",
+      "pay": "급여"
+    },
+    "fields": {
+      "name": "이름",
+      "mobile": "휴대폰",
+      "email": "이메일",
+      "colour": "색상",
+      "roles": "역할",
+      "access": "접근 가능한 화면",
+      "branches": "지점",
+      "days": "요일",
+      "from": "시작",
+      "to": "종료",
+      "commission": "수수료 / 인센티브",
+      "status": "상태"
+    },
+    "hints": {
+      "mobile": "10자리",
+      "colour": "배지에 사용됩니다",
+      "roles": "하나 이상 선택 · 권한이 합산됩니다",
+      "branches": "근무 지점",
+      "days": "예약은 이 요일만 제공됩니다"
+    },
+    "placeholders": {
+      "name": "전체 이름, 예: Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "시간 선택",
+      "commission": "0"
+    },
+    "commissionSuffix": "청구액의 %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "줄이기",
+    "increase": "늘리기",
+    "pickRole": "역할 선택",
+    "statusOn": "활성 · 로그인 가능",
+    "statusOff": "비활성 · 로그아웃됨",
+    "resend": "초대 다시 보내기",
+    "quickFill": {
+      "doctor": "의사 · 10:00–19:00",
+      "therapist": "치료사 · 10:00–19:00",
+      "front_desk": "프런트 데스크 · 09:30–19:30",
+      "pharmacist": "약사 · 09:00–21:00"
+    },
+    "summaryNew": "새 사용자",
+    "save": {
+      "create": "사용자 만들기",
+      "edit": "변경 사항 저장",
+      "createAnother": "만들고 하나 더 추가"
+    },
+    "missing": "이름과 이메일을 입력하세요",
+    "noRole": "역할을 하나 이상 선택하세요",
+    "emailInvalid": "올바른 이메일 주소를 입력하세요",
+    "mobileInvalid": "휴대폰 번호는 10자리여야 합니다",
+    "noPlatformRole": "아직 부여할 역할이 없습니다 · 관리자에게 요청하세요",
+    "added": "{{name}} 추가됨",
+    "saved": "{{name}} 저장됨"
+  },
+  "deleteUser": {
+    "title": "이 사용자를 삭제할까요?",
+    "removed": "{{name}} 삭제됨"
   }
 }

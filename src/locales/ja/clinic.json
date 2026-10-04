@@ -41,6 +41,19 @@
       "description": "チーム、ロールとアクセス、支店"
     }
   },
+  "tones": {
+    "butter": "バター",
+    "lav": "ラベンダー",
+    "sky": "スカイ",
+    "sage": "セージ",
+    "blush": "ブラッシュ",
+    "mint": "ミント",
+    "peach": "ピーチ",
+    "plum": "プラム",
+    "lime": "ライム",
+    "slate": "スレート",
+    "stone": "ストーン"
+  },
   "roles": {
     "admin": "管理者",
     "doctor": "医師",
