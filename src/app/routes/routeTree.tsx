@@ -104,6 +104,7 @@ import { manifest as offerCreateManifest } from '@/pages/organization/$organizat
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
+import { validatePatientImagesSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/images/images.search.ts';
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
 import {
   type PatientFileSearch,
@@ -1280,7 +1281,15 @@ const organizationPatientOverviewRoute = patientFileSectionRoute('overview');
 const organizationPatientVisitsRoute = patientFileSectionRoute('visits');
 const organizationPatientPrescriptionsRoute = patientFileSectionRoute('prescriptions');
 const organizationPatientTreatmentsRoute = patientFileSectionRoute('treatments');
-const organizationPatientImagesRoute = patientFileSectionRoute('images');
+// Photos carries its album and visit filter (`?album=&appointment=`), which
+// its viewer and Photo details keep (S:41–42).
+const organizationPatientImagesRoute = createRoute({
+  getParentRoute: () => organizationPatientFileRoute,
+  path: 'images',
+  validateSearch: validatePatientImagesSearch,
+  component: patientFileSection('images'),
+  errorComponent: RouteErrorBoundary,
+});
 const organizationPatientReportsRoute = patientFileSectionRoute('reports');
 const organizationPatientInvoicesRoute = patientFileSectionRoute('invoices');
 const organizationPatientPaymentsRoute = patientFileSectionRoute('payments');
@@ -1294,6 +1303,21 @@ const organizationPatientEditRoute = createRoute({
   path: 'edit',
   validateSearch: validatePatientFileDialogSearch,
   component: patientFileComponent('PatientFileEdit'),
+  errorComponent: RouteErrorBoundary,
+});
+
+// The photo viewer and Photo details, dialogs over Photos (S:41–42).
+const organizationPatientPhotoRoute = createRoute({
+  getParentRoute: () => organizationPatientImagesRoute,
+  path: '$imageId',
+  component: patientFileComponent('PatientPhotoViewer'),
+  errorComponent: RouteErrorBoundary,
+});
+
+const organizationPatientPhotoEditRoute = createRoute({
+  getParentRoute: () => organizationPatientImagesRoute,
+  path: '$imageId/edit',
+  component: patientFileComponent('PatientPhotoDetails'),
   errorComponent: RouteErrorBoundary,
 });
 
@@ -2061,7 +2085,10 @@ const routeTree = rootRoute.addChildren([
       organizationPatientVisitsRoute,
       organizationPatientPrescriptionsRoute,
       organizationPatientTreatmentsRoute,
-      organizationPatientImagesRoute,
+      organizationPatientImagesRoute.addChildren([
+        organizationPatientPhotoRoute,
+        organizationPatientPhotoEditRoute,
+      ]),
       organizationPatientReportsRoute,
       organizationPatientInvoicesRoute,
       organizationPatientPaymentsRoute,

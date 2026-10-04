@@ -23,6 +23,18 @@ export const PatientFileEdit = lazyRouteComponent(
   'Component',
 );
 
+/** The photo viewer — a dialog over Photos (`S:41`). */
+export const PatientPhotoViewer = lazyRouteComponent(
+  () => import('./images/$imageId/image-id.route.tsx'),
+  'Component',
+);
+
+/** Photo details — a drawer over Photos (`S:42`). */
+export const PatientPhotoDetails = lazyRouteComponent(
+  () => import('./images/$imageId/edit/edit.route.tsx'),
+  'Component',
+);
+
 /**
  * Each section's page (S:33): the route component `routeTree.tsx` mounts for
  * it, and what a file-level drawer shows behind it (A-F1).

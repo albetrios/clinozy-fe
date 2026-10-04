@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1645 src files · ~820 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1684 src files · ~837 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1309,6 +1309,7 @@ clinozy-fe/
 │   │   │   │   ├── offerings-pricing.ts
 │   │   │   │   ├── patient-file-api.ts
 │   │   │   │   ├── patient-file-contracts.ts
+│   │   │   │   ├── patient-images-api.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
 │   │   │   │   ├── payments-api.ts
@@ -1322,7 +1323,7 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
-│   │   │   │   └── [38 test files]
+│   │   │   │   └── [39 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2294,6 +2295,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useElementWidth.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useFormValues/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useFormValues.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useHiddenColumns/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useHiddenColumns.ts
@@ -2386,6 +2391,10 @@ clinozy-fe/
 │   │   │   ├── usePatientFile/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatientFile.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── usePatientPhotos/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePatientPhotos.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── usePatients/
 │   │   │   │   ├── index.ts

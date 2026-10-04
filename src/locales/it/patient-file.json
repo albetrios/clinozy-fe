@@ -149,5 +149,119 @@
     "reviews_other": "{{count}} recensioni",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "Ancora nessun feedback"
+  },
+  "photos": {
+    "albums": {
+      "general": "Generale",
+      "private": "Privato",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Album",
+    "count_one": "{{count}} foto",
+    "count_many": "{{count}} di foto",
+    "count_other": "{{count}} foto",
+    "visitFilter": {
+      "label": "Visita",
+      "all": "Tutte le foto",
+      "allSub": "{{count}} in {{album}}",
+      "none": "Non collegate a una visita",
+      "noneSub": "Caricate dalla scheda",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_one": "{{count}} foto",
+      "visitMeta_many": "{{count}} di foto",
+      "visitMeta_other": "{{count}} foto"
+    },
+    "sizes": {
+      "label": "Dimensione miniature",
+      "small": "Miniature piccole",
+      "medium": "Miniature medie",
+      "large": "Miniature grandi",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "Oggi",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "Apri {{name}}",
+      "edit": "Modifica dettagli",
+      "editHint": "Modifica nome, data e zona del corpo",
+      "delete": "Elimina foto"
+    },
+    "loadMore_one": "Carica altro · ne resta {{count}}",
+    "loadMore_many": "Carica altro · ne restano {{count}}",
+    "loadMore_other": "Carica altro · ne restano {{count}}",
+    "empty": {
+      "title": "Ancora nessuna foto in {{album}}",
+      "body": "Trascina qui le foto o caricale dal tuo computer."
+    },
+    "upload": "Carica immagini",
+    "notImages": "Rilascia file immagine",
+    "uploaded_one": "{{count}} foto caricata in {{album}}",
+    "uploaded_many": "{{count}} di foto caricate in {{album}}",
+    "uploaded_other": "{{count}} foto caricate in {{album}}",
+    "delete": {
+      "title": "Eliminare questa foto?",
+      "reasons": {
+        "wrongPatient": "Paziente sbagliato",
+        "blurry": "Sfocata / da rifare",
+        "duplicate": "Duplicato",
+        "other": "Altro"
+      },
+      "deleted": "Foto eliminata"
+    },
+    "bodyParts": {
+      "face": "Viso",
+      "scalp": "Cuoio capelluto",
+      "hair": "Capelli",
+      "body": "Corpo",
+      "chest": "Petto",
+      "back": "Schiena",
+      "underarm": "Ascelle",
+      "legs": "Gambe",
+      "arms": "Braccia",
+      "other": "Altro"
+    },
+    "viewer": {
+      "label": "Visualizzatore foto",
+      "position": "{{index}} di {{total}}",
+      "zoom": "Zoom",
+      "zoomOut": "Riduci",
+      "zoomOutHint": "Riduci (−)",
+      "zoomIn": "Ingrandisci",
+      "zoomInHint": "Ingrandisci (+)",
+      "zoomReset": "Adatta allo schermo (0)",
+      "close": "Chiudi visualizzatore",
+      "closeHint": "Chiudi (Esc)",
+      "previous": "Foto precedente",
+      "previousHint": "Precedente (←)",
+      "next": "Foto successiva",
+      "nextHint": "Successiva (→)",
+      "hints": {
+        "browse": "← → sfoglia",
+        "zoom": "Scorri o + − per lo zoom",
+        "pan": "Trascina per spostare · doppio clic per ripristinare",
+        "close": "Esc chiude"
+      },
+      "missing": "Foto di esempio · nessun file allegato",
+      "notFoundRecord": "Foto"
+    },
+    "details": {
+      "title": "Dettagli foto",
+      "sub": "Facoltativo · nome, data e zona del corpo aiutano a ritrovarla",
+      "name": "Nome",
+      "namePlaceholder": "es. guancia sinistra prima del peeling",
+      "date": "Data",
+      "album": "Album",
+      "bodyPart": "Zona del corpo",
+      "optional": "facoltativo",
+      "visit": "Visita",
+      "visitHint": "facoltativo · archivia la foto in quell’appuntamento",
+      "notAttached": "Non collegata",
+      "save": "Salva dettagli",
+      "saved": "Dettagli foto salvati"
+    },
+    "loading": "Caricamento delle foto"
   }
 }

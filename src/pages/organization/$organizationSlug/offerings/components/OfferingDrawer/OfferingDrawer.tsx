@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
@@ -12,6 +12,7 @@ import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
@@ -95,12 +96,6 @@ interface SessionProps extends OfferingDrawerBaseProps {
   onRemember: (memory: StepMemory<OfferingStepId>) => void;
   /** "Create & add another" saved: start again, blank. */
   onAnother: () => void;
-}
-
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<OfferingFormValues>): OfferingFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as OfferingFormValues;
 }
 
 /** The Quick fill chips (new only): each presets fields and keeps the rest; none saves. */

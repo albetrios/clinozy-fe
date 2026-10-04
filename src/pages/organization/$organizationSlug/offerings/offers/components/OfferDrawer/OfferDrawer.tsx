@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
@@ -10,6 +10,7 @@ import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { CatalogueDeleteConfirm } from '../../../shared/components/CatalogueDeleteConfirm/index.ts';
@@ -99,12 +100,6 @@ const FIELD_STEPS: Readonly<Record<keyof OfferFormValues, OfferStepId>> = {
   note: 'notes',
   live: 'notes',
 };
-
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<OfferFormValues>): OfferFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as OfferFormValues;
-}
 
 /**
  * Who may do what here (D9, Q-U8): the drawer is editable with Offerings Edit

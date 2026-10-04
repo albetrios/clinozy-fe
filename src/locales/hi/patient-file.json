@@ -142,5 +142,115 @@
     "reviews_other": "{{count}} समीक्षाएँ",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "अभी कोई फ़ीडबैक नहीं"
+  },
+  "photos": {
+    "albums": {
+      "general": "सामान्य",
+      "private": "निजी",
+      "lhr": "LHR"
+    },
+    "albumTabs": "एल्बम",
+    "count_one": "{{count}} फ़ोटो",
+    "count_other": "{{count}} फ़ोटो",
+    "visitFilter": {
+      "label": "विज़िट",
+      "all": "सभी फ़ोटो",
+      "allSub": "{{album}} में {{count}}",
+      "none": "किसी विज़िट से जुड़ी नहीं",
+      "noneSub": "फ़ाइल से अपलोड की गईं",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_one": "{{count}} फ़ोटो",
+      "visitMeta_other": "{{count}} फ़ोटो"
+    },
+    "sizes": {
+      "label": "थंबनेल का आकार",
+      "small": "छोटे थंबनेल",
+      "medium": "मध्यम थंबनेल",
+      "large": "बड़े थंबनेल",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "आज",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "{{name}} खोलें",
+      "edit": "विवरण बदलें",
+      "editHint": "नाम, तारीख़ और शरीर का हिस्सा बदलें",
+      "delete": "फ़ोटो हटाएँ"
+    },
+    "loadMore_one": "और दिखाएँ · {{count}} बाक़ी",
+    "loadMore_other": "और दिखाएँ · {{count}} बाक़ी",
+    "empty": {
+      "title": "{{album}} में अभी कोई फ़ोटो नहीं",
+      "body": "फ़ोटो यहाँ खींचकर छोड़ें या अपने कंप्यूटर से अपलोड करें।"
+    },
+    "upload": "इमेज अपलोड करें",
+    "notImages": "इमेज फ़ाइलें छोड़ें",
+    "uploaded_one": "{{count}} फ़ोटो {{album}} में अपलोड हुई",
+    "uploaded_other": "{{count}} फ़ोटो {{album}} में अपलोड हुईं",
+    "delete": {
+      "title": "यह फ़ोटो हटाएँ?",
+      "reasons": {
+        "wrongPatient": "गलत मरीज़",
+        "blurry": "धुंधली / फिर से लें",
+        "duplicate": "डुप्लिकेट",
+        "other": "अन्य"
+      },
+      "deleted": "फ़ोटो हटाई गई"
+    },
+    "bodyParts": {
+      "face": "चेहरा",
+      "scalp": "स्कैल्प",
+      "hair": "बाल",
+      "body": "शरीर",
+      "chest": "छाती",
+      "back": "पीठ",
+      "underarm": "बगल",
+      "legs": "पैर",
+      "arms": "बाँहें",
+      "other": "अन्य"
+    },
+    "viewer": {
+      "label": "फ़ोटो व्यूअर",
+      "position": "{{total}} में से {{index}}",
+      "zoom": "ज़ूम",
+      "zoomOut": "ज़ूम आउट",
+      "zoomOutHint": "ज़ूम आउट (−)",
+      "zoomIn": "ज़ूम इन",
+      "zoomInHint": "ज़ूम इन (+)",
+      "zoomReset": "स्क्रीन पर फ़िट करें (0)",
+      "close": "व्यूअर बंद करें",
+      "closeHint": "बंद करें (Esc)",
+      "previous": "पिछली फ़ोटो",
+      "previousHint": "पिछली (←)",
+      "next": "अगली फ़ोटो",
+      "nextHint": "अगली (→)",
+      "hints": {
+        "browse": "← → देखें",
+        "zoom": "स्क्रॉल या + − से ज़ूम",
+        "pan": "खिसकाने के लिए खींचें · रीसेट के लिए डबल-क्लिक",
+        "close": "Esc से बंद"
+      },
+      "missing": "नमूना फ़ोटो · कोई फ़ाइल नहीं जुड़ी",
+      "notFoundRecord": "फ़ोटो"
+    },
+    "details": {
+      "title": "फ़ोटो का विवरण",
+      "sub": "वैकल्पिक · नाम, तारीख़ और शरीर का हिस्सा बाद में ढूँढने में मदद करते हैं",
+      "name": "नाम",
+      "namePlaceholder": "जैसे पील से पहले बायाँ गाल",
+      "date": "तारीख़",
+      "album": "एल्बम",
+      "bodyPart": "शरीर का हिस्सा",
+      "optional": "वैकल्पिक",
+      "visit": "विज़िट",
+      "visitHint": "वैकल्पिक · फ़ोटो को उस अपॉइंटमेंट में रखता है",
+      "notAttached": "जुड़ी नहीं",
+      "save": "विवरण सहेजें",
+      "saved": "फ़ोटो का विवरण सहेजा गया"
+    },
+    "loading": "फ़ोटो लोड हो रही हैं"
   }
 }

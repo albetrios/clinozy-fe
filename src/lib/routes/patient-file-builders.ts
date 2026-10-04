@@ -38,3 +38,27 @@ export function organizationPatientEdit(organizationSlug: string, patientId: str
     params: { organizationSlug, patientId },
   } as const;
 }
+
+/** The photo viewer — one photo of the Photos section (`S:41`); the section's `?album=&appointment=` ride along. */
+export function organizationPatientPhoto(
+  organizationSlug: string,
+  patientId: string,
+  imageId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/images/$imageId',
+    params: { organizationSlug, patientId, imageId },
+  } as const;
+}
+
+/** Photo details — the drawer over the Photos section (`S:42`). */
+export function organizationPatientPhotoEdit(
+  organizationSlug: string,
+  patientId: string,
+  imageId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/images/$imageId/edit',
+    params: { organizationSlug, patientId, imageId },
+  } as const;
+}

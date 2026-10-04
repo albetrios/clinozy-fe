@@ -149,5 +149,119 @@
     "reviews_other": "{{count}} avis",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "Pas encore d’avis"
+  },
+  "photos": {
+    "albums": {
+      "general": "Général",
+      "private": "Privé",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Albums",
+    "count_one": "{{count}} photo",
+    "count_many": "{{count}} de photos",
+    "count_other": "{{count}} photos",
+    "visitFilter": {
+      "label": "Visite",
+      "all": "Toutes les photos",
+      "allSub": "{{count}} dans {{album}}",
+      "none": "Rattachées à aucune visite",
+      "noneSub": "Importées depuis le dossier",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_one": "{{count}} photo",
+      "visitMeta_many": "{{count}} de photos",
+      "visitMeta_other": "{{count}} photos"
+    },
+    "sizes": {
+      "label": "Taille des vignettes",
+      "small": "Petites vignettes",
+      "medium": "Vignettes moyennes",
+      "large": "Grandes vignettes",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "Aujourd’hui",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "Ouvrir {{name}}",
+      "edit": "Modifier les détails",
+      "editHint": "Modifier le nom, la date et la zone du corps",
+      "delete": "Supprimer la photo"
+    },
+    "loadMore_one": "Charger plus · {{count}} restante",
+    "loadMore_many": "Charger plus · {{count}} restantes",
+    "loadMore_other": "Charger plus · {{count}} restantes",
+    "empty": {
+      "title": "Aucune photo dans {{album}} pour l’instant",
+      "body": "Glissez des photos ici ou importez-les depuis votre ordinateur."
+    },
+    "upload": "Importer des images",
+    "notImages": "Déposez des fichiers image",
+    "uploaded_one": "{{count}} photo importée dans {{album}}",
+    "uploaded_many": "{{count}} de photos importées dans {{album}}",
+    "uploaded_other": "{{count}} photos importées dans {{album}}",
+    "delete": {
+      "title": "Supprimer cette photo ?",
+      "reasons": {
+        "wrongPatient": "Mauvais patient",
+        "blurry": "Floue / à refaire",
+        "duplicate": "Doublon",
+        "other": "Autre"
+      },
+      "deleted": "Photo supprimée"
+    },
+    "bodyParts": {
+      "face": "Visage",
+      "scalp": "Cuir chevelu",
+      "hair": "Cheveux",
+      "body": "Corps",
+      "chest": "Poitrine",
+      "back": "Dos",
+      "underarm": "Aisselles",
+      "legs": "Jambes",
+      "arms": "Bras",
+      "other": "Autre"
+    },
+    "viewer": {
+      "label": "Visionneuse de photos",
+      "position": "{{index}} sur {{total}}",
+      "zoom": "Zoom",
+      "zoomOut": "Dézoomer",
+      "zoomOutHint": "Dézoomer (−)",
+      "zoomIn": "Zoomer",
+      "zoomInHint": "Zoomer (+)",
+      "zoomReset": "Ajuster à l’écran (0)",
+      "close": "Fermer la visionneuse",
+      "closeHint": "Fermer (Échap)",
+      "previous": "Photo précédente",
+      "previousHint": "Précédente (←)",
+      "next": "Photo suivante",
+      "nextHint": "Suivante (→)",
+      "hints": {
+        "browse": "← → parcourir",
+        "zoom": "Défiler ou + − pour zoomer",
+        "pan": "Glisser pour déplacer · double-clic pour réinitialiser",
+        "close": "Échap pour fermer"
+      },
+      "missing": "Photo d’exemple · aucun fichier joint",
+      "notFoundRecord": "Photo"
+    },
+    "details": {
+      "title": "Détails de la photo",
+      "sub": "Facultatif · le nom, la date et la zone du corps aident à la retrouver",
+      "name": "Nom",
+      "namePlaceholder": "p. ex. joue gauche avant le peeling",
+      "date": "Date",
+      "album": "Album",
+      "bodyPart": "Zone du corps",
+      "optional": "facultatif",
+      "visit": "Visite",
+      "visitHint": "facultatif · classe la photo dans ce rendez-vous",
+      "notAttached": "Non rattachée",
+      "save": "Enregistrer les détails",
+      "saved": "Détails de la photo enregistrés"
+    },
+    "loading": "Chargement des photos"
   }
 }

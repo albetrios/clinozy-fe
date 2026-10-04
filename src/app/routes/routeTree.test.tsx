@@ -15,6 +15,7 @@ import {
   validateLeadCreateSearch,
   validateLeadsSearch,
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { validatePatientImagesSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/images/images.search.ts';
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
 import {
   validatePatientFileDialogSearch,
@@ -694,6 +695,8 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
         '$',
         'edit',
         'images',
+        'images/$imageId',
+        'images/$imageId/edit',
         'invoices',
         'notes',
         'overview',
@@ -711,10 +714,13 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
     );
   });
 
-  it('validates `activity` on the file and `from` on Edit patient', () => {
+  it('validates `activity` on the file, `from` on Edit patient, the album and filter on Photos', () => {
     expect(routeOf(FILE)?.options.validateSearch).toBe(validatePatientFileSearch);
     expect(routeOf(`${FILE}/edit`)?.options.validateSearch).toBe(
       validatePatientFileDialogSearch,
+    );
+    expect(routeOf(`${FILE}/images`)?.options.validateSearch).toBe(
+      validatePatientImagesSearch,
     );
   });
 

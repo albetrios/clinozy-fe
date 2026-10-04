@@ -135,5 +135,111 @@
     "reviews_other": "리뷰 {{count}}건",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "아직 피드백이 없습니다"
+  },
+  "photos": {
+    "albums": {
+      "general": "일반",
+      "private": "비공개",
+      "lhr": "LHR"
+    },
+    "albumTabs": "앨범",
+    "count_other": "사진 {{count}}장",
+    "visitFilter": {
+      "label": "방문",
+      "all": "모든 사진",
+      "allSub": "{{album}}에 {{count}}장",
+      "none": "방문에 연결되지 않음",
+      "noneSub": "차트에서 업로드함",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_other": "사진 {{count}}장"
+    },
+    "sizes": {
+      "label": "썸네일 크기",
+      "small": "작은 썸네일",
+      "medium": "중간 썸네일",
+      "large": "큰 썸네일",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "오늘",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "{{name}} 열기",
+      "edit": "세부 정보 편집",
+      "editHint": "이름, 날짜, 부위 편집",
+      "delete": "사진 삭제"
+    },
+    "loadMore_other": "더 보기 · {{count}}장 남음",
+    "empty": {
+      "title": "{{album}}에 아직 사진이 없습니다",
+      "body": "사진을 여기로 끌어 놓거나 컴퓨터에서 업로드하세요."
+    },
+    "upload": "이미지 업로드",
+    "notImages": "이미지 파일을 놓아 주세요",
+    "uploaded_other": "사진 {{count}}장을 {{album}}에 업로드했습니다",
+    "delete": {
+      "title": "이 사진을 삭제할까요?",
+      "reasons": {
+        "wrongPatient": "다른 환자",
+        "blurry": "흐림 / 재촬영",
+        "duplicate": "중복",
+        "other": "기타"
+      },
+      "deleted": "사진을 삭제했습니다"
+    },
+    "bodyParts": {
+      "face": "얼굴",
+      "scalp": "두피",
+      "hair": "모발",
+      "body": "몸",
+      "chest": "가슴",
+      "back": "등",
+      "underarm": "겨드랑이",
+      "legs": "다리",
+      "arms": "팔",
+      "other": "기타"
+    },
+    "viewer": {
+      "label": "사진 뷰어",
+      "position": "{{total}}장 중 {{index}}",
+      "zoom": "확대/축소",
+      "zoomOut": "축소",
+      "zoomOutHint": "축소 (−)",
+      "zoomIn": "확대",
+      "zoomInHint": "확대 (+)",
+      "zoomReset": "화면에 맞추기 (0)",
+      "close": "뷰어 닫기",
+      "closeHint": "닫기 (Esc)",
+      "previous": "이전 사진",
+      "previousHint": "이전 (←)",
+      "next": "다음 사진",
+      "nextHint": "다음 (→)",
+      "hints": {
+        "browse": "← → 넘기기",
+        "zoom": "스크롤 또는 + − 로 확대/축소",
+        "pan": "끌어서 이동 · 두 번 클릭해 초기화",
+        "close": "Esc 닫기"
+      },
+      "missing": "샘플 사진 · 첨부된 파일 없음",
+      "notFoundRecord": "사진"
+    },
+    "details": {
+      "title": "사진 세부 정보",
+      "sub": "선택 사항 · 이름, 날짜, 부위가 있으면 나중에 찾기 쉽습니다",
+      "name": "이름",
+      "namePlaceholder": "예: 필링 전 왼쪽 볼",
+      "date": "날짜",
+      "album": "앨범",
+      "bodyPart": "부위",
+      "optional": "선택",
+      "visit": "방문",
+      "visitHint": "선택 · 해당 예약에 사진을 연결합니다",
+      "notAttached": "연결 안 함",
+      "save": "세부 정보 저장",
+      "saved": "사진 세부 정보를 저장했습니다"
+    },
+    "loading": "사진을 불러오는 중"
   }
 }

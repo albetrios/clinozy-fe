@@ -142,5 +142,115 @@
     "reviews_other": "{{count}} Bewertungen",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "Noch kein Feedback"
+  },
+  "photos": {
+    "albums": {
+      "general": "Allgemein",
+      "private": "Privat",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Alben",
+    "count_one": "{{count}} Foto",
+    "count_other": "{{count}} Fotos",
+    "visitFilter": {
+      "label": "Besuch",
+      "all": "Alle Fotos",
+      "allSub": "{{count}} in {{album}}",
+      "none": "Keinem Besuch zugeordnet",
+      "noneSub": "Aus der Akte hochgeladen",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_one": "{{count}} Foto",
+      "visitMeta_other": "{{count}} Fotos"
+    },
+    "sizes": {
+      "label": "Vorschaugröße",
+      "small": "Kleine Vorschaubilder",
+      "medium": "Mittlere Vorschaubilder",
+      "large": "Große Vorschaubilder",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "Heute",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "{{name}} öffnen",
+      "edit": "Details bearbeiten",
+      "editHint": "Name, Datum und Körperstelle bearbeiten",
+      "delete": "Foto löschen"
+    },
+    "loadMore_one": "Mehr laden · {{count}} übrig",
+    "loadMore_other": "Mehr laden · {{count}} übrig",
+    "empty": {
+      "title": "Noch keine Fotos in {{album}}",
+      "body": "Ziehen Sie Fotos hierher oder laden Sie sie von Ihrem Computer hoch."
+    },
+    "upload": "Bilder hochladen",
+    "notImages": "Bitte Bilddateien ablegen",
+    "uploaded_one": "{{count}} Foto in {{album}} hochgeladen",
+    "uploaded_other": "{{count}} Fotos in {{album}} hochgeladen",
+    "delete": {
+      "title": "Dieses Foto löschen?",
+      "reasons": {
+        "wrongPatient": "Falscher Patient",
+        "blurry": "Unscharf / neu aufnehmen",
+        "duplicate": "Duplikat",
+        "other": "Sonstiges"
+      },
+      "deleted": "Foto gelöscht"
+    },
+    "bodyParts": {
+      "face": "Gesicht",
+      "scalp": "Kopfhaut",
+      "hair": "Haare",
+      "body": "Körper",
+      "chest": "Brust",
+      "back": "Rücken",
+      "underarm": "Achsel",
+      "legs": "Beine",
+      "arms": "Arme",
+      "other": "Andere"
+    },
+    "viewer": {
+      "label": "Fotoansicht",
+      "position": "{{index}} von {{total}}",
+      "zoom": "Zoom",
+      "zoomOut": "Verkleinern",
+      "zoomOutHint": "Verkleinern (−)",
+      "zoomIn": "Vergrößern",
+      "zoomInHint": "Vergrößern (+)",
+      "zoomReset": "An Bildschirm anpassen (0)",
+      "close": "Ansicht schließen",
+      "closeHint": "Schließen (Esc)",
+      "previous": "Vorheriges Foto",
+      "previousHint": "Zurück (←)",
+      "next": "Nächstes Foto",
+      "nextHint": "Weiter (→)",
+      "hints": {
+        "browse": "← → blättern",
+        "zoom": "Scrollen oder + − zum Zoomen",
+        "pan": "Ziehen zum Verschieben · Doppelklick zum Zurücksetzen",
+        "close": "Esc schließt"
+      },
+      "missing": "Beispielfoto · keine Datei angehängt",
+      "notFoundRecord": "Foto"
+    },
+    "details": {
+      "title": "Fotodetails",
+      "sub": "Optional · Name, Datum und Körperstelle helfen Ihnen, es später zu finden",
+      "name": "Name",
+      "namePlaceholder": "z. B. linke Wange vor dem Peeling",
+      "date": "Datum",
+      "album": "Album",
+      "bodyPart": "Körperstelle",
+      "optional": "optional",
+      "visit": "Besuch",
+      "visitHint": "optional · ordnet das Foto diesem Termin zu",
+      "notAttached": "Nicht zugeordnet",
+      "save": "Details speichern",
+      "saved": "Fotodetails gespeichert"
+    },
+    "loading": "Fotos werden geladen"
   }
 }

@@ -104,7 +104,7 @@ export function usePatientFileActions(): PatientFileActions {
   const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
-  const { patientId, file, section } = usePatientFileContext();
+  const { patientId, file, section, photos } = usePatientFileContext();
   const access = useClinicAccess();
   const referrer = section ? `patients/${patientId}/${section}` : null;
 
@@ -154,7 +154,14 @@ export function usePatientFileActions(): PatientFileActions {
         );
       },
     },
-    photo: { allowed: can('patients', 'create'), run: openSection('images') },
+    photo: {
+      allowed: can('patients', 'create'),
+      // The picker first, inside the click — the browser opens it only there.
+      run: () => {
+        photos.pick('general');
+        openSection('images')();
+      },
+    },
     appointment: {
       allowed: can('appointments', 'create'),
       run: () =>

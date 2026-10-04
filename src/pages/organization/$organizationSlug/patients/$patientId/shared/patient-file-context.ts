@@ -3,6 +3,8 @@ import { createContext, useContext } from 'react';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 
+import type { PatientPhotoUploads } from './hooks/usePatientPhotoUpload/index.ts';
+
 /** What the file layout hands its sections and their drawers. */
 export interface PatientFileContextValue {
   patientId: string;
@@ -19,6 +21,8 @@ export interface PatientFileContextValue {
    */
   masked: boolean;
   toggleMasked: () => void;
+  /** The photo uploads: the section's drop and "Upload images", the Add menu's "Photo". */
+  photos: PatientPhotoUploads;
 }
 
 /** The patient file's context — provided by `PatientFileLayout`. */

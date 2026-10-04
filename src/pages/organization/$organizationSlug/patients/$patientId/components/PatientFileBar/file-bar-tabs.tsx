@@ -89,7 +89,7 @@ export function FileBarTabs({
             onClick={() => onOpen(tab.section)}
             data-testid={`${PATIENT_FILE_BAR_TEST_IDS.tab}-${tab.section}`}
             className={cn(
-              'text-body flex h-8 flex-none items-center gap-1.5 rounded-lg px-2.5 whitespace-nowrap transition-[background-color,color,box-shadow] duration-160',
+              'text-body relative flex h-8 flex-none items-center gap-1.5 rounded-lg px-2.5 whitespace-nowrap transition-[background-color,color,box-shadow] duration-160',
               selected
                 ? cn(tone.surface, 'font-semibold')
                 : cn('text-foreground-soft font-medium', tone.hover),

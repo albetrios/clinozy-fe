@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
@@ -20,6 +20,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { usePatientByPhone } from '@/shared/hooks/usePatients/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -115,12 +116,6 @@ function sessionPrefill(props: SessionProps): PatientDrawerPrefill | undefined {
   if (props.mode === 'create') return props.prefill;
   if (props.mode === 'quick') return { name: props.query, ...props.prefill };
   return undefined;
-}
-
-/** The form's values as they stand, every key present (the form starts with all of them). */
-function useFormValues(form: UseFormReturn<PatientFormValues>): PatientFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as PatientFormValues;
 }
 
 /**

@@ -335,4 +335,22 @@ describe('attachPatientPhoto (S:1643)', () => {
     });
     expect(plain.appointmentId).toBeNull();
   });
+
+  it('files an upload from the Photos section in the album on screen, under no visit', async () => {
+    const today = clinicToday();
+    const visit = clinicFixtures.appointments.snapshot(
+      (appointment) =>
+        appointment.date === today &&
+        appointment.patientId !== null &&
+        appointment.status !== 'cancelled',
+    )[0];
+    const photo = await attachPatientPhoto({
+      patientId: visit?.patientId ?? '',
+      key: 'uploads/lhr.jpg',
+      fileName: 'lhr.jpg',
+      album: 'lhr',
+      appointmentId: null,
+    });
+    expect(photo).toMatchObject({ album: 'lhr', appointmentId: null, takenOn: today });
+  });
 });

@@ -46,6 +46,9 @@ src/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/ #page-
 # section it opened over and a shared drawer whose testId lives in that shared
 # component (`patient-drawer`, `src/shared/components/PatientDrawer/`).
 src/pages/organization/$organizationSlug/patients/$patientId/edit/ #page-root
+# Photo details (`S:42`) renders the shared RecordDrawer, which takes its root
+# id (`patient-photo-details`) as the `testId` prop.
+src/pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edit/ #page-root
 
 # A form on the record drawer: its root is `appointment-form`, its submit is the
 # drawer's primary, which the drawer derives from its own id

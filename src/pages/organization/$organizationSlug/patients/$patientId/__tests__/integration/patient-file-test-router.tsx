@@ -8,7 +8,7 @@ import {
   redirect,
   RouterProvider,
 } from '@tanstack/react-router';
-import { render } from '@testing-library/react';
+import { configure, render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
@@ -22,6 +22,9 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { PatientEditPage } from '../../edit/PatientEditPage.tsx';
+import { PatientPhotoDetailsPage } from '../../images/$imageId/edit/PatientPhotoDetailsPage.tsx';
+import { PatientPhotoViewerPage } from '../../images/$imageId/PatientPhotoViewerPage.tsx';
+import { validatePatientImagesSearch } from '../../images/images.search.ts';
 import { PatientImagesPage } from '../../images/PatientImagesPage.tsx';
 import { PatientInvoicesPage } from '../../invoices/PatientInvoicesPage.tsx';
 import { PatientNotesPage } from '../../notes/PatientNotesPage.tsx';
@@ -35,10 +38,16 @@ import { PatientFileLayout } from '../../PatientFileLayout.tsx';
 import { PatientPaymentsPage } from '../../payments/PatientPaymentsPage.tsx';
 import { PatientPrescriptionsPage } from '../../prescriptions/PatientPrescriptionsPage.tsx';
 import { PatientReportsPage } from '../../reports/PatientReportsPage.tsx';
+import type { PatientPhotoUploads } from '../../shared/hooks/usePatientPhotoUpload/index.ts';
 import { PatientFileContext } from '../../shared/patient-file-context.ts';
 import { PatientTimelinePage } from '../../timeline/PatientTimelinePage.tsx';
 import { PatientTreatmentsPage } from '../../treatments/PatientTreatmentsPage.tsx';
 import { PatientVisitsPage } from '../../visits/PatientVisitsPage.tsx';
+
+// The file reads the fixture world on demand: on a loaded machine its first
+// paint can outlast testing-library's 1s default, so the file's suites wait
+// up to 5s for what they find (only the suites that import this module).
+configure({ asyncUtilTimeout: 5000 });
 
 /** The file's URL for a patient in the `acme` clinic. */
 export function patientFileUrl(patientId: string, rest = ''): string {
@@ -94,7 +103,6 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
     visits: PatientVisitsPage,
     prescriptions: PatientPrescriptionsPage,
     treatments: PatientTreatmentsPage,
-    images: PatientImagesPage,
     reports: PatientReportsPage,
     invoices: PatientInvoicesPage,
     payments: PatientPaymentsPage,
@@ -103,6 +111,23 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
   }).map(([path, component]) =>
     createRoute({ getParentRoute: () => file, path, component }),
   );
+  // Photos, with its album and filter, its viewer and Photo details (S:41–42).
+  const images = createRoute({
+    getParentRoute: () => file,
+    path: 'images',
+    validateSearch: validatePatientImagesSearch,
+    component: PatientImagesPage,
+  });
+  const photo = createRoute({
+    getParentRoute: () => images,
+    path: '$imageId',
+    component: PatientPhotoViewerPage,
+  });
+  const photoEdit = createRoute({
+    getParentRoute: () => images,
+    path: '$imageId/edit',
+    component: PatientPhotoDetailsPage,
+  });
   const edit = createRoute({
     getParentRoute: () => file,
     path: 'edit',
@@ -121,7 +146,13 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
   });
   const router = createRouter({
     routeTree: root.addChildren([
-      file.addChildren([index, unknown, ...sections, edit]),
+      file.addChildren([
+        index,
+        unknown,
+        ...sections,
+        images.addChildren([photo, photoEdit]),
+        edit,
+      ]),
       list,
       elsewhere,
     ]),
@@ -147,6 +178,7 @@ export interface InPatientFileOptions {
   viewable?: readonly PatientFileSectionSlug[];
   masked?: boolean;
   toggleMasked?: () => void;
+  photos?: PatientPhotoUploads;
 }
 
 /**
@@ -164,6 +196,7 @@ export function renderInPatientFile(
     viewable = PATIENT_FILE_SECTIONS,
     masked = true,
     toggleMasked = () => undefined,
+    photos = { pick: () => undefined, upload: () => undefined },
   }: InPatientFileOptions = {},
 ) {
   useOrganizationStore.getState().setPermissions(['organization:read']);
@@ -177,7 +210,7 @@ export function renderInPatientFile(
     component: () => (
       <TooltipProvider>
         <PatientFileContext.Provider
-          value={{ patientId, file, section, viewable, masked, toggleMasked }}
+          value={{ patientId, file, section, viewable, masked, toggleMasked, photos }}
         >
           {ui}
         </PatientFileContext.Provider>

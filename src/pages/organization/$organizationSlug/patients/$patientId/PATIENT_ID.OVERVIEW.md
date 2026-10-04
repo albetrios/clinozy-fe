@@ -41,6 +41,11 @@ persisted, reset per patient — handed down with the file through
 (`hooks/useEscapeBack/`). A patient that is gone toasts "Patient not found · it may have been
 deleted" and goes back to the list; another failure keeps the screen and toasts Retry.
 
+The layout also renders the photo picker once and hands the photo uploads down the context
+(`shared/hooks/usePatientPhotoUpload/`): Photos' drop and "Upload images" and the Add menu's
+"Photo" (General, then Photos) go through the shared upload tray — "2 photos uploaded to
+General" once the last of a batch is filed.
+
 The data is the shared patients domain: the file's read joins the patient with their next
 visit, dues, credit, feedback, record counts and unread messages —
 `@/shared/api/clinic/patient-file-api.ts` (fixture world, `REPLACE_WITH_API`) and
@@ -79,6 +84,8 @@ Every section is a leaf island rendered through the family frame
 | `shared/patient-file-nav.ts`          | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                  |
 | `shared/patient-file.constants.ts`    | `PATIENT_FILE_NS` / `PATIENT_FILE_KEYS` — the section names.                                                                            |
 | `shared/hooks/usePatientFileActions/` | The Add-to-record items the member may use and what each runs; each section's primary item.                                             |
+| `shared/hooks/usePatientPhotoUpload/` | The photo uploads and the hidden picker: drop, "Upload images", the Add menu's "Photo".                                                 |
+| `shared/patient-photos.constants.ts`  | `PATIENT_PHOTOS_NS` / `PATIENT_PHOTOS_KEYS` — Photos, the viewer and Photo details.                                                     |
 | `shared/components/PatientAddMenu/`   | The Add-to-record menu ("+" and a section's "⌄").                                                                                       |
 | `shared/components/PatientSection/`   | The section frame every child renders.                                                                                                  |
 | `__tests__/integration/`              | `__tests__/integration/patient-file-test-router.tsx` mirrors the file's routes for the tests.                                           |

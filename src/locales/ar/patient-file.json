@@ -170,5 +170,131 @@
     "reviews_other": "{{count}} مراجعة",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "لا ملاحظات بعد"
+  },
+  "photos": {
+    "albums": {
+      "general": "عام",
+      "private": "خاص",
+      "lhr": "LHR"
+    },
+    "albumTabs": "الألبومات",
+    "count_zero": "لا صور",
+    "count_one": "صورة واحدة",
+    "count_two": "صورتان",
+    "count_few": "{{count}} صور",
+    "count_many": "{{count}} صورة",
+    "count_other": "{{count}} صورة",
+    "visitFilter": {
+      "label": "الزيارة",
+      "all": "كل الصور",
+      "allSub": "{{count}} في {{album}}",
+      "none": "غير مرتبطة بزيارة",
+      "noneSub": "مرفوعة من الملف",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_zero": "لا صور",
+      "visitMeta_one": "صورة واحدة",
+      "visitMeta_two": "صورتان",
+      "visitMeta_few": "{{count}} صور",
+      "visitMeta_many": "{{count}} صورة",
+      "visitMeta_other": "{{count}} صورة"
+    },
+    "sizes": {
+      "label": "حجم الصور المصغّرة",
+      "small": "صور مصغّرة صغيرة",
+      "medium": "صور مصغّرة متوسطة",
+      "large": "صور مصغّرة كبيرة",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "اليوم",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "فتح {{name}}",
+      "edit": "تعديل التفاصيل",
+      "editHint": "تعديل الاسم والتاريخ وموضع الجسم",
+      "delete": "حذف الصورة"
+    },
+    "loadMore_zero": "تحميل المزيد",
+    "loadMore_one": "تحميل المزيد · بقيت واحدة",
+    "loadMore_two": "تحميل المزيد · بقيت اثنتان",
+    "loadMore_few": "تحميل المزيد · بقيت {{count}}",
+    "loadMore_many": "تحميل المزيد · بقيت {{count}}",
+    "loadMore_other": "تحميل المزيد · بقيت {{count}}",
+    "empty": {
+      "title": "لا صور في {{album}} بعد",
+      "body": "اسحب الصور إلى هنا أو ارفعها من جهازك."
+    },
+    "upload": "رفع صور",
+    "notImages": "أفلت ملفات صور",
+    "uploaded_zero": "لم تُرفع صور إلى {{album}}",
+    "uploaded_one": "رُفعت صورة واحدة إلى {{album}}",
+    "uploaded_two": "رُفعت صورتان إلى {{album}}",
+    "uploaded_few": "رُفعت {{count}} صور إلى {{album}}",
+    "uploaded_many": "رُفعت {{count}} صورة إلى {{album}}",
+    "uploaded_other": "رُفعت {{count}} صورة إلى {{album}}",
+    "delete": {
+      "title": "حذف هذه الصورة؟",
+      "reasons": {
+        "wrongPatient": "مريض خطأ",
+        "blurry": "غير واضحة / إعادة التصوير",
+        "duplicate": "مكرر",
+        "other": "أخرى"
+      },
+      "deleted": "حُذفت الصورة"
+    },
+    "bodyParts": {
+      "face": "الوجه",
+      "scalp": "فروة الرأس",
+      "hair": "الشعر",
+      "body": "الجسم",
+      "chest": "الصدر",
+      "back": "الظهر",
+      "underarm": "الإبط",
+      "legs": "الساقان",
+      "arms": "الذراعان",
+      "other": "أخرى"
+    },
+    "viewer": {
+      "label": "عارض الصور",
+      "position": "{{index}} من {{total}}",
+      "zoom": "التكبير",
+      "zoomOut": "تصغير",
+      "zoomOutHint": "تصغير (−)",
+      "zoomIn": "تكبير",
+      "zoomInHint": "تكبير (+)",
+      "zoomReset": "ملاءمة الشاشة (0)",
+      "close": "إغلاق العارض",
+      "closeHint": "إغلاق (Esc)",
+      "previous": "الصورة السابقة",
+      "previousHint": "السابقة (←)",
+      "next": "الصورة التالية",
+      "nextHint": "التالية (→)",
+      "hints": {
+        "browse": "← → للتنقل",
+        "zoom": "مرّر أو + − للتكبير",
+        "pan": "اسحب للتحريك · انقر مرتين لإعادة الضبط",
+        "close": "Esc للإغلاق"
+      },
+      "missing": "صورة نموذجية · لا ملف مرفق",
+      "notFoundRecord": "الصورة"
+    },
+    "details": {
+      "title": "تفاصيل الصورة",
+      "sub": "اختياري · الاسم والتاريخ وموضع الجسم تساعدك في العثور عليها لاحقًا",
+      "name": "الاسم",
+      "namePlaceholder": "مثلًا: الخد الأيسر قبل التقشير",
+      "date": "التاريخ",
+      "album": "الألبوم",
+      "bodyPart": "موضع الجسم",
+      "optional": "اختياري",
+      "visit": "الزيارة",
+      "visitHint": "اختياري · يحفظ الصورة ضمن ذلك الموعد",
+      "notAttached": "غير مرتبطة",
+      "save": "حفظ التفاصيل",
+      "saved": "حُفظت تفاصيل الصورة"
+    },
+    "loading": "جارٍ تحميل الصور"
   }
 }

@@ -42,6 +42,7 @@ import {
 } from './patient-id.constants.ts';
 import type { PatientFileActivity } from './patient-id.search.ts';
 import { usePatientFileActions } from './shared/hooks/usePatientFileActions/index.ts';
+import { usePatientPhotoUpload } from './shared/hooks/usePatientPhotoUpload/index.ts';
 import {
   PatientFileContext,
   type PatientFileContextValue,
@@ -274,6 +275,7 @@ export function PatientFileLayout() {
   useSectionGuard(section, sections, go);
   useEscapeBack(() => void navigate(organizationPatients(organizationSlug)));
 
+  const photoUpload = usePatientPhotoUpload(patientId);
   const [mask, setMask] = useState({ patientId, masked: true });
   // Another patient's file starts masked again (Q-F4: one flag per file).
   if (mask.patientId !== patientId) setMask({ patientId, masked: true });
@@ -285,8 +287,17 @@ export function PatientFileLayout() {
       viewable: sections.viewable,
       masked: mask.masked,
       toggleMasked: () => setMask((current) => ({ ...current, masked: !current.masked })),
+      photos: { pick: photoUpload.pick, upload: photoUpload.upload },
     }),
-    [patientId, query.data, section, sections.viewable, mask.masked],
+    [
+      patientId,
+      query.data,
+      section,
+      sections.viewable,
+      mask.masked,
+      photoUpload.pick,
+      photoUpload.upload,
+    ],
   );
 
   return (
@@ -303,6 +314,7 @@ export function PatientFileLayout() {
           ) : (
             <FileSkeleton />
           )}
+          <input {...photoUpload.inputProps} />
         </div>
       </TooltipProvider>
     </PatientFileContext.Provider>

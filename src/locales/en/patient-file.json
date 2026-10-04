@@ -142,5 +142,115 @@
     "reviews_other": "{{count}} reviews",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "No feedback yet"
+  },
+  "photos": {
+    "albums": {
+      "general": "General",
+      "private": "Private",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Albums",
+    "count_one": "{{count}} photo",
+    "count_other": "{{count}} photos",
+    "visitFilter": {
+      "label": "Visit",
+      "all": "All photos",
+      "allSub": "{{count}} in {{album}}",
+      "none": "Not attached to a visit",
+      "noneSub": "Uploaded from the file",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_one": "{{count}} photo",
+      "visitMeta_other": "{{count}} photos"
+    },
+    "sizes": {
+      "label": "Thumbnail size",
+      "small": "Small thumbnails",
+      "medium": "Medium thumbnails",
+      "large": "Large thumbnails",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "Today",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "Open {{name}}",
+      "edit": "Edit details",
+      "editHint": "Edit name, date, body part",
+      "delete": "Delete photo"
+    },
+    "loadMore_one": "Load more · {{count}} left",
+    "loadMore_other": "Load more · {{count}} left",
+    "empty": {
+      "title": "No photos in {{album}} yet",
+      "body": "Drag photos here or upload from your computer."
+    },
+    "upload": "Upload images",
+    "notImages": "Drop image files",
+    "uploaded_one": "{{count}} photo uploaded to {{album}}",
+    "uploaded_other": "{{count}} photos uploaded to {{album}}",
+    "delete": {
+      "title": "Delete this photo?",
+      "reasons": {
+        "wrongPatient": "Wrong patient",
+        "blurry": "Blurry / retake",
+        "duplicate": "Duplicate",
+        "other": "Other"
+      },
+      "deleted": "Photo deleted"
+    },
+    "bodyParts": {
+      "face": "Face",
+      "scalp": "Scalp",
+      "hair": "Hair",
+      "body": "Body",
+      "chest": "Chest",
+      "back": "Back",
+      "underarm": "Underarm",
+      "legs": "Legs",
+      "arms": "Arms",
+      "other": "Other"
+    },
+    "viewer": {
+      "label": "Photo viewer",
+      "position": "{{index}} of {{total}}",
+      "zoom": "Zoom",
+      "zoomOut": "Zoom out",
+      "zoomOutHint": "Zoom out (−)",
+      "zoomIn": "Zoom in",
+      "zoomInHint": "Zoom in (+)",
+      "zoomReset": "Fit to screen (0)",
+      "close": "Close viewer",
+      "closeHint": "Close (Esc)",
+      "previous": "Previous photo",
+      "previousHint": "Previous (←)",
+      "next": "Next photo",
+      "nextHint": "Next (→)",
+      "hints": {
+        "browse": "← → browse",
+        "zoom": "Scroll or + − zoom",
+        "pan": "Drag to move · double-click to reset",
+        "close": "Esc close"
+      },
+      "missing": "Sample photo · no file attached",
+      "notFoundRecord": "Photo"
+    },
+    "details": {
+      "title": "Photo details",
+      "sub": "Optional · name, date and body part help you find it later",
+      "name": "Name",
+      "namePlaceholder": "e.g. Left cheek before peel",
+      "date": "Date",
+      "album": "Album",
+      "bodyPart": "Body part",
+      "optional": "optional",
+      "visit": "Visit",
+      "visitHint": "optional · files the photo under that appointment",
+      "notAttached": "Not attached",
+      "save": "Save details",
+      "saved": "Photo details saved"
+    },
+    "loading": "Loading photos"
   }
 }

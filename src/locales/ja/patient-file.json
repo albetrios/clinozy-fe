@@ -135,5 +135,111 @@
     "reviews_other": "レビュー{{count}}件",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
     "noFeedback": "フィードバックはまだありません"
+  },
+  "photos": {
+    "albums": {
+      "general": "一般",
+      "private": "プライベート",
+      "lhr": "LHR"
+    },
+    "albumTabs": "アルバム",
+    "count_other": "写真{{count}}枚",
+    "visitFilter": {
+      "label": "来院",
+      "all": "すべての写真",
+      "allSub": "{{album}}に{{count}}枚",
+      "none": "来院に紐付けなし",
+      "noneSub": "カルテからアップロード",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}",
+      "visitMeta_other": "写真{{count}}枚"
+    },
+    "sizes": {
+      "label": "サムネイルのサイズ",
+      "small": "小さいサムネイル",
+      "medium": "中くらいのサムネイル",
+      "large": "大きいサムネイル",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "today": "今日",
+    "groupWithVisit": "{{photos}} · {{visit}}",
+    "tile": {
+      "open": "{{name}}を開く",
+      "edit": "詳細を編集",
+      "editHint": "名前・日付・部位を編集",
+      "delete": "写真を削除"
+    },
+    "loadMore_other": "さらに読み込む · 残り{{count}}枚",
+    "empty": {
+      "title": "{{album}}にはまだ写真がありません",
+      "body": "ここに写真をドラッグするか、パソコンからアップロードしてください。"
+    },
+    "upload": "画像をアップロード",
+    "notImages": "画像ファイルをドロップしてください",
+    "uploaded_other": "写真{{count}}枚を{{album}}にアップロードしました",
+    "delete": {
+      "title": "この写真を削除しますか?",
+      "reasons": {
+        "wrongPatient": "患者の取り違え",
+        "blurry": "ぼやけている / 撮り直し",
+        "duplicate": "重複",
+        "other": "その他"
+      },
+      "deleted": "写真を削除しました"
+    },
+    "bodyParts": {
+      "face": "顔",
+      "scalp": "頭皮",
+      "hair": "髪",
+      "body": "体",
+      "chest": "胸",
+      "back": "背中",
+      "underarm": "わき",
+      "legs": "脚",
+      "arms": "腕",
+      "other": "その他"
+    },
+    "viewer": {
+      "label": "写真ビューアー",
+      "position": "{{index}} / {{total}}",
+      "zoom": "ズーム",
+      "zoomOut": "縮小",
+      "zoomOutHint": "縮小 (−)",
+      "zoomIn": "拡大",
+      "zoomInHint": "拡大 (+)",
+      "zoomReset": "画面に合わせる (0)",
+      "close": "ビューアーを閉じる",
+      "closeHint": "閉じる (Esc)",
+      "previous": "前の写真",
+      "previousHint": "前へ (←)",
+      "next": "次の写真",
+      "nextHint": "次へ (→)",
+      "hints": {
+        "browse": "← → 切り替え",
+        "zoom": "スクロールまたは + − でズーム",
+        "pan": "ドラッグで移動 · ダブルクリックでリセット",
+        "close": "Esc で閉じる"
+      },
+      "missing": "サンプル写真 · ファイルは添付されていません",
+      "notFoundRecord": "写真"
+    },
+    "details": {
+      "title": "写真の詳細",
+      "sub": "任意 · 名前・日付・部位があると後で見つけやすくなります",
+      "name": "名前",
+      "namePlaceholder": "例: ピーリング前の左頬",
+      "date": "日付",
+      "album": "アルバム",
+      "bodyPart": "部位",
+      "optional": "任意",
+      "visit": "来院",
+      "visitHint": "任意 · その予約に写真を紐付けます",
+      "notAttached": "紐付けなし",
+      "save": "詳細を保存",
+      "saved": "写真の詳細を保存しました"
+    },
+    "loading": "写真を読み込んでいます"
   }
 }

@@ -17,6 +17,7 @@ describe('usePatientFileContext', () => {
       viewable: ['visits'],
       masked: true,
       toggleMasked: vi.fn(),
+      photos: { pick: vi.fn(), upload: vi.fn() },
     };
     const wrapper = ({ children }: { children: ReactNode }) => (
       <PatientFileContext.Provider value={value}>{children}</PatientFileContext.Provider>

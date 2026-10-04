@@ -14,6 +14,7 @@ import {
 import { invoiceBalance } from './clinic-money.ts';
 import {
   type DeleteReason,
+  type ImageAlbum,
   PATIENT_CONVERSION_VALUES,
   PATIENT_STATUS_VALUES,
   PATIENT_TYPE_VALUES,
@@ -437,17 +438,25 @@ export async function restorePatient(id: string): Promise<PatientRecord> {
   return clinicFixtures.patients.restore(id);
 }
 
-/** What an uploaded first photo files: the patient and the storage key the upload tray confirmed. */
+/** What an uploaded photo files: the patient and the storage key the upload tray confirmed. */
 export interface PatientPhotoInput {
   patientId: string;
   key: string;
   fileName: string;
+  /** The album it goes to — General unless the Photos section is on another. */
+  album?: ImageAlbum;
+  /**
+   * The visit it is filed under; left out, their appointment today when there
+   * is one (the New patient drawer's "before photos"); `null` files it under none.
+   */
+  appointmentId?: string | null;
 }
 
 /**
  * File an uploaded photo on the patient (`uploadImages`, `S:1643`;
- * REPLACE_WITH_API) — "before photos · filed under today’s visit": the General
- * album, attached to their appointment today when there is one.
+ * REPLACE_WITH_API) — the New patient drawer's "before photos · filed under
+ * today’s visit" (General, today's appointment), or the Photos section's
+ * upload into the album on screen.
  */
 export async function attachPatientPhoto(
   input: PatientPhotoInput,
@@ -463,8 +472,9 @@ export async function attachPatientPhoto(
   );
   return clinicFixtures.patientImages.create({
     patientId: input.patientId,
-    appointmentId: visit?.id ?? null,
-    album: 'general',
+    appointmentId:
+      input.appointmentId === undefined ? (visit?.id ?? null) : input.appointmentId,
+    album: input.album ?? 'general',
     fileUrl: input.key,
     fileName: input.fileName,
     bodyPart: null,

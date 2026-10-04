@@ -143,4 +143,17 @@ describe('usePatientFileActions', () => {
       from: `patients/${DHARTI}/visits`,
     });
   });
+
+  it('opens the photo picker for General, then Photos (KICKOFF §6.6 Add menu)', async () => {
+    const user = userEvent.setup();
+    const photos = { pick: vi.fn(), upload: vi.fn() };
+    const { router } = renderInPatientFile(<ActionsProbe />, { file, photos });
+    await user.click(await screen.findByRole('button', { name: 'photo' }));
+    expect(photos.pick).toHaveBeenCalledWith('general');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `/organization/acme/patients/${DHARTI}/images`,
+      ),
+    );
+  });
 });

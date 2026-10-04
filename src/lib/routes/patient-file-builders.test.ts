@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   organizationPatient,
   organizationPatientEdit,
+  organizationPatientPhoto,
+  organizationPatientPhotoEdit,
   organizationPatientSection,
 } from './patient-file-builders.ts';
 
@@ -31,5 +33,15 @@ describe('patient-file route builders (KICKOFF §6.6)', () => {
       to: '/organization/$organizationSlug/patients/$patientId/edit',
       params: PARAMS,
     });
+  });
+
+  it('build the photo viewer and Photo details over the Photos section (S:41–42)', () => {
+    expect(organizationPatientPhoto('acme', 'P1', 'I1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/images/$imageId',
+      params: { ...PARAMS, imageId: 'I1' },
+    });
+    expect(organizationPatientPhotoEdit('acme', 'P1', 'I1').to).toBe(
+      '/organization/$organizationSlug/patients/$patientId/images/$imageId/edit',
+    );
   });
 });
