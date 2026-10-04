@@ -101,6 +101,7 @@
   "cells": {
     "patient": "مريض",
     "patientMark": "م",
+    "leadMark": "ع",
     "moreCount": "{{count}} آخرون"
   },
   "emptyState": {

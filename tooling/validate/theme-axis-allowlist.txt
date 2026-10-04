@@ -32,3 +32,6 @@ h-7 gap-1.5 rounded-full border border-border px-2.5 text-xs font-medium focus:b
 # It is an illustration, not a surface: a square core in a round halo reads as a
 # rendering bug, so the pair stays round in every shape.
 inset-1 rounded-full bg-gradient-to-tl
+# A calendar block's status pill sits white on the block's tint (H:2063): the
+# class lands on TonePill, whose span carries data-slot="pill" itself.
+bg-card ps-1.5 pe-1.75

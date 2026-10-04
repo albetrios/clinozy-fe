@@ -121,5 +121,24 @@
     "reschedule": "일정 변경",
     "cancel": "취소",
     "tracker": "상태"
+  },
+  "calendar": {
+    "dayLoad_other": "{{count}}건 예약 · {{hours}}시간",
+    "free": "종일 비어 있음",
+    "doctor": "의사",
+    "bookSlot": "빈 시간을 클릭하여 예약",
+    "newAt": "새 예약 · {{day}} · {{time}}",
+    "pastDay": "지난 날짜는 예약할 수 없습니다",
+    "doctorBooked_other": "{{count}}건 예약",
+    "doctorFree": "비어 있음",
+    "chairTime_other": "{{count}}건 예약 · 체어 타임의 {{percent}}%",
+    "chairTimeOverlap_other": "{{count}}건 예약 · 체어 타임의 {{percent}}% · 중복 예약",
+    "overlap": "중복 예약",
+    "more": "+{{count}}건 더보기",
+    "dayCount_other": "{{day}} · 예약 {{count}}건",
+    "openDay": "날짜 열기",
+    "block": "{{name}} · {{time}} · {{minutes}} 분 · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} 분 · {{service}} · {{doctor}} · {{status}} · 다른 예약과 겹침",
+    "blockTime": "{{time}} · {{minutes}}분"
   }
 }

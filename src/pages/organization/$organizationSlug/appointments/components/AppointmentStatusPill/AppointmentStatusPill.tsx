@@ -8,8 +8,8 @@ import { TonePill } from '@/shared/components/Cells/index.ts';
 /** Props for {@link AppointmentStatusPill}. */
 export interface AppointmentStatusPillProps {
   status: AppointmentStatus;
-  /** 24px in the Agenda and the card (default), 22px where it sits smaller. */
-  size?: 'md' | 'sm';
+  /** 24px in the Agenda and the card (default), 22px where it sits smaller, 18px in a calendar block. */
+  size?: 'md' | 'sm' | 'xs';
   className?: string;
 }
 

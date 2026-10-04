@@ -14,10 +14,12 @@ const PLAIN_SURFACES = {
 } as const;
 
 /**
- * 24px status pills in tables (12px/500, H:688) and 22px pills in person cards
- * (kind, tags, consent; 11.5px/500, H:2732).
+ * 24px status pills in tables (12px/500, H:688), 22px pills in person cards
+ * (kind, tags, consent; 11.5px/500, H:2732) and 18px pills inside calendar
+ * blocks (service and status; 10.5px/500, H:2063).
  */
 const PILL_SIZES = {
+  xs: 'h-4.5 gap-1 px-1.75 text-tiny',
   sm: 'h-5.5 gap-1 px-2 text-caption',
   md: 'h-6 gap-1.5 px-2.5 text-xs',
 } as const;

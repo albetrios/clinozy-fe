@@ -4,6 +4,7 @@ import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.
 
 import {
   agendaGroupLabel,
+  blockPersonTone,
   dayGroupTone,
   latestEvent,
   latestUpdates,
@@ -32,6 +33,14 @@ describe('staffName', () => {
       'Dr. Drashti Desai',
     );
     expect(staffName({ firstName: 'Meera', lastName: '' })).toBe('Meera');
+  });
+});
+
+describe('blockPersonTone (avTone, H:5892)', () => {
+  it('paints a patient sage and everyone else lav on a calendar block', () => {
+    expect(blockPersonTone('patient')).toBe('sage');
+    expect(blockPersonTone('lead')).toBe('lav');
+    expect(blockPersonTone('contact')).toBe('lav');
   });
 });
 

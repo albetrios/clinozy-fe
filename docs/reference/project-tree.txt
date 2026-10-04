@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1084 src files · ~583 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1101 src files · ~591 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -816,9 +816,14 @@ clinozy-fe/
 │   │       │   │   │   ├── AppointmentCard/
 │   │       │   │   │   ├── AppointmentFilters/
 │   │       │   │   │   ├── AppointmentsAgenda/
+│   │       │   │   │   ├── AppointmentsDay/
+│   │       │   │   │   ├── AppointmentsMonth/
 │   │       │   │   │   ├── AppointmentStatusPill/
 │   │       │   │   │   ├── AppointmentStatusPopover/
 │   │       │   │   │   ├── AppointmentsToolbar/
+│   │       │   │   │   ├── AppointmentsWeek/
+│   │       │   │   │   ├── CalendarBlock/
+│   │       │   │   │   ├── CalendarGrid/
 │   │       │   │   │   └── DoctorPicker/
 │   │       │   │   ├── create/
 │   │       │   │   │   ├── create.manifest.ts
@@ -830,7 +835,10 @@ clinozy-fe/
 │   │       │   │   │   ├── useAppointmentsDialogRoute/
 │   │       │   │   │   ├── useAppointmentsNavigation/
 │   │       │   │   │   ├── useAppointmentsView/
+│   │       │   │   │   ├── useCalendarClock/
+│   │       │   │   │   ├── useCalendarRange/
 │   │       │   │   │   └── useLatestUpdateWords/
+│   │       │   │   ├── appointments.calendar.ts
 │   │       │   │   ├── appointments.constants.ts
 │   │       │   │   ├── appointments.display.ts
 │   │       │   │   ├── appointments.manifest.ts
@@ -839,7 +847,7 @@ clinozy-fe/
 │   │       │   │   ├── appointments.route.tsx
 │   │       │   │   ├── appointments.search.ts
 │   │       │   │   ├── AppointmentsPage.tsx
-│   │       │   │   └── [4 test files]
+│   │       │   │   └── [5 test files]
 │   │       │   ├── dashboard/
 │   │       │   │   ├── dashboard.manifest.ts
 │   │       │   │   ├── DASHBOARD.OVERVIEW.md
@@ -1713,6 +1721,7 @@ clinozy-fe/
 │   │   │   │   └── [13 test files]
 │   │   │   ├── SkeletonRows/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── skeleton-in-place.ts
 │   │   │   │   ├── SkeletonRows.tsx
 │   │   │   │   └── [1 test file]
 │   │   │   ├── Spinner/

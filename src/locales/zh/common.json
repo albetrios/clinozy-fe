@@ -101,6 +101,7 @@
   "cells": {
     "patient": "患者",
     "patientMark": "患",
+    "leadMark": "潜",
     "moreCount": "另外 {{count}} 人"
   },
   "emptyState": {

@@ -121,5 +121,24 @@
     "reschedule": "日時を変更",
     "cancel": "キャンセル",
     "tracker": "ステータス"
+  },
+  "calendar": {
+    "dayLoad_other": "予約 {{count}} 件 · {{hours}} 時間",
+    "free": "終日空き",
+    "doctor": "医師",
+    "bookSlot": "空いている枠をクリックして予約",
+    "newAt": "新規予約 · {{day}} · {{time}}",
+    "pastDay": "過去の日付は予約できません",
+    "doctorBooked_other": "予約 {{count}} 件",
+    "doctorFree": "空き",
+    "chairTime_other": "予約 {{count}} 件 · チェア稼働率 {{percent}}%",
+    "chairTimeOverlap_other": "予約 {{count}} 件 · チェア稼働率 {{percent}}% · 重複予約あり",
+    "overlap": "重複予約",
+    "more": "他 {{count}} 件",
+    "dayCount_other": "{{day}} · 予約 {{count}} 件",
+    "openDay": "日を開く",
+    "block": "{{name}} · {{time}} · {{minutes}} 分 · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} 分 · {{service}} · {{doctor}} · {{status}} · 他の予約と重複",
+    "blockTime": "{{time}} · {{minutes}}分"
   }
 }

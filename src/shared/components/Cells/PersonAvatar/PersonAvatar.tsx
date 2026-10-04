@@ -90,6 +90,11 @@ export interface PersonAvatarProps {
   size?: PersonAvatarSize;
   /** Adds the success-green "P" badge at the bottom inline-end corner. */
   patient?: boolean;
+  /**
+   * Adds the violet "L" badge there instead — a lead, as the calendar blocks
+   * mark them (`k126`, H:5929). `patient` wins when both are set.
+   */
+  lead?: boolean;
   /** Adds the presence dot (person cards). */
   presence?: PersonPresence;
   className?: string;
@@ -105,6 +110,7 @@ export function PersonAvatar({
   tone,
   size = 'cell',
   patient = false,
+  lead = false,
   presence,
   className,
 }: PersonAvatarProps) {
@@ -123,16 +129,17 @@ export function PersonAvatar({
           {initials}
         </AvatarFallback>
       </Avatar>
-      {patient ? (
+      {patient || lead ? (
         <span
           data-slot="pill"
-          data-testid="patient-badge"
+          data-testid={patient ? 'patient-badge' : 'lead-badge'}
           className={cn(
-            'bg-success text-success-foreground border-card absolute flex items-center justify-center rounded-full border-2 leading-none font-bold',
+            'border-card absolute flex items-center justify-center rounded-full border-2 leading-none font-bold',
+            patient ? 'bg-success text-success-foreground' : 'bg-assist text-background',
             sizing.badge,
           )}
         >
-          {t(CELLS_KEYS.patientMark)}
+          {t(patient ? CELLS_KEYS.patientMark : CELLS_KEYS.leadMark)}
         </span>
       ) : null}
       {presence ? (

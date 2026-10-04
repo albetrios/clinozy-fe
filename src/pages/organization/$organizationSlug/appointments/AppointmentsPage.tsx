@@ -7,7 +7,10 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from './appointments.constants.ts';
 import { AppointmentActionsProvider } from './components/AppointmentActions/index.ts';
 import { AppointmentsAgenda } from './components/AppointmentsAgenda/index.ts';
+import { AppointmentsDay } from './components/AppointmentsDay/index.ts';
+import { AppointmentsMonth } from './components/AppointmentsMonth/index.ts';
 import { AppointmentsToolbar } from './components/AppointmentsToolbar/index.ts';
+import { AppointmentsWeek } from './components/AppointmentsWeek/index.ts';
 import { useAppointmentsDialogRoute } from './hooks/useAppointmentsDialogRoute/index.ts';
 import { useAppointmentsView } from './hooks/useAppointmentsView/index.ts';
 
@@ -42,6 +45,9 @@ export function AppointmentsPage() {
             className="m-(--room-card-margin) flex min-h-0 flex-1 flex-col"
           >
             {view === 'agenda' ? <AppointmentsAgenda /> : null}
+            {view === 'day' ? <AppointmentsDay /> : null}
+            {view === 'week' ? <AppointmentsWeek /> : null}
+            {view === 'month' ? <AppointmentsMonth /> : null}
           </div>
           <Outlet />
         </section>

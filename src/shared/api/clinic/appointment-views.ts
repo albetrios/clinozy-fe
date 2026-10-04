@@ -14,7 +14,7 @@ import { addCivilDays } from './clinic-time.ts';
 export type AppointmentCalendarView = Exclude<AppointmentView, 'agenda'>;
 
 /** Days from Sunday to a calendar date (Sunday = 0; Q-A10: weeks start on Sunday everywhere). */
-function sundayOffset(date: string): number {
+export function sundayOffset(date: string): number {
   const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 }

@@ -130,5 +130,29 @@
     "reschedule": "समय बदलें",
     "cancel": "रद्द करें",
     "tracker": "स्थिति"
+  },
+  "calendar": {
+    "dayLoad_one": "{{count}} बुक · {{hours}} घं.",
+    "dayLoad_other": "{{count}} बुक · {{hours}} घं.",
+    "free": "पूरा दिन खाली",
+    "doctor": "डॉक्टर",
+    "bookSlot": "बुक करने के लिए किसी खाली स्लॉट पर क्लिक करें",
+    "newAt": "नया अपॉइंटमेंट · {{day}} · {{time}}",
+    "pastDay": "बीती तारीखें बुक नहीं की जा सकतीं",
+    "doctorBooked_one": "{{count}} बुक",
+    "doctorBooked_other": "{{count}} बुक",
+    "doctorFree": "खाली",
+    "chairTime_one": "{{count}} बुक · चेयर टाइम का {{percent}}%",
+    "chairTime_other": "{{count}} बुक · चेयर टाइम का {{percent}}%",
+    "chairTimeOverlap_one": "{{count}} बुक · चेयर टाइम का {{percent}}% · ओवरलैपिंग बुकिंग",
+    "chairTimeOverlap_other": "{{count}} बुक · चेयर टाइम का {{percent}}% · ओवरलैपिंग बुकिंग",
+    "overlap": "ओवरलैपिंग बुकिंग",
+    "more": "+{{count}} और",
+    "dayCount_one": "{{day}} · {{count}} अपॉइंटमेंट",
+    "dayCount_other": "{{day}} · {{count}} अपॉइंटमेंट",
+    "openDay": "दिन खोलें",
+    "block": "{{name}} · {{time}} · {{minutes}} मिनट · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} मिनट · {{service}} · {{doctor}} · {{status}} · किसी दूसरी बुकिंग से टकराता है",
+    "blockTime": "{{time}} · {{minutes}} मि."
   }
 }

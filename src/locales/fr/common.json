@@ -101,6 +101,7 @@
   "cells": {
     "patient": "Patient",
     "patientMark": "P",
+    "leadMark": "L",
     "moreCount": "{{count}} de plus"
   },
   "emptyState": {

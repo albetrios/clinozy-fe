@@ -121,5 +121,24 @@
     "reschedule": "改期",
     "cancel": "取消",
     "tracker": "状态"
+  },
+  "calendar": {
+    "dayLoad_other": "已预约 {{count}} 个 · {{hours}} 小时",
+    "free": "全天空闲",
+    "doctor": "医生",
+    "bookSlot": "点击空闲时段即可预约",
+    "newAt": "新建预约 · {{day}} · {{time}}",
+    "pastDay": "无法预约过去的日期",
+    "doctorBooked_other": "已预约 {{count}} 个",
+    "doctorFree": "空闲",
+    "chairTime_other": "已预约 {{count}} 个 · 占用 {{percent}}% 的诊椅时间",
+    "chairTimeOverlap_other": "已预约 {{count}} 个 · 占用 {{percent}}% 的诊椅时间 · 存在重叠预约",
+    "overlap": "重叠预约",
+    "more": "还有 {{count}} 个",
+    "dayCount_other": "{{day}} · {{count}} 个预约",
+    "openDay": "打开当天",
+    "block": "{{name}} · {{time}} · {{minutes}} 分钟 · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} 分钟 · {{service}} · {{doctor}} · {{status}} · 与另一个预约重叠",
+    "blockTime": "{{time}} · {{minutes}} 分钟"
   }
 }

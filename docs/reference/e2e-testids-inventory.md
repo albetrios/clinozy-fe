@@ -438,7 +438,7 @@ Scope a spec to `chat-column` — a room can show one beside its list.
 | `chat-fill-in`                              | "Fill in" row for a picked template's placeholders                                                                | `ChatColumn/ChatComposer/`  |
 | `chat-mode-mismatch`                        | "Anaya wrote on Instagram · Switch" (the contact wrote on another channel)                                        | `ChatColumn/ChatComposer/`  |
 
-## Appointments room (launch L-36b)
+## Appointments room (launch L-36b, L-37)
 
 `pages/organization/$organizationSlug/appointments/`. The toolbar and the Agenda also carry the
 shared ids above with the `tableId` `appointments` (`appointments-toolbar`, `appointments-tab-agenda`,
@@ -462,3 +462,12 @@ header is its own row (`role="row"`, `data-slot="data-table-group"`) between the
 | `appointments-filters-upcoming` · `-filters-month-previous` · `-month-next` | "Upcoming (default)" · the month arrows                                    | `components/AppointmentFilters/`       |
 | `appointments-filters-doctors`                                              | "Appointed to" doctor picker                                               | `components/DoctorPicker/`             |
 | `appointments-filters-status-<value>`                                       | Status chip (`all` · `active` · a status)                                  | `components/AppointmentFilters/`       |
+| `appointments-calendar`                                                     | A calendar's card (`data-view` = `day` · `week` · `month`)                 | `components/CalendarGrid/`             |
+| `appointments-block`                                                        | A booking on a calendar — block, Month chip or popover row (`data-status`) | `components/CalendarBlock/`            |
+| `appointments-day-column` · `appointments-now-line`                         | A day's column (`data-date`) · the 2px now line (today only)               | `components/CalendarGrid/`             |
+| `appointments-day-slots`                                                    | The Day column's empty surface — a press books its slot (Create only)      | `components/CalendarGrid/`             |
+| `appointments-day-header` · `appointments-day-doctors`                      | Day header (`md` and up) · its doctor picker                               | `components/AppointmentsDay/`          |
+| `appointments-day-strip` · `-day-strip-option`                              | Phone Doctor strip (`role="radiogroup"`) · one pill (`role="radio"`)       | `components/AppointmentsDay/`          |
+| `appointments-week-day`                                                     | A Week day header (`data-date`) — opens the day in Day                     | `components/AppointmentsWeek/`         |
+| `appointments-month-cell` · `appointments-month-more`                       | A Month cell (`data-date`) · its "+<n> more"                               | `components/AppointmentsMonth/`        |
+| `appointments-month-popover` · `appointments-month-open-day`                | The Month day popover (`role="dialog"`) · its "Open day"                   | `components/AppointmentsMonth/`        |

@@ -14,6 +14,7 @@ import {
   type DataTableRowAction,
   DataTableRowActions,
 } from '@/shared/components/DataTableRowActions/index.ts';
+import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { Checkbox } from '@/shared/components/ui/checkbox.tsx';
 
 import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
@@ -54,14 +55,6 @@ const ROW_BASE =
 const GRID_ROW =
   'grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)]';
 const FLEX_ROW = 'flex flex-wrap items-center gap-x-3 gap-y-1.5';
-
-/**
- * While the rows belong to the previous params (a search, sort or filter is
- * loading): every text run becomes a flat bar, icons fade, clicks are off —
- * the rows stay where they are (KICKOFF §6.0 Table refresh; H:275–280).
- */
-const REFRESH_BARS =
-  'pointer-events-none [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:rounded-md [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:bg-muted-strong [&_:is(span,p,a,button,time):not(:has(*)):not(:empty)]:text-transparent [&_svg]:opacity-0';
 
 // Sticky at the inline end with a solid background and a soft edge (H:225).
 const STICKY_ACTIONS =
@@ -447,7 +440,7 @@ export function DataTableRow<TData extends RowData>({
         rowLayoutClass(context),
         tone ? ROW_EDGE[tone] : 'border-s-transparent',
         onRowClick && 'cursor-pointer',
-        context.refreshing && REFRESH_BARS,
+        context.refreshing && SKELETON_IN_PLACE,
       )}
     >
       <RowCells row={row} index={index} context={context} />

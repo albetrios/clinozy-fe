@@ -130,5 +130,29 @@
     "reschedule": "Verschieben",
     "cancel": "Stornieren",
     "tracker": "Status"
+  },
+  "calendar": {
+    "dayLoad_one": "{{count}} gebucht · {{hours}} Std.",
+    "dayLoad_other": "{{count}} gebucht · {{hours}} Std.",
+    "free": "Den ganzen Tag frei",
+    "doctor": "Arzt",
+    "bookSlot": "Klicken Sie auf ein freies Zeitfenster, um zu buchen",
+    "newAt": "Neuer Termin · {{day}} · {{time}}",
+    "pastDay": "Vergangene Tage können nicht gebucht werden",
+    "doctorBooked_one": "{{count}} gebucht",
+    "doctorBooked_other": "{{count}} gebucht",
+    "doctorFree": "frei",
+    "chairTime_one": "{{count}} gebucht · {{percent}} % der Behandlungszeit",
+    "chairTime_other": "{{count}} gebucht · {{percent}} % der Behandlungszeit",
+    "chairTimeOverlap_one": "{{count}} gebucht · {{percent}} % der Behandlungszeit · Doppelbuchung",
+    "chairTimeOverlap_other": "{{count}} gebucht · {{percent}} % der Behandlungszeit · Doppelbuchung",
+    "overlap": "Doppelbuchung",
+    "more": "+{{count}} weitere",
+    "dayCount_one": "{{day}} · {{count}} Termin",
+    "dayCount_other": "{{day}} · {{count}} Termine",
+    "openDay": "Tag öffnen",
+    "block": "{{name}} · {{time}} · {{minutes}} Min. · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} Min. · {{service}} · {{doctor}} · {{status}} · überschneidet sich mit einer anderen Buchung",
+    "blockTime": "{{time}} · {{minutes}} Min."
   }
 }

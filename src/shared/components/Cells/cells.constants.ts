@@ -9,6 +9,8 @@ export const CELLS_KEYS = {
   patient: 'cells.patient',
   /** The "P" badge's glyph (KICKOFF: "the P badge is text"). */
   patientMark: 'cells.patientMark',
+  /** The lead's "L" badge glyph (calendar blocks, H:5929). */
+  leadMark: 'cells.leadMark',
   /** Spoken for an avatar stack's "+N" pill. */
   moreCount: 'cells.moreCount',
 } as const;

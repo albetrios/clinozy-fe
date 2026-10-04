@@ -101,6 +101,7 @@
   "cells": {
     "patient": "मरीज़",
     "patientMark": "म",
+    "leadMark": "ल",
     "moreCount": "{{count}} और"
   },
   "emptyState": {

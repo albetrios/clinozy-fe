@@ -33,6 +33,13 @@ describe('TonePill', () => {
       </TonePill>,
     );
     expect(pill('Booked')).toHaveClass('h-5.5', 'px-2', 'text-caption');
+
+    rerender(
+      <TonePill tone="sky" size="xs">
+        Booked
+      </TonePill>,
+    );
+    expect(pill('Booked')).toHaveClass('h-4.5', 'px-1.75', 'text-tiny');
   });
 
   it('squares under the Sharp shape: rounded-full rides on the pill slot', () => {

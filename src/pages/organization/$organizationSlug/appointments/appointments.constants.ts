@@ -135,6 +135,35 @@ export const APPOINTMENTS_KEYS = {
     cancel: 'card.cancel',
     tracker: 'card.tracker',
   },
+  /** Day · Week · Month (`appointments.md:42–53, 362–365`). */
+  calendar: {
+    /** The Day header: "<n> booked · <h> h". */
+    dayLoad: 'calendar.dayLoad',
+    free: 'calendar.free',
+    /** The phone Day strip's name. */
+    doctor: 'calendar.doctor',
+    bookSlot: 'calendar.bookSlot',
+    /** The slot toast: "New appointment · <day> · <time>". */
+    newAt: 'calendar.newAt',
+    pastDay: 'calendar.pastDay',
+    /** The Day doctor picker's line: "<n> booked" or "free". */
+    doctorBooked: 'calendar.doctorBooked',
+    doctorFree: 'calendar.doctorFree',
+    /** A Week day's load tooltip, with or without " · overlapping booking". */
+    chairTime: 'calendar.chairTime',
+    chairTimeOverlap: 'calendar.chairTimeOverlap',
+    overlap: 'calendar.overlap',
+    /** "+<n> more" in a Month cell. */
+    more: 'calendar.more',
+    /** The Month day popover's title: "<day> · <n> appointments". */
+    dayCount: 'calendar.dayCount',
+    openDay: 'calendar.openDay',
+    /** A block's tooltip, with or without " · overlaps another booking" (Day). */
+    block: 'calendar.block',
+    blockClash: 'calendar.blockClash',
+    /** "10:30 am · 20m". */
+    blockTime: 'calendar.blockTime',
+  },
 } as const;
 
 /**
@@ -166,4 +195,26 @@ export const APPOINTMENTS_TEST_IDS = {
   filtersMonthNext: 'appointments-filters-month-next',
   filtersDoctors: 'appointments-filters-doctors',
   filtersStatus: (value: string) => `appointments-filters-status-${value}`,
+  /** A calendar view's card (`data-view` = day · week · month). */
+  calendar: 'appointments-calendar',
+  /** A booking's block on a calendar (`data-status`). */
+  block: 'appointments-block',
+  /** The Day header row (`md` and up) and its doctor picker. */
+  dayHeader: 'appointments-day-header',
+  dayDoctors: 'appointments-day-doctors',
+  /** The phone Day strip (`role="radiogroup"`) and each doctor in it. */
+  dayStrip: 'appointments-day-strip',
+  dayStripOption: 'appointments-day-strip-option',
+  /** A day's column of blocks (Day, Week) — `data-date`. */
+  dayColumn: 'appointments-day-column',
+  /** The Day column's empty surface a press books a slot on (pointer only, hidden from AT). */
+  daySlots: 'appointments-day-slots',
+  nowLine: 'appointments-now-line',
+  /** A Week day header button — `data-date`. */
+  weekDay: 'appointments-week-day',
+  /** A Month cell, "+<n> more" and its day popover. */
+  monthCell: 'appointments-month-cell',
+  monthMore: 'appointments-month-more',
+  monthPopover: 'appointments-month-popover',
+  monthOpenDay: 'appointments-month-open-day',
 } as const;

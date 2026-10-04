@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { appointmentListParamsOf } from './appointments.params.ts';
+import {
+  appointmentListParamsOf,
+  appointmentRangeParamsOf,
+} from './appointments.params.ts';
 import { validateAppointmentsSearch } from './appointments.search.ts';
 
 const DOCTOR = '9f1c2b3a-4d5e-4f60-8a7b-1c2d3e4f5a6b';
@@ -36,5 +39,42 @@ describe('appointmentListParamsOf — the URL as the Agenda read', () => {
       sort: 'contact',
       order: 'asc',
     });
+  });
+});
+
+describe('appointmentRangeParamsOf — the URL as a calendar read', () => {
+  const search = validateAppointmentsSearch({
+    view: 'week',
+    date: '2026-10-05',
+    doctor: DOCTOR,
+    status: 'all',
+    q: 'meera',
+  });
+
+  it('reads the range with the page’s filters, the picked doctors by default', () => {
+    expect(
+      appointmentRangeParamsOf(search, { from: '2026-10-04', to: '2026-10-10' }),
+    ).toEqual({
+      from: '2026-10-04',
+      to: '2026-10-10',
+      status: 'all',
+      doctorIds: [DOCTOR],
+      q: 'meera',
+      created: undefined,
+      followUp: undefined,
+    });
+  });
+
+  it('reads every doctor when the view counts them itself (the Day)', () => {
+    expect(
+      appointmentRangeParamsOf(search, { from: '2026-10-05', to: '2026-10-05' }, 'every')
+        .doctorIds,
+    ).toEqual([]);
+    expect(
+      appointmentRangeParamsOf(validateAppointmentsSearch({}), {
+        from: '2026-10-05',
+        to: '2026-10-05',
+      }).status,
+    ).toBe('active');
   });
 });

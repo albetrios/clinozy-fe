@@ -1,7 +1,8 @@
 /**
  * The Appointments Filters' rules (KICKOFF §6.4 Filters): the values the URL
- * applies, how many are on, the URL patch that applies a choice, and the mini
- * calendar's days and load dots. Pure — the popover and its tests read them.
+ * applies, how many are on and the URL patch that applies a choice. Pure — the
+ * popover and its tests read them; the mini calendar's month and load dots are
+ * the calendars' (`appointments.calendar.ts`).
  */
 import type {
   AppointmentStatusFilter,
@@ -11,10 +12,8 @@ import type {
   CreatedFilter,
   FollowUpFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { addCivilDays } from '@/shared/api/clinic/clinic-time.ts';
 
 import type { AppointmentsSearch } from '../../appointments.search.ts';
-import { shiftAnchor } from '../../hooks/useAppointmentsNavigation/index.ts';
 
 /** The Filters' choices — pending in the popover, applied in the URL. */
 export interface AppointmentFilterValues {
@@ -75,22 +74,4 @@ export function filtersPatch(
     created: values.created,
     followUp: values.followUp,
   };
-}
-
-/** The days of a month (`YYYY-MM-01`), in order (`YYYY-MM-DD`). */
-export function monthDays(month: string): string[] {
-  const next = shiftAnchor(month, 'month', 1);
-  const days: string[] = [];
-  for (let day = month; day < next; day = addCivilDays(day, 1)) days.push(day);
-  return days;
-}
-
-/**
- * How many dots a day's load earns (H:5923): one up to 6 bookings, two for
- * 7–12, three above 12 — none for a free day.
- */
-export function loadDots(booked: number): 0 | 1 | 2 | 3 {
-  if (booked <= 0) return 0;
-  if (booked <= 6) return 1;
-  return booked <= 12 ? 2 : 3;
 }

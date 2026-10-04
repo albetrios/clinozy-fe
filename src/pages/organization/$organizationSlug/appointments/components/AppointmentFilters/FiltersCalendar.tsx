@@ -12,13 +12,13 @@ import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { ChevronLeft, ChevronRight } from '@/shared/icons/index.ts';
 
+import { loadDots, monthDays } from '../../appointments.calendar.ts';
 import {
   APPOINTMENTS_KEYS,
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
 import { shiftAnchor } from '../../hooks/useAppointmentsNavigation/index.ts';
-import { loadDots, monthDays } from './appointment-filters-model.ts';
 
 /** A calendar month's first day, `YYYY-MM-01`. */
 const monthOf = (date: string) => `${date.slice(0, 7)}-01`;

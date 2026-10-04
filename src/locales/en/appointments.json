@@ -130,5 +130,29 @@
     "reschedule": "Reschedule",
     "cancel": "Cancel",
     "tracker": "Status"
+  },
+  "calendar": {
+    "dayLoad_one": "{{count}} booked · {{hours}} h",
+    "dayLoad_other": "{{count}} booked · {{hours}} h",
+    "free": "Free all day",
+    "doctor": "Doctor",
+    "bookSlot": "Click an empty slot to book",
+    "newAt": "New appointment · {{day}} · {{time}}",
+    "pastDay": "Past dates can’t be booked",
+    "doctorBooked_one": "{{count}} booked",
+    "doctorBooked_other": "{{count}} booked",
+    "doctorFree": "free",
+    "chairTime_one": "{{count}} booked · {{percent}}% of chair time",
+    "chairTime_other": "{{count}} booked · {{percent}}% of chair time",
+    "chairTimeOverlap_one": "{{count}} booked · {{percent}}% of chair time · overlapping booking",
+    "chairTimeOverlap_other": "{{count}} booked · {{percent}}% of chair time · overlapping booking",
+    "overlap": "Overlapping booking",
+    "more": "+{{count}} more",
+    "dayCount_one": "{{day}} · {{count}} appointment",
+    "dayCount_other": "{{day}} · {{count}} appointments",
+    "openDay": "Open day",
+    "block": "{{name}} · {{time}} · {{minutes}} min · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} min · {{service}} · {{doctor}} · {{status}} · overlaps another booking",
+    "blockTime": "{{time}} · {{minutes}}m"
   }
 }

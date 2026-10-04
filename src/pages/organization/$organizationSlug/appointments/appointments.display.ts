@@ -23,12 +23,17 @@ export function staffName(
 
 // ── Tones ──
 
-/** The avatar's tone: patients sage, leads lav, anyone else grey (H:5972). */
+/** The Agenda's avatar tone: patients sage, leads lav, anyone else grey (H:5972). */
 export const PERSON_TONES: Readonly<Record<AppointmentPersonKind, Tone>> = {
   patient: 'sage',
   lead: 'lav',
   contact: 'stone',
 };
+
+/** A calendar block's avatar tone: patients sage, everyone else lav (`avTone`, H:5892). */
+export function blockPersonTone(kind: AppointmentPersonKind): Tone {
+  return kind === 'patient' ? 'sage' : 'lav';
+}
 
 /**
  * The services the design names, by label (`AP_SVC`, H:3416): Consultation

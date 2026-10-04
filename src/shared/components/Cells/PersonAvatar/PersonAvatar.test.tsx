@@ -53,6 +53,18 @@ describe('PersonAvatar', () => {
     expect(badge).toHaveClass('bg-success', 'size-3.5');
   });
 
+  it('adds the violet "L" badge for a lead — the patient’s "P" wins', () => {
+    const { rerender } = render(
+      <PersonAvatar initials="AP" tone="lav" size="line" lead />,
+    );
+    const badge = screen.getByTestId('lead-badge');
+    expect(badge).toHaveTextContent('L');
+    expect(badge).toHaveClass('bg-assist', 'size-2.5');
+    rerender(<PersonAvatar initials="AP" tone="lav" size="line" lead patient />);
+    expect(screen.queryByTestId('lead-badge')).toBeNull();
+    expect(screen.getByTestId('patient-badge')).toHaveTextContent('P');
+  });
+
   it('sizes the card avatar with the 16px badge and a presence dot', () => {
     const { container } = render(
       <PersonAvatar initials="DR" tone="sky" size="card" patient presence="online" />,

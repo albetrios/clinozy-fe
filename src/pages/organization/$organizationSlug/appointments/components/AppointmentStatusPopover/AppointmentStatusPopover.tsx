@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useRef } from 'react';
+import { type ReactElement, type RefObject, useEffect, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { focusSurfaceOnOpen } from '@/lib/focus-surface.ts';
@@ -29,6 +29,9 @@ import {
 } from '../../appointments.constants.ts';
 import { useAppointmentActions } from '../AppointmentActions/index.ts';
 
+/** What a popover anchor measures — the element `anchorRef` points at. */
+type Measurable = { getBoundingClientRect: () => DOMRect };
+
 /** Which list the popover shows: the moves, or "Why is it cancelled?". */
 export type AppointmentStatusView = 'moves' | 'cancel';
 
@@ -41,13 +44,12 @@ export interface AppointmentStatusPopoverProps {
   view: AppointmentStatusView;
   onViewChange: (view: AppointmentStatusView) => void;
   /**
-   * What it opens from: the Status button (`trigger`, the default), or an
-   * element it is only anchored to (`anchor` — a calendar block, opened by
-   * the card's "Cancel").
+   * What it opens from: the Status button (`children`, its trigger) — or,
+   * for a calendar block, the element `anchorRef` points at, which it only
+   * sits under: the card's "Cancel" opens it there.
    */
-  attach?: 'trigger' | 'anchor';
-  /** The Status button, or the anchor element. */
-  children: ReactElement;
+  children?: ReactElement;
+  anchorRef?: RefObject<HTMLElement | null>;
 }
 
 /** A move's dot: the status it moves to, stone for "Move to another time" and Cancel (H:5974). */
@@ -120,8 +122,8 @@ export function AppointmentStatusPopover({
   onOpenChange,
   view,
   onViewChange,
-  attach = 'trigger',
   children,
+  anchorRef,
 }: AppointmentStatusPopoverProps) {
   const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
   const actions = useAppointmentActions();
@@ -188,11 +190,13 @@ export function AppointmentStatusPopover({
           ns: CLINIC_NS,
         })
       : null;
-  const Attach = attach === 'trigger' ? PopoverTrigger : PopoverAnchor;
-
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
-      <Attach asChild>{children}</Attach>
+      {anchorRef ? (
+        <PopoverAnchor virtualRef={anchorRef as RefObject<Measurable>} />
+      ) : (
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+      )}
       <PopoverContent
         role="dialog"
         aria-label={t(APPOINTMENTS_KEYS.status.title)}

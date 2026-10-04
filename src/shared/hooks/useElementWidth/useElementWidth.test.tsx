@@ -84,6 +84,28 @@ describe('useElementWidth', () => {
     expect(resize.observers.every((observer) => observer.disconnected)).toBe(true);
   });
 
+  it('measures the height instead when asked (the Month board’s cells)', () => {
+    const resize = installResizeObserver();
+    let clientHeight = 124;
+    const heightSpy = vi
+      .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+      .mockImplementation(() => clientHeight);
+    function HeightProbe() {
+      const [ref, height] = useElementWidth<HTMLDivElement>(2, 'height');
+      return (
+        <div ref={ref} data-testid="height">
+          {height}
+        </div>
+      );
+    }
+    render(<HeightProbe />);
+    expect(screen.getByTestId('height')).toHaveTextContent('124');
+    clientHeight = 150;
+    act(() => resize.fire());
+    expect(screen.getByTestId('height')).toHaveTextContent('150');
+    heightSpy.mockRestore();
+  });
+
   it('stays at 0 without a ResizeObserver until a width exists', () => {
     vi.stubGlobal('ResizeObserver', undefined);
     render(<Probe />);

@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import i18n from '@/lib/i18n/i18n.ts';
@@ -193,7 +194,12 @@ export function useAppointmentDaySummaries(
   });
 }
 
-/** Every booking a Day, Week or Month board shows (`listAppointmentsRange`); idle without a range. */
+/**
+ * Every booking a Day, Week or Month board shows (`listAppointmentsRange`);
+ * idle without a range. A new range or filter keeps the last board's bookings
+ * (`isPlaceholderData`) while it loads, so the board shows them as the
+ * in-place skeleton instead of going blank (KICKOFF §6.4 States).
+ */
 export function useAppointmentRange(
   params: AppointmentRangeParamsInput | null,
   options: AppointmentQueryOptions = {},
@@ -204,6 +210,7 @@ export function useAppointmentRange(
       : [...appointmentQueryKeys.ranges(), 'none'],
     queryFn: () => (params ? fetchAppointmentRange(params) : Promise.resolve([])),
     enabled: params !== null && (options.enabled ?? true),
+    placeholderData: keepPreviousData,
     notifyOnError: options.notifyOnError ?? true,
   });
 }

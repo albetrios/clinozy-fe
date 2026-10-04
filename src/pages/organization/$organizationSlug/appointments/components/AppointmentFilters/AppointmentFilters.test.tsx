@@ -17,8 +17,6 @@ import {
   appliedFilters,
   countFilters,
   filtersPatch,
-  loadDots,
-  monthDays,
 } from './appointment-filters-model.ts';
 import { AppointmentFilters } from './AppointmentFilters.tsx';
 
@@ -62,16 +60,6 @@ describe('the Filters model', () => {
       created: undefined,
       followUp: undefined,
     });
-  });
-
-  it('dots a day by its load: one up to 6, two to 12, three above (H:5923)', () => {
-    expect([0, 1, 6, 7, 12, 13].map(loadDots)).toEqual([0, 1, 1, 2, 2, 3]);
-  });
-
-  it('lays out a month’s days', () => {
-    const days = monthDays('2026-02-01');
-    expect(days).toHaveLength(28);
-    expect(days.at(-1)).toBe('2026-02-28');
   });
 });
 

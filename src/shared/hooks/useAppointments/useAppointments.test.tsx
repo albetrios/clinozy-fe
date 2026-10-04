@@ -122,6 +122,22 @@ describe('appointment reads', () => {
     expect(result.current.staff.data?.[0]?.roles).toContain('doctor');
   });
 
+  it('keeps the last range’s bookings while the next range loads', async () => {
+    const { result, rerender } = renderHook(
+      ({ from, to }) => useAppointmentRange({ from, to }),
+      { wrapper, initialProps: { from: TODAY, to: TODAY } },
+    );
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    const today = result.current.data;
+    expect(today?.length).toBeGreaterThan(0);
+
+    rerender({ from: '2026-10-04', to: '2026-10-10' });
+    expect(result.current.isPlaceholderData).toBe(true);
+    expect(result.current.data).toBe(today);
+    await waitFor(() => expect(result.current.isPlaceholderData).toBe(false));
+    expect(result.current.data?.every((row) => row.date >= '2026-10-04')).toBe(true);
+  });
+
   it('stays idle without a range, an id or slot params', () => {
     const { result } = renderHook(
       () => ({
