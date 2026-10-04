@@ -32,6 +32,24 @@ function loadNamespaceJson(uiLocale: string, ns: I18nNamespace): Record<string, 
   return {};
 }
 
+/** `…/src/locales/<locale>/<namespace>.json`, separators normalised. */
+const LOCALE_FILE = /\/src\/locales\/([^/]+)\/([^/]+)\.json$/;
+
+/**
+ * The namespace a changed file feeds into this build — a namespace file of the
+ * build's locale or of English, its fallback — or `undefined` for anything else.
+ */
+export function localeNamespaceOf(
+  file: string,
+  uiLocale: string,
+): I18nNamespace | undefined {
+  const match = LOCALE_FILE.exec(file.replaceAll('\\', '/'));
+  if (!match) return undefined;
+  const [, locale, name] = match;
+  if (locale !== uiLocale && locale !== 'en') return undefined;
+  return ALL_NAMESPACES.find((ns) => ns === name);
+}
+
 function renderSingleLocaleModule(bcp47: string): string {
   const uiLocale = uiLocaleFromBcp47(bcp47);
   const profile = localeBuildProfileFor(bcp47);
@@ -142,6 +160,28 @@ export function i18nBuild(options: I18nBuildPluginOptions = {}): Plugin {
         }
       }
       return undefined;
+    },
+    /**
+     * Dev server only. The virtual modules read their locale files when they
+     * load, so Vite cannot see that they depend on them: without this, a running
+     * dev server keeps serving a namespace as it was first loaded, and every key
+     * added since — a pull, a cherry-pick — renders as its raw key path until a
+     * restart. A locale file's edit drops the modules built from it and reloads
+     * the page (i18next already holds the old copy, so a module swap alone would
+     * not reach the screen).
+     */
+    hotUpdate({ file }) {
+      if (mode !== 'single') return undefined;
+      const namespace = localeNamespaceOf(file, uiLocale);
+      if (!namespace) return undefined;
+      const graph = this.environment.moduleGraph;
+      const stale = [NAMESPACE_PREFIX + namespace, VIRTUAL_ID]
+        .map((id) => graph.getModuleById(id))
+        .filter((module) => module !== undefined);
+      if (stale.length === 0) return undefined;
+      for (const module of stale) graph.invalidateModule(module);
+      this.environment.hot.send({ type: 'full-reload' });
+      return [];
     },
   };
 }
