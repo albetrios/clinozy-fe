@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2158 src files · ~1039 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
+Stats: ~2160 src files · ~1040 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -2502,6 +2502,10 @@ clinozy-fe/
 │   │   │   ├── useElementWidth/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useElementWidth.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useEscapeLayer/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useEscapeLayer.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useFeedback/
 │   │   │   │   ├── index.ts

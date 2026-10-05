@@ -1,9 +1,10 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
-import { useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AppearanceDialog } from '@/shared/components/AppearanceDialog/AppearanceDialog.tsx';
 import { CommandPaletteLazy } from '@/shared/components/CommandPalette/index.ts';
 import {
   DataTable,
@@ -11,6 +12,10 @@ import {
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import {
+  LazyOverlay,
+  LazyOverlaySkeleton,
+} from '@/shared/components/LazyOverlay/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/picker.types.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
@@ -106,9 +111,36 @@ function PurchasePage({ onParentClose }: { onParentClose?: () => void }) {
 
 const menuOpen = () => screen.queryByRole('dialog', { name: 'Command menu' });
 
-async function openPurchase(props: { onParentClose?: () => void } = {}) {
+/** Opens a lazy overlay whose chunk never lands — Settings on a hung connection. */
+const slowOverlay = { open: () => {} };
+
+/** The pending surface of a lazy overlay, opened on demand over whatever is up. */
+function SlowOverlay() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    slowOverlay.open = () => setOpen(true);
+  }, []);
+  return open ? (
+    <LazyOverlay
+      load={() => new Promise(() => {})}
+      pending={<LazyOverlaySkeleton testId="slow-pending" />}
+      title="Settings"
+      onDismiss={() => setOpen(false)}
+    />
+  ) : null;
+}
+
+async function openPurchase(
+  props: { onParentClose?: () => void } = {},
+  over: ReactNode = null,
+) {
   const u = user();
-  renderWithProviders(<PurchasePage {...props} />);
+  renderWithProviders(
+    <>
+      <PurchasePage {...props} />
+      {over}
+    </>,
+  );
   await u.click(await screen.findByRole('button', { name: 'New purchase' }));
   const title = await screen.findByTestId('po-title');
   await waitFor(() => expect(title).toHaveFocus());
@@ -157,6 +189,50 @@ describe('Esc layers — the command menu over a drawer', () => {
     await waitFor(() => expect(menuOpen()).toBeNull());
     expect(screen.getByTestId('po')).toBeInTheDocument();
     expect(onParentClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('Esc layers — a surface outside the Radix stack over a drawer', () => {
+  afterEach(() => {
+    act(() => useUIStore.setState({ appearanceOpen: false }));
+  });
+
+  it('the Appearance panel takes one Esc alone; the next closes the drawer', async () => {
+    const onParentClose = vi.fn();
+    const { u } = await openPurchase({ onParentClose }, <AppearanceDialog />);
+
+    act(() => useUIStore.getState().setAppearanceOpen(true));
+    expect(await screen.findByTestId('appearance-dialog')).toBeInTheDocument();
+
+    await u.keyboard('{Escape}');
+
+    expect(screen.queryByTestId('appearance-dialog')).toBeNull();
+    expect(screen.getByTestId('po')).toBeInTheDocument();
+    expect(onParentClose).not.toHaveBeenCalled();
+
+    await u.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByTestId('po')).toBeNull());
+    expect(onParentClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('a lazy overlay still loading takes one Esc alone; the drawer under its scrim stays', async () => {
+    const onParentClose = vi.fn();
+    const { u } = await openPurchase({ onParentClose }, <SlowOverlay />);
+
+    act(() => slowOverlay.open());
+    expect(await screen.findByTestId('slow-pending')).toBeInTheDocument();
+
+    await u.keyboard('{Escape}');
+
+    expect(screen.queryByTestId('slow-pending')).toBeNull();
+    expect(screen.getByTestId('po')).toBeInTheDocument();
+    expect(onParentClose).not.toHaveBeenCalled();
+
+    await u.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByTestId('po')).toBeNull());
+    expect(onParentClose).toHaveBeenCalledTimes(1);
   });
 });
 

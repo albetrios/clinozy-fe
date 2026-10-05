@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils.ts';
 import { PlaceholderPrecededContext } from '@/shared/components/LazyOverlay/lazy-surface-context.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { reportError } from '@/shared/errors/errorHandler.ts';
+import { useEscapeLayer } from '@/shared/hooks/useEscapeLayer/index.ts';
 import { AlertTriangle, X } from '@/shared/icons/index.ts';
 
 /**
@@ -210,26 +211,20 @@ function LazyOverlayError({
   );
 
   /**
-   * Escape out, and Tab round.
-   *
-   * On `document` rather than the card, so Escape works even if something moved
-   * focus back out — the same reason the pending surface listens on `window`.
+   * Escape out — this card alone, the top-most surface, never the drawer under
+   * its scrim (`useEscapeLayer`) — and Tab round, on `document` rather than the
+   * card so both work even if something moved focus back out.
    */
+  useEscapeLayer(onDismiss ? dismiss : undefined);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const card = cardRef.current;
-      if (!card) return;
-
-      if (event.key === 'Escape') {
-        dismiss();
-        return;
-      }
-      if (event.key === 'Tab') trapTabWithin(card, event);
+      if (card && event.key === 'Tab') trapTabWithin(card, event);
     };
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [dismiss]);
+  }, []);
 
   return (
     <OverlayScrim>
@@ -329,17 +324,11 @@ function LazyOverlayPending({
     onShown?.();
   }, [onShown]);
 
-  useEffect(() => {
-    if (!onDismiss) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onDismiss();
-    };
-    // On `window`, like the app's other Escape handlers: a skeleton holds
-    // nothing focusable, so focus is still on the trigger (or on <body> after
-    // the trigger unmounted) and a node-scoped listener would never see the key.
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onDismiss]);
+  // On `window`: a skeleton holds nothing focusable, so focus is still on the
+  // trigger (or on <body>, or in a drawer under the scrim) and a node-scoped
+  // listener would never see the key. The top-most surface takes it — this
+  // one closes alone, the drawer under it stays (`useEscapeLayer`).
+  useEscapeLayer(onDismiss);
 
   return (
     <>

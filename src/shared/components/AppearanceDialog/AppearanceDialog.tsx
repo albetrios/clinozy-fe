@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
+import { useEscapeLayer } from '@/shared/hooks/useEscapeLayer/index.ts';
 import { Sparkles, X } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
@@ -96,11 +97,12 @@ export function AppearanceDialog() {
   const shuffleTheme = useThemeStore((s) => s.shuffleTheme);
   const panelRef = useRef<HTMLElement>(null);
 
+  // Esc closes the panel alone — not the drawer under it — and leaves the key
+  // to a Select or dialog opened over it (the top-most surface first).
+  useEscapeLayer(open ? () => setOpen(false) : undefined);
+
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
     // Click-outside dismiss. Clicks inside portaled overlays (the font selects,
     // popovers, toasts) count as "inside" so they don't close the popup.
     const onPointerDown = (e: PointerEvent) => {
@@ -116,12 +118,8 @@ export function AppearanceDialog() {
       }
       setOpen(false);
     };
-    window.addEventListener('keydown', onKey);
     window.addEventListener('pointerdown', onPointerDown);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('pointerdown', onPointerDown);
-    };
+    return () => window.removeEventListener('pointerdown', onPointerDown);
   }, [open, setOpen]);
 
   const enterProps = useEnterAnimationProps();
