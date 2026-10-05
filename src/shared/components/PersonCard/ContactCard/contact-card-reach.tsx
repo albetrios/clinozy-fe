@@ -67,10 +67,16 @@ export interface ReachRowProps {
   value: string;
   sub: string;
   links: readonly ReachLink[];
-  /** What "Copy" puts on the clipboard, and the toast that says so. */
-  copy: { text: string; message: string };
+  /**
+   * What "Copy" puts on the clipboard, and the toast that says so; `label`
+   * names the button when it copies something other than the value (a
+   * payment reminder's message) — "Copy" by default.
+   */
+  copy: { text: string; message: string; label?: string };
   /** Before the links — the patient rail's eye. */
   extra?: ReactNode;
+  /** In place of the channel tile — a payment reminder's person (32px). */
+  leading?: ReactNode;
   /** The value's type size (13px by default). */
   valueClassName?: string;
 }
@@ -78,7 +84,8 @@ export interface ReachRowProps {
 /**
  * One 32px-tile row per number or handle, with its links and "Copy" (H:2736;
  * the patient rail's Reach, H:719): the contact card's and the rail's, which
- * also masks the number behind an eye.
+ * also masks the number behind an eye, and Medical's payment reminders, which
+ * lead with the person and copy the message.
  */
 export function ReachRow({
   channel,
@@ -87,10 +94,12 @@ export function ReachRow({
   links,
   copy,
   extra,
+  leading,
   valueClassName = 'text-body',
 }: ReachRowProps) {
   const { t } = useTranslation(PERSON_CARD_NS);
   const tile = REACH_TILE[channel];
+  const copyLabel = copy.label ?? t(PERSON_CARD_KEYS.copy);
 
   const copyValue = async () => {
     try {
@@ -106,15 +115,17 @@ export function ReachRow({
       data-slot="contact-reach"
       className="bg-card grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border p-1.5"
     >
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex size-8 items-center justify-center rounded-lg [&_svg]:size-3.75',
-          TONE_CLASSES[tile.tone].surface,
-        )}
-      >
-        {tile.icon}
-      </span>
+      {leading ?? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            'flex size-8 items-center justify-center rounded-lg [&_svg]:size-3.75',
+            TONE_CLASSES[tile.tone].surface,
+          )}
+        >
+          {tile.icon}
+        </span>
+      )}
       <span className="flex min-w-0 flex-col gap-px">
         <span
           className={cn(
@@ -147,12 +158,12 @@ export function ReachRow({
             </Button>
           </Hint>
         ))}
-        <Hint label={t(PERSON_CARD_KEYS.copy)}>
+        <Hint label={copyLabel}>
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={t(PERSON_CARD_KEYS.copy)}
+            aria-label={copyLabel}
             className={ICON_ACTION}
             onClick={() => void copyValue()}
           >

@@ -36,6 +36,7 @@
     "sellAllDiscount": "Vendi tutto al 20% di sconto",
     "removeDiscount": "Rimuovi lo sconto per scadenza",
     "prescriptions": "Ricette da evadere",
+    "paymentReminders": "Invia promemoria di pagamento",
     "payAllReceived": "Paga tutto il ricevuto · {{amount}}"
   },
   "filters": {
@@ -580,7 +581,8 @@
       "payable": "Da pagare {{amount}}",
       "paid": "Pagato {{amount}}",
       "paidOf": "Pagato {{paid}} di {{total}}",
-      "pay": "Paga {{amount}}"
+      "pay": "Paga {{amount}}",
+      "print": "Stampa"
     },
     "sale": {
       "title": "Vendita",
@@ -658,6 +660,23 @@
     },
     "prescriptions": {
       "sub": "Ricetta {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Promemoria di pagamento",
+      "summary_one": "{{count}} cliente deve {{amount}}",
+      "summary_many": "{{count}} clienti devono {{amount}}",
+      "summary_other": "{{count}} clienti devono {{amount}}",
+      "hint": "WhatsApp si apre con il promemoria già scritto: lo invii da lì.",
+      "dueOne": "{{amount}} da pagare · Vendita #{{seq}}",
+      "dueMany_one": "{{amount}} da pagare · {{count}} vendita",
+      "dueMany_many": "{{amount}} da pagare · {{count}} vendite",
+      "dueMany_other": "{{amount}} da pagare · {{count}} vendite",
+      "noPhone": "Nessun telefono salvato",
+      "whatsApp": "Ricorda a {{name}} su WhatsApp",
+      "call": "Chiama {{name}}",
+      "copy": "Copia il promemoria per {{name}}",
+      "copied": "Promemoria per {{name}} copiato",
+      "message": "Ciao {{name}}, le ricordiamo da {{clinic}} che restano da pagare {{amount}} per i suoi farmaci. Risponda qui per qualsiasi domanda. Grazie!"
     }
   }
 }

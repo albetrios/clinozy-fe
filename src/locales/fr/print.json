@@ -99,5 +99,25 @@
       "legs": "Jambes",
       "arms": "Bras"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "Informations fournisseur",
+    "orderDetails": "Détails de la commande",
+    "orderDate": "Date de commande :",
+    "orderNumber": "Bon de commande :",
+    "invoiceNumber": "N° de facture :",
+    "gstin": "GSTIN :",
+    "stages": {
+      "ordered": "Commandé",
+      "received": "Reçu",
+      "paid": "Payé",
+      "cancelled": "Annulé"
+    },
+    "batch": "Lot",
+    "expiry": "Expiration",
+    "free": "Gratuit",
+    "rate": "Tarif",
+    "paid": "Payé :",
+    "issuedBy": "Bon de commande de {{clinic}}"
   }
 }

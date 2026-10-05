@@ -36,6 +36,7 @@
     "sellAllDiscount": "Vender todo con 20 % de descuento",
     "removeDiscount": "Quitar el descuento por caducidad",
     "prescriptions": "Recetas por surtir",
+    "paymentReminders": "Enviar recordatorios de pago",
     "payAllReceived": "Pagar todo lo recibido · {{amount}}"
   },
   "filters": {
@@ -580,7 +581,8 @@
       "payable": "Por pagar {{amount}}",
       "paid": "Pagado {{amount}}",
       "paidOf": "Pagado {{paid}} de {{total}}",
-      "pay": "Pagar {{amount}}"
+      "pay": "Pagar {{amount}}",
+      "print": "Imprimir"
     },
     "sale": {
       "title": "Venta",
@@ -658,6 +660,23 @@
     },
     "prescriptions": {
       "sub": "Receta {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Recordatorios de pago",
+      "summary_one": "{{count}} cliente debe {{amount}}",
+      "summary_many": "{{count}} clientes deben {{amount}}",
+      "summary_other": "{{count}} clientes deben {{amount}}",
+      "hint": "WhatsApp se abre con el recordatorio escrito; lo envías desde allí.",
+      "dueOne": "{{amount}} pendiente · Venta #{{seq}}",
+      "dueMany_one": "{{amount}} pendiente · {{count}} venta",
+      "dueMany_many": "{{amount}} pendiente · {{count}} ventas",
+      "dueMany_other": "{{amount}} pendiente · {{count}} ventas",
+      "noPhone": "Sin teléfono guardado",
+      "whatsApp": "Recordar a {{name}} por WhatsApp",
+      "call": "Llamar a {{name}}",
+      "copy": "Copiar el recordatorio para {{name}}",
+      "copied": "Recordatorio para {{name}} copiado",
+      "message": "Hola {{name}}, le recordamos desde {{clinic}} que tiene {{amount}} pendientes por sus medicamentos. Responda aquí si tiene alguna pregunta. ¡Gracias!"
     }
   }
 }

@@ -287,6 +287,8 @@ export const MEDICAL_DRAWER_KEYS = {
     paidOf: 'drawers.orderView.paidOf',
     /** "Pay ₹2,980" (Q-M1). */
     pay: 'drawers.orderView.pay',
+    /** A paid order's primary: its A4 purchase order (`medical.md:339`, Q-M7). */
+    print: 'drawers.orderView.print',
   },
   /** Sale (view) (`medical.md:333–338`; H:5422–5426). */
   sale: {
@@ -384,6 +386,29 @@ export const MEDICAL_DRAWER_KEYS = {
   prescriptions: {
     /** "Rx #500 · 17 Sep 2026 · Flubolt 400, Clonix-B Lotion". */
     sub: 'drawers.prescriptions.sub',
+  },
+  /**
+   * "Send payment reminders" (`medical.md:17`; Q-M6 — the prototype toasts
+   * "WhatsApp reminders sent for unpaid sales", H:5441): who owes the store,
+   * each reached from here; nothing is sent by the app.
+   */
+  reminders: {
+    title: 'drawers.reminders.title',
+    /** "3 customers owe ₹1,742". */
+    summary: 'drawers.reminders.summary',
+    /** What the buttons do — open WhatsApp or the phone; the user sends. */
+    hint: 'drawers.reminders.hint',
+    /** "₹563 due · Sale #983". */
+    dueOne: 'drawers.reminders.dueOne',
+    /** "₹1,226 due · 2 sales". */
+    dueMany: 'drawers.reminders.dueMany',
+    noPhone: 'drawers.reminders.noPhone',
+    whatsApp: 'drawers.reminders.whatsApp',
+    call: 'drawers.reminders.call',
+    copy: 'drawers.reminders.copy',
+    copied: 'drawers.reminders.copied',
+    /** What the customer reads — rendered in the message language (Q-X2). */
+    message: 'drawers.reminders.message',
   },
   /** New / Edit medicine (`medical.md:170–188`). */
   medicine: {
@@ -506,6 +531,7 @@ export const MEDICAL_DRAWER_TEST_IDS = {
   saleReturn: 'sale-return-drawer',
   expiring: 'expiring-return-drawer',
   prescriptions: 'prescriptions-to-fill',
+  reminders: 'payment-reminders',
 } as const;
 
 /** A drawer stacked on another takes its kind's id with this suffix (`supplier-drawer-stacked`). */

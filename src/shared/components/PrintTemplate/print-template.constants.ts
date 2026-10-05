@@ -4,6 +4,7 @@ import type { InvoiceStatus } from '@/shared/api/clinic/clinic-money.ts';
 import type {
   BodyPart,
   OfferingSpecialty,
+  PoStage,
   RxMeal,
   RxTiming,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -129,6 +130,33 @@ export const PRINT_TEMPLATE_KEYS = {
       arms: 'prescription.bodyPart.arms',
     } satisfies Record<Exclude<BodyPart, 'other'>, string>,
   },
+  /**
+   * The purchase order sheet (Q-M7) — no design draws it: the invoice sheet's
+   * anatomy, its items, notes and summary words reused from `invoice`.
+   */
+  purchaseOrder: {
+    supplierInformation: 'purchaseOrder.supplierInformation',
+    orderDetails: 'purchaseOrder.orderDetails',
+    orderDate: 'purchaseOrder.orderDate',
+    /** "Purchase Order:" over "PO #431". */
+    orderNumber: 'purchaseOrder.orderNumber',
+    /** The supplier's own bill number — the drawer's "Invoice no.". */
+    invoiceNumber: 'purchaseOrder.invoiceNumber',
+    gstin: 'purchaseOrder.gstin',
+    stages: {
+      ordered: 'purchaseOrder.stages.ordered',
+      received: 'purchaseOrder.stages.received',
+      paid: 'purchaseOrder.stages.paid',
+      cancelled: 'purchaseOrder.stages.cancelled',
+    } satisfies Record<PoStage, string>,
+    batch: 'purchaseOrder.batch',
+    expiry: 'purchaseOrder.expiry',
+    free: 'purchaseOrder.free',
+    rate: 'purchaseOrder.rate',
+    paid: 'purchaseOrder.paid',
+    /** The footer's first line: the clinic the order is from. */
+    issuedBy: 'purchaseOrder.issuedBy',
+  },
 } as const;
 
 /** Test ids of the print host and the sheets (`docs/reference/e2e-testids-inventory.md`). */
@@ -139,5 +167,8 @@ export const PRINT_TEMPLATE_TEST_IDS = {
   invoiceSummary: 'invoice-print-summary',
   prescription: 'prescription-print',
   prescriptionItems: 'prescription-print-items',
+  purchaseOrder: 'purchase-order-print',
+  purchaseOrderItems: 'purchase-order-print-items',
+  purchaseOrderSummary: 'purchase-order-print-summary',
   footer: 'print-footer',
 } as const;

@@ -1,21 +1,80 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  clinicOrganization,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 
 import {
   fetchMedicalSale,
   fetchPurchaseOrder,
+  fetchPurchaseOrderSheet,
   fetchSupplier,
   listManufacturers,
   listMedicalReps,
   listMedicalSales,
   listPurchaseOrders,
+  listSaleReminders,
   listSuppliers,
   medicalListSummary,
 } from './medical-api.ts';
 
 afterEach(() => resetClinicFixtures());
+
+describe('payment reminders (`medical.md:17`, Q-M6)', () => {
+  it('lists each customer the unpaid sales name, with their due and sales', async () => {
+    const { clinicName, customers } = await listSaleReminders();
+    expect(clinicName).toBe(clinicOrganization().name);
+    expect(customers).toEqual([
+      {
+        customer: expect.objectContaining({ kind: 'patient', name: 'Dharti Galani' }),
+        due: 56_300,
+        saleSeqs: [978],
+      },
+    ]);
+    // The list's search applies: Rhea's sale is paid, so no one is left.
+    expect((await listSaleReminders({ q: 'rhea' })).customers).toEqual([]);
+  });
+
+  it('sums a customer’s unpaid sales, oldest first', async () => {
+    // Rhea's #983 becomes Dharti's, its payment undone.
+    const dharti = (await clinicFixtures.medicalSales.get(ref.medicalSale(978)))
+      .patientId;
+    const sale = await clinicFixtures.medicalSales.update(ref.medicalSale(983), {
+      patientId: dharti,
+    });
+    for (const payment of clinicFixtures.payments.snapshot(
+      (row) => row.invoiceId === sale.invoiceId,
+    )) {
+      await clinicFixtures.payments.remove(payment.id, 'mistake', null);
+    }
+    const { bill } = await fetchMedicalSale(sale.id);
+    const { customers } = await listSaleReminders();
+    expect(customers).toHaveLength(1);
+    expect(customers[0]).toMatchObject({ due: 56_300 + bill, saleSeqs: [978, 983] });
+  });
+});
+
+describe('the purchase order sheet (Q-M7)', () => {
+  it('reads the order with its supplier, the clinic and its main branch', async () => {
+    const sheet = await fetchPurchaseOrderSheet(ref.purchaseOrder(428));
+    expect(sheet.order).toMatchObject({ seq: 428, supplierName: 'Akshar Medicines' });
+    expect(sheet.supplier.name).toBe('Akshar Medicines');
+    expect(sheet.organization).toMatchObject({ name: clinicOrganization().name });
+    const [main] = clinicFixtures.branches.snapshot((row) => row.isMain);
+    expect(sheet.branch).toEqual({
+      phone: main?.phone,
+      gstNumber: main?.gstNumber ?? null,
+    });
+    // A supplier removed since still prints on its order.
+    await clinicFixtures.suppliers.remove(ref.supplier(52), 'mistake', null);
+    expect((await fetchPurchaseOrderSheet(ref.purchaseOrder(428))).supplier.name).toBe(
+      'Akshar Medicines',
+    );
+  });
+});
 
 describe('sales (`S:1657`)', () => {
   it('reads each sale with its customer, lines, bill, cost and status, newest first', async () => {

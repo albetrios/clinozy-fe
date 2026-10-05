@@ -98,5 +98,25 @@
       "legs": "Beine",
       "arms": "Arme"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "Lieferanteninformationen",
+    "orderDetails": "Bestelldetails",
+    "orderDate": "Bestelldatum:",
+    "orderNumber": "Bestellung:",
+    "invoiceNumber": "Rechnungsnr.:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "Bestellt",
+      "received": "Erhalten",
+      "paid": "Bezahlt",
+      "cancelled": "Storniert"
+    },
+    "batch": "Charge",
+    "expiry": "Ablauf",
+    "free": "Gratis",
+    "rate": "Preis",
+    "paid": "Bezahlt:",
+    "issuedBy": "Bestellung von {{clinic}}"
   }
 }

@@ -99,5 +99,25 @@
       "legs": "Pernas",
       "arms": "Braços"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "Informações do fornecedor",
+    "orderDetails": "Detalhes do pedido",
+    "orderDate": "Data do pedido:",
+    "orderNumber": "Pedido de compra:",
+    "invoiceNumber": "Nº da nota:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "Pedido",
+      "received": "Recebido",
+      "paid": "Pago",
+      "cancelled": "Cancelado"
+    },
+    "batch": "Lote",
+    "expiry": "Validade",
+    "free": "Bônus",
+    "rate": "Preço",
+    "paid": "Pago:",
+    "issuedBy": "Pedido de compra de {{clinic}}"
   }
 }

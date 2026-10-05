@@ -98,5 +98,25 @@
       "legs": "Legs",
       "arms": "Arms"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "Supplier Information",
+    "orderDetails": "Order Details",
+    "orderDate": "Order Date:",
+    "orderNumber": "Purchase Order:",
+    "invoiceNumber": "Invoice No.:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "Ordered",
+      "received": "Received",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "batch": "Batch",
+    "expiry": "Expiry",
+    "free": "Free",
+    "rate": "Rate",
+    "paid": "Paid:",
+    "issuedBy": "Purchase order from {{clinic}}"
   }
 }

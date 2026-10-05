@@ -36,6 +36,7 @@
     "sellAllDiscount": "Vender tudo com 20% de desconto",
     "removeDiscount": "Remover desconto por validade",
     "prescriptions": "Receitas a atender",
+    "paymentReminders": "Enviar lembretes de pagamento",
     "payAllReceived": "Pagar todo o recebido · {{amount}}"
   },
   "filters": {
@@ -580,7 +581,8 @@
       "payable": "A pagar {{amount}}",
       "paid": "Pago {{amount}}",
       "paidOf": "Pago {{paid}} de {{total}}",
-      "pay": "Pagar {{amount}}"
+      "pay": "Pagar {{amount}}",
+      "print": "Imprimir"
     },
     "sale": {
       "title": "Venda",
@@ -658,6 +660,23 @@
     },
     "prescriptions": {
       "sub": "Receita {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Lembretes de pagamento",
+      "summary_one": "{{count}} cliente deve {{amount}}",
+      "summary_many": "{{count}} clientes devem {{amount}}",
+      "summary_other": "{{count}} clientes devem {{amount}}",
+      "hint": "O WhatsApp abre com o lembrete pronto; você envia por lá.",
+      "dueOne": "{{amount}} em aberto · Venda #{{seq}}",
+      "dueMany_one": "{{amount}} em aberto · {{count}} venda",
+      "dueMany_many": "{{amount}} em aberto · {{count}} vendas",
+      "dueMany_other": "{{amount}} em aberto · {{count}} vendas",
+      "noPhone": "Nenhum telefone salvo",
+      "whatsApp": "Lembrar {{name}} pelo WhatsApp",
+      "call": "Ligar para {{name}}",
+      "copy": "Copiar o lembrete para {{name}}",
+      "copied": "Lembrete para {{name}} copiado",
+      "message": "Olá, {{name}}! Este é um lembrete de {{clinic}}: há {{amount}} em aberto pelos seus medicamentos. Responda aqui se tiver alguma dúvida. Obrigado!"
     }
   }
 }

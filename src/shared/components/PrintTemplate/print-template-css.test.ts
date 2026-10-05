@@ -140,6 +140,7 @@ describe('the print sheets’ stylesheet', () => {
         'shared/components/PrintTemplate/PrintTemplate.tsx',
         'shared/components/PrintTemplate/InvoicePrint/InvoicePrint.tsx',
         'shared/components/PrintTemplate/PrescriptionPrint/PrescriptionPrint.tsx',
+        'shared/components/PrintTemplate/PurchaseOrderPrint/PurchaseOrderPrint.tsx',
       ]),
     );
     const named = sheets.flatMap((sheet) => sheet.utilities);

@@ -13,6 +13,7 @@ import {
 import {
   invoiceBalance,
   invoiceLineAmounts,
+  purchaseOrderDue,
   purchaseOrderTotal,
 } from '@/shared/api/clinic/clinic-money.ts';
 import type {
@@ -35,8 +36,11 @@ import {
   PURCHASE_STAGE_ORDER,
   type PurchaseOrderListParams,
   type PurchaseOrderRow,
+  type PurchaseOrderSheet,
   type SaleCustomer,
   type SaleListParams,
+  type SaleReminder,
+  type SaleReminders,
   type SaleRow,
   type SupplierListParams,
   type SupplierRow,
@@ -57,9 +61,15 @@ export const medicalQueryKeys = {
   all: MEDICAL_ROOM_QUERY_KEY,
   sales: (params: SaleListParams) => [...medicalQueryKeys.all, 'sales', params] as const,
   sale: (id: string) => [...medicalQueryKeys.all, 'sale', id] as const,
+  /** "Send payment reminders": who the unpaid sales the list matches name. */
+  saleReminders: (params: SaleListParams) =>
+    [...medicalQueryKeys.all, 'sale-reminders', params] as const,
   purchaseOrders: (params: PurchaseOrderListParams) =>
     [...medicalQueryKeys.all, 'purchase-orders', params] as const,
   purchaseOrder: (id: string) => [...medicalQueryKeys.all, 'purchase-order', id] as const,
+  /** What an order's A4 sheet prints beyond the order. */
+  purchaseOrderSheet: (id: string) =>
+    [...medicalQueryKeys.all, 'purchase-order-sheet', id] as const,
   suppliers: (params: SupplierListParams) =>
     [...medicalQueryKeys.all, 'suppliers', params] as const,
   supplier: (id: string) => [...medicalQueryKeys.all, 'supplier', id] as const,
@@ -231,6 +241,39 @@ export async function listMedicalSales(
   return cursorPageOf(await salesFor(params), cursor);
 }
 
+/**
+ * Who "Send payment reminders" lists (`medical.md:17`; the prototype only
+ * toasts, H:5441; REPLACE_WITH_API): each customer the unpaid sales name —
+ * the list's search and Created applied — with what they owe across them and
+ * their sale numbers, the largest due first; a sale with no customer on
+ * record has no one to remind. The clinic's name comes with them, for the
+ * message.
+ */
+export async function listSaleReminders(
+  params: SaleListParams = {},
+): Promise<SaleReminders> {
+  const { clinicOrganization } = await fixtureWorld();
+  const rows = await salesFor({ q: params.q, created: params.created, status: 'unpaid' });
+  const byCustomer = new Map<string, SaleReminder>();
+  for (const row of [...rows].sort((a, b) => a.seq - b.seq)) {
+    if (!row.customer || row.due <= 0) continue;
+    const key = `${row.customer.kind}:${row.customer.id}`;
+    const known = byCustomer.get(key);
+    if (known) {
+      known.due += row.due;
+      known.saleSeqs.push(row.seq);
+    } else {
+      byCustomer.set(key, { customer: row.customer, due: row.due, saleSeqs: [row.seq] });
+    }
+  }
+  return {
+    clinicName: clinicOrganization().name,
+    customers: [...byCustomer.values()].sort(
+      (a, b) => b.due - a.due || a.customer.name.localeCompare(b.customer.name),
+    ),
+  };
+}
+
 /** One sale as its row — a 404 when it is unknown, deleted or voided. */
 export async function fetchMedicalSale(id: string): Promise<SaleRow> {
   const { clinicFixtures } = await fixtureWorld();
@@ -250,17 +293,13 @@ function toPurchaseOrderRow(
   suppliers: Map<string, string>,
   medicines: Map<string, string>,
 ): PurchaseOrderRow {
-  const total = purchaseOrderTotal(order.items);
   return {
     ...order,
     supplierName: suppliers.get(order.supplierId) ?? '',
     itemNames: order.items.map((item) => medicines.get(item.medicineId) ?? ''),
     freeCount: order.items.reduce((sum, item) => sum + item.free, 0),
-    total,
-    // Only a received order is billed and unsettled: an Ordered one is not
-    // billed yet, a Paid one is settled (the prototype's "Paid ₹1,200 of
-    // ₹1,296" still owes nothing, H:5421).
-    due: order.stage === 'received' ? Math.max(0, total - order.paid) : 0,
+    total: purchaseOrderTotal(order.items),
+    due: purchaseOrderDue(order),
   };
 }
 
@@ -328,6 +367,36 @@ export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> 
     clinicFixtures.medicines.snapshot().map((row) => [row.id, row.name]),
   );
   return toPurchaseOrderRow(order, suppliers, medicines);
+}
+
+/**
+ * A purchase order and what its A4 sheet prints with it (Q-M7;
+ * REPLACE_WITH_API): its supplier — read even if since removed — and the
+ * clinic with its main branch's phone and GSTIN, as an order names no branch.
+ */
+export async function fetchPurchaseOrderSheet(id: string): Promise<PurchaseOrderSheet> {
+  const { clinicFixtures, clinicOrganization } = await fixtureWorld();
+  const order = await fetchPurchaseOrder(id);
+  const supplier = await clinicFixtures.suppliers.get(order.supplierId, {
+    includeDeleted: true,
+  });
+  const branches = clinicFixtures.branches.snapshot();
+  const branch = branches.find((row) => row.isMain) ?? branches[0];
+  const organization = clinicOrganization();
+  return {
+    order,
+    supplier: {
+      name: supplier.name,
+      phone: supplier.phone,
+      gstNumber: supplier.gstNumber,
+    },
+    organization: {
+      name: organization.name,
+      specialties: organization.specialties,
+      currency: organization.currency,
+    },
+    branch: { phone: branch?.phone ?? '', gstNumber: branch?.gstNumber ?? null },
+  };
 }
 
 // ── Suppliers ──

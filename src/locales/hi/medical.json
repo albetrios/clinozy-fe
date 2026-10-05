@@ -36,6 +36,7 @@
     "sellAllDiscount": "सब 20% छूट पर बेचें",
     "removeDiscount": "एक्सपायरी छूट हटाएँ",
     "prescriptions": "भरने वाले प्रिस्क्रिप्शन",
+    "paymentReminders": "भुगतान रिमाइंडर भेजें",
     "payAllReceived": "सभी प्राप्त का भुगतान · {{amount}}"
   },
   "filters": {
@@ -562,7 +563,8 @@
       "payable": "देय {{amount}}",
       "paid": "भुगतान {{amount}}",
       "paidOf": "{{total}} में से {{paid}} का भुगतान",
-      "pay": "{{amount}} का भुगतान करें"
+      "pay": "{{amount}} का भुगतान करें",
+      "print": "प्रिंट करें"
     },
     "sale": {
       "title": "बिक्री",
@@ -637,6 +639,21 @@
     },
     "prescriptions": {
       "sub": "पर्चा {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "भुगतान रिमाइंडर",
+      "summary_one": "{{count}} ग्राहक पर {{amount}} बकाया है",
+      "summary_other": "{{count}} ग्राहकों पर {{amount}} बकाया है",
+      "hint": "WhatsApp रिमाइंडर लिखे हुए खुलता है — आप वहीं से भेजते हैं।",
+      "dueOne": "{{amount}} बकाया · बिक्री #{{seq}}",
+      "dueMany_one": "{{amount}} बकाया · {{count}} बिक्री",
+      "dueMany_other": "{{amount}} बकाया · {{count}} बिक्रियाँ",
+      "noPhone": "कोई फ़ोन सेव नहीं है",
+      "whatsApp": "{{name}} को WhatsApp पर याद दिलाएँ",
+      "call": "{{name}} को कॉल करें",
+      "copy": "{{name}} के लिए रिमाइंडर कॉपी करें",
+      "copied": "{{name}} के लिए रिमाइंडर कॉपी हो गया",
+      "message": "नमस्ते {{name}}, {{clinic}} की ओर से याद दिला रहे हैं कि आपकी दवाओं के {{amount}} बकाया हैं। कोई सवाल हो तो यहीं जवाब दें। धन्यवाद!"
     }
   }
 }

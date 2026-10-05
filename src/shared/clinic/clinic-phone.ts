@@ -28,9 +28,13 @@ export function telHref(phone: string): string {
   return `tel:${phone.replace(/[^\d+]/g, '')}`;
 }
 
-/** A WhatsApp chat link (`wa.me` takes the number with its country code, digits only). */
-export function whatsAppHref(phone: string): string {
-  return `https://wa.me/${phone.replace(/\D/g, '')}`;
+/**
+ * A WhatsApp chat link (`wa.me` takes the number with its country code, digits
+ * only); with `text`, the chat opens with that message typed, ready to send.
+ */
+export function whatsAppHref(phone: string, text?: string): string {
+  const chat = `https://wa.me/${phone.replace(/\D/g, '')}`;
+  return text ? `${chat}?text=${encodeURIComponent(text)}` : chat;
 }
 
 /** An Instagram profile link for a handle, with or without its "@". */

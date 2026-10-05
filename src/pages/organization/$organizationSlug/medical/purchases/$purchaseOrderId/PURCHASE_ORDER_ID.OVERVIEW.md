@@ -1,7 +1,7 @@
 # `pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId` — Purchase order
 
 Route: `/organization/$organizationSlug/medical/purchases/$purchaseOrderId` — a URL-driven dialog over Medical › Purchases (KICKOFF §4,
-D24): the read-only Purchase order view (`S:58`) of a received or paid order. The route renders nothing: the Purchases page reads the URL and opens the
+D24): the read-only Purchase order view (`S:58`) of a received or paid order — a paid one prints its A4 purchase order (L-64, Q-M7). The route renders nothing: the Purchases page reads the URL and opens the
 drawer over the list, so a refresh or a shared link reopens it; an unknown id leaves the list
 in place with "<Record> not found" (`S:115`). Gated like the room — membership
 (`organization:read`) and the `clinic-medical` module, then `requireOrgStatus`.

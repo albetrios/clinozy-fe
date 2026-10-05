@@ -97,5 +97,25 @@
       "legs": "腿部",
       "arms": "手臂"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "供应商信息",
+    "orderDetails": "订单详情",
+    "orderDate": "下单日期：",
+    "orderNumber": "采购单：",
+    "invoiceNumber": "发票号：",
+    "gstin": "GSTIN：",
+    "stages": {
+      "ordered": "已下单",
+      "received": "已收货",
+      "paid": "已付款",
+      "cancelled": "已取消"
+    },
+    "batch": "批次",
+    "expiry": "有效期",
+    "free": "赠品",
+    "rate": "单价",
+    "paid": "已付：",
+    "issuedBy": "{{clinic}} 采购单"
   }
 }

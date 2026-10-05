@@ -36,6 +36,7 @@
     "sellAllDiscount": "Alle mit 20 % Rabatt verkaufen",
     "removeDiscount": "Ablaufrabatt entfernen",
     "prescriptions": "Offene Rezepte",
+    "paymentReminders": "Zahlungserinnerungen senden",
     "payAllReceived": "Alle erhaltenen zahlen · {{amount}}"
   },
   "filters": {
@@ -562,7 +563,8 @@
       "payable": "Offen {{amount}}",
       "paid": "Bezahlt {{amount}}",
       "paidOf": "{{paid}} von {{total}} bezahlt",
-      "pay": "{{amount}} zahlen"
+      "pay": "{{amount}} zahlen",
+      "print": "Drucken"
     },
     "sale": {
       "title": "Verkauf",
@@ -637,6 +639,21 @@
     },
     "prescriptions": {
       "sub": "Rezept {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Zahlungserinnerungen",
+      "summary_one": "{{count}} Kunde schuldet {{amount}}",
+      "summary_other": "{{count}} Kunden schulden {{amount}}",
+      "hint": "WhatsApp öffnet sich mit der fertigen Erinnerung – Sie senden sie dort ab.",
+      "dueOne": "{{amount}} offen · Verkauf #{{seq}}",
+      "dueMany_one": "{{amount}} offen · {{count}} Verkauf",
+      "dueMany_other": "{{amount}} offen · {{count}} Verkäufe",
+      "noPhone": "Keine Telefonnummer gespeichert",
+      "whatsApp": "{{name}} per WhatsApp erinnern",
+      "call": "{{name}} anrufen",
+      "copy": "Erinnerung für {{name}} kopieren",
+      "copied": "Erinnerung für {{name}} kopiert",
+      "message": "Hallo {{name}}, dies ist eine Erinnerung von {{clinic}}: Für Ihre Medikamente sind noch {{amount}} offen. Antworten Sie gern hier, wenn Sie Fragen haben. Vielen Dank!"
     }
   }
 }

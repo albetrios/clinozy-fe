@@ -36,6 +36,7 @@
     "sellAllDiscount": "모두 20% 할인 판매",
     "removeDiscount": "유효기간 임박 할인 해제",
     "prescriptions": "조제할 처방전",
+    "paymentReminders": "결제 알림 보내기",
     "payAllReceived": "입고분 모두 지불 · {{amount}}"
   },
   "filters": {
@@ -544,7 +545,8 @@
       "payable": "미지급 {{amount}}",
       "paid": "지급 {{amount}}",
       "paidOf": "{{total}} 중 {{paid}} 지급",
-      "pay": "{{amount}} 지불"
+      "pay": "{{amount}} 지불",
+      "print": "인쇄"
     },
     "sale": {
       "title": "판매",
@@ -616,6 +618,19 @@
     },
     "prescriptions": {
       "sub": "처방 {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "결제 알림",
+      "summary_other": "고객 {{count}}명이 {{amount}}을(를) 미결제 중입니다",
+      "hint": "WhatsApp이 알림이 작성된 상태로 열리며, 전송은 WhatsApp에서 직접 합니다.",
+      "dueOne": "{{amount}} 미결제 · 판매 #{{seq}}",
+      "dueMany_other": "{{amount}} 미결제 · 판매 {{count}}건",
+      "noPhone": "저장된 전화번호 없음",
+      "whatsApp": "WhatsApp으로 {{name}}님에게 알림",
+      "call": "{{name}}님에게 전화",
+      "copy": "{{name}}님에게 보낼 알림 복사",
+      "copied": "{{name}}님에게 보낼 알림을 복사했습니다",
+      "message": "{{name}}님, 안녕하세요. {{clinic}}에서 알려 드립니다. 의약품 대금 {{amount}}이(가) 아직 결제되지 않았습니다. 궁금한 점이 있으시면 여기로 답장해 주세요. 감사합니다!"
     }
   }
 }

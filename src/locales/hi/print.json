@@ -98,5 +98,25 @@
       "legs": "पैर",
       "arms": "बाँहें"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "सप्लायर की जानकारी",
+    "orderDetails": "ऑर्डर का विवरण",
+    "orderDate": "ऑर्डर की तारीख:",
+    "orderNumber": "परचेज़ ऑर्डर:",
+    "invoiceNumber": "इनवॉइस नं.:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "ऑर्डर किया",
+      "received": "प्राप्त",
+      "paid": "भुगतान हो गया",
+      "cancelled": "रद्द"
+    },
+    "batch": "बैच",
+    "expiry": "एक्सपायरी",
+    "free": "मुफ़्त",
+    "rate": "रेट",
+    "paid": "भुगतान:",
+    "issuedBy": "{{clinic}} की ओर से परचेज़ ऑर्डर"
   }
 }

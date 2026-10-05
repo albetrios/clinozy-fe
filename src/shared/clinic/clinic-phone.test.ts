@@ -45,6 +45,13 @@ describe('clinic phones', () => {
     expect(whatsAppHref('+919825044120')).toBe('https://wa.me/919825044120');
   });
 
+  it('opens a WhatsApp chat with a message typed, encoded', () => {
+    expect(whatsAppHref('+919825044120', 'Hi Rhea, ₹563 is due. Thanks!')).toBe(
+      'https://wa.me/919825044120?text=Hi%20Rhea%2C%20%E2%82%B9563%20is%20due.%20Thanks!',
+    );
+    expect(whatsAppHref('+919825044120', '')).toBe('https://wa.me/919825044120');
+  });
+
   it('links an Instagram handle with or without its @, encoded', () => {
     expect(instagramHref('@rhea.shah')).toBe('https://instagram.com/rhea.shah');
     expect(instagramHref('rhea_skin')).toBe('https://instagram.com/rhea_skin');

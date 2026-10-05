@@ -13,10 +13,15 @@ export interface ReachLink {
   external: boolean;
 }
 
-/** The links a channel offers, labelled by the host (WhatsApp then Call; Call; Instagram). */
+/**
+ * The links a channel offers, labelled by the host (WhatsApp then Call; Call;
+ * Instagram). With `message`, WhatsApp opens with it typed — a payment
+ * reminder, ready to send.
+ */
 export function reachLinks(
   reach: ContactReach,
   labels: { whatsApp: string; call: string; instagram: string },
+  message?: string,
 ): ReachLink[] {
   if (reach.channel === 'instagram') {
     return [
@@ -37,7 +42,7 @@ export function reachLinks(
   if (reach.channel === 'phone') return [call];
   return [
     {
-      href: whatsAppHref(reach.phone),
+      href: whatsAppHref(reach.phone, message),
       label: labels.whatsApp,
       icon: <WhatsAppMark className="size-3.5" />,
       external: true,

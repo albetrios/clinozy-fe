@@ -102,5 +102,25 @@
       "legs": "الساقان",
       "arms": "الذراعان"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "معلومات المورد",
+    "orderDetails": "تفاصيل الطلب",
+    "orderDate": "تاريخ الطلب:",
+    "orderNumber": "أمر الشراء:",
+    "invoiceNumber": "رقم الفاتورة:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "تم الطلب",
+      "received": "مستلم",
+      "paid": "مدفوع",
+      "cancelled": "ملغى"
+    },
+    "batch": "التشغيلة",
+    "expiry": "الانتهاء",
+    "free": "مجاني",
+    "rate": "السعر",
+    "paid": "المدفوع:",
+    "issuedBy": "أمر شراء من {{clinic}}"
   }
 }

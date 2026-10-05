@@ -97,5 +97,25 @@
       "legs": "脚",
       "arms": "腕"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "仕入先情報",
+    "orderDetails": "発注の詳細",
+    "orderDate": "発注日：",
+    "orderNumber": "発注書：",
+    "invoiceNumber": "請求書番号：",
+    "gstin": "GSTIN：",
+    "stages": {
+      "ordered": "発注済み",
+      "received": "受領済み",
+      "paid": "支払済み",
+      "cancelled": "キャンセル済み"
+    },
+    "batch": "ロット",
+    "expiry": "有効期限",
+    "free": "無償",
+    "rate": "単価",
+    "paid": "支払額：",
+    "issuedBy": "{{clinic}} からの発注書"
   }
 }

@@ -1,6 +1,7 @@
 import type {
   Invoice,
   InvoiceItem,
+  MedicalPurchaseOrder,
   Payment,
   PaymentMode,
   PurchaseItem,
@@ -250,6 +251,11 @@ export function belowFloor(item: LineFields, floor: number | null): boolean {
   return floor !== null && invoiceLineAmounts(item).net + FLOOR_TOLERANCE < floor;
 }
 
+/** A purchase line's amount, in paise: qty × rate — free units cost nothing (`S:830`). */
+export function purchaseLineAmount(item: Pick<PurchaseItem, 'qty' | 'rate'>): number {
+  return item.qty * item.rate;
+}
+
 /**
  * A Medical purchase order's bill, in paise (`S:830`, "bill → Σ qty × rate"):
  * free units cost nothing. What is due is this less the order's `paid`.
@@ -257,5 +263,20 @@ export function belowFloor(item: LineFields, floor: number | null): boolean {
 export function purchaseOrderTotal(
   items: readonly Pick<PurchaseItem, 'qty' | 'rate'>[],
 ): number {
-  return items.reduce((sum, item) => sum + item.qty * item.rate, 0);
+  return items.reduce((sum, item) => sum + purchaseLineAmount(item), 0);
+}
+
+/**
+ * What is still owed on a Medical purchase order, in paise (`S:830`, "due →
+ * bill − paid"): only a received order is billed and unsettled — an Ordered
+ * one is not billed yet, a Paid one is settled (the prototype's "Paid ₹1,200
+ * of ₹1,296" still owes nothing, H:5421).
+ */
+export function purchaseOrderDue(
+  order: Pick<MedicalPurchaseOrder, 'stage' | 'paid'> & {
+    items: readonly Pick<PurchaseItem, 'qty' | 'rate'>[];
+  },
+): number {
+  if (order.stage !== 'received') return 0;
+  return Math.max(0, purchaseOrderTotal(order.items) - order.paid);
 }

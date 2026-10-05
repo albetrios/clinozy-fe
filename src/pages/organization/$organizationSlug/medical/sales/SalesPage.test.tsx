@@ -145,6 +145,24 @@ describe('SalesPage', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('Unpaid offers "Send payment reminders" for the customers who owe (Q-M6)', async () => {
+    const user = setup();
+    const view = renderMedicalRoutes(`${ROOM}?status=unpaid`, { sales: SalesPage });
+    await user.click(await screen.findByTestId('medical-sales-view-action-reminders'));
+    const panel = await screen.findByTestId('payment-reminders');
+    const [row] = within(panel).getAllByTestId('payment-reminders-row');
+    expect(row).toHaveTextContent('Dharti Galani');
+    expect(row).toHaveTextContent(/₹563 due · Sale #978/);
+    view.unmount();
+
+    // Returned has no view action.
+    renderMedicalRoutes(`${ROOM}?status=returned`, { sales: SalesPage });
+    expect(await screen.findByTestId('medical-sales-page')).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('medical-sales-view-action-reminders'),
+    ).not.toBeInTheDocument();
+  });
+
   it('New sale is the Invoice drawer with Medical locked, closing back to the room it came from', async () => {
     const user = setup();
     const { router } = renderMedicalRoutes(`${ROOM}/create?from=today`, {

@@ -97,5 +97,25 @@
       "legs": "다리",
       "arms": "팔"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "공급업체 정보",
+    "orderDetails": "주문 정보",
+    "orderDate": "주문일:",
+    "orderNumber": "구매 주문:",
+    "invoiceNumber": "송장 번호:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "주문됨",
+      "received": "입고됨",
+      "paid": "결제 완료",
+      "cancelled": "취소됨"
+    },
+    "batch": "배치",
+    "expiry": "유효기간",
+    "free": "무상",
+    "rate": "단가",
+    "paid": "결제액:",
+    "issuedBy": "{{clinic}}의 구매 주문"
   }
 }

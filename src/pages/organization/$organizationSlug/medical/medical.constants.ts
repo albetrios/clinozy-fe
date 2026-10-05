@@ -43,6 +43,8 @@ export const MEDICAL_KEYS = {
     sellAllDiscount: 'viewActions.sellAllDiscount',
     removeDiscount: 'viewActions.removeDiscount',
     prescriptions: 'viewActions.prescriptions',
+    /** Sales with Status Unpaid (`medical.md:17`, Q-M6). */
+    paymentReminders: 'viewActions.paymentReminders',
     /** "Pay all received · ₹2,980". */
     payAllReceived: 'viewActions.payAllReceived',
   },

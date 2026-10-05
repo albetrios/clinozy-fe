@@ -24,24 +24,31 @@ import {
  */
 
 /** Which sheet — each leaves its own letterhead space. */
-export type PrintSheetKind = 'invoice' | 'prescription';
+export type PrintSheetKind = 'invoice' | 'prescription' | 'purchaseOrder';
+
+// H:436 — 169.5mm wide, 38.1mm from the top, 23.3mm from the inline start.
+const INVOICE_SPACE = { sheet: 'pt-[38.1mm] ps-[23.3mm]', content: 'w-[169.5mm]' };
 
 const SHEET_SPACE: Record<PrintSheetKind, { sheet: string; content: string }> = {
-  // H:436 — 169.5mm wide, 38.1mm from the top, 23.3mm from the inline start.
-  invoice: { sheet: 'pt-[38.1mm] ps-[23.3mm]', content: 'w-[169.5mm]' },
+  invoice: INVOICE_SPACE,
   // H:456 — 178.1mm wide, 42.3mm from the top, 19mm from the inline start.
   prescription: { sheet: 'pt-[42.3mm] ps-[19mm]', content: 'w-[178.1mm]' },
+  // No design draws it (Q-M7): the invoice sheet's letterhead space.
+  purchaseOrder: INVOICE_SPACE,
+};
+
+const INVOICE_FOOTER = {
+  footer: 'mt-[4.55mm] gap-[2.6mm] pt-[2mm]',
+  thanks: 'text-[3.6mm] leading-[4.2mm]',
 };
 
 const FOOTER_STYLE: Record<PrintSheetKind, { footer: string; thanks: string }> = {
-  invoice: {
-    footer: 'mt-[4.55mm] gap-[2.6mm] pt-[2mm]',
-    thanks: 'text-[3.6mm] leading-[4.2mm]',
-  },
+  invoice: INVOICE_FOOTER,
   prescription: {
     footer: 'mt-[4.4mm] gap-[1.45mm] pt-[1.3mm]',
     thanks: 'leading-[3.9mm]',
   },
+  purchaseOrder: INVOICE_FOOTER,
 };
 
 /**
@@ -129,7 +136,8 @@ export function PrintField({
  * The footer: the thank-you line, the branch phone and its GSTIN — from the
  * organization and the branch, never the design's sample clinic (H:453,
  * H:510–511). The thank-you follows the clinic's first specialty; a Medical
- * sheet thanks for "medicine needs".
+ * sheet thanks for "medicine needs". A purchase order goes to a supplier, not
+ * a patient: its first line names the clinic it is from.
  */
 export function PrintFooter({
   kind,
@@ -144,9 +152,10 @@ export function PrintFooter({
 }) {
   const { t } = usePrintTranslation();
   const style = FOOTER_STYLE[kind];
-  const thanksKey = medical
-    ? PRINT_TEMPLATE_KEYS.thanksMedicine
-    : PRINT_TEMPLATE_KEYS.thanks[organization.specialties[0] ?? 'general'];
+  let thanksKey: string =
+    PRINT_TEMPLATE_KEYS.thanks[organization.specialties[0] ?? 'general'];
+  if (medical) thanksKey = PRINT_TEMPLATE_KEYS.thanksMedicine;
+  if (kind === 'purchaseOrder') thanksKey = PRINT_TEMPLATE_KEYS.purchaseOrder.issuedBy;
   return (
     <footer
       data-testid={PRINT_TEMPLATE_TEST_IDS.footer}

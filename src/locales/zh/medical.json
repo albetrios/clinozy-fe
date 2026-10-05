@@ -36,6 +36,7 @@
     "sellAllDiscount": "全部八折出售",
     "removeDiscount": "取消临期折扣",
     "prescriptions": "待配处方",
+    "paymentReminders": "发送付款提醒",
     "payAllReceived": "支付全部已收货 · {{amount}}"
   },
   "filters": {
@@ -544,7 +545,8 @@
       "payable": "应付 {{amount}}",
       "paid": "已付 {{amount}}",
       "paidOf": "已付 {{paid}} / {{total}}",
-      "pay": "支付 {{amount}}"
+      "pay": "支付 {{amount}}",
+      "print": "打印"
     },
     "sale": {
       "title": "销售",
@@ -616,6 +618,19 @@
     },
     "prescriptions": {
       "sub": "处方 {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "付款提醒",
+      "summary_other": "{{count}} 位客户共欠 {{amount}}",
+      "hint": "WhatsApp 会打开并填好提醒内容，由您在那里发送。",
+      "dueOne": "欠款 {{amount}} · 销售 #{{seq}}",
+      "dueMany_other": "欠款 {{amount}} · {{count}} 笔销售",
+      "noPhone": "未保存电话",
+      "whatsApp": "通过 WhatsApp 提醒{{name}}",
+      "call": "致电{{name}}",
+      "copy": "复制给{{name}}的提醒",
+      "copied": "已复制给{{name}}的提醒",
+      "message": "{{name}}您好，这是来自{{clinic}}的提醒：您的药品费用还有 {{amount}} 未付。如有任何疑问，请直接在此回复。谢谢！"
     }
   }
 }

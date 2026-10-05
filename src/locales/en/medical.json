@@ -36,6 +36,7 @@
     "sellAllDiscount": "Sell all at 20% off",
     "removeDiscount": "Remove near-expiry discount",
     "prescriptions": "Prescriptions to fill",
+    "paymentReminders": "Send payment reminders",
     "payAllReceived": "Pay all received · {{amount}}"
   },
   "filters": {
@@ -562,7 +563,8 @@
       "payable": "Payable {{amount}}",
       "paid": "Paid {{amount}}",
       "paidOf": "Paid {{paid}} of {{total}}",
-      "pay": "Pay {{amount}}"
+      "pay": "Pay {{amount}}",
+      "print": "Print"
     },
     "sale": {
       "title": "Sale",
@@ -637,6 +639,21 @@
     },
     "prescriptions": {
       "sub": "Rx {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Payment reminders",
+      "summary_one": "{{count}} customer owes {{amount}}",
+      "summary_other": "{{count}} customers owe {{amount}}",
+      "hint": "WhatsApp opens with the reminder typed — you send it from there.",
+      "dueOne": "{{amount}} due · Sale #{{seq}}",
+      "dueMany_one": "{{amount}} due · {{count}} sale",
+      "dueMany_other": "{{amount}} due · {{count}} sales",
+      "noPhone": "No phone saved",
+      "whatsApp": "Remind {{name}} on WhatsApp",
+      "call": "Call {{name}}",
+      "copy": "Copy the reminder for {{name}}",
+      "copied": "Reminder for {{name}} copied",
+      "message": "Hi {{name}}, this is a reminder from {{clinic}} that {{amount}} is due for your medicines. Reply here if you have any questions. Thank you!"
     }
   }
 }

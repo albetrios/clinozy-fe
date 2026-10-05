@@ -36,6 +36,7 @@
     "sellAllDiscount": "Tout vendre à −20 %",
     "removeDiscount": "Retirer la remise avant expiration",
     "prescriptions": "Ordonnances à délivrer",
+    "paymentReminders": "Envoyer des rappels de paiement",
     "payAllReceived": "Payer tout le reçu · {{amount}}"
   },
   "filters": {
@@ -580,7 +581,8 @@
       "payable": "À payer {{amount}}",
       "paid": "Payé {{amount}}",
       "paidOf": "Payé {{paid}} sur {{total}}",
-      "pay": "Payer {{amount}}"
+      "pay": "Payer {{amount}}",
+      "print": "Imprimer"
     },
     "sale": {
       "title": "Vente",
@@ -658,6 +660,23 @@
     },
     "prescriptions": {
       "sub": "Ordonnance {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Rappels de paiement",
+      "summary_one": "{{count}} client doit {{amount}}",
+      "summary_many": "{{count}} clients doivent {{amount}}",
+      "summary_other": "{{count}} clients doivent {{amount}}",
+      "hint": "WhatsApp s'ouvre avec le rappel rédigé : vous l'envoyez depuis WhatsApp.",
+      "dueOne": "{{amount}} dû · Vente #{{seq}}",
+      "dueMany_one": "{{amount}} dû · {{count}} vente",
+      "dueMany_many": "{{amount}} dû · {{count}} ventes",
+      "dueMany_other": "{{amount}} dû · {{count}} ventes",
+      "noPhone": "Aucun téléphone enregistré",
+      "whatsApp": "Relancer {{name}} sur WhatsApp",
+      "call": "Appeler {{name}}",
+      "copy": "Copier le rappel pour {{name}}",
+      "copied": "Rappel pour {{name}} copié",
+      "message": "Bonjour {{name}}, ceci est un rappel de {{clinic}} : {{amount}} restent dus pour vos médicaments. Répondez ici si vous avez des questions. Merci !"
     }
   }
 }

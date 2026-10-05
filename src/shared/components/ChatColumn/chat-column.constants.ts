@@ -1,4 +1,3 @@
-import type { I18nLocale } from '@/lib/i18n/locales.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
@@ -7,13 +6,6 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
  * always renders, and stays out of the entry bundle.
  */
 export const CHAT_COLUMN_NS = I18N_NAMESPACES.clinic;
-
-/**
- * The language a patient message is written in: English at launch (Q-X2),
- * whatever the screen's language — starters, templates and fill-ins are what
- * the patient reads. The `content` keys below render in it.
- */
-export const MESSAGE_LANGUAGE: I18nLocale = 'en';
 
 /** Key paths in `clinic` (every value verbatim from `_patterns.md:143–193` and `leads.md`). */
 export const CHAT_COLUMN_KEYS = {
@@ -138,7 +130,7 @@ export const CHAT_COLUMN_KEYS = {
     followUp: 'chatColumn.templates.followUp',
     review: 'chatColumn.templates.review',
   },
-  /** What the patient reads — rendered in {@link MESSAGE_LANGUAGE}. */
+  /** What the patient reads — rendered in the message language (`useMessageTranslator`, Q-X2). */
   content: {
     starters: {
       onTheWay: 'chatColumn.content.starters.onTheWay',

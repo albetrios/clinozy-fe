@@ -1,9 +1,11 @@
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type {
+  Branch,
   Manufacturer,
   MedicalPurchaseOrder,
   MedicalRep,
   MedicalSale,
+  Organization,
   PoStage,
   Supplier,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -82,6 +84,21 @@ export interface SaleListParams {
   order?: SortOrder;
 }
 
+/** A customer the store is owed by, as "Send payment reminders" lists them (`medical.md:17`). */
+export interface SaleReminder {
+  customer: SaleCustomer;
+  /** Σ what their unpaid sales still owe, paise. */
+  due: number;
+  /** Their unpaid sales' numbers, oldest first. */
+  saleSeqs: number[];
+}
+
+/** Who to remind, and the clinic the message is from (REPLACE_WITH_API). */
+export interface SaleReminders {
+  clinicName: string;
+  customers: SaleReminder[];
+}
+
 // ── Purchase orders ──
 
 /**
@@ -95,6 +112,17 @@ export interface PurchaseOrderRow extends MedicalPurchaseOrder {
   total: number;
   /** Total − paid while Received — an Ordered order is not billed yet, a Paid one is settled. */
   due: number;
+}
+
+/**
+ * What a purchase order's A4 sheet prints beyond the order (Q-M7): its
+ * supplier, and the clinic with its branch's phone and GSTIN.
+ */
+export interface PurchaseOrderSheet {
+  order: PurchaseOrderRow;
+  supplier: Pick<Supplier, 'name' | 'phone' | 'gstNumber'>;
+  organization: Pick<Organization, 'name' | 'specialties' | 'currency'>;
+  branch: Pick<Branch, 'phone' | 'gstNumber'>;
 }
 
 /** The Stage filter's values (`medical.md:71`) — cancelled orders leave the list. */

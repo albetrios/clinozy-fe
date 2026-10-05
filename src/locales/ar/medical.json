@@ -36,6 +36,7 @@
     "sellAllDiscount": "بيع الكل بخصم 20%",
     "removeDiscount": "إزالة خصم قرب انتهاء الصلاحية",
     "prescriptions": "وصفات بانتظار الصرف",
+    "paymentReminders": "إرسال تذكيرات الدفع",
     "payAllReceived": "ادفع كل المستلم · {{amount}}"
   },
   "filters": {
@@ -634,7 +635,8 @@
       "payable": "مستحق {{amount}}",
       "paid": "مدفوع {{amount}}",
       "paidOf": "مدفوع {{paid}} من {{total}}",
-      "pay": "ادفع {{amount}}"
+      "pay": "ادفع {{amount}}",
+      "print": "طباعة"
     },
     "sale": {
       "title": "البيع",
@@ -721,6 +723,29 @@
     },
     "prescriptions": {
       "sub": "وصفة {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "تذكيرات الدفع",
+      "summary_zero": "{{count}} عملاء مدينون بمبلغ {{amount}}",
+      "summary_one": "{{count}} عميل مدين بمبلغ {{amount}}",
+      "summary_two": "{{count}} عميلان مدينان بمبلغ {{amount}}",
+      "summary_few": "{{count}} عملاء مدينون بمبلغ {{amount}}",
+      "summary_many": "{{count}} عميلًا مدينون بمبلغ {{amount}}",
+      "summary_other": "{{count}} عميل مدينون بمبلغ {{amount}}",
+      "hint": "يفتح واتساب والتذكير مكتوب — وترسله أنت من هناك.",
+      "dueOne": "{{amount}} مستحق · البيع #{{seq}}",
+      "dueMany_zero": "{{amount}} مستحق · {{count}} مبيعات",
+      "dueMany_one": "{{amount}} مستحق · {{count}} بيع",
+      "dueMany_two": "{{amount}} مستحق · {{count}} عمليتا بيع",
+      "dueMany_few": "{{amount}} مستحق · {{count}} مبيعات",
+      "dueMany_many": "{{amount}} مستحق · {{count}} عملية بيع",
+      "dueMany_other": "{{amount}} مستحق · {{count}} عملية بيع",
+      "noPhone": "لا يوجد هاتف محفوظ",
+      "whatsApp": "تذكير {{name}} عبر واتساب",
+      "call": "الاتصال بـ{{name}}",
+      "copy": "نسخ التذكير لـ{{name}}",
+      "copied": "تم نسخ التذكير لـ{{name}}",
+      "message": "مرحبًا {{name}}، هذا تذكير من {{clinic}} بأن مبلغ {{amount}} مستحق عن أدويتك. يمكنك الرد هنا إن كانت لديك أي أسئلة. شكرًا لك!"
     }
   }
 }

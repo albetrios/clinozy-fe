@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { purchaseLineAmount } from '@/shared/api/clinic/clinic-money.ts';
 import type { PurchaseItem } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -10,6 +12,10 @@ import {
   DrawerInfo,
 } from '@/shared/components/DrawerField/index.ts';
 import {
+  printDocument,
+  PurchaseOrderPrint,
+} from '@/shared/components/PrintTemplate/index.ts';
+import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
@@ -17,6 +23,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import {
   type ItemsColumn,
   ItemsField,
@@ -25,7 +32,14 @@ import {
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
-import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
+import {
+  fetchPurchaseOrderSheet,
+  medicalQueryKeys,
+} from '../../../shared/medical-api.ts';
+import type {
+  PurchaseOrderRow,
+  PurchaseOrderSheet,
+} from '../../../shared/medical-contracts.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -100,7 +114,7 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       track: '100px',
       align: 'end',
       cell: ({ row }) => (
-        <ItemsReadCell strong>{formatPaise(row.qty * row.rate)}</ItemsReadCell>
+        <ItemsReadCell strong>{formatPaise(purchaseLineAmount(row))}</ItemsReadCell>
       ),
     },
   ];
@@ -141,6 +155,37 @@ function summaryOf(
   return t(K.paidOf, { paid: formatPaise(order.paid), total: formatPaise(order.total) });
 }
 
+/** An order's A4 purchase order — the browser's dialog 260ms after the sheet renders (H:4423). */
+function printPurchaseOrder({
+  order,
+  supplier,
+  organization,
+  branch,
+}: PurchaseOrderSheet) {
+  return printDocument(
+    <PurchaseOrderPrint
+      order={order}
+      itemNames={order.itemNames}
+      supplier={supplier}
+      organization={organization}
+      branch={branch}
+    />,
+  );
+}
+
+/** "Print" on a paid order (Q-M7): its sheet read, then printed; a failed read is a toast. */
+function usePrintOrder(order: PurchaseOrderRow) {
+  const queryClient = useQueryClient();
+  return () =>
+    void queryClient
+      .fetchQuery({
+        queryKey: medicalQueryKeys.purchaseOrderSheet(order.id),
+        queryFn: () => fetchPurchaseOrderSheet(order.id),
+      })
+      .then(printPurchaseOrder)
+      .catch((error: unknown) => notifyError(error));
+}
+
 /** One opening of the view on a read order. */
 function OrderViewSession({
   open,
@@ -156,22 +201,29 @@ function OrderViewSession({
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const formatPaise = usePaiseFormat();
   const dates = useMedicalDates();
-  const payable = order.stage === 'received' && order.due > 0;
+  const print = usePrintOrder(order);
+  const paid = order.stage === 'paid';
+  // Paid: "Print" (`medical.md:339`). Received with a due: "Pay ₹2,980", for members who pay.
+  let primary: (() => void) | undefined;
+  if (paid) primary = print;
+  else if (order.stage === 'received' && order.due > 0 && onPay) {
+    primary = () => onPay(order);
+  }
   return (
     <RecordDrawer
       open={open}
       onClose={onClose}
       title={t(K.title)}
       tag={`#${order.seq}`}
-      sub={t(order.stage === 'paid' ? K.subPaid : K.subReceived, {
+      sub={t(paid ? K.subPaid : K.subReceived, {
         supplier: order.supplierName,
       })}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}
       summary={summaryOf(order, formatPaise, t)}
       dismissLabel={tDrawer(RECORD_DRAWER_KEYS.close)}
-      saveLabel={t(K.pay, { amount: formatPaise(order.due) })}
-      onSave={payable && onPay ? () => onPay(order) : undefined}
+      saveLabel={paid ? t(K.print) : t(K.pay, { amount: formatPaise(order.due) })}
+      onSave={primary}
       testId={testId}
     >
       <DrawerFieldGrid>
@@ -199,7 +251,8 @@ function OrderViewSession({
  * something due offers "Pay ₹2,980", which opens Payments › Send payment on
  * its bill (Q-M1: the prototype marked it Paid with no ledger entry); the
  * summary reads "Payable ₹2,980", "Paid ₹1,296" or "Paid ₹1,200 of ₹1,296".
- * Printing a paid order is not built (Q-M7).
+ * A paid order offers "Print": its A4 purchase order (Q-M7; the prototype
+ * only toasts "Printing PO #428", H:5421).
  */
 export function PurchaseOrderView({ testId: id, ...props }: PurchaseOrderViewProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);

@@ -1,5 +1,5 @@
 import { Outlet, useSearch } from '@tanstack/react-router';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -30,9 +30,11 @@ import {
 import { useMedicalSummary, useSaleList } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 import { fetchMedicalSale, medicalQueryKeys } from '../shared/medical-api.ts';
-import type { SaleRow } from '../shared/medical-contracts.ts';
+import type { SaleListParams, SaleRow } from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
+import type { PrescriptionToFill } from '../shared/medical-flows-contracts.ts';
 import { SALE_STATUS_TONES } from '../shared/medical-tones.ts';
+import { PaymentReminders } from './components/PaymentReminders/index.ts';
 import { PrescriptionsToFill } from './components/PrescriptionsToFill/index.ts';
 import { SaleDrawer } from './components/SaleDrawer/index.ts';
 import { SaleReturnDrawer } from './components/SaleReturnDrawer/index.ts';
@@ -89,9 +91,30 @@ function SaleDrawers({
 }
 
 /**
+ * The Sales view action for the Status filter (`medical.md:17`): All →
+ * "Prescriptions to fill" (for members who create sales), Unpaid → "Send
+ * payment reminders" (Q-M6); Returned → none, and no actions slot.
+ */
+function salesViewAction({
+  status,
+  params,
+  canCreate,
+  onPickPrescription,
+}: {
+  status: SaleListParams['status'];
+  params: SaleListParams;
+  canCreate: boolean;
+  onPickPrescription: (prescription: PrescriptionToFill) => void;
+}): ReactNode {
+  if (status === 'unpaid') return <PaymentReminders params={params} />;
+  if (!status && canCreate) return <PrescriptionsToFill onPick={onPickPrescription} />;
+  return null;
+}
+
+/**
  * Medical › Sales (KICKOFF §6.7; `medical.md:25–39`), the room's first tab: the
- * Medical toolbar — "Prescriptions to fill" with Status All — over the sales
- * table. A row opens the read-only Sale; "Collect ₹563" records the due on
+ * Medical toolbar — "Prescriptions to fill" with Status All, "Send payment
+ * reminders" with Unpaid — over the sales table. A row opens the read-only Sale; "Collect ₹563" records the due on
  * the ledger (Q-M1), "Return medicines" opens Return from patient, "Print"
  * prints the sale's invoice on the A4 sheet, and an unpaid sale with nothing
  * paid or returned can be voided (Q-M2). New sale is the shared Invoice
@@ -192,15 +215,13 @@ export function SalesPage() {
             },
           },
         }}
-        viewAction={
-          !search.status && canCreate ? (
-            <PrescriptionsToFill
-              onPick={(rx) =>
-                nav.create('sales', { prescription: rx.id, customer: rx.patientId })
-              }
-            />
-          ) : null
-        }
+        viewAction={salesViewAction({
+          status: search.status,
+          params,
+          canCreate,
+          onPickPrescription: (rx) =>
+            nav.create('sales', { prescription: rx.id, customer: rx.patientId }),
+        })}
       />
       <MedicalTable
         tab="sales"

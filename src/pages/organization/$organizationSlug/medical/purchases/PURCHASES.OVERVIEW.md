@@ -3,7 +3,7 @@
 Route: `/organization/$organizationSlug/medical/purchases` (KICKOFF §6.7, L-50). Same gates as
 the Medical room.
 
-Every purchase order but the cancelled (`medical.md:57–71`): PO (and the supplier's bill number) · Supplier · Items (and the free units) · Date · Total · Stage (Ordered sky · Received butter · Paid sage, with what a part-paid order has paid). The sequence follows the stage: an Ordered order opens for editing with "Receive goods" and — for an Admin — "Cancel order"; a Received one opens its read-only view with "Pay ₹2,980"; a Paid one its view. Receive goods' "+ Add unexpected item" takes in what came that was not ordered: its medicine, counts, rate, batch and expiry go into stock and onto the bill. Every payment goes through Payments › Send payment on `?bill=md:<poId>` (Q-M1): the row's and the view's "Pay ₹X", and the view action "Pay all received · ₹X" with Stage Received (the oldest open bill first). Filters: Stage · Created; the footer counts the orders.
+Every purchase order but the cancelled (`medical.md:57–71`): PO (and the supplier's bill number) · Supplier · Items (and the free units) · Date · Total · Stage (Ordered sky · Received butter · Paid sage, with what a part-paid order has paid). The sequence follows the stage: an Ordered order opens for editing with "Receive goods" and — for an Admin — "Cancel order"; a Received one opens its read-only view with "Pay ₹2,980"; a Paid one its view with "Print" — its A4 purchase order (L-64, Q-M7). Receive goods' "+ Add unexpected item" takes in what came that was not ordered: its medicine, counts, rate, batch and expiry go into stock and onto the bill. Every payment goes through Payments › Send payment on `?bill=md:<poId>` (Q-M1): the row's and the view's "Pay ₹X", and the view action "Pay all received · ₹X" with Stage Received (the oldest open bill first). Filters: Stage · Created; the footer counts the orders.
 
 The search, filters and sort live in the URL (the room reads them in `../medical.search.ts`); the list read follows them —
 a sort keeps the rows until the new page arrives, a search or "Apply filter" shows the skeleton.
@@ -25,7 +25,7 @@ list (D24).
 | `hooks/usePurchaseOrderColumns/`  | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.                          |
 | `components/PurchaseOrderDrawer/` | New / Edit purchase order: Order → Items with the quick line ("azel 20 +2 @180"), its Low stock chips and its Browse. |
 | `components/ReceiveGoodsDrawer/`  | Receive goods: "Tick what arrived", its form's rules (`components/ReceiveGoodsDrawer/receive-form.ts`).               |
-| `components/PurchaseOrderView/`   | A received or paid order, locked, with "Pay ₹X".                                                                      |
+| `components/PurchaseOrderView/`   | A received or paid order, locked, with "Pay ₹X" — or, once paid, "Print": the A4 purchase order.                      |
 
 ## Test ids
 

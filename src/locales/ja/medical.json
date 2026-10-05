@@ -36,6 +36,7 @@
     "sellAllDiscount": "すべて 20% オフで販売",
     "removeDiscount": "期限間近の割引を解除",
     "prescriptions": "未調剤の処方",
+    "paymentReminders": "支払いリマインダーを送信",
     "payAllReceived": "受領分をすべて支払う · {{amount}}"
   },
   "filters": {
@@ -544,7 +545,8 @@
       "payable": "未払い {{amount}}",
       "paid": "支払済み {{amount}}",
       "paidOf": "{{total}} のうち {{paid}} 支払済み",
-      "pay": "{{amount}} を支払う"
+      "pay": "{{amount}} を支払う",
+      "print": "印刷"
     },
     "sale": {
       "title": "販売",
@@ -616,6 +618,19 @@
     },
     "prescriptions": {
       "sub": "処方 {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "支払いリマインダー",
+      "summary_other": "{{count}} 人の顧客に {{amount}} の未払いがあります",
+      "hint": "WhatsApp がリマインダー入力済みで開きます。送信は WhatsApp で行ってください。",
+      "dueOne": "{{amount}} 未払い · 販売 #{{seq}}",
+      "dueMany_other": "{{amount}} 未払い · {{count}} 件の販売",
+      "noPhone": "電話番号が保存されていません",
+      "whatsApp": "{{name}} さんに WhatsApp でリマインド",
+      "call": "{{name}} さんに電話",
+      "copy": "{{name}} さん宛てのリマインダーをコピー",
+      "copied": "{{name}} さん宛てのリマインダーをコピーしました",
+      "message": "{{name}} 様、{{clinic}} よりお知らせです。お薬代 {{amount}} が未払いとなっております。ご不明な点がございましたら、こちらにご返信ください。よろしくお願いいたします。"
     }
   }
 }

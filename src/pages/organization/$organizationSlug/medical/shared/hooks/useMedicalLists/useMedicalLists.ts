@@ -10,6 +10,7 @@ import {
   listMedicalReps,
   listMedicalSales,
   listPurchaseOrders,
+  listSaleReminders,
   listSuppliers,
   medicalListSummary,
   medicalQueryKeys,
@@ -45,6 +46,15 @@ export function useSaleList(params: SaleListParams) {
   return useCursorList<SaleRow>({
     queryKey: medicalQueryKeys.sales(params),
     queryFn: async (after) => asListPage(await listMedicalSales(params, after ?? null)),
+    notifyOnError: false,
+  });
+}
+
+/** "Send payment reminders" (`medical.md:17`): who the unpaid sales the list matches name. */
+export function useSaleReminders(params: SaleListParams) {
+  return useAppQuery({
+    queryKey: medicalQueryKeys.saleReminders(params),
+    queryFn: () => listSaleReminders(params),
     notifyOnError: false,
   });
 }

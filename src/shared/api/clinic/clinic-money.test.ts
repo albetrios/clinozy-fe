@@ -15,6 +15,9 @@ import {
   lineFloor,
   overallDiscountFromPercent,
   overallDiscountPercent,
+  purchaseLineAmount,
+  purchaseOrderDue,
+  purchaseOrderTotal,
 } from '@/shared/api/clinic/clinic-money.ts';
 import type { InvoiceItem, Payment } from '@/shared/api/clinic/clinic-schema.ts';
 import {
@@ -298,5 +301,27 @@ describe('the invoice drawer’s figures (KICKOFF §6.9)', () => {
     expect(billBalance(32_400, 10_000)).toMatchObject({ due: 22_400, status: 'partial' });
     expect(billBalance(32_400, 0)).toMatchObject({ due: 32_400, status: 'unpaid' });
     expect(billBalance(0, 0).status).toBe('paid');
+  });
+});
+
+describe('a Medical purchase order’s bill and due (S:830)', () => {
+  // 4 × ₹529 and 10 + 2 free × ₹212.
+  const items = [
+    { qty: 4, free: 0, rate: 52_900 },
+    { qty: 10, free: 2, rate: 21_200 },
+  ];
+
+  it('bills qty × rate — free units cost nothing', () => {
+    expect(purchaseLineAmount({ qty: 10, rate: 21_200 })).toBe(212_000);
+    expect(purchaseOrderTotal(items)).toBe(423_600);
+    expect(purchaseOrderTotal([])).toBe(0);
+  });
+
+  it('owes only on a received order, never below zero', () => {
+    expect(purchaseOrderDue({ stage: 'received', items, paid: 120_000 })).toBe(303_600);
+    expect(purchaseOrderDue({ stage: 'received', items, paid: 500_000 })).toBe(0);
+    // Not billed yet; settled.
+    expect(purchaseOrderDue({ stage: 'ordered', items, paid: 0 })).toBe(0);
+    expect(purchaseOrderDue({ stage: 'paid', items, paid: 120_000 })).toBe(0);
   });
 });

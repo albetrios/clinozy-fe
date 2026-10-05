@@ -132,7 +132,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `medical-manufacturers-page`     | Medical › Manufacturers (`medical-manufacturers-…`)                                                 | `pages/organization/$organizationSlug/medical/manufacturers/` |
 | `medical-mrs-page`               | Medical › MRs (`medical-mrs-…`)                                                                     | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `medical-payments-page`          | Medical › Payments (`medical-payments-…`)                                                           | `pages/organization/$organizationSlug/medical/payments/`      |
-| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`, `prescriptions`, `pay-received`                | `shared/components/RoomToolbar/RoomViewAction/`               |
+| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`, `prescriptions`, `reminders`, `pay-received`   | `shared/components/RoomToolbar/RoomViewAction/`               |
 | `medicine-drawer`                | Medicine drawer — `/medical/medicines/create`, `…/$medicineId/edit` over the list (L-50b)           | `pages/organization/$organizationSlug/medical/shared/`        |
 | `supplier-drawer`                | Supplier drawer — `/medical/suppliers/create`, `…/$supplierId/edit` (L-50b)                         | `pages/organization/$organizationSlug/medical/shared/`        |
 | `manufacturer-drawer`            | Manufacturer drawer — `/medical/manufacturers/create`, `…/$manufacturerId/edit` (L-50b)             | `pages/organization/$organizationSlug/medical/shared/`        |
@@ -141,11 +141,12 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `<kind>-drawer-stacked`          | A Medical drawer stacked on another — `manufacturer`, `supplier`, `rep` (an MR), `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
 | `purchase-order-drawer`          | New / Edit purchase order — `/medical/purchases/create`, `…/$purchaseOrderId/edit` (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
 | `receive-goods-drawer`           | Receive goods — `…/$purchaseOrderId/receive`; `-lines-add` "+ Add unexpected item" (L-50c, L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `purchase-order-view-drawer`     | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` is "Pay ₹X" (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `purchase-order-view-drawer`     | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` "Pay ₹X" / "Print" (L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
 | `sale-drawer`                    | Sale (view) — `/medical/sales/$saleId`; `-save` Collect / Return medicines, `-delete` Void (L-50c)  | `pages/organization/$organizationSlug/medical/sales/`         |
 | `sale-return-drawer`             | Return from patient — `/medical/sales/$saleId/return` (L-50c)                                       | `pages/organization/$organizationSlug/medical/sales/`         |
 | `expiring-return-drawer`         | Return expiring stock — Medicines’ row action, no URL (L-50c)                                       | `pages/organization/$organizationSlug/medical/medicines/`     |
 | `prescriptions-to-fill`          | Prescriptions to fill — Sales’ view action list (`-panel`, options) (L-50c)                         | `pages/organization/$organizationSlug/medical/sales/`         |
+| `payment-reminders`              | Send payment reminders — Sales Unpaid’s view action panel (`-summary`, `-row`) (L-64)               | `pages/organization/$organizationSlug/medical/sales/`         |
 | `stock-items-page`               | Clinic stock › Items (`stock-items-…`)                                                              | `pages/organization/$organizationSlug/stock/items/`           |
 | `stock-purchases-page`           | Clinic stock › Purchases (`stock-purchases-…`)                                                      | `pages/organization/$organizationSlug/stock/purchases/`       |
 | `stock-movements-page`           | Clinic stock › Movements (`stock-movements-…`)                                                      | `pages/organization/$organizationSlug/stock/movements/`       |
@@ -840,15 +841,18 @@ an `ItemsField`; the screen passes its own root id (`testId`, e.g. `invoice-item
 
 ## Clinic print templates (added 2026-10-03, L-22)
 
-| Test ID                    | Element                                                                          | Source                                               |
-| -------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `print-root`               | Print-only host `printDocument()` mounts at the end of `<body>` until afterprint | `shared/components/PrintTemplate/print-document.ts`  |
-| `invoice-print`            | A4 invoice / sale sheet                                                          | `shared/components/PrintTemplate/InvoicePrint/`      |
-| `invoice-print-items`      | Invoice items table (lines + totals row)                                         | `shared/components/PrintTemplate/InvoicePrint/`      |
-| `invoice-print-summary`    | Payment Summary (total, overall discount, bill, balance due)                     | `shared/components/PrintTemplate/InvoicePrint/`      |
-| `prescription-print`       | A4 prescription sheet                                                            | `shared/components/PrintTemplate/PrescriptionPrint/` |
-| `prescription-print-items` | Medicines & Dosage table                                                         | `shared/components/PrintTemplate/PrescriptionPrint/` |
-| `print-footer`             | Sheet footer: thank-you line, branch phone, GSTIN                                | `shared/components/PrintTemplate/PrintTemplate.tsx`  |
+| Test ID                        | Element                                                                              | Source                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `print-root`                   | Print-only host `printDocument()` mounts at the end of `<body>` until afterprint     | `shared/components/PrintTemplate/print-document.ts`   |
+| `invoice-print`                | A4 invoice / sale sheet                                                              | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `invoice-print-items`          | Invoice items table (lines + totals row)                                             | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `invoice-print-summary`        | Payment Summary (total, overall discount, bill, balance due)                         | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `prescription-print`           | A4 prescription sheet                                                                | `shared/components/PrintTemplate/PrescriptionPrint/`  |
+| `prescription-print-items`     | Medicines & Dosage table                                                             | `shared/components/PrintTemplate/PrescriptionPrint/`  |
+| `purchase-order-print`         | A4 purchase order sheet (L-64, Q-M7)                                                 | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `purchase-order-print-items`   | Purchase order lines table (lines + totals row)                                      | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `purchase-order-print-summary` | Payment Summary (total, paid, balance due)                                           | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `print-footer`                 | Sheet footer: thank-you line (a purchase order: who it is from), branch phone, GSTIN | `shared/components/PrintTemplate/PrintTemplate.tsx`   |
 
 ## Chat column (shared, launch L-34)
 

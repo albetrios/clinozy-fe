@@ -1,24 +1,18 @@
-import type { TFunction } from 'i18next';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import i18n from '@/lib/i18n/i18n.ts';
-import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
 import type { ChatPerson } from '@/shared/api/clinic/messages-contracts.ts';
 import { basePrice } from '@/shared/api/clinic/offerings-pricing.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useMessageTranslator } from '@/shared/hooks/useMessageTranslator/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useTemplateValues } from '@/shared/hooks/useThread/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
-import {
-  CHAT_COLUMN_KEYS,
-  CHAT_COLUMN_NS,
-  MESSAGE_LANGUAGE,
-} from './chat-column.constants.ts';
+import { CHAT_COLUMN_KEYS, CHAT_COLUMN_NS } from './chat-column.constants.ts';
 import {
   type ChatContact,
   type ChatSender,
@@ -37,31 +31,6 @@ export function useChatFormat(maskMoney: boolean): ChatFormat {
   const money = usePaiseFormat();
   const clock = useClinicClock();
   return useMemo(() => ({ t, money, clock, maskMoney }), [t, money, clock, maskMoney]);
-}
-
-/**
- * The patient-message translator (Q-X2: messages are English at launch, the
- * screen may not be): loads the message language's `clinic` copy when the
- * screen runs in another language.
- */
-function useMessageTranslator(): TFunction {
-  const [ready, setReady] = useState(() =>
-    i18n.hasResourceBundle(MESSAGE_LANGUAGE, CHAT_COLUMN_NS),
-  );
-  useEffect(() => {
-    if (ready) return;
-    let live = true;
-    void ensureNamespace(MESSAGE_LANGUAGE, CHAT_COLUMN_NS).then(() => {
-      if (live) setReady(true);
-    });
-    return () => {
-      live = false;
-    };
-  }, [ready]);
-  // The translator reads the store when called, so the re-render `ready` causes
-  // is all a late bundle needs.
-  const { t } = useTranslation(CHAT_COLUMN_NS, { lng: MESSAGE_LANGUAGE });
-  return t;
 }
 
 /** The signed-in member as messages name them ("Riya", "Riya S."). */
@@ -87,7 +56,7 @@ export function useMessageContext({
   clock: ChatClock;
   upcoming: VisitSummary['upcoming'];
 }): { ctx: MessageContext; fill: Record<string, string> } {
-  const tm = useMessageTranslator();
+  const tm = useMessageTranslator(CHAT_COLUMN_NS);
   const values = useTemplateValues(person).data;
   const offerings = useOfferings().data;
   const user = useAuthStore((state) => state.user);

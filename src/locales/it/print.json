@@ -99,5 +99,25 @@
       "legs": "Gambe",
       "arms": "Braccia"
     }
+  },
+  "purchaseOrder": {
+    "supplierInformation": "Informazioni fornitore",
+    "orderDetails": "Dettagli ordine",
+    "orderDate": "Data ordine:",
+    "orderNumber": "Ordine d’acquisto:",
+    "invoiceNumber": "N. fattura:",
+    "gstin": "GSTIN:",
+    "stages": {
+      "ordered": "Ordinato",
+      "received": "Ricevuto",
+      "paid": "Pagato",
+      "cancelled": "Annullato"
+    },
+    "batch": "Lotto",
+    "expiry": "Scadenza",
+    "free": "Omaggio",
+    "rate": "Prezzo",
+    "paid": "Pagato:",
+    "issuedBy": "Ordine d’acquisto di {{clinic}}"
   }
 }
