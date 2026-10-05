@@ -31,4 +31,14 @@ describe('ProductWordmark', () => {
     expect(word.textContent).toBe(name.replace('o', ''));
     expect(word.querySelectorAll('circle')).toHaveLength(name.includes('o') ? 2 : 0);
   });
+
+  it('reads left to right under an RTL page, its parts in order', () => {
+    document.documentElement.dir = 'rtl';
+    try {
+      render(<ProductWordmark />);
+      expect(screen.getByTestId('product-wordmark')).toHaveAttribute('dir', 'ltr');
+    } finally {
+      document.documentElement.dir = '';
+    }
+  });
 });

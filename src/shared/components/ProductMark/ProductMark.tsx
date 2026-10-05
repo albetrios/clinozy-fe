@@ -43,6 +43,9 @@ export function ProductWordmark({ className }: { className?: string }) {
     <span
       aria-hidden
       data-testid="product-wordmark"
+      // A brand drawing reads left to right in every locale: under `dir="rtl"`
+      // the flex row would set "clin", the ring and "zy" in reverse.
+      dir="ltr"
       className={cn(
         'text-foreground inline-flex items-baseline leading-none font-semibold tracking-[-0.03em] whitespace-nowrap',
         className,

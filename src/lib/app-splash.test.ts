@@ -590,6 +590,12 @@ describe('app-splash', () => {
     const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
     const html = readFileSync(join(root, 'index.html'), 'utf8');
 
+    it('sets the wordmark left to right, so an RTL boot does not reverse its parts', () => {
+      const tag =
+        /<span[^>]*data-testid="app-splash-wordmark"[^>]*>/.exec(html)?.[0] ?? '';
+      expect(tag).toContain('dir="ltr"');
+    });
+
     /** The `animation` shorthand of one rule in the splash's stylesheet. */
     function animationOf(selector: string): string {
       const start = html.indexOf(`${selector} {`);
