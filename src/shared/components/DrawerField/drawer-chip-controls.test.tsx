@@ -96,6 +96,10 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     expect(screen.getByRole('status')).toHaveTextContent('aesthetic,lhr');
     const lhr = screen.getByRole('button', { name: 'LHR' });
     expect(lhr.querySelector('svg')).not.toBeNull();
+    // The design's picked chip draws the boxed check (H:3023 `check`; KICKOFF §3.4).
+    expect(lhr.querySelector('svg')?.getAttribute('class')).toContain(
+      'lucide-square-check',
+    );
     expect(
       screen.getByRole('button', { name: 'Clinical' }).querySelector('svg'),
     ).toBeNull();

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { type AppIcon, Check } from '@/shared/icons/index.ts';
+import { type AppIcon, SquareCheck } from '@/shared/icons/index.ts';
 
 /** One chip of a {@link DrawerChips} group. */
 export interface DrawerChipOption<T extends string> {
@@ -133,7 +133,7 @@ function toggledPicks<T extends string>(
 /**
  * A drawer's chip field (the design's `chips` kind, H:905): a wrapping row of
  * toggle chips in each value's tone, one pick or any number. A picked chip of
- * a pick-any group carries a 12px check; a clearable one-pick group lets the
+ * a pick-any group carries a 12px boxed check; a clearable one-pick group lets the
  * picked chip be tapped off. Each chip is a button with `aria-pressed`, the
  * row a group named by the field's label.
  */
@@ -186,7 +186,8 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
             )}
           >
             {picked && props.multiple && variant === 'tone' ? (
-              <Check aria-hidden="true" className="size-3 shrink-0" />
+              // The design's `check` draws a box around the tick (H:3023, H:3784).
+              <SquareCheck aria-hidden="true" className="size-3 shrink-0" />
             ) : null}
             {option.icon ? (
               <option.icon aria-hidden="true" className="size-3.25 shrink-0" />
