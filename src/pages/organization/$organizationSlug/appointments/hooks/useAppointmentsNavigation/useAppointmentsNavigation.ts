@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import {
   organizationAppointment,
   organizationAppointmentCreate,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/appointments-builders.ts';
 import {
   type AppointmentCalendarView,
   appointmentViewRange,

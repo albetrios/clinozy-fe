@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationTasks } from '@/lib/routes/index.ts';
+import { organizationTasks } from '@/lib/routes/tasks-builders.ts';
 import { fetchTask, taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';

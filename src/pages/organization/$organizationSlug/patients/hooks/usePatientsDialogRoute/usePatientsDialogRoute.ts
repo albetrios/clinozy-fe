@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationPatients } from '@/lib/routes/index.ts';
+import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import type { PatientDrawerPrefill } from '@/shared/components/PatientDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationLead } from '@/lib/routes/index.ts';
+import { organizationLead } from '@/lib/routes/leads-builders.ts';
 import {
   organizationCheckInEdit,
   organizationReviewEdit,

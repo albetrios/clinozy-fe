@@ -6,7 +6,7 @@
 import type { ReactTable, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { organizationStockTab, type StockTab } from '@/lib/routes/index.ts';
+import { organizationStockTab, type StockTab } from '@/lib/routes/stock-builders.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {

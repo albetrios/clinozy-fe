@@ -3,7 +3,10 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationUsers, organizationUsersRoles } from '@/lib/routes/index.ts';
+import {
+  organizationUsers,
+  organizationUsersRoles,
+} from '@/lib/routes/users-builders.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 

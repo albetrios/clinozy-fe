@@ -1,6 +1,6 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type { StockTab } from '@/lib/routes/index.ts';
+import type { StockTab } from '@/lib/routes/stock-builders.ts';
 import {
   type RoomDialogRouteState,
   useRoomDialogRoute,

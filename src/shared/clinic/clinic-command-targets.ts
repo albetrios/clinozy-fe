@@ -1,20 +1,17 @@
-import {
-  organizationAppointmentCreate,
-  organizationLead,
-  organizationLeadCreate,
-  organizationMedicalCreate,
-  organizationPatientCreate,
-  organizationPaymentReceive,
-} from '@/lib/routes/builders.ts';
+import { organizationAppointmentCreate } from '@/lib/routes/appointments-builders.ts';
 import {
   organizationInvoice,
   organizationInvoiceCreate,
   organizationInvoiceEdit,
 } from '@/lib/routes/invoice-builders.ts';
+import { organizationLead, organizationLeadCreate } from '@/lib/routes/leads-builders.ts';
+import { organizationMedicalCreate } from '@/lib/routes/medical-builders.ts';
 import {
   organizationPatient,
   organizationPatientEdit,
 } from '@/lib/routes/patient-file-builders.ts';
+import { organizationPatientCreate } from '@/lib/routes/patients-builders.ts';
+import { organizationPaymentReceive } from '@/lib/routes/payments-builders.ts';
 import { organizationVisit } from '@/lib/routes/visit-builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';

@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-route
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationPaymentEdit } from '@/lib/routes/index.ts';
+import { organizationPaymentEdit } from '@/lib/routes/payments-builders.ts';
 import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
 import type {
   LedgerListParams,

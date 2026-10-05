@@ -1,10 +1,11 @@
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 
-import { organizationAppointment, organizationPatients } from '@/lib/routes/index.ts';
+import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
   organizationPatientEdit,
   organizationPatientSection,
 } from '@/lib/routes/patient-file-builders.ts';
+import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {

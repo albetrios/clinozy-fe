@@ -6,7 +6,7 @@ import {
   organizationDayClose,
   organizationPendingCreate,
   organizationPendingEdit,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/payments-builders.ts';
 import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   CreditListParams,

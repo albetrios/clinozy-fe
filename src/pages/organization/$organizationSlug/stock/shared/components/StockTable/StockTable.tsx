@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { StockTab } from '@/lib/routes/index.ts';
+import type { StockTab } from '@/lib/routes/stock-builders.ts';
 import { RoomTable, type RoomTableProps } from '@/shared/components/RoomTable/index.ts';
 import { Package } from '@/shared/icons/index.ts';
 

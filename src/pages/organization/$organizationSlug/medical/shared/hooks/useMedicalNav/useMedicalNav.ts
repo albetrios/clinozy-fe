@@ -15,7 +15,7 @@ import {
   organizationPurchaseOrderEdit,
   organizationPurchaseOrderReceive,
   organizationSupplierEdit,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/medical-builders.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 
 import {

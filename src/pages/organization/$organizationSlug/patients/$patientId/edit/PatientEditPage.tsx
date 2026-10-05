@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 
-import { organizationPatients } from '@/lib/routes/index.ts';
+import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 
 import { PATIENT_FILE_SECTION_PAGES } from '../patient-id.sections.ts';

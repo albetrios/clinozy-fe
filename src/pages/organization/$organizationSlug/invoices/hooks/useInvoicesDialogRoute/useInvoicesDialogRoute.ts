@@ -3,11 +3,11 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationPayments } from '@/lib/routes/builders.ts';
 import {
   organizationInvoice,
   organizationInvoiceEdit,
 } from '@/lib/routes/invoice-builders.ts';
+import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';

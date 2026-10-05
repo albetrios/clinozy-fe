@@ -9,8 +9,8 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationPatients } from '@/lib/routes/index.ts';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
+import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import {

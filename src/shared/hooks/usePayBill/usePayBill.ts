@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback } from 'react';
 
-import { organizationPaymentPay } from '@/lib/routes/index.ts';
+import { organizationPaymentPay } from '@/lib/routes/payments-builders.ts';
 import {
   supplierBillKey,
   type SupplierBillRef,

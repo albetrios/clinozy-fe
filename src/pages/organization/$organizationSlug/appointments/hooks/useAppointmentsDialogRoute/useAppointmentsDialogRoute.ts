@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationAppointments } from '@/lib/routes/index.ts';
+import { organizationAppointments } from '@/lib/routes/appointments-builders.ts';
 import {
   appointmentQueryKeys,
   fetchAppointment,

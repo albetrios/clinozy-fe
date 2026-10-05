@@ -6,7 +6,7 @@ import { downloadCsv, toCsv } from '@/lib/csv.ts';
 import {
   organizationUsersBranchCreate,
   organizationUsersBranchEdit,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/users-builders.ts';
 import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';

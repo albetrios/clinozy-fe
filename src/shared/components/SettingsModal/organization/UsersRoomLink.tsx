@@ -1,7 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { organizationUsers, organizationUsersRoles } from '@/lib/routes/index.ts';
+import {
+  organizationUsers,
+  organizationUsersRoles,
+} from '@/lib/routes/users-builders.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,

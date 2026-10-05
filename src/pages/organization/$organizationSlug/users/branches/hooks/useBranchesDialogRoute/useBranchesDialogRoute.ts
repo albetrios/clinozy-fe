@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationUsersBranches } from '@/lib/routes/index.ts';
+import { organizationUsersBranches } from '@/lib/routes/users-builders.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';

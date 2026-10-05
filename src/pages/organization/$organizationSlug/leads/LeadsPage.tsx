@@ -11,7 +11,7 @@ import {
   organizationLead,
   organizationLeadCreate,
   organizationLeads,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/leads-builders.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { LEAD_HOLD_DAYS, leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';

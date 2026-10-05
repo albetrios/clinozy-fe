@@ -2,7 +2,10 @@ import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-route
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationOfferCreate, organizationOfferEdit } from '@/lib/routes/index.ts';
+import {
+  organizationOfferCreate,
+  organizationOfferEdit,
+} from '@/lib/routes/offerings-builders.ts';
 import { OFFER_STATE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';

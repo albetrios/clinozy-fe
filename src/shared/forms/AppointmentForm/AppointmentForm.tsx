@@ -2,7 +2,7 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationLead } from '@/lib/routes/index.ts';
+import { organizationLead } from '@/lib/routes/leads-builders.ts';
 import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';

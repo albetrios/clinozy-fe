@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { organizationAppointment } from '@/lib/routes/index.ts';
+import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
   organizationPatientSection,
   organizationPrescriptionCreate,

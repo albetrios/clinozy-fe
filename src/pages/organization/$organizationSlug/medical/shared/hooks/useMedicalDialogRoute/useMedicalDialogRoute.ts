@@ -1,6 +1,6 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type { MedicalTab } from '@/lib/routes/index.ts';
+import type { MedicalTab } from '@/lib/routes/medical-builders.ts';
 import {
   type RoomDialogRoute,
   type RoomDialogRouteState,

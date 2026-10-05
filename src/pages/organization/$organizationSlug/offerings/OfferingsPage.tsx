@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   organizationOfferingCreate,
   organizationOfferingEdit,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/offerings-builders.ts';
 import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';

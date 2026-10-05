@@ -8,7 +8,7 @@ import {
   organizationPaymentEdit,
   organizationPaymentPay,
   organizationPaymentReceive,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/payments-builders.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';

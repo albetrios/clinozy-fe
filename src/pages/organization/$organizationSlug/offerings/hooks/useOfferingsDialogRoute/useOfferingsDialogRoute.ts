@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationOfferings } from '@/lib/routes/index.ts';
+import { organizationOfferings } from '@/lib/routes/offerings-builders.ts';
 import { fetchOffering, offeringQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';

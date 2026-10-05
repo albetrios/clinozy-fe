@@ -3,7 +3,10 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { downloadCsv, toCsv } from '@/lib/csv.ts';
-import { organizationUserCreate, organizationUserEdit } from '@/lib/routes/index.ts';
+import {
+  organizationUserCreate,
+  organizationUserEdit,
+} from '@/lib/routes/users-builders.ts';
 import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';

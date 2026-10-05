@@ -261,14 +261,19 @@ is the separate `AppearanceDialog` on the root route.)
 src/lib/routes/
 ├── params.ts        Zod param schemas + parsers (incl. parseOrganizationSlugParam)
 ├── builders.ts      organizationDashboard(organizationSlug), … (path constants live here — no paths.ts)
+├── <room>-builders.ts  one per clinic room: leads-, appointments-, patients-, medical-, stock-, …
+├── invoice-builders.ts, patient-file-builders.ts
 ├── page-head.ts     manifestHead(manifest) → document title
 ├── page-manifest.ts manifest types/helpers
-└── index.ts
+└── index.ts         re-exports builders.ts only
 ```
 
 Builders return **`{ to, params }` objects consumed by TanStack's typed `Link`/`navigate`** —
 not hand-built strings — so the router's type safety stays intact. Raw-string variants only
 where the router isn't available (e2e helpers). No hand-built route strings anywhere in app code.
+`builders.ts` and the `index.ts` barrel hold the organization-level builders only: the guards,
+the resolver and `routeTree.tsx` import them, so they ride the entry chunk. A room's builders
+live in their own module, imported by path, and load with the code that navigates there.
 
 **Clinic route plumbing (L-12a).** The org index (`/organization/<slug>`) and any
 unknown path under it redirect to the member's **role home** (D25,

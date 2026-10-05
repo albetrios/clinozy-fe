@@ -7,7 +7,7 @@ import { type SortingState, type Updater, useTable } from '@tanstack/react-table
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationLeadCreate } from '@/lib/routes/index.ts';
+import { organizationLeadCreate } from '@/lib/routes/leads-builders.ts';
 import { groupAppointmentsByDay } from '@/shared/api/clinic/appointment-views.ts';
 import type {
   AppointmentPerson,

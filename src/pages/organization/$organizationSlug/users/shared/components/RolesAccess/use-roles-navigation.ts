@@ -2,7 +2,10 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationUserEdit, organizationUsersRoles } from '@/lib/routes/index.ts';
+import {
+  organizationUserEdit,
+  organizationUsersRoles,
+} from '@/lib/routes/users-builders.ts';
 import type {
   ClinicRoleKey,
   ClinicRoleView,

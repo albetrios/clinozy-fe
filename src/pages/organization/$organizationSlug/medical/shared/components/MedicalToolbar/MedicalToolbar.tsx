@@ -7,7 +7,10 @@ import type { ReactTable, RowData } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { type MedicalTab, organizationMedicalTab } from '@/lib/routes/index.ts';
+import {
+  type MedicalTab,
+  organizationMedicalTab,
+} from '@/lib/routes/medical-builders.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {

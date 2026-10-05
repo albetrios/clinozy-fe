@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationPaymentsPending } from '@/lib/routes/index.ts';
+import { organizationPaymentsPending } from '@/lib/routes/payments-builders.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
 import { creditQueryKeys, fetchCredit } from '@/shared/api/clinic/credits-api.ts';

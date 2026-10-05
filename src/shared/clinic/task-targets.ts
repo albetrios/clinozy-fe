@@ -1,8 +1,8 @@
 import {
   organizationAppointment,
   organizationAppointmentCreate,
-  organizationLead,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/appointments-builders.ts';
+import { organizationLead } from '@/lib/routes/leads-builders.ts';
 import type { TaskFollowOnForm, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import {

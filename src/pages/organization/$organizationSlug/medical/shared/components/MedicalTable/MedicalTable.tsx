@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { MedicalTab } from '@/lib/routes/index.ts';
+import type { MedicalTab } from '@/lib/routes/medical-builders.ts';
 import { RoomTable, type RoomTableProps } from '@/shared/components/RoomTable/index.ts';
 import { Pill } from '@/shared/icons/index.ts';
 

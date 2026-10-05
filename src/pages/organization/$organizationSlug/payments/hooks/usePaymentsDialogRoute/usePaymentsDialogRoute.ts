@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { organizationPayments } from '@/lib/routes/index.ts';
+import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';

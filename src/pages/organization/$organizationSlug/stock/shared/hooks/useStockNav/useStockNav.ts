@@ -10,7 +10,7 @@ import {
   organizationStockVendorEdit,
   type StockCreateTab,
   type StockTab,
-} from '@/lib/routes/index.ts';
+} from '@/lib/routes/stock-builders.ts';
 
 import { type StockCreateSearch, validateStockSearch } from '../../../stock.search.ts';
 
