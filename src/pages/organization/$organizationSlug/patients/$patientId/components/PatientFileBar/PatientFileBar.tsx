@@ -220,7 +220,8 @@ export function PatientFileBar({
       ) : null}
 
       <div className="col-span-3 row-start-2 flex min-w-0 items-center gap-2 md:flex-1 md:gap-0.5">
-        <div className="flex-none md:me-1.5 md:border-e md:pe-2">
+        {/* The folder button's trailing hairline, on a phone too (H:704). */}
+        <div className="flex-none border-e pe-2 md:me-1.5">
           <PatientSectionsPopover
             open={sectionsOpen}
             onOpenChange={setSectionsOpen}
