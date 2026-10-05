@@ -71,10 +71,10 @@ const SORT_KEYS = [
 ] as const;
 
 /** A sortable column of any Clinic stock tab. */
-export type StockSortKey = (typeof SORT_KEYS)[number];
+type StockSortKey = (typeof SORT_KEYS)[number];
 
 /** A column sort in the URL: `bill:desc`, `name:asc` (the shared table's form). */
-export type StockSort = `${StockSortKey}:${'asc' | 'desc'}`;
+type StockSort = `${StockSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for the Clinic stock tabs. */
 export interface StockSearch {

@@ -18,7 +18,7 @@ import {
 export type SendMode = (typeof EXPENSE_MODE_VALUES)[number];
 
 /** The bill a payment settles: a Medical PO or a Clinic stock purchase, by id. */
-export interface SendBillRef {
+interface SendBillRef {
   kind: OpenSupplierBill['kind'];
   purchaseId: string;
   billNo: string;
@@ -149,9 +149,6 @@ export const SEND_QUICK_FILLS = [
   /** The amount in paise. */
   values: { category: ExpenseCategory; amount: number; mode: SendMode };
 }[];
-
-/** One Quick fill preset. */
-export type SendQuickFillId = (typeof SEND_QUICK_FILLS)[number]['id'];
 
 /** The "Paid to" quick chips (`payments.md:119`); "Electricity" is a word, not a name. */
 export const PAID_TO_QUICK = ['Medline Surgicals', 'Meta ads'] as const;

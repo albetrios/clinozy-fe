@@ -22,7 +22,7 @@ import { patientRecordSchema } from './patients-contracts.ts';
  */
 
 /** The patient's next visit — the rail's Up next card. */
-export const patientNextVisitSchema = z.object({
+const patientNextVisitSchema = z.object({
   appointmentId: z.uuid(),
   date: civilDateSchema,
   startTime: clockTimeSchema,
@@ -37,7 +37,7 @@ export type PatientNextVisit = z.infer<typeof patientNextVisitSchema>;
  * The rail's Feedback row: the latest check-in's feel and score ("Better ·
  * 7/10"), else the latest review, and how many of each there are.
  */
-export const patientFileFeedbackSchema = z.object({
+const patientFileFeedbackSchema = z.object({
   feel: checkinFeelSchema.nullable(),
   score: z.number().int().nonnegative().nullable(),
   review: z
@@ -54,7 +54,7 @@ export const patientFileFeedbackSchema = z.object({
 export type PatientFileFeedback = z.infer<typeof patientFileFeedbackSchema>;
 
 /** Records per section — the section popover's "Has records" / "Empty" (table counts, Appendix F). */
-export const patientFileCountsSchema = z.record(
+const patientFileCountsSchema = z.record(
   z.enum(PATIENT_FILE_SECTIONS),
   z.number().int().nonnegative(),
 );

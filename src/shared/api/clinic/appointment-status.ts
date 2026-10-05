@@ -33,7 +33,7 @@ export const APPOINTMENT_FLOW: Readonly<
 };
 
 /** The statuses nothing moves out of — "Final status. Use Rebook to make a new appointment." */
-export const FINAL_APPOINTMENT_STATUSES: readonly AppointmentStatus[] = [
+const FINAL_APPOINTMENT_STATUSES: readonly AppointmentStatus[] = [
   'completed',
   'cancelled',
   'no_show',
@@ -164,14 +164,7 @@ export function restoreGuard(
 // ── The card's next step ──
 
 /** The card's primary next step (H:5900; Rebook is a new booking via `copyOf`, Q-A6). */
-export const APPOINTMENT_NEXT_ACTIONS = [
-  'check_in',
-  'confirm',
-  'complete',
-  'rebook',
-] as const;
-/** One next step. */
-export type AppointmentNextAction = (typeof APPOINTMENT_NEXT_ACTIONS)[number];
+export type AppointmentNextAction = 'check_in' | 'confirm' | 'complete' | 'rebook';
 
 /** The move each next step makes — Rebook makes none: the No-show stays final. */
 export const NEXT_ACTION_MOVES: Readonly<
@@ -220,7 +213,7 @@ export type AppointmentTileStatus = (typeof APPOINTMENT_TILE_STATUSES)[number];
  * first (the tile still toasts), Completed is final once saved, a closed
  * booking (Cancelled, No show), no Edit.
  */
-export type AppointmentTileReason =
+type AppointmentTileReason =
   | 'booked'
   | 'said_yes'
   | 'visit_day'
@@ -351,10 +344,8 @@ export function formStatusGuard(
 
 // ── Cancel reasons ──
 
-/** The cancel view's two groups (H:3421): PATIENT and CLINIC. */
-export const CANCEL_REASON_SIDES = ['patient', 'clinic'] as const;
-/** One side. */
-export type CancelReasonSide = (typeof CANCEL_REASON_SIDES)[number];
+/** One of the cancel view's two groups (H:3421): PATIENT and CLINIC. */
+export type CancelReasonSide = 'patient' | 'clinic';
 
 /** The popover's cancel reasons — exactly the contract's `cancel_reason` (`S:1147–1154`, D32), by side. */
 export const CANCEL_REASON_GROUPS: readonly {

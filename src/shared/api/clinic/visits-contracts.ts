@@ -77,7 +77,7 @@ export const VISIT_CHECKS = ['consent', 'photos', 'allergies'] as const;
 export type VisitCheck = (typeof VISIT_CHECKS)[number];
 
 /** Which safety checks are done — the file's step 1 "Check-in & safety". */
-export const visitChecksSchema = z.object({
+const visitChecksSchema = z.object({
   consent: z.boolean(),
   photos: z.boolean(),
   allergies: z.boolean(),
@@ -122,7 +122,7 @@ export type VisitNote = z.infer<typeof visitNoteSchema>;
  * ("All changes saved 10:42"). A checked-in booking with no record yet is a
  * visit still waiting — the record starts with its first move.
  */
-export const visitRecordSchema = clinicCommonSchema.extend({
+const visitRecordSchema = clinicCommonSchema.extend({
   id: z.uuid(),
   appointmentId: z.uuid().nullable(),
   patientId: z.uuid().nullable(),
@@ -148,7 +148,10 @@ export const setVisitStageInputSchema = z.object({
 /** A stage write. */
 export type SetVisitStageInput = z.infer<typeof setVisitStageInputSchema>;
 
-/** A stage write's answer: the visit after it, and the token its Undo sends. */
+/**
+ * A stage write's answer: the visit after it, and the token its Undo sends.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const visitChangeSchema = z.object({
   visit: visitRecordSchema,
   undoToken: z.string(),
@@ -206,7 +209,7 @@ export type VisitPatient = Pick<
 >;
 
 /** An invoice the patient still owes on — the oldest before this visit ("Previous due · …"). */
-export interface VisitOpenInvoice {
+interface VisitOpenInvoice {
   id: string;
   seq: number;
   type: InvoiceType;
@@ -265,7 +268,7 @@ export const setVisitChecksInputSchema = z.object({
 export type SetVisitChecksInput = z.infer<typeof setVisitChecksInputSchema>;
 
 /** The print languages ("Print in", `today.md:87`) — English only at launch (Q-X2). */
-export const VISIT_PRINT_LANGUAGES = ['en'] as const;
+const VISIT_PRINT_LANGUAGES = ['en'] as const;
 
 /**
  * Consult & Rx's Approve (`today.md:78–93`): the note and the reviewed lines —

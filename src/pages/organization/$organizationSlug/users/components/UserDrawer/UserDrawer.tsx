@@ -69,14 +69,14 @@ interface UserDrawerBaseProps {
 }
 
 /** New user (`users/create/`): an invitation, never a password (D17). */
-export interface UserCreateDrawerProps extends UserDrawerBaseProps {
+interface UserCreateDrawerProps extends UserDrawerBaseProps {
   mode: 'create';
   /** Saved: the room closes the drawer; the list stays (D28). */
   onCreated: () => void;
 }
 
 /** Edit user (`users/$userId/edit/`). */
-export interface UserEditDrawerProps extends UserDrawerBaseProps {
+interface UserEditDrawerProps extends UserDrawerBaseProps {
   mode: 'edit';
   /** Undefined while the Team is still loading — the drawer shows its skeleton. */
   member: TeamMember | undefined;

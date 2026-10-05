@@ -49,17 +49,15 @@ export type TodayFloorParams = z.infer<typeof todayFloorParamsSchema>;
 export type TodayFloorParamsInput = z.input<typeof todayFloorParamsSchema>;
 
 /** The visit a checked-in booking is on, as the floor needs it. */
-export const todayVisitSchema = z.object({
+const todayVisitSchema = z.object({
   id: z.uuid(),
   stage: visitStageSchema,
   /** When the current stage began. */
   stageAt: isoDateTimeSchema,
 });
-/** A floor row's visit. */
-export type TodayVisit = z.infer<typeof todayVisitSchema>;
 
 /** The prescription a visit left for the pharmacy: approved, not yet sold (S:1577 "unfilled Rx"). */
-export const todayPrescriptionSchema = z.object({
+const todayPrescriptionSchema = z.object({
   id: z.uuid(),
   /** When the doctor approved it — "Rx approved 10:05". */
   approvedAt: isoDateTimeSchema,
@@ -75,6 +73,7 @@ export type TodayPrescription = z.infer<typeof todayPrescriptionSchema>;
  * booking with no visit is waiting), a first visit, what the person owes, the
  * bill of this visit, their pack, the Rx to fill and their allergies (the
  * schema has none yet — Appendix F).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const todayFloorRowSchema = appointmentRowSchema.extend({
   visit: todayVisitSchema.nullable(),
@@ -101,6 +100,7 @@ export type TodayFloorRow = z.infer<typeof todayFloorRowSchema>;
  * An open enquiry that wrote in today (the Enquiries lane, Appendix F): a lead
  * that is not a contact thread, not closed and not yet a patient, with the
  * time and words of their latest message.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const todayEnquirySchema = z.object({
   id: z.uuid(),

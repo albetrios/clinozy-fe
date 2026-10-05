@@ -249,7 +249,7 @@ const fullName = (profile: StaffProfile) =>
   [profile.firstName, profile.lastName].filter(Boolean).join(' ');
 
 /** The Team's default order (H:5150): the newest #ID first, then members without a profile by name. */
-export function compareTeamDefault(a: TeamMember, b: TeamMember): number {
+function compareTeamDefault(a: TeamMember, b: TeamMember): number {
   if (a.seq !== null && b.seq !== null) return b.seq - a.seq;
   if (a.seq !== null) return -1;
   if (b.seq !== null) return 1;
@@ -384,7 +384,7 @@ export function teamMemberCreatedAt(member: TeamMember): string | null {
 }
 
 /** The Team's Status filter: Active, or Inactive (a suspended membership). */
-export type TeamStatusFilter = 'active' | 'inactive';
+type TeamStatusFilter = 'active' | 'inactive';
 
 /** The Team's Filters (`users.md:204`), as the URL holds them. */
 export interface TeamFilters {

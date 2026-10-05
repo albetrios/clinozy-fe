@@ -9,10 +9,8 @@ import type { TaskRow, TaskTab } from './tasks-contracts.ts';
  * apart from React; the room turns the label into words.
  */
 
-/** The groups of the list: To do's three by due time, then Snoozed and Done's one each. */
-export const TASK_GROUP_IDS = ['overdue', 'today', 'later', 'snoozed', 'done'] as const;
-/** One group of the list. */
-export type TaskGroupId = (typeof TASK_GROUP_IDS)[number];
+/** One group of the list: To do's three by due time, then Snoozed and Done's one each. */
+export type TaskGroupId = 'overdue' | 'today' | 'later' | 'snoozed' | 'done';
 
 /**
  * Each group's square: Overdue blush · Due today butter · Coming up sky
@@ -78,7 +76,7 @@ export function groupTasks<T extends TaskTiming>(
 }
 
 /** A due label's span unit. */
-export type TaskDueUnit = 'minutes' | 'hours' | 'days';
+type TaskDueUnit = 'minutes' | 'hours' | 'days';
 
 /**
  * A row's due label as data (`tasks.md:58, 309`; H:4219): overdue by minutes,

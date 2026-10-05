@@ -69,7 +69,7 @@ export type OfferRecord = z.infer<typeof offerRecordSchema>;
 export const OFFER_STATE_VALUES = ['live', 'scheduled', 'paused', 'ended'] as const;
 
 /** Zod enum of the derived offer state. */
-export const offerStateSchema = z.enum(OFFER_STATE_VALUES);
+const offerStateSchema = z.enum(OFFER_STATE_VALUES);
 
 /** One derived offer state. */
 export type OfferState = z.infer<typeof offerStateSchema>;
@@ -94,7 +94,7 @@ const SERVER_SET = {
  * (`S:557–577`) and the plan's: a duration of 0 shows "—", any GST rate
  * 0–100, up to 20 branches.
  */
-export const offeringFieldsSchema = offeringRecordSchema
+const offeringFieldsSchema = offeringRecordSchema
   .omit({ ...SERVER_SET, seq: true })
   .extend({
     name: z.string().trim().min(1, 'Add a name').max(120),
@@ -181,7 +181,7 @@ const OFFER_VALUE_RANGES = {
  * (`S:579–600`) and the plan's: the note up to 1,000 characters (AMBER), no
  * branches meaning every branch.
  */
-export const offerFieldsSchema = offerRecordSchema.omit(SERVER_SET).extend({
+const offerFieldsSchema = offerRecordSchema.omit(SERVER_SET).extend({
   name: z.string().trim().min(1, 'Name the offer').max(80),
   code: z
     .string()
@@ -240,13 +240,14 @@ export type OfferPatch = Partial<OfferInput>;
 // ── List reads ──
 
 /** The offerings list's sort keys (`S:1734`: `updatedAt` by default; name, price, category). */
-export const OFFERING_SORT_KEYS = ['updatedAt', 'name', 'price', 'category'] as const;
+const OFFERING_SORT_KEYS = ['updatedAt', 'name', 'price', 'category'] as const;
 
 /**
  * `listOfferings`' params (`S:1734`), passed through to clinozy-be when the API
  * lands. `q` matches the name, the search terms and "#274" (H:5454). The rooms
  * read the whole catalogue and search, filter and sort it in place (KICKOFF
  * §6.11 Lists, AMBER), so these stay optional.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const offeringListParamsSchema = z.object({
   q: z.string().max(80).optional(),
@@ -263,6 +264,7 @@ export type OfferingListParams = z.infer<typeof offeringListParamsSchema>;
  * `listOffers`' params (`S:1735`): the derived `state`, and `q` on the name,
  * the code and the offerings' names (H:5476). Sorted by `startsOn`, newest
  * first.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const offerListParamsSchema = z.object({
   q: z.string().max(80).optional(),

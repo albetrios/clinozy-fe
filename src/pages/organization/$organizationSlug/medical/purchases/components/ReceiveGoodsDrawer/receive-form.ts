@@ -39,7 +39,7 @@ export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
 }
 
 /** What is wrong with an arrived line's expiry: none typed, or not "MM/YY". */
-export type ExpiryProblem = 'missing' | 'invalid';
+type ExpiryProblem = 'missing' | 'invalid';
 
 /** One arrived line's expiry problem. */
 export interface LineExpiryProblem {

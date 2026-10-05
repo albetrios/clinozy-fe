@@ -11,7 +11,7 @@ export const daysAgo = (days: number) =>
   new Date(NOW.getTime() - days * 86_400_000).toISOString();
 
 /** A staff profile with the fields the Leads room reads. */
-export function staffProfile(overrides: Partial<StaffProfile> = {}): StaffProfile {
+function staffProfile(overrides: Partial<StaffProfile> = {}): StaffProfile {
   return {
     ...seedCommon(daysAgo(400)),
     id: '00000000-0000-4000-8000-000000000012',

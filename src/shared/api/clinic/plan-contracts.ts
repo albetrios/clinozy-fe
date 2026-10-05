@@ -19,7 +19,7 @@ import type {
  */
 
 /** Who made a suggestion, as the card's 26px avatar shows them. */
-export interface PlanSuggester {
+interface PlanSuggester {
   name: string;
   initials: string;
   tone: Tone;

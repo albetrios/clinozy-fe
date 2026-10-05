@@ -29,15 +29,15 @@ import { PAYMENT_SPLIT_LIMIT } from './payments-contracts.ts';
 // ── Limits (`S:602–636`) ──
 
 /** At most fifty lines on an invoice (`S:610`). */
-export const INVOICE_ITEM_LIMIT = 50;
+const INVOICE_ITEM_LIMIT = 50;
 /** At most ten people on its "Team" / "Prescribed by" (`S:608`). */
-export const INVOICE_TEAM_LIMIT = 10;
+const INVOICE_TEAM_LIMIT = 10;
 /** The Remark — "Shown on the printed invoice" — 500 characters (`S:618`). */
 export const INVOICE_REMARK_MAX = 500;
 /** A line's quantity: the stepper's 1–999, the contract's range (`S:632`). */
 export const INVOICE_QTY_MAX = 999;
 /** A line's name (`S:630`). */
-export const INVOICE_LINE_NAME_MAX = 120;
+const INVOICE_LINE_NAME_MAX = 120;
 
 // ── Records ──
 
@@ -47,14 +47,17 @@ export const INVOICE_LINE_NAME_MAX = 120;
  * the contract's whole percent can't hold "₹10,000" on a ₹11,328 line
  * (Appendix F: a decimal discount).
  */
-export const invoiceItemRecordSchema = invoiceItemSchema.extend({
+const invoiceItemRecordSchema = invoiceItemSchema.extend({
   discountPct: z.number().min(0).max(100),
 });
 
 /** One stored invoice line. */
-export type InvoiceItemRecord = z.infer<typeof invoiceItemRecordSchema>;
+type InvoiceItemRecord = z.infer<typeof invoiceItemRecordSchema>;
 
-/** An invoice as the plan stores it: the contract's, its lines per {@link invoiceItemRecordSchema}. */
+/**
+ * An invoice as the plan stores it: the contract's, its lines per {@link invoiceItemRecordSchema}.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const invoiceRecordSchema = invoiceSchema.extend({
   items: z.array(invoiceItemRecordSchema),
 });
@@ -65,11 +68,11 @@ export type InvoiceRecord = z.infer<typeof invoiceRecordSchema>;
 // ── Writes ──
 
 /** "Pick a patient" — a clinic or consultation invoice is always a patient's (`payments.md:138`). */
-export const INVOICE_PATIENT_MESSAGE = 'Pick a patient';
+const INVOICE_PATIENT_MESSAGE = 'Pick a patient';
 /** "Pick a customer" — a Medical sale's buyer (`payments.md:138`). */
 export const INVOICE_CUSTOMER_MESSAGE = 'Pick a customer';
 /** "Add at least one item" (`payments.md:146`). */
-export const INVOICE_ITEMS_MESSAGE = 'Add at least one item';
+const INVOICE_ITEMS_MESSAGE = 'Add at least one item';
 
 /**
  * One line as the drawer sends it (`S:624–636`): an offering's (clinic,
@@ -77,14 +80,12 @@ export const INVOICE_ITEMS_MESSAGE = 'Add at least one item';
  * its quantity 1–999, the rate in paise, the Disc % to the precision the Final
  * needs and the GST percent. The batch is the server's (earliest expiry).
  */
-export const invoiceLineInputSchema = invoiceItemRecordSchema
-  .omit({ batchNo: true })
-  .extend({
-    name: z.string().trim().min(1, INVOICE_ITEMS_MESSAGE).max(INVOICE_LINE_NAME_MAX),
-    packSize: z.string().trim().max(30).nullable(),
-    qty: z.number().int().min(1).max(INVOICE_QTY_MAX),
-    gstPct: z.number().min(0).max(100),
-  });
+const invoiceLineInputSchema = invoiceItemRecordSchema.omit({ batchNo: true }).extend({
+  name: z.string().trim().min(1, INVOICE_ITEMS_MESSAGE).max(INVOICE_LINE_NAME_MAX),
+  packSize: z.string().trim().max(30).nullable(),
+  qty: z.number().int().min(1).max(INVOICE_QTY_MAX),
+  gstPct: z.number().min(0).max(100),
+});
 
 /** One line of an invoice write. */
 export type InvoiceLineInput = z.infer<typeof invoiceLineInputSchema>;
@@ -95,7 +96,7 @@ export type InvoiceLineInput = z.infer<typeof invoiceLineInputSchema>;
  * contract's `createInvoice` takes no payment; `createSale` takes `mode` and
  * `paidNow`, `S:1666`).
  */
-export const paidNowSchema = z
+const paidNowSchema = z
   .array(paymentSplitSchema.extend({ amount: paiseSchema.positive() }))
   .max(PAYMENT_SPLIT_LIMIT);
 
@@ -210,7 +211,7 @@ export interface InvoiceRepeatSource {
 }
 
 /** A package the patient holds ("⚡ Package · <offering>"). */
-export interface InvoicePackagePreset {
+interface InvoicePackagePreset {
   offeringId: string;
 }
 

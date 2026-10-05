@@ -15,10 +15,10 @@ import type { LedgerPerson, LedgerRow } from './payments-contracts.ts';
  * Where a day's opening cash came from: the contract's two (`S:1421–1425`) and
  * the plan's "Recounted" (Appendix F) — a count typed at the gate.
  */
-export const DAY_OPENING_SOURCE_VALUES = [...OPENING_SOURCE_VALUES, 'recounted'] as const;
+const DAY_OPENING_SOURCE_VALUES = [...OPENING_SOURCE_VALUES, 'recounted'] as const;
 
 /** An opening cash's source. */
-export type DayOpeningSource = (typeof DAY_OPENING_SOURCE_VALUES)[number];
+type DayOpeningSource = (typeof DAY_OPENING_SOURCE_VALUES)[number];
 
 /**
  * A branch-day close: the contract's fields with the plan's — the recount
@@ -49,7 +49,7 @@ export interface DayOpening {
 }
 
 /** Money one way on the day: the sum and how many entries. */
-export interface DayFlow {
+interface DayFlow {
   amount: number;
   count: number;
 }

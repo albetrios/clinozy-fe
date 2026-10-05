@@ -18,14 +18,13 @@ export const NEW_TASK_DUE_PRESETS = [
 export type NewTaskDuePreset = (typeof NEW_TASK_DUE_PRESETS)[number];
 
 /** What each Due chip sets: days from the clinic's today, at a clinic-local time. */
-export const NEW_TASK_DUE_AT: Readonly<
-  Record<NewTaskDuePreset, { days: number; at: string }>
-> = {
-  today: { days: 0, at: '17:00' },
-  tomorrow: { days: 1, at: '11:00' },
-  inThreeDays: { days: 3, at: '11:00' },
-  nextWeek: { days: 7, at: '11:00' },
-};
+const NEW_TASK_DUE_AT: Readonly<Record<NewTaskDuePreset, { days: number; at: string }>> =
+  {
+    today: { days: 0, at: '17:00' },
+    tomorrow: { days: 1, at: '11:00' },
+    inThreeDays: { days: 3, at: '11:00' },
+    nextWeek: { days: 7, at: '11:00' },
+  };
 
 /** The person a New task is for — a patient, or a lead (a chat-only contact too). */
 export interface NewTaskPerson {

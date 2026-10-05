@@ -2,7 +2,7 @@ import { invoiceLineAmounts } from '@/shared/api/clinic/clinic-money.ts';
 import type { VisitDetail } from '@/shared/api/clinic/visits-contracts.ts';
 
 /** What a bill line's sub-line says (`today.md:263`), or nothing. */
-export type VisitBillLineNote =
+type VisitBillLineNote =
   | { kind: 'fromPack' }
   | { kind: 'discount'; pct: number; final: number }
   | { kind: 'gstExempt' }
@@ -17,7 +17,7 @@ export interface VisitBillRow {
 }
 
 /** One GST rate's line of the totals: "GST 18% on ₹3,150" · ₹567. */
-export interface VisitGstRow {
+interface VisitGstRow {
   rate: number;
   base: number;
   amount: number;

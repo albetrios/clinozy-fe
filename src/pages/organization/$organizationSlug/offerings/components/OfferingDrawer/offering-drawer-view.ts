@@ -56,7 +56,7 @@ export interface OfferOnThis {
 export type OfferingStepId = 'offering' | 'time' | 'details';
 
 /** A step card's head: what it peeks while closed, its sub line, and its gaps. */
-export interface OfferingStepView {
+interface OfferingStepView {
   id: OfferingStepId;
   peek: DrawerPeekItem[];
   summary: string;

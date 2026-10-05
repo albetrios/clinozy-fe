@@ -49,7 +49,7 @@ export interface StockItemRow extends StockItem {
 }
 
 /** The Items columns the server sorts by (`clinic-stock.md:31`). */
-export type StockItemSortKey = 'seq' | 'name' | 'category' | 'stock' | 'lasts';
+type StockItemSortKey = 'seq' | 'name' | 'category' | 'stock' | 'lasts';
 
 /** `listStockItems`' params (`S:1680`): search, Low stock, categories, runways, Created, sort. */
 export interface StockItemListParams {
@@ -74,7 +74,7 @@ export interface StockPurchaseRow extends StockPurchase {
 }
 
 /** The Purchases columns the server sorts by (`clinic-stock.md:47`). */
-export type StockPurchaseSortKey = 'seq' | 'vendor' | 'bill' | 'due';
+type StockPurchaseSortKey = 'seq' | 'vendor' | 'bill' | 'due';
 
 /** `listStockPurchases`' params (`S:1682`): search, statuses, one vendor, Created, sort. */
 export interface StockPurchaseListParams {
@@ -89,7 +89,7 @@ export interface StockPurchaseListParams {
 // ── Movements ──
 
 /** A movement row's item: what the Change cell measures in. */
-export interface StockMovementItem {
+interface StockMovementItem {
   id: string;
   name: string;
   unit: StockItem['unit'];
@@ -128,7 +128,7 @@ export interface StockChangeRow {
  * paid (`clinic-stock.md:71`), derived from it until `listMovements` serves
  * them (Appendix F).
  */
-export interface StockPaymentRow {
+interface StockPaymentRow {
   id: string;
   kind: 'payment';
   purchase: { id: string; seq: number; billNo: string | null };
@@ -164,7 +164,7 @@ export interface StockVendorRow extends StockVendor {
 }
 
 /** The Vendors columns the server sorts by. */
-export type StockVendorSortKey = 'name' | 'payable';
+type StockVendorSortKey = 'name' | 'payable';
 
 /** `listVendors`' params (`S:1683`): search, sort. */
 export interface StockVendorListParams {

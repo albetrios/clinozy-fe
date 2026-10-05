@@ -26,7 +26,7 @@ import { leadsColumn } from './leads-table-layout.ts';
 import { LeadPersonCell, LeadTeamCell, LeadUpdatedCell } from './LeadsTableCells.tsx';
 
 /** A Leads column definition. */
-export type LeadsColumnDef = ColumnDef<DataTableFeatures, LeadRecord>;
+type LeadsColumnDef = ColumnDef<DataTableFeatures, LeadRecord>;
 
 /**
  * The Leads columns (`leads.md:32–34`; `ldColsVM`, H:4176): Lead (always
@@ -35,7 +35,7 @@ export type LeadsColumnDef = ColumnDef<DataTableFeatures, LeadRecord>;
  * newest first → off; Interested in and Team don't sort. The server sorts
  * (`manualSorting`): the column ids are `listLeads`' sort keys.
  */
-export function useLeadsColumns(now: Date): LeadsColumnDef[] {
+function useLeadsColumns(now: Date): LeadsColumnDef[] {
   const { t } = useTranslation(LEADS_NS);
   return useMemo(() => {
     const label = (key: string) => t(key);

@@ -6,12 +6,10 @@ import type {
 import type { VisitDraftLine } from './store/useVisitDraftStore/index.ts';
 
 /** A dose tap cycles 0 → 1 → 2 → 0 (the Rx drawer's, `patient-file.md:111`). */
-export const RX_DOSE_MAX = 2;
+const RX_DOSE_MAX = 2;
 
 /** The dose slots of a line, in the day's order. */
 export const RX_DOSE_SLOTS = ['doseMorning', 'doseAfternoon', 'doseNight'] as const;
-/** One dose slot. */
-export type RxDoseSlot = (typeof RX_DOSE_SLOTS)[number];
 
 let lineSequence = 0;
 

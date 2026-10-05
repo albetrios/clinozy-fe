@@ -27,13 +27,13 @@ import {
 // ── Records ──
 
 /** A ledger entry's reference — "UPI ref / card last 4" (`payments.md:103`). */
-export const PAYMENT_REFERENCE_MAX = 30;
+const PAYMENT_REFERENCE_MAX = 30;
 
 /** A ledger entry's note: the contract's 280 characters (`S:661`). */
-export const PAYMENT_NOTE_MAX = 280;
+const PAYMENT_NOTE_MAX = 280;
 
 /** The amount and the modes of an entry, before or after an edit. */
-export const paymentEditSideSchema = z.object({
+const paymentEditSideSchema = z.object({
   amount: paiseSchema,
   modes: z.array(paymentModeSchema),
 });
@@ -45,7 +45,7 @@ export type PaymentEditSide = z.infer<typeof paymentEditSideSchema>;
  * One logged change of an entry while its day is open — "Edited 1× · last ₹600
  * UPI → ₹700 UPI" (`payments.md:29`; the edit log, Appendix F).
  */
-export const paymentEditSchema = z.object({
+const paymentEditSchema = z.object({
   at: isoDateTimeSchema,
   byId: z.uuid(),
   from: paymentEditSideSchema,
@@ -71,7 +71,7 @@ export const paymentRecordSchema = paymentSchema.extend({
 export type PaymentRecord = z.infer<typeof paymentRecordSchema>;
 
 /** The member a row's "By" cell shows — embedded so a row renders without a join. */
-export const ledgerPersonSchema = z.object({
+const ledgerPersonSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   initials: z.string(),
@@ -87,6 +87,7 @@ export type LedgerPerson = z.infer<typeof ledgerPersonSchema>;
  * bill it settles, the pending credit it came from, who recorded it, and
  * whether its day is closed (the server-derived lock, `dayCloseId`, `S:662`).
  * REPLACE_WITH_API: embed these in `listLedger`.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const ledgerRowSchema = paymentRecordSchema.extend({
   /** The patient's name, else the payee ("Tea & snacks", "Medline Surgicals"). */
@@ -215,6 +216,7 @@ export type LedgerKindFilter = (typeof LEDGER_KIND_VALUES)[number];
  * day Day close reviews (`day`); the header branches (`branchIds`, empty = all);
  * and Medical › Payments' fixed `scope=medical` (`S:71`, `S:1662`). Newest
  * first — the ledger has no column sort (`payments.md:31`).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const ledgerListParamsSchema = z.object({
   direction: paymentDirectionSchema.optional(),

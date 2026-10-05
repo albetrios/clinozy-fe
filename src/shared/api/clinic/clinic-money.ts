@@ -112,7 +112,7 @@ export interface InvoiceBalance {
 }
 
 /** Money in and out of one payment mode, in paise. */
-export interface ModeFlow {
+interface ModeFlow {
   in: number;
   out: number;
 }

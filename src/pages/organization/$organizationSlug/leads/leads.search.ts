@@ -54,7 +54,7 @@ const SORT_KEYS = [
 ] as const satisfies readonly LeadSortKey[];
 
 /** A column sort in the URL: `name:asc`, `updated:desc` (the shared table's form). */
-export type LeadsSort = `${LeadSortKey}:${'asc' | 'desc'}`;
+type LeadsSort = `${LeadSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for `/leads` and its dialog routes. */
 export interface LeadsSearch {

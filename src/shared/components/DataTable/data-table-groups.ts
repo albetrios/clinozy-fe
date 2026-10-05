@@ -20,7 +20,7 @@ export interface TableGroupEntry<TData extends RowData> {
 }
 
 /** A row entry: the row and its index among the rows (selection, j / k). */
-export interface TableRowEntry<TData extends RowData> {
+interface TableRowEntry<TData extends RowData> {
   kind: 'row';
   id: string;
   row: TableRow<TData>;

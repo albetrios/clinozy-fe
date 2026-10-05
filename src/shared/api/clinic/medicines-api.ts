@@ -87,7 +87,7 @@ function readContext(world: FixtureWorld): ReadContext {
 }
 
 /** A medicine as its list row: the stock, its maker, the batch first to expire, the best price. */
-export function toMedicineRow(
+function toMedicineRow(
   medicine: MedicineRecord,
   context: {
     today: string;

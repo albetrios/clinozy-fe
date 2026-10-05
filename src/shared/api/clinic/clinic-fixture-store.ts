@@ -122,7 +122,7 @@ export function refuseUnknownIds(
 }
 
 /** A list read: server-side filter and sort, and the cursor of the page to fetch. */
-export interface ListQuery<T> {
+interface ListQuery<T> {
   where?: (row: T) => boolean;
   sort?: (a: T, b: T) => number;
   cursor?: string | null;

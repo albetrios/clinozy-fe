@@ -29,7 +29,7 @@ export const PATIENT_FILE_DEFAULT_SECTION =
   'timeline' as const satisfies PatientFileSectionSlug;
 
 /** The sections that also need billing view (`S:33`): Invoices and Payments. */
-export const PATIENT_FILE_BILLING_SECTIONS = [
+const PATIENT_FILE_BILLING_SECTIONS = [
   'invoices',
   'payments',
 ] as const satisfies readonly PatientFileSectionSlug[];
@@ -65,7 +65,7 @@ export function viewablePatientFileSections(access: {
  * Doctor or Therapist, and the Private photo album is Doctor or Admin. The
  * clinic's Owner always passes.
  */
-export const PATIENT_FILE_ROLE_GATES = {
+const PATIENT_FILE_ROLE_GATES = {
   prescriptions: ['doctor', 'admin'],
   treatments: ['doctor', 'therapist'],
   privateAlbum: ['doctor', 'admin'],

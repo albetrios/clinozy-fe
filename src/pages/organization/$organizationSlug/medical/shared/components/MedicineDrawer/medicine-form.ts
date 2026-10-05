@@ -116,9 +116,7 @@ export const formStock = (values: Pick<MedicineFormValues, 'batches'>): number =
   values.batches.reduce((sum, batch) => sum + batch.qty, 0);
 
 /** The supplier prices with a supplier picked, as the contract spells them. */
-export function pickedRates(
-  values: Pick<MedicineFormValues, 'supplierRates'>,
-): SupplierRate[] {
+function pickedRates(values: Pick<MedicineFormValues, 'supplierRates'>): SupplierRate[] {
   return values.supplierRates.filter((row) => row.supplierId !== '');
 }
 

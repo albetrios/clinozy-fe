@@ -40,16 +40,13 @@ export const leadRecordSourceSchema = z.enum(LEAD_RECORD_SOURCE_VALUES);
 export type LeadRecordSource = z.infer<typeof leadRecordSourceSchema>;
 
 /** An interest typed into "Add interest" — at most 30 characters (`leads.md:64`). */
-export const customInterestSchema = z.string().trim().min(1).max(30);
+const customInterestSchema = z.string().trim().min(1).max(30);
 
 /** One of the person's numbers: E.164, and whether they are on WhatsApp on it. */
-export const leadContactPhoneSchema = z.object({
+const leadContactPhoneSchema = z.object({
   phone: phoneSchema,
   whatsapp: z.boolean(),
 });
-
-/** One of the person's numbers. */
-export type LeadContactPhone = z.infer<typeof leadContactPhoneSchema>;
 
 /** The channels a contact may prefer (`CHS`, H:3362): WhatsApp · Call · SMS · Instagram. */
 export const CONTACT_CHANNEL_VALUES = ['whatsapp', 'call', 'sms', 'instagram'] as const;
@@ -65,7 +62,7 @@ export type ContactChannel = (typeof CONTACT_CHANNEL_VALUES)[number];
  * Absent on a record nobody has edited — then the lead's own mobile on
  * WhatsApp, no handle, WhatsApp, none.
  */
-export const leadContactSchema = z.object({
+const leadContactSchema = z.object({
   phones: z.array(leadContactPhoneSchema).min(1).max(5),
   instagram: z.array(z.string().trim().min(1).max(30)).max(5),
   defaultChannel: z.enum(CONTACT_CHANNEL_VALUES),
@@ -201,6 +198,7 @@ export type LeadPatch = Partial<LeadFields>;
  * search" — Appendix F, REPLACE_WITH_API): a patient ("Patient #3508 · last
  * visit 24 Sep", "Re-create lead") or a person known only as a lead or a chat
  * ("Lead #2365 · +91 98250 11241", "Use contact") with their contact fields.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const leadContactHitSchema = z.discriminatedUnion('kind', [
   z.object({
@@ -258,6 +256,7 @@ export type LeadSortKey = (typeof LEAD_SORT_KEYS)[number];
  * assigned **or** involved, the `updated` sort — backend requests). The
  * contract takes several statuses; the design filters on one. Contact threads
  * never appear (`S:261`).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const leadListParamsSchema = z.object({
   view: z.enum(LEAD_VIEW_VALUES).optional(),

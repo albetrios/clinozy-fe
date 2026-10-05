@@ -153,7 +153,7 @@ export function missingBranchFields(
 }
 
 /** Which roles may be each default (`users.md:194–197`): Front desk takes Counsellors too. */
-export const DEFAULT_ROLE_KEYS: Readonly<Record<BranchDefaultRole, readonly string[]>> = {
+const DEFAULT_ROLE_KEYS: Readonly<Record<BranchDefaultRole, readonly string[]>> = {
   doctor: ['doctor'],
   desk: ['front_desk', 'counsellor'],
   therapist: ['therapist'],

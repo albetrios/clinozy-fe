@@ -561,7 +561,7 @@ export function slotDone(draft: AppointmentDraft): boolean {
 }
 
 /** Date & time are locked once the patient is checked in (`S:352`). */
-export const slotLocked = (status: AppointmentStatus) => isAppointmentSlotLocked(status);
+const slotLocked = (status: AppointmentStatus) => isAppointmentSlotLocked(status);
 
 /** What the primary button says (H:5983): "Pick a time" · "Book …" · "Move to …" · "Save changes". */
 export type SaveLabelKind = 'pickTime' | 'book' | 'move' | 'saveChanges';

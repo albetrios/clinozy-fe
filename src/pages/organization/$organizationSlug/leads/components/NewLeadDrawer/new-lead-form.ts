@@ -17,7 +17,7 @@ import { type AppIcon, House, InstagramMark, Phone } from '@/shared/icons/index.
  * (the card's avatar, the patient link, the editor's linked notice), or nowhere
  * — typed in "New contact", or prefilled by the contact card's "+ Lead".
  */
-export type NewLeadOrigin = {
+type NewLeadOrigin = {
   kind: LeadContactHit['kind'];
   id: string;
   seq: number;

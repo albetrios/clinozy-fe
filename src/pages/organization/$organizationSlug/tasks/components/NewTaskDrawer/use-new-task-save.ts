@@ -7,7 +7,7 @@ import { useCreateTask } from '@/shared/hooks/useTasks/index.ts';
 import type { NewTaskForm } from './new-task-form.ts';
 
 /** The form's fields in the drawer's order — a server error opens the first one it names. */
-export const NEW_TASK_FIELD_ORDER: readonly (keyof NewTaskForm)[] = [
+const NEW_TASK_FIELD_ORDER: readonly (keyof NewTaskForm)[] = [
   'person',
   'type',
   'title',

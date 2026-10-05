@@ -24,7 +24,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 
 /** Why the boxes and switches can't change: Admin is always full, or the viewer may not. */
-export type RoleLock = 'admin' | 'noPerms' | null;
+type RoleLock = 'admin' | 'noPerms' | null;
 
 /** What a role page may write, and how. */
 export interface RoleAccessWrites {

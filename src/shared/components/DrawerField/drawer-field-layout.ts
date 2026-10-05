@@ -14,7 +14,7 @@ export interface DrawerFieldSlot {
 }
 
 /** Columns in the drawer form's grid. */
-export const DRAWER_GRID_COLUMNS = 6;
+const DRAWER_GRID_COLUMNS = 6;
 
 const SPAN_COLUMNS: Record<DrawerFieldSpan, number> = { full: 6, half: 3, third: 2 };
 

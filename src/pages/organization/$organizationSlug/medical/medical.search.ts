@@ -54,10 +54,10 @@ const SORT_KEYS = [
 ] as const;
 
 /** A sortable column of any Medical tab. */
-export type MedicalSortKey = (typeof SORT_KEYS)[number];
+type MedicalSortKey = (typeof SORT_KEYS)[number];
 
 /** A column sort in the URL: `bill:desc`, `name:asc` (the shared table's form). */
-export type MedicalSort = `${MedicalSortKey}:${'asc' | 'desc'}`;
+type MedicalSort = `${MedicalSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for the Medical tabs and their dialog routes. */
 export interface MedicalSearch {

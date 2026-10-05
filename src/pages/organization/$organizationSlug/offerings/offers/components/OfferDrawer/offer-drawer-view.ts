@@ -35,7 +35,7 @@ const F = K.fields;
 export type OfferStepId = 'offer' | 'where' | 'notes';
 
 /** A step card's head: what it peeks while closed, its sub line, and its gaps. */
-export interface OfferStepView {
+interface OfferStepView {
   id: OfferStepId;
   peek: DrawerPeekItem[];
   summary: string;

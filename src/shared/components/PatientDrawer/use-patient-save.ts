@@ -16,7 +16,7 @@ import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constan
 import { invalidPatientPhones, type PatientFormValues } from './patient-form.ts';
 
 /** The drawer's two steps. */
-export type PatientDrawerStepId = 'contact' | 'clinic';
+type PatientDrawerStepId = 'contact' | 'clinic';
 
 /** Which step holds each field — a server error opens the step of the first one it names. */
 const FIELD_STEPS: Readonly<Record<keyof PatientFormValues, PatientDrawerStepId>> = {

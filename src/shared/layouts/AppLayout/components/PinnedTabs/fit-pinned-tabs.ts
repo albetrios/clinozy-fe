@@ -4,7 +4,7 @@ import { fitTabs, type TabFit } from '@/lib/fit-tabs.ts';
 export const MORE_RESERVE = 84;
 
 /** The search field's share of the header when pins compete with it (H:4084). */
-export const SEARCH_RESERVE = 170;
+const SEARCH_RESERVE = 170;
 
 /**
  * The width one pinned tab needs: inline padding 20, icon 16, gap 6, the label

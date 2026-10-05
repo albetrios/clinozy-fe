@@ -37,14 +37,14 @@ import { leadRecordSourceSchema } from './leads-contracts.ts';
  * Instagram, a logged call and a team note. SMS and e-mail are read-only in
  * the thread.
  */
-export const COMPOSER_MODES = [
+const COMPOSER_MODES = [
   'whatsapp',
   'instagram',
   'call',
   'note',
 ] as const satisfies readonly Channel[];
 /** Zod enum of {@link COMPOSER_MODES}. */
-export const composerModeSchema = z.enum(COMPOSER_MODES);
+const composerModeSchema = z.enum(COMPOSER_MODES);
 /** One composer mode — a sendable channel. */
 export type ComposerMode = z.infer<typeof composerModeSchema>;
 
@@ -52,6 +52,7 @@ export type ComposerMode = z.infer<typeof composerModeSchema>;
  * Whose conversation a chat column shows — one thread per person (D32): a lead
  * is its own thread; a patient's thread is their lead, or a contact thread
  * opened by their first message.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const chatPersonSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('lead'), leadId: z.uuid() }),
@@ -84,7 +85,7 @@ export type SendMessageInput = z.infer<typeof sendMessageInputSchema>;
 // ── The thread ──
 
 /** The thread a person's chat lives in: the lead (`kind` enquiry / retarget) or a contact thread. */
-export const chatThreadSchema = z.object({
+const chatThreadSchema = z.object({
   leadId: z.uuid(),
   kind: leadKindSchema,
   /** When the lead came in — "Lead created · <time> · via <source>". */
@@ -101,7 +102,7 @@ export type ChatThread = z.infer<typeof chatThreadSchema>;
  * A team member as the thread shows them — the sender line and its "Sent this"
  * card (REPLACE_WITH_API: the staff profile read, `S:184–210`).
  */
-export const chatAuthorSchema = z.object({
+const chatAuthorSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   initials: z.string(),
@@ -117,6 +118,7 @@ export type ChatAuthor = z.infer<typeof chatAuthorSchema>;
 /**
  * The chat's read of `getLead` (`S:1589`): the thread — `null` while a patient
  * has none yet — its messages oldest first, and the authors they name.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const chatThreadReadSchema = z.object({
   thread: chatThreadSchema.nullable(),
@@ -126,7 +128,10 @@ export const chatThreadReadSchema = z.object({
 /** A thread with its messages and authors. */
 export type ChatThreadRead = z.infer<typeof chatThreadReadSchema>;
 
-/** Channel health the composer warns about (Q-L10: hidden until the backend signals it). */
+/**
+ * Channel health the composer warns about (Q-L10: hidden until the backend signals it).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const messagingStatusSchema = z.object({
   /** WhatsApp is down: WhatsApp replies queue, and the composer says so. */
   whatsappDown: z.boolean(),
@@ -140,7 +145,7 @@ export type MessagingStatus = z.infer<typeof messagingStatusSchema>;
  * When something happened: an instant (shown with its clock time) or a
  * calendar date the contract stores without one (shown as the day alone).
  */
-export const chatWhenSchema = z.discriminatedUnion('kind', [
+const chatWhenSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('instant'), at: isoDateTimeSchema }),
   z.object({ kind: z.literal('day'), date: civilDateSchema }),
 ]);
@@ -161,6 +166,7 @@ const historyBase = {
  * reminders sent for them, prescriptions, treatments, invoices, payments,
  * check-ins, reviews and task outcomes — joined by id, never by name (§7.3).
  * Names are display names; money is paise.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const contactHistoryEntrySchema = z.discriminatedUnion('kind', [
   z.object({
@@ -242,13 +248,11 @@ export const contactHistoryEntrySchema = z.discriminatedUnion('kind', [
 ]);
 /** One contact-history line. */
 export type ContactHistoryEntry = z.infer<typeof contactHistoryEntrySchema>;
-/** The kinds of contact-history line. */
-export type ContactHistoryKind = ContactHistoryEntry['kind'];
 
 // ── Composer values ──
 
 /** A clinic-local slot, `YYYY-MM-DD` + `HH:mm`. */
-export const chatSlotSchema = z.object({ date: civilDateSchema, time: clockTimeSchema });
+const chatSlotSchema = z.object({ date: civilDateSchema, time: clockTimeSchema });
 /** A free slot. */
 export type ChatSlot = z.infer<typeof chatSlotSchema>;
 
@@ -257,6 +261,7 @@ export type ChatSlot = z.infer<typeof chatSlotSchema>;
  * organisation and the thread's branch, never literals (§7.3): the clinic's
  * name, the branch address, its maps and review links (Appendix F
  * "Branches"), and the next two free slots (REPLACE_WITH_API: the slot read).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const chatTemplateValuesSchema = z.object({
   clinicName: z.string(),

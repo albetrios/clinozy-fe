@@ -584,8 +584,7 @@ export function fillValues(
 // ── Suggestions ──
 
 /** A smart chip (`_patterns.md:180`). */
-export type SmartChipKind =
-  'price' | 'slots' | 'location' | 'explain' | 'greet' | 'followUp';
+type SmartChipKind = 'price' | 'slots' | 'location' | 'explain' | 'greet' | 'followUp';
 
 /** A smart chip: what it offers, the word it explains, whether their message asked for it. */
 export interface SmartChip {

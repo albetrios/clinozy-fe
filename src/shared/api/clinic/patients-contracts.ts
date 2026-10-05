@@ -36,13 +36,13 @@ import { clinicToday } from './clinic-time.ts';
 export const PATIENT_CONSENT_VALUES = ['data', 'photos', 'marketing'] as const;
 
 /** Zod enum of one consent chip. */
-export const patientConsentSchema = z.enum(PATIENT_CONSENT_VALUES);
+const patientConsentSchema = z.enum(PATIENT_CONSENT_VALUES);
 
 /** One consent the patient signed. */
 export type PatientConsent = z.infer<typeof patientConsentSchema>;
 
 /** "Referred by" is a free-text name of at most 30 characters (`patients.md:55`). */
-export const REFERRED_BY_MAX = 30;
+const REFERRED_BY_MAX = 30;
 
 /**
  * A patient as the rooms read it: the contract's `Patient` (`S:287–320`) with
@@ -63,7 +63,7 @@ export const patientRecordSchema = patientSchema.extend({
 export type PatientRecord = z.infer<typeof patientRecordSchema>;
 
 /** The team member a row's "Updated" cell shows — embedded so a row renders without a join. */
-export const patientUpdaterSchema = z.object({
+const patientUpdaterSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   initials: z.string(),
@@ -77,6 +77,7 @@ export type PatientUpdater = z.infer<typeof patientUpdaterSchema>;
  * A list row: the record, what the patient owes the clinic across their open
  * invoices (integer paise; "per-row `dueTotal`", Appendix F) and the member who
  * last saved it (REPLACE_WITH_API: embed both in `listPatients`).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const patientRowSchema = patientRecordSchema.extend({
   dueTotal: paiseSchema,
@@ -89,7 +90,7 @@ export type PatientRow = z.infer<typeof patientRowSchema>;
 // ── Writes ──
 
 /** The form's own limits, inside the contract's (`patients.md:44–58`; `S:295–312`). */
-export const PATIENT_FIELD_LIMITS = {
+const PATIENT_FIELD_LIMITS = {
   name: 60,
   /** The contract allows 240; the drawer's textarea stops at 200. */
   address: 240,
@@ -237,6 +238,7 @@ export type PatientSortKey = (typeof PATIENT_SORT_KEYS)[number];
  * `listPatients`' params (`S:1619`) and the plan's (`recall`, `gender`,
  * `conversion` and the extra sort keys — backend requests, Appendix F). The
  * badge filters take any number of values each.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const patientListParamsSchema = z.object({
   view: z.enum(PATIENT_VIEW_VALUES).optional(),

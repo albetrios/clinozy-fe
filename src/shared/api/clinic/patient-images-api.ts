@@ -101,7 +101,7 @@ export async function listPatientPhotos(
 }
 
 /** What Photo details may change (`updateImage`, `S:1643`): blank fields are left out. */
-export const patientPhotoPatchSchema = z
+const patientPhotoPatchSchema = z
   .object({
     /** Shown over the file name; at most 60 in the drawer (the contract allows 200). */
     caption: z.string().trim().min(1).max(60),

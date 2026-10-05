@@ -11,9 +11,9 @@ import { clockMinutes, clockOfMinutes } from '@/shared/api/clinic/clinic-time.ts
 // ── The hour rail ──
 
 /** The rail's first hour, 9 am (`H0`, H:5924). */
-export const RAIL_FIRST_HOUR = 9;
+const RAIL_FIRST_HOUR = 9;
 /** The hour the rail ends at, 10 pm (`H1`, H:5924) — the last label is 9 pm. */
-export const RAIL_END_HOUR = 22;
+const RAIL_END_HOUR = 22;
 /** One hour on the rail, px (`WPX`, H:5924). */
 export const HOUR_HEIGHT = 88;
 /** The rail's height: 13 hours of 88px — 1,144px. */
@@ -133,7 +133,7 @@ export function laneLayout(
 }
 
 /** A block under this height is one line (`chipOf`'s `hpx < 40`, H:5929; `appointments.md:47`). */
-export const ONE_LINE_BELOW = 40;
+const ONE_LINE_BELOW = 40;
 
 /** Where a block sits in its column. */
 export interface BlockGeometry {
@@ -258,7 +258,7 @@ export function loadDots(booked: number): 0 | 1 | 2 | 3 {
 // ── Month ──
 
 /** A Month chip's height with its gap, px (H:5938). */
-export const MONTH_CHIP_HEIGHT = 26;
+const MONTH_CHIP_HEIGHT = 26;
 
 /**
  * How many chips a Month cell of `cellHeight` px shows (`fitN`, H:5938): all of

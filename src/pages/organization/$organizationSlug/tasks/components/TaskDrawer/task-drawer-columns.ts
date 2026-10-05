@@ -1,5 +1,5 @@
 /** The task drawer's width: `min(900px, 100vw − 40px)` (`tasks.md` › Task drawer › Size). */
-export const TASK_DRAWER_MAX_WIDTH = 900;
+const TASK_DRAWER_MAX_WIDTH = 900;
 
 /** What the drawer always leaves of the viewport (room for the floating ×). */
 const VIEWPORT_GUTTER = 40;

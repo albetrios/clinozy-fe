@@ -16,7 +16,7 @@ import {
 export const PICK_SUPPLIER_MESSAGE = 'Pick a supplier';
 
 /** A purchase line's rate is required once a medicine is picked (`medical.md:259`). */
-export const PURCHASE_RATE_MESSAGE = 'Enter the purchase rate';
+const PURCHASE_RATE_MESSAGE = 'Enter the purchase rate';
 
 /** An arrived line needs its expiry (KICKOFF §6.7, AMBER: the prototype invents "12/27"). */
 export const EXPIRY_MESSAGE = 'Enter the expiry';
@@ -25,7 +25,7 @@ export const EXPIRY_MESSAGE = 'Enter the expiry';
 export const RETURN_NOTHING_MESSAGE = 'Enter what is being returned';
 
 /** One line of a purchase order: the medicine, how many, the free units and the rate. */
-export const purchaseOrderLineInputSchema = z.object({
+const purchaseOrderLineInputSchema = z.object({
   medicineId: z.uuid(),
   qty: z.number().int().positive().max(9999),
   free: z.number().int().nonnegative().max(9999),
@@ -47,7 +47,7 @@ export const purchaseOrderInputSchema = z.object({
 export type PurchaseOrderInput = z.infer<typeof purchaseOrderInputSchema>;
 
 /** One line of Receive goods: whether it arrived, its batch and expiry (`medical.md:271–275`). */
-export const receiveLineInputSchema = z.object({
+const receiveLineInputSchema = z.object({
   arrived: z.boolean(),
   batchNo: z.string().trim().max(30).nullable(),
   expiry: expiryMonthSchema.nullable(),

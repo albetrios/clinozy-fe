@@ -12,7 +12,7 @@ import { useTaskDayTimeWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 
 /** A context tile's label key. */
-export type TaskContextTileKey = keyof typeof TASKS_KEYS.drawer.tiles;
+type TaskContextTileKey = keyof typeof TASKS_KEYS.drawer.tiles;
 
 /** One context tile: its label and its value ("—" when the record has none). */
 export interface TaskContextTile {

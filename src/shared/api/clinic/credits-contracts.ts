@@ -42,7 +42,7 @@ export const CREDIT_REASON_VALUES = {
 } as const;
 
 /** Every reason chip of either direction. */
-export const CREDIT_REASON_KEYS = [
+const CREDIT_REASON_KEYS = [
   ...CREDIT_REASON_VALUES.give,
   ...CREDIT_REASON_VALUES.take.filter((key) => key !== 'other'),
 ] as const;
@@ -75,6 +75,7 @@ export type PendingCreditRecord = z.infer<typeof pendingCreditRecordSchema>;
  * for ("Invoice #785"), and the invoice a use on the next bill settled it on
  * ("Adjusted · Invoice #785", Q-G9). REPLACE_WITH_API: embed these in
  * `listPendingCredits`.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const creditRowSchema = pendingCreditRecordSchema.extend({
   patientSeq: z.number().int().nonnegative().nullable(),
@@ -160,13 +161,11 @@ export interface CreditSettleResult {
 
 // ── Reads ──
 
-/** The Pending table's state filter: each stored status (D22). */
-export const CREDIT_STATUS_FILTER_VALUES = creditStatusSchema.options;
-
 /**
  * `listPendingCredits`' params (`S:1700`): which way (`direction`), the state
  * (`status`), and the plan's Created and `q` (a CR- number, the party, the
  * reason). Newest first.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const creditListParamsSchema = z.object({
   direction: z.array(creditDirectionSchema).optional(),

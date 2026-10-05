@@ -16,7 +16,7 @@ const CHAT_ROOM = 400;
 const CHAT_CEILING = 980;
 const CHAT_SHARE = 0.94;
 /** The chat column's width when the member never dragged the lead chat (H:4572). */
-export const DEFAULT_CHAT_WIDTH = 420;
+const DEFAULT_CHAT_WIDTH = 420;
 
 /** What the drawer takes from `md` up: the whole panel, the form's share and the chat's. */
 export interface AppointmentFormWidths {

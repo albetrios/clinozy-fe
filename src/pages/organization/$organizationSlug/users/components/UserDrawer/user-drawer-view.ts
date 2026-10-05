@@ -45,7 +45,7 @@ export interface UserDrawerView {
  * in the matrix's order — Admin all nine — joined " · "; "Pick a role" when
  * none is picked. Today stays out: every role has it (`S:1012`).
  */
-export function userAccessLine(
+function userAccessLine(
   matrix: ClinicAccessMatrix | undefined,
   roleKeys: readonly ClinicRoleKey[],
   t: TFunction,

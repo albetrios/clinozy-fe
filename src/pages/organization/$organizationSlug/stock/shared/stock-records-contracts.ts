@@ -24,7 +24,7 @@ import {
 export const STOCK_NAME_MESSAGE = 'Add a name';
 
 /** "Pick a supplier" — a purchase's required vendor (`clinic-stock.md:146`). */
-export const STOCK_VENDOR_MESSAGE = 'Pick a supplier';
+const STOCK_VENDOR_MESSAGE = 'Pick a supplier';
 
 /** The longest name a vendor or an item takes. */
 export const STOCK_NAME_MAX = 120;

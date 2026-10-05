@@ -76,19 +76,19 @@ export interface MedicineRow extends MedicineRecord {
 // ── Writes ──
 
 /** "Add a name" (`medical.md:174`). */
-export const MEDICINE_NAME_MESSAGE = 'Add a name';
+const MEDICINE_NAME_MESSAGE = 'Add a name';
 /** "Enter the MRP" (`medical.md:178`). */
-export const MEDICINE_MRP_MESSAGE = 'Enter the MRP';
+const MEDICINE_MRP_MESSAGE = 'Enter the MRP';
 /** "Enter a rate for every supplier price" (`medical.md:182`). */
-export const MEDICINE_RATE_MESSAGE = 'Enter a rate for every supplier price';
+const MEDICINE_RATE_MESSAGE = 'Enter a rate for every supplier price';
 
 /** A batch as the drawer sends it: "MM/YY", whole packs, the purchase rate in paise. */
-export const medicineBatchInputSchema = medicineBatchSchema.extend({
+const medicineBatchInputSchema = medicineBatchSchema.extend({
   batchNo: z.string().trim().min(1, 'Enter the batch').max(40),
 });
 
 /** A supplier price as the drawer sends it — a picked supplier needs its rate. */
-export const supplierRateInputSchema = supplierRateSchema.extend({
+const supplierRateInputSchema = supplierRateSchema.extend({
   rate: paiseSchema.refine((rate) => rate > 0, MEDICINE_RATE_MESSAGE),
 });
 
@@ -139,11 +139,8 @@ export interface QuickMedicineInput {
 export type MedicineSortKey =
   'seq' | 'name' | 'manufacturer' | 'stock' | 'mrp' | 'margin';
 
-/** The near-expiry windows of the "Nearest expiry" filter, in days. */
-export const MEDICINE_EXPIRY_WINDOWS = ['30', '60', '90'] as const;
-
-/** One near-expiry window. */
-export type MedicineExpiryWindow = (typeof MEDICINE_EXPIRY_WINDOWS)[number];
+/** One near-expiry window of the "Nearest expiry" filter, in days. */
+type MedicineExpiryWindow = '30' | '60' | '90';
 
 /**
  * `listMedicines`' params (`S:53`): name, composition, manufacturer or "#458";

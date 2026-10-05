@@ -26,7 +26,7 @@ import {
 export const TEAM_STATUS_VALUES = ['active', 'inactive'] as const;
 
 /** One Status filter value. */
-export type TeamStatusValue = (typeof TEAM_STATUS_VALUES)[number];
+type TeamStatusValue = (typeof TEAM_STATUS_VALUES)[number];
 
 /** The Team's sortable columns (H:5150) — the column ids and the URL's sort keys. */
 export const TEAM_SORT_KEYS = [

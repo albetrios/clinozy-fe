@@ -65,12 +65,12 @@ export const appointmentRecordSchema = appointmentSchema.extend({
 export type AppointmentRecord = z.infer<typeof appointmentRecordSchema>;
 
 /** Who a booking is for: a patient, a lead, or a contact (a contact-thread lead, D32). */
-export const APPOINTMENT_PERSON_KINDS = ['patient', 'lead', 'contact'] as const;
+const APPOINTMENT_PERSON_KINDS = ['patient', 'lead', 'contact'] as const;
 /** One kind of person. */
 export type AppointmentPersonKind = (typeof APPOINTMENT_PERSON_KINDS)[number];
 
 /** The booked person as every view shows them (avatar, name, mobile, "P" badge). */
-export const appointmentPersonSchema = z.object({
+const appointmentPersonSchema = z.object({
   kind: z.enum(APPOINTMENT_PERSON_KINDS),
   name: z.string(),
   phone: phoneSchema.nullable(),
@@ -83,7 +83,7 @@ export const appointmentPersonSchema = z.object({
 export type AppointmentPerson = z.infer<typeof appointmentPersonSchema>;
 
 /** A bookable staff member — the doctor chip, the doctor pickers, the Day strip. */
-export const appointmentStaffSchema = z.object({
+const appointmentStaffSchema = z.object({
   id: z.uuid(),
   firstName: z.string(),
   lastName: z.string().nullable(),
@@ -158,7 +158,7 @@ export type AppointmentView = (typeof APPOINTMENT_VIEWS)[number];
 // ── Filters and list reads ──
 
 /** "Active" (Q-A5): Scheduled, Confirmed and Checked in — in the Agenda and the calendars. */
-export const ACTIVE_APPOINTMENT_STATUSES = [
+const ACTIVE_APPOINTMENT_STATUSES = [
   'scheduled',
   'confirmed',
   'checked_in',
@@ -246,6 +246,7 @@ export type AppointmentRangeParamsInput = z.input<typeof appointmentRangeParamsS
  * One Agenda day's counts (Appendix F's per-day summary — a day can straddle
  * two cursor pages): its bookings in view, how many are confirmed and how many
  * still wait for a reply (Scheduled) — "<n> confirmed · <n> awaiting reply".
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const appointmentDaySummarySchema = z.object({
   date: civilDateSchema,
@@ -274,7 +275,10 @@ export const availableSlotsParamsSchema = z.object({
 /** Slot params as callers write them. */
 export type AvailableSlotsParamsInput = z.input<typeof availableSlotsParamsSchema>;
 
-/** One start in the slot grid. */
+/**
+ * One start in the slot grid.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const appointmentSlotSchema = z.object({
   time: clockTimeSchema,
   free: z.boolean(),
@@ -359,7 +363,7 @@ export type AppointmentPatch = Partial<AppointmentFields> & {
 };
 
 /** The status moves a client asks for directly (the popover, the card, Today). */
-export const APPOINTMENT_STATUS_MOVES = [
+const APPOINTMENT_STATUS_MOVES = [
   'confirmed',
   'checked_in',
   'completed',
@@ -375,7 +379,7 @@ export const appointmentStatusInputSchema = z.object({
 export type AppointmentStatusInput = z.infer<typeof appointmentStatusInputSchema>;
 
 /** A cancel note's limit (`cancelNote`, `S:343`). */
-export const APPOINTMENT_CANCEL_NOTE_MAX = 280;
+const APPOINTMENT_CANCEL_NOTE_MAX = 280;
 
 /**
  * A cancel (`cancelAppointment`, `S:1611`): one of the contract's reasons

@@ -59,7 +59,7 @@ export const TASK_RULE_IDS = [
   'recall',
 ] as const;
 /** Zod enum of the rule ids. */
-export const taskRuleIdSchema = z.enum(TASK_RULE_IDS);
+const taskRuleIdSchema = z.enum(TASK_RULE_IDS);
 /** One rule id. */
 export type TaskRuleId = z.infer<typeof taskRuleIdSchema>;
 
@@ -146,7 +146,7 @@ export type TaskOutcomeEffect =
   | { readonly type: 'patientFollowUp'; readonly days: number };
 
 /** What an outcome does to the task itself. */
-export type TaskOutcomeDisposition =
+type TaskOutcomeDisposition =
   /** Closes it with the outcome's result. */
   | { readonly type: 'close' }
   /** Snoozes it. */
@@ -158,26 +158,23 @@ export type TaskOutcomeDisposition =
   | { readonly type: 'none' };
 
 /**
- * The screens an outcome opens next (the outcome table's "Then"): the
+ * A screen an outcome opens next (the outcome table's "Then"): the
  * appointment form (new, a move of this visit, or a rebooking of its service),
  * the review log, the visit or aftercare check-in, the patient file, or the
  * person's own record ("Fix the number": the patient file or the lead drawer).
  */
-export const TASK_FOLLOW_ON_FORMS = [
-  'appointmentNew',
-  'appointmentMove',
-  'appointmentRebook',
-  'reviewLog',
-  'visitCheckIn',
-  'aftercareCheckIn',
-  'patientFile',
-  'personRecord',
-] as const;
-/** One follow-on screen. */
-export type TaskFollowOnForm = (typeof TASK_FOLLOW_ON_FORMS)[number];
+export type TaskFollowOnForm =
+  | 'appointmentNew'
+  | 'appointmentMove'
+  | 'appointmentRebook'
+  | 'reviewLog'
+  | 'visitCheckIn'
+  | 'aftercareCheckIn'
+  | 'patientFile'
+  | 'personRecord';
 
 /** What follows an outcome: a screen to open (or none) and whether "What’s next" opens on top. */
-export interface TaskOutcomeFollowOn {
+interface TaskOutcomeFollowOn {
   readonly opens: TaskFollowOnForm | null;
   readonly whatsNext: boolean;
 }
@@ -869,7 +866,7 @@ export const TASK_SNOOZE_OPTIONS = [
   'nextWeek',
 ] as const;
 /** Zod enum of the Snooze options. */
-export const taskSnoozeOptionSchema = z.enum(TASK_SNOOZE_OPTIONS);
+const taskSnoozeOptionSchema = z.enum(TASK_SNOOZE_OPTIONS);
 /** One Snooze option. */
 export type TaskSnoozeOption = z.infer<typeof taskSnoozeOptionSchema>;
 
@@ -888,10 +885,8 @@ export const TASK_FOLLOW_UP_WHEN = [
   'inThreeDays',
   'nextWeek',
 ] as const;
-/** Zod enum of the When chips. */
-export const taskFollowUpWhenSchema = z.enum(TASK_FOLLOW_UP_WHEN);
 /** One When chip. */
-export type TaskFollowUpWhen = z.infer<typeof taskFollowUpWhenSchema>;
+export type TaskFollowUpWhen = (typeof TASK_FOLLOW_UP_WHEN)[number];
 
 /** When the follow-up a When chip sets is due: in 3 h, tomorrow 11:00, in 3 or 7 days (`tasks.md:98`). */
 export const TASK_FOLLOW_UP_SPANS: Readonly<Record<TaskFollowUpWhen, TaskTimeSpan>> = {
@@ -917,7 +912,7 @@ export const MANUAL_TASK_TYPES = [
   'payment_reminder',
 ] as const;
 /** Zod enum of the New task types. */
-export const manualTaskTypeSchema = z.enum(MANUAL_TASK_TYPES);
+const manualTaskTypeSchema = z.enum(MANUAL_TASK_TYPES);
 /** One New task type. */
 export type ManualTaskType = z.infer<typeof manualTaskTypeSchema>;
 
@@ -938,7 +933,7 @@ export const MANUAL_TASK_TYPE_KINDS: Readonly<Record<ManualTaskType, TaskKind>> 
 /** New task's priority, "Normal · High" (plan-only, Appendix F). */
 export const TASK_PRIORITIES = ['normal', 'high'] as const;
 /** Zod enum of the priorities. */
-export const taskPrioritySchema = z.enum(TASK_PRIORITIES);
+const taskPrioritySchema = z.enum(TASK_PRIORITIES);
 /** One priority. */
 export type TaskPriority = z.infer<typeof taskPrioritySchema>;
 
@@ -953,14 +948,14 @@ export const TASKS_REFETCH_MS = 60_000;
 /** The list's views, "To do · Snoozed · Done" — `open` is the contract's "Queue" (S:1519). */
 export const TASK_TABS = ['queue', 'snoozed', 'done'] as const;
 /** Zod enum of the views. */
-export const taskTabSchema = z.enum(TASK_TABS);
+const taskTabSchema = z.enum(TASK_TABS);
 /** One view. */
 export type TaskTab = z.infer<typeof taskTabSchema>;
 
 /** "Mine" = mine and unowned; "Everyone" = every owner, offered to every role (Appendix F). */
 export const TASK_SCOPES = ['mine', 'everyone'] as const;
 /** Zod enum of the scopes. */
-export const taskScopeSchema = z.enum(TASK_SCOPES);
+const taskScopeSchema = z.enum(TASK_SCOPES);
 /** One scope. */
 export type TaskScope = z.infer<typeof taskScopeSchema>;
 
@@ -982,12 +977,12 @@ export type TaskListQueryInput = z.input<typeof taskListQuerySchema>;
 // ── Records ──
 
 /** Who resolved a task: a member, or Clinozy (a rule closing itself, an automation). */
-export const TASK_RESOLVERS = ['member', 'clinozy'] as const;
+const TASK_RESOLVERS = ['member', 'clinozy'] as const;
 /** Zod enum of the resolvers. */
-export const taskResolverSchema = z.enum(TASK_RESOLVERS);
+const taskResolverSchema = z.enum(TASK_RESOLVERS);
 
 /** The outcome note's limit (`tasks.md:78`). */
-export const TASK_NOTE_MAX = 200;
+const TASK_NOTE_MAX = 200;
 
 /**
  * A task as the fixture server stores it: the contract's `Task` plus the
@@ -1021,7 +1016,7 @@ export type TaskRecord = z.infer<typeof taskRecordSchema>;
  * what their contact card reads (REPLACE_WITH_API: the schema's `contactCard`,
  * S:1566).
  */
-export const taskPersonSchema = z.object({
+const taskPersonSchema = z.object({
   name: z.string(),
   firstName: z.string(),
   patientId: z.uuid().nullable(),
@@ -1039,7 +1034,7 @@ export const taskPersonSchema = z.object({
 export type TaskPerson = z.infer<typeof taskPersonSchema>;
 
 /** What a source chip names: "Lead #", "Appt #", "Treatment #", "Patient #", "Payments", "Contact". */
-export const TASK_SOURCE_KINDS = [
+const TASK_SOURCE_KINDS = [
   'lead',
   'appointment',
   'treatment',
@@ -1049,7 +1044,7 @@ export const TASK_SOURCE_KINDS = [
 ] as const;
 
 /** A task's source chip — the record kind, its id and its `seq` (null where the contract has none). */
-export const taskSourceRefSchema = z.object({
+const taskSourceRefSchema = z.object({
   kind: z.enum(TASK_SOURCE_KINDS),
   id: z.uuid().nullable(),
   seq: z.number().int().nonnegative().nullable(),
@@ -1061,7 +1056,7 @@ export type TaskSourceRef = z.infer<typeof taskSourceRefSchema>;
  * A staff member as a task row shows them — owner pills, "was …" — and as
  * their team card reads them ("Assigned": roles, presence, phone, email).
  */
-export const taskStaffSchema = userSchema.pick({
+const taskStaffSchema = userSchema.pick({
   id: true,
   firstName: true,
   lastName: true,
@@ -1081,7 +1076,7 @@ export type TaskStaff = z.infer<typeof taskStaffSchema>;
  * embedded, so a row renders without joins (REPLACE_WITH_API: embed them in
  * `listTasks`).
  */
-export const taskRowSchema = taskRecordSchema.extend({
+const taskRowSchema = taskRecordSchema.extend({
   person: taskPersonSchema,
   source: taskSourceRefSchema,
   owner: taskStaffSchema.nullable(),
@@ -1098,7 +1093,7 @@ export const taskRowSchema = taskRecordSchema.extend({
 export type TaskRow = z.infer<typeof taskRowSchema>;
 
 /** The record a task points at (S:1723 "Task + source record"). */
-export const taskSourceRecordSchema = z.discriminatedUnion('kind', [
+const taskSourceRecordSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('appointment'), appointment: appointmentSchema }),
   z.object({ kind: z.literal('lead'), lead: leadRecordSchema }),
   z.object({ kind: z.literal('treatment'), treatment: treatmentSchema }),
@@ -1115,6 +1110,7 @@ export type TaskSourceRecord = z.infer<typeof taskSourceRecordSchema>;
  * its messages, the message to quote (the inbound one for Unreplied messages,
  * the undelivered one for Messages not delivered), the suggested WhatsApp, and
  * the staff the context tiles name.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
 export const taskDetailSchema = z.object({
   task: taskRowSchema,
@@ -1187,14 +1183,15 @@ export const createTaskInputSchema = z.object({
 export type CreateTaskInput = z.input<typeof createTaskInputSchema>;
 
 /** One rule's org setting: on (its tasks show) and handed to Clinozy. */
-export const taskRuleSettingSchema = z.object({
+const taskRuleSettingSchema = z.object({
   on: z.boolean(),
   handled: z.boolean(),
 });
-/** One rule's setting. */
-export type TaskRuleSetting = z.infer<typeof taskRuleSettingSchema>;
 
-/** Every rule's setting (the Rules popover; org settings, Appendix F). */
+/**
+ * Every rule's setting (the Rules popover; org settings, Appendix F).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const taskRuleSettingsSchema = z.record(taskRuleIdSchema, taskRuleSettingSchema);
 /** Every rule's setting. */
 export type TaskRuleSettings = z.infer<typeof taskRuleSettingsSchema>;
@@ -1206,7 +1203,10 @@ export const saveTaskRuleSettingInputSchema = taskRuleSettingSchema.partial().ex
 /** A rule-setting write. */
 export type SaveTaskRuleSettingInput = z.infer<typeof saveTaskRuleSettingInputSchema>;
 
-/** A write's answer: the task after it, and the token that undoes it (every toast offers Undo). */
+/**
+ * A write's answer: the task after it, and the token that undoes it (every toast offers Undo).
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const taskChangeSchema = z.object({
   task: taskRowSchema,
   undoToken: z.string(),

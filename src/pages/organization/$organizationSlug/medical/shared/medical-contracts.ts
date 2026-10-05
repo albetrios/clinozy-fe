@@ -19,10 +19,10 @@ import type { MedicineMaker } from '@/shared/api/clinic/medicines-contracts.ts';
  */
 
 /** A list read's sort direction. */
-export type SortOrder = 'asc' | 'desc';
+type SortOrder = 'asc' | 'desc';
 
 /** A record a row names: its id and name. */
-export interface NamedRef {
+interface NamedRef {
   id: string;
   name: string;
 }
@@ -68,10 +68,10 @@ export interface SaleRow extends MedicalSale {
 }
 
 /** The Sales list's Status filter beyond All (`medical.md:39`). */
-export type SaleStatusFilter = 'unpaid' | 'returned';
+type SaleStatusFilter = 'unpaid' | 'returned';
 
 /** The Sales columns the server sorts by (`medical.md:31`). */
-export type SaleSortKey = 'seq' | 'customer' | 'bill';
+type SaleSortKey = 'seq' | 'customer' | 'bill';
 
 /** `listMedicalSales`' params (`S:49`): Status, the customer or "#983", Created, the sort. */
 export interface SaleListParams {
@@ -101,7 +101,7 @@ export interface PurchaseOrderRow extends MedicalPurchaseOrder {
 export type PurchaseStageFilter = Exclude<PoStage, 'cancelled'>;
 
 /** The Purchases columns the server sorts by (`medical.md:63`). */
-export type PurchaseOrderSortKey = 'seq' | 'supplier' | 'total' | 'stage';
+type PurchaseOrderSortKey = 'seq' | 'supplier' | 'total' | 'stage';
 
 /**
  * `listPurchaseOrders`' params (`S:56`): Stage, the supplier / "#431" / bill,
@@ -139,7 +139,7 @@ export interface SupplierRow extends Supplier {
 }
 
 /** The Suppliers columns the server sorts by (`medical.md:79`). */
-export type SupplierSortKey = 'name' | 'payable';
+type SupplierSortKey = 'name' | 'payable';
 
 /** `listSuppliers`' params (`S:61`): name, any of these makers, Created, the sort. */
 export interface SupplierListParams {

@@ -12,7 +12,7 @@ import { leadRecordSchema } from './leads-contracts.ts';
  */
 
 /** What opens the thread — it seeds the first system line. */
-export const contactThreadContextSchema = z.discriminatedUnion('kind', [
+const contactThreadContextSchema = z.discriminatedUnion('kind', [
   /** "Appointment #<seq> · <service>"; its service becomes the thread's interest. */
   z.object({ kind: z.literal('appointment'), appointmentId: z.uuid() }),
   /** "Task · <title>" (an appointment task seeds its appointment's line). */
@@ -41,7 +41,10 @@ export const ensureContactThreadInputSchema = z
 /** A lookup-or-create as callers write it. */
 export type EnsureContactThreadInput = z.input<typeof ensureContactThreadInputSchema>;
 
-/** The person's thread, and whether this call opened it. */
+/**
+ * The person's thread, and whether this call opened it.
+ * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
+ */
 export const ensureContactThreadResultSchema = z.object({
   lead: leadRecordSchema,
   created: z.boolean(),

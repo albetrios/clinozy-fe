@@ -15,6 +15,11 @@
     // tooling/conventions, not imported at runtime).
     "src/pages/**/*.route.tsx",
     "src/pages/**/*.manifest.ts",
+    // The clinic data contract, GENERATED from the launch's schema-routes.md
+    // ('pnpm clinic:schema'; byte-identical in clinozy-be): its exports are the
+    // contract's surface — every entity, enum and server set — whether or not
+    // a screen reads one yet, and a hand edit would only be regenerated away.
+    "src/shared/api/clinic/clinic-schema.ts",
     // Folder-per-unit barrels are the unit's public API (validator-enforced);
     // treating them as entries means "exported from the barrel" counts as the
     // unit's surface, mirroring the file-structure contract.

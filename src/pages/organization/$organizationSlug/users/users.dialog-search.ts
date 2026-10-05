@@ -10,7 +10,7 @@
 import { oneOf } from '@/lib/routes/search-params.ts';
 
 /** Where a member drawer can be opened from besides the Team. */
-export const USER_DRAWER_ORIGINS = ['roles'] as const;
+const USER_DRAWER_ORIGINS = ['roles'] as const;
 
 /** Validated `?…` search params the member drawer adds to the Team's. */
 export interface UserEditSearch {

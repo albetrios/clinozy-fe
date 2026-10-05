@@ -16,7 +16,7 @@ import { fromMilli, MILLI } from './stock-units.ts';
 export type QuantityMode = 'unit' | 'measure';
 
 /** Movements that take stock out (`IS_MT`, H:3727). */
-export const TAKES_OUT: ReadonlySet<StockMovementInputType> = new Set([
+const TAKES_OUT: ReadonlySet<StockMovementInputType> = new Set([
   'used',
   'damaged',
   'returned',

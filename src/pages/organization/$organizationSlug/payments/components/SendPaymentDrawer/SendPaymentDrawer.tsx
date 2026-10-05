@@ -82,14 +82,14 @@ interface SendDrawerBaseProps {
 }
 
 /** Send payment over the ledger (`/payments/pay`, `S:86`). */
-export interface SendCreateDrawerProps extends SendDrawerBaseProps {
+interface SendCreateDrawerProps extends SendDrawerBaseProps {
   mode: 'create';
   /** `?bill=md:<id>|is:<id>` — Medical's and Clinic stock's "Pay ₹X". */
   bill?: string;
 }
 
 /** Edit payment out (`/payments/$paymentId/edit` for an expense or a bill, `S:87`). */
-export interface SendEditDrawerProps extends SendDrawerBaseProps {
+interface SendEditDrawerProps extends SendDrawerBaseProps {
   mode: 'edit';
   entry: LedgerRow;
   /** No Edit: the drawer only shows the entry. */

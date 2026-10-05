@@ -62,14 +62,14 @@ interface ReceiveDrawerBaseProps {
 }
 
 /** Receive payment over the ledger (`/payments/receive`, `S:85`). */
-export interface ReceiveCreateDrawerProps extends ReceiveDrawerBaseProps {
+interface ReceiveCreateDrawerProps extends ReceiveDrawerBaseProps {
   mode: 'create';
   /** `?patient=&invoice=` — the Patients row's and the file's Collect, ⌘K "New receipt". */
   prefill: PaymentReceiveSearch;
 }
 
 /** Edit payment in (`/payments/$paymentId/edit` for a receipt, `S:87`). */
-export interface ReceiveEditDrawerProps extends ReceiveDrawerBaseProps {
+interface ReceiveEditDrawerProps extends ReceiveDrawerBaseProps {
   mode: 'edit';
   entry: LedgerRow;
   /** No Edit: the drawer only shows the entry. */
