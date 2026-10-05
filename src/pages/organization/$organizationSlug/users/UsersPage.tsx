@@ -340,7 +340,7 @@ export function UsersPage() {
     : [];
 
   return (
-    <section data-testid="users-page" className="flex min-h-0 flex-1 flex-col">
+    <section data-testid="users-page" className="bg-canvas flex min-h-0 flex-1 flex-col">
       {from === 'roles' ? (
         <RolesAccess selected={search.role} />
       ) : (

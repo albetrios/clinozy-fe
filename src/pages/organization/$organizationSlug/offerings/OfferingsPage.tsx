@@ -275,7 +275,10 @@ export function OfferingsPage() {
       : [];
 
   return (
-    <section data-testid="offerings-page" className="flex min-h-0 flex-1 flex-col">
+    <section
+      data-testid="offerings-page"
+      className="bg-canvas flex min-h-0 flex-1 flex-col"
+    >
       <OfferingsToolbar
         tab="offerings"
         tableId={OFFERINGS_TABLE_ID}

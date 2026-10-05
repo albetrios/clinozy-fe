@@ -225,7 +225,10 @@ export function PatientsPage() {
       : [];
 
   return (
-    <section data-testid="patients-page" className="flex min-h-0 flex-1 flex-col">
+    <section
+      data-testid="patients-page"
+      className="bg-canvas flex min-h-0 flex-1 flex-col"
+    >
       <PatientsToolbar
         table={table}
         view={search.view ?? PATIENTS_SEARCH_DEFAULTS.view}

@@ -6,7 +6,7 @@ import { Outlet } from '@tanstack/react-router';
  */
 export function MedicalLayout() {
   return (
-    <div data-testid="medical-page" className="flex min-h-0 flex-1 flex-col">
+    <div data-testid="medical-page" className="bg-canvas flex min-h-0 flex-1 flex-col">
       <Outlet />
     </div>
   );

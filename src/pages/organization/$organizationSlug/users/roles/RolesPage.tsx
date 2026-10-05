@@ -13,7 +13,10 @@ import { validateRolesSearch } from '../users.search.ts';
 export function RolesPage() {
   const { role } = validateRolesSearch(useSearch({ strict: false }));
   return (
-    <section data-testid="users-roles-page" className="flex min-h-0 flex-1 flex-col">
+    <section
+      data-testid="users-roles-page"
+      className="bg-canvas flex min-h-0 flex-1 flex-col"
+    >
       <RolesAccess selected={role} />
     </section>
   );

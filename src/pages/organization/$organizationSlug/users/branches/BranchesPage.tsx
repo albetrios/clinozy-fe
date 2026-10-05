@@ -182,7 +182,10 @@ export function BranchesPage() {
   const drawerAccess = { resolved: access.isResolved, canDelete: access.canDelete };
 
   return (
-    <section data-testid="users-branches-page" className="flex min-h-0 flex-1 flex-col">
+    <section
+      data-testid="users-branches-page"
+      className="bg-canvas flex min-h-0 flex-1 flex-col"
+    >
       <UsersToolbar
         tab="branches"
         filters={{ fields: BRANCH_FILTER_FIELDS, copy: {} }}

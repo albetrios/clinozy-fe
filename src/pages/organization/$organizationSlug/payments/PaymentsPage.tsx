@@ -320,7 +320,10 @@ export function PaymentsPage() {
       : [];
 
   return (
-    <section data-testid="payments-page" className="flex min-h-0 flex-1 flex-col">
+    <section
+      data-testid="payments-page"
+      className="bg-canvas flex min-h-0 flex-1 flex-col"
+    >
       <PaymentsToolbar
         table={table}
         tableId={LEDGER_TABLE_ID}

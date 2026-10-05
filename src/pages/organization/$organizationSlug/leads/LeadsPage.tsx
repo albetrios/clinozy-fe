@@ -331,7 +331,7 @@ export function LeadsPage() {
   );
 
   return (
-    <section data-testid="leads-page" className="flex min-h-0 flex-1 flex-col">
+    <section data-testid="leads-page" className="bg-canvas flex min-h-0 flex-1 flex-col">
       <LeadsToolbar
         view={state.view}
         onViewChange={state.setView}
