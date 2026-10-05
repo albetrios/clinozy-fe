@@ -487,6 +487,16 @@ describe('updateLead (S:1594)', () => {
     expect(lines()).toHaveLength(count);
   });
 
+  it('writes a name exactly as it is — never read as a replacement pattern', async () => {
+    const id = ref.lead(2357);
+    await clinicFixtures.staff.update(AS, { firstName: "Dr. $&$'" });
+    const before = (await fetchLead(id)).involvedIds;
+    await setLeadInvolved(id, [...before, AS]);
+    expect(systemLines(id).at(-1)).toBe("Added Dr. $&$' as involved");
+    await setLeadInvolved(id, before);
+    expect(systemLines(id).at(-1)).toBe("Removed Dr. $&$' from involved");
+  });
+
   it('counts a save by the owner as their activity, not one by anyone else (Q-L9)', async () => {
     const touched = (await fetchLead(ref.lead(2356))).touchedAt;
     expect(

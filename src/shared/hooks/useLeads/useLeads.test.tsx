@@ -5,10 +5,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
 import { countOpenLeadTasks, fetchLead } from '@/shared/api/clinic/leads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -25,6 +29,7 @@ import {
   useMarkLeadRead,
   useReleaseLead,
   useRestoreLead,
+  useSetLeadInvolved,
   useUnrepliedLeadCount,
   useUpdateLead,
 } from './useLeads.ts';
@@ -308,6 +313,25 @@ describe('useAssignLead', () => {
     await waitFor(async () =>
       expect((await fetchLead(lead.id)).ownerId).toBe(lead.ownerId),
     );
+  });
+});
+
+describe('useSetLeadInvolved', () => {
+  it('applies at once with no toast — the chat’s system line is its feedback, so the thread is read again', async () => {
+    const lead = await fetchLead(ref.lead(2357));
+    const thread = messageQueryKeys.thread(lead.id);
+    client.setQueryData(thread, []);
+    const { result } = renderHook(() => useSetLeadInvolved(), { wrapper });
+    await act(() =>
+      result.current.mutateAsync({ id: lead.id, involvedIds: [...lead.involvedIds, AS] }),
+    );
+    expect((await fetchLead(lead.id)).involvedIds).toContain(AS);
+    expect(client.getQueryState(thread)?.isInvalidated).toBe(true);
+    const lines = clinicFixtures.leadMessages
+      .snapshot((message) => message.leadId === lead.id && message.isSystem)
+      .map((message) => message.body);
+    expect(lines.at(-1)).toBe('Added Asha M. as involved');
+    for (const toast of Object.values(notify)) expect(toast).not.toHaveBeenCalled();
   });
 });
 

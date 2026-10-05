@@ -726,6 +726,10 @@ export async function convertLead(id: string): Promise<LeadConversion> {
 const assignedLine = (owner: string, previous: string | null) =>
   previous ? `Assigned to ${owner} · ${previous} stays involved` : `Assigned to ${owner}`;
 
+/** The chat's system line when someone joins or leaves the involved (H:5707). */
+const involvedLine = (name: string, joined: boolean) =>
+  joined ? `Added ${name} as involved` : `Removed ${name} from involved`;
+
 /**
  * Assign a lead (`updateLead({ ownerId })`): the previous owner stays
  * involved, and the chat says so — "Assigned to <name> · <previous> stays
@@ -777,19 +781,19 @@ export async function setLeadInvolved(
     const user = staff.find((row) => row.id === staffId);
     return user ? staffShortName(user) : null;
   };
-  const lines = [
+  const changes = [
     ...lead.involvedIds
       .filter((staffId) => !before.involvedIds.includes(staffId))
-      .map((staffId) => ({ name: nameOf(staffId), line: 'Added {} as involved' })),
+      .map((staffId) => ({ name: nameOf(staffId), joined: true })),
     ...before.involvedIds
       .filter((staffId) => !lead.involvedIds.includes(staffId))
-      .map((staffId) => ({ name: nameOf(staffId), line: 'Removed {} from involved' })),
+      .map((staffId) => ({ name: nameOf(staffId), joined: false })),
   ];
   const now = new Date();
-  for (const { name, line } of lines) {
+  for (const { name, joined } of changes) {
     if (name) {
       await clinicFixtures.leadMessages.create(
-        systemLine(id, line.replace('{}', name), null, now),
+        systemLine(id, involvedLine(name, joined), null, now),
       );
     }
   }
