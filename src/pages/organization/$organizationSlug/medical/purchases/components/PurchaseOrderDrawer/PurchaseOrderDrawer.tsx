@@ -1,10 +1,8 @@
-import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import {
@@ -47,6 +45,7 @@ import {
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
+import { rateMessage } from './order-medicine.ts';
 import {
   linesMissingRate,
   newOrderForm,
@@ -139,22 +138,6 @@ function useSteps(
   ];
 }
 
-/** "Enter the rate for Epriva Tab" — or, for several, "Enter the rate for 2 medicines". */
-function rateMessage(
-  missing: readonly number[],
-  values: PurchaseOrderFormValues,
-  medicines: readonly MedicineRow[],
-  t: TFunction,
-): string {
-  const [first] = missing;
-  const name =
-    first === undefined
-      ? undefined
-      : medicines.find((row) => row.id === values.lines[first]?.medicineId)?.name;
-  if (missing.length === 1 && name) return t(K.rateFor, { name });
-  return t(K.rateForCount, { count: missing.length });
-}
-
 /**
  * The order's save — past the Order step's "Pick a supplier", which the drawer
  * asks first: every picked line's rate, each cell red with "Enter the purchase
@@ -197,7 +180,11 @@ function useOrderSave({
         });
       }
       setOpenStep('items');
-      return { fields: [], message: rateMessage(missing, current, medicines, t) };
+      const names = missing.map(
+        (index) =>
+          medicines.find((row) => row.id === current.lines[index]?.medicineId)?.name,
+      );
+      return { fields: [], message: rateMessage(names, t) };
     },
     onField: (field) => setOpenStep(stepOfField(field)),
     write: () => {

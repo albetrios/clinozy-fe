@@ -568,6 +568,8 @@
       "expiryPlaceholder": "MM/AA",
       "enterExpiry": "Informe a validade",
       "tickArrived": "Marque o que chegou",
+      "addUnexpected": "Adicionar item não previsto",
+      "enterQuantity": "Informe uma quantidade",
       "save": "Marcar como recebido",
       "saved": "Mercadoria recebida · estoque e bônus adicionados"
     },

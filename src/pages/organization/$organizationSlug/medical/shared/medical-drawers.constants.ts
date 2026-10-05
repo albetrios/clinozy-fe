@@ -265,6 +265,10 @@ export const MEDICAL_DRAWER_KEYS = {
     expiryPlaceholder: 'drawers.receive.expiryPlaceholder',
     enterExpiry: 'drawers.receive.enterExpiry',
     tickArrived: 'drawers.receive.tickArrived',
+    /** The table's footer button, after its plus sign (H:5388). */
+    addUnexpected: 'drawers.receive.addUnexpected',
+    /** An unexpected line's count left at 0. */
+    enterQuantity: 'drawers.receive.enterQuantity',
     save: 'drawers.receive.save',
     saved: 'drawers.receive.saved',
   },

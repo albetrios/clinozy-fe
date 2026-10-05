@@ -182,6 +182,85 @@ describe('receive goods (receivePO, S:1672)', () => {
     expect(await batchOf(455, 'NEW-430')).toMatchObject({ qty: 12 });
   });
 
+  it('takes what arrived off the order into stock and onto the bill ("+ Add unexpected item")', async () => {
+    // #430's two lines came, and 3 + 1 free × #458 at ₹440 with them.
+    const order = await receivePurchaseOrder(ref.purchaseOrder(430), {
+      lines: [
+        { arrived: true, batchNo: null, expiry: '12/27' },
+        { arrived: true, batchNo: 'DS-25045', expiry: '10/27' },
+      ],
+      extras: [
+        {
+          medicineId: ref.medicine(458),
+          qty: 3,
+          free: 1,
+          rate: 44_000,
+          batchNo: null,
+          expiry: '06/28',
+        },
+      ],
+    });
+    expect(order.stage).toBe('received');
+    expect(order.items).toHaveLength(3);
+    expect(order.items[2]).toEqual({
+      medicineId: ref.medicine(458),
+      qty: 3,
+      free: 1,
+      rate: 44_000,
+      batchNo: 'NEW-430',
+      expiry: '06/28',
+      received: true,
+    });
+    expect(await batchOf(458, 'NEW-430')).toMatchObject({
+      qty: 4,
+      expiry: '06/28',
+      purchaseRate: 44_000,
+    });
+    // The bill counts it with the order's lines: 4 × ₹529 + 10 × ₹212 + 3 × ₹440.
+    const bill = (await listOpenSupplierBills()).find(
+      (open) => open.purchaseId === ref.purchaseOrder(430),
+    );
+    expect(bill).toMatchObject({ due: 423_600 + 132_000 });
+  });
+
+  it('needs an unexpected line’s expiry, a stocked medicine and its rate', async () => {
+    // Nothing on the order came: the unexpected line is all that arrived.
+    const lines = [
+      { arrived: false, batchNo: null, expiry: null },
+      { arrived: false, batchNo: null, expiry: null },
+    ];
+    const extra = {
+      medicineId: ref.medicine(458),
+      qty: 1,
+      free: 0,
+      rate: 44_000,
+      batchNo: null,
+      expiry: '06/28',
+    };
+    const order = ref.purchaseOrder(430);
+    expect(
+      await failureOf(
+        receivePurchaseOrder(order, { lines, extras: [{ ...extra, expiry: null }] }),
+      ),
+    ).toMatchObject({ status: 422, fields: { 'extras.0.expiry': ['Enter the expiry'] } });
+    expect(
+      await failureOf(
+        receivePurchaseOrder(order, {
+          lines,
+          extras: [{ ...extra, medicineId: '00000000-0000-4000-8000-000000000000' }],
+        }),
+      ),
+    ).toMatchObject({ status: 422, detail: 'Pick medicines the store stocks' });
+    expect(
+      await failureOf(
+        receivePurchaseOrder(order, { lines, extras: [{ ...extra, rate: 0 }] }),
+      ),
+    ).toMatchObject({
+      status: 422,
+      fields: { 'extras.0.rate': ['Enter the purchase rate'] },
+    });
+  });
+
   it('needs an arrived line’s expiry and something that arrived', async () => {
     const noExpiry = await failureOf(
       receivePurchaseOrder(ref.purchaseOrder(430), {

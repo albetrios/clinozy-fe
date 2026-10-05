@@ -140,7 +140,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `rep-visit-drawer`               | Log MR visit — `/medical/mrs/$mrId/visits/create` (L-50b)                                           | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `<kind>-drawer-stacked`          | A Medical drawer stacked on another — `manufacturer`, `supplier`, `rep` (an MR), `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
 | `purchase-order-drawer`          | New / Edit purchase order — `/medical/purchases/create`, `…/$purchaseOrderId/edit` (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `receive-goods-drawer`           | Receive goods — `/medical/purchases/$purchaseOrderId/receive` (L-50c)                               | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `receive-goods-drawer`           | Receive goods — `…/$purchaseOrderId/receive`; `-lines-add` "+ Add unexpected item" (L-50c, L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
 | `purchase-order-view-drawer`     | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` is "Pay ₹X" (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
 | `sale-drawer`                    | Sale (view) — `/medical/sales/$saleId`; `-save` Collect / Return medicines, `-delete` Void (L-50c)  | `pages/organization/$organizationSlug/medical/sales/`         |
 | `sale-return-drawer`             | Return from patient — `/medical/sales/$saleId/return` (L-50c)                                       | `pages/organization/$organizationSlug/medical/sales/`         |

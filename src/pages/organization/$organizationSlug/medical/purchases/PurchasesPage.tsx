@@ -97,7 +97,14 @@ function OrderDrawers({
   if (dialog.kind !== 'record' || leftStage(dialog)) return null;
   const ordered = dialog.record?.stage === 'ordered';
   if (dialog.action === 'receive') {
-    return <ReceiveGoodsDrawer open order={dialog.record} onClose={close} />;
+    return (
+      <ReceiveGoodsDrawer
+        open
+        order={dialog.record}
+        onClose={close}
+        openChild={stack.open}
+      />
+    );
   }
   if (dialog.action === 'edit' || ordered) {
     return (

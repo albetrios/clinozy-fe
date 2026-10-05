@@ -68,8 +68,12 @@ export interface ItemsFieldProps<
    * next mode unused (H:5070).
    */
   clearRow?: () => FieldArray<TForm, TName>;
-  /** False drops the × column (a sale return's rows). */
-  removable?: boolean;
+  /**
+   * False drops the × column (a sale return's rows). A rule gives the × only
+   * to the rows it passes — Receive goods' unexpected lines, never the ordered
+   * ones — and the column shows while a row has one.
+   */
+  removable?: boolean | ((row: FieldArray<TForm, TName>, index: number) => boolean);
   /** The footer's figure at the inline end, 13px/600: a `MoneyCell`, "8 in stock". */
   total?: ReactNode;
   /** Spoken before the total ("Total"). */
@@ -194,7 +198,10 @@ interface ItemsRowProps<TForm extends FieldValues, TName extends FieldArrayPath<
   values: FieldArray<TForm, TName>;
   columns: readonly ItemsColumn<TForm, TName>[];
   note?: ItemsRowNote<TForm, TName>;
+  /** The table has the × column. */
   removable: boolean;
+  /** This row has its × (an empty cell holds the column otherwise). */
+  canRemove: boolean;
   readOnly: boolean;
   phone: boolean;
   onRemove: (index: number) => void;
@@ -211,6 +218,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
   columns,
   note,
   removable,
+  canRemove,
   readOnly,
   phone,
   onRemove,
@@ -235,7 +243,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
       testId: cellTestId,
     }),
   });
-  const lastColumn = removable ? -1 : columns.length - 1;
+  const lastColumn = canRemove ? -1 : columns.length - 1;
 
   return (
     <div
@@ -259,7 +267,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
           {column.cell(contextFor(column.header, `${testId}-${column.id}`))}
         </div>
       ))}
-      {removable ? (
+      {canRemove ? (
         <div role="cell" className={cellClass(phone, false, true)}>
           <button
             type="button"
@@ -273,6 +281,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
           </button>
         </div>
       ) : null}
+      {removable && !canRemove ? <div role="cell" /> : null}
       {note ? (
         <RowNote
           control={control}
@@ -437,7 +446,17 @@ export function ItemsField<
   const { tableRef, addRef, focusAfterRemove } = useFocusAfterRemove();
   useDrawerItemsField(!props.compact);
 
-  const removable = !readOnly && props.removable !== false;
+  const rule = props.removable;
+  const canRemove = (index: number) =>
+    !readOnly &&
+    (typeof rule === 'function'
+      ? rule(rows[index] ?? (fields[index] as FieldArray<TForm, TName>), index)
+      : rule !== false);
+  // A rule's column shows while a row passes it; `true` keeps it on an empty table too.
+  const removable =
+    typeof rule === 'function'
+      ? fields.some((_, index) => canRemove(index))
+      : !readOnly && rule !== false;
   const template = [
     ...columns.map((column) => column.track),
     ...(removable ? [REMOVE_TRACK] : []),
@@ -487,6 +506,7 @@ export function ItemsField<
                   columns={columns}
                   note={props.note}
                   removable={removable}
+                  canRemove={removable && canRemove(index)}
                   readOnly={readOnly}
                   phone={phone}
                   onRemove={removeRow}

@@ -568,6 +568,8 @@
       "expiryPlaceholder": "MM/AA",
       "enterExpiry": "Introduce la caducidad",
       "tickArrived": "Marca lo que llegó",
+      "addUnexpected": "Añadir artículo no previsto",
+      "enterQuantity": "Introduce una cantidad",
       "save": "Marcar como recibido",
       "saved": "Mercancía recibida · existencias y bonificación añadidas"
     },

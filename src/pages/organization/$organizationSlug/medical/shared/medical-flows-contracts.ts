@@ -53,13 +53,35 @@ const receiveLineInputSchema = z.object({
   expiry: expiryMonthSchema.nullable(),
 });
 
-/** Receive goods (`receivePO`, `S:1672`): every line of the order, in its order. */
-export const receiveInputSchema = z.object({
-  lines: z.array(receiveLineInputSchema).max(100),
+/** An unexpected line's count has to be one or more (Receive goods). */
+const RECEIVE_QTY_MESSAGE = 'Enter a quantity';
+
+/**
+ * A line that arrived but was not on the order — "+ Add unexpected item"
+ * (H:5388): the medicine, how many and the free units, the purchase rate it
+ * is billed at, and the batch and expiry it came with. Not in the contract's
+ * `receivePO` (`S:1672`), a backend request (Appendix F; REPLACE_WITH_API).
+ */
+const receiveExtraInputSchema = z.object({
+  medicineId: z.uuid(),
+  qty: z.number().int().positive(RECEIVE_QTY_MESSAGE).max(9999),
+  free: z.number().int().nonnegative().max(9999),
+  rate: paiseSchema.positive(PURCHASE_RATE_MESSAGE),
+  batchNo: z.string().trim().max(30).nullable(),
+  expiry: expiryMonthSchema.nullable(),
 });
 
-/** What Receive goods sends. */
-export type ReceiveInput = z.infer<typeof receiveInputSchema>;
+/**
+ * Receive goods (`receivePO`, `S:1672`): every line of the order, in its
+ * order, and what arrived that the order did not list.
+ */
+export const receiveInputSchema = z.object({
+  lines: z.array(receiveLineInputSchema).max(100),
+  extras: z.array(receiveExtraInputSchema).max(50).default([]),
+});
+
+/** What Receive goods sends — `extras` may be left out. */
+export type ReceiveInput = z.input<typeof receiveInputSchema>;
 
 /** The reasons a patient brings medicine back (`medical.md:289`), in chip order. */
 export const SALE_RETURN_REASONS = [

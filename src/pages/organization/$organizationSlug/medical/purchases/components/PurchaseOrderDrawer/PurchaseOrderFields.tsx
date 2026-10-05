@@ -1,7 +1,6 @@
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import {
   DrawerField,
@@ -10,16 +9,13 @@ import {
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { CalendarPicker } from '@/shared/components/Picker/CalendarPicker/index.ts';
-import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import {
   type ItemsColumn,
   ItemsField,
   ItemsNumberCell,
-  ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
-import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MedicalPartnerPicker } from '../../../shared/components/MedicalPartnerPicker/index.ts';
@@ -30,15 +26,15 @@ import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
+import { useMedicineOptions } from './order-medicine.ts';
+import { OrderMedicineCell } from './OrderMedicineCell.tsx';
 import {
   emptyOrderLine,
   lineAmount,
   orderTotal,
-  pricedBy,
   type PurchaseOrderFormValues,
-  supplierRateOf,
 } from './purchase-order-form.ts';
-import { useOrderMedicineCreate, useOrderQuickLine } from './use-order-quick-line.ts';
+import { useOrderQuickLine } from './use-order-quick-line.ts';
 
 const K = MEDICAL_DRAWER_KEYS.purchaseOrder.fields;
 
@@ -129,100 +125,33 @@ export function OrderFields({
   );
 }
 
-/**
- * The medicine picker's options (`medical.md:261`): with a supplier picked,
- * the medicines it prices first ("From K R Medical Agency") then "Other
- * medicines"; each "8 in stock · ALVI" or "Out of stock · DERM", the
- * supplier's rate at the end.
- */
-function useMedicineOptions(
-  supplierId: string | null,
-  supplierName: string | undefined,
-): PickerOption<MedicineRow>[] {
-  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
-  const medicines = useMedicineCatalogue().data ?? [];
-  const fromSupplier = supplierName
-    ? t(K.fromSupplier, { supplier: supplierName })
-    : undefined;
-  const option = (row: MedicineRow, group?: string): PickerOption<MedicineRow> => {
-    const maker = row.manufacturer?.name ?? '';
-    const rate = supplierRateOf(row, supplierId);
-    return {
-      key: row.id,
-      label: row.name,
-      sub:
-        row.stock > 0
-          ? t(K.inStock, { count: row.stock, maker })
-          : t(K.outOfStock, { maker }),
-      meta: rate > 0 ? formatPaise(rate) : undefined,
-      group,
-      keywords: [row.composition ?? '', maker],
-      leading: { kind: 'none' },
-      data: row,
-    };
-  };
-  if (!fromSupplier) return medicines.map((row) => option(row));
-  const priced = (row: MedicineRow) => pricedBy(row, supplierId);
-  const others = t(K.otherMedicines);
-  return [
-    ...medicines.filter(priced).map((row) => option(row, fromSupplier)),
-    ...medicines.filter((row) => !priced(row)).map((row) => option(row, others)),
-  ];
-}
-
 /** The rows: Medicine · Qty · Free · Rate* · Amount (`medical.md:261`; H:5389). */
 function useLineColumns(
   { form, openChild }: OrderFieldsProps,
   supplierId: string | null,
-  options: PickerOption<MedicineRow>[],
+  options: ReturnType<typeof useMedicineOptions>,
 ): ItemsColumn<PurchaseOrderFormValues, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const createMedicine = useOrderMedicineCreate(supplierId);
-  const setMedicine = (index: number, medicineId: string, rate: number) => {
-    form.setValue(`lines.${index}.medicineId`, medicineId, { shouldDirty: true });
-    form.setValue(`lines.${index}.rate`, rate, { shouldDirty: true });
-  };
   return [
     {
       id: 'medicine',
       header: t(K.medicine),
       track: 'minmax(0,2fr)',
       cell: (row) => (
-        <ItemsPickerCell<PurchaseOrderFormValues, MedicineRow>
-          {...row.bind('medicineId')}
+        <OrderMedicineCell<PurchaseOrderFormValues>
+          binding={row.bind('medicineId')}
           options={options}
-          placeholder={t(K.selectMedicine)}
-          searchPlaceholder={t(K.searchMedicine)}
-          searchable
+          supplierId={supplierId}
+          openChild={openChild}
           disabled={!row.editable}
-          onPick={(option) => {
-            if (option?.data) {
-              form.setValue(
-                `lines.${row.index}.rate`,
-                supplierRateOf(option.data, supplierId),
-                { shouldDirty: true },
-              );
-            }
-          }}
-          onCreate={(query) => {
-            void createMedicine(query).then((medicine) => {
-              if (medicine) setMedicine(row.index, medicine.id, 0);
+          onMedicine={(medicine) => {
+            form.setValue(`lines.${row.index}.medicineId`, medicine.id, {
+              shouldDirty: true,
+            });
+            form.setValue(`lines.${row.index}.rate`, medicine.rate, {
+              shouldDirty: true,
             });
           }}
-          autoCreate
-          createLabel={t(K.addMedicine)}
-          onCreateFull={
-            openChild
-              ? (query) =>
-                  openChild({
-                    kind: 'medicine',
-                    query,
-                    onCreated: (medicine) => setMedicine(row.index, medicine.id, 0),
-                  })
-              : undefined
-          }
-          createFullLabel={t(K.newMedicine)}
         />
       ),
     },

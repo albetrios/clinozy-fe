@@ -15,7 +15,14 @@ import {
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
 import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
-import { expiryProblems, receiveInputOf } from './receive-form.ts';
+import {
+  emptyUnexpectedLine,
+  expiryProblems,
+  receiveInputOf,
+  type ReceiveLineValues,
+  receiveTotal,
+  unexpectedProblems,
+} from './receive-form.ts';
 import { ReceiveGoodsDrawer } from './ReceiveGoodsDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -52,9 +59,33 @@ afterEach(() => {
   resetClinicFixtures();
 });
 
+/** An ordered line of #430 — Epriva Tab, 10 + 2 free at ₹212. */
+const ORDERED: ReceiveLineValues = {
+  medicineId: ref.medicine(455),
+  name: 'Epriva Tab',
+  qty: 10,
+  free: 2,
+  rate: 21_200,
+  arrived: true,
+  batchNo: ' ',
+  expiry: '',
+  unexpected: false,
+};
+
+/** An unexpected line with Azelan picked: 2 at ₹190, batch AZ900. */
+const AZELAN: ReceiveLineValues = {
+  ...emptyUnexpectedLine(),
+  medicineId: ref.medicine(450),
+  name: 'Azelan 20% Cream',
+  qty: 2,
+  rate: 19_000,
+  batchNo: 'AZ900',
+  expiry: '06/28',
+};
+
 describe('receive-form (medical.md:269–279)', () => {
   it('needs an arrived line’s expiry as "MM/YY"; a line that did not arrive sends nothing', () => {
-    const line = { name: 'Epriva Tab', qty: 10, free: 2, batchNo: ' ', expiry: '' };
+    const line = ORDERED;
     expect(
       expiryProblems([
         { ...line, arrived: true },
@@ -78,7 +109,55 @@ describe('receive-form (medical.md:269–279)', () => {
         { arrived: true, batchNo: null, expiry: '12/27' },
         { arrived: false, batchNo: null, expiry: null },
       ],
+      extras: [],
     });
+  });
+
+  it('sends an unexpected line once its medicine is picked; a blank one is left out (H:5388)', () => {
+    const blank = emptyUnexpectedLine();
+    expect(blank).toMatchObject({
+      medicineId: null,
+      qty: 1,
+      arrived: true,
+      unexpected: true,
+    });
+    const lines = [{ ...ORDERED, expiry: '12/27' }, AZELAN, blank];
+    expect(receiveInputOf({ lines })).toEqual({
+      lines: [{ arrived: true, batchNo: null, expiry: '12/27' }],
+      extras: [
+        {
+          medicineId: ref.medicine(450),
+          qty: 2,
+          free: 0,
+          rate: 19_000,
+          batchNo: 'AZ900',
+          expiry: '06/28',
+        },
+      ],
+    });
+    // The blank line asks for nothing; a picked one is checked like an ordered one.
+    expect(expiryProblems([blank, { ...AZELAN, expiry: '' }])).toEqual([
+      { index: 1, problem: 'missing' },
+    ]);
+    // Ticked ✗, an unexpected line is not sent either.
+    expect(receiveInputOf({ lines: [{ ...AZELAN, arrived: false }] }).extras).toEqual([]);
+  });
+
+  it('names an unexpected line with no count or no rate, and bills what comes in', () => {
+    const lines = [
+      { ...ORDERED, expiry: '12/27' },
+      { ...AZELAN, qty: 0 },
+      { ...AZELAN, rate: 0 },
+      emptyUnexpectedLine(),
+    ];
+    expect(unexpectedProblems(lines)).toEqual({ qty: [1], rate: [2] });
+    // #430's ₹4,236 and 2 × ₹190; free units cost nothing, a blank line nothing.
+    expect(receiveTotal({ total: 423_600 }, [ORDERED, { ...AZELAN, free: 3 }])).toBe(
+      423_600 + 38_000,
+    );
+    expect(receiveTotal({ total: 423_600 }, [{ ...AZELAN, arrived: false }])).toBe(
+      423_600,
+    );
   });
 });
 
@@ -140,6 +219,107 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     }
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Tick what arrived');
+  });
+
+  it('adds an unexpected item — medicine, count, rate, batch, expiry — into stock and onto the bill', async () => {
+    const user = setup();
+    const onClose = vi.fn();
+    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
+    renderMedicalDrawer(
+      <ReceiveGoodsDrawer open order={order} onClose={onClose} openChild={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    const table = within(drawer).getByTestId(`${D}-lines-table`);
+    // The design's columns until an unexpected line comes: no Rate, no ×.
+    expect(within(table).queryByRole('columnheader', { name: 'Rate' })).toBeNull();
+    expect(within(drawer).queryByTestId(`${D}-lines-remove`)).not.toBeInTheDocument();
+
+    await user.click(within(drawer).getByTestId(`${D}-lines-add`));
+    expect(within(drawer).getByTestId(`${D}-lines-add`)).toHaveTextContent(
+      'Add unexpected item',
+    );
+    expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(3);
+    expect(within(table).getByRole('columnheader', { name: 'Rate' })).toBeInTheDocument();
+    expect(within(drawer).getAllByTestId(`${D}-lines-remove`)).toHaveLength(1);
+
+    // Azelan from K R Medical Agency's price list: its ₹190 fills the rate.
+    await user.click(within(drawer).getByTestId(`${D}-lines-medicine`));
+    await user.click(
+      await screen.findByTestId(`${D}-lines-medicine-option-${ref.medicine(450)}`),
+    );
+    expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,426');
+    const qty = within(drawer).getByTestId(`${D}-lines-qty`);
+    await user.clear(qty);
+    await user.type(qty, '2');
+    expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,616');
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    // Nothing on the order came; Azelan did, in batch AZ900.
+    const [first, second] = within(drawer).getAllByTestId(`${D}-lines-arrived`);
+    if (!(first && second)) throw new Error('expected the ordered lines');
+    await user.click(first);
+    await user.click(second);
+    const batches = within(drawer).getAllByTestId(`${D}-lines-batch`);
+    const expiries = within(drawer).getAllByTestId(`${D}-lines-expiry`);
+    await user.type(batches[2] as HTMLElement, 'AZ900');
+    await user.type(expiries[2] as HTMLElement, '06/28');
+
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
+    expect(saved.stage).toBe('received');
+    expect(saved.items[2]).toEqual({
+      medicineId: ref.medicine(450),
+      qty: 2,
+      free: 0,
+      rate: 19_000,
+      batchNo: 'AZ900',
+      expiry: '06/28',
+      received: true,
+    });
+    const azelan = await clinicFixtures.medicines.get(ref.medicine(450));
+    expect(azelan.batches.find((batch) => batch.batchNo === 'AZ900')?.qty).toBe(2);
+  });
+
+  it('asks for an unexpected line’s count and rate, and drops it with its ×', async () => {
+    const user = setup();
+    const onClose = vi.fn();
+    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={onClose} />);
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-lines-add`));
+    await user.click(within(drawer).getByTestId(`${D}-lines-medicine`));
+    await user.click(
+      await screen.findByTestId(`${D}-lines-medicine-option-${ref.medicine(450)}`),
+    );
+    for (const expiry of within(drawer).getAllByTestId(`${D}-lines-expiry`)) {
+      await user.type(expiry, '12/27');
+    }
+
+    await user.clear(within(drawer).getByTestId(`${D}-lines-qty`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith('Enter a quantity');
+
+    await user.type(within(drawer).getByTestId(`${D}-lines-qty`), '1');
+    await user.clear(within(drawer).getByTestId(`${D}-lines-rate`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith(
+      'Enter the rate for Azelan 20% Cream',
+    );
+    expect(onClose).not.toHaveBeenCalled();
+
+    // × drops the line, and the Rate column with it.
+    await user.click(within(drawer).getByTestId(`${D}-lines-remove`));
+    expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
+    expect(
+      within(within(drawer).getByTestId(`${D}-lines-table`)).queryByRole('columnheader', {
+        name: 'Rate',
+      }),
+    ).toBeNull();
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
+    expect(saved.items).toHaveLength(2);
   });
 
   it('shimmers until the order is read', async () => {

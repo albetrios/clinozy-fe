@@ -532,6 +532,8 @@
       "expiryPlaceholder": "MM/YY",
       "enterExpiry": "请输入有效期",
       "tickArrived": "请勾选已到货的品项",
+      "addUnexpected": "添加意外到货品项",
+      "enterQuantity": "请输入数量",
       "save": "标记为已收货",
       "saved": "已收货 · 库存和赠品数量已添加"
     },

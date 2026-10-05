@@ -622,6 +622,8 @@
       "expiryPlaceholder": "MM/YY",
       "enterExpiry": "أدخل تاريخ الانتهاء",
       "tickArrived": "ضع علامة على ما وصل",
+      "addUnexpected": "إضافة صنف غير متوقع",
+      "enterQuantity": "أدخل كمية",
       "save": "تعليم كمستلم",
       "saved": "تم استلام البضاعة · أُضيف المخزون والكمية المجانية"
     },

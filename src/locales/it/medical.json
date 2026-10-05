@@ -568,6 +568,8 @@
       "expiryPlaceholder": "MM/AA",
       "enterExpiry": "Inserisci la scadenza",
       "tickArrived": "Spunta ciò che è arrivato",
+      "addUnexpected": "Aggiungi articolo imprevisto",
+      "enterQuantity": "Inserisci una quantità",
       "save": "Segna come ricevuto",
       "saved": "Merce ricevuta · scorte e quantità omaggio aggiunte"
     },

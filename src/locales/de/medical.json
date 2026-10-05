@@ -550,6 +550,8 @@
       "expiryPlaceholder": "MM/JJ",
       "enterExpiry": "Geben Sie den Ablauf ein",
       "tickArrived": "Haken Sie ab, was angekommen ist",
+      "addUnexpected": "Unerwarteten Artikel hinzufügen",
+      "enterQuantity": "Geben Sie eine Menge ein",
       "save": "Als erhalten markieren",
       "saved": "Ware erhalten · Bestand und Gratismenge hinzugefügt"
     },

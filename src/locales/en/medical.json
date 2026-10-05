@@ -550,6 +550,8 @@
       "expiryPlaceholder": "MM/YY",
       "enterExpiry": "Enter the expiry",
       "tickArrived": "Tick what arrived",
+      "addUnexpected": "Add unexpected item",
+      "enterQuantity": "Enter a quantity",
       "save": "Mark received",
       "saved": "Goods received · stock and free quantity added"
     },

@@ -296,6 +296,34 @@ describe('ItemsField — add and remove rows', () => {
     renderWithClient(<LinesHarness newRow={undefined} />);
     expect(screen.queryByTestId('lines-add')).not.toBeInTheDocument();
   });
+
+  it('gives the × only to the rows a rule passes; the column shows while one does', async () => {
+    // Receive goods: the ordered lines stay, an added (unnamed) line can go.
+    const { user, container } = renderWithClient(
+      <LinesHarness removable={(line) => line.name === ''} />,
+    );
+    expect(screen.getByRole('table')).toHaveStyle({
+      '--items-cols': 'minmax(0,2fr) 88px 96px',
+    });
+    expect(screen.queryByTestId('lines-remove')).not.toBeInTheDocument();
+
+    await user.click(screen.getByTestId('lines-add'));
+    expect(screen.getByRole('table')).toHaveStyle({
+      '--items-cols': 'minmax(0,2fr) 88px 96px 30px',
+    });
+    // One × — on the added row; the kept row holds the column with an empty cell.
+    expect(screen.getAllByTestId('lines-remove')).toHaveLength(1);
+    const [kept, added] = rows();
+    expect(within(kept as HTMLElement).getAllByRole('cell')).toHaveLength(4);
+    expect(within(added as HTMLElement).getByTestId('lines-remove')).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+
+    await user.click(screen.getByTestId('lines-remove'));
+    expect(rows()).toHaveLength(1);
+    expect(screen.getByRole('table')).toHaveStyle({
+      '--items-cols': 'minmax(0,2fr) 88px 96px',
+    });
+  });
 });
 
 describe('ItemsField — totals', () => {

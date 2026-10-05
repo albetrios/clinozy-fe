@@ -568,6 +568,8 @@
       "expiryPlaceholder": "MM/AA",
       "enterExpiry": "Saisissez l’expiration",
       "tickArrived": "Cochez ce qui est arrivé",
+      "addUnexpected": "Ajouter un article imprévu",
+      "enterQuantity": "Saisissez une quantité",
       "save": "Marquer comme reçu",
       "saved": "Marchandise reçue · stock et quantité gratuite ajoutés"
     },

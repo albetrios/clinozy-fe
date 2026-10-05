@@ -532,6 +532,8 @@
       "expiryPlaceholder": "MM/YY",
       "enterExpiry": "유효기간을 입력하세요",
       "tickArrived": "도착한 품목을 체크하세요",
+      "addUnexpected": "예상치 못한 품목 추가",
+      "enterQuantity": "수량을 입력하세요",
       "save": "입고 완료로 표시",
       "saved": "입고 완료 · 재고와 무상 수량 추가됨"
     },

@@ -156,7 +156,9 @@ function withStock(
  * Receive goods (`receivePO`, `S:1672`): every arrived line becomes stock —
  * qty + free into its batch ("NEW-430" when none was typed) at the line's
  * rate — and the order moves to Received. An arrived line needs its expiry
- * (KICKOFF §6.7, AMBER).
+ * (KICKOFF §6.7, AMBER). What arrived that the order did not list ("+ Add
+ * unexpected item", H:5388; Appendix F) joins the order as a received line on
+ * the same terms, so the bill counts it.
  */
 export async function receivePurchaseOrder(
   id: string,
@@ -164,23 +166,42 @@ export async function receivePurchaseOrder(
 ): Promise<MedicalPurchaseOrder> {
   const { clinicFixtures } = await fixtureWorld();
   const order = await orderedOrder(clinicFixtures, id);
-  const { lines } = validateClinicInput(receiveInputSchema, input);
+  const { lines, extras } = validateClinicInput(receiveInputSchema, input);
   if (lines.length !== order.items.length) refuse('lines', 'Tick what arrived');
   lines.forEach((line, index) => {
     if (line.arrived && !line.expiry) refuse(`lines.${index}.expiry`, EXPIRY_MESSAGE);
   });
-  if (!lines.some((line) => line.arrived)) refuse('lines', 'Tick what arrived');
-
-  const items = order.items.map((item, index) => {
-    const line = lines[index];
-    if (!line?.arrived) return item;
-    return {
-      ...item,
-      batchNo: line.batchNo || `NEW-${order.seq}`,
-      expiry: line.expiry,
-      received: true,
-    };
+  refuseUnknownIds(
+    'extras',
+    extras.map((extra) => extra.medicineId),
+    clinicFixtures.medicines.snapshot(),
+    'Pick medicines the store stocks',
+  );
+  extras.forEach((extra, index) => {
+    if (!extra.expiry) refuse(`extras.${index}.expiry`, EXPIRY_MESSAGE);
   });
+  if (!lines.some((line) => line.arrived) && extras.length === 0) {
+    refuse('lines', 'Tick what arrived');
+  }
+
+  const newBatch = `NEW-${order.seq}`;
+  const items = [
+    ...order.items.map((item, index) => {
+      const line = lines[index];
+      if (!line?.arrived) return item;
+      return {
+        ...item,
+        batchNo: line.batchNo || newBatch,
+        expiry: line.expiry,
+        received: true,
+      };
+    }),
+    ...extras.map((extra) => ({
+      ...extra,
+      batchNo: extra.batchNo || newBatch,
+      received: true,
+    })),
+  ];
   for (const item of items) {
     if (!(item.received && item.batchNo && item.expiry)) continue;
     const medicine = await clinicFixtures.medicines.get(item.medicineId);

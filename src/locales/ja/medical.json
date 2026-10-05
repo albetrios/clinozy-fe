@@ -532,6 +532,8 @@
       "expiryPlaceholder": "MM/YY",
       "enterExpiry": "有効期限を入力してください",
       "tickArrived": "届いたものにチェックしてください",
+      "addUnexpected": "予定外の品目を追加",
+      "enterQuantity": "数量を入力してください",
       "save": "入荷済みにする",
       "saved": "入荷しました · 在庫と無償数量を追加"
     },
