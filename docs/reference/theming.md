@@ -249,7 +249,7 @@ Named presets and generated looks are mutually exclusive (`data-theme` vs inline
   decision rather than a radius one, so the element needs a slot the
   `[data-shape='sharp']` list squares: its own `data-slot=` within 5 lines above
   (usually **`data-slot="pill"`** — chip, count badge, icon disc, track, swatch), or a
-  primitive that brings one (`<Button>`, `<Badge>`, `<Avatar>`, `<Skeleton>`).
+  primitive that brings one (`<Button>`, `<Avatar>`, `<Skeleton>`).
   **Exempt, because they are indicators and not surfaces:** status dots of at most 10px
   (`size-2.5`, `h-2 w-2`), blurred glows, the `animate-ping` halo, and pseudo-element
   markers (`before:rounded-full` — squared in `index.css` through the `nav-item` that

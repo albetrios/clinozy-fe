@@ -37,14 +37,17 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
 - **One component per job (L-62 — these override the Component Selection table below):**
   - Pick one value or several from a list → the shared **`Picker`**
     (`@/shared/components/Picker`; `multiple` for several, `plain` for a neutral list,
-    `menu` for a list of places). Never `ui/select` (it survives only until the old
-    dashboard's last use goes) and never a hand-built Popover + `Command` list.
+    `menu` for a list of places). Never `ui/select` (it has no callers left) and
+    never a hand-built Popover + `Command` list.
   - A menu of ACTIONS (Account, "+", row ⋯, theme toggle) → `ui/dropdown-menu`.
   - Confirm an action → **`ConfirmDialog`** (`reason` for a record delete / cancel /
     void; plain otherwise — it busy-blocks dismissal); "discard changes?" →
     `useUnsavedChangesGuard`. Never a raw `ui/alert-dialog` in a surface.
   - A search box → `RoomSearch` (a room list, wired to the URL's `q`) or its field
     `RoomSearchField` (`layout="fill"` never folds — Settings). Never `Input` + an icon.
+  - A status or label pill → **`TonePill`** (`Cells`; a section tone, `neutral` for a
+    plain label, `dot` for a status — the rooms' words: positive sage, pending butter,
+    trouble blush). There is no `ui/badge`, and never a styled span.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

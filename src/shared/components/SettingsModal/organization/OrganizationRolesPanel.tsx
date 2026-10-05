@@ -7,6 +7,7 @@ import { isListStale, listRefreshClass } from '@/lib/list-refresh.ts';
 import { cn } from '@/lib/utils.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { CreateRoleDialog } from '@/shared/components/CreateRoleDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
@@ -17,7 +18,6 @@ import {
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Card } from '@/shared/components/ui/card.tsx';
 import {
@@ -105,7 +105,9 @@ function RoleListItem({
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium">{role.name}</p>
           {role.isSystem ? (
-            <Badge variant="outline">{t(panels.systemBadge)}</Badge>
+            <TonePill tone="neutral" size="sm">
+              {t(panels.systemBadge)}
+            </TonePill>
           ) : null}
         </div>
         <p className="text-muted-foreground truncate text-xs">{role.description}</p>

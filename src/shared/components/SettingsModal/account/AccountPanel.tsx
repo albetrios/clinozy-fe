@@ -8,13 +8,13 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { forceLogout } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -115,14 +115,14 @@ export function AccountPanel() {
           </InfoRow>
           <InfoRow label={t(accountPanels.emailLabel)}>{email}</InfoRow>
           <InfoRow label={t(accountPanels.roleLabel)}>
-            <Badge variant="secondary" className="capitalize">
+            <TonePill tone="neutral" size="sm" className="capitalize">
               {role}
-            </Badge>
+            </TonePill>
           </InfoRow>
           <InfoRow label={t(accountPanels.emailVerifiedLabel)}>
-            <Badge variant="success">
-              <ShieldCheck className="h-3 w-3" /> {t(accountPanels.verified)}
-            </Badge>
+            <TonePill tone="sage" size="sm" icon={<ShieldCheck />}>
+              {t(accountPanels.verified)}
+            </TonePill>
           </InfoRow>
         </CardContent>
       </Card>

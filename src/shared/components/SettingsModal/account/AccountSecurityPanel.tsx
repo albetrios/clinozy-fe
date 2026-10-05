@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import type { MfaEnrollment } from '@/shared/api/mfa-api.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
@@ -17,7 +18,6 @@ import {
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -157,14 +157,16 @@ function MfaCard() {
             <CardDescription>{t(SETTINGS_KEYS.security.mfa.description)}</CardDescription>
           </div>
           {mfaStatus.isSuccess ? (
-            <Badge
-              variant={mfaEnabled ? 'success' : 'secondary'}
+            <TonePill
+              tone={mfaEnabled ? 'sage' : 'neutral'}
+              size="sm"
+              dot
               data-testid="mfa-status"
             >
               {mfaEnabled
                 ? t(SETTINGS_KEYS.security.mfa.enabled)
                 : t(SETTINGS_KEYS.security.mfa.disabled)}
-            </Badge>
+            </TonePill>
           ) : null}
           {mfaStatus.isPending ? (
             <Skeleton

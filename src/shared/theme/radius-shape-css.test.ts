@@ -101,7 +101,6 @@ describe('Sharp shape coverage (index.css [data-shape="sharp"])', () => {
     'switch-thumb',
     'input-otp-slot',
     // round BY DESIGN — `rounded-full` in every other shape
-    'badge',
     'avatar',
     'avatar-fallback',
     'progress',

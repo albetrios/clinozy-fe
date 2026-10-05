@@ -16,6 +16,7 @@ import {
   PersonAvatar,
   personInitials,
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { InviteMemberDialog } from '@/shared/components/InviteMemberDialog/index.ts';
@@ -27,7 +28,6 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Card } from '@/shared/components/ui/card.tsx';
 import {
@@ -68,12 +68,14 @@ import { OrgListControls } from './OrgListControls.tsx';
 import { useUsersRoomOpen } from './users-room-open.ts';
 import { UsersRoomLink } from './UsersRoomLink.tsx';
 
-function statusVariant(
-  status: Member['status'],
-): 'secondary' | 'destructive' | 'outline' {
-  if (status === 'suspended') return 'destructive';
-  if (status === 'invited') return 'outline';
-  return 'secondary';
+/**
+ * A member status's pill tone, as the Users room paints it: active sage,
+ * invited butter, suspended (the room's "Inactive") plain.
+ */
+function statusTone(status: Member['status']): PillTone {
+  if (status === 'active') return 'sage';
+  if (status === 'invited') return 'butter';
+  return 'neutral';
 }
 
 function MembersLoading() {
@@ -354,12 +356,12 @@ function MemberRow({
           <InvitationExpiry memberId={member.id} invitation={invitation} />
         ) : null}
       </div>
-      <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
+      <TonePill tone="neutral" size="sm" className="hidden capitalize sm:inline-flex">
         {member.roleName}
-      </Badge>
-      <Badge variant={statusVariant(member.status)} className="capitalize">
+      </TonePill>
+      <TonePill tone={statusTone(member.status)} size="sm" dot className="capitalize">
         {member.status}
-      </Badge>
+      </TonePill>
       {hasActions && member.role !== 'owner' ? (
         // One row's menu is its own failure domain - a member with
         // malformed data must not blank the whole list.

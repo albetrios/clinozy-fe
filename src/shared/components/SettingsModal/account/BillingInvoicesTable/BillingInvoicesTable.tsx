@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { BillingInvoice } from '@/shared/api/billing-contracts.ts';
+import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import {
   DataTable,
   type DataTableFeatures,
@@ -13,7 +14,6 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -27,10 +27,11 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 const INVOICE_KEYS = SETTINGS_KEYS.panels.billing.invoices;
 
-function invoiceStatusVariant(status: BillingInvoice['status']) {
-  if (status === 'paid') return 'secondary' as const;
-  if (status === 'open' || status === 'uncollectible') return 'destructive' as const;
-  return 'outline' as const;
+/** An invoice status's pill tone, in the rooms' words: paid sage, owed blush, else plain. */
+function invoiceStatusTone(status: BillingInvoice['status']): PillTone {
+  if (status === 'paid') return 'sage';
+  if (status === 'open' || status === 'uncollectible') return 'blush';
+  return 'neutral';
 }
 
 function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
@@ -59,9 +60,9 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
         accessorKey: 'status',
         header: t(INVOICE_KEYS.columns.status),
         cell: ({ row }) => (
-          <Badge variant={invoiceStatusVariant(row.original.status)}>
+          <TonePill tone={invoiceStatusTone(row.original.status)} dot>
             {row.original.status}
-          </Badge>
+          </TonePill>
         ),
       },
       {

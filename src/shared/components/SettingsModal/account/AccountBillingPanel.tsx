@@ -20,6 +20,7 @@ import type {
 } from '@/shared/api/billing-contracts.ts';
 import { billingQueryKeys } from '@/shared/api/billing-query-keys.ts';
 import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
+import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { BillingCancellationSection } from '@/shared/components/SettingsModal/account/BillingCancellationSection/index.ts';
 import { BillingInvoicesTable } from '@/shared/components/SettingsModal/account/BillingInvoicesTable/index.ts';
@@ -30,7 +31,6 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -75,12 +75,13 @@ function planActionLabel(
   return t(hasSubscription ? BILLING_KEYS.switchTo : BILLING_KEYS.choose, { name });
 }
 
-function statusBadgeVariant(status: BillingSubscription['status']) {
-  if (status === 'active' || status === 'trialing') return 'secondary' as const;
+/** A subscription status's pill tone: running sage, payment trouble blush, else plain. */
+function statusTone(status: BillingSubscription['status']): PillTone {
+  if (status === 'active' || status === 'trialing') return 'sage';
   if (status === 'incomplete' || status === 'past_due' || status === 'unpaid') {
-    return 'destructive' as const;
+    return 'blush';
   }
-  return 'outline' as const;
+  return 'neutral';
 }
 
 /**
@@ -140,7 +141,11 @@ function PlanCard({
   const busy = pendingPlanId === plan.id;
   let action: ReactNode = null;
   if (current) {
-    action = <Badge variant="secondary">{t(BILLING_KEYS.currentPlan)}</Badge>;
+    action = (
+      <TonePill tone="neutral" size="sm">
+        {t(BILLING_KEYS.currentPlan)}
+      </TonePill>
+    );
   } else if (canManage) {
     action = (
       <Button
@@ -297,9 +302,9 @@ function BillingContent({ sub, plans }: BillingContentProps) {
                 : t(BILLING_KEYS.noPlan)}
             </CardTitle>
             {sub ? (
-              <Badge variant={statusBadgeVariant(sub.status)}>
+              <TonePill tone={statusTone(sub.status)} size="sm" dot>
                 {sub.status.replace('_', ' ')}
-              </Badge>
+              </TonePill>
             ) : null}
           </div>
           <CardDescription>{summaryDescription}</CardDescription>

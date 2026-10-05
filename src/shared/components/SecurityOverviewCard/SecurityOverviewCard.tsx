@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import {
   Card,
   CardContent,
@@ -66,12 +66,13 @@ export function SecurityOverviewCard({
             )}
             <CardTitle className="text-base">{t(keys.title)}</CardTitle>
           </div>
-          <Badge
-            variant={strong ? 'success' : 'secondary'}
+          <TonePill
+            tone={strong ? 'sage' : 'butter'}
+            size="sm"
             data-testid="security-overview-score"
           >
             {t(keys.score, { score, total: items.length })}
-          </Badge>
+          </TonePill>
         </div>
         <CardDescription>{t(keys.description)}</CardDescription>
       </CardHeader>

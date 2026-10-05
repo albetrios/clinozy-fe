@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
 import type { WebhookDeliveryAttempt } from '@/shared/api/webhook-contracts.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Dialog,
@@ -154,7 +154,9 @@ function DeliveryAttemptRow({ attempt }: { attempt: WebhookDeliveryAttempt }) {
           {attempt.httpStatusCode}
         </span>
       ) : null}
-      <Badge variant={delivered ? 'secondary' : 'destructive'}>{attempt.status}</Badge>
+      <TonePill tone={delivered ? 'sage' : 'blush'} size="sm" dot>
+        {attempt.status}
+      </TonePill>
     </li>
   );
 }

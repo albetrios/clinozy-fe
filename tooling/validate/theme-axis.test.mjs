@@ -182,8 +182,8 @@ const REACHABLE = [
     '<Skeleton className="h-5 w-8 rounded-full" />',
   ],
   [
-    'a <Badge> and an <Avatar>',
-    '<><Badge className="rounded-full" /><Avatar className="rounded-full" /></>',
+    'an <Avatar> and its <AvatarFallback>',
+    '<><Avatar className="rounded-full" /><AvatarFallback className="rounded-full" /></>',
   ],
   ['a status dot of at most 10px', '<span className="bg-primary size-2 rounded-full" />'],
   [
@@ -271,8 +271,14 @@ for (const [label, source] of FIXED_SPACING) {
 
 const SCALED_SPACING = [
   ['scale steps', '<div className="px-6 pt-6 pb-3 gap-2 sm:mt-4 -mx-3" />'],
-  ['spacing built on a variable', '<div className="pb-[calc(var(--floating-bottom-offset)+0.75rem)] p-[var(--gutter)]" />'],
-  ['fixed SIZES and OFFSETS — not spacing', '<div className="h-[640px] w-[calc(100%-2rem)] top-[20%] -bottom-[9px] max-w-[960px]" />'],
+  [
+    'spacing built on a variable',
+    '<div className="pb-[calc(var(--floating-bottom-offset)+0.75rem)] p-[var(--gutter)]" />',
+  ],
+  [
+    'fixed SIZES and OFFSETS — not spacing',
+    '<div className="h-[640px] w-[calc(100%-2rem)] top-[20%] -bottom-[9px] max-w-[960px]" />',
+  ],
 ];
 
 for (const [label, source] of SCALED_SPACING) {

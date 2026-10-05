@@ -465,7 +465,7 @@
   --color-accent-foreground: oklch(0.985 0 0);
   --color-destructive: oklch(0.704 0.191 22.216);
   /* Dark ink on the lighter dark-mode red (white on it is ~3.5:1). The button
-     and badge variants paint the token itself — no `dark:` alpha wash. */
+     variant paints the token itself — no `dark:` alpha wash. */
   --color-destructive-foreground: oklch(0.205 0 0);
   --color-success: oklch(0.765 0.177 163.223);
   --color-success-foreground: oklch(0.205 0 0);
@@ -1331,7 +1331,6 @@
      opt in. A vendored primitive that RE-SLOTS its own <Button>s needs its
      slot here too — `button` above no longer matches them (theme-shape.e2e
      measures it; the class string says `rounded-full`, the slot says nothing). */
-  [data-slot='badge'],
   [data-slot='avatar'],
   [data-slot='avatar-fallback'],
   [data-slot='checkbox'],

@@ -14,13 +14,13 @@ import * as billingApi from '@/shared/api/billing-api.ts';
 import type { BillingPaymentMethod } from '@/shared/api/billing-contracts.ts';
 import { billingQueryKeys } from '@/shared/api/billing-query-keys.ts';
 import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -63,7 +63,9 @@ function PaymentMethodRow({ method }: { method: BillingPaymentMethod }) {
         </div>
       </div>
       {method.isDefault ? (
-        <Badge variant="secondary">{t(METHOD_KEYS.defaultBadge)}</Badge>
+        <TonePill tone="neutral" size="sm">
+          {t(METHOD_KEYS.defaultBadge)}
+        </TonePill>
       ) : null}
     </li>
   );

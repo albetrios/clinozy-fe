@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import type { Session } from '@/shared/api/session-contracts.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { FormattedDate } from '@/shared/components/FormattedDate/index.ts';
@@ -9,7 +10,6 @@ import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Card } from '@/shared/components/ui/card.tsx';
 import { useRevokeSession, useSessions } from '@/shared/hooks/useSessions/index.ts';
@@ -97,7 +97,9 @@ export function AccountSessionsPanel() {
                       {session.device ?? t(panels.deviceFallback)}
                     </p>
                     {session.current ? (
-                      <Badge variant="secondary">{t(panels.currentBadge)}</Badge>
+                      <TonePill tone="neutral" size="sm">
+                        {t(panels.currentBadge)}
+                      </TonePill>
                     ) : null}
                   </div>
                   <p className="text-muted-foreground truncate text-xs">

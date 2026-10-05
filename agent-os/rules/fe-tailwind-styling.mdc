@@ -105,7 +105,7 @@ A bare `rounded` and an arbitrary `rounded-[3px]` follow nothing and are rejecte
 
 `rounded-full` is a **shape** decision. On anything that is a surface — a chip, a count
 badge, an icon disc, a track — add `data-slot="pill"` (or use a primitive that already has
-a slot: `Badge`, `Avatar`, `Button`, `Skeleton`) so the Sharp shape can square it.
+a slot: `Avatar`, `Button`, `Skeleton`) so the Sharp shape can square it.
 `pnpm validate:theme-axis` (check 6) rejects a `rounded-full` with no slot within 5 lines
 above it. Status dots (at most 10px — `size-2.5`), blurred glows and pseudo-element markers
 stay round / are squared in `index.css`. Never write an unconditional `rounded-none`; scope
