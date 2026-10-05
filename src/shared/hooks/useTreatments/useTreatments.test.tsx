@@ -14,6 +14,7 @@ import {
   usePatientTreatments,
   useRestoreTreatment,
   useTreatment,
+  useTreatmentCheckIns,
   useUpdateTreatment,
 } from './useTreatments.ts';
 
@@ -92,6 +93,19 @@ describe('useTreatments', () => {
     const { result } = renderHook(() => useTreatment(ref.treatment(498)), { wrapper });
     await waitFor(() => expect(result.current.data?.checkIns).toHaveLength(1));
     const idle = renderHook(() => useTreatment(''), { wrapper });
+    expect(idle.result.current.fetchStatus).toBe('idle');
+  });
+});
+
+describe('useTreatmentCheckIns', () => {
+  it('reads each treatment’s latest check-in — the Treatments table’s Feedback', async () => {
+    const { result } = renderHook(() => useTreatmentCheckIns(DHARTI), { wrapper });
+    await waitFor(() => expect(result.current.data).toBeDefined());
+    expect(result.current.data?.[ref.treatment(498)]).toMatchObject({
+      feel: 'better',
+      score: 7,
+    });
+    const idle = renderHook(() => useTreatmentCheckIns(''), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
   });
 });

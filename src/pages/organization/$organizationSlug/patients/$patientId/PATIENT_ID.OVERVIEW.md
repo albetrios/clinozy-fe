@@ -71,37 +71,39 @@ one loader for the whole file.
 
 ## Files
 
-| File                                    | Responsibility                                                                                                                                         |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `patient-id.route.tsx`                  | Route marker — exports `Component` rendering `PatientFileLayout`.                                                                                      |
-| `patient-id.manifest.ts`                | Manifest — `kind: 'layout'` over the eleven sections, `edit`, `check-ins` and `reviews`, permission `organization:read`, module `clinic-patients`.     |
-| `patient-id.search.ts`                  | URL schemas: the file's `activity`, a file-level drawer's `from`, the check-in and review drawers' visit, treatment and source. Rides the entry chunk. |
-| `patient-id.sections.ts`                | The lazy route components of the layout, every section and the file-level drawers, behind one dynamic import.                                          |
-| `patient-id.constants.ts`               | `PATIENT_FILE_LAYOUT_NS` / `PATIENT_FILE_LAYOUT_KEYS` — the not-found record and the loading label.                                                    |
-| `PatientFileLayout.tsx`                 | The layout: bar, main card, Activity; the mask, the section guard, Esc, the load failure. Owns `data-testid="patient-file-layout"`.                    |
-| `components/PatientFileBar/`            | The file bar and its tab strip.                                                                                                                        |
-| `components/PatientSectionsPopover/`    | The section popover / phone sheet.                                                                                                                     |
-| `components/PatientRail/`               | The rail: identity, Reach, About, Up next; `components/PatientRail/patient-rail.ts` holds the tenure, birthday and masked-number rules.                |
-| `components/PatientActivity/`           | The Activity column's card around `ChatColumn`.                                                                                                        |
-| `hooks/usePatientFileActivity/`         | Whether Activity is open, and its toggle.                                                                                                              |
-| `hooks/usePatientFileNavigation/`       | The file's links: sections, the list, Start visit, Edit patient, Book / Reschedule, Collect, Feedback, history chips.                                  |
-| `hooks/useEscapeBack/`                  | Esc back to the list when nothing else handled it.                                                                                                     |
-| `shared/patient-file-context.ts`        | The file's context for its sections and drawers (`usePatientFileContext`).                                                                             |
-| `shared/patient-file-nav.ts`            | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                                 |
-| `shared/patient-file.constants.ts`      | `PATIENT_FILE_NS` / `PATIENT_FILE_KEYS` — the section names.                                                                                           |
-| `shared/hooks/usePatientFileActions/`   | The Add-to-record items the member may use and what each runs; each section's primary item.                                                            |
-| `shared/hooks/usePatientPhotoUpload/`   | The photo uploads and the hidden picker: drop, "Upload images", the Add menu's "Photo".                                                                |
-| `shared/patient-photos.constants.ts`    | `PATIENT_PHOTOS_NS` / `PATIENT_PHOTOS_KEYS` — Photos, the viewer and Photo details.                                                                    |
-| `shared/components/PatientAddMenu/`     | The Add-to-record menu ("+" and a section's "⌄").                                                                                                      |
-| `shared/components/PatientSection/`     | The section frame every child renders.                                                                                                                 |
-| `shared/components/PatientStaffPicker/` | The record drawers' Doctor / Therapist picker, and who a new record starts with (`useDefaultStaff`).                                                   |
-| `shared/hooks/usePatientRecordRoute/`   | Which record dialog a section's URL opens (create · view · edit), the refusal and not-found returns, and the close.                                    |
-| `shared/hooks/usePatientFileDialog/`    | A file-level drawer route's section behind it (`?from=`, Clinical notes by default), its way back, and its refusal.                                    |
-| `shared/components/CheckInDrawer/`      | Visit / Aftercare check-in (`check-ins/*`, L-43): its form, steps, head and save.                                                                      |
-| `shared/components/ReviewDrawer/`       | Log a review (`reviews/*`, L-43): its form, steps and save with the files' upload.                                                                     |
-| `shared/patient-feedback.ts`            | The feedback words and tones the rail, the Feedback card and the drawers share (counts, "Followed …", score and rating tones).                         |
-| `shared/patient-clinical.ts`            | The clinical notes as chips: one per line until the contract stores arrays (Appendix F).                                                               |
-| `__tests__/integration/`                | `__tests__/integration/patient-file-test-router.tsx` mirrors the file's routes for the tests.                                                          |
+| File                                     | Responsibility                                                                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `patient-id.route.tsx`                   | Route marker — exports `Component` rendering `PatientFileLayout`.                                                                                      |
+| `patient-id.manifest.ts`                 | Manifest — `kind: 'layout'` over the eleven sections, `edit`, `check-ins` and `reviews`, permission `organization:read`, module `clinic-patients`.     |
+| `patient-id.search.ts`                   | URL schemas: the file's `activity`, a file-level drawer's `from`, the check-in and review drawers' visit, treatment and source. Rides the entry chunk. |
+| `patient-id.sections.ts`                 | The lazy route components of the layout, every section and the file-level drawers, behind one dynamic import.                                          |
+| `patient-id.constants.ts`                | `PATIENT_FILE_LAYOUT_NS` / `PATIENT_FILE_LAYOUT_KEYS` — the not-found record and the loading label.                                                    |
+| `PatientFileLayout.tsx`                  | The layout: bar, main card, Activity; the mask, the section guard, Esc, the load failure. Owns `data-testid="patient-file-layout"`.                    |
+| `components/PatientFileBar/`             | The file bar and its tab strip.                                                                                                                        |
+| `components/PatientSectionsPopover/`     | The section popover / phone sheet.                                                                                                                     |
+| `components/PatientRail/`                | The rail: identity, Reach, About, Up next; `components/PatientRail/patient-rail.ts` holds the tenure, birthday and masked-number rules.                |
+| `components/PatientActivity/`            | The Activity column's card around `ChatColumn`.                                                                                                        |
+| `hooks/usePatientFileActivity/`          | Whether Activity is open, and its toggle.                                                                                                              |
+| `hooks/usePatientFileNavigation/`        | The file's links: sections, the list, Start visit, Edit patient, Book / Reschedule, Collect, Feedback, history chips.                                  |
+| `hooks/useEscapeBack/`                   | Esc back to the list when nothing else handled it.                                                                                                     |
+| `shared/patient-file-context.ts`         | The file's context for its sections and drawers (`usePatientFileContext`).                                                                             |
+| `shared/patient-file-nav.ts`             | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                                 |
+| `shared/patient-file.constants.ts`       | `PATIENT_FILE_NS` / `PATIENT_FILE_KEYS` — the section names.                                                                                           |
+| `shared/hooks/usePatientFileActions/`    | The Add-to-record items the member may use and what each runs; each section's primary item.                                                            |
+| `shared/hooks/usePatientPhotoUpload/`    | The photo uploads and the hidden picker: drop, "Upload images", the Add menu's "Photo".                                                                |
+| `shared/patient-photos.constants.ts`     | `PATIENT_PHOTOS_NS` / `PATIENT_PHOTOS_KEYS` — Photos, the viewer and Photo details.                                                                    |
+| `shared/components/PatientAddMenu/`      | The Add-to-record menu ("+" and a section's "⌄").                                                                                                      |
+| `shared/components/PatientSection/`      | The section frame every child renders.                                                                                                                 |
+| `shared/components/PatientStaffPicker/`  | The record drawers' Doctor / Therapist picker, and who a new record starts with (`useDefaultStaff`).                                                   |
+| `shared/hooks/usePatientRecordRoute/`    | Which record dialog a section's URL opens (create · view · edit), the refusal and not-found returns, and the close.                                    |
+| `shared/hooks/usePatientFileDialog/`     | A file-level drawer route's section behind it (`?from=`, Clinical notes by default), its way back, and its refusal.                                    |
+| `shared/components/CheckInDrawer/`       | Visit / Aftercare check-in (`check-ins/*`, L-43): its form, steps, head and save.                                                                      |
+| `shared/components/ReviewDrawer/`        | Log a review (`reviews/*`, L-43): its form, steps and save with the files' upload.                                                                     |
+| `shared/components/PatientSectionTable/` | The section tables' frame (L-43b): the shared table with Export, the empty state, the people cells and the day formats.                                |
+| `shared/hooks/useStaffLookup/`           | The staff member a record names — its doctor, team, author — as a chip; this session's writes as the signed-in member.                                 |
+| `shared/patient-feedback.ts`             | The feedback words and tones the rail, the Feedback card and the drawers share (counts, "Followed …", score and rating tones).                         |
+| `shared/patient-clinical.ts`             | The clinical notes as chips: one per line until the contract stores arrays (Appendix F).                                                               |
+| `__tests__/integration/`                 | `__tests__/integration/patient-file-test-router.tsx` mirrors the file's routes for the tests.                                                          |
 
 ## Test ids
 

@@ -16,6 +16,8 @@ import {
   useLedgerList,
   useOpenInvoices,
   useOpenSupplierBills,
+  usePatientInvoices,
+  usePatientPayments,
   usePayment,
   useRestorePayment,
 } from './usePayments.ts';
@@ -124,5 +126,34 @@ describe('the ledger writes', () => {
     const restore = renderHook(() => useRestorePayment(), { wrapper });
     await act(() => restore.result.current.mutateAsync(ref.payment(310)));
     await waitFor(() => expect(has310(list.result.current.rows)).toBe(true));
+  });
+});
+
+describe('the patient file’s money reads', () => {
+  const dharti = patientRef('Dharti Galani');
+
+  it('reads her receipts and refunds, newest first; idle without her', async () => {
+    const { result } = renderHook(() => usePatientPayments(dharti), { wrapper });
+    await waitFor(() => expect(result.current.data).toBeDefined());
+    expect(result.current.data?.map((row) => row.seq)).toEqual([5505]);
+    expect(result.current.data?.[0]).toMatchObject({
+      direction: 'received',
+      invoice: { seq: 782 },
+    });
+    const idle = renderHook(() => usePatientPayments(''), { wrapper });
+    expect(idle.result.current.fetchStatus).toBe('idle');
+  });
+
+  it('reads every invoice of hers with its items, team, status and sale', async () => {
+    const { result } = renderHook(() => usePatientInvoices(dharti), { wrapper });
+    await waitFor(() => expect(result.current.data).toBeDefined());
+    const lhr = result.current.data?.find((row) => row.seq === 787);
+    expect(lhr).toMatchObject({
+      items: ['LHR Full Face · B4G7'],
+      status: 'unpaid',
+      saleId: null,
+    });
+    const sale = result.current.data?.find((row) => row.seq === 788);
+    expect(sale?.saleId).not.toBeNull();
   });
 });

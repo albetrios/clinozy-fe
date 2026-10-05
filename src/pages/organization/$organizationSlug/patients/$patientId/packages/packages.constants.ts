@@ -15,7 +15,27 @@ export const PACKAGE_KEYS = {
   save: 'package.save',
   noPick: 'package.noPick',
   added: 'package.added',
+  /** A package's card on the section (H:833; `patient-file.md:70–79`). */
+  card: {
+    /** "6 left" (plural). */
+    left: 'package.card.left',
+    /** "1 of 7 used". */
+    used: 'package.card.used',
+    /** "Valid till 24 Sep 2027". */
+    validTill: 'package.card.validTill',
+    /** "Next: 8 Oct". */
+    next: 'package.card.next',
+    use: 'package.card.use',
+    book: 'package.card.book',
+    empty: 'package.card.empty',
+    /** "Session 2 of 7 used". */
+    sessionUsed: 'package.card.sessionUsed',
+    noneLeft: 'package.card.noneLeft',
+  },
 } as const;
 
 /** The drawer's root test id. */
 export const PACKAGE_TEST_ID = 'package-drawer';
+
+/** One package card: `patient-package-<id>`, its `-use` and `-book` buttons. */
+export const PACKAGE_CARD_TEST_ID = 'patient-package';

@@ -617,7 +617,20 @@
     "summary": "Le sedute si contano quando un trattamento è completato",
     "save": "Aggiungi pacchetto",
     "noPick": "Scegli un pacchetto",
-    "added": "Pacchetto aggiunto · fatturalo da Fatture"
+    "added": "Pacchetto aggiunto · fatturalo da Fatture",
+    "card": {
+      "left_one": "{{count}} rimasta",
+      "left_many": "{{count}} rimaste",
+      "left_other": "{{count}} rimaste",
+      "used": "{{used}} di {{total}} usate",
+      "validTill": "Valido fino al {{date}}",
+      "next": "Prossima: {{date}}",
+      "use": "Usa una seduta",
+      "book": "Prenota la prossima",
+      "empty": "Ancora nessun pacchetto",
+      "sessionUsed": "Seduta {{used}} di {{total}} usata",
+      "noneLeft": "Nessuna seduta rimasta"
+    }
   },
   "clinical": {
     "titles": {
@@ -788,5 +801,123 @@
       "video": "Carica la testimonianza",
       "other": "Valutazione, testo e screenshot"
     }
+  },
+  "tables": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV",
+    "visits": {
+      "records": "appuntamenti",
+      "count_one": "{{count}} appuntamento",
+      "count_many": "{{count}} appuntamenti",
+      "count_other": "{{count}} appuntamenti",
+      "empty": "Ancora nessun appuntamento"
+    },
+    "prescriptions": {
+      "records": "prescrizioni",
+      "count_one": "{{count}} prescrizione",
+      "count_many": "{{count}} prescrizioni",
+      "count_other": "{{count}} prescrizioni",
+      "empty": "Ancora nessuna prescrizione",
+      "copied": "Prescrizione copiata"
+    },
+    "treatments": {
+      "records": "trattamenti",
+      "count_one": "{{count}} trattamento",
+      "count_many": "{{count}} trattamenti",
+      "count_other": "{{count}} trattamenti",
+      "empty": "Ancora nessun trattamento",
+      "copied": "Seduta {{session}} aggiunta",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Controllo {{date}}",
+      "callNextDay": "Chiamare il giorno dopo",
+      "callInDays_one": "Chiamare tra {{count}} giorno",
+      "callInDays_many": "Chiamare tra {{count}} giorni",
+      "callInDays_other": "Chiamare tra {{count}} giorni"
+    },
+    "reports": {
+      "records": "referti",
+      "count_one": "{{count}} referto",
+      "count_many": "{{count}} referti",
+      "count_other": "{{count}} referti",
+      "empty": "Ancora nessun referto",
+      "fileSub": "{{format}} · condiviso col paziente su richiesta",
+      "deleteTitle": "Eliminare questo referto?",
+      "deleted": "Referto eliminato"
+    },
+    "invoices": {
+      "records": "fatture",
+      "count_one": "{{count}} fattura",
+      "count_many": "{{count}} fatture",
+      "count_other": "{{count}} fatture",
+      "empty": "Ancora nessuna fattura",
+      "countDue_one": "{{count}} fattura · {{due}} da pagare",
+      "countDue_many": "{{count}} fatture · {{due}} da pagare",
+      "countDue_other": "{{count}} fatture · {{due}} da pagare",
+      "itemCount_one": "{{count}} voce",
+      "itemCount_many": "{{count}} voci",
+      "itemCount_other": "{{count}} voci",
+      "due": "{{amount}} da pagare",
+      "nothingDue": "Niente da pagare"
+    },
+    "payments": {
+      "records": "movimenti",
+      "count_one": "{{count}} movimento",
+      "count_many": "{{count}} movimenti",
+      "count_other": "{{count}} movimenti",
+      "empty": "Ancora nessun pagamento",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Servizio",
+      "doctor": "Medico",
+      "status": "Stato",
+      "date": "Data",
+      "medicines": "Farmaci",
+      "notes": "Note",
+      "updated": "Aggiornato",
+      "treatment": "Trattamento",
+      "area": "Zona",
+      "team": "Team",
+      "session": "Seduta",
+      "details": "Dettagli",
+      "feedback": "Riscontro",
+      "report": "Referto",
+      "type": "Tipo",
+      "uploadedBy": "Caricato da",
+      "invoice": "Fattura",
+      "items": "Voci",
+      "bill": "Importo",
+      "paid": "Pagato / da pagare",
+      "receipt": "Ricevuta",
+      "when": "Quando",
+      "mode": "Modalità",
+      "amount": "Importo",
+      "by": "Da"
+    },
+    "actions": {
+      "print": "Stampa",
+      "preview": "Anteprima",
+      "copyRx": "Copia prescrizione",
+      "sell": "Vendi farmaci",
+      "checkIn": "Controllo",
+      "copyTreatment": "Copia come prossima seduta",
+      "open": "Apri",
+      "pay": "Registra pagamento",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "notes": {
+    "label": "Nuova nota",
+    "placeholder": "Aggiungi una nota per il team",
+    "add": "Aggiungi nota",
+    "by": "{{name}} · {{date}}",
+    "delete": "Elimina nota",
+    "deleted": "Nota eliminata",
+    "empty": "Ancora nessuna nota"
   }
 }

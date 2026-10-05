@@ -14,6 +14,7 @@ import {
   listOpenInvoices,
   listOpenSupplierBills,
   listPatientInvoices,
+  listPatientPayments,
   payExpense,
   paymentQueryKeys,
   receivePayment,
@@ -94,12 +95,24 @@ export function useOpenInvoices(patientId: string | null) {
   });
 }
 
-/** Every invoice of a patient, newest first — idle without a patient (Add pending's "For invoice"). */
+/**
+ * Every invoice of a patient, newest first — idle without a patient (Add
+ * pending's "For invoice", the patient file's Invoices).
+ */
 export function usePatientInvoices(patientId: string | null) {
   return useAppQuery({
     queryKey: paymentQueryKeys.patientInvoices(patientId ?? ''),
     queryFn: () => listPatientInvoices(patientId ?? ''),
     enabled: patientId !== null,
+  });
+}
+
+/** A patient's receipts and refunds, newest first — the patient file's Payments. */
+export function usePatientPayments(patientId: string) {
+  return useAppQuery({
+    queryKey: paymentQueryKeys.patientPayments(patientId),
+    queryFn: () => listPatientPayments(patientId),
+    enabled: patientId !== '',
   });
 }
 

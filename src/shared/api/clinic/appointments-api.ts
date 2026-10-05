@@ -107,6 +107,9 @@ export const appointmentQueryKeys = {
   /** A patient's active packages — the Package session radios. */
   packages: (patientId: string) =>
     [...appointmentQueryKeys.all, 'packages', patientId] as const,
+  /** A patient's bookings — the patient file's Visits. */
+  patient: (patientId: string) =>
+    [...appointmentQueryKeys.all, 'patient', patientId] as const,
   /** The photos filed under one visit. */
   photos: (appointmentId: string) =>
     [...appointmentQueryKeys.all, 'photos', appointmentId] as const,
@@ -154,6 +157,13 @@ export async function fetchAppointmentRange(
 /** One booking (`getAppointment`) — a 404 when it is unknown or deleted. */
 export async function fetchAppointment(id: string): Promise<AppointmentRow> {
   return (await server()).getAppointment(id);
+}
+
+/** A patient's bookings, newest first — the patient file's Visits (REPLACE_WITH_API). */
+export async function fetchPatientAppointments(
+  patientId: string,
+): Promise<AppointmentRow[]> {
+  return (await server()).listPatientAppointments(patientId);
 }
 
 /** The slot grid for a doctor, a day and a length (`availableSlots`). */

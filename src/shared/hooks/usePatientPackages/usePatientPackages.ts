@@ -1,6 +1,7 @@
 import {
   addPatientPackage,
   type AddPatientPackageInput,
+  consumePackageSession,
   listPackageOfferings,
   listPatientPackages,
   patientPackageQueryKeys,
@@ -38,6 +39,20 @@ export function useAddPatientPackage(
 ) {
   return useAppMutation<PatientPackageRecord, AddPatientPackageInput>({
     mutationFn: addPatientPackage,
+    invalidateKeys: [patientQueryKeys.all],
+    ...options,
+  });
+}
+
+/**
+ * Use a session of a package — the card's "Use a session"; refreshes every
+ * patient read. The card raises "Session 2 of 7 used" (or "No sessions left").
+ */
+export function useConsumePackageSession(
+  options: CrudMutationOptions<PatientPackageRecord, string> = {},
+) {
+  return useAppMutation<PatientPackageRecord, string>({
+    mutationFn: consumePackageSession,
     invalidateKeys: [patientQueryKeys.all],
     ...options,
   });

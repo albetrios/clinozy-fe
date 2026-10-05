@@ -8,6 +8,8 @@ export { invoiceSheet, printInvoice } from './invoice-sheet.tsx';
 export {
   type InvoiceCreateDrawerProps,
   type InvoiceCreatePrefill,
+  InvoiceDeleteConfirm,
+  type InvoiceDeleteConfirmProps,
   InvoiceDrawer,
   type InvoiceDrawerProps,
   type InvoiceEditDrawerProps,

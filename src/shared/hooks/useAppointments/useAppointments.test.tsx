@@ -7,6 +7,7 @@ import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-ap
 import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
 import {
@@ -29,6 +30,7 @@ import {
   useConnectedLeads,
   useCreateAppointment,
   useDeleteVisitPhoto,
+  usePatientAppointments,
   useRestoreAppointment,
   useRestoreVisitPhoto,
   useSetAppointmentStatus,
@@ -435,5 +437,21 @@ describe('the appointment form’s reads and the visit’s photos', () => {
       await result.current.restore.mutateAsync(photo.id);
     });
     await waitFor(() => expect(result.current.photos.data).toHaveLength(3));
+  });
+});
+
+describe('usePatientAppointments', () => {
+  it('reads one patient’s bookings, newest first; idle without one', async () => {
+    const { result } = renderHook(
+      () => usePatientAppointments(patientRef('Dharti Galani')),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.data?.length).toBeGreaterThan(1));
+    const slots = (result.current.data ?? []).map(
+      (row) => `${row.date} ${row.startTime}`,
+    );
+    expect(slots).toEqual([...slots].sort().reverse());
+    const idle = renderHook(() => usePatientAppointments(''), { wrapper });
+    expect(idle.result.current.fetchStatus).toBe('idle');
   });
 });

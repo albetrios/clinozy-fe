@@ -587,7 +587,18 @@
     "summary": "完成治疗后计入次数",
     "save": "添加套餐",
     "noPick": "请选择套餐",
-    "added": "套餐已添加 · 请在发票中开票"
+    "added": "套餐已添加 · 请在发票中开票",
+    "card": {
+      "left_other": "剩 {{count}} 次",
+      "used": "已用 {{used}}/{{total}} 次",
+      "validTill": "有效期至 {{date}}",
+      "next": "下次：{{date}}",
+      "use": "使用一次",
+      "book": "预约下次",
+      "empty": "暂无套餐",
+      "sessionUsed": "已使用第 {{used}}/{{total}} 次",
+      "noneLeft": "没有剩余次数"
+    }
   },
   "clinical": {
     "titles": {
@@ -752,5 +763,103 @@
       "video": "上传视频评价",
       "other": "评分、文字和截图"
     }
+  },
+  "tables": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV",
+    "visits": {
+      "records": "预约",
+      "count_other": "{{count}} 个预约",
+      "empty": "暂无预约"
+    },
+    "prescriptions": {
+      "records": "处方",
+      "count_other": "{{count}} 张处方",
+      "empty": "暂无处方",
+      "copied": "已复制处方"
+    },
+    "treatments": {
+      "records": "治疗",
+      "count_other": "{{count}} 次治疗",
+      "empty": "暂无治疗",
+      "copied": "已添加第 {{session}} 次",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "回访 {{date}}",
+      "callNextDay": "次日回电",
+      "callInDays_other": "{{count}} 天后回电"
+    },
+    "reports": {
+      "records": "报告",
+      "count_other": "{{count}} 份报告",
+      "empty": "暂无报告",
+      "fileSub": "{{format}} · 应患者要求可分享",
+      "deleteTitle": "删除这份报告？",
+      "deleted": "已删除报告"
+    },
+    "invoices": {
+      "records": "账单",
+      "count_other": "{{count}} 张账单",
+      "empty": "暂无账单",
+      "countDue_other": "{{count}} 张账单 · 待付 {{due}}",
+      "itemCount_other": "{{count}} 项",
+      "due": "待付 {{amount}}",
+      "nothingDue": "无待付"
+    },
+    "payments": {
+      "records": "收支记录",
+      "count_other": "{{count}} 笔收支",
+      "empty": "暂无付款",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "编号",
+      "offering": "项目",
+      "doctor": "医生",
+      "status": "状态",
+      "date": "日期",
+      "medicines": "药品",
+      "notes": "备注",
+      "updated": "更新",
+      "treatment": "治疗",
+      "area": "部位",
+      "team": "团队",
+      "session": "次数",
+      "details": "详情",
+      "feedback": "反馈",
+      "report": "报告",
+      "type": "类型",
+      "uploadedBy": "上传人",
+      "invoice": "账单",
+      "items": "项目明细",
+      "bill": "金额",
+      "paid": "已付 / 待付",
+      "receipt": "收据",
+      "when": "时间",
+      "mode": "方式",
+      "amount": "金额",
+      "by": "经手人"
+    },
+    "actions": {
+      "print": "打印",
+      "preview": "预览",
+      "copyRx": "复制处方",
+      "sell": "售出药品",
+      "checkIn": "回访",
+      "copyTreatment": "复制为下一次",
+      "open": "打开",
+      "pay": "记录付款",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "notes": {
+    "label": "新备注",
+    "placeholder": "给团队添加备注",
+    "add": "添加备注",
+    "by": "{{name}} · {{date}}",
+    "delete": "删除备注",
+    "deleted": "已删除备注",
+    "empty": "暂无备注"
   }
 }

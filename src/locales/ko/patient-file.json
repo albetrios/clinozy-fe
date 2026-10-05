@@ -587,7 +587,18 @@
     "summary": "시술이 완료되면 회차가 차감됩니다",
     "save": "패키지 추가",
     "noPick": "패키지를 선택하세요",
-    "added": "패키지를 추가했습니다 · 청구서에서 청구하세요"
+    "added": "패키지를 추가했습니다 · 청구서에서 청구하세요",
+    "card": {
+      "left_other": "{{count}}회 남음",
+      "used": "{{total}}회 중 {{used}}회 사용",
+      "validTill": "{{date}}까지 유효",
+      "next": "다음: {{date}}",
+      "use": "1회 사용",
+      "book": "다음 예약",
+      "empty": "아직 패키지가 없습니다",
+      "sessionUsed": "{{total}}회 중 {{used}}회차를 사용했습니다",
+      "noneLeft": "남은 회차가 없습니다"
+    }
   },
   "clinical": {
     "titles": {
@@ -752,5 +763,103 @@
       "video": "후기 영상 업로드",
       "other": "평점, 내용, 스크린샷"
     }
+  },
+  "tables": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다",
+    "visits": {
+      "records": "예약",
+      "count_other": "예약 {{count}}건",
+      "empty": "아직 예약이 없습니다"
+    },
+    "prescriptions": {
+      "records": "처방",
+      "count_other": "처방 {{count}}건",
+      "empty": "아직 처방이 없습니다",
+      "copied": "처방을 복사했습니다"
+    },
+    "treatments": {
+      "records": "시술",
+      "count_other": "시술 {{count}}건",
+      "empty": "아직 시술이 없습니다",
+      "copied": "{{session}}회차를 추가했습니다",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "체크인 {{date}}",
+      "callNextDay": "다음 날 전화",
+      "callInDays_other": "{{count}}일 후 전화"
+    },
+    "reports": {
+      "records": "리포트",
+      "count_other": "리포트 {{count}}건",
+      "empty": "아직 리포트가 없습니다",
+      "fileSub": "{{format}} · 요청 시 환자와 공유",
+      "deleteTitle": "이 리포트를 삭제할까요?",
+      "deleted": "리포트를 삭제했습니다"
+    },
+    "invoices": {
+      "records": "청구서",
+      "count_other": "청구서 {{count}}건",
+      "empty": "아직 청구서가 없습니다",
+      "countDue_other": "청구서 {{count}}건 · 미수 {{due}}",
+      "itemCount_other": "{{count}}개 항목",
+      "due": "미수 {{amount}}",
+      "nothingDue": "미수 없음"
+    },
+    "payments": {
+      "records": "거래",
+      "count_other": "거래 {{count}}건",
+      "empty": "아직 결제가 없습니다",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "서비스",
+      "doctor": "의사",
+      "status": "상태",
+      "date": "날짜",
+      "medicines": "약",
+      "notes": "메모",
+      "updated": "수정",
+      "treatment": "시술",
+      "area": "부위",
+      "team": "팀",
+      "session": "회차",
+      "details": "상세",
+      "feedback": "피드백",
+      "report": "리포트",
+      "type": "유형",
+      "uploadedBy": "업로드한 사람",
+      "invoice": "청구서",
+      "items": "항목",
+      "bill": "청구액",
+      "paid": "결제 / 미수",
+      "receipt": "영수증",
+      "when": "일시",
+      "mode": "수단",
+      "amount": "금액",
+      "by": "담당"
+    },
+    "actions": {
+      "print": "인쇄",
+      "preview": "미리보기",
+      "copyRx": "처방 복사",
+      "sell": "약 판매",
+      "checkIn": "체크인",
+      "copyTreatment": "다음 회차로 복사",
+      "open": "열기",
+      "pay": "결제 기록",
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "notes": {
+    "label": "새 메모",
+    "placeholder": "팀에 남길 메모 추가",
+    "add": "메모 추가",
+    "by": "{{name}} · {{date}}",
+    "delete": "메모 삭제",
+    "deleted": "메모를 삭제했습니다",
+    "empty": "아직 메모가 없습니다"
   }
 }

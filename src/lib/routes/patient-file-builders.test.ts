@@ -8,8 +8,12 @@ import {
   organizationPatientPhoto,
   organizationPatientPhotoEdit,
   organizationPatientSection,
+  organizationPrescription,
+  organizationPrescriptionEdit,
+  organizationReport,
   organizationReviewCreate,
   organizationReviewEdit,
+  organizationTreatmentEdit,
 } from './patient-file-builders.ts';
 
 const PARAMS = { organizationSlug: 'acme', patientId: 'P1' };
@@ -64,6 +68,24 @@ describe('patient-file route builders (KICKOFF §6.6)', () => {
     expect(organizationReviewEdit('acme', 'P1', 'R1')).toEqual({
       to: '/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit',
       params: { ...PARAMS, reviewId: 'R1' },
+    });
+  });
+
+  it('build the record dialogs over Prescriptions, Treatments and Reports (S:36–43)', () => {
+    expect(organizationPrescription('acme', 'P1', 'X1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId',
+      params: { ...PARAMS, prescriptionId: 'X1' },
+    });
+    expect(organizationPrescriptionEdit('acme', 'P1', 'X1').to).toBe(
+      '/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId/edit',
+    );
+    expect(organizationTreatmentEdit('acme', 'P1', 'T1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/treatments/$treatmentId/edit',
+      params: { ...PARAMS, treatmentId: 'T1' },
+    });
+    expect(organizationReport('acme', 'P1', 'R1')).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/reports/$reportId',
+      params: { ...PARAMS, reportId: 'R1' },
     });
   });
 });

@@ -11,7 +11,10 @@ import type {
   PlanSuggestion,
 } from '@/shared/api/clinic/plan-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  INVOICE_STATUS_TONES,
+  OFFERING_CATEGORY_TONES,
+} from '@/shared/clinic/clinic-tones.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -52,13 +55,6 @@ const CHANNEL_TONES: Readonly<Record<Channel, Tone>> = {
   email: 'stone',
   note: 'butter',
 };
-
-/** An invoice status's pill (`pyStatus`, H:3633): Paid sage, Partly paid butter, Due blush. */
-const INVOICE_STATUS_TONES = {
-  paid: 'sage',
-  partial: 'butter',
-  unpaid: 'blush',
-} as const;
 
 /** What the host says about where the card sits. */
 export interface PlanCardHost {

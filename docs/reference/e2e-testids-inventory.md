@@ -717,6 +717,25 @@ section behind and the drawer. Paths are under
 | `review-drawer-where-<source>` · `-rating-<n>`                                         | Log a review (560), step 1: Where, Rating 5 … 1                                          | `shared/components/ReviewDrawer/`        |
 | `review-drawer-link` · `-files` · `-files-input` · `-attached` · `-text`               | Link · the drop zone · its picker · a saved review's files · What they said              | ReviewDrawer                             |
 
+### Patient file sections (launch L-43b)
+
+The section tables, the package cards and Team notes. Each table is the shared `DataTable` with
+`<t>` its id — `patient-visits` · `patient-prescriptions` · `patient-treatments` ·
+`patient-reports` · `patient-invoices` · `patient-payments` — so its parts take the Data table
+ids above (`<t>-table`, `<t>-table-row`, `<t>-table-select-all`, `<t>-table-bulk-export`,
+`<t>-columns-trigger` …). Paths are under
+`pages/organization/$organizationSlug/patients/$patientId/`.
+
+| Test ID                                                  | Element                                                                    | Source                                           |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------ |
+| `patient-prescriptions-row-action-<id>`                  | A prescription's `print` · `preview` · `copy` · `sell` · `edit` · `delete` | `prescriptions/hooks/usePrescriptionRowActions/` |
+| `patient-treatments-row-action-<id>`                     | A treatment's `check-in` · `copy` · `edit` · `delete`                      | `treatments/hooks/useTreatmentRowActions/`       |
+| `patient-reports-row-action-<id>`                        | A report's `open` · `delete`                                               | `reports/PatientReportsPage.tsx`                 |
+| `patient-invoices-row-action-<id>`                       | An invoice's `print` · `preview` · `pay` · `edit` · `delete`               | `invoices/hooks/useInvoiceRowActions/`           |
+| `patient-package-<packageId>` · `-use` · `-book`         | A package card · "Use a session" · "Book next"                             | `packages/PatientPackagesPage.tsx`               |
+| `patient-notes-input` · `patient-notes-add`              | Team notes' composer · "Add note"                                          | `notes/PatientNotesPage.tsx`                     |
+| `patient-note-<noteId>` · `patient-note-delete-<noteId>` | A note's card · its × "Delete note"                                        | `notes/PatientNotesPage.tsx`                     |
+
 ## Quick line (shared, launch L-45)
 
 `shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a

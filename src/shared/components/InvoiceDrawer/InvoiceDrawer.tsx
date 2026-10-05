@@ -6,6 +6,7 @@ import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   InvoiceDetail,
+  InvoiceRecord,
   InvoiceSaveResult,
 } from '@/shared/api/clinic/invoices-contracts.ts';
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
@@ -412,7 +413,7 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
       <InvoiceStackedDrawers stacks={stacks} />
       {editing && (
         <InvoiceDeleteConfirm
-          detail={editing}
+          invoice={editing.invoice}
           open={deleting}
           record={view.summary}
           onClose={() => setDeleting(false)}
@@ -448,28 +449,32 @@ function InvoiceStackedDrawers({
   );
 }
 
+/** Props of {@link InvoiceDeleteConfirm}. */
+export interface InvoiceDeleteConfirmProps {
+  invoice: Pick<InvoiceRecord, 'id' | 'seq'>;
+  open: boolean;
+  /** The confirm's record pill — the drawer's summary, a row's "Invoice #787". */
+  record: string;
+  onClose: () => void;
+  onDeleted?: () => void;
+}
+
 /**
- * Edit invoice's Delete — the `void` ability (Q-U8): the shared reason
- * confirm, "Delete this invoice?", the invoice in its pill; "Invoice #787
- * deleted" offers Undo for 10s (D32, `S:1546`).
+ * An invoice's Delete — the `void` ability (Q-U8), from Edit invoice or the
+ * patient file's Invoices row: the shared reason confirm, "Delete this
+ * invoice?", the invoice in its pill; "Invoice #787 deleted" offers Undo for
+ * 10s (D32, `S:1546`).
  */
-function InvoiceDeleteConfirm({
-  detail,
+export function InvoiceDeleteConfirm({
+  invoice,
   open,
   record,
   onClose,
   onDeleted,
-}: {
-  detail: InvoiceDetail;
-  open: boolean;
-  record: string;
-  onClose: () => void;
-  onDeleted?: () => void;
-}) {
+}: InvoiceDeleteConfirmProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const remove = useDeleteInvoice();
   const restore = useRestoreInvoice();
-  const { invoice } = detail;
   return (
     <ConfirmDialog
       open={open}

@@ -1,3 +1,4 @@
+import type { InvoiceStatus } from '@/shared/api/clinic/clinic-money.ts';
 import type {
   AppointmentStatus,
   CheckinFeel,
@@ -239,6 +240,13 @@ export const INVOICE_TYPE_TONES: Readonly<Record<InvoiceType, Tone>> = {
   clinic: 'sky',
   medical: 'sage',
   consultation: 'lav',
+};
+
+/** An invoice status's pill (`pyStatus`, H:3633): Paid sage, Partly paid butter, Due blush. */
+export const INVOICE_STATUS_TONES: Readonly<Record<InvoiceStatus, Tone>> = {
+  paid: 'sage',
+  partial: 'butter',
+  unpaid: 'blush',
 };
 
 /** Which way a credit goes (`payments.md:45`): Give blush, Take sky. */

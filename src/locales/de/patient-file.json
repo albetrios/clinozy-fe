@@ -602,7 +602,19 @@
     "summary": "Sitzungen werden gezählt, wenn eine Behandlung abgeschlossen ist",
     "save": "Paket hinzufügen",
     "noPick": "Wählen Sie ein Paket aus",
-    "added": "Paket hinzugefügt · stellen Sie es unter Rechnungen in Rechnung"
+    "added": "Paket hinzugefügt · stellen Sie es unter Rechnungen in Rechnung",
+    "card": {
+      "left_one": "{{count}} übrig",
+      "left_other": "{{count}} übrig",
+      "used": "{{used}} von {{total}} genutzt",
+      "validTill": "Gültig bis {{date}}",
+      "next": "Nächster: {{date}}",
+      "use": "Sitzung nutzen",
+      "book": "Nächste buchen",
+      "empty": "Noch keine Pakete",
+      "sessionUsed": "Sitzung {{used}} von {{total}} genutzt",
+      "noneLeft": "Keine Sitzungen übrig"
+    }
   },
   "clinical": {
     "titles": {
@@ -770,5 +782,113 @@
       "video": "Das Erfahrungsvideo hochladen",
       "other": "Bewertung, Text und Screenshot"
     }
+  },
+  "tables": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert",
+    "visits": {
+      "records": "Termine",
+      "count_one": "{{count}} Termin",
+      "count_other": "{{count}} Termine",
+      "empty": "Noch keine Termine"
+    },
+    "prescriptions": {
+      "records": "Rezepte",
+      "count_one": "{{count}} Rezept",
+      "count_other": "{{count}} Rezepte",
+      "empty": "Noch keine Rezepte",
+      "copied": "Rezept kopiert"
+    },
+    "treatments": {
+      "records": "Behandlungen",
+      "count_one": "{{count}} Behandlung",
+      "count_other": "{{count}} Behandlungen",
+      "empty": "Noch keine Behandlungen",
+      "copied": "Sitzung {{session}} hinzugefügt",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Check-in {{date}}",
+      "callNextDay": "Anruf am nächsten Tag",
+      "callInDays_one": "Anruf in {{count}} Tag",
+      "callInDays_other": "Anruf in {{count}} Tagen"
+    },
+    "reports": {
+      "records": "Befunde",
+      "count_one": "{{count}} Befund",
+      "count_other": "{{count}} Befunde",
+      "empty": "Noch keine Befunde",
+      "fileSub": "{{format}} · auf Wunsch mit dem Patienten geteilt",
+      "deleteTitle": "Diesen Befund löschen?",
+      "deleted": "Befund gelöscht"
+    },
+    "invoices": {
+      "records": "Rechnungen",
+      "count_one": "{{count}} Rechnung",
+      "count_other": "{{count}} Rechnungen",
+      "empty": "Noch keine Rechnungen",
+      "countDue_one": "{{count}} Rechnung · {{due}} offen",
+      "countDue_other": "{{count}} Rechnungen · {{due}} offen",
+      "itemCount_one": "{{count}} Position",
+      "itemCount_other": "{{count}} Positionen",
+      "due": "{{amount}} offen",
+      "nothingDue": "Nichts offen"
+    },
+    "payments": {
+      "records": "Buchungen",
+      "count_one": "{{count}} Buchung",
+      "count_other": "{{count}} Buchungen",
+      "empty": "Noch keine Zahlungen",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Leistung",
+      "doctor": "Arzt",
+      "status": "Status",
+      "date": "Datum",
+      "medicines": "Medikamente",
+      "notes": "Notizen",
+      "updated": "Geändert",
+      "treatment": "Behandlung",
+      "area": "Bereich",
+      "team": "Team",
+      "session": "Sitzung",
+      "details": "Details",
+      "feedback": "Rückmeldung",
+      "report": "Befund",
+      "type": "Art",
+      "uploadedBy": "Hochgeladen von",
+      "invoice": "Rechnung",
+      "items": "Positionen",
+      "bill": "Betrag",
+      "paid": "Bezahlt / offen",
+      "receipt": "Beleg",
+      "when": "Wann",
+      "mode": "Zahlart",
+      "amount": "Betrag",
+      "by": "Von"
+    },
+    "actions": {
+      "print": "Drucken",
+      "preview": "Vorschau",
+      "copyRx": "Rezept kopieren",
+      "sell": "Medikamente verkaufen",
+      "checkIn": "Check-in",
+      "copyTreatment": "Als nächste Sitzung kopieren",
+      "open": "Öffnen",
+      "pay": "Zahlung erfassen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "notes": {
+    "label": "Neue Notiz",
+    "placeholder": "Notiz für das Team hinzufügen",
+    "add": "Notiz hinzufügen",
+    "by": "{{name}} · {{date}}",
+    "delete": "Notiz löschen",
+    "deleted": "Notiz gelöscht",
+    "empty": "Noch keine Notizen"
   }
 }

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { compareText, validateClinicInput } from './clinic-fixture-store.ts';
 import {
   civilDateSchema,
+  type DeleteReason,
   type PatientReport,
   reportTypeSchema,
 } from './clinic-schema.ts';
@@ -102,4 +103,23 @@ export async function attachPatientReportFile(
   if (report.files.includes(key)) return report;
   const files = [...report.files, key].slice(0, REPORT_LIMITS.files);
   return clinicFixtures.patientReports.update(reportId, { files });
+}
+
+/**
+ * Delete a report with the confirm's reason ("Delete this report?", D32;
+ * REPLACE_WITH_API): the Reports table's row action — its Undo restores it.
+ */
+export async function deletePatientReport(
+  id: string,
+  reason: DeleteReason,
+  note: string | null,
+): Promise<PatientReport> {
+  const { clinicFixtures } = await fixtureWorld();
+  return clinicFixtures.patientReports.remove(id, reason, note);
+}
+
+/** Restore a deleted report — the delete toast's Undo (REPLACE_WITH_API). */
+export async function restorePatientReport(id: string): Promise<PatientReport> {
+  const { clinicFixtures } = await fixtureWorld();
+  return clinicFixtures.patientReports.restore(id);
 }

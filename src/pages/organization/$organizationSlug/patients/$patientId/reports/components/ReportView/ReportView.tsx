@@ -21,24 +21,11 @@ import {
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
+import { reportFileFormat } from '../../report-file.ts';
 import { REPORT_KEYS, REPORT_NS, REPORT_TEST_IDS } from '../../reports.constants.ts';
 
 const K = REPORT_KEYS;
 const TEST_ID = REPORT_TEST_IDS.view;
-
-/** The formats a report's file can be (`S:447`), by the stored name's extension. */
-const FILE_FORMATS: Readonly<Record<string, string>> = {
-  pdf: 'PDF',
-  jpg: 'JPG',
-  jpeg: 'JPG',
-  png: 'PNG',
-};
-
-/** "PDF" — the first file's format; a report with none reads as drawn (H:4019). */
-function fileFormat(files: readonly string[]): string {
-  const extension = files[0]?.split('.').pop()?.toLowerCase() ?? '';
-  return FILE_FORMATS[extension] ?? 'PDF';
-}
 
 /** One step of the viewer: its read-only values, a full row or a third each. */
 function ViewStep({
@@ -130,7 +117,7 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
               label: t(K.file),
               value: t(K.view.fileLine, {
                 name: report.name,
-                format: fileFormat(report.files),
+                format: reportFileFormat(report.files),
               }),
               span: 'full',
             },

@@ -23,6 +23,7 @@ import {
   type LedgerRow,
   type OpenInvoice,
   type OpenSupplierBill,
+  type PatientInvoiceRow,
   type PayExpenseInput,
   payExpenseInputSchema,
   type PaymentEdit,
@@ -55,6 +56,9 @@ export const paymentQueryKeys = {
     [...paymentQueryKeys.all, 'patient-invoices', patientId] as const,
   /** The supplier bills with a balance — Send payment's first step. */
   openBills: () => [...paymentQueryKeys.all, 'open-bills'] as const,
+  /** A patient's receipts and refunds — the patient file's Payments. */
+  patientPayments: (patientId: string) =>
+    [...paymentQueryKeys.all, 'patient-payments', patientId] as const,
 };
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
@@ -165,8 +169,8 @@ export async function fetchPayment(id: string): Promise<LedgerRow> {
   return toLedgerRow(payment, await ledgerContext());
 }
 
-/** A patient's invoices, each with its bill, what is paid and what is due — oldest first. */
-async function patientInvoiceRows(patientId: string): Promise<OpenInvoice[]> {
+/** A patient's invoices, each with its items, team, bill, what is paid and due, and status — oldest first. */
+async function patientInvoiceRows(patientId: string): Promise<PatientInvoiceRow[]> {
   const { clinicFixtures } = await fixtureWorld();
   const payments = clinicFixtures.payments.snapshot();
   return clinicFixtures.invoices
@@ -182,6 +186,11 @@ async function patientInvoiceRows(patientId: string): Promise<OpenInvoice[]> {
         bill: balance.bill,
         paid: balance.paid,
         due: balance.due,
+        items: invoice.items.map((item) => item.name),
+        remark: invoice.remark,
+        teamIds: invoice.teamIds,
+        status: balance.status,
+        saleId: invoice.saleId,
       };
     });
 }
@@ -196,10 +205,28 @@ export async function listOpenInvoices(patientId: string): Promise<OpenInvoice[]
 
 /**
  * Every invoice of a patient, paid ones too (REPLACE_WITH_API), newest first —
- * Add pending's "For invoice" ("Invoice #772", "₹1,000 · ₹600 due").
+ * Add pending's "For invoice" ("Invoice #772", "₹1,000 · ₹600 due") and the
+ * patient file's Invoices table (items, team, status).
  */
-export async function listPatientInvoices(patientId: string): Promise<OpenInvoice[]> {
+export async function listPatientInvoices(
+  patientId: string,
+): Promise<PatientInvoiceRow[]> {
   return (await patientInvoiceRows(patientId)).reverse();
+}
+
+/**
+ * A patient's ledger entries — receipts and refunds — newest first: the
+ * patient file's Payments table (REPLACE_WITH_API: the ledger read has no
+ * patient filter).
+ */
+export async function listPatientPayments(patientId: string): Promise<LedgerRow[]> {
+  await runDayCloseJob();
+  const { clinicFixtures } = await fixtureWorld();
+  const context = await ledgerContext();
+  return clinicFixtures.payments
+    .snapshot((payment) => payment.patientId === patientId)
+    .sort(newestFirst)
+    .map((payment) => toLedgerRow(payment, context));
 }
 
 /** A Medical PO's bill: Σ qty × rate — free units are not billed (`S:769`). */

@@ -6,5 +6,6 @@ export {
   usePatientTreatments,
   useRestoreTreatment,
   useTreatment,
+  useTreatmentCheckIns,
   useUpdateTreatment,
 } from './useTreatments.ts';

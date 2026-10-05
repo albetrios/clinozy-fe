@@ -74,6 +74,30 @@ export function organizationPrescriptionCreate(
   } as const;
 }
 
+/** The Rx print preview — a prescription's viewer over Prescriptions (`S:36`). */
+export function organizationPrescription(
+  organizationSlug: string,
+  patientId: string,
+  prescriptionId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId',
+    params: { organizationSlug, patientId, prescriptionId },
+  } as const;
+}
+
+/** Edit prescription — the Rx drawer over Prescriptions (`S:37`). */
+export function organizationPrescriptionEdit(
+  organizationSlug: string,
+  patientId: string,
+  prescriptionId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId/edit',
+    params: { organizationSlug, patientId, prescriptionId },
+  } as const;
+}
+
 /** New treatment — the Treatment drawer over Treatments (`S:38`). */
 export function organizationTreatmentCreate(organizationSlug: string, patientId: string) {
   return {
@@ -82,11 +106,35 @@ export function organizationTreatmentCreate(organizationSlug: string, patientId:
   } as const;
 }
 
+/** Edit treatment — the Treatment drawer over Treatments (`S:39`; show = edit). */
+export function organizationTreatmentEdit(
+  organizationSlug: string,
+  patientId: string,
+  treatmentId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/treatments/$treatmentId/edit',
+    params: { organizationSlug, patientId, treatmentId },
+  } as const;
+}
+
 /** Upload report — the Report drawer over Reports (`S:42`). */
 export function organizationReportCreate(organizationSlug: string, patientId: string) {
   return {
     to: '/organization/$organizationSlug/patients/$patientId/reports/create',
     params: { organizationSlug, patientId },
+  } as const;
+}
+
+/** Report view — one report over Reports (`S:43`). */
+export function organizationReport(
+  organizationSlug: string,
+  patientId: string,
+  reportId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/reports/$reportId',
+    params: { organizationSlug, patientId, reportId },
   } as const;
 }
 

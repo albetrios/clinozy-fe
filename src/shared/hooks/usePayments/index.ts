@@ -7,6 +7,7 @@ export {
   useOpenInvoices,
   useOpenSupplierBills,
   usePatientInvoices,
+  usePatientPayments,
   usePayExpense,
   usePayment,
   useReceivePayment,

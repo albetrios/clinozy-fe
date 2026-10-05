@@ -9,6 +9,7 @@ import {
 import {
   organizationInvoice,
   organizationInvoiceCreate,
+  organizationInvoiceEdit,
 } from '@/lib/routes/invoice-builders.ts';
 import {
   organizationPatient,
@@ -29,6 +30,7 @@ export type ClinicCommandTarget =
   | 'patientEdit'
   | 'lead'
   | 'invoice'
+  | 'invoiceEdit'
   | 'visit'
   | 'newSale';
 
@@ -54,6 +56,7 @@ export type ClinicCommandTarget =
  * | `patientEdit`    | `/patients/$patientId/edit`    | live (L-42; the drawer L-32b)  |
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
  * | `invoice`        | `/invoices/$invoiceId`         | live (L-40; the preview)       |
+ * | `invoiceEdit`    | `/invoices/$invoiceId/edit`    | live (L-40; the file's Invoices) |
  * | `visit`          | `/visits/$visitId`             | L-49 (Today's lane actions)    |
  * | `newSale`        | `/medical/sales/create`        | live (L-50c; Invoice drawer)   |
  *
@@ -73,6 +76,7 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   patientEdit: organizationPatientEdit('', '').to,
   lead: organizationLead('', '').to,
   invoice: organizationInvoice('', '').to,
+  invoiceEdit: organizationInvoiceEdit('', '').to,
   visit: '/organization/$organizationSlug/visits/$visitId',
   newSale: organizationMedicalCreate('', 'sales').to,
 };
@@ -83,6 +87,7 @@ const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
   patientEdit: 'patientId',
   lead: 'leadId',
   invoice: 'invoiceId',
+  invoiceEdit: 'invoiceId',
   visit: 'visitId',
 };
 
@@ -96,6 +101,7 @@ const KEEPS_REFERRER: ReadonlySet<ClinicCommandTarget> = new Set([
   'newReceipt',
   'newInvoice',
   'invoice',
+  'invoiceEdit',
   'newSale',
 ]);
 

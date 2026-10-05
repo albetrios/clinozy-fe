@@ -602,7 +602,19 @@
     "summary": "ट्रीटमेंट पूरा होने पर सेशन गिने जाते हैं",
     "save": "पैकेज जोड़ें",
     "noPick": "पैकेज चुनें",
-    "added": "पैकेज जुड़ गया · इसका बिल इनवॉइस से बनाएँ"
+    "added": "पैकेज जुड़ गया · इसका बिल इनवॉइस से बनाएँ",
+    "card": {
+      "left_one": "{{count}} बाकी",
+      "left_other": "{{count}} बाकी",
+      "used": "{{total}} में से {{used}} इस्तेमाल",
+      "validTill": "{{date}} तक मान्य",
+      "next": "अगला: {{date}}",
+      "use": "एक सेशन इस्तेमाल करें",
+      "book": "अगला बुक करें",
+      "empty": "अभी कोई पैकेज नहीं",
+      "sessionUsed": "{{total}} में से सेशन {{used}} इस्तेमाल हुआ",
+      "noneLeft": "कोई सेशन बाकी नहीं"
+    }
   },
   "clinical": {
     "titles": {
@@ -770,5 +782,113 @@
       "video": "टेस्टिमोनियल अपलोड करें",
       "other": "रेटिंग, टेक्स्ट और स्क्रीनशॉट"
     }
+  },
+  "tables": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं",
+    "visits": {
+      "records": "अपॉइंटमेंट",
+      "count_one": "{{count}} अपॉइंटमेंट",
+      "count_other": "{{count}} अपॉइंटमेंट",
+      "empty": "अभी कोई अपॉइंटमेंट नहीं"
+    },
+    "prescriptions": {
+      "records": "प्रिस्क्रिप्शन",
+      "count_one": "{{count}} प्रिस्क्रिप्शन",
+      "count_other": "{{count}} प्रिस्क्रिप्शन",
+      "empty": "अभी कोई प्रिस्क्रिप्शन नहीं",
+      "copied": "प्रिस्क्रिप्शन कॉपी हुआ"
+    },
+    "treatments": {
+      "records": "ट्रीटमेंट",
+      "count_one": "{{count}} ट्रीटमेंट",
+      "count_other": "{{count}} ट्रीटमेंट",
+      "empty": "अभी कोई ट्रीटमेंट नहीं",
+      "copied": "सेशन {{session}} जोड़ा गया",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "चेक-इन {{date}}",
+      "callNextDay": "अगले दिन कॉल",
+      "callInDays_one": "{{count}} दिन में कॉल",
+      "callInDays_other": "{{count}} दिन में कॉल"
+    },
+    "reports": {
+      "records": "रिपोर्ट",
+      "count_one": "{{count}} रिपोर्ट",
+      "count_other": "{{count}} रिपोर्ट",
+      "empty": "अभी कोई रिपोर्ट नहीं",
+      "fileSub": "{{format}} · माँगने पर मरीज़ के साथ साझा",
+      "deleteTitle": "यह रिपोर्ट हटाएँ?",
+      "deleted": "रिपोर्ट हटाई गई"
+    },
+    "invoices": {
+      "records": "इनवॉइस",
+      "count_one": "{{count}} इनवॉइस",
+      "count_other": "{{count}} इनवॉइस",
+      "empty": "अभी कोई इनवॉइस नहीं",
+      "countDue_one": "{{count}} इनवॉइस · {{due}} बाकी",
+      "countDue_other": "{{count}} इनवॉइस · {{due}} बाकी",
+      "itemCount_one": "{{count}} आइटम",
+      "itemCount_other": "{{count}} आइटम",
+      "due": "{{amount}} बाकी",
+      "nothingDue": "कुछ बाकी नहीं"
+    },
+    "payments": {
+      "records": "लेनदेन",
+      "count_one": "{{count}} लेनदेन",
+      "count_other": "{{count}} लेनदेन",
+      "empty": "अभी कोई भुगतान नहीं",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "सेवा",
+      "doctor": "डॉक्टर",
+      "status": "स्थिति",
+      "date": "तारीख",
+      "medicines": "दवाइयाँ",
+      "notes": "नोट्स",
+      "updated": "अपडेट",
+      "treatment": "ट्रीटमेंट",
+      "area": "हिस्सा",
+      "team": "टीम",
+      "session": "सेशन",
+      "details": "विवरण",
+      "feedback": "फ़ीडबैक",
+      "report": "रिपोर्ट",
+      "type": "प्रकार",
+      "uploadedBy": "अपलोड किया",
+      "invoice": "इनवॉइस",
+      "items": "आइटम",
+      "bill": "बिल",
+      "paid": "भुगतान / बाकी",
+      "receipt": "रसीद",
+      "when": "कब",
+      "mode": "माध्यम",
+      "amount": "राशि",
+      "by": "द्वारा"
+    },
+    "actions": {
+      "print": "प्रिंट",
+      "preview": "प्रीव्यू",
+      "copyRx": "प्रिस्क्रिप्शन कॉपी करें",
+      "sell": "दवाइयाँ बेचें",
+      "checkIn": "चेक-इन",
+      "copyTreatment": "अगले सेशन के रूप में कॉपी करें",
+      "open": "खोलें",
+      "pay": "भुगतान दर्ज करें",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ"
+    }
+  },
+  "notes": {
+    "label": "नया नोट",
+    "placeholder": "टीम के लिए नोट जोड़ें",
+    "add": "नोट जोड़ें",
+    "by": "{{name}} · {{date}}",
+    "delete": "नोट हटाएँ",
+    "deleted": "नोट हटाया गया",
+    "empty": "अभी कोई नोट नहीं"
   }
 }

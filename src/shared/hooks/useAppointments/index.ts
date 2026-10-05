@@ -16,6 +16,7 @@ export {
   useConnectedLeads,
   useCreateAppointment,
   useDeleteVisitPhoto,
+  usePatientAppointments,
   useRestoreAppointment,
   useRestoreVisitPhoto,
   useSetAppointmentStatus,

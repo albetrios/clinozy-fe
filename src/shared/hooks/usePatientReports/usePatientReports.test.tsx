@@ -9,8 +9,10 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 
 import {
   useCreatePatientReport,
+  useDeletePatientReport,
   usePatientReport,
   usePatientReports,
+  useRestorePatientReport,
 } from './usePatientReports.ts';
 
 const DHARTI = patientRef('Dharti Galani');
@@ -57,5 +59,29 @@ describe('usePatientReports', () => {
     );
     const idle = renderHook(() => usePatientReport(''), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
+  });
+});
+
+describe('useDeletePatientReport / useRestorePatientReport', () => {
+  it('deletes a report with the confirm’s reason and brings it back', async () => {
+    const { result } = renderHook(
+      () => ({
+        list: usePatientReports(DHARTI),
+        remove: useDeletePatientReport(),
+        restore: useRestorePatientReport(),
+      }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
+    await act(() =>
+      result.current.remove.mutateAsync({
+        id: ref.patientReport(2),
+        reason: 'duplicate',
+        note: null,
+      }),
+    );
+    await waitFor(() => expect(result.current.list.data).toHaveLength(1));
+    await act(() => result.current.restore.mutateAsync(ref.patientReport(2)));
+    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
   });
 });

@@ -17,6 +17,7 @@ import {
   fetchBookableStaff,
   fetchBookingPerson,
   fetchConnectedLeads,
+  fetchPatientAppointments,
   fetchVisitPhotos,
   normalizeAppointmentListParams,
   restoreAppointment,
@@ -453,6 +454,15 @@ export function useActivePackages(patientId: string | null) {
     queryKey: appointmentQueryKeys.packages(patientId ?? ''),
     queryFn: () => fetchActivePackages(patientId ?? ''),
     enabled: patientId !== null,
+  });
+}
+
+/** A patient's bookings, newest first — the patient file's Visits; idle without a patient. */
+export function usePatientAppointments(patientId: string) {
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.patient(patientId),
+    queryFn: () => fetchPatientAppointments(patientId),
+    enabled: patientId !== '',
   });
 }
 

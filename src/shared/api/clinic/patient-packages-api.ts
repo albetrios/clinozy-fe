@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { compareText, validateClinicInput } from './clinic-fixture-store.ts';
+import {
+  clinicHttpError,
+  compareText,
+  validateClinicInput,
+} from './clinic-fixture-store.ts';
 import type { Offering } from './clinic-schema.ts';
 import { addCivilDays, clinicToday } from './clinic-time.ts';
 import type { PatientPackageRecord } from './patient-packages-contracts.ts';
@@ -42,6 +46,8 @@ export interface PatientPackageRow {
   offering: PackageOffering | null;
   /** False until an invoice names it ("Add package", A-F6). */
   invoiced: boolean;
+  /** The day of the next booking that uses one of its sessions — "Next: 8 Oct"; null when none. */
+  nextVisit: string | null;
 }
 
 const packageOffering = (offering: Offering): PackageOffering => ({
@@ -61,6 +67,17 @@ export async function listPatientPackages(
   const offerings = new Map(
     clinicFixtures.offerings.snapshot().map((offering) => [offering.id, offering]),
   );
+  const today = clinicToday();
+  const nextVisit = (packageId: string) =>
+    clinicFixtures.appointments
+      .snapshot(
+        (visit) =>
+          visit.patientPackageId === packageId &&
+          visit.date >= today &&
+          (visit.status === 'scheduled' || visit.status === 'confirmed'),
+      )
+      .map((visit) => visit.date)
+      .sort(compareText)[0] ?? null;
   return clinicFixtures.patientPackages
     .snapshot((row) => row.patientId === patientId)
     .sort((a, b) => compareText(a.createdAt, b.createdAt))
@@ -70,8 +87,26 @@ export async function listPatientPackages(
         package: row,
         offering: offering ? packageOffering(offering) : null,
         invoiced: row.invoiceId !== null,
+        nextVisit: nextVisit(row.id),
       };
     });
+}
+
+/**
+ * Use a session by hand — the card's "Use a session" (H:833): one more used,
+ * a 409 "No sessions left" when none is. The contract counts sessions only
+ * through treatments (`S:452–466`), so this is a backend request
+ * (REPLACE_WITH_API).
+ */
+export async function consumePackageSession(id: string): Promise<PatientPackageRecord> {
+  const { clinicFixtures } = await fixtureWorld();
+  const row = await clinicFixtures.patientPackages.get(id);
+  if (row.sessionsUsed >= row.sessionsTotal) {
+    throw clinicHttpError(409, 'conflict', 'No sessions left');
+  }
+  return clinicFixtures.patientPackages.update(id, {
+    sessionsUsed: row.sessionsUsed + 1,
+  });
 }
 
 /**

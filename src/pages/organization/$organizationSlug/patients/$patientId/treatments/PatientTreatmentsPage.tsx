@@ -1,26 +1,50 @@
-import { useParams } from '@tanstack/react-router';
+'use no memo';
+// The Columns chooser reads the table's live column state through methods on
+// objects that keep their identity; React Compiler memoisation would serve
+// stale answers.
+
+import { useNavigate, useParams } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { organizationTreatmentEdit } from '@/lib/routes/patient-file-builders.ts';
+import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   fetchTreatment,
   type TreatmentDetail,
   treatmentQueryKeys,
 } from '@/shared/api/clinic/treatments-api.ts';
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
-import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
+import {
+  usePatientTreatments,
+  useTreatmentCheckIns,
+} from '@/shared/hooks/useTreatments/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
+import {
+  PATIENT_SECTION_TABLE_IDS,
+  PATIENT_TABLE_KEYS,
+  PATIENT_TABLE_NS,
+  PatientSectionTable,
+} from '../shared/components/PatientSectionTable/index.ts';
 import { useDefaultStaff } from '../shared/components/PatientStaffPicker/index.ts';
 import { usePatientRecordRoute } from '../shared/hooks/usePatientRecordRoute/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import {
   startingTemplate,
+  TreatmentDeleteConfirm,
   TreatmentDrawer,
   type TreatmentNameChip,
 } from './components/TreatmentDrawer/index.ts';
+import {
+  type TreatmentRowAccess,
+  useTreatmentRowActions,
+} from './hooks/useTreatmentRowActions/index.ts';
+import { useTreatmentsTable } from './hooks/useTreatmentsTable/index.ts';
 import { TREATMENT_KEYS, TREATMENT_NS } from './treatments.constants.ts';
 import { manifest } from './treatments.manifest.ts';
 
@@ -75,11 +99,70 @@ function TreatmentDrawerHost({
 }
 
 /**
+ * The Treatments table (KICKOFF §6.6 Section tables; H:4754) in the section:
+ * the patient's treatments newest first with their latest check-in, a row
+ * opening Edit treatment (read-only without the gate), its actions, and
+ * "Delete this treatment?".
+ */
+function TreatmentsTable(access: TreatmentRowAccess) {
+  const { t } = useTranslation(PATIENT_TABLE_NS);
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const { patientId } = usePatientFileContext();
+  const treatments = usePatientTreatments(patientId);
+  const checkIns = useTreatmentCheckIns(patientId);
+  const rows = treatments.data ?? [];
+  const table = useTreatmentsTable(rows, checkIns.data ?? {});
+  const [deleting, setDeleting] = useState<Treatment | null>(null);
+  const rowActions = useTreatmentRowActions({ ...access, onDelete: setDeleting });
+
+  return (
+    <PatientSection
+      section="treatments"
+      data-testid={manifest.testId}
+      columns={
+        <DataTableColumnChooser
+          table={table}
+          tableId={PATIENT_SECTION_TABLE_IDS.treatments}
+        />
+      }
+      className="flex flex-col"
+    >
+      <PatientSectionTable
+        section="treatments"
+        table={table}
+        loading={treatments.isPending}
+        countLabel={
+          rows.length > 0
+            ? t(PATIENT_TABLE_KEYS.treatments.count, { count: rows.length })
+            : undefined
+        }
+        minWidth={1260}
+        onRowClick={(row) =>
+          void navigate(organizationTreatmentEdit(organizationSlug, patientId, row.id))
+        }
+        rowActions={rowActions}
+      />
+      {deleting ? (
+        <TreatmentDeleteConfirm
+          treatment={deleting}
+          open
+          onOpenChange={(open) => {
+            if (!open) setDeleting(null);
+          }}
+          onDeleted={() => setDeleting(null)}
+        />
+      ) : null}
+    </PatientSection>
+  );
+}
+
+/**
  * Patient file › Treatments (KICKOFF §6.6; H:4754; `patient-file.md:48–57`):
- * the section in the file's content column — the table lands with L-43b —
- * and its URL-driven dialogs (`S:38–39`): New treatment and Edit treatment
- * (show = edit). Recording one is the Doctor and Therapist gate (`S:38–39`;
- * the Owner always passes); anyone else reads it.
+ * the section's table in the file's content column and its URL-driven
+ * dialogs (`S:38–39`): New treatment and Edit treatment (show = edit).
+ * Recording one is the Doctor and Therapist gate (`S:38–39`; the Owner always
+ * passes); anyone else reads it.
  */
 export function PatientTreatmentsPage() {
   const { t } = useTranslation(TREATMENT_NS);
@@ -98,7 +181,11 @@ export function PatientTreatmentsPage() {
 
   return (
     <>
-      <PatientSection section="treatments" data-testid={manifest.testId} />
+      <TreatmentsTable
+        writable={writable}
+        canDelete={writable && access.can('patients', 'delete')}
+        canCheckIn={access.isResolved && access.can('patients', 'edit')}
+      />
       {access.isResolved && (route.mode === 'create' || editing) ? (
         <TreatmentDrawerHost
           key={editing?.treatment.id ?? 'new'}

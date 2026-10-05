@@ -6,6 +6,7 @@ import {
   deleteTreatment,
   fetchTreatment,
   listPatientTreatments,
+  listTreatmentCheckIns,
   restoreTreatment,
   type TreatmentInput,
   treatmentQueryKeys,
@@ -28,6 +29,15 @@ export function usePatientTreatments(patientId: string, { enabled = true } = {})
     queryKey: treatmentQueryKeys.patient(patientId),
     queryFn: () => listPatientTreatments(patientId),
     enabled: enabled && patientId !== '',
+  });
+}
+
+/** Each of a patient's treatments' latest check-in — the Treatments table's Feedback. */
+export function useTreatmentCheckIns(patientId: string) {
+  return useAppQuery({
+    queryKey: treatmentQueryKeys.checkIns(patientId),
+    queryFn: () => listTreatmentCheckIns(patientId),
+    enabled: patientId !== '',
   });
 }
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { type CreatedFilter, readCreatedFilter } from './clinic-list-filters.ts';
+import type { InvoiceStatus } from './clinic-money.ts';
 import {
   billKindSchema,
   civilDateSchema,
@@ -243,6 +244,20 @@ export interface OpenInvoice {
   bill: number;
   paid: number;
   due: number;
+}
+
+/**
+ * Every invoice of a patient as the patient file's Invoices table reads it
+ * (KICKOFF §6.6 Section tables): its items' names, the remark under them, the
+ * team and the status beside what is paid and due.
+ */
+export interface PatientInvoiceRow extends OpenInvoice {
+  items: string[];
+  remark: string | null;
+  teamIds: string[];
+  status: InvoiceStatus;
+  /** A Medical sale's invoice — Medical voids it, the row never deletes it. */
+  saleId: string | null;
 }
 
 /**

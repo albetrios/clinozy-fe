@@ -1,10 +1,12 @@
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason, PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   createPatientReport,
+  deletePatientReport,
   fetchPatientReport,
   listPatientReports,
   type PatientReportInput,
   patientReportQueryKeys,
+  restorePatientReport,
 } from '@/shared/api/clinic/patient-reports-api.ts';
 import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
@@ -43,6 +45,38 @@ export function useCreatePatientReport(
 ) {
   return useAppMutation<PatientReport, PatientReportInput>({
     mutationFn: createPatientReport,
+    invalidateKeys: [patientQueryKeys.all],
+    ...options,
+  });
+}
+
+/** A report delete: the record and the confirm's stored reason and note. */
+export interface PatientReportDeleteVars {
+  id: string;
+  reason: DeleteReason;
+  note: string | null;
+}
+
+/**
+ * Delete a report. No toast of its own: the reason confirm's `undo` raises
+ * "Report deleted" with Undo, which runs {@link useRestorePatientReport}.
+ */
+export function useDeletePatientReport(
+  options: CrudMutationOptions<PatientReport, PatientReportDeleteVars> = {},
+) {
+  return useAppMutation<PatientReport, PatientReportDeleteVars>({
+    mutationFn: ({ id, reason, note }) => deletePatientReport(id, reason, note),
+    invalidateKeys: [patientQueryKeys.all],
+    ...options,
+  });
+}
+
+/** Restore a deleted report — the delete toast's Undo. */
+export function useRestorePatientReport(
+  options: CrudMutationOptions<PatientReport, string> = {},
+) {
+  return useAppMutation<PatientReport, string>({
+    mutationFn: restorePatientReport,
     invalidateKeys: [patientQueryKeys.all],
     ...options,
   });

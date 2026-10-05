@@ -25,6 +25,7 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
       patient: `${ORG}/patients/$patientId`,
       lead: `${ORG}/leads/$leadId`,
       invoice: `${ORG}/invoices/$invoiceId`,
+      invoiceEdit: `${ORG}/invoices/$invoiceId/edit`,
     });
   });
 
@@ -111,6 +112,7 @@ describe('clinicCommandNavigation', () => {
       'newReceipt',
       'newInvoice',
       'invoice',
+      'invoiceEdit',
       'newSale',
     ] as const) {
       expect(

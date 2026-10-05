@@ -602,7 +602,19 @@
     "summary": "Sessions are counted when a treatment is completed",
     "save": "Add package",
     "noPick": "Pick a package",
-    "added": "Package added · invoice it from Invoices"
+    "added": "Package added · invoice it from Invoices",
+    "card": {
+      "left_one": "{{count}} left",
+      "left_other": "{{count}} left",
+      "used": "{{used}} of {{total}} used",
+      "validTill": "Valid till {{date}}",
+      "next": "Next: {{date}}",
+      "use": "Use a session",
+      "book": "Book next",
+      "empty": "No packages yet",
+      "sessionUsed": "Session {{used}} of {{total}} used",
+      "noneLeft": "No sessions left"
+    }
   },
   "clinical": {
     "titles": {
@@ -770,5 +782,113 @@
       "video": "Upload the testimonial",
       "other": "Rating, text and screenshot"
     }
+  },
+  "tables": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV",
+    "visits": {
+      "records": "appointments",
+      "count_one": "{{count}} appointment",
+      "count_other": "{{count}} appointments",
+      "empty": "No appointments yet"
+    },
+    "prescriptions": {
+      "records": "prescriptions",
+      "count_one": "{{count}} prescription",
+      "count_other": "{{count}} prescriptions",
+      "empty": "No prescriptions yet",
+      "copied": "Prescription copied"
+    },
+    "treatments": {
+      "records": "treatments",
+      "count_one": "{{count}} treatment",
+      "count_other": "{{count}} treatments",
+      "empty": "No treatments yet",
+      "copied": "Session {{session}} added",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Check-in {{date}}",
+      "callNextDay": "Call next day",
+      "callInDays_one": "Call in {{count}} day",
+      "callInDays_other": "Call in {{count}} days"
+    },
+    "reports": {
+      "records": "reports",
+      "count_one": "{{count}} report",
+      "count_other": "{{count}} reports",
+      "empty": "No reports yet",
+      "fileSub": "{{format}} · shared with patient on request",
+      "deleteTitle": "Delete this report?",
+      "deleted": "Report deleted"
+    },
+    "invoices": {
+      "records": "invoices",
+      "count_one": "{{count}} invoice",
+      "count_other": "{{count}} invoices",
+      "empty": "No invoices yet",
+      "countDue_one": "{{count}} invoice · {{due}} due",
+      "countDue_other": "{{count}} invoices · {{due}} due",
+      "itemCount_one": "{{count}} item",
+      "itemCount_other": "{{count}} items",
+      "due": "{{amount}} due",
+      "nothingDue": "Nothing due"
+    },
+    "payments": {
+      "records": "transactions",
+      "count_one": "{{count}} transaction",
+      "count_other": "{{count}} transactions",
+      "empty": "No payments yet",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Offering",
+      "doctor": "Doctor",
+      "status": "Status",
+      "date": "Date",
+      "medicines": "Medicines",
+      "notes": "Notes",
+      "updated": "Updated",
+      "treatment": "Treatment",
+      "area": "Area",
+      "team": "Team",
+      "session": "Session",
+      "details": "Details",
+      "feedback": "Feedback",
+      "report": "Report",
+      "type": "Type",
+      "uploadedBy": "Uploaded by",
+      "invoice": "Invoice",
+      "items": "Items",
+      "bill": "Bill",
+      "paid": "Paid / due",
+      "receipt": "Receipt",
+      "when": "When",
+      "mode": "Mode",
+      "amount": "Amount",
+      "by": "By"
+    },
+    "actions": {
+      "print": "Print",
+      "preview": "Preview",
+      "copyRx": "Copy prescription",
+      "sell": "Sell medicines",
+      "checkIn": "Check-in",
+      "copyTreatment": "Copy as next session",
+      "open": "Open",
+      "pay": "Record payment",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "notes": {
+    "label": "New note",
+    "placeholder": "Add a note for the team",
+    "add": "Add note",
+    "by": "{{name}} · {{date}}",
+    "delete": "Delete note",
+    "deleted": "Note deleted",
+    "empty": "No notes yet"
   }
 }

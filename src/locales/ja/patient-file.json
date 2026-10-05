@@ -587,7 +587,18 @@
     "summary": "施術が完了すると回数がカウントされます",
     "save": "パッケージを追加",
     "noPick": "パッケージを選択してください",
-    "added": "パッケージを追加しました · 請求書から請求してください"
+    "added": "パッケージを追加しました · 請求書から請求してください",
+    "card": {
+      "left_other": "残り {{count}} 回",
+      "used": "{{total}} 回中 {{used}} 回使用",
+      "validTill": "{{date}} まで有効",
+      "next": "次回: {{date}}",
+      "use": "1 回使用する",
+      "book": "次回を予約",
+      "empty": "パッケージはまだありません",
+      "sessionUsed": "{{total}} 回中 {{used}} 回目を使用しました",
+      "noneLeft": "残りの回数がありません"
+    }
   },
   "clinical": {
     "titles": {
@@ -752,5 +763,103 @@
       "video": "体験談の動画をアップロード",
       "other": "評価・本文・スクリーンショット"
     }
+  },
+  "tables": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました",
+    "visits": {
+      "records": "予約",
+      "count_other": "{{count}} 件の予約",
+      "empty": "予約はまだありません"
+    },
+    "prescriptions": {
+      "records": "処方",
+      "count_other": "{{count}} 件の処方",
+      "empty": "処方はまだありません",
+      "copied": "処方をコピーしました"
+    },
+    "treatments": {
+      "records": "施術",
+      "count_other": "{{count}} 件の施術",
+      "empty": "施術はまだありません",
+      "copied": "{{session}} 回目を追加しました",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "経過確認 {{date}}",
+      "callNextDay": "翌日に電話",
+      "callInDays_other": "{{count}} 日後に電話"
+    },
+    "reports": {
+      "records": "レポート",
+      "count_other": "{{count}} 件のレポート",
+      "empty": "レポートはまだありません",
+      "fileSub": "{{format}} · ご希望に応じて患者に共有",
+      "deleteTitle": "このレポートを削除しますか？",
+      "deleted": "レポートを削除しました"
+    },
+    "invoices": {
+      "records": "請求書",
+      "count_other": "{{count}} 件の請求書",
+      "empty": "請求書はまだありません",
+      "countDue_other": "{{count}} 件の請求書 · 未払い {{due}}",
+      "itemCount_other": "{{count}} 品目",
+      "due": "未払い {{amount}}",
+      "nothingDue": "未払いなし"
+    },
+    "payments": {
+      "records": "取引",
+      "count_other": "{{count}} 件の取引",
+      "empty": "支払いはまだありません",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "メニュー",
+      "doctor": "医師",
+      "status": "状態",
+      "date": "日付",
+      "medicines": "薬",
+      "notes": "メモ",
+      "updated": "更新",
+      "treatment": "施術",
+      "area": "部位",
+      "team": "チーム",
+      "session": "回数",
+      "details": "詳細",
+      "feedback": "フィードバック",
+      "report": "レポート",
+      "type": "種類",
+      "uploadedBy": "アップロード者",
+      "invoice": "請求書",
+      "items": "品目",
+      "bill": "請求額",
+      "paid": "支払済 / 未払い",
+      "receipt": "領収書",
+      "when": "日時",
+      "mode": "方法",
+      "amount": "金額",
+      "by": "担当"
+    },
+    "actions": {
+      "print": "印刷",
+      "preview": "プレビュー",
+      "copyRx": "処方をコピー",
+      "sell": "薬を販売",
+      "checkIn": "経過確認",
+      "copyTreatment": "次回の施術としてコピー",
+      "open": "開く",
+      "pay": "支払いを記録",
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "notes": {
+    "label": "新しいメモ",
+    "placeholder": "チームへのメモを追加",
+    "add": "メモを追加",
+    "by": "{{name}} · {{date}}",
+    "delete": "メモを削除",
+    "deleted": "メモを削除しました",
+    "empty": "メモはまだありません"
   }
 }

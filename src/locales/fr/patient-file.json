@@ -617,7 +617,20 @@
     "summary": "Les séances sont décomptées à la fin d’un soin",
     "save": "Ajouter le forfait",
     "noPick": "Choisissez un forfait",
-    "added": "Forfait ajouté · facturez-le depuis Factures"
+    "added": "Forfait ajouté · facturez-le depuis Factures",
+    "card": {
+      "left_one": "{{count}} restante",
+      "left_many": "{{count}} restantes",
+      "left_other": "{{count}} restantes",
+      "used": "{{used}} sur {{total}} utilisées",
+      "validTill": "Valable jusqu’au {{date}}",
+      "next": "Prochaine : {{date}}",
+      "use": "Utiliser une séance",
+      "book": "Réserver la suivante",
+      "empty": "Aucun forfait pour le moment",
+      "sessionUsed": "Séance {{used}} sur {{total}} utilisée",
+      "noneLeft": "Plus aucune séance"
+    }
   },
   "clinical": {
     "titles": {
@@ -788,5 +801,123 @@
       "video": "Importez le témoignage",
       "other": "Note, texte et capture d’écran"
     }
+  },
+  "tables": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV",
+    "visits": {
+      "records": "rendez-vous",
+      "count_one": "{{count}} rendez-vous",
+      "count_many": "{{count}} rendez-vous",
+      "count_other": "{{count}} rendez-vous",
+      "empty": "Aucun rendez-vous pour le moment"
+    },
+    "prescriptions": {
+      "records": "ordonnances",
+      "count_one": "{{count}} ordonnance",
+      "count_many": "{{count}} ordonnances",
+      "count_other": "{{count}} ordonnances",
+      "empty": "Aucune ordonnance pour le moment",
+      "copied": "Ordonnance copiée"
+    },
+    "treatments": {
+      "records": "soins",
+      "count_one": "{{count}} soin",
+      "count_many": "{{count}} soins",
+      "count_other": "{{count}} soins",
+      "empty": "Aucun soin pour le moment",
+      "copied": "Séance {{session}} ajoutée",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Suivi {{date}}",
+      "callNextDay": "Appeler le lendemain",
+      "callInDays_one": "Appeler dans {{count}} jour",
+      "callInDays_many": "Appeler dans {{count}} jours",
+      "callInDays_other": "Appeler dans {{count}} jours"
+    },
+    "reports": {
+      "records": "comptes rendus",
+      "count_one": "{{count}} compte rendu",
+      "count_many": "{{count}} comptes rendus",
+      "count_other": "{{count}} comptes rendus",
+      "empty": "Aucun compte rendu pour le moment",
+      "fileSub": "{{format}} · partagé avec le patient sur demande",
+      "deleteTitle": "Supprimer ce compte rendu ?",
+      "deleted": "Compte rendu supprimé"
+    },
+    "invoices": {
+      "records": "factures",
+      "count_one": "{{count}} facture",
+      "count_many": "{{count}} factures",
+      "count_other": "{{count}} factures",
+      "empty": "Aucune facture pour le moment",
+      "countDue_one": "{{count}} facture · {{due}} dû",
+      "countDue_many": "{{count}} factures · {{due}} dû",
+      "countDue_other": "{{count}} factures · {{due}} dû",
+      "itemCount_one": "{{count}} ligne",
+      "itemCount_many": "{{count}} lignes",
+      "itemCount_other": "{{count}} lignes",
+      "due": "{{amount}} dû",
+      "nothingDue": "Rien à payer"
+    },
+    "payments": {
+      "records": "opérations",
+      "count_one": "{{count}} opération",
+      "count_many": "{{count}} opérations",
+      "count_other": "{{count}} opérations",
+      "empty": "Aucun paiement pour le moment",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Prestation",
+      "doctor": "Médecin",
+      "status": "Statut",
+      "date": "Date",
+      "medicines": "Médicaments",
+      "notes": "Notes",
+      "updated": "Modifié",
+      "treatment": "Soin",
+      "area": "Zone",
+      "team": "Équipe",
+      "session": "Séance",
+      "details": "Détails",
+      "feedback": "Avis",
+      "report": "Compte rendu",
+      "type": "Type",
+      "uploadedBy": "Ajouté par",
+      "invoice": "Facture",
+      "items": "Lignes",
+      "bill": "Montant",
+      "paid": "Payé / dû",
+      "receipt": "Reçu",
+      "when": "Quand",
+      "mode": "Mode",
+      "amount": "Montant",
+      "by": "Par"
+    },
+    "actions": {
+      "print": "Imprimer",
+      "preview": "Aperçu",
+      "copyRx": "Copier l’ordonnance",
+      "sell": "Vendre les médicaments",
+      "checkIn": "Suivi",
+      "copyTreatment": "Copier comme séance suivante",
+      "open": "Ouvrir",
+      "pay": "Enregistrer un paiement",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    }
+  },
+  "notes": {
+    "label": "Nouvelle note",
+    "placeholder": "Ajouter une note pour l’équipe",
+    "add": "Ajouter la note",
+    "by": "{{name}} · {{date}}",
+    "delete": "Supprimer la note",
+    "deleted": "Note supprimée",
+    "empty": "Aucune note pour le moment"
   }
 }

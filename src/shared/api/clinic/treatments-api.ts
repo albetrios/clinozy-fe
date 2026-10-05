@@ -27,6 +27,9 @@ export const treatmentQueryKeys = {
   patient: (patientId: string) =>
     [...treatmentQueryKeys.all, 'patient', patientId] as const,
   detail: (id: string) => [...treatmentQueryKeys.all, 'detail', id] as const,
+  /** Each of a patient's treatments' latest check-in — the table's Feedback. */
+  checkIns: (patientId: string) =>
+    [...treatmentQueryKeys.all, 'check-ins', patientId] as const,
 };
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
@@ -102,6 +105,31 @@ export async function listPatientTreatments(patientId: string): Promise<Treatmen
   return clinicFixtures.treatments
     .snapshot((treatment) => treatment.patientId === patientId)
     .sort((a, b) => compareText(b.performedAt, a.performedAt));
+}
+
+/**
+ * The latest check-in of each of a patient's treatments, by treatment —
+ * the Treatments table's Feedback ("Better · 7/10"; REPLACE_WITH_API).
+ */
+export async function listTreatmentCheckIns(
+  patientId: string,
+): Promise<Record<string, TreatmentCheckIn>> {
+  const { clinicFixtures } = await fixtureWorld();
+  const latest: Record<string, TreatmentCheckIn> = {};
+  for (const checkIn of clinicFixtures.checkIns
+    .snapshot((row) => row.patientId === patientId && row.treatmentId !== null)
+    .sort(
+      (a, b) => compareText(a.date, b.date) || compareText(a.createdAt, b.createdAt),
+    )) {
+    if (checkIn.treatmentId) {
+      latest[checkIn.treatmentId] = {
+        date: checkIn.date,
+        feel: checkIn.feel,
+        score: checkIn.score,
+      };
+    }
+  }
+  return latest;
 }
 
 /** One treatment and its check-ins — a 404 when it is unknown or deleted (REPLACE_WITH_API). */

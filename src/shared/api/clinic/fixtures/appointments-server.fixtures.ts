@@ -351,6 +351,18 @@ export async function getAppointment(id: string): Promise<AppointmentRow> {
   return rowOf(await clinicFixtures.appointments.get(id), lookups());
 }
 
+/**
+ * One patient's bookings, newest first — the patient file's Visits
+ * (`listAppointments` has no patient filter, `S:1603`: a backend request).
+ */
+export async function listPatientAppointments(
+  patientId: string,
+): Promise<AppointmentRow[]> {
+  return [...liveRows(lookups()).values()]
+    .filter((row) => row.patientId === patientId)
+    .sort((a, b) => bySlot(b, a));
+}
+
 const isBookable = (user: User) =>
   user.active && user.roles.some((role) => role === 'doctor' || role === 'therapist');
 
