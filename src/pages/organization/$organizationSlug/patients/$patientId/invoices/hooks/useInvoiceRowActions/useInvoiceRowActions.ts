@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
@@ -12,6 +12,7 @@ import type { DataTableRowAction } from '@/shared/components/DataTableRowActions
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { Copy, Eye, PenLine, Printer, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import {
@@ -30,8 +31,9 @@ export interface InvoiceRowActions {
 
 /**
  * An Invoices row's actions (KICKOFF §6.6 Section tables; H:4748), on the
- * shared Invoice drawer (L-40), each keeping the file's Invoices behind it
- * (`from`, §4): "Print" (the A4 sheet straight to the printer), "Preview",
+ * shared Invoice drawer (L-40), each opening over the file's Invoices, which
+ * stays behind it (`from`, §4, A-P1 — `useClinicNavigate`): "Print" (the A4
+ * sheet straight to the printer), "Preview",
  * "Copy invoice" (a new invoice prefilled from this one — its lines and
  * discount, today's date, nothing paid; `payments.create`), "Record payment"
  * (Receive payment for this invoice, while it owes — `payments.create`),
@@ -45,7 +47,7 @@ export function useInvoiceRowActions({
   onDelete: (invoice: PatientInvoiceRow) => void;
 }): InvoiceRowActions {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const queryClient = useQueryClient();
   const access = useClinicAccess();
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });

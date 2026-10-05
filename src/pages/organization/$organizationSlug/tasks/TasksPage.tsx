@@ -16,6 +16,7 @@ import {
 import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
@@ -86,7 +87,7 @@ function useNewTask(organizationSlug: string, close: () => void) {
  * offered only with its Create.
  */
 function useTaskContactActions(organizationSlug: string) {
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const access = useClinicAccess();
   const tier = useViewportTier();
   const can = (section: 'leads' | 'appointments', action: 'create') =>
@@ -138,7 +139,7 @@ function useTaskContactActions(organizationSlug: string) {
  * next for <first>?" over the list.
  */
 function useTaskDrawer(organizationSlug: string, close: () => void) {
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const assignees = useTaskAssignees();
   const [whatsNext, setWhatsNext] = useState<WhatsNextFor | null>(null);
   const openTarget = (target: TaskTarget) =>

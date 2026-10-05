@@ -11,6 +11,7 @@ import type {
 } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { fetchOpenVisit, startVisit } from '@/shared/api/clinic/visits-api.ts';
 import { viewablePatientFileSections } from '@/shared/clinic/patient-file-sections.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   renderInPatientFile,
@@ -76,12 +77,14 @@ async function follow(
     file,
     ...options,
   });
-  const start = router.state.location.href;
+  const start = shownLocation(router).href;
   await user.click(await screen.findByRole('button', { name }));
-  await waitFor(() => expect(router.state.location.href).not.toBe(start));
-  const { pathname, search } = router.state.location;
+  await waitFor(() => expect(shownLocation(router).href).not.toBe(start));
+  // Where it went as the URL bar shows it; `page` is the router's page behind.
+  const { pathname, search } = shownLocation(router);
+  const page = router.state.location.pathname;
   unmount();
-  return { pathname, search };
+  return { pathname, search, page };
 }
 
 beforeEach(async () => {
@@ -120,7 +123,10 @@ describe('usePatientFileNavigation', () => {
     unmount();
 
     const resumed = await follow('resumeVisit', { section: 'invoices' });
-    expect(resumed).toEqual({ pathname: `${FILE}/timeline`, search: { visit: 'open' } });
+    expect(resumed).toMatchObject({
+      pathname: `${FILE}/timeline`,
+      search: { visit: 'open' },
+    });
   });
 
   it('opens Edit patient over the open section (A-F1)', async () => {
@@ -132,6 +138,8 @@ describe('usePatientFileNavigation', () => {
   it('books a new visit for this patient, or reschedules the next one, keeping the file', async () => {
     const book = await follow('book');
     expect(book.pathname).toBe('/organization/acme/appointments/create');
+    // The file stays behind the booking (A-P1).
+    expect(book.page).toBe(`${FILE}/visits`);
     expect(book.search).toEqual({ who: DHARTI, from: `patients/${DHARTI}/visits` });
 
     const reschedule = await follow('reschedule');

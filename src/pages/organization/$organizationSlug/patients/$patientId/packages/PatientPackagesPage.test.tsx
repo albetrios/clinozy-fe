@@ -8,6 +8,7 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -84,14 +85,17 @@ describe('PatientPackagesPage', () => {
     const { router } = renderPatientFile(url());
     await user.click(await screen.findByTestId(`patient-package-${LHR}-book`));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       who: DHARTI,
       from: `patients/${DHARTI}/packages`,
     });
+    expect(router.state.location.pathname).toBe(
+      `/organization/acme/patients/${DHARTI}/packages`,
+    );
   });
 
   it('leaves a member who only reads the file the cards alone', async () => {

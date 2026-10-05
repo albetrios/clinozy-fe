@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 
 import {
@@ -130,7 +131,7 @@ function PackageCard({
  */
 export function PatientPackagesPage() {
   const { t } = useTranslation([PATIENT_SECTION_NS, PACKAGE_NS]);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
   const access = useClinicAccess();

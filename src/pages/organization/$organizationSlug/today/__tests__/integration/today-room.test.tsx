@@ -12,6 +12,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as TodayApiModule from '@/shared/api/clinic/today-api.ts';
 import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -250,14 +251,15 @@ describe('the Today room (KICKOFF §6.2)', () => {
     await user.click(
       within(await screen.findByTestId('today-panel')).getByTestId('today-card-action'),
     );
+    // New sale opens over Today, which stays — the URL bar on the sale (A-P1).
+    const sale = `medical/sales/create?prescription=${ref.prescription(501)}&from=today`;
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        '/organization/acme/medical/sales/create',
-      ),
+      expect(router.history.location.href).toBe(`/organization/acme/${sale}`),
     );
+    expect(router.state.location.pathname).toBe(TODAY_PATH);
     expect(router.state.location.search).toEqual({
-      prescription: ref.prescription(501),
-      from: 'today',
+      lane: 'pharmacy',
+      [CROSS_ROOM_PARAM]: sale,
     });
 
     await act(() => router.navigate({ to: `${TODAY_PATH}?lane=enquiries` }));

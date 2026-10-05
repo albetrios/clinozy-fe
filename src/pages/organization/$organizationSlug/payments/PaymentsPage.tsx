@@ -41,13 +41,8 @@ import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { ArrowDownLeft, ArrowUpRight, FileIcon, Wallet } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { DayCloseDrawer } from './components/DayCloseDrawer/index.ts';
-import { ReceivePaymentDrawer } from './components/ReceivePaymentDrawer/index.ts';
-import { SendPaymentDrawer } from './components/SendPaymentDrawer/index.ts';
-import {
-  type PaymentsDialogRoute,
-  usePaymentsDialogRoute,
-} from './hooks/usePaymentsDialogRoute/index.ts';
+import { PaymentsDrawers } from './components/PaymentsDrawers/index.ts';
+import { usePaymentsDialogRoute } from './hooks/usePaymentsDialogRoute/index.ts';
 import {
   LEDGER_FILTER_FIELDS,
   LEDGER_TABLE_ID,
@@ -57,71 +52,6 @@ import {
 import { ledgerListParamsOf } from './payments.params.ts';
 import { validatePaymentsSearch } from './payments.search.ts';
 import { PaymentsToolbar } from './shared/components/PaymentsToolbar/index.ts';
-
-/**
- * The drawer the URL names (D24): Receive payment, Send payment, an open
- * day's entry — a receipt in Receive, money out in Send — or Day close on
- * its day.
- */
-function PaymentsDrawers({
-  dialog,
-  onClose,
-  onDayChange,
-}: {
-  dialog: PaymentsDialogRoute;
-  onClose: () => void;
-  onDayChange: (date: string) => void;
-}) {
-  if (dialog.kind === 'dayClose') {
-    return (
-      <DayCloseDrawer
-        open
-        search={dialog.search}
-        onDayChange={onDayChange}
-        onClose={onClose}
-      />
-    );
-  }
-  if (dialog.kind === 'receive') {
-    return (
-      <ReceivePaymentDrawer
-        open
-        mode="create"
-        prefill={dialog.prefill}
-        onClose={onClose}
-      />
-    );
-  }
-  if (dialog.kind === 'pay') {
-    return (
-      <SendPaymentDrawer
-        open
-        mode="create"
-        bill={dialog.prefill.bill}
-        onClose={onClose}
-      />
-    );
-  }
-  if (dialog.kind !== 'edit' || !dialog.payment) return null;
-  const entry = dialog.payment;
-  return entry.direction === 'received' ? (
-    <ReceivePaymentDrawer
-      open
-      mode="edit"
-      entry={entry}
-      readOnly={dialog.readOnly}
-      onClose={onClose}
-    />
-  ) : (
-    <SendPaymentDrawer
-      open
-      mode="edit"
-      entry={entry}
-      readOnly={dialog.readOnly}
-      onClose={onClose}
-    />
-  );
-}
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'payments.csv';

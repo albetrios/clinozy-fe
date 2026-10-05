@@ -3,7 +3,7 @@
 // through its methods (`getVisibleLeafColumns()` …): React Compiler
 // memoisation would hand the toolbar's Columns chooser a stale answer.
 
-import { Outlet, useLocation, useNavigate, useParams } from '@tanstack/react-router';
+import { Outlet, useLocation, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +22,7 @@ import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import {
   useAssignLead,
   useClaimLead,
@@ -60,7 +61,7 @@ function withoutPrefill({
 
 /** Where a person's contact card goes: their file, a new appointment, a new patient. */
 function personNavigation(
-  navigate: ReturnType<typeof useNavigate>,
+  navigate: ReturnType<typeof useClinicNavigate>,
   organizationSlug: string,
   pathname: string,
 ) {
@@ -124,7 +125,7 @@ export function LeadsPage() {
   // The phone's pane — Chat first, kept between leads (KICKOFF §6.3).
   const [pane, setPane] = useState<LeadDrawerPane>('chat');
   const access = useClinicAccess();
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '', leadId } = useParams({ strict: false });
   const pathname = useLocation({ select: (location) => location.pathname });
   const markRead = useMarkLeadRead();

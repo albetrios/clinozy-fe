@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { useLocation, useParams, useSearch } from '@tanstack/react-router';
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +16,8 @@ import {
   INVOICE_DRAWER_NS,
 } from '@/shared/components/InvoiceDrawer/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -61,18 +63,31 @@ const EDIT_PATH = /\/invoices\/[^/]+\/edit\/?$/;
  * A member without Payments Create who follows a create link goes back with
  * the permission toast, the invoice it would copy never read. `from`
  * (the room that opened it, allow-listed — `safeReferrer`) is where `close`
- * goes; without one, the Payments ledger, the island's default referrer.
+ * goes; without one, the Payments ledger, the island's default referrer. Over
+ * that room's page (A-P1, `useCrossRoomDialog`) it reads the drawer's own
+ * route, every way out goes back to the page as it was, and the move between
+ * the preview and the edit stays over it.
  */
 export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
-  const { organizationSlug = '', invoiceId } = useParams({ strict: false });
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const search: Record<string, unknown> = useSearch({ strict: false });
-  const navigate = useNavigate();
+  const routeParams = useParams({ strict: false });
+  const routePathname = useLocation({ select: (location) => location.pathname });
+  const routeSearch: Record<string, unknown> = useSearch({ strict: false });
+  const { params, pathname, search, crossRoom } = useDialogRouteLocation({
+    params: routeParams,
+    pathname: routePathname,
+    search: routeSearch,
+  });
+  const { organizationSlug = '', invoiceId } = params;
+  const navigate = useClinicNavigate();
   const { t } = useTranslation([INVOICE_DRAWER_NS, ERRORS_NS]);
   const access = useClinicAccess();
 
   const from = safeReferrer(validateInvoiceSearch(search).from, '');
   const close = useCallback(() => {
+    if (crossRoom) {
+      crossRoom.close();
+      return;
+    }
     if (from) {
       void navigate({ href: `/organization/${organizationSlug}/${from}`, replace: true });
       return;
@@ -82,9 +97,10 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
       hash: true,
       replace: true,
     });
-  }, [from, navigate, organizationSlug]);
+  }, [crossRoom, from, navigate, organizationSlug]);
 
-  // Moving between the preview and the edit keeps the room to go back to.
+  // Moving between the preview and the edit keeps the room to go back to —
+  // and, over that room's page, the page (`useClinicNavigate`).
   const openEdit = useCallback(
     (id: string) => {
       void navigate({

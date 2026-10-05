@@ -63,7 +63,16 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
   on the sender's (the page a drawer opens over, when it is an allowed one);
   `visitFlowReferrer` — the patient's visit flow, the one referrer with a query
-  (`timeline?visit=open[&from=today]`, `VISIT_REFERRER`).
+  (`timeline?visit=open[&from=today]`, `VISIT_REFERRER`). It also holds the
+  cross-room drawers (A-P1): `CROSS_ROOM_ROUTES` (the Invoice drawer, Receive
+  payment, the appointment drawers, New sale), `crossRoomNavigation` — the
+  referring page's URL (the visit flow's query included) with the drawer named
+  under `CROSS_ROOM_PARAM`, masked as the drawer's own route — and
+  `crossRoomDialogOf`, its reader. `useClinicNavigate` opens such a drawer from
+  the page; the drawer route hands a deep link over the same way
+  (`handOverToReferrer`, `src/app/routes/dialog-routes.ts`); the app's
+  `CrossRoomDialogs` gates and renders it over the page, and the rooms'
+  dialog-route hooks read it through `useCrossRoomDialog`.
 - `patient-file-sections.ts` — the patient file's eleven section slugs (its
   URL segments, `timeline` the Overview it lands on), the billing ones, the
   sections a member may open (Q-F1: billing alone for an Accountant) and the

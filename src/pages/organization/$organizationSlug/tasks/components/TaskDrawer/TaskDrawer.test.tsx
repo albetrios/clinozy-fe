@@ -6,6 +6,7 @@ import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -169,15 +170,20 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
     expect(await screen.findByTestId('task-drawer-was')).toHaveTextContent('Was Riya S.');
   });
 
-  it('opens a booking for a rebook — the Appointments room keeps Tasks behind it', async () => {
+  it('opens a booking for a rebook over Tasks, which stays behind it (A-P1)', async () => {
     const { router, user } = await openTaskTitled('Rebook Vikram');
     await user.click(screen.getByTestId('task-drawer-outcome-rebooked'));
+    // The URL bar shows the booking's own route; the page is the Tasks list.
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(router.history.location.pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );
-    expect(router.state.location.search).toMatchObject({ source: 'task', from: 'tasks' });
+    expect(router.state.location.pathname).toBe(TASKS);
+    const drawer = String(router.state.location.search[CROSS_ROOM_PARAM]);
+    expect(drawer).toMatch(/^appointments\/create\?/);
+    expect(drawer).toContain('source=task');
+    expect(drawer).toContain('from=tasks');
     expect(undoToast()[0]).toMatch(/^Rebook Vikram · /);
   });
 

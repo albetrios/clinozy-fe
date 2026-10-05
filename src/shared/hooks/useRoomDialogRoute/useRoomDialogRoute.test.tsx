@@ -12,6 +12,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clinicHttpError } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import {
+  type CrossRoomDialog,
+  CrossRoomDialogContext,
+} from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import {
   useRoomDialogRoute,
@@ -84,6 +88,20 @@ function Probe() {
   );
 }
 
+/** The drawer route the cross-room host provides over the page, when a test sets one. */
+let crossRoom: CrossRoomDialog | null = null;
+
+/** The room's page: the Probe — over the page under a cross-room drawer when one is set. */
+function RoomPage() {
+  return crossRoom ? (
+    <CrossRoomDialogContext.Provider value={crossRoom}>
+      <Probe />
+    </CrossRoomDialogContext.Provider>
+  ) : (
+    <Probe />
+  );
+}
+
 /** A room tab at `/room` with its dialog routes, opened at `url`. */
 function renderRoom(url: string, options: ProbeOptions = {}) {
   roomOptions = options;
@@ -91,7 +109,7 @@ function renderRoom(url: string, options: ProbeOptions = {}) {
   const room = createRoute({
     getParentRoute: () => root,
     path: '/room',
-    component: Probe,
+    component: RoomPage,
   });
   const dialogs = [
     'create',
@@ -127,6 +145,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   roomOptions = {};
+  crossRoom = null;
   seen.length = 0;
 });
 
@@ -195,5 +214,53 @@ describe('useRoomDialogRoute (KICKOFF §4, D24, S:115)', () => {
     await waitFor(() => expect(screen.getByTestId('dialog')).toHaveTextContent('create'));
     expect(router.state.location.pathname).toBe('/room/create');
     expect(notifyMock.info).not.toHaveBeenCalled();
+  });
+});
+
+describe('useRoomDialogRoute over another room (A-P1)', () => {
+  const over = (pathname: string, close: () => void, params = {}): CrossRoomDialog => ({
+    pathname,
+    search: { name: 'Al' },
+    params,
+    close,
+  });
+
+  it('reads the drawer from its own route, not the page behind', async () => {
+    crossRoom = over('/room/create', vi.fn());
+    const { router } = renderRoom('/room');
+    await waitFor(() =>
+      expect(screen.getByTestId('dialog')).toHaveTextContent('create Al'),
+    );
+    expect(router.state.location.pathname).toBe('/room');
+
+    crossRoom = over('/room/r1/edit', vi.fn(), { recordId: 'r1' });
+    renderRoom('/room');
+    await waitFor(() =>
+      expect(screen.getAllByTestId('dialog').at(-1)).toHaveTextContent(
+        'record edit Alpha',
+      ),
+    );
+  });
+
+  it('sends a refused create and a dead record back to the page behind', async () => {
+    const close = vi.fn();
+    access.granted = new Set(['view']);
+    crossRoom = over('/room/create', close);
+    const refused = renderRoom('/room');
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'You do not have permission to perform this action.',
+    );
+    refused.unmount();
+
+    close.mockReset();
+    notifyMock.info.mockReset();
+    access.granted = new Set(['view', 'create', 'edit']);
+    crossRoom = over('/room/gone', close, { recordId: 'gone' });
+    renderRoom('/room');
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'Record not found · it may have been deleted',
+    );
   });
 });

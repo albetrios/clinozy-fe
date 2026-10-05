@@ -17,6 +17,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { CLINIC_SECTION_ORDER } from '@/shared/clinic/clinic-sections.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -375,18 +376,32 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
 
 describe('the command menu opens the routes (D24, D19 / D26; §7.3)', () => {
   it.each([
-    ['new-lead', '/organization/acme/leads/create', {}],
-    ['new-appointment', '/organization/acme/appointments/create', { from: 'today' }],
-    ['new-patient', '/organization/acme/patients/create', {}],
-    ['new-receipt', '/organization/acme/payments/receive', { from: 'today' }],
-    ['open-tasks', '/organization/acme/tasks', {}],
-  ])('%s → %s', async (action, pathname, search) => {
+    ['new-lead', '/organization/acme/leads/create'],
+    ['new-patient', '/organization/acme/patients/create'],
+    ['open-tasks', '/organization/acme/tasks'],
+  ])('%s → %s', async (action, pathname) => {
     const { router, user } = await renderMenu();
 
     await user.click(await screen.findByTestId(`command-palette-action-${action}`));
 
     await waitFor(() => expect(router.state.location.pathname).toBe(pathname));
-    expect(router.state.location.search).toEqual(search);
+    expect(router.state.location.search).toEqual({});
+    expect(useUIStore.getState().commandPaletteOpen).toBe(false);
+  });
+
+  it.each([
+    ['new-appointment', 'appointments/create?from=today'],
+    ['new-receipt', 'payments/receive?from=today'],
+  ])('%s → %s, over the page it was asked from (A-P1)', async (action, drawer) => {
+    const { router, user } = await renderMenu();
+
+    await user.click(await screen.findByTestId(`command-palette-action-${action}`));
+
+    await waitFor(() =>
+      expect(router.history.location.href).toBe(`/organization/acme/${drawer}`),
+    );
+    expect(router.state.location.pathname).toBe('/organization/acme/today');
+    expect(router.state.location.search).toEqual({ [CROSS_ROOM_PARAM]: drawer });
     expect(useUIStore.getState().commandPaletteOpen).toBe(false);
   });
 
@@ -421,7 +436,7 @@ describe('the command menu opens the routes (D24, D19 / D26; §7.3)', () => {
     },
   );
 
-  it('opens a lead on its drawer route, an invoice over the page it came from', async () => {
+  it('opens a lead on its drawer route, an invoice over the page it came from (A-P1)', async () => {
     const { router, user } = await renderMenu('/organization/acme/patients');
     await screen.findByTestId('command-palette-group-actions');
 
@@ -435,12 +450,12 @@ describe('the command menu opens the routes (D24, D19 / D26; §7.3)', () => {
         },
       ),
     );
+    const invoice = `invoices/${ref.invoice(787)}?from=patients`;
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `/organization/acme/invoices/${ref.invoice(787)}`,
-      ),
+      expect(router.history.location.href).toBe(`/organization/acme/${invoice}`),
     );
-    expect(router.state.location.search).toEqual({ from: 'patients' });
+    expect(router.state.location.pathname).toBe('/organization/acme/patients');
+    expect(router.state.location.search).toEqual({ [CROSS_ROOM_PARAM]: invoice });
 
     act(() => useUIStore.getState().setCommandPaletteOpen(true));
     await user.type(await screen.findByRole('combobox', { name: 'Search' }), 'galani');

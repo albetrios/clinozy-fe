@@ -766,6 +766,59 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
     },
   );
 
+  it('hands New appointment opened from another room over to that room, masked as its own URL (A-P1)', async () => {
+    const href = '/organization/acme/appointments/create?who=W1&from=today';
+    const location = {
+      pathname: '/organization/acme/appointments/create',
+      search: { who: 'W1', from: 'today' },
+      searchStr: '?who=W1&from=today',
+      href,
+    };
+    const thrown = await Promise.resolve(
+      beforeLoadOf(`${APPOINTMENTS}/create`)({
+        location,
+        params: { organizationSlug: 'acme' },
+        preload: false,
+      }),
+    ).then(
+      () => null,
+      (caught: unknown) => caught,
+    );
+    // The drawer's own gate ran first.
+    expect(gatewayFromManifest).toHaveBeenCalledWith(appointmentCreateManifest);
+    expect(isRedirect(thrown)).toBe(true);
+    expect((thrown as { options: unknown }).options).toMatchObject({
+      href: `/organization/acme/today?dialog=${encodeURIComponent('appointments/create?who=W1&from=today')}`,
+      mask: { href },
+      replace: true,
+      resetScroll: false,
+    });
+  });
+
+  it('keeps a drawer on its own route without another room to keep, and on a preload', async () => {
+    const at = (search: Record<string, unknown>) => ({
+      pathname: '/organization/acme/appointments/create',
+      search,
+      href: '/organization/acme/appointments/create',
+    });
+    for (const search of [{}, { from: 'appointments' }, { from: 'users' }]) {
+      await expect(
+        beforeLoadOf(`${APPOINTMENTS}/create`)({
+          location: at(search),
+          params: { organizationSlug: 'acme' },
+          preload: false,
+        }),
+      ).resolves.toBeUndefined();
+    }
+    await expect(
+      beforeLoadOf(`${APPOINTMENTS}/create`)({
+        location: at({ from: 'today' }),
+        params: { organizationSlug: 'acme' },
+        preload: true,
+      }),
+    ).resolves.toBeUndefined();
+  });
+
   it('redirects the edit URL to the drawer, keeping the search (S:29)', () => {
     const thrown = (() => {
       try {

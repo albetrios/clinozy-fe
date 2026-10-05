@@ -1,4 +1,3 @@
-import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import type { TodayFloorRow, TodayLane } from '@/shared/api/clinic/today-contracts.ts';
@@ -11,6 +10,7 @@ import { taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import { patientVisitTarget } from '@/shared/clinic/visit-redirect.ts';
 import { useSetAppointmentStatus } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useSetVisitStage, useUndoVisitChange } from '@/shared/hooks/useVisits/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -49,7 +49,7 @@ export interface FloorActions {
  */
 export function useFloorActions(organizationSlug: string): FloorActions {
   const { t } = useTranslation(TODAY_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const access = useClinicAccess();
   const checkIn = useSetAppointmentStatus({
     announce: ({ appointment }) =>

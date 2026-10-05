@@ -7,6 +7,7 @@ import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -116,14 +117,15 @@ describe('PatientPrescriptionsPage', () => {
     const { router } = renderPatientFile(url(''));
     await user.click(await screen.findByTestId(action('sell')));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         '/organization/acme/medical/sales/create',
       ),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       prescription: RX_497,
       from: `patients/${DHARTI}/prescriptions`,
     });
+    expect(router.state.location.pathname).toBe(url(''));
   });
 
   it('asks before deleting a prescription and offers Undo', async () => {

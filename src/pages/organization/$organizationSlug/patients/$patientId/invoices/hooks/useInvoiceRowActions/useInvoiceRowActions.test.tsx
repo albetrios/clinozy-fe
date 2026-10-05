@@ -4,8 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import { listPatientInvoices } from '@/shared/api/clinic/payments-api.ts';
 import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import {
@@ -147,6 +149,31 @@ describe('useInvoiceRowActions (H:4748)', () => {
     );
     expect(view.router.state.location.search).toEqual({
       from: 'patients/patient/invoices',
+    });
+  });
+
+  it('opens a copy over the file’s Invoices, which stays — the URL bar on the copy (A-P1)', async () => {
+    const dharti = patientRef('Dharti Galani');
+    const file = await fetchPatientFile(dharti);
+    const view = renderInPatientFile(<Probe />, {
+      section: 'invoices',
+      role: 'owner',
+      file,
+    });
+    await waitFor(() =>
+      expect(latest()?.actions(invoice(787)).length).toBeGreaterThan(2),
+    );
+    latest()
+      ?.actions(invoice(787))
+      .find((action) => action.id === 'copy')
+      ?.onSelect();
+    const section = `/organization/acme/patients/${dharti}/invoices`;
+    const from = encodeURIComponent(`patients/${dharti}/invoices`);
+    const copy = `/organization/acme/invoices/create?type=${invoice(787).type}&patient=${dharti}&copyOf=${invoice(787).id}&from=${from}`;
+    await waitFor(() => expect(view.router.history.location.href).toBe(copy));
+    expect(view.router.state.location.pathname).toBe(section);
+    expect(view.router.state.location.search).toEqual({
+      [CROSS_ROOM_PARAM]: copy.replace('/organization/acme/', ''),
     });
   });
 });

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -22,6 +22,7 @@ import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.
 import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useOpenInvoices, useReceivePayment } from '@/shared/hooks/usePayments/index.ts';
@@ -69,7 +70,7 @@ export interface VisitFlowActions {
 /** What each part of the flow's actions reads: the file, the member, the words, the links. */
 function useFlowBase() {
   const { t } = useTranslation([VISIT_FLOW_NS, CLINIC_NS]);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const queryClient = useQueryClient();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, masked } = usePatientFileContext();

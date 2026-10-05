@@ -6,6 +6,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   renderInPatientFile,
@@ -116,9 +117,13 @@ describe('usePatientFileActions', () => {
 
     await user.click(screen.getByRole('button', { name: 'invoice' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/invoices/create'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
     );
-    expect(router.state.location.search).toEqual({
+    // Over the file's section, which stays behind it (A-P1).
+    expect(router.state.location.pathname).toBe(
+      `/organization/acme/patients/${DHARTI}/visits`,
+    );
+    expect(shownLocation(router).search).toEqual({
       type: 'clinic',
       patient: DHARTI,
       from: `patients/${DHARTI}/visits`,
@@ -130,11 +135,14 @@ describe('usePatientFileActions', () => {
     const { router } = renderInPatientFile(<ActionsProbe />, { file });
     await user.click(await screen.findByRole('button', { name: 'appointment' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );
-    expect(router.state.location.search).toMatchObject({ who: DHARTI });
+    expect(shownLocation(router).search).toMatchObject({ who: DHARTI });
+    expect(router.state.location.pathname).toBe(
+      `/organization/acme/patients/${DHARTI}/visits`,
+    );
   });
 
   it('says "Nothing due" for a payment when nothing is owed, else opens Receive payment', async () => {
@@ -152,12 +160,15 @@ describe('usePatientFileActions', () => {
     });
     await user.click(await screen.findByRole('button', { name: 'payment' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/payments/receive'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       patient: DHARTI,
       from: `patients/${DHARTI}/visits`,
     });
+    expect(router.state.location.pathname).toBe(
+      `/organization/acme/patients/${DHARTI}/visits`,
+    );
   });
 
   it('opens the photo picker for General, then Photos (KICKOFF §6.6 Add menu)', async () => {

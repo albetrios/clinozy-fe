@@ -12,6 +12,7 @@ import {
   CommandList,
 } from '@/shared/components/ui/command.tsx';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { Search } from '@/shared/icons/index.ts';
@@ -76,7 +77,7 @@ export function CommandPaletteContent() {
 /** Close the palette, then run a command — or navigate. */
 function usePaletteCommands() {
   const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const runCommand = useCallback(
     (command: () => void) => {
       setOpen(false);

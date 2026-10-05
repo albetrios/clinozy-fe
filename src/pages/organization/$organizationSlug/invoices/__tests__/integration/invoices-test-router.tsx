@@ -23,11 +23,16 @@ import { InvoicesLayout } from '../../InvoicesLayout.tsx';
  * `$invoiceId` and its `edit`, each rendering nothing — opened at `url` for a
  * member previewed as `role`. `host` stands in for the island's host (a
  * hook's probe); the Payments ledger behind it is a plain page here, and
- * every other path lands on a catch-all that names it.
+ * every other path lands on a catch-all that names it — or on `elsewhere`, a
+ * room a drawer opens over (A-P1).
  */
 export function renderInvoicesRoutes(
   url: string,
-  { role = 'admin', host = InvoicesLayout }: { role?: Role; host?: () => ReactNode } = {},
+  {
+    role = 'admin',
+    host = InvoicesLayout,
+    elsewhere: Elsewhere = () => <p data-testid="elsewhere">elsewhere</p>,
+  }: { role?: Role; host?: () => ReactNode; elsewhere?: () => ReactNode } = {},
 ) {
   useOrganizationStore.getState().setPermissions(['organization:read']);
   useUIStore.setState({ previewRole: role });
@@ -65,7 +70,7 @@ export function renderInvoicesRoutes(
   const elsewhere = createRoute({
     getParentRoute: () => root,
     path: '$',
-    component: () => <p data-testid="elsewhere">elsewhere</p>,
+    component: Elsewhere,
   });
   const router = createRouter({
     routeTree: root.addChildren([

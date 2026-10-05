@@ -7,6 +7,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
 import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -110,26 +111,35 @@ function useRefusal(refused: boolean, pathname: string, close: () => void) {
  * record) opens nothing: the URL goes back to the list in place, with
  * "<Record> not found · it may have been deleted" (`S:115`). Record routes
  * stay open to a viewer — the drawer is view only. `close` returns to the list
- * with its search, filters and sort, and drops the prefill.
+ * with its search, filters and sort, and drops the prefill. Over another
+ * room's page (A-P1, `useCrossRoomDialog` — New sale from the patient file or
+ * Today) it reads the drawer's own route, and every way out goes back to that
+ * page.
  */
 export function useRoomDialogRoute<T, TPrefill>({
   section,
   createActions = CREATE,
   tabActions = NO_ACTIONS,
-  close,
+  close: closeToList,
   param,
   queryKey,
   fetchRecord,
   recordLabel,
   readPrefill,
 }: UseRoomDialogRouteOptions<T, TPrefill>): RoomDialogRouteState<T, TPrefill> {
-  const params: Record<string, string | undefined> = useParams({ strict: false });
+  const routeParams: Record<string, string | undefined> = useParams({ strict: false });
   // The path and the prefill come from one location: while a dialog route is
   // still resolving, the list's own match holds the search it had before.
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const search: Record<string, unknown> = useLocation({
+  const routePathname = useLocation({ select: (location) => location.pathname });
+  const routeSearch: Record<string, unknown> = useLocation({
     select: (location) => location.search,
   });
+  const { params, pathname, search, crossRoom } = useDialogRouteLocation({
+    params: routeParams,
+    pathname: routePathname,
+    search: routeSearch,
+  });
+  const close = crossRoom ? crossRoom.close : closeToList;
   const access = useClinicAccess();
 
   const id = params[param];

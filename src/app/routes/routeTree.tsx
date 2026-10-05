@@ -6,6 +6,7 @@ import {
   lazyRouteComponent,
   notFound,
   Outlet,
+  type ParsedLocation,
   redirect,
   type StaticDataRouteOption,
 } from '@tanstack/react-router';
@@ -182,15 +183,23 @@ type DialogRouteName = keyof Awaited<
  * so a cold load and a navigation are refused exactly as a page's are; the
  * `loader` hands the manifest to `head` for the document title. A component
  * that is lazy itself is preloaded with the registry, so it never suspends on
- * its first render.
+ * its first render. Past the gate, a drawer another room opened hands over to
+ * that room (`handOverToReferrer`, A-P1).
  */
 function dialogRoute(name: DialogRouteName) {
   const load = async (): Promise<DialogRoute> =>
     (await loadDialogRoutes()).DIALOG_ROUTES[name];
   const manifest = async (): Promise<PageManifest> => (await load()).manifest;
+  const gate = roomLeafGate(manifest);
   return {
     staticData: DIALOG_STATIC_DATA,
-    beforeLoad: roomLeafGate(manifest),
+    beforeLoad: async (
+      context: Parameters<typeof gate>[0] & { location: ParsedLocation },
+    ) => {
+      await gate(context);
+      if (!context.preload)
+        (await loadDialogRoutes()).handOverToReferrer(context.location);
+    },
     loader: manifest,
     head: ({ loaderData }: { loaderData?: PageManifest }) =>
       loaderData ? manifestHead(loaderData)() : {},
@@ -257,12 +266,10 @@ const OrganizationPickerPage = lazyRouteComponent(
   'Component',
 );
 // The org shell's nav, View-as pill and ⌘K name the clinic sections, so the
-// `clinic` vocabulary loads with the shell rather than with each room.
+// `clinic` vocabulary loads with the shell rather than with each room. Its
+// module adds, over any room, the drawer another room opened (A-P1).
 const OrganizationShell = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinic],
-    () => import('@/pages/organization/$organizationSlug/organization-slug.route.tsx'),
-  ),
+  localizedRoute([I18N_NAMESPACES.clinic], () => import('./OrganizationShell.tsx')),
   'Component',
 );
 const SuspendedPage = lazyRouteComponent(

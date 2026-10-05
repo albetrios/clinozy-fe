@@ -7,6 +7,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import { PatientsPage } from '../../PatientsPage.tsx';
 import { renderPatientsRoutes, resetPatientsRoutes } from './patients-test-router.tsx';
@@ -142,7 +143,7 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     expect(router.state.location.search).toMatchObject({ activity: 'open' });
   });
 
-  it('takes New invoice, Collect and Edit to their rooms’ drawers, keeping the list behind', async () => {
+  it('opens New invoice and Collect over the list, which stays (A-P1), and Edit over it', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
     await waitFor(() => expect(rows()).toHaveLength(30));
@@ -153,13 +154,15 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     );
     await user.click(dharti.getByTestId('patients-row-action-new-invoice'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/invoices/create'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       type: 'clinic',
       patient: DHARTI,
       from: 'patients',
     });
+    expect(router.state.location.pathname).toBe(PATIENTS);
+    expect(rows()).toHaveLength(30);
 
     router.history.back();
     await waitFor(() => expect(rows()).toHaveLength(30));
@@ -167,9 +170,10 @@ describe('the Patients room (KICKOFF §6.5)', () => {
       within(rowOf('Dharti Galani')).getByTestId('patients-row-action-collect'),
     );
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/payments/receive'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
     );
-    expect(router.state.location.search).toEqual({ patient: DHARTI, from: 'patients' });
+    expect(shownLocation(router).search).toEqual({ patient: DHARTI, from: 'patients' });
+    expect(router.state.location.pathname).toBe(PATIENTS);
 
     router.history.back();
     await waitFor(() => expect(rows()).toHaveLength(30));

@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { useParams, useSearch } from '@tanstack/react-router';
 
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/shared/clinic/patient-file-sections.ts';
 import type { ChatHistoryTarget } from '@/shared/components/ChatColumn/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useOpenVisit, useStartVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import type { RailUpNextActions } from '../../components/PatientRail/index.ts';
@@ -56,7 +57,7 @@ function when<A>(allowed: boolean, action: A): A | undefined {
  * `from` (§4, AMBER A-P1). Each is left out when access says no.
  */
 export function usePatientFileNavigation(): PatientFileNavigation {
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search: { visit?: 'open' } = useSearch({ strict: false });
   const { patientId, section, viewable } = usePatientFileContext();

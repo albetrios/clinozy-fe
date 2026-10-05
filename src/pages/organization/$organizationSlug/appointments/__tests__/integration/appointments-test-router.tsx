@@ -40,9 +40,16 @@ export function grantClinicAccess(level: 'owner' | 'none' = 'owner') {
  * The Appointments family as `routeTree.tsx` registers it — the page with its
  * search schema and its two dialog routes, which render nothing — with `Page`
  * as the page's component, opened at `url`; plus Today, a room a drawer can
- * close back to. The guards and the edit redirect are `routeTree.test.tsx`'s.
+ * close back to — or a cross-room drawer opens over (A-P1), `Today` standing in
+ * for its page. The guards and the edit redirect are `routeTree.test.tsx`'s.
  */
-export function renderAppointmentsRoutes(url: string, Page: () => ReactNode) {
+export function renderAppointmentsRoutes(
+  url: string,
+  Page: () => ReactNode,
+  {
+    Today = () => <p data-testid="today-page">Today</p>,
+  }: { Today?: () => ReactNode } = {},
+) {
   const root = createRootRoute({ component: () => <Outlet /> });
   const appointments = createRoute({
     getParentRoute: () => root,
@@ -65,7 +72,7 @@ export function renderAppointmentsRoutes(url: string, Page: () => ReactNode) {
   const today = createRoute({
     getParentRoute: () => root,
     path: '/organization/$organizationSlug/today',
-    component: () => <p data-testid="today-page">Today</p>,
+    component: Today,
   });
   const router = createRouter({
     routeTree: root.addChildren([appointments.addChildren([create, appointment]), today]),

@@ -1,3 +1,5 @@
+import { defaultParseSearch, defaultStringifySearch } from '@tanstack/react-router';
+
 /**
  * The rooms a shared drawer route can keep behind it (KICKOFF §4): a drawer
  * opened from another room — the Invoice drawer from the patient file, Receive
@@ -5,6 +7,11 @@
  * still has a page behind it. Paths are relative to the organization and must
  * match one of these exactly; anything else falls back to the route's own
  * default, so `from` can never point outside the app.
+ *
+ * The room is kept behind for real (A-P1): {@link crossRoomNavigation} opens
+ * such a drawer over the referring page — still mounted, its search kept —
+ * while the URL bar shows the drawer's own route; {@link crossRoomDialogOf}
+ * reads it back for the host that renders the drawer there.
  */
 
 /**
@@ -28,6 +35,8 @@ const VISIT_FLOW_REFERRER =
 const REFERRER_PATTERNS: readonly RegExp[] = [
   /^today$/,
   /^leads$/,
+  // The lead drawer: a booking from its contact card opens over it (A-P1).
+  /^leads\/[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i,
   /^appointments$/,
   /^patients$/,
   PATIENT_FILE_REFERRER,
@@ -63,8 +72,16 @@ export function safeReferrer(from: unknown, fallback: string): string {
   return typeof from === 'string' && isAllowedReferrer(from) ? from : fallback;
 }
 
-/** An org page's path relative to the organization: `/organization/acme/patients` → `patients`. */
-const ORGANIZATION_PAGE = /^\/organization\/[^/]+\/(.+?)\/?$/;
+/**
+ * An org page: the organization's prefix and the path relative to it —
+ * `/organization/acme/patients` → `/organization/acme/` and `patients`.
+ */
+const ORGANIZATION_PAGE = /^(\/organization\/[^/]+\/)(.+?)\/?$/;
+
+/** The org-relative path of `pathname`, or null outside an organization's pages. */
+function organizationPathOf(pathname: string): string | null {
+  return ORGANIZATION_PAGE.exec(pathname)?.[2] ?? null;
+}
 
 /**
  * The `from` a drawer opened from the page at `pathname` carries — the
@@ -72,6 +89,204 @@ const ORGANIZATION_PAGE = /^\/organization\/[^/]+\/(.+?)\/?$/;
  * drawer may keep it behind, else null (the drawer opens over its own room).
  */
 export function referrerFromPath(pathname: string): string | null {
-  const page = ORGANIZATION_PAGE.exec(pathname)?.[1];
+  const page = organizationPathOf(pathname);
   return page && isAllowedReferrer(page) ? page : null;
+}
+
+/** The search key a referring page's URL names the drawer open over it under (A-P1). */
+export const CROSS_ROOM_PARAM = 'dialog';
+
+/**
+ * A drawer another room's page may open over itself (KICKOFF §4, A-P1): the
+ * Invoice drawer (new, preview, edit), Receive payment, the appointment drawers
+ * and New sale. Its dialog route keeps its own URL and gate; opened with a
+ * `from` naming another room, it renders over that room instead of its own.
+ */
+export interface CrossRoomRoute {
+  /** Its dialog route's name in `src/app/routes/dialog-routes.ts` — the manifest its gate reads. */
+  name:
+    | 'invoiceCreate'
+    | 'invoice'
+    | 'invoiceEdit'
+    | 'paymentReceive'
+    | 'appointmentCreate'
+    | 'appointment'
+    | 'saleCreate';
+  /** Its path under the organization; a record route's id is the first group. */
+  path: RegExp;
+  /** The route param that id fills. */
+  param?: 'invoiceId' | 'appointmentId';
+  /** The room it opens over when no other room opened it: its route's own parent. */
+  room: string;
+}
+
+/** Every drawer route another room may open over itself, in `dialog-routes.ts` order. */
+export const CROSS_ROOM_ROUTES: readonly CrossRoomRoute[] = [
+  {
+    name: 'appointmentCreate',
+    path: /^appointments\/create$/,
+    room: 'appointments',
+  },
+  {
+    name: 'appointment',
+    path: /^appointments\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})$/i,
+    param: 'appointmentId',
+    room: 'appointments',
+  },
+  { name: 'paymentReceive', path: /^payments\/receive$/, room: 'payments' },
+  // The Invoice drawer's own default referrer is the Payments ledger (§4).
+  { name: 'invoiceCreate', path: /^invoices\/create$/, room: 'payments' },
+  {
+    name: 'invoice',
+    path: /^invoices\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})$/i,
+    param: 'invoiceId',
+    room: 'payments',
+  },
+  {
+    name: 'invoiceEdit',
+    path: /^invoices\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})\/edit$/i,
+    param: 'invoiceId',
+    room: 'payments',
+  },
+  { name: 'saleCreate', path: /^medical\/sales\/create$/, room: 'medical/sales' },
+];
+
+/** The cross-room drawer route at an org-relative path, with its record param — or null. */
+function crossRoomRouteOf(
+  path: string,
+): { route: CrossRoomRoute; params: Record<string, string> } | null {
+  for (const route of CROSS_ROOM_ROUTES) {
+    const match = route.path.exec(path);
+    if (!match) continue;
+    const id = match[1];
+    return { route, params: route.param && id ? { [route.param]: id } : {} };
+  }
+  return null;
+}
+
+/** A location as the router parses it — what the cross-room helpers read of it. */
+export interface CrossRoomLocationInput {
+  pathname: string;
+  search: Record<string, unknown>;
+  /** The search as the URL spells it, `?…` (the router's `searchStr`). */
+  searchStr?: string;
+  hash?: string;
+  /** Path, search and hash, the way the URL bar shows them. */
+  href: string;
+}
+
+/** The navigation that opens a drawer over the room it came from: where it goes, what the URL bar shows. */
+export interface CrossRoomNavigation {
+  /** The referring page, as it stands, with the drawer named in its search. */
+  href: string;
+  /** The drawer's own route — the masked URL: shareable, and what a refresh keeps. */
+  mask: { href: string };
+}
+
+/**
+ * How a navigation to a cross-room drawer `target` keeps the room it came
+ * from behind it (A-P1): the referring page's URL — `current`, search and
+ * hash as they stand, when the member is on the page `from` names; else that
+ * page fresh (a deep link, a stale tab) — with the drawer's route in its
+ * search, masked as the drawer's own route. The referring page's route stays
+ * matched (its guards run, its page stays mounted) and the drawer's host
+ * renders over it. Null when `target` is no cross-room drawer, or its `from`
+ * names no allowed room other than the drawer's own — the drawer opens over
+ * its own room, as it always has.
+ */
+export function crossRoomNavigation(
+  target: CrossRoomLocationInput,
+  current?: Pick<CrossRoomLocationInput, 'pathname' | 'search' | 'hash'>,
+): CrossRoomNavigation | null {
+  const page = ORGANIZATION_PAGE.exec(target.pathname);
+  const [, organization = '', path = ''] = page ?? [];
+  const drawer = crossRoomRouteOf(path);
+  if (!page || drawer === null) return null;
+  const from = safeReferrer(target.search.from, '');
+  if (!from || from === drawer.route.room) return null;
+  const referrer = referringPage(current, organization, from);
+  const searchStr = target.searchStr ?? defaultStringifySearch(target.search);
+  const search = defaultStringifySearch({
+    ...referrer.search,
+    [CROSS_ROOM_PARAM]: `${path}${searchStr}`,
+  });
+  return {
+    href: `${referrer.pathname}${search}${referrer.fragment}`,
+    mask: { href: target.href },
+  };
+}
+
+/**
+ * The page a cross-room drawer opens over: the member's, search and hash as
+ * they stand, when it is the page `from` names in the same organization —
+ * else that page fresh. The visit flow's `from` carries its query
+ * (`timeline?visit=open`, {@link visitFlowReferrer}): it is the page's search,
+ * so a drawer the flow opens returns into the flow.
+ */
+function referringPage(
+  current: Pick<CrossRoomLocationInput, 'pathname' | 'search' | 'hash'> | undefined,
+  organization: string,
+  from: string,
+): { pathname: string; search: Record<string, unknown>; fragment: string } {
+  const at = from.indexOf('?');
+  const path = at < 0 ? from : from.slice(0, at);
+  const query = defaultParseSearch(at < 0 ? '' : from.slice(at));
+  const fresh = { pathname: `${organization}${path}`, search: query, fragment: '' };
+  if (!current?.pathname.startsWith(organization)) return fresh;
+  if (organizationPathOf(current.pathname) !== path) return fresh;
+  const fragment = current.hash ? `#${current.hash}` : '';
+  return {
+    pathname: current.pathname,
+    search: { ...query, ...current.search },
+    fragment,
+  };
+}
+
+/** A cross-room drawer as the referring page's URL names it: the drawer route's own location. */
+export interface CrossRoomDialogLocation {
+  route: CrossRoomRoute;
+  /** The drawer route's path, `/organization/acme/invoices/create`. */
+  pathname: string;
+  /** The drawer route's search — its prefill and its `from`. */
+  search: Record<string, unknown>;
+  /** The drawer route's params: the org slug and, on a record route, its id. */
+  params: Record<string, string>;
+  /** The drawer route's href. */
+  href: string;
+}
+
+/**
+ * The cross-room drawer `search` names over the page (the reader's side of
+ * {@link crossRoomNavigation}) — or null when it names none, or names
+ * anything but a cross-room drawer route: the value is checked against the
+ * same table, so a hand-edited URL opens nothing else.
+ */
+export function crossRoomDialogOf(
+  search: Record<string, unknown>,
+  organizationSlug: string,
+): CrossRoomDialogLocation | null {
+  const value = search[CROSS_ROOM_PARAM];
+  if (typeof value !== 'string' || !organizationSlug) return null;
+  const at = value.indexOf('?');
+  const path = at < 0 ? value : value.slice(0, at);
+  const query = at < 0 ? '' : value.slice(at);
+  const drawer = crossRoomRouteOf(path);
+  if (!drawer) return null;
+  const pathname = `/organization/${organizationSlug}/${path}`;
+  return {
+    route: drawer.route,
+    pathname,
+    search: defaultParseSearch(query),
+    params: { organizationSlug, ...drawer.params },
+    href: `${pathname}${query}`,
+  };
+}
+
+/** `search` without the drawer it names — the referring page alone, as the drawer found it. */
+export function withoutCrossRoomDialog(
+  search: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(search).filter(([key]) => key !== CROSS_ROOM_PARAM),
+  );
 }

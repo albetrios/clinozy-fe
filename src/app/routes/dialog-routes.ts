@@ -11,8 +11,16 @@
  * `routeTree.tsx`, which awaits the manifest before the gate). The patient
  * file's dialogs are not here: they inherit the file's gate and
  * ride its own lazy module (`patient-id.sections.ts`).
+ *
+ * A drawer another room opened ({@link handOverToReferrer}, A-P1) leaves its
+ * route for that room's, the drawer named in the room's search and the URL
+ * bar keeping the drawer's route.
  */
-import type { RouteComponent } from '@tanstack/react-router';
+import {
+  type ParsedLocation,
+  redirect,
+  type RouteComponent,
+} from '@tanstack/react-router';
 
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
@@ -109,6 +117,7 @@ import { manifest as branchCreateManifest } from '@/pages/organization/$organiza
 import { Component as BranchCreateRoute } from '@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { Component as UserCreateRoute } from '@/pages/organization/$organizationSlug/users/create/create.route.tsx';
+import { crossRoomNavigation } from '@/shared/clinic/clinic-referrer.ts';
 
 /** A dialog route's lazily loaded half: the manifest its gate and title read, and its component. */
 export interface DialogRoute {
@@ -194,3 +203,25 @@ export const DIALOG_ROUTES = {
   },
   stockVendorEdit: { manifest: stockVendorEditManifest, Component: StockVendorEditRoute },
 } satisfies Record<string, DialogRoute>;
+
+/**
+ * A drawer another room owns, entered on its own route with a `from` naming
+ * an allowed room other than its own (KICKOFF §4, A-P1) — a shared link, a
+ * stale tab, a link that skipped `useClinicNavigate` — goes to that room
+ * instead: the room's page with the drawer named in its search, masked as the
+ * drawer's own route, so the room stands behind the drawer, its guards run,
+ * and the URL bar still shows the link. `dialogRoute(name)` in
+ * `routeTree.tsx` calls it once the drawer's own gate has passed; any other
+ * dialog route stays where it is.
+ */
+export function handOverToReferrer(location: ParsedLocation): void {
+  const over = crossRoomNavigation(location);
+  if (!over) return;
+  throw redirect({
+    href: over.href,
+    // The router builds a mask from an href too; its type spells only `to`.
+    mask: over.mask as Parameters<typeof redirect>[0]['mask'],
+    replace: true,
+    resetScroll: false,
+  });
+}

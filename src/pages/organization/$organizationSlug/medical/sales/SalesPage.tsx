@@ -3,7 +3,6 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { InvoiceDrawer } from '@/shared/components/InvoiceDrawer/index.ts';
 import {
   type RoomFilterFields,
   useRoomFilters,
@@ -23,21 +22,14 @@ import {
 } from '../shared/components/MedicalFlowConfirm/index.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
-import {
-  type MedicalDialogRoute,
-  useMedicalDialogRoute,
-} from '../shared/hooks/useMedicalDialogRoute/index.ts';
 import { useMedicalSummary, useSaleList } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
-import { fetchMedicalSale, medicalQueryKeys } from '../shared/medical-api.ts';
 import type { SaleListParams, SaleRow } from '../shared/medical-contracts.ts';
-import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import type { PrescriptionToFill } from '../shared/medical-flows-contracts.ts';
 import { SALE_STATUS_TONES } from '../shared/medical-tones.ts';
 import { PaymentReminders } from './components/PaymentReminders/index.ts';
 import { PrescriptionsToFill } from './components/PrescriptionsToFill/index.ts';
-import { SaleDrawer } from './components/SaleDrawer/index.ts';
-import { SaleReturnDrawer } from './components/SaleReturnDrawer/index.ts';
+import { SaleDrawers } from './components/SaleDrawers/index.ts';
 import { useSaleActions } from './hooks/useSaleActions/index.ts';
 import { useSaleColumns } from './hooks/useSaleColumns/index.ts';
 import { saleFilterKey, saleParamsOf } from './sales.params.ts';
@@ -49,46 +41,6 @@ const SALE_FILTER_FIELDS = {
   status: { kind: 'options', values: SALE_STATUSES, single: true },
   created: { kind: 'date', presets: 'created' },
 } as const satisfies RoomFilterFields;
-
-/**
- * The drawer the URL names (D24): New sale — the shared Invoice drawer with the
- * type locked to Medical (`S:50`), on `?prescription=&customer=`, closing back
- * to `from` (Today's Dispense, AMBER A-P1) or the Sales list — the read-only
- * Sale, or Return from patient.
- */
-function SaleDrawers({
-  dialog,
-  close,
-  closeTo,
-  onReturn,
-}: {
-  dialog: MedicalDialogRoute<SaleRow>;
-  close: () => void;
-  closeTo: (from: string | undefined) => void;
-  onReturn: (sale: SaleRow) => void;
-}) {
-  if (dialog.kind === 'create') {
-    const back = () => closeTo(dialog.prefill.from);
-    return (
-      <InvoiceDrawer
-        mode="create"
-        sale
-        open
-        prefill={{
-          prescriptionId: dialog.prefill.prescription ?? null,
-          patientId: dialog.prefill.customer ?? null,
-        }}
-        onClose={back}
-        onCreated={back}
-      />
-    );
-  }
-  if (dialog.kind !== 'record') return null;
-  if (dialog.action === 'return') {
-    return <SaleReturnDrawer open sale={dialog.record} onClose={close} />;
-  }
-  return <SaleDrawer open sale={dialog.record} onClose={close} onReturn={onReturn} />;
-}
 
 /**
  * The Sales view action for the Status filter (`medical.md:17`): All →
@@ -133,13 +85,6 @@ export function SalesPage() {
   const filters = useRoomFilters(SALE_FILTER_FIELDS);
   const actions = useSaleActions();
   const [voiding, setVoiding] = useState<MedicalFlowTarget | null>(null);
-  const { dialog, close } = useMedicalDialogRoute({
-    tab: 'sales',
-    param: 'saleId',
-    queryKey: medicalQueryKeys.sale,
-    fetchRecord: fetchMedicalSale,
-    recordLabel: t(MEDICAL_DRAWER_KEYS.records.sale),
-  });
 
   const list = useSaleList(params);
   const { rows, loading } = useRoomList(list, TABLE_ID, saleFilterKey(params));
@@ -251,12 +196,7 @@ export function SalesPage() {
         }
         avatar
       />
-      <SaleDrawers
-        dialog={dialog}
-        close={close}
-        closeTo={(from) => nav.closeTo('sales', from)}
-        onReturn={(sale) => nav.saleReturn(sale.id)}
-      />
+      <SaleDrawers />
       <MedicalFlowConfirm target={voiding} onClose={() => setVoiding(null)} />
       <Outlet />
     </section>

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -16,6 +16,7 @@ import { personFullName } from '@/shared/components/Cells/index.ts';
 import { usePatientAppointments } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientNotes } from '@/shared/hooks/usePatientNotes/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
@@ -73,7 +74,7 @@ const dayOnly = (day: string) => ({
  */
 export function useActivityFeed(): { entries: ActivityEntry[]; loading: boolean } {
   const { t } = useTranslation([TIMELINE_NS, CLINIC_NS]);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, viewable, masked } = usePatientFileContext();
   const access = useClinicAccess();

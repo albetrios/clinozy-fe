@@ -15,9 +15,11 @@ starts step 1 collapsed — and `$appointmentId/` in Edit or Reschedule, the id 
 booking loads so the same drawer fills in. Copy opens `create/?copyOf=`, a chat's
 "Appointment #…" chip that booking. `/appointments/$appointmentId/edit` is a
 `@/app/routes/routeTree.tsx` redirect to the drawer, search kept. A dead id stays on the page
-with "Appointment not found · it may have been deleted" (`S:115`); a drawer closes to the
-referrer `from` (allow-listed rooms, A-P1) or back to the page with the page's own params — a
-new booking moves the page's `date` to its day (H:6051, D28).
+with "Appointment not found · it may have been deleted" (`S:115`); a drawer closes back to the
+page with the page's own params — a new booking moves the page's `date` to its day (H:6051,
+D28). Opened from another room (`from` on the referrer allow-list), the form opens over that
+room, which stays behind it while the URL bar shows the drawer's route (A-P1): the app's
+cross-room host renders `components/AppointmentDialog/` there.
 
 The URL (`appointments.search.ts`, D27): `view` — Agenda (default) · Day · Week · Month, Week
 rendering Day on a phone with the URL replaced (`useAppointmentsView`); `date` (the Agenda's one

@@ -10,6 +10,10 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  type CrossRoomDialog,
+  CrossRoomDialogContext,
+} from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import {
   renderPaymentsRoutes,
@@ -176,6 +180,55 @@ describe('usePaymentsDialogRoute (KICKOFF §4, D24)', () => {
     expect(read()).toEqual({ kind: 'none' });
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
     expect(notifyMock.info).toHaveBeenCalledWith(
+      'You do not have permission to perform this action.',
+    );
+  });
+});
+
+describe('usePaymentsDialogRoute over another room (A-P1)', () => {
+  /** The Probe over Pending, reading Receive from the drawer route the host provides. */
+  function overPending(dialog: CrossRoomDialog) {
+    return function PendingWithReceive() {
+      return (
+        <CrossRoomDialogContext.Provider value={dialog}>
+          <Probe />
+        </CrossRoomDialogContext.Provider>
+      );
+    };
+  }
+  const receive = (close: () => void): CrossRoomDialog => ({
+    pathname: `${LEDGER}/receive`,
+    search: { patient: RHEA, from: 'payments/pending' },
+    params: { organizationSlug: 'acme' },
+    close,
+  });
+
+  it('reads Receive from the drawer’s own route, and closes back to the page behind', async () => {
+    const user = userEvent.setup();
+    const close = vi.fn();
+    const { router } = renderPaymentsRoutes(`${LEDGER}/pending?direction=give`, {
+      pending: overPending(receive(close)),
+    });
+    await waitFor(() =>
+      expect(read()).toEqual({
+        kind: 'receive',
+        prefill: { patient: RHEA, from: 'payments/pending' },
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(close).toHaveBeenCalledOnce();
+    expect(router.state.location.pathname).toBe(`${LEDGER}/pending`);
+  });
+
+  it('refuses Receive without Create there too: the toast once, and back to the page behind', async () => {
+    const close = vi.fn();
+    renderPaymentsRoutes(`${LEDGER}/pending`, {
+      pending: overPending(receive(close)),
+      role: 'therapist',
+    });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(read()).toEqual({ kind: 'none' });
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
       'You do not have permission to perform this action.',
     );
   });

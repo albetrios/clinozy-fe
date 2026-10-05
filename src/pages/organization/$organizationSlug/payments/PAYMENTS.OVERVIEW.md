@@ -49,8 +49,9 @@ A layout island over four URL-driven dialogs (D24), each a direct child whose ro
 nothing — this page reads the URL (`hooks/usePaymentsDialogRoute/`) and opens the drawer
 over the ledger:
 
-- `receive/` — Receive payment, prefilled from `?patient=&invoice=`; `from` keeps the room
-  it came from behind it and is where it closes to (A-P1, `safeReferrer`).
+- `receive/` — Receive payment, prefilled from `?patient=&invoice=`. Opened from another room
+  (`from`, `safeReferrer`) it opens over that room, which stays behind it (A-P1): the app's
+  cross-room host renders `components/PaymentsDrawers/`'s `PaymentsDialogHost` there.
 - `pay/` — Send payment, on `?bill=md:<poId>` or `?bill=is:<purchaseId>`.
 - `$paymentId/edit/` — the entry's drawer while its day is open: a receipt in Receive, money
   out in Send. A closed day's entry goes back to the ledger with "PAY-5509 · Day closed", a

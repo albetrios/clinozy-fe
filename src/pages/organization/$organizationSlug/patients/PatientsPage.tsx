@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { Outlet, useParams, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +23,7 @@ import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
@@ -81,7 +82,7 @@ function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
  */
 export function PatientsPage() {
   const { t } = useTranslation(PATIENTS_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validatePatientsSearch(useSearch({ strict: false }));
   const params = patientListParamsOf(search);

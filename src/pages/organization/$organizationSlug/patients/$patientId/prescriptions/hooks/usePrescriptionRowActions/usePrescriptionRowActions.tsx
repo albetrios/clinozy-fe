@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -19,6 +19,7 @@ import {
   printDocument,
 } from '@/shared/components/PrintTemplate/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useCreatePrescription } from '@/shared/hooks/usePrescriptions/index.ts';
 import { Copy, Eye, PenLine, Printer, Receipt, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -57,7 +58,7 @@ export function usePrescriptionRowActions({
   onDelete: (prescription: Prescription) => void;
 }): (prescription: Prescription) => DataTableRowAction[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const queryClient = useQueryClient();
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
   const create = useCreatePrescription();

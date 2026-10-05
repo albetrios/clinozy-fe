@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -12,6 +12,7 @@ import {
   type PatientFileSectionSlug,
 } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 
 import { useClinicalLists } from '../../../shared/hooks/useClinicalLists/index.ts';
 import { usePackageSession } from '../../../shared/hooks/usePackageSession/index.ts';
@@ -52,7 +53,7 @@ import { useSmartNote } from './use-smart-note.ts';
  */
 export function OverviewBento() {
   const { t } = useTranslation(TIMELINE_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, viewable } = usePatientFileContext();
   const access = useClinicAccess();

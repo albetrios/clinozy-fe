@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
@@ -17,6 +17,7 @@ import {
   type PatientFileSectionSlug,
 } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import {
   type AppIcon,
   Calendar,
@@ -114,7 +115,7 @@ export interface PatientFileActions {
  */
 export function usePatientFileActions(): PatientFileActions {
   const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, section, photos } = usePatientFileContext();
   const access = useClinicAccess();

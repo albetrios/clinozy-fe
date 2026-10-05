@@ -1,10 +1,13 @@
 # `pages/organization/$organizationSlug/invoices` — the shared Invoice drawer's routes
 
 Route: `/organization/$organizationSlug/invoices` (`S:92–94`; KICKOFF §4, §6.9, D24). The island
-has no page of its own: its routes are URL-driven dialogs over a referrer. The Payments ledger
-stands behind them — `src/app/routes/routeTree.tsx` renders `PaymentsPage` beside this island's host, the §4
-default (deviation A-P1, as L-38) — and `?from=` names the room that opened the drawer, where it
-closes to (`safeReferrer`; else the ledger).
+has no page of its own: its routes are URL-driven dialogs over a referrer. Opened from another
+room — `?from=` on the referrer allow-list — the drawer opens over that room, which stays mounted
+behind it with its guards and search, while the URL bar shows the drawer's own route (A-P1): the
+app's cross-room host (`src/app/routes/CrossRoomDialogs.tsx`) renders this island's host there,
+and `hooks/useInvoicesDialogRoute/` reads the drawer's route from it. Otherwise the Payments ledger
+stands behind it — `src/app/routes/routeTree.tsx` renders `PaymentsPage` beside this island's
+host, the §4 default — and closing goes to `from`, else the ledger.
 
 Gated like the Payments room, the money domain: membership (`organization:read`) and the
 `clinic-payments` module, then `requireOrgStatus`; in-room View / Create / Edit / Delete come

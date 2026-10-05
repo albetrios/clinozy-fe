@@ -11,6 +11,7 @@ import {
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -68,18 +69,30 @@ const CREATE_PATH = /\/appointments\/create\/?$/;
  * follows a create link lands back on the page with the permission toast.
  * `close` returns to the referrer `from` (allow-listed rooms, A-P1), else to
  * the page with its own params and nothing of the drawer's — on the new
- * booking's day after a create (H:6051).
+ * booking's day after a create (H:6051). Over another room's page (A-P1,
+ * `useCrossRoomDialog`) it reads the drawer's own route, and every way out
+ * goes back to that page.
  */
 export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
-  const { organizationSlug = '', appointmentId } = useParams({ strict: false });
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const search: Record<string, unknown> = useSearch({ strict: false });
+  const routeParams = useParams({ strict: false });
+  const routePathname = useLocation({ select: (location) => location.pathname });
+  const routeSearch: Record<string, unknown> = useSearch({ strict: false });
+  const { params, pathname, search, crossRoom } = useDialogRouteLocation({
+    params: routeParams,
+    pathname: routePathname,
+    search: routeSearch,
+  });
+  const { organizationSlug = '', appointmentId } = params;
   const navigate = useNavigate();
   const { t } = useTranslation([APPOINTMENTS_NS, ERRORS_NS]);
   const access = useClinicAccess();
 
   const backToPage = useCallback(
     (date?: string) => {
+      if (crossRoom) {
+        crossRoom.close();
+        return;
+      }
       void navigate({
         ...organizationAppointments(organizationSlug),
         // The page's own params only: the drawer's (`time`, `who`, `mode` …) close with it.
@@ -91,7 +104,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
         replace: true,
       });
     },
-    [navigate, organizationSlug],
+    [crossRoom, navigate, organizationSlug],
   );
   const leaveDeadLink = useCallback(() => backToPage(), [backToPage]);
 
@@ -125,13 +138,13 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   );
   const close = useCallback(
     (options?: { date?: string }) => {
-      if (from) {
+      if (from && !crossRoom) {
         void navigate({ href: `/organization/${organizationSlug}/${from}` });
         return;
       }
       backToPage(options?.date);
     },
-    [from, navigate, organizationSlug, backToPage],
+    [crossRoom, from, navigate, organizationSlug, backToPage],
   );
 
   if (appointmentId !== undefined) {

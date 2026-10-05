@@ -6,6 +6,11 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+import {
+  type CrossRoomDialog,
+  CrossRoomDialogContext,
+} from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import {
   renderInvoicesRoutes,
@@ -117,24 +122,47 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
     await waitFor(() => expect(read()).toEqual({ kind: 'edit', seq: 787 }));
   });
 
-  it('closes back to the room that opened it, keeping `from` from the preview to the edit', async () => {
+  it('keeps `from` from the preview to the edit, and closes back to it', async () => {
     const user = userEvent.setup();
-    const { router } = renderInvoicesRoutes(
-      `${BASE}/${ref.invoice(787)}?from=patients/${DHARTI}/invoices`,
-      { host: Probe },
-    );
+    const { router } = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=payments`, {
+      host: Probe,
+    });
     await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
     await user.click(screen.getByRole('button', { name: 'Edit' }));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${BASE}/${ref.invoice(787)}/edit`),
     );
-    expect(router.state.location.search).toEqual({ from: `patients/${DHARTI}/invoices` });
+    expect(router.state.location.search).toEqual({ from: 'payments' });
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${DHARTI}/invoices`,
-      ),
+      expect(router.state.location.pathname).toBe('/organization/acme/payments'),
     );
+  });
+
+  it('closes back to another room that opened it; its edit opens over that room (A-P1)', async () => {
+    const user = userEvent.setup();
+    const file = `patients/${DHARTI}/invoices`;
+    const preview = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=${file}`, {
+      host: Probe,
+    });
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() =>
+      expect(preview.router.state.location.pathname).toBe(`/organization/acme/${file}`),
+    );
+    preview.unmount();
+
+    const { router } = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=${file}`, {
+      host: Probe,
+    });
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    await user.click(screen.getByRole('button', { name: 'Edit' }));
+    const edit = `${BASE}/${ref.invoice(787)}/edit?from=${encodeURIComponent(file)}`;
+    await waitFor(() => expect(router.history.location.href).toBe(edit));
+    expect(router.state.location.pathname).toBe(`/organization/acme/${file}`);
+    expect(router.state.location.search).toEqual({
+      [CROSS_ROOM_PARAM]: edit.replace('/organization/acme/', ''),
+    });
   });
 
   it('closes to the Payments ledger without a referrer, and ignores one off the allow-list', async () => {
@@ -184,5 +212,81 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
         .getQueryCache()
         .find({ queryKey: invoiceQueryKeys.detail(ref.invoice(787)) }),
     ).toBeUndefined();
+  });
+});
+
+describe('useInvoicesDialogRoute over another room (A-P1)', () => {
+  /** The Probe on another page, reading the drawer route the host provides. */
+  function over(dialog: CrossRoomDialog) {
+    return function PageWithInvoice() {
+      return (
+        <CrossRoomDialogContext.Provider value={dialog}>
+          <Probe />
+        </CrossRoomDialogContext.Provider>
+      );
+    };
+  }
+  const drawer = (
+    path: string,
+    search: Record<string, unknown>,
+    close: () => void,
+    params: Record<string, string> = {},
+  ): CrossRoomDialog => ({
+    pathname: `${BASE}/${path}`,
+    search,
+    params: { organizationSlug: 'acme', ...params },
+    close,
+  });
+
+  it('reads a copy from the drawer’s own route — the page behind has no say — and closes back to the page', async () => {
+    const user = userEvent.setup();
+    const close = vi.fn();
+    const { router } = renderInvoicesRoutes('/organization/acme/today?lane=checkout', {
+      elsewhere: over(
+        drawer(
+          'create',
+          { type: 'clinic', patient: DHARTI, copyOf: ref.invoice(787), from: 'today' },
+          close,
+        ),
+      ),
+    });
+    await waitFor(() =>
+      expect(read()).toEqual({
+        kind: 'create',
+        prefill: {
+          type: 'clinic',
+          patient: DHARTI,
+          copyOf: ref.invoice(787),
+          from: 'today',
+        },
+        source: 787,
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(close).toHaveBeenCalledOnce();
+    expect(router.state.location.pathname).toBe('/organization/acme/today');
+  });
+
+  it('goes back to the page behind on an invoice that is gone, and on a create link without Payments Create', async () => {
+    const close = vi.fn();
+    const gone = renderInvoicesRoutes('/organization/acme/today', {
+      elsewhere: over(drawer(MISSING, { from: 'today' }, close, { invoiceId: MISSING })),
+    });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'Invoice not found · it may have been deleted',
+    );
+    gone.unmount();
+
+    close.mockReset();
+    notifyMock.info.mockReset();
+    renderInvoicesRoutes('/organization/acme/today', {
+      role: 'doctor',
+      elsewhere: over(drawer('create', { from: 'today' }, close)),
+    });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'You do not have permission to perform this action.',
+    );
   });
 });

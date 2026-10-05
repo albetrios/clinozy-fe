@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
@@ -8,6 +8,7 @@ import {
   PrescriptionPrint,
   printDocument,
 } from '@/shared/components/PrintTemplate/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import {
   useLoadRxSheetContext,
   useRxSheetContext,
@@ -81,7 +82,7 @@ export function useRxDone({
   onClose: () => void;
 }) {
   const { t } = useTranslation(RX_NS);
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   return (saved: Prescription, sell: boolean) => {
     notify.success(

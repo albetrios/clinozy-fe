@@ -7,6 +7,7 @@ import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
@@ -37,7 +38,7 @@ function useFollowOn(
   organizationSlug: string,
   book: (request: TodayBookingRequest) => void,
 ) {
-  const navigate = useNavigate();
+  const navigate = useClinicNavigate();
   const access = useClinicAccess();
   return (target: TaskTarget) => {
     if (target.kind === 'newAppointment') {

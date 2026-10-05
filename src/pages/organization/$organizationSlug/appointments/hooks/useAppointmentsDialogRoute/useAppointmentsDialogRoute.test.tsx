@@ -4,6 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  type CrossRoomDialog,
+  CrossRoomDialogContext,
+} from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -179,5 +183,73 @@ describe('useAppointmentsDialogRoute', () => {
       'You do not have permission to perform this action.',
     );
     expect(seen()).toEqual({ kind: 'none' });
+  });
+});
+
+describe('useAppointmentsDialogRoute over another room (A-P1)', () => {
+  const TODAY = '/organization/acme/today';
+
+  /** Today with the Probe on it, reading the booking from the drawer route the host provides. */
+  function overToday(dialog: CrossRoomDialog) {
+    return function TodayWithBooking() {
+      return (
+        <CrossRoomDialogContext.Provider value={dialog}>
+          <Probe />
+        </CrossRoomDialogContext.Provider>
+      );
+    };
+  }
+  const drawer = (path: string, search: Record<string, unknown>, close: () => void) => ({
+    pathname: `${PAGE}/${path}`,
+    search,
+    params: {
+      organizationSlug: 'acme',
+      ...(path === 'create' ? {} : { appointmentId: path }),
+    },
+    close,
+  });
+
+  it('reads the booking from the drawer’s own route — the page behind has no say — and closes back to it', async () => {
+    const close = vi.fn();
+    const who = ref.appointment(5);
+    const { router } = renderAppointmentsRoutes(`${TODAY}?lane=waiting`, Probe, {
+      Today: overToday(drawer('create', { who, source: 'task', from: 'today' }, close)),
+    });
+    await waitFor(() =>
+      expect(seen()).toEqual({
+        kind: 'create',
+        prefill: { who, source: 'task', from: 'today' },
+      }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(close).toHaveBeenCalledOnce();
+    expect(router.state.location.pathname).toBe(TODAY);
+  });
+
+  it('goes back to the page behind on a dead booking link, and on a create link without Create', async () => {
+    const close = vi.fn();
+    const missing = renderAppointmentsRoutes(TODAY, Probe, {
+      Today: overToday(drawer(ref.appointment(1), { from: 'today' }, close)),
+    });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'Appointment not found · it may have been deleted',
+    );
+    missing.unmount();
+
+    notifyMock.info.mockReset();
+    close.mockReset();
+    useOrganizationStore
+      .getState()
+      .setPermissions(['organization:read', 'organization:delete']);
+    useUIStore.getState().setPreviewRole('therapist');
+    renderAppointmentsRoutes(TODAY, Probe, {
+      Today: overToday(drawer('create', { from: 'today' }, close)),
+    });
+    await waitFor(() => expect(close).toHaveBeenCalledOnce());
+    expect(seen()).toEqual({ kind: 'none' });
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'You do not have permission to perform this action.',
+    );
   });
 });

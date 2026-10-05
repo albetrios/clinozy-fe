@@ -9,6 +9,7 @@ import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import { ledgerEntryLock } from '@/shared/components/LedgerCells/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -104,17 +105,29 @@ function useRefusal(refused: boolean, pathname: string, back: () => void) {
  * closed" (`S:87`). A member without Create who follows a Receive or Pay link
  * lands on the ledger with the permission toast. `close` returns to the
  * referrer `from` (allow-listed rooms, A-P1), else to the ledger with its own
- * params and nothing of the drawer's.
+ * params and nothing of the drawer's. Over another room's page (A-P1,
+ * `useCrossRoomDialog`) it reads the drawer's own route, and every way out
+ * goes back to that page.
  */
 export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
-  const { organizationSlug = '', paymentId } = useParams({ strict: false });
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const search: Record<string, unknown> = useSearch({ strict: false });
+  const routeParams = useParams({ strict: false });
+  const routePathname = useLocation({ select: (location) => location.pathname });
+  const routeSearch: Record<string, unknown> = useSearch({ strict: false });
+  const { params, pathname, search, crossRoom } = useDialogRouteLocation({
+    params: routeParams,
+    pathname: routePathname,
+    search: routeSearch,
+  });
+  const { organizationSlug = '', paymentId } = params;
   const navigate = useNavigate();
   const { t } = useTranslation(PAYMENTS_NS);
   const access = useClinicAccess();
 
   const backToLedger = useCallback(() => {
+    if (crossRoom) {
+      crossRoom.close();
+      return;
+    }
     void navigate({
       ...organizationPayments(organizationSlug),
       // The ledger's own params only: the drawer's (`patient`, `bill` …) close with it.
@@ -122,7 +135,7 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
       hash: true,
       replace: true,
     });
-  }, [navigate, organizationSlug]);
+  }, [crossRoom, navigate, organizationSlug]);
 
   const entry = useDialogRouteRecord({
     id: paymentId,
@@ -148,12 +161,12 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
     ? safeReferrer(validatePaymentReceiveSearch(search).from, '')
     : '';
   const close = useCallback(() => {
-    if (from) {
+    if (from && !crossRoom) {
       void navigate({ href: `/organization/${organizationSlug}/${from}` });
       return;
     }
     backToLedger();
-  }, [from, navigate, organizationSlug, backToLedger]);
+  }, [crossRoom, from, navigate, organizationSlug, backToLedger]);
 
   if (paymentId !== undefined) {
     if (!entry.isOpen || lockedEntry) return { dialog: { kind: 'none' }, close };

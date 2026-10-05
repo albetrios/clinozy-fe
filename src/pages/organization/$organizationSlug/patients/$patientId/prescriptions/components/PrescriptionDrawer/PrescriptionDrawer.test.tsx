@@ -13,6 +13,7 @@ import type * as PrescriptionsApi from '@/shared/api/clinic/prescriptions-api.ts
 import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -246,15 +247,17 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
     await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-pigmentation'));
     await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         '/organization/acme/medical/sales/create',
       ),
     );
     const [saved] = dhartiRx();
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       prescription: saved?.id,
       from: `patients/${DHARTI}/prescriptions`,
     });
+    // The Rx drawer closes; Prescriptions stays behind the sale (A-P1).
+    expect(router.state.location.pathname).toBe(url(''));
   });
 
   it('edits a prescription, prints it, and saves “Prescription #497 saved”', async () => {
