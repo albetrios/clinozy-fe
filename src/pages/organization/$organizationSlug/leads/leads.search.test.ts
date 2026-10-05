@@ -11,11 +11,7 @@ import {
   LEAD_VIEW_VALUES,
 } from '@/shared/api/clinic/leads-contracts.ts';
 
-import {
-  LEADS_SEARCH_DEFAULTS,
-  validateLeadCreateSearch,
-  validateLeadsSearch,
-} from './leads.search.ts';
+import { LEADS_SEARCH_DEFAULTS, validateLeadsSearch } from './leads.search.ts';
 
 const STAFF = '9f1c2b3a-4d5e-4f60-8a7b-1c2d3e4f5a6b';
 const OTHER_STAFF = '0a1b2c3d-4e5f-4a6b-9c8d-7e6f5a4b3c2d';
@@ -109,29 +105,5 @@ describe('validateLeadsSearch — the list URL (S:22)', () => {
     for (const key of LEAD_SORT_KEYS) {
       expect(validateLeadsSearch({ sort: `${key}:asc` }).sort).toBe(`${key}:asc`);
     }
-  });
-});
-
-describe('validateLeadCreateSearch — the New lead prefill (S:23)', () => {
-  it('keeps the name and the mobile, the mobile as E.164', () => {
-    expect(
-      validateLeadCreateSearch({ name: ' Rhea Shah ', phone: '98250 11241' }),
-    ).toEqual({
-      name: 'Rhea Shah',
-      phone: '+919825011241',
-    });
-    expect(validateLeadCreateSearch({ phone: '+919825011241' }).phone).toBe(
-      '+919825011241',
-    );
-    // The router parses `?phone=9825011241` into a number.
-    expect(validateLeadCreateSearch({ phone: 9825011241 }).phone).toBe('+919825011241');
-  });
-
-  it('drops a mobile that is not one and a name past the contract’s 120 characters', () => {
-    expect(validateLeadCreateSearch({ name: 'x'.repeat(121), phone: '12345' })).toEqual({
-      name: undefined,
-      phone: undefined,
-    });
-    expect(validateLeadCreateSearch({})).toEqual({ name: undefined, phone: undefined });
   });
 });

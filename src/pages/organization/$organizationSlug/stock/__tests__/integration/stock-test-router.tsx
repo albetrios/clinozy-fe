@@ -16,7 +16,8 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { validateStockCreateSearch, validateStockSearch } from '../../stock.search.ts';
+import { validateStockCreateSearch } from '../../stock.dialog-search.ts';
+import { validateStockSearch } from '../../stock.search.ts';
 
 /** A tab page and the dialog paths under it (each renders nothing, as `routeTree.tsx` has them). */
 const TAB_DIALOGS = {

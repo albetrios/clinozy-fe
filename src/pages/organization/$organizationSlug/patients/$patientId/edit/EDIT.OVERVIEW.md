@@ -8,7 +8,7 @@ when `from` names none, as the schema has it — taken from the file's sections 
 patient drawer in its edit mode over it
 (`@/shared/components/PatientDrawer/`). Saving or closing goes back to that section; the
 drawer's Delete ("Delete this record?", 10s Undo) goes back to the Patients list. `from` is
-parsed by `validatePatientFileDialogSearch` in `../patient-id.search.ts` and checked by the hook.
+parsed by `validatePatientFileDialogSearch` in `../patient-id.dialog-search.ts` and checked by the hook.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); without
 Patients edit the drawer opens read-only ("View only · your role can’t change this").

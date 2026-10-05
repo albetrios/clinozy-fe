@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/leads/create` — a URL-driven dialog ov
 Leads list (KICKOFF §4, D24; `S:23`). The route renders nothing: the Leads page reads
 the URL and opens the New lead drawer over the list, so a refresh or a shared link
 reopens it. `?name=&phone=` prefill the drawer (⌘K "New lead", the contact card's
-"+ Lead") — parsed by `validateLeadCreateSearch` in the parent's `../leads.search.ts`
+"+ Lead") — parsed by `validateLeadCreateSearch` in the parent's `../leads.dialog-search.ts`
 (an invalid mobile is dropped; a valid one arrives E.164), and scrubbed from
 telemetry (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership
 (`organization:read`) and the `clinic-leads` module, then `requireOrgStatus`; in-room

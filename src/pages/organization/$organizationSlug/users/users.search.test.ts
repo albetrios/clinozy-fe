@@ -6,7 +6,6 @@ import { TEAM_SORT_KEYS as CONTRACT_SORT_KEYS } from '@/shared/api/clinic/users-
 import {
   TEAM_SORT_KEYS,
   validateRolesSearch,
-  validateUserEditSearch,
   validateUsersSearch,
 } from './users.search.ts';
 
@@ -80,13 +79,5 @@ describe('validateRolesSearch', () => {
     });
     expect(validateRolesSearch({ role: 'owner' })).toEqual({ role: undefined });
     expect(validateRolesSearch({})).toEqual({ role: undefined });
-  });
-});
-
-describe('validateUserEditSearch', () => {
-  it('reads where the drawer was opened from, never a stray origin', () => {
-    expect(validateUserEditSearch({ from: 'roles' })).toEqual({ from: 'roles' });
-    expect(validateUserEditSearch({ from: 'invoices' })).toEqual({ from: undefined });
-    expect(validateUserEditSearch({})).toEqual({ from: undefined });
   });
 });

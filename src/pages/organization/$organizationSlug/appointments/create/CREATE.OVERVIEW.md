@@ -10,7 +10,7 @@ Prefill: the page's own `date` and `doctor` (one doctor picked prefills the doct
 `time`, `who` (a patient's or a lead's id), `copyOf` (Copy and Rebook — a new booking, the old
 one stays), the plan's `source` (`chat` or `task`: step 1 collapsed, Date & time open) and
 `from` (the room it was opened from — allow-listed, the drawer closes back to it).
-`validateAppointmentCreateSearch` in the parent's `../appointments.search.ts` parses them.
+`validateAppointmentCreateSearch` in the parent's `../appointments.dialog-search.ts` parses them.
 
 Gated like the room (membership, the `clinic-appointments` module, `requireOrgStatus`); a
 member without Create who follows a link here lands back on the page with the permission

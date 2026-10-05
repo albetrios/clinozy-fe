@@ -18,11 +18,8 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { validateBranchesSearch } from '../../branches/branches.search.ts';
-import {
-  validateRolesSearch,
-  validateUserEditSearch,
-  validateUsersSearch,
-} from '../../users.search.ts';
+import { validateUserEditSearch } from '../../users.dialog-search.ts';
+import { validateRolesSearch, validateUsersSearch } from '../../users.search.ts';
 
 /** Every code the Users room maps (D17): read, invite, manage members and roles. */
 export const USERS_ADMIN_CODES: OrganizationPermission[] = [

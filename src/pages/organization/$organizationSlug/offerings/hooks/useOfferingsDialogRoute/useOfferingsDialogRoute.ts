@@ -14,8 +14,8 @@ import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
 import {
   type OfferingCreateSearch,
   validateOfferingCreateSearch,
-  validateOfferingsSearch,
-} from '../../offerings.search.ts';
+} from '../../offerings.dialog-search.ts';
+import { validateOfferingsSearch } from '../../offerings.search.ts';
 
 /** The dialog the Offerings URL opens over the list (KICKOFF §4, D24). */
 export type OfferingsDialogRoute =

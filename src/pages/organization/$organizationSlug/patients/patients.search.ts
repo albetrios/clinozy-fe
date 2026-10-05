@@ -1,22 +1,16 @@
 /**
  * URL search-param schemas for the Patients room (consumed by routeTree's
  * `validateSearch`): the list's view, search, filters and sort (KICKOFF §6.5,
- * `S:30`), and the New patient prefill on `create/` (`S:31`). A value the URL
- * can't hold — an unknown type, a bad date range — is dropped, never an error.
- * Defaults stay out of the URL (`/patients` is the All view, newest first).
+ * `S:30`). A value the URL can't hold — an unknown type, a bad date range —
+ * is dropped, never an error. Defaults stay out of the URL (`/patients` is the
+ * All view, newest first). New patient's prefill is
+ * `patients.dialog-search.ts`'s, off the entry chunk.
  *
  * The contract's values are declared here, not imported: `routeTree.tsx` is the
  * entry chunk, and the generated schema module is pages of zod. The test pins
  * each list to the contract's enum.
  */
-import {
-  listIn,
-  oneOf,
-  queryOf,
-  RECORD_ID,
-  sortOf,
-  textOf,
-} from '@/lib/routes/search-params.ts';
+import { listIn, oneOf, queryOf, sortOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   type FollowUpFilter,
@@ -33,7 +27,6 @@ import type {
   PatientSortKey,
   PatientView,
 } from '@/shared/api/clinic/patients-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 /** The list's views, in the tab order (`patients.md:203–207`). */
 export const PATIENT_VIEWS = [
@@ -109,33 +102,5 @@ export function validatePatientsSearch(search: Record<string, unknown>): Patient
     created: readCreatedFilter(search.created),
     followUp: readFollowUpFilter(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),
-  };
-}
-
-/** The New patient prefill (`S:31`; ⌘K "New patient", the contact card's "+ Patient"). */
-export interface PatientCreateSearch {
-  /** The person's name, as given (≤ 120 characters): the first word fills First name, the rest Last name. */
-  name?: string;
-  /** Their mobile, E.164 — a typed or pasted 10-digit Indian mobile. */
-  phone?: string;
-  /** The lead the patient comes from — sets `Patient.leadId` (`S:317`). */
-  fromLead?: string;
-}
-
-/**
- * Parse the `/patients/create` prefill. `name` and `phone` are personal data:
- * the telemetry scrub filters both from every captured URL
- * (`SENSITIVE_QUERY_PARAMS`).
- */
-export function validatePatientCreateSearch(
-  search: Record<string, unknown>,
-): PatientCreateSearch {
-  const name = textOf(search.name);
-  const phone = textOf(search.phone);
-  const fromLead = textOf(search.fromLead);
-  return {
-    name: name && name.length <= 120 ? name : undefined,
-    phone: (phone && toClinicPhone(phone)) || undefined,
-    fromLead: RECORD_ID.test(fromLead) ? fromLead : undefined,
   };
 }

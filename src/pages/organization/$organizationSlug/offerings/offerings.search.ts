@@ -1,10 +1,10 @@
 /**
  * URL search-param schemas for the Offerings room (consumed by routeTree's
  * `validateSearch`): the Offerings tab's search, filters and sort (KICKOFF
- * §6.11 Routes; `S:98–100`, D22), the New offering prefill on `create/`
- * (`?name=`, `S:99`). A value the URL can't
- * hold — an unknown category, a bad date range — is dropped, never an error.
- * Defaults stay out of the URL (`/offerings` is every offering, newest first).
+ * §6.11 Routes; `S:98–100`, D22). A value the URL can't hold — an unknown
+ * category, a bad date range — is dropped, never an error. Defaults stay out of
+ * the URL (`/offerings` is every offering, newest first). New offering's
+ * `?name=` is `offerings.dialog-search.ts`'s, off the entry chunk.
  *
  * The contract's values are declared here, not imported: `routeTree.tsx` is the
  * entry chunk, and the generated schema module is pages of zod. The test pins
@@ -16,7 +16,6 @@ import {
   queryOf,
   RECORD_ID,
   sortOf,
-  textOf,
 } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
@@ -92,18 +91,4 @@ export function validateOfferingsSearch(
     created: readCreatedFilter(search.created),
     sort: sortOf(OFFERING_SORT_KEYS, search.sort),
   };
-}
-
-/** The New offering prefill (`S:99`): the name typed where it was asked for. */
-export interface OfferingCreateSearch {
-  /** The offering's name, as given (≤ 120 characters, the contract's). */
-  name?: string;
-}
-
-/** Parse the `/offerings/create` prefill. */
-export function validateOfferingCreateSearch(
-  search: Record<string, unknown>,
-): OfferingCreateSearch {
-  const name = textOf(search.name);
-  return { name: name && name.length <= 120 ? name : undefined };
 }

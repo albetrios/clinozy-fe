@@ -10,7 +10,7 @@ in place, the page's filters kept, with "Appointment not found · it may have be
 
 Params: the plan's `mode=reschedule` ("Move to another time", "Reschedule": the form opens as
 "Reschedule #<seq>") and `from` (the room it was opened from — allow-listed, the drawer closes
-back to it), parsed by `validateAppointmentSearch` in `../appointments.search.ts`.
+back to it), parsed by `validateAppointmentSearch` in `../appointments.dialog-search.ts`.
 `/appointments/$appointmentId/edit` is a `@/app/routes/routeTree.tsx` redirect to this URL, search kept
 (`S:29`). The drawer is read-only without Edit (Therapists, Q-A16).
 

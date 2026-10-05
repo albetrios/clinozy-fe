@@ -24,7 +24,7 @@ import {
   useRxSheetContext,
 } from '@/shared/hooks/usePrescriptions/index.ts';
 
-import type { PatientRxCreateSearch } from '../patient-id.search.ts';
+import { validatePatientRxCreateSearch } from '../patient-id.dialog-search.ts';
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import {
   PATIENT_SECTION_TABLE_IDS,
@@ -81,7 +81,8 @@ function RxDrawerHost({
   onClose: () => void;
 }) {
   const { patientId, file } = usePatientFileContext();
-  const search: PatientRxCreateSearch = useSearch({ strict: false });
+  // New prescription's route keeps the raw values (typed only); parsed here.
+  const search = validatePatientRxCreateSearch(useSearch({ strict: false }));
   const [today] = useState(() => clinicToday());
   const history = usePatientPrescriptions(patientId);
   const catalog = useRxCatalog(patientId);

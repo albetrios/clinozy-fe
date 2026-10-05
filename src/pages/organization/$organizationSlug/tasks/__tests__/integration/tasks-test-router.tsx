@@ -14,7 +14,8 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { validateTaskCreateSearch, validateTasksSearch } from '../../tasks.search.ts';
+import { validateTaskCreateSearch } from '../../tasks.dialog-search.ts';
+import { validateTasksSearch } from '../../tasks.search.ts';
 
 /**
  * The Tasks family as `routeTree.tsx` registers it — the list with its search

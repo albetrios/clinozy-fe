@@ -15,8 +15,8 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
+import { validateMedicalCreateSearch } from '../../medical.dialog-search.ts';
 import {
-  validateMedicalCreateSearch,
   validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '../../medical.search.ts';

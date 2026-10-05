@@ -23,7 +23,7 @@ import {
   useTaskAssignees,
 } from '../../hooks/useTaskAssignees/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import type { TaskCreateSearch } from '../../tasks.search.ts';
+import type { TaskCreateSearch } from '../../tasks.dialog-search.ts';
 import {
   type NewTaskForm,
   newTaskForm,

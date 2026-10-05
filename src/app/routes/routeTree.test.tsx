@@ -10,34 +10,19 @@ import { requireOrgStatus, requireSuspendedOrgStatus } from '@/app/guards/org-ga
 import { composePageTitle } from '@/lib/routes/page-head.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
-import {
-  validateAppointmentCreateSearch,
-  validateAppointmentSearch,
-  validateAppointmentsSearch,
-} from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
+import { validateAppointmentsSearch } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
 import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
 import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
-import {
-  validateLeadCreateSearch,
-  validateLeadsSearch,
-} from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { validateLeadsSearch } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { validatePatientImagesSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/images/images.search.ts';
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
-import {
-  validatePatientFeedbackSearch,
-  validatePatientFileDialogSearch,
-  validatePatientFileSearch,
-} from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
+import { validatePatientFileSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
-import {
-  validateTaskCreateSearch,
-  validateTasksSearch,
-} from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
-import { validateVisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
@@ -145,6 +130,18 @@ function beforeLoadOf(routeId: string): BeforeLoad {
     `route ${routeId} must have beforeLoad`,
   ).toBeDefined();
   return route?.options.beforeLoad as BeforeLoad;
+}
+
+/**
+ * A dialog route keeps its search as the URL has it — typed for the links that
+ * open it; the page or sheet that reads it parses it with the room's validator,
+ * which loads with the room rather than the entry chunk (L-54).
+ */
+function expectKeptSearch(route: { options: { validateSearch?: unknown } } | undefined) {
+  const raw = { name: '  Rhea  ', from: 'nowhere', junk: 1 };
+  const validate = route?.options.validateSearch as
+    ((search: object) => object) | undefined;
+  expect(validate?.(raw)).toBe(raw);
 }
 
 /** The app's real route tree in a memory router, at `url`. */
@@ -543,11 +540,9 @@ describe('the Leads dialog routes (KICKOFF §4, D24, S:22–25)', () => {
     ]);
   });
 
-  it('validates the list’s search on the list, and the New lead prefill on create', () => {
+  it('validates the list’s search on the list, and keeps New lead’s prefill for the list to parse', () => {
     expect(routeOf(LEADS)?.options.validateSearch).toBe(validateLeadsSearch);
-    expect(routeOf(`${LEADS}/create`)?.options.validateSearch).toBe(
-      validateLeadCreateSearch,
-    );
+    expectKeptSearch(routeOf(`${LEADS}/create`));
   });
 
   it.each([
@@ -637,16 +632,12 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
     ]);
   });
 
-  it('validates the page’s view and filters on the page, and each drawer’s own params on its route', () => {
+  it('validates the page’s view and filters on the page, and keeps each drawer’s params for the page to parse', () => {
     expect(routeOf(APPOINTMENTS)?.options.validateSearch).toBe(
       validateAppointmentsSearch,
     );
-    expect(routeOf(`${APPOINTMENTS}/create`)?.options.validateSearch).toBe(
-      validateAppointmentCreateSearch,
-    );
-    expect(routeOf(`${APPOINTMENTS}/$appointmentId`)?.options.validateSearch).toBe(
-      validateAppointmentSearch,
-    );
+    expectKeptSearch(routeOf(`${APPOINTMENTS}/create`));
+    expectKeptSearch(routeOf(`${APPOINTMENTS}/$appointmentId`));
   });
 
   it.each([
@@ -733,9 +724,7 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
       Object.keys(router.routesById).filter((id) => id.startsWith(`${TASKS}/`)),
     ).toEqual([`${TASKS}/create`, `${TASKS}/$taskId`]);
     expect(routeOf(TASKS)?.options.validateSearch).toBe(validateTasksSearch);
-    expect(routeOf(`${TASKS}/create`)?.options.validateSearch).toBe(
-      validateTaskCreateSearch,
-    );
+    expectKeptSearch(routeOf(`${TASKS}/create`));
   });
 
   it('gates New task on its own manifest, then the status guard', async () => {
@@ -792,7 +781,8 @@ describe('the Visit sheet route (KICKOFF §6.13, D18; L-49)', () => {
         id.startsWith('/organization/$organizationSlug/visits'),
       ),
     ).toEqual([VISIT]);
-    expect(routeOf(VISIT)?.options.validateSearch).toBe(validateVisitSearch);
+    // Its `?tab=` stays as the URL has it: the sheet parses it.
+    expectKeptSearch(routeOf(VISIT));
     // A dialog route: its manifest loads with the dialog-route registry (L-54).
     expect(routeOf(VISIT)?.options.staticData).toEqual({ dialog: true });
     await expect(routeOf(VISIT)?.options.loader?.()).resolves.toBe(visitManifest);
@@ -870,20 +860,17 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
     );
   });
 
-  it('validates `activity` on the file, `from` on Edit patient, the feedback drawers’ params, the album and filter on Photos', () => {
+  it('validates `activity` on the file and the album and filter on Photos, and keeps the drawers’ params for them to parse', () => {
     expect(routeOf(FILE)?.options.validateSearch).toBe(validatePatientFileSearch);
-    expect(routeOf(`${FILE}/edit`)?.options.validateSearch).toBe(
-      validatePatientFileDialogSearch,
-    );
     for (const drawer of [
+      'edit',
       'check-ins/create',
       'check-ins/$checkInId/edit',
       'reviews/create',
       'reviews/$reviewId/edit',
+      'prescriptions/create',
     ]) {
-      expect(routeOf(`${FILE}/${drawer}`)?.options.validateSearch).toBe(
-        validatePatientFeedbackSearch,
-      );
+      expectKeptSearch(routeOf(`${FILE}/${drawer}`));
     }
     expect(routeOf(`${FILE}/images`)?.options.validateSearch).toBe(
       validatePatientImagesSearch,
@@ -934,6 +921,7 @@ describe('the dialog routes’ manifests load with the dialog-route registry (D2
       loader?: () => Promise<PageManifest>;
       head?: (context: { loaderData?: PageManifest }) => unknown;
       beforeLoad?: (context: Record<string, unknown>) => Promise<void> | void;
+      validateSearch?: unknown;
     };
   };
   const dialogRoutes = (
@@ -959,6 +947,15 @@ describe('the dialog routes’ manifests load with the dialog-route registry (D2
     for (const route of dialogRoutes) {
       expect(route.options.staticData, route.id).toEqual({ dialog: true });
     }
+  });
+
+  it('parses no dialog’s search in the entry chunk: every dialog route shares one pass-through', () => {
+    const searches = dialogRoutes.flatMap((route) =>
+      route.options.validateSearch ? [route.options.validateSearch] : [],
+    );
+    // 23 drawers' prefills and params, and the Visit sheet's tab.
+    expect(searches).toHaveLength(24);
+    expect(new Set(searches).size).toBe(1);
   });
 
   it('loads each route’s own manifest — every registry name matches its route', async () => {

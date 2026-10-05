@@ -21,7 +21,8 @@ keeps all four; its track scrolls sideways when short.
 | `stock.route.tsx`                        | Route marker — exports `Component` rendering `StockLayout`.                                                                                |
 | `stock.manifest.ts`                      | Manifest — `kind: 'layout'`, children `items`, `purchases`, `movements`, `vendors`; module `clinic-stock`, nav section `stock`.            |
 | `stock.constants.ts`                     | `STOCK_NS` / `STOCK_KEYS` (the `clinic-stock` namespace) and `STOCK_TABLE_IDS`.                                                            |
-| `stock.search.ts`                        | Every tab's URL params (search, filters, sort) and the dialog routes' prefills — the entry chunk's dependency-free reader.                 |
+| `stock.search.ts`                        | Every tab's URL params (search, filters, sort) — the entry chunk's dependency-free reader.                                                 |
+| `stock.dialog-search.ts`                 | The create drawers' prefills — parsed by `useStockDialogRoute`; loads with the room.                                                       |
 | `StockLayout.tsx`                        | Layout over the tab routes (`<Outlet />`).                                                                                                 |
 | `shared/stock-contracts.ts`              | The rows each list read returns (the contract record + what the server derives).                                                           |
 | `shared/stock-api.ts`                    | The fixture reads (REPLACE_WITH_API): cursor pages, a record by id, the footer figures, the automatic sections' values.                    |

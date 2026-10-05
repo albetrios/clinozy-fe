@@ -14,10 +14,8 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import {
-  validateInvoiceCreateSearch,
-  validateInvoiceSearch,
-} from '../../invoices.search.ts';
+import { validateInvoiceCreateSearch } from '../../invoices.dialog-search.ts';
+import { validateInvoiceSearch } from '../../invoices.search.ts';
 import { InvoicesLayout } from '../../InvoicesLayout.tsx';
 
 /**

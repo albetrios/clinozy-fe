@@ -80,15 +80,16 @@ all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`
 
 ## Files
 
-| File                     | Responsibility                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `medical.route.tsx`      | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                               |
-| `medical.manifest.ts`    | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                                            |
-| `medical.constants.ts`   | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                                            |
-| `medical.search.ts`      | The tabs' URL reader (`validateMedicalSearch`) and the dialog routes' prefills.                                                                                                             |
-| `MedicalLayout.tsx`      | Layout over the tab routes (`<Outlet />`).                                                                                                                                                  |
-| `shared/`                | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the drawers, pickers, stack, delete and flow confirms; the list, partner, flow and dialog-route hooks. |
-| `__tests__/integration/` | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.                                                                                           |
+| File                       | Responsibility                                                                                                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `medical.route.tsx`        | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                               |
+| `medical.manifest.ts`      | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                                            |
+| `medical.constants.ts`     | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                                            |
+| `medical.search.ts`        | The tabs' URL reader (`validateMedicalSearch`).                                                                                                                                             |
+| `medical.dialog-search.ts` | The create drawers' prefills — parsed by `useMedicalDialogRoute`; loads with the room.                                                                                                      |
+| `MedicalLayout.tsx`        | Layout over the tab routes (`<Outlet />`).                                                                                                                                                  |
+| `shared/`                  | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the drawers, pickers, stack, delete and flow confirms; the list, partner, flow and dialog-route hooks. |
+| `__tests__/integration/`   | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.                                                                                           |
 
 ## Test ids
 

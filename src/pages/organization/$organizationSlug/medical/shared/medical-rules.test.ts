@@ -9,7 +9,6 @@ import {
   MEDICINE_EXPIRY_FILTERS,
   PURCHASE_STAGES,
   SALE_STATUSES,
-  validateMedicalCreateSearch,
   validateMedicalSearch,
 } from '../medical.search.ts';
 import {
@@ -52,27 +51,6 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
       stage: undefined,
       sort: undefined,
     });
-  });
-
-  it('reads the dialog prefills', () => {
-    expect(
-      validateMedicalCreateSearch({ name: 'Azel', supplier: ID, reorder: 'low' }),
-    ).toEqual({
-      name: 'Azel',
-      supplier: ID,
-      reorder: 'low',
-      prescription: undefined,
-      customer: undefined,
-      from: undefined,
-    });
-    expect(validateMedicalCreateSearch({ supplier: 'x', reorder: 'all' })).toMatchObject({
-      supplier: undefined,
-      reorder: undefined,
-    });
-    // New sale from Today's Dispense: the prescription and the room to go back to.
-    expect(
-      validateMedicalCreateSearch({ prescription: ID, from: 'today' }),
-    ).toMatchObject({ prescription: ID, from: 'today' });
   });
 
   it('pins the filter values to the contract (the reader cannot import the schema)', () => {

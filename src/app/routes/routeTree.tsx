@@ -44,27 +44,23 @@ import { validateLoginSearch } from '@/pages/login/login.search.ts';
 import { manifest as mfaManifest } from '@/pages/mfa/mfa.manifest.ts';
 import { manifest as onboardingManifest } from '@/pages/onboarding/onboarding.manifest.ts';
 import { validateOnboardingSearch } from '@/pages/onboarding/onboarding.search.ts';
+import type {
+  AppointmentCreateSearch,
+  AppointmentSearch,
+} from '@/pages/organization/$organizationSlug/appointments/appointments.dialog-search.ts';
 import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
-import {
-  validateAppointmentCreateSearch,
-  validateAppointmentSearch,
-  validateAppointmentsSearch,
-} from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
+import { validateAppointmentsSearch } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
 import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
+import type { InvoiceCreateSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.dialog-search.ts';
 import { manifest as invoicesManifest } from '@/pages/organization/$organizationSlug/invoices/invoices.manifest.ts';
-import {
-  validateInvoiceCreateSearch,
-  validateInvoiceSearch,
-} from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
+import { validateInvoiceSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
+import type { LeadCreateSearch } from '@/pages/organization/$organizationSlug/leads/leads.dialog-search.ts';
 import { manifest as leadsManifest } from '@/pages/organization/$organizationSlug/leads/leads.manifest.ts';
-import {
-  validateLeadCreateSearch,
-  validateLeadsSearch,
-} from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { validateLeadsSearch } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
 import { manifest as medicalManufacturersManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.manifest.ts';
+import type { MedicalCreateSearch } from '@/pages/organization/$organizationSlug/medical/medical.dialog-search.ts';
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import {
-  validateMedicalCreateSearch,
   validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '@/pages/organization/$organizationSlug/medical/medical.search.ts';
@@ -74,64 +70,58 @@ import { manifest as medicalPaymentsManifest } from '@/pages/organization/$organ
 import { manifest as medicalPurchasesManifest } from '@/pages/organization/$organizationSlug/medical/purchases/purchases.manifest.ts';
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
 import { manifest as medicalSuppliersManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/suppliers.manifest.ts';
+import type { OfferingCreateSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.dialog-search.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
-import {
-  validateOfferingCreateSearch,
-  validateOfferingsSearch,
-} from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import { validateOfferingsSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
 import { validatePatientImagesSearch } from '@/pages/organization/$organizationSlug/patients/$patientId/images/images.search.ts';
+import type {
+  PatientFeedbackDialogSearch,
+  PatientFileDialogSearch,
+  PatientRxCreateSearch,
+} from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.dialog-search.ts';
 import { manifest as patientFileManifest } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.manifest.ts';
 import {
   type PatientFileSearch,
-  validatePatientFeedbackSearch,
-  validatePatientFileDialogSearch,
   validatePatientFileSearch,
-  validatePatientRxCreateSearch,
 } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
+import type { PatientCreateSearch } from '@/pages/organization/$organizationSlug/patients/patients.dialog-search.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
-import {
-  validatePatientCreateSearch,
-  validatePatientsSearch,
-} from '@/pages/organization/$organizationSlug/patients/patients.search.ts';
+import { validatePatientsSearch } from '@/pages/organization/$organizationSlug/patients/patients.search.ts';
+import type {
+  DayCloseSearch,
+  PaymentPaySearch,
+  PaymentReceiveSearch,
+} from '@/pages/organization/$organizationSlug/payments/payments.dialog-search.ts';
 import { manifest as paymentsManifest } from '@/pages/organization/$organizationSlug/payments/payments.manifest.ts';
-import {
-  validateDayCloseSearch,
-  validatePaymentPaySearch,
-  validatePaymentReceiveSearch,
-  validatePaymentsSearch,
-} from '@/pages/organization/$organizationSlug/payments/payments.search.ts';
+import { validatePaymentsSearch } from '@/pages/organization/$organizationSlug/payments/payments.search.ts';
 import { manifest as pendingManifest } from '@/pages/organization/$organizationSlug/payments/pending/pending.manifest.ts';
 import { validatePendingSearch } from '@/pages/organization/$organizationSlug/payments/pending/pending.search.ts';
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
 import { manifest as stockMovementsManifest } from '@/pages/organization/$organizationSlug/stock/movements/movements.manifest.ts';
 import { manifest as stockPurchasesManifest } from '@/pages/organization/$organizationSlug/stock/purchases/purchases.manifest.ts';
+import type { StockCreateSearch } from '@/pages/organization/$organizationSlug/stock/stock.dialog-search.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
-import {
-  validateStockCreateSearch,
-  validateStockSearch,
-} from '@/pages/organization/$organizationSlug/stock/stock.search.ts';
+import { validateStockSearch } from '@/pages/organization/$organizationSlug/stock/stock.search.ts';
 import { manifest as stockVendorsManifest } from '@/pages/organization/$organizationSlug/stock/vendors/vendors.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
+import type { TaskCreateSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.dialog-search.ts';
 import { manifest as tasksManifest } from '@/pages/organization/$organizationSlug/tasks/tasks.manifest.ts';
-import {
-  validateTaskCreateSearch,
-  validateTasksSearch,
-} from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { validateTodaySearch } from '@/pages/organization/$organizationSlug/today/today.search.ts';
 import { manifest as usersBranchesManifest } from '@/pages/organization/$organizationSlug/users/branches/branches.manifest.ts';
 import { validateBranchesSearch } from '@/pages/organization/$organizationSlug/users/branches/branches.search.ts';
 import { manifest as usersRolesManifest } from '@/pages/organization/$organizationSlug/users/roles/roles.manifest.ts';
+import type { UserEditSearch } from '@/pages/organization/$organizationSlug/users/users.dialog-search.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import {
   validateRolesSearch,
-  validateUserEditSearch,
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
-import { validateVisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
+import type { VisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
@@ -160,6 +150,22 @@ import { localizedRoute } from './localized-route.ts';
  * read by `PageTransition`).
  */
 const DIALOG_STATIC_DATA: StaticDataRouteOption = { dialog: true };
+
+/**
+ * A dialog route's `validateSearch`: the route keeps the URL's values as they
+ * come and only types them for the links that open it. What reads them parses
+ * them — a page's `use<Room>DialogRoute`, the Visit sheet — with the validator
+ * that loads with it (`<room>.dialog-search.ts`), so no dialog's schema rides
+ * the entry chunk.
+ */
+function dialogSearch<TSearch>(): (search: Record<string, unknown>) => TSearch {
+  return keepSearch as (search: Record<string, unknown>) => TSearch;
+}
+
+/** The one pass-through every dialog route's search shares. */
+function keepSearch(search: Record<string, unknown>): Record<string, unknown> {
+  return search;
+}
 
 // The dialog routes' manifests and components (`dialog-routes.ts`), behind ONE
 // dynamic import: this file is the entry chunk, and a dialog route opens a
@@ -801,7 +807,7 @@ const organizationLeadsRoute = createRoute({
 const organizationLeadCreateRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: 'create',
-  validateSearch: validateLeadCreateSearch,
+  validateSearch: dialogSearch<LeadCreateSearch>(),
   ...dialogRoute('leadCreate'),
 });
 
@@ -839,14 +845,14 @@ const organizationAppointmentsRoute = createRoute({
 const organizationAppointmentCreateRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: 'create',
-  validateSearch: validateAppointmentCreateSearch,
+  validateSearch: dialogSearch<AppointmentCreateSearch>(),
   ...dialogRoute('appointmentCreate'),
 });
 
 const organizationAppointmentRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: '$appointmentId',
-  validateSearch: validateAppointmentSearch,
+  validateSearch: dialogSearch<AppointmentSearch>(),
   ...dialogRoute('appointment'),
 });
 
@@ -878,7 +884,7 @@ const organizationPatientsRoute = createRoute({
 const organizationPatientCreateRoute = createRoute({
   getParentRoute: () => organizationPatientsRoute,
   path: 'create',
-  validateSearch: validatePatientCreateSearch,
+  validateSearch: dialogSearch<PatientCreateSearch>(),
   ...dialogRoute('patientCreate'),
 });
 
@@ -983,27 +989,27 @@ function patientFileDrawerRoute<const Path extends string, Search>(
 const organizationPatientEditRoute = patientFileDrawerRoute(
   'edit',
   'PatientFileEdit',
-  validatePatientFileDialogSearch,
+  dialogSearch<PatientFileDialogSearch>(),
 );
 const organizationCheckInCreateRoute = patientFileDrawerRoute(
   'check-ins/create',
   'PatientCheckInCreate',
-  validatePatientFeedbackSearch,
+  dialogSearch<PatientFeedbackDialogSearch>(),
 );
 const organizationCheckInEditRoute = patientFileDrawerRoute(
   'check-ins/$checkInId/edit',
   'PatientCheckInEdit',
-  validatePatientFeedbackSearch,
+  dialogSearch<PatientFeedbackDialogSearch>(),
 );
 const organizationReviewCreateRoute = patientFileDrawerRoute(
   'reviews/create',
   'PatientReviewCreate',
-  validatePatientFeedbackSearch,
+  dialogSearch<PatientFeedbackDialogSearch>(),
 );
 const organizationReviewEditRoute = patientFileDrawerRoute(
   'reviews/$reviewId/edit',
   'PatientReviewEdit',
-  validatePatientFeedbackSearch,
+  dialogSearch<PatientFeedbackDialogSearch>(),
 );
 
 // The photo viewer and Photo details, dialogs over Photos (S:41–42).
@@ -1029,7 +1035,7 @@ const organizationPrescriptionCreateRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: 'create',
   // `?medicines=` — the names a smart note recognised (AMBER A-F5).
-  validateSearch: validatePatientRxCreateSearch,
+  validateSearch: dialogSearch<PatientRxCreateSearch>(),
   staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('prescriptionCreate'),
   errorComponent: RouteErrorBoundary,
@@ -1093,14 +1099,14 @@ const organizationPaymentsRoute = createRoute({
 const organizationPaymentReceiveRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'receive',
-  validateSearch: validatePaymentReceiveSearch,
+  validateSearch: dialogSearch<PaymentReceiveSearch>(),
   ...dialogRoute('paymentReceive'),
 });
 
 const organizationPaymentPayRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'pay',
-  validateSearch: validatePaymentPaySearch,
+  validateSearch: dialogSearch<PaymentPaySearch>(),
   ...dialogRoute('paymentPay'),
 });
 
@@ -1113,7 +1119,7 @@ const organizationPaymentEditRoute = createRoute({
 const organizationDayCloseRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'day-close',
-  validateSearch: validateDayCloseSearch,
+  validateSearch: dialogSearch<DayCloseSearch>(),
   ...dialogRoute('dayClose'),
 });
 
@@ -1173,7 +1179,7 @@ const organizationInvoicesRoute = createRoute({
 const organizationInvoiceCreateRoute = createRoute({
   getParentRoute: () => organizationInvoicesRoute,
   path: 'create',
-  validateSearch: validateInvoiceCreateSearch,
+  validateSearch: dialogSearch<InvoiceCreateSearch>(),
   ...dialogRoute('invoiceCreate'),
 });
 
@@ -1198,7 +1204,7 @@ const organizationInvoiceEditRoute = createRoute({
 const organizationVisitRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'visits/$visitId',
-  validateSearch: validateVisitSearch,
+  validateSearch: dialogSearch<VisitSearch>(),
   ...dialogRoute('visit'),
 });
 // ── end of the Visit sheet ──
@@ -1219,7 +1225,7 @@ const organizationTasksRoute = createRoute({
 const organizationTaskCreateRoute = createRoute({
   getParentRoute: () => organizationTasksRoute,
   path: 'create',
-  validateSearch: validateTaskCreateSearch,
+  validateSearch: dialogSearch<TaskCreateSearch>(),
   ...dialogRoute('taskCreate'),
 });
 
@@ -1247,7 +1253,7 @@ const organizationOfferingsRoute = createRoute({
 const organizationOfferingCreateRoute = createRoute({
   getParentRoute: () => organizationOfferingsRoute,
   path: 'create',
-  validateSearch: validateOfferingCreateSearch,
+  validateSearch: dialogSearch<OfferingCreateSearch>(),
   ...dialogRoute('offeringCreate'),
 });
 
@@ -1307,7 +1313,7 @@ const organizationUserEditRoute = createRoute({
   getParentRoute: () => organizationUsersRoute,
   path: '$userId/edit',
   // `?from=roles` keeps Roles & access behind the drawer (H:5188).
-  validateSearch: validateUserEditSearch,
+  validateSearch: dialogSearch<UserEditSearch>(),
   ...dialogRoute('userEdit'),
 });
 
@@ -1474,7 +1480,7 @@ const organizationMedicalPaymentsRoute = createRoute({
 const organizationSaleCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalSalesRoute,
   path: 'create',
-  validateSearch: validateMedicalCreateSearch,
+  validateSearch: dialogSearch<MedicalCreateSearch>(),
   ...dialogRoute('saleCreate'),
 });
 
@@ -1493,7 +1499,7 @@ const organizationSaleReturnRoute = createRoute({
 const organizationMedicineCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalMedicinesRoute,
   path: 'create',
-  validateSearch: validateMedicalCreateSearch,
+  validateSearch: dialogSearch<MedicalCreateSearch>(),
   ...dialogRoute('medicineCreate'),
 });
 
@@ -1506,7 +1512,7 @@ const organizationMedicineEditRoute = createRoute({
 const organizationPurchaseOrderCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalPurchasesRoute,
   path: 'create',
-  validateSearch: validateMedicalCreateSearch,
+  validateSearch: dialogSearch<MedicalCreateSearch>(),
   ...dialogRoute('purchaseOrderCreate'),
 });
 
@@ -1642,7 +1648,7 @@ const organizationStockVendorsRoute = createRoute({
 const organizationStockItemCreateRoute = createRoute({
   getParentRoute: () => organizationStockItemsRoute,
   path: 'create',
-  validateSearch: validateStockCreateSearch,
+  validateSearch: dialogSearch<StockCreateSearch>(),
   ...dialogRoute('stockItemCreate'),
 });
 
@@ -1661,7 +1667,7 @@ const organizationStockCheckRoute = createRoute({
 const organizationStockPurchaseCreateRoute = createRoute({
   getParentRoute: () => organizationStockPurchasesRoute,
   path: 'create',
-  validateSearch: validateStockCreateSearch,
+  validateSearch: dialogSearch<StockCreateSearch>(),
   ...dialogRoute('stockPurchaseCreate'),
 });
 
@@ -1674,7 +1680,7 @@ const organizationStockPurchaseEditRoute = createRoute({
 const organizationStockVendorCreateRoute = createRoute({
   getParentRoute: () => organizationStockVendorsRoute,
   path: 'create',
-  validateSearch: validateStockCreateSearch,
+  validateSearch: dialogSearch<StockCreateSearch>(),
   ...dialogRoute('stockVendorCreate'),
 });
 

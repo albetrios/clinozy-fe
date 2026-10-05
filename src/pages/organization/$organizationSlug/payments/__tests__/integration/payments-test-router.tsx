@@ -18,8 +18,8 @@ import {
   validateDayCloseSearch,
   validatePaymentPaySearch,
   validatePaymentReceiveSearch,
-  validatePaymentsSearch,
-} from '../../payments.search.ts';
+} from '../../payments.dialog-search.ts';
+import { validatePaymentsSearch } from '../../payments.search.ts';
 import { PaymentsPage } from '../../PaymentsPage.tsx';
 import { validatePendingSearch } from '../../pending/pending.search.ts';
 import { PendingPage } from '../../pending/PendingPage.tsx';

@@ -9,7 +9,6 @@ import {
   STOCK_CATEGORIES,
   STOCK_MOVEMENT_KINDS,
   STOCK_PURCHASE_STATUSES,
-  validateStockCreateSearch,
   validateStockSearch,
 } from './stock.search.ts';
 
@@ -45,19 +44,6 @@ describe('stock.search.ts (the entry chunk’s reader)', () => {
     expect(validateStockSearch({ stock: 'all', sort: 'margin:asc' })).toMatchObject({
       stock: undefined,
       sort: undefined,
-    });
-  });
-
-  it('reads the dialog prefills', () => {
-    expect(validateStockCreateSearch({ reorder: 'low', name: ' Cotton rolls ' })).toEqual(
-      {
-        reorder: 'low',
-        name: 'Cotton rolls',
-      },
-    );
-    expect(validateStockCreateSearch({ reorder: 'all', name: 'x'.repeat(121) })).toEqual({
-      reorder: undefined,
-      name: undefined,
     });
   });
 

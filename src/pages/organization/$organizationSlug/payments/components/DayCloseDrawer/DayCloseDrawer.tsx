@@ -44,7 +44,7 @@ import {
   PAYMENTS_KEYS,
   PAYMENTS_NS,
 } from '../../payments.constants.ts';
-import type { DayCloseSearch } from '../../payments.search.ts';
+import type { DayCloseSearch } from '../../payments.dialog-search.ts';
 import { useDayLabel } from '../../shared/hooks/useDayLabel/index.ts';
 import { ReceivePaymentDrawer } from '../ReceivePaymentDrawer/index.ts';
 import { SendPaymentDrawer } from '../SendPaymentDrawer/index.ts';

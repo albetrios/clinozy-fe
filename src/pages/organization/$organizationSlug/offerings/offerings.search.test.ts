@@ -6,7 +6,6 @@ import { OFFERING_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   OFFERING_CATEGORY_FILTER,
   OFFERING_SORT_KEYS,
-  validateOfferingCreateSearch,
   validateOfferingsSearch,
 } from './offerings.search.ts';
 
@@ -97,20 +96,5 @@ describe('validateOfferingsSearch (S:98, D22)', () => {
     for (const key of OFFERING_SORT_KEYS) {
       expect(validateOfferingsSearch({ sort: `${key}:asc` }).sort).toBe(`${key}:asc`);
     }
-  });
-});
-
-describe('validateOfferingCreateSearch (S:99)', () => {
-  it('prefills the name it was asked with', () => {
-    expect(validateOfferingCreateSearch({ name: ' Hydra facial ' })).toEqual({
-      name: 'Hydra facial',
-    });
-  });
-
-  it('drops an empty or over-long name', () => {
-    expect(validateOfferingCreateSearch({})).toEqual({ name: undefined });
-    expect(validateOfferingCreateSearch({ name: 'x'.repeat(121) })).toEqual({
-      name: undefined,
-    });
   });
 });

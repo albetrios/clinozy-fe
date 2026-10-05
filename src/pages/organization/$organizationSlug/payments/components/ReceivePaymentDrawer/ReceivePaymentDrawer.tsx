@@ -29,7 +29,7 @@ import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
-import type { PaymentReceiveSearch } from '../../payments.search.ts';
+import type { PaymentReceiveSearch } from '../../payments.dialog-search.ts';
 import {
   emptyReceiveForm,
   halfOf,

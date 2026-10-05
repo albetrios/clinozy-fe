@@ -14,8 +14,8 @@ import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 import {
   type TaskCreateSearch,
   validateTaskCreateSearch,
-  validateTasksSearch,
-} from '../../tasks.search.ts';
+} from '../../tasks.dialog-search.ts';
+import { validateTasksSearch } from '../../tasks.search.ts';
 
 /** The dialog the Tasks URL opens over the list (KICKOFF §4, D24). */
 export type TasksDialogRoute =

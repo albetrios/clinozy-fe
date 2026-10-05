@@ -30,14 +30,15 @@ money domain: `@/shared/api/clinic/invoices-api.ts` (fixture world, `REPLACE_WIT
 
 ## Files
 
-| File                                             | Responsibility                                                               |
-| ------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `invoices.route.tsx`                             | Route marker — exports `Component` rendering `InvoicesLayout`.               |
-| `invoices.manifest.ts`                           | Manifest — `kind: 'layout'`, children `create`, `$invoiceId`.                |
-| `invoices.search.ts`                             | URL params — `?from=` everywhere; `?type=&patient=` on create.               |
-| `InvoicesLayout.tsx`                             | The host — the drawer or the preview the URL names; nothing at the bare URL. |
-| `hooks/useInvoicesDialogRoute/`                  | Reads the URL into the dialog, reads the invoice, closes to `from`.          |
-| `__tests__/integration/invoices-test-router.tsx` | Test harness — the island's routes in a memory router.                       |
+| File                                             | Responsibility                                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `invoices.route.tsx`                             | Route marker — exports `Component` rendering `InvoicesLayout`.                               |
+| `invoices.manifest.ts`                           | Manifest — `kind: 'layout'`, children `create`, `$invoiceId`.                                |
+| `invoices.search.ts`                             | URL params — `?from=` on every invoice route (entry chunk).                                  |
+| `invoices.dialog-search.ts`                      | New invoice's `?type=&patient=` — parsed by `useInvoicesDialogRoute`; loads with the drawer. |
+| `InvoicesLayout.tsx`                             | The host — the drawer or the preview the URL names; nothing at the bare URL.                 |
+| `hooks/useInvoicesDialogRoute/`                  | Reads the URL into the dialog, reads the invoice, closes to `from`.                          |
+| `__tests__/integration/invoices-test-router.tsx` | Test harness — the island's routes in a memory router.                                       |
 
 ## Test ids
 

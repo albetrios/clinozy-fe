@@ -22,8 +22,8 @@ import { notify } from '@/shared/notify/index.ts';
 import {
   type InvoiceCreateSearch,
   validateInvoiceCreateSearch,
-  validateInvoiceSearch,
-} from '../../invoices.search.ts';
+} from '../../invoices.dialog-search.ts';
+import { validateInvoiceSearch } from '../../invoices.search.ts';
 
 /** The dialog the invoices URL opens (KICKOFF §4, D24; `S:92–94`). */
 export type InvoicesDialogRoute =

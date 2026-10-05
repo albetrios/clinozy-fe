@@ -46,23 +46,23 @@ The data is the shared Visit model: `@/shared/api/clinic/visits-api.ts`,
 
 ## Files
 
-| File                         | Responsibility                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------- |
-| `visits.route.tsx`           | Route marker — exports `Component` rendering `VisitPage`.                             |
-| `visits.manifest.ts`         | Manifest — `kind: 'leaf'`, module `clinic-today`, permission `organization:read`.     |
-| `visits.search.ts`           | `?tab=` (rides the entry chunk: one reader, one list).                                |
-| `visits.constants.ts`        | `VISIT_NS` (Today's namespace), `VISIT_KEYS`, `VISIT_TEST_IDS`, the tabs and filters. |
-| `VisitPage.tsx`              | The visit read, the tabs the member may use, the not-found and refusal ways back.     |
-| `visits.bill.ts`             | Checkout's lines and totals from the money module; the amount field's rupees.         |
-| `visits.rx.ts`               | The Rx draft lines: copied, added, dosed, Approve's readiness.                        |
-| `visits.person.ts`           | The masked number and the consent marks of the header band.                           |
-| `components/VisitSheet/`     | The dialog, the header band, the tab row and the save label.                          |
-| `components/VisitHistory/`   | History and "Next for this visit".                                                    |
-| `components/VisitConsult/`   | Relevant history, the consult note, the Rx lines and Approve.                         |
-| `components/VisitTreatment/` | The session, its settings and areas, Complete / Reverse, the photo comparison.        |
-| `components/VisitCheckout/`  | The bill and the payment.                                                             |
-| `hooks/useVisitSave/`        | The tabs' writes and their outcomes (refusal toast, "Couldn't save" with Retry).      |
-| `store/useVisitDraftStore/`  | The sheet's drafts, per visit, in memory.                                             |
+| File                         | Responsibility                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `visits.route.tsx`           | Route marker — exports `Component` rendering `VisitPage`.                                                                 |
+| `visits.manifest.ts`         | Manifest — `kind: 'leaf'`, module `clinic-today`, permission `organization:read`.                                         |
+| `visits.search.ts`           | `?tab=` — the route keeps the raw value and the sheet parses it, so the reader loads with the sheet, not the entry chunk. |
+| `visits.constants.ts`        | `VISIT_NS` (Today's namespace), `VISIT_KEYS`, `VISIT_TEST_IDS`, the tabs and filters.                                     |
+| `VisitPage.tsx`              | The visit read, the tabs the member may use, the not-found and refusal ways back.                                         |
+| `visits.bill.ts`             | Checkout's lines and totals from the money module; the amount field's rupees.                                             |
+| `visits.rx.ts`               | The Rx draft lines: copied, added, dosed, Approve's readiness.                                                            |
+| `visits.person.ts`           | The masked number and the consent marks of the header band.                                                               |
+| `components/VisitSheet/`     | The dialog, the header band, the tab row and the save label.                                                              |
+| `components/VisitHistory/`   | History and "Next for this visit".                                                                                        |
+| `components/VisitConsult/`   | Relevant history, the consult note, the Rx lines and Approve.                                                             |
+| `components/VisitTreatment/` | The session, its settings and areas, Complete / Reverse, the photo comparison.                                            |
+| `components/VisitCheckout/`  | The bill and the payment.                                                                                                 |
+| `hooks/useVisitSave/`        | The tabs' writes and their outcomes (refusal toast, "Couldn't save" with Retry).                                          |
+| `store/useVisitDraftStore/`  | The sheet's drafts, per visit, in memory.                                                                                 |
 
 ## Test ids
 

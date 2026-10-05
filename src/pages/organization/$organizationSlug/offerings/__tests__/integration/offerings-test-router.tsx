@@ -13,10 +13,8 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import {
-  validateOfferingCreateSearch,
-  validateOfferingsSearch,
-} from '../../offerings.search.ts';
+import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
+import { validateOfferingsSearch } from '../../offerings.search.ts';
 import { OfferingsPage } from '../../OfferingsPage.tsx';
 import { validateOffersSearch } from '../../offers/offers.search.ts';
 import { OffersPage } from '../../offers/OffersPage.tsx';

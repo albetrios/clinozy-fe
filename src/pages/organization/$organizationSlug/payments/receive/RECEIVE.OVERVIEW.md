@@ -1,7 +1,7 @@
 # `pages/organization/$organizationSlug/payments/receive` — Receive payment
 
 Route: `/organization/$organizationSlug/payments/receive` (`S:85`) — a URL-driven dialog over the Payments ledger (KICKOFF §4, D24).
-The route renders nothing: the Payments ledger reads the URL and opens the Receive payment drawer over itself. `?patient=&invoice=` prefill it (the Patients row's Collect, the patient file's Collect, ⌘K "New receipt") and `from` keeps the room it was opened from behind it (A-P1) — parsed by `validatePaymentReceiveSearch` in the parent's `../payments.search.ts`.
+The route renders nothing: the Payments ledger reads the URL and opens the Receive payment drawer over itself. `?patient=&invoice=` prefill it (the Patients row's Collect, the patient file's Collect, ⌘K "New receipt") and `from` keeps the room it was opened from behind it (A-P1) — parsed by `validatePaymentReceiveSearch` in the parent's `../payments.dialog-search.ts`.
 Gated like the room — membership (`organization:read`) and the `clinic-payments` module, then
 `requireOrgStatus`; in-room access is `useClinicAccess`.
 

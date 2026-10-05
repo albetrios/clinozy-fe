@@ -1,9 +1,9 @@
 /**
- * URL search params of the Visit sheet (consumed by routeTree's
- * `validateSearch`; KICKOFF §4, §6.13): the open tab — History by default,
- * left out of the URL. This module rides the entry chunk, so it is the shared
- * reader and one literal list; the tabs' type is the access module's
- * (`visit-access.ts`), checked here at compile time.
+ * URL search params of the Visit sheet (KICKOFF §4, §6.13): the open tab —
+ * History by default, left out of the URL. The sheet's route only types its
+ * search from here (`dialogSearch` in `routeTree.tsx`) and the sheet parses
+ * it, so this module loads with the sheet, not the entry chunk; the tabs' type
+ * is the access module's (`visit-access.ts`), checked here at compile time.
  */
 import { oneOf } from '@/lib/routes/search-params.ts';
 import type { VisitTab } from '@/shared/clinic/visit-access.ts';

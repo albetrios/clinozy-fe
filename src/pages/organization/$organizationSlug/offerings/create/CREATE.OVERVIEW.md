@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/offerings/create` — a URL-driven dialo
 Offerings tab (KICKOFF §4, D24; `S:99`). The route renders nothing: the Offerings page reads
 the URL and opens the New offering drawer over the list, so a refresh or a shared link
 reopens it. `?name=` prefills the drawer's Name — parsed by `validateOfferingCreateSearch` in
-the parent's `../offerings.search.ts` (at most 120 characters, the contract's; the drawer
+the parent's `../offerings.dialog-search.ts` (at most 120 characters, the contract's; the drawer
 keeps the first 60). Gated like the room — membership (`organization:read`) and the
 `clinic-offerings` module, then `requireOrgStatus`; in-room Create is `useClinicAccess` —
 without it the list sends the link back with the permission toast. The drawer is the room's

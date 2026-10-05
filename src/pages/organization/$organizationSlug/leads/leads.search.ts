@@ -1,22 +1,15 @@
 /**
  * URL search-param schemas for the Leads room (consumed by routeTree's
  * `validateSearch`): the list's view, search, filters and sort (KICKOFF §6.3,
- * `S:22`), and the New lead prefill on `create/` (`S:23`). A value the URL
- * can't hold — an unknown status, a bad date range — is dropped, never an
- * error. Defaults stay out of the URL (`/leads` is the Mine view).
+ * `S:22`). A value the URL can't hold — an unknown status, a bad date range —
+ * is dropped, never an error. Defaults stay out of the URL (`/leads` is the
+ * Mine view). New lead's prefill is `leads.dialog-search.ts`'s, off the entry.
  *
  * The contract's values are declared here, not imported: `routeTree.tsx` is the
  * entry chunk, and the generated schema module is pages of zod. The test pins
  * each list to the contract's enum.
  */
-import {
-  listOf,
-  oneOf,
-  queryOf,
-  RECORD_ID,
-  sortOf,
-  textOf,
-} from '@/lib/routes/search-params.ts';
+import { listOf, oneOf, queryOf, RECORD_ID, sortOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   type FollowUpFilter,
@@ -30,7 +23,6 @@ import type {
   LeadSortKey,
   LeadView,
 } from '@/shared/api/clinic/leads-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 const VIEWS = ['mine', 'unread', 'all'] as const satisfies readonly LeadView[];
 const STATUSES = [
@@ -101,29 +93,5 @@ export function validateLeadsSearch(search: Record<string, unknown>): LeadsSearc
     created: readCreatedFilter(search.created),
     followUp: readFollowUpFilter(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),
-  };
-}
-
-/** The New lead prefill (`S:23`; ⌘K "New lead", contact card "+ Lead"). */
-export interface LeadCreateSearch {
-  /** The person's name, as given (≤ 120 characters, the contract's). */
-  name?: string;
-  /** Their mobile, E.164 — a typed or pasted 10-digit Indian mobile. */
-  phone?: string;
-}
-
-/**
- * Parse the `/leads/create` prefill. Both values are personal data: the
- * telemetry scrub filters `name` and `phone` from every captured URL
- * (`SENSITIVE_QUERY_PARAMS`).
- */
-export function validateLeadCreateSearch(
-  search: Record<string, unknown>,
-): LeadCreateSearch {
-  const name = textOf(search.name);
-  const phone = textOf(search.phone);
-  return {
-    name: name && name.length <= 120 ? name : undefined,
-    phone: (phone && toClinicPhone(phone)) || undefined,
   };
 }

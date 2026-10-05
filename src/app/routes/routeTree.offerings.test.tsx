@@ -5,10 +5,7 @@ import { requireOrgStatus } from '@/app/guards/org-gates.ts';
 import { manifest as offeringEditManifest } from '@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.manifest.ts';
 import { manifest as offeringCreateManifest } from '@/pages/organization/$organizationSlug/offerings/create/create.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
-import {
-  validateOfferingCreateSearch,
-  validateOfferingsSearch,
-} from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
+import { validateOfferingsSearch } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
 import { manifest as offerEditManifest } from '@/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/edit.manifest.ts';
 import { manifest as offerCreateManifest } from '@/pages/organization/$organizationSlug/offerings/offers/create/create.manifest.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
@@ -96,12 +93,13 @@ describe('the Offerings room’s routes (KICKOFF §4, D24, S:98–103)', () => {
     ]);
   });
 
-  it('validates each tab’s own search, and the New offering prefill', () => {
+  it('validates each tab’s own search, and keeps New offering’s prefill for the tab to parse', () => {
     expect(routeOf(OFFERINGS)?.options.validateSearch).toBe(validateOfferingsSearch);
     expect(routeOf(OFFERS)?.options.validateSearch).toBe(validateOffersSearch);
-    expect(routeOf(OFFERING_CREATE)?.options.validateSearch).toBe(
-      validateOfferingCreateSearch,
-    );
+    const raw = { name: '  Peel  ' };
+    const validate = routeOf(OFFERING_CREATE)?.options.validateSearch as
+      ((search: object) => object) | undefined;
+    expect(validate?.(raw)).toBe(raw);
   });
 
   it.each([

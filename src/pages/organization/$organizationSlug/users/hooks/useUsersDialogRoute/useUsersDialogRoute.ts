@@ -11,7 +11,8 @@ import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { type UserEditSearch, validateUsersSearch } from '../../users.search.ts';
+import type { UserEditSearch } from '../../users.dialog-search.ts';
+import { validateUsersSearch } from '../../users.search.ts';
 
 /** The drawer the Users URL opens over its page (KICKOFF §4, D24). */
 export type UsersDialog =

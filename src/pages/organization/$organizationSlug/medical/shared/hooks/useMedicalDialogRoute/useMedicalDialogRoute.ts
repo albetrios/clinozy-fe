@@ -10,7 +10,7 @@ import {
 import {
   type MedicalCreateSearch,
   validateMedicalCreateSearch,
-} from '../../../medical.search.ts';
+} from '../../../medical.dialog-search.ts';
 import { useMedicalNav } from '../useMedicalNav/index.ts';
 
 /** The dialog a Medical tab's URL opens over its list, with Medical's create prefill. */

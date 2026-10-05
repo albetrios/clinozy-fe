@@ -35,8 +35,8 @@ import { PatientPackagesPage } from '../../packages/PatientPackagesPage.tsx';
 import {
   validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
-  validatePatientFileSearch,
-} from '../../patient-id.search.ts';
+} from '../../patient-id.dialog-search.ts';
+import { validatePatientFileSearch } from '../../patient-id.search.ts';
 import { PatientFileLayout } from '../../PatientFileLayout.tsx';
 import { PatientPaymentsPage } from '../../payments/PatientPaymentsPage.tsx';
 import { PatientPrescriptionsPage } from '../../prescriptions/PatientPrescriptionsPage.tsx';

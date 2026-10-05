@@ -20,8 +20,8 @@ import {
   validateDayCloseSearch,
   validatePaymentPaySearch,
   validatePaymentReceiveSearch,
-  validatePaymentsSearch,
-} from '../../payments.search.ts';
+} from '../../payments.dialog-search.ts';
+import { validatePaymentsSearch } from '../../payments.search.ts';
 
 /** The dialog the Payments URL opens over the ledger (KICKOFF §4, D24). */
 export type PaymentsDialogRoute =

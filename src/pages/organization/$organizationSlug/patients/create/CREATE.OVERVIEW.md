@@ -5,7 +5,7 @@ Patients list (KICKOFF §4, D24; `S:31`). The route renders nothing: the Patient
 the URL and opens the New patient drawer over the list, so a refresh or a shared link
 reopens it. `?name=&phone=&fromLead=` prefill the drawer (⌘K "New patient", the contact
 card's "+ Patient") — parsed by `validatePatientCreateSearch` in the parent's
-`../patients.search.ts` (an invalid mobile is dropped; a valid one arrives E.164;
+`../patients.dialog-search.ts` (an invalid mobile is dropped; a valid one arrives E.164;
 `fromLead` must be a record id), and `name` / `phone` are scrubbed from telemetry
 (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership (`organization:read`) and the
 `clinic-patients` module, then `requireOrgStatus`; in-room Create is `useClinicAccess` —

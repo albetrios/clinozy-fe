@@ -52,11 +52,11 @@ import {
   useRoleDirectory,
 } from './shared/hooks/useRoleDirectory/index.ts';
 import { TEAM_TABLE_ID, USERS_KEYS, USERS_NS } from './users.constants.ts';
+import { validateUserEditSearch } from './users.dialog-search.ts';
 import {
   TEAM_STATUS_VALUES,
   type TeamSortColumn,
   type UsersSearch,
-  validateUserEditSearch,
   validateUsersSearch,
 } from './users.search.ts';
 

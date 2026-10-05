@@ -19,8 +19,8 @@ import {
   type AppointmentCreateSearch,
   validateAppointmentCreateSearch,
   validateAppointmentSearch,
-  validateAppointmentsSearch,
-} from '../../appointments.search.ts';
+} from '../../appointments.dialog-search.ts';
+import { validateAppointmentsSearch } from '../../appointments.search.ts';
 
 /**
  * A booking's prefill (`S:27`): the create route's own params, and the page's

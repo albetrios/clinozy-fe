@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/invoices/create` (`S:92`) — a URL-driv
 referrer (KICKOFF §4, D24). The route renders nothing: the invoices island reads the URL and
 opens the shared Invoice drawer. `?type=clinic|medical|consultation&patient=` prefill it and
 `?from=` keeps the room it was opened from — parsed by `validateInvoiceCreateSearch` in the
-parent's `../invoices.search.ts`. Without Payments Create the link lands on the ledger with the
+parent's `../invoices.dialog-search.ts`. Without Payments Create the link lands on the ledger with the
 permission toast.
 
 ## Files

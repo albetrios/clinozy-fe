@@ -8,7 +8,10 @@ import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 
 import { LEADS_KEYS, LEADS_NS } from '../../leads.constants.ts';
-import { type LeadCreateSearch, validateLeadCreateSearch } from '../../leads.search.ts';
+import {
+  type LeadCreateSearch,
+  validateLeadCreateSearch,
+} from '../../leads.dialog-search.ts';
 
 /** The dialog the Leads URL opens over the list (KICKOFF §4, D24). */
 export type LeadsDialogRoute =

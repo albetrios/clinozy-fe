@@ -10,7 +10,7 @@ import {
 } from '@/shared/clinic/patient-file-sections.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import type { PatientFileDialogSearch } from '../../../patient-id.search.ts';
+import { validatePatientFileDialogSearch } from '../../../patient-id.dialog-search.ts';
 
 /** What a file-level dialog route reads (`edit/`, `check-ins/*`, `reviews/*`). */
 export interface PatientFileDialog {
@@ -30,7 +30,8 @@ export function usePatientFileDialog({
   canOpen,
 }: { canOpen?: boolean } = {}): PatientFileDialog {
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
-  const search: PatientFileDialogSearch = useSearch({ strict: false });
+  // The route keeps the raw values (its search is typed only); parsed here.
+  const search = validatePatientFileDialogSearch(useSearch({ strict: false }));
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = useNavigate();
   const { t } = useTranslation(ERRORS_NS);

@@ -1,7 +1,8 @@
 /**
  * URL search-param schema for the Clinic stock tabs (consumed by routeTree's
  * `validateSearch`; KICKOFF §6.8, `S:72–83`): each tab's search, filters and
- * sort, and the dialog routes' prefills. One reader serves every tab — each
+ * sort; the dialog routes' prefills are `stock.dialog-search.ts`'s, off the
+ * entry chunk. One reader serves every tab — each
  * reads only its own keys — so the entry chunk carries one parser. A value
  * the URL can't hold is dropped, never an error; defaults stay out of the URL.
  *
@@ -17,7 +18,6 @@ import {
   queryOf,
   RECORD_ID,
   sortOf,
-  textOf,
 } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
@@ -115,24 +115,5 @@ export function validateStockSearch(search: Record<string, unknown>): StockSearc
     vendor: matchOf(RECORD_ID, search.vendor),
     type: listIn(STOCK_MOVEMENT_KINDS, search.type),
     item: matchOf(RECORD_ID, search.item),
-  };
-}
-
-/** The dialog routes' prefills: New purchase's `?reorder=low` (`S:79`). */
-export interface StockCreateSearch {
-  /** "Reorder low items": every item at or below its minimum. */
-  reorder?: 'low';
-  /** A typed name (≤ 120 characters) — New item, New clinic vendor. */
-  name?: string;
-}
-
-/** Parse a Clinic stock dialog route's prefill. */
-export function validateStockCreateSearch(
-  search: Record<string, unknown>,
-): StockCreateSearch {
-  const name = textOf(search.name);
-  return {
-    reorder: oneOf(['low'] as const, search.reorder),
-    name: name && name.length <= 120 ? name : undefined,
   };
 }

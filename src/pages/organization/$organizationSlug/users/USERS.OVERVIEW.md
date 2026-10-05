@@ -37,7 +37,8 @@ days and hours (`shared/hooks/useHoursFormat/`).
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                         |
 | `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `clinic-users`, nav `users`.            |
-| `users.search.ts`                 | `validateUsersSearch` (`q`, `role`, `branch`, `status`, `created`, `sort`), `validateRolesSearch`, `validateUserEditSearch` (`from`).             |
+| `users.search.ts`                 | `validateUsersSearch` (`q`, `role`, `branch`, `status`, `created`, `sort`), `validateRolesSearch`.                                                |
+| `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                       |
 | `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                        |
 | `UsersPage.tsx`                   | The Team (or Roles & access, `from=roles`): toolbar, table, row actions, bulk Export, the user drawers and the delete confirm. Owns `users-page`. |
 | `components/TeamCells/`           | The Team's cells (ID, User, Roles with "Main role" / "Also", Branches, Status with the invitation).                                               |

@@ -15,10 +15,8 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import {
-  validateOfferingCreateSearch,
-  validateOfferingsSearch,
-} from '../../offerings.search.ts';
+import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
+import { validateOfferingsSearch } from '../../offerings.search.ts';
 import {
   type OfferingsDialogRoute,
   useOfferingsDialogRoute,

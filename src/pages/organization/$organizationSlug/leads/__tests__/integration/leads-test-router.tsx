@@ -10,7 +10,8 @@ import {
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import { validateLeadCreateSearch, validateLeadsSearch } from '../../leads.search.ts';
+import { validateLeadCreateSearch } from '../../leads.dialog-search.ts';
+import { validateLeadsSearch } from '../../leads.search.ts';
 
 /**
  * The Leads family as `routeTree.tsx` registers it — the list with its search

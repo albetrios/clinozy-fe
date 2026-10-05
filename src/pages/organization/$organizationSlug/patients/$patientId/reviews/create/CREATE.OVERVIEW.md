@@ -7,7 +7,7 @@ names none, as the schema has it — taken from the file's sections module
 family-shared review drawer over it (`../../shared/components/ReviewDrawer/`), on the source
 `?source=` names (Google when none) and tied to the visit `?appointment=` names. Saving or
 closing goes back to that section. The params are parsed by `validatePatientFeedbackSearch`
-in `../../patient-id.search.ts`.
+in `../../patient-id.dialog-search.ts`.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
 Patients edit is `useClinicAccess` — anyone without it who follows the link lands back on the

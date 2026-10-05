@@ -9,7 +9,7 @@ import {
 import {
   type StockCreateSearch,
   validateStockCreateSearch,
-} from '../../../stock.search.ts';
+} from '../../../stock.dialog-search.ts';
 import { useStockNav } from '../useStockNav/index.ts';
 
 /** Options of {@link useStockDialogRoute}. */

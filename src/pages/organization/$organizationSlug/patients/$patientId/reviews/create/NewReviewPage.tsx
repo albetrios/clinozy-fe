@@ -5,7 +5,7 @@ import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
-import type { PatientFeedbackDialogSearch } from '../../patient-id.search.ts';
+import { validatePatientFeedbackSearch } from '../../patient-id.dialog-search.ts';
 import { PATIENT_FILE_SECTION_PAGES } from '../../patient-id.sections.ts';
 import { ReviewDrawer } from '../../shared/components/ReviewDrawer/index.ts';
 import { usePatientFileDialog } from '../../shared/hooks/usePatientFileDialog/index.ts';
@@ -19,7 +19,8 @@ import { usePatientFileContext } from '../../shared/patient-file-context.ts';
  * anyone else lands back on the section with the permission toast.
  */
 export function NewReviewPage() {
-  const search: PatientFeedbackDialogSearch = useSearch({ strict: false });
+  // The route keeps the raw values (its search is typed only); parsed here.
+  const search = validatePatientFeedbackSearch(useSearch({ strict: false }));
   const { patientId, file } = usePatientFileContext();
   const access = useClinicAccess();
   const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;

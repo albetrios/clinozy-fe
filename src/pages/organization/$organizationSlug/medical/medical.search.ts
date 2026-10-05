@@ -1,7 +1,8 @@
 /**
  * URL search-param schema for the Medical room's tabs (consumed by
  * routeTree's `validateSearch`; KICKOFF §6.7, `S:49–71`): each tab's search,
- * filters and sort, and the dialog routes' prefills. One reader serves every
+ * filters and sort; the dialog routes' prefills are
+ * `medical.dialog-search.ts`'s, off the entry chunk. One reader serves every
  * tab — each tab reads only its own keys — so the entry chunk carries one
  * parser, not seven. A value the URL can't hold is dropped, never an error;
  * defaults stay out of the URL.
@@ -99,48 +100,6 @@ export function validateMedicalSearch(search: Record<string, unknown>): MedicalS
     stage: oneOf(PURCHASE_STAGES, search.stage),
     suppliers: ids(search.suppliers),
     mrs: ids(search.mrs),
-  };
-}
-
-/**
- * The dialog routes' prefills: New medicine's `?name=`, New purchase order's
- * `?supplier=&reorder=low`, New sale's `?prescription=&customer=&from=`.
- */
-export interface MedicalCreateSearch {
-  /** A typed medicine name (≤ 120 characters). */
-  name?: string;
-  /** The supplier a new purchase order starts on. */
-  supplier?: string;
-  /** "Reorder low stock": every medicine at or below its reorder level (`S:57`). */
-  reorder?: 'low';
-  /** The prescription a new sale fills (`S:50`). */
-  prescription?: string;
-  /** The customer a new sale starts on. */
-  customer?: string;
-  /**
-   * The room New sale opened from and closes back to — Today's Dispense sends
-   * `from=today` (KICKOFF §4, AMBER A-P1). Raw here; the close checks it
-   * against the referrer allow-list (`safeReferrer`).
-   */
-  from?: string;
-}
-
-/** Parse a Medical dialog route's prefill. */
-export function validateMedicalCreateSearch(
-  search: Record<string, unknown>,
-): MedicalCreateSearch {
-  const name = textOf(search.name);
-  const one = (value: unknown) => {
-    const text = textOf(value);
-    return RECORD_ID.test(text) ? text : undefined;
-  };
-  return {
-    name: name && name.length <= 120 ? name : undefined,
-    supplier: one(search.supplier),
-    reorder: oneOf(['low'] as const, search.reorder),
-    prescription: one(search.prescription),
-    customer: one(search.customer),
-    from: textOf(search.from) || undefined,
   };
 }
 

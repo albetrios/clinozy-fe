@@ -12,7 +12,8 @@ import {
   type StockTab,
 } from '@/lib/routes/stock-builders.ts';
 
-import { type StockCreateSearch, validateStockSearch } from '../../../stock.search.ts';
+import type { StockCreateSearch } from '../../../stock.dialog-search.ts';
+import { validateStockSearch } from '../../../stock.search.ts';
 
 /** The list params a dialog route keeps from its tab: the search, filters and sort. */
 const listSearch = (current: Record<string, unknown>) => validateStockSearch(current);

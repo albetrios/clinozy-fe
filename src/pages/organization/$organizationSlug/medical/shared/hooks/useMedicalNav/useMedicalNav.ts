@@ -18,10 +18,8 @@ import {
 } from '@/lib/routes/medical-builders.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 
-import {
-  type MedicalCreateSearch,
-  validateMedicalSearch,
-} from '../../../medical.search.ts';
+import type { MedicalCreateSearch } from '../../../medical.dialog-search.ts';
+import { validateMedicalSearch } from '../../../medical.search.ts';
 
 /** A Medical tab with a create dialog route. */
 export type MedicalCreateTab = Exclude<MedicalTab, 'payments'>;

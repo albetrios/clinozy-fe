@@ -7,7 +7,7 @@ names none, as the schema has it — taken from the file's sections module
 family-shared check-in drawer over it (`../../shared/components/CheckInDrawer/`): an aftercare
 check-in when `?treatment=` names the treatment it follows, tied to the visit `?appointment=`
 names. Saving or closing goes back to that section. The params are parsed by
-`validatePatientFeedbackSearch` in `../../patient-id.search.ts`.
+`validatePatientFeedbackSearch` in `../../patient-id.dialog-search.ts`.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
 Patients edit is `useClinicAccess` — anyone without it who follows the link lands back on the

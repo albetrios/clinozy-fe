@@ -13,7 +13,7 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { VisitSheet } from './components/VisitSheet/index.ts';
 import { VISIT_KEYS, VISIT_NS, VISIT_TABS } from './visits.constants.ts';
-import type { VisitSearch } from './visits.search.ts';
+import { validateVisitSearch } from './visits.search.ts';
 
 /**
  * The Visit sheet's page (`/visits/$visitId`; KICKOFF §6.13, D18): the visit
@@ -27,7 +27,8 @@ export function VisitPage() {
   const { t } = useTranslation([VISIT_NS, ERRORS_NS]);
   const navigate = useNavigate();
   const { organizationSlug = '', visitId } = useParams({ strict: false });
-  const search: VisitSearch = useSearch({ strict: false });
+  // The route keeps the raw values (its search is typed only); parsed here.
+  const search = validateVisitSearch(useSearch({ strict: false }));
   const access = useClinicAccess();
   const left = useRef(false);
 

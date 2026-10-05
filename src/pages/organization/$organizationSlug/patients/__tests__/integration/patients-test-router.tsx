@@ -16,10 +16,8 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import {
-  validatePatientCreateSearch,
-  validatePatientsSearch,
-} from '../../patients.search.ts';
+import { validatePatientCreateSearch } from '../../patients.dialog-search.ts';
+import { validatePatientsSearch } from '../../patients.search.ts';
 
 /**
  * The Patients family as `routeTree.tsx` registers it — the list with its

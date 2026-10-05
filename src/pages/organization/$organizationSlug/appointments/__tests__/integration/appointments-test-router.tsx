@@ -16,8 +16,8 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import {
   validateAppointmentCreateSearch,
   validateAppointmentSearch,
-  validateAppointmentsSearch,
-} from '../../appointments.search.ts';
+} from '../../appointments.dialog-search.ts';
+import { validateAppointmentsSearch } from '../../appointments.search.ts';
 import { AppointmentActionsProvider } from '../../components/AppointmentActions/index.ts';
 
 /** The Appointments page's path in the tests. */

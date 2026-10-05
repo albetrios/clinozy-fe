@@ -8,10 +8,8 @@ import type { PatientDrawerPrefill } from '@/shared/components/PatientDrawer/ind
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  validatePatientCreateSearch,
-  validatePatientsSearch,
-} from '../../patients.search.ts';
+import { validatePatientCreateSearch } from '../../patients.dialog-search.ts';
+import { validatePatientsSearch } from '../../patients.search.ts';
 
 /** The dialog the Patients URL opens over the list (KICKOFF §4, D24). */
 export type PatientsDialogRoute =
