@@ -32,6 +32,7 @@ import {
 } from './leads-api.ts';
 import type { LeadListParams } from './leads-contracts.ts';
 import { LEAD_HOLD_DAYS, leadHold } from './leads-hold.ts';
+import { fetchTaskPage } from './tasks-api.ts';
 
 const RS = staffRef('RS');
 const NK = staffRef('NK');
@@ -513,6 +514,23 @@ describe('the drawer’s save and its side effects (saveLead, Q-T3)', () => {
     expect(await countOpenLeadTasks(id)).toBe(0);
     expect(messagesOf(id)).toHaveLength(before);
     expect((await failureOf(undoLeadChange(saved.undoToken))).status).toBe(409);
+  });
+
+  it('leaves one follow-up task on its due day — the follow rule counts the status’s own', async () => {
+    const id = ref.lead(2363);
+    const followUps = async () =>
+      (await fetchTaskPage({ scope: 'everyone' })).rows
+        .filter((row) => row.leadId === id && row.title.startsWith('Follow'))
+        .map((row) => row.title);
+    await saveLead(id, { status: 'follow_up' }, RS);
+    // A second move to Follow-up the same day opens nothing more.
+    await saveLead(id, { status: 'contacted' }, RS);
+    await saveLead(id, { status: 'follow_up' }, RS);
+    expect(await followUps()).toEqual(['Follow-up']);
+
+    // 11:30 on the due day: the follow rule's condition is met — Follow-up, its date today.
+    vi.setSystemTime(new Date('2026-10-04T06:00:00Z'));
+    expect(await followUps()).toEqual(['Follow-up']);
   });
 
   it('opens one Call back on No response, never a second while it is open', async () => {

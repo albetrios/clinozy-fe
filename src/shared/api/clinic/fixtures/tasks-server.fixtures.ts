@@ -969,11 +969,14 @@ function createdSourceOf(
 /**
  * {@link createTask}'s write inside another operation's `change` — a lead's
  * status side effects open their task this way, so one Undo takes the status
- * and its task back together.
+ * and its task back together. `standsFor` names the rule match a task opened
+ * ahead of the job stands for (a Follow-up status's task is the "follow"
+ * rule's for its day): the job counts its key and never opens a second.
  */
 export async function createTaskIn(
   change: FixtureChange,
   raw: CreateTaskInput,
+  standsFor?: { ruleKey: string },
 ): Promise<TaskRecord> {
   const input = validateClinicInput(createTaskInputSchema, raw);
   if (input.ownerId) activeStaff(input.ownerId);
@@ -994,6 +997,7 @@ export async function createTaskIn(
     ...createdSourceOf(followed, patientId, leadId),
     dueAt: input.dueAt,
     ...OPEN_TASK,
+    ruleKey: standsFor?.ruleKey ?? null,
     rule: input.rule,
     manualType: input.manualType,
     priority: input.priority,

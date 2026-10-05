@@ -577,19 +577,23 @@ async function leadUndoRecords(): Promise<Map<string, LeadUndo>> {
  * one Undo reverses them all (§7.3 — the prototype reverts only the status):
  * a moved status writes "Status → <status>" into the chat; Follow-up opens a
  * "Follow-up" task due tomorrow for the member saving and sets `followUpAt`
- * to it; No response opens a "Call back" task due tomorrow unless one is open
- * (both task kind `follow_up`, A-L5).
+ * to it — the "follow" rule's task for that day, opened ahead of the job, so
+ * the day brings no second one, and none while one for that day is open; No
+ * response opens a "Call back" task due tomorrow unless one is open (both
+ * task kind `follow_up`, A-L5).
  */
 export async function saveLead(
   id: string,
   patch: LeadPatch,
   viewerId: string | null = null,
 ): Promise<LeadSave> {
-  const [{ clinicFixtures }, { createTaskIn }, { systemLine }] = await Promise.all([
-    fixtureWorld(),
-    import('./fixtures/tasks-server.fixtures.ts'),
-    import('./fixtures/messages.fixtures.ts'),
-  ]);
+  const [{ clinicFixtures }, { createTaskIn }, { systemLine }, { taskRuleKeys }] =
+    await Promise.all([
+      fixtureWorld(),
+      import('./fixtures/tasks-server.fixtures.ts'),
+      import('./fixtures/messages.fixtures.ts'),
+      import('./fixtures/task-rules.fixtures.ts'),
+    ]);
   const saved = await clinicFixtures.leads.get(id);
   const change = recordFixtureChange();
   let lead = await change.update(
@@ -608,14 +612,25 @@ export async function saveLead(
   }
   const followUpTask = moved && lead.status === 'follow_up';
   if (followUpTask) {
-    await createTaskIn(change, {
-      title: 'Follow-up',
-      why: 'Follow up',
-      ownerId: viewerId ?? lead.ownerId,
-      leadId: id,
-      dueAt: due,
-      kind: 'follow_up',
-    });
+    const ruleKey = taskRuleKeys.follow(id, clinicToday(new Date(due)));
+    const followUpOpen =
+      clinicFixtures.tasks.snapshot(
+        (task) => task.ruleKey === ruleKey && task.status !== 'done',
+      ).length > 0;
+    if (!followUpOpen) {
+      await createTaskIn(
+        change,
+        {
+          title: 'Follow-up',
+          why: 'Follow up',
+          ownerId: viewerId ?? lead.ownerId,
+          leadId: id,
+          dueAt: due,
+          kind: 'follow_up',
+        },
+        { ruleKey },
+      );
+    }
     lead = await change.update(clinicFixtures.leads, id, { followUpAt: due });
   }
   const callBackOpen =
