@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
 import { monthDays } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
@@ -61,7 +62,8 @@ export interface FiltersCalendarProps {
 
 /**
  * The Filters' mini month calendar (H:2000–2007; `appointments.md:107`):
- * "‹ <Month YYYY> ›", S M T W T F S, 32px days with one to three load dots,
+ * "‹ <Month YYYY> ›", the two-letter weekdays ("Su Mo Tu" — the calendars'
+ * one form, `weekdayHeaders`), 32px days with one to three load dots,
  * past days at 60%, today grey, the pick dark; each day's tooltip "<date> ·
  * <n> booked". A second press on the picked day clears it; "Upcoming
  * (default)" goes back to every day from today. It keeps its own month — the
@@ -69,7 +71,8 @@ export interface FiltersCalendarProps {
  */
 export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarProps) {
   const { t } = useTranslation(APPOINTMENTS_NS);
-  const { formatDate } = useLocaleFormat();
+  const { formatDate, prefs } = useLocaleFormat();
+  const headers = weekdayHeaders(prefs.formatLocale);
   const today = clinicToday();
   const [month, setMonth] = useState(() => civilMonthStart(value ?? today));
   const days = monthDays(month);
@@ -85,7 +88,7 @@ export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarP
   );
   const booked = bookedByDay(range.data ?? []);
   const keys = APPOINTMENTS_KEYS.filters;
-  // A week of Sunday-first days, for the weekday initials.
+  // A week of Sunday-first days, for the weekday headers.
   const sunday = addCivilDays(today, -localDateOf(today).getDay());
   const weekdays = Array.from({ length: 7 }, (_, index) => addCivilDays(sunday, index));
 
@@ -130,9 +133,7 @@ export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarP
         className="text-tiny text-muted-foreground grid grid-cols-7 gap-0.5 text-center"
       >
         {weekdays.map((day) => (
-          <span key={day}>
-            {formatDate(localDateOf(day), { weekday: 'narrow' }, { civilDay: true })}
-          </span>
+          <span key={day}>{headers[localDateOf(day).getDay()]}</span>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-0.5">

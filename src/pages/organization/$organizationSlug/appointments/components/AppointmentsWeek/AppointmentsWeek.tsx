@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { addCivilDays, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
@@ -48,7 +49,7 @@ function WeekDayHeader({
   onOpen: () => void;
 }) {
   const { t } = useTranslation(APPOINTMENTS_NS);
-  const { formatDate } = useLocaleFormat();
+  const { formatDate, prefs } = useLocaleFormat();
   const day = localDateOf(date);
   const load = weekLoad(rows);
   const keys = APPOINTMENTS_KEYS.calendar;
@@ -68,7 +69,7 @@ function WeekDayHeader({
       )}
     >
       <span className="text-micro text-muted-foreground leading-[1.25]">
-        {formatDate(day, { weekday: 'short' }, { civilDay: true })}
+        {weekdayHeaders(prefs.formatLocale, 'short')[day.getDay()]}
       </span>
       <span
         className={cn(

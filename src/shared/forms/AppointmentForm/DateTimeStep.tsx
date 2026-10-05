@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
 import { monthCells } from '@/shared/api/clinic/appointment-views.ts';
 import {
@@ -106,8 +107,8 @@ function QuickDates({
 
 /**
  * The month calendar (H:2779–2781): "‹ <Month YYYY> ›" — "‹" off on the
- * current month — the weekday initials Sunday first (Q-A10), past days
- * disabled, today and the pick in sky.
+ * current month — the two-letter weekdays ("Su Mo Tu", `weekdayHeaders`)
+ * Sunday first (Q-A10), past days disabled, today and the pick in sky.
  */
 function BookingCalendar({
   draft,
@@ -125,7 +126,8 @@ function BookingCalendar({
   onPick: (date: string) => void;
 }) {
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
-  const { formatDate } = useLocaleFormat();
+  const { formatDate, prefs } = useLocaleFormat();
+  const headers = weekdayHeaders(prefs.formatLocale);
   const cells = monthCells(month);
   const sunday = addCivilDays(today, -localDateOf(today).getDay());
   const weekdays = Array.from({ length: 7 }, (_, index) => addCivilDays(sunday, index));
@@ -178,7 +180,7 @@ function BookingCalendar({
             aria-hidden="true"
             className="text-muted-foreground flex h-5 items-center justify-center text-[length:calc(var(--text-xs)*5/6)]"
           >
-            {formatDate(localDateOf(day), { weekday: 'narrow' }, { civilDay: true })}
+            {headers[localDateOf(day).getDay()]}
           </span>
         ))}
         {cells.map((day, index) => {

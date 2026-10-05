@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 
+import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { Calendar } from '@/shared/components/ui/calendar.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -14,12 +15,21 @@ function weekStartsOnFromPrefs(
 }
 
 /**
- * Locale-aware Calendar — injects `weekStartsOn` + month dropdown formatting from
- * {@link useLocaleFormat}. App code should import this instead of the vendored
- * `ui/calendar` so new date-picker surfaces honour Appearance prefs by default.
+ * Locale-aware Calendar — injects `weekStartsOn`, the month dropdown and the
+ * weekday headers from {@link useLocaleFormat}: the headers read the format
+ * locale's two-letter days ("Mo Tu We", {@link weekdayHeaders}), each named in
+ * full for a screen reader. App code should import this instead of the
+ * vendored `ui/calendar` so new date-picker surfaces honour Appearance prefs by
+ * default.
  */
-export function LocalizedCalendar({ weekStartsOn, formatters, ...props }: CalendarProps) {
-  const { formatDate, firstDayOfWeek } = useLocaleFormat();
+export function LocalizedCalendar({
+  weekStartsOn,
+  formatters,
+  labels,
+  ...props
+}: CalendarProps) {
+  const { formatDate, firstDayOfWeek, prefs } = useLocaleFormat();
+  const headers = weekdayHeaders(prefs.formatLocale);
   return (
     <Calendar
       weekStartsOn={weekStartsOn ?? weekStartsOnFromPrefs(firstDayOfWeek)}
@@ -28,7 +38,12 @@ export function LocalizedCalendar({ weekStartsOn, formatters, ...props }: Calend
         // display timezone west of the device from labelling March as Feb.
         formatMonthDropdown: (date) =>
           formatDate(date, { month: 'short' }, { civilDay: true }),
+        formatWeekdayName: (date) => headers[date.getDay()] ?? '',
         ...formatters,
+      }}
+      labels={{
+        labelWeekday: (date) => formatDate(date, { weekday: 'long' }, { civilDay: true }),
+        ...labels,
       }}
       {...props}
     />

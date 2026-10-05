@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   appointmentViewRange,
@@ -128,7 +129,8 @@ function MonthCell({ date, today, rows, fit, refreshing, onOpenDay }: MonthCellP
  * day in Day.
  */
 export function AppointmentsMonth() {
-  const { formatDate } = useLocaleFormat();
+  const { prefs } = useLocaleFormat();
+  const headers = weekdayHeaders(prefs.formatLocale, 'short');
   const navigation = useAppointmentsNavigation();
   const clock = useCalendarClock();
   const read = useCalendarRange('month');
@@ -146,9 +148,7 @@ export function AppointmentsMonth() {
           className="text-micro text-muted-foreground grid grid-cols-7 gap-1 px-1"
         >
           {weekdays.map((date) => (
-            <span key={date}>
-              {formatDate(localDateOf(date), { weekday: 'short' }, { civilDay: true })}
-            </span>
+            <span key={date}>{headers[localDateOf(date).getDay()]}</span>
           ))}
         </div>
         <div className="grid min-h-0 flex-1 auto-rows-[minmax(0,1fr)] grid-cols-7 gap-1">

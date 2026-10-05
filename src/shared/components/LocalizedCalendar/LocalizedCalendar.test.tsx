@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // Hoisted so the vi.mock factories below can reference them safely.
 const h = vi.hoisted(() => ({
   firstDayOfWeek: 'monday' as 'saturday' | 'sunday' | 'monday',
+  formatLocale: 'en-GB',
   formatDate: vi.fn<(date: Date, options?: unknown) => string>(() => 'MONTH'),
   calendarProps: vi.fn<(props: Record<string, unknown>) => void>(),
 }));
@@ -12,6 +13,7 @@ vi.mock('@/shared/hooks/useLocaleFormat/index.ts', () => ({
   useLocaleFormat: () => ({
     formatDate: h.formatDate,
     firstDayOfWeek: h.firstDayOfWeek,
+    prefs: { formatLocale: h.formatLocale },
   }),
 }));
 
@@ -35,6 +37,7 @@ function lastCalendarProps(): Record<string, unknown> {
 describe('LocalizedCalendar', () => {
   afterEach(() => {
     h.firstDayOfWeek = 'monday';
+    h.formatLocale = 'en-GB';
     h.calendarProps.mockClear();
     h.formatDate.mockClear();
   });
@@ -67,6 +70,37 @@ describe('LocalizedCalendar', () => {
       { civilDay: true },
     );
     expect(label).toBe('MONTH');
+  });
+
+  it.each([
+    ['en-GB', 'Mo'],
+    ['de-DE', 'Mo'],
+    ['ar-SA', 'ن'],
+    ['ja-JP', '月'],
+  ])(
+    'heads the weekdays in the format locale’s two letters (%s → %s for Monday)',
+    (locale, monday) => {
+      h.formatLocale = locale;
+      render(<LocalizedCalendar />);
+      const formatters = lastCalendarProps().formatters as {
+        formatWeekdayName: (date: Date) => string;
+      };
+      // react-day-picker hands each column a local-midnight Date.
+      expect(formatters.formatWeekdayName(new Date(2026, 9, 5))).toBe(monday);
+    },
+  );
+
+  it('names each weekday column in full for a screen reader', () => {
+    render(<LocalizedCalendar />);
+    const labels = lastCalendarProps().labels as {
+      labelWeekday: (date: Date) => string;
+    };
+    labels.labelWeekday(new Date(2026, 9, 5));
+    expect(h.formatDate).toHaveBeenCalledWith(
+      expect.any(Date),
+      { weekday: 'long' },
+      { civilDay: true },
+    );
   });
 
   it('preserves caller-supplied formatters alongside the injected one', () => {
