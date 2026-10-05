@@ -114,10 +114,12 @@ describe('product identity', () => {
     const html = read('index.html');
     expect(html).toContain('<title>{{PRODUCT_NAME}}</title>');
     expect(html).toContain('{{PRODUCT_THEME_COLOR}}');
-    // The boot splash: its label and its wordmark drawing.
+    // The boot splash: its label and its wordmark drawing. The wordmark span may
+    // carry more attributes (its `dir="ltr"`) on any lines Prettier puts them;
+    // what holds is that its content is the token, never a drawn name.
     expect(html).toContain('aria-label="Loading {{PRODUCT_NAME}}"');
     expect(html).toMatch(
-      /class="app-splash-word" aria-hidden="true"\s*>\{\{PRODUCT_WORDMARK\}\}</,
+      /class="app-splash-word"(?:\s+[\w-]+="[^"]*")*\s*>\{\{PRODUCT_WORDMARK\}\}</,
     );
     expect(html).not.toContain(`<title>${identity.productName}</title>`);
     const { head, tail } = wordmarkParts(identity.productName);
