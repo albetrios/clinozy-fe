@@ -2,7 +2,10 @@ import { useBlocker } from '@tanstack/react-router';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import {
+  ConfirmDialog,
+  isConfirmedWriteRunning,
+} from '@/shared/components/ConfirmDialog/index.ts';
 
 import { UNSAVED_CHANGES_KEYS, UNSAVED_CHANGES_NS } from './unsaved-changes.constants.ts';
 
@@ -30,7 +33,9 @@ export interface UseUnsavedChangesGuardOptions {
  *
  * `when` is read through a ref, so the blocker registers once and always sees
  * the latest committed value; a confirmed discard also lets the navigation its
- * own `exit` starts through, instead of asking a second time.
+ * own `exit` starts through, instead of asking a second time. So does an exit a
+ * confirm's write starts — a drawer closing after its record was deleted,
+ * cancelled or voided was answered by that confirm (L-64: one confirm).
  */
 export function useUnsavedChangesGuard({
   when,
@@ -51,7 +56,10 @@ export function useUnsavedChangesGuard({
     if (!when) discardedRef.current = false;
   }, [when]);
 
-  const shouldBlockFn = useCallback(() => whenRef.current && !discardedRef.current, []);
+  const shouldBlockFn = useCallback(
+    () => whenRef.current && !discardedRef.current && !isConfirmedWriteRunning(),
+    [],
+  );
 
   const { proceed, reset, status } = useBlocker({
     shouldBlockFn,
@@ -63,7 +71,7 @@ export function useUnsavedChangesGuard({
   const open = routeBlocked || pendingExit !== null;
 
   const confirmDiscard = useCallback((exit: () => void) => {
-    if (!whenRef.current) {
+    if (!whenRef.current || isConfirmedWriteRunning()) {
       exit();
       return;
     }

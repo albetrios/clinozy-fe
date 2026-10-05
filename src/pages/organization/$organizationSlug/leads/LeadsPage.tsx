@@ -260,7 +260,7 @@ export function LeadsPage() {
                   : undefined,
               onRelease:
                 mine && !hold.open && !hold.closed && viewerId !== null
-                  ? () => release.mutate({ id: lead.id, viewerId })
+                  ? () => release.mutate({ lead, viewerId })
                   : undefined,
               onAssign: (person) =>
                 assign.mutate({

@@ -171,7 +171,7 @@ export function useLogStockMovement(
   return useStockWrite(logStockMovement, options);
 }
 
-/** The Undo of a use or a movement: it goes, the stock comes back. */
+/** The Undo of a use, a movement or a revert: it goes, the stock comes back. */
 export function useUndoStockMovement(
   options: CrudMutationOptions<StockItem, string> = {},
 ) {

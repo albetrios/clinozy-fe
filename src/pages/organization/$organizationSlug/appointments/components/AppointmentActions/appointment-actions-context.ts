@@ -23,8 +23,15 @@ export interface AppointmentActionsValue {
     appointment: AppointmentRow,
     move: Exclude<AppointmentMove, 'cancelled'>,
   ) => void;
-  /** Cancel with one of the contract's reasons; "Other" asks for its note first (A-A3). */
-  cancel: (appointment: AppointmentRow, reason: CancelReason) => void;
+  /**
+   * Cancel with one of the contract's reasons — "Other" with the note the
+   * contract requires (`S:1154`), typed in the cancel view itself (L-64: one ask).
+   */
+  cancel: (
+    appointment: AppointmentRow,
+    reason: CancelReason,
+    note?: string | null,
+  ) => void;
   /** The card's next step: Check in · Confirm · Complete, or Rebook — a new booking (Q-A6). */
   runNext: (appointment: AppointmentRow) => void;
   /** The booking's drawer. */

@@ -198,6 +198,37 @@ describe('Medical › Purchases', () => {
       ),
     );
   });
+
+  it('cancels an order with unsaved edits in one confirm — no "Discard changes?" after it (L-64)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderMedicalRoutes(
+      `${ROOM}/purchases/${ref.purchaseOrder(430)}/edit`,
+      PAGES,
+    );
+    // The drawer shimmers until the order is read; type once its fields are in.
+    await user.type(
+      await screen.findByTestId('purchase-order-drawer-bill-no', {}, { timeout: 3000 }),
+      '9',
+    );
+    await user.click(screen.getByTestId('purchase-order-drawer-delete'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-mistake'));
+    const asked: string[] = [];
+    const observer = new MutationObserver(() => {
+      for (const node of document.querySelectorAll('[data-testid="confirm-dialog"]')) {
+        asked.push(node.textContent ?? '');
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/purchases`));
+    observer.disconnect();
+    expect(asked.some((text) => text.includes('Discard changes?'))).toBe(false);
+    expect(notifyMock.undo).toHaveBeenCalledWith(
+      'PO #430 cancelled',
+      expect.objectContaining({ onUndo: expect.any(Function) }),
+    );
+  });
 });
 
 describe('Medical › Suppliers, Manufacturers and MRs', () => {

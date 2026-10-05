@@ -17,6 +17,7 @@ import {
   CONFIRM_NS,
   CONFIRM_TEST_IDS,
 } from './confirm-dialog.constants.ts';
+import { runConfirmedWrite } from './confirmed-write.ts';
 import { ReasonConfirm, type ReasonConfirmProps } from './ReasonConfirm.tsx';
 
 /** The centred confirm every platform surface uses — `ConfirmDialog` without `reason`. */
@@ -72,7 +73,7 @@ function PlainConfirmDialog({
     busyRef.current = true;
     setBusy(true);
     try {
-      await onConfirm();
+      await runConfirmedWrite(onConfirm);
       onOpenChange(false);
     } catch {
       // Keep the dialog open — the caller is responsible for surfacing the error.

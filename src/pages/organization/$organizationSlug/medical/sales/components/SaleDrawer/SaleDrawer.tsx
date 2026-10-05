@@ -189,7 +189,13 @@ function SaleSession({
         deleteLabel={t(K.voidSale)}
         onDelete={
           actions.canVoid(sale)
-            ? () => setVoiding({ kind: 'voidSale', id: sale.id, record: summary })
+            ? () =>
+                setVoiding({
+                  kind: 'voidSale',
+                  id: sale.id,
+                  seq: sale.seq,
+                  record: summary,
+                })
             : undefined
         }
         testId={testId}

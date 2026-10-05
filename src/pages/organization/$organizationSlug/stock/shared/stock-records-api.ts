@@ -250,14 +250,20 @@ export async function logStockMovement(
 }
 
 /**
- * The Undo of a use or a movement (`clinic-stock.md:102, 139`;
- * REPLACE_WITH_API): the movement goes and the item takes its change back.
+ * The Undo of a use, a movement or a revert (`clinic-stock.md:102, 139`;
+ * REPLACE_WITH_API): the movement goes and the item takes its change back —
+ * and an undone revert leaves the movement it reverted revertable again (L-64).
  */
 export async function undoStockMovement(id: string): Promise<StockItem> {
   const { clinicFixtures } = await fixtureWorld();
   const movement = await clinicFixtures.stockMovements.get(id);
   const item = await clinicFixtures.stockItems.get(movement.itemId);
   await clinicFixtures.stockMovements.remove(id, 'mistake', null);
+  if (movement.revertsId) {
+    await clinicFixtures.stockMovements.update(movement.revertsId, {
+      revertedById: null,
+    });
+  }
   return clinicFixtures.stockItems.update(item.id, {
     qtyMilli: Math.max(0, item.qtyMilli - movement.deltaMilli),
   });

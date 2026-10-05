@@ -312,12 +312,20 @@ describe('useAssignLead', () => {
 });
 
 describe('useReleaseLead', () => {
-  it('releases with "Released to the team · anyone can claim"', async () => {
+  it('releases with "Released to the team · anyone can claim" and Undo, which puts the team back', async () => {
+    const lead = await fetchLead(ref.lead(2356));
     const { result } = renderHook(() => useReleaseLead(), { wrapper });
-    await act(() => result.current.mutateAsync({ id: ref.lead(2356), viewerId: RS }));
-    expect(notify.success).toHaveBeenCalledWith(
-      'Released to the team · anyone can claim',
+    await act(() => result.current.mutateAsync({ lead, viewerId: RS }));
+    const undo = lastUndo();
+    expect(undo.message).toBe('Released to the team · anyone can claim');
+    expect(notify.success).not.toHaveBeenCalled();
+    expect((await fetchLead(lead.id)).releasedAt).not.toBeNull();
+
+    act(() => undo.onUndo());
+    await waitFor(async () =>
+      expect((await fetchLead(lead.id)).releasedAt).toBe(lead.releasedAt),
     );
+    expect((await fetchLead(lead.id)).ownerId).toBe(lead.ownerId);
   });
 });
 

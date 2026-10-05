@@ -9,4 +9,5 @@ export {
   type ConfirmDialogProps,
   type PlainConfirmDialogProps,
 } from './ConfirmDialog.tsx';
+export { isConfirmedWriteRunning } from './confirmed-write.ts';
 export type { ConfirmReasonConfig, ReasonConfirmProps } from './ReasonConfirm.tsx';

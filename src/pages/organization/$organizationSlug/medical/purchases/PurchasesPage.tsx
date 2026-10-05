@@ -248,6 +248,7 @@ export function PurchasesPage() {
           setCancelling({
             kind: 'cancelOrder',
             id: order.id,
+            seq: order.seq,
             record: [order.supplierName, formatPaise(order.total)].join(' · '),
           }),
       });

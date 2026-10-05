@@ -20,6 +20,8 @@ import {
   createPurchaseOrder,
   listPrescriptionsToFill,
   receivePurchaseOrder,
+  restorePurchaseOrder,
+  restoreSale,
   returnExpiringStock,
   returnSale,
   updatePurchaseOrder,
@@ -119,6 +121,13 @@ export function useCancelPurchaseOrder(
   );
 }
 
+/** Put a cancelled order back to Ordered — the Undo of "PO #430 cancelled" (10s, D32); silent. */
+export function useRestorePurchaseOrder(
+  options: CrudMutationOptions<MedicalPurchaseOrder, string> = {},
+) {
+  return useFlowWrite(restorePurchaseOrder, options, STOCK_KEYS);
+}
+
 /** Receive goods (`S:1672`): stock in, and the order becomes a bill to pay. */
 export function useReceivePurchaseOrder(
   options: CrudMutationOptions<MedicalPurchaseOrder, FlowUpdateVars<ReceiveInput>> = {},
@@ -157,6 +166,11 @@ export function useVoidSale(
     options,
     SALE_KEYS,
   );
+}
+
+/** Bring a voided sale back — its invoice and stock too — the Undo of "Sale #978 voided" (10s, D32); silent. */
+export function useRestoreSale(options: CrudMutationOptions<MedicalSale, string> = {}) {
+  return useFlowWrite(restoreSale, options, SALE_KEYS);
 }
 
 // ── Stock back to a supplier ──

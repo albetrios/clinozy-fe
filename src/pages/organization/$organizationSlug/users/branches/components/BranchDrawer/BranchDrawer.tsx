@@ -21,7 +21,7 @@ import {
 } from '../../../shared/hooks/useRoleDirectory/index.ts';
 import { BRANCH_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import type { BranchRow } from '../../hooks/useBranchRows/index.ts';
-import { BranchDeleteConfirm } from '../BranchDeleteConfirm/index.ts';
+import type { BranchDeleteTarget } from '../BranchDeleteConfirm/index.ts';
 import { useBranchDrawerView } from './branch-drawer-view.ts';
 import {
   type BranchDrawerStepId,
@@ -79,8 +79,12 @@ export interface BranchEditDrawerProps extends BranchDrawerBaseProps {
   /** Undefined while the list is still loading — the drawer shows its skeleton. */
   row: BranchRow | undefined;
   onSaved: () => void;
-  /** Deleted from the drawer (its Delete, with Undo in the toast). */
-  onDeleted: () => void;
+  /**
+   * The footer's Delete: the page opens its delete confirm, which outlives
+   * the drawer for the 10s Undo (a confirm inside the drawer was unmounted —
+   * the removal cancelled — when the drawer closed, L-64), and closes it.
+   */
+  onDelete: (target: BranchDeleteTarget) => void;
 }
 
 /** Props of {@link BranchDrawer}. */
@@ -227,7 +231,6 @@ function BranchDrawerSession(props: BranchDrawerProps) {
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<BranchDrawerStepId>('place');
-  const [deleting, setDeleting] = useState(false);
   const readouts = useBranchDrawerView({ values, members: props.members, format });
   const { saveState, save } = useBranchSave({
     form,
@@ -239,59 +242,54 @@ function BranchDrawerSession(props: BranchDrawerProps) {
     onDone: useSaveOutcome(props),
   });
 
+  const remove =
+    props.mode === 'edit' && row && chrome.canDelete
+      ? () => props.onDelete({ branch: row.branch, record: readouts.summary })
+      : undefined;
+
   return (
-    <>
-      <RecordDrawer
-        open={props.open}
-        onClose={props.onClose}
-        title={chrome.title}
-        tag={row ? row.branch.name : undefined}
-        sub={t(K.sub)}
-        badges={loading ? [] : readouts.badges}
-        content={CONTENT_PROFILE}
-        tone={USERS_TONE}
-        steps={
-          loading
-            ? []
-            : branchDrawerSteps({
-                form,
-                values,
-                view: readouts,
-                format,
-                directory,
-                people,
-                readOnly,
-                idPrefix,
-                t,
-              })
-        }
-        openStep={openStep}
-        onOpenStepChange={(step) => setOpenStep(step as BranchDrawerStepId)}
-        onMissing={() =>
-          notify.warning(values.name.trim() ? t(K.addressMissing) : t(K.nameMissing))
-        }
-        summary={loading ? undefined : readouts.summary}
-        readOnly={!loading && readOnly}
-        saveLabel={chrome.saveLabel}
-        onSave={() => void save()}
-        saveState={saveState}
-        onDelete={chrome.canDelete ? () => setDeleting(true) : undefined}
-        dirty={isDirty}
-        testId={BRANCH_DRAWER_TEST_ID}
-      >
-        {loading ? (
-          <SkeletonRows rows={6} label={chrome.title} rowClassName="h-12" />
-        ) : null}
-      </RecordDrawer>
-      <BranchDeleteConfirm
-        target={deleting && row ? { branch: row.branch, record: readouts.summary } : null}
-        onClose={() => setDeleting(false)}
-        onDeleted={() => {
-          setDeleting(false);
-          if (props.mode === 'edit') props.onDeleted();
-        }}
-      />
-    </>
+    <RecordDrawer
+      open={props.open}
+      onClose={props.onClose}
+      title={chrome.title}
+      tag={row ? row.branch.name : undefined}
+      sub={t(K.sub)}
+      badges={loading ? [] : readouts.badges}
+      content={CONTENT_PROFILE}
+      tone={USERS_TONE}
+      steps={
+        loading
+          ? []
+          : branchDrawerSteps({
+              form,
+              values,
+              view: readouts,
+              format,
+              directory,
+              people,
+              readOnly,
+              idPrefix,
+              t,
+            })
+      }
+      openStep={openStep}
+      onOpenStepChange={(step) => setOpenStep(step as BranchDrawerStepId)}
+      onMissing={() =>
+        notify.warning(values.name.trim() ? t(K.addressMissing) : t(K.nameMissing))
+      }
+      summary={loading ? undefined : readouts.summary}
+      readOnly={!loading && readOnly}
+      saveLabel={chrome.saveLabel}
+      onSave={() => void save()}
+      saveState={saveState}
+      onDelete={remove}
+      dirty={isDirty}
+      testId={BRANCH_DRAWER_TEST_ID}
+    >
+      {loading ? (
+        <SkeletonRows rows={6} label={chrome.title} rowClassName="h-12" />
+      ) : null}
+    </RecordDrawer>
   );
 }
 

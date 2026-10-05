@@ -23,8 +23,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { useRoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { USER_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
-import { UserDeleteConfirm } from '../UserDeleteConfirm/index.ts';
-import { UserLeaveConfirm } from '../UserLeaveConfirm/index.ts';
+import type { UserDeleteTarget } from '../UserDeleteConfirm/index.ts';
 import { type UserSaveOutcome, useUserSave } from './use-user-save.ts';
 import { useUserDrawerView } from './user-drawer-view.ts';
 import {
@@ -81,8 +80,13 @@ interface UserEditDrawerProps extends UserDrawerBaseProps {
   /** Undefined while the Team is still loading — the drawer shows its skeleton. */
   member: TeamMember | undefined;
   onSaved: () => void;
-  /** Deleted from the drawer (its Delete, with Undo in the toast). */
-  onDeleted: () => void;
+  /**
+   * The footer's Delete: the room opens its delete confirm, which outlives
+   * the drawer for the 10s Undo, and closes the drawer once it is scheduled.
+   */
+  onDelete: (target: UserDeleteTarget) => void;
+  /** "Leave clinic" on your own drawer: the room opens its leave confirm. */
+  onLeave: (member: TeamMember) => void;
 }
 
 /** Props of {@link UserDrawer}. */
@@ -235,57 +239,27 @@ function userDrawerSteps({
   ];
 }
 
-/** Which of the footer's destructive confirms is open. */
-type DrawerExit = 'delete' | 'leave' | null;
-
 /**
  * The footer's destructive button — Delete on someone else's drawer, "Leave
- * clinic" on your own (never the owner's, D17) — and which confirm it opened.
+ * clinic" on your own (never the owner's, D17). It hands the member to the
+ * room, whose confirm outlives this drawer: the removal waits out its 10s
+ * Undo in the confirm, and a confirm inside the drawer was unmounted — the
+ * removal cancelled — the moment the drawer closed (L-64).
  */
-function useDrawerExit(access: UserDrawerAccess, member: TeamMember | null) {
+function useDrawerExit(props: SessionProps, member: TeamMember | null, record?: string) {
   const { t } = useTranslation(USERS_NS);
-  const [open, setOpen] = useState<DrawerExit>(null);
-  let kind: DrawerExit = null;
-  if (member && access.canDelete) kind = 'delete';
-  else if (member && access.canLeave) kind = 'leave';
-  return {
-    open,
-    close: () => setOpen(null),
-    onDelete: kind ? () => setOpen(kind) : undefined,
-    deleteLabel: kind === 'leave' ? t(USERS_KEYS.rowActions.leave) : undefined,
-  };
-}
-
-/** The Delete and Leave clinic confirms behind the footer's destructive button. */
-function DrawerExitConfirms({
-  open,
-  member,
-  record,
-  onClose,
-  onDone,
-}: {
-  open: DrawerExit;
-  member: TeamMember | null;
-  /** The drawer's summary line, in the delete confirm's pill. */
-  record: string | undefined;
-  onClose: () => void;
-  /** The removal or the leave is scheduled: the drawer closes. */
-  onDone: () => void;
-}) {
-  return (
-    <>
-      <UserDeleteConfirm
-        target={open === 'delete' && member ? { member, record } : null}
-        onClose={onClose}
-        onDeleted={onDone}
-      />
-      <UserLeaveConfirm
-        member={open === 'leave' ? member : null}
-        onClose={onClose}
-        onScheduled={onDone}
-      />
-    </>
-  );
+  if (props.mode !== 'edit' || !member)
+    return { onDelete: undefined, deleteLabel: undefined };
+  if (props.access.canDelete) {
+    return { onDelete: () => props.onDelete({ member, record }), deleteLabel: undefined };
+  }
+  if (props.access.canLeave) {
+    return {
+      onDelete: () => props.onLeave(member),
+      deleteLabel: t(USERS_KEYS.rowActions.leave),
+    };
+  }
+  return { onDelete: undefined, deleteLabel: undefined };
 }
 
 /** One opening of the drawer: the form, its checks and its save. */
@@ -302,7 +276,6 @@ function UserDrawerSession(props: SessionProps) {
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<UserDrawerStepId>('profile');
-  const exit = useDrawerExit(props.access, member);
   const resend = useResendInvitation();
   const view = useUserDrawerView({
     values,
@@ -324,6 +297,7 @@ function UserDrawerSession(props: SessionProps) {
   const readouts = chrome.loading
     ? { badges: [], summary: undefined }
     : { badges: view.badges, summary: view.summary };
+  const exit = useDrawerExit(props, member, readouts.summary);
   const steps = chrome.loading
     ? []
     : userDrawerSteps({
@@ -339,48 +313,36 @@ function UserDrawerSession(props: SessionProps) {
       });
 
   return (
-    <>
-      <RecordDrawer
-        open={props.open}
-        onClose={props.onClose}
-        title={chrome.title}
-        tag={chrome.tag}
-        sub={t(K.sub)}
-        badges={readouts.badges}
-        quickFill={chrome.create ? quickFillItems(form, t) : undefined}
-        content={CONTENT_PROFILE}
-        tone={USERS_TONE}
-        steps={steps}
-        openStep={openStep}
-        onOpenStepChange={(step) => setOpenStep(step as UserDrawerStepId)}
-        onMissing={() => notify.warning(t(K.missing))}
-        summary={readouts.summary}
-        readOnly={!(chrome.loading || props.access.canWrite)}
-        saveLabel={chrome.saveLabel}
-        onSave={() => void save(false)}
-        saveState={saveState}
-        saveAndAddLabel={t(K.save.createAnother)}
-        onSaveAndAdd={chrome.create ? () => void save(true) : undefined}
-        onDelete={exit.onDelete}
-        deleteLabel={exit.deleteLabel}
-        dirty={isDirty}
-        testId={USER_DRAWER_TEST_ID}
-      >
-        {chrome.loading ? (
-          <SkeletonRows rows={6} label={chrome.title} rowClassName="h-12" />
-        ) : null}
-      </RecordDrawer>
-      <DrawerExitConfirms
-        open={exit.open}
-        member={member}
-        record={readouts.summary}
-        onClose={exit.close}
-        onDone={() => {
-          exit.close();
-          if (props.mode === 'edit') props.onDeleted();
-        }}
-      />
-    </>
+    <RecordDrawer
+      open={props.open}
+      onClose={props.onClose}
+      title={chrome.title}
+      tag={chrome.tag}
+      sub={t(K.sub)}
+      badges={readouts.badges}
+      quickFill={chrome.create ? quickFillItems(form, t) : undefined}
+      content={CONTENT_PROFILE}
+      tone={USERS_TONE}
+      steps={steps}
+      openStep={openStep}
+      onOpenStepChange={(step) => setOpenStep(step as UserDrawerStepId)}
+      onMissing={() => notify.warning(t(K.missing))}
+      summary={readouts.summary}
+      readOnly={!(chrome.loading || props.access.canWrite)}
+      saveLabel={chrome.saveLabel}
+      onSave={() => void save(false)}
+      saveState={saveState}
+      saveAndAddLabel={t(K.save.createAnother)}
+      onSaveAndAdd={chrome.create ? () => void save(true) : undefined}
+      onDelete={exit.onDelete}
+      deleteLabel={exit.deleteLabel}
+      dirty={isDirty}
+      testId={USER_DRAWER_TEST_ID}
+    >
+      {chrome.loading ? (
+        <SkeletonRows rows={6} label={chrome.title} rowClassName="h-12" />
+      ) : null}
+    </RecordDrawer>
   );
 }
 

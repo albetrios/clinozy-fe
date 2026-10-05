@@ -92,6 +92,7 @@ export function MovementsPage() {
             id: 'revert',
             label: t(STOCK_KEYS.movements.rowActions.revert),
             icon: RefreshCw,
+            destructive: true,
             onSelect: () => setReverting(row),
           },
         ]

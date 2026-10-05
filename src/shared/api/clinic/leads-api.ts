@@ -843,8 +843,8 @@ export async function releaseLead(id: string, viewerId: string): Promise<LeadRec
 }
 
 /**
- * Put a lead's team back as it was before a claim or an assignment — their
- * toasts' Undo. REPLACE_WITH_API: the server's undo of that write.
+ * Put a lead's team back as it was before a claim, an assignment or a release
+ * — their toasts' Undo. REPLACE_WITH_API: the server's undo of that write.
  */
 export async function restoreLeadTeam(id: string, team: LeadTeam): Promise<LeadRecord> {
   const { clinicFixtures } = await fixtureWorld();

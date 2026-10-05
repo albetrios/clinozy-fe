@@ -183,6 +183,9 @@ export const APPOINTMENTS_TEST_IDS = {
   statusPopover: 'appointments-status-popover',
   statusOption: (move: string) => `appointments-status-option-${move}`,
   cancelReason: (reason: string) => `appointments-cancel-reason-${reason}`,
+  /** "Other"'s note in the cancel view, and its red "Cancel" (L-64: one ask). */
+  cancelNote: 'appointments-cancel-note',
+  cancelSubmit: 'appointments-cancel-submit',
   statusBack: 'appointments-status-back',
   appointmentCard: 'appointment-card',
   cardNext: 'appointment-card-next',

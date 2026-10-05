@@ -914,6 +914,7 @@ header is its own row (`role="row"`, `data-slot="data-table-group"`) between the
 | `appointments-status-popover`                                               | Change status popover (`role="dialog"`)                                    | `components/AppointmentStatusPopover/` |
 | `appointments-status-option-<move>`                                         | One move — a status or `reschedule`; `aria-disabled` + reason when guarded | `components/AppointmentStatusPopover/` |
 | `appointments-cancel-reason-<reason>` · `appointments-status-back`          | Cancel view: one reason · Back                                             | `components/AppointmentStatusPopover/` |
+| `appointments-cancel-note` · `appointments-cancel-submit`                   | Cancel view, "Other": its required note · the red "Cancel" (one ask)       | `components/AppointmentStatusPopover/` |
 | `appointment-card`                                                          | Booking card (hover card, quick view, phone tap)                           | `components/AppointmentCard/`          |
 | `appointment-card-next` · `-open` · `-move-<move>`                          | Card: next action · Open · Reschedule / Cancel                             | `components/AppointmentCard/`          |
 | `appointments-filters-calendar` · `-filters-day`                            | Filters month calendar · one day (`aria-pressed` when picked)              | `components/AppointmentFilters/`       |

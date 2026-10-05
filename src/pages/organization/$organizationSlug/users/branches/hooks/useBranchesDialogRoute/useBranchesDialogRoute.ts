@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
@@ -45,14 +45,19 @@ export function useBranchesDialogRoute(
   const { t } = useTranslation([ERRORS_NS, USERS_NS]);
   const edit = EDIT_PATH.exec(pathname);
 
+  // The route this hook is closing itself: a branch just deleted from its
+  // drawer leaves the list before the route does, and is not "not found".
+  const [closing, setClosing] = useState<string | null>(null);
+  if (closing !== null && closing !== pathname) setClosing(null);
   const close = useCallback(() => {
+    setClosing(pathname);
     void navigate({
       ...organizationUsersBranches(organizationSlug),
       search: (current: Record<string, unknown>) => validateBranchesSearch(current),
       hash: true,
       replace: true,
     });
-  }, [navigate, organizationSlug]);
+  }, [navigate, organizationSlug, pathname]);
 
   const isCreate = CREATE_PATH.test(pathname);
   const refused = isCreate && options.accessResolved && !options.canCreate;
@@ -60,7 +65,8 @@ export function useBranchesDialogRoute(
   const row = branchId
     ? list.rows.find((candidate) => candidate.branch.id === branchId)
     : undefined;
-  const missing = branchId !== undefined && !list.isPending && !row;
+  const closingHere = closing === pathname;
+  const missing = branchId !== undefined && !list.isPending && !row && !closingHere;
 
   const reportedFor = useRef<string | null>(null);
   useEffect(() => {
@@ -78,6 +84,8 @@ export function useBranchesDialogRoute(
     close();
   }, [refused, missing, pathname, close, t]);
 
+  // Closing: the drawer goes at once, while the route catches up.
+  if (closingHere) return { dialog: { kind: 'none' }, close };
   if (isCreate && !refused) return { dialog: { kind: 'create' }, close };
   if (branchId && !missing) return { dialog: { kind: 'edit', branchId, row }, close };
   return { dialog: { kind: 'none' }, close };

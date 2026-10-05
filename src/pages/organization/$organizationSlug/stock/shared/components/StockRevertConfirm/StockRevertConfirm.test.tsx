@@ -80,13 +80,43 @@ describe('StockRevertConfirm (clinic-stock.md:289–301)', () => {
     await user.click(within(dialog).getByRole('radio', { name: 'Wrong quantity' }));
     await user.click(within(dialog).getByRole('button', { name: 'Revert' }));
     await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith(
+      expect(notifyMock.undo).toHaveBeenCalledWith(
         'Used reverted · Noprik Plus numbing cream 50 gm back to 6 tube',
+        { onUndo: expect.any(Function) },
       ),
     );
+    expect(notifyMock.success).not.toHaveBeenCalled();
     expect(
       clinicFixtures.stockMovements.snapshot((row) => row.revertsId === movement.id)[0],
     ).toMatchObject({ type: 'reverted', revertReason: 'wrong_qty', deltaMilli: 1000 });
+  });
+
+  it('Undo takes the revert back: the stock as it was, the movement revertable again (L-64)', async () => {
+    const user = setup();
+    const movement = await changeRow(ref.stockMovement(1));
+    const before = await clinicFixtures.stockItems.get(movement.item.id);
+    renderStockDrawer(<StockRevertConfirm movement={movement} onClose={vi.fn()} />);
+    const dialog = await screen.findByRole('alertdialog');
+    await user.click(within(dialog).getByRole('radio', { name: 'Logged by mistake' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Revert' }));
+    await waitFor(() => expect(notifyMock.undo).toHaveBeenCalledTimes(1));
+    expect((await clinicFixtures.stockItems.get(movement.item.id)).qtyMilli).toBe(
+      before.qtyMilli + 1000,
+    );
+
+    const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
+    options.onUndo();
+    await waitFor(async () =>
+      expect((await clinicFixtures.stockItems.get(movement.item.id)).qtyMilli).toBe(
+        before.qtyMilli,
+      ),
+    );
+    expect(
+      clinicFixtures.stockMovements.snapshot((row) => row.revertsId === movement.id),
+    ).toHaveLength(0);
+    expect(
+      (await clinicFixtures.stockMovements.get(movement.id)).revertedById,
+    ).toBeNull();
   });
 
   it('"Other" sends what the team typed', async () => {
@@ -98,7 +128,7 @@ describe('StockRevertConfirm (clinic-stock.md:289–301)', () => {
     await user.click(within(dialog).getByRole('radio', { name: 'Other' }));
     await user.type(within(dialog).getByRole('textbox'), 'Seal was fine');
     await user.click(within(dialog).getByRole('button', { name: 'Revert' }));
-    await waitFor(() => expect(notifyMock.success).toHaveBeenCalled());
+    await waitFor(() => expect(notifyMock.undo).toHaveBeenCalled());
     expect(
       clinicFixtures.stockMovements.snapshot((row) => row.revertsId === movement.id)[0],
     ).toMatchObject({ revertReason: 'other', usedFor: 'Seal was fine' });

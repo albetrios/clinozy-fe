@@ -33,7 +33,8 @@ calendar with load dots, "Appointed to", the status chips) and "New appointment"
 the shared `DataTable` grouped by day (`groups`: sticky day headers with the day's counts across
 every page), sorted inside each day through the URL, re-gridded on a phone. Every booking surface
 reads one `AppointmentActionsProvider`: the Change status popover (the status machine's moves and
-guards, its cancel view with the contract's reasons, "Other" through the reason confirm — A-A3),
+guards, its cancel view with the contract's reasons — one tap cancels, "Other" takes its required
+note in the view itself, asked once — L-64),
 the booking card (hover after 420ms, pinned from the row's eye, a sheet-like popover on a phone)
 and the row click into the drawer. A move is optimistic with Undo; a list that fails to load keeps
 the last copy and toasts Retry (`useListLoadError`).

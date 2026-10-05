@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -39,7 +39,10 @@ function Probe({ appointment }: { appointment: AppointmentRow }) {
       <button type="button" onClick={() => actions.move(appointment, 'reschedule')}>
         reschedule
       </button>
-      <button type="button" onClick={() => actions.cancel(appointment, 'other')}>
+      <button
+        type="button"
+        onClick={() => actions.cancel(appointment, 'other', ' Clinic closed early ')}
+      >
         other
       </button>
       <button
@@ -117,24 +120,17 @@ describe('AppointmentActionsProvider', () => {
     );
   });
 
-  it('asks for the note behind "Other", then stores it with the contract’s "other"', async () => {
+  it('stores "Other" with the note the cancel view took — no second confirm (L-64)', async () => {
     const user = userEvent.setup();
     renderInAppointments(<Probe appointment={scheduled} />);
     await user.click(await screen.findByRole('button', { name: 'other' }));
-    const confirm = await screen.findByRole('alertdialog', {
-      name: 'Cancel this appointment?',
-    });
-    expect(confirm).toHaveTextContent(
-      `${scheduled.person.name} · ${scheduled.serviceLabel}`,
-    );
-    await user.type(within(confirm).getByRole('textbox'), 'Clinic closed early');
-    await user.click(within(confirm).getByRole('button', { name: 'Cancel' }));
     await waitFor(() =>
       expect(notifyMock.undo).toHaveBeenCalledWith(
         `${scheduled.person.name} → Cancelled · Other · slot freed, reminders stopped`,
         expect.anything(),
       ),
     );
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     const after = await fetchAppointment(scheduled.id);
     expect(after).toMatchObject({
       status: 'cancelled',

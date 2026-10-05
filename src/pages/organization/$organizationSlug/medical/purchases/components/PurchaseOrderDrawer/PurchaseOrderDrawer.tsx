@@ -292,7 +292,13 @@ function OrderSession({
         deleteLabel={t(K.cancelOrder)}
         onDelete={
           order && canDelete
-            ? () => setCancelling({ kind: 'cancelOrder', id: order.id, record: total })
+            ? () =>
+                setCancelling({
+                  kind: 'cancelOrder',
+                  id: order.id,
+                  seq: order.seq,
+                  record: total,
+                })
             : undefined
         }
         dirty={isDirty}

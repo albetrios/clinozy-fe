@@ -383,11 +383,21 @@ export function UsersPage() {
           />
         </>
       )}
-      <UserDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      {/* Row and drawer alike: the 10s Undo outlives the drawer (L-64). */}
+      <UserDeleteConfirm
+        target={deleting}
+        onClose={() => setDeleting(null)}
+        onDeleted={() => {
+          if (dialog.kind === 'edit') close();
+        }}
+      />
       <UserLeaveConfirm
         member={leaving}
         onClose={() => setLeaving(null)}
-        onScheduled={() => setLeaving(null)}
+        onScheduled={() => {
+          setLeaving(null);
+          if (dialog.kind === 'edit') close();
+        }}
       />
       <UserDrawer
         mode="create"
@@ -422,7 +432,8 @@ export function UsersPage() {
         }}
         onClose={close}
         onSaved={close}
-        onDeleted={close}
+        onDelete={setDeleting}
+        onLeave={setLeaving}
       />
       <Outlet />
     </section>

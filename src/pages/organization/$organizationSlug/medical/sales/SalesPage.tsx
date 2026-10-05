@@ -190,6 +190,7 @@ export function SalesPage() {
           setVoiding({
             kind: 'voidSale',
             id: sale.id,
+            seq: sale.seq,
             record: sale.customer?.name ?? `#${sale.seq}`,
           }),
       });

@@ -20,7 +20,7 @@ import {
 } from '@/shared/hooks/useRoles/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { notify } from '@/shared/notify/index.ts';
+import { notify, UNDO_TOAST_DURATION_MS } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -112,6 +112,8 @@ function useRoleAdmin(role: ClinicRoleView | null, directory: RoleDirectory) {
           ns: ERRORS_NS,
         }),
         toastId: `delete-role-${platformRole.id}`,
+        // Every Undo runs the same 10s window (D32), not the deferred default.
+        delayMs: UNDO_TOAST_DURATION_MS,
         commit: async () => {
           await remove.mutateAsync(platformRole.id);
           await updateMatrix.mutateAsync({ kind: 'dropCustom', key: role.key });

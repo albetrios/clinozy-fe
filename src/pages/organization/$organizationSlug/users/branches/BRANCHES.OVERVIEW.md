@@ -21,19 +21,19 @@ tab still lists the closed ones.
 
 ## Files
 
-| File                              | Responsibility                                                                                                             |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `branches.route.tsx`              | Route marker — exports `Component` rendering `BranchesPage`.                                                               |
-| `branches.manifest.ts`            | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `membership:read`, module `clinic-users`.                     |
-| `branches.search.ts`              | `validateBranchesSearch` — `created` (entry chunk: no zod).                                                                |
-| `BranchesPage.tsx`                | The list: toolbar, table, row actions, bulk Export, the branch drawers and the delete confirm. Owns `users-branches-page`. |
-| `components/BranchCells/`         | The cells — the chip with "Main", two-line Address / Contact / Default people, hours, the Team's avatars, Open / Closed.   |
-| `components/BranchDrawer/`        | The branch drawer: form, read-outs, the three steps' fields and the save.                                                  |
-| `components/BranchDeleteConfirm/` | "Delete this branch?" — the row leaves at once, the branch after the 10s Undo.                                             |
-| `hooks/useBranchRows/`            | The list ⨝ the Team: each branch's people and default people.                                                              |
-| `hooks/useBranchWrites/`          | Save and delete a branch, refreshing every branch read and the staff profiles.                                             |
-| `hooks/useBranchesTable/`         | The columns and table instance (Address is the primary cell; the Branch chip the phone row's key).                         |
-| `hooks/useBranchesDialogRoute/`   | Which drawer the URL opens; refusal and "Branch not found" back to the list.                                               |
+| File                              | Responsibility                                                                                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `branches.route.tsx`              | Route marker — exports `Component` rendering `BranchesPage`.                                                                                                             |
+| `branches.manifest.ts`            | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `membership:read`, module `clinic-users`.                                                                   |
+| `branches.search.ts`              | `validateBranchesSearch` — `created` (entry chunk: no zod).                                                                                                              |
+| `BranchesPage.tsx`                | The list: toolbar, table, row actions, bulk Export, the branch drawers and the delete confirm. Owns `users-branches-page`.                                               |
+| `components/BranchCells/`         | The cells — the chip with "Main", two-line Address / Contact / Default people, hours, the Team's avatars, Open / Closed.                                                 |
+| `components/BranchDrawer/`        | The branch drawer: form, read-outs, the three steps' fields and the save.                                                                                                |
+| `components/BranchDeleteConfirm/` | "Delete this branch?" — the row leaves at once, the branch after the 10s Undo; mounted by the page for the row and the drawer, so the window outlives the drawer (L-64). |
+| `hooks/useBranchRows/`            | The list ⨝ the Team: each branch's people and default people.                                                                                                            |
+| `hooks/useBranchWrites/`          | Save and delete a branch, refreshing every branch read and the staff profiles.                                                                                           |
+| `hooks/useBranchesTable/`         | The columns and table instance (Address is the primary cell; the Branch chip the phone row's key).                                                                       |
+| `hooks/useBranchesDialogRoute/`   | Which drawer the URL opens; refusal and "Branch not found" back to the list.                                                                                             |
 
 ## Test ids
 

@@ -68,11 +68,27 @@ async function confirm(
   await waitFor(() => expect(onDone).toHaveBeenCalled());
 }
 
+/** Press the Undo of the toast the confirm raised — the one `notify.undo` was handed. */
+function pressUndo(message: string) {
+  expect(notifyMock.undo).toHaveBeenCalledTimes(1);
+  expect(notifyMock.undo).toHaveBeenCalledWith(message, {
+    onUndo: expect.any(Function),
+  });
+  const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
+  options.onUndo();
+}
+
+/** A medicine's batch quantity, by the medicine's number and the batch. */
+async function batchQty(medicineSeq: number, batchNo: string) {
+  const medicine = await clinicFixtures.medicines.get(ref.medicine(medicineSeq));
+  return medicine.batches.find((batch) => batch.batchNo === batchNo)?.qty;
+}
+
 describe('MedicalFlowConfirm (medical.md:357–368)', () => {
-  it('cancels an Ordered purchase order with its reason: "PO #430 cancelled"', async () => {
+  it('cancels an Ordered purchase order with its reason, and Undo puts it back', async () => {
     const id = ref.purchaseOrder(430);
     await confirm(
-      { kind: 'cancelOrder', id, record: '₹4,236' },
+      { kind: 'cancelOrder', id, seq: 430, record: '₹4,236' },
       'Cancel this purchase order?',
       'Ordered by mistake',
       'Cancel order',
@@ -81,20 +97,37 @@ describe('MedicalFlowConfirm (medical.md:357–368)', () => {
       stage: 'cancelled',
       cancelReason: 'mistake',
     });
-    expect(notifyMock.success).toHaveBeenCalledWith('PO #430 cancelled');
-    expect(notifyMock.undo).not.toHaveBeenCalled();
+    // One answer: "PO #430 cancelled" with Undo — no plain success beside it.
+    expect(notifyMock.success).not.toHaveBeenCalled();
+    pressUndo('PO #430 cancelled');
+    await waitFor(async () =>
+      expect(await clinicFixtures.purchaseOrders.get(id)).toMatchObject({
+        stage: 'ordered',
+        cancelReason: null,
+      }),
+    );
   });
 
-  it('voids an unpaid sale: "Sale #978 voided"', async () => {
+  it('voids an unpaid sale, and Undo brings it back — its invoice and its stock', async () => {
     const id = ref.medicalSale(978);
+    const before = await batchQty(453, 'ADE25510');
     await confirm(
-      { kind: 'voidSale', id, record: 'Dharti Galani' },
+      { kind: 'voidSale', id, seq: 978, record: 'Dharti Galani' },
       'Void this sale?',
       'Billed by mistake',
       'Void sale',
     );
     expect((await clinicFixtures.medicalSales.get(id)).voidedAt).not.toBeNull();
-    expect(notifyMock.success).toHaveBeenCalledWith('Sale #978 voided');
+    expect(await batchQty(453, 'ADE25510')).toBeGreaterThan(before ?? 0);
+    expect(notifyMock.success).not.toHaveBeenCalled();
+    pressUndo('Sale #978 voided');
+    await waitFor(async () =>
+      expect((await clinicFixtures.medicalSales.get(id)).voidedAt).toBeNull(),
+    );
+    expect(await batchQty(453, 'ADE25510')).toBe(before);
+    expect(
+      clinicFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
+    ).toHaveLength(1);
   });
 
   it('stays closed without a target', () => {

@@ -68,7 +68,7 @@ function teamOf(lead: LeadRecord): LeadTeam {
   };
 }
 
-/** The Undo write behind a claim's or an assignment's toast; silent unless it fails. */
+/** The Undo write behind a claim's, an assignment's or a release's toast; silent unless it fails. */
 function useRestoreLeadTeam() {
   return useAppMutation<LeadRecord, { id: string; team: LeadTeam }>({
     mutationFn: ({ id, team }) => restoreLeadTeam(id, team),
@@ -339,20 +339,29 @@ export function useAssignLead(
 
 /** What a release sends. */
 export interface LeadReleaseVars {
-  id: string;
+  /** The lead as the row shows it — its team is what Undo puts back. */
+  lead: LeadRecord;
   /** The signed-in member's staff id — only the owner may release. */
   viewerId: string;
 }
 
-/** Release a lead to the team — "Released to the team · anyone can claim". */
+/**
+ * Release a lead to the team — "Released to the team · anyone can claim" with
+ * Undo for 10s, which puts the team back (L-64), as a claim's and an
+ * assignment's do.
+ */
 export function useReleaseLead(
   options: CrudMutationOptions<LeadRecord, LeadReleaseVars> = {},
 ) {
+  const restoreTeam = useRestoreLeadTeam();
   return useAppMutation<LeadRecord, LeadReleaseVars>({
-    mutationFn: ({ id, viewerId }) => releaseLead(id, viewerId),
+    mutationFn: ({ lead, viewerId }) => releaseLead(lead.id, viewerId),
     invalidateKeys: [leadQueryKeys.all],
-    successMessage: () => leadToast(LEAD_TOASTS_KEYS.released),
-    ...options,
+    ...withUndoToast(options, (_released, { lead }) => {
+      notify.undo(leadToast(LEAD_TOASTS_KEYS.released), {
+        onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
+      });
+    }),
   });
 }
 

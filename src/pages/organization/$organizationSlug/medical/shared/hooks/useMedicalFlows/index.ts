@@ -7,6 +7,8 @@ export {
   useCreatePurchaseOrder,
   usePrescriptionsToFill,
   useReceivePurchaseOrder,
+  useRestorePurchaseOrder,
+  useRestoreSale,
   useReturnExpiringStock,
   useReturnSale,
   useUpdatePurchaseOrder,

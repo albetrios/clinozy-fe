@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
@@ -199,24 +202,41 @@ describe('AppointmentsAgenda (KICKOFF §6.4 Agenda)', () => {
     );
   });
 
-  it('asks for the note in the reason confirm when the reason is "Other" (A-A3)', async () => {
+  it('takes "Other"’s note in the cancel view itself — one ask, no second confirm (L-64)', async () => {
     const user = userEvent.setup();
     renderAppointmentsRoutes(PAGE, Agenda);
     const row = await rowWithStatus('Scheduled');
     await user.click(within(row).getByTestId('appointments-status-button'));
     const popover = await screen.findByTestId('appointments-status-popover');
     await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
-    await user.click(within(popover).getByTestId('appointments-cancel-reason-other'));
-    const confirm = await screen.findByRole('alertdialog', {
-      name: 'Cancel this appointment?',
-    });
-    expect(within(confirm).getByRole('radio', { name: 'Other' })).toHaveAttribute(
-      'aria-checked',
-      'true',
+    const other = within(popover).getByTestId('appointments-cancel-reason-other');
+    await user.click(other);
+    expect(other).toHaveAttribute('aria-expanded', 'true');
+    const note = within(popover).getByRole('textbox', { name: 'Note' });
+    expect(note).toHaveFocus();
+    // The red "Cancel" waits for the note the contract requires (S:1154).
+    const submit = within(popover).getByTestId('appointments-cancel-submit');
+    expect(submit).toHaveAttribute('aria-disabled', 'true');
+    await user.click(submit);
+    expect(popover).toHaveTextContent('Add a short note for “Other”');
+    expect(notifyMock.undo).not.toHaveBeenCalled();
+
+    await user.type(note, 'Power cut in the clinic{Enter}');
+    await waitFor(() =>
+      expect(notifyMock.undo).toHaveBeenCalledWith(
+        expect.stringMatching(/ → Cancelled · Other · slot freed, reminders stopped$/),
+        expect.objectContaining({ onUndo: expect.any(Function) }),
+      ),
     );
-    expect(confirm).toHaveTextContent(
-      'The slot is released and reminders stop. You can restore it until the time passes.',
-    );
+    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('appointments-status-popover')).not.toBeInTheDocument();
+    expect(
+      clinicFixtures.appointments.snapshot(
+        (visit) =>
+          visit.cancelReason === 'other' &&
+          visit.cancelNote === 'Power cut in the clinic',
+      ),
+    ).toHaveLength(1);
   });
 
   it('hides the Status button without Edit, showing the status alone', async () => {

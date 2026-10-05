@@ -30,6 +30,8 @@ import {
   createPurchaseOrder,
   listPrescriptionsToFill,
   receivePurchaseOrder,
+  restorePurchaseOrder,
+  restoreSale,
   returnExpiringStock,
   returnSale,
   updatePurchaseOrder,
@@ -140,6 +142,18 @@ describe('purchase orders (createPO · updatePO · cancelPO, S:1670–1673)', ()
     expect(
       (await failureOf(cancelPurchaseOrder(ref.purchaseOrder(430), 'other'))).status,
     ).toBe(409);
+  });
+
+  it('restores a cancelled order to Ordered — the Undo — and nothing else', async () => {
+    await cancelPurchaseOrder(ref.purchaseOrder(430), 'mistake');
+    const restored = await restorePurchaseOrder(ref.purchaseOrder(430));
+    expect(restored).toMatchObject({ stage: 'ordered', cancelReason: null });
+    const seqs = (await listPurchaseOrders()).items.map((order) => order.seq);
+    expect(seqs).toContain(430);
+    expect(await failureOf(restorePurchaseOrder(ref.purchaseOrder(430)))).toMatchObject({
+      status: 409,
+      detail: 'This order is not cancelled',
+    });
   });
 });
 
@@ -468,6 +482,20 @@ describe('void a sale (voidSale, S:1668; Q-M2)', () => {
     expect((await failureOf(voidSale(ref.medicalSale(978), 'other', 'x'))).status).toBe(
       409,
     );
+  });
+
+  it('restores a voided sale — the Undo: its invoice back, its stock out again', async () => {
+    await voidSale(ref.medicalSale(978), 'mistake', null);
+    const sale = await restoreSale(ref.medicalSale(978));
+    expect(sale.voidedAt).toBeNull();
+    expect((await batchOf(453, 'ADE25510'))?.qty).toBe(7);
+    expect((await batchOf(456, '026-312'))?.qty).toBe(3);
+    expect(
+      clinicFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
+    ).toHaveLength(1);
+    const seqs = (await listMedicalSales()).items.map((row) => row.seq);
+    expect(seqs).toContain(978);
+    expect((await failureOf(restoreSale(ref.medicalSale(978)))).status).toBe(409);
   });
 });
 

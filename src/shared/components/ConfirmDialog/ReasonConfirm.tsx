@@ -46,6 +46,7 @@ import {
   reasonChipTone,
   toReasonChoice,
 } from './confirm-reasons.ts';
+import { runConfirmedWrite } from './confirmed-write.ts';
 import { REASON_CONFIRM_KEYS, REASON_CONFIRM_NS } from './reason-confirm.constants.ts';
 
 /** The note's length cap — the design's 160 (the schema allows 280, `S:134`). */
@@ -204,7 +205,7 @@ function useReasonDraft({
       typed,
     );
     const landed = await Promise.resolve()
-      .then(() => onConfirm(choice))
+      .then(() => runConfirmedWrite(() => onConfirm(choice)))
       .then(
         () => true,
         (error: unknown) => {

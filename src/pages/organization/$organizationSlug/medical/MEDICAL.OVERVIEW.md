@@ -59,11 +59,12 @@ are the shared `useMedicines` hooks.
   (`createSale`, stock by earliest expiry), on `?prescription=&customer=`, closing back to `from`
   (Today's Dispense) or the list; the Sale view, Collect (one UPI receipt on the ledger, Undo),
   Print (the invoice on the A4 sheet), Return from patient (stock back or written off; a refund
-  and its credit note when paid) and Void (`shared/components/MedicalFlowConfirm/`, Q-M2); the
-  "Prescriptions to fill" view action.
+  and its credit note when paid) and Void (`shared/components/MedicalFlowConfirm/`, Q-M2; Undo for
+  10s puts the sale, its invoice and its stock back, L-64); the "Prescriptions to fill" view action.
 - **Purchases** (`purchases/`): New / Edit purchase order ("⚡ Reorder low stock"), Receive goods
   (each arrived line a batch of qty + free; its expiry asked for), the received or paid view, and
-  Cancel order. Every PO payment goes through Payments › Send payment — "Pay ₹2,980" on a row and
+  Cancel order (Undo for 10s puts it back to Ordered, L-64). Every PO payment goes through
+  Payments › Send payment — "Pay ₹2,980" on a row and
   the view, "Pay all received" with Stage Received, a supplier's "Pay ₹827" on its row and in its
   drawer's Quick fill — via the shared `usePayBill` (`?bill=md:<poId>`, Q-M1).
 - **Medicines**: "Return expiring stock to supplier" (`medicines/components/ExpiringReturnDrawer/`,

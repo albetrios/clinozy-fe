@@ -513,7 +513,10 @@ describe('RolesAccess — new, renamed and deleted roles', () => {
       ).toBeNull(),
     );
     expect(api.deleteRole).not.toHaveBeenCalled();
-    await vi.advanceTimersByTimeAsync(10_000);
+    // The Undo window is the shared 10s, not the deferred default's 5s.
+    await vi.advanceTimersByTimeAsync(9_000);
+    expect(api.deleteRole).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1_000);
     await waitFor(() =>
       expect(api.deleteRole).toHaveBeenCalledWith(PLATFORM_ROLES.senior.id),
     );

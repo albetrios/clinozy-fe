@@ -172,4 +172,19 @@ describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
     const { popover } = await openFor({ status: 'scheduled', date: '2026-10-04' });
     expect(await axeForDialog(popover)).toHaveNoViolations();
   });
+
+  it('opens "Other"’s note in the cancel view; Back closes it again', async () => {
+    const { popover, user } = await openFor({ status: 'scheduled', date: '2026-10-04' });
+    await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
+    await user.click(await screen.findByTestId('appointments-cancel-reason-other'));
+    const note = screen.getByTestId('appointments-cancel-note');
+    await waitFor(() => expect(note).toHaveFocus());
+    expect(note).toHaveAttribute('maxlength', '160');
+    expect(screen.getByTestId('appointments-cancel-submit')).toHaveTextContent('Cancel');
+    expect(
+      await axeForDialog(screen.getByTestId('appointments-status-popover')),
+    ).toHaveNoViolations();
+    await user.click(screen.getByTestId('appointments-status-back'));
+    expect(screen.queryByTestId('appointments-cancel-note')).not.toBeInTheDocument();
+  });
 });

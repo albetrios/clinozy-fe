@@ -33,27 +33,27 @@ days and hours (`shared/hooks/useHoursFormat/`).
 
 ## Files
 
-| File                              | Responsibility                                                                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                         |
-| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `clinic-users`, nav `users`.            |
-| `users.search.ts`                 | `validateUsersSearch` (`q`, `role`, `branch`, `status`, `created`, `sort`), `validateRolesSearch`.                                                |
-| `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                       |
-| `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                        |
-| `UsersPage.tsx`                   | The Team (or Roles & access, `from=roles`): toolbar, table, row actions, bulk Export, the user drawers and the delete confirm. Owns `users-page`. |
-| `components/TeamCells/`           | The Team's cells (ID, User, Roles with "Main role" / "Also", Branches, Status with the invitation).                                               |
-| `components/UserDrawer/`          | The user drawer: form, read-outs, the two steps' fields and the save (invite or edit, D47).                                                       |
-| `components/UserDeleteConfirm/`   | "Delete this user?" — the row leaves at once, the membership after the 10s Undo (or the invitation is cancelled).                                 |
-| `hooks/useTeamTable/`             | The Team's columns and table instance (Roles is the phone key column; no Branches column with one open branch).                                   |
-| `hooks/useUsersDialogRoute/`      | Which drawer the URL opens; refusal and "User not found" back to the Team (or to the role it was opened from).                                    |
-| `roles/`                          | Roles & access (`/users/roles`) — renders `RolesAccess` for the URL's `role`.                                                                     |
-| `branches/`                       | Branches (`/users/branches`) and the branch drawer — its own island with `branches/create/` and `branches/$branchId/edit/`.                       |
-| `shared/components/UsersToolbar/` | The room toolbar for every tab.                                                                                                                   |
-| `shared/components/RolesAccess/`  | Roles & access: the role list, the role page, the matrix, the special permissions; instant writes with rollback.                                  |
-| `shared/hooks/useRoleDirectory/`  | Every listed role named and toned (presets by the clinic vocabulary, custom roles by name).                                                       |
-| `shared/hooks/useNewRole/`        | "New role": the next "New role" name, `organization:read` only, the next custom tone; selects it.                                                 |
-| `shared/hooks/useHoursFormat/`    | The words for days and hours — "Mon–Sat · 10:00–19:00", "Every day" — for the Team, the user drawer and Branches.                                 |
-| `__tests__/integration/`          | The test router (the family's routes over a mocked clinozy-be) and the drawer / removal flows.                                                    |
+| File                              | Responsibility                                                                                                                                                                                                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                                                                                         |
+| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `clinic-users`, nav `users`.                                                                            |
+| `users.search.ts`                 | `validateUsersSearch` (`q`, `role`, `branch`, `status`, `created`, `sort`), `validateRolesSearch`.                                                                                                                |
+| `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                                                                                       |
+| `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                                                                                        |
+| `UsersPage.tsx`                   | The Team (or Roles & access, `from=roles`): toolbar, table, row actions, bulk Export, the user drawers and the delete confirm. Owns `users-page`.                                                                 |
+| `components/TeamCells/`           | The Team's cells (ID, User, Roles with "Main role" / "Also", Branches, Status with the invitation).                                                                                                               |
+| `components/UserDrawer/`          | The user drawer: form, read-outs, the two steps' fields and the save (invite or edit, D47).                                                                                                                       |
+| `components/UserDeleteConfirm/`   | "Delete this user?" — the row leaves at once, the membership after the 10s Undo (or the invitation is cancelled). Mounted by the page for the row and the drawer alike, so the window outlives the drawer (L-64). |
+| `hooks/useTeamTable/`             | The Team's columns and table instance (Roles is the phone key column; no Branches column with one open branch).                                                                                                   |
+| `hooks/useUsersDialogRoute/`      | Which drawer the URL opens; refusal and "User not found" back to the Team (or to the role it was opened from).                                                                                                    |
+| `roles/`                          | Roles & access (`/users/roles`) — renders `RolesAccess` for the URL's `role`.                                                                                                                                     |
+| `branches/`                       | Branches (`/users/branches`) and the branch drawer — its own island with `branches/create/` and `branches/$branchId/edit/`.                                                                                       |
+| `shared/components/UsersToolbar/` | The room toolbar for every tab.                                                                                                                                                                                   |
+| `shared/components/RolesAccess/`  | Roles & access: the role list, the role page, the matrix, the special permissions; instant writes with rollback.                                                                                                  |
+| `shared/hooks/useRoleDirectory/`  | Every listed role named and toned (presets by the clinic vocabulary, custom roles by name).                                                                                                                       |
+| `shared/hooks/useNewRole/`        | "New role": the next "New role" name, `organization:read` only, the next custom tone; selects it.                                                                                                                 |
+| `shared/hooks/useHoursFormat/`    | The words for days and hours — "Mon–Sat · 10:00–19:00", "Every day" — for the Team, the user drawer and Branches.                                                                                                 |
+| `__tests__/integration/`          | The test router (the family's routes over a mocked clinozy-be) and the drawer / removal flows.                                                                                                                    |
 
 ## Test ids
 

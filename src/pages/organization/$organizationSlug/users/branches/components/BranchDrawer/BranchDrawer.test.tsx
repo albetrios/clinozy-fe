@@ -274,6 +274,36 @@ describe('the branch drawer — Edit branch', () => {
     expect(within(panel).queryByTestId('branch-drawer-delete')).toBeNull();
   });
 
+  it('deletes a branch from its drawer: one confirm, it closes, the branch goes after the window', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const vesu = branchNamed('Vesu');
+    const { router } = renderBranches(
+      `/organization/acme/users/branches/${vesu.id}/edit`,
+    );
+    const panel = await drawer();
+    await user.click(within(panel).getByTestId('branch-drawer-delete'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users/branches'),
+    );
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      'Vesu removed',
+      expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
+    );
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() =>
+      expect(clinicFixtures.branches.snapshot((row) => row.id === vesu.id)).toHaveLength(
+        0,
+      ),
+    );
+    // Neither "Branch not found" nor "Action cancelled" on the way out.
+    expect(notifyMock.info).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
   it('is view only without the Users row’s Edit', async () => {
     resetUsersRoutes();
     renderUsersRoutes(

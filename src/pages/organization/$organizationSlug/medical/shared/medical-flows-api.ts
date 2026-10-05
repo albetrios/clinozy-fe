@@ -126,7 +126,7 @@ export async function updatePurchaseOrder(
 /**
  * Cancel an Ordered order (`cancelPO`, `S:1673`): it stops here; stock and the
  * supplier's dues are not changed. The reason is the `delete_reason` the
- * confirm stores (D32) — Undo is a backend request.
+ * confirm stores (D32); {@link restorePurchaseOrder} is its Undo.
  */
 export async function cancelPurchaseOrder(
   id: string,
@@ -137,6 +137,21 @@ export async function cancelPurchaseOrder(
   return clinicFixtures.purchaseOrders.update(id, {
     stage: 'cancelled',
     cancelReason: reason,
+  });
+}
+
+/**
+ * Undo a cancel — the Undo of "PO #430 cancelled" (`POST …/restore` in the
+ * 10s window, D32; REPLACE_WITH_API — a backend request, Appendix F): the
+ * order is Ordered again, the stage it was cancelled from, its reason gone.
+ */
+export async function restorePurchaseOrder(id: string): Promise<MedicalPurchaseOrder> {
+  const { clinicFixtures } = await fixtureWorld();
+  const order = await clinicFixtures.purchaseOrders.get(id);
+  if (order.stage !== 'cancelled') conflict('This order is not cancelled');
+  return clinicFixtures.purchaseOrders.update(id, {
+    stage: 'ordered',
+    cancelReason: null,
   });
 }
 
@@ -290,7 +305,7 @@ function returnedQty(sale: MedicalSale, medicineId: string, batchNo: string) {
     .reduce((sum, item) => sum + item.qty, 0);
 }
 
-/** Put `qty` back into each line's batch. */
+/** Put `qty` back into each line's batch — a negative `qty` takes it out again, never below none. */
 async function restock(
   world: FixtureWorld,
   lines: readonly { medicineId: string; batchNo: string; qty: number }[],
@@ -301,7 +316,9 @@ async function restock(
     if (!known) continue;
     await world.medicines.update(medicine.id, {
       batches: medicine.batches.map((batch) =>
-        batch.batchNo === line.batchNo ? { ...batch, qty: batch.qty + line.qty } : batch,
+        batch.batchNo === line.batchNo
+          ? { ...batch, qty: Math.max(0, batch.qty + line.qty) }
+          : batch,
       ),
     });
   }
@@ -372,7 +389,7 @@ export async function returnSale(
 /**
  * Void a sale (`voidSale`, `S:1668`; Q-M2): only one nothing was paid on or
  * returned from — the sale is void, its invoice cancelled, and every line's
- * stock goes back into its batch.
+ * stock goes back into its batch. {@link restoreSale} is its Undo.
  */
 export async function voidSale(
   saleId: string,
@@ -389,6 +406,24 @@ export async function voidSale(
   return clinicFixtures.medicalSales.update(saleId, {
     voidedAt: new Date().toISOString(),
   });
+}
+
+/**
+ * Undo a void — the Undo of "Sale #978 voided" (`POST …/restore` in the 10s
+ * window, D32; REPLACE_WITH_API — a backend request, Appendix F): its invoice
+ * comes back, every line's stock leaves its batch again, and the sale is in
+ * the list as it was.
+ */
+export async function restoreSale(saleId: string): Promise<MedicalSale> {
+  const { clinicFixtures } = await fixtureWorld();
+  const sale = await clinicFixtures.medicalSales.get(saleId);
+  if (!sale.voidedAt) conflict('This sale is not void');
+  const invoice = await clinicFixtures.invoices.restore(sale.invoiceId);
+  await restock(
+    clinicFixtures,
+    soldLines(invoice).map((line) => ({ ...line, qty: -line.qty })),
+  );
+  return clinicFixtures.medicalSales.update(saleId, { voidedAt: null });
 }
 
 // ── Stock back to a supplier ──

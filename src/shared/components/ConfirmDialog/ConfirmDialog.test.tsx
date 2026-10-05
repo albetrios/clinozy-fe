@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import { ConfirmDialog } from './ConfirmDialog.tsx';
+import { isConfirmedWriteRunning } from './confirmed-write.ts';
 
 const base = {
   open: true,
@@ -111,5 +112,31 @@ describe('ConfirmDialog', () => {
   it('has no accessibility violations', async () => {
     const { baseElement } = render(<ConfirmDialog {...base} />);
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
+  });
+
+  it('marks its write as running for exactly as long as onConfirm runs (L-64)', async () => {
+    const user = userEvent.setup();
+    const seen: boolean[] = [];
+    const onConfirm = vi.fn(async () => {
+      seen.push(isConfirmedWriteRunning());
+      await Promise.resolve();
+      seen.push(isConfirmedWriteRunning());
+    });
+    render(<ConfirmDialog {...base} onConfirm={onConfirm} />);
+    expect(isConfirmedWriteRunning()).toBe(false);
+    await user.click(screen.getByTestId('confirm-accept'));
+    await waitFor(() => expect(onConfirm).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(isConfirmedWriteRunning()).toBe(false));
+    expect(seen).toEqual([true, true]);
+  });
+
+  it('ends the running write when onConfirm fails, too', async () => {
+    const user = userEvent.setup();
+    render(
+      <ConfirmDialog {...base} onConfirm={() => Promise.reject(new Error('nope'))} />,
+    );
+    await user.click(screen.getByTestId('confirm-accept'));
+    await waitFor(() => expect(screen.getByTestId('confirm-accept')).toBeEnabled());
+    expect(isConfirmedWriteRunning()).toBe(false);
   });
 });

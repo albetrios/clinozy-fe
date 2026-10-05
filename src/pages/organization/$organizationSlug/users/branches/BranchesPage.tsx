@@ -225,7 +225,15 @@ export function BranchesPage() {
         }
         className="m-(--room-card-margin) flex-1"
       />
-      <BranchDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      {/* The row's and the drawer's confirm both live here, so the removal's
+          10s Undo outlives the drawer it was confirmed from (L-64). */}
+      <BranchDeleteConfirm
+        target={deleting}
+        onClose={() => setDeleting(null)}
+        onDeleted={() => {
+          if (dialog.kind === 'edit') close();
+        }}
+      />
       <BranchDrawer
         mode="create"
         open={dialog.kind === 'create'}
@@ -246,7 +254,7 @@ export function BranchesPage() {
         ready={!list.isPending}
         onClose={close}
         onSaved={close}
-        onDeleted={close}
+        onDelete={setDeleting}
       />
       <Outlet />
     </section>

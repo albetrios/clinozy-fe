@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
@@ -67,7 +67,12 @@ export function useUsersDialogRoute(
   const edit = EDIT_PATH.exec(pathname);
 
   const { from, role } = options;
+  // The route this hook is closing itself: a member just deleted from their
+  // drawer leaves the list before the route does, and is not "not found".
+  const [closing, setClosing] = useState<string | null>(null);
+  if (closing !== null && closing !== pathname) setClosing(null);
   const close = useCallback(() => {
+    setClosing(pathname);
     if (from === 'roles') {
       void navigate({
         ...organizationUsersRoles(organizationSlug),
@@ -83,7 +88,7 @@ export function useUsersDialogRoute(
       hash: true,
       replace: true,
     });
-  }, [navigate, organizationSlug, from, role]);
+  }, [navigate, organizationSlug, from, role, pathname]);
 
   const isCreate = CREATE_PATH.test(pathname);
   const refused = isCreate && options.accessResolved && !options.canInvite;
@@ -91,7 +96,9 @@ export function useUsersDialogRoute(
   const member = membershipId
     ? team.members.find((row) => row.membershipId === membershipId)
     : undefined;
-  const missing = membershipId !== undefined && !team.isPending && !member;
+  const closingHere = closing === pathname;
+  const missing =
+    membershipId !== undefined && !team.isPending && !member && !closingHere;
 
   const reportedFor = useRef<string | null>(null);
   useEffect(() => {
@@ -109,6 +116,8 @@ export function useUsersDialogRoute(
     close();
   }, [refused, missing, pathname, close, t]);
 
+  // Closing: the drawer goes at once, while the route catches up.
+  if (closingHere) return { dialog: { kind: 'none' }, close };
   if (isCreate && !refused) return { dialog: { kind: 'create' }, close };
   if (membershipId && !missing) {
     return { dialog: { kind: 'edit', membershipId, member }, close };

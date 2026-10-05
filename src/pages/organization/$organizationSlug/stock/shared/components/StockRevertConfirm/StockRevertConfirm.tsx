@@ -9,7 +9,10 @@ import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-co
 import { notify } from '@/shared/notify/index.ts';
 
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
-import { useRevertStockMovement } from '../../hooks/useStockWrites/index.ts';
+import {
+  useRevertStockMovement,
+  useUndoStockMovement,
+} from '../../hooks/useStockWrites/index.ts';
 import type { StockChangeRow } from '../../stock-contracts.ts';
 import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
 
@@ -39,12 +42,14 @@ export interface StockRevertConfirmProps {
  * what it was before this entry. Both entries stay in the history.", and the
  * schema's `revert_reason` chips — "Other" waits for a note. The write adds a
  * linked Reverted entry and toasts "Used reverted · … back to 6 tube"
- * (`revertMovement`, `S:1689`).
+ * (`revertMovement`, `S:1689`) with Undo for 10s, which takes the Reverted
+ * entry back out and the stock with it (L-64).
  */
 export function StockRevertConfirm({ movement, onClose }: StockRevertConfirmProps) {
   const { t, i18n } = useTranslation(STOCK_DRAWERS_NS);
   const words = useStockWords();
   const revert = useRevertStockMovement();
+  const undo = useUndoStockMovement();
   const type = movement ? words.movementType(movement.kind).label : '';
   return (
     <ConfirmDialog
@@ -67,17 +72,18 @@ export function StockRevertConfirm({ movement, onClose }: StockRevertConfirmProp
       }}
       onConfirm={async ({ picked, comment }) => {
         if (!movement) return;
-        const { item } = await revert.mutateAsync({
+        const { item, movement: reverting } = await revert.mutateAsync({
           movementId: movement.id,
           reason: picked.value as RevertReason,
           note: comment || null,
         });
-        notify.success(
+        notify.undo(
           t(K.done, {
             type,
             name: item.name,
             quantity: words.units(item, item.qtyMilli),
           }),
+          { onUndo: () => undo.mutate(reverting.id) },
         );
       }}
     />

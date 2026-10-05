@@ -360,6 +360,32 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     expect(api.removeMember).not.toHaveBeenCalled();
   });
 
+  it('deletes from the drawer too: it closes, and the membership goes after the window', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { router } = renderUsersRoutes(
+      '/organization/acme/users/mbr_reenal/edit',
+      UsersPage,
+    );
+    const panel = await drawer();
+    await user.click(within(panel).getByTestId('user-drawer-delete'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    expect(within(dialog).getByText('Delete this user?')).toBeInTheDocument();
+    await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users'),
+    );
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      'Dr. Reenal Chaniyara removed',
+      expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
+    );
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_reenal'));
+    // The drawer closing never takes the delete back ("Action cancelled").
+    expect(notifyMock.info).not.toHaveBeenCalled();
+  });
+
   it('cancels an invitation instead of removing a membership', async () => {
     await confirmDelete('new@clinic.com');
     await vi.advanceTimersByTimeAsync(10_000);
@@ -438,6 +464,25 @@ describe('Users › leave the clinic (D17 — Settings’ self-removal)', () => 
     expect(within(dialog).getByText('Leave Cresence Skin?')).toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Stay' }));
     expect(api.leaveOrganization).not.toHaveBeenCalled();
+  });
+
+  it('leaves from your own drawer too: it closes, and the leave lands after the window', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { router } = renderUsersRoutes(
+      '/organization/acme/users/mbr_riya/edit',
+      UsersPage,
+    );
+    const panel = await drawer();
+    await user.click(within(panel).getByTestId('user-drawer-delete'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/users'),
+    );
+    await vi.advanceTimersByTimeAsync(10_000);
+    await waitFor(() => expect(api.leaveOrganization).toHaveBeenCalledTimes(1));
+    expect(notifyMock.info).not.toHaveBeenCalled();
   });
 
   it('never offers it to the owner — clinozy-be makes them transfer ownership first', async () => {
