@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
-import { monthCells } from '@/shared/api/clinic/appointment-views.ts';
 import {
   APPOINTMENT_SLOT_STEPS,
   type AppointmentSlot,
@@ -10,7 +8,7 @@ import {
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   addCivilDays,
-  addCivilMonths,
+  civilDateOf,
   civilMonthStart,
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
@@ -19,10 +17,10 @@ import {
   DrawerQuickChips,
   type DrawerQuickOption,
 } from '@/shared/components/DrawerField/index.ts';
+import { LocalizedCalendar } from '@/shared/components/LocalizedCalendar/index.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/index.ts';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { ChevronLeft, ChevronRight } from '@/shared/icons/index.ts';
 
 import {
   APPOINTMENT_FORM_KEYS,
@@ -47,10 +45,6 @@ const SLOT_COLUMNS: Readonly<Record<AppointmentSlotStep, string>> = {
   30: 'grid-cols-2',
   15: 'grid-cols-4',
 };
-
-/** The calendar's pick: 24% of the sky ink over its tint (H:5999). */
-const PICKED_DAY =
-  'bg-[color-mix(in_oklab,var(--color-tone-sky-foreground)_24%,var(--color-tone-sky))] text-tone-sky-foreground font-semibold';
 
 /** Props for {@link DateTimeStep}. */
 export interface DateTimeStepProps {
@@ -106,9 +100,10 @@ function QuickDates({
 }
 
 /**
- * The month calendar (H:2779–2781): "‹ <Month YYYY> ›" — "‹" off on the
- * current month — the two-letter weekdays ("Su Mo Tu", `weekdayHeaders`)
- * Sunday first (Q-A10), past days disabled, today and the pick in sky.
+ * The month calendar (H:2779–2781) — the app's month grid in its `compact`
+ * look: "‹ <Month YYYY> ›" — "‹" off on the current month — the two-letter
+ * weekdays Sunday first (Q-A10), past days off, today and the pick in sky.
+ * One tab stop: arrow keys move between days, Enter or Space picks.
  */
 function BookingCalendar({
   draft,
@@ -126,14 +121,7 @@ function BookingCalendar({
   onPick: (date: string) => void;
 }) {
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
-  const { formatDate, prefs } = useLocaleFormat();
-  const headers = weekdayHeaders(prefs.formatLocale);
-  const cells = monthCells(month);
-  const sunday = addCivilDays(today, -localDateOf(today).getDay());
-  const weekdays = Array.from({ length: 7 }, (_, index) => addCivilDays(sunday, index));
-  const atCurrent = month <= civilMonthStart(today);
-  const nav =
-    'bg-card text-foreground-soft hover:bg-muted flex size-6 items-center justify-center rounded-md border transition-colors disabled:pointer-events-none disabled:opacity-50';
+  const { formatDate } = useLocaleFormat();
   return (
     <div
       role="group"
@@ -142,82 +130,39 @@ function BookingCalendar({
       data-slot="booking-calendar"
       className="bg-card rounded-lg border p-2"
     >
-      <div className="mb-1 flex items-center justify-between">
-        <button
-          type="button"
-          aria-label={t(K.previousMonth)}
-          title={t(K.previousMonth)}
-          disabled={atCurrent || disabled}
-          data-testid={IDS.calendarPrevious}
-          onClick={() => onMonthChange(addCivilMonths(month, -1))}
-          className={nav}
-        >
-          <ChevronLeft aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-        </button>
-        <span className="text-detail font-semibold" aria-live="polite">
-          {formatDate(
-            localDateOf(month),
-            { month: 'long', year: 'numeric' },
-            { civilDay: true },
-          )}
-        </span>
-        <button
-          type="button"
-          aria-label={t(K.nextMonth)}
-          title={t(K.nextMonth)}
-          disabled={disabled}
-          data-testid={IDS.calendarNext}
-          onClick={() => onMonthChange(addCivilMonths(month, 1))}
-          className={nav}
-        >
-          <ChevronRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-        </button>
-      </div>
-      <div className="grid grid-cols-7 gap-px">
-        {weekdays.map((day) => (
-          <span
-            key={day}
-            aria-hidden="true"
-            className="text-muted-foreground flex h-5 items-center justify-center text-[length:calc(var(--text-xs)*5/6)]"
-          >
-            {headers[localDateOf(day).getDay()]}
-          </span>
-        ))}
-        {cells.map((day, index) => {
-          if (day === null) {
-            // biome-ignore lint/suspicious/noArrayIndexKey: the blanks have no identity of their own
-            return <span key={`blank-${index}`} aria-hidden="true" className="h-6.5" />;
-          }
-          const past = day < today;
-          const picked = draft.date === day;
-          const isToday = day === today;
-          let look = 'hover:bg-muted';
-          if (picked) look = PICKED_DAY;
-          else if (isToday) look = cn(TONE_CLASSES.sky.surface, 'font-semibold');
-          return (
-            <button
-              key={day}
-              type="button"
-              aria-pressed={picked}
-              aria-label={formatDate(
-                localDateOf(day),
-                { weekday: 'short', day: 'numeric', month: 'short' },
-                { civilDay: true },
-              )}
-              disabled={past || disabled}
-              data-testid={IDS.calendarDay}
-              data-day={day}
-              onClick={() => onPick(day)}
-              className={cn(
-                'text-caption h-6.5 rounded-md tabular-nums transition-colors disabled:pointer-events-none',
-                past ? 'text-disabled' : look,
-              )}
-            >
-              {formatDate(localDateOf(day), { day: 'numeric' }, { civilDay: true })}
-            </button>
-          );
-        })}
-      </div>
+      <LocalizedCalendar
+        look="compact"
+        tone="sky"
+        mode="single"
+        required
+        selected={draft.date ? localDateOf(draft.date) : undefined}
+        onSelect={(date) => {
+          if (date) onPick(civilDateOf(date));
+        }}
+        month={localDateOf(month)}
+        onMonthChange={(date) => onMonthChange(civilMonthStart(civilDateOf(date)))}
+        startMonth={localDateOf(civilMonthStart(today))}
+        today={localDateOf(today)}
+        weekStartsOn={0}
+        showOutsideDays={false}
+        disabled={disabled ? true : { before: localDateOf(today) }}
+        disableNavigation={disabled}
+        labels={{
+          labelDayButton: (date) =>
+            formatDate(
+              date,
+              { weekday: 'short', day: 'numeric', month: 'short' },
+              { civilDay: true },
+            ),
+          labelPrevious: () => t(K.previousMonth),
+          labelNext: () => t(K.nextMonth),
+        }}
+        testIds={{
+          day: IDS.calendarDay,
+          previous: IDS.calendarPrevious,
+          next: IDS.calendarNext,
+        }}
+      />
     </div>
   );
 }

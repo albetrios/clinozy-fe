@@ -41,9 +41,9 @@ export function monthDays(month: string): string[] {
 }
 
 /**
- * A month as calendar cells (H:5936) — the Month board's and the booking
- * calendar's: the month's days under Sun–Sat (Q-A10), `null` before the first
- * and after the last so every row has seven.
+ * A month as calendar cells (H:5936) — the Month board's (the month grids are
+ * `LocalizedCalendar`): the month's days under Sun–Sat (Q-A10), `null` before
+ * the first and after the last so every row has seven.
  */
 export function monthCells(anchor: string): (string | null)[] {
   const days = monthDays(civilMonthStart(anchor));

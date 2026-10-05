@@ -39,6 +39,10 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     (`@/shared/components/Picker`; `multiple` for several, `plain` for a neutral list,
     `menu` for a list of places). There is no `ui/select` (deleted in L-62) — never
     re-add it, and never a hand-built Popover + `Command` list.
+  - Pick a day on a month → **`LocalizedCalendar`** (`look`: `picker` inside
+    `CalendarPicker`, `compact` the booking step, `regular` the Filters; `tone`, a
+    `dots` modifier, `testIds`). Never a hand-built grid of day buttons, never
+    `ui/calendar`.
   - A menu of ACTIONS (Account, "+", row ⋯, theme toggle) → `ui/dropdown-menu`.
   - Confirm an action → **`ConfirmDialog`** (`reason` for a record delete / cancel /
     void; plain otherwise — it busy-blocks dismissal); "discard changes?" →

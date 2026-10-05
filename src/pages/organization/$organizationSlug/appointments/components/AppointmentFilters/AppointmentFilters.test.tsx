@@ -108,10 +108,12 @@ describe('AppointmentFilters (appointments.md:103–117, 135–147)', () => {
     const ninth = days.find((day) => day.dataset.day === '2026-10-09');
     if (!ninth) throw new Error('no 9 Oct');
     expect(ninth).toHaveAccessibleName(/^2026-10-09 · \d+ booked$/);
+    // The month grid marks the pick on the day's gridcell (one tab stop, arrows move).
+    const cell = () => ninth.closest('[role="gridcell"]');
     await user.click(ninth);
-    expect(ninth).toHaveAttribute('aria-pressed', 'true');
+    expect(cell()).toHaveAttribute('aria-selected', 'true');
     await user.click(ninth);
-    expect(ninth).toHaveAttribute('aria-pressed', 'false');
+    expect(cell()).not.toHaveAttribute('aria-selected');
     await user.click(ninth);
     await user.click(within(panel).getByTestId('appointments-filters-apply'));
     await waitFor(() =>

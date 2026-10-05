@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
-import { monthDays } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   addCivilDays,
+  civilDateOf,
   civilMonthStart,
   clinicToday,
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  type CalendarDayDots,
+  LocalizedCalendar,
+} from '@/shared/components/LocalizedCalendar/index.ts';
 import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { ChevronLeft, ChevronRight } from '@/shared/icons/index.ts';
 
 import { loadDots } from '../../appointments.calendar.ts';
 import {
@@ -23,24 +24,12 @@ import {
 } from '../../appointments.constants.ts';
 import { shiftAnchor } from '../../hooks/useAppointmentsNavigation/index.ts';
 
-/** A calendar month's first day, `YYYY-MM-01`. */
-
-/** The first day's column, Sunday first (H:5920) — literal classes for Tailwind. */
-const FIRST_COLUMN = [
-  'col-start-1',
-  'col-start-2',
-  'col-start-3',
-  'col-start-4',
-  'col-start-5',
-  'col-start-6',
-  'col-start-7',
-] as const;
-
-/** A day's dots, by name — at most three. */
-const DOTS = ['first', 'second', 'third'] as const;
-
 /** A dot's colour by the day's load: sage, butter, then the red of a full day. */
-const DOT_COLOURS = ['', 'bg-tone-sage-dot', 'bg-tone-butter-dot', 'bg-now-indicator'];
+const DOT_COLOURS = {
+  1: 'bg-tone-sage-dot',
+  2: 'bg-tone-butter-dot',
+  3: 'bg-now-indicator',
+} as const;
 
 /** Bookings that hold a slot on each day — every one but a cancelled one (`perDay`, H:5893). */
 function bookedByDay(rows: readonly AppointmentRow[]): Map<string, number> {
@@ -61,22 +50,18 @@ export interface FiltersCalendarProps {
 }
 
 /**
- * The Filters' mini month calendar (H:2000–2007; `appointments.md:107`):
- * "‹ <Month YYYY> ›", the two-letter weekdays ("Su Mo Tu" — the calendars'
- * one form, `weekdayHeaders`), 32px days with one to three load dots,
- * past days at 60%, today grey, the pick dark; each day's tooltip "<date> ·
- * <n> booked". A second press on the picked day clears it; "Upcoming
- * (default)" goes back to every day from today. It keeps its own month — the
- * prototype shared one with the Month board (H:5919, §7.3).
+ * The Filters' mini month calendar (H:2000–2007; `appointments.md:107`) — the
+ * app's month grid in its `regular` look: "‹ <Mon YYYY> ›", the two-letter
+ * weekdays Sunday first (Q-A10), 32px days with one to three load dots, past
+ * days at 60%, today grey, the pick dark; each day's tooltip "<date> · <n>
+ * booked". A second press on the picked day clears it; "Upcoming (default)"
+ * goes back to every day from today. It keeps its own month — the prototype
+ * shared one with the Month board (H:5919, §7.3).
  */
 export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarProps) {
   const { t } = useTranslation(APPOINTMENTS_NS);
-  const { formatDate, prefs } = useLocaleFormat();
-  const headers = weekdayHeaders(prefs.formatLocale);
   const today = clinicToday();
   const [month, setMonth] = useState(() => civilMonthStart(value ?? today));
-  const days = monthDays(month);
-  const firstColumn = FIRST_COLUMN[localDateOf(month).getDay()];
   const range = useAppointmentRange(
     {
       from: month,
@@ -88,97 +73,43 @@ export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarP
   );
   const booked = bookedByDay(range.data ?? []);
   const keys = APPOINTMENTS_KEYS.filters;
-  // A week of Sunday-first days, for the weekday headers.
-  const sunday = addCivilDays(today, -localDateOf(today).getDay());
-  const weekdays = Array.from({ length: 7 }, (_, index) => addCivilDays(sunday, index));
+  const dots = (date: string): CalendarDayDots | undefined => {
+    const level = loadDots(booked.get(date) ?? 0);
+    return level === 0 ? undefined : { count: level, className: DOT_COLOURS[level] };
+  };
 
   return (
     <div
       data-testid={APPOINTMENTS_TEST_IDS.filtersCalendar}
       className="flex flex-col gap-2 rounded-lg border p-2.5"
     >
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          aria-label={t(keys.previousMonth)}
-          title={t(keys.previousMonth)}
-          data-testid={APPOINTMENTS_TEST_IDS.filtersMonthPrevious}
-          data-slot="button"
-          onClick={() => setMonth(shiftAnchor(month, 'month', -1))}
-          className="bg-card hover:bg-muted flex size-8 items-center justify-center rounded-lg border transition-colors"
-        >
-          <ChevronLeft aria-hidden="true" className="size-3.75 rtl:rotate-180" />
-        </button>
-        <span className="text-body font-semibold" aria-live="polite">
-          {formatDate(
-            localDateOf(month),
-            { month: 'short', year: 'numeric' },
-            { civilDay: true },
-          )}
-        </span>
-        <button
-          type="button"
-          aria-label={t(keys.nextMonth)}
-          title={t(keys.nextMonth)}
-          data-testid={APPOINTMENTS_TEST_IDS.filtersMonthNext}
-          data-slot="button"
-          onClick={() => setMonth(shiftAnchor(month, 'month', 1))}
-          className="bg-card hover:bg-muted flex size-8 items-center justify-center rounded-lg border transition-colors"
-        >
-          <ChevronRight aria-hidden="true" className="size-3.75 rtl:rotate-180" />
-        </button>
-      </div>
-      <div
-        aria-hidden="true"
-        className="text-tiny text-muted-foreground grid grid-cols-7 gap-0.5 text-center"
-      >
-        {weekdays.map((day) => (
-          <span key={day}>{headers[localDateOf(day).getDay()]}</span>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 gap-0.5">
-        {days.map((day, index) => {
-          const count = booked.get(day) ?? 0;
-          const picked = value === day;
-          const isToday = day === today;
-          const label = t(keys.dayBooked, { date: day, count });
-          let fill = 'hover:bg-muted';
-          if (picked) fill = 'bg-primary text-primary-foreground';
-          else if (isToday) fill = 'bg-muted';
-          return (
-            <button
-              key={day}
-              type="button"
-              aria-label={label}
-              title={label}
-              aria-pressed={picked}
-              data-testid={APPOINTMENTS_TEST_IDS.filtersDay}
-              data-day={day}
-              onClick={() => onChange(picked ? undefined : day)}
-              className={cn(
-                'text-body flex h-8 flex-col items-center justify-center gap-0.5 rounded-lg transition-colors',
-                index === 0 && firstColumn,
-                fill,
-                (picked || isToday) && 'font-semibold',
-                day < today && 'opacity-60',
-              )}
-            >
-              {formatDate(localDateOf(day), { day: 'numeric' }, { civilDay: true })}
-              <span aria-hidden="true" className="flex h-1 gap-0.5">
-                {DOTS.slice(0, loadDots(count)).map((dot) => (
-                  <span
-                    key={dot}
-                    className={cn(
-                      'size-1 rounded-full',
-                      picked ? 'bg-canvas' : DOT_COLOURS[loadDots(count)],
-                    )}
-                  />
-                ))}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <LocalizedCalendar
+        look="regular"
+        mode="single"
+        selected={value ? localDateOf(value) : undefined}
+        onSelect={(date) => onChange(date ? civilDateOf(date) : undefined)}
+        month={localDateOf(month)}
+        onMonthChange={(date) => setMonth(civilMonthStart(civilDateOf(date)))}
+        today={localDateOf(today)}
+        weekStartsOn={0}
+        showOutsideDays={false}
+        modifiers={{ past: { before: localDateOf(today) } }}
+        modifiersClassNames={{ past: 'opacity-60' }}
+        dots={dots}
+        labels={{
+          labelDayButton: (date) => {
+            const day = civilDateOf(date);
+            return t(keys.dayBooked, { date: day, count: booked.get(day) ?? 0 });
+          },
+          labelPrevious: () => t(keys.previousMonth),
+          labelNext: () => t(keys.nextMonth),
+        }}
+        testIds={{
+          day: APPOINTMENTS_TEST_IDS.filtersDay,
+          previous: APPOINTMENTS_TEST_IDS.filtersMonthPrevious,
+          next: APPOINTMENTS_TEST_IDS.filtersMonthNext,
+        }}
+      />
       <button
         type="button"
         aria-pressed={value === undefined}

@@ -41,7 +41,7 @@
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "agent-os/skills/shadcn/SKILL.md",
-      "computedHash": "4beceee816123a0a5b57ad837e7df25ce2070b5632358c3d9e3dc2152a3a5daa"
+      "computedHash": "b9bf515a13e420b7afa987967f94f451816d018b0b29fdae7164872207226854"
     },
     "systematic-debugging": {
       "source": "obra/superpowers",

@@ -190,6 +190,36 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     expect(within(panel).queryAllByTestId(IDS.slotTime)).toHaveLength(0);
   });
 
+  it('picks the day on the month grid: past days off, "‹" off on this month, the pick in sky', async () => {
+    const user = setUser();
+    renderNew();
+    const panel = await form(NEW);
+    const calendar = within(panel).getByTestId(IDS.calendar);
+    expect(calendar).toHaveAccessibleName('Calendar');
+    const day = (iso: string) =>
+      within(calendar)
+        .getAllByTestId(IDS.calendarDay)
+        .find((button) => button.dataset.day === iso) as HTMLElement;
+    expect(day('2026-10-02')).toBeDisabled();
+    expect(day(TODAY)).toHaveAttribute('data-day-state', 'selected');
+    expect(within(calendar).getByTestId(IDS.calendarPrevious)).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    await user.click(day('2026-10-09'));
+    expect(day('2026-10-09')).toHaveAttribute('data-day-state', 'selected');
+    expect(day(TODAY)).toHaveAttribute('data-day-state', 'today');
+    expect(within(panel).getByTestId(`${IDS.quickDate}-today`)).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    await user.click(within(calendar).getByTestId(IDS.calendarNext));
+    expect(within(calendar).getByRole('status')).toHaveTextContent('November 2026');
+    expect(within(calendar).getByTestId(IDS.calendarPrevious)).not.toHaveAttribute(
+      'aria-disabled',
+    );
+  });
+
   it('finds a patient, picks a free slot and books it: "Book <day>, <time>"', async () => {
     const user = setUser();
     const { onSaved } = renderNew({ prefill: { date: '2026-10-05' } });

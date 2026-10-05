@@ -59,10 +59,19 @@ after fixing one, grep `formatDate(` and classify every caller.
 
 Import **`@/shared/components/LocalizedCalendar`**, never
 `@/shared/components/ui/calendar.tsx`. The wrapper injects `weekStartsOn` from
-`firstDayOfWeek` and a `formatMonthDropdown` that passes `{ civilDay: true }` —
+`firstDayOfWeek`, the two-letter weekday headers, and a caption, month / year
+dropdowns, day numbers and day names that all pass `{ civilDay: true }` —
 without it, a display timezone west of the device labels March as Feb. An
 `eslint no-restricted-imports` rule enforces this from `src/shared/**` and
 `src/pages/**`.
+
+It is the app's **one month grid** (L-62): `look` picks the date field's popover
+(`picker`, `CalendarPicker`), the booking step's (`compact`) or the Filters'
+(`regular`); `tone`, a `dots` modifier (days with marks) and `testIds` (each day
+button carries `data-day="YYYY-MM-DD"`) cover the rest. Hand it local-midnight
+Dates from `localDateOf(civil)` and read picks back with `civilDateOf(date)`;
+pass `weekStartsOn={0}` where the clinic's Sunday week rules (Q-A10). Never draw
+a grid of day buttons by hand.
 
 ## Charts and vendored components
 

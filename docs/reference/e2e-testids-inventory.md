@@ -909,33 +909,33 @@ shared ids above with the `tableId` `appointments` (`appointments-toolbar`, `app
 `appointments-search`, `appointments-filters-trigger`, `appointments-table-row`). An Agenda day
 header is its own row (`role="row"`, `data-slot="data-table-group"`) between the body rows.
 
-| Test ID                                                                     | Element                                                                    | Source                                 |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
-| `appointments-today`                                                        | "Today" · "This week" · "This month" (`aria-pressed` on the current one)   | `components/AppointmentsToolbar/`      |
-| `appointments-period-previous` · `-period-next` · `-period-label`           | Period arrows · the period's name                                          | `components/AppointmentsToolbar/`      |
-| `appointments-day-group`                                                    | Agenda day header: date tile, "Today" / weekday, sub line, counts          | `components/AppointmentsAgenda/`       |
-| `appointments-empty` · `appointments-book-one`                              | "No appointments here · book one" · its "book one" (Create only)           | `components/AppointmentsAgenda/`       |
-| `appointments-quick-view`                                                   | Row eye — pins the booking card (not on a phone)                           | `components/AppointmentsAgenda/`       |
-| `appointments-status-button`                                                | Row "Change status" button (Edit only; otherwise the status alone)         | `components/AppointmentsAgenda/`       |
-| `appointments-status-popover`                                               | Change status popover (`role="dialog"`)                                    | `components/AppointmentStatusPopover/` |
-| `appointments-status-option-<move>`                                         | One move — a status or `reschedule`; `aria-disabled` + reason when guarded | `components/AppointmentStatusPopover/` |
-| `appointments-cancel-reason-<reason>` · `appointments-status-back`          | Cancel view: one reason · Back                                             | `components/AppointmentStatusPopover/` |
-| `appointments-cancel-note` · `appointments-cancel-submit`                   | Cancel view, "Other": its required note · the red "Cancel" (one ask)       | `components/AppointmentStatusPopover/` |
-| `appointment-card`                                                          | Booking card (hover card, quick view, phone tap)                           | `components/AppointmentCard/`          |
-| `appointment-card-next` · `-open` · `-move-<move>`                          | Card: next action · Open · Reschedule / Cancel                             | `components/AppointmentCard/`          |
-| `appointments-filters-calendar` · `-filters-day`                            | Filters month calendar · one day (`aria-pressed` when picked)              | `components/AppointmentFilters/`       |
-| `appointments-filters-upcoming` · `-filters-month-previous` · `-month-next` | "Upcoming (default)" · the month arrows                                    | `components/AppointmentFilters/`       |
-| `appointments-filters-doctors`                                              | "Appointed to" doctor picker                                               | `components/DoctorPicker/`             |
-| `appointments-filters-status-<value>`                                       | Status chip (`all` · `active` · a status)                                  | `components/AppointmentFilters/`       |
-| `appointments-calendar`                                                     | A calendar's card (`data-view` = `day` · `week` · `month`)                 | `components/CalendarGrid/`             |
-| `appointments-block`                                                        | A booking on a calendar — block, Month chip or popover row (`data-status`) | `components/CalendarBlock/`            |
-| `appointments-day-column` · `appointments-now-line`                         | A day's column (`data-date`) · the 2px now line (today only)               | `components/CalendarGrid/`             |
-| `appointments-day-slots`                                                    | The Day column's empty surface — a press books its slot (Create only)      | `components/CalendarGrid/`             |
-| `appointments-day-header` · `appointments-day-doctors`                      | Day header (`md` and up) · its doctor picker                               | `components/AppointmentsDay/`          |
-| `appointments-day-strip` · `-day-strip-option`                              | Phone Doctor strip (`role="radiogroup"`) · one pill (`role="radio"`)       | `components/AppointmentsDay/`          |
-| `appointments-week-day`                                                     | A Week day header (`data-date`) — opens the day in Day                     | `components/AppointmentsWeek/`         |
-| `appointments-month-cell` · `appointments-month-more`                       | A Month cell (`data-date`) · its "+<n> more"                               | `components/AppointmentsMonth/`        |
-| `appointments-month-popover` · `appointments-month-open-day`                | The Month day popover (`role="dialog"`) · its "Open day"                   | `components/AppointmentsMonth/`        |
+| Test ID                                                                     | Element                                                                                    | Source                                 |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `appointments-today`                                                        | "Today" · "This week" · "This month" (`aria-pressed` on the current one)                   | `components/AppointmentsToolbar/`      |
+| `appointments-period-previous` · `-period-next` · `-period-label`           | Period arrows · the period's name                                                          | `components/AppointmentsToolbar/`      |
+| `appointments-day-group`                                                    | Agenda day header: date tile, "Today" / weekday, sub line, counts                          | `components/AppointmentsAgenda/`       |
+| `appointments-empty` · `appointments-book-one`                              | "No appointments here · book one" · its "book one" (Create only)                           | `components/AppointmentsAgenda/`       |
+| `appointments-quick-view`                                                   | Row eye — pins the booking card (not on a phone)                                           | `components/AppointmentsAgenda/`       |
+| `appointments-status-button`                                                | Row "Change status" button (Edit only; otherwise the status alone)                         | `components/AppointmentsAgenda/`       |
+| `appointments-status-popover`                                               | Change status popover (`role="dialog"`)                                                    | `components/AppointmentStatusPopover/` |
+| `appointments-status-option-<move>`                                         | One move — a status or `reschedule`; `aria-disabled` + reason when guarded                 | `components/AppointmentStatusPopover/` |
+| `appointments-cancel-reason-<reason>` · `appointments-status-back`          | Cancel view: one reason · Back                                                             | `components/AppointmentStatusPopover/` |
+| `appointments-cancel-note` · `appointments-cancel-submit`                   | Cancel view, "Other": its required note · the red "Cancel" (one ask)                       | `components/AppointmentStatusPopover/` |
+| `appointment-card`                                                          | Booking card (hover card, quick view, phone tap)                                           | `components/AppointmentCard/`          |
+| `appointment-card-next` · `-open` · `-move-<move>`                          | Card: next action · Open · Reschedule / Cancel                                             | `components/AppointmentCard/`          |
+| `appointments-filters-calendar` · `-filters-day`                            | Filters month grid · one day button (`data-day`; its gridcell `aria-selected` when picked) | `components/AppointmentFilters/`       |
+| `appointments-filters-upcoming` · `-filters-month-previous` · `-month-next` | "Upcoming (default)" · the month arrows                                                    | `components/AppointmentFilters/`       |
+| `appointments-filters-doctors`                                              | "Appointed to" doctor picker                                                               | `components/DoctorPicker/`             |
+| `appointments-filters-status-<value>`                                       | Status chip (`all` · `active` · a status)                                                  | `components/AppointmentFilters/`       |
+| `appointments-calendar`                                                     | A calendar's card (`data-view` = `day` · `week` · `month`)                                 | `components/CalendarGrid/`             |
+| `appointments-block`                                                        | A booking on a calendar — block, Month chip or popover row (`data-status`)                 | `components/CalendarBlock/`            |
+| `appointments-day-column` · `appointments-now-line`                         | A day's column (`data-date`) · the 2px now line (today only)                               | `components/CalendarGrid/`             |
+| `appointments-day-slots`                                                    | The Day column's empty surface — a press books its slot (Create only)                      | `components/CalendarGrid/`             |
+| `appointments-day-header` · `appointments-day-doctors`                      | Day header (`md` and up) · its doctor picker                                               | `components/AppointmentsDay/`          |
+| `appointments-day-strip` · `-day-strip-option`                              | Phone Doctor strip (`role="radiogroup"`) · one pill (`role="radio"`)                       | `components/AppointmentsDay/`          |
+| `appointments-week-day`                                                     | A Week day header (`data-date`) — opens the day in Day                                     | `components/AppointmentsWeek/`         |
+| `appointments-month-cell` · `appointments-month-more`                       | A Month cell (`data-date`) · its "+<n> more"                                               | `components/AppointmentsMonth/`        |
+| `appointments-month-popover` · `appointments-month-open-day`                | The Month day popover (`role="dialog"`) · its "Open day"                                   | `components/AppointmentsMonth/`        |
 
 ## Appointment form (shared, launch L-38)
 
@@ -945,27 +945,27 @@ booking) or `appointment-drawer` (Edit, Reschedule), with the drawer's derived i
 `-main`, `-aside`). The type, length and status chips carry `<id>-<value>`; the treatment, package
 and doctor pickers the shared picker ids; Cancel visit and Delete photo the shared reason confirm.
 
-| Test ID                                                                                | Element                                                                           | Source                      |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------- |
-| `appointment-form`                                                                     | The form's sections (a size container — under 520px the fields stack)             | `AppointmentForm.tsx`       |
-| `appointment-form-who-search` · `-who-hit` · `-who-create`                             | Person search · one hit · "+ Create contact “<query>”"                            | `WhoSection.tsx`            |
-| `appointment-form-who-card` · `-who-mobile`                                            | The person's card · a new contact's "+91" mobile                                  | `WhoSection.tsx`            |
-| `appointment-form-who-edit` · `-who-edit-name` · `-who-edit-mobile` · `-who-edit-save` | The inline Name · Mobile editor ("Edit" on the contact card) and its Save         | `WhoSection.tsx`            |
-| `appointment-form-connected-lead` · `appointment-form-lead-option`                     | A "Connected lead" chip · a "Lead" radio (two or more open leads)                 | `WhoSection.tsx`            |
-| `appointment-form-status` · `-status-<status>` · `-status-hint`                        | Visit status (Edit): the section · one tile (`data-step`) · the hint line         | `VisitStatusSection.tsx`    |
-| `appointment-form-cancelled` · `-restore` · `-rescheduled`                             | Cancelled banner · its Restore · the "Rescheduled · was …" note                   | `VisitStatusSection.tsx`    |
-| `appointment-form-plan` · `-copy` · `-rebook` · `-cancel-visit`                        | Plan flag · Copy (Rebook for a No-show) · Cancel visit                            | `VisitStatusSection.tsx`    |
-| `appointment-form-details` · `-details-toggle`                                         | Step 1 Appointment (`data-open`) · its head                                       | `AppointmentFormBlocks.tsx` |
-| `appointment-form-type` · `-treatment` · `-package` · `-package-as-treatment`          | Type chips · treatment picker · package radios · "Book as treatment"              | `AppointmentDetails.tsx`    |
-| `appointment-form-doctor` · `-length` · `-reason` · `-notes`                           | Doctor picker · length chips · Reason · Notes                                     | `AppointmentDetails.tsx`    |
-| `appointment-form-slot` · `-slot-toggle`                                               | Step 2 Date & time (`data-open`; locked after check-in) · its head                | `AppointmentFormBlocks.tsx` |
-| `appointment-form-quick-<today\|tomorrow\|next-week>`                                  | Quick dates (`aria-pressed`)                                                      | `DateTimeStep.tsx`          |
-| `appointment-form-calendar` · `-calendar-day` · `-calendar-previous` · `-next`         | Month calendar · one day (`data-day`, `aria-pressed`) · the month arrows          | `DateTimeStep.tsx`          |
-| `appointment-form-slot-step` · `-slot-hour` · `-slot-time`                             | "30 min" · "15 min" · one hour row · one start (`data-time`; disabled when taken) | `DateTimeStep.tsx`          |
-| `appointment-form-not-patient` · `-create-patient`                                     | Step 3 "Not a patient yet" · "Create patient record" (stacks `patient-quick-add`) | `PatientSections.tsx`       |
-| `appointment-form-photos` · `-photos-check-in` · `-photos-upload`                      | Visit photos · "Check in now" · "Upload photos"                                   | `PatientSections.tsx`       |
-| `appointment-form-photo` · `appointment-form-photo-delete`                             | One photo tile · its Delete                                                       | `PatientSections.tsx`       |
-| `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                               | `AppointmentForm.tsx`       |
+| Test ID                                                                                | Element                                                                                   | Source                      |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------- |
+| `appointment-form`                                                                     | The form's sections (a size container — under 520px the fields stack)                     | `AppointmentForm.tsx`       |
+| `appointment-form-who-search` · `-who-hit` · `-who-create`                             | Person search · one hit · "+ Create contact “<query>”"                                    | `WhoSection.tsx`            |
+| `appointment-form-who-card` · `-who-mobile`                                            | The person's card · a new contact's "+91" mobile                                          | `WhoSection.tsx`            |
+| `appointment-form-who-edit` · `-who-edit-name` · `-who-edit-mobile` · `-who-edit-save` | The inline Name · Mobile editor ("Edit" on the contact card) and its Save                 | `WhoSection.tsx`            |
+| `appointment-form-connected-lead` · `appointment-form-lead-option`                     | A "Connected lead" chip · a "Lead" radio (two or more open leads)                         | `WhoSection.tsx`            |
+| `appointment-form-status` · `-status-<status>` · `-status-hint`                        | Visit status (Edit): the section · one tile (`data-step`) · the hint line                 | `VisitStatusSection.tsx`    |
+| `appointment-form-cancelled` · `-restore` · `-rescheduled`                             | Cancelled banner · its Restore · the "Rescheduled · was …" note                           | `VisitStatusSection.tsx`    |
+| `appointment-form-plan` · `-copy` · `-rebook` · `-cancel-visit`                        | Plan flag · Copy (Rebook for a No-show) · Cancel visit                                    | `VisitStatusSection.tsx`    |
+| `appointment-form-details` · `-details-toggle`                                         | Step 1 Appointment (`data-open`) · its head                                               | `AppointmentFormBlocks.tsx` |
+| `appointment-form-type` · `-treatment` · `-package` · `-package-as-treatment`          | Type chips · treatment picker · package radios · "Book as treatment"                      | `AppointmentDetails.tsx`    |
+| `appointment-form-doctor` · `-length` · `-reason` · `-notes`                           | Doctor picker · length chips · Reason · Notes                                             | `AppointmentDetails.tsx`    |
+| `appointment-form-slot` · `-slot-toggle`                                               | Step 2 Date & time (`data-open`; locked after check-in) · its head                        | `AppointmentFormBlocks.tsx` |
+| `appointment-form-quick-<today\|tomorrow\|next-week>`                                  | Quick dates (`aria-pressed`)                                                              | `DateTimeStep.tsx`          |
+| `appointment-form-calendar` · `-calendar-day` · `-calendar-previous` · `-next`         | Month grid · one day button (`data-day`; its gridcell `aria-selected`) · the month arrows | `DateTimeStep.tsx`          |
+| `appointment-form-slot-step` · `-slot-hour` · `-slot-time`                             | "30 min" · "15 min" · one hour row · one start (`data-time`; disabled when taken)         | `DateTimeStep.tsx`          |
+| `appointment-form-not-patient` · `-create-patient`                                     | Step 3 "Not a patient yet" · "Create patient record" (stacks `patient-quick-add`)         | `PatientSections.tsx`       |
+| `appointment-form-photos` · `-photos-check-in` · `-photos-upload`                      | Visit photos · "Check in now" · "Upload photos"                                           | `PatientSections.tsx`       |
+| `appointment-form-photo` · `appointment-form-photo-delete`                             | One photo tile · its Delete                                                               | `PatientSections.tsx`       |
+| `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                                       | `AppointmentForm.tsx`       |
 
 ---
 
