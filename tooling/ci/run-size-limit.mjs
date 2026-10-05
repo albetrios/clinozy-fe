@@ -32,7 +32,7 @@ if (jsPaths.length === 0) {
 }
 
 // Budgets are a RATCHET (same philosophy as coverage thresholds): pinned just
-// above the measured first-paint size (JS ~216 kB gz, CSS ~22 kB gz) so any
+// above the measured first-paint size (JS ~248 kB gz, CSS ~43 kB gz) so any
 // regression trips CI immediately — lower as the bundle shrinks, never raise
 // to absorb growth.
 //
@@ -168,8 +168,7 @@ const config = [
      * Tasks list read left `tasks.search.ts` for `tasks.params.ts`, which
      * loads with the room (≈ −0.06 kB). Almost all of it is route
      * registration — manifests, builders and validators of dialog routes
-     * that render nothing on their own; L-54 moves that weight off the entry
-     * chunk once the builders stop editing `routeTree.tsx`, then lowers this.
+     * that render nothing on their own; L-54 moved it off (below).
      *
      * 253.1 → 255.1 kB (same exemption, D48): measured 254.67 kB after the
      * Today, Payments drawer, Day close, Medical drawer and Clinic stock rows
@@ -189,13 +188,8 @@ const config = [
      *   reader); L-39c −0.01, L-41 nothing.
      * Trimmed first: nothing obvious is left outside the registrations —
      * every reader these rows added is already dependency-free (no zod in
-     * the entry) and each tab's list read loads with its tab. The L-54 plan
-     * is expected to take ~6–7 kB gzipped off the entry chunk and lower this
-     * budget: a lazy `dialogRoute()` factory for the ~44 dialog routes that
-     * render nothing (the manifest and validators load with the route,
-     * `beforeLoad` awaits the manifest before the gateway), the builders
-     * split per room, and a `build:check` tripwire for dialog manifests and
-     * room builders in the entry.
+     * the entry) and each tab's list read loads with its tab; the route
+     * registrations themselves left with L-54 (below).
      *
      * 255.1 → 256.1 kB (same exemption, D48): measured 255.66 kB after the
      * Invoice drawer and Medical flows rows (254.66 kB before them), each row
@@ -215,11 +209,34 @@ const config = [
      *   filter values moved to `shared/api/clinic/` at no cost.
      * Trimmed first: nothing — the new readers are dependency-free, and the
      * drawer, its money module and the print preview load with their routes.
-     * The L-54 `dialogRoute()` plan above (now ~47 dialog routes, the
-     * invoices' three among them) is still expected to take ~6–7 kB gzipped
-     * off the entry chunk and lower this budget.
+     *
+     * 256.1 → 248.5 kB, lowered (L-54): measured 248.12 kB, from 257.43 kB on
+     * top of the Visit sheet (L-49) — the rows since 256.1 had taken first
+     * paint over the limit. Route registration left the entry chunk (209.5 →
+     * 161.2 kB raw, 60.1 → 50.7 kB gzipped), each commit built on this tree
+     * and attributed through the hidden source maps:
+     * - The clinic rooms behind one lazy module (−4.78 kB): the 25 room pages,
+     *   tabs and layouts and the invoices host load through `room-routes.ts`
+     *   (`roomRoute(name)`), so the entry no longer carries their `import()`s'
+     *   preload lists — every chunk each room shares, by name — nor the
+     *   ~150 chunk names only those lists used. The org shell's loader and the
+     *   signed-in warm-up fetch the module before a room needs it.
+     * - The dialog routes' manifests (−2.50 kB): the 47 drawers, viewers and
+     *   previews and the Visit sheet keep only their path in the entry;
+     *   `dialogRoute(name)` loads the manifest and component from
+     *   `dialog-routes.ts` — one import, not 48 — and `beforeLoad` awaits the
+     *   manifest before the same gate a page runs.
+     * - The room builders (−1.08 kB): `builders.ts` keeps the organization-
+     *   level four the entry calls; each room's are imported by path.
+     * - The dialog routes' search schemas (−0.96 kB): they moved to each
+     *   room's `<room>.dialog-search.ts`, with `toClinicPhone` and the Visit
+     *   sheet's tab reader; the routes keep their search, typed for links, and
+     *   the rooms parse it.
+     * `pnpm build:check` (`check-entry-routes.mjs`) now fails on a dialog
+     * manifest or a room builder in the first-paint chunks. ~0.4 kB of
+     * headroom, as the earlier limits left.
      */
-    limit: '256.1 kB',
+    limit: '248.5 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -333,12 +350,22 @@ const config = [
            * figure, the strips' auto-fit grid, the review rows' 910px
            * container re-grid). The Clinic stock room took 0.08 off (L-51:
            * the placeholder Items page's own heading gave way to the room
-           * toolbar's); L-39b and L-39c nothing. L-54 lowers this with the
-           * JS budget — the print sheets' millimetre utilities and the
-           * calendars' second in-place skeleton look, named above, are the
-           * candidates.
+           * toolbar's); L-39b and L-39c nothing.
+           *
+           * 43.7 → 43.6 kB, lowered (L-54): measured 43.30 kB. The rows since
+           * 43.7 was set — the Invoice drawer and Medical flows, the patient
+           * file's record drawers, notes and overview, the purchase quick
+           * lines, the one in-place skeleton look (which took the calendars'
+           * second one out) and the Visit sheet (+0.33 kB of its own) — had
+           * taken it to 44.19 kB. The A4 print sheets' utilities — their
+           * millimetre boxes, Arial and table layout, the first candidate
+           * named above — then left the first paint (−0.89 kB): `index.css`
+           * no longer scans `shared/components/PrintTemplate/`, whose own
+           * `print-template.css` loads with the chunks that print (the two
+           * token variants only the sheets use stay here, in its
+           * `@source inline(…)`). ~0.3 kB of headroom.
            */
-          limit: '43.7 kB',
+          limit: '43.6 kB',
           gzip: true,
         },
       ]
