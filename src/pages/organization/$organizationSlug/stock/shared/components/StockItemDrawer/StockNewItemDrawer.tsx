@@ -30,7 +30,7 @@ import {
 import { STOCK_NAME_MAX } from '../../stock-records-contracts.ts';
 import {
   ItemCategoryField,
-  ItemLevelFields,
+  ItemLevelField,
   ItemNameField,
   ItemUnitField,
 } from './stock-item-fields.tsx';
@@ -163,8 +163,9 @@ function NewItemSession({
       missing: values.name.trim() ? [] : [t(F.name)],
       content: (
         <DrawerStepBody readOnly={false}>
+          {/* The grid reads each field's width here: Name a half that stays a half. */}
           <DrawerFieldGrid>
-            <ItemNameField {...body} />
+            <ItemNameField {...body} span="half" stretch={false} />
             <ItemCategoryField {...body} />
             <ItemUnitField {...body} units={QUICK_ITEM_UNITS} />
           </DrawerFieldGrid>
@@ -181,8 +182,10 @@ function NewItemSession({
       ],
       content: (
         <DrawerStepBody readOnly={false}>
+          {/* Two thirds share the row as halves (H:4069). */}
           <DrawerFieldGrid>
-            <ItemLevelFields {...body} />
+            <ItemLevelField {...body} name="minQty" span="third" />
+            <ItemLevelField {...body} name="maxQty" span="third" />
           </DrawerFieldGrid>
         </DrawerStepBody>
       ),

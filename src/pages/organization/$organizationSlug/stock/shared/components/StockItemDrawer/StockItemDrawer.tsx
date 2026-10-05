@@ -42,11 +42,12 @@ import { MILLI } from '../../stock-units.ts';
 import { StockDeleteConfirm } from '../StockDeleteConfirm/index.ts';
 import {
   ItemCategoryField,
-  ItemContentsFields,
+  ItemContentsField,
   type ItemFieldProps,
-  ItemLevelFields,
+  ItemLevelField,
+  ItemMeasureField,
   ItemNameField,
-  ItemQuantityFields,
+  ItemQuantityField,
   ItemUnitField,
   ItemVendorField,
 } from './stock-item-fields.tsx';
@@ -129,11 +130,14 @@ function useSteps(
       missing: name ? [] : [t(K.fields.name)],
       content: (
         <DrawerStepBody readOnly={readOnly}>
+          {/* The grid reads each field's width here (H:5270): Name a half that
+              stays a half, "Contents per" a third beside "Measured in". */}
           <DrawerFieldGrid>
-            <ItemNameField {...body} />
+            <ItemNameField {...body} span="half" stretch={false} />
             <ItemCategoryField {...body} />
             <ItemUnitField {...body} units={ITEM_UNITS} />
-            <ItemContentsFields {...body} />
+            <ItemContentsField {...body} span="third" />
+            <ItemMeasureField {...body} span="half" />
           </DrawerFieldGrid>
         </DrawerStepBody>
       ),
@@ -152,9 +156,12 @@ function useSteps(
       ],
       content: (
         <DrawerStepBody readOnly={readOnly}>
+          {/* Four thirds (H:5271): In stock, Usage and Minimum, then Maximum alone at half. */}
           <DrawerFieldGrid>
-            <ItemQuantityFields {...body} />
-            <ItemLevelFields {...body} />
+            <ItemQuantityField {...body} name="inStock" span="third" />
+            <ItemQuantityField {...body} name="usage" span="third" />
+            <ItemLevelField {...body} name="minQty" span="third" />
+            <ItemLevelField {...body} name="maxQty" span="third" />
           </DrawerFieldGrid>
         </DrawerStepBody>
       ),
@@ -167,7 +174,7 @@ function useSteps(
       content: (
         <DrawerStepBody readOnly={readOnly}>
           <DrawerFieldGrid>
-            <ItemVendorField {...body} />
+            <ItemVendorField {...body} span="half" stretch={false} />
           </DrawerFieldGrid>
         </DrawerStepBody>
       ),

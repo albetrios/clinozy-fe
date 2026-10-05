@@ -121,6 +121,32 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
     });
   });
 
+  it('lays its fields on the grid as the design (H:5270–5272)', async () => {
+    const user = setup();
+    renderStockDrawer(<StockItemDrawer mode="create" open onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    const columns = (testId: string) =>
+      within(drawer)
+        .getByTestId(`${D}-${testId}`)
+        .closest('[class*="col-span-"]')
+        ?.className.match(/col-span-(\d)/)?.[1];
+    // Name a half that stays a half; "Contents per" a third, "Measured in" the rest.
+    expect(columns('name')).toBe('3');
+    expect(columns('unit-pack')).toBe('6');
+    expect(columns('contents')).toBe('2');
+    expect(columns('measure-ml')).toBe('4');
+
+    await user.click(within(drawer).getByTestId(`${D}-step-levels-trigger`));
+    expect(columns('in-stock')).toBe('2');
+    expect(columns('usage')).toBe('2');
+    expect(columns('min-decrease')).toBe('2');
+    // The third left alone in its row widens to half.
+    expect(columns('max-decrease')).toBe('3');
+
+    await user.click(within(drawer).getByTestId(`${D}-step-vendor-trigger`));
+    expect(columns('vendor')).toBe('3');
+  });
+
   it('edits an item: "#167" and its pill, a changed count saved as an Adjust', async () => {
     const user = setup();
     const onClose = vi.fn();
@@ -215,6 +241,16 @@ describe('StockNewItemDrawer (clinic-stock.md:187–201)', () => {
     expect(within(drawer).getByTestId(`${N}-step-details-peek`)).toHaveTextContent(
       /Minimum\s*1\s*Maximum\s*5/,
     );
+    const columns = (testId: string) =>
+      within(drawer)
+        .getByTestId(`${N}-${testId}`)
+        .closest('[class*="col-span-"]')
+        ?.className.match(/col-span-(\d)/)?.[1];
+    expect(columns('name')).toBe('3');
+    await user.click(within(drawer).getByTestId(`${N}-step-details-trigger`));
+    // Minimum and Maximum share their row as halves (H:4069).
+    expect(columns('min-decrease')).toBe('3');
+    expect(columns('max-decrease')).toBe('3');
 
     await user.click(within(drawer).getByTestId(`${N}-save`));
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
