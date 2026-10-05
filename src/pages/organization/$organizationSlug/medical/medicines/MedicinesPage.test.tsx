@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -35,5 +36,20 @@ describe('MedicinesPage', () => {
       'medical-medicines-tab-medicines',
     );
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('a batch expiring within 90 days can go back to its supplier', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    renderMedicalRoutes('/organization/acme/medical/medicines', {
+      medicines: MedicinesPage,
+    });
+    const [action] = await screen.findAllByTestId(
+      'medical-medicines-row-action-return-expiring',
+    );
+    expect(action).toHaveAccessibleName('Return expiring stock to supplier');
+    await user.click(action as HTMLElement);
+    expect(await screen.findByTestId('expiring-return-drawer')).toHaveTextContent(
+      'Return expiring stock',
+    );
   });
 });

@@ -51,22 +51,44 @@ its drawer over the list, on the shared record drawer:
 
 The partners' writes are `shared/medical-partners-api.ts` (contracts in
 `shared/medical-partners-contracts.ts`; hooks in `shared/hooks/useMedicalPartners/`); a medicine's
-are the shared `useMedicines` hooks. The purchase-order, sale and return drawers are L-50c.
+are the shared `useMedicines` hooks.
+
+## The flows (L-50c)
+
+- **Sales** (`sales/`): New sale is the shared Invoice drawer with the type locked to Medical
+  (`createSale`, stock by earliest expiry), on `?prescription=&customer=`, closing back to `from`
+  (Today's Dispense) or the list; the Sale view, Collect (one UPI receipt on the ledger, Undo),
+  Print (the invoice on the A4 sheet), Return from patient (stock back or written off; a refund
+  and its credit note when paid) and Void (`shared/components/MedicalFlowConfirm/`, Q-M2); the
+  "Prescriptions to fill" view action.
+- **Purchases** (`purchases/`): New / Edit purchase order ("⚡ Reorder low stock"), Receive goods
+  (each arrived line a batch of qty + free; its expiry asked for), the received or paid view, and
+  Cancel order. Every PO payment goes through Payments › Send payment — "Pay ₹2,980" on a row and
+  the view, "Pay all received" with Stage Received, a supplier's "Pay ₹827" on its row and in its
+  drawer's Quick fill — via the shared `usePayBill` (`?bill=md:<poId>`, Q-M1).
+- **Medicines**: "Return expiring stock to supplier" (`medicines/components/ExpiringReturnDrawer/`,
+  no URL) — the batch drops, the supplier gives a credit that lowers its payable and joins its
+  Account (`shared/medical-supplier-credits.ts`, Appendix F).
+- **Payments**: the shared ledger units with `scope=medical` (`listMedicalPayments`, `S:1662`).
+
+The flows' writes are `shared/medical-flows-api.ts` (contracts in
+`shared/medical-flows-contracts.ts`; hooks in `shared/hooks/useMedicalFlows/`), money through the
+ledger's `newLedgerEntry` and Day close's `assertDayOpen` (REPLACE_WITH_API).
 
 The search, filters and sort of every tab live in the URL (`medical.search.ts`, one reader for
 all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`.
 
 ## Files
 
-| File                     | Responsibility                                                                                                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `medical.route.tsx`      | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                  |
-| `medical.manifest.ts`    | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                               |
-| `medical.constants.ts`   | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                               |
-| `medical.search.ts`      | The tabs' URL reader (`validateMedicalSearch`) and the dialog routes' prefills.                                                                                                |
-| `MedicalLayout.tsx`      | Layout over the tab routes (`<Outlet />`).                                                                                                                                     |
-| `shared/`                | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the drawers, pickers, stack and delete confirm; the list, partner and dialog-route hooks. |
-| `__tests__/integration/` | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.                                                                              |
+| File                     | Responsibility                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `medical.route.tsx`      | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                               |
+| `medical.manifest.ts`    | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                                            |
+| `medical.constants.ts`   | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                                            |
+| `medical.search.ts`      | The tabs' URL reader (`validateMedicalSearch`) and the dialog routes' prefills.                                                                                                             |
+| `MedicalLayout.tsx`      | Layout over the tab routes (`<Outlet />`).                                                                                                                                                  |
+| `shared/`                | Family-shared: contracts, api, tones, filters, params; the toolbar, table and cells; the drawers, pickers, stack, delete and flow confirms; the list, partner, flow and dialog-route hooks. |
+| `__tests__/integration/` | The tabs end to end; `__tests__/integration/medical-test-router.tsx` mirrors the family's routes.                                                                                           |
 
 ## Test ids
 
@@ -74,4 +96,7 @@ all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`
 `medical-<tab>` (`medical-sales-toolbar`, `medical-sales-tab-medicines`, `medical-sales-new`,
 `medical-sales-new-menu`, `medical-sales-table-row`); the view action
 `medical-<tab>-view-action-<id>`; the drawers `medicine-drawer`, `supplier-drawer`,
-`manufacturer-drawer`, `rep-drawer`, `rep-visit-drawer` (a stacked child adds `-stacked`).
+`manufacturer-drawer`, `rep-drawer`, `rep-visit-drawer` (a stacked child adds `-stacked`),
+`purchase-order-drawer`, `receive-goods-drawer`, `purchase-order-view-drawer`, `sale-drawer`,
+`sale-return-drawer`, `expiring-return-drawer`, New sale's `invoice-drawer`, and the
+`prescriptions-to-fill` list.

@@ -102,7 +102,10 @@ describe('Medical › Sales (KICKOFF §6.7)', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${ROOM}/sales/${sale}`),
     );
-    // The list keeps its filter behind the drawer.
+    // The list keeps its filter behind the drawer, and Close goes back to it.
+    expect(router.state.location.search).toMatchObject({ status: 'unpaid' });
+    await user.click(await screen.findByTestId('sale-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/sales`));
     expect(router.state.location.search).toMatchObject({ status: 'unpaid' });
     await user.click(
       within(rowOf('sales', '#978')).getByTestId('medical-sales-row-action-return'),
@@ -184,6 +187,8 @@ describe('Medical › Purchases', () => {
         `${ROOM}/purchases/${ref.purchaseOrder(430)}/edit`,
       ),
     );
+    await user.click(await screen.findByTestId('purchase-order-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/purchases`));
     await user.click(
       within(rowOf('purchases', '1631')).getByTestId('medical-purchases-row-action-view'),
     );

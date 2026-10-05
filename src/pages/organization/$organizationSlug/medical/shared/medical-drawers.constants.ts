@@ -16,6 +16,8 @@ export const MEDICAL_DRAWER_KEYS = {
     supplier: 'drawers.records.supplier',
     manufacturer: 'drawers.records.manufacturer',
     mr: 'drawers.records.mr',
+    sale: 'drawers.records.sale',
+    purchaseOrder: 'drawers.records.purchaseOrder',
   },
   /** An edit drawer's primary (`medical.md:185, 203, 219, 234`). */
   saveChanges: 'drawers.saveChanges',
@@ -132,7 +134,11 @@ export const MEDICAL_DRAWER_KEYS = {
       creditStage: 'drawers.supplier.account.creditStage',
       adjusted: 'drawers.supplier.account.adjusted',
     },
-    quickFill: { newOrder: 'drawers.supplier.quickFill.newOrder' },
+    quickFill: {
+      newOrder: 'drawers.supplier.quickFill.newOrder',
+      /** "Pay ₹827" (Q-M1). */
+      pay: 'drawers.supplier.quickFill.pay',
+    },
     save: 'drawers.supplier.save',
     saved: 'drawers.supplier.saved',
   },
@@ -176,6 +182,197 @@ export const MEDICAL_DRAWER_KEYS = {
     saved: 'drawers.visit.saved',
     /** A visit logged with no next one set. */
     savedNoReminder: 'drawers.visit.savedNoReminder',
+  },
+  /** Cancel order and Void sale (`medical.md:366`): titles and toasts. */
+  flowConfirm: {
+    cancelOrder: 'drawers.flowConfirm.cancelOrder',
+    voidSale: 'drawers.flowConfirm.voidSale',
+    /** "PO #430 cancelled". */
+    cancelled: 'drawers.flowConfirm.cancelled',
+    /** "Sale #978 voided". */
+    voided: 'drawers.flowConfirm.voided',
+  },
+  /** New / Edit purchase order (`medical.md:254–267`). */
+  purchaseOrder: {
+    title: {
+      create: 'drawers.purchaseOrder.title.create',
+      edit: 'drawers.purchaseOrder.title.edit',
+    },
+    sub: 'drawers.purchaseOrder.sub',
+    steps: {
+      order: 'drawers.purchaseOrder.steps.order',
+      items: 'drawers.purchaseOrder.steps.items',
+    },
+    fields: {
+      supplier: 'drawers.purchaseOrder.fields.supplier',
+      billNo: 'drawers.purchaseOrder.fields.billNo',
+      date: 'drawers.purchaseOrder.fields.date',
+      items: 'drawers.purchaseOrder.fields.items',
+      medicine: 'drawers.purchaseOrder.fields.medicine',
+      selectMedicine: 'drawers.purchaseOrder.fields.selectMedicine',
+      searchMedicine: 'drawers.purchaseOrder.fields.searchMedicine',
+      qty: 'drawers.purchaseOrder.fields.qty',
+      free: 'drawers.purchaseOrder.fields.free',
+      rate: 'drawers.purchaseOrder.fields.rate',
+      amount: 'drawers.purchaseOrder.fields.amount',
+      add: 'drawers.purchaseOrder.fields.add',
+      total: 'drawers.purchaseOrder.fields.total',
+      /** "From K R Medical Agency" — the medicine picker's first group. */
+      fromSupplier: 'drawers.purchaseOrder.fields.fromSupplier',
+      otherMedicines: 'drawers.purchaseOrder.fields.otherMedicines',
+      /** "8 in stock · ALVI". */
+      inStock: 'drawers.purchaseOrder.fields.inStock',
+      /** "Out of stock · DERM". */
+      outOfStock: 'drawers.purchaseOrder.fields.outOfStock',
+      addMedicine: 'drawers.purchaseOrder.fields.addMedicine',
+      newMedicine: 'drawers.purchaseOrder.fields.newMedicine',
+      /** The red rate cell's tooltip. */
+      enterRate: 'drawers.purchaseOrder.fields.enterRate',
+      /** "2 medicines · ₹4,236" — the Items step's head (plural). */
+      peek: 'drawers.purchaseOrder.fields.peek',
+    },
+    quickFill: { reorder: 'drawers.purchaseOrder.quickFill.reorder' },
+    /** "Enter the rate for Epriva Tab". */
+    rateFor: 'drawers.purchaseOrder.rateFor',
+    /** "Enter the rate for 2 medicines" (plural). */
+    rateForCount: 'drawers.purchaseOrder.rateForCount',
+    pickSupplier: 'drawers.purchaseOrder.pickSupplier',
+    save: 'drawers.purchaseOrder.save',
+    saved: 'drawers.purchaseOrder.saved',
+    cancelOrder: 'drawers.purchaseOrder.cancelOrder',
+  },
+  /** Receive goods (`medical.md:269–279`). */
+  receive: {
+    title: 'drawers.receive.title',
+    /** "K R Medical Agency · tick each item and enter batch & expiry". */
+    sub: 'drawers.receive.sub',
+    section: 'drawers.receive.section',
+    arrived: 'drawers.receive.arrived',
+    /** A line's toggle, spoken: "Arrived" / "Not arrived". */
+    notArrived: 'drawers.receive.notArrived',
+    medicine: 'drawers.receive.medicine',
+    qty: 'drawers.receive.qty',
+    free: 'drawers.receive.free',
+    batch: 'drawers.receive.batch',
+    expiry: 'drawers.receive.expiry',
+    expiryPlaceholder: 'drawers.receive.expiryPlaceholder',
+    enterExpiry: 'drawers.receive.enterExpiry',
+    tickArrived: 'drawers.receive.tickArrived',
+    save: 'drawers.receive.save',
+    saved: 'drawers.receive.saved',
+  },
+  /** Purchase order (view) (`medical.md:333–334`; H:5418–5421). */
+  orderView: {
+    title: 'drawers.orderView.title',
+    /** "Shree Ramdev Medical Agency · received, stock added · items locked". */
+    subReceived: 'drawers.orderView.subReceived',
+    /** "Akshar Medicines · paid, locked". */
+    subPaid: 'drawers.orderView.subPaid',
+    /** "Payable ₹2,980". */
+    payable: 'drawers.orderView.payable',
+    /** "Paid ₹1,296". */
+    paid: 'drawers.orderView.paid',
+    /** "Paid ₹1,200 of ₹1,296". */
+    paidOf: 'drawers.orderView.paidOf',
+    /** "Pay ₹2,980" (Q-M1). */
+    pay: 'drawers.orderView.pay',
+  },
+  /** Sale (view) (`medical.md:333–338`; H:5422–5426). */
+  sale: {
+    title: 'drawers.sale.title',
+    /** "Rhea Shah · Today 10:12 · a sale is changed by a return, not edited". */
+    sub: 'drawers.sale.sub',
+    /** A sale with no customer on record. */
+    walkIn: 'drawers.sale.walkIn',
+    badges: {
+      paid: 'drawers.sale.badges.paid',
+      unpaid: 'drawers.sale.badges.unpaid',
+      /** "Returned ₹239". */
+      returned: 'drawers.sale.badges.returned',
+      /** "Invoice #785 · in patient file". */
+      invoice: 'drawers.sale.badges.invoice',
+    },
+    medicines: 'drawers.sale.medicines',
+    medicine: 'drawers.sale.medicine',
+    batch: 'drawers.sale.batch',
+    qty: 'drawers.sale.qty',
+    amount: 'drawers.sale.amount',
+    /** "2 medicines · ₹1,200" (plural). */
+    summary: 'drawers.sale.summary',
+    /** "Collect ₹563". */
+    collect: 'drawers.sale.collect',
+    returnMedicines: 'drawers.sale.returnMedicines',
+    voidSale: 'drawers.sale.voidSale',
+    /** "₹563 received". */
+    collected: 'drawers.sale.collected',
+  },
+  /** Return from patient (`medical.md:283–295`). */
+  saleReturn: {
+    title: 'drawers.saleReturn.title',
+    /** "Rhea Shah · returned stock goes back into its batch". */
+    sub: 'drawers.saleReturn.sub',
+    steps: {
+      back: 'drawers.saleReturn.steps.back',
+      reason: 'drawers.saleReturn.steps.reason',
+    },
+    medicine: 'drawers.saleReturn.medicine',
+    batch: 'drawers.saleReturn.batch',
+    sold: 'drawers.saleReturn.sold',
+    refund: 'drawers.saleReturn.refund',
+    return: 'drawers.saleReturn.return',
+    reason: 'drawers.saleReturn.reason',
+    reasons: {
+      unused: 'drawers.saleReturn.reasons.unused',
+      reaction: 'drawers.saleReturn.reasons.reaction',
+      rx_changed: 'drawers.saleReturn.reasons.rx_changed',
+      wrong_item: 'drawers.saleReturn.reasons.wrong_item',
+      damaged: 'drawers.saleReturn.reasons.damaged',
+    },
+    refundBy: 'drawers.saleReturn.refundBy',
+    /** "1 medicine · ₹550" — the first step's head (plural). */
+    peek: 'drawers.saleReturn.peek',
+    quickFill: 'drawers.saleReturn.quickFill',
+    /** "Refund ₹550". */
+    save: 'drawers.saleReturn.save',
+    /** "Unused · ₹550". */
+    summary: 'drawers.saleReturn.summary',
+    nothing: 'drawers.saleReturn.nothing',
+    /** "₹550 refunded · stock added back". */
+    refunded: 'drawers.saleReturn.refunded',
+    /** "₹550 refunded · stock written off" (Damaged, Reaction). */
+    refundedWrittenOff: 'drawers.saleReturn.refundedWrittenOff',
+    /** An unpaid sale's return lowers the due: "₹550 off the bill · stock added back". */
+    lowered: 'drawers.saleReturn.lowered',
+    loweredWrittenOff: 'drawers.saleReturn.loweredWrittenOff',
+  },
+  /** Return expiring stock (`medical.md:297–309`). */
+  expiring: {
+    title: 'drawers.expiring.title',
+    /** "Glycolac Cream · batch 026-312 · expires 11/26". */
+    sub: 'drawers.expiring.sub',
+    supplier: 'drawers.expiring.supplier',
+    /** "Bought at ₹123". */
+    boughtAt: 'drawers.expiring.boughtAt',
+    quantity: 'drawers.expiring.quantity',
+    /** "of 3". */
+    of: 'drawers.expiring.of',
+    creditNote: 'drawers.expiring.creditNote',
+    badges: {
+      /** "Credit ₹369". */
+      credit: 'drawers.expiring.badges.credit',
+      /** "58 days left" (plural). */
+      daysLeft: 'drawers.expiring.badges.daysLeft',
+    },
+    /** "Credit reduces what you owe Akshar Medicines". */
+    summary: 'drawers.expiring.summary',
+    save: 'drawers.expiring.save',
+    /** "3 returned · ₹369 credit from Akshar Medicines". */
+    saved: 'drawers.expiring.saved',
+  },
+  /** Prescriptions to fill (`medical.md:417–431`). */
+  prescriptions: {
+    /** "Rx #500 · 17 Sep 2026 · Flubolt 400, Clonix-B Lotion". */
+    sub: 'drawers.prescriptions.sub',
   },
   /** New / Edit medicine (`medical.md:170–188`). */
   medicine: {
@@ -291,6 +488,13 @@ export const MEDICAL_DRAWER_TEST_IDS = {
   manufacturer: 'manufacturer-drawer',
   mr: 'rep-drawer',
   visit: 'rep-visit-drawer',
+  purchaseOrder: 'purchase-order-drawer',
+  receive: 'receive-goods-drawer',
+  orderView: 'purchase-order-view-drawer',
+  sale: 'sale-drawer',
+  saleReturn: 'sale-return-drawer',
+  expiring: 'expiring-return-drawer',
+  prescriptions: 'prescriptions-to-fill',
 } as const;
 
 /** A drawer stacked on another takes its kind's id with this suffix (`supplier-drawer-stacked`). */

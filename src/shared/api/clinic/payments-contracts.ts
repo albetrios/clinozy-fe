@@ -211,8 +211,9 @@ export type LedgerKindFilter = (typeof LEDGER_KIND_VALUES)[number];
 /**
  * `listLedger`'s params (`S:1699`): Show (`direction`), What (`kind`), Mode
  * (`mode`), Created and `q` (a PAY- number, the party, an invoice number); the
- * day Day close reviews (`day`); the header branches (`branchIds`, empty = all).
- * Newest first — the ledger has no column sort (`payments.md:31`).
+ * day Day close reviews (`day`); the header branches (`branchIds`, empty = all);
+ * and Medical › Payments' fixed `scope=medical` (`S:71`, `S:1662`). Newest
+ * first — the ledger has no column sort (`payments.md:31`).
  */
 export const ledgerListParamsSchema = z.object({
   direction: paymentDirectionSchema.optional(),
@@ -224,6 +225,7 @@ export const ledgerListParamsSchema = z.object({
   q: z.string().max(80).optional(),
   day: civilDateSchema.optional(),
   branchIds: z.array(z.uuid()).optional(),
+  scope: z.enum(['medical']).optional(),
 });
 
 /** Params of the ledger read. */
@@ -259,4 +261,16 @@ export interface OpenSupplierBill {
   due: number;
   /** Whole days since the purchase, on the clinic's today. */
   daysPending: number;
+}
+
+/** A supplier bill as the rooms that buy name it: its kind and its purchase. */
+export type SupplierBillRef = Pick<OpenSupplierBill, 'kind' | 'purchaseId'>;
+
+/**
+ * A supplier bill's key — `md:<poId>` (a Medical PO) or `is:<purchaseId>` (a
+ * Clinic stock purchase): Send payment's picker key and the `?bill=` that
+ * Medical's and Clinic stock's "Pay ₹X" open it on (`S:86`, Q-M1).
+ */
+export function supplierBillKey(bill: SupplierBillRef): string {
+  return `${bill.kind === 'medical_po' ? 'md' : 'is'}:${bill.purchaseId}`;
 }

@@ -60,4 +60,22 @@ describe('VendorsPage (Q-K1)', () => {
       }),
     ).toBeVisible();
   });
+
+  it('"Pay ₹X" while a vendor is owed opens Send payment on their oldest open purchase', async () => {
+    const user = userEvent.setup();
+    const { router } = renderStockRoutes(`${ROOM}/vendors`, { vendors: VendorsPage });
+    await waitFor(() =>
+      expect(screen.getAllByTestId('stock-vendors-row-action-pay')).toHaveLength(2),
+    );
+    const pay = screen
+      .getAllByTestId('stock-vendors-row-action-pay')
+      .find((button) => button.getAttribute('aria-label') === 'Pay ₹1,710');
+    await user.click(pay as HTMLElement);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
+    );
+    expect(router.state.location.search).toEqual({
+      bill: `is:${ref.stockPurchase(15)}`,
+    });
+  });
 });

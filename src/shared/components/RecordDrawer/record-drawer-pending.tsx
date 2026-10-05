@@ -9,7 +9,8 @@ export interface RecordDrawerPendingProps {
   onClose: () => void;
   /** The drawer's own title — "Edit offering", "Edit supplier". */
   title: string;
-  sub: string;
+  /** Its sub line; a view whose sub names the record ("Rhea Shah · Today 10:12") has none yet. */
+  sub?: string;
   /** What is loading, for the skeleton's announcement ("Offering", "Supplier"). */
   recordLabel: string;
   /** The loaded drawer's shape, so the width does not jump when it arrives. */

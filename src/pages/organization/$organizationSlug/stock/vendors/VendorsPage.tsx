@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { PenLine, Trash } from '@/shared/icons/index.ts';
+import { PenLine, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import {
   StockDeleteConfirm,
@@ -38,10 +39,11 @@ const TABLE_ID = STOCK_TABLE_IDS.vendors;
  * Suppliers: the Clinic stock toolbar — search only, "+ New clinic vendor" for
  * those who keep the stock — over the vendors, their purchases and what they
  * are owed. A row opens Edit clinic vendor; the footer counts the vendors and
- * their payable (AMBER: the copy is not in the source). The dialog routes
- * render nothing: this page opens the vendor drawer for `create/` (`?name=`)
- * and `$vendorId/edit/`; Delete — only while nothing is owed — asks for a
- * reason. "Pay ₹X" waits on the Payments pay route (L-50c, Q-M1).
+ * their payable (AMBER: the copy is not in the source). "Pay ₹X", while a
+ * vendor is owed, opens Payments › Send payment on their oldest open purchase
+ * (Q-M1). The dialog routes render nothing: this page opens the vendor drawer
+ * for `create/` (`?name=`) and `$vendorId/edit/`; Delete — only while nothing
+ * is owed — asks for a reason.
  */
 export function VendorsPage() {
   const { t } = useTranslation(STOCK_NS);
@@ -51,6 +53,7 @@ export function VendorsPage() {
   const access = useStockAccess();
   const nav = useStockNav();
   const { formatPaise } = useStockWords();
+  const { canPay, pay } = usePayBill();
   const [deleting, setDeleting] = useState<StockDeleteTarget | null>(null);
   const { dialog, close } = useStockDialogRoute({
     tab: 'vendors',
@@ -72,14 +75,24 @@ export function VendorsPage() {
   });
 
   const rowActions = (vendor: StockVendorRow): DataTableRowAction[] => {
-    const actions: DataTableRowAction[] = [
-      {
-        id: 'edit',
-        label: t(STOCK_KEYS.vendors.rowActions.edit),
-        icon: PenLine,
-        onSelect: () => nav.vendorEdit(vendor.id),
-      },
-    ];
+    const actions: DataTableRowAction[] = [];
+    const oldest = vendor.oldestOpenPurchase;
+    if (canPay && vendor.payable > 0 && oldest) {
+      actions.push({
+        id: 'pay',
+        label: t(STOCK_KEYS.vendors.rowActions.pay, {
+          amount: formatPaise(vendor.payable),
+        }),
+        icon: Wallet,
+        onSelect: () => pay({ kind: 'stock_po', purchaseId: oldest.id }),
+      });
+    }
+    actions.push({
+      id: 'edit',
+      label: t(STOCK_KEYS.vendors.rowActions.edit),
+      icon: PenLine,
+      onSelect: () => nav.vendorEdit(vendor.id),
+    });
     // A vendor still owed money stays: their bills need them (`deleteStockVendor`, 409).
     if (access.canDelete && vendor.payable === 0) {
       actions.push({

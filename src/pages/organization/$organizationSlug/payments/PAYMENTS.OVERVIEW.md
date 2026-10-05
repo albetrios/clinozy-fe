@@ -109,18 +109,21 @@ world, `REPLACE_WITH_API`), their contracts beside them, and the hooks in
 | `PaymentsPage.tsx`                                   | The ledger — toolbar, table, states, row and bulk actions, the delete confirm; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="payments-page"`.               |
 | `shared/components/PaymentsToolbar/`                 | Family-shared: the room toolbar both tabs mount — h1, the tab links, search, Filters, Columns, Day close and the tab's create actions.                                             |
 | `shared/hooks/useDayLabel/`                          | Family-shared: a day as the drawers' tiles name it — "Today", else "Oct 2" (Send's Date, Add pending's Settle by and invoice days).                                                |
-| `components/LedgerCells/`                            | The cells and their wording (`components/LedgerCells/ledger-cells.ts`): Ref, What, When with the edit line, From / to with its sub line, Mode, the signed Amount, By.              |
 | `components/DayCloseDrawer/`                         | Day close: the bar, the gate, the working strip, the report, the review, and the rules they share (`components/DayCloseDrawer/day-close-view.ts`).                                 |
-| `components/PaymentDeleteConfirm/`                   | Delete an entry: the reason confirm, the invoice sentence, the optimistic delete and its Undo.                                                                                     |
 | `components/ReceivePaymentDrawer/`                   | Receive payment / Edit payment in: the form's rules (`components/ReceivePaymentDrawer/receive-form.ts`), the fields, the save.                                                     |
 | `components/SendPaymentDrawer/`                      | Send payment / Edit payment out: the form's rules (`components/SendPaymentDrawer/send-form.ts`), the three steps' fields, the save and the photos.                                 |
-| `hooks/useLedgerTable/`                              | The columns (tracks, folds, the meta line and key column by tier), hidden columns, the row tone.                                                                                   |
-| `hooks/useLedgerRowActions/`                         | An entry's row actions — Edit, Delete; none when locked — for the ledger and Day close's review.                                                                                   |
 | `hooks/useDayClose/`                                 | Day close's read and writes: the day, accept the opening, close, reopen, tick an entry (optimistic).                                                                               |
 | `hooks/usePaymentsDialogRoute/`                      | Which dialog the URL opens, the closed-day and permission refusals, and the close back to the referrer or the ledger.                                                              |
 | `__tests__/integration/`                             | The ledger and Pending end to end; `__tests__/integration/payments-test-router.tsx` mirrors the family's routes for the tests.                                                     |
 | `receive/`, `pay/`, `$paymentId/edit/`, `day-close/` | The dialog-route islands — see their overviews.                                                                                                                                    |
 | `pending/`                                           | The Pending tab — see its overview.                                                                                                                                                |
+
+The ledger's own units live in the shared layer, because Medical › Payments shows the same ledger
+limited to Medical (L-50c): the cells and their words (`src/shared/components/LedgerCells/`, keys
+`LEDGER_KEYS` in the `payments` namespace — `PAYMENTS_KEYS` composes them), the delete confirm
+(`src/shared/components/PaymentDeleteConfirm/`), the table (`src/shared/hooks/useLedgerTable/`,
+under its table id) and the row actions (`src/shared/hooks/useLedgerRowActions/`). The Filters'
+values are `LEDGER_FILTER_VALUES` (`src/shared/api/clinic/ledger-filter-values.ts`).
 
 ## Test ids
 

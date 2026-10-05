@@ -17,6 +17,7 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   validateMedicalCreateSearch,
+  validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '../../medical.search.ts';
 
@@ -64,7 +65,8 @@ export function renderMedicalRoutes(
     const page = createRoute({
       getParentRoute: () => medical,
       path: tab,
-      validateSearch: validateMedicalSearch,
+      validateSearch:
+        tab === 'payments' ? validateMedicalPaymentsSearch : validateMedicalSearch,
       component: pages[tab] ?? (() => <p>{tab} tab</p>),
     });
     const dialogs = TAB_DIALOGS[tab].map((path) =>

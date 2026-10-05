@@ -14,7 +14,7 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
-import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
+import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 
 /*
  * What the ledger's cells say about an entry (`payments.md:29`, H:5096–5108) —
@@ -23,7 +23,7 @@ import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
  * word an entry the same way.
  */
 
-const SUB = PAYMENTS_KEYS.ledger.sub;
+const SUB = LEDGER_KEYS.ledger.sub;
 
 /** The What pill: "Received" or "Paid", in the kind's tone. */
 export function ledgerWhat(row: Pick<LedgerRow, 'direction' | 'kind'>): {
@@ -31,7 +31,7 @@ export function ledgerWhat(row: Pick<LedgerRow, 'direction' | 'kind'>): {
   tone: Tone;
 } {
   return {
-    labelKey: PAYMENTS_KEYS.directions[row.direction],
+    labelKey: LEDGER_KEYS.directions[row.direction],
     tone: PAYMENT_KIND_TONES[row.kind],
   };
 }
@@ -118,15 +118,15 @@ export function ledgerEntryLock(
 ): string | null {
   const ref = displayId.payment(row.seq);
   if (row.pendingCreditSeq !== null) {
-    return t(PAYMENTS_KEYS.ledger.creditEntry, {
+    return t(LEDGER_KEYS.ledger.creditEntry, {
       ref,
       credit: displayId.pendingCredit(row.pendingCreditSeq),
     });
   }
   if (!row.locked) return null;
   return row.edits.length > 0
-    ? t(PAYMENTS_KEYS.ledger.dayClosedEdited, { ref, count: row.edits.length })
-    : t(PAYMENTS_KEYS.ledger.dayClosed, { ref });
+    ? t(LEDGER_KEYS.ledger.dayClosedEdited, { ref, count: row.edits.length })
+    : t(LEDGER_KEYS.ledger.dayClosed, { ref });
 }
 
 /** "₹600 UPI" — one side of a logged edit. */
@@ -136,7 +136,7 @@ export function editSideLabel(
   tClinic: TFunction,
   formatPaise: (paise: number) => string,
 ): string {
-  return t(PAYMENTS_KEYS.ledger.editSide, {
+  return t(LEDGER_KEYS.ledger.editSide, {
     amount: formatPaise(side.amount),
     modes: ledgerModesLabel(side.modes, tClinic),
   });
@@ -158,15 +158,15 @@ export function useLedgerTime(): (instant: string) => string {
  * the clock time, in the viewer's locale and hour cycle.
  */
 export function useLedgerWhen(): (instant: string) => string {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const { formatDate } = useLocaleFormat();
   const timeOf = useLedgerTime();
   return (instant) => {
     const time = timeOf(instant);
     if (clinicDateOf(instant) === clinicToday()) {
-      return t(PAYMENTS_KEYS.ledger.today, { time });
+      return t(LEDGER_KEYS.ledger.today, { time });
     }
-    return t(PAYMENTS_KEYS.ledger.dayTime, {
+    return t(LEDGER_KEYS.ledger.dayTime, {
       day: formatDate(instant, { day: 'numeric', month: 'short' }),
       time,
     });
@@ -175,7 +175,7 @@ export function useLedgerWhen(): (instant: string) => string {
 
 /** The From / to sub line, worded for the viewer. */
 export function useLedgerSubLine(): (row: LedgerRow) => string {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   return (row) => ledgerSubLine(row, t, tClinic, displayId.creditNote);
 }

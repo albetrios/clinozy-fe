@@ -226,7 +226,9 @@
       "medicine": "의약품",
       "supplier": "공급업체",
       "manufacturer": "제조사",
-      "mr": "MR"
+      "mr": "MR",
+      "sale": "판매",
+      "purchaseOrder": "구매 주문"
     },
     "saveChanges": "변경 사항 저장",
     "addName": "이름을 입력하세요",
@@ -328,7 +330,8 @@
         "adjusted": "정산됨"
       },
       "quickFill": {
-        "newOrder": "새 구매 주문"
+        "newOrder": "새 구매 주문",
+        "pay": "{{amount}} 지불"
       },
       "save": "공급업체 추가",
       "saved": "공급업체 저장됨"
@@ -461,6 +464,152 @@
         "enterRates": "모든 공급업체 가격에 단가를 입력하세요",
         "pickManufacturer": "제조사를 선택하세요"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "이 구매 주문을 취소할까요?",
+      "voidSale": "이 판매를 무효화할까요?",
+      "cancelled": "{{order}} 취소됨",
+      "voided": "판매 #{{seq}} 무효화됨"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "새 구매 주문",
+        "edit": "구매 주문 편집"
+      },
+      "sub": "주문 → 입고 → 지불",
+      "steps": {
+        "order": "주문",
+        "items": "품목"
+      },
+      "fields": {
+        "supplier": "공급업체",
+        "billNo": "송장 번호",
+        "date": "주문일",
+        "items": "품목",
+        "medicine": "의약품",
+        "selectMedicine": "의약품 선택…",
+        "searchMedicine": "의약품 검색",
+        "qty": "수량",
+        "free": "무상",
+        "rate": "단가",
+        "amount": "금액",
+        "add": "의약품 추가",
+        "total": "합계",
+        "fromSupplier": "{{supplier}}에서",
+        "otherMedicines": "기타 의약품",
+        "inStock": "재고 {{count}}개 · {{maker}}",
+        "outOfStock": "재고 없음 · {{maker}}",
+        "addMedicine": "의약품 추가",
+        "newMedicine": "새 의약품",
+        "enterRate": "구매 단가를 입력하세요",
+        "peek_other": "의약품 {{count}}개 · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "재고 부족 재주문"
+      },
+      "rateFor": "{{name}}의 단가를 입력하세요",
+      "rateForCount_other": "의약품 {{count}}개의 단가를 입력하세요",
+      "pickSupplier": "공급업체를 선택하세요",
+      "save": "주문 만들기",
+      "saved": "구매 주문 저장됨",
+      "cancelOrder": "주문 취소"
+    },
+    "receive": {
+      "title": "입고 처리",
+      "sub": "{{supplier}} · 각 품목을 체크하고 배치와 유효기간을 입력하세요",
+      "section": "도착한 품목 체크",
+      "arrived": "도착",
+      "notArrived": "미도착",
+      "medicine": "의약품",
+      "qty": "수량",
+      "free": "무상",
+      "batch": "배치",
+      "expiry": "유효기간",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "유효기간을 입력하세요",
+      "tickArrived": "도착한 품목을 체크하세요",
+      "save": "입고 완료로 표시",
+      "saved": "입고 완료 · 재고와 무상 수량 추가됨"
+    },
+    "orderView": {
+      "title": "구매 주문",
+      "subReceived": "{{supplier}} · 입고됨, 재고 추가 · 품목 잠김",
+      "subPaid": "{{supplier}} · 결제 완료, 잠김",
+      "payable": "미지급 {{amount}}",
+      "paid": "지급 {{amount}}",
+      "paidOf": "{{total}} 중 {{paid}} 지급",
+      "pay": "{{amount}} 지불"
+    },
+    "sale": {
+      "title": "판매",
+      "sub": "{{customer}} · {{when}} · 판매는 편집하지 않고 반품으로 변경합니다",
+      "walkIn": "방문 고객",
+      "badges": {
+        "paid": "결제 완료",
+        "unpaid": "미결제",
+        "returned": "반품 {{amount}}",
+        "invoice": "청구서 #{{seq}} · 환자 파일에 있음"
+      },
+      "medicines": "의약품",
+      "medicine": "의약품",
+      "batch": "배치",
+      "qty": "수량",
+      "amount": "금액",
+      "summary_other": "의약품 {{count}}개 · {{amount}}",
+      "collect": "{{amount}} 수금",
+      "returnMedicines": "의약품 반품",
+      "voidSale": "판매 무효화",
+      "collected": "{{amount}} 수금됨"
+    },
+    "saleReturn": {
+      "title": "환자 반품",
+      "sub": "{{customer}} · 반품된 재고는 원래 배치로 돌아갑니다",
+      "steps": {
+        "back": "반품되는 품목",
+        "reason": "사유 및 환불"
+      },
+      "medicine": "의약품",
+      "batch": "배치",
+      "sold": "판매",
+      "refund": "환불",
+      "return": "반품",
+      "reason": "사유",
+      "reasons": {
+        "unused": "미사용",
+        "reaction": "부작용",
+        "rx_changed": "의사가 처방 변경",
+        "wrong_item": "잘못된 품목",
+        "damaged": "파손"
+      },
+      "refundBy": "환불 방법",
+      "peek_other": "의약품 {{count}}개 · {{amount}}",
+      "quickFill": "모두 반품",
+      "save": "{{amount}} 환불",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "반품할 품목을 입력하세요",
+      "refunded": "{{amount}} 환불됨 · 재고 복원",
+      "refundedWrittenOff": "{{amount}} 환불됨 · 재고 폐기",
+      "lowered": "{{amount}} 반품됨 · 재고 복원",
+      "loweredWrittenOff": "{{amount}} 반품됨 · 재고 폐기"
+    },
+    "expiring": {
+      "title": "유효기간 임박 재고 반품",
+      "sub": "{{medicine}} · 배치 {{batch}} · {{expiry}} 만료",
+      "supplier": "공급업체",
+      "boughtAt": "구매가 {{amount}}",
+      "quantity": "수량",
+      "of": "/ {{count}}",
+      "creditNote": "크레딧 노트",
+      "badges": {
+        "credit": "크레딧 {{amount}}",
+        "daysLeft_other": "{{count}}일 남음"
+      },
+      "summary": "크레딧으로 {{supplier}}에 대한 미지급금이 줄어듭니다",
+      "save": "반품하고 크레딧 받기",
+      "saved": "{{count}}개 반품 · {{supplier}}에서 {{amount}} 크레딧"
+    },
+    "prescriptions": {
+      "sub": "처방 {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

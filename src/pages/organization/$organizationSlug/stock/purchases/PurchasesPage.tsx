@@ -9,9 +9,10 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { PenLine, Trash } from '@/shared/icons/index.ts';
+import { PenLine, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import {
   StockDeleteConfirm,
@@ -69,11 +70,12 @@ function usePurchaseFilters() {
  * stock toolbar — "+ New purchase" for those who keep the stock — over the
  * bills from clinic vendors: ID, Supplier, Invoice (hidden), Date, Bill, Due
  * and Status, the row's edge in its status. A row opens Edit purchase. The
- * footer counts the purchases and what is due on them. The dialog routes
- * render nothing: this page opens the Purchase drawer for `create/` —
- * `?reorder=low` presets "Reorder low items" — and `$purchaseId/edit/`, with
- * a vendor or an item stacked on it; Delete asks for a reason. "Pay ₹X" waits
- * on the Payments pay route (L-50c, Q-M1).
+ * footer counts the purchases and what is due on them. "Pay ₹1,710",
+ * while something is due, opens Payments › Send payment on the bill (Q-M1).
+ * The dialog routes render nothing: this page opens the Purchase drawer for
+ * `create/` — `?reorder=low` presets "Reorder low items" — and
+ * `$purchaseId/edit/`, with a vendor or an item stacked on it; Delete asks
+ * for a reason.
  */
 export function PurchasesPage() {
   const { t } = useTranslation(STOCK_NS);
@@ -86,6 +88,7 @@ export function PurchasesPage() {
   const { fields, copy } = usePurchaseFilters();
   const filters = useRoomFilters(fields);
   const stack = useStockStack();
+  const { canPay, pay } = usePayBill();
   const [deleting, setDeleting] = useState<StockDeleteTarget | null>(null);
   const { dialog, close } = useStockDialogRoute({
     tab: 'purchases',
@@ -107,14 +110,23 @@ export function PurchasesPage() {
   });
 
   const rowActions = (purchase: StockPurchaseRow): DataTableRowAction[] => {
-    const actions: DataTableRowAction[] = [
-      {
-        id: 'edit',
-        label: t(STOCK_KEYS.purchases.rowActions.edit),
-        icon: PenLine,
-        onSelect: () => nav.purchaseEdit(purchase.id),
-      },
-    ];
+    const actions: DataTableRowAction[] = [];
+    if (canPay && purchase.due > 0) {
+      actions.push({
+        id: 'pay',
+        label: t(STOCK_KEYS.purchases.rowActions.pay, {
+          amount: formatPaise(purchase.due),
+        }),
+        icon: Wallet,
+        onSelect: () => pay({ kind: 'stock_po', purchaseId: purchase.id }),
+      });
+    }
+    actions.push({
+      id: 'edit',
+      label: t(STOCK_KEYS.purchases.rowActions.edit),
+      icon: PenLine,
+      onSelect: () => nav.purchaseEdit(purchase.id),
+    });
     if (access.canDelete) {
       actions.push({
         id: 'delete',

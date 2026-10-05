@@ -10,6 +10,7 @@ import {
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
 import { personFullName } from '@/shared/components/Cells/index.ts';
 
 import type {
@@ -48,7 +49,7 @@ import {
 
 /** TanStack Query keys for Clinic stock — all under `['clinic', 'stock']`. */
 export const stockQueryKeys = {
-  all: ['clinic', 'stock'] as const,
+  all: STOCK_ROOM_QUERY_KEY,
   items: (params: StockItemListParams) =>
     [...stockQueryKeys.all, 'items', params] as const,
   item: (id: string) => [...stockQueryKeys.all, 'item', id] as const,

@@ -20,7 +20,10 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,
@@ -99,6 +102,11 @@ interface SupplierDrawerBaseProps {
   openChild?: OpenMedicalChild;
   /** Quick fill's "New purchase order" (edit): a new order for this supplier. */
   onNewOrder?: (supplierId: string) => void;
+  /**
+   * Quick fill's "Pay ₹827" (edit, while something is due; Q-M1): Send payment
+   * on the supplier's oldest open bill. Passed only to members who may pay.
+   */
+  onPay?: (supplier: SupplierRow) => void;
   testId?: string;
 }
 
@@ -313,7 +321,7 @@ function useSteps(
     {
       id: 'supplier',
       title: t(K.steps.supplier),
-      summary: [name, phoneText, gst].filter(Boolean).join(' · ') || notFilled,
+      summary: drawerStepSummary([name, phoneText, gst], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.phone), value: phoneText },
@@ -356,21 +364,37 @@ function useSteps(
 const stepOfField = (field: string) =>
   field === 'manufacturerIds' ? 'distributes' : 'supplier';
 
-/** The header's Quick fill (edit): "⚡ New purchase order" (`medical.md:203`). */
+/**
+ * The header's Quick fill (edit; `medical.md:203`): "⚡ New purchase order"
+ * (sky) and, while the supplier is owed money, "⚡ Pay ₹827" (sage) — Send
+ * payment on its oldest open bill (Q-M1).
+ */
 function quickFillOf(
   supplier: SupplierRow | null,
-  onNewOrder: ((supplierId: string) => void) | undefined,
+  actions: Pick<SupplierDrawerBaseProps, 'onNewOrder' | 'onPay'>,
   t: TFunction,
+  formatPaise: (paise: number) => string,
 ): QuickFillItem[] | undefined {
-  if (!(supplier && onNewOrder)) return undefined;
-  return [
-    {
+  if (!supplier) return undefined;
+  const { onNewOrder, onPay } = actions;
+  const items: QuickFillItem[] = [];
+  if (onNewOrder) {
+    items.push({
       id: 'new-order',
       label: t(K.quickFill.newOrder),
       tone: 'sky',
       onSelect: () => onNewOrder(supplier.id),
-    },
-  ];
+    });
+  }
+  if (onPay && supplier.payable > 0 && supplier.oldestOpenBill) {
+    items.push({
+      id: 'pay',
+      label: t(K.quickFill.pay, { amount: formatPaise(supplier.payable) }),
+      tone: 'sage',
+      onSelect: () => onPay(supplier),
+    });
+  }
+  return items.length > 0 ? items : undefined;
 }
 
 /** One opening of the drawer: the form, its steps and its save. */
@@ -383,6 +407,7 @@ function SupplierSession({
   onSaved,
   openChild,
   onNewOrder,
+  onPay,
   testId,
 }: SupplierDrawerBaseProps & {
   supplier: SupplierRow | null;
@@ -391,6 +416,7 @@ function SupplierSession({
 }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tPatient } = useTranslation(PATIENT_DRAWER_NS);
+  const formatPaise = usePaiseFormat();
   const idPrefix = `supplier-${useId().replace(/:/g, '')}`;
   const { readOnly, canDelete } = useMedicalDrawerAccess(supplier !== null);
   const pickers = useMedicalPickers();
@@ -443,7 +469,11 @@ function SupplierSession({
         onClose={onClose}
         title={t(supplier ? K.title.edit : K.title.create)}
         sub={t(K.sub)}
-        quickFill={stacked ? undefined : quickFillOf(supplier, onNewOrder, t)}
+        quickFill={
+          stacked
+            ? undefined
+            : quickFillOf(supplier, { onNewOrder, onPay }, t, formatPaise)
+        }
         content={supplier ? EDIT_PROFILE : CREATE_PROFILE}
         tone={SECTION_TONES.medical}
         steps={steps}

@@ -78,6 +78,7 @@ import { manifest as medicalManufacturersManifest } from '@/pages/organization/$
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import {
   validateMedicalCreateSearch,
+  validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '@/pages/organization/$organizationSlug/medical/medical.search.ts';
 import { manifest as medicineEditManifest } from '@/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/edit.manifest.ts';
@@ -574,7 +575,8 @@ const MedicalMrsPage = lazyRouteComponent(
 );
 const MedicalPaymentsPage = lazyRouteComponent(
   localizedRoute(
-    [I18N_NAMESPACES.medical],
+    // The ledger's words are the Payments room's (`LEDGER_NS`).
+    [I18N_NAMESPACES.medical, I18N_NAMESPACES.payments],
     () =>
       import('@/pages/organization/$organizationSlug/medical/payments/payments.route.tsx'),
   ),
@@ -1960,6 +1962,7 @@ const organizationMedicalPaymentsRoute = createRoute({
   getParentRoute: () => organizationMedicalRoute,
   path: 'payments',
   head: manifestHead(medicalPaymentsManifest),
+  validateSearch: validateMedicalPaymentsSearch,
   beforeLoad: roomLeafGate(medicalPaymentsManifest),
   component: MedicalPaymentsPage,
   errorComponent: RouteErrorBoundary,

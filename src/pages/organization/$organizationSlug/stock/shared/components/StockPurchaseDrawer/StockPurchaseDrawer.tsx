@@ -8,7 +8,10 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { StockPurchase } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
@@ -121,7 +124,7 @@ function useSteps(
     {
       id: 'bill',
       title: t(K.steps.bill),
-      summary: [vendorName, billNo].filter(Boolean).join(' · ') || notFilled,
+      summary: drawerStepSummary([vendorName, billNo], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.vendor), value: vendorName ?? '' },
         { kind: 'value', label: t(K.fields.billNo), value: billNo },
@@ -145,9 +148,10 @@ function useSteps(
     {
       id: 'payment',
       title: t(K.steps.payment),
-      summary: [formatPaise(billOf(values)), paid > 0 ? formatPaise(paid) : '']
-        .filter(Boolean)
-        .join(' · '),
+      summary: drawerStepSummary(
+        [formatPaise(billOf(values)), paid > 0 ? formatPaise(paid) : ''],
+        '',
+      ),
       peek: [
         {
           kind: 'value',

@@ -236,7 +236,9 @@
       "medicine": "Arzneimittel",
       "supplier": "Lieferant",
       "manufacturer": "Hersteller",
-      "mr": "Pharmareferent"
+      "mr": "Pharmareferent",
+      "sale": "Verkauf",
+      "purchaseOrder": "Bestellung"
     },
     "saveChanges": "Änderungen speichern",
     "addName": "Geben Sie einen Namen ein",
@@ -344,7 +346,8 @@
         "adjusted": "Verrechnet"
       },
       "quickFill": {
-        "newOrder": "Neue Bestellung"
+        "newOrder": "Neue Bestellung",
+        "pay": "{{amount}} zahlen"
       },
       "save": "Lieferant hinzufügen",
       "saved": "Lieferant gespeichert"
@@ -477,6 +480,157 @@
         "enterRates": "Geben Sie für jeden Lieferantenpreis einen Preis ein",
         "pickManufacturer": "Wählen Sie einen Hersteller"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "Diese Bestellung stornieren?",
+      "voidSale": "Diesen Verkauf stornieren?",
+      "cancelled": "{{order}} storniert",
+      "voided": "Verkauf #{{seq}} storniert"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "Neue Bestellung",
+        "edit": "Bestellung bearbeiten"
+      },
+      "sub": "Bestellen → annehmen → zahlen",
+      "steps": {
+        "order": "Bestellung",
+        "items": "Positionen"
+      },
+      "fields": {
+        "supplier": "Lieferant",
+        "billNo": "Rechnungsnr.",
+        "date": "Bestelldatum",
+        "items": "Positionen",
+        "medicine": "Arzneimittel",
+        "selectMedicine": "Arzneimittel auswählen…",
+        "searchMedicine": "Arzneimittel suchen",
+        "qty": "Menge",
+        "free": "Gratis",
+        "rate": "Preis",
+        "amount": "Betrag",
+        "add": "Arzneimittel hinzufügen",
+        "total": "Summe",
+        "fromSupplier": "Von {{supplier}}",
+        "otherMedicines": "Weitere Arzneimittel",
+        "inStock": "{{count}} auf Lager · {{maker}}",
+        "outOfStock": "Nicht auf Lager · {{maker}}",
+        "addMedicine": "Arzneimittel hinzufügen",
+        "newMedicine": "Neues Arzneimittel",
+        "enterRate": "Geben Sie den Einkaufspreis ein",
+        "peek_one": "{{count}} Arzneimittel · {{amount}}",
+        "peek_other": "{{count}} Arzneimittel · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "Niedrigen Bestand nachbestellen"
+      },
+      "rateFor": "Geben Sie den Preis für {{name}} ein",
+      "rateForCount_one": "Geben Sie den Preis für {{count}} Arzneimittel ein",
+      "rateForCount_other": "Geben Sie den Preis für {{count}} Arzneimittel ein",
+      "pickSupplier": "Wählen Sie einen Lieferanten",
+      "save": "Bestellung anlegen",
+      "saved": "Bestellung gespeichert",
+      "cancelOrder": "Bestellung stornieren"
+    },
+    "receive": {
+      "title": "Ware annehmen",
+      "sub": "{{supplier}} · haken Sie jede Position ab und geben Sie Charge und Ablauf ein",
+      "section": "Abhaken, was angekommen ist",
+      "arrived": "Angekommen",
+      "notArrived": "Nicht angekommen",
+      "medicine": "Arzneimittel",
+      "qty": "Menge",
+      "free": "Gratis",
+      "batch": "Charge",
+      "expiry": "Ablauf",
+      "expiryPlaceholder": "MM/JJ",
+      "enterExpiry": "Geben Sie den Ablauf ein",
+      "tickArrived": "Haken Sie ab, was angekommen ist",
+      "save": "Als erhalten markieren",
+      "saved": "Ware erhalten · Bestand und Gratismenge hinzugefügt"
+    },
+    "orderView": {
+      "title": "Bestellung",
+      "subReceived": "{{supplier}} · erhalten, Bestand gebucht · Positionen gesperrt",
+      "subPaid": "{{supplier}} · bezahlt, gesperrt",
+      "payable": "Offen {{amount}}",
+      "paid": "Bezahlt {{amount}}",
+      "paidOf": "{{paid}} von {{total}} bezahlt",
+      "pay": "{{amount}} zahlen"
+    },
+    "sale": {
+      "title": "Verkauf",
+      "sub": "{{customer}} · {{when}} · ein Verkauf wird durch eine Rückgabe geändert, nicht bearbeitet",
+      "walkIn": "Laufkunde",
+      "badges": {
+        "paid": "Bezahlt",
+        "unpaid": "Offen",
+        "returned": "Zurückgegeben {{amount}}",
+        "invoice": "Rechnung #{{seq}} · in der Patientenakte"
+      },
+      "medicines": "Arzneimittel",
+      "medicine": "Arzneimittel",
+      "batch": "Charge",
+      "qty": "Menge",
+      "amount": "Betrag",
+      "summary_one": "{{count}} Arzneimittel · {{amount}}",
+      "summary_other": "{{count}} Arzneimittel · {{amount}}",
+      "collect": "{{amount}} kassieren",
+      "returnMedicines": "Arzneimittel zurücknehmen",
+      "voidSale": "Verkauf stornieren",
+      "collected": "{{amount}} erhalten"
+    },
+    "saleReturn": {
+      "title": "Rückgabe vom Patienten",
+      "sub": "{{customer}} · zurückgegebener Bestand geht in seine Charge zurück",
+      "steps": {
+        "back": "Was zurückkommt",
+        "reason": "Grund & Erstattung"
+      },
+      "medicine": "Arzneimittel",
+      "batch": "Charge",
+      "sold": "Verkauft",
+      "refund": "Erstattung",
+      "return": "Zurück",
+      "reason": "Grund",
+      "reasons": {
+        "unused": "Unbenutzt",
+        "reaction": "Reaktion",
+        "rx_changed": "Arzt hat Rezept geändert",
+        "wrong_item": "Falscher Artikel",
+        "damaged": "Beschädigt"
+      },
+      "refundBy": "Erstatten per",
+      "peek_one": "{{count}} Arzneimittel · {{amount}}",
+      "peek_other": "{{count}} Arzneimittel · {{amount}}",
+      "quickFill": "Alles zurücknehmen",
+      "save": "{{amount}} erstatten",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "Geben Sie ein, was zurückgegeben wird",
+      "refunded": "{{amount}} erstattet · Bestand wieder hinzugefügt",
+      "refundedWrittenOff": "{{amount}} erstattet · Bestand abgeschrieben",
+      "lowered": "{{amount}} zurückgegeben · Bestand wieder hinzugefügt",
+      "loweredWrittenOff": "{{amount}} zurückgegeben · Bestand abgeschrieben"
+    },
+    "expiring": {
+      "title": "Ablaufenden Bestand zurückgeben",
+      "sub": "{{medicine}} · Charge {{batch}} · läuft ab {{expiry}}",
+      "supplier": "Lieferant",
+      "boughtAt": "Gekauft zu {{amount}}",
+      "quantity": "Menge",
+      "of": "von {{count}}",
+      "creditNote": "Gutschrift",
+      "badges": {
+        "credit": "Gutschrift {{amount}}",
+        "daysLeft_one": "Noch {{count}} Tag",
+        "daysLeft_other": "Noch {{count}} Tage"
+      },
+      "summary": "Die Gutschrift senkt, was Sie {{supplier}} schulden",
+      "save": "Zurückgeben & Gutschrift nehmen",
+      "saved": "{{count}} zurückgegeben · {{amount}} Gutschrift von {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "Rezept {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

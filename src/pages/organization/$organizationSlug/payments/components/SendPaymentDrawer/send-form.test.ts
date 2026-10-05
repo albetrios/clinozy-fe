@@ -8,7 +8,6 @@ import type {
 import {
   ageTone,
   amountText,
-  billKey,
   billOf,
   emptySendForm,
   SEND_QUICK_FILLS,
@@ -70,9 +69,7 @@ describe('the send form', () => {
     expect(sendMissing(picked)).toEqual([]);
   });
 
-  it('keys a bill as the `?bill=` link does, and finds it again', () => {
-    expect(billKey(PO_431)).toBe(`md:${PO_431.purchaseId}`);
-    expect(billKey(STOCK_15)).toBe(`is:${STOCK_15.purchaseId}`);
+  it('finds the bill a `?bill=` link names among the open ones', () => {
     expect(billOf([PO_431, STOCK_15], `is:${STOCK_15.purchaseId}`)).toBe(STOCK_15);
     expect(billOf([PO_431], undefined)).toBeNull();
   });

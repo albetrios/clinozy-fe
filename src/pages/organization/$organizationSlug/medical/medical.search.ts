@@ -11,6 +11,7 @@
  * pins each list to the contract's enum.
  */
 import {
+  listIn,
   listOf,
   oneOf,
   queryOf,
@@ -22,6 +23,9 @@ import {
   type CreatedFilter,
   readCreatedFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
+import type { PaymentMode } from '@/shared/api/clinic/clinic-schema.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
+import type { LedgerKindFilter } from '@/shared/api/clinic/payments-contracts.ts';
 
 /** Sales' Status filter beyond All (`medical.md:39`). */
 export const SALE_STATUSES = ['unpaid', 'returned'] as const;
@@ -98,7 +102,10 @@ export function validateMedicalSearch(search: Record<string, unknown>): MedicalS
   };
 }
 
-/** The dialog routes' prefills: New medicine's `?name=`, New purchase order's `?supplier=&reorder=low`. */
+/**
+ * The dialog routes' prefills: New medicine's `?name=`, New purchase order's
+ * `?supplier=&reorder=low`, New sale's `?prescription=&customer=&from=`.
+ */
 export interface MedicalCreateSearch {
   /** A typed medicine name (≤ 120 characters). */
   name?: string;
@@ -110,6 +117,12 @@ export interface MedicalCreateSearch {
   prescription?: string;
   /** The customer a new sale starts on. */
   customer?: string;
+  /**
+   * The room New sale opened from and closes back to — Today's Dispense sends
+   * `from=today` (KICKOFF §4, AMBER A-P1). Raw here; the close checks it
+   * against the referrer allow-list (`safeReferrer`).
+   */
+  from?: string;
 }
 
 /** Parse a Medical dialog route's prefill. */
@@ -127,5 +140,33 @@ export function validateMedicalCreateSearch(
     reorder: oneOf(['low'] as const, search.reorder),
     prescription: one(search.prescription),
     customer: one(search.customer),
+    from: textOf(search.from) || undefined,
+  };
+}
+
+/**
+ * Medical › Payments' params (`S:71`): the Payments ledger's What, Mode,
+ * Created and search — its Medical scope is fixed, not in the URL — and no
+ * "Show" (`medical.md:135`).
+ */
+export interface MedicalPaymentsSearch {
+  /** A PAY- number, the party or an invoice number (≤ 80 characters). */
+  q?: string;
+  /** What: any of these kinds. */
+  kind?: LedgerKindFilter[];
+  /** Mode: any entry with a split in these modes. */
+  mode?: PaymentMode[];
+  created?: CreatedFilter;
+}
+
+/** Parse Medical › Payments' search params. */
+export function validateMedicalPaymentsSearch(
+  search: Record<string, unknown>,
+): MedicalPaymentsSearch {
+  return {
+    q: queryOf(search.q, 80),
+    kind: listIn(LEDGER_FILTER_VALUES.kind, search.kind),
+    mode: listIn(LEDGER_FILTER_VALUES.mode, search.mode),
+    created: readCreatedFilter(search.created),
   };
 }

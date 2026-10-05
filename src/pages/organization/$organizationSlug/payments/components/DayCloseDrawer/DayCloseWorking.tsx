@@ -11,6 +11,7 @@ import {
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import { DrawerNumberInput } from '@/shared/components/DrawerField/index.ts';
+import { useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
@@ -23,7 +24,6 @@ import {
   PAYMENTS_KEYS,
   PAYMENTS_NS,
 } from '../../payments.constants.ts';
-import { useLedgerTime } from '../LedgerCells/index.ts';
 import {
   cashDifference,
   DIFFERENCE_TONES,

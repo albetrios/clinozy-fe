@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils.ts';
 import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { CheckCircle } from '@/shared/icons/index.ts';
@@ -14,7 +15,6 @@ import {
   PAYMENTS_KEYS,
   PAYMENTS_NS,
 } from '../../payments.constants.ts';
-import { useLedgerTime } from '../LedgerCells/index.ts';
 import {
   cashDifference,
   dayLog,

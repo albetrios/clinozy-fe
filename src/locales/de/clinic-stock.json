@@ -132,7 +132,8 @@
     },
     "rowActions": {
       "edit": "Bearbeiten",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "pay": "{{amount}} zahlen"
     }
   },
   "movements": {
@@ -178,7 +179,8 @@
     "noPurchases": "Keine Einkäufe",
     "rowActions": {
       "edit": "Bearbeiten",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "pay": "{{amount}} zahlen"
     }
   },
   "drawers": {

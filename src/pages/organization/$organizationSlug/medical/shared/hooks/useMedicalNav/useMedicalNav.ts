@@ -16,6 +16,7 @@ import {
   organizationPurchaseOrderReceive,
   organizationSupplierEdit,
 } from '@/lib/routes/index.ts';
+import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 
 import {
   type MedicalCreateSearch,
@@ -32,7 +33,8 @@ const listSearch = (current: Record<string, unknown>) => validateMedicalSearch(c
  * The Medical family's navigation (KICKOFF §4, D24): each create, view and edit
  * dialog route over its own tab — a create from another tab opens over the
  * tab it belongs to (a standing deviation, §6.7) — keeping the tab's list
- * params, and the close back onto a tab with nothing of the drawer's.
+ * params, and the close back onto a tab with nothing of the drawer's, or onto
+ * the room a drawer was opened from.
  */
 export function useMedicalNav() {
   const navigate = useNavigate();
@@ -40,16 +42,30 @@ export function useMedicalNav() {
 
   return useMemo(() => {
     const slug = organizationSlug;
+    /** Back to a tab's list, keeping its search, filters and sort. */
+    const close = (tab: MedicalTab) =>
+      void navigate({
+        ...organizationMedicalTab(slug, tab),
+        search: listSearch,
+        hash: true,
+        replace: true,
+      });
     return {
       organizationSlug: slug,
-      /** Back to a tab's list, keeping its search, filters and sort. */
-      close: (tab: MedicalTab) =>
-        void navigate({
-          ...organizationMedicalTab(slug, tab),
-          search: listSearch,
-          hash: true,
-          replace: true,
-        }),
+      close,
+      /**
+       * Back to the room a drawer opened from — `from` when the referrer
+       * allow-list has it (Today's Dispense sends `from=today`; KICKOFF §4,
+       * AMBER A-P1) — else to the tab's list.
+       */
+      closeTo: (tab: MedicalTab, from: string | undefined) => {
+        const room = safeReferrer(from, '');
+        if (!room || room === `medical/${tab}`) {
+          close(tab);
+          return;
+        }
+        void navigate({ href: `/organization/${slug}/${room}`, replace: true });
+      },
       /** Another tab, fresh. */
       tab: (tab: MedicalTab) => void navigate(organizationMedicalTab(slug, tab)),
       /** A create drawer over its own tab, with its prefill. */
@@ -67,8 +83,13 @@ export function useMedicalNav() {
           ...organizationMedicineEdit(slug, medicineId),
           search: listSearch,
         }),
-      purchaseOrder: (id: string) =>
-        void navigate({ ...organizationPurchaseOrder(slug, id), search: listSearch }),
+      /** An order's view; `replace` when it stands in for a route the order's stage has left. */
+      purchaseOrder: (id: string, replace = false) =>
+        void navigate({
+          ...organizationPurchaseOrder(slug, id),
+          search: listSearch,
+          replace,
+        }),
       purchaseOrderEdit: (id: string) =>
         void navigate({ ...organizationPurchaseOrderEdit(slug, id), search: listSearch }),
       purchaseOrderReceive: (id: string) =>

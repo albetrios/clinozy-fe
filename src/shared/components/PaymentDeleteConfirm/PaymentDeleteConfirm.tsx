@@ -7,12 +7,11 @@ import {
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
+import { LEDGER_KEYS, LEDGER_NS } from '@/shared/components/LedgerCells/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useDeletePayment, useRestorePayment } from '@/shared/hooks/usePayments/index.ts';
 
-import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
-
-const K = PAYMENTS_KEYS.deleteEntry;
+const K = LEDGER_KEYS.deleteEntry;
 
 /**
  * The ledger's reasons (`payments.md:34`): "Entered twice" is the schema's
@@ -20,9 +19,9 @@ const K = PAYMENTS_KEYS.deleteEntry;
  * (D32), and "Other" waits for a note.
  */
 const LEDGER_REASONS: readonly ConfirmReasonOption[] = [
-  { value: 'duplicate', labelKey: `${PAYMENTS_NS}:${K.reasons.twice}` },
-  { value: 'wrong_amount', labelKey: `${PAYMENTS_NS}:${K.reasons.amount}` },
-  { value: 'wrong_party', labelKey: `${PAYMENTS_NS}:${K.reasons.party}` },
+  { value: 'duplicate', labelKey: `${LEDGER_NS}:${K.reasons.twice}` },
+  { value: 'wrong_amount', labelKey: `${LEDGER_NS}:${K.reasons.amount}` },
+  { value: 'wrong_party', labelKey: `${LEDGER_NS}:${K.reasons.party}` },
   { value: 'other', labelKey: REASON_CONFIRM_KEYS.reasons.other },
 ];
 
@@ -57,7 +56,7 @@ export function PaymentDeleteConfirm({
   onClose,
   onDeleted,
 }: PaymentDeleteConfirmProps) {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const formatPaise = usePaiseFormat();
   const remove = useDeletePayment();
   const restore = useRestorePayment();

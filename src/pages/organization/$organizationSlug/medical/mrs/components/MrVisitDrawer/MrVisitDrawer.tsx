@@ -18,7 +18,10 @@ import {
   DrawerTextarea,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import {
   RecordDrawer,
@@ -209,7 +212,7 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: [next, samples].filter(Boolean).join(' · ') || notFilled,
+      summary: drawerStepSummary([next, samples], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.nextVisit), value: next },
         { kind: 'value', label: t(K.fields.samples), value: samples },

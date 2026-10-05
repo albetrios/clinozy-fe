@@ -23,7 +23,7 @@ import {
 } from '@/shared/hooks/useMedicines/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { Package, PenLine, Tag, Trash } from '@/shared/icons/index.ts';
+import { Package, PenLine, RefreshCw, Tag, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
@@ -45,6 +45,7 @@ import { useManufacturerCatalogue } from '../shared/hooks/useMedicalLists/index.
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 import { useMedicalStack } from '../shared/hooks/useMedicalStack/index.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
+import { ExpiringReturnDrawer } from './components/ExpiringReturnDrawer/index.ts';
 import { useMedicineColumns } from './hooks/useMedicineColumns/index.ts';
 import { medicineFilterKey, medicineParamsOf } from './medicines.params.ts';
 
@@ -126,7 +127,8 @@ function useDiscountToggle() {
  * toolbar — "Reorder low stock" with Low stock on, "Sell all at 20% off" /
  * "Remove near-expiry discount" with a Nearest expiry window — over the
  * medicines table. A row opens Edit medicine; a batch expiring within 90 days
- * adds the discount toggle; Delete asks for a reason. The search, filters and
+ * adds "Return expiring stock to supplier" (its drawer, no URL) and the
+ * discount toggle; Delete asks for a reason. The search, filters and
  * sort live in the URL. The dialog routes render nothing: this page opens the
  * Medicine drawer for `create/` (`?name=`) and `$medicineId/edit/`, with any
  * child stacked on it.
@@ -143,6 +145,7 @@ export function MedicinesPage() {
   const toggleDiscount = useDiscountToggle();
   const stack = useMedicalStack();
   const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
+  const [returning, setReturning] = useState<MedicineRow | null>(null);
   const { dialog, close } = useMedicalDialogRoute({
     tab: 'medicines',
     param: 'medicineId',
@@ -170,6 +173,14 @@ export function MedicinesPage() {
     const actions: DataTableRowAction[] = [];
     const expiring =
       row.nearest !== null && row.nearest.daysLeft <= EXPIRY_ACTIONS_WITHIN;
+    if (canEdit && expiring && row.stock > 0 && row.supplierRates.length > 0) {
+      actions.push({
+        id: 'return-expiring',
+        label: t(keys.returnExpiring),
+        icon: RefreshCw,
+        onSelect: () => setReturning(row),
+      });
+    }
     if (canEdit && expiring) {
       const on = row.nearExpiryDiscountPct === 0;
       actions.push({
@@ -277,6 +288,7 @@ export function MedicinesPage() {
       />
       <MedicalStackHost stack={stack} />
       <MedicalDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <ExpiringReturnDrawer medicine={returning} onClose={() => setReturning(null)} />
       <Outlet />
     </section>
   );

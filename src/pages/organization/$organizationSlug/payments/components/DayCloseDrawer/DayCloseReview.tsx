@@ -14,6 +14,13 @@ import {
   type DataTableRowAction,
   DataTableRowActions,
 } from '@/shared/components/DataTableRowActions/index.ts';
+import {
+  LedgerAmountCell,
+  LedgerModeCell,
+  LedgerPartyCell,
+  LedgerWhatCell,
+  LedgerWhenCell,
+} from '@/shared/components/LedgerCells/index.ts';
 import { Progress } from '@/shared/components/ui/progress.tsx';
 import { Check, ChevronDown, Lock } from '@/shared/icons/index.ts';
 
@@ -22,13 +29,6 @@ import {
   PAYMENTS_KEYS,
   PAYMENTS_NS,
 } from '../../payments.constants.ts';
-import {
-  LedgerAmountCell,
-  LedgerModeCell,
-  LedgerPartyCell,
-  LedgerWhatCell,
-  LedgerWhenCell,
-} from '../LedgerCells/index.ts';
 
 const K = PAYMENTS_KEYS.dayClose.review;
 const T = `${DAY_CLOSE_TEST_ID}-review`;

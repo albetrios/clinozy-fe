@@ -246,7 +246,9 @@
       "medicine": "Medicamento",
       "supplier": "Proveedor",
       "manufacturer": "Fabricante",
-      "mr": "Visitador"
+      "mr": "Visitador",
+      "sale": "Venta",
+      "purchaseOrder": "Orden de compra"
     },
     "saveChanges": "Guardar cambios",
     "addName": "Añade un nombre",
@@ -360,7 +362,8 @@
         "adjusted": "Aplicado"
       },
       "quickFill": {
-        "newOrder": "Nueva orden de compra"
+        "newOrder": "Nueva orden de compra",
+        "pay": "Pagar {{amount}}"
       },
       "save": "Añadir proveedor",
       "saved": "Proveedor guardado"
@@ -493,6 +496,162 @@
         "enterRates": "Introduce una tarifa en cada precio de proveedor",
         "pickManufacturer": "Elige un fabricante"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "¿Cancelar esta orden de compra?",
+      "voidSale": "¿Anular esta venta?",
+      "cancelled": "{{order}} cancelada",
+      "voided": "Venta #{{seq}} anulada"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "Nueva orden de compra",
+        "edit": "Editar orden de compra"
+      },
+      "sub": "Pedir → recibir → pagar",
+      "steps": {
+        "order": "Pedido",
+        "items": "Artículos"
+      },
+      "fields": {
+        "supplier": "Proveedor",
+        "billNo": "N.º de factura",
+        "date": "Fecha del pedido",
+        "items": "Artículos",
+        "medicine": "Medicamento",
+        "selectMedicine": "Selecciona un medicamento…",
+        "searchMedicine": "Buscar medicamento",
+        "qty": "Cant.",
+        "free": "Bonif.",
+        "rate": "Tarifa",
+        "amount": "Importe",
+        "add": "Añadir medicamento",
+        "total": "Total",
+        "fromSupplier": "De {{supplier}}",
+        "otherMedicines": "Otros medicamentos",
+        "inStock": "{{count}} en existencias · {{maker}}",
+        "outOfStock": "Sin existencias · {{maker}}",
+        "addMedicine": "Añadir medicamento",
+        "newMedicine": "Nuevo medicamento",
+        "enterRate": "Introduce la tarifa de compra",
+        "peek_one": "{{count}} medicamento · {{amount}}",
+        "peek_many": "{{count}} medicamentos · {{amount}}",
+        "peek_other": "{{count}} medicamentos · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "Reponer existencias bajas"
+      },
+      "rateFor": "Introduce la tarifa de {{name}}",
+      "rateForCount_one": "Introduce la tarifa de {{count}} medicamento",
+      "rateForCount_many": "Introduce la tarifa de {{count}} medicamentos",
+      "rateForCount_other": "Introduce la tarifa de {{count}} medicamentos",
+      "pickSupplier": "Elige un proveedor",
+      "save": "Crear pedido",
+      "saved": "Orden de compra guardada",
+      "cancelOrder": "Cancelar orden"
+    },
+    "receive": {
+      "title": "Recibir mercancía",
+      "sub": "{{supplier}} · marca cada artículo e introduce lote y caducidad",
+      "section": "Marca lo que llegó",
+      "arrived": "Llegó",
+      "notArrived": "No llegó",
+      "medicine": "Medicamento",
+      "qty": "Cant.",
+      "free": "Bonif.",
+      "batch": "Lote",
+      "expiry": "Caducidad",
+      "expiryPlaceholder": "MM/AA",
+      "enterExpiry": "Introduce la caducidad",
+      "tickArrived": "Marca lo que llegó",
+      "save": "Marcar como recibido",
+      "saved": "Mercancía recibida · existencias y bonificación añadidas"
+    },
+    "orderView": {
+      "title": "Orden de compra",
+      "subReceived": "{{supplier}} · recibida, existencias añadidas · artículos bloqueados",
+      "subPaid": "{{supplier}} · pagada, bloqueada",
+      "payable": "Por pagar {{amount}}",
+      "paid": "Pagado {{amount}}",
+      "paidOf": "Pagado {{paid}} de {{total}}",
+      "pay": "Pagar {{amount}}"
+    },
+    "sale": {
+      "title": "Venta",
+      "sub": "{{customer}} · {{when}} · una venta se cambia con una devolución, no se edita",
+      "walkIn": "Cliente de paso",
+      "badges": {
+        "paid": "Pagado",
+        "unpaid": "Pendiente",
+        "returned": "Devuelto {{amount}}",
+        "invoice": "Factura #{{seq}} · en el expediente del paciente"
+      },
+      "medicines": "Medicamentos",
+      "medicine": "Medicamento",
+      "batch": "Lote",
+      "qty": "Cant.",
+      "amount": "Importe",
+      "summary_one": "{{count}} medicamento · {{amount}}",
+      "summary_many": "{{count}} medicamentos · {{amount}}",
+      "summary_other": "{{count}} medicamentos · {{amount}}",
+      "collect": "Cobrar {{amount}}",
+      "returnMedicines": "Devolver medicamentos",
+      "voidSale": "Anular venta",
+      "collected": "{{amount}} recibido"
+    },
+    "saleReturn": {
+      "title": "Devolución del paciente",
+      "sub": "{{customer}} · las existencias devueltas vuelven a su lote",
+      "steps": {
+        "back": "Qué se devuelve",
+        "reason": "Motivo y reembolso"
+      },
+      "medicine": "Medicamento",
+      "batch": "Lote",
+      "sold": "Vendido",
+      "refund": "Reembolso",
+      "return": "Devolver",
+      "reason": "Motivo",
+      "reasons": {
+        "unused": "Sin usar",
+        "reaction": "Reacción",
+        "rx_changed": "El médico cambió la receta",
+        "wrong_item": "Artículo equivocado",
+        "damaged": "Dañado"
+      },
+      "refundBy": "Reembolsar por",
+      "peek_one": "{{count}} medicamento · {{amount}}",
+      "peek_many": "{{count}} medicamentos · {{amount}}",
+      "peek_other": "{{count}} medicamentos · {{amount}}",
+      "quickFill": "Devolver todo",
+      "save": "Reembolsar {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "Introduce lo que se devuelve",
+      "refunded": "{{amount}} reembolsado · existencias repuestas",
+      "refundedWrittenOff": "{{amount}} reembolsado · existencias dadas de baja",
+      "lowered": "{{amount}} devuelto · existencias repuestas",
+      "loweredWrittenOff": "{{amount}} devuelto · existencias dadas de baja"
+    },
+    "expiring": {
+      "title": "Devolver existencias por caducar",
+      "sub": "{{medicine}} · lote {{batch}} · caduca {{expiry}}",
+      "supplier": "Proveedor",
+      "boughtAt": "Comprado a {{amount}}",
+      "quantity": "Cantidad",
+      "of": "de {{count}}",
+      "creditNote": "Nota de crédito",
+      "badges": {
+        "credit": "Crédito {{amount}}",
+        "daysLeft_one": "Queda {{count}} día",
+        "daysLeft_many": "Quedan {{count}} días",
+        "daysLeft_other": "Quedan {{count}} días"
+      },
+      "summary": "El crédito reduce lo que debes a {{supplier}}",
+      "save": "Devolver y tomar crédito",
+      "saved": "{{count}} devueltos · {{amount}} de crédito de {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "Receta {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

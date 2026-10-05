@@ -1,34 +1,174 @@
+import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
-import { Wallet } from '@/shared/icons/index.ts';
+import { organizationPaymentEdit } from '@/lib/routes/index.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
+import type {
+  LedgerListParams,
+  LedgerRow,
+} from '@/shared/api/clinic/payments-contracts.ts';
+import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  LEDGER_KEYS,
+  LEDGER_NS,
+  ledgerEntryLock,
+} from '@/shared/components/LedgerCells/index.ts';
+import {
+  PaymentDeleteConfirm,
+  type PaymentDeleteTarget,
+} from '@/shared/components/PaymentDeleteConfirm/index.ts';
+import {
+  type RoomFilterCopy,
+  type RoomFilterFields,
+  useRoomFilters,
+} from '@/shared/components/RoomToolbar/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
+import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
+import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
+import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
+import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
-import { MEDICAL_KEYS, MEDICAL_NS } from '../medical.constants.ts';
+import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
+import {
+  type MedicalPaymentsSearch,
+  validateMedicalPaymentsSearch,
+} from '../medical.search.ts';
+import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
+import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
+
+const TABLE_ID = MEDICAL_TABLE_IDS.payments;
+
+/** The ledger's minimum width with every column (`medical.md:125`). */
+const LEDGER_MIN_WIDTH = 1180;
+
+/** Medical › Payments' Filters (`medical.md:135`): What · Mode · Created — no "Show". */
+const MEDICAL_LEDGER_FILTER_FIELDS = {
+  kind: { kind: 'options', values: LEDGER_FILTER_VALUES.kind },
+  mode: { kind: 'options', values: LEDGER_FILTER_VALUES.mode },
+  created: { kind: 'date', presets: 'created' },
+} as const satisfies RoomFilterFields;
+
+/** The Filters' What and Mode sections, in the ledger's words and tones. */
+function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
+  const { t } = useTranslation(LEDGER_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
+  return {
+    kind: {
+      label: t(LEDGER_KEYS.columns.what),
+      options: Object.fromEntries(
+        LEDGER_FILTER_VALUES.kind.map((kind) => [
+          kind,
+          { label: t(LEDGER_KEYS.kinds[kind]), tone: PAYMENT_KIND_TONES[kind] },
+        ]),
+      ),
+    },
+    mode: {
+      label: t(LEDGER_KEYS.columns.mode),
+      options: Object.fromEntries(
+        LEDGER_FILTER_VALUES.mode.map((mode) => [
+          mode,
+          {
+            label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+            tone: PAYMENT_MODE_TONES[mode],
+          },
+        ]),
+      ),
+    },
+  };
+}
+
+/** The ledger read for the URL: its filters and search, the header branches, the Medical scope. */
+function ledgerParamsOf(
+  search: MedicalPaymentsSearch,
+  branchIds: readonly string[],
+): LedgerListParams {
+  return {
+    kind: search.kind,
+    mode: search.mode,
+    created: search.created,
+    q: search.q,
+    branchIds: branchIds.length > 0 ? [...branchIds] : undefined,
+    scope: 'medical',
+  };
+}
 
 /**
  * Medical › Payments (KICKOFF §6.7; `medical.md:121–135`): the Payments ledger
- * limited to Medical (`scope=medical`, `S:71`) under the Medical toolbar. The
- * ledger is the Payments room's (L-39) and mounts here once it is shared;
- * until then the tab shows its empty state under the toolbar.
+ * limited to Medical (`scope=medical`, `S:71`, `S:1662`) — receipts on Medical
+ * invoices ("Sale · Invoice #785"), payments of Medical PO bills and expenses
+ * in Medicines — under the Medical toolbar, "New sale" its primary. The shared
+ * ledger columns, no sort; What, Mode, Created and the search in the URL. An
+ * open day's entry opens in Payments (`/payments/$paymentId/edit` — the
+ * drawer over the Payments ledger, a standing deviation, `S:87`) with Edit and
+ * Delete in its row; a closed day's answers "PAY-5501 · Day closed".
  */
 export function MedicalPaymentsPage() {
   const { t } = useTranslation(MEDICAL_NS);
+  const { t: tLedger } = useTranslation(LEDGER_NS);
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const search = validateMedicalPaymentsSearch(useSearch({ strict: false }));
+  const { preferences } = usePreferences();
+  const access = useClinicAccess();
+  const nav = useMedicalNav();
+  const filters = useRoomFilters(MEDICAL_LEDGER_FILTER_FIELDS);
+  const filterCopy = useFilterCopy();
+  const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
+
+  const list = useLedgerList(ledgerParamsOf(search, preferences.branchFilter));
+  const { rows, loading } = useRoomList(
+    list,
+    TABLE_ID,
+    JSON.stringify([search.q, search.kind, search.mode, search.created]),
+  );
+  const table = useLedgerTable(loading ? [] : rows, TABLE_ID);
+
+  const openEntry = (row: LedgerRow) => {
+    const lock = ledgerEntryLock(row, tLedger);
+    if (lock) {
+      notify.info(lock);
+      return;
+    }
+    void navigate({ ...organizationPaymentEdit(organizationSlug, row.id), search: {} });
+  };
+  const rowActions = useLedgerRowActions({ onEdit: openEntry, onDelete: setDeleting });
+  const canCreate = access.isResolved && access.can('medical', 'create');
+
   return (
     <section data-testid="medical-payments-page" className="flex min-h-0 flex-1 flex-col">
-      <MedicalToolbar tab="payments" />
-      <div
-        data-slot="medical-payments-ledger"
-        className="bg-card m-(--room-card-margin) flex flex-1 flex-col rounded-xl border max-md:m-0 max-md:rounded-none max-md:border-0"
-      >
-        <h2 className="sr-only">{t(MEDICAL_KEYS.tabs.payments)}</h2>
-        <EmptyState
-          tone="blush"
-          icon={<Wallet />}
-          title={t(MEDICAL_KEYS.payments.empty)}
-          description={t(MEDICAL_KEYS.empty.hint)}
-        />
-      </div>
+      <MedicalToolbar
+        tab="payments"
+        table={table}
+        filters={{ fields: MEDICAL_LEDGER_FILTER_FIELDS, copy: filterCopy }}
+      />
+      <MedicalTable
+        tab="payments"
+        table={table}
+        list={list}
+        loading={loading}
+        filtered={filters.count > 0}
+        onClearFilters={() => filters.apply({})}
+        emptyTitle={t(MEDICAL_KEYS.payments.empty)}
+        emptyAction={
+          canCreate
+            ? { label: t(MEDICAL_KEYS.create.sale), onSelect: () => nav.create('sales') }
+            : undefined
+        }
+        recordsLabel={t(MEDICAL_KEYS.payments.records)}
+        minWidth={LEDGER_MIN_WIDTH}
+        onRowClick={openEntry}
+        rowTone={ledgerRowTone}
+        rowActions={rowActions}
+        exportName="medical-payments.csv"
+        avatar
+      />
+      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <Outlet />
     </section>
   );
 }

@@ -1,7 +1,7 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
+import { LEDGER_KEYS } from '@/shared/components/LedgerCells/ledger-cells.constants.ts';
 import type { RoomFilterFields } from '@/shared/components/RoomToolbar/index.ts';
-
-import { LEDGER_FILTER_VALUES } from './payments.search.ts';
 
 /** The Payments room's i18n namespace — the ledger, Pending and their drawers. */
 export const PAYMENTS_NS = I18N_NAMESPACES.payments;
@@ -9,7 +9,8 @@ export const PAYMENTS_NS = I18N_NAMESPACES.payments;
 /**
  * The Payments room's copy, verbatim from `payments.md` › Copy (KICKOFF §6.9).
  * The payment modes, invoice types and expense categories are the shared clinic
- * vocabulary (`CLINIC_KEYS`).
+ * vocabulary (`CLINIC_KEYS`); the ledger's own words are the shared
+ * `LEDGER_KEYS`, which Medical › Payments reads too.
  */
 export const PAYMENTS_KEYS = {
   manifest: { title: 'manifest.title' },
@@ -30,13 +31,7 @@ export const PAYMENTS_KEYS = {
   },
   /** Column headers, also the meta line's labels and the Filters sections'. */
   columns: {
-    ref: 'columns.ref',
-    what: 'columns.what',
-    when: 'columns.when',
-    party: 'columns.party',
-    mode: 'columns.mode',
-    amount: 'columns.amount',
-    by: 'columns.by',
+    ...LEDGER_KEYS.columns,
     who: 'columns.who',
     way: 'columns.way',
     why: 'columns.why',
@@ -45,50 +40,11 @@ export const PAYMENTS_KEYS = {
   },
   /** The Filters popover's "Show" section: All · Received · Paid. */
   filters: { show: 'filters.show', all: 'filters.all' },
-  /** "Received" / "Paid" — the What pill, and the Show chips. */
-  directions: { received: 'directions.received', paid: 'directions.paid' },
-  /** The What filter's chips — the contract's kind labels (`S:1378–1386`). */
-  kinds: {
-    receipt: 'kinds.receipt',
-    refund: 'kinds.refund',
-    expense: 'kinds.expense',
-    money_back: 'kinds.money_back',
-  },
-  ledger: {
-    /** "All entries loaded" — the plural noun the end line names. */
-    records: 'ledger.records',
-    /** "Today 11:05". */
-    today: 'ledger.today',
-    /** "27 Sep 18:40". */
-    dayTime: 'ledger.dayTime',
-    /** "Edited 1× · last ₹600 UPI → ₹700 UPI" (plural). */
-    edited: 'ledger.edited',
-    /** "₹600 UPI" — one side of an edit. */
-    editSide: 'ledger.editSide',
-    /** "+ ₹600" / "− ₹260". */
-    received: 'ledger.received',
-    paid: 'ledger.paid',
-    /** The From / to cell's sub line, piece by piece. */
-    sub: {
-      invoice: 'ledger.sub.invoice',
-      sale: 'ledger.sub.sale',
-      refund: 'ledger.sub.refund',
-      refundNote: 'ledger.sub.refundNote',
-      refundFor: 'ledger.sub.refundFor',
-      moneyBack: 'ledger.sub.moneyBack',
-      medicalBill: 'ledger.sub.medicalBill',
-      stockBill: 'ledger.sub.stockBill',
-      fromCredit: 'ledger.sub.fromCredit',
-    },
-    /** A closed day's row click: "PAY-5509 · Day closed" (+ " · edited 2×"). */
-    dayClosed: 'ledger.dayClosed',
-    dayClosedEdited: 'ledger.dayClosedEdited',
-    /** A settled credit's entry: "PAY-5601 · From CR-2" — it is the credit's (H:5105). */
-    creditEntry: 'ledger.creditEntry',
-  },
+  directions: LEDGER_KEYS.directions,
+  kinds: LEDGER_KEYS.kinds,
+  ledger: LEDGER_KEYS.ledger,
   rowActions: {
-    edit: 'rowActions.edit',
-    delete: 'rowActions.delete',
+    ...LEDGER_KEYS.rowActions,
     giveBack: 'rowActions.giveBack',
     gotBack: 'rowActions.gotBack',
     useOnBill: 'rowActions.useOnBill',
@@ -105,19 +61,7 @@ export const PAYMENTS_KEYS = {
     description: 'empty.description',
     receive: 'empty.receive',
   },
-  /** Delete an entry (`payments.md:34, 282–294`). */
-  deleteEntry: {
-    title: 'deleteEntry.title',
-    effect: 'deleteEntry.effect',
-    effectInvoice: 'deleteEntry.effectInvoice',
-    reasons: {
-      twice: 'deleteEntry.reasons.twice',
-      amount: 'deleteEntry.reasons.amount',
-      party: 'deleteEntry.reasons.party',
-    },
-    removed: 'deleteEntry.removed',
-    removedInvoice: 'deleteEntry.removedInvoice',
-  },
+  deleteEntry: LEDGER_KEYS.deleteEntry,
   /** A dialog route's record, as "<Record> not found · it may have been deleted" names it (`S:115`). */
   dialog: {
     record: 'dialog.record',

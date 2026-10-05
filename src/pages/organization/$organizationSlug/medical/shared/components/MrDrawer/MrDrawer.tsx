@@ -19,7 +19,10 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,
@@ -295,7 +298,7 @@ function useSteps(
     {
       id: 'mr',
       title: t(K.steps.mr),
-      summary: [name, phoneText, next].filter(Boolean).join(' · ') || notFilled,
+      summary: drawerStepSummary([name, phoneText, next], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.phone), value: phoneText },

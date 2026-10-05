@@ -236,7 +236,9 @@
       "medicine": "Medicine",
       "supplier": "Supplier",
       "manufacturer": "Manufacturer",
-      "mr": "MR"
+      "mr": "MR",
+      "sale": "Sale",
+      "purchaseOrder": "Purchase order"
     },
     "saveChanges": "Save changes",
     "addName": "Add a name",
@@ -344,7 +346,8 @@
         "adjusted": "Adjusted"
       },
       "quickFill": {
-        "newOrder": "New purchase order"
+        "newOrder": "New purchase order",
+        "pay": "Pay {{amount}}"
       },
       "save": "Add supplier",
       "saved": "Supplier saved"
@@ -477,6 +480,157 @@
         "enterRates": "Enter a rate for every supplier price",
         "pickManufacturer": "Pick a manufacturer"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "Cancel this purchase order?",
+      "voidSale": "Void this sale?",
+      "cancelled": "{{order}} cancelled",
+      "voided": "Sale #{{seq}} voided"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "New purchase order",
+        "edit": "Edit purchase order"
+      },
+      "sub": "Order → receive → pay",
+      "steps": {
+        "order": "Order",
+        "items": "Items"
+      },
+      "fields": {
+        "supplier": "Supplier",
+        "billNo": "Invoice no.",
+        "date": "Order date",
+        "items": "Items",
+        "medicine": "Medicine",
+        "selectMedicine": "Select medicine…",
+        "searchMedicine": "Search medicine",
+        "qty": "Qty",
+        "free": "Free",
+        "rate": "Rate",
+        "amount": "Amount",
+        "add": "Add medicine",
+        "total": "Total",
+        "fromSupplier": "From {{supplier}}",
+        "otherMedicines": "Other medicines",
+        "inStock": "{{count}} in stock · {{maker}}",
+        "outOfStock": "Out of stock · {{maker}}",
+        "addMedicine": "Add medicine",
+        "newMedicine": "New medicine",
+        "enterRate": "Enter the purchase rate",
+        "peek_one": "{{count}} medicine · {{amount}}",
+        "peek_other": "{{count}} medicines · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "Reorder low stock"
+      },
+      "rateFor": "Enter the rate for {{name}}",
+      "rateForCount_one": "Enter the rate for {{count}} medicine",
+      "rateForCount_other": "Enter the rate for {{count}} medicines",
+      "pickSupplier": "Pick a supplier",
+      "save": "Create order",
+      "saved": "Purchase order saved",
+      "cancelOrder": "Cancel order"
+    },
+    "receive": {
+      "title": "Receive goods",
+      "sub": "{{supplier}} · tick each item and enter batch & expiry",
+      "section": "Tick what arrived",
+      "arrived": "Arrived",
+      "notArrived": "Not arrived",
+      "medicine": "Medicine",
+      "qty": "Qty",
+      "free": "Free",
+      "batch": "Batch",
+      "expiry": "Expiry",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "Enter the expiry",
+      "tickArrived": "Tick what arrived",
+      "save": "Mark received",
+      "saved": "Goods received · stock and free quantity added"
+    },
+    "orderView": {
+      "title": "Purchase order",
+      "subReceived": "{{supplier}} · received, stock added · items locked",
+      "subPaid": "{{supplier}} · paid, locked",
+      "payable": "Payable {{amount}}",
+      "paid": "Paid {{amount}}",
+      "paidOf": "Paid {{paid}} of {{total}}",
+      "pay": "Pay {{amount}}"
+    },
+    "sale": {
+      "title": "Sale",
+      "sub": "{{customer}} · {{when}} · a sale is changed by a return, not edited",
+      "walkIn": "Walk-in customer",
+      "badges": {
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "returned": "Returned {{amount}}",
+        "invoice": "Invoice #{{seq}} · in patient file"
+      },
+      "medicines": "Medicines",
+      "medicine": "Medicine",
+      "batch": "Batch",
+      "qty": "Qty",
+      "amount": "Amount",
+      "summary_one": "{{count}} medicine · {{amount}}",
+      "summary_other": "{{count}} medicines · {{amount}}",
+      "collect": "Collect {{amount}}",
+      "returnMedicines": "Return medicines",
+      "voidSale": "Void sale",
+      "collected": "{{amount}} received"
+    },
+    "saleReturn": {
+      "title": "Return from patient",
+      "sub": "{{customer}} · returned stock goes back into its batch",
+      "steps": {
+        "back": "What is coming back",
+        "reason": "Reason & refund"
+      },
+      "medicine": "Medicine",
+      "batch": "Batch",
+      "sold": "Sold",
+      "refund": "Refund",
+      "return": "Return",
+      "reason": "Reason",
+      "reasons": {
+        "unused": "Unused",
+        "reaction": "Reaction",
+        "rx_changed": "Doctor changed Rx",
+        "wrong_item": "Wrong item",
+        "damaged": "Damaged"
+      },
+      "refundBy": "Refund by",
+      "peek_one": "{{count}} medicine · {{amount}}",
+      "peek_other": "{{count}} medicines · {{amount}}",
+      "quickFill": "Return everything",
+      "save": "Refund {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "Enter what is being returned",
+      "refunded": "{{amount}} refunded · stock added back",
+      "refundedWrittenOff": "{{amount}} refunded · stock written off",
+      "lowered": "{{amount}} returned · stock added back",
+      "loweredWrittenOff": "{{amount}} returned · stock written off"
+    },
+    "expiring": {
+      "title": "Return expiring stock",
+      "sub": "{{medicine}} · batch {{batch}} · expires {{expiry}}",
+      "supplier": "Supplier",
+      "boughtAt": "Bought at {{amount}}",
+      "quantity": "Quantity",
+      "of": "of {{count}}",
+      "creditNote": "Credit note",
+      "badges": {
+        "credit": "Credit {{amount}}",
+        "daysLeft_one": "{{count}} day left",
+        "daysLeft_other": "{{count}} days left"
+      },
+      "summary": "Credit reduces what you owe {{supplier}}",
+      "save": "Return & take credit",
+      "saved": "{{count}} returned · {{amount}} credit from {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "Rx {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

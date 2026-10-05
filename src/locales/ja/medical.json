@@ -226,7 +226,9 @@
       "medicine": "医薬品",
       "supplier": "仕入先",
       "manufacturer": "メーカー",
-      "mr": "MR"
+      "mr": "MR",
+      "sale": "販売",
+      "purchaseOrder": "発注"
     },
     "saveChanges": "変更を保存",
     "addName": "名前を入力してください",
@@ -328,7 +330,8 @@
         "adjusted": "相殺済み"
       },
       "quickFill": {
-        "newOrder": "新しい発注"
+        "newOrder": "新しい発注",
+        "pay": "{{amount}} を支払う"
       },
       "save": "仕入先を追加",
       "saved": "仕入先を保存しました"
@@ -461,6 +464,152 @@
         "enterRates": "すべての仕入先価格に単価を入力してください",
         "pickManufacturer": "メーカーを選択してください"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "この発注をキャンセルしますか？",
+      "voidSale": "この販売を取り消しますか？",
+      "cancelled": "{{order}} をキャンセルしました",
+      "voided": "販売 #{{seq}} を取り消しました"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "新しい発注",
+        "edit": "発注を編集"
+      },
+      "sub": "発注 → 入荷 → 支払い",
+      "steps": {
+        "order": "発注",
+        "items": "品目"
+      },
+      "fields": {
+        "supplier": "仕入先",
+        "billNo": "請求書番号",
+        "date": "発注日",
+        "items": "品目",
+        "medicine": "医薬品",
+        "selectMedicine": "医薬品を選択…",
+        "searchMedicine": "医薬品を検索",
+        "qty": "数量",
+        "free": "無償",
+        "rate": "単価",
+        "amount": "金額",
+        "add": "医薬品を追加",
+        "total": "合計",
+        "fromSupplier": "{{supplier}} から",
+        "otherMedicines": "その他の医薬品",
+        "inStock": "在庫 {{count}} · {{maker}}",
+        "outOfStock": "在庫切れ · {{maker}}",
+        "addMedicine": "医薬品を追加",
+        "newMedicine": "新しい医薬品",
+        "enterRate": "仕入単価を入力してください",
+        "peek_other": "{{count}} 品目 · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "在庫少を再発注"
+      },
+      "rateFor": "{{name}} の単価を入力してください",
+      "rateForCount_other": "{{count}} 品目の単価を入力してください",
+      "pickSupplier": "仕入先を選択してください",
+      "save": "発注を作成",
+      "saved": "発注を保存しました",
+      "cancelOrder": "発注をキャンセル"
+    },
+    "receive": {
+      "title": "入荷を記録",
+      "sub": "{{supplier}} · 各品目にチェックしてロットと有効期限を入力",
+      "section": "届いたものにチェック",
+      "arrived": "入荷",
+      "notArrived": "未入荷",
+      "medicine": "医薬品",
+      "qty": "数量",
+      "free": "無償",
+      "batch": "ロット",
+      "expiry": "有効期限",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "有効期限を入力してください",
+      "tickArrived": "届いたものにチェックしてください",
+      "save": "入荷済みにする",
+      "saved": "入荷しました · 在庫と無償数量を追加"
+    },
+    "orderView": {
+      "title": "発注",
+      "subReceived": "{{supplier}} · 入荷済み、在庫追加済み · 品目はロック",
+      "subPaid": "{{supplier}} · 支払済み、ロック",
+      "payable": "未払い {{amount}}",
+      "paid": "支払済み {{amount}}",
+      "paidOf": "{{total}} のうち {{paid}} 支払済み",
+      "pay": "{{amount}} を支払う"
+    },
+    "sale": {
+      "title": "販売",
+      "sub": "{{customer}} · {{when}} · 販売は返品で変更し、編集はしません",
+      "walkIn": "来店客",
+      "badges": {
+        "paid": "支払済み",
+        "unpaid": "未払い",
+        "returned": "返品 {{amount}}",
+        "invoice": "請求書 #{{seq}} · 患者ファイル内"
+      },
+      "medicines": "医薬品",
+      "medicine": "医薬品",
+      "batch": "ロット",
+      "qty": "数量",
+      "amount": "金額",
+      "summary_other": "{{count}} 品目 · {{amount}}",
+      "collect": "{{amount}} を回収",
+      "returnMedicines": "医薬品を返品",
+      "voidSale": "販売を取り消す",
+      "collected": "{{amount}} を受け取りました"
+    },
+    "saleReturn": {
+      "title": "患者からの返品",
+      "sub": "{{customer}} · 返品された在庫は元のロットに戻ります",
+      "steps": {
+        "back": "返品されるもの",
+        "reason": "理由と返金"
+      },
+      "medicine": "医薬品",
+      "batch": "ロット",
+      "sold": "販売数",
+      "refund": "返金",
+      "return": "返品",
+      "reason": "理由",
+      "reasons": {
+        "unused": "未使用",
+        "reaction": "副作用",
+        "rx_changed": "医師が処方を変更",
+        "wrong_item": "品違い",
+        "damaged": "破損"
+      },
+      "refundBy": "返金方法",
+      "peek_other": "{{count}} 品目 · {{amount}}",
+      "quickFill": "すべて返品",
+      "save": "{{amount}} を返金",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "返品するものを入力してください",
+      "refunded": "{{amount}} を返金しました · 在庫に戻しました",
+      "refundedWrittenOff": "{{amount}} を返金しました · 在庫は廃棄",
+      "lowered": "{{amount}} を返品 · 在庫に戻しました",
+      "loweredWrittenOff": "{{amount}} を返品 · 在庫は廃棄"
+    },
+    "expiring": {
+      "title": "期限間近の在庫を返品",
+      "sub": "{{medicine}} · ロット {{batch}} · 期限 {{expiry}}",
+      "supplier": "仕入先",
+      "boughtAt": "仕入値 {{amount}}",
+      "quantity": "数量",
+      "of": "/ {{count}}",
+      "creditNote": "クレジットノート",
+      "badges": {
+        "credit": "クレジット {{amount}}",
+        "daysLeft_other": "残り {{count}} 日"
+      },
+      "summary": "クレジットで {{supplier}} への買掛金が減ります",
+      "save": "返品してクレジットを受け取る",
+      "saved": "{{count}} 個を返品 · {{supplier}} から {{amount}} のクレジット"
+    },
+    "prescriptions": {
+      "sub": "処方 {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

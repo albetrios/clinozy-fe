@@ -13,11 +13,9 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
-import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-
 import {
+  LEDGER_KEYS,
+  LEDGER_NS,
   LedgerAmountCell,
   LedgerByCell,
   LedgerModeCell,
@@ -29,8 +27,10 @@ import {
   LedgerWhatCell,
   LedgerWhenCell,
   useLedgerWhen,
-} from '../../components/LedgerCells/index.ts';
-import { LEDGER_TABLE_ID, PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
+} from '@/shared/components/LedgerCells/index.ts';
+import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
+import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 /** The table's row as the meta line and the phone key read it. */
 const rowOf = (original: unknown) => original as LedgerRow;
@@ -44,7 +44,7 @@ const rowOf = (original: unknown) => original as LedgerRow;
  * ledger runs newest first (`payments.md:31`).
  */
 function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const formatPaise = usePaiseFormat();
   const when = useLedgerWhen();
@@ -54,7 +54,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'ref',
       accessorKey: 'seq',
-      header: t(PAYMENTS_KEYS.columns.ref),
+      header: t(LEDGER_KEYS.columns.ref),
       enableSorting: false,
       enableHiding: false,
       cell: ({ row }) => <LedgerRefCell seq={row.original.seq} />,
@@ -67,7 +67,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'what',
       accessorKey: 'direction',
-      header: t(PAYMENTS_KEYS.columns.what),
+      header: t(LEDGER_KEYS.columns.what),
       enableSorting: false,
       cell: ({ row }) => <LedgerWhatCell row={row.original} />,
       meta: {
@@ -82,7 +82,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'when',
       accessorKey: 'paidAt',
-      header: t(PAYMENTS_KEYS.columns.when),
+      header: t(LEDGER_KEYS.columns.when),
       enableSorting: false,
       cell: ({ row }) => <LedgerWhenCell row={row.original} />,
       meta: {
@@ -94,7 +94,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'party',
       accessorKey: 'partyName',
-      header: t(PAYMENTS_KEYS.columns.party),
+      header: t(LEDGER_KEYS.columns.party),
       enableSorting: false,
       cell: ({ row }) => <LedgerPartyCell row={row.original} />,
       meta: {
@@ -108,7 +108,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'mode',
       accessorFn: (row) => ledgerModes(row).join(','),
-      header: t(PAYMENTS_KEYS.columns.mode),
+      header: t(LEDGER_KEYS.columns.mode),
       enableSorting: false,
       cell: ({ row }) => <LedgerModeCell row={row.original} />,
       meta: {
@@ -128,7 +128,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'amount',
       accessorKey: 'amount',
-      header: t(PAYMENTS_KEYS.columns.amount),
+      header: t(LEDGER_KEYS.columns.amount),
       enableSorting: false,
       cell: ({ row }) => <LedgerAmountCell row={row.original} />,
       meta: {
@@ -138,8 +138,8 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
           const row = rowOf(original);
           return t(
             row.direction === 'received'
-              ? PAYMENTS_KEYS.ledger.received
-              : PAYMENTS_KEYS.ledger.paid,
+              ? LEDGER_KEYS.ledger.received
+              : LEDGER_KEYS.ledger.paid,
             { amount: formatPaise(row.amount) },
           );
         },
@@ -148,7 +148,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
     {
       id: 'by',
       accessorFn: (row) => row.by?.name ?? '',
-      header: t(PAYMENTS_KEYS.columns.by),
+      header: t(LEDGER_KEYS.columns.by),
       enableSorting: false,
       cell: ({ row }) => <LedgerByCell row={row.original} />,
       // The 28px people pill folds to nothing (H:4115).
@@ -164,12 +164,13 @@ export function ledgerRowTone(row: Pick<LedgerRow, 'kind'>) {
 
 /**
  * The ledger table instance (KICKOFF §6.9): the loaded cursor pages, keyed by
- * the entry's id; no column sorts; the Columns choice is a device pref
- * (`useHiddenColumns` — the recommended set shows them all).
+ * the entry's id; no column sorts; the Columns choice is a device pref under
+ * the table's id (`useHiddenColumns` — the recommended set shows them all) —
+ * the Payments ledger's, or Medical › Payments' own.
  */
-export function useLedgerTable(rows: readonly LedgerRow[]) {
+export function useLedgerTable(rows: readonly LedgerRow[], tableId: string) {
   const columns = useLedgerColumns();
-  const visibility = useHiddenColumns(LEDGER_TABLE_ID, columns);
+  const visibility = useHiddenColumns(tableId, columns);
   return useTable({
     features: dataTableFeatures,
     data: rows as LedgerRow[],

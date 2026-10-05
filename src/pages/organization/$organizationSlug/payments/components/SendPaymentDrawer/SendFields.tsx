@@ -5,6 +5,7 @@ import { EXPENSE_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   EXPENSE_MODE_VALUES,
   type OpenSupplierBill,
+  supplierBillKey,
 } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
@@ -32,7 +33,6 @@ import {
   ageTone,
   AMOUNT_QUICK,
   amountText,
-  billKey,
   PAID_TO_QUICK,
   type SendFormValues,
 } from './send-form.ts';
@@ -70,7 +70,7 @@ function useBillOptions(bills: readonly OpenSupplierBill[]): PickerOption[] {
       tone: 'lav',
     },
     ...bills.map((bill) => ({
-      key: billKey(bill),
+      key: supplierBillKey(bill),
       label: label(bill),
       sub: [bill.billNo ? t(K.billNo, { bill: bill.billNo }) : '', age(bill.daysPending)]
         .filter(Boolean)
@@ -123,7 +123,9 @@ export function SendBillFields({
           searchable
           options={options}
           value={picked ?? OTHER_SPEND}
-          onChange={(key) => onPick(bills.find((bill) => billKey(bill) === key) ?? null)}
+          onChange={(key) =>
+            onPick(bills.find((bill) => supplierBillKey(bill) === key) ?? null)
+          }
           disabled={readOnly}
           size="md"
           minWidth={320}
@@ -135,7 +137,7 @@ export function SendBillFields({
           <DrawerChips
             label={t(K.oldest)}
             options={bills.slice(0, 3).map((bill) => ({
-              value: billKey(bill),
+              value: supplierBillKey(bill),
               label: t(K.oldestChip, {
                 seq: bill.seq,
                 supplier: bill.supplierName.split(' ')[0] ?? bill.supplierName,
@@ -146,7 +148,7 @@ export function SendBillFields({
             }))}
             value={null}
             onChange={(key) =>
-              onPick(bills.find((bill) => billKey(bill) === key) ?? null)
+              onPick(bills.find((bill) => supplierBillKey(bill) === key) ?? null)
             }
             disabled={readOnly}
             testId={`${testId}-oldest`}

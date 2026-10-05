@@ -1,4 +1,4 @@
-import { type ReactElement, type Ref, useId, useState } from 'react';
+import { type ReactElement, type ReactNode, type Ref, useId, useState } from 'react';
 import { type FieldError, type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -505,5 +505,36 @@ export function ItemsPickerCell<TForm extends FieldValues, TOption = unknown>({
       </CellMessage>
       <CellMessageText id={errorId} message={message} />
     </>
+  );
+}
+
+/** Props of {@link ItemsReadCell}. */
+export interface ItemsReadCellProps {
+  children: ReactNode;
+  /** The row's own name or figure, in full weight; the rest are muted. */
+  strong?: boolean;
+  className?: string;
+}
+
+/**
+ * A read-only cell's text — a view's rows (a supplier's Account, a sale's
+ * medicines, a received order's lines): 13px on one line with tabular
+ * figures, the row's own name or figure in full weight, the rest muted.
+ */
+export function ItemsReadCell({
+  children,
+  strong = false,
+  className,
+}: ItemsReadCellProps) {
+  return (
+    <span
+      className={cn(
+        'text-body min-w-0 truncate tabular-nums',
+        strong ? 'text-foreground font-medium' : 'text-muted-foreground-strong',
+        className,
+      )}
+    >
+      {children}
+    </span>
   );
 }

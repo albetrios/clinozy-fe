@@ -128,7 +128,8 @@
     },
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제"
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
     }
   },
   "movements": {
@@ -171,7 +172,8 @@
     "noPurchases": "구매 없음",
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제"
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
     }
   },
   "drawers": {

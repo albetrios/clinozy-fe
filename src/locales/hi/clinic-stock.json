@@ -132,7 +132,8 @@
     },
     "rowActions": {
       "edit": "संपादित करें",
-      "delete": "हटाएँ"
+      "delete": "हटाएँ",
+      "pay": "{{amount}} का भुगतान करें"
     }
   },
   "movements": {
@@ -178,7 +179,8 @@
     "noPurchases": "कोई ख़रीद नहीं",
     "rowActions": {
       "edit": "संपादित करें",
-      "delete": "हटाएँ"
+      "delete": "हटाएँ",
+      "pay": "{{amount}} का भुगतान करें"
     }
   },
   "drawers": {

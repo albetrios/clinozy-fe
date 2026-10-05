@@ -6,6 +6,7 @@ import {
   type OpenSupplierBill,
   type PayExpenseInput,
   type PaymentPatch,
+  supplierBillKey,
 } from '@/shared/api/clinic/payments-contracts.ts';
 
 /*
@@ -102,17 +103,12 @@ export function withBill(
   };
 }
 
-/** A bill's picker key: `md:<id>` or `is:<id>`, the `?bill=` form (`S:86`). */
-export function billKey(bill: Pick<OpenSupplierBill, 'kind' | 'purchaseId'>): string {
-  return `${bill.kind === 'medical_po' ? 'md' : 'is'}:${bill.purchaseId}`;
-}
-
 /** The bill `?bill=md:<id>|is:<id>` names among the open ones. */
 export function billOf(
   bills: readonly OpenSupplierBill[],
   key: string | undefined,
 ): OpenSupplierBill | null {
-  return bills.find((bill) => billKey(bill) === key) ?? null;
+  return bills.find((bill) => supplierBillKey(bill) === key) ?? null;
 }
 
 /** "Pending longest": the tone of a bill's age — blush from 30 days, butter from 14 (H:5130). */

@@ -63,11 +63,16 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
       reorder: 'low',
       prescription: undefined,
       customer: undefined,
+      from: undefined,
     });
     expect(validateMedicalCreateSearch({ supplier: 'x', reorder: 'all' })).toMatchObject({
       supplier: undefined,
       reorder: undefined,
     });
+    // New sale from Today's Dispense: the prescription and the room to go back to.
+    expect(
+      validateMedicalCreateSearch({ prescription: ID, from: 'today' }),
+    ).toMatchObject({ prescription: ID, from: 'today' });
   });
 
   it('pins the filter values to the contract (the reader cannot import the schema)', () => {

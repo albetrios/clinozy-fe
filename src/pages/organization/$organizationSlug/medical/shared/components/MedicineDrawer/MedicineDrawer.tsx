@@ -14,7 +14,10 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
@@ -228,9 +231,10 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'medicine',
       title: t(K.steps.main),
-      summary:
-        [name, maker?.label, mrpText, `${values.gstPct}%`].filter(Boolean).join(' · ') ||
+      summary: drawerStepSummary(
+        [name, maker?.label, mrpText, `${values.gstPct}%`],
         notFilled,
+      ),
       peek: [
         { kind: 'value', label: t(F.name), value: name },
         {

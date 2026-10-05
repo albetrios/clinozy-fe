@@ -128,7 +128,8 @@
     },
     "rowActions": {
       "edit": "編集",
-      "delete": "削除"
+      "delete": "削除",
+      "pay": "{{amount}} を支払う"
     }
   },
   "movements": {
@@ -171,7 +172,8 @@
     "noPurchases": "仕入れなし",
     "rowActions": {
       "edit": "編集",
-      "delete": "削除"
+      "delete": "削除",
+      "pay": "{{amount}} を支払う"
     }
   },
   "drawers": {

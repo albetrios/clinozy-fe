@@ -16,6 +16,8 @@ export {
   type ItemsPickerCellProps,
   ItemsQtyCell,
   type ItemsQtyCellProps,
+  ItemsReadCell,
+  type ItemsReadCellProps,
   ItemsTextCell,
   type ItemsTextCellProps,
 } from './items-field-cells.tsx';

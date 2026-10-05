@@ -1,7 +1,9 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 
 import {
@@ -33,5 +35,35 @@ describe('SuppliersPage', () => {
       'medical-suppliers-tab-suppliers',
     );
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('"Pay ₹2,980" while a supplier is owed opens Send payment on its oldest open bill', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const { router } = renderMedicalRoutes('/organization/acme/medical/suppliers', {
+      suppliers: SuppliersPage,
+    });
+    const pay = await screen.findByTestId('medical-suppliers-row-action-pay');
+    expect(pay).toHaveAccessibleName('Pay ₹2,980');
+    await user.click(pay);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
+    );
+    expect(router.state.location.search).toEqual({
+      bill: `md:${ref.purchaseOrder(431)}`,
+    });
+  });
+
+  it('the Supplier drawer offers "⚡ Pay ₹2,980" too', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    const { router } = renderMedicalRoutes(
+      `/organization/acme/medical/suppliers/${ref.supplier(58)}/edit`,
+      { suppliers: SuppliersPage },
+    );
+    const pay = await screen.findByTestId('supplier-drawer-quick-fill-pay');
+    expect(pay).toHaveTextContent('Pay ₹2,980');
+    await user.click(pay);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
+    );
   });
 });

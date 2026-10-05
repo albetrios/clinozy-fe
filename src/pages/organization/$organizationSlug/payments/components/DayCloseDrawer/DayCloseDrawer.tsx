@@ -7,7 +7,12 @@ import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { ledgerEntryLock, useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
+import {
+  PaymentDeleteConfirm,
+  type PaymentDeleteTarget,
+} from '@/shared/components/PaymentDeleteConfirm/index.ts';
 import {
   DRAWER_WIDTH_CLASS,
   RECORD_DRAWER_OVERLAY_CLASS,
@@ -19,6 +24,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet.ts
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
@@ -33,7 +39,6 @@ import {
   useEntryCheck,
   useReopenDay,
 } from '../../hooks/useDayClose/index.ts';
-import { useLedgerRowActions } from '../../hooks/useLedgerRowActions/index.ts';
 import {
   DAY_CLOSE_TEST_ID,
   PAYMENTS_KEYS,
@@ -41,11 +46,6 @@ import {
 } from '../../payments.constants.ts';
 import type { DayCloseSearch } from '../../payments.search.ts';
 import { useDayLabel } from '../../shared/hooks/useDayLabel/index.ts';
-import { ledgerEntryLock, useLedgerTime } from '../LedgerCells/index.ts';
-import {
-  PaymentDeleteConfirm,
-  type PaymentDeleteTarget,
-} from '../PaymentDeleteConfirm/index.ts';
 import { ReceivePaymentDrawer } from '../ReceivePaymentDrawer/index.ts';
 import { SendPaymentDrawer } from '../SendPaymentDrawer/index.ts';
 import { dayCloseBranchId, typedPaise } from './day-close-view.ts';

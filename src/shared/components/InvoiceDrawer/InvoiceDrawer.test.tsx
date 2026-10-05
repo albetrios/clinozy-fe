@@ -354,6 +354,18 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
 
+  it('lets a pharmacist — Medical, no Payments — make a New sale, never a clinic invoice', async () => {
+    asRole('pharmacist');
+    const sale = renderCreate({}, true);
+    const drawer = await panel();
+    expect(within(drawer).getByTestId('invoice-drawer-save')).toBeInTheDocument();
+    expect(drawer).not.toHaveTextContent('View only · your role can’t change this');
+    sale.unmount();
+    renderCreate();
+    const invoice = await panel();
+    expect(invoice).toHaveTextContent('View only · your role can’t change this');
+  });
+
   it('bills a medicine at its MRP with no GST on top (D45), and refuses more than the stock', async () => {
     const user = setUser();
     renderCreate({ patientId: RHEA, type: 'medical' }, true);

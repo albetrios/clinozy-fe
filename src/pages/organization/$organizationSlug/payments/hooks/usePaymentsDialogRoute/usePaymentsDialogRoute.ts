@@ -7,11 +7,11 @@ import { organizationPayments } from '@/lib/routes/index.ts';
 import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { ledgerEntryLock } from '@/shared/components/LedgerCells/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { ledgerEntryLock } from '../../components/LedgerCells/index.ts';
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import {
   type DayCloseSearch,

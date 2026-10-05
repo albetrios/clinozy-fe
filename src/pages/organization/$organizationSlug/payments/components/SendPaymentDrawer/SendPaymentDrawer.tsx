@@ -7,9 +7,10 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { ledgerDayOf } from '@/shared/api/clinic/day-close-api.ts';
 import { attachPaymentFile } from '@/shared/api/clinic/payments-api.ts';
-import type {
-  LedgerRow,
-  OpenSupplierBill,
+import {
+  type LedgerRow,
+  type OpenSupplierBill,
+  supplierBillKey,
 } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
@@ -23,6 +24,7 @@ import {
   type PickedFile,
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import { PaymentDeleteConfirm } from '@/shared/components/PaymentDeleteConfirm/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
@@ -45,10 +47,8 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import { useDayLabel } from '../../shared/hooks/useDayLabel/index.ts';
-import { PaymentDeleteConfirm } from '../PaymentDeleteConfirm/index.ts';
 import {
   amountText,
-  billKey,
   billOf,
   emptySendForm,
   SEND_QUICK_FILLS,
@@ -165,7 +165,9 @@ function useSteps({
   const missing = sendMissing(values);
   const amount = sendAmount(values);
   const picked = values.bill
-    ? bills?.find((bill) => billKey(bill) === billKey(values.bill ?? bill))
+    ? bills?.find(
+        (bill) => supplierBillKey(bill) === supplierBillKey(values.bill ?? bill),
+      )
     : undefined;
   const billSummary = picked ? billLabel(picked) : t(K.otherSpend);
   const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: CLINIC_NS });
@@ -319,7 +321,9 @@ function useChrome(values: SendFormValues, bills: readonly OpenSupplierBill[] | 
   const amount = sendAmount(values);
   const category = tClinic(CLINIC_KEYS.expenseCategories[values.category]);
   const picked = values.bill
-    ? (bills ?? []).find((bill) => billKey(bill) === billKey(values.bill ?? bill))
+    ? (bills ?? []).find(
+        (bill) => supplierBillKey(bill) === supplierBillKey(values.bill ?? bill),
+      )
     : undefined;
   const badges: DrawerBadge[] = [
     { id: 'category', label: category, tone: EXPENSE_CATEGORY_TONES[values.category] },
@@ -375,7 +379,7 @@ function stepBodies({
       <DrawerStepBody readOnly={readOnly}>
         <SendBillFields
           bills={bills ?? []}
-          picked={values.bill ? billKey(values.bill) : null}
+          picked={values.bill ? supplierBillKey(values.bill) : null}
           onPick={(bill) =>
             form.reset(withBill(form.getValues(), bill), { keepDefaultValues: true })
           }

@@ -11,6 +11,7 @@ import {
 } from '@/lib/routes/index.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -18,11 +19,22 @@ import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import {
+  ledgerEntryLock,
+  useLedgerSubLine,
+  useLedgerWhen,
+} from '@/shared/components/LedgerCells/index.ts';
+import {
+  PaymentDeleteConfirm,
+  type PaymentDeleteTarget,
+} from '@/shared/components/PaymentDeleteConfirm/index.ts';
+import {
   type RoomFilterCopy,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
+import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -30,19 +42,8 @@ import { ArrowDownLeft, ArrowUpRight, FileIcon, Wallet } from '@/shared/icons/in
 import { notify } from '@/shared/notify/index.ts';
 
 import { DayCloseDrawer } from './components/DayCloseDrawer/index.ts';
-import {
-  ledgerEntryLock,
-  useLedgerSubLine,
-  useLedgerWhen,
-} from './components/LedgerCells/index.ts';
-import {
-  PaymentDeleteConfirm,
-  type PaymentDeleteTarget,
-} from './components/PaymentDeleteConfirm/index.ts';
 import { ReceivePaymentDrawer } from './components/ReceivePaymentDrawer/index.ts';
 import { SendPaymentDrawer } from './components/SendPaymentDrawer/index.ts';
-import { useLedgerRowActions } from './hooks/useLedgerRowActions/index.ts';
-import { ledgerRowTone, useLedgerTable } from './hooks/useLedgerTable/index.ts';
 import {
   type PaymentsDialogRoute,
   usePaymentsDialogRoute,
@@ -54,7 +55,7 @@ import {
   PAYMENTS_NS,
 } from './payments.constants.ts';
 import { ledgerListParamsOf } from './payments.params.ts';
-import { LEDGER_FILTER_VALUES, validatePaymentsSearch } from './payments.search.ts';
+import { validatePaymentsSearch } from './payments.search.ts';
 import { PaymentsToolbar } from './shared/components/PaymentsToolbar/index.ts';
 
 /**
@@ -281,7 +282,7 @@ export function PaymentsPage() {
   });
   const list = useLedgerList(params);
   useListLoadError(list, LEDGER_TABLE_ID);
-  const table = useLedgerTable(list.rows);
+  const table = useLedgerTable(list.rows, LEDGER_TABLE_ID);
 
   const can = (action: 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('payments', action);

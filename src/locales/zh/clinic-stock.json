@@ -128,7 +128,8 @@
     },
     "rowActions": {
       "edit": "编辑",
-      "delete": "删除"
+      "delete": "删除",
+      "pay": "支付 {{amount}}"
     }
   },
   "movements": {
@@ -171,7 +172,8 @@
     "noPurchases": "无采购",
     "rowActions": {
       "edit": "编辑",
-      "delete": "删除"
+      "delete": "删除",
+      "pay": "支付 {{amount}}"
     }
   },
   "drawers": {

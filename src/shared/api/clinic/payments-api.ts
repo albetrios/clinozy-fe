@@ -83,6 +83,19 @@ function matchesSearch(row: LedgerRow, query: string): boolean {
     .some((field) => field.includes(needle));
 }
 
+/**
+ * Medical's own entries (`listMedicalPayments`, `S:1662`): receipts and
+ * refunds on Medical invoices, payments of Medical PO bills, and expenses in
+ * Medicines.
+ */
+function isMedical(row: LedgerRow): boolean {
+  return (
+    row.invoice?.type === 'medical' ||
+    row.bill?.kind === 'medical_po' ||
+    row.expenseCategory === 'medicines'
+  );
+}
+
 /** The What filter's kind for an entry: a supplier bill is an expense. */
 function whatOf(payment: PaymentRecord) {
   return payment.kind === 'supplier_bill' ? 'expense' : payment.kind;
@@ -102,6 +115,7 @@ const LEDGER_CHECKS: readonly ((
     !created || createdFilterMatches(row.createdAt, created, today),
   (row, { day }) => !day || ledgerDayOf(row) === day,
   (row, { branchIds }) => !branchIds?.length || branchIds.includes(row.branchId),
+  (row, { scope }) => scope !== 'medical' || isMedical(row),
   (row, { q }) => matchesSearch(row, q ?? ''),
 ];
 
@@ -118,8 +132,9 @@ const newestFirst = (a: PaymentRecord, b: PaymentRecord) =>
 /**
  * One cursor page of the ledger (`listLedger`, `S:1699`; REPLACE_WITH_API):
  * receipts, refunds and expenses merged, newest first, filtered by Show, What,
- * Mode, Created, `q`, the reviewed day and the header branches. Each row names
- * its party, invoice, bill, credit, author and lock.
+ * Mode, Created, `q`, the reviewed day, the header branches and — for Medical ›
+ * Payments — the Medical scope. Each row names its party, invoice, bill,
+ * credit, author and lock.
  */
 export async function listLedger(
   params: LedgerListParams = {},
@@ -274,8 +289,8 @@ async function invoiceDue(invoiceId: string, exceptPaymentId: string | null) {
 
 /**
  * What every new ledger entry starts from — a receipt, an expense, an
- * invoice's "Paid now" (`invoices-server.fixtures.ts`); the kind's fields come
- * from the caller.
+ * invoice's "Paid now" (`invoices-server.fixtures.ts`), Medical's Collect and
+ * refunds (`medical-flows-api.ts`); the kind's fields come from the caller.
  */
 export function newLedgerEntry(
   fields: Pick<

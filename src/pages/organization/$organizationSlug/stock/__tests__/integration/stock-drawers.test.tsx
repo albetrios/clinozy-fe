@@ -258,14 +258,19 @@ describe('Clinic stock › Movements Revert (clinic-stock.md:65)', () => {
     const confirm = await screen.findByRole('alertdialog');
     await user.click(within(confirm).getByRole('radio', { name: 'Logged by mistake' }));
     await user.click(within(confirm).getByRole('button', { name: 'Revert' }));
+    // The revert is found by what it says: a seeded entry later today can sort above it.
+    const isRevert = (row: HTMLElement) =>
+      /Reverts used of .+ · Logged by mistake/.test(row.textContent ?? '');
     await waitFor(() =>
-      expect(screen.getAllByTestId('stock-movements-table-row')[0]).toHaveTextContent(
-        /Reverts used of .+ · Logged by mistake/,
+      expect(screen.getAllByTestId('stock-movements-table-row').some(isRevert)).toBe(
+        true,
       ),
     );
-    const [reverting, original] = screen
+    const noprik = screen
       .getAllByTestId('stock-movements-table-row')
       .filter((row) => row.textContent?.includes('Noprik'));
+    const reverting = noprik.find(isRevert);
+    const original = noprik.find((row) => !isRevert(row));
     expect(
       within(reverting as HTMLElement).queryByTestId(/-row-action-revert/),
     ).toBeNull();
@@ -290,7 +295,8 @@ describe('Clinic stock › Vendors (Q-K1)', () => {
     const user = setup();
     const { router } = await openTab('vendors', 'Ibreia');
     expect(actionsOf('vendors', 'Ibreia')).toEqual(['edit', 'delete']);
-    expect(actionsOf('vendors', 'Cranix')).toEqual(['edit']);
+    // Cranix is owed: Pay, never Delete (Q-M1).
+    expect(actionsOf('vendors', 'Cranix')).toEqual(['pay', 'edit']);
 
     await user.click(action('vendors', 'Ibreia', 'delete'));
     const confirm = await screen.findByRole('alertdialog');

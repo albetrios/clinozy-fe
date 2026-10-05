@@ -13,7 +13,8 @@ who keep the stock. AMBER: the column labels and the empty copy are not in the s
 
 `create/` (New clinic vendor) · `$vendorId/edit/` (Edit clinic vendor) — each renders nothing; this page
 opens the clinic vendor drawer over the list (D24). Delete shows only while nothing is owed; it asks for a
-reason. "Pay ₹X" waits on the Payments pay route (L-50c, Q-M1).
+reason. "Pay ₹X", while a vendor is owed, opens Payments › Send payment on their oldest open
+purchase (`?bill=is:<purchaseId>`, Q-M1).
 
 ## Files
 

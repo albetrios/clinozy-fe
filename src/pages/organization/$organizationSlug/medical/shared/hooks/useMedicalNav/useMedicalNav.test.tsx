@@ -25,6 +25,15 @@ function Probe() {
       <button type="button" onClick={() => nav.create('purchases', { supplier: ID })}>
         new order
       </button>
+      <button type="button" onClick={() => nav.closeTo('sales', 'today')}>
+        back to today
+      </button>
+      <button type="button" onClick={() => nav.closeTo('sales', 'https://evil.test')}>
+        back to elsewhere
+      </button>
+      <button type="button" onClick={() => nav.closeTo('sales', 'medical/sales')}>
+        back to sales
+      </button>
     </>
   );
 }
@@ -55,5 +64,30 @@ describe('useMedicalNav', () => {
       expect(router.state.location.pathname).toBe(`${ROOM}/purchases/create`),
     );
     expect(router.state.location.search).toMatchObject({ supplier: ID });
+  });
+
+  it('closes New sale back to the room it opened from, when the allow-list has it', async () => {
+    const user = userEvent.setup();
+    const first = renderMedicalRoutes(`${ROOM}/sales/create?from=today`, {
+      sales: Probe,
+    });
+    await user.click(await screen.findByRole('button', { name: 'back to today' }));
+    await waitFor(() =>
+      expect(first.router.state.location.pathname).toBe('/organization/acme/today'),
+    );
+    first.unmount();
+
+    // Anything else — a room the list lacks, or the tab itself — closes onto the tab.
+    const second = renderMedicalRoutes(`${ROOM}/sales/create`, { sales: Probe });
+    await user.click(await screen.findByRole('button', { name: 'back to elsewhere' }));
+    await waitFor(() =>
+      expect(second.router.state.location.pathname).toBe(`${ROOM}/sales`),
+    );
+    second.unmount();
+    const third = renderMedicalRoutes(`${ROOM}/sales/create`, { sales: Probe });
+    await user.click(await screen.findByRole('button', { name: 'back to sales' }));
+    await waitFor(() =>
+      expect(third.router.state.location.pathname).toBe(`${ROOM}/sales`),
+    );
   });
 });

@@ -1,4 +1,7 @@
-import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
+import {
+  clinicDateOf,
+  createdFilterMatches,
+} from '@/shared/api/clinic/clinic-filter-match.ts';
 import {
   clinicHttpError,
   compareText,
@@ -39,6 +42,7 @@ import {
   type SupplierRow,
 } from './medical-contracts.ts';
 import type { SupplierAccountRow } from './medical-partners-contracts.ts';
+import { type SupplierCredit, supplierCreditStore } from './medical-supplier-credits.ts';
 
 /*
  * The Medical family's reads and writes (`S:1655–1677`), on the fixture world
@@ -77,6 +81,12 @@ export const medicalQueryKeys = {
 const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
 
 type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+
+/** The credits suppliers gave for returned expiring stock (fixture state beside the world). */
+async function supplierCredits(): Promise<readonly SupplierCredit[]> {
+  const { onClinicFixturesReset } = await fixtureWorld();
+  return supplierCreditStore(onClinicFixturesReset).list();
+}
 
 /** Whether `createdAt` passes the Created filter (none set passes). */
 function createdOk(
@@ -225,6 +235,7 @@ export async function listMedicalSales(
 export async function fetchMedicalSale(id: string): Promise<SaleRow> {
   const { clinicFixtures } = await fixtureWorld();
   const sale = await clinicFixtures.medicalSales.get(id);
+  if (sale.voidedAt) throw clinicHttpError(404, 'not_found', 'Sale not found');
   const invoices = new Map(
     clinicFixtures.invoices.snapshot().map((invoice) => [invoice.id, invoice]),
   );
@@ -323,10 +334,14 @@ export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> 
 
 /**
  * Every live supplier as its row: the makers it distributes, its live orders,
- * what it is owed on received orders and since when (`S:830`, "N days
- * pending → today − date while due > 0").
+ * what it is owed on received orders — less the credit it gave for returned
+ * stock (`medical.md:309`) — and since when (`S:830`, "N days pending → today
+ * − date while due > 0").
  */
-function supplierRows(world: FixtureWorld): SupplierRow[] {
+function supplierRows(
+  world: FixtureWorld,
+  credits: readonly SupplierCredit[],
+): SupplierRow[] {
   const today = clinicToday();
   const makers = makersOf(world);
   const orders = purchaseOrderRows(world);
@@ -341,7 +356,13 @@ function supplierRows(world: FixtureWorld): SupplierRow[] {
       manufacturers: makersFor(supplier.manufacturerIds, makers),
       orderCount: own.length,
       orderTotal: own.reduce((sum, order) => sum + order.total, 0),
-      payable: open.reduce((sum, order) => sum + order.due, 0),
+      payable: Math.max(
+        0,
+        open.reduce((sum, order) => sum + order.due, 0) -
+          credits
+            .filter((credit) => credit.supplierId === supplier.id)
+            .reduce((sum, credit) => sum + credit.amount, 0),
+      ),
       ageingDays: oldest ? Math.max(0, civilDayOffset(oldest.date, today)) : null,
       hasOpenOrder: own.some((order) => order.stage !== 'paid'),
       oldestOpenBill: oldest ? { id: oldest.id, seq: oldest.seq, due: oldest.due } : null,
@@ -358,7 +379,7 @@ const SUPPLIER_ORDER = {
 async function suppliersFor(params: SupplierListParams): Promise<SupplierRow[]> {
   const { clinicFixtures } = await fixtureWorld();
   const today = clinicToday();
-  return supplierRows(clinicFixtures)
+  return supplierRows(clinicFixtures, await supplierCredits())
     .filter(
       (row) =>
         searchMatches(params.q, [row.name]) &&
@@ -385,21 +406,22 @@ export function fetchAllSuppliers(params: SupplierListParams = {}) {
 /** One supplier as its row — a 404 when it is unknown or deleted. */
 export async function fetchSupplier(id: string): Promise<SupplierRow> {
   const { clinicFixtures } = await fixtureWorld();
-  const [row] = supplierRows(clinicFixtures).filter((supplier) => supplier.id === id);
+  const [row] = supplierRows(clinicFixtures, await supplierCredits()).filter(
+    (supplier) => supplier.id === id,
+  );
   if (!row) throw clinicHttpError(404, 'not_found', 'Supplier not found');
   return row;
 }
 
 /**
- * A supplier's Account (`medical.md:200`): every live order, latest first —
- * its stage, total and what is still owed on it. Credits from returned stock
- * join it with Return expiring stock (L-50c; REPLACE_WITH_API).
+ * A supplier's Account (`medical.md:200`): every live order — its stage, total
+ * and what is still owed on it — and every credit it gave for returned stock
+ * ("Credit · 026-312"), latest first (REPLACE_WITH_API).
  */
 export async function fetchSupplierAccount(id: string): Promise<SupplierAccountRow[]> {
   const { clinicFixtures } = await fixtureWorld();
-  return purchaseOrderRows(clinicFixtures)
+  const orders: SupplierAccountRow[] = purchaseOrderRows(clinicFixtures)
     .filter((order) => order.supplierId === id)
-    .sort((a, b) => compareText(b.date, a.date) || b.seq - a.seq)
     .map((order) => ({
       kind: 'order' as const,
       id: order.id,
@@ -410,6 +432,16 @@ export async function fetchSupplierAccount(id: string): Promise<SupplierAccountR
       amount: order.total,
       due: order.due,
     }));
+  const credits: SupplierAccountRow[] = (await supplierCredits())
+    .filter((credit) => credit.supplierId === id)
+    .map((credit) => ({
+      kind: 'credit' as const,
+      id: credit.id,
+      batchNo: credit.batchNo,
+      date: clinicDateOf(credit.at),
+      amount: credit.amount,
+    }));
+  return [...credits, ...orders].sort((a, b) => compareText(b.date, a.date));
 }
 
 // ── Manufacturers ──

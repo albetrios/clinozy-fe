@@ -148,7 +148,8 @@
     },
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف"
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
     }
   },
   "movements": {
@@ -206,7 +207,8 @@
     "noPurchases": "لا مشتريات",
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف"
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
     }
   },
   "drawers": {

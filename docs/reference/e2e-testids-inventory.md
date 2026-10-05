@@ -130,13 +130,20 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `medical-manufacturers-page`     | Medical › Manufacturers (`medical-manufacturers-…`)                                                 | `pages/organization/$organizationSlug/medical/manufacturers/` |
 | `medical-mrs-page`               | Medical › MRs (`medical-mrs-…`)                                                                     | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `medical-payments-page`          | Medical › Payments (`medical-payments-…`)                                                           | `pages/organization/$organizationSlug/medical/payments/`      |
-| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`                                                 | `shared/components/RoomToolbar/RoomViewAction/`               |
+| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`, `prescriptions`, `pay-received`                | `shared/components/RoomToolbar/RoomViewAction/`               |
 | `medicine-drawer`                | Medicine drawer — `/medical/medicines/create`, `…/$medicineId/edit` over the list (L-50b)           | `pages/organization/$organizationSlug/medical/shared/`        |
 | `supplier-drawer`                | Supplier drawer — `/medical/suppliers/create`, `…/$supplierId/edit` (L-50b)                         | `pages/organization/$organizationSlug/medical/shared/`        |
 | `manufacturer-drawer`            | Manufacturer drawer — `/medical/manufacturers/create`, `…/$manufacturerId/edit` (L-50b)             | `pages/organization/$organizationSlug/medical/shared/`        |
 | `rep-drawer`                     | MR drawer — `/medical/mrs/create`, `…/$mrId/edit` (L-50b)                                           | `pages/organization/$organizationSlug/medical/shared/`        |
 | `rep-visit-drawer`               | Log MR visit — `/medical/mrs/$mrId/visits/create` (L-50b)                                           | `pages/organization/$organizationSlug/medical/mrs/`           |
 | `<kind>-drawer-stacked`          | A Medical drawer stacked on another — `manufacturer`, `supplier`, `rep` (an MR), `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
+| `purchase-order-drawer`          | New / Edit purchase order — `/medical/purchases/create`, `…/$purchaseOrderId/edit` (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `receive-goods-drawer`           | Receive goods — `/medical/purchases/$purchaseOrderId/receive` (L-50c)                               | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `purchase-order-view-drawer`     | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` is "Pay ₹X" (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `sale-drawer`                    | Sale (view) — `/medical/sales/$saleId`; `-save` Collect / Return medicines, `-delete` Void (L-50c)  | `pages/organization/$organizationSlug/medical/sales/`         |
+| `sale-return-drawer`             | Return from patient — `/medical/sales/$saleId/return` (L-50c)                                       | `pages/organization/$organizationSlug/medical/sales/`         |
+| `expiring-return-drawer`         | Return expiring stock — Medicines’ row action, no URL (L-50c)                                       | `pages/organization/$organizationSlug/medical/medicines/`     |
+| `prescriptions-to-fill`          | Prescriptions to fill — Sales’ view action list (`-panel`, options) (L-50c)                         | `pages/organization/$organizationSlug/medical/sales/`         |
 | `stock-items-page`               | Clinic stock › Items (`stock-items-…`)                                                              | `pages/organization/$organizationSlug/stock/items/`           |
 | `stock-purchases-page`           | Clinic stock › Purchases (`stock-purchases-…`)                                                      | `pages/organization/$organizationSlug/stock/purchases/`       |
 | `stock-movements-page`           | Clinic stock › Movements (`stock-movements-…`)                                                      | `pages/organization/$organizationSlug/stock/movements/`       |

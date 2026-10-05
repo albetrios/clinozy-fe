@@ -5,9 +5,9 @@
  * schema's `followUp` and `sort` are left as they come and unused: the ledger
  * has no Follow-up filter and no sortable column (`payments.md:31, 39`).
  *
- * The contract's values are declared here, not imported: `routeTree.tsx` is the
- * entry chunk, and the generated schema module is pages of zod. The test pins
- * each list to the contract's enum.
+ * The filters' values are the shared `LEDGER_FILTER_VALUES` — declared, not
+ * imported from the contract: `routeTree.tsx` is the entry chunk, and the
+ * generated schema module is pages of zod.
  */
 import {
   listIn,
@@ -23,18 +23,8 @@ import {
   readCreatedFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { PaymentDirection, PaymentMode } from '@/shared/api/clinic/clinic-schema.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
 import type { LedgerKindFilter } from '@/shared/api/clinic/payments-contracts.ts';
-
-/** Each ledger filter's values, in the chip order (`payments.md:39`). */
-export const LEDGER_FILTER_VALUES = {
-  direction: ['received', 'paid'],
-  kind: ['receipt', 'refund', 'expense', 'money_back'],
-  mode: ['cash', 'upi', 'card', 'credit'],
-} as const satisfies {
-  direction: readonly PaymentDirection[];
-  kind: readonly LedgerKindFilter[];
-  mode: readonly PaymentMode[];
-};
 
 /** Validated `?…` search params for `/payments` and its dialog routes. */
 export interface PaymentsSearch {

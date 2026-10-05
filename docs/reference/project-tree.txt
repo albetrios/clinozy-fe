@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1951 src files · ~957 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~1983 src files · ~972 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -934,6 +934,7 @@ clinozy-fe/
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── medicines/
 │   │       │   │   │   ├── $medicineId/
+│   │       │   │   │   ├── components/
 │   │       │   │   │   ├── create/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── medicines.manifest.ts
@@ -961,6 +962,7 @@ clinozy-fe/
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── purchases/
 │   │       │   │   │   ├── $purchaseOrderId/
+│   │       │   │   │   ├── components/
 │   │       │   │   │   ├── create/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── purchases.manifest.ts
@@ -971,6 +973,7 @@ clinozy-fe/
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── sales/
 │   │       │   │   │   ├── $saleId/
+│   │       │   │   │   ├── components/
 │   │       │   │   │   ├── create/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── sales.manifest.ts
@@ -986,10 +989,13 @@ clinozy-fe/
 │   │       │   │   │   ├── medical-contracts.ts
 │   │       │   │   │   ├── medical-drawer-form.ts
 │   │       │   │   │   ├── medical-drawers.constants.ts
+│   │       │   │   │   ├── medical-flows-api.ts
+│   │       │   │   │   ├── medical-flows-contracts.ts
 │   │       │   │   │   ├── medical-partners-api.ts
 │   │       │   │   │   ├── medical-partners-contracts.ts
+│   │       │   │   │   ├── medical-supplier-credits.ts
 │   │       │   │   │   ├── medical-tones.ts
-│   │       │   │   │   └── [2 test files]
+│   │       │   │   │   └── [3 test files]
 │   │       │   │   ├── suppliers/
 │   │       │   │   │   ├── $supplierId/
 │   │       │   │   │   ├── create/
@@ -1105,8 +1111,6 @@ clinozy-fe/
 │   │       │   │   │   └── integration/
 │   │       │   │   ├── components/
 │   │       │   │   │   ├── DayCloseDrawer/
-│   │       │   │   │   ├── LedgerCells/
-│   │       │   │   │   ├── PaymentDeleteConfirm/
 │   │       │   │   │   ├── ReceivePaymentDrawer/
 │   │       │   │   │   └── SendPaymentDrawer/
 │   │       │   │   ├── day-close/
@@ -1117,8 +1121,6 @@ clinozy-fe/
 │   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── hooks/
 │   │       │   │   │   ├── useDayClose/
-│   │       │   │   │   ├── useLedgerRowActions/
-│   │       │   │   │   ├── useLedgerTable/
 │   │       │   │   │   └── usePaymentsDialogRoute/
 │   │       │   │   ├── pay/
 │   │       │   │   │   ├── pay.manifest.ts
@@ -1402,6 +1404,7 @@ clinozy-fe/
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-hold.ts
+│   │   │   │   ├── ledger-filter-values.ts
 │   │   │   │   ├── ledger-rows.ts
 │   │   │   │   ├── medicine-stock.ts
 │   │   │   │   ├── medicines-api.ts
@@ -1423,6 +1426,7 @@ clinozy-fe/
 │   │   │   │   ├── plan-contracts.ts
 │   │   │   │   ├── preferences-api.ts
 │   │   │   │   ├── presence-api.ts
+│   │   │   │   ├── stock-room-query-key.ts
 │   │   │   │   ├── task-views.ts
 │   │   │   │   ├── tasks-api.ts
 │   │   │   │   ├── tasks-contracts.ts
@@ -1432,7 +1436,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [45 test files]
+│   │   │   │   └── [46 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1889,6 +1893,12 @@ clinozy-fe/
 │   │   │   │   ├── lazy-surface-context.ts
 │   │   │   │   ├── LazyOverlay.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── LedgerCells/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── ledger-cells.constants.ts
+│   │   │   │   ├── ledger-cells.ts
+│   │   │   │   ├── LedgerCells.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── LocalizedCalendar/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── LocalizedCalendar.tsx
@@ -1964,6 +1974,10 @@ clinozy-fe/
 │   │   │   │   ├── patient-picker-options.ts
 │   │   │   │   ├── patient-picker.constants.ts
 │   │   │   │   ├── PatientPicker.tsx
+│   │   │   │   └── [1 test file]
+│   │   │   ├── PaymentDeleteConfirm/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── PaymentDeleteConfirm.tsx
 │   │   │   │   └── [1 test file]
 │   │   │   ├── PermissionGuard/
 │   │   │   │   ├── index.ts
@@ -2500,6 +2514,14 @@ clinozy-fe/
 │   │   │   │   ├── leads-toasts.constants.ts
 │   │   │   │   ├── useLeads.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useLedgerRowActions/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useLedgerRowActions.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useLedgerTable/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useLedgerTable.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useList/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useList.ts
@@ -2583,6 +2605,10 @@ clinozy-fe/
 │   │   │   ├── usePatients/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatients.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── usePayBill/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePayBill.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── usePayments/
 │   │   │   │   ├── index.ts

@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { type ItemsColumn, ItemsField } from '@/shared/forms/ItemsField/index.ts';
+import {
+  type ItemsColumn,
+  ItemsField,
+  ItemsReadCell,
+} from '@/shared/forms/ItemsField/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
@@ -23,29 +27,6 @@ interface AccountForm {
   rows: SupplierAccountRow[];
 }
 
-/** A cell's text: 13px, one line, the reference cell in full weight. */
-function CellText({
-  children,
-  strong = false,
-  className,
-}: {
-  children: string;
-  strong?: boolean;
-  className?: string;
-}) {
-  return (
-    <span
-      className={cn(
-        'text-body min-w-0 truncate tabular-nums',
-        strong ? 'text-foreground font-medium' : 'text-muted-foreground-strong',
-        className,
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
 /** The table's five columns (`medical.md:200`; H:5381). */
 function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
@@ -58,18 +39,18 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
       header: t(K.reference),
       track: 'minmax(0,1.4fr)',
       cell: ({ row }) => (
-        <CellText strong>
+        <ItemsReadCell strong>
           {row.kind === 'order'
             ? [displayId.purchaseOrder(row.seq), row.billNo].filter(Boolean).join(' · ')
             : t(K.credit, { batch: row.batchNo })}
-        </CellText>
+        </ItemsReadCell>
       ),
     },
     {
       id: 'date',
       header: t(K.date),
       track: '80px',
-      cell: ({ row }) => <CellText>{dates.day(row.date)}</CellText>,
+      cell: ({ row }) => <ItemsReadCell>{dates.day(row.date)}</ItemsReadCell>,
     },
     {
       id: 'stage',
@@ -77,18 +58,18 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
       track: '90px',
       cell: ({ row }) =>
         row.kind === 'order' ? (
-          <CellText
+          <ItemsReadCell
             className={cn(
               'font-medium',
               TONE_CLASSES[PURCHASE_STAGE_TONES[row.stage]].ink,
             )}
           >
             {tRoom(MEDICAL_KEYS.purchases.stages[row.stage])}
-          </CellText>
+          </ItemsReadCell>
         ) : (
-          <CellText className={cn('font-medium', TONE_CLASSES.butter.ink)}>
+          <ItemsReadCell className={cn('font-medium', TONE_CLASSES.butter.ink)}>
             {t(K.creditStage)}
-          </CellText>
+          </ItemsReadCell>
         ),
     },
     {
@@ -97,11 +78,11 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
       track: '90px',
       align: 'end',
       cell: ({ row }) => (
-        <CellText strong>
+        <ItemsReadCell strong>
           {row.kind === 'order'
             ? formatPaise(row.amount)
             : `− ${formatPaise(row.amount)}`}
-        </CellText>
+        </ItemsReadCell>
       ),
     },
     {
@@ -110,16 +91,16 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
       track: '100px',
       align: 'end',
       cell: ({ row }) => {
-        if (row.kind === 'credit') return <CellText>{t(K.adjusted)}</CellText>;
-        if (row.stage === 'paid') return <CellText>{t(K.paid)}</CellText>;
+        if (row.kind === 'credit') return <ItemsReadCell>{t(K.adjusted)}</ItemsReadCell>;
+        if (row.stage === 'paid') return <ItemsReadCell>{t(K.paid)}</ItemsReadCell>;
         if (row.due > 0) {
           return (
-            <CellText className={TONE_CLASSES.blush.ink}>
+            <ItemsReadCell className={TONE_CLASSES.blush.ink}>
               {t(K.due, { amount: formatPaise(row.due) })}
-            </CellText>
+            </ItemsReadCell>
           );
         }
-        return <CellText>{t(K.notBilled)}</CellText>;
+        return <ItemsReadCell>{t(K.notBilled)}</ItemsReadCell>;
       },
     },
   ];

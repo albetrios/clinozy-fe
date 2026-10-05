@@ -2,12 +2,14 @@ import { useTranslation } from 'react-i18next';
 
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import {
+  LEDGER_KEYS,
+  LEDGER_NS,
+  ledgerEntryLock,
+} from '@/shared/components/LedgerCells/index.ts';
+import type { PaymentDeleteTarget } from '@/shared/components/PaymentDeleteConfirm/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { PenLine, Trash } from '@/shared/icons/index.ts';
-
-import { ledgerEntryLock } from '../../components/LedgerCells/index.ts';
-import type { PaymentDeleteTarget } from '../../components/PaymentDeleteConfirm/index.ts';
-import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 
 /** What the actions do: open the entry's drawer, ask to delete it. */
 export interface LedgerRowActionHandlers {
@@ -25,7 +27,7 @@ export function useLedgerRowActions({
   onEdit,
   onDelete,
 }: LedgerRowActionHandlers): (row: LedgerRow) => DataTableRowAction[] {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const access = useClinicAccess();
   const can = (action: 'edit' | 'delete') =>
     access.isResolved && access.can('payments', action);
@@ -35,7 +37,7 @@ export function useLedgerRowActions({
     if (can('edit')) {
       actions.push({
         id: 'edit',
-        label: t(PAYMENTS_KEYS.rowActions.edit),
+        label: t(LEDGER_KEYS.rowActions.edit),
         icon: PenLine,
         onSelect: () => onEdit(row),
       });
@@ -43,7 +45,7 @@ export function useLedgerRowActions({
     if (can('delete')) {
       actions.push({
         id: 'delete',
-        label: t(PAYMENTS_KEYS.rowActions.delete),
+        label: t(LEDGER_KEYS.rowActions.delete),
         icon: Trash,
         destructive: true,
         onSelect: () =>

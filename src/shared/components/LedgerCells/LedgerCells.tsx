@@ -14,7 +14,7 @@ import {
 } from '@/shared/components/Cells/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
-import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
+import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 import {
   editSideLabel,
   ledgerModes,
@@ -42,7 +42,7 @@ export function LedgerWhatCell({
   size?: TonePillProps['size'];
   className?: string;
 }) {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const what = ledgerWhat(row);
   return (
     <TonePill tone={what.tone} size={size} className={className}>
@@ -56,7 +56,7 @@ export function LedgerWhatCell({
  * UPI → ₹700 UPI" in the butter ink under it (`payments.md:29`).
  */
 export function LedgerWhenCell({ row }: { row: Pick<LedgerRow, 'paidAt' | 'edits'> }) {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const formatPaise = usePaiseFormat();
   const when = useLedgerWhen();
@@ -68,7 +68,7 @@ export function LedgerWhenCell({ row }: { row: Pick<LedgerRow, 'paidAt' | 'edits
       </span>
       {last ? (
         <span className="text-caption text-tone-butter-foreground truncate tabular-nums">
-          {t(PAYMENTS_KEYS.ledger.edited, {
+          {t(LEDGER_KEYS.ledger.edited, {
             count: row.edits.length,
             from: editSideLabel(last.from, t, tClinic, formatPaise),
             to: editSideLabel(last.to, t, tClinic, formatPaise),
@@ -132,7 +132,7 @@ export function LedgerAmountCell({
   row: Pick<LedgerRow, 'direction' | 'amount'>;
   className?: string;
 }) {
-  const { t } = useTranslation(PAYMENTS_NS);
+  const { t } = useTranslation(LEDGER_NS);
   const formatPaise = usePaiseFormat();
   const received = row.direction === 'received';
   return (
@@ -143,7 +143,7 @@ export function LedgerAmountCell({
         className,
       )}
     >
-      {t(received ? PAYMENTS_KEYS.ledger.received : PAYMENTS_KEYS.ledger.paid, {
+      {t(received ? LEDGER_KEYS.ledger.received : LEDGER_KEYS.ledger.paid, {
         amount: formatPaise(row.amount),
       })}
     </span>

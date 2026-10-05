@@ -10,7 +10,7 @@ import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { PAYMENTS_NS } from '../../payments.constants.ts';
+import { LEDGER_NS } from './ledger-cells.constants.ts';
 import {
   editSideLabel,
   ledgerEntryLock,
@@ -32,7 +32,7 @@ import {
 /** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
 const NOW = new Date('2026-10-03T04:30:00Z');
 
-const t = i18n.getFixedT('en', PAYMENTS_NS);
+const t = i18n.getFixedT('en', LEDGER_NS);
 const tClinic = i18n.getFixedT('en', CLINIC_NS);
 const rupees = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN')}`;
 

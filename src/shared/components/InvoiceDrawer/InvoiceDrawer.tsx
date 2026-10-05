@@ -129,11 +129,16 @@ function startingForm(
   return emptyInvoiceForm(today, prefill);
 }
 
-/** What the drawer's access allows (KICKOFF §6.9 Access; Q-U8). */
-function useInvoiceAccess(editing: InvoiceDetail | null) {
+/**
+ * What the drawer's access allows (KICKOFF §6.9 Access; Q-U8): Payments Create
+ * or Edit — but Medical's New sale is Medical's create (§6.7 Access: Admin,
+ * Pharmacist), so a pharmacist without Payments still sells.
+ */
+function useInvoiceAccess(editing: InvoiceDetail | null, newSale: boolean) {
   const access = useClinicAccess();
   const readOnly =
-    access.isResolved && !access.can('payments', editing ? 'edit' : 'create');
+    access.isResolved &&
+    !access.can(newSale ? 'medical' : 'payments', editing ? 'edit' : 'create');
   const sale = Boolean(editing?.invoice.saleId);
   return {
     readOnly,
@@ -286,7 +291,7 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   const input = sessionInput(props);
   const { editing } = input;
   const saved = savedFigures(editing);
-  const access = useInvoiceAccess(editing);
+  const access = useInvoiceAccess(editing, editing === null && Boolean(props.sale));
   const branchId = defaultBranchId(openBranches, preferences.branchFilter);
 
   const form = useForm<InvoiceFormValues>({

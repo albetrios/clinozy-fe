@@ -14,7 +14,10 @@ import {
   DrawerSwatches,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  type DrawerStep,
+  drawerStepSummary,
+} from '@/shared/components/DrawerSteps/index.ts';
 import {
   RecordDrawer,
   RecordDrawerPending,
@@ -279,7 +282,7 @@ function useSteps(body: BodyProps, readOnly: boolean): DrawerStep[] {
     {
       id: 'maker',
       title: t(K.steps.maker),
-      summary: [name, colour].filter(Boolean).join(' · ') || notFilled,
+      summary: drawerStepSummary([name, colour], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.colour), value: colour, tone: values.tone },

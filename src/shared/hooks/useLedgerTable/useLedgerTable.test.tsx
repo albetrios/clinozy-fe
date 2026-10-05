@@ -35,7 +35,7 @@ afterEach(() => {
 
 describe('useLedgerTable (payments.md:29–30)', () => {
   it('lays out Ref · What · When · From / to · Mode · Amount · By, none sortable, Ref locked', () => {
-    const { result } = renderHook(() => useLedgerTable(rows));
+    const { result } = renderHook(() => useLedgerTable(rows, 'payments'));
     const columns = result.current.getAllLeafColumns();
     expect(columns.map((column) => column.id)).toEqual([
       'ref',
@@ -61,13 +61,13 @@ describe('useLedgerTable (payments.md:29–30)', () => {
   });
 
   it('puts the meta line on When, and on From / to on a phone', () => {
-    const desktop = renderHook(() => useLedgerTable(rows));
+    const desktop = renderHook(() => useLedgerTable(rows, 'payments'));
     expect(desktop.result.current.getColumn('when')?.columnDef.meta?.primary).toBe(true);
     expect(desktop.result.current.getColumn('party')?.columnDef.meta?.primary).toBe(
       false,
     );
     viewport.tier = 'phone';
-    const phone = renderHook(() => useLedgerTable(rows));
+    const phone = renderHook(() => useLedgerTable(rows, 'payments'));
     expect(phone.result.current.getColumn('when')?.columnDef.meta?.primary).toBe(false);
     expect(phone.result.current.getColumn('party')?.columnDef.meta?.primary).toBe(true);
     // A patient's chip draws the avatar, so its meta line indents; a payee's doesn't.
@@ -78,7 +78,7 @@ describe('useLedgerTable (payments.md:29–30)', () => {
   });
 
   it('folds each column to its meta-line value; By folds to nothing', () => {
-    const { result } = renderHook(() => useLedgerTable(rows));
+    const { result } = renderHook(() => useLedgerTable(rows, 'payments'));
     const tea = rows.find((row) => row.seq === 310);
     const fold = (id: string) =>
       result.current.getColumn(id)?.columnDef.meta?.foldValue?.(tea);

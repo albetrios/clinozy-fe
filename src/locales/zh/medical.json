@@ -226,7 +226,9 @@
       "medicine": "药品",
       "supplier": "供应商",
       "manufacturer": "生产商",
-      "mr": "医药代表"
+      "mr": "医药代表",
+      "sale": "销售",
+      "purchaseOrder": "采购单"
     },
     "saveChanges": "保存更改",
     "addName": "请添加名称",
@@ -328,7 +330,8 @@
         "adjusted": "已抵扣"
       },
       "quickFill": {
-        "newOrder": "新建采购单"
+        "newOrder": "新建采购单",
+        "pay": "支付 {{amount}}"
       },
       "save": "添加供应商",
       "saved": "已保存供应商"
@@ -461,6 +464,152 @@
         "enterRates": "请为每个供应商价格填写单价",
         "pickManufacturer": "请选择生产商"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "取消此采购单？",
+      "voidSale": "作废此销售？",
+      "cancelled": "{{order}} 已取消",
+      "voided": "销售 #{{seq}} 已作废"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "新建采购单",
+        "edit": "编辑采购单"
+      },
+      "sub": "下单 → 收货 → 付款",
+      "steps": {
+        "order": "订单",
+        "items": "品项"
+      },
+      "fields": {
+        "supplier": "供应商",
+        "billNo": "发票号",
+        "date": "下单日期",
+        "items": "品项",
+        "medicine": "药品",
+        "selectMedicine": "选择药品…",
+        "searchMedicine": "搜索药品",
+        "qty": "数量",
+        "free": "赠品",
+        "rate": "单价",
+        "amount": "金额",
+        "add": "添加药品",
+        "total": "合计",
+        "fromSupplier": "来自 {{supplier}}",
+        "otherMedicines": "其他药品",
+        "inStock": "库存 {{count}} · {{maker}}",
+        "outOfStock": "缺货 · {{maker}}",
+        "addMedicine": "添加药品",
+        "newMedicine": "新建药品",
+        "enterRate": "请输入采购单价",
+        "peek_other": "{{count}} 种药品 · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "补货低库存"
+      },
+      "rateFor": "请输入 {{name}} 的单价",
+      "rateForCount_other": "请输入 {{count}} 种药品的单价",
+      "pickSupplier": "请选择供应商",
+      "save": "创建订单",
+      "saved": "采购单已保存",
+      "cancelOrder": "取消订单"
+    },
+    "receive": {
+      "title": "收货",
+      "sub": "{{supplier}} · 勾选每个品项并填写批次和有效期",
+      "section": "勾选已到货的品项",
+      "arrived": "已到货",
+      "notArrived": "未到货",
+      "medicine": "药品",
+      "qty": "数量",
+      "free": "赠品",
+      "batch": "批次",
+      "expiry": "有效期",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "请输入有效期",
+      "tickArrived": "请勾选已到货的品项",
+      "save": "标记为已收货",
+      "saved": "已收货 · 库存和赠品数量已添加"
+    },
+    "orderView": {
+      "title": "采购单",
+      "subReceived": "{{supplier}} · 已收货，库存已添加 · 品项已锁定",
+      "subPaid": "{{supplier}} · 已付款，已锁定",
+      "payable": "应付 {{amount}}",
+      "paid": "已付 {{amount}}",
+      "paidOf": "已付 {{paid}} / {{total}}",
+      "pay": "支付 {{amount}}"
+    },
+    "sale": {
+      "title": "销售",
+      "sub": "{{customer}} · {{when}} · 销售通过退货更改，不可编辑",
+      "walkIn": "散客",
+      "badges": {
+        "paid": "已付款",
+        "unpaid": "未付款",
+        "returned": "已退货 {{amount}}",
+        "invoice": "发票 #{{seq}} · 在患者档案中"
+      },
+      "medicines": "药品",
+      "medicine": "药品",
+      "batch": "批次",
+      "qty": "数量",
+      "amount": "金额",
+      "summary_other": "{{count}} 种药品 · {{amount}}",
+      "collect": "收取 {{amount}}",
+      "returnMedicines": "退回药品",
+      "voidSale": "作废销售",
+      "collected": "已收到 {{amount}}"
+    },
+    "saleReturn": {
+      "title": "患者退货",
+      "sub": "{{customer}} · 退回的库存回到原批次",
+      "steps": {
+        "back": "退回什么",
+        "reason": "原因和退款"
+      },
+      "medicine": "药品",
+      "batch": "批次",
+      "sold": "已售",
+      "refund": "退款",
+      "return": "退回",
+      "reason": "原因",
+      "reasons": {
+        "unused": "未使用",
+        "reaction": "不良反应",
+        "rx_changed": "医生更改了处方",
+        "wrong_item": "品项错误",
+        "damaged": "已损坏"
+      },
+      "refundBy": "退款方式",
+      "peek_other": "{{count}} 种药品 · {{amount}}",
+      "quickFill": "全部退回",
+      "save": "退款 {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "请输入退回的内容",
+      "refunded": "已退款 {{amount}} · 库存已退回",
+      "refundedWrittenOff": "已退款 {{amount}} · 库存已报废",
+      "lowered": "已退货 {{amount}} · 库存已退回",
+      "loweredWrittenOff": "已退货 {{amount}} · 库存已报废"
+    },
+    "expiring": {
+      "title": "退回临期库存",
+      "sub": "{{medicine}} · 批次 {{batch}} · {{expiry}} 到期",
+      "supplier": "供应商",
+      "boughtAt": "进价 {{amount}}",
+      "quantity": "数量",
+      "of": "/ {{count}}",
+      "creditNote": "贷项通知单",
+      "badges": {
+        "credit": "抵扣 {{amount}}",
+        "daysLeft_other": "剩余 {{count}} 天"
+      },
+      "summary": "抵扣会减少您欠 {{supplier}} 的金额",
+      "save": "退回并获取抵扣",
+      "saved": "已退回 {{count}} · 来自 {{supplier}} 的 {{amount}} 抵扣"
+    },
+    "prescriptions": {
+      "sub": "处方 {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

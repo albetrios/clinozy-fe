@@ -276,7 +276,9 @@
       "medicine": "الدواء",
       "supplier": "المورد",
       "manufacturer": "الشركة المصنّعة",
-      "mr": "المندوب"
+      "mr": "المندوب",
+      "sale": "البيع",
+      "purchaseOrder": "أمر الشراء"
     },
     "saveChanges": "حفظ التغييرات",
     "addName": "أضف اسمًا",
@@ -408,7 +410,8 @@
         "adjusted": "تمت التسوية"
       },
       "quickFill": {
-        "newOrder": "أمر شراء جديد"
+        "newOrder": "أمر شراء جديد",
+        "pay": "ادفع {{amount}}"
       },
       "save": "إضافة مورد",
       "saved": "تم حفظ المورد"
@@ -541,6 +544,177 @@
         "enterRates": "أدخل سعرًا لكل سعر مورد",
         "pickManufacturer": "اختر شركة مصنّعة"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "إلغاء أمر الشراء هذا؟",
+      "voidSale": "إلغاء هذا البيع؟",
+      "cancelled": "تم إلغاء {{order}}",
+      "voided": "تم إلغاء البيع #{{seq}}"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "أمر شراء جديد",
+        "edit": "تعديل أمر الشراء"
+      },
+      "sub": "اطلب ← استلم ← ادفع",
+      "steps": {
+        "order": "الطلب",
+        "items": "الأصناف"
+      },
+      "fields": {
+        "supplier": "المورد",
+        "billNo": "رقم الفاتورة",
+        "date": "تاريخ الطلب",
+        "items": "الأصناف",
+        "medicine": "الدواء",
+        "selectMedicine": "اختر دواءً…",
+        "searchMedicine": "ابحث عن دواء",
+        "qty": "الكمية",
+        "free": "مجاني",
+        "rate": "السعر",
+        "amount": "المبلغ",
+        "add": "إضافة دواء",
+        "total": "الإجمالي",
+        "fromSupplier": "من {{supplier}}",
+        "otherMedicines": "أدوية أخرى",
+        "inStock": "{{count}} في المخزون · {{maker}}",
+        "outOfStock": "نفد من المخزون · {{maker}}",
+        "addMedicine": "إضافة دواء",
+        "newMedicine": "دواء جديد",
+        "enterRate": "أدخل سعر الشراء",
+        "peek_zero": "{{count}} أدوية · {{amount}}",
+        "peek_one": "{{count}} دواء · {{amount}}",
+        "peek_two": "{{count}} دواءان · {{amount}}",
+        "peek_few": "{{count}} أدوية · {{amount}}",
+        "peek_many": "{{count}} دواءً · {{amount}}",
+        "peek_other": "{{count}} دواء · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "إعادة طلب المخزون المنخفض"
+      },
+      "rateFor": "أدخل سعر {{name}}",
+      "rateForCount_zero": "أدخل سعر {{count}} أدوية",
+      "rateForCount_one": "أدخل سعر {{count}} دواء",
+      "rateForCount_two": "أدخل سعر {{count}} دواءين",
+      "rateForCount_few": "أدخل سعر {{count}} أدوية",
+      "rateForCount_many": "أدخل سعر {{count}} دواءً",
+      "rateForCount_other": "أدخل سعر {{count}} دواء",
+      "pickSupplier": "اختر موردًا",
+      "save": "إنشاء الطلب",
+      "saved": "تم حفظ أمر الشراء",
+      "cancelOrder": "إلغاء الطلب"
+    },
+    "receive": {
+      "title": "استلام البضاعة",
+      "sub": "{{supplier}} · ضع علامة على كل صنف وأدخل التشغيلة والانتهاء",
+      "section": "ضع علامة على ما وصل",
+      "arrived": "وصل",
+      "notArrived": "لم يصل",
+      "medicine": "الدواء",
+      "qty": "الكمية",
+      "free": "مجاني",
+      "batch": "التشغيلة",
+      "expiry": "الانتهاء",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "أدخل تاريخ الانتهاء",
+      "tickArrived": "ضع علامة على ما وصل",
+      "save": "تعليم كمستلم",
+      "saved": "تم استلام البضاعة · أُضيف المخزون والكمية المجانية"
+    },
+    "orderView": {
+      "title": "أمر الشراء",
+      "subReceived": "{{supplier}} · مستلم، أُضيف المخزون · الأصناف مقفلة",
+      "subPaid": "{{supplier}} · مدفوع، مقفل",
+      "payable": "مستحق {{amount}}",
+      "paid": "مدفوع {{amount}}",
+      "paidOf": "مدفوع {{paid}} من {{total}}",
+      "pay": "ادفع {{amount}}"
+    },
+    "sale": {
+      "title": "البيع",
+      "sub": "{{customer}} · {{when}} · يُعدَّل البيع بالإرجاع لا بالتحرير",
+      "walkIn": "عميل عابر",
+      "badges": {
+        "paid": "مدفوع",
+        "unpaid": "غير مدفوع",
+        "returned": "مُرتجع {{amount}}",
+        "invoice": "الفاتورة #{{seq}} · في ملف المريض"
+      },
+      "medicines": "الأدوية",
+      "medicine": "الدواء",
+      "batch": "التشغيلة",
+      "qty": "الكمية",
+      "amount": "المبلغ",
+      "summary_zero": "{{count}} أدوية · {{amount}}",
+      "summary_one": "{{count}} دواء · {{amount}}",
+      "summary_two": "{{count}} دواءان · {{amount}}",
+      "summary_few": "{{count}} أدوية · {{amount}}",
+      "summary_many": "{{count}} دواءً · {{amount}}",
+      "summary_other": "{{count}} دواء · {{amount}}",
+      "collect": "تحصيل {{amount}}",
+      "returnMedicines": "إرجاع الأدوية",
+      "voidSale": "إلغاء البيع",
+      "collected": "تم استلام {{amount}}"
+    },
+    "saleReturn": {
+      "title": "إرجاع من المريض",
+      "sub": "{{customer}} · يعود المخزون المُرتجع إلى تشغيلته",
+      "steps": {
+        "back": "ما الذي يُرجَع",
+        "reason": "السبب والاسترداد"
+      },
+      "medicine": "الدواء",
+      "batch": "التشغيلة",
+      "sold": "المُباع",
+      "refund": "الاسترداد",
+      "return": "إرجاع",
+      "reason": "السبب",
+      "reasons": {
+        "unused": "غير مستخدم",
+        "reaction": "تفاعل",
+        "rx_changed": "غيّر الطبيب الوصفة",
+        "wrong_item": "صنف خاطئ",
+        "damaged": "تالف"
+      },
+      "refundBy": "الاسترداد عبر",
+      "peek_zero": "{{count}} أدوية · {{amount}}",
+      "peek_one": "{{count}} دواء · {{amount}}",
+      "peek_two": "{{count}} دواءان · {{amount}}",
+      "peek_few": "{{count}} أدوية · {{amount}}",
+      "peek_many": "{{count}} دواءً · {{amount}}",
+      "peek_other": "{{count}} دواء · {{amount}}",
+      "quickFill": "إرجاع الكل",
+      "save": "استرداد {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "أدخل ما يتم إرجاعه",
+      "refunded": "تم استرداد {{amount}} · أُعيد المخزون",
+      "refundedWrittenOff": "تم استرداد {{amount}} · شُطب المخزون",
+      "lowered": "تم إرجاع {{amount}} · أُعيد المخزون",
+      "loweredWrittenOff": "تم إرجاع {{amount}} · شُطب المخزون"
+    },
+    "expiring": {
+      "title": "إرجاع المخزون القريب من الانتهاء",
+      "sub": "{{medicine}} · التشغيلة {{batch}} · ينتهي {{expiry}}",
+      "supplier": "المورد",
+      "boughtAt": "اشتُري بسعر {{amount}}",
+      "quantity": "الكمية",
+      "of": "من {{count}}",
+      "creditNote": "إشعار دائن",
+      "badges": {
+        "credit": "رصيد {{amount}}",
+        "daysLeft_zero": "تبقى {{count}} يوم",
+        "daysLeft_one": "تبقى {{count}} يوم",
+        "daysLeft_two": "تبقى {{count}} يومان",
+        "daysLeft_few": "تبقى {{count}} أيام",
+        "daysLeft_many": "تبقى {{count}} يومًا",
+        "daysLeft_other": "تبقى {{count}} يوم"
+      },
+      "summary": "يقلّل الرصيد ما تدين به لـ {{supplier}}",
+      "save": "إرجاع وأخذ الرصيد",
+      "saved": "تم إرجاع {{count}} · رصيد {{amount}} من {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "وصفة {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

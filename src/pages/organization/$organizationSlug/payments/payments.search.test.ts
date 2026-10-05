@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  PAYMENT_DIRECTION_VALUES,
-  PAYMENT_MODE_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { LEDGER_KIND_VALUES } from '@/shared/api/clinic/payments-contracts.ts';
 import { roomFilterValues } from '@/shared/components/RoomToolbar/RoomFilters/room-filters.ts';
 
 import { LEDGER_FILTER_FIELDS } from './payments.constants.ts';
 import {
-  LEDGER_FILTER_VALUES,
   validateDayCloseSearch,
   validatePaymentPaySearch,
   validatePaymentReceiveSearch,
@@ -18,14 +12,6 @@ import {
 
 const PATIENT = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 const PO = '6a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
-
-describe('the contract’s values, declared for the entry chunk', () => {
-  it('match the contract’s enums', () => {
-    expect(LEDGER_FILTER_VALUES.direction).toEqual(PAYMENT_DIRECTION_VALUES);
-    expect(LEDGER_FILTER_VALUES.kind).toEqual(LEDGER_KIND_VALUES);
-    expect(LEDGER_FILTER_VALUES.mode).toEqual(PAYMENT_MODE_VALUES);
-  });
-});
 
 describe('validatePaymentsSearch (S:84)', () => {
   it('keeps what the URL can hold and answers every key', () => {

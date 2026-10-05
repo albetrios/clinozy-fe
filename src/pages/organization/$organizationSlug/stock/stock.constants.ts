@@ -143,6 +143,8 @@ export const STOCK_KEYS = {
       unpaid: 'purchases.statuses.unpaid',
     },
     rowActions: {
+      /** "Pay ₹1,710" (Q-M1). */
+      pay: 'purchases.rowActions.pay',
       edit: 'purchases.rowActions.edit',
       delete: 'purchases.rowActions.delete',
     },
@@ -191,6 +193,8 @@ export const STOCK_KEYS = {
     purchases: 'vendors.purchases',
     noPurchases: 'vendors.noPurchases',
     rowActions: {
+      /** "Pay ₹2,310" (Q-M1). */
+      pay: 'vendors.rowActions.pay',
       edit: 'vendors.rowActions.edit',
       delete: 'vendors.rowActions.delete',
     },

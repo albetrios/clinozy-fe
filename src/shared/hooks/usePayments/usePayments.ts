@@ -5,6 +5,7 @@ import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.t
 import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
 import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
 import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
 import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import {
   deletePayment,
@@ -27,6 +28,7 @@ import type {
   PaymentRecord,
   ReceivePaymentInput,
 } from '@/shared/api/clinic/payments-contracts.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -35,8 +37,9 @@ import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 /**
  * What a money write refreshes (KICKOFF §6.9 Data): the ledger, the credits,
  * every patient read (their dues), the invoices and ⌘K's invoice results — an
- * entry moves an invoice's balance — and Day close (its entries, totals and
- * locks).
+ * entry moves an invoice's balance — Day close (its entries, totals and
+ * locks), and the rooms whose rows carry money (Q-M1): Medical's sales and
+ * orders, Clinic stock's purchases and vendors.
  */
 export const MONEY_WRITE_KEYS: readonly QueryKey[] = [
   paymentQueryKeys.all,
@@ -45,6 +48,8 @@ export const MONEY_WRITE_KEYS: readonly QueryKey[] = [
   invoiceQueryKeys.all,
   commandSearchQueryKeys.all,
   dayCloseQueryKeys.all,
+  MEDICAL_ROOM_QUERY_KEY,
+  STOCK_ROOM_QUERY_KEY,
 ];
 
 // ── Reads ──

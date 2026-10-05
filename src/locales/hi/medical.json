@@ -236,7 +236,9 @@
       "medicine": "दवा",
       "supplier": "सप्लायर",
       "manufacturer": "निर्माता",
-      "mr": "एमआर"
+      "mr": "एमआर",
+      "sale": "बिक्री",
+      "purchaseOrder": "परचेज़ ऑर्डर"
     },
     "saveChanges": "बदलाव सहेजें",
     "addName": "नाम जोड़ें",
@@ -344,7 +346,8 @@
         "adjusted": "समायोजित"
       },
       "quickFill": {
-        "newOrder": "नया परचेज़ ऑर्डर"
+        "newOrder": "नया परचेज़ ऑर्डर",
+        "pay": "{{amount}} का भुगतान करें"
       },
       "save": "सप्लायर जोड़ें",
       "saved": "सप्लायर सहेजा गया"
@@ -477,6 +480,157 @@
         "enterRates": "हर सप्लायर रेट में रेट लिखें",
         "pickManufacturer": "निर्माता चुनें"
       }
+    },
+    "flowConfirm": {
+      "cancelOrder": "यह परचेज़ ऑर्डर रद्द करें?",
+      "voidSale": "यह बिक्री रद्द करें?",
+      "cancelled": "{{order}} रद्द किया गया",
+      "voided": "बिक्री #{{seq}} रद्द की गई"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "नया परचेज़ ऑर्डर",
+        "edit": "परचेज़ ऑर्डर संपादित करें"
+      },
+      "sub": "ऑर्डर → प्राप्त करें → भुगतान",
+      "steps": {
+        "order": "ऑर्डर",
+        "items": "आइटम"
+      },
+      "fields": {
+        "supplier": "सप्लायर",
+        "billNo": "इनवॉइस नं.",
+        "date": "ऑर्डर की तारीख",
+        "items": "आइटम",
+        "medicine": "दवा",
+        "selectMedicine": "दवा चुनें…",
+        "searchMedicine": "दवा खोजें",
+        "qty": "मात्रा",
+        "free": "मुफ़्त",
+        "rate": "रेट",
+        "amount": "राशि",
+        "add": "दवा जोड़ें",
+        "total": "कुल",
+        "fromSupplier": "{{supplier}} से",
+        "otherMedicines": "अन्य दवाइयाँ",
+        "inStock": "{{count}} स्टॉक में · {{maker}}",
+        "outOfStock": "स्टॉक में नहीं · {{maker}}",
+        "addMedicine": "दवा जोड़ें",
+        "newMedicine": "नई दवा",
+        "enterRate": "खरीद रेट दर्ज करें",
+        "peek_one": "{{count}} दवा · {{amount}}",
+        "peek_other": "{{count}} दवाइयाँ · {{amount}}"
+      },
+      "quickFill": {
+        "reorder": "कम स्टॉक फिर से मँगाएँ"
+      },
+      "rateFor": "{{name}} का रेट दर्ज करें",
+      "rateForCount_one": "{{count}} दवा का रेट दर्ज करें",
+      "rateForCount_other": "{{count}} दवाइयों का रेट दर्ज करें",
+      "pickSupplier": "सप्लायर चुनें",
+      "save": "ऑर्डर बनाएँ",
+      "saved": "परचेज़ ऑर्डर सहेजा गया",
+      "cancelOrder": "ऑर्डर रद्द करें"
+    },
+    "receive": {
+      "title": "सामान प्राप्त करें",
+      "sub": "{{supplier}} · हर आइटम पर टिक करें और बैच व एक्सपायरी भरें",
+      "section": "जो आया उस पर टिक करें",
+      "arrived": "आया",
+      "notArrived": "नहीं आया",
+      "medicine": "दवा",
+      "qty": "मात्रा",
+      "free": "मुफ़्त",
+      "batch": "बैच",
+      "expiry": "एक्सपायरी",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "एक्सपायरी दर्ज करें",
+      "tickArrived": "जो आया उस पर टिक करें",
+      "save": "प्राप्त के रूप में चिह्नित करें",
+      "saved": "सामान प्राप्त हुआ · स्टॉक और मुफ़्त मात्रा जोड़ी गई"
+    },
+    "orderView": {
+      "title": "परचेज़ ऑर्डर",
+      "subReceived": "{{supplier}} · प्राप्त, स्टॉक जोड़ा गया · आइटम लॉक",
+      "subPaid": "{{supplier}} · भुगतान हो गया, लॉक",
+      "payable": "देय {{amount}}",
+      "paid": "भुगतान {{amount}}",
+      "paidOf": "{{total}} में से {{paid}} का भुगतान",
+      "pay": "{{amount}} का भुगतान करें"
+    },
+    "sale": {
+      "title": "बिक्री",
+      "sub": "{{customer}} · {{when}} · बिक्री वापसी से बदलती है, संपादन से नहीं",
+      "walkIn": "वॉक-इन ग्राहक",
+      "badges": {
+        "paid": "भुगतान हो गया",
+        "unpaid": "बकाया",
+        "returned": "लौटाया गया {{amount}}",
+        "invoice": "इनवॉइस #{{seq}} · मरीज़ की फ़ाइल में"
+      },
+      "medicines": "दवाइयाँ",
+      "medicine": "दवा",
+      "batch": "बैच",
+      "qty": "मात्रा",
+      "amount": "राशि",
+      "summary_one": "{{count}} दवा · {{amount}}",
+      "summary_other": "{{count}} दवाइयाँ · {{amount}}",
+      "collect": "{{amount}} वसूलें",
+      "returnMedicines": "दवाइयाँ वापस लें",
+      "voidSale": "बिक्री रद्द करें",
+      "collected": "{{amount}} प्राप्त हुए"
+    },
+    "saleReturn": {
+      "title": "मरीज़ से वापसी",
+      "sub": "{{customer}} · लौटाया गया स्टॉक अपने बैच में वापस जाता है",
+      "steps": {
+        "back": "क्या वापस आ रहा है",
+        "reason": "कारण और रिफ़ंड"
+      },
+      "medicine": "दवा",
+      "batch": "बैच",
+      "sold": "बेचा",
+      "refund": "रिफ़ंड",
+      "return": "वापसी",
+      "reason": "कारण",
+      "reasons": {
+        "unused": "इस्तेमाल नहीं हुई",
+        "reaction": "रिएक्शन",
+        "rx_changed": "डॉक्टर ने पर्चा बदला",
+        "wrong_item": "गलत आइटम",
+        "damaged": "खराब"
+      },
+      "refundBy": "रिफ़ंड का तरीका",
+      "peek_one": "{{count}} दवा · {{amount}}",
+      "peek_other": "{{count}} दवाइयाँ · {{amount}}",
+      "quickFill": "सब वापस लें",
+      "save": "{{amount}} रिफ़ंड करें",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "जो वापस आ रहा है वह दर्ज करें",
+      "refunded": "{{amount}} रिफ़ंड किया गया · स्टॉक वापस जोड़ा गया",
+      "refundedWrittenOff": "{{amount}} रिफ़ंड किया गया · स्टॉक बट्टे खाते में डाला गया",
+      "lowered": "{{amount}} वापस · स्टॉक वापस जोड़ा गया",
+      "loweredWrittenOff": "{{amount}} वापस · स्टॉक बट्टे खाते में डाला गया"
+    },
+    "expiring": {
+      "title": "एक्सपायर होने वाला स्टॉक लौटाएँ",
+      "sub": "{{medicine}} · बैच {{batch}} · {{expiry}} को एक्सपायर",
+      "supplier": "सप्लायर",
+      "boughtAt": "{{amount}} में खरीदा",
+      "quantity": "मात्रा",
+      "of": "{{count}} में से",
+      "creditNote": "क्रेडिट नोट",
+      "badges": {
+        "credit": "क्रेडिट {{amount}}",
+        "daysLeft_one": "{{count}} दिन बाकी",
+        "daysLeft_other": "{{count}} दिन बाकी"
+      },
+      "summary": "क्रेडिट से {{supplier}} का बकाया घटता है",
+      "save": "लौटाएँ और क्रेडिट लें",
+      "saved": "{{count}} लौटाए गए · {{supplier}} से {{amount}} क्रेडिट"
+    },
+    "prescriptions": {
+      "sub": "पर्चा {{rx}} · {{date}} · {{medicines}}"
     }
   }
 }

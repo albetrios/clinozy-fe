@@ -11,9 +11,10 @@ import {
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { Package, PenLine, Trash } from '@/shared/icons/index.ts';
+import { Package, PenLine, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
 import { validateMedicalSearch } from '../medical.search.ts';
@@ -44,9 +45,10 @@ const TABLE_ID = MEDICAL_TABLE_IDS.suppliers;
 
 /**
  * Medical › Suppliers (KICKOFF §6.7; `medical.md:73–87`): the Medical toolbar
- * over the suppliers — a row opens Edit supplier; "New purchase order" opens
- * one on that supplier; Delete, with nothing due and no order to settle, asks
- * for a reason. The footer counts the suppliers and what they are owed; the
+ * over the suppliers — a row opens Edit supplier; "Pay ₹827", while something
+ * is due, opens Payments › Send payment on its oldest open bill (Q-M1); "New
+ * purchase order" opens one on that supplier; Delete, with nothing due and no
+ * order to settle, asks for a reason. The footer counts the suppliers and what they are owed; the
  * row edge shows how long while money is due. This page opens the Supplier
  * drawer for the `create/` and `$supplierId/edit/` routes.
  */
@@ -64,6 +66,7 @@ export function SuppliersPage() {
   });
   const filters = useRoomFilters(fields);
   const stack = useMedicalStack();
+  const { canPay, pay } = usePayBill();
   const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
   const { dialog, close } = useMedicalDialogRoute({
     tab: 'suppliers',
@@ -88,7 +91,24 @@ export function SuppliersPage() {
   const canDelete = access.isResolved && access.can('medical', 'delete');
   const keys = MEDICAL_KEYS.suppliers;
 
+  /** Send payment on the supplier's oldest open bill — "Add & another" walks the rest (AMBER). */
+  const paySupplier = (supplier: SupplierRow) => {
+    if (supplier.oldestOpenBill) {
+      pay({ kind: 'medical_po', purchaseId: supplier.oldestOpenBill.id });
+    }
+  };
+
   const rowActions = (supplier: SupplierRow): DataTableRowAction[] => [
+    ...(canPay && supplier.payable > 0 && supplier.oldestOpenBill
+      ? [
+          {
+            id: 'pay',
+            label: t(keys.rowActions.pay, { amount: formatPaise(supplier.payable) }),
+            icon: Wallet,
+            onSelect: () => paySupplier(supplier),
+          },
+        ]
+      : []),
     ...(canCreate
       ? [
           {
@@ -174,6 +194,7 @@ export function SuppliersPage() {
         onClose={close}
         openChild={stack.open}
         onNewOrder={(supplierId) => nav.create('purchases', { supplier: supplierId })}
+        onPay={canPay ? paySupplier : undefined}
       />
       <MedicalStackHost stack={stack} />
       <MedicalDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />

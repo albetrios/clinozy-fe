@@ -55,7 +55,7 @@ export type ClinicCommandTarget =
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
  * | `invoice`        | `/invoices/$invoiceId`         | live (L-40; the preview)       |
  * | `visit`          | `/visits/$visitId`             | L-49 (Today's lane actions)    |
- * | `newSale`        | `/medical/sales/create`        | live (L-50; the drawer L-50c)  |
+ * | `newSale`        | `/medical/sales/create`        | live (L-50c; Invoice drawer)   |
  *
  * Plain strings on purpose: a literal no registered route has yet would not
  * type-check as a `to`. When a row adds a route's builder, it swaps its
