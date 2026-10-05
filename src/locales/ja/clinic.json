@@ -1307,7 +1307,9 @@
       "inStock": "在庫 {{count}}",
       "outOfStock": "在庫切れ",
       "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
-      "tooMuchDiscount": "{{name}} の割引が大きすぎます · 管理者に確認してください"
+      "tooMuchDiscount": "{{name}} の割引が大きすぎます · 管理者に確認してください",
+      "newMedicineName": "新しい医薬品名",
+      "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定"
     },
     "payment": {
       "full": "全額 · {{mode}} で {{amount}}",

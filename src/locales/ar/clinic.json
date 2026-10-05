@@ -1402,7 +1402,9 @@
       "inStock": "متوفر {{count}}",
       "outOfStock": "غير متوفر",
       "belowFloor": "أقل من أدنى سعر {{amount}} لـ {{name}}",
-      "tooMuchDiscount": "خصم كبير جدًا على {{name}} · اسأل المسؤول"
+      "tooMuchDiscount": "خصم كبير جدًا على {{name}} · اسأل المسؤول",
+      "newMedicineName": "اسم دواء جديد",
+      "medicineAdded": "تمت إضافة {{name}} · حدّد السعر الأقصى لاحقًا في المخزون"
     },
     "payment": {
       "full": "كامل · {{amount}} عبر {{mode}}",

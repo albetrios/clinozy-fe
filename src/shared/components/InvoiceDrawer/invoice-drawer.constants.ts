@@ -92,6 +92,10 @@ export const INVOICE_DRAWER_KEYS = {
     /** The Final cell's tooltip below the floor (H:5059). */
     belowFloor: 'invoiceDrawer.items.belowFloor',
     tooMuchDiscount: 'invoiceDrawer.items.tooMuchDiscount',
+    /** Browse's inline field for a medicine the store lacks (`medical.md:413`, Q-M4). */
+    newMedicineName: 'invoiceDrawer.items.newMedicineName',
+    /** "Azel Cream added · set MRP later in Stock" — the quick draft's toast. */
+    medicineAdded: 'invoiceDrawer.items.medicineAdded',
   },
   payment: {
     full: 'invoiceDrawer.payment.full',

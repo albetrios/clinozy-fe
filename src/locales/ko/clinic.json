@@ -1307,7 +1307,9 @@
       "inStock": "재고 {{count}}",
       "outOfStock": "재고 없음",
       "belowFloor": "{{name}}의 최저가 {{amount}}보다 낮습니다",
-      "tooMuchDiscount": "{{name}} 할인이 너무 큽니다 · 관리자에게 문의하세요"
+      "tooMuchDiscount": "{{name}} 할인이 너무 큽니다 · 관리자에게 문의하세요",
+      "newMedicineName": "새 의약품 이름",
+      "medicineAdded": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정"
     },
     "payment": {
       "full": "전액 · {{mode}}로 {{amount}}",

@@ -366,6 +366,58 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
     expect(invoice).toHaveTextContent('View only · your role can’t change this');
   });
 
+  it('adds a medicine the store lacks as a quick draft (Q-M4) — from the line and from Browse', async () => {
+    const user = setUser();
+    asRole('pharmacist');
+    renderCreate({ patientId: RHEA, type: 'medical' }, true);
+    await user.click(await screen.findByTestId('invoice-drawer-step-items-trigger'));
+    const line = await screen.findByTestId('invoice-drawer-quick-line-input');
+    await user.type(line, 'azel cream 2');
+    await user.click(await screen.findByTestId('invoice-drawer-quick-line-typed'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Azel Cream added · set MRP later in Stock',
+      ),
+    );
+    expect(
+      clinicFixtures.medicines.snapshot((medicine) => medicine.name === 'Azel Cream')[0],
+    ).toMatchObject({ isQuick: true, mrp: 0 });
+    await waitFor(() =>
+      expect(screen.getByTestId('invoice-drawer-items-row')).toHaveTextContent(
+        'Azel Cream',
+      ),
+    );
+    expect(screen.getByTestId('invoice-drawer-items-qty')).toHaveValue('2');
+
+    // Browse's inline "New medicine name" adds one more, on the next row.
+    await user.click(screen.getByTestId('invoice-drawer-quick-line-browse'));
+    const browse = await screen.findByTestId('invoice-drawer-quick-line-browse-panel');
+    const name = within(browse).getByTestId('invoice-drawer-quick-line-browse-new');
+    expect(name).toHaveAttribute('placeholder', 'New medicine name');
+    await user.type(name, 'Derma gel{Enter}');
+    await waitFor(() =>
+      expect(screen.getAllByTestId('invoice-drawer-items-row')).toHaveLength(2),
+    );
+    expect(
+      clinicFixtures.medicines.snapshot((medicine) => medicine.name === 'Derma gel'),
+    ).toHaveLength(1);
+  });
+
+  it('offers no new medicine to a role that cannot create one', async () => {
+    const user = setUser();
+    asRole('accountant');
+    renderCreate({ patientId: RHEA, type: 'medical' });
+    await user.click(await screen.findByTestId('invoice-drawer-step-items-trigger'));
+    await user.type(await screen.findByTestId('invoice-drawer-quick-line-input'), 'zzq');
+    expect(await screen.findByTestId('invoice-drawer-quick-line-no-match')).toBeVisible();
+    expect(screen.queryByTestId('invoice-drawer-quick-line-typed')).toBeNull();
+    await user.click(screen.getByTestId('invoice-drawer-quick-line-browse'));
+    const browse = await screen.findByTestId('invoice-drawer-quick-line-browse-panel');
+    expect(
+      within(browse).queryByTestId('invoice-drawer-quick-line-browse-new'),
+    ).toBeNull();
+  });
+
   it('bills a medicine at its MRP with no GST on top (D45), and refuses more than the stock', async () => {
     const user = setUser();
     renderCreate({ patientId: RHEA, type: 'medical' }, true);

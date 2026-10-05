@@ -1345,7 +1345,9 @@
       "inStock": "{{count}} in magazzino",
       "outOfStock": "Esaurito",
       "belowFloor": "Sotto il prezzo minimo di {{amount}} per {{name}}",
-      "tooMuchDiscount": "Troppo sconto su {{name}} · chiedi a un admin"
+      "tooMuchDiscount": "Troppo sconto su {{name}} · chiedi a un admin",
+      "newMedicineName": "Nome del nuovo farmaco",
+      "medicineAdded": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte"
     },
     "payment": {
       "full": "Intero · {{amount}} in {{mode}}",

@@ -1307,7 +1307,9 @@
       "inStock": "库存 {{count}}",
       "outOfStock": "缺货",
       "belowFloor": "低于 {{name}} 的最低价 {{amount}}",
-      "tooMuchDiscount": "{{name}} 折扣过大 · 请询问管理员"
+      "tooMuchDiscount": "{{name}} 折扣过大 · 请询问管理员",
+      "newMedicineName": "新药品名称",
+      "medicineAdded": "已添加 {{name}} · 稍后在库存中设置零售价"
     },
     "payment": {
       "full": "全额 · {{mode}} {{amount}}",

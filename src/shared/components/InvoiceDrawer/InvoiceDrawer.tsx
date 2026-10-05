@@ -149,6 +149,8 @@ function useInvoiceAccess(editing: InvoiceDetail | null, newSale: boolean) {
     canDelete: editing !== null && !readOnly && !sale && access.canAbility('void'),
     disc: access.canAbility('disc'),
     floorVisible: access.canAbility('floor'),
+    /** A medicine the store lacks becomes a quick draft (Q-M4): Medical's create. */
+    addMedicine: access.can('medical', 'create'),
   };
 }
 
@@ -217,6 +219,7 @@ function invoiceSteps(input: StepsInput): DrawerStep[] {
           total={input.figures.totals.bill}
           readOnly={access.readOnly}
           locked={access.sale}
+          canAddMedicine={access.addMedicine}
           onNewOffering={input.stacks.openNewOffering}
           onPromo={input.onPromo}
         />

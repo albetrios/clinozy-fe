@@ -20,6 +20,7 @@ import {
   quickLineMatches,
   type QuickLineTerm,
   type QuickLineTermValues,
+  quickLineTypedName,
   useQuickLineTerms,
 } from '@/shared/components/QuickLine/index.ts';
 import {
@@ -30,6 +31,7 @@ import {
   ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
+import { useQuickCreateMedicine } from '@/shared/hooks/useMedicines/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import {
@@ -43,7 +45,11 @@ import {
   type InvoiceLineForm,
   namedLines,
 } from './invoice-form.ts';
-import { type InvoiceCatalogItem, lineFromCatalog } from './invoice-lines.ts';
+import {
+  type InvoiceCatalogItem,
+  lineFromCatalog,
+  medicineCatalogItem,
+} from './invoice-lines.ts';
 import { withAddedLine, withSteppedLine } from './invoice-rows.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
@@ -68,6 +74,8 @@ export interface InvoiceItemsFieldProps {
   readOnly: boolean;
   /** A sale's medicines are never changed (`S:51`): the rows show, nothing edits them. */
   locked: boolean;
+  /** A medicine the store lacks may become a quick draft (Q-M4): Medical's create. */
+  canAddMedicine: boolean;
   /** "New offering · “q”" on a row's picker — the stacked offering form (L-30e). */
   onNewOffering: (rowIndex: number, query: string) => void;
   /** A picked offering with a live offer: "<offer> applied to <offering>". */
@@ -279,10 +287,35 @@ function useItemColumns(
 }
 
 /**
+ * A sale's medicine the store lacks (Q-M4; `medical.md:401`, 413): the quick
+ * line's "Not in the list · add as typed" and Browse's "New medicine name"
+ * add it as a quick Medical draft — MRP ₹0, "Needs MRP and composition" —
+ * and bill it on the next blank row. None where the role can't create one.
+ */
+function useMedicineDraft(
+  enabled: boolean,
+  add: (item: InvoiceCatalogItem, values: QuickLineTermValues) => void,
+): ((name: string, values: QuickLineTermValues) => void) | undefined {
+  const { t } = useTranslation(INVOICE_DRAWER_NS);
+  const quickMedicine = useQuickCreateMedicine({
+    successMessage: (medicine) => t(K.medicineAdded, { name: medicine.name }),
+  });
+  if (!enabled) return undefined;
+  return (name, values) => {
+    void quickMedicine
+      .mutateAsync({ name })
+      .then((medicine) => add(medicineCatalogItem(medicine), values))
+      .catch(() => undefined);
+  };
+}
+
+/**
  * The Items step (`payments.md:142`; H:5058–5059): the quick line —
  * "lhr face 1 10%" (the shared shorthand, `useQuickLineTerms`), its matches,
- * "Often billed" and Browse — over the item rows: the offering (or medicine)
- * picker with "New offering · “q”" stacking the offering form, the Qty
+ * "Often billed" and Browse, where on a Medical invoice a medicine the store
+ * lacks becomes a quick draft (`useMedicineDraft`, Q-M4) — over the item
+ * rows: the offering (or medicine) picker with "New offering · “q”"
+ * stacking the offering form, the Qty
  * stepper (1–999), the Rate read-only (the effective price, or the MRP), the
  * Disc %, GST read-only (0% on a medicine: its MRP includes it, D45) and the
  * Final, whose typing back-solves the discount and which turns red under the
@@ -310,6 +343,7 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
     setRows(withAddedLine(form.getValues('items'), item, values));
     if (item.promo) props.onPromo(item);
   };
+  const addMedicine = useMedicineDraft(medical && props.canAddMedicine, add);
 
   const countOf = (item: QuickLineItem<InvoiceCatalogItem>) =>
     namedLines(rows)
@@ -360,11 +394,25 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
               )
             }
             onPick={add}
+            typedName={
+              addMedicine
+                ? (words) => quickLineTypedName(catalog.items, words)
+                : undefined
+            }
+            onCreate={addMedicine}
             frequent={{
               label: t(K.oftenBilled),
               items: oftenBilled.map((item) => quickItemOf(item, catalog)),
             }}
-            browse={browse}
+            browse={{
+              ...browse,
+              newItem: addMedicine
+                ? {
+                    placeholder: t(K.newMedicineName),
+                    onAdd: (name) => addMedicine(name, {}),
+                  }
+                : undefined,
+            }}
             testId={INVOICE_DRAWER_TEST_IDS.quickLine}
           />
         ) : undefined

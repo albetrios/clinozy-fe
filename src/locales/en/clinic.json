@@ -1326,7 +1326,9 @@
       "inStock": "{{count}} in stock",
       "outOfStock": "Out of stock",
       "belowFloor": "Below the lowest price {{amount}} for {{name}}",
-      "tooMuchDiscount": "Too much discount on {{name}} · ask an admin"
+      "tooMuchDiscount": "Too much discount on {{name}} · ask an admin",
+      "newMedicineName": "New medicine name",
+      "medicineAdded": "{{name}} added · set MRP later in Stock"
     },
     "payment": {
       "full": "Full · {{amount}} in {{mode}}",

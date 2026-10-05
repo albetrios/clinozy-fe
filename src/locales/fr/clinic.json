@@ -1345,7 +1345,9 @@
       "inStock": "{{count}} en stock",
       "outOfStock": "En rupture",
       "belowFloor": "Sous le prix minimum de {{amount}} pour {{name}}",
-      "tooMuchDiscount": "Trop de remise sur {{name}} · demandez à un admin"
+      "tooMuchDiscount": "Trop de remise sur {{name}} · demandez à un admin",
+      "newMedicineName": "Nom du nouveau médicament",
+      "medicineAdded": "{{name}} ajouté · fixez le prix max. plus tard dans Stock"
     },
     "payment": {
       "full": "Total · {{amount}} en {{mode}}",

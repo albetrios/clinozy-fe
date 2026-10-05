@@ -1345,7 +1345,9 @@
       "inStock": "{{count}} em estoque",
       "outOfStock": "Sem estoque",
       "belowFloor": "Abaixo do preço mínimo de {{amount}} para {{name}}",
-      "tooMuchDiscount": "Desconto demais em {{name}} · fale com um admin"
+      "tooMuchDiscount": "Desconto demais em {{name}} · fale com um admin",
+      "newMedicineName": "Nome do novo medicamento",
+      "medicineAdded": "{{name}} adicionado · defina o PMC depois em Estoque"
     },
     "payment": {
       "full": "Integral · {{amount}} em {{mode}}",

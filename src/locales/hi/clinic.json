@@ -1326,7 +1326,9 @@
       "inStock": "स्टॉक में {{count}}",
       "outOfStock": "स्टॉक ख़त्म",
       "belowFloor": "{{name}} के न्यूनतम मूल्य {{amount}} से कम",
-      "tooMuchDiscount": "{{name}} पर बहुत ज़्यादा छूट · एडमिन से पूछें"
+      "tooMuchDiscount": "{{name}} पर बहुत ज़्यादा छूट · एडमिन से पूछें",
+      "newMedicineName": "नई दवा का नाम",
+      "medicineAdded": "{{name}} जोड़ा गया · एमआरपी बाद में स्टॉक में भरें"
     },
     "payment": {
       "full": "पूरा · {{amount}} {{mode}} में",
