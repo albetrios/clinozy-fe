@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   type DrawerBadge,
@@ -174,10 +175,13 @@ function SaleSession({
         onClose={onClose}
         title={t(K.title)}
         tag={`#${sale.seq}`}
-        sub={t(K.sub, {
-          customer: sale.customer?.name ?? t(K.walkIn),
-          when: dates.when(sale.soldAt),
-        })}
+        sub={t(
+          K.sub,
+          isolateValues({
+            customer: sale.customer?.name ?? t(K.walkIn),
+            when: dates.when(sale.soldAt),
+          }),
+        )}
         badges={badgesOf(sale, formatPaise, t)}
         content={CONTENT_PROFILE}
         tone={SECTION_TONES.medical}

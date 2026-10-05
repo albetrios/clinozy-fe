@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
@@ -25,8 +26,9 @@ export function branchDefaultsLines(
   row: Pick<BranchRow, 'defaults'>,
   t: TFunction,
 ): { value: string; sub: string } | null {
+  // The member's name isolated: it stays whole beside a right-to-left role.
   const lines = row.defaults.map(({ role, member }) =>
-    t(USERS_KEYS.branches.defaults[role], { name: member.name }),
+    t(USERS_KEYS.branches.defaults[role], { name: isolateText(member.name) }),
   );
   const [first, ...rest] = lines;
   return first ? { value: first, sub: rest.join(' · ') } : null;

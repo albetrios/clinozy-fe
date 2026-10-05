@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type { PatientReportDetail } from '@/shared/api/clinic/patient-reports-api.ts';
 import {
@@ -151,7 +152,7 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
       onClose={onClose}
       title={report.name}
       tag={type}
-      sub={t(K.view.sub, { name: patientName, date })}
+      sub={t(K.view.sub, isolateValues({ name: patientName, date }))}
       // 560px as drawn (H:4019): five read-only values.
       content={{ fieldCount: 5 }}
       tone="sky"

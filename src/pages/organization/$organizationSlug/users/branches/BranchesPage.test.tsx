@@ -10,6 +10,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   member,
@@ -108,7 +109,10 @@ describe('Users › Branches (users.md:79–95)', () => {
     expect(within(vesu).getByText('Tue–Sun · 11:00–20:00')).toBeInTheDocument();
     // The Team who work there and the default people the Team has.
     expect(within(adajan).getByText('Riya S.')).toBeInTheDocument();
-    expect(within(adajan).getByText('Doctor · Dr. Nisha Mavani')).toBeInTheDocument();
+    // The member's name isolated beside the role.
+    expect(
+      within(adajan).getByText(`Doctor · ${fsi('Dr. Nisha Mavani')}`),
+    ).toBeInTheDocument();
     expect(screen.getByText('All branches loaded')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });

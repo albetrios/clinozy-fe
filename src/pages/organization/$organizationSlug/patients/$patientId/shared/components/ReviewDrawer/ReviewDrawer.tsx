@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import type { Review, ReviewSource } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ReviewSaved } from '@/shared/api/clinic/feedback-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
@@ -156,7 +157,7 @@ export function ReviewDrawer({
       open
       onClose={onClose}
       title={t(K.title)}
-      sub={t(K.sub, { name: patientName })}
+      sub={t(K.sub, { name: isolateText(patientName) })}
       // 560px as drawn (H:4398): its zone and text are full rows that fit.
       content={{ fieldCount: 5 }}
       tone="butter"

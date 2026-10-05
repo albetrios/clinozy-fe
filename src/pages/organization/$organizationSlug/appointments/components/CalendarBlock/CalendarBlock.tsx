@@ -1,6 +1,7 @@
 import { type CSSProperties, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
@@ -115,15 +116,18 @@ export function CalendarBlock({
     ns: CLINIC_NS,
   });
   const doctorName = doctor ? personFullName(doctor) : '';
+  // The tooltip's name, time, service and doctor are isolated tokens.
   const title = t(
     clash ? APPOINTMENTS_KEYS.calendar.blockClash : APPOINTMENTS_KEYS.calendar.block,
     {
-      name: person.name,
-      time,
+      ...isolateValues({
+        name: person.name,
+        time,
+        service: appointment.serviceLabel,
+        doctor: doctorName,
+        status: statusLabel,
+      }),
       minutes: appointment.durationMin,
-      service: appointment.serviceLabel,
-      doctor: doctorName,
-      status: statusLabel,
     },
   );
   const oneLine =
@@ -157,7 +161,10 @@ export function CalendarBlock({
             patient={person.kind === 'patient'}
             lead={person.kind === 'lead'}
           />
-          <span className="text-caption min-w-0 flex-[1_1_60px] truncate leading-[1.25] font-semibold">
+          <span
+            dir="auto"
+            className="text-caption min-w-0 flex-[1_1_60px] truncate [text-align:match-parent] leading-[1.25] font-semibold"
+          >
             {person.name}
           </span>
           {doctor ? (
@@ -166,7 +173,7 @@ export function CalendarBlock({
           {oneLine ? null : <span aria-hidden="true" className="h-0 basis-full" />}
           <span className="text-foreground-soft flex-none whitespace-nowrap tabular-nums">
             {t(APPOINTMENTS_KEYS.calendar.blockTime, {
-              time,
+              time: isolateText(time),
               minutes: appointment.durationMin,
             })}
           </span>

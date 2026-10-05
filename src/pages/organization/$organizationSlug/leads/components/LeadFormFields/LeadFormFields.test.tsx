@@ -205,12 +205,32 @@ describe('LeadContactStrip', () => {
       </TooltipProvider>,
     );
     expect(screen.getByText('Dharti Galani')).toBeInTheDocument();
-    expect(screen.getByText(/\+91 82006 03212/)).toHaveTextContent(
-      '+91 82006 03212 · +2 more',
-    );
+    // The mobile always reads left to right inside its line; " · +2 more"
+    // keeps the page's direction after it.
+    const phone = screen.getByText('+91 82006 03212');
+    expect(phone).toHaveAttribute('dir', 'ltr');
+    expect(phone.parentElement).toHaveTextContent('+91 82006 03212 · +2 more');
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument();
     // A patient's avatar carries the "P" badge.
     expect(screen.getByText('DG')).toBeInTheDocument();
     expect(screen.getByText('P')).toBeInTheDocument();
+  });
+
+  it('keeps a Latin name whole on a right-to-left page, aligned as the strip', () => {
+    render(
+      <TooltipProvider>
+        <div dir="rtl">
+          <LeadContactStrip
+            card={{ kind: 'lead', name: 'Riya S.', reach: [] }}
+            name="Riya S."
+            phone="+919825044120"
+          />
+        </div>
+      </TooltipProvider>,
+    );
+    const name = screen.getByText('Riya S.');
+    expect(name).toHaveAttribute('dir', 'auto');
+    expect(name).toHaveClass('[text-align:match-parent]');
+    expect(name.parentElement).toHaveTextContent('Riya S.+91 98250 44120');
   });
 });

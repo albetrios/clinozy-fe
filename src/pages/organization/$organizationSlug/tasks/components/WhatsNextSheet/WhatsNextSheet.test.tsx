@@ -6,6 +6,7 @@ import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import { taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
@@ -50,8 +51,9 @@ describe('WhatsNextSheet (KICKOFF §6.10 What’s next)', () => {
     expect(
       screen.getByRole('heading', { name: 'What’s next for Priti?' }),
     ).toBeInTheDocument();
+    // The closed task's title and result are isolated tokens in the sub line.
     expect(sheet).toHaveAccessibleDescription(
-      'Closed · Confirm Priti’s visit · Confirmed on call',
+      `Closed · ${fsi('Confirm Priti’s visit')} · ${fsi('Confirmed on call')}`,
     );
     expect(screen.getByTestId('whats-next-drawer-dismiss')).toHaveTextContent(
       'Nothing next',

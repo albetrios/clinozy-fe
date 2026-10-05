@@ -1,6 +1,7 @@
 import type { KeyboardEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
@@ -115,8 +116,15 @@ function OwnerCell({ row }: { row: TaskRowRecord }) {
         className="border-border bg-card inline-flex h-7 max-w-full min-w-0 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 whitespace-nowrap"
       >
         <PersonAvatar size="chip" initials={owner.initials} tone={owner.tone} />
-        <span className="text-detail min-w-0 truncate font-medium">
-          {previous ? t(TASKS_KEYS.row.was, { name, first: previous.firstName }) : name}
+        {/* A name alone reads in its own direction; "<name> · was <first>"
+            keeps the page's with both names isolated. */}
+        <span
+          dir={previous ? undefined : 'auto'}
+          className="text-detail min-w-0 truncate font-medium"
+        >
+          {previous
+            ? t(TASKS_KEYS.row.was, isolateValues({ name, first: previous.firstName }))
+            : name}
         </span>
       </span>
     </TeamCard>

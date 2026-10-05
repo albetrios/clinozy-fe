@@ -8,6 +8,7 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   patientFileUrl,
@@ -58,7 +59,10 @@ describe('PatientNotesPage', () => {
     expect(newest).toHaveTextContent(
       'Patient suggested the peel package, will decide after first session',
     );
-    expect(within(newest).getByText(/^Riya S\. · /)).toBeInTheDocument();
+    // The author and the time are isolated: "Riya S." keeps its full stop at its end.
+    expect(
+      within(newest).getByText(new RegExp(`^${fsi('Riya S\\.')} · `)),
+    ).toBeInTheDocument();
     expect(oldest).toHaveTextContent('Clinic visited');
   });
 

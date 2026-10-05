@@ -11,6 +11,7 @@ import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   APPOINTMENTS_PAGE,
@@ -70,8 +71,29 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
     expect(card).toHaveTextContent('Jalpa Sheladiya');
     expect(card).toHaveTextContent('#2858');
     expect(card).toHaveTextContent('Confirmed');
-    expect(card).toHaveTextContent(/Tomorrow · 10:30 AM · 20 min/);
+    expect(withoutBidiMarks(card.textContent)).toMatch(/Tomorrow · 10:30 AM · 20 min/);
     expect(card).toHaveTextContent('Dr. Drashti');
+  });
+
+  it('keeps the name, phone, id, slot and doctor whole on a right-to-left page', async () => {
+    renderCard(
+      booking({
+        status: 'confirmed',
+        date: '2026-10-04',
+        startTime: '10:30',
+        person: { ...base.person, name: 'Riya S.', phone: '+919825044120' },
+      }),
+    );
+    const card = await screen.findByTestId('card');
+    const name = within(card).getByText('Riya S.');
+    expect(name).toHaveAttribute('dir', 'auto');
+    expect(name).toHaveClass('[text-align:match-parent]');
+    expect(within(card).getByText('+91 98250 44120')).toHaveAttribute('dir', 'ltr');
+    expect(within(card).getByText('#2858')).toHaveAttribute('dir', 'ltr');
+    expect(within(card).getByText('Dr. Drashti')).toHaveAttribute('dir', 'auto');
+    // The day and the time are tokens inside the translated line.
+    expect(card).toHaveTextContent(`${fsi('Tomorrow')} · ${fsi('10:30 AM')} · 20 min`);
+    expect(card).toHaveTextContent('Riya S.+91 98250 44120#2858');
   });
 
   it('marks the tracker: done steps checked, the current one numbered', async () => {

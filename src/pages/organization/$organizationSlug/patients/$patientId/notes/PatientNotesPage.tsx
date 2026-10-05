@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import type { PatientNote } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   PATIENT_NOTE_MAX,
@@ -100,7 +101,8 @@ function NoteCard({
       <div className="flex min-w-0 flex-1 flex-col gap-0.75">
         <span className="text-caption text-muted-foreground">
           {t(NOTES_KEYS.by, {
-            name: author ? shortPersonName(author.name) : '—',
+            // The author isolated; the moment is the rule's (its time isolated within).
+            name: author ? isolateText(shortPersonName(author.name)) : '—',
             date: clock.moment(note.createdAt),
           })}
         </span>

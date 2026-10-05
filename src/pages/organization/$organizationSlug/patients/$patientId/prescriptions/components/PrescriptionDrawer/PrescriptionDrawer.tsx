@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Prescription, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
@@ -306,7 +307,10 @@ export function PrescriptionDrawer({
         onClose={onClose}
         title={t(prescription ? K.title.edit : K.title.create)}
         tag={prescription ? displayId.prescription(prescription.seq) : undefined}
-        sub={t(K.sub, { name: patient.name, id: displayId.patient(patient.seq) })}
+        sub={t(
+          K.sub,
+          isolateValues({ name: patient.name, id: displayId.patient(patient.seq) }),
+        )}
         badges={[
           { id: 'medicines', label: medicines, tone: 'sage' },
           ...(doctor ? [{ id: 'doctor', label: doctorName, tone: doctor.tone }] : []),

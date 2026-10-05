@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditPartyRow } from '@/shared/api/clinic/credits-contracts.ts';
 import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
@@ -18,10 +19,10 @@ export const NO_INVOICE = 'none';
 /** A party's line under its name: "Patient · #3441", "Contact · +91 …", "Clinic vendor". */
 function partySub(row: CreditPartyRow, t: TFunction): string {
   if (row.kind === 'patient')
-    return t(K.parties.patient, { id: displayId.patient(row.seq) });
+    return t(K.parties.patient, { id: isolateText(displayId.patient(row.seq)) });
   if (row.kind === 'contact') {
     return row.phone
-      ? t(K.parties.contactPhone, { phone: formatClinicPhone(row.phone) })
+      ? t(K.parties.contactPhone, { phone: isolateText(formatClinicPhone(row.phone)) })
       : t(K.parties.contact);
   }
   return t(row.kind === 'vendor' ? K.parties.vendor : K.parties.supplier);

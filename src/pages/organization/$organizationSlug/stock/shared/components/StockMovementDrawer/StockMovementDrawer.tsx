@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerChips,
@@ -426,7 +427,10 @@ function MovementSession({
       open={open}
       onClose={onClose}
       title={t(titleKey(values.type))}
-      sub={t(K.sub, { name: item.name, quantity: words.quantity(item, item.qtyMilli) })}
+      sub={t(
+        K.sub,
+        isolateValues({ name: item.name, quantity: words.quantity(item, item.qtyMilli) }),
+      )}
       badges={[
         { id: 'type', label: typeLabel.label, tone: typeLabel.tone ?? undefined },
         {

@@ -183,7 +183,10 @@ export function PatientFileBar({
         <span aria-hidden="true" className="text-border-strong text-xl leading-[1.2]">
           /
         </span>
-        <h1 className="min-w-0 truncate text-xl leading-[1.2] font-semibold tracking-[-0.015em]">
+        <h1
+          dir="auto"
+          className="min-w-0 truncate text-xl leading-[1.2] font-semibold tracking-[-0.015em]"
+        >
           {name}
         </h1>
       </span>
@@ -197,11 +200,18 @@ export function PatientFileBar({
           className="max-md:hidden"
         />
         <span className="flex min-w-0 flex-col leading-[1.3]">
-          {/* The page's heading wherever the breadcrumb's is hidden. */}
-          <h1 className="truncate text-sm leading-[1.3] font-semibold whitespace-nowrap">
+          {/* The page's heading wherever the breadcrumb's is hidden — the name in
+              its own direction, "#3508 · +91 ••••• •3212" always left to right. */}
+          <h1
+            dir="auto"
+            className="truncate [text-align:match-parent] text-sm leading-[1.3] font-semibold whitespace-nowrap"
+          >
             {name}
           </h1>
-          <span className="text-caption text-muted-foreground truncate whitespace-nowrap tabular-nums">
+          <span
+            dir="ltr"
+            className="text-caption text-muted-foreground truncate [text-align:match-parent] whitespace-nowrap tabular-nums"
+          >
             {identity}
           </span>
         </span>

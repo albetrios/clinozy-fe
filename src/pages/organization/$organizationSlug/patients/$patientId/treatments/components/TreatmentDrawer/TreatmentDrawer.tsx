@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import type { Treatment, TreatmentTemplate } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-api.ts';
 import type { TreatmentCheckIn } from '@/shared/api/clinic/treatments-api.ts';
@@ -250,9 +251,7 @@ export function TreatmentDrawer({
         steps={steps}
         openStep={step}
         onOpenStepChange={setStep}
-        summary={[values.name.trim() || t(K.record), session, doctorName]
-          .filter(Boolean)
-          .join(' · ')}
+        summary={isolateJoin([values.name.trim() || t(K.record), session, doctorName])}
         readOnly={readOnly}
         saveLabel={t(treatment ? K.save.edit : K.save.create)}
         onSave={() => void save()}

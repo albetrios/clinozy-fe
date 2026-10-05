@@ -1,6 +1,7 @@
 import { type ReactElement, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { focusSurfaceOnOpen } from '@/lib/focus-surface.ts';
 import { cn } from '@/lib/utils.ts';
 import {
@@ -141,7 +142,9 @@ export interface AppointmentCardContentProps {
  * the person and "#<seq>", the service and status pills, "<day> · <time> ·
  * <n> min", the doctor, the last update, "This appointment is closed ·
  * <status>", the 4-step tracker; then the next step and "Open", and the other
- * moves — each through the popover's guards (Q-A7).
+ * moves — each through the popover's guards (Q-A7). The name and the doctor
+ * read in their own direction, the phone and the id left to right, and the
+ * day and time are isolated in their line — whole on a right-to-left page.
  */
 export function AppointmentCardContent({
   appointment,
@@ -197,16 +200,25 @@ export function AppointmentCardContent({
           patient={person.kind === 'patient'}
         />
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="text-field truncate leading-[1.3] font-semibold">
+          <span
+            dir="auto"
+            className="text-field truncate [text-align:match-parent] leading-[1.3] font-semibold"
+          >
             {person.name}
           </span>
           {person.phone ? (
-            <span className="text-caption text-muted-foreground leading-[1.3] tabular-nums">
+            <span
+              dir="ltr"
+              className="text-caption text-muted-foreground [text-align:match-parent] leading-[1.3] tabular-nums"
+            >
               {formatClinicPhone(person.phone)}
             </span>
           ) : null}
         </span>
-        <span className="text-micro text-muted-foreground flex-none tabular-nums">
+        <span
+          dir="ltr"
+          className="text-micro text-muted-foreground flex-none tabular-nums"
+        >
           {displayId.appointment(appointment.seq)}
         </span>
       </div>
@@ -218,12 +230,15 @@ export function AppointmentCardContent({
       </div>
       <div className="text-detail text-foreground-soft flex flex-col gap-1">
         <span className="tabular-nums">
-          {t(APPOINTMENTS_KEYS.card.when, { ...slot, minutes: appointment.durationMin })}
+          {t(APPOINTMENTS_KEYS.card.when, {
+            ...isolateValues(slot),
+            minutes: appointment.durationMin,
+          })}
         </span>
         {doctor ? (
           <span className="flex items-center gap-1.5">
             <PersonAvatar size="line" initials={doctor.initials} tone={doctor.tone} />
-            {doctorName}
+            <span dir="auto">{doctorName}</span>
           </span>
         ) : null}
         <span className="text-muted-foreground truncate">

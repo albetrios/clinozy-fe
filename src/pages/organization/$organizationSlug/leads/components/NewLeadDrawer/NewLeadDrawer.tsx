@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { findOpenLeadByPhone } from '@/shared/api/clinic/leads-api.ts';
 import type { LeadContactHit, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
@@ -353,8 +354,8 @@ export function NewLeadDrawer({
           record
             ? {
                 text: t(K.linked, {
-                  name: form.contact.name.trim(),
-                  kind: `${tCard(PERSON_CARD_KEYS.kind[record.kind])} ${record.displayId}`,
+                  name: isolateText(form.contact.name.trim()),
+                  kind: `${tCard(PERSON_CARD_KEYS.kind[record.kind])} ${isolateText(record.displayId)}`,
                 }),
                 onUndo: () => setForm((current) => withoutOrigin(current)),
               }

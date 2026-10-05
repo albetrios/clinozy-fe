@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
   TASK_REMIND_MINUTES,
@@ -235,7 +236,7 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
       open
       onClose={onClose}
       title={t(K.title)}
-      sub={person ? t(K.sub, { person: person.name }) : t(K.subNoPerson)}
+      sub={person ? t(K.sub, { person: isolateText(person.name) }) : t(K.subNoPerson)}
       width={720}
       // The open step's circle in the near-black ink, as the composer's (H:4483, z900).
       tone="stone"

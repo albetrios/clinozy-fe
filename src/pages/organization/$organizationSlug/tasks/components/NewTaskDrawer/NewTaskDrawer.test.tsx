@@ -10,6 +10,7 @@ import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderTasksRoutes,
@@ -122,7 +123,7 @@ describe('NewTaskDrawer (KICKOFF §6.10 New task, Q-T4)', () => {
     const { user, router } = await openNewTask();
     await pickPerson(user, 'Priti');
     expect(screen.getByTestId('new-task-drawer')).toHaveAccessibleDescription(
-      'For Priti Soni · shows in Tasks and on this person’s timeline',
+      `For ${fsi('Priti Soni')} · shows in Tasks and on this person’s timeline`,
     );
     await user.type(screen.getByTestId('new-task-title'), 'Share the laser price');
     await user.click(screen.getByTestId('new-task-drawer-step-when-trigger'));
@@ -159,7 +160,7 @@ describe('NewTaskDrawer (KICKOFF §6.10 New task, Q-T4)', () => {
     await openNewTask(`?patient=${PRITI}`);
     await waitFor(() =>
       expect(screen.getByTestId('new-task-drawer')).toHaveAccessibleDescription(
-        'For Priti Soni · shows in Tasks and on this person’s timeline',
+        `For ${fsi('Priti Soni')} · shows in Tasks and on this person’s timeline`,
       ),
     );
     expect(screen.getByTestId('new-task-drawer-summary')).toHaveTextContent(

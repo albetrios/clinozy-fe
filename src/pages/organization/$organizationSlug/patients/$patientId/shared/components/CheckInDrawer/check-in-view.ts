@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import {
   type CheckinFeel,
@@ -84,10 +85,12 @@ export function useCheckInHead({
   const previous = context?.previous;
   const last = previous
     ? t(K.last, {
-        date: formatDate(
-          localDateOf(previous.date),
-          { day: 'numeric', month: 'short' },
-          { civilDay: true },
+        date: isolateText(
+          formatDate(
+            localDateOf(previous.date),
+            { day: 'numeric', month: 'short' },
+            { civilDay: true },
+          ),
         ),
         feel: t(CLINIC_KEYS.checkInFeels[previous.feel], { ns: CLINIC_NS }),
       })
@@ -95,7 +98,8 @@ export function useCheckInHead({
   const service = context?.treatment?.name ?? context?.appointment?.service;
   return {
     title: t(aftercare ? K.titles.aftercare : K.titles.visit),
-    sub: [patientName, service, last].filter(Boolean).join(' · '),
+    // The drawer's sub keeps the page's direction; each part is isolated.
+    sub: isolateJoin([patientName, service, last]),
     context: contextText(context, t),
   };
 }

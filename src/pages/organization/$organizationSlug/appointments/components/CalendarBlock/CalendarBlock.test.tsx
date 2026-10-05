@@ -8,6 +8,7 @@ import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   APPOINTMENTS_PAGE,
@@ -73,7 +74,9 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     expect(block().className).toContain('border-s-tone-butter-foreground');
     expect(block().className).toContain('flex-wrap');
     expect(block()).toHaveTextContent('Jalpa Sheladiya');
-    expect(block()).toHaveTextContent('10:30 AM · 60m');
+    // The time is an isolated token; the name reads in its own direction.
+    expect(block()).toHaveTextContent(`${fsi('10:30 AM')} · 60m`);
+    expect(within(block()).getByText('Jalpa Sheladiya')).toHaveAttribute('dir', 'auto');
     expect(block()).toHaveTextContent(appointment.serviceLabel);
     expect(block()).toHaveTextContent('Scheduled');
     expect(within(block()).getByTestId('patient-badge')).toHaveTextContent('P');
@@ -98,11 +101,9 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     await screen.findByTestId('appointments-block');
     expect(within(block()).getByTestId('lead-badge')).toHaveTextContent('L');
     expect(block().className).toContain('flex-nowrap');
-    expect(block()).toHaveAttribute(
-      'title',
-      expect.stringMatching(
-        /^Jalpa Sheladiya · .+ · 20 min · .+ · overlaps another booking$/,
-      ),
+    // The tooltip's tokens are isolated; its words and order as read:
+    expect(withoutBidiMarks(block().getAttribute('title'))).toMatch(
+      /^Jalpa Sheladiya · .+ · 20 min · .+ · overlaps another booking$/,
     );
   });
 

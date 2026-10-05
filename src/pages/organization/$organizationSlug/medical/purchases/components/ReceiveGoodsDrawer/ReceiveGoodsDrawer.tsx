@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useController, useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -359,7 +360,7 @@ function ReceiveSession({
       onClose={onClose}
       title={t(K.title)}
       tag={`#${order.seq}`}
-      sub={t(K.sub, { supplier: order.supplierName })}
+      sub={t(K.sub, { supplier: isolateText(order.supplierName) })}
       badges={badges}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}

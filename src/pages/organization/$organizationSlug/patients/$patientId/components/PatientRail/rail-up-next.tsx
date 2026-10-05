@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   civilDayOffset,
@@ -101,13 +102,17 @@ function NextVisitCard({
         )}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-px">
-        <span className="text-body truncate font-semibold">
+        {/* A moment alone on its line reads in its own direction (today's bare time too). */}
+        <span
+          dir="auto"
+          className="text-body truncate [text-align:match-parent] font-semibold"
+        >
           {visit ? when(visit) : t(K.notBooked)}
         </span>
         <span className="text-muted-foreground truncate text-xs">
           {visit
             ? t(K.visitService, {
-                service: visit.serviceLabel,
+                service: isolateText(visit.serviceLabel),
                 minutes: visit.durationMin,
               })
             : t(K.noUpcoming)}
@@ -152,6 +157,7 @@ function DueCard({
       <span className="flex min-w-0 flex-1 flex-col gap-px">
         <span className="flex items-center gap-1">
           <span
+            dir="auto"
             data-testid="patient-rail-due"
             className="text-body font-semibold tabular-nums"
           >
@@ -251,14 +257,16 @@ export function RailUpNext({
           <span className="flex min-w-0 flex-1 flex-col gap-px">
             <span className="text-body font-semibold tabular-nums">
               {t(K.creditToReturn, {
-                amount: masked ? t(K.maskedAmount) : formatPaise(file.credit.amount),
+                amount: isolateText(
+                  masked ? t(K.maskedAmount) : formatPaise(file.credit.amount),
+                ),
               })}
             </span>
             <span
               className="text-tone-butter-foreground truncate text-xs"
-              title={file.credit.reasons.join(' · ')}
+              title={isolateJoin(file.credit.reasons)}
             >
-              {file.credit.reasons.join(' · ')}
+              {isolateJoin(file.credit.reasons)}
             </span>
           </span>
         </div>

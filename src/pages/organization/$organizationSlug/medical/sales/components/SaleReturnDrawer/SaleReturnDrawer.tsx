@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Controller, useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_MODE_TONES, SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -288,7 +289,7 @@ function ReturnSession({
       onClose={onClose}
       title={t(K.title)}
       tag={`#${sale.seq}`}
-      sub={t(K.sub, { customer })}
+      sub={t(K.sub, { customer: isolateText(customer) })}
       quickFill={[
         {
           id: 'everything',

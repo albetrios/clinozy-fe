@@ -3,6 +3,7 @@ import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { purchaseLineAmount } from '@/shared/api/clinic/clinic-money.ts';
 import type { PurchaseItem } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -216,7 +217,7 @@ function OrderViewSession({
       title={t(K.title)}
       tag={`#${order.seq}`}
       sub={t(paid ? K.subPaid : K.subReceived, {
-        supplier: order.supplierName,
+        supplier: isolateText(order.supplierName),
       })}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}

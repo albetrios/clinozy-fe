@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import {
   TASK_FOLLOW_UP_WHEN,
   TASK_WHY_MAX,
@@ -79,7 +80,7 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
   const stepLabel = (step: (typeof WHATS_NEXT_STEPS)[number]) => t(K.step[step]);
   const whenLabel = (when: (typeof TASK_FOLLOW_UP_WHEN)[number]) =>
     tRules(TASK_RULE_KEYS.followUpWhen[when]);
-  const closed = t(K.sub, { title: task.title, result });
+  const closed = t(K.sub, isolateValues({ title: task.title, result }));
 
   const { saveState, save } = useDrawerSave<WhatsNextForm, TaskChange>({
     form,

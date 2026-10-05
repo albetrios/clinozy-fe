@@ -26,6 +26,8 @@ export interface LeadContactStripProps extends ContactCardActions {
  * patient, else lav — the name 16/600 and the mobile; the contact card on
  * hover with the actions the caller offers (Edit / Change contact, "+ Lead" …).
  * The lead drawer shows it over the cards, New lead in place of the Contact step.
+ * The name reads in its own direction and the mobile left to right, so both
+ * stay whole on a right-to-left page; " · +2 more" keeps the page's.
  */
 export function LeadContactStrip({
   card,
@@ -51,11 +53,14 @@ export function LeadContactStrip({
             patient={isPatient}
           />
           <span className="flex min-w-0 flex-col leading-[1.3]">
-            <span className="truncate text-base font-semibold tracking-[-0.01em]">
+            <span
+              dir="auto"
+              className="truncate [text-align:match-parent] text-base font-semibold tracking-[-0.01em]"
+            >
               {name}
             </span>
             <span className="text-foreground-soft text-caption tabular-nums">
-              {phone ? formatClinicPhone(phone) : null}
+              {phone ? <span dir="ltr">{formatClinicPhone(phone)}</span> : null}
               {more}
             </span>
           </span>

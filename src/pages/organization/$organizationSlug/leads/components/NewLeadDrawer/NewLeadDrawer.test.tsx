@@ -9,6 +9,7 @@ import { listLeads } from '@/shared/api/clinic/leads-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { renderLeadsRoutes } from '../../__tests__/integration/leads-test-router.tsx';
 import { LeadsPage } from '../../LeadsPage.tsx';
@@ -112,6 +113,9 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     await user.type(screen.getByTestId('new-lead-search'), 'Dharti');
     const hit = await screen.findByTestId('new-lead-hit-patient-3508');
     expect(hit).toHaveTextContent('Re-create lead');
+    // The name in its own direction; the hit line's id isolated in its sentence.
+    expect(within(hit).getByText('Dharti Galani')).toHaveAttribute('dir', 'auto');
+    expect(hit).toHaveTextContent(`Patient ${fsi('#3508')} · last visit`);
     await user.click(hit);
 
     expect(notifyMock.success).toHaveBeenCalledWith(

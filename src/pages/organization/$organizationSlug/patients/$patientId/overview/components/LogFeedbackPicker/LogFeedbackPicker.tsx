@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import {
   organizationCheckInCreate,
   organizationReviewCreate,
@@ -95,7 +96,7 @@ export function LogFeedbackPicker({
       open
       onClose={onClose}
       title={t(K.title)}
-      sub={t(K.sub, { name: patientName })}
+      sub={t(K.sub, { name: isolateText(patientName) })}
       // 560px as drawn (H:4406): rows of chips.
       content={{ fieldCount: 3 }}
       tone="sage"

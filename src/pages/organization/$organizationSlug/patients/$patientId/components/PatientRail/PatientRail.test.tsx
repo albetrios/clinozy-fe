@@ -8,6 +8,7 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PatientRail, type PatientRailProps } from './PatientRail.tsx';
@@ -64,6 +65,37 @@ describe('PatientRail', () => {
     expect(rail).toHaveTextContent('Aesthetic');
     expect(rail).toHaveTextContent('Regular');
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps the name, ID, numbers, date and address whole on a right-to-left page', async () => {
+    document.documentElement.dir = 'rtl';
+    try {
+      const since = { ...file.patient, createdAt: '2026-09-24T09:10:00.000Z' };
+      renderRail({ file: { ...file, patient: since } });
+      const rail = await screen.findByTestId('patient-rail');
+      const name = within(rail).getByText('Dharti Galani');
+      expect(name).toHaveAttribute('dir', 'auto');
+      expect(name).toHaveClass('[text-align:match-parent]');
+      expect(screen.getByTestId('patient-rail-copy-id')).toHaveAttribute('dir', 'ltr');
+      // The tenure's tooltip isolates its date inside the sentence.
+      expect(within(rail).getByText('9 days as patient').getAttribute('title')).toMatch(
+        /^Since \u2068[^\u2069]+2026\u2069$/,
+      );
+      // Every number and handle reads left to right, masked or not.
+      const reach = screen.getByRole('region', { name: 'Reach' });
+      for (const value of within(reach).getAllByText(/•••• \d{4}|@dharti/)) {
+        expect(value).toHaveAttribute('dir', 'auto');
+      }
+      const about = screen.getByRole('region', { name: 'About' });
+      expect(within(about).getByText('Gujarati')).toHaveAttribute('dir', 'auto');
+      expect(within(about).getByText('Umra, Velanja', { exact: false })).toHaveAttribute(
+        'dir',
+        'auto',
+      );
+      expect(rail).toHaveTextContent('Dharti Galani#3508·9 days as patient');
+    } finally {
+      document.documentElement.dir = '';
+    }
   });
 
   it('copies the patient ID and edits the contact', async () => {
@@ -140,7 +172,8 @@ describe('PatientRail', () => {
     // The date tile names the day; the line beside it reads the time alone.
     expect(upNext).toHaveTextContent(/11:00\sAM/);
     expect(upNext).not.toHaveTextContent('Today');
-    expect(upNext).toHaveTextContent('Hydrafacial · 45 min');
+    // The service is an isolated token in its line.
+    expect(upNext).toHaveTextContent(`${fsi('Hydrafacial')} · 45 min`);
     await user.click(screen.getByTestId('patient-rail-book'));
     expect(screen.getByTestId('patient-rail-book')).toHaveTextContent('Reschedule');
     expect(onBook).toHaveBeenLastCalledWith(next);
@@ -178,8 +211,8 @@ describe('PatientRail', () => {
       file: { ...file, credit: { amount: 50_000, reasons: ['Charged twice'] } },
     });
     const upNext = await screen.findByRole('region', { name: 'Up next' });
-    expect(upNext).toHaveTextContent('₹ •••• to return');
-    expect(upNext).toHaveTextContent('Charged twice');
+    expect(upNext).toHaveTextContent(`${fsi('₹ ••••')} to return`);
+    expect(upNext).toHaveTextContent(fsi('Charged twice'));
   });
 
   it('sums up their feedback and opens it', async () => {

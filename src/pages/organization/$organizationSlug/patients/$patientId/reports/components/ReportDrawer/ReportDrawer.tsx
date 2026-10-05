@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import {
   type DrawerStep,
@@ -122,7 +123,7 @@ export function ReportDrawer({
       open
       onClose={onClose}
       title={t(K.upload.title)}
-      sub={patientName}
+      sub={isolateText(patientName)}
       // 560px as drawn (H:4831): its zone and note are full rows that fit.
       content={{ fieldCount: 5 }}
       tone="sage"

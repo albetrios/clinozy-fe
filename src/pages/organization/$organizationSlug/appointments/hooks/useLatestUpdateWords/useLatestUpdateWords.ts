@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 
@@ -21,7 +22,8 @@ export interface LatestUpdateWords {
 /**
  * The "Latest update" pills' words — the Agenda's pills and tooltips, and the
  * appointment card's last-update line. "Moved from" names the old slot
- * clinic-local, as the toasts do.
+ * clinic-local, as the toasts do — its day and time isolated, so they stay
+ * whole on a right-to-left page.
  */
 export function useLatestUpdateWords(): LatestUpdateWords {
   const { t } = useTranslation(APPOINTMENTS_NS);
@@ -48,7 +50,7 @@ export function useLatestUpdateWords(): LatestUpdateWords {
         const instant = new Date(update.from);
         return t(
           KEYS.latestHints.moved,
-          slotLabel(clinicToday(instant), clinicClockTime(instant)),
+          isolateValues(slotLabel(clinicToday(instant), clinicClockTime(instant))),
         );
       }
       return t(KEYS.latestHints[update.kind]);

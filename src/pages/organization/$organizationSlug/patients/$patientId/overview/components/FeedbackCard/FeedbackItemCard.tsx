@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
@@ -69,7 +70,10 @@ function ActionLine({
   if (item.action) {
     const action = t(K.actionKinds[item.action.action]);
     const by = item.action.by?.name.split(' ')[0];
-    const text = by ? t(K.actionBy, { action, name: by }) : t(K.actionLogged, { action });
+    // The name isolated: a Latin first name keeps its place in a right-to-left pill.
+    const text = by
+      ? t(K.actionBy, { action, name: isolateText(by) })
+      : t(K.actionLogged, { action });
     return (
       <>
         <span

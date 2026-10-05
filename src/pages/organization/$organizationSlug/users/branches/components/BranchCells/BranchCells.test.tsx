@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {
@@ -60,8 +61,9 @@ describe('the Branches cells (users.md:85)', () => {
         t,
       ),
     ).toEqual({
-      value: 'doctor · Dr. Nisha Mavani',
-      sub: 'desk · Riya Shah · therapist · Ridhi Sohaliya',
+      // Each member's name isolated beside its role.
+      value: `doctor · ${fsi('Dr. Nisha Mavani')}`,
+      sub: `desk · ${fsi('Riya Shah')} · therapist · ${fsi('Ridhi Sohaliya')}`,
     });
     expect(branchDefaultsLines({ defaults: [] }, t)).toBeNull();
   });

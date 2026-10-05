@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -305,9 +306,10 @@ function useHeader(values: MedicineFormValues, pickers: MedicalPickers) {
   const maker = makerOf(pickers, values.manufacturerId);
   const composition = values.composition.trim();
   const makerName = maker?.label ?? '';
+  // The header's sub keeps the page's direction; its maker and composition are isolated.
   const sub = composition
-    ? t(K.sub, { maker: makerName, composition })
-    : t(K.subNoComposition, { maker: makerName });
+    ? t(K.sub, isolateValues({ maker: makerName, composition }))
+    : t(K.subNoComposition, { maker: isolateText(makerName) });
   const best = bestFormRate(values);
   const bestSupplier = best
     ? (pickers.suppliers().find((option) => option.key === best.supplierId)?.label ?? '')
@@ -319,10 +321,10 @@ function useHeader(values: MedicineFormValues, pickers: MedicalPickers) {
       ? [
           {
             id: 'best',
-            label: t(K.badges.best, {
-              rate: formatPaise(best.rate),
-              supplier: bestSupplier,
-            }),
+            label: t(
+              K.badges.best,
+              isolateValues({ rate: formatPaise(best.rate), supplier: bestSupplier }),
+            ),
             tone: 'sage' as const,
           },
         ]

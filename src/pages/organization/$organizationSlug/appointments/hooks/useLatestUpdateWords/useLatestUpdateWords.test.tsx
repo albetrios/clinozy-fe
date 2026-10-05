@@ -47,6 +47,7 @@ describe('useLatestUpdateWords (appointments.md:359–360)', () => {
         times: 1,
         from: clinicInstant('2026-10-02', '16:30'),
       }),
-    ).toMatch(/^Moved from .+ 4:30\sPM$/);
+      // The old slot's day and time are isolated tokens in the sentence.
+    ).toMatch(/^Moved from \u2068.+\u2069 \u20684:30\sPM\u2069$/);
   });
 });

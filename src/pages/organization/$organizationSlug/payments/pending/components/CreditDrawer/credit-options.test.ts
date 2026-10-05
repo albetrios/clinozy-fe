@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { PAYMENTS_NS } from '../../../payments.constants.ts';
 import { partyByName } from './credit-form.ts';
@@ -24,7 +25,8 @@ describe('the Who picker’s rows (payments.md:157)', () => {
     ).toMatchObject({
       key: 'patient:p1',
       label: 'Kiran Desai',
-      sub: 'Patient · #3441',
+      // The id isolated in the translated line (a right-to-left page keeps it whole).
+      sub: `Patient · ${fsi('#3441')}`,
       group: 'Patients',
       leading: { kind: 'avatar', initials: 'KD', patient: true },
     });
@@ -38,7 +40,7 @@ describe('the Who picker’s rows (payments.md:157)', () => {
       ),
     ).toMatchObject({
       key: 'name:viral-sheth',
-      sub: 'Contact · +91 98250 77120',
+      sub: `Contact · ${fsi('+91 98250 77120')}`,
       group: 'Contacts',
       leading: { kind: 'avatar', initials: 'VS' },
     });

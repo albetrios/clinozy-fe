@@ -55,7 +55,14 @@ describe('PatientFileBar', () => {
     expect(
       screen.getAllByRole('heading', { level: 1, name: 'Dharti Galani' }),
     ).toHaveLength(2);
-    expect(screen.getByText('#3508 · +91 ••••• •3212')).toBeInTheDocument();
+    // All data, so the line reads left to right on any page; the name in its own direction.
+    expect(screen.getByText('#3508 · +91 ••••• •3212')).toHaveAttribute('dir', 'ltr');
+    for (const heading of screen.getAllByRole('heading', {
+      level: 1,
+      name: 'Dharti Galani',
+    })) {
+      expect(heading).toHaveAttribute('dir', 'auto');
+    }
     const tablist = screen.getByRole('tablist', { name: 'Patient sections' });
     expect(
       within(tablist)

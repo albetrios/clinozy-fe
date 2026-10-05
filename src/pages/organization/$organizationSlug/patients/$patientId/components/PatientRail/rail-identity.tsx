@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
@@ -42,10 +43,12 @@ function useTenureLine(patient: PatientRecord): { line: string; since: string } 
   if (tenure.kind === 'days') line = t(K.daysAsPatient, { count: tenure.count });
   if (tenure.kind === 'months') line = t(K.monthsAsPatient, { count: tenure.count });
   const since = t(K.since, {
-    date: formatDate(
-      localDateOf(joined),
-      { day: 'numeric', month: 'short', year: 'numeric' },
-      { civilDay: true },
+    date: isolateText(
+      formatDate(
+        localDateOf(joined),
+        { day: 'numeric', month: 'short', year: 'numeric' },
+        { civilDay: true },
+      ),
     ),
   });
   return { line, since };
@@ -54,7 +57,8 @@ function useTenureLine(patient: PatientRecord): { line: string; since: string } 
 /**
  * The rail's fixed top (H:713–716): the 48px sage avatar with the "P" badge,
  * the name, "#3508" (copies), the tenure, the type and status pills — on the
- * sage tint — and "Edit contact".
+ * sage tint — and "Edit contact". The name reads in its own direction and the
+ * id left to right, so both stay whole on a right-to-left page.
  */
 export function RailIdentity({
   patient,
@@ -82,7 +86,10 @@ export function RailIdentity({
     <div className="bg-tone-sage-tint grid flex-none grid-cols-[3rem_minmax(0,1fr)_auto] items-start gap-3.5 border-b py-4.5 ps-4.5 pe-3">
       <PersonAvatar size="card" tone="sage" patient initials={personInitials(name)} />
       <div className="flex min-w-0 flex-col gap-1.5 pt-0.5">
-        <span className="text-base leading-[1.2] font-semibold tracking-[-0.015em] wrap-anywhere">
+        <span
+          dir="auto"
+          className="[text-align:match-parent] text-base leading-[1.2] font-semibold tracking-[-0.015em] wrap-anywhere"
+        >
           {name}
         </span>
         <span className="text-caption text-muted-foreground-strong flex flex-wrap items-center gap-1.5 tabular-nums">
@@ -92,6 +99,7 @@ export function RailIdentity({
                 type="button"
                 onClick={() => void copyId()}
                 aria-label={`${t(K.copyId)} · ${id}`}
+                dir="ltr"
                 data-testid="patient-rail-copy-id"
                 className="text-tone-sage-foreground font-semibold hover:underline"
               >

@@ -6,6 +6,7 @@ import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import type { TaskRow as TaskRowRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
 import { TaskRow, type TaskRowProps } from './TaskRow.tsx';
@@ -111,7 +112,15 @@ describe('TaskRow (tasks.md:24–38)', () => {
         />
       </Table>,
     );
-    expect(screen.getByText('Asha M. · was Riya')).toBeInTheDocument();
+    // Both names isolated: "Asha M." keeps its full stop at its end on a right-to-left page.
+    expect(
+      screen.getByText(`${fsi('Asha M.')} · was ${fsi('Riya')}`),
+    ).toBeInTheDocument();
+  });
+
+  it('reads a lone owner’s name in its own direction', () => {
+    renderRow(taskRowFixture({ owner: ASHA }));
+    expect(screen.getByText('Asha M.')).toHaveAttribute('dir', 'auto');
   });
 
   it('names a lead’s, a treatment’s and a chat-only person’s source in its ink', () => {

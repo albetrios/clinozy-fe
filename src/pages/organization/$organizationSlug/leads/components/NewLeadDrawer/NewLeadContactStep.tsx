@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { LeadContactHit } from '@/shared/api/clinic/leads-contracts.ts';
@@ -36,7 +37,8 @@ export interface NewLeadContactStepProps {
 /**
  * A hit's second line: "Patient #3508 · last visit 24 Sep" or "Lead #2365 ·
  * +91 98250 11241" — the last visit's day by the rooms' one time rule ("Today",
- * as the design words it, H:3318, H:5824; "Yesterday", "Mon", "24 Sep").
+ * as the design words it, H:3318, H:5824; "Yesterday", "Mon", "24 Sep"); the id
+ * and the phone isolated, so each stays whole on a right-to-left page.
  */
 function useHitLine() {
   const { t } = useTranslation(LEADS_NS);
@@ -44,13 +46,14 @@ function useHitLine() {
   return (hit: LeadContactHit) => {
     if (hit.kind === 'patient') {
       const id = displayId.patient(hit.seq);
-      if (!hit.lastVisit) return t(K.hits.patientNew, { id });
-      return t(K.hits.patient, { id, date: clock.day(hit.lastVisit) });
+      if (!hit.lastVisit) return t(K.hits.patientNew, isolateValues({ id }));
+      // The rule's day word keeps the page's direction; the id is isolated.
+      return t(K.hits.patient, { id: isolateText(id), date: clock.day(hit.lastVisit) });
     }
     const phone = formatClinicPhone(hit.phone);
     return hit.contactThread
-      ? t(K.hits.contact, { phone })
-      : t(K.hits.lead, { id: displayId.lead(hit.seq), phone });
+      ? t(K.hits.contact, isolateValues({ phone }))
+      : t(K.hits.lead, isolateValues({ id: displayId.lead(hit.seq), phone }));
   };
 }
 
@@ -139,7 +142,12 @@ export function NewLeadContactStep({
               patient={hit.kind === 'patient'}
             />
             <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-              <span className="text-body truncate font-medium">{hit.name}</span>
+              <span
+                dir="auto"
+                className="text-body truncate [text-align:match-parent] font-medium"
+              >
+                {hit.name}
+              </span>
               <span className="text-caption text-muted-foreground truncate">
                 {hitLine(hit)}
               </span>

@@ -1,6 +1,7 @@
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import type { PackageOffering } from '@/shared/api/clinic/patient-packages-api.ts';
 import {
   DrawerChips,
@@ -110,7 +111,7 @@ export function AddPackageDrawer({
       open
       onClose={onClose}
       title={t(K.title)}
-      sub={patientName}
+      sub={isolateText(patientName)}
       // 560px as drawn (H:4835): one wrapping row of chips.
       content={{ fieldCount: 1 }}
       tone="sage"

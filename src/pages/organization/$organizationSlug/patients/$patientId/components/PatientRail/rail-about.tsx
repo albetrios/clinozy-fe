@@ -51,6 +51,7 @@ function useGenderAge(file: PatientFile, today: string): string | null {
  * About (H:720): gender and age; the birth date with the birthday chip within
  * 45 days ("🎂 in 24 days" / "🎂 today", lav); the language (a backend
  * request); the address or "No address"; the consent chips (the person card's).
+ * The date, the language and the address read in their own direction.
  */
 export function RailAbout({ file }: { file: PatientFile }) {
   const { t } = useTranslation(PATIENT_RAIL_NS);
@@ -72,7 +73,7 @@ export function RailAbout({ file }: { file: PatientFile }) {
         {genderAge ? <AboutRow icon={<Users />}>{genderAge}</AboutRow> : null}
         {dateOfBirth ? (
           <AboutRow icon={<Calendar />}>
-            <span className="min-w-0 wrap-anywhere">
+            <span dir="auto" className="min-w-0 wrap-anywhere">
               {formatDate(
                 localDateOf(dateOfBirth),
                 { day: 'numeric', month: 'short', year: 'numeric' },
@@ -92,10 +93,14 @@ export function RailAbout({ file }: { file: PatientFile }) {
           </AboutRow>
         ) : null}
         {file.language ? (
-          <AboutRow icon={<MessageSquare />}>{file.language}</AboutRow>
+          <AboutRow icon={<MessageSquare />}>
+            <span dir="auto">{file.language}</span>
+          </AboutRow>
         ) : null}
         <AboutRow icon={<MapPin />}>
-          <span className="min-w-0 wrap-anywhere">{address ?? t(K.noAddress)}</span>
+          <span dir="auto" className="min-w-0 [text-align:match-parent] wrap-anywhere">
+            {address ?? t(K.noAddress)}
+          </span>
         </AboutRow>
         <AboutRow icon={<Shield />}>
           <ConsentChips
