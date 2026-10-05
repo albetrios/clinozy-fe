@@ -147,6 +147,8 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow, D18; H:758–768)', () => {
     );
     await waitFor(() => expect(step('rx')).toHaveAttribute('data-state', 'done'));
     expect(step('rx')).toHaveTextContent('Flubolt 400, Clonix-B Lotion');
+    // The Rx at the consult moves Today's card on (L-64: the stage follows the records).
+    expect((await fetchVisit(ref.visit(2866))).visit.stage).toBe('checkout');
 
     await user.click(screen.getByTestId('visit-flow-write-rx'));
     await waitFor(() =>
@@ -154,6 +156,31 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow, D18; H:758–768)', () => {
         patientFileUrl(SANA, '/prescriptions/create'),
       ),
     );
+    // The drawer keeps the flow open behind it and closes back to it.
+    expect(router.state.location.search).toEqual({ visit: 'open' });
+  });
+
+  it('opened from Today: its drawers carry the way back, and Pause returns to Today (L-64)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientFile(
+      patientFileUrl(DHRUV, '/timeline?visit=open&from=today'),
+      { role: 'owner' },
+    );
+    await user.click(await screen.findByTestId('visit-flow-write-rx'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        patientFileUrl(DHRUV, '/prescriptions/create'),
+      ),
+    );
+    expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
+    await router.navigate({
+      href: patientFileUrl(DHRUV, '/timeline?visit=open&from=today'),
+    });
+    await user.click(await screen.findByTestId('visit-flow-pause'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/today'),
+    );
+    expect((await fetchVisit(ref.visit(2865))).visit.stage).toBe('treatment');
   });
 
   it('bills the visit and collects what is due, for the front desk', async () => {

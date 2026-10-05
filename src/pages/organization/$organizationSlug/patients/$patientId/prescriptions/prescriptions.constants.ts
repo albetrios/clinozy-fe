@@ -133,6 +133,8 @@ export const RX_KEYS = {
     create: 'rx.save.create',
     edit: 'rx.save.edit',
     sell: 'rx.save.sell',
+    /** "Approve · print · send to pharmacy" — a new Rx written in the visit flow. */
+    visit: 'rx.save.visit',
     /** "2 medicines · Dr. Drashti". */
     summary: 'rx.save.summary',
     noMedicine: 'rx.save.noMedicine',

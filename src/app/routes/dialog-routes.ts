@@ -8,15 +8,12 @@
  * is the entry chunk — carried there, the manifests and a lazy import each cost
  * every first paint, for drawers most loads never open. Here they load the
  * first time a dialog route is entered, or hovered (`dialogRoute` in
- * `routeTree.tsx`, which awaits the manifest before the gate). The Visit
- * sheet is the one with a UI of its own — a full-screen layer over the room —
- * so its component stays a lazy chunk of its own, preloaded with this module.
- * The patient file's dialogs are not here: they inherit the file's gate and
+ * `routeTree.tsx`, which awaits the manifest before the gate). The patient
+ * file's dialogs are not here: they inherit the file's gate and
  * ride its own lazy module (`patient-id.sections.ts`).
  */
-import { lazyRouteComponent, type RouteComponent } from '@tanstack/react-router';
+import type { RouteComponent } from '@tanstack/react-router';
 
-import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
 import { Component as AppointmentRoute } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.route.tsx';
@@ -112,28 +109,13 @@ import { manifest as branchCreateManifest } from '@/pages/organization/$organiza
 import { Component as BranchCreateRoute } from '@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { Component as UserCreateRoute } from '@/pages/organization/$organizationSlug/users/create/create.route.tsx';
-import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
-
-import { localizedRoute } from './localized-route.ts';
 
 /** A dialog route's lazily loaded half: the manifest its gate and title read, and its component. */
 export interface DialogRoute {
   manifest: PageManifest;
-  /**
-   * Renders nothing of its own — or only its child dialog's outlet; the Visit
-   * sheet's is lazy itself, and `dialogRoute` preloads it.
-   */
+  /** Renders nothing of its own — or only its child dialog's outlet. */
   Component: RouteComponent;
 }
-
-/** The Visit sheet (L-49): Today's copy loads with its chunk, which its words live in. */
-const VisitSheet = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.today],
-    () => import('@/pages/organization/$organizationSlug/visits/visits.route.tsx'),
-  ),
-  'Component',
-);
 
 /** Every manifest-backed dialog route, by the name `dialogRoute(name)` in `routeTree.tsx` registers it under. */
 export const DIALOG_ROUTES = {
@@ -211,5 +193,4 @@ export const DIALOG_ROUTES = {
     Component: StockVendorCreateRoute,
   },
   stockVendorEdit: { manifest: stockVendorEditManifest, Component: StockVendorEditRoute },
-  visit: { manifest: visitManifest, Component: VisitSheet },
 } satisfies Record<string, DialogRoute>;

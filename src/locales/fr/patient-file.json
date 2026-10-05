@@ -389,6 +389,7 @@
       "create": "Enregistrer l’ordonnance",
       "edit": "Enregistrer les modifications",
       "sell": "Enregistrer et vendre",
+      "visit": "Valider · imprimer · envoyer à la pharmacie",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Ajoutez un médicament",
       "saved": "Ordonnance enregistrée",

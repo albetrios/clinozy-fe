@@ -1,4 +1,3 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
@@ -8,15 +7,10 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Prescription, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type { RxCatalog } from '@/shared/api/clinic/prescriptions-api.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {
   type DrawerStep,
   drawerStepSummary,
 } from '@/shared/components/DrawerSteps/index.ts';
-import {
-  PrescriptionPrint,
-  printDocument,
-} from '@/shared/components/PrintTemplate/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import {
@@ -25,8 +19,6 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { useRxSheetContext } from '@/shared/hooks/usePrescriptions/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 
 import { useStaffMember } from '../../../shared/components/PatientStaffPicker/index.ts';
 import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';
@@ -43,6 +35,7 @@ import {
 } from './rx-form.ts';
 import { RxMedicinesField } from './rx-medicines-field.tsx';
 import { RxNotesFields, RxPrescriptionFields } from './rx-steps.tsx';
+import { rxSaveLabelKey, rxVisitMode, useRxDone, useRxPrint } from './use-rx-done.tsx';
 import { useRxSave } from './use-rx-save.ts';
 
 const K = RX_KEYS;
@@ -160,6 +153,14 @@ export interface PrescriptionDrawerProps {
   today: string;
   /** A smart note's medicines (AMBER A-F5): a new prescription starts with a line each. */
   medicines?: readonly string[];
+  /**
+   * Written in the visit flow (`?visit=open`, the flow's "Write prescription"; L-64):
+   * a new Rx is tied to the open visit's booking — Today's pharmacy lane and
+   * Medical's "Prescriptions to fill" — its save reads "Approve · print · send
+   * to pharmacy", and the saved Rx prints on A4 before the drawer closes; the
+   * visit moves on (the server's rule, `advanceVisitAfter`).
+   */
+  visit?: { appointmentId: string | null };
   onClose: () => void;
 }
 
@@ -237,11 +238,10 @@ export function PrescriptionDrawer({
   canDelete,
   today,
   medicines: smartNoteMedicines = [],
+  visit,
   onClose,
 }: PrescriptionDrawerProps) {
   const { t } = useTranslation(RX_NS);
-  const navigate = useNavigate();
-  const { organizationSlug = '' } = useParams({ strict: false });
   const form = useForm<RxFormValues>({
     defaultValues: initialRxForm({
       prescription,
@@ -255,7 +255,6 @@ export function PrescriptionDrawer({
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('prescription');
   const [deleting, setDeleting] = useState(false);
-  const sheet = useRxSheetContext(patient.id, values.doctorId);
 
   const { person: doctor, shortName: doctorName } = useStaffMember(values.doctorId);
   const medicines = t(K.medicines, { count: namedRxLines(values.items).length });
@@ -269,48 +268,31 @@ export function PrescriptionDrawer({
     readOnly: !writable,
   });
 
+  const { approving, appointmentId } = rxVisitMode(visit, prescription);
+  const printRx = useRxPrint(patient.id, values.doctorId);
   const { saveState, save } = useRxSave({
     form,
     prescription,
     patientId: patient.id,
+    appointmentId,
     onStep: setStep,
-    onDone: (saved, sell) => {
-      notify.success(
-        prescription
-          ? t(K.save.savedNumber, { number: displayId.prescription(saved.seq) })
-          : t(K.save.saved),
-      );
-      if (!sell) {
-        onClose();
-        return;
-      }
-      // The sale keeps the prescriptions section behind it (`from`, §4).
-      void navigate(
-        clinicCommandNavigation('newSale', {
-          organizationSlug,
-          referrer: `patients/${patient.id}/prescriptions`,
-          search: { prescription: saved.id },
-        }),
-      );
-    },
+    onDone: useRxDone({
+      editing: prescription !== null,
+      approving,
+      patientId: patient.id,
+      print: printRx,
+      onClose,
+    }),
   });
 
   const print = () => {
-    if (!(prescription && sheet.data)) return;
+    if (!prescription) return;
     const input = rxInputOf(form.getValues(), {
       patientId: patient.id,
       appointmentId: prescription.appointmentId,
       followUpDate: prescription.followUpDate,
     });
-    void printDocument(
-      <PrescriptionPrint
-        prescription={{ ...prescription, ...input }}
-        patient={sheet.data.patient}
-        doctor={sheet.data.doctor}
-        organization={sheet.data.organization}
-        branch={sheet.data.branch}
-      />,
-    );
+    printRx({ ...prescription, ...input });
   };
 
   return (
@@ -342,7 +324,7 @@ export function PrescriptionDrawer({
           doctorName ? t(K.save.summary, { medicines, doctor: doctorName }) : medicines
         }
         readOnly={!writable}
-        saveLabel={t(prescription ? K.save.edit : K.save.create)}
+        saveLabel={t(rxSaveLabelKey(prescription !== null, approving))}
         onSave={() => void save(false)}
         saveState={saveState}
         saveAndAddLabel={t(K.save.sell)}

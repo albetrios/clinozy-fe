@@ -22,32 +22,13 @@ import {
   effectivePrice,
   invoiceLineRate,
 } from '@/shared/api/clinic/offerings-pricing.ts';
-import { receivePayment } from '@/shared/api/clinic/payments-api.ts';
 import {
-  createPrescription,
-  type PrescriptionInput,
-} from '@/shared/api/clinic/prescriptions-api.ts';
-import {
-  createTreatment,
-  deleteTreatment,
-  restoreTreatment,
-  type TreatmentInput,
-} from '@/shared/api/clinic/treatments-api.ts';
-import {
-  type ApproveVisitRxInput,
-  approveVisitRxInputSchema,
   canMoveVisit,
   type CompleteVisitInput,
   completeVisitInputSchema,
   type CreateVisitBillInput,
   createVisitBillInputSchema,
   NO_VISIT_CHECKS,
-  type ReceiveVisitPaymentInput,
-  receiveVisitPaymentInputSchema,
-  type RecordVisitSessionInput,
-  recordVisitSessionInputSchema,
-  type ReverseVisitSessionInput,
-  reverseVisitSessionInputSchema,
   type SetVisitChecksInput,
   setVisitChecksInputSchema,
   type SetVisitStageInput,
@@ -63,8 +44,8 @@ import {
   type VisitCompletion,
   type VisitDetail,
   type VisitPack,
-  type VisitReceipt,
   type VisitRecord,
+  type VisitRecordKind,
   type VisitStage,
 } from '@/shared/api/clinic/visits-contracts.ts';
 
@@ -77,9 +58,9 @@ import { clinicFixtures, onClinicFixturesReset } from './world.fixtures.ts';
  * `setVisitStage`, `completeVisit` … Undo of a check-in" — REPLACE_WITH_API).
  * A checked-in booking's visit moves through the stage machine
  * (`VISIT_STAGE_FLOW`); the first move starts its record, and so does "Start
- * visit" in the file. Each tab's write is one operation that writes its record
- * through the domain's own write (the Rx, the session, the invoice, the
- * receipt) and leaves the visit in the stage those records make it (`S:352`).
+ * visit" in the file. The records written at it — the Rx, the session, the
+ * invoice, the receipt, through each domain's own write — leave it in the
+ * stage they make it (`S:352`, `advanceVisitAfter`).
  * `visits-api.ts` loads this module on demand; when the API lands, it goes.
  */
 
@@ -366,7 +347,7 @@ function recordsOf({ patientId }: VisitRecord) {
   };
 }
 
-/** The patient as the sheet's header and History read them. */
+/** The patient as the visit reads them. */
 function visitPatientOf(
   patient: ReturnType<typeof recordsOf>['patient'],
 ): VisitDetail['patient'] {
@@ -430,7 +411,7 @@ function billOf(
   return { invoice: null, billLines, billDue: bill };
 }
 
-/** The visit as the Visit sheet and the file's flow read it (`getVisit`). */
+/** The visit as the file's flow reads it (`getVisit`). */
 async function detailOf(visit: VisitRecord): Promise<VisitDetail> {
   const booking = visit.appointmentId ? await getAppointment(visit.appointmentId) : null;
   const { patient, prescriptions, treatments } = recordsOf(visit);
@@ -603,167 +584,6 @@ export async function setVisitChecks(raw: SetVisitChecksInput): Promise<VisitRec
   return saveVisit(visit, { checks: { ...visit.checks, ...input.checks } });
 }
 
-/** Who signs an Rx written at a visit: its booking's doctor, else the patient's, else the first doctor. */
-function doctorOf(visit: VisitRecord, booking: AppointmentRow | null): string {
-  if (booking?.doctorId) return booking.doctorId;
-  const patient = clinicFixtures.patients.snapshot(
-    (row) => row.id === visit.patientId,
-  )[0];
-  if (patient?.doctorId) return patient.doctorId;
-  const doctor = clinicFixtures.staff.snapshot(
-    (user) => user.active && user.roles.includes('doctor'),
-  )[0];
-  if (!doctor) throw clinicHttpError(409, 'no_doctor', 'Add a doctor to the team first');
-  return doctor.id;
-}
-
-/**
- * Approve (`today.md:78–93`): `createPrescription` with the visit's booking
- * (`S:1641`) — the Rx joins Medical's "Prescriptions to fill" — and the consult
- * note on the visit; the visit moves to Treatment when a session is due, else
- * to Checkout (never back). One Rx per visit (409 after the first).
- */
-export async function approveVisitRx(
-  raw: ApproveVisitRxInput,
-): Promise<{ visit: VisitRecord; prescription: Prescription }> {
-  const input = validateClinicInput(approveVisitRxInputSchema, raw);
-  const visit = await visitOf(input.visitId);
-  refuseDone(visit);
-  const patientId = patientIdOf(visit);
-  const detail = await detailOf(visit);
-  if (detail.prescription) {
-    throw clinicHttpError(
-      409,
-      'already_approved',
-      'This visit’s prescription is already approved',
-    );
-  }
-  const rx: PrescriptionInput = {
-    patientId,
-    appointmentId: visit.appointmentId,
-    doctorId: doctorOf(visit, detail.booking),
-    date: clinicToday(),
-    items: input.items,
-    advice: input.note.plan || null,
-    labReport: null,
-    procedureToday: null,
-    followUpDate: null,
-  };
-  const prescription = await createPrescription(rx);
-  const saved = await saveVisit(visit, {
-    note: input.note,
-    prescriptionId: prescription.id,
-    stage: stageAfter(visit.stage, detail.sessionDue ? 'treatment' : 'checkout'),
-  });
-  return { visit: saved, prescription };
-}
-
-/** The session number today's session is: the package's next, else the last one's next. */
-function nextSessionNo(detail: VisitDetail): number {
-  if (detail.pack)
-    return Math.min(detail.pack.sessionsUsed + 1, detail.pack.sessionsTotal);
-  return (detail.lastTreatment?.sessionNo ?? 0) + 1;
-}
-
-/** What today's session is — its offering, name and template: the booking's, else the last session's. */
-function sessionKindOf({
-  booking,
-  lastTreatment,
-  pack,
-}: VisitDetail): Pick<TreatmentInput, 'offeringId' | 'name' | 'template'> {
-  return {
-    offeringId: offeringOfBooking(booking)?.id ?? lastTreatment?.offeringId ?? null,
-    name: lastTreatment?.name ?? booking?.serviceLabel ?? pack?.name ?? 'Treatment',
-    template: lastTreatment?.template ?? 'skin',
-  };
-}
-
-/** Who does today's session: the booking's team, else the last session's. */
-function sessionTeamOf({
-  booking,
-  lastTreatment,
-}: VisitDetail): Pick<TreatmentInput, 'doctorId' | 'therapistId'> {
-  return {
-    doctorId: booking?.doctorId ?? lastTreatment?.doctorId ?? null,
-    therapistId: booking?.therapistId ?? lastTreatment?.therapistId ?? null,
-  };
-}
-
-/**
- * Complete session (`today.md:95–108`): `createTreatment` with the package and
- * the session number (`S:1642`) — exactly one package session; its day-2
- * aftercare call follows from it (the task rules, `S:739`). The visit moves to
- * Checkout. One session per visit (409 after the first).
- */
-export async function recordVisitSession(
-  raw: RecordVisitSessionInput,
-): Promise<{ visit: VisitRecord; treatment: Treatment }> {
-  const input = validateClinicInput(recordVisitSessionInputSchema, raw);
-  const visit = await visitOf(input.visitId);
-  refuseDone(visit);
-  const patientId = patientIdOf(visit);
-  const detail = await detailOf(visit);
-  if (detail.treatment) {
-    throw clinicHttpError(409, 'already_recorded', 'Today’s session is already recorded');
-  }
-  const settings = Object.fromEntries(
-    Object.entries(input.params).filter(([, value]) => value.trim() !== ''),
-  );
-  const treatment = await createTreatment({
-    patientId,
-    appointmentId: visit.appointmentId,
-    ...sessionKindOf(detail),
-    ...sessionTeamOf(detail),
-    performedAt: new Date().toISOString(),
-    bodyParts: input.bodyParts,
-    sessionNo: nextSessionNo(detail),
-    params: { ...detail.lastTreatment?.params, ...settings },
-    remark: null,
-    aftercareCall: 'in_2_days',
-    packageId: detail.pack?.id ?? null,
-  });
-  const saved = await saveVisit(visit, {
-    treatmentId: treatment.id,
-    stage: stageAfter(visit.stage, 'checkout'),
-  });
-  return { visit: saved, treatment };
-}
-
-/**
- * Reverse with reason (`S:1546`): today's session soft-deleted with the reason
- * confirm's choice — its package session given back; the visit keeps its
- * stage. Answers the session, for the toast's Undo.
- */
-export async function reverseVisitSession(
-  raw: ReverseVisitSessionInput,
-): Promise<Treatment> {
-  const input = validateClinicInput(reverseVisitSessionInputSchema, raw);
-  const visit = await visitOf(input.visitId);
-  refuseDone(visit);
-  const detail = await detailOf(visit);
-  if (!detail.treatment) {
-    throw clinicHttpError(409, 'no_session', 'No session is recorded at this visit');
-  }
-  const removed = await deleteTreatment(
-    detail.treatment.id,
-    input.reason,
-    input.note || null,
-  );
-  await saveVisit(visit, { treatmentId: null });
-  return removed;
-}
-
-/** The Undo of a Reverse: the session back on the visit, its package session used again. */
-export async function restoreVisitSession(
-  visitId: string,
-  treatmentId: string,
-): Promise<Treatment> {
-  const visit = await visitOf(visitId);
-  const restored = await restoreTreatment(treatmentId);
-  await saveVisit(visit, { treatmentId: restored.id });
-  return restored;
-}
-
 /**
  * Create bill (`today.md:263`) and the flow's "Create invoice from visit":
  * `createInvoice` of the clinic type with the visit's lines (`S:1716`) — one
@@ -820,6 +640,35 @@ export async function createVisitBill(
 }
 
 /**
+ * Move the patient's open visit on after a record written at it (D18: the
+ * stage follows the records, `S:352` — what the Visit sheet's tabs did, now
+ * the file's own drawers and flow): the Rx to Treatment when a session is due,
+ * else to Checkout; the session to Checkout; a receipt at Checkout to the
+ * pharmacy while the visit's Rx is still to fill. Never back (`stageAfter`),
+ * never a visit that is done, and a record the visit doesn't hold moves
+ * nothing. The Rx, treatment and receipt writes call it after their own write.
+ */
+export async function advanceVisitAfter(
+  patientId: string,
+  kind: VisitRecordKind,
+): Promise<VisitRecord | null> {
+  const visit = await getOpenVisit(patientId);
+  if (!visit) return null;
+  const detail = await detailOf(visit);
+  let target: VisitStage | null = null;
+  if (kind === 'prescription' && detail.prescription) {
+    target = detail.sessionDue ? 'treatment' : 'checkout';
+  } else if (kind === 'treatment' && detail.treatment) {
+    target = 'checkout';
+  } else if (kind === 'payment' && visit.stage === 'checkout' && detail.rxToFill) {
+    target = 'pharmacy';
+  }
+  if (!target) return visit;
+  const stage = stageAfter(visit.stage, target);
+  return stage === visit.stage ? visit : saveVisit(visit, { stage });
+}
+
+/**
  * Close a visit (D18): the stage it ends in and, with a patient, its booking
  * completed — a completed booking needs a patient record (the status guard).
  */
@@ -831,62 +680,6 @@ async function closeVisit(visit: VisitRecord, stage: VisitStage): Promise<VisitR
     }
   }
   return saveVisit(visit, { stage });
-}
-
-/**
- * Receive (`today.md:110–121`): the amount in one mode, recorded as receipts
- * (`receivePayment`, `S:1708`) against the visit's bill first and then the
- * older dues, oldest first — never above what is owed (422). Once confirmed,
- * the visit goes to the pharmacy when its Rx is still to fill, else it is done;
- * either way its booking completes. A part payment leaves a due — the
- * invoices' payment-due task follows (server).
- */
-export async function receiveVisitPayment(
-  raw: ReceiveVisitPaymentInput,
-): Promise<VisitReceipt> {
-  const input = validateClinicInput(receiveVisitPaymentInputSchema, raw);
-  const visit = await visitOf(input.visitId);
-  refuseDone(visit);
-  const patientId = patientIdOf(visit);
-  const detail = await detailOf(visit);
-  if (!detail.invoice) {
-    throw clinicHttpError(409, 'not_billed', 'Create the bill first');
-  }
-  const payments = clinicFixtures.payments.snapshot();
-  const owed = [
-    detail.invoice,
-    ...clinicFixtures.invoices
-      .snapshot(
-        (invoice) => invoice.patientId === patientId && invoice.id !== detail.invoice?.id,
-      )
-      .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq),
-  ]
-    .map((invoice) => ({ invoice, due: invoiceBalance(invoice, payments).due }))
-    .filter((row) => row.due > 0);
-  const total = owed.reduce((sum, row) => sum + row.due, 0);
-  if (input.amount > total) {
-    const message = 'More than is owed';
-    throw clinicHttpError(422, 'validation', message, { amount: [message] });
-  }
-  let left = input.amount;
-  let firstSeq: number | null = null;
-  for (const { invoice, due } of owed) {
-    if (left <= 0) break;
-    const amount = Math.min(left, due);
-    const receipt = await receivePayment({
-      branchId: invoice.branchId,
-      patientId,
-      invoiceId: invoice.id,
-      splits: [{ mode: input.mode, amount }],
-      reference: null,
-      note: null,
-    });
-    firstSeq ??= receipt.seq;
-    left -= amount;
-  }
-  const stage: VisitStage = detail.rxToFill ? 'pharmacy' : 'done';
-  const closed = await closeVisit(visit, stageAfter(visit.stage, stage));
-  return { paymentSeq: firstSeq ?? 0, amount: input.amount, stage: closed.stage };
 }
 
 /**

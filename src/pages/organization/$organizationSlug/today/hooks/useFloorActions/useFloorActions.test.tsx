@@ -63,6 +63,11 @@ const LANES = groupTodayLanes(
       status: 'completed',
       prescription: { id: uuid(50), approvedAt: '2026-10-03T04:35:00.000Z', items: 3 },
     }),
+    floorRow({
+      id: uuid(6),
+      status: 'checked_in',
+      visit: { id: uuid(60), stage: 'checkout', stageAt: '2026-10-03T05:05:00.000Z' },
+    }),
   ],
   [enquiry()],
 );
@@ -121,7 +126,7 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     ).toBe('checked_in');
   });
 
-  it('opens a therapist’s session on its visit — and waits for a visit’s id', async () => {
+  it('opens a therapist’s session on the patient’s page, the visit flow open (L-64)', async () => {
     const { router } = await actionsFor('therapist');
     await waitFor(() =>
       expect(probe.actions?.actionOf(cardIn('treatment'))).toBeTypeOf('function'),
@@ -129,22 +134,63 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     act(() => probe.actions?.actionOf(cardIn('treatment'))?.());
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/visits/${uuid(30)}`,
+        `/organization/acme/patients/${uuid(2)}/timeline`,
       ),
     );
-    expect(router.state.location.search).toEqual({ tab: 'treatment' });
-    // The card is remembered, so its action takes focus back when the sheet closes.
+    expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
+    // The card is remembered, so its action takes focus back on the way back to Today.
     expect(takeVisitCard()).toBe(cardIn('treatment').id);
   });
 
-  it('does nothing for a visit the floor moved a moment ago (no id yet)', async () => {
-    const { router } = await actionsFor('doctor');
+  it('opens a checkout on the patient’s page for a member who takes payments', async () => {
+    const { router } = await actionsFor('front_desk');
     await waitFor(() =>
-      expect(probe.actions?.actionOf(cardIn('with_doctor'))).toBeTypeOf('function'),
+      expect(probe.actions?.actionOf(cardIn('checkout'))).toBeTypeOf('function'),
     );
-    act(() => probe.actions?.actionOf(cardIn('with_doctor'))?.());
-    expect(router.state.location.pathname).toBe(TODAY_PATH);
-    expect(takeVisitCard()).toBeNull();
+    expect(probe.actions?.actionOf(cardIn('treatment'))).toBeNull();
+    act(() => probe.actions?.actionOf(cardIn('checkout'))?.());
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `/organization/acme/patients/${uuid(2)}/timeline`,
+      ),
+    );
+    expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
+  });
+
+  it('offers no consult: With doctor has no action, even for a doctor (L-64)', async () => {
+    await actionsFor('doctor');
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('treatment'))).toBeTypeOf('function'),
+    );
+    expect(probe.actions?.actionOf(cardIn('with_doctor'))).toBeNull();
+  });
+
+  it('has no page to open for a booking with no patient record', async () => {
+    await actionsFor('admin');
+    const [card] = groupTodayLanes(
+      [
+        floorRow({
+          id: uuid(7),
+          status: 'checked_in',
+          patientId: null,
+          person: {
+            kind: 'lead',
+            name: 'Kabir',
+            phone: null,
+            patientId: null,
+            leadId: uuid(70),
+            seq: 1,
+          },
+          visit: { id: uuid(71), stage: 'checkout', stageAt: '2026-10-03T05:05:00.000Z' },
+        }),
+      ],
+      [],
+    ).checkout;
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('checkout'))).toBeTypeOf('function'),
+    );
+    if (!card) throw new Error('no checkout card');
+    expect(probe.actions?.actionOf(card)).toBeNull();
   });
 
   it('opens an enquiry’s lead, a patient’s file, or says there is no record', async () => {

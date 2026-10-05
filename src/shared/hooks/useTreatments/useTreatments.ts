@@ -12,6 +12,7 @@ import {
   treatmentQueryKeys,
   updateTreatment,
 } from '@/shared/api/clinic/treatments-api.ts';
+import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -60,7 +61,8 @@ export function useCreateTreatment(
 ) {
   return useAppMutation<Treatment, TreatmentInput>({
     mutationFn: createTreatment,
-    invalidateKeys: TREATMENT_WRITE_KEYS,
+    // Today's session at the patient's open visit moves it to Checkout.
+    invalidateKeys: [...TREATMENT_WRITE_KEYS, ...VISIT_WRITE_KEYS],
     ...options,
   });
 }

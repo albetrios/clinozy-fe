@@ -2,12 +2,14 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -101,6 +103,41 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
       'open',
     );
     expect(dhartiRx()).toHaveLength(1);
+  });
+
+  it('in the visit flow: approves, prints, sends to the pharmacy and goes back to the flow (L-64)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
+    resetClinicFixtures();
+    try {
+      // Sana Kapoor is with the doctor (visit 2866), opened from Today's card.
+      const SANA = patientRef('Sana Kapoor');
+      const user = userEvent.setup();
+      const { router } = renderPatientFile(
+        patientFileUrl(SANA, '/prescriptions/create?visit=open&from=today'),
+        { role: 'doctor' },
+      );
+      const drawer = await screen.findByTestId('rx-drawer');
+      const save = within(drawer).getByTestId('rx-drawer-save');
+      expect(save).toHaveTextContent('Approve · print · send to pharmacy');
+      await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
+      await user.click(save);
+      await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe(patientFileUrl(SANA, '/timeline')),
+      );
+      expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
+      const [written] = clinicFixtures.prescriptions
+        .snapshot((rx) => rx.patientId === SANA)
+        .sort((a, b) => b.seq - a.seq);
+      // Tied to the visit's booking: Today's pharmacy lane and Medical's to fill.
+      expect(written?.appointmentId).toBe(ref.appointment(2866));
+      const visit = await fetchVisit(ref.visit(2866));
+      expect(visit.visit.stage).toBe('checkout');
+      expect(visit.rxToFill).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('fills the hair fall kit and saves it — “Prescription saved”', async () => {

@@ -138,6 +138,7 @@ export async function fetchPrescription(id: string): Promise<Prescription> {
 /**
  * Write a prescription (`createPrescription`, `S:1641`; REPLACE_WITH_API):
  * a 422 names a broken rule ("Add a medicine"), a 404 an unknown patient.
+ * Written at the patient's open visit, it moves the visit on (`advanceVisitAfter`).
  */
 export async function createPrescription(
   input: PrescriptionInput,
@@ -146,7 +147,11 @@ export async function createPrescription(
   const fields = validateClinicInput(prescriptionInputSchema, input);
   await clinicFixtures.patients.get(fields.patientId);
   const items = await withStoreMedicines(clinicFixtures, fields.items);
-  return clinicFixtures.prescriptions.create({ ...fields, items });
+  const created = await clinicFixtures.prescriptions.create({ ...fields, items });
+  // Written at the patient's open visit, it moves the visit on (Today's card).
+  const { advanceVisitAfter } = await import('./visits-api.ts');
+  await advanceVisitAfter(created.patientId, 'prescription');
+  return created;
 }
 
 /** Save a prescription's changes (`updatePrescription`, `S:1641`; REPLACE_WITH_API). */

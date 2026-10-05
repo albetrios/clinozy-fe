@@ -9,7 +9,7 @@ const padded = (seq: number, width: number) => String(seq).padStart(width, '0');
 export const displayId = {
   /** Lists, pills and the file header: "#3508". */
   patient: (seq: number) => `#${seq}`,
-  /** The patient code on the Visit sheet and print: "PT-0412". */
+  /** The patient code on print: "PT-0412". */
   patientCode: (seq: number) => `PT-${padded(seq, 4)}`,
   lead: (seq: number) => `#${seq}`,
   appointment: (seq: number) => `#${seq}`,

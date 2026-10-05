@@ -29,18 +29,7 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
     });
   });
 
-  it('takes Today’s lane actions and Save & sell to the Visit sheet and the sale drawer (§6.2)', () => {
-    expect(
-      clinicCommandNavigation('visit', {
-        organizationSlug: 'acme',
-        recordId: PATIENT,
-        search: { tab: 'consult' },
-      }),
-    ).toEqual({
-      to: `${ORG}/visits/$visitId`,
-      params: { organizationSlug: 'acme', visitId: PATIENT },
-      search: { tab: 'consult' },
-    });
+  it('takes Today’s Dispense and Save & sell to the sale drawer (§6.2)', () => {
     expect(
       clinicCommandNavigation('newSale', {
         organizationSlug: 'acme',

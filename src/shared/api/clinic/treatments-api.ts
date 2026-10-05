@@ -153,6 +153,9 @@ export async function createTreatment(input: TreatmentInput): Promise<Treatment>
   await clinicFixtures.patients.get(fields.patientId);
   const saved = await clinicFixtures.treatments.create(fields);
   await countSession(clinicFixtures, saved.packageId, 1);
+  // Today's session at the patient's open visit moves it to Checkout.
+  const { advanceVisitAfter } = await import('./visits-api.ts');
+  await advanceVisitAfter(saved.patientId, 'treatment');
   return saved;
 }
 

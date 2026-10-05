@@ -22,23 +22,23 @@ export type TodayLaneTone = Extract<
   'lav' | 'sky' | 'butter' | 'blush' | 'sage' | 'mint'
 >;
 
-/** A lane's tone and its cards' action (`today.md:38–46`). */
+/** A lane's tone and its cards' action (`today.md:38–46`); null — no action. */
 export interface TodayLaneMeta {
   tone: TodayLaneTone;
-  action: TodayCardAction;
+  action: TodayCardAction | null;
 }
 
 /**
  * Each lane's tone and card action: Enquiries lav "Book" · Arriving sky
- * "Check in" · Waiting butter "Send in" · With doctor blush "Open consult" ·
- * Treatment sage "Open session" · Checkout butter "Checkout" · Pharmacy mint
- * "Dispense".
+ * "Check in" · Waiting butter "Send in" · With doctor blush, no action (the
+ * consult is the patient page's, L-64) · Treatment sage "Open session" ·
+ * Checkout butter "Checkout" · Pharmacy mint "Dispense".
  */
 export const TODAY_LANE_META: Readonly<Record<TodayLane, TodayLaneMeta>> = {
   enquiries: { tone: 'lav', action: 'book' },
   arriving: { tone: 'sky', action: 'checkIn' },
   waiting: { tone: 'butter', action: 'sendIn' },
-  with_doctor: { tone: 'blush', action: 'openConsult' },
+  with_doctor: { tone: 'blush', action: null },
   treatment: { tone: 'sage', action: 'openSession' },
   checkout: { tone: 'butter', action: 'checkout' },
   pharmacy: { tone: 'mint', action: 'dispense' },

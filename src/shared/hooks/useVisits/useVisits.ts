@@ -1,16 +1,11 @@
 import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
 import type { TodayFloorRow } from '@/shared/api/clinic/today-contracts.ts';
 import {
-  approveVisitRx,
   completeVisit,
   createVisitBill,
   fetchOpenVisit,
   fetchVisit,
   fetchVisitCatalog,
-  receiveVisitPayment,
-  recordVisitSession,
-  restoreVisitSession,
-  reverseVisitSession,
   setVisitChecks,
   setVisitStage,
   shareVisit,
@@ -33,10 +28,11 @@ import { INVOICE_WRITE_KEYS } from '@/shared/hooks/useInvoices/index.ts';
 
 /**
  * The Visit's reads and writes (D18): Today's stage moves and their Undo, and
- * what the Visit sheet and the patient file's flow write — the safety checks,
- * the Rx, the session, the bill, the payment, the share and the end of the
- * visit. Writes toast only their errors; the screens toast success themselves
- * with their own words.
+ * what the patient file's flow writes on the visit itself — the safety checks,
+ * the bill, the share and the end of the visit (the Rx, the session and the
+ * payment are the patient's own records; their writes move the visit on).
+ * Writes toast only their errors; the screens toast success themselves with
+ * their own words.
  */
 
 const isFloorRow = (value: unknown): value is TodayFloorRow =>
@@ -88,18 +84,18 @@ export function useUndoVisitChange() {
   });
 }
 
-// ── The Visit sheet and the file's flow ──
+// ── The file's flow ──
 
 /**
- * What a tab's record write may have changed beyond the visit: the money reads,
+ * What a visit's record write may have changed beyond the visit: the money reads,
  * the patient's records and dues, the invoices, the plan, the floor, the tasks
  * (an aftercare call, a payment due) and Medical's "Prescriptions to fill".
  */
 const RECORD_WRITE_KEYS = [visitQueryKeys.all, ...INVOICE_WRITE_KEYS];
 
 /**
- * One visit with what its tabs read (`getVisit`); idle without an id. A 404
- * raises no toast here — the sheet's route reports "Visit not found".
+ * One visit with the records written at it (`getVisit`); idle without an id.
+ * A 404 raises no toast here — the caller decides.
  */
 export function useVisitDetail(visitId: string | null) {
   return useAppQuery({
@@ -175,59 +171,23 @@ export function useSetVisitChecks() {
 /** How a record write reports a failure. */
 export interface VisitWriteOptions {
   /**
-   * Toast the mapped error (default false: the Visit sheet shows a failure in
-   * place — "Not saved · your changes are kept" — and toasts it with Retry
-   * itself; the file's flow, which has no such row, passes true).
+   * Toast the mapped error (default false: the caller shows the failure in
+   * place; the file's flow, which has no such row, passes true).
    */
   notifyOnError?: boolean;
 }
 
 /**
- * The tabs' record writes. Not optimistic — each shows as done only once the
+ * The visit's record writes. Not optimistic — each shows as done only once the
  * server confirms (`today.md:121`), and each is single-flight (a second press
  * joins the first; the fetch client's idempotency key covers a retry).
  */
 const recordWrite = ({ notifyOnError = false }: VisitWriteOptions) =>
   ({ invalidateKeys: RECORD_WRITE_KEYS, notifyOnError }) as const;
 
-/** Approve the Rx and keep the consult note. */
-export function useApproveVisitRx(options: VisitWriteOptions = {}) {
-  return useAppMutation({ mutationFn: approveVisitRx, ...recordWrite(options) });
-}
-
-/** Record today's session. */
-export function useRecordVisitSession(options: VisitWriteOptions = {}) {
-  return useAppMutation({ mutationFn: recordVisitSession, ...recordWrite(options) });
-}
-
-/**
- * Reverse today's session with a reason — its failure toasts (the reason
- * confirm shows only a 422 on the reason or the note in place).
- */
-export function useReverseVisitSession() {
-  return useAppMutation({
-    mutationFn: reverseVisitSession,
-    ...recordWrite({ notifyOnError: true }),
-  });
-}
-
-/** The Undo of a Reverse — silent unless it fails. */
-export function useRestoreVisitSession() {
-  return useAppMutation({
-    mutationFn: ({ visitId, treatmentId }: { visitId: string; treatmentId: string }) =>
-      restoreVisitSession(visitId, treatmentId),
-    invalidateKeys: RECORD_WRITE_KEYS,
-  });
-}
-
 /** Create the visit's bill. */
 export function useCreateVisitBill(options: VisitWriteOptions = {}) {
   return useAppMutation({ mutationFn: createVisitBill, ...recordWrite(options) });
-}
-
-/** Receive a payment at checkout. */
-export function useReceiveVisitPayment(options: VisitWriteOptions = {}) {
-  return useAppMutation({ mutationFn: receiveVisitPayment, ...recordWrite(options) });
 }
 
 /** Complete the visit and its booking. */
@@ -235,7 +195,7 @@ export function useCompleteVisit(options: VisitWriteOptions = {}) {
   return useAppMutation({ mutationFn: completeVisit, ...recordWrite(options) });
 }
 
-/** Send the Rx, invoice and photos on WhatsApp — its failure toasts (no tab row shows it). */
+/** Send the Rx, invoice and photos on WhatsApp — its failure toasts (no row shows it). */
 export function useShareVisit() {
   return useAppMutation({
     mutationFn: shareVisit,

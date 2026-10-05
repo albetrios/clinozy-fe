@@ -248,6 +248,9 @@
       "other": "기타"
     }
   },
+  "visits": {
+    "record": "방문"
+  },
   "patientDelete": {
     "title": "이 환자를 삭제할까요?",
     "titleRecord": "이 기록을 삭제할까요?",

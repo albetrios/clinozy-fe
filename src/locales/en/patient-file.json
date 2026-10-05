@@ -375,6 +375,7 @@
       "create": "Save prescription",
       "edit": "Save changes",
       "sell": "Save & sell",
+      "visit": "Approve · print · send to pharmacy",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Add a medicine",
       "saved": "Prescription saved",

@@ -316,6 +316,10 @@ export const CLINIC_KEYS = {
       other: 'patients.referralSources.other',
     },
   },
+  /** The D18 Visit as a record — "Visit not found" for a link to one that is gone. */
+  visits: {
+    record: 'visits.record',
+  },
   /**
    * The offerings domain, shared by the Offerings room, the Invoice drawer and
    * the booking drawer: the stored enums' labels (`S:1330, 1349`; the derived

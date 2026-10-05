@@ -315,7 +315,7 @@ const TREATMENT_ROWS: readonly TreatmentRow[] = [
     visit: 2790,
   },
   // Today's treatment card is Dhruv's laser session (`CARDS` c9, H:3455): the
-  // Visit sheet's settings table compares today with his last session
+  // visit flow's "Repeat" takes his last session's settings
   // (`today.md:99–101`), from his LHR package (`PACKAGE_ROWS` key 4).
   {
     key: 506,

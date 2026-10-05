@@ -133,7 +133,7 @@ function VisitCard({
           ))}
         </span>
       ) : null}
-      {action ? (
+      {action && meta.action ? (
         <button
           type="button"
           data-testid={TODAY_TEST_IDS.cardAction}
@@ -175,7 +175,7 @@ function VisitCardSkeleton() {
 }
 
 /**
- * Focus back on the card whose action opened the Visit sheet (KICKOFF §6.13,
+ * Focus back on the card whose action opened the patient's visit flow (KICKOFF §6.6,
  * §7.2) once the panel shows its cards — its action, else its name; nothing
  * when the card has left this lane.
  */

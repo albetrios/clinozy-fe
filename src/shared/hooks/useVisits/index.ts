@@ -1,12 +1,7 @@
 export {
-  useApproveVisitRx,
   useCompleteVisit,
   useCreateVisitBill,
   useOpenVisit,
-  useReceiveVisitPayment,
-  useRecordVisitSession,
-  useRestoreVisitSession,
-  useReverseVisitSession,
   useSetVisitChecks,
   useSetVisitStage,
   useShareVisit,

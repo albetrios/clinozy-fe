@@ -12,6 +12,7 @@ import {
   restorePrescription,
   updatePrescription,
 } from '@/shared/api/clinic/prescriptions-api.ts';
+import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -63,13 +64,17 @@ export function useRxSheetContext(patientId: string, doctorId: string | null) {
   });
 }
 
-/** Write a prescription; the drawer raises "Prescription saved". */
+/**
+ * Write a prescription; the drawer raises "Prescription saved". Written at
+ * the patient's open visit, it moves the visit on — the visits and Today's
+ * floor are read again.
+ */
 export function useCreatePrescription(
   options: CrudMutationOptions<Prescription, PrescriptionInput> = {},
 ) {
   return useAppMutation<Prescription, PrescriptionInput>({
     mutationFn: createPrescription,
-    invalidateKeys: RX_WRITE_KEYS,
+    invalidateKeys: [...RX_WRITE_KEYS, ...VISIT_WRITE_KEYS],
     ...options,
   });
 }

@@ -98,7 +98,7 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
     expect(act).toHaveBeenCalledTimes(1);
   });
 
-  it('gives focus back to the card whose action opened the Visit sheet (§7.2)', async () => {
+  it('gives focus back to the card whose action opened the visit flow (§7.2)', async () => {
     rememberVisitCard(uuid(1));
     const { unmount } = renderPanel();
     await vi.waitFor(() => expect(screen.getByTestId('today-card-action')).toHaveFocus());

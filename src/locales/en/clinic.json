@@ -248,6 +248,9 @@
       "other": "Other"
     }
   },
+  "visits": {
+    "record": "Visit"
+  },
   "patientDelete": {
     "title": "Delete this patient?",
     "titleRecord": "Delete this record?",

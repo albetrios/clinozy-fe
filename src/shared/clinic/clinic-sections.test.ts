@@ -18,7 +18,6 @@ describe('CLINIC_SECTION_ORDER', () => {
 describe('clinicSectionForPath', () => {
   it.each([
     ['/organization/acme/today', 'today'],
-    ['/organization/acme/visits/0b6d…', 'today'],
     ['/organization/acme/leads/9f1c/edit', 'leads'],
     ['/organization/acme/patients/1/timeline', 'patients'],
     ['/organization/acme/stock/items?category=x', 'stock'],

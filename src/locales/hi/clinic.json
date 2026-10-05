@@ -248,6 +248,9 @@
       "other": "अन्य"
     }
   },
+  "visits": {
+    "record": "विज़िट"
+  },
   "patientDelete": {
     "title": "इस मरीज़ को हटाएँ?",
     "titleRecord": "इस रिकॉर्ड को हटाएँ?",

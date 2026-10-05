@@ -42,8 +42,10 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   the person's record) and its navigation with the room kept behind
   (`taskTargetNavigation`, `from=tasks` / `from=today`).
 - `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
-- `visit-access.ts` — who can use each Visit sheet tab (`canUseVisitTab`,
-  KICKOFF §6.13): Today hides a lane action whose tab the member can't use.
+- `visit-redirect.ts` — where a visit's work happens: the patient's own page
+  with the visit flow open (`patientVisitTarget`: `timeline?visit=open&from=today`,
+  Today's "Open session" and "Checkout") and an old Visit sheet link's redirect
+  (`visitRedirect`: its patient's page, else Today with "Visit not found"; L-64).
 - `clinic-phone.ts` — a typed or pasted mobile as the contract stores it
   (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
   shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
@@ -52,8 +54,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   (`clinicPhoneDigits`) and shown (`formatClinicPhoneDigits`, `98250 44120`)
   behind the "+91" box (`CLINIC_PHONE_PREFIX`); apart from `clinic-phone.ts`,
   which the URL readers bring onto the entry chunk.
-- `clinic-sections.ts` — the sections in nav order, the section a URL is in
-  (`/visits/…` belongs to Today), and where a room the access in force can't
+- `clinic-sections.ts` — the sections in nav order, the section a URL is in,
+  and where a room the access in force can't
   view sends the member (first viewable after Today; Q-U11) — the org layout's
   `useRoomLanding` applies it on every access change, View-as and its Exit too.
 - `clinic-referrer.ts` — the `from` allow-list a shared drawer route keeps its
@@ -67,7 +69,7 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `clinic-command-targets.ts` — where ⌘K's clinic rows go (`/leads/create`,
   `/appointments/create`, `/patients/create`, `/payments/receive`, `/tasks`,
   `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) — and
-  Today's lane actions (`/visits/$visitId`, `/medical/sales/create`) — and
+  Today's "Dispense" (`/medical/sales/create`) — and
   `clinicCommandNavigation`, which fills in the record param and `from`. Several
   of those routes land with later ledger rows; the table names which.
 - `appointment-display.ts` — how every booking surface paints a booking: a

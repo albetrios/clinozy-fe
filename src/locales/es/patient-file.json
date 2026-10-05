@@ -389,6 +389,7 @@
       "create": "Guardar receta",
       "edit": "Guardar cambios",
       "sell": "Guardar y vender",
+      "visit": "Aprobar · imprimir · enviar a farmacia",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Añade un medicamento",
       "saved": "Receta guardada",

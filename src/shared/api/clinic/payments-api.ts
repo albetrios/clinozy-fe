@@ -348,7 +348,8 @@ export function newLedgerEntry(
  * Receive payment (`receivePayment`, `S:1708`; REPLACE_WITH_API): a receipt
  * from a patient — required — against one of their invoices or none. An amount
  * above that invoice's due is a 422; a closed day a 409. The invoice's due
- * follows from the receipts (`S:622`).
+ * follows from the receipts (`S:622`); the patient's open visit follows its
+ * Checkout receipt (`advanceVisitAfter`).
  */
 export async function receivePayment(input: ReceivePaymentInput): Promise<LedgerRow> {
   const { clinicFixtures } = await fixtureWorld();
@@ -383,6 +384,9 @@ export async function receivePayment(input: ReceivePaymentInput): Promise<Ledger
       note: fields.note || null,
     }),
   );
+  // Collected at the patient's open visit, it sends an Rx still to fill to the pharmacy.
+  const { advanceVisitAfter } = await import('./visits-api.ts');
+  await advanceVisitAfter(fields.patientId, 'payment');
   return toLedgerRow(payment, await ledgerContext());
 }
 

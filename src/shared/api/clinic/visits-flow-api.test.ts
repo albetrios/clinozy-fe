@@ -7,17 +7,15 @@ import type { PrescriptionItem } from './clinic-schema.ts';
 import { clinicInstant } from './clinic-time.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import { receivePayment } from './payments-api.ts';
+import { createPrescription } from './prescriptions-api.ts';
+import { createTreatment } from './treatments-api.ts';
 import {
-  approveVisitRx,
   completeVisit,
   createVisitBill,
   fetchOpenVisit,
   fetchVisit,
   fetchVisitCatalog,
-  receiveVisitPayment,
-  recordVisitSession,
-  restoreVisitSession,
-  reverseVisitSession,
   setVisitChecks,
   shareVisit,
   startVisit,
@@ -53,13 +51,6 @@ const line = (medicineName: string): PrescriptionItem => ({
   qty: 1,
   remarks: null,
 });
-
-const NOTE = {
-  complaint: 'Review of dark patches',
-  findings: 'Patches lighter',
-  diagnoses: ['Melasma'],
-  plan: 'Continue laser',
-};
 
 const visitOf = (seq: number) => ref.visit(seq);
 const appointmentOf = (seq: number) => ref.appointment(seq);
@@ -176,133 +167,112 @@ describe('startVisit and the open visit', () => {
   });
 });
 
-describe('approveVisitRx (Consult & Rx)', () => {
-  it('writes the Rx on the booking, keeps the note and moves a consult on to Checkout', async () => {
-    const { visit, prescription } = await approveVisitRx({
-      visitId: visitOf(2866),
-      note: NOTE,
-      items: [line('Tretinoin 0.025% cream 20 g')],
-      language: 'en',
-    });
-    expect(prescription).toMatchObject({
-      appointmentId: appointmentOf(2866),
-      date: TODAY,
-    });
-    expect(visit).toMatchObject({
-      stage: 'checkout',
-      note: NOTE,
-      prescriptionId: prescription.id,
-    });
+/** An Rx written at a visit — through the patient's own write, as the file's drawer does. */
+async function prescribeAt(seq: number, name = 'Tretinoin 0.025% cream 20 g') {
+  const detail = await fetchVisit(visitOf(seq));
+  const doctor = clinicFixtures.staff.snapshot(
+    (user) => user.active && user.roles.includes('doctor'),
+  )[0];
+  return createPrescription({
+    patientId: detail.person.patientId ?? '',
+    appointmentId: appointmentOf(seq),
+    doctorId: detail.booking?.doctorId ?? doctor?.id ?? '',
+    date: TODAY,
+    items: [line(name)],
+    advice: null,
+    labReport: null,
+    procedureToday: null,
+    followUpDate: null,
+  });
+}
+
+/** Today's session at a visit — the package's next — as the Treatment drawer writes it. */
+async function sessionAt(seq: number) {
+  const before = await fetchVisit(visitOf(seq));
+  return createTreatment({
+    patientId: before.person.patientId ?? '',
+    appointmentId: appointmentOf(seq),
+    offeringId: before.lastTreatment?.offeringId ?? null,
+    name: before.lastTreatment?.name ?? 'Treatment',
+    template: 'skin',
+    performedAt: new Date().toISOString(),
+    doctorId: null,
+    therapistId: null,
+    bodyParts: [],
+    sessionNo: (before.pack?.sessionsUsed ?? 0) + 1,
+    params: {},
+    remark: null,
+    aftercareCall: 'in_2_days',
+    packageId: before.pack?.id ?? null,
+  });
+}
+
+const stageOf = async (seq: number) => (await fetchVisit(visitOf(seq))).visit.stage;
+
+describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
+  it('an Rx at the consult moves it to Checkout, and it is still to fill', async () => {
+    expect(await stageOf(2866)).toBe('with_doctor');
+    const prescription = await prescribeAt(2866);
+    expect(prescription.appointmentId).toBe(appointmentOf(2866));
+    expect(await stageOf(2866)).toBe('checkout');
     expect((await fetchVisit(visitOf(2866))).rxToFill).toBe(true);
   });
 
-  it('moves a visit with a session due on to Treatment', async () => {
-    const { visit } = await approveVisitRx({
-      visitId: visitOf(2865),
-      note: NOTE,
-      items: [line('Sunscreen SPF 50')],
-      language: 'en',
-    });
-    expect(visit.stage).toBe('treatment');
+  it('an Rx never moves a visit back — a visit with a session due stays in Treatment', async () => {
+    expect(await stageOf(2865)).toBe('treatment');
+    await prescribeAt(2865, 'Sunscreen SPF 50');
+    expect(await stageOf(2865)).toBe('treatment');
   });
 
-  it('approves once per visit, and never for a visit already completed', async () => {
-    const input = {
-      visitId: visitOf(2866),
-      note: NOTE,
-      items: [line('A')],
-      language: 'en' as const,
-    };
-    await approveVisitRx(input);
-    expect(await failureOf(approveVisitRx(input))).toMatchObject({
-      status: 409,
-      code: 'already_approved',
-    });
-    await completeVisit({ visitId: visitOf(2866) });
-    expect(await failureOf(approveVisitRx(input))).toMatchObject({
-      status: 409,
-      code: 'visit_done',
-    });
+  it('today’s session moves the visit to Checkout and uses the package session', async () => {
+    await sessionAt(2865);
+    const after = await fetchVisit(visitOf(2865));
+    expect(after.visit.stage).toBe('checkout');
+    expect(after.treatment).not.toBeNull();
+    expect(after.pack?.sessionsUsed).toBe(4);
   });
 
-  it('refuses a visit with no patient record', async () => {
-    const lead = await clinicFixtures.visits.create({
-      appointmentId: null,
-      patientId: null,
-      leadId: ref.lead(2385),
-      stage: 'with_doctor',
-      stageAt: new Date().toISOString(),
-      checks: { consent: false, photos: false, allergies: false },
+  it('a receipt at Checkout sends a visit with an Rx to fill to the pharmacy', async () => {
+    await prescribeAt(2866);
+    const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
+    const due = invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due;
+    await receivePayment({
+      branchId: invoice.branchId,
+      patientId: await patientOfVisit(2866),
+      invoiceId: invoice.id,
+      splits: [{ mode: 'cash', amount: Math.floor(due / 2) }],
+      reference: null,
       note: null,
-      prescriptionId: null,
-      treatmentId: null,
-      invoiceId: null,
-      sharedAt: null,
     });
-    expect(
-      await failureOf(
-        approveVisitRx({
-          visitId: lead.id,
-          note: NOTE,
-          items: [line('A')],
-          language: 'en',
-        }),
-      ),
-    ).toMatchObject({ status: 409, code: 'needs_patient' });
+    expect(await stageOf(2866)).toBe('pharmacy');
+  });
+
+  it('a receipt at Checkout with nothing to fill leaves the visit for “Complete visit”', async () => {
+    const invoice = await clinicFixtures.invoices.get(ref.invoice(791));
+    await receivePayment({
+      branchId: invoice.branchId,
+      patientId: await patientOfVisit(2864),
+      invoiceId: invoice.id,
+      splits: [{ mode: 'upi', amount: 371_700 }],
+      reference: null,
+      note: null,
+    });
+    expect(await stageOf(2864)).toBe('checkout');
+    await completeVisit({ visitId: visitOf(2864) });
+    expect(await stageOf(2864)).toBe('done');
+    expect((await clinicFixtures.appointments.get(appointmentOf(2864))).status).toBe(
+      'completed',
+    );
+  });
+
+  it('moves nothing for a visit already completed', async () => {
+    await completeVisit({ visitId: visitOf(2866) });
+    await prescribeAt(2866);
+    expect(await stageOf(2866)).toBe('done');
   });
 });
 
-describe('recordVisitSession and its reverse (Treatment)', () => {
-  it('records the package’s next session once and moves the visit to Checkout', async () => {
-    const { visit, treatment } = await recordVisitSession({
-      visitId: visitOf(2865),
-      params: { power: '20 J/cm²', machine: 'GentleMax' },
-      bodyParts: ['legs'],
-    });
-    expect(treatment).toMatchObject({
-      sessionNo: 4,
-      aftercareCall: 'in_2_days',
-      bodyParts: ['legs'],
-      appointmentId: appointmentOf(2865),
-    });
-    expect(treatment.params).toMatchObject({ power: '20 J/cm²', skinType: 'Type IV' });
-    expect(visit.stage).toBe('checkout');
-    const detail = await fetchVisit(visitOf(2865));
-    expect(detail.pack?.sessionsUsed).toBe(4);
-    expect(detail.treatment?.id).toBe(treatment.id);
-    expect(
-      await failureOf(
-        recordVisitSession({ visitId: visitOf(2865), params: {}, bodyParts: [] }),
-      ),
-    ).toMatchObject({ status: 409, code: 'already_recorded' });
-  });
-
-  it('reverses the session with a reason — the package session back — and restores it', async () => {
-    const { treatment } = await recordVisitSession({
-      visitId: visitOf(2865),
-      params: {},
-      bodyParts: [],
-    });
-    await reverseVisitSession({ visitId: visitOf(2865), reason: 'mistake', note: null });
-    let detail = await fetchVisit(visitOf(2865));
-    expect(detail.treatment).toBeNull();
-    expect(detail.pack?.sessionsUsed).toBe(3);
-    await restoreVisitSession(visitOf(2865), treatment.id);
-    detail = await fetchVisit(visitOf(2865));
-    expect(detail.treatment?.id).toBe(treatment.id);
-    expect(detail.pack?.sessionsUsed).toBe(4);
-  });
-
-  it('has nothing to reverse before a session is recorded', async () => {
-    expect(
-      await failureOf(
-        reverseVisitSession({ visitId: visitOf(2865), reason: 'mistake', note: null }),
-      ),
-    ).toMatchObject({ status: 409, code: 'no_session' });
-  });
-});
-
-describe('createVisitBill and receiveVisitPayment (Checkout)', () => {
+describe('createVisitBill (the flow’s “Create invoice from visit”)', () => {
   it('bills the visit’s lines once', async () => {
     const { visit, invoice } = await createVisitBill({ visitId: visitOf(2866) });
     expect(invoice).toMatchObject({ type: 'clinic', remark: 'From today’s visit' });
@@ -314,67 +284,19 @@ describe('createVisitBill and receiveVisitPayment (Checkout)', () => {
     });
   });
 
-  it('refuses to bill a visit with nothing on it, and to receive before the bill', async () => {
+  it('refuses to bill a visit with nothing on it', async () => {
     const varun = clinicFixtures.patients.snapshot((row) => row.firstName === 'Varun')[0];
     const visit = await startVisit({ patientId: varun?.id ?? '' });
     expect(await failureOf(createVisitBill({ visitId: visit.id }))).toMatchObject({
       status: 422,
       detail: 'Nothing to bill',
     });
-    expect(
-      await failureOf(
-        receiveVisitPayment({ visitId: visit.id, amount: 100, mode: 'upi' }),
-      ),
-    ).toMatchObject({ status: 409, code: 'not_billed' });
-  });
-
-  it('receives the bill in full and the visit completes — off the floor', async () => {
-    const receipt = await receiveVisitPayment({
-      visitId: visitOf(2864),
-      amount: 371_700,
-      mode: 'upi',
-    });
-    expect(receipt).toMatchObject({ amount: 371_700, stage: 'done' });
-    const invoice = await clinicFixtures.invoices.get(ref.invoice(791));
-    expect(invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due).toBe(0);
-    expect((await clinicFixtures.appointments.get(appointmentOf(2864))).status).toBe(
-      'completed',
-    );
-  });
-
-  it('sends a visit with an Rx to fill on to the pharmacy, and leaves a part payment due', async () => {
-    await approveVisitRx({
-      visitId: visitOf(2866),
-      note: NOTE,
-      items: [line('A')],
-      language: 'en',
-    });
-    const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
-    const due = invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due;
-    const receipt = await receiveVisitPayment({
-      visitId: visitOf(2866),
-      amount: Math.floor(due / 2),
-      mode: 'cash',
-    });
-    expect(receipt.stage).toBe('pharmacy');
-    const after = await clinicFixtures.invoices.get(invoice.id);
-    expect(invoiceBalance(after, clinicFixtures.payments.snapshot()).due).toBe(
-      due - Math.floor(due / 2),
-    );
-  });
-
-  it('refuses more than is owed', async () => {
-    expect(
-      await failureOf(
-        receiveVisitPayment({ visitId: visitOf(2864), amount: 9_999_900, mode: 'card' }),
-      ),
-    ).toMatchObject({ status: 422, detail: 'More than is owed' });
   });
 });
 
 describe('completeVisit, shareVisit and the catalog', () => {
   it('completes the visit and its booking, and names the package session it used', async () => {
-    await recordVisitSession({ visitId: visitOf(2865), params: {}, bodyParts: [] });
+    await sessionAt(2865);
     const done = await completeVisit({ visitId: visitOf(2865) });
     expect(done).toMatchObject({ packageSessionUsed: true, followUpDate: null });
     expect(done.visit.stage).toBe('done');
@@ -384,12 +306,7 @@ describe('completeVisit, shareVisit and the catalog', () => {
   });
 
   it('sets the patient’s follow-up from the visit Rx', async () => {
-    const { prescription } = await approveVisitRx({
-      visitId: visitOf(2866),
-      note: NOTE,
-      items: [line('A')],
-      language: 'en',
-    });
+    const prescription = await prescribeAt(2866, 'A');
     await clinicFixtures.prescriptions.update(prescription.id, {
       followUpDate: '2026-10-26',
     });

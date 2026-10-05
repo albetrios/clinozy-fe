@@ -389,6 +389,7 @@
       "create": "Salva prescrizione",
       "edit": "Salva modifiche",
       "sell": "Salva e vendi",
+      "visit": "Approva · stampa · invia in farmacia",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Aggiungi un farmaco",
       "saved": "Prescrizione salvata",

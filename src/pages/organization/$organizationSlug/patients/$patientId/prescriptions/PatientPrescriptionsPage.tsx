@@ -34,6 +34,7 @@ import {
 } from '../shared/components/PatientSectionTable/index.ts';
 import { useDefaultStaff } from '../shared/components/PatientStaffPicker/index.ts';
 import { usePatientRecordRoute } from '../shared/hooks/usePatientRecordRoute/index.ts';
+import { useVisitFlowReturn } from '../shared/hooks/useVisitFlowReturn/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import {
   PrescriptionDrawer,
@@ -66,7 +67,9 @@ function RxPreview({
 /**
  * New or Edit prescription, once the patient's history, the catalog and the
  * default doctor are read; a new one opened from a smart note starts with
- * the medicines it named (`?medicines=`, AMBER A-F5).
+ * the medicines it named (`?medicines=`, AMBER A-F5). Opened from the visit
+ * flow (`?visit=open`) with a visit open, a new one is written at that visit —
+ * "Approve · print · send to pharmacy" — and closes back to the flow.
  */
 function RxDrawerHost({
   prescription,
@@ -87,7 +90,8 @@ function RxDrawerHost({
   const history = usePatientPrescriptions(patientId);
   const catalog = useRxCatalog(patientId);
   const doctor = useDefaultStaff('doctor', history.data?.[0]?.doctorId);
-  if (!(file && history.data && doctor.ready)) return null;
+  const flow = useVisitFlowReturn();
+  if (!(file && history.data && doctor.ready && flow.ready)) return null;
   return (
     <PrescriptionDrawer
       prescription={prescription}
@@ -99,7 +103,8 @@ function RxDrawerHost({
       canDelete={canDelete}
       today={today}
       medicines={prescription ? undefined : search.medicines}
-      onClose={onClose}
+      visit={flow.visit ? { appointmentId: flow.visit.appointmentId } : undefined}
+      onClose={flow.visit ? flow.backToFlow : onClose}
     />
   );
 }

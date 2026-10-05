@@ -361,6 +361,7 @@
       "create": "保存处方",
       "edit": "保存更改",
       "sell": "保存并销售",
+      "visit": "批准 · 打印 · 发送至药房",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "请添加药物",
       "saved": "处方已保存",

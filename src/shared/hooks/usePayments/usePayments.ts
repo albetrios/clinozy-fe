@@ -30,6 +30,7 @@ import type {
   ReceivePaymentInput,
 } from '@/shared/api/clinic/payments-contracts.ts';
 import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
+import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -136,7 +137,8 @@ export function useReceivePayment(
 ) {
   return useAppMutation<LedgerRow, ReceivePaymentInput>({
     mutationFn: receivePayment,
-    invalidateKeys: [...MONEY_WRITE_KEYS],
+    // A Checkout receipt at the patient's open visit may send it to the pharmacy.
+    invalidateKeys: [...MONEY_WRITE_KEYS, ...VISIT_WRITE_KEYS],
     ...options,
   });
 }

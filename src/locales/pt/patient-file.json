@@ -389,6 +389,7 @@
       "create": "Salvar receita",
       "edit": "Salvar alterações",
       "sell": "Salvar e vender",
+      "visit": "Aprovar · imprimir · enviar à farmácia",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Adicione um medicamento",
       "saved": "Receita salva",

@@ -248,6 +248,9 @@
       "other": "其他"
     }
   },
+  "visits": {
+    "record": "就诊"
+  },
   "patientDelete": {
     "title": "删除此患者？",
     "titleRecord": "删除此记录？",

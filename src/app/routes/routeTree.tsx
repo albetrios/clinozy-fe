@@ -121,7 +121,6 @@ import {
   validateRolesSearch,
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
-import type { VisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
@@ -154,7 +153,7 @@ const DIALOG_STATIC_DATA: StaticDataRouteOption = { dialog: true };
 /**
  * A dialog route's `validateSearch`: the route keeps the URL's values as they
  * come and only types them for the links that open it. What reads them parses
- * them — a page's `use<Room>DialogRoute`, the Visit sheet — with the validator
+ * them — a page's `use<Room>DialogRoute` — with the validator
  * that loads with it (`<room>.dialog-search.ts`), so no dialog's schema rides
  * the entry chunk.
  */
@@ -185,8 +184,8 @@ type DialogRouteName = keyof Awaited<
  * the room's gate on it (gateway, then the org status guard — `roomLeafGate`),
  * so a cold load and a navigation are refused exactly as a page's are; the
  * `loader` hands the manifest to `head` for the document title. A component
- * that is lazy itself (the Visit sheet's) is preloaded with the registry, so
- * it never suspends on its first render.
+ * that is lazy itself is preloaded with the registry, so it never suspends on
+ * its first render.
  */
 function dialogRoute(name: DialogRouteName) {
   const load = async (): Promise<DialogRoute> =>
@@ -1195,19 +1194,21 @@ const organizationInvoiceEditRoute = createRoute({
   ...dialogRoute('invoiceEdit'),
 });
 
-// ── The Visit sheet (L-49; KICKOFF §6.13, D18) ──
-// A full-screen page of Today's module over the shell (the sheet is its own
-// layer), on `visits/$visitId` — `visits/` owns the param. A sheet over the
-// room that opened it: opening and closing it is no page change, so the room
-// does not rise again when the sheet closes — a dialog route, whose manifest
-// and (lazy, Today's copy with it) component load with the registry.
-const organizationVisitRoute = createRoute({
+// An old Visit sheet link (`visits/$visitId?tab=…`; the sheet is gone, L-64):
+// a pure redirect, like `/` — to the visit's patient's page with the visit
+// flow open (`timeline?visit=open&from=today`), or Today with "Visit not
+// found". The resolver loads on demand.
+const organizationVisitRedirectRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'visits/$visitId',
-  validateSearch: dialogSearch<VisitSearch>(),
-  ...dialogRoute('visit'),
+  beforeLoad: async ({ params, preload }) => {
+    if (preload) return;
+    const { visitRedirect } = await import('@/shared/clinic/visit-redirect.ts');
+    throw redirect(await visitRedirect(params.organizationSlug, params.visitId));
+  },
+  component: () => null,
+  errorComponent: RouteErrorBoundary,
 });
-// ── end of the Visit sheet ──
 
 const organizationTasksRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
@@ -1865,7 +1866,7 @@ const routeTree = rootRoute.addChildren([
       organizationInvoiceCreateRoute,
       organizationInvoiceRoute.addChildren([organizationInvoiceEditRoute]),
     ]),
-    organizationVisitRoute,
+    organizationVisitRedirectRoute,
     organizationTasksRoute.addChildren([
       organizationTaskCreateRoute,
       organizationTaskRoute,

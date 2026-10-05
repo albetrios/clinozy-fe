@@ -361,6 +361,7 @@
       "create": "처방전 저장",
       "edit": "변경 사항 저장",
       "sell": "저장 후 판매",
+      "visit": "승인 · 인쇄 · 약국으로 전송",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "약을 추가하세요",
       "saved": "처방전을 저장했습니다",

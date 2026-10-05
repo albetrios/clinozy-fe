@@ -1,14 +1,12 @@
 import { z } from 'zod';
 
 import type { AppointmentRow } from './appointments-contracts.ts';
+import type { prescriptionItemSchema } from './clinic-schema.ts';
 import {
-  bodyPartSchema,
   clinicCommonSchema,
-  deleteReasonSchema,
   type InvoiceType,
   isoDateTimeSchema,
   type Prescription,
-  prescriptionItemSchema,
   type Tone,
   type Treatment,
 } from './clinic-schema.ts';
@@ -18,14 +16,14 @@ import type { PatientRecord } from './patients-contracts.ts';
 /**
  * The Visit (D18): one visit per patient in the clinic, from check-in to the
  * last desk step — the stage Today's floor shows it in, and the record the
- * Visit sheet and the patient file's flow both write. The schema has no Visit
+ * patient file's visit flow writes. The schema has no Visit
  * entity (check-in is `Appointment.status = checked_in`, `S:341, 352`), so it
  * is plan-only — Appendix F's "a Visit entity (id, appointmentId, patientId,
  * stage …, stage timestamps, `lastSavedAt`); the consult note (complaint and
  * plan ≤ 120, findings, diagnosis[]); `getVisit`, `setVisitStage`,
  * `completeVisit`" — on the fixture server until clinozy-be serves it
- * (REPLACE_WITH_API). Today (L-48) moves its stage; the Visit sheet and the
- * file's flow (L-49) write its records.
+ * (REPLACE_WITH_API). Today (L-48) moves its stage; the file's flow (L-49)
+ * and the patient's own drawers write its records, which move it on (L-64).
  */
 
 /** A visit's stages, in floor order (`today.md:157–165`); `done` is off the floor. */
@@ -159,7 +157,7 @@ export const visitChangeSchema = z.object({
 /** A stage write's answer. */
 export type VisitChange = z.infer<typeof visitChangeSchema>;
 
-// ── The Visit sheet's read (`getVisit`, Appendix F) ──
+// ── The visit's read (`getVisit`, Appendix F) ──
 
 /** The package a visit uses a session of: its name, sessions, sale day and validity. */
 export interface VisitPack {
@@ -190,10 +188,7 @@ export interface VisitBillLine {
   fromPack: boolean;
 }
 
-/**
- * The patient as the sheet's header band reads them: "F · 29 · PT-0412 · +91
- * 98250 ··· 41" and the consent chip (`today.md:134`).
- */
+/** The patient as the visit reads them: who, how to reach them, their consents (`today.md:134`). */
 export type VisitPatient = Pick<
   PatientRecord,
   | 'id'
@@ -216,10 +211,10 @@ interface VisitOpenInvoice {
 }
 
 /**
- * What the Visit sheet and the file's flow read of one visit (`getVisit`,
+ * What the file's flow reads of one visit (`getVisit`,
  * Appendix F): the visit, its booking (the person, doctor, service, room), the
  * package it uses, whether a session is due, the records written at it (the
- * Rx, the session, the bill) and the ones before it the tabs build on (the
+ * Rx, the session, the bill) and the ones before it the flow builds on (the
  * last Rx to copy, the last session's settings), the bill's lines and dues.
  */
 export interface VisitDetail {
@@ -267,84 +262,25 @@ export const setVisitChecksInputSchema = z.object({
 /** A checks write. */
 export type SetVisitChecksInput = z.infer<typeof setVisitChecksInputSchema>;
 
-/** The print languages ("Print in", `today.md:87`) — English only at launch (Q-X2). */
-const VISIT_PRINT_LANGUAGES = ['en'] as const;
-
-/**
- * Consult & Rx's Approve (`today.md:78–93`): the note and the reviewed lines —
- * `createPrescription` with the visit's booking (`S:1641`) and the note on the
- * Visit, one write; the visit moves on (treatment or checkout).
- */
-export const approveVisitRxInputSchema = z.object({
-  visitId: z.uuid(),
-  note: visitNoteSchema,
-  items: z.array(prescriptionItemSchema).min(1, 'Add a medicine').max(30),
-  language: z.enum(VISIT_PRINT_LANGUAGES),
-});
-/** An Approve. */
-export type ApproveVisitRxInput = z.infer<typeof approveVisitRxInputSchema>;
-
-/** The settings table's inputs (`today.md:99–101`: each ≤ 20). */
-export const VISIT_SETTING_MAX = 20;
-
-/**
- * Treatment's "Complete session" (`today.md:95–108`): today's settings and the
- * areas — `createTreatment` with the package and the session number
- * (`S:1642`; its day-2 aftercare call follows from it), one write.
- */
-export const recordVisitSessionInputSchema = z.object({
-  visitId: z.uuid(),
-  params: z.record(z.string(), z.string().trim().max(VISIT_SETTING_MAX)),
-  bodyParts: z.array(bodyPartSchema).max(12),
-});
-/** A Complete session. */
-export type RecordVisitSessionInput = z.infer<typeof recordVisitSessionInputSchema>;
-
-/** "Reverse with reason": the session soft-deleted with the reason confirm's choice (`S:1546`). */
-export const reverseVisitSessionInputSchema = z.object({
-  visitId: z.uuid(),
-  reason: deleteReasonSchema,
-  note: z.string().trim().max(500).nullable(),
-});
-/** A Reverse with reason. */
-export type ReverseVisitSessionInput = z.infer<typeof reverseVisitSessionInputSchema>;
-
-/** Checkout's "Create bill" and the flow's "Create invoice from visit": the visit's lines, one invoice. */
+/** The flow's "Create invoice from visit": the visit's lines, one invoice. */
 export const createVisitBillInputSchema = z.object({ visitId: z.uuid() });
 /** A Create bill. */
 export type CreateVisitBillInput = z.infer<typeof createVisitBillInputSchema>;
 
-/** The modes Checkout takes in one tap (`today.md:114`); Split is the Receive drawer's (AMBER). */
+/** The modes the flow's Collect takes in one tap (`today.md:114`); Split is the Receive drawer's (AMBER). */
 export const VISIT_PAYMENT_MODES = ['upi', 'cash', 'card'] as const;
-/** One Checkout mode. */
+/** One Collect mode. */
 export type VisitPaymentMode = (typeof VISIT_PAYMENT_MODES)[number];
 
-/** The amount field's limit (`today.md:115`: ≤ 9 digits of rupees). */
-export const VISIT_AMOUNT_MAX_DIGITS = 9;
-
 /**
- * Checkout's Receive (`today.md:110–121`): the amount in one mode, recorded
- * against the visit's bill and then the older dues — never twice (the fetch
- * client's idempotency key); the visit moves to the pharmacy or completes.
+ * The records a visit follows (D18: the stage follows the records, `S:352`):
+ * an Rx written at it moves it to Treatment when a session is due, else to
+ * Checkout; a session to Checkout; a receipt at Checkout to the pharmacy while
+ * its Rx is still to fill.
  */
-export const receiveVisitPaymentInputSchema = z.object({
-  visitId: z.uuid(),
-  /** Paise. */
-  amount: z.number().int().positive('Enter an amount'),
-  mode: z.enum(VISIT_PAYMENT_MODES),
-});
-/** A Receive. */
-export type ReceiveVisitPaymentInput = z.infer<typeof receiveVisitPaymentInputSchema>;
+export type VisitRecordKind = 'prescription' | 'treatment' | 'payment';
 
-/** The visit's receipts: the first one's number, and the total recorded. */
-export interface VisitReceipt {
-  paymentSeq: number;
-  amount: number;
-  /** Where the visit went: the pharmacy (an Rx to fill) or done. */
-  stage: VisitStage;
-}
-
-/** The file's "✓ Complete visit", and Checkout's when nothing is left to pay (`completeVisit`). */
+/** The file's "✓ Complete visit" (`completeVisit`). */
 export const completeVisitInputSchema = z.object({ visitId: z.uuid() });
 /** A Complete visit. */
 export type CompleteVisitInput = z.infer<typeof completeVisitInputSchema>;

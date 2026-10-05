@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2225 src files · ~1084 tests in src/ · 53 E2E specs · 32 shadcn UI primitives
+Stats: ~2190 src files · ~1071 tests in src/ · 53 E2E specs · 32 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -478,8 +478,7 @@ clinozy-fe/
 │   │   │   ├── stock-builders.ts
 │   │   │   ├── tasks-builders.ts
 │   │   │   ├── users-builders.ts
-│   │   │   ├── visit-builders.ts
-│   │   │   └── [17 test files]
+│   │   │   └── [16 test files]
 │   │   ├── app-splash.ts
 │   │   ├── appearance-surface.ts
 │   │   ├── brand-wordmark.ts
@@ -1360,30 +1359,6 @@ clinozy-fe/
 │   │       │   │   ├── users.search.ts
 │   │       │   │   ├── UsersPage.tsx
 │   │       │   │   └── [3 test files]
-│   │       │   ├── visits/
-│   │       │   │   ├── __tests__/
-│   │       │   │   │   └── integration/
-│   │       │   │   ├── components/
-│   │       │   │   │   ├── VisitCheckout/
-│   │       │   │   │   ├── VisitConsult/
-│   │       │   │   │   ├── VisitHistory/
-│   │       │   │   │   ├── VisitSheet/
-│   │       │   │   │   └── VisitTreatment/
-│   │       │   │   ├── hooks/
-│   │       │   │   │   ├── useTabStripScroll/
-│   │       │   │   │   └── useVisitSave/
-│   │       │   │   ├── store/
-│   │       │   │   │   └── useVisitDraftStore/
-│   │       │   │   ├── VisitPage.tsx
-│   │       │   │   ├── visits.bill.ts
-│   │       │   │   ├── visits.constants.ts
-│   │       │   │   ├── visits.manifest.ts
-│   │       │   │   ├── VISITS.OVERVIEW.md
-│   │       │   │   ├── visits.person.ts
-│   │       │   │   ├── visits.route.tsx
-│   │       │   │   ├── visits.rx.ts
-│   │       │   │   ├── visits.search.ts
-│   │       │   │   └── [5 test files]
 │   │       │   ├── organization-slug.manifest.ts
 │   │       │   ├── organization-slug.route.tsx
 │   │       │   ├── ORGANIZATION_SLUG.OVERVIEW.md
@@ -1582,7 +1557,7 @@ clinozy-fe/
 │   │   │   ├── task-rule-icons.ts
 │   │   │   ├── task-rules.constants.ts
 │   │   │   ├── task-targets.ts
-│   │   │   ├── visit-access.ts
+│   │   │   ├── visit-redirect.ts
 │   │   │   └── [16 test files]
 │   │   ├── components/
 │   │   │   ├── AppearanceDialog/

@@ -6,8 +6,9 @@ import {
   type ClinicCommandNavigation,
   clinicCommandNavigation,
 } from '@/shared/clinic/clinic-command-targets.ts';
+import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
-import { canUseVisitTab, type VisitTab } from '@/shared/clinic/visit-access.ts';
+import { patientVisitTarget } from '@/shared/clinic/visit-redirect.ts';
 import { useSetAppointmentStatus } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useSetVisitStage, useUndoVisitChange } from '@/shared/hooks/useVisits/index.ts';
@@ -35,11 +36,16 @@ export interface FloorActions {
  * The floor's actions (KICKOFF §6.2 lanes table, Stage machine): "Book" opens
  * the enquiry's lead drawer; "Check in" moves the booking to Checked in and
  * "Send in" moves its visit to the doctor — both at once, with their own toast
- * and Undo, which reverts the side effects too; "Open consult", "Open
- * session" and "Checkout" open the Visit sheet on their tab; "Dispense" opens
- * the sale drawer from the Rx. Each is hidden from a member who can't take
- * it: Book needs Leads View, Check in and Send in Appointments Edit, the
- * Visit's tab its own access (§6.13), Dispense Medical Create.
+ * and Undo, which reverts the side effects too; "Open session" and "Checkout"
+ * open the patient's own page with the visit flow (`timeline?visit=open`,
+ * §6.6), where the session, the bill and the collection are written and the
+ * card moves on; "Dispense" opens the sale drawer from the Rx. With doctor
+ * has no action (L-64: the consult is the patient page's — the card's name
+ * opens it). Each is hidden from a member who can't take it: Book needs Leads
+ * View, Check in and Send in Appointments Edit, Open session Patients View and
+ * the treatments gate (Doctor, Therapist — `S:38`), Checkout Patients View and
+ * Payments Create, Dispense Medical Create; a booking with no patient record
+ * has no page to open.
  */
 export function useFloorActions(organizationSlug: string): FloorActions {
   const { t } = useTranslation(TODAY_NS);
@@ -85,20 +91,13 @@ export function useFloorActions(organizationSlug: string): FloorActions {
       );
   };
 
-  /** "Open consult" · "Open session" · "Checkout": the Visit sheet on the lane's tab. */
-  const openVisit = (row: TodayFloorRow, tab: VisitTab) => {
-    if (!canUseVisitTab(tab, access)) return null;
+  /** "Open session" · "Checkout": the patient's page, the visit flow open, Today the way back. */
+  const openPatientVisit = (row: TodayFloorRow, allowed: boolean) => {
+    const { patientId } = row.person;
+    if (!(allowed && patientId && access.can('patients', 'view'))) return null;
     return () => {
-      // A visit the floor moved a moment ago has no id until the refetch.
-      if (!row.visit?.id) return;
       rememberVisitCard(row.id);
-      go(
-        clinicCommandNavigation('visit', {
-          organizationSlug,
-          recordId: row.visit.id,
-          search: { tab },
-        }),
-      );
+      go(patientVisitTarget(organizationSlug, patientId));
     };
   };
 
@@ -110,9 +109,10 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     arriving: ({ row }) =>
       canEditBookings ? () => checkIn.mutate({ id: row.id, status: 'checked_in' }) : null,
     waiting: (card) => (canEditBookings ? () => void sendIn(card) : null),
-    with_doctor: ({ row }) => openVisit(row, 'consult'),
-    treatment: ({ row }) => openVisit(row, 'treatment'),
-    checkout: ({ row }) => openVisit(row, 'checkout'),
+    with_doctor: () => null,
+    treatment: ({ row }) =>
+      openPatientVisit(row, passesPatientFileGate(access.roles, 'treatments')),
+    checkout: ({ row }) => openPatientVisit(row, access.can('payments', 'create')),
     pharmacy: ({ row }) => dispense(row),
   };
 

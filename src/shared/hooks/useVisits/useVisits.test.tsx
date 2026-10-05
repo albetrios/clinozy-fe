@@ -12,14 +12,9 @@ import { useTodayFloor } from '@/shared/hooks/useTodayFloor/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
-  useApproveVisitRx,
   useCompleteVisit,
   useCreateVisitBill,
   useOpenVisit,
-  useReceiveVisitPayment,
-  useRecordVisitSession,
-  useRestoreVisitSession,
-  useReverseVisitSession,
   useSetVisitChecks,
   useSetVisitStage,
   useShareVisit,
@@ -150,7 +145,7 @@ describe('useSetVisitStage / useUndoVisitChange (D18)', () => {
   });
 });
 
-describe('the Visit sheet’s reads and writes (L-49)', () => {
+describe('the visit flow’s reads and writes (L-49)', () => {
   it('reads a visit, the patient’s open visit and the catalog; idle without ids', async () => {
     const { result } = renderHook(
       () => ({
@@ -217,52 +212,24 @@ describe('the Visit sheet’s reads and writes (L-49)', () => {
     expect(withVisitChecks(null, { visitId: 'v', checks: { consent: true } })).toBeNull();
   });
 
-  it('starts a visit, bills it, records a session and completes it — failures stay quiet by default', async () => {
+  it('starts a visit, bills it, shares and completes it — a bill failure stays quiet by default', async () => {
     const { result } = renderHook(
       () => ({
         start: useStartVisit(),
-        session: useRecordVisitSession(),
         bill: useCreateVisitBill(),
-        receive: useReceiveVisitPayment(),
         complete: useCompleteVisit({ notifyOnError: true }),
         share: useShareVisit(),
-        approve: useApproveVisitRx(),
-        reverse: useReverseVisitSession(),
-        restore: useRestoreVisitSession(),
       }),
       { wrapper },
     );
-    const sessionResult = await act(() =>
-      result.current.session.mutateAsync({
-        visitId: ref.visit(2865),
-        params: {},
-        bodyParts: [],
-      }),
-    );
-    expect(sessionResult.treatment.sessionNo).toBe(4);
-    await act(() =>
-      result.current.reverse.mutateAsync({
-        visitId: ref.visit(2865),
-        reason: 'mistake',
-        note: null,
-      }),
-    );
-    await act(() =>
-      result.current.restore.mutateAsync({
-        visitId: ref.visit(2865),
-        treatmentId: sessionResult.treatment.id,
-      }),
-    );
     await act(() => result.current.share.mutateAsync({ visitId: ref.visit(2865) }));
+    // The flow shows a record write's failure itself — no toast from the hook.
     await act(async () => {
       await result.current.bill
         .mutateAsync({ visitId: ref.visit(2865) })
         .catch(() => undefined);
-    });
-    // The sheet shows a record write's failure itself — no toast from the hook.
-    await act(async () => {
-      await result.current.receive
-        .mutateAsync({ visitId: ref.visit(2866), amount: 100, mode: 'upi' })
+      await result.current.bill
+        .mutateAsync({ visitId: ref.visit(2865) })
         .catch(() => undefined);
     });
     expect(notify.error).not.toHaveBeenCalled();
@@ -277,6 +244,5 @@ describe('the Visit sheet’s reads and writes (L-49)', () => {
     });
     expect(notify.error).toHaveBeenCalledWith('This visit is already completed');
     expect(result.current.start).toBeDefined();
-    expect(result.current.approve).toBeDefined();
   });
 });

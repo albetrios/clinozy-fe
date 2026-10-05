@@ -159,7 +159,8 @@ function useStatuses(
  * one column up to 880px — "Visit in progress", Pause and "✓ Complete visit",
  * then five step cards, all open, the first unfinished one current: Check-in &
  * safety, Prescription, Treatment (waits for the checks), Invoice, Collect &
- * share. One Visit with the Visit sheet: what either writes, both show.
+ * share. Today's "Open session" and "Checkout" open it (`from=today`, L-64);
+ * the records written here move Today's card on.
  */
 export function VisitFlow({ visit }: { visit: VisitRecord }) {
   const { t } = useTranslation([VISIT_FLOW_NS, CLINIC_NS]);

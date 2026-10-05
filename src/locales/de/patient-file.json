@@ -375,6 +375,7 @@
       "create": "Rezept speichern",
       "edit": "Änderungen speichern",
       "sell": "Speichern & verkaufen",
+      "visit": "Freigeben · drucken · an Apotheke senden",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Fügen Sie ein Medikament hinzu",
       "saved": "Rezept gespeichert",

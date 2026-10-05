@@ -3,7 +3,6 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import {
-  organizationPatientSection,
   organizationPrescriptionCreate,
   organizationTreatmentCreate,
 } from '@/lib/routes/patient-file-builders.ts';
@@ -36,6 +35,10 @@ import {
 import { notify } from '@/shared/notify/index.ts';
 
 import { useDefaultStaff } from '../../../shared/components/PatientStaffPicker/index.ts';
+import {
+  useVisitFlowReturn,
+  visitFlowSearch,
+} from '../../../shared/hooks/useVisitFlowReturn/index.ts';
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import { TIMELINE_KEYS } from '../../timeline.constants.ts';
 import { VISIT_FLOW_KEYS, VISIT_FLOW_NS } from './visit-flow.constants.ts';
@@ -71,12 +74,15 @@ function useFlowBase() {
   const { patientId, file, masked } = usePatientFileContext();
   const access = useClinicAccess();
   const formatPaise = usePaiseFormat();
+  const flow = useVisitFlowReturn();
   return {
     t,
     navigate,
     organizationSlug,
     patientId,
     file,
+    /** The flow's place in the URL: its drawers keep it open, its exits go back to Today when it came from there. */
+    flow,
     roles: access.isResolved ? access.roles : [],
     canBill: access.isResolved && access.can('payments', 'create'),
     /** An amount as the file shows it — masked while the file is. */
@@ -93,14 +99,15 @@ type FlowBase = ReturnType<typeof useFlowBase>;
 
 /**
  * The visit's own writes: the safety checks, the share, the end of the visit
- * ("Visit completed · …", then back to the Overview) and Pause (back with the
- * visit open).
+ * ("Visit completed · …", then back to the Overview — or Today, when Today's
+ * card opened the flow) and Pause (the same way out, the visit left open).
  */
 function useVisitActions(
   base: FlowBase,
   visit: VisitRecord,
 ): Pick<VisitFlowActions, 'toggleCheck' | 'share' | 'complete' | 'pause'> {
-  const { t, navigate, organizationSlug, patientId, file } = base;
+  const { t, file, flow } = base;
+  const { leaveFlow } = flow;
   const { formatDate } = useLocaleFormat();
   const setChecks = useSetVisitChecks();
   const share = useShareVisit();
@@ -108,12 +115,6 @@ function useVisitActions(
   const name = file
     ? [file.patient.firstName, file.patient.lastName].filter(Boolean).join(' ')
     : '';
-  const leaveFlow = () =>
-    void navigate({
-      ...organizationPatientSection(organizationSlug, patientId, 'timeline'),
-      search: {},
-      replace: true,
-    });
   const completed = ({ packageSessionUsed, followUpDate }: VisitCompletion) => {
     const parts = [t(K.completed)];
     if (packageSessionUsed) parts.push(t(K.packageUsed));
@@ -154,7 +155,9 @@ function useClinicalActions(
   VisitFlowActions,
   'prescribeKit' | 'writeRx' | 'repeatTreatment' | 'newTreatment'
 > {
-  const { t, navigate, organizationSlug, patientId, roles, refreshVisit } = base;
+  const { t, navigate, organizationSlug, patientId, roles, refreshVisit, flow } = base;
+  // The drawers keep the flow open behind them and close back to it.
+  const inFlow = visitFlowSearch(flow.fromToday ? 'today' : undefined);
   const createRx = useCreatePrescription();
   const createTreatment = useCreateTreatment();
   const doctor = useDefaultStaff('doctor', detail?.booking?.doctorId);
@@ -162,7 +165,10 @@ function useClinicalActions(
   const prescribes = passesPatientFileGate(roles, 'prescriptions');
   const treats = passesPatientFileGate(roles, 'treatments');
   const toNewTreatment = () =>
-    void navigate(organizationTreatmentCreate(organizationSlug, patientId));
+    void navigate({
+      ...organizationTreatmentCreate(organizationSlug, patientId),
+      search: inFlow,
+    });
   const whenReady = (run: () => void) => () => {
     if (ready) run();
     else notify.info(t(K.treatment.blocked));
@@ -211,7 +217,11 @@ function useClinicalActions(
   return {
     prescribeKit: prescribes && doctor.id ? prescribeKit : undefined,
     writeRx: prescribes
-      ? () => void navigate(organizationPrescriptionCreate(organizationSlug, patientId))
+      ? () =>
+          void navigate({
+            ...organizationPrescriptionCreate(organizationSlug, patientId),
+            search: inFlow,
+          })
       : undefined,
     repeatTreatment: treats ? whenReady(repeat) : undefined,
     newTreatment: treats ? whenReady(toNewTreatment) : undefined,

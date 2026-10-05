@@ -248,6 +248,9 @@
       "other": "Sonstiges"
     }
   },
+  "visits": {
+    "record": "Besuch"
+  },
   "patientDelete": {
     "title": "Diesen Patienten löschen?",
     "titleRecord": "Diesen Datensatz löschen?",

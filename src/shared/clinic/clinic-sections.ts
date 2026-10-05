@@ -23,11 +23,9 @@ export function isClinicSection(value: string): value is Section {
 }
 
 // A Map, not an object literal: `constructor` and friends must not resolve.
-const SECTION_BY_SEGMENT: ReadonlyMap<string, Section> = new Map([
-  ...CLINIC_SECTION_ORDER.map((section) => [section, section] as const),
-  // The Visit sheet opens from Today's cards (D18).
-  ['visits', 'today'],
-]);
+const SECTION_BY_SEGMENT: ReadonlyMap<string, Section> = new Map(
+  CLINIC_SECTION_ORDER.map((section) => [section, section] as const),
+);
 
 const ROOM_SEGMENT = /^\/organization\/[^/]+\/([^/?#]+)/;
 

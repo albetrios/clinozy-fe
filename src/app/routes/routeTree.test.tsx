@@ -22,7 +22,6 @@ import { manifest as suspendedManifest } from '@/pages/organization/$organizatio
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
 import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
-import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
@@ -91,6 +90,10 @@ vi.mock('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx', ()
 });
 
 vi.mock('@/core/security/gateway.ts', () => ({ gatewayFromManifest }));
+const { visitRedirectMock } = vi.hoisted(() => ({ visitRedirectMock: vi.fn() }));
+vi.mock('@/shared/clinic/visit-redirect.ts', () => ({
+  visitRedirect: visitRedirectMock,
+}));
 vi.mock('@/core/security/gate-context.ts', () => ({
   toGateContext: vi.fn(() => ({ kind: 'gate-context-sentinel' })),
 }));
@@ -197,13 +200,11 @@ describe('router configuration', () => {
     )
       .filter((route) => route.options.staticData?.dialog === true)
       .map((route) => route.id);
-    // Every null-rendering dialog island (D24): drawers, viewers, previews —
-    // and the Visit sheet, its own full-screen layer over the room (L-49).
-    expect(dialogs).toHaveLength(62);
+    // Every null-rendering dialog island (D24): drawers, viewers, previews.
+    expect(dialogs).toHaveLength(61);
     expect(dialogs).toEqual(
       expect.arrayContaining(
         [
-          '/visits/$visitId',
           '/leads/$leadId',
           '/leads/create',
           '/tasks/$taskId',
@@ -757,46 +758,58 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
   });
 });
 
-describe('the Visit sheet route (KICKOFF §6.13, D18; L-49)', () => {
+describe('an old Visit sheet link (L-64: the sheet is gone)', () => {
   const VISIT = '/organization/$organizationSlug/visits/$visitId';
-  type VisitRoute = {
-    options: {
-      validateSearch?: unknown;
-      staticData?: { manifest?: unknown; dialog?: true };
-      loader?: () => Promise<unknown>;
-    };
-  };
-  const routeOf = (id: string) =>
-    (router.routesById as unknown as Record<string, VisitRoute | undefined>)[id];
 
-  beforeEach(() => {
-    gatewayExecutor.mockClear();
-    gatewayFromManifest.mockClear();
-    vi.mocked(requireOrgStatus).mockClear();
-  });
-
-  it('registers the sheet under the org shell with its tab search, as a sheet over the room', async () => {
+  it('is a pure redirect under the org shell — no page, no dialog', () => {
     expect(
       Object.keys(router.routesById).filter((id) =>
         id.startsWith('/organization/$organizationSlug/visits'),
       ),
     ).toEqual([VISIT]);
-    // Its `?tab=` stays as the URL has it: the sheet parses it.
-    expectKeptSearch(routeOf(VISIT));
-    // A dialog route: its manifest loads with the dialog-route registry (L-54).
-    expect(routeOf(VISIT)?.options.staticData).toEqual({ dialog: true });
-    await expect(routeOf(VISIT)?.options.loader?.()).resolves.toBe(visitManifest);
+    const route = (
+      router.routesById as unknown as Record<
+        string,
+        { options: { staticData?: unknown; validateSearch?: unknown } }
+      >
+    )[VISIT];
+    expect(route?.options.staticData).toBeUndefined();
+    expect(route?.options.validateSearch).toBeUndefined();
   });
 
-  it('runs the room gateway on its own manifest, then the status guard', async () => {
-    await beforeLoadOf(VISIT)({
-      location: { href: '/organization/acme/visits/V1?tab=consult' },
-      params: { organizationSlug: 'acme', visitId: 'V1' },
-      preload: false,
+  it('redirects to where the resolver sends the visit — and does nothing on a preload', async () => {
+    visitRedirectMock.mockResolvedValueOnce({
+      to: '/organization/$organizationSlug/patients/$patientId/timeline',
+      params: { organizationSlug: 'acme', patientId: 'P1' },
+      search: { visit: 'open', from: 'today' },
+      replace: true,
     });
-    expect(gatewayFromManifest).toHaveBeenCalledWith(visitManifest);
-    expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
-    expect(requireOrgStatus).toHaveBeenCalledTimes(1);
+    const run = beforeLoadOf(VISIT);
+    await expect(
+      run({
+        location: { href: '/organization/acme/visits/V1' },
+        params: { organizationSlug: 'acme', visitId: 'V1' },
+        preload: true,
+      }),
+    ).resolves.toBeUndefined();
+    expect(visitRedirectMock).not.toHaveBeenCalled();
+    const thrown = await Promise.resolve(
+      run({
+        location: { href: '/organization/acme/visits/V1?tab=consult' },
+        params: { organizationSlug: 'acme', visitId: 'V1' },
+        preload: false,
+      }),
+    ).then(
+      () => null,
+      (caught: unknown) => caught,
+    );
+    expect(visitRedirectMock).toHaveBeenCalledWith('acme', 'V1');
+    expect(isRedirect(thrown)).toBe(true);
+    expect((thrown as { options: unknown }).options).toMatchObject({
+      to: '/organization/$organizationSlug/patients/$patientId/timeline',
+      params: { organizationSlug: 'acme', patientId: 'P1' },
+      search: { visit: 'open', from: 'today' },
+    });
   });
 });
 
@@ -927,8 +940,8 @@ describe('the dialog routes’ manifests load with the dialog-route registry (D2
   const dialogRoutes = (
     Object.values(router.routesById) as unknown as DialogRoute[]
   ).filter((route) => route.options.staticData?.dialog === true);
-  // Every drawer, viewer and preview with a manifest, and the Visit sheet; the
-  // patient file's dialogs inherit the file's gate and carry no manifest.
+  // Every drawer, viewer and preview with a manifest; the patient file's
+  // dialogs inherit the file's gate and carry no manifest.
   const manifestBacked = dialogRoutes.filter((route) => route.options.loader);
   const gateArgsFor = (preload: boolean) => ({
     location: { href: '/organization/acme/x' },
@@ -943,7 +956,7 @@ describe('the dialog routes’ manifests load with the dialog-route registry (D2
   });
 
   it('keeps every dialog manifest out of the entry chunk: static data only says it is a dialog', () => {
-    expect(manifestBacked).toHaveLength(48);
+    expect(manifestBacked).toHaveLength(47);
     for (const route of dialogRoutes) {
       expect(route.options.staticData, route.id).toEqual({ dialog: true });
     }
@@ -953,8 +966,8 @@ describe('the dialog routes’ manifests load with the dialog-route registry (D2
     const searches = dialogRoutes.flatMap((route) =>
       route.options.validateSearch ? [route.options.validateSearch] : [],
     );
-    // 23 drawers' prefills and params, and the Visit sheet's tab.
-    expect(searches).toHaveLength(24);
+    // 23 drawers' prefills and params.
+    expect(searches).toHaveLength(23);
     expect(new Set(searches).size).toBe(1);
   });
 

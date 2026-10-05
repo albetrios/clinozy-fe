@@ -248,6 +248,9 @@
       "other": "その他"
     }
   },
+  "visits": {
+    "record": "来院"
+  },
   "patientDelete": {
     "title": "この患者を削除しますか？",
     "titleRecord": "このレコードを削除しますか？",

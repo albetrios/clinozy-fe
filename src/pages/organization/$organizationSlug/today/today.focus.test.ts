@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { rememberVisitCard, takeVisitCard } from './today.focus.ts';
 
-describe('the Visit sheet’s way back to its card (KICKOFF §7.2)', () => {
+describe('the visit flow’s way back to its card (KICKOFF §7.2)', () => {
   it('hands the remembered card out once', () => {
     expect(takeVisitCard()).toBeNull();
     rememberVisitCard('a1');

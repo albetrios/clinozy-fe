@@ -49,8 +49,8 @@ function entryPath(entry: AppNavEntry, organizationSlug: string): string {
 /**
  * The section bar's navigation model (KICKOFF §3.2): the nav entries with
  * their tones, the pinned tabs from `usePreferences().pinnedSections` (pin
- * order; per user on the server, D32), the current room by URL — `/visits/…`
- * belongs to Today — and an optimistic pin toggle that appends new pins.
+ * order; per user on the server, D32), the current room by URL, and an
+ * optimistic pin toggle that appends new pins.
  */
 export function useSectionBarNav(
   navItems: readonly AppNavEntry[],

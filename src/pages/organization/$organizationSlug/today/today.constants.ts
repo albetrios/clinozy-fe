@@ -5,9 +5,12 @@ import type { GreetingPart } from '@/shared/clinic/clinic-greeting.ts';
 /** The Today room's i18n namespace. */
 export const TODAY_NS = I18N_NAMESPACES.today;
 
-/** A lane card's action (`today.md:226`). */
+/**
+ * A lane card's action (`today.md:226`) — With doctor has none since the
+ * consult moved to the patient's page (L-64).
+ */
 export type TodayCardAction =
-  'book' | 'checkIn' | 'sendIn' | 'openConsult' | 'openSession' | 'checkout' | 'dispense';
+  'book' | 'checkIn' | 'sendIn' | 'openSession' | 'checkout' | 'dispense';
 
 /**
  * The Today room's keys, verbatim from `today.md` › Copy (KICKOFF §6.2). The
@@ -61,7 +64,6 @@ export const TODAY_KEYS = {
     book: 'actions.book',
     checkIn: 'actions.checkIn',
     sendIn: 'actions.sendIn',
-    openConsult: 'actions.openConsult',
     openSession: 'actions.openSession',
     checkout: 'actions.checkout',
     dispense: 'actions.dispense',

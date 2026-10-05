@@ -40,9 +40,12 @@ row dense), Clinical, Photos and Team notes two columns wide — then the **acti
   "New treatment" — both wait for the checks: "Finish check-in first"), **Invoice** (the visit's
   lines and total, "Create invoice from visit", "Custom invoice") and **Collect & share**
   (collect the oldest due in a tap, share the Rx, invoice and photos on WhatsApp). Each step is
-  done by its record on the same Visit the Visit sheet (`visits/$visitId`) writes, so either
-  shows what the other did; each action shows only for a member who may take it; money follows
-  the file's mask. Without an open visit the param is dropped and the Overview stays — a link
+  done by its record on the patient's open Visit, and those records move the visit on — Today's
+  card changes lane (L-64). "Write prescription" and "New treatment" keep the flow open behind
+  their drawer (`?visit=open`) and close back to it — the Rx there is "Approve · print · send to
+  pharmacy", tied to the visit's booking; opened from Today's "Open session" or "Checkout"
+  (`from=today`), Pause and "Complete visit" go back to Today. Each action shows only for a
+  member who may take it; money follows the file's mask. Without an open visit the param is dropped and the Overview stays — a link
   never starts a visit.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room

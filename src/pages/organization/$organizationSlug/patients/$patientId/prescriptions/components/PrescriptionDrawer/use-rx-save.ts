@@ -38,6 +38,8 @@ export interface UseRxSaveOptions {
   /** The prescription an edit saves; a new one has none. */
   prescription: Prescription | null;
   patientId: string;
+  /** The booking a new Rx is written at — the open visit's, in the visit flow. */
+  appointmentId?: string | null;
   onStep: (step: RxStepId) => void;
   /** The write went through; `sell` when it was "Save & sell". */
   onDone: (prescription: Prescription, sell: boolean) => void;
@@ -53,6 +55,7 @@ export function useRxSave({
   form,
   prescription,
   patientId,
+  appointmentId = null,
   onStep,
   onDone,
 }: UseRxSaveOptions) {
@@ -72,7 +75,7 @@ export function useRxSave({
     write: async () => {
       const input = rxInputOf(form.getValues(), {
         patientId,
-        appointmentId: prescription?.appointmentId ?? null,
+        appointmentId: prescription ? prescription.appointmentId : appointmentId,
         followUpDate: prescription?.followUpDate ?? null,
       });
       return prescription

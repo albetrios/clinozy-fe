@@ -6,7 +6,10 @@ import { axe } from 'vitest-axe';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as TodayApiModule from '@/shared/api/clinic/today-api.ts';
 import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -218,19 +221,30 @@ describe('the Today room (KICKOFF §6.2)', () => {
     ).toHaveTextContent('Open session');
   });
 
-  it('opens a visit, a sale from the Rx and a lead from their lanes', async () => {
+  it('opens a checkout on the patient’s page, a sale from the Rx and a lead from their lanes', async () => {
     const user = userEvent.setup();
     const { router } = renderTodayRoute(`${TODAY_PATH}?lane=with_doctor`, TodayPage, {
       role: 'admin',
     });
     await loaded();
-    await user.click(within(cardNamed('Sana Kapoor')).getByTestId('today-card-action'));
+    // With doctor has no action (L-64): the consult is the patient page's.
+    expect(
+      within(cardNamed('Sana Kapoor')).queryByTestId('today-card-action'),
+    ).not.toBeInTheDocument();
+
+    await act(() => router.navigate({ to: `${TODAY_PATH}?lane=checkout` }));
+    const checkout = within(await screen.findByTestId('today-panel')).getByTestId(
+      'today-card-action',
+    );
+    expect(checkout).toHaveTextContent('Checkout');
+    await user.click(checkout);
+    const booking = await clinicFixtures.appointments.get(ref.appointment(2864));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/visits/${ref.visit(2866)}`,
+        `/organization/acme/patients/${booking.patientId}/timeline`,
       ),
     );
-    expect(router.state.location.search).toEqual({ tab: 'consult' });
+    expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
 
     await act(() => router.navigate({ to: `${TODAY_PATH}?lane=pharmacy` }));
     await user.click(

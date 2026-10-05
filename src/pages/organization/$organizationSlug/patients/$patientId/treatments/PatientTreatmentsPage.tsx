@@ -36,6 +36,7 @@ import {
 } from '../shared/components/PatientSectionTable/index.ts';
 import { useDefaultStaff } from '../shared/components/PatientStaffPicker/index.ts';
 import { usePatientRecordRoute } from '../shared/hooks/usePatientRecordRoute/index.ts';
+import { useVisitFlowReturn } from '../shared/hooks/useVisitFlowReturn/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import {
   startingTemplate,
@@ -55,11 +56,67 @@ import { manifest } from './treatments.manifest.ts';
 const NAME_CHIPS = 4;
 
 /**
- * New or Edit treatment, once the patient's treatments and packages and the
- * default doctor and therapist are read; the name chips are the first four
- * offerings that are not a consultation. An edit's "Log check-in" stacks the
- * check-in drawer for this treatment over it (`patient-file.md:278, 291`);
- * Back returns to the treatment, whose feedback line then names the check-in.
+ * What New and Edit treatment start from — the patient's last treatment, their
+ * packages, the name chips (the first four offerings that are not a
+ * consultation) and the default doctor and therapist — null until all are read.
+ */
+function useTreatmentDrawerData(patientId: string) {
+  const treatments = usePatientTreatments(patientId);
+  const packages = usePatientPackages(patientId);
+  const offerings = useOfferings({ notifyOnError: false });
+  const last = treatments.data?.[0];
+  const doctor = useDefaultStaff('doctor', last?.doctorId);
+  const therapist = useDefaultStaff('therapist', last?.therapistId);
+  if (!(treatments.data && packages.data && doctor.ready && therapist.ready)) {
+    return null;
+  }
+  const names: TreatmentNameChip[] = (offerings.data ?? [])
+    .filter((offering) => offering.active && offering.category !== 'consultation')
+    .slice(0, NAME_CHIPS)
+    .map((offering) => ({ name: offering.name, offeringId: offering.id }));
+  return {
+    last,
+    packages: packages.data,
+    names,
+    staff: { doctorId: doctor.id, therapistId: therapist.id },
+  };
+}
+
+/**
+ * An edit's ⚡ "Log check-in" (`patient-file.md:278, 291`): the aftercare
+ * check-in for this treatment, stacked over its drawer; Back returns to the
+ * treatment, whose feedback line then names the check-in.
+ */
+function TreatmentCheckIn({
+  treatment,
+  onClose,
+}: {
+  treatment: Treatment;
+  onClose: () => void;
+}) {
+  const { patientId, file } = usePatientFileContext();
+  const [today] = useState(() => clinicToday());
+  if (!file) return null;
+  return (
+    <CheckInDrawer
+      patientId={patientId}
+      patientName={patientName(file.patient)}
+      checkIn={null}
+      appointmentId={treatment.appointmentId}
+      treatmentId={treatment.id}
+      today={today}
+      stacked
+      onClose={onClose}
+    />
+  );
+}
+
+/**
+ * New or Edit treatment, once what it starts from is read
+ * (`useTreatmentDrawerData`); an edit offers "Log check-in" to a member who
+ * may check in. Opened from the visit flow (`?visit=open`) with a visit open,
+ * it closes back to the flow — today's session there moves the visit to
+ * Checkout.
  */
 function TreatmentDrawerHost({
   treatment,
@@ -76,49 +133,29 @@ function TreatmentDrawerHost({
   canCheckIn: boolean;
   onClose: () => void;
 }) {
-  const { patientId, file } = usePatientFileContext();
+  const { patientId } = usePatientFileContext();
   const [checkingIn, setCheckingIn] = useState(false);
-  const [today] = useState(() => clinicToday());
-  const treatments = usePatientTreatments(patientId);
-  const packages = usePatientPackages(patientId);
-  const offerings = useOfferings({ notifyOnError: false });
-  const last = treatments.data?.[0];
-  const doctor = useDefaultStaff('doctor', last?.doctorId);
-  const therapist = useDefaultStaff('therapist', last?.therapistId);
-  if (!(treatments.data && packages.data && doctor.ready && therapist.ready)) {
-    return null;
-  }
-  const names: TreatmentNameChip[] = (offerings.data ?? [])
-    .filter((offering) => offering.active && offering.category !== 'consultation')
-    .slice(0, NAME_CHIPS)
-    .map((offering) => ({ name: offering.name, offeringId: offering.id }));
-  const checkInFor = treatment && canCheckIn && file ? treatment.treatment : null;
+  const data = useTreatmentDrawerData(patientId);
+  const flow = useVisitFlowReturn();
+  if (!(data && flow.ready)) return null;
+  const checkInFor = treatment && canCheckIn ? treatment.treatment : null;
   return (
     <>
       <TreatmentDrawer
         treatment={treatment}
         patientId={patientId}
-        last={last}
-        packages={packages.data}
-        names={names}
-        staff={{ doctorId: doctor.id, therapistId: therapist.id }}
-        template={startingTemplate(last)}
+        last={data.last}
+        packages={data.packages}
+        names={data.names}
+        staff={data.staff}
+        template={startingTemplate(data.last)}
         writable={writable}
         canDelete={canDelete}
         onLogCheckIn={checkInFor ? () => setCheckingIn(true) : undefined}
-        onClose={onClose}
+        onClose={flow.visit ? flow.backToFlow : onClose}
       />
-      {checkingIn && checkInFor && file ? (
-        <CheckInDrawer
-          patientId={patientId}
-          patientName={patientName(file.patient)}
-          checkIn={null}
-          appointmentId={checkInFor.appointmentId}
-          treatmentId={checkInFor.id}
-          today={today}
-          stacked
-          onClose={() => setCheckingIn(false)}
-        />
+      {checkingIn && checkInFor ? (
+        <TreatmentCheckIn treatment={checkInFor} onClose={() => setCheckingIn(false)} />
       ) : null}
     </>
   );

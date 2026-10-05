@@ -12,7 +12,6 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import { organizationPatientCreate } from '@/lib/routes/patients-builders.ts';
 import { organizationPaymentReceive } from '@/lib/routes/payments-builders.ts';
-import { organizationVisit } from '@/lib/routes/visit-builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
 
@@ -29,7 +28,6 @@ export type ClinicCommandTarget =
   | 'lead'
   | 'invoice'
   | 'invoiceEdit'
-  | 'visit'
   | 'newSale';
 
 /**
@@ -55,7 +53,6 @@ export type ClinicCommandTarget =
  * | `lead`           | `/leads/$leadId`               | live (L-33; the drawer L-34b)  |
  * | `invoice`        | `/invoices/$invoiceId`         | live (L-40; the preview)       |
  * | `invoiceEdit`    | `/invoices/$invoiceId/edit`    | live (L-40; the file's Invoices) |
- * | `visit`          | `/visits/$visitId`             | live (L-49; Today's lanes)     |
  * | `newSale`        | `/medical/sales/create`        | live (L-50c; Invoice drawer)   |
  *
  * Plain strings on purpose: a literal no registered route has yet would not
@@ -75,7 +72,6 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   lead: organizationLead('', '').to,
   invoice: organizationInvoice('', '').to,
   invoiceEdit: organizationInvoiceEdit('', '').to,
-  visit: organizationVisit('', '').to,
   newSale: organizationMedicalCreate('', 'sales').to,
 };
 
@@ -86,7 +82,6 @@ const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
   lead: 'leadId',
   invoice: 'invoiceId',
   invoiceEdit: 'invoiceId',
-  visit: 'visitId',
 };
 
 /**

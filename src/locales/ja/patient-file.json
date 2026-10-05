@@ -361,6 +361,7 @@
       "create": "処方箋を保存",
       "edit": "変更を保存",
       "sell": "保存して販売",
+      "visit": "承認 · 印刷 · 薬局へ送信",
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "薬を追加してください",
       "saved": "処方箋を保存しました",
