@@ -15,6 +15,7 @@ import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -151,8 +152,9 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     expect(within(panel).getByTestId('patient-drawer-badges')).toHaveTextContent(
       'AestheticNew',
     );
+    // Each summary part isolated: a name or a mobile stays whole on a right-to-left page.
     expect(within(panel).getByTestId('patient-drawer-footer')).toHaveTextContent(
-      'New patient · Aesthetic',
+      `${fsi('New patient')} · ${fsi('Aesthetic')}`,
     );
     expect(within(panel).getByTestId('patient-drawer-save')).toHaveTextContent(
       'Create patient',
@@ -208,7 +210,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     // New patients start as Aesthetic (H:4685); LHR joins it.
     await user.click(screen.getByTestId('patient-drawer-types-lhr'));
     expect(screen.getByTestId('patient-drawer-footer')).toHaveTextContent(
-      'Priya Shah · Aesthetic, LHR · +91 98765 00001',
+      `${fsi('Priya Shah')} · ${fsi('Aesthetic, LHR')} · ${fsi('+91 98765 00001')}`,
     );
     await user.click(screen.getByTestId('patient-drawer-save'));
 

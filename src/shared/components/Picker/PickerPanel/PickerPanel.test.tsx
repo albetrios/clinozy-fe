@@ -98,6 +98,20 @@ describe('PickerPanel', () => {
     expect(within(patient).getByText('P')).toBeInTheDocument();
   });
 
+  it('isolates the label, the sub and the meta in their own direction, in order', () => {
+    // "PT-1042" or a phone in a right-to-left row reorders unless isolated.
+    panel();
+    const patient = screen.getByTestId('who-option-p1');
+    expect(within(patient).getByText('Riya Sharma')).toHaveAttribute('dir', 'auto');
+    const sub = within(patient).getByText('PT-1042');
+    expect(sub).toHaveAttribute('dir', 'auto');
+    expect(sub).toHaveClass('[text-align:match-parent]');
+    expect(
+      within(screen.getByTestId('who-option-d1')).getByText('4 today'),
+    ).toHaveAttribute('dir', 'auto');
+    expect(patient).toHaveTextContent('Riya SharmaPatientPT-1042');
+  });
+
   it('leads rows with a tone tile, a pill or nothing as asked', () => {
     const rows = buildPickerRows({
       options: [

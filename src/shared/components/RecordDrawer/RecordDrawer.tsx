@@ -60,13 +60,20 @@ export interface RecordDrawerProps {
    * after "Discard" otherwise. Never called while a save is in flight.
    */
   onClose: () => void;
-  /** Header title (18px/600) and the dialog's accessible name; takes focus on open. */
+  /**
+   * Header title (18px/600) and the dialog's accessible name; takes focus on
+   * open. It reads in its own direction (a record's name on a right-to-left page).
+   */
   title: string;
-  /** Grey tag pill beside the title, e.g. the record's "#273". */
+  /** Grey tag pill beside the title, e.g. the record's "#273" — in its own direction. */
   tag?: string;
   /** At the header's inline end: Stock check's "2 of 10 counted". */
   headerEnd?: ReactNode;
-  /** Sub line under the title (13px, muted) and the dialog's description. */
+  /**
+   * Sub line under the title (13px, muted) and the dialog's description. It
+   * keeps the page's direction — a translated sentence often leads with a name
+   * — so the caller isolates each data token in it (`isolateValues`).
+   */
   sub?: string;
   /**
    * Below `md` the sub line is only read out, not shown — Stock check keeps
@@ -213,9 +220,10 @@ function DrawerHeader({
           <SheetTitle
             ref={titleRef}
             tabIndex={-1}
+            dir="auto"
             data-testid={`${testId}-title`}
             className={cn(
-              'min-w-0 truncate tracking-[-0.01em] outline-none',
+              'min-w-0 truncate [text-align:match-parent] tracking-[-0.01em] outline-none',
               large ? 'text-xl leading-[1.2]' : 'text-lg',
             )}
           >
@@ -223,6 +231,7 @@ function DrawerHeader({
           </SheetTitle>
           {tag ? (
             <span
+              dir="auto"
               data-testid={`${testId}-tag`}
               className="bg-muted text-caption text-muted-foreground-strong inline-flex h-5.5 shrink-0 items-center rounded-md px-1.5 font-medium whitespace-nowrap tabular-nums"
             >
@@ -252,7 +261,10 @@ function DrawerHeader({
   );
 }
 
-/** The 24px pill strip under the header, sharing its hairline; nothing when empty. */
+/**
+ * The 24px pill strip under the header, sharing its hairline; nothing when
+ * empty. Each pill reads in its own direction ("Bill ₹324", a branch's name).
+ */
 function DrawerBadges({
   badges,
   testId,
@@ -269,6 +281,7 @@ function DrawerBadges({
       {badges.map((badge) => (
         <span
           key={badge.id}
+          dir="auto"
           data-slot="pill"
           className={cn(
             'inline-block h-6 max-w-full truncate rounded-full px-2.5 text-xs leading-6 font-medium tabular-nums',

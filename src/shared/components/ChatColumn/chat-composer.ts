@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 
+import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import type {
   Channel,
   LeadInterest,
@@ -430,7 +431,11 @@ export function starters(set: StarterSet, t: TFunction, ctx: MessageContext): St
   }));
 }
 
-/** The empty card's line for the set (`_patterns.md:171–173`), in the screen's language. */
+/**
+ * The empty card's line for the set (`_patterns.md:171–173`), in the screen's
+ * language — its name, service, day and time isolated (the date inside "on 9
+ * Oct" too), so each stays whole on a right-to-left page.
+ */
 export function emptyLine(
   set: StarterSet,
   t: TFunction,
@@ -443,15 +448,22 @@ export function emptyLine(
     upcoming?.when.kind === 'instant'
   ) {
     const { at } = upcoming.when;
-    return t(keys.empty.visit, {
-      first,
-      service: upcoming.service,
-      when: dayPhrase(clock.dayOf(at), clock, t, SCREEN_DAYS),
-      time: clock.time(at),
-    });
+    const screenClock = {
+      ...clock,
+      date: (date: string) => isolateText(clock.date(date)),
+    };
+    return t(
+      keys.empty.visit,
+      isolateValues({
+        first,
+        service: upcoming.service,
+        when: dayPhrase(clock.dayOf(at), screenClock, t, SCREEN_DAYS),
+        time: clock.time(at),
+      }),
+    );
   }
   return set === 'pastVisits'
-    ? t(keys.empty.pastVisits, { first })
+    ? t(keys.empty.pastVisits, { first: isolateText(first) })
     : t(keys.empty.noVisits);
 }
 

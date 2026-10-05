@@ -5,6 +5,7 @@ import i18n from '@/lib/i18n/i18n.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
 import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   clinicClockOf,
@@ -107,8 +108,11 @@ describe('clinicWallClock', () => {
   });
 });
 
-/** ICU spaces a 12-hour "am" with U+202F; read every space as one. */
-const plain = (text: string) => text.replace(/\s/gu, ' ');
+/**
+ * ICU spaces a 12-hour "am" with U+202F; read every space as one — and drop
+ * the time's isolate marks (their own test below).
+ */
+const plain = (text: string) => withoutBidiMarks(text).replace(/\s/gu, ' ');
 
 const initial = useLocaleStore.getState();
 
@@ -179,6 +183,20 @@ describe('useClinicClock', () => {
       expect(moment('2026-10-04T03:40:00.000Z', false)).toBe('Yesterday');
       expect(day('2026-10-05')).toBe('Today');
       expect(day('2026-10-01')).toBe('Thu');
+    });
+
+    it('isolates the time beside a day word; the day word keeps the page’s direction', () => {
+      useLocaleStore.setState({
+        formatLocale: 'en-GB',
+        hourCycle: 'h12',
+        timeZone: 'auto',
+      });
+      const { result } = renderHook(() => useClinicClock());
+      // "9:10 am" stays whole beside a right-to-left day word ("أمس 9:10 am").
+      expect(result.current.moment('2026-10-04T03:40:00.000Z')).toBe(
+        `Yesterday ${fsi('9:10\u00a0am')}`,
+      );
+      expect(result.current.day('2026-10-04')).toBe('Yesterday');
     });
 
     it('follows the member’s 24-hour clock', () => {

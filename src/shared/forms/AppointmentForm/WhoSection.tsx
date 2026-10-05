@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin, isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentConnectedLead } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { AppointmentStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -121,7 +122,10 @@ function WhoSearch({
         leadId: lead.id,
         seq: lead.seq,
       },
-      sub: t(K.lead, { id: `#${lead.seq}`, phone: formatClinicPhone(lead.phone) }),
+      sub: t(
+        K.lead,
+        isolateValues({ id: `#${lead.seq}`, phone: formatClinicPhone(lead.phone) }),
+      ),
     });
   }
   const pick = (who: WhoDraft) => {
@@ -163,7 +167,12 @@ function WhoSearch({
                 patient={who.kind === 'patient'}
               />
               <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-                <span className="text-field font-semibold">{who.name}</span>
+                <span
+                  dir="auto"
+                  className="text-field [text-align:match-parent] font-semibold"
+                >
+                  {who.name}
+                </span>
                 <span className="text-caption text-muted-foreground-strong truncate tabular-nums">
                   {sub}
                 </span>
@@ -361,16 +370,14 @@ function LeadRadios({
       >
         {leads.map((lead, index) => {
           const on = lead.id === picked;
-          const sub = [
+          const sub = isolateJoin([
             lead.source
               ? t(CLINIC_KEYS.leads.sources[lead.source], { ns: CLINIC_NS })
               : '',
             lead.interests.join(', '),
             // When the lead came in, by the rooms' one time rule (days alone).
             clock.moment(lead.createdAt, { withTime: false }),
-          ]
-            .filter(Boolean)
-            .join(' · ');
+          ]);
           return (
             <button
               key={lead.id}
@@ -431,7 +438,10 @@ function whoSubline(who: WhoDraft, newContact: string): string {
   return who.phone ? formatClinicPhone(who.phone) : '';
 }
 
-/** The who card's avatar, name and line (H:2748). */
+/**
+ * The who card's avatar, name and line (H:2748): the name in its own
+ * direction, the mobile left to right — whole on a right-to-left page.
+ */
 function WhoIdentity({ who }: { who: WhoDraft }) {
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
   return (
@@ -443,8 +453,16 @@ function WhoIdentity({ who }: { who: WhoDraft }) {
         patient={who.kind === 'patient'}
       />
       <span className="flex min-w-0 flex-col leading-[1.3]">
-        <span className="truncate text-sm font-semibold">{who.name}</span>
-        <span className="text-muted-foreground-strong truncate text-xs tabular-nums">
+        <span
+          dir="auto"
+          className="truncate [text-align:match-parent] text-sm font-semibold"
+        >
+          {who.name}
+        </span>
+        <span
+          dir={who.kind === 'new' ? undefined : 'ltr'}
+          className="text-muted-foreground-strong truncate [text-align:match-parent] text-xs tabular-nums"
+        >
           {whoSubline(who, t(K.newContact))}
         </span>
       </span>

@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import {
   APPOINTMENT_FORM_CANCEL_REASONS,
   type AppointmentFormCancelReason,
@@ -476,10 +477,10 @@ export function CancelVisitConfirm({
       description={t(APPT.cancelConfirm.effect)}
       confirmLabel={t(APPT.cancelConfirm.action)}
       reason={{
-        record: t(APPT.cancelConfirm.record, {
-          name: row.person.name,
-          service: row.serviceLabel,
-        }),
+        record: t(
+          APPT.cancelConfirm.record,
+          isolateValues({ name: row.person.name, service: row.serviceLabel }),
+        ),
         options: FORM_CANCEL_OPTIONS,
       }}
       onConfirm={async (choice) => {

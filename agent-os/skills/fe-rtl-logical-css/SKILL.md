@@ -62,6 +62,38 @@ physically inside a container whose padding is logical:
 **Rule: if a container's padding is logical, its absolutely-positioned children
 must be logical too.** Grep the pair when you touch either.
 
+## Data inside RTL text (bidi isolation)
+
+Mirroring the layout is half of RTL; the other half is **Latin data inside
+right-to-left text**. The bidi algorithm lends a token's neutral characters
+(spaces, `+`, `.`, `−`, `·`) to the run around it, so on an Arabic page
+"+91 98250 44120" reads "44120 98250 91+", "Riya S." reads ".Riya S",
+"11:30 AM" reads "AM 11:30" and "INV-787" reads "787-INV". Isolate the data —
+never the sentence.
+
+| What | Do |
+| ---- | -- |
+| An element that holds only data — a name, a phone, an id, a date | `dir="auto"` for free text, `dir="ltr"` for phones and ids (always left to right); on a line of its own add `[text-align:match-parent]` so it still aligns with the page (the table cells' mechanism, L-53) |
+| A data token inside a translated sentence | keep the sentence in the page's direction; wrap the token with `isolateText(x)` / `t(key, isolateValues({ name, date }))` from `src/lib/bidi-isolate.ts` (FSI/LRI…PDI — the string form of `dir`) |
+| The design's " · " join of values | `isolateJoin(parts)` (also behind `drawerStepSummary`) |
+| An inline token rendered as an element | `<span dir="ltr">` / `<bdi>` inside the line |
+
+Two traps:
+
+- **`dir="auto"` only where the text is data.** It takes the first letter it
+  meets — inside an isolate too — and many Arabic translations lead with the
+  token (`{{name}} · …`), so a translated sentence under `dir="auto"` can turn
+  left to right as a whole. A unit's data lines take it (the table cells', the
+  Picker's label / sub / meta, a pill's label, the drawer title and tag); a
+  sentence slot — `RecordDrawer`'s `sub` — keeps the page's direction and its
+  callers isolate the tokens.
+- **Never isolate text that leaves the screen** — message templates and
+  starters (they are sent), task titles and notes (they are stored), copied
+  values and CSV cells. The marks are invisible but real characters.
+
+Tests: assert the attribute (`toHaveAttribute('dir', 'auto')`) or the marks —
+`fsi()` / `lri()` / `withoutBidiMarks()` from `tests/utils/bidi-marks.ts`.
+
 ## Verify
 
 ```bash

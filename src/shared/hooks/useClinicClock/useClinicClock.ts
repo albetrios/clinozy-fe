@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { dateFormatOptions, resolvedTimeZone } from '@/lib/i18n/intl-config.ts';
 import {
   civilDayReading,
@@ -94,9 +95,16 @@ export interface ClinicClockWords {
   tomorrow: string;
   /** "Mon" — a day of the last six, by its weekday. */
   weekday: (date: string) => string;
-  /** "Today 11:30 am" — today and a clock time together. */
+  /**
+   * "Today 11:30 am" — today and a clock time together. The hook's words
+   * isolate the time (bidi), as in {@link dayTime}.
+   */
   todayTime: (time: string) => string;
-  /** "Yesterday 10:30 am" — a day and a clock time together. */
+  /**
+   * "Yesterday 10:30 am" — a day and a clock time together. The hook's words
+   * isolate the time (bidi), so it stays whole beside a right-to-left day word;
+   * the day word keeps the page's direction.
+   */
   dayTime: (day: string, time: string) => string;
 }
 
@@ -246,9 +254,11 @@ export function useClinicClock(): ClinicClock {
         yesterday: t(PICKER_KEYS.date.yesterday, { ns: PICKER_NS }),
         tomorrow: t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS }),
         weekday: (date) => civil(date, { weekday: 'short' }),
-        todayTime: (time) => t(CLINIC_KEYS.clock.todayTime, { ns: CLINIC_NS, time }),
+        // The time is the line's data token (isolated); the day word is the page's text.
+        todayTime: (time) =>
+          t(CLINIC_KEYS.clock.todayTime, { ns: CLINIC_NS, time: isolateText(time) }),
         dayTime: (day, time) =>
-          t(CLINIC_KEYS.clock.dayTime, { ns: CLINIC_NS, day, time }),
+          t(CLINIC_KEYS.clock.dayTime, { ns: CLINIC_NS, day, time: isolateText(time) }),
       },
     );
   }, [formatDate, prefs, t]);

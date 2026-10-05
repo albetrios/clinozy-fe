@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditSettleResult } from '@/shared/api/clinic/credits-contracts.ts';
 import { DrawerField, DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
@@ -107,7 +108,7 @@ function SettleSession({
       onClose={onClose}
       title={t(K.title[way])}
       tag={displayId.pendingCredit(credit.seq)}
-      sub={t(K.sub[way], { name: credit.partyName, reason })}
+      sub={t(K.sub[way], isolateValues({ name: credit.partyName, reason }))}
       content={CONTENT_PROFILE}
       stacked
       saveLabel={t(K.save[way], { amount: formatPaise(total) })}

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { lri } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { type ContactEditorValue, emptyContactValue } from './contact-editor-value.ts';
@@ -231,7 +232,9 @@ describe('ContactEditor', () => {
 
     await user.click(await screen.findByTestId('contact-editor-id'));
     expect(writeText).toHaveBeenCalledWith('#2365');
-    expect(notifyMock.success).toHaveBeenCalledWith('Contact ID #2365 copied');
+    // The clipboard takes the bare id; the toast isolates it left to right.
+    expect(notifyMock.success).toHaveBeenCalledWith(`Contact ID ${lri('#2365')} copied`);
+    expect(screen.getByText('#2365')).toHaveAttribute('dir', 'ltr');
   });
 
   it('offers the band’s actions for a known contact, closing the editor first', async () => {

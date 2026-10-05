@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -256,7 +257,7 @@ function ComposerNotes({
     <>
       {hint?.kind === 'here' ? (
         <span className="text-caption text-muted-foreground min-w-0 flex-1 truncate">
-          {t(keys.replyHint, { first })}
+          {t(keys.replyHint, { first: isolateText(first) })}
         </span>
       ) : null}
       {hint?.kind === 'mismatch' ? (
@@ -267,7 +268,10 @@ function ComposerNotes({
           onClick={() => onSwitch(hint.channel)}
           className="border-tone-blush-border bg-tone-blush text-tone-blush-foreground hover:ring-tone-blush-foreground inline-flex h-6 max-w-full items-center truncate rounded-full border px-2.5 text-xs font-medium whitespace-nowrap hover:ring-1"
         >
-          {t(keys.mismatch, { first, channel: t(CLINIC_KEYS.channels[hint.channel]) })}
+          {t(keys.mismatch, {
+            first: isolateText(first),
+            channel: t(CLINIC_KEYS.channels[hint.channel]),
+          })}
         </button>
       ) : null}
       {outage ? (

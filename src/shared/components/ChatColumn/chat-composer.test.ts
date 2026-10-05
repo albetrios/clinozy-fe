@@ -4,6 +4,7 @@ import i18n from '@/lib/i18n/i18n.ts';
 import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { ContactHistoryEntry } from '@/shared/api/clinic/messages-contracts.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { CHAT_COLUMN_NS } from './chat-column.constants.ts';
 import {
@@ -286,15 +287,18 @@ describe('the empty card and its starters (_patterns.md:171–178)', () => {
 
   it('writes the line for a coming visit, past visits only, and none', () => {
     const later = visitSummary([visit('2026-10-04T05:30:00.000Z')], clock);
+    // Each data token isolated, so a right-to-left page keeps "11:00 am" whole.
     expect(emptyLine('visitLater', t, 'Dharti', later.upcoming, clock)).toBe(
-      'Dharti’s Hydrafacial is tomorrow at 11:00 am · a quick WhatsApp keeps the slot',
+      `${fsi('Dharti')}’s ${fsi('Hydrafacial')} is ${fsi('tomorrow')} at ${fsi('11:00 am')} · a quick WhatsApp keeps the slot`,
     );
     const far = visitSummary([visit('2026-10-09T10:30:00.000Z')], clock);
+    // The date inside "on 9 Oct" too.
+    const onDate = `on ${fsi('9 Oct')}`;
     expect(emptyLine('visitLater', t, 'Dharti', far.upcoming, clock)).toBe(
-      'Dharti’s Hydrafacial is on 9 Oct at 4:00 pm · a quick WhatsApp keeps the slot',
+      `${fsi('Dharti')}’s ${fsi('Hydrafacial')} is ${fsi(onDate)} at ${fsi('4:00 pm')} · a quick WhatsApp keeps the slot`,
     );
     expect(emptyLine('pastVisits', t, 'Dharti', null, clock)).toBe(
-      'Every WhatsApp, call and note with Dharti shows here',
+      `Every WhatsApp, call and note with ${fsi('Dharti')} shows here`,
     );
     expect(emptyLine('noVisits', t, 'Dharti', null, clock)).toBe(
       'Start with a WhatsApp · replies land here',

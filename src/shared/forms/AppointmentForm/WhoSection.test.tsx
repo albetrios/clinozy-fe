@@ -7,6 +7,7 @@ import { axe } from 'vitest-axe';
 
 import type { AppointmentConnectedLead } from '@/shared/api/clinic/appointments-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
@@ -120,6 +121,15 @@ describe('WhoSection — the person (H:2748–2755)', () => {
     expect(screen.queryByTestId(IDS.whoEdit)).not.toBeInTheDocument();
   });
 
+  it('keeps the name and the mobile whole on a right-to-left page, in order', () => {
+    const { container } = renderWho();
+    const name = screen.getByText('Priya Shah');
+    expect(name).toHaveAttribute('dir', 'auto');
+    expect(name).toHaveClass('[text-align:match-parent]');
+    expect(screen.getByText('+91 98765 43210')).toHaveAttribute('dir', 'ltr');
+    expect(container).toHaveTextContent('Priya Shah+91 98765 43210');
+  });
+
   it('closes the editor on Esc without saving', async () => {
     const user = userEvent.setup();
     const { onSaveContact } = renderWho();
@@ -187,7 +197,8 @@ describe('WhoSection — connected leads (S:330, H:4139, H:5996)', () => {
       'false',
     ]);
     expect(radios[0]).toHaveTextContent('Lead #2365');
-    expect(radios[0]).toHaveTextContent('Instagram · LHR');
+    // Each part isolated: a Latin interest or a date stays whole on a right-to-left page.
+    expect(radios[0]).toHaveTextContent(`${fsi('Instagram')} · ${fsi('LHR')}`);
     await user.click(radios[1]!);
     expect(onChange).toHaveBeenCalledWith({ kind: 'lead', leadId: 'b' });
     // The section sits inside the drawer's dialog in the app: no page landmarks here.

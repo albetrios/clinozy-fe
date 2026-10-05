@@ -83,7 +83,11 @@ export interface ChatColumnProps {
   className?: string;
 }
 
-/** The header (KICKOFF §3.5): the host's header height, a 34px avatar, the name and the phone. */
+/**
+ * The header (KICKOFF §3.5): the host's header height, a 34px avatar, the name
+ * and the phone — the name in its own direction, the phone always left to
+ * right, both aligned as the header is (a right-to-left page keeps them whole).
+ */
 function ChatHeader({
   contact,
   contactCard,
@@ -98,11 +102,18 @@ function ChatHeader({
         patient={contact.isPatient}
       />
       <span className="flex min-w-0 flex-col leading-[1.3]">
-        <span id={nameId} className="text-field truncate font-semibold">
+        <span
+          id={nameId}
+          dir="auto"
+          className="text-field truncate [text-align:match-parent] font-semibold"
+        >
           {contact.name}
         </span>
         {contact.phone ? (
-          <span className="text-caption text-muted-foreground truncate tabular-nums">
+          <span
+            dir="ltr"
+            className="text-caption text-muted-foreground truncate [text-align:match-parent] tabular-nums"
+          >
             {formatClinicPhone(contact.phone)}
           </span>
         ) : null}

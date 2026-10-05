@@ -14,6 +14,7 @@ import { composerModes } from '@/shared/components/ChatColumn/chat-composer.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { Calendar, WhatsAppMark } from '@/shared/icons/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { ChatComposer, type ChatComposerProps } from './ChatComposer.tsx';
 
@@ -120,7 +121,8 @@ describe('ChatComposer', () => {
         onModeChange={onModeChange}
       />,
     );
-    expect(screen.getByText('Anaya last wrote here')).toBeVisible();
+    // Their name isolated: a Latin name keeps its order in a right-to-left note.
+    expect(screen.getByText(`${fsi('Anaya')} last wrote here`)).toBeVisible();
     expect(screen.getByText('WhatsApp down · replies will queue')).toBeVisible();
     expect(screen.getByText('Prefers contact after 6 pm')).toBeVisible();
 
@@ -131,7 +133,7 @@ describe('ChatComposer', () => {
       />,
     );
     await user.click(
-      screen.getByRole('button', { name: 'Anaya wrote on Instagram · Switch' }),
+      screen.getByRole('button', { name: `${fsi('Anaya')} wrote on Instagram · Switch` }),
     );
     expect(onModeChange).toHaveBeenCalledWith('instagram');
   });

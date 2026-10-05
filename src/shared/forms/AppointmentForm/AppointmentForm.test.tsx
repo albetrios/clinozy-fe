@@ -200,7 +200,8 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     const slot = await firstFreeSlot(panel);
     await user.click(slot);
     const save = within(panel).getByTestId(`${NEW}-save`);
-    expect(save).toHaveTextContent(/^Book Mon/);
+    // "Book <day>, <time>" — the day (FSI…) and the time isolated in the label.
+    expect(save).toHaveTextContent(/^Book \u2068Mon/);
     expect(save).not.toHaveAttribute('data-incomplete');
     await user.click(save);
     await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());

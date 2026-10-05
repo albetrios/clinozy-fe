@@ -10,6 +10,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   patientFileUrl,
@@ -78,9 +79,12 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(within(drawer).getByTestId('treatment-drawer-name')).toHaveValue(
       'LHR Full Face',
     );
-    expect(within(drawer).getByTestId('treatment-drawer-step-session')).toHaveTextContent(
-      /LHR Full Face · 2 · /,
-    );
+    // The step's summary values are isolated tokens; their words and order as read:
+    expect(
+      withoutBidiMarks(
+        within(drawer).getByTestId('treatment-drawer-step-session').textContent,
+      ),
+    ).toMatch(/LHR Full Face · 2 · /);
     const fill = within(drawer).getByTestId('treatment-drawer-quick-fill');
     expect(
       within(fill).getByRole('button', { name: /Next session of LHR Full Face/ }),

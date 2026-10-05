@@ -16,6 +16,9 @@ import {
 const notify = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify }));
 
+/** A data token isolated in its own direction (FSI…PDI) inside a sentence. */
+const iso = (text: string) => `\u2068${text}\u2069`;
+
 /** Rhea Shah as the prototype seeds her (`CINFO`, H:3369; reviews H:3685). */
 const RHEA: ContactCardData = {
   kind: 'patient',
@@ -82,7 +85,7 @@ describe('ContactCardContent — header', () => {
       'text-tone-sage-foreground',
       'font-semibold',
     );
-    expect(screen.getByText('Since 28 Jun 2026')).toBeInTheDocument();
+    expect(screen.getByText(`Since ${iso('28 Jun 2026')}`)).toBeInTheDocument();
 
     // "Patient" plus at most two tags.
     expect(screen.getByText('Patient').closest('[data-slot="pill"]')).toHaveClass(
@@ -112,12 +115,28 @@ describe('ContactCardContent — header', () => {
       { onOpenPatientFile: () => {} },
     );
     expect(container.querySelector('.bg-tone-lav-tint')).not.toBeNull();
-    expect(screen.getByText('Lead since 16 Jun 2026')).toBeInTheDocument();
+    expect(screen.getByText(`Lead since ${iso('16 Jun 2026')}`)).toBeInTheDocument();
     expect(screen.getByText('Lead').closest('[data-slot="pill"]')).toHaveClass(
       'bg-tone-lav',
     );
     expect(screen.queryByTestId('contact-card-open-file')).toBeNull();
     expect(screen.queryByTestId('patient-badge')).toBeNull();
+  });
+
+  it('isolates the name and the id on a right-to-left page, in their order', () => {
+    const { container } = render(
+      <TooltipProvider>
+        <div dir="rtl">
+          <ContactCardContent data={{ ...RHEA, name: 'Riya S.' }} close={() => {}} />
+        </div>
+      </TooltipProvider>,
+    );
+    // ".Riya S" and a reordered id are what an unisolated right-to-left line draws.
+    const name = screen.getByText('Riya S.');
+    expect(name).toHaveAttribute('dir', 'auto');
+    expect(name).toHaveClass('[text-align:match-parent]');
+    expect(screen.getByText('#3508')).toHaveAttribute('dir', 'ltr');
+    expect(container).toHaveTextContent(`Riya S.#3508Since ${iso('28 Jun 2026')}`);
   });
 
   it('draws a medical contact on the canvas in mint', () => {
@@ -165,6 +184,12 @@ describe('ContactCardContent — reach', () => {
     expect(within(reach).getByText('+91 98980 12345')).toBeInTheDocument();
     expect(within(reach).getByText('Phone · alternate')).toBeInTheDocument();
     expect(within(reach).getByText('@rhea.shah')).toBeInTheDocument();
+    // Numbers and handles read in their own direction — left to right — aligned as the row.
+    for (const value of ['+91 98250 44120', '+91 98980 12345', '@rhea.shah']) {
+      expect(within(reach).getByText(value)).toHaveAttribute('dir', 'auto');
+      expect(within(reach).getByText(value)).toHaveClass('[text-align:match-parent]');
+    }
+    expect(within(reach).getByText('WhatsApp · primary')).not.toHaveAttribute('dir');
 
     const [whatsApp] = within(reach).getAllByRole('link', { name: 'WhatsApp' });
     expect(whatsApp).toHaveAttribute('href', 'https://wa.me/919825044120');
@@ -188,8 +213,9 @@ describe('ContactCardContent — reach', () => {
     const [copyFirst] = screen.getAllByRole('button', { name: 'Copy' });
     await user.click(copyFirst as HTMLElement);
     await waitFor(() =>
-      expect(notify.success).toHaveBeenCalledWith('Copied +91 98250 44120'),
+      expect(notify.success).toHaveBeenCalledWith('Copied \u2066+91 98250 44120\u2069'),
     );
+    // The clipboard takes the bare number — the marks are for the toast only.
     expect(await navigator.clipboard.readText()).toBe('+91 98250 44120');
   });
 
@@ -217,7 +243,8 @@ describe('ContactCardContent — team and about', () => {
     const onClaim = vi.fn();
     renderContent(RHEA, { onClaim });
     const team = screen.getByRole('group', { name: 'Team' });
-    expect(within(team).getByTitle('Dr. Rakesh · Doctor')).toBeInTheDocument();
+    expect(within(team).getByTitle(`${iso('Dr. Rakesh')} · Doctor`)).toBeInTheDocument();
+    expect(within(team).getByText('Dr. Rakesh')).toHaveAttribute('dir', 'auto');
     expect(within(team).getByText('Front desk')).toBeInTheDocument();
     await user.click(within(team).getByRole('button', { name: 'Open · Claim' }));
     expect(onClaim).toHaveBeenCalledOnce();
@@ -231,12 +258,24 @@ describe('ContactCardContent — team and about', () => {
       'Gujarati',
       'Vesu, Surat',
       'Shah family · 2 contacts',
-      'Came via Instagram',
-      '₹1,200 to return to them · ₹500 they owe the clinic',
-      '1 review · latest 5★ on Video · 20 Jun',
+      `Came via ${iso('Instagram')}`,
+      `${iso('₹1,200')} to return to them · ${iso('₹500')} they owe the clinic`,
+      `1 review · latest ${iso('5')}★ on ${iso('Video')} · 20 Jun`,
     ]) {
       expect(within(about).getByText(row)).toBeInTheDocument();
     }
+  });
+
+  it('reads the person’s own About rows in their direction; sentences keep the page’s', () => {
+    renderContent(RHEA);
+    const about = screen.getByRole('group', { name: 'About' });
+    for (const own of ['Gujarati', 'Vesu, Surat', 'Shah family · 2 contacts']) {
+      expect(within(about).getByText(own)).toHaveAttribute('dir', 'auto');
+    }
+    expect(within(about).getByText('Female · 29 yrs')).not.toHaveAttribute('dir');
+    expect(within(about).getByText(`Came via ${iso('Instagram')}`)).not.toHaveAttribute(
+      'dir',
+    );
   });
 
   it('marks each consent given or not, for eyes and for screen readers', () => {
@@ -260,7 +299,7 @@ describe('ContactCardContent — team and about', () => {
       about: { reviews: { ...RHEA.about!.reviews!, count: 3 } },
     });
     expect(
-      screen.getByText('3 reviews · latest 5★ on Video · 20 Jun'),
+      screen.getByText(`3 reviews · latest ${iso('5')}★ on ${iso('Video')} · 20 Jun`),
     ).toBeInTheDocument();
   });
 });

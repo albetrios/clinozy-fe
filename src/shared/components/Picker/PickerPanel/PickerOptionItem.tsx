@@ -45,7 +45,13 @@ function PickerOptionLabel<T>({ row, bold }: { row: PickerOptionRow<T>; bold: bo
     );
   }
   return (
-    <span className={cn('max-w-full min-w-0 truncate', bold && 'font-semibold')}>
+    <span
+      dir="auto"
+      className={cn(
+        'max-w-full min-w-0 truncate [text-align:match-parent]',
+        bold && 'font-semibold',
+      )}
+    >
       {match ? (
         <>
           {match.before}
@@ -114,7 +120,9 @@ export interface PickerOptionItemProps<T> {
  * match on `bg-highlight`; the sub and the meta; then a 16px check in the
  * tone's ink or an 18px checkbox. Active rows take the tone at 55%, picked
  * ones at 70%. `aria-checked` carries the pick — cmdk spends `aria-selected`
- * on the active row.
+ * on the active row. The label, the sub and the meta each take their own
+ * direction (`dir="auto"`), so a name or "#3508 · +91 98250 44120" stays whole
+ * on a right-to-left page, aligned as the row is.
  */
 export function PickerOptionItem<T>({
   row,
@@ -149,13 +157,19 @@ export function PickerOptionItem<T>({
         <PickerOptionLabel row={row} bold={picked && mode === 'single'} />
         {isPatient ? <span className="sr-only">{patientLabel}</span> : null}
         {option.sub ? (
-          <span className="text-caption text-muted-foreground min-w-0 flex-[1_1_7.5rem] truncate tabular-nums">
+          <span
+            dir="auto"
+            className="text-caption text-muted-foreground min-w-0 flex-[1_1_7.5rem] truncate [text-align:match-parent] tabular-nums"
+          >
             {option.sub}
           </span>
         ) : null}
       </span>
       {option.meta ? (
-        <span className="text-caption text-muted-foreground shrink-0 whitespace-nowrap tabular-nums">
+        <span
+          dir="auto"
+          className="text-caption text-muted-foreground shrink-0 whitespace-nowrap tabular-nums"
+        >
           {option.meta}
         </span>
       ) : null}

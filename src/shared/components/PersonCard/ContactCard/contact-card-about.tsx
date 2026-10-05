@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import type {
   ContactAbout,
@@ -42,21 +43,24 @@ function creditsLine(
   formatPaise: (paise: number) => string,
   t: TFunction,
 ) {
+  const owed = (key: string, paise: number | undefined) =>
+    paise ? t(key, { amount: isolateText(formatPaise(paise)) }) : null;
   const parts = [
-    about.owedToThem
-      ? t(keys.owedToThem, { amount: formatPaise(about.owedToThem) })
-      : null,
-    about.owedByThem
-      ? t(keys.owedByThem, { amount: formatPaise(about.owedByThem) })
-      : null,
+    owed(keys.owedToThem, about.owedToThem),
+    owed(keys.owedByThem, about.owedByThem),
   ].filter((part) => part !== null);
   return parts.length ? parts.join(' · ') : null;
 }
 
-/** One About row: its 14px icon and its text, when there is any. */
+/**
+ * One About row: its 14px icon and its text, when there is any. A row that is
+ * the person's own data (`own` — language, area, household) reads in its own
+ * direction; a sentence keeps the page's, its tokens isolated.
+ */
 interface AboutLine<Text = string | null | undefined> {
   icon: ReactNode;
   text: Text;
+  own?: boolean;
 }
 
 /** The design's About rows with their 14px icons, in its order (H:5692). */
@@ -70,12 +74,12 @@ function useAboutRows(about: ContactAbout): AboutLine<string>[] {
     about.reviews && about.reviews.count > 0 ? about.reviews : null;
   const rows: AboutLine[] = [
     { icon: <Users />, text: genderAgeLine(about, age, t) },
-    { icon: <MessageSquare />, text: about.language },
-    { icon: <MapPin />, text: about.area },
-    { icon: <House />, text: about.household },
+    { icon: <MessageSquare />, text: about.language, own: true },
+    { icon: <MapPin />, text: about.area, own: true },
+    { icon: <House />, text: about.household, own: true },
     {
       icon: <Tag />,
-      text: about.source ? t(keys.cameVia, { source: about.source }) : null,
+      text: about.source ? t(keys.cameVia, { source: isolateText(about.source) }) : null,
     },
     { icon: <Wallet />, text: creditsLine(about, formatPaise, t) },
     {
@@ -83,8 +87,11 @@ function useAboutRows(about: ContactAbout): AboutLine<string>[] {
       text: reviews
         ? t(keys.reviews, {
             count: reviews.count,
-            rating: formatNumber(reviews.latestRating),
-            source: reviews.latestSource,
+            ...isolateValues({
+              rating: formatNumber(reviews.latestRating),
+              source: reviews.latestSource,
+            }),
+            // The rule's day: a day word reads in the page's direction.
             date: clock.moment(reviews.latestAt, { withTime: false }),
           })
         : null,
@@ -154,7 +161,10 @@ export function ContactAboutGroup({ about }: { about: ContactAbout }) {
       <div className="flex flex-col gap-2.25">
         {rows.map((row) => (
           <AboutRow key={row.text} icon={row.icon}>
-            <span className="text-body text-foreground-soft min-w-0 wrap-anywhere tabular-nums">
+            <span
+              dir={row.own ? 'auto' : undefined}
+              className="text-body text-foreground-soft min-w-0 [text-align:match-parent] wrap-anywhere tabular-nums"
+            >
               {row.text}
             </span>
           </AboutRow>

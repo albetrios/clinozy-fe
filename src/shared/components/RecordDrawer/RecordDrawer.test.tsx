@@ -109,6 +109,32 @@ describe('RecordDrawer — shell', () => {
     expect(within(screen.getByTestId('pt-body')).getByText('fields')).toBeInTheDocument();
   });
 
+  it('reads a record’s name, tag and badges in their own direction; the sub keeps the page’s', async () => {
+    // "Riya S." or "INV-787" in a right-to-left header reorders unless isolated.
+    document.documentElement.dir = 'rtl';
+    try {
+      renderWithProviders(
+        <Harness
+          startOpen
+          title="Riya S."
+          tag="INV-787"
+          sub="Patient file"
+          badges={[{ id: 'bill', label: 'Bill ₹324' }]}
+        />,
+      );
+      const title = await screen.findByTestId('pt-title');
+      expect(title).toHaveAttribute('dir', 'auto');
+      expect(title).toHaveClass('[text-align:match-parent]');
+      expect(screen.getByTestId('pt-tag')).toHaveAttribute('dir', 'auto');
+      expect(screen.getByText('Bill ₹324')).toHaveAttribute('dir', 'auto');
+      // A sub line often leads with a name: its tokens are isolated, not the line.
+      expect(screen.getByText('Patient file')).not.toHaveAttribute('dir');
+      expect(title.parentElement).toHaveTextContent('Riya S.INV-787');
+    } finally {
+      document.documentElement.dir = '';
+    }
+  });
+
   it('sets a 20px title over a 12.5px sub line for a screen-sized header', async () => {
     renderWithProviders(<Harness startOpen largeTitle />);
     expect(await screen.findByTestId('pt-title')).toHaveClass('text-xl');

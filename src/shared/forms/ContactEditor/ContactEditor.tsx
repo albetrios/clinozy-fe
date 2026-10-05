@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import {
@@ -110,7 +111,8 @@ type BandActions = Pick<
  * The tinted band under the header (H:1967): the 48px avatar, the name as typed
  * ("New contact" until then; a patient's links to the file, "↗"), the kind pill,
  * and "+ Lead" · "+ Appointment" · "+ Patient" for a known contact — each
- * closes the editor first.
+ * closes the editor first. The name reads in its own direction, as the contact
+ * card's does.
  */
 function ContactEditorBand({
   name,
@@ -162,7 +164,9 @@ function ContactEditorBand({
                 onClick={leaveThen(openFile)}
                 className="text-title decoration-border-strong inline-flex max-w-full items-center gap-1 self-start text-start leading-[1.2] font-semibold underline underline-offset-3 hover:decoration-current"
               >
-                <span className="wrap-anywhere">{shown}</span>
+                <span dir="auto" className="[text-align:match-parent] wrap-anywhere">
+                  {shown}
+                </span>
                 <span aria-hidden="true" className="text-body text-muted-foreground">
                   ↗
                 </span>
@@ -171,7 +175,10 @@ function ContactEditorBand({
             <TooltipContent>{tCard(PERSON_CARD_KEYS.openPatientFile)}</TooltipContent>
           </Tooltip>
         ) : (
-          <span className="text-title leading-[1.2] font-semibold wrap-anywhere">
+          <span
+            dir="auto"
+            className="text-title [text-align:match-parent] leading-[1.2] font-semibold wrap-anywhere"
+          >
             {shown}
           </span>
         )}
@@ -227,7 +234,8 @@ function ContactEditorPanel({
       id: 'identity',
       title: t(K.steps.identity),
       // Collapsed, the card names the contact; green once it has a name (H:4483, `accVM`).
-      summary: step === 'identity' ? undefined : draft.name.trim() || undefined,
+      summary:
+        step === 'identity' ? undefined : isolateText(draft.name.trim()) || undefined,
       complete: draft.name.trim() !== '',
       content: (
         <ContactIdentityFields

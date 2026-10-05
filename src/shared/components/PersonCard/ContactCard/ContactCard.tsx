@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -47,7 +48,10 @@ const FOOTER_COLUMNS = ['grid-cols-1', 'grid-cols-2', 'grid-cols-3'] as const;
 /** Wraps an action so it dismisses the card first. */
 type RunThenClose = (action: () => void) => () => void;
 
-/** The name: a link to the patient file ("↗") for a patient, else plain text. */
+/**
+ * The name: a link to the patient file ("↗") for a patient, else plain text —
+ * in its own direction, aligned as the header is.
+ */
 function ContactName({
   name,
   onOpen,
@@ -58,7 +62,10 @@ function ContactName({
   const { t } = useTranslation(PERSON_CARD_NS);
   if (!onOpen) {
     return (
-      <span className="text-title leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere">
+      <span
+        dir="auto"
+        className="text-title [text-align:match-parent] leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere"
+      >
         {name}
       </span>
     );
@@ -71,7 +78,9 @@ function ContactName({
         onClick={onOpen}
         className="text-title decoration-border-strong inline-flex max-w-full items-center gap-1 self-start text-start leading-[1.2] font-semibold tracking-[-0.01em] underline underline-offset-3 hover:decoration-current"
       >
-        <span className="wrap-anywhere">{name}</span>
+        <span dir="auto" className="[text-align:match-parent] wrap-anywhere">
+          {name}
+        </span>
         <span aria-hidden="true" className="text-body text-muted-foreground flex-none">
           ↗
         </span>
@@ -129,7 +138,9 @@ function ContactHeader({
   const sinceKey = data.kind === 'lead' ? keys.leadSince : keys.since;
   const since = data.since
     ? t(sinceKey, {
-        date: formatDate(data.since, { day: 'numeric', month: 'short', year: 'numeric' }),
+        date: isolateText(
+          formatDate(data.since, { day: 'numeric', month: 'short', year: 'numeric' }),
+        ),
       })
     : null;
   const { onOpenPatientFile, onEditContact, onChangeContact } = actions;
@@ -157,7 +168,7 @@ function ContactHeader({
         {data.displayId || since ? (
           <span className="text-caption text-muted-foreground-strong flex items-baseline gap-2 leading-[1.2] tabular-nums">
             {data.displayId ? (
-              <span className={cn('font-semibold', TONE_CLASSES[tone].ink)}>
+              <span dir="ltr" className={cn('font-semibold', TONE_CLASSES[tone].ink)}>
                 {data.displayId}
               </span>
             ) : null}
@@ -234,7 +245,7 @@ function ContactTeamGroup({
           <span
             key={member.id}
             data-slot="pill"
-            title={`${member.name} · ${member.role}`}
+            title={`${isolateText(member.name)} · ${member.role}`}
             className="border-border bg-card inline-flex h-7 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 whitespace-nowrap"
           >
             <PersonAvatar
@@ -243,7 +254,9 @@ function ContactTeamGroup({
               tone={member.tone}
             />
             <span className="flex flex-col leading-[1.1]">
-              <span className="text-xs font-medium">{shortPersonName(member.name)}</span>
+              <span dir="auto" className="[text-align:match-parent] text-xs font-medium">
+                {shortPersonName(member.name)}
+              </span>
               <span className="text-tiny text-muted-foreground">{member.role}</span>
             </span>
           </span>

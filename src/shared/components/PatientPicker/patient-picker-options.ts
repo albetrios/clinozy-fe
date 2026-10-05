@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 
+import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { PatientPickRow } from '@/shared/api/clinic/patient-search-api.ts';
 import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
@@ -28,7 +29,7 @@ export function patientPickOption(
     return {
       key: row.id,
       label: row.name,
-      sub: t(PATIENT_PICKER_KEYS.lead, { id: displayId.lead(row.seq) }),
+      sub: t(PATIENT_PICKER_KEYS.lead, { id: isolateText(displayId.lead(row.seq)) }),
       leading: { kind: 'avatar', initials: personInitials(row.name) },
       disabled: true,
       data: row,
@@ -41,9 +42,12 @@ export function patientPickOption(
   return {
     key: row.id,
     label: row.name,
-    sub: [due, displayId.patient(row.seq), row.phone ? formatClinicPhone(row.phone) : '']
-      .filter(Boolean)
-      .join(' · '),
+    // Each part isolated: the phone stays whole on a right-to-left page.
+    sub: isolateJoin([
+      due,
+      displayId.patient(row.seq),
+      row.phone ? formatClinicPhone(row.phone) : '',
+    ]),
     leading: { kind: 'avatar', initials: personInitials(row.name), patient: true },
     data: row,
   };

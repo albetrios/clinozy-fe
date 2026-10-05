@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { civilYearsBetween, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
@@ -221,13 +222,12 @@ export function usePatientDrawerView({
 
   return {
     labels,
-    summary: [
+    // The footer's "<name> · <types> · <mobile>", each part isolated.
+    summary: isolateJoin([
       labels.name || t(K.summaryEmpty),
       labels.types.join(', '),
       storedPhone ? formatClinicPhone(storedPhone) : '',
-    ]
-      .filter(Boolean)
-      .join(' · '),
+    ]),
     badges: drawerBadges(values, labels, t),
     contact: {
       peek: contactPeek,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Branch, Role } from '@/shared/api/clinic/clinic-schema.ts';
 import {
@@ -78,15 +79,18 @@ function useTeamOptions(picked: readonly string[]): PickerOption<StaffProfile>[]
     }));
 }
 
-/** One customer as an option of the Medical field, under its group (`payments.md:138`). */
+/**
+ * One customer as an option of the Medical field, under its group
+ * (`payments.md:138`) — its "#3508 · +91 …" sub isolated part by part.
+ */
 function customerOption(
   row: SaleCustomerRow,
   t: (key: string) => string,
 ): PickerOption<SaleCustomerRow> {
   const phone = row.phone ? formatClinicPhone(row.phone) : t(K.customerSub.noMobile);
-  let sub = phone;
-  if (row.kind === 'patient') sub = `${displayId.patient(row.seq)} · ${phone}`;
-  else if (row.kind === 'lead') sub = `${displayId.lead(row.seq)} · ${phone}`;
+  let sub = isolateJoin([phone]);
+  if (row.kind === 'patient') sub = isolateJoin([displayId.patient(row.seq), phone]);
+  else if (row.kind === 'lead') sub = isolateJoin([displayId.lead(row.seq), phone]);
   return {
     key: row.id,
     label: row.name,

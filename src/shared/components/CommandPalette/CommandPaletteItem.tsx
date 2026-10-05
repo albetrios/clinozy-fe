@@ -10,7 +10,9 @@ import type { AppIcon } from '@/shared/icons/index.ts';
  * title (13.5px / 500) and an optional sub at the inline end (12px, muted, at
  * most 45%). The active row takes `bg-muted`. It keeps cmdk's own
  * `command-item` slot, as the Picker's rows do: the `menu-item` slot's
- * `--radius-md` would round it 6px, not the design's 8px.
+ * `--radius-md` would round it 6px, not the design's 8px. The title and the
+ * sub read in their own direction — a patient's name, "#3508 · •••• 3212" —
+ * the title still aligned as the row is.
  */
 export function CommandItem({
   children,
@@ -55,9 +57,14 @@ export function CommandItem({
       ) : (
         <Icon aria-hidden="true" className="text-muted-foreground size-3.75" />
       )}
-      <span className="min-w-0 flex-1 truncate">{children}</span>
+      <span dir="auto" className="min-w-0 flex-1 truncate [text-align:match-parent]">
+        {children}
+      </span>
       {sub ? (
-        <span className="text-muted-foreground max-w-[45%] flex-none truncate text-xs font-normal tabular-nums">
+        <span
+          dir="auto"
+          className="text-muted-foreground max-w-[45%] flex-none truncate text-xs font-normal tabular-nums"
+        >
           {sub}
         </span>
       ) : null}

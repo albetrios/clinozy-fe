@@ -1,3 +1,4 @@
+import { isolateJoin, isolateValues } from '@/lib/bidi-isolate.ts';
 import type {
   AppointmentRow,
   AppointmentStaff,
@@ -17,7 +18,8 @@ import type {
 /*
  * The appointment form's derived words (`appointments.md` › Copy): the title,
  * the footer's summary and primary, step 1's summary and the cancelled
- * banner's reason. Pure — the caller hands its `t`.
+ * banner's reason. Pure — the caller hands its `t`. Names, days and times are
+ * isolated in what they compose, so each stays whole on a right-to-left page.
  */
 
 /** The `t` the words are made with. */
@@ -43,14 +45,12 @@ export function footerSummary(
   draft: AppointmentDraft,
   doctor: AppointmentStaff | undefined,
 ): string {
-  return [
+  return isolateJoin([
     draft.who?.name,
     draft.serviceLabel,
     t(K.footer.minutes, { minutes: draft.durationMin }),
     doctor ? personFullName(doctor) : '',
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  ]);
 }
 
 /** The primary (H:5983): "Pick a time" · "Book <day>, <time>" · "Move to <day>, <time>" · "Save changes". */
@@ -60,7 +60,7 @@ export function saveLabelText(
   slot: { day: string; time: string },
 ): string {
   if (kind === 'pickTime' || kind === 'saveChanges') return t(K.footer[kind]);
-  return t(K.footer[kind], slot);
+  return t(K.footer[kind], isolateValues(slot));
 }
 
 /** Step 1's summary when collapsed: service · doctor · length · “reason”, else "Not filled yet". */
@@ -70,13 +70,13 @@ export function detailsSummaryText(
   doctor: AppointmentStaff | undefined,
 ): string {
   const reason = draft.reason.trim();
-  const parts = [
+  const summary = isolateJoin([
     draft.serviceLabel,
     doctor ? personFullName(doctor) : '',
     t(K.footer.minutes, { minutes: draft.durationMin }),
     reason ? `“${reason.slice(0, 40)}”` : '',
-  ].filter(Boolean);
-  return parts.length > 0 ? parts.join(' · ') : t(K.details.notFilled);
+  ]);
+  return summary || t(K.details.notFilled);
 }
 
 /**
@@ -90,7 +90,7 @@ export function rescheduledText(
 ): string | null {
   if (!note) return null;
   const key = note.confirmAgain ? K.status.rescheduledConfirm : K.status.rescheduled;
-  return t(key, slotLabel(note.was.date, note.was.time));
+  return t(key, isolateValues(slotLabel(note.was.date, note.was.time)));
 }
 
 /** The cancelled banner's reason: an "Other"'s note, else the reason's label; `null` without one. */

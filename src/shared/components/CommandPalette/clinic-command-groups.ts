@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
@@ -183,10 +184,13 @@ export function useClinicCommandGroups({
   const patientRow = (hit: CommandSearchPatient): CommandRow => ({
     value: `patient:${hit.id}`,
     label: hit.name,
-    sub: t(COMMAND_MENU_KEYS.patientSub, {
-      id: displayId.patient(hit.seq),
-      lastDigits: lastDigits(hit.phone),
-    }),
+    sub: t(
+      COMMAND_MENU_KEYS.patientSub,
+      isolateValues({
+        id: displayId.patient(hit.seq),
+        lastDigits: lastDigits(hit.phone),
+      }),
+    ),
     icon: Users,
     testId: `command-palette-patient-${hit.id}`,
     // Activity open on tablet and desktop, closed on a phone (H:4605, §6.6).
@@ -206,7 +210,9 @@ export function useClinicCommandGroups({
     return {
       value: `lead:${hit.id}`,
       label: hit.name,
-      sub: statusKey ? t(COMMAND_MENU_KEYS.leadSub, { id, status: t(statusKey) }) : id,
+      sub: statusKey
+        ? t(COMMAND_MENU_KEYS.leadSub, isolateValues({ id, status: t(statusKey) }))
+        : id,
       icon: UserPlus,
       testId: `command-palette-lead-${hit.id}`,
       onSelect: () =>
@@ -236,7 +242,10 @@ export function useClinicCommandGroups({
         id: displayId.invoiceNumber(hit.seq),
       }),
       sub: hit.personName
-        ? t(COMMAND_MENU_KEYS.invoiceSub, { person: hit.personName, date: day })
+        ? t(
+            COMMAND_MENU_KEYS.invoiceSub,
+            isolateValues({ person: hit.personName, date: day }),
+          )
         : day,
       icon: Receipt,
       testId: `command-palette-invoice-${hit.id}`,

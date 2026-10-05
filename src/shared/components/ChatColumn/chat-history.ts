@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 
+import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import type { LeadMessage, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   ChatThread,
@@ -74,11 +75,9 @@ export function chatWhenLabel(when: ChatWhen, clock: ChatClock): string {
 
 type Part = string | null | false;
 
-/** The line's parts joined by the design's " · ". */
+/** The line's parts joined by the design's " · ", each isolated in its own direction. */
 function joined(format: ChatFormat, parts: readonly Part[]): string {
-  return parts
-    .filter((part): part is string => Boolean(part))
-    .join(format.t(keys.separator));
+  return isolateJoin(parts, format.t(keys.separator));
 }
 
 function moneyOf(format: ChatFormat, paise: number): string {

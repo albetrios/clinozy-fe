@@ -1,5 +1,6 @@
 import { type ReactNode, useLayoutEffect, useRef } from 'react';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Channel } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ChatAuthor } from '@/shared/api/clinic/messages-contracts.ts';
@@ -136,7 +137,9 @@ function HistoryLine({
         <Icon className="size-3" />
       </span>
       <span className="min-w-0 truncate">{chip.text}</span>
-      <span className="text-muted-foreground flex-none tabular-nums">{when}</span>
+      <span dir="auto" className="text-muted-foreground flex-none tabular-nums">
+        {when}
+      </span>
     </>
   );
   const { target } = chip;
@@ -178,7 +181,9 @@ function SystemLine({ text, when }: { text: string; when: string }) {
         className={cn(LINE, 'rounded-full ps-3.5')}
       >
         <span className="min-w-0 truncate">{text}</span>
-        <span className="text-muted-foreground flex-none tabular-nums">{when}</span>
+        <span dir="auto" className="text-muted-foreground flex-none tabular-nums">
+          {when}
+        </span>
       </span>
     </div>
   );
@@ -240,7 +245,11 @@ interface BubbleData {
   onRetry?: () => void;
 }
 
-/** A message: the bubble (max 68%) and its 11px meta line — sender · glyph · time · delivery. */
+/**
+ * A message: the bubble (max 68%) and its 11px meta line — sender · glyph ·
+ * time · delivery. The message reads in its own direction (an English message
+ * on an Arabic page), as does the time.
+ */
 function MessageBubble({ data, format }: { data: BubbleData; format: ChatFormat }) {
   const ours = data.kind !== 'in';
   const glyph = data.kind === 'note' ? undefined : GLYPHS[data.channel];
@@ -259,6 +268,7 @@ function MessageBubble({ data, format }: { data: BubbleData; format: ChatFormat 
         )}
       >
         <div
+          dir="auto"
           className={cn(
             'text-field rounded-lg border px-3.25 py-2.25 leading-[1.45] wrap-anywhere whitespace-pre-wrap',
             ours ? OURS[data.channel] : THEIRS[data.channel],
@@ -291,7 +301,9 @@ function MessageBubble({ data, format }: { data: BubbleData; format: ChatFormat 
               <TooltipContent>{channelName}</TooltipContent>
             </Tooltip>
           ) : null}
-          <span className="whitespace-nowrap tabular-nums">{data.at}</span>
+          <span dir="auto" className="whitespace-nowrap tabular-nums">
+            {data.at}
+          </span>
           <Delivery view={data.delivery} onRetry={data.onRetry} format={format} />
         </div>
       </div>
@@ -401,12 +413,18 @@ export function ChatThread({
     if (element) element.scrollTop = element.scrollHeight;
   }, [lineCount]);
 
-  /** A team member as a meta line names them: "Riya S.", "Riya S. · call", "Riya S. · note". */
+  /**
+   * A team member as a meta line names them: "Riya S.", "Riya S. · call",
+   * "Riya S. · note" — the name isolated, so its full stop stays at its end.
+   */
   const teamLabel = (kind: BubbleKind, name: string): string => {
-    if (kind === 'call') return t(keys.sender.call, { name });
-    if (kind === 'note') return t(keys.sender.note, { name });
-    return name;
+    const isolated = isolateText(name);
+    if (kind === 'call') return t(keys.sender.call, { name: isolated });
+    if (kind === 'note') return t(keys.sender.note, { name: isolated });
+    return isolated;
   };
+  /** Their first name on their messages — isolated like a team member's. */
+  const contactLabel = contactFirst ? isolateText(contactFirst) : null;
 
   const bubbleOf = (
     entry: Extract<ThreadEntry, { kind: 'message' | 'outbox' }>,
@@ -431,7 +449,7 @@ export function ChatThread({
     const author = message.authorId ? authors[message.authorId] : undefined;
     const name = author ? shortPersonName(author.name) : null;
     let label: string | null = null;
-    if (kind === 'in') label = contactFirst || null;
+    if (kind === 'in') label = contactLabel;
     else if (name) label = teamLabel(kind, name);
     return {
       kind,

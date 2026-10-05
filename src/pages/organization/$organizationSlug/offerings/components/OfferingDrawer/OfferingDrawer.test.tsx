@@ -10,6 +10,7 @@ import {
 import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   OFFERINGS_URL,
@@ -123,7 +124,10 @@ describe('OfferingDrawer — New offering (KICKOFF §6.11)', () => {
     expect(
       within(stepOf('offering')).getByText('Offering, price & sessions'),
     ).toBeVisible();
-    expect(stepOf('offering')).toHaveTextContent('Treatment · All branches · 1 · 0%');
+    // The step's summary values are isolated tokens; their words and order as read:
+    expect(withoutBidiMarks(stepOf('offering').textContent)).toContain(
+      'Treatment · All branches · 1 · 0%',
+    );
     expect(within(stepOf('time')).getByText('Time, validity & details')).toBeVisible();
     expect(part('summary')).toHaveTextContent('Untitled · Treatment');
     expect(part('save')).toHaveTextContent('Create offering');

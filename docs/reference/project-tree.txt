@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2148 src files · ~1047 tests in src/ · 48 E2E specs · 29 shadcn UI primitives
+Stats: ~2149 src files · ~1048 tests in src/ · 48 E2E specs · 29 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -483,6 +483,7 @@ clinozy-fe/
 │   │   │   └── [16 test files]
 │   │   ├── app-splash.ts
 │   │   ├── appearance-surface.ts
+│   │   ├── bidi-isolate.ts
 │   │   ├── brand-wordmark.ts
 │   │   ├── chunk-prefetch.ts
 │   │   ├── csp-api-origin.ts
@@ -506,7 +507,7 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [25 test files]
+│   │   └── [26 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── appointments.json
@@ -2878,6 +2879,7 @@ clinozy-fe/
 │   │   ├── app-nav-fixture.ts
 │   │   ├── auth-api-paths.ts
 │   │   ├── axe-for-dialog.ts
+│   │   ├── bidi-marks.ts
 │   │   ├── e2e-api-retry.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts

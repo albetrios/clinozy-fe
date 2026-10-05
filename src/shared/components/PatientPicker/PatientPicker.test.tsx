@@ -11,6 +11,7 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PATIENT_PICKER_NS } from './patient-picker.constants.ts';
@@ -63,7 +64,8 @@ describe('patientPickOption (payments.md:101)', () => {
       ),
     ).toMatchObject({
       label: 'Kiran Desai',
-      sub: '₹8,550 due · #3441 · +91 98791 22840',
+      // Each part isolated, so the phone stays whole on a right-to-left page.
+      sub: `${fsi('₹8,550 due')} · ${fsi('#3441')} · ${fsi('+91 98791 22840')}`,
       leading: { kind: 'avatar', initials: 'KD', patient: true },
     });
     expect(
@@ -79,14 +81,14 @@ describe('patientPickOption (payments.md:101)', () => {
         t,
         rupees,
       ).sub,
-    ).toBe('Nothing due · #3508');
+    ).toBe(`${fsi('Nothing due')} · ${fsi('#3508')}`);
     expect(
       patientPickOption(
         { kind: 'lead', id: 'l', seq: 2363, name: 'Viral Sheth' },
         t,
         rupees,
       ),
-    ).toMatchObject({ sub: 'Lead #2363 · not a patient yet', disabled: true });
+    ).toMatchObject({ sub: `Lead ${fsi('#2363')} · not a patient yet`, disabled: true });
   });
 });
 

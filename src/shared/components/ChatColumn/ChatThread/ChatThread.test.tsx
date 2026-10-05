@@ -18,6 +18,7 @@ import type {
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { clinicClockOf } from '@/shared/hooks/useClinicClock/index.ts';
 import { Calendar } from '@/shared/icons/index.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { ChatThread, type ChatThreadProps } from './ChatThread.tsx';
 
@@ -129,10 +130,10 @@ describe('ChatThread', () => {
     expect(theirs).toHaveAttribute('data-kind', 'in');
     expect(theirs).toHaveClass('justify-start');
     // Today's messages carry the clock time alone (the prototype's "10:28").
-    expect(theirs).toHaveTextContent('Anaya·WhatsApp10:28 am');
+    expect(theirs).toHaveTextContent(`${fsi('Anaya')}·WhatsApp10:28 am`);
     expect(ours).toHaveAttribute('data-kind', 'out');
     expect(ours).toHaveClass('justify-end');
-    expect(ours).toHaveTextContent('Riya S.·WhatsApp10:28 am·Read');
+    expect(ours).toHaveTextContent(`${fsi('Riya S.')}·WhatsApp10:28 am·Read`);
     expect(within(ours as HTMLElement).getByText('Read')).toHaveClass(
       'text-success-strong',
     );
@@ -157,9 +158,9 @@ describe('ChatThread', () => {
     });
     const [call, note] = screen.getAllByTestId(ids.bubble);
     expect(call).toHaveAttribute('data-kind', 'call');
-    expect(call).toHaveTextContent('Riya S. · call');
+    expect(call).toHaveTextContent(`${fsi('Riya S.')} · call`);
     expect(within(call as HTMLElement).getByText('No answer')).toHaveClass('bg-tone-sky');
-    expect(note).toHaveTextContent('Riya S. · note');
+    expect(note).toHaveTextContent(`${fsi('Riya S.')} · note`);
     expect(within(note as HTMLElement).getByText('Prefers Hindi')).toHaveClass(
       'bg-tone-butter',
       'border-dashed',
@@ -216,7 +217,34 @@ describe('ChatThread', () => {
         },
       ],
     });
-    expect(screen.getByTestId(ids.bubble)).toHaveTextContent('Riya S. · call');
+    expect(screen.getByTestId(ids.bubble)).toHaveTextContent(`${fsi('Riya S.')} · call`);
+  });
+
+  it('reads a message and its time in their own direction on a right-to-left page', () => {
+    render(
+      <TooltipProvider>
+        <div dir="rtl">
+          <ChatThread
+            entries={[message({ body: 'Is Saturday possible?' })]}
+            divider="Lead created"
+            empty={null}
+            authors={AUTHORS}
+            contactFirst="Anaya"
+            whatsappDown={false}
+            format={formatWith()}
+            onResend={vi.fn()}
+            resendingId={null}
+            onRetry={vi.fn()}
+          />
+        </div>
+      </TooltipProvider>,
+    );
+    // An English message on an Arabic page reads left to right; so does "10:28 am".
+    expect(screen.getByText('Is Saturday possible?')).toHaveAttribute('dir', 'auto');
+    expect(screen.getByText('10:28 am')).toHaveAttribute('dir', 'auto');
+    expect(screen.getByTestId(ids.bubble)).toHaveTextContent(
+      `Is Saturday possible?${fsi('Anaya')}·WhatsApp10:28 am`,
+    );
   });
 
   it('draws history chips — a button when the host opens records — and system lines', async () => {

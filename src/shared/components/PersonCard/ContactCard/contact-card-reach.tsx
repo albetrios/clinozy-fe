@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -85,7 +86,9 @@ export interface ReachRowProps {
  * One 32px-tile row per number or handle, with its links and "Copy" (H:2736;
  * the patient rail's Reach, H:719): the contact card's and the rail's, which
  * also masks the number behind an eye, and Medical's payment reminders, which
- * lead with the person and copy the message.
+ * lead with the person and copy the message. The value — a number, "•••• 3212",
+ * a handle or the reminder's person — reads in its own direction (`dir="auto"`:
+ * a number has no letters, so it reads left to right), aligned as the row is.
  */
 export function ReachRow({
   channel,
@@ -128,8 +131,9 @@ export function ReachRow({
       )}
       <span className="flex min-w-0 flex-col gap-px">
         <span
+          dir="auto"
           className={cn(
-            'truncate font-semibold tabular-nums',
+            'truncate [text-align:match-parent] font-semibold tabular-nums',
             valueClassName,
             // After the size: a type-size class would drop an earlier leading (cn).
             'leading-[1.2]',
@@ -192,7 +196,10 @@ export function ContactReachGroup({ reach }: { reach: readonly ContactReach[] })
               value={value}
               sub={sub}
               links={links}
-              copy={{ text: value, message: t(PERSON_CARD_KEYS.copied, { value }) }}
+              copy={{
+                text: value,
+                message: t(PERSON_CARD_KEYS.copied, { value: isolateText(value, 'ltr') }),
+              }}
             />
           );
         })

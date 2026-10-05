@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateJoin, isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -53,11 +54,16 @@ export interface TeamCardData {
   updatedAt?: string | null;
 }
 
-/** One Reach row: its 13px icon and its text, when there is any. */
+/**
+ * One Reach row: its 13px icon and its text, when there is any. The phone and
+ * the e-mail always read left to right (`ltr`); the composed rows keep the
+ * page's direction with each name or time isolated.
+ */
 interface ReachLine<Text = string | null | undefined> {
   key: string;
   icon: ReactNode;
   text: Text;
+  ltr?: boolean;
 }
 
 /** How to reach the member: phone, e-mail, branches, hours — each only when known. */
@@ -67,13 +73,18 @@ function teamReach(data: TeamCardData, t: TFunction): ReachLine<string>[] {
       key: 'phone',
       icon: <Phone />,
       text: data.phone ? formatClinicPhone(data.phone) : null,
+      ltr: true,
     },
-    { key: 'email', icon: <Mail />, text: data.email },
-    { key: 'branches', icon: <House />, text: data.branches?.join(' · ') },
+    { key: 'email', icon: <Mail />, text: data.email, ltr: true },
+    {
+      key: 'branches',
+      icon: <House />,
+      text: data.branches ? isolateJoin(data.branches) : null,
+    },
     {
       key: 'hours',
       icon: <Clock />,
-      text: data.hours ? t(PERSON_CARD_KEYS.works, data.hours) : null,
+      text: data.hours ? t(PERSON_CARD_KEYS.works, isolateValues(data.hours)) : null,
     },
   ];
   return rows.filter((row): row is ReachLine<string> => Boolean(row.text));
@@ -92,7 +103,10 @@ function TeamHeader({ data, kind }: { data: TeamCardData; kind?: TeamCardKind })
         presence={data.online ? 'online' : 'offline'}
       />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.3]">
-        <span className="text-title truncate leading-[1.3] font-semibold">
+        <span
+          dir="auto"
+          className="text-title truncate [text-align:match-parent] leading-[1.3] font-semibold"
+        >
           {data.name}
         </span>
         <span className="text-muted-foreground-strong text-xs leading-[1.3]">
@@ -136,10 +150,12 @@ export function TeamCardContent({
   const reach = teamReach(data, t);
   const updated = data.updatedAt
     ? t(keys.updated, {
-        time: formatDate(data.updatedAt, {
-          ...dateFormatOptions('time', prefs.hourCycle),
-          second: undefined,
-        }),
+        time: isolateText(
+          formatDate(data.updatedAt, {
+            ...dateFormatOptions('time', prefs.hourCycle),
+            second: undefined,
+          }),
+        ),
       })
     : t(keys.fetching);
 
@@ -174,7 +190,12 @@ export function TeamCardContent({
                   >
                     {row.icon}
                   </span>
-                  <span className="truncate tabular-nums">{row.text}</span>
+                  <span
+                    dir={row.ltr ? 'ltr' : undefined}
+                    className="truncate tabular-nums"
+                  >
+                    {row.text}
+                  </span>
                 </span>
               ))}
             </CardGroup>

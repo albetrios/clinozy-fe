@@ -24,6 +24,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import { CommandPalette } from './CommandPalette.tsx';
 
@@ -326,12 +327,23 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
       undefined,
       { timeout: 3000 },
     );
-    expect(dharti).toHaveTextContent('Dharti Galani#3508 · •••• 3212');
+    // Each sub token isolated; the name and the sub read in their own direction.
+    expect(dharti).toHaveTextContent(
+      `Dharti Galani${fsi('#3508')} · •••• ${fsi('3212')}`,
+    );
+    expect(within(dharti).getByText('Dharti Galani')).toHaveAttribute('dir', 'auto');
     expect(
-      screen.getByTestId(`command-palette-lead-${ref.lead(2352)}`),
-    ).toHaveTextContent('Dharti Galani#2352 · Clinic visited');
+      within(dharti).getByText(`${fsi('#3508')} · •••• ${fsi('3212')}`),
+    ).toHaveAttribute('dir', 'auto');
+    expect(
+      withoutBidiMarks(
+        screen.getByTestId(`command-palette-lead-${ref.lead(2352)}`).textContent,
+      ),
+    ).toBe('Dharti Galani#2352 · Clinic visited');
     const invoice = screen.getByTestId(`command-palette-invoice-${ref.invoice(787)}`);
-    expect(invoice).toHaveTextContent(/^Clinic invoice #787Dharti Galani · /);
+    expect(withoutBidiMarks(invoice.textContent)).toMatch(
+      /^Clinic invoice #787Dharti Galani · /,
+    );
     expect(activeRow()).toBe(dharti);
 
     await user.clear(search());
@@ -350,7 +362,7 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
       await screen.findByTestId(`command-palette-lead-${ref.lead(2371)}`, undefined, {
         timeout: 3000,
       }),
-    ).toHaveTextContent('#2371 · Re-targeted');
+    ).toHaveTextContent(`${fsi('#2371')} · ${fsi('Re-targeted')}`);
 
     await user.clear(search());
     await user.type(search(), 'neha');

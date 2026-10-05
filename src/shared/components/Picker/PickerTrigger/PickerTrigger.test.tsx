@@ -149,6 +149,23 @@ describe('PickerValue', () => {
     expect(container.querySelector('[class*="-dot"]')).toBeNull();
   });
 
+  it('reads a picked name and its meta in their own direction on a right-to-left page', () => {
+    const { container } = render(
+      <div dir="rtl">
+        <PickerValue
+          selected={[{ key: 'r', label: 'Riya S.', meta: '#3508', tone: 'sky' }]}
+          multiple={false}
+          size="md"
+          placeholder=""
+          maxChips={3}
+        />
+      </div>,
+    );
+    expect(screen.getByText('Riya S.')).toHaveAttribute('dir', 'auto');
+    expect(screen.getByText('#3508')).toHaveAttribute('dir', 'auto');
+    expect(container).toHaveTextContent('Riya S.#3508');
+  });
+
   it('draws a person as an avatar chip', () => {
     const { container } = render(
       <PickerValue
@@ -163,6 +180,7 @@ describe('PickerValue', () => {
     expect(screen.getByText('Dr. Mavani').closest('[data-slot="pill"]')).toHaveClass(
       'h-7',
     );
+    expect(screen.getByText('Dr. Mavani')).toHaveAttribute('dir', 'auto');
     expect(container.querySelector('.bg-tone-sage')).not.toBeNull();
   });
 

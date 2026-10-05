@@ -89,6 +89,20 @@ describe('TonePill', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('isolates the label in its own direction; the dot stays with the page', () => {
+    // On a right-to-left page a Latin tag keeps its brackets and full stop in place.
+    const { container } = render(
+      <div dir="rtl">
+        <TonePill tone="lav" dot>
+          Hair-fall (PRP)
+        </TonePill>
+      </div>,
+    );
+    expect(screen.getByText('Hair-fall (PRP)')).toHaveAttribute('dir', 'auto');
+    expect(pill('Hair-fall (PRP)')).not.toHaveAttribute('dir');
+    expect(container).toHaveTextContent('Hair-fall (PRP)');
+  });
+
   it('truncates a long label inside the pill and keeps a sized icon its size', () => {
     render(
       <TonePill tone="sky" icon={<Phone className="size-3.5" />}>

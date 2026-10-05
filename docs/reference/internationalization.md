@@ -33,6 +33,7 @@ flowchart LR
 - **Language + date/time + money:** Appearance side panel (`LanguagePrefsCard` + `DateTimePrefsCard` + `MoneyPrefsCard`). Language tiles are multi-locale only; text direction + date/timezone + number/currency always available.
 - **Appearance handle:** inline-end floating palette via `FloatingEdgeControls` (theme unlocked only).
 - **RTL FOUC:** `public/locale-init.js` sets `lang`/`dir` from `locale-preference` before paint (mirrors `theme-init.js`). Static HTML keeps `lang="en" dir="ltr"` as a no-JS fallback.
+- **Data inside RTL text:** a Latin name, phone, id, time or amount on a right-to-left page is reordered by the bidi algorithm ("+91 98250 44120" → "44120 98250 91+") unless it is isolated. An element that holds only data takes `dir="auto"` (names, free text) or `dir="ltr"` (phones, ids) plus `[text-align:match-parent]`; a translated sentence keeps the page's direction and isolates each data token with `isolateText` / `isolateValues` / `isolateJoin` (`src/lib/bidi-isolate.ts`, FSI/LRI…PDI). Never `dir="auto"` a line whose translation may lead with a token, and never isolate text that is stored, sent or copied (message templates, task titles, the clipboard). Rules: `agent-os/skills/fe-rtl-logical-css/SKILL.md` → Data inside RTL text.
 
 ---
 

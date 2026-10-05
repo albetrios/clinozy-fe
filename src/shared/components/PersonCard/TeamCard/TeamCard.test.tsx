@@ -8,6 +8,9 @@ import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import { TeamCard, TeamCardContent, type TeamCardData } from './TeamCard.tsx';
 
+/** A data token isolated in its own direction (FSI…PDI) inside a sentence. */
+const iso = (text: string) => `\u2068${text}\u2069`;
+
 /** Riya Shah as `US_SEED` and `PEOPLE` seed her (H:3374, H:3593). */
 const RIYA: TeamCardData = {
   name: 'Riya Shah',
@@ -92,11 +95,33 @@ describe('TeamCardContent', () => {
     for (const row of [
       '+91 98250 44120',
       'riya@cresence.skin',
-      'Adajan · Vesu',
-      'Works 10:00 – 19:00',
+      `${iso('Adajan')} · ${iso('Vesu')}`,
+      `Works ${iso('10:00')} – ${iso('19:00')}`,
     ]) {
       expect(within(reach).getByText(row)).toBeInTheDocument();
     }
+  });
+
+  it('keeps the name, phone and e-mail whole on a right-to-left page', () => {
+    render(
+      <TooltipProvider>
+        <div dir="rtl" data-testid="rtl">
+          <TeamCardContent data={RIYA} close={() => {}} />
+        </div>
+      </TooltipProvider>,
+    );
+    const name = screen.getByText('Riya Shah');
+    expect(name).toHaveAttribute('dir', 'auto');
+    expect(name).toHaveClass('[text-align:match-parent]');
+    // A phone and an address always read left to right; the branch list keeps the page's.
+    expect(screen.getByText('+91 98250 44120')).toHaveAttribute('dir', 'ltr');
+    expect(screen.getByText('riya@cresence.skin')).toHaveAttribute('dir', 'ltr');
+    expect(screen.getByText(`${iso('Adajan')} · ${iso('Vesu')}`)).not.toHaveAttribute(
+      'dir',
+    );
+    expect(screen.getByTestId('rtl')).toHaveTextContent(
+      '+91 98250 44120riya@cresence.skin',
+    );
   });
 
   it('assigns with the default label, or the caller’s, and closes', async () => {
@@ -119,7 +144,7 @@ describe('TeamCardContent', () => {
         <TeamCardContent data={RIYA} close={() => {}} />
       </TooltipProvider>,
     );
-    expect(screen.getByText('Updated 05:35')).toBeInTheDocument();
+    expect(screen.getByText(`Updated ${iso('05:35')}`)).toBeInTheDocument();
 
     rerender(
       <TooltipProvider>

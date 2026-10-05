@@ -19,6 +19,7 @@ import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import { CHAT_COLUMN_TEST_IDS as ids } from './chat-column.constants.ts';
 import type { ChatContact } from './chat-composer.ts';
@@ -120,10 +121,19 @@ describe('the conversation', () => {
     const header = screen.getByTestId(ids.header);
     expect(within(header).getByText('Anaya Desai')).toBeVisible();
     expect(within(header).getByText('+91 98795 21034')).toBeVisible();
+    // The name in its own direction, the phone always left to right — whole on
+    // a right-to-left page, each aligned as the header is, in this order.
+    expect(within(header).getByText('Anaya Desai')).toHaveAttribute('dir', 'auto');
+    expect(within(header).getByText('+91 98795 21034')).toHaveAttribute('dir', 'ltr');
+    expect(within(header).getByText('+91 98795 21034')).toHaveClass(
+      '[text-align:match-parent]',
+    );
+    expect(header).toHaveTextContent('Anaya Desai+91 98795 21034');
     expect(screen.getByRole('region', { name: 'Anaya Desai' })).toBeInTheDocument();
 
     expect(await screen.findByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · Today 10:28 am · via WhatsApp',
+      // The rule's time is an isolated token beside its day word.
+      `Lead created · Today ${fsi('10:28 am')} · via WhatsApp`,
     );
     expect(screen.getByTestId(ids.system)).toHaveTextContent(
       'Lead created from WhatsApp ad',
@@ -132,9 +142,9 @@ describe('the conversation', () => {
     expect(bubbles()[0]).toHaveTextContent(
       'Hi, I have acne scars since 2 years. What is the treatment and price?',
     );
-    expect(bubbles()[0]).toHaveTextContent('Anaya·WhatsApp10:28 am');
+    expect(bubbles()[0]).toHaveTextContent(`${fsi('Anaya')}·WhatsApp10:28 am`);
     expect(screen.getByRole('log', { name: 'Messages' })).toBeInTheDocument();
-    expect(screen.getByText('Anaya last wrote here')).toBeVisible();
+    expect(screen.getByText(`${fsi('Anaya')} last wrote here`)).toBeVisible();
     expect(screen.getByRole('tab', { name: 'WhatsApp' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -154,17 +164,18 @@ describe('the conversation', () => {
       within(screen.getByTestId(ids.header)).getByTestId('patient-badge'),
     ).toBeVisible();
     await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
-    // A time's own space is unbreakable (U+00A0); read it as a plain one.
+    // The parts are isolated and a time's own space is unbreakable (U+00A0):
+    // read the words and their order.
     const chips = screen
       .getAllByTestId(ids.history)
-      .map((chip) => chip.textContent?.replace(/\u00a0/gu, ' '));
+      .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));
     expect(chips[0]).toBe('Appointment #2740 · Peel · Completed · Dr. NishaWed 2:50 pm');
     expect(chips).toContain('Clinic invoice #787 · ₹4,800 · ₹4,800 dueWed');
     expect(chips.at(-1)).toBe(
       'Appointment #2859 · Peel · Confirmed · Dr. Nisha14 Oct 11:00 am',
     );
     expect(screen.getByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · 22 Aug 10:00 am · via Instagram',
+      `Lead created · 22 Aug ${fsi('10:00 am')} · via Instagram`,
     );
 
     await user.click(screen.getAllByTestId(ids.history)[0] as HTMLElement);
@@ -179,7 +190,7 @@ describe('the conversation', () => {
     await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
     const chips = screen
       .getAllByTestId(ids.history)
-      .map((chip) => chip.textContent?.replace(/\u00a0/gu, ' '));
+      .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));
     expect(chips).toContain('Clinic invoice #787 · ₹ •••• · ₹ •••• dueWed');
     expect(chips.join(' ')).not.toMatch(/₹\d/);
   });
@@ -288,7 +299,7 @@ describe('sending', () => {
     expect(pending).toHaveAttribute('data-kind', 'out');
     expect(pending).toHaveTextContent('Hi Anaya, Saturday 11:30 works.');
     // Named at once — the signed-in member — before the server names the author.
-    expect(pending).toHaveTextContent('Riya S.·WhatsApp');
+    expect(pending).toHaveTextContent(`${fsi('Riya S.')}·WhatsApp`);
     expect(pending).toHaveTextContent('Sending…');
 
     release();
@@ -298,7 +309,7 @@ describe('sending', () => {
       ),
     );
     const sent = bubbles().at(-1);
-    expect(sent).toHaveTextContent('Riya S.·WhatsApp');
+    expect(sent).toHaveTextContent(`${fsi('Riya S.')}·WhatsApp`);
     expect(sent).toHaveTextContent('·Sent');
     expect(messagesApi.sendMessage).toHaveBeenCalledWith({
       leadId: ref.lead(2363),
@@ -423,7 +434,7 @@ describe('"Send via"', () => {
   it('offers to switch to the channel they last wrote on', async () => {
     const user = userEvent.setup();
     renderChat({ person: KABIR, contact: KABIR_CONTACT });
-    await screen.findByText('Kabir last wrote here');
+    await screen.findByText(`${fsi('Kabir')} last wrote here`);
     await user.click(screen.getByRole('tab', { name: 'WhatsApp' }));
     await user.click(screen.getByTestId(ids.mismatch));
     expect(screen.getByRole('tab', { name: 'Instagram' })).toHaveAttribute(

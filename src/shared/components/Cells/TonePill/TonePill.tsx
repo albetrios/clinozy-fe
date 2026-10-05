@@ -37,7 +37,10 @@ export interface TonePillProps extends ComponentProps<'span'> {
   icon?: ReactNode;
 }
 
-/** A label on a tinted pill — status, kind, tag or consent — in a section tone. */
+/**
+ * A label on a tinted pill — status, kind, tag or consent — in a section tone.
+ * The label takes its own direction (`dir="auto"`); the pill keeps the page's.
+ */
 export function TonePill({
   tone,
   size = 'md',
@@ -84,7 +87,12 @@ export function TonePill({
           {icon}
         </span>
       ) : null}
-      <span className="min-w-0 truncate">{children}</span>
+      {/* The label in its own direction — a Latin tag or service keeps its
+          punctuation in place on a right-to-left page — while the dot and the
+          icon stay at the page's start. */}
+      <span dir="auto" className="min-w-0 truncate">
+        {children}
+      </span>
     </span>
   );
 }

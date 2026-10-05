@@ -4,6 +4,7 @@ import type {
   AppointmentRow,
   AppointmentStaff,
 } from '@/shared/api/clinic/appointments-contracts.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { emptyDraft } from './appointment-form-model.ts';
 import {
@@ -49,11 +50,17 @@ describe('the form’s words', () => {
         seq: 3508,
       },
     };
+    // Each part isolated, so a name stays whole on a right-to-left page.
     expect(footerSummary(t, draft, doctor)).toBe(
-      'Dharti Galani · Consultation · appointmentForm.footer.minutes{"minutes":20} · Reenal Shah',
+      [
+        fsi('Dharti Galani'),
+        fsi('Consultation'),
+        fsi('appointmentForm.footer.minutes{"minutes":20}'),
+        fsi('Reenal Shah'),
+      ].join(' · '),
     );
     expect(footerSummary(t, { ...draft, who: null }, undefined)).toBe(
-      'Consultation · appointmentForm.footer.minutes{"minutes":20}',
+      `${fsi('Consultation')} · ${fsi('appointmentForm.footer.minutes{"minutes":20}')}`,
     );
   });
 
@@ -64,14 +71,19 @@ describe('the form’s words', () => {
       'appointmentForm.footer.saveChanges',
     );
     expect(saveLabelText(t, 'book', slot)).toBe(
-      'appointmentForm.footer.book{"day":"Mon 5 Oct","time":"10:15 am"}',
+      `appointmentForm.footer.book{"day":"${fsi('Mon 5 Oct')}","time":"${fsi('10:15 am')}"}`,
     );
   });
 
   it('sums step 1 up with the reason quoted, cut at 40 characters', () => {
     const draft = { ...emptyDraft(null), reason: ` ${'r'.repeat(50)} ` };
     expect(detailsSummaryText(t, draft, doctor)).toBe(
-      `Consultation · Reenal Shah · appointmentForm.footer.minutes{"minutes":20} · “${'r'.repeat(40)}”`,
+      [
+        fsi('Consultation'),
+        fsi('Reenal Shah'),
+        fsi('appointmentForm.footer.minutes{"minutes":20}'),
+        fsi(`“${'r'.repeat(40)}”`),
+      ].join(' · '),
     );
   });
 
@@ -80,10 +92,10 @@ describe('the form’s words', () => {
     const was = { date: '2026-10-05', time: '10:00', status: 'confirmed' as const };
     expect(rescheduledText(t, null, label)).toBeNull();
     expect(rescheduledText(t, { was, confirmAgain: true }, label)).toBe(
-      'appointmentForm.status.rescheduledConfirm{"day":"2026-10-05","time":"10:00"}',
+      `appointmentForm.status.rescheduledConfirm{"day":"${fsi('2026-10-05')}","time":"${fsi('10:00')}"}`,
     );
     expect(rescheduledText(t, { was, confirmAgain: false }, label)).toBe(
-      'appointmentForm.status.rescheduled{"day":"2026-10-05","time":"10:00"}',
+      `appointmentForm.status.rescheduled{"day":"${fsi('2026-10-05')}","time":"${fsi('10:00')}"}`,
     );
   });
 

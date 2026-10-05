@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
@@ -80,14 +81,17 @@ interface ContactStepProps {
   testId: string;
 }
 
-/** The ID chip (H:1969): the record's own id to copy (D32), and the help beside it. */
+/**
+ * The ID chip (H:1969): the record's own id to copy (D32), and the help beside
+ * it. The id always reads left to right; the copy glyph keeps the page's side.
+ */
 function ContactIdRow({ recordId, testId }: { recordId: string | null; testId: string }) {
   const { t } = useTranslation(CONTACT_EDITOR_NS);
   const copy = async () => {
     if (!recordId) return;
     try {
       await navigator.clipboard.writeText(recordId);
-      notify.success(t(K.idCopied, { id: recordId }));
+      notify.success(t(K.idCopied, { id: isolateText(recordId, 'ltr') }));
     } catch {
       // A blocked clipboard copies nothing; the id stays on screen to read.
     }
@@ -104,7 +108,7 @@ function ContactIdRow({ recordId, testId }: { recordId: string | null; testId: s
               data-testid={`${testId}-id`}
               className="group/copy bg-muted text-muted-foreground-strong hover:bg-muted-strong text-caption inline-flex h-8 items-center gap-1.25 rounded-lg border px-2.25 font-mono font-medium"
             >
-              {recordId}
+              <span dir="ltr">{recordId}</span>
               <Copy
                 aria-hidden="true"
                 className="size-3 opacity-0 transition-opacity duration-150 group-hover/copy:opacity-100 group-focus-visible/copy:opacity-100"

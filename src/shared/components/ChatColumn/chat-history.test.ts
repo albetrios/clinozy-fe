@@ -23,6 +23,7 @@ import {
   Wallet,
   WhatsAppMark,
 } from '@/shared/icons/index.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import { CHAT_COLUMN_NS } from './chat-column.constants.ts';
 import {
@@ -120,8 +121,9 @@ const day = (date: string) => ({
 /** Every space as a plain one — a time's own is unbreakable (`U+00A0`). */
 const plain = (value: string) => value.replace(/\u00a0/gu, ' ');
 
+/** A line's words and order as read — its parts' isolate marks have their own test. */
 const text = (entry: ContactHistoryEntry, maskMoney = false) =>
-  plain(historyText(entry, formatWith(maskMoney)));
+  plain(withoutBidiMarks(historyText(entry, formatWith(maskMoney))));
 
 describe('chat times — the rooms’ one time rule', () => {
   it.each([
@@ -168,7 +170,13 @@ describe('contact-history strings (_patterns.md:184–192)', () => {
     expect(text(entry)).toBe('Appointment #2740 · Peel · Completed · Dr. Nisha');
     expect(historyChip(entry, formatWith())).toEqual({
       key: `appointment:${ID}`,
-      text: 'Appointment #2740 · Peel · Completed · Dr. Nisha',
+      // Each part isolated: "Dr. Nisha" keeps its full stop on a right-to-left page.
+      text: [
+        fsi('Appointment #2740'),
+        fsi('Peel'),
+        fsi('Completed'),
+        fsi('Dr. Nisha'),
+      ].join(' · '),
       icon: Calendar,
       tone: 'sage',
       target: { kind: 'appointment', appointmentId: ID },

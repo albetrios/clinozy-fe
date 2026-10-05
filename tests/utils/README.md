@@ -108,6 +108,20 @@ Radix dialogs portal outside the render container — use `axeForDialog` instead
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 ```
 
+### `bidi-marks.ts` (isolated data tokens)
+
+A data token inside a translated sentence is wrapped in invisible bidi marks
+(`src/lib/bidi-isolate.ts`). `fsi(text)` / `lri(text)` build the expected text
+from literal marks; `withoutBidiMarks(text)` strips them when a test checks only
+the words and their order:
+
+```ts
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+
+expect(row).toHaveTextContent(`Patient ${fsi('#3508')} · last visit`);
+expect(withoutBidiMarks(chip.textContent)).toBe('Appointment #2740 · Peel');
+```
+
 ## Test fixtures (`tests/fixtures/`)
 
 Static shapes for unit tests only — never imported from `src/`.

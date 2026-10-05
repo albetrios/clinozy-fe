@@ -127,7 +127,9 @@ function PickerChip<T>({ option }: { option: PickerOption<T> }) {
         className="bg-background text-foreground text-detail inline-flex h-7 max-w-full min-w-0 shrink-0 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 font-medium whitespace-nowrap"
       >
         <PersonAvatar initials={leading.initials} tone={tone} size="chip" />
-        <span className="truncate">{option.label}</span>
+        <span dir="auto" className="truncate">
+          {option.label}
+        </span>
       </span>
     );
   }
@@ -164,9 +166,14 @@ function PickerPlainValue<T>({
           className="text-muted-foreground-strong size-3.5 shrink-0"
         />
       ) : null}
-      <span className="truncate">{option.label}</span>
+      <span dir="auto" className="truncate">
+        {option.label}
+      </span>
       {option.meta && size !== 'sm' ? (
-        <span className="text-caption text-muted-foreground shrink-0 tabular-nums">
+        <span
+          dir="auto"
+          className="text-caption text-muted-foreground shrink-0 tabular-nums"
+        >
           {option.meta}
         </span>
       ) : null}
@@ -187,7 +194,7 @@ export interface PickerValueProps<T> {
 /**
  * What the trigger shows: the placeholder; one pick as its dot, icon or chip
  * (a person is an avatar chip); several picks as up to `maxChips` tone chips
- * then a "+N" count.
+ * then a "+N" count. A picked name or value reads in its own direction.
  */
 export function PickerValue<T>({
   selected,
