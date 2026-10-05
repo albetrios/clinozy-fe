@@ -382,7 +382,8 @@
     "session": "第 {{session}} 次",
     "quickFill": {
       "next": "{{name}} 的下一次",
-      "package": "{{name}} · 第 {{session}} 次"
+      "package": "{{name}} · 第 {{session}} 次",
+      "checkIn": "记录回访"
     },
     "type": "类型",
     "templates": {

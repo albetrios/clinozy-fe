@@ -173,6 +173,31 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     );
   });
 
+  it('logs a check-in from an edit: ⚡ "Log check-in" stacks the aftercare check-in, Back returns', async () => {
+    const user = userEvent.setup();
+    renderPatientFile(url(`/${LHR}/edit`), { role: 'doctor' });
+    const drawer = await screen.findByTestId('treatment-drawer');
+    await user.click(within(drawer).getByTestId('treatment-drawer-quick-fill-check-in'));
+    const checkIn = await screen.findByTestId('check-in-drawer');
+    expect(within(checkIn).getByTestId('check-in-drawer-title')).toHaveTextContent(
+      'Aftercare check-in',
+    );
+    const back = within(checkIn).getByTestId('check-in-drawer-dismiss');
+    expect(back).toHaveTextContent('Back');
+    await user.click(back);
+    await waitFor(() =>
+      expect(screen.queryByTestId('check-in-drawer')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('treatment-drawer')).toBeInTheDocument();
+  });
+
+  it('offers no "Log check-in" on a new treatment', async () => {
+    const { drawer } = await openNew();
+    expect(
+      within(drawer).queryByTestId('treatment-drawer-quick-fill-check-in'),
+    ).not.toBeInTheDocument();
+  });
+
   it('reads only for an Admin — treatments are Doctor and Therapist (S:39)', async () => {
     renderPatientFile(url(`/${LHR}/edit`), { role: 'admin' });
     const drawer = await screen.findByTestId('treatment-drawer');

@@ -57,26 +57,45 @@ export interface TreatmentDrawerProps {
   /** Doctor, Therapist, Owner (`S:38–39`); anyone else reads it. */
   writable: boolean;
   canDelete: boolean;
+  /**
+   * An edit's ⚡ "Log check-in" (`patient-file.md:278`): opens the check-in
+   * drawer for this treatment, stacked over this one. Absent — no chip (a new
+   * treatment, or a member who may not check in).
+   */
+  onLogCheckIn?: () => void;
   onClose: () => void;
 }
 
-/** The Quick fill chips (H:4828): "Next session of …" (new) and one per package. */
+/**
+ * The Quick fill chips (H:4828): "Log check-in" (edit), "Next session of …"
+ * (new) and one per package.
+ */
 function quickFillItems({
   form,
   editing,
   last,
   packages,
+  onLogCheckIn,
   t,
 }: {
   form: UseFormReturn<TreatmentFormValues>;
   editing: boolean;
   last: Treatment | undefined;
   packages: readonly PatientPackageRow[];
+  onLogCheckIn: (() => void) | undefined;
   t: TFunction;
 }): QuickFillItem[] {
   const fill = (values: TreatmentFormValues) =>
     form.reset(values, { keepDefaultValues: true, keepErrors: true });
   const items: QuickFillItem[] = [];
+  if (editing && onLogCheckIn) {
+    items.push({
+      id: 'check-in',
+      label: t(K.quickFill.checkIn),
+      tone: 'sage',
+      onSelect: onLogCheckIn,
+    });
+  }
   if (!editing && last) {
     items.push({
       id: 'next',
@@ -112,7 +131,8 @@ function quickFillItems({
  * `patient-file.md:123–141, 360–372`): 680px, "New treatment" / "Edit
  * treatment" (the contract numbers no treatment, so no tag), "Fields follow
  * the clinic specialty · switch if needed", the template and session badges;
- * Quick fill "Next session of …" and one chip per package; the Type switch;
+ * Quick fill "Log check-in" (edit), "Next session of …" (new) and one chip per
+ * package; the Type switch;
  * three steps. Nothing is required — a blank name saves as "Treatment"
  * (A-F11). "Treatment saved", and the template is remembered for the next.
  */
@@ -126,6 +146,7 @@ export function TreatmentDrawer({
   template,
   writable,
   canDelete,
+  onLogCheckIn,
   onClose,
 }: TreatmentDrawerProps) {
   const { t } = useTranslation(TREATMENT_NS);
@@ -216,6 +237,7 @@ export function TreatmentDrawer({
           editing: Boolean(treatment),
           last,
           packages,
+          onLogCheckIn,
           t,
         })}
         // The everyday 680px: a form with chip groups and textareas.

@@ -396,7 +396,8 @@
     "session": "Session {{session}}",
     "quickFill": {
       "next": "Next session of {{name}}",
-      "package": "{{name}} · session {{session}}"
+      "package": "{{name}} · session {{session}}",
+      "checkIn": "Log check-in"
     },
     "type": "Type",
     "templates": {

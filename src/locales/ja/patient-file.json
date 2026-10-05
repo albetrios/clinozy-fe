@@ -382,7 +382,8 @@
     "session": "{{session}}回目",
     "quickFill": {
       "next": "{{name}} の次の回",
-      "package": "{{name}} · {{session}}回目"
+      "package": "{{name}} · {{session}}回目",
+      "checkIn": "経過を記録"
     },
     "type": "種類",
     "templates": {

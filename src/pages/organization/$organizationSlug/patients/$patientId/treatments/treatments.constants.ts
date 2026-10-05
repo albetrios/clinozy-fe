@@ -12,6 +12,8 @@ export const TREATMENT_KEYS = {
   /** "Session 2". */
   session: 'treatment.session',
   quickFill: {
+    /** "Log check-in" — an edit's check-in drawer, stacked (H:4828). */
+    checkIn: 'treatment.quickFill.checkIn',
     /** "Next session of LHR Full Face". */
     next: 'treatment.quickFill.next',
     /** "LHR Full Face · B4G7 · session 2". */

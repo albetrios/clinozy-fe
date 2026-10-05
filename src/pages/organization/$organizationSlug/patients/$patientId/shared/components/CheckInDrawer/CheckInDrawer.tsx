@@ -44,6 +44,8 @@ export interface CheckInDrawerProps {
   treatmentId: string | null;
   /** Today's civil date — a new check-in's day. */
   today: string;
+  /** Stacked over another drawer (the Treatment drawer's "Log check-in"): Back closes it. */
+  stacked?: boolean;
   onClose: () => void;
 }
 
@@ -73,6 +75,7 @@ export function CheckInDrawer({
   appointmentId,
   treatmentId,
   today,
+  stacked = false,
   onClose,
 }: CheckInDrawerProps) {
   const { t } = useTranslation(CHECK_IN_NS);
@@ -154,6 +157,7 @@ export function CheckInDrawer({
       onSave={() => void save()}
       saveState={saveState}
       dirty={isDirty}
+      stacked={stacked}
       testId={CHECK_IN_TEST_ID}
     />
   );

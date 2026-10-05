@@ -410,7 +410,8 @@
     "session": "Seduta {{session}}",
     "quickFill": {
       "next": "Prossima seduta di {{name}}",
-      "package": "{{name}} · seduta {{session}}"
+      "package": "{{name}} · seduta {{session}}",
+      "checkIn": "Registra controllo"
     },
     "type": "Tipo",
     "templates": {

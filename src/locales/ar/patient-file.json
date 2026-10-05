@@ -452,7 +452,8 @@
     "session": "الجلسة {{session}}",
     "quickFill": {
       "next": "الجلسة التالية من {{name}}",
-      "package": "{{name}} · الجلسة {{session}}"
+      "package": "{{name}} · الجلسة {{session}}",
+      "checkIn": "تسجيل متابعة"
     },
     "type": "النوع",
     "templates": {

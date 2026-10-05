@@ -396,7 +396,8 @@
     "session": "Sitzung {{session}}",
     "quickFill": {
       "next": "Nächste Sitzung von {{name}}",
-      "package": "{{name}} · Sitzung {{session}}"
+      "package": "{{name}} · Sitzung {{session}}",
+      "checkIn": "Check-in erfassen"
     },
     "type": "Art",
     "templates": {

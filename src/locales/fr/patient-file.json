@@ -410,7 +410,8 @@
     "session": "Séance {{session}}",
     "quickFill": {
       "next": "Séance suivante de {{name}}",
-      "package": "{{name}} · séance {{session}}"
+      "package": "{{name}} · séance {{session}}",
+      "checkIn": "Saisir un suivi"
     },
     "type": "Type",
     "templates": {

@@ -396,7 +396,8 @@
     "session": "सेशन {{session}}",
     "quickFill": {
       "next": "{{name}} का अगला सेशन",
-      "package": "{{name}} · सेशन {{session}}"
+      "package": "{{name}} · सेशन {{session}}",
+      "checkIn": "चेक-इन दर्ज करें"
     },
     "type": "प्रकार",
     "templates": {

@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 
 import { organizationTreatmentEdit } from '@/lib/routes/patient-file-builders.ts';
 import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
+import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import {
   fetchTreatment,
   type TreatmentDetail,
@@ -24,6 +26,7 @@ import {
   useTreatmentCheckIns,
 } from '@/shared/hooks/useTreatments/index.ts';
 
+import { CheckInDrawer } from '../shared/components/CheckInDrawer/index.ts';
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import {
   PATIENT_SECTION_TABLE_IDS,
@@ -54,21 +57,28 @@ const NAME_CHIPS = 4;
 /**
  * New or Edit treatment, once the patient's treatments and packages and the
  * default doctor and therapist are read; the name chips are the first four
- * offerings that are not a consultation.
+ * offerings that are not a consultation. An edit's "Log check-in" stacks the
+ * check-in drawer for this treatment over it (`patient-file.md:278, 291`);
+ * Back returns to the treatment, whose feedback line then names the check-in.
  */
 function TreatmentDrawerHost({
   treatment,
   writable,
   canDelete,
+  canCheckIn,
   onClose,
 }: {
   /** The treatment an edit opens; null for a new one. */
   treatment: TreatmentDetail | null;
   writable: boolean;
   canDelete: boolean;
+  /** Patients Edit — the check-in's gate, as on the Treatments row. */
+  canCheckIn: boolean;
   onClose: () => void;
 }) {
-  const { patientId } = usePatientFileContext();
+  const { patientId, file } = usePatientFileContext();
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [today] = useState(() => clinicToday());
   const treatments = usePatientTreatments(patientId);
   const packages = usePatientPackages(patientId);
   const offerings = useOfferings({ notifyOnError: false });
@@ -82,19 +92,35 @@ function TreatmentDrawerHost({
     .filter((offering) => offering.active && offering.category !== 'consultation')
     .slice(0, NAME_CHIPS)
     .map((offering) => ({ name: offering.name, offeringId: offering.id }));
+  const checkInFor = treatment && canCheckIn && file ? treatment.treatment : null;
   return (
-    <TreatmentDrawer
-      treatment={treatment}
-      patientId={patientId}
-      last={last}
-      packages={packages.data}
-      names={names}
-      staff={{ doctorId: doctor.id, therapistId: therapist.id }}
-      template={startingTemplate(last)}
-      writable={writable}
-      canDelete={canDelete}
-      onClose={onClose}
-    />
+    <>
+      <TreatmentDrawer
+        treatment={treatment}
+        patientId={patientId}
+        last={last}
+        packages={packages.data}
+        names={names}
+        staff={{ doctorId: doctor.id, therapistId: therapist.id }}
+        template={startingTemplate(last)}
+        writable={writable}
+        canDelete={canDelete}
+        onLogCheckIn={checkInFor ? () => setCheckingIn(true) : undefined}
+        onClose={onClose}
+      />
+      {checkingIn && checkInFor && file ? (
+        <CheckInDrawer
+          patientId={patientId}
+          patientName={patientName(file.patient)}
+          checkIn={null}
+          appointmentId={checkInFor.appointmentId}
+          treatmentId={checkInFor.id}
+          today={today}
+          stacked
+          onClose={() => setCheckingIn(false)}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -192,6 +218,7 @@ export function PatientTreatmentsPage() {
           treatment={editing ?? null}
           writable={writable}
           canDelete={writable && access.can('patients', 'delete')}
+          canCheckIn={access.can('patients', 'edit')}
           onClose={route.close}
         />
       ) : null}

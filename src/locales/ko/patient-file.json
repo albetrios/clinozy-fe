@@ -382,7 +382,8 @@
     "session": "{{session}}회차",
     "quickFill": {
       "next": "{{name}} 다음 회차",
-      "package": "{{name}} · {{session}}회차"
+      "package": "{{name}} · {{session}}회차",
+      "checkIn": "경과 기록"
     },
     "type": "종류",
     "templates": {
