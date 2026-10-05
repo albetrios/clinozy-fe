@@ -31,7 +31,10 @@ export const TIMELINE_KEYS = {
       futureSuggestions: 'timeline.clinical.later',
     },
     smartLabel: 'timeline.clinical.smartLabel',
+    /** "Smart note · type naturally, e.g. {{example}}". */
     smartPlaceholder: 'timeline.clinical.smartPlaceholder',
+    /** The placeholder's example in the UI language — one the note reads (L-64). */
+    smartExample: 'timeline.clinical.smartExample',
     add: 'timeline.clinical.add',
     /** "3 items added from your note" (plural). */
     added: 'timeline.clinical.added',

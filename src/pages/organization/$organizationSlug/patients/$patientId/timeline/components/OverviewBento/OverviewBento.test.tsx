@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -9,6 +9,7 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
+import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import {
   patientFileUrl,
@@ -17,6 +18,13 @@ import {
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
 import { OverviewBento } from './OverviewBento.tsx';
+import type * as SmartNoteModule from './smart-note.ts';
+import { loadSmartNoteReading } from './smart-note.ts';
+
+vi.mock('./smart-note.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof SmartNoteModule>();
+  return { ...actual, loadSmartNoteReading: vi.fn(actual.loadSmartNoteReading) };
+});
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -61,6 +69,7 @@ beforeEach(() => {
 afterEach(() => {
   resetPatientFile();
   resetClinicFixtures();
+  useLocaleStore.setState({ locale: 'en' });
 });
 
 describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
@@ -102,13 +111,15 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
       'hair fall 2 months, suggest PRP',
     );
     await user.click(within(clinical).getByRole('button', { name: 'Add' }));
-    expect(notifyMock.success).toHaveBeenCalledWith('2 items added from your note');
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('2 items added from your note'),
+    );
     expect(within(clinical).getByText('Hair fall')).toBeInTheDocument();
-    expect(within(clinical).getByText('Prp')).toBeInTheDocument();
+    expect(within(clinical).getByText('PRP')).toBeInTheDocument();
     expect(within(clinical).getByRole('textbox', { name: 'Smart note' })).toHaveValue('');
     await waitFor(async () =>
       expect((await clinicFixtures.patients.get(DHARTI)).treatmentSuggestions).toMatch(
-        /Prp$/,
+        /PRP$/,
       ),
     );
 
@@ -116,7 +127,55 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
       within(clinical).getByRole('textbox', { name: 'Smart note' }),
       'ok{Enter}',
     );
-    expect(notifyMock.info).toHaveBeenCalledWith('Nothing recognised yet');
+    await waitFor(() =>
+      expect(notifyMock.info).toHaveBeenCalledWith('Nothing recognised yet'),
+    );
+  });
+
+  it('reads a smart note in the UI language, its example in the placeholder', async () => {
+    useLocaleStore.setState({ locale: 'de' });
+    const { user } = openOverview();
+    const clinical = await card('clinical');
+    const input = within(clinical).getByRole('textbox', { name: 'Smart note' });
+    expect(input).toHaveAttribute(
+      'placeholder',
+      'Smart note · type naturally, e.g. hair fall 2 months, suggest PRP',
+    );
+    await user.type(input, 'Haarausfall und Juckreiz, PRP vorschlagen{Enter}');
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('3 items added from your note'),
+    );
+    expect(within(clinical).getByText('Haarausfall')).toBeInTheDocument();
+    expect(within(clinical).getByText('Juckreiz')).toBeInTheDocument();
+  });
+
+  it('says when a smart note’s words cannot load, and Retry reads it', async () => {
+    const { user } = openOverview();
+    const clinical = await card('clinical');
+    vi.mocked(loadSmartNoteReading).mockRejectedValueOnce(new Error('offline'));
+    await user.type(
+      within(clinical).getByRole('textbox', { name: 'Smart note' }),
+      'acne on the chin{Enter}',
+    );
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Could not load data.', {
+        action: { label: 'Try again', onClick: expect.any(Function) },
+      }),
+    );
+    expect(notifyMock.info).not.toHaveBeenCalled();
+    expect(within(clinical).getByRole('textbox', { name: 'Smart note' })).toHaveValue(
+      'Acne on the chin',
+    );
+
+    const [, options] = notifyMock.error.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    act(() => options.action.onClick());
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('1 item added from your note'),
+    );
+    expect(within(clinical).getByText('Acne')).toBeInTheDocument();
   });
 
   it('opens New prescription with a line for each medicine a smart note names', async () => {

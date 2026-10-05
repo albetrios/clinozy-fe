@@ -871,7 +871,8 @@
       "suggested": "建议",
       "later": "以后",
       "smartLabel": "智能备注",
-      "smartPlaceholder": "智能备注 · 自然输入，例如 hair fall 2 months, suggest PRP",
+      "smartPlaceholder": "智能备注 · 自然输入，例如 {{example}}",
+      "smartExample": "脱发2个月，建议PRP",
       "add": "添加",
       "added_other": "已从备注中添加 {{count}} 项",
       "nothing": "尚未识别到内容"

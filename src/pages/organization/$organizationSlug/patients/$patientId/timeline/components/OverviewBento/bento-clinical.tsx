@@ -52,14 +52,14 @@ export function ClinicalBentoCard({
           className="flex gap-2"
           onSubmit={(event) => {
             event.preventDefault();
-            smart.apply();
+            void smart.apply();
           }}
         >
           <DrawerInput
             value={smart.note}
             onChange={(event) => smart.setNote(event.target.value)}
             maxLength={SMART_NOTE_MAX}
-            placeholder={t(K.smartPlaceholder)}
+            placeholder={t(K.smartPlaceholder, { example: t(K.smartExample) })}
             aria-label={t(K.smartLabel)}
             data-testid={TIMELINE_TEST_IDS.smartInput}
             className="bg-canvas min-w-0 flex-1 px-3"

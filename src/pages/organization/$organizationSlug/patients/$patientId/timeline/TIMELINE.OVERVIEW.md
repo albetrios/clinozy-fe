@@ -20,11 +20,15 @@ row dense), Clinical, Photos and Team notes two columns wide — then the **acti
   Due (masked with the file, its eye) and Paid, the last three invoices opening the Invoice
   drawer (`invoices/$invoiceId/edit` with `from`, or the view), "Collect payment" while
   something is owed. Reports: the last three. Team notes: the composer and the last three notes.
-- **Smart note** (Clinical, for a member who edits the patient): the words it knows (H:3702,
-  English only) become Complaints, Diagnosis and Suggested chips in one patient write; the Rx
-  catalogue's medicines it names open New prescription with a line each
-  (`prescriptions/create?medicines=`, AMBER A-F5) — never an Rx saved silently, the Rx gate
-  deciding. "Nothing recognised yet" otherwise.
+- **Smart note** (Clinical, for a member who edits the patient): the words it knows — the UI
+  language's (`components/OverviewBento/smart-note-words/`, the prototype's keys, H:3702, in all
+  11 locales, loaded per locale on first use), then English, which every locale still reads —
+  become Complaints, Diagnosis and Suggested chips in one patient write; case and accents fold,
+  a short word must stand alone, Chinese, Japanese and Korean match anywhere. The Rx catalogue's
+  medicines it names open New prescription with a line each (`prescriptions/create?medicines=`,
+  AMBER A-F5) — never an Rx saved silently, the Rx gate deciding. "Nothing recognised yet"
+  otherwise; words that cannot load say so, with a Retry. The placeholder's example is the
+  locale's own (`timeline.clinical.smartExample`).
 - **Activity timeline** (H:4840–4864, AMBER A-F7): every record — visits, prescriptions,
   treatments, invoices and payments (billing view only), photos, notes — newest first under
   their days ("Today", "3 days ago", "In 2 days", else the date), a day's photos as one row with
@@ -65,7 +69,8 @@ one lazy module (`../patient-id.sections.ts`).
 | `components/OverviewBento/bento-clinical.tsx`      | Clinical: the smart note and the four lists.                                                           |
 | `components/OverviewBento/bento-care.tsx`          | Visits, Packages, Prescriptions, Treatments.                                                           |
 | `components/OverviewBento/bento-files.tsx`         | Photos, Billing, Reports, Team notes.                                                                  |
-| `components/OverviewBento/smart-note.ts`           | The smart note's dictionary and reader.                                                                |
+| `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                            |
+| `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).   |
 | `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                       |
 | `components/ActivityTimeline/ActivityTimeline.tsx` | The card: the filter chips, the day headings, the rows.                                                |
 | `components/ActivityTimeline/activity-feed.ts`     | The kinds, chips and tones; rows (newest first, a day's photos joined) and counts.                     |

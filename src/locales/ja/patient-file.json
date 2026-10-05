@@ -871,7 +871,8 @@
       "suggested": "提案",
       "later": "今後",
       "smartLabel": "スマートメモ",
-      "smartPlaceholder": "スマートメモ · 自由に入力（例: hair fall 2 months, suggest PRP）",
+      "smartPlaceholder": "スマートメモ · 自由に入力（例: {{example}}）",
+      "smartExample": "2か月前から抜け毛、PRPを提案",
       "add": "追加",
       "added_other": "メモから{{count}}件を追加しました",
       "nothing": "まだ何も認識されていません"

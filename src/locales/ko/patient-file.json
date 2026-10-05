@@ -871,7 +871,8 @@
       "suggested": "제안",
       "later": "추후",
       "smartLabel": "스마트 메모",
-      "smartPlaceholder": "스마트 메모 · 자연스럽게 입력하세요. 예: hair fall 2 months, suggest PRP",
+      "smartPlaceholder": "스마트 메모 · 자연스럽게 입력하세요. 예: {{example}}",
+      "smartExample": "2개월째 탈모, PRP 권유",
       "add": "추가",
       "added_other": "메모에서 {{count}}개 항목을 추가했습니다",
       "nothing": "아직 인식된 항목이 없습니다"
