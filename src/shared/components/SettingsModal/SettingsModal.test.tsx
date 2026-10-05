@@ -14,20 +14,39 @@ import { SettingsModal } from './SettingsModal.tsx';
 vi.mock('posthog-js', () => ({ default: { capture: vi.fn() } }));
 
 const { useMeContextMock, notificationsPanelThrows, notificationsPanelDirty } =
-  vi.hoisted(() => ({
-    useMeContextMock: vi.fn(),
-    notificationsPanelThrows: { value: false },
-    // Stands in for a panel holding unsaved edits, through the real registration hook.
-    notificationsPanelDirty: { value: false },
-  }));
+  vi.hoisted(() => {
+    const listeners = new Set<() => void>();
+    return {
+      useMeContextMock: vi.fn(),
+      notificationsPanelThrows: { value: false },
+      // Stands in for a panel holding unsaved edits, through the real registration
+      // hook; `set` re-renders it, as a save landing clears a real panel's draft.
+      notificationsPanelDirty: {
+        value: false,
+        set(next: boolean) {
+          this.value = next;
+          for (const listener of listeners) listener();
+        },
+        subscribe(listener: () => void) {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+      },
+    };
+  });
 vi.mock('./account/AccountNotificationsPanel.tsx', async (importOriginal) => {
   const actual = await importOriginal<{ AccountNotificationsPanel: () => ReactNode }>();
   const { useRegisterSettingsDirty } = await import('./settings-dirty.tsx');
+  const { useSyncExternalStore } = await import('react');
   return {
     ...actual,
     AccountNotificationsPanel: () => {
       if (notificationsPanelThrows.value) throw new Error('Notifications panel crashed');
-      useRegisterSettingsDirty('notifications-test', notificationsPanelDirty.value);
+      const dirty = useSyncExternalStore(
+        (listener) => notificationsPanelDirty.subscribe(listener),
+        () => notificationsPanelDirty.value,
+      );
+      useRegisterSettingsDirty('notifications-test', dirty);
       return actual.AccountNotificationsPanel();
     },
   };
@@ -471,6 +490,25 @@ describe('SettingsModal', () => {
     await waitFor(() =>
       expect(router.state.location.hash).toBe('settings/account/security'),
     );
+  });
+
+  it('drops the prompt and closes once a save in flight lands — Esc mid-save', async () => {
+    notificationsPanelDirty.value = true;
+    const { router } = renderWithProviders(<SettingsModal />, {
+      initialEntries: ['/#settings/account/notifications'],
+    });
+    await screen.findByTestId('settings-section-notifications');
+
+    // Esc while the panel's save is still in flight: its draft is not clean yet.
+    fireEvent.keyDown(screen.getByTestId('settings-modal'), { key: 'Escape' });
+    expect(await screen.findByTestId('settings-discard-dialog')).toBeInTheDocument();
+
+    // The save lands: nothing is left to discard, so the close it parked goes ahead.
+    act(() => notificationsPanelDirty.set(false));
+    await waitFor(() =>
+      expect(screen.queryByTestId('settings-discard-dialog')).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(router.state.location.hash).toBe(''));
   });
 
   it('switches sections from the mobile picker', async () => {

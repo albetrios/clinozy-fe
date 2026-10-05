@@ -213,12 +213,23 @@ function useDiscardGuard() {
     [dirtyCtx?.isDirty],
   );
 
-  const confirmDiscard = () => {
+  const confirmDiscard = useCallback(() => {
     const action = pendingActionRef.current;
     pendingActionRef.current = null;
     setDiscardOpen(false);
     action?.();
-  };
+  }, []);
+
+  // Asked while a save was still in flight (Esc during "Saving…"): the prompt
+  // warned about changes that have since landed. Once nothing is dirty there
+  // is nothing left to discard, so the parked action goes ahead instead of the
+  // prompt outliving its reason. A failed save keeps the panel dirty — and the
+  // prompt up.
+  const isDirty = dirtyCtx?.isDirty ?? false;
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the parked action navigates, so it cannot run during render; this reacts once to a panel's save landing
+    if (discardOpen && !isDirty) confirmDiscard();
+  }, [discardOpen, isDirty, confirmDiscard]);
 
   return { discardOpen, setDiscardOpen, runOrConfirmDiscard, confirmDiscard };
 }
