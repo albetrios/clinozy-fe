@@ -618,6 +618,12 @@ export function patternFor(from) {
  * `.codex/` symlink into `agent-os/`, so following them would rewrite the same file
  * two or three times; and a fresh clone has dangling links whose targets are
  * gitignored, which made `statSync` throw ENOENT and abort the whole rename.
+ *
+ * A nested checkout is skipped too: a directory below the root that holds its own
+ * `.git` (a file for a linked worktree, a directory for a clone) is another
+ * repository — the agent worktrees under `.claude/worktrees/` are full copies of
+ * this one. Walking them made every repo-wide scan read each file once per
+ * worktree (the ci-policy scans timed out) and would let a rename rewrite them.
  */
 export function renameableFiles(root = ROOT, dir = root, out = []) {
   for (const entry of readdirSync(dir)) {
@@ -627,6 +633,7 @@ export function renameableFiles(root = ROOT, dir = root, out = []) {
     const stats = lstatSync(full);
     if (stats.isSymbolicLink()) continue;
     if (stats.isDirectory()) {
+      if (existsSync(join(full, '.git'))) continue;
       renameableFiles(root, full, out);
       continue;
     }

@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -56,6 +57,26 @@ function rawControlBytes(buffer: Buffer): number[] {
   }
   return [...found].sort((a, b) => a - b);
 }
+
+describe('the repo text-file walk', () => {
+  it('skips a nested checkout, such as an agent worktree', () => {
+    const root = mkdtempSync(join(tmpdir(), 'rename-walk-'));
+    try {
+      writeFileSync(join(root, 'top.ts'), 'export {};\n');
+      mkdirSync(join(root, 'src'));
+      writeFileSync(join(root, 'src', 'kept.ts'), 'export {};\n');
+      mkdirSync(join(root, 'worktree'));
+      writeFileSync(join(root, 'worktree', '.git'), 'gitdir: elsewhere\n');
+      writeFileSync(join(root, 'worktree', 'copy.ts'), 'export {};\n');
+      mkdirSync(join(root, 'clone', '.git'), { recursive: true });
+      writeFileSync(join(root, 'clone', 'copy.ts'), 'export {};\n');
+
+      expect(renameableFiles(root).sort()).toEqual(['src/kept.ts', 'top.ts']);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
 
 describe('source files are plain text', () => {
   const files: string[] = renameableFiles(ROOT);
