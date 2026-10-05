@@ -347,7 +347,10 @@
         "email": "Email",
         "inApp": "In-app",
         "desktop": "Desktop"
-      }
+      },
+      "kind": "Notification",
+      "loadFailed": "Couldn't load your preferences. Please try again.",
+      "desktopDenied": "Desktop notifications need browser permission. Enable them in your browser settings, then turn this on again."
     },
     "appearance": {
       "title": "Appearance",

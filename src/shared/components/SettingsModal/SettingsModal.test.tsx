@@ -167,7 +167,8 @@ describe('SettingsModal', () => {
 
     const dialog = await screen.findByTestId('settings-modal');
     expect(dialog).toHaveClass('sm:w-[calc(100%-2rem)]', 'sm:max-w-[960px]');
-    expect(dialog).toHaveClass('sm:rounded-lg');
+    // 12px — the design's centred-dialog corners (the command menu's).
+    expect(dialog).toHaveClass('sm:rounded-xl');
     expect(dialog).toHaveClass('3xl:h-[760px]', '3xl:max-w-[1120px]');
     expect(dialog).toHaveAttribute('data-slot', 'dialog-content');
     // Only the phone sheet is square by construction.

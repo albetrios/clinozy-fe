@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -190,10 +190,9 @@ describe('AccountSecurityPanel', () => {
     // The score is a claim too — it must not be computed from the defaults.
     expect(screen.queryByTestId('security-overview')).not.toBeInTheDocument();
     expect(screen.getByTestId('security-overview-loading')).toBeInTheDocument();
+    // The loading card still names itself — its head is the real title.
     expect(
-      screen
-        .getByTestId('security-overview-loading')
-        .querySelector('[data-slot="card-title"]'),
+      within(screen.getByTestId('security-overview-loading')).getByRole('heading'),
     ).toHaveTextContent(/\S/);
   });
 

@@ -1,25 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import type {
   NotificationCategory,
   NotificationChannel,
   NotificationPreference,
 } from '@/shared/api/notification-contracts.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { Switch } from '@/shared/components/ui/switch.tsx';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
 } from '@/shared/hooks/useNotifications/index.ts';
+import { NOTIFICATION_CATEGORY_LOOK } from '@/shared/notifications/category-look.ts';
 import { requestDesktopPermission } from '@/shared/notifications/desktop.ts';
 
 import { SETTINGS_KEYS, SETTINGS_NS } from '../settings.constants.ts';
@@ -62,6 +59,13 @@ const CHANNELS: { id: NotificationChannel; labelKey: string }[] = [
   { id: 'inApp', labelKey: SETTINGS_KEYS.panels.notifications.channels.inApp },
   { id: 'desktop', labelKey: SETTINGS_KEYS.panels.notifications.channels.desktop },
 ];
+
+/**
+ * The matrix's grid, as Roles & access draws its own (H:1133): the kind of
+ * update, then one 72px column per channel. It keeps its width and scrolls
+ * sideways inside its bordered box on a phone.
+ */
+const MATRIX_GRID = 'grid grid-cols-[minmax(200px,1fr)_repeat(3,72px)] items-center';
 
 function prefKey(category: NotificationCategory, channel: NotificationChannel): string {
   return `${category}:${channel}`;
@@ -240,48 +244,94 @@ export function AccountNotificationsPanel() {
     applyToggle(category, channel, value).catch(() => undefined);
   }
 
+  const panel = SETTINGS_KEYS.panels.notifications;
   return (
-    <div className="space-y-6" data-testid="settings-section-notifications">
-      <SectionHeader
-        title={t(SETTINGS_KEYS.panels.notifications.title)}
-        description={t(SETTINGS_KEYS.panels.notifications.description)}
-      />
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            {t(SETTINGS_KEYS.panels.notifications.deliveryTitle)}
-          </CardTitle>
-          <CardDescription>
-            {t(SETTINGS_KEYS.panels.notifications.deliveryDescription)}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? <PanelSkeleton testId="notifications-prefs-loading" /> : null}
+    <div className="flex flex-col gap-4" data-testid="settings-section-notifications">
+      <SectionHeader title={t(panel.title)} description={t(panel.description)} />
+      <SettingsCard
+        title={t(panel.deliveryTitle)}
+        description={t(panel.deliveryDescription)}
+      >
+        {isLoading ? <PanelSkeleton testId="notifications-prefs-loading" /> : null}
 
-          {isError ? (
-            <div data-testid="notification-prefs-error">
-              <RetryError
-                message="Couldn't load your preferences. Please try again."
-                onRetry={() => {
-                  void refetch();
-                }}
-                isRetrying={isFetching}
-              />
-            </div>
-          ) : null}
+        {isError ? (
+          <div data-testid="notification-prefs-error">
+            <RetryError
+              message={t(panel.loadFailed)}
+              onRetry={() => {
+                void refetch();
+              }}
+              isRetrying={isFetching}
+            />
+          </div>
+        ) : null}
 
-          {!(isLoading || isError) ? (
-            <>
-              <div className="divide-y">
-                {CATEGORIES.map((cat) => (
-                  <div key={cat.id} className="py-4 first:pt-0 last:pb-0">
-                    <p className="text-sm font-medium">{t(cat.labelKey)}</p>
-                    <p className="text-muted-foreground text-xs">
-                      {t(cat.descriptionKey)}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+        {!(isLoading || isError) ? (
+          <>
+            {/* The Roles & access matrix (`users.md:59–69`; H:1131–1136): each
+                kind of update a row — its 26px tone tile, name and description —
+                and a switch per channel. */}
+            <div className="[scrollbar-width:thin] overflow-x-auto rounded-xl border">
+              <div role="table" aria-label={t(panel.deliveryTitle)} className="min-w-110">
+                <div
+                  role="row"
+                  tabIndex={-1}
+                  className={cn(
+                    MATRIX_GRID,
+                    'bg-canvas text-tiny text-muted-foreground h-9 border-b px-3 font-semibold tracking-[0.04em] uppercase',
+                  )}
+                >
+                  <span role="columnheader" tabIndex={-1}>
+                    {t(panel.kind)}
+                  </span>
+                  {CHANNELS.map((ch) => (
+                    <span
+                      key={ch.id}
+                      role="columnheader"
+                      tabIndex={-1}
+                      className="text-center"
+                    >
+                      {t(ch.labelKey)}
+                    </span>
+                  ))}
+                </div>
+                {CATEGORIES.map((cat) => {
+                  const look = NOTIFICATION_CATEGORY_LOOK[cat.id];
+                  return (
+                    <div
+                      key={cat.id}
+                      role="row"
+                      tabIndex={-1}
+                      className={cn(
+                        MATRIX_GRID,
+                        'border-b-muted hover:bg-canvas min-h-12 border-b px-3 transition-colors duration-150 last:border-b-0',
+                      )}
+                    >
+                      <span
+                        role="rowheader"
+                        tabIndex={-1}
+                        className="flex min-w-0 items-center gap-2.5 py-1.5"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'flex size-6.5 shrink-0 items-center justify-center rounded-md',
+                            TONE_CLASSES[look.tone].surface,
+                          )}
+                        >
+                          <look.icon className="size-3.5" />
+                        </span>
+                        <span className="flex min-w-0 flex-col leading-[1.3]">
+                          <span className="text-body leading-[1.3] font-semibold">
+                            {t(cat.labelKey)}
+                          </span>
+                          <span className="text-caption text-muted-foreground truncate">
+                            {t(cat.descriptionKey)}
+                          </span>
+                        </span>
+                      </span>
                       {CHANNELS.map((ch) => (
-                        <div key={ch.id} className="flex items-center gap-2 text-sm">
+                        <span key={ch.id} role="cell" className="flex justify-center">
                           <Switch
                             checked={isEnabled(cat.id, ch.id)}
                             onCheckedChange={(value) =>
@@ -294,23 +344,21 @@ export function AccountNotificationsPanel() {
                             aria-label={`${t(cat.labelKey)} — ${t(ch.labelKey)}`}
                             data-testid={`notify-${cat.id}-${ch.id}`}
                           />
-                          <span className="text-muted-foreground">{t(ch.labelKey)}</span>
-                        </div>
+                        </span>
                       ))}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              {desktopDenied ? (
-                <output className="text-muted-foreground mt-4 block text-xs">
-                  Desktop notifications need browser permission. Enable them in your
-                  browser settings, then turn this on again.
-                </output>
-              ) : null}
-            </>
-          ) : null}
-        </CardContent>
-      </Card>
+            </div>
+            {desktopDenied ? (
+              <output className="text-muted-foreground block text-xs leading-[1.45]">
+                {t(panel.desktopDenied)}
+              </output>
+            ) : null}
+          </>
+        ) : null}
+      </SettingsCard>
     </div>
   );
 }

@@ -136,7 +136,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
   return (
     <>
       <form
-        className="space-y-5"
+        className="flex flex-col gap-(--form-gap)"
         data-testid="profile-form"
         onSubmit={handleSubmit(() => {
           // Validate BEFORE the confirm dialog — an invalid field (e.g. an
@@ -145,7 +145,8 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           if (isDirty) setShowConfirm(true);
         })}
       >
-        <div className="grid gap-5 sm:grid-cols-2">
+        {/* The drawer form's grid gap (`--form-gap`): half-width names from `sm`. */}
+        <div className="grid gap-(--form-gap) sm:grid-cols-2">
           <DrawerField
             label={t(panels.nameLabel)}
             htmlFor="profile-name"
@@ -190,13 +191,15 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           </p>
         </DrawerField>
 
-        <Button
-          type="submit"
-          disabled={save.isPending || !isDirty}
-          data-testid="profile-submit"
-        >
-          {save.isPending ? t(panels.saving) : t(panels.save)}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={save.isPending || !isDirty}
+            data-testid="profile-submit"
+          >
+            {save.isPending ? t(panels.saving) : t(panels.save)}
+          </Button>
+        </div>
       </form>
 
       {/* Open until the save resolves (onSuccess closes it), and not dismissible meanwhile. */}

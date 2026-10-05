@@ -69,6 +69,32 @@ describe('AccountNotificationsPanel', () => {
     expect(screen.getByTestId('notify-billing-desktop')).toBeInTheDocument();
   });
 
+  it('lays the matrix out as Roles & access does: a column per channel, a row per kind', () => {
+    render(<AccountNotificationsPanel />);
+    const table = screen.getByRole('table', { name: 'Delivery' });
+    // The kind of update, then Email · In-app · Desktop.
+    expect(
+      screen.getAllByRole('columnheader').map((header) => header.textContent),
+    ).toEqual(['Notification', 'Email', 'In-app', 'Desktop']);
+    const rowHeaders = screen.getAllByRole('rowheader');
+    expect(rowHeaders).toHaveLength(4);
+    expect(rowHeaders[0]).toHaveTextContent('Product & system');
+    // Each kind carries its tone tile (the inbox draws the same one).
+    expect(rowHeaders[2]?.querySelector('.bg-tone-peach')).not.toBeNull();
+    expect(table).toContainElement(screen.getByTestId('notify-billing-desktop'));
+  });
+
+  it('says why a denied desktop switch stays off, in the locale bundle’s words', async () => {
+    const user = userEvent.setup();
+    requestPermissionMock.mockResolvedValue('denied');
+    render(<AccountNotificationsPanel />);
+    await user.click(screen.getByTestId('notify-billing-desktop'));
+    expect(
+      await screen.findByText(/Desktop notifications need browser permission/),
+    ).toBeInTheDocument();
+    expect(updateMutate).not.toHaveBeenCalled();
+  });
+
   it('shows a loading state', () => {
     usePrefsMock.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     render(<AccountNotificationsPanel />);

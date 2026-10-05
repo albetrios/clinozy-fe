@@ -345,7 +345,10 @@
         "email": "邮件",
         "inApp": "应用内",
         "desktop": "桌面"
-      }
+      },
+      "kind": "通知",
+      "loadFailed": "无法加载你的通知偏好。请重试。",
+      "desktopDenied": "桌面通知需要浏览器授权。请先在浏览器设置中允许，然后再次开启此项。"
     },
     "appearance": {
       "title": "外观",

@@ -12,19 +12,13 @@ import {
   PersonAvatar,
   personInitials,
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import {
   computeProfileCompleteness,
   type ProfileInput,
@@ -64,18 +58,20 @@ export function AccountProfilePanel() {
   const panels = SETTINGS_KEYS.panels.profile;
 
   return (
-    <div className="space-y-6" data-testid="settings-section-profile">
+    <div className="flex flex-col gap-4" data-testid="settings-section-profile">
       <SectionHeader
         title={t(panels.title)}
         description={t(panels.description)}
         meta={t(panels.completeness, { percent: completeness })}
       />
       <AvatarCard name={values.name} />
-      <ProfileForm
-        email={user?.email ?? ''}
-        defaultValues={seeded}
-        onValuesChange={setEdited}
-      />
+      <SettingsCard>
+        <ProfileForm
+          email={user?.email ?? ''}
+          defaultValues={seeded}
+          onValuesChange={setEdited}
+        />
+      </SettingsCard>
     </div>
   );
 }
@@ -124,12 +120,11 @@ function AvatarCard({ name }: { name: string }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t(profile.avatarTitle)}</CardTitle>
-        <CardDescription>{t(profile.avatarDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center gap-4">
+    <SettingsCard
+      title={t(profile.avatarTitle)}
+      description={t(profile.avatarDescription)}
+    >
+      <div className="flex flex-wrap items-center gap-4">
         {/* The shared avatar is decorative; this frame names the picture. */}
         <div
           role="img"
@@ -176,7 +171,7 @@ function AvatarCard({ name }: { name: string }) {
             </Button>
           ) : null}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

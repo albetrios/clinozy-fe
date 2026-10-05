@@ -1,17 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { CheckCircle, ShieldAlert, ShieldCheck } from '@/shared/icons/index.ts';
 
 export interface SecurityOverviewCardProps {
@@ -21,7 +16,9 @@ export interface SecurityOverviewCardProps {
 
 /**
  * At-a-glance security posture — helps users see what's protecting their account
- * without digging through each card.
+ * without digging through each card. A settings card headed by the shield and
+ * the score pill (sage when every protection is on, butter otherwise), then one
+ * 13px line per protection with its check.
  */
 export function SecurityOverviewCard({
   mfaEnabled,
@@ -55,46 +52,52 @@ export function SecurityOverviewCard({
   const strong = score === items.length;
 
   return (
-    <Card data-testid="security-overview">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            {strong ? (
-              <ShieldCheck className="text-success" aria-hidden />
-            ) : (
-              <ShieldAlert className="text-tone-butter-foreground" aria-hidden />
-            )}
-            <CardTitle className="text-base">{t(keys.title)}</CardTitle>
-          </div>
-          <TonePill
-            tone={strong ? 'sage' : 'butter'}
-            size="sm"
-            data-testid="security-overview-score"
+    <SettingsCard
+      data-testid="security-overview"
+      title={
+        <>
+          {strong ? (
+            <ShieldCheck className="text-success size-4 shrink-0" aria-hidden />
+          ) : (
+            <ShieldAlert
+              className="text-tone-butter-foreground size-4 shrink-0"
+              aria-hidden
+            />
+          )}
+          {t(keys.title)}
+        </>
+      }
+      description={t(keys.description)}
+      action={
+        <TonePill
+          tone={strong ? 'sage' : 'butter'}
+          className="tabular-nums"
+          data-testid="security-overview-score"
+        >
+          {t(keys.score, { score, total: items.length })}
+        </TonePill>
+      }
+    >
+      <ul className="flex flex-col gap-2">
+        {items.map((item) => (
+          <li
+            key={item.id}
+            className="text-body flex items-center gap-2"
+            data-testid={`security-overview-${item.id}`}
           >
-            {t(keys.score, { score, total: items.length })}
-          </TonePill>
-        </div>
-        <CardDescription>{t(keys.description)}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ul className="flex flex-col gap-2">
-          {items.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-2 text-sm"
-              data-testid={`security-overview-${item.id}`}
-            >
-              <CheckCircle
-                className={item.ok ? 'text-success' : 'text-muted-foreground'}
-                aria-hidden
-              />
-              <span className={item.ok ? 'text-foreground' : 'text-muted-foreground'}>
-                {item.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </CardContent>
-    </Card>
+            <CheckCircle
+              className={cn(
+                'size-4 shrink-0',
+                item.ok ? 'text-success' : 'text-muted-foreground',
+              )}
+              aria-hidden
+            />
+            <span className={item.ok ? 'text-foreground' : 'text-muted-foreground'}>
+              {item.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </SettingsCard>
   );
 }

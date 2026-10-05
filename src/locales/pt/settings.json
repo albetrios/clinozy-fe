@@ -351,7 +351,10 @@
         "email": "E-mail",
         "inApp": "No app",
         "desktop": "Área de trabalho"
-      }
+      },
+      "kind": "Notificação",
+      "loadFailed": "Não foi possível carregar suas preferências. Tente novamente.",
+      "desktopDenied": "As notificações na área de trabalho precisam da permissão do navegador. Ative-as nas configurações do navegador e depois ligue esta opção novamente."
     },
     "appearance": {
       "title": "Aparência",

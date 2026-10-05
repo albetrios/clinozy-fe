@@ -347,7 +347,10 @@
         "email": "E-Mail",
         "inApp": "In der App",
         "desktop": "Desktop"
-      }
+      },
+      "kind": "Benachrichtigung",
+      "loadFailed": "Ihre Einstellungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+      "desktopDenied": "Desktop-Benachrichtigungen benötigen die Erlaubnis des Browsers. Aktivieren Sie sie in Ihren Browsereinstellungen und schalten Sie dies dann erneut ein."
     },
     "appearance": {
       "title": "Darstellung",

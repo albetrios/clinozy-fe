@@ -1,17 +1,9 @@
 import { useNavigate, useRouter, useRouterState } from '@tanstack/react-router';
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ORGANIZATION } from '@/core/config/constants.ts';
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
-import { cn } from '@/lib/utils.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
@@ -43,6 +35,10 @@ import {
   visibleSettingsNavGroups,
 } from './settings-nav-visibility.ts';
 import { resolveSettingsSection } from './settings-resolve.ts';
+import {
+  SETTINGS_SCOPE_TONES,
+  SettingsSectionContext,
+} from './settings-section-context.ts';
 import type {
   SettingsScope,
   SettingsSection,
@@ -68,19 +64,20 @@ export function SettingsModal() {
   );
 }
 
-/** One dialog shell for both the loading and the resolved states. */
 /**
- * A full-screen sheet on phones (square — it IS the screen), a dialog from `sm`.
+ * One dialog shell for both the loading and the resolved states: a full-screen
+ * sheet on phones (square — it IS the screen), a dialog from `sm`, in the
+ * design's centred-dialog frame (12px corners, the command menu's).
  *
  * The `sm:` half has to undo the sheet, not just cap it: `w-full` with only a
  * `max-w` left the modal flush against both edges on anything between 640px and
  * 960px (every tablet), and an unconditional `rounded-none` kept it square on
- * desktop under every radius setting. `sm:rounded-lg` is token-backed and the
+ * desktop under every radius setting. `sm:rounded-xl` is token-backed and the
  * dialog slot squares it again under the Sharp shape.
  */
 const SETTINGS_DIALOG_CLASS =
   'h-dvh max-h-dvh w-full max-w-full gap-0 overflow-hidden rounded-none p-0 ' +
-  'sm:h-[640px] sm:max-h-[85vh] sm:w-[calc(100%-2rem)] sm:max-w-[960px] sm:rounded-lg ' +
+  'sm:h-[640px] sm:max-h-[85vh] sm:w-[calc(100%-2rem)] sm:max-w-[960px] sm:rounded-xl ' +
   '3xl:h-[760px] 3xl:max-w-[1120px]';
 
 /**
@@ -177,22 +174,19 @@ function useSettingsSection() {
 }
 
 /**
- * Mobile section picker — the sidebar is hidden below sm. `ps-4` is
- * the content pane's gutter, so the picker and the fields under it
- * share a left edge.
+ * Mobile section switch — the rail is hidden below `sm`, so a phone picks the
+ * section from the shared Picker (its 72% bottom sheet), as the phone list
+ * toolbars pick: a 44px trigger, each row the section's icon tile, the two
+ * scopes as groups. `ps-4` is the content pane's gutter, so the switch and the
+ * fields under it share a left edge.
  *
- * `pe-14` reserves room for the dialog's close button, which is
- * now pinned on the logical end too (`ui/dialog.tsx`) — so the two
- * mirror together. They did not: the button was physical
- * (`right-4`) while this inset was logical, which put them on
- * opposite sides in Arabic and Hebrew and ran the picker under the
- * X. Fixed in the primitive rather than here, because every dialog
- * had it.
- *
- * 14 rather than 12: the button is 32px wide inset 16px, so 48px of
- * reservation left the picker flush against the X with nothing
- * between them. 56px is the same 16px gutter the rest of the pane
- * uses, and is what "feels tight" was about (QA-V3 suggestion 7).
+ * `pe-14` reserves room for the dialog's close button, which is pinned on the
+ * logical end too (`ui/dialog.tsx`) — so the two mirror together. They did
+ * not: the button was physical (`right-4`) while this inset was logical, which
+ * put them on opposite sides in Arabic and Hebrew and ran the picker under the
+ * X. 14 rather than 12: the button is 32px wide inset 16px, so 48px of
+ * reservation left the picker flush against the X with nothing between them;
+ * 56px keeps the pane's own 16px gutter between the two (QA-V3 suggestion 7).
  */
 function MobileSectionPicker({
   groups,
@@ -209,15 +203,20 @@ function MobileSectionPicker({
       key: `${item.scope}/${item.section}`,
       label: t(item.labelKey),
       group: t(group.labelKey),
+      groupTone: SETTINGS_SCOPE_TONES[group.scope],
+      tone: SETTINGS_SCOPE_TONES[item.scope],
+      leading: { kind: 'icon' as const, icon: item.icon },
+      keywords: item.keywords,
     })),
   );
   return (
-    <div className="shrink-0 border-b py-3 ps-4 pe-14 sm:hidden">
+    <div className="shrink-0 border-b py-2 ps-4 pe-14 sm:hidden">
       <Picker
         label={t(SETTINGS_KEYS.nav.ariaSections)}
         value={`${active.scope}/${active.section}`}
         options={options}
         plain
+        size="lg"
         placeholder={t(SETTINGS_SECTION_LABEL_KEYS[active.section])}
         onChange={(key) => {
           if (!key) return;
@@ -252,9 +251,6 @@ function SettingsModalBody() {
   });
   const navigate = useNavigate();
   const router = useRouter();
-  // Drives the top scroll-shadow on the content panel (elevates the header bar
-  // once the user scrolls down past the top).
-  const [scrolled, setScrolled] = useState(false);
 
   const close = useCallback(() => {
     if (router.history.length > 1) {
@@ -296,33 +292,30 @@ function SettingsModalBody() {
           }}
         >
           <DialogTitle className="sr-only">{t(SETTINGS_KEYS.dialog.title)}</DialogTitle>
-          <div className="grid h-full min-h-0 grid-cols-1 sm:grid-cols-[240px_1fr]">
+          {/* The Users room's master–detail split (`users.md:19`; H:1117): the
+              rail on `canvas`, minmax(220px, 264px), and the section's page
+              scrolling on its own beside it. */}
+          <div className="grid h-full min-h-0 grid-cols-1 sm:grid-cols-[minmax(220px,264px)_minmax(0,1fr)]">
             <SettingsNav groups={readyGroups} active={active} onSelect={goTo} />
             <div className="flex min-h-0 flex-col">
               <MobileSectionPicker groups={readyGroups} active={active} onSelect={goTo} />
-              {/* Desktop: empty header strip — gives the dialog's close button room
-                and elevates with a shadow once the content scrolls beneath it. */}
               <div
-                aria-hidden
-                className={cn(
-                  'pointer-events-none z-10 hidden h-12 shrink-0 transition-shadow duration-200 sm:block',
-                  scrolled && 'scroll-shadow-top',
-                )}
-              />
-              <div
-                // `sm:px-6` / `sm:pb-6`: the standard dialog inset (see SettingsNav).
-                className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6 sm:px-6 sm:pt-2 sm:pb-6"
+                // `sm:px-6` / `sm:pb-6`: the standard dialog inset. No top inset:
+                // each section's head row is the pane's header, pinned to its top
+                // while the panel scrolls beneath it (`SectionHeader`).
+                className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 sm:px-6 sm:pb-6"
                 data-testid="settings-content"
-                onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
               >
-                {contextReady ? (
-                  <ActivePanel
-                    key={`${active.scope}/${active.section}`}
-                    active={active}
-                  />
-                ) : (
-                  <SettingsContentLoading active={active} />
-                )}
+                <SettingsSectionContext value={active}>
+                  {contextReady ? (
+                    <ActivePanel
+                      key={`${active.scope}/${active.section}`}
+                      active={active}
+                    />
+                  ) : (
+                    <SettingsContentLoading active={active} />
+                  )}
+                </SettingsSectionContext>
               </div>
             </div>
           </div>

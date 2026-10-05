@@ -29,20 +29,35 @@ describe('SettingsNav', () => {
     expect(screen.getByTestId('settings-nav-organization-members')).toBeInTheDocument();
   });
 
-  it('insets the search box and the nav by the standard dialog padding', () => {
-    // Every other dialog gets 24px from `DialogContent` (`p-6`). The settings
-    // modal opts out (`p-0`), and its search box used to sit 12px from the corner
-    // next to a content pane inset 32px. `6` is a spacing-scale step, so — like
-    // `p-6` — it follows the theme's Density setting; a fixed `[24px]` would not.
+  it('is the role list’s canvas column, inset on the spacing scale', () => {
+    // The rail is the Users room's role list (`users.md:44–53`): a `canvas`
+    // column with its own 8px inset (`p-2`). The insets are spacing-scale steps,
+    // so — like the dialogs' `p-6` — they follow the theme's Density setting; a
+    // fixed `[8px]` would not. The search sits on the rows' 10px sides, so the
+    // column reads as one block.
     renderNav();
 
+    expect(screen.getByTestId('settings-nav')).toHaveClass('bg-canvas', 'border-e');
     const search = screen.getByTestId('settings-search');
     const searchPane = search.parentElement?.parentElement;
-    expect(searchPane).toHaveClass('px-6', 'pt-6');
-    expect(searchPane).not.toHaveClass('p-3');
+    expect(searchPane).toHaveClass('px-2.5', 'pt-5');
+    expect(screen.getByRole('navigation')).toHaveClass('px-2', 'pb-3');
+    for (const pane of [searchPane, screen.getByRole('navigation')]) {
+      expect(pane?.className ?? '').not.toMatch(/\bp[xysetb]?-\[/);
+    }
+  });
 
-    // The pills share the search box's edges, so the column reads as one block.
-    expect(screen.getByRole('navigation')).toHaveClass('px-6', 'pb-6');
+  it('draws the open section as the card on the canvas', () => {
+    // The selected role's look (H:1120): the card's fill, edge and shadow.
+    renderNav({ active: { scope: 'account', section: 'security' } });
+    expect(screen.getByTestId('settings-nav-account-security')).toHaveClass(
+      'bg-card',
+      'border-border-strong',
+      'font-semibold',
+    );
+    expect(screen.getByTestId('settings-nav-account-profile')).toHaveClass(
+      'border-transparent',
+    );
   });
 
   it('marks the active section with aria-current="page"', () => {

@@ -351,7 +351,10 @@
         "email": "Correo",
         "inApp": "En la app",
         "desktop": "Escritorio"
-      }
+      },
+      "kind": "Notificación",
+      "loadFailed": "No se pudieron cargar tus preferencias. Inténtalo de nuevo.",
+      "desktopDenied": "Las notificaciones de escritorio necesitan permiso del navegador. Actívalas en la configuración del navegador y vuelve a encender esta opción."
     },
     "appearance": {
       "title": "Apariencia",

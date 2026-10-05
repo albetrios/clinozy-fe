@@ -1568,19 +1568,6 @@
   visibility: hidden;
 }
 
-/* Elevation shown under a sticky header once content scrolls beneath it.
-   Mode-aware via `--color-foreground` (which flips with .dark): a soft dark
-   shadow on the light surface, and a faint light separator on the dark surface —
-   a fixed dark shadow would be invisible there. Same rule, the token adapts. */
-.scroll-shadow-top {
-  box-shadow: 0 6px 10px -8px
-    color-mix(in oklch, var(--color-foreground) 22%, transparent);
-}
-.dark .scroll-shadow-top {
-  box-shadow: 0 6px 10px -8px
-    color-mix(in oklch, var(--color-foreground) 14%, transparent);
-}
-
 /* shadcn menu/select items ship a `cursor-default` utility (utilities layer),
    which defeats the pointer affordance declared in @layer base below. Restore a
    pointer cursor on interactive menu/select items — this block is UNLAYERED, so

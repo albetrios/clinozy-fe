@@ -2,8 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { Card } from '@/shared/components/ui/card.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 
 /** How many rows a wait draws. Three reads as "a list is coming" without implying a length. */
 const ROW_KEYS = ['first', 'second', 'third'] as const;
@@ -33,6 +32,9 @@ const ROW_KEYS = ['first', 'second', 'third'] as const;
  * wrong so much as unrecognisable: the card, the dividers and the row rhythm
  * are what a settings panel actually looks like, so the swap to real content
  * reads as filling in rather than replacing (the property SET-22 was protecting).
+ * It is the launch's list card (the table frame, `muted` row hairlines) with the
+ * design's flat skeleton bars — `SkeletonBar`, the 64 / 48 / 60% cycle, no
+ * shimmer (`_patterns.md:282`).
  *
  * @param props - `name` is what is being fetched ("Members", "Billing");
  *   `testId` overrides the default for a caller whose tests already assert on
@@ -56,20 +58,27 @@ export function PanelSkeleton({
       <output aria-live="polite" className="sr-only">
         {name ? t(LOCALE_KEYS.loadingNamed, { name }) : `${t(LOCALE_KEYS.loading)}…`}
       </output>
-      <Card className="gap-0 overflow-hidden py-0" aria-hidden="true">
-        <ul className="divide-border divide-y">
-          {ROW_KEYS.map((row) => (
-            <li key={row} className="flex items-center gap-3 p-3">
-              <Skeleton className="size-5 shrink-0" />
-              <div className="min-w-0 flex-1 space-y-1.5">
-                <Skeleton className="h-4 w-40 max-w-[60%]" />
-                <Skeleton className="h-3 w-64 max-w-[85%]" />
+      <div
+        data-slot="card"
+        aria-hidden="true"
+        className="bg-card overflow-hidden rounded-xl border"
+      >
+        <ul className="flex flex-col">
+          {ROW_KEYS.map((row, index) => (
+            <li
+              key={row}
+              className="border-b-muted flex items-center gap-3 border-b px-(--table-pad-x) py-2.5 last:border-b-0"
+            >
+              <SkeletonBar shape="field" className="size-8 shrink-0" />
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <SkeletonBar index={index} />
+                <SkeletonBar index={index + 1} className="h-[0.6em]" />
               </div>
-              <Skeleton className="h-8 w-20 shrink-0" />
+              <SkeletonBar shape="field" className="h-8 w-20 shrink-0" />
             </li>
           ))}
         </ul>
-      </Card>
+      </div>
     </div>
   );
 }

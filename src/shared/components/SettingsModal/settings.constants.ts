@@ -133,6 +133,9 @@ export const SETTINGS_KEYS = {
         inApp: 'panels.notifications.channels.inApp',
         desktop: 'panels.notifications.channels.desktop',
       },
+      kind: 'panels.notifications.kind',
+      loadFailed: 'panels.notifications.loadFailed',
+      desktopDenied: 'panels.notifications.desktopDenied',
     },
     appearance: {
       title: 'panels.appearance.title',
