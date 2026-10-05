@@ -46,7 +46,14 @@ const gatewayFromManifest = vi.hoisted(() =>
   vi.fn(() => gatewayExecutor as (context: unknown) => Promise<void>),
 );
 const requireAuth = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
-const shellLoads = vi.hoisted(() => ({ auth: vi.fn(), public: vi.fn() }));
+const shellLoads = vi.hoisted(() => ({
+  auth: vi.fn(),
+  public: vi.fn(),
+  organization: vi.fn(),
+  personal: vi.fn(),
+  payments: vi.fn(),
+  invoices: vi.fn(),
+}));
 const preloadAuthLayoutVariant = vi.hoisted(() =>
   vi.fn((_variant: number) => Promise.resolve()),
 );
@@ -66,6 +73,24 @@ vi.mock('@/shared/layouts/AuthLayout/index.ts', () => {
 vi.mock('@/shared/layouts/PublicLayout/index.ts', () => {
   shellLoads.public();
   return { PublicLayout: () => null };
+});
+// The islands the signed-in shells and the invoices host render inside their own
+// components — the router's chunk preloader cannot see them, so their loaders must.
+vi.mock('@/pages/organization/$organizationSlug/organization-slug.route.tsx', () => {
+  shellLoads.organization();
+  return { Component: () => null };
+});
+vi.mock('@/shared/layouts/AppLayout/index.ts', () => {
+  shellLoads.personal();
+  return { Component: () => null };
+});
+vi.mock('@/pages/organization/$organizationSlug/payments/payments.route.tsx', () => {
+  shellLoads.payments();
+  return { Component: () => null };
+});
+vi.mock('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx', () => {
+  shellLoads.invoices();
+  return { Component: () => null };
 });
 
 vi.mock('@/core/security/gateway.ts', () => ({ gatewayFromManifest }));
@@ -124,19 +149,26 @@ const gateArgs = (preload: boolean) => ({
  *   instead of being satisfied by a hover preload.
  */
 describe('router configuration', () => {
+  // An island rendered inside a route's own component is invisible to the router's
+  // chunk preloader. Unwarmed, `lazyRouteComponent` suspends through `use()` on its
+  // first render, and React warns that it "did not call use() when it finished" —
+  // every cold entry into a clinic did. So the route's loader warms it.
   it.each([
-    ['auth-shell', 'auth'],
-    ['public-shell', 'public'],
-  ] as const)('preloads nested %s content through its route loader', async (id, key) => {
+    ['auth-shell', ['auth']],
+    ['public-shell', ['public']],
+    ['/organization/$organizationSlug', ['organization']],
+    ['personal-app', ['personal']],
+    ['/organization/$organizationSlug/invoices', ['payments', 'invoices']],
+  ] as const)('preloads nested %s content through its route loader', async (id, keys) => {
     const route = Object.values(router.routesById).find((item) => item.id.endsWith(id));
     const loader = route?.options.loader as (() => Promise<void> | undefined) | undefined;
     expect(loader).toBeTypeOf('function');
-    expect(shellLoads[key]).not.toHaveBeenCalled();
+    for (const key of keys) expect(shellLoads[key]).not.toHaveBeenCalled();
     await loader?.();
-    expect(shellLoads[key]).toHaveBeenCalledOnce();
+    for (const key of keys) expect(shellLoads[key]).toHaveBeenCalledOnce();
     // TanStack removes the preload method after the component is cached.
     await loader?.();
-    expect(shellLoads[key]).toHaveBeenCalledOnce();
+    for (const key of keys) expect(shellLoads[key]).toHaveBeenCalledOnce();
   });
 
   it('preloads route chunks on intent', () => {

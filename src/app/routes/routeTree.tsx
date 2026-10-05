@@ -786,6 +786,20 @@ function preloadAuthShell(): Promise<unknown> {
 }
 
 /**
+ * A signed-in shell's own island AND the app shell the session calls for. The
+ * shell route renders its island inside a component of its own (the spinner
+ * while the session loads), which the router's chunk preloader never sees:
+ * unwarmed, the lazy island suspended through `use()` on its first render and
+ * React warned on every cold entry into a clinic that it "did not call use()
+ * when it finished" — and the spinner flashed once more.
+ */
+function preloadAppShell(island: {
+  preload?: () => Promise<void> | undefined;
+}): Promise<unknown> {
+  return Promise.all([island.preload?.(), preloadSessionAppShell()]);
+}
+
+/**
  * Warm the chunks a cold load is about to need, WHILE the auth bootstrap is in
  * flight — called once from `main.tsx`.
  *
@@ -1055,9 +1069,9 @@ const organizationShellRoute = createRoute({
     await requireProvisionedWorkspace({ params, redirectFrom: location.href });
     await resolveActiveOrg({ params });
   },
-  // The shell AppLayout will pick, fetched alongside the route's own chunks
-  // rather than after the layout mounts (see preloadSessionAppShell).
-  loader: () => preloadSessionAppShell(),
+  // The shell's island and the AppLayout it will pick, fetched alongside the
+  // route's own chunks rather than after the layout mounts (preloadAppShell).
+  loader: () => preloadAppShell(OrganizationShell),
   component: function OrganizationShellRoute() {
     const isLoading = useAuthStore((s) => s.isLoading);
     if (isLoading) return <FullPageSpinner />;
@@ -1655,6 +1669,9 @@ const organizationInvoicesRoute = createRoute({
   head: manifestHead(invoicesManifest),
   validateSearch: validateInvoiceSearch,
   beforeLoad: roomLeafGate(invoicesManifest),
+  // Both render inside this route's own component, out of the router's chunk
+  // preloader's sight — warmed here so neither suspends on `use()` (preloadAppShell).
+  loader: () => Promise.all([PaymentsPage.preload?.(), InvoicesHost.preload?.()]),
   // The Payments ledger behind, the island's dialog host over it.
   component: () => (
     <>
@@ -2359,7 +2376,7 @@ const personalShellRoute = createRoute({
     requirePersonalDeployment({});
     await requirePersonalDashboardWorkspace({ redirectFrom: location.href });
   },
-  loader: () => preloadSessionAppShell(),
+  loader: () => preloadAppShell(PersonalShell),
   component: function PersonalShellRoute() {
     return (
       <Suspense fallback={<FullPageSpinner />}>
