@@ -38,7 +38,10 @@ chips), the tab row bound to `?tab=` with the save label ("All changes saved 10:
 The drafts — the consult note, the Rx lines and their review marks, the settings and areas —
 live in `store/useVisitDraftStore/` (memory only, keyed by visit, never persisted) until the
 write that uses them. `hooks/useVisitSave/` runs each tab's write and gives the tab row its
-state. Below `md` the sheet scrolls as one page and every tab's columns stack (D29).
+state. Below `md` the sheet scrolls as one page and every tab's columns stack (D29); the four
+tabs keep the tab row's width — the save label drops to its own line under them — and
+`hooks/useTabStripScroll/` fades the strip's edge where more tabs wait (a long locale) and keeps
+the open tab in view.
 
 The data is the shared Visit model: `@/shared/api/clinic/visits-api.ts`,
 `@/shared/api/clinic/visits-contracts.ts` and `@/shared/hooks/useVisits/` (plan-only,
@@ -62,6 +65,7 @@ The data is the shared Visit model: `@/shared/api/clinic/visits-api.ts`,
 | `components/VisitTreatment/` | The session, its settings and areas, Complete / Reverse, the photo comparison.                                            |
 | `components/VisitCheckout/`  | The bill and the payment.                                                                                                 |
 | `hooks/useVisitSave/`        | The tabs' writes and their outcomes (refusal toast, "Couldn't save" with Retry).                                          |
+| `hooks/useTabStripScroll/`   | The tab strip's edge hints (which end hides tabs) and the open tab kept in view.                                          |
 | `store/useVisitDraftStore/`  | The sheet's drafts, per visit, in memory.                                                                                 |
 
 ## Test ids

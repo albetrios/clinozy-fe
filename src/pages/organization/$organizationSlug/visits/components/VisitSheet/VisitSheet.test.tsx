@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -151,5 +151,42 @@ describe('VisitSheet', () => {
       expect(screen.getAllByTestId('visit-history-row').length).toBeGreaterThan(0),
     );
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
+  });
+
+  it('fades the tab strip where more tabs wait, and keeps the save label out of it', async () => {
+    // A phone's 339px strip under four long labels: 420px of tabs.
+    const strip = (element: Element) => element.getAttribute('role') === 'tablist';
+    vi.spyOn(Element.prototype, 'scrollWidth', 'get').mockImplementation(function (
+      this: Element,
+    ) {
+      return strip(this) ? 420 : 0;
+    });
+    vi.spyOn(Element.prototype, 'clientWidth', 'get').mockImplementation(function (
+      this: Element,
+    ) {
+      return strip(this) ? 339 : 0;
+    });
+    const scrolled = vi.spyOn(Element.prototype, 'scrollLeft', 'get').mockReturnValue(0);
+    vi.spyOn(Element.prototype, 'scrollLeft', 'set').mockImplementation(() => {});
+    try {
+      const detail = await fetchVisit(ref.visit(2865));
+      renderSheet({ detail });
+      await screen.findByTestId('visit-name');
+      const tablist = screen.getByRole('tablist');
+      const hint = (edge: string) =>
+        tablist.parentElement?.querySelector(`[data-edge="${edge}"]`) ?? null;
+      expect(hint('end')).not.toBeNull();
+      expect(hint('start')).toBeNull();
+      expect(tablist.parentElement).not.toContainElement(
+        screen.getByTestId('visit-saved'),
+      );
+
+      scrolled.mockReturnValue(81);
+      fireEvent.scroll(tablist);
+      expect(hint('start')).not.toBeNull();
+      expect(hint('end')).toBeNull();
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

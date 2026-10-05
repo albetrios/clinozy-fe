@@ -13,6 +13,7 @@ import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 
+import { useTabStripScroll } from '../../hooks/useTabStripScroll/index.ts';
 import { useVisitSave, type VisitSaveState } from '../../hooks/useVisitSave/index.ts';
 import { VISIT_KEYS, VISIT_NS, VISIT_TEST_IDS } from '../../visits.constants.ts';
 import { VisitCheckout } from '../VisitCheckout/index.ts';
@@ -42,7 +43,11 @@ export interface VisitSheetProps {
   onProfile?: () => void;
 }
 
-/** "All changes saved 10:42" · "Saving…" · "Not saved · your changes are kept". */
+/**
+ * "All changes saved 10:42" · "Saving…" · "Not saved · your changes are kept":
+ * at the tab row's inline end, and on a phone on its own line under the tabs,
+ * so the four tabs keep the row's whole width (D29).
+ */
 function SavedLabel({
   state,
   savedAt,
@@ -63,7 +68,7 @@ function SavedLabel({
       data-testid={ids.saved}
       data-state={state}
       className={cn(
-        'text-caption flex-none self-center ps-3 whitespace-nowrap',
+        'text-caption flex-none self-center ps-3 whitespace-nowrap max-md:self-end max-md:px-3 max-md:py-1.5',
         state === 'failed' ? 'text-destructive' : 'text-muted-foreground-strong',
       )}
     >
@@ -93,7 +98,9 @@ function useNameFocus(ready: boolean, nameRef: RefObject<HTMLHeadingElement | nu
  * inline start close it (the strip is out of the tab order). The header band,
  * the tab row bound to `?tab=` with the save label at its inline end, and the
  * open tab, each writing its own record. Below `md` it scrolls as one page and
- * every tab's columns stack.
+ * every tab's columns stack; the tabs keep the row's width (the save label
+ * drops under them), the strip scrolls sideways with a faded edge where more
+ * tabs wait, and the open tab is kept in view.
  */
 export function VisitSheet({
   detail,
@@ -109,6 +116,7 @@ export function VisitSheet({
   const nameRef = useRef<HTMLHeadingElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const save = useVisitSave();
+  const [stripRef, edges] = useTabStripScroll(tab);
   useNameFocus(detail !== null, nameRef);
 
   const body = () => {
@@ -179,22 +187,41 @@ export function VisitSheet({
               onValueChange={(value) => onTab(value as VisitTab)}
               className="flex min-h-0 flex-1 flex-col max-md:flex-none"
             >
-              <div className="flex min-w-0 border-b px-5.5 pt-2 max-md:px-3">
-                <TabsPrimitive.List
-                  aria-label={t(K.tabsLabel)}
-                  className="flex min-w-0 flex-1 [scrollbar-width:none] gap-1 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                >
-                  {tabs.map((value) => (
-                    <TabsPrimitive.Trigger
-                      key={value}
-                      value={value}
-                      data-testid={ids.tab(value)}
-                      className="text-field data-[state=active]:border-primary data-[state=active]:text-foreground text-muted-foreground-strong hover:text-foreground -mb-px flex-none border-b-2 border-transparent px-3.5 py-2 whitespace-nowrap transition-colors"
-                    >
-                      {t(K.tabs[value])}
-                    </TabsPrimitive.Trigger>
-                  ))}
-                </TabsPrimitive.List>
+              <div className="flex min-w-0 border-b px-5.5 pt-2 max-md:flex-col max-md:border-b-0 max-md:px-0">
+                <div className="relative flex min-w-0 flex-1 max-md:border-b">
+                  <TabsPrimitive.List
+                    ref={stripRef}
+                    aria-label={t(K.tabsLabel)}
+                    className="flex min-w-0 flex-1 [scrollbar-width:none] gap-1 overflow-x-auto max-md:gap-0 max-md:px-3 [&::-webkit-scrollbar]:hidden"
+                  >
+                    {tabs.map((value) => (
+                      <TabsPrimitive.Trigger
+                        key={value}
+                        value={value}
+                        data-tab={value}
+                        data-testid={ids.tab(value)}
+                        className="text-field data-[state=active]:border-primary data-[state=active]:text-foreground text-muted-foreground-strong hover:text-foreground -mb-px flex-none border-b-2 border-transparent px-3.5 py-2 whitespace-nowrap transition-colors max-md:px-2"
+                      >
+                        {t(K.tabs[value])}
+                      </TabsPrimitive.Trigger>
+                    ))}
+                  </TabsPrimitive.List>
+                  {/* Edge hints: more tabs wait past a faded end (a long locale on a phone). */}
+                  {edges.start ? (
+                    <span
+                      aria-hidden="true"
+                      data-edge="start"
+                      className="from-background pointer-events-none absolute inset-y-0 start-0 w-6 bg-gradient-to-r to-transparent rtl:rotate-180"
+                    />
+                  ) : null}
+                  {edges.end ? (
+                    <span
+                      aria-hidden="true"
+                      data-edge="end"
+                      className="to-background pointer-events-none absolute inset-y-0 end-0 w-6 bg-gradient-to-r from-transparent rtl:rotate-180"
+                    />
+                  ) : null}
+                </div>
                 <SavedLabel
                   state={save.state}
                   savedAt={detail?.visit.updatedAt ?? null}
