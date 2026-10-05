@@ -123,9 +123,11 @@ export function AgendaDayHeader({
             </span>
             {waiting > 0 ? (
               <>
+                {/* 1 × 12px in `--z200` = `border` (H:2036). */}
                 <span
                   aria-hidden="true"
-                  className="bg-muted-strong h-3 w-px self-center"
+                  data-slot="count-divider"
+                  className="bg-border h-3 w-px self-center"
                 />
                 <span className="text-tone-butter-foreground inline-flex items-baseline gap-1 font-medium">
                   <Trans

@@ -268,6 +268,8 @@ describe('AgendaDayHeader (H:5906)', () => {
       'title',
       '1 confirmed · 3 waiting for a reply',
     );
+    // The rule between the two counts is the `--z200` hairline (H:2036), not `muted-strong`.
+    expect(header.querySelector('[data-slot="count-divider"]')).toHaveClass('bg-border');
   });
 
   it('says "· all set" once nobody is waiting, and dates a past day', () => {
