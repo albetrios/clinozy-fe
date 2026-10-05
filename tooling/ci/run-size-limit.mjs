@@ -196,8 +196,30 @@ const config = [
      * `beforeLoad` awaits the manifest before the gateway), the builders
      * split per room, and a `build:check` tripwire for dialog manifests and
      * room builders in the entry.
+     *
+     * 255.1 → 256.1 kB (same exemption, D48): measured 255.66 kB after the
+     * Invoice drawer and Medical flows rows (254.66 kB before them), each row
+     * boundary built on this tree and attributed through the hidden source
+     * maps:
+     * - L-40, the shared Invoice drawer (+0.73 kB): +0.63 entry — its four
+     *   route blocks (the `invoices/` host over the Payments ledger, create,
+     *   `$invoiceId` and its edit) with their lazy imports' preload lists,
+     *   their four manifests and the URL reader (`invoices.search.ts`:
+     *   `type`, `patient`, `from`) — and +0.10 the glyphs the shared
+     *   QuickLine draws joining the first-paint icons chunk.
+     * - L-50c, the Medical flows (+0.27 kB), all entry: Medical › Payments'
+     *   `validateSearch` (`validateMedicalPaymentsSearch`) with New sale's
+     *   `from`, the `payments` copy on that tab's loader, and the Medical and
+     *   Clinic stock routes' preload lists naming the chunks the flows share
+     *   (the ledger units, the Invoice drawer, `usePayBill`); the ledger's
+     *   filter values moved to `shared/api/clinic/` at no cost.
+     * Trimmed first: nothing — the new readers are dependency-free, and the
+     * drawer, its money module and the print preview load with their routes.
+     * The L-54 `dialogRoute()` plan above (now ~47 dialog routes, the
+     * invoices' three among them) is still expected to take ~6–7 kB gzipped
+     * off the entry chunk and lower this budget.
      */
-    limit: '255.1 kB',
+    limit: '256.1 kB',
     gzip: true,
   },
   ...(cssPaths.length
