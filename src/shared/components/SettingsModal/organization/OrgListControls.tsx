@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { RoomSearchField } from '@/shared/components/RoomToolbar/RoomSearchField/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import { Search } from '@/shared/icons/index.ts';
 
 import { ORG_LIST_SORT_PRESETS, type OrgListSortPreset } from './org-list-sort.ts';
 
@@ -46,18 +45,15 @@ export function OrgListControls({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-      <div className="relative max-w-sm flex-1">
-        <Search className="text-muted-foreground absolute start-3 top-1/2 size-4 -translate-y-1/2" />
-        <Input
-          type="search"
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
-          className="ps-9"
-          data-testid={searchTestId}
-        />
-      </div>
+      <RoomSearchField
+        layout="fill"
+        value={search}
+        onValueChange={onSearchChange}
+        placeholder={searchPlaceholder}
+        label={searchPlaceholder}
+        inputTestId={searchTestId}
+        className="max-w-sm flex-1"
+      />
       <div className="flex w-full flex-col gap-1.5 sm:w-48">
         <Label htmlFor={sortTestId} className="text-muted-foreground text-xs">
           {t(SORT_LABEL_KEYS.label)}

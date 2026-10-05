@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RoomSearchField } from '@/shared/components/RoomToolbar/RoomSearchField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Search } from '@/shared/icons/index.ts';
 
 import { SETTINGS_KEYS, SETTINGS_NS } from './settings.constants.ts';
@@ -70,21 +70,14 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
           each pane has to put it back: the search box used to sit 12px from the
           corner beside a content pane inset 32px. */}
       <div className="space-y-2 px-6 pt-6 pb-3">
-        <div className="relative">
-          <Search
-            className="text-muted-foreground absolute start-2.5 top-1/2 size-4 -translate-y-1/2"
-            aria-hidden
-          />
-          <Input
-            type="search"
-            placeholder={t(SETTINGS_KEYS.nav.searchPlaceholder)}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="bg-background h-9 ps-8"
-            aria-label={t(SETTINGS_KEYS.nav.searchAria)}
-            data-testid="settings-search"
-          />
-        </div>
+        <RoomSearchField
+          layout="fill"
+          value={query}
+          onValueChange={setQuery}
+          placeholder={t(SETTINGS_KEYS.nav.searchPlaceholder)}
+          label={t(SETTINGS_KEYS.nav.searchAria)}
+          inputTestId="settings-search"
+        />
         {/* How many sections the query actually matched. Without it the rail
             silently shrank with no way to tell a one-hit search from a list
             that had always been that short — and now that the open section

@@ -4,16 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 import { isEditableElementFocused } from '@/lib/editable-focus.ts';
 import { queryOf } from '@/lib/routes/search-params.ts';
-import { cn } from '@/lib/utils.ts';
 import { insideOverlay } from '@/shared/components/DataTable/useTableSelection.ts';
 import {
   ROOM_TOOLBAR_KEYS,
   ROOM_TOOLBAR_NS,
   roomToolbarTestIds,
 } from '@/shared/components/RoomToolbar/room-toolbar.constants.ts';
-import { Label } from '@/shared/components/ui/label.tsx';
+import { RoomSearchField } from '@/shared/components/RoomToolbar/RoomSearchField/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import { Search } from '@/shared/icons/index.ts';
 
 /** The list search's debounce (KICKOFF §6.0 Timers; S:1540). */
 export const ROOM_SEARCH_DEBOUNCE_MS = 300;
@@ -72,7 +70,6 @@ export function RoomSearch({
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [text, setText] = useState(applied);
-  const [focused, setFocused] = useState(false);
   // The `q` this box last wrote, and the URL's `q` it last saw: a change it
   // did not write came from elsewhere, so the box shows it.
   const [written, setWritten] = useState(applied);
@@ -84,8 +81,6 @@ export function RoomSearch({
       setText(applied);
     }
   }
-  const expanded = focused || text !== '';
-
   const write = (query: string) => {
     setWritten(query);
     patchSearch({ q: query === '' ? undefined : query });
@@ -116,59 +111,18 @@ export function RoomSearch({
   }, []);
 
   return (
-    <Label
-      data-slot="room-search"
-      data-expanded={expanded}
-      data-testid={ids.search}
+    <RoomSearchField
+      value={text}
+      onValueChange={onType}
+      placeholder={placeholder}
+      label={label}
+      width={width}
+      keyHint={keyHint}
+      maxLength={SEARCH_QUERY_MAX}
       title={t(ROOM_TOOLBAR_KEYS.searchTitle)}
-      className={cn(
-        // The Label's own weight and selection rule would reach the input (it inherits font).
-        'border-border bg-background text-muted-foreground relative flex h-10 min-w-0 cursor-text items-center gap-2 rounded-lg border px-3 font-normal select-auto',
-        'focus-within:border-disabled focus-within:ring-ring/50 focus-within:ring-[3px]',
-        '[transition:flex-basis_220ms_cubic-bezier(.2,.8,.2,1),max-width_220ms_cubic-bezier(.2,.8,.2,1),min-width_220ms_cubic-bezier(.2,.8,.2,1),background-color_120ms_ease]',
-        'md:h-9 md:max-w-55 md:min-w-37.5 md:flex-[0_1_200px] md:px-2.5',
-        width === 'wide' && 'md:max-w-none md:flex-[0_1_220px]',
-        // Folded to the 36px square (the hover fill and pointer as the design's, H:296).
-        !expanded &&
-          'hover:bg-muted cursor-pointer md:max-w-9 md:min-w-9 md:flex-[0_0_36px] md:justify-center md:px-0',
-        className,
-      )}
-    >
-      <Search aria-hidden="true" className="size-3.75 flex-none" />
-      <input
-        ref={inputRef}
-        type="text"
-        role="searchbox"
-        inputMode="search"
-        value={text}
-        maxLength={SEARCH_QUERY_MAX}
-        placeholder={placeholder}
-        aria-label={label}
-        enterKeyHint="search"
-        onChange={(event) => onType(event.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') event.currentTarget.blur();
-        }}
-        className={cn(
-          'text-field text-foreground placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent outline-none',
-          // Folded, the input stays focusable ("/", Tab) and a click on the square reaches it.
-          !expanded && 'md:sr-only',
-        )}
-      />
-      {/* The "/" key hint — the title says it for everyone else. */}
-      {keyHint ? (
-        <span
-          aria-hidden="true"
-          className={cn(
-            'border-border bg-canvas text-micro text-muted-foreground flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-sm border px-1 leading-none font-normal max-md:hidden',
-            !expanded && 'md:hidden',
-          )}
-        >
-          /
-        </span>
-      ) : null}
-    </Label>
+      testId={ids.search}
+      inputRef={inputRef}
+      className={className}
+    />
   );
 }
