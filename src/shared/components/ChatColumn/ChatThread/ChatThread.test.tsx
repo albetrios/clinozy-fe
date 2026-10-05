@@ -36,6 +36,7 @@ const clock: ChatClock = clinicClockOf(
     yesterday: 'Yesterday',
     tomorrow: 'Tomorrow',
     weekday: () => 'Wed',
+    todayTime: (time) => `Today ${time}`,
     dayTime: (day, time) => `${day} ${time}`,
   },
 );

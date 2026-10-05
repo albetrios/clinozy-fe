@@ -30,8 +30,8 @@ describe('MedicalCells', () => {
 
   it('names an instant and a visit by the rooms’ one time rule, a record by its date', () => {
     const { result } = renderHook(() => useMedicalDates());
-    // Today: the clock time alone.
-    expect(result.current.when(new Date().toISOString())).toMatch(/^\d{1,2}:\d{2}/);
+    // The day named, with its time: "Today 10:12 am".
+    expect(result.current.when(new Date().toISOString())).toMatch(/^Today \d{1,2}:\d{2}/);
     expect(result.current.visit(clinicToday())).toBe('Today');
     expect(result.current.visit(addCivilDays(clinicToday(), -1))).toBe('Yesterday');
     expect(result.current.day(clinicToday())).toMatch(/\d/);

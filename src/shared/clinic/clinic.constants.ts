@@ -117,6 +117,8 @@ export const CLINIC_KEYS = {
    * app's one set (`PICKER_KEYS.date`, `common`).
    */
   clock: {
+    /** "Today 11:30 am". */
+    todayTime: 'clock.todayTime',
     dayTime: 'clock.dayTime',
   },
   /**

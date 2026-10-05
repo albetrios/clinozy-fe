@@ -92,8 +92,8 @@ describe('useStockWords', () => {
 
   it('dates a movement by the rooms’ one time rule, bills with their year', () => {
     const w = words();
-    // Today: the clock time alone; another day by name, without its time.
-    expect(w.when(new Date().toISOString())).toMatch(/^\d{1,2}:\d{2}/);
+    // The movements show days alone: today by name too, no time.
+    expect(w.when(new Date().toISOString())).toBe('Today');
     expect(w.when(new Date(Date.now() - 86_400_000).toISOString())).toBe('Yesterday');
     expect(w.day(clinicToday())).toBe('Today');
     // The viewer's locale orders it ("Sep 22, 2026" in en-US); the year is always there.

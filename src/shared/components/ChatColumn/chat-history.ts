@@ -62,11 +62,11 @@ export interface ChatFormat {
 }
 
 /**
- * A time as the thread shows it — every line, message and chip by the rooms'
- * one rule (`ClinicClock.moment`): today the clock time alone ("10:28 am"),
- * then "Yesterday 9:10 am", "Fri 4:00 pm", a week back the date ("24 Sep");
- * ahead "Tomorrow 11:00 am", "9 Oct 4:00 pm" — and the day alone for a
- * record the contract dates without a clock time ("Yesterday", "24 Sep").
+ * A history chip's or the divider's time by the rooms' one rule
+ * (`ClinicClock.moment`; `_patterns.md:193`): "Today 4:00 pm", "Yesterday
+ * 9:10 am", "Fri 4:00 pm", "24 Sep 4:00 pm"; ahead "Tomorrow 11:00 am", "9 Oct
+ * 4:00 pm" — and the day alone for a record the contract dates without a
+ * clock time ("Today", "24 Sep"). A message keeps today's bare time.
  */
 export function chatWhenLabel(when: ChatWhen, clock: ChatClock): string {
   return when.kind === 'day' ? clock.day(when.date) : clock.moment(when.at);
@@ -299,7 +299,7 @@ export function threadEntries(
             key: message.id,
             sortAt: message.sentAt,
             text: message.body,
-            when: format.clock.moment(message.sentAt),
+            when: format.clock.moment(message.sentAt, { sameDay: true }),
           }
         : { kind: 'message', key: message.id, sortAt: message.sentAt, message },
     ),

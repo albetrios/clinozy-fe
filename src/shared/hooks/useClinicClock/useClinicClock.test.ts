@@ -30,6 +30,7 @@ const words: ClinicClockWords = {
   yesterday: 'Yesterday',
   tomorrow: 'Tomorrow',
   weekday: (date) => `weekday ${date}`,
+  todayTime: (time) => `Today ${time}`,
   dayTime: (day, time) => `${day} ${time}`,
 };
 
@@ -37,25 +38,31 @@ describe('clinicClockOf — the one time rule', () => {
   const clock = clinicClockOf(parts, words);
 
   it.each([
-    ['2026-10-05T10:30', '10:30'],
+    ['2026-10-05T10:30', 'Today 10:30'],
     ['2026-10-04T09:10', 'Yesterday 09:10'],
     ['2026-10-02T16:00', 'weekday 2026-10-02 16:00'],
     ['2026-09-29T16:00', 'weekday 2026-09-29 16:00'],
-    ['2026-09-28T16:00', 'date 2026-09-28'],
-    ['2025-12-24T16:00', 'date 2025-12-24'],
+    ['2026-09-28T16:00', 'date 2026-09-28 16:00'],
+    ['2025-12-24T16:00', 'date 2025-12-24 16:00'],
     ['2026-10-06T11:00', 'Tomorrow 11:00'],
     ['2026-10-09T16:00', 'date 2026-10-09 16:00'],
   ])('reads the moment %s as "%s"', (instant, label) => {
     expect(clock.moment(instant)).toBe(label);
   });
 
-  it('drops the time on other days where the room shows days alone — never today’s', () => {
-    expect(clock.moment('2026-10-05T10:30', { withTime: false })).toBe('10:30');
+  it('names the day alone where the room shows days — today too', () => {
+    expect(clock.moment('2026-10-05T10:30', { withTime: false })).toBe('Today');
     expect(clock.moment('2026-10-04T09:10', { withTime: false })).toBe('Yesterday');
     expect(clock.moment('2026-10-02T16:00', { withTime: false })).toBe(
       'weekday 2026-10-02',
     );
     expect(clock.moment('2026-10-09T16:00', { withTime: false })).toBe('date 2026-10-09');
+  });
+
+  it('gives today its bare time only where the context already is that day', () => {
+    expect(clock.moment('2026-10-05T10:30', { sameDay: true })).toBe('10:30');
+    expect(clock.moment('2026-10-04T09:10', { sameDay: true })).toBe('Yesterday 09:10');
+    expect(clock.wallMoment('2026-10-05', '15:30', { sameDay: true })).toBe('w15:30');
   });
 
   it('names a calendar date by the same rule, today in words', () => {
@@ -75,12 +82,14 @@ describe('clinicClockOf — the one time rule', () => {
     // The clinic's own day of `now` (Asia/Kolkata): 20:00 UTC on the 5th is the 6th there.
     const lateMonday = new Date('2026-10-05T20:00:00.000Z');
     expect(clock.wallDay('2026-10-06', lateMonday)).toBe('Today');
-    expect(clock.wallMoment('2026-10-06', '09:00', { now: lateMonday })).toBe('w09:00');
+    expect(clock.wallMoment('2026-10-06', '09:00', { now: lateMonday })).toBe(
+      'Today w09:00',
+    );
   });
 
   it('reads a wall-clock day and time against the clinic’s own today', () => {
     const viewerAhead = clinicClockOf({ ...parts, today: '2026-10-06' }, words);
-    expect(viewerAhead.wallMoment('2026-10-05', '15:30')).toBe('w15:30');
+    expect(viewerAhead.wallMoment('2026-10-05', '15:30')).toBe('Today w15:30');
     expect(viewerAhead.wallMoment('2026-10-06', '09:00')).toBe('Tomorrow w09:00');
     expect(viewerAhead.wallMoment('2026-10-06', '09:00', { withTime: false })).toBe(
       'Tomorrow',
@@ -159,12 +168,12 @@ describe('useClinicClock', () => {
         timeZone: 'auto',
       });
       const { moment, day } = render();
-      expect(moment('2026-10-05T05:00:00.000Z')).toBe('10:30 am');
+      expect(moment('2026-10-05T05:00:00.000Z')).toBe('Today 10:30 am');
       expect(moment('2026-10-04T03:40:00.000Z')).toBe('Yesterday 9:10 am');
       expect(moment('2026-10-02T10:30:00.000Z')).toBe('Fri 4:00 pm');
       expect(moment('2026-09-29T10:30:00.000Z')).toBe('Tue 4:00 pm');
-      expect(moment('2026-09-28T10:30:00.000Z')).toBe('28 Sept');
-      expect(moment('2025-12-24T10:30:00.000Z')).toBe('24 Dec 2025');
+      expect(moment('2026-09-28T10:30:00.000Z')).toBe('28 Sept 4:00 pm');
+      expect(moment('2025-12-24T10:30:00.000Z')).toBe('24 Dec 2025 4:00 pm');
       expect(moment('2026-10-06T05:30:00.000Z')).toBe('Tomorrow 11:00 am');
       expect(moment('2026-10-09T10:30:00.000Z')).toBe('9 Oct 4:00 pm');
       expect(moment('2026-10-04T03:40:00.000Z', false)).toBe('Yesterday');
@@ -179,10 +188,10 @@ describe('useClinicClock', () => {
         timeZone: 'auto',
       });
       const { moment, wallMoment } = render();
-      expect(moment('2026-10-05T05:00:00.000Z')).toBe('10:30');
+      expect(moment('2026-10-05T05:00:00.000Z')).toBe('Today 10:30');
       expect(moment('2026-10-04T03:40:00.000Z')).toBe('Yesterday 09:10');
       expect(moment('2026-10-02T10:30:00.000Z')).toBe('Fri 16:00');
-      expect(wallMoment('2026-10-05', '15:30')).toBe('15:30');
+      expect(wallMoment('2026-10-05', '15:30')).toBe('Today 15:30');
       expect(wallMoment('2026-10-07', '09:00')).toBe('Oct 7 09:00');
     });
 
@@ -194,7 +203,7 @@ describe('useClinicClock', () => {
       });
       const { moment } = render();
       // 18:40 UTC on 4 Oct is 00:10 on 5 Oct in Asia/Kolkata — today.
-      expect(moment('2026-10-04T18:40:00.000Z')).toBe('12:10 am');
+      expect(moment('2026-10-04T18:40:00.000Z')).toBe('Today 12:10 am');
       // 18:20 UTC is 23:50 on the 4th — yesterday.
       expect(moment('2026-10-04T18:20:00.000Z')).toBe('Yesterday 11:50 pm');
     });
@@ -220,10 +229,10 @@ describe('useClinicClock', () => {
         timeZone: 'auto',
       });
       const { moment, day } = render();
-      expect(moment('2026-10-05T05:00:00.000Z')).toBe('10:30');
+      expect(moment('2026-10-05T05:00:00.000Z')).toBe('Heute 10:30');
       expect(moment('2026-10-04T03:40:00.000Z')).toBe('Gestern 9:10');
       expect(moment('2026-10-02T10:30:00.000Z')).toBe('Fr 16:00');
-      expect(moment('2026-09-28T10:30:00.000Z')).toBe('28. Sept.');
+      expect(moment('2026-09-28T10:30:00.000Z', false)).toBe('28. Sept.');
       expect(day('2026-10-05')).toBe('Heute');
     });
   });

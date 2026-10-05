@@ -98,9 +98,8 @@ describe('the Payments ledger (KICKOFF §6.9)', () => {
     await waitFor(() => expect(rows()).toHaveLength(16));
     const tea = rowOf('PAY-310');
     expect(tea).toHaveTextContent('Paid');
-    // Today reads its time alone (the rooms' one time rule).
-    expect(tea).toHaveTextContent('11:05');
-    expect(tea).not.toHaveTextContent('Today');
+    // The rooms' one time rule names the day: "Today 11:05 AM".
+    expect(tea).toHaveTextContent('Today 11:05');
     expect(tea).toHaveTextContent('Tea & snacks');
     expect(tea).toHaveTextContent('Misc');
     expect(tea).toHaveTextContent('Cash');

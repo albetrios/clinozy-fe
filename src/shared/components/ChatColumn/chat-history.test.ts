@@ -92,6 +92,7 @@ const clock: ChatClock = clinicClockOf(
     yesterday: 'Yesterday',
     tomorrow: 'Tomorrow',
     weekday: weekdayOf,
+    todayTime: (time) => `Today ${time}`,
     dayTime: (day, time) => `${day} ${time}`,
   },
 );
@@ -124,10 +125,10 @@ const text = (entry: ContactHistoryEntry, maskMoney = false) =>
 
 describe('chat times — the rooms’ one time rule', () => {
   it.each([
-    [{ kind: 'instant', at: '2026-10-03T10:30:00.000Z' }, '4:00 pm'],
+    [{ kind: 'instant', at: '2026-10-03T10:30:00.000Z' }, 'Today 4:00 pm'],
     [{ kind: 'instant', at: '2026-10-02T03:40:00.000Z' }, 'Yesterday 9:10 am'],
     [{ kind: 'instant', at: '2026-09-30T10:30:00.000Z' }, 'Wed 4:00 pm'],
-    [{ kind: 'instant', at: '2026-09-20T10:30:00.000Z' }, '20 Sep'],
+    [{ kind: 'instant', at: '2026-09-20T10:30:00.000Z' }, '20 Sep 4:00 pm'],
     [{ kind: 'instant', at: '2026-10-04T05:30:00.000Z' }, 'Tomorrow 11:00 am'],
     [{ kind: 'instant', at: '2026-10-09T10:30:00.000Z' }, '9 Oct 4:00 pm'],
     [{ kind: 'day', date: '2026-10-03' }, 'Today'],
@@ -149,7 +150,7 @@ describe('chat times — the rooms’ one time rule', () => {
   it('reads the day in the clinic’s zone — 11:30 pm IST is still today', () => {
     expect(
       plain(chatWhenLabel({ kind: 'instant', at: '2026-10-03T18:00:00.000Z' }, clock)),
-    ).toBe('11:30 pm');
+    ).toBe('Today 11:30 pm');
   });
 });
 

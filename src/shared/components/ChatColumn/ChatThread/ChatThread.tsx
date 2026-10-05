@@ -418,7 +418,7 @@ export function ChatThread({
         kind,
         channel: message.channel,
         body: message.body,
-        at: format.clock.moment(message.at),
+        at: format.clock.moment(message.at, { sameDay: true }),
         who: selfName ? (
           <Sender label={teamLabel(kind, selfName)} author={undefined} format={format} />
         ) : null,
@@ -437,7 +437,7 @@ export function ChatThread({
       kind,
       channel: message.channel,
       body: message.body,
-      at: format.clock.moment(message.sentAt),
+      at: format.clock.moment(message.sentAt, { sameDay: true }),
       who: label ? (
         <Sender
           label={label}

@@ -68,10 +68,9 @@ export function civilDayOffset(from: string, to: string): number {
 /**
  * Where a calendar date sits from today, as the rooms name a moment (the one
  * time rule): today; yesterday; two to six days back (`thisWeek` — its
- * weekday names it); a week or more back (`earlier` — its date, the time
- * dropped); tomorrow; two or more days ahead (`ahead` — its date, the time
- * kept). A weekday only ever names a past day, so "Mon" never reads as next
- * Monday.
+ * weekday names it); a week or more back (`earlier` — its date); tomorrow;
+ * two or more days ahead (`ahead` — its date). A weekday only ever names a
+ * past day, so "Mon" never reads as next Monday.
  */
 export type CivilDayReading =
   'today' | 'yesterday' | 'thisWeek' | 'earlier' | 'tomorrow' | 'ahead';

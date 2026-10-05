@@ -566,6 +566,7 @@
     "retry": "다시 시도"
   },
   "clock": {
+    "todayTime": "오늘 {{time}}",
     "dayTime": "{{day}} {{time}}"
   },
   "channels": {

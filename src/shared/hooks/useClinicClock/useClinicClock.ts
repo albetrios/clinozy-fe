@@ -13,10 +13,24 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
-/** How a moment reads: with its clock time on other days, and from when. */
+/**
+ * The context a moment sits in — what the room around it already shows — and
+ * from when it is read.
+ */
 export interface ClinicMomentOptions {
-  /** Default `true`; `false` where the room shows days alone (today still reads its time). */
+  /**
+   * Default `true`: the room shows times, so the day comes with its time —
+   * "Today 11:30 am", "Yesterday 4:00 pm", "Mon 9:00 am", "24 Sep 10:30 am".
+   * `false` where the room shows days alone: "Today", "Yesterday", "Mon",
+   * "24 Sep".
+   */
   withTime?: boolean;
+  /**
+   * The context already is the day (a chat bubble under the conversation of
+   * today): today's moment is its bare time ("10:28 am"), any other day still
+   * names its day. Default `false`.
+   */
+  sameDay?: boolean;
   /**
    * The moment "today" is read from — a list that keeps its own clock (the
    * tasks' due labels, the leads' hold) passes it; default, when the clock
@@ -57,10 +71,11 @@ export interface ClinicClock {
    */
   day: (date: string, now?: Date) => string;
   /**
-   * An instant by the one rule: today its clock time ("10:30 am"); yesterday,
-   * a day of the last six, tomorrow or a day ahead, its {@link day} — with
-   * the time where the room shows times ("Yesterday 10:30 am", "Mon 10:30 am",
-   * "7 Oct 3:30 pm"); a week or more back, its date alone ("24 Sep").
+   * An instant by the one rule: its {@link day} with its time where the room
+   * shows times — "Today 11:30 am", "Yesterday 4:00 pm", "Mon 9:00 am", "24 Sep
+   * 10:30 am"; ahead "Tomorrow 3:30 pm", "7 Oct 3:30 pm" — the day alone where
+   * it shows days, the bare time only where the context already is that day
+   * ({@link ClinicMomentOptions}).
    */
   moment: (instant: string, options?: ClinicMomentOptions) => string;
   /** A clinic-local calendar date by the rule's day words — read against the clinic's own today. */
@@ -79,6 +94,8 @@ export interface ClinicClockWords {
   tomorrow: string;
   /** "Mon" — a day of the last six, by its weekday. */
   weekday: (date: string) => string;
+  /** "Today 11:30 am" — today and a clock time together. */
+  todayTime: (time: string) => string;
   /** "Yesterday 10:30 am" — a day and a clock time together. */
   dayTime: (day: string, time: string) => string;
 }
@@ -131,20 +148,21 @@ export function clinicClockOf(
     }
   };
   /**
-   * The rule once the day is known: today the time alone, a week back the
-   * date alone; any other day with its time where the room shows times — a
-   * day ahead keeps it, a booking's time is the point.
+   * The rule once the day is known: the day always named — with its time
+   * where the room shows times — and today's bare time only where the context
+   * already is today.
    */
   const momentFrom = (
     today: string,
     date: string,
     time: string,
-    { withTime = true }: ClinicMomentOptions = {},
+    { withTime = true, sameDay = false }: ClinicMomentOptions = {},
   ): string => {
-    const reading = civilDayReading(today, date);
-    if (reading === 'today') return time;
-    const day = dayFrom(today, date);
-    return withTime && reading !== 'earlier' ? words.dayTime(day, time) : day;
+    if (!withTime) return dayFrom(today, date);
+    if (civilDayReading(today, date) === 'today') {
+      return sameDay ? time : words.todayTime(time);
+    }
+    return words.dayTime(dayFrom(today, date), time);
   };
   return {
     ...clock,
@@ -228,6 +246,7 @@ export function useClinicClock(): ClinicClock {
         yesterday: t(PICKER_KEYS.date.yesterday, { ns: PICKER_NS }),
         tomorrow: t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS }),
         weekday: (date) => civil(date, { weekday: 'short' }),
+        todayTime: (time) => t(CLINIC_KEYS.clock.todayTime, { ns: CLINIC_NS, time }),
         dayTime: (day, time) =>
           t(CLINIC_KEYS.clock.dayTime, { ns: CLINIC_NS, day, time }),
       },

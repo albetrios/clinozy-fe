@@ -123,7 +123,7 @@ describe('the conversation', () => {
     expect(screen.getByRole('region', { name: 'Anaya Desai' })).toBeInTheDocument();
 
     expect(await screen.findByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · 10:28 am · via WhatsApp',
+      'Lead created · Today 10:28 am · via WhatsApp',
     );
     expect(screen.getByTestId(ids.system)).toHaveTextContent(
       'Lead created from WhatsApp ad',
@@ -164,7 +164,7 @@ describe('the conversation', () => {
       'Appointment #2859 · Peel · Confirmed · Dr. Nisha14 Oct 11:00 am',
     );
     expect(screen.getByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · 22 Aug · via Instagram',
+      'Lead created · 22 Aug 10:00 am · via Instagram',
     );
 
     await user.click(screen.getAllByTestId(ids.history)[0] as HTMLElement);

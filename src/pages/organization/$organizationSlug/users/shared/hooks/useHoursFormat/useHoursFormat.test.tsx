@@ -28,7 +28,9 @@ describe('useHoursFormat — days, hours and times', () => {
 
   it('reads an update by the rooms’ one time rule — today its time, another year’s with its year', () => {
     const { result } = renderHook(() => useHoursFormat());
-    expect(result.current.updated('2026-10-03T03:32:00.000Z')).toMatch(/^9:02\sAM$/);
+    expect(result.current.updated('2026-10-03T03:32:00.000Z')).toMatch(
+      /^Today 9:02\sAM$/,
+    );
     expect(result.current.updated('2026-10-02T03:32:00.000Z')).toMatch(
       /^Yesterday 9:02\sAM$/,
     );
