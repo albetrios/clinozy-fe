@@ -85,6 +85,18 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled();
   });
 
+  it('times Info as the thread does: "Today 10:28", the last message by its clock', async () => {
+    const { drawer } = await openAnaya();
+    const info = within(drawer).getByRole('region', { name: 'Info' });
+    const cell = (label: string) => within(info).getByText(label).closest('div');
+    // The design's "Today 09:20" (H:1813) — never "Sep 27 · 10:28 AM" on the
+    // same day; the clock itself follows the viewer's locale and hour cycle.
+    expect(cell('Created')).toHaveTextContent(/^CreatedToday 10:28 [ap]m$/i);
+    expect(cell('Last message')).toHaveTextContent(
+      /^Last messageWhatsApp · 10:31 [ap]m$/i,
+    );
+  });
+
   it('saves a status move with its side effects, and Undo takes them back', async () => {
     const user = userEvent.setup();
     const { drawer } = await openAnaya();
