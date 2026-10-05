@@ -28,7 +28,7 @@ const rowOf = (original: unknown) => original as SaleRow;
 /**
  * The Sales columns (KICKOFF §6.7 Tables; `medical.md:29–36`): Sale ·
  * Customer · Medicines · Bill · Margin (hidden) · Status · When — tracks
- * `80px minmax(200px,1.3fr) minmax(220px,1.6fr) 100px 100px 100px 120px`. On a
+ * `80px minmax(200px,1.3fr) minmax(220px,1.6fr) 100px 100px 100px 128px`. On a
  * phone the Customer leads, the Bill is the key and the meta line reads
  * Medicines, Status, When and "#983". The column ids are the URL's sort keys.
  */
@@ -196,7 +196,9 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
         </span>
       ),
       meta: {
-        track: '120px',
+        // 128px, not the design's 120 (`medical.md:29`): the 12-hour
+        // "Yesterday 11:53 AM" is 125px at 13px.
+        track: '128px',
         foldValue: (original) => dates.when(rowOf(original).soldAt),
       },
     },
