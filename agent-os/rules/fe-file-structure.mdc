@@ -93,7 +93,7 @@ Apply to:
 
 **Exception — shadcn primitives stay flat.** `src/shared/components/ui/` keeps the shadcn convention (`button.tsx`, `card.tsx`, etc.) — no folder-per-unit.
 
-**Exception — cohesive flat groups.** A multi-file component group that only makes sense as a set keeps flat files inside its parent folder: the `SettingsModal` panel groups (`account/`, `organization/`). Tests colocate beside the group's logic files. Everything else follows folder-per-unit (the former `data-table/` flat group is now folder-per-unit components: `DataTable/`, `DataTableColumnHeader/`, `DataTablePagination/` and their siblings; a list's toolbar is `RoomToolbar/`).
+**Exception — cohesive flat groups.** A multi-file component group that only makes sense as a set keeps flat files inside its parent folder: the `SettingsModal` panel groups (`account/`, `organization/`). Tests colocate beside the group's logic files. Everything else follows folder-per-unit (the former `data-table/` flat group is now folder-per-unit components: `DataTable/`, `DataTableColumnHeader/`, `DataTableColumnChooser/` and their siblings; a list's toolbar is `RoomToolbar/`).
 
 ## Page Naming (directory)
 

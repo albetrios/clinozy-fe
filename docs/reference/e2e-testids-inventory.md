@@ -283,7 +283,6 @@ ids sit in the toolbar. A room's own Filters (the `filtersSlot`, Appointments) k
 | `filter-<fieldKey>-from` / `-to`                   | A date section's custom-range pickers                                       | `RoomToolbar/RoomFilters/`    |
 | `<tableId>-<actionId>` / `<tableId>-new-menu`      | Primary action(s) (`new-patient`, `pay`) / the split "⌄" menu               | `RoomToolbar/RoomPrimary/`    |
 | `<tableId>-fab`                                    | Floating "New" group (phone)                                                | `RoomToolbar/RoomPrimary/`    |
-| `<tableId>-view-bar` / `-view-<viewId>`            | View bar under the toolbar, and each sub-view tab                           | `RoomToolbar/RoomViewBar/`    |
 
 ---
 

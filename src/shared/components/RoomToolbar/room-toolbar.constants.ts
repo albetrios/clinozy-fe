@@ -80,7 +80,5 @@ export function roomToolbarTestIds(prefix: string) {
     primary: (id: string) => `${prefix}-${id}`,
     primaryMenu: `${prefix}-new-menu`,
     fab: `${prefix}-fab`,
-    viewBar: `${prefix}-view-bar`,
-    view: (id: string) => `${prefix}-view-${id}`,
   } as const;
 }

@@ -44,8 +44,9 @@ className="… slide-in-from-end-2 rtl:slide-in-from-start-2"
 <span aria-hidden="true" className="inline-block rtl:rotate-180">→</span>
 ```
 
-Existing precedents to copy: `Surface.tsx` (modal centering + drawer slide),
-`AppearanceDialog.tsx`, vendored `ui/calendar.tsx` nav chevrons.
+Existing precedents to copy: `AppToaster.tsx` (the centred pending bar),
+`AppearanceDialog.tsx`, the drawer switch thumb (`drawer-choice-controls.tsx`),
+vendored `ui/calendar.tsx` nav chevrons.
 
 ## Where RTL actually breaks
 

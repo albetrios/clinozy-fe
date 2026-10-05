@@ -7,7 +7,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { DataTableColumnHeader } from '@/shared/components/DataTableColumnHeader/index.ts';
-import { DataTablePagination } from '@/shared/components/DataTablePagination/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RoomToolbar } from '@/shared/components/RoomToolbar/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -108,8 +107,8 @@ const KIT_COLUMNS: ColumnDef<DataTableFeatures, Person>[] = [
 ];
 
 /**
- * The whole kit, wired the way a list page wires it: toolbar, table,
- * pagination. The toolbar's search writes the URL's `q`; a list filtered on
+ * The whole kit, wired the way a list page wires it: toolbar, table, and
+ * a bare pager over the paging feature. The toolbar's search writes the URL's `q`; a list filtered on
  * the client feeds it to the name column's filter.
  */
 function KitHarness({ data }: Readonly<{ data: Person[] }>) {
@@ -130,7 +129,13 @@ function KitHarness({ data }: Readonly<{ data: Person[] }>) {
         search={{ placeholder: 'Search people', label: 'Search people' }}
       />
       <DataTable table={table} selectable />
-      <DataTablePagination table={table} />
+      {/* The paging feature, driven the way a pager would (lists scroll in pages instead). */}
+      <span>
+        Page {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
+      </span>
+      <button type="button" onClick={() => table.nextPage()}>
+        Next page
+      </button>
     </>
   );
 }

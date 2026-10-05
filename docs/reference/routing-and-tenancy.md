@@ -328,7 +328,7 @@ Executed as phase 0 of the epic:
 | `useOrganizationStore` (`shared/store/useOrganizationStore/`) | `useOrganizationStore` (+ eslint runtime-trio config + `fe-file-structure.mdc` trio text) |
 | `OrgPermission` (`core/types/permissions.ts`)                 | `OrganizationPermission`                                                                  |
 | `shared/api/my-orgs.ts`                                       | `shared/tenancy/my-organizations.ts`                                                      |
-| `OrgSwitcher`, `OrgBadges` (`shared/components/`)             | `OrganizationSwitcher`, `OrganizationBadges`                                              |
+| `OrgSwitcher` (`shared/components/`)                          | `OrganizationSwitcher`                                                                    |
 | `TENANT.*` constants                                          | `ORGANIZATION.*` constants                                                                |
 | Settings section id `org-general`                             | scope `organization`, section `general`                                                   |
 

@@ -50,8 +50,3 @@ export {
   type RoomToolbarProps,
 } from './RoomToolbar.tsx';
 export { RoomViewAction, type RoomViewActionProps } from './RoomViewAction/index.ts';
-export {
-  type RoomView,
-  RoomViewBar,
-  type RoomViewBarProps,
-} from './RoomViewBar/index.ts';

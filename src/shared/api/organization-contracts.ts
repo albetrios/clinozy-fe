@@ -57,11 +57,6 @@ export function isInvitationExpired(
   return Date.parse(invitation.expiresAt) <= now;
 }
 
-// `InvitationStatus` still backs the accept-invite status badge
-// (OrganizationBadges); the full invitation resource/type was removed with the
-// dead /invitations subsystem — invites are INVITED memberships (see Member).
-export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
-
 export type RoleSummary = {
   id: string;
   name: string;
