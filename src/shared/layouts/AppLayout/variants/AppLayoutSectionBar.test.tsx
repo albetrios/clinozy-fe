@@ -137,6 +137,15 @@ describe('SectionBarShell — header', () => {
     );
   });
 
+  it('fits a 320px phone: the controls never shrink, the section chip gives way (L-64)', async () => {
+    renderShell();
+    const bar = await header();
+    const controls = bar.querySelector('[data-slot="header-controls"]');
+    expect(controls).toHaveClass('flex-[1_0_auto]', 'md:min-w-0', 'md:flex-1');
+    expect(controls).not.toHaveClass('min-w-0');
+    expect(controls).toContainElement(within(bar).getByTestId('search-trigger'));
+  });
+
   it('marks the pinned current room and tints its tab', async () => {
     renderShell('/organization/acme/leads');
     const leads = await within(await header()).findByTestId('nav-leads');

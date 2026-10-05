@@ -54,6 +54,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `nav-more-<id>`                  | A folded pinned tab inside "More"                                                                   | `AppLayout/components/PinnedTabs/`                            |
 | `nav-more-sections`              | Phone tab bar: "More" (opens All sections)                                                          | `AppLayout.shared.tsx (MobileNav)`                            |
 | `branch-picker`                  | Header branch picker                                                                                | `AppLayout/components/BranchPicker/`                          |
+| `branch-picker-label`            | Branch picker: its label (hidden below md — the compact pin)                                        | `AppLayout/components/BranchPicker/`                          |
 | `branch-picker-all`              | Branch picker: All branches                                                                         | `AppLayout/components/BranchPicker/`                          |
 | `branch-picker-<branchId>`       | Branch picker: one branch                                                                           | `AppLayout/components/BranchPicker/`                          |
 | `account-menu`                   | Account menu (section bar)                                                                          | `AppLayout/components/AccountMenu/`                           |

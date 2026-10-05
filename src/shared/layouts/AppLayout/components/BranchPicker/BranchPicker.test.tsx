@@ -52,6 +52,16 @@ describe('BranchPicker', () => {
     );
   });
 
+  it('is the compact pin on a phone: the name hides below md, the button keeps it (L-64)', async () => {
+    renderWithProviders(<BranchPicker />);
+    const trigger = await screen.findByTestId('branch-picker');
+    const label = screen.getByTestId('branch-picker-label');
+    expect(label).toHaveTextContent('All branches');
+    expect(label).toHaveClass('hidden', 'md:inline');
+    expect(trigger).toHaveAccessibleName('Branch · All branches');
+    expect(trigger).toHaveClass('flex-none');
+  });
+
   it('keeps at least one branch', async () => {
     const user = userEvent.setup();
     renderWithProviders(<BranchPicker />);

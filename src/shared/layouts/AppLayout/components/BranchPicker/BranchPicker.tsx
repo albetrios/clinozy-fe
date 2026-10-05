@@ -26,7 +26,9 @@ const keys = LAYOUT_KEYS.app.sectionBar.branch;
  * KICKOFF §6.12 One open branch). The selection is
  * `UserPreference.branchFilter` (empty = all, S:235) through the D32
  * preferences hook. "All branches" toggles every branch on, or back to the
- * first picked; the last branch cannot be turned off.
+ * first picked; the last branch cannot be turned off. Below `md` it is the
+ * compact pin (+ the count of extra branches): the phone header holds the
+ * section chip, search, this and the avatar at 320px.
  */
 export function BranchPicker() {
   const { t } = useTranslation(LAYOUT_NS);
@@ -73,12 +75,15 @@ export function BranchPicker() {
           title={t(keys.title, { names: isAll ? t(keys.all) : names.join(', ') })}
           data-testid="branch-picker"
           className={cn(
-            'bg-card hover:bg-muted text-detail flex h-8 flex-none items-center gap-1.5 rounded-lg border px-2.5 font-medium whitespace-nowrap transition-colors',
+            'bg-card hover:bg-muted text-detail flex h-8 flex-none items-center gap-1 rounded-lg border px-2 font-medium whitespace-nowrap transition-colors md:gap-1.5 md:px-2.5',
             open ? 'border-disabled' : 'border-border',
           )}
         >
           <MapPin className="size-3.25" aria-hidden />
-          <span>{label}</span>
+          {/* A phone keeps the pin and the chevron (the name is the button's label). */}
+          <span data-testid="branch-picker-label" className="hidden md:inline">
+            {label}
+          </span>
           {!isAll && names.length > 1 ? (
             <span
               data-slot="pill"

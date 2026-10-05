@@ -28,6 +28,15 @@ describe('SectionChip', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('is the header item that gives way on a narrow phone: it shrinks and ellipsizes (L-64)', () => {
+    render(<SectionChip entry={today} />);
+    const chip = screen.getByTestId('section-chip');
+    expect(chip).toHaveClass('min-w-0', 'flex-[0_1_auto]');
+    expect(chip).not.toHaveClass('flex-none');
+    expect(chip).toHaveAttribute('title', 'Today');
+    expect(chip.firstElementChild).toHaveClass('truncate');
+  });
+
   it('draws nothing outside a room', () => {
     const { container } = render(<SectionChip entry={null} />);
     expect(container).toBeEmptyDOMElement();

@@ -171,7 +171,11 @@ export function SectionBarShell({
             fontFamily={fontFamily}
           />
         </nav>
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5">
+        {/* Phone: the controls keep their size (the section chip gives way); from md the search shrinks. */}
+        <div
+          data-slot="header-controls"
+          className="flex flex-[1_0_auto] items-center justify-end gap-1.5 md:min-w-0 md:flex-1"
+        >
           <span ref={searchRef} className="contents">
             <SearchTrigger sectionBar />
           </span>
