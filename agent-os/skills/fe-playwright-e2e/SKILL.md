@@ -21,7 +21,10 @@ All values live in each repo's **`.env.local`** (gitignored dev file, `NODE_ENV=
   `VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (do **not** set `VITE_CAPTCHA_DISABLED`).
 
 Then: boot clinozy-be (`pnpm dev`, wait for `GET /readyz` → 200), and run `pnpm test:e2e` from
-clinozy-fe. `deployment-*.e2e.test.ts` auto-skip unless `me/context` matches their mode pair —
+clinozy-fe. The suite boots its own dev server on `:5180`; when clinozy-be's `ALLOWED_ORIGINS`
+admits only `:5173`, run against the dev server already up there instead —
+`E2E_BASE_URL=http://localhost:5173 pnpm test:e2e` (no `webServer`; the storage state follows the
+origin). `deployment-*.e2e.test.ts` auto-skip unless `me/context` matches their mode pair —
 swap the two `*_ORGANIZATION_ENABLED` values in clinozy-be's `.env.local` and restart to
 exercise personal-only / team-only. CI does the equivalent with `NODE_ENV=test`.
 
@@ -60,6 +63,12 @@ test('logs in', async ({ page }) => {
 
 **Auth flows:** `tests/utils/e2e-auth.ts` — `registerNewUserAndGoToDashboard`, `authenticateViaSignup`, `completeOnboardingWizard`, `navigateInApp` (client-side nav; avoids cold-load auth race — see `__clinozyFeRouter` in `src/main.tsx` dev hook). **All E2E requires clinozy-be** — `tests/e2e/global-setup.ts` fails fast when `/readyz` is down.
 
+**The clinic shell:** the section bar has no sidebar, bell or header theme toggle — the Account
+menu (`openAccountMenu`, `openNotificationCenter`, `chooseThemeMode` in `e2e-hybrid.ts`) holds
+them, and "Switch clinic" (`openOrganizationSwitcher`). A room spec starts from
+`openNewClinic(page)` (`tests/utils/e2e-clinic.ts`): a new owner of a new clinic on their role home,
+signed in through `page.request` so a cold `page.goto` (a deep link) restores the session.
+
 ## When to use which
 
 - **Always testid** for: page roots, form wrappers, fields, submit, nav items, dialogs, tables (see `fe-e2e-testids` skill).
@@ -68,18 +77,20 @@ test('logs in', async ({ page }) => {
 
 ## File layout
 
-| File                        | Scope                                   |
-| --------------------------- | --------------------------------------- |
-| `auth.e2e.test.ts`          | Unified login, OAuth, guards, email OTP |
-| `dashboard.e2e.test.ts`     | Shell + placeholder dashboard           |
-| `settings.e2e.test.ts`      | Hash modal `#settings/...`              |
-| `navigation.e2e.test.ts`    | 404, auth guards                        |
-| `organization.e2e.test.ts`  | Picker at `/organization`               |
-| `notifications.e2e.test.ts` | Notification center                     |
-| `org-switching.e2e.test.ts` | Dual-URL switcher                       |
-| `responsive.e2e.test.ts`    | 320px overflow                          |
-| `accessibility.e2e.test.ts` | Axe WCAG gate                           |
-| `visual.e2e.test.ts`        | Screenshots (reduced motion)            |
+| File                               | Scope                                     |
+| ---------------------------------- | ----------------------------------------- |
+| `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP   |
+| `dashboard.e2e.test.ts`            | Shell + placeholder dashboard             |
+| `clinic-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone |
+| `clinic-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)         |
+| `settings.e2e.test.ts`             | Hash modal `#settings/...`                |
+| `navigation.e2e.test.ts`           | 404, auth guards                          |
+| `organization.e2e.test.ts`         | Picker at `/organization`                 |
+| `notifications.e2e.test.ts`        | Notification center                       |
+| `org-switching.e2e.test.ts`        | Account menu › Switch clinic              |
+| `responsive.e2e.test.ts`           | 320px overflow                            |
+| `accessibility.e2e.test.ts`        | Axe WCAG gate                             |
+| `visual.e2e.test.ts`               | Screenshots (reduced motion)              |
 
 ## Workflow (new spec)
 

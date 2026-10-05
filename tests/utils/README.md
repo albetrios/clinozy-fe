@@ -63,7 +63,30 @@ Requires **clinozy-be** on `:3000` — Vite proxies `/api` in dev.
 | `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate (needs `DATABASE_URL`)                                 |
 | `createTeamOrgViaApi(page)`                | Create a team org through the API (cookie refresh → token); skips when team orgs are off  |
 | `createTeamOrgAndOpenDashboard(page)`      | `createTeamOrgViaApi`, then open that org's dashboard in the app                          |
-| `selectOrganizationInSwitcher(page, slug)` | Switch active org in the header switcher                                                  |
+| `openOrganizationSwitcher(page)`           | Open the switcher — Account menu › "Switch clinic" in the section bar, else the header's  |
+| `selectOrganizationInSwitcher(page, slug)` | Switch active org through that switcher                                                   |
+
+### `e2e-hybrid.ts` — the section-bar shell
+
+The clinic shell has no sidebar, bell or header theme toggle: the Account menu (the avatar,
+`user-menu-trigger`) holds them.
+
+| Helper                         | Purpose                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `expectAppHeaderReady(page)`   | Header, search ("Search or jump to") and avatar ("<name> · <status>")      |
+| `openAccountMenu(page)`        | Open the Account menu (`account-menu`, named "Account")                    |
+| `openNotificationCenter(page)` | Account menu › Notifications → `notification-popover`                      |
+| `chooseThemeMode(page, mode)`  | Account menu › Appearance pills (`account-menu-theme-<mode>`), then closes |
+
+### `e2e-clinic.ts` — the clinic rooms
+
+| Helper                                | Purpose                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `openNewClinic(page)`                 | A new owner of a new clinic (team org) via `page.request`, standing on their role home (Today); skips when team orgs are off |
+| `openRoomFromShell(page, room, tier)` | Open a room as a member does: pinned tab (header / phone tab bar) or All sections (popover / "More" sheet)                   |
+| `expectRoomReady(page, room)`         | The room's URL, page root and its `h1` (a11y guard)                                                                          |
+| `CLINIC_ROOMS` · `CLINIC_VIEWPORTS`   | The ten rooms in nav order · desktop 1440×900 and phone 375×812                                                              |
+| `hideDevtools(page)`                  | Hide the React Query devtools (`VITE_DEVTOOLS`) — their toggle covers the phone tab bar's "More"                             |
 
 ### `e2e-tenancy.ts`
 

@@ -8,7 +8,7 @@
 
 | Path                       | Purpose                                                                                                                                                                                                                          | Tool                | Command                   |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------- |
-| **`tests/utils/`**         | Helpers: `renderWithProviders`, `e2e-hybrid`, `e2e-auth`, `axe-for-dialog`, `task-row-fixture` (a task list row — Tasks and Today)                                                                                               | Vitest / Playwright | (imported by tests)       |
+| **`tests/utils/`**         | Helpers: `renderWithProviders`, `e2e-hybrid`, `e2e-auth`, `e2e-clinic` (a new clinic, the rooms, the shell's nav), `axe-for-dialog`, `task-row-fixture` (a task list row — Tasks and Today)                                      | Vitest / Playwright | (imported by tests)       |
 | **`tests/fixtures/`**      | Test-only fixture data (never imported by `src/`)                                                                                                                                                                                | —                   | —                         |
 | **`tests/factories/`**     | Test data factories (never imported by `src/`)                                                                                                                                                                                   | —                   | (imported by tests)       |
 | **`tests/e2e/`**           | Browser + API E2E (one suite)                                                                                                                                                                                                    | Playwright          | `pnpm test:e2e`           |
@@ -24,7 +24,7 @@
 | Unit / component | `src/**/*.test.tsx`       | No — `vi.mock()`                                                  |
 | E2E              | `tests/e2e/*.e2e.test.ts` | **clinozy-be** on `:3000` (required — global-setup fails if down) |
 
-**Running E2E locally:** follow `docs/reference/testing.md` → E2E → **"Local run — required env & steps"**. Required env lives in each repo's **`.env.local`** (never a plain `.env`): clinozy-be needs `RATE_LIMIT_RELAXED_CAPS=true` + `DATABASE_TLS_ENFORCED=false` + `DATABASE_RLS_SAFETY_ENFORCED=false`; clinozy-fe needs `VITE_DEV_API_URL=http://localhost:3000`.
+**Running E2E locally:** follow `docs/reference/testing.md` → E2E → **"Local run — required env & steps"**. Required env lives in each repo's **`.env.local`** (never a plain `.env`): clinozy-be needs `RATE_LIMIT_RELAXED_CAPS=true` + `DATABASE_TLS_ENFORCED=false` + `DATABASE_RLS_SAFETY_ENFORCED=false`; clinozy-fe needs `VITE_DEV_API_URL=http://localhost:3000`. When clinozy-be's `ALLOWED_ORIGINS` admits only the dev server's origin, point the suite at that running server instead of its own `:5180` one: `E2E_BASE_URL=http://localhost:5173 pnpm test:e2e` (skips the config's `webServer`).
 
 ## Commands
 
