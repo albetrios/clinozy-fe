@@ -2,6 +2,7 @@ import { type APIRequestContext, expect, test } from '@playwright/test';
 
 import {
   fetchMeContextWire,
+  fetchMyOrganizationsWire,
   type ProbedDeployment,
   probeLiveDeployment,
   skipUnlessDeploymentMode,
@@ -10,7 +11,11 @@ import {
   createSessionViaEmailCode,
   verifyDatabaseConnection,
 } from '@/tests/utils/e2e-session.ts';
-import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
+import {
+  bearerHeaders,
+  createTeamOrganization,
+  expectNoPersonalBilling,
+} from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * Dual deployment contract (default product shape):
@@ -59,8 +64,8 @@ test.describe('deployment — personal-and-team', () => {
 
   test('user can create a TEAM organization alongside the personal workspace', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
-    const before = await fetchMeContextWire(api, accessToken);
-    expect(before.organizations.some((o) => o.type === 'PERSONAL')).toBe(true);
+    const before = await fetchMyOrganizationsWire(api, accessToken);
+    expect(before.some((o) => o.type === 'PERSONAL')).toBe(true);
 
     const { createStatus, org, teamToken } = await createTeamOrganization(
       api,
@@ -69,17 +74,17 @@ test.describe('deployment — personal-and-team', () => {
     expect(createStatus).toBe(200);
     expect(org?.id).toMatch(/^org_/);
 
-    const after = await fetchMeContextWire(api, teamToken);
-    expect(after.organizations.some((o) => o.type === 'PERSONAL')).toBe(true);
-    expect(after.organizations.some((o) => o.type === 'TEAM')).toBe(true);
+    const after = await fetchMyOrganizationsWire(api, teamToken);
+    expect(after.some((o) => o.type === 'PERSONAL')).toBe(true);
+    expect(after.some((o) => o.type === 'TEAM')).toBe(true);
   });
 
-  test('billing is gated on personal token but allowed on team token', async () => {
+  test('billing is empty on the personal token and readable on the team token', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
     const personalBilling = await api.get(`${API}/billing/subscriptions`, {
       headers: bearerHeaders(accessToken),
     });
-    expect(personalBilling.status()).toBe(403);
+    await expectNoPersonalBilling(personalBilling);
 
     const { org, teamToken } = await createTeamOrganization(api, accessToken);
     expect(org).not.toBeNull();

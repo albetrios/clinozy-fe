@@ -1,4 +1,4 @@
-import type { APIRequestContext } from '@playwright/test';
+import { type APIRequestContext, type APIResponse, expect } from '@playwright/test';
 
 import { e2eTeamOrgProfile } from './e2e-faker.ts';
 
@@ -14,6 +14,21 @@ export function bearerHeaders(token: string, withIdem = false): Record<string, s
 }
 
 export type TeamOrg = { id: string; slug: string | null; name?: string };
+
+/**
+ * A personal workspace has no billing of its own, and a read never leaks
+ * another organization's. clinozy-be's billing reads are open to both kinds of
+ * workspace (`docs/routes.txt`: `both`): the subscriptions list answers with an
+ * empty page, the rest (invoices, payment methods) with 422 "create a team
+ * organization".
+ */
+export async function expectNoPersonalBilling(res: APIResponse): Promise<void> {
+  if (res.status() === 200) {
+    expect(((await res.json()) as { data: unknown[] }).data).toEqual([]);
+    return;
+  }
+  expect([403, 404, 422]).toContain(res.status());
+}
 
 /** Create a TEAM org and optionally switch the token into it. */
 export async function createTeamOrganization(

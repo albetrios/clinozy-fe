@@ -56,17 +56,19 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
     const { data } = await ctx.json();
     expect(data.active_organization.type).toBe('PERSONAL');
     expect(data.active_organization.status).toBe('ACTIVE');
+    expect(data.user.personal_organization_id).toBe(data.active_organization.id);
     expect(Array.isArray(data.my_permissions)).toBe(true);
-    expect(data.organizations.length).toBeGreaterThanOrEqual(1);
   });
 
+  // The workspace list lives at /users/me/organizations (me/context carries none).
   test('[+] list my organizations includes the personal org', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
-    const list = await api.get('/api/v1/tenancy/organizations', {
+    const list = await api.get('/api/v1/users/me/organizations', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(list.status()).toBe(200);
-    expect((await list.json()).data.length).toBeGreaterThanOrEqual(1);
+    const { data } = (await list.json()) as { data: Array<{ type: string }> };
+    expect(data.some((org) => org.type === 'PERSONAL')).toBe(true);
   });
 
   test('[+] switch-to-personal re-mints an access token', async () => {
@@ -97,7 +99,9 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
   });
 
   test('[-] protected tenancy route without auth → 401', async () => {
-    expect((await api.get('/api/v1/tenancy/organizations')).status()).toBe(401);
+    expect((await api.get('/api/v1/tenancy/organizations/by-slug/acme')).status()).toBe(
+      401,
+    );
   });
 
   test('[-] switch to a non-member organization → 403/404', async () => {

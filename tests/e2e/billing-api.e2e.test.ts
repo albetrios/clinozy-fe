@@ -4,6 +4,7 @@ import { createSessionViaEmailCode } from '@/tests/utils/e2e-session.ts';
 import {
   bearerHeaders,
   createTeamOrganization,
+  expectNoPersonalBilling,
   idempotencyKey,
 } from '@/tests/utils/e2e-tenancy.ts';
 
@@ -79,12 +80,12 @@ test.describe('clinozy-be — billing', () => {
     expect((await api.get(`${API}/billing/subscriptions`)).status()).toBe(401);
   });
 
-  test('[-] GET /billing/subscriptions on a personal org → 403 (billing gated)', async () => {
+  test('[-] GET /billing/subscriptions on a personal org reads no billing', async () => {
     const token = await sessionToken();
     const res = await api.get(`${API}/billing/subscriptions`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    expect(res.status()).toBe(403);
+    await expectNoPersonalBilling(res);
   });
 
   test('[+] team org owner can list subscriptions after switch', async () => {
@@ -266,15 +267,15 @@ test.describe('clinozy-be — billing', () => {
     expect(res.status()).toBe(401);
   });
 
-  // Billing is gated to team orgs — a personal-org token must never read billing
-  // data (subscriptions is proven 403 above; invoices/payment-methods share the
-  // gate). Assert the personal org is denied and never leaks a 200 with data.
+  // A personal-org token must never read billing data. clinozy-be gates these two
+  // with 422 ("create a team organization"); the subscriptions list above answers
+  // with an empty page — `expectNoPersonalBilling` holds either way.
   test('[-] GET /billing/invoices on a personal org is gated (no 200 leak)', async () => {
     const token = await sessionToken();
     const res = await api.get(`${API}/billing/invoices`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    expect([403, 404]).toContain(res.status());
+    await expectNoPersonalBilling(res);
   });
 
   test('[-] GET /billing/payment-methods on a personal org is gated (no 200 leak)', async () => {
@@ -282,6 +283,6 @@ test.describe('clinozy-be — billing', () => {
     const res = await api.get(`${API}/billing/payment-methods`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    expect([403, 404]).toContain(res.status());
+    await expectNoPersonalBilling(res);
   });
 });

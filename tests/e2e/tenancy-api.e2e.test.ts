@@ -140,7 +140,7 @@ test.describe('clinozy-be — organization lifecycle', () => {
     test.skip(!org, 'team creation unavailable on this deployment');
 
     const tokenB = await sessionToken();
-    const listB = await api.get(`${API}/tenancy/organizations`, {
+    const listB = await api.get(`${API}/users/me/organizations`, {
       headers: bearerHeaders(tokenB),
     });
     const ids = ((await listB.json()) as { data: Array<{ id: string }> }).data.map(
