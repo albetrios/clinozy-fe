@@ -722,9 +722,37 @@ export async function convertLead(id: string): Promise<LeadConversion> {
   return { lead: converted, patientId: patient.id, undoToken };
 }
 
-/** Assign a lead (`updateLead({ ownerId })`): the previous owner stays involved. */
-export function assignLead(id: string, ownerId: string): Promise<LeadRecord> {
-  return updateLead(id, { ownerId });
+/** The system line an assignment leaves (`leads.md:196`, H:5705); a lead nobody owned names no one. */
+const assignedLine = (owner: string, previous: string | null) =>
+  previous ? `Assigned to ${owner} · ${previous} stays involved` : `Assigned to ${owner}`;
+
+/**
+ * Assign a lead (`updateLead({ ownerId })`): the previous owner stays
+ * involved, and the chat says so — "Assigned to <name> · <previous> stays
+ * involved", the team's short names (KICKOFF §6.3 people events). The toast's
+ * Undo puts the team back and keeps the line, as the prototype does (H:5705).
+ */
+export async function assignLead(id: string, ownerId: string): Promise<LeadRecord> {
+  const [{ clinicFixtures }, { systemLine }, { staffShortName }] = await Promise.all([
+    fixtureWorld(),
+    import('./fixtures/messages.fixtures.ts'),
+    import('./fixtures/task-rules.fixtures.ts'),
+  ]);
+  const before = await clinicFixtures.leads.get(id);
+  const lead = await updateLead(id, { ownerId });
+  const nameOf = (staffId: string | null) => {
+    const user = staffId
+      ? clinicFixtures.staff.snapshot((row) => row.id === staffId)[0]
+      : undefined;
+    return user ? staffShortName(user) : null;
+  };
+  const owner = lead.ownerId === before.ownerId ? null : nameOf(lead.ownerId);
+  if (owner) {
+    await clinicFixtures.leadMessages.create(
+      systemLine(id, assignedLine(owner, nameOf(before.ownerId)), null, new Date()),
+    );
+  }
+  return lead;
 }
 
 /**

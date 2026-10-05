@@ -454,6 +454,20 @@ describe('updateLead (S:1594)', () => {
     expect(before.touchedAt).not.toBe(NOW.toISOString());
   });
 
+  it('writes the assignment into the chat: "Assigned to <name> · <previous> stays involved"', async () => {
+    const id = ref.lead(2357);
+    const lines = () =>
+      clinicFixtures.leadMessages
+        .snapshot((message) => message.leadId === id && message.isSystem)
+        .map((message) => message.body);
+    await assignLead(id, NK);
+    expect(lines().at(-1)).toBe('Assigned to Nidhi K. · Dr. Reenal stays involved');
+    const count = lines().length;
+    // Assigning the owner they already have writes nothing.
+    await assignLead(id, NK);
+    expect(lines()).toHaveLength(count);
+  });
+
   it('counts a save by the owner as their activity, not one by anyone else (Q-L9)', async () => {
     const touched = (await fetchLead(ref.lead(2356))).touchedAt;
     expect(
