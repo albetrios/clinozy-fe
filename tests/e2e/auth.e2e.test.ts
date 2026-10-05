@@ -20,7 +20,6 @@ test.describe('Authentication', () => {
     await expectAuthScreenReady(page);
     await expect(page.getByTestId('auth-email-panel')).toBeVisible();
     await expect(page.getByTestId('auth-continue-google')).toBeVisible();
-    await expect(page.getByTestId('auth-continue-github')).toBeVisible();
   });
 
   test('invalid verification code calls the API and surfaces an error', async ({
@@ -65,13 +64,25 @@ test.describe('Authentication', () => {
     await expect(page.getByTestId('unauthorized-page')).toBeVisible();
   });
 
-  test('shows Continue with GitHub on the unified auth screen', async ({ page }) => {
+  /**
+   * GitHub OAuth is not provisioned for this deployment, so `AuthForm` filters its
+   * button out even where `VITE_AUTH_OAUTH_GITHUB` is on (the icon, test id and
+   * `/callback` stay wired). Google is the one provider offered. When GitHub's
+   * credentials exist and the filter goes, this spec is the one to flip.
+   */
+  test('offers Continue with Google, and not GitHub until its OAuth is provisioned', async ({
+    page,
+  }) => {
     await gotoApp(page, '/login');
     await expectAuthScreenReady(page);
-    await expect(page.getByTestId('auth-continue-github')).toBeVisible();
+    await expect(page.getByTestId('auth-continue-google')).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /continue with github/i }),
+      page.getByRole('button', { name: /continue with google/i }),
     ).toBeVisible();
+    await expect(page.getByTestId('auth-continue-github')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /continue with github/i })).toHaveCount(
+      0,
+    );
   });
 
   test('redirects unauthenticated users to login', async ({ page }) => {

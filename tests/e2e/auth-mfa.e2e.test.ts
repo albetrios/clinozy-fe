@@ -4,7 +4,11 @@ import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
-import { fillTestId, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  fillTestId,
+  gotoApp,
+  typeEmailVerificationCode,
+} from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   e2eAuthHeaders,
@@ -38,16 +42,21 @@ function totpAt(secret: string, timestepMs: number): string {
   return String(code).padStart(6, '0');
 }
 
-/** A TOTP code from a window not used before (waits into the next step if needed). */
+/**
+ * A TOTP code from a window not used before (waits into the next step if needed).
+ * The wait runs to the next 30s boundary: four 5s polls covered only 15s of a
+ * window, so a challenge a few seconds after the enrolment's code gave up.
+ */
 async function freshTotp(secret: string, used: Set<string>): Promise<string> {
-  for (let attempt = 0; attempt < 4; attempt += 1) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
     const code = totpAt(secret, Date.now());
     if (!used.has(code)) {
       used.add(code);
       return code;
     }
     // Same 30s window as a previously-used code — wait for the next one.
-    await new Promise((resolve) => setTimeout(resolve, 5_000));
+    const untilNextStep = 30_000 - (Date.now() % 30_000) + 250;
+    await new Promise((resolve) => setTimeout(resolve, untilNextStep));
   }
   throw new Error('could not mint an unused TOTP window');
 }
@@ -165,8 +174,8 @@ test.describe.serial('MFA — TOTP enrollment and challenge login', () => {
 
     const loginCode = await freshEmailCode(api, email, signInCode);
     signInCode = loginCode;
-    await page.getByTestId('auth-email-code').click();
-    await page.keyboard.type(loginCode, { delay: 40 });
+    // The sixth character submits (the local echo's prefill is cleared first).
+    await typeEmailVerificationCode(page, loginCode);
 
     // An MFA-enrolled account must NOT land in the app on the email factor alone.
     await expect(page.getByTestId('mfa-page')).toBeVisible({ timeout: 20_000 });
@@ -204,8 +213,8 @@ test.describe.serial('MFA — TOTP enrollment and challenge login', () => {
 
     const loginCode = await freshEmailCode(api, email, signInCode);
     signInCode = loginCode;
-    await page.getByTestId('auth-email-code').click();
-    await page.keyboard.type(loginCode, { delay: 40 });
+    // The sixth character submits (the local echo's prefill is cleared first).
+    await typeEmailVerificationCode(page, loginCode);
 
     await expect(page.getByTestId('mfa-page')).toBeVisible({ timeout: 20_000 });
     await page.getByTestId('mfa-toggle-recovery').click();

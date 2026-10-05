@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { byTestId } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
@@ -18,7 +19,10 @@ test.describe('Locale & RTL preferences', () => {
   });
 
   async function openAppearance(page: Page) {
-    await page.getByRole('button', { name: /open appearance/i }).click();
+    // The edge handle, by test id: the dashboard has its own "Open appearance" action.
+    const handle = byTestId(page, 'floating-settings');
+    await expect(handle).toHaveAccessibleName(/open appearance/i);
+    await handle.click();
     await expect(page.getByTestId('appearance-panel')).toBeVisible({
       timeout: 10_000,
     });
@@ -39,11 +43,9 @@ test.describe('Locale & RTL preferences', () => {
   });
 
   test('RTL preference survives a reload on a signed-in page', async ({ page }) => {
-    // KNOWN REGRESSION: reloading an authenticated page fires two /auth/refresh
-    // calls (silentRefresh + refreshAccessToken are separately single-flighted);
-    // the second sends the pre-rotation CSRF cookie, gets 403, and force-logs
-    // the session out. Re-enable once the boot refresh is truly single-flight.
-    test.fixme(true, 'authenticated reload bounces to /login (double-refresh CSRF race)');
+    // Was parked while an authenticated reload fired two /auth/refresh calls and
+    // the second force-logged the session out; the boot refresh is one
+    // single-flight path now (`refreshAccessToken`), so a reload keeps the session.
     test.setTimeout(120_000);
     await registerNewUserAndGoToDashboard(page);
     await openAppearance(page);

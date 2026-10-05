@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   completeOnboardingWizard,
   createTeamOrgAndOpenDashboard,
+  createTeamOrgViaApi,
   loginViaEmailCodeUI,
   navigateInApp,
   registerNewUserAndGoToDashboard,
@@ -118,10 +119,44 @@ test.describe('Product journeys', () => {
     await expectLoginFormReady(page);
   });
 
-  test('suspended page renders for authenticated team member', async ({ page }) => {
+  /**
+   * A member of a SUSPENDED organization is held on its blocked page. clinozy-be
+   * suspends an organization itself (a lapsed plan, an admin) — nothing a local run
+   * can trigger — so the three answers that carry the status (the workspace list the
+   * org guard resolves the slug from, the switch into it, and me/context) say what
+   * they would then say. An active organization's `…/suspended` sends the member
+   * back instead (`org-lifecycle.e2e.test.ts`).
+   */
+  test('suspended page renders for a member of a suspended team organization', async ({
+    page,
+  }) => {
     await registerNewUserAndGoToDashboard(page);
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
-    await navigateAuthenticated(page, `/organization/${slug}/suspended`);
+    const { slug } = await createTeamOrgViaApi(page);
+    type OrgWire = { slug?: string | null; status?: string };
+    const suspend = (org: OrgWire | null | undefined) => {
+      if (org?.slug === slug) org.status = 'SUSPENDED';
+    };
+    await page.route('**/api/v1/users/me/organizations*', async (route) => {
+      const response = await route.fetch();
+      const body = (await response.json()) as { data?: OrgWire[] };
+      body.data?.forEach(suspend);
+      await route.fulfill({ response, json: body });
+    });
+    for (const path of ['auth/me/context', 'auth/switch-to-organization']) {
+      await page.route(`**/api/v1/${path}`, async (route) => {
+        const response = await route.fetch();
+        const body = (await response.json()) as {
+          data?: { active_organization?: OrgWire | null };
+        };
+        suspend(body.data?.active_organization);
+        await route.fulfill({ response, json: body });
+      });
+    }
+
+    await navigateAuthenticated(page, `/organization/${slug}/dashboard`);
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/suspended`), {
+      timeout: 15000,
+    });
     await expect(page.getByTestId('suspended-page')).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('suspended-switch-organization')).toBeVisible();
   });
