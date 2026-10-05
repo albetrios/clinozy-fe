@@ -12,6 +12,7 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -221,10 +222,12 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow, D18; H:758–768)', () => {
     );
     await user.click(await screen.findByTestId('visit-flow-custom-invoice'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/invoices/create'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
     );
-    // The custom invoice closes back into the flow, Today still its way back.
-    expect(router.state.location.search).toMatchObject({
+    // The flow stands behind the custom invoice (A-P1), which closes back into it,
+    // Today still its way back.
+    expect(router.state.location.pathname).toBe(patientFileUrl(ISHITA, '/timeline'));
+    expect(shownLocation(router).search).toMatchObject({
       from: `patients/${ISHITA}/timeline?visit=open&from=today`,
     });
     await router.navigate({

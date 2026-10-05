@@ -6,6 +6,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -87,13 +88,14 @@ describe('PatientInvoicesPage', () => {
     const lhr = await invoiceRow('#787');
     await user.click(within(lhr).getByTestId(action('pay')));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/payments/receive'),
+      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       patient: DHARTI,
       invoice: ref.invoice(787),
       from: FROM,
     });
+    expect(router.state.location.pathname).toBe(url());
   });
 
   it('opens Edit invoice from a row and the preview from its action', async () => {
@@ -103,16 +105,16 @@ describe('PatientInvoicesPage', () => {
     expect(within(consultation).queryByTestId(action('pay'))).not.toBeInTheDocument();
     await user.click(within(consultation).getByText('Free first visit'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         `/organization/acme/invoices/${ref.invoice(786)}/edit`,
       ),
     );
-    expect(router.state.location.search).toEqual({ from: FROM });
+    expect(shownLocation(router).search).toEqual({ from: FROM });
     router.history.back();
     const again = await invoiceRow('#786');
     await user.click(within(again).getByTestId(action('preview')));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         `/organization/acme/invoices/${ref.invoice(786)}`,
       ),
     );

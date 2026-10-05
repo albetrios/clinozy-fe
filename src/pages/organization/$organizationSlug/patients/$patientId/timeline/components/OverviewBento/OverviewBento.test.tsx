@@ -10,6 +10,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -60,7 +61,7 @@ const openOverview = (role?: Parameters<typeof renderPatientFile>[1]) => {
 };
 const card = (name: string) => screen.findByTestId(`overview-card-${name}`);
 const path = (router: ReturnType<typeof renderPatientFile>['router']) =>
-  router.state.location.pathname;
+  shownLocation(router).pathname;
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
@@ -188,7 +189,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
       await user.type(input, 'start flubolt at night{Enter}');
       expect(path(router)).toBe(`${FILE}/prescriptions/create`);
     });
-    expect(router.state.location.search).toMatchObject({ medicines: ['Flubolt 400'] });
+    expect(shownLocation(router).search).toMatchObject({ medicines: ['Flubolt 400'] });
     const drawer = await screen.findByTestId('rx-drawer');
     expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
       '1 medicine',
@@ -232,7 +233,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     await waitFor(() =>
       expect(path(router)).toMatch(/^\/organization\/acme\/invoices\/[^/]+\/edit$/),
     );
-    expect(router.state.location.search).toMatchObject({
+    expect(shownLocation(router).search).toMatchObject({
       from: `patients/${DHARTI}/timeline`,
     });
   });
@@ -242,7 +243,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     const billing = await card('billing');
     await user.click(within(billing).getByRole('button', { name: 'Collect payment' }));
     await waitFor(() => expect(path(router)).toBe('/organization/acme/payments/receive'));
-    expect(router.state.location.search).toMatchObject({ patient: DHARTI });
+    expect(shownLocation(router).search).toMatchObject({ patient: DHARTI });
   });
 
   it('reschedules the next visit, and books one when none is', async () => {
@@ -252,7 +253,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     await waitFor(() =>
       expect(path(router)).toMatch(/^\/organization\/acme\/appointments\/[^/]+$/),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       mode: 'reschedule',
       from: `patients/${DHARTI}/timeline`,
     });
@@ -264,11 +265,11 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     expect(await within(empty).findByText('No visits yet')).toBeInTheDocument();
     await user.click(within(empty).getByRole('button', { name: 'Book' }));
     await waitFor(() =>
-      expect(booking.router.state.location.pathname).toBe(
+      expect(shownLocation(booking.router).pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );
-    expect(booking.router.state.location.search).toMatchObject({ who: kavya });
+    expect(shownLocation(booking.router).search).toMatchObject({ who: kavya });
   });
 
   it('opens a photo’s album, a treatment’s drawer and a new record', async () => {
@@ -277,7 +278,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     const [thumb] = await within(photos).findAllByTestId('overview-card-photos-thumb');
     await user.click(thumb!);
     await waitFor(() => expect(path(router)).toBe(`${FILE}/images`));
-    expect(router.state.location.search).toMatchObject({ album: 'lhr' });
+    expect(shownLocation(router).search).toMatchObject({ album: 'lhr' });
 
     await router.navigate({ to: `${FILE}/timeline` });
     const treatments = await card('treatments');

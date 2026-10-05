@@ -7,6 +7,7 @@ import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   renderInPatientFile,
@@ -87,8 +88,8 @@ describe('useActivityFeed (KICKOFF §6.6 Activity timeline, H:4840–4864)', () 
       section: 'timeline',
     });
     await user.click(await row(name));
-    await waitFor(() => expect(router.state.location.pathname).toMatch(path));
-    expect(router.state.location.search).toMatchObject(search);
+    await waitFor(() => expect(shownLocation(router).pathname).toMatch(path));
+    expect(shownLocation(router).search).toMatchObject(search);
   });
 
   it('says so for a patient with no records', async () => {

@@ -7,6 +7,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   renderInPatientFile,
@@ -61,7 +62,7 @@ describe('PatientSection', () => {
 
     await user.click(screen.getByTestId('patient-section-primary'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
+      expect(shownLocation(router).pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );

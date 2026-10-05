@@ -177,15 +177,21 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
       await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
       await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
       await waitFor(() =>
-        expect(router.state.location.pathname).toBe(
+        expect(shownLocation(router).pathname).toBe(
           '/organization/acme/medical/sales/create',
         ),
       );
+      // The flow itself stands behind the sale (A-P1).
+      expect(router.state.location.pathname).toBe(patientFileUrl(SANA, '/timeline'));
+      expect(router.state.location.search).toMatchObject({
+        visit: 'open',
+        from: 'today',
+      });
       const [written] = clinicFixtures.prescriptions
         .snapshot((rx) => rx.patientId === SANA)
         .sort((a, b) => b.seq - a.seq);
       // The sale closes back into the flow, Today still its way back.
-      expect(router.state.location.search).toEqual({
+      expect(shownLocation(router).search).toEqual({
         prescription: written?.id,
         from: `patients/${SANA}/timeline?visit=open&from=today`,
       });
