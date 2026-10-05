@@ -84,7 +84,8 @@ export function LeadCard({
             {number}
           </span>
         )}
-        <h3 className="text-body-lg font-semibold">{label}</h3>
+        {/* 13.5px/600 (H:1768) — `text-field`; there is no `text-body-lg` step. */}
+        <h3 className="text-field font-semibold">{label}</h3>
       </div>
       <div className="flex flex-col gap-2.5 px-4 pb-4">{children}</div>
     </section>

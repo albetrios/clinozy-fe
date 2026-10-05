@@ -7,12 +7,27 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
 import { ASHA, NIDHI, RIYA } from '../../__tests__/integration/leads-test-data.ts';
 import {
+  LeadCard,
   LeadContactStrip,
   LeadInterestsField,
   LeadPeopleField,
   LeadProgressField,
   LeadSourceField,
 } from './index.ts';
+
+describe('LeadCard', () => {
+  it('titles the card at the design’s 13.5px/600 — a defined text step (H:1768)', () => {
+    render(
+      <LeadCard label="Lead details" number={1}>
+        <p>fields</p>
+      </LeadCard>,
+    );
+    const title = screen.getByRole('heading', { name: 'Lead details' });
+    // `text-body-lg` is no step of this theme: it rendered at the inherited 16px.
+    expect(title).toHaveClass('text-field', 'font-semibold');
+    expect(title).not.toHaveClass('text-body-lg');
+  });
+});
 
 describe('LeadSourceField', () => {
   it('offers the sources in the design’s order, Phone call last, one picked', async () => {
@@ -137,7 +152,10 @@ describe('LeadPeopleField', () => {
     });
     await user.click(involved[1] as HTMLElement);
     expect(onToggleInvolved).toHaveBeenCalledWith(NIDHI, false);
-    await user.type(within(popover).getByRole('textbox', { name: 'Search team' }), 'zzz');
+    const search = within(popover).getByRole('textbox', { name: 'Search team' });
+    // The picker's search input is 13.5px (`_patterns.md:84`).
+    expect(search).toHaveClass('text-field');
+    await user.type(search, 'zzz');
     expect(within(popover).getByText('No match')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });

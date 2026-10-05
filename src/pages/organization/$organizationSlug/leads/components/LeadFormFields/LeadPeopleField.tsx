@@ -225,7 +225,7 @@ export function LeadPeopleField({
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t(LEADS_KEYS.drawer.popover.search)}
               aria-label={t(LEADS_KEYS.drawer.popover.search)}
-              className="text-body-lg h-full min-w-0 flex-1 bg-transparent outline-none"
+              className="text-field h-full min-w-0 flex-1 bg-transparent outline-none"
             />
           </div>
           <span className="text-muted-foreground text-caption px-1.5 py-0.5 font-medium">
