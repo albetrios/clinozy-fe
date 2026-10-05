@@ -111,6 +111,10 @@ export function unexpectedProblems(lines: readonly ReceiveLineValues[]): {
 /** Whether anything arrived. */
 export const anyArrived = (lines: readonly ReceiveLineValues[]) => lines.some(comesIn);
 
+/** The lines the badge counts ("2 items", H:5394): the order's and each unexpected one coming in. */
+export const receiveLineCount = (lines: readonly ReceiveLineValues[]) =>
+  lines.filter((line) => !line.unexpected || comesIn(line)).length;
+
 /**
  * The bill once received (the summary, `medical.md:277`): the order's total
  * and each unexpected line coming in, qty × rate — free units cost nothing.

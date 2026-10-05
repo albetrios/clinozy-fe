@@ -51,6 +51,7 @@ const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
 beforeEach(() => {
+  viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   resetClinicFixtures();
 });
@@ -173,6 +174,23 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     );
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,236');
+    // The chip row (H:5394): the supplier in sky, the lines and their bill.
+    const badges = within(drawer).getByTestId(`${D}-badges`);
+    expect([...badges.children].map((badge) => badge.textContent)).toEqual([
+      'K R Medical Agency',
+      '2 items',
+      '₹4,236',
+    ]);
+    // The section's heading shows (H:5388), and names the table's group.
+    expect(
+      within(drawer).getByRole('group', { name: 'Tick what arrived' }),
+    ).toBeInTheDocument();
+    // A long sub wraps to a second line on a phone instead of being cut.
+    expect(
+      within(drawer).getByText(
+        'K R Medical Agency · tick each item and enter batch & expiry',
+      ),
+    ).toHaveClass('max-md:line-clamp-2', 'max-md:whitespace-normal');
     expect(await axeForDialog(drawer)).toHaveNoViolations();
 
     // Nothing typed: each arrived line's expiry is asked for.
@@ -252,6 +270,10 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     await user.clear(qty);
     await user.type(qty, '2');
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,616');
+    // The chips follow the lines, the unexpected one included.
+    expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent(
+      'K R Medical Agency3 items₹4,616',
+    );
     expect(await axeForDialog(drawer)).toHaveNoViolations();
 
     // Nothing on the order came; Azelan did, in batch AZ900.
@@ -320,6 +342,28 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
     expect(saved.items).toHaveLength(2);
+  });
+
+  it('names an unexpected line’s figures on a phone, where the header row is gone', async () => {
+    viewport.tier = 'phone';
+    const user = setup();
+    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-lines-add`));
+    const [, , added] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    const row = within(added as HTMLElement);
+    for (const name of ['Qty', 'Free', 'Rate']) {
+      // A visible caption, and the same name on the field itself.
+      expect(row.getByText(name)).toBeVisible();
+      expect(row.getByRole('textbox', { name })).toBeInTheDocument();
+    }
+    expect(row.getByRole('textbox', { name: 'Qty' })).toHaveClass('max-md:w-14');
+    // The ordered lines keep the design's bare figures.
+    const [ordered] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(within(ordered as HTMLElement).queryByText('Qty')).toBeNull();
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+    viewport.tier = 'desktop';
   });
 
   it('shimmers until the order is read', async () => {

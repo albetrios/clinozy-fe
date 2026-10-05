@@ -1,10 +1,13 @@
+import type { ReactNode } from 'react';
 import { useController, useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
 import {
+  type DrawerBadge,
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
@@ -20,8 +23,10 @@ import {
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { Check, X } from '@/shared/icons/index.ts';
 
+import { MEDICAL_KEYS } from '../../../medical.constants.ts';
 import { useReceivePurchaseOrder } from '../../../shared/hooks/useMedicalFlows/index.ts';
 import type { OpenMedicalChild } from '../../../shared/hooks/useMedicalStack/index.ts';
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
@@ -43,6 +48,7 @@ import {
   receiveFormOf,
   type ReceiveFormValues,
   receiveInputOf,
+  receiveLineCount,
   receiveTotal,
   unexpectedProblems,
 } from './receive-form.ts';
@@ -108,6 +114,26 @@ function ArrivedCell({
   );
 }
 
+/**
+ * An unexpected line's figure on a phone, where the table drops its header
+ * row: the column's name before it, as the header reads (10.5px uppercase).
+ * The control carries the same name as its accessible name.
+ */
+function PhoneCaption({ label, children }: { label: string; children: ReactNode }) {
+  if (useViewportTier() !== 'phone') return children;
+  return (
+    <span className="flex min-w-0 items-center gap-1.5">
+      <span
+        aria-hidden="true"
+        className="text-tiny text-muted-foreground font-semibold tracking-[0.04em] uppercase"
+      >
+        {label}
+      </span>
+      {children}
+    </span>
+  );
+}
+
 /** What the columns read beside the form. */
 interface ColumnsContext {
   form: UseFormReturn<ReceiveFormValues>;
@@ -139,12 +165,15 @@ function useColumns({
   const locked = (row: LineContext) => readOnly || !row.row.arrived;
   const count = (key: 'qty' | 'free') => (row: LineContext) =>
     row.row.unexpected ? (
-      <ItemsNumberCell
-        {...row.bind(key)}
-        max={ITEMS_QTY_MAX}
-        maxLength={4}
-        readOnly={locked(row)}
-      />
+      <PhoneCaption label={row.label}>
+        <ItemsNumberCell
+          {...row.bind(key)}
+          max={ITEMS_QTY_MAX}
+          maxLength={4}
+          readOnly={locked(row)}
+          className="max-md:w-14"
+        />
+      </PhoneCaption>
     ) : (
       <ItemsReadCell>{String(row.row[key])}</ItemsReadCell>
     );
@@ -155,12 +184,15 @@ function useColumns({
     align: 'end',
     cell: (row) =>
       row.row.unexpected ? (
-        <ItemsNumberCell
-          {...row.bind('rate')}
-          money
-          placeholder={t(F.rate)}
-          readOnly={locked(row)}
-        />
+        <PhoneCaption label={row.label}>
+          <ItemsNumberCell
+            {...row.bind('rate')}
+            money
+            placeholder={t(F.rate)}
+            readOnly={locked(row)}
+            className="max-md:w-24"
+          />
+        </PhoneCaption>
       ) : (
         <ItemsReadCell>{formatPaise(row.row.rate)}</ItemsReadCell>
       ),
@@ -311,6 +343,16 @@ function ReceiveSession({
     openChild,
     priced: lines.some((line) => line.unexpected),
   });
+  const total = formatPaise(receiveTotal(order, lines));
+  // The supplier, the lines and their bill, which follow the unexpected ones (H:5394).
+  const badges: DrawerBadge[] = [
+    { id: 'supplier', label: order.supplierName, tone: 'sky' },
+    {
+      id: 'items',
+      label: t(MEDICAL_KEYS.purchases.items, { count: receiveLineCount(lines) }),
+    },
+    { id: 'total', label: total },
+  ];
   return (
     <RecordDrawer
       open={open}
@@ -318,33 +360,38 @@ function ReceiveSession({
       title={t(K.title)}
       tag={`#${order.seq}`}
       sub={t(K.sub, { supplier: order.supplierName })}
+      badges={badges}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}
-      summary={formatPaise(receiveTotal(order, lines))}
+      summary={total}
       readOnly={readOnly}
       saveLabel={t(K.save)}
       onSave={() => void save()}
       saveState={saveState}
       testId={testId}
     >
-      <ItemsField
-        control={form.control}
-        name="lines"
-        label={t(K.section)}
-        columns={columns}
-        newRow={emptyUnexpectedLine}
-        addLabel={t(K.addUnexpected)}
-        readOnly={readOnly}
-        removable={(line) => line.unexpected}
-        testId={`${testId}-lines`}
-      />
+      {/* One section, under its heading "Tick what arrived" (H:5388). */}
+      <DrawerFieldGrid title={t(K.section)}>
+        <ItemsField
+          control={form.control}
+          name="lines"
+          label={t(K.section)}
+          columns={columns}
+          newRow={emptyUnexpectedLine}
+          addLabel={t(K.addUnexpected)}
+          readOnly={readOnly}
+          removable={(line) => line.unexpected}
+          testId={`${testId}-lines`}
+        />
+      </DrawerFieldGrid>
     </RecordDrawer>
   );
 }
 
 /**
  * Receive goods (KICKOFF §6.7 Drawers; `medical.md:269–279`; H:5387–5392) on
- * an Ordered order, 840px, one section — "Tick what arrived": each line
+ * an Ordered order, 840px: under the header the supplier, the lines and their
+ * bill as chips (H:5394), then one section — "Tick what arrived": each line
  * Arrived ✓ (by default) or ✗, its medicine, qty and free units, and the batch
  * and expiry it came with. "+ Add unexpected item" adds a line for what came
  * but was not ordered — its medicine, counts, rate, batch and expiry; × drops

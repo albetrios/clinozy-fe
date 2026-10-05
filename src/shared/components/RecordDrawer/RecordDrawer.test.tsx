@@ -580,8 +580,14 @@ describe('RecordDrawer — phone (below md)', () => {
     expect(close).toHaveAccessibleName('Close');
     expect(close).toHaveClass('end-2', 'top-2', 'size-11');
     expect(close).not.toHaveAttribute('data-slot', 'floating-edge');
-    // The header clears it (56px at the inline end) and is 60px tall by its token.
-    expect(close.parentElement).toHaveClass('max-md:pe-14', 'h-(--drawer-header-height)');
+    // The header clears it (56px at the inline end) and is 60px tall by its token —
+    // at least: a long sub wraps to a second line and the header grows with it.
+    expect(close.parentElement).toHaveClass(
+      'max-md:pe-14',
+      'h-(--drawer-header-height)',
+      'max-md:h-auto',
+      'max-md:min-h-(--drawer-header-height)',
+    );
     expect(document.querySelector('[data-slot="floating-edge"]')).toBeNull();
   });
 

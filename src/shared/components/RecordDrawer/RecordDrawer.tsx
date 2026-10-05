@@ -204,8 +204,10 @@ function DrawerHeader({
   close: ReactNode;
   testId: string;
 }) {
+  // On a phone a long sub wraps to a second line, as the design's does, and the
+  // header grows past its 60px instead of cutting it.
   return (
-    <div className="relative flex h-(--drawer-header-height) shrink-0 items-center overflow-hidden border-b p-(--drawer-header-pad) max-md:pe-14">
+    <div className="relative flex h-(--drawer-header-height) shrink-0 items-center overflow-hidden border-b p-(--drawer-header-pad) max-md:h-auto max-md:min-h-(--drawer-header-height) max-md:pe-14">
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-2">
           <SheetTitle
@@ -231,7 +233,7 @@ function DrawerHeader({
         {sub ? (
           <SheetDescription
             className={cn(
-              'truncate',
+              'truncate max-md:line-clamp-2 max-md:whitespace-normal',
               large ? 'text-detail' : 'text-body',
               hideSubOnPhone && 'max-md:sr-only',
             )}
