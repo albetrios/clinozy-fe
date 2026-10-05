@@ -78,7 +78,7 @@ import {
   Plug as LuPlug,
   Plus as LuPlus,
   Printer as LuPrinter,
-  Receipt as LuReceipt,
+  ReceiptText as LuReceiptText,
   RefreshCw as LuRefreshCw,
   Rocket as LuRocket,
   RotateCw as LuRotateCw,
@@ -249,8 +249,11 @@ export const Plus = makeIcon('Plus', LuPlus);
 export const Plug = makeIcon('Plug', LuPlug);
 /** Lucide `printer`: print. */
 export const Printer = makeIcon('Printer', LuPrinter);
-/** Lucide `receipt`: invoices and sales. */
-export const Receipt = makeIcon('Receipt', LuReceipt);
+/**
+ * Lucide `receipt-text`: invoices and sales — the design's `receipt` draws text
+ * lines on the slip (H:3012), where Lucide `receipt` draws a `$`.
+ */
+export const Receipt = makeIcon('Receipt', LuReceiptText);
 /** Lucide `refresh-cw`: redo or change (`RotateCw` is another glyph). */
 export const RefreshCw = makeIcon('RefreshCw', LuRefreshCw);
 export const Rocket = makeIcon('Rocket', LuRocket);

@@ -50,6 +50,12 @@ describe('icon barrel', () => {
     expect(svg?.getAttribute('class')).toContain('lucide');
   });
 
+  it('draws Receipt as the design’s slip with text lines, not Lucide’s dollar receipt (H:3012)', () => {
+    const { container } = render(<icons.Receipt className="size-4" />);
+    const svgClass = container.querySelector('svg')?.getAttribute('class') ?? '';
+    expect(svgClass).toContain('lucide-receipt-text');
+  });
+
   it('swaps to the selected library once its lazy chunk loads', async () => {
     useAuthStore.setState({ isAuthenticated: true, isLoading: false });
     const { container } = render(<Boxes className="size-4" />);
