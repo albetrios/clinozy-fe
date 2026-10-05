@@ -109,12 +109,6 @@ export const SETTINGS_KEYS = {
       acknowledge: 'security.recoveryCodes.acknowledge',
     },
   },
-  discard: {
-    title: 'discard.title',
-    description: 'discard.description',
-    stay: 'discard.stay',
-    leave: 'discard.leave',
-  },
   dialog: {
     title: 'dialog.title',
   },
@@ -439,7 +433,6 @@ export const SETTINGS_KEYS = {
         confirmDescription: 'panels.billing.cancellation.confirmDescription',
         keep: 'panels.billing.cancellation.keep',
         confirm: 'panels.billing.cancellation.confirm',
-        cancelling: 'panels.billing.cancellation.cancelling',
       },
     },
   },

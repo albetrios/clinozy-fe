@@ -207,7 +207,11 @@ Groups and rows render only for what the access in force (View-as included) may 
 ## Shared confirm (`ConfirmDialog`)
 
 The plain confirm and the reason confirm (`reason` set) share the first three ids; the
-reason confirm carries `data-layout="panel"` from `md` and `data-layout="sheet"` below.
+reason confirm carries `data-layout="panel"` from `md` and `data-layout="sheet"` below. A
+plain confirm whose specs already named its ids passes them as `testIds` (L-62): Settings'
+discard prompt `settings-discard-dialog` / `-stay` / `-leave`, delete account
+`account-delete-cancel` / `-confirm`, cancel subscription `billing-cancel-dialog` /
+`billing-cancel-confirm`, the profile save `profile-confirm-cancel` / `-save`.
 
 | Test ID                  | Element                                                                      | File                                        |
 | ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------- |

@@ -5,7 +5,6 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,21 +17,12 @@ import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Dialog, DialogContent, DialogTitle } from '@/shared/components/ui/dialog.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAccessResolved } from '@/shared/hooks/useCan/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
+import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -187,48 +177,6 @@ function useSettingsSection() {
 }
 
 /**
- * The unsaved-changes guard: runs an action straight away, or — while a panel is dirty — parks
- * it behind the discard confirmation until the user leaves or stays.
- */
-function useDiscardGuard() {
-  const dirtyCtx = useSettingsDirty();
-  const [discardOpen, setDiscardOpen] = useState(false);
-  const pendingActionRef = useRef<(() => void) | null>(null);
-
-  const runOrConfirmDiscard = useCallback(
-    (action: () => void) => {
-      if (dirtyCtx?.isDirty) {
-        pendingActionRef.current = action;
-        setDiscardOpen(true);
-        return;
-      }
-      action();
-    },
-    [dirtyCtx?.isDirty],
-  );
-
-  const confirmDiscard = useCallback(() => {
-    const action = pendingActionRef.current;
-    pendingActionRef.current = null;
-    setDiscardOpen(false);
-    action?.();
-  }, []);
-
-  // Asked while a save was still in flight (Esc during "Saving…"): the prompt
-  // warned about changes that have since landed. Once nothing is dirty there
-  // is nothing left to discard, so the parked action goes ahead instead of the
-  // prompt outliving its reason. A failed save keeps the panel dirty — and the
-  // prompt up.
-  const isDirty = dirtyCtx?.isDirty ?? false;
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- the parked action navigates, so it cannot run during render; this reacts once to a panel's save landing
-    if (discardOpen && !isDirty) confirmDiscard();
-  }, [discardOpen, isDirty, confirmDiscard]);
-
-  return { discardOpen, setDiscardOpen, runOrConfirmDiscard, confirmDiscard };
-}
-
-/**
  * Mobile section picker — the sidebar is hidden below sm. `ps-4` is
  * the content pane's gutter, so the picker and the fields under it
  * share a left edge.
@@ -283,46 +231,25 @@ function MobileSectionPicker({
   );
 }
 
-/** "Discard your changes?" — shown when a guarded action meets a dirty panel. */
-function DiscardChangesDialog({
-  open,
-  onOpenChange,
-  onLeave,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onLeave: () => void;
-}) {
-  const { t } = useTranslation(SETTINGS_NS);
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent data-testid="settings-discard-dialog">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t(SETTINGS_KEYS.discard.title)}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t(SETTINGS_KEYS.discard.description)}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel data-testid="settings-discard-stay">
-            {t(SETTINGS_KEYS.discard.stay)}
-          </AlertDialogCancel>
-          <AlertDialogAction onClick={onLeave} data-testid="settings-discard-leave">
-            {t(SETTINGS_KEYS.discard.leave)}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
+/** The discard prompt's test ids (`settings-discard-*`, as the Settings specs name them). */
+const SETTINGS_DISCARD_TEST_IDS = {
+  dialog: 'settings-discard-dialog',
+  cancel: 'settings-discard-stay',
+  accept: 'settings-discard-leave',
+} as const;
 
 function SettingsModalBody() {
   const { t } = useTranslation(SETTINGS_NS);
   // The shell stays mounted while panels load or change sections.
   const enterProps = useEnterAnimationProps();
   const { active, readyGroups, contextReady } = useSettingsSection();
-  const { discardOpen, setDiscardOpen, runOrConfirmDiscard, confirmDiscard } =
-    useDiscardGuard();
+  const isDirty = useSettingsDirty()?.isDirty ?? false;
+  // A guarded action (close, a section switch, Back) meets a dirty panel: the
+  // shared "Discard changes?" prompt — with the ids the Settings specs know.
+  const { guardDialog, confirmDiscard } = useUnsavedChangesGuard({
+    when: isDirty,
+    testIds: SETTINGS_DISCARD_TEST_IDS,
+  });
   const navigate = useNavigate();
   const router = useRouter();
   // Drives the top scroll-shadow on the content panel (elevates the header bar
@@ -339,12 +266,12 @@ function SettingsModalBody() {
 
   if (!active) return null;
 
-  const guardedClose = () => runOrConfirmDiscard(close);
+  const guardedClose = () => confirmDiscard(close);
 
   // Section switches replace the history entry so a single Back closes the
   // modal from anywhere instead of replaying every visited section.
   const goTo = (next: SettingsSectionRef) => {
-    runOrConfirmDiscard(() => {
+    confirmDiscard(() => {
       void navigate({
         to: '.',
         hash: settingsHash(next.scope, next.section),
@@ -402,11 +329,7 @@ function SettingsModalBody() {
         </DialogContent>
       </Dialog>
 
-      <DiscardChangesDialog
-        open={discardOpen}
-        onOpenChange={setDiscardOpen}
-        onLeave={confirmDiscard}
-      />
+      {guardDialog}
     </>
   );
 }

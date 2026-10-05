@@ -109,12 +109,6 @@
       "sendFailed": "Non è stato possibile inviare il codice. Riprova."
     }
   },
-  "discard": {
-    "title": "Scartare le modifiche non salvate?",
-    "description": "Hai modifiche non salvate. Lasciare questa sezione le scarterà.",
-    "stay": "Continua a modificare",
-    "leave": "Scarta modifiche"
-  },
   "dialog": {
     "title": "Impostazioni"
   },
@@ -438,8 +432,7 @@
         "confirmTitle": "Disdire l'abbonamento?",
         "confirmDescription": "Il tuo spazio di lavoro mantiene l'accesso completo fino al {{date}}. Dopo, l'abbonamento termina e le funzioni a pagamento potrebbero essere limitate.",
         "keep": "Mantieni abbonamento",
-        "confirm": "Conferma disdetta",
-        "cancelling": "Disdetta in corso…"
+        "confirm": "Conferma disdetta"
       }
     }
   }

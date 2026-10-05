@@ -106,12 +106,6 @@
       "sendFailed": "无法发送验证码，请重试。"
     }
   },
-  "discard": {
-    "title": "放弃未保存的更改？",
-    "description": "您有未保存的更改。离开将丢弃它们。",
-    "stay": "继续编辑",
-    "leave": "放弃更改"
-  },
   "dialog": {
     "title": "设置"
   },
@@ -432,8 +426,7 @@
         "confirmTitle": "取消订阅？",
         "confirmDescription": "您的工作区在 {{date}} 之前保持完整访问权限。之后订阅结束，付费功能可能受限。",
         "keep": "保留订阅",
-        "confirm": "确认取消",
-        "cancelling": "取消中…"
+        "confirm": "确认取消"
       }
     }
   }

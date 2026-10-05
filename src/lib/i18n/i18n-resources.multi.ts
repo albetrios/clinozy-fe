@@ -3,7 +3,7 @@ import enCommon from '@/locales/en/common.json';
 import enErrors from '@/locales/en/errors.json';
 import enLayout from '@/locales/en/layout.json';
 import { manifest as onboardingManifest } from '@/locales/en/onboarding.json';
-import { dialog, discard, nav, panels } from '@/locales/en/settings.json';
+import { dialog, nav, panels } from '@/locales/en/settings.json';
 
 import type { LocaleBuildProfile } from './build-config.ts';
 import type { I18nLocale } from './locales.ts';
@@ -275,7 +275,6 @@ export function getBootstrapResources(): Record<string, Partial<NamespaceResourc
       [I18N_NAMESPACES.onboarding]: { manifest: onboardingManifest },
       [I18N_NAMESPACES.settings]: {
         dialog,
-        discard,
         nav,
         panels: { appearance: panels.appearance },
       },

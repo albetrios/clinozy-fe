@@ -109,12 +109,6 @@
       "sendFailed": "Não foi possível enviar o código. Tente novamente."
     }
   },
-  "discard": {
-    "title": "Descartar alterações não salvas?",
-    "description": "Você tem alterações não salvas. Sair desta seção as descartará.",
-    "stay": "Continuar editando",
-    "leave": "Descartar alterações"
-  },
   "dialog": {
     "title": "Configurações"
   },
@@ -438,8 +432,7 @@
         "confirmTitle": "Cancelar assinatura?",
         "confirmDescription": "Seu workspace mantém acesso completo até {{date}}. Depois disso, a assinatura termina e os recursos pagos podem ficar limitados.",
         "keep": "Manter assinatura",
-        "confirm": "Confirmar cancelamento",
-        "cancelling": "Cancelando…"
+        "confirm": "Confirmar cancelamento"
       }
     }
   }

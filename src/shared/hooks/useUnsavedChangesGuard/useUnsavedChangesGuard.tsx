@@ -1,9 +1,10 @@
 import { useBlocker } from '@tanstack/react-router';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
   ConfirmDialog,
+  type ConfirmTestIds,
   isConfirmedWriteRunning,
 } from '@/shared/components/ConfirmDialog/index.ts';
 
@@ -21,6 +22,8 @@ export interface UseUnsavedChangesGuardOptions {
   confirmLabel?: string;
   /** Label that keeps the user where they are; defaults to "Keep editing". */
   cancelLabel?: string;
+  /** The prompt's test ids, for a surface whose specs already name them. */
+  testIds?: ConfirmTestIds;
 }
 
 /**
@@ -35,7 +38,10 @@ export interface UseUnsavedChangesGuardOptions {
  * the latest committed value; a confirmed discard also lets the navigation its
  * own `exit` starts through, instead of asking a second time. So does an exit a
  * confirm's write starts — a drawer closing after its record was deleted,
- * cancelled or voided was answered by that confirm (L-64: one confirm).
+ * cancelled or voided was answered by that confirm (L-64: one confirm). Asked
+ * while a save was still in flight (× during "Saving…"), the prompt warned
+ * about changes that have since landed: once `when` turns false the parked exit
+ * goes ahead on its own; a failed save keeps the surface dirty — and the prompt up.
  */
 export function useUnsavedChangesGuard({
   when,
@@ -43,6 +49,7 @@ export function useUnsavedChangesGuard({
   description,
   confirmLabel,
   cancelLabel,
+  testIds,
 }: UseUnsavedChangesGuardOptions) {
   const { t } = useTranslation(UNSAVED_CHANGES_NS);
   const whenRef = useRef(when);
@@ -89,6 +96,14 @@ export function useUnsavedChangesGuard({
     exit?.();
   }, [routeBlocked, proceed, pendingExit]);
 
+  // The save landed under the prompt: nothing is left to discard.
+  useEffect(() => {
+    if (when || pendingExit === null) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the parked exit navigates, so it cannot run during render; this reacts once to a save landing
+    setPendingExit(null);
+    pendingExit();
+  }, [when, pendingExit]);
+
   const handleOpenChange = useCallback(
     (next: boolean) => {
       if (next) return;
@@ -107,6 +122,7 @@ export function useUnsavedChangesGuard({
       confirmLabel={confirmLabel ?? t(UNSAVED_CHANGES_KEYS.discard)}
       cancelLabel={cancelLabel ?? t(UNSAVED_CHANGES_KEYS.keepEditing)}
       destructive
+      testIds={testIds}
       onConfirm={handleConfirm}
     />
   );

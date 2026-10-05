@@ -107,12 +107,6 @@
       "sendFailed": "We couldn't send the code. Please try again."
     }
   },
-  "discard": {
-    "title": "Discard unsaved changes?",
-    "description": "You have unsaved changes. Leaving this section will discard them.",
-    "stay": "Keep editing",
-    "leave": "Discard changes"
-  },
   "dialog": {
     "title": "Settings"
   },
@@ -434,8 +428,7 @@
         "confirmTitle": "Cancel subscription?",
         "confirmDescription": "Your workspace keeps full access until {{date}}. After that, the subscription ends and paid features may be limited.",
         "keep": "Keep subscription",
-        "confirm": "Confirm cancellation",
-        "cancelling": "Cancelling…"
+        "confirm": "Confirm cancellation"
       }
     }
   }

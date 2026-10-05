@@ -24,6 +24,19 @@ describe('ConfirmDialog', () => {
     expect(screen.getByText('This action cannot be undone.')).toBeInTheDocument();
   });
 
+  it('carries a surface’s own test ids when it names them', () => {
+    render(
+      <ConfirmDialog
+        {...base}
+        testIds={{ dialog: 'billing-cancel-dialog', accept: 'billing-cancel-confirm' }}
+      />,
+    );
+    expect(screen.getByTestId('billing-cancel-dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-cancel-confirm')).toHaveTextContent('Confirm');
+    // A role the surface does not name keeps the shared id.
+    expect(screen.getByTestId('confirm-cancel')).toHaveTextContent('Cancel');
+  });
+
   it('stays the centred alert dialog without `reason`', () => {
     render(<ConfirmDialog {...base} />);
     const dialog = screen.getByRole('alertdialog', { name: 'Delete role?' });

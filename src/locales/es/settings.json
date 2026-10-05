@@ -109,12 +109,6 @@
       "sendFailed": "No pudimos enviar el código. Inténtalo de nuevo."
     }
   },
-  "discard": {
-    "title": "¿Descartar cambios sin guardar?",
-    "description": "Tienes cambios sin guardar. Si sales, se perderán.",
-    "stay": "Seguir editando",
-    "leave": "Descartar cambios"
-  },
   "dialog": {
     "title": "Configuración"
   },
@@ -438,8 +432,7 @@
         "confirmTitle": "¿Cancelar la suscripción?",
         "confirmDescription": "Tu espacio de trabajo conserva el acceso completo hasta el {{date}}. Después, la suscripción termina y las funciones de pago pueden quedar limitadas.",
         "keep": "Mantener suscripción",
-        "confirm": "Confirmar cancelación",
-        "cancelling": "Cancelando…"
+        "confirm": "Confirmar cancelación"
       }
     }
   }

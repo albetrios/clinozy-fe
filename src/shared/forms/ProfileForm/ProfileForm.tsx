@@ -9,21 +9,12 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
@@ -138,8 +129,9 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
     },
   });
 
-  const onConfirmedSubmit = handleSubmit((values) => {
-    save.mutate(values);
+  // Re-validated on confirm; a failed save rejects, so the confirm stays open.
+  const onConfirmedSubmit = handleSubmit(async (values) => {
+    await save.mutateAsync(values);
   });
 
   return (
@@ -213,33 +205,17 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
         </Button>
       </form>
 
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t(panels.confirmTitle)}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t(panels.confirmDescription)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="profile-confirm-cancel">
-              {t(panels.confirmCancel)}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                // Keep the dialog open until the mutation resolves (onSuccess
-                // closes it); Radix would otherwise close on click.
-                e.preventDefault();
-                void onConfirmedSubmit();
-              }}
-              isLoading={save.isPending}
-              data-testid="profile-confirm-save"
-            >
-              {save.isPending ? t(panels.saving) : t(panels.confirmSave)}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Open until the save resolves (onSuccess closes it), and not dismissible meanwhile. */}
+      <ConfirmDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        title={t(panels.confirmTitle)}
+        description={t(panels.confirmDescription)}
+        cancelLabel={t(panels.confirmCancel)}
+        confirmLabel={t(panels.confirmSave)}
+        onConfirm={onConfirmedSubmit}
+        testIds={{ cancel: 'profile-confirm-cancel', accept: 'profile-confirm-save' }}
+      />
     </>
   );
 }

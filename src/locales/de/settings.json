@@ -107,12 +107,6 @@
       "sendFailed": "Der Code konnte nicht gesendet werden. Bitte erneut versuchen."
     }
   },
-  "discard": {
-    "title": "Ungespeicherte Änderungen verwerfen?",
-    "description": "Sie haben ungespeicherte Änderungen. Beim Verlassen dieses Bereichs gehen sie verloren.",
-    "stay": "Weiter bearbeiten",
-    "leave": "Änderungen verwerfen"
-  },
   "dialog": {
     "title": "Einstellungen"
   },
@@ -434,8 +428,7 @@
         "confirmTitle": "Abo kündigen?",
         "confirmDescription": "Ihr Workspace behält bis zum {{date}} vollen Zugriff. Danach endet das Abo und kostenpflichtige Funktionen können eingeschränkt werden.",
         "keep": "Abo behalten",
-        "confirm": "Kündigung bestätigen",
-        "cancelling": "Wird gekündigt…"
+        "confirm": "Kündigung bestätigen"
       }
     }
   }

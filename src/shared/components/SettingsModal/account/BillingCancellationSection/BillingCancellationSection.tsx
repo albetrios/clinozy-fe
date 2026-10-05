@@ -2,21 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { BillingSubscription } from '@/shared/api/billing-contracts.ts';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -75,56 +65,38 @@ export function BillingCancellationSection({
             {resumeSubscription.isPending ? t(keys.resuming) : t(keys.resume)}
           </Button>
         ) : (
-          <AlertDialog
-            open={confirmOpen}
-            // Esc or an overlay click must not abandon a cancellation that is
-            // already running.
-            onOpenChange={(open) => {
-              if (!cancelSubscription.isPending) setConfirmOpen(open);
-            }}
-          >
-            <AlertDialogTrigger asChild>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={
-                  cancelSubscription.isPending || subscription.status === 'incomplete'
-                }
-                data-testid="billing-cancel"
-              >
-                {t(keys.cancelAction)}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent data-testid="billing-cancel-dialog">
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t(keys.confirmTitle)}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t(keys.confirmDescription, { date: periodEnd })}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={cancelSubscription.isPending}>
-                  {t(keys.keep)}
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(event) => {
-                    // Radix closes on click. Hold the dialog open until the
-                    // request resolves, so a failure lands on the confirm that
-                    // caused it instead of an empty screen — and so the button
-                    // cannot be pressed twice on the way out (SET-14).
-                    event.preventDefault();
-                    cancelSubscription.mutate(subscription.id, {
-                      onSuccess: () => setConfirmOpen(false),
-                    });
-                  }}
-                  isLoading={cancelSubscription.isPending}
-                  data-testid="billing-cancel-confirm"
-                >
-                  {cancelSubscription.isPending ? t(keys.cancelling) : t(keys.confirm)}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={
+                cancelSubscription.isPending || subscription.status === 'incomplete'
+              }
+              onClick={() => setConfirmOpen(true)}
+              data-testid="billing-cancel"
+            >
+              {t(keys.cancelAction)}
+            </Button>
+            {/* Held open until the request resolves, so a failure lands on the
+                confirm that caused it and the button cannot be pressed twice on
+                the way out (SET-14); Esc and the overlay wait for it too. */}
+            <ConfirmDialog
+              open={confirmOpen}
+              onOpenChange={setConfirmOpen}
+              title={t(keys.confirmTitle)}
+              description={t(keys.confirmDescription, { date: periodEnd })}
+              cancelLabel={t(keys.keep)}
+              confirmLabel={t(keys.confirm)}
+              destructive
+              onConfirm={async () => {
+                await cancelSubscription.mutateAsync(subscription.id);
+              }}
+              testIds={{
+                dialog: 'billing-cancel-dialog',
+                accept: 'billing-cancel-confirm',
+              }}
+            />
+          </>
         )}
       </CardContent>
     </Card>

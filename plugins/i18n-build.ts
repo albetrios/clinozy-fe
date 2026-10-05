@@ -59,13 +59,12 @@ function renderSingleLocaleModule(bcp47: string): string {
       loadNamespaceJson(uiLocale, ns),
     ]),
   );
-  const { dialog, discard, nav, panels } = loadNamespaceJson(
+  const { dialog, nav, panels } = loadNamespaceJson(
     uiLocale,
     I18N_NAMESPACES.settings,
   );
   namespaces.settings = {
     dialog,
-    discard,
     nav,
     panels: { appearance: (panels as Record<string, unknown> | undefined)?.appearance },
   };

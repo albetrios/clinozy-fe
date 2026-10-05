@@ -8,21 +8,12 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { forceLogout } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -162,34 +153,19 @@ export function AccountPanel() {
         </CardContent>
       </Card>
 
-      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t(accountPanels.deleteTitle)}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t(accountPanels.deleteDescription)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="account-delete-cancel">
-              {t(accountPanels.deleteCancel)}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-              onClick={(e) => {
-                // Keep the dialog open until the request resolves (success routes
-                // away; error stays so the user can retry).
-                e.preventDefault();
-                deleteAccount.mutate();
-              }}
-              isLoading={deleteAccount.isPending}
-              data-testid="account-delete-confirm"
-            >
-              {t(accountPanels.deleteConfirm)}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Open until the request resolves — success routes away; a failure stays
+          so the user can retry — and it cannot be dismissed meanwhile. */}
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title={t(accountPanels.deleteTitle)}
+        description={t(accountPanels.deleteDescription)}
+        cancelLabel={t(accountPanels.deleteCancel)}
+        confirmLabel={t(accountPanels.deleteConfirm)}
+        destructive
+        onConfirm={() => deleteAccount.mutateAsync()}
+        testIds={{ cancel: 'account-delete-cancel', accept: 'account-delete-confirm' }}
+      />
     </div>
   );
 }

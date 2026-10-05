@@ -7,6 +7,7 @@ export type {
 export {
   ConfirmDialog,
   type ConfirmDialogProps,
+  type ConfirmTestIds,
   type PlainConfirmDialogProps,
 } from './ConfirmDialog.tsx';
 export { isConfirmedWriteRunning } from './confirmed-write.ts';

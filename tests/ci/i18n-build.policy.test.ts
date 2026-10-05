@@ -36,7 +36,6 @@ describe('production i18n resource boundaries', () => {
         onboarding: { manifest: expect.any(Object) },
         settings: {
           dialog: expect.any(Object),
-          discard: expect.any(Object),
           nav: expect.any(Object),
           panels: { appearance: expect.any(Object) },
         },

@@ -20,6 +20,9 @@ import {
 import { runConfirmedWrite } from './confirmed-write.ts';
 import { ReasonConfirm, type ReasonConfirmProps } from './ReasonConfirm.tsx';
 
+/** A plain confirm's own test ids, for a surface whose specs already name them. */
+export type ConfirmTestIds = Partial<Record<'dialog' | 'cancel' | 'accept', string>>;
+
 /** The centred confirm every platform surface uses — `ConfirmDialog` without `reason`. */
 export interface PlainConfirmDialogProps {
   open: boolean;
@@ -32,6 +35,8 @@ export interface PlainConfirmDialogProps {
   cancelLabel?: string;
   /** Style the confirm button as a destructive (red) action. */
   destructive?: boolean;
+  /** The surface's own test ids; `confirm-dialog` / `-cancel` / `-accept` otherwise. */
+  testIds?: ConfirmTestIds;
   /** Absent here: setting it switches to the reason panel. */
   reason?: undefined;
   /** Runs on confirm. If it resolves the dialog closes; if it throws it stays
@@ -58,6 +63,7 @@ function PlainConfirmDialog({
   confirmLabel,
   cancelLabel,
   destructive = false,
+  testIds,
   onConfirm,
 }: PlainConfirmDialogProps) {
   const { t } = useTranslation(CONFIRM_NS);
@@ -92,7 +98,7 @@ function PlainConfirmDialog({
       }}
     >
       <AlertDialogContent
-        data-testid={CONFIRM_TEST_IDS.dialog}
+        data-testid={testIds?.dialog ?? CONFIRM_TEST_IDS.dialog}
         onOpenAutoFocus={() => {
           const previous = document.activeElement;
           returnFocusRef.current = previous instanceof HTMLElement ? previous : null;
@@ -116,7 +122,10 @@ function PlainConfirmDialog({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy} data-testid={CONFIRM_TEST_IDS.cancel}>
+          <AlertDialogCancel
+            disabled={busy}
+            data-testid={testIds?.cancel ?? CONFIRM_TEST_IDS.cancel}
+          >
             {cancelLabel ?? t(CONFIRM_KEYS.cancel)}
           </AlertDialogCancel>
           <Button
@@ -124,7 +133,7 @@ function PlainConfirmDialog({
             onClick={handleConfirm}
             disabled={busy}
             isLoading={busy}
-            data-testid={CONFIRM_TEST_IDS.accept}
+            data-testid={testIds?.accept ?? CONFIRM_TEST_IDS.accept}
           >
             {confirmLabel ?? t(CONFIRM_KEYS.accept)}
           </Button>

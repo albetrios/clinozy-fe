@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -38,7 +38,17 @@ vi.mock('@/shared/hooks/useSubscription/index.ts', async () => {
       setIsPending(false);
       options?.onSuccess?.();
     }
-    return { isPending, mutate };
+    function mutateAsync(id: string) {
+      spy(id);
+      setIsPending(true);
+      return new Promise<void>((resolve) => {
+        ctl.finish = () => {
+          setIsPending(false);
+          resolve();
+        };
+      });
+    }
+    return { isPending, mutate, mutateAsync };
   }
   return {
     useCancelSubscription: () => useLifecycle(cancelMutate),
@@ -109,19 +119,19 @@ describe('BillingCancellationSection', () => {
     await user.click(screen.getByTestId('billing-cancel'));
     await user.click(await screen.findByTestId('billing-cancel-confirm'));
 
-    expect(cancelMutate).toHaveBeenCalledWith(
-      'sub_test',
-      expect.objectContaining({ onSuccess: expect.any(Function) }),
-    );
-    // Still open, still busy, and no longer pressable.
+    expect(cancelMutate).toHaveBeenCalledWith('sub_test');
+    // Still open, still busy, and no longer pressable — the shared confirm.
     const confirm = await screen.findByTestId('billing-cancel-confirm');
+    expect(screen.getByTestId('billing-cancel-dialog')).toBeInTheDocument();
     expect(confirm).toBeDisabled();
     expect(confirm).toHaveAttribute('aria-busy', 'true');
     expect(confirm.querySelector('.animate-spin')).not.toBeNull();
-    expect(confirm).toHaveTextContent(copy(KEYS.cancelling));
+    expect(confirm).toHaveTextContent(copy(KEYS.confirm));
 
     act(() => ctl.finish?.());
-    expect(screen.queryByTestId('billing-cancel-confirm')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByTestId('billing-cancel-confirm')).not.toBeInTheDocument(),
+    );
   });
 
   it('shows the resume button working, not just greyed out', async () => {

@@ -257,3 +257,30 @@ describe('useUnsavedChangesGuard', () => {
     });
   });
 });
+
+describe('useUnsavedChangesGuard — a save landing under the prompt', () => {
+  it('runs the parked exit once the surface turns clean', async () => {
+    // × during "Saving…": the prompt warned about changes that have since
+    // landed, so the exit it parked goes ahead instead of waiting on a choice.
+    const onExit = vi.fn();
+    function Landing() {
+      const [dirty, setDirty] = useState(true);
+      return (
+        <>
+          <button type="button" data-testid="save-lands" onClick={() => setDirty(false)}>
+            save
+          </button>
+          <GuardedSurface dirty={dirty} onExit={onExit} />
+        </>
+      );
+    }
+    renderWithRouter(<Landing />);
+    fireEvent.click(await screen.findByTestId('surface-exit'));
+    await screen.findByTestId('confirm-dialog');
+
+    fireEvent.click(screen.getByTestId('save-lands'));
+
+    expect(await screen.findByTestId('other-page')).toBeInTheDocument();
+    expect(onExit).toHaveBeenCalledTimes(1);
+  });
+});
