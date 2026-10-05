@@ -100,8 +100,18 @@ export async function authenticateViaEmailCode(page: Page): Promise<{ email: str
 }
 
 /**
- * Walks the onboarding wizard through to a dashboard when the user still needs it.
- * Skips workspace/invite steps when they are hidden for the deployment mode.
+ * Where a signed-in session lands: the organization picker, or a clinic room. A
+ * clinic's home (`/organization/<slug>`) is never a landing on its own — it
+ * redirects on to the member's role home.
+ */
+const LANDED_URL = /\/organization(?:\/[^/?#]+\/[^/?#]+)?(?:[?#]|$)/;
+
+/**
+ * Walks the onboarding wizard through to the workspace when the user still needs it.
+ * Skips workspace/invite steps when they are hidden for the deployment mode. A team-only
+ * deployment creates the clinic in the wizard and lands on its role home (Today for its
+ * owner); where personal workspaces still exist the wizard creates none, and the user
+ * lands on the organization picker (D44: a personal workspace has no clinic).
  */
 export async function completeOnboardingWizard(page: Page): Promise<void> {
   await expect(page.getByTestId('onboarding-page')).toBeVisible({ timeout: 10000 });
@@ -127,14 +137,13 @@ export async function completeOnboardingWizard(page: Page): Promise<void> {
   }
 
   await clickTestId(page, 'onboarding-finish');
-  await expect(page).toHaveURL(/\/organization\/[^/]+\/dashboard|\/dashboard/, {
-    timeout: 15000,
-  });
+  await expect(page).toHaveURL(LANDED_URL, { timeout: 15000 });
 }
 
 /**
- * Signs in through the unified `/login` email-code UI and lands on onboarding or a dashboard.
- * Requires clinozy-be on :3000 (Vite proxies `/api` in dev) and DATABASE_URL for code retrieval.
+ * Signs in through the unified `/login` email-code UI and lands on onboarding, the
+ * organization picker or a clinic room. Requires clinozy-be on :3000 (Vite proxies
+ * `/api` in dev) and DATABASE_URL for code retrieval.
  */
 export async function loginViaEmailCodeUI(
   page: Page,
@@ -153,10 +162,9 @@ export async function loginViaEmailCodeUI(
   await watchForEmailStepReappearing(page);
   await fillEmailVerificationCode(page, code);
 
-  await expect(page).toHaveURL(
-    /\/onboarding|\/organization\/[^/]+\/dashboard|\/dashboard/,
-    { timeout: 20000 },
-  );
+  await expect(page).toHaveURL(new RegExp(`/onboarding|${LANDED_URL.source}`), {
+    timeout: 20000,
+  });
   await expectEmailStepNeverReappeared(page);
 
   return { email };
@@ -196,19 +204,21 @@ async function expectEmailStepNeverReappeared(page: Page): Promise<void> {
 }
 
 /**
- * Email-code UI sign-in, then onboarding when needed, ending on a dashboard shell.
- * Uses API send-code/login (refresh cookie) then SPA hydrate — reliable across browsers.
- * For explicit `/login` UI coverage see `loginViaEmailCodeUI` and auth.e2e tests.
+ * Email-code sign-in, then onboarding when needed, ending inside a clinic on Today —
+ * its owner's role home (D25). Uses API send-code/login (refresh cookie) then SPA
+ * hydrate — reliable across browsers. For explicit `/login` UI coverage see
+ * `loginViaEmailCodeUI` and auth.e2e tests.
  */
-export async function registerNewUserAndGoToDashboard(page: Page): Promise<void> {
+export async function registerNewUserAndGoToToday(page: Page): Promise<void> {
   await authenticateViaEmailCodeAndLand(page);
 }
 
 /**
  * API email-code session, then client navigation to `/` (refresh cookie hydrates the SPA),
- * ending on a dashboard: the personal `/dashboard`, the team dashboard onboarding lands
- * on, or — when `/` resolves into a team workspace, whose root is the member's role home
- * (D25: Today for an owner) — that workspace's dashboard, opened explicitly.
+ * ending inside a clinic on Today. A new user walks the onboarding wizard first; it lands
+ * them in the clinic it created (team-only), or — where personal workspaces still exist —
+ * on the organization picker, since they own no clinic yet: one is created for them
+ * through the API and opened.
  */
 export async function authenticateViaEmailCodeAndLand(
   page: Page,
@@ -216,23 +226,39 @@ export async function authenticateViaEmailCodeAndLand(
   const { email } = await authenticateViaEmailCode(page);
   // Client-side nav keeps the in-memory access token; a full reload would require the refresh cookie.
   await navigateInApp(page, '/');
-  await expect(page).toHaveURL(
-    /\/onboarding|\/organization\/[^/]+\/[^/?#]+|\/dashboard/,
-    {
-      timeout: 15000,
-    },
-  );
+  await expect(page).toHaveURL(new RegExp(`/onboarding|${LANDED_URL.source}`), {
+    timeout: 15000,
+  });
   if (page.url().includes('/onboarding')) {
     await completeOnboardingWizard(page);
   }
-  const roleHome = /^\/organization\/([^/]+)\/(?!dashboard(?:$|\/))/.exec(
-    new URL(page.url()).pathname,
-  );
-  if (roleHome) {
-    await navigateInApp(page, `/organization/${roleHome[1]}/dashboard`);
+  if (new URL(page.url()).pathname === '/organization') {
+    await createTeamOrgAndOpenToday(page);
   }
-  await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   return { email };
+}
+
+/**
+ * A new user who stays on their personal workspace, standing on the organization
+ * picker: a personal workspace has no clinic (D44), so the picker — and Settings
+ * over it — is all it reaches. Skips where personal workspaces are off: the
+ * onboarding wizard makes a clinic there instead.
+ */
+export async function registerNewUserOnPersonalWorkspace(page: Page): Promise<void> {
+  await authenticateViaEmailCode(page);
+  await navigateInApp(page, '/');
+  await expect(page).toHaveURL(new RegExp(`/onboarding|${LANDED_URL.source}`), {
+    timeout: 15000,
+  });
+  if (page.url().includes('/onboarding')) {
+    await completeOnboardingWizard(page);
+  }
+  test.skip(
+    new URL(page.url()).pathname !== '/organization',
+    'personal workspaces are off on this deployment (onboarding made a clinic)',
+  );
+  await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 15000 });
 }
 
 /**
@@ -268,26 +294,23 @@ export async function createTeamOrgViaApi(
 }
 
 /**
- * {@link createTeamOrgViaApi}, then opens the new organization's dashboard in
- * the app — where creating one from the old switcher landed. The navigation is
- * client-side, so the in-memory session carries over (a reload would need the
- * refresh cookie). Returns once the dashboard names the new organization: the
- * guard's switch into it has landed (the refresh above retired the page's token,
- * so the app first renews it), and a menu opened now is not torn down mid-click.
+ * {@link createTeamOrgViaApi}, then opens the new clinic in the app — its home,
+ * which lands its owner on Today (D25). The navigation is client-side, so the
+ * in-memory session carries over (a reload would need the refresh cookie).
+ * Returns once Today is up in the new clinic: the guard's switch into it has
+ * landed (the refresh above retired the page's token, so the app first renews
+ * it), and a menu opened now is not torn down mid-click.
  */
-export async function createTeamOrgAndOpenDashboard(
+export async function createTeamOrgAndOpenToday(
   page: Page,
   opts?: { name?: string; slug?: string },
 ): Promise<{ slug: string; name: string }> {
   const { slug, name } = await createTeamOrgViaApi(page, opts);
-  await navigateInApp(page, `/organization/${slug}/dashboard`);
-  await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
+  await navigateInApp(page, `/organization/${slug}`);
+  await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today(?:[?#]|$)`), {
     timeout: 15000,
   });
-  await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
-  await expect(page.getByTestId('dashboard-org-name')).toHaveText(name, {
-    timeout: 15000,
-  });
+  await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   return { slug, name };
 }
 

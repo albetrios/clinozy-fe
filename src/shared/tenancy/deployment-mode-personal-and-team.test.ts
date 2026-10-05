@@ -66,7 +66,7 @@ describe('deployment-mode — personal-and-team', () => {
     ).toEqual({ to: '/onboarding' });
   });
 
-  it('routes personal active org to /dashboard and team active org to slug dashboard', () => {
+  it('routes a personal active org to the picker and a team active org to its home', () => {
     expect(
       resolveRootTarget(
         meCtx({
@@ -82,7 +82,7 @@ describe('deployment-mode — personal-and-team', () => {
           },
         }),
       ),
-    ).toEqual({ to: '/dashboard' });
+    ).toEqual({ to: '/organization' });
 
     expect(
       resolveRootTarget(
@@ -100,7 +100,7 @@ describe('deployment-mode — personal-and-team', () => {
         }),
       ),
     ).toEqual({
-      to: '/organization/$organizationSlug/dashboard',
+      to: '/organization/$organizationSlug',
       params: { organizationSlug: 'acme' },
     });
   });

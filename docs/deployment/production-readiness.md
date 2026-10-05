@@ -28,7 +28,7 @@ The frontend **shell** is solid:
 ### A. Backend & infrastructure (owned by your team — not fixable in this repo)
 
 - [ ] **Deploy clinozy-be** (or API with the same contract) and replace any remaining
-      placeholder data (`dashboard.placeholder-data.ts`) with live endpoints.
+      placeholder data (the clinic rooms' `*.fixtures.ts`) with live endpoints.
       `pnpm contracts:drift` checks the committed route catalog — re-verify against the
       running server.
 - [ ] **Confirm the auth contract:** HttpOnly refresh cookie (`SameSite=Lax`+), refresh-session
@@ -54,7 +54,6 @@ The frontend **shell** is solid:
 
 - [ ] **Privacy policy + terms** (`VITE_PRIVACY_POLICY_URL`; consent banner links when set).
 - [ ] Confirm consent model fits your jurisdiction.
-- [ ] **Dashboard placeholder** — replace `dashboard.placeholder-data.ts` widgets with real APIs before launch if dashboard is in scope.
 
 ### D. In-repo gaps closed in prior waves
 

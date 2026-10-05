@@ -16,12 +16,15 @@ Where a bare `/` lands, decided from the JWT-backed session context.
      `!user.onboarding_completed`) → `/onboarding`. This is checked _before_ any
      active-org routing, so a personal deployment's auto-provisioned org does not
      short-circuit a fresh user past the wizard.
-   - Then by `(deploymentMode, activeOrg)`:
-     - `personal-only`: active PERSONAL → `/dashboard`; none → `/dashboard`.
-     - `team-only`: active TEAM with slug → `/organization/$slug/dashboard`; else
-       `/organization` (picker).
-     - `both`: PERSONAL active → `/dashboard`; TEAM active → `/organization/$slug/dashboard`.
-3. Resolver returns the redirect (`organizationDashboard(slug)` for team targets).
+   - Then the active org: a TEAM with a slug (outside a `personal-only`
+     deployment) → its home, `/organization/$slug` (`organizationHome(slug)`),
+     which sends the member on to their role home (D25: Today for most roles) —
+     or to the picker when they cannot read that org. Everything else — no active
+     org, a PERSONAL active org, a `personal-only` deployment — → `/organization`
+     (the picker): personal workspaces have no clinic (D44), and the picker's list
+     and "Create organization" lead into one.
+3. Resolver returns the redirect. The retired `/dashboard` URL redirects to `/`, so
+   it resolves the same way.
 
 Entry point: `organization-resolver.ts` · Ends at: a redirect target, never an island.
 

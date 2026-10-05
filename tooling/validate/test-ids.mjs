@@ -308,9 +308,7 @@ function validateForms() {
 
       const hasSubmit =
         new RegExp(`${testIdAttr}submit`, 'i').test(content) ||
-        new RegExp(`${testIdAttr}(signIn|dashboard|continue|action)`, 'i').test(
-          content,
-        ) ||
+        new RegExp(`${testIdAttr}(signIn|continue|action)`, 'i').test(content) ||
         content.includes(`"${slug}-submit"`) ||
         content.includes(`'${slug}-submit'`);
 

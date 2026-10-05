@@ -60,7 +60,7 @@ describe('CreateOrganizationDialog', () => {
     });
   });
 
-  it('creates the organization and navigates to its dashboard', async () => {
+  it('creates the organization and navigates to its home', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CreateOrganizationDialog open onOpenChange={() => {}} />);
 
@@ -74,7 +74,7 @@ describe('CreateOrganizationDialog', () => {
       expect(switchToOrganization).toHaveBeenCalledWith('org_new');
       expect(navigateMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: '/organization/$organizationSlug/dashboard',
+          to: '/organization/$organizationSlug',
           params: { organizationSlug: 'new-org' },
         }),
       );

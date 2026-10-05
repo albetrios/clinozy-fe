@@ -93,10 +93,7 @@ function inferNamespace(filePath, fileText) {
 
   const rel = relative(SRC, filePath);
   const segment = rel.split('/')[1];
-  if (
-    segment &&
-    ['onboarding', 'login', 'auth', 'dashboard', 'settings'].includes(segment)
-  ) {
+  if (segment && ['onboarding', 'login', 'auth', 'settings'].includes(segment)) {
     return segment;
   }
   if (rel.includes('/SettingsModal/')) return 'settings';

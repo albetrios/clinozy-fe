@@ -239,7 +239,7 @@ export const authApi = {
   /**
    * Stamp the caller's onboarding as complete (idempotent). Called when the wizard
    * finishes so the next `me/context` reports `onboarding_completed: true` and the
-   * post-login resolver routes to the dashboard instead of back into onboarding.
+   * post-login resolver routes to the workspace instead of back into onboarding.
    */
   completeOnboarding: async (token: string): Promise<void> => {
     const response = await authFetch(

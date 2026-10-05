@@ -155,7 +155,7 @@ const indexRoute = createRoute({
 
 Established case:
 
-- `/` → the active organization's dashboard (from me/context), else the `/organization` picker, else `/onboarding` — the root resolver (`resolveRootRedirect` in `src/shared/tenancy/organization-resolver.ts`, wired as the index route's `beforeLoad` in `src/app/routes/routeTree.tsx`)
+- `/` → `/onboarding` first, then the active organization's home (from me/context; it picks the member's role home), else the `/organization` picker — the root resolver (`resolveRootRedirect` in `src/shared/tenancy/organization-resolver.ts`, wired as the index route's `beforeLoad` in `src/app/routes/routeTree.tsx`)
 
 (Settings is not a route space — it is the global `#settings/<scope>/<section>` hash modal.)
 
@@ -179,11 +179,11 @@ Vitest globs cover both `src/**/*.test.{ts,tsx}` and `src/**/__tests__/**/*.test
 
 ## Examples
 
-| Island                   | Path                                                  | Notes                                        |
-| ------------------------ | ----------------------------------------------------- | -------------------------------------------- |
-| Organization hub         | `src/pages/organization/`                             | Layout — picker + `$organizationSlug/` child |
-| Dashboard child          | `src/pages/organization/$organizationSlug/dashboard/` | Leaf under the org layout                    |
-| Organizations (resource) | `src/pages/organization/`                             | Resource — list + URL-driven dialogs         |
+| Island                   | Path                                              | Notes                                        |
+| ------------------------ | ------------------------------------------------- | -------------------------------------------- |
+| Organization hub         | `src/pages/organization/`                         | Layout — picker + `$organizationSlug/` child |
+| Today (a clinic room)    | `src/pages/organization/$organizationSlug/today/` | Leaf under the org layout                    |
+| Organizations (resource) | `src/pages/organization/`                         | Resource — list + URL-driven dialogs         |
 
 ---
 

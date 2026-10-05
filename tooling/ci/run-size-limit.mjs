@@ -32,7 +32,7 @@ if (jsPaths.length === 0) {
 }
 
 // Budgets are a RATCHET (same philosophy as coverage thresholds): pinned just
-// above the measured first-paint size (JS ~248 kB gz, CSS ~43 kB gz) so any
+// above the measured first-paint size (JS ~247 kB gz, CSS ~39 kB gz) so any
 // regression trips CI immediately — lower as the bundle shrinks, never raise
 // to absorb growth.
 //
@@ -235,8 +235,20 @@ const config = [
      * `pnpm build:check` (`check-entry-routes.mjs`) now fails on a dialog
      * manifest or a room builder in the first-paint chunks. ~0.4 kB of
      * headroom, as the earlier limits left.
+     *
+     * 248.5 → 247.1 kB, lowered (L-63, the old dashboard retired): measured
+     * 246.82 kB on top of L-64. What left the first paint with it: the
+     * dashboard's two routes (the org leaf and the personal `/dashboard` shell
+     * with its two guards), its manifest and builder, the `dashboard`
+     * namespace's eleven locale loaders, the nav's template-page branch, six
+     * glyphs only the dashboard drew (`LayoutDashboard`, `CalendarDays`,
+     * `GitBranch`, `Globe`, `Languages`, `Smartphone`) in all three icon sets,
+     * the theme store's dashboard arrangement axis, the command menu's seed and
+     * "Navigation" group, and the English copy only those used; the `/dashboard`
+     * redirect and the org home's empty state (one `roomRoute` name) came
+     * back. ~0.3 kB of headroom.
      */
-    limit: '248.5 kB',
+    limit: '247.1 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -368,8 +380,19 @@ const config = [
            * sheet's and drawer's header, footer and close, the command
            * shortcut, the radio item, the toggle — left with knip's pass
            * (−0.62 kB). ~0.3 kB of headroom.
+           *
+           * 43 → 39.6 kB, lowered (L-63, the old dashboard retired): measured
+           * 39.34 kB on top of L-64. Tailwind emits a source file's classes
+           * whether or not anything mounts it, so the drop is the files that
+           * left: the dashboard island and its ~25 widgets (the hero, the KPI
+           * tiles, the charts, the bento and pulse arrangements, the heatmap,
+           * the gantt, the activity map, the carousel's cards), the theme
+           * showcase, the Appearance "Dashboard" card, the shadcn `chart`,
+           * `carousel` and `table` primitives only they used, and the carousel
+           * arrows' two Sharp-shape slots in `index.css`; the org home's empty
+           * state reuses `EmptyState`'s look. ~0.3 kB of headroom.
            */
-          limit: '43 kB',
+          limit: '39.6 kB',
           gzip: true,
         },
       ]

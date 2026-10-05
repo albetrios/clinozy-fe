@@ -1393,5 +1393,9 @@
     "title": "印刷プレビュー · {{title}}",
     "close": "閉じる",
     "print": "印刷 / PDF保存"
+  },
+  "clinicHomeEmpty": {
+    "title": "まだ何も有効になっていません",
+    "description": "クリニックのセクションは、有効になり次第ここに表示されます。"
   }
 }

@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome } from '@/lib/routes/index.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { acceptInvitation } from '@/shared/api/organization-api.ts';
@@ -221,7 +221,7 @@ export function AcceptInvitePage() {
       setStatus('success');
       redirectAfterDelay(() => {
         if (slug) {
-          void navigate({ ...organizationDashboard(slug), replace: true });
+          void navigate({ ...organizationHome(slug), replace: true });
         } else {
           void navigate({ to: '/', replace: true });
         }

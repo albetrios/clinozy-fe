@@ -46,10 +46,12 @@ const shellLoads = vi.hoisted(() => ({
   auth: vi.fn(),
   public: vi.fn(),
   organization: vi.fn(),
-  personal: vi.fn(),
   payments: vi.fn(),
   invoices: vi.fn(),
+  emptyHome: vi.fn(),
 }));
+const clinicHomeRoute = vi.hoisted(() => vi.fn());
+const notifyInfo = vi.hoisted(() => vi.fn());
 const preloadAuthLayoutVariant = vi.hoisted(() =>
   vi.fn((_variant: number) => Promise.resolve()),
 );
@@ -76,10 +78,18 @@ vi.mock('@/pages/organization/$organizationSlug/organization-slug.route.tsx', ()
   shellLoads.organization();
   return { Component: () => null };
 });
-vi.mock('@/shared/layouts/AppLayout/index.ts', () => {
-  shellLoads.personal();
-  return { Component: () => null };
-});
+vi.mock(
+  '@/pages/organization/$organizationSlug/components/ClinicHomeEmpty/index.ts',
+  () => {
+    shellLoads.emptyHome();
+    return { ClinicHomeEmpty: () => null };
+  },
+);
+vi.mock('@/shared/clinic/clinic-home.ts', () => ({ clinicHomeRoute }));
+vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  notify: { info: notifyInfo },
+}));
 vi.mock('@/pages/organization/$organizationSlug/payments/payments.route.tsx', () => {
   shellLoads.payments();
   return { Component: () => null };
@@ -103,8 +113,6 @@ vi.mock('@/core/rbac/guards.ts', () => ({
 }));
 vi.mock('@/app/guards/org-gates.ts', () => ({
   requireOrgStatus: vi.fn(),
-  requirePersonalDashboardWorkspace: vi.fn().mockResolvedValue(undefined),
-  requirePersonalDeployment: vi.fn(),
   requireProvisionedWorkspace: vi.fn().mockResolvedValue(undefined),
   requireSuspendedOrgStatus: vi.fn(),
   requireTeamDeployment: vi.fn(),
@@ -176,7 +184,6 @@ describe('router configuration', () => {
     ['auth-shell', ['auth']],
     ['public-shell', ['public']],
     ['/organization/$organizationSlug', ['organization']],
-    ['personal-app', ['personal']],
     ['/organization/$organizationSlug/invoices', ['payments', 'invoices']],
   ] as const)('preloads nested %s content through its route loader', async (id, keys) => {
     const route = Object.values(router.routesById).find((item) => item.id.endsWith(id));
@@ -319,7 +326,7 @@ describe('router configuration', () => {
     it('no route opts out: the policy is the router’s, so every cold URL is covered', () => {
       // It used to be opted into by four routes (`/`, the auth shell,
       // `/onboarding`, `/organization`) — but a cold visit lands just as often on
-      // a bookmarked dashboard or an emailed invite, which got the blank page.
+      // a bookmarked room or an emailed invite, which got the blank page.
       const overriding = allRoutes.filter(
         (route) =>
           route.options.pendingMs !== undefined ||
@@ -352,17 +359,14 @@ describe('router configuration', () => {
       useThemeStore.setState({ authVariant: 0 });
     });
 
-    it.each([['/organization/$organizationSlug'], ['personal-app']])(
-      'the %s shell loader fetches the app shell the session calls for',
-      async (suffix) => {
-        // By the time a loader runs, `beforeLoad` has put me/context in the store,
-        // so the shell can be fetched alongside the route's own chunks instead of
-        // after AppLayout mounts.
-        await routeEndingWith(suffix)?.options.loader?.();
+    it('the org shell loader fetches the app shell the session calls for', async () => {
+      // By the time a loader runs, `beforeLoad` has put me/context in the store,
+      // so the shell can be fetched alongside the route's own chunks instead of
+      // after AppLayout mounts.
+      await routeEndingWith('/organization/$organizationSlug')?.options.loader?.();
 
-        expect(preloadSessionAppShell).toHaveBeenCalledOnce();
-      },
-    );
+      expect(preloadSessionAppShell).toHaveBeenCalledOnce();
+    });
 
     it('warms the sign-in side for a likely guest, in parallel with the auth bootstrap', async () => {
       preloadBootRoutes({ likelySignedIn: false });
@@ -427,13 +431,10 @@ describe('router configuration', () => {
       return manifest?.nav ? [{ fullPath: route.fullPath, manifest }] : [];
     });
     expect(navRoutes.map((route) => route.fullPath)).toContain(
-      '/organization/$organizationSlug/dashboard',
+      '/organization/$organizationSlug/today',
     );
     for (const route of navRoutes) {
-      const scope = route.fullPath.startsWith('/organization/')
-        ? 'organization'
-        : 'personal';
-      expect(navCandidates([route], scope, () => true)).toHaveLength(1);
+      expect(navCandidates([route], () => true)).toHaveLength(1);
     }
   });
 
@@ -465,14 +466,14 @@ describe('guard wiring in beforeLoad', () => {
   it('suspended leaf runs the INVERSE status guard, never requireOrgStatus', async () => {
     // The leaf is exempt from `requireOrgStatus` so a suspended organization can
     // render without looping — but exempt is not unguarded: the inverse guard
-    // sends an organization that is NOT suspended back to its dashboard.
+    // sends an organization that is NOT suspended back to its home.
     await beforeLoadOf('/organization/$organizationSlug/suspended')(gateArgs(false));
     expect(requireSuspendedOrgStatus).toHaveBeenCalledTimes(1);
     expect(requireOrgStatus).not.toHaveBeenCalled();
   });
 
-  it('dashboard runs requireOrgStatus, never the inverse', async () => {
-    await beforeLoadOf('/organization/$organizationSlug/dashboard')(gateArgs(false));
+  it('a room runs requireOrgStatus, never the inverse', async () => {
+    await beforeLoadOf('/organization/$organizationSlug/today')(gateArgs(false));
     expect(requireOrgStatus).toHaveBeenCalledTimes(1);
     expect(requireSuspendedOrgStatus).not.toHaveBeenCalled();
   });
@@ -508,6 +509,110 @@ describe('guard wiring in beforeLoad', () => {
       preload: false,
     });
     expect(requireAuth).toHaveBeenCalledWith(href);
+  });
+});
+
+/** What a `beforeLoad` threw — a redirect or a not-found — or `undefined` when it returned. */
+async function thrownBy(run: () => Promise<void> | void): Promise<unknown> {
+  try {
+    await run();
+    return undefined;
+  } catch (error: unknown) {
+    return error;
+  }
+}
+
+describe('the org home replaces the dashboard as every landing (L-63)', () => {
+  const HOME = '/organization/$organizationSlug/';
+  const UNKNOWN = '/organization/$organizationSlug/$';
+  const args = {
+    location: { href: '/organization/acme' },
+    params: { organizationSlug: 'acme' },
+    preload: false,
+  };
+  const leads = {
+    to: '/organization/$organizationSlug/leads',
+    params: { organizationSlug: 'acme' },
+  };
+
+  beforeEach(() => {
+    clinicHomeRoute.mockReset();
+    notifyInfo.mockClear();
+    vi.mocked(requireOrgStatus).mockReset();
+  });
+
+  it('sends the member on to their role home', async () => {
+    clinicHomeRoute.mockResolvedValue(leads);
+    const thrown = await thrownBy(() => beforeLoadOf(HOME)(args));
+    expect(isRedirect(thrown)).toBe(true);
+    expect(thrown).toMatchObject({ options: leads });
+    expect(clinicHomeRoute).toHaveBeenCalledWith('acme');
+  });
+
+  it('renders the empty home in place when no room is open — no redirect, so no loop', async () => {
+    clinicHomeRoute.mockResolvedValue(null);
+    expect(await thrownBy(() => beforeLoadOf(HOME)(args))).toBeUndefined();
+    expect(requireOrgStatus).toHaveBeenCalledOnce();
+
+    const home = (
+      router.routesById as unknown as Record<
+        string,
+        { options: { component?: { preload?: () => Promise<void> | undefined } } }
+      >
+    )[HOME];
+    await home?.options.component?.preload?.();
+    expect(shellLoads.emptyHome).toHaveBeenCalledOnce();
+  });
+
+  it('gives a suspended clinic its blocked state, never the empty home', async () => {
+    const suspended = redirect({
+      to: '/organization/$organizationSlug/suspended',
+      params: { organizationSlug: 'acme' },
+    });
+    vi.mocked(requireOrgStatus).mockImplementation(() => {
+      throw suspended;
+    });
+    expect(await thrownBy(() => beforeLoadOf(HOME)(args))).toBe(suspended);
+    expect(clinicHomeRoute).not.toHaveBeenCalled();
+  });
+
+  it('resolves nothing on a hover preload', async () => {
+    await beforeLoadOf(HOME)({ ...args, preload: true });
+    expect(clinicHomeRoute).not.toHaveBeenCalled();
+    expect(requireOrgStatus).not.toHaveBeenCalled();
+  });
+
+  it('an unknown in-org path says so and lands on the role home', async () => {
+    clinicHomeRoute.mockResolvedValue(leads);
+    const thrown = await thrownBy(() => beforeLoadOf(UNKNOWN)(args));
+    expect(notifyInfo).toHaveBeenCalledOnce();
+    expect(thrown).toMatchObject({ options: leads });
+  });
+
+  it('with no room open, an unknown in-org path lands on the empty home', async () => {
+    clinicHomeRoute.mockResolvedValue(null);
+    const thrown = await thrownBy(() => beforeLoadOf(UNKNOWN)(args));
+    expect(thrown).toMatchObject({
+      options: {
+        to: '/organization/$organizationSlug',
+        params: { organizationSlug: 'acme' },
+      },
+    });
+  });
+
+  it('keeps no route at the old team dashboard — its URL is an unknown in-org path', () => {
+    const ids = Object.keys(router.routesById);
+    expect(ids).not.toContain('/organization/$organizationSlug/dashboard');
+    expect(ids).not.toContain('personal-app');
+  });
+
+  it('resolves the retired /dashboard as / does', async () => {
+    const thrown = await thrownBy(() => beforeLoadOf('/dashboard')(args));
+    expect(isRedirect(thrown)).toBe(true);
+    expect(thrown).toMatchObject({ options: { to: '/' } });
+    expect(
+      await thrownBy(() => beforeLoadOf('/dashboard')({ ...args, preload: true })),
+    ).toBeUndefined();
   });
 });
 

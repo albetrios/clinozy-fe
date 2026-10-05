@@ -48,7 +48,6 @@ export const LAYOUT_KEYS = {
     logOut: 'app.logOut',
     toggleSidebar: 'app.toggleSidebar',
     footerCopyright: 'app.footerCopyright',
-    nav: { dashboard: 'app.nav.dashboard' },
     sectionBar: {
       nav: 'app.sectionBar.nav',
       allSections: 'app.sectionBar.allSections',
@@ -150,7 +149,6 @@ export const LAYOUT_KEYS = {
       placeholder: 'app.commandPalette.placeholder',
       empty: 'app.commandPalette.empty',
       groups: {
-        navigation: 'app.commandPalette.groups.navigation',
         theme: 'app.commandPalette.groups.theme',
         account: 'app.commandPalette.groups.account',
         organizations: 'app.commandPalette.groups.organizations',
@@ -206,7 +204,3 @@ export const AUTH_LAYOUT_STAT_KEYS = [
   { value: '99.99%', labelKey: LAYOUT_KEYS.auth.stats.uptime },
   { value: 'SOC 2', labelKey: LAYOUT_KEYS.auth.stats.compliant },
 ] as const;
-
-export const APP_NAV_SEGMENT_KEYS = {
-  dashboard: LAYOUT_KEYS.app.nav.dashboard,
-} as const;

@@ -11,7 +11,7 @@ import {
   CommandInput,
   CommandList,
 } from '@/shared/components/ui/command.tsx';
-import { type AppNavEntry, useAppNav } from '@/shared/hooks/useAppNav/index.ts';
+import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { Search } from '@/shared/icons/index.ts';
@@ -95,7 +95,7 @@ function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: strin
   const { query } = useCommandPaletteSearch();
   // The same entries as the shell's nav: manifest-driven, and narrowed by the
   // member's clinic access and any View-as preview.
-  const { entries } = useAppNav('organization');
+  const { entries } = useAppNav();
   const { go } = usePaletteCommands();
   const clinic = useClinicCommandGroups({
     query,
@@ -103,20 +103,11 @@ function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: strin
     navEntries: entries,
     go,
   });
-  return (
-    <CommandMenu
-      organizationSlug={organizationSlug}
-      navEntries={entries}
-      clinic={clinic}
-    />
-  );
+  return <CommandMenu organizationSlug={organizationSlug} clinic={clinic} />;
 }
 
 function PersonalCommandMenu() {
-  const { entries } = useAppNav('personal');
-  return (
-    <CommandMenu organizationSlug="" navEntries={entries} clinic={NO_CLINIC_COMMANDS} />
-  );
+  return <CommandMenu organizationSlug="" clinic={NO_CLINIC_COMMANDS} />;
 }
 
 /**
@@ -128,11 +119,9 @@ function PersonalCommandMenu() {
  */
 function CommandMenu({
   organizationSlug,
-  navEntries,
   clinic,
 }: {
   organizationSlug: string;
-  navEntries: readonly AppNavEntry[];
   clinic: ClinicCommandGroups;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
@@ -142,16 +131,9 @@ function CommandMenu({
   const { query } = useCommandPaletteSearch();
   const { data: meContext } = useMeContext();
   const deploymentFlags = useDeploymentFlags();
-  const { runCommand, go } = usePaletteCommands();
+  const { runCommand } = usePaletteCommands();
   const inOrganization = organizationSlug !== '';
-  const platform = usePlatformCommandGroups({
-    query,
-    inOrganization,
-    navEntries,
-    organizationSlug,
-    runCommand,
-    go,
-  });
+  const platform = usePlatformCommandGroups({ query, runCommand });
   const selection = useCommandSelection(query, clinic.groups[0]?.rows[0]?.value);
   const closePalette = useCallback(() => {
     setOpen(false);

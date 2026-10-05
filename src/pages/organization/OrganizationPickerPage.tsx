@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome } from '@/lib/routes/index.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -25,8 +25,8 @@ import {
 function OrganizationList() {
   const { t } = useTranslation(AUTH_NS);
   /*
-   * The same list, under the same cache key, that the guard chain, the switcher
-   * and the dashboard read. The guard that sent the user here already resolved
+   * The same list, under the same cache key, that the guard chain and the
+   * switcher read. The guard that sent the user here already resolved
    * it, so the FIRST paint shows the real list instead of flashing two skeletons
    * for the length of a cached response (PICK-2). The hook raises no toast; this
    * list renders its own error card with a retry.
@@ -85,7 +85,7 @@ function OrganizationList() {
         organizations.map((organization) => (
           <Link
             key={organization.id}
-            {...organizationDashboard(organization.slug)}
+            {...organizationHome(organization.slug)}
             className="block"
             data-testid={`organization-picker-option-${organization.slug}`}
           >
@@ -114,8 +114,8 @@ function OrganizationList() {
 
 /**
  * Organization picker — choose which organization to enter. Selecting one
- * navigates to its dashboard; the organization guard syncs context from the
- * URL and persists the choice for the `/` resolver.
+ * navigates to its home (the member's role home); the organization guard syncs
+ * context from the URL and persists the choice for the `/` resolver.
  */
 export function OrganizationPickerPage() {
   const { t } = useTranslation(AUTH_NS);

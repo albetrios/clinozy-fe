@@ -46,9 +46,6 @@
     "logOut": "लॉग आउट",
     "toggleSidebar": "साइडबार टॉगल करें",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "डैशबोर्ड"
-    },
     "sidebar": {
       "workspace": "वर्कस्पेस",
       "menu": "मेनू",
@@ -94,7 +91,6 @@
       "placeholder": "खोजें या जाएँ…",
       "empty": "कोई परिणाम नहीं मिला।",
       "groups": {
-        "navigation": "नेविगेशन",
         "theme": "थीम",
         "account": "खाता",
         "organizations": "संगठन",

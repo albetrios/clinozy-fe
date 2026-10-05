@@ -2,7 +2,7 @@ import { expect, type Page, type PlaywrightWorkerArgs, test } from '@playwright/
 
 import {
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserOnPersonalWorkspace,
 } from '@/tests/utils/e2e-auth.ts';
 import { gotoApp, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
@@ -27,7 +27,7 @@ type TeamContext = { slug: string; subscribed: boolean; planCount: number };
 
 /**
  * Create a team org via the API, optionally seed a free-plan subscription, then
- * hydrate the browser with the team-scoped token and land on its dashboard.
+ * hydrate the browser with the team-scoped token and land on its home (Today).
  * Returns `null` when the environment can't provision one (seat seed / Stripe).
  * `planCount` reflects the seeded plan catalog so plan-dependent specs can skip
  * gracefully when no plans exist in this environment.
@@ -82,8 +82,8 @@ async function setUpTeamBilling(
     }, teamToken);
 
     if (!org.slug) throw new Error('team org slug missing');
-    await navigateInApp(page, `/organization/${org.slug}/dashboard`);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    await navigateInApp(page, `/organization/${org.slug}`);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     return { slug: org.slug, subscribed, planCount: plans.length };
   } finally {
     await api.dispose();
@@ -168,8 +168,8 @@ test.describe('Billing & subscription', () => {
   });
 
   test('a personal account cannot manage billing (team-gated)', async ({ page }) => {
-    // Default registration lands in personal mode (no team org).
-    await registerNewUserAndGoToDashboard(page);
+    // A personal workspace reaches Settings over the organization picker (D44).
+    await registerNewUserOnPersonalWorkspace(page);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('settings-account-billing')).toBeVisible({

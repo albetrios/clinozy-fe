@@ -2,7 +2,6 @@
 export const I18N_NAMESPACES = {
   common: 'common',
   layout: 'layout',
-  dashboard: 'dashboard',
   settings: 'settings',
   errors: 'errors',
   onboarding: 'onboarding',

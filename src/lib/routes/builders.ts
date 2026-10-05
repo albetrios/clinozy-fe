@@ -19,20 +19,13 @@ export function organizationPicker() {
 }
 
 /**
- * An organization's index — no UI of its own: it sends the member to their
- * role home (D25), or the dashboard when the deployment enables no clinic room.
+ * An organization's home — every way into a clinic lands here. It sends the
+ * member on to their role home (D25: Today for most roles); when no clinic room
+ * is open to them it shows the "nothing is switched on" state in its place.
  */
 export function organizationHome(organizationSlug: string) {
   return {
     to: '/organization/$organizationSlug',
-    params: { organizationSlug },
-  } as const;
-}
-
-/** An organization's dashboard — the home when the deployment enables no clinic room (D25). */
-export function organizationDashboard(organizationSlug: string) {
-  return {
-    to: '/organization/$organizationSlug/dashboard',
     params: { organizationSlug },
   } as const;
 }

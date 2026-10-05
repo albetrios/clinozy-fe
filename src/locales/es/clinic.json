@@ -1437,5 +1437,9 @@
     "title": "Vista previa · {{title}}",
     "close": "Cerrar",
     "print": "Imprimir / Guardar PDF"
+  },
+  "clinicHomeEmpty": {
+    "title": "Aquí aún no hay nada activado",
+    "description": "Las secciones de tu clínica aparecerán aquí en cuanto se activen para ti."
   }
 }

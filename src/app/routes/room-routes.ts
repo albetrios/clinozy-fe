@@ -1,6 +1,7 @@
 /**
  * The clinic rooms' pages and tabs (KICKOFF §4) — every room island under the
- * organization shell, and the Invoice drawer's host — behind ONE dynamic import
+ * organization shell, the Invoice drawer's host, and the org home's empty state
+ * that stands in for a room when none is open — behind ONE dynamic import
  * from `routeTree.tsx`, as the patient file's sections are behind
  * `patient-id.sections.ts`.
  *
@@ -21,6 +22,13 @@ import { localizedRoute } from './localized-route.ts';
 
 /** Every clinic room's page or tab component, by the name `roomRoute(name)` mounts it under. */
 export const ROOM_ROUTES = {
+  // The org home when no room is open to the member (L-63). Its words are
+  // `clinic`'s, which load with the org shell.
+  ClinicHomeEmpty: lazyRouteComponent(
+    () =>
+      import('@/pages/organization/$organizationSlug/components/ClinicHomeEmpty/index.ts'),
+    'ClinicHomeEmpty',
+  ),
   // Today's work queue reads the Tasks rule copy (one task model, Q-T3): `tasks` loads with it.
   TodayPage: lazyRouteComponent(
     localizedRoute(

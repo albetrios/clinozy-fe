@@ -13,8 +13,6 @@ import { Suspense } from 'react';
 
 import {
   requireOrgStatus,
-  requirePersonalDashboardWorkspace,
-  requirePersonalDeployment,
   requireProvisionedWorkspace,
   requireSuspendedOrgStatus,
   requireTeamDeployment,
@@ -27,7 +25,7 @@ import { gatewayFromManifest } from '@/core/security/gateway.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import { organizationDashboard } from '@/lib/routes/builders.ts';
+import { organizationHome } from '@/lib/routes/builders.ts';
 import {
   APP_DESCRIPTION,
   APP_TITLE,
@@ -50,7 +48,6 @@ import type {
 } from '@/pages/organization/$organizationSlug/appointments/appointments.dialog-search.ts';
 import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
 import { validateAppointmentsSearch } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
-import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
 import type { InvoiceCreateSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.dialog-search.ts';
 import { manifest as invoicesManifest } from '@/pages/organization/$organizationSlug/invoices/invoices.manifest.ts';
 import { validateInvoiceSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
@@ -268,18 +265,6 @@ const OrganizationShell = lazyRouteComponent(
   ),
   'Component',
 );
-const DashboardPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.dashboard],
-    () => import('@/pages/organization/$organizationSlug/dashboard/dashboard.route.tsx'),
-  ),
-  'Component',
-);
-// Personal-org space reuses the shared AppLayout directly (no org param in URL).
-const PersonalShell = lazyRouteComponent(
-  () => import('@/shared/layouts/AppLayout/index.ts'),
-  'Component',
-);
 const SuspendedPage = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/suspended/suspended.route.tsx'),
   'Component',
@@ -311,6 +296,8 @@ function warmRoomRoutes(): void {
   loadRoomRoutes().catch(() => undefined);
 }
 
+// The org home's state when no clinic room is open to the member, in a room's place.
+const ClinicHomeEmpty = roomRoute('ClinicHomeEmpty');
 const TodayPage = roomRoute('TodayPage');
 const LeadsPage = roomRoute('LeadsPage');
 const AppointmentsPage = roomRoute('AppointmentsPage');
@@ -463,12 +450,12 @@ export function preloadBootRoutes(hint: { likelySignedIn: boolean }): void {
  */
 export async function preloadSignedInShell(): Promise<void> {
   /*
-   * Onboarding first, then everything else.
+   * Onboarding first, then the clinic.
    *
    * A FIRST sign-in — the case this warm-up exists for, since a returning user
-   * already had the shells warmed at boot — lands on onboarding, not the
-   * dashboard. It is also the smallest of the four. Starting all four at once
-   * lets the much heavier dashboard shell compete with it for the same
+   * already had the shells warmed at boot — lands on onboarding, not in a
+   * clinic. It is also the smallest of the three. Starting all three at once
+   * lets the much heavier org shell and its rooms compete with it for the same
    * connections, so the one chunk most likely to be needed can arrive last.
    *
    * `allSettled`, not `all`: one destination failing to warm says nothing about
@@ -477,12 +464,7 @@ export async function preloadSignedInShell(): Promise<void> {
    * exist. It also means this never rejects, so callers need no catch.
    */
   await Promise.allSettled([OnboardingPage.preload?.()]);
-  await Promise.allSettled([
-    PersonalShell.preload?.(),
-    OrganizationShell.preload?.(),
-    DashboardPage.preload?.(),
-    loadRoomRoutes(),
-  ]);
+  await Promise.allSettled([OrganizationShell.preload?.(), loadRoomRoutes()]);
 }
 
 // ── Root ──
@@ -647,8 +629,8 @@ const unauthorizedRoute = createRoute({
 });
 
 // ── Index resolver ──
-// `/` keeps no UI: last-used organization → its dashboard, else the
-// `/organization` picker, else onboarding (routing-and-tenancy.md §2).
+// `/` keeps no UI: onboarding first, then the active organization's home (the
+// member's role home), else the `/organization` picker (routing-and-tenancy.md §2).
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
@@ -710,16 +692,6 @@ const organizationShellRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
-const organizationDashboardRoute = createRoute({
-  getParentRoute: () => organizationShellRoute,
-  path: 'dashboard',
-  head: manifestHead(dashboardManifest),
-  staticData: { manifest: dashboardManifest },
-  beforeLoad: roomLeafGate(dashboardManifest),
-  component: DashboardPage,
-  errorComponent: RouteErrorBoundary,
-});
-
 // Runs the standard leaf gateway (session → module → permission), then the
 // INVERSE of `requireOrgStatus`. It stays outside `requireOrgStatus` on purpose
 // — a suspended organization must render its blocked state without
@@ -743,20 +715,25 @@ const organizationSuspendedRoute = createRoute({
 // ── Clinic rooms (KICKOFF §4, L-12a) ──
 // The leaf pattern: gateway (session → module → permission), then the org
 // status guard; the manifest rides along as staticData for the nav (L-12).
-// The org index and an unknown in-org path go to the member's role home
-// (D25, S:115); `/medical` and `/stock` open on their first tab.
+// The org home (the index) and an unknown in-org path go to the member's role
+// home (D25, S:115) — Today for most roles; `/medical` and `/stock` open on
+// their first tab. With no room open to the member — every clinic module off
+// (D8: production until each room's API lands) or an access that views none —
+// the home renders `ClinicHomeEmpty` in a room's place: it never redirects
+// then, so nothing can loop.
 const organizationIndexRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: '/',
   beforeLoad: async ({ params, preload }) => {
     if (preload) return;
+    // A suspended organization goes to its blocked state, never to the empty
+    // state below — the gate every room runs, run here for the home's own page.
+    requireOrgStatus({ params });
     const { clinicHomeRoute } = await import('@/shared/clinic/clinic-home.ts');
-    throw redirect(
-      (await clinicHomeRoute(params.organizationSlug)) ??
-        organizationDashboard(params.organizationSlug),
-    );
+    const home = await clinicHomeRoute(params.organizationSlug);
+    if (home) throw redirect(home);
   },
-  component: () => null,
+  component: ClinicHomeEmpty,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -772,7 +749,7 @@ const organizationNotFoundRoute = createRoute({
     notify.info(i18n.t(ERRORS_KEYS.route.pageNotFound, { ns: ERRORS_NS }));
     throw redirect(
       (await clinicHomeRoute(params.organizationSlug)) ??
-        organizationDashboard(params.organizationSlug),
+        organizationHome(params.organizationSlug),
     );
   },
   component: () => null,
@@ -1691,41 +1668,20 @@ const organizationStockVendorEditRoute = createRoute({
   ...dialogRoute('stockVendorEdit'),
 });
 
-// ── Personal space (/dashboard) ──
-// Personal organizations land on root URLs — no `$organizationSlug` in the path.
-// The active org comes from the session context (me/context / JWT), not the URL,
-// so this shell only requires an authenticated session. (Dual-URL, research/11
-// §3.3.) The org-scoped team space remains `/organization/$organizationSlug/*`.
-const personalShellRoute = createRoute({
+// ── The retired `/dashboard` ──
+// The old dashboard is gone (L-63) and personal workspaces are off (D44), so
+// the personal space's URL — a bookmark, an installed app's last page — now
+// resolves as `/` does: the active clinic's home, else the organization picker,
+// where a personal workspace lands (its list and "Create organization" lead
+// into a clinic, so it is never a dead end).
+const retiredDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: 'personal-app',
-  beforeLoad: async ({ location, preload }) => {
-    if (preload) return;
-    await requireAuth(location.href);
-    requirePersonalDeployment({});
-    await requirePersonalDashboardWorkspace({ redirectFrom: location.href });
-  },
-  loader: () => preloadAppShell(PersonalShell),
-  component: function PersonalShellRoute() {
-    return (
-      <Suspense fallback={<FullPageSpinner />}>
-        <PersonalShell />
-      </Suspense>
-    );
-  },
-  errorComponent: RouteErrorBoundary,
-});
-
-const personalDashboardRoute = createRoute({
-  getParentRoute: () => personalShellRoute,
   path: '/dashboard',
-  head: manifestHead(dashboardManifest),
-  staticData: { manifest: dashboardManifest },
-  beforeLoad: async ({ preload, location, params }) => {
+  beforeLoad: ({ preload }) => {
     if (preload) return;
-    await gatewayFromManifest(dashboardManifest)(toGateContext(location, params));
+    throw redirect({ to: '/' });
   },
-  component: DashboardPage,
+  component: () => null,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -1756,7 +1712,6 @@ const routeTree = rootRoute.addChildren([
   organizationPickerRoute,
   organizationShellRoute.addChildren([
     organizationIndexRoute,
-    organizationDashboardRoute,
     organizationSuspendedRoute,
     organizationTodayRoute,
     organizationLeadsRoute.addChildren([
@@ -1890,7 +1845,7 @@ const routeTree = rootRoute.addChildren([
     ]),
     organizationNotFoundRoute,
   ]),
-  personalShellRoute.addChildren([personalDashboardRoute]),
+  retiredDashboardRoute,
   notFoundRoute,
 ]);
 
@@ -1901,7 +1856,7 @@ const routeTree = rootRoute.addChildren([
  * **BOOT** — until the first navigation resolves. Nothing is on screen to keep:
  * the HTML splash is up, and the pending component (`FullPageSpinner`) renders
  * nothing of its own but HOLDS that splash. So it mounts at once (`pendingMs: 0`)
- * on EVERY cold URL — `/`, a bookmarked dashboard, an emailed invite link — which
+ * on EVERY cold URL — `/`, a bookmarked room, an emailed invite link — which
  * is what makes the boot one continuous screen instead of a splash that fades to
  * a blank page while a guard awaits the network (X-6). It used to be opted into
  * by four routes; a cold visit can land on any of them.

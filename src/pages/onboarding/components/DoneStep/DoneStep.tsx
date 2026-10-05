@@ -6,7 +6,7 @@ import { ONBOARDING_KEYS, ONBOARDING_NS } from '../../onboarding.constants.ts';
 import type { OnboardingStep } from '../../onboarding-flow.ts';
 
 /**
- * Review summary shown before the final "Enter dashboard" action. Only rows
+ * Review summary shown before the final "Enter workspace" action. Only rows
  * this flow actually collected are shown: `organizationName` exists only when
  * the `workspace` step ran (team-only mode) and invites only when the `invite`
  * step ran — rendering them unconditionally showed a dangling "Organization: —"

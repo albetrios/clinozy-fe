@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -139,7 +139,7 @@ test.describe('Cookie consent card', () => {
     // wizard, whose Continue button sits at the very end of the page, exactly
     // where a full-width card lands. The page reserves the card's height at its
     // end, so every step can still be scrolled clear of it and pressed.
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await expect(byTestId(page, 'consent-banner')).toBeVisible();
 
     const tabBar = await boxOf(page, 'mobile-bottom-bar');

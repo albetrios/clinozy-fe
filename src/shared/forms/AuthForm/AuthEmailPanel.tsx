@@ -121,7 +121,7 @@ function navigateAfterEmailLogin(
   if (redirectPath) {
     return navigate({ to: redirectPath, replace: true });
   }
-  if (rootTarget.to === '/organization/$organizationSlug/dashboard') {
+  if (rootTarget.to === '/organization/$organizationSlug') {
     return navigate({ to: rootTarget.to, params: rootTarget.params, replace: true });
   }
   return navigate({ to: rootTarget.to, replace: true });

@@ -20,6 +20,7 @@ type RoomName = keyof typeof ROOM_ROUTES;
 
 const ORG = '@/pages/organization/$organizationSlug';
 const ROOM_MODULES: Record<RoomName, string> = {
+  ClinicHomeEmpty: `${ORG}/components/ClinicHomeEmpty/index.ts`,
   TodayPage: `${ORG}/today/today.route.tsx`,
   LeadsPage: `${ORG}/leads/leads.route.tsx`,
   AppointmentsPage: `${ORG}/appointments/appointments.route.tsx`,
@@ -56,7 +57,7 @@ beforeAll(async () => {
   for (const [name, path] of Object.entries(ROOM_MODULES)) {
     vi.doMock(path, () => {
       loaded.push(name as RoomName);
-      return { Component: () => null };
+      return { Component: () => null, ClinicHomeEmpty: () => null };
     });
   }
   ({ ROOM_ROUTES: rooms } = await import('./room-routes.ts'));

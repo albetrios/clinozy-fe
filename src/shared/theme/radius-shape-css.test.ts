@@ -107,9 +107,6 @@ describe('Sharp shape coverage (index.css [data-shape="sharp"])', () => {
     'progress',
     'progress-indicator',
     'floating-edge',
-    // the vendored carousel re-slots its arrow <Button>s, so `button` misses them
-    'carousel-previous',
-    'carousel-next',
     'kbd',
     'pill',
     // tiles

@@ -1393,5 +1393,9 @@
     "title": "인쇄 미리보기 · {{title}}",
     "close": "닫기",
     "print": "인쇄 / PDF 저장"
+  },
+  "clinicHomeEmpty": {
+    "title": "아직 켜진 항목이 없습니다",
+    "description": "클리닉의 섹션이 켜지면 바로 여기에 표시됩니다."
   }
 }

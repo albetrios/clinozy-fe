@@ -24,7 +24,8 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 
 ```text
 /organization                                                    organization picker
-/organization/$organizationSlug/dashboard
+/organization/$organizationSlug                                   the clinic's home → the member's role home
+/organization/$organizationSlug/today
 /organization/$organizationSlug/patients
 /organization/$organizationSlug/patients/$patientId
 /organization/$organizationSlug/appointments                      agenda · day · week · month
@@ -43,10 +44,12 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
   (`from`). Never add a second detail URL for the same resource.
 - **`/` (root):** a resolver route — reads `me/context` and redirects. **Onboarding first:**
   a not-yet-onboarded user (`!user.onboarding_completed`) → `/onboarding` in every deployment
-  mode (even personal, whose org is auto-provisioned). Once onboarded: PERSONAL → root
-  `/dashboard`, TEAM → `/organization/$organizationSlug/dashboard`, else `/organization` picker.
-  Dual-URL: the personal org lives on root URLs (no org param), the team org on its
-  `$organizationSlug/` space. The shared `<Dashboard/>` renders in both; `/` keeps no UI.
+  mode (even personal, whose org is auto-provisioned). Once onboarded: an active TEAM →
+  `/organization/$organizationSlug` (the clinic's home, which sends the member on to their
+  role home — Today for most roles), else the `/organization` picker. Personal workspaces
+  have no clinic (D44), so a PERSONAL active org lands on the picker too: its list and
+  "Create organization" lead into one. `/` keeps no UI, and the retired `/dashboard`
+  redirects to it (L-63).
 - Auth islands (`/login`, `/mfa`, `/callback`, …), `/onboarding`, `/accept-invite/$invitationId`
   stay top-level, unchanged.
 
@@ -56,9 +59,10 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 "sub-pages" segment and the mirror must be literal. "Everything between two `*.route.tsx` files
 belongs to the parent" still holds.
 
-> **Built today:** only `dashboard/` and `suspended/` exist under `$organizationSlug/`.
-> The `patients/`, `appointments/`, `billing/`, and `reports/` islands below are the **Phase 3
-> shapes** (planned, not on disk) — scaffold them against these rules when requirements land.
+> **Built today:** `suspended/` and the ten clinic rooms (`today/`, `leads/`, `appointments/`,
+> `patients/`, `medical/`, `stock/`, `payments/`, `tasks/`, `offerings/`, `users/`) exist under
+> `$organizationSlug/`. The `billing/` and `reports/` islands below are **shapes** (planned,
+> not on disk) — scaffold them against these rules when requirements land.
 
 ```text
 src/pages/
@@ -74,7 +78,7 @@ src/pages/
         ├── organization-slug.route.tsx            ← layout boundary; org guards in beforeLoad/loader
         ├── organization-slug.manifest.ts              kind: 'layout', children: [...]
         ├── OrganizationLayout.tsx               shell UI + <Outlet />
-        ├── dashboard/                           4-file island
+        ├── today/                               4-file island (the role home for most roles)
         ├── patients/
         │   ├── PATIENTS.OVERVIEW.md
         │   ├── patients.route.tsx  patients.manifest.ts  PatientsPage.tsx
@@ -260,7 +264,7 @@ is the separate `AppearanceDialog` on the root route.)
 ```text
 src/lib/routes/
 ├── params.ts        Zod param schemas + parsers (incl. parseOrganizationSlugParam)
-├── builders.ts      organizationDashboard(organizationSlug), … (path constants live here — no paths.ts)
+├── builders.ts      organizationHome(organizationSlug), … (path constants live here — no paths.ts)
 ├── <room>-builders.ts  one per clinic room: leads-, appointments-, patients-, medical-, stock-, …
 ├── invoice-builders.ts, patient-file-builders.ts
 ├── page-head.ts     manifestHead(manifest) → document title
@@ -279,8 +283,10 @@ live in their own module, imported by path, and load with the code that navigate
 unknown path under it redirect to the member's **role home** (D25,
 `shared/clinic/clinic-home.ts`: Pharmacist Medical, Accountant Payments,
 Marketing Leads, everyone else Today; the first open room when that one is
-closed; the dashboard when no clinic module is on) — the unknown path with a
-"Page not found" toast (S:115). An unknown organization slug keeps the platform's
+closed) — the unknown path with a "Page not found" toast (S:115). When no clinic
+room is open to the member (every module off, D8, or no View), the org index
+renders `ClinicHomeEmpty` in a room's place instead of redirecting — "Nothing is
+switched on here yet" — and the unknown path lands there (L-63). An unknown organization slug keeps the platform's
 404 (identical for an unknown and a non-member slug, so existence never leaks).
 A URL-driven dialog route renders nothing of its own, so `routeTree.tsx` — the entry
 chunk — carries only its path: its manifest and component load with one lazy registry,
@@ -302,12 +308,12 @@ falls back to the drawer's own parent.
 
 **The primary nav is manifest-driven.** A route the nav lists carries its manifest as
 `staticData: { manifest }` in `routeTree.tsx`, and the manifest's `nav` field says how it shows:
-a clinic room names its `section` (order, label, icon and View access follow the section), a
-template page (the Dashboard) only an `id`. `useAppNav(scope)` (`shared/hooks/useAppNav/`) reads
-those routes off the tree — so shared code never imports a page — keeps the deployment's enabled
-modules, drops the template pages when any clinic room is enabled (D25: the Dashboard stays for
-personal mode), then filters by the manifest's platform permission and the member's clinic access,
-View-as included. Every shell's nav and the ⌘K nav group draw the same list; each entry links to
+a clinic room names its `section` (order, label, icon and View access follow the section).
+`useAppNav()` (`shared/hooks/useAppNav/`) reads those routes off the tree — so shared code never
+imports a page — keeps the rooms whose module the deployment enables, then filters by the
+manifest's platform permission and the member's clinic access, View-as included. With no room
+enabled the nav is empty and the org home shows its empty state. Every shell's nav and the ⌘K
+"Go to" group draw the same list; each entry links to
 its route's own path with `organizationSlug` as the only param. A clinic room in the URL that the
 access in force can't view — a role previewed from Users › Roles & access, or the member's own
 access after "Exit preview" — is replaced (history `replace`, hash kept) by the first viewable

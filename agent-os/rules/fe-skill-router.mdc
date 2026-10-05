@@ -81,7 +81,7 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 
 3. **Route island**: When creating or refactoring any route or sub-route, invoke `fe-route-island` first: identical directory tree, `<PAGE>.OVERVIEW.md`, imports stay inside the island (+ core/shared/lib/stores only).
 
-3b. **Routing & tenancy**: When adding or changing routes under `organization/$organizationSlug/`, root `/dashboard`, `routeTree.tsx` guards, `gatewayFromManifest`, session hydrate/invalidate, or settings hash behavior, invoke **`fe-routing-tenancy`** after `fe-route-island`. See **`agent-os/rules/fe-routing-tenancy-sync.mdc`**.
+3b. **Routing & tenancy**: When adding or changing routes under `organization/$organizationSlug/`, `routeTree.tsx` guards, `gatewayFromManifest`, session hydrate/invalidate, or settings hash behavior, invoke **`fe-routing-tenancy`** after `fe-route-island`. See **`agent-os/rules/fe-routing-tenancy-sync.mdc`**.
 
 3c. **Resource CRUD**: When scaffolding a backend resource (list + URL-driven create/edit dialogs, `*.resource.ts`, L7 bootstrap), invoke **`fe-resource-crud`** after `fe-route-island` (+ **`fe-routing-tenancy`** when org-scoped).
 

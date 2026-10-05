@@ -9,9 +9,8 @@ describe.each([
   ['SkeletonShimmer', SkeletonShimmer, 'animate-shimmer'],
 ] as const)('%s', (_name, Placeholder, animation) => {
   it('carries the skeleton slot, so the Shape axis reaches it', () => {
-    // Regression: only the vendored `ui/skeleton` had the slot. These two are
-    // the ones the dashboard, the members table and the shell actually load
-    // with — a Sharp app painted round placeholders, then snapped square.
+    // Regression: only the vendored `ui/skeleton` had the slot — a Sharp app
+    // painted these round placeholders, then snapped square.
     render(<Placeholder data-testid="placeholder" />);
 
     expect(screen.getByTestId('placeholder')).toHaveAttribute('data-slot', 'skeleton');

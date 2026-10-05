@@ -4,9 +4,8 @@ import { useCallback, useMemo } from 'react';
 
 /**
  * URL search-param shape this hook reads and writes. A structural subset — any
- * route whose `validateSearch` schema includes these keys is compatible (e.g.
- * the dashboard's `dashboardSearchSchema`). Other search params the route
- * defines are preserved untouched.
+ * route whose `validateSearch` schema includes these keys is compatible. Other
+ * search params the route defines are preserved untouched.
  */
 export interface DataTableSearch {
   /** Global table search query. */

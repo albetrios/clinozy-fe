@@ -1415,5 +1415,9 @@
     "title": "Druckvorschau · {{title}}",
     "close": "Schließen",
     "print": "Drucken / Als PDF speichern"
+  },
+  "clinicHomeEmpty": {
+    "title": "Hier ist noch nichts eingeschaltet",
+    "description": "Die Bereiche Ihrer Praxis erscheinen hier, sobald sie für Sie eingeschaltet sind."
   }
 }

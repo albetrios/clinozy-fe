@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "Alles bereit",
-      "description": "Prüfen und zum Dashboard wechseln."
+      "description": "Prüfen und zum Arbeitsbereich wechseln."
     }
   },
   "welcome": {
@@ -98,7 +98,7 @@
   "actions": {
     "back": "Zurück",
     "continue": "Weiter",
-    "enterDashboard": "Zum Dashboard",
+    "enterWorkspace": "Zum Arbeitsbereich",
     "settingUp": "Wird eingerichtet…"
   },
   "defaults": {

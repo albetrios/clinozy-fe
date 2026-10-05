@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgAndOpenDashboard,
-  registerNewUserAndGoToDashboard,
+  createTeamOrgAndOpenToday,
+  registerNewUserAndGoToToday,
+  registerNewUserOnPersonalWorkspace,
 } from '@/tests/utils/e2e-auth.ts';
 import { uniqueE2eEmail } from '@/tests/utils/e2e-faker.ts';
 import {
@@ -28,7 +29,7 @@ test.describe('Edge cases — settings hash modal', () => {
   });
 
   test('invalid section hash canonicalizes to account profile', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await page.evaluate(() => {
       window.location.hash = '#settings/account/not-a-real-section';
     });
@@ -42,7 +43,7 @@ test.describe('Edge cases — settings hash modal', () => {
   test('legacy organization billing hash opens account billing panel', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await page.evaluate(() => {
       window.location.hash = '#settings/organization/billing';
     });
@@ -56,7 +57,8 @@ test.describe('Edge cases — settings hash modal', () => {
   test('organization members hash on personal workspace falls back to profile', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    // A personal workspace reaches Settings over the organization picker (D44).
+    await registerNewUserOnPersonalWorkspace(page);
     await page.evaluate(() => {
       window.location.hash = '#settings/organization/members';
     });
@@ -69,7 +71,7 @@ test.describe('Edge cases — settings hash modal', () => {
   test('settings deep link overlays a 404 page without losing the route', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await navigateAuthenticated(page, '/this-page-does-not-exist-e2e');
     await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 10000 });
 
@@ -93,19 +95,19 @@ test.describe('Edge cases — settings hash modal', () => {
   test('a non-settings hash (skip-link anchor) never mounts the modal', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await page.evaluate(() => {
       window.location.hash = '#main-content';
     });
     // parseSettingsHash returns null for non-settings hashes → modal stays closed.
     await expect(page.getByTestId('settings-modal')).not.toBeVisible();
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+    await expect(page.getByTestId('today-page')).toBeVisible();
   });
 
   test('switching section via the hash swaps the panel in place (single modal)', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'profile');
     await expect(page.getByTestId('settings-section-profile')).toBeVisible({
       timeout: 10000,
@@ -125,7 +127,7 @@ test.describe('Edge cases — settings hash modal', () => {
   test('Escape closes the 404-overlaid settings modal and keeps the 404 page', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await navigateAuthenticated(page, '/this-page-does-not-exist-e2e-2');
     await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 10000 });
 
@@ -202,8 +204,8 @@ test.describe('Edge cases — billing Stripe return', () => {
     // under a customer who had just come back from 3DS. Nothing had ever run this
     // spec (it was skipping by accident), which is how that shipped. The last
     // assertion is the one that matters: the billing panel is still there.
-    await registerNewUserAndGoToDashboard(page);
-    await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    await createTeamOrgAndOpenToday(page);
 
     // A Stripe return is a full page LOAD of `…?redirect_status=…#settings/…`,
     // so load it. The router is the source of truth for location

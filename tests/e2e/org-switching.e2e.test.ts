@@ -1,9 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import {
-  createTeamOrgAndOpenDashboard,
+  createTeamOrgAndOpenToday,
   openOrganizationSwitcher,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
@@ -33,50 +33,45 @@ test.describe('Organization switching (Account menu › Switch clinic)', () => {
   });
 
   test('switch clinic moves between two clinics', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const first = await createTeamOrgAndOpenDashboard(page);
-    const second = await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    const first = await createTeamOrgAndOpenToday(page);
+    const second = await createTeamOrgAndOpenToday(page);
 
     await selectOrganizationInSwitcher(page, first.slug);
-    await expect(page).toHaveURL(new RegExp(`/organization/${first.slug}/dashboard`), {
+    // Landed: Today in the clinic switched to — its home picks the owner's role
+    // home (D25) — and the menu is gone.
+    await expect(page).toHaveURL(new RegExp(`/organization/${first.slug}/today`), {
       timeout: 15000,
     });
-    // Landed: the dashboard names the clinic switched to (and the menu is gone).
-    await expect(page.getByTestId('dashboard-org-name')).toHaveText(first.name, {
-      timeout: 15000,
-    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('account-menu')).toHaveCount(0);
 
     await selectOrganizationInSwitcher(page, second.slug);
-    await expect(page).toHaveURL(new RegExp(`/organization/${second.slug}/dashboard`), {
+    await expect(page).toHaveURL(new RegExp(`/organization/${second.slug}/today`), {
       timeout: 15000,
     });
-    await expect(page.getByTestId('dashboard-org-name')).toHaveText(second.name, {
-      timeout: 15000,
-    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   });
 
-  test('switcher moves between the personal dashboard and a team', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const team = await createTeamOrgAndOpenDashboard(page);
+  test('switcher moves between the personal workspace and a team', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const team = await createTeamOrgAndOpenToday(page);
 
     await openOrganizationSwitcher(page);
     test.skip(
       !(await optionShown(page, 'personal')),
       'personal workspaces are off on this deployment',
     );
+    // A personal workspace has no clinic (D44): it lands on the picker, whose
+    // list leads back into one.
     await page.getByTestId('organization-switcher-option-personal').click();
-    await expect(page).toHaveURL(/\/dashboard(?:\?|$|#)/, { timeout: 15000 });
-    await expect(page.getByTestId('dashboard-org-name')).toHaveText('Personal', {
-      timeout: 15000,
-    });
+    await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 15000 });
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 15000 });
 
-    await selectOrganizationInSwitcher(page, team.slug);
-    await expect(page).toHaveURL(new RegExp(`/organization/${team.slug}/dashboard`), {
+    await page.getByTestId(`organization-picker-option-${team.slug}`).click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${team.slug}/today`), {
       timeout: 15000,
     });
-    await expect(page.getByTestId('dashboard-org-name')).toHaveText(team.name, {
-      timeout: 15000,
-    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   });
 });

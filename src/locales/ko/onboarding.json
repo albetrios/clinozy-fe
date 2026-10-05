@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "준비 완료",
-      "description": "확인하고 대시보드로 이동하세요."
+      "description": "확인하고 워크스페이스로 이동하세요."
     }
   },
   "welcome": {
@@ -97,7 +97,7 @@
   "actions": {
     "back": "뒤로",
     "continue": "계속",
-    "enterDashboard": "대시보드 들어가기",
+    "enterWorkspace": "워크스페이스 들어가기",
     "settingUp": "설정 중…"
   },
   "defaults": {

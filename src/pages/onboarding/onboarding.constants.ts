@@ -55,7 +55,7 @@ export const ONBOARDING_KEYS = {
   actions: {
     back: 'actions.back',
     continue: 'actions.continue',
-    enterDashboard: 'actions.enterDashboard',
+    enterWorkspace: 'actions.enterWorkspace',
     settingUp: 'actions.settingUp',
   },
   defaults: {

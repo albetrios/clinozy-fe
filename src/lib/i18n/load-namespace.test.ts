@@ -42,15 +42,15 @@ describe('load-namespace', () => {
   });
 
   it('coalesces simultaneous requests for the same locale and namespace', async () => {
-    i18n.removeResourceBundle('it', I18N_NAMESPACES.dashboard);
+    i18n.removeResourceBundle('it', I18N_NAMESPACES.today);
     const add = vi.spyOn(i18n, 'addResourceBundle');
     await Promise.all([
-      ensureNamespace('it', I18N_NAMESPACES.dashboard),
-      ensureNamespace('it', I18N_NAMESPACES.dashboard),
+      ensureNamespace('it', I18N_NAMESPACES.today),
+      ensureNamespace('it', I18N_NAMESPACES.today),
     ]);
     expect(
       add.mock.calls.filter(
-        ([locale, ns]) => locale === 'it' && ns === I18N_NAMESPACES.dashboard,
+        ([locale, ns]) => locale === 'it' && ns === I18N_NAMESPACES.today,
       ),
     ).toHaveLength(1);
   });
@@ -118,17 +118,17 @@ describe('load-namespace', () => {
 
   it('awaits deferred namespaces using only the selected locale in single mode', async () => {
     vi.spyOn(buildRuntime, 'isMultiLocaleBuild').mockReturnValue(false);
-    i18n.removeResourceBundle('en', I18N_NAMESPACES.dashboard);
+    i18n.removeResourceBundle('en', I18N_NAMESPACES.today);
     const add = vi.spyOn(i18n, 'addResourceBundle');
-    await ensureNamespace('es', I18N_NAMESPACES.dashboard);
+    await ensureNamespace('es', I18N_NAMESPACES.today);
     expect(add).toHaveBeenCalledWith(
       'en',
-      I18N_NAMESPACES.dashboard,
+      I18N_NAMESPACES.today,
       expect.any(Object),
       true,
       true,
     );
-    expect(i18n.hasResourceBundle('en', I18N_NAMESPACES.dashboard)).toBe(true);
+    expect(i18n.hasResourceBundle('en', I18N_NAMESPACES.today)).toBe(true);
   });
 
   it('preloadLocaleIdle no-ops under Vitest', () => {
@@ -179,7 +179,7 @@ describe('load-namespace', () => {
     expect(
       freshI18n.t('manifest.login.title', { ns: I18N_NAMESPACES.auth, lng: 'en' }),
     ).toBe('Sign in');
-    expect(freshI18n.hasResourceBundle('en', I18N_NAMESPACES.dashboard)).toBe(false);
+    expect(freshI18n.hasResourceBundle('en', I18N_NAMESPACES.today)).toBe(false);
     expect(freshI18n.getResourceBundle('en', I18N_NAMESPACES.onboarding)).toEqual({
       manifest: expect.any(Object),
     });
@@ -188,7 +188,7 @@ describe('load-namespace', () => {
     await fresh.ensureActiveLocale('es');
     expect(freshI18n.hasResourceBundle('es', I18N_NAMESPACES.auth)).toBe(true);
     expect(freshI18n.hasResourceBundle('es', I18N_NAMESPACES.settings)).toBe(true);
-    expect(freshI18n.hasResourceBundle('es', I18N_NAMESPACES.dashboard)).toBe(false);
+    expect(freshI18n.hasResourceBundle('es', I18N_NAMESPACES.today)).toBe(false);
     expect(freshI18n.hasResourceBundle('es', I18N_NAMESPACES.onboarding)).toBe(false);
   });
 
@@ -236,8 +236,8 @@ describe('load-namespace', () => {
       await delayed;
     });
     await committing;
-    await fresh.ensureNamespace('en', I18N_NAMESPACES.dashboard);
-    expect(instance.hasResourceBundle('de', I18N_NAMESPACES.dashboard)).toBe(true);
+    await fresh.ensureNamespace('en', I18N_NAMESPACES.today);
+    expect(instance.hasResourceBundle('de', I18N_NAMESPACES.today)).toBe(true);
     release();
     await switching;
   });
@@ -294,24 +294,24 @@ describe('load-namespace', () => {
     const resources = await import('@/lib/i18n/i18n-resources.ts');
     const original = resources.loadLocaleNamespace;
     let failLayout!: (error: Error) => void;
-    let releaseDashboard!: () => void;
-    let reachedDashboard!: () => void;
+    let releaseToday!: () => void;
+    let reachedToday!: () => void;
     const layout = new Promise<void>((_resolve, reject) => {
       failLayout = reject;
     });
-    const dashboard = new Promise<void>((resolve) => {
-      releaseDashboard = resolve;
+    const today = new Promise<void>((resolve) => {
+      releaseToday = resolve;
     });
     const reached = new Promise<void>((resolve) => {
-      reachedDashboard = resolve;
+      reachedToday = resolve;
     });
     const loader = vi
       .spyOn(resources, 'loadLocaleNamespace')
       .mockImplementation(async (locale, ns) => {
         if (locale === 'es' && ns === I18N_NAMESPACES.layout) await layout;
-        if (locale === 'es' && ns === I18N_NAMESPACES.dashboard) {
-          reachedDashboard();
-          await dashboard;
+        if (locale === 'es' && ns === I18N_NAMESPACES.today) {
+          reachedToday();
+          await today;
         }
         return original(locale, ns);
       });
@@ -322,7 +322,7 @@ describe('load-namespace', () => {
     });
     const failure = expect(switching).rejects.toThrow('layout failed');
     let navigationSettled = false;
-    const navigation = fresh.ensureNamespace('en', I18N_NAMESPACES.dashboard).then(() => {
+    const navigation = fresh.ensureNamespace('en', I18N_NAMESPACES.today).then(() => {
       navigationSettled = true;
     });
     try {
@@ -331,9 +331,9 @@ describe('load-namespace', () => {
       await failure;
       await vi.waitFor(() => expect(navigationSettled).toBe(true), { timeout: 200 });
       expect(instance.language).toBe('en');
-      expect(instance.hasResourceBundle('en', I18N_NAMESPACES.dashboard)).toBe(true);
+      expect(instance.hasResourceBundle('en', I18N_NAMESPACES.today)).toBe(true);
     } finally {
-      releaseDashboard();
+      releaseToday();
       await Promise.allSettled([switching, navigation]);
       await settleLoads(loader);
     }

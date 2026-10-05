@@ -191,11 +191,12 @@ test.describe.serial('MFA — TOTP enrollment and challenge login', () => {
     // input-otp auto-submits on the 6th character — no manual click needed.
     await page.keyboard.type(await freshTotp(secret, usedTotp), { delay: 40 });
 
+    // The account owns no clinic, so it lands on the organization picker (D44).
     await expect(page, `mfa calls: ${mfaCalls.join(' | ')}`).toHaveURL(
-      /\/organization\/[^/]+\/dashboard|\/dashboard/,
+      /\/organization(?:[?#]|$)/,
       { timeout: 30_000 },
     );
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 15_000 });
   });
 
   test('a recovery code passes the MFA challenge when the authenticator is lost', async ({
@@ -222,8 +223,6 @@ test.describe.serial('MFA — TOTP enrollment and challenge login', () => {
     await page.keyboard.type(recoveryCode ?? '', { delay: 40 });
     await page.getByTestId('mfa-submit').click();
 
-    await expect(page).toHaveURL(/\/organization\/[^/]+\/dashboard|\/dashboard/, {
-      timeout: 25_000,
-    });
+    await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 25_000 });
   });
 });

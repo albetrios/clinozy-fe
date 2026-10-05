@@ -104,7 +104,7 @@ export function SectionBarShell({
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
-  const nav = useSectionBarNav(navItems, organizationSlug);
+  const nav = useSectionBarNav(navItems);
   const [allSectionsOpen, setAllSectionsOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -199,7 +199,7 @@ export function SectionBarShell({
           </div>
         </div>
       </header>
-      <AppMain flush={nav.current?.section != null} banner="none" />
+      <AppMain flush={nav.current !== null} banner="none" />
       <NoticeStack />
       <MobileNav
         navItems={navItems}

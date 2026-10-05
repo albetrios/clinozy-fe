@@ -4,7 +4,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 
 /**
  * Onboarding — leaf island (`/onboarding`).
- * First-run flow that collects profile basics before sending the user to the dashboard.
+ * First-run flow that collects profile basics before sending the user to their workspace.
  *
  * The title key and test id are written out here, not read off
  * `onboarding.constants.ts`: `routeTree.tsx` imports this manifest statically,

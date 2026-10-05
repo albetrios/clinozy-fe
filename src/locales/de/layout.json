@@ -46,9 +46,6 @@
     "logOut": "Abmelden",
     "toggleSidebar": "Seitenleiste umschalten",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Dashboard"
-    },
     "sidebar": {
       "workspace": "Arbeitsbereich",
       "menu": "Menü",
@@ -94,7 +91,6 @@
       "placeholder": "Suchen oder springen zu…",
       "empty": "Keine Ergebnisse gefunden.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Design",
         "account": "Konto",
         "organizations": "Organisationen",

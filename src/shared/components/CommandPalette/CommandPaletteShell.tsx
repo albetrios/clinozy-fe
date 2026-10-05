@@ -22,22 +22,9 @@ export function CommandPaletteShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation(LAYOUT_NS);
   // State, not a ref: the portal mounts the dialog a render after the shell.
   const [content, setContent] = useState<HTMLDivElement | null>(null);
-  /**
-   * Seeded ONCE, from whatever asked for this opening — a dashboard suggestion
-   * chip names something specific ("Invite members"), and a palette that opens
-   * blank makes the user restate it. Read through the initializer rather than
-   * an effect so the first paint already shows the filtered list, and never
-   * read again: typing here must not write back to the store.
-   */
-  const [query, setQuery] = useState(() => useUIStore.getState().commandPaletteSeed);
-  // A seeded palette puts the caret AFTER the seed, so the first keystroke
-  // extends the suggestion instead of landing in front of it.
-  const seedCaret = query.length === 0 ? null : query.length;
-  const searchFocus = useRef<SearchFocus>({
-    focused: true,
-    start: seedCaret,
-    end: seedCaret,
-  });
+  // Every opening starts blank (⌘K, the header search).
+  const [query, setQuery] = useState('');
+  const searchFocus = useRef<SearchFocus>({ focused: true, start: null, end: null });
   const [previousFocus] = useState(() => document.activeElement as HTMLElement | null);
   const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
   const rememberFocus = useCallback((focused: boolean) => {

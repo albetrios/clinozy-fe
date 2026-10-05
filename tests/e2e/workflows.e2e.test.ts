@@ -8,7 +8,7 @@ import {
   completeOnboardingWizard,
   loginViaEmailCodeUI,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
@@ -145,9 +145,9 @@ test.describe('Invitations workflow (API)', () => {
 });
 
 test.describe('Auth workflow (UI)', () => {
-  test('API session hydrate lands on dashboard with app shell', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+  test('API session hydrate lands on Today with the app shell', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('app-layout')).toBeVisible();
   });
 
@@ -157,29 +157,30 @@ test.describe('Auth workflow (UI)', () => {
     if (page.url().includes('/onboarding')) {
       await completeOnboardingWizard(page);
     }
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    // Team-only: the new clinic's Today. Personal workspaces on: the picker (D44).
+    await expect(
+      page.getByTestId('today-page').or(page.getByTestId('organization-page')),
+    ).toBeVisible({ timeout: 15000 });
   });
 
-  test('session persists across in-app navigation on dashboard', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const dashboardUrl = page.url();
+  test('session persists across in-app navigation on Today', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const todayUrl = new URL(page.url()).pathname;
     await page.evaluate(() => {
       window.location.hash = '#settings/account/profile';
     });
     await expect(page.getByTestId('settings-modal')).toBeVisible({ timeout: 15000 });
     await page.keyboard.press('Escape');
     await navigateInApp(page, '/');
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
-    expect(page.url()).toMatch(/\/dashboard|\/organization\/[^/]+\/dashboard/);
-    if (dashboardUrl.includes('/organization/')) {
-      expect(page.url()).toContain('/organization/');
-    }
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    // `/` resolves back into the same clinic, on the same role home.
+    expect(new URL(page.url()).pathname).toBe(todayUrl);
   });
 });
 
 test.describe('Org switch workflow (UI)', () => {
   test('create team via switcher then switch back to personal', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     // Only the preview shells' header switcher creates; the clinic shell's Switch
     // clinic (Account menu) lists workspaces — `org-switching.e2e.test.ts` drives it.
     const switcher = byTestId(page, 'organization-switcher-trigger');
@@ -194,7 +195,8 @@ test.describe('Org switch workflow (UI)', () => {
     await page.getByTestId('create-organization-dialog-name').fill(name);
     await page.getByTestId('create-organization-dialog-slug').fill(slug);
     await page.getByTestId('create-organization-dialog-submit').click();
-    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
+    // The new clinic's home lands its owner on Today.
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today`), {
       timeout: 15000,
     });
 
@@ -207,7 +209,8 @@ test.describe('Org switch workflow (UI)', () => {
     // the menu to be fully gone before the helper opens it again.
     await expect(personal).toBeHidden();
     await selectOrganizationInSwitcher(page, 'personal');
-    await expect(page).toHaveURL(/\/dashboard(?:\?|$|#)/, { timeout: 15000 });
+    // A personal workspace has no clinic (D44): it lands on the picker.
+    await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 15000 });
   });
 });
 

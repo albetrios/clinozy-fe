@@ -75,7 +75,7 @@ Helpers: `shared/errors/rate-limit.ts` (`isRateLimitError`, `getRateLimitRetryAf
 3. Mutations stay **outside** the boundary.
 4. Custom `loading=` / `errorMessage=` only when defaults are wrong for the layout.
 
-Migrated reference panels: Settings org/account panels, dashboard widgets.
+Migrated reference panels: Settings org/account panels.
 
 ---
 

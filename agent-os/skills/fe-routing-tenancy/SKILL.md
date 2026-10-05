@@ -31,7 +31,7 @@ Organization context travels in the **URL path** — there is no `X-Organization
 
 ## When to invoke
 
-- New route under `pages/organization/$organizationSlug/` or root `/dashboard`
+- New route under `pages/organization/$organizationSlug/`
 - Editing `src/app/routes/routeTree.tsx` `beforeLoad` / loader guards
 - Adding `permission`, `module`, or `onDeny` on a protected manifest
 - Session boot, logout, org switch (`hydrateSessionContext`, `invalidateSessionContext`)
@@ -44,14 +44,14 @@ Organization context travels in the **URL path** — there is no `X-Organization
 
 1. **Scaffold island** — `fe-route-island` → 4 mandatory files + `docs/reference/routes-and-ui.md`.
 2. **Manifest policy** — set `permission`, optional `module` (L6b key from catalog), optional `onDeny` (`unauthorized` vs `notFound`).
-3. **Register in `routeTree.tsx`** — lazy child under `$organizationSlug` layout (or personal `/dashboard` chain).
+3. **Register in `routeTree.tsx`** — lazy child under `$organizationSlug` layout.
 4. **Tenancy guards (team org)** — in order where applicable:
    - `requireAuth`
    - `requireProvisionedWorkspace`
    - `requireOrganizationContext($organizationSlug)` — syncs store from URL; unknown org → **404**
    - `requireActiveOrganization` — suspended → `…/suspended`
    - `gatewayFromManifest(manifest)` — session + permission + disabled module
-5. **Personal dashboard** — use personal guard chain from `GUARDS.OVERVIEW.md` (not the slug chain).
+5. **No personal space** — personal workspaces are off (D44): the retired `/dashboard` redirects to `/`, and a personal or missing workspace lands on the `/organization` picker (`GUARDS.OVERVIEW.md`).
 6. **Do not** call `requireFeature()` when manifest has `module` — prefer `gatewayFromManifest`.
 7. **Resource fetch** — scope in API path; 404/403 from API maps to islands — not a separate guard waterfall.
 8. **Tests** — extend `tests/security/route-access-matrix.security.test.ts` when access policy changes.
@@ -112,8 +112,9 @@ Guards and `/` resolver share the same helper — do not fork a second `me/conte
 Pure redirect route — no island UI. `resolveRootTarget` checks **onboarding first**:
 `!user.onboarding_completed` → `/onboarding` (every deployment mode — even personal,
 whose org is auto-provisioned; only the wizard steps differ). Once onboarded:
-active org dashboard → `/organization` picker. Personal org uses root `/dashboard`;
-team org uses `/organization/$organizationSlug/dashboard`. Onboarding finish stamps the
+the active team org's home (`/organization/$organizationSlug`, which picks the member's
+role home — Today for most roles) → else the `/organization` picker (a personal workspace
+has no clinic, D44). Onboarding finish stamps the
 flag via `POST /users/me/onboarding/complete` before the resolver re-runs.
 
 ---

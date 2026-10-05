@@ -1,5 +1,4 @@
 export {
-  organizationDashboard,
   organizationHome,
   organizationPicker,
   organizationSuspended,

@@ -48,7 +48,6 @@ describe('AppearancePanel', () => {
       iconColor: 'default',
       iconLibrary: 'lucide',
       layoutWidth: 'contained',
-      dashboardVariant: 0,
       toastVariant: DEFAULT_TOAST_VARIANT,
       toastPosition: DEFAULT_TOAST_POSITION,
       seed: null,
@@ -165,26 +164,6 @@ describe('AppearancePanel', () => {
       expect(useThemeStore.getState().customTheme).not.toBeNull();
     },
   );
-
-  it('picking a dashboard arrangement updates the theme store', async () => {
-    const user = userEvent.setup();
-    render(<AppearancePanel />);
-    expect(screen.getByTestId('dashboard-variant-card')).toBeInTheDocument();
-    await user.click(screen.getByTestId('dashboard-variant-pulse'));
-    expect(useThemeStore.getState().dashboardVariant).toBe(2);
-    await user.click(screen.getByTestId('dashboard-variant-bento'));
-    expect(useThemeStore.getState().dashboardVariant).toBe(3);
-    await user.click(screen.getByTestId('dashboard-variant-classic'));
-    expect(useThemeStore.getState().dashboardVariant).toBe(0);
-  });
-
-  it('dashboard shuffle rolls to a different arrangement', async () => {
-    const user = userEvent.setup();
-    render(<AppearancePanel />);
-    await user.click(screen.getByTestId('shuffle-dashboard'));
-    const variant = useThemeStore.getState().dashboardVariant;
-    expect([1, 2, 3]).toContain(variant); // never re-rolls the current (0)
-  });
 
   it.each([
     ['harmony-analogous', 'harmonyId', 'analogous'],
@@ -306,6 +285,6 @@ describe('AppearancePanel', () => {
     platformOverrides.layoutWidthForced = 'full';
     render(<AppearancePanel />);
     expect(screen.queryByTestId('layout-width-card')).not.toBeInTheDocument();
-    expect(screen.getByTestId('dashboard-variant-card')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-preview-card')).toBeInTheDocument();
   });
 });

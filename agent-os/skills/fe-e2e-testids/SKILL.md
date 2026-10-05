@@ -29,7 +29,7 @@ Single source of truth for **Playwright-ready selectors** in clinozy-fe. Use **`
 
 | Check          | Rule                                                                                                                        |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Page manifests | `manifest.testId` must appear on a `data-testid` in the island or its delegated shell (e.g. `Dashboard` → `dashboard-page`) |
+| Page manifests | `manifest.testId` must appear on a `data-testid` in the island or its delegated shell (e.g. `OrganizationLayout` → `app-layout`) |
 | Forms          | `src/pages/**/forms/*Form.tsx` and `src/shared/forms/*Form.tsx` need `*-form` + primary action (`*-submit`, `*-sign-in`, …) |
 | Shell          | `app-layout`, `auth-layout`, `settings-modal` roots                                                                         |
 

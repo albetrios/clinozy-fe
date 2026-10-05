@@ -3,7 +3,7 @@ import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { iconOnSidebarSurface } from '@/lib/icon-surface.ts';
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
@@ -325,7 +325,7 @@ function useOrganizationSwitch({
    * second half to that: nothing ever closed it again. Team → team is a param
    * change on the `$organizationSlug` shell this control lives inside, so the
    * component stays mounted and the menu was left hanging open over the
-   * freshly-switched dashboard. Radix still drives every OTHER open/close —
+   * freshly-switched clinic. Radix still drives every OTHER open/close —
    * trigger, Escape, outside click, re-picking the active row — through
    * `onOpenChange`; this state only adds the missing close-on-success.
    */
@@ -359,13 +359,15 @@ function useOrganizationSwitch({
     if (org.type === 'PERSONAL') {
       if (!personalOrganizations) return;
       await switchToPersonal();
+      // A personal workspace has no clinic (D44), so it lands on the picker —
+      // its list and "Create organization" are the way back into one.
       // Awaited, not `void`: a navigation that rejects is the other half of
       // "and on failure, nothing happens ever" — fire-and-forget put it out of
       // reach of the catch below, so it could not be reported either.
-      await navigate({ to: '/dashboard' });
+      await navigate(organizationPicker());
       return;
     }
-    if (org.slug) await navigate(organizationDashboard(org.slug));
+    if (org.slug) await navigate(organizationHome(org.slug));
   }
 
   function selectOrg(org: OrganizationSummary) {
@@ -435,10 +437,10 @@ function useOrganizationSwitch({
 /**
  * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
  * organizations from `me/context`, split into **Personal** and **Organizations**
- * sections. Switching to a **team** org navigates to its
- * `/organization/$organizationSlug/dashboard` (the org guard performs the
+ * sections. Switching to a **team** org navigates to its home,
+ * `/organization/$organizationSlug` (the org guard performs the
  * switch-on-navigation); switching to the **personal** org has no URL to drive
- * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
+ * it, so it calls `switchToPersonal()` and lands on the `/organization` picker.
  */
 /**
  * What both presentations read: whether the switcher shows at all, the
@@ -525,10 +527,10 @@ function OrganizationSwitcherSubmenu({
 /**
  * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
  * organizations from `me/context`, split into **Personal** and **Organizations**
- * sections. Switching to a **team** org navigates to its
- * `/organization/$organizationSlug/dashboard` (the org guard performs the
+ * sections. Switching to a **team** org navigates to its home,
+ * `/organization/$organizationSlug` (the org guard performs the
  * switch-on-navigation); switching to the **personal** org has no URL to drive
- * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
+ * it, so it calls `switchToPersonal()` and lands on the `/organization` picker.
  */
 export function OrganizationSwitcher(props: OrganizationSwitcherProps) {
   return props.presentation === 'submenu' ? (

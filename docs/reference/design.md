@@ -125,8 +125,7 @@ on its surface, in both modes.
      **Reading** (~768px) via Appearance → Layout; deploy lock via
      `VITE_LAYOUT_WIDTH`.
   2. **Page grid** — free responsive grids: `auto-fit` + `minmax()` for tile rows,
-     `2fr / 1fr` splits for asymmetric panels (`src/lib/responsive-grid.ts`); see
-     dashboard.
+     `2fr / 1fr` splits for asymmetric panels.
   3. **Reading measure** — `max-w-prose` (~65ch) for paragraphs only; **not**
      the whole app. Claude-style ~768px caps belong on reading/chat pages
      locally, not on admin shells.
@@ -175,8 +174,8 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   opacity fade** so copy stays visible if animation is skipped or reduced-motion
   short-circuits duration. `accordion` for disclosure; `shimmer` for skeleton
   loading. Overlays use the shadcn enter/exit utilities (`tw-animate-css`).
-- **Dashboard / product motion.** Prefer **Anime.js** for intentional numeric or
-  timeline motion (`useAnimeCountUp` on stats). Avoid stacking Framer-style page
+- **Product motion.** Prefer **Anime.js** for intentional numeric or timeline
+  motion (`useOnboardingStepMotion` on the onboarding steps). Avoid stacking Framer-style page
   fades on content shells.
 - **High-impact moments over confetti.** One well-orchestrated reveal on
   navigation reads as more polished than scattered micro-interactions. Prefer a

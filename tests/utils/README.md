@@ -52,19 +52,20 @@ Faker-backed disposable data for Playwright/API E2E (emails stay on `@acme.test`
 
 Requires **clinozy-be** on `:3000` — Vite proxies `/api` in dev.
 
-| Helper                                     | Purpose                                                                                   |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `createSessionViaEmailCode(api)`           | API helper — send-code + login; needs `DATABASE_URL` (reads code from `auth.mail_outbox`) |
-| `authenticateViaEmailCode(page)`           | Browser/API helper — same flow via Playwright request (needs `DATABASE_URL`)              |
-| `authenticateViaSignup(page)`              | Alias of `authenticateViaEmailCode` (legacy signup route removed)                         |
-| `completeOnboardingWizard(page)`           | Walk onboarding when `needsOnboarding`                                                    |
-| `registerNewUserAndGoToDashboard(page)`    | UI email-code login + onboarding when needed → dashboard                                  |
-| `loginViaEmailCodeUI(page)`                | Email-code login via `/login` UI only (needs `DATABASE_URL`)                              |
-| `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate (needs `DATABASE_URL`)                                 |
-| `createTeamOrgViaApi(page)`                | Create a team org through the API (cookie refresh → token); skips when team orgs are off  |
-| `createTeamOrgAndOpenDashboard(page)`      | `createTeamOrgViaApi`, then open that org's dashboard in the app                          |
-| `openOrganizationSwitcher(page)`           | Open the switcher — Account menu › "Switch clinic" in the section bar, else the header's  |
-| `selectOrganizationInSwitcher(page, slug)` | Switch active org through that switcher                                                   |
+| Helper                                     | Purpose                                                                                                                                       |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createSessionViaEmailCode(api)`           | API helper — send-code + login; needs `DATABASE_URL` (reads code from `auth.mail_outbox`)                                                     |
+| `authenticateViaEmailCode(page)`           | Browser/API helper — same flow via Playwright request (needs `DATABASE_URL`)                                                                  |
+| `authenticateViaSignup(page)`              | Alias of `authenticateViaEmailCode` (legacy signup route removed)                                                                             |
+| `completeOnboardingWizard(page)`           | Walk onboarding when `needsOnboarding`                                                                                                        |
+| `registerNewUserAndGoToToday(page)`        | Email-code login + onboarding when needed → Today in a clinic the user owns (one is made through the API when onboarding lands on the picker) |
+| `loginViaEmailCodeUI(page)`                | Email-code login via `/login` UI only (needs `DATABASE_URL`)                                                                                  |
+| `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate, ending on Today (needs `DATABASE_URL`)                                                                    |
+| `registerNewUserOnPersonalWorkspace(page)` | A new user left on their personal workspace — the organization picker (D44); skips where personal workspaces are off                          |
+| `createTeamOrgViaApi(page)`                | Create a team org through the API (cookie refresh → token); skips when team orgs are off                                                      |
+| `createTeamOrgAndOpenToday(page)`          | `createTeamOrgViaApi`, then open that clinic's home in the app — Today, its owner's role home                                                 |
+| `openOrganizationSwitcher(page)`           | Open the switcher — Account menu › "Switch clinic" in the section bar, else the header's                                                      |
+| `selectOrganizationInSwitcher(page, slug)` | Switch active org through that switcher                                                                                                       |
 
 ### `e2e-hybrid.ts` — the section-bar shell
 

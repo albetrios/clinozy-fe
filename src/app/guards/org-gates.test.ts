@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   requireOrgStatus,
-  requirePersonalDashboardWorkspace,
-  requirePersonalDeployment,
   requireProvisionedWorkspace,
   requireSuspendedOrgStatus,
   requireTeamDeployment,
@@ -12,8 +10,6 @@ import {
 import {
   requireActiveOrganization,
   requireOrganizationContext,
-  requirePersonalOrganizationsDeployment,
-  requireProvisionedPersonalDashboard,
   requireProvisionedTeamWorkspace,
   requireSuspendedOrganization,
   requireTeamOrganizationsDeployment,
@@ -22,8 +18,6 @@ import {
 vi.mock('./route-guards.ts', () => ({
   requireActiveOrganization: vi.fn(),
   requireOrganizationContext: vi.fn(),
-  requirePersonalOrganizationsDeployment: vi.fn(),
-  requireProvisionedPersonalDashboard: vi.fn(),
   requireProvisionedTeamWorkspace: vi.fn(),
   requireSuspendedOrganization: vi.fn(),
   requireTeamOrganizationsDeployment: vi.fn(),
@@ -58,18 +52,14 @@ describe('org gates — thin wrappers stay faithful to the underlying guards', (
     expect(requireSuspendedOrganization).toHaveBeenLastCalledWith('');
   });
 
-  it('deployment gates call their mode guards with no context', async () => {
+  it('the deployment gate calls its mode guard with no context', async () => {
     await requireTeamDeployment({ params: {} });
     expect(requireTeamOrganizationsDeployment).toHaveBeenCalledTimes(1);
-
-    await requirePersonalDeployment(undefined);
-    expect(requirePersonalOrganizationsDeployment).toHaveBeenCalledTimes(1);
   });
 
   it('returns synchronously from passing organization gates', () => {
     expect(requireOrgStatus({ params: {} })).toBeUndefined();
     expect(requireTeamDeployment({ params: {} })).toBeUndefined();
-    expect(requirePersonalDeployment(undefined)).toBeUndefined();
   });
 
   it('synchronously propagates access denials from organization gates', () => {
@@ -82,33 +72,20 @@ describe('org gates — thin wrappers stay faithful to the underlying guards', (
       throw denial;
     });
     expect(() => requireTeamDeployment({ params: {} })).toThrow(denial);
-    vi.mocked(requirePersonalOrganizationsDeployment).mockImplementationOnce(() => {
-      throw denial;
-    });
-    expect(() => requirePersonalDeployment(undefined)).toThrow(denial);
   });
 
-  it('personal dashboard gate carries the deep link for the onboarding redirect', async () => {
-    await requirePersonalDashboardWorkspace({ redirectFrom: '/dashboard?tab=usage' });
-    expect(requireProvisionedPersonalDashboard).toHaveBeenCalledWith({
-      redirectFrom: '/dashboard?tab=usage',
-    });
-  });
-
-  it('team workspace gate flags the picker when no slug is in the URL', async () => {
+  it('the workspace gate carries the deep link for the onboarding redirect', async () => {
     await requireProvisionedWorkspace({ params: {}, redirectFrom: '/organization' });
     expect(requireProvisionedTeamWorkspace).toHaveBeenCalledWith({
-      organizationPicker: true,
       redirectFrom: '/organization',
     });
 
     await requireProvisionedWorkspace({
       params: { organizationSlug: 'acme' },
-      redirectFrom: '/organization/acme/dashboard',
+      redirectFrom: '/organization/acme/today',
     });
     expect(requireProvisionedTeamWorkspace).toHaveBeenLastCalledWith({
-      organizationPicker: false,
-      redirectFrom: '/organization/acme/dashboard',
+      redirectFrom: '/organization/acme/today',
     });
   });
 

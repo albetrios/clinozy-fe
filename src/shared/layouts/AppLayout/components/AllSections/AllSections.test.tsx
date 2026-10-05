@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { House, LayoutDashboard, UserPlus } from '@/shared/icons/index.ts';
+import { House, UserPlus } from '@/shared/icons/index.ts';
 import type {
   SectionBarEntry,
   SectionBarNav,
@@ -36,7 +36,6 @@ function navWith(overrides: Partial<SectionBarNav> = {}): SectionBarNav {
     pinned: [leads],
     current: today,
     currentUnpinned: true,
-    canPin: true,
     isPinned: (entry) => entry === leads,
     togglePin: vi.fn(),
     ...overrides,
@@ -68,35 +67,6 @@ describe('AllSectionsList', () => {
     ).toHaveAttribute('aria-pressed', 'true');
     await user.click(pinToday);
     expect(nav.togglePin).toHaveBeenCalledWith(today);
-  });
-
-  it('offers no pins while the nav holds only template pages', async () => {
-    const dashboard: SectionBarEntry = {
-      id: 'dashboard',
-      to: '/organization/$organizationSlug/dashboard',
-      section: null,
-      icon: LayoutDashboard,
-      labelNs: 'layout',
-      labelKey: 'app.nav.dashboard',
-      tone: 'stone',
-      descriptionKey: null,
-    };
-    renderWithProviders(
-      <AllSectionsList
-        nav={navWith({
-          entries: [dashboard],
-          pinned: [dashboard],
-          current: dashboard,
-          canPin: false,
-          currentUnpinned: false,
-        })}
-        organizationSlug="acme"
-        onNavigate={vi.fn()}
-      />,
-    );
-    await screen.findByTestId('all-sections-dashboard');
-    expect(screen.queryByRole('button')).toBeNull();
-    expect(screen.queryByText('Pin to keep in the bar')).toBeNull();
   });
 
   it('has no axe violations', async () => {

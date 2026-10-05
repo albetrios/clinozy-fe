@@ -10,7 +10,7 @@ Canonical layout for everything under `src/`. Read before adding any file. The f
 
 ## The pages rule in five lines
 
-1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/dashboard` → `pages/organization/$organizationSlug/dashboard/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders with full-word names. One exception: `/` is a pure resolver route (redirect only, no island).
+1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/today` → `pages/organization/$organizationSlug/today/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders with full-word names. One exception: `/` is a pure resolver route (redirect only, no island).
 2. **Every page folder maintains the same 4 files** — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `<Page>Layout.tsx`), `<PAGE>.OVERVIEW.md` — plus 2 registrations: `src/app/routes/routeTree.tsx` and `docs/reference/routes-and-ui.md`. `$param` folders derive their prefix mechanically (strip `$`, kebab-case).
 3. **Page shells live in `shared/layouts/`** — `AuthLayout` via the pathless `auth-shell` route; `AppLayout` via the `pages/organization/$organizationSlug/` layout island (the org guard boundary). No grouping directories under `pages/`.
 4. **Promotion ladder:** one page → inside that page; a page + its OWN nested children → that page's `shared/` (family-shared, e.g. `pages/organization/$organizationSlug/shared/`); pages from different families or any `src/shared` component → root `src/shared/` (`shared/api/auth-api.ts`, `shared/tenancy/`, …).
@@ -120,7 +120,7 @@ segment is itself a page (`organization/$organizationSlug/`).
 
 ### Custom page
 
-For pages that aren't a backend resource (dashboard, login, callback, onboarding, accept-invite):
+For pages that aren't a backend resource (login, callback, onboarding, accept-invite):
 
 ```
 src/pages/<page>/                          ← folder = URL segment
@@ -218,7 +218,7 @@ const indexRoute = createRoute({
 ```
 
 Established cases:
-- `/` → resolver route (active organization's dashboard, else `/organization`, else `/onboarding`)
+- `/` → resolver route (`/onboarding` first, then the active organization's home, else `/organization`)
 - Future resource layouts with multiple children pick a default child
 
 ## Nested routes — direct children (`<segment>/`, `$param/`)
@@ -236,9 +236,9 @@ pages/organization/                       → /organization (picker)
 ├── OrganizationPickerPage.tsx
 └── $organizationSlug/                      → /organization/$organizationSlug (org guard boundary)
     ├── organization-slug.route.tsx
-    ├── organization-slug.manifest.ts         kind: 'layout', children: ['dashboard', 'suspended']
+    ├── organization-slug.manifest.ts         kind: 'layout', children: ['suspended', 'today', …]
     ├── OrganizationLayout.tsx
-    ├── dashboard/                        full island shape, recursively
+    ├── today/                            full island shape, recursively (one of the ten clinic rooms)
     └── suspended/
 ```
 
@@ -253,7 +253,7 @@ Two invariants follow from "the modal lives in the hash", and both have shipped 
 - **Same-route navigation must state the hash.** TanStack Router resolves an *omitted* `hash` to none, so `navigate({ to: '.', search, replace: true })` — "just patch the search" — also closes the modal. Write `hash: true` to keep it (or `hash: ''` to clear it on purpose); ESLint rejects a same-route `navigate()` that says neither. Clearing Stripe's return params goes through `stripeReturnCleanupNavigation()` (`lib/billing/stripe-return.ts`) — three hand-written copies of those options dropped a customer who had just finished 3DS onto a bare dashboard.
 - **The modal decides nothing until it has BOTH answers**: me/context (which sections exist) *and* the permission set (`useAccessResolved()`). Entering an organization clears the store's permissions a beat before the real set lands; an empty **unresolved** list is "not known yet", never "you may do nothing". Treating it as an answer rewrote an organization deep link to `account/profile` — permanently, because the fallback is written back to the URL. The one exception: when me/context settled **without data** there is nothing to derive permissions from, so the modal does not wait.
 
-`/` is the other folder-less URL: a pure resolver route (active organization's dashboard, else the `/organization` picker, else `/onboarding`) registered inline in `routeTree.tsx`.
+`/` is the other folder-less URL: a pure resolver route (`/onboarding` first, then the active organization's home, else the `/organization` picker) registered inline in `routeTree.tsx`; the retired `/dashboard` redirects to it.
 
 ## Dialog vs full page — decision tree
 

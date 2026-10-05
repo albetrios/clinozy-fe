@@ -197,7 +197,7 @@ Copy this checklist for **each** axis. Do not skip steps.
 2. Find CSS hooks in `src/index.css` (`[data-*]` blocks or CSS vars).
 3. Note which **`data-slot`** values the axis targets (if any).
 4. Open Appearance → set axis to **most extreme** value (e.g. radius `sharp`, elevation `flat`, density `compact`).
-5. Screenshot or mentally note: login, dashboard, settings modal, command palette, toast, tables.
+5. Screenshot or mentally note: login, Today, settings modal, command palette, toast, tables.
 
 ### Phase 1 — Inventory violations
 
@@ -257,10 +257,10 @@ rounded corner. Add a screen or overlay to it when the audit touches one.
 Manual: Appearance → toggle axis across **all options** on:
 
 - `/login` (public card layout)
-- `/organization/acme/dashboard` (dashboard, theme showcase)
+- `/organization/acme/today` (Today — the role home for most roles)
 - Settings modal (`#settings/account/profile`)
 - Command palette (⌘K)
-- Trigger a toast (shuffle on dashboard)
+- Trigger a toast (Shuffle in Appearance)
 
 ### Phase 4 — Record
 

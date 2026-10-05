@@ -406,7 +406,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 ### 4e. animejs (installed — motion implementation)
 
 **Path:** `agent-os/skills/animejs/SKILL.md`
-**Purpose:** Anime.js v4 timelines, object tweens, stagger — **this repo's animation library** (`useAnimeCountUp` on dashboard stats).
+**Purpose:** Anime.js v4 timelines, object tweens, stagger — **this repo's animation library** (`useOnboardingStepMotion` on the onboarding steps).
 
 **Trigger keywords:** "anime.js", "count up", "timeline animation", "stagger animation"
 
@@ -670,7 +670,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 - Skill: `agent-os/skills/fe-route-island/SKILL.md`
 - Reference: `docs/reference/route-island-structure.md`
 - Template: `docs/getting-started/route-island-template.md`
-- Examples: `src/pages/organization/$organizationSlug/dashboard/`, `src/pages/login/`
+- Examples: `src/pages/organization/$organizationSlug/today/`, `src/pages/login/`
 
 ---
 

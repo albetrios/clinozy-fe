@@ -296,16 +296,15 @@ or deploy lock `VITE_LAYOUT_WIDTH=full`. Do not mix contained + full per random 
 **Rule L-3 — Free responsive grid (preferred):** Compose pages with `grid-cols-1`,
 `sm:grid-cols-2`, `lg:grid-cols-3`, and occasional `col-span-2` on a **small**
 column count — not a global 12-column framework. Use `flex flex-wrap gap-*` for
-chip/action rows. Example: dashboard highlights `lg:grid-cols-3` + `lg:col-span-2`.
+chip/action rows. Example: a main column beside an aside, `lg:grid-cols-3` + `lg:col-span-2`.
 
 **Rule L-3b — 12-column (optional):** Only when a design truly needs fine-grained
 spans (e.g. 8+4 on a 12-track). Default product pages should not use `grid-cols-12`.
 
 **Rule L-4 — Auto-fit inside sections:** Quick actions, card galleries, and
-settings groups use **`repeat(auto-fit, minmax(min(100%, …), 1fr))`** via
-`src/lib/responsive-grid.ts` (`autoFitActionsGrid`, `autoFitCardsGrid`) or
-equivalent Tailwind arbitrary grids. Asymmetric pairs (highlight + stats) use
-`splitMainAsideGrid` (`2fr / 1fr` on `lg+`). Prefer **consistent `gap-*`**
+settings groups use **`repeat(auto-fit, minmax(min(100%, …), 1fr))`** as
+Tailwind arbitrary grids. Asymmetric pairs (highlight + stats) use
+`2fr / 1fr` on `lg+`. Prefer **consistent `gap-*`**
 (scales with density axis).
 
 **Rule L-5 — Prose cap for reading only:** Any multi-sentence description,
@@ -330,14 +329,12 @@ with the glass.
 
 ### Current implementation map
 
-| Surface              | File                               | Width pattern                                                                         |
-| -------------------- | ---------------------------------- | ------------------------------------------------------------------------------------- |
-| Authenticated main   | `AppLayout.shared.tsx` → `AppMain` | Appearance → **Layout** (`layoutWidth` store); `data-layout-width` on `#main-content` |
-| Dashboard bento      | `Dashboard.tsx`                    | `splitMainAsideGrid` (2fr/1fr) + `autoFitActionsGrid` / `autoFitCardsGrid`            |
-| Section descriptions | `Dashboard.tsx` `SectionHeading`   | `max-w-prose`                                                                         |
-| Auth forms           | `AuthLayout` variants              | `max-w-md` / `max-w-[400px]`                                                          |
-| Public pages         | `PublicLayout`                     | `max-w-md`                                                                            |
-| Env override         | `core/config/env.ts`               | `VITE_LAYOUT_WIDTH=contained \| full \| reading` (locks Appearance picker)            |
+| Surface            | File                               | Width pattern                                                                         |
+| ------------------ | ---------------------------------- | ------------------------------------------------------------------------------------- |
+| Authenticated main | `AppLayout.shared.tsx` → `AppMain` | Appearance → **Layout** (`layoutWidth` store); `data-layout-width` on `#main-content` |
+| Auth forms         | `AuthLayout` variants              | `max-w-md` / `max-w-[400px]`                                                          |
+| Public pages       | `PublicLayout`                     | `max-w-md`                                                                            |
+| Env override       | `core/config/env.ts`               | `VITE_LAYOUT_WIDTH=contained \| full \| reading` (locks Appearance picker)            |
 
 **Appearance → Layout → Content width:** **Standard** (1536px) · **Full width** · **Reading** (~768px, Claude-style).
 

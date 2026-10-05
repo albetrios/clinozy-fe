@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { openAccountMenu, openNotificationCenter } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -21,7 +21,7 @@ test.describe('Notification center (empty inbox)', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
   });
 
   test('a fresh account shows the empty-inbox state with mark-all hidden', async ({

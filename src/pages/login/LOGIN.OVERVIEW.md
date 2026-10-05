@@ -27,7 +27,7 @@ New passwordless users → `/onboarding` → app.
      `debug_verification_code` and the verify step **prefills** it (fills, never
      auto-submits). Field presence is the gate — no client flag; the echo never
      exists in production (clinozy-be `.refine()`-forbids `TEST_MODE` there).
-2. **OAuth / passkey:** `/callback` → `silentRefresh()` → post-auth resolver (onboarding or dashboard)
+2. **OAuth / passkey:** `/callback` → `silentRefresh()` → post-auth resolver (onboarding, the clinic home, or the picker)
 
 ### The hand-off is one-way (LOGIN-5, LOGIN-7)
 

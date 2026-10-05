@@ -45,12 +45,12 @@ const PAGES = [
   'patients',
   'medical',
   'users',
-  'dashboard',
+  'suspended',
 ];
 
 /**
  * The org layout as the route tree mounts it — the guard over an `<Outlet />`
- * — with a page per room (and the non-room dashboard), opened at `path`, for
+ * — with a page per room (and the non-room suspended page), opened at `path`, for
  * `email` holding `codes`, previewing `previewRole`.
  */
 function renderLayout(
@@ -140,10 +140,10 @@ describe('useRoomLanding (Q-U11)', () => {
   });
 
   it('leaves a path outside the rooms alone', async () => {
-    const { router } = renderLayout('dashboard', { previewRole: 'marketing' });
-    await expectPage('dashboard');
+    const { router } = renderLayout('suspended', { previewRole: 'marketing' });
+    await expectPage('suspended');
     await act(async () => {});
-    expect(router.state.location.pathname).toBe('/organization/acme/dashboard');
+    expect(router.state.location.pathname).toBe('/organization/acme/suspended');
   });
 
   it('stays put on "Exit preview" when the member’s own access views the room', async () => {

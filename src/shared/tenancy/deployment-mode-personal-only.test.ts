@@ -49,7 +49,7 @@ describe('deployment-mode — personal-only', () => {
     expect(shouldAllowCreateTeam(PERSONAL_ONLY)).toBe(false);
   });
 
-  it('routes root to /dashboard when a personal org is active', () => {
+  it('routes root to the organization picker when a personal org is active (D44)', () => {
     expect(
       resolveRootTarget(
         meCtx({
@@ -65,7 +65,7 @@ describe('deployment-mode — personal-only', () => {
           },
         }),
       ),
-    ).toEqual({ to: '/dashboard' });
+    ).toEqual({ to: '/organization' });
   });
 
   it('routes a fresh (not-onboarded) user to /onboarding despite the auto-provisioned personal org', () => {

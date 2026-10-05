@@ -2,10 +2,7 @@ import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
 import { SPLASH_FRAMES_MS, SPLASH_REDUCED_FRAMES_MS } from '@/lib/app-splash.ts';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import {
-  createTeamOrgViaApi,
-  registerNewUserAndGoToDashboard,
-} from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, clickTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -43,7 +40,7 @@ const TRACE_BOOT = `
   window.__bootTrace = trace;
   const CONTENT = [
     '[data-testid="login-form"]', '[data-testid="auth-form"]', 'form',
-    '[data-testid="dashboard-page"]', '[data-testid="app-layout"]',
+    '[data-testid="today-page"]', '[data-testid="app-layout"]',
     '[data-testid="full-page-spinner"]', '[data-testid="onboarding-page"]',
     '[data-testid="not-found-page"]', 'main',
   ].join(',');
@@ -107,17 +104,17 @@ test.describe('Cold load — one continuous screen', () => {
     page,
   }) => {
     // Not one of the four routes that used to opt into an immediate pending
-    // state — a bookmarked dashboard is just as cold an entry as `/`.
+    // state — a bookmarked room is just as cold an entry as `/`.
     await page.addInitScript(TRACE_BOOT);
     await slowAuthBootstrap(page);
-    await page.goto('/dashboard');
+    await page.goto('/organization/acme/today');
 
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
     await expectLoginFormReady(page);
     expectOneContinuousScreen(await bootTrace(page));
   });
 
-  test('a signed-in user reloading the dashboard sees splash → dashboard, nothing between', async ({
+  test('a signed-in user reloading Today sees splash → Today, nothing between', async ({
     page,
   }) => {
     test.setTimeout(120_000);
@@ -125,18 +122,18 @@ test.describe('Cold load — one continuous screen', () => {
       await verifyDatabaseConnection(),
       'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
     ).toBe(true);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     await page.addInitScript(TRACE_BOOT);
     await slowAuthBootstrap(page);
     await page.reload();
 
-    await expect(byTestId(page, 'dashboard-page')).toBeVisible({ timeout: 30_000 });
+    await expect(byTestId(page, 'today-page')).toBeVisible({ timeout: 30_000 });
     await expect(page).not.toHaveURL(/\/login/);
     expectOneContinuousScreen(await bootTrace(page));
   });
 
-  test('a signed-in user opening / is taken to their dashboard the same way', async ({
+  test('a signed-in user opening / is taken to their role home the same way', async ({
     page,
   }) => {
     test.setTimeout(120_000);
@@ -144,12 +141,12 @@ test.describe('Cold load — one continuous screen', () => {
       await verifyDatabaseConnection(),
       'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
     ).toBe(true);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     await page.addInitScript(TRACE_BOOT);
     await page.goto('/');
 
-    await expect(byTestId(page, 'dashboard-page')).toBeVisible({ timeout: 30_000 });
+    await expect(byTestId(page, 'today-page')).toBeVisible({ timeout: 30_000 });
     expectOneContinuousScreen(await bootTrace(page));
   });
 });
@@ -302,13 +299,14 @@ async function serveShellWhileOffline(
 
 /**
  * A signed-in member — with a refresh cookie, so a cold load restores the
- * session — of a team organization they own (role home: Today). The org is made
- * through the API: the clinic shell has no organization switcher.
+ * session — standing on Today in a clinic they own (their role home). Returns
+ * that clinic's slug.
  */
 async function signInToNewTeamOrganization(page: Page): Promise<string> {
-  await registerNewUserAndGoToDashboard(page);
-  const { slug } = await createTeamOrgViaApi(page);
-  return slug;
+  await registerNewUserAndGoToToday(page);
+  const slug = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
+  expect(slug, 'landed outside a clinic').toBeTruthy();
+  return slug ?? '';
 }
 
 test.describe('Splash — frames, slot, offline hold, reduced motion', () => {

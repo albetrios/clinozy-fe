@@ -29,12 +29,10 @@ function measureLabel(label: string, fontFamily: string): number {
 function useEntryText(entry: SectionBarEntry) {
   const { t } = useTranslation(LAYOUT_NS);
   const label = t(entry.labelKey, { ns: entry.labelNs });
-  const title = entry.descriptionKey
-    ? t(LAYOUT_KEYS.app.sectionBar.tabTitle, {
-        section: label,
-        description: t(entry.descriptionKey, { ns: entry.labelNs }),
-      })
-    : label;
+  const title = t(LAYOUT_KEYS.app.sectionBar.tabTitle, {
+    section: label,
+    description: t(entry.descriptionKey, { ns: entry.labelNs }),
+  });
   return { label, title };
 }
 

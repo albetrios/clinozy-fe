@@ -61,7 +61,7 @@ test('logs in', async ({ page }) => {
 
 **Helpers:** `tests/utils/e2e-hybrid.ts` — `AUTH_LABELS`, `LAYOUT_LABELS`, `expect*FormReady`, `expectHybridVisible`.
 
-**Auth flows:** `tests/utils/e2e-auth.ts` — `registerNewUserAndGoToDashboard`, `authenticateViaSignup`, `completeOnboardingWizard`, `navigateInApp` (client-side nav; avoids cold-load auth race — see `__clinozyFeRouter` in `src/main.tsx` dev hook). **All E2E requires clinozy-be** — `tests/e2e/global-setup.ts` fails fast when `/readyz` is down.
+**Auth flows:** `tests/utils/e2e-auth.ts` — `registerNewUserAndGoToToday`, `authenticateViaSignup`, `completeOnboardingWizard`, `navigateInApp` (client-side nav; avoids cold-load auth race — see `__clinozyFeRouter` in `src/main.tsx` dev hook). **All E2E requires clinozy-be** — `tests/e2e/global-setup.ts` fails fast when `/readyz` is down.
 
 **The clinic shell:** the section bar has no sidebar, bell or header theme toggle — the Account
 menu (`openAccountMenu`, `openNotificationCenter`, `chooseThemeMode` in `e2e-hybrid.ts`) holds
@@ -80,7 +80,7 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 | File                               | Scope                                     |
 | ---------------------------------- | ----------------------------------------- |
 | `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP   |
-| `dashboard.e2e.test.ts`            | Shell + placeholder dashboard             |
+| `home.e2e.test.ts`                 | Landing on Today in the clinic shell      |
 | `clinic-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone |
 | `clinic-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)         |
 | `settings.e2e.test.ts`             | Hash modal `#settings/...`                |

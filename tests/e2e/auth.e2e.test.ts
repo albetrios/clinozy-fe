@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { API_ENDPOINTS } from '@/core/config/constants.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { uniqueE2eEmail } from '@/tests/utils/e2e-faker.ts';
 import {
   clickTestId,
@@ -38,13 +38,13 @@ test.describe('Authentication', () => {
     await expect(page.getByTestId('auth-email-verify-panel')).toBeVisible();
   });
 
-  test('email-code sign-in through clinozy-be reaches dashboard', async ({ page }) => {
+  test('email-code sign-in through clinozy-be reaches Today', async ({ page }) => {
     test.skip(
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible();
   });
 
   test('MFA route shows session-expired shell without token', async ({ page }) => {

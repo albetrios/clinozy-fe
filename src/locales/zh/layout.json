@@ -46,9 +46,6 @@
     "logOut": "退出登录",
     "toggleSidebar": "切换侧边栏",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "控制台"
-    },
     "sidebar": {
       "workspace": "工作区",
       "menu": "菜单",
@@ -94,7 +91,6 @@
       "placeholder": "搜索或跳转…",
       "empty": "未找到结果。",
       "groups": {
-        "navigation": "导航",
         "theme": "主题",
         "account": "账户",
         "organizations": "组织",

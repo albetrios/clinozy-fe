@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgAndOpenDashboard,
-  registerNewUserAndGoToDashboard,
+  createTeamOrgAndOpenToday,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import { openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 
 test.describe('Settings modal (hash-driven)', () => {
   test.beforeEach(async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
   });
 
   test('opens from the user menu and writes the hash', async ({ page }) => {
@@ -27,7 +27,7 @@ test.describe('Settings modal (hash-driven)', () => {
     await expect(page.getByTestId('settings-section-security')).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByTestId('dashboard-page')).toBeAttached();
+    await expect(page.getByTestId('today-page')).toBeAttached();
   });
 
   test('account nav sections render profile and security panels', async ({ page }) => {
@@ -82,7 +82,7 @@ test.describe('Settings modal (hash-driven)', () => {
   });
 
   test('organization nav appears after creating a team org', async ({ page }) => {
-    await createTeamOrgAndOpenDashboard(page);
+    await createTeamOrgAndOpenToday(page);
 
     await openSettingsHash(page, 'account', 'profile');
     await page.getByTestId('settings-nav-organization-general').click();

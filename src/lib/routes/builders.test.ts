@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  organizationDashboard,
   organizationHome,
   organizationPicker,
   organizationSuspended,
@@ -15,10 +14,6 @@ describe('route builders', () => {
       to: '/organization/$organizationSlug',
       params: { organizationSlug: 'acme' },
     });
-    expect(organizationDashboard('acme')).toEqual({
-      to: '/organization/$organizationSlug/dashboard',
-      params: { organizationSlug: 'acme' },
-    });
     expect(organizationSuspended('acme')).toEqual({
       to: '/organization/$organizationSlug/suspended',
       params: { organizationSlug: 'acme' },
@@ -29,7 +24,6 @@ describe('route builders', () => {
     // A room's builders are imported by path (`leads-builders.ts`, …): through
     // this barrel they would ride every first paint again.
     expect(Object.keys(barrel).sort()).toEqual([
-      'organizationDashboard',
       'organizationHome',
       'organizationPicker',
       'organizationSuspended',

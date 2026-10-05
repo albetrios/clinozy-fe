@@ -46,9 +46,6 @@
     "logOut": "Se déconnecter",
     "toggleSidebar": "Afficher/masquer la barre latérale",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Tableau de bord"
-    },
     "sidebar": {
       "workspace": "Espace de travail",
       "menu": "Menu",
@@ -94,7 +91,6 @@
       "placeholder": "Rechercher ou aller à…",
       "empty": "Aucun résultat trouvé.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Thème",
         "account": "Compte",
         "organizations": "Organisations",

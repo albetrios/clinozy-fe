@@ -1,15 +1,12 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import {
-  navigateInApp,
-  registerNewUserAndGoToDashboard,
-} from '@/tests/utils/e2e-auth.ts';
+import { navigateInApp, registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { expectAuthScreenReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
- * The instant the dashboard's clock reads: its date line and its sample trends
- * follow the day. Noon-ish UTC is 5 Oct everywhere from UTC−9 to UTC+13, and it
+ * The instant Today's clinic clock reads: its greeting and the floor's fixture
+ * day follow it. Noon-ish UTC is 5 Oct everywhere from UTC−9 to UTC+13, and it
  * is in the past, so a session minted now never reads as expired.
  */
 const FIXED_NOW = new Date('2026-10-05T10:00:00Z');
@@ -93,22 +90,20 @@ test.describe('Visual Regression', () => {
     });
   });
 
-  test('dashboard page', async ({ page }) => {
+  // The clinic home: where a member lands — Today for a clinic's owner (D25).
+  test('Today (the clinic home)', async ({ page }) => {
     // Date only: timers keep running, so boot, refresh and toasts behave as live.
     await page.clock.setFixedTime(FIXED_NOW);
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     await settled(page);
 
-    await expect(page).toHaveScreenshot('dashboard.png', {
+    await expect(page).toHaveScreenshot('today.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.03,
       animations: 'disabled',
       // A new user every run: their name in the greeting and their initials.
-      mask: [
-        page.getByTestId('dashboard-greeting'),
-        page.getByTestId('user-menu-trigger'),
-      ],
+      mask: [page.getByTestId('today-greeting'), page.getByTestId('user-menu-trigger')],
     });
   });
 
@@ -142,7 +137,7 @@ test.describe('Visual Regression', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await navigateInApp(page, '/accept-invite/inv_expired');
     await expect(page.getByTestId('accept-invite-error')).toBeVisible({
       timeout: 10000,

@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import {
   completeOnboardingWizard,
-  createTeamOrgAndOpenDashboard,
+  createTeamOrgAndOpenToday,
   createTeamOrgViaApi,
   loginViaEmailCodeUI,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import {
   clickTestId,
@@ -33,13 +33,17 @@ test.describe('Product journeys', () => {
     );
   });
 
-  test('onboarding wizard completes and lands on dashboard', async ({ page }) => {
+  test('onboarding wizard completes and lands in the workspace', async ({ page }) => {
     requireDatabaseUrl();
     await loginViaEmailCodeUI(page, uniqueE2eEmail('onboard-ui'));
     if (page.url().includes('/onboarding')) {
       await completeOnboardingWizard(page);
     }
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    // Team-only: the clinic the wizard made, on its owner's role home (Today).
+    // Personal workspaces on: the organization picker — no clinic yet (D44).
+    await expect(
+      page.getByTestId('today-page').or(page.getByTestId('organization-page')),
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('accept invite happy path joins team org', async ({ page, playwright }) => {
@@ -92,10 +96,12 @@ test.describe('Product journeys', () => {
       await expect(page.getByTestId('accept-invite-success')).toBeVisible({
         timeout: 15000,
       });
-      await expect(page).toHaveURL(new RegExp(`/organization/${orgSlug}/dashboard`), {
-        timeout: 20000,
-      });
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      // The clinic's home, which sends the member on to their role home.
+      await expect(page).toHaveURL(
+        new RegExp(`/organization/${orgSlug}(?:/[^/?#]+)?(?:[?#]|$)`),
+        { timeout: 20000 },
+      );
+      await expect(page.getByTestId('app-layout')).toBeVisible();
     } finally {
       await ownerApi.dispose();
       await inviteeApi.dispose();
@@ -130,7 +136,7 @@ test.describe('Product journeys', () => {
   test('suspended page renders for a member of a suspended team organization', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     const { slug } = await createTeamOrgViaApi(page);
     type OrgWire = { slug?: string | null; status?: string };
     const suspend = (org: OrgWire | null | undefined) => {
@@ -153,7 +159,8 @@ test.describe('Product journeys', () => {
       });
     }
 
-    await navigateAuthenticated(page, `/organization/${slug}/dashboard`);
+    // The clinic's home runs the status guard before it picks a room.
+    await navigateAuthenticated(page, `/organization/${slug}`);
     await expect(page).toHaveURL(new RegExp(`/organization/${slug}/suspended`), {
       timeout: 15000,
     });
@@ -162,18 +169,18 @@ test.describe('Product journeys', () => {
   });
 
   test('logout clears session and blocks protected routes', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await expectAppHeaderReady(page);
     await page.getByTestId('user-menu-trigger').click();
     await clickTestId(page, 'logout-button');
     await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     await expectLoginFormReady(page);
-    await navigateInApp(page, '/dashboard');
+    await navigateInApp(page, '/organization');
     await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
   });
 
   test('settings account and organization section smoke matrix', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     const accountSections: Array<{ section: string; panel: string }> = [
       { section: 'profile', panel: 'settings-section-profile' },
@@ -197,7 +204,7 @@ test.describe('Product journeys', () => {
     await expect(page.getByTestId('settings-modal')).toHaveCount(0);
     await expectAppHeaderReady(page);
 
-    await createTeamOrgAndOpenDashboard(page);
+    await createTeamOrgAndOpenToday(page);
 
     // Regression: deep-linking to an organization section the instant the org
     // exists used to land on Account · Profile. Entering an org clears the store's
@@ -220,7 +227,7 @@ test.describe('Product journeys', () => {
   test('account settings nav tour switches sections via nav clicks and syncs the URL', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'profile');
     await expect(page.getByTestId('settings-section-profile')).toBeVisible({
       timeout: 10000,
@@ -244,7 +251,7 @@ test.describe('Product journeys', () => {
   test('the active settings nav item is marked with aria-current=page', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'security');
 
     await expect(page.getByTestId('settings-nav-account-security')).toHaveAttribute(

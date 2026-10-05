@@ -38,9 +38,7 @@ function SectionRow({
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   const label = t(entry.labelKey, { ns: entry.labelNs });
-  const description = entry.descriptionKey
-    ? t(entry.descriptionKey, { ns: entry.labelNs })
-    : null;
+  const description = t(entry.descriptionKey, { ns: entry.labelNs });
   const current = entry === nav.current;
   const pinned = nav.isPinned(entry);
   const tone = TONE_CLASSES[entry.tone];
@@ -52,11 +50,10 @@ function SectionRow({
         activeOptions={{ exact: true }}
         onClick={onNavigate}
         aria-current={current ? 'page' : undefined}
-        title={description ? `${label} · ${description}` : label}
+        title={`${label} · ${description}`}
         data-testid={`all-sections-${entry.id}`}
         className={cn(
-          'flex min-w-0 flex-1 items-center gap-2.5 rounded-lg border py-1.5 ps-1.5 text-start transition-colors',
-          nav.canPin ? 'pe-10' : 'pe-1.5',
+          'flex min-w-0 flex-1 items-center gap-2.5 rounded-lg border py-1.5 ps-1.5 pe-10 text-start transition-colors',
           current
             ? 'bg-canvas border-border-strong'
             : 'hover:bg-muted border-transparent',
@@ -72,31 +69,27 @@ function SectionRow({
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="text-body truncate leading-[1.3] font-semibold">{label}</span>
-          {description ? (
-            <span className="text-muted-foreground text-caption truncate leading-[1.3]">
-              {description}
-            </span>
-          ) : null}
+          <span className="text-muted-foreground text-caption truncate leading-[1.3]">
+            {description}
+          </span>
         </span>
       </Link>
-      {entry.section !== null ? (
-        <button
-          type="button"
-          aria-pressed={pinned}
-          aria-label={t(pinned ? keys.unpinAria : keys.pinAria, { section: label })}
-          title={t(pinned ? keys.unpin : keys.pin)}
-          onClick={() => nav.togglePin(entry)}
-          data-testid={`all-sections-pin-${entry.id}`}
-          className={cn(
-            'absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md border transition-colors',
-            pinned
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-transparent'
-              : 'text-muted-foreground hover:border-border border-transparent',
-          )}
-        >
-          <MapPin className="size-3.5" aria-hidden />
-        </button>
-      ) : null}
+      <button
+        type="button"
+        aria-pressed={pinned}
+        aria-label={t(pinned ? keys.unpinAria : keys.pinAria, { section: label })}
+        title={t(pinned ? keys.unpin : keys.pin)}
+        onClick={() => nav.togglePin(entry)}
+        data-testid={`all-sections-pin-${entry.id}`}
+        className={cn(
+          'absolute end-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md border transition-colors',
+          pinned
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-transparent'
+            : 'text-muted-foreground hover:border-border border-transparent',
+        )}
+      >
+        <MapPin className="size-3.5" aria-hidden />
+      </button>
     </div>
   );
 }
@@ -129,12 +122,10 @@ export function AllSectionsList({
           />
         ))}
       </div>
-      {nav.canPin ? (
-        <div className="text-muted-foreground text-caption flex items-center gap-2 border-t px-2 pt-1.5 pb-0.5">
-          <span>{t(keys.pinFooter)}</span>
-          <span className="ms-auto whitespace-nowrap">{t(keys.keysHint)}</span>
-        </div>
-      ) : null}
+      <div className="text-muted-foreground text-caption flex items-center gap-2 border-t px-2 pt-1.5 pb-0.5">
+        <span>{t(keys.pinFooter)}</span>
+        <span className="ms-auto whitespace-nowrap">{t(keys.keysHint)}</span>
+      </div>
     </div>
   );
 }

@@ -65,7 +65,7 @@ function roomManifest(section: string): PageManifest {
 }
 
 function Shell() {
-  const { entries } = useAppNav('organization');
+  const { entries } = useAppNav();
   return <SectionBarShell navItems={entries} organizationSlug="acme" />;
 }
 

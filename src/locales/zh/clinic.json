@@ -1393,5 +1393,9 @@
     "title": "打印预览 · {{title}}",
     "close": "关闭",
     "print": "打印 / 保存 PDF"
+  },
+  "clinicHomeEmpty": {
+    "title": "这里还没有开启任何内容",
+    "description": "诊所的版块为你开启后，会立即显示在这里。"
   }
 }

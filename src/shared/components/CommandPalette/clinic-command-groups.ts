@@ -135,9 +135,7 @@ export function useClinicCommandGroups({
   const router = useRouter({ warn: false });
   const { formatDate } = useLocaleFormat();
   const access = useClinicAccess();
-  const rooms = new Set(
-    navEntries.flatMap((entry) => (entry.section ? [entry.section] : [])),
-  );
+  const rooms = new Set(navEntries.map((entry) => entry.section));
   const allowed = (section: Section, grant: ClinicAction) =>
     access.isResolved && rooms.has(section) && access.can(section, grant);
   const searchFor = {

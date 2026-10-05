@@ -119,7 +119,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
     },
     onSuccess: async (values) => {
       // Reflect the new name in the app shell (avatar + header) right away, and
-      // refetch me/context so the dashboard greeting picks it up too.
+      // refetch me/context so every greeting picks it up too.
       const user = useAuthStore.getState().user;
       if (user) {
         useAuthStore.getState().setUser({

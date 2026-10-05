@@ -111,7 +111,7 @@ export function Component() {
   useOrgBrand();
   const { t } = useTranslation(ERRORS_NS);
   const { organizationSlug = '' } = useParams({ strict: false });
-  const { entries: navItems } = useAppNav(organizationSlug ? 'organization' : 'personal');
+  const { entries: navItems } = useAppNav();
   const themeVariant = useThemeStore((s) => s.appVariant);
   const { flags, ready } = useDeploymentFlagsState();
   // House rule 4: the shell is derived ONLY from loaded session context. Before

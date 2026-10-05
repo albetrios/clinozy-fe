@@ -13,7 +13,6 @@ export const manifest = {
   permission: null,
   kind: 'layout',
   children: [
-    'dashboard',
     'suspended',
     'today',
     'leads',

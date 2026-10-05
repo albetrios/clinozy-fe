@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "Tutto pronto",
-      "description": "Controlla e vai alla dashboard."
+      "description": "Controlla e vai al tuo spazio di lavoro."
     }
   },
   "welcome": {
@@ -99,7 +99,7 @@
   "actions": {
     "back": "Indietro",
     "continue": "Continua",
-    "enterDashboard": "Entra nella dashboard",
+    "enterWorkspace": "Entra nello spazio di lavoro",
     "settingUp": "Configurazione…"
   },
   "defaults": {

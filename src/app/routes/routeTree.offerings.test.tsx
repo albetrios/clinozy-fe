@@ -40,8 +40,6 @@ vi.mock('@/core/rbac/guards.ts', () => ({
 }));
 vi.mock('@/app/guards/org-gates.ts', () => ({
   requireOrgStatus: vi.fn(),
-  requirePersonalDashboardWorkspace: vi.fn().mockResolvedValue(undefined),
-  requirePersonalDeployment: vi.fn(),
   requireProvisionedWorkspace: vi.fn().mockResolvedValue(undefined),
   requireSuspendedOrgStatus: vi.fn(),
   requireTeamDeployment: vi.fn(),

@@ -11,7 +11,7 @@ import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summar
 
 /**
  * Both server queries a logo is rendered from — the organization list (switcher,
- * dashboard, General panel) and me/context — invalidated together so neither
+ * picker, General panel) and me/context — invalidated together so neither
  * keeps the old one.
  */
 const LOGO_DEPENDENT_KEYS = [myOrganizationsQueryKey, meContextQueryKey];

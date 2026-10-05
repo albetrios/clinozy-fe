@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
-import { House, LayoutDashboard } from '@/shared/icons/index.ts';
+import { House } from '@/shared/icons/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -47,18 +47,13 @@ const room = (section: string): NavRoute => ({
   fullPath: `${ORG}/${section}`,
   manifest: manifest(section, { id: section, section }, `clinic-${section}`),
 });
-const orgDashboard: NavRoute = {
-  fullPath: `${ORG}/dashboard`,
-  manifest: manifest('dashboard', { id: 'dashboard' }, 'billing'),
-};
-const personalDashboard: NavRoute = { ...orgDashboard, fullPath: '/dashboard' };
 const enabled = () => true;
 const ids = (entries: { id: string }[]) => entries.map((entry) => entry.id);
 
 describe('navCandidates', () => {
-  it('lists the clinic rooms in section order, without the template Dashboard', () => {
-    const routes = [room('users'), orgDashboard, room('today'), room('leads')];
-    const entries = navCandidates(routes, 'organization', enabled);
+  it('lists the clinic rooms in section order', () => {
+    const routes = [room('users'), room('today'), room('leads')];
+    const entries = navCandidates(routes, enabled);
     expect(ids(entries)).toEqual(['today', 'leads', 'users']);
     expect(entries[0]).toMatchObject({
       to: `${ORG}/today`,
@@ -70,29 +65,17 @@ describe('navCandidates', () => {
     });
   });
 
-  it('falls back to the Dashboard when the deployment enables no clinic room', () => {
-    const routes = [room('today'), room('leads'), orgDashboard];
-    const entries = navCandidates(
-      routes,
-      'organization',
-      (key) => !key.startsWith('clinic-'),
-    );
-    expect(ids(entries)).toEqual(['dashboard']);
-    expect(entries[0]).toMatchObject({
-      section: null,
-      icon: LayoutDashboard,
-      labelNs: 'layout',
-    });
+  it('lists nothing when the deployment enables no clinic room (D8)', () => {
+    const routes = [room('today'), room('leads')];
+    expect(navCandidates(routes, (key) => !key.startsWith('clinic-'))).toEqual([]);
   });
 
-  it('keeps the personal tree apart from the organization tree', () => {
-    const routes = [room('today'), orgDashboard, personalDashboard];
-    expect(navCandidates(routes, 'personal', enabled)).toMatchObject([
-      { id: 'dashboard', to: '/dashboard' },
-    ]);
+  it('lists only the rooms under the organization shell', () => {
+    const outside: NavRoute = { ...room('today'), fullPath: '/today' };
+    expect(ids(navCandidates([outside, room('leads')], enabled))).toEqual(['leads']);
   });
 
-  it('drops a disabled room, an unknown section and an unknown template page', () => {
+  it('drops a disabled room, an unknown section and a route outside the nav', () => {
     const routes = [
       room('today'),
       room('leads'),
@@ -100,17 +83,16 @@ describe('navCandidates', () => {
         fullPath: `${ORG}/wards`,
         manifest: manifest('wards', { id: 'wards', section: 'wards' }),
       },
-      { fullPath: `${ORG}/reports`, manifest: manifest('reports', { id: 'reports' }) },
       { fullPath: `${ORG}/inbox`, manifest: manifest('inbox', undefined) },
     ];
-    expect(
-      ids(navCandidates(routes, 'organization', (key) => key !== 'clinic-leads')),
-    ).toEqual(['today']);
+    expect(ids(navCandidates(routes, (key) => key !== 'clinic-leads'))).toEqual([
+      'today',
+    ]);
   });
 });
 
 function Probe() {
-  const nav = useAppNav('organization');
+  const nav = useAppNav();
   return (
     <output data-testid="nav">
       {nav.isResolved ? ids(nav.entries).join(',') : 'pending'}
@@ -121,14 +103,13 @@ function Probe() {
 function renderNav() {
   const root = createRootRoute({ component: () => <Outlet /> });
   const org = createRoute({ getParentRoute: () => root, path: ORG, component: Probe });
-  const children = [room('users'), room('today'), room('leads'), orgDashboard].map(
-    (route) =>
-      createRoute({
-        getParentRoute: () => org,
-        path: route.manifest.segment,
-        staticData: { manifest: route.manifest },
-        component: () => null,
-      }),
+  const children = [room('users'), room('today'), room('leads')].map((route) =>
+    createRoute({
+      getParentRoute: () => org,
+      path: route.manifest.segment,
+      staticData: { manifest: route.manifest },
+      component: () => null,
+    }),
   );
   const router = createRouter({
     routeTree: root.addChildren([org.addChildren(children)]),

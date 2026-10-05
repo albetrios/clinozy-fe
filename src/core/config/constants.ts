@@ -19,7 +19,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     /** Current user profile lives in the users domain, not auth. */
     ME: '/users/me',
-    /** Stamp onboarding as finished (idempotent) so post-login routing lands on the dashboard. */
+    /** Stamp onboarding as finished (idempotent) so post-login routing lands in the workspace. */
     ONBOARDING_COMPLETE: '/users/me/onboarding/complete',
     /** Complete the login second factor: POST { mfa_session_token, code } → token. */
     MFA_LOGIN: '/auth/mfa/login',

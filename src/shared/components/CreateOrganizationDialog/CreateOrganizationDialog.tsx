@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome } from '@/lib/routes/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Dialog,
@@ -46,7 +46,7 @@ interface CreateOrganizationDialogProps {
 /**
  * Dialog to create a new organization from anywhere in the app shell. On
  * success it refreshes the organization list and navigates to the new
- * organization's dashboard — the `$organizationSlug` guard syncs context,
+ * organization's home — the `$organizationSlug` guard syncs context,
  * persists the choice, and loads permissions. Works uncontrolled (with a
  * trigger) or controlled (via `open` / `onOpenChange`).
  */
@@ -138,7 +138,7 @@ export function CreateOrganizationDialog({
         // overwrote the organization the user was in, so Back from the new one
         // skipped straight past it. Switching through the switcher or the command
         // palette already pushes — creating is a switch too.
-        await navigate(organizationDashboard(org.slug));
+        await navigate(organizationHome(org.slug));
       } catch {
         // Created, but the hop into it failed. Say exactly that — the new
         // organization is already in the switcher, so the user is one click

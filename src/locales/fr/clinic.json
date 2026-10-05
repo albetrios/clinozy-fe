@@ -1437,5 +1437,9 @@
     "title": "Aperçu avant impression · {{title}}",
     "close": "Fermer",
     "print": "Imprimer / Enregistrer en PDF"
+  },
+  "clinicHomeEmpty": {
+    "title": "Rien n’est encore activé ici",
+    "description": "Les sections de votre clinique apparaîtront ici dès qu’elles seront activées pour vous."
   }
 }

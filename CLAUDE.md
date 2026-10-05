@@ -173,7 +173,7 @@ Every directory under `src/pages/` that corresponds to a frontend URL path **mus
 
 **The rule in five lines (read this first):**
 
-1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/dashboard` → `pages/organization/$organizationSlug/dashboard/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders — except a **param-only leaf**, which owns the param in its route path instead of a `$param/` folder (`accept-invite/` owns `/accept-invite/$invitationId` flat because the parent segment has no page of its own). Exceptions: `/` is a pure resolver route (redirect only, no island); app-shell routes with no feature island — `/unauthorized`, the `$` 404 splat (`UnauthorizedPage`/`NotFoundPage`), and the personal-mode `/dashboard` shell (deployment-mode split, reuses the org dashboard island) — live in `src/app/routes/`, not `src/pages/`.
+1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/today` → `pages/organization/$organizationSlug/today/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders — except a **param-only leaf**, which owns the param in its route path instead of a `$param/` folder (`accept-invite/` owns `/accept-invite/$invitationId` flat because the parent segment has no page of its own). Exceptions: `/` is a pure resolver route (redirect only, no island), and so is the retired `/dashboard` (a redirect to `/`); app-shell routes with no feature island — `/unauthorized` and the `$` 404 splat (`UnauthorizedPage`/`NotFoundPage`) — live in `src/app/routes/`, not `src/pages/`.
 2. **Every page folder maintains the same 4 files** — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `Layout`), `<PAGE>.OVERVIEW.md` — plus 2 registrations: `routeTree.tsx` and `docs/reference/routes-and-ui.md`. In `$param` folders the prefix derives mechanically: strip `$`, kebab-case (`$organizationSlug/` → `organization-slug.route.tsx`, `ORGANIZATION_SLUG.OVERVIEW.md`).
 3. **Page shells live in `shared/layouts/`** — AuthLayout via the pathless `auth-shell` route; AppLayout via the `pages/organization/$organizationSlug/` layout island (the org guard boundary). No grouping directories under `pages/`.
 4. **Code used by 2+ page islands lives in `shared/`** (e.g. `shared/api/auth-api.ts`, `shared/tenancy/`).
@@ -199,10 +199,10 @@ src/pages/
     ├── OrganizationPickerPage.tsx
     └── $organizationSlug/             ← /organization/acme — org guard boundary
         ├── organization-slug.route.tsx     ($param folder → strip-$ kebab prefix)
-        ├── organization-slug.manifest.ts       kind: 'layout', children: [dashboard, suspended]
+        ├── organization-slug.manifest.ts       kind: 'layout', children: [suspended, today, …]
         ├── OrganizationLayout.tsx        mounts shared AppLayout
         ├── ORGANIZATION_SLUG.OVERVIEW.md
-        ├── dashboard/               ← …/dashboard — full island (api, contracts, hooks/, components/)
+        ├── today/                   ← …/today — full island; the role home for most roles (D25)
         ├── suspended/               ← …/suspended — status-guard target
         └── patients/                ← (example) future islands nest directly: patients/$patientId/…
 ```

@@ -1,6 +1,7 @@
 import type { NavigateFn } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 
+import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { CommandGroup } from '@/shared/components/ui/command.tsx';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
 import { Building, Check, User } from '@/shared/icons/index.ts';
@@ -43,10 +44,11 @@ export function CommandPaletteOrgGroup({
   const switchingRef = useRef(false);
   const organizations = useMyOrganizationSummaries().data ?? [];
 
-  // A personal workspace has no slug — it is reached at the root `/dashboard`,
-  // not `/organization/<slug>/dashboard`. The old `.filter((org) => org.slug)`
-  // therefore dropped it silently: the one workspace a user cannot navigate to
-  // by URL was the one the palette would not list (SHELL-12).
+  // A personal workspace has no slug — no `/organization/<slug>` reaches it, so
+  // switching to it lands on the `/organization` picker. The old
+  // `.filter((org) => org.slug)` therefore dropped it silently: the one
+  // workspace a user cannot navigate to by URL was the one the palette would
+  // not list (SHELL-12).
   const entries = organizations.filter((org) =>
     org.type === 'PERSONAL' ? personalOrganizationsEnabled : Boolean(org.slug),
   );
@@ -85,13 +87,10 @@ export function CommandPaletteOrgGroup({
         await switchToPersonal();
         // No slug to drive the guard, so the switch has to happen first —
         // mirrors what OrganizationSwitcher does for the same destination.
-        await navigate({ to: '/dashboard' });
+        await navigate(organizationPicker());
       } else {
         if (!org.slug) return;
-        await navigate({
-          to: '/organization/$organizationSlug/dashboard',
-          params: { organizationSlug: org.slug },
-        });
+        await navigate(organizationHome(org.slug));
       }
       // Dismiss only once the destination is actually mounted. Dismissing on
       // select is what made a switch look like nothing at all: the palette

@@ -187,10 +187,9 @@ Use the animation kit from `@/lib/animations/` (everything here respects
   `@/shared/components/Spinner/index.ts`, which follows the Icon library setting and is
   `aria-hidden` because the text or `aria-busy` control beside it does the announcing.
   Never hand-roll `animate-spin` on an icon.
-- `useAnimeCountUp` — Anime.js number count-up (dashboard stats).
 - `prefersReducedMotion` — gate custom motion on the user's setting.
 
-Richer motion (dashboard, onboarding steps) is built with Anime.js (`animejs`) —
+Richer motion (onboarding steps) is built with Anime.js (`animejs`) —
 see the `animejs` skill.
 
 ## React Performance (Vite SPA)

@@ -46,9 +46,6 @@
     "logOut": "Sair",
     "toggleSidebar": "Alternar barra lateral",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Painel"
-    },
     "sidebar": {
       "workspace": "Espaço de trabalho",
       "menu": "Menu",
@@ -94,7 +91,6 @@
       "placeholder": "Pesquisar ou ir para…",
       "empty": "Nenhum resultado encontrado.",
       "groups": {
-        "navigation": "Navegação",
         "theme": "Tema",
         "account": "Conta",
         "organizations": "Organizações",

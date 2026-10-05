@@ -1328,10 +1328,9 @@
      nothing is round. Primitives first, then `pill`: the opt-in slot for
      app-level chips, count badges, icon discs and tracks. Status dots (≤ 10px)
      and blurred glows are indicators, not surfaces, and deliberately do not
-     opt in. The vendored carousel RE-SLOTS its arrow <Button>s, so `button`
-     above no longer matches them — found by the browser sweep
-     (theme-shape.e2e), not by reading: the class string says `rounded-full`,
-     the slot says nothing. */
+     opt in. A vendored primitive that RE-SLOTS its own <Button>s needs its
+     slot here too — `button` above no longer matches them (theme-shape.e2e
+     measures it; the class string says `rounded-full`, the slot says nothing). */
   [data-slot='badge'],
   [data-slot='avatar'],
   [data-slot='avatar-fallback'],
@@ -1342,8 +1341,6 @@
   [data-slot='progress-indicator'],
   [data-slot='input-otp-slot'],
   [data-slot='floating-edge'],
-  [data-slot='carousel-previous'],
-  [data-slot='carousel-next'],
   [data-slot='kbd'],
   [data-slot='pill']
 ),

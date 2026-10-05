@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   authenticateViaEmailCodeAndLand,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import {
   openAccountMenu,
@@ -12,10 +12,10 @@ import {
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
- * Account settings + header UX for a signed-in (personal) account: profile edit
- * with its confirm dialog, the sessions and notifications sections, the
- * danger-zone delete confirmation, and the notification center popover. These
- * are personal-account surfaces, so a plain registration is enough.
+ * Account settings + header UX for a signed-in account: profile edit with its
+ * confirm dialog, the sessions and notifications sections, the danger-zone
+ * delete confirmation, and the notification center popover. These are account
+ * surfaces — the same in any workspace — so a plain registration is enough.
  */
 
 test.describe('Account settings', () => {
@@ -24,7 +24,7 @@ test.describe('Account settings', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
   });
 
   test('profile section renders the form and saves through the confirm dialog', async ({
@@ -155,7 +155,7 @@ test.describe('Account settings — search', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'profile');
     await expect(page.getByTestId('settings-section-profile')).toBeVisible({
       timeout: 15000,

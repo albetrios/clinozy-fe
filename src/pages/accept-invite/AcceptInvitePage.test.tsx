@@ -191,7 +191,7 @@ describe('AcceptInvitePage', () => {
       );
     });
 
-    it('still opens the dashboard when the switch succeeds', async () => {
+    it('still opens the clinic home when the switch succeeds', async () => {
       renderWithProviders(<AcceptInvitePage />);
 
       expect(await screen.findByTestId('accept-invite-success')).toBeInTheDocument();
@@ -199,7 +199,7 @@ describe('AcceptInvitePage', () => {
         () =>
           expect(navigateMock).toHaveBeenCalledWith(
             expect.objectContaining({
-              to: '/organization/$organizationSlug/dashboard',
+              to: '/organization/$organizationSlug',
               params: { organizationSlug: 'acme' },
               replace: true,
             }),

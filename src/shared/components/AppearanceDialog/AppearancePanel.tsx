@@ -47,7 +47,6 @@ import {
   ACCENT_INTENSITIES,
   BASE_COLORS,
   CONTRAST_MODES,
-  DASHBOARD_VARIANTS_CATALOG,
   DENSITY_SCALES,
   ELEVATION_LEVELS,
   FOCUS_RINGS,
@@ -62,7 +61,6 @@ import {
   LAYOUT_WIDTHS,
   MENU_STYLES,
   MOTION_PRESETS,
-  nextDashboardVariant,
   nextToastVariant,
   normalizeLook,
   oklchToHex,
@@ -766,64 +764,6 @@ function LayoutWidthCard() {
   );
 }
 
-/** The dashboard's arrangement. */
-function DashboardVariantCard() {
-  const { t: tAppearance } = useTranslation(APPEARANCE_NS);
-  const dashboardVariant = useThemeStore((s) => s.dashboardVariant);
-  const setDashboardVariant = useThemeStore((s) => s.setDashboardVariant);
-  const shuffleDashboard = () =>
-    setDashboardVariant(nextDashboardVariant(dashboardVariant));
-  return (
-    <Card data-testid="dashboard-variant-card">
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.dashboardTitle)}
-        </CardTitle>
-        <CardDescription>
-          {tAppearance(APPEARANCE_KEYS.dashboardDescription)}
-        </CardDescription>
-        <CardAction>
-          <SectionShuffle
-            onClick={shuffleDashboard}
-            label={tAppearance(APPEARANCE_KEYS.sectionDashboard)}
-            testId="shuffle-dashboard"
-          />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <FieldLabel>{tAppearance(APPEARANCE_KEYS.dashboardArrangement)}</FieldLabel>
-        <Choices
-          ariaLabel={tAppearance(APPEARANCE_KEYS.dashboardArrangement)}
-          value={
-            (
-              DASHBOARD_VARIANTS_CATALOG[dashboardVariant] ??
-              DASHBOARD_VARIANTS_CATALOG[0]
-            ).id
-          }
-          options={DASHBOARD_VARIANTS_CATALOG.map(({ id, label }) => ({ id, label }))}
-          onPick={(value) =>
-            setDashboardVariant(
-              Math.max(
-                0,
-                DASHBOARD_VARIANTS_CATALOG.findIndex((option) => option.id === value),
-              ),
-            )
-          }
-          testPrefix="dashboard-variant"
-        />
-        <p className="text-muted-foreground text-xs leading-relaxed">
-          {
-            (
-              DASHBOARD_VARIANTS_CATALOG[dashboardVariant] ??
-              DASHBOARD_VARIANTS_CATALOG[0]
-            ).description
-          }
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
 /** Density, contrast, elevation, separation, motion and the focus ring. */
 function SurfaceCard() {
   const { t: tAppearance } = useTranslation(APPEARANCE_NS);
@@ -1097,7 +1037,6 @@ export function AppearancePanel() {
       <TypographyCard />
       <IconsCard />
       {platformConfig.layoutWidthForced === null ? <LayoutWidthCard /> : null}
-      <DashboardVariantCard />
       <SurfaceCard />
       <NotificationsCard />
       <CustomLookNote />

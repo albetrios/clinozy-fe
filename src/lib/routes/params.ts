@@ -11,7 +11,8 @@ import { z } from 'zod';
 /**
  * Organization slug as it appears in team URLs: human-readable, lowercase
  * alphanumeric with internal hyphens (1–64 chars). Team orgs carry a slug;
- * personal orgs have none and live on root `/dashboard` instead (FE-22).
+ * personal orgs have none (FE-22) — a personal workspace lands on the
+ * `/organization` picker.
  */
 const organizationSlugParamSchema = z
   .string()

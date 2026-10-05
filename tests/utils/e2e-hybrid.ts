@@ -84,7 +84,7 @@ export async function fillEmailVerificationCode(
     .toBeEnabled({ timeout: 5000 })
     .catch(() => undefined);
 
-  const leftLogin = page.waitForURL(/\/(onboarding|dashboard|organization\/)/, {
+  const leftLogin = page.waitForURL(/\/(onboarding|organization(?:[/?#]|$))/, {
     timeout: 15000,
   });
 

@@ -166,7 +166,7 @@ export async function createSessionViaEmailCode(
 
   // Stamp onboarding complete (idempotent) — mirrors the wizard's finish step.
   // Without it the fail-closed workspace guard bounces API-minted sessions to
-  // `/onboarding` instead of the dashboard the specs navigate to.
+  // `/onboarding` instead of the clinic the specs navigate to.
   const complete = await withApiRetry(() =>
     api.post(`${API}${API_ENDPOINTS.AUTH.ONBOARDING_COMPLETE}`, {
       headers: { ...e2eAuthHeaders(), Authorization: `Bearer ${accessToken}` },

@@ -104,11 +104,11 @@ function createDestinationRouter(
     path: '/login',
     component: LoginComponent,
   });
-  const dashboardRoute = createRoute({
+  const pickerRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/dashboard',
-    ...hold('/dashboard'),
-    component: () => <div data-testid="dest-dashboard" />,
+    path: '/organization',
+    ...hold('/organization'),
+    component: () => <div data-testid="dest-picker" />,
   });
   const onboardingRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -116,10 +116,10 @@ function createDestinationRouter(
     ...hold('/onboarding'),
     component: () => <div data-testid="dest-onboarding" />,
   });
-  const orgDashboardRoute = createRoute({
+  const orgHomeRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '/organization/$organizationSlug/dashboard',
-    component: () => <div data-testid="dest-org-dashboard" />,
+    path: '/organization/$organizationSlug',
+    component: () => <div data-testid="dest-org-home" />,
   });
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -129,9 +129,9 @@ function createDestinationRouter(
   const tree = rootRoute.addChildren([
     indexRoute,
     loginRoute,
-    dashboardRoute,
+    pickerRoute,
     onboardingRoute,
-    orgDashboardRoute,
+    orgHomeRoute,
   ]);
   return createRouter({
     routeTree: tree,
@@ -228,9 +228,9 @@ describe('AuthEmailPanel', () => {
   });
 
   // Regression: a returning user with an active team org must land DIRECTLY on
-  // that org's dashboard — not bounce through the `/` resolver, which re-fetches
+  // that org's home — not bounce through the `/` resolver, which re-fetches
   // me/context and keeps `/login` mounted for the round-trip (flash of login).
-  it('navigates straight to the active org dashboard, not through `/`', async () => {
+  it('navigates straight to the active org home, not through `/`', async () => {
     vi.mocked(queryClient.getQueryData).mockReturnValueOnce({
       user: {
         id: 'usr_1',
@@ -255,7 +255,7 @@ describe('AuthEmailPanel', () => {
         createdAt: TS,
         updatedAt: TS,
       },
-      // Member can read the team org → lands on its dashboard (not the picker).
+      // Member can read the team org → lands on its home (not the picker).
       myPermissions: ['organization:read'],
       globalRole: null,
       organizations: [],
@@ -267,7 +267,7 @@ describe('AuthEmailPanel', () => {
     await verifyWith(router);
 
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/dashboard'),
+      expect(router.state.location.pathname).toBe('/organization/acme'),
     );
     expect(screen.queryByTestId('auth-email-verify-panel')).not.toBeInTheDocument();
   });

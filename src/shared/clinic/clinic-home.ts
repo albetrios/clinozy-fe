@@ -63,7 +63,8 @@ export function clinicHomeSection(
  * an unknown in-org path send them here (`S:115`). Uses the access in force —
  * their staff profile's roles, View-as included, the Users room by their
  * clinozy-be codes (D17) — and the deployment's enabled modules; null when no
- * clinic room is open, and the caller falls back to the dashboard.
+ * clinic room is open, and the org home shows its "nothing is switched on"
+ * state instead (L-63).
  */
 export async function clinicHomeRoute(organizationSlug: string) {
   const { permissions } = useOrganizationStore.getState();

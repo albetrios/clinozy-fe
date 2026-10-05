@@ -1,9 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import {
-  createTeamOrgAndOpenDashboard,
+  createTeamOrgAndOpenToday,
   openOrganizationSwitcher,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
 
@@ -28,16 +28,22 @@ test.describe('Organization picker', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
   });
 
-  test('redirects provisioned personal users to dashboard', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+  test('lists a provisioned member’s clinic and leads back into it', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const slug = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
     await navigateAuthenticated(page, '/organization');
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+
+    await page.getByTestId(`organization-picker-option-${slug ?? ''}`).click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug ?? ''}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible();
   });
 
   test('the switcher opens an accessible menu and closes on Escape', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
     await openOrganizationSwitcher(page);
 
     const option = page.getByTestId(`organization-switcher-option-${slug}`);
@@ -50,7 +56,7 @@ test.describe('Organization picker', () => {
   });
 
   test('the create-organization action opens the create dialog', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     const trigger = await headerSwitcher(page);
     test.skip(trigger === null, NO_HEADER_SWITCHER);
     await trigger?.click();
@@ -79,7 +85,7 @@ test.describe('Organization picker', () => {
   test('an invalid Workspace URL is explained, not silently refused', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     const trigger = await headerSwitcher(page);
     test.skip(trigger === null, NO_HEADER_SWITCHER);
     await trigger?.click();
@@ -108,8 +114,8 @@ test.describe('Organization picker', () => {
   });
 
   test('organization switcher lists team org after create', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
     await openOrganizationSwitcher(page);
     await expect(page.getByTestId(`organization-switcher-option-${slug}`)).toBeVisible({
       timeout: 10000,

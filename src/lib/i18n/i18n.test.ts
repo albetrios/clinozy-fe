@@ -39,7 +39,6 @@ describe('Arabic plural categories', () => {
     [I18N_NAMESPACES.onboarding, 'toast.finishSuccessWithInvites'],
     [I18N_NAMESPACES.onboarding, 'toast.invitePartialFailure'],
     [I18N_NAMESPACES.onboarding, 'done.invitesPending'],
-    [I18N_NAMESPACES.dashboard, 'members.description'],
     [I18N_NAMESPACES.settings, 'security.overview.passkeysOn'],
     [I18N_NAMESPACES.settings, 'panels.roles.memberCount'],
   ] as const;
@@ -126,7 +125,6 @@ describe('plural coverage in every locale', () => {
     [I18N_NAMESPACES.onboarding, 'toast.finishSuccessWithInvites'],
     [I18N_NAMESPACES.onboarding, 'toast.invitePartialFailure'],
     [I18N_NAMESPACES.onboarding, 'done.invitesPending'],
-    [I18N_NAMESPACES.dashboard, 'members.description'],
     [I18N_NAMESPACES.settings, 'security.overview.passkeysOn'],
     [I18N_NAMESPACES.settings, 'panels.roles.memberCount'],
   ] as const;

@@ -1415,5 +1415,9 @@
     "title": "Print preview · {{title}}",
     "close": "Close",
     "print": "Print / Save PDF"
+  },
+  "clinicHomeEmpty": {
+    "title": "Nothing is switched on here yet",
+    "description": "Your clinic's sections appear here as soon as they're switched on for you."
   }
 }

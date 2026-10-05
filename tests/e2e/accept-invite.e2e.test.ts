@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  navigateInApp,
-  registerNewUserAndGoToDashboard,
-} from '@/tests/utils/e2e-auth.ts';
+import { navigateInApp, registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { expectLoginFormReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -46,7 +43,7 @@ test.describe('Accept invite', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     // No `?token` — the page reports it without spending an API call.
     await navigateInApp(page, '/accept-invite/inv_expired');

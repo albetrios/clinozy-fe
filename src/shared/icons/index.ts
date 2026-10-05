@@ -19,7 +19,6 @@ import {
   Boxes as LuBoxes,
   Building2 as LuBuilding,
   Calendar as LuCalendar,
-  CalendarDays as LuCalendarDays,
   Camera as LuCamera,
   Check as LuCheck,
   CheckCircle2 as LuCheckCircle,
@@ -40,15 +39,11 @@ import {
   File as LuFile,
   Fingerprint as LuFingerprint,
   FolderOpen as LuFolderOpen,
-  GitBranch as LuGitBranch,
-  Globe as LuGlobe,
   House as LuHouse,
   Image as LuImage,
   Info as LuInfo,
   Keyboard as LuKeyboard,
-  Languages as LuLanguages,
   Laptop as LuLaptop,
-  LayoutDashboard as LuLayoutDashboard,
   LayoutGrid as LuLayoutGrid,
   Link as LuLink,
   ListFilter as LuListFilter,
@@ -89,7 +84,6 @@ import {
   ShieldAlert as LuShieldAlert,
   ShieldCheck as LuShieldCheck,
   SlidersHorizontal as LuSlidersHorizontal,
-  Smartphone as LuSmartphone,
   Sparkles as LuSparkles,
   SquareCheck as LuSquareCheck,
   Star as LuStar,
@@ -158,9 +152,8 @@ export const Bell = makeIcon('Bell', LuBell);
 export const BellOff = makeIcon('BellOff', LuBellOff);
 export const Boxes = makeIcon('Boxes', LuBoxes);
 export const Building = makeIcon('Building', LuBuilding);
-/** Lucide `calendar`: appointments and dates (`CalendarDays` is another glyph). */
+/** Lucide `calendar`: appointments and dates. */
 export const Calendar = makeIcon('Calendar', LuCalendar);
-export const CalendarDays = makeIcon('CalendarDays', LuCalendarDays);
 /** Lucide `camera`: photos and photo uploads. */
 export const Camera = makeIcon('Camera', LuCamera);
 export const Check = makeIcon('Check', LuCheck);
@@ -188,9 +181,7 @@ export const FileIcon = makeIcon('FileIcon', LuFile);
 export const Fingerprint = makeIcon('Fingerprint', LuFingerprint);
 /** Lucide `folder-open`: a patient file's sections. */
 export const FolderOpen = makeIcon('FolderOpen', LuFolderOpen);
-export const GitBranch = makeIcon('GitBranch', LuGitBranch);
 export const Github = makeIcon('Github', LuGithub);
-export const Globe = makeIcon('Globe', LuGlobe);
 /** Lucide `house`: Today, walk-ins and who is in the clinic. */
 export const House = makeIcon('House', LuHouse);
 /** Lucide `image`: photos; named so it never shadows the DOM `Image`. */
@@ -201,8 +192,6 @@ export const Info = makeIcon('Info', LuInfo);
 export const InstagramMark = makeIcon('InstagramMark', LuInstagramMark);
 export const Keyboard = makeIcon('Keyboard', LuKeyboard);
 export const Laptop = makeIcon('Laptop', LuLaptop);
-export const Languages = makeIcon('Languages', LuLanguages);
-export const LayoutDashboard = makeIcon('LayoutDashboard', LuLayoutDashboard);
 /** Lucide `layout-grid`: overviews and browse panels. */
 export const LayoutGrid = makeIcon('LayoutGrid', LuLayoutGrid);
 /** Lucide `link`: links; named so it never shadows the router's `Link`. */
@@ -266,7 +255,6 @@ export const ShieldAlert = makeIcon('ShieldAlert', LuShieldAlert);
 export const Shield = makeIcon('Shield', LuShield);
 export const ShieldCheck = makeIcon('ShieldCheck', LuShieldCheck);
 export const SlidersHorizontal = makeIcon('SlidersHorizontal', LuSlidersHorizontal);
-export const Smartphone = makeIcon('Smartphone', LuSmartphone);
 export const Sparkles = makeIcon('Sparkles', LuSparkles);
 /** Lucide `square-check`: tasks and checked items. */
 export const SquareCheck = makeIcon('SquareCheck', LuSquareCheck);

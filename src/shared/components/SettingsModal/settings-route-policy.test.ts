@@ -11,8 +11,8 @@ describe('isSettingsPathAllowed', () => {
   });
 
   it('allows settings on app surfaces', () => {
-    expect(isSettingsPathAllowed('/dashboard')).toBe(true);
-    expect(isSettingsPathAllowed('/organization/acme/dashboard')).toBe(true);
+    expect(isSettingsPathAllowed('/organization/acme')).toBe(true);
+    expect(isSettingsPathAllowed('/organization/acme/today')).toBe(true);
     expect(isSettingsPathAllowed('/organization')).toBe(true);
   });
 });

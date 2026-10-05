@@ -34,7 +34,7 @@ const {
 /*
  * Only `useNavigate` is stubbed; the rest of the router is real because
  * renderWithProviders mounts a RouterProvider. The harness route tree has no
- * /dashboard, so a real navigation renders "Not Found" and unmounts the
+ * clinic routes, so a real navigation renders "Not Found" and unmounts the
  * switcher — which would make the post-success latch test pass for the wrong
  * reason, by removing the component whose mounted state is the point.
  */
@@ -325,7 +325,7 @@ describe('OrganizationSwitcher', () => {
        * row can act as the progress indicator — but the menu was UNCONTROLLED,
        * so nothing ever closed it again. Team → team is a param change on the
        * `$organizationSlug` shell this control lives inside, which keeps the
-       * component mounted, so the menu hung open over the new dashboard.
+       * component mounted, so the menu hung open over the new clinic.
        *
        * `useNavigate` is stubbed at module level ON PURPOSE (see the top of this
        * file). A real navigation renders "Not Found" and unmounts the switcher,
@@ -426,7 +426,7 @@ describe('OrganizationSwitcher', () => {
     it('re-arms the latch after a SUCCESSFUL switch (the component stays mounted)', async () => {
       /*
        * `useNavigate` is stubbed to a no-op ON PURPOSE. The harness router has
-       * no /dashboard route, so a real navigation renders "Not Found" and tears
+       * no clinic route, so a real navigation renders "Not Found" and tears
        * the switcher out — which would make this test pass for the wrong reason,
        * by unmounting the component whose mounted state is the whole point.
        * Production keeps it mounted: team → team is a param change on the

@@ -1437,5 +1437,9 @@
     "title": "Anteprima di stampa · {{title}}",
     "close": "Chiudi",
     "print": "Stampa / Salva PDF"
+  },
+  "clinicHomeEmpty": {
+    "title": "Qui non è ancora attivo nulla",
+    "description": "Le sezioni della tua clinica appariranno qui non appena saranno attivate per te."
   }
 }

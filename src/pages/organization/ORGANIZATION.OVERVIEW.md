@@ -1,8 +1,10 @@
 # `pages/organization` — Organization picker
 
 Route: `/organization`. Lists the signed-in user's organizations; selecting one enters
-`/organization/$organizationSlug/dashboard`. The `/` resolver redirects here when the user has
-organizations but no (valid) last-used one. Spec: `docs/reference/routing-and-tenancy.md`.
+its home, `/organization/$organizationSlug` (the member's role home). The `/` resolver
+redirects here when the user has organizations but no (valid) last-used one, and when the
+active workspace is personal — a personal workspace has no clinic (D44), so the list and
+"Create organization" are its way in. Spec: `docs/reference/routing-and-tenancy.md`.
 
 ## Files
 

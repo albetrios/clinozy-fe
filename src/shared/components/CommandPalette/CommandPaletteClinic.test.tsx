@@ -139,7 +139,7 @@ beforeEach(() => {
   useAuthStore.setState({
     user: { id: 'usr_1', email: 'o@e.com', role: 'user' } as AuthUser,
   });
-  useUIStore.setState({ commandPaletteOpen: true, commandPaletteSeed: '' });
+  useUIStore.setState({ commandPaletteOpen: true });
   signIn('owner');
 });
 afterEach(() => {

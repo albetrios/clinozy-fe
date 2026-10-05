@@ -107,10 +107,10 @@ export function buildWebManifest(): {
     screenshots: [],
     shortcuts: [
       {
-        name: 'Dashboard',
+        name: 'Home',
         short_name: 'Home',
         url: '/',
-        description: 'Go to the main dashboard',
+        description: 'Open your clinic',
       },
     ],
   };

@@ -2,8 +2,8 @@ import userEvent from '@testing-library/user-event';
 import { axe } from 'vitest-axe';
 
 vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
-  const { DASHBOARD_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
-  return { useAppNav: () => DASHBOARD_ONLY_NAV };
+  const { TODAY_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => TODAY_ONLY_NAV };
 });
 vi.mock('@/core/http/fetch-client.ts', () => ({
   apiClient: {
@@ -120,7 +120,7 @@ describe('AppLayout', () => {
     const { findAllByTestId, findByTestId } = renderWithProviders(<AppLayout />);
 
     // nav links render twice by design: sidebar + mobile bottom bar
-    expect(await findAllByTestId('nav-dashboard')).toHaveLength(2);
+    expect(await findAllByTestId('nav-today')).toHaveLength(2);
     expect(await findByTestId('user-menu-trigger')).toBeInTheDocument();
     expect(await findByTestId('search-trigger')).toBeInTheDocument();
   });
@@ -143,7 +143,7 @@ describe('AppLayout', () => {
     expect(await findByTestId('main-content')).toBeInTheDocument();
     expect(await findByTestId('user-menu-trigger')).toBeInTheDocument();
     expect(await findByTestId('search-trigger')).toBeInTheDocument();
-    expect((await findAllByTestId('nav-dashboard')).length).toBeGreaterThanOrEqual(1);
+    expect((await findAllByTestId('nav-today')).length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the icon-rail preview shell (3) with the profile control', async () => {

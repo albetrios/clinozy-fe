@@ -271,11 +271,12 @@ picker starts on the content's `4` gutter. Browser-proven under Compact and Airy
 
 Two traps the slot model has, both found by measuring rather than reading:
 
-- **A vendored primitive can re-slot a `<Button>`.** `ui/carousel` renders its arrows as
-  `<Button data-slot="carousel-previous">`, so the `button` rule no longer matches them.
-  A primitive that is round by design needs **its own** slot in the Sharp list.
+- **A vendored primitive can re-slot a `<Button>`.** `ui/carousel` (removed with the old
+  dashboard, L-63) rendered its arrows as `<Button data-slot="carousel-previous">`, so the
+  `button` rule no longer matched them. A primitive that is round by design needs **its
+  own** slot in the Sharp list.
 - **A placeholder needs the corners of the thing it stands in for.** `lib/animations`
-  ships the skeletons the dashboard actually loads with; both carry
+  ships the skeletons the shell actually loads with; both carry
   `data-slot="skeleton"` like `ui/skeleton`, or a Sharp app paints round and snaps square.
 
 Allowlisted exceptions live in `tooling/validate/theme-axis-allowlist.txt` — prefer a
@@ -287,8 +288,8 @@ spelling, every allowed one) via `pnpm test:github-scripts`.
 
 **The gate reads class strings; only a browser can read corners.**
 `tests/e2e/theme-shape.e2e.test.ts` seeds radius **None** + shape **Sharp**, then asks
-for the computed `border-radius` of every painted element on the sign-in screen, the
-dashboard (desktop and phone shell) and the open overlays (settings, appearance,
+for the computed `border-radius` of every painted element on the sign-in screen,
+Today (desktop and phone shell) and the open overlays (settings, appearance,
 notifications). It must come back empty; a control test runs the same sweep on the
 default look and must find corners, and a third proves the **Round** look grows them.
 
@@ -302,7 +303,7 @@ These rules prevent “invisible UI” when themes or motion settings change:
 
 | Rule                                                                   | Where enforced                                                 |
 | ---------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `text-card-foreground` on card surfaces                                | `Card` primitive + custom dashboard/card markup                |
+| `text-card-foreground` on card surfaces                                | `Card` primitive + custom card markup                          |
 | Minimum `text-xs` for product labels/hints                             | `agent-os/rules/fe-tailwind-styling.mdc`, `design.md` §2       |
 | Page transitions use **transform-only** `route-rise` (no opacity fade) | `src/index.css` (`--animate-fade-in-up`), `PageTransition.tsx` |
 

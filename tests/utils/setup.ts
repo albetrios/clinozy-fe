@@ -52,7 +52,7 @@ class ResizeObserverStub {
 }
 globalThis.ResizeObserver ??= ResizeObserverStub as unknown as typeof ResizeObserver;
 
-// jsdom does not implement IntersectionObserver — required by embla-carousel
+// jsdom does not implement IntersectionObserver — required by the load-more sentinel
 class IntersectionObserverStub {
   observe(): void {}
   unobserve(): void {}

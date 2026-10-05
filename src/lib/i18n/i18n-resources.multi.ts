@@ -22,7 +22,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   en: {
     common: () => import('@/locales/en/common.json'),
     layout: () => import('@/locales/en/layout.json'),
-    dashboard: () => import('@/locales/en/dashboard.json'),
     settings: () => import('@/locales/en/settings.json'),
     errors: () => import('@/locales/en/errors.json'),
     auth: () => import('@/locales/en/auth.json'),
@@ -44,7 +43,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   es: {
     common: () => import('@/locales/es/common.json'),
     layout: () => import('@/locales/es/layout.json'),
-    dashboard: () => import('@/locales/es/dashboard.json'),
     settings: () => import('@/locales/es/settings.json'),
     errors: () => import('@/locales/es/errors.json'),
     auth: () => import('@/locales/es/auth.json'),
@@ -66,7 +64,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   zh: {
     common: () => import('@/locales/zh/common.json'),
     layout: () => import('@/locales/zh/layout.json'),
-    dashboard: () => import('@/locales/zh/dashboard.json'),
     settings: () => import('@/locales/zh/settings.json'),
     errors: () => import('@/locales/zh/errors.json'),
     auth: () => import('@/locales/zh/auth.json'),
@@ -88,7 +85,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   fr: {
     common: () => import('@/locales/fr/common.json'),
     layout: () => import('@/locales/fr/layout.json'),
-    dashboard: () => import('@/locales/fr/dashboard.json'),
     settings: () => import('@/locales/fr/settings.json'),
     errors: () => import('@/locales/fr/errors.json'),
     auth: () => import('@/locales/fr/auth.json'),
@@ -110,7 +106,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   de: {
     common: () => import('@/locales/de/common.json'),
     layout: () => import('@/locales/de/layout.json'),
-    dashboard: () => import('@/locales/de/dashboard.json'),
     settings: () => import('@/locales/de/settings.json'),
     errors: () => import('@/locales/de/errors.json'),
     auth: () => import('@/locales/de/auth.json'),
@@ -132,7 +127,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   ja: {
     common: () => import('@/locales/ja/common.json'),
     layout: () => import('@/locales/ja/layout.json'),
-    dashboard: () => import('@/locales/ja/dashboard.json'),
     settings: () => import('@/locales/ja/settings.json'),
     errors: () => import('@/locales/ja/errors.json'),
     auth: () => import('@/locales/ja/auth.json'),
@@ -154,7 +148,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   pt: {
     common: () => import('@/locales/pt/common.json'),
     layout: () => import('@/locales/pt/layout.json'),
-    dashboard: () => import('@/locales/pt/dashboard.json'),
     settings: () => import('@/locales/pt/settings.json'),
     errors: () => import('@/locales/pt/errors.json'),
     auth: () => import('@/locales/pt/auth.json'),
@@ -176,7 +169,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   ar: {
     common: () => import('@/locales/ar/common.json'),
     layout: () => import('@/locales/ar/layout.json'),
-    dashboard: () => import('@/locales/ar/dashboard.json'),
     settings: () => import('@/locales/ar/settings.json'),
     errors: () => import('@/locales/ar/errors.json'),
     auth: () => import('@/locales/ar/auth.json'),
@@ -198,7 +190,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   hi: {
     common: () => import('@/locales/hi/common.json'),
     layout: () => import('@/locales/hi/layout.json'),
-    dashboard: () => import('@/locales/hi/dashboard.json'),
     settings: () => import('@/locales/hi/settings.json'),
     errors: () => import('@/locales/hi/errors.json'),
     auth: () => import('@/locales/hi/auth.json'),
@@ -220,7 +211,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   ko: {
     common: () => import('@/locales/ko/common.json'),
     layout: () => import('@/locales/ko/layout.json'),
-    dashboard: () => import('@/locales/ko/dashboard.json'),
     settings: () => import('@/locales/ko/settings.json'),
     errors: () => import('@/locales/ko/errors.json'),
     auth: () => import('@/locales/ko/auth.json'),
@@ -242,7 +232,6 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
   it: {
     common: () => import('@/locales/it/common.json'),
     layout: () => import('@/locales/it/layout.json'),
-    dashboard: () => import('@/locales/it/dashboard.json'),
     settings: () => import('@/locales/it/settings.json'),
     errors: () => import('@/locales/it/errors.json'),
     auth: () => import('@/locales/it/auth.json'),

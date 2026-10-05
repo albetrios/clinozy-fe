@@ -2,11 +2,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { logout } from '@/shared/auth/service.ts';
-import type { ClinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { SETTINGS_NS } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
-import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useVisibleSettingsSections } from '@/shared/hooks/useSettingsNav/index.ts';
 import {
@@ -38,8 +36,8 @@ export const PALETTE_LOGOUT_TOAST_ID = 'command-palette-logout-failed';
 
 /**
  * The theme rows' labels are translated, so a search for "theme" would reach
- * them in English and nowhere else. Keywords are locale-independent, which is
- * what the dashboard's "Change theme" suggestion seeds the palette with.
+ * them in English and nowhere else. Keywords are locale-independent, so the
+ * rows answer it in every language.
  */
 const THEME_KEYWORDS = ['theme', 'appearance', 'light', 'dark', 'system'] as const;
 
@@ -65,7 +63,7 @@ function matching(groups: CommandRowGroup[], query: string): CommandRowGroup[] {
 
 /** The platform rows, split around the workspace group (a component of its own). */
 export interface PlatformCommandGroups {
-  /** Navigation (outside an organization) and Settings. */
+  /** Settings. */
   leading: CommandRowGroup[];
   /** Shortcuts, Theme and Account. */
   trailing: CommandRowGroup[];
@@ -74,27 +72,18 @@ export interface PlatformCommandGroups {
 /**
  * The palette's platform rows, kept by the relocation table (KICKOFF §3.2):
  * Settings (user, organization and every section the Settings modal would
- * show), Keyboard shortcuts, the three theme modes and Log out — and, outside
- * an organization, the nav, which the clinic lists as "Go to" inside one. Each
- * row answers the query by its label or its keywords.
+ * show), Keyboard shortcuts, the three theme modes and Log out. The rooms are
+ * the clinic's "Go to" group. Each row answers the query by its label or its
+ * keywords.
  *
  * @param runCommand Closes the palette, then runs the command.
- * @param go Closes the palette and navigates.
  */
 export function usePlatformCommandGroups({
   query,
-  inOrganization,
-  navEntries,
-  organizationSlug,
   runCommand,
-  go,
 }: {
   query: string;
-  inOrganization: boolean;
-  navEntries: readonly AppNavEntry[];
-  organizationSlug: string;
   runCommand: (command: () => void) => void;
-  go: (navigation: ClinicCommandNavigation) => void;
 }): PlatformCommandGroups {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tSettings } = useTranslation(SETTINGS_NS);
@@ -125,18 +114,6 @@ export function usePlatformCommandGroups({
   });
 
   const leading: CommandRowGroup[] = [
-    {
-      id: 'navigation',
-      heading: t(cp.groups.navigation),
-      rows: inOrganization
-        ? []
-        : navEntries.map((entry) => ({
-            value: `navigation:${entry.id}`,
-            label: t(entry.labelKey, { ns: entry.labelNs }),
-            icon: entry.icon,
-            onSelect: () => go({ to: entry.to, params: { organizationSlug } }),
-          })),
-    },
     {
       id: 'settings',
       heading: t(cp.settings),

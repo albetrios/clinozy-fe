@@ -157,7 +157,7 @@ async function persistOnboardingResult(input: {
       /*
        * Best-effort by design — a failed profile PATCH must never strand the
        * wizard. Best-effort is not the same as invisible though: the user's name
-       * silently failed to save and the dashboard then greeted them by their
+       * silently failed to save and Today then greeted them by their
        * email prefix, with nothing anywhere to say why (ONB-11).
        *
        * So: reported for us, and said out loud to the user. A warning, not an
@@ -277,7 +277,7 @@ function isOnboardingDirty(input: {
  * the personal fallback: an invited (or pre-provisioned) user finishing the
  * wizard was brought here to join that team — landing them on Personal hides
  * the very workspace they came for. With several teams no single one is the
- * obvious destination, so fall back to personal; the dashboard switcher lists
+ * obvious destination, so fall back to personal; the workspace switcher lists
  * them all.
  *
  * Gate the personal switch on the concrete `personalOrganizationId`, not the
@@ -396,10 +396,10 @@ function navigateAfterOnboarding(
     return navigate({ to: redirectPath, replace: true });
   }
   const target = resolveRootTarget(ctx);
-  if (target.to === '/organization/$organizationSlug/dashboard') {
+  if (target.to === '/organization/$organizationSlug') {
     return navigate({ to: target.to, params: target.params, replace: true });
   }
-  if (target.to === '/dashboard' || target.to === '/organization') {
+  if (target.to === '/organization') {
     return navigate({ to: target.to, replace: true });
   }
   return navigate({ to: '/', replace: true });
@@ -498,7 +498,7 @@ function WizardActions(props: {
         >
           {props.submitting
             ? t(ONBOARDING_KEYS.actions.settingUp)
-            : t(ONBOARDING_KEYS.actions.enterDashboard)}
+            : t(ONBOARDING_KEYS.actions.enterWorkspace)}
         </Button>
       ) : (
         <Button
@@ -562,7 +562,7 @@ function renderStep(
  * That screen is this wizard. Clearing `submitting` the moment `navigate()`
  * was *called* then put the Continue/Enter button back to its idle label, so
  * the finished wizard sat there looking untouched, a success toast beside it
- * and the URL already reading `/dashboard` — indistinguishable from a click
+ * and the URL already reading the destination — indistinguishable from a click
  * that did nothing, and reliably "fixed" by a manual reload (QA-V3-1).
  *
  * Covering it with the same overlay the organization switcher uses says what
@@ -755,7 +755,7 @@ function OnboardingCard({
 /**
  * Multi-step, resumable onboarding wizard. Progress is persisted in
  * {@link useOnboardingStore}; the final step creates the organization, sends any
- * invitations, and navigates to the new organization's dashboard (the
+ * invitations, and navigates to the new organization's home (the
  * `$organizationSlug` guard syncs context, persists, and loads permissions).
  * Step UIs live in `components/` (folder-per-unit).
  */
@@ -813,7 +813,7 @@ export function OnboardingPage() {
    * permissive `DEFAULT_DEPLOYMENT_FLAGS` when it is missing — so a failed
    * me/context silently produced a `personal-and-team` flow: no workspace step,
    * no organization created, onboarding still stamped complete, and the user
-   * dropped on a personal dashboard the deployment may not even have.
+   * dropped on a personal workspace the deployment may not even have.
    *
    * `isError` counts even when a stale `data` is still cached (a background
    * refetch that failed): the wizard would otherwise submit against a context
@@ -859,7 +859,7 @@ export function OnboardingPage() {
    * `finishingRef` only covers the run itself: its `finally` fires the moment
    * `navigateAfterOnboarding` *starts* the navigation, while the destination's
    * guard chain is still awaiting the network. The wizard stays mounted and
-   * interactive for that whole stretch, so a second "Enter dashboard" click
+   * interactive for that whole stretch, so a second "Enter workspace" click
    * re-ran the ENTIRE finish. Org creation is idempotent (cached append +
    * existence check), but the profile PATCH, `completeOnboarding`, the org
    * switch, the analytics event and every invitation went out a SECOND time —
@@ -991,7 +991,7 @@ export function OnboardingPage() {
 
       // Awaited so the profile PATCH lands BEFORE the me/context refetch below —
       // unawaited, the refreshed context could still carry firstName: null and
-      // the dashboard would greet the user by their email prefix instead of the
+      // Today would greet the user by their email prefix instead of the
       // name they just typed. Still best-effort: every failure inside is
       // swallowed, so awaiting can never strand the wizard.
       await persistOnboardingResult({
@@ -1005,7 +1005,7 @@ export function OnboardingPage() {
 
       // Stamp onboarding complete on the backend BEFORE re-reading me/context, so
       // the refreshed context (and every later `/` resolve + workspace guard)
-      // reports onboarding done and routes to the dashboard instead of looping
+      // reports onboarding done and routes to the workspace instead of looping
       // back here. Awaited on purpose: a failure surfaces as the finish error and
       // keeps the user on the wizard to retry, rather than a silent redirect loop.
       const accessToken = getAccessToken();

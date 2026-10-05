@@ -31,7 +31,7 @@ Make **every UI surface respect Appearance / Shuffle config**. Work **one axis (
 2. Find CSS in `src/index.css` (`[data-elevation]`, `[data-separation]`, CSS vars, etc.).
 3. List which **`data-slot`** values the axis targets.
 4. In Appearance, set axis to **each extreme** (e.g. elevation `flat` vs `lifted`, separation `border` vs `shadow`).
-5. Note surfaces to verify: login, dashboard, settings modal, command palette, toast, tables.
+5. Note surfaces to verify: login, Today, settings modal, command palette, toast, tables.
 
 ---
 
@@ -61,7 +61,7 @@ Categorize each hit:
 | E   | System gap                    | Extend `[data-*]` selectors in `index.css`              |
 | F   | Off-scale radius              | Bare `rounded` / `rounded-[3px]` → a named step (`rounded-sm`, `rounded-xs`); gate check 5 |
 | G   | Round by design, no slot      | `rounded-full` on a chip/badge/disc/track → add `data-slot="pill"`; never on dots or glows; gate check 6 |
-| H   | Primitive re-slots a `<Button>` | `ui/carousel` arrows carry `data-slot="carousel-previous"`, so the `button` rule misses them → add the primitive's OWN slot to the axis block |
+| H   | Primitive re-slots a `<Button>` | e.g. the since-removed `ui/carousel`'s arrows carried `data-slot="carousel-previous"`, so the `button` rule missed them → add the primitive's OWN slot to the axis block |
 | I   | Pseudo-element draws the shape  | `before:rounded-full` cannot carry a slot → target `[data-slot='…']::before` in `index.css` |
 | J   | Fixed-size spacing (Density)    | `p-[24px]` / `gap-[6px]` → a scale step (`p-6`, `gap-1.5`); gate check 7. A `p-0` dialog repeats `DialogContent`'s `6` on each of its panes |
 
@@ -105,7 +105,7 @@ it when the audit touches a new screen or overlay. For any other axis with a com
 effect, prefer the same shape of test — sweep + a control on the default look — over a
 manual toggle.
 
-Manual: toggle axis across **all options** on login, dashboard, settings (`#settings/...`), ⌘K, toast.
+Manual: toggle axis across **all options** on login, Today, settings (`#settings/...`), ⌘K, toast.
 
 ---
 

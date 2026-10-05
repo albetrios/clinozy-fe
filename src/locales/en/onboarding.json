@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "You're all set",
-      "description": "Review and jump into your dashboard."
+      "description": "Review and jump into your workspace."
     }
   },
   "welcome": {
@@ -98,7 +98,7 @@
   "actions": {
     "back": "Back",
     "continue": "Continue",
-    "enterDashboard": "Enter dashboard",
+    "enterWorkspace": "Enter workspace",
     "settingUp": "Setting up…"
   },
   "defaults": {

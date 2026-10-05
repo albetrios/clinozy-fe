@@ -1,21 +1,20 @@
 import type { AppNav } from '@/shared/hooks/useAppNav/index.ts';
-import { LayoutDashboard } from '@/shared/icons/index.ts';
-import { APP_NAV_SEGMENT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
+import { House } from '@/shared/icons/index.ts';
 
 /**
- * The nav a template deployment draws — the Dashboard alone — for shell and ⌘K
- * tests that mock `useAppNav` (its own suite covers how the nav is built).
+ * A nav holding one room — Today — for shell and ⌘K tests that mock `useAppNav`
+ * (its own suite covers how the nav is built).
  */
-export const DASHBOARD_ONLY_NAV: AppNav = {
+export const TODAY_ONLY_NAV: AppNav = {
   isResolved: true,
   entries: [
     {
-      id: 'dashboard',
-      to: '/dashboard',
-      section: null,
-      icon: LayoutDashboard,
-      labelNs: LAYOUT_NS,
-      labelKey: APP_NAV_SEGMENT_KEYS.dashboard,
+      id: 'today',
+      to: '/organization/$organizationSlug/today',
+      section: 'today',
+      icon: House,
+      labelNs: 'clinic',
+      labelKey: 'sections.today.label',
       permission: 'organization:read',
     },
   ],

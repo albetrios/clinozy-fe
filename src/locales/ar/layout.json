@@ -46,9 +46,6 @@
     "logOut": "تسجيل الخروج",
     "toggleSidebar": "تبديل الشريط الجانبي",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "لوحة التحكم"
-    },
     "sidebar": {
       "workspace": "مساحة العمل",
       "menu": "القائمة",
@@ -94,7 +91,6 @@
       "placeholder": "ابحث أو انتقل إلى…",
       "empty": "لم يتم العثور على نتائج.",
       "groups": {
-        "navigation": "التنقل",
         "theme": "المظهر",
         "account": "الحساب",
         "organizations": "المؤسسات",

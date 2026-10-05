@@ -14,7 +14,7 @@ export type PageManifest = {
   /** Full pathname this island serves. */
   path: string;
   /**
-   * Human document title for this page ("Sign in", "Dashboard"). Rendered as
+   * Human document title for this page ("Sign in", "Today"). Rendered as
    * `<title>` via the route's `head` (see `manifestHead`) and announced to
    * screen readers by `RouteAnnouncer` on SPA navigations.
    */
@@ -35,17 +35,16 @@ export type PageManifest = {
    */
   onDeny?: 'unauthorized' | 'notFound';
   /**
-   * Primary-nav presence. The app nav (`useAppNav`) lists the routes whose
-   * manifest sets this, read off the route tree (`staticData.manifest`): a
-   * clinic room names its `section`, and its order, label, icon and View
-   * access follow the section; an entry without one is a template page (the
-   * Dashboard), listed only when the deployment enables no clinic room (D25).
+   * Primary-nav presence. The app nav (`useAppNav`) lists the clinic rooms whose
+   * manifest sets this, read off the route tree (`staticData.manifest`): the
+   * room names its `section`, and its order, label, icon and View access
+   * follow the section (D25).
    */
   nav?: {
-    /** The `nav-<id>` test id; a template page's presentation key. */
+    /** The `nav-<id>` test id. */
     id: string;
-    /** The clinic section (`Section` in the clinic contract), for a room. */
-    section?: string;
+    /** The clinic section (`Section` in the clinic contract). */
+    section: string;
   };
   /** `layout` = has `<Outlet />` and `children`; `leaf` = terminal UI. */
   kind: RouteIslandKind;

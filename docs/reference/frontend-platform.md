@@ -91,7 +91,7 @@ gateway(requireSession, requirePermissionGate(...), requireModuleGate(...))
 ```
 
 Protected routes in `routeTree.tsx` call `gatewayFromManifest` where the island
-declares RBAC/module policy (e.g. dashboard). Org-scoped tenancy gates
+declares RBAC/module policy (e.g. a clinic room). Org-scoped tenancy gates
 (`resolveActiveOrg`, `requireOrgStatus`, …) run **before** or **after** per route
 needs — see [`GUARDS.OVERVIEW.md`](../../src/app/guards/GUARDS.OVERVIEW.md).
 
@@ -107,11 +107,11 @@ resolve to `notFound()` (404).
 Deployment env `VITE_DISABLED_MODULES` (comma-separated) disables feature
 surfaces. Manifest `module` keys must match this catalog:
 
-| Key            | Surfaces (today / planned)                                               |
-| -------------- | ------------------------------------------------------------------------ |
-| `billing`      | Dashboard reference manifest; settings billing panel; subscription hooks |
-| `members`      | Members resource registry reference; settings members panel              |
-| `integrations` | Settings integrations panel (planned)                                    |
+| Key            | Surfaces (today / planned)                                  |
+| -------------- | ----------------------------------------------------------- |
+| `billing`      | Settings billing panel; subscription hooks                  |
+| `members`      | Members resource registry reference; settings members panel |
+| `integrations` | Settings integrations panel (planned)                       |
 
 UI should hide nav/settings entries via `isModuleEnabled()` when a module is
 off — routes still 404 via the gateway if linked directly.
@@ -227,7 +227,7 @@ event catalog: **[`docs/integrations/posthog-frontend.md`](../integrations/posth
 ---
 
 Use `shared/components/QueryBoundary` for **server-state panels** (settings
-sections, dashboard widgets) that depend on TanStack Query:
+sections) that depend on TanStack Query:
 
 1. **Wrap the query at the panel boundary** — parent holds `useQuery` / hook;
    child render-prop receives typed `data`.
@@ -241,7 +241,7 @@ sections, dashboard widgets) that depend on TanStack Query:
    uses `errors` namespace.
 
 Migrated panels: `OrganizationMembersPanel`, `OrganizationRolesPanel`,
-`AccountBillingPanel`, `OrganizationGeneralPanel`, dashboard widgets.
+`AccountBillingPanel`, `OrganizationGeneralPanel`.
 
 ---
 

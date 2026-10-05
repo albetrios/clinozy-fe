@@ -780,35 +780,6 @@ export function nextPublicVariant(current: number): number {
 }
 
 /**
- * Dashboard arrangement variants (TEMP preview — see Dashboard variants). The
- * store holds the active index; labels are product nomenclature (untranslated,
- * like the font/width catalogs) for the Appearance picker.
- */
-export const DASHBOARD_VARIANTS_CATALOG = [
-  { id: 'classic', label: 'Classic', description: 'Onboarding-first single column' },
-  {
-    id: 'command',
-    label: 'Command center',
-    description: 'Two columns with a tools rail',
-  },
-  { id: 'pulse', label: 'Pulse', description: 'Analytics-first with the gauge band' },
-  { id: 'bento', label: 'Bento', description: 'Everything at a glance, magazine grid' },
-] as const;
-
-/** How many Dashboard arrangement variants exist (TEMP — see Dashboard variants). */
-const DASHBOARD_VARIANT_COUNT = DASHBOARD_VARIANTS_CATALOG.length;
-
-/**
- * TEMP (dashboard preview): a different arrangement index in 0..N-1. Remove
- * together with the `dashboardVariant` store field + the Dashboard variants.
- */
-export function nextDashboardVariant(current: number): number {
-  // eslint-disable-next-line sonarjs/pseudo-random -- cosmetic layout preview, not security
-  const v = Math.floor(Math.random() * DASHBOARD_VARIANT_COUNT);
-  return v === current ? (v + 1) % DASHBOARD_VARIANT_COUNT : v;
-}
-
-/**
  * TEMP (toast design preview): the available custom-toast designs. The store
  * holds the active index; `CustomToast` maps it to one of these. Remove together
  * with the `toastVariant` store field + the CustomToast design map.
@@ -886,7 +857,7 @@ export const SHUFFLE_TEMP = {
    * OFF. Every other axis here is cosmetic — colour, type, radius, toast style —
    * and repaints in place. This one is structural: each shell is a different
    * component owning its own `<main>`, so rolling it unmounts the routed island
-   * and takes a chart range, a calendar selection and a carousel position with
+   * and takes a room's filters, a calendar selection and a drawer's draft with
    * it. A theme shuffle is not a reason to throw away the user's page state
    * (SHELL-5). The shell variants still exist and are still selectable — they
    * are simply no longer part of a cosmetic dice roll.
@@ -894,8 +865,6 @@ export const SHUFFLE_TEMP = {
   appLayout: false,
   /** Cycle the PublicLayout preview design on shuffle. */
   publicLayout: true,
-  /** Cycle the Dashboard arrangement preview on shuffle. */
-  dashboard: true,
   /** Roll the custom-toast design on shuffle. */
   toastVariant: true,
   /** Roll the toast position on shuffle. */

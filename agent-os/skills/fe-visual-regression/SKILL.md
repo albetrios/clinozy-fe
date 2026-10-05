@@ -21,7 +21,7 @@ extreme values are pinned as pixels.
 - **Determinism is non-negotiable.** Every test inherits
   `page.emulateMedia({ reducedMotion: 'reduce' })` (spec-level `beforeEach`) and
   passes `animations: 'disabled'`. Diff budget: `maxDiffPixelRatio: 0.02` for
-  static screens, `0.03` for data-bearing pages (e.g. dashboard). Do not raise a
+  static screens, `0.03` for data-bearing pages (e.g. Today). Do not raise a
   budget to make a failure pass — that hides the regression the lane exists to
   catch.
 - **A failed visual test is a finding, not an obstacle.** Inspect the
@@ -64,7 +64,7 @@ Do **not** snapshot every axis × every route (matrix explosion), transient stat
 
 Follow the existing spec: `gotoApp(page, '<path>')` +
 `expectAuthScreenReady`/testid wait from `tests/utils/e2e-hybrid.ts`, authenticated
-routes via `registerNewUserAndGoToDashboard` from `tests/utils/e2e-auth.ts`,
+routes via `registerNewUserAndGoToToday` from `tests/utils/e2e-auth.ts`,
 `fullPage: true`, kebab-case snapshot names (`<route>-<variant>.png`). Selector
 conventions stay `fe-playwright-e2e` (hybrid selectors); test ids come from
 `fe-e2e-testids`.

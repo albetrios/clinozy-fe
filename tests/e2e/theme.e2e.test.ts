@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { chooseThemeMode, openAccountMenu } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -17,7 +17,7 @@ test.describe('Theme mode', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
   });
 
   test('switches to dark and back to light', async ({ page }) => {

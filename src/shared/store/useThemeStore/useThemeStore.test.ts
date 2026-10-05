@@ -25,7 +25,6 @@ describe('useThemeStore', () => {
       iconLibrary: 'lucide',
       authVariant: 0,
       appVariant: 0,
-      dashboardVariant: 0,
     });
     const root = document.documentElement;
     delete root.dataset.theme;
@@ -147,12 +146,6 @@ describe('useThemeStore', () => {
     // on; either way the stored index stays a valid variant.
     expect([0, 1, 2]).toContain(state.authVariant);
     expect([0, 1, 2]).toContain(state.appVariant);
-    expect([0, 1, 2, 3]).toContain(state.dashboardVariant);
-  });
-
-  it('setDashboardVariant stores the arrangement index (TEMP preview)', () => {
-    useThemeStore.getState().setDashboardVariant(2);
-    expect(useThemeStore.getState().dashboardVariant).toBe(2);
   });
 
   it('applyThemeSeed reproduces a look from its seed and stores it', () => {
@@ -198,8 +191,8 @@ describe('useThemeStore', () => {
   it('shuffleTheme leaves the app shell alone — it is cosmetic, not structural (SHELL-5)', () => {
     // Every other shuffled axis repaints in place. `appVariant` selects a
     // DIFFERENT shell component, each owning its own <main>, so rolling it
-    // unmounts the routed island and takes the user's chart range, calendar
-    // selection and carousel position with it.
+    // unmounts the routed island and takes a room's filters, a calendar
+    // selection and a drawer's draft with it.
     useThemeStore.setState({ appVariant: 0 });
     for (let i = 0; i < 25; i += 1) useThemeStore.getState().shuffleTheme();
     expect(useThemeStore.getState().appVariant).toBe(0);
@@ -229,12 +222,11 @@ describe('useThemeStore', () => {
     /**
      * The persisted key set, spelled out.
      *
-     * SHELL-9 reports a chosen dashboard arrangement reverting on reload because
-     * `partialize` omitted its axis. No `dashboardVariant` exists on this branch
-     * (see the assertion below), so there is nothing to add — but the shape of
-     * that bug is "a user-chosen axis was left out of `partialize` and nobody
-     * noticed". Pinning the set means the next axis has to be an explicit choice:
-     * add it here and it persists, leave it out and this test says so out loud.
+     * SHELL-9 reported a chosen arrangement reverting on reload because
+     * `partialize` omitted its axis — the shape of that bug is "a user-chosen
+     * axis was left out of `partialize` and nobody noticed". Pinning the set
+     * means the next axis has to be an explicit choice: add it here and it
+     * persists, leave it out and this test says so out loud.
      */
     const PERSISTED_KEYS = [
       'baseId',
@@ -252,12 +244,7 @@ describe('useThemeStore', () => {
     ];
 
     /** Deliberately ephemeral: shuffle-only previews, stripped in `migrate` too. */
-    const EPHEMERAL_KEYS = [
-      'appVariant',
-      'authVariant',
-      'publicVariant',
-      'dashboardVariant',
-    ];
+    const EPHEMERAL_KEYS = ['appVariant', 'authVariant', 'publicVariant'];
 
     function persistedKeys(): string[] {
       const raw = window.localStorage.getItem('theme-preference');
@@ -276,21 +263,6 @@ describe('useThemeStore', () => {
       useThemeStore.getState().setTheme('light');
       const keys = persistedKeys();
       for (const key of EPHEMERAL_KEYS) expect(keys).not.toContain(key);
-    });
-
-    it('treats the dashboard arrangement axis as a preview, not a preference', () => {
-      // This assertion used to read "no dashboard axis exists on this branch",
-      // as a tripwire: whoever added one had to decide whether it persists.
-      // The dashboard shuffle variants added one, so here is that decision.
-      // `dashboardVariant` is shuffle-driven exactly like the other preview
-      // axes and is absent from `partialize`, so it must not survive a reload.
-      expect(Object.keys(useThemeStore.getState())).toContain('dashboardVariant');
-
-      useThemeStore.setState({ dashboardVariant: 2 });
-      useThemeStore.getState().setTheme('dark');
-
-      expect(persistedKeys()).not.toContain('dashboardVariant');
-      expect(persistedKeys()).toEqual(PERSISTED_KEYS);
     });
   });
 });
@@ -556,7 +528,6 @@ describe('useThemeStore — persistence contract', () => {
     expect(persisted).not.toHaveProperty('authVariant');
     expect(persisted).not.toHaveProperty('appVariant');
     expect(persisted).not.toHaveProperty('publicVariant');
-    expect(persisted).not.toHaveProperty('dashboardVariant');
   });
 
   it('rehydrating a named preset re-applies it to the document', () => {
@@ -598,7 +569,6 @@ describe('useThemeStore — shuffle gates', () => {
       authLayout: false,
       appLayout: false,
       publicLayout: false,
-      dashboard: false,
       toastVariant: false,
       toastPosition: false,
     });
@@ -607,7 +577,6 @@ describe('useThemeStore — shuffle gates', () => {
         authVariant: 1,
         appVariant: 2,
         publicVariant: 1,
-        dashboardVariant: 2,
       });
       const before = useThemeStore.getState();
 
@@ -617,7 +586,6 @@ describe('useThemeStore — shuffle gates', () => {
       expect(after.authVariant).toBe(before.authVariant);
       expect(after.appVariant).toBe(before.appVariant);
       expect(after.publicVariant).toBe(before.publicVariant);
-      expect(after.dashboardVariant).toBe(before.dashboardVariant);
       expect(after.toastVariant).toBe(before.toastVariant);
       expect(after.toastPosition).toBe(before.toastPosition);
       // The look itself still rolls — gates only pin the TEMP previews.

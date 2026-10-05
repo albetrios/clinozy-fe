@@ -43,7 +43,7 @@ function deferred() {
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   useRouterState: ({ select }: { select: (state: unknown) => unknown }) =>
-    select({ location: { pathname: '/dashboard' } }),
+    select({ location: { pathname: '/organization/acme/today' } }),
 }));
 vi.mock('@/lib/chunk-prefetch.ts', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
@@ -91,7 +91,6 @@ describe('AppearanceDialogLazy', () => {
       'Colour',
       'Type & shape',
       'Icons',
-      'Dashboard',
       'Surface & motion',
       'Notifications',
     ]) {

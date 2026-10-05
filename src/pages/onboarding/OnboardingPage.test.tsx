@@ -406,7 +406,7 @@ describe('OnboardingPage', () => {
     expect(state.data.firstName).toBe('');
   });
 
-  it('creates the org once and navigates to its dashboard', async () => {
+  it('creates the org once and navigates to its home', async () => {
     const user = userEvent.setup();
     seedDoneStep(['a@acme.com']);
     renderWithProviders(<OnboardingPage />);
@@ -583,7 +583,7 @@ describe('OnboardingPage', () => {
 
       await waitFor(() => expect(navigate).toHaveBeenCalled());
       // The PATCH must land before the refetch, or the refreshed context still
-      // carries firstName: null and the dashboard greets by email prefix.
+      // carries firstName: null and Today greets by email prefix.
       expect(order).toEqual(['updateProfile', 'hydrate']);
     } finally {
       clearAccessToken();
@@ -716,7 +716,7 @@ describe('OnboardingPage', () => {
     expect(inviteMember).not.toHaveBeenCalled();
   });
 
-  it('finishes both mode to personal dashboard without creating a team org', async () => {
+  it('finishes both mode on the organization picker without creating a team org', async () => {
     useHybridSession();
     const user = userEvent.setup();
     const store = useOnboardingStore.getState();
@@ -731,9 +731,10 @@ describe('OnboardingPage', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
     expect(createOrganization).not.toHaveBeenCalled();
     expect(switchToPersonal).toHaveBeenCalledTimes(1);
-    // Lands DIRECTLY on the personal dashboard — no bounce through `/`.
+    // Lands DIRECTLY on the picker — a personal workspace has no clinic (D44) —
+    // with no bounce through `/`.
     expect(navigate).toHaveBeenCalledWith(
-      expect.objectContaining({ to: '/dashboard', replace: true }),
+      expect.objectContaining({ to: '/organization', replace: true }),
     );
   });
 
@@ -759,16 +760,16 @@ describe('OnboardingPage', () => {
     expect(createOrganization).not.toHaveBeenCalled();
     expect(switchToPersonal).not.toHaveBeenCalled();
     // Onboarding is complete, so the resolver routes this personal-mode session to
-    // `/dashboard` directly (the personal workspace self-heals on the next read);
-    // the old `/` fallback only fired when the resolver still wanted onboarding.
+    // the picker directly; the old `/` fallback only fired when the resolver still
+    // wanted onboarding.
     expect(navigate).toHaveBeenCalledWith(
-      expect.objectContaining({ to: '/dashboard', replace: true }),
+      expect.objectContaining({ to: '/organization', replace: true }),
     );
   });
 
   // Mode coverage: personal-only never creates a team org; the personal workspace
-  // exists, so finishing lands DIRECTLY on `/dashboard`.
-  it('personal-only mode finishes directly to the personal dashboard', async () => {
+  // has no clinic (D44), so finishing lands DIRECTLY on the picker.
+  it('personal-only mode finishes directly on the organization picker', async () => {
     const personalOnly = { personalOrganizations: true, teamOrganizations: false };
     deploymentFlagsRef.value = personalOnly;
     hydratedContextRef.value.deploymentFlags = personalOnly;
@@ -791,7 +792,7 @@ describe('OnboardingPage', () => {
     expect(createOrganization).not.toHaveBeenCalled();
     expect(switchToPersonal).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenCalledWith(
-      expect.objectContaining({ to: '/dashboard', replace: true }),
+      expect.objectContaining({ to: '/organization', replace: true }),
     );
   });
 
@@ -981,11 +982,11 @@ describe('OnboardingPage', () => {
      * until unmount. `completeOnboarding` can answer 200 without sticking (the
      * case the ref's own comment names): the destination's workspace guard then
      * redirects the user straight back to `/onboarding`, which does NOT remount
-     * this page. With the latch still armed every further "Enter dashboard"
+     * this page. With the latch still armed every further "Enter workspace"
      * click only replayed a navigation that bounced again — a wizard the user
      * could not complete and could not leave.
      *
-     * So: same journey the router really takes — away to the dashboard, then
+     * So: same journey the router really takes — away to the clinic, then
      * back here — and the next click must run the writes again, not replay.
      */
     const user = userEvent.setup();
@@ -1002,9 +1003,9 @@ describe('OnboardingPage', () => {
       expect(authApi.completeOnboarding).toHaveBeenCalledTimes(1);
       expect(inviteMember).toHaveBeenCalledTimes(1);
 
-      // The router leaves for the dashboard, whose guard refuses us and
+      // The router leaves for the clinic, whose guard refuses us and
       // redirects back — the page stays mounted through both.
-      setRouterPathname('/organization/acme/dashboard');
+      setRouterPathname('/organization/acme/today');
       setRouterPathname('/onboarding');
       expect(screen.getByTestId('onboarding-page')).toBeInTheDocument();
       expect(finishButton).toBeEnabled();
@@ -1031,7 +1032,7 @@ describe('OnboardingPage', () => {
     /*
      * The other half of the gate above: it must arm on SUCCESS only. Armed on
      * every attempt — or held past the failure path — a first attempt that blew
-     * up would leave a brand-new user staring at an "Enter dashboard" button
+     * up would leave a brand-new user staring at an "Enter workspace" button
      * that had quietly stopped doing anything, with no way out of the wizard.
      */
     const user = userEvent.setup();
@@ -1144,7 +1145,7 @@ describe('OnboardingPage', () => {
       // Onboarding still succeeds — the save is best-effort by contract...
       await waitFor(() => expect(navigate).toHaveBeenCalled());
       // ...but the user is told, instead of being greeted by their email prefix
-      // on the dashboard with nothing anywhere to explain it.
+      // on Today with nothing anywhere to explain it.
       await waitFor(() =>
         expect(warningSpy).toHaveBeenCalledWith(
           expect.stringContaining('save your name'),

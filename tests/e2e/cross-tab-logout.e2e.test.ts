@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, clickTestId, expectAppHeaderReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -18,7 +18,7 @@ test.describe('Cross-tab logout', () => {
 
   test('logging out in tab A signs tab B out too', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     // Second tab of the same browser context shares the session.
     const tabB = await context.newPage();

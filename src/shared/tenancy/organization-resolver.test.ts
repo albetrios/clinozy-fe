@@ -4,7 +4,6 @@ import type { MeContext, OrganizationType } from './me-context.ts';
 import {
   resolveRootRedirect,
   resolveRootTarget,
-  workspaceRedirectForPersonalDashboard,
   workspaceRedirectForTeamEntry,
 } from './organization-resolver.ts';
 import { ensureSessionContext } from './session-context.ts';
@@ -33,7 +32,7 @@ function meCtx(
       updatedAt: 't',
     },
     activeOrganization,
-    // A member landing on a team dashboard can read the org — the realistic
+    // A member landing in a clinic's rooms can read the org — the realistic
     // default. Tests for the "can't read the active team org" fallback override
     // this to [].
     myPermissions: ['organization:read'],
@@ -76,9 +75,9 @@ describe('resolveRootRedirect (`/` → active org from me/context)', () => {
     await expect(resolveRootRedirect()).resolves.toEqual({ to: '/organization' });
   });
 
-  it('routes a personal active org to the root /dashboard', async () => {
+  it('routes a personal active org to the organization picker (D44)', async () => {
     vi.mocked(ensureSessionContext).mockResolvedValue(meCtx(activeOrg('PERSONAL', null)));
-    await expect(resolveRootRedirect()).resolves.toEqual({ to: '/dashboard' });
+    await expect(resolveRootRedirect()).resolves.toEqual({ to: '/organization' });
   });
 
   it('routes a team active org to its index, which picks the role home (D25)', async () => {
@@ -114,22 +113,35 @@ describe('resolveRootTarget (dual-URL `/` decision — slug variant)', () => {
     ).toEqual({ to: '/organization' });
   });
 
-  it('routes a personal org to the root /dashboard', () => {
+  it('routes a personal org to the organization picker — a personal workspace has no clinic (D44)', () => {
     expect(resolveRootTarget(meCtx(activeOrg('PERSONAL', null)))).toEqual({
-      to: '/dashboard',
+      to: '/organization',
     });
   });
 
-  it('routes a team org to its slug space', () => {
+  it('routes no active org to the picker when onboarding is done (personal modes too)', () => {
+    expect(resolveRootTarget(meCtx(null))).toEqual({ to: '/organization' });
+  });
+
+  it('routes a team org to its home', () => {
     expect(resolveRootTarget(meCtx(activeOrg('TEAM', 'acme')))).toEqual({
-      to: '/organization/$organizationSlug/dashboard',
+      to: '/organization/$organizationSlug',
       params: { organizationSlug: 'acme' },
     });
   });
 
+  it('routes a personal-only deployment to the picker, whatever is active', () => {
+    expect(
+      resolveRootTarget({
+        ...meCtx(activeOrg('TEAM', 'acme')),
+        deploymentFlags: { personalOrganizations: true, teamOrganizations: false },
+      }),
+    ).toEqual({ to: '/organization' });
+  });
+
   it('lands on the picker (not a dead-end) when the active team org is unreadable', () => {
-    // Regression: a member whose role lacks organization:read used to resolve to
-    // the team dashboard, get bounced to /unauthorized, and loop on "Go Home".
+    // Regression: a member whose role lacks organization:read used to resolve
+    // into the clinic, get bounced to /unauthorized, and loop on "Go Home".
     expect(
       resolveRootTarget({ ...meCtx(activeOrg('TEAM', 'acme')), myPermissions: [] }),
     ).toEqual({ to: '/organization' });
@@ -147,27 +159,6 @@ describe('resolveRootTarget (dual-URL `/` decision — slug variant)', () => {
 });
 
 describe('workspace surface guards (URL vs me/context)', () => {
-  it('blocks personal /dashboard when onboarding is required', () => {
-    expect(workspaceRedirectForPersonalDashboard(meCtx(null, false))).toEqual({
-      to: '/onboarding',
-    });
-  });
-
-  it('allows personal /dashboard when the active org is personal', () => {
-    expect(
-      workspaceRedirectForPersonalDashboard(meCtx(activeOrg('PERSONAL', null))),
-    ).toBeNull();
-  });
-
-  it('redirects personal /dashboard to team slug when that is the active org', () => {
-    expect(
-      workspaceRedirectForPersonalDashboard(meCtx(activeOrg('TEAM', 'acme'))),
-    ).toEqual({
-      to: '/organization/$organizationSlug/dashboard',
-      params: { organizationSlug: 'acme' },
-    });
-  });
-
   it('allows slug-targeted team entry when there is no active org but memberships exist', () => {
     // The slug chain (requireOrganizationContext) validates membership and
     // performs the switch — bouncing to the picker here would break deep links.
@@ -182,14 +173,11 @@ describe('workspace surface guards (URL vs me/context)', () => {
 
   it('allows organization picker when resolver target is organization picker', () => {
     expect(
-      workspaceRedirectForTeamEntry(
-        {
-          ...meCtx(null),
-          organizations: [{ ...activeOrg('TEAM', 'acme'), isActive: false }],
-          deploymentFlags: { personalOrganizations: false, teamOrganizations: true },
-        },
-        { organizationPicker: true },
-      ),
+      workspaceRedirectForTeamEntry({
+        ...meCtx(null),
+        organizations: [{ ...activeOrg('TEAM', 'acme'), isActive: false }],
+        deploymentFlags: { personalOrganizations: false, teamOrganizations: true },
+      }),
     ).toBeNull();
   });
 
@@ -206,12 +194,10 @@ describe('workspace surface guards (URL vs me/context)', () => {
     expect(workspaceRedirectForTeamEntry(meCtx(activeOrg('PERSONAL', null)))).toBeNull();
   });
 
-  it('still routes personal-active sessions off the bare /organization picker', () => {
-    expect(
-      workspaceRedirectForTeamEntry(meCtx(activeOrg('PERSONAL', null)), {
-        organizationPicker: true,
-      }),
-    ).toEqual({ to: '/dashboard' });
+  it('lets personal-active sessions stay on the picker — it is where they land', () => {
+    // It used to bounce them to the personal `/dashboard`; with that space gone
+    // the picker is their landing, so a redirect here would loop.
+    expect(workspaceRedirectForTeamEntry(meCtx(activeOrg('PERSONAL', null)))).toBeNull();
   });
 
   it('still sends slug-targeted team entry to onboarding when the user has not onboarded', () => {

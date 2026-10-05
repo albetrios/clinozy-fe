@@ -46,9 +46,6 @@
     "logOut": "Log out",
     "toggleSidebar": "Toggle sidebar",
     "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Dashboard"
-    },
     "sidebar": {
       "workspace": "Workspace",
       "menu": "Menu",
@@ -94,7 +91,6 @@
       "placeholder": "Search or jump to…",
       "empty": "No results found.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Theme",
         "account": "Account",
         "organizations": "Organizations",

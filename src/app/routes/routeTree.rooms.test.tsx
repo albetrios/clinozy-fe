@@ -53,10 +53,6 @@ vi.mock('@/pages/organization/$organizationSlug/organization-slug.route.tsx', ()
 });
 // The signed-in warm-up's other islands, kept light: it warms onboarding first.
 vi.mock('@/pages/onboarding/onboarding.route.tsx', () => ({ Component: () => null }));
-vi.mock('@/pages/organization/$organizationSlug/dashboard/dashboard.route.tsx', () => ({
-  Component: () => null,
-}));
-vi.mock('@/shared/layouts/AppLayout/index.ts', () => ({ Component: () => null }));
 vi.mock('@/shared/layouts/AppLayout/app-layout-variants.ts', () => ({
   preloadSessionAppShell: vi.fn(() => Promise.resolve()),
 }));

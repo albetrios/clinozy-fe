@@ -2,9 +2,9 @@ import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import {
-  createTeamOrgAndOpenDashboard,
+  createTeamOrgAndOpenToday,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, openAccountMenu, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
@@ -33,8 +33,8 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     page,
   }) => {
     test.setTimeout(150_000);
-    await registerNewUserAndGoToDashboard(page);
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
 
     // The switcher is what this test reads the new name from: the Account menu's
     // "Switch clinic" row, which names the active workspace once there are two.
@@ -83,17 +83,18 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     // organization can render its blocked state without redirect-looping. That
     // exemption used to mean unguarded in BOTH directions — typing the URL told
     // the owner of a demonstrably active organization that it was suspended,
-    // while the dashboard one click away still showed it as Active.
+    // while every room one click away treated it as Active.
     test.setTimeout(150_000);
-    await registerNewUserAndGoToDashboard(page);
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
 
     await page.goto(`/organization/${slug}/suspended`);
 
-    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
+    // Sent back to the clinic's home, which lands its owner on Today.
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today`), {
       timeout: 15_000,
     });
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('suspended-page')).toHaveCount(0);
   });
 
@@ -106,8 +107,8 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     let inviteeApi: APIRequestContext | undefined;
 
     try {
-      await registerNewUserAndGoToDashboard(page);
-      const { slug } = await createTeamOrgAndOpenDashboard(page);
+      await registerNewUserAndGoToToday(page);
+      const { slug } = await createTeamOrgAndOpenToday(page);
 
       // Invite through the Users room's "New user" — the members surface (D17).
       await navigateInApp(page, `/organization/${slug}/users/create`);

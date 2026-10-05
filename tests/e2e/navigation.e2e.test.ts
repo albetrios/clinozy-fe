@@ -9,7 +9,13 @@ test.describe('Navigation', () => {
   });
 
   test('protected routes redirect to login when unauthenticated', async ({ page }) => {
-    for (const path of ['/', '/dashboard', '/onboarding', '/organization'] as const) {
+    for (const path of [
+      '/',
+      '/dashboard',
+      '/onboarding',
+      '/organization',
+      '/organization/acme/today',
+    ] as const) {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
       await expectLoginFormReady(page);

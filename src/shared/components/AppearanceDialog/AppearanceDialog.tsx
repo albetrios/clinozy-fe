@@ -46,7 +46,6 @@ function AppearanceContent() {
         ...(platformConfig.layoutWidthForced === null
           ? [APPEARANCE_KEYS.layoutTitle]
           : []),
-        APPEARANCE_KEYS.dashboardTitle,
         APPEARANCE_KEYS.surfaceTitle,
         APPEARANCE_KEYS.notificationsTitle,
       ];

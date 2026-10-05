@@ -17,9 +17,10 @@ import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * Provision a team org via the API and hydrate the team-scoped browser session,
- * landing on its dashboard. Returns `null` when the env can't provision one.
+ * landing on its home — Today, its owner's role home. Returns `null` when the env
+ * can't provision one.
  */
-async function landOnTeamDashboard(
+async function landInTeamClinic(
   page: Page,
   playwright: PlaywrightWorkerArgs['playwright'],
 ): Promise<{ slug: string } | null> {
@@ -44,8 +45,8 @@ async function landOnTeamDashboard(
     }, teamToken);
 
     if (!org.slug) throw new Error('team org slug missing');
-    await navigateInApp(page, `/organization/${org.slug}/dashboard`);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    await navigateInApp(page, `/organization/${org.slug}`);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     return { slug: org.slug };
   } finally {
     await api.dispose();
@@ -61,7 +62,7 @@ test.describe('Organization settings', () => {
   });
 
   test('general section renders the org profile panel', async ({ page, playwright }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'general');
@@ -80,7 +81,7 @@ test.describe('Organization settings', () => {
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'members');
@@ -119,7 +120,7 @@ test.describe('Organization settings', () => {
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     // Inviting moved from Settings to the Users room's "New user" (D17).
@@ -163,7 +164,7 @@ test.describe('Organization settings', () => {
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'account', 'integrations');
@@ -199,7 +200,7 @@ test.describe('Organization settings', () => {
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'roles');

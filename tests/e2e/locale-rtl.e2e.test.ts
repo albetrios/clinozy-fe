@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -19,7 +19,7 @@ test.describe('Locale & RTL preferences', () => {
   });
 
   async function openAppearance(page: Page) {
-    // The edge handle, by test id: the dashboard has its own "Open appearance" action.
+    // The edge handle, by test id.
     const handle = byTestId(page, 'floating-settings');
     await expect(handle).toHaveAccessibleName(/open appearance/i);
     await handle.click();
@@ -30,7 +30,7 @@ test.describe('Locale & RTL preferences', () => {
 
   test('forcing RTL flips the document live and auto restores it', async ({ page }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
 
     await openAppearance(page);
@@ -47,13 +47,13 @@ test.describe('Locale & RTL preferences', () => {
     // the second force-logged the session out; the boot refresh is one
     // single-flight path now (`refreshAccessToken`), so a reload keeps the session.
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openAppearance(page);
     await page.getByTestId('text-direction-rtl').click();
     await page.keyboard.press('Escape');
 
     await page.reload();
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 30_000 });
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   });
 
@@ -61,7 +61,7 @@ test.describe('Locale & RTL preferences', () => {
     page,
   }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     await openAppearance(page);
     const arabic = page.getByTestId('language-ar');

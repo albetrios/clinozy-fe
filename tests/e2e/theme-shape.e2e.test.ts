@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import {
   byTestId,
   expectLoginFormReady,
@@ -128,14 +128,14 @@ test.describe('Square look — radius None + Sharp shape', () => {
         'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
       );
       await seedSquareLook(page);
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await expect(page.locator('html')).toHaveAttribute('data-shape', 'sharp');
     });
 
-    test('the dashboard and the shell have no rounded corner left', async ({ page }) => {
+    test('Today and the shell have no rounded corner left', async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
-      await expect(byTestId(page, 'dashboard-greeting')).toBeVisible();
-      // Below-the-fold widgets mount as they scroll into view.
+      await expect(byTestId(page, 'today-greeting')).toBeVisible();
+      // Whatever mounts as it scrolls into view is swept too.
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(0);
 
@@ -144,7 +144,7 @@ test.describe('Square look — radius None + Sharp shape', () => {
 
     test('the phone shell — tab bar and header — has none either', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
-      await expect(byTestId(page, 'dashboard-greeting')).toBeVisible();
+      await expect(byTestId(page, 'today-greeting')).toBeVisible();
 
       expect(await roundedElements(page)).toEqual([]);
     });
@@ -277,7 +277,7 @@ test.describe('Density axis — the settings modal’s insets follow the theme',
         lookWith('default', 'uniform', densityId),
       );
       await page.setViewportSize({ width: 1280, height: 800 });
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
 
       await page.goto(`${new URL(page.url()).pathname}#settings/account/profile`);
       await expect(byTestId(page, 'settings-section-profile')).toBeVisible();

@@ -82,7 +82,7 @@ describe('CommandPaletteOrgGroup', () => {
     expect(screen.getByText('Switch to Globex')).toBeInTheDocument();
   });
 
-  it('selecting another organization navigates to its dashboard', () => {
+  it('selecting another organization navigates to its home', () => {
     renderGroup([
       { id: 'org_1', name: 'Acme', slug: 'acme', isActive: true },
       { id: 'org_2', name: 'Globex', slug: 'globex', isActive: false },
@@ -91,7 +91,7 @@ describe('CommandPaletteOrgGroup', () => {
     fireEvent.click(screen.getByText('Switch to Globex'));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: '/organization/$organizationSlug/dashboard',
+      to: '/organization/$organizationSlug',
       params: { organizationSlug: 'globex' },
     });
   });

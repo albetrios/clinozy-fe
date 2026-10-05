@@ -25,7 +25,6 @@ export const AUTH_KEYS = {
     backToSignIn: 'common.backToSignIn',
     goToSignIn: 'common.goToSignIn',
     tryAgain: 'common.tryAgain',
-    goToDashboard: 'common.goToDashboard',
     sending: 'common.sending',
     sendingEllipsis: 'common.sendingEllipsis',
     verifying: 'common.verifying',

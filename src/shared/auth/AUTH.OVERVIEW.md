@@ -51,7 +51,7 @@ anybody out.
   broadcasts to sibling tabs and redirects to `/login` — and leaves the HttpOnly
   refresh cookie valid. Called for a session that is still alive, `/login` boots,
   the silent refresh succeeds, and the guest-only guard sends the user straight
-  back to the dashboard. It is right only when the server session is **already
+  back into the app. It is right only when the server session is **already
   gone**: a dead session in the fetch client, a deleted account, or the tail of
   `logout()` itself.
 - **`logout({ reason })` is the ONE way to end a live session.** It dispatches
