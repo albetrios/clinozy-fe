@@ -83,18 +83,28 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       onClick={() => cycleSort(column)}
       className={cn(
         // The 6px bleed lets the hover fill reach past the column gap (H:678).
-        '-mx-1.5 flex h-[var(--dt-head-h,2.5rem)] w-[calc(100%+0.75rem)] min-w-0 items-center gap-1 px-1.5 tracking-[inherit] uppercase transition-colors duration-120',
+        '-mx-1.5 flex h-[var(--dt-head-h,2.5rem)] w-[calc(100%+0.75rem)] min-w-0 items-center px-1.5 tracking-[inherit] uppercase transition-colors duration-120',
         'hover:bg-muted-strong',
         sorted ? 'bg-muted-strong text-foreground' : 'text-muted-foreground',
         alignEnd && 'justify-end',
         className,
       )}
     >
-      <span className="truncate">{title}</span>
-      <SortIcon
-        aria-hidden="true"
-        className={cn('size-3 flex-none', sorted ? 'opacity-100' : 'opacity-45')}
-      />
+      {/*
+        A start-aligned label may run into the button's end padding before it
+        truncates: the design's label never truncates there, its arrow slides
+        into the padding ("MANUFACTURER" in a 110px track, H:678).
+      */}
+      <span
+        data-slot="sort-label"
+        className={cn('flex min-w-0 items-center gap-1', !alignEnd && '-me-1.5')}
+      >
+        <span className="truncate">{title}</span>
+        <SortIcon
+          aria-hidden="true"
+          className={cn('size-3 flex-none', sorted ? 'opacity-100' : 'opacity-45')}
+        />
+      </span>
     </button>
   );
 }

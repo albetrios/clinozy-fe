@@ -91,9 +91,19 @@ describe('DataTableColumnHeader', () => {
 
   it('aligns an amount column to the inline end', () => {
     render(<Harness align="end" />);
-    expect(screen.getByRole('button', { name: 'Amount' }).className).toContain(
-      'justify-end',
-    );
+    const button = screen.getByRole('button', { name: 'Amount' });
+    expect(button.className).toContain('justify-end');
+    // An end-aligned arrow keeps its place at the column's edge.
+    expect(button.querySelector('[data-slot="sort-label"]')).not.toHaveClass('-me-1.5');
+  });
+
+  it('lets a start-aligned label use the end padding before it truncates (H:678)', () => {
+    render(<Harness />);
+    const group = screen
+      .getByRole('button', { name: 'Amount' })
+      .querySelector('[data-slot="sort-label"]');
+    expect(group).toHaveClass('-me-1.5');
+    expect(group?.firstElementChild).toHaveClass('truncate');
   });
 
   it('has no accessibility violations', async () => {
