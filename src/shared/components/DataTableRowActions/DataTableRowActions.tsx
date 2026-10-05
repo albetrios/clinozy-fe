@@ -110,7 +110,9 @@ export function DataTableRowActions({
                     'text-detail rounded-lg px-0 shadow-none transition-colors duration-120',
                     labelled && 'gap-1.5 ps-2 pe-2.5 max-md:ps-2.5 max-md:pe-3',
                     action.destructive
-                      ? 'bg-destructive-tint border-destructive-border text-destructive hover:border-destructive hover:bg-destructive-tint hover:text-destructive'
+                      ? // The `dark:` pair outranks the outline variant's `dark:bg-input/30 dark:border-input`,
+                        // which otherwise drop the tint in dark mode.
+                        'bg-destructive-tint border-destructive-border text-destructive hover:border-destructive hover:bg-destructive-tint hover:text-destructive dark:bg-destructive-tint dark:border-destructive-border dark:hover:bg-destructive-tint'
                       : 'bg-card text-foreground-soft hover:border-primary hover:bg-muted hover:text-foreground',
                   )}
                 >

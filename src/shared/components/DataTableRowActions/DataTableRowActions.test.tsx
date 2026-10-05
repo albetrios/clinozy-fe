@@ -69,6 +69,26 @@ describe('DataTableRowActions', () => {
     expect(buttons[1]?.className).toContain('bg-destructive-tint');
   });
 
+  it('keeps the destructive tint and border in dark mode over the outline variant’s dark fill', () => {
+    renderActions([
+      {
+        id: 'delete',
+        label: 'Delete',
+        icon: Trash,
+        onSelect: vi.fn(),
+        destructive: true,
+      },
+    ]);
+    const button = screen.getByRole('button', { name: 'Delete' });
+    // tailwind-merge drops the vendored `dark:bg-input/30` / `dark:border-input` for these.
+    expect(button).toHaveClass(
+      'dark:bg-destructive-tint',
+      'dark:border-destructive-border',
+    );
+    expect(button).not.toHaveClass('dark:bg-input/30');
+    expect(button).not.toHaveClass('dark:border-input');
+  });
+
   it('runs the action without opening the row', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
