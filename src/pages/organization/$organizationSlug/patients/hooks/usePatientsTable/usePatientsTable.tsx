@@ -237,8 +237,10 @@ function usePatientColumns(
       accessorKey: 'updatedAt',
       header: t(PATIENTS_KEYS.columns.updated),
       cell: ({ row }) => <PatientUpdatedCell patient={row.original} />,
+      // 1.3fr, not the design's 1fr (H:4698): a 12-hour "Oct 05 · 10:40 AM"
+      // beside "Dr. Drashti" needs ~211px, which 1fr leaves at 188 at 1440.
       // The 28px people pill folds to nothing (H:4115).
-      meta: { track: 'minmax(150px,1fr)', foldValue: () => null },
+      meta: { track: 'minmax(150px,1.3fr)', foldValue: () => null },
     },
   ];
 }
