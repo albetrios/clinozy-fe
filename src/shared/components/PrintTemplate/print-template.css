@@ -1,0 +1,12 @@
+/* The A4 print sheets' own utilities (KICKOFF §3.5) — their millimetre boxes,
+   Arial and table layout — generated from this folder alone and loaded with
+   the sheets, not on every first paint: `src/index.css` leaves this folder out
+   of the main scan (L-54). Only Tailwind's default theme is known here, so a
+   sheet may use the app's token utilities (`text-foreground`, `bg-background`,
+   …) only where the screens use them too — the main stylesheet then has them;
+   `print-template-css.test.ts` holds the sheets to that. */
+@import 'tailwindcss/theme' theme(reference);
+@import 'tailwindcss/utilities' source(none);
+@source './';
+@source not './**/*.test.ts';
+@source not './**/*.test.tsx';

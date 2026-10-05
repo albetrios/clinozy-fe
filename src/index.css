@@ -11,6 +11,14 @@
    never loads this CSS, so nothing under test needs it. */
 @source not './**/*.test.ts';
 @source not './**/*.test.tsx';
+/* …nor are the A4 print sheets the first paint: their millimetre boxes are
+   utilities no screen draws until a sheet does, so they load with the sheets
+   (`shared/components/PrintTemplate/print-template.css`). */
+@source not './shared/components/PrintTemplate';
+/* …all but the sheets' token utilities no screen spells: those need the app's
+   theme, which only this stylesheet has (`print-template-css.test.ts` keeps the
+   list whole). */
+@source inline('*:border-border *:border-border-strong');
 /* Enter/exit utilities (animate-in / animate-out / fade / zoom / slide)
    used by the shadcn overlays: dialog, dropdown, popover, tooltip, select. */
 @import 'tw-animate-css';

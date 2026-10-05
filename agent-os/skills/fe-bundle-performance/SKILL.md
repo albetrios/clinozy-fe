@@ -106,6 +106,14 @@ Before widening it, know what it protects against: a class the app only **compos
 runtime** (`` `col-span-${n}` ``) was never safe — it merely worked while some doc happened to
 spell it. Write the full class name in source.
 
+**A surface no first paint draws can carry its own stylesheet.** The A4 print sheets' millimetre
+utilities were ~0.9 kB gzipped of the initial CSS. `src/index.css` now leaves
+`shared/components/PrintTemplate/` out of the scan (`@source not`), and
+`print-template.css` there generates that folder's utilities with Tailwind's default theme,
+imported by `PrintTemplate.tsx` — Vite ships it with the lazy chunks that print. Its limit:
+the default theme knows no app token, so a sheet may use a token utility only where a screen
+spells it too (`print-template-css.test.ts` fails otherwise).
+
 - **Tripwire:** `pnpm build:check` → `tooling/ci/check-css-sources.mjs`. Every raw-palette
   utility in `dist/` must be spelled in non-test `src/` (vendored `ui/` is the legitimate
   source); one that is not means the scan has widened again. Tested both directions in

@@ -1,3 +1,5 @@
+import './print-template.css';
+
 import type { ReactNode } from 'react';
 
 import { localeDirection } from '@/lib/i18n/locales.ts';
