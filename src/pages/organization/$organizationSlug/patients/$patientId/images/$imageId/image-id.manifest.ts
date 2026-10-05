@@ -3,7 +3,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 /**
  * The photo viewer
  * (`/organization/$organizationSlug/patients/$patientId/images/$imageId`,
- * `S:41`; KICKOFF §6.6) — a full-screen dialog over Photos. The file layout's
+ * `S:40`; KICKOFF §6.6) — a full-screen dialog over Photos. The file layout's
  * gate covers it; the Private album is Doctor, Admin and Owner only. Its child
  * on disk is Photo details (`edit`), which `routeTree.tsx` registers beside it
  * under Photos.

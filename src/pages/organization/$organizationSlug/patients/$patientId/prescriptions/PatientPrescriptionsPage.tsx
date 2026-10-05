@@ -1,10 +1,121 @@
+import { useParams } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import type { Prescription } from '@/shared/api/clinic/clinic-schema.ts';
+import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import {
+  fetchPrescription,
+  prescriptionQueryKeys,
+} from '@/shared/api/clinic/prescriptions-api.ts';
+import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import {
+  usePatientPrescriptions,
+  useRxCatalog,
+  useRxSheetContext,
+} from '@/shared/hooks/usePrescriptions/index.ts';
+
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
+import { useDefaultStaff } from '../shared/components/PatientStaffPicker/index.ts';
+import { usePatientRecordRoute } from '../shared/hooks/usePatientRecordRoute/index.ts';
+import { usePatientFileContext } from '../shared/patient-file-context.ts';
+import { PrescriptionDrawer } from './components/PrescriptionDrawer/index.ts';
+import { RxPrintPreview } from './components/RxPrintPreview/index.ts';
+import { RX_KEYS, RX_NS } from './prescriptions.constants.ts';
 import { manifest } from './prescriptions.manifest.ts';
 
+/** The print preview, once the sheet's patient, doctor, clinic and branch are read. */
+function RxPreview({
+  prescription,
+  onClose,
+}: {
+  prescription: Prescription;
+  onClose: () => void;
+}) {
+  const sheet = useRxSheetContext(prescription.patientId, prescription.doctorId);
+  if (!sheet.data) return null;
+  return (
+    <RxPrintPreview prescription={prescription} sheet={sheet.data} onClose={onClose} />
+  );
+}
+
 /**
- * Patient file › Prescriptions (KICKOFF §6.6; H:4753; `patient-file.md:34–46`): the section in the
- * file's content column, under its header — the table lands with L-43b, the prescription drawers and the print preview with L-45; "New prescription" is the Doctor and Admin gate (`S:35`).
+ * New or Edit prescription, once the patient's history, the catalog and the
+ * default doctor are read.
+ */
+function RxDrawerHost({
+  prescription,
+  writable,
+  canDelete,
+  onClose,
+}: {
+  /** The prescription an edit opens; null for a new one. */
+  prescription: Prescription | null;
+  writable: boolean;
+  canDelete: boolean;
+  onClose: () => void;
+}) {
+  const { patientId, file } = usePatientFileContext();
+  const [today] = useState(() => clinicToday());
+  const history = usePatientPrescriptions(patientId);
+  const catalog = useRxCatalog(patientId);
+  const doctor = useDefaultStaff('doctor', history.data?.[0]?.doctorId);
+  if (!(file && history.data && doctor.ready)) return null;
+  return (
+    <PrescriptionDrawer
+      prescription={prescription}
+      patient={{ id: patientId, name: patientName(file.patient), seq: file.patient.seq }}
+      history={history.data}
+      catalog={catalog.data}
+      defaultDoctorId={doctor.id}
+      writable={writable}
+      canDelete={canDelete}
+      today={today}
+      onClose={onClose}
+    />
+  );
+}
+
+/**
+ * Patient file › Prescriptions (KICKOFF §6.6; H:4753; `patient-file.md:34–46`):
+ * the section in the file's content column — the table lands with L-43b —
+ * and its URL-driven dialogs (`S:35–37`): New prescription, the print
+ * preview, Edit prescription. Writing one is the Doctor and Admin gate
+ * (`S:35, 37`; the Owner always passes); anyone else reads it.
  */
 export function PatientPrescriptionsPage() {
-  return <PatientSection section="prescriptions" data-testid={manifest.testId} />;
+  const { t } = useTranslation(RX_NS);
+  const { prescriptionId } = useParams({ strict: false });
+  const access = useClinicAccess();
+  const writable =
+    access.isResolved && passesPatientFileGate(access.roles, 'prescriptions');
+  const route = usePatientRecordRoute<Prescription>({
+    section: 'prescriptions',
+    id: prescriptionId,
+    queryKey: prescriptionQueryKeys.detail,
+    fetchRecord: fetchPrescription,
+    recordLabel: t(RX_KEYS.record),
+    canCreate: access.isResolved ? writable : undefined,
+  });
+  const editing = route.mode === 'edit' ? route.record : undefined;
+
+  return (
+    <>
+      <PatientSection section="prescriptions" data-testid={manifest.testId} />
+      {access.isResolved && (route.mode === 'create' || editing) ? (
+        <RxDrawerHost
+          key={editing?.id ?? 'new'}
+          prescription={editing ?? null}
+          writable={writable}
+          canDelete={writable && access.can('patients', 'delete')}
+          onClose={route.close}
+        />
+      ) : null}
+      {route.mode === 'view' && route.record ? (
+        <RxPreview prescription={route.record} onClose={route.close} />
+      ) : null}
+    </>
+  );
 }

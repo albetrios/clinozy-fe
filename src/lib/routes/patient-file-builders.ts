@@ -39,7 +39,7 @@ export function organizationPatientEdit(organizationSlug: string, patientId: str
   } as const;
 }
 
-/** The photo viewer — one photo of the Photos section (`S:41`); the section's `?album=&appointment=` ride along. */
+/** The photo viewer — one photo of the Photos section (`S:40`); the section's `?album=&appointment=` ride along. */
 export function organizationPatientPhoto(
   organizationSlug: string,
   patientId: string,
@@ -51,7 +51,7 @@ export function organizationPatientPhoto(
   } as const;
 }
 
-/** Photo details — the drawer over the Photos section (`S:42`). */
+/** Photo details — the drawer over the Photos section (`S:41`). */
 export function organizationPatientPhotoEdit(
   organizationSlug: string,
   patientId: string,
@@ -60,5 +60,32 @@ export function organizationPatientPhotoEdit(
   return {
     to: '/organization/$organizationSlug/patients/$patientId/images/$imageId/edit',
     params: { organizationSlug, patientId, imageId },
+  } as const;
+}
+
+/** New prescription — the Rx drawer over Prescriptions (`S:35`). */
+export function organizationPrescriptionCreate(
+  organizationSlug: string,
+  patientId: string,
+) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/prescriptions/create',
+    params: { organizationSlug, patientId },
+  } as const;
+}
+
+/** New treatment — the Treatment drawer over Treatments (`S:38`). */
+export function organizationTreatmentCreate(organizationSlug: string, patientId: string) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/treatments/create',
+    params: { organizationSlug, patientId },
+  } as const;
+}
+
+/** Upload report — the Report drawer over Reports (`S:42`). */
+export function organizationReportCreate(organizationSlug: string, patientId: string) {
+  return {
+    to: '/organization/$organizationSlug/patients/$patientId/reports/create',
+    params: { organizationSlug, patientId },
   } as const;
 }

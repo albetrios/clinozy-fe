@@ -60,7 +60,7 @@ afterEach(() => {
   resetClinicFixtures();
 });
 
-describe('Photo details (KICKOFF §6.6; S:42)', () => {
+describe('Photo details (KICKOFF §6.6; S:41)', () => {
   it('opens over Photos with the photo’s name, date, album, body part and visit', async () => {
     const photo = general();
     const { baseElement } = renderPatientFile(detailsUrl(photo.id));

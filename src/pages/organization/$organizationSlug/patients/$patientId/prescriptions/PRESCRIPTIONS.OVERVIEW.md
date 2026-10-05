@@ -3,7 +3,11 @@
 Route: `/organization/$organizationSlug/patients/$patientId/prescriptions` — a section of the
 patient file (KICKOFF §6.6, D26; H:4753; `patient-file.md:34–46`). It renders in the file layout's content
 column through the family's section frame (`../shared/components/PatientSection/`) — its title and, when the member may add one, the split "New …" + "⌄";
-the table lands with L-43b, the prescription drawers and the print preview with L-45; "New prescription" is the Doctor and Admin gate (`S:35`).
+the table lands with L-43b. Its URL-driven dialogs (L-45; `S:35–37`) render nothing — the section
+reads the URL (`../shared/hooks/usePatientRecordRoute/`) and opens them over itself: `create/` and
+`$prescriptionId/edit/` the Prescription drawer, `$prescriptionId/` the print preview. Writing one
+is the Doctor and Admin gate (`S:35, 37`; the Owner always passes) — anyone else following a create
+link lands back here with the permission toast, and reads an edit view only.
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
 access is `useClinicAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
@@ -11,12 +15,17 @@ one lazy module (`../patient-id.sections.ts`).
 
 ## Files
 
-| File                           | Responsibility                                                                                              |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `prescriptions.route.tsx`      | Route marker — exports `Component` rendering `PatientPrescriptionsPage`.                                    |
-| `prescriptions.manifest.ts`    | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Prescriptions". |
-| `PatientPrescriptionsPage.tsx` | The section: `PatientSection` with its header and content.                                                  |
+| File                                                     | Responsibility                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `prescriptions.route.tsx`                                | Route marker — exports `Component` rendering `PatientPrescriptionsPage`.                                                                                                                                                                                                                                                                               |
+| `prescriptions.manifest.ts`                              | Manifest — `kind: 'layout'` (children `create`, `$prescriptionId`), permission `organization:read`, module `clinic-patients`, title "Prescriptions".                                                                                                                                                                                                   |
+| `prescriptions.constants.ts`                             | The drawer's and preview's copy keys and root test ids.                                                                                                                                                                                                                                                                                                |
+| `PatientPrescriptionsPage.tsx`                           | The section, and the dialog its URL names: the drawer once the history, catalog and default doctor are read; the preview once the sheet's context is.                                                                                                                                                                                                  |
+| `components/PrescriptionDrawer/`                         | The 1040px drawer: "Prescription" (Date, Doctor) → "Medicines" (the quick line + Browse on the shared `QuickLine`, the Rx parser `components/PrescriptionDrawer/rx-quick-line.ts`, the medicines table) → "Clinical notes"; Quick fill Print / Repeat last / the three kits; "Save & sell" hands the saved Rx to `medical/sales/create?prescription=`. |
+| `components/RxPrintPreview/`                             | The print preview: an 820px panel holding the shared A4 sheet (`PrescriptionPrint`), fitted to its width; "Print / Save PDF".                                                                                                                                                                                                                          |
+| `create/` · `$prescriptionId/` · `$prescriptionId/edit/` | The dialog routes (each renders nothing).                                                                                                                                                                                                                                                                                                              |
 
 ## Test ids
 
-`patient-section-prescriptions` — the section's root (`docs/reference/e2e-testids-inventory.md` › Patient file).
+`patient-section-prescriptions` — the section's root; `rx-drawer`, `rx-print-preview` and their parts
+(`docs/reference/e2e-testids-inventory.md` › Patient file records).

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~1983 src files · ~972 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
+Stats: ~2059 src files · ~1000 tests in src/ · 43 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1417,6 +1417,9 @@ clinozy-fe/
 │   │   │   │   ├── patient-file-api.ts
 │   │   │   │   ├── patient-file-contracts.ts
 │   │   │   │   ├── patient-images-api.ts
+│   │   │   │   ├── patient-packages-api.ts
+│   │   │   │   ├── patient-packages-contracts.ts
+│   │   │   │   ├── patient-reports-api.ts
 │   │   │   │   ├── patient-search-api.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
@@ -1425,6 +1428,7 @@ clinozy-fe/
 │   │   │   │   ├── plan-api.ts
 │   │   │   │   ├── plan-contracts.ts
 │   │   │   │   ├── preferences-api.ts
+│   │   │   │   ├── prescriptions-api.ts
 │   │   │   │   ├── presence-api.ts
 │   │   │   │   ├── stock-room-query-key.ts
 │   │   │   │   ├── task-views.ts
@@ -1432,11 +1436,12 @@ clinozy-fe/
 │   │   │   │   ├── tasks-contracts.ts
 │   │   │   │   ├── today-api.ts
 │   │   │   │   ├── today-contracts.ts
+│   │   │   │   ├── treatments-api.ts
 │   │   │   │   ├── users-api.ts
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [46 test files]
+│   │   │   │   └── [50 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1874,7 +1879,6 @@ clinozy-fe/
 │   │   │   │   ├── InvoicePaymentFields.tsx
 │   │   │   │   ├── InvoiceTotals.tsx
 │   │   │   │   ├── InvoiceTypeSwitch.tsx
-│   │   │   │   ├── quick-line-match.ts
 │   │   │   │   ├── use-invoice-catalog.ts
 │   │   │   │   ├── use-invoice-drawer.ts
 │   │   │   │   ├── use-invoice-save.ts
@@ -2078,12 +2082,13 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── QuickLine/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── quick-line-match.ts
 │   │   │   │   ├── quick-line-state.ts
 │   │   │   │   ├── quick-line.constants.ts
 │   │   │   │   ├── quick-line.types.ts
 │   │   │   │   ├── QuickLine.tsx
 │   │   │   │   ├── QuickLineBrowse.tsx
-│   │   │   │   └── [1 test file]
+│   │   │   │   └── [2 test files]
 │   │   │   ├── RateLimitNotice/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RateLimitNotice.tsx
@@ -2598,9 +2603,17 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatientFile.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── usePatientPackages/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePatientPackages.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── usePatientPhotos/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatientPhotos.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── usePatientReports/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePatientReports.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── usePatients/
 │   │   │   │   ├── index.ts
@@ -2621,6 +2634,10 @@ clinozy-fe/
 │   │   │   ├── usePreferences/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePreferences.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── usePrescriptions/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePrescriptions.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── usePresence/
 │   │   │   │   ├── index.ts
@@ -2686,6 +2703,10 @@ clinozy-fe/
 │   │   │   ├── useTodayFloor/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useTodayFloor.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useTreatments/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useTreatments.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useUnsavedChangesGuard/
 │   │   │   │   ├── index.ts

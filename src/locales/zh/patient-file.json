@@ -241,5 +241,352 @@
       "saved": "照片详情已保存"
     },
     "loading": "正在加载照片"
+  },
+  "rx": {
+    "record": "处方",
+    "title": {
+      "create": "新建处方",
+      "edit": "编辑处方"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_other": "{{count}} 种药",
+    "quickFill": {
+      "print": "打印处方",
+      "repeat": "重复上次处方 {{number}}",
+      "kits": {
+        "hairFall": "脱发套装",
+        "postPeel": "换肤后套装",
+        "pigmentation": "色素套装"
+      }
+    },
+    "kit": {
+      "reapply": "每 3 小时重新涂抹",
+      "avoidSun": "48 小时内避免日晒和磨砂"
+    },
+    "steps": {
+      "prescription": "处方",
+      "medicines": "药物",
+      "notes": "临床备注"
+    },
+    "date": "日期",
+    "doctor": "医生",
+    "doctorPlaceholder": "选择医生",
+    "quick": {
+      "placeholder": "输入药物、剂量、时间 · 例如 flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "常开药物",
+      "groups": {
+        "all": "全部",
+        "often": "常开药物",
+        "oral": "口服",
+        "topical": "外用"
+      },
+      "newMedicine": "列表中没有的药物",
+      "lastSaved": "已保存上次剂量",
+      "noDosage": "无既往剂量",
+      "inStock_other": "库存 {{count}}",
+      "outOfStock": "无库存",
+      "added": "已添加 {{name}}",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "药物",
+      "medicine": "药物",
+      "dose": "剂量 · 早 中 晚",
+      "meal": "用餐",
+      "where": "部位",
+      "qty": "数量",
+      "searchMedicine": "搜索药物",
+      "addMedicine": "添加药物",
+      "use": "使用",
+      "note": "备注 · 例如 10 天、薄涂一层、避免日晒"
+    },
+    "dose": {
+      "group": "剂量 早 · 中 · 晚",
+      "times": {
+        "morning": "早上",
+        "afternoon": "中午",
+        "night": "晚上"
+      },
+      "on": "{{time}} · {{taps}} — 点击更改",
+      "off": "{{time}} · 无 — 点击更改",
+      "sos": "SOS",
+      "sosHint": "仅在需要时 (SOS)"
+    },
+    "meal": {
+      "before": "饭前",
+      "after": "饭后",
+      "beforeHint": "饭前",
+      "afterHint": "饭后",
+      "more": "更多时间",
+      "change": "{{timing}} · 更改"
+    },
+    "timings": {
+      "empty_stomach": "空腹",
+      "with_meal": "随餐",
+      "morning": "早上",
+      "night": "晚上",
+      "morning_night": "早晚各一次",
+      "thrice_week": "每周三次",
+      "once_week": "每周一次",
+      "alternate_days": "隔天一次"
+    },
+    "places": {
+      "face": "面部",
+      "scalp": "头皮",
+      "hair": "头发",
+      "body": "身体",
+      "underarm": "腋下",
+      "neck": "颈部",
+      "back": "背部",
+      "chest": "胸部",
+      "hands": "手部",
+      "legs": "腿部",
+      "feet": "足部",
+      "lips": "嘴唇",
+      "underEyes": "眼下",
+      "affectedArea": "患处"
+    },
+    "notes": {
+      "advice": "备注",
+      "advicePlaceholder": "给患者的建议",
+      "lab": "化验报告",
+      "labPlaceholder": "建议的检查或结果",
+      "procedure": "今日处理",
+      "procedurePlaceholder": "今天做了什么"
+    },
+    "daysNote_other": "{{count}} 天",
+    "dayWords": "天, 日",
+    "save": {
+      "create": "保存处方",
+      "edit": "保存更改",
+      "sell": "保存并销售",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "请添加药物",
+      "saved": "处方已保存",
+      "savedNumber": "处方 {{number}} 已保存"
+    },
+    "delete": {
+      "title": "删除此处方？",
+      "deleted": "处方已删除"
+    },
+    "preview": "处方 {{number}}"
+  },
+  "treatment": {
+    "record": "治疗",
+    "title": {
+      "create": "新建治疗",
+      "edit": "编辑治疗"
+    },
+    "sub": "字段按诊所专科设置 · 如有需要可切换",
+    "session": "第 {{session}} 次",
+    "quickFill": {
+      "next": "{{name}} 的下一次",
+      "package": "{{name}} · 第 {{session}} 次"
+    },
+    "type": "类型",
+    "templates": {
+      "skin": "皮肤 · 激光",
+      "dental": "牙科",
+      "physio": "理疗",
+      "gynac": "妇科",
+      "general": "通用"
+    },
+    "steps": {
+      "session": "疗程",
+      "details": "{{template}}详情",
+      "aftercare": "术后护理"
+    },
+    "name": "治疗",
+    "namePlaceholder": "选择或输入",
+    "sessionNo": "疗程次数",
+    "doctor": "医生",
+    "doctorPlaceholder": "选择医生",
+    "therapist": "治疗师",
+    "therapistPlaceholder": "选择治疗师",
+    "skin": {
+      "therapyType": "治疗类型",
+      "therapyTypes": {
+        "laser": "激光",
+        "peel": "换肤",
+        "facial": "面部护理",
+        "injectable": "注射",
+        "microneedling": "微针"
+      },
+      "bodyPart": "部位",
+      "pickAny": "可多选",
+      "areas": {
+        "face": "面部",
+        "upperLip": "上唇",
+        "chin": "下巴",
+        "underarm": "腋下",
+        "arms": "手臂",
+        "legs": "腿部",
+        "back": "背部",
+        "chest": "胸部",
+        "fullBody": "全身"
+      },
+      "skinType": "肤质类型",
+      "skinTypeValue": "{{type}} 型",
+      "machine": "设备",
+      "machinePlaceholder": "例如 Soprano Ice",
+      "wavelength": "波长",
+      "startReading": "开始读数",
+      "endReading": "结束读数",
+      "readingPlaceholder": "发数 / 计数器",
+      "power": "能量 · 频率 · PD · 模式",
+      "powerPlaceholder": "例如 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "处理",
+      "procedures": {
+        "scaling": "洁牙",
+        "filling": "补牙",
+        "rct": "根管治疗",
+        "extraction": "拔牙",
+        "crown": "牙冠",
+        "implant": "种植",
+        "whitening": "美白"
+      },
+      "teeth": "牙齿",
+      "teethHint": "FDI 编号 · 点按选择",
+      "quadrants": {
+        "upperRight": "右上",
+        "upperLeft": "左上",
+        "lowerRight": "右下",
+        "lowerLeft": "左下"
+      },
+      "tooth": "牙齿 {{tooth}}",
+      "material": "材料",
+      "materialPlaceholder": "例如 复合树脂 A2",
+      "anaesthesia": "麻醉",
+      "given": "已麻醉",
+      "notGiven": "未麻醉"
+    },
+    "physio": {
+      "region": "部位",
+      "regions": {
+        "neck": "颈部",
+        "shoulder": "肩部",
+        "back": "背部",
+        "hip": "髋部",
+        "knee": "膝部",
+        "ankle": "踝部"
+      },
+      "modality": "方式",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "超声",
+        "exercise": "运动",
+        "manualTherapy": "手法治疗",
+        "traction": "牵引"
+      },
+      "painBefore": "治疗前疼痛",
+      "painAfter": "治疗后疼痛",
+      "painHint": "0–10",
+      "exercises": "居家锻炼",
+      "exercisesPlaceholder": "组数、次数、频率"
+    },
+    "gynac": {
+      "visitType": "就诊类型",
+      "visitTypes": {
+        "anc": "产前检查",
+        "pnc": "产后检查",
+        "infertility": "不孕",
+        "contraception": "避孕",
+        "general": "通用"
+      },
+      "lmp": "末次月经",
+      "gestation": "孕周",
+      "weeks": "周",
+      "bp": "血压",
+      "bpPlaceholder": "120/80",
+      "weight": "体重",
+      "kg": "公斤",
+      "findings": "检查所见",
+      "findingsPlaceholder": "检查结果"
+    },
+    "general": {
+      "area": "部位",
+      "areaPlaceholder": "用逗号分隔",
+      "parameters": "参数",
+      "parametersPlaceholder": "每行一个，例如 剂量: 2 ml"
+    },
+    "aftercare": {
+      "remark": "备注",
+      "remarkPlaceholder": "反应、建议、下一步计划",
+      "call": "术后回访电话",
+      "callHint": "创建任务，询问感觉如何以及是否遵照执行",
+      "calls": {
+        "none": "不回访",
+        "next_day": "第二天",
+        "in_2_days": "2 天后",
+        "in_week": "一周后"
+      },
+      "feedback": "本次治疗的反馈",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "暂无回访 · 请使用上方的记录回访"
+    },
+    "save": {
+      "create": "保存治疗",
+      "edit": "保存更改",
+      "saved": "治疗已保存"
+    },
+    "delete": {
+      "title": "删除此治疗？",
+      "deleted": "治疗已删除"
+    }
+  },
+  "report": {
+    "record": "报告",
+    "types": {
+      "lab": "化验",
+      "scan": "影像",
+      "consent": "知情同意",
+      "other": "其他"
+    },
+    "steps": {
+      "report": "报告",
+      "details": "详情",
+      "notes": "备注"
+    },
+    "type": "类型",
+    "name": "名称",
+    "date": "日期",
+    "file": "文件",
+    "upload": {
+      "title": "上传报告",
+      "namePlaceholder": "例如 血常规",
+      "drop": "拖放报告或浏览",
+      "fileHint": "PDF、JPG 或 PNG · 最大 {{limit}}",
+      "remove": "移除 {{name}}",
+      "note": "备注",
+      "notePlaceholder": "可选",
+      "summary": "{{type}} · {{files}}",
+      "save": "上传",
+      "noName": "请为报告命名",
+      "uploaded": "报告已上传",
+      "files_other": "{{count}} 个文件"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "添加人",
+      "fileLine": "{{name}} · {{format}} · 应患者要求共享",
+      "notes": "备注",
+      "noNotes": "此报告没有备注",
+      "download": "下载",
+      "downloading": "正在下载 {{name}}"
+    }
+  },
+  "package": {
+    "title": "添加套餐",
+    "step": "选择套餐",
+    "option": "{{name}} · {{sessions}} 次 · {{price}}",
+    "empty": "暂无多次服务项目",
+    "summary": "完成治疗后计入次数",
+    "save": "添加套餐",
+    "noPick": "请选择套餐",
+    "added": "套餐已添加 · 请在发票中开票"
   }
 }

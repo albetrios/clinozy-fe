@@ -6,7 +6,7 @@
 import { oneOf, textOf } from '@/lib/routes/search-params.ts';
 
 /** The Activity column in a link: open or closed (D19 › Activity default). */
-export const PATIENT_FILE_ACTIVITY = ['open', 'closed'] as const;
+const PATIENT_FILE_ACTIVITY = ['open', 'closed'] as const;
 
 /** One Activity state a link can carry. */
 export type PatientFileActivity = (typeof PATIENT_FILE_ACTIVITY)[number];

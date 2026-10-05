@@ -18,6 +18,21 @@ import {
  * the purchase order, the Rx drawer).
  */
 
+// ── Form ──
+
+/** A medicine's Browse group (H:5058): applied on the skin, or taken. */
+export type MedicineForm = 'oral' | 'topical';
+
+const TOPICAL = /lotion|shampoo|cream|gel|serum|sunscreen|spf|wash|soap|oil/i;
+
+/**
+ * Topical when the name says it is put on (H:5058), oral otherwise — the
+ * group the invoice's and the Rx drawer's Browse files a medicine under.
+ */
+export function medicineForm(name: string): MedicineForm {
+  return TOPICAL.test(name) ? 'topical' : 'oral';
+}
+
 // ── Records ──
 
 /**

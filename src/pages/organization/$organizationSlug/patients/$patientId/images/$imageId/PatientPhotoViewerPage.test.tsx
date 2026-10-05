@@ -63,7 +63,7 @@ afterEach(() => {
   resetClinicFixtures();
 });
 
-describe('the photo viewer (KICKOFF §6.6; S:41)', () => {
+describe('the photo viewer (KICKOFF §6.6; S:40)', () => {
   it('opens one photo over Photos, named, placed in its album', async () => {
     const [first] = varunGeneral();
     const { baseElement } = renderPatientFile(viewerUrl(VARUN, first?.id ?? ''));

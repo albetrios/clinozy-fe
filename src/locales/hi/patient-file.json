@@ -252,5 +252,356 @@
       "saved": "फ़ोटो का विवरण सहेजा गया"
     },
     "loading": "फ़ोटो लोड हो रही हैं"
+  },
+  "rx": {
+    "record": "पर्चा",
+    "title": {
+      "create": "नया पर्चा",
+      "edit": "पर्चा बदलें"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_one": "{{count}} दवा",
+    "medicines_other": "{{count}} दवाएँ",
+    "quickFill": {
+      "print": "पर्चा प्रिंट करें",
+      "repeat": "पिछला पर्चा {{number}} दोहराएँ",
+      "kits": {
+        "hairFall": "बाल झड़ने का किट",
+        "postPeel": "पील के बाद का किट",
+        "pigmentation": "पिगमेंटेशन किट"
+      }
+    },
+    "kit": {
+      "reapply": "हर 3 घंटे में फिर लगाएँ",
+      "avoidSun": "48 घंटे धूप और स्क्रब से बचें"
+    },
+    "steps": {
+      "prescription": "पर्चा",
+      "medicines": "दवाएँ",
+      "notes": "क्लिनिकल नोट्स"
+    },
+    "date": "तारीख़",
+    "doctor": "डॉक्टर",
+    "doctorPlaceholder": "डॉक्टर चुनें",
+    "quick": {
+      "placeholder": "दवा, खुराक, समय लिखें · जैसे flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "अक्सर लिखी जाने वाली",
+      "groups": {
+        "all": "सभी",
+        "often": "अक्सर लिखी जाने वाली",
+        "oral": "मुँह से",
+        "topical": "लगाने वाली"
+      },
+      "newMedicine": "सूची में नहीं वाली दवा",
+      "lastSaved": "पिछली खुराक सहेजी गई",
+      "noDosage": "कोई पिछली खुराक नहीं",
+      "inStock_one": "{{count}} स्टॉक में",
+      "inStock_other": "{{count}} स्टॉक में",
+      "outOfStock": "स्टॉक में नहीं",
+      "added": "{{name}} जोड़ी गई",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "दवाएँ",
+      "medicine": "दवा",
+      "dose": "खुराक · सु दो रा",
+      "meal": "भोजन",
+      "where": "कहाँ",
+      "qty": "मात्रा",
+      "searchMedicine": "दवा खोजें",
+      "addMedicine": "दवा जोड़ें",
+      "use": "उपयोग करें",
+      "note": "टिप्पणी · जैसे 10 दिन, पतली परत लगाएँ, धूप से बचें"
+    },
+    "dose": {
+      "group": "खुराक सुबह · दोपहर · रात",
+      "times": {
+        "morning": "सुबह",
+        "afternoon": "दोपहर",
+        "night": "रात"
+      },
+      "on": "{{time}} · {{taps}} — बदलने के लिए क्लिक करें",
+      "off": "{{time}} · कोई नहीं — बदलने के लिए क्लिक करें",
+      "sos": "SOS",
+      "sosHint": "सिर्फ़ ज़रूरत पड़ने पर (SOS)"
+    },
+    "meal": {
+      "before": "पहले",
+      "after": "बाद",
+      "beforeHint": "भोजन से पहले",
+      "afterHint": "भोजन के बाद",
+      "more": "और समय",
+      "change": "{{timing}} · बदलें"
+    },
+    "timings": {
+      "empty_stomach": "ख़ाली पेट",
+      "with_meal": "भोजन के साथ",
+      "morning": "सुबह",
+      "night": "रात",
+      "morning_night": "सुबह और रात",
+      "thrice_week": "हफ़्ते में तीन बार",
+      "once_week": "हफ़्ते में एक बार",
+      "alternate_days": "एक दिन छोड़कर"
+    },
+    "places": {
+      "face": "चेहरा",
+      "scalp": "स्कैल्प",
+      "hair": "बाल",
+      "body": "शरीर",
+      "underarm": "बगल",
+      "neck": "गर्दन",
+      "back": "पीठ",
+      "chest": "छाती",
+      "hands": "हाथ",
+      "legs": "पैर",
+      "feet": "पंजे",
+      "lips": "होंठ",
+      "underEyes": "आँखों के नीचे",
+      "affectedArea": "प्रभावित जगह"
+    },
+    "notes": {
+      "advice": "नोट्स",
+      "advicePlaceholder": "मरीज़ के लिए सलाह",
+      "lab": "लैब रिपोर्ट",
+      "labPlaceholder": "सुझाई गई जाँचें या नतीजे",
+      "procedure": "आज की प्रक्रिया",
+      "procedurePlaceholder": "आज क्या किया गया"
+    },
+    "daysNote_one": "{{count}} दिन",
+    "daysNote_other": "{{count}} दिन",
+    "dayWords": "दिन",
+    "save": {
+      "create": "पर्चा सहेजें",
+      "edit": "बदलाव सहेजें",
+      "sell": "सहेजें और बेचें",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "कोई दवा जोड़ें",
+      "saved": "पर्चा सहेजा गया",
+      "savedNumber": "पर्चा {{number}} सहेजा गया"
+    },
+    "delete": {
+      "title": "यह पर्चा हटाएँ?",
+      "deleted": "पर्चा हटाया गया"
+    },
+    "preview": "पर्चा {{number}}"
+  },
+  "treatment": {
+    "record": "उपचार",
+    "title": {
+      "create": "नया उपचार",
+      "edit": "उपचार बदलें"
+    },
+    "sub": "फ़ील्ड क्लिनिक की विशेषज्ञता के हिसाब से हैं · ज़रूरत हो तो बदलें",
+    "session": "सेशन {{session}}",
+    "quickFill": {
+      "next": "{{name}} का अगला सेशन",
+      "package": "{{name}} · सेशन {{session}}"
+    },
+    "type": "प्रकार",
+    "templates": {
+      "skin": "त्वचा · लेज़र",
+      "dental": "डेंटल",
+      "physio": "फ़िज़ियो",
+      "gynac": "स्त्री रोग",
+      "general": "सामान्य"
+    },
+    "steps": {
+      "session": "सेशन",
+      "details": "{{template}} विवरण",
+      "aftercare": "बाद की देखभाल"
+    },
+    "name": "उपचार",
+    "namePlaceholder": "चुनें या लिखें",
+    "sessionNo": "सेशन संख्या",
+    "doctor": "डॉक्टर",
+    "doctorPlaceholder": "डॉक्टर चुनें",
+    "therapist": "थेरेपिस्ट",
+    "therapistPlaceholder": "थेरेपिस्ट चुनें",
+    "skin": {
+      "therapyType": "थेरेपी का प्रकार",
+      "therapyTypes": {
+        "laser": "लेज़र",
+        "peel": "पील",
+        "facial": "फ़ेशियल",
+        "injectable": "इंजेक्शन",
+        "microneedling": "माइक्रोनीडलिंग"
+      },
+      "bodyPart": "शरीर का हिस्सा",
+      "pickAny": "कितने भी चुनें",
+      "areas": {
+        "face": "चेहरा",
+        "upperLip": "ऊपरी होंठ",
+        "chin": "ठोड़ी",
+        "underarm": "बगल",
+        "arms": "बाँहें",
+        "legs": "पैर",
+        "back": "पीठ",
+        "chest": "छाती",
+        "fullBody": "पूरा शरीर"
+      },
+      "skinType": "त्वचा का प्रकार",
+      "skinTypeValue": "टाइप {{type}}",
+      "machine": "मशीन",
+      "machinePlaceholder": "जैसे Soprano Ice",
+      "wavelength": "वेवलेंथ",
+      "startReading": "शुरुआती रीडिंग",
+      "endReading": "अंतिम रीडिंग",
+      "readingPlaceholder": "शॉट / काउंटर",
+      "power": "पावर · फ़्रीक्वेंसी · PD · मोड",
+      "powerPlaceholder": "जैसे 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "प्रक्रिया",
+      "procedures": {
+        "scaling": "स्केलिंग",
+        "filling": "फ़िलिंग",
+        "rct": "रूट कैनाल",
+        "extraction": "दाँत निकालना",
+        "crown": "क्राउन",
+        "implant": "इम्प्लांट",
+        "whitening": "व्हाइटनिंग"
+      },
+      "teeth": "दाँत",
+      "teethHint": "FDI नंबरिंग · चुनने के लिए टैप करें",
+      "quadrants": {
+        "upperRight": "ऊपर दाएँ",
+        "upperLeft": "ऊपर बाएँ",
+        "lowerRight": "नीचे दाएँ",
+        "lowerLeft": "नीचे बाएँ"
+      },
+      "tooth": "दाँत {{tooth}}",
+      "material": "सामग्री",
+      "materialPlaceholder": "जैसे कम्पोज़िट A2",
+      "anaesthesia": "एनेस्थीसिया",
+      "given": "दिया गया",
+      "notGiven": "नहीं दिया गया"
+    },
+    "physio": {
+      "region": "हिस्सा",
+      "regions": {
+        "neck": "गर्दन",
+        "shoulder": "कंधा",
+        "back": "पीठ",
+        "hip": "कूल्हा",
+        "knee": "घुटना",
+        "ankle": "टखना"
+      },
+      "modality": "विधि",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "अल्ट्रासाउंड",
+        "exercise": "व्यायाम",
+        "manualTherapy": "मैनुअल थेरेपी",
+        "traction": "ट्रैक्शन"
+      },
+      "painBefore": "पहले दर्द",
+      "painAfter": "बाद में दर्द",
+      "painHint": "0–10",
+      "exercises": "घर पर व्यायाम",
+      "exercisesPlaceholder": "सेट, दोहराव, कितनी बार"
+    },
+    "gynac": {
+      "visitType": "विज़िट का प्रकार",
+      "visitTypes": {
+        "anc": "प्रसव-पूर्व",
+        "pnc": "प्रसव-पश्चात",
+        "infertility": "बाँझपन",
+        "contraception": "गर्भनिरोध",
+        "general": "सामान्य"
+      },
+      "lmp": "आख़िरी माहवारी",
+      "gestation": "गर्भावस्था",
+      "weeks": "हफ़्ते",
+      "bp": "बीपी",
+      "bpPlaceholder": "120/80",
+      "weight": "वज़न",
+      "kg": "किलो",
+      "findings": "निष्कर्ष",
+      "findingsPlaceholder": "जाँच के निष्कर्ष"
+    },
+    "general": {
+      "area": "जगह",
+      "areaPlaceholder": "कॉमा से अलग करें",
+      "parameters": "पैरामीटर",
+      "parametersPlaceholder": "हर पंक्ति में एक, जैसे खुराक: 2 ml"
+    },
+    "aftercare": {
+      "remark": "टिप्पणी",
+      "remarkPlaceholder": "प्रतिक्रिया, सलाह, अगली योजना",
+      "call": "फ़ॉलो-अप कॉल",
+      "callHint": "यह पूछने के लिए टास्क बनाता है कि कैसा लग रहा है और क्या पालन किया",
+      "calls": {
+        "none": "कोई कॉल नहीं",
+        "next_day": "अगले दिन",
+        "in_2_days": "2 दिन में",
+        "in_week": "एक हफ़्ते में"
+      },
+      "feedback": "इस उपचार पर फ़ीडबैक",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "अभी कोई चेक-इन नहीं · ऊपर चेक-इन दर्ज करें का उपयोग करें"
+    },
+    "save": {
+      "create": "उपचार सहेजें",
+      "edit": "बदलाव सहेजें",
+      "saved": "उपचार सहेजा गया"
+    },
+    "delete": {
+      "title": "यह उपचार हटाएँ?",
+      "deleted": "उपचार हटाया गया"
+    }
+  },
+  "report": {
+    "record": "रिपोर्ट",
+    "types": {
+      "lab": "लैब",
+      "scan": "स्कैन",
+      "consent": "सहमति",
+      "other": "अन्य"
+    },
+    "steps": {
+      "report": "रिपोर्ट",
+      "details": "विवरण",
+      "notes": "नोट्स"
+    },
+    "type": "प्रकार",
+    "name": "नाम",
+    "date": "तारीख़",
+    "file": "फ़ाइल",
+    "upload": {
+      "title": "रिपोर्ट अपलोड करें",
+      "namePlaceholder": "जैसे CBC रिपोर्ट",
+      "drop": "रिपोर्ट यहाँ छोड़ें या ब्राउज़ करें",
+      "fileHint": "PDF, JPG या PNG · {{limit}} तक",
+      "remove": "{{name}} हटाएँ",
+      "note": "नोट",
+      "notePlaceholder": "वैकल्पिक",
+      "summary": "{{type}} · {{files}}",
+      "save": "अपलोड करें",
+      "noName": "रिपोर्ट का नाम लिखें",
+      "uploaded": "रिपोर्ट अपलोड हो गई",
+      "files_one": "{{count}} फ़ाइल",
+      "files_other": "{{count}} फ़ाइलें"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "किसने जोड़ा",
+      "fileLine": "{{name}} · {{format}} · माँगने पर मरीज़ को दी जाती है",
+      "notes": "नोट्स",
+      "noNotes": "इस रिपोर्ट पर कोई नोट नहीं",
+      "download": "डाउनलोड करें",
+      "downloading": "{{name}} डाउनलोड हो रही है"
+    }
+  },
+  "package": {
+    "title": "पैकेज जोड़ें",
+    "step": "पैकेज चुनें",
+    "option": "{{name}} · {{sessions}} सेशन · {{price}}",
+    "empty": "अभी कई सेशन वाली कोई सेवा नहीं",
+    "summary": "ट्रीटमेंट पूरा होने पर सेशन गिने जाते हैं",
+    "save": "पैकेज जोड़ें",
+    "noPick": "पैकेज चुनें",
+    "added": "पैकेज जुड़ गया · इसका बिल इनवॉइस से बनाएँ"
   }
 }

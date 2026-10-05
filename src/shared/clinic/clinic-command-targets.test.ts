@@ -28,7 +28,7 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
     });
   });
 
-  it('takes Today’s lane actions to the Visit sheet and the sale drawer (§6.2)', () => {
+  it('takes Today’s lane actions and Save & sell to the Visit sheet and the sale drawer (§6.2)', () => {
     expect(
       clinicCommandNavigation('visit', {
         organizationSlug: 'acme',
@@ -51,6 +51,14 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
       params: { organizationSlug: 'acme' },
       search: { prescription: PATIENT, from: 'today' },
     });
+    // The Rx drawer's "Save & sell" (L-45) keeps the prescriptions section behind it.
+    expect(
+      clinicCommandNavigation('newSale', {
+        organizationSlug: 'acme',
+        referrer: `patients/${PATIENT}/prescriptions`,
+        search: { prescription: 'rx-1' },
+      }).search,
+    ).toEqual({ prescription: 'rx-1', from: `patients/${PATIENT}/prescriptions` });
   });
 
   it('takes the Patients row actions to the other rooms’ drawers (§6.5)', () => {

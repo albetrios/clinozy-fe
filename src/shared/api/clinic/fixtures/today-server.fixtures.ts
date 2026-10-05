@@ -57,7 +57,11 @@ function moneyOf(
 /** The package a booking uses a session of — else the patient's first open one. */
 function packOf(
   row: AppointmentRow,
-  packages: readonly PatientPackage[],
+  // What a package needs here — invoiced or not (an added package has no invoice yet, A-F6).
+  packages: readonly Pick<
+    PatientPackage,
+    'id' | 'patientId' | 'sessionsUsed' | 'sessionsTotal' | 'validUntil'
+  >[],
   today: string,
 ): TodayFloorRow['pack'] {
   const { patientId } = row.person;

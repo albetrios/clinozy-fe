@@ -357,9 +357,10 @@ const loadPatientFile = localizedRoute(
   () =>
     import('@/pages/organization/$organizationSlug/patients/$patientId/patient-id.sections.ts'),
 );
+type PatientFileModule = Awaited<ReturnType<typeof loadPatientFile>>;
 type PatientFileRoutes = Omit<
-  Awaited<ReturnType<typeof loadPatientFile>>,
-  'PATIENT_FILE_SECTION_PAGES'
+  PatientFileModule,
+  'PATIENT_FILE_SECTION_PAGES' | 'PATIENT_FILE_DIALOG_PAGES'
 >;
 const patientFileComponent = (name: keyof PatientFileRoutes) =>
   lazyRouteComponent(async () => {
@@ -374,6 +375,16 @@ const patientFileSection = (section: PatientFileSectionSlug) =>
     await page.preload?.();
     return { Component: page };
   }, 'Component');
+// A section's URL-driven dialog (S:35–43): it renders nothing — the section opens it.
+const patientFileDialog = (
+  dialog: keyof PatientFileModule['PATIENT_FILE_DIALOG_PAGES'],
+) =>
+  lazyRouteComponent(
+    async () => ({
+      Component: (await loadPatientFile()).PATIENT_FILE_DIALOG_PAGES[dialog],
+    }),
+    'Component',
+  );
 const PaymentsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.payments],
@@ -1409,6 +1420,51 @@ const organizationPatientPhotoEditRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// The record dialogs over Prescriptions, Treatments and Reports (S:35–43):
+// each renders nothing — the section reads the URL and opens its drawer.
+const organizationPrescriptionCreateRoute = createRoute({
+  getParentRoute: () => organizationPatientPrescriptionsRoute,
+  path: 'create',
+  component: patientFileDialog('prescriptionCreate'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationPrescriptionRoute = createRoute({
+  getParentRoute: () => organizationPatientPrescriptionsRoute,
+  path: '$prescriptionId',
+  component: patientFileDialog('prescription'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationPrescriptionEditRoute = createRoute({
+  getParentRoute: () => organizationPatientPrescriptionsRoute,
+  path: '$prescriptionId/edit',
+  component: patientFileDialog('prescriptionEdit'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationTreatmentCreateRoute = createRoute({
+  getParentRoute: () => organizationPatientTreatmentsRoute,
+  path: 'create',
+  component: patientFileDialog('treatmentCreate'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationTreatmentEditRoute = createRoute({
+  getParentRoute: () => organizationPatientTreatmentsRoute,
+  path: '$treatmentId/edit',
+  component: patientFileDialog('treatmentEdit'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationReportCreateRoute = createRoute({
+  getParentRoute: () => organizationPatientReportsRoute,
+  path: 'create',
+  component: patientFileDialog('reportCreate'),
+  errorComponent: RouteErrorBoundary,
+});
+const organizationReportRoute = createRoute({
+  getParentRoute: () => organizationPatientReportsRoute,
+  path: '$reportId',
+  component: patientFileDialog('report'),
+  errorComponent: RouteErrorBoundary,
+});
+
 // `/payments` is the ledger itself (D24, `S:84`); its drawers are URL-driven
 // dialogs over it — each renders nothing, the page reads the URL and opens it.
 const organizationPaymentsRoute = createRoute({
@@ -2336,13 +2392,23 @@ const routeTree = rootRoute.addChildren([
       organizationPatientTimelineRoute,
       organizationPatientOverviewRoute,
       organizationPatientVisitsRoute,
-      organizationPatientPrescriptionsRoute,
-      organizationPatientTreatmentsRoute,
+      organizationPatientPrescriptionsRoute.addChildren([
+        organizationPrescriptionCreateRoute,
+        organizationPrescriptionRoute,
+        organizationPrescriptionEditRoute,
+      ]),
+      organizationPatientTreatmentsRoute.addChildren([
+        organizationTreatmentCreateRoute,
+        organizationTreatmentEditRoute,
+      ]),
       organizationPatientImagesRoute.addChildren([
         organizationPatientPhotoRoute,
         organizationPatientPhotoEditRoute,
       ]),
-      organizationPatientReportsRoute,
+      organizationPatientReportsRoute.addChildren([
+        organizationReportCreateRoute,
+        organizationReportRoute,
+      ]),
       organizationPatientInvoicesRoute,
       organizationPatientPaymentsRoute,
       organizationPatientPackagesRoute,

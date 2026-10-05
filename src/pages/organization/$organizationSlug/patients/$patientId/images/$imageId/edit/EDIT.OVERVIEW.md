@@ -1,6 +1,6 @@
 # `pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edit` — Photo details
 
-Route: `/organization/$organizationSlug/patients/$patientId/images/$imageId/edit` (`S:42`;
+Route: `/organization/$organizationSlug/patients/$patientId/images/$imageId/edit` (`S:41`;
 KICKOFF §6.6 Drawers) — the 560px drawer over the Photos section, keeping its
 `?album=&appointment=`.
 

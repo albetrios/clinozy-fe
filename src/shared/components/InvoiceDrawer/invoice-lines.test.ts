@@ -4,7 +4,10 @@ import {
   offeringSeed,
   offerSeed,
 } from '@/shared/api/clinic/fixtures/offerings.fixtures.ts';
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
+import {
+  medicineForm,
+  type MedicineRecord,
+} from '@/shared/api/clinic/medicines-contracts.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 
 import { blankLine } from './invoice-form.ts';
@@ -12,7 +15,6 @@ import {
   coveredSessions,
   lineFromCatalog,
   medicineCatalogItem,
-  medicineForm,
   offeringCatalogItem,
   offeringsFor,
   oftenBilledItems,

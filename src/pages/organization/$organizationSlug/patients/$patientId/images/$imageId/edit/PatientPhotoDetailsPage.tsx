@@ -245,7 +245,7 @@ function PhotoDetailsForm({
 }
 
 /**
- * Photo details — `/patients/$patientId/images/$imageId/edit` (`S:42`; KICKOFF
+ * Photo details — `/patients/$patientId/images/$imageId/edit` (`S:41`; KICKOFF
  * §6.6 Drawers): the 560px drawer over Photos — Name (≤60, a blank one keeps
  * the old), Date, Album (General stone · Private lav · LHR blush), Body part
  * (optional), Visit ("Not attached" + the last 8). "Save details" → "Photo

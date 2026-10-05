@@ -241,5 +241,352 @@
       "saved": "사진 세부 정보를 저장했습니다"
     },
     "loading": "사진을 불러오는 중"
+  },
+  "rx": {
+    "record": "처방전",
+    "title": {
+      "create": "새 처방전",
+      "edit": "처방전 수정"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_other": "약 {{count}}개",
+    "quickFill": {
+      "print": "처방전 인쇄",
+      "repeat": "지난 처방전 {{number}} 반복",
+      "kits": {
+        "hairFall": "탈모 키트",
+        "postPeel": "필링 후 키트",
+        "pigmentation": "색소 키트"
+      }
+    },
+    "kit": {
+      "reapply": "3시간마다 다시 바르기",
+      "avoidSun": "48시간 동안 햇빛과 스크럽 피하기"
+    },
+    "steps": {
+      "prescription": "처방전",
+      "medicines": "약",
+      "notes": "임상 메모"
+    },
+    "date": "날짜",
+    "doctor": "의사",
+    "doctorPlaceholder": "의사 선택",
+    "quick": {
+      "placeholder": "약, 용량, 시간 입력 · 예: flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "자주 처방",
+      "groups": {
+        "all": "전체",
+        "often": "자주 처방",
+        "oral": "경구",
+        "topical": "외용"
+      },
+      "newMedicine": "목록에 없는 약",
+      "lastSaved": "지난 용량 저장됨",
+      "noDosage": "이전 용량 없음",
+      "inStock_other": "재고 {{count}}",
+      "outOfStock": "재고 없음",
+      "added": "{{name}} 추가됨",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "약",
+      "medicine": "약",
+      "dose": "용량 · 아 점 저",
+      "meal": "식사",
+      "where": "부위",
+      "qty": "수량",
+      "searchMedicine": "약 검색",
+      "addMedicine": "약 추가",
+      "use": "사용",
+      "note": "메모 · 예: 10일, 얇게 바르기, 햇빛 피하기"
+    },
+    "dose": {
+      "group": "용량 아침 · 점심 · 저녁",
+      "times": {
+        "morning": "아침",
+        "afternoon": "점심",
+        "night": "저녁"
+      },
+      "on": "{{time}} · {{taps}} — 클릭해서 변경",
+      "off": "{{time}} · 없음 — 클릭해서 변경",
+      "sos": "SOS",
+      "sosHint": "필요할 때만 (SOS)"
+    },
+    "meal": {
+      "before": "식전",
+      "after": "식후",
+      "beforeHint": "식전",
+      "afterHint": "식후",
+      "more": "다른 시간",
+      "change": "{{timing}} · 변경"
+    },
+    "timings": {
+      "empty_stomach": "공복",
+      "with_meal": "식사와 함께",
+      "morning": "아침",
+      "night": "저녁",
+      "morning_night": "아침과 저녁",
+      "thrice_week": "주 3회",
+      "once_week": "주 1회",
+      "alternate_days": "격일"
+    },
+    "places": {
+      "face": "얼굴",
+      "scalp": "두피",
+      "hair": "모발",
+      "body": "몸",
+      "underarm": "겨드랑이",
+      "neck": "목",
+      "back": "등",
+      "chest": "가슴",
+      "hands": "손",
+      "legs": "다리",
+      "feet": "발",
+      "lips": "입술",
+      "underEyes": "눈 밑",
+      "affectedArea": "환부"
+    },
+    "notes": {
+      "advice": "메모",
+      "advicePlaceholder": "환자에게 주는 조언",
+      "lab": "검사 결과",
+      "labPlaceholder": "권장 검사 또는 결과",
+      "procedure": "오늘의 시술",
+      "procedurePlaceholder": "오늘 한 일"
+    },
+    "daysNote_other": "{{count}}일",
+    "dayWords": "일",
+    "save": {
+      "create": "처방전 저장",
+      "edit": "변경 사항 저장",
+      "sell": "저장 후 판매",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "약을 추가하세요",
+      "saved": "처방전을 저장했습니다",
+      "savedNumber": "처방전 {{number}}을(를) 저장했습니다"
+    },
+    "delete": {
+      "title": "이 처방전을 삭제할까요?",
+      "deleted": "처방전을 삭제했습니다"
+    },
+    "preview": "처방전 {{number}}"
+  },
+  "treatment": {
+    "record": "시술",
+    "title": {
+      "create": "새 시술",
+      "edit": "시술 수정"
+    },
+    "sub": "항목은 병원 전문 분야에 맞춰져 있어요 · 필요하면 바꾸세요",
+    "session": "{{session}}회차",
+    "quickFill": {
+      "next": "{{name}} 다음 회차",
+      "package": "{{name}} · {{session}}회차"
+    },
+    "type": "종류",
+    "templates": {
+      "skin": "피부 · 레이저",
+      "dental": "치과",
+      "physio": "물리치료",
+      "gynac": "산부인과",
+      "general": "일반"
+    },
+    "steps": {
+      "session": "회차",
+      "details": "{{template}} 상세",
+      "aftercare": "사후 관리"
+    },
+    "name": "시술",
+    "namePlaceholder": "선택하거나 입력",
+    "sessionNo": "회차 번호",
+    "doctor": "의사",
+    "doctorPlaceholder": "의사 선택",
+    "therapist": "치료사",
+    "therapistPlaceholder": "치료사 선택",
+    "skin": {
+      "therapyType": "시술 종류",
+      "therapyTypes": {
+        "laser": "레이저",
+        "peel": "필링",
+        "facial": "페이셜",
+        "injectable": "주사",
+        "microneedling": "마이크로니들링"
+      },
+      "bodyPart": "부위",
+      "pickAny": "여러 개 선택 가능",
+      "areas": {
+        "face": "얼굴",
+        "upperLip": "인중",
+        "chin": "턱",
+        "underarm": "겨드랑이",
+        "arms": "팔",
+        "legs": "다리",
+        "back": "등",
+        "chest": "가슴",
+        "fullBody": "전신"
+      },
+      "skinType": "피부 타입",
+      "skinTypeValue": "타입 {{type}}",
+      "machine": "장비",
+      "machinePlaceholder": "예: Soprano Ice",
+      "wavelength": "파장",
+      "startReading": "시작 카운터",
+      "endReading": "종료 카운터",
+      "readingPlaceholder": "샷 / 카운터",
+      "power": "출력 · 주파수 · PD · 모드",
+      "powerPlaceholder": "예: 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "시술",
+      "procedures": {
+        "scaling": "스케일링",
+        "filling": "충전",
+        "rct": "신경치료",
+        "extraction": "발치",
+        "crown": "크라운",
+        "implant": "임플란트",
+        "whitening": "미백"
+      },
+      "teeth": "치아",
+      "teethHint": "FDI 번호 · 눌러서 선택",
+      "quadrants": {
+        "upperRight": "오른쪽 위",
+        "upperLeft": "왼쪽 위",
+        "lowerRight": "오른쪽 아래",
+        "lowerLeft": "왼쪽 아래"
+      },
+      "tooth": "치아 {{tooth}}",
+      "material": "재료",
+      "materialPlaceholder": "예: 레진 A2",
+      "anaesthesia": "마취",
+      "given": "함",
+      "notGiven": "안 함"
+    },
+    "physio": {
+      "region": "부위",
+      "regions": {
+        "neck": "목",
+        "shoulder": "어깨",
+        "back": "등",
+        "hip": "고관절",
+        "knee": "무릎",
+        "ankle": "발목"
+      },
+      "modality": "치료 방법",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "초음파",
+        "exercise": "운동",
+        "manualTherapy": "도수 치료",
+        "traction": "견인"
+      },
+      "painBefore": "치료 전 통증",
+      "painAfter": "치료 후 통증",
+      "painHint": "0–10",
+      "exercises": "홈 운동",
+      "exercisesPlaceholder": "세트, 반복, 횟수"
+    },
+    "gynac": {
+      "visitType": "방문 종류",
+      "visitTypes": {
+        "anc": "산전 진찰",
+        "pnc": "산후 진찰",
+        "infertility": "난임",
+        "contraception": "피임",
+        "general": "일반"
+      },
+      "lmp": "마지막 생리",
+      "gestation": "임신 주수",
+      "weeks": "주",
+      "bp": "혈압",
+      "bpPlaceholder": "120/80",
+      "weight": "체중",
+      "kg": "kg",
+      "findings": "소견",
+      "findingsPlaceholder": "진찰 소견"
+    },
+    "general": {
+      "area": "부위",
+      "areaPlaceholder": "쉼표로 구분",
+      "parameters": "파라미터",
+      "parametersPlaceholder": "한 줄에 하나, 예: 용량: 2 ml"
+    },
+    "aftercare": {
+      "remark": "비고",
+      "remarkPlaceholder": "반응, 조언, 다음 계획",
+      "call": "사후 관리 전화",
+      "callHint": "상태와 실천 여부를 묻는 할 일을 만들어요",
+      "calls": {
+        "none": "전화 안 함",
+        "next_day": "다음 날",
+        "in_2_days": "2일 후",
+        "in_week": "1주일 후"
+      },
+      "feedback": "이 시술에 대한 피드백",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "아직 체크인이 없어요 · 위의 체크인 기록을 사용하세요"
+    },
+    "save": {
+      "create": "시술 저장",
+      "edit": "변경 사항 저장",
+      "saved": "시술을 저장했습니다"
+    },
+    "delete": {
+      "title": "이 시술을 삭제할까요?",
+      "deleted": "시술을 삭제했습니다"
+    }
+  },
+  "report": {
+    "record": "검사 결과",
+    "types": {
+      "lab": "검사",
+      "scan": "영상",
+      "consent": "동의서",
+      "other": "기타"
+    },
+    "steps": {
+      "report": "검사 결과",
+      "details": "세부 정보",
+      "notes": "메모"
+    },
+    "type": "유형",
+    "name": "이름",
+    "date": "날짜",
+    "file": "파일",
+    "upload": {
+      "title": "검사 결과 업로드",
+      "namePlaceholder": "예: 혈액 검사",
+      "drop": "결과지를 끌어다 놓거나 찾아보기",
+      "fileHint": "PDF, JPG 또는 PNG · 최대 {{limit}}",
+      "remove": "{{name}} 삭제",
+      "note": "메모",
+      "notePlaceholder": "선택 사항",
+      "summary": "{{type}} · {{files}}",
+      "save": "업로드",
+      "noName": "검사 결과의 이름을 입력하세요",
+      "uploaded": "검사 결과를 업로드했습니다",
+      "files_other": "파일 {{count}}개"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "추가한 사람",
+      "fileLine": "{{name}} · {{format}} · 요청 시 환자와 공유",
+      "notes": "메모",
+      "noNotes": "이 결과에 메모가 없습니다",
+      "download": "다운로드",
+      "downloading": "{{name}} 다운로드 중"
+    }
+  },
+  "package": {
+    "title": "패키지 추가",
+    "step": "패키지 선택",
+    "option": "{{name}} · {{sessions}}회 · {{price}}",
+    "empty": "아직 여러 회차 서비스가 없습니다",
+    "summary": "시술이 완료되면 회차가 차감됩니다",
+    "save": "패키지 추가",
+    "noPick": "패키지를 선택하세요",
+    "added": "패키지를 추가했습니다 · 청구서에서 청구하세요"
   }
 }

@@ -667,6 +667,49 @@ table carry the shared ids with the `tableId` `users-branches` (`users-branches-
 | `patient-photo-viewer` · `patient-photo-viewer-<part>`                                      | The photo viewer (`role="dialog"`); parts `stage` · `previous` · `next` · `zoom-out` · `zoom-reset` · `zoom-in` · `edit` · `delete` · `close` | `images/$imageId/components/PhotoViewer/`         |
 | `patient-photo-details` · `patient-photo-details-<field>`                                   | Photo details (the shared drawer's root); fields `name` · `date` · `album-<album>` · `body-part-<part>` · `visit-<id or none>`                | `images/$imageId/edit/`                           |
 
+### Patient file records (launch L-45)
+
+The record drawers are `RecordDrawer`s — their parts take the Record drawer ids above, `<d>`
+being the root: `rx-drawer`, `treatment-drawer`, `report-drawer`, `report-view`,
+`package-drawer`. Their dialog routes render nothing; the section opens them (Add package has no
+route). Paths are under `pages/organization/$organizationSlug/patients/$patientId/`.
+
+| Test ID                                                                          | Element                                                                                                         | Source                                          |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `rx-drawer-date` · `rx-drawer-doctor`                                            | New / Edit prescription (1040): step 1's Date and Doctor                                                        | `prescriptions/components/PrescriptionDrawer/`  |
+| `rx-drawer-quick-fill-<id>`                                                      | Quick fill: `print` (edit) · `repeat` (new) · the kits `hairFall` · `postPeel` · `pigmentation`                 | PrescriptionDrawer                              |
+| `rx-quick-line` · `rx-quick-line-<part>`                                         | The medicines' quick line (Quick line ids below)                                                                | PrescriptionDrawer                              |
+| `rx-items` · `rx-items-<part>`                                                   | The medicines (Items field ids; columns `medicineName` · `dose` · `when` · `where` · `qty`)                     | PrescriptionDrawer                              |
+| `rx-items-dose-<time>` · `rx-items-dose-sos`                                     | A line's dose taps (`morning` · `afternoon` · `night`) · SOS                                                    | `PrescriptionDrawer/rx-item-cells.tsx`          |
+| `rx-items-when-<meal>` · `rx-items-when-more`                                    | A line's meal chips (`before` · `after`) · "More timings"                                                       | `PrescriptionDrawer/rx-item-cells.tsx`          |
+| `rx-drawer-advice` · `rx-drawer-lab-report` · `rx-drawer-procedure-today`        | Step 3's Notes, Lab report, Today's procedure                                                                   | PrescriptionDrawer                              |
+| `rx-print-preview` · `rx-print-preview-close` · `rx-print-preview-print`         | The print preview (`$prescriptionId`, 820) · Close · "Print / Save PDF"                                         | `prescriptions/components/RxPrintPreview/`      |
+| `treatment-drawer-template-<template>`                                           | The Type switch (`skin` · `dental` · `physio` · `gynac` · `general`)                                            | `treatments/components/TreatmentDrawer/`        |
+| `treatment-drawer-name` · `-name-quick` · `-session` · `-doctor` · `-therapist`  | New / Edit treatment (680), step 1                                                                              | TreatmentDrawer                                 |
+| `treatment-drawer-<param>` · `-areas` · `-tooth-<fdi>` · `-anaesthesia` · `-lmp` | Step 2 by template (a param kebab-cased: `skin-type`, `pain-before`)                                            | `TreatmentDrawer/treatment-template-fields.tsx` |
+| `treatment-drawer-remark` · `-call` · `-feedback`                                | Step 3: Remark, the Aftercare call chips, "Feedback on this treatment"                                          | TreatmentDrawer                                 |
+| `report-drawer-type-<type>` · `report-drawer-name` · `report-drawer-date`        | Upload report (560): Type (`lab` · `scan` · `consent` · `other`), Name, Date                                    | `reports/components/ReportDrawer/`              |
+| `report-drawer-file` · `report-drawer-file-input` · `report-drawer-note`         | The File drop zone · its hidden picker · Note                                                                   | ReportDrawer                                    |
+| `report-view-<field>`                                                            | Report view (560, read only; "Download" is `report-view-save`): `type` · `date` · `added-by` · `file` · `notes` | `reports/components/ReportView/`                |
+| `package-drawer-offering-<offeringId>` · `package-drawer-empty`                  | Add package (560): one chip per multi-session offering · "No multi-session offerings yet"                       | `packages/components/AddPackageDrawer/`         |
+
+## Quick line (shared, launch L-45)
+
+`shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a
+grammar-agnostic shell (the screen brings the parser). `<q>` is its root id (`rx-quick-line`).
+
+| Test ID                                                     | Element                                                                                     | Source                          |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------- |
+| `<q>` · `<q>-input`                                         | The row · its input (a combobox over the matches)                                           | `shared/components/QuickLine/`  |
+| `<q>-matches` · `<q>-option` · `<q>-typed` · `<q>-no-match` | The matches list · a match · the typed name ("Not in the list · add as typed") · "No match" | QuickLine                       |
+| `<q>-frequent`                                              | The frequent chips under the row                                                            | QuickLine                       |
+| `<q>-browse` · `<q>-browse-panel`                           | "Browse" · its panel                                                                        | QuickLine                       |
+| `<q>-browse-group-<id>` · `<q>-browse-tile`                 | A group button (`aria-pressed`) · a tile with its stepper                                   | `QuickLine/QuickLineBrowse.tsx` |
+| `<q>-browse-new` · `<q>-browse-done`                        | "Add new" field · "Done"                                                                    | `QuickLine/QuickLineBrowse.tsx` |
+
+A drawer's upload field (`shared/components/DrawerField/drawer-files-field.tsx`) is `<z>` with
+its hidden picker `<z>-input` — `report-drawer-file`, `patient-drawer-photos`.
+
 ## Items field (shared, launch L-17a)
 
 A drawer's item rows (invoice lines, sale / PO / purchase items, Rx medicines, Mode · Amount) are

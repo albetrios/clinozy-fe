@@ -1,7 +1,12 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
+import {
+  organizationPatientSection,
+  organizationPrescriptionCreate,
+  organizationReportCreate,
+  organizationTreatmentCreate,
+} from '@/lib/routes/patient-file-builders.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
@@ -69,7 +74,7 @@ export interface PatientAddItem {
 /**
  * Each section's split primary "New …" (H:4746–4764; `patient-file.md:512`):
  * the Add-menu item it runs. Overview, Clinical notes and Team notes have
- * none; "Add package" lands with its drawer.
+ * none; Packages passes its own, "Add package" (no Add-menu item).
  */
 export const SECTION_PRIMARY_ITEM: Readonly<
   Partial<Record<PatientFileSectionSlug, PatientAddItemId>>
@@ -121,8 +126,15 @@ export function usePatientFileActions(): PatientFileActions {
     void navigate(navigation);
 
   const actions: Record<PatientAddItemId, { allowed: boolean; run: () => void }> = {
-    prescription: { allowed: passes('prescriptions'), run: openSection('prescriptions') },
-    treatment: { allowed: passes('treatments'), run: openSection('treatments') },
+    prescription: {
+      allowed: passes('prescriptions'),
+      run: () =>
+        void navigate(organizationPrescriptionCreate(organizationSlug, patientId)),
+    },
+    treatment: {
+      allowed: passes('treatments'),
+      run: () => void navigate(organizationTreatmentCreate(organizationSlug, patientId)),
+    },
     invoice: {
       allowed: can('payments', 'create'),
       run: () =>
@@ -173,7 +185,10 @@ export function usePatientFileActions(): PatientFileActions {
           }),
         ),
     },
-    report: { allowed: can('patients', 'edit'), run: openSection('reports') },
+    report: {
+      allowed: can('patients', 'edit'),
+      run: () => void navigate(organizationReportCreate(organizationSlug, patientId)),
+    },
     note: { allowed: can('patients', 'create'), run: openSection('notes') },
   };
 

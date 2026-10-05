@@ -5,7 +5,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * (`/organization/$organizationSlug/patients/$patientId/images`; KICKOFF §6.6,
  * D26). The file layout's gate covers it (membership, the `clinic-patients`
  * module, the org status); in-room access is `useClinicAccess`. Its child is
- * the photo viewer (`$imageId`, with Photo details under it, `S:41–42`).
+ * the photo viewer (`$imageId`, with Photo details under it, `S:40–41`).
  */
 export const manifest = {
   segment: 'images',

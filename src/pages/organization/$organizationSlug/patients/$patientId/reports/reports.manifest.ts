@@ -13,6 +13,6 @@ export const manifest = {
   testId: 'patient-section-reports',
   permission: 'organization:read',
   module: 'clinic-patients',
-  kind: 'leaf',
-  children: [],
+  kind: 'layout',
+  children: ['create', '$reportId'],
 } as const satisfies PageManifest;

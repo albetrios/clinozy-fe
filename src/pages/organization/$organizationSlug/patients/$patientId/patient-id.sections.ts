@@ -2,6 +2,14 @@ import { lazyRouteComponent } from '@tanstack/react-router';
 
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 
+import { Component as PrescriptionEdit } from './prescriptions/$prescriptionId/edit/edit.route.tsx';
+import { Component as Prescription } from './prescriptions/$prescriptionId/prescription-id.route.tsx';
+import { Component as PrescriptionCreate } from './prescriptions/create/create.route.tsx';
+import { Component as Report } from './reports/$reportId/report-id.route.tsx';
+import { Component as ReportCreate } from './reports/create/create.route.tsx';
+import { Component as TreatmentEdit } from './treatments/$treatmentId/edit/edit.route.tsx';
+import { Component as TreatmentCreate } from './treatments/create/create.route.tsx';
+
 /*
  * The patient file's route components (KICKOFF §6.6, L-42), behind ONE
  * dynamic import from `routeTree.tsx` — the entry chunk carries a single
@@ -73,3 +81,18 @@ export const PATIENT_FILE_SECTION_PAGES = {
   ),
   notes: lazyRouteComponent(() => import('./notes/notes.route.tsx'), 'Component'),
 } as const satisfies Record<PatientFileSectionSlug, unknown>;
+
+/**
+ * The sections' URL-driven dialogs (`S:35–43`; D24): each renders nothing —
+ * its section reads the URL and opens the drawer or viewer over itself — so
+ * they ride this module rather than a chunk each.
+ */
+export const PATIENT_FILE_DIALOG_PAGES = {
+  prescriptionCreate: PrescriptionCreate,
+  prescription: Prescription,
+  prescriptionEdit: PrescriptionEdit,
+  treatmentCreate: TreatmentCreate,
+  treatmentEdit: TreatmentEdit,
+  reportCreate: ReportCreate,
+  report: Report,
+} as const;

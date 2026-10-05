@@ -252,5 +252,356 @@
       "saved": "Photo details saved"
     },
     "loading": "Loading photos"
+  },
+  "rx": {
+    "record": "Prescription",
+    "title": {
+      "create": "New prescription",
+      "edit": "Edit prescription"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_one": "{{count}} medicine",
+    "medicines_other": "{{count}} medicines",
+    "quickFill": {
+      "print": "Print prescription",
+      "repeat": "Repeat last Rx {{number}}",
+      "kits": {
+        "hairFall": "Hair fall kit",
+        "postPeel": "Post-peel kit",
+        "pigmentation": "Pigmentation kit"
+      }
+    },
+    "kit": {
+      "reapply": "Reapply every 3 h",
+      "avoidSun": "Avoid sun and scrubs for 48 h"
+    },
+    "steps": {
+      "prescription": "Prescription",
+      "medicines": "Medicines",
+      "notes": "Clinical notes"
+    },
+    "date": "Date",
+    "doctor": "Doctor",
+    "doctorPlaceholder": "Pick doctor",
+    "quick": {
+      "placeholder": "Type medicine, dose, timing · e.g. flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "Often prescribed",
+      "groups": {
+        "all": "All",
+        "often": "Often prescribed",
+        "oral": "Oral",
+        "topical": "Topical"
+      },
+      "newMedicine": "Medicine not in the list",
+      "lastSaved": "Last dosage saved",
+      "noDosage": "No previous dosage",
+      "inStock_one": "{{count}} in stock",
+      "inStock_other": "{{count}} in stock",
+      "outOfStock": "out of stock",
+      "added": "{{name}} added",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "Medicines",
+      "medicine": "Medicine",
+      "dose": "Dose · M A N",
+      "meal": "Meal",
+      "where": "Where",
+      "qty": "Qty",
+      "searchMedicine": "Search medicine",
+      "addMedicine": "Add medicine",
+      "use": "Use",
+      "note": "Remarks · e.g. 10 days, apply thin layer, avoid sun"
+    },
+    "dose": {
+      "group": "Dose morning · afternoon · night",
+      "times": {
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "night": "Night"
+      },
+      "on": "{{time}} · {{taps}} — click to change",
+      "off": "{{time}} · none — click to change",
+      "sos": "SOS",
+      "sosHint": "Only when needed (SOS)"
+    },
+    "meal": {
+      "before": "Before",
+      "after": "After",
+      "beforeHint": "Before meal",
+      "afterHint": "After meal",
+      "more": "More timings",
+      "change": "{{timing}} · change"
+    },
+    "timings": {
+      "empty_stomach": "Empty stomach",
+      "with_meal": "With meal",
+      "morning": "Morning",
+      "night": "Night",
+      "morning_night": "Morning & night",
+      "thrice_week": "Thrice a week",
+      "once_week": "Once a week",
+      "alternate_days": "Alternate days"
+    },
+    "places": {
+      "face": "Face",
+      "scalp": "Scalp",
+      "hair": "Hair",
+      "body": "Body",
+      "underarm": "Underarm",
+      "neck": "Neck",
+      "back": "Back",
+      "chest": "Chest",
+      "hands": "Hands",
+      "legs": "Legs",
+      "feet": "Feet",
+      "lips": "Lips",
+      "underEyes": "Under eyes",
+      "affectedArea": "Affected area"
+    },
+    "notes": {
+      "advice": "Notes",
+      "advicePlaceholder": "Advice for the patient",
+      "lab": "Lab report",
+      "labPlaceholder": "Tests advised or results",
+      "procedure": "Today’s procedure",
+      "procedurePlaceholder": "What was done today"
+    },
+    "daysNote_one": "{{count}} day",
+    "daysNote_other": "{{count}} days",
+    "dayWords": "day, days",
+    "save": {
+      "create": "Save prescription",
+      "edit": "Save changes",
+      "sell": "Save & sell",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "Add a medicine",
+      "saved": "Prescription saved",
+      "savedNumber": "Prescription {{number}} saved"
+    },
+    "delete": {
+      "title": "Delete this prescription?",
+      "deleted": "Prescription deleted"
+    },
+    "preview": "Prescription {{number}}"
+  },
+  "treatment": {
+    "record": "Treatment",
+    "title": {
+      "create": "New treatment",
+      "edit": "Edit treatment"
+    },
+    "sub": "Fields follow the clinic specialty · switch if needed",
+    "session": "Session {{session}}",
+    "quickFill": {
+      "next": "Next session of {{name}}",
+      "package": "{{name}} · session {{session}}"
+    },
+    "type": "Type",
+    "templates": {
+      "skin": "Skin · laser",
+      "dental": "Dental",
+      "physio": "Physio",
+      "gynac": "Gynac",
+      "general": "General"
+    },
+    "steps": {
+      "session": "Session",
+      "details": "{{template}} details",
+      "aftercare": "Aftercare"
+    },
+    "name": "Treatment",
+    "namePlaceholder": "Pick or type",
+    "sessionNo": "Session number",
+    "doctor": "Doctor",
+    "doctorPlaceholder": "Pick doctor",
+    "therapist": "Therapist",
+    "therapistPlaceholder": "Pick therapist",
+    "skin": {
+      "therapyType": "Therapy type",
+      "therapyTypes": {
+        "laser": "Laser",
+        "peel": "Peel",
+        "facial": "Facial",
+        "injectable": "Injectable",
+        "microneedling": "Microneedling"
+      },
+      "bodyPart": "Body part",
+      "pickAny": "pick any",
+      "areas": {
+        "face": "Face",
+        "upperLip": "Upper lip",
+        "chin": "Chin",
+        "underarm": "Underarm",
+        "arms": "Arms",
+        "legs": "Legs",
+        "back": "Back",
+        "chest": "Chest",
+        "fullBody": "Full body"
+      },
+      "skinType": "Skin type",
+      "skinTypeValue": "Type {{type}}",
+      "machine": "Machine",
+      "machinePlaceholder": "e.g. Soprano Ice",
+      "wavelength": "Wavelength",
+      "startReading": "Start reading",
+      "endReading": "End reading",
+      "readingPlaceholder": "Shots / counter",
+      "power": "Power · frequency · PD · mode",
+      "powerPlaceholder": "e.g. 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "Procedure",
+      "procedures": {
+        "scaling": "Scaling",
+        "filling": "Filling",
+        "rct": "RCT",
+        "extraction": "Extraction",
+        "crown": "Crown",
+        "implant": "Implant",
+        "whitening": "Whitening"
+      },
+      "teeth": "Teeth",
+      "teethHint": "FDI numbering · tap to select",
+      "quadrants": {
+        "upperRight": "Upper right",
+        "upperLeft": "Upper left",
+        "lowerRight": "Lower right",
+        "lowerLeft": "Lower left"
+      },
+      "tooth": "Tooth {{tooth}}",
+      "material": "Material",
+      "materialPlaceholder": "e.g. Composite A2",
+      "anaesthesia": "Anaesthesia",
+      "given": "Given",
+      "notGiven": "Not given"
+    },
+    "physio": {
+      "region": "Region",
+      "regions": {
+        "neck": "Neck",
+        "shoulder": "Shoulder",
+        "back": "Back",
+        "hip": "Hip",
+        "knee": "Knee",
+        "ankle": "Ankle"
+      },
+      "modality": "Modality",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "Ultrasound",
+        "exercise": "Exercise",
+        "manualTherapy": "Manual therapy",
+        "traction": "Traction"
+      },
+      "painBefore": "Pain before",
+      "painAfter": "Pain after",
+      "painHint": "0–10",
+      "exercises": "Home exercises",
+      "exercisesPlaceholder": "Sets, reps, frequency"
+    },
+    "gynac": {
+      "visitType": "Visit type",
+      "visitTypes": {
+        "anc": "ANC",
+        "pnc": "PNC",
+        "infertility": "Infertility",
+        "contraception": "Contraception",
+        "general": "General"
+      },
+      "lmp": "LMP",
+      "gestation": "Gestation",
+      "weeks": "weeks",
+      "bp": "BP",
+      "bpPlaceholder": "120/80",
+      "weight": "Weight",
+      "kg": "kg",
+      "findings": "Findings",
+      "findingsPlaceholder": "Examination findings"
+    },
+    "general": {
+      "area": "Area",
+      "areaPlaceholder": "Comma separated",
+      "parameters": "Parameters",
+      "parametersPlaceholder": "One per line, e.g. Dose: 2 ml"
+    },
+    "aftercare": {
+      "remark": "Remark",
+      "remarkPlaceholder": "Reaction, advice, next plan",
+      "call": "Aftercare call",
+      "callHint": "creates a task to ask how it feels and what they followed",
+      "calls": {
+        "none": "No call",
+        "next_day": "Next day",
+        "in_2_days": "In 2 days",
+        "in_week": "In a week"
+      },
+      "feedback": "Feedback on this treatment",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "No check-in yet · use Log check-in above"
+    },
+    "save": {
+      "create": "Save treatment",
+      "edit": "Save changes",
+      "saved": "Treatment saved"
+    },
+    "delete": {
+      "title": "Delete this treatment?",
+      "deleted": "Treatment deleted"
+    }
+  },
+  "report": {
+    "record": "Report",
+    "types": {
+      "lab": "Lab",
+      "scan": "Scan",
+      "consent": "Consent",
+      "other": "Other"
+    },
+    "steps": {
+      "report": "Report",
+      "details": "Details",
+      "notes": "Notes"
+    },
+    "type": "Type",
+    "name": "Name",
+    "date": "Date",
+    "file": "File",
+    "upload": {
+      "title": "Upload report",
+      "namePlaceholder": "e.g. CBC report",
+      "drop": "Drop the report or browse",
+      "fileHint": "PDF, JPG or PNG · up to {{limit}}",
+      "remove": "Remove {{name}}",
+      "note": "Note",
+      "notePlaceholder": "Optional",
+      "summary": "{{type}} · {{files}}",
+      "save": "Upload",
+      "noName": "Name the report",
+      "uploaded": "Report uploaded",
+      "files_one": "{{count}} file",
+      "files_other": "{{count}} files"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "Added by",
+      "fileLine": "{{name}} · {{format}} · shared with the patient on request",
+      "notes": "Notes",
+      "noNotes": "No notes on this report",
+      "download": "Download",
+      "downloading": "Downloading {{name}}"
+    }
+  },
+  "package": {
+    "title": "Add package",
+    "step": "Pick a package",
+    "option": "{{name}} · {{sessions}}s · {{price}}",
+    "empty": "No multi-session offerings yet",
+    "summary": "Sessions are counted when a treatment is completed",
+    "save": "Add package",
+    "noPick": "Pick a package",
+    "added": "Package added · invoice it from Invoices"
   }
 }

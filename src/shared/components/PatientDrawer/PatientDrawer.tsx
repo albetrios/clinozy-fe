@@ -13,6 +13,7 @@ import {
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { PatientDeleteConfirm } from '@/shared/components/PatientDeleteConfirm/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
@@ -42,7 +43,7 @@ import {
   patientInputOf,
 } from './patient-form.ts';
 import { PatientClinicFields, PatientContactFields } from './PatientDrawerFields.tsx';
-import { PatientDuplicateNotice, type PickedPhoto } from './PatientDrawerParts.tsx';
+import { PatientDuplicateNotice } from './PatientDrawerParts.tsx';
 import { type PatientSaveOutcome, usePatientSave } from './use-patient-save.ts';
 
 /** What every use of the drawer passes. */
@@ -270,7 +271,7 @@ function PatientDrawerSession(props: SessionProps) {
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('contact');
-  const [photos, setPhotos] = useState<PickedPhoto[]>([]);
+  const [photos, setPhotos] = useState<PickedFile[]>([]);
   const [deleting, setDeleting] = useState(false);
 
   const startingBranchId = defaultBranchId(openBranches, preferences.branchFilter);

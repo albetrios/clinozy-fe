@@ -88,15 +88,21 @@ describe('usePatientFileActions', () => {
     expect(itemIds()).not.toContain('treatment');
   });
 
-  it('opens a record’s section, and the invoice drawer keeping the file behind it', async () => {
+  it('opens a record’s drawer over its section, and the invoice drawer keeping the file behind it', async () => {
     const user = userEvent.setup();
-    const { router } = renderInPatientFile(<ActionsProbe />, { file });
-    await user.click(await screen.findByRole('button', { name: 'prescription' }));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${DHARTI}/prescriptions`,
-      ),
-    );
+    const { router } = renderInPatientFile(<ActionsProbe />, { file, role: 'owner' });
+    for (const [item, path] of [
+      ['prescription', 'prescriptions/create'],
+      ['treatment', 'treatments/create'],
+      ['report', 'reports/create'],
+    ] as const) {
+      await user.click(await screen.findByRole('button', { name: item }));
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe(
+          `/organization/acme/patients/${DHARTI}/${path}`,
+        ),
+      );
+    }
 
     await user.click(screen.getByRole('button', { name: 'invoice' }));
     await waitFor(() =>

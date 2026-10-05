@@ -10,5 +10,13 @@ export type {
   QuickLineParse,
   QuickLineProps,
 } from './quick-line.types.ts';
+export {
+  nameNumbers,
+  QUICK_LINE_MATCH_LIMIT,
+  quickLineBrowseMatches,
+  quickLineMatches,
+  type QuickLineSearchable,
+  quickLineTypedName,
+} from './quick-line-match.ts';
 export { QuickLine } from './QuickLine.tsx';
 export { QuickLineBrowse, type QuickLineBrowseProps } from './QuickLineBrowse.tsx';

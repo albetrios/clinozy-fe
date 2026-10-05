@@ -16,9 +16,6 @@ import { TriangleAlert } from '@/shared/icons/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
 
-/** A photo picked for filing: the file, and an id for its chip. */
-export type PickedPhoto = PickedFile;
-
 /** The one size limit a clinic upload carries (Q-P5: 10 MB everywhere). */
 const PHOTO_LIMIT_BYTES = UPLOAD_MAX_BYTES['organization-file'];
 
@@ -82,8 +79,8 @@ export function PatientPhotosField({
   testId,
 }: {
   id: string;
-  files: readonly PickedPhoto[];
-  onChange: (files: PickedPhoto[]) => void;
+  files: readonly PickedFile[];
+  onChange: (files: PickedFile[]) => void;
   disabled?: boolean;
   testId: string;
 }) {

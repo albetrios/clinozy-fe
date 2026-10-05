@@ -21,7 +21,6 @@ import {
   organizationSchema,
   patientImageSchema,
   patientNoteSchema,
-  patientPackageSchema,
   patientReportSchema,
   prescriptionSchema,
   reviewSchema,
@@ -46,6 +45,7 @@ import {
   offeringRecordSchema,
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import { patientPackageRecordSchema } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import { patientRecordSchema } from '@/shared/api/clinic/patients-contracts.ts';
 import { paymentRecordSchema } from '@/shared/api/clinic/payments-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
@@ -75,7 +75,8 @@ const SCHEMAS = {
   treatments: treatmentSchema,
   patientImages: patientImageSchema,
   patientReports: patientReportSchema,
-  patientPackages: patientPackageSchema,
+  // A package may be added before its invoice (A-F6, Appendix F).
+  patientPackages: patientPackageRecordSchema,
   patientNotes: patientNoteSchema,
   offeringSuggestions: offeringSuggestionSchema,
   checkIns: checkInSchema,

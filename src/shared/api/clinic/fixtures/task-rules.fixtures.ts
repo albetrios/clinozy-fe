@@ -197,7 +197,10 @@ export interface TaskRuleWorld {
   appointments: readonly Appointment[];
   treatments: readonly Treatment[];
   checkIns: readonly CheckIn[];
-  packages: readonly PatientPackage[];
+  packages: readonly Pick<
+    PatientPackage,
+    'patientId' | 'sessionsUsed' | 'sessionsTotal'
+  >[];
 }
 
 /** A task one of the rules wants to exist now. */

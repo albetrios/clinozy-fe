@@ -686,7 +686,7 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
     vi.mocked(requireOrgStatus).mockClear();
   });
 
-  it('registers the eleven sections, Edit patient, the index and the unknown section', () => {
+  it('registers the eleven sections, their record dialogs, Edit patient, the index and the unknown section', () => {
     const children = Object.keys(router.routesById)
       .filter((id) => id.startsWith(`${FILE}/`))
       .sort();
@@ -703,9 +703,17 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
         'packages',
         'payments',
         'prescriptions',
+        // The record dialogs (S:35–39, 42–43): each renders nothing over its section.
+        'prescriptions/create',
+        'prescriptions/$prescriptionId',
+        'prescriptions/$prescriptionId/edit',
         'reports',
+        'reports/create',
+        'reports/$reportId',
         'timeline',
         'treatments',
+        'treatments/create',
+        'treatments/$treatmentId/edit',
         'visits',
         '',
       ]

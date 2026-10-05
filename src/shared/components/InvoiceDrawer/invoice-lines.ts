@@ -2,7 +2,11 @@ import { lineFloor } from '@/shared/api/clinic/clinic-money.ts';
 import type { InvoiceType, OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { medicineStock } from '@/shared/api/clinic/medicine-stock.ts';
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
+import {
+  type MedicineForm,
+  medicineForm,
+  type MedicineRecord,
+} from '@/shared/api/clinic/medicines-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
@@ -11,9 +15,9 @@ import {
   effectivePrice,
   invoiceLineRate,
 } from '@/shared/api/clinic/offerings-pricing.ts';
+import type { QuickLineSearchable } from '@/shared/components/QuickLine/index.ts';
 
 import type { InvoiceLineForm } from './invoice-form.ts';
-import type { QuickLineSearchable } from './quick-line-match.ts';
 
 /*
  * What the Invoice drawer can bill (KICKOFF §6.9 Items): the offerings of the
@@ -23,16 +27,6 @@ import type { QuickLineSearchable } from './quick-line-match.ts';
  * GST included (D45) and the near-expiry discount (Q-M3). Each entry knows
  * the line a pick fills, its Browse group, its sessions and its floor.
  */
-
-/** A medicine's Browse group (H:5058): applied on the skin, or taken. */
-export type MedicineForm = 'oral' | 'topical';
-
-const TOPICAL = /lotion|shampoo|cream|gel|serum|sunscreen|spf|wash|soap|oil/i;
-
-/** Topical when the name says it is put on (H:5058), oral otherwise. */
-export function medicineForm(name: string): MedicineForm {
-  return TOPICAL.test(name) ? 'topical' : 'oral';
-}
 
 /** One thing the drawer can bill. */
 export interface InvoiceCatalogItem extends QuickLineSearchable {

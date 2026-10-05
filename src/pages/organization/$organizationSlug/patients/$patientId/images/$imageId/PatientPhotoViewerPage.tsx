@@ -85,7 +85,7 @@ function useViewerPhotos(privateAlbum: boolean, enabled: boolean) {
 }
 
 /**
- * The photo viewer — `/patients/$patientId/images/$imageId` (`S:41`; KICKOFF
+ * The photo viewer — `/patients/$patientId/images/$imageId` (`S:40`; KICKOFF
  * §6.6): over the Photos section, browsing the album under its visit filter
  * (the section's `?album=&appointment=`); ‹ › and ← → replace the URL with the
  * next photo. Closing goes back to the section. Edit details opens Photo

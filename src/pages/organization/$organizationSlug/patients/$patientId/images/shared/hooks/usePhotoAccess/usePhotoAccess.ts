@@ -13,7 +13,7 @@ export interface PhotoAccess {
   albums: readonly PhotoAlbum[];
   /** Upload — Patients create ("Upload images", the drop). */
   canUpload: boolean;
-  /** Photo details — Patients edit (`S:42`); read-only without. */
+  /** Photo details — Patients edit (`S:41`); read-only without. */
   canEdit: boolean;
   /** Delete — Patients delete. */
   canDelete: boolean;

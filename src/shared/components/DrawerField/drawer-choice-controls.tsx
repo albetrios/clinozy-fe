@@ -144,14 +144,17 @@ export function DrawerToggle({
 /**
  * A drawer's read-only value (the design's `info` kind, H:1596): a 38px
  * `canvas` box with a 1px edge, 13.5px tabular figures — "Billed today",
- * "Offers on this", the Offer drawer's previews.
+ * "Offers on this", the Offer drawer's previews. One line with an ellipsis;
+ * `wrap` lets a long value (a report's notes) run onto more lines instead.
  */
 export function DrawerInfo({
   children,
+  wrap = false,
   className,
   testId,
 }: {
   children: ReactNode;
+  wrap?: boolean;
   className?: string;
   testId?: string;
 }) {
@@ -160,10 +163,15 @@ export function DrawerInfo({
       data-testid={testId}
       className={cn(
         'bg-canvas text-field text-muted-foreground-strong flex min-h-9.5 min-w-0 items-center rounded-lg border px-2.5 tabular-nums',
+        wrap && 'py-2',
         className,
       )}
     >
-      <span className="min-w-0 truncate">{children}</span>
+      <span
+        className={cn('min-w-0', wrap ? 'break-words whitespace-pre-line' : 'truncate')}
+      >
+        {children}
+      </span>
     </div>
   );
 }

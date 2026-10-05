@@ -263,5 +263,360 @@
       "saved": "Détails de la photo enregistrés"
     },
     "loading": "Chargement des photos"
+  },
+  "rx": {
+    "record": "Ordonnance",
+    "title": {
+      "create": "Nouvelle ordonnance",
+      "edit": "Modifier l’ordonnance"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_one": "{{count}} médicament",
+    "medicines_many": "{{count}} médicaments",
+    "medicines_other": "{{count}} médicaments",
+    "quickFill": {
+      "print": "Imprimer l’ordonnance",
+      "repeat": "Reprendre la dernière ordonnance {{number}}",
+      "kits": {
+        "hairFall": "Kit chute de cheveux",
+        "postPeel": "Kit post-peeling",
+        "pigmentation": "Kit pigmentation"
+      }
+    },
+    "kit": {
+      "reapply": "Réappliquer toutes les 3 h",
+      "avoidSun": "Éviter le soleil et les gommages pendant 48 h"
+    },
+    "steps": {
+      "prescription": "Ordonnance",
+      "medicines": "Médicaments",
+      "notes": "Notes cliniques"
+    },
+    "date": "Date",
+    "doctor": "Médecin",
+    "doctorPlaceholder": "Choisir le médecin",
+    "quick": {
+      "placeholder": "Saisissez médicament, dose, moment · p. ex. flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "Souvent prescrits",
+      "groups": {
+        "all": "Tous",
+        "often": "Souvent prescrits",
+        "oral": "Oral",
+        "topical": "Topique"
+      },
+      "newMedicine": "Médicament absent de la liste",
+      "lastSaved": "Dernière posologie enregistrée",
+      "noDosage": "Aucune posologie précédente",
+      "inStock_one": "{{count}} en stock",
+      "inStock_many": "{{count}} en stock",
+      "inStock_other": "{{count}} en stock",
+      "outOfStock": "en rupture",
+      "added": "{{name}} ajouté",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "Médicaments",
+      "medicine": "Médicament",
+      "dose": "Dose · M M S",
+      "meal": "Repas",
+      "where": "Où",
+      "qty": "Qté",
+      "searchMedicine": "Rechercher un médicament",
+      "addMedicine": "Ajouter un médicament",
+      "use": "Utiliser",
+      "note": "Remarques · p. ex. 10 jours, couche fine, éviter le soleil"
+    },
+    "dose": {
+      "group": "Dose matin · midi · soir",
+      "times": {
+        "morning": "Matin",
+        "afternoon": "Midi",
+        "night": "Soir"
+      },
+      "on": "{{time}} · {{taps}} — cliquez pour changer",
+      "off": "{{time}} · aucune — cliquez pour changer",
+      "sos": "SOS",
+      "sosHint": "Seulement si besoin (SOS)"
+    },
+    "meal": {
+      "before": "Avant",
+      "after": "Après",
+      "beforeHint": "Avant le repas",
+      "afterHint": "Après le repas",
+      "more": "Autres moments",
+      "change": "{{timing}} · changer"
+    },
+    "timings": {
+      "empty_stomach": "À jeun",
+      "with_meal": "Pendant le repas",
+      "morning": "Le matin",
+      "night": "Le soir",
+      "morning_night": "Matin et soir",
+      "thrice_week": "Trois fois par semaine",
+      "once_week": "Une fois par semaine",
+      "alternate_days": "Un jour sur deux"
+    },
+    "places": {
+      "face": "Visage",
+      "scalp": "Cuir chevelu",
+      "hair": "Cheveux",
+      "body": "Corps",
+      "underarm": "Aisselle",
+      "neck": "Cou",
+      "back": "Dos",
+      "chest": "Poitrine",
+      "hands": "Mains",
+      "legs": "Jambes",
+      "feet": "Pieds",
+      "lips": "Lèvres",
+      "underEyes": "Sous les yeux",
+      "affectedArea": "Zone atteinte"
+    },
+    "notes": {
+      "advice": "Notes",
+      "advicePlaceholder": "Conseils pour le patient",
+      "lab": "Bilan biologique",
+      "labPlaceholder": "Examens conseillés ou résultats",
+      "procedure": "Soin du jour",
+      "procedurePlaceholder": "Ce qui a été fait aujourd’hui"
+    },
+    "daysNote_one": "{{count}} jour",
+    "daysNote_many": "{{count}} jours",
+    "daysNote_other": "{{count}} jours",
+    "dayWords": "jour, jours",
+    "save": {
+      "create": "Enregistrer l’ordonnance",
+      "edit": "Enregistrer les modifications",
+      "sell": "Enregistrer et vendre",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "Ajoutez un médicament",
+      "saved": "Ordonnance enregistrée",
+      "savedNumber": "Ordonnance {{number}} enregistrée"
+    },
+    "delete": {
+      "title": "Supprimer cette ordonnance ?",
+      "deleted": "Ordonnance supprimée"
+    },
+    "preview": "Ordonnance {{number}}"
+  },
+  "treatment": {
+    "record": "Soin",
+    "title": {
+      "create": "Nouveau soin",
+      "edit": "Modifier le soin"
+    },
+    "sub": "Les champs suivent la spécialité du cabinet · changez si besoin",
+    "session": "Séance {{session}}",
+    "quickFill": {
+      "next": "Séance suivante de {{name}}",
+      "package": "{{name}} · séance {{session}}"
+    },
+    "type": "Type",
+    "templates": {
+      "skin": "Peau · laser",
+      "dental": "Dentaire",
+      "physio": "Kiné",
+      "gynac": "Gynéco",
+      "general": "Général"
+    },
+    "steps": {
+      "session": "Séance",
+      "details": "Détails {{template}}",
+      "aftercare": "Suivi"
+    },
+    "name": "Soin",
+    "namePlaceholder": "Choisir ou saisir",
+    "sessionNo": "Numéro de séance",
+    "doctor": "Médecin",
+    "doctorPlaceholder": "Choisir le médecin",
+    "therapist": "Thérapeute",
+    "therapistPlaceholder": "Choisir le thérapeute",
+    "skin": {
+      "therapyType": "Type de thérapie",
+      "therapyTypes": {
+        "laser": "Laser",
+        "peel": "Peeling",
+        "facial": "Soin du visage",
+        "injectable": "Injection",
+        "microneedling": "Microneedling"
+      },
+      "bodyPart": "Zone",
+      "pickAny": "au choix",
+      "areas": {
+        "face": "Visage",
+        "upperLip": "Lèvre supérieure",
+        "chin": "Menton",
+        "underarm": "Aisselle",
+        "arms": "Bras",
+        "legs": "Jambes",
+        "back": "Dos",
+        "chest": "Poitrine",
+        "fullBody": "Corps entier"
+      },
+      "skinType": "Phototype",
+      "skinTypeValue": "Type {{type}}",
+      "machine": "Appareil",
+      "machinePlaceholder": "p. ex. Soprano Ice",
+      "wavelength": "Longueur d’onde",
+      "startReading": "Compteur début",
+      "endReading": "Compteur fin",
+      "readingPlaceholder": "Tirs / compteur",
+      "power": "Puissance · fréquence · PD · mode",
+      "powerPlaceholder": "p. ex. 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "Acte",
+      "procedures": {
+        "scaling": "Détartrage",
+        "filling": "Obturation",
+        "rct": "Dévitalisation",
+        "extraction": "Extraction",
+        "crown": "Couronne",
+        "implant": "Implant",
+        "whitening": "Blanchiment"
+      },
+      "teeth": "Dents",
+      "teethHint": "Numérotation FDI · touchez pour choisir",
+      "quadrants": {
+        "upperRight": "Haut droite",
+        "upperLeft": "Haut gauche",
+        "lowerRight": "Bas droite",
+        "lowerLeft": "Bas gauche"
+      },
+      "tooth": "Dent {{tooth}}",
+      "material": "Matériau",
+      "materialPlaceholder": "p. ex. Composite A2",
+      "anaesthesia": "Anesthésie",
+      "given": "Faite",
+      "notGiven": "Non faite"
+    },
+    "physio": {
+      "region": "Région",
+      "regions": {
+        "neck": "Cou",
+        "shoulder": "Épaule",
+        "back": "Dos",
+        "hip": "Hanche",
+        "knee": "Genou",
+        "ankle": "Cheville"
+      },
+      "modality": "Technique",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "Ultrasons",
+        "exercise": "Exercices",
+        "manualTherapy": "Thérapie manuelle",
+        "traction": "Traction"
+      },
+      "painBefore": "Douleur avant",
+      "painAfter": "Douleur après",
+      "painHint": "0–10",
+      "exercises": "Exercices à la maison",
+      "exercisesPlaceholder": "Séries, répétitions, fréquence"
+    },
+    "gynac": {
+      "visitType": "Type de visite",
+      "visitTypes": {
+        "anc": "Prénatal",
+        "pnc": "Postnatal",
+        "infertility": "Fertilité",
+        "contraception": "Contraception",
+        "general": "Général"
+      },
+      "lmp": "DDR",
+      "gestation": "Grossesse",
+      "weeks": "semaines",
+      "bp": "Tension",
+      "bpPlaceholder": "120/80",
+      "weight": "Poids",
+      "kg": "kg",
+      "findings": "Constatations",
+      "findingsPlaceholder": "Résultats de l’examen"
+    },
+    "general": {
+      "area": "Zone",
+      "areaPlaceholder": "Séparées par des virgules",
+      "parameters": "Paramètres",
+      "parametersPlaceholder": "Un par ligne, p. ex. Dose : 2 ml"
+    },
+    "aftercare": {
+      "remark": "Remarque",
+      "remarkPlaceholder": "Réaction, conseils, suite",
+      "call": "Appel de suivi",
+      "callHint": "crée une tâche pour demander comment ça va et ce qui a été suivi",
+      "calls": {
+        "none": "Pas d’appel",
+        "next_day": "Le lendemain",
+        "in_2_days": "Dans 2 jours",
+        "in_week": "Dans une semaine"
+      },
+      "feedback": "Retour sur ce soin",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "Pas encore de suivi · utilisez Noter un suivi ci-dessus"
+    },
+    "save": {
+      "create": "Enregistrer le soin",
+      "edit": "Enregistrer les modifications",
+      "saved": "Soin enregistré"
+    },
+    "delete": {
+      "title": "Supprimer ce soin ?",
+      "deleted": "Soin supprimé"
+    }
+  },
+  "report": {
+    "record": "Compte rendu",
+    "types": {
+      "lab": "Analyse",
+      "scan": "Imagerie",
+      "consent": "Consentement",
+      "other": "Autre"
+    },
+    "steps": {
+      "report": "Compte rendu",
+      "details": "Détails",
+      "notes": "Notes"
+    },
+    "type": "Type",
+    "name": "Nom",
+    "date": "Date",
+    "file": "Fichier",
+    "upload": {
+      "title": "Importer un compte rendu",
+      "namePlaceholder": "ex. NFS",
+      "drop": "Déposez le compte rendu ou parcourez",
+      "fileHint": "PDF, JPG ou PNG · jusqu’à {{limit}}",
+      "remove": "Retirer {{name}}",
+      "note": "Note",
+      "notePlaceholder": "Facultatif",
+      "summary": "{{type}} · {{files}}",
+      "save": "Importer",
+      "noName": "Nommez le compte rendu",
+      "uploaded": "Compte rendu importé",
+      "files_one": "{{count}} fichier",
+      "files_many": "{{count}} de fichiers",
+      "files_other": "{{count}} fichiers"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "Ajouté par",
+      "fileLine": "{{name}} · {{format}} · transmis au patient sur demande",
+      "notes": "Notes",
+      "noNotes": "Aucune note sur ce compte rendu",
+      "download": "Télécharger",
+      "downloading": "Téléchargement de {{name}}"
+    }
+  },
+  "package": {
+    "title": "Ajouter un forfait",
+    "step": "Choisissez un forfait",
+    "option": "{{name}} · {{sessions}} séances · {{price}}",
+    "empty": "Aucune prestation en plusieurs séances pour l’instant",
+    "summary": "Les séances sont décomptées à la fin d’un soin",
+    "save": "Ajouter le forfait",
+    "noPick": "Choisissez un forfait",
+    "added": "Forfait ajouté · facturez-le depuis Factures"
   }
 }

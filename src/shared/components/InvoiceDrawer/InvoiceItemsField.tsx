@@ -12,9 +12,12 @@ import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
+  nameNumbers,
   QuickLine,
   type QuickLineBrowseConfig,
+  quickLineBrowseMatches,
   type QuickLineItem,
+  quickLineMatches,
   type QuickLineParse,
 } from '@/shared/components/QuickLine/index.ts';
 import {
@@ -41,11 +44,6 @@ import {
 import { type InvoiceCatalogItem, lineFromCatalog } from './invoice-lines.ts';
 import { type InvoiceLineValues, parseInvoiceLine } from './invoice-quick-line.ts';
 import { withAddedLine, withSteppedLine } from './invoice-rows.ts';
-import {
-  nameNumbers,
-  quickLineBrowseMatches,
-  quickLineMatches,
-} from './quick-line-match.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
 const K = INVOICE_DRAWER_KEYS.items;

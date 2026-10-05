@@ -32,6 +32,7 @@ import {
   DrawerQuickChips,
   DrawerStepBody,
   DrawerTextarea,
+  type PickedFile,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import {
@@ -49,7 +50,7 @@ import {
   PATIENT_FORM_LIMITS,
   type PatientFormValues,
 } from './patient-form.ts';
-import { PatientPhotosField, type PickedPhoto } from './PatientDrawerParts.tsx';
+import { PatientPhotosField } from './PatientDrawerParts.tsx';
 
 /** Consent chips: what was signed (`patients.md:83`) — Data and Photos sage, Marketing stone. */
 const CONSENT_TONES: Readonly<Record<PatientConsent, Tone>> = {
@@ -354,8 +355,8 @@ export function PatientClinicFields({
   onPhotosChange,
 }: PatientFieldsProps & {
   today: string;
-  photos: readonly PickedPhoto[];
-  onPhotosChange: (files: PickedPhoto[]) => void;
+  photos: readonly PickedFile[];
+  onPhotosChange: (files: PickedFile[]) => void;
 }) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);

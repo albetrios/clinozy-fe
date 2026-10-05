@@ -104,5 +104,17 @@ describe('DrawerInfo (H:1596)', () => {
   it('shows a read-only value', () => {
     render(<DrawerInfo testId="billed">₹7,500 · 17% below list</DrawerInfo>);
     expect(screen.getByTestId('billed')).toHaveTextContent('₹7,500 · 17% below list');
+    expect(screen.getByText('₹7,500 · 17% below list')).toHaveClass('truncate');
+  });
+
+  it('wraps a long value onto more lines', () => {
+    render(
+      <DrawerInfo wrap testId="notes">
+        TSH slightly high · recheck in 6 weeks
+      </DrawerInfo>,
+    );
+    const value = screen.getByText('TSH slightly high · recheck in 6 weeks');
+    expect(value).not.toHaveClass('truncate');
+    expect(value).toHaveClass('whitespace-pre-line');
   });
 });

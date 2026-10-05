@@ -1,6 +1,6 @@
 # `pages/organization/$organizationSlug/patients/$patientId/images/$imageId` — Photo viewer
 
-Route: `/organization/$organizationSlug/patients/$patientId/images/$imageId` (`S:41`; KICKOFF
+Route: `/organization/$organizationSlug/patients/$patientId/images/$imageId` (`S:40`; KICKOFF
 §6.6 Photo viewer) — a full-screen dialog over the Photos section, keeping its
 `?album=&appointment=`.
 

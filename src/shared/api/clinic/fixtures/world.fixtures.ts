@@ -17,7 +17,6 @@ import type {
   Organization,
   PatientImage,
   PatientNote,
-  PatientPackage,
   PatientReport,
   Prescription,
   Review,
@@ -37,6 +36,7 @@ import type {
   OfferingRecord,
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { PatientPackageRecord } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
@@ -148,7 +148,8 @@ export const clinicFixtures = {
     resource: 'Report',
     seed: () => patientReportSeed(),
   }),
-  patientPackages: createFixtureCollection<PatientPackage>({
+  // A package may be added before its invoice (A-F6) — see patient-packages-contracts.ts.
+  patientPackages: createFixtureCollection<PatientPackageRecord>({
     resource: 'Package',
     seed: () => patientPackageSeed(),
   }),

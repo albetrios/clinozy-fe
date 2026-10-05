@@ -296,5 +296,372 @@
       "saved": "حُفظت تفاصيل الصورة"
     },
     "loading": "جارٍ تحميل الصور"
+  },
+  "rx": {
+    "record": "الوصفة",
+    "title": {
+      "create": "وصفة جديدة",
+      "edit": "تعديل الوصفة"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_zero": "لا أدوية",
+    "medicines_one": "دواء واحد",
+    "medicines_two": "دواءان",
+    "medicines_few": "{{count}} أدوية",
+    "medicines_many": "{{count}} دواءً",
+    "medicines_other": "{{count}} دواء",
+    "quickFill": {
+      "print": "طباعة الوصفة",
+      "repeat": "تكرار آخر وصفة {{number}}",
+      "kits": {
+        "hairFall": "مجموعة تساقط الشعر",
+        "postPeel": "مجموعة ما بعد التقشير",
+        "pigmentation": "مجموعة التصبغ"
+      }
+    },
+    "kit": {
+      "reapply": "يُعاد وضعه كل 3 ساعات",
+      "avoidSun": "تجنّب الشمس والمقشرات لمدة 48 ساعة"
+    },
+    "steps": {
+      "prescription": "الوصفة",
+      "medicines": "الأدوية",
+      "notes": "ملاحظات سريرية"
+    },
+    "date": "التاريخ",
+    "doctor": "الطبيب",
+    "doctorPlaceholder": "اختر الطبيب",
+    "quick": {
+      "placeholder": "اكتب الدواء والجرعة والتوقيت · مثل flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "often": "يوصف كثيرًا",
+      "groups": {
+        "all": "الكل",
+        "often": "يوصف كثيرًا",
+        "oral": "فموي",
+        "topical": "موضعي"
+      },
+      "newMedicine": "دواء غير موجود في القائمة",
+      "lastSaved": "حُفظت آخر جرعة",
+      "noDosage": "لا جرعة سابقة",
+      "inStock_zero": "لا شيء في المخزون",
+      "inStock_one": "واحد في المخزون",
+      "inStock_two": "اثنان في المخزون",
+      "inStock_few": "{{count}} في المخزون",
+      "inStock_many": "{{count}} في المخزون",
+      "inStock_other": "{{count}} في المخزون",
+      "outOfStock": "نفد من المخزون",
+      "added": "أُضيف {{name}}",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "الأدوية",
+      "medicine": "الدواء",
+      "dose": "الجرعة · ص ظ ل",
+      "meal": "الوجبة",
+      "where": "المكان",
+      "qty": "الكمية",
+      "searchMedicine": "ابحث عن دواء",
+      "addMedicine": "إضافة دواء",
+      "use": "استخدام",
+      "note": "ملاحظات · مثل 10 أيام، طبقة رقيقة، تجنّب الشمس"
+    },
+    "dose": {
+      "group": "الجرعة صباحًا · ظهرًا · ليلًا",
+      "times": {
+        "morning": "صباحًا",
+        "afternoon": "ظهرًا",
+        "night": "ليلًا"
+      },
+      "on": "{{time}} · {{taps}} — انقر للتغيير",
+      "off": "{{time}} · لا شيء — انقر للتغيير",
+      "sos": "SOS",
+      "sosHint": "عند الحاجة فقط (SOS)"
+    },
+    "meal": {
+      "before": "قبل",
+      "after": "بعد",
+      "beforeHint": "قبل الأكل",
+      "afterHint": "بعد الأكل",
+      "more": "توقيتات أخرى",
+      "change": "{{timing}} · تغيير"
+    },
+    "timings": {
+      "empty_stomach": "على معدة فارغة",
+      "with_meal": "مع الطعام",
+      "morning": "صباحًا",
+      "night": "ليلًا",
+      "morning_night": "صباحًا ومساءً",
+      "thrice_week": "ثلاث مرات أسبوعيًا",
+      "once_week": "مرة أسبوعيًا",
+      "alternate_days": "يومًا بعد يوم"
+    },
+    "places": {
+      "face": "الوجه",
+      "scalp": "فروة الرأس",
+      "hair": "الشعر",
+      "body": "الجسم",
+      "underarm": "الإبط",
+      "neck": "الرقبة",
+      "back": "الظهر",
+      "chest": "الصدر",
+      "hands": "اليدان",
+      "legs": "الساقان",
+      "feet": "القدمان",
+      "lips": "الشفتان",
+      "underEyes": "تحت العينين",
+      "affectedArea": "المنطقة المصابة"
+    },
+    "notes": {
+      "advice": "ملاحظات",
+      "advicePlaceholder": "نصائح للمريض",
+      "lab": "تقرير المختبر",
+      "labPlaceholder": "الفحوص الموصى بها أو النتائج",
+      "procedure": "إجراء اليوم",
+      "procedurePlaceholder": "ما الذي أُجري اليوم"
+    },
+    "daysNote_zero": "{{count}} يوم",
+    "daysNote_one": "يوم واحد",
+    "daysNote_two": "يومان",
+    "daysNote_few": "{{count}} أيام",
+    "daysNote_many": "{{count}} يومًا",
+    "daysNote_other": "{{count}} يوم",
+    "dayWords": "يوم, أيام, يومًا, يومان",
+    "save": {
+      "create": "حفظ الوصفة",
+      "edit": "حفظ التغييرات",
+      "sell": "حفظ وبيع",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "أضِف دواءً",
+      "saved": "حُفظت الوصفة",
+      "savedNumber": "حُفظت الوصفة {{number}}"
+    },
+    "delete": {
+      "title": "حذف هذه الوصفة؟",
+      "deleted": "حُذفت الوصفة"
+    },
+    "preview": "الوصفة {{number}}"
+  },
+  "treatment": {
+    "record": "العلاج",
+    "title": {
+      "create": "علاج جديد",
+      "edit": "تعديل العلاج"
+    },
+    "sub": "تتبع الحقول تخصص العيادة · بدّل عند الحاجة",
+    "session": "الجلسة {{session}}",
+    "quickFill": {
+      "next": "الجلسة التالية من {{name}}",
+      "package": "{{name}} · الجلسة {{session}}"
+    },
+    "type": "النوع",
+    "templates": {
+      "skin": "البشرة · ليزر",
+      "dental": "الأسنان",
+      "physio": "العلاج الطبيعي",
+      "gynac": "النسائية",
+      "general": "عام"
+    },
+    "steps": {
+      "session": "الجلسة",
+      "details": "تفاصيل {{template}}",
+      "aftercare": "الرعاية اللاحقة"
+    },
+    "name": "العلاج",
+    "namePlaceholder": "اختر أو اكتب",
+    "sessionNo": "رقم الجلسة",
+    "doctor": "الطبيب",
+    "doctorPlaceholder": "اختر الطبيب",
+    "therapist": "المعالج",
+    "therapistPlaceholder": "اختر المعالج",
+    "skin": {
+      "therapyType": "نوع العلاج",
+      "therapyTypes": {
+        "laser": "ليزر",
+        "peel": "تقشير",
+        "facial": "تنظيف بشرة",
+        "injectable": "حقن",
+        "microneedling": "الوخز بالإبر الدقيقة"
+      },
+      "bodyPart": "منطقة الجسم",
+      "pickAny": "اختر ما تشاء",
+      "areas": {
+        "face": "الوجه",
+        "upperLip": "الشفة العليا",
+        "chin": "الذقن",
+        "underarm": "الإبط",
+        "arms": "الذراعان",
+        "legs": "الساقان",
+        "back": "الظهر",
+        "chest": "الصدر",
+        "fullBody": "الجسم كاملًا"
+      },
+      "skinType": "نوع البشرة",
+      "skinTypeValue": "النوع {{type}}",
+      "machine": "الجهاز",
+      "machinePlaceholder": "مثل Soprano Ice",
+      "wavelength": "الطول الموجي",
+      "startReading": "قراءة البداية",
+      "endReading": "قراءة النهاية",
+      "readingPlaceholder": "نبضات / عدّاد",
+      "power": "الطاقة · التردد · PD · الوضع",
+      "powerPlaceholder": "مثل 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "الإجراء",
+      "procedures": {
+        "scaling": "تنظيف الجير",
+        "filling": "حشوة",
+        "rct": "علاج عصب",
+        "extraction": "خلع",
+        "crown": "تاج",
+        "implant": "زرعة",
+        "whitening": "تبييض"
+      },
+      "teeth": "الأسنان",
+      "teethHint": "ترقيم FDI · انقر للاختيار",
+      "quadrants": {
+        "upperRight": "العلوي الأيمن",
+        "upperLeft": "العلوي الأيسر",
+        "lowerRight": "السفلي الأيمن",
+        "lowerLeft": "السفلي الأيسر"
+      },
+      "tooth": "السن {{tooth}}",
+      "material": "المادة",
+      "materialPlaceholder": "مثل كومبوزيت A2",
+      "anaesthesia": "التخدير",
+      "given": "أُعطي",
+      "notGiven": "لم يُعطَ"
+    },
+    "physio": {
+      "region": "المنطقة",
+      "regions": {
+        "neck": "الرقبة",
+        "shoulder": "الكتف",
+        "back": "الظهر",
+        "hip": "الورك",
+        "knee": "الركبة",
+        "ankle": "الكاحل"
+      },
+      "modality": "الأسلوب",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "موجات فوق صوتية",
+        "exercise": "تمارين",
+        "manualTherapy": "علاج يدوي",
+        "traction": "شد"
+      },
+      "painBefore": "الألم قبل",
+      "painAfter": "الألم بعد",
+      "painHint": "0–10",
+      "exercises": "تمارين منزلية",
+      "exercisesPlaceholder": "مجموعات، تكرارات، عدد المرات"
+    },
+    "gynac": {
+      "visitType": "نوع الزيارة",
+      "visitTypes": {
+        "anc": "متابعة الحمل",
+        "pnc": "ما بعد الولادة",
+        "infertility": "العقم",
+        "contraception": "منع الحمل",
+        "general": "عام"
+      },
+      "lmp": "آخر دورة",
+      "gestation": "عمر الحمل",
+      "weeks": "أسابيع",
+      "bp": "ضغط الدم",
+      "bpPlaceholder": "120/80",
+      "weight": "الوزن",
+      "kg": "كغ",
+      "findings": "الموجودات",
+      "findingsPlaceholder": "نتائج الفحص"
+    },
+    "general": {
+      "area": "المنطقة",
+      "areaPlaceholder": "مفصولة بفواصل",
+      "parameters": "المعايير",
+      "parametersPlaceholder": "واحد في كل سطر، مثل الجرعة: 2 مل"
+    },
+    "aftercare": {
+      "remark": "ملاحظة",
+      "remarkPlaceholder": "التفاعل، النصائح، الخطة التالية",
+      "call": "مكالمة المتابعة",
+      "callHint": "تنشئ مهمة للسؤال عن الشعور وما تم الالتزام به",
+      "calls": {
+        "none": "بلا مكالمة",
+        "next_day": "في اليوم التالي",
+        "in_2_days": "بعد يومين",
+        "in_week": "بعد أسبوع"
+      },
+      "feedback": "ملاحظات على هذا العلاج",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "لا متابعة بعد · استخدم تسجيل متابعة في الأعلى"
+    },
+    "save": {
+      "create": "حفظ العلاج",
+      "edit": "حفظ التغييرات",
+      "saved": "حُفظ العلاج"
+    },
+    "delete": {
+      "title": "حذف هذا العلاج؟",
+      "deleted": "حُذف العلاج"
+    }
+  },
+  "report": {
+    "record": "تقرير",
+    "types": {
+      "lab": "مختبر",
+      "scan": "أشعة",
+      "consent": "موافقة",
+      "other": "أخرى"
+    },
+    "steps": {
+      "report": "التقرير",
+      "details": "التفاصيل",
+      "notes": "الملاحظات"
+    },
+    "type": "النوع",
+    "name": "الاسم",
+    "date": "التاريخ",
+    "file": "الملف",
+    "upload": {
+      "title": "رفع تقرير",
+      "namePlaceholder": "مثل تقرير صورة الدم",
+      "drop": "أفلت التقرير هنا أو تصفّح",
+      "fileHint": "PDF أو JPG أو PNG · حتى {{limit}}",
+      "remove": "إزالة {{name}}",
+      "note": "ملاحظة",
+      "notePlaceholder": "اختياري",
+      "summary": "{{type}} · {{files}}",
+      "save": "رفع",
+      "noName": "سمِّ التقرير",
+      "uploaded": "تم رفع التقرير",
+      "files_zero": "لا ملفات",
+      "files_one": "ملف واحد",
+      "files_two": "ملفان",
+      "files_few": "{{count}} ملفات",
+      "files_many": "{{count}} ملفًا",
+      "files_other": "{{count}} ملف"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "addedBy": "أضافه",
+      "fileLine": "{{name}} · {{format}} · يُشارك مع المريض عند الطلب",
+      "notes": "الملاحظات",
+      "noNotes": "لا ملاحظات على هذا التقرير",
+      "download": "تنزيل",
+      "downloading": "جارٍ تنزيل {{name}}"
+    }
+  },
+  "package": {
+    "title": "إضافة باقة",
+    "step": "اختر باقة",
+    "option": "{{name}} · {{sessions}} جلسات · {{price}}",
+    "empty": "لا توجد خدمات متعددة الجلسات بعد",
+    "summary": "تُحتسب الجلسات عند اكتمال العلاج",
+    "save": "إضافة الباقة",
+    "noPick": "اختر باقة",
+    "added": "تمت إضافة الباقة · أصدر فاتورتها من الفواتير"
   }
 }

@@ -62,7 +62,7 @@ src/pages/organization/$organizationSlug/invoices/$invoiceId/ #page-root
 # section it opened over and a shared drawer whose testId lives in that shared
 # component (`patient-drawer`, `src/shared/components/PatientDrawer/`).
 src/pages/organization/$organizationSlug/patients/$patientId/edit/ #page-root
-# Photo details (`S:42`) renders the shared RecordDrawer, which takes its root
+# Photo details (`S:41`) renders the shared RecordDrawer, which takes its root
 # id (`patient-photo-details`) as the `testId` prop.
 src/pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edit/ #page-root
 
@@ -71,3 +71,14 @@ src/pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edi
 # (`new-appointment-drawer-save`, `appointment-drawer-save`) — there is no
 # `*-submit` attribute in the form's file to find.
 src/shared/forms/AppointmentForm/ #form
+
+# The patient file's record dialogs (`S:35–39, 42–43`): each renders nothing — its
+# section reads the URL and opens the drawer, which passes its root id
+# (`rx-drawer`, `rx-print-preview`, `treatment-drawer`, `report-drawer`,
+# `report-view`) to the shared RecordDrawer or Sheet as a constant.
+src/pages/organization/$organizationSlug/patients/$patientId/prescriptions/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/treatments/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/treatments/$treatmentId/edit/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reports/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reports/$reportId/ #page-root

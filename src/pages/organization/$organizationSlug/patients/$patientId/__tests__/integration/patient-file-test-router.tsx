@@ -49,6 +49,13 @@ import { PatientVisitsPage } from '../../visits/PatientVisitsPage.tsx';
 // up to 5s for what they find (only the suites that import this module).
 configure({ asyncUtilTimeout: 5000 });
 
+/** Each section's URL-driven dialogs, as `routeTree.tsx` registers them under it (S:35–43). */
+const DIALOG_PATHS: Readonly<Record<string, readonly string[]>> = {
+  prescriptions: ['create', '$prescriptionId', '$prescriptionId/edit'],
+  treatments: ['create', '$treatmentId/edit'],
+  reports: ['create', '$reportId'],
+};
+
 /** The file's URL for a patient in the `acme` clinic. */
 export function patientFileUrl(patientId: string, rest = ''): string {
   return `/organization/acme/patients/${patientId}${rest}`;
@@ -108,10 +115,15 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
     payments: PatientPaymentsPage,
     packages: PatientPackagesPage,
     notes: PatientNotesPage,
-  }).map(([path, component]) =>
-    createRoute({ getParentRoute: () => file, path, component }),
-  );
-  // Photos, with its album and filter, its viewer and Photo details (S:41–42).
+  }).map(([path, component]) => {
+    const section = createRoute({ getParentRoute: () => file, path, component });
+    // The record dialogs (S:35–43) render nothing: the section opens them.
+    const dialogs = (DIALOG_PATHS[path] ?? []).map((dialog) =>
+      createRoute({ getParentRoute: () => section, path: dialog, component: () => null }),
+    );
+    return dialogs.length ? section.addChildren(dialogs) : section;
+  });
+  // Photos, with its album and filter, its viewer and Photo details (S:40–41).
   const images = createRoute({
     getParentRoute: () => file,
     path: 'images',
