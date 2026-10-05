@@ -33,8 +33,8 @@
   ],
   "project": ["src/**/*.{ts,tsx}", "plugins/**/*.ts", "tooling/**/*.{mjs,ts}"],
   // Nothing suppressed — every prior ignore (vendored ui/**, staged
-  // organization-contracts, recharts-via-chart) is now genuinely used or
-  // reachable, so knip stays clean without them. Keep it that way.
+  // organization-contracts, recharts-via-chart) is now genuinely used, reachable
+  // or gone, so knip stays clean without them. Keep it that way.
   "ignore": [],
   // Dependencies knip cannot see (no CSS parsing; shell-script / MCP invocation):
   //  - tailwindcss + tw-animate-css: imported in src/index.css (Tailwind v4 CSS-first)

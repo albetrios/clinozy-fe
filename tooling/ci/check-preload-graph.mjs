@@ -3,7 +3,7 @@
  * Preload-graph tripwire. Run AFTER `pnpm build`.
  *
  * The deferred-by-design chunks (observability, analytics, command palette,
- * forms, charts) must never re-enter dist/index.html's modulepreload list — a
+ * forms) must never re-enter dist/index.html's modulepreload list — a
  * single static import anywhere in the entry graph silently drags them back
  * onto the first-paint network path (exactly how Sentry's 460 KB chunk ended
  * up preloaded before this gate existed).
@@ -14,7 +14,7 @@
  */
 import { readFileSync } from 'node:fs';
 
-const FORBIDDEN_CHUNKS = ['sentry', 'posthog', 'cmdk', 'rhf', 'charts'];
+const FORBIDDEN_CHUNKS = ['sentry', 'posthog', 'cmdk', 'rhf'];
 
 const html = readFileSync('dist/index.html', 'utf8');
 const referenced = [...html.matchAll(/assets\/([a-zA-Z][\w]*)-[\w-]+\.js/g)].map(
