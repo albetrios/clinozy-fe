@@ -28,8 +28,10 @@ export interface PersonChipProps extends Omit<ComponentProps<'span'>, 'children'
 
 /**
  * The person cell: 32px avatar, name 13px/500 over a 12px muted sub, both
- * truncating (KICKOFF §3.5 Cells; H:683). Wrap it in a `ContactCard` to make it
- * the hover / tap trigger for the person's card.
+ * truncating (KICKOFF §3.5 Cells; H:683). Each line takes its own direction
+ * from its text (`dir="auto"`), so "Riya S." and "+91 98250 44120" read in
+ * order on a right-to-left page. Wrap it in a `ContactCard` to make it the
+ * hover / tap trigger for the person's card.
  */
 export function PersonChip({
   name,
@@ -55,9 +57,12 @@ export function PersonChip({
         patient={patient}
       />
       <span className="flex min-w-0 flex-col text-start">
+        {/* Each line isolated in its own direction (a Latin name or a phone keeps
+            its order on a right-to-left page), aligned as the cell is. */}
         <span
+          dir="auto"
           className={cn(
-            'text-body truncate leading-[1.3]',
+            'text-body truncate [text-align:match-parent] leading-[1.3]',
             emphasis ? 'font-semibold' : 'font-medium',
           )}
         >
@@ -66,8 +71,9 @@ export function PersonChip({
         </span>
         {sub ? (
           <span
+            dir="auto"
             className={cn(
-              'text-muted-foreground truncate leading-[1.3] tabular-nums',
+              'text-muted-foreground truncate [text-align:match-parent] leading-[1.3] tabular-nums',
               subSize === 'caption' ? 'text-caption' : 'text-xs',
             )}
           >

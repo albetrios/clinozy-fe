@@ -48,6 +48,8 @@ describe('AvatarStack', () => {
     expect(first).toHaveClass('ps-0.75', 'pe-2.5');
     // Only the first pill carries a name.
     expect(screen.getByTitle('Nidhi Kapoor')).not.toHaveTextContent('Nidhi K.');
+    // Isolated in its own direction: its full stop stays at its end right-to-left.
+    expect(screen.getByText('Dr. Rakesh')).toHaveAttribute('dir', 'auto');
   });
 
   it('wraps each pill for its card and puts the presence dot on the avatar', () => {

@@ -46,6 +46,18 @@ describe('PersonChip', () => {
     expect(screen.getByText('+91 98795 21034')).toHaveClass('text-caption');
   });
 
+  it('isolates the name and the phone in their own direction, aligned as the cell', () => {
+    // A right-to-left page reorders "Riya S." and "+91 …" unless each line is isolated.
+    render(<PersonChip name="Riya S." sub="+91 98250 44120" tone="blush" />);
+    for (const line of [
+      screen.getByText('Riya S.'),
+      screen.getByText('+91 98250 44120'),
+    ]) {
+      expect(line).toHaveAttribute('dir', 'auto');
+      expect(line).toHaveClass('[text-align:match-parent]');
+    }
+  });
+
   it('uses the record initials when given', () => {
     render(<PersonChip name="Dr. Rakesh Patel" initials="RP" tone="sky" />);
     expect(screen.getByText('RP')).toBeInTheDocument();

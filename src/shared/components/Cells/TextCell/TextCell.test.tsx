@@ -15,6 +15,17 @@ describe('TextCell', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('isolates each line in its own direction (a phone on a right-to-left page)', () => {
+    render(<TextCell text="Ankur Pharma" sub="+91 98250 44120" />);
+    for (const line of [
+      screen.getByText('Ankur Pharma'),
+      screen.getByText('+91 98250 44120'),
+    ]) {
+      expect(line).toHaveAttribute('dir', 'auto');
+      expect(line).toHaveClass('[text-align:match-parent]');
+    }
+  });
+
   it('aligns an amount to the inline end in its weight', () => {
     render(
       <TextCell text="₹1,200" sub="− ₹239 returned" weight="semibold" align="end" />,

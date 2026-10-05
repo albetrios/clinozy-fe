@@ -28,7 +28,8 @@ const WEIGHT = {
 /**
  * A two-line table cell (H:684): a 13px line over a 12px muted one, both
  * truncating — a medicine and its composition, a bill and what came back, a clinic item
- * and its pack size.
+ * and its pack size. Each line takes its own direction from its text
+ * (`dir="auto"`): a supplier's phone keeps its order on a right-to-left page.
  */
 export function TextCell({
   text,
@@ -46,11 +47,18 @@ export function TextCell({
         className,
       )}
     >
-      <span className={cn('max-w-full truncate', WEIGHT[weight])}>{text}</span>
+      {/* Each line isolated in its own direction, aligned as the cell is. */}
+      <span
+        dir="auto"
+        className={cn('max-w-full truncate [text-align:match-parent]', WEIGHT[weight])}
+      >
+        {text}
+      </span>
       {sub ? (
         <span
+          dir="auto"
           className={cn(
-            'max-w-full truncate text-xs',
+            'max-w-full truncate [text-align:match-parent] text-xs',
             subTone ? TONE_CLASSES[subTone].ink : 'text-muted-foreground',
           )}
         >

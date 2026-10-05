@@ -96,6 +96,8 @@ export function AvatarStack({
             {named ? (
               <span
                 aria-hidden="true"
+                // "Riya S." keeps its full stop at its end on a right-to-left page.
+                dir="auto"
                 className="text-detail min-w-0 truncate font-medium"
               >
                 {shortPersonName(person.name)}
