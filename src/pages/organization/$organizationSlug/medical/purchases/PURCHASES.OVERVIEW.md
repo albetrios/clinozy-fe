@@ -23,7 +23,7 @@ list (D24).
 | `purchases.params.ts`             | The list read from the URL (defaults applied, the tab's own sort keys) and its filter key.                            |
 | `PurchasesPage.tsx`               | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`.               |
 | `hooks/usePurchaseOrderColumns/`  | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.                          |
-| `components/PurchaseOrderDrawer/` | New / Edit purchase order: Order → Items, its form's rules (`components/PurchaseOrderDrawer/purchase-order-form.ts`). |
+| `components/PurchaseOrderDrawer/` | New / Edit purchase order: Order → Items with the quick line ("azel 20 +2 @180"), its Low stock chips and its Browse. |
 | `components/ReceiveGoodsDrawer/`  | Receive goods: "Tick what arrived", its form's rules (`components/ReceiveGoodsDrawer/receive-form.ts`).               |
 | `components/PurchaseOrderView/`   | A received or paid order, locked, with "Pay ₹X".                                                                      |
 

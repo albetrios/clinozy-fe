@@ -337,7 +337,10 @@
         "nothing": "कुछ नहीं",
         "enterRate": "दर दर्ज करें",
         "peek_one": "{{count}} आइटम · {{amount}}",
-        "peek_other": "{{count}} आइटम · {{amount}}"
+        "peek_other": "{{count}} आइटम · {{amount}}",
+        "quickLine": "आइटम और मात्रा लिखें · जैसे gloves 10 @250",
+        "quickHint": "10 = मात्रा · @250 = दर",
+        "lowStockChip": "{{name}} · {{quantity}} बचे"
       },
       "save": "ख़रीद बनाएँ",
       "pickSupplier": "सप्लायर चुनें",

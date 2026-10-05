@@ -337,7 +337,10 @@
         "nothing": "Nothing",
         "enterRate": "Enter the rate",
         "peek_one": "{{count}} item · {{amount}}",
-        "peek_other": "{{count}} items · {{amount}}"
+        "peek_other": "{{count}} items · {{amount}}",
+        "quickLine": "Type item and qty · e.g. gloves 10 @250",
+        "quickHint": "10 = qty · @250 = rate",
+        "lowStockChip": "{{name}} · {{quantity}} left"
       },
       "save": "Create purchase",
       "pickSupplier": "Pick a supplier",

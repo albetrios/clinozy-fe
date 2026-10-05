@@ -519,7 +519,11 @@
         "newMedicine": "नई दवा",
         "enterRate": "खरीद रेट दर्ज करें",
         "peek_one": "{{count}} दवा · {{amount}}",
-        "peek_other": "{{count}} दवाइयाँ · {{amount}}"
+        "peek_other": "{{count}} दवाइयाँ · {{amount}}",
+        "quickLine": "दवा, मात्रा, मुफ़्त, रेट लिखें · जैसे azel 20 +2 @180",
+        "quickHint": "20 = मात्रा · +2 = मुफ़्त · @180 = रेट",
+        "lowStockChip": "{{name}} · {{quantity}} बचे",
+        "newMedicineName": "नई दवा का नाम"
       },
       "quickFill": {
         "reorder": "कम स्टॉक फिर से मँगाएँ"

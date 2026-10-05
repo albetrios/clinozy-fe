@@ -112,6 +112,66 @@ describe('StockPurchaseDrawer (clinic-stock.md:142–157, 247–259)', () => {
     expect(qtyOf(D_TAN)).toBe(6000);
   });
 
+  it('fills the bill from the quick line — "gloves 10 @250" — the Low stock chips, a typed name and Browse', async () => {
+    const user = setup();
+    renderStockDrawer(<StockPurchaseDrawer mode="create" open onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    await pickAnkur(user, drawer);
+    await user.click(within(drawer).getByTestId(`${D}-step-items-trigger`));
+    const line = await within(drawer).findByTestId(`${D}-quick-line-input`);
+    expect(line).toHaveAttribute(
+      'placeholder',
+      'Type item and qty · e.g. gloves 10 @250',
+    );
+    // The low items the bill lacks (H:5276): "Retises Nano Peel 1% · 1 left".
+    const chips = () => within(drawer).getByTestId(`${D}-quick-line-frequent`);
+    expect(chips()).toHaveTextContent('Low stock');
+    expect(chips()).toHaveTextContent('Retises Nano Peel 1% · 1 left');
+    const qtys = () =>
+      within(drawer)
+        .getAllByTestId(`${D}-lines-qty`)
+        .map((qty) => (qty as HTMLInputElement).value);
+
+    // Ten at ₹250 — this line reads no free units.
+    await user.type(line, 'gloves 10 @250');
+    expect(within(drawer).getByText('×10')).toBeVisible();
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(badges(drawer)).toHaveTextContent('Bill ₹2,500'));
+
+    // A chip orders the item up to its maximum: D-Tan Mask, 6 − 0.
+    await user.click(
+      within(chips()).getByRole('button', { name: /D-Tan Mask · 0 left/ }),
+    );
+    await waitFor(() => expect(qtys()).toEqual(['10', '6']));
+
+    // A typed name the list lacks: a quick clinic item from the bill's vendor.
+    await user.type(line, 'cotton rolls');
+    await user.click(await screen.findByTestId(`${D}-quick-line-typed`));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Cotton Rolls added to clinic items',
+      ),
+    );
+    await waitFor(() => expect(qtys()).toEqual(['10', '6', '5']));
+    expect(
+      clinicFixtures.stockItems.snapshot((item) => item.name === 'Cotton Rolls')[0],
+    ).toMatchObject({ vendorId: ANKUR, unit: 'piece', maxQty: 5 });
+
+    // Browse: the categories; a tap orders the item up to its maximum (30 − 14).
+    await user.click(within(drawer).getByTestId(`${D}-quick-line-browse`));
+    const panel = await screen.findByTestId(`${D}-quick-line-browse-panel`);
+    await user.click(
+      within(panel).getByTestId(`${D}-quick-line-browse-group-consumables`),
+    );
+    const tiles = within(panel).getAllByTestId(`${D}-quick-line-browse-tile`);
+    expect(tiles.map((tile) => tile.hasAttribute('data-added'))).toEqual([true, false]);
+    await user.click(
+      within(panel).getByRole('button', { name: /Add one · Gauze swabs/ }),
+    );
+    await waitFor(() => expect(qtys()).toEqual(['10', '6', '5', '16']));
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
   it('`?reorder=low` waits for the items, then opens on the reordered lines', async () => {
     renderStockDrawer(
       <StockPurchaseDrawer

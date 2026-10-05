@@ -519,7 +519,11 @@
         "newMedicine": "Neues Arzneimittel",
         "enterRate": "Geben Sie den Einkaufspreis ein",
         "peek_one": "{{count}} Arzneimittel · {{amount}}",
-        "peek_other": "{{count}} Arzneimittel · {{amount}}"
+        "peek_other": "{{count}} Arzneimittel · {{amount}}",
+        "quickLine": "Arzneimittel, Menge, Gratis, Preis eingeben · z. B. azel 20 +2 @180",
+        "quickHint": "20 = Menge · +2 = gratis · @180 = Preis",
+        "lowStockChip": "{{name}} · noch {{quantity}}",
+        "newMedicineName": "Name des neuen Arzneimittels"
       },
       "quickFill": {
         "reorder": "Niedrigen Bestand nachbestellen"

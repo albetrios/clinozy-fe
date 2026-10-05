@@ -39,6 +39,9 @@ export const emptyOrderLine = (): OrderLineValues => ({
   rate: 0,
 });
 
+/** A line with no medicine yet: the quick line's next add fills it. */
+export const isBlankOrderLine = (line: OrderLineValues) => line.medicineId === null;
+
 /** A line's amount: qty × rate — free units cost nothing (`S:830`). */
 export const lineAmount = (line: OrderLineValues) =>
   line.medicineId ? line.qty * line.rate : 0;
@@ -51,6 +54,12 @@ export const orderTotal = (lines: readonly OrderLineValues[]) =>
 export const pickedLines = (lines: readonly OrderLineValues[]) =>
   lines.filter((line) => line.medicineId !== null);
 
+/** Whether the supplier prices a medicine — "From K R Medical Agency" (`medical.md:261`). */
+export const pricedBy = (
+  medicine: Pick<MedicineRow, 'supplierRates'>,
+  supplierId: string | null,
+) => medicine.supplierRates.some((rate) => rate.supplierId === supplierId);
+
 /** This supplier's rate for a medicine, else its best rate, else nothing (0). */
 export function supplierRateOf(
   medicine: Pick<MedicineRow, 'supplierRates' | 'bestRate'> | undefined,
@@ -61,9 +70,29 @@ export function supplierRateOf(
   return own?.rate ?? medicine.bestRate?.rate ?? 0;
 }
 
-/** Every medicine at or below its reorder level — Out included (H:5436). */
-const lowStock = (medicines: readonly MedicineRow[]) =>
-  medicines.filter((row) => medicineStockLevel(row.stock, row.minStock) !== 'ok');
+/** Every medicine at or below its reorder level — Out included (H:5436): the "Low stock" chips. */
+export const lowStockMedicines = <T extends Pick<MedicineRow, 'stock' | 'minStock'>>(
+  medicines: readonly T[],
+) => medicines.filter((row) => medicineStockLevel(row.stock, row.minStock) !== 'ok');
+
+/**
+ * A medicine's line as the quick line, Browse and "Reorder low stock" add it
+ * (H:5389 `addP`, H:5436): the typed quantity, else what fills it up to its
+ * fill-up level (at least one); the typed free units; the typed rate, else
+ * the supplier's.
+ */
+export function orderLineFor(
+  medicine: Pick<MedicineRow, 'id' | 'stock' | 'maxStock' | 'supplierRates' | 'bestRate'>,
+  supplierId: string | null,
+  values: { qty?: number; free?: number; rate?: number } = {},
+): OrderLineValues {
+  return {
+    medicineId: medicine.id,
+    qty: values.qty ?? reorderQuantity(medicine.stock, medicine.maxStock),
+    free: values.free ?? 0,
+    rate: values.rate ?? supplierRateOf(medicine, supplierId),
+  };
+}
 
 /**
  * The supplier most of the low medicines buy from (H:5436): the one listed on
@@ -71,7 +100,7 @@ const lowStock = (medicines: readonly MedicineRow[]) =>
  */
 export function reorderSupplier(medicines: readonly MedicineRow[]): string | null {
   const counts = new Map<string, number>();
-  for (const row of lowStock(medicines)) {
+  for (const row of lowStockMedicines(medicines)) {
     for (const rate of row.supplierRates) {
       counts.set(rate.supplierId, (counts.get(rate.supplierId) ?? 0) + 1);
     }
@@ -92,12 +121,7 @@ export function reorderLines(
   medicines: readonly MedicineRow[],
   supplierId: string | null,
 ): OrderLineValues[] {
-  return lowStock(medicines).map((row) => ({
-    medicineId: row.id,
-    qty: reorderQuantity(row.stock, row.maxStock),
-    free: 0,
-    rate: supplierRateOf(row, supplierId),
-  }));
+  return lowStockMedicines(medicines).map((row) => orderLineFor(row, supplierId));
 }
 
 /** A new order: the supplier given (or none yet), today, the lines given. */

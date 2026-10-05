@@ -369,7 +369,10 @@
         "peek_two": "صنفان · {{amount}}",
         "peek_few": "{{count}} أصناف · {{amount}}",
         "peek_many": "{{count}} صنفًا · {{amount}}",
-        "peek_other": "{{count}} صنف · {{amount}}"
+        "peek_other": "{{count}} صنف · {{amount}}",
+        "quickLine": "اكتب الصنف والكمية · مثال: gloves 10 @250",
+        "quickHint": "10 = الكمية · @250 = السعر",
+        "lowStockChip": "{{name}} · متبقٍ {{quantity}}"
       },
       "save": "إنشاء المشتريات",
       "pickSupplier": "اختر موردًا",

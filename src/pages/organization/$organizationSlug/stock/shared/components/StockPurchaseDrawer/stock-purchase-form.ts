@@ -27,6 +27,26 @@ export interface StockPurchaseFormValues {
 /** A blank line: "+ Add item". */
 export const emptyLine = (): PurchaseLineValues => ({ itemId: null, qty: 1, rate: 0 });
 
+/** A line with no item yet: the quick line's next add fills it. */
+export const isBlankLine = (line: PurchaseLineValues) => line.itemId === null;
+
+/**
+ * An item's line as the quick line, Browse and "Reorder low items" add it
+ * (H:5276 `addL`, `clinic-stock.md:154`): the typed quantity, else what fills
+ * it up to its maximum (at least one); the typed rate, else none yet — the
+ * rate is asked for before the save.
+ */
+export function lineFor(
+  item: Pick<StockItemRow, 'id' | 'qtyMilli' | 'maxQty'>,
+  values: { qty?: number; rate?: number } = {},
+): PurchaseLineValues {
+  return {
+    itemId: item.id,
+    qty: values.qty ?? reorderUnits(item.qtyMilli, item.maxQty),
+    rate: values.rate ?? 0,
+  };
+}
+
 /** The lines' total, paise. */
 export const linesTotal = (lines: readonly PurchaseLineValues[]) =>
   lines.reduce((sum, line) => sum + (line.itemId ? line.qty * line.rate : 0), 0);
@@ -46,13 +66,7 @@ export const dueOf = (values: StockPurchaseFormValues) =>
  * its minimum, ordered up to its maximum — at least one — the rates to fill.
  */
 export function reorderLines(items: readonly StockItemRow[]): PurchaseLineValues[] {
-  return items
-    .filter((item) => item.level !== 'ok')
-    .map((item) => ({
-      itemId: item.id,
-      qty: reorderUnits(item.qtyMilli, item.maxQty),
-      rate: 0,
-    }));
+  return items.filter((item) => item.level !== 'ok').map((item) => lineFor(item));
 }
 
 /** A new purchase: today's bill, nothing in it yet (`clinic-stock.md:148`). */

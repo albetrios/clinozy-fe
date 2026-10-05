@@ -96,6 +96,81 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     ).toHaveLength(1);
   });
 
+  it('fills the items from the quick line — "azel 20 +2 @180" — the Low stock chips and Browse', async () => {
+    const user = setup();
+    renderMedicalDrawer(<PurchaseOrderDrawer mode="create" open onClose={vi.fn()} />);
+    await waitFor(() =>
+      expect(screen.getByTestId(`${D}-supplier`)).toHaveTextContent('Akshar Medicines'),
+    );
+    const drawer = screen.getByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-step-items-trigger`));
+    const line = await within(drawer).findByTestId(`${D}-quick-line-input`);
+    expect(line).toHaveAttribute(
+      'placeholder',
+      'Type medicine, qty, free, rate · e.g. azel 20 +2 @180',
+    );
+    // The low medicines the order lacks (H:5389): "Arganlif Hair Serum 50 ml · 2 left".
+    const chips = () => within(drawer).getByTestId(`${D}-quick-line-frequent`);
+    expect(chips()).toHaveTextContent('Low stock');
+    expect(within(chips()).getAllByRole('button')).toHaveLength(3);
+
+    // Twenty and two free at ₹180 — the shorthand's pills while it is typed.
+    await user.type(line, 'azel 20 +2 @180');
+    expect(within(drawer).getByText('+2 free')).toBeVisible();
+    expect(within(drawer).getByText('@ ₹180')).toBeVisible();
+    await user.keyboard('{Enter}');
+    expect(screen.getByTestId(`${D}-summary`)).toHaveTextContent('₹3,600');
+    expect(within(drawer).getAllByTestId(`${D}-lines-free`)[0]).toHaveValue('2');
+
+    // A chip orders the medicine up to its fill-up level at its best rate: 10 − 2 at ₹677.
+    await user.click(
+      within(chips()).getByRole('button', { name: /Arganlif Hair Serum 50 ml · 2 left/ }),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId(`${D}-summary`)).toHaveTextContent('₹9,016'),
+    );
+    expect(within(chips()).getAllByRole('button')).toHaveLength(2);
+
+    // Browse: All · Low stock · From Akshar Medicines · Other medicines; a tap adds one.
+    await user.click(within(drawer).getByTestId(`${D}-quick-line-browse`));
+    const panel = await screen.findByTestId(`${D}-quick-line-browse-panel`);
+    expect(
+      within(panel)
+        .getAllByRole('button', { pressed: false })
+        .concat(within(panel).getAllByRole('button', { pressed: true }))
+        .map((button) => button.textContent),
+    ).toEqual(
+      expect.arrayContaining(['Low stock', 'From Akshar Medicines', 'Other medicines']),
+    );
+    await user.click(within(panel).getByTestId(`${D}-quick-line-browse-group-low`));
+    const tiles = within(panel).getAllByTestId(`${D}-quick-line-browse-tile`);
+    expect(tiles).toHaveLength(3);
+    expect(tiles.filter((tile) => tile.hasAttribute('data-added'))).toHaveLength(1);
+    expect(panel).toHaveTextContent('2 added');
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    // "New medicine name": a quick medicine on the supplier, at MRP ₹0.
+    await user.type(
+      within(panel).getByTestId(`${D}-quick-line-browse-new`),
+      'Azel cream{Enter}',
+    );
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Azel cream added · set MRP later in Stock',
+      ),
+    );
+    await waitFor(() =>
+      expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(3),
+    );
+    const [quick] = clinicFixtures.medicines.snapshot(
+      (medicine) => medicine.name === 'Azel cream',
+    );
+    expect(quick).toMatchObject({ isQuick: true, mrp: 0 });
+    expect(quick?.supplierRates.map((rate) => rate.supplierId)).toEqual([
+      ref.supplier(52),
+    ]);
+  });
+
   it('`?supplier=` names the supplier; `?reorder=low` opens on Items at the supplier most of them use', async () => {
     const first = renderMedicalDrawer(
       <PurchaseOrderDrawer

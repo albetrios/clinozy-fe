@@ -502,7 +502,11 @@
         "addMedicine": "의약품 추가",
         "newMedicine": "새 의약품",
         "enterRate": "구매 단가를 입력하세요",
-        "peek_other": "의약품 {{count}}개 · {{amount}}"
+        "peek_other": "의약품 {{count}}개 · {{amount}}",
+        "quickLine": "의약품, 수량, 무상, 단가 입력 · 예: azel 20 +2 @180",
+        "quickHint": "20 = 수량 · +2 = 무상 · @180 = 단가",
+        "lowStockChip": "{{name}} · {{quantity}}개 남음",
+        "newMedicineName": "새 의약품 이름"
       },
       "quickFill": {
         "reorder": "재고 부족 재주문"

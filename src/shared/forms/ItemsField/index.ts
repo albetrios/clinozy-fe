@@ -1,4 +1,4 @@
-export { itemsFieldTestIds } from './items-field.constants.ts';
+export { ITEMS_QTY_MAX, itemsFieldTestIds } from './items-field.constants.ts';
 export type {
   ItemsCellBinding,
   ItemsColumn,

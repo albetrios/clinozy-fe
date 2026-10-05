@@ -329,7 +329,10 @@
         "full": "全額",
         "nothing": "なし",
         "enterRate": "単価を入力してください",
-        "peek_other": "{{count}} 品目 · {{amount}}"
+        "peek_other": "{{count}} 品目 · {{amount}}",
+        "quickLine": "品目と数量を入力 · 例: gloves 10 @250",
+        "quickHint": "10 = 数量 · @250 = 単価",
+        "lowStockChip": "{{name}} · 残り {{quantity}}"
       },
       "save": "仕入れを作成",
       "pickSupplier": "仕入先を選択してください",

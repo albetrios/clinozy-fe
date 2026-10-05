@@ -12,6 +12,7 @@ import {
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { CalendarPicker } from '@/shared/components/Picker/CalendarPicker/index.ts';
+import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
@@ -33,6 +34,7 @@ import {
   linesTotal,
   type StockPurchaseFormValues,
 } from './stock-purchase-form.ts';
+import { usePurchaseQuickLine } from './use-purchase-quick-line.ts';
 
 const K = STOCK_DRAWER_KEYS.purchase.fields;
 
@@ -191,16 +193,23 @@ function useLineColumns({
 }
 
 /**
- * ITEMS RECEIVED (`clinic-stock.md:149`): the bill's rows — an item ("Select
- * item…"; "New clinic item · “q”" stacked), its quantity, the rate it was
- * bought at (required once an item is picked) and the amount — "+ Add item"
- * and the total. The quick line, Browse and the Low stock chips arrive with
- * the shared quick line (L-45).
+ * ITEMS RECEIVED (`clinic-stock.md:149`): the quick line — "gloves 10 @250",
+ * the Low stock chips and Browse (`usePurchaseQuickLine`) — over the bill's
+ * rows: an item ("Select item…"; "New clinic item · “q”" stacked), its
+ * quantity, the rate it was bought at (required once an item is picked) and
+ * the amount — "+ Add item" and the total.
  */
 export function ItemsFields(props: PurchaseFieldsProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
   const lines = useWatch({ control: props.form.control, name: 'lines' });
+  const vendorId = useWatch({ control: props.form.control, name: 'vendorId' });
+  const quickLine = usePurchaseQuickLine({
+    form: props.form,
+    lines,
+    vendorId,
+    testId: props.testId,
+  });
   return (
     <ItemsField
       control={props.form.control}
@@ -213,6 +222,7 @@ export function ItemsFields(props: PurchaseFieldsProps) {
       totalLabel={t(K.total)}
       readOnly={props.readOnly}
       testId={`${props.testId}-lines`}
+      toolbar={props.readOnly ? undefined : <QuickLine {...quickLine} />}
     />
   );
 }

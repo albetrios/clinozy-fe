@@ -536,7 +536,11 @@
         "enterRate": "Inserisci il prezzo d’acquisto",
         "peek_one": "{{count}} farmaco · {{amount}}",
         "peek_many": "{{count}} farmaci · {{amount}}",
-        "peek_other": "{{count}} farmaci · {{amount}}"
+        "peek_other": "{{count}} farmaci · {{amount}}",
+        "quickLine": "Scrivi farmaco, quantità, omaggio, prezzo · es. azel 20 +2 @180",
+        "quickHint": "20 = quantità · +2 = omaggio · @180 = prezzo",
+        "lowStockChip": "{{name}} · ne restano {{quantity}}",
+        "newMedicineName": "Nome del nuovo farmaco"
       },
       "quickFill": {
         "reorder": "Riordina le scorte basse"

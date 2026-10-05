@@ -536,7 +536,11 @@
         "enterRate": "Introduce la tarifa de compra",
         "peek_one": "{{count}} medicamento · {{amount}}",
         "peek_many": "{{count}} medicamentos · {{amount}}",
-        "peek_other": "{{count}} medicamentos · {{amount}}"
+        "peek_other": "{{count}} medicamentos · {{amount}}",
+        "quickLine": "Escribe medicamento, cantidad, bonificación, precio · p. ej. azel 20 +2 @180",
+        "quickHint": "20 = cantidad · +2 = bonificación · @180 = precio",
+        "lowStockChip": "{{name}} · quedan {{quantity}}",
+        "newMedicineName": "Nombre del nuevo medicamento"
       },
       "quickFill": {
         "reorder": "Reponer existencias bajas"

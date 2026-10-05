@@ -337,7 +337,10 @@
         "nothing": "Nichts",
         "enterRate": "Geben Sie den Preis ein",
         "peek_one": "{{count}} Artikel · {{amount}}",
-        "peek_other": "{{count}} Artikel · {{amount}}"
+        "peek_other": "{{count}} Artikel · {{amount}}",
+        "quickLine": "Artikel und Menge eingeben · z. B. gloves 10 @250",
+        "quickHint": "10 = Menge · @250 = Preis",
+        "lowStockChip": "{{name}} · noch {{quantity}}"
       },
       "save": "Einkauf anlegen",
       "pickSupplier": "Wählen Sie einen Lieferanten",

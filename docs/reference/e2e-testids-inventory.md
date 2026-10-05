@@ -791,7 +791,9 @@ are under `pages/organization/$organizationSlug/patients/$patientId/timeline/com
 
 `shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a
 grammar-agnostic shell (the screen brings the parser; the item lines share `useQuickLineTerms`:
-`20` qty · `+2` free · `@180` rate · `10%` discount). `<q>` is its root id (`rx-quick-line`).
+`20` qty · `+2` free · `@180` rate · `10%` discount). `<q>` is its root id (`rx-quick-line`,
+`invoice-drawer-quick-line`, and the purchase drawers' `purchase-order-drawer-quick-line` and
+`stock-purchase-drawer-quick-line` — their Items quick line, Low stock chips and Browse).
 
 | Test ID                                                     | Element                                                                                     | Source                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------- |

@@ -178,6 +178,11 @@ export const STOCK_DRAWER_KEYS = {
       enterRate: 'drawers.purchase.fields.enterRate',
       /** "2 items · ₹1,710". */
       peek: 'drawers.purchase.fields.peek',
+      /** The quick line's placeholder and its hint (`clinic-stock.md:149`). */
+      quickLine: 'drawers.purchase.fields.quickLine',
+      quickHint: 'drawers.purchase.fields.quickHint',
+      /** "Nitrile gloves (M) · 6 left" — a Low stock chip. */
+      lowStockChip: 'drawers.purchase.fields.lowStockChip',
     },
     save: 'drawers.purchase.save',
     pickSupplier: 'drawers.purchase.pickSupplier',

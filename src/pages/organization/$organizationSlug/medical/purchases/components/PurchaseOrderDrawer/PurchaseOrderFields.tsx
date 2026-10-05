@@ -11,6 +11,7 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { CalendarPicker } from '@/shared/components/Picker/CalendarPicker/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
+import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import {
   type ItemsColumn,
   ItemsField,
@@ -18,10 +19,7 @@ import {
   ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
-import {
-  useMedicineCatalogue,
-  useQuickCreateMedicine,
-} from '@/shared/hooks/useMedicines/index.ts';
+import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { MedicalPartnerPicker } from '../../../shared/components/MedicalPartnerPicker/index.ts';
@@ -36,9 +34,11 @@ import {
   emptyOrderLine,
   lineAmount,
   orderTotal,
+  pricedBy,
   type PurchaseOrderFormValues,
   supplierRateOf,
 } from './purchase-order-form.ts';
+import { useOrderMedicineCreate, useOrderQuickLine } from './use-order-quick-line.ts';
 
 const K = MEDICAL_DRAWER_KEYS.purchaseOrder.fields;
 
@@ -135,13 +135,13 @@ export function OrderFields({
  * medicines"; each "8 in stock · ALVI" or "Out of stock · DERM", the
  * supplier's rate at the end.
  */
-function useMedicineOptions(supplierId: string | null): PickerOption<MedicineRow>[] {
+function useMedicineOptions(
+  supplierId: string | null,
+  supplierName: string | undefined,
+): PickerOption<MedicineRow>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
   const medicines = useMedicineCatalogue().data ?? [];
-  const supplierName = useSupplierCatalogue().data?.find(
-    (row) => row.id === supplierId,
-  )?.name;
   const fromSupplier = supplierName
     ? t(K.fromSupplier, { supplier: supplierName })
     : undefined;
@@ -163,8 +163,7 @@ function useMedicineOptions(supplierId: string | null): PickerOption<MedicineRow
     };
   };
   if (!fromSupplier) return medicines.map((row) => option(row));
-  const priced = (row: MedicineRow) =>
-    row.supplierRates.some((rate) => rate.supplierId === supplierId);
+  const priced = (row: MedicineRow) => pricedBy(row, supplierId);
   const others = t(K.otherMedicines);
   return [
     ...medicines.filter(priced).map((row) => option(row, fromSupplier)),
@@ -173,17 +172,13 @@ function useMedicineOptions(supplierId: string | null): PickerOption<MedicineRow
 }
 
 /** The rows: Medicine · Qty · Free · Rate* · Amount (`medical.md:261`; H:5389). */
-function useLineColumns({
-  form,
-  openChild,
-}: OrderFieldsProps): ItemsColumn<PurchaseOrderFormValues, 'lines'>[] {
+function useLineColumns(
+  { form, openChild }: OrderFieldsProps,
+  supplierId: string | null,
+  options: PickerOption<MedicineRow>[],
+): ItemsColumn<PurchaseOrderFormValues, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const supplierId = useWatch({ control: form.control, name: 'supplierId' });
-  const options = useMedicineOptions(supplierId);
-  const quickMedicine = useQuickCreateMedicine({
-    successMessage: (medicine) =>
-      t(MEDICAL_DRAWER_KEYS.quick.medicine, { name: medicine.name }),
-  });
+  const createMedicine = useOrderMedicineCreate(supplierId);
   const setMedicine = (index: number, medicineId: string, rate: number) => {
     form.setValue(`lines.${index}.medicineId`, medicineId, { shouldDirty: true });
     form.setValue(`lines.${index}.rate`, rate, { shouldDirty: true });
@@ -211,10 +206,9 @@ function useLineColumns({
             }
           }}
           onCreate={(query) => {
-            quickMedicine
-              .mutateAsync({ name: query, supplierId })
-              .then((medicine) => setMedicine(row.index, medicine.id, 0))
-              .catch(() => undefined);
+            void createMedicine(query).then((medicine) => {
+              if (medicine) setMedicine(row.index, medicine.id, 0);
+            });
           }}
           autoCreate
           createLabel={t(K.addMedicine)}
@@ -277,29 +271,43 @@ function useLineColumns({
 }
 
 /**
- * ITEMS (`medical.md:261`): the order's rows — a medicine (grouped by the
- * supplier's price list; "Add medicine “q”" makes a quick one linked to the
- * supplier, "New medicine · “q”" opens it in full on top), its quantity, the
- * free units, the purchase rate (required once a medicine is picked) and the
- * amount — "+ Add medicine" and the total. The quick line, Browse and the Low
- * stock chips arrive with the shared quick line (L-45).
+ * ITEMS (`medical.md:261`): the quick line — "azel 20 +2 @180", the Low stock
+ * chips and Browse (`useOrderQuickLine`) — over the order's rows: a medicine
+ * (grouped by the supplier's price list; "Add medicine “q”" makes a quick one
+ * linked to the supplier, "New medicine · “q”" opens it in full on top), its
+ * quantity, the free units, the purchase rate (required once a medicine is
+ * picked) and the amount — "+ Add medicine" and the total.
  */
 export function ItemsFields(props: OrderFieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
   const lines = useWatch({ control: props.form.control, name: 'lines' });
+  const supplierId = useWatch({ control: props.form.control, name: 'supplierId' });
+  const supplierName = useSupplierCatalogue().data?.find(
+    (row) => row.id === supplierId,
+  )?.name;
+  const options = useMedicineOptions(supplierId, supplierName);
+  const quickLine = useOrderQuickLine({
+    form: props.form,
+    options,
+    lines,
+    supplierId,
+    supplierName,
+    testId: props.testId,
+  });
   return (
     <ItemsField
       control={props.form.control}
       name="lines"
       label={t(K.items)}
-      columns={useLineColumns(props)}
+      columns={useLineColumns(props, supplierId, options)}
       newRow={emptyOrderLine}
       addLabel={t(K.add)}
       total={formatPaise(orderTotal(lines))}
       totalLabel={t(K.total)}
       readOnly={props.readOnly}
       testId={`${props.testId}-lines`}
+      toolbar={props.readOnly ? undefined : <QuickLine {...quickLine} />}
     />
   );
 }

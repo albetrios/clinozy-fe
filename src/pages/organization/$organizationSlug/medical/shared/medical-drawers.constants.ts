@@ -230,6 +230,13 @@ export const MEDICAL_DRAWER_KEYS = {
       enterRate: 'drawers.purchaseOrder.fields.enterRate',
       /** "2 medicines · ₹4,236" — the Items step's head (plural). */
       peek: 'drawers.purchaseOrder.fields.peek',
+      /** The quick line's placeholder and its hint (`medical.md:261`). */
+      quickLine: 'drawers.purchaseOrder.fields.quickLine',
+      quickHint: 'drawers.purchaseOrder.fields.quickHint',
+      /** "Arganlif Hair Serum 50 ml · 2 left" — a Low stock chip. */
+      lowStockChip: 'drawers.purchaseOrder.fields.lowStockChip',
+      /** Browse's inline field for a medicine the list lacks (`medical.md:413`). */
+      newMedicineName: 'drawers.purchaseOrder.fields.newMedicineName',
     },
     quickFill: { reorder: 'drawers.purchaseOrder.quickFill.reorder' },
     /** "Enter the rate for Epriva Tab". */

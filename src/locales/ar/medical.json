@@ -587,7 +587,11 @@
         "peek_two": "{{count}} دواءان · {{amount}}",
         "peek_few": "{{count}} أدوية · {{amount}}",
         "peek_many": "{{count}} دواءً · {{amount}}",
-        "peek_other": "{{count}} دواء · {{amount}}"
+        "peek_other": "{{count}} دواء · {{amount}}",
+        "quickLine": "اكتب الدواء والكمية والمجاني والسعر · مثال: azel 20 +2 @180",
+        "quickHint": "20 = الكمية · +2 = مجاني · @180 = السعر",
+        "lowStockChip": "{{name}} · متبقٍ {{quantity}}",
+        "newMedicineName": "اسم دواء جديد"
       },
       "quickFill": {
         "reorder": "إعادة طلب المخزون المنخفض"

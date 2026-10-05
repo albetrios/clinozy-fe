@@ -18,6 +18,12 @@ export {
   type QuickLineSearchable,
   quickLineTypedName,
 } from './quick-line-match.ts';
+export {
+  quickLineCount,
+  type QuickLineStepRules,
+  withQuickLineRow,
+  withSteppedQuickLineRow,
+} from './quick-line-rows.ts';
 export type { QuickLineTerm, QuickLineTermValues } from './quick-line-terms.ts';
 export { QuickLine } from './QuickLine.tsx';
 export { QuickLineBrowse, type QuickLineBrowseProps } from './QuickLineBrowse.tsx';

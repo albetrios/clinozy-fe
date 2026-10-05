@@ -24,7 +24,11 @@ import {
 } from '@/shared/components/ui/tooltip.tsx';
 import { Minus, Plus } from '@/shared/icons/index.ts';
 
-import { ITEMS_FIELD_KEYS, ITEMS_FIELD_NS } from './items-field.constants.ts';
+import {
+  ITEMS_FIELD_KEYS,
+  ITEMS_FIELD_NS,
+  ITEMS_QTY_MAX,
+} from './items-field.constants.ts';
 import type { ItemsCellBinding } from './items-field.types.ts';
 
 /*
@@ -305,7 +309,7 @@ export interface ItemsQtyCellProps<
 > extends ItemsCellBinding<TForm> {
   /** 1 by default: "−" stops there, and an emptied count comes back to it. */
   min?: number;
-  /** 9,999 by default (H:3811); the invoice's 1–999 passes 999. */
+  /** `ITEMS_QTY_MAX` (9,999) by default (H:3811); the invoice's 1–999 passes 999. */
   max?: number;
   /** A message of the screen's own, over the field's validation. */
   error?: string;
@@ -325,7 +329,7 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   label,
   testId,
   min = 1,
-  max = 9999,
+  max = ITEMS_QTY_MAX,
   error,
   readOnly = false,
 }: ItemsQtyCellProps<TForm>) {

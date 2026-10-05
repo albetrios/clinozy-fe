@@ -41,7 +41,7 @@ keeps all four; its track scrolls sideways when short.
 | `shared/components/StockItemDrawer/`     | New / Edit item (680px; Item → Levels → Supplier) and the stacked New clinic item (Item → Details).                                        |
 | `shared/components/StockMovementDrawer/` | Log usage / Receive stock / Adjust stock (560px; Movement → Details → Notes), with Undo.                                                   |
 | `shared/components/StockUsePopover/`     | The Use popover: 300px at the row's Use button — quantity, its measure, "Used for", the After line, Undo.                                  |
-| `shared/components/StockPurchaseDrawer/` | New / Edit purchase (840px; Bill → Items received → Payment), "⚡ Reorder low items".                                                      |
+| `shared/components/StockPurchaseDrawer/` | New / Edit purchase (840px; Bill → Items received → Payment), "⚡ Reorder low items", quick line, Low stock chips, Browse.                 |
 | `shared/components/StockVendorDrawer/`   | New / Edit clinic vendor (560px), stacked or on the Vendors tab's routes.                                                                  |
 | `shared/components/StockCheckDrawer/`    | Stock check (840px): the count grid — 2 × 2 cards on a phone — the counter and "Fill rest as matching".                                    |
 | `shared/components/StockPickers/`        | The Supplier and Item pickers with their "New … · “q”" + "full details".                                                                   |

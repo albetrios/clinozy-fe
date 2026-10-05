@@ -345,7 +345,10 @@
         "enterRate": "Introduce el precio",
         "peek_one": "{{count}} artículo · {{amount}}",
         "peek_many": "{{count}} de artículos · {{amount}}",
-        "peek_other": "{{count}} artículos · {{amount}}"
+        "peek_other": "{{count}} artículos · {{amount}}",
+        "quickLine": "Escribe artículo y cantidad · p. ej. gloves 10 @250",
+        "quickHint": "10 = cantidad · @250 = precio",
+        "lowStockChip": "{{name}} · quedan {{quantity}}"
       },
       "save": "Crear compra",
       "pickSupplier": "Elige un proveedor",

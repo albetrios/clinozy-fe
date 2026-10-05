@@ -519,7 +519,11 @@
         "newMedicine": "New medicine",
         "enterRate": "Enter the purchase rate",
         "peek_one": "{{count}} medicine · {{amount}}",
-        "peek_other": "{{count}} medicines · {{amount}}"
+        "peek_other": "{{count}} medicines · {{amount}}",
+        "quickLine": "Type medicine, qty, free, rate · e.g. azel 20 +2 @180",
+        "quickHint": "20 = qty · +2 = free · @180 = rate",
+        "lowStockChip": "{{name}} · {{quantity}} left",
+        "newMedicineName": "New medicine name"
       },
       "quickFill": {
         "reorder": "Reorder low stock"

@@ -10,6 +10,11 @@ import type {
   PrescriptionInput,
   RxCatalogMedicine,
 } from '@/shared/api/clinic/prescriptions-api.ts';
+import {
+  quickLineCount,
+  withQuickLineRow,
+  withSteppedQuickLineRow,
+} from '@/shared/components/QuickLine/index.ts';
 
 import { dosesPerDay, type RxDose, type RxLineValues } from './rx-quick-line.ts';
 
@@ -387,12 +392,12 @@ export function rxLineFor(
   };
 }
 
+/** A line with no medicine yet: the next add fills it. */
+const isBlankRxLine = (item: RxFormLine) => item.medicineName.trim() === '';
+
 /** The lines after adding one (H:4806): it fills the first blank row, or comes last. */
 export function withRxLine(items: readonly RxFormLine[], line: RxFormLine): RxFormLine[] {
-  const blank = items.findIndex((item) => item.medicineName.trim() === '');
-  return blank >= 0
-    ? items.map((item, index) => (index === blank ? line : item))
-    : [...items, line];
+  return withQuickLineRow(items, line, isBlankRxLine);
 }
 
 /**
@@ -440,9 +445,7 @@ export function rxFormWithMedicines(
 
 /** How many of a medicine the lines hold — Browse's tile count. */
 export function rxCountOf(items: readonly RxFormLine[], name: string): number {
-  return items
-    .filter((item) => item.medicineName === name)
-    .reduce((sum, item) => sum + item.qty, 0);
+  return quickLineCount(items, (item) => item.medicineName === name);
 }
 
 /**
@@ -456,14 +459,12 @@ export function steppedRxLines(
   step: 1 | -1,
   daysNote: (days: number) => string,
 ): RxFormLine[] {
-  const index = items.findIndex((item) => item.medicineName === medicine.name);
-  if (index < 0) {
-    return step > 0 ? withRxLine(items, rxLineFor(medicine, {}, daysNote)) : [...items];
-  }
-  const qty = (items[index]?.qty ?? 0) + step;
-  if (qty > 0) return items.map((item, at) => (at === index ? { ...item, qty } : item));
-  const left = items.filter((item) => item.medicineName !== medicine.name);
-  return left.length ? left : [emptyRxLine()];
+  return withSteppedQuickLineRow(items, step, {
+    isBlank: isBlankRxLine,
+    holds: (item) => item.medicineName === medicine.name,
+    newRow: () => rxLineFor(medicine, {}, daysNote),
+    blank: emptyRxLine,
+  });
 }
 
 // ── Kits ──

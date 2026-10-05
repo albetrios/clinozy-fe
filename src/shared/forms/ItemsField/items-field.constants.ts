@@ -25,6 +25,9 @@ export const ITEMS_FIELD_KEYS = {
   moneyPlaceholder: 'itemsField.moneyPlaceholder',
 } as const;
 
+/** A row's count cap — the quantity stepper's own (H:3811); the invoice's 1–999 passes 999. */
+export const ITEMS_QTY_MAX = 9999;
+
 /** Root test id of an items field without a `testId`; hosts pass their own (`invoice-items`). */
 export const ITEMS_FIELD_TEST_ID = 'items-field';
 

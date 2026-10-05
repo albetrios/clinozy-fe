@@ -329,7 +329,10 @@
         "full": "全额",
         "nothing": "无",
         "enterRate": "请输入单价",
-        "peek_other": "{{count}} 件物品 · {{amount}}"
+        "peek_other": "{{count}} 件物品 · {{amount}}",
+        "quickLine": "输入物品和数量 · 例如 gloves 10 @250",
+        "quickHint": "10 = 数量 · @250 = 单价",
+        "lowStockChip": "{{name}} · 剩 {{quantity}}"
       },
       "save": "创建采购",
       "pickSupplier": "请选择供应商",
