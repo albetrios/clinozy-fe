@@ -47,7 +47,6 @@ function AppearanceContent() {
           ? [APPEARANCE_KEYS.layoutTitle]
           : []),
         APPEARANCE_KEYS.surfaceTitle,
-        APPEARANCE_KEYS.notificationsTitle,
       ];
 
   return (

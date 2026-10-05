@@ -1,63 +1,61 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-import { TOAST_VARIANTS } from '@/shared/theme/index.ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AppToaster } from './AppToaster.tsx';
 import { notify } from './notify.ts';
 
-describe('toast dismiss integration', () => {
-  // The platform designs carry a close button; the clinic bar (the default
-  // preset's toast) has none, by design, and leaves on its timer or a swipe.
-  beforeEach(() => {
-    useThemeStore.setState({ toastVariant: TOAST_VARIANTS.indexOf('tint') });
-  });
+/** Sonner has taken the toast over from the immediate host (which marks its own). */
+async function sonnerToast(): Promise<HTMLElement> {
+  let toast: HTMLElement | undefined;
+  await waitFor(
+    () => {
+      toast = screen.getByTestId('app-toast');
+      expect(toast).not.toHaveAttribute('data-toast-pending');
+    },
+    { timeout: 5000 },
+  );
+  return toast as HTMLElement;
+}
 
+describe('toast dismiss integration', () => {
+  // Every toast is the design's bar: no close button, it leaves on its timer
+  // or a swipe — except a toast with no timer, which carries a dismiss ×.
   afterEach(() => {
     act(() => {
       notify.dismiss();
     });
   });
 
-  it('dismisses when the close button is clicked', async () => {
-    const user = userEvent.setup();
+  it('draws the bar without a close button for a timed toast', async () => {
     render(<AppToaster />);
-
     act(() => {
-      notify.success('Hello');
+      notify.success('Saved');
     });
+    const toast = await sonnerToast();
+    expect(toast).toHaveTextContent('Saved');
+    expect(screen.queryByTestId('toast-dismiss')).toBeNull();
+  });
 
-    // Wait for Sonner to take the toast over from the immediate host: a click
-    // on the host's button during that handoff lands on a node being removed.
-    await waitFor(
-      () =>
-        expect(screen.getByTestId('app-toast')).toHaveAttribute(
-          'data-toast-variant',
-          'tint',
-        ),
-      { timeout: 5000 },
-    );
+  it('dismisses a persistent toast on its ×, firing onDismiss once', async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn();
+    render(<AppToaster />);
+    act(() => {
+      notify.info('Update available', {
+        id: 'update',
+        duration: Number.POSITIVE_INFINITY,
+        onDismiss,
+      });
+    });
+    await sonnerToast();
 
     await user.click(screen.getByTestId('toast-dismiss'));
 
     await waitFor(
       () => expect(screen.queryByTestId('app-toast')).not.toBeInTheDocument(),
-      {
-        timeout: 5000,
-      },
+      { timeout: 5000 },
     );
-  });
-
-  it('draws the clinic bar without a close button', async () => {
-    useThemeStore.setState({ toastVariant: TOAST_VARIANTS.indexOf('bar') });
-    render(<AppToaster />);
-    act(() => {
-      notify.success('Saved');
-    });
-    const toast = await screen.findByTestId('app-toast', undefined, { timeout: 5000 });
-    expect(toast).toHaveAttribute('data-toast-variant', 'bar');
-    expect(screen.queryByTestId('toast-dismiss')).toBeNull();
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 });

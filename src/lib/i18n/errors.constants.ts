@@ -53,16 +53,6 @@ export const ERRORS_KEYS = {
     undo: 'toast.undo',
     undone: 'toast.undone',
     processing: 'toast.processing',
-    preview: {
-      successTitle: 'toast.preview.successTitle',
-      successDescription: 'toast.preview.successDescription',
-      errorTitle: 'toast.preview.errorTitle',
-      errorDescription: 'toast.preview.errorDescription',
-      warningTitle: 'toast.preview.warningTitle',
-      warningDescription: 'toast.preview.warningDescription',
-      infoTitle: 'toast.preview.infoTitle',
-      infoDescription: 'toast.preview.infoDescription',
-    },
   },
   api: {
     fallback: 'api.fallback',
@@ -102,9 +92,6 @@ export const ERRORS_KEYS = {
       themeCodeNumeric: 'frontend.account.themeCodeNumeric',
       themeLinkCopied: 'frontend.account.themeLinkCopied',
       themeLinkCopiedDescription: 'frontend.account.themeLinkCopiedDescription',
-      notificationStylePreview: 'frontend.account.notificationStylePreview',
-      notificationStylePreviewDescription:
-        'frontend.account.notificationStylePreviewDescription',
       accountDeletionPending: 'frontend.account.accountDeletionPending',
       avatarInvalidType: 'frontend.account.avatarInvalidType',
       avatarTooLarge: 'frontend.account.avatarTooLarge',

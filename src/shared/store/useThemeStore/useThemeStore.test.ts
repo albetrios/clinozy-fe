@@ -4,11 +4,9 @@ import {
   DEFAULT_ICON_COLOR,
   DEFAULT_LAYOUT_WIDTH,
   DEFAULT_PRESET,
-  DEFAULT_TOAST_POSITION,
   GENERATED_PRESET,
   generateSeededTheme,
   SHUFFLE_TEMP,
-  TOAST_VARIANTS,
 } from '@/shared/theme/index.ts';
 
 import { useThemeStore } from './useThemeStore.ts';
@@ -142,7 +140,7 @@ describe('useThemeStore', () => {
     // icons ride along the shuffle — values stay valid
     expect(['thin', 'regular', 'bold']).toContain(state.iconWeight);
     expect(['lucide', 'tabler', 'phosphor']).toContain(state.iconLibrary);
-    // TEMP preview axes (layout/toast) roll only when their SHUFFLE_TEMP switch is
+    // TEMP preview axes (layouts) roll only when their SHUFFLE_TEMP switch is
     // on; either way the stored index stays a valid variant.
     expect([0, 1, 2]).toContain(state.authVariant);
     expect([0, 1, 2]).toContain(state.appVariant);
@@ -239,8 +237,6 @@ describe('useThemeStore', () => {
       'preset',
       'seed',
       'theme',
-      'toastPosition',
-      'toastVariant',
     ];
 
     /** Deliberately ephemeral: shuffle-only previews, stripped in `migrate` too. */
@@ -449,74 +445,43 @@ describe('useThemeStore — persistence contract', () => {
     expect(migrate?.(null, 1)).toBeNull();
   });
 
-  it('migrate v4 moves the never-picked top-right toasts to bottom-centre', () => {
-    const migrate = useThemeStore.persist.getOptions().migrate;
-    expect(DEFAULT_TOAST_POSITION).toBe('bottom-center');
-
-    const moved = migrate?.(
-      { preset: DEFAULT_PRESET, toastPosition: 'top-right' },
-      4,
-    ) as Record<string, unknown>;
-    expect(moved.toastPosition).toBe('bottom-center');
-    // Older still, with no position stored at all: the new default too.
-    const unset = migrate?.({ theme: 'dark' }, 1) as Record<string, unknown>;
-    expect(unset.toastPosition).toBe('bottom-center');
-  });
-
-  it.each(['top-center', 'top-left', 'bottom-right', 'bottom-left'])(
-    'migrate v4 keeps a picked %s',
-    (picked) => {
+  it.each([4, 5, 6])(
+    'migrate drops the retired toast design and position (a v%i pick included)',
+    (version) => {
       const migrate = useThemeStore.persist.getOptions().migrate;
-      const kept = migrate?.({ toastPosition: picked }, 4) as Record<string, unknown>;
-      expect(kept.toastPosition).toBe(picked);
+      const migrated = migrate?.(
+        { preset: DEFAULT_PRESET, toastVariant: 2, toastPosition: 'top-left' },
+        version,
+      ) as Record<string, unknown>;
+      expect(migrated).not.toHaveProperty('toastVariant');
+      expect(migrated).not.toHaveProperty('toastPosition');
+      expect(migrated.preset).toBe(DEFAULT_PRESET);
     },
   );
 
-  it('a v5 top-right is a choice, kept as is', () => {
-    const migrate = useThemeStore.persist.getOptions().migrate;
-    const kept = migrate?.({ toastPosition: 'top-right' }, 5) as Record<string, unknown>;
-    expect(kept.toastPosition).toBe('top-right');
-  });
-
-  it('a stored v4 preference rehydrates onto the new toast default', async () => {
+  it('a stored v6 preference with a toast pick loads without it, saved as v7', async () => {
     localStorage.setItem(
       'theme-preference',
       JSON.stringify({
-        state: { theme: 'light', preset: DEFAULT_PRESET, toastPosition: 'top-right' },
-        version: 4,
+        state: {
+          theme: 'light',
+          preset: DEFAULT_PRESET,
+          toastVariant: 3,
+          toastPosition: 'top-right',
+        },
+        version: 6,
       }),
     );
     await useThemeStore.persist.rehydrate();
 
-    expect(useThemeStore.getState().toastPosition).toBe('bottom-center');
+    expect(useThemeStore.getState()).not.toHaveProperty('toastVariant');
+    expect(useThemeStore.getState()).not.toHaveProperty('toastPosition');
+    expect(useThemeStore.getState().preset).toBe(DEFAULT_PRESET);
     const stored = JSON.parse(localStorage.getItem('theme-preference') ?? '{}');
-    expect(stored).toMatchObject({
-      version: 6,
-      state: { toastPosition: 'bottom-center' },
-    });
+    expect(stored.version).toBe(7);
+    expect(stored.state).not.toHaveProperty('toastVariant');
+    expect(stored.state).not.toHaveProperty('toastPosition');
     localStorage.removeItem('theme-preference');
-  });
-
-  it('a stored v5 preference on the default preset takes its toast bar (v6)', async () => {
-    localStorage.setItem(
-      'theme-preference',
-      JSON.stringify({
-        state: { theme: 'light', preset: DEFAULT_PRESET, toastVariant: 0 },
-        version: 5,
-      }),
-    );
-    await useThemeStore.persist.rehydrate();
-    expect(TOAST_VARIANTS[useThemeStore.getState().toastVariant]).toBe('bar');
-    localStorage.removeItem('theme-preference');
-  });
-
-  it('keeps a toast design the user picked, and other presets’ defaults', () => {
-    const migrate = useThemeStore.persist.getOptions().migrate;
-    if (!migrate) throw new Error('the store migrates its persisted state');
-    const migrated = (state: Record<string, unknown>) =>
-      (migrate(state, 5) as unknown as { toastVariant: number }).toastVariant;
-    expect(migrated({ preset: DEFAULT_PRESET, toastVariant: 2 })).toBe(2);
-    expect(migrated({ preset: 'violet', toastVariant: 0 })).toBe(0);
   });
 
   it('partialize never persists the TEMP preview variants', () => {
@@ -569,8 +534,6 @@ describe('useThemeStore — shuffle gates', () => {
       authLayout: false,
       appLayout: false,
       publicLayout: false,
-      toastVariant: false,
-      toastPosition: false,
     });
     try {
       useThemeStore.setState({
@@ -586,8 +549,6 @@ describe('useThemeStore — shuffle gates', () => {
       expect(after.authVariant).toBe(before.authVariant);
       expect(after.appVariant).toBe(before.appVariant);
       expect(after.publicVariant).toBe(before.publicVariant);
-      expect(after.toastVariant).toBe(before.toastVariant);
-      expect(after.toastPosition).toBe(before.toastPosition);
       // The look itself still rolls — gates only pin the TEMP previews.
       expect(after.preset).toBe(GENERATED_PRESET);
       expect(after.seed).not.toBeNull();

@@ -35,7 +35,7 @@ method we used for **corner radius + shape**.
 | 14  | **Icon library** (`iconLibrary`)          | lazy icon chunks                             | ✅ Done (2025-06) |
 | 15  | **Light/dark mode** (`theme`)             | `.dark` on `<html>`                          | ✅ Done (2025-06) |
 | 16  | **Named presets** (`preset`)              | `data-theme`                                 | ✅ Done (2025-06) |
-| 17  | **Toast variant / position**              | Zustand + sonner                             | ✅ Done (2025-06) |
+| 17  | **Toasts** (one design since L-62)        | the bar on `primary` (sonner)                | ✅ Retired        |
 | 18  | **Layout preview variants** (TEMP)        | `authVariant`, `appVariant`, `publicVariant` | ✅ Done (2025-06) |
 
 **All 18 axes audited.** Re-run a single axis by setting its row back to ⬜ Pending.
@@ -164,12 +164,12 @@ and inline vars replace `data-theme`.
 | **Icon weight**  | `iconWeight`  | `thin` (1.5), `regular` (2), `bold` (2.5)                    | `regular` | `--icon-stroke`                      |
 | **Icon library** | `iconLibrary` | `lucide`, `tabler`, `phosphor`                               | `lucide`  | dynamic import in `icon-registry.ts` |
 
-### E. Toast preview (TEMP — marked for retirement in `presets.ts`)
+### E. Toasts (not an axis)
 
-| Axis               | Store field            | Options                                                                                       | Default                                                       |
-| ------------------ | ---------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Toast design**   | `toastVariant` (index) | `tint`, `solid`, `outline`, `accent`, **`minimal`**, **`glass`**                              | `0` → tint                                                    |
-| **Toast position** | `toastPosition`        | `top-right`, `top-center`, **`top-left`**, `bottom-right`, `bottom-center`, **`bottom-left`** | `bottom-center` (persist v5 moved a never-picked `top-right`) |
+Retired in L-62: every toast is the clinic design's bar (`shared/notify/ToastBar.tsx`),
+bottom-centre. It follows the theme through `primary` / `primary-foreground` and the
+`--elevation-menu` shadow; there is no design or position to audit. Persist v7 drops the
+old `toastVariant` / `toastPosition` picks.
 
 ### F. Layout shell preview (TEMP — shuffle-gated via `SHUFFLE_TEMP`)
 

@@ -42,17 +42,7 @@
     "dismiss": "Dispensar notificação",
     "undo": "Desfazer",
     "undone": "Ação cancelada",
-    "processing": "Processando…",
-    "preview": {
-      "successTitle": "Alterações salvas",
-      "successDescription": "Suas configurações estão ativas.",
-      "errorTitle": "Algo deu errado",
-      "errorDescription": "Tente novamente.",
-      "warningTitle": "Atenção",
-      "warningDescription": "Esta ação precisa de revisão.",
-      "infoTitle": "Você sabia?",
-      "infoDescription": "Embaralhar também muda este design."
-    }
+    "processing": "Processando…"
   },
   "api": {
     "fallback": "Algo deu errado. Tente novamente.",
@@ -92,8 +82,6 @@
       "copySuccess": "ID da conta copiado",
       "themeLinkCopied": "Link do tema copiado",
       "themeLinkCopiedDescription": "Compartilhe esta URL para reproduzir a aparência.",
-      "notificationStylePreview": "Estilo de notificação",
-      "notificationStylePreviewDescription": "{{variant}} — tematizado com seu destaque e cores semânticas.",
       "accountDeletionPending": "Conta excluída. Saindo…",
       "avatarInvalidType": "Escolha um arquivo de imagem.",
       "avatarTooLarge": "O avatar deve ter menos de 2 MB.",

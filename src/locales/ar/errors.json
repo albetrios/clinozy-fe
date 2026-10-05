@@ -42,17 +42,7 @@
     "dismiss": "إغلاق الإشعار",
     "undo": "تراجع",
     "undone": "تم إلغاء الإجراء",
-    "processing": "جارٍ المعالجة…",
-    "preview": {
-      "successTitle": "تم حفظ التغييرات",
-      "successDescription": "إعداداتك نشطة.",
-      "errorTitle": "حدث خطأ ما",
-      "errorDescription": "يُرجى المحاولة مرة أخرى.",
-      "warningTitle": "تنبيه",
-      "warningDescription": "يحتاج هذا الإجراء إلى مراجعة.",
-      "infoTitle": "هل تعلم؟",
-      "infoDescription": "الخلط يغيّر هذا التصميم أيضًا."
-    }
+    "processing": "جارٍ المعالجة…"
   },
   "api": {
     "fallback": "حدث خطأ ما. يُرجى المحاولة مرة أخرى.",
@@ -92,8 +82,6 @@
       "copySuccess": "تم نسخ معرّف الحساب",
       "themeLinkCopied": "تم نسخ رابط المظهر",
       "themeLinkCopiedDescription": "شارك هذا الرابط لإعادة إنتاج المظهر.",
-      "notificationStylePreview": "نمط الإشعار",
-      "notificationStylePreviewDescription": "{{variant}} — مُنمَّط بألوانك المميزة والدلالية.",
       "accountDeletionPending": "تم حذف الحساب. جارٍ تسجيل الخروج…",
       "avatarInvalidType": "يُرجى اختيار ملف صورة.",
       "avatarTooLarge": "يجب أن تكون الصورة الرمزية أقل من 2 ميجابايت.",

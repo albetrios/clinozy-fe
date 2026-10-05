@@ -42,17 +42,7 @@
     "dismiss": "सूचना खारिज करें",
     "undo": "पूर्ववत",
     "undone": "क्रिया रद्द",
-    "processing": "प्रसंस्करण…",
-    "preview": {
-      "successTitle": "परिवर्तन सहेजे गए",
-      "successDescription": "आपकी सेटिंग्स लाइव हैं।",
-      "errorTitle": "कुछ गलत हो गया",
-      "errorDescription": "कृपया फिर कोशिश करें।",
-      "warningTitle": "ध्यान दें",
-      "warningDescription": "इस क्रिया की समीक्षा आवश्यक है।",
-      "infoTitle": "क्या आप जानते हैं?",
-      "infoDescription": "शफ़ल भी इस डिज़ाइन को बदलता है।"
-    }
+    "processing": "प्रसंस्करण…"
   },
   "api": {
     "fallback": "कुछ गलत हो गया। कृपया फिर कोशिश करें।",
@@ -92,8 +82,6 @@
       "copySuccess": "खाता ID कॉपी किया गया",
       "themeLinkCopied": "थीम लिंक कॉपी किया गया",
       "themeLinkCopiedDescription": "दिखावट दोहराने के लिए यह URL साझा करें।",
-      "notificationStylePreview": "सूचना शैली",
-      "notificationStylePreviewDescription": "{{variant}} — आपके एक्सेंट और सिमेंटिक रंगों के साथ।",
       "accountDeletionPending": "खाता हटाया गया। साइन आउट हो रहा है…",
       "avatarInvalidType": "कृपया एक छवि फ़ाइल चुनें।",
       "avatarTooLarge": "अवतार 2 MB से कम होना चाहिए।",

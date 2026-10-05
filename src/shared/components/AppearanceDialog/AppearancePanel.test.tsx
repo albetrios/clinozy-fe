@@ -4,14 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/shared/notify/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-import {
-  ACCENT_COLORS,
-  DEFAULT_TOAST_POSITION,
-  DEFAULT_TOAST_VARIANT,
-  generateTheme,
-  normalizeLook,
-  TOAST_VARIANTS,
-} from '@/shared/theme/index.ts';
+import { ACCENT_COLORS, generateTheme, normalizeLook } from '@/shared/theme/index.ts';
 
 import { AppearancePanel } from './AppearancePanel.tsx';
 
@@ -48,8 +41,6 @@ describe('AppearancePanel', () => {
       iconColor: 'default',
       iconLibrary: 'lucide',
       layoutWidth: 'contained',
-      toastVariant: DEFAULT_TOAST_VARIANT,
-      toastPosition: DEFAULT_TOAST_POSITION,
       seed: null,
     });
     platformOverrides.themeLock = false;
@@ -81,11 +72,12 @@ describe('AppearancePanel', () => {
     expect(screen.getByTestId('icon-bold')).toBeInTheDocument();
     expect(screen.getByTestId('iconcolor-primary')).toBeInTheDocument();
     expect(screen.getByTestId('icon-preview-star')).toBeInTheDocument();
-    // Surface + notifications
+    // Surface — and no Notifications card: every toast is the design's bar.
     expect(screen.getByTestId('layout-width-card')).toBeInTheDocument();
     expect(screen.getByTestId('layout-width-contained')).toBeInTheDocument();
     expect(screen.getByTestId('shuffle-surface')).toBeInTheDocument();
-    expect(screen.getByTestId('toast-variant-swatches')).toBeInTheDocument();
+    expect(screen.queryByTestId('toast-preview-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('shuffle-notifications')).not.toBeInTheDocument();
   });
 
   it('renders language, text direction, date & time, and money controls', () => {
@@ -100,24 +92,6 @@ describe('AppearancePanel', () => {
     expect(screen.getByTestId('money-prefs')).toBeInTheDocument();
     expect(screen.getByTestId('number-style-compact')).toBeInTheDocument();
     expect(screen.getByTestId('currency-code-select')).toBeInTheDocument();
-  });
-
-  it('tags the accent preview bar as a pill, so the Sharp shape squares it', () => {
-    // The preview has to look like the toast it previews, and the real accent
-    // bar is square-ended under Sharp.
-    render(<AppearancePanel />);
-
-    const bar = screen.getByTestId('toast-swatch-accent').querySelector('span');
-    expect(bar).toHaveClass('rounded-full');
-    expect(bar).toHaveAttribute('data-slot', 'pill');
-  });
-
-  it('notification shuffle rolls the toast variant', async () => {
-    const user = userEvent.setup();
-    render(<AppearancePanel />);
-    const before = useThemeStore.getState().toastVariant;
-    await user.click(screen.getByTestId('shuffle-notifications'));
-    expect(useThemeStore.getState().toastVariant).not.toBe(before);
   });
 
   it('picking a named preset applies data-theme and clears custom look', async () => {
@@ -191,7 +165,6 @@ describe('AppearancePanel', () => {
     ['menu-glass', 'menu', 'glass'],
     ['icon-bold', 'iconWeight', 'bold'],
     ['iconlib-phosphor', 'iconLibrary', 'phosphor'],
-    ['toastpos-top-center', 'toastPosition', 'top-center'],
   ] as const)('%s sets %s', async (testId, field, value) => {
     const user = userEvent.setup();
     render(<AppearancePanel />);
@@ -219,26 +192,6 @@ describe('AppearancePanel', () => {
       ACCENT_COLORS.find((colour) => colour.id === 'teal')?.hue,
     );
   });
-
-  it('picking a toast design, as a swatch or a pill, sets the variant', async () => {
-    const user = userEvent.setup();
-    render(<AppearancePanel />);
-    await user.click(screen.getByTestId('toast-swatch-glass'));
-    expect(useThemeStore.getState().toastVariant).toBe(TOAST_VARIANTS.indexOf('glass'));
-    await user.click(screen.getByTestId('toast-solid'));
-    expect(useThemeStore.getState().toastVariant).toBe(TOAST_VARIANTS.indexOf('solid'));
-  });
-
-  it.each(['success', 'error', 'warning', 'info'] as const)(
-    'the %s preview raises that kind of toast',
-    async (kind) => {
-      const raise = vi.spyOn(notify, kind).mockImplementation(() => '');
-      const user = userEvent.setup();
-      render(<AppearancePanel />);
-      await user.click(screen.getByTestId(`toast-preview-${kind}`));
-      expect(raise).toHaveBeenCalledTimes(1);
-    },
-  );
 
   it('applies a pasted theme code and clears the field', async () => {
     const user = userEvent.setup();
@@ -278,13 +231,12 @@ describe('AppearancePanel', () => {
     expect(screen.getByTestId('language-prefs')).toBeInTheDocument();
     expect(screen.getByTestId('money-prefs')).toBeInTheDocument();
     expect(screen.queryByTestId('theme-dark')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('toast-preview-card')).not.toBeInTheDocument();
   });
 
   it('drops the content-width card when the deployment forces a width', () => {
     platformOverrides.layoutWidthForced = 'full';
     render(<AppearancePanel />);
     expect(screen.queryByTestId('layout-width-card')).not.toBeInTheDocument();
-    expect(screen.getByTestId('toast-preview-card')).toBeInTheDocument();
+    expect(screen.getByTestId('shuffle-surface')).toBeInTheDocument();
   });
 });

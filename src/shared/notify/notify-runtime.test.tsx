@@ -26,11 +26,22 @@ describe('notification renderer', () => {
       title: 'Saved',
       description: 'All set',
       action,
-      onDismiss,
+      persistent: false,
     });
+    // The caller's onDismiss rides on the Sonner toast alone — Sonner fires it
+    // once, for the × and for a swipe — never on the surface as well.
+    expect(render('save').props).not.toHaveProperty('onDismiss');
     expect(options).toHaveProperty('duration', undefined);
     options.onDismiss();
     expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it('marks a toast with no timer persistent, so the bar draws its dismiss ×', () => {
+    show('info', 'Update available', { id: 'update', duration: Infinity });
+    const [render] = toastMock.custom.mock.calls[0] as [
+      (id: string) => { props: Record<string, unknown> },
+    ];
+    expect(render('update').props).toMatchObject({ persistent: true });
   });
 
   it('explicitly clears an earlier persistent loading duration', () => {

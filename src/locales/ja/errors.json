@@ -42,17 +42,7 @@
     "dismiss": "通知を閉じる",
     "undo": "元に戻す",
     "undone": "操作をキャンセルしました",
-    "processing": "処理中…",
-    "preview": {
-      "successTitle": "変更を保存しました",
-      "successDescription": "設定が反映されています。",
-      "errorTitle": "問題が発生しました",
-      "errorDescription": "もう一度お試しください。",
-      "warningTitle": "ご注意",
-      "warningDescription": "この操作には確認が必要です。",
-      "infoTitle": "ご存じですか？",
-      "infoDescription": "シャッフルでもこのデザインが変わります。"
-    }
+    "processing": "処理中…"
   },
   "api": {
     "fallback": "問題が発生しました。もう一度お試しください。",
@@ -92,8 +82,6 @@
       "copySuccess": "アカウント ID をコピーしました",
       "themeLinkCopied": "テーマリンクをコピーしました",
       "themeLinkCopiedDescription": "この URL を共有して見た目を再現できます。",
-      "notificationStylePreview": "通知スタイル",
-      "notificationStylePreviewDescription": "{{variant}} — アクセントとセマンティックカラーでテーマ化。",
       "accountDeletionPending": "アカウントを削除しました。サインアウト中…",
       "avatarInvalidType": "画像ファイルを選択してください。",
       "avatarTooLarge": "アバターは 2 MB 未満である必要があります。",

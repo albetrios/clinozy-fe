@@ -40,16 +40,6 @@
   },
   "toast": {
     "dismiss": "关闭通知",
-    "preview": {
-      "successTitle": "已保存更改",
-      "successDescription": "您的设置已生效。",
-      "errorTitle": "出了点问题",
-      "errorDescription": "请重试。",
-      "warningTitle": "请注意",
-      "warningDescription": "此操作需要审核。",
-      "infoTitle": "你知道吗？",
-      "infoDescription": "随机切换也会改变此设计。"
-    },
     "undo": "撤销",
     "undone": "已取消操作",
     "processing": "处理中…"
@@ -92,8 +82,6 @@
       "copySuccess": "账户 ID 已复制",
       "themeLinkCopied": "主题链接已复制",
       "themeLinkCopiedDescription": "分享此 URL 以复现外观。",
-      "notificationStylePreview": "通知样式",
-      "notificationStylePreviewDescription": "{{variant}} — 使用您的强调色和语义颜色。",
       "accountDeletionPending": "账户已删除，正在登出…",
       "avatarInvalidType": "请选择图片文件。",
       "avatarTooLarge": "头像必须小于 2 MB。",

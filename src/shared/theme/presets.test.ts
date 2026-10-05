@@ -122,7 +122,6 @@ describe('theme presets', () => {
       iconWeight: 'thin',
       layoutWidth: 'full',
       intensityId: 'muted',
-      toastVariant: 'bar',
     });
     expect(presetAxisDefaults('violet')).toEqual({});
     expect(presetAxisDefaults('bogus')).toEqual({});

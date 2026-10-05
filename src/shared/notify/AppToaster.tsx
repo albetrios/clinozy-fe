@@ -3,9 +3,6 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { X } from '@/shared/icons/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-import { TOAST_VARIANTS, type ToastPosition } from '@/shared/theme/index.ts';
 
 import { notificationBridge, notify, TOAST_DURATION_MS } from './notify.ts';
 import { ToastBar } from './ToastBar.tsx';
@@ -35,87 +32,46 @@ type Pending = ReturnType<typeof notificationBridge.getSnapshot>['pending'];
 /** The immediate host: queued toasts, shown with their real actions until Sonner is ready. */
 function PendingToasts({
   pending,
-  placement,
   dismissLabel,
-  bar,
 }: {
   pending: Pending;
-  placement: string;
   dismissLabel: string;
-  /** The active design is the clinic bar — draw that, not the generic card. */
-  bar: boolean;
 }) {
   return (
     <section
       data-sonner-toaster
-      className={`pointer-events-none fixed z-[999999999] flex w-[calc(100vw-1.5rem)] flex-col gap-2.5 sm:w-[min(100vw-2rem,20rem)] ${placement}`}
+      className={`pointer-events-none fixed z-[999999999] flex w-[calc(100vw-1.5rem)] flex-col gap-2.5 sm:w-[min(100vw-2rem,20rem)] ${PENDING_BOTTOM} start-1/2 -translate-x-1/2 rtl:translate-x-1/2`}
     >
-      {pending.slice(-4).map(({ id, type, message, options }) =>
-        bar ? (
-          <ToastBar
-            key={id}
-            pending
-            alert={type === 'error'}
-            title={message}
-            description={options.description}
-            action={options.action}
-            onAction={() => {
-              options.action?.onClick();
-              notify.dismiss(id);
-            }}
-          />
-        ) : (
-          <article
-            key={id}
-            data-testid="app-toast"
-            data-toast-pending
-            data-slot="card"
-            className="bg-popover text-popover-foreground border-border pointer-events-auto flex items-start gap-2.5 border px-3 py-2.5"
-          >
-            <div className="min-w-0 flex-1">
-              <output role={type === 'error' ? 'alert' : undefined} className="block">
-                <span className="block text-sm font-medium">{message}</span>
-                {options.description ? (
-                  <span className="text-muted-foreground mt-0.5 block text-xs">
-                    {options.description}
-                  </span>
-                ) : null}
-              </output>
-              {options.action ? (
-                <button
-                  type="button"
-                  data-testid="toast-action"
-                  className="mt-1 text-xs underline"
-                  onClick={() => {
-                    options.action?.onClick();
-                    notify.dismiss(id);
-                  }}
-                >
-                  {options.action.label}
-                </button>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              data-testid="toast-dismiss"
-              className="flex size-6 shrink-0 items-center justify-center rounded-sm"
-              aria-label={dismissLabel}
-              onClick={() => {
-                options.onDismiss?.();
-                notify.dismiss(id);
-              }}
-            >
-              <X className="size-3.5" />
-            </button>
-          </article>
-        ),
-      )}
+      {pending.slice(-4).map(({ id, type, message, options }) => (
+        <ToastBar
+          key={id}
+          pending
+          alert={type === 'error'}
+          title={message}
+          description={options.description}
+          action={type === 'loading' ? undefined : options.action}
+          onAction={() => {
+            options.action?.onClick();
+            notify.dismiss(id);
+          }}
+          dismiss={
+            options.duration === Number.POSITIVE_INFINITY && type !== 'loading'
+              ? { label: dismissLabel }
+              : undefined
+          }
+          onDismiss={() => {
+            options.onDismiss?.();
+            notify.dismiss(id);
+          }}
+        />
+      ))}
     </section>
   );
 }
 
 /**
  * Immediate notification content, upgraded to Sonner once its host is ready.
+ * Every toast is the design's bottom bar, centred at the bottom (KICKOFF L-20).
  *
  * The toasts are the top layer: above every drawer, sheet and dialog (Sonner's
  * own `z-index`, matched by the immediate host), and — once the renderer is
@@ -124,8 +80,6 @@ function PendingToasts({
  */
 export function AppToaster() {
   const { t } = useTranslation(ERRORS_NS);
-  const position = useThemeStore((s) => s.toastPosition) as ToastPosition;
-  const toastVariant = useThemeStore((s) => s.toastVariant);
   const state = useSyncExternalStore(
     notificationBridge.subscribe,
     notificationBridge.getSnapshot,
@@ -136,28 +90,18 @@ export function AppToaster() {
   useEffect(() => {
     if (Renderer) return notificationBridge.activate();
   }, [Renderer]);
-  const atTop = position.startsWith('top');
-  const vertical = atTop ? 'top-16 sm:top-[4.5rem]' : PENDING_BOTTOM;
-  const edge = position.endsWith('left') ? 'start-3 sm:start-4' : 'end-3 sm:end-4';
-  const horizontal = position.endsWith('center')
-    ? 'start-1/2 -translate-x-1/2 rtl:translate-x-1/2'
-    : edge;
 
   const toasts = (
     <>
       {Renderer ? (
         <Renderer
-          position={position}
+          position="bottom-center"
           gap={10}
           visibleToasts={4}
           duration={TOAST_DURATION_MS.default}
           style={STACK_WIDTH}
-          offset={atTop ? { top: '4.5rem' } : { bottom: BOTTOM_OFFSET }}
-          mobileOffset={
-            atTop
-              ? { top: '4rem', left: PHONE_INSET, right: PHONE_INSET }
-              : { bottom: BOTTOM_OFFSET, left: PHONE_INSET, right: PHONE_INSET }
-          }
+          offset={{ bottom: BOTTOM_OFFSET }}
+          mobileOffset={{ bottom: BOTTOM_OFFSET, left: PHONE_INSET, right: PHONE_INSET }}
           toastOptions={{
             unstyled: true,
             classNames: {
@@ -170,9 +114,7 @@ export function AppToaster() {
       {state.pending.length > 0 ? (
         <PendingToasts
           pending={state.pending}
-          placement={`${vertical} ${horizontal}`}
           dismissLabel={t(ERRORS_KEYS.toast.dismiss)}
-          bar={TOAST_VARIANTS[toastVariant % TOAST_VARIANTS.length] === 'bar'}
         />
       ) : null}
     </>

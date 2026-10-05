@@ -245,8 +245,9 @@ drive it:
 - **Appearance studio** (Settings → Appearance): per-axis pickers for mode,
   named presets, accent/chart hue, base colour, harmony, accent intensity, body +
   heading fonts, radius, shape language, type scale, menu style, icon weight, icon
-  library, density, contrast, elevation, separation, motion, and focus ring — plus
-  toast preview (temporary). Every option list is imported from `presets.ts`.
+  library, density, contrast, elevation, separation, motion, and focus ring. Every
+  option list is imported from `presets.ts`. (Toasts have one design — the clinic
+  bar, bottom-centre — so there is no toast picker.)
 - **Shuffle**: generates a fresh _full look_ in one click (rolls generated axes +
   orthogonal base/menu/icons) — the shadcn-create experience, applied inline on
   `<html>` (CSP-safe) and persisted via `customTheme` + shareable `?theme=<seed>`.

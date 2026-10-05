@@ -19,8 +19,6 @@ vi.mock('./notify-runtime.tsx', async (importOriginal) => {
   return importOriginal();
 });
 
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
 import { AppToaster } from './AppToaster.tsx';
 import { notify } from './notify.ts';
 
@@ -41,7 +39,6 @@ afterEach(() => {
 describe('AppToaster', () => {
   it('shows actionable messages during a delayed or failed load and retries on new work', async () => {
     const user = userEvent.setup();
-    useThemeStore.getState().setToastPosition('bottom-center');
     render(<AppToaster />);
     expect(transport.attempts).toBe(0);
     expect(toasterMock).not.toHaveBeenCalled();
@@ -56,15 +53,32 @@ describe('AppToaster', () => {
       });
     });
     expect(screen.getByRole('alert')).toHaveTextContent('Could not save');
-    // The immediate host sits where Sonner will: 16px over the phone's bottom
-    // stack, the width less 12px a side below `sm`, above every overlay.
+    // The immediate host sits where Sonner will: centred, 16px over the phone's
+    // bottom stack, the width less 12px a side below `sm`, above every overlay.
     const host = screen.getByRole('alert').closest('section');
     expect(host).toHaveClass(
       `bottom-[${squash(BOTTOM_EDGE)}]`,
+      'start-1/2',
+      '-translate-x-1/2',
       'w-[calc(100vw-1.5rem)]',
       'sm:w-[min(100vw-2rem,20rem)]',
       'z-[999999999]',
     );
+    // …drawing the same bar Sonner will: no × on a toast with a timer…
+    expect(screen.getByTestId('app-toast')).toHaveAttribute('data-toast-pending');
+    expect(screen.queryByTestId('toast-dismiss')).not.toBeInTheDocument();
+    // …and a × on one without, which runs its onDismiss and takes it away.
+    const dismissed = vi.fn();
+    act(() => {
+      notify.info('Update available', {
+        id: 'update',
+        duration: Number.POSITIVE_INFINITY,
+        onDismiss: dismissed,
+      });
+    });
+    await user.click(screen.getByTestId('toast-dismiss'));
+    expect(dismissed).toHaveBeenCalledOnce();
+    expect(screen.queryByText('Update available')).not.toBeInTheDocument();
     await waitFor(() => expect(transport.release).toBeDefined());
     await act(async () => {
       transport.release?.();
@@ -96,21 +110,5 @@ describe('AppToaster', () => {
     expect(toastMock.custom).toHaveBeenCalledOnce();
     expect(toastMock.custom.mock.calls[0]?.[1]).toHaveProperty('id');
     expect(screen.queryByText('Could not save')).not.toBeInTheDocument();
-
-    act(() => {
-      useThemeStore.getState().setToastPosition('top-right');
-    });
-    expect(toasterMock).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        position: 'top-right',
-        offset: { top: '4.5rem' },
-        mobileOffset: { top: '4rem', left: '0.75rem', right: '0.75rem' },
-      }),
-      undefined,
-    );
-  });
-
-  it('starts bottom-centre — the default the v5 migration moves top-right onto', () => {
-    expect(useThemeStore.getInitialState().toastPosition).toBe('bottom-center');
   });
 });

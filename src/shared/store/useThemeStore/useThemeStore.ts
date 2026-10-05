@@ -16,8 +16,6 @@ import {
   DEFAULT_LAYOUT_WIDTH,
   DEFAULT_MENU,
   DEFAULT_PRESET,
-  DEFAULT_TOAST_POSITION,
-  DEFAULT_TOAST_VARIANT,
   GENERATED_PRESET,
   type GeneratedTheme,
   generateSeededTheme,
@@ -26,8 +24,6 @@ import {
   nextAppVariant,
   nextAuthVariant,
   nextPublicVariant,
-  nextToastPosition,
-  nextToastVariant,
   normalizeLayoutWidthId,
   normalizeLook,
   presetAxisDefaults,
@@ -35,7 +31,6 @@ import {
   releaseBootThemeVars,
   SHUFFLE_TEMP,
   shuffleIcons,
-  TOAST_VARIANTS,
 } from '@/shared/theme/index.ts';
 
 type Mode = 'light' | 'dark' | 'system';
@@ -63,10 +58,6 @@ interface ThemeStore {
   appVariant: number;
   /** TEMP: PublicLayout preview shell index (0..2); rolled by shuffle. */
   publicVariant: number;
-  /** TEMP: custom-toast design index (0..N-1); rolled by shuffle + the picker. */
-  toastVariant: number;
-  /** TEMP: toast position (sonner Position subset); rolled by shuffle + the picker. */
-  toastPosition: string;
   /** Seed of the active generated look — enables shareable `?theme=<seed>` +
    *  reproducible shuffles. null on a named preset or a hand-tweaked look. */
   seed: number | null;
@@ -81,10 +72,6 @@ interface ThemeStore {
   setIconWeight: (id: string) => void;
   setIconColor: (id: string) => void;
   setIconLibrary: (id: string) => void;
-  /** TEMP: set the custom-toast design index (Appearance preview). */
-  setToastVariant: (index: number) => void;
-  /** TEMP: set the toast position (Appearance preview). */
-  setToastPosition: (position: string) => void;
   /** Set app main content width (contained | full | reading). */
   setLayoutWidth: (id: LayoutWidthId) => void;
   /** Apply a specific seed's look (shareable `?theme=<seed>` / reproducible). */
@@ -93,47 +80,29 @@ interface ThemeStore {
   shuffleTheme: () => void;
 }
 
-/** The toast default before persist v5 (`DEFAULT_TOAST_POSITION` is bottom-centre since). */
-const PREVIOUS_TOAST_POSITION_DEFAULT = 'top-right';
-
-/**
- * Persist v5: bottom-centre became the toast default (the design's bar, L-20).
- * As v4 did for the preset — whoever is still on the old default never picked
- * a position, so they follow the new one; any other pick stays.
- */
-function migrateToastDefault(persisted: Record<string, unknown>, version: number): void {
-  if (version >= 5) return;
-  if (
-    persisted.toastPosition === undefined ||
-    persisted.toastPosition === PREVIOUS_TOAST_POSITION_DEFAULT
-  ) {
-    persisted.toastPosition = DEFAULT_TOAST_POSITION;
-  }
-}
-
 /** What a fresh install starts on: the default preset's own axes over the
  *  platform defaults, light mode (the design's default — System follows the OS
  *  once chosen). */
 const FIRST_VISIT_AXES = presetAxisDefaults(DEFAULT_PRESET);
 const FIRST_VISIT_ICON_WEIGHT = FIRST_VISIT_AXES.iconWeight ?? DEFAULT_ICON_WEIGHT;
 const FIRST_VISIT_LAYOUT_WIDTH = FIRST_VISIT_AXES.layoutWidth ?? DEFAULT_LAYOUT_WIDTH;
-const FIRST_VISIT_TOAST_VARIANT = FIRST_VISIT_AXES.toastVariant
-  ? TOAST_VARIANTS.indexOf(FIRST_VISIT_AXES.toastVariant)
-  : DEFAULT_TOAST_VARIANT;
 
 /**
- * Persist v6: the default preset brings its own toast (the design's bar).
- * Whoever is on that preset with the old default toast never picked one, so
- * they follow it; any other pick stays.
+ * Fields older versions persisted that the store no longer has: the TEMP shell
+ * previews (v4) and the toast design + position previews (v7 — every toast is
+ * the design's bottom bar now). Dropped on load, so no old pick lingers.
  */
-function migrateToastVariant(persisted: Record<string, unknown>, version: number): void {
-  if (version >= 6 || persisted.preset !== DEFAULT_PRESET) return;
-  if (
-    persisted.toastVariant === undefined ||
-    persisted.toastVariant === DEFAULT_TOAST_VARIANT
-  ) {
-    persisted.toastVariant = FIRST_VISIT_TOAST_VARIANT;
-  }
+const RETIRED_FIELDS = [
+  'authVariant',
+  'appVariant',
+  'publicVariant',
+  'toastVariant',
+  'toastPosition',
+] as const;
+
+/** Drop {@link RETIRED_FIELDS} from a persisted state being migrated. */
+function dropRetiredFields(persisted: Record<string, unknown>): void {
+  for (const field of RETIRED_FIELDS) delete persisted[field];
 }
 
 function applyMode(theme: Mode) {
@@ -182,8 +151,6 @@ export const useThemeStore = create<ThemeStore>()(
       authVariant: 0,
       appVariant: 0,
       publicVariant: 0,
-      toastVariant: FIRST_VISIT_TOAST_VARIANT,
-      toastPosition: DEFAULT_TOAST_POSITION,
       seed: null,
       layoutWidth: FIRST_VISIT_LAYOUT_WIDTH,
       setTheme: (theme) => {
@@ -207,9 +174,6 @@ export const useThemeStore = create<ThemeStore>()(
           seed: null,
           ...(axes.iconWeight ? { iconWeight: axes.iconWeight } : {}),
           ...(axes.layoutWidth ? { layoutWidth: axes.layoutWidth } : {}),
-          ...(axes.toastVariant
-            ? { toastVariant: TOAST_VARIANTS.indexOf(axes.toastVariant) }
-            : {}),
         });
       },
       updateLook: (partial) => {
@@ -242,8 +206,6 @@ export const useThemeStore = create<ThemeStore>()(
         // The @/shared/icons barrel subscribes to this and lazy-loads the set.
         set({ iconLibrary: id });
       },
-      setToastVariant: (index) => set({ toastVariant: index }),
-      setToastPosition: (position) => set({ toastPosition: position }),
       setLayoutWidth: (id) => {
         set({ layoutWidth: normalizeLayoutWidthId(id) });
       },
@@ -286,18 +248,12 @@ export const useThemeStore = create<ThemeStore>()(
           publicVariant: SHUFFLE_TEMP.publicLayout
             ? nextPublicVariant(get().publicVariant)
             : get().publicVariant,
-          toastVariant: SHUFFLE_TEMP.toastVariant
-            ? nextToastVariant(get().toastVariant)
-            : get().toastVariant,
-          toastPosition: SHUFFLE_TEMP.toastPosition
-            ? nextToastPosition(get().toastPosition)
-            : get().toastPosition,
         });
       },
     }),
     {
       name: 'theme-preference',
-      version: 6,
+      version: 7,
       migrate: (persisted, version) => {
         if (persisted && typeof persisted === 'object') {
           const next: Record<string, unknown> = { ...persisted };
@@ -326,11 +282,7 @@ export const useThemeStore = create<ThemeStore>()(
               next.layoutWidth = FIRST_VISIT_LAYOUT_WIDTH;
             }
           }
-          migrateToastDefault(next, version);
-          migrateToastVariant(next, version);
-          delete next.authVariant;
-          delete next.appVariant;
-          delete next.publicVariant;
+          dropRetiredFields(next);
           return next as unknown as ThemeStore;
         }
         return persisted as ThemeStore;
@@ -344,8 +296,6 @@ export const useThemeStore = create<ThemeStore>()(
         iconWeight: state.iconWeight,
         iconColor: state.iconColor,
         iconLibrary: state.iconLibrary,
-        toastVariant: state.toastVariant,
-        toastPosition: state.toastPosition,
         seed: state.seed,
         layoutWidth: state.layoutWidth,
       }),

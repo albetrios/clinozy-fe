@@ -24,7 +24,7 @@ export function show(type: ToastType, message: string, opts: NotifyOptions) {
         title: message,
         description: opts.description,
         action: opts.action,
-        onDismiss: opts.onDismiss,
+        persistent: opts.duration === Number.POSITIVE_INFINITY,
       }),
     {
       id: opts.id,

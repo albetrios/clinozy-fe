@@ -42,17 +42,7 @@
     "dismiss": "Benachrichtigung schließen",
     "undo": "Rückgängig",
     "undone": "Aktion abgebrochen",
-    "processing": "Wird verarbeitet…",
-    "preview": {
-      "successTitle": "Änderungen gespeichert",
-      "successDescription": "Ihre Einstellungen sind aktiv.",
-      "errorTitle": "Etwas ist schiefgelaufen",
-      "errorDescription": "Bitte erneut versuchen.",
-      "warningTitle": "Achtung",
-      "warningDescription": "Diese Aktion erfordert eine Prüfung.",
-      "infoTitle": "Wussten Sie schon?",
-      "infoDescription": "Mischen ändert auch dieses Design."
-    }
+    "processing": "Wird verarbeitet…"
   },
   "api": {
     "fallback": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
@@ -92,8 +82,6 @@
       "copySuccess": "Konto-ID kopiert",
       "themeLinkCopied": "Theme-Link kopiert",
       "themeLinkCopiedDescription": "Teilen Sie diese URL, um das Erscheinungsbild zu reproduzieren.",
-      "notificationStylePreview": "Benachrichtigungsstil",
-      "notificationStylePreviewDescription": "{{variant}} — mit Ihrem Akzent und semantischen Farben.",
       "accountDeletionPending": "Konto gelöscht. Abmeldung…",
       "avatarInvalidType": "Bitte wählen Sie eine Bilddatei.",
       "avatarTooLarge": "Avatar muss unter 2 MB sein.",

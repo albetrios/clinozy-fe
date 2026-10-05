@@ -42,17 +42,7 @@
     "dismiss": "알림 닫기",
     "undo": "실행 취소",
     "undone": "작업이 취소됨",
-    "processing": "처리 중…",
-    "preview": {
-      "successTitle": "변경 사항이 저장됨",
-      "successDescription": "설정이 적용되었습니다.",
-      "errorTitle": "문제가 발생했습니다",
-      "errorDescription": "다시 시도해 주세요.",
-      "warningTitle": "주의",
-      "warningDescription": "이 작업에는 검토가 필요합니다.",
-      "infoTitle": "알고 계셨나요?",
-      "infoDescription": "셔플하면 이 디자인도 바뀝니다."
-    }
+    "processing": "처리 중…"
   },
   "api": {
     "fallback": "문제가 발생했습니다. 다시 시도해 주세요.",
@@ -92,8 +82,6 @@
       "copySuccess": "계정 ID가 복사됨",
       "themeLinkCopied": "테마 링크가 복사됨",
       "themeLinkCopiedDescription": "이 URL을 공유해 외관을 재현하세요.",
-      "notificationStylePreview": "알림 스타일",
-      "notificationStylePreviewDescription": "{{variant}} — 액센트와 시맨틱 색상으로 테마 적용.",
       "accountDeletionPending": "계정이 삭제됨. 로그아웃 중…",
       "avatarInvalidType": "이미지 파일을 선택해 주세요.",
       "avatarTooLarge": "아바타는 2MB 미만이어야 합니다.",

@@ -123,9 +123,9 @@ in **light** mode, with the preset's axis defaults (icon weight `thin`, layout w
 anyone still on the never-picked base palette to it, and `public/theme-init.js` mirrors
 that before the bundle loads, so a cold load paints the preset from the first frame
 (`boot-theme-vars.drift.test.ts` pins every preset's pre-paint primary to its block).
-Persist v5 does the same for toasts: `DEFAULT_TOAST_POSITION` is `bottom-center` (the
-design's bar), and anyone still on the old `top-right` default follows it; any other
-picked position stays.
+Toasts are not a theme axis: every toast is the design's bar, bottom-centre
+(`shared/notify/ToastBar.tsx`). Persist v7 drops the toast design and position picks
+older versions saved.
 
 Unlike the accent presets it is **full-surface**: its `[data-theme]` block sets every
 surface token and sits after the base-colour blocks, so a stored `data-base` tint does
@@ -202,30 +202,28 @@ rules mapped to every axis; **`agent-os/rules/fe-preset-product-design.mdc`** fo
 Full axis list and status: **[theme-axis-audit-playbook.md](theme-axis-audit-playbook.md)**.
 Post-audit follow-up: **[theme-axis-follow-up-plan.md](theme-axis-follow-up-plan.md)**.
 
-| Axis             | Attribute / store                            | Options (from `presets.ts`)                                                                                                                    |
-| ---------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Named preset     | `data-theme` / `preset`                      | default, violet, emerald, rose, ocean, custom                                                                                                  |
-| Mode             | `.dark` class / `theme`                      | light, dark, system                                                                                                                            |
-| Accent hue       | inline / `customTheme.hue`                   | rose, orange, amber, lime, emerald, teal, blue, violet, pink (+ continuous hue)                                                                |
-| Chart harmony    | `harmonyId`                                  | monochromatic, analogous, complementary, split, triadic                                                                                        |
-| Accent intensity | `intensityId`                                | subtle, muted, balanced, vibrant, max                                                                                                          |
-| Base neutral     | `data-base` / `baseId`                       | neutral, stone, slate, olive, zinc, warm                                                                                                       |
-| Menu surface     | `data-menu` / `menu`                         | default, translucent, glass                                                                                                                    |
-| Radius           | `radiusId`                                   | sharp, default, rounded, round                                                                                                                 |
-| Shape            | `data-shape` / `shapeId`                     | uniform, mixed, pill, sharp                                                                                                                    |
-| Type scale       | inline `--text-*` / `typeScaleId`            | tight, compact, default, grand, display                                                                                                        |
-| Elevation        | `data-elevation` / `elevationId`             | flat, soft, lifted, floating                                                                                                                   |
-| Contrast         | `data-contrast` / `contrastId`               | normal, soft, crisp, dim, amoled                                                                                                               |
-| Separation       | `data-separation` / `separationId`           | border, hairline, shadow                                                                                                                       |
-| Density          | inline `--spacing` / `densityId`             | compact, cozy, relaxed, airy                                                                                                                   |
-| Layout width     | store `layoutWidth` / `VITE_LAYOUT_WIDTH`    | contained (standard), full, reading                                                                                                            |
-| Motion           | inline `--default-transition-*` / `motionId` | instant, calm, smooth, snappy (+ OS reduce → instant)                                                                                          |
-| Focus ring       | `data-focus` / `focusId`                     | ring, glow, offset, underline, inset                                                                                                           |
-| Toast variant    | store `toastVariant` (index)                 | tint, solid, outline, accent, minimal, glass, bar — `bar` is the clinic design's toast and the Zinc Pastel default (TEMP preview for the rest) |
-| Toast position   | store `toastPosition`                        | top-right, top-center, top-left, bottom-right, bottom-center, bottom-left                                                                      |
-| Icon weight      | `--icon-stroke` / `iconWeight`               | thin, regular, bold                                                                                                                            |
-| Icon colour      | `data-icon-color` / `iconColor`              | default, foreground, muted, primary, accent, destructive                                                                                       |
-| Icon library     | lazy chunk / `iconLibrary`                   | lucide, tabler, phosphor                                                                                                                       |
+| Axis             | Attribute / store                            | Options (from `presets.ts`)                                                     |
+| ---------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
+| Named preset     | `data-theme` / `preset`                      | default, violet, emerald, rose, ocean, custom                                   |
+| Mode             | `.dark` class / `theme`                      | light, dark, system                                                             |
+| Accent hue       | inline / `customTheme.hue`                   | rose, orange, amber, lime, emerald, teal, blue, violet, pink (+ continuous hue) |
+| Chart harmony    | `harmonyId`                                  | monochromatic, analogous, complementary, split, triadic                         |
+| Accent intensity | `intensityId`                                | subtle, muted, balanced, vibrant, max                                           |
+| Base neutral     | `data-base` / `baseId`                       | neutral, stone, slate, olive, zinc, warm                                        |
+| Menu surface     | `data-menu` / `menu`                         | default, translucent, glass                                                     |
+| Radius           | `radiusId`                                   | sharp, default, rounded, round                                                  |
+| Shape            | `data-shape` / `shapeId`                     | uniform, mixed, pill, sharp                                                     |
+| Type scale       | inline `--text-*` / `typeScaleId`            | tight, compact, default, grand, display                                         |
+| Elevation        | `data-elevation` / `elevationId`             | flat, soft, lifted, floating                                                    |
+| Contrast         | `data-contrast` / `contrastId`               | normal, soft, crisp, dim, amoled                                                |
+| Separation       | `data-separation` / `separationId`           | border, hairline, shadow                                                        |
+| Density          | inline `--spacing` / `densityId`             | compact, cozy, relaxed, airy                                                    |
+| Layout width     | store `layoutWidth` / `VITE_LAYOUT_WIDTH`    | contained (standard), full, reading                                             |
+| Motion           | inline `--default-transition-*` / `motionId` | instant, calm, smooth, snappy (+ OS reduce → instant)                           |
+| Focus ring       | `data-focus` / `focusId`                     | ring, glow, offset, underline, inset                                            |
+| Icon weight      | `--icon-stroke` / `iconWeight`               | thin, regular, bold                                                             |
+| Icon colour      | `data-icon-color` / `iconColor`              | default, foreground, muted, primary, accent, destructive                        |
+| Icon library     | lazy chunk / `iconLibrary`                   | lucide, tabler, phosphor                                                        |
 
 Generated / shuffled looks set accent hue, chart harmony, fonts, radius, and all
 experience axes via inline CSS vars (`applyGeneratedTheme` in `shared/theme/presets.ts`).

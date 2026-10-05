@@ -42,17 +42,7 @@
     "dismiss": "Dismiss notification",
     "undo": "Undo",
     "undone": "Action cancelled",
-    "processing": "Processing…",
-    "preview": {
-      "successTitle": "Changes saved",
-      "successDescription": "Your settings are live.",
-      "errorTitle": "Something went wrong",
-      "errorDescription": "Please try again.",
-      "warningTitle": "Heads up",
-      "warningDescription": "This action needs a review.",
-      "infoTitle": "Did you know?",
-      "infoDescription": "Shuffle also rolls this design."
-    }
+    "processing": "Processing…"
   },
   "api": {
     "fallback": "Something went wrong. Please try again.",
@@ -92,8 +82,6 @@
       "copySuccess": "Account ID copied",
       "themeLinkCopied": "Theme link copied",
       "themeLinkCopiedDescription": "Share this URL to reproduce the look.",
-      "notificationStylePreview": "Notification style",
-      "notificationStylePreviewDescription": "{{variant}} — themed with your accent and semantic colors.",
       "accountDeletionPending": "Account deleted. Signing you out…",
       "avatarInvalidType": "Please choose an image file.",
       "avatarTooLarge": "Avatar must be under 2 MB.",

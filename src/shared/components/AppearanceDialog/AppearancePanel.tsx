@@ -61,7 +61,6 @@ import {
   LAYOUT_WIDTHS,
   MENU_STYLES,
   MOTION_PRESETS,
-  nextToastVariant,
   normalizeLook,
   oklchToHex,
   rollColour,
@@ -70,11 +69,6 @@ import {
   SEPARATION_STRATEGIES,
   SHAPE_LANGUAGES,
   THEME_PRESETS,
-  TOAST_POSITION_LABELS,
-  TOAST_POSITIONS,
-  TOAST_VARIANTS,
-  type ToastPosition,
-  type ToastVariant,
   TYPE_SCALES,
 } from '@/shared/theme/index.ts';
 
@@ -104,70 +98,6 @@ const MOTION_OPTIONS = toOptions(MOTION_PRESETS);
 const HARMONY_OPTIONS = toOptions(HARMONY_RULES);
 const INTENSITY_OPTIONS = toOptions(ACCENT_INTENSITIES);
 const TYPE_SCALE_OPTIONS = toOptions(TYPE_SCALES);
-
-/** TEMP: toast-design choices for the preview picker. */
-const TOAST_VARIANT_OPTIONS = TOAST_VARIANTS.map((id) => ({
-  id,
-  label: id.charAt(0).toUpperCase() + id.slice(1),
-}));
-
-/** Toast-position choices for the preview picker. */
-const TOAST_POSITION_OPTIONS = TOAST_POSITIONS.map((id) => ({
-  id,
-  label: TOAST_POSITION_LABELS[id],
-}));
-
-/** Inline swatches — each variant uses live semantic tokens (success tone as sample). */
-function ToastVariantSwatches({
-  activeIndex,
-  onPick,
-}: {
-  activeIndex: number;
-  onPick: (index: number) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-2" data-testid="toast-variant-swatches">
-      {TOAST_VARIANTS.map((variant, index) => (
-        <button
-          key={variant}
-          type="button"
-          data-slot="button"
-          aria-label={`${variant} toast style`}
-          aria-pressed={index === activeIndex}
-          data-testid={`toast-swatch-${variant}`}
-          onClick={() => onPick(index)}
-          className={cn(
-            'relative flex h-9 min-w-[4.25rem] flex-1 items-center justify-center rounded-lg border text-[10px] font-semibold capitalize transition',
-            variant === 'tint' &&
-              'border-success/25 bg-success/10 text-success border-transparent',
-            variant === 'solid' &&
-              'bg-success text-success-foreground border-transparent',
-            variant === 'outline' &&
-              'bg-popover text-popover-foreground border-success/50',
-            variant === 'bar' && 'bg-primary text-primary-foreground border-transparent',
-            variant === 'accent' &&
-              'border-border bg-popover text-popover-foreground ps-3',
-            variant === 'minimal' &&
-              'border-border/60 bg-background/80 text-foreground border-dashed',
-            variant === 'glass' &&
-              'border-border/40 bg-popover/55 text-popover-foreground backdrop-blur-md',
-            index === activeIndex &&
-              'ring-ring ring-offset-background ring-2 ring-offset-2',
-          )}
-        >
-          {variant === 'accent' ? (
-            <span
-              data-slot="pill"
-              className="bg-success absolute inset-y-1 start-0 w-1 rounded-full"
-              aria-hidden="true"
-            />
-          ) : null}
-          {variant}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 /**
  * Colour field: a native colour "snippet" for any hue, plus the preset swatches as
@@ -853,130 +783,6 @@ function SurfaceCard() {
   );
 }
 
-/** The toast design and position, with a preview button for each kind. */
-function NotificationsCard() {
-  const { t: tAppearance } = useTranslation(APPEARANCE_NS);
-  const { t } = useTranslation(ERRORS_NS);
-  const toastVariant = useThemeStore((s) => s.toastVariant);
-  const setToastVariant = useThemeStore((s) => s.setToastVariant);
-  const toastPosition = useThemeStore((s) => s.toastPosition);
-  const setToastPosition = useThemeStore((s) => s.setToastPosition);
-  const shuffleNotifications = () => {
-    const next = nextToastVariant(toastVariant);
-    setToastVariant(next);
-    const name = TOAST_VARIANTS[next] ?? 'tint';
-    notify.success(
-      i18n.t(ERRORS_KEYS.frontend.account.notificationStylePreview, { ns: ERRORS_NS }),
-      {
-        description: i18n.t(
-          ERRORS_KEYS.frontend.account.notificationStylePreviewDescription,
-          {
-            ns: ERRORS_NS,
-            variant: `${name.charAt(0).toUpperCase() + name.slice(1)}`,
-          },
-        ),
-      },
-    );
-  };
-
-  return (
-    <Card data-testid="toast-preview-card">
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.notificationsTitle)}
-        </CardTitle>
-        <CardDescription>
-          {tAppearance(APPEARANCE_KEYS.notificationsDescription)}
-        </CardDescription>
-        <CardAction>
-          <SectionShuffle
-            onClick={shuffleNotifications}
-            label={tAppearance(APPEARANCE_KEYS.sectionNotifications)}
-            testId="shuffle-notifications"
-          />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <FieldLabel>{tAppearance(APPEARANCE_KEYS.toastDesign)}</FieldLabel>
-          <ToastVariantSwatches activeIndex={toastVariant} onPick={setToastVariant} />
-          <Choices
-            ariaLabel={tAppearance(APPEARANCE_KEYS.toastDesign)}
-            value={TOAST_VARIANTS[toastVariant] ?? TOAST_VARIANTS[0]}
-            options={TOAST_VARIANT_OPTIONS}
-            onPick={(id) => setToastVariant(TOAST_VARIANTS.indexOf(id as ToastVariant))}
-            testPrefix="toast"
-          />
-        </div>
-        <div className="space-y-2">
-          <FieldLabel>{tAppearance(APPEARANCE_KEYS.position)}</FieldLabel>
-          <Choices
-            ariaLabel={tAppearance(APPEARANCE_KEYS.positionAria)}
-            value={toastPosition as ToastPosition}
-            options={TOAST_POSITION_OPTIONS}
-            onPick={setToastPosition}
-            testPrefix="toastpos"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              notify.success(t(ERRORS_KEYS.toast.preview.successTitle), {
-                description: t(ERRORS_KEYS.toast.preview.successDescription),
-              })
-            }
-            data-testid="toast-preview-success"
-          >
-            {tAppearance(APPEARANCE_KEYS.previewSuccess)}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              notify.error(t(ERRORS_KEYS.toast.preview.errorTitle), {
-                description: t(ERRORS_KEYS.toast.preview.errorDescription),
-              })
-            }
-            data-testid="toast-preview-error"
-          >
-            {tAppearance(APPEARANCE_KEYS.previewError)}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              notify.warning(t(ERRORS_KEYS.toast.preview.warningTitle), {
-                description: t(ERRORS_KEYS.toast.preview.warningDescription),
-              })
-            }
-            data-testid="toast-preview-warning"
-          >
-            {tAppearance(APPEARANCE_KEYS.previewWarning)}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              notify.info(t(ERRORS_KEYS.toast.preview.infoTitle), {
-                description: t(ERRORS_KEYS.toast.preview.infoDescription),
-              })
-            }
-            data-testid="toast-preview-info"
-          >
-            {tAppearance(APPEARANCE_KEYS.previewInfo)}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 /** "Custom" under the cards while a generated look is applied, naming it when it can. */
 function CustomLookNote() {
   const { t: tAppearance } = useTranslation(APPEARANCE_NS);
@@ -1038,7 +844,6 @@ export function AppearancePanel() {
       <IconsCard />
       {platformConfig.layoutWidthForced === null ? <LayoutWidthCard /> : null}
       <SurfaceCard />
-      <NotificationsCard />
       <CustomLookNote />
     </div>
   );

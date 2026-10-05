@@ -13,8 +13,6 @@ export interface ThemePreset {
     iconWeight?: string;
     layoutWidth?: LayoutWidthId;
     intensityId?: string;
-    /** The toast design the preset was drawn with. */
-    toastVariant?: ToastVariant;
   }>;
 }
 
@@ -35,7 +33,6 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
       iconWeight: 'thin',
       layoutWidth: 'full',
       intensityId: 'muted',
-      toastVariant: 'bar',
     },
   },
   { id: 'default', label: 'Classic' },
@@ -780,68 +777,6 @@ export function nextPublicVariant(current: number): number {
 }
 
 /**
- * TEMP (toast design preview): the available custom-toast designs. The store
- * holds the active index; `CustomToast` maps it to one of these. Remove together
- * with the `toastVariant` store field + the CustomToast design map.
- */
-export const TOAST_VARIANTS = [
-  'tint',
-  'solid',
-  'outline',
-  'accent',
-  'minimal',
-  'glass',
-  // The clinic design's bottom bar (KICKOFF L-20): `primary` fill, an outline
-  // action, no icon — the Zinc Pastel preset's toast.
-  'bar',
-] as const;
-export type ToastVariant = (typeof TOAST_VARIANTS)[number];
-export const DEFAULT_TOAST_VARIANT = 0;
-
-/** TEMP (toast preview): a different toast-design index than the current one. */
-export function nextToastVariant(current: number): number {
-  // eslint-disable-next-line sonarjs/pseudo-random -- cosmetic toast preview, not security
-  const v = Math.floor(Math.random() * TOAST_VARIANTS.length);
-  return v === current ? (v + 1) % TOAST_VARIANTS.length : v;
-}
-
-/**
- * TEMP (toast preview): where toasts appear (a subset of sonner's positions, so
- * people can pick a spot they'll notice). The store holds the active value.
- */
-export const TOAST_POSITIONS = [
-  'top-right',
-  'top-center',
-  'top-left',
-  'bottom-right',
-  'bottom-center',
-  'bottom-left',
-] as const;
-export type ToastPosition = (typeof TOAST_POSITIONS)[number];
-/**
- * Where toasts start: bottom-centre, the design's bar (KICKOFF L-20). It was
- * `top-right` before persist v5, which moves anyone still on that default.
- */
-export const DEFAULT_TOAST_POSITION: ToastPosition = 'bottom-center';
-
-/** Human labels for toast position picker (Appearance panel). */
-export const TOAST_POSITION_LABELS: Record<ToastPosition, string> = {
-  'top-right': 'Top right',
-  'top-center': 'Top center',
-  'top-left': 'Top left',
-  'bottom-right': 'Bottom right',
-  'bottom-center': 'Bottom center',
-  'bottom-left': 'Bottom left',
-};
-
-/** TEMP (toast preview): a different toast position than the current one. */
-export function nextToastPosition(current: string): ToastPosition {
-  const others = TOAST_POSITIONS.filter((p) => p !== current);
-  // eslint-disable-next-line sonarjs/pseudo-random -- cosmetic toast preview, not security
-  return others[Math.floor(Math.random() * others.length)] ?? DEFAULT_TOAST_POSITION;
-}
-
-/**
  * TEMP shuffle switches — gate which PREVIEW axes `shuffleTheme()` rolls. The core
  * look (accent / chart / fonts / radius / icons) ALWAYS shuffles; these only
  * toggle the temporary previews, and are OFF by default so a normal shuffle stays
@@ -854,7 +789,7 @@ export const SHUFFLE_TEMP = {
   /**
    * Cycle the AppLayout (app shell) preview design on shuffle.
    *
-   * OFF. Every other axis here is cosmetic — colour, type, radius, toast style —
+   * OFF. Every other axis here is cosmetic — colour, type, radius, icons —
    * and repaints in place. This one is structural: each shell is a different
    * component owning its own `<main>`, so rolling it unmounts the routed island
    * and takes a room's filters, a calendar selection and a drawer's draft with
@@ -865,10 +800,6 @@ export const SHUFFLE_TEMP = {
   appLayout: false,
   /** Cycle the PublicLayout preview design on shuffle. */
   publicLayout: true,
-  /** Roll the custom-toast design on shuffle. */
-  toastVariant: true,
-  /** Roll the toast position on shuffle. */
-  toastPosition: true,
 };
 
 /**

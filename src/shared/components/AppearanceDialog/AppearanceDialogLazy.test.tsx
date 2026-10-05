@@ -92,10 +92,13 @@ describe('AppearanceDialogLazy', () => {
       'Type & shape',
       'Icons',
       'Surface & motion',
-      'Notifications',
     ]) {
       expect(within(pending).getByRole('heading', { name, exact: true })).toBeVisible();
     }
+    // No Notifications section: every toast is the design's bar.
+    expect(
+      within(pending).queryByRole('heading', { name: 'Notifications', exact: true }),
+    ).not.toBeInTheDocument();
     fireEvent.click(shuffle);
     expect(useThemeStore.getState().preset).toBe('custom');
     fireEvent.click(screen.getByTestId('appearance-close'));

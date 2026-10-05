@@ -40,16 +40,6 @@
   },
   "toast": {
     "dismiss": "Descartar notificación",
-    "preview": {
-      "successTitle": "Cambios guardados",
-      "successDescription": "Tu configuración ya está activa.",
-      "errorTitle": "Algo salió mal",
-      "errorDescription": "Inténtalo de nuevo.",
-      "warningTitle": "Atención",
-      "warningDescription": "Esta acción necesita revisión.",
-      "infoTitle": "¿Sabías que…?",
-      "infoDescription": "Mezclar también cambia este diseño."
-    },
     "undo": "Deshacer",
     "undone": "Acción cancelada",
     "processing": "Procesando…"
@@ -92,8 +82,6 @@
       "copySuccess": "ID de cuenta copiado",
       "themeLinkCopied": "Enlace del tema copiado",
       "themeLinkCopiedDescription": "Comparte esta URL para reproducir el aspecto.",
-      "notificationStylePreview": "Estilo de notificación",
-      "notificationStylePreviewDescription": "{{variant}} — con tu acento y colores semánticos.",
       "accountDeletionPending": "Cuenta eliminada. Cerrando sesión…",
       "avatarInvalidType": "Elige un archivo de imagen.",
       "avatarTooLarge": "El avatar debe pesar menos de 2 MB.",

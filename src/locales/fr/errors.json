@@ -42,17 +42,7 @@
     "dismiss": "Fermer la notification",
     "undo": "Annuler",
     "undone": "Action annulée",
-    "processing": "Traitement…",
-    "preview": {
-      "successTitle": "Modifications enregistrées",
-      "successDescription": "Vos paramètres sont actifs.",
-      "errorTitle": "Une erreur s'est produite",
-      "errorDescription": "Veuillez réessayer.",
-      "warningTitle": "Attention",
-      "warningDescription": "Cette action nécessite une vérification.",
-      "infoTitle": "Le saviez-vous ?",
-      "infoDescription": "Mélanger modifie aussi ce design."
-    }
+    "processing": "Traitement…"
   },
   "api": {
     "fallback": "Une erreur s'est produite. Veuillez réessayer.",
@@ -92,8 +82,6 @@
       "copySuccess": "ID du compte copié",
       "themeLinkCopied": "Lien du thème copié",
       "themeLinkCopiedDescription": "Partagez cette URL pour reproduire l'apparence.",
-      "notificationStylePreview": "Style de notification",
-      "notificationStylePreviewDescription": "{{variant}} — thématisé avec votre accent et vos couleurs sémantiques.",
       "accountDeletionPending": "Compte supprimé. Déconnexion…",
       "avatarInvalidType": "Veuillez choisir un fichier image.",
       "avatarTooLarge": "L'avatar doit faire moins de 2 Mo.",

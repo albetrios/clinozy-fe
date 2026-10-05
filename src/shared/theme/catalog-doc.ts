@@ -21,8 +21,6 @@ import {
   SEPARATION_STRATEGIES,
   SHAPE_LANGUAGES,
   THEME_PRESETS,
-  TOAST_POSITIONS,
-  TOAST_VARIANTS,
   TYPE_SCALES,
 } from './presets.ts';
 
@@ -61,8 +59,6 @@ export const CATALOG_OPTION_IDS = {
   shape: ids(SHAPE_LANGUAGES),
   typeScale: recordKeys(TYPE_SCALES),
   focus: ids(FOCUS_RINGS),
-  toastVariants: [...TOAST_VARIANTS],
-  toastPositions: [...TOAST_POSITIONS],
 } as const;
 
 /** @public Loaded by tooling/validate/theme-catalog.mjs through a computed import. */
@@ -114,10 +110,6 @@ export const THEME_DOC_ASSERTIONS: Record<string, DocAssertion[]> = {
     {
       label: 'focus ring',
       mustInclude: CATALOG_OPTION_IDS.focus,
-    },
-    {
-      label: 'toast variants',
-      mustInclude: CATALOG_OPTION_IDS.toastVariants,
     },
     {
       label: 'harmony',

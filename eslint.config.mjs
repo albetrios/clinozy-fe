@@ -324,7 +324,7 @@ export default defineConfig([
   // The rule flags the SYNTAX `obj[key]`, not an actual unsafe lookup, so it cannot be
   // satisfied by making the code safer — only by avoiding computed access entirely. Every
   // remaining site here is a record keyed by a typed union or a local `as const` array
-  // (`INTL_LOCALE[locale]`, `envProfiles[environment]`, `TOAST_VARIANTS[next]`), and
+  // (`INTL_LOCALE[locale]`, `envProfiles[environment]`, `TONE_CLASSES[tone]`), and
   // `noUncheckedIndexedAccess: true` (tsconfig.app.json) already forces each of those reads
   // to be handled as possibly-undefined. That is the guarantee the rule is reaching for, and
   // the compiler enforces it where the linter can only guess.

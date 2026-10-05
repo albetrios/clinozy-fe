@@ -1,6 +1,4 @@
 # Documented theme-axis exceptions (substring match against each violation line).
-# CustomToast solid variant keeps shadow-md for toast design depth.
-CustomToast.tsx
 # Appearance picker *selection* rings (not focus — category D in playbook).
 AppearancePanel.tsx
 # Intentional flat semantic surfaces.

@@ -42,17 +42,7 @@
     "dismiss": "Chiudi notifica",
     "undo": "Annulla",
     "undone": "Azione annullata",
-    "processing": "Elaborazione…",
-    "preview": {
-      "successTitle": "Modifiche salvate",
-      "successDescription": "Le tue impostazioni sono attive.",
-      "errorTitle": "Qualcosa è andato storto",
-      "errorDescription": "Riprova.",
-      "warningTitle": "Attenzione",
-      "warningDescription": "Questa azione richiede una revisione.",
-      "infoTitle": "Lo sapevi?",
-      "infoDescription": "Anche mescolare cambia questo design."
-    }
+    "processing": "Elaborazione…"
   },
   "api": {
     "fallback": "Qualcosa è andato storto. Riprova.",
@@ -92,8 +82,6 @@
       "copySuccess": "ID account copiato",
       "themeLinkCopied": "Link del tema copiato",
       "themeLinkCopiedDescription": "Condividi questo URL per riprodurre l'aspetto.",
-      "notificationStylePreview": "Stile notifica",
-      "notificationStylePreviewDescription": "{{variant}} — temizzato con il tuo accento e i colori semantici.",
       "accountDeletionPending": "Account eliminato. Disconnessione…",
       "avatarInvalidType": "Scegli un file immagine.",
       "avatarTooLarge": "L'avatar deve essere inferiore a 2 MB.",

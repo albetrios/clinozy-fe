@@ -226,14 +226,15 @@ reason confirm carries `data-layout="panel"` from `md` and `data-layout="sheet"`
 
 ## Toasts (`AppToaster` + `notify`)
 
-Bottom-centre by default, the top layer above every drawer, sheet and dialog, and on a
-phone 16px above the bottom stack (`--floating-bottom-offset` + notice + "New" + safe area).
+One design — the clinic bar — always bottom-centre, the top layer above every drawer, sheet and
+dialog, and on a phone 16px above the bottom stack (`--floating-bottom-offset` + notice + "New" +
+safe area).
 
-| Test ID         | Element                                                            | File                                              |
-| --------------- | ------------------------------------------------------------------ | ------------------------------------------------- |
-| `app-toast`     | One toast (`data-toast-pending` while the immediate host shows it) | `shared/notify/CustomToast.tsx`, `AppToaster.tsx` |
-| `toast-action`  | Its action — "Undo" (`notify.undo`, 10s) or the caller's ("Retry") | CustomToast, AppToaster                           |
-| `toast-dismiss` | Dismiss ×                                                          | CustomToast, AppToaster                           |
+| Test ID         | Element                                                                    | File                                    |
+| --------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| `app-toast`     | One toast (`data-toast-pending` while the immediate host shows it)         | `shared/notify/ToastBar.tsx`            |
+| `toast-action`  | Its action — "Undo" (`notify.undo`, 10s) or the caller's ("Retry")         | ToastBar (via CustomToast / AppToaster) |
+| `toast-dismiss` | Dismiss × — only on a toast with no timer ("Update available"); snoozes it | ToastBar (via CustomToast / AppToaster) |
 
 ---
 
