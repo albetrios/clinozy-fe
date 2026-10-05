@@ -129,7 +129,8 @@ export function TaskList({
   className,
 }: TaskListProps) {
   const { t } = useTranslation(TASKS_NS);
-  const dueLabel = useTaskDueLabel();
+  // Rows sit under "Due today" / "Coming up": today's due times read bare.
+  const dueLabel = useTaskDueLabel({ sameDay: true });
   const sentinelRef = useRef<HTMLDivElement>(null);
   useLoadMoreSentinel(sentinelRef, {
     hasNextPage: hasNextPage && !loading && !refreshing,

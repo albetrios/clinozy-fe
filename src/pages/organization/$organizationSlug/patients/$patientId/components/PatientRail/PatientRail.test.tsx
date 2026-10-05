@@ -137,8 +137,9 @@ describe('PatientRail', () => {
     };
     renderRail({ file: { ...file, nextVisit: next }, actions: { onBook } });
     const upNext = await screen.findByRole('region', { name: 'Up next' });
-    // The rooms' one time rule names the day (H:723 "Today · 11:00 am").
-    expect(upNext).toHaveTextContent(/Today 11:00\sAM/);
+    // The date tile names the day; the line beside it reads the time alone.
+    expect(upNext).toHaveTextContent(/11:00\sAM/);
+    expect(upNext).not.toHaveTextContent('Today');
     expect(upNext).toHaveTextContent('Hydrafacial · 45 min');
     await user.click(screen.getByTestId('patient-rail-book'));
     expect(screen.getByTestId('patient-rail-book')).toHaveTextContent('Reschedule');

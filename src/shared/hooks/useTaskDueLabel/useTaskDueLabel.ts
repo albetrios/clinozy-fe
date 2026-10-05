@@ -48,11 +48,12 @@ export function useTaskDayTimeWords(): (
 }
 
 /** A due day and time by the rooms' one time rule: "11:30 am" today, "Tomorrow 3:30 pm", "7 Oct 3:30 pm". */
-function useDueAtWords(): (label: TaskDueAt, now: Date) => string {
+function useDueAtWords(sameDay = false): (label: TaskDueAt, now: Date) => string {
   const clock = useClinicClock();
   return useCallback(
-    (label: TaskDueAt, now: Date) => clock.wallMoment(label.date, label.time, { now }),
-    [clock],
+    (label: TaskDueAt, now: Date) =>
+      clock.wallMoment(label.date, label.time, { now, sameDay }),
+    [clock, sameDay],
   );
 }
 
@@ -74,12 +75,17 @@ export function useTaskDueAtWords(): (date: string, time: string, now: Date) => 
  * time rule — "11:30 pm" tonight, "Tomorrow 3:30 pm", "7 Oct 3:30 pm";
  * "Snoozed · 2 h · no answer", "Done · Now", "Done · 9:00 am" or "Done by
  * Clinozy" — the clinic's days and clock, the day in the viewer's language and
- * the time in their Appearance hour cycle (§7.2).
+ * the time in their Appearance hour cycle (§7.2). `sameDay` where the rows
+ * already sit under today — the Today aside, Tasks' "Due today": today's
+ * times bare ("11:30 pm"), other days still named.
  */
-export function useTaskDueLabel(): (task: TaskDueLabelInput, now: Date) => string {
+export function useTaskDueLabel({ sameDay = false }: { sameDay?: boolean } = {}): (
+  task: TaskDueLabelInput,
+  now: Date,
+) => string {
   const { t } = useTranslation(TASK_RULES_NS);
   const clock = useClinicClock();
-  const atWords = useDueAtWords();
+  const atWords = useDueAtWords(sameDay);
 
   const words = useCallback(
     (label: TaskDueLabel, now: Date): string => {
@@ -102,12 +108,15 @@ export function useTaskDueLabel(): (task: TaskDueLabelInput, now: Date) => strin
           }
           const at = new Date(label.at);
           return t(TASK_DUE_KEYS.done, {
-            time: clock.wallMoment(clinicToday(at), clinicClockTime(at), { now }),
+            time: clock.wallMoment(clinicToday(at), clinicClockTime(at), {
+              now,
+              sameDay,
+            }),
           });
         }
       }
     },
-    [t, clock, atWords],
+    [t, clock, atWords, sameDay],
   );
 
   return useCallback(

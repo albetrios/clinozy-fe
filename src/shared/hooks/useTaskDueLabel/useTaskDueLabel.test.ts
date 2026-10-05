@@ -90,6 +90,21 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
   });
 });
 
+describe('useTaskDueLabel under today (the Today aside, Tasks’ "Due today")', () => {
+  it('reads today’s times bare and still names any other day', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDueLabel({ sameDay: true }));
+    expect(result.current(open(at(721)), NOW)).toBe('22:31');
+    expect(result.current(open('2026-10-05T12:30:00.000Z'), NOW)).toBe('Tomorrow 18:00');
+    expect(
+      result.current(
+        { ...open(at(-30)), status: 'done', resolvedBy: 'member', resolvedAt: at(-90) },
+        NOW,
+      ),
+    ).toBe('Done · 09:00');
+  });
+});
+
 describe('useTaskDueAtWords', () => {
   it('words a picked day and time the way the due label does', () => {
     useLocaleStore.setState({ hourCycle: 'h23' });

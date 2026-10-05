@@ -86,7 +86,8 @@ function QueueCard({
 }) {
   const { t } = useTranslation(TODAY_NS);
   const { t: tTasks } = useTranslation(TASK_RULES_NS);
-  const dueLabel = useTaskDueLabel();
+  // The Today room already is today: today's due times read bare.
+  const dueLabel = useTaskDueLabel({ sameDay: true });
   const ownerName = useOwnerName();
   const { row, result, busy } = entry;
   const rule = TASK_RULES[row.rule];

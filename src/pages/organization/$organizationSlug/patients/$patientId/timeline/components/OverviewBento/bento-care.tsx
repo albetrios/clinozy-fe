@@ -41,7 +41,7 @@ interface CardLinks {
   onNew?: { label: string; run: () => void } | null;
 }
 
-/** The next visit (H:771): the 44px date tile, "Today · 11:00 am" and "Peel · 30 min". */
+/** The next visit (H:771): the 44px date tile, its time "11:00 am" and "Peel · 30 min". */
 function NextVisitTile({ visit }: { visit: PatientNextVisit }) {
   const { t } = useTranslation(TIMELINE_NS);
   const { formatDate } = useLocaleFormat();
