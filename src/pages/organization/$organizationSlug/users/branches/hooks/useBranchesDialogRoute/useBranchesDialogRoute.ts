@@ -84,9 +84,25 @@ export function useBranchesDialogRoute(
     close();
   }, [refused, missing, pathname, close, t]);
 
-  // Closing: the drawer goes at once, while the route catches up.
-  if (closingHere) return { dialog: { kind: 'none' }, close };
-  if (isCreate && !refused) return { dialog: { kind: 'create' }, close };
-  if (branchId && !missing) return { dialog: { kind: 'edit', branchId, row }, close };
-  return { dialog: { kind: 'none' }, close };
+  return {
+    dialog: branchesDialog({ closingHere, isCreate, refused, branchId, missing, row }),
+    close,
+  };
+}
+
+/** The drawer the URL opens — none while the page is closing it, as the route catches up. */
+function branchesDialog(route: {
+  closingHere: boolean;
+  isCreate: boolean;
+  refused: boolean;
+  branchId: string | undefined;
+  missing: boolean;
+  row: BranchRow | undefined;
+}): BranchesDialog {
+  if (route.closingHere) return { kind: 'none' };
+  if (route.isCreate && !route.refused) return { kind: 'create' };
+  if (route.branchId && !route.missing) {
+    return { kind: 'edit', branchId: route.branchId, row: route.row };
+  }
+  return { kind: 'none' };
 }

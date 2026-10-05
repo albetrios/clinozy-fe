@@ -116,11 +116,32 @@ export function useUsersDialogRoute(
     close();
   }, [refused, missing, pathname, close, t]);
 
-  // Closing: the drawer goes at once, while the route catches up.
-  if (closingHere) return { dialog: { kind: 'none' }, close };
-  if (isCreate && !refused) return { dialog: { kind: 'create' }, close };
-  if (membershipId && !missing) {
-    return { dialog: { kind: 'edit', membershipId, member }, close };
+  return {
+    dialog: usersDialog({
+      closingHere,
+      isCreate,
+      refused,
+      membershipId,
+      missing,
+      member,
+    }),
+    close,
+  };
+}
+
+/** The drawer the URL opens — none while the room is closing it, as the route catches up. */
+function usersDialog(route: {
+  closingHere: boolean;
+  isCreate: boolean;
+  refused: boolean;
+  membershipId: string | undefined;
+  missing: boolean;
+  member: TeamMember | undefined;
+}): UsersDialog {
+  if (route.closingHere) return { kind: 'none' };
+  if (route.isCreate && !route.refused) return { kind: 'create' };
+  if (route.membershipId && !route.missing) {
+    return { kind: 'edit', membershipId: route.membershipId, member: route.member };
   }
-  return { dialog: { kind: 'none' }, close };
+  return { kind: 'none' };
 }
