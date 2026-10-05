@@ -919,5 +919,74 @@
     "delete": "Supprimer la note",
     "deleted": "Note supprimée",
     "empty": "Aucune note pour le moment"
+  },
+  "timeline": {
+    "open": "Ouvrir {{card}}",
+    "clinical": {
+      "suggested": "Suggéré",
+      "later": "Plus tard",
+      "smartLabel": "Note intelligente",
+      "smartPlaceholder": "Note intelligente · écrivez librement, p. ex. hair fall 2 months, suggest PRP",
+      "add": "Ajouter",
+      "added_one": "{{count}} élément ajouté depuis votre note",
+      "added_many": "{{count}} d’éléments ajoutés depuis votre note",
+      "added_other": "{{count}} éléments ajoutés depuis votre note",
+      "nothing": "Rien de reconnu pour le moment"
+    },
+    "visits": {
+      "empty": "Aucune visite pour le moment"
+    },
+    "photos": {
+      "upload": "Importer",
+      "empty": "Aucune photo pour le moment · importez la première"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "Prochaine · {{date}}",
+      "overdue": "Séance {{session}} en retard",
+      "done": "Toutes les séances effectuées",
+      "use": "Utiliser une séance",
+      "empty": "Aucun forfait actif"
+    },
+    "prescriptions": {
+      "title": "Ordonnance {{number}}"
+    },
+    "treatments": {
+      "sub": "Séance {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "Dû",
+      "paid": "Payé",
+      "show": "Afficher les montants",
+      "hide": "Masquer les montants",
+      "invoice": "Facture {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Encaisser le paiement"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Note d’équipe",
+      "placeholder": "Écrivez une note pour l’équipe…",
+      "post": "Publier"
+    },
+    "activity": {
+      "filtersLabel": "Filtres d’activité",
+      "notes": "Notes",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_one": "Il y a {{count}} jour",
+      "daysAgo_many": "Il y a {{count}} de jours",
+      "daysAgo_other": "Il y a {{count}} jours",
+      "inDays_one": "Dans {{count}} jour",
+      "inDays_many": "Dans {{count}} de jours",
+      "inDays_other": "Dans {{count}} jours",
+      "rx": "Ordonnance {{number}} · {{medicines}}",
+      "treatment": "{{name}} · séance {{session}}",
+      "received": "Reçu {{amount}} · {{mode}}",
+      "refund": "Remboursement {{amount}} · {{mode}}",
+      "against": "Pour {{number}}",
+      "empty": "Aucune activité pour le moment"
+    }
   }
 }

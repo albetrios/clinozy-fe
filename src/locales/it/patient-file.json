@@ -919,5 +919,74 @@
     "delete": "Elimina nota",
     "deleted": "Nota eliminata",
     "empty": "Ancora nessuna nota"
+  },
+  "timeline": {
+    "open": "Apri {{card}}",
+    "clinical": {
+      "suggested": "Suggerito",
+      "later": "Più avanti",
+      "smartLabel": "Nota intelligente",
+      "smartPlaceholder": "Nota intelligente · scrivi liberamente, ad es. hair fall 2 months, suggest PRP",
+      "add": "Aggiungi",
+      "added_one": "{{count}} elemento aggiunto dalla tua nota",
+      "added_many": "{{count}} di elementi aggiunti dalla tua nota",
+      "added_other": "{{count}} elementi aggiunti dalla tua nota",
+      "nothing": "Ancora nulla di riconosciuto"
+    },
+    "visits": {
+      "empty": "Ancora nessuna visita"
+    },
+    "photos": {
+      "upload": "Carica",
+      "empty": "Ancora nessuna foto · carica la prima"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "Prossima · {{date}}",
+      "overdue": "Seduta {{session}} in ritardo",
+      "done": "Tutte le sedute completate",
+      "use": "Usa seduta",
+      "empty": "Nessun pacchetto attivo"
+    },
+    "prescriptions": {
+      "title": "Prescrizione {{number}}"
+    },
+    "treatments": {
+      "sub": "Seduta {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "Da pagare",
+      "paid": "Pagato",
+      "show": "Mostra importi",
+      "hide": "Nascondi importi",
+      "invoice": "Fattura {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Incassa pagamento"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Nota del team",
+      "placeholder": "Scrivi una nota per il team…",
+      "post": "Pubblica"
+    },
+    "activity": {
+      "filtersLabel": "Filtri attività",
+      "notes": "Note",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_one": "{{count}} giorno fa",
+      "daysAgo_many": "{{count}} di giorni fa",
+      "daysAgo_other": "{{count}} giorni fa",
+      "inDays_one": "Tra {{count}} giorno",
+      "inDays_many": "Tra {{count}} di giorni",
+      "inDays_other": "Tra {{count}} giorni",
+      "rx": "Prescrizione {{number}} · {{medicines}}",
+      "treatment": "{{name}} · seduta {{session}}",
+      "received": "Ricevuto {{amount}} · {{mode}}",
+      "refund": "Rimborso {{amount}} · {{mode}}",
+      "against": "Per {{number}}",
+      "empty": "Ancora nessuna attività"
+    }
   }
 }

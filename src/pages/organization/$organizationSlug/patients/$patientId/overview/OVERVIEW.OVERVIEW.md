@@ -39,7 +39,9 @@ module (`../patient-id.sections.ts`).
 | `components/ClinicalChipCard/`  | One chip card: dot, title, "1 new", chips with ×, the dashed input.                               |
 | `components/FeedbackCard/`      | The Feedback card: header, type chips, carousel, cards, Remove and Log action.                    |
 | `components/LogFeedbackPicker/` | The stacked picker: Check-in, Treatment feedback, Review.                                         |
-| `hooks/useClinicalLists/`       | The chip cards' notes, their writes and the chips added this visit.                               |
+
+The chip cards read and write the notes through `../shared/hooks/useClinicalLists/` — the
+family's, since the Overview's Clinical card and smart note write them too (L-46).
 
 ## Test ids
 

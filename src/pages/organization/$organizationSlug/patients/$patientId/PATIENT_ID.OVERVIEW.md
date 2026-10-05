@@ -103,6 +103,10 @@ one loader for the whole file.
 | `shared/hooks/useStaffLookup/`           | The staff member a record names — its doctor, team, author — as a chip; this session's writes as the signed-in member.                                 |
 | `shared/patient-feedback.ts`             | The feedback words and tones the rail, the Feedback card and the drawers share (counts, "Followed …", score and rating tones).                         |
 | `shared/patient-clinical.ts`             | The clinical notes as chips: one per line until the contract stores arrays (Appendix F).                                                               |
+| `shared/hooks/useClinicalLists/`         | The clinical lists' chips and their writes — Clinical notes' chip cards and the Overview's smart note (one write for all its chips).                   |
+| `shared/hooks/usePackageSession/`        | A package's session used by hand: Packages' "Use a session" and the Overview's "Use session".                                                          |
+| `shared/components/PhotoThumb/`          | A patient photo, or its glyph: Photos' tiles, the viewer, the Overview's Photos card and activity rows.                                                |
+| `shared/patient-visit.ts`                | The next visit's day and time ("Today · 11:00 am") — the rail's Up next and the Overview's Visits card.                                                |
 | `__tests__/integration/`                 | `__tests__/integration/patient-file-test-router.tsx` mirrors the file's routes for the tests.                                                          |
 
 ## Test ids

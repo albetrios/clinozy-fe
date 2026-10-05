@@ -120,6 +120,7 @@ import {
   validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
   validatePatientFileSearch,
+  validatePatientRxCreateSearch,
 } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
 import { manifest as patientCreateManifest } from '@/pages/organization/$organizationSlug/patients/create/create.manifest.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
@@ -1459,6 +1460,8 @@ const organizationPatientPhotoEditRoute = createRoute({
 const organizationPrescriptionCreateRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: 'create',
+  // `?medicines=` — the names a smart note recognised (AMBER A-F5).
+  validateSearch: validatePatientRxCreateSearch,
   component: patientFileDialog('prescriptionCreate'),
   errorComponent: RouteErrorBoundary,
 });

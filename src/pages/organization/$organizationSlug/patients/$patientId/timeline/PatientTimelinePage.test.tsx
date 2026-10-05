@@ -23,4 +23,17 @@ describe('PatientTimelinePage', () => {
       screen.getByRole('heading', { level: 2, name: 'Overview' }),
     ).toBeInTheDocument();
   });
+
+  it('shows the bento, then the activity timeline, without a section header (H:4943)', async () => {
+    renderPatientFile(patientFileUrl(DHARTI, '/timeline'));
+    const bento = await screen.findByTestId('overview-bento');
+    const activity = screen.getByTestId('overview-activity');
+    expect(
+      bento.compareDocumentPosition(activity) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 2, name: 'Overview' })).toHaveClass(
+      'sr-only',
+    );
+    expect(screen.queryByTestId('patient-section-primary')).not.toBeInTheDocument();
+  });
 });

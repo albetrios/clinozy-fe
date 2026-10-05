@@ -32,12 +32,11 @@ import { useStaffMember } from '../../../shared/components/PatientStaffPicker/in
 import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';
 import { RxDeleteConfirm } from './rx-delete-confirm.tsx';
 import {
+  initialRxForm,
   namedRxLines,
-  newRxForm,
   RX_KITS,
   RX_NOTES,
   rxFormLineOf,
-  rxFormOf,
   type RxFormValues,
   rxInputOf,
   rxKitLines,
@@ -159,6 +158,8 @@ export interface PrescriptionDrawerProps {
   writable: boolean;
   canDelete: boolean;
   today: string;
+  /** A smart note's medicines (AMBER A-F5): a new prescription starts with a line each. */
+  medicines?: readonly string[];
   onClose: () => void;
 }
 
@@ -235,15 +236,20 @@ export function PrescriptionDrawer({
   writable,
   canDelete,
   today,
+  medicines: smartNoteMedicines = [],
   onClose,
 }: PrescriptionDrawerProps) {
   const { t } = useTranslation(RX_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const form = useForm<RxFormValues>({
-    defaultValues: prescription
-      ? rxFormOf(prescription)
-      : newRxForm(today, defaultDoctorId),
+    defaultValues: initialRxForm({
+      prescription,
+      today,
+      doctorId: defaultDoctorId,
+      medicines: smartNoteMedicines,
+      catalog: catalog?.medicines ?? [],
+    }),
   });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });

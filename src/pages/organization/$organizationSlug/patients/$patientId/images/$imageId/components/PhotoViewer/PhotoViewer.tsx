@@ -14,11 +14,11 @@ import {
   X,
 } from '@/shared/icons/index.ts';
 
+import { PhotoThumb } from '../../../../shared/components/PhotoThumb/index.ts';
 import {
   PATIENT_PHOTOS_KEYS,
   PATIENT_PHOTOS_NS,
 } from '../../../../shared/patient-photos.constants.ts';
-import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
 import { usePhotoZoom } from '../../hooks/usePhotoZoom/index.ts';
 import { PHOTO_VIEWER_TEST_IDS } from './photo-viewer.constants.ts';
 

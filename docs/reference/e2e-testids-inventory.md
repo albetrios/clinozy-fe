@@ -736,6 +736,25 @@ ids above (`<t>-table`, `<t>-table-row`, `<t>-table-select-all`, `<t>-table-bulk
 | `patient-notes-input` · `patient-notes-add`              | Team notes' composer · "Add note"                                          | `notes/PatientNotesPage.tsx`                     |
 | `patient-note-<noteId>` · `patient-note-delete-<noteId>` | A note's card · its × "Delete note"                                        | `notes/PatientNotesPage.tsx`                     |
 
+### Patient file Overview (launch L-46)
+
+The default section's bento and activity timeline. `<c>` is a card — `clinical` · `visits` ·
+`photos` · `packages` · `prescriptions` · `treatments` · `billing` · `reports` · `notes`. Paths
+are under `pages/organization/$organizationSlug/patients/$patientId/timeline/components/`.
+
+| Test ID                                                       | Element                                                                                                                 | Source                             |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `overview-bento`                                              | The grid of cards                                                                                                       | `OverviewBento/OverviewBento.tsx`  |
+| `overview-card-<c>` · `-open` · `-new` · `-row` · `-empty`    | A card · "Open <card>" · its "New …" · a listed record · its empty line                                                 | `OverviewBento/bento-card.tsx`     |
+| `overview-card-visits-book` · `overview-card-photos-upload`   | Visits' "Book" / "Reschedule" · Photos' "Upload"                                                                        | `OverviewBento/`                   |
+| `overview-card-photos-thumb` · `overview-card-packages-use`   | A photo (opens its album) · a package's "Use session"                                                                   | `OverviewBento/`                   |
+| `overview-card-prescriptions-latest`                          | The latest prescription                                                                                                 | `OverviewBento/bento-care.tsx`     |
+| `overview-card-billing-eye` · `overview-card-billing-collect` | Show / Hide amounts (`aria-pressed`) · "Collect payment"                                                                | `OverviewBento/bento-files.tsx`    |
+| `overview-smart-note` · `overview-smart-note-add`             | The smart note · its "Add"                                                                                              | `OverviewBento/bento-clinical.tsx` |
+| `overview-note-input` · `overview-note-post`                  | Team notes' composer · "Post"                                                                                           | `OverviewBento/bento-files.tsx`    |
+| `overview-activity` · `overview-activity-filter-<kind>`       | The activity card · a filter chip (`all` · `visit` · `rx` · `treat` · `inv` · `pay` · `photo` · `note`; `aria-pressed`) | `ActivityTimeline/`                |
+| `overview-activity-row`                                       | A row (`data-kind`) — a record, or a day's photos                                                                       | `ActivityTimeline/`                |
+
 ## Quick line (shared, launch L-45)
 
 `shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a

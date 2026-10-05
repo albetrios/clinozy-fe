@@ -890,5 +890,71 @@
     "delete": "नोट हटाएँ",
     "deleted": "नोट हटाया गया",
     "empty": "अभी कोई नोट नहीं"
+  },
+  "timeline": {
+    "open": "{{card}} खोलें",
+    "clinical": {
+      "suggested": "सुझाए गए",
+      "later": "बाद में",
+      "smartLabel": "स्मार्ट नोट",
+      "smartPlaceholder": "स्मार्ट नोट · सहज रूप से लिखें, जैसे hair fall 2 months, suggest PRP",
+      "add": "जोड़ें",
+      "added_one": "आपके नोट से {{count}} आइटम जोड़ा गया",
+      "added_other": "आपके नोट से {{count}} आइटम जोड़े गए",
+      "nothing": "अभी तक कुछ पहचाना नहीं गया"
+    },
+    "visits": {
+      "empty": "अभी कोई विज़िट नहीं"
+    },
+    "photos": {
+      "upload": "अपलोड करें",
+      "empty": "अभी कोई फ़ोटो नहीं · पहली फ़ोटो अपलोड करें"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "अगला · {{date}}",
+      "overdue": "सेशन {{session}} में देरी",
+      "done": "सभी सेशन पूरे",
+      "use": "सेशन इस्तेमाल करें",
+      "empty": "कोई सक्रिय पैकेज नहीं"
+    },
+    "prescriptions": {
+      "title": "पर्चा {{number}}"
+    },
+    "treatments": {
+      "sub": "सेशन {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "बाकी",
+      "paid": "चुकाया",
+      "show": "राशियाँ दिखाएँ",
+      "hide": "राशियाँ छिपाएँ",
+      "invoice": "{{type}} इनवॉइस {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "भुगतान लें"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "टीम नोट",
+      "placeholder": "टीम के लिए नोट लिखें…",
+      "post": "पोस्ट करें"
+    },
+    "activity": {
+      "filtersLabel": "गतिविधि फ़िल्टर",
+      "notes": "नोट्स",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_one": "{{count}} दिन पहले",
+      "daysAgo_other": "{{count}} दिन पहले",
+      "inDays_one": "{{count}} दिन में",
+      "inDays_other": "{{count}} दिनों में",
+      "rx": "पर्चा {{number}} · {{medicines}}",
+      "treatment": "{{name}} · सेशन {{session}}",
+      "received": "{{amount}} प्राप्त · {{mode}}",
+      "refund": "रिफ़ंड {{amount}} · {{mode}}",
+      "against": "{{number}} के लिए",
+      "empty": "अभी कोई गतिविधि नहीं"
+    }
   }
 }

@@ -60,6 +60,11 @@ describe('useStaffLookup', () => {
     });
   });
 
+  it('reads a note still on its way (no author yet) as the signed-in member', () => {
+    const { result } = renderHook(() => useStaffLookup(), { wrapper });
+    expect(result.current('')).toMatchObject({ id: me.data.id, initials: 'RS' });
+  });
+
   it('knows nobody for no id, or an id it has never seen', async () => {
     const { result } = renderHook(() => useStaffLookup(), { wrapper });
     await waitFor(() => expect(result.current(staffRef('DD'))).not.toBeNull());

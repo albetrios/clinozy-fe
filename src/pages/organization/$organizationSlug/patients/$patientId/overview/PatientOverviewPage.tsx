@@ -16,17 +16,13 @@ import {
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
+import { useClinicalLists } from '../shared/hooks/useClinicalLists/index.ts';
+import { CLINICAL_LISTS } from '../shared/patient-clinical.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import { ClinicalChipCard } from './components/ClinicalChipCard/index.ts';
 import { FeedbackCard } from './components/FeedbackCard/index.ts';
 import { LogFeedbackPicker } from './components/LogFeedbackPicker/index.ts';
-import { useClinicalLists } from './hooks/useClinicalLists/index.ts';
-import {
-  CLINICAL_KEYS,
-  CLINICAL_LISTS,
-  CLINICAL_NS,
-  OVERVIEW_TEST_IDS,
-} from './overview.constants.ts';
+import { CLINICAL_KEYS, CLINICAL_NS, OVERVIEW_TEST_IDS } from './overview.constants.ts';
 import { manifest } from './overview.manifest.ts';
 
 /** Where a suggestion added from the file is made (`OfferingSuggestion.source`, `S:487`). */

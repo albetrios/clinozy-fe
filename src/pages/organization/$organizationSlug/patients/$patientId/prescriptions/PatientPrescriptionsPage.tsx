@@ -3,7 +3,7 @@
 // objects that keep their identity; React Compiler memoisation would serve
 // stale answers.
 
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,6 +24,7 @@ import {
   useRxSheetContext,
 } from '@/shared/hooks/usePrescriptions/index.ts';
 
+import type { PatientRxCreateSearch } from '../patient-id.search.ts';
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import {
   PATIENT_SECTION_TABLE_IDS,
@@ -64,7 +65,8 @@ function RxPreview({
 
 /**
  * New or Edit prescription, once the patient's history, the catalog and the
- * default doctor are read.
+ * default doctor are read; a new one opened from a smart note starts with
+ * the medicines it named (`?medicines=`, AMBER A-F5).
  */
 function RxDrawerHost({
   prescription,
@@ -79,6 +81,7 @@ function RxDrawerHost({
   onClose: () => void;
 }) {
   const { patientId, file } = usePatientFileContext();
+  const search: PatientRxCreateSearch = useSearch({ strict: false });
   const [today] = useState(() => clinicToday());
   const history = usePatientPrescriptions(patientId);
   const catalog = useRxCatalog(patientId);
@@ -94,6 +97,7 @@ function RxDrawerHost({
       writable={writable}
       canDelete={canDelete}
       today={today}
+      medicines={prescription ? undefined : search.medicines}
       onClose={onClose}
     />
   );

@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { organizationAppointment } from '@/lib/routes/index.ts';
 import {
   organizationPatientSection,
   organizationPrescriptionCreate,
@@ -8,6 +9,7 @@ import {
   organizationTreatmentCreate,
 } from '@/lib/routes/patient-file-builders.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {
@@ -94,6 +96,11 @@ export interface PatientFileActions {
   items: PatientAddItem[];
   /** The item a section's "New …" runs, when the section has one the member may use. */
   primaryFor: (section: PatientFileSectionSlug) => PatientAddItem | null;
+  /**
+   * Move a booked visit: the appointment form in `mode=reschedule`, the file
+   * behind it (`from`) — the rail's Up next and the Overview's Visits card.
+   */
+  reschedule: (visit: Pick<PatientNextVisit, 'appointmentId'>) => void;
 }
 
 /**
@@ -200,6 +207,11 @@ export function usePatientFileActions(): PatientFileActions {
 
   return {
     items,
+    reschedule: (visit) =>
+      void navigate({
+        ...organizationAppointment(organizationSlug, visit.appointmentId),
+        search: { mode: 'reschedule', ...(referrer ? { from: referrer } : {}) },
+      }),
     primaryFor: (target) => {
       const id = SECTION_PRIMARY_ITEM[target];
       return items.find((item) => item.id === id) ?? null;

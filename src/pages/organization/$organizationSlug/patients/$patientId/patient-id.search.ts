@@ -78,3 +78,26 @@ export function validatePatientFeedbackSearch(
     source: oneOf(PATIENT_REVIEW_SOURCES, search.source),
   };
 }
+
+/** How many medicine names a smart note hands New prescription (H:4920). */
+const RX_PREFILL_LIMIT = 10;
+
+/** The longest medicine name the drawer takes (`RX_LIMITS.medicineName`). */
+const RX_PREFILL_NAME_MAX = 120;
+
+/** Validated `?…` params of New prescription (`S:35`). */
+export interface PatientRxCreateSearch {
+  /** The medicines a smart note recognised (AMBER A-F5): each a line of the new Rx. */
+  medicines?: string[];
+}
+
+/** Parse New prescription's params: up to ten medicine names, blanks dropped. */
+export function validatePatientRxCreateSearch(
+  search: Record<string, unknown>,
+): PatientRxCreateSearch {
+  const names = (Array.isArray(search.medicines) ? search.medicines : [])
+    .map((name) => textOf(name).slice(0, RX_PREFILL_NAME_MAX))
+    .filter(Boolean)
+    .slice(0, RX_PREFILL_LIMIT);
+  return { medicines: names.length > 0 ? names : undefined };
+}

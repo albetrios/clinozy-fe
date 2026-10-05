@@ -16,9 +16,10 @@ export interface StaffChip {
 /**
  * The staff member a record names — its doctor, team, author — from the
  * clinic's staff profiles (KICKOFF §6.6 Section tables, Team notes). A
- * record written in this session carries the fixture actor, which stands for
- * the signed-in member (REPLACE_WITH_API: the server stamps the member).
- * Null while the profiles load, and for an id they do not know.
+ * record written in this session carries the fixture actor, and one still on
+ * its way (an optimistic note) no author yet: both stand for the signed-in
+ * member (REPLACE_WITH_API: the server stamps the member). Null while the
+ * profiles load, for no id, and for an id they do not know.
  */
 export function useStaffLookup(): (id: string | null | undefined) => StaffChip | null {
   const staff = useStaffProfiles();
@@ -29,8 +30,8 @@ export function useStaffLookup(): (id: string | null | undefined) => StaffChip |
   );
   return useCallback(
     (id) => {
-      if (!id) return null;
-      const profile = id === FIXTURE_ACTOR_ID ? me.data : byId.get(id);
+      if (id === null || id === undefined) return null;
+      const profile = id === FIXTURE_ACTOR_ID || id === '' ? me.data : byId.get(id);
       if (!profile) return null;
       return {
         id: profile.id,

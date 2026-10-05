@@ -190,6 +190,9 @@ function whenOf(item: Pick<PrescriptionItem, 'meal' | 'timing' | 'timingText'>):
   return item.timingText ? typedValue(item.timingText) : '';
 }
 
+/** What a new line reads of a medicine: its name, the store's id, this patient's last line. */
+type RxLineMedicine = Pick<RxCatalogMedicine, 'name' | 'medicineId' | 'last'>;
+
 /** A saved line as the row holds it. */
 export function rxFormLineOf(item: PrescriptionItem): RxFormLine {
   const dose: RxDose | undefined = item.sos
@@ -366,7 +369,7 @@ function shorthandFields(values: RxLineValues): Partial<RxFormLine> {
  * last one's, else 1; "10 days" in the note when days were typed.
  */
 export function rxLineFor(
-  medicine: Pick<RxCatalogMedicine, 'name' | 'medicineId' | 'last'>,
+  medicine: RxLineMedicine,
   values: RxLineValues,
   daysNote: (days: number) => string,
 ): RxFormLine {
@@ -392,6 +395,49 @@ export function withRxLine(items: readonly RxFormLine[], line: RxFormLine): RxFo
     : [...items, line];
 }
 
+/**
+ * The drawer's starting form: an edit's prescription, else a new one — with
+ * a line for each medicine a smart note named (AMBER A-F5).
+ */
+export function initialRxForm({
+  prescription,
+  today,
+  doctorId,
+  medicines,
+  catalog,
+}: {
+  prescription: Prescription | null;
+  today: string;
+  doctorId: string | null;
+  medicines: readonly string[];
+  catalog: readonly RxLineMedicine[];
+}): RxFormValues {
+  if (prescription) return rxFormOf(prescription);
+  return rxFormWithMedicines(newRxForm(today, doctorId), medicines, catalog);
+}
+
+/**
+ * A new prescription opened from a smart note (AMBER A-F5): a line for each
+ * medicine it named — the store's, with its last dosage, when the catalogue
+ * carries the name; else the name as typed (the save maps it, `S:378`).
+ */
+export function rxFormWithMedicines(
+  form: RxFormValues,
+  names: readonly string[],
+  catalog: readonly RxLineMedicine[],
+): RxFormValues {
+  const items = names.reduce((lines, name) => {
+    const known = catalog.find(
+      (medicine) => medicine.name.toLowerCase() === name.toLowerCase(),
+    );
+    return withRxLine(
+      lines,
+      rxLineFor(known ?? { name, medicineId: null, last: null }, {}, () => ''),
+    );
+  }, form.items);
+  return { ...form, items };
+}
+
 /** How many of a medicine the lines hold — Browse's tile count. */
 export function rxCountOf(items: readonly RxFormLine[], name: string): number {
   return items
@@ -406,7 +452,7 @@ export function rxCountOf(items: readonly RxFormLine[], name: string): number {
  */
 export function steppedRxLines(
   items: readonly RxFormLine[],
-  medicine: Pick<RxCatalogMedicine, 'name' | 'medicineId' | 'last'>,
+  medicine: RxLineMedicine,
   step: 1 | -1,
   daysNote: (days: number) => string,
 ): RxFormLine[] {

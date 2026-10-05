@@ -861,5 +861,68 @@
     "delete": "メモを削除",
     "deleted": "メモを削除しました",
     "empty": "メモはまだありません"
+  },
+  "timeline": {
+    "open": "{{card}}を開く",
+    "clinical": {
+      "suggested": "提案",
+      "later": "今後",
+      "smartLabel": "スマートメモ",
+      "smartPlaceholder": "スマートメモ · 自由に入力（例: hair fall 2 months, suggest PRP）",
+      "add": "追加",
+      "added_other": "メモから{{count}}件を追加しました",
+      "nothing": "まだ何も認識されていません"
+    },
+    "visits": {
+      "empty": "来院はまだありません"
+    },
+    "photos": {
+      "upload": "アップロード",
+      "empty": "写真はまだありません · 最初の1枚をアップロード"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "次回 · {{date}}",
+      "overdue": "{{session}}回目が期限超過",
+      "done": "すべての回が完了",
+      "use": "1回使用",
+      "empty": "有効なパッケージはありません"
+    },
+    "prescriptions": {
+      "title": "処方箋 {{number}}"
+    },
+    "treatments": {
+      "sub": "{{session}}回目 · {{date}}"
+    },
+    "billing": {
+      "due": "未払い",
+      "paid": "支払済み",
+      "show": "金額を表示",
+      "hide": "金額を隠す",
+      "invoice": "{{type}}請求書 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "支払いを受け取る"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "チームメモ",
+      "placeholder": "チームへのメモを書く…",
+      "post": "投稿"
+    },
+    "activity": {
+      "filtersLabel": "アクティビティの絞り込み",
+      "notes": "メモ",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_other": "{{count}}日前",
+      "inDays_other": "{{count}}日後",
+      "rx": "処方箋 {{number}} · {{medicines}}",
+      "treatment": "{{name}} · {{session}}回目",
+      "received": "{{amount}}を受領 · {{mode}}",
+      "refund": "返金 {{amount}} · {{mode}}",
+      "against": "{{number}} 宛て",
+      "empty": "アクティビティはまだありません"
+    }
   }
 }

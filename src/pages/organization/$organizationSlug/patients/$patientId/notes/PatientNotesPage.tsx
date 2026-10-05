@@ -6,11 +6,7 @@ import {
   PATIENT_NOTE_MAX,
   patientNoteInputSchema,
 } from '@/shared/api/clinic/patient-notes-api.ts';
-import {
-  PersonAvatar,
-  personFullName,
-  shortPersonName,
-} from '@/shared/components/Cells/index.ts';
+import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerTextarea } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
@@ -21,7 +17,6 @@ import {
   usePatientNotes,
   useRestorePatientNote,
 } from '@/shared/hooks/usePatientNotes/index.ts';
-import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { X } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -144,21 +139,9 @@ export function PatientNotesPage() {
   const remove = useDeletePatientNote(patientId);
   const restore = useRestorePatientNote();
   const staff = useStaffLookup();
-  const me = useMyStaffProfile();
   const canAdd = access.isResolved && access.can('patients', 'create');
   const canDelete = access.isResolved && access.can('patients', 'delete');
   const list = notes.data ?? [];
-  // A note still on its way has no author yet: the member writing it.
-  const authorOf = (note: PatientNote): StaffChip | null => {
-    if (!isDraft(note)) return staff(note.createdById);
-    if (!me.data) return null;
-    return {
-      id: me.data.id,
-      name: personFullName(me.data),
-      initials: me.data.initials,
-      tone: me.data.tone,
-    };
-  };
   const deleteNote = (note: PatientNote) =>
     remove.mutate(note.id, {
       onSuccess: () =>
@@ -173,7 +156,7 @@ export function PatientNotesPage() {
           <NoteCard
             key={note.id}
             note={note}
-            author={authorOf(note)}
+            author={staff(note.createdById)}
             onDelete={canDelete && !isDraft(note) ? () => deleteNote(note) : null}
           />
         ))}

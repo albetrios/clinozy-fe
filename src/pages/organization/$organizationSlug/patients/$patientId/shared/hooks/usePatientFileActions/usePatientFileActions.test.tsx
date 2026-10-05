@@ -40,6 +40,16 @@ function ActionsProbe() {
   );
 }
 
+/** Moves the visit `A1`. */
+function RescheduleProbe() {
+  const { reschedule } = usePatientFileActions();
+  return (
+    <button type="button" onClick={() => reschedule({ appointmentId: 'A1' })}>
+      reschedule
+    </button>
+  );
+}
+
 const itemIds = () =>
   screen
     .getAllByRole('button')
@@ -161,5 +171,31 @@ describe('usePatientFileActions', () => {
         `/organization/acme/patients/${DHARTI}/images`,
       ),
     );
+  });
+
+  it('moves a booked visit: the appointment form in reschedule mode, the file behind it', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<RescheduleProbe />, {
+      file,
+      section: 'timeline',
+    });
+    await user.click(await screen.findByRole('button', { name: 'reschedule' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/appointments/A1'),
+    );
+    expect(router.state.location.search).toEqual({
+      mode: 'reschedule',
+      from: `patients/${DHARTI}/timeline`,
+    });
+  });
+
+  it('moves a visit from outside a section with no way back', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<RescheduleProbe />, { file, section: null });
+    await user.click(await screen.findByRole('button', { name: 'reschedule' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/appointments/A1'),
+    );
+    expect(router.state.location.search).toEqual({ mode: 'reschedule' });
   });
 });

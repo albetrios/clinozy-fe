@@ -7,6 +7,7 @@ import {
   validatePatientFeedbackSearch,
   validatePatientFileDialogSearch,
   validatePatientFileSearch,
+  validatePatientRxCreateSearch,
 } from './patient-id.search.ts';
 
 describe('the patient file’s search params', () => {
@@ -51,6 +52,26 @@ describe('the patient file’s search params', () => {
       treatment: undefined,
       source: undefined,
     });
+  });
+
+  it('keeps up to ten medicine names a smart note hands New prescription (A-F5)', () => {
+    expect(
+      validatePatientRxCreateSearch({
+        medicines: [' Flubolt 400 ', '', {}, 'Clonix-B Lotion'],
+      }),
+    ).toEqual({ medicines: ['Flubolt 400', 'Clonix-B Lotion'] });
+    const many = Array.from(
+      { length: 12 },
+      (_, index) => `Medicine ${'x'.repeat(index)}`,
+    );
+    expect(validatePatientRxCreateSearch({ medicines: many }).medicines).toHaveLength(10);
+    expect(
+      validatePatientRxCreateSearch({ medicines: ['y'.repeat(200)] }).medicines?.[0],
+    ).toHaveLength(120);
+    expect(validatePatientRxCreateSearch({ medicines: 'Flubolt 400' })).toEqual({
+      medicines: undefined,
+    });
+    expect(validatePatientRxCreateSearch({})).toEqual({ medicines: undefined });
   });
 
   it('declares the review sources the schema has, in its order', () => {

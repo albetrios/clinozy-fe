@@ -861,5 +861,68 @@
     "delete": "메모 삭제",
     "deleted": "메모를 삭제했습니다",
     "empty": "아직 메모가 없습니다"
+  },
+  "timeline": {
+    "open": "{{card}} 열기",
+    "clinical": {
+      "suggested": "제안",
+      "later": "추후",
+      "smartLabel": "스마트 메모",
+      "smartPlaceholder": "스마트 메모 · 자연스럽게 입력하세요. 예: hair fall 2 months, suggest PRP",
+      "add": "추가",
+      "added_other": "메모에서 {{count}}개 항목을 추가했습니다",
+      "nothing": "아직 인식된 항목이 없습니다"
+    },
+    "visits": {
+      "empty": "아직 방문이 없습니다"
+    },
+    "photos": {
+      "upload": "업로드",
+      "empty": "아직 사진이 없습니다 · 첫 사진을 업로드하세요"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "다음 · {{date}}",
+      "overdue": "{{session}}회차 기한 지남",
+      "done": "모든 회차 완료",
+      "use": "1회 사용",
+      "empty": "활성 패키지가 없습니다"
+    },
+    "prescriptions": {
+      "title": "처방전 {{number}}"
+    },
+    "treatments": {
+      "sub": "{{session}}회차 · {{date}}"
+    },
+    "billing": {
+      "due": "미수",
+      "paid": "수납 완료",
+      "show": "금액 보기",
+      "hide": "금액 숨기기",
+      "invoice": "{{type}} 청구서 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "결제 받기"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "팀 메모",
+      "placeholder": "팀에 남길 메모를 작성하세요…",
+      "post": "게시"
+    },
+    "activity": {
+      "filtersLabel": "활동 필터",
+      "notes": "메모",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_other": "{{count}}일 전",
+      "inDays_other": "{{count}}일 후",
+      "rx": "처방전 {{number}} · {{medicines}}",
+      "treatment": "{{name}} · {{session}}회차",
+      "received": "{{amount}} 수납 · {{mode}}",
+      "refund": "환불 {{amount}} · {{mode}}",
+      "against": "{{number}} 대상",
+      "empty": "아직 활동이 없습니다"
+    }
   }
 }

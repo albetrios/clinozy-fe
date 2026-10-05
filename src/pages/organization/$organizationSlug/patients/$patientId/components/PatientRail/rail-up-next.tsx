@@ -1,11 +1,9 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   civilDayOffset,
-  clinicInstant,
   clinicToday,
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
@@ -27,6 +25,7 @@ import {
 } from '@/shared/icons/index.ts';
 
 import { feedbackCountsText } from '../../shared/patient-feedback.ts';
+import { useVisitWhen } from '../../shared/patient-visit.ts';
 import { PATIENT_RAIL_KEYS, PATIENT_RAIL_NS } from './patient-rail.constants.ts';
 
 const K = PATIENT_RAIL_KEYS;
@@ -68,28 +67,6 @@ function CardButton({
       {children}
     </button>
   );
-}
-
-/** "Today · 11:00 am" / "Tomorrow · …" / "Sat, 10 Oct · …" — the next visit's day and time. */
-function useVisitWhen(): (visit: PatientNextVisit) => string {
-  const { t } = useTranslation(PATIENT_RAIL_NS);
-  const { formatDate, prefs } = useLocaleFormat();
-  return (visit) => {
-    const offset = civilDayOffset(clinicToday(), visit.date);
-    let day = formatDate(
-      localDateOf(visit.date),
-      { weekday: 'short', day: 'numeric', month: 'short' },
-      { civilDay: true },
-    );
-    if (offset === 0) day = t(K.today);
-    if (offset === 1) day = t(K.tomorrow);
-    const time = formatDate(clinicInstant(visit.date, visit.startTime), {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: 'numeric',
-      second: undefined,
-    });
-    return t(K.visitWhen, { day, time });
-  };
 }
 
 /** The next visit (H:723): a 44px date tile, when and what, Reschedule — or "Not booked" and Book. */

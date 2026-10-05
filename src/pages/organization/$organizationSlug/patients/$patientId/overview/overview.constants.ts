@@ -1,25 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { kebabCase } from '@/lib/kebab-case.ts';
-import type { FeedbackActionKind, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientClinical } from '@/shared/api/clinic/patients-contracts.ts';
+import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
+
+import type { ClinicalField } from '../shared/patient-clinical.ts';
 
 /** Clinical notes read the patient file's namespace. */
 export const CLINICAL_NS = I18N_NAMESPACES.patientFile;
-
-/** One chip card's list — a clinical field of the patient. */
-export type ClinicalField = keyof PatientClinical;
-
-/**
- * The four chip cards in their order (H:4797 `OVK`; `patient-file.md:53`):
- * Complaints blush, Diagnosis lav, Treatment suggestions sage, Future
- * suggestions sky.
- */
-export const CLINICAL_LISTS: readonly { field: ClinicalField; tone: Tone }[] = [
-  { field: 'complaints', tone: 'blush' },
-  { field: 'diagnosis', tone: 'lav' },
-  { field: 'treatmentSuggestions', tone: 'sage' },
-  { field: 'futureSuggestions', tone: 'sky' },
-];
 
 /** The chip cards' copy (`patient-file.md:52–56`), verbatim. */
 export const CLINICAL_KEYS = {

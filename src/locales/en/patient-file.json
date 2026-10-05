@@ -890,5 +890,71 @@
     "delete": "Delete note",
     "deleted": "Note deleted",
     "empty": "No notes yet"
+  },
+  "timeline": {
+    "open": "Open {{card}}",
+    "clinical": {
+      "suggested": "Suggested",
+      "later": "Later",
+      "smartLabel": "Smart note",
+      "smartPlaceholder": "Smart note · type naturally, e.g. hair fall 2 months, suggest PRP",
+      "add": "Add",
+      "added_one": "{{count}} item added from your note",
+      "added_other": "{{count}} items added from your note",
+      "nothing": "Nothing recognised yet"
+    },
+    "visits": {
+      "empty": "No visits yet"
+    },
+    "photos": {
+      "upload": "Upload",
+      "empty": "No photos yet · upload the first"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "Next · {{date}}",
+      "overdue": "Session {{session}} overdue",
+      "done": "All sessions done",
+      "use": "Use session",
+      "empty": "No active packages"
+    },
+    "prescriptions": {
+      "title": "Rx {{number}}"
+    },
+    "treatments": {
+      "sub": "Session {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "Due",
+      "paid": "Paid",
+      "show": "Show amounts",
+      "hide": "Hide amounts",
+      "invoice": "{{type}} invoice {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Collect payment"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Team note",
+      "placeholder": "Write a note for the team…",
+      "post": "Post"
+    },
+    "activity": {
+      "filtersLabel": "Activity filters",
+      "notes": "Notes",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "inDays_one": "In {{count}} day",
+      "inDays_other": "In {{count}} days",
+      "rx": "Rx {{number}} · {{medicines}}",
+      "treatment": "{{name}} · session {{session}}",
+      "received": "Received {{amount}} · {{mode}}",
+      "refund": "Refund {{amount}} · {{mode}}",
+      "against": "Against {{number}}",
+      "empty": "No activity yet"
+    }
   }
 }

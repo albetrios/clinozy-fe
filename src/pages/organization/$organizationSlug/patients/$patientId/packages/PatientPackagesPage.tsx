@@ -11,11 +11,7 @@ import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import {
-  useConsumePackageSession,
-  usePatientPackages,
-} from '@/shared/hooks/usePatientPackages/index.ts';
-import { notify } from '@/shared/notify/index.ts';
+import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 
 import {
   PATIENT_SECTION_KEYS,
@@ -23,6 +19,7 @@ import {
   PatientSection,
 } from '../shared/components/PatientSection/index.ts';
 import { useTableDay } from '../shared/components/PatientSectionTable/index.ts';
+import { usePackageSession } from '../shared/hooks/usePackageSession/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import { AddPackageDrawer } from './components/AddPackageDrawer/index.ts';
 import { PACKAGE_CARD_TEST_ID, PACKAGE_KEYS, PACKAGE_NS } from './packages.constants.ts';
@@ -138,29 +135,13 @@ export function PatientPackagesPage() {
   const { patientId, file } = usePatientFileContext();
   const access = useClinicAccess();
   const packages = usePatientPackages(patientId);
-  const consume = useConsumePackageSession();
   const [adding, setAdding] = useState(false);
   const canAdd = access.isResolved && access.can('patients', 'create');
   const canUse = access.isResolved && access.can('patients', 'edit');
   const canBook = access.isResolved && access.can('appointments', 'create');
   const rows = packages.data ?? [];
 
-  const use = ({ package: record }: PatientPackageRow) => {
-    if (record.sessionsUsed >= record.sessionsTotal) {
-      notify.info(t(K.noneLeft, { ns: PACKAGE_NS }));
-      return;
-    }
-    consume.mutate(record.id, {
-      onSuccess: (saved) =>
-        notify.success(
-          t(K.sessionUsed, {
-            ns: PACKAGE_NS,
-            used: saved.sessionsUsed,
-            total: saved.sessionsTotal,
-          }),
-        ),
-    });
-  };
+  const takeSession = usePackageSession();
   const book = () =>
     void navigate(
       clinicCommandNavigation('newAppointment', {
@@ -191,7 +172,7 @@ export function PatientPackagesPage() {
                 <PackageCard
                   key={row.package.id}
                   row={row}
-                  onUse={canUse ? () => use(row) : null}
+                  onUse={canUse ? () => takeSession(row) : null}
                   onBook={canBook ? book : null}
                 />
               ))}

@@ -37,10 +37,6 @@ export const PATIENT_RAIL_KEYS = {
   birthdayToday: 'rail.birthdayToday',
   noAddress: 'rail.noAddress',
   upNext: 'rail.upNext',
-  /** "Today · 11:00 am". */
-  visitWhen: 'rail.visitWhen',
-  today: 'rail.today',
-  tomorrow: 'rail.tomorrow',
   /** "Hydrafacial · 45 min". */
   visitService: 'rail.visitService',
   reschedule: 'rail.reschedule',

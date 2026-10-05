@@ -1006,5 +1006,83 @@
     "delete": "حذف الملاحظة",
     "deleted": "تم حذف الملاحظة",
     "empty": "لا ملاحظات بعد"
+  },
+  "timeline": {
+    "open": "فتح {{card}}",
+    "clinical": {
+      "suggested": "مقترح",
+      "later": "لاحقًا",
+      "smartLabel": "ملاحظة ذكية",
+      "smartPlaceholder": "ملاحظة ذكية · اكتب بشكل طبيعي، مثل: hair fall 2 months, suggest PRP",
+      "add": "إضافة",
+      "added_zero": "لم يُضف أي عنصر من ملاحظتك",
+      "added_one": "أُضيف عنصر واحد من ملاحظتك",
+      "added_two": "أُضيف عنصران من ملاحظتك",
+      "added_few": "أُضيفت {{count}} عناصر من ملاحظتك",
+      "added_many": "أُضيف {{count}} عنصرًا من ملاحظتك",
+      "added_other": "أُضيف {{count}} عنصر من ملاحظتك",
+      "nothing": "لم يتم التعرّف على شيء بعد"
+    },
+    "visits": {
+      "empty": "لا زيارات بعد"
+    },
+    "photos": {
+      "upload": "رفع",
+      "empty": "لا صور بعد · ارفع أول صورة"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "التالي · {{date}}",
+      "overdue": "الجلسة {{session}} متأخرة",
+      "done": "اكتملت كل الجلسات",
+      "use": "استخدام جلسة",
+      "empty": "لا باقات نشطة"
+    },
+    "prescriptions": {
+      "title": "الوصفة {{number}}"
+    },
+    "treatments": {
+      "sub": "الجلسة {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "مستحق",
+      "paid": "مدفوع",
+      "show": "إظهار المبالغ",
+      "hide": "إخفاء المبالغ",
+      "invoice": "فاتورة {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "تحصيل الدفعة"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "ملاحظة الفريق",
+      "placeholder": "اكتب ملاحظة للفريق…",
+      "post": "نشر"
+    },
+    "activity": {
+      "filtersLabel": "عوامل تصفية النشاط",
+      "notes": "الملاحظات",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_zero": "اليوم",
+      "daysAgo_one": "منذ يوم واحد",
+      "daysAgo_two": "منذ يومين",
+      "daysAgo_few": "منذ {{count}} أيام",
+      "daysAgo_many": "منذ {{count}} يومًا",
+      "daysAgo_other": "منذ {{count}} يوم",
+      "inDays_zero": "اليوم",
+      "inDays_one": "خلال يوم واحد",
+      "inDays_two": "خلال يومين",
+      "inDays_few": "خلال {{count}} أيام",
+      "inDays_many": "خلال {{count}} يومًا",
+      "inDays_other": "خلال {{count}} يوم",
+      "rx": "الوصفة {{number}} · {{medicines}}",
+      "treatment": "{{name}} · الجلسة {{session}}",
+      "received": "استُلم {{amount}} · {{mode}}",
+      "refund": "استرداد {{amount}} · {{mode}}",
+      "against": "مقابل {{number}}",
+      "empty": "لا نشاط بعد"
+    }
   }
 }

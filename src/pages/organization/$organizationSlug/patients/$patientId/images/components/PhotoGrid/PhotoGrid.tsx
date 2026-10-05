@@ -6,11 +6,11 @@ import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PenLine, Trash } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 
+import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
 import {
   PATIENT_PHOTOS_KEYS,
   PATIENT_PHOTOS_NS,
 } from '../../../shared/patient-photos.constants.ts';
-import { PhotoThumb } from '../../shared/components/PhotoThumb/index.ts';
 import { PHOTO_BODY_PART_TONES, PHOTO_SIZE_LOOK } from '../../shared/photo-looks.ts';
 import type { PhotoDay } from '../../shared/photo-view.ts';
 import { PHOTO_GRID_TEST_IDS } from './photo-grid.constants.ts';

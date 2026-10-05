@@ -15,6 +15,7 @@ import type { ChatHistoryTarget } from '@/shared/components/ChatColumn/index.ts'
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import type { RailUpNextActions } from '../../components/PatientRail/index.ts';
+import { usePatientFileActions } from '../../shared/hooks/usePatientFileActions/index.ts';
 import { usePatientFileContext } from '../../shared/patient-file-context.ts';
 
 /** Where the file's own links go — each hidden (undefined) when the member can't. */
@@ -51,6 +52,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, section, viewable } = usePatientFileContext();
   const access = useClinicAccess();
+  const actions = usePatientFileActions();
   const referrer = section ? `patients/${patientId}/${section}` : null;
   const from = referrer ? { from: referrer } : {};
   const can = (
@@ -68,11 +70,6 @@ export function usePatientFileNavigation(): PatientFileNavigation {
         search: { who: patientId },
       }),
     );
-  const reschedule = (visit: PatientNextVisit) =>
-    void navigate({
-      ...organizationAppointment(organizationSlug, visit.appointmentId),
-      search: { mode: 'reschedule', ...from },
-    });
   const editContact = () =>
     void navigate({
       ...organizationPatientEdit(organizationSlug, patientId),
@@ -107,7 +104,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     editContact: when(can('patients', 'edit'), editContact),
     railActions: {
       onBook: when(canBook, (next: PatientNextVisit | null) =>
-        next ? reschedule(next) : book(),
+        next ? actions.reschedule(next) : book(),
       ),
       onCollect: when(can('payments', 'create'), collect),
       onFeedback: when(viewable.includes('overview'), () => openSection('overview')),

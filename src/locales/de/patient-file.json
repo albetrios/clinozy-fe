@@ -890,5 +890,71 @@
     "delete": "Notiz löschen",
     "deleted": "Notiz gelöscht",
     "empty": "Noch keine Notizen"
+  },
+  "timeline": {
+    "open": "{{card}} öffnen",
+    "clinical": {
+      "suggested": "Vorgeschlagen",
+      "later": "Später",
+      "smartLabel": "Smarte Notiz",
+      "smartPlaceholder": "Smarte Notiz · einfach frei schreiben, z. B. hair fall 2 months, suggest PRP",
+      "add": "Hinzufügen",
+      "added_one": "{{count}} Eintrag aus Ihrer Notiz hinzugefügt",
+      "added_other": "{{count}} Einträge aus Ihrer Notiz hinzugefügt",
+      "nothing": "Noch nichts erkannt"
+    },
+    "visits": {
+      "empty": "Noch keine Besuche"
+    },
+    "photos": {
+      "upload": "Hochladen",
+      "empty": "Noch keine Fotos · laden Sie das erste hoch"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "Nächster · {{date}}",
+      "overdue": "Sitzung {{session}} überfällig",
+      "done": "Alle Sitzungen erledigt",
+      "use": "Sitzung nutzen",
+      "empty": "Keine aktiven Pakete"
+    },
+    "prescriptions": {
+      "title": "Rezept {{number}}"
+    },
+    "treatments": {
+      "sub": "Sitzung {{session}} · {{date}}"
+    },
+    "billing": {
+      "due": "Offen",
+      "paid": "Bezahlt",
+      "show": "Beträge anzeigen",
+      "hide": "Beträge ausblenden",
+      "invoice": "{{type}}-Rechnung {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Zahlung kassieren"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Teamnotiz",
+      "placeholder": "Notiz für das Team schreiben…",
+      "post": "Posten"
+    },
+    "activity": {
+      "filtersLabel": "Aktivitätsfilter",
+      "notes": "Notizen",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_one": "Vor {{count}} Tag",
+      "daysAgo_other": "Vor {{count}} Tagen",
+      "inDays_one": "In {{count}} Tag",
+      "inDays_other": "In {{count}} Tagen",
+      "rx": "Rezept {{number}} · {{medicines}}",
+      "treatment": "{{name}} · Sitzung {{session}}",
+      "received": "{{amount}} erhalten · {{mode}}",
+      "refund": "Erstattung {{amount}} · {{mode}}",
+      "against": "Zu {{number}}",
+      "empty": "Noch keine Aktivität"
+    }
   }
 }

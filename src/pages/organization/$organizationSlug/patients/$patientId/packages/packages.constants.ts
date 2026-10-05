@@ -28,9 +28,6 @@ export const PACKAGE_KEYS = {
     use: 'package.card.use',
     book: 'package.card.book',
     empty: 'package.card.empty',
-    /** "Session 2 of 7 used". */
-    sessionUsed: 'package.card.sessionUsed',
-    noneLeft: 'package.card.noneLeft',
   },
 } as const;
 

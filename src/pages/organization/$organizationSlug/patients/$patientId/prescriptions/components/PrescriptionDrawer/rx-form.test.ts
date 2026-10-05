@@ -7,6 +7,7 @@ import type {
 
 import {
   emptyRxLine,
+  initialRxForm,
   namedRxLines,
   newRxForm,
   RX_KITS,
@@ -15,6 +16,7 @@ import {
   rxDoseOf,
   rxFormLineOf,
   rxFormOf,
+  rxFormWithMedicines,
   rxInputOf,
   rxItemOf,
   rxKitLines,
@@ -160,6 +162,50 @@ describe('the form', () => {
     });
     expect(input).toMatchObject({ advice: null, labReport: 'CBC', doctorId: 'dr' });
     expect(namedRxLines(values.items)).toHaveLength(1);
+  });
+});
+
+describe('a new prescription from a smart note (AMBER A-F5)', () => {
+  const catalog = [{ name: 'Flubolt 400', medicineId: 'm-1', last: item() }];
+
+  it('opens with a line for each medicine named — the store’s, else as written', () => {
+    const form = rxFormWithMedicines(
+      newRxForm('2026-10-03', 'dr'),
+      ['flubolt 400', 'Clonix-B Lotion'],
+      catalog,
+    );
+    expect(form.items).toHaveLength(2);
+    expect(form.items[0]).toMatchObject({
+      medicineName: 'Flubolt 400',
+      medicineId: 'm-1',
+      dose: '0-0-1',
+      qty: 8,
+    });
+    expect(form.items[1]).toMatchObject({
+      medicineName: 'Clonix-B Lotion',
+      medicineId: null,
+    });
+  });
+
+  it('starts an edit from its prescription, a new one from the smart note', () => {
+    const rx = {
+      date: '2026-09-24',
+      doctorId: 'dr',
+      items: [item({ medicineName: 'Epriva Tab' })],
+      advice: null,
+      labReport: null,
+      procedureToday: null,
+    } as Prescription;
+    const opened = (prescription: Prescription | null) =>
+      initialRxForm({
+        prescription,
+        today: '2026-10-03',
+        doctorId: 'dr',
+        medicines: ['Flubolt 400'],
+        catalog,
+      }).items.map((line) => line.medicineName);
+    expect(opened(rx)).toEqual(['Epriva Tab']);
+    expect(opened(null)).toEqual(['Flubolt 400']);
   });
 });
 

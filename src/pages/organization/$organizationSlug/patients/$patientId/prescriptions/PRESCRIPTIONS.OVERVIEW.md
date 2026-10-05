@@ -5,7 +5,9 @@ patient file (KICKOFF §6.6, D26; H:4753; `patient-file.md:34–46`). It renders
 column through the family's section frame (`../shared/components/PatientSection/`) — its title and, when the member may add one, the split "New …" + "⌄";
 the section's table (L-43b) on the family's `../shared/components/PatientSectionTable/` — the shared data table with selection and Export, folded columns on a tablet, rows with the key column on a phone, the footer count and "All … loaded", or the section's empty state: ID · Date · Medicines (the names over their directions) · Notes (hidden) · Doctor · Updated (hidden); a row opens Edit prescription; Print, Preview, Copy prescription, Sell medicines, Edit and Delete ("Delete this prescription?", Undo). Its URL-driven dialogs (L-45; `S:35–37`) render nothing — the section
 reads the URL (`../shared/hooks/usePatientRecordRoute/`) and opens them over itself: `create/` and
-`$prescriptionId/edit/` the Prescription drawer, `$prescriptionId/` the print preview. Writing one
+`$prescriptionId/edit/` the Prescription drawer, `$prescriptionId/` the print preview; `create/`
+takes `?medicines=` — the names the Overview's smart note recognised, each a line of the new Rx
+(AMBER A-F5). Writing one
 is the Doctor and Admin gate (`S:35, 37`; the Owner always passes) — anyone else following a create
 link lands back here with the permission toast, and reads an edit view only.
 

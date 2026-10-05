@@ -86,6 +86,49 @@ describe('useClinicalLists (updatePatient, S:1640)', () => {
     ).toBe('Tanning on face\nUneven skin tone\nDry patches');
   });
 
+  it('adds a smart note’s chips at once — each list written once, a chip it holds skipped', async () => {
+    const { result } = await renderLists();
+    const added: number[] = [];
+    act(() => {
+      added.push(
+        result.current.addAll([
+          { field: 'complaints', text: 'Hair fall' },
+          { field: 'complaints', text: 'tanning on face' },
+          { field: 'complaints', text: 'hair fall' },
+          { field: 'diagnosis', text: 'Melasma' },
+        ]),
+      );
+    });
+    expect(added).toEqual([2]);
+    expect(result.current.items('complaints')).toEqual([
+      'Tanning on face',
+      'Uneven skin tone',
+      'Hair fall',
+    ]);
+    expect([...result.current.fresh('complaints')]).toEqual(['Hair fall']);
+    expect([...result.current.fresh('diagnosis')]).toEqual(['Melasma']);
+    await waitFor(async () =>
+      expect(await savedComplaints()).toBe(
+        'Tanning on face\nUneven skin tone\nHair fall',
+      ),
+    );
+    expect((await clinicFixtures.patients.get(DHARTI)).diagnosis).toBe(
+      'Post-inflammatory hyperpigmentation\nMelasma',
+    );
+  });
+
+  it('adds nothing when the note holds only chips the lists have', async () => {
+    const { result } = await renderLists();
+    const added: number[] = [];
+    act(() => {
+      added.push(
+        result.current.addAll([{ field: 'complaints', text: 'UNEVEN SKIN TONE' }]),
+      );
+    });
+    expect(added).toEqual([0]);
+    expect(result.current.items('complaints')).toHaveLength(2);
+  });
+
   it('removes a chip — the last one leaves no note', async () => {
     const { result } = await renderLists();
     act(() => result.current.remove('futureSuggestions', 'Hydrafacial after 4 weeks'));

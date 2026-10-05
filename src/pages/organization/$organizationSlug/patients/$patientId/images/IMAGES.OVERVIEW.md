@@ -46,12 +46,14 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | `components/PhotoGrid/`                 | Day groups and tiles.                                                                        |
 | `shared/photo-looks.ts`                 | Album icons and tones, body-part tones, the S / M / L looks.                                 |
 | `shared/photo-view.ts`                  | Album and visit filtering, day groups, the filter's visits, stepping through a list.         |
-| `shared/components/PhotoThumb/`         | A photo, or its glyph when there is no file to show.                                         |
 | `shared/components/PhotoDeleteConfirm/` | "Delete this photo?" with its reasons and Undo.                                              |
 | `shared/hooks/usePhotoAccess/`          | What the member may do with the photos.                                                      |
 | `shared/hooks/usePhotoDayLabel/`        | "Today" / "24 Sep" / "24 Sep 2025".                                                          |
 | `shared/hooks/useMissingPhoto/`         | "Photo not found" for a photo that is gone.                                                  |
 | `$imageId/`                             | The photo viewer — see its overview.                                                         |
+
+A tile's photo is the family's `../shared/components/PhotoThumb/` (the Overview's Photos card
+and activity rows show it too).
 
 ## Test ids
 

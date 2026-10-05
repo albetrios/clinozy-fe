@@ -861,5 +861,68 @@
     "delete": "删除备注",
     "deleted": "已删除备注",
     "empty": "暂无备注"
+  },
+  "timeline": {
+    "open": "打开{{card}}",
+    "clinical": {
+      "suggested": "建议",
+      "later": "以后",
+      "smartLabel": "智能备注",
+      "smartPlaceholder": "智能备注 · 自然输入，例如 hair fall 2 months, suggest PRP",
+      "add": "添加",
+      "added_other": "已从备注中添加 {{count}} 项",
+      "nothing": "尚未识别到内容"
+    },
+    "visits": {
+      "empty": "暂无就诊"
+    },
+    "photos": {
+      "upload": "上传",
+      "empty": "暂无照片 · 上传第一张"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "next": "下次 · {{date}}",
+      "overdue": "第 {{session}} 次已逾期",
+      "done": "所有疗程已完成",
+      "use": "使用一次",
+      "empty": "暂无有效套餐"
+    },
+    "prescriptions": {
+      "title": "处方 {{number}}"
+    },
+    "treatments": {
+      "sub": "第 {{session}} 次 · {{date}}"
+    },
+    "billing": {
+      "due": "待付",
+      "paid": "已付",
+      "show": "显示金额",
+      "hide": "隐藏金额",
+      "invoice": "{{type}}发票 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "收款"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "团队备注",
+      "placeholder": "给团队写备注…",
+      "post": "发布"
+    },
+    "activity": {
+      "filtersLabel": "动态筛选",
+      "notes": "备注",
+      "filterTitle": "{{label}} · {{count}}",
+      "daysAgo_other": "{{count}} 天前",
+      "inDays_other": "{{count}} 天后",
+      "rx": "处方 {{number}} · {{medicines}}",
+      "treatment": "{{name}} · 第 {{session}} 次",
+      "received": "已收 {{amount}} · {{mode}}",
+      "refund": "退款 {{amount}} · {{mode}}",
+      "against": "对应 {{number}}",
+      "empty": "暂无动态"
+    }
   }
 }
