@@ -134,6 +134,13 @@ function recordOfMatch(found: TaskRuleMatch): CreateInput<TaskRecord> {
 }
 
 /**
+ * A rule task's id, from its rule key — the rule and the record it matched —
+ * so the job names the same task the same on every load: a reload or a shared
+ * `/tasks/<id>` link finds it again (the world reseeds on every page load).
+ */
+const ruleTaskId = (ruleKey: string) => fixtureUuid('rule-task', ruleKey);
+
+/**
  * Bring the stored tasks up to the rules: wake snoozes that ran out, close the
  * derived tasks whose record changed ("Done by Clinozy"), create the new
  * ones. Inside a write, `change` records it so that write's Undo reverses it —
@@ -184,7 +191,13 @@ export async function syncTaskRules(
       snoozeLabel: null,
     });
   }
-  for (const found of plan.create) await change.create(tasks, recordOfMatch(found));
+  for (const found of plan.create) {
+    const id = ruleTaskId(found.ruleKey);
+    // Reads run the job side by side (Today's queue and its Done list): another
+    // run may have made this task since the plan was drawn — make it once.
+    if (tasks.snapshot((task) => task.id === id).length > 0) continue;
+    await change.create(tasks, recordOfMatch(found), { id });
+  }
 }
 
 // ── Rows ──

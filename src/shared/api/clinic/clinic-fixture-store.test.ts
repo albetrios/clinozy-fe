@@ -128,6 +128,24 @@ describe('fixture collection', () => {
     expect(collection.snapshot()).toHaveLength(120);
   });
 
+  it('names a row by the id the caller derives: a live twin is a 409, a removed one gives way', async () => {
+    const collection = things();
+    const id = '00000000-0000-4000-8000-0000000000aa';
+    const created = await collection.create({ name: 'Named' }, { id });
+    expect(created.id).toBe(id);
+    expect((await collection.get(id)).name).toBe('Named');
+
+    const twin = await collection
+      .create({ name: 'Twin' }, { id })
+      .catch((caught: unknown) => caught);
+    expect(isHttpError(twin) && twin.status === 409).toBe(true);
+
+    await collection.remove(id, 'mistake', null);
+    await collection.create({ name: 'Again' }, { id });
+    expect((await collection.get(id)).name).toBe('Again');
+    expect(collection.snapshot((row) => row.id === id)).toHaveLength(1);
+  });
+
   it('invents no seq for an entity without a display id', async () => {
     type Plain = ClinicCommon & { id: string; name: string };
     const plain = createFixtureCollection<Plain>({

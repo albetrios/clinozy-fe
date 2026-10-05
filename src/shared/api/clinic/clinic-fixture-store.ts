@@ -142,7 +142,13 @@ export interface FixtureCollection<T extends Row> {
    * `includeDeleted` asks for a deleted one too (a restore's own checks).
    */
   get(id: string, options?: { includeDeleted?: boolean }): Promise<T>;
-  create(input: CreateInput<T>): Promise<T>;
+  /**
+   * A new row. `id` names a record whose identity the server derives — a rule
+   * task's, the same on every load, so a reload or a shared link finds it: a
+   * live row with that id is a 409, a removed one (an undone create) gives way
+   * to the new row. Omitted, the server mints one.
+   */
+  create(input: CreateInput<T>, options?: { id?: string }): Promise<T>;
   /**
    * Merge a patch into a live row. `stamp: false` leaves `updatedAt` alone — for
    * a per-viewer marker (a read receipt) that is no edit of the record.
@@ -211,12 +217,16 @@ export function createFixtureCollection<T extends Row>(options: {
       }
       return clone(row);
     },
-    async create(input) {
+    async create(input, { id = crypto.randomUUID() } = {}) {
       const stamp = now().toISOString();
       const seqs = all().map((row) => row.seq ?? 0);
+      const named = all().findIndex((candidate) => candidate.id === id);
+      if (named >= 0 && all()[named]?.deletedAt === null) {
+        throw clinicHttpError(409, 'conflict', `${options.resource} already exists`);
+      }
       const row = {
         ...input,
-        id: crypto.randomUUID(),
+        id,
         ...(sequenced() ? { seq: Math.max(0, ...seqs) + 1 } : {}),
         organizationId: FIXTURE_ORGANIZATION_ID,
         createdAt: stamp,
@@ -226,7 +236,8 @@ export function createFixtureCollection<T extends Row>(options: {
         deleteReason: null,
         deleteNote: null,
       } as unknown as T;
-      all().push(row);
+      if (named >= 0) all().splice(named, 1, row);
+      else all().push(row);
       return clone(row);
     },
     async update(id, patch, { stamp = true } = {}) {
@@ -275,6 +286,7 @@ export interface FixtureChange {
   create<T extends Row>(
     collection: FixtureCollection<T>,
     input: CreateInput<T>,
+    options?: { id?: string },
   ): Promise<T>;
   /** Reverse every recorded write, newest first. */
   reverse(): Promise<void>;
@@ -292,8 +304,8 @@ export function recordFixtureChange(): FixtureChange {
       undo.push(() => collection.update(id, restore));
       return collection.update(id, patch);
     },
-    async create(collection, input) {
-      const row = await collection.create(input);
+    async create(collection, input, options) {
+      const row = await collection.create(input, options);
       undo.push(() => collection.remove(row.id, 'mistake', null));
       return row;
     },

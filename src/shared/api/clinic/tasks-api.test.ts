@@ -208,6 +208,46 @@ describe('the drawer read', () => {
   });
 });
 
+describe('a rule task’s id', () => {
+  it('stays the same across a reload, so its link opens it again', async () => {
+    const before = await taskTitled('Reply to Anaya');
+    // A page load reseeds the fixture world and the job derives its tasks again.
+    resetClinicFixtures();
+    const after = await taskTitled('Reply to Anaya');
+    expect(after.id).toBe(before.id);
+    expect((await fetchTask(before.id)).task.title).toBe('Reply to Anaya');
+  });
+
+  it('is made once when two reads run the job side by side', async () => {
+    const [queue, done] = await Promise.all([
+      fetchTaskPage({ scope: 'everyone' }),
+      fetchTaskPage({ tab: 'done', scope: 'everyone' }),
+    ]);
+    expect(queue.rows.length).toBeGreaterThan(0);
+    expect(done.rows).toBeDefined();
+    const titlesNow = titles(await rowsOf({ scope: 'everyone' }));
+    expect(titlesNow.filter((title) => title === 'Reply to Anaya')).toHaveLength(1);
+  });
+
+  it('comes back as the same task when its rule matches again after an Undo', async () => {
+    clock(TODAY, '12:00');
+    const noShow = async () =>
+      recordTaskOutcome({
+        taskId: (await taskTitled('Has Priti arrived?')).id,
+        outcome: 'noShow',
+      });
+    const { undoToken } = await noShow();
+    const rebook = await taskTitled('Rebook Priti');
+    await undoTaskChange(undoToken);
+    expect(titles(await rowsOf({ scope: 'everyone' }))).not.toContain('Rebook Priti');
+
+    await noShow();
+    const again = await taskTitled('Rebook Priti');
+    expect(again.id).toBe(rebook.id);
+    expect((await fetchTask(again.id)).task.status).toBe('open');
+  });
+});
+
 describe('outcomes', () => {
   it('closes with the result and the note, writes the lead, and leaves a line on its chat', async () => {
     const anaya = await taskTitled('Reply to Anaya');
