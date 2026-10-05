@@ -36,8 +36,10 @@ shared status move (`useSetAppointmentStatus`, optimistic, Undo reverts its side
 plan-only, `src/shared/api/clinic/visits-*`); "Open session" and "Checkout" open the patient's
 own page with the visit flow (`patients/$patientId/timeline?visit=open&from=today`, §6.6) — the
 Rx, the session, the bill and the collection are written there, each moving the visit on (the
-card changes lane), and the flow's Pause / Complete visit come back here, focus on the card's
-action (`today.focus.ts`). The Visit sheet (`/visits/$visitId`) is gone (L-64): an old link
+card changes lane: a receipt at Checkout sends a visit whose Rx is still to fill to the pharmacy,
+its booking completed, so the sale takes the card off the floor, and completes one paid in full
+with nothing to fill), and the flow's Pause / Complete visit (or that Collect) come back here,
+focus on the card's action (`today.focus.ts`). The Visit sheet (`/visits/$visitId`) is gone (L-64): an old link
 redirects to the visit's patient page. A failed read toasts "Couldn’t load this list ·
 connection dropped. Showing the last copy." with Retry and keeps the last copy; the first load
 wears the in-place skeleton.

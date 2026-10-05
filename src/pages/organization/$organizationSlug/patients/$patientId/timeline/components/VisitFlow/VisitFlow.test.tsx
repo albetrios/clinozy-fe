@@ -211,6 +211,36 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow, D18; H:758–768)', () => {
     expect(notifyMock.success).toHaveBeenLastCalledWith('₹ •••• received by Cash');
   });
 
+  it('opened from Today: a Collect that pays the bill in full ends the visit and goes back to Today (D18, S:352)', async () => {
+    // Ishita is at Checkout with her bill (#791) and nothing to fill.
+    const ISHITA = patientRef('Ishita Vora');
+    const user = userEvent.setup();
+    const { router } = renderPatientFile(
+      patientFileUrl(ISHITA, '/timeline?visit=open&from=today'),
+      { role: 'owner' },
+    );
+    await user.click(await screen.findByTestId('visit-flow-custom-invoice'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/invoices/create'),
+    );
+    // The custom invoice closes back into the flow, Today still its way back.
+    expect(router.state.location.search).toMatchObject({
+      from: `patients/${ISHITA}/timeline?visit=open&from=today`,
+    });
+    await router.navigate({
+      href: patientFileUrl(ISHITA, '/timeline?visit=open&from=today'),
+    });
+
+    await user.click(await screen.findByTestId('visit-flow-collect-upi'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/today'),
+    );
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      expect.stringMatching(/ received by UPI$/),
+    );
+    expect((await fetchVisit(ref.visit(2864))).visit.stage).toBe('done');
+  });
+
   it('shares the visit, then completes it and goes back to the Overview', async () => {
     const { user, router } = openFlow(DHRUV, 'owner');
     await user.click(await screen.findByTestId('visit-flow-share'));

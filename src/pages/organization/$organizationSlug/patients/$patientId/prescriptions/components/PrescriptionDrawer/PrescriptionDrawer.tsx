@@ -7,6 +7,7 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Prescription, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type { RxCatalog } from '@/shared/api/clinic/prescriptions-api.ts';
+import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import {
   type DrawerStep,
   drawerStepSummary,
@@ -158,9 +159,10 @@ export interface PrescriptionDrawerProps {
    * a new Rx is tied to the open visit's booking — Today's pharmacy lane and
    * Medical's "Prescriptions to fill" — its save reads "Approve · print · send
    * to pharmacy", and the saved Rx prints on A4 before the drawer closes; the
-   * visit moves on (the server's rule, `advanceVisitAfter`).
+   * visit moves on (the server's rule, `advanceVisitAfter`). "Save & sell"
+   * keeps the flow behind the sale (`fromToday`: Today opened the flow).
    */
-  visit?: { appointmentId: string | null };
+  visit?: { appointmentId: string | null; fromToday: boolean };
   onClose: () => void;
 }
 
@@ -279,7 +281,9 @@ export function PrescriptionDrawer({
     onDone: useRxDone({
       editing: prescription !== null,
       approving,
-      patientId: patient.id,
+      sellFrom: visit
+        ? visitFlowReferrer(patient.id, visit.fromToday)
+        : `patients/${patient.id}/prescriptions`,
       print: printRx,
       onClose,
     }),
@@ -292,7 +296,7 @@ export function PrescriptionDrawer({
       appointmentId: prescription.appointmentId,
       followUpDate: prescription.followUpDate,
     });
-    printRx({ ...prescription, ...input });
+    void printRx({ ...prescription, ...input });
   };
 
   return (

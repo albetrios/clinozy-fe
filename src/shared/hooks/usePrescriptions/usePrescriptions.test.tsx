@@ -6,11 +6,16 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type { PrescriptionInput } from '@/shared/api/clinic/prescriptions-api.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
+import {
+  type PrescriptionInput,
+  prescriptionQueryKeys,
+} from '@/shared/api/clinic/prescriptions-api.ts';
 
 import {
   useCreatePrescription,
   useDeletePrescription,
+  useLoadRxSheetContext,
   usePatientPrescriptions,
   usePrescription,
   useRestorePrescription,
@@ -120,6 +125,29 @@ describe('usePrescriptions', () => {
     const id = result.current.list.data?.[0]?.id ?? '';
     const one = renderHook(() => usePrescription(id), { wrapper });
     await waitFor(() => expect(one.result.current.data?.seq).toBe(497));
+  });
+
+  it('refreshes Medical’s “Prescriptions to fill” after a new prescription and a delete', async () => {
+    // Medical's list sits under the room's prefix (`useMedicalFlows`), fresh for 5 minutes.
+    const toFill = [...MEDICAL_ROOM_QUERY_KEY, 'prescriptions-to-fill'];
+    const { result } = renderHook(useRxProbe, { wrapper });
+    client.setQueryData(toFill, []);
+    const saved = await act(() => result.current.create.mutateAsync(INPUT));
+    expect(client.getQueryState(toFill)?.isInvalidated).toBe(true);
+
+    client.setQueryData(toFill, []);
+    await act(() =>
+      result.current.remove.mutateAsync({ id: saved.id, reason: 'mistake', note: null }),
+    );
+    expect(client.getQueryState(toFill)?.isInvalidated).toBe(true);
+  });
+
+  it('loads the sheet’s context on demand, keeping it for the hook', async () => {
+    const doctor = staffRef('DD');
+    const { result } = renderHook(useLoadRxSheetContext, { wrapper });
+    const sheet = await act(() => result.current(DHARTI, doctor));
+    expect(sheet.doctor?.firstName).toBe('Dr. Drashti');
+    expect(client.getQueryData(prescriptionQueryKeys.sheet(DHARTI, doctor))).toBe(sheet);
   });
 
   it('stays idle without a patient or a prescription', () => {

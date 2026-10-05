@@ -6,8 +6,8 @@ import {
   recordFixtureChange,
   validateClinicInput,
 } from '@/shared/api/clinic/clinic-fixture-store.ts';
-import { invoiceBalance, invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
-import type { Prescription, Treatment } from '@/shared/api/clinic/clinic-schema.ts';
+import { invoiceBalance } from '@/shared/api/clinic/clinic-money.ts';
+import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   clinicClockTime,
   clinicInstant,
@@ -288,28 +288,6 @@ const isFilled = (prescriptionId: string) =>
     (sale) => sale.voidedAt === null && sale.prescriptionId === prescriptionId,
   ).length > 0;
 
-/** What the patient still owes on invoices other than this visit's, and the oldest of them. */
-function previousDueOf(visit: VisitRecord): VisitDetail['previousDue'] {
-  if (!visit.patientId) return { amount: 0, invoice: null };
-  const payments = clinicFixtures.payments.snapshot();
-  const open = clinicFixtures.invoices
-    .snapshot(
-      (invoice) =>
-        invoice.patientId === visit.patientId && invoice.id !== visit.invoiceId,
-    )
-    .map((invoice) => ({ invoice, due: invoiceBalance(invoice, payments).due }))
-    .filter((row) => row.due > 0)
-    .sort(
-      (a, b) =>
-        compareText(a.invoice.date, b.invoice.date) || a.invoice.seq - b.invoice.seq,
-    );
-  const oldest = open[0]?.invoice;
-  return {
-    amount: open.reduce((sum, row) => sum + row.due, 0),
-    invoice: oldest ? { id: oldest.id, seq: oldest.seq, type: oldest.type } : null,
-  };
-}
-
 /** The stages a session can still be due in — from Checkout on, the session question is closed. */
 const SESSION_STAGES: ReadonlySet<VisitStage> = new Set([
   'waiting',
@@ -347,26 +325,6 @@ function recordsOf({ patientId }: VisitRecord) {
   };
 }
 
-/** The patient as the visit reads them. */
-function visitPatientOf(
-  patient: ReturnType<typeof recordsOf>['patient'],
-): VisitDetail['patient'] {
-  if (!patient) return null;
-  const { id, seq, firstName, lastName, gender, dateOfBirth, phone, consents } = patient;
-  return {
-    id,
-    seq,
-    firstName,
-    lastName,
-    gender,
-    dateOfBirth,
-    phone,
-    consents,
-    leadId: patient.leadId,
-    createdAt: patient.createdAt,
-  };
-}
-
 /** The session before today's — "Last session" and the settings it remembers. */
 function lastTreatmentOf(
   visit: VisitRecord,
@@ -380,35 +338,18 @@ function lastTreatmentOf(
   return earlier.sort((a, b) => compareText(b.performedAt, a.performedAt))[0] ?? null;
 }
 
-/** The last Rx before this visit's — "Copy <date> prescription". */
-function lastPrescriptionOf(
-  visit: VisitRecord,
-  prescriptions: readonly Prescription[],
-  prescription: Prescription | null,
-): Prescription | null {
-  const earlier = prescriptions.filter(
-    (row) => row.id !== prescription?.id && !atVisit(visit, row),
-  );
-  return earlier.sort((a, b) => compareText(b.date, a.date) || b.seq - a.seq)[0] ?? null;
-}
-
-/** The visit's bill: its invoice's lines and due once billed, else the lines it pulls and their total. */
+/** The visit's bill: its invoice and that invoice's lines once billed, else the lines it pulls. */
 function billOf(
   visit: VisitRecord,
   booking: AppointmentRow | null,
   treatment: Treatment | null,
   pack: VisitPack | null,
-): Pick<VisitDetail, 'invoice' | 'billLines' | 'billDue'> {
+): Pick<VisitDetail, 'invoice' | 'billLines'> {
   const invoice = visit.invoiceId
     ? clinicFixtures.invoices.snapshot((row) => row.id === visit.invoiceId)[0]
     : undefined;
-  if (invoice) {
-    const { due } = invoiceBalance(invoice, clinicFixtures.payments.snapshot());
-    return { invoice, billLines: linesOfInvoice(invoice), billDue: due };
-  }
-  const billLines = billLinesOf(booking, treatment, pack);
-  const { bill } = invoiceTotals({ items: billLines, overallDiscount: 0 });
-  return { invoice: null, billLines, billDue: bill };
+  if (invoice) return { invoice, billLines: linesOfInvoice(invoice) };
+  return { invoice: null, billLines: billLinesOf(booking, treatment, pack) };
 }
 
 /** The visit as the file's flow reads it (`getVisit`). */
@@ -427,16 +368,13 @@ async function detailOf(visit: VisitRecord): Promise<VisitDetail> {
       patientId: visit.patientId,
       leadId: visit.leadId,
     },
-    patient: visitPatientOf(patient),
     pack,
     sessionDue: sessionDueAt(visit, booking, treatment, pack),
     treatment,
     lastTreatment: lastTreatmentOf(visit, treatments, treatment),
     prescription,
-    lastPrescription: lastPrescriptionOf(visit, prescriptions, prescription),
     rxToFill: prescription !== null && !isFilled(prescription.id),
     ...billOf(visit, booking, treatment, pack),
-    previousDue: previousDueOf(visit),
   };
 }
 
@@ -534,7 +472,6 @@ function newVisitFields(
     stage: 'waiting' as const,
     stageAt: new Date().toISOString(),
     checks: NO_VISIT_CHECKS,
-    note: null,
     prescriptionId: null,
     treatmentId: null,
     invoiceId: null,
@@ -643,10 +580,10 @@ export async function createVisitBill(
  * Move the patient's open visit on after a record written at it (D18: the
  * stage follows the records, `S:352` — what the Visit sheet's tabs did, now
  * the file's own drawers and flow): the Rx to Treatment when a session is due,
- * else to Checkout; the session to Checkout; a receipt at Checkout to the
- * pharmacy while the visit's Rx is still to fill. Never back (`stageAfter`),
- * never a visit that is done, and a record the visit doesn't hold moves
- * nothing. The Rx, treatment and receipt writes call it after their own write.
+ * else to Checkout; the session to Checkout; a receipt at Checkout closes it
+ * (`closeAfterReceipt`). Never back (`stageAfter`), never a visit that is
+ * done, and a record the visit doesn't hold moves nothing. The Rx, treatment
+ * and receipt writes call it after their own write.
  */
 export async function advanceVisitAfter(
   patientId: string,
@@ -655,17 +592,37 @@ export async function advanceVisitAfter(
   const visit = await getOpenVisit(patientId);
   if (!visit) return null;
   const detail = await detailOf(visit);
+  if (kind === 'payment') return closeAfterReceipt(visit, detail);
   let target: VisitStage | null = null;
   if (kind === 'prescription' && detail.prescription) {
     target = detail.sessionDue ? 'treatment' : 'checkout';
   } else if (kind === 'treatment' && detail.treatment) {
     target = 'checkout';
-  } else if (kind === 'payment' && visit.stage === 'checkout' && detail.rxToFill) {
-    target = 'pharmacy';
   }
   if (!target) return visit;
   const stage = stageAfter(visit.stage, target);
   return stage === visit.stage ? visit : saveVisit(visit, { stage });
+}
+
+/**
+ * A receipt at Checkout (D18, `S:352`; what the Visit sheet's Receive did,
+ * `today.md:110–121`): the visit goes to the pharmacy while its Rx is still to
+ * fill — a part payment too, its balance a due — else it is done once its bill
+ * is paid in full; either way it closes and its booking completes, so Today's
+ * pharmacy card leaves the floor once the Rx is sold. A part payment with
+ * nothing to fill leaves it at Checkout for "Complete visit"; a receipt at any
+ * other stage moves nothing.
+ */
+async function closeAfterReceipt(
+  visit: VisitRecord,
+  detail: VisitDetail,
+): Promise<VisitRecord> {
+  if (visit.stage !== 'checkout') return visit;
+  if (detail.rxToFill) return closeVisit(visit, 'pharmacy');
+  const settled =
+    detail.invoice !== null &&
+    invoiceBalance(detail.invoice, clinicFixtures.payments.snapshot()).due === 0;
+  return settled ? finishVisit(visit, detail) : visit;
 }
 
 /**
@@ -683,27 +640,37 @@ async function closeVisit(visit: VisitRecord, stage: VisitStage): Promise<VisitR
 }
 
 /**
- * "✓ Complete visit" (`completeVisit`, Appendix F): the visit done and its
- * booking completed; a session today out of a package used that session (it
- * was counted when recorded), and the visit's Rx follow-up becomes the
- * patient's. Answers what happened, for the toast.
+ * End a visit (D18) — "✓ Complete visit", or a receipt that pays its bill in
+ * full with nothing to fill: done, its booking completed, and the visit's Rx
+ * follow-up the patient's.
  */
-export async function completeVisit(raw: CompleteVisitInput): Promise<VisitCompletion> {
-  const input = validateClinicInput(completeVisitInputSchema, raw);
-  const visit = await visitOf(input.visitId);
-  refuseDone(visit);
-  const detail = await detailOf(visit);
+async function finishVisit(
+  visit: VisitRecord,
+  detail: VisitDetail,
+): Promise<VisitRecord> {
   const followUpDate = detail.prescription?.followUpDate ?? null;
   if (followUpDate && visit.patientId) {
     await clinicFixtures.patients.update(visit.patientId, {
       followUpAt: clinicInstant(followUpDate, clinicClockTime(new Date())),
     });
   }
-  const closed = await closeVisit(visit, 'done');
+  return closeVisit(visit, 'done');
+}
+
+/**
+ * "✓ Complete visit" (`completeVisit`, Appendix F): the visit ends
+ * (`finishVisit`); a session today out of a package used that session (it was
+ * counted when recorded). Answers what happened, for the toast.
+ */
+export async function completeVisit(raw: CompleteVisitInput): Promise<VisitCompletion> {
+  const input = validateClinicInput(completeVisitInputSchema, raw);
+  const visit = await visitOf(input.visitId);
+  refuseDone(visit);
+  const detail = await detailOf(visit);
   return {
-    visit: closed,
+    visit: await finishVisit(visit, detail),
     packageSessionUsed: detail.treatment?.packageId != null,
-    followUpDate,
+    followUpDate: detail.prescription?.followUpDate ?? null,
   };
 }
 

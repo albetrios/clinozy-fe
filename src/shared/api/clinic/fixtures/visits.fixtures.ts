@@ -28,8 +28,8 @@ interface VisitRow {
  * doctor ("In room 9 min" at 10:42), Dhruv in his laser session, Ishita at
  * checkout (her bill of 10:30, `PY_INV` #791) and Harsh at the pharmacy (his
  * Rx #501 approved at 10:05). Rhea, Nikhil and Meera are checked in with no
- * visit record yet — Waiting. No safety check is ticked and no consult note
- * is kept: the prototype has neither for them.
+ * visit record yet — Waiting. No safety check is ticked: the prototype has
+ * none for them.
  */
 const VISIT_ROWS: readonly VisitRow[] = [
   { appointment: 2866, stage: 'with_doctor', since: 'Today · 10:33' },
@@ -56,7 +56,6 @@ export function visitSeed(today: string = clinicToday()): VisitRecord[] {
       stage: row.stage,
       stageAt: since,
       checks: NO_VISIT_CHECKS,
-      note: null,
       prescriptionId: row.prescription ? ref.prescription(row.prescription) : null,
       treatmentId: null,
       invoiceId: row.invoice ? ref.invoice(row.invoice) : null,

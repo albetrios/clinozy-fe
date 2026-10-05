@@ -103,7 +103,11 @@ function RxDrawerHost({
       canDelete={canDelete}
       today={today}
       medicines={prescription ? undefined : search.medicines}
-      visit={flow.visit ? { appointmentId: flow.visit.appointmentId } : undefined}
+      visit={
+        flow.visit
+          ? { appointmentId: flow.visit.appointmentId, fromToday: flow.fromToday }
+          : undefined
+      }
       onClose={flow.visit ? flow.backToFlow : onClose}
     />
   );

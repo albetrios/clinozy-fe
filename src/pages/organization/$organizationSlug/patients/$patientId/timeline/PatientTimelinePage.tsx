@@ -1,13 +1,15 @@
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
+import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useOpenVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import type { PatientFileSearch } from '../patient-id.search.ts';
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
+import { useVisitFlowReturn } from '../shared/hooks/useVisitFlowReturn/index.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import { ActivityTimeline } from './components/ActivityTimeline/index.ts';
 import { OverviewBento } from './components/OverviewBento/index.ts';
@@ -19,21 +21,35 @@ import {
 import { manifest } from './timeline.manifest.ts';
 
 /**
- * `?visit=open` without an open visit drops the param and leaves the Overview
- * (KICKOFF §6.6: a deep link never starts a visit — navigation never mutates).
+ * `?visit=open` without an open visit (`gone`). A stale link drops the param
+ * and leaves the Overview (KICKOFF §6.6: a deep link never starts a visit —
+ * navigation never mutates). A visit that ends under the flow — "✓ Complete
+ * visit", or a Collect that pays its bill in full with nothing to fill (D18) —
+ * leaves the flow the way it came: Today when Today's card opened it.
  */
-function useDropStaleVisitParam(stale: boolean) {
+function useFlowExit(visit: VisitRecord | null, gone: boolean) {
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
+  const { leaveFlow } = useVisitFlowReturn();
+  const shown = useRef(false);
   useEffect(() => {
-    if (!stale) return;
+    if (visit) {
+      shown.current = true;
+      return;
+    }
+    if (!gone) return;
+    if (shown.current) {
+      shown.current = false;
+      leaveFlow();
+      return;
+    }
     void navigate({
       ...organizationPatientSection(organizationSlug, patientId, 'timeline'),
       search: {},
       replace: true,
     });
-  }, [stale, navigate, organizationSlug, patientId]);
+  }, [visit, gone, leaveFlow, navigate, organizationSlug, patientId]);
 }
 
 /**
@@ -51,7 +67,7 @@ export function PatientTimelinePage() {
   const wantsFlow = search.visit === 'open';
   const open = useOpenVisit(wantsFlow ? patientId : '');
   const visit = wantsFlow ? (open.data ?? null) : null;
-  useDropStaleVisitParam(wantsFlow && open.isSuccess && visit === null);
+  useFlowExit(visit, wantsFlow && open.isSuccess && visit === null);
 
   let body = (
     <div className="px-(--table-pad-x) pt-4 pb-24">

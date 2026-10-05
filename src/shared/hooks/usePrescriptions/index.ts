@@ -3,6 +3,7 @@ export {
   type PrescriptionUpdateVars,
   useCreatePrescription,
   useDeletePrescription,
+  useLoadRxSheetContext,
   usePatientPrescriptions,
   usePrescription,
   useRestorePrescription,

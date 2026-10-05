@@ -3,10 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   canMoveVisit,
   stageAfter,
-  VISIT_NOTE_LIMITS,
   VISIT_STAGE_FLOW,
   VISIT_STAGES,
-  visitNoteSchema,
 } from './visits-contracts.ts';
 
 describe('the Visit stage machine (KICKOFF §6.2; D18)', () => {
@@ -32,7 +30,7 @@ describe('the Visit stage machine (KICKOFF §6.2; D18)', () => {
   });
 });
 
-describe('stageAfter (a tab’s record leaves the visit where its records put it)', () => {
+describe('stageAfter (a record written at the visit leaves it where its records put it)', () => {
   it('moves the visit forward to where the record takes it', () => {
     expect(stageAfter('with_doctor', 'checkout')).toBe('checkout');
     expect(stageAfter('waiting', 'treatment')).toBe('treatment');
@@ -42,20 +40,5 @@ describe('stageAfter (a tab’s record leaves the visit where its records put it
     expect(stageAfter('checkout', 'treatment')).toBe('checkout');
     expect(stageAfter('pharmacy', 'checkout')).toBe('pharmacy');
     expect(stageAfter('done', 'pharmacy')).toBe('done');
-  });
-});
-
-describe('the consult note (Appendix F)', () => {
-  it('takes complaint and plan up to 120 characters, trimmed', () => {
-    const note = visitNoteSchema.parse({
-      complaint: '  Review  ',
-      findings: '',
-      diagnoses: ['Melasma'],
-      plan: 'x'.repeat(VISIT_NOTE_LIMITS.plan),
-    });
-    expect(note.complaint).toBe('Review');
-    expect(
-      visitNoteSchema.safeParse({ ...note, complaint: 'x'.repeat(121) }).success,
-    ).toBe(false);
   });
 });

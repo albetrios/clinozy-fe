@@ -2,13 +2,8 @@ import {
   fetchPatientFile,
   patientFileQueryKeys,
 } from '@/shared/api/clinic/patient-file-api.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-
-/** A 404 — the patient is unknown or deleted; asking again won't change it. */
-export function isPatientFileMissing(error: unknown): boolean {
-  return isHttpError(error) && error.status === 404;
-}
 
 /**
  * One patient's file — the record and the rail facts (`getPatient`, `S:1629`;
@@ -22,7 +17,7 @@ export function usePatientFile(patientId: string | undefined) {
     queryKey: patientFileQueryKeys.detail(patientId ?? ''),
     queryFn: () => fetchPatientFile(patientId ?? ''),
     enabled: Boolean(patientId),
-    retry: (failures, error) => !isPatientFileMissing(error) && failures < 2,
+    retry: (failures, error) => !isNotFound(error) && failures < 2,
     // The file renders this failure itself (see above).
     notifyOnError: false,
   });

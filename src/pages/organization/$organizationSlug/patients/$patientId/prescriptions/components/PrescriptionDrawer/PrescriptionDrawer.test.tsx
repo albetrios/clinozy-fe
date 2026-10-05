@@ -9,6 +9,7 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as PrescriptionsApi from '@/shared/api/clinic/prescriptions-api.ts';
 import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -42,6 +43,21 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
   PRINTING_ATTRIBUTE: 'data-printing',
 }));
 
+/** Holds the print sheet's read while a test sets it, to print before it lands. */
+const sheetGate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
+vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof PrescriptionsApi>();
+  return {
+    ...actual,
+    fetchRxSheetContext: async (
+      ...args: Parameters<typeof actual.fetchRxSheetContext>
+    ) => {
+      await sheetGate.hold;
+      return actual.fetchRxSheetContext(...args);
+    },
+  };
+});
+
 const DHARTI = patientRef('Dharti Galani');
 const RX_497 = ref.prescription(497);
 const url = (rest: string) => patientFileUrl(DHARTI, `/prescriptions${rest}`);
@@ -63,6 +79,7 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockClear();
+  sheetGate.hold = null;
   resetClinicFixtures();
 });
 afterEach(() => {
@@ -135,6 +152,46 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
       const visit = await fetchVisit(ref.visit(2866));
       expect(visit.visit.stage).toBe('checkout');
       expect(visit.rxToFill).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('in the visit flow, Save & sell prints once the sheet is read and keeps the flow behind the sale (L-64)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
+    resetClinicFixtures();
+    try {
+      const SANA = patientRef('Sana Kapoor');
+      let release: () => void = () => undefined;
+      sheetGate.hold = new Promise((resolve) => {
+        release = resolve;
+      });
+      const user = userEvent.setup();
+      const { router } = renderPatientFile(
+        patientFileUrl(SANA, '/prescriptions/create?visit=open&from=today'),
+        { role: 'doctor' },
+      );
+      const drawer = await screen.findByTestId('rx-drawer');
+      await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
+      await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe(
+          '/organization/acme/medical/sales/create',
+        ),
+      );
+      const [written] = clinicFixtures.prescriptions
+        .snapshot((rx) => rx.patientId === SANA)
+        .sort((a, b) => b.seq - a.seq);
+      // The sale closes back into the flow, Today still its way back.
+      expect(router.state.location.search).toEqual({
+        prescription: written?.id,
+        from: `patients/${SANA}/timeline?visit=open&from=today`,
+      });
+      // The sheet is still being read: the print waits for it rather than skipping.
+      expect(printMock).not.toHaveBeenCalled();
+      release();
+      await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
     } finally {
       vi.useRealTimers();
     }

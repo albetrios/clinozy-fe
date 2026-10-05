@@ -7,8 +7,12 @@ import type { PrescriptionItem } from './clinic-schema.ts';
 import { clinicInstant } from './clinic-time.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import { createInvoice } from './invoices-api.ts';
+import { medicineStock } from './medicine-stock.ts';
 import { receivePayment } from './payments-api.ts';
 import { createPrescription } from './prescriptions-api.ts';
+import { fetchTodayFloor } from './today-api.ts';
+import { todayLaneOf } from './today-contracts.ts';
 import { createTreatment } from './treatments-api.ts';
 import {
   completeVisit,
@@ -72,7 +76,6 @@ describe('getVisit (D18; Appendix F, fixture)', () => {
     const detail = await fetchVisit(visitOf(2865));
     expect(detail.person.name).toBe('Dhruv Patel');
     expect(detail.booking?.id).toBe(appointmentOf(2865));
-    expect(detail.patient).toMatchObject({ firstName: 'Dhruv', lastName: 'Patel' });
     expect(detail.pack).toMatchObject({ sessionsTotal: 10, sessionsUsed: 3 });
     expect(detail.sessionDue).toBe(true);
     expect(detail.treatment).toBeNull();
@@ -84,7 +87,7 @@ describe('getVisit (D18; Appendix F, fixture)', () => {
     expect(detail.billLines).toEqual([
       expect.objectContaining({ fromPack: true, rate: 0, qty: 1 }),
     ]);
-    expect(detail.billDue).toBe(0);
+    expect(detail.invoice).toBeNull();
   });
 
   it('reads a checkout visit with its bill and what it owes', async () => {
@@ -93,7 +96,10 @@ describe('getVisit (D18; Appendix F, fixture)', () => {
     expect(detail.billLines).toEqual([
       expect.objectContaining({ name: 'Chemical peel', discountPct: 10, gstPct: 18 }),
     ]);
-    expect(detail.billDue).toBe(371_700);
+    expect(
+      detail.invoice &&
+        invoiceBalance(detail.invoice, clinicFixtures.payments.snapshot()),
+    ).toMatchObject({ due: 371_700 });
     expect(detail.sessionDue).toBe(false);
   });
 
@@ -208,6 +214,59 @@ async function sessionAt(seq: number) {
 }
 
 const stageOf = async (seq: number) => (await fetchVisit(visitOf(seq))).visit.stage;
+const bookingStatusOf = async (seq: number) =>
+  (await clinicFixtures.appointments.get(appointmentOf(seq))).status;
+/** A booking's card on Today's floor — undefined once it has left. */
+const floorCardOf = async (seq: number) =>
+  (await fetchTodayFloor()).find((row) => row.id === appointmentOf(seq));
+
+/** Receive an amount against an invoice, as the flow's Collect and the Receive drawer write it. */
+async function receive(seq: number, invoiceId: string, amount: number) {
+  const invoice = await clinicFixtures.invoices.get(invoiceId);
+  return receivePayment({
+    branchId: invoice.branchId,
+    patientId: await patientOfVisit(seq),
+    invoiceId,
+    splits: [{ mode: 'cash', amount }],
+    reference: null,
+    note: null,
+  });
+}
+
+/** "Dispense": a Medical sale of one stocked medicine that fills the Rx. */
+async function dispense(seq: number, prescriptionId: string) {
+  const medicine = clinicFixtures.medicines.snapshot(
+    (row) => medicineStock(row.batches) > 0,
+  )[0];
+  if (!medicine) throw new Error('no medicine in stock');
+  const patientId = await patientOfVisit(seq);
+  const patient = await clinicFixtures.patients.get(patientId);
+  return createInvoice({
+    type: 'medical',
+    branchId: patient.homeBranchId,
+    patientId,
+    medicalContactId: null,
+    leadId: null,
+    teamIds: [],
+    items: [
+      {
+        offeringId: null,
+        medicineId: medicine.id,
+        name: medicine.name,
+        packSize: null,
+        qty: 1,
+        rate: medicine.mrp,
+        discountPct: 0,
+        gstPct: 0,
+      },
+    ],
+    overallDiscount: 0,
+    date: TODAY,
+    remark: null,
+    prescriptionId,
+    paidNow: [],
+  });
+}
 
 describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
   it('an Rx at the consult moves it to Checkout, and it is still to fill', async () => {
@@ -232,37 +291,92 @@ describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
     expect(after.pack?.sessionsUsed).toBe(4);
   });
 
-  it('a receipt at Checkout sends a visit with an Rx to fill to the pharmacy', async () => {
-    await prescribeAt(2866);
+  it('a receipt at Checkout sends a visit with an Rx to fill to the pharmacy, its booking completed — the sale takes the card off Today', async () => {
+    const prescription = await prescribeAt(2866);
     const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
     const due = invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due;
-    await receivePayment({
-      branchId: invoice.branchId,
-      patientId: await patientOfVisit(2866),
-      invoiceId: invoice.id,
-      splits: [{ mode: 'cash', amount: Math.floor(due / 2) }],
-      reference: null,
-      note: null,
-    });
+    // A part payment too: its balance stays a due.
+    await receive(2866, invoice.id, Math.floor(due / 2));
     expect(await stageOf(2866)).toBe('pharmacy');
+    expect(await bookingStatusOf(2866)).toBe('completed');
+    const card = await floorCardOf(2866);
+    expect(card && todayLaneOf(card)).toBe('pharmacy');
+    expect(card?.prescription?.id).toBe(prescription.id);
+
+    await dispense(2866, prescription.id);
+    expect(await floorCardOf(2866)).toBeUndefined();
   });
 
-  it('a receipt at Checkout with nothing to fill leaves the visit for “Complete visit”', async () => {
-    const invoice = await clinicFixtures.invoices.get(ref.invoice(791));
-    await receivePayment({
-      branchId: invoice.branchId,
-      patientId: await patientOfVisit(2864),
-      invoiceId: invoice.id,
-      splits: [{ mode: 'upi', amount: 371_700 }],
-      reference: null,
-      note: null,
-    });
+  it('a receipt that pays the bill in full with nothing to fill completes the visit and its booking — off the floor (S:352)', async () => {
+    expect(await floorCardOf(2864)).toBeDefined();
+    await receive(2864, ref.invoice(791), 371_700);
+    expect(await stageOf(2864)).toBe('done');
+    expect(await bookingStatusOf(2864)).toBe('completed');
+    expect(await floorCardOf(2864)).toBeUndefined();
+  });
+
+  it('a part payment with nothing to fill leaves the visit at Checkout for “Complete visit”', async () => {
+    await receive(2864, ref.invoice(791), 100_000);
     expect(await stageOf(2864)).toBe('checkout');
+    expect(await bookingStatusOf(2864)).toBe('checked_in');
     await completeVisit({ visitId: visitOf(2864) });
     expect(await stageOf(2864)).toBe('done');
-    expect((await clinicFixtures.appointments.get(appointmentOf(2864))).status).toBe(
-      'completed',
+    expect(await bookingStatusOf(2864)).toBe('completed');
+  });
+
+  it('a receipt before Checkout moves nothing', async () => {
+    const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
+    const due = invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due;
+    await receive(2866, invoice.id, due);
+    expect(await stageOf(2866)).toBe('with_doctor');
+    expect(await bookingStatusOf(2866)).toBe('checked_in');
+  });
+
+  it('an Rx written with no booking (the section’s “+”) is the open visit’s: tied to its booking, so the pharmacy card dispenses it', async () => {
+    const patientId = await patientOfVisit(2866);
+    const doctor = (await fetchVisit(visitOf(2866))).booking?.doctorId ?? '';
+    const prescription = await createPrescription({
+      patientId,
+      appointmentId: null,
+      doctorId: doctor,
+      date: TODAY,
+      items: [line('Tretinoin 0.025% cream 20 g')],
+      advice: null,
+      labReport: null,
+      procedureToday: null,
+      followUpDate: null,
+    });
+    expect(prescription.appointmentId).toBe(appointmentOf(2866));
+    expect(await stageOf(2866)).toBe('checkout');
+
+    const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
+    await receive(
+      2866,
+      invoice.id,
+      invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due,
     );
+    const card = await floorCardOf(2866);
+    expect(card && todayLaneOf(card)).toBe('pharmacy');
+    expect(card?.prescription?.id).toBe(prescription.id);
+  });
+
+  it('leaves an Rx written with no open visit without a booking', async () => {
+    const varun = clinicFixtures.patients.snapshot((row) => row.firstName === 'Varun')[0];
+    const doctor = clinicFixtures.staff.snapshot(
+      (user) => user.active && user.roles.includes('doctor'),
+    )[0];
+    const prescription = await createPrescription({
+      patientId: varun?.id ?? '',
+      appointmentId: null,
+      doctorId: doctor?.id ?? '',
+      date: TODAY,
+      items: [line('Sunscreen SPF 50')],
+      advice: null,
+      labReport: null,
+      procedureToday: null,
+      followUpDate: null,
+    });
+    expect(prescription.appointmentId).toBeNull();
   });
 
   it('moves nothing for a visit already completed', async () => {

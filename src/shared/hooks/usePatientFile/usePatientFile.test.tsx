@@ -8,8 +8,9 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { isNotFound } from '@/shared/errors/HttpError.ts';
 
-import { isPatientFileMissing, usePatientFile } from './usePatientFile.ts';
+import { usePatientFile } from './usePatientFile.ts';
 
 const DHARTI = patientRef('Dharti Galani');
 
@@ -43,7 +44,7 @@ describe('usePatientFile', () => {
     await clinicFixtures.patients.remove(DHARTI, 'mistake', null);
     const { result } = renderHook(() => usePatientFile(DHARTI), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(isPatientFileMissing(result.current.error)).toBe(true);
+    expect(isNotFound(result.current.error)).toBe(true);
     expect(result.current.failureCount).toBe(1);
   });
 });

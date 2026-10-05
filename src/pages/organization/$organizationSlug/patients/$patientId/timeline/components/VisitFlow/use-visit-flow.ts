@@ -19,6 +19,7 @@ import type {
 } from '@/shared/api/clinic/visits-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -99,8 +100,9 @@ type FlowBase = ReturnType<typeof useFlowBase>;
 
 /**
  * The visit's own writes: the safety checks, the share, the end of the visit
- * ("Visit completed · …", then back to the Overview — or Today, when Today's
- * card opened the flow) and Pause (the same way out, the visit left open).
+ * ("Visit completed · …" — the page then leaves the flow, as for any visit that
+ * ends under it: back to the Overview, or Today when Today's card opened the
+ * flow) and Pause (the same way out, the visit left open).
  */
 function useVisitActions(
   base: FlowBase,
@@ -127,7 +129,6 @@ function useVisitActions(
       parts.push(t(K.followUp, { date }));
     }
     notify.success(parts.join(' · '));
-    leaveFlow();
   };
   return {
     toggleCheck: (check) =>
@@ -230,15 +231,16 @@ function useClinicalActions(
 
 /**
  * Invoice and Collect (Payments create): the visit's invoice from its lines,
- * a custom invoice for this patient, and the oldest open invoice collected in
- * full in one tap.
+ * a custom invoice for this patient — the flow kept behind it — and the oldest
+ * open invoice collected in full in one tap.
  */
 function useMoneyActions(
   base: FlowBase,
   visit: VisitRecord,
   detail: VisitDetail | undefined,
 ): Pick<VisitFlowActions, 'createInvoice' | 'customInvoice' | 'collect'> {
-  const { t, navigate, organizationSlug, patientId, file, money, refreshVisit } = base;
+  const { t, navigate, organizationSlug, patientId, file, money, refreshVisit, flow } =
+    base;
   const createBill = useCreateVisitBill({ notifyOnError: true });
   const receive = useReceivePayment();
   const openInvoices = useOpenInvoices(patientId).data ?? [];
@@ -295,7 +297,7 @@ function useMoneyActions(
       void navigate(
         clinicCommandNavigation('newInvoice', {
           organizationSlug,
-          referrer: `patients/${patientId}/timeline`,
+          referrer: visitFlowReferrer(patientId, flow.fromToday),
           search: { type: 'clinic', patient: patientId },
         }),
       ),

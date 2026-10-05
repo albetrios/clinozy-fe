@@ -6,13 +6,31 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as VisitsApi from '@/shared/api/clinic/visits-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { patientVisitTarget, VISIT_REFERRER, visitRedirect } from './visit-redirect.ts';
+import { VISIT_REFERRER } from './clinic-referrer.ts';
+import { patientVisitTarget, visitRedirect } from './visit-redirect.ts';
 
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
+
+/** The next visit read's failure, when a test sets one; the fixture server otherwise. */
+const read = vi.hoisted(() => ({ failure: null as Error | null }));
+vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof VisitsApi>();
+  return {
+    ...actual,
+    fetchVisit: async (...args: Parameters<typeof actual.fetchVisit>) => {
+      const { failure } = read;
+      read.failure = null;
+      if (failure) throw failure;
+      return actual.fetchVisit(...args);
+    },
+  };
+});
 
 const TIMELINE = '/organization/$organizationSlug/patients/$patientId/timeline';
 
@@ -20,6 +38,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
   vi.mocked(notify.info).mockReset();
+  read.failure = null;
   resetClinicFixtures();
 });
 afterEach(() => {
@@ -69,7 +88,6 @@ describe('visitRedirect — an old Visit sheet link (L-64)', () => {
       stage: 'with_doctor',
       stageAt: new Date().toISOString(),
       checks: { consent: false, photos: false, allergies: false },
-      note: null,
       prescriptionId: null,
       treatmentId: null,
       invoiceId: null,
@@ -80,4 +98,16 @@ describe('visitRedirect — an old Visit sheet link (L-64)', () => {
     );
     expect(notify.info).toHaveBeenCalledTimes(1);
   });
+
+  it.each([
+    ['a server error', new HttpError('Server error', 500, '/visits', 'GET')],
+    ['a dropped connection', new TypeError('Failed to fetch')],
+  ])(
+    'throws %s for the route’s error boundary — never “Visit not found”',
+    async (_what, failure) => {
+      read.failure = failure;
+      await expect(visitRedirect('acme', ref.visit(2866))).rejects.toBe(failure);
+      expect(notify.info).not.toHaveBeenCalled();
+    },
+  );
 });

@@ -31,8 +31,8 @@ import { notify } from './notify.ts';
 
 /**
  * Toasts are the top layer (KICKOFF L-20): above every drawer, sheet and
- * dialog — the prototype's z 50 left them under the Visit sheet (§7.3) — and
- * still usable there: "Retry" on a failed save is pressed while the drawer
+ * dialog — the prototype's z 50 left them under its drawers and sheets (§7.3) —
+ * and still usable there: "Retry" on a failed save is pressed while the drawer
  * holding the draft is open, and that press must not dismiss the drawer.
  */
 

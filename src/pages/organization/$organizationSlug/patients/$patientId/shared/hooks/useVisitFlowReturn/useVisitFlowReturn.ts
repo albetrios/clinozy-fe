@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
 import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 import { CLINIC_SECTION_ROUTES } from '@/shared/clinic/clinic-home.ts';
-import { VISIT_REFERRER } from '@/shared/clinic/visit-redirect.ts';
+import { VISIT_REFERRER } from '@/shared/clinic/clinic-referrer.ts';
 import { useOpenVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import { usePatientFileContext } from '../../patient-file-context.ts';
@@ -79,7 +79,7 @@ export function useVisitFlowReturn(): VisitFlowReturn {
   return {
     inFlow,
     visit: inFlow ? (open.data ?? null) : null,
-    ready: !inFlow || !open.isPending,
+    ready: !(inFlow && open.isPending),
     fromToday,
     backToFlow,
     leaveFlow,

@@ -1,4 +1,7 @@
+import { useQueryClient } from '@tanstack/react-query';
+
 import type { DeleteReason, Prescription } from '@/shared/api/clinic/clinic-schema.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
 import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import {
   createPrescription,
@@ -19,9 +22,10 @@ import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 
 /**
  * What a prescription write refreshes: every patient read — the prescriptions
- * sit under it, and the file's section counts read them.
+ * sit under it, and the file's section counts read them — and the Medical
+ * room's reads, whose "Prescriptions to fill" lists the Rx no sale has filled.
  */
-const RX_WRITE_KEYS = [patientQueryKeys.all];
+const RX_WRITE_KEYS = [patientQueryKeys.all, MEDICAL_ROOM_QUERY_KEY];
 
 /** One patient's prescriptions, newest first (KICKOFF §6.6); idle without a patient. */
 export function usePatientPrescriptions(patientId: string, { enabled = true } = {}) {
@@ -55,13 +59,31 @@ export function useRxCatalog(patientId: string) {
   });
 }
 
-/** What the printed sheet needs beyond the Rx: the patient, doctor, clinic and branch. */
-export function useRxSheetContext(patientId: string, doctorId: string | null) {
-  return useAppQuery({
+/** The printed sheet's read — one key and fetch for the hook and for a print that waits for it. */
+function rxSheetQuery(patientId: string, doctorId: string | null) {
+  return {
     queryKey: prescriptionQueryKeys.sheet(patientId, doctorId),
     queryFn: () => fetchRxSheetContext(patientId, doctorId),
-    enabled: patientId !== '',
-  });
+  };
+}
+
+/** What the printed sheet needs beyond the Rx: the patient, doctor, clinic and branch. */
+export function useRxSheetContext(patientId: string, doctorId: string | null) {
+  return useAppQuery({ ...rxSheetQuery(patientId, doctorId), enabled: patientId !== '' });
+}
+
+/**
+ * Read a printed sheet's context now: the copy {@link useRxSheetContext} keeps,
+ * else the server's — so a print waits for it instead of skipping. A failed
+ * read toasts with Retry, as the hook's does, and rejects.
+ */
+export function useLoadRxSheetContext() {
+  const queryClient = useQueryClient();
+  return (patientId: string, doctorId: string | null) =>
+    queryClient.ensureQueryData({
+      ...rxSheetQuery(patientId, doctorId),
+      meta: { notifyOnError: true },
+    });
 }
 
 /**

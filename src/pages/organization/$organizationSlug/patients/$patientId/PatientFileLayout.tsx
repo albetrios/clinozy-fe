@@ -19,12 +19,10 @@ import {
 } from '@/shared/clinic/patient-file-sections.ts';
 import { SkeletonBar, SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import {
-  isPatientFileMissing,
-  usePatientFile,
-} from '@/shared/hooks/usePatientFile/index.ts';
+import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -77,7 +75,7 @@ function useFileLoadFailure(
   onMissing: () => void,
 ) {
   const { t } = useTranslation([PATIENT_FILE_LAYOUT_NS, ERRORS_NS]);
-  const missing = isPatientFileMissing(query.error);
+  const missing = isNotFound(query.error);
   useListLoadError(
     { isError: query.isError && !missing, refetch: () => void query.refetch() },
     `patient-file:${patientId}`,

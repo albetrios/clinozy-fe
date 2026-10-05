@@ -1,1 +1,1 @@
-export { isPatientFileMissing, usePatientFile } from './usePatientFile.ts';
+export { usePatientFile } from './usePatientFile.ts';

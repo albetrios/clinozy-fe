@@ -45,7 +45,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `visit-redirect.ts` — where a visit's work happens: the patient's own page
   with the visit flow open (`patientVisitTarget`: `timeline?visit=open&from=today`,
   Today's "Open session" and "Checkout") and an old Visit sheet link's redirect
-  (`visitRedirect`: its patient's page, else Today with "Visit not found"; L-64).
+  (`visitRedirect`: its patient's page, else — on a 404 only — Today with "Visit
+  not found"; any other failure is thrown for the route's error boundary; L-64).
 - `clinic-phone.ts` — a typed or pasted mobile as the contract stores it
   (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
   shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
@@ -60,7 +61,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   `useRoomLanding` applies it on every access change, View-as and its Exit too.
 - `clinic-referrer.ts` — the `from` allow-list a shared drawer route keeps its
   referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
-  on the sender's (the page a drawer opens over, when it is an allowed one).
+  on the sender's (the page a drawer opens over, when it is an allowed one);
+  `visitFlowReferrer` — the patient's visit flow, the one referrer with a query
+  (`timeline?visit=open[&from=today]`, `VISIT_REFERRER`).
 - `patient-file-sections.ts` — the patient file's eleven section slugs (its
   URL segments, `timeline` the Overview it lands on), the billing ones, the
   sections a member may open (Q-F1: billing alone for an Accountant) and the

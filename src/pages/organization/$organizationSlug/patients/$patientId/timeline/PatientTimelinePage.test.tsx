@@ -52,4 +52,13 @@ describe('PatientTimelinePage', () => {
     expect(router.state.location.pathname).toBe(patientFileUrl(DHARTI, '/timeline'));
     expect(screen.queryByTestId('visit-flow')).not.toBeInTheDocument();
   });
+
+  it('drops a stale link from Today the same way — it never bounces back to Today', async () => {
+    const { router } = renderPatientFile(
+      patientFileUrl(DHARTI, '/timeline?visit=open&from=today'),
+    );
+    expect(await screen.findByTestId('overview-bento')).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.search).toEqual({}));
+    expect(router.state.location.pathname).toBe(patientFileUrl(DHARTI, '/timeline'));
+  });
 });

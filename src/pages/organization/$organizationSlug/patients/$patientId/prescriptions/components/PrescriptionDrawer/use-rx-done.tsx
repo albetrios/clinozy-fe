@@ -8,26 +8,33 @@ import {
   PrescriptionPrint,
   printDocument,
 } from '@/shared/components/PrintTemplate/index.ts';
-import { useRxSheetContext } from '@/shared/hooks/usePrescriptions/index.ts';
+import {
+  useLoadRxSheetContext,
+  useRxSheetContext,
+} from '@/shared/hooks/usePrescriptions/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
 
 /**
- * The A4 sheet of a prescription as it stands, once the sheet's patient,
- * doctor, clinic and branch are read — nothing before then.
+ * The A4 sheet of a prescription as it stands. The sheet's patient, doctor,
+ * clinic and branch are read ahead, so a print is instant; one asked for before
+ * they land waits for them — never skipped — and goes on even if the drawer has
+ * closed meanwhile. A failed read has toasted itself, with Retry.
  */
 export function useRxPrint(patientId: string, doctorId: string | null) {
-  const sheet = useRxSheetContext(patientId, doctorId);
-  return (rx: Prescription) => {
-    if (!sheet.data) return;
-    void printDocument(
+  useRxSheetContext(patientId, doctorId);
+  const loadSheet = useLoadRxSheetContext();
+  return async (rx: Prescription): Promise<void> => {
+    const sheet = await loadSheet(rx.patientId, rx.doctorId).catch(() => null);
+    if (!sheet) return;
+    await printDocument(
       <PrescriptionPrint
         prescription={rx}
-        patient={sheet.data.patient}
-        doctor={sheet.data.doctor}
-        organization={sheet.data.organization}
-        branch={sheet.data.branch}
+        patient={sheet.patient}
+        doctor={sheet.doctor}
+        organization={sheet.organization}
+        branch={sheet.branch}
       />,
     );
   };
@@ -56,19 +63,21 @@ export function rxSaveLabelKey(editing: boolean, approving: boolean): string {
  * What a landed save does: "Prescription saved" (or "#500 saved" on an edit);
  * in the visit flow the new Rx prints on A4 (the Visit sheet's Approve, L-64);
  * then the drawer closes — or, after "Save & sell", a new medical sale opens
- * from it with the prescriptions section kept behind (`from`, §4).
+ * from it, closing back to `sellFrom` (§4): the visit flow when the drawer came
+ * from it, else the patient's prescriptions.
  */
 export function useRxDone({
   editing,
   approving,
-  patientId,
+  sellFrom,
   print,
   onClose,
 }: {
   editing: boolean;
   approving: boolean;
-  patientId: string;
-  print: (rx: Prescription) => void;
+  /** The room the sale "Save & sell" opens closes back to (`from`). */
+  sellFrom: string;
+  print: (rx: Prescription) => Promise<void>;
   onClose: () => void;
 }) {
   const { t } = useTranslation(RX_NS);
@@ -80,7 +89,7 @@ export function useRxDone({
         ? t(RX_KEYS.save.savedNumber, { number: displayId.prescription(saved.seq) })
         : t(RX_KEYS.save.saved),
     );
-    if (approving) print(saved);
+    if (approving) void print(saved);
     if (!sell) {
       onClose();
       return;
@@ -88,7 +97,7 @@ export function useRxDone({
     void navigate(
       clinicCommandNavigation('newSale', {
         organizationSlug,
-        referrer: `patients/${patientId}/prescriptions`,
+        referrer: sellFrom,
         search: { prescription: saved.id },
       }),
     );

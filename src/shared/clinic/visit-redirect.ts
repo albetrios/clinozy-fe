@@ -2,13 +2,12 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
 import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
+import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { CLINIC_KEYS, CLINIC_NS } from './clinic.constants.ts';
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
-
-/** The room a visit link goes back to — and the patient page's way back (`from`). */
-export const VISIT_REFERRER = 'today';
+import { VISIT_REFERRER } from './clinic-referrer.ts';
 
 /** A navigation to where a visit's work happens, as `navigate()` and `redirect()` take it. */
 export interface VisitNavigation {
@@ -37,20 +36,28 @@ export function patientVisitTarget(
   };
 }
 
+/** The visit's patient — null when the server doesn't know the visit (a 404); any other failure is thrown. */
+async function patientOfVisit(visitId: string): Promise<string | null> {
+  try {
+    return (await fetchVisit(visitId)).person.patientId;
+  } catch (error) {
+    if (isNotFound(error)) return null;
+    throw error;
+  }
+}
+
 /**
  * Where an old Visit sheet link lands (`/visits/$visitId?tab=…`, L-64: the
  * sheet is gone): the visit's patient's page with the flow open. A visit the
- * server doesn't know, or one with no patient record yet, goes to Today with
- * "Visit not found · it may have been deleted".
+ * server doesn't know (a 404), or one with no patient record yet, goes to
+ * Today with "Visit not found · it may have been deleted". Any other failure
+ * — offline, a 5xx — is thrown, for the route's error boundary to show and retry.
  */
 export async function visitRedirect(
   organizationSlug: string,
   visitId: string,
 ): Promise<VisitRedirect> {
-  const patientId = await fetchVisit(visitId).then(
-    (visit) => visit.person.patientId,
-    () => null,
-  );
+  const patientId = await patientOfVisit(visitId);
   if (patientId) {
     return { ...patientVisitTarget(organizationSlug, patientId), replace: true };
   }

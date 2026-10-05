@@ -47,8 +47,12 @@ row dense), Clinical, Photos and Team notes two columns wide — then the **acti
   done by its record on the patient's open Visit, and those records move the visit on — Today's
   card changes lane (L-64). "Write prescription" and "New treatment" keep the flow open behind
   their drawer (`?visit=open`) and close back to it — the Rx there is "Approve · print · send to
-  pharmacy", tied to the visit's booking; opened from Today's "Open session" or "Checkout"
-  (`from=today`), Pause and "Complete visit" go back to Today. Each action shows only for a
+  pharmacy", tied to the visit's booking; its "Save & sell" and the step's "Custom invoice"
+  open their drawer in another room with the flow as its way back
+  (`from=patients/<id>/timeline?visit=open`). A visit that ends under the flow — "Complete
+  visit", or a Collect that pays its bill in full with nothing to fill (D18, S:352) — leaves
+  the flow; opened from Today's "Open session" or "Checkout" (`from=today`), Pause and that
+  exit go back to Today. Each action shows only for a
   member who may take it; money follows the file's mask. Without an open visit the param is dropped and the Overview stays — a link
   never starts a visit.
 

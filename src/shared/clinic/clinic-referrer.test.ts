@@ -5,6 +5,7 @@ import {
   PATIENT_FILE_REFERRER,
   referrerFromPath,
   safeReferrer,
+  visitFlowReferrer,
 } from './clinic-referrer.ts';
 import { PATIENT_FILE_SECTIONS } from './patient-file-sections.ts';
 
@@ -39,8 +40,25 @@ describe('the drawer referrer allow-list', () => {
     'medical',
     'today?x=1',
     'TODAY',
+    `patients/${PATIENT}/timeline?visit=closed`,
+    `patients/${PATIENT}/timeline?visit=open&from=leads`,
+    `patients/${PATIENT}/invoices?visit=open`,
+    `patients/${PATIENT}/timeline?visit=open&x=//evil.example`,
   ])('rejects %j', (from) => {
     expect(isAllowedReferrer(from)).toBe(false);
+  });
+});
+
+describe('visitFlowReferrer (L-64)', () => {
+  it('is the patient’s visit flow, Today kept as its way back — and allowed', () => {
+    expect(visitFlowReferrer(PATIENT, true)).toBe(
+      `patients/${PATIENT}/timeline?visit=open&from=today`,
+    );
+    expect(visitFlowReferrer(PATIENT, false)).toBe(
+      `patients/${PATIENT}/timeline?visit=open`,
+    );
+    expect(isAllowedReferrer(visitFlowReferrer(PATIENT, true))).toBe(true);
+    expect(isAllowedReferrer(visitFlowReferrer(PATIENT, false))).toBe(true);
   });
 });
 

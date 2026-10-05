@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 /** What a URL-driven drawer needs to know about its record. */
@@ -18,8 +18,6 @@ export interface DialogRouteRecord<T> {
   /** Read the record again — a failure's Retry. */
   refetch: () => void;
 }
-
-const isNotFound = (error: unknown) => isHttpError(error) && error.status === 404;
 
 /**
  * The dialog-route deep-link pattern (KICKOFF §4, `S:115`). A URL-driven drawer
