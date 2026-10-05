@@ -37,10 +37,11 @@ describe('useStockItemColumns', () => {
       value: 'Creams & Serums',
       dotClassName: expect.stringContaining('sky'),
     });
-    expect(fold('stock', soframycin)).toMatchObject({ value: '3 tube · 90 g · OK' });
+    // A bar cell folds as plain words, without a dot (H:4116).
+    expect(fold('stock', soframycin)).toBe('3 tube · 90 g · OK');
     expect(fold('lasts', soframycin)).toMatchObject({ value: '~6 weeks' });
     expect(fold('vendor', soframycin)).toBe('Ankur Pharma');
-    expect(fold('stock', dTan)).toMatchObject({ value: '0 pack · 0 pcs · Out' });
+    expect(fold('stock', dTan)).toBe('0 pack · 0 pcs · Out');
     expect(fold('lasts', dTan)).toMatchObject({ value: '~0 days' });
     expect(fold('vendor', dTan)).toBeNull();
   });

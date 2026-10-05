@@ -96,10 +96,8 @@ export function useStockItemColumns(): ColumnDef<DataTableFeatures, StockItemRow
       },
       meta: {
         track: '170px',
-        foldValue: (original) => {
-          const stock = words.stock(rowOf(original));
-          return { value: stock.label, dotClassName: TONE_CLASSES[stock.tone].fill };
-        },
+        // A bar cell folds as plain words — the design dots badge cells only (H:4116).
+        foldValue: (original) => words.stock(rowOf(original)).label,
       },
     },
     {

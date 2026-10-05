@@ -42,7 +42,8 @@ describe('useMedicineColumns', () => {
     const { result } = renderHook(() => useMedicineColumns());
     const fold = (id: string) =>
       result.current.find((column) => column.id === id)?.meta?.foldValue?.(row);
-    expect(fold('stock')).toMatchObject({ value: '8 in stock · OK' });
+    // A bar cell folds as plain words, without a dot (H:4116).
+    expect(fold('stock')).toBe('8 in stock · OK');
     expect(fold('expiry')).toMatchObject({ value: expect.stringContaining('CSH26044') });
     expect(fold('margin')).toBe('32%');
     expect(fold('mrp')).toBe('₹650');
