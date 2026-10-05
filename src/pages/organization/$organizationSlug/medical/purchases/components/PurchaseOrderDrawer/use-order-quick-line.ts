@@ -47,7 +47,7 @@ const ORDER_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'free', 'rate'];
 /** How many "Low stock" chips the line offers (H:5389 `slice(0, 6)`). */
 const LOW_STOCK_CHIPS = 6;
 
-/** A medicine as the line lists it: its picker option's words, searched with its keywords. */
+/** A medicine as the line lists it: its picker option's words, searched with its maker's name. */
 type OrderEntry = QuickLineItem<MedicineRow> & QuickLineSearchable;
 
 /**
@@ -77,7 +77,9 @@ function entriesOf(options: readonly PickerOption<MedicineRow>[]): OrderEntry[] 
             label: option.label,
             sub: option.sub,
             meta: option.meta,
-            keywords: option.keywords?.join(' '),
+            // Name and maker, as the order's line searches (H:5389: label + sub);
+            // the composition stays the picker's and the sale's.
+            keywords: option.data.manufacturer?.name,
             data: option.data,
           },
         ]

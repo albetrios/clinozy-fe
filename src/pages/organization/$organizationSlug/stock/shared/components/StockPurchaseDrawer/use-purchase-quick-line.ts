@@ -1,7 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { STOCK_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   nameNumbers,
   quickLineBrowseMatches,
@@ -77,8 +76,9 @@ export function usePurchaseQuickLine({
   const entries: PurchaseEntry[] = catalogue.map((item) => ({
     key: item.id,
     label: item.name,
+    // "3 tube in stock" — the unit too, as the line's catalogue words it (H:5276).
     sub: t(STOCK_DRAWER_KEYS.pickers.inStock, {
-      quantity: words.figure(fromMilli(item.qtyMilli)),
+      quantity: words.units(item, item.qtyMilli),
     }),
     keywords: words.category(item.category).label,
     data: item,
@@ -107,9 +107,8 @@ export function usePurchaseQuickLine({
   const lacking = entries
     .filter((entry) => isLow(entry) && !lines.some((line) => line.itemId === entry.key))
     .slice(0, LOW_STOCK_CHIPS);
-  const categories = STOCK_CATEGORY_VALUES.filter((category) =>
-    entries.some((entry) => entry.data.category === category),
-  );
+  // The categories in the order the catalogue first lists them (H:5276 `G`).
+  const categories = [...new Set(entries.map((entry) => entry.data.category))];
   const groups = [
     { id: 'all', label: t(STOCK_KEYS.filters.all) },
     ...(entries.some(isLow)
