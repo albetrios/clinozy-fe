@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { withApiRetry } from '@/tests/utils/e2e-api-retry.ts';
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import {
@@ -8,15 +9,18 @@ import {
   uniqueE2eEmail,
 } from '@/tests/utils/e2e-faker.ts';
 import {
+  byTestId,
   clickTestId,
   expectLoginFormReady,
   fillEmailVerificationCode,
   fillTestId,
   gotoApp,
+  openAccountMenu,
 } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   e2eAuthHeaders,
+  echoedVerificationCode,
   pollVerificationCodeFromMailOutbox,
   requireDatabaseUrl,
 } from '@/tests/utils/e2e-session.ts';
@@ -55,21 +59,27 @@ export async function authenticateViaEmailCode(page: Page): Promise<{ email: str
   await gotoApp(page, '/login');
   await expectLoginFormReady(page);
   const email = uniqueE2eEmail('e2e');
-  const send = await page.request.post('/api/v1/auth/email/send-code', {
-    data: { email },
-    headers: e2eAuthHeaders(),
-  });
+  const send = await withApiRetry(() =>
+    page.request.post('/api/v1/auth/email/send-code', {
+      data: { email },
+      headers: e2eAuthHeaders(),
+    }),
+  );
   expect(
     send.ok(),
     `send-code failed: ${send.status()} ${await send.text()}`,
   ).toBeTruthy();
 
-  const code = await pollVerificationCodeFromMailOutbox(email);
+  const code =
+    (await echoedVerificationCode(send)) ??
+    (await pollVerificationCodeFromMailOutbox(email));
 
-  const login = await page.request.post('/api/v1/auth/email/login', {
-    data: { email, code },
-    headers: e2eAuthHeaders(),
-  });
+  const login = await withApiRetry(() =>
+    page.request.post('/api/v1/auth/email/login', {
+      data: { email, code },
+      headers: e2eAuthHeaders(),
+    }),
+  );
   expect(
     login.ok(),
     `email/login failed: ${login.status()} ${await login.text()}`,
@@ -195,7 +205,10 @@ export async function registerNewUserAndGoToDashboard(page: Page): Promise<void>
 }
 
 /**
- * API email-code session, then client navigation to `/` (refresh cookie hydrates the SPA).
+ * API email-code session, then client navigation to `/` (refresh cookie hydrates the SPA),
+ * ending on a dashboard: the personal `/dashboard`, the team dashboard onboarding lands
+ * on, or — when `/` resolves into a team workspace, whose root is the member's role home
+ * (D25: Today for an owner) — that workspace's dashboard, opened explicitly.
  */
 export async function authenticateViaEmailCodeAndLand(
   page: Page,
@@ -204,11 +217,19 @@ export async function authenticateViaEmailCodeAndLand(
   // Client-side nav keeps the in-memory access token; a full reload would require the refresh cookie.
   await navigateInApp(page, '/');
   await expect(page).toHaveURL(
-    /\/onboarding|\/organization\/[^/]+\/dashboard|\/dashboard/,
-    { timeout: 15000 },
+    /\/onboarding|\/organization\/[^/]+\/[^/?#]+|\/dashboard/,
+    {
+      timeout: 15000,
+    },
   );
   if (page.url().includes('/onboarding')) {
     await completeOnboardingWizard(page);
+  }
+  const roleHome = /^\/organization\/([^/]+)\/(?!dashboard(?:$|\/))/.exec(
+    new URL(page.url()).pathname,
+  );
+  if (roleHome) {
+    await navigateInApp(page, `/organization/${roleHome[1]}/dashboard`);
   }
   await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
   return { email };
@@ -224,7 +245,7 @@ export async function authenticateViaEmailCodeAndLand(
 export async function createTeamOrgViaApi(
   page: Page,
   opts?: { name?: string; slug?: string },
-): Promise<{ slug: string }> {
+): Promise<{ slug: string; name: string }> {
   const refresh = await page.request.post('/api/v1/auth/refresh', {
     headers: { origin: new URL(page.url()).origin },
   });
@@ -243,34 +264,55 @@ export async function createTeamOrgViaApi(
     opts,
   );
   expect(org?.slug, `team organization not created (${createStatus})`).toBeTruthy();
-  return { slug: org?.slug ?? '' };
+  return { slug: org?.slug ?? '', name: org?.name ?? '' };
 }
 
 /**
  * {@link createTeamOrgViaApi}, then opens the new organization's dashboard in
  * the app — where creating one from the old switcher landed. The navigation is
  * client-side, so the in-memory session carries over (a reload would need the
- * refresh cookie).
+ * refresh cookie). Returns once the dashboard names the new organization: the
+ * guard's switch into it has landed (the refresh above retired the page's token,
+ * so the app first renews it), and a menu opened now is not torn down mid-click.
  */
 export async function createTeamOrgAndOpenDashboard(
   page: Page,
   opts?: { name?: string; slug?: string },
-): Promise<{ slug: string }> {
-  const { slug } = await createTeamOrgViaApi(page, opts);
+): Promise<{ slug: string; name: string }> {
+  const { slug, name } = await createTeamOrgViaApi(page, opts);
   await navigateInApp(page, `/organization/${slug}/dashboard`);
   await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
     timeout: 15000,
   });
   await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
-  return { slug };
+  await expect(page.getByTestId('dashboard-org-name')).toHaveText(name, {
+    timeout: 15000,
+  });
+  return { slug, name };
 }
 
-/** Opens the org switcher and selects an option by slug (`personal` for personal org). */
+/**
+ * Opens the organization switcher. The section-bar shell keeps it in the Account
+ * menu, as its "Switch clinic" row — shown once the member belongs to two or more
+ * workspaces; the preview shells keep it in the header.
+ */
+export async function openOrganizationSwitcher(page: Page): Promise<void> {
+  if (!(await byTestId(page, 'organization-switcher-trigger').isVisible())) {
+    await openAccountMenu(page);
+  }
+  // Busy (disabled) while me/context loads or a switch is in flight.
+  await expect(byTestId(page, 'organization-switcher-trigger')).toBeEnabled({
+    timeout: 15000,
+  });
+  await clickTestId(page, 'organization-switcher-trigger');
+}
+
+/** Selects a workspace in the switcher by slug (`personal` for the personal org). */
 export async function selectOrganizationInSwitcher(
   page: Page,
   slug: string,
 ): Promise<void> {
-  await clickTestId(page, 'organization-switcher-trigger');
+  await openOrganizationSwitcher(page);
   await clickTestId(page, `organization-switcher-option-${slug}`);
 }
 

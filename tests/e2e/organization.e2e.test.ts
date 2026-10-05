@@ -1,10 +1,26 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import {
   createTeamOrgAndOpenDashboard,
+  openOrganizationSwitcher,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
+
+/**
+ * The header switcher with "Create organization" belongs to the preview shells
+ * (sidebar, top nav, rail). The clinic shell — the section bar, the default — keeps
+ * the switcher in the Account menu as "Switch clinic", which lists workspaces and
+ * creates none, so the create-dialog specs skip there.
+ */
+const NO_HEADER_SWITCHER =
+  'the section-bar shell has no header switcher (Switch clinic lives in the Account menu and creates nothing)';
+
+/** The header switcher of a preview shell, when this shell has one. */
+async function headerSwitcher(page: Page) {
+  const trigger = byTestId(page, 'organization-switcher-trigger');
+  return (await trigger.isVisible()) ? trigger : null;
+}
 
 test.describe('Organization picker', () => {
   test('redirects unauthenticated visitors to login', async ({ page }) => {
@@ -21,23 +37,23 @@ test.describe('Organization picker', () => {
 
   test('the switcher opens an accessible menu and closes on Escape', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    await openOrganizationSwitcher(page);
 
-    await trigger.click();
-    // Radix DropdownMenuContent exposes role="menu".
-    await expect(page.getByRole('menu')).toBeVisible();
+    const option = page.getByTestId(`organization-switcher-option-${slug}`);
+    await expect(option).toBeVisible({ timeout: 10000 });
+    // a11y guard: a workspace is a menu item of the switcher's own menu.
+    await expect(page.getByRole('menuitem', { name: new RegExp(slug) })).toBeVisible();
 
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(option).toBeHidden();
   });
 
   test('the create-organization action opens the create dialog', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
-
-    await trigger.click();
+    const trigger = await headerSwitcher(page);
+    test.skip(trigger === null, NO_HEADER_SWITCHER);
+    await trigger?.click();
     const createItem = page.getByTestId('organization-switcher-create');
     test.skip(
       !(await createItem.isVisible()),
@@ -64,10 +80,9 @@ test.describe('Organization picker', () => {
     page,
   }) => {
     await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
-
-    await trigger.click();
+    const trigger = await headerSwitcher(page);
+    test.skip(trigger === null, NO_HEADER_SWITCHER);
+    await trigger?.click();
     const createItem = page.getByTestId('organization-switcher-create');
     test.skip(
       !(await createItem.isVisible()),
@@ -94,10 +109,8 @@ test.describe('Organization picker', () => {
 
   test('organization switcher lists team org after create', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
     const { slug } = await createTeamOrgAndOpenDashboard(page);
-    await byTestId(page, 'organization-switcher-trigger').click();
+    await openOrganizationSwitcher(page);
     await expect(page.getByTestId(`organization-switcher-option-${slug}`)).toBeVisible({
       timeout: 10000,
     });

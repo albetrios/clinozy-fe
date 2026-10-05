@@ -4,7 +4,11 @@ import {
   authenticateViaEmailCodeAndLand,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
-import { openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  openAccountMenu,
+  openNotificationCenter,
+  openSettingsHash,
+} from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
@@ -88,10 +92,12 @@ test.describe('Account settings', () => {
     await expect(page.getByTestId('account-delete-confirm')).toHaveCount(0);
   });
 
-  test('the notification bell opens the notification center', async ({ page }) => {
-    // a11y guard: the bell is a labelled control.
-    await expect(page.getByTestId('notification-bell')).toBeVisible();
-    await page.getByTestId('notification-bell').click();
+  test('the Account menu opens the notification center', async ({ page }) => {
+    // The section bar has no bell: Notifications is a row of the Account menu.
+    await openAccountMenu(page);
+    // a11y guard: the row is a labelled menu item.
+    await expect(page.getByRole('menuitem', { name: /notifications/i })).toBeVisible();
+    await page.getByTestId('account-menu-notifications').click();
     // The center opens; a fresh account shows the empty inbox state inside it.
     await expect(page.getByTestId('notification-popover')).toBeVisible();
   });
@@ -129,8 +135,7 @@ test.describe('Account settings', () => {
   });
 
   test('the notification center closes on Escape', async ({ page }) => {
-    await page.getByTestId('notification-bell').click();
-    await expect(page.getByTestId('notification-popover')).toBeVisible();
+    await openNotificationCenter(page);
 
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('notification-popover')).not.toBeVisible();

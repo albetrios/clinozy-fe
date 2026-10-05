@@ -1,7 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
-import { byTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  byTestId,
+  expectLoginFormReady,
+  openNotificationCenter,
+} from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
@@ -165,8 +169,9 @@ test.describe('Square look — radius None + Sharp shape', () => {
       await page.keyboard.press('Escape');
       await expect(byTestId(page, 'appearance-panel')).toHaveCount(0);
 
-      await byTestId(page, 'notification-bell').click();
-      await expect(byTestId(page, 'notification-popover')).toBeVisible();
+      // The notification center, from the Account menu's row (the section bar has no bell).
+      await openNotificationCenter(page);
+      await expect(page.getByTestId('account-menu')).toHaveCount(0);
       expect(await roundedElements(page)).toEqual([]);
     });
   });

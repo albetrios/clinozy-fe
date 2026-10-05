@@ -6,7 +6,7 @@ import {
   navigateInApp,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
-import { byTestId, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
+import { byTestId, openAccountMenu, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   pollInvitationTokenFromMailOutbox,
@@ -34,14 +34,19 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
   }) => {
     test.setTimeout(150_000);
     await registerNewUserAndGoToDashboard(page);
-    const switcher = page.getByTestId('organization-switcher-trigger').first();
+    const { slug } = await createTeamOrgAndOpenDashboard(page);
+
+    // The switcher is what this test reads the new name from: the Account menu's
+    // "Switch clinic" row, which names the active workspace once there are two.
+    await openAccountMenu(page);
+    const switcher = page.getByTestId('organization-switcher-trigger');
     const switcherShown = await switcher
       .waitFor({ state: 'visible', timeout: 10_000 })
       .then(() => true)
       .catch(() => false);
-    // The switcher is what this test reads the new name from.
-    test.skip(!switcherShown, 'org switcher hidden');
-    const { slug } = await createTeamOrgAndOpenDashboard(page);
+    test.skip(!switcherShown, 'one workspace only — the Account menu shows no switcher');
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('account-menu')).toHaveCount(0);
 
     await openSettingsHash(page, 'organization', 'general');
     await expect(page.getByTestId('settings-section-org-general')).toBeVisible({
@@ -54,10 +59,21 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
 
     // The slug is immutable from this panel; the URL must keep it.
     await expect(page).toHaveURL(new RegExp(`/organization/${slug}/`));
-    await page.keyboard.press('Escape');
+    // Leave once the save has landed — an Escape while it is in flight meets the
+    // form still dirty and asks "Discard unsaved changes?".
     await expect(
-      page.getByTestId('organization-switcher-trigger').locator('visible=true').first(),
-    ).toContainText(renamed, { timeout: 15_000 });
+      page.getByTestId('app-toast').filter({ hasText: 'Organization updated' }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('org-general-save')).toBeDisabled();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('settings-modal')).toHaveCount(0);
+    await openAccountMenu(page);
+    await expect(page.getByTestId('organization-switcher-trigger')).toContainText(
+      renamed,
+      {
+        timeout: 15_000,
+      },
+    );
   });
 
   test('an active organization cannot be talked into its own suspended page', async ({
@@ -98,7 +114,23 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
       await byTestId(page, 'user-drawer-name').fill('Lifecycle Invitee');
       await byTestId(page, 'user-drawer-email').fill(inviteeEmail);
+      const invite = page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          response.url().includes('/tenancy/organization/memberships'),
+        { timeout: 15_000 },
+      );
       await byTestId(page, 'user-drawer-save').click();
+      // A fresh team organization sits on a one-seat plan in the local billing seed,
+      // so the owner fills it and the invite is refused (`journeys` skips the same way).
+      const invited = await invite;
+      if (invited.status() === 409) {
+        const body = (await invited.json()) as { error?: { reason?: string } };
+        test.skip(
+          body.error?.reason === 'seat_limit_reached',
+          'team org seat limit reached in local billing seed',
+        );
+      }
       const row = page
         .getByTestId('users-team-table-row')
         .filter({ hasText: 'Lifecycle Invitee' });
@@ -120,9 +152,7 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       expect(accept.ok(), `accept failed: ${accept.status()}`).toBe(true);
 
       // Owner promotes the member to Admin from their drawer. Navigate away and
-      // back instead of reloading: an authenticated reload currently trips the
-      // double-refresh CSRF race (see cross-tab/locale-rtl fixmes), and a
-      // remount refetches the roster just as well.
+      // back — a remount refetches the roster, with no cold boot to wait out.
       await navigateInApp(page, `/organization/${slug}/users/roles`);
       await navigateInApp(page, `/organization/${slug}/users`);
       await row.click();

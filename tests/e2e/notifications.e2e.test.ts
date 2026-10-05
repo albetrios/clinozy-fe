@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { openAccountMenu, openNotificationCenter } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
@@ -26,12 +27,15 @@ test.describe('Notification center (empty inbox)', () => {
   test('a fresh account shows the empty-inbox state with mark-all hidden', async ({
     page,
   }) => {
-    // No unread items → the header badge is absent.
-    await expect(page.getByTestId('notification-badge')).toHaveCount(0);
-
-    await page.getByTestId('notification-bell').click();
-    await expect(page.getByTestId('notification-popover')).toBeVisible();
-    await expect(page.getByTestId('empty-state')).toBeVisible();
+    // No unread items → no count on the Account menu's Notifications row.
+    await openAccountMenu(page);
+    await expect(page.getByTestId('account-menu-notifications')).toHaveText(
+      /^notifications$/i,
+    );
+    await page.getByTestId('account-menu-notifications').click();
+    const popover = page.getByTestId('notification-popover');
+    await expect(popover).toBeVisible();
+    await expect(popover.getByTestId('empty-state')).toBeVisible();
     // MarkAllReadButton renders null when the inbox is empty (hidden entirely,
     // not merely disabled) — assert absence to match that contract.
     await expect(page.getByTestId('notification-mark-all')).toHaveCount(0);
@@ -41,8 +45,7 @@ test.describe('Notification center (empty inbox)', () => {
   });
 
   test('the empty notification center closes on Escape', async ({ page }) => {
-    await page.getByTestId('notification-bell').click();
-    await expect(page.getByTestId('notification-popover')).toBeVisible();
+    await openNotificationCenter(page);
 
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('notification-popover')).not.toBeVisible();

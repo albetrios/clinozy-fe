@@ -4,7 +4,11 @@ import {
   createTeamOrgAndOpenDashboard,
   registerNewUserAndGoToDashboard,
 } from '@/tests/utils/e2e-auth.ts';
-import { expectAppHeaderReady } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  byTestId,
+  expectAppHeaderReady,
+  openAccountMenu,
+} from '@/tests/utils/e2e-hybrid.ts';
 
 // The dashboard module is a placeholder until it is rebuilt after auth
 // (REPLACE_WITH_MODULE) — these specs cover the shell + placeholder only.
@@ -22,14 +26,18 @@ test.describe('Dashboard', () => {
     await expectAppHeaderReady(page);
   });
 
-  test('sidebar navigation is visible', async ({ page }) => {
-    await expect(page.getByTestId('sidebar')).toBeVisible();
+  test('the section bar carries the navigation', async ({ page }) => {
+    // The clinic shell has no sidebar: one header bar, its "Sections" nav holding
+    // All sections and the pinned tabs (KICKOFF §3.2).
+    await expect(page.getByRole('navigation', { name: 'Sections' })).toBeVisible();
+    await expect(byTestId(page, 'all-sections-trigger')).toBeVisible();
   });
 
-  test('the sidebar Settings quick-link opens the settings modal over the dashboard', async ({
+  test('Settings in the Account menu opens the settings modal over the dashboard', async ({
     page,
   }) => {
-    await page.getByTestId('sidebar-settings').click();
+    await openAccountMenu(page);
+    await byTestId(page, 'user-menu-settings').click();
     await expect(page.getByTestId('settings-modal')).toBeVisible();
     await expect(page).toHaveURL(/#settings\/account\/profile$/);
     // Dashboard stays mounted behind the modal.

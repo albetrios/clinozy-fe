@@ -180,8 +180,13 @@ test.describe('Auth workflow (UI)', () => {
 test.describe('Org switch workflow (UI)', () => {
   test('create team via switcher then switch back to personal', async ({ page }) => {
     await registerNewUserAndGoToDashboard(page);
+    // Only the preview shells' header switcher creates; the clinic shell's Switch
+    // clinic (Account menu) lists workspaces — `org-switching.e2e.test.ts` drives it.
     const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
+    test.skip(
+      !(await switcher.isVisible()),
+      'the section-bar shell has no header switcher (Switch clinic lives in the Account menu and creates nothing)',
+    );
 
     await switcher.click();
     await page.getByTestId('organization-switcher-create').click();
