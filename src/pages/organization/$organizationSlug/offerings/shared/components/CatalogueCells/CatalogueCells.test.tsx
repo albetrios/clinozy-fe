@@ -50,10 +50,11 @@ describe('the cells both Offerings tables share', () => {
     expect(screen.getByText(/· /)).toBeInTheDocument();
   });
 
-  it('folds the branches into the meta line, "All branches" quiet', () => {
+  it('folds the branches into the meta line, "All branches" quiet with its grey dot', () => {
     const { result } = renderHook(() => useBranchFold());
     expect(result.current(['all'], BRANCHES)).toEqual({
       value: 'All branches',
+      dotClassName: expect.stringContaining('bg-tone-stone-foreground'),
       quiet: true,
     });
     expect(result.current([VESU.id, ADAJAN.id], BRANCHES)).toEqual({

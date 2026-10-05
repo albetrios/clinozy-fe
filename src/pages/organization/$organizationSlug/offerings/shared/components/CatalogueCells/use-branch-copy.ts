@@ -10,7 +10,8 @@ import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.cons
 
 /**
  * The Branches cell's meta-line value: the names, the dot in the first one's
- * tone — and "All branches" as a quiet value the phone line drops.
+ * tone — and "All branches" with the grey chip's dot (a badge value folds with
+ * its dot, KICKOFF §6.11; H:4115), quiet so the phone line drops it.
  */
 export function useBranchFold(): (
   values: readonly string[],
@@ -20,7 +21,11 @@ export function useBranchFold(): (
   return (values, branches) => {
     if (values.length === 0) return null;
     if (values.length === 1 && values[0] === ALL_BRANCHES) {
-      return { value: t(CATALOGUE_CELLS_KEYS.allBranches), quiet: true };
+      return {
+        value: t(CATALOGUE_CELLS_KEYS.allBranches),
+        dotClassName: TONE_CLASSES.stone.fill,
+        quiet: true,
+      };
     }
     const named = values.flatMap((value) => {
       const branch = branches.find((candidate) => candidate.id === value);
