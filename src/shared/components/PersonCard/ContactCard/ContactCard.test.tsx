@@ -260,7 +260,7 @@ describe('ContactCardContent — team and about', () => {
       'Shah family · 2 contacts',
       `Came via ${iso('Instagram')}`,
       `${iso('₹1,200')} to return to them · ${iso('₹500')} they owe the clinic`,
-      `1 review · latest ${iso('5')}★ on ${iso('Video')} · 20 Jun`,
+      `1 review · latest ${iso('5')}★ on ${iso('Video')} · ${iso('20 Jun')}`,
     ]) {
       expect(within(about).getByText(row)).toBeInTheDocument();
     }
@@ -299,7 +299,9 @@ describe('ContactCardContent — team and about', () => {
       about: { reviews: { ...RHEA.about!.reviews!, count: 3 } },
     });
     expect(
-      screen.getByText(`3 reviews · latest ${iso('5')}★ on ${iso('Video')} · 20 Jun`),
+      screen.getByText(
+        `3 reviews · latest ${iso('5')}★ on ${iso('Video')} · ${iso('20 Jun')}`,
+      ),
     ).toBeInTheDocument();
   });
 });

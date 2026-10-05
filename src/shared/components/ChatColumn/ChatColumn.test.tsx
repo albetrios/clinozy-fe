@@ -175,7 +175,7 @@ describe('the conversation', () => {
       'Appointment #2859 · Peel · Confirmed · Dr. Nisha14 Oct 11:00 am',
     );
     expect(screen.getByTestId(ids.divider)).toHaveTextContent(
-      `Lead created · 22 Aug ${fsi('10:00 am')} · via Instagram`,
+      `Lead created · ${fsi('22 Aug')} ${fsi('10:00 am')} · via Instagram`,
     );
 
     await user.click(screen.getAllByTestId(ids.history)[0] as HTMLElement);

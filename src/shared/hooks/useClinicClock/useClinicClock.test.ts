@@ -197,6 +197,9 @@ describe('useClinicClock', () => {
         `Yesterday ${fsi('9:10\u00a0am')}`,
       );
       expect(result.current.day('2026-10-04')).toBe('Yesterday');
+      // A date is a data token too; a weekday is a day word.
+      expect(result.current.day('2026-09-28')).toBe(fsi('28 Sept'));
+      expect(result.current.day('2026-10-01')).toBe('Thu');
     });
 
     it('follows the member’s 24-hour clock', () => {

@@ -96,6 +96,12 @@ export interface ClinicClockWords {
   /** "Mon" — a day of the last six, by its weekday. */
   weekday: (date: string) => string;
   /**
+   * "24 Sep", "Sep 24, 2025" — a day the rule names by its date. The hook's
+   * words isolate it (bidi), as they do the time; without it the clock's own
+   * {@link ClinicClock.date} is used.
+   */
+  date?: (date: string) => string;
+  /**
    * "Today 11:30 am" — today and a clock time together. The hook's words
    * isolate the time (bidi), as in {@link dayTime}.
    */
@@ -152,7 +158,7 @@ export function clinicClockOf(
         return words.weekday(date);
       case 'ahead':
       case 'earlier':
-        return clock.date(date);
+        return words.date ? words.date(date) : clock.date(date);
     }
   };
   /**
@@ -218,6 +224,13 @@ export function useClinicClock(): ClinicClock {
     const thisYear = (date: string) => date.slice(0, 4) === today.slice(0, 4);
     const civil = (date: string, options: Intl.DateTimeFormatOptions) =>
       formatDate(localDateOf(date), options, { civilDay: true });
+    /** "9 Oct" — "9 Oct 2025" in another year. */
+    const dateText = (date: string) =>
+      civil(date, {
+        day: 'numeric',
+        month: 'short',
+        ...(thisYear(date) ? {} : { year: 'numeric' }),
+      });
     const hourCycle: Intl.DateTimeFormatOptions = {
       ...dateFormatOptions('time', prefs.hourCycle),
       hour: 'numeric',
@@ -237,12 +250,7 @@ export function useClinicClock(): ClinicClock {
               ? { ...clockOptions, minute: undefined }
               : clockOptions,
           ),
-        date: (date) =>
-          civil(date, {
-            day: 'numeric',
-            month: 'short',
-            ...(thisYear(date) ? {} : { year: 'numeric' }),
-          }),
+        date: dateText,
         // Screen-only (lane hints, cards, due labels): one unbreakable token.
         wallTime: (date, time) =>
           keepTogether(
@@ -254,7 +262,10 @@ export function useClinicClock(): ClinicClock {
         yesterday: t(PICKER_KEYS.date.yesterday, { ns: PICKER_NS }),
         tomorrow: t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS }),
         weekday: (date) => civil(date, { weekday: 'short' }),
-        // The time is the line's data token (isolated); the day word is the page's text.
+        // The date and the time are the line's data tokens (isolated); the day
+        // words keep the page's direction. The clock's own `date` stays bare —
+        // message text reads it.
+        date: (date) => isolateText(dateText(date)),
         todayTime: (time) =>
           t(CLINIC_KEYS.clock.todayTime, { ns: CLINIC_NS, time: isolateText(time) }),
         dayTime: (day, time) =>
