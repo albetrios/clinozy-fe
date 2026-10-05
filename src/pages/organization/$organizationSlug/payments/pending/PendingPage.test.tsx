@@ -51,7 +51,11 @@ describe('PendingPage', () => {
     expect(
       within(panel)
         .getAllByRole('group')
-        .map((group) => group.firstChild?.textContent),
+        .map(
+          (group) =>
+            document.getElementById(group.getAttribute('aria-labelledby') ?? '')
+              ?.textContent,
+        ),
     ).toEqual(['Which way', 'State', 'Created']);
     const tone = (label: string) =>
       within(panel).getByText(label).closest('[data-tone]')?.getAttribute('data-tone');

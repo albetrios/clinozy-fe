@@ -7,6 +7,7 @@ import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts'
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -106,13 +107,12 @@ function ActivityToggle({
         <Icon aria-hidden="true" className="size-4 rtl:-scale-x-100" />
         <span className="max-md:sr-only">{t(K.activity)}</span>
         {!open && unread > 0 ? (
-          <span
-            data-slot="pill"
-            className="bg-success text-success-foreground text-tiny inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1.25 font-semibold tabular-nums max-md:absolute max-md:-end-1 max-md:-top-1"
-          >
-            <span aria-hidden="true">{unread}</span>
-            <span className="sr-only">{t(K.unread, { count: unread })}</span>
-          </span>
+          <CountBadge
+            count={unread}
+            tone="success"
+            srLabel={t(K.unread, { count: unread })}
+            className="max-md:absolute max-md:-end-1 max-md:-top-1"
+          />
         ) : null}
       </button>
     </Tip>

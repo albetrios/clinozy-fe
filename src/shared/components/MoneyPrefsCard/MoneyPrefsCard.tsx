@@ -15,7 +15,8 @@ import {
   NUMBER_STYLE_LABEL_KEYS,
   NUMBER_STYLE_PREFERENCE_LIST,
 } from '@/lib/i18n/locale.constants.ts';
-import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
+import { FieldLabel } from '@/shared/components/FieldLabel/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -69,24 +70,32 @@ export function MoneyPrefsCard() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.numberStyleHeading)}</FieldLabel>
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.numberStyleHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.numberStyleHeading)}
             value={numberStyle}
-            options={NUMBER_STYLE_PREFERENCE_LIST}
-            labelFor={(id) => t(NUMBER_STYLE_LABEL_KEYS[id])}
-            onPick={(id) => setNumberStyle(id)}
-            testPrefix="number-style"
+            options={NUMBER_STYLE_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(NUMBER_STYLE_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setNumberStyle(id);
+            }}
+            testId="number-style"
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.currencyDisplayHeading)}</FieldLabel>
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.currencyDisplayHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.currencyDisplayHeading)}
             value={currencyDisplay}
-            options={CURRENCY_DISPLAY_PREFERENCE_LIST}
-            labelFor={(id) => t(CURRENCY_DISPLAY_LABEL_KEYS[id])}
-            onPick={(id) => setCurrencyDisplay(id)}
-            testPrefix="currency-display"
+            options={CURRENCY_DISPLAY_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(CURRENCY_DISPLAY_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setCurrencyDisplay(id);
+            }}
+            testId="currency-display"
           />
         </div>
         <div className="flex flex-col gap-1.5">

@@ -26,8 +26,13 @@ export interface DrawerChipOption<T extends string> {
 export type DrawerChipsVariant = 'tone' | 'outline' | 'button';
 
 interface DrawerChipsBaseProps<T extends string> {
-  /** The group's accessible name — the field's label. */
-  label: string;
+  /** The group's accessible name — the field's label (or name it with `labelledBy`). */
+  label?: string;
+  /**
+   * The id of a visible heading that names the group in place of `label` —
+   * a Filters section's label over its chips.
+   */
+  labelledBy?: string;
   options: readonly DrawerChipOption<T>[];
   variant?: DrawerChipsVariant;
   /** A control that flows on after the chips, in the same wrapping row ("+ Custom"). */
@@ -131,15 +136,18 @@ function toggledPicks<T extends string>(
 }
 
 /**
- * A drawer's chip field (the design's `chips` kind, H:905): a wrapping row of
- * toggle chips in each value's tone, one pick or any number. A picked chip of
- * a pick-any group carries a 12px boxed check; a clearable one-pick group lets the
- * picked chip be tapped off. Each chip is a button with `aria-pressed`, the
- * row a group named by the field's label.
+ * The app's one toggle chip (L-62) — a drawer's chip field (the design's
+ * `chips` kind, H:905), the Filters' sections and the Appearance choices: a
+ * wrapping row of toggle chips in each value's tone (untoned on `muted`), one
+ * pick or any number. A picked chip of a pick-any group carries a 12px boxed
+ * check; a clearable one-pick group lets the picked chip be tapped off. Each
+ * chip is a button with `aria-pressed`, the row a group named by the field's
+ * label (or the visible heading `labelledBy` points at).
  */
 export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
   const {
     label,
+    labelledBy,
     options,
     variant = 'tone',
     trailing,
@@ -163,7 +171,8 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
   return (
     <div
       role="group"
-      aria-label={label}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
       data-testid={testId}
       className={cn('flex flex-wrap items-center gap-1.5', className)}
     >
@@ -177,6 +186,7 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
             data-slot={variant === 'button' ? 'button' : 'pill'}
             aria-pressed={picked}
             disabled={disabled}
+            data-tone={option.tone}
             title={option.hint}
             data-testid={testId ? `${testId}-${option.value}` : undefined}
             onClick={() => toggle(option.value)}

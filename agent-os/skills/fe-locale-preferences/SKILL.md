@@ -24,7 +24,7 @@ Related: `fe-locale-formatting` (consuming prefs) · `fe-i18n-constants` (copy) 
    must normalize, never crash hydration.
 4. Label key paths in `locale.constants.ts` + values in **all 11** locale packs.
 5. UI in the matching Appearance card (`LanguagePrefsCard`, `DateTimePrefsCard`,
-   `MoneyPrefsCard`) using the shared `OptionPills`.
+   `MoneyPrefsCard`) using the app's toggle chips (`DrawerChips`, untoned) under a `FieldLabel`.
 
 ## Race-safe apply — every path, not just `setLocale`
 

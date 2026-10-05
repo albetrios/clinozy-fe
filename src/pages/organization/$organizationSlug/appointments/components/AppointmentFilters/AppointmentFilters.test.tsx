@@ -82,16 +82,13 @@ describe('AppointmentFilters (appointments.md:103–117, 135–147)', () => {
       expect(within(panel).getByRole('group', { name })).toBeInTheDocument();
     }
     expect(
-      within(panel).getByTestId('appointments-filters-status-active').firstElementChild,
+      within(panel).getByTestId('appointments-filters-status-active'),
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('keeps choices pending until "Apply filter", then writes the URL and counts', async () => {
     const { panel, user, router } = await open();
-    await user.click(
-      within(panel).getByTestId('appointments-filters-status-cancelled')
-        .firstElementChild as HTMLElement,
-    );
+    await user.click(within(panel).getByTestId('appointments-filters-status-cancelled'));
     expect(router.state.location.search).toEqual({});
     await user.click(within(panel).getByTestId('appointments-filters-apply'));
     await waitFor(() =>
@@ -141,10 +138,7 @@ describe('AppointmentFilters (appointments.md:103–117, 135–147)', () => {
 
   it('closes on Esc without applying (D33)', async () => {
     const { panel, user, router } = await open();
-    await user.click(
-      within(panel).getByTestId('appointments-filters-status-all')
-        .firstElementChild as HTMLElement,
-    );
+    await user.click(within(panel).getByTestId('appointments-filters-status-all'));
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByTestId('appointments-filters')).toBeNull());
     expect(router.state.location.search).toEqual({});

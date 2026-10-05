@@ -7,8 +7,6 @@ export {
 export {
   automaticSection,
   type AutomaticSectionValue,
-  FilterChip,
-  type FilterChipProps,
   RoomDateFilter,
   type RoomDateFilterKind,
   type RoomDateFilterProps,

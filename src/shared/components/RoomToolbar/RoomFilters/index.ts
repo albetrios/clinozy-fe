@@ -12,8 +12,6 @@ export {
   showsAutomaticSection,
 } from './room-filters.ts';
 export {
-  FilterChip,
-  type FilterChipProps,
   RoomDateFilter,
   type RoomDateFilterProps,
   type RoomFilterCopy,

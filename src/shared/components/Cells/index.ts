@@ -3,6 +3,11 @@ export {
   type AvatarStackPerson,
   type AvatarStackProps,
 } from './AvatarStack/index.ts';
+export {
+  CountBadge,
+  type CountBadgeProps,
+  type CountBadgeTone,
+} from './CountBadge/index.ts';
 export { IdPill } from './IdPill/index.ts';
 export { MoneyCell, type MoneyCellProps } from './MoneyCell/index.ts';
 export {

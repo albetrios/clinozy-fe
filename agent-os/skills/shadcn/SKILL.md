@@ -52,6 +52,12 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
   - A status or label pill → **`TonePill`** (`Cells`; a section tone, `neutral` for a
     plain label, `dot` for a status — the rooms' words: positive sage, pending butter,
     trouble blush). There is no `ui/badge`, and never a styled span.
+  - A toggle chip (pick one or several, a filter value, an Appearance choice) →
+    **`DrawerChips`** (each option's `tone`, untoned on `muted`; `multiple`,
+    `clearable`, `ordered`; `labelledBy` when a visible heading names the row). Pills
+    that do not toggle stay `TonePill` / `IdPill` / `PersonChip`.
+  - An 18px count on a button or heading → **`CountBadge`** (`Cells`; `tone` primary /
+    success / inverse, "99+", `srLabel`). Never a hand-rolled `rounded-full` count.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

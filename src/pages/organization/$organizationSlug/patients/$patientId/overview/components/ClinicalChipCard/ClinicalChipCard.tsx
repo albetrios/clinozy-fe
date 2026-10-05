@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 
 import { CLINICAL_KEYS, CLINICAL_NS } from '../../overview.constants.ts';
@@ -80,14 +81,15 @@ export function ClinicalChipCard({
         />
         <span className="min-w-0 truncate">{title}</span>
         {freshCount > 0 ? (
-          <span
+          <CountBadge
+            count={freshCount}
+            tone="inverse"
             title={t(CLINICAL_KEYS.newHint)}
-            data-slot="pill"
             data-testid={`${testId}-new`}
-            className="bg-foreground text-background text-tiny ms-1.5 inline-flex h-4.5 flex-none items-center rounded-full px-1.5 font-semibold"
+            className="ms-1.5"
           >
             {t(CLINICAL_KEYS.newCount, { count: freshCount })}
-          </span>
+          </CountBadge>
         ) : null}
       </h3>
       <ul className="flex flex-wrap gap-1.5">

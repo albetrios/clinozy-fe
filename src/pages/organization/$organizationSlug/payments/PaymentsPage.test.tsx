@@ -57,7 +57,11 @@ describe('PaymentsPage', () => {
     expect(
       within(panel)
         .getAllByRole('group')
-        .map((group) => group.firstChild?.textContent),
+        .map(
+          (group) =>
+            document.getElementById(group.getAttribute('aria-labelledby') ?? '')
+              ?.textContent,
+        ),
     ).toEqual(['Show', 'What', 'Mode', 'Created']);
     const tone = (label: string) =>
       within(panel).getByText(label).closest('[data-tone]')?.getAttribute('data-tone');

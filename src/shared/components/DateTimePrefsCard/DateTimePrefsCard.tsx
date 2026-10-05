@@ -18,7 +18,8 @@ import {
   LOCALE_TEST_IDS,
   TIME_ZONE_LIST,
 } from '@/lib/i18n/locale.constants.ts';
-import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
+import { FieldLabel } from '@/shared/components/FieldLabel/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
@@ -129,25 +130,33 @@ export function DateTimePrefsCard() {
 
         <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.dateFormatHeading)}</FieldLabel>
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.dateFormatHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.dateFormatHeading)}
             value={dateFormat}
-            options={DATE_FORMAT_PREFERENCE_LIST}
-            labelFor={(id) => t(DATE_FORMAT_LABEL_KEYS[id])}
-            onPick={(id) => setDateFormat(id)}
-            testPrefix="date-format"
+            options={DATE_FORMAT_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(DATE_FORMAT_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setDateFormat(id);
+            }}
+            testId="date-format"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.hourCycleHeading)}</FieldLabel>
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.hourCycleHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.hourCycleHeading)}
             value={hourCycle}
-            options={HOUR_CYCLE_PREFERENCE_LIST}
-            labelFor={(id) => t(HOUR_CYCLE_LABEL_KEYS[id])}
-            onPick={(id) => setHourCycle(id)}
-            testPrefix="hour-cycle"
+            options={HOUR_CYCLE_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(HOUR_CYCLE_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setHourCycle(id);
+            }}
+            testId="hour-cycle"
           />
         </div>
 

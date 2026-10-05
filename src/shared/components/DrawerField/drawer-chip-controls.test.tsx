@@ -216,6 +216,22 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     expect(screen.getByTestId('length-30')).not.toHaveAttribute('title');
   });
 
+  it('lets a visible heading name the group (a Filters section label)', () => {
+    render(
+      <>
+        <span id="gender-heading">GENDER</span>
+        <DrawerChips
+          labelledBy="gender-heading"
+          options={GENDERS}
+          value={null}
+          onChange={() => undefined}
+        />
+      </>,
+    );
+    const group = screen.getByRole('group', { name: 'GENDER' });
+    expect(group).not.toHaveAttribute('aria-label');
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<PickAny />);
     expect(await axe(container)).toHaveNoViolations();

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -121,12 +122,7 @@ export function BranchPicker() {
             {label}
           </span>
           {!isAll && names.length > 1 ? (
-            <span
-              data-slot="pill"
-              className="bg-primary text-primary-foreground text-tiny flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1.25 font-semibold tabular-nums"
-            >
-              +{names.length - 1}
-            </span>
+            <CountBadge count={names.length - 1}>+{names.length - 1}</CountBadge>
           ) : null}
           <ChevronDown
             className={cn(

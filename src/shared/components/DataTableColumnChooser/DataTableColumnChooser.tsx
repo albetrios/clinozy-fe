@@ -8,6 +8,7 @@ import type { Column, ReactTable, RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   COLUMNS_SHOW_ALL_KEY,
   DEFAULT_TABLE_TEST_PREFIX,
@@ -156,12 +157,10 @@ export function DataTableColumnChooser<TData extends RowData>({
         >
           <Eye aria-hidden="true" className="size-4" />
           {hidden > 0 ? (
-            <span
-              data-slot="pill"
-              className="border-canvas bg-primary text-primary-foreground text-tiny absolute -end-1.75 -top-1.75 flex h-4.5 min-w-4.5 items-center justify-center rounded-full border-2 px-1.25 font-semibold tabular-nums"
-            >
-              {hidden}
-            </span>
+            <CountBadge
+              count={hidden}
+              className="border-canvas absolute -end-1.75 -top-1.75 border-2"
+            />
           ) : null}
         </button>
       )}

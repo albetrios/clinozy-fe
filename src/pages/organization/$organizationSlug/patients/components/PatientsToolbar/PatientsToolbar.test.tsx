@@ -90,7 +90,9 @@ describe('PatientsToolbar', () => {
     const groups = within(panel).getAllByRole('group');
     expect(
       groups.map(
-        (group) => group.getAttribute('aria-labelledby') && group.firstChild?.textContent,
+        (group) =>
+          document.getElementById(group.getAttribute('aria-labelledby') ?? '')
+            ?.textContent,
       ),
     ).toEqual(['Gender', 'Type', 'Status', 'Conversion', 'Created', 'Follow-up date']);
     expect(within(panel).getByText('Female').closest('[data-tone]')).toHaveAttribute(

@@ -115,7 +115,11 @@ describe('LeadsToolbar (leads.md:17)', () => {
     expect(
       within(panel)
         .getAllByRole('group')
-        .map((group) => group.querySelector('span')?.textContent),
+        .map(
+          (group) =>
+            document.getElementById(group.getAttribute('aria-labelledby') ?? '')
+              ?.textContent,
+        ),
     ).toEqual([
       'Status',
       'Source · pick any',

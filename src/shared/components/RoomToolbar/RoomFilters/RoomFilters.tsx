@@ -18,16 +18,20 @@ import {
 } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { TONE_CLASSES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 import {
+  CountBadge,
   PersonAvatar,
   personInitials,
-  TonePill,
 } from '@/shared/components/Cells/index.ts';
 import {
   TABLE_KEYS,
   TABLE_NS,
 } from '@/shared/components/DataTable/data-table.constants.ts';
+import {
+  type DrawerChipOption,
+  DrawerChips,
+} from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { PickerSheet } from '@/shared/components/Picker/PickerSheet/index.ts';
 import {
@@ -65,6 +69,10 @@ import { useRoomFilters } from './useRoomFilters.ts';
 /** How far back and ahead a custom range's pickers reach (H:4459). */
 const RANGE_PAST_DAYS = 365;
 const RANGE_FUTURE_DAYS = 90;
+
+/** The chip values that stand for no pick ("Any", "All") and for a custom range. */
+const ANY_CHIP = '__any';
+const RANGE_CHIP = '__range';
 
 /** One option chip's copy: its label, its tone (else its label's), an icon. */
 export interface RoomFilterOption {
@@ -130,88 +138,58 @@ export interface RoomFiltersProps {
   className?: string;
 }
 
-/** Props for {@link FilterChip}. */
-export interface FilterChipProps {
-  label: string;
-  tone: Tone;
-  icon?: AppIcon;
-  pressed: boolean;
-  onToggle: () => void;
-}
-
-/**
- * One 24px toggle chip in its value's tone: picked = a 1.5px ring in its ink,
- * a 1px one on hover (H:1089) — the Filters popover's chips, and a view bar's.
- */
-export function FilterChip({
-  label,
-  tone,
-  icon: Icon,
-  pressed,
-  onToggle,
-}: FilterChipProps) {
-  // The ring is drawn on the button in the tone's ink (`ring-current`).
-  return (
-    <button
-      type="button"
-      aria-pressed={pressed}
-      data-slot="pill"
-      data-filter-chip=""
-      onClick={onToggle}
-      className={cn(
-        'flex max-w-full flex-none rounded-full ring-current transition-shadow duration-150',
-        TONE_CLASSES[tone].ink,
-        pressed ? 'ring-[1.5px]' : 'hover:ring-1',
-      )}
-    >
-      <TonePill tone={tone} icon={Icon ? <Icon className="size-3.25" /> : undefined}>
-        {label}
-      </TonePill>
-    </button>
-  );
-}
-
 /**
  * A section: its 11px uppercase label — with a "Clear" link at its end while
- * the section has picks — over a wrapping row of chips.
+ * the section has picks — over its control. Chips (`DrawerChips`, the app's
+ * toggle chips) are handed the label's id and are the section's group; any
+ * other control (the people picker) sits in a group the label names.
  */
 function FilterSection({
   label,
   children,
-  after,
   onClear,
   clearLabel,
 }: {
   label: string;
-  children: ReactNode;
-  after?: ReactNode;
+  /** The section's control — or its chips, handed the label's id to name their group. */
+  children: ReactNode | ((labelId: string) => ReactNode);
   /** The section has picks; its copy names the "Clear" link. */
   onClear?: () => void;
   clearLabel?: string;
 }) {
   const labelId = useId();
+  const heading = (
+    <div className="flex items-center justify-between gap-2">
+      <span
+        id={labelId}
+        className="text-micro text-muted-foreground leading-[1.2] font-semibold tracking-[0.05em] uppercase"
+      >
+        {label}
+      </span>
+      {onClear && clearLabel ? (
+        <button
+          type="button"
+          data-slot="filters-section-clear"
+          onClick={onClear}
+          className="text-caption text-muted-foreground hover:text-foreground rounded-sm leading-tight transition-colors"
+        >
+          {clearLabel}
+        </button>
+      ) : null}
+    </div>
+  );
+  if (typeof children === 'function') {
+    return (
+      <div className="flex flex-col gap-2">
+        {heading}
+        {children(labelId)}
+      </div>
+    );
+  }
   return (
     <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-2">
-        <span
-          id={labelId}
-          className="text-micro text-muted-foreground leading-[1.2] font-semibold tracking-[0.05em] uppercase"
-        >
-          {label}
-        </span>
-        {onClear && clearLabel ? (
-          <button
-            type="button"
-            data-slot="filters-section-clear"
-            onClick={onClear}
-            className="text-caption text-muted-foreground hover:text-foreground rounded-sm leading-tight transition-colors"
-          >
-            {clearLabel}
-          </button>
-        ) : null}
-      </div>
+      {heading}
       <div className="flex flex-wrap gap-1.5">{children}</div>
-      {after}
     </div>
   );
 }
@@ -325,57 +303,58 @@ export function RoomDateFilter({
     });
   const rangeName = (end: string) => `${t(keys.label)} · ${end}`;
 
+  const rangeEnds = ends ? (
+    // A full row of its own under the chips: the range's two ends.
+    <div className="mt-0.5 grid basis-full grid-cols-2 gap-2">
+      <RangeEnd
+        label={t(ROOM_FILTERS_KEYS.from)}
+        name={rangeName(t(ROOM_FILTERS_KEYS.from))}
+        value={ends.from}
+        max={ends.to ?? undefined}
+        onChange={(date) => setEnd('from', date)}
+        testId={`filter-${fieldKey}-from`}
+      />
+      <RangeEnd
+        label={t(ROOM_FILTERS_KEYS.to)}
+        name={rangeName(t(ROOM_FILTERS_KEYS.to))}
+        value={ends.to}
+        min={ends.from ?? undefined}
+        onChange={(date) => setEnd('to', date)}
+        testId={`filter-${fieldKey}-to`}
+      />
+    </div>
+  ) : null;
+  const options: DrawerChipOption<string>[] = [
+    { value: ANY_CHIP, label: t(ROOM_FILTERS_KEYS.any), tone: 'stone' },
+    ...chips.presets.map((preset) => ({
+      value: preset,
+      label: t(presetKeys[preset] ?? preset),
+      tone: tones[preset] ?? 'stone',
+    })),
+    { value: RANGE_CHIP, label: t(keys.range), tone: chips.range },
+  ];
+  let picked = value ?? ANY_CHIP;
+  if (ends) picked = RANGE_CHIP;
+
   return (
-    <FilterSection
-      label={t(keys.label)}
-      after={
-        ends ? (
-          <div className="grid grid-cols-2 gap-2">
-            <RangeEnd
-              label={t(ROOM_FILTERS_KEYS.from)}
-              name={rangeName(t(ROOM_FILTERS_KEYS.from))}
-              value={ends.from}
-              max={ends.to ?? undefined}
-              onChange={(date) => setEnd('from', date)}
-              testId={`filter-${fieldKey}-from`}
-            />
-            <RangeEnd
-              label={t(ROOM_FILTERS_KEYS.to)}
-              name={rangeName(t(ROOM_FILTERS_KEYS.to))}
-              value={ends.to}
-              min={ends.from ?? undefined}
-              onChange={(date) => setEnd('to', date)}
-              testId={`filter-${fieldKey}-to`}
-            />
-          </div>
-        ) : null
-      }
-    >
-      <FilterChip
-        label={t(ROOM_FILTERS_KEYS.any)}
-        tone="stone"
-        pressed={value === undefined}
-        onToggle={() => set(undefined)}
-      />
-      {chips.presets.map((preset) => (
-        <FilterChip
-          key={preset}
-          label={t(presetKeys[preset] ?? preset)}
-          tone={tones[preset] ?? 'stone'}
-          pressed={value === preset}
-          onToggle={() => set(preset)}
+    <FilterSection label={t(keys.label)}>
+      {(labelId) => (
+        <DrawerChips
+          labelledBy={labelId}
+          options={options}
+          value={picked}
+          onChange={(next) => {
+            if (next !== RANGE_CHIP) {
+              set(next === ANY_CHIP || next === null ? undefined : next);
+              return;
+            }
+            // A range starts on today at each end it does not have yet.
+            const today = clinicToday();
+            set(toDateRange(ends?.from ?? today, ends?.to ?? today));
+          }}
+          trailing={rangeEnds}
         />
-      ))}
-      <FilterChip
-        label={t(keys.range)}
-        tone={chips.range}
-        pressed={ends !== null}
-        onToggle={() => {
-          // A range starts on today at each end it does not have yet.
-          const today = clinicToday();
-          set(toDateRange(ends?.from ?? today, ends?.to ?? today));
-        }}
-      />
+      )}
     </FilterSection>
   );
 }
@@ -383,7 +362,8 @@ export function RoomDateFilter({
 /**
  * An options filter's section: a chip per value in its tone (else its label's)
  * — any number picked, or one for a `single` filter, whose "All" / "Any" chip
- * (when the copy names one) stands for no pick.
+ * (when the copy names one) stands for no pick; tapping a single filter's pick
+ * again clears it.
  */
 function OptionsSection({
   fieldKey,
@@ -399,50 +379,60 @@ function OptionsSection({
   onChange: Dispatch<SetStateAction<RoomFilterValues>>;
 }) {
   const picked = values[fieldKey] ?? [];
+  const options: DrawerChipOption<string>[] = field.values.map((value) => {
+    const option = copy?.options[value];
+    const label = option?.label ?? value;
+    return {
+      value,
+      label,
+      tone: option?.tone ?? toneForLabel(label),
+      icon: option?.icon,
+    };
+  });
+  // Each pick is one toggle on the pending values, so quick taps all land.
+  const toggle = (value: string) =>
+    onChange((pending) => toggleRoomFilterOption(pending, fieldKey, value, field.single));
+  const clear = () => onChange((pending) => clearRoomFilter(pending, fieldKey));
+  const anyLabel = field.single ? copy?.anyLabel : undefined;
+
   return (
     <FilterSection
       label={copy?.label ?? fieldKey}
       clearLabel={copy?.clearLabel}
-      onClear={
-        picked.length > 0
-          ? () => onChange((pending) => clearRoomFilter(pending, fieldKey))
-          : undefined
-      }
+      onClear={picked.length > 0 ? clear : undefined}
     >
-      {field.single && copy?.anyLabel ? (
-        <FilterChip
-          label={copy.anyLabel}
-          tone="stone"
-          pressed={picked.length === 0}
-          onToggle={() =>
-            // "All" / "Any" un-picks the one value picked, if any.
-            onChange((pending) => {
-              const [current] = pending[fieldKey] ?? [];
-              return current === undefined
-                ? pending
-                : toggleRoomFilterOption(pending, fieldKey, current, true);
-            })
-          }
-        />
-      ) : null}
-      {field.values.map((value) => {
-        const option = copy?.options[value];
-        const label = option?.label ?? value;
-        return (
-          <FilterChip
-            key={value}
-            label={label}
-            tone={option?.tone ?? toneForLabel(label)}
-            icon={option?.icon}
-            pressed={picked.includes(value)}
-            onToggle={() =>
-              onChange((pending) =>
-                toggleRoomFilterOption(pending, fieldKey, value, field.single),
-              )
+      {(labelId) =>
+        field.single ? (
+          <DrawerChips
+            labelledBy={labelId}
+            options={
+              anyLabel
+                ? [{ value: ANY_CHIP, label: anyLabel, tone: 'stone' }, ...options]
+                : options
             }
+            value={picked[0] ?? (anyLabel ? ANY_CHIP : null)}
+            clearable
+            onChange={(next) => {
+              if (next === null || next === ANY_CHIP) clear();
+              else toggle(next);
+            }}
           />
-        );
-      })}
+        ) : (
+          <DrawerChips
+            labelledBy={labelId}
+            multiple
+            ordered
+            options={options}
+            value={picked}
+            onChange={(next) => {
+              const toggled =
+                next.find((value) => !picked.includes(value)) ??
+                picked.find((value) => !next.includes(value));
+              if (toggled !== undefined) toggle(toggled);
+            }}
+          />
+        )
+      }
     </FilterSection>
   );
 }
@@ -712,7 +702,10 @@ export function RoomFilters({
         panelClassName="w-85 max-w-[calc(100vw-2.5rem)] max-h-[min(calc(100vh-10rem),var(--radix-popover-content-available-height))] rounded-xl"
         onOpenAutoFocus={(event) => {
           const panel = event.target instanceof HTMLElement ? event.target : null;
-          panel?.querySelector<HTMLElement>('[data-filter-chip]')?.focus();
+          // The first section's first chip (people rows and buttons are not pills).
+          panel
+            ?.querySelector<HTMLElement>('button[data-slot="pill"][aria-pressed]')
+            ?.focus();
         }}
         trigger={
           <RoomFiltersTrigger
@@ -850,13 +843,7 @@ export function RoomFiltersTrigger({
       {t(ROOM_FILTERS_KEYS.title)}
       {count > 0 ? (
         <>
-          <span
-            aria-hidden="true"
-            data-slot="pill"
-            className="bg-primary text-primary-foreground text-tiny flex h-4.5 min-w-4.5 flex-none items-center justify-center rounded-full px-1.25 font-semibold tabular-nums"
-          >
-            {count}
-          </span>
+          <CountBadge count={count} aria-hidden="true" />
           {/* The space keeps "Filters" and the count apart in the accessible name. */}{' '}
           <span className="sr-only">{t(ROOM_FILTERS_KEYS.appliedCount, { count })}</span>
         </>

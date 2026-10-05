@@ -7,6 +7,7 @@ import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { ROLE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -242,16 +243,7 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
         label={t(LAYOUT_KEYS.app.notifications.title)}
         testId="account-menu-notifications"
         onSelect={onOpenNotifications}
-        trailing={
-          unread > 0 ? (
-            <span
-              data-slot="pill"
-              className="bg-primary text-primary-foreground text-tiny flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1.25 font-semibold tabular-nums"
-            >
-              {unread > 99 ? '99+' : unread}
-            </span>
-          ) : null
-        }
+        trailing={unread > 0 ? <CountBadge count={unread} /> : null}
       />
       <MenuRow
         icon={Settings}

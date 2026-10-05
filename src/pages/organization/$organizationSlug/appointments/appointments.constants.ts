@@ -197,7 +197,8 @@ export const APPOINTMENTS_TEST_IDS = {
   filtersMonthPrevious: 'appointments-filters-month-previous',
   filtersMonthNext: 'appointments-filters-month-next',
   filtersDoctors: 'appointments-filters-doctors',
-  filtersStatus: (value: string) => `appointments-filters-status-${value}`,
+  /** The STATUS chips' group; each chip is `appointments-filters-status-<value>`. */
+  filtersStatus: 'appointments-filters-status',
   /** A calendar view's card (`data-view` = day · week · month). */
   calendar: 'appointments-calendar',
   /** A booking's block on a calendar (`data-status`). */

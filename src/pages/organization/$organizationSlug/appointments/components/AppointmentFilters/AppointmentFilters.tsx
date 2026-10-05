@@ -16,9 +16,9 @@ import {
 import { APPOINTMENT_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
 import { PickerSheet } from '@/shared/components/Picker/index.ts';
 import {
-  FilterChip,
   ROOM_FILTERS_KEYS,
   ROOM_TOOLBAR_NS,
   RoomDateFilter,
@@ -49,17 +49,38 @@ import { FiltersCalendar } from './FiltersCalendar.tsx';
 /** The STATUS chips in order (H:5945): All · Active (open) · each status. */
 const STATUS_CHIPS = ['all', 'active', ...APPOINTMENT_STATUS_VALUES] as const;
 
-/** A section: 11px/600 uppercase label over its control (H:2009, H:2022). */
-function Section({ label, children }: { label: string; children: ReactNode }) {
+/**
+ * A section: 11px/600 uppercase label over its control (H:2009, H:2022). The
+ * section is the labelled group, unless its control is a group of its own —
+ * the chips, handed the label's id to name themselves.
+ */
+function Section({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode | ((labelId: string) => ReactNode);
+}) {
   const labelId = useId();
+  const heading = (
+    <span
+      id={labelId}
+      className="text-micro text-muted-foreground font-semibold tracking-[0.04em] uppercase"
+    >
+      {label}
+    </span>
+  );
+  if (typeof children === 'function') {
+    return (
+      <div className="flex flex-col gap-1.5">
+        {heading}
+        {children(labelId)}
+      </div>
+    );
+  }
   return (
     <div role="group" aria-labelledby={labelId} className="flex flex-col gap-1.5">
-      <span
-        id={labelId}
-        className="text-micro text-muted-foreground font-semibold tracking-[0.04em] uppercase"
-      >
-        {label}
-      </span>
+      {heading}
       {children}
     </div>
   );
@@ -174,27 +195,24 @@ export function AppointmentFilters({ view, className }: AppointmentFiltersProps)
               />
             </Section>
             <Section label={t(keys.status)}>
-              <div className="flex flex-wrap gap-1.5">
-                {STATUS_CHIPS.map((value) => (
-                  <span
-                    key={value}
-                    data-testid={APPOINTMENTS_TEST_IDS.filtersStatus(value)}
-                  >
-                    <FilterChip
-                      label={statusLabel(value)}
-                      tone={
-                        value === 'all' || value === 'active'
-                          ? 'stone'
-                          : APPOINTMENT_STATUS_TONES[value]
-                      }
-                      pressed={pending.status === value}
-                      onToggle={() =>
-                        setPending((current) => ({ ...current, status: value }))
-                      }
-                    />
-                  </span>
-                ))}
-              </div>
+              {(labelId) => (
+                <DrawerChips
+                  labelledBy={labelId}
+                  options={STATUS_CHIPS.map((value) => ({
+                    value,
+                    label: statusLabel(value),
+                    tone:
+                      value === 'all' || value === 'active'
+                        ? 'stone'
+                        : APPOINTMENT_STATUS_TONES[value],
+                  }))}
+                  value={pending.status}
+                  onChange={(status) => {
+                    if (status) setPending((current) => ({ ...current, status }));
+                  }}
+                  testId={APPOINTMENTS_TEST_IDS.filtersStatus}
+                />
+              )}
             </Section>
             <RoomDateFilter
               fieldKey="created"

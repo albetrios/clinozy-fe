@@ -16,7 +16,8 @@ import {
 } from '@/lib/i18n/locale.constants.ts';
 import { I18N_LOCALES, LOCALE_NATIVE_LABELS } from '@/lib/i18n/locales.ts';
 import { cn } from '@/lib/utils.ts';
-import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
+import { FieldLabel } from '@/shared/components/FieldLabel/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { Check } from '@/shared/icons/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
@@ -88,13 +89,17 @@ export function LanguagePrefsCard() {
           {multiLocale ? (
             <FieldLabel>{t(LOCALE_KEYS.textDirectionHeading)}</FieldLabel>
           ) : null}
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.textDirectionHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.textDirectionHeading)}
             value={textDirection}
-            options={TEXT_DIRECTION_PREFERENCE_LIST}
-            labelFor={(id) => t(TEXT_DIRECTION_LABEL_KEYS[id])}
-            onPick={(id) => setTextDirection(id)}
-            testPrefix="text-direction"
+            options={TEXT_DIRECTION_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(TEXT_DIRECTION_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setTextDirection(id);
+            }}
+            testId="text-direction"
           />
         </div>
       </div>
