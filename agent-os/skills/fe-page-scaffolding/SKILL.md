@@ -194,7 +194,9 @@ import { manifestHead } from '@/lib/routes/page-head.ts';
 import { manifest as <name>Manifest } from '@/pages/<name>/<name>.manifest.ts';
 
 // lazyRouteComponent (NOT React.lazy) so `defaultPreload: 'intent'` can
-// prefetch the island chunk on hover/touch.
+// prefetch the island chunk on hover/touch. A clinic room under the org shell
+// goes in src/app/routes/room-routes.ts instead, mounted with roomRoute('<Name>');
+// a URL-driven dialog route registers with ...dialogRoute('<name>') (dialog-routes.ts).
 const <Name>Page = lazyRouteComponent(
   () => import('@/pages/<name>/<name>.route.tsx'),
   'Component',

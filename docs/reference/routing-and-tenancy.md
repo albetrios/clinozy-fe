@@ -286,7 +286,9 @@ A URL-driven dialog route renders nothing of its own, so `routeTree.tsx` — the
 chunk — carries only its path: its manifest and component load with one lazy registry,
 `src/app/routes/dialog-routes.ts`, and `dialogRoute(name)` awaits the manifest before
 running the same gate as the page under it (gateway, then the org status guard), then
-titles the document from it. A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
+titles the document from it. The rooms' own pages and tabs reach the entry the same way — one
+lazy module, `src/app/routes/room-routes.ts` (`roomRoute(name)`), which the org shell's loader
+warms. A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
 that matches nothing leaves the parent page behind, toasts "<Record> not found ·
 it may have been deleted" and replaces the URL with the parent. A room tab reads all
 of its dialog routes through `useRoomDialogRoute` (`shared/hooks/useRoomDialogRoute/`):

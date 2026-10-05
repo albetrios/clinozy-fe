@@ -279,37 +279,37 @@ const SuspendedPage = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/suspended/suspended.route.tsx'),
   'Component',
 );
-// Clinic rooms (KICKOFF §4): each loads its own namespace with its chunk.
-// Today's work queue reads the Tasks rule copy (one task model, Q-T3): `tasks` loads with it.
-const TodayPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.today, I18N_NAMESPACES.tasks],
-    () => import('@/pages/organization/$organizationSlug/today/today.route.tsx'),
-  ),
-  'Component',
-);
-const LeadsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.leads],
-    () => import('@/pages/organization/$organizationSlug/leads/leads.route.tsx'),
-  ),
-  'Component',
-);
-const AppointmentsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.appointments],
-    () =>
-      import('@/pages/organization/$organizationSlug/appointments/appointments.route.tsx'),
-  ),
-  'Component',
-);
-const PatientsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.patients],
-    () => import('@/pages/organization/$organizationSlug/patients/patients.route.tsx'),
-  ),
-  'Component',
-);
+// The clinic rooms' pages and tabs (`room-routes.ts`), behind ONE dynamic
+// import: one per room here would put each room's preload list — every chunk
+// it shares, by name — on the entry chunk. A room's own chunk is preloaded
+// right after the module, so a navigation never suspends on the second hop,
+// and the org shell's loader fetches the module before any room needs it.
+const loadRoomRoutes = () => import('./room-routes.ts');
+
+/** A room's name in the `room-routes.ts` module. */
+type RoomRouteName = keyof Awaited<ReturnType<typeof loadRoomRoutes>>['ROOM_ROUTES'];
+
+/** A clinic room's page or tab component, loaded through the room-route module. */
+function roomRoute(name: RoomRouteName) {
+  return lazyRouteComponent(async () => {
+    const { ROOM_ROUTES } = await loadRoomRoutes();
+    await ROOM_ROUTES[name].preload?.();
+    return ROOM_ROUTES;
+  }, name);
+}
+
+/**
+ * Fetch the room-route module ahead of any room — speculation, so a failure
+ * is swallowed: the room's own load requests it again, with its error boundary.
+ */
+function warmRoomRoutes(): void {
+  loadRoomRoutes().catch(() => undefined);
+}
+
+const TodayPage = roomRoute('TodayPage');
+const LeadsPage = roomRoute('LeadsPage');
+const AppointmentsPage = roomRoute('AppointmentsPage');
+const PatientsPage = roomRoute('PatientsPage');
 // The patient file (KICKOFF §6.6, L-42): its layout and every section and
 // dialog route come through ONE lazy module, so this entry chunk carries one
 // import for all of them. Each route's own chunk is preloaded right after the
@@ -347,166 +347,27 @@ const patientFileDialog = (
     }),
     'Component',
   );
-const PaymentsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.payments],
-    () => import('@/pages/organization/$organizationSlug/payments/payments.route.tsx'),
-  ),
-  'Component',
-);
-const PaymentsPendingPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.payments],
-    () =>
-      import('@/pages/organization/$organizationSlug/payments/pending/pending.route.tsx'),
-  ),
-  'Component',
-);
-const TasksPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.tasks],
-    () => import('@/pages/organization/$organizationSlug/tasks/tasks.route.tsx'),
-  ),
-  'Component',
-);
-const OfferingsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.offerings],
-    () => import('@/pages/organization/$organizationSlug/offerings/offerings.route.tsx'),
-  ),
-  'Component',
-);
-// The Offers tab is the room's second page (D24): its own chunk, the room's namespace.
-const OffersPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.offerings],
-    () =>
-      import('@/pages/organization/$organizationSlug/offerings/offers/offers.route.tsx'),
-  ),
-  'Component',
-);
-const UsersPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.users],
-    () => import('@/pages/organization/$organizationSlug/users/users.route.tsx'),
-  ),
-  'Component',
-);
-const UsersRolesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.users],
-    () => import('@/pages/organization/$organizationSlug/users/roles/roles.route.tsx'),
-  ),
-  'Component',
-);
-const UsersBranchesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.users],
-    () =>
-      import('@/pages/organization/$organizationSlug/users/branches/branches.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalLayout = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () => import('@/pages/organization/$organizationSlug/medical/medical.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalSalesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () => import('@/pages/organization/$organizationSlug/medical/sales/sales.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalMedicinesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () =>
-      import('@/pages/organization/$organizationSlug/medical/medicines/medicines.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalPurchasesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () =>
-      import('@/pages/organization/$organizationSlug/medical/purchases/purchases.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalSuppliersPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () =>
-      import('@/pages/organization/$organizationSlug/medical/suppliers/suppliers.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalManufacturersPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () =>
-      import('@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalMrsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.medical],
-    () => import('@/pages/organization/$organizationSlug/medical/mrs/mrs.route.tsx'),
-  ),
-  'Component',
-);
-const MedicalPaymentsPage = lazyRouteComponent(
-  localizedRoute(
-    // The ledger's words are the Payments room's (`LEDGER_NS`).
-    [I18N_NAMESPACES.medical, I18N_NAMESPACES.payments],
-    () =>
-      import('@/pages/organization/$organizationSlug/medical/payments/payments.route.tsx'),
-  ),
-  'Component',
-);
-const StockLayout = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinicStock],
-    () => import('@/pages/organization/$organizationSlug/stock/stock.route.tsx'),
-  ),
-  'Component',
-);
-const StockItemsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinicStock],
-    () => import('@/pages/organization/$organizationSlug/stock/items/items.route.tsx'),
-  ),
-  'Component',
-);
-const StockPurchasesPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinicStock],
-    () =>
-      import('@/pages/organization/$organizationSlug/stock/purchases/purchases.route.tsx'),
-  ),
-  'Component',
-);
-const StockMovementsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinicStock],
-    () =>
-      import('@/pages/organization/$organizationSlug/stock/movements/movements.route.tsx'),
-  ),
-  'Component',
-);
-const StockVendorsPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.clinicStock],
-    () =>
-      import('@/pages/organization/$organizationSlug/stock/vendors/vendors.route.tsx'),
-  ),
-  'Component',
-);
+const PaymentsPage = roomRoute('PaymentsPage');
+const PaymentsPendingPage = roomRoute('PaymentsPendingPage');
+const TasksPage = roomRoute('TasksPage');
+const OfferingsPage = roomRoute('OfferingsPage');
+const OffersPage = roomRoute('OffersPage');
+const UsersPage = roomRoute('UsersPage');
+const UsersRolesPage = roomRoute('UsersRolesPage');
+const UsersBranchesPage = roomRoute('UsersBranchesPage');
+const MedicalLayout = roomRoute('MedicalLayout');
+const MedicalSalesPage = roomRoute('MedicalSalesPage');
+const MedicalMedicinesPage = roomRoute('MedicalMedicinesPage');
+const MedicalPurchasesPage = roomRoute('MedicalPurchasesPage');
+const MedicalSuppliersPage = roomRoute('MedicalSuppliersPage');
+const MedicalManufacturersPage = roomRoute('MedicalManufacturersPage');
+const MedicalMrsPage = roomRoute('MedicalMrsPage');
+const MedicalPaymentsPage = roomRoute('MedicalPaymentsPage');
+const StockLayout = roomRoute('StockLayout');
+const StockItemsPage = roomRoute('StockItemsPage');
+const StockPurchasesPage = roomRoute('StockPurchasesPage');
+const StockMovementsPage = roomRoute('StockMovementsPage');
+const StockVendorsPage = roomRoute('StockVendorsPage');
 const NotFoundPage = lazyRouteComponent(
   () => import('@/app/routes/NotFoundPage.tsx'),
   'Component',
@@ -615,6 +476,7 @@ export async function preloadSignedInShell(): Promise<void> {
     PersonalShell.preload?.(),
     OrganizationShell.preload?.(),
     DashboardPage.preload?.(),
+    loadRoomRoutes(),
   ]);
 }
 
@@ -825,8 +687,12 @@ const organizationShellRoute = createRoute({
     await resolveActiveOrg({ params });
   },
   // The shell's island and the AppLayout it will pick, fetched alongside the
-  // route's own chunks rather than after the layout mounts (preloadAppShell).
-  loader: () => preloadAppShell(OrganizationShell),
+  // route's own chunks rather than after the layout mounts (preloadAppShell);
+  // the rooms' module too, without holding the shell for it.
+  loader: () => {
+    warmRoomRoutes();
+    return preloadAppShell(OrganizationShell);
+  },
   component: function OrganizationShellRoute() {
     const isLoading = useAuthStore((s) => s.isLoading);
     if (isLoading) return <FullPageSpinner />;
@@ -1283,10 +1149,7 @@ const organizationCreditEditRoute = createRoute({
 // referrer — stands behind them, its outlet holding the dialog routes (which
 // render nothing), and the island's host opens each dialog over it; `from`
 // takes the drawer back to the room that opened it.
-const InvoicesHost = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx'),
-  'Component',
-);
+const InvoicesHost = roomRoute('InvoicesHost');
 
 const organizationInvoicesRoute = createRoute({
   getParentRoute: () => organizationShellRoute,

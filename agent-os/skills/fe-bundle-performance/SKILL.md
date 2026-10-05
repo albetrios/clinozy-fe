@@ -53,6 +53,18 @@ dev server — see `docs/reference/local-production-perf.md`.
    in the entry chunk. Import the loaders it calls **dynamically, inside the
    function** — two tiny static imports were enough to break the budget. (That is
    an `import()` in a function body, not the module-scope one below.)
+8. **Route registration is first-paint weight.** Every manifest, validator,
+   builder and `import()` that `routeTree.tsx` holds ships on every load — and
+   Vite gives each `import()` a preload list naming every chunk the island
+   shares, which the entry carries too. L-54 measured that as most of the route
+   registration: the clinic rooms' imports now sit behind ONE lazy module
+   (`src/app/routes/room-routes.ts`, mounted with `roomRoute(name)` and warmed
+   by the org shell's loader), the dialog routes' manifests behind another
+   (`dialog-routes.ts`, `...dialogRoute(name)`, which awaits the manifest
+   before the gate), and each room's builders are imported by their own path,
+   never through the `@/lib/routes/index.ts` barrel. `pnpm build:check`
+   (`check-entry-routes.mjs`) trips on a dialog manifest or a room builder in
+   the first-paint chunks.
 
 ## Attribute a regression before you chase it
 
