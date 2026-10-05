@@ -7,6 +7,7 @@ import {
   notFound,
   Outlet,
   redirect,
+  type StaticDataRouteOption,
 } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
@@ -202,6 +203,15 @@ import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { resolveRootRedirect } from '@/shared/tenancy/organization-resolver.ts';
 
 import { ErrorBoundary } from './ErrorBoundary.tsx';
+
+/**
+ * A URL-driven dialog route's static data (D24), its manifest with it when it
+ * has one: the route renders nothing of its own, so opening it over its page
+ * is no page change (`staticData.dialog`, read by `PageTransition`).
+ */
+function dialogRoute(manifest?: PageManifest): StaticDataRouteOption {
+  return manifest ? { manifest, dialog: true } : { dialog: true };
+}
 
 // ── Lazy components ──
 // lazyRouteComponent (not React.lazy): the router can call `.preload()` on
@@ -1193,7 +1203,7 @@ const organizationLeadCreateRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: 'create',
   head: manifestHead(leadCreateManifest),
-  staticData: { manifest: leadCreateManifest },
+  staticData: dialogRoute(leadCreateManifest),
   validateSearch: validateLeadCreateSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1208,7 +1218,7 @@ const organizationLeadRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: '$leadId',
   head: manifestHead(leadManifest),
-  staticData: { manifest: leadManifest },
+  staticData: dialogRoute(leadManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(leadManifest)(toGateContext(location, params));
@@ -1254,7 +1264,7 @@ const organizationAppointmentCreateRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: 'create',
   head: manifestHead(appointmentCreateManifest),
-  staticData: { manifest: appointmentCreateManifest },
+  staticData: dialogRoute(appointmentCreateManifest),
   validateSearch: validateAppointmentCreateSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1269,7 +1279,7 @@ const organizationAppointmentRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: '$appointmentId',
   head: manifestHead(appointmentManifest),
-  staticData: { manifest: appointmentManifest },
+  staticData: dialogRoute(appointmentManifest),
   validateSearch: validateAppointmentSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1316,7 +1326,7 @@ const organizationPatientCreateRoute = createRoute({
   getParentRoute: () => organizationPatientsRoute,
   path: 'create',
   head: manifestHead(patientCreateManifest),
-  staticData: { manifest: patientCreateManifest },
+  staticData: dialogRoute(patientCreateManifest),
   validateSearch: validatePatientCreateSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1423,6 +1433,7 @@ function patientFileDrawerRoute<const Path extends string, Search>(
     getParentRoute: () => organizationPatientFileRoute,
     path,
     validateSearch,
+    staticData: dialogRoute(),
     component: patientFileComponent(component),
     errorComponent: RouteErrorBoundary,
   });
@@ -1458,6 +1469,7 @@ const organizationReviewEditRoute = patientFileDrawerRoute(
 const organizationPatientPhotoRoute = createRoute({
   getParentRoute: () => organizationPatientImagesRoute,
   path: '$imageId',
+  staticData: dialogRoute(),
   component: patientFileComponent('PatientPhotoViewer'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1465,6 +1477,7 @@ const organizationPatientPhotoRoute = createRoute({
 const organizationPatientPhotoEditRoute = createRoute({
   getParentRoute: () => organizationPatientImagesRoute,
   path: '$imageId/edit',
+  staticData: dialogRoute(),
   component: patientFileComponent('PatientPhotoDetails'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1476,42 +1489,49 @@ const organizationPrescriptionCreateRoute = createRoute({
   path: 'create',
   // `?medicines=` — the names a smart note recognised (AMBER A-F5).
   validateSearch: validatePatientRxCreateSearch,
+  staticData: dialogRoute(),
   component: patientFileDialog('prescriptionCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationPrescriptionRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: '$prescriptionId',
+  staticData: dialogRoute(),
   component: patientFileDialog('prescription'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationPrescriptionEditRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: '$prescriptionId/edit',
+  staticData: dialogRoute(),
   component: patientFileDialog('prescriptionEdit'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationTreatmentCreateRoute = createRoute({
   getParentRoute: () => organizationPatientTreatmentsRoute,
   path: 'create',
+  staticData: dialogRoute(),
   component: patientFileDialog('treatmentCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationTreatmentEditRoute = createRoute({
   getParentRoute: () => organizationPatientTreatmentsRoute,
   path: '$treatmentId/edit',
+  staticData: dialogRoute(),
   component: patientFileDialog('treatmentEdit'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationReportCreateRoute = createRoute({
   getParentRoute: () => organizationPatientReportsRoute,
   path: 'create',
+  staticData: dialogRoute(),
   component: patientFileDialog('reportCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationReportRoute = createRoute({
   getParentRoute: () => organizationPatientReportsRoute,
   path: '$reportId',
+  staticData: dialogRoute(),
   component: patientFileDialog('report'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1537,7 +1557,7 @@ const organizationPaymentReceiveRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'receive',
   head: manifestHead(receiveManifest),
-  staticData: { manifest: receiveManifest },
+  staticData: dialogRoute(receiveManifest),
   validateSearch: validatePaymentReceiveSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1552,7 +1572,7 @@ const organizationPaymentPayRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'pay',
   head: manifestHead(payManifest),
-  staticData: { manifest: payManifest },
+  staticData: dialogRoute(payManifest),
   validateSearch: validatePaymentPaySearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1567,7 +1587,7 @@ const organizationPaymentEditRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: '$paymentId/edit',
   head: manifestHead(paymentEditManifest),
-  staticData: { manifest: paymentEditManifest },
+  staticData: dialogRoute(paymentEditManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(paymentEditManifest)(toGateContext(location, params));
@@ -1581,7 +1601,7 @@ const organizationDayCloseRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'day-close',
   head: manifestHead(dayCloseManifest),
-  staticData: { manifest: dayCloseManifest },
+  staticData: dialogRoute(dayCloseManifest),
   validateSearch: validateDayCloseSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1615,7 +1635,7 @@ const organizationPendingCreateRoute = createRoute({
   getParentRoute: () => organizationPaymentsPendingRoute,
   path: 'create',
   head: manifestHead(pendingCreateManifest),
-  staticData: { manifest: pendingCreateManifest },
+  staticData: dialogRoute(pendingCreateManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(pendingCreateManifest)(toGateContext(location, params));
@@ -1629,7 +1649,7 @@ const organizationCreditEditRoute = createRoute({
   getParentRoute: () => organizationPaymentsPendingRoute,
   path: '$creditId/edit',
   head: manifestHead(creditEditManifest),
-  staticData: { manifest: creditEditManifest },
+  staticData: dialogRoute(creditEditManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(creditEditManifest)(toGateContext(location, params));
@@ -1688,6 +1708,7 @@ const organizationInvoiceCreateRoute = createRoute({
   head: manifestHead(invoiceCreateManifest),
   validateSearch: validateInvoiceCreateSearch,
   beforeLoad: roomLeafGate(invoiceCreateManifest),
+  staticData: dialogRoute(),
   component: InvoiceCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -1697,6 +1718,7 @@ const organizationInvoiceRoute = createRoute({
   path: '$invoiceId',
   head: manifestHead(invoiceManifest),
   beforeLoad: roomLeafGate(invoiceManifest),
+  staticData: dialogRoute(),
   component: InvoiceRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -1706,6 +1728,7 @@ const organizationInvoiceEditRoute = createRoute({
   path: 'edit',
   head: manifestHead(invoiceEditManifest),
   beforeLoad: roomLeafGate(invoiceEditManifest),
+  staticData: dialogRoute(),
   component: InvoiceEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -1731,7 +1754,7 @@ const organizationTaskCreateRoute = createRoute({
   getParentRoute: () => organizationTasksRoute,
   path: 'create',
   head: manifestHead(taskCreateManifest),
-  staticData: { manifest: taskCreateManifest },
+  staticData: dialogRoute(taskCreateManifest),
   validateSearch: validateTaskCreateSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1748,7 +1771,7 @@ const organizationTaskRoute = createRoute({
   getParentRoute: () => organizationTasksRoute,
   path: '$taskId',
   head: manifestHead(taskManifest),
-  staticData: { manifest: taskManifest },
+  staticData: dialogRoute(taskManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(taskManifest)(toGateContext(location, params));
@@ -1779,7 +1802,7 @@ const organizationOfferingCreateRoute = createRoute({
   getParentRoute: () => organizationOfferingsRoute,
   path: 'create',
   head: manifestHead(offeringCreateManifest),
-  staticData: { manifest: offeringCreateManifest },
+  staticData: dialogRoute(offeringCreateManifest),
   validateSearch: validateOfferingCreateSearch,
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
@@ -1794,7 +1817,7 @@ const organizationOfferingEditRoute = createRoute({
   getParentRoute: () => organizationOfferingsRoute,
   path: '$offeringId/edit',
   head: manifestHead(offeringEditManifest),
-  staticData: { manifest: offeringEditManifest },
+  staticData: dialogRoute(offeringEditManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(offeringEditManifest)(toGateContext(location, params));
@@ -1827,7 +1850,7 @@ const organizationOfferCreateRoute = createRoute({
   getParentRoute: () => organizationOffersRoute,
   path: 'create',
   head: manifestHead(offerCreateManifest),
-  staticData: { manifest: offerCreateManifest },
+  staticData: dialogRoute(offerCreateManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(offerCreateManifest)(toGateContext(location, params));
@@ -1841,7 +1864,7 @@ const organizationOfferEditRoute = createRoute({
   getParentRoute: () => organizationOffersRoute,
   path: '$offerId/edit',
   head: manifestHead(offerEditManifest),
-  staticData: { manifest: offerEditManifest },
+  staticData: dialogRoute(offerEditManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(offerEditManifest)(toGateContext(location, params));
@@ -1872,7 +1895,7 @@ const organizationUserCreateRoute = createRoute({
   getParentRoute: () => organizationUsersRoute,
   path: 'create',
   head: manifestHead(userCreateManifest),
-  staticData: { manifest: userCreateManifest },
+  staticData: dialogRoute(userCreateManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(userCreateManifest)(toGateContext(location, params));
@@ -1886,7 +1909,7 @@ const organizationUserEditRoute = createRoute({
   getParentRoute: () => organizationUsersRoute,
   path: '$userId/edit',
   head: manifestHead(userEditManifest),
-  staticData: { manifest: userEditManifest },
+  staticData: dialogRoute(userEditManifest),
   // `?from=roles` keeps Roles & access behind the drawer (H:5188).
   validateSearch: validateUserEditSearch,
   beforeLoad: async ({ params, preload, location }) => {
@@ -1936,7 +1959,7 @@ const organizationUsersBranchCreateRoute = createRoute({
   getParentRoute: () => organizationUsersBranchesRoute,
   path: 'create',
   head: manifestHead(branchCreateManifest),
-  staticData: { manifest: branchCreateManifest },
+  staticData: dialogRoute(branchCreateManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(branchCreateManifest)(toGateContext(location, params));
@@ -1950,7 +1973,7 @@ const organizationUsersBranchEditRoute = createRoute({
   getParentRoute: () => organizationUsersBranchesRoute,
   path: '$branchId/edit',
   head: manifestHead(branchEditManifest),
-  staticData: { manifest: branchEditManifest },
+  staticData: dialogRoute(branchEditManifest),
   beforeLoad: async ({ params, preload, location }) => {
     if (preload) return;
     await gatewayFromManifest(branchEditManifest)(toGateContext(location, params));
@@ -2086,6 +2109,7 @@ const organizationSaleCreateRoute = createRoute({
   head: manifestHead(saleCreateManifest),
   validateSearch: validateMedicalCreateSearch,
   beforeLoad: roomLeafGate(saleCreateManifest),
+  staticData: dialogRoute(),
   component: SaleCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2095,6 +2119,7 @@ const organizationSaleRoute = createRoute({
   path: '$saleId',
   head: manifestHead(saleManifest),
   beforeLoad: roomLeafGate(saleManifest),
+  staticData: dialogRoute(),
   component: SaleRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2104,6 +2129,7 @@ const organizationSaleReturnRoute = createRoute({
   path: 'return',
   head: manifestHead(saleReturnManifest),
   beforeLoad: roomLeafGate(saleReturnManifest),
+  staticData: dialogRoute(),
   component: SaleReturnRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2114,6 +2140,7 @@ const organizationMedicineCreateRoute = createRoute({
   head: manifestHead(medicineCreateManifest),
   validateSearch: validateMedicalCreateSearch,
   beforeLoad: roomLeafGate(medicineCreateManifest),
+  staticData: dialogRoute(),
   component: MedicineCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2123,6 +2150,7 @@ const organizationMedicineEditRoute = createRoute({
   path: '$medicineId/edit',
   head: manifestHead(medicineEditManifest),
   beforeLoad: roomLeafGate(medicineEditManifest),
+  staticData: dialogRoute(),
   component: MedicineEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2133,6 +2161,7 @@ const organizationPurchaseOrderCreateRoute = createRoute({
   head: manifestHead(purchaseOrderCreateManifest),
   validateSearch: validateMedicalCreateSearch,
   beforeLoad: roomLeafGate(purchaseOrderCreateManifest),
+  staticData: dialogRoute(),
   component: PurchaseOrderCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2142,6 +2171,7 @@ const organizationPurchaseOrderRoute = createRoute({
   path: '$purchaseOrderId',
   head: manifestHead(purchaseOrderManifest),
   beforeLoad: roomLeafGate(purchaseOrderManifest),
+  staticData: dialogRoute(),
   component: PurchaseOrderRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2151,6 +2181,7 @@ const organizationPurchaseOrderEditRoute = createRoute({
   path: 'edit',
   head: manifestHead(purchaseOrderEditManifest),
   beforeLoad: roomLeafGate(purchaseOrderEditManifest),
+  staticData: dialogRoute(),
   component: PurchaseOrderEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2160,6 +2191,7 @@ const organizationPurchaseOrderReceiveRoute = createRoute({
   path: 'receive',
   head: manifestHead(purchaseOrderReceiveManifest),
   beforeLoad: roomLeafGate(purchaseOrderReceiveManifest),
+  staticData: dialogRoute(),
   component: PurchaseOrderReceiveRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2169,6 +2201,7 @@ const organizationSupplierCreateRoute = createRoute({
   path: 'create',
   head: manifestHead(supplierCreateManifest),
   beforeLoad: roomLeafGate(supplierCreateManifest),
+  staticData: dialogRoute(),
   component: SupplierCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2178,6 +2211,7 @@ const organizationSupplierEditRoute = createRoute({
   path: '$supplierId/edit',
   head: manifestHead(supplierEditManifest),
   beforeLoad: roomLeafGate(supplierEditManifest),
+  staticData: dialogRoute(),
   component: SupplierEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2187,6 +2221,7 @@ const organizationManufacturerCreateRoute = createRoute({
   path: 'create',
   head: manifestHead(manufacturerCreateManifest),
   beforeLoad: roomLeafGate(manufacturerCreateManifest),
+  staticData: dialogRoute(),
   component: ManufacturerCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2196,6 +2231,7 @@ const organizationManufacturerEditRoute = createRoute({
   path: '$manufacturerId/edit',
   head: manifestHead(manufacturerEditManifest),
   beforeLoad: roomLeafGate(manufacturerEditManifest),
+  staticData: dialogRoute(),
   component: ManufacturerEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2205,6 +2241,7 @@ const organizationMrCreateRoute = createRoute({
   path: 'create',
   head: manifestHead(mrCreateManifest),
   beforeLoad: roomLeafGate(mrCreateManifest),
+  staticData: dialogRoute(),
   component: MrCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2214,6 +2251,7 @@ const organizationMrEditRoute = createRoute({
   path: '$mrId/edit',
   head: manifestHead(mrEditManifest),
   beforeLoad: roomLeafGate(mrEditManifest),
+  staticData: dialogRoute(),
   component: MrEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2223,6 +2261,7 @@ const organizationMrVisitCreateRoute = createRoute({
   path: '$mrId/visits/create',
   head: manifestHead(mrVisitCreateManifest),
   beforeLoad: roomLeafGate(mrVisitCreateManifest),
+  staticData: dialogRoute(),
   component: MrVisitCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2302,6 +2341,7 @@ const organizationStockItemCreateRoute = createRoute({
   head: manifestHead(stockItemCreateManifest),
   validateSearch: validateStockCreateSearch,
   beforeLoad: roomLeafGate(stockItemCreateManifest),
+  staticData: dialogRoute(),
   component: StockItemCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2311,6 +2351,7 @@ const organizationStockItemEditRoute = createRoute({
   path: '$itemId/edit',
   head: manifestHead(stockItemEditManifest),
   beforeLoad: roomLeafGate(stockItemEditManifest),
+  staticData: dialogRoute(),
   component: StockItemEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2320,6 +2361,7 @@ const organizationStockCheckRoute = createRoute({
   path: 'check',
   head: manifestHead(stockCheckManifest),
   beforeLoad: roomLeafGate(stockCheckManifest),
+  staticData: dialogRoute(),
   component: StockCheckRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2330,6 +2372,7 @@ const organizationStockPurchaseCreateRoute = createRoute({
   head: manifestHead(stockPurchaseCreateManifest),
   validateSearch: validateStockCreateSearch,
   beforeLoad: roomLeafGate(stockPurchaseCreateManifest),
+  staticData: dialogRoute(),
   component: StockPurchaseCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2339,6 +2382,7 @@ const organizationStockPurchaseEditRoute = createRoute({
   path: '$purchaseId/edit',
   head: manifestHead(stockPurchaseEditManifest),
   beforeLoad: roomLeafGate(stockPurchaseEditManifest),
+  staticData: dialogRoute(),
   component: StockPurchaseEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2349,6 +2393,7 @@ const organizationStockVendorCreateRoute = createRoute({
   head: manifestHead(stockVendorCreateManifest),
   validateSearch: validateStockCreateSearch,
   beforeLoad: roomLeafGate(stockVendorCreateManifest),
+  staticData: dialogRoute(),
   component: StockVendorCreateRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2358,6 +2403,7 @@ const organizationStockVendorEditRoute = createRoute({
   path: '$vendorId/edit',
   head: manifestHead(stockVendorEditManifest),
   beforeLoad: roomLeafGate(stockVendorEditManifest),
+  staticData: dialogRoute(),
   component: StockVendorEditRoute,
   errorComponent: RouteErrorBoundary,
 });
@@ -2639,5 +2685,11 @@ declare module '@tanstack/react-router' {
      * app nav, ⌘K) reads route metadata without importing pages.
      */
     manifest?: PageManifest;
+    /**
+     * A URL-driven dialog route (D24): it renders nothing of its own — the
+     * page under it opens the drawer — so `PageTransition` holds that page
+     * still while the dialog opens, switches and closes.
+     */
+    dialog?: true;
   }
 }

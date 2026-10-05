@@ -6,11 +6,21 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PageTransition } from './PageTransition.tsx';
 
-const { locationMock } = vi.hoisted(() => ({ locationMock: vi.fn() }));
+const { matchesMock } = vi.hoisted(() => ({ matchesMock: vi.fn() }));
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
-  return { ...actual, useLocation: () => locationMock() as { pathname: string } };
+  return {
+    ...actual,
+    useMatches: ({ select }: { select: (matches: unknown) => unknown }) =>
+      select(matchesMock()),
+  };
 });
+
+/** The router's matches for a page — and, with `dialog`, a dialog route open over it (D24). */
+const at = (pathname: string, dialog?: string) => [
+  { pathname, staticData: {} },
+  ...(dialog ? [{ pathname: dialog, staticData: { dialog: true } }] : []),
+];
 
 interface CommitFrame {
   /** Classes on the wrapper when the commit ended — what the first frame paints. */
@@ -86,7 +96,7 @@ function StatefulChild() {
 
 describe('PageTransition', () => {
   beforeEach(() => {
-    locationMock.mockReturnValue({ pathname: '/organization/acme/dashboard' });
+    matchesMock.mockReturnValue(at('/organization/acme/dashboard'));
   });
 
   it('renders children with readable foreground and route-rise animation class', async () => {
@@ -106,7 +116,7 @@ describe('PageTransition', () => {
 
   describe('SHELL-6 — a route change animates, it does not remount', () => {
     it('keeps the same wrapper element and the child state across a path change', () => {
-      locationMock.mockReturnValue({ pathname: '/organization/acme/dashboard' });
+      matchesMock.mockReturnValue(at('/organization/acme/dashboard'));
       const { rerender } = render(
         <PageTransition>
           <StatefulChild />
@@ -119,7 +129,7 @@ describe('PageTransition', () => {
       expect(counter).toHaveTextContent('1');
 
       // Switch organization — a real path change.
-      locationMock.mockReturnValue({ pathname: '/organization/globex/dashboard' });
+      matchesMock.mockReturnValue(at('/organization/globex/dashboard'));
       rerender(
         <PageTransition>
           <StatefulChild />
@@ -133,7 +143,7 @@ describe('PageTransition', () => {
     });
 
     it('takes extra classes — a flush room becomes a bounded column', () => {
-      locationMock.mockReturnValue({ pathname: '/a' });
+      matchesMock.mockReturnValue(at('/a'));
       render(
         <PageTransition className="flex min-h-0 flex-1 flex-col">
           <p data-testid="copy">copy</p>
@@ -149,7 +159,7 @@ describe('PageTransition', () => {
     });
 
     it('still re-applies the animation class on a path change', () => {
-      locationMock.mockReturnValue({ pathname: '/a' });
+      matchesMock.mockReturnValue(at('/a'));
       const { rerender } = render(
         <PageTransition>
           <p data-testid="copy">copy</p>
@@ -158,7 +168,7 @@ describe('PageTransition', () => {
       const wrapper = screen.getByTestId('copy').parentElement;
       expect(wrapper).toHaveClass('animate-fade-in-up');
 
-      locationMock.mockReturnValue({ pathname: '/b' });
+      matchesMock.mockReturnValue(at('/b'));
       rerender(
         <PageTransition>
           <p data-testid="copy">copy</p>
@@ -191,7 +201,7 @@ describe('PageTransition', () => {
 
     it('replays the animation inside the route-change commit', () => {
       const frames: CommitFrame[] = [];
-      locationMock.mockReturnValue({ pathname: '/a' });
+      matchesMock.mockReturnValue(at('/a'));
       const { rerender } = render(
         <FirstFrameProbe frames={frames}>
           <PageTransition>
@@ -200,7 +210,7 @@ describe('PageTransition', () => {
         </FirstFrameProbe>,
       );
 
-      locationMock.mockReturnValue({ pathname: '/b' });
+      matchesMock.mockReturnValue(at('/b'));
       rerender(
         <FirstFrameProbe frames={frames}>
           <PageTransition>
@@ -215,6 +225,58 @@ describe('PageTransition', () => {
       // RESTARTS the animation happened before this frame was painted.
       expect(frames[1]?.classes).toContain('animate-fade-in-up');
       expect(frames[1]?.classWrites).toBeGreaterThan(0);
+    });
+  });
+
+  describe('a dialog route over the page (D24) is no page change', () => {
+    /** Renders under the probe, then moves through `steps` — one commit each. */
+    function walk(first: ReturnType<typeof at>, ...steps: ReturnType<typeof at>[]) {
+      const frames: CommitFrame[] = [];
+      const tree = () => (
+        <FirstFrameProbe frames={frames}>
+          <PageTransition>
+            <p data-testid="copy">copy</p>
+          </PageTransition>
+        </FirstFrameProbe>
+      );
+      matchesMock.mockReturnValue(first);
+      const { rerender } = render(tree());
+      for (const step of steps) {
+        matchesMock.mockReturnValue(step);
+        rerender(tree());
+      }
+      const wrapper = screen.getByTestId('copy').parentElement;
+      return { frames, wrapper };
+    }
+
+    it('holds the list still while a drawer opens over it, switches and closes', () => {
+      const { frames, wrapper } = walk(
+        at('/leads'),
+        at('/leads', '/leads/1'),
+        at('/leads', '/leads/2'),
+        at('/leads'),
+      );
+      // Not one restart after the first paint: the list never rises under the backdrop.
+      expect(frames.slice(1).map((frame) => frame.classWrites)).toEqual([0, 0, 0]);
+      expect(wrapper).toHaveAttribute('data-route', '/leads');
+    });
+
+    it('keeps the section a drawer route renders over, and plays for a new page', () => {
+      const { frames, wrapper } = walk(
+        at('/patients/1/timeline'),
+        // Edit patient renders the section it opened from, and its drawer (A-F1).
+        at('/patients/1', '/patients/1/edit'),
+        at('/today'),
+      );
+      expect(frames[1]?.classWrites).toBe(0);
+      expect(frames[2]?.classWrites).toBeGreaterThan(0);
+      expect(wrapper).toHaveAttribute('data-route', '/today');
+    });
+
+    it('keys a cold load on a dialog route to the page under it', () => {
+      const { frames, wrapper } = walk(at('/leads', '/leads/1'), at('/leads'));
+      expect(frames[1]?.classWrites).toBe(0);
+      expect(wrapper).toHaveAttribute('data-route', '/leads');
     });
   });
 });

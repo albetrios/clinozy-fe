@@ -171,6 +171,47 @@ describe('router configuration', () => {
     for (const key of keys) expect(shellLoads[key]).toHaveBeenCalledOnce();
   });
 
+  it('marks the URL-driven dialog routes — and no page — so the page holds still under them', () => {
+    const SLUG = '/organization/$organizationSlug';
+    const dialogs = (
+      Object.values(router.routesById) as unknown as {
+        id: string;
+        options: { staticData?: { dialog?: true } };
+      }[]
+    )
+      .filter((route) => route.options.staticData?.dialog === true)
+      .map((route) => route.id);
+    // Every null-rendering dialog island (D24): drawers, viewers, previews.
+    expect(dialogs).toHaveLength(61);
+    expect(dialogs).toEqual(
+      expect.arrayContaining(
+        [
+          '/leads/$leadId',
+          '/leads/create',
+          '/tasks/$taskId',
+          '/patients/$patientId/edit',
+          '/patients/$patientId/reviews/create',
+          '/patients/$patientId/images/$imageId',
+          '/patients/$patientId/treatments/create',
+          '/invoices/$invoiceId/edit',
+          '/medical/sales/$saleId/return',
+          '/stock/items/check',
+        ].map((path) => `${SLUG}${path}`),
+      ),
+    );
+    for (const page of [
+      '/leads',
+      '/today',
+      '/invoices',
+      '/patients/$patientId',
+      '/patients/$patientId/timeline',
+      '/medical/sales',
+      '/payments/pending',
+    ]) {
+      expect(dialogs).not.toContain(`${SLUG}${page}`);
+    }
+  });
+
   it('preloads route chunks on intent', () => {
     expect(router.options.defaultPreload).toBe('intent');
   });
