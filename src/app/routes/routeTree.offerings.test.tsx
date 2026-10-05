@@ -67,8 +67,9 @@ const OFFER_EDIT = `${OFFERS}/$offerId/edit`;
 type OfferingsRoute = {
   options: {
     validateSearch?: unknown;
-    staticData?: { manifest?: { nav?: unknown } };
+    staticData?: { manifest?: { nav?: unknown }; dialog?: true };
     beforeLoad?: (context: Record<string, unknown>) => Promise<void> | void;
+    loader?: () => Promise<unknown>;
   };
 };
 const routeOf = (id: string) =>
@@ -121,11 +122,25 @@ describe('the Offerings room’s routes (KICKOFF §4, D24, S:98–103)', () => {
       expect(gatewayFromManifest).toHaveBeenCalledWith(manifest);
       expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
       expect(requireOrgStatus).toHaveBeenCalledTimes(1);
-      expect(routeOf(id)?.options.staticData?.manifest).toBe(manifest);
+    },
+  );
+
+  it.each([
+    [OFFERING_CREATE, offeringCreateManifest],
+    [OFFERING_EDIT, offeringEditManifest],
+    [OFFER_CREATE, offerCreateManifest],
+    [OFFER_EDIT, offerEditManifest],
+  ] as const)(
+    '%s loads its manifest with the dialog-route registry, not the entry chunk',
+    async (id, manifest) => {
+      expect(routeOf(id)?.options.staticData).toEqual({ dialog: true });
+      await expect(routeOf(id)?.options.loader?.()).resolves.toBe(manifest);
     },
   );
 
   it('puts only the room in the nav, never its Offers tab or its dialogs', () => {
+    expect(routeOf(OFFERINGS)?.options.staticData?.manifest).toBe(offeringsManifest);
+    expect(routeOf(OFFERS)?.options.staticData?.manifest).toBe(offersManifest);
     expect(routeOf(OFFERINGS)?.options.staticData?.manifest?.nav).toBeDefined();
     for (const id of [OFFERS, OFFERING_CREATE, OFFERING_EDIT, OFFER_CREATE, OFFER_EDIT]) {
       expect(routeOf(id)?.options.staticData?.manifest?.nav).toBeUndefined();

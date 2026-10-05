@@ -277,7 +277,11 @@ Marketing Leads, everyone else Today; the first open room when that one is
 closed; the dashboard when no clinic module is on) — the unknown path with a
 "Page not found" toast (S:115). An unknown organization slug keeps the platform's
 404 (identical for an unknown and a non-member slug, so existence never leaks).
-A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
+A URL-driven dialog route renders nothing of its own, so `routeTree.tsx` — the entry
+chunk — carries only its path: its manifest and component load with one lazy registry,
+`src/app/routes/dialog-routes.ts`, and `dialogRoute(name)` awaits the manifest before
+running the same gate as the page under it (gateway, then the org status guard), then
+titles the document from it. A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
 that matches nothing leaves the parent page behind, toasts "<Record> not found ·
 it may have been deleted" and replaces the URL with the parent. A room tab reads all
 of its dialog routes through `useRoomDialogRoute` (`shared/hooks/useRoomDialogRoute/`):

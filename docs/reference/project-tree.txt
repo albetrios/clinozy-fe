@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2203 src files · ~1058 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
+Stats: ~2205 src files · ~1059 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -362,11 +362,13 @@ clinozy-fe/
 │   │   │   ├── QueryProvider.tsx
 │   │   │   └── [1 test file]
 │   │   ├── routes/
+│   │   │   ├── dialog-routes.ts
 │   │   │   ├── ErrorBoundary.tsx
+│   │   │   ├── localized-route.ts
 │   │   │   ├── NotFoundPage.tsx
 │   │   │   ├── routeTree.tsx
 │   │   │   ├── UnauthorizedPage.tsx
-│   │   │   └── [5 test files]
+│   │   │   └── [6 test files]
 │   │   └── version/
 │   │       ├── show-update-available-toast.ts
 │   │       ├── version-update.constants.ts

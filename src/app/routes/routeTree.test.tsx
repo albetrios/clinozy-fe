@@ -1,7 +1,14 @@
-import { createMemoryHistory, createRouter, isRedirect } from '@tanstack/react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  createMemoryHistory,
+  createRouter,
+  isRedirect,
+  redirect,
+} from '@tanstack/react-router';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requireOrgStatus, requireSuspendedOrgStatus } from '@/app/guards/org-gates.ts';
+import { composePageTitle } from '@/lib/routes/page-head.ts';
+import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
 import {
   validateAppointmentCreateSearch,
@@ -45,7 +52,10 @@ import {
 
 const gatewayExecutor = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const gatewayFromManifest = vi.hoisted(() =>
-  vi.fn(() => gatewayExecutor as (context: unknown) => Promise<void>),
+  vi.fn(
+    (_manifest: { path: string }) =>
+      gatewayExecutor as (context: unknown) => Promise<void>,
+  ),
 );
 const requireAuth = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const shellLoads = vi.hoisted(() => ({
@@ -136,6 +146,13 @@ function beforeLoadOf(routeId: string): BeforeLoad {
   ).toBeDefined();
   return route?.options.beforeLoad as BeforeLoad;
 }
+
+/** The app's real route tree in a memory router, at `url`. */
+const memoryRouterAt = (url: string) =>
+  createRouter({
+    routeTree: router.routeTree,
+    history: createMemoryHistory({ initialEntries: [url] }),
+  });
 
 const gateArgs = (preload: boolean) => ({
   location: { href: '/organization/acme/suspended' },
@@ -503,6 +520,7 @@ describe('the Leads dialog routes (KICKOFF §4, D24, S:22–25)', () => {
       validateSearch?: unknown;
       staticData?: { manifest?: unknown };
       beforeLoad?: (context: Record<string, unknown>) => unknown;
+      loader?: () => Promise<unknown>;
     };
   };
   const routeOf = (id: string) =>
@@ -546,7 +564,9 @@ describe('the Leads dialog routes (KICKOFF §4, D24, S:22–25)', () => {
       expect(gatewayFromManifest).toHaveBeenCalledWith(manifest);
       expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
       expect(requireOrgStatus).toHaveBeenCalledTimes(1);
-      expect(routeOf(id)?.options.staticData?.manifest).toBe(manifest);
+      // The manifest rides the dialog-route registry, not the entry chunk.
+      expect(routeOf(id)?.options.staticData?.manifest).toBeUndefined();
+      await expect(routeOf(id)?.options.loader?.()).resolves.toBe(manifest);
     },
   );
 
@@ -594,6 +614,7 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
       validateSearch?: unknown;
       staticData?: { manifest?: unknown };
       beforeLoad?: (context: Record<string, unknown>) => unknown;
+      loader?: () => Promise<unknown>;
     };
   };
   const routeOf = (id: string) =>
@@ -642,7 +663,9 @@ describe('the Appointments dialog routes (KICKOFF §4, D24, D27, S:26–29)', ()
       expect(gatewayFromManifest).toHaveBeenCalledWith(manifest);
       expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
       expect(requireOrgStatus).toHaveBeenCalledTimes(1);
-      expect(routeOf(id)?.options.staticData?.manifest).toBe(manifest);
+      // The manifest rides the dialog-route registry, not the entry chunk.
+      expect(routeOf(id)?.options.staticData?.manifest).toBeUndefined();
+      await expect(routeOf(id)?.options.loader?.()).resolves.toBe(manifest);
     },
   );
 
@@ -693,6 +716,7 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
     options: {
       validateSearch?: unknown;
       staticData?: { manifest?: unknown };
+      loader?: () => Promise<unknown>;
     };
   };
   const routeOf = (id: string) =>
@@ -722,7 +746,8 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
     });
     expect(gatewayFromManifest).toHaveBeenCalledWith(taskCreateManifest);
     expect(requireOrgStatus).toHaveBeenCalledTimes(1);
-    expect(routeOf(`${TASKS}/create`)?.options.staticData?.manifest).toBe(
+    expect(routeOf(`${TASKS}/create`)?.options.staticData?.manifest).toBeUndefined();
+    await expect(routeOf(`${TASKS}/create`)?.options.loader?.()).resolves.toBe(
       taskCreateManifest,
     );
   });
@@ -736,7 +761,10 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
     expect(gatewayFromManifest).toHaveBeenCalledWith(taskManifest);
     expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
     expect(requireOrgStatus).toHaveBeenCalledTimes(1);
-    expect(routeOf(`${TASKS}/$taskId`)?.options.staticData?.manifest).toBe(taskManifest);
+    expect(routeOf(`${TASKS}/$taskId`)?.options.staticData?.manifest).toBeUndefined();
+    await expect(routeOf(`${TASKS}/$taskId`)?.options.loader?.()).resolves.toBe(
+      taskManifest,
+    );
   });
 });
 
@@ -746,6 +774,7 @@ describe('the Visit sheet route (KICKOFF §6.13, D18; L-49)', () => {
     options: {
       validateSearch?: unknown;
       staticData?: { manifest?: unknown; dialog?: true };
+      loader?: () => Promise<unknown>;
     };
   };
   const routeOf = (id: string) =>
@@ -757,17 +786,16 @@ describe('the Visit sheet route (KICKOFF §6.13, D18; L-49)', () => {
     vi.mocked(requireOrgStatus).mockClear();
   });
 
-  it('registers the sheet under the org shell with its tab search, as a sheet over the room', () => {
+  it('registers the sheet under the org shell with its tab search, as a sheet over the room', async () => {
     expect(
       Object.keys(router.routesById).filter((id) =>
         id.startsWith('/organization/$organizationSlug/visits'),
       ),
     ).toEqual([VISIT]);
     expect(routeOf(VISIT)?.options.validateSearch).toBe(validateVisitSearch);
-    expect(routeOf(VISIT)?.options.staticData).toEqual({
-      manifest: visitManifest,
-      dialog: true,
-    });
+    // A dialog route: its manifest loads with the dialog-route registry (L-54).
+    expect(routeOf(VISIT)?.options.staticData).toEqual({ dialog: true });
+    await expect(routeOf(VISIT)?.options.loader?.()).resolves.toBe(visitManifest);
   });
 
   it('runs the room gateway on its own manifest, then the status guard', async () => {
@@ -794,11 +822,6 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
   };
   const routeOf = (id: string) =>
     (router.routesById as unknown as Record<string, FileRoute | undefined>)[id];
-  const fileRouter = (url: string) =>
-    createRouter({
-      routeTree: router.routeTree,
-      history: createMemoryHistory({ initialEntries: [url] }),
-    });
 
   beforeEach(() => {
     gatewayExecutor.mockClear();
@@ -880,7 +903,7 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
   });
 
   it('opens the Overview from the bare URL, keeping the Patients row’s `activity`', async () => {
-    const memoryRouter = fileRouter('/organization/acme/patients/P1?activity=open');
+    const memoryRouter = memoryRouterAt('/organization/acme/patients/P1?activity=open');
     await memoryRouter.load();
     await vi.waitFor(() =>
       expect(memoryRouter.state.location.pathname).toBe(
@@ -892,12 +915,142 @@ describe('the patient file routes (KICKOFF §6.6, §4; S:33–34)', () => {
   });
 
   it('sends an unknown section to the Overview', async () => {
-    const memoryRouter = fileRouter('/organization/acme/patients/P1/secret/deeper');
+    const memoryRouter = memoryRouterAt('/organization/acme/patients/P1/secret/deeper');
     await memoryRouter.load();
     await vi.waitFor(() =>
       expect(memoryRouter.state.location.pathname).toBe(
         '/organization/acme/patients/P1/timeline',
       ),
     );
+  });
+});
+
+describe('the dialog routes’ manifests load with the dialog-route registry (D24, L-54)', () => {
+  type DialogRoute = {
+    id: string;
+    fullPath: string;
+    options: {
+      staticData?: Record<string, unknown>;
+      loader?: () => Promise<PageManifest>;
+      head?: (context: { loaderData?: PageManifest }) => unknown;
+      beforeLoad?: (context: Record<string, unknown>) => Promise<void> | void;
+    };
+  };
+  const dialogRoutes = (
+    Object.values(router.routesById) as unknown as DialogRoute[]
+  ).filter((route) => route.options.staticData?.dialog === true);
+  // Every drawer, viewer and preview with a manifest, and the Visit sheet; the
+  // patient file's dialogs inherit the file's gate and carry no manifest.
+  const manifestBacked = dialogRoutes.filter((route) => route.options.loader);
+  const gateArgsFor = (preload: boolean) => ({
+    location: { href: '/organization/acme/x' },
+    params: { organizationSlug: 'acme' },
+    preload,
+  });
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('keeps every dialog manifest out of the entry chunk: static data only says it is a dialog', () => {
+    expect(manifestBacked).toHaveLength(48);
+    for (const route of dialogRoutes) {
+      expect(route.options.staticData, route.id).toEqual({ dialog: true });
+    }
+  });
+
+  it('loads each route’s own manifest — every registry name matches its route', async () => {
+    for (const route of manifestBacked) {
+      const manifest = await route.options.loader?.();
+      expect(manifest?.path, route.id).toBe(route.fullPath);
+    }
+  });
+
+  it('gates each one on its own manifest, then the org status guard — as before', async () => {
+    for (const route of manifestBacked) {
+      gatewayFromManifest.mockClear();
+      vi.mocked(requireOrgStatus).mockClear();
+      await route.options.beforeLoad?.(gateArgsFor(false));
+      expect(gatewayFromManifest, route.id).toHaveBeenCalledExactlyOnceWith(
+        await route.options.loader?.(),
+      );
+      expect(gatewayExecutor).toHaveBeenLastCalledWith({ kind: 'gate-context-sentinel' });
+      expect(requireOrgStatus, route.id).toHaveBeenCalledOnce();
+    }
+  });
+
+  it('skips the gate on a hover preload — the real navigation runs it', async () => {
+    for (const route of manifestBacked)
+      await route.options.beforeLoad?.(gateArgsFor(true));
+    expect(gatewayFromManifest).not.toHaveBeenCalled();
+    expect(requireOrgStatus).not.toHaveBeenCalled();
+  });
+
+  it('titles the document from the loaded manifest, and leaves the page’s title until it loads', async () => {
+    const route = manifestBacked.find((item) => item.fullPath.endsWith('/leads/create'));
+    const manifest = await route?.options.loader?.();
+    expect(route?.options.head?.({ loaderData: manifest })).toEqual({
+      meta: [{ title: composePageTitle('New lead') }],
+    });
+    expect(route?.options.head?.({})).toEqual({});
+  });
+});
+
+describe('a dialog route refuses a member without its permission (L-54: RBAC as strong as before)', () => {
+  const LEADS = '/organization/$organizationSlug/leads';
+  const deny = vi.fn(() => {
+    throw redirect({ to: '/unauthorized' });
+  });
+
+  beforeEach(() => {
+    deny.mockClear();
+    // The Leads page lets the member in; New lead's own manifest does not.
+    gatewayFromManifest.mockImplementation((manifest) =>
+      manifest.path === `${LEADS}/create` ? deny : gatewayExecutor,
+    );
+  });
+  afterEach(() => {
+    gatewayFromManifest.mockImplementation(() => gatewayExecutor);
+  });
+
+  it('on a cold load of its URL', async () => {
+    const memoryRouter = memoryRouterAt('/organization/acme/leads/create?name=Asha');
+    await memoryRouter.load();
+
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe('/unauthorized'),
+    );
+    expect(deny).toHaveBeenCalledOnce();
+    expect(memoryRouter.state.matches.map((match) => match.routeId)).not.toContain(
+      `${LEADS}/create`,
+    );
+  });
+
+  it('on a navigation from its page', async () => {
+    const memoryRouter = memoryRouterAt('/organization/acme/leads');
+    await memoryRouter.load();
+    expect(memoryRouter.state.location.pathname).toBe('/organization/acme/leads');
+
+    await memoryRouter.navigate({
+      to: '/organization/$organizationSlug/leads/create',
+      params: { organizationSlug: 'acme' },
+    });
+
+    await vi.waitFor(() =>
+      expect(memoryRouter.state.location.pathname).toBe('/unauthorized'),
+    );
+    expect(deny).toHaveBeenCalledOnce();
+  });
+
+  it('and lets a permitted member in', async () => {
+    gatewayFromManifest.mockImplementation(() => gatewayExecutor);
+    const memoryRouter = memoryRouterAt('/organization/acme/leads/create');
+    await memoryRouter.load();
+
+    expect(memoryRouter.state.location.pathname).toBe('/organization/acme/leads/create');
+    expect(memoryRouter.state.matches.at(-1)?.routeId).toBe(`${LEADS}/create`);
+    expect(deny).not.toHaveBeenCalled();
   });
 });

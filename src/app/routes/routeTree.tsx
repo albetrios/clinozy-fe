@@ -26,13 +26,8 @@ import { toGateContext } from '@/core/security/gate-context.ts';
 import { gatewayFromManifest } from '@/core/security/gateway.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
-import { I18N_NAMESPACES, type I18nNamespace } from '@/lib/i18n/namespaces.ts';
-import {
-  organizationAppointment,
-  organizationDashboard,
-  organizationLead,
-} from '@/lib/routes/builders.ts';
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import { organizationDashboard } from '@/lib/routes/builders.ts';
 import {
   APP_DESCRIPTION,
   APP_TITLE,
@@ -49,32 +44,23 @@ import { validateLoginSearch } from '@/pages/login/login.search.ts';
 import { manifest as mfaManifest } from '@/pages/mfa/mfa.manifest.ts';
 import { manifest as onboardingManifest } from '@/pages/onboarding/onboarding.manifest.ts';
 import { validateOnboardingSearch } from '@/pages/onboarding/onboarding.search.ts';
-import { manifest as appointmentManifest } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.manifest.ts';
 import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
 import {
   validateAppointmentCreateSearch,
   validateAppointmentSearch,
   validateAppointmentsSearch,
 } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
-import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
-import { manifest as invoiceEditManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.manifest.ts';
-import { manifest as invoiceManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/invoice-id.manifest.ts';
-import { manifest as invoiceCreateManifest } from '@/pages/organization/$organizationSlug/invoices/create/create.manifest.ts';
 import { manifest as invoicesManifest } from '@/pages/organization/$organizationSlug/invoices/invoices.manifest.ts';
 import {
   validateInvoiceCreateSearch,
   validateInvoiceSearch,
 } from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
-import { manifest as leadManifest } from '@/pages/organization/$organizationSlug/leads/$leadId/lead-id.manifest.ts';
-import { manifest as leadCreateManifest } from '@/pages/organization/$organizationSlug/leads/create/create.manifest.ts';
 import { manifest as leadsManifest } from '@/pages/organization/$organizationSlug/leads/leads.manifest.ts';
 import {
   validateLeadCreateSearch,
   validateLeadsSearch,
 } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
-import { manifest as manufacturerEditManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/edit/edit.manifest.ts';
-import { manifest as manufacturerCreateManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/create/create.manifest.ts';
 import { manifest as medicalManufacturersManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.manifest.ts';
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import {
@@ -82,35 +68,17 @@ import {
   validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '@/pages/organization/$organizationSlug/medical/medical.search.ts';
-import { manifest as medicineEditManifest } from '@/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/edit.manifest.ts';
-import { manifest as medicineCreateManifest } from '@/pages/organization/$organizationSlug/medical/medicines/create/create.manifest.ts';
 import { manifest as medicalMedicinesManifest } from '@/pages/organization/$organizationSlug/medical/medicines/medicines.manifest.ts';
-import { manifest as mrEditManifest } from '@/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/edit.manifest.ts';
-import { manifest as mrVisitCreateManifest } from '@/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/create.manifest.ts';
-import { manifest as mrCreateManifest } from '@/pages/organization/$organizationSlug/medical/mrs/create/create.manifest.ts';
 import { manifest as medicalMrsManifest } from '@/pages/organization/$organizationSlug/medical/mrs/mrs.manifest.ts';
 import { manifest as medicalPaymentsManifest } from '@/pages/organization/$organizationSlug/medical/payments/payments.manifest.ts';
-import { manifest as purchaseOrderEditManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/edit/edit.manifest.ts';
-import { manifest as purchaseOrderManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/purchase-order-id.manifest.ts';
-import { manifest as purchaseOrderReceiveManifest } from '@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/receive/receive.manifest.ts';
-import { manifest as purchaseOrderCreateManifest } from '@/pages/organization/$organizationSlug/medical/purchases/create/create.manifest.ts';
 import { manifest as medicalPurchasesManifest } from '@/pages/organization/$organizationSlug/medical/purchases/purchases.manifest.ts';
-import { manifest as saleReturnManifest } from '@/pages/organization/$organizationSlug/medical/sales/$saleId/return/return.manifest.ts';
-import { manifest as saleManifest } from '@/pages/organization/$organizationSlug/medical/sales/$saleId/sale-id.manifest.ts';
-import { manifest as saleCreateManifest } from '@/pages/organization/$organizationSlug/medical/sales/create/create.manifest.ts';
 import { manifest as medicalSalesManifest } from '@/pages/organization/$organizationSlug/medical/sales/sales.manifest.ts';
-import { manifest as supplierEditManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/$supplierId/edit/edit.manifest.ts';
-import { manifest as supplierCreateManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/create/create.manifest.ts';
 import { manifest as medicalSuppliersManifest } from '@/pages/organization/$organizationSlug/medical/suppliers/suppliers.manifest.ts';
-import { manifest as offeringEditManifest } from '@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.manifest.ts';
-import { manifest as offeringCreateManifest } from '@/pages/organization/$organizationSlug/offerings/create/create.manifest.ts';
 import { manifest as offeringsManifest } from '@/pages/organization/$organizationSlug/offerings/offerings.manifest.ts';
 import {
   validateOfferingCreateSearch,
   validateOfferingsSearch,
 } from '@/pages/organization/$organizationSlug/offerings/offerings.search.ts';
-import { manifest as offerEditManifest } from '@/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/edit.manifest.ts';
-import { manifest as offerCreateManifest } from '@/pages/organization/$organizationSlug/offerings/offers/create/create.manifest.ts';
 import { manifest as offersManifest } from '@/pages/organization/$organizationSlug/offerings/offers/offers.manifest.ts';
 import { validateOffersSearch } from '@/pages/organization/$organizationSlug/offerings/offers/offers.search.ts';
 import { manifest as organizationShellManifest } from '@/pages/organization/$organizationSlug/organization-slug.manifest.ts';
@@ -123,15 +91,11 @@ import {
   validatePatientFileSearch,
   validatePatientRxCreateSearch,
 } from '@/pages/organization/$organizationSlug/patients/$patientId/patient-id.search.ts';
-import { manifest as patientCreateManifest } from '@/pages/organization/$organizationSlug/patients/create/create.manifest.ts';
 import { manifest as patientsManifest } from '@/pages/organization/$organizationSlug/patients/patients.manifest.ts';
 import {
   validatePatientCreateSearch,
   validatePatientsSearch,
 } from '@/pages/organization/$organizationSlug/patients/patients.search.ts';
-import { manifest as paymentEditManifest } from '@/pages/organization/$organizationSlug/payments/$paymentId/edit/edit.manifest.ts';
-import { manifest as dayCloseManifest } from '@/pages/organization/$organizationSlug/payments/day-close/day-close.manifest.ts';
-import { manifest as payManifest } from '@/pages/organization/$organizationSlug/payments/pay/pay.manifest.ts';
 import { manifest as paymentsManifest } from '@/pages/organization/$organizationSlug/payments/payments.manifest.ts';
 import {
   validateDayCloseSearch,
@@ -139,30 +103,18 @@ import {
   validatePaymentReceiveSearch,
   validatePaymentsSearch,
 } from '@/pages/organization/$organizationSlug/payments/payments.search.ts';
-import { manifest as creditEditManifest } from '@/pages/organization/$organizationSlug/payments/pending/$creditId/edit/edit.manifest.ts';
-import { manifest as pendingCreateManifest } from '@/pages/organization/$organizationSlug/payments/pending/create/create.manifest.ts';
 import { manifest as pendingManifest } from '@/pages/organization/$organizationSlug/payments/pending/pending.manifest.ts';
 import { validatePendingSearch } from '@/pages/organization/$organizationSlug/payments/pending/pending.search.ts';
-import { manifest as receiveManifest } from '@/pages/organization/$organizationSlug/payments/receive/receive.manifest.ts';
-import { manifest as stockItemEditManifest } from '@/pages/organization/$organizationSlug/stock/items/$itemId/edit/edit.manifest.ts';
-import { manifest as stockCheckManifest } from '@/pages/organization/$organizationSlug/stock/items/check/check.manifest.ts';
-import { manifest as stockItemCreateManifest } from '@/pages/organization/$organizationSlug/stock/items/create/create.manifest.ts';
 import { manifest as stockItemsManifest } from '@/pages/organization/$organizationSlug/stock/items/items.manifest.ts';
 import { manifest as stockMovementsManifest } from '@/pages/organization/$organizationSlug/stock/movements/movements.manifest.ts';
-import { manifest as stockPurchaseEditManifest } from '@/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/edit.manifest.ts';
-import { manifest as stockPurchaseCreateManifest } from '@/pages/organization/$organizationSlug/stock/purchases/create/create.manifest.ts';
 import { manifest as stockPurchasesManifest } from '@/pages/organization/$organizationSlug/stock/purchases/purchases.manifest.ts';
 import { manifest as stockManifest } from '@/pages/organization/$organizationSlug/stock/stock.manifest.ts';
 import {
   validateStockCreateSearch,
   validateStockSearch,
 } from '@/pages/organization/$organizationSlug/stock/stock.search.ts';
-import { manifest as stockVendorEditManifest } from '@/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/edit.manifest.ts';
-import { manifest as stockVendorCreateManifest } from '@/pages/organization/$organizationSlug/stock/vendors/create/create.manifest.ts';
 import { manifest as stockVendorsManifest } from '@/pages/organization/$organizationSlug/stock/vendors/vendors.manifest.ts';
 import { manifest as suspendedManifest } from '@/pages/organization/$organizationSlug/suspended/suspended.manifest.ts';
-import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
-import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
 import { manifest as tasksManifest } from '@/pages/organization/$organizationSlug/tasks/tasks.manifest.ts';
 import {
   validateTaskCreateSearch,
@@ -170,12 +122,8 @@ import {
 } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { validateTodaySearch } from '@/pages/organization/$organizationSlug/today/today.search.ts';
-import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
-import { manifest as branchEditManifest } from '@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.manifest.ts';
 import { manifest as usersBranchesManifest } from '@/pages/organization/$organizationSlug/users/branches/branches.manifest.ts';
 import { validateBranchesSearch } from '@/pages/organization/$organizationSlug/users/branches/branches.search.ts';
-import { manifest as branchCreateManifest } from '@/pages/organization/$organizationSlug/users/branches/create/create.manifest.ts';
-import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { manifest as usersRolesManifest } from '@/pages/organization/$organizationSlug/users/roles/roles.manifest.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
 import {
@@ -183,7 +131,6 @@ import {
   validateUserEditSearch,
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
-import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
 import { validateVisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
@@ -200,36 +147,65 @@ import { SettingsModalLazy } from '@/shared/components/SettingsModal/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { AppToaster } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { resolveRootRedirect } from '@/shared/tenancy/organization-resolver.ts';
 
+import type { DialogRoute } from './dialog-routes.ts';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
+import { localizedRoute } from './localized-route.ts';
 
 /**
- * A URL-driven dialog route's static data (D24), its manifest with it when it
- * has one: the route renders nothing of its own, so opening it over its page
- * is no page change (`staticData.dialog`, read by `PageTransition`).
+ * A URL-driven dialog route's static data (D24): the route renders nothing of
+ * its own, so opening it over its page is no page change (`staticData.dialog`,
+ * read by `PageTransition`).
  */
-function dialogRoute(manifest?: PageManifest): StaticDataRouteOption {
-  return manifest ? { manifest, dialog: true } : { dialog: true };
+const DIALOG_STATIC_DATA: StaticDataRouteOption = { dialog: true };
+
+// The dialog routes' manifests and components (`dialog-routes.ts`), behind ONE
+// dynamic import: this file is the entry chunk, and a dialog route opens a
+// drawer most loads never see.
+const loadDialogRoutes = () => import('./dialog-routes.ts');
+
+/** A dialog route's name in the `dialog-routes.ts` registry. */
+type DialogRouteName = keyof Awaited<
+  ReturnType<typeof loadDialogRoutes>
+>['DIALOG_ROUTES'];
+
+/**
+ * A URL-driven dialog route over its page (D24) — every option but its path
+ * and search. It renders nothing of its own (the page reads the URL and opens
+ * the drawer), and its manifest and component load with the dialog-route
+ * registry, not the entry chunk: `beforeLoad` awaits the manifest, then runs
+ * the room's gate on it (gateway, then the org status guard — `roomLeafGate`),
+ * so a cold load and a navigation are refused exactly as a page's are; the
+ * `loader` hands the manifest to `head` for the document title. A component
+ * that is lazy itself (the Visit sheet's) is preloaded with the registry, so
+ * it never suspends on its first render.
+ */
+function dialogRoute(name: DialogRouteName) {
+  const load = async (): Promise<DialogRoute> =>
+    (await loadDialogRoutes()).DIALOG_ROUTES[name];
+  const manifest = async (): Promise<PageManifest> => (await load()).manifest;
+  return {
+    staticData: DIALOG_STATIC_DATA,
+    beforeLoad: roomLeafGate(manifest),
+    loader: manifest,
+    head: ({ loaderData }: { loaderData?: PageManifest }) =>
+      loaderData ? manifestHead(loaderData)() : {},
+    component: lazyRouteComponent(async () => {
+      const route = await load();
+      await route.Component.preload?.();
+      return route;
+    }, 'Component'),
+    errorComponent: RouteErrorBoundary,
+  };
 }
 
 // ── Lazy components ──
 // lazyRouteComponent (not React.lazy): the router can call `.preload()` on
 // these, which is what makes `defaultPreload: 'intent'` actually fetch the
 // island's chunk on hover/touch. Suspension is handled by the router's
-// defaultPendingComponent.
-function localizedRoute<T>(namespaces: readonly I18nNamespace[], load: () => Promise<T>) {
-  return async () => {
-    const locale = useLocaleStore.getState().locale;
-    const [, module] = await Promise.all([
-      Promise.all(namespaces.map((ns) => ensureNamespace(locale, ns))),
-      load(),
-    ]);
-    return module;
-  };
-}
+// defaultPendingComponent. `localizedRoute` loads an island's copy with it.
 
 const AuthLayout = lazyRouteComponent(
   localizedRoute(
@@ -319,16 +295,6 @@ const LeadsPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Leads room's dialog routes render nothing of their own (the list opens
-// the drawer), so they need no namespace beyond the room's.
-const LeadCreateRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/leads/create/create.route.tsx'),
-  'Component',
-);
-const LeadRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/leads/$leadId/lead-id.route.tsx'),
-  'Component',
-);
 const AppointmentsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.appointments],
@@ -337,29 +303,11 @@ const AppointmentsPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Appointments room's dialog routes render nothing of their own (the page
-// opens the drawer), so they need no namespace beyond the room's.
-const AppointmentCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/appointments/create/create.route.tsx'),
-  'Component',
-);
-const AppointmentRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.route.tsx'),
-  'Component',
-);
 const PatientsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.patients],
     () => import('@/pages/organization/$organizationSlug/patients/patients.route.tsx'),
   ),
-  'Component',
-);
-// The Patients room's dialog route renders nothing of its own (the list opens
-// the drawer), so it needs no namespace beyond the room's.
-const PatientCreateRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/patients/create/create.route.tsx'),
   'Component',
 );
 // The patient file (KICKOFF §6.6, L-42): its layout and every section and
@@ -414,37 +362,6 @@ const PaymentsPendingPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Payments room's dialog routes render nothing of their own (the ledger or
-// Pending opens the drawer), so they need no namespace beyond the room's.
-const PaymentReceiveRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/payments/receive/receive.route.tsx'),
-  'Component',
-);
-const PaymentPayRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/payments/pay/pay.route.tsx'),
-  'Component',
-);
-const PaymentEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/payments/$paymentId/edit/edit.route.tsx'),
-  'Component',
-);
-const DayCloseRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/payments/day-close/day-close.route.tsx'),
-  'Component',
-);
-const PendingCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/payments/pending/create/create.route.tsx'),
-  'Component',
-);
-const CreditEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/payments/pending/$creditId/edit/edit.route.tsx'),
-  'Component',
-);
 const TasksPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.tasks],
@@ -452,33 +369,11 @@ const TasksPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Tasks room's dialog routes render nothing of their own (the list opens the
-// drawers), so they need no namespace beyond the room's.
-const TaskCreateRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/tasks/create/create.route.tsx'),
-  'Component',
-);
-const TaskRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/tasks/$taskId/task-id.route.tsx'),
-  'Component',
-);
 const OfferingsPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.offerings],
     () => import('@/pages/organization/$organizationSlug/offerings/offerings.route.tsx'),
   ),
-  'Component',
-);
-// The Offering drawer's dialog routes render nothing of their own (the list
-// opens the drawer), so they need no namespace beyond the room's.
-const OfferingCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/offerings/create/create.route.tsx'),
-  'Component',
-);
-const OfferingEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/offerings/$offeringId/edit/edit.route.tsx'),
   'Component',
 );
 // The Offers tab is the room's second page (D24): its own chunk, the room's namespace.
@@ -490,33 +385,11 @@ const OffersPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Offer drawer's dialog routes render nothing of their own either.
-const OfferCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/offerings/offers/create/create.route.tsx'),
-  'Component',
-);
-const OfferEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/edit.route.tsx'),
-  'Component',
-);
 const UsersPage = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.users],
     () => import('@/pages/organization/$organizationSlug/users/users.route.tsx'),
   ),
-  'Component',
-);
-// The Users room's dialog routes render nothing of their own (the Team opens
-// the drawer), so they need no namespace beyond the room's.
-const UserCreateRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/users/create/create.route.tsx'),
-  'Component',
-);
-const UserEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/users/$userId/edit/edit.route.tsx'),
   'Component',
 );
 const UsersRolesPage = lazyRouteComponent(
@@ -532,17 +405,6 @@ const UsersBranchesPage = lazyRouteComponent(
     () =>
       import('@/pages/organization/$organizationSlug/users/branches/branches.route.tsx'),
   ),
-  'Component',
-);
-// Branches' dialog routes render nothing of their own (the list opens the drawer).
-const BranchCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx'),
-  'Component',
-);
-const BranchEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.route.tsx'),
   'Component',
 );
 const MedicalLayout = lazyRouteComponent(
@@ -607,88 +469,6 @@ const MedicalPaymentsPage = lazyRouteComponent(
   ),
   'Component',
 );
-// The Medical dialog routes render nothing of their own (each tab page opens
-// the drawer), so they need no namespace beyond the room's.
-const SaleCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/sales/create/create.route.tsx'),
-  'Component',
-);
-const SaleRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/sales/$saleId/sale-id.route.tsx'),
-  'Component',
-);
-const SaleReturnRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/sales/$saleId/return/return.route.tsx'),
-  'Component',
-);
-const MedicineCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/medicines/create/create.route.tsx'),
-  'Component',
-);
-const MedicineEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/edit.route.tsx'),
-  'Component',
-);
-const PurchaseOrderCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/purchases/create/create.route.tsx'),
-  'Component',
-);
-const PurchaseOrderRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/purchase-order-id.route.tsx'),
-  'Component',
-);
-const PurchaseOrderEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/edit/edit.route.tsx'),
-  'Component',
-);
-const PurchaseOrderReceiveRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/receive/receive.route.tsx'),
-  'Component',
-);
-const SupplierCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/suppliers/create/create.route.tsx'),
-  'Component',
-);
-const SupplierEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/suppliers/$supplierId/edit/edit.route.tsx'),
-  'Component',
-);
-const ManufacturerCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/manufacturers/create/create.route.tsx'),
-  'Component',
-);
-const ManufacturerEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/edit/edit.route.tsx'),
-  'Component',
-);
-const MrCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/mrs/create/create.route.tsx'),
-  'Component',
-);
-const MrEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/edit.route.tsx'),
-  'Component',
-);
-const MrVisitCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/create.route.tsx'),
-  'Component',
-);
 const StockLayout = lazyRouteComponent(
   localizedRoute(
     [I18N_NAMESPACES.clinicStock],
@@ -725,43 +505,6 @@ const StockVendorsPage = lazyRouteComponent(
     () =>
       import('@/pages/organization/$organizationSlug/stock/vendors/vendors.route.tsx'),
   ),
-  'Component',
-);
-// The Clinic stock dialog routes render nothing of their own (each tab page
-// opens the drawer), so they need no namespace beyond the room's.
-const StockItemCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/items/create/create.route.tsx'),
-  'Component',
-);
-const StockItemEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/items/$itemId/edit/edit.route.tsx'),
-  'Component',
-);
-const StockCheckRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/items/check/check.route.tsx'),
-  'Component',
-);
-const StockPurchaseCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/purchases/create/create.route.tsx'),
-  'Component',
-);
-const StockPurchaseEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/edit.route.tsx'),
-  'Component',
-);
-const StockVendorCreateRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/vendors/create/create.route.tsx'),
-  'Component',
-);
-const StockVendorEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/edit.route.tsx'),
   'Component',
 );
 const NotFoundPage = lazyRouteComponent(
@@ -1101,11 +844,7 @@ const organizationDashboardRoute = createRoute({
   path: 'dashboard',
   head: manifestHead(dashboardManifest),
   staticData: { manifest: dashboardManifest },
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(dashboardManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(dashboardManifest),
   component: DashboardPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1175,11 +914,7 @@ const organizationTodayRoute = createRoute({
   head: manifestHead(todayManifest),
   staticData: { manifest: todayManifest },
   validateSearch: validateTodaySearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(todayManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(todayManifest),
   component: TodayPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1190,11 +925,7 @@ const organizationLeadsRoute = createRoute({
   head: manifestHead(leadsManifest),
   staticData: { manifest: leadsManifest },
   validateSearch: validateLeadsSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(leadsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(leadsManifest),
   component: LeadsPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1204,30 +935,14 @@ const organizationLeadsRoute = createRoute({
 const organizationLeadCreateRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: 'create',
-  head: manifestHead(leadCreateManifest),
-  staticData: dialogRoute(leadCreateManifest),
   validateSearch: validateLeadCreateSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(leadCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: LeadCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('leadCreate'),
 });
 
 const organizationLeadRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: '$leadId',
-  head: manifestHead(leadManifest),
-  staticData: dialogRoute(leadManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(leadManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: LeadRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('lead'),
 });
 
 // Show and edit are one drawer (S:25): the edit URL lands on the lead's,
@@ -1236,10 +951,7 @@ const organizationLeadEditRoute = createRoute({
   getParentRoute: () => organizationLeadsRoute,
   path: '$leadId/edit',
   beforeLoad: ({ params, search }) => {
-    throw redirect({
-      ...organizationLead(params.organizationSlug, params.leadId),
-      search,
-    });
+    throw redirect({ to: organizationLeadRoute.fullPath, params, search });
   },
   component: () => null,
   errorComponent: RouteErrorBoundary,
@@ -1251,11 +963,7 @@ const organizationAppointmentsRoute = createRoute({
   head: manifestHead(appointmentsManifest),
   staticData: { manifest: appointmentsManifest },
   validateSearch: validateAppointmentsSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(appointmentsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(appointmentsManifest),
   component: AppointmentsPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1265,31 +973,15 @@ const organizationAppointmentsRoute = createRoute({
 const organizationAppointmentCreateRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: 'create',
-  head: manifestHead(appointmentCreateManifest),
-  staticData: dialogRoute(appointmentCreateManifest),
   validateSearch: validateAppointmentCreateSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(appointmentCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: AppointmentCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('appointmentCreate'),
 });
 
 const organizationAppointmentRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: '$appointmentId',
-  head: manifestHead(appointmentManifest),
-  staticData: dialogRoute(appointmentManifest),
   validateSearch: validateAppointmentSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(appointmentManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: AppointmentRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('appointment'),
 });
 
 // Show is edit (S:29): the edit URL lands on the booking's, keeping the page's
@@ -1298,10 +990,7 @@ const organizationAppointmentEditRoute = createRoute({
   getParentRoute: () => organizationAppointmentsRoute,
   path: '$appointmentId/edit',
   beforeLoad: ({ params, search }) => {
-    throw redirect({
-      ...organizationAppointment(params.organizationSlug, params.appointmentId),
-      search,
-    });
+    throw redirect({ to: organizationAppointmentRoute.fullPath, params, search });
   },
   component: () => null,
   errorComponent: RouteErrorBoundary,
@@ -1313,11 +1002,7 @@ const organizationPatientsRoute = createRoute({
   head: manifestHead(patientsManifest),
   staticData: { manifest: patientsManifest },
   validateSearch: validatePatientsSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(patientsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(patientsManifest),
   component: PatientsPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1327,16 +1012,8 @@ const organizationPatientsRoute = createRoute({
 const organizationPatientCreateRoute = createRoute({
   getParentRoute: () => organizationPatientsRoute,
   path: 'create',
-  head: manifestHead(patientCreateManifest),
-  staticData: dialogRoute(patientCreateManifest),
   validateSearch: validatePatientCreateSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(patientCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: PatientCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('patientCreate'),
 });
 
 // The patient file (KICKOFF §4, §6.6): a layout of its own beside the list,
@@ -1348,11 +1025,7 @@ const organizationPatientFileRoute = createRoute({
   head: manifestHead(patientFileManifest),
   staticData: { manifest: patientFileManifest },
   validateSearch: validatePatientFileSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(patientFileManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(patientFileManifest),
   component: patientFileComponent('PatientFileLayout'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1435,7 +1108,7 @@ function patientFileDrawerRoute<const Path extends string, Search>(
     getParentRoute: () => organizationPatientFileRoute,
     path,
     validateSearch,
-    staticData: dialogRoute(),
+    staticData: DIALOG_STATIC_DATA,
     component: patientFileComponent(component),
     errorComponent: RouteErrorBoundary,
   });
@@ -1471,7 +1144,7 @@ const organizationReviewEditRoute = patientFileDrawerRoute(
 const organizationPatientPhotoRoute = createRoute({
   getParentRoute: () => organizationPatientImagesRoute,
   path: '$imageId',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileComponent('PatientPhotoViewer'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1479,7 +1152,7 @@ const organizationPatientPhotoRoute = createRoute({
 const organizationPatientPhotoEditRoute = createRoute({
   getParentRoute: () => organizationPatientImagesRoute,
   path: '$imageId/edit',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileComponent('PatientPhotoDetails'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1491,49 +1164,49 @@ const organizationPrescriptionCreateRoute = createRoute({
   path: 'create',
   // `?medicines=` — the names a smart note recognised (AMBER A-F5).
   validateSearch: validatePatientRxCreateSearch,
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('prescriptionCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationPrescriptionRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: '$prescriptionId',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('prescription'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationPrescriptionEditRoute = createRoute({
   getParentRoute: () => organizationPatientPrescriptionsRoute,
   path: '$prescriptionId/edit',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('prescriptionEdit'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationTreatmentCreateRoute = createRoute({
   getParentRoute: () => organizationPatientTreatmentsRoute,
   path: 'create',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('treatmentCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationTreatmentEditRoute = createRoute({
   getParentRoute: () => organizationPatientTreatmentsRoute,
   path: '$treatmentId/edit',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('treatmentEdit'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationReportCreateRoute = createRoute({
   getParentRoute: () => organizationPatientReportsRoute,
   path: 'create',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('reportCreate'),
   errorComponent: RouteErrorBoundary,
 });
 const organizationReportRoute = createRoute({
   getParentRoute: () => organizationPatientReportsRoute,
   path: '$reportId',
-  staticData: dialogRoute(),
+  staticData: DIALOG_STATIC_DATA,
   component: patientFileDialog('report'),
   errorComponent: RouteErrorBoundary,
 });
@@ -1546,11 +1219,7 @@ const organizationPaymentsRoute = createRoute({
   head: manifestHead(paymentsManifest),
   staticData: { manifest: paymentsManifest },
   validateSearch: validatePaymentsSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(paymentsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(paymentsManifest),
   component: PaymentsPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1558,60 +1227,28 @@ const organizationPaymentsRoute = createRoute({
 const organizationPaymentReceiveRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'receive',
-  head: manifestHead(receiveManifest),
-  staticData: dialogRoute(receiveManifest),
   validateSearch: validatePaymentReceiveSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(receiveManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: PaymentReceiveRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('paymentReceive'),
 });
 
 const organizationPaymentPayRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'pay',
-  head: manifestHead(payManifest),
-  staticData: dialogRoute(payManifest),
   validateSearch: validatePaymentPaySearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(payManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: PaymentPayRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('paymentPay'),
 });
 
 const organizationPaymentEditRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: '$paymentId/edit',
-  head: manifestHead(paymentEditManifest),
-  staticData: dialogRoute(paymentEditManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(paymentEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: PaymentEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('paymentEdit'),
 });
 
 const organizationDayCloseRoute = createRoute({
   getParentRoute: () => organizationPaymentsRoute,
   path: 'day-close',
-  head: manifestHead(dayCloseManifest),
-  staticData: dialogRoute(dayCloseManifest),
   validateSearch: validateDayCloseSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(dayCloseManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: DayCloseRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('dayClose'),
 });
 
 // Payments › Pending (`S:88`): the room's second tab, a page of its own — a
@@ -1622,11 +1259,7 @@ const organizationPaymentsPendingRoute = createRoute({
   head: manifestHead(pendingManifest),
   staticData: { manifest: pendingManifest },
   validateSearch: validatePendingSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(pendingManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(pendingManifest),
   component: PaymentsPendingPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1636,29 +1269,13 @@ const organizationPaymentsPendingRoute = createRoute({
 const organizationPendingCreateRoute = createRoute({
   getParentRoute: () => organizationPaymentsPendingRoute,
   path: 'create',
-  head: manifestHead(pendingCreateManifest),
-  staticData: dialogRoute(pendingCreateManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(pendingCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: PendingCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('pendingCreate'),
 });
 
 const organizationCreditEditRoute = createRoute({
   getParentRoute: () => organizationPaymentsPendingRoute,
   path: '$creditId/edit',
-  head: manifestHead(creditEditManifest),
-  staticData: dialogRoute(creditEditManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(creditEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: CreditEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('creditEdit'),
 });
 
 // The shared Invoice drawer (`S:92–94`, D24; KICKOFF §4, §6.9). Its routes are
@@ -1668,20 +1285,6 @@ const organizationCreditEditRoute = createRoute({
 // takes the drawer back to the room that opened it.
 const InvoicesHost = lazyRouteComponent(
   () => import('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx'),
-  'Component',
-);
-const InvoiceCreateRoute = lazyRouteComponent(
-  () => import('@/pages/organization/$organizationSlug/invoices/create/create.route.tsx'),
-  'Component',
-);
-const InvoiceRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/invoices/$invoiceId/invoice-id.route.tsx'),
-  'Component',
-);
-const InvoiceEditRoute = lazyRouteComponent(
-  () =>
-    import('@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.route.tsx'),
   'Component',
 );
 
@@ -1707,57 +1310,33 @@ const organizationInvoicesRoute = createRoute({
 const organizationInvoiceCreateRoute = createRoute({
   getParentRoute: () => organizationInvoicesRoute,
   path: 'create',
-  head: manifestHead(invoiceCreateManifest),
   validateSearch: validateInvoiceCreateSearch,
-  beforeLoad: roomLeafGate(invoiceCreateManifest),
-  staticData: dialogRoute(),
-  component: InvoiceCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('invoiceCreate'),
 });
 
 const organizationInvoiceRoute = createRoute({
   getParentRoute: () => organizationInvoicesRoute,
   path: '$invoiceId',
-  head: manifestHead(invoiceManifest),
-  beforeLoad: roomLeafGate(invoiceManifest),
-  staticData: dialogRoute(),
-  component: InvoiceRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('invoice'),
 });
 
 const organizationInvoiceEditRoute = createRoute({
   getParentRoute: () => organizationInvoiceRoute,
   path: 'edit',
-  head: manifestHead(invoiceEditManifest),
-  beforeLoad: roomLeafGate(invoiceEditManifest),
-  staticData: dialogRoute(),
-  component: InvoiceEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('invoiceEdit'),
 });
 
 // ── The Visit sheet (L-49; KICKOFF §6.13, D18) ──
 // A full-screen page of Today's module over the shell (the sheet is its own
-// layer), on `visits/$visitId` — `visits/` owns the param. It loads Today's
-// copy, which the sheet's words live in.
-const VisitPage = lazyRouteComponent(
-  localizedRoute(
-    [I18N_NAMESPACES.today],
-    () => import('@/pages/organization/$organizationSlug/visits/visits.route.tsx'),
-  ),
-  'Component',
-);
-
+// layer), on `visits/$visitId` — `visits/` owns the param. A sheet over the
+// room that opened it: opening and closing it is no page change, so the room
+// does not rise again when the sheet closes — a dialog route, whose manifest
+// and (lazy, Today's copy with it) component load with the registry.
 const organizationVisitRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'visits/$visitId',
-  head: manifestHead(visitManifest),
-  // A sheet over the room that opened it: opening and closing it is no page
-  // change, so the room does not rise again when the sheet closes.
-  staticData: dialogRoute(visitManifest),
   validateSearch: validateVisitSearch,
-  beforeLoad: roomLeafGate(visitManifest),
-  component: VisitPage,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('visit'),
 });
 // ── end of the Visit sheet ──
 
@@ -1767,11 +1346,7 @@ const organizationTasksRoute = createRoute({
   head: manifestHead(tasksManifest),
   staticData: { manifest: tasksManifest },
   validateSearch: validateTasksSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(tasksManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(tasksManifest),
   component: TasksPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1781,16 +1356,8 @@ const organizationTasksRoute = createRoute({
 const organizationTaskCreateRoute = createRoute({
   getParentRoute: () => organizationTasksRoute,
   path: 'create',
-  head: manifestHead(taskCreateManifest),
-  staticData: dialogRoute(taskCreateManifest),
   validateSearch: validateTaskCreateSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(taskCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: TaskCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('taskCreate'),
 });
 
 // URL-driven dialog over the Tasks list (D24, S:97): it renders nothing; the
@@ -1798,15 +1365,7 @@ const organizationTaskCreateRoute = createRoute({
 const organizationTaskRoute = createRoute({
   getParentRoute: () => organizationTasksRoute,
   path: '$taskId',
-  head: manifestHead(taskManifest),
-  staticData: dialogRoute(taskManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(taskManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: TaskRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('task'),
 });
 
 const organizationOfferingsRoute = createRoute({
@@ -1815,11 +1374,7 @@ const organizationOfferingsRoute = createRoute({
   head: manifestHead(offeringsManifest),
   staticData: { manifest: offeringsManifest },
   validateSearch: validateOfferingsSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offeringsManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(offeringsManifest),
   component: OfferingsPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1829,30 +1384,14 @@ const organizationOfferingsRoute = createRoute({
 const organizationOfferingCreateRoute = createRoute({
   getParentRoute: () => organizationOfferingsRoute,
   path: 'create',
-  head: manifestHead(offeringCreateManifest),
-  staticData: dialogRoute(offeringCreateManifest),
   validateSearch: validateOfferingCreateSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offeringCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: OfferingCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('offeringCreate'),
 });
 
 const organizationOfferingEditRoute = createRoute({
   getParentRoute: () => organizationOfferingsRoute,
   path: '$offeringId/edit',
-  head: manifestHead(offeringEditManifest),
-  staticData: dialogRoute(offeringEditManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offeringEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: OfferingEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('offeringEdit'),
 });
 
 // The room's tabs are literal child URLs (D24, S:101). The Offers tab is a page
@@ -1863,11 +1402,7 @@ const organizationOffersRoute = createRoute({
   head: manifestHead(offersManifest),
   staticData: { manifest: offersManifest },
   validateSearch: validateOffersSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offersManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(offersManifest),
   component: OffersPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1877,29 +1412,13 @@ const organizationOffersRoute = createRoute({
 const organizationOfferCreateRoute = createRoute({
   getParentRoute: () => organizationOffersRoute,
   path: 'create',
-  head: manifestHead(offerCreateManifest),
-  staticData: dialogRoute(offerCreateManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offerCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: OfferCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('offerCreate'),
 });
 
 const organizationOfferEditRoute = createRoute({
   getParentRoute: () => organizationOffersRoute,
   path: '$offerId/edit',
-  head: manifestHead(offerEditManifest),
-  staticData: dialogRoute(offerEditManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(offerEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: OfferEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('offerEdit'),
 });
 
 const organizationUsersRoute = createRoute({
@@ -1908,11 +1427,7 @@ const organizationUsersRoute = createRoute({
   head: manifestHead(usersManifest),
   staticData: { manifest: usersManifest },
   validateSearch: validateUsersSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(usersManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(usersManifest),
   component: UsersPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1922,31 +1437,15 @@ const organizationUsersRoute = createRoute({
 const organizationUserCreateRoute = createRoute({
   getParentRoute: () => organizationUsersRoute,
   path: 'create',
-  head: manifestHead(userCreateManifest),
-  staticData: dialogRoute(userCreateManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(userCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: UserCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('userCreate'),
 });
 
 const organizationUserEditRoute = createRoute({
   getParentRoute: () => organizationUsersRoute,
   path: '$userId/edit',
-  head: manifestHead(userEditManifest),
-  staticData: dialogRoute(userEditManifest),
   // `?from=roles` keeps Roles & access behind the drawer (H:5188).
   validateSearch: validateUserEditSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(userEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: UserEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('userEdit'),
 });
 
 // Roles & access sits beside the Team, not under it: the Team route renders
@@ -1957,11 +1456,7 @@ const organizationUsersRolesRoute = createRoute({
   head: manifestHead(usersRolesManifest),
   staticData: { manifest: usersRolesManifest },
   validateSearch: validateRolesSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(usersRolesManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(usersRolesManifest),
   component: UsersRolesPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1974,11 +1469,7 @@ const organizationUsersBranchesRoute = createRoute({
   head: manifestHead(usersBranchesManifest),
   staticData: { manifest: usersBranchesManifest },
   validateSearch: validateBranchesSearch,
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(usersBranchesManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
+  beforeLoad: roomLeafGate(usersBranchesManifest),
   component: UsersBranchesPage,
   errorComponent: RouteErrorBoundary,
 });
@@ -1986,29 +1477,13 @@ const organizationUsersBranchesRoute = createRoute({
 const organizationUsersBranchCreateRoute = createRoute({
   getParentRoute: () => organizationUsersBranchesRoute,
   path: 'create',
-  head: manifestHead(branchCreateManifest),
-  staticData: dialogRoute(branchCreateManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(branchCreateManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: BranchCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('usersBranchCreate'),
 });
 
 const organizationUsersBranchEditRoute = createRoute({
   getParentRoute: () => organizationUsersBranchesRoute,
   path: '$branchId/edit',
-  head: manifestHead(branchEditManifest),
-  staticData: dialogRoute(branchEditManifest),
-  beforeLoad: async ({ params, preload, location }) => {
-    if (preload) return;
-    await gatewayFromManifest(branchEditManifest)(toGateContext(location, params));
-    requireOrgStatus({ params });
-  },
-  component: BranchEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('usersBranchEdit'),
 });
 
 const organizationMedicalRoute = createRoute({
@@ -2039,10 +1514,11 @@ const organizationMedicalIndexRoute = createRoute({
 
 /**
  * A clinic leaf's gate (KICKOFF §4): the manifest's gateway (session → module
- * → permission), then the org status guard — one function for the Medical and
- * Clinic stock tabs and dialog routes.
+ * → permission), then the org status guard — one function for the rooms' pages
+ * and tabs, and for every dialog route, whose manifest it awaits first
+ * (`dialogRoute`).
  */
-function roomLeafGate(manifest: PageManifest) {
+function roomLeafGate(manifest: PageManifest | (() => Promise<PageManifest>)) {
   return async ({
     params,
     preload,
@@ -2053,7 +1529,8 @@ function roomLeafGate(manifest: PageManifest) {
     location: Parameters<typeof toGateContext>[0];
   }) => {
     if (preload) return;
-    await gatewayFromManifest(manifest)(toGateContext(location, params));
+    const policy = typeof manifest === 'function' ? await manifest() : manifest;
+    await gatewayFromManifest(policy)(toGateContext(location, params));
     requireOrgStatus({ params });
   };
 }
@@ -2134,164 +1611,100 @@ const organizationMedicalPaymentsRoute = createRoute({
 const organizationSaleCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalSalesRoute,
   path: 'create',
-  head: manifestHead(saleCreateManifest),
   validateSearch: validateMedicalCreateSearch,
-  beforeLoad: roomLeafGate(saleCreateManifest),
-  staticData: dialogRoute(),
-  component: SaleCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('saleCreate'),
 });
 
 const organizationSaleRoute = createRoute({
   getParentRoute: () => organizationMedicalSalesRoute,
   path: '$saleId',
-  head: manifestHead(saleManifest),
-  beforeLoad: roomLeafGate(saleManifest),
-  staticData: dialogRoute(),
-  component: SaleRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('sale'),
 });
 
 const organizationSaleReturnRoute = createRoute({
   getParentRoute: () => organizationSaleRoute,
   path: 'return',
-  head: manifestHead(saleReturnManifest),
-  beforeLoad: roomLeafGate(saleReturnManifest),
-  staticData: dialogRoute(),
-  component: SaleReturnRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('saleReturn'),
 });
 
 const organizationMedicineCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalMedicinesRoute,
   path: 'create',
-  head: manifestHead(medicineCreateManifest),
   validateSearch: validateMedicalCreateSearch,
-  beforeLoad: roomLeafGate(medicineCreateManifest),
-  staticData: dialogRoute(),
-  component: MedicineCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('medicineCreate'),
 });
 
 const organizationMedicineEditRoute = createRoute({
   getParentRoute: () => organizationMedicalMedicinesRoute,
   path: '$medicineId/edit',
-  head: manifestHead(medicineEditManifest),
-  beforeLoad: roomLeafGate(medicineEditManifest),
-  staticData: dialogRoute(),
-  component: MedicineEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('medicineEdit'),
 });
 
 const organizationPurchaseOrderCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalPurchasesRoute,
   path: 'create',
-  head: manifestHead(purchaseOrderCreateManifest),
   validateSearch: validateMedicalCreateSearch,
-  beforeLoad: roomLeafGate(purchaseOrderCreateManifest),
-  staticData: dialogRoute(),
-  component: PurchaseOrderCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('purchaseOrderCreate'),
 });
 
 const organizationPurchaseOrderRoute = createRoute({
   getParentRoute: () => organizationMedicalPurchasesRoute,
   path: '$purchaseOrderId',
-  head: manifestHead(purchaseOrderManifest),
-  beforeLoad: roomLeafGate(purchaseOrderManifest),
-  staticData: dialogRoute(),
-  component: PurchaseOrderRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('purchaseOrder'),
 });
 
 const organizationPurchaseOrderEditRoute = createRoute({
   getParentRoute: () => organizationPurchaseOrderRoute,
   path: 'edit',
-  head: manifestHead(purchaseOrderEditManifest),
-  beforeLoad: roomLeafGate(purchaseOrderEditManifest),
-  staticData: dialogRoute(),
-  component: PurchaseOrderEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('purchaseOrderEdit'),
 });
 
 const organizationPurchaseOrderReceiveRoute = createRoute({
   getParentRoute: () => organizationPurchaseOrderRoute,
   path: 'receive',
-  head: manifestHead(purchaseOrderReceiveManifest),
-  beforeLoad: roomLeafGate(purchaseOrderReceiveManifest),
-  staticData: dialogRoute(),
-  component: PurchaseOrderReceiveRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('purchaseOrderReceive'),
 });
 
 const organizationSupplierCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalSuppliersRoute,
   path: 'create',
-  head: manifestHead(supplierCreateManifest),
-  beforeLoad: roomLeafGate(supplierCreateManifest),
-  staticData: dialogRoute(),
-  component: SupplierCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('supplierCreate'),
 });
 
 const organizationSupplierEditRoute = createRoute({
   getParentRoute: () => organizationMedicalSuppliersRoute,
   path: '$supplierId/edit',
-  head: manifestHead(supplierEditManifest),
-  beforeLoad: roomLeafGate(supplierEditManifest),
-  staticData: dialogRoute(),
-  component: SupplierEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('supplierEdit'),
 });
 
 const organizationManufacturerCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalManufacturersRoute,
   path: 'create',
-  head: manifestHead(manufacturerCreateManifest),
-  beforeLoad: roomLeafGate(manufacturerCreateManifest),
-  staticData: dialogRoute(),
-  component: ManufacturerCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('manufacturerCreate'),
 });
 
 const organizationManufacturerEditRoute = createRoute({
   getParentRoute: () => organizationMedicalManufacturersRoute,
   path: '$manufacturerId/edit',
-  head: manifestHead(manufacturerEditManifest),
-  beforeLoad: roomLeafGate(manufacturerEditManifest),
-  staticData: dialogRoute(),
-  component: ManufacturerEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('manufacturerEdit'),
 });
 
 const organizationMrCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalMrsRoute,
   path: 'create',
-  head: manifestHead(mrCreateManifest),
-  beforeLoad: roomLeafGate(mrCreateManifest),
-  staticData: dialogRoute(),
-  component: MrCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('mrCreate'),
 });
 
 const organizationMrEditRoute = createRoute({
   getParentRoute: () => organizationMedicalMrsRoute,
   path: '$mrId/edit',
-  head: manifestHead(mrEditManifest),
-  beforeLoad: roomLeafGate(mrEditManifest),
-  staticData: dialogRoute(),
-  component: MrEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('mrEdit'),
 });
 
 const organizationMrVisitCreateRoute = createRoute({
   getParentRoute: () => organizationMedicalMrsRoute,
   path: '$mrId/visits/create',
-  head: manifestHead(mrVisitCreateManifest),
-  beforeLoad: roomLeafGate(mrVisitCreateManifest),
-  staticData: dialogRoute(),
-  component: MrVisitCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('mrVisitCreate'),
 });
 
 const organizationStockRoute = createRoute({
@@ -2366,74 +1779,46 @@ const organizationStockVendorsRoute = createRoute({
 const organizationStockItemCreateRoute = createRoute({
   getParentRoute: () => organizationStockItemsRoute,
   path: 'create',
-  head: manifestHead(stockItemCreateManifest),
   validateSearch: validateStockCreateSearch,
-  beforeLoad: roomLeafGate(stockItemCreateManifest),
-  staticData: dialogRoute(),
-  component: StockItemCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockItemCreate'),
 });
 
 const organizationStockItemEditRoute = createRoute({
   getParentRoute: () => organizationStockItemsRoute,
   path: '$itemId/edit',
-  head: manifestHead(stockItemEditManifest),
-  beforeLoad: roomLeafGate(stockItemEditManifest),
-  staticData: dialogRoute(),
-  component: StockItemEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockItemEdit'),
 });
 
 const organizationStockCheckRoute = createRoute({
   getParentRoute: () => organizationStockItemsRoute,
   path: 'check',
-  head: manifestHead(stockCheckManifest),
-  beforeLoad: roomLeafGate(stockCheckManifest),
-  staticData: dialogRoute(),
-  component: StockCheckRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockCheck'),
 });
 
 const organizationStockPurchaseCreateRoute = createRoute({
   getParentRoute: () => organizationStockPurchasesRoute,
   path: 'create',
-  head: manifestHead(stockPurchaseCreateManifest),
   validateSearch: validateStockCreateSearch,
-  beforeLoad: roomLeafGate(stockPurchaseCreateManifest),
-  staticData: dialogRoute(),
-  component: StockPurchaseCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockPurchaseCreate'),
 });
 
 const organizationStockPurchaseEditRoute = createRoute({
   getParentRoute: () => organizationStockPurchasesRoute,
   path: '$purchaseId/edit',
-  head: manifestHead(stockPurchaseEditManifest),
-  beforeLoad: roomLeafGate(stockPurchaseEditManifest),
-  staticData: dialogRoute(),
-  component: StockPurchaseEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockPurchaseEdit'),
 });
 
 const organizationStockVendorCreateRoute = createRoute({
   getParentRoute: () => organizationStockVendorsRoute,
   path: 'create',
-  head: manifestHead(stockVendorCreateManifest),
   validateSearch: validateStockCreateSearch,
-  beforeLoad: roomLeafGate(stockVendorCreateManifest),
-  staticData: dialogRoute(),
-  component: StockVendorCreateRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockVendorCreate'),
 });
 
 const organizationStockVendorEditRoute = createRoute({
   getParentRoute: () => organizationStockVendorsRoute,
   path: '$vendorId/edit',
-  head: manifestHead(stockVendorEditManifest),
-  beforeLoad: roomLeafGate(stockVendorEditManifest),
-  staticData: dialogRoute(),
-  component: StockVendorEditRoute,
-  errorComponent: RouteErrorBoundary,
+  ...dialogRoute('stockVendorEdit'),
 });
 
 // ── Personal space (/dashboard) ──
