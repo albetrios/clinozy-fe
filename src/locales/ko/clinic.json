@@ -1221,7 +1221,13 @@
     "emptyGroup": "이 그룹에 일치하는 항목이 없습니다.",
     "addOne": "하나 추가",
     "removeOne": "하나 빼기",
-    "addNew": "새로 추가"
+    "addNew": "새로 추가",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "무상 +{{count}}",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% 할인"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1276,11 +1282,6 @@
       "quickLineMedical": "의약품과 수량 입력 · 예: sun 2",
       "hint": "2 = 수량 · 10% = 할인 · @500 = 단가",
       "oftenBilled": "자주 청구",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "{{percent}}% 할인"
-      },
       "browse": {
         "all": "전체",
         "oral": "경구",

@@ -1239,7 +1239,13 @@
     "emptyGroup": "Nothing in this group matches.",
     "addOne": "Add one",
     "removeOne": "Remove one",
-    "addNew": "Add new"
+    "addNew": "Add new",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} free",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% off"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1294,11 +1300,6 @@
       "quickLineMedical": "Type medicine and qty · e.g. sun 2",
       "hint": "2 = qty · 10% = discount · @500 = rate",
       "oftenBilled": "Often billed",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "{{percent}}% off"
-      },
       "browse": {
         "all": "All",
         "oral": "Oral",

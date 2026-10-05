@@ -18,7 +18,9 @@ import {
   quickLineBrowseMatches,
   type QuickLineItem,
   quickLineMatches,
-  type QuickLineParse,
+  type QuickLineTerm,
+  type QuickLineTermValues,
+  useQuickLineTerms,
 } from '@/shared/components/QuickLine/index.ts';
 import {
   type ItemsColumn,
@@ -42,11 +44,13 @@ import {
   namedLines,
 } from './invoice-form.ts';
 import { type InvoiceCatalogItem, lineFromCatalog } from './invoice-lines.ts';
-import { type InvoiceLineValues, parseInvoiceLine } from './invoice-quick-line.ts';
 import { withAddedLine, withSteppedLine } from './invoice-rows.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
 const K = INVOICE_DRAWER_KEYS.items;
+
+/** What an invoice line reads (`payments.md:140`): "2 = qty · 10% = discount · @500 = rate". */
+const INVOICE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount', 'rate'];
 
 /** Props of {@link InvoiceItemsField}. */
 export interface InvoiceItemsFieldProps {
@@ -276,7 +280,7 @@ function useItemColumns(
 
 /**
  * The Items step (`payments.md:142`; H:5058–5059): the quick line —
- * "lhr face 1 10%" (the grammar in `invoice-quick-line.ts`), its matches,
+ * "lhr face 1 10%" (the shared shorthand, `useQuickLineTerms`), its matches,
  * "Often billed" and Browse — over the item rows: the offering (or medicine)
  * picker with "New offering · “q”" stacking the offering form, the Qty
  * stepper (1–999), the Rate read-only (the effective price, or the MRP), the
@@ -287,7 +291,6 @@ function useItemColumns(
  */
 export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
   const { form, catalog, oftenBilled, readOnly, locked } = props;
   const medical = props.values.type === 'medical';
   const editable = !(readOnly || locked);
@@ -295,25 +298,17 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
     []) as InvoiceLineForm[];
   const columns = useItemColumns(props);
   const groups = useBrowseGroups(catalog, oftenBilled, medical);
-  const numbers = nameNumbers(catalog.items.map((item) => item.label));
+  const parse = useQuickLineTerms({
+    numbers: nameNumbers(catalog.items.map((item) => item.label)),
+    terms: INVOICE_LINE_TERMS,
+    max: INVOICE_QTY_MAX,
+  });
   const setRows = (next: InvoiceLineForm[]) =>
     form.setValue('items', next, { shouldDirty: true });
 
-  const add = (item: InvoiceCatalogItem, values: InvoiceLineValues) => {
+  const add = (item: InvoiceCatalogItem, values: QuickLineTermValues) => {
     setRows(withAddedLine(form.getValues('items'), item, values));
     if (item.promo) props.onPromo(item);
-  };
-
-  const parse = (text: string): QuickLineParse<InvoiceLineValues> => {
-    const parsed = parseInvoiceLine(text, numbers);
-    const tags: string[] = [];
-    if (parsed.values.qty) tags.push(t(K.tags.qty, { count: parsed.values.qty }));
-    if (parsed.values.rate)
-      tags.push(t(K.tags.rate, { amount: formatPaise(parsed.values.rate) }));
-    if (parsed.values.discountPct) {
-      tags.push(t(K.tags.discount, { percent: parsed.values.discountPct }));
-    }
-    return { words: parsed.words, tags, values: parsed.values };
   };
 
   const countOf = (item: QuickLineItem<InvoiceCatalogItem>) =>
@@ -355,7 +350,7 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
       testId={INVOICE_DRAWER_TEST_IDS.items}
       toolbar={
         editable ? (
-          <QuickLine<InvoiceCatalogItem, InvoiceLineValues>
+          <QuickLine<InvoiceCatalogItem, QuickLineTermValues>
             placeholder={t(medical ? K.quickLineMedical : K.quickLine)}
             hint={t(K.hint)}
             parse={parse}

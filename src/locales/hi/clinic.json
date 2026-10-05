@@ -1239,7 +1239,13 @@
     "emptyGroup": "इस समूह में कुछ मेल नहीं खाता।",
     "addOne": "एक जोड़ें",
     "removeOne": "एक हटाएँ",
-    "addNew": "नया जोड़ें"
+    "addNew": "नया जोड़ें",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} मुफ़्त",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% छूट"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1294,11 +1300,6 @@
       "quickLineMedical": "दवा और मात्रा लिखें · जैसे sun 2",
       "hint": "2 = मात्रा · 10% = छूट · @500 = रेट",
       "oftenBilled": "अक्सर बिल होने वाले",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "{{percent}}% छूट"
-      },
       "browse": {
         "all": "सभी",
         "oral": "खाने वाली",

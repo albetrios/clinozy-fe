@@ -1,8 +1,8 @@
 import { INVOICE_QTY_MAX } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { QuickLineTermValues } from '@/shared/components/QuickLine/index.ts';
 
 import { blankLine, type InvoiceLineForm } from './invoice-form.ts';
 import { type InvoiceCatalogItem, lineFromCatalog } from './invoice-lines.ts';
-import type { InvoiceLineValues } from './invoice-quick-line.ts';
 
 /*
  * What the quick line and Browse do to the item rows (H:5058 `addI`,
@@ -14,7 +14,7 @@ import type { InvoiceLineValues } from './invoice-quick-line.ts';
 export function withAddedLine(
   rows: readonly InvoiceLineForm[],
   item: InvoiceCatalogItem,
-  values: InvoiceLineValues = {},
+  values: QuickLineTermValues = {},
 ): InvoiceLineForm[] {
   const line = lineFromCatalog(item, values);
   const blank = rows.findIndex((row) => row.name.trim() === '');

@@ -1221,7 +1221,13 @@
     "emptyGroup": "このグループに一致するものはありません。",
     "addOne": "1つ追加",
     "removeOne": "1つ減らす",
-    "addNew": "新規追加"
+    "addNew": "新規追加",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "無償 +{{count}}",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% オフ"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1276,11 +1282,6 @@
       "quickLineMedical": "医薬品と数量を入力 · 例: sun 2",
       "hint": "2 = 数量 · 10% = 割引 · @500 = 単価",
       "oftenBilled": "よく請求する項目",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "{{percent}}% オフ"
-      },
       "browse": {
         "all": "すべて",
         "oral": "内服",

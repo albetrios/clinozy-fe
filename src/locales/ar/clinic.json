@@ -1311,7 +1311,13 @@
     "emptyGroup": "لا شيء في هذه المجموعة يطابق.",
     "addOne": "إضافة واحد",
     "removeOne": "إزالة واحد",
-    "addNew": "إضافة جديد"
+    "addNew": "إضافة جديد",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} مجانًا",
+      "rate": "@ {{amount}}",
+      "discount": "خصم {{percent}}%"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1366,11 +1372,6 @@
       "quickLineMedical": "اكتب الدواء والكمية · مثال: sun 2",
       "hint": "2 = الكمية · 10% = الخصم · @500 = السعر",
       "oftenBilled": "الأكثر فوترة",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "خصم {{percent}}%"
-      },
       "browse": {
         "all": "الكل",
         "oral": "فموي",

@@ -65,12 +65,6 @@ export const INVOICE_DRAWER_KEYS = {
     quickLineMedical: 'invoiceDrawer.items.quickLineMedical',
     hint: 'invoiceDrawer.items.hint',
     oftenBilled: 'invoiceDrawer.items.oftenBilled',
-    /** The parsed shorthand's pills: "×2", "@ ₹500", "10% off". */
-    tags: {
-      qty: 'invoiceDrawer.items.tags.qty',
-      rate: 'invoiceDrawer.items.tags.rate',
-      discount: 'invoiceDrawer.items.tags.discount',
-    },
     browse: {
       all: 'invoiceDrawer.items.browse.all',
       oral: 'invoiceDrawer.items.browse.oral',

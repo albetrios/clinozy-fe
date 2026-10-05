@@ -790,7 +790,8 @@ are under `pages/organization/$organizationSlug/patients/$patientId/timeline/com
 ## Quick line (shared, launch L-45)
 
 `shared/components/QuickLine/`: one line of shorthand that fills a list, with Browse — a
-grammar-agnostic shell (the screen brings the parser). `<q>` is its root id (`rx-quick-line`).
+grammar-agnostic shell (the screen brings the parser; the item lines share `useQuickLineTerms`:
+`20` qty · `+2` free · `@180` rate · `10%` discount). `<q>` is its root id (`rx-quick-line`).
 
 | Test ID                                                     | Element                                                                                     | Source                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------- |

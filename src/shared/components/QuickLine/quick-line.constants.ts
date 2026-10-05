@@ -38,6 +38,13 @@ export const QUICK_LINE_KEYS = {
   addOne: 'quickLine.addOne',
   removeOne: 'quickLine.removeOne',
   addNew: 'quickLine.addNew',
+  /** The shorthand's pills (H:3863): "×20" · "+2 free" · "@ ₹180" · "10% off". */
+  tags: {
+    qty: 'quickLine.tags.qty',
+    free: 'quickLine.tags.free',
+    rate: 'quickLine.tags.rate',
+    discount: 'quickLine.tags.discount',
+  },
 } as const;
 
 /** How many tiles Browse shows before "Showing 60 of 84" (H:3798). */

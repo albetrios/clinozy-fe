@@ -1221,7 +1221,13 @@
     "emptyGroup": "此分组中没有匹配项。",
     "addOne": "加一个",
     "removeOne": "减一个",
-    "addNew": "新增"
+    "addNew": "新增",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "赠品 +{{count}}",
+      "rate": "@ {{amount}}",
+      "discount": "减 {{percent}}%"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1276,11 +1282,6 @@
       "quickLineMedical": "输入药品和数量 · 例如 sun 2",
       "hint": "2 = 数量 · 10% = 折扣 · @500 = 单价",
       "oftenBilled": "常开项目",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "减 {{percent}}%"
-      },
       "browse": {
         "all": "全部",
         "oral": "口服",

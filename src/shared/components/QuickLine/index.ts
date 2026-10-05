@@ -18,5 +18,7 @@ export {
   type QuickLineSearchable,
   quickLineTypedName,
 } from './quick-line-match.ts';
+export type { QuickLineTerm, QuickLineTermValues } from './quick-line-terms.ts';
 export { QuickLine } from './QuickLine.tsx';
 export { QuickLineBrowse, type QuickLineBrowseProps } from './QuickLineBrowse.tsx';
+export { useQuickLineTerms } from './use-quick-line-terms.ts';

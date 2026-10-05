@@ -1239,7 +1239,13 @@
     "emptyGroup": "Nichts in dieser Gruppe passt.",
     "addOne": "Eins hinzufügen",
     "removeOne": "Eins entfernen",
-    "addNew": "Neu hinzufügen"
+    "addNew": "Neu hinzufügen",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} gratis",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}} % Rabatt"
+    }
   },
   "invoiceDrawer": {
     "title": {
@@ -1294,11 +1300,6 @@
       "quickLineMedical": "Medikament und Menge eingeben · z. B. sun 2",
       "hint": "2 = Menge · 10% = Rabatt · @500 = Preis",
       "oftenBilled": "Häufig abgerechnet",
-      "tags": {
-        "qty": "×{{count}}",
-        "rate": "@ {{amount}}",
-        "discount": "{{percent}} % Rabatt"
-      },
       "browse": {
         "all": "Alle",
         "oral": "Oral",
