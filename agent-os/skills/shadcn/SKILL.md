@@ -58,6 +58,10 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     that do not toggle stay `TonePill` / `IdPill` / `PersonChip`.
   - An 18px count on a button or heading → **`CountBadge`** (`Cells`; `tone` primary /
     success / inverse, "99+", `srLabel`). Never a hand-rolled `rounded-full` count.
+  - A row of tabs → **`RoomTabs`** (links to a room's child routes) or **`RoomViewTabs`**
+    (in-page views, panes, modes: `look` track / card / plain, `fill`, `activation`
+    automatic, per-tab colours, `disabled` + `hint`). Never a hand-built `role="tablist"`;
+    the Settings nav and `ToggleGroup` stay.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

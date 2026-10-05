@@ -17,6 +17,7 @@ import {
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
+import { RoomViewTabs } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -247,33 +248,25 @@ export function LeadDrawer({
                   >
                     <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
                   </button>
-                  <div
-                    role="tablist"
-                    aria-label={t(LEADS_KEYS.drawer.panels)}
-                    className="bg-muted flex flex-1 gap-0.5 rounded-lg border p-0.75"
-                  >
-                    {(['details', 'chat'] as const).map((key) => {
-                      const Icon = key === 'details' ? Users : WhatsAppMark;
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          role="tab"
-                          aria-selected={pane === key}
-                          onClick={() => onPaneChange(key)}
-                          data-slot="button"
-                          className="text-body text-foreground-soft aria-selected:bg-card aria-selected:text-foreground flex h-7.5 flex-1 items-center justify-center gap-1.5 rounded-md font-medium aria-selected:shadow-(--elevation-sm)"
-                        >
-                          <Icon aria-hidden="true" className="size-3.5" />
-                          {t(
-                            key === 'details'
-                              ? LEADS_KEYS.drawer.details
-                              : LEADS_KEYS.drawer.chat,
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <RoomViewTabs
+                    fill
+                    activation="automatic"
+                    label={t(LEADS_KEYS.drawer.panels)}
+                    tabs={[
+                      { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
+                      {
+                        id: 'chat',
+                        label: t(LEADS_KEYS.drawer.chat),
+                        icon: WhatsAppMark,
+                      },
+                    ]}
+                    value={pane}
+                    onValueChange={(next) =>
+                      onPaneChange(next === 'chat' ? 'chat' : 'details')
+                    }
+                    testIdPrefix={LEADS_TEST_IDS.drawerPanes}
+                    className="min-w-0 flex-1"
+                  />
                 </div>
                 <div className="pointer-events-auto fixed inset-x-0 top-13 bottom-0 z-40 flex flex-col">
                   {pane === 'details' ? (

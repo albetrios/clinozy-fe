@@ -1,11 +1,4 @@
-import {
-  type KeyboardEvent,
-  type RefObject,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type KeyboardEvent, type RefObject, useId, useMemo, useState } from 'react';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
@@ -33,6 +26,10 @@ import {
 } from '@/shared/components/ChatColumn/chat-composer.ts';
 import type { ChatFormat } from '@/shared/components/ChatColumn/chat-history.ts';
 import {
+  type RoomViewTab,
+  RoomViewTabs,
+} from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
+import {
   Popover,
   PopoverAnchor,
   PopoverContent,
@@ -42,7 +39,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   type AppIcon,
   Calendar,
@@ -136,24 +132,13 @@ function placeholderFor(mode: ComposerMode, first: string, t: Translate): string
     : t(keys.placeholder.messageNoName, { channel });
 }
 
-/** The tab a key moves to, in reading order (←/→ swap under RTL), Home and End. */
-function tabFromKey(
-  key: string,
-  usable: readonly ComposerMode[],
-  current: ComposerMode,
-  rtl: boolean,
-): ComposerMode | undefined {
-  const at = usable.indexOf(current);
-  const forward = rtl ? 'ArrowLeft' : 'ArrowRight';
-  const back = rtl ? 'ArrowRight' : 'ArrowLeft';
-  if (key === forward) return usable[(at + 1) % usable.length];
-  if (key === back) return usable[(at - 1 + usable.length) % usable.length];
-  if (key === 'Home') return usable[0];
-  if (key === 'End') return usable.at(-1);
-  return undefined;
-}
-
-/** The "Send via" tabs: a roving `tablist`, the selected tab solid in its channel colour. */
+/**
+ * The "Send via" tabs (H:5770) — the room view tabs' `card` look: four equal
+ * 32px segments on the card, the selected one solid in its channel's colour
+ * (D93), the others in the channel's ink; each names itself as its tooltip, a
+ * disabled one says why. The arrows open the mode they reach (mirrored
+ * right-to-left), Home / End jump, a disabled mode is passed by.
+ */
 function ModeTabs({
   mode,
   modes,
@@ -169,71 +154,38 @@ function ModeTabs({
   controls: string;
   t: Translate;
 }) {
-  const { direction } = useLocaleFormat();
-  const listRef = useRef<HTMLDivElement>(null);
-  const usable = modes.filter((option) => !option.disabled).map((option) => option.mode);
-
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const next = tabFromKey(event.key, usable, mode, direction === 'rtl');
-    if (!next) return;
-    event.preventDefault();
-    onModeChange(next);
-    listRef.current?.querySelector<HTMLButtonElement>(`[data-mode="${next}"]`)?.focus();
-  };
-
+  const tabs: RoomViewTab[] = modes.map((option) => {
+    const label = t(keys.modes[option.mode]);
+    const paint = MODE_PAINT[option.mode];
+    return {
+      id: option.mode,
+      label,
+      icon: MODE_ICONS[option.mode],
+      iconOnly: !showLabels,
+      hint: option.disabled ? t(keys.noInstagram) : label,
+      disabled: option.disabled,
+      selectedClassName: cn(
+        paint.fill,
+        'text-background font-semibold shadow-(--elevation-control)',
+      ),
+      idleClassName: option.disabled ? 'text-disabled' : cn(paint.ink, 'font-medium'),
+    };
+  });
   return (
-    <div
-      ref={listRef}
-      role="tablist"
-      aria-label={t(keys.sendVia)}
-      data-slot="chat-modes"
-      data-testid={ids.modes}
-      className="bg-card flex w-full items-center gap-0.75 rounded-lg border p-0.75 shadow-(--elevation-control)"
-    >
-      {modes.map((option) => {
-        const Icon = MODE_ICONS[option.mode];
-        const selected = option.mode === mode;
-        const label = t(keys.modes[option.mode]);
-        const paint = MODE_PAINT[option.mode];
-        return (
-          <Tooltip key={option.mode}>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                role="tab"
-                data-mode={option.mode}
-                data-testid={`${ids.mode}-${option.mode}`}
-                aria-selected={selected}
-                aria-controls={controls}
-                aria-disabled={option.disabled || undefined}
-                aria-label={label}
-                tabIndex={selected ? 0 : -1}
-                onKeyDown={onKeyDown}
-                onClick={() => {
-                  if (!option.disabled) onModeChange(option.mode);
-                }}
-                className={cn(
-                  'text-detail flex h-8 min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 rounded-md px-2.5 transition-[background-color,color,box-shadow] duration-150',
-                  selected
-                    ? cn(
-                        paint.fill,
-                        'text-background font-semibold shadow-(--elevation-control)',
-                      )
-                    : cn(paint.ink, 'font-medium', !option.disabled && 'hover:bg-muted'),
-                  option.disabled && 'text-disabled cursor-not-allowed opacity-45',
-                )}
-              >
-                <Icon aria-hidden="true" className="size-3.5 flex-none" />
-                {showLabels ? <span className="min-w-0 truncate">{label}</span> : null}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {option.disabled ? t(keys.noInstagram) : label}
-            </TooltipContent>
-          </Tooltip>
-        );
-      })}
-    </div>
+    <RoomViewTabs
+      look="card"
+      fill
+      activation="automatic"
+      label={t(keys.sendVia)}
+      tabs={tabs}
+      value={mode}
+      onValueChange={(next) => {
+        const picked = modes.find((option) => option.mode === next);
+        if (picked && !picked.disabled) onModeChange(picked.mode);
+      }}
+      controls={controls}
+      testIds={{ list: ids.modes, tab: (id) => `${ids.mode}-${id}` }}
+    />
   );
 }
 

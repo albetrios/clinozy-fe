@@ -6,12 +6,17 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   PersonAvatar,
   personInitials,
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
+import {
+  type RoomViewTab,
+  RoomViewTabs,
+} from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -28,7 +33,16 @@ import {
 
 import { PatientAddMenu } from '../../shared/components/PatientAddMenu/index.ts';
 import type { PatientAddItem } from '../../shared/hooks/usePatientFileActions/index.ts';
-import { patientFileTabs } from '../../shared/patient-file-nav.ts';
+import {
+  PATIENT_FILE_KEYS,
+  PATIENT_FILE_NS,
+} from '../../shared/patient-file.constants.ts';
+import {
+  PATIENT_FILE_SECTION_ICONS,
+  PATIENT_FILE_SECTION_TONES,
+  type PatientFileTab,
+  patientFileTabs,
+} from '../../shared/patient-file-nav.ts';
 import { lastFourDigits } from '../PatientRail/patient-rail.ts';
 import {
   PATIENT_SECTIONS_POPOVER_KEYS,
@@ -36,7 +50,6 @@ import {
   PATIENT_SECTIONS_TEST_ID,
   PatientSectionsPopover,
 } from '../PatientSectionsPopover/index.ts';
-import { FileBarTabs } from './file-bar-tabs.tsx';
 import {
   PATIENT_FILE_BAR_KEYS,
   PATIENT_FILE_BAR_NS,
@@ -45,6 +58,60 @@ import {
 
 const K = PATIENT_FILE_BAR_KEYS;
 const ids = PATIENT_FILE_BAR_TEST_IDS;
+
+/**
+ * The pinned section tabs (H:710; `patient-file.md:17`) — the room view tabs'
+ * `plain` look: no track, scrolling sideways without a scrollbar; 32px tabs, a
+ * 14px icon (muted until open) and the 13px label; the open one in its tone at
+ * 600, the others tinted 45% on hover; an unpinned open section with its 5px
+ * dot. ← / → open the previous / next tab (mirrored right-to-left) and keep
+ * focus on it (H:4942 `tabKey`); Home / End jump.
+ */
+function FileBarTabs({
+  tabs,
+  current,
+  onOpen,
+}: {
+  tabs: readonly PatientFileTab[];
+  current: PatientFileSectionSlug | null;
+  onOpen: (section: PatientFileSectionSlug) => void;
+}) {
+  const { t } = useTranslation([PATIENT_FILE_BAR_NS, PATIENT_FILE_NS]);
+  const viewTabs: RoomViewTab[] = tabs.map((tab) => {
+    const tone = TONE_CLASSES[PATIENT_FILE_SECTION_TONES[tab.section]];
+    return {
+      id: tab.section,
+      label: t(PATIENT_FILE_KEYS.sections[tab.section], { ns: PATIENT_FILE_NS }),
+      icon: PATIENT_FILE_SECTION_ICONS[tab.section],
+      selectedClassName: cn(tone.surface, 'font-semibold'),
+      idleClassName: cn('text-foreground-soft font-medium', tone.hover),
+      badge: tab.temporary ? (
+        <span
+          title={t(K.notPinned)}
+          data-slot="pill"
+          className="size-1.25 flex-none rounded-full bg-current opacity-50"
+        >
+          <span className="sr-only">{t(K.notPinned)}</span>
+        </span>
+      ) : undefined,
+    };
+  });
+  return (
+    <RoomViewTabs
+      look="plain"
+      activation="automatic"
+      label={t(K.tabs)}
+      tabs={viewTabs}
+      value={current ?? ''}
+      onValueChange={(section) => {
+        const tab = tabs.find((entry) => entry.section === section);
+        if (tab) onOpen(tab.section);
+      }}
+      testIds={{ list: ids.tabs, tab: (section) => `${ids.tab}-${section}` }}
+      className="min-w-0 flex-1"
+    />
+  );
+}
 
 /** Props of {@link PatientFileBar}. */
 export interface PatientFileBarProps {

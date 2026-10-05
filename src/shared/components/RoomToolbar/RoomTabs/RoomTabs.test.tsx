@@ -395,3 +395,109 @@ describe('RoomViewTabs', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('RoomViewTabs — the other tab rows (card, plain, fill, automatic)', () => {
+  function Modes({ onValueChange = vi.fn() }: { onValueChange?: (id: string) => void }) {
+    const [value, setValue] = useState('whatsapp');
+    return (
+      <RoomViewTabs
+        look="card"
+        fill
+        activation="automatic"
+        label="Send via"
+        value={value}
+        onValueChange={(id) => {
+          setValue(id);
+          onValueChange(id);
+        }}
+        testIds={{ list: 'chat-modes', tab: (id) => `chat-mode-${id}` }}
+        tabs={[
+          {
+            id: 'whatsapp',
+            label: 'WhatsApp',
+            icon: House,
+            iconOnly: true,
+            selectedClassName: 'bg-channel-whatsapp text-background',
+          },
+          {
+            id: 'instagram',
+            label: 'Instagram',
+            icon: Wallet,
+            iconOnly: true,
+            disabled: true,
+            hint: 'Instagram is not connected',
+          },
+          { id: 'call', label: 'Call log', icon: Wallet, iconOnly: true },
+        ]}
+      />
+    );
+  }
+
+  it('names icon-only tabs by their label, keeps the test ids it is given and fills the row', () => {
+    render(<Modes />);
+    const list = screen.getByTestId('chat-modes');
+    expect(list).toHaveAccessibleName('Send via');
+    expect(list.className).toContain('w-full');
+    const whatsapp = screen.getByRole('tab', { name: 'WhatsApp' });
+    expect(whatsapp).toBe(screen.getByTestId('chat-mode-whatsapp'));
+    expect(whatsapp.className).toContain('flex-1');
+    // The tab's own selected colours win over the look's.
+    expect(whatsapp.className).toContain('bg-channel-whatsapp');
+    expect(whatsapp).not.toHaveTextContent('WhatsApp');
+  });
+
+  it('opens the tab the arrows reach, passing a disabled one by', async () => {
+    const onValueChange = vi.fn();
+    const user = userEvent.setup();
+    render(<Modes onValueChange={onValueChange} />);
+    expect(screen.getByRole('tab', { name: 'Instagram' })).toBeDisabled();
+    await user.click(screen.getByRole('tab', { name: 'WhatsApp' }));
+    await user.keyboard('{ArrowRight}');
+    expect(onValueChange).toHaveBeenLastCalledWith('call');
+    expect(screen.getByRole('tab', { name: 'Call log' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Call log' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  it('draws the plain look without a track, an idle tab in its own colours', () => {
+    render(
+      <RoomViewTabs
+        look="plain"
+        label="Patient sections"
+        value="visits"
+        onValueChange={vi.fn()}
+        testIdPrefix="patient-file"
+        tabs={[
+          {
+            id: 'visits',
+            label: 'Visits',
+            icon: House,
+            selectedClassName: 'bg-tone-sky text-tone-sky-foreground',
+          },
+          {
+            id: 'notes',
+            label: 'Notes',
+            icon: Wallet,
+            idleClassName: 'text-foreground-soft',
+          },
+        ]}
+      />,
+    );
+    const list = screen.getByTestId('patient-file-tabs');
+    expect(list).not.toHaveAttribute('data-room-tabs-track');
+    expect(list.className).not.toContain('bg-muted');
+    expect(screen.getByTestId('patient-file-tab-visits').className).toContain(
+      'bg-tone-sky',
+    );
+    expect(screen.getByTestId('patient-file-tab-notes').className).toContain(
+      'text-foreground-soft',
+    );
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Modes />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});

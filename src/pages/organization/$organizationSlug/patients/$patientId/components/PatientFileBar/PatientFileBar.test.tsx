@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -87,22 +87,23 @@ describe('PatientFileBar', () => {
   it('opens a tab on click, and the next or previous one with the arrow keys', async () => {
     const user = userEvent.setup();
     const { onOpenSection } = renderBar();
-    await user.click(await screen.findByTestId('patient-file-tab-invoices'));
-    expect(onOpenSection).toHaveBeenLastCalledWith('invoices');
-    const tablist = screen.getByRole('tablist');
-    fireEvent.keyDown(tablist, { key: 'ArrowRight' });
-    expect(onOpenSection).toHaveBeenLastCalledWith('prescriptions');
-    fireEvent.keyDown(tablist, { key: 'ArrowLeft' });
-    expect(onOpenSection).toHaveBeenLastCalledWith('overview');
-    // Only the open tab is in the Tab order.
-    expect(screen.getByTestId('patient-file-tab-visits')).toHaveAttribute(
-      'tabindex',
-      '0',
-    );
+    // One tab stop: the row, which hands focus to the open tab.
+    const tablist = await screen.findByRole('tablist');
+    expect(tablist).toHaveAttribute('tabindex', '0');
     expect(screen.getByTestId('patient-file-tab-overview')).toHaveAttribute(
       'tabindex',
       '-1',
     );
+    act(() => tablist.focus());
+    expect(screen.getByTestId('patient-file-tab-visits')).toHaveFocus();
+    // The arrows open the tab they reach and keep focus on it.
+    await user.keyboard('{ArrowRight}');
+    expect(onOpenSection).toHaveBeenLastCalledWith('prescriptions');
+    expect(screen.getByTestId('patient-file-tab-prescriptions')).toHaveFocus();
+    await user.keyboard('{ArrowLeft}{ArrowLeft}');
+    expect(onOpenSection).toHaveBeenLastCalledWith('overview');
+    await user.click(screen.getByTestId('patient-file-tab-invoices'));
+    expect(onOpenSection).toHaveBeenLastCalledWith('invoices');
   });
 
   it('marks an open section that is not pinned with its dot', async () => {

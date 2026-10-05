@@ -33,6 +33,8 @@ export const PATIENT_FILE_BAR_TEST_IDS = {
   add: 'patient-file-add',
   startVisit: 'patient-file-start-visit',
   activity: 'patient-file-activity',
+  /** The section tabs' row. */
+  tabs: 'patient-file-tabs',
   /** One tab: `patient-file-tab-<section>`. */
   tab: 'patient-file-tab',
 } as const;

@@ -11,7 +11,14 @@ import {
   ROOM_TOOLBAR_NS,
   roomToolbarTestIds,
 } from '@/shared/components/RoomToolbar/room-toolbar.constants.ts';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip.tsx';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
+import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { type AppIcon, ChevronDown } from '@/shared/icons/index.ts';
 
@@ -49,20 +56,27 @@ function tabWidth(label: string, hasIcon: boolean, fontFamily: string): number {
   return 24 + (hasIcon ? 20 : 0) + measureTextWidth(label, `500 12.5px ${fontFamily}`);
 }
 
-/** A tab's label row: the icon, the label, and trailing content (a count chip). */
+/**
+ * A tab's label row: the icon, the label (none for an icon-only tab; it
+ * truncates where the tabs share the row), and trailing content (a count chip).
+ */
 function SegmentLabel({
   icon: Icon,
   label,
   badge,
+  iconClassName,
 }: {
   icon?: AppIcon;
-  label: string;
+  label?: string;
   badge?: ReactNode;
+  iconClassName?: string;
 }) {
   return (
     <>
-      {Icon ? <Icon aria-hidden="true" className="size-3.5 flex-none" /> : null}
-      {label}
+      {Icon ? (
+        <Icon aria-hidden="true" className={cn('size-3.5 flex-none', iconClassName)} />
+      ) : null}
+      {label === undefined ? null : <span className="min-w-0 truncate">{label}</span>}
       {badge}
     </>
   );
@@ -244,7 +258,7 @@ export function RoomTabs({
   );
 }
 
-/** One in-page view: a search param of the room's list (D4), not a route. */
+/** One in-page view: a search param of the room's list (D4), a pane or a mode — not a route. */
 export interface RoomViewTab {
   /** The view's value — the React key and the test id (`<prefix>-tab-<id>`). */
   id: string;
@@ -252,10 +266,64 @@ export interface RoomViewTab {
   icon?: AppIcon;
   /** Trailing content inside the tab, such as a count chip. */
   badge?: ReactNode;
+  /** Only the icon shows: the label names the tab and is its tooltip. */
+  iconOnly?: boolean;
+  /** The tab's tooltip on hover — a disabled tab's reason. */
+  hint?: string;
+  /** Not pickable: the arrows pass it by, and its hint says why. */
+  disabled?: boolean;
+  /** Its colours while selected — a section's tone, a channel's solid fill. */
+  selectedClassName?: string;
+  /** Its colours while not selected. */
+  idleClassName?: string;
 }
 
+/** How a {@link RoomViewTabs} row looks. */
+type RoomViewTabsLook = 'track' | 'card' | 'plain';
+
+/** Each look's row, segment and default states (the tabs' own colours win). */
+const VIEW_LOOKS: Readonly<
+  Record<
+    RoomViewTabsLook,
+    { list: string; segment: string; selected: string; idle: string; icon?: string }
+  >
+> = {
+  track: {
+    list: TRACK,
+    segment: SEGMENT,
+    selected: SEGMENT_STATE.selected,
+    idle: SEGMENT_STATE.idle,
+  },
+  // The chat composer's "Send via" (H:5770): 32px segments on the card.
+  card: {
+    list: 'bg-card flex min-w-0 items-center gap-0.75 rounded-lg border p-0.75 shadow-(--elevation-control)',
+    segment:
+      'text-detail flex h-8 items-center gap-1.5 rounded-md px-2.5 whitespace-nowrap transition-[background-color,color,box-shadow] duration-150',
+    selected:
+      'bg-primary text-primary-foreground font-semibold shadow-(--elevation-control)',
+    idle: 'text-muted-foreground-strong hover:bg-muted font-medium',
+  },
+  // The patient file bar (H:710): no track, 32px tabs; an idle tab's icon is muted.
+  plain: {
+    list: 'flex max-w-full min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+    segment:
+      'text-body relative flex h-8 items-center gap-1.5 rounded-lg px-2.5 whitespace-nowrap transition-[background-color,color,box-shadow] duration-160',
+    selected: 'bg-muted text-foreground font-semibold',
+    idle: 'text-foreground-soft hover:bg-muted font-medium',
+    icon: 'text-muted-foreground group-data-[state=active]/view-tab:text-current',
+  },
+};
+
+/**
+ * A tab row's test ids: the room convention from a prefix (`<prefix>-tabs`,
+ * `<prefix>-tab-<id>`), or the ids a surface's specs already name.
+ */
+type RoomViewTabsTestIds =
+  | { testIdPrefix: string; testIds?: undefined }
+  | { testIds: { list: string; tab: (id: string) => string }; testIdPrefix?: undefined };
+
 /** Props for {@link RoomViewTabs}. */
-export interface RoomViewTabsProps {
+export type RoomViewTabsProps = RoomViewTabsTestIds & {
   /** The tablist's accessible name ("Lead views"). */
   label: string;
   tabs: readonly RoomViewTab[];
@@ -264,15 +332,88 @@ export interface RoomViewTabsProps {
   onValueChange: (id: string) => void;
   /** The id of the list the views filter (each tab's `aria-controls`). */
   controls?: string;
-  /** Test-id prefix — the room's table id. */
-  testIdPrefix: string;
+  /**
+   * `track` (default): the room tabs' segmented track; `card`: 32px segments on
+   * a card with a hairline (the chat composer's "Send via"); `plain`: no track,
+   * 32px tabs in their own colours (the patient file bar).
+   */
+  look?: RoomViewTabsLook;
+  /** The tabs share the row's width (the composer, the lead drawer's phone switch). */
+  fill?: boolean;
+  /**
+   * `manual` (default): the arrows move, Enter or Space opens — so arrowing
+   * past a view never refetches its list; `automatic`: the arrows open the tab
+   * they reach (a pane, a mode, a file section).
+   */
+  activation?: 'manual' | 'automatic';
+  className?: string;
+};
+
+/** One tab: the Radix trigger in its look and colours, with its tooltip when it has one. */
+function ViewTab({
+  tab,
+  selected,
+  look,
+  fill,
+  controls,
+  testId,
+}: {
+  tab: RoomViewTab;
+  selected: boolean;
+  look: RoomViewTabsLook;
+  fill: boolean;
+  controls?: string;
+  testId: string;
+}) {
+  const styles = VIEW_LOOKS[look];
+  const width = fill ? 'min-w-0 flex-1 basis-0 justify-center' : 'flex-none';
+  const trigger = (
+    <TabsPrimitive.Trigger
+      value={tab.id}
+      disabled={tab.disabled}
+      aria-controls={controls}
+      aria-label={tab.iconOnly ? tab.label : undefined}
+      data-testid={testId}
+      data-slot="room-tab"
+      className={cn(
+        'group/view-tab',
+        styles.segment,
+        width,
+        selected ? styles.selected : styles.idle,
+        selected ? tab.selectedClassName : tab.idleClassName,
+        'disabled:cursor-not-allowed disabled:opacity-45',
+      )}
+    >
+      <SegmentLabel
+        icon={tab.icon}
+        label={tab.iconOnly ? undefined : tab.label}
+        badge={tab.badge}
+        iconClassName={styles.icon}
+      />
+    </TabsPrimitive.Trigger>
+  );
+  const hint = tab.hint ?? (tab.iconOnly ? tab.label : undefined);
+  if (!hint) return trigger;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {/* A disabled button takes no pointer: its tooltip hangs on a wrapper. */}
+        {tab.disabled ? <span className={cn('flex', width)}>{trigger}</span> : trigger}
+      </TooltipTrigger>
+      <TooltipContent>{hint}</TooltipContent>
+    </Tooltip>
+  );
 }
 
 /**
- * A room's in-page views on the same segmented track (KICKOFF §3.5: in-page
- * view tabs are tabs — the Radix `Tabs` shadcn's `tabs` wraps) — "All · In
- * clinic today · …", "Mine · Unreplied · All". Arrow keys move between views;
- * Enter or Space opens one, so arrowing past a view never refetches the list.
+ * A room's in-page views (KICKOFF §3.5: in-page view tabs are tabs — the Radix
+ * `Tabs` shadcn's `tabs` wraps): "All · In clinic today · …", "Mine ·
+ * Unreplied · All" on the room tabs' segmented track — and the app's other
+ * tab rows on the same unit: the chat composer's "Send via" (`card`, each
+ * channel's solid fill — D93), the patient file bar's sections (`plain`, each
+ * in its tone) and a drawer's phone panes (`fill`). Roving focus: one tab
+ * stop, the arrows move (mirrored right-to-left), Home / End jump, a disabled
+ * tab is passed by; Enter or Space opens (`automatic`: the arrows open).
  * Scrolls sideways when narrower than its tabs.
  */
 export function RoomViewTabs({
@@ -282,39 +423,51 @@ export function RoomViewTabs({
   onValueChange,
   controls,
   testIdPrefix,
+  testIds,
+  look = 'track',
+  fill = false,
+  activation = 'manual',
+  className,
 }: RoomViewTabsProps) {
-  const ids = roomToolbarTestIds(testIdPrefix);
-  // Radix tabs underneath, styled as the room tabs' segments: the shadcn
-  // trigger's own active, dark and underline rules would each need overriding.
+  const { direction } = useLocaleFormat();
+  const roomIds = roomToolbarTestIds(testIdPrefix ?? '');
+  const ids = testIds ?? { list: roomIds.tabs, tab: roomIds.tab };
+  const styles = VIEW_LOOKS[look];
+  // Radix tabs underneath, styled as the look's segments: the shadcn trigger's
+  // own active, dark and underline rules would each need overriding.
+  const list = (
+    <TabsPrimitive.List
+      aria-label={label}
+      data-testid={ids.list}
+      data-room-tabs-track={look === 'track' ? '' : undefined}
+      className={cn(styles.list, fill ? 'w-full' : 'w-max')}
+    >
+      {tabs.map((tab) => (
+        <ViewTab
+          key={tab.id}
+          tab={tab}
+          selected={tab.id === value}
+          look={look}
+          fill={fill}
+          controls={controls}
+          testId={ids.tab(tab.id)}
+        />
+      ))}
+    </TabsPrimitive.List>
+  );
   return (
     <TabsPrimitive.Root
       value={value}
       onValueChange={onValueChange}
-      activationMode="manual"
-      className="flex w-full min-w-0"
+      activationMode={activation}
+      dir={direction}
+      className={cn('flex w-full min-w-0', className)}
     >
-      <TabsPrimitive.List
-        aria-label={label}
-        data-testid={ids.tabs}
-        data-room-tabs-track=""
-        className={cn(TRACK, 'w-max')}
-      >
-        {tabs.map((tab) => (
-          <TabsPrimitive.Trigger
-            key={tab.id}
-            value={tab.id}
-            aria-controls={controls}
-            data-testid={ids.tab(tab.id)}
-            data-slot="room-tab"
-            className={cn(
-              SEGMENT,
-              tab.id === value ? SEGMENT_STATE.selected : SEGMENT_STATE.idle,
-            )}
-          >
-            <SegmentLabel icon={tab.icon} label={tab.label} badge={tab.badge} />
-          </TabsPrimitive.Trigger>
-        ))}
-      </TabsPrimitive.List>
+      {tabs.some((tab) => tab.hint || tab.iconOnly) ? (
+        <TooltipProvider>{list}</TooltipProvider>
+      ) : (
+        list
+      )}
     </TabsPrimitive.Root>
   );
 }

@@ -32,8 +32,8 @@ row dense), Clinical, Photos and Team notes two columns wide — then the **acti
 - **Activity timeline** (H:4840–4864, AMBER A-F7): every record — visits, prescriptions,
   treatments, invoices and payments (billing view only), photos, notes — newest first under
   their days ("Today", "3 days ago", "In 2 days", else the date), a day's photos as one row with
-  their thumbnails, money masked with the file; the filter chips show their counts (a chip of
-  none hides); each row opens its record. A merged activity feed is a backend request.
+  their thumbnails, money masked with the file; the filter tabs (`RoomViewTabs`) show their counts (a tab
+  of none hides); each row opens its record. A merged activity feed is a backend request.
 - **Visit flow** (KICKOFF §6.6 Visit flow, D18; H:758–768, H:4871–4898): on
   `?visit=open` — set by the file bar's "Start visit" (the open visit, else a new one, today's
   booking checked in) and its "Visit in progress · Resume" — one column up to 880px: "Visit in
@@ -76,7 +76,7 @@ one lazy module (`../patient-id.sections.ts`).
 | `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                            |
 | `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).   |
 | `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                       |
-| `components/ActivityTimeline/ActivityTimeline.tsx` | The card: the filter chips, the day headings, the rows.                                                |
+| `components/ActivityTimeline/ActivityTimeline.tsx` | The card: the filter tabs, the day headings, the rows.                                                 |
 | `components/ActivityTimeline/activity-feed.ts`     | The kinds, chips and tones; rows (newest first, a day's photos joined) and counts.                     |
 | `components/ActivityTimeline/use-activity-feed.ts` | The patient's records as activity entries, in the viewer's words, each with what opens it.             |
 | `components/VisitFlow/VisitFlow.tsx`               | The visit flow: its head (Pause, Complete visit) and the five step cards with their status lines.      |
@@ -91,7 +91,7 @@ one lazy module (`../patient-id.sections.ts`).
 `-open`, `-new`, `-row`, `-empty`; Visits `-book`; Photos `-upload`, `-thumb`; Packages `-use`;
 Prescriptions `-latest`; Billing `-eye`, `-collect`), `overview-smart-note` · `-add`,
 `overview-note-input` · `overview-note-post`, `overview-activity`,
-`overview-activity-filter-<kind>`, `overview-activity-row` (`docs/reference/e2e-testids-inventory.md`
+`overview-activity-filters`, `overview-activity-filter-<kind>`, `overview-activity-row` (`docs/reference/e2e-testids-inventory.md`
 › Patient file Overview); the flow's `visit-flow`, `visit-flow-pause` · `-complete`,
 `visit-flow-step-<step>`, `visit-flow-check-<check>`, `visit-flow-kit`, `visit-flow-write-rx`,
 `visit-flow-repeat`, `visit-flow-new-treatment`, `visit-flow-create-invoice` · `-custom-invoice`,

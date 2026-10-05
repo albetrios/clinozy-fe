@@ -408,7 +408,7 @@ describe('"Send via"', () => {
     renderChat({ person: ANAYA, contact: ANAYA_CONTACT });
     await screen.findByTestId(ids.textarea);
     const instagram = screen.getByRole('tab', { name: 'Instagram' });
-    expect(instagram).toHaveAttribute('aria-disabled', 'true');
+    expect(instagram).toBeDisabled();
     await user.click(instagram);
     expect(instagram).toHaveAttribute('aria-selected', 'false');
 

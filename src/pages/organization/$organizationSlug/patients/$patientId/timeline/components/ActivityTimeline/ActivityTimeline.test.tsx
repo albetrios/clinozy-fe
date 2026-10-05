@@ -118,7 +118,7 @@ describe('ActivityTimeline (KICKOFF §6.6, H:4840–4864)', () => {
     expect(first.open).toHaveBeenCalled();
   });
 
-  it('filters by kind — a chip of none hides, the chosen one pressed', async () => {
+  it('filters by kind — a tab of none hides, the chosen one selected', async () => {
     const user = userEvent.setup();
     feed.entries = [
       entry('Peel', 'visit', -1),
@@ -126,17 +126,15 @@ describe('ActivityTimeline (KICKOFF §6.6, H:4840–4864)', () => {
       entry('Clinic visited', 'note', -2),
     ];
     renderInPatientFile(<ActivityTimeline />, { section: 'timeline' });
-    const all = await screen.findByRole('button', { name: 'All · 3' });
-    expect(all).toHaveAttribute('aria-pressed', 'true');
-    expect(
-      screen.queryByRole('button', { name: /^Prescriptions/ }),
-    ).not.toBeInTheDocument();
-    const visits = screen.getByRole('button', { name: 'Visits · 2' });
+    const all = await screen.findByRole('tab', { name: 'All · 3' });
+    expect(all).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByRole('tab', { name: /^Prescriptions/ })).not.toBeInTheDocument();
+    const visits = screen.getByRole('tab', { name: 'Visits · 2' });
     await user.click(visits);
-    expect(visits).toHaveAttribute('aria-pressed', 'true');
-    expect(all).toHaveAttribute('aria-pressed', 'false');
+    expect(visits).toHaveAttribute('aria-selected', 'true');
+    expect(all).toHaveAttribute('aria-selected', 'false');
     expect(rows().map((row) => row.textContent)).toEqual(['Peel', 'Consultation']);
-    await user.click(screen.getByRole('button', { name: 'Notes · 1' }));
+    await user.click(screen.getByRole('tab', { name: 'Notes · 1' }));
     expect(rows().map((row) => row.textContent)).toEqual(['Clinic visited']);
   });
 

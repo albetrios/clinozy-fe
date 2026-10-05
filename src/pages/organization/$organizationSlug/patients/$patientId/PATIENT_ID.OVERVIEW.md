@@ -117,7 +117,7 @@ one loader for the whole file.
 
 `patient-file-layout`; `patient-file-back`, `patient-file-sections` (panel
 `patient-file-sections-panel`, tiles `patient-file-sections-tile-<section>`, pins
-`patient-file-sections-pin-<section>`), `patient-file-tab-<section>`, `patient-file-add`,
+`patient-file-sections-pin-<section>`), `patient-file-tabs` (tabs `patient-file-tab-<section>`), `patient-file-add`,
 `patient-file-add-menu` (items `patient-file-add-menu-<item>`), `patient-file-start-visit`,
 `patient-file-activity`, `patient-file-activity-column`; `patient-rail`,
 `patient-rail-copy-id`, `patient-rail-edit`, `patient-rail-book`, `patient-rail-due`,

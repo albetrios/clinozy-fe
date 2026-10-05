@@ -245,6 +245,8 @@ export const LEADS_TEST_IDS = {
   holdDot: 'leads-hold-dot',
   drawer: 'lead-drawer',
   drawerChat: 'lead-drawer-chat',
+  /** The phone's Details · Chat switch: `lead-drawer-panes-tabs`, `-tab-details`, `-tab-chat`. */
+  drawerPanes: 'lead-drawer-panes',
   drawerSave: 'lead-drawer-save',
   drawerRemove: 'lead-drawer-remove',
   drawerPeople: 'lead-drawer-people',

@@ -42,7 +42,7 @@ describe('useActivityFeed (KICKOFF §6.6 Activity timeline, H:4840–4864)', () 
     expect(await row(/^3 photos/)).toBeInTheDocument();
     expect(await row(/^Clinic visited/)).toBeInTheDocument();
     for (const chip of ['Visits · 3', 'Invoices · 4', 'Payments · 1', 'Notes · 2']) {
-      expect(screen.getByRole('button', { name: chip })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: chip })).toBeInTheDocument();
     }
   });
 

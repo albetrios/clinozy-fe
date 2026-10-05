@@ -192,7 +192,9 @@ export const TIMELINE_TEST_IDS = {
   noteInput: 'overview-note-input',
   notePost: 'overview-note-post',
   activity: 'overview-activity',
-  /** A filter chip: `overview-activity-filter-<kind>`. */
+  /** The filter tabs' row. */
+  filters: 'overview-activity-filters',
+  /** A filter tab: `overview-activity-filter-<kind>`. */
   filter: (kind: string) => `overview-activity-filter-${kind}`,
   activityRow: 'overview-activity-row',
 } as const;

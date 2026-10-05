@@ -12,6 +12,10 @@ import {
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
+import {
+  type RoomViewTab,
+  RoomViewTabs,
+} from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   type AppIcon,
@@ -79,44 +83,56 @@ function useDayHeading(): (day: string) => { main: string; sub: string | null } 
   });
 }
 
-/** A filter chip (H:4864): the kind's icon and count — "All" spelled out — its tone when on. */
-function FilterChip({
-  filter,
-  count,
-  on,
+/**
+ * The filter tabs (H:4864) — the room view tabs' track: each kind's icon and
+ * count, "All" spelled out, the open one in its tone's ink; each names itself
+ * "<kind> · <count>". In-page views of the list: the arrows move, Enter or
+ * Space opens.
+ */
+function ActivityFilters({
+  counts,
+  active,
   onSelect,
+  controls,
 }: {
-  filter: ActivityFilter;
-  count: number;
-  on: boolean;
-  onSelect: () => void;
+  counts: Readonly<Record<ActivityFilter, number>>;
+  active: ActivityFilter;
+  onSelect: (filter: ActivityFilter) => void;
+  controls?: string;
 }) {
   const { t } = useTranslation(TIMELINE_NS);
-  const Icon = ACTIVITY_ICONS[filter];
-  const label = t(K.filters[filter]);
+  const kinds = ACTIVITY_FILTERS.filter((kind) => kind === 'all' || counts[kind] > 0);
+  const tabs: RoomViewTab[] = kinds.map((kind) => {
+    const label = t(K.filters[kind]);
+    return {
+      id: kind,
+      label: t(K.filterTitle, { label, count: counts[kind] }),
+      // "All" is spelled out; a kind shows its icon. The tab's name says both.
+      icon: kind === 'all' ? undefined : ACTIVITY_ICONS[kind],
+      iconOnly: true,
+      badge: (
+        <>
+          {kind === 'all' ? <span>{label}</span> : null}
+          <span className="tabular-nums">{counts[kind]}</span>
+        </>
+      ),
+      selectedClassName:
+        kind === 'all' ? undefined : TONE_CLASSES[ACTIVITY_TONES[kind]].ink,
+    };
+  });
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={on}
-      aria-label={t(K.filterTitle, { label, count })}
-      title={t(K.filterTitle, { label, count })}
-      data-testid={TIMELINE_TEST_IDS.filter(filter)}
-      className={cn(
-        'text-caption flex h-7 items-center gap-1.5 rounded-lg px-2 font-medium tabular-nums transition-colors',
-        on
-          ? 'bg-card ring-border shadow-(--elevation-card) ring-1'
-          : 'text-muted-foreground hover:bg-muted',
-        on && filter !== 'all' && TONE_CLASSES[ACTIVITY_TONES[filter]].ink,
-      )}
-    >
-      {filter === 'all' ? (
-        <span>{label}</span>
-      ) : (
-        <Icon aria-hidden="true" className="size-3.5" />
-      )}
-      <span>{count}</span>
-    </button>
+    <RoomViewTabs
+      label={t(K.filtersLabel)}
+      tabs={tabs}
+      value={active}
+      onValueChange={(next) => {
+        const kind = kinds.find((entry) => entry === next);
+        if (kind) onSelect(kind);
+      }}
+      controls={controls}
+      testIds={{ list: TIMELINE_TEST_IDS.filters, tab: TIMELINE_TEST_IDS.filter }}
+      className="w-auto"
+    />
   );
 }
 
@@ -204,6 +220,7 @@ function ActivityRowView({ row }: { row: ActivityRow }) {
 export function ActivityTimeline() {
   const { t } = useTranslation(TIMELINE_NS);
   const titleId = useId();
+  const listId = useId();
   const heading = useDayHeading();
   const { entries, loading } = useActivityFeed();
   const [filter, setFilter] = useState<ActivityFilter>('all');
@@ -233,26 +250,15 @@ export function ActivityTimeline() {
           {t(K.title)}
         </h3>
         <span className="flex-1" />
-        <div
-          role="group"
-          aria-label={t(K.filtersLabel)}
-          className="bg-muted flex flex-wrap gap-0.5 rounded-lg p-0.5"
-        >
-          {ACTIVITY_FILTERS.filter((kind) => kind === 'all' || counts[kind] > 0).map(
-            (kind) => (
-              <FilterChip
-                key={kind}
-                filter={kind}
-                count={counts[kind]}
-                on={active === kind}
-                onSelect={() => setFilter(kind)}
-              />
-            ),
-          )}
-        </div>
+        <ActivityFilters
+          counts={counts}
+          active={active}
+          onSelect={setFilter}
+          controls={rows.length > 0 ? listId : undefined}
+        />
       </div>
       {rows.length > 0 ? (
-        <div className="flex flex-col">
+        <div id={listId} className="flex flex-col">
           {rows.map((row) => {
             const day = row.newDay ? heading(row.day) : null;
             return (
