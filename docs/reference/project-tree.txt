@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2160 src files · ~1040 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
+Stats: ~2159 src files · ~1040 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1782,7 +1782,7 @@ clinozy-fe/
 │   │   │   │   ├── useRowKeyboardNav.ts
 │   │   │   │   ├── useTableSelection.ts
 │   │   │   │   ├── useTableWindow.ts
-│   │   │   │   └── [6 test files]
+│   │   │   │   └── [5 test files]
 │   │   │   ├── DataTableBulkBar/
 │   │   │   │   ├── DataTableBulkBar.tsx
 │   │   │   │   ├── index.ts
@@ -2238,9 +2238,8 @@ clinozy-fe/
 │   │   │   │   └── [2 test files]
 │   │   │   ├── SkeletonRows/
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── skeleton-in-place.ts
 │   │   │   │   ├── SkeletonRows.tsx
-│   │   │   │   └── [1 test file]
+│   │   │   │   └── [2 test files]
 │   │   │   ├── Spinner/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── Spinner.tsx

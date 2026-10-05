@@ -15,10 +15,7 @@ import type {
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import {
-  SKELETON_IN_PLACE,
-  SkeletonRows,
-} from '@/shared/components/SkeletonRows/index.ts';
+import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
   type LoadMorePaging,
   useLoadMoreSentinel,
@@ -165,12 +162,13 @@ export function TaskList({
             aria-busy={refreshing || undefined}
             data-testid={TASKS_TEST_IDS.list}
             data-tab={tab}
-            className={cn(refreshing && SKELETON_IN_PLACE)}
           >
             {groups.map((group) => (
               <div
                 key={group.id}
                 role="rowgroup"
+                // Bars in place while a new view loads — the rooms' one skeleton (index.css).
+                data-refreshing={refreshing || undefined}
                 data-testid={TASKS_TEST_IDS.group(group.id)}
               >
                 <GroupHeader group={group} />

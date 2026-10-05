@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentCalendarView } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import {
@@ -158,7 +157,7 @@ export function DayColumn({
           className="bg-muted/75 pointer-events-none absolute inset-x-0 top-0 h-(--veil)"
         />
       )}
-      <div className={cn('contents', refreshing && SKELETON_IN_PLACE)}>
+      <div className="contents" data-refreshing={refreshing || undefined}>
         {rows.map((row) => (
           <CalendarBlock
             key={row.id}

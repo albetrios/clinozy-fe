@@ -149,7 +149,10 @@ describe('TaskList (tasks.md:18–38)', () => {
     );
     const table = screen.getByRole('table');
     expect(table).toHaveAttribute('aria-busy', 'true');
-    expect(table.className).toContain('pointer-events-none');
+    // Each group's rows are its items: the rooms' one in-place skeleton (index.css).
+    for (const group of within(table).getAllByRole('rowgroup')) {
+      expect(group).toHaveAttribute('data-refreshing', 'true');
+    }
   });
 
   it('opens a row', async () => {

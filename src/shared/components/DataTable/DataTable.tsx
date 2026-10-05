@@ -311,15 +311,12 @@ function PinnedGroupHeader<TData extends RowData>({
 }
 
 /**
- * The refresh state (H:275): clicks are off until the new rows land; the bars
- * themselves — every leaf text in a row a flat `muted-strong` bar, an avatar a
- * plain disc without its badge, an icon nothing; group headers kept — are one
- * rule in `index.css` keyed on the rowgroup's `data-refreshing`, not long
- * arbitrary variants in every page's CSS.
+ * The rows' rowgroup — group headers among them — or the empty state in a
+ * single full-width cell. While new rows load it carries `data-refreshing`:
+ * the in-place skeleton every room shares (one `index.css` rule — clicks off,
+ * every leaf text in a row a flat `muted-strong` bar, an avatar a plain disc,
+ * an icon nothing, group headers kept; H:275).
  */
-const REFRESH_BARS = 'pointer-events-none cursor-progress';
-
-/** The rows' rowgroup — group headers among them — or the empty state in a single full-width cell. */
 function TableBody<TData extends RowData>({
   tableWindow,
   context,
@@ -369,10 +366,7 @@ function TableBody<TData extends RowData>({
       role="rowgroup"
       data-slot="data-table-body"
       data-refreshing={refreshing || undefined}
-      className={cn(
-        'shrink-0 pt-(--dt-pad-top) pb-(--dt-pad-bottom)',
-        refreshing && REFRESH_BARS,
-      )}
+      className="shrink-0 pt-(--dt-pad-top) pb-(--dt-pad-bottom)"
     >
       {tableWindow.windowed.length > 0 ? (
         tableWindow.windowed.map(renderEntry)

@@ -7,7 +7,6 @@ import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contract
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import {
   useAppointmentSlotLabel,
   useBookableStaff,
@@ -183,10 +182,8 @@ export function AppointmentsDay() {
                 {t(APPOINTMENTS_KEYS.filters.allDoctors)}
               </span>
               <span
-                className={cn(
-                  'text-caption text-muted-foreground leading-[1.25] whitespace-nowrap',
-                  loading && SKELETON_IN_PLACE,
-                )}
+                data-refreshing={loading || undefined}
+                className="text-caption text-muted-foreground leading-[1.25] whitespace-nowrap"
               >
                 <span>
                   {load.booked > 0

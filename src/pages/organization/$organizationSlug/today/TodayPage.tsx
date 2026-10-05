@@ -2,12 +2,10 @@ import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { cn } from '@/lib/utils.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
-import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
@@ -106,10 +104,9 @@ export function TodayPage() {
       {loading ? <output className="sr-only">{t(TODAY_KEYS.loading)}</output> : null}
       <div className="grid grid-cols-1 md:min-h-0 md:flex-1 md:grid-cols-[minmax(0,1fr)_312px]">
         <div
-          className={cn(
-            'flex min-w-0 flex-col gap-3.5 px-3 pt-3.5 pb-2.5 md:min-h-0 md:overflow-y-auto md:px-5.5 md:pt-4 md:pb-3',
-            floor.loading && cn(SKELETON_IN_PLACE, 'cursor-progress'),
-          )}
+          // The first load: bars over every leaf in place (the rooms' one skeleton, index.css).
+          data-refreshing={floor.loading || undefined}
+          className="flex min-w-0 flex-col gap-3.5 px-3 pt-3.5 pb-2.5 md:min-h-0 md:overflow-y-auto md:px-5.5 md:pt-4 md:pb-3"
         >
           <TodayGreeting
             firstName={me.data?.user.firstName ?? null}
@@ -145,7 +142,6 @@ export function TodayPage() {
           }
           now={now}
           onOutcome={queue.record}
-          className={cn(queue.loading && cn(SKELETON_IN_PLACE, 'cursor-progress'))}
         />
       </div>
       <TodayBooking request={booking} onClose={() => setBooking(null)} />

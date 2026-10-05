@@ -871,12 +871,12 @@ describe('DataTable — refresh (KICKOFF §6.0)', () => {
       <Room data={[patient(1)]} onRowClick={onRowClick} refreshing />,
     );
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
-    // The rows' rowgroup carries the pause and the bars (one `index.css` rule).
+    // The rows' rowgroup carries the pause and the bars: the in-place skeleton
+    // every room shares, one `index.css` rule (skeleton-in-place-css.test.ts).
     const rowgroup = screen
       .getByTestId('patients-table-row')
       .closest('[data-slot="data-table-body"]');
     expect(rowgroup).toHaveAttribute('data-refreshing', 'true');
-    expect(rowgroup?.className).toContain('pointer-events-none');
 
     rerender(<Room data={[patient(1)]} onRowClick={onRowClick} />);
     expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');

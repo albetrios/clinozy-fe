@@ -8,7 +8,6 @@ import {
 } from '@/shared/api/clinic/appointment-views.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { addCivilDays, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { SKELETON_IN_PLACE } from '@/shared/components/SkeletonRows/index.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -94,7 +93,7 @@ function MonthCell({ date, today, rows, fit, refreshing, onOpenDay }: MonthCellP
           />
         ) : null}
       </span>
-      <div className={cn('contents', refreshing && SKELETON_IN_PLACE)}>
+      <div className="contents" data-refreshing={refreshing || undefined}>
         {shown.map((row) => (
           <CalendarBlock key={row.id} appointment={row} variant="chip" />
         ))}

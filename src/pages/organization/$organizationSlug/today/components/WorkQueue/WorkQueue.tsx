@@ -185,6 +185,8 @@ export function WorkQueue({
     <aside
       aria-labelledby={headingId}
       data-testid={TODAY_TEST_IDS.queue}
+      // The first load: bars over every leaf in place (the rooms' one skeleton, index.css).
+      data-refreshing={loading || undefined}
       className={cn(
         'bg-canvas flex flex-col border-t md:min-h-0 md:border-s md:border-t-0',
         className,
