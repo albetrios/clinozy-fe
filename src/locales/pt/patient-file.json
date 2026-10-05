@@ -926,7 +926,7 @@
       "later": "Mais tarde",
       "smartLabel": "Nota inteligente",
       "smartPlaceholder": "Nota inteligente · escreva livremente, ex.: {{example}}",
-      "smartExample": "queda de cabelo há 2 meses, sugerir PRP",
+      "smartExample": "queda de cabelo 2 meses, PRP",
       "add": "Adicionar",
       "added_one": "{{count}} item adicionado da sua nota",
       "added_many": "{{count}} de itens adicionados da sua nota",

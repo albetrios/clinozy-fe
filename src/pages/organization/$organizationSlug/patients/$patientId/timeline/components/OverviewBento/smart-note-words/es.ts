@@ -11,6 +11,7 @@ export const WORDS: SmartNoteDictionary = {
       'Caída del cabello',
       'caída de cabello',
       'caída del pelo',
+      'caída capilar',
       'pérdida de cabello',
     ],
     itching: ['Picazón', 'comezón', 'prurito', 'picor'],
