@@ -1,7 +1,46 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import committedState from './tests/e2e/storage/e2e-init.json' with { type: 'json' };
+
 const E2E_PORT = 5180;
-const E2E_BASE_URL = `http://localhost:${E2E_PORT}`;
+
+/**
+ * `E2E_BASE_URL` runs the suite against a server that is already up — e.g. the dev
+ * server on :5173, when clinozy-be's `ALLOWED_ORIGINS` only accepts that origin and
+ * :5180 would get 403s — and skips this config's own `webServer`. Unset, the suite
+ * boots its own on :5180 as before.
+ */
+const EXTERNAL_BASE_URL = process.env.E2E_BASE_URL;
+const E2E_BASE_URL = EXTERNAL_BASE_URL ?? `http://localhost:${E2E_PORT}`;
+
+/**
+ * The shared storage state (cookie consent pre-answered) is keyed by origin, so it is
+ * re-pointed at the origin under test — otherwise the consent card sits over every spec.
+ */
+const storageState = {
+  ...committedState,
+  origins: committedState.origins.map((entry) => ({
+    ...entry,
+    origin: new URL(E2E_BASE_URL).origin,
+  })),
+};
+
+/** The server the suite boots for itself: the production preview in CI, the dev server locally. */
+function ownWebServer() {
+  if (process.env.CI) {
+    return {
+      command: `pnpm preview --port ${E2E_PORT} --strictPort`,
+      url: E2E_BASE_URL,
+      reuseExistingServer: false,
+    };
+  }
+  return {
+    command: `pnpm dev --port ${E2E_PORT} --strictPort`,
+    url: E2E_BASE_URL,
+    reuseExistingServer: true,
+    timeout: 120_000,
+  };
+}
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -17,7 +56,7 @@ export default defineConfig({
   reporter: [['html', { outputFolder: 'test-results/report', open: 'never' }]],
   use: {
     baseURL: E2E_BASE_URL,
-    storageState: 'tests/e2e/storage/e2e-init.json',
+    storageState,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -35,16 +74,5 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: process.env.CI
-    ? {
-        command: `pnpm preview --port ${E2E_PORT} --strictPort`,
-        url: E2E_BASE_URL,
-        reuseExistingServer: false,
-      }
-    : {
-        command: `pnpm dev --port ${E2E_PORT} --strictPort`,
-        url: E2E_BASE_URL,
-        reuseExistingServer: true,
-        timeout: 120_000,
-      },
+  webServer: EXTERNAL_BASE_URL ? undefined : ownWebServer(),
 });
