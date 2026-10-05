@@ -179,9 +179,7 @@
     "toasts": {
       "claimedAfter_one": "{{count}} दिन निष्क्रिय रहने के बाद {{me}} ने क्लेम किया · {{owner}} शामिल रहेंगे",
       "claimedAfter_other": "{{count}} दिन निष्क्रिय रहने के बाद {{me}} ने क्लेम किया · {{owner}} शामिल रहेंगे",
-      "releasedOpen": "{{name}} अब कोई भी क्लेम कर सकता है",
-      "addedInvolved": "{{name}} को शामिल व्यक्ति के रूप में जोड़ा गया",
-      "removedInvolved": "{{name}} को शामिल लोगों से हटाया गया"
+      "releasedOpen": "{{name}} अब कोई भी क्लेम कर सकता है"
     }
   },
   "newLead": {

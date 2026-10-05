@@ -188,9 +188,7 @@
       "claimedAfter_one": "Assumido por {{me}} após {{count}} dia sem atividade · {{owner}} continua envolvido",
       "claimedAfter_many": "Assumido por {{me}} após {{count}} dias sem atividade · {{owner}} continua envolvido",
       "claimedAfter_other": "Assumido por {{me}} após {{count}} dias sem atividade · {{owner}} continua envolvido",
-      "releasedOpen": "{{name}} está livre para qualquer pessoa assumir",
-      "addedInvolved": "{{name}} adicionado como envolvido",
-      "removedInvolved": "{{name}} removido dos envolvidos"
+      "releasedOpen": "{{name}} está livre para qualquer pessoa assumir"
     }
   },
   "newLead": {

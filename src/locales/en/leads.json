@@ -179,9 +179,7 @@
     "toasts": {
       "claimedAfter_one": "Claimed by {{me}} after {{count}} idle day · {{owner}} stays involved",
       "claimedAfter_other": "Claimed by {{me}} after {{count}} idle days · {{owner}} stays involved",
-      "releasedOpen": "{{name}} is open for anyone to claim",
-      "addedInvolved": "Added {{name}} as involved",
-      "removedInvolved": "Removed {{name}} from involved"
+      "releasedOpen": "{{name}} is open for anyone to claim"
     }
   },
   "newLead": {

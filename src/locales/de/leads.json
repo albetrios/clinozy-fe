@@ -179,9 +179,7 @@
     "toasts": {
       "claimedAfter_one": "Von {{me}} übernommen nach {{count}} inaktivem Tag · {{owner}} bleibt beteiligt",
       "claimedAfter_other": "Von {{me}} übernommen nach {{count}} inaktiven Tagen · {{owner}} bleibt beteiligt",
-      "releasedOpen": "{{name}} kann jetzt von allen übernommen werden",
-      "addedInvolved": "{{name}} als beteiligt hinzugefügt",
-      "removedInvolved": "{{name}} aus den Beteiligten entfernt"
+      "releasedOpen": "{{name}} kann jetzt von allen übernommen werden"
     }
   },
   "newLead": {

@@ -188,9 +188,7 @@
       "claimedAfter_one": "Preso in carico da {{me}} dopo {{count}} giorno di inattività · {{owner}} resta coinvolto",
       "claimedAfter_many": "Preso in carico da {{me}} dopo {{count}} giorni di inattività · {{owner}} resta coinvolto",
       "claimedAfter_other": "Preso in carico da {{me}} dopo {{count}} giorni di inattività · {{owner}} resta coinvolto",
-      "releasedOpen": "{{name}} può essere preso in carico da chiunque",
-      "addedInvolved": "{{name}} aggiunto come coinvolto",
-      "removedInvolved": "{{name}} rimosso dai coinvolti"
+      "releasedOpen": "{{name}} può essere preso in carico da chiunque"
     }
   },
   "newLead": {

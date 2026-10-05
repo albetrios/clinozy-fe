@@ -27,6 +27,7 @@ import {
   restoreLeadTeam,
   saveLead,
   searchLeadContacts,
+  setLeadInvolved,
   undoLeadChange,
   updateLead,
 } from './leads-api.ts';
@@ -40,6 +41,12 @@ const DR = staffRef('DR');
 const AS = staffRef('AS');
 /** 10:00 on 3 Oct, clinic time — the seed day is today. */
 const NOW = new Date('2026-10-03T04:30:00Z');
+
+/** A lead's system lines in the chat, oldest first. */
+const systemLines = (id: string) =>
+  clinicFixtures.leadMessages
+    .snapshot((message) => message.leadId === id && message.isSystem)
+    .map((message) => message.body);
 
 /** The rejection a call ends in, so its status and fields can be read. */
 async function failureOf(call: Promise<unknown>) {
@@ -456,15 +463,27 @@ describe('updateLead (S:1594)', () => {
 
   it('writes the assignment into the chat: "Assigned to <name> · <previous> stays involved"', async () => {
     const id = ref.lead(2357);
-    const lines = () =>
-      clinicFixtures.leadMessages
-        .snapshot((message) => message.leadId === id && message.isSystem)
-        .map((message) => message.body);
+    const lines = () => systemLines(id);
     await assignLead(id, NK);
     expect(lines().at(-1)).toBe('Assigned to Nidhi K. · Dr. Reenal stays involved');
     const count = lines().length;
     // Assigning the owner they already have writes nothing.
     await assignLead(id, NK);
+    expect(lines()).toHaveLength(count);
+  });
+
+  it('writes an involved change into the chat: "Added <name> as involved" (H:5707)', async () => {
+    const id = ref.lead(2357);
+    const lines = () => systemLines(id);
+    const before = (await fetchLead(id)).involvedIds;
+    const added = await setLeadInvolved(id, [...before, AS]);
+    expect(added.involvedIds).toContain(AS);
+    expect(lines().at(-1)).toBe('Added Asha M. as involved');
+    await setLeadInvolved(id, before);
+    expect(lines().at(-1)).toBe('Removed Asha M. from involved');
+    const count = lines().length;
+    // The same list again changes nobody and writes nothing.
+    await setLeadInvolved(id, before);
     expect(lines()).toHaveLength(count);
   });
 

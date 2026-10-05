@@ -188,9 +188,7 @@
       "claimedAfter_one": "Reclamado por {{me}} tras {{count}} día inactivo · {{owner}} sigue implicado",
       "claimedAfter_many": "Reclamado por {{me}} tras {{count}} días inactivos · {{owner}} sigue implicado",
       "claimedAfter_other": "Reclamado por {{me}} tras {{count}} días inactivos · {{owner}} sigue implicado",
-      "releasedOpen": "{{name}} está libre para que cualquiera lo reclame",
-      "addedInvolved": "{{name}} añadido como implicado",
-      "removedInvolved": "{{name}} quitado de los implicados"
+      "releasedOpen": "{{name}} está libre para que cualquiera lo reclame"
     }
   },
   "newLead": {

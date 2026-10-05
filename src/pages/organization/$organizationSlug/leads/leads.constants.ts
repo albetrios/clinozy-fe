@@ -185,8 +185,6 @@ export const LEADS_KEYS = {
       claimedAfter: 'drawer.toasts.claimedAfter',
       /** "<name> is open for anyone to claim". */
       releasedOpen: 'drawer.toasts.releasedOpen',
-      addedInvolved: 'drawer.toasts.addedInvolved',
-      removedInvolved: 'drawer.toasts.removedInvolved',
     },
   },
   /** New lead (KICKOFF §6.3; `leads.md:75–90, 138–150, 246–262`, H:1883–1961). */

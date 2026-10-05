@@ -24,8 +24,8 @@ import {
   restoreLeadTeam,
   saveLead,
   searchLeadContacts,
+  setLeadInvolved,
   undoLeadChange,
-  updateLead,
 } from '@/shared/api/clinic/leads-api.ts';
 import type {
   LeadContactHit,
@@ -327,7 +327,8 @@ export function useAssignLead(
   const restoreTeam = useRestoreLeadTeam();
   return useAppMutation<LeadRecord, LeadAssignVars>({
     mutationFn: ({ lead, ownerId }) => assignLead(lead.id, ownerId),
-    invalidateKeys: [leadQueryKeys.all],
+    // The chat shows the assignment's system line (H:5705) at once.
+    invalidateKeys: [leadQueryKeys.all, messageQueryKeys.all],
     ...withUndoToast(options, (_assigned, { lead, ownerName }) => {
       notify.undo(leadToast(LEAD_TOASTS_KEYS.assigned, { name: ownerName }), {
         onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
@@ -355,21 +356,21 @@ export function useReleaseLead(
   });
 }
 
-/** What an involved change sends: the new list and the toast that names it. */
+/** What an involved change sends: the new list. */
 export interface LeadInvolvedVars {
   id: string;
   involvedIds: readonly string[];
-  /** "Added <name> as involved" / "Removed <name> from involved". */
-  message: string;
 }
 
-/** Add or remove someone involved — the people popover's toggle; applies at once. */
+/**
+ * Add or remove someone involved — the people popover's toggle; applies at
+ * once. Its feedback is the chat's system line ("Added <name> as involved",
+ * H:5707), so the thread is read again; no toast.
+ */
 export function useSetLeadInvolved() {
   return useAppMutation<LeadRecord, LeadInvolvedVars>({
-    mutationFn: ({ id, involvedIds }) =>
-      updateLead(id, { involvedIds: [...involvedIds] }),
-    invalidateKeys: [leadQueryKeys.all],
-    successMessage: (_lead, { message }) => message,
+    mutationFn: ({ id, involvedIds }) => setLeadInvolved(id, involvedIds),
+    invalidateKeys: [leadQueryKeys.all, messageQueryKeys.all],
   });
 }
 

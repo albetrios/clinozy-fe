@@ -274,12 +274,6 @@ export function LeadsPage() {
                   involvedIds: involved
                     ? [...lead.involvedIds, person.id]
                     : lead.involvedIds.filter((id) => id !== person.id),
-                  message: t(
-                    involved
-                      ? LEADS_KEYS.drawer.toasts.addedInvolved
-                      : LEADS_KEYS.drawer.toasts.removedInvolved,
-                    { name: personFullName(person) },
-                  ),
                 }),
             }}
           />

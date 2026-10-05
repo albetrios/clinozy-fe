@@ -188,9 +188,7 @@
       "claimedAfter_one": "Récupéré par {{me}} après {{count}} jour d’inactivité · {{owner}} reste impliqué",
       "claimedAfter_many": "Récupéré par {{me}} après {{count}} jours d’inactivité · {{owner}} reste impliqué",
       "claimedAfter_other": "Récupéré par {{me}} après {{count}} jours d’inactivité · {{owner}} reste impliqué",
-      "releasedOpen": "{{name}} peut être récupéré par n’importe qui",
-      "addedInvolved": "{{name}} ajouté comme impliqué",
-      "removedInvolved": "{{name}} retiré des impliqués"
+      "releasedOpen": "{{name}} peut être récupéré par n’importe qui"
     }
   },
   "newLead": {

@@ -170,9 +170,7 @@
     },
     "toasts": {
       "claimedAfter_other": "{{count}} 日間動きがなかったため {{me}} が引き取りました · {{owner}} は関係者として残ります",
-      "releasedOpen": "{{name}} は誰でも引き取れるようになりました",
-      "addedInvolved": "{{name}} を関係者に追加しました",
-      "removedInvolved": "{{name}} を関係者から外しました"
+      "releasedOpen": "{{name}} は誰でも引き取れるようになりました"
     }
   },
   "newLead": {

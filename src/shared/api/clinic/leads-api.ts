@@ -756,6 +756,47 @@ export async function assignLead(id: string, ownerId: string): Promise<LeadRecor
 }
 
 /**
+ * Set who is involved on a lead — the people popover's toggle (`leads.md:196`,
+ * H:5707). The chat says who joined or left, one system line per person in
+ * the team's short names: "Added <name> as involved" / "Removed <name> from
+ * involved" — the line is the toggle's feedback, as in the prototype (no toast).
+ */
+export async function setLeadInvolved(
+  id: string,
+  involvedIds: readonly string[],
+): Promise<LeadRecord> {
+  const [{ clinicFixtures }, { systemLine }, { staffShortName }] = await Promise.all([
+    fixtureWorld(),
+    import('./fixtures/messages.fixtures.ts'),
+    import('./fixtures/task-rules.fixtures.ts'),
+  ]);
+  const before = await clinicFixtures.leads.get(id);
+  const lead = await updateLead(id, { involvedIds: [...involvedIds] });
+  const staff = clinicFixtures.staff.snapshot();
+  const nameOf = (staffId: string) => {
+    const user = staff.find((row) => row.id === staffId);
+    return user ? staffShortName(user) : null;
+  };
+  const lines = [
+    ...lead.involvedIds
+      .filter((staffId) => !before.involvedIds.includes(staffId))
+      .map((staffId) => ({ name: nameOf(staffId), line: 'Added {} as involved' })),
+    ...before.involvedIds
+      .filter((staffId) => !lead.involvedIds.includes(staffId))
+      .map((staffId) => ({ name: nameOf(staffId), line: 'Removed {} from involved' })),
+  ];
+  const now = new Date();
+  for (const { name, line } of lines) {
+    if (name) {
+      await clinicFixtures.leadMessages.create(
+        systemLine(id, line.replace('{}', name), null, now),
+      );
+    }
+  }
+  return lead;
+}
+
+/**
  * Claim a lead (plan, Appendix F): the viewer becomes its owner, the previous
  * owner stays involved, and the hold starts again. Open, held ("Take over")
  * or its owner gone ("Join · take") alike; a closed lead stays with its owner

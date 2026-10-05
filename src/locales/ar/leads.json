@@ -215,9 +215,7 @@
       "claimedAfter_few": "استلمه {{me}} بعد {{count}} أيام خاملة · يبقى {{owner}} مشاركًا",
       "claimedAfter_many": "استلمه {{me}} بعد {{count}} يومًا خاملًا · يبقى {{owner}} مشاركًا",
       "claimedAfter_other": "استلمه {{me}} بعد {{count}} يوم خامل · يبقى {{owner}} مشاركًا",
-      "releasedOpen": "{{name}} متاح لأي شخص لاستلامه",
-      "addedInvolved": "تمت إضافة {{name}} كمشارك",
-      "removedInvolved": "تمت إزالة {{name}} من المشاركين"
+      "releasedOpen": "{{name}} متاح لأي شخص لاستلامه"
     }
   },
   "newLead": {

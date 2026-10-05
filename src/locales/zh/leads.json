@@ -170,9 +170,7 @@
     },
     "toasts": {
       "claimedAfter_other": "闲置 {{count}} 天后由 {{me}} 认领 · {{owner}} 仍为参与者",
-      "releasedOpen": "{{name}} 现在任何人都可以认领",
-      "addedInvolved": "已将 {{name}} 添加为参与者",
-      "removedInvolved": "已将 {{name}} 从参与者中移除"
+      "releasedOpen": "{{name}} 现在任何人都可以认领"
     }
   },
   "newLead": {
