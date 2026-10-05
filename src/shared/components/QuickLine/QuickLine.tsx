@@ -1,4 +1,4 @@
-import { type RefObject, useId, useRef } from 'react';
+import { useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -134,13 +134,20 @@ function FrequentChips<TItem>({
   );
 }
 
-/** "Browse" beside the line, and its panel anchored to the whole row (H:3797). */
+/**
+ * "Browse" beside the line, and its panel anchored to the whole row (H:3797):
+ * the anchor is a box laid over the row (the row is `relative`), so the panel
+ * takes the row's width and place. It comes after the trigger: Radix wraps a
+ * trigger in an anchor of its own until the custom one registers, and the
+ * last anchor whose ref attaches wins — after Strict Mode's remount re-attached
+ * the trigger's, a `virtualRef` (set once, in an effect) lost to a detached
+ * button and pinned the panel 2px wide at the viewport's corner.
+ */
 function BrowseButton<TItem>({
   config,
   words,
   open,
   onOpenChange,
-  rowRef,
   disabled,
   testId,
 }: {
@@ -148,7 +155,6 @@ function BrowseButton<TItem>({
   words: readonly string[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  rowRef: RefObject<HTMLDivElement | null>;
   disabled: boolean;
   testId: string;
 }) {
@@ -156,7 +162,6 @@ function BrowseButton<TItem>({
   const ids = quickLineTestIds(testId);
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverAnchor virtualRef={rowRef} />
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -175,6 +180,10 @@ function BrowseButton<TItem>({
           {t(K.browse)}
         </button>
       </PopoverTrigger>
+      <PopoverAnchor
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+      />
       <PopoverContent
         side="bottom"
         align="start"
@@ -272,7 +281,6 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
   const { t } = useTranslation(QUICK_LINE_NS);
   const ids = quickLineTestIds(testId);
   const listId = useId();
-  const rowRef = useRef<HTMLDivElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const state = useQuickLineState(props, listId);
 
@@ -285,7 +293,7 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
         }}
       >
         <PopoverAnchor asChild>
-          <div ref={rowRef} className="flex gap-2">
+          <div className="relative flex gap-2">
             <div
               ref={boxRef}
               className={cn(
@@ -345,7 +353,6 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
                 words={state.parsed.words}
                 open={state.browsing}
                 onOpenChange={state.setBrowsing}
-                rowRef={rowRef}
                 disabled={disabled}
                 testId={testId}
               />
