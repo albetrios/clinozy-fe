@@ -1636,6 +1636,12 @@
   h6 {
     font-family: var(--font-heading, var(--font-sans));
   }
+  /* Keyboard hints read left to right in every locale: under dir="rtl" the
+     bidi algorithm would set "⌘K" as "K⌘" (the ⌘ is neutral). */
+  kbd {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
   /* Icon weight — Lucide/Tabler stroke-width, driven by the Appearance picker.
      (Phosphor uses fixed path weights, so it ignores this.) */
   svg.lucide,
