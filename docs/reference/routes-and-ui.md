@@ -154,7 +154,6 @@ The app uses **shadcn/ui** as the selected component library. Allowed sources ar
 | Checkbox     | `shared/components/ui/checkbox.tsx`      | Settings, tables                               |
 | Separator    | `shared/components/ui/separator.tsx`     | Visual separation                              |
 | Avatar       | `shared/components/ui/avatar.tsx`        | User avatar                                    |
-| Select       | `shared/components/ui/select.tsx`        | No callers — every pick is the shared Picker   |
 | Switch       | `shared/components/ui/switch.tsx`        | MFA / preference toggles                       |
 | Skeleton     | `shared/components/ui/skeleton.tsx`      | Loading placeholders (QueryBoundary)           |
 | Popover      | `shared/components/ui/popover.tsx`       | Org switcher, light menus                      |
