@@ -16,6 +16,7 @@ import {
   NUMBER_STYLE_PREFERENCE_LIST,
 } from '@/lib/i18n/locale.constants.ts';
 import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   Card,
   CardContent,
@@ -23,15 +24,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+
+/** The currencies as picker rows. */
+const CURRENCY_CODE_OPTIONS = CURRENCY_CODE_LIST.map((entry) => ({
+  key: entry.id,
+  label: entry.label,
+}));
 
 /**
  * Number + currency preferences — persisted via {@link useLocaleStore}.
@@ -97,29 +97,17 @@ export function MoneyPrefsCard() {
         </div>
         <div className="flex flex-col gap-2">
           <FieldLabel>{t(LOCALE_KEYS.currencyCodeHeading)}</FieldLabel>
-          <Select
+          <Picker
+            label={t(LOCALE_KEYS.currencyCodeHeading)}
             value={currencyCode}
-            onValueChange={(value) => setCurrencyCode(value as CurrencyCode)}
-          >
-            <SelectTrigger
-              aria-label={t(LOCALE_KEYS.currencyCodeHeading)}
-              data-testid="currency-code-select"
-              className="w-full"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="z-[90] max-h-64">
-              {CURRENCY_CODE_LIST.map((entry) => (
-                <SelectItem
-                  key={entry.id}
-                  value={entry.id}
-                  data-testid={`currency-code-${entry.id.toLowerCase()}`}
-                >
-                  {entry.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={CURRENCY_CODE_OPTIONS}
+            plain
+            onChange={(key) => {
+              if (key) setCurrencyCode(key as CurrencyCode);
+            }}
+            testId="currency-code-select"
+            className="w-full"
+          />
         </div>
 
         <div className="bg-muted/30 text-muted-foreground rounded-md border border-dashed px-3 py-2 text-xs">

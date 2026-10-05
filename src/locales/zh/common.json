@@ -198,8 +198,9 @@
       "allShown": "已显示全部 {{count}} 列",
       "hiddenCount": "已隐藏 {{count}} 列",
       "search": "搜索列",
-      "noMatch": "没有匹配的列",
-      "shown": "显示 {{shown}}/{{total}}"
+      "shown": "显示 {{shown}}/{{total}}",
+      "viewGroup": "视图",
+      "columnsGroup": "列"
     },
     "fold": {
       "showAll_other": "{{count}} 列收在行内 · 全部显示",

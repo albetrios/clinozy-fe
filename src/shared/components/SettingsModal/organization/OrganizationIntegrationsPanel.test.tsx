@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -9,6 +9,7 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 /** The panel's copy as the bundle renders it — never the English literal. */
 const copy = (key: string, lng = 'en') => i18n.t(key, { ns: SETTINGS_NS, lng });
@@ -88,7 +89,7 @@ vi.mock('@/shared/hooks/useWebhooks/index.ts', async () => {
 import { OrganizationIntegrationsPanel } from './OrganizationIntegrationsPanel.tsx';
 
 // The API-key create dialog now sources its scope list from clinozy-be's permission catalog.
-// This suite renders the panel without a QueryClientProvider, so stub the hook.
+// Stub the hook so this suite stays about the panel, not that fetch.
 const { useAssignablePermissionsMock } = vi.hoisted(() => ({
   useAssignablePermissionsMock: vi.fn(() => ({
     rows: [{ code: 'organization:read', name: 'View Organization', category: 'tenancy' }],
@@ -175,27 +176,27 @@ beforeEach(() => {
 describe('OrganizationIntegrationsPanel — API keys', () => {
   it('shows an empty state when there are no keys', () => {
     useApiKeysMock.mockReturnValue(apiKeysResult({ rows: [] }));
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
   });
 
   it('lists keys with a revoke control when the user has the permission', () => {
     setCanManage(true);
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.getByText('CI deploy key')).toBeInTheDocument();
     expect(screen.getByTestId('apikey-revoke-key_1')).toBeInTheDocument();
   });
 
   it('hides the revoke control without the permission', () => {
     setCanManage(false);
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.queryByTestId('apikey-revoke-key_1')).not.toBeInTheDocument();
   });
 
   it('confirms and revokes a key', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('apikey-revoke-key_1'));
     await user.click(screen.getByTestId('confirm-accept'));
     await waitFor(() => expect(revokeMutateAsync).toHaveBeenCalledWith('key_1'));
@@ -204,7 +205,7 @@ describe('OrganizationIntegrationsPanel — API keys', () => {
   it('forwards the debounced search term to the hook', async () => {
     useApiKeysMock.mockReturnValue(apiKeysResult({ rows: [] }));
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.type(screen.getByTestId('apikeys-search'), 'ci');
     await waitFor(() =>
       expect(useApiKeysMock).toHaveBeenLastCalledWith(
@@ -216,7 +217,7 @@ describe('OrganizationIntegrationsPanel — API keys', () => {
   it('forwards the selected sort preset to the hook', async () => {
     useApiKeysMock.mockReturnValue(apiKeysResult({ rows: [] }));
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('apikeys-sort'));
     await user.click(await screen.findByRole('option', { name: 'Oldest first' }));
     await waitFor(() =>
@@ -232,7 +233,7 @@ describe('OrganizationIntegrationsPanel — API keys', () => {
       apiKeysResult({ rows: [KEY], hasNextPage: true, fetchNextPage }),
     );
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('apikeys-load-more'));
     expect(fetchNextPage).toHaveBeenCalledTimes(1);
   });
@@ -241,7 +242,7 @@ describe('OrganizationIntegrationsPanel — API keys', () => {
 describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('lists webhooks with cap-gated controls', () => {
     setCanManage(true);
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.getByText('https://x.test/hook')).toBeInTheDocument();
     expect(screen.getByTestId('webhook-add')).toBeInTheDocument();
     expect(screen.getByTestId('webhook-delete-whk_1')).toBeInTheDocument();
@@ -249,7 +250,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
 
   it('hides webhook controls without the permission', () => {
     setCanManage(false);
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.queryByTestId('webhook-add')).not.toBeInTheDocument();
     expect(screen.queryByTestId('webhook-delete-whk_1')).not.toBeInTheDocument();
   });
@@ -269,7 +270,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       permissions: ['api-key:read'],
       permissionsResolved: true,
     });
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.getByText('CI deploy key')).toBeInTheDocument();
     expect(screen.queryByTestId('webhook-add')).not.toBeInTheDocument();
     expect(screen.queryByText('https://x.test/hook')).not.toBeInTheDocument();
@@ -289,7 +290,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       permissions: ['api-key:read', 'api-key:manage'],
       permissionsResolved: true,
     });
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     const keys = SETTINGS_KEYS.panels.integrations;
     expect(screen.getByText(copy(keys.descriptionApiKeysOnly))).toBeInTheDocument();
     expect(screen.queryByText(copy(keys.description))).not.toBeInTheDocument();
@@ -297,7 +298,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
 
   it('mentions webhooks when the webhooks half is actually shown', () => {
     setCanManage(true);
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     const keys = SETTINGS_KEYS.panels.integrations;
     expect(screen.getByText(copy(keys.description))).toBeInTheDocument();
     expect(screen.queryByText(copy(keys.descriptionApiKeysOnly))).not.toBeInTheDocument();
@@ -306,7 +307,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('creates a webhook with a URL + selected event', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-add'));
     await user.type(await screen.findByTestId('webhook-url'), 'https://new.test/hook');
     await user.click(screen.getByTestId('webhook-event-membership.created'));
@@ -322,7 +323,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('opens the edit form prefilled with the row being edited', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-edit-whk_1'));
     expect(await screen.findByTestId('webhook-url')).toHaveValue('https://x.test/hook');
   });
@@ -330,7 +331,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('saves an edit as a PATCH for that webhook id', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-edit-whk_1'));
     const url = await screen.findByTestId('webhook-url');
     await user.clear(url);
@@ -356,7 +357,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('re-seeds the form when it is reopened after a cancelled edit', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-edit-whk_1'));
     const first = await screen.findByTestId('webhook-url');
     await user.clear(first);
@@ -370,7 +371,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('fires a test delivery for the row', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-test-whk_1'));
     expect(testWebhookMutate).toHaveBeenCalledWith('whk_1', expect.anything());
   });
@@ -390,7 +391,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       },
     );
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-test-whk_1'));
     const result = await screen.findByTestId('webhook-test-result-whk_1');
     expect(result).toHaveTextContent('500');
@@ -410,7 +411,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       },
     );
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-test-whk_1'));
     expect(await screen.findByTestId('webhook-test-result-whk_1')).toHaveTextContent(
       copy(SETTINGS_KEYS.panels.integrations.testNoStatus),
@@ -420,7 +421,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('opens the delivery history for the row', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-history-whk_1'));
     expect(await screen.findByTestId('webhook-attempts-dialog')).toBeInTheDocument();
   });
@@ -439,7 +440,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       permissions: ['webhook:read'],
       permissionsResolved: true,
     });
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     expect(screen.getByTestId('webhook-history-whk_1')).toBeInTheDocument();
     expect(screen.queryByTestId('webhook-test-whk_1')).not.toBeInTheDocument();
     expect(screen.queryByTestId('webhook-edit-whk_1')).not.toBeInTheDocument();
@@ -448,7 +449,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
   it('confirms and deletes a webhook', async () => {
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
     await user.click(screen.getByTestId('webhook-delete-whk_1'));
     await user.click(screen.getByTestId('confirm-accept'));
     await waitFor(() => expect(deleteWebhookMutateAsync).toHaveBeenCalledWith('whk_1'));
@@ -470,7 +471,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       isFetching: false,
       refetch,
     });
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
 
     expect(screen.getByTestId('webhooks-error')).toBeInTheDocument();
     expect(screen.queryByTestId('webhooks-list')).not.toBeInTheDocument();
@@ -492,7 +493,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
       isFetching: false,
       refetch: vi.fn(),
     });
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
 
     expect(
       screen.getByText(copy(SETTINGS_KEYS.panels.integrations.webhooksEmptyTitle)),
@@ -507,7 +508,7 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
     // rejection only ever appeared as a toast — never beside the URL field.
     setCanManage(true);
     const user = userEvent.setup();
-    render(<OrganizationIntegrationsPanel />);
+    renderWithQueryClient(<OrganizationIntegrationsPanel />);
 
     await user.click(screen.getByTestId('webhook-add'));
     await user.type(screen.getByTestId('webhook-url'), 'https://hooks.acme.test/core');

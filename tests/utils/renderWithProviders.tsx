@@ -8,7 +8,7 @@ import {
   RouterProvider,
 } from '@tanstack/react-router';
 import { render, type RenderOptions } from '@testing-library/react';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 /**
  * Create a fresh QueryClient for each test to prevent shared state.
@@ -84,4 +84,24 @@ export function renderWithProviders(
     queryClient: testQueryClient,
     router: testRouter,
   };
+}
+
+/**
+ * Renders a component inside a fresh TanStack Query client only — synchronous,
+ * no router. For units that need the client but no route (the shared Picker
+ * reads its data hooks through it), where `renderWithProviders`' async route
+ * mount would add nothing but a wait.
+ */
+export function renderWithQueryClient(
+  ui: ReactElement,
+  {
+    queryClient,
+    ...renderOptions
+  }: Omit<RenderWithProvidersOptions, 'initialEntries'> = {},
+) {
+  const testQueryClient = queryClient ?? createTestQueryClient();
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>
+  );
+  return { ...render(ui, { wrapper, ...renderOptions }), queryClient: testQueryClient };
 }

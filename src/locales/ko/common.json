@@ -198,8 +198,9 @@
       "allShown": "{{count}}개 열 모두 표시",
       "hiddenCount": "{{count}}개 숨김",
       "search": "열 검색",
-      "noMatch": "일치하는 열이 없습니다",
-      "shown": "{{total}}개 중 {{shown}}개 표시"
+      "shown": "{{total}}개 중 {{shown}}개 표시",
+      "viewGroup": "보기",
+      "columnsGroup": "열"
     },
     "fold": {
       "showAll_other": "{{count}}개 열이 행 안에 · 모두 표시",

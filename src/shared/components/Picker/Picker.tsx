@@ -22,6 +22,7 @@ import {
   usePickerRecent,
   usePickerRows,
   usePickerSource,
+  usePlainProps,
 } from './picker-hooks.ts';
 import { handlePickerKey } from './picker-keyboard.ts';
 import {
@@ -144,9 +145,10 @@ function createActions<T>(
  * Keys: ↑ ↓ (skipping disabled rows, wrapping), PgUp / PgDn ±8, Home / End, ↵
  * picks (or creates), Esc closes and returns focus to the trigger, Tab closes,
  * and type-ahead when there is no search row. A single pick closes the list;
- * a multi-select stays open.
+ * a multi-select stays open. `plain` draws a neutral list (stone, no dots).
  */
-export function Picker<T = unknown>(props: PickerProps<T>) {
+export function Picker<T = unknown>(input: PickerProps<T>) {
+  const props = usePlainProps(input);
   const { t, i18n } = useTranslation(PICKER_NS);
   const ids = pickerTestIds(props.testId ?? PICKER_DEFAULT_TEST_ID);
   const mode = pickerMode(props);

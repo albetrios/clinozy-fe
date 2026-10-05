@@ -188,8 +188,11 @@ describe('SettingsModal', () => {
     expect(content).not.toHaveClass('sm:px-8');
 
     // Phone sheet: the section picker starts on the content's gutter, so it and
-    // the fields under it share a left edge.
-    const picker = screen.getByTestId('settings-mobile-section').parentElement;
+    // the fields under it share a left edge. (Its row wraps the Picker's own
+    // field wrapper, hence `closest` rather than the trigger's parent.)
+    const picker = screen
+      .getByTestId('settings-mobile-section')
+      .closest('[class*="sm:hidden"]');
     expect(picker).toHaveClass('ps-4', 'sm:hidden');
     // Reserves room for the dialog's close button, which is pinned on the
     // logical end too — so the two mirror together under RTL. They did not: the

@@ -18,6 +18,19 @@ test('renders component', () => {
 - `initialEntries?: string[]` — initial route entries (default: `['/']`)
 - `queryClient?: QueryClient` — custom client (default: fresh, no retries)
 
+## renderWithQueryClient
+
+The same fresh QueryClient without the router — synchronous, for a unit that needs
+the client but no route (anything that renders the shared `Picker`, whose data hooks
+read it).
+
+```tsx
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
+
+renderWithQueryClient(<DateTimePrefsCard />);
+expect(screen.getByTestId('time-zone-select')).toBeInTheDocument();
+```
+
 ### Isolating HTTP in unit tests
 
 Stub `apiClient` or module dependencies with `vi.mock()` and `vi.fn()` at the top of the test file — unit tests never start a server.

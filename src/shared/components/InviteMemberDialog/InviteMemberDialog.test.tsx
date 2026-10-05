@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 import { InviteMemberDialog } from './InviteMemberDialog.tsx';
 
@@ -55,7 +56,7 @@ describe('InviteMemberDialog', () => {
       rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
     );
     inviteMutate.mockResolvedValueOnce({ email: 'new@x.test' });
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     const user = await open();
 
     await screen.findByTestId('invite-member-form');
@@ -74,7 +75,7 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
     );
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     const user = await open();
     await user.click(await screen.findByTestId('invite-member-role'));
 
@@ -84,7 +85,7 @@ describe('InviteMemberDialog', () => {
 
   it('guides the user to create a role when only Owner exists', async () => {
     useRolesMock.mockReturnValue(rolesResult([role('rol_owner', 'Owner')]));
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-no-roles')).toBeInTheDocument();
@@ -93,7 +94,7 @@ describe('InviteMemberDialog', () => {
 
   it('shows a loading state while roles are fetching', async () => {
     useRolesMock.mockReturnValue(rolesResult([], true));
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-loading')).toBeInTheDocument();
@@ -113,7 +114,7 @@ describe('InviteMemberDialog', () => {
       isError: true,
       refetch,
     });
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await user.click(screen.getByTestId('invite-member-open'));
 
     expect(await screen.findByTestId('invite-member-roles-error')).toBeInTheDocument();
@@ -126,7 +127,7 @@ describe('InviteMemberDialog', () => {
   it('still guides the user when the fetch SUCCEEDS with no assignable role', async () => {
     const user = userEvent.setup();
     useRolesMock.mockReturnValue(rolesResult([role('rol_owner', 'Owner')]));
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await user.click(screen.getByTestId('invite-member-open'));
 
     expect(await screen.findByTestId('invite-member-no-roles')).toBeInTheDocument();
@@ -146,7 +147,7 @@ describe('InviteMemberDialog', () => {
         role('rol_view', 'Viewer'),
       ]),
     );
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Member');
@@ -156,7 +157,7 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_admin', 'Admin'), role('rol_view', 'Viewer')]),
     );
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Viewer');
@@ -170,7 +171,7 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_a', 'Support'), role('rol_b', 'Editor')]),
     );
-    render(<InviteMemberDialog />);
+    renderWithQueryClient(<InviteMemberDialog />);
     await user.click(screen.getByTestId('invite-member-open'));
     await screen.findByTestId('invite-member-form');
 
@@ -193,7 +194,7 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_a', 'Support'), role('rol_b', 'Editor')]),
     );
-    const { rerender } = render(<InviteMemberDialog />);
+    const { rerender } = renderWithQueryClient(<InviteMemberDialog />);
     await user.click(screen.getByTestId('invite-member-open'));
     await screen.findByTestId('invite-member-role');
 

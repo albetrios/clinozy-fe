@@ -198,8 +198,9 @@
       "allShown": "सभी {{count}} कॉलम दिख रहे हैं",
       "hiddenCount": "{{count}} छिपे हुए",
       "search": "कॉलम खोजें",
-      "noMatch": "कोई कॉलम मेल नहीं खाता",
-      "shown": "{{total}} में से {{shown}} दिख रहे हैं"
+      "shown": "{{total}} में से {{shown}} दिख रहे हैं",
+      "viewGroup": "दृश्य",
+      "columnsGroup": "कॉलम"
     },
     "fold": {
       "showAll_one": "{{count}} कॉलम पंक्तियों में · सभी दिखाएँ",

@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
 import { isInvitableRole, leastPrivilegeRoleId } from '@/shared/api/clinic/users-api.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
@@ -23,13 +24,6 @@ import {
 } from '@/shared/components/ui/dialog.tsx';
 import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { useInviteMember } from '@/shared/hooks/useInvitations/index.ts';
 import { useRoles } from '@/shared/hooks/useRoles/index.ts';
 import { UserPlus } from '@/shared/icons/index.ts';
@@ -125,26 +119,22 @@ export function InviteMemberDialog() {
             control={control}
             name="roleId"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger
-                  id="invite-role"
-                  className="w-full"
-                  aria-invalid={!!errors.roleId}
-                  aria-describedby={errors.roleId ? 'invite-role-error' : undefined}
-                  data-testid="invite-member-role"
-                >
-                  <SelectValue
-                    placeholder={t(SETTINGS_KEYS.panels.members.rolePlaceholder)}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {invitableRoles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Picker
+                id="invite-role"
+                label="Role"
+                value={field.value || null}
+                options={invitableRoles.map((role) => ({
+                  key: role.id,
+                  label: role.name,
+                }))}
+                plain
+                placeholder={t(SETTINGS_KEYS.panels.members.rolePlaceholder)}
+                onChange={(key) => field.onChange(key ?? '')}
+                invalid={!!errors.roleId}
+                aria-describedby={errors.roleId ? 'invite-role-error' : undefined}
+                testId="invite-member-role"
+                className="w-full"
+              />
             )}
           />
           {/* An organization with no Member and no Viewer opens with no role

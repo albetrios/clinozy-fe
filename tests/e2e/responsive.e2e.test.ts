@@ -43,7 +43,7 @@ test.describe('Responsive @ 320px', () => {
     await page.goto(`${orgPath}#settings/account/profile`);
 
     await expect(page.getByTestId('settings-modal')).toBeVisible();
-    // Mobile: the section <Select> drives nav; the desktop sidebar is hidden.
+    // Mobile: the section picker drives nav; the desktop sidebar is hidden.
     await expect(page.getByTestId('settings-mobile-section')).toBeVisible();
     await expect(page.getByTestId('settings-nav')).toBeHidden();
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
@@ -77,7 +77,7 @@ test.describe('Responsive @ 1280px (desktop)', () => {
     await page.goto(`${orgPath}#settings/account/profile`);
 
     await expect(page.getByTestId('settings-modal')).toBeVisible();
-    // Desktop: the sidebar nav drives navigation; the mobile <Select> is hidden
+    // Desktop: the sidebar nav drives navigation; the mobile picker is hidden
     // (inverse of the 320px case).
     await expect(page.getByTestId('settings-nav')).toBeVisible();
     await expect(page.getByTestId('settings-mobile-section')).toBeHidden();

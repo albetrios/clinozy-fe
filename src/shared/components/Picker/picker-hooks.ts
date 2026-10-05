@@ -14,13 +14,44 @@ import {
   PICKER_SCROLL_THROTTLE_MS,
   PICKER_SEARCH_THRESHOLD,
 } from './picker.constants.ts';
-import type { PickerOption, PickerProps } from './picker.types.ts';
+import type { PickerLoader, PickerOption, PickerProps } from './picker.types.ts';
 import type { PickerMode } from './picker-model.ts';
-import { selectedKeysOf } from './picker-model.ts';
+import { plainOption, selectedKeysOf } from './picker-model.ts';
 import { buildPickerRows, type PickerRows } from './picker-rows.ts';
 
 const EMPTY_PAGE: ListPage<never> = { rows: [], next: null, hasMore: false };
 const NO_OPTIONS: readonly PickerOption<never>[] = [];
+
+/**
+ * The props a `plain` picker renders from: its static, selected and remote
+ * options each drawn plain ({@link plainOption}); other props pass through.
+ */
+export function usePlainProps<T>(props: PickerProps<T>): PickerProps<T> {
+  const { plain = false, options, selectedOptions, loadOptions } = props;
+  const plainOptions = useMemo(
+    () => (plain ? options?.map(plainOption) : options),
+    [plain, options],
+  );
+  const plainSelected = useMemo(
+    () => (plain ? selectedOptions?.map(plainOption) : selectedOptions),
+    [plain, selectedOptions],
+  );
+  const plainLoader = useMemo((): PickerLoader<T> | undefined => {
+    if (!plain || !loadOptions) return loadOptions;
+    return (query, cursor) =>
+      loadOptions(query, cursor).then((page) => ({
+        ...page,
+        rows: page.rows.map(plainOption),
+      }));
+  }, [plain, loadOptions]);
+  if (!plain) return props;
+  return {
+    ...props,
+    options: plainOptions,
+    selectedOptions: plainSelected,
+    loadOptions: plainLoader,
+  };
+}
 
 /** Where a picker's options come from, and the loading flags its panel shows. */
 export interface PickerSource<T> {

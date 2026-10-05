@@ -1,6 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 import { ApiKeyCreateDialog } from './ApiKeyCreateDialog.tsx';
 
@@ -83,7 +85,7 @@ describe('ApiKeyCreateDialog', () => {
     // Regression: the fetcher used to omit `scopes` (required, and the body is
     // `.strict()` server-side) and send `expires_in_days` as a STRING, so every
     // create this dialog could have made would have been rejected 400.
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -101,7 +103,7 @@ describe('ApiKeyCreateDialog', () => {
   it('omits the expiry entirely for a key that never expires', async () => {
     // clinozy-be caps `expires_in_days` at 365, so "never" cannot be expressed as
     // a bigger number — the field has to be absent.
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Forever');
@@ -119,7 +121,7 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('refuses to submit without a scope, and says why', async () => {
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'No scopes');
@@ -132,7 +134,7 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('refuses to submit without a name, and says why', async () => {
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.click(screen.getByTestId('apikey-scope-organization:read'));
@@ -148,7 +150,7 @@ describe('ApiKeyCreateDialog', () => {
     // clinozy-be stores only a hash. A secret dismissed by a stray keypress is
     // gone, and the key has to be rotated — so the gate is not decoration.
     createSucceeds();
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -171,7 +173,7 @@ describe('ApiKeyCreateDialog', () => {
 
   it('keeps the dialog open while an unacknowledged secret is on screen', async () => {
     createSucceeds({ id: 'pat_y', name: 'Escape test', secret: 'core_cd_ANOTHERSECRET' });
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Escape test');
@@ -191,7 +193,7 @@ describe('ApiKeyCreateDialog', () => {
     createMutate.mockImplementation((_vars, handlers) => {
       handlers.onError(new Error('An API key with that name already exists'));
     });
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Duplicate');
@@ -204,7 +206,7 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('a second click on a scope takes it off again', async () => {
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Toggling');
@@ -222,7 +224,7 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('Cancel closes the dialog and the next open starts empty', async () => {
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Abandoned');
@@ -244,7 +246,7 @@ describe('ApiKeyCreateDialog', () => {
 
   it('Done closes the dialog once the secret is acknowledged', async () => {
     createSucceeds();
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -269,7 +271,7 @@ describe('ApiKeyCreateDialog', () => {
     // secret, closes the only screen that shows it, and has to rotate the key.
     createSucceeds();
     copySensitiveText.mockResolvedValue(false);
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -285,7 +287,7 @@ describe('ApiKeyCreateDialog', () => {
 
   it('confirms a copy that worked', async () => {
     createSucceeds();
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -303,7 +305,7 @@ describe('ApiKeyCreateDialog', () => {
     // Esc and the overlay both come through `onOpenChange`. Closing mid-request
     // would lose the secret of a key the server is about to create.
     createState.isPending = true;
-    render(<ApiKeyCreateDialog />);
+    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     expect(screen.getByTestId('apikey-cancel')).toBeDisabled();

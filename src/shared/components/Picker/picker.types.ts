@@ -104,6 +104,12 @@ interface PickerBaseProps<T> {
   recentKey?: string;
   /** Action menu: no check column, no Recent, no search by default. */
   menu?: boolean;
+  /**
+   * A neutral list (the prototype's `plain`, H:3917 / H:3961): rows and group
+   * squares in `stone`, no tone dot — for options colour says nothing about
+   * (columns, settings, languages). Avatars, icons and pills stay.
+   */
+  plain?: boolean;
   /** Offers a "Create “<query>”" row for an unmatched search. */
   onCreate?: (query: string) => void;
   /** Replaces "Create" in the create row (e.g. "Add supplier"). */

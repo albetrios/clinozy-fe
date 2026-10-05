@@ -1,5 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { type ReactNode, useRef } from 'react';
+import { type ComponentType, type ReactNode, Suspense, useRef } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
 import { useReplayedAnimation } from '@/lib/animations/index.ts';
@@ -11,17 +12,12 @@ import {
 } from '@/lib/i18n/locale.constants.ts';
 import { I18N_LOCALES, isI18nLocale, LOCALE_NATIVE_LABELS } from '@/lib/i18n/locales.ts';
 import { iconOnBrandSurface } from '@/lib/icon-surface.ts';
+import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
+import type { PickerSingleProps } from '@/shared/components/Picker/index.ts';
 import { ProductMark } from '@/shared/components/ProductMark/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
-import { ShieldCheck, Sparkles, Users, Zap } from '@/shared/icons/index.ts';
+import { ChevronDown, ShieldCheck, Sparkles, Users, Zap } from '@/shared/icons/index.ts';
 import {
   AUTH_LAYOUT_STAT_KEYS,
   LAYOUT_KEYS,
@@ -55,38 +51,70 @@ export function SkipLink() {
   );
 }
 
+/**
+ * The shared Picker, fetched on its own: `/login` paints its form without
+ * waiting for the picker's list, bottom sheet and search.
+ */
+const loadLocalePicker = onceAsync(() =>
+  import('@/shared/components/Picker/index.ts').then((module) => ({
+    default: module.Picker as ComponentType<PickerSingleProps<unknown>>,
+  })),
+);
+
+/**
+ * The language trigger as it looks before the picker arrives (and if its chunk
+ * fails): the picker's `sm` field with the current language — inert, so the
+ * real control replaces it without a shift.
+ */
+function LocaleTriggerPlaceholder({ label }: { label: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="bg-background text-body flex min-h-8 min-w-[9.5rem] items-center gap-2 rounded-lg border ps-2.5 pe-2.5 shadow-(--elevation-control)"
+    >
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <ChevronDown className="text-muted-foreground size-3.5 flex-none" />
+    </span>
+  );
+}
+
 /** Compact language switcher — sets UI locale (and auto RTL for Arabic) on auth. */
-function AuthLocaleSelect() {
+function AuthLocalePicker() {
   const { t } = useTranslation(LOCALE_NS);
   const locale = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
+  const { Component: LocalePicker } = useRetryableLazy(loadLocalePicker);
 
   if (!isMultiLocaleBuild()) return null;
 
+  const options = I18N_LOCALES.map((code) => ({
+    key: code,
+    label: t(LOCALE_LABEL_KEYS[code], { defaultValue: LOCALE_NATIVE_LABELS[code] }),
+  }));
+  const placeholder = (
+    <LocaleTriggerPlaceholder
+      label={options.find((option) => option.key === locale)?.label ?? locale}
+    />
+  );
   return (
-    <Select
-      value={locale}
-      onValueChange={(value) => {
-        if (isI18nLocale(value)) void setLocale(value);
-      }}
-    >
-      <SelectTrigger
-        size="sm"
-        className="min-w-[9.5rem]"
-        aria-label={t(LOCALE_KEYS.openAria)}
-        data-testid="auth-locale-select"
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent align="end">
-        {I18N_LOCALES.map((code) => (
-          <SelectItem key={code} value={code}>
-            {}
-            {t(LOCALE_LABEL_KEYS[code], { defaultValue: LOCALE_NATIVE_LABELS[code] })}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <ErrorBoundary fallback={placeholder}>
+      <Suspense fallback={placeholder}>
+        <LocalePicker
+          label={t(LOCALE_KEYS.openAria)}
+          value={locale}
+          options={options}
+          plain
+          onChange={(key) => {
+            if (key && isI18nLocale(key)) void setLocale(key);
+          }}
+          size="sm"
+          align="end"
+          minWidth={180}
+          testId="auth-locale-select"
+          className="min-w-[9.5rem]"
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -96,7 +124,7 @@ export function AuthControls({ surface = 'default' }: { surface?: 'default' | 'b
   useTranslation(LAYOUT_NS);
   return (
     <div className="flex items-center gap-3">
-      <AuthLocaleSelect />
+      <AuthLocalePicker />
       <ThemeModeToggle surface={surface === 'brand' ? 'brand' : 'default'} />
     </div>
   );

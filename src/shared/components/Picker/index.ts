@@ -19,6 +19,7 @@ export type {
   PickerSize,
   PickerTriggerState,
 } from './picker.types.ts';
+export { type PickerLayer, PickerLayerContext } from './picker-layer.ts';
 export { filterPickerOptions } from './picker-rows.ts';
 export { PickerSheet, type PickerSheetProps } from './PickerSheet/index.ts';
 export {

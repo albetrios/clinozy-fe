@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/shared/notify/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { ACCENT_COLORS, generateTheme, normalizeLook } from '@/shared/theme/index.ts';
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AppearancePanel } from './AppearancePanel.tsx';
 
@@ -57,7 +58,7 @@ describe('AppearancePanel', () => {
   });
 
   it('renders every appearance section in a single scroll (no tabs)', () => {
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(screen.getByTestId('appearance-panel')).toBeInTheDocument();
     // No tab strip anymore — all sections are stacked.
     expect(screen.queryByTestId('appearance-tab-theme')).not.toBeInTheDocument();
@@ -81,7 +82,7 @@ describe('AppearancePanel', () => {
   });
 
   it('renders language, text direction, date & time, and money controls', () => {
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(screen.getByTestId('language-prefs')).toBeInTheDocument();
     expect(screen.getByTestId('language-en')).toBeInTheDocument();
     expect(screen.getByTestId('text-direction-auto')).toBeInTheDocument();
@@ -97,7 +98,7 @@ describe('AppearancePanel', () => {
   it('picking a named preset applies data-theme and clears custom look', async () => {
     const user = userEvent.setup();
     useThemeStore.setState({ preset: 'custom', customTheme: generateTheme() });
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('named-preset-violet'));
     expect(useThemeStore.getState().preset).toBe('violet');
     expect(useThemeStore.getState().customTheme).toBeNull();
@@ -106,7 +107,7 @@ describe('AppearancePanel', () => {
 
   it('picking an accent colour switches to the custom look', async () => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('accent-violet'));
     expect(useThemeStore.getState().preset).toBe('custom');
     expect(useThemeStore.getState().customTheme?.hue).toBe(290);
@@ -115,7 +116,7 @@ describe('AppearancePanel', () => {
 
   it('picking an icon colour applies it (orthogonal)', async () => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('iconcolor-muted'));
     expect(useThemeStore.getState().iconColor).toBe('muted');
     expect(document.documentElement.dataset.iconColor).toBe('muted');
@@ -123,7 +124,7 @@ describe('AppearancePanel', () => {
 
   it('picking content width updates the theme store', async () => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('layout-width-reading'));
     expect(useThemeStore.getState().layoutWidth).toBe('reading');
   });
@@ -132,7 +133,7 @@ describe('AppearancePanel', () => {
     '%s re-rolls into a custom look',
     async (testId) => {
       const user = userEvent.setup();
-      render(<AppearancePanel />);
+      renderWithQueryClient(<AppearancePanel />);
       await user.click(screen.getByTestId(testId));
       expect(useThemeStore.getState().preset).toBe('custom');
       expect(useThemeStore.getState().customTheme).not.toBeNull();
@@ -153,7 +154,7 @@ describe('AppearancePanel', () => {
     ['focus-glow', 'focusId', 'glow'],
   ] as const)("%s sets the look's %s", async (testId, axis, value) => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(normalizeLook(useThemeStore.getState().customTheme)[axis]).not.toBe(value);
     await user.click(screen.getByTestId(testId));
     expect(normalizeLook(useThemeStore.getState().customTheme)[axis]).toBe(value);
@@ -167,7 +168,7 @@ describe('AppearancePanel', () => {
     ['iconlib-phosphor', 'iconLibrary', 'phosphor'],
   ] as const)('%s sets %s', async (testId, field, value) => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(useThemeStore.getState()[field]).not.toBe(value);
     await user.click(screen.getByTestId(testId));
     expect(useThemeStore.getState()[field]).toBe(value);
@@ -178,7 +179,7 @@ describe('AppearancePanel', () => {
     ['font-heading', 'headingFontId'],
   ] as const)("%s sets the look's %s", async (testId, axis) => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId(testId));
     await user.click(await screen.findByRole('option', { name: 'Grotesk' }));
     expect(normalizeLook(useThemeStore.getState().customTheme)[axis]).toBe('grotesk');
@@ -186,7 +187,7 @@ describe('AppearancePanel', () => {
 
   it('picking a chart colour moves the chart hue', async () => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('chart-teal'));
     expect(useThemeStore.getState().customTheme?.chartHue).toBe(
       ACCENT_COLORS.find((colour) => colour.id === 'teal')?.hue,
@@ -195,7 +196,7 @@ describe('AppearancePanel', () => {
 
   it('applies a pasted theme code and clears the field', async () => {
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.type(screen.getByTestId('theme-seed-input'), '4242');
     await user.click(screen.getByTestId('theme-seed-apply'));
     expect(useThemeStore.getState().seed).toBe(4242);
@@ -205,7 +206,7 @@ describe('AppearancePanel', () => {
   it('rejects a theme code that is not a number, keeping what was typed', async () => {
     const error = vi.spyOn(notify, 'error').mockImplementation(() => '');
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.type(screen.getByTestId('theme-seed-input'), 'abc');
     await user.click(screen.getByTestId('theme-seed-apply'));
     expect(error).toHaveBeenCalledTimes(1);
@@ -217,7 +218,7 @@ describe('AppearancePanel', () => {
     vi.spyOn(notify, 'success').mockImplementation(() => '');
     useThemeStore.getState().applyThemeSeed(12345);
     const user = userEvent.setup();
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     await user.click(screen.getByTestId('theme-copy-link'));
     await expect(navigator.clipboard.readText()).resolves.toBe(
       `${window.location.origin}?theme=12345`,
@@ -226,7 +227,7 @@ describe('AppearancePanel', () => {
 
   it('shows a locked note and only the locale cards when the theme is locked', () => {
     platformOverrides.themeLock = true;
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(screen.getByTestId('theme-locked')).toBeInTheDocument();
     expect(screen.getByTestId('language-prefs')).toBeInTheDocument();
     expect(screen.getByTestId('money-prefs')).toBeInTheDocument();
@@ -235,7 +236,7 @@ describe('AppearancePanel', () => {
 
   it('drops the content-width card when the deployment forces a width', () => {
     platformOverrides.layoutWidthForced = 'full';
-    render(<AppearancePanel />);
+    renderWithQueryClient(<AppearancePanel />);
     expect(screen.queryByTestId('layout-width-card')).not.toBeInTheDocument();
     expect(screen.getByTestId('shuffle-surface')).toBeInTheDocument();
   });

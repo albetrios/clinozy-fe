@@ -198,8 +198,9 @@
       "allShown": "全{{count}}列を表示中",
       "hiddenCount": "{{count}}列を非表示",
       "search": "列を検索",
-      "noMatch": "一致する列がありません",
-      "shown": "{{total}}列中{{shown}}列を表示"
+      "shown": "{{total}}列中{{shown}}列を表示",
+      "viewGroup": "表示",
+      "columnsGroup": "列"
     },
     "fold": {
       "showAll_other": "{{count}}列を行内に表示 · すべて表示",

@@ -198,8 +198,9 @@
       "allShown": "All {{count}} columns shown",
       "hiddenCount": "{{count}} hidden",
       "search": "Search columns",
-      "noMatch": "No columns match",
-      "shown": "{{shown}} of {{total}} shown"
+      "shown": "{{shown}} of {{total}} shown",
+      "viewGroup": "View",
+      "columnsGroup": "Columns"
     },
     "fold": {
       "showAll_one": "{{count}} column in rows · Show all",

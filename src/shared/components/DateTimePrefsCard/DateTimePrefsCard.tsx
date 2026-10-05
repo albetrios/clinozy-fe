@@ -11,16 +11,15 @@ import {
   DATE_FORMAT_LABEL_KEYS,
   DATE_FORMAT_PREFERENCE_LIST,
   FORMAT_LOCALE_LIST,
-  formatLocaleTestId,
   HOUR_CYCLE_LABEL_KEYS,
   HOUR_CYCLE_PREFERENCE_LIST,
   LOCALE_KEYS,
   LOCALE_NS,
   LOCALE_TEST_IDS,
   TIME_ZONE_LIST,
-  timeZoneTestId,
 } from '@/lib/i18n/locale.constants.ts';
 import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   Card,
   CardContent,
@@ -29,16 +28,15 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
-import {
   localeFormatPrefs,
   useLocaleStore,
 } from '@/shared/store/useLocaleStore/index.ts';
+
+/** The regional formats as picker rows (their names are the catalog's own). */
+const FORMAT_LOCALE_OPTIONS = FORMAT_LOCALE_LIST.map((entry) => ({
+  key: entry.id,
+  label: entry.label,
+}));
 
 /**
  * Device-local date/time controls — regional format locale (country), IANA
@@ -59,6 +57,10 @@ export function DateTimePrefsCard() {
   const setDateFormat = useLocaleStore((s) => s.setDateFormat);
   const setHourCycle = useLocaleStore((s) => s.setHourCycle);
   const setTimeZone = useLocaleStore((s) => s.setTimeZone);
+  const timeZoneOptions = TIME_ZONE_LIST.map((entry) => ({
+    key: entry.id,
+    label: entry.id === 'auto' ? t(LOCALE_KEYS.timeZoneDevice) : entry.label,
+  }));
 
   const previews = useMemo(() => {
     const prefs = localeFormatPrefs({
@@ -103,56 +105,32 @@ export function DateTimePrefsCard() {
       <CardContent className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <FieldLabel>{t(LOCALE_KEYS.formatLocaleHeading)}</FieldLabel>
-          <Select
+          <Picker
+            label={t(LOCALE_KEYS.formatLocaleHeading)}
             value={formatLocale}
-            onValueChange={(value) => setFormatLocale(value as FormatLocaleTag)}
-          >
-            <SelectTrigger
-              aria-label={t(LOCALE_KEYS.formatLocaleHeading)}
-              data-testid="format-locale-select"
-              className="w-full"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="z-[90] max-h-64">
-              {FORMAT_LOCALE_LIST.map((entry) => (
-                <SelectItem
-                  key={entry.id}
-                  value={entry.id}
-                  data-testid={formatLocaleTestId(entry.id)}
-                >
-                  {entry.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={FORMAT_LOCALE_OPTIONS}
+            plain
+            onChange={(key) => {
+              if (key) setFormatLocale(key as FormatLocaleTag);
+            }}
+            testId="format-locale-select"
+            className="w-full"
+          />
         </div>
 
         <div className="flex flex-col gap-2">
           <FieldLabel>{t(LOCALE_KEYS.timeZoneHeading)}</FieldLabel>
-          <Select
+          <Picker
+            label={t(LOCALE_KEYS.timeZoneHeading)}
             value={timeZone}
-            onValueChange={(value) => setTimeZone(value as TimeZonePreference)}
-          >
-            <SelectTrigger
-              aria-label={t(LOCALE_KEYS.timeZoneHeading)}
-              data-testid="time-zone-select"
-              className="w-full"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="z-[90] max-h-64">
-              {TIME_ZONE_LIST.map((entry) => (
-                <SelectItem
-                  key={entry.id}
-                  value={entry.id}
-                  data-testid={timeZoneTestId(entry.id)}
-                >
-                  {entry.id === 'auto' ? t(LOCALE_KEYS.timeZoneDevice) : entry.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={timeZoneOptions}
+            plain
+            onChange={(key) => {
+              if (key) setTimeZone(key as TimeZonePreference);
+            }}
+            testId="time-zone-select"
+            className="w-full"
+          />
         </div>
 
         <div className="flex flex-col gap-2">

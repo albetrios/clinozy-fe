@@ -222,7 +222,7 @@ Categorize each hit:
 
 | Category                          | Fix                                                                                   |
 | --------------------------------- | ------------------------------------------------------------------------------------- |
-| **A. Should be shadcn primitive** | Use `<Card>`, `<Button>`, `<Input>`, `<Select>`                                       |
+| **A. Should be shadcn primitive** | Use `<Card>`, `<Button>`, `<Input>`, the shared `<Picker>`                            |
 | **B. Needs existing slot**        | Add `data-slot="card" \| "button" \| "nav-item" \| …`                                 |
 | **C. Fixed scale class**          | Replace `rounded-2xl` → `Card` or token class; remove skeleton `rounded-xl` overrides |
 | **D. Intentional**                | `rounded-full` avatars, dots, progress pills — document exception                     |

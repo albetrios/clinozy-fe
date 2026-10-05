@@ -19,8 +19,9 @@ export const TABLE_KEYS = {
     allShown: 'table.columns.allShown',
     hiddenCount: 'table.columns.hiddenCount',
     search: 'table.columns.search',
-    noMatch: 'table.columns.noMatch',
     shown: 'table.columns.shown',
+    viewGroup: 'table.columns.viewGroup',
+    columnsGroup: 'table.columns.columnsGroup',
   },
   fold: {
     showAll: 'table.fold.showAll',
@@ -50,6 +51,9 @@ export const TABLE_KEYS = {
   },
 } as const;
 
+/** The Columns picker's "Show all columns" row — a key no column id takes. */
+export const COLUMNS_SHOW_ALL_KEY = 'show-all';
+
 /** `data-testid`s of the shared table chrome, prefixed per table. */
 export const TABLE_TEST_IDS = {
   table: (prefix: string) => `${prefix}-table`,
@@ -65,7 +69,9 @@ export const TABLE_TEST_IDS = {
   loadingMore: (prefix: string) => `${prefix}-table-loading-more`,
   end: (prefix: string) => `${prefix}-table-end`,
   columnsTrigger: (prefix: string) => `${prefix}-columns-trigger`,
-  columnsShowAll: (prefix: string) => `${prefix}-columns-show-all`,
+  /** The Columns picker's base id: its panel, search and `-option-<columnId>` rows. */
+  columns: (prefix: string) => `${prefix}-columns`,
+  columnsShowAll: (prefix: string) => `${prefix}-columns-option-${COLUMNS_SHOW_ALL_KEY}`,
   savedViews: (prefix: string) => `${prefix}-saved-views`,
 } as const;
 

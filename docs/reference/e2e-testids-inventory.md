@@ -30,152 +30,152 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 
 ## App shell
 
-| Test ID                          | Element                                                                                             | File                                                          |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `app-layout`                     | Authenticated shell                                                                                 | `AppLayout.tsx`                                               |
-| `focus-shell`                    | Focus layout-variant shell                                                                          | `AppLayout/variants/AppLayoutFocus.tsx`                       |
-| `sidebar`                        | Sidebar                                                                                             | AppLayout                                                     |
-| `nav-<room>`                     | A clinic room's nav link (`nav-<id>` from the manifest's `nav.id`, `useAppNav`) — e.g. `nav-today`  | `AppLayout.shared.tsx` (sidebar + mobile)                     |
-| `sidebar-quick-links`            | Persistent sidebar shortcuts group                                                                  | `AppLayout/components/SidebarQuickLinks/`                     |
-| `sidebar-search`                 | Command palette from sidebar                                                                        | SidebarQuickLinks                                             |
-| `sidebar-settings`               | Settings hash modal from sidebar                                                                    | SidebarQuickLinks                                             |
-| `app-context-strip`              | Quick-access pill strip (settings sections + search)                                                | `AppLayout/components/AppContextStrip/`                       |
-| `main-content`                   | Main content region (skip-link target)                                                              | `AppLayout.shared.tsx`                                        |
-| `mobile-bottom-bar`              | Mobile nav bar                                                                                      | AppLayout                                                     |
-| `header`                         | Top bar                                                                                             | AppLayout                                                     |
-| `brand-logo`                     | Product mark (+ wordmark in the section bar)                                                        | `AppLayout.shared.tsx`                                        |
-| `section-chip`                   | Phone header: the current room's name in its tone                                                   | `AppLayout/components/SectionChip/`                           |
-| `all-sections-trigger`           | Section bar: All sections compass (tinted when the current room is unpinned)                        | `AppLayout/components/AllSections/`                           |
-| `all-sections`                   | All sections popover (dialog)                                                                       | `AppLayout/components/AllSections/`                           |
-| `all-sections-sheet`             | All sections bottom sheet (phone)                                                                   | `AppLayout/components/AllSections/`                           |
-| `all-sections-<id>`              | All sections row link per room                                                                      | `AppLayout/components/AllSections/`                           |
-| `all-sections-pin-<id>`          | Pin / unpin toggle per room                                                                         | `AppLayout/components/AllSections/`                           |
-| `nav-more`                       | Section bar: "More" for folded pinned tabs                                                          | `AppLayout/components/PinnedTabs/`                            |
-| `nav-more-<id>`                  | A folded pinned tab inside "More"                                                                   | `AppLayout/components/PinnedTabs/`                            |
-| `nav-more-sections`              | Phone tab bar: "More" (opens All sections)                                                          | `AppLayout.shared.tsx (MobileNav)`                            |
-| `branch-picker`                  | Header branch picker                                                                                | `AppLayout/components/BranchPicker/`                          |
-| `branch-picker-label`            | Branch picker: its label (hidden below md — the compact pin)                                        | `AppLayout/components/BranchPicker/`                          |
-| `branch-picker-all`              | Branch picker: All branches                                                                         | `AppLayout/components/BranchPicker/`                          |
-| `branch-picker-<branchId>`       | Branch picker: one branch                                                                           | `AppLayout/components/BranchPicker/`                          |
-| `account-menu`                   | Account menu (section bar)                                                                          | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-identity`          | Account menu identity block (opens profile)                                                         | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-status-<presence>` | Status radio pill (online · away · busy)                                                            | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-theme-<mode>`      | Appearance radio pill (light · dark · system)                                                       | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-notifications`     | Account menu: Notifications row                                                                     | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-security`          | Account menu: Security row                                                                          | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-billing`           | Account menu: Billing row                                                                           | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-devices`           | Account menu: Devices row                                                                           | `AppLayout/components/AccountMenu/`                           |
-| `account-menu-shortcuts`         | Account menu: Keyboard shortcuts row                                                                | `AppLayout/components/AccountMenu/`                           |
-| `view-as-bar`                    | View-as pill ("Previewing as <role>")                                                               | `AppLayout/components/NoticeStack/`                           |
-| `view-as-exit`                   | View-as pill: Exit preview                                                                          | `AppLayout/components/NoticeStack/`                           |
-| `upload-tray`                    | Upload tray (bottom inline-end; shown while files upload)                                           | `components/UploadTray/` (mounted by `AppLayout.tsx`)         |
-| `upload-tray-status`             | Upload tray live status (always mounted, visually hidden)                                           | UploadTray                                                    |
-| `upload-tray-toggle`             | Upload tray: collapse / expand the file list                                                        | UploadTray                                                    |
-| `upload-tray-row`                | One file (`data-status`: queued, uploading, attaching, done, failed)                                | UploadTray                                                    |
-| `upload-tray-retry`              | Failed file: Retry (resumes at the step that failed)                                                | UploadTray                                                    |
-| `upload-tray-remove`             | Failed file: Remove                                                                                 | UploadTray                                                    |
-| `clinic-home-empty`              | The org home when no clinic room is open — "Nothing is switched on here yet" (L-63)                 | `$organizationSlug/components/ClinicHomeEmpty/`               |
-| `today-page`                     | Clinic room page: Today                                                                             | `pages/organization/$organizationSlug/today/`                 |
-| `leads-page`                     | Clinic room page: Leads                                                                             | `pages/organization/$organizationSlug/leads/`                 |
-| `new-lead-drawer`                | New lead drawer — `/leads/create` opens it over the list (L-35)                                     | `pages/organization/$organizationSlug/leads/`                 |
-| `lead-drawer`                    | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                                       | `pages/organization/$organizationSlug/leads/`                 |
-| `leads-empty`                    | Leads list: "No leads match" (+ "Clear filters" / "New lead")                                       | `pages/organization/$organizationSlug/leads/`                 |
-| `leads-claim`                    | Leads row: "Open to team · Claim / Join" (claims from the row)                                      | `leads/components/LeadsTable/`                                |
-| `leads-hold-dot`                 | Leads row: the hold's release-today / tomorrow dot on the owner                                     | `leads/components/LeadsTable/`                                |
-| `lead-drawer-chat`               | Lead drawer: the chat pane (the phone's Chat pane)                                                  | `leads/components/LeadDrawer/`                                |
-| `lead-drawer-save`               | Lead drawer: "Save lead" (disabled until the draft changes)                                         | `leads/components/LeadDrawer/`                                |
-| `lead-drawer-remove`             | Lead drawer: "Remove lead" (opens the reason confirm)                                               | `leads/components/LeadDrawer/`                                |
-| `lead-drawer-people`             | Lead drawer: "Assigned & involved" (opens "People on this lead")                                    | `leads/components/LeadFormFields/`                            |
-| `lead-drawer-resize`             | Lead drawer: the chat's resize handle (`role="separator"`)                                          | `leads/components/LeadDrawer/`                                |
-| `new-lead-search`                | New lead: "Search by name or mobile" (the Contact step)                                             | `leads/components/NewLeadDrawer/`                             |
-| `new-lead-preset-<id>`           | New lead: Quick start chip — `walkIn`, `phoneCall`, `instagramDm`                                   | `leads/components/NewLeadDrawer/`                             |
-| `new-lead-hit-<kind>-<seq>`      | New lead: a search hit — `patient-3508` ("Re-create lead"), `lead-2365`                             | `leads/components/NewLeadDrawer/`                             |
-| `new-lead-no-match`              | New lead: "No existing match"                                                                       | `leads/components/NewLeadDrawer/`                             |
-| `new-lead-new-contact`           | New lead: "New contact" (opens the contact editor)                                                  | `leads/components/NewLeadDrawer/`                             |
-| `new-lead-change`                | New lead: the person's strip — "Change"                                                             | `leads/components/NewLeadDrawer/`                             |
-| `appointments-page`              | Clinic room page: Appointments                                                                      | `pages/organization/$organizationSlug/appointments/`          |
-| `new-appointment-drawer`         | New appointment form — `/appointments/create` over the page (L-38)                                  | `pages/organization/$organizationSlug/appointments/`          |
-| `appointment-drawer`             | Appointment form — `/appointments/$appointmentId` over the page (L-38)                              | `pages/organization/$organizationSlug/appointments/`          |
-| `patients-page`                  | Clinic room page: Patients (toolbar and table ids: the shared ones, `patients-…`)                   | `pages/organization/$organizationSlug/patients/`              |
-| `patient-drawer`                 | New patient drawer — `/patients/create` opens it over the list (L-32b)                              | `pages/organization/$organizationSlug/patients/`              |
-| `patient-quick-add`              | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)                               | `shared/components/PatientDrawer/`                            |
-| `payments-page`                  | Clinic room page: Payments (toolbar and table ids: the shared ones, `payments-…`)                   | `pages/organization/$organizationSlug/payments/`              |
-| `payments-pending-page`          | Payments › Pending (toolbar and table ids: the shared ones, `payments-pending-…`)                   | `payments/pending/`                                           |
-| `receive-drawer`                 | Receive payment — `/payments/receive` over the ledger (L-39b)                                       | `pages/organization/$organizationSlug/payments/`              |
-| `pay-drawer`                     | Send payment — `/payments/pay` over the ledger (L-39b)                                              | `pages/organization/$organizationSlug/payments/`              |
-| `credit-drawer`                  | Add / Edit pending — over Payments › Pending (L-39c)                                                | `payments/pending/`                                           |
-| `settle-credit-drawer`           | Give back / Got it back — stacked, no URL (L-39c)                                                   | `shared/components/SettleCreditDrawer/`                       |
-| `day-close-drawer`               | Day close — `/payments/day-close` over the ledger (L-41)                                            | `pages/organization/$organizationSlug/payments/`              |
-| `invoice-drawer`                 | New / Edit invoice — `/invoices/create` · `/invoices/$invoiceId/edit` (L-40)                        | `shared/components/InvoiceDrawer/`                            |
-| `invoice-preview`                | Print preview — `/invoices/$invoiceId` (L-40; `-close`, `-print`)                                   | `shared/components/PrintPreview/`                             |
-| `tasks-page`                     | Clinic room page: Tasks (its own ids: the Tasks room section below)                                 | `pages/organization/$organizationSlug/tasks/`                 |
-| `new-task-drawer`                | New task — `/tasks/create` opens it over the list (L-47d)                                           | `pages/organization/$organizationSlug/tasks/`                 |
-| `task-drawer`                    | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                                       | `pages/organization/$organizationSlug/tasks/`                 |
-| `patient-file-layout`            | Patient file — `/patients/$patientId/<section>` (L-42; ids below)                                   | `pages/…/patients/$patientId/`                                |
-| `offerings-page`                 | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)                     | `pages/organization/$organizationSlug/offerings/`             |
-| `offering-drawer`                | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c)                   | `pages/organization/$organizationSlug/offerings/`             |
-| `offers-page`                    | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)                              | `offerings/offers/` (child of the above)                      |
-| `offer-drawer`                   | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)                      | `offerings/offers/` (child of the above)                      |
-| `offering-quick-create`          | Stacked "New offering" — over the Invoice drawer's line picker (L-30e, L-40)                        | `shared/components/OfferingQuickCreate/`                      |
-| `users-page`                     | Clinic room page: Users                                                                             | `pages/organization/$organizationSlug/users/`                 |
-| `users-team-table`               | Users › Team table (toolbar and table ids: the shared ones, `users-team-…`)                         | `pages/organization/$organizationSlug/users/`                 |
-| `user-drawer`                    | User drawer — `/users/create` (New user) and `/users/$userId/edit` (L-31b)                          | `pages/organization/$organizationSlug/users/`                 |
-| `users-roles-page`               | Users › Roles & access page — `/users/roles` (L-31c)                                                | `pages/organization/$organizationSlug/users/roles/`           |
-| `users-roles-panel`              | Roles & access card: role list and role page (also behind a drawer opened there)                    | `pages/organization/$organizationSlug/users/shared/`          |
-| `users-branches-page`            | Users › Branches page — `/users/branches` (L-31d)                                                   | `pages/…/users/branches/`                                     |
-| `users-branches-table`           | Users › Branches table (toolbar and table ids: the shared `users-branches-…`)                       | `pages/…/users/branches/`                                     |
-| `branch-drawer`                  | Branch drawer — `/users/branches/create` and `…/$branchId/edit` (L-31d)                             | `pages/…/users/branches/`                                     |
-| `medical-sales-page`             | Medical › Sales (toolbar and table ids: the shared ones, `medical-sales-…`)                         | `pages/organization/$organizationSlug/medical/sales/`         |
-| `medical-medicines-page`         | Medical › Medicines (`medical-medicines-…`)                                                         | `pages/organization/$organizationSlug/medical/medicines/`     |
-| `medical-purchases-page`         | Medical › Purchases (`medical-purchases-…`)                                                         | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `medical-suppliers-page`         | Medical › Suppliers (`medical-suppliers-…`)                                                         | `pages/organization/$organizationSlug/medical/suppliers/`     |
-| `medical-manufacturers-page`     | Medical › Manufacturers (`medical-manufacturers-…`)                                                 | `pages/organization/$organizationSlug/medical/manufacturers/` |
-| `medical-mrs-page`               | Medical › MRs (`medical-mrs-…`)                                                                     | `pages/organization/$organizationSlug/medical/mrs/`           |
-| `medical-payments-page`          | Medical › Payments (`medical-payments-…`)                                                           | `pages/organization/$organizationSlug/medical/payments/`      |
-| `medical-<tab>-view-action-<id>` | A Medical tab’s view action — `reorder`, `discount`, `prescriptions`, `reminders`, `pay-received`   | `shared/components/RoomToolbar/RoomViewAction/`               |
-| `medicine-drawer`                | Medicine drawer — `/medical/medicines/create`, `…/$medicineId/edit` over the list (L-50b)           | `pages/organization/$organizationSlug/medical/shared/`        |
-| `supplier-drawer`                | Supplier drawer — `/medical/suppliers/create`, `…/$supplierId/edit` (L-50b)                         | `pages/organization/$organizationSlug/medical/shared/`        |
-| `manufacturer-drawer`            | Manufacturer drawer — `/medical/manufacturers/create`, `…/$manufacturerId/edit` (L-50b)             | `pages/organization/$organizationSlug/medical/shared/`        |
-| `rep-drawer`                     | MR drawer — `/medical/mrs/create`, `…/$mrId/edit` (L-50b)                                           | `pages/organization/$organizationSlug/medical/shared/`        |
-| `rep-visit-drawer`               | Log MR visit — `/medical/mrs/$mrId/visits/create` (L-50b)                                           | `pages/organization/$organizationSlug/medical/mrs/`           |
-| `<kind>-drawer-stacked`          | A Medical drawer stacked on another — `manufacturer`, `supplier`, `rep` (an MR), `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
-| `purchase-order-drawer`          | New / Edit purchase order — `/medical/purchases/create`, `…/$purchaseOrderId/edit` (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `receive-goods-drawer`           | Receive goods — `…/$purchaseOrderId/receive`; `-lines-add` "+ Add unexpected item" (L-50c, L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `purchase-order-view-drawer`     | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` "Pay ₹X" / "Print" (L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
-| `sale-drawer`                    | Sale (view) — `/medical/sales/$saleId`; `-save` Collect / Return medicines, `-delete` Void (L-50c)  | `pages/organization/$organizationSlug/medical/sales/`         |
-| `sale-return-drawer`             | Return from patient — `/medical/sales/$saleId/return` (L-50c)                                       | `pages/organization/$organizationSlug/medical/sales/`         |
-| `expiring-return-drawer`         | Return expiring stock — Medicines’ row action, no URL (L-50c)                                       | `pages/organization/$organizationSlug/medical/medicines/`     |
-| `prescriptions-to-fill`          | Prescriptions to fill — Sales’ view action list (`-panel`, options) (L-50c)                         | `pages/organization/$organizationSlug/medical/sales/`         |
-| `payment-reminders`              | Send payment reminders — Sales Unpaid’s view action panel (`-summary`, `-row`) (L-64)               | `pages/organization/$organizationSlug/medical/sales/`         |
-| `stock-items-page`               | Clinic stock › Items (`stock-items-…`)                                                              | `pages/organization/$organizationSlug/stock/items/`           |
-| `stock-purchases-page`           | Clinic stock › Purchases (`stock-purchases-…`)                                                      | `pages/organization/$organizationSlug/stock/purchases/`       |
-| `stock-movements-page`           | Clinic stock › Movements (`stock-movements-…`)                                                      | `pages/organization/$organizationSlug/stock/movements/`       |
-| `stock-vendors-page`             | Clinic stock › Vendors (`stock-vendors-…`; Q-K1)                                                    | `pages/organization/$organizationSlug/stock/vendors/`         |
-| `stock-items-view-action-check`  | Clinic stock › Items — "Stock check"                                                                | `shared/components/RoomToolbar/RoomViewAction/`               |
-| `stock-item-drawer`              | Item drawer — `/stock/items/create`, `…/$itemId/edit` over the list (L-51b)                         | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-check-drawer`             | Stock check — `/stock/items/check`; `-counter`, `-row`, `-count`, `-same`, `-difference` (L-51b)    | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-movement-drawer`          | Log usage / Receive stock / Adjust stock — a row action, no URL (L-51b)                             | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-use-popover`              | The Use popover at a row's Use button (L-51b)                                                       | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-purchase-drawer`          | Purchase drawer — `/stock/purchases/create` (`?reorder=low`), `…/$purchaseId/edit` (L-51b)          | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-vendor-drawer`            | Clinic vendor drawer — `/stock/vendors/create`, `…/$vendorId/edit` (L-51b)                          | `pages/organization/$organizationSlug/stock/shared/`          |
-| `stock-<kind>-drawer-stacked`    | A child stacked on a stock drawer — `vendor`, `new-item` (L-51b)                                    | `pages/organization/$organizationSlug/stock/shared/`          |
-| `sidebar-toggle`                 | Menu button                                                                                         | AppLayout                                                     |
-| `search-trigger`                 | Command palette                                                                                     | AppLayout                                                     |
-| `user-menu-trigger`              | Avatar menu                                                                                         | AppLayout                                                     |
-| `user-menu-settings`             | Settings item in avatar menu                                                                        | `AppLayout.shared.tsx`                                        |
-| `logout-button`                  | Log out                                                                                             | AppLayout                                                     |
-| `full-page-spinner`              | Bootstrap loading                                                                                   | `FullPageSpinner.tsx`                                         |
-| `organization-switcher-trigger`  | Org switcher                                                                                        | `OrganizationSwitcher.tsx`                                    |
-| `organization-switcher-create`   | Create org from switcher                                                                            | OrganizationSwitcher                                          |
-| `organization-switcher-caption`  | Product name under the org name — sidebar brand lockup only                                         | OrganizationSwitcher                                          |
-| `sidebar-brand`                  | Sidebar identity row (mark + switcher as one lockup; same height as `header`)                       | `AppLayoutSidebar.tsx`                                        |
-| `sidebar-scrim`                  | Scrim behind the open navigation drawer (below `lg`)                                                | `AppLayoutSidebar.tsx`                                        |
-| `session-timeout-dialog`         | Inactivity warning (5 min idle, 90 s grace)                                                         | `SessionTimeoutDialog.tsx`                                    |
-| `session-signout`                | "Sign out" on the inactivity warning — revokes server-side                                          | SessionTimeoutDialog                                          |
-| `session-stay`                   | "Stay signed in" — default focus; restarts the idle clock                                           | SessionTimeoutDialog                                          |
-| `consent-banner`                 | Cookie-consent card (bottom-start corner; undecided only)                                           | `ConsentBanner.tsx`                                           |
-| `consent-accept`                 | Grant analytics consent                                                                             | ConsentBanner                                                 |
-| `consent-decline`                | Decline analytics consent                                                                           | ConsentBanner                                                 |
+| Test ID                             | Element                                                                                             | File                                                          |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `app-layout`                        | Authenticated shell                                                                                 | `AppLayout.tsx`                                               |
+| `focus-shell`                       | Focus layout-variant shell                                                                          | `AppLayout/variants/AppLayoutFocus.tsx`                       |
+| `sidebar`                           | Sidebar                                                                                             | AppLayout                                                     |
+| `nav-<room>`                        | A clinic room's nav link (`nav-<id>` from the manifest's `nav.id`, `useAppNav`) — e.g. `nav-today`  | `AppLayout.shared.tsx` (sidebar + mobile)                     |
+| `sidebar-quick-links`               | Persistent sidebar shortcuts group                                                                  | `AppLayout/components/SidebarQuickLinks/`                     |
+| `sidebar-search`                    | Command palette from sidebar                                                                        | SidebarQuickLinks                                             |
+| `sidebar-settings`                  | Settings hash modal from sidebar                                                                    | SidebarQuickLinks                                             |
+| `app-context-strip`                 | Quick-access pill strip (settings sections + search)                                                | `AppLayout/components/AppContextStrip/`                       |
+| `main-content`                      | Main content region (skip-link target)                                                              | `AppLayout.shared.tsx`                                        |
+| `mobile-bottom-bar`                 | Mobile nav bar                                                                                      | AppLayout                                                     |
+| `header`                            | Top bar                                                                                             | AppLayout                                                     |
+| `brand-logo`                        | Product mark (+ wordmark in the section bar)                                                        | `AppLayout.shared.tsx`                                        |
+| `section-chip`                      | Phone header: the current room's name in its tone                                                   | `AppLayout/components/SectionChip/`                           |
+| `all-sections-trigger`              | Section bar: All sections compass (tinted when the current room is unpinned)                        | `AppLayout/components/AllSections/`                           |
+| `all-sections`                      | All sections popover (dialog)                                                                       | `AppLayout/components/AllSections/`                           |
+| `all-sections-sheet`                | All sections bottom sheet (phone)                                                                   | `AppLayout/components/AllSections/`                           |
+| `all-sections-<id>`                 | All sections row link per room                                                                      | `AppLayout/components/AllSections/`                           |
+| `all-sections-pin-<id>`             | Pin / unpin toggle per room                                                                         | `AppLayout/components/AllSections/`                           |
+| `nav-more`                          | Section bar: "More" for folded pinned tabs                                                          | `AppLayout/components/PinnedTabs/`                            |
+| `nav-more-option-<id>`              | A folded pinned tab inside "More" (a Picker menu; `nav-more-panel` is the list)                     | `AppLayout/components/PinnedTabs/`                            |
+| `nav-more-sections`                 | Phone tab bar: "More" (opens All sections)                                                          | `AppLayout.shared.tsx (MobileNav)`                            |
+| `branch-picker`                     | Header branch picker                                                                                | `AppLayout/components/BranchPicker/`                          |
+| `branch-picker-label`               | Branch picker: its label (hidden below md — the compact pin)                                        | `AppLayout/components/BranchPicker/`                          |
+| `branch-picker-option-all-branches` | Branch picker (shared Picker, multi): All branches; `branch-picker-panel` is the list               | `AppLayout/components/BranchPicker/`                          |
+| `branch-picker-option-<branchId>`   | Branch picker: one branch                                                                           | `AppLayout/components/BranchPicker/`                          |
+| `account-menu`                      | Account menu (section bar)                                                                          | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-identity`             | Account menu identity block (opens profile)                                                         | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-status-<presence>`    | Status radio pill (online · away · busy)                                                            | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-theme-<mode>`         | Appearance radio pill (light · dark · system)                                                       | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-notifications`        | Account menu: Notifications row                                                                     | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-security`             | Account menu: Security row                                                                          | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-billing`              | Account menu: Billing row                                                                           | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-devices`              | Account menu: Devices row                                                                           | `AppLayout/components/AccountMenu/`                           |
+| `account-menu-shortcuts`            | Account menu: Keyboard shortcuts row                                                                | `AppLayout/components/AccountMenu/`                           |
+| `view-as-bar`                       | View-as pill ("Previewing as <role>")                                                               | `AppLayout/components/NoticeStack/`                           |
+| `view-as-exit`                      | View-as pill: Exit preview                                                                          | `AppLayout/components/NoticeStack/`                           |
+| `upload-tray`                       | Upload tray (bottom inline-end; shown while files upload)                                           | `components/UploadTray/` (mounted by `AppLayout.tsx`)         |
+| `upload-tray-status`                | Upload tray live status (always mounted, visually hidden)                                           | UploadTray                                                    |
+| `upload-tray-toggle`                | Upload tray: collapse / expand the file list                                                        | UploadTray                                                    |
+| `upload-tray-row`                   | One file (`data-status`: queued, uploading, attaching, done, failed)                                | UploadTray                                                    |
+| `upload-tray-retry`                 | Failed file: Retry (resumes at the step that failed)                                                | UploadTray                                                    |
+| `upload-tray-remove`                | Failed file: Remove                                                                                 | UploadTray                                                    |
+| `clinic-home-empty`                 | The org home when no clinic room is open — "Nothing is switched on here yet" (L-63)                 | `$organizationSlug/components/ClinicHomeEmpty/`               |
+| `today-page`                        | Clinic room page: Today                                                                             | `pages/organization/$organizationSlug/today/`                 |
+| `leads-page`                        | Clinic room page: Leads                                                                             | `pages/organization/$organizationSlug/leads/`                 |
+| `new-lead-drawer`                   | New lead drawer — `/leads/create` opens it over the list (L-35)                                     | `pages/organization/$organizationSlug/leads/`                 |
+| `lead-drawer`                       | Lead drawer — `/leads/$leadId` opens it over the list (L-34b)                                       | `pages/organization/$organizationSlug/leads/`                 |
+| `leads-empty`                       | Leads list: "No leads match" (+ "Clear filters" / "New lead")                                       | `pages/organization/$organizationSlug/leads/`                 |
+| `leads-claim`                       | Leads row: "Open to team · Claim / Join" (claims from the row)                                      | `leads/components/LeadsTable/`                                |
+| `leads-hold-dot`                    | Leads row: the hold's release-today / tomorrow dot on the owner                                     | `leads/components/LeadsTable/`                                |
+| `lead-drawer-chat`                  | Lead drawer: the chat pane (the phone's Chat pane)                                                  | `leads/components/LeadDrawer/`                                |
+| `lead-drawer-save`                  | Lead drawer: "Save lead" (disabled until the draft changes)                                         | `leads/components/LeadDrawer/`                                |
+| `lead-drawer-remove`                | Lead drawer: "Remove lead" (opens the reason confirm)                                               | `leads/components/LeadDrawer/`                                |
+| `lead-drawer-people`                | Lead drawer: "Assigned & involved" (opens "People on this lead")                                    | `leads/components/LeadFormFields/`                            |
+| `lead-drawer-resize`                | Lead drawer: the chat's resize handle (`role="separator"`)                                          | `leads/components/LeadDrawer/`                                |
+| `new-lead-search`                   | New lead: "Search by name or mobile" (the Contact step)                                             | `leads/components/NewLeadDrawer/`                             |
+| `new-lead-preset-<id>`              | New lead: Quick start chip — `walkIn`, `phoneCall`, `instagramDm`                                   | `leads/components/NewLeadDrawer/`                             |
+| `new-lead-hit-<kind>-<seq>`         | New lead: a search hit — `patient-3508` ("Re-create lead"), `lead-2365`                             | `leads/components/NewLeadDrawer/`                             |
+| `new-lead-no-match`                 | New lead: "No existing match"                                                                       | `leads/components/NewLeadDrawer/`                             |
+| `new-lead-new-contact`              | New lead: "New contact" (opens the contact editor)                                                  | `leads/components/NewLeadDrawer/`                             |
+| `new-lead-change`                   | New lead: the person's strip — "Change"                                                             | `leads/components/NewLeadDrawer/`                             |
+| `appointments-page`                 | Clinic room page: Appointments                                                                      | `pages/organization/$organizationSlug/appointments/`          |
+| `new-appointment-drawer`            | New appointment form — `/appointments/create` over the page (L-38)                                  | `pages/organization/$organizationSlug/appointments/`          |
+| `appointment-drawer`                | Appointment form — `/appointments/$appointmentId` over the page (L-38)                              | `pages/organization/$organizationSlug/appointments/`          |
+| `patients-page`                     | Clinic room page: Patients (toolbar and table ids: the shared ones, `patients-…`)                   | `pages/organization/$organizationSlug/patients/`              |
+| `patient-drawer`                    | New patient drawer — `/patients/create` opens it over the list (L-32b)                              | `pages/organization/$organizationSlug/patients/`              |
+| `patient-quick-add`                 | Quick-add patient — the same form stacked on a picker's drawer (Q-P2)                               | `shared/components/PatientDrawer/`                            |
+| `payments-page`                     | Clinic room page: Payments (toolbar and table ids: the shared ones, `payments-…`)                   | `pages/organization/$organizationSlug/payments/`              |
+| `payments-pending-page`             | Payments › Pending (toolbar and table ids: the shared ones, `payments-pending-…`)                   | `payments/pending/`                                           |
+| `receive-drawer`                    | Receive payment — `/payments/receive` over the ledger (L-39b)                                       | `pages/organization/$organizationSlug/payments/`              |
+| `pay-drawer`                        | Send payment — `/payments/pay` over the ledger (L-39b)                                              | `pages/organization/$organizationSlug/payments/`              |
+| `credit-drawer`                     | Add / Edit pending — over Payments › Pending (L-39c)                                                | `payments/pending/`                                           |
+| `settle-credit-drawer`              | Give back / Got it back — stacked, no URL (L-39c)                                                   | `shared/components/SettleCreditDrawer/`                       |
+| `day-close-drawer`                  | Day close — `/payments/day-close` over the ledger (L-41)                                            | `pages/organization/$organizationSlug/payments/`              |
+| `invoice-drawer`                    | New / Edit invoice — `/invoices/create` · `/invoices/$invoiceId/edit` (L-40)                        | `shared/components/InvoiceDrawer/`                            |
+| `invoice-preview`                   | Print preview — `/invoices/$invoiceId` (L-40; `-close`, `-print`)                                   | `shared/components/PrintPreview/`                             |
+| `tasks-page`                        | Clinic room page: Tasks (its own ids: the Tasks room section below)                                 | `pages/organization/$organizationSlug/tasks/`                 |
+| `new-task-drawer`                   | New task — `/tasks/create` opens it over the list (L-47d)                                           | `pages/organization/$organizationSlug/tasks/`                 |
+| `task-drawer`                       | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                                       | `pages/organization/$organizationSlug/tasks/`                 |
+| `patient-file-layout`               | Patient file — `/patients/$patientId/<section>` (L-42; ids below)                                   | `pages/…/patients/$patientId/`                                |
+| `offerings-page`                    | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)                     | `pages/organization/$organizationSlug/offerings/`             |
+| `offering-drawer`                   | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c)                   | `pages/organization/$organizationSlug/offerings/`             |
+| `offers-page`                       | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)                              | `offerings/offers/` (child of the above)                      |
+| `offer-drawer`                      | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)                      | `offerings/offers/` (child of the above)                      |
+| `offering-quick-create`             | Stacked "New offering" — over the Invoice drawer's line picker (L-30e, L-40)                        | `shared/components/OfferingQuickCreate/`                      |
+| `users-page`                        | Clinic room page: Users                                                                             | `pages/organization/$organizationSlug/users/`                 |
+| `users-team-table`                  | Users › Team table (toolbar and table ids: the shared ones, `users-team-…`)                         | `pages/organization/$organizationSlug/users/`                 |
+| `user-drawer`                       | User drawer — `/users/create` (New user) and `/users/$userId/edit` (L-31b)                          | `pages/organization/$organizationSlug/users/`                 |
+| `users-roles-page`                  | Users › Roles & access page — `/users/roles` (L-31c)                                                | `pages/organization/$organizationSlug/users/roles/`           |
+| `users-roles-panel`                 | Roles & access card: role list and role page (also behind a drawer opened there)                    | `pages/organization/$organizationSlug/users/shared/`          |
+| `users-branches-page`               | Users › Branches page — `/users/branches` (L-31d)                                                   | `pages/…/users/branches/`                                     |
+| `users-branches-table`              | Users › Branches table (toolbar and table ids: the shared `users-branches-…`)                       | `pages/…/users/branches/`                                     |
+| `branch-drawer`                     | Branch drawer — `/users/branches/create` and `…/$branchId/edit` (L-31d)                             | `pages/…/users/branches/`                                     |
+| `medical-sales-page`                | Medical › Sales (toolbar and table ids: the shared ones, `medical-sales-…`)                         | `pages/organization/$organizationSlug/medical/sales/`         |
+| `medical-medicines-page`            | Medical › Medicines (`medical-medicines-…`)                                                         | `pages/organization/$organizationSlug/medical/medicines/`     |
+| `medical-purchases-page`            | Medical › Purchases (`medical-purchases-…`)                                                         | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `medical-suppliers-page`            | Medical › Suppliers (`medical-suppliers-…`)                                                         | `pages/organization/$organizationSlug/medical/suppliers/`     |
+| `medical-manufacturers-page`        | Medical › Manufacturers (`medical-manufacturers-…`)                                                 | `pages/organization/$organizationSlug/medical/manufacturers/` |
+| `medical-mrs-page`                  | Medical › MRs (`medical-mrs-…`)                                                                     | `pages/organization/$organizationSlug/medical/mrs/`           |
+| `medical-payments-page`             | Medical › Payments (`medical-payments-…`)                                                           | `pages/organization/$organizationSlug/medical/payments/`      |
+| `medical-<tab>-view-action-<id>`    | A Medical tab’s view action — `reorder`, `discount`, `prescriptions`, `reminders`, `pay-received`   | `shared/components/RoomToolbar/RoomViewAction/`               |
+| `medicine-drawer`                   | Medicine drawer — `/medical/medicines/create`, `…/$medicineId/edit` over the list (L-50b)           | `pages/organization/$organizationSlug/medical/shared/`        |
+| `supplier-drawer`                   | Supplier drawer — `/medical/suppliers/create`, `…/$supplierId/edit` (L-50b)                         | `pages/organization/$organizationSlug/medical/shared/`        |
+| `manufacturer-drawer`               | Manufacturer drawer — `/medical/manufacturers/create`, `…/$manufacturerId/edit` (L-50b)             | `pages/organization/$organizationSlug/medical/shared/`        |
+| `rep-drawer`                        | MR drawer — `/medical/mrs/create`, `…/$mrId/edit` (L-50b)                                           | `pages/organization/$organizationSlug/medical/shared/`        |
+| `rep-visit-drawer`                  | Log MR visit — `/medical/mrs/$mrId/visits/create` (L-50b)                                           | `pages/organization/$organizationSlug/medical/mrs/`           |
+| `<kind>-drawer-stacked`             | A Medical drawer stacked on another — `manufacturer`, `supplier`, `rep` (an MR), `medicine` (L-50b) | `pages/organization/$organizationSlug/medical/shared/`        |
+| `purchase-order-drawer`             | New / Edit purchase order — `/medical/purchases/create`, `…/$purchaseOrderId/edit` (L-50c)          | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `receive-goods-drawer`              | Receive goods — `…/$purchaseOrderId/receive`; `-lines-add` "+ Add unexpected item" (L-50c, L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `purchase-order-view-drawer`        | Purchase order (view) — `/medical/purchases/$purchaseOrderId`; `-save` "Pay ₹X" / "Print" (L-64)    | `pages/organization/$organizationSlug/medical/purchases/`     |
+| `sale-drawer`                       | Sale (view) — `/medical/sales/$saleId`; `-save` Collect / Return medicines, `-delete` Void (L-50c)  | `pages/organization/$organizationSlug/medical/sales/`         |
+| `sale-return-drawer`                | Return from patient — `/medical/sales/$saleId/return` (L-50c)                                       | `pages/organization/$organizationSlug/medical/sales/`         |
+| `expiring-return-drawer`            | Return expiring stock — Medicines’ row action, no URL (L-50c)                                       | `pages/organization/$organizationSlug/medical/medicines/`     |
+| `prescriptions-to-fill`             | Prescriptions to fill — Sales’ view action list (`-panel`, options) (L-50c)                         | `pages/organization/$organizationSlug/medical/sales/`         |
+| `payment-reminders`                 | Send payment reminders — Sales Unpaid’s view action panel (`-summary`, `-row`) (L-64)               | `pages/organization/$organizationSlug/medical/sales/`         |
+| `stock-items-page`                  | Clinic stock › Items (`stock-items-…`)                                                              | `pages/organization/$organizationSlug/stock/items/`           |
+| `stock-purchases-page`              | Clinic stock › Purchases (`stock-purchases-…`)                                                      | `pages/organization/$organizationSlug/stock/purchases/`       |
+| `stock-movements-page`              | Clinic stock › Movements (`stock-movements-…`)                                                      | `pages/organization/$organizationSlug/stock/movements/`       |
+| `stock-vendors-page`                | Clinic stock › Vendors (`stock-vendors-…`; Q-K1)                                                    | `pages/organization/$organizationSlug/stock/vendors/`         |
+| `stock-items-view-action-check`     | Clinic stock › Items — "Stock check"                                                                | `shared/components/RoomToolbar/RoomViewAction/`               |
+| `stock-item-drawer`                 | Item drawer — `/stock/items/create`, `…/$itemId/edit` over the list (L-51b)                         | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-check-drawer`                | Stock check — `/stock/items/check`; `-counter`, `-row`, `-count`, `-same`, `-difference` (L-51b)    | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-movement-drawer`             | Log usage / Receive stock / Adjust stock — a row action, no URL (L-51b)                             | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-use-popover`                 | The Use popover at a row's Use button (L-51b)                                                       | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-purchase-drawer`             | Purchase drawer — `/stock/purchases/create` (`?reorder=low`), `…/$purchaseId/edit` (L-51b)          | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-vendor-drawer`               | Clinic vendor drawer — `/stock/vendors/create`, `…/$vendorId/edit` (L-51b)                          | `pages/organization/$organizationSlug/stock/shared/`          |
+| `stock-<kind>-drawer-stacked`       | A child stacked on a stock drawer — `vendor`, `new-item` (L-51b)                                    | `pages/organization/$organizationSlug/stock/shared/`          |
+| `sidebar-toggle`                    | Menu button                                                                                         | AppLayout                                                     |
+| `search-trigger`                    | Command palette                                                                                     | AppLayout                                                     |
+| `user-menu-trigger`                 | Avatar menu                                                                                         | AppLayout                                                     |
+| `user-menu-settings`                | Settings item in avatar menu                                                                        | `AppLayout.shared.tsx`                                        |
+| `logout-button`                     | Log out                                                                                             | AppLayout                                                     |
+| `full-page-spinner`                 | Bootstrap loading                                                                                   | `FullPageSpinner.tsx`                                         |
+| `organization-switcher-trigger`     | Org switcher                                                                                        | `OrganizationSwitcher.tsx`                                    |
+| `organization-switcher-create`      | Create org from switcher                                                                            | OrganizationSwitcher                                          |
+| `organization-switcher-caption`     | Product name under the org name — sidebar brand lockup only                                         | OrganizationSwitcher                                          |
+| `sidebar-brand`                     | Sidebar identity row (mark + switcher as one lockup; same height as `header`)                       | `AppLayoutSidebar.tsx`                                        |
+| `sidebar-scrim`                     | Scrim behind the open navigation drawer (below `lg`)                                                | `AppLayoutSidebar.tsx`                                        |
+| `session-timeout-dialog`            | Inactivity warning (5 min idle, 90 s grace)                                                         | `SessionTimeoutDialog.tsx`                                    |
+| `session-signout`                   | "Sign out" on the inactivity warning — revokes server-side                                          | SessionTimeoutDialog                                          |
+| `session-stay`                      | "Stay signed in" — default focus; restarts the idle clock                                           | SessionTimeoutDialog                                          |
+| `consent-banner`                    | Cookie-consent card (bottom-start corner; undecided only)                                           | `ConsentBanner.tsx`                                           |
+| `consent-accept`                    | Grant analytics consent                                                                             | ConsentBanner                                                 |
+| `consent-decline`                   | Decline analytics consent                                                                           | ConsentBanner                                                 |
 
 ---
 
@@ -244,19 +244,19 @@ Every list table carries these, prefixed by its `tableId` (`patients-table-row`)
 one uses `data` (`data-table-row`). A control mounted per row shares one id — reach it by
 index or scope it to its row.
 
-| Test ID                                           | Element                                                         | File                      |
-| ------------------------------------------------- | --------------------------------------------------------------- | ------------------------- |
-| `<tableId>-table`                                 | Table card                                                      | `DataTable/DataTable.tsx` |
-| `<tableId>-table-header`                          | Header row (`md` and up)                                        | `DataTableHeaderRow.tsx`  |
-| `<tableId>-table-row`                             | Body row (`data-row-index`; `data-kfocus` under j / k)          | `DataTableRow.tsx`        |
-| `<tableId>-table-select-all` / `-select-row`      | Selection boxes (`md` and up)                                   | `DataTableRow.tsx`        |
-| `<tableId>-table-footer`                          | 44px footer (count, fold toggle, bulk bar)                      | `DataTableFooter.tsx`     |
-| `<tableId>-table-fold-toggle`                     | "<N> columns in rows · Show all" ↔ "Fit to width"               | `DataTableFooter.tsx`     |
-| `<tableId>-table-bulk-bar`                        | Bulk bar; `-bulk-select-all`, `-bulk-clear`, `-bulk-<actionId>` | `DataTableBulkBar/`       |
-| `<tableId>-table-loading-more` / `-table-end`     | "Loading more …" rows / "All … loaded" end line                 | `DataTableTail.tsx`       |
-| `<tableId>-row-action-<actionId>` / `-row-more`   | Row actions and the "More actions" menu                         | `DataTableRowActions/`    |
-| `<tableId>-columns-trigger` / `-columns-show-all` | Columns chooser; options `-columns-option-<columnId>`           | `DataTableColumnChooser/` |
-| `<tableId>-saved-views`                           | Saved views track                                               | `DataTableSavedViews/`    |
+| Test ID                                         | Element                                                                                                                                    | File                      |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+| `<tableId>-table`                               | Table card                                                                                                                                 | `DataTable/DataTable.tsx` |
+| `<tableId>-table-header`                        | Header row (`md` and up)                                                                                                                   | `DataTableHeaderRow.tsx`  |
+| `<tableId>-table-row`                           | Body row (`data-row-index`; `data-kfocus` under j / k)                                                                                     | `DataTableRow.tsx`        |
+| `<tableId>-table-select-all` / `-select-row`    | Selection boxes (`md` and up)                                                                                                              | `DataTableRow.tsx`        |
+| `<tableId>-table-footer`                        | 44px footer (count, fold toggle, bulk bar)                                                                                                 | `DataTableFooter.tsx`     |
+| `<tableId>-table-fold-toggle`                   | "<N> columns in rows · Show all" ↔ "Fit to width"                                                                                          | `DataTableFooter.tsx`     |
+| `<tableId>-table-bulk-bar`                      | Bulk bar; `-bulk-select-all`, `-bulk-clear`, `-bulk-<actionId>`                                                                            | `DataTableBulkBar/`       |
+| `<tableId>-table-loading-more` / `-table-end`   | "Loading more …" rows / "All … loaded" end line                                                                                            | `DataTableTail.tsx`       |
+| `<tableId>-row-action-<actionId>` / `-row-more` | Row actions and the "More actions" menu                                                                                                    | `DataTableRowActions/`    |
+| `<tableId>-columns-trigger` / `-columns-panel`  | Columns chooser (shared Picker, multi); rows `-columns-option-<columnId>`, "Show all" `-columns-option-show-all`, search `-columns-search` | `DataTableColumnChooser/` |
+| `<tableId>-saved-views`                         | Saved views track                                                                                                                          | `DataTableSavedViews/`    |
 
 ---
 

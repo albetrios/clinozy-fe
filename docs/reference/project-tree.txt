@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2149 src files · ~1048 tests in src/ · 48 E2E specs · 29 shadcn UI primitives
+Stats: ~2150 src files · ~1049 tests in src/ · 48 E2E specs · 29 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1946,6 +1946,7 @@ clinozy-fe/
 │   │   │   │   ├── picker-dom.ts
 │   │   │   │   ├── picker-hooks.ts
 │   │   │   │   ├── picker-keyboard.ts
+│   │   │   │   ├── picker-layer.ts
 │   │   │   │   ├── picker-model.ts
 │   │   │   │   ├── picker-rows.ts
 │   │   │   │   ├── picker-visuals.tsx
@@ -2719,7 +2720,7 @@ clinozy-fe/
 │   │   │   │   │   │   ├── fit-pinned-tabs.ts
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── PinnedTabs.tsx
-│   │   │   │   │   │   └── [1 test file]
+│   │   │   │   │   │   └── [2 test files]
 │   │   │   │   │   ├── SectionChip/
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── SectionChip.tsx

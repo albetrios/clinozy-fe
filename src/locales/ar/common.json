@@ -198,8 +198,9 @@
       "allShown": "كل الأعمدة ظاهرة ({{count}})",
       "hiddenCount": "{{count}} مخفية",
       "search": "البحث في الأعمدة",
-      "noMatch": "لا توجد أعمدة مطابقة",
-      "shown": "{{shown}} من {{total}} ظاهرة"
+      "shown": "{{shown}} من {{total}} ظاهرة",
+      "viewGroup": "العرض",
+      "columnsGroup": "الأعمدة"
     },
     "fold": {
       "showAll_zero": "لا أعمدة داخل الصفوف · إظهار الكل",

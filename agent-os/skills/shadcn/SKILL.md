@@ -34,6 +34,14 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
   base `radix`, Tailwind v4 CSS-first (`src/index.css`), UI alias `@/shared/components/ui`.
 - **Structure:** vendored primitives stay FLAT in `src/shared/components/ui/`; everything
   composed on top follows folder-per-unit (`agent-os/rules/fe-file-structure.mdc`).
+- **One component per job (L-62 — these override the Component Selection table below):**
+  - Pick one value or several from a list → the shared **`Picker`**
+    (`@/shared/components/Picker`; `multiple` for several, `plain` for a neutral list,
+    `menu` for a list of places). Never `ui/select` (it survives only until the old
+    dashboard's last use goes) and never a hand-built Popover + `Command` list.
+  - A menu of ACTIONS (Account, "+", row ⋯, theme toggle) → `ui/dropdown-menu`.
+  - Toasts → `notify` (`@/shared/notify`) — one design, the clinic bar, bottom-centre;
+    never `sonner` directly.
 
 ### Selection workflow
 

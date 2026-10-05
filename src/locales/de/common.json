@@ -198,8 +198,9 @@
       "allShown": "Alle {{count}} Spalten sichtbar",
       "hiddenCount": "{{count}} ausgeblendet",
       "search": "Spalten suchen",
-      "noMatch": "Keine passenden Spalten",
-      "shown": "{{shown}} von {{total}} sichtbar"
+      "shown": "{{shown}} von {{total}} sichtbar",
+      "viewGroup": "Ansicht",
+      "columnsGroup": "Spalten"
     },
     "fold": {
       "showAll_one": "{{count}} Spalte in Zeilen · Alle anzeigen",

@@ -198,8 +198,9 @@
       "allShown": "Todas as {{count}} colunas visíveis",
       "hiddenCount": "{{count}} ocultas",
       "search": "Pesquisar colunas",
-      "noMatch": "Nenhuma coluna corresponde",
-      "shown": "{{shown}} de {{total}} visíveis"
+      "shown": "{{shown}} de {{total}} visíveis",
+      "viewGroup": "Visão",
+      "columnsGroup": "Colunas"
     },
     "fold": {
       "showAll_one": "{{count}} coluna nas linhas · Mostrar tudo",

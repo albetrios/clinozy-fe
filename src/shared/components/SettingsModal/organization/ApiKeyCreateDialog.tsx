@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import type { ApiKeyWithSecret } from '@/shared/api/organization-contracts.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
@@ -20,13 +21,6 @@ import {
 } from '@/shared/components/ui/dialog.tsx';
 import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useCreateApiKey } from '@/shared/hooks/useApiKeys/index.ts';
@@ -259,28 +253,24 @@ export function ApiKeyCreateDialog() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="apikey-expiry">{t(integrations.apiKeyExpiryLabel)}</Label>
-                <Select
+                <Picker
+                  id="apikey-expiry"
+                  label={t(integrations.apiKeyExpiryLabel)}
                   value={expiry}
-                  onValueChange={(value) => setExpiry(value as ExpiryChoice)}
-                >
-                  <SelectTrigger
-                    id="apikey-expiry"
-                    className="w-full"
-                    data-testid="apikey-expiry"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPIRY_CHOICES.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {t(integrations.apiKeyExpiryDays, { count: option.days })}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value={NEVER_EXPIRES}>
-                      {t(integrations.apiKeyExpiryNever)}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  options={[
+                    ...EXPIRY_CHOICES.map((option) => ({
+                      key: option.value,
+                      label: t(integrations.apiKeyExpiryDays, { count: option.days }),
+                    })),
+                    { key: NEVER_EXPIRES, label: t(integrations.apiKeyExpiryNever) },
+                  ]}
+                  plain
+                  onChange={(key) => {
+                    if (key) setExpiry(key as ExpiryChoice);
+                  }}
+                  testId="apikey-expiry"
+                  className="w-full"
+                />
               </div>
 
               <div className="space-y-1.5">

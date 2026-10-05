@@ -6,7 +6,6 @@ import {
   type DateFormatPreference,
   type FirstDayOfWeek,
   FORMAT_LOCALE_TAGS,
-  type FormatLocaleTag,
   HOUR_CYCLE_PREFERENCES,
   type HourCyclePreference,
   type MeasurementSystem,
@@ -15,7 +14,6 @@ import {
   TEXT_DIRECTION_PREFERENCES,
   type TextDirectionPreference,
   TIME_ZONE_TAGS,
-  type TimeZonePreference,
 } from './intl-config.ts';
 import type { I18nLocale, TextDirection } from './locales.ts';
 import { I18N_NAMESPACES } from './namespaces.ts';
@@ -172,21 +170,9 @@ export const LOCALE_TEST_IDS = {
   dateTimeCard: 'date-time-prefs',
   moneyCard: 'money-prefs',
   menuItem: (code: string) => `language-${code}`,
-  formatLocaleItem: (tag: string) => `format-locale-${tag.replace(/-/g, '_')}`,
-  timeZoneItem: (zone: string) => `time-zone-${zone.replace(/\//g, '_')}`,
   dateFormatItem: (style: string) => `date-format-${style}`,
   hourCycleItem: (style: string) => `hour-cycle-${style}`,
   textDirectionItem: (style: string) => `text-direction-${style}`,
   numberStyleItem: (style: string) => `number-style-${style}`,
   currencyDisplayItem: (style: string) => `currency-display-${style}`,
-  currencyCodeItem: (code: string) => `currency-code-${code.toLowerCase()}`,
 } as const;
-
-/** Stable test id for a timezone option in the prefs select. */
-export function timeZoneTestId(zone: TimeZonePreference): string {
-  return LOCALE_TEST_IDS.timeZoneItem(zone);
-}
-
-export function formatLocaleTestId(tag: FormatLocaleTag): string {
-  return LOCALE_TEST_IDS.formatLocaleItem(tag);
-}

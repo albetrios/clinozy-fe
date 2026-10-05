@@ -21,6 +21,7 @@ import {
 import { DateTimePrefsCard } from '@/shared/components/DateTimePrefsCard/index.ts';
 import { LanguagePrefsCard } from '@/shared/components/LanguagePrefsCard/index.ts';
 import { MoneyPrefsCard } from '@/shared/components/MoneyPrefsCard/index.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Card,
@@ -31,13 +32,6 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
 import { Input } from '@/shared/components/ui/input.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { Separator } from '@/shared/components/ui/separator.tsx';
 import { Check, Monitor, Moon, Sparkles, Sun } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -202,8 +196,18 @@ function Choices({
   );
 }
 
-/** Font dropdown (body / heading) over the web-safe catalog. */
-function FontSelect({
+function FieldLabel({ children }: { children: string }) {
+  return <p className="text-sm font-medium">{children}</p>;
+}
+
+/** The web-safe font catalog as picker rows (font families are proper nouns). */
+const FONT_OPTIONS = Object.entries(GENERATED_FONTS).map(([key, font]) => ({
+  key,
+  label: font.label,
+}));
+
+/** Font picker (body / heading) over the web-safe catalog; `id` is its test id. */
+function FontPicker({
   id,
   label,
   value,
@@ -216,31 +220,20 @@ function FontSelect({
 }) {
   return (
     <div className="space-y-2">
-      <p id={`${id}-label`} className="text-sm font-medium">
-        {label}
-      </p>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger
-          className="w-full"
-          aria-labelledby={`${id}-label`}
-          data-testid={id}
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="z-[90]">
-          {Object.entries(GENERATED_FONTS).map(([fid, f]) => (
-            <SelectItem key={fid} value={fid}>
-              {f.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FieldLabel>{label}</FieldLabel>
+      <Picker
+        label={label}
+        value={value}
+        options={FONT_OPTIONS}
+        plain
+        onChange={(key) => {
+          if (key) onChange(key);
+        }}
+        testId={id}
+        className="w-full"
+      />
     </div>
   );
-}
-
-function FieldLabel({ children }: { children: string }) {
-  return <p className="text-sm font-medium">{children}</p>;
 }
 
 /**
@@ -546,13 +539,13 @@ function TypographyCard() {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <FontSelect
+          <FontPicker
             id="font-body"
             label={tAppearance(APPEARANCE_KEYS.bodyFont)}
             value={bodyFontId}
             onChange={(value) => updateLook({ bodyFontId: value })}
           />
-          <FontSelect
+          <FontPicker
             id="font-heading"
             label={tAppearance(APPEARANCE_KEYS.headingFont)}
             value={headingFontId}

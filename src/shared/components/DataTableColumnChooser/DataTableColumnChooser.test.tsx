@@ -1,5 +1,5 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -13,6 +13,7 @@ import {
   useDevicePrefsStore,
 } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 import { DataTableColumnChooser } from './DataTableColumnChooser.tsx';
 
@@ -56,20 +57,24 @@ const option = (name: string) =>
 
 describe('DataTableColumnChooser', () => {
   it('counts the hidden columns on its 36px Eye button', () => {
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     const trigger = screen.getByRole('button', { name: 'Show or hide columns' });
     expect(trigger).toHaveAttribute('title', 'Columns · 2 of 4 shown');
     expect(trigger).toHaveTextContent('2');
-    expect(trigger.className).toContain('max-md:hidden');
+    // The picker's field wrapper hides below md: phone rows fold columns themselves.
+    expect(trigger.parentElement?.className).toContain('max-md:hidden');
   });
 
-  it('lists "Show all columns" first, then each hideable column', async () => {
+  it('lists "Show all columns" under View, then each hideable column under Columns', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
 
     const options = screen.getAllByRole('option');
-    expect(options[0]).toHaveTextContent('Show all columns Recommended set hides 2');
+    expect(options[0]).toHaveTextContent('Show all columns');
+    expect(options[0]).toHaveTextContent('Recommended set hides 2');
+    expect(screen.getByText('View')).toBeInTheDocument();
+    expect(screen.getByText('Columns')).toBeInTheDocument();
     expect(options.slice(1).map((item) => item.textContent)).toEqual([
       'Patient',
       'Gender',
@@ -82,7 +87,7 @@ describe('DataTableColumnChooser', () => {
 
   it('persists a toggled column on this device', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
     await user.click(option('Gender'));
 
@@ -92,7 +97,7 @@ describe('DataTableColumnChooser', () => {
 
   it('shows everything, then returns to the recommended set on a second tap', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
 
     await user.click(option('Show all columns'));
@@ -100,9 +105,8 @@ describe('DataTableColumnChooser', () => {
     expect(option('Show all columns')).toHaveTextContent(
       'Tap again for the recommended set',
     );
-    expect(
-      screen.queryByRole('button', { name: 'Show or hide columns' }),
-    ).not.toHaveTextContent(/\d/);
+    // The open list is modal (the trigger is hidden from the a11y tree under it).
+    expect(screen.getByTestId('patients-columns-trigger')).not.toHaveTextContent(/\d/);
 
     await user.click(option('Show all columns'));
     expect(useDevicePrefsStore.getState().hiddenColumns.patients).toEqual([
@@ -117,7 +121,7 @@ describe('DataTableColumnChooser', () => {
       { accessorKey: 'status', header: 'Status' },
       { accessorKey: 'source', header: 'Source' },
     ];
-    render(<Harness columns={plain} />);
+    renderWithQueryClient(<Harness columns={plain} />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
     expect(option('Show all columns')).toHaveTextContent('All 2 columns shown');
     await user.click(option('Source'));
@@ -130,34 +134,33 @@ describe('DataTableColumnChooser', () => {
       accessorKey: `column${'abcdefghi'[index]}`,
       header: `Column ${'ABCDEFGHI'[index]}`,
     })) satisfies ColumnDef<DataTableFeatures, Row>[];
-    render(<Harness columns={many} />);
+    renderWithQueryClient(<Harness columns={many} />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
     const search = screen.getByPlaceholderText('Search columns');
     await user.type(search, 'column c');
     const listbox = screen.getByRole('listbox');
-    // "Show all columns" stays first; the columns narrow by name.
+    // The search narrows the list to the rows that match it.
     expect(
       within(listbox)
         .getAllByRole('option')
-        .slice(1)
         .map((item) => item.textContent),
     ).toEqual(['Column C']);
 
     await user.clear(search);
     await user.type(search, 'zzz');
-    expect(screen.getByText('No columns match')).toBeInTheDocument();
+    expect(screen.getByText(/No results for/)).toBeInTheDocument();
   });
 
   it('has no search box at eight columns or fewer', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
     expect(screen.queryByPlaceholderText('Search columns')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations while open', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
+    renderWithQueryClient(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
     expect(await axeForDialog(screen.getByRole('dialog'))).toHaveNoViolations();
   });

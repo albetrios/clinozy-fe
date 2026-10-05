@@ -1,11 +1,16 @@
+import { act, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { pickerTestIds } from '@/shared/components/Picker/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AuthLayout, preloadAuthLayoutVariants } from './AuthLayout.tsx';
+
+const LANGUAGE = pickerTestIds('auth-locale-select');
 
 describe('AuthLayout', () => {
   // Preload lazy shells so Suspense doesn't flake under full-suite contention.
@@ -99,14 +104,22 @@ describe('AuthLayout', () => {
     expect(await findByTestId('auth-form-container')).toBeInTheDocument();
   });
 
-  it('shows the auth locale select in multi-locale builds', async () => {
+  it('shows the auth language picker in multi-locale builds, and it switches the UI', async () => {
+    const user = userEvent.setup();
     const { findByTestId } = renderWithProviders(
       <AuthLayout>
         <div>child</div>
       </AuthLayout>,
     );
     expect(await findByTestId('auth-layout')).toBeInTheDocument();
-    expect(await findByTestId('auth-locale-select')).toBeInTheDocument();
+    // The picker loads on its own; until then an inert copy of its trigger holds the spot.
+    const trigger = await findByTestId(LANGUAGE.trigger);
+    expect(trigger).toHaveAccessibleName(/English/);
+
+    await user.click(trigger);
+    await user.click(await findByTestId(LANGUAGE.option('de')));
+    await waitFor(() => expect(useLocaleStore.getState().locale).toBe('de'));
+    await act(() => useLocaleStore.getState().setLocale('en'));
   });
 
   it('has no accessibility violations', async () => {

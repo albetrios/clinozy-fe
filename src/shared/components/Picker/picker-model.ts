@@ -55,6 +55,20 @@ export function openingPages<T>(props: PickerProps<T>): number {
   return Math.max(1, Math.ceil((index + 1 + PICKER_RECENT_ROWS) / PICKER_PAGE_SIZE));
 }
 
+/**
+ * An option as a `plain` list draws it (H:3917, H:3958, H:3961): its row and
+ * group square in `stone`, and no tone dot — an avatar, icon or pill stays.
+ */
+export function plainOption<T>(option: PickerOption<T>): PickerOption<T> {
+  const kind = option.leading?.kind ?? 'dot';
+  return {
+    ...option,
+    tone: 'stone',
+    groupTone: 'stone',
+    leading: kind === 'dot' ? { kind: 'none' } : option.leading,
+  };
+}
+
 /** `keys` with `key` toggled (added at the end, or removed). */
 export function toggleKey(keys: readonly string[], key: string): string[] {
   return keys.includes(key)

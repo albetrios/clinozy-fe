@@ -1,16 +1,11 @@
-import { Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu.tsx';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 import type {
   SectionBarEntry,
@@ -73,32 +68,10 @@ function PinnedTab({
   );
 }
 
-function FoldedTab({
-  entry,
-  organizationSlug,
-}: {
-  entry: SectionBarEntry;
-  organizationSlug: string;
-}) {
-  const { label, title } = useEntryText(entry);
-  return (
-    <DropdownMenuItem asChild className="text-body h-9 gap-2.5 rounded-md">
-      <Link
-        to={entry.to}
-        params={{ organizationSlug }}
-        title={title}
-        data-testid={`nav-more-${entry.id}`}
-      >
-        <entry.icon className="size-4" aria-hidden />
-        {label}
-      </Link>
-    </DropdownMenuItem>
-  );
-}
-
 /**
  * Header slots 4 and 5 (`shell.md:21–22`; H:537–538): the pinned rooms as tabs,
- * and — once the measured space runs out — "More", a list of the folded pins.
+ * and — once the measured space runs out — "More", the folded pins as a Picker
+ * menu (each room's icon tile in its tone; picking one opens it).
  * `available` is the measured tab space (null until measured: nothing folds).
  */
 export function PinnedTabs({
@@ -113,7 +86,7 @@ export function PinnedTabs({
   fontFamily: string;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const navigate = useNavigate();
   const labelsKey = nav.pinned
     .map((entry) => t(entry.labelKey, { ns: entry.labelNs }))
     .join('\n');
@@ -128,6 +101,7 @@ export function PinnedTabs({
   }, [labelsKey, measured, fontFamily]);
   const currentIndex = nav.current ? nav.pinned.indexOf(nav.current) : -1;
   const fit = fitPinnedTabs(widths, available, currentIndex);
+  const folded = fit.folded.flatMap((index) => nav.pinned[index] ?? []);
 
   return (
     <>
@@ -142,9 +116,25 @@ export function PinnedTabs({
           />
         ) : null;
       })}
-      {fit.folded.length > 0 ? (
-        <DropdownMenu open={moreOpen} onOpenChange={setMoreOpen}>
-          <DropdownMenuTrigger asChild>
+      {folded.length > 0 ? (
+        <Picker
+          menu
+          label={t(LAYOUT_KEYS.app.sectionBar.morePinned)}
+          value={null}
+          options={folded.map((entry) => ({
+            key: entry.id,
+            label: t(entry.labelKey, { ns: entry.labelNs }),
+            tone: entry.tone,
+            leading: { kind: 'icon', icon: entry.icon },
+          }))}
+          onChange={(id) => {
+            const entry = folded.find((pin) => pin.id === id);
+            if (entry) void navigate({ to: entry.to, params: { organizationSlug } });
+          }}
+          minWidth={200}
+          testId="nav-more"
+          className="flex-none"
+          renderTrigger={({ open }) => (
             <button
               type="button"
               aria-label={t(LAYOUT_KEYS.app.sectionBar.morePinned)}
@@ -152,7 +142,7 @@ export function PinnedTabs({
               data-testid="nav-more"
               className={cn(
                 'text-foreground-soft hover:bg-muted text-body flex h-8 flex-none items-center gap-1 rounded-lg ps-2.5 pe-2 font-medium whitespace-nowrap transition-colors duration-160',
-                moreOpen && 'bg-muted',
+                open && 'bg-muted',
               )}
             >
               {t(LAYOUT_KEYS.app.sectionBar.more)}
@@ -160,28 +150,12 @@ export function PinnedTabs({
                 aria-hidden
                 className={cn(
                   'text-muted-foreground size-3.5 transition-transform duration-150',
-                  moreOpen && 'rotate-180',
+                  open && 'rotate-180',
                 )}
               />
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            sideOffset={6}
-            className="data-[state=open]:animate-dropdown-in min-w-50 rounded-xl p-1.5"
-          >
-            {fit.folded.map((index) => {
-              const entry = nav.pinned[index];
-              return entry ? (
-                <FoldedTab
-                  key={entry.id}
-                  entry={entry}
-                  organizationSlug={organizationSlug}
-                />
-              ) : null;
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+        />
       ) : null}
     </>
   );

@@ -1,18 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
+import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { Search } from '@/shared/icons/index.ts';
 
 import { ORG_LIST_SORT_PRESETS, type OrgListSortPreset } from './org-list-sort.ts';
@@ -68,25 +62,21 @@ export function OrgListControls({
         <Label htmlFor={sortTestId} className="text-muted-foreground text-xs">
           {t(SORT_LABEL_KEYS.label)}
         </Label>
-        <Select
+        <Picker
+          id={sortTestId}
+          label={t(SORT_LABEL_KEYS.label)}
           value={sort}
-          onValueChange={(value) => onSortChange(value as OrgListSortPreset)}
-        >
-          <SelectTrigger
-            id={sortTestId}
-            data-testid={sortTestId}
-            aria-label={t(SORT_LABEL_KEYS.label)}
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option} value={option}>
-                {t(SORT_OPTION_LABELS[option])}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          options={SORT_OPTIONS.map((option) => ({
+            key: option,
+            label: t(SORT_OPTION_LABELS[option]),
+          }))}
+          plain
+          onChange={(key) => {
+            if (key) onSortChange(key as OrgListSortPreset);
+          }}
+          minWidth={180}
+          testId={sortTestId}
+        />
       </div>
     </div>
   );

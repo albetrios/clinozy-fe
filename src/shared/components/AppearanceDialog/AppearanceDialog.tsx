@@ -10,6 +10,7 @@ import { closeControlClassName } from '@/lib/icon-surface.ts';
 import { useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
+import { PickerLayerContext } from '@/shared/components/Picker/picker-layer.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useEscapeLayer } from '@/shared/hooks/useEscapeLayer/index.ts';
@@ -96,20 +97,21 @@ export function AppearanceDialog() {
   const panelRef = useRef<HTMLElement>(null);
 
   // Esc closes the panel alone — not the drawer under it — and leaves the key
-  // to a Select or dialog opened over it (the top-most surface first).
+  // to a picker or dialog opened over it (the top-most surface first).
   useEscapeLayer(open ? () => setOpen(false) : undefined);
 
   useEffect(() => {
     if (!open) return;
-    // Click-outside dismiss. Clicks inside portaled overlays (the font selects,
-    // popovers, toasts) count as "inside" so they don't close the popup.
+    // Click-outside dismiss. Clicks inside portaled overlays (the pickers' lists
+    // — a popover, or a phone's bottom sheet and its dim layer — menus, toasts)
+    // count as "inside" so they don't close the popup.
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as Element | null;
       if (
         !target ||
         panelRef.current?.contains(target) ||
         target.closest(
-          '[data-slot="select-content"],[data-slot="popover-content"],[data-slot="dropdown-menu-content"],[data-sonner-toaster]',
+          '[data-picker-surface],[data-slot="drawer-overlay"],[data-slot="popover-content"],[data-slot="dropdown-menu-content"],[data-sonner-toaster]',
         )
       ) {
         return;
@@ -175,7 +177,10 @@ export function AppearanceDialog() {
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-        <AppearanceContent />
+        {/* The panel sits at z-80, over the app's overlays: its pickers open above it. */}
+        <PickerLayerContext value="raised">
+          <AppearanceContent />
+        </PickerLayerContext>
       </div>
     </aside>
   );

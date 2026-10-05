@@ -1,17 +1,7 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu.tsx';
+import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { ChevronDown, MapPin } from '@/shared/icons/index.ts';
@@ -20,21 +10,25 @@ import { notify } from '@/shared/notify/index.ts';
 
 const keys = LAYOUT_KEYS.app.sectionBar.branch;
 
+/** The "All branches" row's key — a branch id never takes it. */
+const ALL_BRANCHES_KEY = 'all-branches';
+
 /**
- * Header slot 9 (`shell.md:26`; H:545): which branches the rooms show — only
- * when the clinic has more than one open branch (`useBranches().isMultiBranch`,
- * KICKOFF §6.12 One open branch). The selection is
+ * Header slot 9 (`shell.md:26`; H:545, H:6114): which branches the rooms show
+ * — only when the clinic has more than one open branch
+ * (`useBranches().isMultiBranch`, KICKOFF §6.12 One open branch). The list is
+ * the shared Picker, multi-select: "All branches" under "View", then each
+ * branch (its tone dot, its area) under "Branches". The selection is
  * `UserPreference.branchFilter` (empty = all, S:235) through the D32
  * preferences hook. "All branches" toggles every branch on, or back to the
- * first picked; the last branch cannot be turned off. Below `md` it is the
- * compact pin (+ the count of extra branches): the phone header holds the
- * section chip, search, this and the avatar at 320px.
+ * first picked; the last branch cannot be turned off. Below `md` the trigger
+ * is the compact pin (+ the count of extra branches): the phone header holds
+ * the section chip, search, this and the avatar at 320px.
  */
 export function BranchPicker() {
   const { t } = useTranslation(LAYOUT_NS);
   const { openBranches: branches, isMultiBranch } = useBranches();
   const { preferences, update } = usePreferences();
-  const [open, setOpen] = useState(false);
   if (!isMultiBranch) return null;
 
   const allIds = branches.map((branch) => branch.id);
@@ -66,9 +60,51 @@ export function BranchPicker() {
     );
   };
 
+  const options: PickerOption[] = [
+    {
+      key: ALL_BRANCHES_KEY,
+      label: t(keys.all),
+      sub: t(keys.allSub, { count: allIds.length }),
+      group: t(keys.viewGroup),
+    },
+    ...branches.map((branch) => ({
+      key: branch.id,
+      label: branch.name,
+      sub: branch.area,
+      group: t(keys.branchesGroup),
+      tone: branch.tone,
+    })),
+  ];
+  const value = isAll ? [ALL_BRANCHES_KEY, ...allIds] : selected;
+
+  /** One row changed: "All branches", or one branch on or off. */
+  const handleChange = (picked: string[]) => {
+    const toggled =
+      picked.find((key) => !value.includes(key)) ??
+      value.find((key) => !picked.includes(key));
+    if (toggled === undefined) return;
+    if (toggled === ALL_BRANCHES_KEY) {
+      set(isAll ? [selected[0] ?? allIds[0] ?? ''] : allIds);
+      return;
+    }
+    set(
+      selected.includes(toggled)
+        ? selected.filter((id) => id !== toggled)
+        : [...selected, toggled],
+    );
+  };
+
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
+    <Picker
+      multiple
+      label={t(keys.branchesGroup)}
+      value={value}
+      options={options}
+      onChange={handleChange}
+      align="end"
+      testId="branch-picker"
+      className="flex-none"
+      renderTrigger={({ open }) => (
         <button
           type="button"
           aria-label={t(keys.label, { label })}
@@ -100,76 +136,7 @@ export function BranchPicker() {
             aria-hidden
           />
         </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        sideOffset={6}
-        className="data-[state=open]:animate-dropdown-in min-w-60 rounded-xl p-1.5"
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-muted-foreground text-micro px-2 font-semibold tracking-[0.05em] uppercase">
-            {t(keys.viewGroup)}
-          </DropdownMenuLabel>
-          <DropdownMenuCheckboxItem
-            checked={isAll}
-            onSelect={(event) => event.preventDefault()}
-            onCheckedChange={() => set(isAll ? [selected[0] ?? allIds[0] ?? ''] : allIds)}
-            data-testid="branch-picker-all"
-            className="items-start py-1.5"
-          >
-            <span className="flex flex-col">
-              <span className="text-body leading-[1.3] font-medium">{t(keys.all)}</span>
-              <span className="text-muted-foreground text-caption leading-[1.3]">
-                {t(keys.allSub, { count: allIds.length })}
-              </span>
-            </span>
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-muted-foreground text-micro px-2 font-semibold tracking-[0.05em] uppercase">
-            {t(keys.branchesGroup)}
-          </DropdownMenuLabel>
-          {branches.map((branch) => {
-            const on = selected.includes(branch.id);
-            return (
-              <DropdownMenuCheckboxItem
-                key={branch.id}
-                checked={on}
-                onSelect={(event) => event.preventDefault()}
-                onCheckedChange={() =>
-                  set(
-                    on
-                      ? selected.filter((id) => id !== branch.id)
-                      : [...selected, branch.id],
-                  )
-                }
-                data-testid={`branch-picker-${branch.id}`}
-                className="items-start py-1.5"
-              >
-                <span className="flex min-w-0 items-start gap-2">
-                  <span
-                    aria-hidden
-                    data-slot="pill"
-                    className={cn(
-                      'mt-1.5 size-2.5 flex-none rounded-full',
-                      TONE_CLASSES[branch.tone].fill,
-                    )}
-                  />
-                  <span className="flex min-w-0 flex-col">
-                    <span className="text-body leading-[1.3] font-medium">
-                      {branch.name}
-                    </span>
-                    <span className="text-muted-foreground text-caption truncate leading-[1.3]">
-                      {branch.area}
-                    </span>
-                  </span>
-                </span>
-              </DropdownMenuCheckboxItem>
-            );
-          })}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+    />
   );
 }

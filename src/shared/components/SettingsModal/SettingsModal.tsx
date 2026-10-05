@@ -17,6 +17,7 @@ import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,13 +29,6 @@ import {
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog.tsx';
 import { Dialog, DialogContent, DialogTitle } from '@/shared/components/ui/dialog.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAccessResolved } from '@/shared/hooks/useCan/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
@@ -262,35 +256,29 @@ function MobileSectionPicker({
   onSelect: (next: SettingsSectionRef) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
+  const options = groups.flatMap((group) =>
+    group.items.map((item) => ({
+      key: `${item.scope}/${item.section}`,
+      label: t(item.labelKey),
+      group: t(group.labelKey),
+    })),
+  );
   return (
     <div className="shrink-0 border-b py-3 ps-4 pe-14 sm:hidden">
-      <Select
+      <Picker
+        label={t(SETTINGS_KEYS.nav.ariaSections)}
         value={`${active.scope}/${active.section}`}
-        onValueChange={(value) => {
-          const [scope, section] = value.split('/') as [SettingsScope, SettingsSection];
+        options={options}
+        plain
+        placeholder={t(SETTINGS_SECTION_LABEL_KEYS[active.section])}
+        onChange={(key) => {
+          if (!key) return;
+          const [scope, section] = key.split('/') as [SettingsScope, SettingsSection];
           onSelect({ scope, section });
         }}
-      >
-        <SelectTrigger
-          className="w-full"
-          data-testid="settings-mobile-section"
-          aria-label={t(SETTINGS_KEYS.nav.ariaSections)}
-        >
-          <SelectValue placeholder={t(SETTINGS_SECTION_LABEL_KEYS[active.section])} />
-        </SelectTrigger>
-        <SelectContent>
-          {groups
-            .flatMap((group) => group.items)
-            .map((item) => (
-              <SelectItem
-                key={`${item.scope}/${item.section}`}
-                value={`${item.scope}/${item.section}`}
-              >
-                {t(item.labelKey)}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
+        testId="settings-mobile-section"
+        className="w-full"
+      />
     </div>
   );
 }
