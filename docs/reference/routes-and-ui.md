@@ -142,29 +142,28 @@ The app uses **shadcn/ui** as the selected component library. Allowed sources ar
 
 ### UI primitives in use
 
-| Component    | Path                                     | Used for                                             |
-| ------------ | ---------------------------------------- | ---------------------------------------------------- |
-| Button       | `shared/components/ui/button.tsx`        | Actions, submit, Google sign-in, nav                 |
-| Input        | `shared/components/ui/input.tsx`         | Text fields, search                                  |
-| Label        | `shared/components/ui/label.tsx`         | Form labels                                          |
-| Card         | `shared/components/ui/card.tsx`          | Dashboard cards, content blocks                      |
-| Dialog       | `shared/components/ui/dialog.tsx`        | Modals, SessionTimeoutDialog                         |
-| AlertDialog  | `shared/components/ui/alert-dialog.tsx`  | Confirmations                                        |
-| DropdownMenu | `shared/components/ui/dropdown-menu.tsx` | User menu, actions                                   |
-| Tooltip      | `shared/components/ui/tooltip.tsx`       | Hints                                                |
-| Checkbox     | `shared/components/ui/checkbox.tsx`      | Settings, tables                                     |
-| Separator    | `shared/components/ui/separator.tsx`     | Visual separation                                    |
-| Badge        | `shared/components/ui/badge.tsx`         | Status, counts                                       |
-| Avatar       | `shared/components/ui/avatar.tsx`        | User avatar                                          |
-| Table        | `shared/components/ui/table.tsx`         | Dashboard MembersTable                               |
-| Tabs         | `shared/components/ui/tabs.tsx`          | Settings + org management tabs, dashboard team panel |
-| Select       | `shared/components/ui/select.tsx`        | Role filters, pickers                                |
-| Switch       | `shared/components/ui/switch.tsx`        | MFA / preference toggles                             |
-| Skeleton     | `shared/components/ui/skeleton.tsx`      | Loading placeholders (QueryBoundary)                 |
-| Popover      | `shared/components/ui/popover.tsx`       | Org switcher, light menus                            |
-| Chart        | `shared/components/ui/chart.tsx`         | Recharts wrapper (replaces @nivo)                    |
-| Progress     | `shared/components/ui/progress.tsx`      | Profile completeness meter                           |
-| Textarea     | `shared/components/ui/textarea.tsx`      | Bio / multi-line inputs (forwards ref for RHF)       |
+| Component    | Path                                     | Used for                                       |
+| ------------ | ---------------------------------------- | ---------------------------------------------- |
+| Button       | `shared/components/ui/button.tsx`        | Actions, submit, Google sign-in, nav           |
+| Input        | `shared/components/ui/input.tsx`         | Text fields, search                            |
+| Label        | `shared/components/ui/label.tsx`         | Form labels                                    |
+| Card         | `shared/components/ui/card.tsx`          | Dashboard cards, content blocks                |
+| Dialog       | `shared/components/ui/dialog.tsx`        | Modals, SessionTimeoutDialog                   |
+| AlertDialog  | `shared/components/ui/alert-dialog.tsx`  | Confirmations                                  |
+| DropdownMenu | `shared/components/ui/dropdown-menu.tsx` | User menu, actions                             |
+| Tooltip      | `shared/components/ui/tooltip.tsx`       | Hints                                          |
+| Checkbox     | `shared/components/ui/checkbox.tsx`      | Settings, tables                               |
+| Separator    | `shared/components/ui/separator.tsx`     | Visual separation                              |
+| Badge        | `shared/components/ui/badge.tsx`         | Status, counts                                 |
+| Avatar       | `shared/components/ui/avatar.tsx`        | User avatar                                    |
+| Table        | `shared/components/ui/table.tsx`         | Dashboard MembersTable                         |
+| Select       | `shared/components/ui/select.tsx`        | Role filters, pickers                          |
+| Switch       | `shared/components/ui/switch.tsx`        | MFA / preference toggles                       |
+| Skeleton     | `shared/components/ui/skeleton.tsx`      | Loading placeholders (QueryBoundary)           |
+| Popover      | `shared/components/ui/popover.tsx`       | Org switcher, light menus                      |
+| Chart        | `shared/components/ui/chart.tsx`         | Recharts wrapper (replaces @nivo)              |
+| Progress     | `shared/components/ui/progress.tsx`      | Profile completeness meter                     |
+| Textarea     | `shared/components/ui/textarea.tsx`      | Bio / multi-line inputs (forwards ref for RHF) |
 
 Other shared pieces: **FormError**, **FormField** (forms), **FullPageSpinner**, **RetryError**, **QueryBoundary** (query loading/error wrapper), **DataTable** (rows on one CSS grid with the fold engine, phone rows, selection + bulk bar, virtualised infinite lists, rows grouped under sticky headers; plus its column header, toolbar, pagination, column chooser, saved views and row actions), **InviteMemberDialog**, **CreateOrganizationDialog**, **OrganizationSwitcher**, **OrganizationBadges**, **SettingsModal** (global, hash-driven), **CommandPalette** (cmdk), **PermissionGuard**. Layouts: **AuthLayout** (mounted by the pathless `auth-shell` route), **AppLayout** (mounted by the `$organizationSlug` island); the root shell lives in `app/routes/routeTree.tsx`.
 

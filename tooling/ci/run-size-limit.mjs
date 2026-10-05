@@ -352,7 +352,7 @@ const config = [
            * the placeholder Items page's own heading gave way to the room
            * toolbar's); L-39b and L-39c nothing.
            *
-           * 43.7 → 43.6 kB, lowered (L-54): measured 43.30 kB. The rows since
+           * 43.7 → 43 kB, lowered (L-54): measured 42.68 kB. The rows since
            * 43.7 was set — the Invoice drawer and Medical flows, the patient
            * file's record drawers, notes and overview, the purchase quick
            * lines, the one in-place skeleton look (which took the calendars'
@@ -363,9 +363,13 @@ const config = [
            * no longer scans `shared/components/PrintTemplate/`, whose own
            * `print-template.css` loads with the chunks that print (the two
            * token variants only the sheets use stay here, in its
-           * `@source inline(…)`). ~0.3 kB of headroom.
+           * `@source inline(…)`). The shadcn parts L-07 added that no screen
+           * composed — `tabs`, `scroll-area` and `resizable` whole, the
+           * sheet's and drawer's header, footer and close, the command
+           * shortcut, the radio item, the toggle — left with knip's pass
+           * (−0.62 kB). ~0.3 kB of headroom.
            */
-          limit: '43.6 kB',
+          limit: '43 kB',
           gzip: true,
         },
       ]
