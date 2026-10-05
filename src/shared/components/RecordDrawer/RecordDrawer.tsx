@@ -84,7 +84,10 @@ export interface RecordDrawerProps {
    */
   initialFocusRef?: RefObject<HTMLElement | null>;
   badges?: readonly DrawerBadge[];
-  /** Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer. */
+  /**
+   * Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer,
+   * but for a chip that opens another record (`keepWhenReadOnly`).
+   */
   quickFill?: readonly QuickFillItem[];
   /**
    * A strip under the Quick fill row that stays put while the body scrolls —
@@ -147,7 +150,10 @@ export interface RecordDrawerProps {
   flushBody?: boolean;
   /** Footer summary (ellipsis; a phone gives it its own last row). */
   summary?: string;
-  /** View only: "Close", no Save / Delete / Quick fill, and the read-only note. */
+  /**
+   * View only: "Close", no Save / Delete, no Quick fill but a chip that opens
+   * another record (`keepWhenReadOnly`), and the read-only note.
+   */
   readOnly?: boolean;
   /** A child stacked on a parent drawer: the close button reads "Back". */
   stacked?: boolean;
@@ -453,7 +459,9 @@ export function RecordDrawer(props: RecordDrawerProps) {
       />
       <DrawerBadges badges={props.badges ?? []} testId={testId} />
       <QuickFillRow
-        items={props.readOnly ? [] : (props.quickFill ?? [])}
+        items={(props.quickFill ?? []).filter(
+          (item) => !props.readOnly || item.keepWhenReadOnly,
+        )}
         testId={testId}
       />
       <DrawerStrip testId={`${testId}-header-strip`} className="px-(--drawer-pad-x) pt-3">

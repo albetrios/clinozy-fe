@@ -59,7 +59,8 @@ export interface TreatmentDrawerProps {
   canDelete: boolean;
   /**
    * An edit's ⚡ "Log check-in" (`patient-file.md:278`): opens the check-in
-   * drawer for this treatment, stacked over this one. Absent — no chip (a new
+   * drawer for this treatment, stacked over this one — on a read-only drawer
+   * too, the check-in being Patients Edit's. Absent — no chip (a new
    * treatment, or a member who may not check in).
    */
   onLogCheckIn?: () => void;
@@ -93,6 +94,9 @@ function quickFillItems({
       id: 'check-in',
       label: t(K.quickFill.checkIn),
       tone: 'sage',
+      // A check-in is its own record (Patients Edit): offered on a read-only
+      // drawer too, as the row's "Check-in" is.
+      keepWhenReadOnly: true,
       onSelect: onLogCheckIn,
     });
   }

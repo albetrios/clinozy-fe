@@ -22,7 +22,7 @@ export function SectionChip({ entry }: { entry: SectionBarEntry | null }) {
       data-testid="section-chip"
       title={label}
       className={cn(
-        'inline-flex h-7 min-w-0 flex-[0_1_auto] items-center rounded-lg px-2.5 text-sm font-semibold tracking-[-0.01em] whitespace-nowrap md:hidden',
+        'inline-flex h-7 min-w-0 flex-initial items-center rounded-lg px-2.5 text-sm font-semibold tracking-[-0.01em] whitespace-nowrap md:hidden',
         TONE_CLASSES[entry.tone].surface,
       )}
     >

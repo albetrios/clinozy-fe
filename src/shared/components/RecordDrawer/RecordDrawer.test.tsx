@@ -533,6 +533,29 @@ describe('RecordDrawer — saving', () => {
     expect(screen.queryByTestId('pt-delete')).not.toBeInTheDocument();
     expect(screen.queryByTestId('pt-quick-fill')).not.toBeInTheDocument();
   });
+
+  it('keeps, view only, a Quick fill chip that opens another record — and only that one', async () => {
+    const u = user();
+    const onCheckIn = vi.fn();
+    renderWithProviders(
+      <Harness
+        startOpen
+        readOnly
+        quickFill={[
+          {
+            id: 'check-in',
+            label: 'Log check-in',
+            keepWhenReadOnly: true,
+            onSelect: onCheckIn,
+          },
+          { id: 'preset', label: 'Preset', onSelect: vi.fn() },
+        ]}
+      />,
+    );
+    await u.click(await screen.findByTestId('pt-quick-fill-check-in'));
+    expect(onCheckIn).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('pt-quick-fill-preset')).not.toBeInTheDocument();
+  });
 });
 
 describe('RecordDrawer — phone (below md)', () => {

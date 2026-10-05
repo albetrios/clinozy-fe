@@ -85,7 +85,11 @@ function useTreatmentDrawerData(patientId: string) {
 /**
  * An edit's ⚡ "Log check-in" (`patient-file.md:278, 291`): the aftercare
  * check-in for this treatment, stacked over its drawer; Back returns to the
- * treatment, whose feedback line then names the check-in.
+ * treatment, whose feedback line then names the check-in. An aftercare
+ * check-in follows the treatment (`treatmentId`) and is taken at no visit, so
+ * it carries no booking — `appointmentId` names the visit a "Visit check-in"
+ * is taken at — as the row's "Check-in" and the aftercare call's "Doing well"
+ * write it.
  */
 function TreatmentCheckIn({
   treatment,
@@ -102,7 +106,7 @@ function TreatmentCheckIn({
       patientId={patientId}
       patientName={patientName(file.patient)}
       checkIn={null}
-      appointmentId={treatment.appointmentId}
+      appointmentId={null}
       treatmentId={treatment.id}
       today={today}
       stacked

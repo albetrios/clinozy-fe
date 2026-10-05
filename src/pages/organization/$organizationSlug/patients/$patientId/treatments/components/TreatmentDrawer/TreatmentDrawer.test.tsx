@@ -191,6 +191,23 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(screen.getByTestId('treatment-drawer')).toBeInTheDocument();
   });
 
+  it('saves the stacked check-in as the treatment’s aftercare — no booking, as the row’s “Check-in” writes it', async () => {
+    const user = userEvent.setup();
+    renderPatientFile(url(`/${LHR}/edit`), { role: 'doctor' });
+    const drawer = await screen.findByTestId('treatment-drawer');
+    await user.click(within(drawer).getByTestId('treatment-drawer-quick-fill-check-in'));
+    const checkIn = await screen.findByTestId('check-in-drawer');
+    await user.click(within(checkIn).getByTestId('check-in-drawer-feel-much_better'));
+    await user.click(within(checkIn).getByTestId('check-in-drawer-save'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('check-in-drawer')).not.toBeInTheDocument(),
+    );
+    const saved = clinicFixtures.checkIns.snapshot(
+      (row) => row.treatmentId === LHR && row.feel === 'much_better',
+    );
+    expect(saved).toEqual([expect.objectContaining({ appointmentId: null })]);
+  });
+
   it('offers no "Log check-in" on a new treatment', async () => {
     const { drawer } = await openNew();
     expect(
@@ -199,11 +216,21 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
   });
 
   it('reads only for an Admin — treatments are Doctor and Therapist (S:39)', async () => {
+    const user = userEvent.setup();
     renderPatientFile(url(`/${LHR}/edit`), { role: 'admin' });
     const drawer = await screen.findByTestId('treatment-drawer');
     expect(within(drawer).queryByTestId('treatment-drawer-save')).not.toBeInTheDocument();
     expect(within(drawer).getByTestId('treatment-drawer-summary')).toHaveTextContent(
       'View only · your role can’t change this',
     );
+    // A check-in is Patients Edit's, as on the row: ⚡ "Log check-in" stays, alone.
+    const fill = within(drawer).getByTestId('treatment-drawer-quick-fill');
+    expect(
+      within(fill)
+        .getAllByRole('button')
+        .map((chip) => chip.textContent),
+    ).toEqual(['Log check-in']);
+    await user.click(within(fill).getByTestId('treatment-drawer-quick-fill-check-in'));
+    expect(await screen.findByTestId('check-in-drawer')).toBeInTheDocument();
   });
 });

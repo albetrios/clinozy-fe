@@ -19,6 +19,12 @@ export interface QuickFillItem {
   tone?: Tone;
   /** What the preset fills in, as the chip's tooltip. */
   description?: string;
+  /**
+   * The chip opens another record rather than prefilling this form (the
+   * Treatment drawer's "Log check-in"): it stays on a read-only drawer, offered
+   * by the screen only to a member who may write that record.
+   */
+  keepWhenReadOnly?: boolean;
   onSelect: () => void;
 }
 
