@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -135,5 +135,41 @@ describe('PersonAvatar', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<PersonAvatar initials="RS" tone="sage" patient />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('PersonAvatar — photo, identity / profile sizes, the user’s Status', () => {
+  it('draws the photo over the initials, and falls back to them if it fails', async () => {
+    const { container } = render(
+      <PersonAvatar
+        initials="AL"
+        tone="stone"
+        size="profile"
+        src="https://signed.test/a.png"
+      />,
+    );
+    const photo = screen.getByTestId('person-avatar-photo');
+    expect(photo).toHaveAttribute('src', 'https://signed.test/a.png');
+    // Decorative like the disc: the caller names the picture beside it.
+    expect(photo).toHaveAttribute('alt', '');
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-16');
+    expect(await axe(container)).toHaveNoViolations();
+
+    fireEvent.error(photo);
+    expect(screen.queryByTestId('person-avatar-photo')).not.toBeInTheDocument();
+    expect(container).toHaveTextContent('AL');
+  });
+
+  it.each([
+    ['online', 'bg-presence-online'],
+    ['away', 'bg-tone-butter-dot'],
+    ['busy', 'bg-now-indicator'],
+    ['offline', 'bg-border-strong'],
+  ] as const)('paints the %s dot', (presence, fill) => {
+    const { container } = render(
+      <PersonAvatar initials="RV" tone="sky" size="identity" presence={presence} />,
+    );
+    expect(container.querySelector(`[data-presence="${presence}"]`)).toHaveClass(fill);
+    expect(container.querySelector('[data-slot="avatar"]')).toHaveClass('size-10');
   });
 });

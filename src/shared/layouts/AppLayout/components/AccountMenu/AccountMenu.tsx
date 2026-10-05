@@ -6,7 +6,11 @@ import { cn } from '@/lib/utils.ts';
 import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { ROLE_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { ROLE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { OrganizationSwitcher } from '@/shared/components/OrganizationSwitcher/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import type { SettingsSection } from '@/shared/components/SettingsModal/settings-sections.ts';
@@ -64,50 +68,6 @@ const THEME_OPTIONS = [
 /** A radio pill: the menu's radio item laid out as a 28px chip (its dot indicator hidden). */
 const radioPillClassName =
   'data-[state=checked]:bg-muted data-[state=checked]:border-disabled h-7 gap-1.5 rounded-full border border-border px-2.5 text-xs font-medium focus:bg-muted [&>span:first-child]:hidden';
-
-function initialsOf(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function Avatar({
-  initials,
-  toneClassName,
-  dotClassName,
-  size,
-}: {
-  initials: string;
-  toneClassName: string;
-  dotClassName: string;
-  size: 'header' | 'menu';
-}) {
-  return (
-    <span
-      data-slot="pill"
-      className={cn(
-        'relative flex flex-none items-center justify-center rounded-full font-semibold',
-        size === 'header' ? 'text-caption size-8' : 'text-body size-10',
-        toneClassName,
-      )}
-    >
-      {initials}
-      <span
-        data-slot="pill"
-        aria-hidden
-        className={cn(
-          'border-card absolute end-0 bottom-0 rounded-full border-2',
-          size === 'header' ? 'size-2.5' : 'size-3',
-          dotClassName,
-        )}
-      />
-    </span>
-  );
-}
 
 function MenuRow({
   icon: Icon,
@@ -351,13 +311,13 @@ export function AccountMenu({
 
   const name = user?.name ?? user?.email ?? t(LAYOUT_KEYS.app.userFallback);
   const [mainRole] = roles;
-  const tone = TONE_CLASSES[mainRole ? ROLE_TONES[mainRole] : 'stone'];
-  const avatar = (size: 'header' | 'menu') => (
-    <Avatar
-      initials={initialsOf(name)}
-      toneClassName={tone.surface}
-      dotClassName={PRESENCE_DOT[presence]}
+  const tone = mainRole ? ROLE_TONES[mainRole] : 'stone';
+  const avatar = (size: 'cell' | 'identity') => (
+    <PersonAvatar
+      initials={personInitials(name)}
+      tone={tone}
       size={size}
+      presence={presence}
     />
   );
 
@@ -376,7 +336,7 @@ export function AccountMenu({
               : 'hover:shadow-[0_0_0_2px_var(--color-card),0_0_0_3.5px_var(--color-border-strong)]',
           )}
         >
-          {avatar('header')}
+          {avatar('cell')}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -398,7 +358,7 @@ export function AccountMenu({
         <IdentityBlock
           name={name}
           email={user?.email}
-          avatar={avatar('menu')}
+          avatar={avatar('identity')}
           onOpenProfile={() =>
             void navigate({ to: '.', hash: settingsHash('account', 'profile') })
           }

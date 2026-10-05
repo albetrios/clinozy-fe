@@ -45,6 +45,8 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     `useUnsavedChangesGuard`. Never a raw `ui/alert-dialog` in a surface.
   - A search box → `RoomSearch` (a room list, wired to the URL's `q`) or its field
     `RoomSearchField` (`layout="fill"` never folds — Settings). Never `Input` + an icon.
+  - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
+    photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - Toasts → `notify` (`@/shared/notify`) — one design, the clinic bar, bottom-centre;
     never `sonner` directly.
 

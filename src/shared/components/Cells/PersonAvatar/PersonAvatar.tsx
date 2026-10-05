@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -22,8 +23,10 @@ const BADGE_TEXT = 'text-[length:calc(var(--text-xs)*2/3)]';
  * popover's rows (10.5px, H:1786); `cell` 32px in table person cells (11px, 14px "P"
  * badge, H:683); `header` 34px in the chat column's contact header (11.5px,
  * 14px badge, H:1830); `strip` 38px in the lead drawer's contact strip (12px,
- * H:1759); `field` 36px in form pickers (12px, H:2756); `card` 48px in
- * person cards (15px, 16px badge, 12px presence dot; H:2731, H:2872). The
+ * H:1759); `field` 36px in form pickers (12px, H:2756); `identity` 40px in
+ * the Account menu's identity row (13px, 12px presence dot; H:545–551);
+ * `card` 48px in person cards (15px, 16px badge, 12px presence dot; H:2731,
+ * H:2872); `profile` 64px for the user's own photo in Settings. The
  * sub-scale sizes derive from `--text-xs` so the Type scale axis moves them.
  */
 const AVATAR_SIZES = {
@@ -89,19 +92,41 @@ const AVATAR_SIZES = {
     badge: cn('size-3.5 -end-0.5 -bottom-0.5', BADGE_TEXT),
     presence: 'size-2.5 end-0 bottom-0',
   },
+  identity: {
+    root: 'size-10',
+    initials: 'text-body',
+    badge: cn('size-4 -end-0.75 -bottom-0.75', BADGE_TEXT),
+    presence: 'size-3 end-0 bottom-0',
+  },
   card: {
     root: 'size-12',
     initials: 'text-title',
     badge: cn('size-4 -end-0.75 -bottom-0.75', BADGE_TEXT),
     presence: 'size-3 end-px bottom-px',
   },
+  profile: {
+    root: 'size-16',
+    initials: 'text-xl',
+    badge: cn('size-5 -end-0.5 -bottom-0.5', BADGE_TEXT),
+    presence: 'size-3.5 end-0.5 bottom-0.5',
+  },
 } as const;
 
-/** One of the design's avatar sizes: 16, 18, 22, 26, 28, 30, 32, 34, 36, 38 or 48px. */
+/** One of the design's avatar sizes: 16, 18, 22, 26, 28, 30, 32, 34, 36, 38, 40, 48 or 64px. */
 export type PersonAvatarSize = keyof typeof AVATAR_SIZES;
 
-/** Presence as a person card shows it (`presence-online`, else `border-strong`). */
-export type PersonPresence = 'online' | 'offline';
+/**
+ * Presence as the dot shows it: a person card's online / offline, and the
+ * signed-in user's own Status (online, away, busy — Appendix E: Busy `--k89`).
+ */
+export type PersonPresence = 'online' | 'offline' | 'away' | 'busy';
+
+const PRESENCE_DOT: Readonly<Record<PersonPresence, string>> = {
+  online: 'bg-presence-online',
+  offline: 'bg-border-strong',
+  away: 'bg-tone-butter-dot',
+  busy: 'bg-now-indicator',
+};
 
 /** Props for {@link PersonAvatar}: initials, tone, size and the badge or dot. */
 export interface PersonAvatarProps {
@@ -117,8 +142,13 @@ export interface PersonAvatarProps {
    * mark them (`k126`, H:5929). `patient` wins when both are set.
    */
   lead?: boolean;
-  /** Adds the presence dot (person cards). */
+  /** Adds the presence dot (person cards, the user's own avatar). */
   presence?: PersonPresence;
+  /**
+   * The person's photo, over the initials: they show while it loads and if it
+   * fails. Decorative like the disc — name it beside the avatar.
+   */
+  src?: string | null;
   /**
    * A picked person: a 1.5px ring in the tone's ink, 2px off the disc (the
    * Leads Team filter and the people popover's assignee, H:1714, H:1786).
@@ -139,11 +169,15 @@ export function PersonAvatar({
   patient = false,
   lead = false,
   presence,
+  src,
   selected = false,
   className,
 }: PersonAvatarProps) {
   const { t } = useTranslation(CELLS_NS);
   const sizing = AVATAR_SIZES[size];
+  // The photo that failed to load: its initials stay, until the src changes.
+  const [broken, setBroken] = useState<string | null>(null);
+  const photo = src && src !== broken ? src : null;
   return (
     <span
       aria-hidden="true"
@@ -164,6 +198,15 @@ export function PersonAvatar({
         >
           {initials}
         </AvatarFallback>
+        {photo ? (
+          <img
+            src={photo}
+            alt=""
+            data-testid="person-avatar-photo"
+            onError={() => setBroken(photo)}
+            className="absolute inset-0 size-full object-cover"
+          />
+        ) : null}
       </Avatar>
       {patient || lead ? (
         <span
@@ -184,7 +227,7 @@ export function PersonAvatar({
           data-presence={presence}
           className={cn(
             'border-card absolute rounded-full border-2',
-            presence === 'online' ? 'bg-presence-online' : 'bg-border-strong',
+            PRESENCE_DOT[presence],
             sizing.presence,
           )}
         />

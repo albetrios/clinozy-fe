@@ -12,6 +12,10 @@ import {
   type OrgRole,
 } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { InviteMemberDialog } from '@/shared/components/InviteMemberDialog/index.ts';
@@ -23,7 +27,6 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
-import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Card } from '@/shared/components/ui/card.tsx';
@@ -64,17 +67,6 @@ import {
 import { OrgListControls } from './OrgListControls.tsx';
 import { useUsersRoomOpen } from './users-room-open.ts';
 import { UsersRoomLink } from './UsersRoomLink.tsx';
-
-function initials(name: string): string {
-  const letters = name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part.charAt(0))
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-  return letters || '?';
-}
 
 function statusVariant(
   status: Member['status'],
@@ -348,9 +340,11 @@ function MemberRow({
 
   return (
     <li className="flex items-center gap-3 p-3">
-      <Avatar className="size-9">
-        <AvatarFallback className="text-xs">{initials(member.name)}</AvatarFallback>
-      </Avatar>
+      <PersonAvatar
+        initials={personInitials(member.name) || '?'}
+        tone="stone"
+        size="field"
+      />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{member.name}</p>
         {member.email !== member.name ? (

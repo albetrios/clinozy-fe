@@ -392,6 +392,7 @@ Rendered inside any room; scope them to the room's own container in a spec.
 | `team-card` · `team-card-assign`                                                      | Team card (`role="dialog"`, named by the member) · its assign button                                     | `shared/components/PersonCard/TeamCard/`      |
 | `skeleton-rows` · `skeleton-row`                                                      | Flat skeleton block · one placeholder row                                                                | `shared/components/SkeletonRows/`             |
 | `patient-badge` · `avatar-stack-more`                                                 | The "P" patient badge · an avatar stack's "+N" pill                                                      | `shared/components/Cells/`                    |
+| `person-avatar-photo`                                                                 | A person's photo over their initials (`PersonAvatar` `src`; the Settings profile preview)                | `shared/components/Cells/`                    |
 
 ---
 

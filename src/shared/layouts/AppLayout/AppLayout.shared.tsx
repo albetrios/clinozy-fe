@@ -10,11 +10,14 @@ import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
 import { ProductMark, ProductWordmark } from '@/shared/components/ProductMark/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
-import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
@@ -228,13 +231,7 @@ export function UserMenu({
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
   const initials = user?.name
-    ? user.name
-        .split(' ')
-        .filter(Boolean)
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+    ? personInitials(user.name)
     : (user?.email?.slice(0, 2).toUpperCase() ?? '??');
 
   const handleLogout = async () => {
@@ -254,11 +251,7 @@ export function UserMenu({
           aria-label={t(LAYOUT_KEYS.app.userMenu)}
           data-testid="user-menu-trigger"
         >
-          <Avatar className="ring-border size-8 ring-1">
-            <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <PersonAvatar initials={initials} tone="stone" size="cell" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} side={side} className="w-56">

@@ -9,6 +9,10 @@ import {
   type UploadImageContentType,
 } from '@/shared/api/uploads-api.ts';
 import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
@@ -99,7 +103,6 @@ function AvatarCard({ name }: { name: string }) {
   const uploadAvatar = useUploadUserAvatar();
   const removeAvatar = useRemoveUserAvatar();
   const busy = uploadAvatar.isPending || removeAvatar.isPending;
-  const initial = (name || '?').charAt(0).toUpperCase();
 
   function onAvatarFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -127,20 +130,21 @@ function AvatarCard({ name }: { name: string }) {
         <CardDescription>{t(profile.avatarDescription)}</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center gap-4">
+        {/* The shared avatar is decorative; this frame names the picture. */}
         <div
-          data-slot="pill"
-          className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full"
+          role="img"
+          aria-label={
+            name ? t(profile.avatarAlt, { name }) : t(profile.avatarAltFallback)
+          }
+          className="shrink-0"
           data-testid="user-avatar-preview"
         >
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={name ? t(profile.avatarAlt, { name }) : t(profile.avatarAltFallback)}
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xl font-semibold">{initial}</span>
-          )}
+          <PersonAvatar
+            initials={personInitials(name) || '?'}
+            tone="stone"
+            size="profile"
+            src={avatarUrl}
+          />
         </div>
         <div className="flex flex-wrap gap-2">
           <input
