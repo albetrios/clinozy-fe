@@ -3023,6 +3023,7 @@ clinozy-fe/
 │   │   ├── check-api-contract-drift.mjs
 │   │   ├── check-css-sources.mjs
 │   │   ├── check-doc-staleness.mjs
+│   │   ├── check-entry-routes.mjs
 │   │   ├── check-no-sourcemaps.mjs
 │   │   ├── check-patch-coverage.mjs
 │   │   ├── check-preload-graph.mjs
@@ -3032,7 +3033,7 @@ clinozy-fe/
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
 │   │   ├── strip-sourcemaps.mjs
-│   │   └── [4 test files]
+│   │   └── [5 test files]
 │   ├── codegen/
 │   │   └── clinic-schema.mjs
 │   ├── dev/

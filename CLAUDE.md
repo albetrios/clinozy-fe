@@ -337,7 +337,7 @@ Family-shared is importable by the parent island and its descendants only — ne
 - Use `type` imports for type-only imports: `import type { User } from './types.ts'`
 - **Icons:** import from `@/shared/icons/index.ts` — never `lucide-react` directly (eslint-enforced; vendored `components/ui/` is exempt). One-file icon-library swap.
 - **Heavy deferred modules** (`@sentry/react`, `posthog-js`, the SettingsModal/CommandPalette trees) are **dynamic-import only** — a single static import drags their chunk onto the first-paint preload path (`pnpm build:check` tripwires this).
-- **`routeTree.tsx` IS the entry chunk.** A surface the root route mounts exports **only its lazy shell** from its barrel (`SettingsModalLazy`, `AppearanceDialogLazy`, `ConsentBannerLazy`), and an entry-resident module never imports a large constants table for a few keys — declare them locally and pin them with a drift test. Attribution method + the other levers: `agent-os/skills/fe-bundle-performance/SKILL.md`.
+- **`routeTree.tsx` IS the entry chunk.** A surface the root route mounts exports **only its lazy shell** from its barrel (`SettingsModalLazy`, `AppearanceDialogLazy`, `ConsentBannerLazy`), and an entry-resident module never imports a large constants table for a few keys — declare them locally and pin them with a drift test. A URL-driven dialog route never imports its manifest there — register it with `...dialogRoute(name)`, its manifest and component in `src/app/routes/dialog-routes.ts` — and a room's route builders are imported by their own path (`@/lib/routes/<room>-builders.ts`), never through the `@/lib/routes/index.ts` barrel; `pnpm build:check` trips on either. Attribution method + the other levers: `agent-os/skills/fe-bundle-performance/SKILL.md`.
 
 ```tsx
 // Good

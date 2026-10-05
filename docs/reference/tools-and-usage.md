@@ -124,6 +124,9 @@ Further gates, all mirroring clinozy-be:
 - **Preload graph** (`pnpm build:check`, after `pnpm build`) — deferred chunks
   (sentry/posthog/cmdk/rhf/charts) must never re-enter `dist/index.html`'s modulepreload list;
   one static import anywhere in the entry graph silently drags them onto the first-paint path.
+  The same gate keeps route weight off the entry (`tooling/ci/check-entry-routes.mjs`): no path a
+  dialog route's manifest or a room's builder module spells may reach the first-paint chunks —
+  dialog manifests load with `src/app/routes/dialog-routes.ts`, room builders by their own path.
 - **Icon barrel** (`@/shared/icons`) — every app icon import flows through one file (eslint
   `no-restricted-imports`), so swapping the icon library is a one-file change.
 - **Contract drift** (`pnpm contracts:drift`) — every backend endpoint this app references
