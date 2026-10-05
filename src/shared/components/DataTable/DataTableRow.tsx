@@ -45,6 +45,9 @@ const FLEX_ROW = 'flex flex-wrap items-center gap-x-3 gap-y-1.5';
 const STICKY_ACTIONS =
   'sticky end-0 z-1 flex items-center justify-end self-stretch bg-inherit shadow-[-8px_0_8px_-8px_oklch(0_0_0/0.08)] rtl:shadow-[8px_0_8px_-8px_oklch(0_0_0/0.08)]';
 
+/** Which colour of a row's tone paints its 3px status edge: the ink or the dot. */
+export type RowEdge = 'ink' | 'dot';
+
 /** Everything a row needs from its table, computed once per table render. */
 export interface RowContext<TData extends RowData> {
   prefix: string;
@@ -72,6 +75,8 @@ export interface RowContext<TData extends RowData> {
   selection: TableSelection<TData>;
   onRowClick?: (row: TableRow<TData>) => void;
   getRowTone?: (row: TableRow<TData>) => Tone | undefined;
+  /** The status edge in the tone's ink or its dot colour. */
+  rowEdge: RowEdge;
   /** The open record's row keeps the `muted` fill. */
   isRowActive?: (row: TableRow<TData>) => boolean;
   keyboardNav: boolean;
@@ -364,6 +369,12 @@ function rowLayoutClass<TData extends RowData>(context: RowContext<TData>): stri
   return FLEX_ROW;
 }
 
+/** The 3px status edge: transparent without a tone, else its ink or its dot. */
+function edgeClass(tone: Tone | undefined, edge: RowEdge): string {
+  if (!tone) return 'border-s-transparent';
+  return edge === 'dot' ? TONE_CLASSES[tone].edgeDot : TONE_CLASSES[tone].edge;
+}
+
 function RowCells<TData extends RowData>({
   row,
   index,
@@ -445,7 +456,7 @@ export function DataTableRow<TData extends RowData>({
       className={cn(
         ROW_BASE,
         rowLayoutClass(context),
-        tone ? TONE_CLASSES[tone].edge : 'border-s-transparent',
+        edgeClass(tone, context.rowEdge),
         onRowClick && 'cursor-pointer',
       )}
     >

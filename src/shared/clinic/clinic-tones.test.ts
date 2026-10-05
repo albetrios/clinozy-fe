@@ -146,9 +146,10 @@ describe('list-row states', () => {
     }
   });
 
-  it('draws a row’s inline-start status edge in the tone’s dot colour', () => {
+  it('draws a row’s inline-start status edge in the tone’s ink (preset.md:192), or its dot', () => {
     for (const tone of TONE_VALUES) {
-      expect(TONE_CLASSES[tone].edge).toBe(`border-s-tone-${tone}-dot`);
+      expect(TONE_CLASSES[tone].edge).toBe(`border-s-tone-${tone}-foreground`);
+      expect(TONE_CLASSES[tone].edgeDot).toBe(`border-s-tone-${tone}-dot`);
     }
   });
 });

@@ -322,8 +322,18 @@ export interface ToneClasses {
   active: string;
   /** A picked list row: the tone at 70%. */
   picked: string;
-  /** A row's 3px inline-start status edge in the tone's dot colour (`border-s-3` on the row). */
+  /**
+   * A row's 3px inline-start status edge in the tone's ink (`border-s-3` on the
+   * row): the preset's rule — "transparent unless a screen gives it a tone ink"
+   * (`preset.md:192`) — and every room table's `bar` (H:4700, H:5108, H:5254,
+   * H:5334, H:5464) and the calendar blocks' (H:5929).
+   */
   edge: string;
+  /**
+   * The same edge in the tone's dot colour — the rows that the design paints
+   * with the dot: Leads (H:5643), the Agenda (H:5913) and Tasks (H:4274).
+   */
+  edgeDot: string;
 }
 
 /**
@@ -345,7 +355,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-butter/55',
     picked: 'bg-tone-butter/70',
 
-    edge: 'border-s-tone-butter-dot',
+    edge: 'border-s-tone-butter-foreground',
+    edgeDot: 'border-s-tone-butter-dot',
   },
   lav: {
     bg: 'bg-tone-lav',
@@ -361,7 +372,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-lav/55',
     picked: 'bg-tone-lav/70',
 
-    edge: 'border-s-tone-lav-dot',
+    edge: 'border-s-tone-lav-foreground',
+    edgeDot: 'border-s-tone-lav-dot',
   },
   sky: {
     bg: 'bg-tone-sky',
@@ -377,7 +389,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-sky/55',
     picked: 'bg-tone-sky/70',
 
-    edge: 'border-s-tone-sky-dot',
+    edge: 'border-s-tone-sky-foreground',
+    edgeDot: 'border-s-tone-sky-dot',
   },
   sage: {
     bg: 'bg-tone-sage',
@@ -393,7 +406,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-sage/55',
     picked: 'bg-tone-sage/70',
 
-    edge: 'border-s-tone-sage-dot',
+    edge: 'border-s-tone-sage-foreground',
+    edgeDot: 'border-s-tone-sage-dot',
   },
   blush: {
     bg: 'bg-tone-blush',
@@ -409,7 +423,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-blush/55',
     picked: 'bg-tone-blush/70',
 
-    edge: 'border-s-tone-blush-dot',
+    edge: 'border-s-tone-blush-foreground',
+    edgeDot: 'border-s-tone-blush-dot',
   },
   mint: {
     bg: 'bg-tone-mint',
@@ -425,7 +440,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-mint/55',
     picked: 'bg-tone-mint/70',
 
-    edge: 'border-s-tone-mint-dot',
+    edge: 'border-s-tone-mint-foreground',
+    edgeDot: 'border-s-tone-mint-dot',
   },
   peach: {
     bg: 'bg-tone-peach',
@@ -441,7 +457,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-peach/55',
     picked: 'bg-tone-peach/70',
 
-    edge: 'border-s-tone-peach-dot',
+    edge: 'border-s-tone-peach-foreground',
+    edgeDot: 'border-s-tone-peach-dot',
   },
   plum: {
     bg: 'bg-tone-plum',
@@ -457,7 +474,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-plum/55',
     picked: 'bg-tone-plum/70',
 
-    edge: 'border-s-tone-plum-dot',
+    edge: 'border-s-tone-plum-foreground',
+    edgeDot: 'border-s-tone-plum-dot',
   },
   lime: {
     bg: 'bg-tone-lime',
@@ -473,7 +491,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-lime/55',
     picked: 'bg-tone-lime/70',
 
-    edge: 'border-s-tone-lime-dot',
+    edge: 'border-s-tone-lime-foreground',
+    edgeDot: 'border-s-tone-lime-dot',
   },
   slate: {
     bg: 'bg-tone-slate',
@@ -489,7 +508,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-slate/55',
     picked: 'bg-tone-slate/70',
 
-    edge: 'border-s-tone-slate-dot',
+    edge: 'border-s-tone-slate-foreground',
+    edgeDot: 'border-s-tone-slate-dot',
   },
   stone: {
     bg: 'bg-tone-stone',
@@ -505,7 +525,8 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     active: 'data-[selected=true]:bg-tone-stone/55',
     picked: 'bg-tone-stone/70',
 
-    edge: 'border-s-tone-stone-dot',
+    edge: 'border-s-tone-stone-foreground',
+    edgeDot: 'border-s-tone-stone-dot',
   },
 };
 

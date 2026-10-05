@@ -30,16 +30,6 @@ import {
   type AppointmentStatusView,
 } from '../AppointmentStatusPopover/index.ts';
 
-/** The block's 3px inline-start edge in its status's ink (H:2063) — literal classes for Tailwind. */
-const STATUS_EDGE: Readonly<Record<AppointmentStatus, string>> = {
-  scheduled: 'border-s-tone-butter-foreground',
-  confirmed: 'border-s-tone-sky-foreground',
-  checked_in: 'border-s-tone-lav-foreground',
-  completed: 'border-s-tone-sage-foreground',
-  cancelled: 'border-s-tone-stone-foreground',
-  no_show: 'border-s-tone-blush-foreground',
-};
-
 /**
  * Each variant's box: placed on the column; a Month line — 22px, so with the
  * cell's 4px gap each takes the 26px `monthFit` counts in (H:5938); a popover
@@ -75,7 +65,8 @@ function blockClassName(
     'border-border text-foreground text-micro box-border flex min-w-0 content-start items-center gap-x-1.25 gap-y-0.75 overflow-hidden rounded-lg border border-s-3 px-1.5 text-start leading-[1.25] transition-[background-color,box-shadow] duration-150',
     'hover:bg-card hover:shadow-(--elevation-menu)',
     TONE_CLASSES[APPOINTMENT_STATUS_TONES[status]].bg,
-    STATUS_EDGE[status],
+    // The 3px inline-start edge in the status's ink (H:2063, H:5929).
+    TONE_CLASSES[APPOINTMENT_STATUS_TONES[status]].edge,
     oneLine ? 'flex-nowrap' : 'flex-wrap',
     VARIANT_BOX[variant],
   );

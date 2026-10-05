@@ -174,6 +174,8 @@ export function AppointmentsAgenda() {
         phoneLayout="regrid"
         phoneGridClassName={AGENDA_PHONE_GRID}
         getRowTone={(row) => APPOINTMENT_STATUS_TONES[row.original.status]}
+        // The Agenda's edge is the status dot colour (`appointments.md`, H:5913).
+        rowEdge="dot"
         onRowClick={(row) => actions.open(row.original)}
         groups={{
           keyOf: (row) => row.date,

@@ -83,6 +83,8 @@ export function LeadsTable({
           const { status } = row.original;
           return status ? LEAD_STATUS_TONES[status] : undefined;
         }}
+        // The lead rows' edge is the status dot colour (`leads.md:35`, H:5643).
+        rowEdge="dot"
         empty={empty}
         className="m-(--room-card-margin) flex-1"
       />

@@ -88,6 +88,13 @@ describe('AppointmentsAgenda (KICKOFF §6.4 Agenda)', () => {
     expect(headers[0]?.closest('[role="row"]')?.className).toContain('sticky');
   });
 
+  it('edges each row in its status’s dot colour, unlike the ink of other room tables (H:5913)', async () => {
+    renderAppointmentsRoutes(PAGE, Agenda);
+    const row = await rowWithStatus('Scheduled');
+    expect(row).toHaveClass('border-s-tone-butter-dot');
+    expect(row).not.toHaveClass('border-s-tone-butter-foreground');
+  });
+
   it('shows the columns in the design’s order, the quick view unlabelled', async () => {
     renderAppointmentsRoutes(PAGE, Agenda);
     await rows();

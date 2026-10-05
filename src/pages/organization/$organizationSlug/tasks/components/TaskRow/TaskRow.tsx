@@ -145,7 +145,8 @@ export function TaskRow({
   const Icon = TASK_RULE_ICONS[row.rule];
   const done = row.status === 'done';
   const overdue = isTaskOverdue(row, now);
-  let edge: string = TONE_CLASSES[rule.tone].edge;
+  // The rule's dot colour, as the design's task rows (H:4274).
+  let edge: string = TONE_CLASSES[rule.tone].edgeDot;
   if (overdue) edge = 'border-s-now-indicator';
   if (done) edge = 'border-s-border';
   let dueInk = 'text-foreground-soft font-medium';

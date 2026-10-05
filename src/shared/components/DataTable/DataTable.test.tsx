@@ -653,11 +653,23 @@ describe('DataTable — rows', () => {
     expect(onRowClick).toHaveBeenCalledTimes(2);
   });
 
-  it('paints the 3px status edge in the row’s tone', () => {
+  it('paints the 3px status edge in the row tone’s ink (preset.md:192)', () => {
     render(<Room data={[patient(1)]} getRowTone={() => 'blush'} />);
-    expect(screen.getByTestId('patients-table-row').className).toContain(
-      'border-s-tone-blush-dot',
-    );
+    const row = screen.getByTestId('patients-table-row');
+    expect(row).toHaveClass('border-s-tone-blush-foreground');
+    expect(row).not.toHaveClass('border-s-tone-blush-dot');
+  });
+
+  it('paints the edge in the tone’s dot colour when the table asks for it (Leads, the Agenda)', () => {
+    render(<Room data={[patient(1)]} getRowTone={() => 'blush'} rowEdge="dot" />);
+    const row = screen.getByTestId('patients-table-row');
+    expect(row).toHaveClass('border-s-tone-blush-dot');
+    expect(row).not.toHaveClass('border-s-tone-blush-foreground');
+  });
+
+  it('leaves the edge transparent without a tone', () => {
+    render(<Room data={[patient(1)]} />);
+    expect(screen.getByTestId('patients-table-row')).toHaveClass('border-s-transparent');
   });
 
   it('keeps the actions sticky at the inline end, destructive last after a separator', () => {

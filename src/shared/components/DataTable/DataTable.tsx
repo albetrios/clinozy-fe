@@ -48,7 +48,7 @@ import {
 } from './data-table-layout.ts';
 import { DataTableFooter } from './DataTableFooter.tsx';
 import { DataTableHeaderRow } from './DataTableHeaderRow.tsx';
-import { DataTableRow, type RowContext } from './DataTableRow.tsx';
+import { DataTableRow, type RowContext, type RowEdge } from './DataTableRow.tsx';
 import { DataTableTail } from './DataTableTail.tsx';
 import type { DataTableFeatures } from './table-features.ts';
 import { useRowKeyboardNav } from './useRowKeyboardNav.ts';
@@ -129,6 +129,11 @@ export interface DataTableProps<TData extends RowData> {
   onRowClick?: (row: TableRow<TData>) => void;
   /** The 3px inline-start status edge's tone. */
   getRowTone?: (row: TableRow<TData>) => Tone | undefined;
+  /**
+   * The edge's colour: the tone's ink (default — `preset.md:192`, every room
+   * table's `bar`) or its dot, which Leads (H:5643) and the Agenda (H:5913) use.
+   */
+  rowEdge?: RowEdge;
   /**
    * The row whose record is open in a drawer over the list: it keeps the
    * `muted` fill (`leads.md:35`).
@@ -235,6 +240,7 @@ function buildRowContext<TData extends RowData>(args: {
     selection: args.selection,
     onRowClick: props.onRowClick,
     getRowTone: props.getRowTone,
+    rowEdge: props.rowEdge ?? 'ink',
     isRowActive: props.isRowActive,
     keyboardNav: options.keyboardNav,
     focusIndex: args.focusIndex,
