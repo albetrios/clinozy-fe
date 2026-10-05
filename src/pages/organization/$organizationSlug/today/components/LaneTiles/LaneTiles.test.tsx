@@ -129,10 +129,12 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
       '-mx-3',
       'px-3',
     );
-    // 106px tracks: a 12-hour "since 10:40 AM" fits in one line at 1024.
+    // 106px tracks: a 12-hour "since 10:40 AM" fits in one line at 1024; from
+    // `lg` 114px, so "oldest 12:40 PM" does too at 1280 (seven 125px tiles).
     expect(strip).toHaveClass(
       'md:grid',
       'md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))]',
+      'lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))]',
     );
     expect(screen.getByTestId('today-lane-checkout')).toHaveClass(
       'w-32',

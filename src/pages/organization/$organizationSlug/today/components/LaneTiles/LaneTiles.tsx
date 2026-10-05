@@ -33,9 +33,13 @@ export interface LaneTilesProps {
  * seven buttons in fixed order, the selected one pressed. From `md` a grid of
  * `auto-fill` 106px tracks — the design's 104 fit its 24-hour hints, but at
  * 1024 they make six 105px tiles a row, too narrow for a 12-hour "since 10:40
- * AM" (82px); 106 makes it five 127px tiles, as the design draws that width,
- * while 820 and 1440 keep their rows. Below `md` one snap strip of 128px tiles
- * that bleeds to the screen edges. Each tile: the label in the lane's ink, the
+ * AM" (82px); 106 makes it five 127px tiles, as the design draws that width.
+ * From `lg` the tracks start at 114px, so the widest 12-hour hint ("oldest
+ * 12:40 PM", 86px) stays on one line wherever the row lands: at 1280 seven
+ * 125px tiles (106 made eight 108px tracks there — 81px for the hint), at
+ * 1440 eight 128px tracks. The time itself never breaks (`useClinicClock`
+ * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds to
+ * the screen edges. Each tile: the label in the lane's ink, the
  * count, up to four faces then "+N", and the hint. Lanes outside the member's
  * focus sit at 60%; hover inks the border at once (no transition).
  */
@@ -49,7 +53,7 @@ export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTiles
       role="group"
       aria-label={t(TODAY_KEYS.lanes.label)}
       data-testid={TODAY_TEST_IDS.lanes}
-      className="-mx-3 flex flex-none snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))] md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden"
+      className="-mx-3 flex flex-none snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))] [&::-webkit-scrollbar]:hidden"
     >
       {TODAY_LANES.map((lane) => {
         const cards = lanes[lane];

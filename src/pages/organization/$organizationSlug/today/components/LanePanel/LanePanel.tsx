@@ -108,8 +108,10 @@ function VisitCard({
         className="flex flex-col gap-0.5 rounded-sm text-start"
       >
         <span className="flex items-baseline justify-between gap-1.5">
-          <span className="text-field leading-[normal] font-medium">{card.name}</span>
-          <span className="text-caption text-muted-foreground-strong leading-[normal] tabular-nums">
+          <span className="text-field min-w-0 leading-[normal] font-medium">
+            {card.name}
+          </span>
+          <span className="text-caption text-muted-foreground-strong shrink-0 leading-[normal] whitespace-nowrap tabular-nums">
             {clock.wallTime(today, card.time)}
           </span>
         </span>
