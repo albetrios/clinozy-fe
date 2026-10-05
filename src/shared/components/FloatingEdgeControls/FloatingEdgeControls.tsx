@@ -8,7 +8,12 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 /**
  * Inline-end Appearance handle (mirrors under RTL). Language / region / timezone /
- * money prefs live inside the Appearance panel. Hidden while Appearance is open.
+ * money prefs live inside the Appearance panel. Hidden while Appearance is open,
+ * and — through its `floating-edge-controls` slot, by the stylesheet — while any
+ * modal surface is up: a drawer, a dialog, a confirm or a phone sheet. Pinned
+ * mid-height on the inline-end edge, it otherwise sat over a drawer's body and
+ * its footer buttons (`index.css`, the overlay-keyed rule it shares with the
+ * feedback trigger).
  */
 function FloatingEdgeControlsInner() {
   const appearanceOpen = useUIStore((s) => s.appearanceOpen);
@@ -19,6 +24,7 @@ function FloatingEdgeControlsInner() {
   return (
     <div
       className="pointer-events-none fixed end-0 top-1/2 z-[70] hidden -translate-y-1/2 flex-col gap-2 sm:flex"
+      data-slot="floating-edge-controls"
       data-testid="floating-edge-controls"
     >
       <FloatingSettingsButton />

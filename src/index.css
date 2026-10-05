@@ -1761,13 +1761,28 @@
 :root:has([data-slot='upload-tray']) #sentry-feedback {
   display: none;
 }
-/* Same rule, the other direction: a MODAL dialog owns the screen while it is
-   open, and the trigger is pinned above everything the dialog dims — so it sat
-   lit up over Settings, over a confirm, over the invite form, at every width.
-   Keyed on the OVERLAY rather than the content: that is what marks a dialog as
-   modal, so the non-modal Appearance panel (no scrim, page stays live) keeps
-   its trigger, which is right — nothing is being interrupted there. */
-:root:has([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'])
+/* Same rule, the other direction: a MODAL surface owns the screen while it is
+   open, and both floating edge controls are pinned above everything it dims —
+   the feedback trigger sat lit up over Settings, over a confirm, over the
+   invite form, and the Appearance handle (inline end, mid-height) over a
+   drawer's body and its footer ("Next: Items →" at 1440). A side drawer is as
+   modal as a centred dialog, so the sheets and the phone sheets count too.
+   Keyed on the OVERLAY rather than the content: that is what marks a surface
+   as modal, so the non-modal Appearance panel (no scrim, page stays live)
+   keeps the trigger, which is right — nothing is being interrupted there. */
+:root:has(
+    [data-slot='dialog-overlay'],
+    [data-slot='alert-dialog-overlay'],
+    [data-slot='sheet-overlay'],
+    [data-slot='drawer-overlay']
+  )
+  [data-slot='floating-edge-controls'],
+:root:has(
+    [data-slot='dialog-overlay'],
+    [data-slot='alert-dialog-overlay'],
+    [data-slot='sheet-overlay'],
+    [data-slot='drawer-overlay']
+  )
   #sentry-feedback {
   display: none;
 }

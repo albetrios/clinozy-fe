@@ -31,6 +31,18 @@ describe('FloatingEdgeControls', () => {
     expect(screen.getByTestId('floating-settings-stub')).toBeInTheDocument();
   });
 
+  it('carries the slot the stylesheet hides under an open drawer or dialog', () => {
+    // `index.css` hides `[data-slot='floating-edge-controls']` while any modal
+    // overlay is mounted (edge-handle-css.test.ts) — the handle sat over drawer
+    // bodies and footers. The record drawer's × shares `floating-edge`, so the
+    // container carries a slot of its own.
+    render(<FloatingEdgeControls />);
+    expect(screen.getByTestId('floating-edge-controls')).toHaveAttribute(
+      'data-slot',
+      'floating-edge-controls',
+    );
+  });
+
   it('hides the handle while the appearance panel is open', () => {
     uiState.appearanceOpen = true;
     render(<FloatingEdgeControls />);

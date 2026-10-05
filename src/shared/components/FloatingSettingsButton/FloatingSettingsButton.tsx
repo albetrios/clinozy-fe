@@ -8,11 +8,11 @@ import { Palette } from '@/shared/icons/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 /**
- * A handle pinned to the right edge that opens the non-modal Appearance popup —
- * so the theme is one click away on EVERY layout (auth, public, app). Sits above
- * modals (z-70, pointer-events re-enabled), so it stays reachable even over an
- * open dialog. Rendered inside {@link FloatingEdgeControls}; positioning is on
- * the parent stack.
+ * A handle pinned to the inline-end edge that opens the non-modal Appearance
+ * popup — so the theme is one click away on EVERY layout (auth, public, app).
+ * It steps aside while a modal surface (drawer, dialog, confirm) is open, so it
+ * never covers a drawer's body or footer. Rendered inside
+ * {@link FloatingEdgeControls}; positioning and hiding are on the parent stack.
  */
 export function FloatingSettingsButton() {
   const { t } = useTranslation(LOCALE_NS);
