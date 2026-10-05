@@ -10,6 +10,7 @@ import {
 import { fetchMedicine } from '@/shared/api/clinic/medicines-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderMedicalDrawer,
@@ -66,7 +67,11 @@ describe('ExpiringReturnDrawer (medical.md:297–309)', () => {
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent(
       'Return expiring stock',
     );
+    // The sub's medicine, batch and expiry are isolated tokens.
     expect(drawer).toHaveTextContent(
+      `${fsi('Glycolac Cream')} · batch ${fsi('026-312')}`,
+    );
+    expect(withoutBidiMarks(drawer.textContent)).toMatch(
       /Glycolac Cream · batch 026-312 · expires \d\d\/\d\d/,
     );
     expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent('Credit ₹369');

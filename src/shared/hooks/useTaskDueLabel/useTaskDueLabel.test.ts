@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   type TaskDueLabelInput,
@@ -23,9 +24,10 @@ const open = (dueAt: string): TaskDueLabelInput => ({
   resolvedAt: null,
 });
 
+/** The label's words and order as read — its time's isolate marks have their own test. */
 function label(task: TaskDueLabelInput): string {
   const { result } = renderHook(() => useTaskDueLabel());
-  return result.current(task, NOW);
+  return withoutBidiMarks(result.current(task, NOW));
 }
 
 const initialHourCycle = useLocaleStore.getState().hourCycle;
@@ -95,7 +97,10 @@ describe('useTaskDueLabel under today (the Today aside, Tasks’ "Due today")', 
     useLocaleStore.setState({ hourCycle: 'h23' });
     const { result } = renderHook(() => useTaskDueLabel({ sameDay: true }));
     expect(result.current(open(at(721)), NOW)).toBe('22:31');
-    expect(result.current(open('2026-10-05T12:30:00.000Z'), NOW)).toBe('Tomorrow 18:00');
+    // Another day is named, its time isolated beside the day word.
+    expect(result.current(open('2026-10-05T12:30:00.000Z'), NOW)).toBe(
+      `Tomorrow ${fsi('18:00')}`,
+    );
     expect(
       result.current(
         { ...open(at(-30)), status: 'done', resolvedBy: 'member', resolvedAt: at(-90) },
@@ -109,9 +114,14 @@ describe('useTaskDueAtWords', () => {
   it('words a picked day and time the way the due label does', () => {
     useLocaleStore.setState({ hourCycle: 'h23' });
     const { result } = renderHook(() => useTaskDueAtWords());
-    expect(result.current('2026-10-04', '17:00', NOW)).toBe('Today 17:00');
-    expect(result.current('2026-10-05', '11:00', NOW)).toBe('Tomorrow 11:00');
-    expect(result.current('2026-10-07', '15:30', NOW)).toMatch(/^(Oct 7|7 Oct) 15:30$/);
+    // The time is an isolated token beside its day word.
+    expect(result.current('2026-10-04', '17:00', NOW)).toBe(`Today ${fsi('17:00')}`);
+    expect(withoutBidiMarks(result.current('2026-10-05', '11:00', NOW))).toBe(
+      'Tomorrow 11:00',
+    );
+    expect(withoutBidiMarks(result.current('2026-10-07', '15:30', NOW))).toMatch(
+      /^(Oct 7|7 Oct) 15:30$/,
+    );
   });
 });
 

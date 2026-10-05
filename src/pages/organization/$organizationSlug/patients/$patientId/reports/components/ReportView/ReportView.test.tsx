@@ -9,6 +9,7 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   patientFileUrl,
@@ -56,7 +57,11 @@ describe('Report view (KICKOFF §6.6; S:43)', () => {
       'CBC + Thyroid profile',
     );
     expect(within(drawer).getByTestId('report-view-tag')).toHaveTextContent('Lab');
-    expect(drawer).toHaveTextContent(/Dharti Galani · \w{3} \d{1,2}, \d{4}/);
+    // The sub's name and date are isolated tokens.
+    expect(drawer).toHaveTextContent(`${fsi('Dharti Galani')} · `);
+    expect(withoutBidiMarks(drawer.textContent)).toMatch(
+      /Dharti Galani · \w{3} \d{1,2}, \d{4}/,
+    );
     expect(within(drawer).getByTestId('report-view-type')).toHaveTextContent('Lab');
     await user.click(within(drawer).getByTestId('report-view-step-details-trigger'));
     expect(within(drawer).getByTestId('report-view-added-by')).toHaveTextContent(/^Riya/);

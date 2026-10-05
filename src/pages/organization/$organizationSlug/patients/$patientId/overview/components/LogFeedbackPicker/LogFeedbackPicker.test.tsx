@@ -6,6 +6,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderInPatientFile,
@@ -49,7 +50,9 @@ describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
   it('groups what can be logged: a consultation, the recent treatments, each review source', async () => {
     const { picker, baseElement } = await openPicker();
     expect(within(picker).getByTestId(`${ID}-title`)).toHaveTextContent('Log feedback');
-    expect(picker).toHaveTextContent('Dharti Galani · pick what you want to record');
+    expect(picker).toHaveTextContent(
+      `${fsi('Dharti Galani')} · pick what you want to record`,
+    );
     for (const group of ['Check-in', 'Treatment feedback', 'Review']) {
       // The titled group, and its chips' own group by the same name.
       expect(within(picker).getAllByRole('group', { name: group })).toHaveLength(2);

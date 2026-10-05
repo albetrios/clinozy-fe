@@ -11,6 +11,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { SettleCreditDrawer } from './SettleCreditDrawer.tsx';
@@ -71,7 +72,7 @@ describe('SettleCreditDrawer — Give back (payments.md:170–180)', () => {
     expect(part('tag')).toHaveTextContent('CR-2');
     expect(
       within(drawer).getByText(
-        'To Tanvi Shah · Charged twice for corn removal · adds an Out entry to Payments',
+        `To ${fsi('Tanvi Shah')} · ${fsi('Charged twice for corn removal')} · adds an Out entry to Payments`,
       ),
     ).toBeInTheDocument();
     expect(within(drawer).getByText('How it goes back')).toBeInTheDocument();
@@ -158,7 +159,9 @@ describe('SettleCreditDrawer — Give back (payments.md:170–180)', () => {
       <SettleCreditDrawer credit={credit} reasonLabel="Overpaid" onClose={vi.fn()} />,
     );
     expect(
-      await screen.findByText('To Rhea Shah · Overpaid · adds an Out entry to Payments'),
+      await screen.findByText(
+        `To ${fsi('Rhea Shah')} · ${fsi('Overpaid')} · adds an Out entry to Payments`,
+      ),
     ).toBeInTheDocument();
     await user.click(part('save'));
     await waitFor(() => expect(notifyMock.success).toHaveBeenCalled());
@@ -177,7 +180,7 @@ describe('SettleCreditDrawer — Got it back', () => {
     expect(within(drawer).getByText('Got it back')).toBeInTheDocument();
     expect(
       within(drawer).getByText(
-        'From Medline Surgicals · Returned a box of damaged gloves · adds an In entry to Payments',
+        `From ${fsi('Medline Surgicals')} · ${fsi('Returned a box of damaged gloves')} · adds an In entry to Payments`,
       ),
     ).toBeInTheDocument();
     expect(within(drawer).getByText('How it came in')).toBeInTheDocument();

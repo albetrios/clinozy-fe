@@ -10,6 +10,7 @@ import {
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderMedicalDrawer,
@@ -157,10 +158,10 @@ describe('MedicineDrawer — Edit medicine', () => {
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-tag`)).toHaveTextContent('#456');
-    expect(drawer).toHaveTextContent('AVRI · Glycolic acid 6%');
+    expect(drawer).toHaveTextContent(`${fsi('AVRI')} · ${fsi('Glycolic acid 6%')}`);
     await waitFor(() =>
       expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent(
-        'Best ₹123 · Akshar Medicines',
+        `Best ${fsi('₹123')} · ${fsi('Akshar Medicines')}`,
       ),
     );
     expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent('3 in stock');

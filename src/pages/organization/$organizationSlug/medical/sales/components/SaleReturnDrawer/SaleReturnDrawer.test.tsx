@@ -9,6 +9,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderMedicalDrawer,
@@ -68,7 +69,7 @@ describe('SaleReturnDrawer (medical.md:283–295)', () => {
       'Return from patient',
     );
     expect(drawer).toHaveTextContent(
-      'Rhea Shah · returned stock goes back into its batch',
+      `${fsi('Rhea Shah')} · returned stock goes back into its batch`,
     );
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
 

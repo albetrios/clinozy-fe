@@ -91,9 +91,10 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     const cell = (label: string) => within(info).getByText(label).closest('div');
     // The design's "Today 09:20" (H:1813) — never "Sep 27 · 10:28 AM" on the
     // same day; the clock itself follows the viewer's locale and hour cycle.
-    expect(cell('Created')).toHaveTextContent(/^CreatedToday 10:28 [ap]m$/i);
+    // The rule's time is an isolated token beside its day word.
+    expect(cell('Created')).toHaveTextContent(/^CreatedToday \u206810:28 [ap]m\u2069$/i);
     expect(cell('Last message')).toHaveTextContent(
-      /^Last messageWhatsApp · Today 10:31 [ap]m$/i,
+      /^Last messageWhatsApp · Today \u206810:31 [ap]m\u2069$/i,
     );
   });
 

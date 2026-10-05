@@ -9,6 +9,7 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   patientFileUrl,
@@ -64,7 +65,7 @@ describe('Log a review (KICKOFF §6.6; S:46–47)', () => {
     const { drawer, baseElement } = await open('/reviews/create');
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Log a review');
     expect(drawer).toHaveTextContent(
-      'Dharti Galani · kept on the patient file so anyone can find it later',
+      `${fsi('Dharti Galani')} · kept on the patient file so anyone can find it later`,
     );
     expect(within(drawer).getByTestId(`${D}-where-google`)).toHaveAttribute(
       'aria-pressed',

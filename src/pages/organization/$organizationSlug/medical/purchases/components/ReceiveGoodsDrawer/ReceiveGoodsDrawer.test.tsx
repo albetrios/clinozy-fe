@@ -9,6 +9,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderMedicalDrawer,
@@ -170,7 +171,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
     expect(drawer).toHaveTextContent(
-      'K R Medical Agency · tick each item and enter batch & expiry',
+      `${fsi('K R Medical Agency')} · tick each item and enter batch & expiry`,
     );
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,236');
@@ -188,7 +189,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     // A long sub wraps to a second line on a phone instead of being cut.
     expect(
       within(drawer).getByText(
-        'K R Medical Agency · tick each item and enter batch & expiry',
+        `${fsi('K R Medical Agency')} · tick each item and enter batch & expiry`,
       ),
     ).toHaveClass('max-md:line-clamp-2', 'max-md:whitespace-normal');
     expect(await axeForDialog(drawer)).toHaveNoViolations();

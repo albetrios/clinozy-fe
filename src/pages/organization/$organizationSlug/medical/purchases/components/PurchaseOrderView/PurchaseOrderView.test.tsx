@@ -7,6 +7,7 @@ import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderMedicalDrawer,
@@ -65,7 +66,7 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Purchase order');
     expect(drawer).toHaveTextContent(
-      'Shree Ramdev Medical Agency · received, stock added · items locked',
+      `${fsi('Shree Ramdev Medical Agency')} · received, stock added · items locked`,
     );
     expect(within(drawer).getByTestId(`${D}-bill-no`)).toHaveTextContent('1631');
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
@@ -85,7 +86,7 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
       <PurchaseOrderView open order={order} onClose={vi.fn()} onPay={onPay} />,
     );
     let drawer = await screen.findByTestId(D);
-    expect(drawer).toHaveTextContent('Akshar Medicines · paid, locked');
+    expect(drawer).toHaveTextContent(`${fsi('Akshar Medicines')} · paid, locked`);
     // ₹1,200 paid of ₹1,296 — still Paid, nothing owed (H:5421).
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent(
       'Paid ₹1,200 of ₹1,296',

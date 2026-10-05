@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
+import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { followUpWhen, patientAge } from './patient-cells.ts';
@@ -136,11 +137,9 @@ describe('PatientCells', () => {
     );
     expect(tones).toEqual(['butter', 'blush', 'sky']);
     // The rooms' one time rule: today the time, this week the weekday, ahead the date.
-    expect(badges.map((node) => node.textContent?.replace(/\s/gu, ' '))).toEqual([
-      'Today 2:50 PM',
-      'Wed 2:50 PM',
-      'Oct 9 2:50 PM',
-    ]);
+    expect(
+      badges.map((node) => withoutBidiMarks(node.textContent).replace(/\s/gu, ' ')),
+    ).toEqual(['Today 2:50 PM', 'Wed 2:50 PM', 'Oct 9 2:50 PM']);
   });
 
   it('shows what is due in the blush ink, else a muted dash', async () => {
@@ -156,7 +155,8 @@ describe('PatientCells', () => {
     renderWithProviders(<PatientUpdatedCell patient={patient} />);
     expect(await screen.findByText('Riya S.')).toBeInTheDocument();
     // Saved at 09:00 this morning: the rooms' one time rule names the day.
-    expect(screen.getByText(/^Today 9:00\sAM$/)).toBeInTheDocument();
+    // The rule's time is an isolated token beside its day word.
+    expect(screen.getByText(/^Today \u20689:00\sAM\u2069$/)).toBeInTheDocument();
   });
 
   it('draws the patient chip — sage avatar, "P" badge, name over the mobile — and is accessible', async () => {

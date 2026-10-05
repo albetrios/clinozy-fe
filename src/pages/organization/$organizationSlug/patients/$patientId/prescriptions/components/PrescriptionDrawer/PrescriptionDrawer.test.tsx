@@ -13,6 +13,7 @@ import type * as PrescriptionsApi from '@/shared/api/clinic/prescriptions-api.ts
 import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -94,7 +95,7 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
     expect(within(drawer).getByTestId('rx-drawer-title')).toHaveTextContent(
       'New prescription',
     );
-    expect(drawer).toHaveTextContent('Dharti Galani · #3508');
+    expect(drawer).toHaveTextContent(`${fsi('Dharti Galani')} · ${fsi('#3508')}`);
     expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
       '0 medicines',
     );

@@ -207,8 +207,9 @@ describe('the ledger’s cells', () => {
       </div>,
     );
     // The viewer's locale and hour cycle: en's default reads "Today 11:05 AM".
-    expect(await screen.findByText(/^Today 11:05/)).toBeInTheDocument();
-    expect(screen.getByText(/^Yesterday 11:55/)).toBeInTheDocument();
+    // The rule's time is an isolated token beside its day word.
+    expect(await screen.findByText(/^Today \u206811:05/)).toBeInTheDocument();
+    expect(screen.getByText(/^Yesterday \u206811:55/)).toBeInTheDocument();
     expect(screen.getByText('Edited 1× · last ₹600 UPI → ₹700 UPI')).toHaveClass(
       'text-tone-butter-foreground',
     );

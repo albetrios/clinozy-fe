@@ -99,7 +99,7 @@ describe('the Payments ledger (KICKOFF §6.9)', () => {
     const tea = rowOf('PAY-310');
     expect(tea).toHaveTextContent('Paid');
     // The rooms' one time rule names the day: "Today 11:05 AM".
-    expect(tea).toHaveTextContent('Today 11:05');
+    expect(tea).toHaveTextContent('Today \u206811:05');
     expect(tea).toHaveTextContent('Tea & snacks');
     expect(tea).toHaveTextContent('Misc');
     expect(tea).toHaveTextContent('Cash');

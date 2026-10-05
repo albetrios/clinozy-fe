@@ -29,10 +29,10 @@ describe('useHoursFormat — days, hours and times', () => {
   it('reads an update by the rooms’ one time rule — today its time, another year’s with its year', () => {
     const { result } = renderHook(() => useHoursFormat());
     expect(result.current.updated('2026-10-03T03:32:00.000Z')).toMatch(
-      /^Today 9:02\sAM$/,
+      /^Today \u20689:02\sAM\u2069$/,
     );
     expect(result.current.updated('2026-10-02T03:32:00.000Z')).toMatch(
-      /^Yesterday 9:02\sAM$/,
+      /^Yesterday \u20689:02\sAM\u2069$/,
     );
     expect(result.current.updated('2025-12-09T05:08:00.000Z')).toMatch(/2025/);
     expect(result.current.updated('2026-08-23T06:22:00.000Z')).not.toMatch(/2026/);

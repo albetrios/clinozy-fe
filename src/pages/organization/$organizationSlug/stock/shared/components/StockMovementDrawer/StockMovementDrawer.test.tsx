@@ -9,6 +9,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import {
   renderStockDrawer,
@@ -74,7 +75,9 @@ describe('StockMovementDrawer (clinic-stock.md:126–140, 233–245)', () => {
     const user = setup();
     const { drawer, onClose } = await openFor('received');
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Receive stock');
-    expect(drawer).toHaveTextContent('Soframycin 30 gm · 3 tube · 90 g now');
+    expect(drawer).toHaveTextContent(
+      `${fsi('Soframycin 30 gm')} · ${fsi('3 tube · 90 g')} now`,
+    );
     expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent(
       'ReceivedAfter: 4 tube · 120 g',
     );
