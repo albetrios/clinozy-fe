@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { organizationNameFromEmail } from '@/lib/onboarding-defaults.ts';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: onboarding stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { deriveOrganizationSlug } from '@/shared/tenancy/my-organizations.ts';
@@ -51,22 +52,26 @@ export function WorkspaceStep() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="ob-org">
-          {t(ONBOARDING_KEYS.workspace.organizationNameLabel)}
-        </Label>
-        <Input
+      <DrawerField
+        label={t(ONBOARDING_KEYS.workspace.organizationNameLabel)}
+        htmlFor="ob-org"
+      >
+        <DrawerInput
           id="ob-org"
+          autoComplete="organization"
           value={organizationName}
           onChange={(e) => patch({ organizationName: e.target.value })}
           placeholder={t(ONBOARDING_KEYS.workspace.organizationNamePlaceholder)}
           data-testid={ONBOARDING_TEST_IDS.organizationName}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="ob-slug">{t(ONBOARDING_KEYS.workspace.slugLabel)}</Label>
-        <Input
+      </DrawerField>
+      {/* The error sits above the URL preview, so it is a child here, not the field's own line. */}
+      <DrawerField label={t(ONBOARDING_KEYS.workspace.slugLabel)} htmlFor="ob-slug">
+        <DrawerInput
           id="ob-slug"
+          capitalize={false}
+          autoCapitalize="none"
+          spellCheck={false}
           value={organizationSlug}
           onChange={(e) => patch({ organizationSlug: e.target.value })}
           placeholder={t(ONBOARDING_KEYS.workspace.slugPlaceholder)}
@@ -97,7 +102,7 @@ export function WorkspaceStep() {
             }}
           />
         </p>
-      </div>
+      </DrawerField>
     </div>
   );
 }

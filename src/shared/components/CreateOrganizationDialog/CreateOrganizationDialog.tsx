@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { organizationHome } from '@/lib/routes/index.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Dialog,
@@ -18,8 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { Plus } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
@@ -184,11 +183,13 @@ export function CreateOrganizationDialog({
           className="space-y-4"
           data-testid="create-organization-dialog-form"
         >
-          <div className="space-y-2">
-            <Label htmlFor="new-org-name">
-              {tLayout(LAYOUT_KEYS.app.orgCreate.nameLabel)}
-            </Label>
-            <Input
+          <DrawerField
+            label={tLayout(LAYOUT_KEYS.app.orgCreate.nameLabel)}
+            htmlFor="new-org-name"
+            error={errors.name?.message}
+            errorTestId="create-organization-dialog-name-error"
+          >
+            <DrawerInput
               id="new-org-name"
               autoComplete="organization"
               placeholder={tLayout(LAYOUT_KEYS.app.orgCreate.namePlaceholder)}
@@ -197,21 +198,13 @@ export function CreateOrganizationDialog({
               data-testid="create-organization-dialog-name"
               {...register('name')}
             />
-            {errors.name && (
-              <p
-                id="new-org-name-error"
-                className="text-destructive text-xs"
-                role="alert"
-                data-testid="create-organization-dialog-name-error"
-              >
-                {errors.name.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="new-org-slug">
-              {tLayout(LAYOUT_KEYS.app.orgCreate.slugLabel)}
-            </Label>
+          </DrawerField>
+          <DrawerField
+            label={tLayout(LAYOUT_KEYS.app.orgCreate.slugLabel)}
+            htmlFor="new-org-slug"
+            error={errors.slug?.message}
+            errorTestId="create-organization-dialog-slug-error"
+          >
             {/*
               Optional, but not unvalidated: the schema rejects anything outside
               `[a-z0-9-]`. This field used to render no error at all — no
@@ -222,25 +215,18 @@ export function CreateOrganizationDialog({
               `role="alert"` existed anywhere on it. The name field beside it has
               always said why it refused; this one now does too.
             */}
-            <Input
+            <DrawerInput
               id="new-org-slug"
+              capitalize={false}
+              autoCapitalize="none"
+              spellCheck={false}
               placeholder={tLayout(LAYOUT_KEYS.app.orgCreate.slugPlaceholder)}
               aria-invalid={!!errors.slug}
               aria-describedby={errors.slug ? 'new-org-slug-error' : undefined}
               data-testid="create-organization-dialog-slug"
               {...register('slug')}
             />
-            {errors.slug && (
-              <p
-                id="new-org-slug-error"
-                className="text-destructive text-xs"
-                role="alert"
-                data-testid="create-organization-dialog-slug-error"
-              >
-                {errors.slug.message}
-              </p>
-            )}
-          </div>
+          </DrawerField>
           <DialogFooter>
             <Button
               type="submit"

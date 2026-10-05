@@ -8,6 +8,7 @@ import {
   UPLOAD_MAX_BYTES,
   type UploadImageContentType,
 } from '@/shared/api/uploads-api.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import {
   SETTINGS_KEYS,
@@ -23,8 +24,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import {
   useRemoveOrganizationLogo,
@@ -238,28 +237,31 @@ function OrganizationGeneralForm({
           <CardDescription>{tSettings(general.basicsDescription)}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="org-name">{tSettings(general.nameLabel)}</Label>
-            <Input
+          <DrawerField label={tSettings(general.nameLabel)} htmlFor="org-name">
+            <DrawerInput
               id="org-name"
+              autoComplete="organization"
               value={name}
               onChange={(event) => setDraft(event.target.value)}
               placeholder={tSettings(general.namePlaceholder)}
               disabled={!canManage}
               data-testid="org-name"
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="org-slug">{tSettings(general.slugLabel)}</Label>
-            <Input
+          </DrawerField>
+          <DrawerField label={tSettings(general.slugLabel)} htmlFor="org-slug">
+            <DrawerInput
               id="org-slug"
+              capitalize={false}
               value={activeOrg?.slug ?? organizationSlug ?? ''}
               readOnly
               disabled
+              aria-describedby="org-slug-hint"
               data-testid="org-slug"
             />
-            <p className="text-muted-foreground text-xs">{tSettings(general.slugHint)}</p>
-          </div>
+            <p id="org-slug-hint" className="text-muted-foreground text-xs">
+              {tSettings(general.slugHint)}
+            </p>
+          </DrawerField>
           {canManage ? (
             <div className="flex justify-end">
               <Button

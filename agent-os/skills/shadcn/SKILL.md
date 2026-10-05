@@ -47,6 +47,9 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     `RoomSearchField` (`layout="fill"` never folds — Settings). Never `Input` + an icon.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
+  - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer
+    controls (`capitalize={false}` for slugs, codes, emails, handles, passwords; the
+    right `type` / `inputMode` / `autoComplete`). Never a bare `Label` + `Input`.
   - Toasts → `notify` (`@/shared/notify`) — one design, the clinic bar, bottom-centre;
     never `sonner` directly.
 

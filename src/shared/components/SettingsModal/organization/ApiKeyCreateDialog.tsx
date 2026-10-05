@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import type { ApiKeyWithSecret } from '@/shared/api/organization-contracts.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import {
   SETTINGS_KEYS,
@@ -19,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
@@ -240,19 +240,20 @@ export function ApiKeyCreateDialog() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="apikey-name">{t(integrations.apiKeyNameLabel)}</Label>
-                <Input
+              <DrawerField label={t(integrations.apiKeyNameLabel)} htmlFor="apikey-name">
+                <DrawerInput
                   id="apikey-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder={t(integrations.apiKeyNamePlaceholder)}
                   data-testid="apikey-name"
                 />
-              </div>
+              </DrawerField>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="apikey-expiry">{t(integrations.apiKeyExpiryLabel)}</Label>
+              <DrawerField
+                label={t(integrations.apiKeyExpiryLabel)}
+                htmlFor="apikey-expiry"
+              >
                 <Picker
                   id="apikey-expiry"
                   label={t(integrations.apiKeyExpiryLabel)}
@@ -271,10 +272,9 @@ export function ApiKeyCreateDialog() {
                   testId="apikey-expiry"
                   className="w-full"
                 />
-              </div>
+              </DrawerField>
 
-              <div className="space-y-1.5">
-                <Label>{t(integrations.apiKeyScopesLabel)}</Label>
+              <DrawerField label={t(integrations.apiKeyScopesLabel)}>
                 <p className="text-muted-foreground text-xs">
                   {t(integrations.apiKeyScopesHint)}
                 </p>
@@ -307,7 +307,7 @@ export function ApiKeyCreateDialog() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </DrawerField>
 
               <FormError message={error} data-testid="apikey-error" />
             </div>

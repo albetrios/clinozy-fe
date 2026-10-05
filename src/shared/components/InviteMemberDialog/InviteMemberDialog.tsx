@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
 import { isInvitableRole, leastPrivilegeRoleId } from '@/shared/api/clinic/users-api.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
@@ -22,8 +23,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { useInviteMember } from '@/shared/hooks/useInvitations/index.ts';
 import { useRoles } from '@/shared/hooks/useRoles/index.ts';
 import { UserPlus } from '@/shared/icons/index.ts';
@@ -94,11 +93,15 @@ export function InviteMemberDialog() {
         className="space-y-4"
         data-testid="invite-member-form"
       >
-        <div className="space-y-2">
-          <Label htmlFor="invite-email">Email</Label>
-          <Input
+        <DrawerField
+          label="Email"
+          htmlFor="invite-email"
+          error={translateFormMessage(errors.email?.message)}
+        >
+          <DrawerInput
             id="invite-email"
             type="email"
+            capitalize={false}
             placeholder={t(SETTINGS_KEYS.panels.members.emailPlaceholder)}
             autoComplete="email"
             aria-invalid={!!errors.email}
@@ -106,15 +109,13 @@ export function InviteMemberDialog() {
             data-testid="invite-member-email"
             {...register('email')}
           />
-          {errors.email && (
-            <p id="invite-email-error" className="text-destructive text-xs" role="alert">
-              {translateFormMessage(errors.email.message)}
-            </p>
-          )}
-        </div>
+        </DrawerField>
 
-        <div className="space-y-2">
-          <Label htmlFor="invite-role">Role</Label>
+        <DrawerField
+          label="Role"
+          htmlFor="invite-role"
+          error={translateFormMessage(errors.roleId?.message)}
+        >
           <Controller
             control={control}
             name="roleId"
@@ -138,16 +139,9 @@ export function InviteMemberDialog() {
             )}
           />
           {/* An organization with no Member and no Viewer opens with no role
-              chosen, and `handleSubmit` then blocks the send. Without this the
-              press did nothing, said nothing, and left the inviter staring at a
-              filled-in form — the Email field one div up has always shown its
-              error; this one never did. */}
-          {errors.roleId && (
-            <p id="invite-role-error" className="text-destructive text-xs" role="alert">
-              {translateFormMessage(errors.roleId.message)}
-            </p>
-          )}
-        </div>
+              chosen, and `handleSubmit` then blocks the send: the field says
+              why (its error line), as the Email field above always has. */}
+        </DrawerField>
 
         <DialogFooter>
           <Button

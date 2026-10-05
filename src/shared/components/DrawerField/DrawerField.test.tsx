@@ -30,6 +30,23 @@ describe('DrawerField', () => {
     expect(hint).toHaveAttribute('title', '10 digits');
   });
 
+  it('puts a form’s own test id on the error line', () => {
+    render(
+      <DrawerField
+        label="Workspace URL"
+        htmlFor="new-org-slug"
+        error="Use lowercase letters, numbers and dashes"
+        errorTestId="create-organization-dialog-slug-error"
+      >
+        <Input id="new-org-slug" />
+      </DrawerField>,
+    );
+    expect(screen.getByTestId('create-organization-dialog-slug-error')).toHaveAttribute(
+      'id',
+      'new-org-slug-error',
+    );
+  });
+
   it('shows the field’s error under the control, at <id>-error', () => {
     render(
       <DrawerField label="First name" htmlFor="pt-first" error="Add a first name">

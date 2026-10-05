@@ -19,6 +19,7 @@ import {
   APPEARANCE_NS,
 } from '@/shared/components/AppearanceDialog/appearance.constants.ts';
 import { DateTimePrefsCard } from '@/shared/components/DateTimePrefsCard/index.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { LanguagePrefsCard } from '@/shared/components/LanguagePrefsCard/index.ts';
 import { MoneyPrefsCard } from '@/shared/components/MoneyPrefsCard/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
@@ -31,7 +32,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Separator } from '@/shared/components/ui/separator.tsx';
 import { Check, Monitor, Moon, Sparkles, Sun } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -352,8 +352,9 @@ function ThemeCard() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Input
+            <DrawerInput
               inputMode="numeric"
+              capitalize={false}
               value={seedInput}
               onChange={(e) => setSeedInput(e.target.value)}
               placeholder={tAppearance(APPEARANCE_KEYS.codePlaceholder)}

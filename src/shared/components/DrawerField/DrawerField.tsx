@@ -30,6 +30,8 @@ export interface DrawerFieldProps {
   hint?: string;
   /** The field's validation message, under the control. */
   error?: string;
+  /** Test id on the error line, for a form whose specs already name it. */
+  errorTestId?: string;
   /** Width in the drawer's 6-column grid (read by {@link DrawerFieldGrid}). */
   span?: DrawerFieldSpan;
   /** False keeps the field at its span when its row has room (pickers, names). */
@@ -52,6 +54,7 @@ export function DrawerField({
   required = false,
   hint,
   error,
+  errorTestId,
   children,
   className,
   testId,
@@ -89,6 +92,7 @@ export function DrawerField({
         <p
           id={htmlFor ? drawerFieldErrorId(htmlFor) : undefined}
           role="alert"
+          data-testid={errorTestId}
           className="text-destructive text-xs"
         >
           {error}

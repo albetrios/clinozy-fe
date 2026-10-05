@@ -8,6 +8,7 @@ import {
   updateWebhookSchema,
   type Webhook,
 } from '@/shared/api/webhook-contracts.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
@@ -22,8 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
@@ -137,24 +136,26 @@ export function WebhookFormDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="webhook-url">{t(integrations.payloadUrlLabel)}</Label>
-            <Input
+          <DrawerField label={t(integrations.payloadUrlLabel)} htmlFor="webhook-url">
+            <DrawerInput
               id="webhook-url"
+              inputMode="url"
+              capitalize={false}
+              autoComplete="url"
+              spellCheck={false}
               value={url}
               onChange={(event) => setUrl(event.target.value)}
               placeholder={t(integrations.webhookUrlPlaceholder)}
               data-testid="webhook-url"
             />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t(integrations.eventsLabel)}</Label>
+          </DrawerField>
+          <DrawerField label={t(integrations.eventsLabel)}>
             <WebhookEventChecklist
               catalog={catalog}
               selected={events}
               onToggle={toggleEvent}
             />
-          </div>
+          </DrawerField>
           {/*
             The same error card the sign-in form and the step-up dialog use — a bare red
             line under the events reads as a caption, not as the thing that went wrong.

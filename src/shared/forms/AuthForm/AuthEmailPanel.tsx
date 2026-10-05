@@ -22,10 +22,11 @@ import { useCaptchaIntent } from '@/shared/auth/captcha/useCaptchaIntent/index.t
 import { stashMfaHandoff } from '@/shared/auth/mfa-handoff.ts';
 import { isSafeRedirectPath } from '@/shared/auth/redirect-safety.ts';
 import { establishSession } from '@/shared/auth/service.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: the sign-in chunk stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useCooldownClock } from '@/shared/hooks/useCooldownClock/index.ts';
@@ -299,9 +300,13 @@ function EmailStepForm({
       <FormError message={formError} data-testid={AUTH_FORM_TEST_IDS.emailErrorBanner} />
       <form onSubmit={onSubmit}>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="auth-email">{t(AUTH_KEYS.common.email)}</Label>
-            <Input
+          <DrawerField
+            label={t(AUTH_KEYS.common.email)}
+            htmlFor="auth-email"
+            error={translateFormMessage(emailError?.message)}
+            errorTestId={AUTH_FORM_TEST_IDS.emailError}
+          >
+            <DrawerInput
               id="auth-email"
               type="email"
               placeholder={t(AUTH_KEYS.common.emailPlaceholder)}
@@ -312,16 +317,7 @@ function EmailStepForm({
               {...register('email')}
               onFocus={() => onInteract?.()}
             />
-            {emailError ? (
-              <p
-                className="text-destructive text-xs"
-                role="alert"
-                data-testid={AUTH_FORM_TEST_IDS.emailError}
-              >
-                {translateFormMessage(emailError.message)}
-              </p>
-            ) : null}
-          </div>
+          </DrawerField>
 
           {/* Between the email field and its button: the challenge belongs to the
               action below it, and appearing here keeps it in the reading order the
@@ -561,8 +557,7 @@ export function AuthEmailPanel({
       data-testid={AUTH_FORM_TEST_IDS.emailVerifyPanel}
     >
       <FormError message={formError} data-testid={AUTH_FORM_TEST_IDS.emailErrorBanner} />
-      <div className="space-y-2 pt-2 text-start">
-        <Label htmlFor="auth-email-code">{t(AUTH_KEYS.auth.email.codeLabel)}</Label>
+      <DrawerField label={t(AUTH_KEYS.auth.email.codeLabel)} className="pt-2 text-start">
         <TotpCodeInput
           value={verificationCode}
           onChange={setVerificationCode}
@@ -582,7 +577,7 @@ export function AuthEmailPanel({
           aria-label={t(AUTH_KEYS.auth.email.codeAria)}
           className="justify-start"
         />
-      </div>
+      </DrawerField>
 
       {/* Same position on the verify step: above the gated button. */}
       <CaptchaSlot

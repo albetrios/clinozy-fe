@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { closeControlClassName } from '@/lib/icon-surface.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: onboarding stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { Plus, X } from '@/shared/icons/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
@@ -50,11 +51,16 @@ export function InviteStep() {
   return (
     <div className="space-y-4">
       <div className="flex items-end gap-2">
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="ob-invite">{t(ONBOARDING_KEYS.invite.emailLabel)}</Label>
-          <Input
+        <DrawerField
+          label={t(ONBOARDING_KEYS.invite.emailLabel)}
+          htmlFor="ob-invite"
+          className="flex-1"
+        >
+          <DrawerInput
             id="ob-invite"
             type="email"
+            capitalize={false}
+            autoComplete="email"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -71,7 +77,7 @@ export function InviteStep() {
             placeholder={t(ONBOARDING_KEYS.invite.emailPlaceholder)}
             data-testid={ONBOARDING_TEST_IDS.inviteEmail}
           />
-        </div>
+        </DrawerField>
         <Button
           type="button"
           variant="outline"

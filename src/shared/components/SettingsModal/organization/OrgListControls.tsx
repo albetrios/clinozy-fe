@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
+import { DrawerField } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RoomSearchField } from '@/shared/components/RoomToolbar/RoomSearchField/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Label } from '@/shared/components/ui/label.tsx';
 
 import { ORG_LIST_SORT_PRESETS, type OrgListSortPreset } from './org-list-sort.ts';
 
@@ -54,10 +54,11 @@ export function OrgListControls({
         inputTestId={searchTestId}
         className="max-w-sm flex-1"
       />
-      <div className="flex w-full flex-col gap-1.5 sm:w-48">
-        <Label htmlFor={sortTestId} className="text-muted-foreground text-xs">
-          {t(SORT_LABEL_KEYS.label)}
-        </Label>
+      <DrawerField
+        label={t(SORT_LABEL_KEYS.label)}
+        htmlFor={sortTestId}
+        className="w-full sm:w-48"
+      >
         <Picker
           id={sortTestId}
           label={t(SORT_LABEL_KEYS.label)}
@@ -73,7 +74,7 @@ export function OrgListControls({
           minWidth={180}
           testId={sortTestId}
         />
-      </div>
+      </DrawerField>
     </div>
   );
 }

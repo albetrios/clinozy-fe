@@ -10,14 +10,13 @@ import i18n from '@/lib/i18n/i18n.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -147,43 +146,38 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
         })}
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="profile-name">{t(panels.nameLabel)}</Label>
-            <Input
+          <DrawerField
+            label={t(panels.nameLabel)}
+            htmlFor="profile-name"
+            error={errors.name?.message}
+          >
+            <DrawerInput
               id="profile-name"
+              autoComplete="name"
               {...register('name')}
               placeholder={t(SETTINGS_KEYS.panels.profile.namePlaceholder)}
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? 'profile-name-error' : undefined}
               data-testid="profile-name"
             />
-            {errors.name && (
-              <p
-                id="profile-name-error"
-                className="text-destructive text-xs"
-                role="alert"
-              >
-                {errors.name.message}
-              </p>
-            )}
-          </div>
+          </DrawerField>
 
-          <div className="space-y-2">
-            <Label htmlFor="profile-job-title">{t(panels.jobTitleLabel)}</Label>
-            <Input
+          <DrawerField label={t(panels.jobTitleLabel)} htmlFor="profile-job-title">
+            <DrawerInput
               id="profile-job-title"
+              autoComplete="organization-title"
               {...register('jobTitle')}
               placeholder={t(SETTINGS_KEYS.panels.profile.jobTitlePlaceholder)}
               data-testid="profile-job-title"
             />
-          </div>
+          </DrawerField>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="profile-email">{t(panels.emailLabel)}</Label>
-          <Input
+        <DrawerField label={t(panels.emailLabel)} htmlFor="profile-email">
+          <DrawerInput
             id="profile-email"
             type="email"
+            capitalize={false}
             value={email}
             disabled
             readOnly
@@ -194,7 +188,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           <p id="profile-email-desc" className="text-muted-foreground text-xs">
             {t(panels.emailHint)}
           </p>
-        </div>
+        </DrawerField>
 
         <Button
           type="submit"

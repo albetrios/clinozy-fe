@@ -11,6 +11,11 @@ import {
   type RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
 import {
+  DrawerField,
+  DrawerInput,
+  DrawerTextarea,
+} from '@/shared/components/DrawerField/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
@@ -25,10 +30,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
-import { Textarea } from '@/shared/components/ui/textarea.tsx';
 import {
   type AssignablePermissions,
   useAssignablePermissions,
@@ -247,40 +250,38 @@ export function CreateRoleDialog({
             </div>
           ) : (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="role-name">Name</Label>
-                <Input
+              <DrawerField
+                label="Name"
+                htmlFor="role-name"
+                error={translateFormMessage(errors.name?.message)}
+              >
+                <DrawerInput
                   id="role-name"
                   placeholder={t(SETTINGS_KEYS.panels.roles.namePlaceholder)}
                   aria-invalid={!!errors.name}
                   data-testid="role-create-name"
                   {...register('name')}
                 />
-                {errors.name && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.name.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
 
-              <div className="space-y-2">
-                <Label htmlFor="role-description">Description</Label>
-                <Textarea
+              <DrawerField
+                label="Description"
+                htmlFor="role-description"
+                error={translateFormMessage(errors.description?.message)}
+              >
+                <DrawerTextarea
                   id="role-description"
                   placeholder={t(SETTINGS_KEYS.panels.roles.descriptionPlaceholder)}
                   aria-invalid={!!errors.description}
                   data-testid="role-create-description"
                   {...register('description')}
                 />
-                {errors.description && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.description.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
 
-              <div className="space-y-2">
-                <Label>Permissions</Label>
+              <DrawerField
+                label="Permissions"
+                error={translateFormMessage(errors.permissions?.message)}
+              >
                 <Controller
                   control={control}
                   name="permissions"
@@ -292,12 +293,7 @@ export function CreateRoleDialog({
                     />
                   )}
                 />
-                {errors.permissions && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.permissions.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
             </>
           )}
 

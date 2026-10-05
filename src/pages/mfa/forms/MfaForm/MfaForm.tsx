@@ -10,10 +10,11 @@ import { type MfaVerifyInput, mfaVerifySchema } from '@/shared/api/auth-contract
 import { clearMfaHandoff, readMfaHandoff } from '@/shared/auth/mfa-handoff.ts';
 import { safeRedirect } from '@/shared/auth/redirect-safety.ts';
 import { establishSession } from '@/shared/auth/service.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: the MFA chunk stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 
@@ -186,59 +187,58 @@ export function MfaForm() {
         <div className="flex flex-col gap-4">
           <FormError message={apiError} data-testid={MFA_TEST_IDS.formError} />
 
-          <div className="flex flex-col gap-2">
+          <DrawerField
+            label={
+              useRecovery
+                ? t(AUTH_KEYS.mfa.recoveryCodeLabel)
+                : t(AUTH_KEYS.mfa.codeLabel)
+            }
+            htmlFor="mfa-code"
+            error={translateFormMessage(errors.code?.message)}
+          >
             {useRecovery ? (
-              <>
-                <Label htmlFor="mfa-code">{t(AUTH_KEYS.mfa.recoveryCodeLabel)}</Label>
-                <Input
-                  id="mfa-code"
-                  type="text"
-                  inputMode="text"
-                  autoComplete="one-time-code"
-                  placeholder={t(AUTH_KEYS.mfa.recoveryPlaceholder)}
-                  maxLength={AUTH_MFA_RECOVERY_MAX_LENGTH}
-                  disabled={pending}
-                  aria-invalid={!!errors.code}
-                  aria-describedby={errors.code ? 'mfa-code-error' : undefined}
-                  data-testid={MFA_TEST_IDS.code}
-                  {...register('code')}
-                />
-              </>
+              <DrawerInput
+                id="mfa-code"
+                type="text"
+                capitalize={false}
+                spellCheck={false}
+                inputMode="text"
+                autoComplete="one-time-code"
+                placeholder={t(AUTH_KEYS.mfa.recoveryPlaceholder)}
+                maxLength={AUTH_MFA_RECOVERY_MAX_LENGTH}
+                disabled={pending}
+                aria-invalid={!!errors.code}
+                aria-describedby={errors.code ? 'mfa-code-error' : undefined}
+                data-testid={MFA_TEST_IDS.code}
+                {...register('code')}
+              />
             ) : (
-              <>
-                <Label htmlFor="mfa-code">{t(AUTH_KEYS.mfa.codeLabel)}</Label>
-                <Controller
-                  name="code"
-                  control={control}
-                  render={({ field }) => (
-                    <TotpCodeInput
-                      id="mfa-code"
-                      value={field.value}
-                      onChange={field.onChange}
-                      onComplete={() => {
-                        // Belt to `disabled`'s braces: a paste that lands in the
-                        // same frame as the first submit never reaches the API.
-                        if (verifyingRef.current) return;
-                        handleSubmit(onSubmit)().catch(() => {
-                          /* onSubmit maps its own errors to form state */
-                        });
-                      }}
-                      disabled={pending}
-                      invalid={!!errors.code || !!apiError}
-                      shake={otpShake}
-                      testId={MFA_TEST_IDS.code}
-                      aria-label={t(AUTH_KEYS.mfa.codeLabel)}
-                    />
-                  )}
-                />
-              </>
+              <Controller
+                name="code"
+                control={control}
+                render={({ field }) => (
+                  <TotpCodeInput
+                    id="mfa-code"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onComplete={() => {
+                      // Belt to `disabled`'s braces: a paste that lands in the
+                      // same frame as the first submit never reaches the API.
+                      if (verifyingRef.current) return;
+                      handleSubmit(onSubmit)().catch(() => {
+                        /* onSubmit maps its own errors to form state */
+                      });
+                    }}
+                    disabled={pending}
+                    invalid={!!errors.code || !!apiError}
+                    shake={otpShake}
+                    testId={MFA_TEST_IDS.code}
+                    aria-label={t(AUTH_KEYS.mfa.codeLabel)}
+                  />
+                )}
+              />
             )}
-            {errors.code ? (
-              <p id="mfa-code-error" className="text-destructive text-xs" role="alert">
-                {translateFormMessage(errors.code.message)}
-              </p>
-            ) : null}
-          </div>
+          </DrawerField>
 
           <div>
             {/* `isLoading`, not just `disabled`: the shared Button renders the

@@ -8,6 +8,7 @@ import {
   stepUpWithPassword,
   stepUpWithTotp,
 } from '@/shared/api/step-up-api.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
@@ -22,8 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -91,11 +90,11 @@ function StepUpFactorFields({
 
   if (factor === 'password') {
     return (
-      <div className="space-y-2">
-        <Label htmlFor="step-up-password">{t(keys.passwordLabel)}</Label>
-        <Input
+      <DrawerField label={t(keys.passwordLabel)} htmlFor="step-up-password">
+        <DrawerInput
           id="step-up-password"
           type="password"
+          capitalize={false}
           autoComplete="current-password"
           value={password}
           onChange={(event) => onPasswordChange(event.target.value)}
@@ -104,27 +103,25 @@ function StepUpFactorFields({
         {showPasswordHint ? (
           <p className="text-muted-foreground text-xs">{t(keys.passwordRequired)}</p>
         ) : null}
-      </div>
+      </DrawerField>
     );
   }
 
   if (factor === 'totp') {
     return (
-      <div className="space-y-2">
-        <Label htmlFor="step-up-code">{t(keys.totpLabel)}</Label>
+      <DrawerField label={t(keys.totpLabel)} htmlFor="step-up-code">
         <TotpCodeInput
           id="step-up-code"
           value={code}
           onChange={onCodeChange}
           testId="step-up-code"
         />
-      </div>
+      </DrawerField>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="step-up-code">{t(keys.emailCodeLabel)}</Label>
+    <DrawerField label={t(keys.emailCodeLabel)} htmlFor="step-up-code">
       <TotpCodeInput
         id="step-up-code"
         value={code}
@@ -143,14 +140,14 @@ function StepUpFactorFields({
         type="button"
         variant="link"
         size="sm"
-        className="h-auto p-0"
+        className="h-auto self-start p-0"
         isLoading={isSending}
         onClick={onResend}
         data-testid="step-up-resend"
       >
         {codeSent ? t(keys.resent) : t(keys.resend)}
       </Button>
-    </div>
+    </DrawerField>
   );
 }
 

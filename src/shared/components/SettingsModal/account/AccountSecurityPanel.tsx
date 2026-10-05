@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import type { MfaEnrollment } from '@/shared/api/mfa-api.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { QrCode } from '@/shared/components/QrCode/index.ts';
 import { RecoveryCodesPanel } from '@/shared/components/RecoveryCodesPanel/index.ts';
@@ -33,7 +34,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
@@ -222,10 +222,11 @@ function MfaCard() {
                   onCopy={() => void handleCopySecret()}
                 />
 
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="mfa-code">
-                    {t(SETTINGS_KEYS.security.mfa.codeLabel)}
-                  </Label>
+                <DrawerField
+                  label={t(SETTINGS_KEYS.security.mfa.codeLabel)}
+                  htmlFor="mfa-code"
+                  error={confirmError || undefined}
+                >
                   <TotpCodeInput
                     id="mfa-code"
                     value={code}
@@ -235,12 +236,7 @@ function MfaCard() {
                     testId="mfa-code"
                     aria-label={t(SETTINGS_KEYS.security.mfa.codeAria)}
                   />
-                  {confirmError ? (
-                    <p className="text-destructive text-xs" role="alert">
-                      {confirmError}
-                    </p>
-                  ) : null}
-                </div>
+                </DrawerField>
               </div>
               <DialogFooter>
                 <Button variant="ghost" onClick={closeSetup}>
@@ -499,18 +495,18 @@ function PasskeysCard() {
               {t(SETTINGS_KEYS.security.passkeys.addDescription)}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="passkey-name">
-              {t(SETTINGS_KEYS.security.passkeys.nameLabel)}
-            </Label>
-            <Input
+          <DrawerField
+            label={t(SETTINGS_KEYS.security.passkeys.nameLabel)}
+            htmlFor="passkey-name"
+          >
+            <DrawerInput
               id="passkey-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
               data-testid="passkey-name"
             />
-          </div>
+          </DrawerField>
           <DialogFooter>
             <Button variant="ghost" onClick={closeAdd}>
               {t(SETTINGS_KEYS.security.passkeys.cancel)}
