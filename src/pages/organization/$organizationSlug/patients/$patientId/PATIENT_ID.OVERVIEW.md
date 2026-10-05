@@ -19,8 +19,10 @@ A column on `canvas` inside the room gutter (`PatientFileLayout.tsx`):
   name" while the rail shows or the identity block (the name over "#3508 · +91 ••••• •3212",
   always masked) otherwise, the folder button with the section popover, the pinned tabs
   (← / → move between them; an open unpinned section shows with its dot), "+" (the Add-to-
-  record menu, hidden when the member may add nothing), "Start visit" and "Activity" with
-  its unread badge. Below `md` a 3-column grid: Back · identity · the end cluster, then the
+  record menu, hidden when the member may add nothing), "Start visit" (the patient's visit —
+  today's booking checked in, or one without a booking — and its flow on
+  `timeline?visit=open`, D18) or, while a visit is open and the flow isn't showing, the "Visit in
+  progress · Resume" pill back to it, and "Activity" with its unread badge. Below `md` a 3-column grid: Back · identity · the end cluster, then the
   folder and the tabs across.
 - **Section popover** (`components/PatientSectionsPopover/`) — the four groups of tiles
   (Open now · Empty · Has records) with a pin each; the pins are a server preference
@@ -75,7 +77,7 @@ one loader for the whole file.
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `patient-id.route.tsx`                   | Route marker — exports `Component` rendering `PatientFileLayout`.                                                                                      |
 | `patient-id.manifest.ts`                 | Manifest — `kind: 'layout'` over the eleven sections, `edit`, `check-ins` and `reviews`, permission `organization:read`, module `clinic-patients`.     |
-| `patient-id.search.ts`                   | URL schemas: the file's `activity`, a file-level drawer's `from`, the check-in and review drawers' visit, treatment and source. Rides the entry chunk. |
+| `patient-id.search.ts`                   | URL schemas: the file's `activity`, `visit` (the flow), a file-level drawer's `from`, the feedback drawers' visit, treatment and source (entry chunk). |
 | `patient-id.sections.ts`                 | The lazy route components of the layout, every section and the file-level drawers, behind one dynamic import.                                          |
 | `patient-id.constants.ts`                | `PATIENT_FILE_LAYOUT_NS` / `PATIENT_FILE_LAYOUT_KEYS` — the not-found record and the loading label.                                                    |
 | `PatientFileLayout.tsx`                  | The layout: bar, main card, Activity; the mask, the section guard, Esc, the load failure. Owns `data-testid="patient-file-layout"`.                    |
@@ -84,7 +86,7 @@ one loader for the whole file.
 | `components/PatientRail/`                | The rail: identity, Reach, About, Up next; `components/PatientRail/patient-rail.ts` holds the tenure, birthday and masked-number rules.                |
 | `components/PatientActivity/`            | The Activity column's card around `ChatColumn`.                                                                                                        |
 | `hooks/usePatientFileActivity/`          | Whether Activity is open, and its toggle.                                                                                                              |
-| `hooks/usePatientFileNavigation/`        | The file's links: sections, the list, Start visit, Edit patient, Book / Reschedule, Collect, Feedback, history chips.                                  |
+| `hooks/usePatientFileNavigation/`        | The file's links: sections, the list, Start visit / Resume (the flow), Edit patient, Book / Reschedule, Collect, Feedback, history chips.              |
 | `hooks/useEscapeBack/`                   | Esc back to the list when nothing else handled it.                                                                                                     |
 | `shared/patient-file-context.ts`         | The file's context for its sections and drawers (`usePatientFileContext`).                                                                             |
 | `shared/patient-file-nav.ts`             | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                                 |

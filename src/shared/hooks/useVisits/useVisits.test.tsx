@@ -11,7 +11,25 @@ import type * as VisitsApiModule from '@/shared/api/clinic/visits-api.ts';
 import { useTodayFloor } from '@/shared/hooks/useTodayFloor/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { useSetVisitStage, useUndoVisitChange, withVisitStage } from './useVisits.ts';
+import {
+  useApproveVisitRx,
+  useCompleteVisit,
+  useCreateVisitBill,
+  useOpenVisit,
+  useReceiveVisitPayment,
+  useRecordVisitSession,
+  useRestoreVisitSession,
+  useReverseVisitSession,
+  useSetVisitChecks,
+  useSetVisitStage,
+  useShareVisit,
+  useStartVisit,
+  useUndoVisitChange,
+  useVisitCatalog,
+  useVisitDetail,
+  withVisitChecks,
+  withVisitStage,
+} from './useVisits.ts';
 
 /** Holds a stage write until a test lets it land, so the optimistic move can be seen. */
 const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
@@ -129,5 +147,136 @@ describe('useSetVisitStage / useUndoVisitChange (D18)', () => {
     const priti = result.current.floor.data?.find((row) => row.seq === 2848);
     expect(priti ? todayLaneOf(priti) : null).toBe('arriving');
     expect(notify.error).toHaveBeenCalledWith('Check them in first');
+  });
+});
+
+describe('the Visit sheet’s reads and writes (L-49)', () => {
+  it('reads a visit, the patient’s open visit and the catalog; idle without ids', async () => {
+    const { result } = renderHook(
+      () => ({
+        detail: useVisitDetail(ref.visit(2865)),
+        none: useVisitDetail(null),
+        catalog: useVisitCatalog(),
+      }),
+      { wrapper },
+    );
+    await waitFor(() =>
+      expect(result.current.detail.data?.person.name).toBe('Dhruv Patel'),
+    );
+    await waitFor(() => expect(result.current.catalog.data?.kits).toHaveLength(3));
+    expect(result.current.none.fetchStatus).toBe('idle');
+    const patientId = result.current.detail.data?.person.patientId ?? '';
+    const open = renderHook(() => useOpenVisit(patientId), { wrapper });
+    await waitFor(() => expect(open.result.current.data?.id).toBe(ref.visit(2865)));
+    expect(
+      renderHook(() => useOpenVisit(''), { wrapper }).result.current.fetchStatus,
+    ).toBe('idle');
+  });
+
+  it('ticks a check at once and keeps it once the server answers', async () => {
+    const { result } = renderHook(
+      () => ({ detail: useVisitDetail(ref.visit(2866)), checks: useSetVisitChecks() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.detail.data).toBeDefined());
+    await act(async () => {
+      await result.current.checks.mutateAsync({
+        visitId: ref.visit(2866),
+        checks: { consent: true },
+      });
+    });
+    await waitFor(() =>
+      expect(result.current.detail.data?.visit.checks.consent).toBe(true),
+    );
+  });
+
+  it('patches only the visit a check write names', () => {
+    const detail = {
+      visit: { id: 'v', checks: { consent: false, photos: false, allergies: false } },
+    };
+    expect(withVisitChecks(detail, { visitId: 'v', checks: { photos: true } })).toEqual({
+      visit: { id: 'v', checks: { consent: false, photos: true, allergies: false } },
+    });
+    expect(withVisitChecks(detail, { visitId: 'w', checks: { photos: true } })).toBe(
+      detail,
+    );
+    expect(withVisitChecks(undefined, { visitId: 'v', checks: {} })).toBeUndefined();
+  });
+
+  it('patches the file’s open visit too, and leaves the catalogue and “none” alone', () => {
+    const open = { id: 'v', checks: { consent: false, photos: false, allergies: false } };
+    expect(withVisitChecks(open, { visitId: 'v', checks: { consent: true } })).toEqual({
+      id: 'v',
+      checks: { consent: true, photos: false, allergies: false },
+    });
+    expect(withVisitChecks(open, { visitId: 'w', checks: { consent: true } })).toBe(open);
+    const catalog = { diagnoses: [], kits: [] };
+    expect(withVisitChecks(catalog, { visitId: 'v', checks: { consent: true } })).toBe(
+      catalog,
+    );
+    expect(withVisitChecks(null, { visitId: 'v', checks: { consent: true } })).toBeNull();
+  });
+
+  it('starts a visit, bills it, records a session and completes it — failures stay quiet by default', async () => {
+    const { result } = renderHook(
+      () => ({
+        start: useStartVisit(),
+        session: useRecordVisitSession(),
+        bill: useCreateVisitBill(),
+        receive: useReceiveVisitPayment(),
+        complete: useCompleteVisit({ notifyOnError: true }),
+        share: useShareVisit(),
+        approve: useApproveVisitRx(),
+        reverse: useReverseVisitSession(),
+        restore: useRestoreVisitSession(),
+      }),
+      { wrapper },
+    );
+    const sessionResult = await act(() =>
+      result.current.session.mutateAsync({
+        visitId: ref.visit(2865),
+        params: {},
+        bodyParts: [],
+      }),
+    );
+    expect(sessionResult.treatment.sessionNo).toBe(4);
+    await act(() =>
+      result.current.reverse.mutateAsync({
+        visitId: ref.visit(2865),
+        reason: 'mistake',
+        note: null,
+      }),
+    );
+    await act(() =>
+      result.current.restore.mutateAsync({
+        visitId: ref.visit(2865),
+        treatmentId: sessionResult.treatment.id,
+      }),
+    );
+    await act(() => result.current.share.mutateAsync({ visitId: ref.visit(2865) }));
+    await act(async () => {
+      await result.current.bill
+        .mutateAsync({ visitId: ref.visit(2865) })
+        .catch(() => undefined);
+    });
+    // The sheet shows a record write's failure itself — no toast from the hook.
+    await act(async () => {
+      await result.current.receive
+        .mutateAsync({ visitId: ref.visit(2866), amount: 100, mode: 'upi' })
+        .catch(() => undefined);
+    });
+    expect(notify.error).not.toHaveBeenCalled();
+    const done = await act(() =>
+      result.current.complete.mutateAsync({ visitId: ref.visit(2865) }),
+    );
+    expect(done.visit.stage).toBe('done');
+    await act(async () => {
+      await result.current.complete
+        .mutateAsync({ visitId: ref.visit(2865) })
+        .catch(() => undefined);
+    });
+    expect(notify.error).toHaveBeenCalledWith('This visit is already completed');
+    expect(result.current.start).toBeDefined();
+    expect(result.current.approve).toBeDefined();
   });
 });

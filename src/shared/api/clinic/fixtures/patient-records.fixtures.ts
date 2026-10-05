@@ -52,6 +52,7 @@ const BODY_PARTS: Record<string, BodyPart> = {
   Scalp: 'scalp',
   Chest: 'chest',
   Underarm: 'underarm',
+  Legs: 'legs',
 };
 
 interface RxLine {
@@ -249,7 +250,10 @@ interface TreatmentRow {
   visit: number | null;
 }
 
-/** `PT_TR` (H:3672–3674), verbatim. Dharti's LHR session uses her LHR package. */
+/**
+ * `PT_TR` (H:3672–3674), verbatim, and Dhruv's last laser session before today's.
+ * Dharti's LHR session uses her LHR package.
+ */
 const TREATMENT_ROWS: readonly TreatmentRow[] = [
   {
     key: 505,
@@ -309,6 +313,32 @@ const TREATMENT_ROWS: readonly TreatmentRow[] = [
     offering: 268,
     packageKey: 1,
     visit: 2790,
+  },
+  // Today's treatment card is Dhruv's laser session (`CARDS` c9, H:3455): the
+  // Visit sheet's settings table compares today with his last session
+  // (`today.md:99–101`), from his LHR package (`PACKAGE_ROWS` key 4).
+  {
+    key: 506,
+    patient: 'Dhruv Patel',
+    at: '12 Sep 2026 · 10:20',
+    doctor: 'DN',
+    therapist: 'KP',
+    name: 'Laser hair reduction',
+    parts: ['Legs'],
+    session: 3,
+    // Its day-2 call was made at the time; no aftercare task is left open.
+    callAfterDays: 0,
+    params: {
+      type: 'Laser',
+      skinType: 'Type IV',
+      machine: 'GentleMax',
+      power: '18 J/cm²',
+      wavelength: '755',
+    },
+    remark: 'Mild redness, settled in 1 day',
+    offering: 267,
+    packageKey: 4,
+    visit: null,
   },
 ];
 
@@ -427,7 +457,7 @@ export interface PackageRow {
 }
 
 /**
- * `PT_PK` (H:3677), verbatim. A package is made by invoicing its offering, so
+ * `PT_PK` (H:3677), verbatim, and Dhruv's LHR pack. A package is made by invoicing its offering, so
  * each names its invoice; the sale date is `till` less the offering's validity.
  */
 export const PACKAGE_ROWS: readonly PackageRow[] = [
@@ -457,6 +487,16 @@ export const PACKAGE_ROWS: readonly PackageRow[] = [
     until: '23 Aug 2027',
     invoice: 780,
     sold: '23 Aug · 12:30',
+  },
+  // Dhruv's LHR pack, sold on `PY_INV` #781 — today is its fourth session ("Session 4", H:3455).
+  {
+    key: 4,
+    patient: 'Dhruv Patel',
+    offering: 267,
+    used: 3,
+    until: '28 Aug 2027',
+    invoice: 781,
+    sold: '28 Aug · 17:15',
   },
 ];
 

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2159 src files · ~1040 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
+Stats: ~2203 src files · ~1058 tests in src/ · 45 E2E specs · 35 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -466,7 +466,8 @@ clinozy-fe/
 │   │   │   ├── params.ts
 │   │   │   ├── patient-file-builders.ts
 │   │   │   ├── search-params.ts
-│   │   │   └── [7 test files]
+│   │   │   ├── visit-builders.ts
+│   │   │   └── [8 test files]
 │   │   ├── app-splash.ts
 │   │   ├── appearance-surface.ts
 │   │   ├── brand-wordmark.ts
@@ -482,6 +483,7 @@ clinozy-fe/
 │   │   ├── lazy-module.ts
 │   │   ├── list-refresh.ts
 │   │   ├── number-text.ts
+│   │   ├── occurrence-keys.ts
 │   │   ├── onboarding-defaults.ts
 │   │   ├── parse-list-tolerant.ts
 │   │   ├── password-breach.ts
@@ -493,7 +495,7 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [26 test files]
+│   │   └── [27 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── appointments.json
@@ -1281,13 +1283,14 @@ clinozy-fe/
 │   │       │   │   │   └── useWorkQueue/
 │   │       │   │   ├── today.constants.ts
 │   │       │   │   ├── today.flags.ts
+│   │       │   │   ├── today.focus.ts
 │   │       │   │   ├── today.lanes.ts
 │   │       │   │   ├── today.manifest.ts
 │   │       │   │   ├── TODAY.OVERVIEW.md
 │   │       │   │   ├── today.route.tsx
 │   │       │   │   ├── today.search.ts
 │   │       │   │   ├── TodayPage.tsx
-│   │       │   │   └── [4 test files]
+│   │       │   │   └── [5 test files]
 │   │       │   ├── users/
 │   │       │   │   ├── $userId/
 │   │       │   │   │   └── edit/
@@ -1334,6 +1337,29 @@ clinozy-fe/
 │   │       │   │   ├── users.search.ts
 │   │       │   │   ├── UsersPage.tsx
 │   │       │   │   └── [2 test files]
+│   │       │   ├── visits/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── components/
+│   │       │   │   │   ├── VisitCheckout/
+│   │       │   │   │   ├── VisitConsult/
+│   │       │   │   │   ├── VisitHistory/
+│   │       │   │   │   ├── VisitSheet/
+│   │       │   │   │   └── VisitTreatment/
+│   │       │   │   ├── hooks/
+│   │       │   │   │   └── useVisitSave/
+│   │       │   │   ├── store/
+│   │       │   │   │   └── useVisitDraftStore/
+│   │       │   │   ├── VisitPage.tsx
+│   │       │   │   ├── visits.bill.ts
+│   │       │   │   ├── visits.constants.ts
+│   │       │   │   ├── visits.manifest.ts
+│   │       │   │   ├── VISITS.OVERVIEW.md
+│   │       │   │   ├── visits.person.ts
+│   │       │   │   ├── visits.route.tsx
+│   │       │   │   ├── visits.rx.ts
+│   │       │   │   ├── visits.search.ts
+│   │       │   │   └── [5 test files]
 │   │       │   ├── organization-slug.manifest.ts
 │   │       │   ├── organization-slug.route.tsx
 │   │       │   ├── ORGANIZATION_SLUG.OVERVIEW.md
@@ -1449,7 +1475,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [51 test files]
+│   │   │   │   └── [52 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts

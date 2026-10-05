@@ -924,5 +924,73 @@
       "against": "{{number}} 宛て",
       "empty": "アクティビティはまだありません"
     }
+  },
+  "visitFlow": {
+    "pill": "来院対応中",
+    "lead": "今日の来院に必要なことを1画面で",
+    "pause": "一時停止",
+    "complete": "✓ 来院を完了",
+    "completed": "来院を完了しました",
+    "packageUsed": "パッケージを1回使用",
+    "followUp": "フォローアップを{{date}}に設定",
+    "loading": "来院情報",
+    "steps": {
+      "checks": "受付と安全確認",
+      "rx": "処方箋",
+      "treatment": "施術",
+      "invoice": "請求書",
+      "collect": "集金と共有"
+    },
+    "checks": {
+      "labels": {
+        "consent": "同意書に署名済み",
+        "photos": "ビフォー写真を撮影済み",
+        "allergies": "アレルギーと服用薬を確認済み"
+      },
+      "hints": {
+        "consent": "これがないと施術を開始できません",
+        "photos": "アフター写真と自動でペアになります",
+        "allergies": "来院のたびに確認します"
+      },
+      "left_other": "残りの確認 {{count}} 件",
+      "done": "すべての確認が完了"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "処方箋を書く",
+      "empty": "キットからワンタップで、または手動で作成",
+      "prescribed": "{{name}} を処方しました"
+    },
+    "treatment": {
+      "repeat": "⚡ 繰り返す · {{name}} · {{session}}回目",
+      "new": "新しい施術",
+      "memo": "この患者について記憶: {{memo}}",
+      "pack": "{{name}} を1回使用",
+      "blocked": "先に受付を完了してください",
+      "empty": "今日の施術を記録",
+      "last": "前回の設定: {{memo}}",
+      "done": "{{name}} · {{session}}回目",
+      "repeated": "{{session}}回目を前回の設定で記録しました"
+    },
+    "invoice": {
+      "total": "合計",
+      "create": "来院から請求書を作成",
+      "custom": "カスタム請求書",
+      "created": "来院から請求書 {{number}} を作成しました",
+      "nothing": "請求するものはありません",
+      "ready_other": "{{count}} 品目の準備完了 · {{total}}",
+      "covered": "パッケージで対応 · 請求なし",
+      "empty": "まだ請求するものはありません",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "{{amount}} を集金 · UPI",
+      "received": "{{mode}}で{{amount}}を受領",
+      "share": "処方箋・請求書・写真を共有",
+      "shared": "処方箋・請求書・写真を WhatsApp で{{name}}さんに送信しました",
+      "due": "未払い {{amount}}",
+      "nothing": "未払いなし",
+      "sent": "WhatsApp で送信済み"
+    }
   }
 }

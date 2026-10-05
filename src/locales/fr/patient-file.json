@@ -988,5 +988,77 @@
       "against": "Pour {{number}}",
       "empty": "Aucune activité pour le moment"
     }
+  },
+  "visitFlow": {
+    "pill": "Visite en cours",
+    "lead": "Tout pour la visite du jour sur un seul écran",
+    "pause": "Mettre en pause",
+    "complete": "✓ Terminer la visite",
+    "completed": "Visite terminée",
+    "packageUsed": "1 séance du forfait utilisée",
+    "followUp": "suivi prévu le {{date}}",
+    "loading": "la visite",
+    "steps": {
+      "checks": "Arrivée et sécurité",
+      "rx": "Ordonnance",
+      "treatment": "Traitement",
+      "invoice": "Facture",
+      "collect": "Encaisser et partager"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consentement signé",
+        "photos": "Photos avant prises",
+        "allergies": "Allergies et médicaments vérifiés"
+      },
+      "hints": {
+        "consent": "Le traitement ne peut pas commencer sans lui",
+        "photos": "Associées automatiquement aux photos après",
+        "allergies": "Demandé à chaque visite"
+      },
+      "left_one": "{{count}} vérification restante",
+      "left_many": "{{count}} vérifications restantes",
+      "left_other": "{{count}} vérifications restantes",
+      "done": "Toutes les vérifications sont faites"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Rédiger une ordonnance",
+      "empty": "En un geste depuis un kit, ou rédigez-en une",
+      "prescribed": "{{name}} prescrit"
+    },
+    "treatment": {
+      "repeat": "⚡ Répéter · {{name}} · séance {{session}}",
+      "new": "Nouveau traitement",
+      "memo": "Mémorisé pour ce patient : {{memo}}",
+      "pack": "Utilise 1 séance de {{name}}",
+      "blocked": "Terminez d’abord l’arrivée",
+      "empty": "Enregistrer la séance du jour",
+      "last": "Derniers réglages : {{memo}}",
+      "done": "{{name}} · séance {{session}}",
+      "repeated": "Séance {{session}} enregistrée avec les derniers réglages"
+    },
+    "invoice": {
+      "total": "Total",
+      "create": "Créer la facture depuis la visite",
+      "custom": "Facture personnalisée",
+      "created": "Facture {{number}} créée depuis la visite",
+      "nothing": "Rien à facturer",
+      "ready_one": "{{count}} ligne prête · {{total}}",
+      "ready_many": "{{count}} lignes prêtes · {{total}}",
+      "ready_other": "{{count}} lignes prêtes · {{total}}",
+      "covered": "Couvert par le forfait · rien à facturer",
+      "empty": "Rien à facturer pour l’instant",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "Encaisser {{amount}} · UPI",
+      "received": "{{amount}} reçus ({{mode}})",
+      "share": "Partager ordonnance, facture et photos",
+      "shared": "Ordonnance, facture et photos envoyées à {{name}} sur WhatsApp",
+      "due": "{{amount}} dû",
+      "nothing": "Rien à payer",
+      "sent": "Envoyé sur WhatsApp"
+    }
   }
 }

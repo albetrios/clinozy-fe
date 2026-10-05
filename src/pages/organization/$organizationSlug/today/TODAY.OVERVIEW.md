@@ -32,7 +32,9 @@ write — `src/shared/api/clinic/today-api.ts` on the fixture server (REPLACE_WI
 lane rule (`todayLaneOf`) is shared with the server; the pulse is derived. "Check in" is the
 shared status move (`useSetAppointmentStatus`, optimistic, Undo reverts its side effects);
 "Send in" moves the D18 Visit's stage (`useSetVisitStage`, optimistic, Undo — the Visit is
-plan-only, `src/shared/api/clinic/visits-*`). A failed read toasts "Couldn’t load this list ·
+plan-only, `src/shared/api/clinic/visits-*`); "Open consult" · "Open session" · "Checkout"
+open the Visit sheet (`../visits/`, L-49) on their tab, and when it closes focus goes back to
+the card's action (`today.focus.ts`). A failed read toasts "Couldn’t load this list ·
 connection dropped. Showing the last copy." with Retry and keeps the last copy; the first load
 wears the in-place skeleton.
 
@@ -46,6 +48,7 @@ wears the in-place skeleton.
 | `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                      |
 | `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                |
 | `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`) and their tones.                                                                                                                                         |
+| `today.focus.ts`            | The card whose lane action opened the Visit sheet, remembered for its panel to focus again (memory only, handed out once).                                                                                       |
 | `TodayPage.tsx`             | Room page — greeting row, tiles, panel, work queue, the stacked booking form. Owns `data-testid="today-page"`.                                                                                                   |
 | `components/TodayGreeting/` | The greeting (the page's h1), the pulse, "New booking" and "Walk-in".                                                                                                                                            |
 | `components/LaneTiles/`     | The seven tiles: count, faces, hint, focus dimming; grid from `md`, snap strip below.                                                                                                                            |

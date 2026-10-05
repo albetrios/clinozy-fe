@@ -956,5 +956,75 @@
       "against": "Against {{number}}",
       "empty": "No activity yet"
     }
+  },
+  "visitFlow": {
+    "pill": "Visit in progress",
+    "lead": "Everything for today's visit on one screen",
+    "pause": "Pause",
+    "complete": "✓ Complete visit",
+    "completed": "Visit completed",
+    "packageUsed": "1 package session used",
+    "followUp": "follow-up set for {{date}}",
+    "loading": "the visit",
+    "steps": {
+      "checks": "Check-in & safety",
+      "rx": "Prescription",
+      "treatment": "Treatment",
+      "invoice": "Invoice",
+      "collect": "Collect & share"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consent signed",
+        "photos": "Before photos taken",
+        "allergies": "Allergies & medicines checked"
+      },
+      "hints": {
+        "consent": "Treatment can't start without it",
+        "photos": "Auto-paired with after photos",
+        "allergies": "Asked at every visit"
+      },
+      "left_one": "{{count}} check left",
+      "left_other": "{{count}} checks left",
+      "done": "All checks done"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Write prescription",
+      "empty": "One tap from a kit, or write one",
+      "prescribed": "{{name}} prescribed"
+    },
+    "treatment": {
+      "repeat": "⚡ Repeat · {{name}} · session {{session}}",
+      "new": "New treatment",
+      "memo": "Remembered for this patient: {{memo}}",
+      "pack": "Uses 1 session of {{name}}",
+      "blocked": "Finish check-in first",
+      "empty": "Record today's session",
+      "last": "Last settings: {{memo}}",
+      "done": "{{name}} · session {{session}}",
+      "repeated": "Session {{session}} recorded with last settings"
+    },
+    "invoice": {
+      "total": "Total",
+      "create": "Create invoice from visit",
+      "custom": "Custom invoice",
+      "created": "Invoice {{number}} created from the visit",
+      "nothing": "Nothing to bill",
+      "ready_one": "{{count}} item ready · {{total}}",
+      "ready_other": "{{count}} items ready · {{total}}",
+      "covered": "Covered by package · nothing to bill",
+      "empty": "Nothing to bill yet",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "Collect {{amount}} · UPI",
+      "received": "{{amount}} received by {{mode}}",
+      "share": "Share Rx, invoice & photos",
+      "shared": "Rx, invoice and photos sent to {{name}} on WhatsApp",
+      "due": "{{amount}} due",
+      "nothing": "Nothing due",
+      "sent": "Sent on WhatsApp"
+    }
   }
 }

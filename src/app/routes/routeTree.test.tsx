@@ -29,6 +29,8 @@ import {
   validateTaskCreateSearch,
   validateTasksSearch,
 } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
+import { validateVisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
@@ -181,11 +183,13 @@ describe('router configuration', () => {
     )
       .filter((route) => route.options.staticData?.dialog === true)
       .map((route) => route.id);
-    // Every null-rendering dialog island (D24): drawers, viewers, previews.
-    expect(dialogs).toHaveLength(61);
+    // Every null-rendering dialog island (D24): drawers, viewers, previews —
+    // and the Visit sheet, its own full-screen layer over the room (L-49).
+    expect(dialogs).toHaveLength(62);
     expect(dialogs).toEqual(
       expect.arrayContaining(
         [
+          '/visits/$visitId',
           '/leads/$leadId',
           '/leads/create',
           '/tasks/$taskId',
@@ -733,6 +737,48 @@ describe('the Tasks dialog routes (KICKOFF §4, D24, S:95–97)', () => {
     expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
     expect(requireOrgStatus).toHaveBeenCalledTimes(1);
     expect(routeOf(`${TASKS}/$taskId`)?.options.staticData?.manifest).toBe(taskManifest);
+  });
+});
+
+describe('the Visit sheet route (KICKOFF §6.13, D18; L-49)', () => {
+  const VISIT = '/organization/$organizationSlug/visits/$visitId';
+  type VisitRoute = {
+    options: {
+      validateSearch?: unknown;
+      staticData?: { manifest?: unknown; dialog?: true };
+    };
+  };
+  const routeOf = (id: string) =>
+    (router.routesById as unknown as Record<string, VisitRoute | undefined>)[id];
+
+  beforeEach(() => {
+    gatewayExecutor.mockClear();
+    gatewayFromManifest.mockClear();
+    vi.mocked(requireOrgStatus).mockClear();
+  });
+
+  it('registers the sheet under the org shell with its tab search, as a sheet over the room', () => {
+    expect(
+      Object.keys(router.routesById).filter((id) =>
+        id.startsWith('/organization/$organizationSlug/visits'),
+      ),
+    ).toEqual([VISIT]);
+    expect(routeOf(VISIT)?.options.validateSearch).toBe(validateVisitSearch);
+    expect(routeOf(VISIT)?.options.staticData).toEqual({
+      manifest: visitManifest,
+      dialog: true,
+    });
+  });
+
+  it('runs the room gateway on its own manifest, then the status guard', async () => {
+    await beforeLoadOf(VISIT)({
+      location: { href: '/organization/acme/visits/V1?tab=consult' },
+      params: { organizationSlug: 'acme', visitId: 'V1' },
+      preload: false,
+    });
+    expect(gatewayFromManifest).toHaveBeenCalledWith(visitManifest);
+    expect(gatewayExecutor).toHaveBeenCalledWith({ kind: 'gate-context-sentinel' });
+    expect(requireOrgStatus).toHaveBeenCalledTimes(1);
   });
 });
 

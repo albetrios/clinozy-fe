@@ -956,5 +956,75 @@
       "against": "Zu {{number}}",
       "empty": "Noch keine Aktivität"
     }
+  },
+  "visitFlow": {
+    "pill": "Besuch läuft",
+    "lead": "Alles für den heutigen Besuch auf einem Bildschirm",
+    "pause": "Pausieren",
+    "complete": "✓ Besuch abschließen",
+    "completed": "Besuch abgeschlossen",
+    "packageUsed": "1 Paketsitzung genutzt",
+    "followUp": "Wiedervorlage am {{date}}",
+    "loading": "Der Besuch",
+    "steps": {
+      "checks": "Check-in & Sicherheit",
+      "rx": "Rezept",
+      "treatment": "Behandlung",
+      "invoice": "Rechnung",
+      "collect": "Kassieren & teilen"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Einwilligung unterschrieben",
+        "photos": "Vorher-Fotos gemacht",
+        "allergies": "Allergien & Medikamente geprüft"
+      },
+      "hints": {
+        "consent": "Ohne sie kann die Behandlung nicht beginnen",
+        "photos": "Automatisch mit den Nachher-Fotos gepaart",
+        "allergies": "Bei jedem Besuch erfragt"
+      },
+      "left_one": "Noch {{count}} Prüfung offen",
+      "left_other": "Noch {{count}} Prüfungen offen",
+      "done": "Alle Prüfungen erledigt"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Rezept schreiben",
+      "empty": "Mit einem Tippen aus einem Set – oder selbst schreiben",
+      "prescribed": "{{name}} verordnet"
+    },
+    "treatment": {
+      "repeat": "⚡ Wiederholen · {{name}} · Sitzung {{session}}",
+      "new": "Neue Behandlung",
+      "memo": "Für diesen Patienten gemerkt: {{memo}}",
+      "pack": "Nutzt 1 Sitzung von {{name}}",
+      "blocked": "Schließen Sie zuerst den Check-in ab",
+      "empty": "Heutige Sitzung erfassen",
+      "last": "Letzte Einstellungen: {{memo}}",
+      "done": "{{name}} · Sitzung {{session}}",
+      "repeated": "Sitzung {{session}} mit den letzten Einstellungen erfasst"
+    },
+    "invoice": {
+      "total": "Summe",
+      "create": "Rechnung aus dem Besuch erstellen",
+      "custom": "Individuelle Rechnung",
+      "created": "Rechnung {{number}} aus dem Besuch erstellt",
+      "nothing": "Nichts abzurechnen",
+      "ready_one": "{{count}} Position bereit · {{total}}",
+      "ready_other": "{{count}} Positionen bereit · {{total}}",
+      "covered": "Durch das Paket abgedeckt · nichts abzurechnen",
+      "empty": "Noch nichts abzurechnen",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "{{amount}} kassieren · UPI",
+      "received": "{{amount}} eingenommen ({{mode}})",
+      "share": "Rezept, Rechnung & Fotos teilen",
+      "shared": "Rezept, Rechnung und Fotos per WhatsApp an {{name}} gesendet",
+      "due": "{{amount}} offen",
+      "nothing": "Nichts offen",
+      "sent": "Per WhatsApp gesendet"
+    }
   }
 }

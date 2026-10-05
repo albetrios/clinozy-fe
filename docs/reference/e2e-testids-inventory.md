@@ -334,6 +334,36 @@ form over the page (`appointment-form-…` ids, below).
 | `today-queue-card` / `today-queue-outcome`  | A task card (`data-task-id`, `data-closed`); an outcome button (`data-outcome`)                    | `components/WorkQueue/`                             |
 | `today-queue-empty` / `today-booking-error` | The To do line when nothing is left; the stacked booking form's load failure                       | `components/WorkQueue/`, `components/TodayBooking/` |
 
+The lane actions "Open consult" · "Open session" · "Checkout" open the Visit sheet (below) on
+their tab; when it closes, focus goes back to the card's action (`today.focus.ts`).
+
+## Visit sheet (`/visits/$visitId`, L-49)
+
+A full-screen sheet over the room it opened from (`?tab=history|consult|treatment|checkout`),
+one Visit model with Today's floor and the patient file's flow (D18). Paths are under
+`pages/organization/$organizationSlug/visits/components/`.
+
+| Test ID                                                                        | Element                                                                                                                         | Source                               |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `visit-page` · `visit-close-strip`                                             | The sheet (the dialog) · its 12px strip that closes it                                                                          | `VisitSheet/VisitSheet.tsx`          |
+| `visit-name` · `visit-meta` · `visit-chip`                                     | The person's name (the dialog title) · "PT-… · phone" · a chip (`data-chip`: pack, due, consent, stage)                         | `VisitSheet/visit-header.tsx`        |
+| `visit-full-profile` · `visit-close`                                           | "Full profile" (the patient file's Overview) · "Close · Esc"                                                                    | `VisitSheet/visit-header.tsx`        |
+| `visit-tab-<tab>` · `visit-saved`                                              | A tab (`history` · `consult` · `treatment` · `checkout`) · the saved line (`data-state`)                                        | `VisitSheet/VisitSheet.tsx`          |
+| `visit-needs-patient`                                                          | A lead's visit in a write tab: "Create the patient record first…"                                                               | `VisitSheet/needs-patient.tsx`       |
+| `visit-history` · `visit-history-filter-<filter>`                              | The History tab · a filter (`all` · `clinical` · `money` · `messages` · `audit`; `aria-pressed`)                                | `VisitHistory/VisitHistory.tsx`      |
+| `visit-history-row` · `visit-next-<tab>`                                       | A row (`data-kind`) · a "Next for this visit" jump (`consult` · `treatment` · `checkout`)                                       | `VisitHistory/VisitHistory.tsx`      |
+| `visit-consult` · `visit-complaint` · `visit-findings`                         | The Consult & Rx tab · the complaint and findings fields                                                                        | `VisitConsult/`                      |
+| `visit-diagnosis` · `visit-plan`                                               | A diagnosis chip (`aria-pressed`) · the plan field                                                                              | `VisitConsult/consult-note.tsx`      |
+| `visit-copy-rx` · `visit-rx-add` · `visit-approve`                             | "Copy {date} prescription" · an "Add" chip · "Approve · print · send to pharmacy" (`aria-disabled` until every line has a dose) | `VisitConsult/VisitConsult.tsx`      |
+| `visit-rx-line` · `visit-rx-review` · `visit-rx-dose` · `visit-rx-remove`      | An Rx line · its "Set dose" (a line without one; `aria-expanded`) or ✓ review (`aria-pressed`) · the dose editor · remove       | `VisitConsult/rx-lines.tsx`          |
+| `visit-rx-approved`                                                            | The approved box with "Print"                                                                                                   | `VisitConsult/VisitConsult.tsx`      |
+| `visit-treatment` · `visit-setting-<key>` · `visit-area`                       | The Treatment tab (pack bar segments carry `data-segment`) · a setting's "today" field · an area pill                           | `VisitTreatment/`                    |
+| `visit-complete-session` · `visit-session-recorded` · `visit-reverse-session`  | "Complete session k of m" · the recorded box · "Reverse with reason"                                                            | `VisitTreatment/VisitTreatment.tsx`  |
+| `visit-photo` · `visit-capture`                                                | A comparison photo · the "Capture today" tile                                                                                   | `VisitTreatment/visit-photos.tsx`    |
+| `visit-checkout` · `visit-bill-line` · `visit-create-bill` · `visit-bill-made` | The Checkout tab · a bill line · "Create bill" · the finalised line (Cancel bill · Credit note)                                 | `VisitCheckout/`                     |
+| `visit-mode-<mode>` · `visit-amount` · `visit-receive`                         | A payment mode (`upi` · `cash` · `card` · `split`; `aria-checked`) · the amount · "Receive ₹… by …"                             | `VisitCheckout/checkout-payment.tsx` |
+| `visit-complete`                                                               | "✓ Complete visit" when nothing is left to pay                                                                                  | `VisitCheckout/checkout-payment.tsx` |
+
 ---
 
 ## Dashboard (`/`)
@@ -786,6 +816,22 @@ are under `pages/organization/$organizationSlug/patients/$patientId/timeline/com
 | `overview-note-input` · `overview-note-post`                  | Team notes' composer · "Post"                                                                                           | `OverviewBento/bento-files.tsx`    |
 | `overview-activity` · `overview-activity-filter-<kind>`       | The activity card · a filter chip (`all` · `visit` · `rx` · `treat` · `inv` · `pay` · `photo` · `note`; `aria-pressed`) | `ActivityTimeline/`                |
 | `overview-activity-row`                                       | A row (`data-kind`) — a record, or a day's photos                                                                       | `ActivityTimeline/`                |
+
+### Patient file visit flow (launch L-49)
+
+`timeline?visit=open` while the patient has an open visit (D18): the flow takes the Overview's
+place. The file bar's `patient-file-start-visit` starts one; its "Visit in progress · Resume"
+pill returns to it. Paths are under `…/timeline/components/VisitFlow/`.
+
+| Test ID                                                   | Element                                                                           | Source           |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------- |
+| `visit-flow` · `visit-flow-pause` · `visit-flow-complete` | The flow · "Pause" (back to the Overview, the visit open) · "✓ Complete visit"    | `VisitFlow.tsx`  |
+| `visit-flow-step-<step>`                                  | A step card (`checks` · `rx` · `treatment` · `invoice` · `collect`; `data-state`) | `VisitFlow.tsx`  |
+| `visit-flow-check-<check>`                                | A safety check tile (`consent` · `photos` · `allergies`; role `checkbox`)         | `flow-steps.tsx` |
+| `visit-flow-kit` · `visit-flow-write-rx`                  | A one-tap Rx kit (`data-kit`) · "Write prescription"                              | `flow-steps.tsx` |
+| `visit-flow-repeat` · `visit-flow-new-treatment`          | "⚡ Repeat · … · session n" · "New treatment"                                     | `flow-steps.tsx` |
+| `visit-flow-create-invoice` · `visit-flow-custom-invoice` | "Create invoice from visit" · "Custom invoice"                                    | `flow-steps.tsx` |
+| `visit-flow-collect-<mode>` · `visit-flow-share`          | Collect the oldest due (`upi` · `cash` · `card`) · "Share Rx, invoice & photos"   | `flow-steps.tsx` |
 
 ## Quick line (shared, launch L-45)
 

@@ -11,6 +11,9 @@ const PATIENT_FILE_ACTIVITY = ['open', 'closed'] as const;
 /** One Activity state a link can carry. */
 export type PatientFileActivity = (typeof PATIENT_FILE_ACTIVITY)[number];
 
+/** The visit flow in a link (D18): `open` shows it in place of the Overview. */
+const PATIENT_FILE_VISIT = ['open'] as const;
+
 /** Validated `?…` params of the file layout, and so of every section. */
 export interface PatientFileSearch {
   /**
@@ -19,13 +22,22 @@ export interface PatientFileSearch {
    * in this session.
    */
   activity?: PatientFileActivity;
+  /**
+   * `timeline?visit=open` — the visit flow (KICKOFF §6.6, L-49). Only the
+   * Overview reads it; a section's own link leaves it out, so it never follows
+   * the member elsewhere.
+   */
+  visit?: (typeof PATIENT_FILE_VISIT)[number];
 }
 
-/** Parse the file layout's params; an unknown `activity` is dropped. */
+/** Parse the file layout's params; an unknown `activity` or `visit` is dropped. */
 export function validatePatientFileSearch(
   search: Record<string, unknown>,
 ): PatientFileSearch {
-  return { activity: oneOf(PATIENT_FILE_ACTIVITY, search.activity) };
+  return {
+    activity: oneOf(PATIENT_FILE_ACTIVITY, search.activity),
+    visit: oneOf(PATIENT_FILE_VISIT, search.visit),
+  };
 }
 
 /** Validated `?…` params of a file-level drawer (`edit/`, `S:34`). */

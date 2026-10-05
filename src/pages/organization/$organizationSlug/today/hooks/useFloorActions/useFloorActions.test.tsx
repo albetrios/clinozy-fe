@@ -17,6 +17,7 @@ import {
   resetTodayRoute,
   TODAY_PATH,
 } from '../../__tests__/integration/today-test-router.tsx';
+import { takeVisitCard } from '../../today.focus.ts';
 import { groupTodayLanes, type TodayCard } from '../../today.lanes.ts';
 import { type FloorActions, useFloorActions } from './useFloorActions.ts';
 
@@ -132,6 +133,8 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
       ),
     );
     expect(router.state.location.search).toEqual({ tab: 'treatment' });
+    // The card is remembered, so its action takes focus back when the sheet closes.
+    expect(takeVisitCard()).toBe(cardIn('treatment').id);
   });
 
   it('does nothing for a visit the floor moved a moment ago (no id yet)', async () => {
@@ -141,6 +144,7 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     );
     act(() => probe.actions?.actionOf(cardIn('with_doctor'))?.());
     expect(router.state.location.pathname).toBe(TODAY_PATH);
+    expect(takeVisitCard()).toBeNull();
   });
 
   it('opens an enquiry’s lead, a patient’s file, or says there is no record', async () => {

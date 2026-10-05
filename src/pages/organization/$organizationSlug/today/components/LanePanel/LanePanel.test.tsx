@@ -7,6 +7,7 @@ import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { enquiry, floorRow, uuid } from '../../__tests__/integration/today-fixtures.ts';
+import { rememberVisitCard, takeVisitCard } from '../../today.focus.ts';
 import { groupTodayLanes, type TodayCard } from '../../today.lanes.ts';
 import { LanePanel, type LanePanelProps } from './LanePanel.tsx';
 
@@ -95,6 +96,25 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
     );
     await user.click(screen.getByTestId('today-card-action'));
     expect(act).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives focus back to the card whose action opened the Visit sheet (§7.2)', async () => {
+    rememberVisitCard(uuid(1));
+    const { unmount } = renderPanel();
+    await vi.waitFor(() => expect(screen.getByTestId('today-card-action')).toHaveFocus());
+    unmount();
+
+    rememberVisitCard(uuid(1));
+    renderPanel({ actionOf: () => null });
+    await vi.waitFor(() => expect(screen.getByTestId('today-card-open')).toHaveFocus());
+  });
+
+  it('focuses nothing when the card has left the lane, and forgets it', async () => {
+    rememberVisitCard(uuid(7));
+    renderPanel();
+    await screen.findByTestId('today-card');
+    expect(document.body).toHaveFocus();
+    expect(takeVisitCard()).toBeNull();
   });
 
   it('hides an action the member can’t take', async () => {

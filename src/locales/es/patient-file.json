@@ -988,5 +988,77 @@
       "against": "Para {{number}}",
       "empty": "Aún no hay actividad"
     }
+  },
+  "visitFlow": {
+    "pill": "Visita en curso",
+    "lead": "Todo lo de la visita de hoy en una sola pantalla",
+    "pause": "Pausar",
+    "complete": "✓ Completar visita",
+    "completed": "Visita completada",
+    "packageUsed": "1 sesión del paquete usada",
+    "followUp": "seguimiento fijado para el {{date}}",
+    "loading": "la visita",
+    "steps": {
+      "checks": "Llegada y seguridad",
+      "rx": "Receta",
+      "treatment": "Tratamiento",
+      "invoice": "Factura",
+      "collect": "Cobrar y compartir"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consentimiento firmado",
+        "photos": "Fotos de antes tomadas",
+        "allergies": "Alergias y medicamentos revisados"
+      },
+      "hints": {
+        "consent": "El tratamiento no puede empezar sin él",
+        "photos": "Se emparejan solas con las fotos de después",
+        "allergies": "Se pregunta en cada visita"
+      },
+      "left_one": "Queda {{count}} comprobación",
+      "left_many": "Quedan {{count}} comprobaciones",
+      "left_other": "Quedan {{count}} comprobaciones",
+      "done": "Todas las comprobaciones hechas"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Escribir receta",
+      "empty": "Con un toque desde un kit, o escribe una",
+      "prescribed": "{{name}} recetado"
+    },
+    "treatment": {
+      "repeat": "⚡ Repetir · {{name}} · sesión {{session}}",
+      "new": "Nuevo tratamiento",
+      "memo": "Recordado para este paciente: {{memo}}",
+      "pack": "Usa 1 sesión de {{name}}",
+      "blocked": "Termina primero el registro de llegada",
+      "empty": "Registrar la sesión de hoy",
+      "last": "Últimos ajustes: {{memo}}",
+      "done": "{{name}} · sesión {{session}}",
+      "repeated": "Sesión {{session}} registrada con los últimos ajustes"
+    },
+    "invoice": {
+      "total": "Total",
+      "create": "Crear factura desde la visita",
+      "custom": "Factura personalizada",
+      "created": "Factura {{number}} creada desde la visita",
+      "nothing": "Nada que facturar",
+      "ready_one": "{{count}} concepto listo · {{total}}",
+      "ready_many": "{{count}} conceptos listos · {{total}}",
+      "ready_other": "{{count}} conceptos listos · {{total}}",
+      "covered": "Cubierto por el paquete · nada que facturar",
+      "empty": "Aún no hay nada que facturar",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "Cobrar {{amount}} · UPI",
+      "received": "{{amount}} cobrados ({{mode}})",
+      "share": "Compartir receta, factura y fotos",
+      "shared": "Receta, factura y fotos enviadas a {{name}} por WhatsApp",
+      "due": "{{amount}} pendiente",
+      "nothing": "Nada pendiente",
+      "sent": "Enviado por WhatsApp"
+    }
   }
 }

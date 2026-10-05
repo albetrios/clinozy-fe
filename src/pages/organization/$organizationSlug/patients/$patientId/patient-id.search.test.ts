@@ -22,6 +22,15 @@ describe('the patient file’s search params', () => {
     expect(validatePatientFileSearch({})).toEqual({ activity: undefined });
   });
 
+  it('keeps `visit=open` for the visit flow and drops any other value (L-49)', () => {
+    expect(validatePatientFileSearch({ visit: 'open' })).toStrictEqual({
+      activity: undefined,
+      visit: 'open',
+    });
+    expect(validatePatientFileSearch({ visit: 'closed' }).visit).toBeUndefined();
+    expect(validatePatientFileSearch({ visit: ['open'] }).visit).toBeUndefined();
+  });
+
   it('keeps a drawer’s `from` as text, for the drawer to check', () => {
     expect(validatePatientFileDialogSearch({ from: 'visits' })).toEqual({
       from: 'visits',

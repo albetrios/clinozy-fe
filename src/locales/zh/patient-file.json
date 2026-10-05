@@ -924,5 +924,73 @@
       "against": "对应 {{number}}",
       "empty": "暂无动态"
     }
+  },
+  "visitFlow": {
+    "pill": "就诊进行中",
+    "lead": "今天就诊的所有内容都在一个屏幕上",
+    "pause": "暂停",
+    "complete": "✓ 完成就诊",
+    "completed": "就诊已完成",
+    "packageUsed": "已使用 1 次套餐",
+    "followUp": "随访定于 {{date}}",
+    "loading": "就诊信息",
+    "steps": {
+      "checks": "签到与安全",
+      "rx": "处方",
+      "treatment": "治疗",
+      "invoice": "发票",
+      "collect": "收款与分享"
+    },
+    "checks": {
+      "labels": {
+        "consent": "已签署同意书",
+        "photos": "已拍术前照片",
+        "allergies": "已核对过敏史和用药"
+      },
+      "hints": {
+        "consent": "没有它无法开始治疗",
+        "photos": "自动与术后照片配对",
+        "allergies": "每次就诊都会询问"
+      },
+      "left_other": "还剩 {{count}} 项检查",
+      "done": "所有检查已完成"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "开处方",
+      "empty": "从套装一键开具，或手动开具",
+      "prescribed": "已开具 {{name}}"
+    },
+    "treatment": {
+      "repeat": "⚡ 重复 · {{name}} · 第 {{session}} 次",
+      "new": "新建治疗",
+      "memo": "已为此患者记住：{{memo}}",
+      "pack": "使用 1 次 {{name}}",
+      "blocked": "请先完成签到",
+      "empty": "记录今天的治疗",
+      "last": "上次参数：{{memo}}",
+      "done": "{{name}} · 第 {{session}} 次",
+      "repeated": "已按上次参数记录第 {{session}} 次"
+    },
+    "invoice": {
+      "total": "合计",
+      "create": "根据就诊创建发票",
+      "custom": "自定义发票",
+      "created": "已根据就诊创建发票 {{number}}",
+      "nothing": "无可开票项目",
+      "ready_other": "{{count}} 项已就绪 · {{total}}",
+      "covered": "已由套餐覆盖 · 无需开票",
+      "empty": "暂无可开票项目",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "收款 {{amount}} · UPI",
+      "received": "已通过{{mode}}收款 {{amount}}",
+      "share": "分享处方、发票和照片",
+      "shared": "已通过 WhatsApp 将处方、发票和照片发送给 {{name}}",
+      "due": "欠款 {{amount}}",
+      "nothing": "无欠款",
+      "sent": "已通过 WhatsApp 发送"
+    }
   }
 }

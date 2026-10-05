@@ -9,6 +9,7 @@ import type {
   PatientFile,
   PatientNextVisit,
 } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { fetchOpenVisit, startVisit } from '@/shared/api/clinic/visits-api.ts';
 import { viewablePatientFileSections } from '@/shared/clinic/patient-file-sections.ts';
 
 import {
@@ -35,6 +36,7 @@ function NavigationProbe() {
     reports: () => navigation.openSection('reports'),
     list: navigation.backToList,
     startVisit: navigation.startVisit,
+    resumeVisit: navigation.resumeVisit,
     editContact: navigation.editContact,
     book: navigation.railActions.onBook && (() => navigation.railActions.onBook?.(null)),
     reschedule:
@@ -97,8 +99,28 @@ describe('usePatientFileNavigation', () => {
     expect((await follow('list')).pathname).toBe('/organization/acme/patients');
   });
 
-  it('starts a visit on the Overview, where the visit flow runs', async () => {
-    expect((await follow('startVisit')).pathname).toBe(`${FILE}/timeline`);
+  it('starts a visit and opens its flow on the Overview (D18)', async () => {
+    expect(await fetchOpenVisit(DHARTI)).toBeNull();
+    const started = await follow('startVisit');
+    expect(started.pathname).toBe(`${FILE}/timeline`);
+    expect(started.search).toEqual({ visit: 'open' });
+    expect(await fetchOpenVisit(DHARTI)).not.toBeNull();
+  });
+
+  it('offers Resume instead of Start visit while a visit is open', async () => {
+    await startVisit({ patientId: DHARTI });
+    const { unmount } = renderInPatientFile(<NavigationProbe />, {
+      file,
+      section: 'visits',
+    });
+    expect(
+      await screen.findByRole('button', { name: 'resumeVisit' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'startVisit' })).not.toBeInTheDocument();
+    unmount();
+
+    const resumed = await follow('resumeVisit', { section: 'invoices' });
+    expect(resumed).toEqual({ pathname: `${FILE}/timeline`, search: { visit: 'open' } });
   });
 
   it('opens Edit patient over the open section (A-F1)', async () => {

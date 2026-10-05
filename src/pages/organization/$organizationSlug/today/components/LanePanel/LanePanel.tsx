@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -12,6 +12,7 @@ import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
 import { TODAY_FLAG_TONES, todayCardFlags, type TodayFlag } from '../../today.flags.ts';
+import { takeVisitCard } from '../../today.focus.ts';
 import { TODAY_LANE_META, type TodayCard } from '../../today.lanes.ts';
 import { useCardServiceLine } from './use-card-service-line.ts';
 
@@ -174,6 +175,26 @@ function VisitCardSkeleton() {
 }
 
 /**
+ * Focus back on the card whose action opened the Visit sheet (KICKOFF §6.13,
+ * §7.2) once the panel shows its cards — its action, else its name; nothing
+ * when the card has left this lane.
+ */
+function useVisitCardFocus(loading: boolean) {
+  const panel = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (loading) return;
+    const cardId = takeVisitCard();
+    if (!cardId) return;
+    const card = panel.current?.querySelector(`[data-card-id="${CSS.escape(cardId)}"]`);
+    const target =
+      card?.querySelector<HTMLElement>(`[data-testid="${TODAY_TEST_IDS.cardAction}"]`) ??
+      card?.querySelector<HTMLElement>(`[data-testid="${TODAY_TEST_IDS.cardOpen}"]`);
+    target?.focus();
+  }, [loading]);
+  return panel;
+}
+
+/**
  * The selected lane's panel (KICKOFF §6.2; `today.md:20, 52–57`; H:599–614): a
  * card in the lane's fill and line — its name and "<n> people", then the
  * visit cards on an `auto-fill` 210px grid (four across at 1440, two at 1024
@@ -192,9 +213,11 @@ export function LanePanel({
 }: LanePanelProps) {
   const { t } = useTranslation(TODAY_NS);
   const headingId = useId();
+  const panel = useVisitCardFocus(loading);
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
   return (
     <section
+      ref={panel}
       aria-labelledby={headingId}
       data-testid={TODAY_TEST_IDS.panel}
       data-lane={lane}

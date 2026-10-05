@@ -924,5 +924,73 @@
       "against": "{{number}} 대상",
       "empty": "아직 활동이 없습니다"
     }
+  },
+  "visitFlow": {
+    "pill": "방문 진행 중",
+    "lead": "오늘 방문에 필요한 모든 것을 한 화면에",
+    "pause": "일시 중지",
+    "complete": "✓ 방문 완료",
+    "completed": "방문 완료",
+    "packageUsed": "패키지 1회 사용",
+    "followUp": "{{date}} 후속 조치 설정",
+    "loading": "방문 정보",
+    "steps": {
+      "checks": "체크인 및 안전",
+      "rx": "처방전",
+      "treatment": "시술",
+      "invoice": "청구서",
+      "collect": "수납 및 공유"
+    },
+    "checks": {
+      "labels": {
+        "consent": "동의서 서명 완료",
+        "photos": "시술 전 사진 촬영 완료",
+        "allergies": "알레르기 및 복용 약 확인 완료"
+      },
+      "hints": {
+        "consent": "이것 없이는 시술을 시작할 수 없습니다",
+        "photos": "시술 후 사진과 자동으로 짝지어집니다",
+        "allergies": "방문할 때마다 확인합니다"
+      },
+      "left_other": "확인 {{count}}개 남음",
+      "done": "모든 확인 완료"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "처방전 작성",
+      "empty": "키트에서 한 번에, 또는 직접 작성",
+      "prescribed": "{{name}} 처방됨"
+    },
+    "treatment": {
+      "repeat": "⚡ 반복 · {{name}} · {{session}}회차",
+      "new": "새 시술",
+      "memo": "이 환자에 대해 기억된 설정: {{memo}}",
+      "pack": "{{name}} 1회 사용",
+      "blocked": "먼저 체크인을 완료하세요",
+      "empty": "오늘 시술 회차 기록",
+      "last": "지난 설정: {{memo}}",
+      "done": "{{name}} · {{session}}회차",
+      "repeated": "지난 설정으로 {{session}}회차를 기록했습니다"
+    },
+    "invoice": {
+      "total": "합계",
+      "create": "방문으로 청구서 만들기",
+      "custom": "직접 작성 청구서",
+      "created": "방문으로 청구서 {{number}} 생성됨",
+      "nothing": "청구할 항목 없음",
+      "ready_other": "{{count}}개 항목 준비됨 · {{total}}",
+      "covered": "패키지로 처리 · 청구할 항목 없음",
+      "empty": "아직 청구할 항목이 없습니다",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "{{amount}} 수납 · UPI",
+      "received": "{{amount}} 수납 ({{mode}})",
+      "share": "처방전, 청구서, 사진 공유",
+      "shared": "처방전, 청구서, 사진을 WhatsApp으로 {{name}}님에게 보냈습니다",
+      "due": "미수 {{amount}}",
+      "nothing": "미수 없음",
+      "sent": "WhatsApp으로 전송됨"
+    }
   }
 }

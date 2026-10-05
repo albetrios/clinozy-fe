@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
@@ -298,12 +299,9 @@ function FillInRow({
   // One chip per placeholder; a message can hold the same one twice, so the
   // key counts its occurrences.
   const chips = useMemo(() => {
-    const seen = new Map<string, number>();
-    return templateVariables(text).map((variable) => {
-      const nth = (seen.get(variable) ?? 0) + 1;
-      seen.set(variable, nth);
-      return { variable, key: `${variable}:${nth}` };
-    });
+    const variables = templateVariables(text);
+    const keys = occurrenceKeys(variables);
+    return variables.map((variable, index) => ({ variable, key: keys[index] }));
   }, [text]);
   if (!chips.length) return null;
   return (

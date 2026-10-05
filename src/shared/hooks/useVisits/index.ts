@@ -1,1 +1,20 @@
-export { useSetVisitStage, useUndoVisitChange, withVisitStage } from './useVisits.ts';
+export {
+  useApproveVisitRx,
+  useCompleteVisit,
+  useCreateVisitBill,
+  useOpenVisit,
+  useReceiveVisitPayment,
+  useRecordVisitSession,
+  useRestoreVisitSession,
+  useReverseVisitSession,
+  useSetVisitChecks,
+  useSetVisitStage,
+  useShareVisit,
+  useStartVisit,
+  useUndoVisitChange,
+  useVisitCatalog,
+  useVisitDetail,
+  type VisitWriteOptions,
+  withVisitChecks,
+  withVisitStage,
+} from './useVisits.ts';

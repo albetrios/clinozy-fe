@@ -13,6 +13,10 @@ export interface DialogRouteRecord<T> {
   /** The drawer should be open: the dialog route matched and the record exists (or is loading). */
   isOpen: boolean;
   isPending: boolean;
+  /** The read failed for another reason than a missing record (a dropped connection, a 5xx). */
+  isError: boolean;
+  /** Read the record again — a failure's Retry. */
+  refetch: () => void;
 }
 
 const isNotFound = (error: unknown) => isHttpError(error) && error.status === 404;
@@ -61,5 +65,7 @@ export function useDialogRouteRecord<T>({
     record: id === undefined ? undefined : query.data,
     isOpen: id !== undefined && !missing,
     isPending: id !== undefined && query.isPending,
+    isError: id !== undefined && query.isError && !missing,
+    refetch: () => void query.refetch(),
   };
 }

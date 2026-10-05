@@ -202,6 +202,7 @@ function PatientFileBody({
         activityOpen={activity.open}
         onToggleActivity={activity.toggle}
         onStartVisit={go.startVisit}
+        onResumeVisit={go.resumeVisit}
       />
       <div className="m-(--room-card-margin) flex min-h-0 flex-1 gap-3 max-md:gap-0">
         <div

@@ -14,6 +14,7 @@ import { useSetVisitStage, useUndoVisitChange } from '@/shared/hooks/useVisits/i
 import { notify } from '@/shared/notify/index.ts';
 
 import { TODAY_KEYS, TODAY_NS } from '../../today.constants.ts';
+import { rememberVisitCard } from '../../today.focus.ts';
 import type { TodayCard } from '../../today.lanes.ts';
 
 /** A booking's card (the lanes past Enquiries). */
@@ -90,6 +91,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     return () => {
       // A visit the floor moved a moment ago has no id until the refetch.
       if (!row.visit?.id) return;
+      rememberVisitCard(row.id);
       go(
         clinicCommandNavigation('visit', {
           organizationSlug,

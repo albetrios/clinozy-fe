@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 
 import { organizationAppointment, organizationPatients } from '@/lib/routes/index.ts';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@/shared/clinic/patient-file-sections.ts';
 import type { ChatHistoryTarget } from '@/shared/components/ChatColumn/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useOpenVisit, useStartVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import type { RailUpNextActions } from '../../components/PatientRail/index.ts';
 import { usePatientFileActions } from '../../shared/hooks/usePatientFileActions/index.ts';
@@ -23,8 +24,14 @@ export interface PatientFileNavigation {
   openSection: (section: PatientFileSectionSlug) => void;
   /** Back to the Patients list (the Back button, the breadcrumb, Esc). */
   backToList: () => void;
-  /** "Start visit": the Overview, where the visit flow runs (L-49, D18). */
+  /**
+   * "Start visit" (D18): the patient's open visit, else a new one — today's
+   * booking checked in when it is not yet — and the flow on the Overview
+   * (`timeline?visit=open`). Hidden while a visit is open.
+   */
   startVisit?: () => void;
+  /** "Visit in progress · Resume": back to the flow — while a visit is open and the flow isn't showing. */
+  resumeVisit?: () => void;
   /** The rail's "Edit contact" → `edit/` over this section (A-F1). */
   editContact?: () => void;
   /** The rail's Up next: Book / Reschedule, Collect, Feedback. */
@@ -50,9 +57,22 @@ function when<A>(allowed: boolean, action: A): A | undefined {
 export function usePatientFileNavigation(): PatientFileNavigation {
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
+  const search: { visit?: 'open' } = useSearch({ strict: false });
   const { patientId, section, viewable } = usePatientFileContext();
   const access = useClinicAccess();
   const actions = usePatientFileActions();
+  const openVisit = useOpenVisit(patientId).data ?? null;
+  const start = useStartVisit();
+  const flowShowing = section === PATIENT_FILE_DEFAULT_SECTION && search.visit === 'open';
+  const toFlow = () =>
+    void navigate({
+      ...organizationPatientSection(
+        organizationSlug,
+        patientId,
+        PATIENT_FILE_DEFAULT_SECTION,
+      ),
+      search: { visit: 'open' },
+    });
   const referrer = section ? `patients/${patientId}/${section}` : null;
   const from = referrer ? { from: referrer } : {};
   const can = (
@@ -98,9 +118,10 @@ export function usePatientFileNavigation(): PatientFileNavigation {
   return {
     openSection,
     backToList: () => void navigate(organizationPatients(organizationSlug)),
-    startVisit: when(viewable.includes(PATIENT_FILE_DEFAULT_SECTION), () =>
-      openSection(PATIENT_FILE_DEFAULT_SECTION),
+    startVisit: when(viewable.includes(PATIENT_FILE_DEFAULT_SECTION) && !openVisit, () =>
+      start.mutate({ patientId }, { onSuccess: toFlow }),
     ),
+    resumeVisit: when(Boolean(openVisit) && !flowShowing, toFlow),
     editContact: when(can('patients', 'edit'), editContact),
     railActions: {
       onBook: when(canBook, (next: PatientNextVisit | null) =>

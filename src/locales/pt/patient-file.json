@@ -988,5 +988,77 @@
       "against": "Referente a {{number}}",
       "empty": "Nenhuma atividade ainda"
     }
+  },
+  "visitFlow": {
+    "pill": "Visita em andamento",
+    "lead": "Tudo da visita de hoje em uma só tela",
+    "pause": "Pausar",
+    "complete": "✓ Concluir visita",
+    "completed": "Visita concluída",
+    "packageUsed": "1 sessão do pacote usada",
+    "followUp": "retorno marcado para {{date}}",
+    "loading": "a visita",
+    "steps": {
+      "checks": "Chegada e segurança",
+      "rx": "Receita",
+      "treatment": "Tratamento",
+      "invoice": "Fatura",
+      "collect": "Receber e compartilhar"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consentimento assinado",
+        "photos": "Fotos de antes tiradas",
+        "allergies": "Alergias e medicamentos verificados"
+      },
+      "hints": {
+        "consent": "O tratamento não pode começar sem ele",
+        "photos": "Pareadas automaticamente com as fotos de depois",
+        "allergies": "Perguntado em toda visita"
+      },
+      "left_one": "Falta {{count}} verificação",
+      "left_many": "Faltam {{count}} verificações",
+      "left_other": "Faltam {{count}} verificações",
+      "done": "Todas as verificações feitas"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Escrever receita",
+      "empty": "Um toque a partir de um kit, ou escreva uma",
+      "prescribed": "{{name}} receitado"
+    },
+    "treatment": {
+      "repeat": "⚡ Repetir · {{name}} · sessão {{session}}",
+      "new": "Novo tratamento",
+      "memo": "Lembrado para este paciente: {{memo}}",
+      "pack": "Usa 1 sessão de {{name}}",
+      "blocked": "Conclua a chegada primeiro",
+      "empty": "Registrar a sessão de hoje",
+      "last": "Últimos ajustes: {{memo}}",
+      "done": "{{name}} · sessão {{session}}",
+      "repeated": "Sessão {{session}} registrada com os últimos ajustes"
+    },
+    "invoice": {
+      "total": "Total",
+      "create": "Criar fatura a partir da visita",
+      "custom": "Fatura personalizada",
+      "created": "Fatura {{number}} criada a partir da visita",
+      "nothing": "Nada a faturar",
+      "ready_one": "{{count}} item pronto · {{total}}",
+      "ready_many": "{{count}} itens prontos · {{total}}",
+      "ready_other": "{{count}} itens prontos · {{total}}",
+      "covered": "Coberto pelo pacote · nada a faturar",
+      "empty": "Nada a faturar ainda",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "Receber {{amount}} · UPI",
+      "received": "{{amount}} recebidos ({{mode}})",
+      "share": "Compartilhar receita, fatura e fotos",
+      "shared": "Receita, fatura e fotos enviadas para {{name}} pelo WhatsApp",
+      "due": "{{amount}} pendente",
+      "nothing": "Nada pendente",
+      "sent": "Enviado pelo WhatsApp"
+    }
   }
 }

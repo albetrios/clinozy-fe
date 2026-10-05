@@ -183,6 +183,8 @@ import {
   validateUserEditSearch,
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
+import { manifest as visitManifest } from '@/pages/organization/$organizationSlug/visits/visits.manifest.ts';
+import { validateVisitSearch } from '@/pages/organization/$organizationSlug/visits/visits.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
@@ -1733,6 +1735,32 @@ const organizationInvoiceEditRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+// ── The Visit sheet (L-49; KICKOFF §6.13, D18) ──
+// A full-screen page of Today's module over the shell (the sheet is its own
+// layer), on `visits/$visitId` — `visits/` owns the param. It loads Today's
+// copy, which the sheet's words live in.
+const VisitPage = lazyRouteComponent(
+  localizedRoute(
+    [I18N_NAMESPACES.today],
+    () => import('@/pages/organization/$organizationSlug/visits/visits.route.tsx'),
+  ),
+  'Component',
+);
+
+const organizationVisitRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'visits/$visitId',
+  head: manifestHead(visitManifest),
+  // A sheet over the room that opened it: opening and closing it is no page
+  // change, so the room does not rise again when the sheet closes.
+  staticData: dialogRoute(visitManifest),
+  validateSearch: validateVisitSearch,
+  beforeLoad: roomLeafGate(visitManifest),
+  component: VisitPage,
+  errorComponent: RouteErrorBoundary,
+});
+// ── end of the Visit sheet ──
+
 const organizationTasksRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'tasks',
@@ -2583,6 +2611,7 @@ const routeTree = rootRoute.addChildren([
       organizationInvoiceCreateRoute,
       organizationInvoiceRoute.addChildren([organizationInvoiceEditRoute]),
     ]),
+    organizationVisitRoute,
     organizationTasksRoute.addChildren([
       organizationTaskCreateRoute,
       organizationTaskRoute,

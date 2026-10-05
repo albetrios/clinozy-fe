@@ -988,5 +988,77 @@
       "against": "Per {{number}}",
       "empty": "Ancora nessuna attività"
     }
+  },
+  "visitFlow": {
+    "pill": "Visita in corso",
+    "lead": "Tutto per la visita di oggi in un’unica schermata",
+    "pause": "Metti in pausa",
+    "complete": "✓ Completa visita",
+    "completed": "Visita completata",
+    "packageUsed": "1 seduta del pacchetto usata",
+    "followUp": "follow-up fissato per il {{date}}",
+    "loading": "questa visita",
+    "steps": {
+      "checks": "Arrivo e sicurezza",
+      "rx": "Prescrizione",
+      "treatment": "Trattamento",
+      "invoice": "Fattura",
+      "collect": "Incassa e condividi"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consenso firmato",
+        "photos": "Foto prima scattate",
+        "allergies": "Allergie e farmaci verificati"
+      },
+      "hints": {
+        "consent": "Senza consenso il trattamento non può iniziare",
+        "photos": "Abbinate in automatico alle foto dopo",
+        "allergies": "Chiesto a ogni visita"
+      },
+      "left_one": "Manca {{count}} controllo",
+      "left_many": "Mancano {{count}} controlli",
+      "left_other": "Mancano {{count}} controlli",
+      "done": "Tutti i controlli fatti"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Scrivi prescrizione",
+      "empty": "Con un tocco da un kit, o scrivine una",
+      "prescribed": "{{name}} prescritto"
+    },
+    "treatment": {
+      "repeat": "⚡ Ripeti · {{name}} · seduta {{session}}",
+      "new": "Nuovo trattamento",
+      "memo": "Ricordato per questo paziente: {{memo}}",
+      "pack": "Usa 1 seduta di {{name}}",
+      "blocked": "Completa prima l’arrivo",
+      "empty": "Registra la seduta di oggi",
+      "last": "Ultime impostazioni: {{memo}}",
+      "done": "{{name}} · seduta {{session}}",
+      "repeated": "Seduta {{session}} registrata con le ultime impostazioni"
+    },
+    "invoice": {
+      "total": "Totale",
+      "create": "Crea fattura dalla visita",
+      "custom": "Fattura personalizzata",
+      "created": "Fattura {{number}} creata dalla visita",
+      "nothing": "Niente da fatturare",
+      "ready_one": "{{count}} voce pronta · {{total}}",
+      "ready_many": "{{count}} voci pronte · {{total}}",
+      "ready_other": "{{count}} voci pronte · {{total}}",
+      "covered": "Coperto dal pacchetto · niente da fatturare",
+      "empty": "Ancora niente da fatturare",
+      "done": "{{number}} · {{total}}"
+    },
+    "collect": {
+      "upi": "Incassa {{amount}} · UPI",
+      "received": "{{amount}} incassati ({{mode}})",
+      "share": "Condividi prescrizione, fattura e foto",
+      "shared": "Prescrizione, fattura e foto inviate a {{name}} su WhatsApp",
+      "due": "{{amount}} da pagare",
+      "nothing": "Niente da pagare",
+      "sent": "Inviato su WhatsApp"
+    }
   }
 }

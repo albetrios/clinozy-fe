@@ -14,7 +14,14 @@ const RECORDS: Record<string, { id: string; name: string }> = {
   l1: { id: 'l1', name: 'Rhea' },
 };
 
+const attempts = { down: 0 };
+
 async function fetchRecord(id: string) {
+  if (id === 'down') {
+    attempts.down += 1;
+    if (attempts.down <= 3) throw clinicHttpError(503, 'unavailable', 'Try again');
+    return { id, name: 'Back' };
+  }
   const record = RECORDS[id];
   if (!record) throw clinicHttpError(404, 'not_found', 'Lead not found');
   return record;
@@ -44,10 +51,11 @@ beforeEach(() => notifyMock.info.mockReset());
 describe('useDialogRouteRecord', () => {
   it('stays closed while the dialog route is not matched', () => {
     const { result } = renderRecord(undefined);
-    expect(result.current).toEqual({
+    expect(result.current).toMatchObject({
       record: undefined,
       isOpen: false,
       isPending: false,
+      isError: false,
     });
   });
 
@@ -66,5 +74,18 @@ describe('useDialogRouteRecord', () => {
     );
     rerender({ id: 'gone' });
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports another failure as an error, stays open and reads again on refetch', async () => {
+    attempts.down = 0;
+    const { result, onMissing } = renderRecord('down');
+    await waitFor(() => expect(result.current.isError).toBe(true), { timeout: 8000 });
+    expect(result.current.isOpen).toBe(true);
+    expect(onMissing).not.toHaveBeenCalled();
+    result.current.refetch();
+    await waitFor(() =>
+      expect(result.current.record).toEqual({ id: 'down', name: 'Back' }),
+    );
+    expect(result.current.isError).toBe(false);
   });
 });

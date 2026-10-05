@@ -1,6 +1,7 @@
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -130,19 +131,6 @@ function ValueTile({
       )}
     </div>
   );
-}
-
-/**
- * React keys for peek values that may repeat — two rows of one offering, two
- * members with one short name: the value, then "·2", "·3" for its repeats.
- */
-function occurrenceKeys(values: readonly string[]): string[] {
-  const seen = new Map<string, number>();
-  return values.map((value) => {
-    const count = (seen.get(value) ?? 0) + 1;
-    seen.set(value, count);
-    return count === 1 ? value : `${value}·${count}`;
-  });
 }
 
 function MultiTile({
