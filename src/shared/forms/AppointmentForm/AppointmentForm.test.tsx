@@ -180,6 +180,16 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     expect(notifyMock.warning).toHaveBeenCalledWith('Pick who the appointment is for');
   });
 
+  it('says so when the day offers no time — a Sunday the clinic is shut', async () => {
+    // 4 Oct 2026 is a Sunday; the main branch opens Monday to Saturday.
+    renderNew({ prefill: { date: '2026-10-04' } });
+    const panel = await form(NEW);
+    expect(
+      await within(panel).findByText('No times to book on this day · pick another date'),
+    ).toBeVisible();
+    expect(within(panel).queryAllByTestId(IDS.slotTime)).toHaveLength(0);
+  });
+
   it('finds a patient, picks a free slot and books it: "Book <day>, <time>"', async () => {
     const user = setUser();
     const { onSaved } = renderNew({ prefill: { date: '2026-10-05' } });

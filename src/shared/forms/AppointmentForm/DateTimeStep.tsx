@@ -351,6 +351,20 @@ function HourRow({
 }
 
 /**
+ * The line in place of the grid: no date yet — "Pick a date to see times" —
+ * or a day the read answered with no start at all (the branch closed, the
+ * doctor off, every time already passed), which says so instead of leaving
+ * the space under the day blank. A full day still draws its taken slots.
+ */
+function slotHint(
+  date: string | null,
+  slots: readonly AppointmentSlot[] | undefined,
+): 'pickDate' | 'none' | null {
+  if (!date) return 'pickDate';
+  return slots?.length === 0 ? 'none' : null;
+}
+
+/**
  * Step 2 · Date & time's body (H:2777–2790; `appointments.md:83–86`): the
  * quick days, the month calendar and the slot grid — one row per hour with
  * free starts and the taken ones struck through, two columns past six hours.
@@ -377,6 +391,7 @@ export function DateTimeStep({
   };
   const hours = slotHours(slots ?? []);
   const columns = slotColumns(hours);
+  const hint = slotHint(draft.date, slots);
   return (
     <div className="flex flex-col gap-2.5">
       <QuickDates draft={draft} today={today} disabled={disabled} onPick={pickDate} />
@@ -400,7 +415,7 @@ export function DateTimeStep({
               onChange={onSlotStepChange}
             />
           </div>
-          {draft.date ? (
+          {hint === null ? (
             <div
               className={cn(
                 'grid items-start gap-x-3.5 gap-y-1',
@@ -427,7 +442,7 @@ export function DateTimeStep({
               ))}
             </div>
           ) : (
-            <span className="text-muted-foreground text-xs">{t(K.pickDate)}</span>
+            <span className="text-muted-foreground text-xs">{t(K[hint])}</span>
           )}
         </div>
       </div>

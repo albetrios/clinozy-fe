@@ -1090,6 +1090,7 @@
       "stepOption": "{{minutes}} 分钟",
       "time": "时间",
       "pickDate": "选择日期以查看时间",
+      "none": "当天没有可预约的时间 · 请选择其他日期",
       "am": "上午",
       "pm": "下午",
       "hour": "{{period}}{{hour}}点",

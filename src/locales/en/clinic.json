@@ -1105,6 +1105,7 @@
       "stepOption": "{{minutes}} min",
       "time": "Time",
       "pickDate": "Pick a date to see times",
+      "none": "No times to book on this day · pick another date",
       "am": "AM",
       "pm": "PM",
       "hour": "{{hour}} {{period}}",

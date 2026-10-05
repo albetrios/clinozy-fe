@@ -1120,6 +1120,7 @@
       "stepOption": "{{minutes}} min",
       "time": "Hora",
       "pickDate": "Elige una fecha para ver horarios",
+      "none": "No hay horarios para reservar este día · elige otra fecha",
       "am": "a. m.",
       "pm": "p. m.",
       "hour": "{{hour}} {{period}}",

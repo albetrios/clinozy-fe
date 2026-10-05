@@ -1105,6 +1105,7 @@
       "stepOption": "{{minutes}} Min.",
       "time": "Uhrzeit",
       "pickDate": "Wählen Sie ein Datum, um Zeiten zu sehen",
+      "none": "An diesem Tag sind keine Zeiten buchbar · wählen Sie ein anderes Datum",
       "am": "AM",
       "pm": "PM",
       "hour": "{{hour}} {{period}}",

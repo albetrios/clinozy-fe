@@ -140,6 +140,8 @@ export const APPOINTMENT_FORM_KEYS = {
     stepOption: 'appointmentForm.slot.stepOption',
     time: 'appointmentForm.slot.time',
     pickDate: 'appointmentForm.slot.pickDate',
+    /** The day offers no start: closed, the doctor off, or every time passed. */
+    none: 'appointmentForm.slot.none',
     am: 'appointmentForm.slot.am',
     pm: 'appointmentForm.slot.pm',
     /** "<hour> <AM/PM>" — a row's name. */
