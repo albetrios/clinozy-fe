@@ -101,20 +101,29 @@ each row is built and verified.
 ## Revisions to upcoming rows
 
 A built row that changes a row not yet built records the revised row text here;
-the KICKOFF ledger row gets `revised → AS-BUILT #n` and nothing else.
+the KICKOFF ledger row gets `revised → AS-BUILT #n` and nothing else. Rows the user adds after
+approval are recorded here too, with their decision (D97): KICKOFF.md stays frozen but for its
+Status cells.
 
-| #   | Ledger row | Revised row                                                                                                                                                                                                                                                                                                                       | Decision |
-| --- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| #15 | L-12       | Depends on L-25 (was L-09): the nav model is built first, on the existing shells, and L-09 builds `sectionBar` on `useAppNav`                                                                                                                                                                                                     | D38      |
-| #66 | L-49       | Visit (`visits/$visitId`, D18): four tabs, phone (D29), the file's flow on `timeline?visit=open` — on the Visit layer and the per-tab access L-48 built (`visits-contracts.ts`, `visits-api.ts`, `useVisits`, `canUseVisitTab`), never a second Visit model; Today's Open consult, Open session and Checkout open it on their tab | D74      |
-| #72 | L-50c      | Medical flows: POs, Pay routing (Q-M1) — the Supplier drawer's "⚡ Pay ₹827" (L-50b) and Clinic stock's "Pay ₹X" on Purchases and Vendors (L-51b) included — New sale via the Invoice drawer, Sale view, Collect, returns, Void (Q-M2), Prescriptions to fill, sale print                                                         | D80      |
+| #   | Ledger row | Revised row                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Decision |
+| --- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| #15 | L-12       | Depends on L-25 (was L-09): the nav model is built first, on the existing shells, and L-09 builds `sectionBar` on `useAppNav`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | D38      |
+| #66 | L-49       | Visit (`visits/$visitId`, D18): four tabs, phone (D29), the file's flow on `timeline?visit=open` — on the Visit layer and the per-tab access L-48 built (`visits-contracts.ts`, `visits-api.ts`, `useVisits`, `canUseVisitTab`), never a second Visit model; Today's Open consult, Open session and Checkout open it on their tab                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | D74      |
+| #72 | L-50c      | Medical flows: POs, Pay routing (Q-M1) — the Supplier drawer's "⚡ Pay ₹827" (L-50b) and Clinic stock's "Pay ₹X" on Purchases and Vendors (L-51b) included — New sale via the Invoice drawer, Sale view, Collect, returns, Void (Q-M2), Prescriptions to fill, sale print                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | D80      |
+| —   | L-62       | New row — **Common components**: one component per job across the app — dropdown, select, menu and picker; the date pickers; confirm dialogs; chips, pills and badges; tabs; search inputs; empty states; toasts; drawers against dialogs. Where several variants exist, the user picks one from screenshots of each opened; every caller is migrated and no behaviour is lost. Kind: structural · Depends on: L-53 (the screens as built, #86) and the user's picks · Skill/driver: `fe-component-promotion`, `shadcn`, `composition-patterns`, `fe-safe-bulk-edits` · Acceptance: one unit per job with every caller on it and nothing old beside it; unit and E2E green                                                                                                                                             | D97      |
+| —   | L-63       | New row — **Retire the old dashboard**: remove the pre-launch dashboard island, its components, routes, tests, docs and copy where nothing needs them; every member lands on their clinic role home (Today); personal workspaces off (D44) handled without a dead end. Kind: structural · Depends on: L-12a (the role-home resolver, D25), D44 — and re-records or retires L-56's dashboard baseline (#87) · Skill/driver: `fe-routing-tenancy`, `fe-safe-bulk-edits`, `fe-documentation-maintenance`, `fe-visual-regression` · Acceptance: no dead route, test, doc or key left; every role lands on Today; unit and E2E green                                                                                                                                                                                        | D97      |
+| —   | L-64       | New row — **UX fixes after the launch review**: the post-launch UX list's open items — the phone header overlap, A-P1 (the referrer behind cross-room drawers, D88), one time-format rule, RTL isolation of Latin data outside the table cells, the involved line in the chat, "Copy invoice", Receive goods' "+ Add unexpected item", PO print, payment reminders, the smart note's locales, the remaining 12-hour wraps, one delete confirm with Undo everywhere, two-letter weekdays. Kind: screen · Depends on: L-53 (#86, the list), L-62 (the confirm, the date pickers) · Skill/driver: `fe-design-ditto`, `fe-routing-tenancy`, `fe-rtl-logical-css`, `fe-locale-formatting` · Acceptance: each item fixed, or a Standing deviation with its decision; side by side at 375 and 1440 for the screens it touches | D97      |
+| —   | L-65       | New row — **Adapt the rest of the app to the design**: every public route (login, MFA, callback, onboarding, accept-invite, the organization picker, suspended, unauthorized, 404, the offline page) and the shared surfaces the launch kept (the Settings modal, Appearance, notifications, the error fallbacks, the command menu's platform rows, billing) restyled to the launch's design language on the unified components. Kind: screen · Depends on: L-62 (the unified components), L-63 (the dashboard gone first) · Skill/driver: `fe-design-ditto`, `fe-theme-axis-audit`, `fe-visual-regression` · Acceptance: each surface in the launch's look at 375 and 1440, light and dark; the visual baselines re-recorded                                                                                          | D97      |
+| —   | L-58       | Close the iteration: `pnpm iteration:status … done` once `AS-BUILT.md` has its summary and Standing deviations; `frozen` in the last commit before merging. Depends on: L-54, L-55, L-56, L-57 (deferred, D96), L-62 – L-65                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | D96, D97 |
 
 ## AMBER (L-57)
 
 Every AMBER item the plan named — Appendix C.3, the §6 labels (A-L1 … A-L9, A-A1 … A-A5, A-P1,
 A-P2, A-F1 … A-F15) and the unlabelled §3 and §6 defaults — and every AMBER default the build took
 (the AMBER decisions D39 – D91, the entries' Differences and the Standing deviations), each with what
-was built (D34, D90). The Visit sheet's items closed with L-49 (#84); none waits on a build row now. None of them stops the build; each is a default someone has to confirm. A yes
+was built (D34, D90). The Visit sheet's items closed with L-49 (#84); none waits on a build row now.
+L-57 is deferred past this iteration with the user's OK (D96): each item keeps its default until its
+owner answers. None of them stops the build; each is a default someone has to confirm. A yes
 closes it; another answer becomes a decision before L-58, or a `change` / `fix` iteration after it.
 
 **At build:** `as planned` — the plan's default, built · `revised (D…)` — the build changed the
@@ -352,32 +361,36 @@ native reviewers (the ten non-English locales).
 
 ## Summary
 
-Written at the close's preparation (D95). 85 of the 88 ledger rows are `done`; L-57 (the AMBER
-answers) and L-60 (each room going live) are `in progress` and L-58 — the close — is `open`. The
-close needs Nikunj Mavani's OK to defer L-57 and L-60; until it is recorded, the deferrals below are
-proposed, not agreed.
+A draft: written at the close's preparation (D95) and kept open by D97. 85 of the 88 planned rows
+are `done`; L-57 (the AMBER answers) and L-60 (each room going live) are `deferred` with the user's
+OK (D96); L-58 — the close — stays `open` until the four rows the user added to this iteration are
+built, L-62 – L-65 (D97; › Revisions to upcoming rows). The final Summary is written then.
 
-- **Planned, not built** (deferred — the user's OK pending, D95):
-  - **L-57** — the 149 items in › AMBER (L-57), each built on its default; an answer becomes a
-    decision, or a `change` / `fix` iteration.
-  - **L-60** — no room's fixtures are swapped yet: every clinic module is fixture-backed, and
-    production's default `VITE_DISABLED_MODULES` turns them all off; each room goes live as
-    clinozy-be serves its operations ([`plans/backend-handoff.md`](plans/backend-handoff.md)).
-  - **A-P1** — the referring room behind a cross-room drawer (the Invoice drawer, Receive payment,
-    the appointment drawers, New sale): the drawer's own room stands behind it and closing returns
-    to `from`; building it needs route masking per referrer or a patient-file context (D88).
-  - **The Visit sheet's data-less parts** (#84): "Dictate a draft", the allergy chip and the safety
-    box, Split, "Advance paid" and the discount's provenance, Print in Gujarati and Hindi (Q-X2).
-  - **Treatment's ⚡ "Log check-in"** (edit; `patient-file.md:278, 291`): the check-in drawer exists
-    (#76), but the Treatment drawer's Quick fill doesn't offer it, and its aftercare line still says
-    "No check-in yet · use Log check-in above" (#75).
-  - **Smaller surfaces:** "Copy invoice" in the patient file (#77); Photos "Compare" (#78); PO print
-    (Q-M7); payment reminders and the bulk bar's Message and Print until messaging exists (Q-M6,
-    Q-P8); an offering's specialty chips (Q-O6, D63); "Edit contact" from other rooms' contact cards
-    and the household line (#47); `create/?source=chat` filling the reason from the thread (#56).
-  - **Verification §8 asked for:** the Arabic pass per screen at 1440, the D23 boundaries
-    (767 / 768, 1279 / 1280px) and dark on every screen (#86, §8.1); light and dark baselines per
-    room route (#87, §8.6).
+- **Planned, not built:**
+  - **Deferred, with the user's OK (D96):**
+    - **L-57** — the 149 items in › AMBER (L-57), each built on its default and waiting on its
+      owner; an answer becomes a decision, or a `change` / `fix` iteration.
+    - **L-60** — no room's fixtures are swapped yet: every clinic module is fixture-backed, and
+      production's default `VITE_DISABLED_MODULES` turns them all off; each room goes live as
+      clinozy-be serves its operations ([`plans/backend-handoff.md`](plans/backend-handoff.md)).
+  - **Now in L-64 (D97):** A-P1, the referring room behind a cross-room drawer (D88); "Copy
+    invoice" (#77); PO print (Q-M7) and payment reminders (Q-M6); Receive goods' "+ Add unexpected
+    item" (#74); the smart note's locales (D86); Latin data right to left outside the table cells,
+    the remaining 12-hour wraps and two-letter weekdays (#86); the involved line in the chat (#83);
+    the phone header overlap.
+  - **Not scheduled yet:**
+    - The Visit sheet's data-less parts (#84) — "Dictate a draft", the allergy chip and the safety
+      box, Split, "Advance paid" and the discount's provenance — wait on their APIs (L-60, N16 –
+      N18); Print in Gujarati and Hindi waits on Q-X2.
+    - Treatment's ⚡ "Log check-in" (edit; `patient-file.md:278, 291`): the check-in drawer exists
+      (#76), but the Treatment drawer's Quick fill doesn't offer it, and its aftercare line still
+      says "No check-in yet · use Log check-in above" (#75) — a candidate for L-64.
+    - Photos "Compare" (#78); the bulk bar's Message and Print until messaging exists (Q-P8); an
+      offering's specialty chips (Q-O6, D63); "Edit contact" from other rooms' contact cards and the
+      household line (#47); `create/?source=chat` filling the reason from the thread (#56).
+    - The verification §8 asked for: the Arabic pass per screen at 1440, the D23 boundaries
+      (767 / 768, 1279 / 1280px) and dark on every screen (#86, §8.1); light and dark baselines per
+      room route (#87, §8.6).
 - **Built, not planned:**
   - The first-paint architecture the gates needed (#85): the rooms behind one lazy
     `room-routes.ts`, the dialog routes' manifests behind `dialog-routes.ts`, the builders per room,
@@ -393,25 +406,20 @@ proposed, not agreed.
     "Create the patient record first" (#84).
   - Removed: L-07's `tabs`, `scroll-area` and `resizable` with `react-resizable-panels` — nothing
     composed them (#85).
-- **Follow-ups for the next iteration:**
+- **Follow-ups for the next iteration** (what L-62 – L-65 don't cover):
   - **clinozy-be's plan, where it differs** (`plans/backend-handoff.md`): rooms and machines per
     branch (its D28) against the fixed room list; a treatment reversed, never deleted (its D40),
     against the soft delete with Undo; an Rx as a draft, then approved (its D31), against final on
     save; invoice numbers per branch GSTIN and financial year (its D23) against `#<seq>` on screen
     and `INV-<seq>` printed. Each is settled when its room is wired — a `change` iteration here, or a
     narrower decision there.
-  - **A-P1** — keep it as a Standing deviation, or schedule (a) route masking per referrer or
-    (b) a patient-file context (D88).
-  - **The AMBER answers (L-57)** and **each room's go-live (L-60)**, with the requests N1–N18.
+  - **The AMBER answers (L-57)** and **each room's go-live (L-60)**, deferred (D96), with the
+    requests N1–N18.
   - **Verification:** the Arabic RTL pass per screen, the D23 boundaries and dark everywhere
-    (§8.1); per-route light and dark baselines for the rooms (§8.6); the dashboard baseline
-    re-recorded once personal workspaces are off (D44).
-  - **Right to left:** Latin data outside the table cells — the Visit header's meta, the contact
-    and team cards, the chat header, AppointmentCard, LeadContactStrip, PatientRail, the pickers'
-    sub lines, the drawer headers and "name · phone" strings (#86).
-  - **For Design:** the section chip over "All branches" at 375; the chip tints, "Send via", the
-    weekday letters, the date picker's dot and the ₹ tile (#86); the involved toggle's system pill
-    (#83).
+    (§8.1); per-route light and dark baselines for the rooms (§8.6), with L-65's re-recorded set;
+    the dashboard baseline goes with L-63.
+  - **For Design:** the section chip over "All branches" at 375 if L-64's header fix doesn't settle
+    it; the chip tints, "Send via", the date picker's dot and the ₹ tile (#86).
   - **Open defects:** Book in the task drawer without an appointment-Create check; one rise on a
     cold deep link into a patient-file drawer (#83, D89); Treatment's "Log check-in" and its
     dangling hint (above).
@@ -427,8 +435,8 @@ proposed, not agreed.
 
 The complete list of where the code differs from the design. The launch has no Baseline, so the
 list starts empty; a deviation is added when it is found and removed when an iteration resolves it.
-The next iteration copies this list as its starting point. Complete at the close's preparation
-(D95): every row's deliberate differences through #87.
+The next iteration copies this list as its starting point. Complete through #87 (D95); the rows
+added by D97 add to it as they are built.
 
 | Item                                                                  | Design says                                                                                                                       | Built as                                                                                                                                                                                                                                                        | Since iteration        | Decision                                                                |
 | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |

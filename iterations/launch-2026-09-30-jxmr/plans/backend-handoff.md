@@ -6,7 +6,8 @@ row). `KICKOFF.md` froze at approval, so what the build added lives here
 ([D90](decisions.md)): the fixtures each room swaps for its API, how a room goes live, the requests
 raised while building, the Appendix F requests the build leans on, and where clinozy-be's approved
 plan and this build differ. Ledger row L-60 closes room by room, as each room's fixtures are swapped
-and its module enabled (D8).
+and its module enabled (D8); it is deferred past this iteration with the user's OK (D96), so the
+handoff continues as each API lands.
 
 clinozy-be's same-named iteration took all of Appendix F (its D3) and traces it in its
 `plans/coverage.md` › "Full drop — frontend requests (D3)". The **new** requests below are not in
