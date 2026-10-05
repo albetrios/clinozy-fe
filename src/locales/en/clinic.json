@@ -1393,6 +1393,7 @@
         "medical": "Medical invoice #{{seq}} created",
         "consultation": "Consultation invoice #{{seq}} created"
       },
+      "copied": "Copied as #{{seq}}",
       "createdPlan_one": "{{created}} · {{count}} offering suggestions item marked invoiced",
       "createdPlan_other": "{{created}} · {{count}} offering suggestions items marked invoiced",
       "saved": "Invoice #{{seq}} saved",

@@ -6,6 +6,7 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { listPatientInvoices } from '@/shared/api/clinic/payments-api.ts';
 import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import {
   renderInPatientFile,
@@ -34,8 +35,11 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
 const captured: InvoiceRowActions[] = [];
 const latest = () => captured.at(-1);
 const onDelete = vi.fn();
+/** Whether the member's access had resolved, render by render. */
+const resolved: boolean[] = [];
 
 function Probe() {
+  resolved.push(useClinicAccess().isResolved);
   captured.push(useInvoiceRowActions({ onDelete }));
   return null;
 }
@@ -52,6 +56,7 @@ beforeEach(async () => {
   printMock.mockClear();
   onDelete.mockReset();
   captured.length = 0;
+  resolved.length = 0;
   resetClinicFixtures();
   invoices = await listPatientInvoices(patientRef('Dharti Galani'));
 });
@@ -73,9 +78,9 @@ const ids = (hook: InvoiceRowActions, seq: number) =>
 describe('useInvoiceRowActions (H:4748)', () => {
   it('gives the owner every action on an invoice that owes, and no Delete on a sale’s', async () => {
     const { hook } = await rowFor('owner');
-    expect(ids(hook, 787)).toEqual(['print', 'preview', 'pay', 'edit', 'delete']);
-    expect(ids(hook, 788)).toEqual(['print', 'preview', 'pay', 'edit']);
-    expect(ids(hook, 786)).toEqual(['print', 'preview', 'edit', 'delete']);
+    expect(ids(hook, 787)).toEqual(['print', 'preview', 'copy', 'pay', 'edit', 'delete']);
+    expect(ids(hook, 788)).toEqual(['print', 'preview', 'copy', 'pay', 'edit']);
+    expect(ids(hook, 786)).toEqual(['print', 'preview', 'copy', 'edit', 'delete']);
     hook
       .actions(invoice(787))
       .find((action) => action.id === 'delete')
@@ -85,7 +90,32 @@ describe('useInvoiceRowActions (H:4748)', () => {
 
   it('keeps Delete from a member without the void ability', async () => {
     const { hook } = await rowFor('front_desk');
-    expect(ids(hook, 787)).toEqual(['print', 'preview', 'pay', 'edit']);
+    expect(ids(hook, 787)).toEqual(['print', 'preview', 'copy', 'pay', 'edit']);
+  });
+
+  it('offers neither Copy invoice nor Record payment to a member who may not create invoices', async () => {
+    renderInPatientFile(<Probe />, { section: 'invoices', role: 'pharmacist' });
+    await waitFor(() => expect(resolved.at(-1)).toBe(true));
+    expect(ids(latest() as InvoiceRowActions, 787)).toEqual(['print', 'preview']);
+  });
+
+  it('copies an invoice into a new one for this patient, keeping the section behind it', async () => {
+    const { view, hook } = await rowFor('owner');
+    hook
+      .actions(invoice(787))
+      .find((action) => action.id === 'copy')
+      ?.onSelect();
+    await waitFor(() =>
+      expect(view.router.state.location.pathname).toBe(
+        '/organization/acme/invoices/create',
+      ),
+    );
+    expect(view.router.state.location.search).toEqual({
+      type: invoice(787).type,
+      patient: 'patient',
+      copyOf: invoice(787).id,
+      from: 'patients/patient/invoices',
+    });
   });
 
   it('prints the invoice’s sheet, read on demand', async () => {

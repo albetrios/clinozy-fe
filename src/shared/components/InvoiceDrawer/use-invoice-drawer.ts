@@ -110,16 +110,16 @@ export interface TeamPrefill {
 /**
  * The team a new invoice starts with (`payments.md:139`): the patient's last
  * invoice's team, else the member themself — until the member changes it. An
- * edit keeps its own.
+ * invoice with a team of its own keeps it (`ownTeam`): an edit, a copy.
  */
 export function useTeamPrefill(
   form: InvoiceForm,
-  editing: boolean,
+  ownTeam: boolean,
   patientId: string | null,
 ): TeamPrefill {
   const me = useMyStaffProfile();
   const presets = useInvoicePresets(patientId);
-  const touchedRef = useRef(editing);
+  const touchedRef = useRef(ownTeam);
   const recent = presets.data?.recentTeamIds ?? [];
   const mine = me.data ? [me.data.id] : [];
   const key = (recent.length > 0 ? recent : mine).join();
@@ -183,19 +183,23 @@ export function useInvoiceStacks(form: InvoiceForm, today: string) {
 
 /**
  * A save's toast (`payments.md:149`): "Clinic invoice #788 created" (+ "· 2
- * offering suggestions items marked invoiced"), "Invoice #787 saved" (+ "·
- * offering suggestions updated") — then the host's hand-off.
+ * offering suggestions items marked invoiced"), a copy's "Copied as #788"
+ * (H:5017, + the same), "Invoice #787 saved" (+ "· offering suggestions
+ * updated") — then the host's hand-off.
  */
 export function useSaveToast(
-  mode: 'create' | 'edit',
+  kind: 'create' | 'copy' | 'edit',
   onSaved: (result: InvoiceSaveResult) => void,
 ) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   return (result: InvoiceSaveResult) => {
     const { invoice } = result.detail;
     const linked = result.planLinked;
-    if (mode === 'create') {
-      const created = t(K.toasts.created[invoice.type], { seq: invoice.seq });
+    if (kind !== 'edit') {
+      const created =
+        kind === 'copy'
+          ? t(K.toasts.copied, { seq: invoice.seq })
+          : t(K.toasts.created[invoice.type], { seq: invoice.seq });
       notify.success(
         linked > 0 ? t(K.toasts.createdPlan, { created, count: linked }) : created,
       );

@@ -95,6 +95,8 @@ export const PATIENT_TABLE_KEYS = {
     preview: 'tables.actions.preview',
     copyRx: 'tables.actions.copyRx',
     sell: 'tables.actions.sell',
+    /** "Copy invoice" — the Invoice drawer prefilled from the invoice. */
+    copyInvoice: 'tables.actions.copyInvoice',
     checkIn: 'tables.actions.checkIn',
     copyTreatment: 'tables.actions.copyTreatment',
     open: 'tables.actions.open',

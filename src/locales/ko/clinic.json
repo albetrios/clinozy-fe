@@ -1372,6 +1372,7 @@
         "medical": "의약품 청구서 #{{seq}} 생성됨",
         "consultation": "상담 청구서 #{{seq}} 생성됨"
       },
+      "copied": "사본 청구서 #{{seq}} 생성됨",
       "createdPlan_other": "{{created}} · 제안 {{count}}건을 청구 완료로 표시함",
       "saved": "청구서 #{{seq}} 저장됨",
       "savedPlan": "청구서 #{{seq}} 저장됨 · 제안 업데이트됨",

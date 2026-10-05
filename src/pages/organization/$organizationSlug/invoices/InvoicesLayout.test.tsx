@@ -5,7 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  clinicFixtures,
+  resetClinicFixtures,
+} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -78,6 +81,29 @@ describe('InvoicesLayout — the invoice routes over the ledger (KICKOFF §4, §
       ),
     );
     expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
+  it('opens a copy of an invoice: its lines and party, nothing paid (Copy invoice)', async () => {
+    const source = await clinicFixtures.invoices.get(ref.invoice(787));
+    renderInvoicesRoutes(
+      `${BASE}/create?type=${source.type}&patient=${DHARTI}&copyOf=${source.id}`,
+    );
+    const drawer = await screen.findByTestId('invoice-drawer');
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('invoice-drawer-footer')).toHaveTextContent(
+        new RegExp(`Dharti Galani · ${source.items.length} items?`),
+      ),
+    );
+    expect(within(drawer).getByTestId('invoice-drawer-title')).toHaveTextContent(
+      'New invoice',
+    );
+    // #787's ₹4,800, none of it paid on the copy.
+    expect(within(drawer).getByTestId('invoice-drawer-totals-bill')).toHaveTextContent(
+      '₹4,800',
+    );
+    expect(within(drawer).getByTestId('invoice-drawer-totals-due')).toHaveTextContent(
+      '₹4,800',
+    );
   });
 
   it('previews an invoice on its A4 sheet — the Remark on it — and prints that sheet', async () => {

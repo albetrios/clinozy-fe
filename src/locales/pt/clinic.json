@@ -1414,6 +1414,7 @@
         "medical": "Fatura médica #{{seq}} criada",
         "consultation": "Fatura de consulta #{{seq}} criada"
       },
+      "copied": "Copiada como fatura #{{seq}}",
       "createdPlan_one": "{{created}} · {{count}} sugestão marcada como faturada",
       "createdPlan_many": "{{created}} · {{count}} sugestões marcadas como faturadas",
       "createdPlan_other": "{{created}} · {{count}} sugestões marcadas como faturadas",

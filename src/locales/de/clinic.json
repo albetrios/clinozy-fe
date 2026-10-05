@@ -1393,6 +1393,7 @@
         "medical": "Medizinrechnung #{{seq}} erstellt",
         "consultation": "Konsultationsrechnung #{{seq}} erstellt"
       },
+      "copied": "Als Rechnung #{{seq}} kopiert",
       "createdPlan_one": "{{created}} · {{count}} Vorschlag als abgerechnet markiert",
       "createdPlan_other": "{{created}} · {{count}} Vorschläge als abgerechnet markiert",
       "saved": "Rechnung #{{seq}} gespeichert",

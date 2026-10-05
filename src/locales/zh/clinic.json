@@ -1372,6 +1372,7 @@
         "medical": "已创建药品发票 #{{seq}}",
         "consultation": "已创建问诊发票 #{{seq}}"
       },
+      "copied": "已复制为发票 #{{seq}}",
       "createdPlan_other": "{{created}} · 已将 {{count}} 条建议标记为已开票",
       "saved": "发票 #{{seq}} 已保存",
       "savedPlan": "发票 #{{seq}} 已保存 · 建议已更新",

@@ -1372,6 +1372,7 @@
         "medical": "医薬品の請求書 #{{seq}} を作成しました",
         "consultation": "診察の請求書 #{{seq}} を作成しました"
       },
+      "copied": "請求書 #{{seq}} としてコピーしました",
       "createdPlan_other": "{{created}} · 提案 {{count}} 件を請求済みにしました",
       "saved": "請求書 #{{seq}} を保存しました",
       "savedPlan": "請求書 #{{seq}} を保存しました · 提案を更新しました",

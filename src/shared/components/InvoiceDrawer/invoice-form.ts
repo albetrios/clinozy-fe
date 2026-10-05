@@ -145,6 +145,30 @@ export function invoiceFormOf(detail: InvoiceDetail): InvoiceFormValues {
   };
 }
 
+/**
+ * A copy of a saved invoice — the patient file's "Copy invoice"
+ * (`patient-file.md:43`, H:5017 `copyInv`): what the bill says — its type,
+ * party, team, lines (quantities, prices, discounts), overall discount and
+ * remark — dated today with nothing paid, filed like any new invoice under
+ * the screen's branch (`branchId`, where a sale's stock is drawn). What
+ * belonged to the original alone stays with it: its number and status, its
+ * payments, the batches its sale drew and the prescription it dispensed.
+ */
+export function copiedInvoiceForm(
+  detail: InvoiceDetail,
+  today: string,
+  branchId: string | null,
+): InvoiceFormValues {
+  const form = invoiceFormOf(detail);
+  return {
+    ...form,
+    branchId,
+    items: form.items.map((item) => ({ ...item, batchNo: null })),
+    date: today,
+    prescriptionId: null,
+  };
+}
+
 /** The percent field's text for a number: empty for none. */
 function percentText(percent: number): string {
   return percent > 0 ? String(percent) : '';

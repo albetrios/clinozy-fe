@@ -1393,6 +1393,7 @@
         "medical": "मेडिकल इनवॉइस #{{seq}} बनाया गया",
         "consultation": "कंसल्टेशन इनवॉइस #{{seq}} बनाया गया"
       },
+      "copied": "इनवॉइस #{{seq}} के रूप में कॉपी किया गया",
       "createdPlan_one": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुआ",
       "createdPlan_other": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुए",
       "saved": "इनवॉइस #{{seq}} सहेजा गया",

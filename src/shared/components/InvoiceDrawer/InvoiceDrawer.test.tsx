@@ -93,6 +93,21 @@ async function renderEdit(invoiceSeq: number) {
   return { detail, onSaved, onDeleted };
 }
 
+/** New invoice as a copy of `detail` — the patient file's "Copy invoice". */
+function renderCopy(detail: InvoiceDetail) {
+  const onCreated = vi.fn();
+  renderWithProviders(
+    <InvoiceDrawer
+      mode="create"
+      open
+      prefill={{ copyOf: detail }}
+      onClose={vi.fn()}
+      onCreated={onCreated}
+    />,
+  );
+  return { onCreated };
+}
+
 const panel = () => screen.findByTestId('invoice-drawer');
 
 /** Add a line through the quick line: type it, then ↵. */
@@ -486,6 +501,78 @@ describe('InvoiceDrawer — Edit invoice', () => {
     expect(clinicFixtures.invoices.snapshot((row) => row.seq === 787)[0]?.remark).toBe(
       'Second sitting next week',
     );
+  });
+});
+
+describe('InvoiceDrawer — Copy invoice (patient-file.md:43)', () => {
+  it('opens a copy as a new invoice: the lines, team and remark, today, nothing paid', async () => {
+    const user = setUser();
+    const source = await fetchInvoice(ref.invoice(787));
+    renderCopy({ ...source, invoice: { ...source.invoice, remark: 'Second sitting' } });
+    const drawer = await panel();
+    expect(drawer).toHaveClass('md:w-[min(840px,calc(100vw-56px))]');
+    expect(within(drawer).getByTestId('invoice-drawer-title')).toHaveTextContent(
+      'New invoice',
+    );
+    expect(within(drawer).queryByTestId('invoice-drawer-tag')).toBeNull();
+    expect(within(drawer).getByTestId('invoice-drawer-footer')).toHaveTextContent(
+      'Clinic · Dharti Galani · 1 item',
+    );
+    // ₹4,800 billed and nothing of it paid: #787's own payments stay with #787.
+    expect(totals('bill')).toHaveTextContent('₹4,800');
+    expect(totals('due')).toHaveTextContent('₹4,800');
+    await user.click(screen.getByTestId('invoice-drawer-step-items-trigger'));
+    expect(
+      within(screen.getByTestId('invoice-drawer-items-row')).getByText(
+        'LHR Full Face · B4G7',
+      ),
+    ).toBeInTheDocument();
+    await user.click(screen.getByTestId('invoice-drawer-step-payment-trigger'));
+    expect(screen.getByTestId('invoice-drawer-remark')).toHaveValue('Second sitting');
+  });
+
+  it('saves the copy as a new invoice of today — "Copied as #N" — leaving the original as it was', async () => {
+    const user = setUser();
+    const source = await fetchInvoice(ref.invoice(787));
+    const { onCreated } = renderCopy({
+      ...source,
+      invoice: { ...source.invoice, remark: 'Second sitting' },
+    });
+    await panel();
+    await user.click(screen.getByTestId('invoice-drawer-save'));
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    const result = onCreated.mock.calls[0]?.[0] as { detail: InvoiceDetail } | undefined;
+    const copy = result?.detail.invoice;
+    expect(copy?.seq).not.toBe(787);
+    // Dharti's accepted LHR suggestion links to it, as to any new invoice (H:4410).
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      `Copied as #${copy?.seq} · 1 offering suggestions item marked invoiced`,
+    );
+    expect(copy).toMatchObject({
+      type: 'clinic',
+      patientId: DHARTI,
+      teamIds: source.invoice.teamIds,
+      items: source.invoice.items,
+      overallDiscount: source.invoice.overallDiscount,
+      remark: 'Second sitting',
+      date: '2026-10-03',
+    });
+    expect(result?.detail.balance.paid).toBe(0);
+    expect(await fetchInvoice(ref.invoice(787))).toEqual(source);
+  });
+
+  it('starts a copy of an invoice without a team — a sale’s — with the patient’s last team', async () => {
+    const user = setUser();
+    // #788 is Dharti's sale (no team); her last invoice with a team is #787.
+    const source = await fetchInvoice(ref.invoice(788));
+    expect(source.invoice.teamIds).toEqual([]);
+    const lastTeam = (await fetchInvoice(ref.invoice(787))).invoice.teamIds;
+    const { onCreated } = renderCopy(source);
+    await panel();
+    await user.click(screen.getByTestId('invoice-drawer-save'));
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    const result = onCreated.mock.calls[0]?.[0] as { detail: InvoiceDetail } | undefined;
+    expect(result?.detail.invoice).toMatchObject({ type: 'medical', teamIds: lastTeam });
   });
 });
 

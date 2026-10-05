@@ -16,7 +16,8 @@ import { useInvoicesDialogRoute } from './hooks/useInvoicesDialogRoute/index.ts'
  * own — its routes are dialogs over a referrer, the Payments ledger standing
  * behind them (`routeTree.tsx` renders the ledger beside this host, and the
  * ledger's outlet holds the dialog routes, which render nothing). It reads
- * the URL and opens New invoice (`create/`, on `?type=&patient=`), an
+ * the URL and opens New invoice (`create/`, on `?type=&patient=`, or a copy
+ * of a saved invoice on `?copyOf=`), an
  * invoice's preview with Print (`$invoiceId/`) or Edit invoice
  * (`$invoiceId/edit/`); closing goes back to `from` — the room that opened
  * it — else to the ledger. After a save the page behind stays (D28).
@@ -30,7 +31,11 @@ export function InvoicesLayout() {
       <InvoiceDrawer
         mode="create"
         open
-        prefill={{ type: dialog.prefill.type, patientId: dialog.prefill.patient ?? null }}
+        prefill={{
+          type: dialog.prefill.type,
+          patientId: dialog.prefill.patient ?? null,
+          copyOf: dialog.source,
+        }}
         onClose={close}
         onCreated={close}
       />

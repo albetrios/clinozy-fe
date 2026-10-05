@@ -155,6 +155,8 @@ export const INVOICE_DRAWER_KEYS = {
       medical: 'invoiceDrawer.toasts.created.medical',
       consultation: 'invoiceDrawer.toasts.created.consultation',
     },
+    /** A copy's create — the patient file's "Copy invoice" (H:5017): "Copied as #788". */
+    copied: 'invoiceDrawer.toasts.copied',
     /** "<created> · 2 offering suggestions items marked invoiced". */
     createdPlan: 'invoiceDrawer.toasts.createdPlan',
     saved: 'invoiceDrawer.toasts.saved',

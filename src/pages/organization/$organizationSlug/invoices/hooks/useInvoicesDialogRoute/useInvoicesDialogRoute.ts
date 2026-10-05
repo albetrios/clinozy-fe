@@ -28,8 +28,11 @@ import { validateInvoiceSearch } from '../../invoices.search.ts';
 /** The dialog the invoices URL opens (KICKOFF §4, D24; `S:92–94`). */
 export type InvoicesDialogRoute =
   | { kind: 'none' }
-  /** `/invoices/create` — New invoice, on `?type=&patient=`. */
-  | { kind: 'create'; prefill: InvoiceCreateSearch }
+  /**
+   * `/invoices/create` — New invoice, on `?type=&patient=`; on `?copyOf=` the
+   * saved invoice it copies (`source`, once read — nothing opens before).
+   */
+  | { kind: 'create'; prefill: InvoiceCreateSearch; source?: InvoiceDetail }
   /** `/invoices/$invoiceId` — the preview with Print; `detail` arrives once loaded. */
   | { kind: 'preview'; invoiceId: string; detail: InvoiceDetail | undefined }
   /** `/invoices/$invoiceId/edit` — Edit invoice. */
@@ -53,8 +56,10 @@ const EDIT_PATH = /\/invoices\/[^/]+\/edit\/?$/;
  * Which dialog the invoices URL opens over its referrer (KICKOFF §4) — the
  * dialog routes render nothing, so the island reads them here. An invoice id
  * that names no invoice opens nothing: back to the referrer with "Invoice not
- * found · it may have been deleted" (`S:115`). A member without Payments
- * Create who follows a create link goes back with the permission toast. `from`
+ * found · it may have been deleted" (`S:115`) — and so does a copy
+ * (`?copyOf=`, the patient file's "Copy invoice") of an invoice that is gone.
+ * A member without Payments Create who follows a create link goes back with
+ * the permission toast, the invoice it would copy never read. `from`
  * (the room that opened it, allow-listed — `safeReferrer`) is where `close`
  * goes; without one, the Payments ledger, the island's default referrer.
  */
@@ -110,8 +115,18 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
   });
 
   const isCreate = invoiceId === undefined && CREATE_PATH.test(pathname);
-  const createRefused =
-    isCreate && access.isResolved && !access.can('payments', 'create');
+  const prefill = validateInvoiceCreateSearch(search);
+  const mayCreate = access.isResolved && access.can('payments', 'create');
+  const createRefused = isCreate && access.isResolved && !mayCreate;
+  // "Copy invoice": the invoice it copies, read once the member may create
+  // one; one that is gone closes with the not-found toast.
+  const source = useDialogRouteRecord({
+    id: isCreate && mayCreate ? prefill.copyOf : undefined,
+    queryKey: invoiceQueryKeys.detail,
+    fetchRecord: fetchInvoice,
+    recordLabel: t(INVOICE_DRAWER_KEYS.record, { ns: INVOICE_DRAWER_NS }),
+    onMissing: close,
+  });
   const refusedFor = useRef<string | null>(null);
   useEffect(() => {
     if (!createRefused || refusedFor.current === pathname) return;
@@ -127,10 +142,16 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
     return { dialog: { kind, invoiceId, detail: invoice.record }, ...state };
   }
   if (isCreate && !createRefused) {
-    return {
-      dialog: { kind: 'create', prefill: validateInvoiceCreateSearch(search) },
-      ...state,
-    };
+    return { dialog: createDialog(prefill, source.record), ...state };
   }
   return { dialog: { kind: 'none' }, ...state };
+}
+
+/** New invoice — a copy (`?copyOf=`) only once the invoice it copies is read. */
+function createDialog(
+  prefill: InvoiceCreateSearch,
+  source: InvoiceDetail | undefined,
+): InvoicesDialogRoute {
+  if (prefill.copyOf === undefined) return { kind: 'create', prefill };
+  return source ? { kind: 'create', prefill, source } : { kind: 'none' };
 }

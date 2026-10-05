@@ -4,6 +4,7 @@ import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
 
 import {
   blankLine,
+  copiedInvoiceForm,
   draftFigures,
   emptyInvoiceForm,
   invoiceFormOf,
@@ -17,6 +18,7 @@ import {
 
 const BRANCH = '8adb0054-f0cf-4a71-8366-a1a2074930c7';
 const PATIENT = '3eee5550-eff8-4c65-9a38-cdaea2136773';
+const VESU = '5c1f0b7e-2d4a-4e8b-9a6c-7d3e2f1a0b9c';
 
 const corn = { ...blankLine(), offeringId: 'corn', name: 'Corn Removal', rate: 100_000 };
 
@@ -152,5 +154,56 @@ describe('the Invoice drawer’s form (KICKOFF §6.9)', () => {
       teamIds: ['t-1'],
       party: { kind: 'patient', name: 'Dharti Galani', phone: '+919825044120' },
     });
+  });
+
+  it('copies what a saved invoice bills — lines, discounts, party, team, remark — today, nothing paid (Copy invoice)', () => {
+    const line = { ...corn, qty: 2, discountPct: 5, gstPct: 18, batchNo: 'B-42' };
+    const detail = {
+      invoice: {
+        type: 'medical',
+        branchId: BRANCH,
+        teamIds: ['t-1'],
+        items: [line],
+        // 10% of the ₹1,900 left after the line's 5%.
+        overallDiscount: 19_000,
+        remark: 'From today’s visit',
+        date: '2026-09-24',
+        prescriptionId: 'rx-1',
+      },
+      party: {
+        kind: 'patient',
+        id: PATIENT,
+        seq: 3508,
+        name: 'Dharti Galani',
+        firstName: 'Dharti',
+        lastName: 'Galani',
+        phone: '+919825044120',
+      },
+    } as unknown as InvoiceDetail;
+    // Copied at another branch than the one it was raised at.
+    const copy = copiedInvoiceForm(detail, '2026-10-03', VESU);
+    expect(copy).toEqual({
+      type: 'medical',
+      // Filed where it is raised, like any new invoice — where a sale draws its stock.
+      branchId: VESU,
+      party: {
+        kind: 'patient',
+        id: PATIENT,
+        name: 'Dharti Galani',
+        phone: '+919825044120',
+      },
+      teamIds: ['t-1'],
+      // The line as billed — its quantity, price, discount and GST — without the
+      // batch its sale drew.
+      items: [{ ...line, batchNo: null }],
+      overallDiscountPct: '10',
+      remark: 'From today’s visit',
+      // Today, nothing paid, and not the prescription the original dispensed.
+      date: '2026-10-03',
+      paidNow: [{ mode: 'upi', amount: 0 }],
+      prescriptionId: null,
+    });
+    // The saved invoice is left as it was.
+    expect(detail.invoice.items[0]?.batchNo).toBe('B-42');
   });
 });

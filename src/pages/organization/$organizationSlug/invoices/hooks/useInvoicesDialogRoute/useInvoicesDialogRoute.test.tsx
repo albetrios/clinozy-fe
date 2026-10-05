@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 
 import {
   renderInvoicesRoutes,
@@ -26,10 +27,12 @@ const MISSING = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 /** Shows what the hook reads (an invoice by its seq), and closes through it. */
 function Probe() {
   const { dialog, close, openEdit } = useInvoicesDialogRoute();
-  const shown =
-    dialog.kind === 'preview' || dialog.kind === 'edit'
-      ? { kind: dialog.kind, seq: dialog.detail?.invoice.seq ?? null }
-      : dialog;
+  let shown: unknown = dialog;
+  if (dialog.kind === 'preview' || dialog.kind === 'edit') {
+    shown = { kind: dialog.kind, seq: dialog.detail?.invoice.seq ?? null };
+  } else if (dialog.kind === 'create' && dialog.source) {
+    shown = { ...dialog, source: dialog.source.invoice.seq };
+  }
   return (
     <>
       <output>{JSON.stringify(shown)}</output>
@@ -70,6 +73,39 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
         kind: 'create',
         prefill: { type: 'consultation', patient: DHARTI, from: 'today' },
       }),
+    );
+  });
+
+  it('reads a copy: New invoice opens once the invoice it copies is read (Copy invoice)', async () => {
+    renderInvoicesRoutes(
+      `${BASE}/create?type=clinic&patient=${DHARTI}&copyOf=${ref.invoice(787)}&from=today`,
+      { host: Probe },
+    );
+    await waitFor(() =>
+      expect(read()).toEqual({
+        kind: 'create',
+        prefill: {
+          type: 'clinic',
+          patient: DHARTI,
+          copyOf: ref.invoice(787),
+          from: 'today',
+        },
+        source: 787,
+      }),
+    );
+  });
+
+  it('opens no copy of an invoice that is gone: back, "Invoice not found…"', async () => {
+    const { router } = renderInvoicesRoutes(`${BASE}/create?copyOf=${MISSING}`, {
+      host: Probe,
+    });
+    await waitFor(() =>
+      expect(notifyMock.info).toHaveBeenCalledWith(
+        'Invoice not found · it may have been deleted',
+      ),
+    );
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments'),
     );
   });
 
@@ -132,5 +168,21 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
       expect(router.state.location.pathname).toBe('/organization/acme/payments'),
     );
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('turns a copy link away for a role without Payments Create, the invoice it copies never read', async () => {
+    const { router, queryClient } = renderInvoicesRoutes(
+      `${BASE}/create?copyOf=${ref.invoice(787)}`,
+      { host: Probe, role: 'doctor' },
+    );
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments'),
+    );
+    expect(notifyMock.info).toHaveBeenCalledTimes(1);
+    expect(
+      queryClient
+        .getQueryCache()
+        .find({ queryKey: invoiceQueryKeys.detail(ref.invoice(787)) }),
+    ).toBeUndefined();
   });
 });

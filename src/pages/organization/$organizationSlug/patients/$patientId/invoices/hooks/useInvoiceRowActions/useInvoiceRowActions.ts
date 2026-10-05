@@ -12,7 +12,7 @@ import type { DataTableRowAction } from '@/shared/components/DataTableRowActions
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { Eye, PenLine, Printer, Trash, Wallet } from '@/shared/icons/index.ts';
+import { Copy, Eye, PenLine, Printer, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import {
   PATIENT_TABLE_KEYS,
@@ -32,9 +32,11 @@ export interface InvoiceRowActions {
  * An Invoices row's actions (KICKOFF §6.6 Section tables; H:4748), on the
  * shared Invoice drawer (L-40), each keeping the file's Invoices behind it
  * (`from`, §4): "Print" (the A4 sheet straight to the printer), "Preview",
- * "Record payment" (Receive payment for this invoice, while it owes —
- * `payments.create`), "Edit" (`payments.edit`) and "Delete" (`payments.edit`
- * and the `void` ability, never a sale's invoice — Medical voids those).
+ * "Copy invoice" (a new invoice prefilled from this one — its lines and
+ * discount, today's date, nothing paid; `payments.create`), "Record payment"
+ * (Receive payment for this invoice, while it owes — `payments.create`),
+ * "Edit" (`payments.edit`) and "Delete" (`payments.edit` and the `void`
+ * ability, never a sale's invoice — Medical voids those).
  */
 export function useInvoiceRowActions({
   onDelete,
@@ -72,6 +74,14 @@ export function useInvoiceRowActions({
       notifyError(error);
     }
   };
+  const copy = (invoice: PatientInvoiceRow) =>
+    void navigate(
+      clinicCommandNavigation('newInvoice', {
+        organizationSlug,
+        referrer,
+        search: { type: invoice.type, patient: patientId, copyOf: invoice.id },
+      }),
+    );
   const pay = (invoice: PatientInvoiceRow) =>
     void navigate(
       clinicCommandNavigation('newReceipt', {
@@ -96,6 +106,14 @@ export function useInvoiceRowActions({
         onSelect: () => go('invoice', invoice),
       },
     ];
+    if (canPay) {
+      list.push({
+        id: 'copy',
+        label: t(keys.actions.copyInvoice),
+        icon: Copy,
+        onSelect: () => copy(invoice),
+      });
+    }
     if (canPay && invoice.due > 0) {
       list.push({
         id: 'pay',

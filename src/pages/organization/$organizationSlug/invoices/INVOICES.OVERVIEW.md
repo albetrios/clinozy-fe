@@ -18,7 +18,11 @@ Each child renders nothing — the host (`InvoicesLayout.tsx`) reads the URL thr
 `hooks/useInvoicesDialogRoute/` and opens:
 
 - `create/` — New invoice (the shared `InvoiceDrawer`), prefilled from `?type=&patient=`
-  (`S:92`).
+  (`S:92`). On `?copyOf=` it opens as a copy of a saved invoice, once that invoice is read: the
+  patient file's "Copy invoice" (`patient-file.md:43`). It takes the invoice's party, team,
+  lines, discount and remark, dated today with nothing paid (`copiedInvoiceForm`), and its
+  save says "Copied as #788" (H:5017). A copy of an invoice that is gone answers "Invoice not
+  found"; the invoice is not read for a member without Payments Create.
 - `$invoiceId/` — the invoice's preview: the shared `PrintPreview` (820) holding its A4 sheet
   (`InvoicePrint`, the Remark on it) with "Print / Save PDF" (`S:93`).
 - `$invoiceId/edit/` — Edit invoice, the same drawer on the saved invoice (`S:94`).

@@ -768,7 +768,7 @@ ids above (`<t>-table`, `<t>-table-row`, `<t>-table-select-all`, `<t>-table-bulk
 | `patient-prescriptions-row-action-<id>`                  | A prescription's `print` · `preview` · `copy` · `sell` · `edit` · `delete` | `prescriptions/hooks/usePrescriptionRowActions/` |
 | `patient-treatments-row-action-<id>`                     | A treatment's `check-in` · `copy` · `edit` · `delete`                      | `treatments/hooks/useTreatmentRowActions/`       |
 | `patient-reports-row-action-<id>`                        | A report's `open` · `delete`                                               | `reports/PatientReportsPage.tsx`                 |
-| `patient-invoices-row-action-<id>`                       | An invoice's `print` · `preview` · `pay` · `edit` · `delete`               | `invoices/hooks/useInvoiceRowActions/`           |
+| `patient-invoices-row-action-<id>`                       | An invoice's `print` · `preview` · `copy` · `pay` · `edit` · `delete`      | `invoices/hooks/useInvoiceRowActions/`           |
 | `patient-package-<packageId>` · `-use` · `-book`         | A package card · "Use a session" · "Book next"                             | `packages/PatientPackagesPage.tsx`               |
 | `patient-notes-input` · `patient-notes-add`              | Team notes' composer · "Add note"                                          | `notes/PatientNotesPage.tsx`                     |
 | `patient-note-<noteId>` · `patient-note-delete-<noteId>` | A note's card · its × "Delete note"                                        | `notes/PatientNotesPage.tsx`                     |

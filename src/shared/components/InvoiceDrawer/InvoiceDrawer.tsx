@@ -42,6 +42,7 @@ import {
 import { type InvoiceDrawerView, useInvoiceDrawerView } from './invoice-drawer-view.ts';
 import {
   blankLine,
+  copiedInvoiceForm,
   draftFigures,
   emptyInvoiceForm,
   type InvoiceDraftFigures,
@@ -82,12 +83,19 @@ interface InvoiceDrawerBaseProps {
   sale?: boolean;
 }
 
-/** What a new invoice opens on — the URL's `?type=` and `?patient=`, a prescription to sell. */
+/** What a new invoice opens on — the URL's `?type=` and `?patient=`, a prescription to sell, an invoice to copy. */
 export interface InvoiceCreatePrefill {
   type?: InvoiceType;
   patientId?: string | null;
   /** `?prescription=` (Medical, `S:50`): its patient, medicines and "From Rx #500". */
   prescriptionId?: string | null;
+  /**
+   * `?copyOf=` — the patient file's "Copy invoice" (`patient-file.md:43`): the
+   * saved invoice a new one starts as — its party, team, lines, discount and
+   * remark, dated today with nothing paid (`copiedInvoiceForm`); its save
+   * says "Copied as #788" (H:5017).
+   */
+  copyOf?: InvoiceDetail;
 }
 
 /** New invoice — `invoices/create/` (`S:92`), or Medical's New sale. */
@@ -120,6 +128,9 @@ function startingForm(
   branchId: string | null,
 ): InvoiceFormValues {
   if (props.mode === 'edit') return invoiceFormOf(props.detail);
+  if (props.prefill?.copyOf) {
+    return copiedInvoiceForm(props.prefill.copyOf, today, branchId);
+  }
   const patientId = props.prefill?.patientId;
   const prefill: InvoicePrefill = {
     type: props.sale ? 'medical' : (props.prefill?.type ?? 'clinic'),
@@ -242,11 +253,15 @@ function invoiceSteps(input: StepsInput): DrawerStep[] {
   ];
 }
 
-/** The props as an opening reads them: the saved invoice, the prescription to sell, the hand-offs. */
+/**
+ * The props as an opening reads them: the saved invoice, the invoice to copy,
+ * the prescription to sell, the hand-offs.
+ */
 function sessionInput(props: InvoiceDrawerProps) {
   if (props.mode === 'edit') {
     return {
       editing: props.detail,
+      copyOf: null,
       prescriptionId: null,
       onSaved: props.onSaved,
       onDeleted: props.onDeleted,
@@ -254,10 +269,17 @@ function sessionInput(props: InvoiceDrawerProps) {
   }
   return {
     editing: null,
+    copyOf: props.prefill?.copyOf ?? null,
     prescriptionId: props.prefill?.prescriptionId ?? null,
     onSaved: props.onCreated,
     onDeleted: undefined,
   };
+}
+
+/** The save's toast: an edit's, a copy's ("Copied as #788") or a new invoice's. */
+function saveToastKind(input: ReturnType<typeof sessionInput>) {
+  if (input.editing) return 'edit';
+  return input.copyOf ? 'copy' : 'create';
 }
 
 /** The reads the form's type and party need: the catalogue, "Often billed", the plan. */
@@ -312,7 +334,10 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   usePrefillPatientName(form);
   usePrescriptionPrefill(form, input.prescriptionId, catalog.items);
   useBranchPrefill(form, branchId);
-  const team = useTeamPrefill(form, editing !== null, reads.patientId);
+  // An edit keeps its team, and so does a copy of an invoice that has one; a
+  // copy of one without starts like any new invoice (`payments.md:139`).
+  const ownTeam = editing !== null || (input.copyOf?.invoice.teamIds.length ?? 0) > 0;
+  const team = useTeamPrefill(form, ownTeam, reads.patientId);
   const stacks = useInvoiceStacks(form, today);
 
   const figures = draftFigures(values, saved.alreadyPaid);
@@ -345,7 +370,7 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
     floorOf,
     floorVisible: access.floorVisible,
     onStep: setOpenStep,
-    onDone: useSaveToast(props.mode, input.onSaved),
+    onDone: useSaveToast(saveToastKind(input), input.onSaved),
   });
 
   const switchType = (type: InvoiceType) => {

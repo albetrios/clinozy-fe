@@ -23,6 +23,8 @@ export const INVOICE_TYPE_PARAMS = [
 export interface InvoiceCreateSearch extends InvoiceSearch {
   type?: InvoiceType;
   patient?: string;
+  /** The patient file's "Copy invoice": the saved invoice a new one starts as. */
+  copyOf?: string;
 }
 
 /** Parse New invoice's params. */
@@ -32,6 +34,7 @@ export function validateInvoiceCreateSearch(
   return {
     type: oneOf(INVOICE_TYPE_PARAMS, search.type),
     patient: matchOf(RECORD_ID, search.patient),
+    copyOf: matchOf(RECORD_ID, search.copyOf),
     from: textOf(search.from) || undefined,
   };
 }
