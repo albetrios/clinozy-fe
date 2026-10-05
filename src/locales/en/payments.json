@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "entries",
-    "today": "Today {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "Edited {{count}}× · last {{from}} → {{to}}",
     "edited_other": "Edited {{count}}× · last {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",

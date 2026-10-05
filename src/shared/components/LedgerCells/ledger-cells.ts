@@ -1,26 +1,23 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicDateOf } from '@/shared/api/clinic/clinic-filter-match.ts';
 import type { PaymentMode, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   LedgerRow,
   PaymentEditSide,
 } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 
 /*
  * What the ledger's cells say about an entry (`payments.md:29`, H:5096–5108) —
- * pure wording, and the two hooks that word it for the viewer, so the cells,
- * the meta line, the phone rows, Day close's review and the CSV export all
- * word an entry the same way.
+ * pure wording, and the hook that words the sub line for the viewer, so the
+ * cells, the meta line, the phone rows, Day close's review and the CSV export
+ * all word an entry the same way. When reads by the rooms' one time rule
+ * (`useClinicClock`).
  */
 
 const SUB = LEDGER_KEYS.ledger.sub;
@@ -140,37 +137,6 @@ export function editSideLabel(
     amount: formatPaise(side.amount),
     modes: ledgerModesLabel(side.modes, tClinic),
   });
-}
-
-/** "11:05" — an instant's clock time, in the viewer's locale and hour cycle. */
-export function useLedgerTime(): (instant: string) => string {
-  const { formatDate, prefs } = useLocaleFormat();
-  return (instant) =>
-    formatDate(instant, {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: 'numeric',
-      second: undefined,
-    });
-}
-
-/**
- * "Today 11:05" / "27 Sep 18:40" — the day (Today on the clinic's today) and
- * the clock time, in the viewer's locale and hour cycle.
- */
-export function useLedgerWhen(): (instant: string) => string {
-  const { t } = useTranslation(LEDGER_NS);
-  const { formatDate } = useLocaleFormat();
-  const timeOf = useLedgerTime();
-  return (instant) => {
-    const time = timeOf(instant);
-    if (clinicDateOf(instant) === clinicToday()) {
-      return t(LEDGER_KEYS.ledger.today, { time });
-    }
-    return t(LEDGER_KEYS.ledger.dayTime, {
-      day: formatDate(instant, { day: 'numeric', month: 'short' }),
-      time,
-    });
-  };
 }
 
 /** The From / to sub line, worded for the viewer. */

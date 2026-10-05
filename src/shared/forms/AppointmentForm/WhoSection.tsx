@@ -21,8 +21,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useCommandSearch } from '@/shared/hooks/useCommandSearch/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Search } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -347,7 +347,7 @@ function LeadRadios({
   onChange: (change: AppointmentFormChange) => void;
 }) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
-  const { formatDate } = useLocaleFormat();
+  const clock = useClinicClock();
   const picked = linkedLeadId(draft, leads);
   return (
     <div className="flex flex-col gap-2">
@@ -366,7 +366,8 @@ function LeadRadios({
               ? t(CLINIC_KEYS.leads.sources[lead.source], { ns: CLINIC_NS })
               : '',
             lead.interests.join(', '),
-            formatDate(lead.createdAt, { day: 'numeric', month: 'short' }),
+            // When the lead came in, by the rooms' one time rule (days alone).
+            clock.moment(lead.createdAt, { withTime: false }),
           ]
             .filter(Boolean)
             .join(' · ');

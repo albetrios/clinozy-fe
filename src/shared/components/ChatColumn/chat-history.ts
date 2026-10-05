@@ -9,7 +9,7 @@ import type {
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
-import { type ClinicClock, clinicDayLabel } from '@/shared/hooks/useClinicClock/index.ts';
+import type { ClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import type { OutboxMessage } from '@/shared/hooks/useThread/index.ts';
 import {
   type AppIcon,
@@ -62,27 +62,14 @@ export interface ChatFormat {
 }
 
 /**
- * A time as the thread shows it (`_patterns.md:193`): "Today 4:00 pm",
- * "Tomorrow 11:00 am", "Yesterday 9:10 am", "9 Oct 4:00 pm" — and the day
- * alone for a record the contract dates without a clock time.
+ * A time as the thread shows it — every line, message and chip by the rooms'
+ * one rule (`ClinicClock.moment`): today the clock time alone ("10:28 am"),
+ * then "Yesterday 9:10 am", "Fri 4:00 pm", a week back the date ("24 Sep");
+ * ahead "Tomorrow 11:00 am", "9 Oct 4:00 pm" — and the day alone for a
+ * record the contract dates without a clock time ("Yesterday", "24 Sep").
  */
-export function chatWhenLabel(when: ChatWhen, clock: ChatClock, t: TFunction): string {
-  const date = when.kind === 'day' ? when.date : clock.dayOf(when.at);
-  const day = clinicDayLabel(date, clock, t);
-  return when.kind === 'day'
-    ? day
-    : t(keys.when.dayTime, { day, time: clock.time(when.at) });
-}
-
-/**
- * A message's time on its meta line or system line: the clock time alone today
- * ("10:28 am" — the prototype's "10:28", H:3397), else the day with it
- * ("Yesterday 9:10 am", "30 Sept 4:00 pm"). History chips keep "Today …".
- */
-export function messageTimeLabel(at: string, clock: ChatClock, t: TFunction): string {
-  return clock.dayOf(at) === clock.today
-    ? clock.time(at)
-    : chatWhenLabel({ kind: 'instant', at }, clock, t);
+export function chatWhenLabel(when: ChatWhen, clock: ChatClock): string {
+  return when.kind === 'day' ? clock.day(when.date) : clock.moment(when.at);
 }
 
 type Part = string | null | false;
@@ -121,7 +108,7 @@ const HISTORY_PARTS: {
   reminder: (entry, { t, clock }) => [
     t(keys.history.reminder),
     entry.service,
-    chatWhenLabel({ kind: 'instant', at: entry.visitAt }, clock, t),
+    clock.moment(entry.visitAt),
   ],
   prescription: (entry, { t }) => [
     t(keys.history.prescription, { seq: entry.seq }),
@@ -201,7 +188,7 @@ export function threadDivider(
   const { t, clock } = format;
   if (thread && thread.kind !== 'contact_thread') {
     return t(keys.created.lead, {
-      time: chatWhenLabel({ kind: 'instant', at: thread.createdAt }, clock, t),
+      time: clock.moment(thread.createdAt),
       source: thread.source ? t(CLINIC_KEYS.leads.sources[thread.source]) : '—',
     });
   }
@@ -303,7 +290,7 @@ export function threadEntries(
         key: `${entry.kind}:${entry.id}`,
         sortAt: entry.sortAt,
         chip: historyChip(entry, format),
-        when: chatWhenLabel(entry.when, format.clock, format.t),
+        when: chatWhenLabel(entry.when, format.clock),
       })),
     ...messages.map((message): ThreadEntry =>
       message.isSystem
@@ -312,7 +299,7 @@ export function threadEntries(
             key: message.id,
             sortAt: message.sentAt,
             text: message.body,
-            when: messageTimeLabel(message.sentAt, format.clock, format.t),
+            when: format.clock.moment(message.sentAt),
           }
         : { kind: 'message', key: message.id, sortAt: message.sentAt, message },
     ),

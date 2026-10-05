@@ -425,7 +425,6 @@
     "contact": "Kontakt"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "Zurückgestellt · {{label}}",
     "done": "Erledigt · {{time}}",
     "doneNow": "Erledigt · Jetzt",

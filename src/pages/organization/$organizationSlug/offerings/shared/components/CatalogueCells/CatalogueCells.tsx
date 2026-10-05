@@ -8,7 +8,7 @@ import {
   type AvatarStackPerson,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 
 import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.constants.ts';
 
@@ -125,7 +125,8 @@ export function BranchChips({
 
 /**
  * The Updated cell (`offerings.md:31`): who saved the record — a 22px avatar
- * in its pill — then "Sep 25 · 11:44". Hidden by default (Columns brings it).
+ * in its pill — then when, by the rooms' one time rule ("11:44 am", "Yesterday
+ * 11:44 am", "25 Sep"). Hidden by default (Columns brings it).
  */
 export function SavedByCell({
   person,
@@ -135,12 +136,12 @@ export function SavedByCell({
   person: AvatarStackPerson | undefined;
   updatedAt: string;
 }) {
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   return (
     <span className="flex min-w-0 items-center gap-2">
       {person ? <AvatarStack people={[person]} className="min-w-0 flex-none" /> : null}
       <span className="text-caption text-muted-foreground min-w-0 truncate tabular-nums">
-        {dayTime(updatedAt)}
+        {clock.moment(updatedAt)}
       </span>
     </span>
   );

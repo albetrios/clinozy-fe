@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { LeadContactHit } from '@/shared/api/clinic/leads-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
@@ -11,7 +10,7 @@ import {
   CONTACT_EDITOR_KEYS,
   CONTACT_EDITOR_NS,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { Plus, Search } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
@@ -34,24 +33,19 @@ export interface NewLeadContactStepProps {
   onNewContact: () => void;
 }
 
-/** A hit's second line: "Patient #3508 · last visit 24 Sep" or "Lead #2365 · +91 98250 11241". */
+/**
+ * A hit's second line: "Patient #3508 · last visit 24 Sep" or "Lead #2365 ·
+ * +91 98250 11241" — the last visit's day by the rooms' one time rule ("Today",
+ * as the design words it, H:3318, H:5824; "Yesterday", "Mon", "24 Sep").
+ */
 function useHitLine() {
   const { t } = useTranslation(LEADS_NS);
-  const { formatDate } = useLocaleFormat();
+  const clock = useClinicClock();
   return (hit: LeadContactHit) => {
     if (hit.kind === 'patient') {
       const id = displayId.patient(hit.seq);
       if (!hit.lastVisit) return t(K.hits.patientNew, { id });
-      // "Today" for a visit today, as the design words it (H:3318, H:5824); else "24 Sep".
-      const date =
-        hit.lastVisit === clinicToday()
-          ? t(K.hits.today)
-          : formatDate(
-              hit.lastVisit,
-              { day: 'numeric', month: 'short' },
-              { civilDay: true },
-            );
-      return t(K.hits.patient, { id, date });
+      return t(K.hits.patient, { id, date: clock.day(hit.lastVisit) });
     }
     const phone = formatClinicPhone(hit.phone);
     return hit.contactThread

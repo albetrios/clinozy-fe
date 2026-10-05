@@ -56,7 +56,6 @@
     "mrs": "एमआर"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "फ़ोन जोड़ें",
     "noValue": "—"

@@ -16,10 +16,6 @@ export const CHAT_COLUMN_KEYS = {
     patientThread: 'chatColumn.created.patientThread',
     contactThread: 'chatColumn.created.contactThread',
   },
-  /** A time with its day; the day words are the app's one set (`PICKER_KEYS.date`, `common`). */
-  when: {
-    dayTime: 'chatColumn.when.dayTime',
-  },
   history: {
     appointment: 'chatColumn.history.appointment',
     reminder: 'chatColumn.history.reminder',

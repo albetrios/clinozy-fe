@@ -425,7 +425,6 @@
     "contact": "संपर्क"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "स्थगित · {{label}}",
     "done": "पूरा · {{time}}",
     "doneNow": "पूरा · अभी",

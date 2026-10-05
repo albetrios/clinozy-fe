@@ -130,10 +130,17 @@ describe('PatientCells', () => {
         <PatientFollowUpCell followUpAt={null} today={TODAY} />
       </div>,
     );
-    const tones = (await screen.findAllByText(/·/)).map((node) =>
+    const badges = await screen.findAllByText(/2:50/);
+    const tones = badges.map((node) =>
       node.closest('[data-tone]')?.getAttribute('data-tone'),
     );
     expect(tones).toEqual(['butter', 'blush', 'sky']);
+    // The rooms' one time rule: today the time, this week the weekday, ahead the date.
+    expect(badges.map((node) => node.textContent?.replace(/\s/gu, ' '))).toEqual([
+      '2:50 PM',
+      'Wed 2:50 PM',
+      'Oct 9 2:50 PM',
+    ]);
   });
 
   it('shows what is due in the blush ink, else a muted dash', async () => {
@@ -148,7 +155,8 @@ describe('PatientCells', () => {
   it('names who last saved the patient, and when', async () => {
     renderWithProviders(<PatientUpdatedCell patient={patient} />);
     expect(await screen.findByText('Riya S.')).toBeInTheDocument();
-    expect(screen.getByText(/·/)).toBeInTheDocument();
+    // Saved at 09:00 this morning: today reads its time alone.
+    expect(screen.getByText(/^9:00\sAM$/)).toBeInTheDocument();
   });
 
   it('draws the patient chip — sage avatar, "P" badge, name over the mobile — and is accessible', async () => {

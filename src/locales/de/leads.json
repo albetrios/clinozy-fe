@@ -40,19 +40,7 @@
     "empty": "Keine passenden Leads",
     "clearFilters": "Filter löschen",
     "moreInterests_one": "{{count}} weiteres: {{list}}",
-    "moreInterests_other": "{{count}} weitere: {{list}}",
-    "updated": {
-      "justNow": "Gerade eben",
-      "minutes_one": "vor {{count}} Min.",
-      "minutes_other": "vor {{count}} Min.",
-      "hours_one": "vor {{count}} Std.",
-      "hours_other": "vor {{count}} Std.",
-      "yesterday": "Gestern",
-      "days_one": "vor {{count}} Tag",
-      "days_other": "vor {{count}} Tagen",
-      "weeks_one": "vor {{count}} Woche",
-      "weeks_other": "vor {{count}} Wochen"
-    }
+    "moreInterests_other": "{{count}} weitere: {{list}}"
   },
   "team": {
     "claim": "Offen · Übernehmen",
@@ -205,8 +193,7 @@
       "lead": "Lead {{id}} · {{phone}}",
       "contact": "Kontakt · {{phone}}",
       "recreate": "Lead neu anlegen",
-      "useContact": "Kontakt verwenden",
-      "today": "Heute"
+      "useContact": "Kontakt verwenden"
     },
     "noMatch": "Kein vorhandener Treffer",
     "more_one": " · +{{count}} weitere",

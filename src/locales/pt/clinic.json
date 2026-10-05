@@ -569,8 +569,10 @@
   },
   "lists": {
     "loadError": "Não foi possível carregar esta lista · conexão perdida. Mostrando a última cópia.",
-    "retry": "Tentar novamente",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "Tentar novamente"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -623,9 +625,6 @@
       "lead": "Lead criado · {{time}} · via {{source}}",
       "patientThread": "Paciente · só chat · sem lead",
       "contactThread": "Contato · só chat · sem lead"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "Consulta #{{seq}}",

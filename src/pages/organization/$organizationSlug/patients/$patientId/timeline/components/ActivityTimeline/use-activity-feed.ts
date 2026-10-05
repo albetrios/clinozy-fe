@@ -1,14 +1,12 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import {
   organizationPatientSection,
   organizationPrescriptionEdit,
   organizationTreatmentEdit,
 } from '@/lib/routes/patient-file-builders.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicDateOf } from '@/shared/api/clinic/clinic-filter-match.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { photoName } from '@/shared/api/clinic/patient-images-api.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
@@ -17,7 +15,7 @@ import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts'
 import { personFullName } from '@/shared/components/Cells/index.ts';
 import { usePatientAppointments } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientNotes } from '@/shared/hooks/usePatientNotes/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
@@ -45,17 +43,16 @@ function visitTone(status: string) {
   return 'sky' as const;
 }
 
-/** An instant's clinic day, the instant, and its clock time. */
+/**
+ * An instant's day, the instant, and its clock time — both on the clinic clock,
+ * so a row sits under the day its time belongs to.
+ */
 function useTimed() {
-  const { formatDate, prefs } = useLocaleFormat();
+  const clock = useClinicClock();
   return (instant: string) => ({
-    day: clinicDateOf(instant),
+    day: clock.dayOf(instant),
     at: instant,
-    time: formatDate(instant, {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: 'numeric',
-      second: undefined,
-    }),
+    time: clock.time(instant),
   });
 }
 

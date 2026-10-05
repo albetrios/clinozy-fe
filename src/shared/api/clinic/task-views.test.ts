@@ -93,21 +93,18 @@ describe('taskDueLabel (tasks.md:58, H:4219)', () => {
     // 22:31 tonight in the clinic is still today.
     expect(taskDueLabel(task(minutesFromNow(721)), NOW)).toEqual({
       kind: 'at',
-      day: 'today',
       date: '2026-10-04',
       time: '22:31',
     });
     // 11:00 tomorrow, clinic-local (05:30 UTC).
     expect(taskDueLabel(task('2026-10-05T05:30:00.000Z'), NOW)).toEqual({
       kind: 'at',
-      day: 'tomorrow',
       date: '2026-10-05',
       time: '11:00',
     });
     // 00:30 on 7 Oct in the clinic is still 6 Oct in UTC.
     expect(taskDueLabel(task('2026-10-06T19:00:00.000Z'), NOW)).toEqual({
       kind: 'at',
-      day: 'date',
       date: '2026-10-07',
       time: '00:30',
     });
@@ -194,15 +191,11 @@ describe('groupTasks (tasks.md:19, 30)', () => {
 });
 
 describe('taskDueAt', () => {
-  it('names a picked day and time against the clinic’s today', () => {
-    expect(taskDueAt('2026-10-04', '17:00', NOW)).toEqual({
+  it('carries a picked clinic-local day and time — the clock words them', () => {
+    expect(taskDueAt('2026-10-04', '17:00')).toEqual({
       kind: 'at',
-      day: 'today',
       date: '2026-10-04',
       time: '17:00',
     });
-    expect(taskDueAt('2026-10-05', '11:00', NOW).day).toBe('tomorrow');
-    expect(taskDueAt('2026-10-03', '11:00', NOW).day).toBe('yesterday');
-    expect(taskDueAt('2026-10-11', '11:00', NOW).day).toBe('date');
   });
 });

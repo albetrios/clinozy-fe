@@ -33,8 +33,6 @@
     "records": "users",
     "mainRole": "Main role",
     "alsoRole": "Also",
-    "today": "Today · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

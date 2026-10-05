@@ -7,7 +7,7 @@ import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { ledgerEntryLock, useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
+import { ledgerEntryLock } from '@/shared/components/LedgerCells/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import {
   PaymentDeleteConfirm,
@@ -24,6 +24,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet.ts
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -102,7 +103,7 @@ function useCount(key: string, view: DayCloseView | undefined) {
 function useDayWrites(branchId: string | null, date: string) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatPaise = usePaiseFormat();
-  const timeOf = useLedgerTime();
+  const { time: timeOf } = useClinicClock();
   const key = { branchId: branchId ?? '', date };
   const accept = useAcceptOpeningCash();
   const close = useCloseDay();

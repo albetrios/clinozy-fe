@@ -29,7 +29,6 @@
     "type": "النوع"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "addPhone": "إضافة هاتف",
     "noValue": "—"
   },

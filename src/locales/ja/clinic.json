@@ -563,8 +563,10 @@
   },
   "lists": {
     "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",
-    "retry": "再試行",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "再試行"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -617,9 +619,6 @@
       "lead": "リード作成 · {{time}} · {{source}} 経由",
       "patientThread": "患者 · チャットのみ · リードなし",
       "contactThread": "連絡先 · チャットのみ · リードなし"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "予約 #{{seq}}",

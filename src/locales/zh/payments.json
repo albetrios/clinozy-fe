@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "记录",
-    "today": "今天 {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_other": "已编辑 {{count}} 次 · 最近 {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",
     "received": "+ {{amount}}",

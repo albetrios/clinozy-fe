@@ -424,7 +424,6 @@
     "contact": "연락처"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "다시 알림 · {{label}}",
     "done": "완료 · {{time}}",
     "doneNow": "완료 · 방금",

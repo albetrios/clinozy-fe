@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "movimenti",
-    "today": "Oggi {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
     "edited_many": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
     "edited_other": "Modificato {{count}}× · ultimo {{from}} → {{to}}",

@@ -29,7 +29,6 @@
     "type": "種類"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "addPhone": "電話番号を追加",
     "noValue": "—"
   },

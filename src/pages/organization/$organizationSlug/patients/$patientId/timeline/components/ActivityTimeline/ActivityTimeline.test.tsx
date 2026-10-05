@@ -57,7 +57,7 @@ beforeEach(() => {
 afterEach(() => resetPatientFile());
 
 describe('ActivityTimeline (KICKOFF §6.6, H:4840–4864)', () => {
-  it('lists the records newest first under their days, near ones in words', async () => {
+  it('lists the records newest first under their days, named by the rooms’ one time rule', async () => {
     feed.entries = [
       entry('Peel', 'visit', 0, {
         time: '11:05 AM',
@@ -84,11 +84,16 @@ describe('ActivityTimeline (KICKOFF §6.6, H:4840–4864)', () => {
       'Clinic invoice #787',
       'Old note',
     ]);
-    for (const heading of ['In 3 days', 'Tomorrow', 'Today', 'Yesterday', '4 days ago']) {
+    // The past week by its weekday (en-US, the test's format locale).
+    const weekday = new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      timeZone: 'UTC',
+    }).format(new Date(`${addCivilDays(today, -4)}T12:00:00Z`));
+    for (const heading of ['Tomorrow', 'Today', 'Yesterday', weekday]) {
       expect(screen.getByText(heading)).toBeInTheDocument();
     }
-    // A week or more away: the date alone — with its year when it is not this one.
-    expect(screen.queryByText('In 7 days')).not.toBeInTheDocument();
+    // A day ahead or a week back: the date alone — with its year when it is not this one.
+    expect(screen.queryByText(/days? ago|^In \d/)).not.toBeInTheDocument();
     expect(
       screen.getByText(new RegExp(addCivilDays(today, -400).slice(0, 4))),
     ).toBeInTheDocument();

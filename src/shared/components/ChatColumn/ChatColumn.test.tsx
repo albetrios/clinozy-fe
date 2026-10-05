@@ -123,7 +123,7 @@ describe('the conversation', () => {
     expect(screen.getByRole('region', { name: 'Anaya Desai' })).toBeInTheDocument();
 
     expect(await screen.findByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · Today 10:28 am · via WhatsApp',
+      'Lead created · 10:28 am · via WhatsApp',
     );
     expect(screen.getByTestId(ids.system)).toHaveTextContent(
       'Lead created from WhatsApp ad',
@@ -154,16 +154,17 @@ describe('the conversation', () => {
       within(screen.getByTestId(ids.header)).getByTestId('patient-badge'),
     ).toBeVisible();
     await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
-    const chips = screen.getAllByTestId(ids.history).map((chip) => chip.textContent);
-    expect(chips[0]).toBe(
-      'Appointment #2740 · Peel · Completed · Dr. Nisha30 Sept 2:50 pm',
-    );
-    expect(chips).toContain('Clinic invoice #787 · ₹4,800 · ₹4,800 due30 Sept');
+    // A time's own space is unbreakable (U+00A0); read it as a plain one.
+    const chips = screen
+      .getAllByTestId(ids.history)
+      .map((chip) => chip.textContent?.replace(/\u00a0/gu, ' '));
+    expect(chips[0]).toBe('Appointment #2740 · Peel · Completed · Dr. NishaWed 2:50 pm');
+    expect(chips).toContain('Clinic invoice #787 · ₹4,800 · ₹4,800 dueWed');
     expect(chips.at(-1)).toBe(
       'Appointment #2859 · Peel · Confirmed · Dr. Nisha14 Oct 11:00 am',
     );
     expect(screen.getByTestId(ids.divider)).toHaveTextContent(
-      'Lead created · 22 Aug 10:00 am · via Instagram',
+      'Lead created · 22 Aug · via Instagram',
     );
 
     await user.click(screen.getAllByTestId(ids.history)[0] as HTMLElement);
@@ -176,8 +177,10 @@ describe('the conversation', () => {
   it('masks every ₹ behind the patient file’s privacy', async () => {
     renderChat({ person: DHARTI, contact: DHARTI_CONTACT, maskMoney: true });
     await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
-    const chips = screen.getAllByTestId(ids.history).map((chip) => chip.textContent);
-    expect(chips).toContain('Clinic invoice #787 · ₹ •••• · ₹ •••• due30 Sept');
+    const chips = screen
+      .getAllByTestId(ids.history)
+      .map((chip) => chip.textContent?.replace(/\u00a0/gu, ' '));
+    expect(chips).toContain('Clinic invoice #787 · ₹ •••• · ₹ •••• dueWed');
     expect(chips.join(' ')).not.toMatch(/₹\d/);
   });
 

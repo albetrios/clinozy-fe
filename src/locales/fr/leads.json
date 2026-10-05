@@ -42,23 +42,7 @@
     "clearFilters": "Effacer les filtres",
     "moreInterests_one": "{{count}} de plus : {{list}}",
     "moreInterests_many": "{{count}} de plus : {{list}}",
-    "moreInterests_other": "{{count}} de plus : {{list}}",
-    "updated": {
-      "justNow": "À l’instant",
-      "minutes_one": "il y a {{count}} min",
-      "minutes_many": "il y a {{count}} min",
-      "minutes_other": "il y a {{count}} min",
-      "hours_one": "il y a {{count}} h",
-      "hours_many": "il y a {{count}} h",
-      "hours_other": "il y a {{count}} h",
-      "yesterday": "Hier",
-      "days_one": "il y a {{count}} jour",
-      "days_many": "il y a {{count}} jours",
-      "days_other": "il y a {{count}} jours",
-      "weeks_one": "il y a {{count}} semaine",
-      "weeks_many": "il y a {{count}} semaines",
-      "weeks_other": "il y a {{count}} semaines"
-    }
+    "moreInterests_other": "{{count}} de plus : {{list}}"
   },
   "team": {
     "claim": "Ouvert · Prendre",
@@ -214,8 +198,7 @@
       "lead": "Lead {{id}} · {{phone}}",
       "contact": "Contact · {{phone}}",
       "recreate": "Recréer le lead",
-      "useContact": "Utiliser le contact",
-      "today": "Aujourd’hui"
+      "useContact": "Utiliser le contact"
     },
     "noMatch": "Aucune correspondance",
     "more_one": " · +{{count}} autre",

@@ -40,7 +40,6 @@ export const PATIENT_PHOTOS_KEYS = {
     mediumShort: 'photos.sizes.mediumShort',
     largeShort: 'photos.sizes.largeShort',
   },
-  today: 'photos.today',
   /** "Loading photos" — the skeleton's spoken label. */
   loading: 'photos.loading',
   /** "3 photos · 24 Sep · Hydrafacial" — a date group's line. */

@@ -87,7 +87,7 @@ describe('useLedgerTable (payments.md:29–30)', () => {
       value: 'Paid',
       dotClassName: expect.stringContaining('bg-tone-butter-foreground'),
     });
-    expect(fold('when')).toMatch(/^Today 11:05/);
+    expect(fold('when')).toMatch(/^11:05/);
     expect(fold('party')).toBe('Tea & snacks');
     expect(fold('mode')).toMatchObject({ value: 'Cash' });
     expect(fold('amount')).toBe('− ₹260');

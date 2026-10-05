@@ -17,6 +17,7 @@ import {
 } from '@/shared/clinic/clinic-tones.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -243,6 +244,7 @@ export function usePlanCard(host: PlanCardHost): PlanCard {
   const { t } = useTranslation([OFFERING_SUGGESTIONS_NS, CLINIC_NS]);
   const money = usePaiseFormat();
   const { formatDate } = useLocaleFormat();
+  const clock = useClinicClock();
   const access = useClinicAccess();
   // No patient yet (a lead's booking, a New form): nothing to read.
   const plan = usePlan(host.patientId || null);
@@ -261,13 +263,8 @@ export function usePlanCard(host: PlanCardHost): PlanCard {
         { day: 'numeric', month: 'short' },
         { civilDay: true },
       ),
-    instant: (at) =>
-      formatDate(at, {
-        day: 'numeric',
-        month: 'short',
-        hour: 'numeric',
-        minute: '2-digit',
-      }),
+    // Who suggested it and when, and each contact line: the rooms' one time rule.
+    instant: (at) => clock.moment(at),
     canFloor: access.canAbility('floor'),
   };
 

@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import {
-  civilDayOffset,
-  clinicToday,
-  localDateOf,
+  type CivilDayReading,
+  civilDayReading,
 } from '@/shared/api/clinic/clinic-time.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -13,8 +12,7 @@ import {
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
-import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   type AppIcon,
   Calendar,
@@ -57,42 +55,28 @@ const ACTIVITY_ICONS: Readonly<Record<ActivityFilter, AppIcon>> = {
   note: MessageSquare,
 };
 
-/** How far a day may be for its relative name (H:4851 `relD`: within six days). */
-const RELATIVE_DAYS = 7;
-
 /** How many of a day's photos a collapsed row shows (H:4860 `slice(0, 4)`). */
 const PHOTO_THUMBS = 4;
 
+/** The readings whose name is a word or a weekday, so the date follows it. */
+const NAMED_DAYS = new Set<CivilDayReading>([
+  'today',
+  'yesterday',
+  'tomorrow',
+  'thisWeek',
+]);
+
 /**
- * A day's header (H:4861): "Today" / "Yesterday" / "3 days ago" / "In 2 days"
- * over "Sat, 3 Oct" — the year when it is not this one — else the date alone.
+ * A day's header (H:4861), named by the rooms' one time rule: "Today",
+ * "Yesterday", "Sat" or "Tomorrow" over the date ("3 Oct"); a week back the
+ * date alone ("24 Sep"), a day ahead its date ("7 Oct").
  */
 function useDayHeading(): (day: string) => { main: string; sub: string | null } {
-  const { t } = useTranslation([TIMELINE_NS, PICKER_NS]);
-  const { formatDate } = useLocaleFormat();
-  return (day) => {
-    const today = clinicToday();
-    const offset = civilDayOffset(today, day);
-    const date = formatDate(
-      localDateOf(day),
-      {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        ...(day.slice(0, 4) === today.slice(0, 4) ? {} : { year: 'numeric' }),
-      },
-      { civilDay: true },
-    );
-    let relative: string | null = null;
-    if (offset === 0) relative = t(PICKER_KEYS.date.today, { ns: PICKER_NS });
-    else if (offset === -1) relative = t(PICKER_KEYS.date.yesterday, { ns: PICKER_NS });
-    else if (offset === 1) relative = t(PICKER_KEYS.date.tomorrow, { ns: PICKER_NS });
-    else if (offset < 0 && -offset < RELATIVE_DAYS)
-      relative = t(K.daysAgo, { count: -offset });
-    else if (offset > 0 && offset < RELATIVE_DAYS)
-      relative = t(K.inDays, { count: offset });
-    return relative ? { main: relative, sub: date } : { main: date, sub: null };
-  };
+  const clock = useClinicClock();
+  return (day) => ({
+    main: clock.day(day),
+    sub: NAMED_DAYS.has(civilDayReading(clock.today, day)) ? clock.date(day) : null,
+  });
 }
 
 /** A filter chip (H:4864): the kind's icon and count — "All" spelled out — its tone when on. */

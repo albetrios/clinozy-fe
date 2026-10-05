@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "lançamentos",
-    "today": "Hoje {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "Editado {{count}}× · último {{from}} → {{to}}",
     "edited_many": "Editado {{count}}× · último {{from}} → {{to}}",
     "edited_other": "Editado {{count}}× · último {{from}} → {{to}}",

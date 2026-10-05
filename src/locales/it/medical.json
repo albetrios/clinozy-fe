@@ -56,7 +56,6 @@
     "mrs": "Informatori"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "Aggiungi telefono",
     "noValue": "—"

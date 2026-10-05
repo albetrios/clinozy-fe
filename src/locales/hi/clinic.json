@@ -566,8 +566,10 @@
   },
   "lists": {
     "loadError": "यह सूची लोड नहीं हो सकी · कनेक्शन टूट गया। आख़िरी कॉपी दिखाई जा रही है।",
-    "retry": "फिर से कोशिश करें",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "फिर से कोशिश करें"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -620,9 +622,6 @@
       "lead": "लीड बनी · {{time}} · {{source}} से",
       "patientThread": "मरीज़ · सिर्फ़ चैट · कोई लीड नहीं",
       "contactThread": "संपर्क · सिर्फ़ चैट · कोई लीड नहीं"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "अपॉइंटमेंट #{{seq}}",

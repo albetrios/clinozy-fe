@@ -65,6 +65,30 @@ export function civilDayOffset(from: string, to: string): number {
   return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / DAY_MS);
 }
 
+/**
+ * Where a calendar date sits from today, as the rooms name a moment (the one
+ * time rule): today; yesterday; two to six days back (`thisWeek` — its
+ * weekday names it); a week or more back (`earlier` — its date, the time
+ * dropped); tomorrow; two or more days ahead (`ahead` — its date, the time
+ * kept). A weekday only ever names a past day, so "Mon" never reads as next
+ * Monday.
+ */
+export type CivilDayReading =
+  'today' | 'yesterday' | 'thisWeek' | 'earlier' | 'tomorrow' | 'ahead';
+
+/** How many days back a weekday still names the day: within the last six. */
+const THIS_WEEK_DAYS = 6;
+
+/** How {@link CivilDayReading} reads `date` on the day `today` (calendar dates). */
+export function civilDayReading(today: string, date: string): CivilDayReading {
+  const offset = civilDayOffset(today, date);
+  if (offset === 0) return 'today';
+  if (offset === -1) return 'yesterday';
+  if (offset === 1) return 'tomorrow';
+  if (offset > 1) return 'ahead';
+  return -offset <= THIS_WEEK_DAYS ? 'thisWeek' : 'earlier';
+}
+
 /** Whole years from one calendar date to another — an age on a given day. */
 export function civilYearsBetween(from: string, to: string): number {
   const [fromYear = 0, fromMonth = 0, fromDay = 0] = from.split('-').map(Number);

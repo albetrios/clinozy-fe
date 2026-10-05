@@ -8,7 +8,7 @@ import type {
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { clinicDayLabel, useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
@@ -131,16 +131,13 @@ export function useStockWords() {
       label: runwayLabel(runway),
       tone: runwayTone(runwayDays(runway)),
     }),
-    /** A movement's "When": "Today 11:05" today, else the day ("25 Sep", "Yesterday"). */
-    when: (instant: string) => {
-      const day = clock.dayOf(instant);
-      const label = clinicDayLabel(day, clock, t);
-      return day === clock.today
-        ? t(STOCK_KEYS.table.when, { day: label, time: clock.time(instant) })
-        : label;
-    },
-    /** A calendar date as the room names it: "Today", "Yesterday", "25 Sep". */
-    day: (date: string) => clinicDayLabel(date, clock, t),
+    /**
+     * A movement's "When" by the rooms' one time rule, days alone: "11:05 am"
+     * today, else "Yesterday", "Mon", "25 Sep".
+     */
+    when: (instant: string) => clock.moment(instant, { withTime: false }),
+    /** A calendar date by the same rule: "Today", "Yesterday", "Mon", "25 Sep". */
+    day: (date: string) => clock.day(date),
     /** A bill's date with its year: "22 Sep 2026" (`clinic-stock.md:45`). */
     billDate: (date: string) =>
       formatDate(

@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "écritures",
-    "today": "Aujourd’hui {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "Modifié {{count}}× · dernier {{from}} → {{to}}",
     "edited_many": "Modifié {{count}}× · dernier {{from}} → {{to}}",
     "edited_other": "Modifié {{count}}× · dernier {{from}} → {{to}}",

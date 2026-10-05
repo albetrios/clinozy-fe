@@ -113,9 +113,6 @@
     "birthdayToday": "🎂 今日",
     "noAddress": "住所なし",
     "upNext": "次の予定",
-    "visitWhen": "{{day}} · {{time}}",
-    "today": "今日",
-    "tomorrow": "明日",
     "visitService": "{{service}} · {{minutes}}分",
     "reschedule": "日時を変更",
     "book": "予約",
@@ -163,7 +160,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "today": "今日",
     "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "{{name}}を開く",
@@ -919,8 +915,6 @@
       "filtersLabel": "アクティビティの絞り込み",
       "notes": "メモ",
       "filterTitle": "{{label}} · {{count}}",
-      "daysAgo_other": "{{count}}日前",
-      "inDays_other": "{{count}}日後",
       "rx": "処方箋 {{number}} · {{medicines}}",
       "treatment": "{{name}} · {{session}}回目",
       "received": "{{amount}}を受領 · {{mode}}",

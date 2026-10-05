@@ -426,7 +426,6 @@
     "contact": "Contacto"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "Pospuesta · {{label}}",
     "done": "Hecha · {{time}}",
     "doneNow": "Hecha · Ahora",

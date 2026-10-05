@@ -33,8 +33,6 @@
     "records": "ユーザー",
     "mainRole": "メインのロール",
     "alsoRole": "兼任",
-    "today": "今日 · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

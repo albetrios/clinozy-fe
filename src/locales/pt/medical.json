@@ -56,7 +56,6 @@
     "mrs": "Representantes"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "Adicionar telefone",
     "noValue": "—"

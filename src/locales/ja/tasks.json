@@ -424,7 +424,6 @@
     "contact": "連絡先"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "スヌーズ · {{label}}",
     "done": "完了 · {{time}}",
     "doneNow": "完了 · たった今",

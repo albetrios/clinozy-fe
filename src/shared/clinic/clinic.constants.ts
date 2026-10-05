@@ -110,8 +110,14 @@ export const CLINIC_KEYS = {
   lists: {
     loadError: 'lists.loadError',
     retry: 'lists.retry',
-    /** "Sep 24 · 14:50" — a day and a time (`useDayTime`). */
-    dayTime: 'lists.dayTime',
+  },
+  /**
+   * The one time rule's words (`useClinicClock`): a day and a clock time
+   * together — "Yesterday 10:30 am", "Mon 10:30 am". The day words are the
+   * app's one set (`PICKER_KEYS.date`, `common`).
+   */
+  clock: {
+    dayTime: 'clock.dayTime',
   },
   /**
    * The contract's enum labels the rooms share (`schema-routes.md` › Enums,

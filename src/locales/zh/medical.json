@@ -56,7 +56,6 @@
     "mrs": "医药代表"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "添加电话",
     "noValue": "—"

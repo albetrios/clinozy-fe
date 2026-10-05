@@ -29,7 +29,6 @@
     "type": "Typ"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "addPhone": "Telefon hinzufügen",
     "noValue": "—"
   },

@@ -129,10 +129,6 @@ export const TIMELINE_KEYS = {
     },
     /** "Visits · 3" — a chip's name. */
     filterTitle: 'timeline.activity.filterTitle',
-    /** "3 days ago" (plural); today, yesterday and tomorrow are the app's own words. */
-    daysAgo: 'timeline.activity.daysAgo',
-    /** "In 2 days" (plural). */
-    inDays: 'timeline.activity.inDays',
     /** "Rx #500 · Flubolt 400, Clonix-B Lotion". */
     rx: 'timeline.activity.rx',
     /** "2 medicines" (plural). */

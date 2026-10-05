@@ -40,19 +40,7 @@
     "empty": "No leads match",
     "clearFilters": "Clear filters",
     "moreInterests_one": "{{count}} more: {{list}}",
-    "moreInterests_other": "{{count}} more: {{list}}",
-    "updated": {
-      "justNow": "Just now",
-      "minutes_one": "{{count}} min ago",
-      "minutes_other": "{{count}} min ago",
-      "hours_one": "{{count}} h ago",
-      "hours_other": "{{count}} h ago",
-      "yesterday": "Yesterday",
-      "days_one": "{{count}} day ago",
-      "days_other": "{{count}} days ago",
-      "weeks_one": "{{count}} week ago",
-      "weeks_other": "{{count}} weeks ago"
-    }
+    "moreInterests_other": "{{count}} more: {{list}}"
   },
   "team": {
     "claim": "Open · Claim",
@@ -205,8 +193,7 @@
       "lead": "Lead {{id}} · {{phone}}",
       "contact": "Contact · {{phone}}",
       "recreate": "Re-create lead",
-      "useContact": "Use contact",
-      "today": "Today"
+      "useContact": "Use contact"
     },
     "noMatch": "No existing match",
     "more_one": " · +{{count}} more",

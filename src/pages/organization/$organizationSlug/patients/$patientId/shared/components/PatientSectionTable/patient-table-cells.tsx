@@ -1,5 +1,5 @@
 import { AvatarStack } from '@/shared/components/Cells/index.ts';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 
 import type { StaffChip } from '../../hooks/useStaffLookup/index.ts';
 
@@ -18,18 +18,18 @@ export function StaffCell({ person }: { person: StaffChip | null }) {
 }
 
 /**
- * The Updated cell (H:4753): who wrote the record in its pill, then "Sep 24 ·
- * 15:39" — the Patients room's Updated cell.
+ * The Updated cell (H:4753): who wrote the record in its pill, then when, by
+ * the rooms' one time rule — the Patients room's Updated cell.
  */
 export function UpdatedCell({ person, at }: { person: StaffChip | null; at: string }) {
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   return (
     <span className="flex min-w-0 items-center gap-2">
       {person ? (
         <AvatarStack nameFirst people={[person]} className="min-w-0 flex-none" />
       ) : null}
       <span className="text-caption text-muted-foreground min-w-0 truncate tabular-nums">
-        {dayTime(at)}
+        {clock.moment(at)}
       </span>
     </span>
   );

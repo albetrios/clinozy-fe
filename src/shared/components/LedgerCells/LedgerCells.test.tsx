@@ -187,7 +187,7 @@ describe('the ledger’s cells', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('reads When as "Today 11:05", an earlier day by its date, the edit under it', async () => {
+  it('reads When by the rooms’ one time rule — the time today, “Yesterday” with it — the edit under it', async () => {
     renderWithProviders(
       <div>
         <LedgerWhenCell row={entry(310)} />
@@ -206,9 +206,9 @@ describe('the ledger’s cells', () => {
         />
       </div>,
     );
-    // The viewer's locale and hour cycle: en's default reads "Oct 2 11:55 AM".
-    expect(await screen.findByText(/^Today 11:05/)).toBeInTheDocument();
-    expect(screen.getByText(/^Oct 2 11:55/)).toBeInTheDocument();
+    // The viewer's locale and hour cycle: en's default reads "11:05 AM" today.
+    expect(await screen.findByText(/^11:05/)).toBeInTheDocument();
+    expect(screen.getByText(/^Yesterday 11:55/)).toBeInTheDocument();
     expect(screen.getByText('Edited 1× · last ₹600 UPI → ₹700 UPI')).toHaveClass(
       'text-tone-butter-foreground',
     );

@@ -29,7 +29,6 @@
     "type": "प्रकार"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "addPhone": "फ़ोन जोड़ें",
     "noValue": "—"
   },

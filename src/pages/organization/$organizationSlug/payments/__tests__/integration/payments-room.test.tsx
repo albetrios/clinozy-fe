@@ -98,7 +98,9 @@ describe('the Payments ledger (KICKOFF §6.9)', () => {
     await waitFor(() => expect(rows()).toHaveLength(16));
     const tea = rowOf('PAY-310');
     expect(tea).toHaveTextContent('Paid');
-    expect(tea).toHaveTextContent('Today 11:05');
+    // Today reads its time alone (the rooms' one time rule).
+    expect(tea).toHaveTextContent('11:05');
+    expect(tea).not.toHaveTextContent('Today');
     expect(tea).toHaveTextContent('Tea & snacks');
     expect(tea).toHaveTextContent('Misc');
     expect(tea).toHaveTextContent('Cash');
@@ -227,6 +229,8 @@ describe('the Payments ledger (KICKOFF §6.9)', () => {
       'payments.csv',
       expect.stringContaining('PAY-310'),
     );
+    // A sheet outlives the day: When is the full date and time, not "11:05 AM".
+    expect(String(csv.downloadCsv.mock.calls[0]?.[1])).toMatch(/2026/);
     expect(notifyMock.success).toHaveBeenCalledWith('1 row exported as CSV');
   });
 

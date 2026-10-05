@@ -11,7 +11,7 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
   useAddPatientNote,
@@ -323,7 +323,7 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
   const notes = usePatientNotes(patientId);
   const add = useAddPatientNote(patientId);
   const staff = useStaffLookup();
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   const [body, setBody] = useState('');
   const rows = notes.data ?? [];
   const K = TIMELINE_KEYS.notes;
@@ -390,7 +390,7 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
                   <span className="text-caption text-muted-foreground">
                     {t(K.by, {
                       name: author ? shortPersonName(author.name) : '—',
-                      date: dayTime(note.createdAt),
+                      date: clock.moment(note.createdAt),
                     })}
                   </span>
                 </span>

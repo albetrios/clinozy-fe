@@ -113,9 +113,6 @@
     "birthdayToday": "🎂 今天",
     "noAddress": "无地址",
     "upNext": "即将到来",
-    "visitWhen": "{{day}} · {{time}}",
-    "today": "今天",
-    "tomorrow": "明天",
     "visitService": "{{service}} · {{minutes}} 分钟",
     "reschedule": "改期",
     "book": "预约",
@@ -163,7 +160,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "today": "今天",
     "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "打开 {{name}}",
@@ -919,8 +915,6 @@
       "filtersLabel": "动态筛选",
       "notes": "备注",
       "filterTitle": "{{label}} · {{count}}",
-      "daysAgo_other": "{{count}} 天前",
-      "inDays_other": "{{count}} 天后",
       "rx": "处方 {{number}} · {{medicines}}",
       "treatment": "{{name}} · 第 {{session}} 次",
       "received": "已收 {{amount}} · {{mode}}",

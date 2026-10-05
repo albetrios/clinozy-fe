@@ -20,6 +20,7 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import {
@@ -36,7 +37,6 @@ import {
 import type { PhotoAlbum } from '../../images.search.ts';
 import { useMissingPhoto } from '../../shared/hooks/useMissingPhoto/index.ts';
 import { usePhotoAccess } from '../../shared/hooks/usePhotoAccess/index.ts';
-import { usePhotoDayLabel } from '../../shared/hooks/usePhotoDayLabel/index.ts';
 import {
   PHOTO_ALBUM_LOOK,
   PHOTO_BODY_PART_TONES,
@@ -104,7 +104,7 @@ function PhotoDetailsForm({
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const access = usePhotoAccess();
-  const dayLabel = usePhotoDayLabel();
+  const { day: dayLabel } = useClinicClock();
   const update = useUpdatePatientPhoto({ notifyOnError: false });
   const methods = useForm<PhotoForm>({ defaultValues: formOf(photo) });
   const form = useFormValues(methods);

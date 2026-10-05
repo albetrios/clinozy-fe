@@ -11,6 +11,7 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 
 import {
@@ -20,7 +21,6 @@ import {
   PATIENT_TABLE_NS,
   TeamCell,
   useTableDay,
-  useTableDayTime,
 } from '../../../shared/components/PatientSectionTable/index.ts';
 import {
   type StaffChip,
@@ -125,7 +125,7 @@ function useTreatmentsColumns(
 ): ColumnDef<DataTableFeatures, Treatment>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
-  const dayTime = useTableDayTime();
+  const clock = useClinicClock();
   const staff = useStaffLookup();
   const parts = useTreatmentParts();
   const team = (treatment: Treatment) =>
@@ -245,12 +245,12 @@ function useTreatmentsColumns(
     },
     {
       id: 'date',
-      accessorFn: (row) => dayTime(row.performedAt),
+      accessorFn: (row) => clock.moment(row.performedAt),
       header: t(keys.columns.date),
       enableSorting: false,
       cell: ({ row }) => (
         <span className="text-body text-muted-foreground-strong truncate tabular-nums">
-          {dayTime(row.original.performedAt)}
+          {clock.moment(row.original.performedAt)}
         </span>
       ),
       meta: { track: '160px' },

@@ -182,6 +182,7 @@ describe('the section tables’ cells', () => {
   it('reads who wrote a record and when in the Updated cell', () => {
     render(<UpdatedCell person={DRASHTI} at="2026-09-24T09:20:00.000Z" />);
     expect(screen.getByText('Dr. Drashti')).toBeInTheDocument();
-    expect(screen.getByText(/ · /)).toBeInTheDocument();
+    // A week or more back: the date alone (the rooms' one time rule).
+    expect(screen.getByText(/Sep 24/)).toBeInTheDocument();
   });
 });

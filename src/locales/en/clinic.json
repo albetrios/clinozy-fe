@@ -566,8 +566,10 @@
   },
   "lists": {
     "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",
-    "retry": "Retry",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "Retry"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -620,9 +622,6 @@
       "lead": "Lead created · {{time}} · via {{source}}",
       "patientThread": "Patient · chat only · no lead",
       "contactThread": "Contact · chat only · no lead"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "Appointment #{{seq}}",

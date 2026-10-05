@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { Notification } from '@/shared/api/notification-contracts.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
-import { FormattedDate } from '@/shared/components/FormattedDate/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -16,6 +15,7 @@ import {
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -88,7 +88,10 @@ function UnreadBadge({ unread }: { unread: number }) {
   );
 }
 
-/** One inbox row: category glyph (tinted while unread), title, body and relative time. */
+/**
+ * One inbox row: category glyph (tinted while unread), title, body and when —
+ * by the rooms' one time rule ("10:30 am", "Yesterday 4:10 pm", "24 Sep").
+ */
 function NotificationRow({
   item,
   onClick,
@@ -96,6 +99,7 @@ function NotificationRow({
   item: Notification;
   onClick: (item: Notification) => void;
 }) {
+  const clock = useClinicClock();
   return (
     <li>
       <button
@@ -135,7 +139,7 @@ function NotificationRow({
             {item.body}
           </span>
           <span className="text-muted-foreground/70 mt-1 block text-[11px]">
-            <FormattedDate value={item.createdAt} relative />
+            <time dateTime={item.createdAt}>{clock.moment(item.createdAt)}</time>
           </span>
         </span>
       </button>

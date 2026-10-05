@@ -563,8 +563,10 @@
   },
   "lists": {
     "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",
-    "retry": "다시 시도",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "다시 시도"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -617,9 +619,6 @@
       "lead": "리드 생성 · {{time}} · {{source}} 경유",
       "patientThread": "환자 · 채팅만 · 리드 없음",
       "contactThread": "연락처 · 채팅만 · 리드 없음"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "예약 #{{seq}}",

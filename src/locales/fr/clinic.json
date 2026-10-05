@@ -569,8 +569,10 @@
   },
   "lists": {
     "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",
-    "retry": "Réessayer",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "Réessayer"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -623,9 +625,6 @@
       "lead": "Prospect créé · {{time}} · via {{source}}",
       "patientThread": "Patient · chat uniquement · pas de prospect",
       "contactThread": "Contact · chat uniquement · pas de prospect"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "Rendez-vous #{{seq}}",

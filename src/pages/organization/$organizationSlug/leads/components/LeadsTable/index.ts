@@ -4,7 +4,5 @@ export {
   LEADS_COLUMNS,
   type LeadsColumnId,
   leadTableMinWidth,
-  type LeadUpdatedLabel,
-  leadUpdatedLabel,
 } from './leads-table-layout.ts';
 export { LeadsTable, type LeadsTableProps } from './LeadsTable.tsx';

@@ -12,16 +12,14 @@ import {
   useAppointmentSlotLabel,
   usePatientAppointments,
 } from '@/shared/hooks/useAppointments/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePatientPrescriptions } from '@/shared/hooks/usePrescriptions/index.ts';
 import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
 import { Calendar, Package, Pill, Sparkles } from '@/shared/icons/index.ts';
 
-import {
-  useTableDay,
-  useTableDayTime,
-} from '../../../shared/components/PatientSectionTable/index.ts';
+import { useTableDay } from '../../../shared/components/PatientSectionTable/index.ts';
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import { useVisitWhen } from '../../../shared/patient-visit.ts';
 import {
@@ -324,7 +322,7 @@ export function TreatmentsBentoCard({
 }: CardLinks & { onEdit: (treatmentId: string) => void }) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
-  const dayTime = useTableDayTime();
+  const clock = useClinicClock();
   const treatments = usePatientTreatments(patientId);
   const rows = treatments.data ?? [];
   const testId = TIMELINE_TEST_IDS.card('treatments');
@@ -345,7 +343,7 @@ export function TreatmentsBentoCard({
               title={row.name}
               sub={t(TIMELINE_KEYS.treatments.sub, {
                 session: row.sessionNo,
-                date: dayTime(row.performedAt),
+                date: clock.moment(row.performedAt),
               })}
               onClick={() => onEdit(row.id)}
               testId={`${testId}-row`}

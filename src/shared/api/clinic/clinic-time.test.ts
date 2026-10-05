@@ -5,6 +5,7 @@ import {
   addCivilMonths,
   civilDateOf,
   civilDayOffset,
+  civilDayReading,
   civilMonthStart,
   civilYearsBetween,
   clinicClockTime,
@@ -87,6 +88,29 @@ describe('clinic clock (Asia/Kolkata)', () => {
     expect(civilYearsBetween('1997-09-17', '2026-09-17')).toBe(29);
     expect(civilYearsBetween('1997-09-18', '2026-09-17')).toBe(28);
     expect(civilYearsBetween('1997-10-01', '2026-09-30')).toBe(28);
+  });
+});
+
+describe('civilDayReading (the one time rule)', () => {
+  const today = '2026-10-05';
+  it.each([
+    ['2026-10-05', 'today'],
+    ['2026-10-04', 'yesterday'],
+    ['2026-10-03', 'thisWeek'],
+    ['2026-09-29', 'thisWeek'],
+    ['2026-09-28', 'earlier'],
+    ['2025-10-05', 'earlier'],
+    ['2026-10-06', 'tomorrow'],
+    ['2026-10-07', 'ahead'],
+    ['2027-01-04', 'ahead'],
+  ] as const)('reads %s as %s', (date, reading) => {
+    expect(civilDayReading(today, date)).toBe(reading);
+  });
+
+  it('counts back across a month and a year end', () => {
+    expect(civilDayReading('2027-01-02', '2026-12-31')).toBe('thisWeek');
+    expect(civilDayReading('2027-01-01', '2026-12-31')).toBe('yesterday');
+    expect(civilDayReading('2026-12-31', '2027-01-01')).toBe('tomorrow');
   });
 });
 

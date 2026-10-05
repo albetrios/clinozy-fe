@@ -1,12 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import type { Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  clinicToday,
-  localDateOf,
-  workingDaysPattern,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf, workingDaysPattern } from '@/shared/api/clinic/clinic-time.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -32,7 +28,7 @@ export interface HoursFormat {
   days: (days: readonly Weekday[]) => string;
   /** "Mon–Sat · 09:30–19:30" — the clock times as written (clinic-local `HH:mm`). */
   hours: (days: readonly Weekday[], from: string, to: string) => string;
-  /** "Today · 09:02", else "Dec 09, 2025 · 10:38" (the year only when it isn't this one). */
+  /** When a profile was saved, by the rooms' one time rule: "9:02 am", "Yesterday 10:38 am", "9 Dec 2025". */
   updated: (instant: string) => string;
 }
 
@@ -45,7 +41,8 @@ export interface HoursFormat {
  */
 export function useHoursFormat(): HoursFormat {
   const { t } = useTranslation(USERS_NS);
-  const { formatDate, prefs } = useLocaleFormat();
+  const { formatDate } = useLocaleFormat();
+  const clock = useClinicClock();
 
   const weekday = (day: Weekday) => {
     const date = localDateOf(MONDAY);
@@ -70,32 +67,11 @@ export function useHoursFormat(): HoursFormat {
     }
   };
 
-  const time = (instant: string) =>
-    formatDate(instant, {
-      ...dateFormatOptions('time', prefs.hourCycle),
-      hour: '2-digit',
-      second: undefined,
-    });
-
-  const updated = (instant: string) => {
-    const day = clinicToday(new Date(instant));
-    if (day === clinicToday()) return t(USERS_KEYS.table.today, { time: time(instant) });
-    const sameYear = day.slice(0, 4) === clinicToday().slice(0, 4);
-    return t(USERS_KEYS.table.dayTime, {
-      day: formatDate(instant, {
-        month: 'short',
-        day: '2-digit',
-        ...(sameYear ? {} : { year: 'numeric' }),
-      }),
-      time: time(instant),
-    });
-  };
-
   return {
     weekday,
     days,
     hours: (picked, from, to) =>
       t(USERS_KEYS.hours.line, { days: days(picked), from, to }),
-    updated,
+    updated: (instant) => clock.moment(instant),
   };
 }

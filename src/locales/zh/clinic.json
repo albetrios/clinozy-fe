@@ -563,8 +563,10 @@
   },
   "lists": {
     "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",
-    "retry": "重试",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "重试"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -617,9 +619,6 @@
       "lead": "线索已创建 · {{time}} · 来自 {{source}}",
       "patientThread": "患者 · 仅聊天 · 无线索",
       "contactThread": "联系人 · 仅聊天 · 无线索"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "预约 #{{seq}}",

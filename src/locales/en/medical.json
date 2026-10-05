@@ -56,7 +56,6 @@
     "mrs": "MRs"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "Add phone",
     "noValue": "—"

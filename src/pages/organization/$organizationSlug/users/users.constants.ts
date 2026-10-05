@@ -45,10 +45,6 @@ export const USERS_KEYS = {
     mainRole: 'table.mainRole',
     /** Every other role pill's tooltip. */
     alsoRole: 'table.alsoRole',
-    /** "Today · 09:02". */
-    today: 'table.today',
-    /** "Dec 09, 2025 · 10:38". */
-    dayTime: 'table.dayTime',
     /** "10%". */
     commission: 'table.commission',
   },

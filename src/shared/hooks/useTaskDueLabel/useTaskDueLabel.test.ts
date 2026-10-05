@@ -43,13 +43,13 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
     expect(label(open(at(5 * 60)))).toBe('in 5 h');
   });
 
-  it('names the clinic day and the time beyond that, in the Appearance hour cycle', () => {
+  it('names the clinic day and the time beyond that by the rooms’ one time rule', () => {
     useLocaleStore.setState({ hourCycle: 'h12' });
+    // 22:31 tonight: today reads its time alone.
+    expect(label(open(at(721)))).toMatch(/^10:31\s?pm$/i);
     expect(label(open('2026-10-05T05:30:00.000Z'))).toMatch(/^Tomorrow 11:00\s?am$/i);
-    // The day reads in the viewer's format locale ("Wed, Oct 7" in en-US, "Wed 7 Oct" in en-GB).
-    expect(label(open('2026-10-07T10:00:00.000Z'))).toMatch(
-      /^Wed,? (Oct 7|7 Oct) 3:30\s?pm$/i,
-    );
+    // A day ahead reads its date in the viewer's format locale ("Oct 7" in en-US, "7 Oct" in en-GB).
+    expect(label(open('2026-10-07T10:00:00.000Z'))).toMatch(/^(Oct 7|7 Oct) 3:30\s?pm$/i);
     useLocaleStore.setState({ hourCycle: 'h23' });
     expect(label(open('2026-10-05T12:30:00.000Z'))).toBe('Tomorrow 18:00');
   });
@@ -78,6 +78,15 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
         resolvedAt: at(-90),
       }),
     ).toBe('Done · 09:00');
+    // Closed on another day: the day by the rooms' one time rule, with its time.
+    expect(
+      label({
+        ...open(at(-30)),
+        status: 'done',
+        resolvedBy: 'member',
+        resolvedAt: '2026-10-03T12:00:00.000Z',
+      }),
+    ).toBe('Done · Yesterday 17:30');
   });
 });
 
@@ -85,11 +94,9 @@ describe('useTaskDueAtWords', () => {
   it('words a picked day and time the way the due label does', () => {
     useLocaleStore.setState({ hourCycle: 'h23' });
     const { result } = renderHook(() => useTaskDueAtWords());
-    expect(result.current('2026-10-04', '17:00', NOW)).toBe('Today 17:00');
+    expect(result.current('2026-10-04', '17:00', NOW)).toBe('17:00');
     expect(result.current('2026-10-05', '11:00', NOW)).toBe('Tomorrow 11:00');
-    expect(result.current('2026-10-07', '15:30', NOW)).toMatch(
-      /^Wed,? (Oct 7|7 Oct) 15:30$/,
-    );
+    expect(result.current('2026-10-07', '15:30', NOW)).toMatch(/^(Oct 7|7 Oct) 15:30$/);
   });
 });
 
@@ -101,5 +108,7 @@ describe('useTaskDayTimeWords', () => {
       day: 'Today',
       time: '11:30',
     });
+    // The day by the rooms' one time rule: a past day of this week by its weekday.
+    expect(result.current('2026-10-01', '11:30', NOW).day).toBe('Thu');
   });
 });

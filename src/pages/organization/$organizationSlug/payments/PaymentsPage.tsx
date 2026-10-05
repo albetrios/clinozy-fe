@@ -21,7 +21,6 @@ import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/ind
 import {
   ledgerEntryLock,
   useLedgerSubLine,
-  useLedgerWhen,
 } from '@/shared/components/LedgerCells/index.ts';
 import {
   PaymentDeleteConfirm,
@@ -36,6 +35,7 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
+import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { ArrowDownLeft, ArrowUpRight, FileIcon, Wallet } from '@/shared/icons/index.ts';
@@ -216,11 +216,15 @@ function useLedgerFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   };
 }
 
-/** One CSV row of an entry: its cells as the ledger words them. */
+/**
+ * One CSV row of an entry: its cells as the ledger words them — but When as
+ * the full date and time in the member's date format, not the room's "Mon
+ * 9:10 am": a sheet outlives the day it was exported.
+ */
 function useLedgerCsv() {
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const when = useLedgerWhen();
+  const { formatDate } = useLocaleFormat();
   const subLine = useLedgerSubLine();
   const headers = [
     t(PAYMENTS_KEYS.columns.ref),
@@ -234,7 +238,7 @@ function useLedgerCsv() {
   const rowOf = (row: LedgerRow) => [
     displayId.payment(row.seq),
     t(PAYMENTS_KEYS.directions[row.direction]),
-    when(row.paidAt),
+    formatDate(row.paidAt),
     [row.partyName, subLine(row)].filter(Boolean).join(' · '),
     [
       ...new Set(

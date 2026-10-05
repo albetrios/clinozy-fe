@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "Buchungen",
-    "today": "Heute {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
     "edited_other": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",

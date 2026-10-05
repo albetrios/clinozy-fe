@@ -33,8 +33,6 @@
     "records": "उपयोगकर्ता",
     "mainRole": "मुख्य भूमिका",
     "alsoRole": "साथ में",
-    "today": "आज · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

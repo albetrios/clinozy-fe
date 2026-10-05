@@ -426,7 +426,6 @@
     "contact": "Contato"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "Adiada · {{label}}",
     "done": "Concluída · {{time}}",
     "doneNow": "Concluída · Agora",

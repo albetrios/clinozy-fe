@@ -6,9 +6,5 @@ export {
   CONTACT_PREFERENCES,
   firstNameOf,
 } from './chat-composer.ts';
-export {
-  type ChatHistoryTarget,
-  chatWhenLabel,
-  messageTimeLabel,
-} from './chat-history.ts';
+export type { ChatHistoryTarget } from './chat-history.ts';
 export { ChatColumn, type ChatColumnProps } from './ChatColumn.tsx';

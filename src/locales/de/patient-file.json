@@ -117,9 +117,6 @@
     "birthdayToday": "🎂 heute",
     "noAddress": "Keine Adresse",
     "upNext": "Als Nächstes",
-    "visitWhen": "{{day}} · {{time}}",
-    "today": "Heute",
-    "tomorrow": "Morgen",
     "visitService": "{{service}} · {{minutes}} Min.",
     "reschedule": "Verschieben",
     "book": "Buchen",
@@ -172,7 +169,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "today": "Heute",
     "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "{{name}} öffnen",
@@ -949,10 +945,6 @@
       "filtersLabel": "Aktivitätsfilter",
       "notes": "Notizen",
       "filterTitle": "{{label}} · {{count}}",
-      "daysAgo_one": "Vor {{count}} Tag",
-      "daysAgo_other": "Vor {{count}} Tagen",
-      "inDays_one": "In {{count}} Tag",
-      "inDays_other": "In {{count}} Tagen",
       "rx": "Rezept {{number}} · {{medicines}}",
       "treatment": "{{name}} · Sitzung {{session}}",
       "received": "{{amount}} erhalten · {{mode}}",

@@ -33,8 +33,6 @@
     "records": "사용자",
     "mainRole": "주 역할",
     "alsoRole": "추가",
-    "today": "오늘 · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

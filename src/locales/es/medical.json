@@ -56,7 +56,6 @@
     "mrs": "Visitadores"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}} %",
     "addPhone": "Añadir teléfono",
     "noValue": "—"

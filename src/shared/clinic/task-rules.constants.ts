@@ -425,8 +425,6 @@ export const TASK_DUE_KEYS = {
     days: 'due.overdue.days',
   },
   soon: { minutes: 'due.soon.minutes', hours: 'due.soon.hours' },
-  /** "<day> <time>" — "Today 11:30 am", "Wed 7 Oct 3:30 pm". */
-  at: 'due.at',
   snoozed: 'due.snoozed',
   /** A snooze with no label of its own reads the Snoozed view's name. */
   snoozedPlain: 'groups.snoozed',

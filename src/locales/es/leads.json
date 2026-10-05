@@ -42,23 +42,7 @@
     "clearFilters": "Borrar filtros",
     "moreInterests_one": "{{count}} más: {{list}}",
     "moreInterests_many": "{{count}} más: {{list}}",
-    "moreInterests_other": "{{count}} más: {{list}}",
-    "updated": {
-      "justNow": "Justo ahora",
-      "minutes_one": "hace {{count}} min",
-      "minutes_many": "hace {{count}} min",
-      "minutes_other": "hace {{count}} min",
-      "hours_one": "hace {{count}} h",
-      "hours_many": "hace {{count}} h",
-      "hours_other": "hace {{count}} h",
-      "yesterday": "Ayer",
-      "days_one": "hace {{count}} día",
-      "days_many": "hace {{count}} días",
-      "days_other": "hace {{count}} días",
-      "weeks_one": "hace {{count}} semana",
-      "weeks_many": "hace {{count}} semanas",
-      "weeks_other": "hace {{count}} semanas"
-    }
+    "moreInterests_other": "{{count}} más: {{list}}"
   },
   "team": {
     "claim": "Abierto · Tomar",
@@ -214,8 +198,7 @@
       "lead": "Lead {{id}} · {{phone}}",
       "contact": "Contacto · {{phone}}",
       "recreate": "Volver a crear lead",
-      "useContact": "Usar contacto",
-      "today": "Hoy"
+      "useContact": "Usar contacto"
     },
     "noMatch": "Ninguna coincidencia",
     "more_one": " · +{{count}} más",

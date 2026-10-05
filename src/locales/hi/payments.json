@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "प्रविष्टियाँ",
-    "today": "आज {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_one": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
     "edited_other": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",

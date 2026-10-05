@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils.ts';
 import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { CheckCircle } from '@/shared/icons/index.ts';
 
@@ -79,7 +79,7 @@ function useLogText(view: DayCloseView, difference: number | null) {
 /** "What happened" (H:5121): dot · time · who · what, in order. */
 function DayLog({ view, difference }: { view: DayCloseView; difference: number | null }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const timeOf = useLedgerTime();
+  const { time: timeOf } = useClinicClock();
   const textOf = useLogText(view, difference);
   return (
     <div className="flex flex-col gap-1.5" data-testid={`${T}-log`}>
@@ -135,7 +135,7 @@ export function DayCloseReport({
 }: DayCloseReportProps) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatPaise = usePaiseFormat();
-  const timeOf = useLedgerTime();
+  const { time: timeOf } = useClinicClock();
   const difference = cashDifference(view.countedCash, view.expectedCash);
   const tone = differenceTone(difference);
   const sub =

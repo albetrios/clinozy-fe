@@ -2,11 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  clinicClockTime,
+  clinicToday,
+  localDateOf,
+} from '@/shared/api/clinic/clinic-time.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchContactHistory } from '@/shared/api/clinic/messages-api.ts';
 import type { ContactHistoryEntry } from '@/shared/api/clinic/messages-contracts.ts';
+import { clinicClockOf } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   Calendar,
   CheckCircle,
@@ -26,7 +31,6 @@ import {
   chatWhenLabel,
   historyChip,
   historyText,
-  messageTimeLabel,
   threadEntries,
 } from './chat-history.ts';
 
@@ -45,33 +49,52 @@ const MONTHS = [
   'Dec',
 ];
 
-/** The clinic's clock on 3 Oct 2026, formatting as the design writes it (12-hour, lowercase). */
-const clock: ChatClock = {
-  today: '2026-10-03',
-  dayOf: (instant) => clinicToday(new Date(instant)),
-  time: (instant) => {
-    const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
-      .split(':')
-      .map(Number);
-    const meridiem = hour < 12 ? 'am' : 'pm';
-    return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${meridiem}`;
-  },
-  shortTime: (instant) => {
-    const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
-      .split(':')
-      .map(Number);
-    const meridiem = hour < 12 ? 'am' : 'pm';
-    const minutes = minute === 0 ? '' : `:${String(minute).padStart(2, '0')}`;
-    return `${hour % 12 || 12}${minutes} ${meridiem}`;
-  },
-  date: (date) => {
-    const [year, month = 1, day] = date.split('-').map(Number);
-    const sameYear = year === 2026;
-    return sameYear
-      ? `${day} ${MONTHS[month - 1]}`
-      : `${day} ${MONTHS[month - 1]} ${year}`;
-  },
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/** "9 Oct", "28 Sep 2025" — as the design writes a date. */
+const dateOf = (date: string) => {
+  const [year, month = 1, day] = date.split('-').map(Number);
+  return year === 2026
+    ? `${day} ${MONTHS[month - 1]}`
+    : `${day} ${MONTHS[month - 1]} ${year}`;
 };
+const weekdayOf = (date: string) => WEEKDAYS[localDateOf(date).getDay()] ?? '';
+
+/**
+ * The clinic's clock on Saturday 3 Oct 2026 — the rooms' one time rule over
+ * parts that format as the design writes them (12-hour, lowercase).
+ */
+const clock: ChatClock = clinicClockOf(
+  {
+    today: '2026-10-03',
+    clinicToday: '2026-10-03',
+    dayOf: (instant) => clinicToday(new Date(instant)),
+    time: (instant) => {
+      const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
+        .split(':')
+        .map(Number);
+      const meridiem = hour < 12 ? 'am' : 'pm';
+      return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${meridiem}`;
+    },
+    shortTime: (instant) => {
+      const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
+        .split(':')
+        .map(Number);
+      const meridiem = hour < 12 ? 'am' : 'pm';
+      const minutes = minute === 0 ? '' : `:${String(minute).padStart(2, '0')}`;
+      return `${hour % 12 || 12}${minutes} ${meridiem}`;
+    },
+    date: dateOf,
+    wallTime: (_date, time) => time,
+  },
+  {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    tomorrow: 'Tomorrow',
+    weekday: weekdayOf,
+    dayTime: (day, time) => `${day} ${time}`,
+  },
+);
 
 function formatWith(maskMoney = false): ChatFormat {
   return {
@@ -93,35 +116,40 @@ const day = (date: string) => ({
   sortAt: `${date}T03:30:00.000Z`,
 });
 
-const text = (entry: ContactHistoryEntry, maskMoney = false) =>
-  historyText(entry, formatWith(maskMoney));
+/** Every space as a plain one — a time's own is unbreakable (`U+00A0`). */
+const plain = (value: string) => value.replace(/\u00a0/gu, ' ');
 
-describe('chat times (_patterns.md:193)', () => {
-  const t = i18n.getFixedT('en', CHAT_COLUMN_NS);
+const text = (entry: ContactHistoryEntry, maskMoney = false) =>
+  plain(historyText(entry, formatWith(maskMoney)));
+
+describe('chat times — the rooms’ one time rule', () => {
   it.each([
-    [{ kind: 'instant', at: '2026-10-03T10:30:00.000Z' }, 'Today 4:00 pm'],
-    [{ kind: 'instant', at: '2026-10-04T05:30:00.000Z' }, 'Tomorrow 11:00 am'],
+    [{ kind: 'instant', at: '2026-10-03T10:30:00.000Z' }, '4:00 pm'],
     [{ kind: 'instant', at: '2026-10-02T03:40:00.000Z' }, 'Yesterday 9:10 am'],
+    [{ kind: 'instant', at: '2026-09-30T10:30:00.000Z' }, 'Wed 4:00 pm'],
+    [{ kind: 'instant', at: '2026-09-20T10:30:00.000Z' }, '20 Sep'],
+    [{ kind: 'instant', at: '2026-10-04T05:30:00.000Z' }, 'Tomorrow 11:00 am'],
     [{ kind: 'instant', at: '2026-10-09T10:30:00.000Z' }, '9 Oct 4:00 pm'],
+    [{ kind: 'day', date: '2026-10-03' }, 'Today'],
     [{ kind: 'day', date: '2026-10-02' }, 'Yesterday'],
+    [{ kind: 'day', date: '2026-09-29' }, 'Tue'],
     [{ kind: 'day', date: '2026-10-04' }, 'Tomorrow'],
     [{ kind: 'day', date: '2026-10-09' }, '9 Oct'],
     [{ kind: 'day', date: '2025-09-28' }, '28 Sep 2025'],
   ] as const)('reads %j as "%s"', (when, label) => {
-    expect(chatWhenLabel(when, clock, t)).toBe(label);
+    expect(plain(chatWhenLabel(when, clock))).toBe(label);
+  });
+
+  it('keeps a 12-hour time in one piece: no line break inside "4:00 pm"', () => {
+    expect(
+      chatWhenLabel({ kind: 'instant', at: '2026-10-02T10:30:00.000Z' }, clock),
+    ).toBe('Yesterday 4:00\u00a0pm');
   });
 
   it('reads the day in the clinic’s zone — 11:30 pm IST is still today', () => {
     expect(
-      chatWhenLabel({ kind: 'instant', at: '2026-10-03T18:00:00.000Z' }, clock, t),
-    ).toBe('Today 11:30 pm');
-  });
-
-  it('gives a message today its clock time alone, any other day its day too', () => {
-    expect(messageTimeLabel('2026-10-03T04:58:00.000Z', clock, t)).toBe('10:28 am');
-    expect(messageTimeLabel('2026-10-02T03:40:00.000Z', clock, t)).toBe(
-      'Yesterday 9:10 am',
-    );
+      plain(chatWhenLabel({ kind: 'instant', at: '2026-10-03T18:00:00.000Z' }, clock)),
+    ).toBe('11:30 pm');
   });
 });
 

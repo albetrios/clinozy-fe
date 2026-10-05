@@ -56,7 +56,6 @@
     "mrs": "Délégués"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}} %",
     "addPhone": "Ajouter un téléphone",
     "noValue": "—"

@@ -10,7 +10,7 @@ import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.t
 import { DrawerTextarea } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   useAddPatientNote,
   useDeletePatientNote,
@@ -82,7 +82,7 @@ function NoteCard({
   onDelete: (() => void) | null;
 }) {
   const { t } = useTranslation(NOTES_NS);
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   return (
     <div
       data-slot="card"
@@ -101,7 +101,7 @@ function NoteCard({
         <span className="text-caption text-muted-foreground">
           {t(NOTES_KEYS.by, {
             name: author ? shortPersonName(author.name) : '—',
-            date: dayTime(note.createdAt),
+            date: clock.moment(note.createdAt),
           })}
         </span>
         <p className="text-field leading-[1.45] break-words whitespace-pre-line">

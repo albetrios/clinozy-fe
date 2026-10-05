@@ -1,7 +1,7 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 
 import { useMedicalDates } from './medical-dates.ts';
 import { MakerPills, NamePills } from './MedicalCells.tsx';
@@ -28,9 +28,12 @@ describe('MedicalCells', () => {
     ).toHaveAttribute('data-tone', 'mint');
   });
 
-  it('names an instant "Today …" and a date by its day', () => {
+  it('names an instant and a visit by the rooms’ one time rule, a record by its date', () => {
     const { result } = renderHook(() => useMedicalDates());
-    expect(result.current.when(new Date().toISOString())).toMatch(/^Today /);
+    // Today: the clock time alone.
+    expect(result.current.when(new Date().toISOString())).toMatch(/^\d{1,2}:\d{2}/);
+    expect(result.current.visit(clinicToday())).toBe('Today');
+    expect(result.current.visit(addCivilDays(clinicToday(), -1))).toBe('Yesterday');
     expect(result.current.day(clinicToday())).toMatch(/\d/);
   });
 });

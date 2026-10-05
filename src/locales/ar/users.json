@@ -33,8 +33,6 @@
     "records": "المستخدمين",
     "mainRole": "الدور الرئيسي",
     "alsoRole": "أيضًا",
-    "today": "اليوم · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

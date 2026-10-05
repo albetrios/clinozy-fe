@@ -33,8 +33,6 @@
     "records": "用户",
     "mainRole": "主要角色",
     "alsoRole": "兼任",
-    "today": "今天 · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

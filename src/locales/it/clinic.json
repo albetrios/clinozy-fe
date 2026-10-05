@@ -569,8 +569,10 @@
   },
   "lists": {
     "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",
-    "retry": "Riprova",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "Riprova"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "WhatsApp",
@@ -623,9 +625,6 @@
       "lead": "Lead creato · {{time}} · tramite {{source}}",
       "patientThread": "Paziente · solo chat · nessun lead",
       "contactThread": "Contatto · solo chat · nessun lead"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "Appuntamento #{{seq}}",

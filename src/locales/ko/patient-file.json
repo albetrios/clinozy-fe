@@ -113,9 +113,6 @@
     "birthdayToday": "🎂 오늘",
     "noAddress": "주소 없음",
     "upNext": "다음 일정",
-    "visitWhen": "{{day}} · {{time}}",
-    "today": "오늘",
-    "tomorrow": "내일",
     "visitService": "{{service}} · {{minutes}}분",
     "reschedule": "일정 변경",
     "book": "예약",
@@ -163,7 +160,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "today": "오늘",
     "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "{{name}} 열기",
@@ -919,8 +915,6 @@
       "filtersLabel": "활동 필터",
       "notes": "메모",
       "filterTitle": "{{label}} · {{count}}",
-      "daysAgo_other": "{{count}}일 전",
-      "inDays_other": "{{count}}일 후",
       "rx": "처방전 {{number}} · {{medicines}}",
       "treatment": "{{name}} · {{session}}회차",
       "received": "{{amount}} 수납 · {{mode}}",

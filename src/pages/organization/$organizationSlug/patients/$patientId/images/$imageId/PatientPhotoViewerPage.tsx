@@ -8,6 +8,7 @@ import {
   organizationPatientSection,
 } from '@/lib/routes/patient-file-builders.ts';
 import type { PatientPhoto } from '@/shared/api/clinic/patient-images-api.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
 
 import { usePatientFileContext } from '../../shared/patient-file-context.ts';
@@ -19,7 +20,6 @@ import type { PatientImagesSearch } from '../images.search.ts';
 import { PhotoDeleteConfirm } from '../shared/components/PhotoDeleteConfirm/index.ts';
 import { useMissingPhoto } from '../shared/hooks/useMissingPhoto/index.ts';
 import { usePhotoAccess } from '../shared/hooks/usePhotoAccess/index.ts';
-import { usePhotoDayLabel } from '../shared/hooks/usePhotoDayLabel/index.ts';
 import { photoAt, photosInView } from '../shared/photo-view.ts';
 import { PhotoViewer } from './components/PhotoViewer/index.ts';
 
@@ -28,7 +28,7 @@ const K = PATIENT_PHOTOS_KEYS;
 /** "Face · 24 Sep · General" — the viewer's line under the name (H:4785 `lb.meta`). */
 function usePhotoMeta(): (photo: PatientPhoto) => string {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
-  const dayLabel = usePhotoDayLabel();
+  const { day: dayLabel } = useClinicClock();
   return (photo) =>
     [
       photo.bodyPart ? t(K.bodyParts[photo.bodyPart]) : null,

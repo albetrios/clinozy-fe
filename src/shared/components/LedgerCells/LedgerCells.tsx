@@ -12,6 +12,7 @@ import {
   TonePill,
   type TonePillProps,
 } from '@/shared/components/Cells/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
@@ -21,7 +22,6 @@ import {
   ledgerModesLabel,
   ledgerWhat,
   useLedgerSubLine,
-  useLedgerWhen,
 } from './ledger-cells.ts';
 
 /** The Ref cell: "PAY-310" on the 22px grey pill — every entry, whatever its source (`S:647`). */
@@ -52,19 +52,20 @@ export function LedgerWhatCell({
 }
 
 /**
- * The When cell: the day and time, and — once edited — "Edited 1× · last ₹600
- * UPI → ₹700 UPI" in the butter ink under it (`payments.md:29`).
+ * The When cell: the moment by the rooms' one time rule ("11:05 am", "Yesterday
+ * 6:40 pm", "27 Sep"), and — once edited — "Edited 1× · last ₹600 UPI → ₹700
+ * UPI" in the butter ink under it (`payments.md:29`).
  */
 export function LedgerWhenCell({ row }: { row: Pick<LedgerRow, 'paidAt' | 'edits'> }) {
   const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const formatPaise = usePaiseFormat();
-  const when = useLedgerWhen();
+  const clock = useClinicClock();
   const last = row.edits.at(-1);
   return (
     <span className="flex min-w-0 flex-col">
       <span className="text-body text-foreground-soft truncate leading-[1.3] tabular-nums">
-        {when(row.paidAt)}
+        {clock.moment(row.paidAt)}
       </span>
       {last ? (
         <span className="text-caption text-tone-butter-foreground truncate tabular-nums">

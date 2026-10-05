@@ -65,8 +65,6 @@ export const MEDICAL_KEYS = {
     mrs: 'filters.mrs',
   },
   table: {
-    /** "Today 10:12" — a day word or date and a clock time. */
-    when: 'table.when',
     /** "49%". */
     percent: 'table.percent',
     addPhone: 'table.addPhone',

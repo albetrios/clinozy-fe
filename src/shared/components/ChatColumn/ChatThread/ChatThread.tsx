@@ -17,12 +17,11 @@ import {
   deliveryView,
   type Starter,
 } from '@/shared/components/ChatColumn/chat-composer.ts';
-import {
-  type ChatFormat,
-  type ChatHistoryTarget,
-  type HistoryChip,
-  messageTimeLabel,
-  type ThreadEntry,
+import type {
+  ChatFormat,
+  ChatHistoryTarget,
+  HistoryChip,
+  ThreadEntry,
 } from '@/shared/components/ChatColumn/chat-history.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { TeamCard } from '@/shared/components/PersonCard/index.ts';
@@ -292,7 +291,7 @@ function MessageBubble({ data, format }: { data: BubbleData; format: ChatFormat 
               <TooltipContent>{channelName}</TooltipContent>
             </Tooltip>
           ) : null}
-          <span className="tabular-nums">{data.at}</span>
+          <span className="whitespace-nowrap tabular-nums">{data.at}</span>
           <Delivery view={data.delivery} onRetry={data.onRetry} format={format} />
         </div>
       </div>
@@ -419,7 +418,7 @@ export function ChatThread({
         kind,
         channel: message.channel,
         body: message.body,
-        at: messageTimeLabel(message.at, format.clock, t),
+        at: format.clock.moment(message.at),
         who: selfName ? (
           <Sender label={teamLabel(kind, selfName)} author={undefined} format={format} />
         ) : null,
@@ -438,7 +437,7 @@ export function ChatThread({
       kind,
       channel: message.channel,
       body: message.body,
-      at: messageTimeLabel(message.sentAt, format.clock, t),
+      at: format.clock.moment(message.sentAt),
       who: label ? (
         <Sender
           label={label}

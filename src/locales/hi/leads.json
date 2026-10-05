@@ -40,19 +40,7 @@
     "empty": "कोई मेल खाती लीड नहीं",
     "clearFilters": "फ़िल्टर हटाएँ",
     "moreInterests_one": "{{count}} और: {{list}}",
-    "moreInterests_other": "{{count}} और: {{list}}",
-    "updated": {
-      "justNow": "अभी",
-      "minutes_one": "{{count}} मिनट पहले",
-      "minutes_other": "{{count}} मिनट पहले",
-      "hours_one": "{{count}} घंटा पहले",
-      "hours_other": "{{count}} घंटे पहले",
-      "yesterday": "कल",
-      "days_one": "{{count}} दिन पहले",
-      "days_other": "{{count}} दिन पहले",
-      "weeks_one": "{{count}} हफ़्ता पहले",
-      "weeks_other": "{{count}} हफ़्ते पहले"
-    }
+    "moreInterests_other": "{{count}} और: {{list}}"
   },
   "team": {
     "claim": "खुली · लें",
@@ -205,8 +193,7 @@
       "lead": "लीड {{id}} · {{phone}}",
       "contact": "संपर्क · {{phone}}",
       "recreate": "लीड फिर से बनाएँ",
-      "useContact": "संपर्क इस्तेमाल करें",
-      "today": "आज"
+      "useContact": "संपर्क इस्तेमाल करें"
     },
     "noMatch": "कोई मौजूदा मेल नहीं",
     "more_one": " · +{{count}} और",

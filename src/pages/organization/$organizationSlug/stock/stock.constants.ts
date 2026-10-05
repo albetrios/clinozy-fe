@@ -35,8 +35,6 @@ export const STOCK_KEYS = {
     type: 'filters.type',
   },
   table: {
-    /** "Today 11:05" — a day word and a clock time. */
-    when: 'table.when',
     addPhone: 'table.addPhone',
     noValue: 'table.noValue',
   },

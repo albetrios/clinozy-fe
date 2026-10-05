@@ -47,7 +47,8 @@ describe('the cells both Offerings tables share', () => {
       />,
     );
     expect(screen.getByText('Riya Shah')).toBeInTheDocument();
-    expect(screen.getByText(/· /)).toBeInTheDocument();
+    // A week or more back: the date alone (the rooms' one time rule).
+    expect(screen.getByText(/Sep 24/)).toBeInTheDocument();
   });
 
   it('folds the branches into the meta line, "All branches" quiet with its grey dot', () => {

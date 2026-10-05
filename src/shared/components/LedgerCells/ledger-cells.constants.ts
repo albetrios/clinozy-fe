@@ -35,10 +35,6 @@ export const LEDGER_KEYS = {
   ledger: {
     /** "All entries loaded" — the plural noun the end line names. */
     records: 'ledger.records',
-    /** "Today 11:05". */
-    today: 'ledger.today',
-    /** "27 Sep 18:40". */
-    dayTime: 'ledger.dayTime',
     /** "Edited 1× · last ₹600 UPI → ₹700 UPI" (plural). */
     edited: 'ledger.edited',
     /** "₹600 UPI" — one side of an edit. */

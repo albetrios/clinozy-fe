@@ -33,8 +33,6 @@
     "records": "usuários",
     "mainRole": "Função principal",
     "alsoRole": "Também",
-    "today": "Hoje · {{time}}",
-    "dayTime": "{{day}} · {{time}}",
     "commission": "{{value}}%"
   },
   "status": {

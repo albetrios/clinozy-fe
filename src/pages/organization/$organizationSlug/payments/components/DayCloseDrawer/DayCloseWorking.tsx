@@ -11,11 +11,11 @@ import {
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import { DrawerNumberInput } from '@/shared/components/DrawerField/index.ts';
-import { useLedgerTime } from '@/shared/components/LedgerCells/index.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { Check } from '@/shared/icons/index.ts';
 
@@ -128,7 +128,7 @@ export function DayCloseWorking({
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const formatPaise = usePaiseFormat();
-  const timeOf = useLedgerTime();
+  const { time: timeOf } = useClinicClock();
   const difference = cashDifference(typedPaise(count), view.expectedCash);
   const tone = DIFFERENCE_TONES[differenceTone(difference)];
   return (

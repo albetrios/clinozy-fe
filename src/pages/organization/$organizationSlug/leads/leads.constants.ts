@@ -41,15 +41,6 @@ export const LEADS_KEYS = {
     clearFilters: 'list.clearFilters',
     /** The "+N" interests pill, read out with every interest. Plural. */
     moreInterests: 'list.moreInterests',
-    /** "Updated" as the prototype words it (H:6149). Plurals but `justNow`, `yesterday`. */
-    updated: {
-      justNow: 'list.updated.justNow',
-      minutes: 'list.updated.minutes',
-      hours: 'list.updated.hours',
-      yesterday: 'list.updated.yesterday',
-      days: 'list.updated.days',
-      weeks: 'list.updated.weeks',
-    },
   },
   /** The Team column's hold pills and the team card's take-over button (H:6151–6153). */
   team: {
@@ -214,8 +205,6 @@ export const LEADS_KEYS = {
       lead: 'newLead.hits.lead',
       /** "Contact · <mobile>" — a chat-only person. */
       contact: 'newLead.hits.contact',
-      /** "Today" — a last visit today. */
-      today: 'newLead.hits.today',
       recreate: 'newLead.hits.recreate',
       useContact: 'newLead.hits.useContact',
     },

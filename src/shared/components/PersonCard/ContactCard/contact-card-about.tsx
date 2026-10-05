@@ -12,6 +12,7 @@ import {
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
 import { CardGroup } from '@/shared/components/PersonCard/person-card-parts.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
@@ -61,7 +62,8 @@ interface AboutLine<Text = string | null | undefined> {
 /** The design's About rows with their 14px icons, in its order (H:5692). */
 function useAboutRows(about: ContactAbout): AboutLine<string>[] {
   const { t } = useTranslation(PERSON_CARD_NS);
-  const { formatDate, formatNumber } = useLocaleFormat();
+  const { formatNumber } = useLocaleFormat();
+  const clock = useClinicClock();
   const formatPaise = usePaiseFormat();
   const age = typeof about.age === 'number' ? formatNumber(about.age) : null;
   const reviews: ContactReviews | null =
@@ -83,7 +85,7 @@ function useAboutRows(about: ContactAbout): AboutLine<string>[] {
             count: reviews.count,
             rating: formatNumber(reviews.latestRating),
             source: reviews.latestSource,
-            date: formatDate(reviews.latestAt, { day: 'numeric', month: 'short' }),
+            date: clock.moment(reviews.latestAt, { withTime: false }),
           })
         : null,
     },

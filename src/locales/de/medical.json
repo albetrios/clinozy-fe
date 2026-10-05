@@ -56,7 +56,6 @@
     "mrs": "Pharmareferenten"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}} %",
     "addPhone": "Telefon hinzufügen",
     "noValue": "—"

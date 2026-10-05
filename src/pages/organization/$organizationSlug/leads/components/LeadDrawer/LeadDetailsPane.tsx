@@ -8,7 +8,6 @@ import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { chatWhenLabel, messageTimeLabel } from '@/shared/components/ChatColumn/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
@@ -84,17 +83,10 @@ function lastMessageOf(messages: readonly LeadMessage[] | undefined): LeadMessag
 }
 
 /**
- * "Today 9:20 am", "Yesterday 4:10 pm", "27 Sep 10:28 am" — a lead's created
- * stamp as the header's tooltip and Info show it: the thread's day words and
- * the viewer's clock (the design's "Today 09:20", H:1813).
+ * The header (H:1755): "Edit lead", the ID to copy, "Re-target", the sub line.
+ * The ID's tooltip names when the lead was created by the rooms' one time rule
+ * ("9:20 am" today, "Yesterday 4:10 pm", "27 Sep").
  */
-function useStamp() {
-  const { t } = useTranslation(CLINIC_NS);
-  const clock = useClinicClock();
-  return (iso: string) => chatWhenLabel({ kind: 'instant', at: iso }, clock, t);
-}
-
-/** The header (H:1755): "Edit lead", the ID to copy, "Re-target", the sub line. */
 function LeadDetailsHeader({
   lead,
   titleRef,
@@ -103,7 +95,7 @@ function LeadDetailsHeader({
   titleRef: Ref<HTMLHeadingElement>;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const stamp = useStamp();
+  const clock = useClinicClock();
   const seq = String(lead.seq);
   const copyId = async () => {
     try {
@@ -139,7 +131,10 @@ function LeadDetailsHeader({
             </button>
           </TooltipTrigger>
           <TooltipContent>
-            {t(LEADS_KEYS.drawer.idTooltip, { seq, created: stamp(lead.createdAt) })}
+            {t(LEADS_KEYS.drawer.idTooltip, {
+              seq,
+              created: clock.moment(lead.createdAt),
+            })}
           </TooltipContent>
         </Tooltip>
         {lead.kind === 'retarget' ? (
@@ -258,21 +253,20 @@ function LeadInfoCard({
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const clock = useClinicClock();
-  const stamp = useStamp();
   const openTasks = useOpenLeadTasks(lead.id);
   const last = lastMessageOf(messages);
   const lastValue = last
     ? t(LEADS_KEYS.drawer.info.lastMessageValue, {
         channel: tClinic(CLINIC_KEYS.channels[last.channel]),
-        // As the thread times it: the clock alone today, else with its day.
-        at: messageTimeLabel(last.sentAt, clock, tClinic),
+        // By the rooms' one time rule, as the thread times it.
+        at: clock.moment(last.sentAt),
       })
     : t(LEADS_KEYS.drawer.info.none);
   const facts: LeadFact[] = [
     {
       key: 'created',
       label: t(LEADS_KEYS.drawer.info.created),
-      value: stamp(lead.createdAt),
+      value: clock.moment(lead.createdAt),
     },
     { key: 'last', label: t(LEADS_KEYS.drawer.info.lastMessage), value: lastValue },
     {

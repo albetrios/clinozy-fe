@@ -14,13 +14,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
 import { staffPerson, teamCardDataOf } from '../LeadFields/lead-people.ts';
 import { useLeadsTableContext } from './leads-table-context.ts';
-import { leadUpdatedLabel } from './leads-table-layout.ts';
 
 /** A cell control that must not also open the row. */
 /** The first word of a name ("Claim Anaya"). */
@@ -209,19 +209,15 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
 }
 
 /**
- * "Updated" (`leads.md:32`): the relative time at 12px with a dotted
- * underline, its tooltip the full date and time — "Wed, 30 Sep 2026 · 11:00 am
- * IST".
+ * "Updated" (`leads.md:32`): when the lead last changed by the rooms' one time
+ * rule, read at the list's `now` — "10:40 am" today, then "Yesterday", "Mon",
+ * "24 Sep", days alone in the 84px column — at 12px with a dotted underline,
+ * its tooltip the full date and time — "Wed, 30 Sep 2026 · 11:00 am IST".
  */
 export function LeadUpdatedCell({ lead, now }: { lead: LeadRecord; now: Date }) {
-  const { t } = useTranslation(LEADS_NS);
+  const clock = useClinicClock();
   const { formatDate, prefs } = useLocaleFormat();
-  const label = leadUpdatedLabel(lead.updatedAt, now);
-  const counted = 'count' in label ? { count: label.count } : {};
-  const text =
-    label.kind === 'date'
-      ? formatDate(lead.updatedAt, { day: 'numeric', month: 'short' })
-      : t(LEADS_KEYS.list.updated[label.kind], counted);
+  const text = clock.moment(lead.updatedAt, { withTime: false, now });
   const full = `${formatDate(lead.updatedAt, {
     weekday: 'short',
     day: 'numeric',

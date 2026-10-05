@@ -424,7 +424,6 @@
     "contact": "联系人"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "已推迟 · {{label}}",
     "done": "已完成 · {{time}}",
     "doneNow": "已完成 · 刚刚",

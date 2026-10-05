@@ -19,7 +19,7 @@ import {
   type ContactCardActions,
   type ContactCardData,
 } from '@/shared/components/PersonCard/index.ts';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENTS_KEYS, PATIENTS_NS } from '../../patients.constants.ts';
@@ -137,7 +137,11 @@ export function PatientAgeCell({
   );
 }
 
-/** The Follow-up cell: "Sep 24 · 14:50" — blush when past, butter today, sky ahead. */
+/**
+ * The Follow-up cell, by the rooms' one time rule — "2:50 pm" today, "Tomorrow
+ * 2:50 pm", "9 Oct 2:50 pm" ahead, "Mon 2:50 pm" or "24 Sep" overdue —
+ * blush when past, butter today, sky ahead.
+ */
 export function PatientFollowUpCell({
   followUpAt,
   today,
@@ -145,11 +149,11 @@ export function PatientFollowUpCell({
   followUpAt: string | null;
   today: string;
 }) {
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   if (!followUpAt) return null;
   return (
     <TonePill tone={FOLLOW_UP_TONES[followUpWhen(followUpAt, today)]}>
-      <span className="tabular-nums">{dayTime(followUpAt)}</span>
+      <span className="whitespace-nowrap tabular-nums">{clock.moment(followUpAt)}</span>
     </TonePill>
   );
 }
@@ -162,9 +166,12 @@ export function PatientDueCell({ dueTotal }: { dueTotal: number }) {
   );
 }
 
-/** The Updated cell: who last saved the record in a 28px pill ("Riya S."), then "Sep 24 · 15:39". */
+/**
+ * The Updated cell: who last saved the record in a 28px pill ("Riya S."), then
+ * when, by the rooms' one time rule ("3:39 pm", "Yesterday 3:39 pm", "24 Sep").
+ */
 export function PatientUpdatedCell({ patient }: { patient: PatientRow }) {
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   return (
     <span className="flex min-w-0 items-center gap-2">
       {patient.updatedBy ? (
@@ -187,7 +194,7 @@ export function PatientUpdatedCell({ patient }: { patient: PatientRow }) {
           !patient.updatedBy && 'text-body',
         )}
       >
-        {dayTime(patient.updatedAt)}
+        {clock.moment(patient.updatedAt)}
       </span>
     </span>
   );

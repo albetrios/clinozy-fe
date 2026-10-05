@@ -19,7 +19,8 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   segmented track, "3 photos", the visit filter "All photos ⌄" ("All photos" · "Not attached to a
   visit" · each visit with photos), the S / M / L radios — the size is a device pref
   (`useDevicePrefsStore.photoSize`).
-- **Grid** (`components/PhotoGrid/`): a group per day ("24 Sep" / "Today", "3 photos · 24 Sep ·
+- **Grid** (`components/PhotoGrid/`): a group per day, named by the rooms' one time rule
+  (`useClinicClock().day`: "Today", "Yesterday", "Mon", "24 Sep"; "3 photos · 24 Sep ·
   Hydrafacial"), square tiles at 110 / 160 / 230px with the body-part pill and the caption bar
   (Edit and Delete at M and L; shown on hover where hover exists). A tile opens the viewer
   (`$imageId/`), Edit opens Photo details (`$imageId/edit/`), Delete the reason confirm ("Wrong
@@ -48,7 +49,6 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | `shared/photo-view.ts`                  | Album and visit filtering, day groups, the filter's visits, stepping through a list.         |
 | `shared/components/PhotoDeleteConfirm/` | "Delete this photo?" with its reasons and Undo.                                              |
 | `shared/hooks/usePhotoAccess/`          | What the member may do with the photos.                                                      |
-| `shared/hooks/usePhotoDayLabel/`        | "Today" / "24 Sep" / "24 Sep 2025".                                                          |
 | `shared/hooks/useMissingPhoto/`         | "Photo not found" for a photo that is gone.                                                  |
 | `$imageId/`                             | The photo viewer — see its overview.                                                         |
 

@@ -16,17 +16,29 @@ import type {
   ThreadEntry,
 } from '@/shared/components/ChatColumn/chat-history.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { clinicClockOf } from '@/shared/hooks/useClinicClock/index.ts';
 import { Calendar } from '@/shared/icons/index.ts';
 
 import { ChatThread, type ChatThreadProps } from './ChatThread.tsx';
 
-const clock: ChatClock = {
-  today: '2026-10-03',
-  dayOf: (instant) => instant.slice(0, 10),
-  time: () => '10:28 am',
-  shortTime: () => '10 am',
-  date: () => '30 Sep',
-};
+const clock: ChatClock = clinicClockOf(
+  {
+    today: '2026-10-03',
+    clinicToday: '2026-10-03',
+    dayOf: (instant) => instant.slice(0, 10),
+    time: () => '10:28 am',
+    shortTime: () => '10 am',
+    date: () => '30 Sep',
+    wallTime: (_date, time) => time,
+  },
+  {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    tomorrow: 'Tomorrow',
+    weekday: () => 'Wed',
+    dayTime: (day, time) => `${day} ${time}`,
+  },
+);
 
 function formatWith(): ChatFormat {
   return {

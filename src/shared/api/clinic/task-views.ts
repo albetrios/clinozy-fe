@@ -1,5 +1,5 @@
 import type { Tone } from './clinic-schema.ts';
-import { civilDayOffset, clinicClockTime, clinicToday } from './clinic-time.ts';
+import { clinicClockTime, clinicToday } from './clinic-time.ts';
 import type { TaskRow, TaskTab } from './tasks-contracts.ts';
 
 /*
@@ -89,9 +89,7 @@ export type TaskDueLabel =
   | { kind: 'soon'; unit: Exclude<TaskDueUnit, 'days'>; count: number }
   | {
       kind: 'at';
-      /** Today, Tomorrow, Yesterday, or another day by its date. */
-      day: 'today' | 'tomorrow' | 'yesterday' | 'date';
-      /** The clinic-local day, `YYYY-MM-DD`. */
+      /** The clinic-local day, `YYYY-MM-DD` — worded by the rooms' one time rule. */
       date: string;
       /** The clinic-local clock time, `HH:mm`. */
       time: string;
@@ -111,27 +109,16 @@ function spanOf(minutes: number): { unit: TaskDueUnit; count: number } {
   return { unit: 'days', count: Math.round(minutes / 1440) };
 }
 
-const DAY_WORDS: Readonly<Record<number, 'today' | 'tomorrow' | 'yesterday'>> = {
-  0: 'today',
-  1: 'tomorrow',
-  [-1]: 'yesterday',
-};
-
 /** A due label on a day at a clock time. */
 export type TaskDueAt = Extract<TaskDueLabel, { kind: 'at' }>;
 
 /**
- * A clinic-local day and clock time as a due label read at `now`: "Today",
- * "Tomorrow", "Yesterday" or the date, and the time (New task's toast names
- * a picked due this way).
+ * A clinic-local day and clock time as a due label — New task's toast names a
+ * picked due this way; the words come from the rooms' one time rule
+ * (`ClinicClock.wallMoment`).
  */
-export function taskDueAt(date: string, time: string, now: Date): TaskDueAt {
-  return {
-    kind: 'at',
-    day: DAY_WORDS[civilDayOffset(clinicToday(now), date)] ?? 'date',
-    date,
-    time,
-  };
+export function taskDueAt(date: string, time: string): TaskDueAt {
+  return { kind: 'at', date, time };
 }
 
 /**
@@ -157,5 +144,5 @@ export function taskDueLabel(task: TaskTiming, now: Date): TaskDueLabel {
       count: span.count,
     };
   }
-  return taskDueAt(clinicToday(due), clinicClockTime(due), now);
+  return taskDueAt(clinicToday(due), clinicClockTime(due));
 }

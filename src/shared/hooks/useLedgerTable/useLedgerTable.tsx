@@ -26,8 +26,8 @@ import {
   ledgerWhat,
   LedgerWhatCell,
   LedgerWhenCell,
-  useLedgerWhen,
 } from '@/shared/components/LedgerCells/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -47,7 +47,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const formatPaise = usePaiseFormat();
-  const when = useLedgerWhen();
+  const clock = useClinicClock();
   const phone = useViewportTier() === 'phone';
 
   return [
@@ -88,7 +88,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
       meta: {
         track: '150px',
         primary: !phone,
-        foldValue: (original) => when(rowOf(original).paidAt),
+        foldValue: (original) => clock.moment(rowOf(original).paidAt),
       },
     },
     {

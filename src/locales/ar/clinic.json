@@ -578,8 +578,10 @@
   },
   "lists": {
     "loadError": "تعذّر تحميل هذه القائمة · انقطع الاتصال. يتم عرض آخر نسخة.",
-    "retry": "إعادة المحاولة",
-    "dayTime": "{{day}} · {{time}}"
+    "retry": "إعادة المحاولة"
+  },
+  "clock": {
+    "dayTime": "{{day}} {{time}}"
   },
   "channels": {
     "whatsapp": "واتساب",
@@ -632,9 +634,6 @@
       "lead": "تم إنشاء العميل المحتمل · {{time}} · عبر {{source}}",
       "patientThread": "مريض · دردشة فقط · بلا عميل محتمل",
       "contactThread": "جهة اتصال · دردشة فقط · بلا عميل محتمل"
-    },
-    "when": {
-      "dayTime": "{{day}} {{time}}"
     },
     "history": {
       "appointment": "الموعد #{{seq}}",

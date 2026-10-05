@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "記録",
-    "today": "今日 {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_other": "{{count}}回編集 · 最終 {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",
     "received": "+ {{amount}}",

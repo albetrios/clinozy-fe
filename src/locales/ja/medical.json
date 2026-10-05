@@ -56,7 +56,6 @@
     "mrs": "MR"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}%",
     "addPhone": "電話番号を追加",
     "noValue": "—"

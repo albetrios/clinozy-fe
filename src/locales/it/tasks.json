@@ -426,7 +426,6 @@
     "contact": "Contatto"
   },
   "due": {
-    "at": "{{day}} {{time}}",
     "snoozed": "Posticipata · {{label}}",
     "done": "Fatta · {{time}}",
     "doneNow": "Fatta · Ora",

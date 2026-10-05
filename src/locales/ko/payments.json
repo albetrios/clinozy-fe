@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "내역",
-    "today": "오늘 {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_other": "{{count}}회 수정 · 최근 {{from}} → {{to}}",
     "editSide": "{{amount}} {{modes}}",
     "received": "+ {{amount}}",

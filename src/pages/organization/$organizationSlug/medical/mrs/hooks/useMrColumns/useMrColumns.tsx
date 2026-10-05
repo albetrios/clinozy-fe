@@ -72,14 +72,14 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
       enableSorting: false,
       cell: ({ row }) => (
         <span className="truncate tabular-nums">
-          {row.original.lastVisitOn ? dates.day(row.original.lastVisitOn) : noValue}
+          {row.original.lastVisitOn ? dates.visit(row.original.lastVisitOn) : noValue}
         </span>
       ),
       meta: {
         track: '110px',
         foldValue: (original) => {
           const last = rowOf(original).lastVisitOn;
-          return last ? dates.day(last) : null;
+          return last ? dates.visit(last) : null;
         },
       },
     },
@@ -93,7 +93,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
         if (!next) return null;
         return (
           <TonePill tone={nextVisitTone(next, today)}>
-            <span className="tabular-nums">{dates.day(next)}</span>
+            <span className="whitespace-nowrap tabular-nums">{dates.visit(next)}</span>
           </TonePill>
         );
       },
@@ -104,7 +104,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
           const next = rowOf(original).nextVisitOn;
           if (!next) return null;
           return {
-            value: dates.day(next),
+            value: dates.visit(next),
             dotClassName: TONE_CLASSES[nextVisitTone(next, today)].fill,
           };
         },

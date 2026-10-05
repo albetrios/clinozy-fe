@@ -137,7 +137,9 @@ describe('PatientRail', () => {
     };
     renderRail({ file: { ...file, nextVisit: next }, actions: { onBook } });
     const upNext = await screen.findByRole('region', { name: 'Up next' });
-    expect(upNext).toHaveTextContent('Today ·');
+    // Today reads its time alone (the rooms' one time rule).
+    expect(upNext).toHaveTextContent(/11:00\sAM/);
+    expect(upNext).not.toHaveTextContent('Today');
     expect(upNext).toHaveTextContent('Hydrafacial · 45 min');
     await user.click(screen.getByTestId('patient-rail-book'));
     expect(screen.getByTestId('patient-rail-book')).toHaveTextContent('Reschedule');

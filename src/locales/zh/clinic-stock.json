@@ -29,7 +29,6 @@
     "type": "类型"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "addPhone": "添加电话",
     "noValue": "—"
   },

@@ -53,8 +53,6 @@
   },
   "ledger": {
     "records": "القيود",
-    "today": "اليوم {{time}}",
-    "dayTime": "{{day}} {{time}}",
     "edited_zero": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
     "edited_one": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",
     "edited_two": "عُدّل {{count}} مرة · آخرها {{from}} ← {{to}}",

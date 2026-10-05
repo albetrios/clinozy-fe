@@ -48,35 +48,7 @@
     "moreInterests_two": "اثنان آخران: {{list}}",
     "moreInterests_few": "{{count}} أخرى: {{list}}",
     "moreInterests_many": "{{count}} أخرى: {{list}}",
-    "moreInterests_other": "{{count}} أخرى: {{list}}",
-    "updated": {
-      "justNow": "الآن",
-      "minutes_zero": "قبل {{count}} دقيقة",
-      "minutes_one": "قبل دقيقة",
-      "minutes_two": "قبل دقيقتين",
-      "minutes_few": "قبل {{count}} دقائق",
-      "minutes_many": "قبل {{count}} دقيقة",
-      "minutes_other": "قبل {{count}} دقيقة",
-      "hours_zero": "قبل {{count}} ساعة",
-      "hours_one": "قبل ساعة",
-      "hours_two": "قبل ساعتين",
-      "hours_few": "قبل {{count}} ساعات",
-      "hours_many": "قبل {{count}} ساعة",
-      "hours_other": "قبل {{count}} ساعة",
-      "yesterday": "أمس",
-      "days_zero": "قبل {{count}} يوم",
-      "days_one": "قبل يوم",
-      "days_two": "قبل يومين",
-      "days_few": "قبل {{count}} أيام",
-      "days_many": "قبل {{count}} يومًا",
-      "days_other": "قبل {{count}} يوم",
-      "weeks_zero": "قبل {{count}} أسبوع",
-      "weeks_one": "قبل أسبوع",
-      "weeks_two": "قبل أسبوعين",
-      "weeks_few": "قبل {{count}} أسابيع",
-      "weeks_many": "قبل {{count}} أسبوعًا",
-      "weeks_other": "قبل {{count}} أسبوع"
-    }
+    "moreInterests_other": "{{count}} أخرى: {{list}}"
   },
   "team": {
     "claim": "مفتوح · استلم",
@@ -241,8 +213,7 @@
       "lead": "العميل المحتمل {{id}} · {{phone}}",
       "contact": "جهة اتصال · {{phone}}",
       "recreate": "إعادة إنشاء العميل المحتمل",
-      "useContact": "استخدام جهة الاتصال",
-      "today": "اليوم"
+      "useContact": "استخدام جهة الاتصال"
     },
     "noMatch": "لا توجد نتيجة مطابقة",
     "more_zero": " · +{{count}} أخرى",

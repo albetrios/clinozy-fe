@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils.ts';
 import type { PatientPhoto } from '@/shared/api/clinic/patient-images-api.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
 import { ImageIcon } from '@/shared/icons/index.ts';
@@ -29,7 +30,6 @@ import { manifest } from './images.manifest.ts';
 import type { PatientImagesSearch, PhotoAlbum } from './images.search.ts';
 import { PhotoDeleteConfirm } from './shared/components/PhotoDeleteConfirm/index.ts';
 import { type PhotoAccess, usePhotoAccess } from './shared/hooks/usePhotoAccess/index.ts';
-import { usePhotoDayLabel } from './shared/hooks/usePhotoDayLabel/index.ts';
 import {
   photoDays,
   PHOTOS_PAGE,
@@ -211,7 +211,7 @@ function PhotosBody({
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const size = useDevicePrefsStore((state) => state.photoSize);
-  const dayLabel = usePhotoDayLabel();
+  const { day: dayLabel } = useClinicClock();
   const links = usePhotoLinks();
   if (!loaded) return <PhotosSkeleton />;
   if (view.shown.length === 0) {
@@ -267,7 +267,7 @@ export function PatientImagesPage() {
   );
   const size = useDevicePrefsStore((state) => state.photoSize);
   const setSize = useDevicePrefsStore((state) => state.setPhotoSize);
-  const dayLabel = usePhotoDayLabel();
+  const { day: dayLabel } = useClinicClock();
   const links = usePhotoLinks();
   const [deleting, setDeleting] = useState<PatientPhoto | null>(null);
 

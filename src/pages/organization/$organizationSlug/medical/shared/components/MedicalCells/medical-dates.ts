@@ -1,35 +1,18 @@
-import { useTranslation } from 'react-i18next';
-
-import {
-  type ClinicClock,
-  clinicDayLabel,
-  useClinicClock,
-} from '@/shared/hooks/useClinicClock/index.ts';
-
-import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
-
-/** "Today 10:12", "Yesterday 9:10", "25 Sep 10:52" — an instant as the tables name it. */
-function whenLabel(
-  instant: string,
-  clock: ClinicClock,
-  t: ReturnType<typeof useTranslation>['t'],
-): string {
-  return t(MEDICAL_KEYS.table.when, {
-    day: clinicDayLabel(clock.dayOf(instant), clock, t),
-    time: clock.time(instant),
-  });
-}
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 
 /**
- * The tables' date words: an instant as "Today 10:12" and a calendar date as
- * "25 Sep" (the year added when it is another year's) — on the clinic clock.
+ * The tables' date words, on the clinic clock: a moment by the rooms' one time
+ * rule — `when` an instant ("10:12 am" today, "Yesterday 9:10 am", "Fri 10:52
+ * am", "25 Sep") and `visit` a rep's last or next visit day ("Today", "Mon",
+ * "9 Oct") — and `day` a record's calendar date as it is dated ("25 Sep",
+ * the year added when it is another year's).
  */
 export function useMedicalDates() {
-  const { t } = useTranslation(MEDICAL_NS);
   const clock = useClinicClock();
   return {
     clock,
-    when: (instant: string) => whenLabel(instant, clock, t),
+    when: (instant: string) => clock.moment(instant),
+    visit: (date: string) => clock.day(date),
     day: (date: string) => clock.date(date),
   };
 }

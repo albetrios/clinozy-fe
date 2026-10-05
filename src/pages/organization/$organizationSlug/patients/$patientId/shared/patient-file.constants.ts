@@ -23,13 +23,6 @@ export const PATIENT_FILE_KEYS = {
     packages: 'sections.packages',
     notes: 'sections.notes',
   },
-  /** A visit's day and time — the rail's Up next and the Overview's Visits card. */
-  visit: {
-    /** "Today · 11:00 am". */
-    when: 'rail.visitWhen',
-    today: 'rail.today',
-    tomorrow: 'rail.tomorrow',
-  },
   /** A package's session used by hand — Packages and the Overview. */
   package: {
     /** "Session 2 of 7 used". */

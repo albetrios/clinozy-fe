@@ -11,6 +11,7 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
@@ -20,7 +21,6 @@ import {
   PATIENT_TABLE_KEYS,
   PATIENT_TABLE_NS,
   StaffCell,
-  useTableDayTime,
 } from '../../../shared/components/PatientSectionTable/index.ts';
 
 const keys = PATIENT_TABLE_KEYS;
@@ -36,7 +36,7 @@ const rowOf = (original: unknown) => original as LedgerRow;
 function usePatientPaymentsColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const dayTime = useTableDayTime();
+  const clock = useClinicClock();
   const formatPaise = usePaiseFormat();
   // "Cash + UPI" — each split's mode once, as the ledger's Mode pill joins them.
   const modes = (row: LedgerRow) => [...new Set(row.splits.map((split) => split.mode))];
@@ -65,12 +65,12 @@ function usePatientPaymentsColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] 
     },
     {
       id: 'when',
-      accessorFn: (row) => dayTime(row.paidAt),
+      accessorFn: (row) => clock.moment(row.paidAt),
       header: t(keys.columns.when),
       enableSorting: false,
       cell: ({ row }) => (
         <span className="text-body truncate tabular-nums">
-          {dayTime(row.original.paidAt)}
+          {clock.moment(row.original.paidAt)}
         </span>
       ),
       meta: { track: '150px', primary: true },

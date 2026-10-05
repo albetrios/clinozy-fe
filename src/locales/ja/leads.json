@@ -38,15 +38,7 @@
     },
     "empty": "一致するリードはありません",
     "clearFilters": "フィルターをクリア",
-    "moreInterests_other": "他 {{count}} 件: {{list}}",
-    "updated": {
-      "justNow": "たった今",
-      "minutes_other": "{{count}} 分前",
-      "hours_other": "{{count}} 時間前",
-      "yesterday": "昨日",
-      "days_other": "{{count}} 日前",
-      "weeks_other": "{{count}} 週間前"
-    }
+    "moreInterests_other": "他 {{count}} 件: {{list}}"
   },
   "team": {
     "claim": "開放中 · 引き受ける",
@@ -196,8 +188,7 @@
       "lead": "リード {{id}} · {{phone}}",
       "contact": "連絡先 · {{phone}}",
       "recreate": "リードを再作成",
-      "useContact": "連絡先を使う",
-      "today": "今日"
+      "useContact": "連絡先を使う"
     },
     "noMatch": "一致する人はいません",
     "more_other": " · 他 +{{count}}",

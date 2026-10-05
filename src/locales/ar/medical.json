@@ -56,7 +56,6 @@
     "mrs": "المندوبون"
   },
   "table": {
-    "when": "{{day}} {{time}}",
     "percent": "{{value}}٪",
     "addPhone": "إضافة هاتف",
     "noValue": "—"

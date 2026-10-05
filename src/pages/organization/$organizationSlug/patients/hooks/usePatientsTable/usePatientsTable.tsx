@@ -22,7 +22,7 @@ import {
   PERSON_CARD_KEYS,
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
-import { useDayTime } from '@/shared/hooks/useDayTime/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 
@@ -74,7 +74,7 @@ function usePatientColumns(
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
   const formatPaise = usePaiseFormat();
-  const dayTime = useDayTime();
+  const clock = useClinicClock();
   const today = clinicToday();
 
   const types = (patient: PatientRow) =>
@@ -214,7 +214,10 @@ function usePatientColumns(
           const { followUpAt } = rowOf(original);
           if (!followUpAt) return null;
           const tone = FOLLOW_UP_TONES[followUpWhen(followUpAt, today)];
-          return { value: dayTime(followUpAt), dotClassName: TONE_CLASSES[tone].fill };
+          return {
+            value: clock.moment(followUpAt),
+            dotClassName: TONE_CLASSES[tone].fill,
+          };
         },
       },
     },
@@ -237,7 +240,7 @@ function usePatientColumns(
       accessorKey: 'updatedAt',
       header: t(PATIENTS_KEYS.columns.updated),
       cell: ({ row }) => <PatientUpdatedCell patient={row.original} />,
-      // 1.3fr, not the design's 1fr (H:4698): a 12-hour "Oct 05 · 10:40 AM"
+      // 1.3fr, not the design's 1fr (H:4698): a 12-hour "Yesterday 10:40 AM"
       // beside "Dr. Drashti" needs ~211px, which 1fr leaves at 188 at 1440.
       // The 28px people pill folds to nothing (H:4115).
       meta: { track: 'minmax(150px,1.3fr)', foldValue: () => null },
