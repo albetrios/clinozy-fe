@@ -1,7 +1,9 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { compile } from 'tailwindcss';
 import { describe, expect, it } from 'vitest';
 
 /*
@@ -11,11 +13,56 @@ import { describe, expect, it } from 'vitest';
  * (`text-foreground`, `*:border-border-strong`) is generated only because the
  * main stylesheet has it: a screen spells it, or `index.css` lists it in its
  * `@source inline(…)`. Anything else would print unstyled; this holds the
- * sheets to that.
+ * sheets to that. It loads after the main stylesheet, so its utilities sit
+ * in a layer beneath the main `utilities` — this holds that too.
  */
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SRC = join(HERE, '../../..');
+const require = createRequire(import.meta.url);
+
+/** `print-template.css` as the build generates it, for the given class names. */
+async function compilePrintStylesheet(candidates: string[]): Promise<string> {
+  const compiler = await compile(readFileSync(join(HERE, 'print-template.css'), 'utf8'), {
+    base: HERE,
+    loadStylesheet: async (id, base) => {
+      const path = id.startsWith('tailwindcss/')
+        ? require.resolve(`${id}.css`)
+        : join(base, id);
+      return { path, base: dirname(path), content: readFileSync(path, 'utf8') };
+    },
+  });
+  return compiler.build(candidates);
+}
+
+/** A stylesheet's top-level rules: each one's prelude and its block (empty for a statement). */
+function topLevelRules(css: string): { prelude: string; block: string }[] {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const rules: { prelude: string; block: string }[] = [];
+  let depth = 0;
+  let start = 0;
+  let open = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (char === ';' && depth === 0) {
+      rules.push({ prelude: text.slice(start, index).trim(), block: '' });
+      start = index + 1;
+    } else if (char === '{') {
+      if (depth === 0) open = index;
+      depth += 1;
+    } else if (char === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        rules.push({
+          prelude: text.slice(start, open).trim(),
+          block: text.slice(open + 1, index),
+        });
+        start = index + 1;
+      }
+    }
+  }
+  return rules;
+}
 
 /** The source files under `dir`, tests and this folder left out where asked. */
 function sources(dir: string, skip?: string): string[] {
@@ -98,6 +145,28 @@ describe('the print sheets’ stylesheet', () => {
     const named = sheets.flatMap((sheet) => sheet.utilities);
     expect(named).toContain('text-foreground');
     expect(named).toContain('*:border-border-strong');
+  });
+
+  it('lays its utilities beneath the screens’ own, so a drawer keeps its width', async () => {
+    // The main stylesheet's layer order is tailwindcss's own statement.
+    const order = /@layer ([\w\s,-]+);/
+      .exec(readFileSync(require.resolve('tailwindcss/index.css'), 'utf8'))?.[1]
+      ?.split(',')
+      .map((name) => name.trim());
+    expect(order?.indexOf('components')).toBeLessThan(order?.indexOf('utilities') ?? -1);
+
+    const rules = topLevelRules(await compilePrintStylesheet(['w-full', 'mt-[1.1mm]']));
+    // No style outside a layer (`@property` only registers a property): an
+    // unlayered `.w-full` outranked a record drawer's `md:w-[min(840px,…)]`
+    // and filled the viewport.
+    expect(rules.filter((rule) => !/^@(?:layer|property)\b/.test(rule.prelude))).toEqual(
+      [],
+    );
+    const components = rules.find((rule) => rule.prelude === '@layer components');
+    expect(components?.block).toMatch(/\.w-full\s*\{\s*width:\s*100%;/);
+    expect(components?.block).toMatch(
+      /\.mt-\\\[1\\\.1mm\\\]\s*\{\s*margin-top:\s*1\.1mm;/,
+    );
   });
 
   it('uses a token utility only where the main stylesheet has it', () => {

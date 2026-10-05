@@ -112,7 +112,11 @@ utilities were ~0.9 kB gzipped of the initial CSS. `src/index.css` now leaves
 `print-template.css` there generates that folder's utilities with Tailwind's default theme,
 imported by `PrintTemplate.tsx` — Vite ships it with the lazy chunks that print. Its limit:
 the default theme knows no app token, so a sheet may use a token utility only where a screen
-spells it too (`print-template-css.test.ts` fails otherwise).
+spells it too (`print-template-css.test.ts` fails otherwise). **A split stylesheet's utilities
+go in a layer below `utilities`** (`@import 'tailwindcss/utilities' layer(components)`): it loads
+after the main one, and outside a layer its copies of shared utilities (`w-full`, `flex`) outrank
+every screen's responsive class. Every record drawer filled the viewport, and `flex md:hidden`
+showed on desktop, once a sheet had loaded (the same test pins the layer).
 
 - **Tripwire:** `pnpm build:check` → `tooling/ci/check-css-sources.mjs`. Every raw-palette
   utility in `dist/` must be spelled in non-test `src/` (vendored `ui/` is the legitimate
