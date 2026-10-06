@@ -777,12 +777,12 @@ describe('RecordDrawer — the other drawers’ slots (task, Day close, contact 
   it('shows the column beside the form from md, and on a phone behind a pane switch', async () => {
     const panes = {
       label: 'Lead panels',
-      main: { id: 'details', label: 'Details' },
+      form: { id: 'details', label: 'Details' },
       aside: { id: 'chat', label: 'Chat' },
       testIdPrefix: 'pt-panes',
     };
     function Panes() {
-      const [pane, setPane] = useState<'main' | 'aside'>('main');
+      const [pane, setPane] = useState<'form' | 'aside'>('form');
       return (
         <Harness
           startOpen

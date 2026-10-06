@@ -208,9 +208,9 @@ export function LeadDrawer({
           width: widths.chat,
           panes: {
             label: t(LEADS_KEYS.drawer.panels),
-            main: { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
+            form: { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
             aside: { id: 'chat', label: t(LEADS_KEYS.drawer.chat), icon: WhatsAppMark },
-            value: pane === 'chat' ? 'aside' : 'main',
+            value: pane === 'chat' ? 'aside' : 'form',
             onValueChange: (next) => onPaneChange(next === 'aside' ? 'chat' : 'details'),
             testIdPrefix: LEADS_TEST_IDS.drawerPanes,
           },

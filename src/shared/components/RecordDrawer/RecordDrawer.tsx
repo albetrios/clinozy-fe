@@ -62,11 +62,11 @@ interface RecordDrawerPanes {
   /** The switch's accessible name ("Lead panes"). */
   label: string;
   /** The form's tab and the column's — each `id` names its tab's test id. */
-  main: { id: string; label: string; icon?: AppIcon };
+  form: { id: string; label: string; icon?: AppIcon };
   aside: { id: string; label: string; icon?: AppIcon };
   /** The pane shown — the screen may keep it between records. */
-  value: 'main' | 'aside';
-  onValueChange: (pane: 'main' | 'aside') => void;
+  value: 'form' | 'aside';
+  onValueChange: (pane: 'form' | 'aside') => void;
   /** The switch's test ids: `<prefix>-tabs`, `<prefix>-tab-<pane id>`. */
   testIdPrefix: string;
 }
@@ -612,12 +612,12 @@ function DrawerPaneSwitch({ panes }: { panes: RecordDrawerPanes }) {
         activation="automatic"
         label={panes.label}
         tabs={[
-          { id: panes.main.id, label: panes.main.label, icon: panes.main.icon },
+          { id: panes.form.id, label: panes.form.label, icon: panes.form.icon },
           { id: panes.aside.id, label: panes.aside.label, icon: panes.aside.icon },
         ]}
-        value={panes.value === 'aside' ? panes.aside.id : panes.main.id}
+        value={panes.value === 'aside' ? panes.aside.id : panes.form.id}
         onValueChange={(id) =>
-          panes.onValueChange(id === panes.aside.id ? 'aside' : 'main')
+          panes.onValueChange(id === panes.aside.id ? 'aside' : 'form')
         }
         testIdPrefix={panes.testIdPrefix}
       />
