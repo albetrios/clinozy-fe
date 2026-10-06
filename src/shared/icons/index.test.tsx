@@ -1,11 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
-import { loadIconSet } from './icon-registry.ts';
 import * as icons from './index.ts';
 import {
   Boxes,
@@ -18,11 +14,6 @@ import {
   WhatsAppMark,
   X,
 } from './index.ts';
-
-afterEach(() => {
-  useThemeStore.setState({ iconLibrary: 'lucide' });
-  useAuthStore.setState({ isAuthenticated: false, isLoading: false });
-});
 
 /** The local brand marks — lucide-react ships no brand icons. */
 const LOCAL_MARKS = [
@@ -43,7 +34,7 @@ const DIRECTIONAL = [
 ];
 
 describe('icon barrel', () => {
-  it('renders the Lucide icon by default', () => {
+  it('renders the Lucide glyph', () => {
     const { container } = render(<Boxes className="size-4" />);
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
@@ -56,32 +47,13 @@ describe('icon barrel', () => {
     expect(svgClass).toContain('lucide-receipt-text');
   });
 
-  it('swaps to the selected library once its lazy chunk loads', async () => {
-    useAuthStore.setState({ isAuthenticated: true, isLoading: false });
-    const { container } = render(<Boxes className="size-4" />);
-    useThemeStore.getState().setIconLibrary('tabler');
-    loadIconSet('tabler');
-    await waitFor(
-      () => {
-        expect(container.querySelector('svg')?.getAttribute('class')).toContain(
-          'tabler-icon',
-        );
-      },
-      { timeout: 12_000 },
-    );
-  });
-
-  it('registers every export under its own name and draws it by default', () => {
-    const exports = Object.entries(icons);
-    // The alt sets are looked up by this name — a mismatch swaps in another glyph.
-    const misnamed = exports.filter(([name, Icon]) => Icon.displayName !== name);
+  it('draws every export', () => {
     // childElementCount, not a `svg > *` query: under jsdom that selector
     // matches only the first svg a test renders.
-    const blank = exports.filter(
+    const blank = Object.entries(icons).filter(
       ([, Icon]) => !render(<Icon />).container.querySelector('svg')?.childElementCount,
     );
 
-    expect(misnamed.map(([name]) => name)).toEqual([]);
     expect(blank.map(([name]) => name)).toEqual([]);
   });
 

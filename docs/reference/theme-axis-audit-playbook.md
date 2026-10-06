@@ -4,14 +4,23 @@
 > **Mandatory rule:** `agent-os/rules/fe-theme-axis-audit.mdc`  
 > Agents MUST read both before any axis cycle.
 
-Repeatable process for making **every UI surface respect Appearance / Shuffle config**.
-Use this when context is fresh or after a long break — work **one axis at a time**, same
-method we used for **corner radius + shape**.
+Repeatable process for making **every UI surface follow the design tokens and the axis
+hooks in `src/index.css`**. Use this when context is fresh or after a long break — work
+**one axis at a time**, same method we used for **corner radius + shape**.
 
-**Source of truth for catalogs:** `src/shared/theme/presets.ts`  
-**Runtime application:** `applyGeneratedTheme()`, `applyThemePreset()`, `applyBaseColor()`,
-`applyMenuStyle()`, `applyIconWeight()` + `useThemeStore` (`src/shared/store/useThemeStore/`)  
-**CSS hooks:** `src/index.css` (`@theme`, `[data-*]` blocks, `[data-slot='…']` selectors)
+> **Status (2026-10, L-65): the Appearance studio is retired.** The app wears one look,
+> `clinozy-zinc-pastel`, in light or dark; nothing varies the axes at runtime any more, and
+> each renders at the launch's default (`docs/reference/theming.md` → _The axes, at the
+> launch's defaults_). The procedure still applies — a surface that bypasses a token is
+> wrong under the one look too — but an axis's other values can only be previewed by
+> setting its hook by hand in the browser's devtools (`data-shape="sharp"` on `<html>`,
+> `data-elevation="flat"`, `--spacing: 0.215rem` …). The tracker and the history below are
+> kept as the record of how the hooks were built.
+
+**Source of truth:** `src/index.css` (`@theme`, the look's `[data-theme]` blocks, the
+`[data-*]` axis blocks, `[data-slot='…']` selectors)  
+**Runtime application:** `applyTheme()` (`src/shared/theme/presets.ts`) and the mode in
+`useThemeStore` (`src/shared/store/useThemeStore/`)
 
 ---
 
@@ -80,7 +89,7 @@ change shape half way through the boot (drift-tested in `locale-init.drift.test.
 
 **Follow-up — measure, don't read (2026-09).** Grep found the class strings; it could not
 find these, and a computed-style sweep in a browser did
-(`tests/e2e/theme-shape.e2e.test.ts` — now the definitive Phase 3 step for radius/shape):
+(`tests/e2e/theme-shape.e2e.test.ts`, the Phase 3 step for radius/shape until it was retired with the studio in 2026-10):
 
 - **`ui/carousel` re-slots its arrow `<Button>`s** (`data-slot="carousel-previous"` /
   `-next`), so the `button` rule stopped matching and the dashboard's highlight arrows
@@ -104,74 +113,30 @@ the icon barrel is allowlisted. A gate nobody has watched fail is a green checkm
 
 ---
 
-## Full config catalog
+## Config catalog — retired with the studio
 
-### A. Mode (always available)
+The catalogs the studio offered (named presets, accent and chart hues, harmony,
+intensity, base colours, menu styles, fonts, radii, shapes, type scales, density,
+motion, elevation, contrast, separation, focus rings, icon weight / colour / library,
+content widths) are gone from `src/shared/theme/presets.ts`. What renders is the
+launch's default for each — the table in `docs/reference/theming.md` (_The axes, at the
+launch's defaults_). The `[data-*]` blocks in `index.css` that implemented the other
+values remain, so an audit can still set one by hand:
 
-| Setting        | Options                     | Default | Applied via                                       |
-| -------------- | --------------------------- | ------- | ------------------------------------------------- |
-| **Color mode** | `light` · `dark` · `system` | `light` | `.dark` class on `<html>` (`useThemeStore.theme`) |
+| Hook (on `<html>`) | Values the blocks implement                                   |
+| ------------------ | ------------------------------------------------------------- |
+| `data-shape`       | `mixed` · `pill` · `sharp` (default: none)                    |
+| `data-elevation`   | `flat` · `soft` · `lifted` · `floating`                       |
+| `data-contrast`    | `soft` · `crisp` · `dim` · `amoled` (dark)                    |
+| `data-separation`  | `hairline` · `shadow`                                         |
+| `data-focus`       | `glow` · `offset` · `underline` · `inset`                     |
+| `data-menu`        | `translucent` · `glass`                                       |
+| `data-base`        | `stone` · `slate` · `olive` · `zinc` · `warm`                 |
+| `data-icon-color`  | `foreground` · `muted` · `primary` · `accent` · `destructive` |
+| `--spacing`        | any rem (default 0.25rem)                                     |
+| `--radius-lg`      | any rem (default 0.5rem; the scale derives from it)           |
 
-### B. Named presets (mutually exclusive with generated look)
-
-| Preset id             | Label               | Applied via                                                        |
-| --------------------- | ------------------- | ------------------------------------------------------------------ |
-| `clinozy-zinc-pastel` | Clinozy Zinc Pastel | `data-theme="clinozy-zinc-pastel"` — **full-surface**, the default |
-| `default`             | Classic             | no `data-theme` (uses `@theme` in `index.css`) — `BASE_PRESET`     |
-| `violet`              | Violet              | `data-theme="violet"` (accent only)                                |
-| `emerald`             | Emerald             | `data-theme="emerald"` (accent only)                               |
-| `rose`                | Rose                | `data-theme="rose"` (accent only)                                  |
-| `ocean`               | Ocean               | `data-theme="ocean"` (accent only)                                 |
-
-`DEFAULT_PRESET` (a fresh install) is `clinozy-zinc-pastel`; `BASE_PRESET` is the one
-preset without an attribute and the fallback for an unknown id. The Clinozy preset owns
-its surfaces, its slot shadows (`--elevation-*`), its keyboard focus fill (plus the
-platform ring) and its scrollbars in `index.css`, and carries axis defaults (icon weight
-`thin`, layout width `full`, intensity `muted` for a look started from it) — see
-[theming.md](theming.md) › The default look.
-
-When user picks **Shuffle** or customizes any generated axis → store sets `preset: 'custom'`
-and inline vars replace `data-theme`.
-
-### C. Generated look axes (`customTheme` / Shuffle)
-
-| Axis                   | Store field     | Options                                                                                                  | Default    |
-| ---------------------- | --------------- | -------------------------------------------------------------------------------------------------------- | ---------- |
-| **Accent hue**         | `hue`           | Any hue 0–360; picker uses `ACCENT_COLORS`: rose, orange, amber, lime, emerald, teal, blue, violet, pink | 290        |
-| **Chart anchor**       | `chartHue`      | Same hue space (independent picker)                                                                      | 290        |
-| **Body font**          | `bodyFontId`    | `inter`, `grotesk`, `geometric`, `humanist`, `serif`, `slab`, `mono`                                     | `inter`    |
-| **Heading font**       | `headingFontId` | same catalog                                                                                             | `inter`    |
-| **Corner radius**      | `radiusId`      | `sharp` (0), `default` (0.5rem), `rounded` (0.75), `round` (1)                                           | `default`  |
-| **Density**            | `densityId`     | `compact`, `cozy`, `relaxed`, **`airy`**                                                                 | `cozy`     |
-| **Motion**             | `motionId`      | **`instant`**, `calm`, `smooth`, `snappy`                                                                | `smooth`   |
-| **Elevation**          | `elevationId`   | `flat`, `soft`, `lifted`, **`floating`**                                                                 | `soft`     |
-| **Contrast**           | `contrastId`    | `normal`, `soft`, `crisp`, `dim`, `amoled`                                                               | `normal`   |
-| **Chart harmony**      | `harmonyId`     | `monochromatic`, `analogous`, `complementary`, **`split`**, `triadic`                                    | `triadic`  |
-| **Accent intensity**   | `intensityId`   | **`subtle`**, `muted`, `balanced`, `vibrant`, **`max`**                                                  | `balanced` |
-| **Surface separation** | `separationId`  | `border`, **`hairline`**, `shadow`                                                                       | `border`   |
-| **Shape language**     | `shapeId`       | `uniform`, **`mixed`**, `pill`, `sharp`                                                                  | `uniform`  |
-| **Type scale**         | `typeScaleId`   | **`tight`**, `compact`, `default`, `grand`, **`display`**                                                | `default`  |
-| **Focus ring**         | `focusId`       | `ring`, `glow`, **`offset`**, `underline`, **`inset`**                                                   | `ring`     |
-
-**Shareable seeds:** `?theme=<32-bit-seed>` reproduces the full generated look (`generateSeededTheme`).
-
-### D. Orthogonal axes (work under any preset or custom look)
-
-| Axis             | Store field   | Options                                                      | Default   | Applied via                          |
-| ---------------- | ------------- | ------------------------------------------------------------ | --------- | ------------------------------------ |
-| **Base colour**  | `baseId`      | `neutral`, `stone`, `slate`, `olive`, **`zinc`**, **`warm`** | `neutral` | `data-base` (omitted when neutral)   |
-| **Menu style**   | `menu`        | `default`, `translucent`, **`glass`**                        | `default` | `data-menu`                          |
-| **Icon weight**  | `iconWeight`  | `thin` (1.5), `regular` (2), `bold` (2.5)                    | `regular` | `--icon-stroke`                      |
-| **Icon library** | `iconLibrary` | `lucide`, `tabler`, `phosphor`                               | `lucide`  | dynamic import in `icon-registry.ts` |
-
-### E. Toasts (not an axis)
-
-Retired in L-62: every toast is the clinic design's bar (`shared/notify/ToastBar.tsx`),
-bottom-centre. It follows the theme through `primary` / `primary-foreground` and the
-`--elevation-menu` shadow; there is no design or position to audit. Persist v7 drops the
-old `toastVariant` / `toastPosition` picks.
-
-### F. Layout shell preview (TEMP — shuffle-gated via `SHUFFLE_TEMP`)
+### Layout shell preview (TEMP)
 
 One design per surface: the app shell is the section bar alone (no axis — the sidebar,
 top-nav, rail and Focus previews and `appVariant` are gone). The auth and public layouts
@@ -182,11 +147,8 @@ still carry pre-launch previews, leftovers to remove:
 | **Auth layout**   | `authVariant`   | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.authLayout` off, L-65) / Split / Spotlight / Minimal |
 | **Public layout** | `publicVariant` | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.publicLayout` off, L-65) / Centered / Card / Brand   |
 
-### G. Environment lock
-
-| Env                    | Effect                                              |
-| ---------------------- | --------------------------------------------------- |
-| `VITE_THEME_LOCK=true` | Hides Appearance + Shuffle; pins code-defined theme |
+`VITE_THEME_LOCK=true` now only swaps the Appearance drawer's Mode card for the
+"managed by your organization" note.
 
 ---
 
@@ -196,10 +158,10 @@ Copy this checklist for **each** axis. Do not skip steps.
 
 ### Phase 0 — Understand the axis
 
-1. Read the axis definition in `src/shared/theme/presets.ts` (catalog + default + apply fn).
+1. Read the axis's hook and its values in the _Config catalog_ above.
 2. Find CSS hooks in `src/index.css` (`[data-*]` blocks or CSS vars).
 3. Note which **`data-slot`** values the axis targets (if any).
-4. Open Appearance → set axis to **most extreme** value (e.g. radius `sharp`, elevation `flat`, density `compact`).
+4. In the browser's devtools, set the hook to its **most extreme** value (e.g. `data-shape="sharp"`, `data-elevation="flat"`, `--spacing: 0.215rem` on `<html>`).
 5. Screenshot or mentally note: login, Today, settings modal, command palette, toast, tables.
 
 ### Phase 1 — Inventory violations
@@ -248,22 +210,18 @@ pnpm eslint --fix <changed-files>
 pnpm test -- --run <colocated-tests-for-touched-components>
 ```
 
-Radius / shape — measured, not eyeballed (needs clinozy-be on `:3000`):
+Measure, don't eyeball: with the hook set by hand, sweep the computed style the axis
+drives (e.g. `getComputedStyle(el).borderRadius` over every painted element under
+`data-shape="sharp"` and `--radius-lg: 0`). The Playwright sweep that did this from a
+seeded look was retired with the studio that could seed one.
 
-```bash
-pnpm exec playwright test tests/e2e/theme-shape.e2e.test.ts
-```
-
-It seeds radius None + Sharp and fails with the list of elements that still have a
-rounded corner. Add a screen or overlay to it when the audit touches one.
-
-Manual: Appearance → toggle axis across **all options** on:
+Manual: set the hook across **all its values** on:
 
 - `/login` (public card layout)
 - `/organization/acme/today` (Today — the role home for most roles)
-- Settings modal (`#settings/account/profile`)
+- Settings drawer (`#settings/account/profile`)
 - Command palette (⌘K)
-- Trigger a toast (Shuffle in Appearance)
+- A toast (any save)
 
 ### Phase 4 — Record
 

@@ -1,7 +1,7 @@
 import type { ComponentType, SVGProps } from 'react';
 
-/** Props every app icon accepts — the common SVG subset across icon libraries. */
+/** Props every app icon accepts — the SVG element's own. */
 export type IconProps = SVGProps<SVGSVGElement>;
 
-/** A swappable icon component — Lucide / Tabler / Phosphor all satisfy this. */
+/** An app icon component: a Lucide glyph or one of the vendored brand marks. */
 export type AppIcon = ComponentType<IconProps>;

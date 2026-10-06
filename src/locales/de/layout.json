@@ -127,8 +127,7 @@
     "theme": {
       "light": "Hell",
       "dark": "Dunkel",
-      "system": "System",
-      "shuffle": "Theme zufällig wählen"
+      "system": "System"
     },
     "sectionBar": {
       "nav": "Bereiche",

@@ -11,8 +11,8 @@ globs:
 
 # Preset product-design rules
 
-Before changing theme catalogs, `applyGeneratedTheme`, Appearance pickers, or
-dense product UI that relies on preset axes, read:
+Before changing the look (`presets.ts`, the look's blocks in `index.css`) or
+dense product UI that relies on the axis tokens, read:
 
 **`docs/reference/preset-product-design-rules.md`**
 
@@ -29,20 +29,22 @@ dense product UI that relies on preset axes, read:
    = transform-only). Honour `prefers-reduced-motion` → instant.
 5. **Touch:** Interactive targets ≥ **24×24 CSS px** (44×44 for primary on
    coarse pointer).
-6. **Layout:** Default **`contained`** shell; user picks **Standard / Full / Reading**
-   in Appearance → Layout (unless `VITE_LAYOUT_WIDTH` locks deploy).
+6. **Layout:** Default **`full`** shell (the launch's); a deployment can pin
+   **Standard** (`contained`) or **Reading** with `VITE_LAYOUT_WIDTH`.
 
-## Shuffle vs product defaults
+## The launch's defaults
 
-Shuffle may pick extreme axes for demos. Production defaults live in
-`DEFAULT_LOOK` (`presets.ts`): `cozy`, `default` type scale, `normal` contrast.
-Do not change defaults without updating the doc + `validate:theme-catalog`.
+The Appearance studio and Shuffle are retired (2026-10): the app wears one look,
+`clinozy-zinc-pastel`, and every axis renders at its default — comfortable
+density, the default type scale, normal contrast. Do not change a default without
+updating the doc + `validate:theme-catalog`.
 
 ## When implementing UI
 
 - Use relative type utilities (`text-sm`, `text-xs`), not px/arbitrary sub-12px.
 - Surfaces that participate in elevation/separation need `data-slot`.
-- Test Appearance at axis extremes once per feature area.
+- Set an axis hook by hand at its extremes once per feature area (playbook →
+  _Config catalog_).
 
 Full per-axis tables, external references (Atlassian, Material, Cloudscape,
 WCAG), and diagnostics: **`docs/reference/preset-product-design-rules.md`**.

@@ -9,7 +9,10 @@ Make **every UI surface respect Appearance / Shuffle config**. Work **one axis (
 
 **Canonical playbook (status tracker + catalog):** `docs/reference/theme-axis-audit-playbook.md`  
 **CSS hooks:** `src/index.css`  
-**Catalogs + apply fns:** `src/shared/theme/presets.ts`
+**The look:** `src/shared/theme/presets.ts` — one look, `clinozy-zinc-pastel`. The
+Appearance studio and Shuffle are retired (2026-10): nothing varies an axis at runtime,
+each renders at the launch's default, and an audit sets a hook by hand in devtools to
+see its other values (playbook → _Config catalog_).
 
 ---
 
@@ -27,10 +30,10 @@ Make **every UI surface respect Appearance / Shuffle config**. Work **one axis (
 
 ## Phase 0 — Understand the axis
 
-1. Read axis definition in `src/shared/theme/presets.ts` (catalog, default, `applyGeneratedTheme` / `applyDataAxis`).
+1. Read the axis's hook and values in the playbook's _Config catalog_.
 2. Find CSS in `src/index.css` (`[data-elevation]`, `[data-separation]`, CSS vars, etc.).
 3. List which **`data-slot`** values the axis targets.
-4. In Appearance, set axis to **each extreme** (e.g. elevation `flat` vs `lifted`, separation `border` vs `shadow`).
+4. In devtools, set the hook on `<html>` to **each extreme** (e.g. `data-elevation="flat"` vs `"lifted"`, `data-separation="border"` vs `"shadow"`).
 5. Note surfaces to verify: login, Today, settings modal, command palette, toast, tables.
 
 ---
@@ -93,15 +96,12 @@ pnpm test -- --run <colocated-tests-for-touched-paths>
 
 **Radius / shape — measure it.** Reading class strings missed the carousel arrows, the
 `lib/animations` skeletons and the nav markers; a computed-style sweep in a browser found
-all three in one run (needs clinozy-be on `:3000`):
-
-```bash
-pnpm exec playwright test tests/e2e/theme-shape.e2e.test.ts
-```
-
-It seeds radius None + Sharp and must return **no** element with a rounded corner (status
-dots ≤ 10px, blurred glows and dev tooling are exempt by rule, never by selector). Extend
-it when the audit touches a new screen or overlay. For any other axis with a computable
+all three in one run. The Appearance studio is retired (2026-10, the one look
+`clinozy-zinc-pastel`), and the seeded-look spec that ran that sweep with it: set the
+hook by hand on `<html>` (`data-shape="sharp"`, `--radius-lg: 0`) and sweep the computed
+`border-radius` of every painted element — it must return **no** rounded element (status
+dots ≤ 10px, blurred glows and dev tooling are exempt by rule, never by selector). For any
+other axis with a computable
 effect, prefer the same shape of test — sweep + a control on the default look — over a
 manual toggle.
 

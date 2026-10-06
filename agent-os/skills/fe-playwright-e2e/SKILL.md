@@ -160,8 +160,9 @@ undecided (`consent-card.e2e.test.ts`).
 `@theme` nor `calc()`, so a unit test can only pin the stylesheet's _text_. When the
 claim is "nothing on this screen still has X", ask the browser: one `page.evaluate` over
 `body *` that returns a description of every offender, asserted `toEqual([])` so the
-failure message **is** the to-do list (`theme-shape.e2e.test.ts` — it found three misses
-grep had not). Three rules keep such a sweep honest:
+failure message **is** the to-do list (the radius/shape sweep, `theme-shape.e2e.test.ts`
+until the theme studio retired — it found three misses grep had not). Three rules keep
+such a sweep honest:
 
 - **Exempt by rule, never by selector** ("at most 10px", "blurred", "dev tooling") — a
   selector list is an allowlist nobody reviews.

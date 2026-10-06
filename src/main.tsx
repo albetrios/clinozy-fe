@@ -32,12 +32,10 @@ import {
   startAuthBootstrap,
 } from '@/shared/auth/service.ts';
 import { hasSessionHint } from '@/shared/auth/session-lifetime.ts';
-import { initDeferredIconSets } from '@/shared/icons/icon-registry.ts';
 import {
   hasAnalyticsConsent,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { resolveOrganizationFromSubdomain } from '@/shared/tenancy/tenancy-service.ts';
 
 import App from './App.tsx';
@@ -99,16 +97,6 @@ const root = createRoot(document.getElementById('root')!);
 resolveOrganizationFromSubdomain();
 bootstrapResources();
 
-// Apply a shared theme seed (?theme=<seed>) before render, then strip the param so
-// it never reaches the router's search validation. Reproduces any shared look.
-const themeSeedParam = new URLSearchParams(window.location.search).get('theme');
-if (themeSeedParam && /^\d+$/.test(themeSeedParam)) {
-  useThemeStore.getState().applyThemeSeed(Number(themeSeedParam));
-  const url = new URL(window.location.href);
-  url.searchParams.delete('theme');
-  window.history.replaceState(null, '', url.toString());
-}
-
 // Playwright E2E hooks (`navigateInApp`, `establishSession`, Turnstile readiness).
 // Env-gated (VITE_E2E_HOOKS) — on locally, off in every deployed build.
 if (platformConfig.e2eHooks) {
@@ -165,9 +153,6 @@ preloadBootRoutes({ likelySignedIn: hasSessionHint() });
 
 // Initialize observability/analytics after splash dismiss + idle (auth funnels stay lean).
 initObservabilityWhenIdle();
-
-// Alt icon libraries (Phosphor/Tabler) load after auth — Lucide covers first paint.
-initDeferredIconSets();
 
 // Recover from a lazy chunk that a newer deploy has already renamed away: one
 // reload onto the current build per buildId, never over a field being typed in.

@@ -1,5 +1,11 @@
 # Preset product-design rules
 
+> **Status (2026-10, L-65):** the Appearance studio and Shuffle are retired. The app
+> wears one look, `clinozy-zinc-pastel`, at the launch's default for every axis
+> ([theming.md](theming.md) → _The axes, at the launch's defaults_). These floors still
+> bind that look — and any future one; the per-axis option ranges below describe the
+> catalogs the studio offered, kept as the reasoning behind the defaults.
+
 **What:** Canonical rules for configuring and consuming Appearance / Shuffle
 presets in a **product UI** (admin, dashboards, settings, data tools) — not
 marketing landings.

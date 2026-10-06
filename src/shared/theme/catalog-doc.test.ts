@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import { CATALOG_OPTION_IDS } from './catalog-doc.ts';
-import { BASE_COLORS, ELEVATION_LEVELS, MOTION_PRESETS } from './presets.ts';
+import { THEME_DOC_ASSERTIONS } from './catalog-doc.ts';
+import { THEME_ID } from './presets.ts';
 
 describe('catalog-doc', () => {
-  it('derives base colour ids from BASE_COLORS', () => {
-    expect(CATALOG_OPTION_IDS.baseColors).toEqual(BASE_COLORS.map((c) => c.id));
+  it('asks every theming doc to name the one look', () => {
+    for (const [doc, assertions] of Object.entries(THEME_DOC_ASSERTIONS)) {
+      expect(
+        assertions.some((assertion) => assertion.mustInclude.includes(THEME_ID)),
+        doc,
+      ).toBe(true);
+    }
   });
 
-  it('derives elevation ids from ELEVATION_LEVELS', () => {
-    expect(CATALOG_OPTION_IDS.elevation).toEqual(ELEVATION_LEVELS.map((e) => e.id));
-  });
-
-  it('derives motion ids from MOTION_PRESETS', () => {
-    expect(CATALOG_OPTION_IDS.motion).toEqual(Object.keys(MOTION_PRESETS));
+  it('keeps the retired studio out of each of them', () => {
+    for (const [doc, assertions] of Object.entries(THEME_DOC_ASSERTIONS)) {
+      const excluded = assertions.flatMap((assertion) => assertion.mustExclude ?? []);
+      expect(excluded, doc).toEqual(expect.arrayContaining(['?theme=', 'shuffleTheme']));
+    }
   });
 });

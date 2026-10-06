@@ -17,7 +17,6 @@ import type {
 } from '@/shared/layouts/AppLayout/section-bar-nav.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import {
   layoutMainClassName,
@@ -243,9 +242,8 @@ let scrollResetBound = false;
  * cross-tab logout broadcast — funnels through the auth service's
  * `clearLocalAuthState()`, and its one effect observable from here is
  * `useAuthStore.clearAuth()`. Watching that one transition therefore covers all
- * of them without this shell having to know about any of them, and follows the
- * store-subscription pattern already used for auth transitions in
- * `shared/icons/icon-registry.ts`.
+ * of them without this shell having to know about any of them — a plain
+ * subscription to the auth store's transition.
  *
  * Bound once from the first `AppMain` mount and deliberately never unbound. The
  * offset it guards cannot be non-zero unless `AppMain` has mounted, so binding
@@ -272,11 +270,7 @@ function bindScrollResetToSession(): void {
 export function AppMain({ flush = false }: { flush?: boolean } = {}) {
   const { t } = useTranslation(ERRORS_NS);
   const mainRef = useRef<HTMLElement>(null);
-  const layoutPreference = useThemeStore((s) => s.layoutWidth);
-  const layoutWidth = resolveEffectiveLayoutWidth(
-    platformConfig.layoutWidthForced,
-    layoutPreference,
-  );
+  const layoutWidth = resolveEffectiveLayoutWidth(platformConfig.layoutWidthForced);
 
   useEffect(() => {
     bindScrollResetToSession();

@@ -127,8 +127,7 @@
     "theme": {
       "light": "라이트",
       "dark": "다크",
-      "system": "시스템",
-      "shuffle": "테마 셔플"
+      "system": "시스템"
     },
     "sectionBar": {
       "nav": "섹션",

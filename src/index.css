@@ -284,8 +284,8 @@
   --breakpoint-3xl: 120rem;
   --breakpoint-4xl: 160rem;
 
-  /* Radii. `sm`/`md`/`lg`/`xl` are the ones the Corner radius axis sets inline
-     (presets.ts). Every OTHER step DERIVES from `--radius-lg`, so `rounded-xs`,
+  /* Radii. `sm`/`md`/`lg`/`xl` are the ones the old Corner radius axis set
+     inline. Every OTHER step DERIVES from `--radius-lg`, so `rounded-xs`,
      `rounded-2xl`… follow the axis too: left at Tailwind's fixed defaults they
      kept a 16px corner under radius "None", which is how the dashboard hero
      stayed round in an otherwise square app. With the default `lg` of 0.5rem
@@ -550,104 +550,6 @@
   --color-tone-slate-border: oklch(0.4 0.024 255);
 }
 
-/* ── Theme presets (data-theme) — accent overrides, composed with .dark ── */
-[data-theme='violet'] {
-  --color-primary: oklch(0.55 0.22 290);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.55 0.22 290);
-  --color-sidebar-primary: oklch(0.55 0.22 290);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 290);
-  --color-chart-2: oklch(0.66 0.15 314);
-  --color-chart-3: oklch(0.62 0.16 266);
-  --color-chart-4: oklch(0.72 0.13 338);
-  --color-chart-5: oklch(0.52 0.17 278);
-}
-.dark[data-theme='violet'] {
-  --color-primary: oklch(0.62 0.19 290);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.62 0.19 290);
-  --color-sidebar-primary: oklch(0.62 0.19 290);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 290);
-  --color-chart-2: oklch(0.78 0.15 314);
-  --color-chart-3: oklch(0.68 0.16 266);
-  --color-chart-4: oklch(0.82 0.13 338);
-  --color-chart-5: oklch(0.62 0.17 278);
-}
-[data-theme='emerald'] {
-  --color-primary: oklch(0.6 0.14 162);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.6 0.14 162);
-  --color-sidebar-primary: oklch(0.6 0.14 162);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 162);
-  --color-chart-2: oklch(0.66 0.15 186);
-  --color-chart-3: oklch(0.62 0.16 138);
-  --color-chart-4: oklch(0.72 0.13 210);
-  --color-chart-5: oklch(0.52 0.17 150);
-}
-.dark[data-theme='emerald'] {
-  --color-primary: oklch(0.7 0.15 162);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-ring: oklch(0.7 0.15 162);
-  --color-sidebar-primary: oklch(0.7 0.15 162);
-  --color-sidebar-primary-foreground: oklch(0.205 0 0);
-  --color-chart-1: oklch(0.72 0.17 162);
-  --color-chart-2: oklch(0.78 0.15 186);
-  --color-chart-3: oklch(0.68 0.16 138);
-  --color-chart-4: oklch(0.82 0.13 210);
-  --color-chart-5: oklch(0.62 0.17 150);
-}
-[data-theme='rose'] {
-  --color-primary: oklch(0.58 0.21 12);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.58 0.21 12);
-  --color-sidebar-primary: oklch(0.58 0.21 12);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 12);
-  --color-chart-2: oklch(0.66 0.15 36);
-  --color-chart-3: oklch(0.62 0.16 348);
-  --color-chart-4: oklch(0.72 0.13 60);
-  --color-chart-5: oklch(0.52 0.17 0);
-}
-.dark[data-theme='rose'] {
-  --color-primary: oklch(0.65 0.19 12);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.65 0.19 12);
-  --color-sidebar-primary: oklch(0.65 0.19 12);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 12);
-  --color-chart-2: oklch(0.78 0.15 36);
-  --color-chart-3: oklch(0.68 0.16 348);
-  --color-chart-4: oklch(0.82 0.13 60);
-  --color-chart-5: oklch(0.62 0.17 0);
-}
-[data-theme='ocean'] {
-  --color-primary: oklch(0.55 0.16 230);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.55 0.16 230);
-  --color-sidebar-primary: oklch(0.55 0.16 230);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 230);
-  --color-chart-2: oklch(0.66 0.15 254);
-  --color-chart-3: oklch(0.62 0.16 206);
-  --color-chart-4: oklch(0.72 0.13 278);
-  --color-chart-5: oklch(0.52 0.17 218);
-}
-.dark[data-theme='ocean'] {
-  --color-primary: oklch(0.62 0.14 230);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.62 0.14 230);
-  --color-sidebar-primary: oklch(0.62 0.14 230);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 230);
-  --color-chart-2: oklch(0.78 0.15 254);
-  --color-chart-3: oklch(0.68 0.16 206);
-  --color-chart-4: oklch(0.82 0.13 278);
-  --color-chart-5: oklch(0.62 0.17 218);
-}
-
 /* ── Base colour (data-base) — tint the neutral surfaces/borders, keeping each
    token's per-mode lightness so light/dark stay correct. `neutral` = no block. */
 [data-base='stone'] {
@@ -781,11 +683,12 @@
   --color-sidebar-border: oklch(0.32 0.018 75);
 }
 
-/* ── Named preset: Clinozy Zinc Pastel (`clinozy-zinc-pastel`) — FULL-SURFACE ──
-   Unlike the accent presets above it sets every surface token, so it sits after
-   the base-colour blocks: a stored `data-base` does not tint its zinc surfaces.
-   Light here (also what prints), dark below. Values: the design's preset
-   (`preset.md`, prototype H:11 / H:12) — KICKOFF §3.1. */
+/* ── The app's one look: Clinozy Zinc Pastel (`clinozy-zinc-pastel`) ──
+   `public/theme-init.js` and `applyTheme()` put it on <html>. It sets every
+   surface token, so it sits after the base-colour blocks: a `data-base` does
+   not tint its zinc surfaces. Light here (also what prints), dark below.
+   Values: the design's preset (`preset.md`, prototype H:11 / H:12) —
+   KICKOFF §3.1. */
 [data-theme='clinozy-zinc-pastel'] {
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.141 0.004 285.8);
@@ -930,8 +833,7 @@
     --color-ring: oklch(0.274 0.005 286);
   }
 }
-/* Surfaces — the design's shadows on the platform slots (other presets keep
-   each primitive's own shadow; a generated look uses the Elevation axis). */
+/* Surfaces — the design's shadows on the platform slots. */
 [data-theme='clinozy-zinc-pastel'] [data-slot='card'] {
   box-shadow: var(--elevation-card);
 }
@@ -1058,44 +960,6 @@
     --drawer-body-pad: 0.875rem 1rem 1.25rem;
     --drawer-footer-pad: 0.625rem 0.75rem calc(0.625rem + env(safe-area-inset-bottom));
   }
-}
-
-/* ── Accent swatches (Appearance pickers) — fixed catalog hues ── */
-.theme-dot-rose {
-  background-color: oklch(0.58 0.21 12);
-}
-.theme-dot-orange {
-  background-color: oklch(0.58 0.21 50);
-}
-.theme-dot-amber {
-  background-color: oklch(0.58 0.21 75);
-}
-.theme-dot-lime {
-  background-color: oklch(0.58 0.21 130);
-}
-.theme-dot-emerald {
-  background-color: oklch(0.58 0.21 160);
-}
-.theme-dot-teal {
-  background-color: oklch(0.58 0.21 190);
-}
-.theme-dot-blue {
-  background-color: oklch(0.58 0.21 255);
-}
-.theme-dot-violet {
-  background-color: oklch(0.58 0.21 290);
-}
-.theme-dot-pink {
-  background-color: oklch(0.58 0.21 350);
-}
-/* Named-preset swatch: the Clinozy ink and one section tone. The picker lists
-   named presets as text today, so nothing draws it yet. */
-.theme-dot-clinozy-zinc-pastel {
-  background: linear-gradient(
-    135deg,
-    oklch(0.21 0.006 285.9) 50%,
-    oklch(0.925 0.045 150) 50%
-  );
 }
 
 /* ── Menu style (data-menu) — translucent dropdowns/popovers/selects ── */
@@ -1605,32 +1469,27 @@
     direction: ltr;
     unicode-bidi: isolate;
   }
-  /* Icon weight — Lucide/Tabler stroke-width, driven by the Appearance picker.
-     (Phosphor uses fixed path weights, so it ignores this.) */
-  svg.lucide,
-  svg.tabler-icon {
-    stroke-width: var(--icon-stroke, 2);
+  /* Icon weight — the Lucide stroke. The launch's look draws the thin 1.5
+     (the Appearance picker that varied it is retired; `--icon-stroke` stays
+     the one knob). */
+  svg.lucide {
+    stroke-width: var(--icon-stroke, 1.5);
     color: var(--icon-app-color, currentColor);
   }
 
-  [data-icon-color='foreground'] svg.lucide,
-  [data-icon-color='foreground'] svg.tabler-icon {
+  [data-icon-color='foreground'] svg.lucide {
     --icon-app-color: var(--color-foreground);
   }
-  [data-icon-color='muted'] svg.lucide,
-  [data-icon-color='muted'] svg.tabler-icon {
+  [data-icon-color='muted'] svg.lucide {
     --icon-app-color: var(--color-muted-foreground);
   }
-  [data-icon-color='primary'] svg.lucide,
-  [data-icon-color='primary'] svg.tabler-icon {
+  [data-icon-color='primary'] svg.lucide {
     --icon-app-color: var(--color-primary);
   }
-  [data-icon-color='accent'] svg.lucide,
-  [data-icon-color='accent'] svg.tabler-icon {
+  [data-icon-color='accent'] svg.lucide {
     --icon-app-color: var(--color-primary);
   }
-  [data-icon-color='destructive'] svg.lucide,
-  [data-icon-color='destructive'] svg.tabler-icon {
+  [data-icon-color='destructive'] svg.lucide {
     --icon-app-color: var(--color-destructive);
   }
 

@@ -127,8 +127,7 @@
     "theme": {
       "light": "लाइट",
       "dark": "डार्क",
-      "system": "सिस्टम",
-      "shuffle": "थीम शफ़ल करें"
+      "system": "सिस्टम"
     },
     "sectionBar": {
       "nav": "अनुभाग",

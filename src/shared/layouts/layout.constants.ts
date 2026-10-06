@@ -33,7 +33,6 @@ export const LAYOUT_KEYS = {
       light: 'app.theme.light',
       dark: 'app.theme.dark',
       system: 'app.theme.system',
-      shuffle: 'app.theme.shuffle',
     },
     search: 'app.search',
     searchShortcutMac: 'app.searchShortcutMac',

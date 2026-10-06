@@ -127,8 +127,7 @@
     "theme": {
       "light": "Chiaro",
       "dark": "Scuro",
-      "system": "Sistema",
-      "shuffle": "Tema casuale"
+      "system": "Sistema"
     },
     "sectionBar": {
       "nav": "Sezioni",

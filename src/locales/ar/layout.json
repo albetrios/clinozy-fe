@@ -127,8 +127,7 @@
     "theme": {
       "light": "فاتح",
       "dark": "داكن",
-      "system": "النظام",
-      "shuffle": "تبديل عشوائي للسمة"
+      "system": "النظام"
     },
     "sectionBar": {
       "nav": "الأقسام",

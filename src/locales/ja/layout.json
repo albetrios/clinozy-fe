@@ -127,8 +127,7 @@
     "theme": {
       "light": "ライト",
       "dark": "ダーク",
-      "system": "システム",
-      "shuffle": "テーマをシャッフル"
+      "system": "システム"
     },
     "sectionBar": {
       "nav": "セクション",

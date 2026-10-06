@@ -1,105 +1,48 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import {
-  applyBaseColor,
-  applyGeneratedTheme,
-  applyIconColor,
-  applyIconWeight,
-  applyMenuStyle,
-  applyThemePreset,
-  BASE_PRESET,
-  DEFAULT_BASE,
-  DEFAULT_ICON_COLOR,
-  DEFAULT_ICON_LIBRARY,
-  DEFAULT_ICON_WEIGHT,
-  DEFAULT_LAYOUT_WIDTH,
-  DEFAULT_MENU,
-  DEFAULT_PRESET,
-  GENERATED_PRESET,
-  type GeneratedTheme,
-  generateSeededTheme,
-  isThemePreset,
-  type LayoutWidthId,
-  nextAuthVariant,
-  nextPublicVariant,
-  normalizeLayoutWidthId,
-  normalizeLook,
-  presetAxisDefaults,
-  randomSeed,
-  releaseBootThemeVars,
-  SHUFFLE_TEMP,
-  shuffleIcons,
-} from '@/shared/theme/index.ts';
+import { applyTheme } from '@/shared/theme/index.ts';
 
 type Mode = 'light' | 'dark' | 'system';
+
+const MODES: readonly string[] = ['light', 'dark', 'system'] satisfies readonly Mode[];
 
 interface ThemeStore {
   /** Light/dark mode. */
   theme: Mode;
-  /** Active named accent preset (see `shared/theme`); `custom` when generated. */
-  preset: string;
-  /** The active generated look (accent + chart + fonts + radius) when custom. */
-  customTheme: GeneratedTheme | null;
-  /** Neutral base colour (orthogonal — applies under any preset). */
-  baseId: string;
-  /** Menu surface style (orthogonal). */
-  menu: string;
-  /** Icon weight — Lucide stroke-width (orthogonal). */
-  iconWeight: string;
-  /** Icon colour — semantic token via data-icon-color (orthogonal). */
-  iconColor: string;
-  /** Icon library — lucide (default) | tabler | phosphor (orthogonal). */
-  iconLibrary: string;
-  /** TEMP: AuthLayout preview design index (0..2); rolled by shuffle. */
+  /** TEMP: AuthLayout preview design index; 0, the default, is the launch's canvas. */
   authVariant: number;
-  /** TEMP: PublicLayout preview shell index (0..2); rolled by shuffle. */
+  /** TEMP: PublicLayout preview shell index; 0, the default, is the launch's canvas. */
   publicVariant: number;
-  /** Seed of the active generated look — enables shareable `?theme=<seed>` +
-   *  reproducible shuffles. null on a named preset or a hand-tweaked look. */
-  seed: number | null;
-  /** Main content shell width (orthogonal — Appearance → Layout). */
-  layoutWidth: LayoutWidthId;
   setTheme: (theme: Mode) => void;
-  setPreset: (preset: string) => void;
-  /** Set one axis of the custom look (accent/chart/font/radius); switches to custom. */
-  updateLook: (partial: Partial<GeneratedTheme>) => void;
-  setBaseColor: (id: string) => void;
-  setMenu: (id: string) => void;
-  setIconWeight: (id: string) => void;
-  setIconColor: (id: string) => void;
-  setIconLibrary: (id: string) => void;
-  /** Set app main content width (contained | full | reading). */
-  setLayoutWidth: (id: LayoutWidthId) => void;
-  /** Apply a specific seed's look (shareable `?theme=<seed>` / reproducible). */
-  applyThemeSeed: (seed: number) => void;
-  /** Generate + apply a fresh full look from a new random seed. */
-  shuffleTheme: () => void;
 }
 
-/** What a fresh install starts on: the default preset's own axes over the
- *  platform defaults, light mode (the design's default — System follows the OS
- *  once chosen). */
-const FIRST_VISIT_AXES = presetAxisDefaults(DEFAULT_PRESET);
-const FIRST_VISIT_ICON_WEIGHT = FIRST_VISIT_AXES.iconWeight ?? DEFAULT_ICON_WEIGHT;
-const FIRST_VISIT_LAYOUT_WIDTH = FIRST_VISIT_AXES.layoutWidth ?? DEFAULT_LAYOUT_WIDTH;
+/**
+ * The persisted mode, or the default — light, the design's default — for
+ * anything else: a missing value, a corrupt one, or a payload from a build that
+ * never had this key.
+ */
+function readMode(persisted: unknown): Mode {
+  const theme =
+    persisted && typeof persisted === 'object'
+      ? (persisted as { theme?: unknown }).theme
+      : undefined;
+  return typeof theme === 'string' && MODES.includes(theme) ? (theme as Mode) : 'light';
+}
 
 /**
- * Fields older versions persisted that the store no longer has: the TEMP shell
- * previews (v4) and the toast design + position previews (v7 — every toast is
- * the design's bottom bar now). Dropped on load, so no old pick lingers.
+ * The resolved palette the retired generated looks left for the boot script
+ * (`theme-boot-vars`). Nothing reads it any more; cleared once, with the
+ * migration that retires the looks.
  */
-const RETIRED_FIELDS = [
-  'authVariant',
-  'appVariant',
-  'publicVariant',
-  'toastVariant',
-  'toastPosition',
-] as const;
+const RETIRED_BOOT_SNAPSHOT_KEY = 'theme-boot-vars';
 
-/** Drop {@link RETIRED_FIELDS} from a persisted state being migrated. */
-function dropRetiredFields(persisted: Record<string, unknown>): void {
-  for (const field of RETIRED_FIELDS) delete persisted[field];
+function dropRetiredBootSnapshot(): void {
+  try {
+    localStorage.removeItem(RETIRED_BOOT_SNAPSHOT_KEY);
+  } catch {
+    // Storage unavailable (private mode): nothing was written there either.
+  }
 }
 
 function applyMode(theme: Mode) {
@@ -111,196 +54,43 @@ function applyMode(theme: Mode) {
   } else {
     root.classList.remove('dark');
   }
-
-  // The class above is only half the switch. `theme-init.js` pinned the splash
-  // palette INLINE on <html> for the mode the document booted in, and an inline
-  // custom property outranks `.dark`, so --color-background / --color-foreground
-  // / --color-muted would stay on the old mode while every token the app owns
-  // flips — a half-dark page that only a reload repairs. This is the one place
-  // the mode is ever applied, so it is the one place that has to let them go.
-  releaseBootThemeVars();
 }
 
 /**
- * Re-assert the active look on `<html>`. Boot and every mode change run the same
- * path so the generated accent — and the boot snapshot `applyGeneratedTheme`
- * leaves for the next cold load — always describes the mode now on screen.
+ * The mode — light, dark or the OS's — over the app's one look. Persisted on
+ * the device (`theme-preference`); `public/theme-init.js` applies the same mode
+ * and look before first paint, so the boot never flashes the other one.
  */
-function applyActiveLook(preset: string, customTheme: GeneratedTheme | null): void {
-  if (preset === GENERATED_PRESET && customTheme != null) {
-    applyGeneratedTheme(customTheme);
-  } else {
-    applyThemePreset(preset);
-  }
-}
-
 export const useThemeStore = create<ThemeStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       theme: 'light',
-      preset: DEFAULT_PRESET,
-      customTheme: null,
-      baseId: DEFAULT_BASE,
-      menu: DEFAULT_MENU,
-      iconWeight: FIRST_VISIT_ICON_WEIGHT,
-      iconColor: DEFAULT_ICON_COLOR,
-      iconLibrary: DEFAULT_ICON_LIBRARY,
       authVariant: 0,
       publicVariant: 0,
-      seed: null,
-      layoutWidth: FIRST_VISIT_LAYOUT_WIDTH,
       setTheme: (theme) => {
         applyMode(theme);
-        // Re-taken for the new mode: the snapshot the boot script replays is
-        // tagged with the mode it was captured in, so without this the next cold
-        // load finds a stale tag, skips the fast path, and the splash paints the
-        // base palette until React catches up.
-        applyActiveLook(get().preset, get().customTheme);
         set({ theme });
-      },
-      setPreset: (preset) => {
-        const next = isThemePreset(preset) ? preset : BASE_PRESET;
-        applyThemePreset(next);
-        // A preset designed with its own icon weight / layout width brings them.
-        const axes = presetAxisDefaults(next);
-        if (axes.iconWeight) applyIconWeight(axes.iconWeight);
-        set({
-          preset: next,
-          customTheme: null,
-          seed: null,
-          ...(axes.iconWeight ? { iconWeight: axes.iconWeight } : {}),
-          ...(axes.layoutWidth ? { layoutWidth: axes.layoutWidth } : {}),
-        });
-      },
-      updateLook: (partial) => {
-        // Change one axis of the current look and switch to custom. A hand-tweaked
-        // look no longer maps to a seed, so clear it. A look started from a named
-        // preset keeps the accent intensity that preset was designed with.
-        const { intensityId } = presetAxisDefaults(get().preset);
-        const seed = get().customTheme ?? (intensityId ? { intensityId } : null);
-        const next = { ...normalizeLook(seed), ...partial };
-        applyGeneratedTheme(next);
-        set({ preset: GENERATED_PRESET, customTheme: next, seed: null });
-      },
-      setBaseColor: (id) => {
-        applyBaseColor(id);
-        set({ baseId: id });
-      },
-      setMenu: (id) => {
-        applyMenuStyle(id);
-        set({ menu: id });
-      },
-      setIconWeight: (id) => {
-        applyIconWeight(id);
-        set({ iconWeight: id });
-      },
-      setIconColor: (id) => {
-        applyIconColor(id);
-        set({ iconColor: id });
-      },
-      setIconLibrary: (id) => {
-        // The @/shared/icons barrel subscribes to this and lazy-loads the set.
-        set({ iconLibrary: id });
-      },
-      setLayoutWidth: (id) => {
-        set({ layoutWidth: normalizeLayoutWidthId(id) });
-      },
-      applyThemeSeed: (seed) => {
-        // Reproduce a specific look from its seed (shared link / QA). Icons + TEMP
-        // previews are orthogonal to the seed, so they're left as-is.
-        const look = generateSeededTheme(seed);
-        applyGeneratedTheme(look);
-        set({ preset: GENERATED_PRESET, customTheme: look, seed });
-      },
-      shuffleTheme: () => {
-        // A fresh random seed → a fully reproducible look (colour + chart + fonts +
-        // radius + density/motion/elevation/contrast). Icons ride along: sometimes
-        // a new weight, sometimes a different library.
-        const seed = randomSeed();
-        const next = generateSeededTheme(seed);
-        applyGeneratedTheme(next);
-        const icons = shuffleIcons({
-          weight: get().iconWeight,
-          library: get().iconLibrary,
-          color: get().iconColor,
-        });
-        applyIconWeight(icons.weight);
-        applyIconColor(icons.color);
-        set({
-          preset: GENERATED_PRESET,
-          customTheme: next,
-          seed,
-          iconWeight: icons.weight,
-          iconColor: icons.color,
-          iconLibrary: icons.library,
-          // TEMP previews — each gated by a SHUFFLE_TEMP switch (flip on/off on
-          // request); when off, shuffle leaves that axis untouched.
-          authVariant: SHUFFLE_TEMP.authLayout
-            ? nextAuthVariant(get().authVariant)
-            : get().authVariant,
-          publicVariant: SHUFFLE_TEMP.publicLayout
-            ? nextPublicVariant(get().publicVariant)
-            : get().publicVariant,
-        });
       },
     }),
     {
       name: 'theme-preference',
-      version: 7,
-      migrate: (persisted, version) => {
-        if (persisted && typeof persisted === 'object') {
-          const next: Record<string, unknown> = { ...persisted };
-          if (version < 2) {
-            next.iconColor = DEFAULT_ICON_COLOR;
-          }
-          if (version < 3) {
-            next.layoutWidth = DEFAULT_LAYOUT_WIDTH;
-          }
-          // v4 ships a named preset as the default. Whoever was still on the old
-          // default (the base palette) never picked one, so they move to the new
-          // default with its axes — unless they had changed an axis themselves.
-          // `public/theme-init.js` mirrors this for the pre-paint.
-          if (version < 4 && (next.preset === undefined || next.preset === BASE_PRESET)) {
-            next.preset = DEFAULT_PRESET;
-            if (
-              next.iconWeight === undefined ||
-              next.iconWeight === DEFAULT_ICON_WEIGHT
-            ) {
-              next.iconWeight = FIRST_VISIT_ICON_WEIGHT;
-            }
-            if (
-              next.layoutWidth === undefined ||
-              next.layoutWidth === DEFAULT_LAYOUT_WIDTH
-            ) {
-              next.layoutWidth = FIRST_VISIT_LAYOUT_WIDTH;
-            }
-          }
-          dropRetiredFields(next);
-          return next as unknown as ThemeStore;
-        }
-        return persisted as ThemeStore;
+      // v8 retires the Appearance studio: presets, the generated look and its
+      // seed, base colour, menu style, icon weight / colour / library and the
+      // content width are no longer the user's to pick. Only the mode survives
+      // the migration; every other field an earlier build saved is dropped, so
+      // no old value can reach the page.
+      version: 8,
+      migrate: (persisted) => {
+        dropRetiredBootSnapshot();
+        return { theme: readMode(persisted) } as ThemeStore;
       },
-      partialize: (state) => ({
-        theme: state.theme,
-        preset: state.preset,
-        customTheme: state.customTheme,
-        baseId: state.baseId,
-        menu: state.menu,
-        iconWeight: state.iconWeight,
-        iconColor: state.iconColor,
-        iconLibrary: state.iconLibrary,
-        seed: state.seed,
-        layoutWidth: state.layoutWidth,
-      }),
+      // A stored mode outside the three (a hand edit, a corrupt write) falls
+      // back to light instead of reaching the page.
+      merge: (persisted, current) => ({ ...current, theme: readMode(persisted) }),
+      partialize: (state) => ({ theme: state.theme }),
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          applyMode(state.theme);
-          applyBaseColor(state.baseId ?? DEFAULT_BASE);
-          applyMenuStyle(state.menu ?? DEFAULT_MENU);
-          applyIconWeight(state.iconWeight ?? DEFAULT_ICON_WEIGHT);
-          applyIconColor(state.iconColor ?? DEFAULT_ICON_COLOR);
-          applyActiveLook(state.preset, state.customTheme);
-        }
+        applyMode(state?.theme ?? 'light');
+        applyTheme();
       },
     },
   ),
@@ -312,10 +102,8 @@ const themeListenerController = new AbortController();
 if (typeof window !== 'undefined') {
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   const handler = () => {
-    const { theme, preset, customTheme } = useThemeStore.getState();
-    if (theme !== 'system') return;
+    if (useThemeStore.getState().theme !== 'system') return;
     applyMode('system');
-    applyActiveLook(preset, customTheme);
   };
 
   mediaQuery.addEventListener('change', handler, {

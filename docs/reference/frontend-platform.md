@@ -248,7 +248,8 @@ Migrated panels: `OrganizationMembersPanel`, `OrganizationRolesPanel`,
 ## Loading Contract
 
 Settings, appearance, and search keep their ready shell and static controls
-visible. Skeletons belong only to unavailable dynamic content and reserve the
+visible (a drawer that loads on demand shows its own frame — title, sub line,
+card bars — while its chunk is in flight). Skeletons belong only to unavailable dynamic content and reserve the
 space that content will occupy. Existing content stays visible during refetch;
 unknown authentication or permission state must not expose actionable controls.
 

@@ -111,8 +111,6 @@ export default defineConfig(({ command, mode }) => {
             '**/sentry-*.js',
             '**/posthog-*.js',
             '**/SettingsModal-*.js',
-            '**/iconset-phosphor-*.js',
-            '**/iconset-tabler-*.js',
             '**/CommandPalette-*.js',
             '**/AppearanceDialog-*.js',
           ],

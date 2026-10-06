@@ -45,55 +45,35 @@ async function freshStore() {
   return (await import('./useThemeStore.ts')).useThemeStore;
 }
 
-/** What `public/theme-init.js` leaves inline after painting the splash in light. */
-function pinLightBootPalette() {
-  const root = document.documentElement;
-  root.style.setProperty('--color-background', 'oklch(1 0 0)');
-  root.style.setProperty('--color-foreground', 'oklch(0.145 0 0)');
-  root.style.setProperty('--color-card', 'oklch(1 0 0)');
-}
-
 /**
- * `system` mode follows the OS, so an OS flip is a third way into
- * `applyMode` — and it carried the same half-switched page as the in-app
- * switcher, with no click to blame it on.
+ * `system` mode follows the OS, so an OS flip is a third way into `applyMode`
+ * beside the in-app switcher and the boot.
  */
 describe('useThemeStore — OS colour-scheme changes', () => {
   afterEach(() => {
-    const root = document.documentElement;
-    for (const name of ['--color-background', '--color-foreground', '--color-card']) {
-      root.style.removeProperty(name);
-    }
-    root.classList.remove('dark');
+    document.documentElement.classList.remove('dark');
     vi.resetModules();
   });
 
-  it('an OS flip to dark switches the page whole, boot palette included', async () => {
+  it('an OS flip switches system mode with it', async () => {
     const media = installMatchMedia(false);
     const useThemeStore = await freshStore();
     useThemeStore.setState({ theme: 'system' });
-    pinLightBootPalette();
 
     media.flip(true);
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
 
-    const root = document.documentElement;
-    expect(root.classList.contains('dark')).toBe(true);
-    expect(root.style.getPropertyValue('--color-background')).toBe('');
-    expect(root.style.getPropertyValue('--color-foreground')).toBe('');
-    expect(root.style.getPropertyValue('--color-card')).toBe('');
+    media.flip(false);
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 
   it('leaves a pinned mode alone when the OS flips under it', async () => {
     const media = installMatchMedia(false);
     const useThemeStore = await freshStore();
     useThemeStore.setState({ theme: 'light' });
-    pinLightBootPalette();
 
     media.flip(true);
 
-    const root = document.documentElement;
-    expect(root.classList.contains('dark')).toBe(false);
-    // Nothing ran, so the boot palette is still where theme-init.js left it.
-    expect(root.style.getPropertyValue('--color-background')).toBe('oklch(1 0 0)');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 });

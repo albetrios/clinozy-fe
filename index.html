@@ -49,24 +49,23 @@
     <title>{{PRODUCT_NAME}}</title>
     <!-- Runtime config from Docker entrypoint (noop in dev) -->
     <script src="/config.js" defer></script>
-    <!-- Prevent theme FOUC: apply dark class + saved accent/radius before React hydrates -->
+    <!-- Prevent theme FOUC: apply the look and the saved mode before React hydrates -->
     <script src="/theme-init.js"></script>
     <!-- Prevent locale/dir FOUC: apply lang + dir from locale-preference before paint -->
     <script src="/locale-init.js"></script>
     <!-- Boot splash (KICKOFF §6.1; splash.md). Frames 1–4 — the mark, its halo,
          the "C", the dot and the wordmark — are CSS keyframes here, so they play
-         before any JS. theme-init.js sets `.dark`, the preset and the resolved
-         palette first, so every colour is the theme's from the first frame. The
+         before any JS. theme-init.js sets `.dark` and the look first, so every
+         colour is the theme's from the first frame. The
          React slot (AppSplashSlot) fills `.app-splash-slot` with the greeting
          block; the HTML carries no copy (Q-S1). src/lib/app-splash.ts decides the
          exit. `position: fixed` can't introduce a scrollbar. -->
     <style>
-      /* Pre-paint fallbacks for the tokens the splash paints from: the default
-         look (clinozy-zinc-pastel in src/index.css). `:where()` keeps them at
-         zero specificity — the stylesheet's own `:root`, `.dark` and preset
-         blocks win as soon as it has loaded, and theme-init.js's inline palette
-         wins over both. Keep in step with BOOT_SPLASH_VARS in
-         src/shared/theme/presets.ts. */
+      /* Pre-paint fallbacks for the tokens the splash paints from: the app's
+         one look (clinozy-zinc-pastel in src/index.css). `:where()` keeps them
+         at zero specificity — the stylesheet's own `:root`, `.dark` and look
+         blocks win as soon as it has loaded. theme-init.js writes no inline
+         token, so nothing outranks them. Keep in step with the look's blocks. */
       :where(html) {
         --color-background: oklch(1 0 0);
         --color-card: oklch(1 0 0);

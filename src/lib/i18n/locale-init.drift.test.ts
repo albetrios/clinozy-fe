@@ -28,16 +28,27 @@ describe('theme-init.js drift', () => {
   it('reads the same persist key as useThemeStore', () => {
     expect(source).toContain("localStorage.getItem('theme-preference')");
   });
+
+  it('puts the one look on <html> before anything can throw', () => {
+    // Before the `try`: a storage error must not cost the page its look.
+    const look = source.indexOf("root.dataset.theme = 'clinozy-zinc-pastel'");
+    expect(look).toBeGreaterThan(-1);
+    expect(look).toBeLessThan(source.indexOf('try {'));
+  });
+
+  it('writes no inline custom property — none can pin a colour to the boot mode', () => {
+    // An inline token outranks `:root` and `.dark`: one left behind turned a
+    // later mode switch into a half-dark page that only a reload repaired.
+    expect(source).not.toMatch(/style\.setProperty\(/);
+  });
 });
 
-describe('boot splash shape drift (theme-init.js ↔ index.html ↔ AppSplashSlot ↔ BrandLoader)', () => {
+describe('boot splash shape drift (index.html ↔ AppSplashSlot ↔ BrandLoader)', () => {
   // Under the Sharp shape nothing in the app is round, and the splash is the
   // first thing on screen. The files have to agree or the loader changes shape
-  // half way through the boot: theme-init.js sets `data-shape` before paint,
-  // and index.css squares the `pill` slots on it — the progress track and bar
-  // the React slot renders inside the splash, and BrandLoader's, which takes
-  // over from it.
-  const themeInit = readFileSync(join(root, 'public/theme-init.js'), 'utf8');
+  // half way through the boot: index.css squares the `pill` slots — the
+  // progress track and bar the React slot renders inside the splash, and
+  // BrandLoader's, which takes over from it.
   const html = readFileSync(join(root, 'index.html'), 'utf8');
   const css = readFileSync(join(root, 'src/index.css'), 'utf8');
   const loader = readFileSync(
@@ -48,11 +59,6 @@ describe('boot splash shape drift (theme-init.js ↔ index.html ↔ AppSplashSlo
     join(root, 'src/shared/components/AppSplashSlot/AppSplashSlot.tsx'),
     'utf8',
   );
-
-  it('theme-init.js applies the Sharp shape before first paint', () => {
-    expect(themeInit).toContain("state.customTheme.shapeId === 'sharp'");
-    expect(themeInit).toContain("root.dataset.shape = 'sharp'");
-  });
 
   it('the splash’s progress track and bar are pills, squared by index.css', () => {
     for (const part of ['app-splash-track', 'app-splash-bar']) {
