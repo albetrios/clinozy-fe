@@ -324,7 +324,7 @@ src/shared/
 
 A folder-per-unit directory may carry a **plain constants module** at its root when the
 constants span every unit inside it (e.g. `layouts/layout.constants.ts` — shared i18n
-keys + testids for all layout variants). Same idea as a family island's plain
+keys + testids for all layouts). Same idea as a family island's plain
 `<name>-contracts.ts` modules: cohesion beats forcing a fake unit folder.
 
 ## Core Layer

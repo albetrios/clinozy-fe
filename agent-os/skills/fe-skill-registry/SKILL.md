@@ -781,7 +781,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-design-ditto/SKILL.md`
 
-**Purpose:** Build faithfully ("ditto") from the specs in an iteration's `intake-files/` — preset first, then a new shell variant, then screens — and verify side by side against the source at 375px and 1440px. The per-screen build skill `fe-kickoff-iteration` drives for each ledger row.
+**Purpose:** Build faithfully ("ditto") from the specs in an iteration's `intake-files/` — preset first, then the shell (replacing the old design), then screens — and verify side by side against the source at 375px and 1440px. The per-screen build skill `fe-kickoff-iteration` drives for each ledger row.
 
 **Trigger keywords:** "ditto", "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", "build from legacy"
 

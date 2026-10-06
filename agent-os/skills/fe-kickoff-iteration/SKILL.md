@@ -55,7 +55,7 @@ Follow the ledger in its order (respecting Depends on). For each row:
    **`fe-design-ditto`** for that screen: theme first, then interaction shell →
    flow skeleton → regions (desktop and mobile together) → content → states →
    motion. A foundation row runs the skill it names (`fe-theme-axis-audit` for
-   the preset, the shell variant made live, `fe-route-island` /
+   the preset, the shell replacing the old design, `fe-route-island` /
    `fe-page-scaffolding` for islands, and so on).
 2. **Verify** — the row's Acceptance, by the README's Intake mode:
    - **`full` / `overlay`** — a screen gets a **side-by-side comparison against

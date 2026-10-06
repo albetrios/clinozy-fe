@@ -62,12 +62,11 @@ Use Tailwind's mobile-first breakpoints:
 Breakpoints: `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px), `2xl` (1536px),
 plus two declared in `index.css` for the big-monitor tier — **`3xl` (1920px)** and
 **`4xl` (2560px)**. A layout that stops growing at `2xl` floats in the middle of a big
-monitor: let the content column, the sidebar, hero type and large overlays keep scaling.
+monitor: let the content column, hero type and large overlays keep scaling.
 
 House rules (full reasoning: `docs/reference/design.md` → Screen tiers):
 
-- The sidebar is a **drawer below `lg`**, not `md`; closed means `invisible`, not just
-  translated away (off-screen is still focusable).
+- There is no sidebar: the section bar's one header holds the nav on every viewport.
 - The bottom tab bar exists below `md`. Anything else pinned to the bottom edge uses
   `bottom-[calc(var(--floating-bottom-offset,0rem)+…)]` so it rides above the bar.
 - An overlay that is a sheet on phones must **undo** the sheet from `sm`
