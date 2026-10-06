@@ -85,7 +85,8 @@ and dark-mode variants stay balanced.
 - **Semantic state.** `success` (green), `warning` (amber), `info` (blue),
   `destructive` (red) each ship a `*-foreground` pair and are tuned per mode. Use
   them for _meaning only_ — a green button that isn't "success" is a mistake.
-- **Special surfaces.** `brand` is the always-dark marketing panel (AuthLayout) —
+- **Special surfaces.** `brand` is the always-dark marketing panel (the Split and
+  Spotlight AuthLayout previews; the launch's default sign-in is the canvas) —
   constant across light/dark. `overlay` is the scrim, only ever used with opacity
   (`bg-overlay/50`). `chart-1..5` is a monochrome ramp by default; a theme/Shuffle
   spreads it from the accent.

@@ -4,7 +4,7 @@ import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 
-import { ProductMark, ProductWordmark } from './ProductMark.tsx';
+import { BrandLogo, ProductMark, ProductWordmark } from './ProductMark.tsx';
 
 describe('ProductMark', () => {
   it('draws the tile, the C stroke and the dot from tokens', async () => {
@@ -40,5 +40,34 @@ describe('ProductWordmark', () => {
     } finally {
       document.documentElement.dir = '';
     }
+  });
+});
+
+describe('BrandLogo', () => {
+  it('is the 28px mark alone by default, named once', () => {
+    render(<BrandLogo />);
+    const logo = screen.getByRole('img', { name: PRODUCT_NAME });
+    expect(logo).toHaveAttribute('data-testid', 'brand-logo');
+    expect(screen.getByTestId('product-mark')).toHaveClass('size-7');
+    expect(screen.queryByTestId('product-wordmark')).toBeNull();
+  });
+
+  it('shows the 19px wordmark from md up in the section bar ("md")', () => {
+    render(<BrandLogo wordmark="md" />);
+    const word = screen.getByTestId('product-wordmark');
+    expect(word).toHaveClass('text-[1.1875rem]');
+    expect(word.parentElement).toHaveClass('hidden', 'md:inline-flex');
+  });
+
+  it('shows the wordmark at every width on the signed-out frame ("always")', () => {
+    render(<BrandLogo wordmark="always" />);
+    const wrapper = screen.getByTestId('product-wordmark').parentElement;
+    expect(wrapper).toHaveClass('inline-flex');
+    expect(wrapper).not.toHaveClass('hidden');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<BrandLogo wordmark="always" />);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

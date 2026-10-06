@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2148 src files · ~1051 tests in src/ · 48 E2E specs · 28 shadcn UI primitives
+Stats: ~2152 src files · ~1052 tests in src/ · 48 E2E specs · 28 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1981,6 +1981,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── ProductMark.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── PublicFrame/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── PublicFrame.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── QrCode/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── QrCode.tsx
@@ -2742,6 +2746,7 @@ clinozy-fe/
 │   │   │   │   └── [8 test files]
 │   │   │   ├── AuthLayout/
 │   │   │   │   ├── variants/
+│   │   │   │   │   ├── AuthLayoutCanvas.tsx
 │   │   │   │   │   ├── AuthLayoutMinimal.tsx
 │   │   │   │   │   ├── AuthLayoutSplit.tsx
 │   │   │   │   │   └── AuthLayoutSpotlight.tsx
@@ -2757,6 +2762,7 @@ clinozy-fe/
 │   │   │   ├── PublicLayout/
 │   │   │   │   ├── variants/
 │   │   │   │   │   ├── PublicLayoutBrand.tsx
+│   │   │   │   │   ├── PublicLayoutCanvas.tsx
 │   │   │   │   │   ├── PublicLayoutCard.tsx
 │   │   │   │   │   └── PublicLayoutCentered.tsx
 │   │   │   │   ├── index.ts

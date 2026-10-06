@@ -56,8 +56,9 @@ function formatResendCooldown(remainingMs: number): string {
 /** Duration of the wrong-code shake; matches the `animate-otp-shake` keyframes. */
 const CODE_SHAKE_MS = 450;
 
+/** An inline text action in the verify footer's 12.5px lines — underlined ink, no box. */
 const inlineLinkClassName =
-  'text-foreground h-auto p-0 text-sm font-normal underline underline-offset-4 hover:text-foreground/80 disabled:pointer-events-none disabled:opacity-50';
+  'text-foreground text-detail h-auto p-0 font-medium underline underline-offset-4 hover:text-foreground/80 disabled:pointer-events-none disabled:opacity-50';
 
 const emailOnlySchema = z.object({
   email: z
@@ -244,7 +245,7 @@ function VerifyStepFooter({
 }) {
   const { t } = useTranslation(AUTH_NS);
   return (
-    <footer className="flex flex-col gap-2.5 text-center text-sm lg:text-start">
+    <footer className="text-detail flex flex-col gap-1.5 border-t pt-4">
       <p className="text-muted-foreground text-pretty">
         {t(AUTH_KEYS.auth.email.resendHint)}{' '}
         <ResendHint
@@ -322,7 +323,12 @@ function EmailStepForm({
           {/* Between the email field and its button: the challenge belongs to the
               action below it, and appearing here keeps it in the reading order the
               user is already following. Active only while THIS step raised it. */}
-          <CaptchaSlot active={captchaActive} testId={AUTH_FORM_TEST_IDS.captchaSlot} />
+          {/* `empty:hidden`: an idle slot takes no gap in the stack. */}
+          <CaptchaSlot
+            active={captchaActive}
+            testId={AUTH_FORM_TEST_IDS.captchaSlot}
+            className="empty:hidden"
+          />
 
           <AuthMethodButton
             type="submit"
@@ -557,7 +563,7 @@ export function AuthEmailPanel({
       data-testid={AUTH_FORM_TEST_IDS.emailVerifyPanel}
     >
       <FormError message={formError} data-testid={AUTH_FORM_TEST_IDS.emailErrorBanner} />
-      <DrawerField label={t(AUTH_KEYS.auth.email.codeLabel)} className="pt-2 text-start">
+      <DrawerField label={t(AUTH_KEYS.auth.email.codeLabel)} className="text-start">
         <TotpCodeInput
           value={verificationCode}
           onChange={setVerificationCode}
@@ -583,6 +589,7 @@ export function AuthEmailPanel({
       <CaptchaSlot
         active={challengeFor === AUTH_CHALLENGE_KEYS.emailVerify}
         testId={AUTH_FORM_TEST_IDS.captchaSlot}
+        className="empty:hidden"
       />
 
       <AuthMethodButton

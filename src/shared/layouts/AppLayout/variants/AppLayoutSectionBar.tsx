@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { NotificationCenter } from '@/shared/components/NotificationCenter/index.ts';
+import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import {
   AppMain,
-  BrandLogo,
   MobileNav,
   type NavItems,
   SearchTrigger,
@@ -150,7 +150,7 @@ export function SectionBarShell({
         className="bg-card relative z-30 flex min-h-[calc(3.25rem+1px)] flex-none items-center gap-2 border-b px-(--room-header-pad-x) md:min-h-[calc(3.75rem+1px)] md:gap-2.5"
       >
         <span ref={markRef} className="flex flex-none">
-          <BrandLogo wordmark />
+          <BrandLogo wordmark="md" />
         </span>
         <SectionChip entry={nav.current} />
         <nav

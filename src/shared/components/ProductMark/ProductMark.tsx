@@ -77,3 +77,29 @@ export function ProductWordmark({ className }: { className?: string }) {
     </span>
   );
 }
+
+/**
+ * The logo — the shell header's slot 1 (`shell.md:18`; H:525): the 28px mark
+ * and, with `wordmark`, the 19px wordmark beside it (gap 9px), named once as
+ * `role="img"`. `wordmark="md"` is the section bar's (a phone header shows the
+ * mark only); `"always"` is the signed-out frame's, which has the room. Not a
+ * link. Drawn by every app shell header and by `PublicFrame`, so the logo sits in
+ * the same place before and after sign-in.
+ */
+export function BrandLogo({ wordmark }: { wordmark?: 'md' | 'always' }) {
+  return (
+    <span
+      role="img"
+      aria-label={PRODUCT_NAME}
+      className="flex flex-none items-center gap-2.25 leading-none"
+      data-testid="brand-logo"
+    >
+      <ProductMark className="size-7" />
+      {wordmark ? (
+        <span className={wordmark === 'md' ? 'hidden md:inline-flex' : 'inline-flex'}>
+          <ProductWordmark className="text-[1.1875rem]" />
+        </span>
+      ) : null}
+    </span>
+  );
+}

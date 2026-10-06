@@ -521,8 +521,9 @@ const rootRoute = createRootRoute({
 });
 
 // ── Auth shell ──
-// Pathless layout route (`id`, not `path`): mounts the split-screen AuthLayout
-// once over every auth page; the pages keep their top-level URLs (/login, …).
+// Pathless layout route (`id`, not `path`): mounts the AuthLayout (the launch's
+// sign-in canvas by default) once over every auth page; the pages keep their
+// top-level URLs (/login, …).
 // AuthLayout is rendered inside a custom component (it wraps Outlet), so it
 // keeps a local Suspense boundary — the router only manages route components.
 const authShellRoute = createRoute({
@@ -570,7 +571,7 @@ const mfaRoute = createRoute({
 
 // ── Public shell ──
 // Pathless layout for callback, onboarding, accept-invite, and unauthorized —
-// centered chrome without the auth split-screen or app sidebar.
+// the signed-out canvas without the sign-in form's card or the app shell.
 const publicShellRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'public-shell',

@@ -1,1 +1,1 @@
-export { ProductMark, ProductWordmark } from './ProductMark.tsx';
+export { BrandLogo, ProductMark, ProductWordmark } from './ProductMark.tsx';

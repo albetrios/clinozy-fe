@@ -13,6 +13,7 @@ import { establishSession } from '@/shared/auth/service.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
 // The field and its input by their own modules: the MFA chunk stays free of the drawer controls.
 import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
+import { PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
@@ -148,15 +149,11 @@ export function MfaForm() {
 
   if (!mfaToken) {
     return (
-      <div className="flex flex-col gap-6" data-testid={MFA_TEST_IDS.form}>
-        <div className="flex flex-col gap-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t(AUTH_KEYS.mfa.sessionExpiredHeading)}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {t(AUTH_KEYS.mfa.sessionExpiredSubheading)}
-          </p>
-        </div>
+      <div className="flex flex-col gap-5" data-testid={MFA_TEST_IDS.form}>
+        <PublicCardHeader
+          title={t(AUTH_KEYS.mfa.sessionExpiredHeading)}
+          description={t(AUTH_KEYS.mfa.sessionExpiredSubheading)}
+        />
         <Button asChild className="w-full">
           <Link to="/login">{t(AUTH_KEYS.common.signIn)}</Link>
         </Button>
@@ -165,17 +162,13 @@ export function MfaForm() {
   }
 
   return (
-    <div className="flex flex-col gap-6" data-testid={MFA_TEST_IDS.form}>
-      <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t(AUTH_KEYS.mfa.heading)}
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          {useRecovery
-            ? t(AUTH_KEYS.mfa.recoveryHint)
-            : t(AUTH_KEYS.mfa.authenticatorHint)}
-        </p>
-      </div>
+    <div className="flex flex-col gap-5" data-testid={MFA_TEST_IDS.form}>
+      <PublicCardHeader
+        title={t(AUTH_KEYS.mfa.heading)}
+        description={
+          useRecovery ? t(AUTH_KEYS.mfa.recoveryHint) : t(AUTH_KEYS.mfa.authenticatorHint)
+        }
+      />
 
       <form
         // Bound at submit time, not during render: `onSubmit` reads refs, and
@@ -234,6 +227,7 @@ export function MfaForm() {
                     shake={otpShake}
                     testId={MFA_TEST_IDS.code}
                     aria-label={t(AUTH_KEYS.mfa.codeLabel)}
+                    className="justify-start"
                   />
                 )}
               />
@@ -255,12 +249,12 @@ export function MfaForm() {
             </Button>
           </div>
 
-          <div className="text-center">
+          <div className="border-t pt-4">
             <Button
               type="button"
               variant="link"
               size="sm"
-              className="h-auto p-0 text-xs"
+              className="text-detail text-foreground h-auto p-0 font-medium underline underline-offset-4"
               disabled={pending}
               onClick={() => {
                 setValue('useRecoveryCode', !useRecovery);

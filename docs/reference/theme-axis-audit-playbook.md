@@ -173,11 +173,11 @@ old `toastVariant` / `toastPosition` picks.
 
 ### F. Layout shell preview (TEMP — shuffle-gated via `SHUFFLE_TEMP`)
 
-| Axis              | Store field     | Count      | Notes                       |
-| ----------------- | --------------- | ---------- | --------------------------- |
-| **Auth layout**   | `authVariant`   | 3 variants | Spotlight / Minimal / Split |
-| **App layout**    | `appVariant`    | 3 variants | Sidebar / top / rail shells |
-| **Public layout** | `publicVariant` | 3 variants | Card / Brand / …            |
+| Axis              | Store field     | Count      | Notes                                                                                                      |
+| ----------------- | --------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
+| **Auth layout**   | `authVariant`   | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.authLayout` off, L-65) / Split / Spotlight / Minimal |
+| **App layout**    | `appVariant`    | 3 variants | Sidebar / top / rail shells (the section bar resolves for 0; `SHUFFLE_TEMP.appLayout` off)                 |
+| **Public layout** | `publicVariant` | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.publicLayout` off, L-65) / Centered / Card / Brand   |
 
 ### G. Environment lock
 

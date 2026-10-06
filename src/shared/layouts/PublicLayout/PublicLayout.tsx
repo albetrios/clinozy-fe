@@ -6,28 +6,33 @@ import { LayoutVariantFallback } from '@/shared/layouts/LayoutVariantFallback/in
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
 // Each variant is fetched on first render (or preload) and shared from then on.
-// A module-scope `import()` would instead fetch all three the moment this
+// A module-scope `import()` would instead fetch all four the moment this
 // module evaluates, which defeats the split.
+const loadCanvas = onceAsync(() => import('./variants/PublicLayoutCanvas.tsx'));
 const loadCentered = onceAsync(() => import('./variants/PublicLayoutCentered.tsx'));
 const loadCard = onceAsync(() => import('./variants/PublicLayoutCard.tsx'));
 const loadBrand = onceAsync(() => import('./variants/PublicLayoutBrand.tsx'));
 
+const CanvasPublic = lazy(() => loadCanvas().then((m) => ({ default: m.CanvasPublic })));
 const CenteredPublic = lazy(() =>
   loadCentered().then((m) => ({ default: m.CenteredPublic })),
 );
 const CardPublic = lazy(() => loadCard().then((m) => ({ default: m.CardPublic })));
 const BrandPublic = lazy(() => loadBrand().then((m) => ({ default: m.BrandPublic })));
 
-const PUBLIC_SHELLS = [CenteredPublic, CardPublic, BrandPublic] as const;
+/** The launch's canvas first (L-65), then the earlier previews. */
+const PUBLIC_SHELLS = [CanvasPublic, CenteredPublic, CardPublic, BrandPublic] as const;
 
 /**
- * Minimal centered chrome for public, non-app routes — `/callback`, `/unauthorized`,
- * `/onboarding`, `/accept-invite/$id`, and the 404. Three TEMP preview shells
- * (centered, card, brand) lazy-load via `publicVariant` (Shuffle cycles).
+ * Chrome for public, non-app routes — `/callback`, `/unauthorized`,
+ * `/onboarding` and `/accept-invite/$id`. The variant index is `publicVariant`:
+ * 0, the default, is the launch's signed-out canvas — default, pinned (the
+ * shuffle no longer rolls it), not persisted; 1–3 are the earlier previews
+ * (centered, card, brand).
  */
 export function PublicLayout() {
   const variant = useThemeStore((s) => s.publicVariant);
-  const Shell = PUBLIC_SHELLS[variant] ?? CenteredPublic;
+  const Shell = PUBLIC_SHELLS[variant] ?? CanvasPublic;
 
   return (
     <Suspense fallback={<LayoutVariantFallback />}>
@@ -53,7 +58,7 @@ export function PublicLayout() {
 
 /** Warms every variant chunk so tests can render any shell without a Suspense race. */
 const preloadPublicLayoutVariants = () =>
-  Promise.all([loadCentered(), loadCard(), loadBrand()]);
+  Promise.all([loadCanvas(), loadCentered(), loadCard(), loadBrand()]);
 
 /* eslint-disable react-refresh/only-export-components -- test-facing preload hook */
 export { preloadPublicLayoutVariants };

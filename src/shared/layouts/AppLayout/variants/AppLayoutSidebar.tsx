@@ -6,6 +6,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { NotificationCenter } from '@/shared/components/NotificationCenter/index.ts';
 import { OrganizationSwitcher } from '@/shared/components/OrganizationSwitcher/index.ts';
+import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Separator } from '@/shared/components/ui/separator.tsx';
@@ -14,7 +15,6 @@ import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { Menu } from '@/shared/icons/index.ts';
 import {
   AppMain,
-  BrandLogo,
   MobileNav,
   type NavItems,
   NavList,

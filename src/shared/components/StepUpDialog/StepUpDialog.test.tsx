@@ -258,7 +258,8 @@ describe('StepUpDialog', () => {
 
     const error = await screen.findByTestId('step-up-error');
     expect(error).toHaveAttribute('role', 'alert');
-    expect(error).toHaveClass('bg-destructive/10');
+    // FormError's tint: the design's danger soft (L-65).
+    expect(error).toHaveClass('bg-destructive-tint');
     expect(error.querySelector('svg')).not.toBeNull();
   });
 });

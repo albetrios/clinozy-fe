@@ -32,8 +32,12 @@ export function ThemeModeToggle({
   menuSide,
   menuAlign = 'end',
 }: {
-  /** Tinted shell the trigger sits on — adjusts icon/button contrast. */
-  surface?: 'default' | 'brand' | 'sidebar';
+  /**
+   * Tinted shell the trigger sits on — adjusts icon/button contrast. `frame` is
+   * the signed-out canvas's header: a 32px outline button, as the clinic header
+   * draws its own controls.
+   */
+  surface?: 'default' | 'brand' | 'sidebar' | 'frame';
   /** Menu placement — `right` keeps the panel inside the viewport on a narrow rail. */
   menuSide?: 'top' | 'right' | 'bottom' | 'left';
   menuAlign?: 'start' | 'center' | 'end';
@@ -55,6 +59,10 @@ export function ThemeModeToggle({
   } else if (surface === 'sidebar') {
     surfaceTriggerClass =
       'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
+  } else if (surface === 'frame') {
+    // The 8px corner of the header's 32px controls (`shell.md:20`) and of the
+    // language field beside it.
+    surfaceTriggerClass = 'text-foreground-soft rounded-lg';
   }
 
   let surfaceIconClass: string | undefined;
@@ -68,8 +76,8 @@ export function ThemeModeToggle({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant={surface === 'frame' ? 'outline' : 'ghost'}
+          size={surface === 'frame' ? 'icon-sm' : 'icon'}
           className={surfaceTriggerClass}
           aria-label={tLocale(LOCALE_KEYS.toggleTheme)}
           data-testid="theme-toggle"

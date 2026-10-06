@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as VariantsModule from './auth-layout-variants.ts';
 
+vi.mock('./variants/AuthLayoutCanvas.tsx', () => ({ CanvasAuth: () => null }));
 vi.mock('./variants/AuthLayoutSplit.tsx', () => ({ SplitAuth: () => null }));
 vi.mock('./variants/AuthLayoutSpotlight.tsx', () => ({ SpotlightAuth: () => null }));
 vi.mock('./variants/AuthLayoutMinimal.tsx', () => ({ MinimalAuth: () => null }));
@@ -15,11 +16,12 @@ type Variants = typeof VariantsModule;
  */
 function fetched(variants: Variants): string[] {
   return [
+    ['canvas', variants.loadCanvasAuth],
     ['split', variants.loadSplitAuth],
     ['spotlight', variants.loadSpotlightAuth],
     ['minimal', variants.loadMinimalAuth],
   ]
-    .filter(([, load]) => (load as Variants['loadSplitAuth']).peek() !== undefined)
+    .filter(([, load]) => (load as Variants['loadCanvasAuth']).peek() !== undefined)
     .map(([name]) => name as string);
 }
 
@@ -37,29 +39,30 @@ describe('auth-layout-variants', () => {
   });
 
   it.each([
-    [0, 'split'],
-    [1, 'spotlight'],
-    [2, 'minimal'],
+    [0, 'canvas'],
+    [1, 'split'],
+    [2, 'spotlight'],
+    [3, 'minimal'],
   ] as const)('variant %i fetches only the %s chunk', async (variant, name) => {
     await variants.preloadAuthLayoutVariant(variant);
 
     expect(fetched(variants)).toEqual([name]);
   });
 
-  it('falls back to Split for an index with no variant, like the layout does', async () => {
+  it('falls back to the canvas for an index with no variant, like the layout does', async () => {
     await variants.preloadAuthLayoutVariant(42);
 
-    expect(fetched(variants)).toEqual(['split']);
+    expect(fetched(variants)).toEqual(['canvas']);
   });
 
   it('shares one module promise between a preload and the lazy() that follows', () => {
     // Two promises would request the chunk twice and let Suspense flake.
-    expect(variants.loadSplitAuth()).toBe(variants.loadSplitAuth());
+    expect(variants.loadCanvasAuth()).toBe(variants.loadCanvasAuth());
   });
 
   it('preloadAllAuthLayoutVariants warms every variant (test harness)', async () => {
     await variants.preloadAllAuthLayoutVariants();
 
-    expect(fetched(variants)).toEqual(['split', 'spotlight', 'minimal']);
+    expect(fetched(variants)).toEqual(['canvas', 'split', 'spotlight', 'minimal']);
   });
 });

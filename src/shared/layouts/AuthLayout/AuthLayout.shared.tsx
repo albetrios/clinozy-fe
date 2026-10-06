@@ -118,14 +118,22 @@ function AuthLocalePicker() {
   );
 }
 
-/** Theme + language controls for auth shell variants (single auth screen). */
-export function AuthControls({ surface = 'default' }: { surface?: 'default' | 'brand' }) {
+/**
+ * Theme + language controls for auth shell variants (single auth screen).
+ * `frame` is the signed-out canvas's header (`PublicFrame`): two 32px bordered
+ * controls, 8px apart, as the clinic header draws its own.
+ */
+export function AuthControls({
+  surface = 'default',
+}: {
+  surface?: 'default' | 'brand' | 'frame';
+}) {
   // Subscribe to the layout namespace so the control re-renders on locale change.
   useTranslation(LAYOUT_NS);
   return (
-    <div className="flex items-center gap-3">
+    <div className={cn('flex items-center', surface === 'frame' ? 'gap-2' : 'gap-3')}>
       <AuthLocalePicker />
-      <ThemeModeToggle surface={surface === 'brand' ? 'brand' : 'default'} />
+      <ThemeModeToggle surface={surface} />
     </div>
   );
 }

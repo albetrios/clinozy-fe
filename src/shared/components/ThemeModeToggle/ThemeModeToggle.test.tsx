@@ -27,6 +27,22 @@ describe('ThemeModeToggle', () => {
     );
   });
 
+  it('is a ghost 36px icon button by default', () => {
+    render(<ThemeModeToggle />);
+    const trigger = screen.getByTestId('theme-toggle');
+    expect(trigger).toHaveAttribute('data-variant', 'ghost');
+    expect(trigger).toHaveAttribute('data-size', 'icon');
+  });
+
+  it('on the signed-out frame, is a 32px outline button with the field corner', () => {
+    // The clinic header's own controls: 32px, bordered, 8px corners (`shell.md:20`).
+    render(<ThemeModeToggle surface="frame" />);
+    const trigger = screen.getByTestId('theme-toggle');
+    expect(trigger).toHaveAttribute('data-variant', 'outline');
+    expect(trigger).toHaveAttribute('data-size', 'icon-sm');
+    expect(trigger).toHaveClass('rounded-lg', 'text-foreground-soft');
+  });
+
   it('switches mode via the menu (Light / Dark / System)', async () => {
     const user = userEvent.setup();
     render(<ThemeModeToggle />);

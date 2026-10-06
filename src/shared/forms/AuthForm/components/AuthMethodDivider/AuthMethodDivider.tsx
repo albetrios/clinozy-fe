@@ -4,7 +4,11 @@ import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { Separator } from '@/shared/components/ui/separator.tsx';
 import { AUTH_FORM_TEST_IDS } from '@/shared/forms/AuthForm/auth-form.constants.ts';
 
-/** Visual break between one-click sign-in and email credential entry. */
+/**
+ * Visual break between one-click sign-in and email credential entry: two
+ * hairlines and "or" as the design's section eyebrow (11px/600, uppercase,
+ * +0.05em, muted).
+ */
 export function AuthMethodDivider() {
   const { t } = useTranslation(AUTH_NS);
 
@@ -15,7 +19,7 @@ export function AuthMethodDivider() {
       data-testid={AUTH_FORM_TEST_IDS.methodDivider}
     >
       <Separator className="flex-1" />
-      <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <span className="text-muted-foreground text-micro font-semibold tracking-[0.05em] uppercase">
         {t(AUTH_KEYS.auth.dividerOr)}
       </span>
       <Separator className="flex-1" />

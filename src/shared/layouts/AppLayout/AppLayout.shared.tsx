@@ -6,7 +6,6 @@ import { platformConfig } from '@/core/config/env.ts';
 import { PageTransition } from '@/lib/animations/PageTransition.tsx';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { iconOnSidebarSurface } from '@/lib/icon-surface.ts';
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -16,7 +15,6 @@ import {
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
-import { ProductMark, ProductWordmark } from '@/shared/components/ProductMark/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -97,28 +95,6 @@ export function SkipLink() {
     >
       {t(LAYOUT_KEYS.a11y.skipToMain)}
     </a>
-  );
-}
-
-/**
- * The product mark and — with `wordmark` — the lower-case name beside it (from
- * `md` up: a phone header shows the mark only). The shell's brand slot.
- */
-export function BrandLogo({ wordmark = false }: { wordmark?: boolean }) {
-  return (
-    <span
-      role="img"
-      aria-label={PRODUCT_NAME}
-      className="flex flex-none items-center gap-2.25 leading-none"
-      data-testid="brand-logo"
-    >
-      <ProductMark className="size-7" />
-      {wordmark ? (
-        <span className="hidden md:inline-flex">
-          <ProductWordmark className="text-[1.1875rem]" />
-        </span>
-      ) : null}
-    </span>
   );
 }
 

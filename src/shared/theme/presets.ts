@@ -737,8 +737,11 @@ export function shuffleIcons(current: {
   };
 }
 
-/** How many AuthLayout preview designs exist (TEMP — see AuthLayout variants). */
-const AUTH_VARIANT_COUNT = 3;
+/**
+ * How many AuthLayout designs exist (TEMP — see AuthLayout variants): the
+ * launch's canvas (0, the default) and three earlier previews.
+ */
+const AUTH_VARIANT_COUNT = 4;
 
 /**
  * TEMP (auth-layout preview): a different design index in 0..N-1. Remove
@@ -763,8 +766,11 @@ export function nextAppVariant(current: number): number {
   return v === current ? (v + 1) % APP_VARIANT_COUNT : v;
 }
 
-/** How many PublicLayout preview shells exist (TEMP — see PublicLayout variants). */
-const PUBLIC_VARIANT_COUNT = 3;
+/**
+ * How many PublicLayout shells exist (TEMP — see PublicLayout variants): the
+ * launch's canvas (0, the default) and three earlier previews.
+ */
+const PUBLIC_VARIANT_COUNT = 4;
 
 /**
  * TEMP (public-layout preview): a different shell index in 0..N-1. Remove together
@@ -784,8 +790,16 @@ export function nextPublicVariant(current: number): number {
  * previews are retired.
  */
 export const SHUFFLE_TEMP = {
-  /** Cycle the AuthLayout (login screen) preview design on shuffle. */
-  authLayout: true,
+  /**
+   * Cycle the AuthLayout (login screen) preview design on shuffle.
+   *
+   * OFF since L-65: the default (variant 0) is the launch's sign-in canvas, and
+   * a shuffle may not rotate it away (docs/design-workflow/process/adoption.md,
+   * "Making a variant live"). Structural for the same reason as `appLayout`:
+   * each auth shell owns the form, so rolling it mid-sign-in would remount the
+   * email step and drop a code the user is typing.
+   */
+  authLayout: false,
   /**
    * Cycle the AppLayout (app shell) preview design on shuffle.
    *
@@ -798,8 +812,12 @@ export const SHUFFLE_TEMP = {
    * are simply no longer part of a cosmetic dice roll.
    */
   appLayout: false,
-  /** Cycle the PublicLayout preview design on shuffle. */
-  publicLayout: true,
+  /**
+   * Cycle the PublicLayout preview design on shuffle. OFF since L-65: the
+   * default (variant 0) is the launch's signed-out canvas, pinned like the auth
+   * one — the onboarding wizard lives in this layout.
+   */
+  publicLayout: false,
 };
 
 /**

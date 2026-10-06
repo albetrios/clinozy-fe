@@ -27,6 +27,7 @@ import {
   rollColour,
   rollSurface,
   rollTypography,
+  SHUFFLE_TEMP,
   shuffleIcons,
   THEME_PRESETS,
 } from './presets.ts';
@@ -373,14 +374,21 @@ describe('orthogonal base colour + menu', () => {
   });
 
   it('nextAuthVariant returns a different design index in range (TEMP)', () => {
-    for (const current of [0, 1, 2]) {
+    // The launch's canvas (0) and the three earlier previews.
+    for (const current of [0, 1, 2, 3]) {
       for (let i = 0; i < 20; i += 1) {
         const v = nextAuthVariant(current);
         expect(v).toBeGreaterThanOrEqual(0);
-        expect(v).toBeLessThan(3);
+        expect(v).toBeLessThan(4);
         expect(v).not.toBe(current);
       }
     }
+  });
+
+  it('pins the launch canvases: shuffle never rolls the auth or public layout (L-65)', () => {
+    // adoption.md "Making a variant live": the default AND pinned.
+    expect(SHUFFLE_TEMP.authLayout).toBe(false);
+    expect(SHUFFLE_TEMP.publicLayout).toBe(false);
   });
 
   it('nextAppVariant returns a different shell index in range (TEMP)', () => {

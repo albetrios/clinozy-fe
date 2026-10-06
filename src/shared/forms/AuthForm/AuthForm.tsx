@@ -465,8 +465,8 @@ export function AuthForm() {
 
   if (!hasAnyMethod) {
     return (
-      <div className="space-y-6" data-testid={AUTH_FORM_TEST_IDS.form}>
-        <p className="text-muted-foreground text-center text-sm">
+      <div data-testid={AUTH_FORM_TEST_IDS.form}>
+        <p className="text-muted-foreground text-body text-center">
           {t(AUTH_KEYS.auth.unavailable)}
         </p>
       </div>
@@ -475,11 +475,7 @@ export function AuthForm() {
 
   if (autoGooglePending) {
     return (
-      <div
-        className="space-y-6"
-        data-testid={AUTH_FORM_TEST_IDS.form}
-        data-auto-google-pending=""
-      >
+      <div data-testid={AUTH_FORM_TEST_IDS.form} data-auto-google-pending="">
         <AuthAutoGooglePending onSkip={cancelAutoGoogle} />
       </div>
     );
@@ -487,7 +483,7 @@ export function AuthForm() {
 
   return (
     <div
-      className={`flex flex-col ${isEmailVerify ? 'gap-5' : 'gap-7'}`}
+      className="flex flex-col gap-5"
       data-testid={AUTH_FORM_TEST_IDS.form}
       data-email-verify={isEmailVerify ? '' : undefined}
     >

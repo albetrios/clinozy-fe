@@ -528,7 +528,8 @@ describe('OrganizationIntegrationsPanel — webhooks', () => {
     const inline = screen.getByTestId('webhook-error');
     expect(inline).toHaveTextContent(/already registered|went wrong/i);
     expect(inline).toHaveAttribute('role', 'alert');
-    expect(inline).toHaveClass('bg-destructive/10');
+    // FormError's tint: the design's danger soft (L-65).
+    expect(inline).toHaveClass('bg-destructive-tint');
     expect(inline.querySelector('svg')).not.toBeNull();
   });
 });

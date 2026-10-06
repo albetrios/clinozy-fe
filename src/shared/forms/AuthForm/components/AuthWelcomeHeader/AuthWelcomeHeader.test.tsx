@@ -30,4 +30,18 @@ describe('AuthWelcomeHeader', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
+
+  it("sets the heading in the drawer title's anatomy, start-aligned", () => {
+    render(<AuthWelcomeHeader />);
+    const heading = screen.getByRole('heading', { level: 1, name: 'Welcome back' });
+    expect(heading).toHaveClass('text-lg', 'font-semibold', 'tracking-[-0.01em]');
+    expect(heading.parentElement).not.toHaveClass('text-center');
+  });
+
+  it('keeps the address whole and left to right inside the sentence', () => {
+    render(<AuthWelcomeHeader variant="emailVerify" email="user@example.com" />);
+    const address = screen.getByText('user@example.com');
+    expect(address).toHaveAttribute('dir', 'ltr');
+    expect(address).toHaveClass('wrap-anywhere');
+  });
 });
