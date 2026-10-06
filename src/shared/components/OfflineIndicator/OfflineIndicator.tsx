@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import { useAppSplashActive } from '@/shared/hooks/useAppSplashActive/index.ts';
 import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus/index.ts';
 
 /**
@@ -18,12 +19,17 @@ const OFFLINE_MESSAGE_KEY = 'splash.offline.message';
  * bottom — above the phone tab bar — with a red status dot and the splash's
  * own offline line, "Can’t reach Clinozy · check the internet connection".
  * Uses role="alert" and aria-live for screen reader announcement.
+ *
+ * Not while the boot splash covers the page: offline at mount, the splash holds
+ * with that same line and its Retry, and the pill under it — invisible, the app
+ * renders at opacity 0 there — would be a second assertive alert saying it again.
  */
 export function OfflineIndicator() {
   const online = useOnlineStatus();
+  const splashActive = useAppSplashActive();
   const { t } = useTranslation(I18N_NAMESPACES.common);
 
-  if (online) return null;
+  if (online || splashActive) return null;
 
   return (
     <div

@@ -1,13 +1,10 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  holdAppSplash,
-  isAppSplashActive,
-  onAppSplashDismissed,
-} from '@/lib/app-splash.ts';
+import { holdAppSplash } from '@/lib/app-splash.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { BrandLoader } from '@/shared/components/BrandLoader/index.ts';
+import { useAppSplashActive } from '@/shared/hooks/useAppSplashActive/index.ts';
 
 /**
  * Full-page branded loader used during app bootstrap and auth checks. While the
@@ -24,23 +21,18 @@ import { BrandLoader } from '@/shared/components/BrandLoader/index.ts';
  */
 export function FullPageSpinner() {
   const { t } = useTranslation(LOCALE_NS);
-  const [splashHidden, setSplashHidden] = useState(() => !isAppSplashActive());
+  // Turns false only if the splash gave up waiting (MAX_HOLD_MS) — then this
+  // loader has to become visible, since the overlay it was hiding behind is gone.
+  const splashActive = useAppSplashActive();
 
   // Layout effect, not effect: the hold has to be registered before the browser
   // paints, because main.tsx requests the dismissal from a post-paint rAF pair.
   useLayoutEffect(() => {
-    if (splashHidden) return;
+    if (!splashActive) return;
     return holdAppSplash();
-  }, [splashHidden]);
+  }, [splashActive]);
 
-  // Only reachable if the splash gave up waiting (MAX_HOLD_MS) — then this
-  // loader has to become visible, since the overlay it was hiding behind is gone.
-  useEffect(() => {
-    if (splashHidden) return;
-    return onAppSplashDismissed(() => setSplashHidden(true));
-  }, [splashHidden]);
-
-  if (!splashHidden) return null;
+  if (splashActive) return null;
 
   return (
     <output

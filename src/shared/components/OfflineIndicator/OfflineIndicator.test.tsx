@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
@@ -55,6 +55,29 @@ describe('OfflineIndicator', () => {
       'h-11',
     );
     expect(pill.className).toContain('var(--floating-bottom-offset');
+  });
+
+  // Offline at mount the boot splash holds with this same line and a Retry, while
+  // the app renders under it at opacity 0: a pill there would be a second,
+  // invisible assertive alert saying it again (the boot-splash E2E's offline hold).
+  it('stays out while the boot splash holds, and shows once the splash is gone', () => {
+    goOffline();
+    const splash = document.createElement('div');
+    splash.id = 'app-splash';
+    document.body.prepend(splash);
+
+    try {
+      render(<OfflineIndicator />);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      act(() => {
+        splash.remove();
+        window.dispatchEvent(new CustomEvent('app-splash-dismissed'));
+      });
+      expect(screen.getByTestId('offline-indicator')).toHaveTextContent(/can’t reach/i);
+    } finally {
+      splash.remove();
+    }
   });
 
   it('has role="alert" when visible', () => {
