@@ -90,8 +90,8 @@ describe('WorkQueue (KICKOFF §6.2 Work queue aside; one task model, Q-T3)', () 
     expect(nobody).toHaveTextContent('Owner: Anyone');
   });
 
-  it('closes a card in place with its result, at 70%', async () => {
-    renderQueue({
+  it('closes a card in place with its result, receded a text step instead of 70% opacity', async () => {
+    const { container } = renderQueue({
       entries: [
         {
           row: taskRowFixture(),
@@ -102,8 +102,31 @@ describe('WorkQueue (KICKOFF §6.2 Work queue aside; one task model, Q-T3)', () 
     });
     const card = await screen.findByTestId('today-queue-card');
     expect(card).toHaveTextContent('✓ Confirmed on call · reminder stays');
-    expect(card).toHaveClass('opacity-70');
     expect(within(card).queryByTestId('today-queue-outcome')).not.toBeInTheDocument();
+    // The design's 70% opacity took the card's 11–12px lines below WCAG AA (axe:
+    // 3.7–4.4:1). It recedes on text tokens the preset holds at ≥ 4.5:1 instead.
+    expect(card.className).not.toMatch(/\bopacity-/);
+    expect(within(card).getByText('Confirm Priti’s visit')).toHaveClass(
+      'text-muted-foreground-strong',
+    );
+    expect(within(card).getByText(/^Laser session not confirmed\./)).toHaveClass(
+      'text-muted-foreground',
+    );
+    expect(within(card).getByText('Owner: Riya (you)')).toHaveClass(
+      'text-muted-foreground',
+    );
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps an open card on the full-strength text steps', async () => {
+    renderQueue();
+    const card = await screen.findByTestId('today-queue-card');
+    expect(within(card).getByText(/^Laser session not confirmed\./)).toHaveClass(
+      'text-foreground-soft',
+    );
+    expect(within(card).getByText('Owner: Riya (you)')).toHaveClass(
+      'text-muted-foreground-strong',
+    );
   });
 
   it('records an outcome, and waits while one is on its way', async () => {

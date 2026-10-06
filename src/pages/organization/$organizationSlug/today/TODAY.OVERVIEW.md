@@ -21,9 +21,10 @@ Admin dim nothing). The default lane is the first in focus with people, else the
 people, else Enquiries; a picked lane lives in the URL for the session (`?lane=`). The work
 queue (`?queue=everyone`; Mine by default — the tasks the member owns) is the Tasks room's one
 task model: its open tasks by due time and the ones closed today, the rule's pill and
-outcomes, the shared due labels; an outcome closes the card in place ("✓ <result>", 70%) and
-toasts "<name>: <result>" with Undo; a booking follow-on stacks the shared appointment form
-over Today (`components/TodayBooking/`), a record follow-on navigates. "What’s next" chains
+outcomes, the shared due labels; an outcome closes the card in place ("✓ <result>", each
+line a text step lighter — the design's 70%, kept at AA contrast) and toasts
+"<name>: <result>" with Undo; a booking follow-on stacks the shared appointment form over
+Today (`components/TodayBooking/`), a record follow-on navigates. "What’s next" chains
 only in the Tasks room.
 
 Data: `listTodayFloor` (today's bookings joined with their visit, first visit, dues, today's

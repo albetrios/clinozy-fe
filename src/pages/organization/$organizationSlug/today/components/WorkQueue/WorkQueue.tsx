@@ -58,6 +58,26 @@ function QueueCardSkeleton() {
   );
 }
 
+/**
+ * A card's text colours, open and closed. The design closes a card at 70%
+ * opacity (H:620–650), which took its 11–12px lines to 3.7–4.4:1 — below WCAG
+ * AA (axe, the Today a11y spec). A closed card recedes one text step per line
+ * instead, every pair one the preset's contrast test holds at ≥ 4.5:1 in both
+ * modes; its tone pill and "✓ <result>" keep their colours.
+ */
+const QUEUE_CARD_INK = {
+  open: {
+    title: '',
+    why: 'text-foreground-soft',
+    meta: 'text-muted-foreground-strong',
+  },
+  closed: {
+    title: 'text-muted-foreground-strong',
+    why: 'text-muted-foreground',
+    meta: 'text-muted-foreground',
+  },
+} as const;
+
 /** "Owner: Riya (you)" · "Owner: Kiran P." · "Owner: Anyone". */
 function useOwnerName(): (row: TaskRow) => string {
   const { t } = useTranslation(TODAY_NS);
@@ -73,7 +93,8 @@ function useOwnerName(): (row: TaskRow) => string {
 /**
  * One work-queue card (`today.md:66`; H:620–650): the rule's pill in its tone
  * and the due label (blush when overdue) · the task · why · "Owner: <name>" ·
- * the rule's outcomes — or, once closed, "✓ <result>" with the card at 70%.
+ * the rule's outcomes — or, once closed, "✓ <result>" with the card receded
+ * ({@link QUEUE_CARD_INK}: the design's 70%, kept at AA contrast).
  */
 function QueueCard({
   entry,
@@ -95,16 +116,14 @@ function QueueCard({
   const outcomeKeys = copy.outcomes as Readonly<Record<string, { label: string }>>;
   const closed = result !== null;
   const overdue = !closed && isTaskOverdue(row, now);
+  const ink = QUEUE_CARD_INK[closed ? 'closed' : 'open'];
   return (
     <article
       data-testid={TODAY_TEST_IDS.queueCard}
       data-task-id={row.id}
       data-closed={closed || undefined}
       aria-busy={busy || undefined}
-      className={cn(
-        'bg-background flex flex-col gap-1.5 rounded-lg border p-2.5',
-        closed && 'opacity-70',
-      )}
+      className="bg-background flex flex-col gap-1.5 rounded-lg border p-2.5"
     >
       <div className="flex items-center justify-between gap-1.5">
         <span
@@ -119,17 +138,17 @@ function QueueCard({
         <span
           className={cn(
             'text-caption leading-[normal] tabular-nums',
-            overdue ? TONE_CLASSES.blush.ink : 'text-muted-foreground-strong',
+            overdue ? TONE_CLASSES.blush.ink : ink.meta,
           )}
         >
           {dueLabel(row, now)}
         </span>
       </div>
-      <p className="text-body leading-[normal] font-medium">{row.title}</p>
-      {row.why ? (
-        <p className="text-foreground-soft text-xs leading-[1.4]">{row.why}</p>
-      ) : null}
-      <p className="text-caption text-muted-foreground-strong leading-[normal]">
+      <p className={cn('text-body leading-[normal] font-medium', ink.title)}>
+        {row.title}
+      </p>
+      {row.why ? <p className={cn('text-xs leading-[1.4]', ink.why)}>{row.why}</p> : null}
+      <p className={cn('text-caption leading-[normal]', ink.meta)}>
         {t(TODAY_KEYS.queue.owner, { name: ownerName(row) })}
       </p>
       {closed ? (
