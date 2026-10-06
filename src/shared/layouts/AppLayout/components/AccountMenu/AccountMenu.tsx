@@ -14,7 +14,8 @@ import {
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { OrganizationSwitcher } from '@/shared/components/OrganizationSwitcher/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
-import type { SettingsSection } from '@/shared/components/SettingsModal/settings-sections.ts';
+import { isSettingsModuleEnabled } from '@/shared/components/SettingsModal/settings-modules.ts';
+import type { AccountSettingsSection } from '@/shared/components/SettingsModal/settings-sections.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +66,44 @@ const THEME_OPTIONS = [
   { value: 'dark', icon: Moon, labelKey: LAYOUT_KEYS.app.theme.dark },
   { value: 'system', icon: Monitor, labelKey: LAYOUT_KEYS.app.theme.system },
 ] as const;
+
+/**
+ * The rows that open an Account settings section, in menu order. Each follows
+ * its section's module gate exactly as the Settings rail does
+ * (`isSettingsModuleEnabled`, from `VITE_DISABLED_MODULES`): a deployment
+ * without billing shows no Billing row.
+ */
+const SETTINGS_ROWS: readonly {
+  section: AccountSettingsSection;
+  icon: AppIcon;
+  labelKey: string;
+  testId: string;
+}[] = [
+  {
+    section: 'profile',
+    icon: Settings,
+    labelKey: LAYOUT_KEYS.app.settings,
+    testId: 'user-menu-settings',
+  },
+  {
+    section: 'security',
+    icon: Shield,
+    labelKey: keys.security,
+    testId: 'account-menu-security',
+  },
+  {
+    section: 'billing',
+    icon: CreditCard,
+    labelKey: keys.billing,
+    testId: 'account-menu-billing',
+  },
+  {
+    section: 'sessions',
+    icon: MonitorSmartphone,
+    labelKey: keys.devices,
+    testId: 'account-menu-devices',
+  },
+];
 
 /** A radio pill: the menu's radio item laid out as a 28px chip (its dot indicator hidden). */
 const radioPillClassName =
@@ -234,7 +273,7 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
   const navigate = useNavigate();
   const setShortcutsOpen = useUIStore((state) => state.setShortcutsOpen);
   const { data: unread = 0 } = useUnreadCount();
-  const openSettings = (section: SettingsSection) =>
+  const openSettings = (section: AccountSettingsSection) =>
     void navigate({ to: '.', hash: settingsHash('account', section) });
   return (
     <DropdownMenuGroup className="flex flex-col p-1.5">
@@ -245,30 +284,17 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
         onSelect={onOpenNotifications}
         trailing={unread > 0 ? <CountBadge count={unread} /> : null}
       />
-      <MenuRow
-        icon={Settings}
-        label={t(LAYOUT_KEYS.app.settings)}
-        testId="user-menu-settings"
-        onSelect={() => openSettings('profile')}
-      />
-      <MenuRow
-        icon={Shield}
-        label={t(keys.security)}
-        testId="account-menu-security"
-        onSelect={() => openSettings('security')}
-      />
-      <MenuRow
-        icon={CreditCard}
-        label={t(keys.billing)}
-        testId="account-menu-billing"
-        onSelect={() => openSettings('billing')}
-      />
-      <MenuRow
-        icon={MonitorSmartphone}
-        label={t(keys.devices)}
-        testId="account-menu-devices"
-        onSelect={() => openSettings('sessions')}
-      />
+      {SETTINGS_ROWS.filter(({ section }) =>
+        isSettingsModuleEnabled({ scope: 'account', section }),
+      ).map((row) => (
+        <MenuRow
+          key={row.section}
+          icon={row.icon}
+          label={t(row.labelKey)}
+          testId={row.testId}
+          onSelect={() => openSettings(row.section)}
+        />
+      ))}
       <MenuRow
         icon={Keyboard}
         label={t(LAYOUT_KEYS.app.shortcuts.title)}

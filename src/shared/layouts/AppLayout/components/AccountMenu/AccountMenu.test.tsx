@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type * as RequireModule from '@/core/security/gates/require-module.ts';
 import { resetPresenceFixture } from '@/shared/api/clinic/presence-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -13,8 +14,17 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AccountMenu } from './AccountMenu.tsx';
 
-const { logoutMock } = vi.hoisted(() => ({ logoutMock: vi.fn() }));
+const { logoutMock, disabledModules } = vi.hoisted(() => ({
+  logoutMock: vi.fn(),
+  disabledModules: new Set<string>(),
+}));
 vi.mock('@/shared/auth/service.ts', () => ({ logout: logoutMock }));
+// The deployment's module switch (`VITE_DISABLED_MODULES`), read through the
+// same gate the Settings rail uses.
+vi.mock('@/core/security/gates/require-module.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof RequireModule>()),
+  isModuleEnabled: (moduleKey: string) => !disabledModules.has(moduleKey),
+}));
 vi.mock('@/shared/components/OrganizationSwitcher/index.ts', () => ({
   OrganizationSwitcher: () => null,
 }));
@@ -24,6 +34,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 beforeEach(() => {
   resetPresenceFixture();
+  disabledModules.clear();
   logoutMock.mockReset().mockResolvedValue(undefined);
   useAuthStore.setState({
     user: {
@@ -87,5 +98,40 @@ describe('AccountMenu', () => {
     renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
     const { menu } = await openMenu();
     expect(await axe(menu)).toHaveNoViolations();
+  });
+});
+
+describe('AccountMenu — a module-gated row follows its module', () => {
+  it('opens the Billing section from its row while billing is on', async () => {
+    const { router } = renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    const { user, menu } = await openMenu();
+    await user.click(within(menu).getByTestId('account-menu-billing'));
+    await waitFor(() =>
+      expect(router.state.location.hash).toBe('settings/account/billing'),
+    );
+  });
+
+  it('drops the Billing row when the deployment disables billing, as the Settings rail does', async () => {
+    disabledModules.add('billing');
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    const { menu } = await openMenu();
+
+    expect(within(menu).queryByTestId('account-menu-billing')).not.toBeInTheDocument();
+    // Sections without a module gate keep their rows.
+    for (const id of [
+      'user-menu-settings',
+      'account-menu-security',
+      'account-menu-devices',
+    ]) {
+      expect(within(menu).getByTestId(id)).toBeInTheDocument();
+    }
+  });
+
+  it('keeps every row when only a module no row opens is off', async () => {
+    disabledModules.add('members');
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    const { menu } = await openMenu();
+
+    expect(within(menu).getByTestId('account-menu-billing')).toBeInTheDocument();
   });
 });
