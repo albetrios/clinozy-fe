@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
-import { iconOnBrandSurface, iconOnSidebarSurface } from '@/lib/icon-surface.ts';
+import { iconOnBrandSurface } from '@/lib/icon-surface.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -29,18 +29,13 @@ import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
  */
 export function ThemeModeToggle({
   surface = 'default',
-  menuSide,
-  menuAlign = 'end',
 }: {
   /**
    * Tinted shell the trigger sits on — adjusts icon/button contrast. `frame` is
    * the signed-out canvas's header: a 32px outline button, as the clinic header
    * draws its own controls.
    */
-  surface?: 'default' | 'brand' | 'sidebar' | 'frame';
-  /** Menu placement — `right` keeps the panel inside the viewport on a narrow rail. */
-  menuSide?: 'top' | 'right' | 'bottom' | 'left';
-  menuAlign?: 'start' | 'center' | 'end';
+  surface?: 'default' | 'brand' | 'frame';
 }) {
   const { t: tLocale } = useTranslation(LOCALE_NS);
   const { t } = useTranslation(LAYOUT_NS);
@@ -56,21 +51,13 @@ export function ThemeModeToggle({
   if (surface === 'brand') {
     surfaceTriggerClass =
       'text-brand-foreground/80 hover:bg-brand-foreground/10 hover:text-brand-foreground';
-  } else if (surface === 'sidebar') {
-    surfaceTriggerClass =
-      'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
   } else if (surface === 'frame') {
     // The 8px corner of the header's 32px controls (`shell.md:20`) and of the
     // language field beside it.
     surfaceTriggerClass = 'text-foreground-soft rounded-lg';
   }
 
-  let surfaceIconClass: string | undefined;
-  if (surface === 'brand') {
-    surfaceIconClass = iconOnBrandSurface;
-  } else if (surface === 'sidebar') {
-    surfaceIconClass = iconOnSidebarSurface;
-  }
+  const surfaceIconClass = surface === 'brand' ? iconOnBrandSurface : undefined;
 
   return (
     <DropdownMenu>
@@ -85,7 +72,7 @@ export function ThemeModeToggle({
           <ThemeIcon className={cn('h-4 w-4', surfaceIconClass)} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={menuAlign} side={menuSide}>
+      <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')} data-testid="theme-light">
           <Sun className="me-2 h-4 w-4" /> {t(LAYOUT_KEYS.app.theme.light)}
         </DropdownMenuItem>

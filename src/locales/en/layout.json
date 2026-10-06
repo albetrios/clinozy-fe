@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "Skip to main content",
-    "mainNavigation": "Main navigation",
-    "sidebarNavigation": "Sidebar navigation",
-    "mobileNavigation": "Mobile navigation"
+    "skipToMain": "Skip to main content"
   },
   "auth": {
     "switchToRegister": "Create an account",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "Search",
-    "searchPlaceholder": "Search...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "User menu",
     "userFallback": "User",
     "settings": "Settings",
     "logOut": "Log out",
-    "toggleSidebar": "Toggle sidebar",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "Workspace",
-      "menu": "Menu",
-      "shortcuts": "Shortcuts"
-    },
-    "contextStrip": {
-      "label": "Quick access",
-      "labelSolo": "Jump to",
-      "profile": "Profile",
-      "security": "Security",
-      "billing": "Billing",
-      "appearance": "Appearance",
-      "shortcuts": "Shortcuts"
-    },
     "workspaceSwitch": {
       "preparing": "Preparing your workspace",
       "loadingAccess": "Loading members and permissions",
@@ -179,7 +158,10 @@
       },
       "statusToast": "Status · {{status}}",
       "switchClinic": "Switch clinic",
+      "security": "Security",
+      "billing": "Billing",
       "devices": "Devices",
+      "appearance": "Appearance",
       "viewAs": {
         "previewing": "Previewing as {{role}}",
         "noSections": "No sections",

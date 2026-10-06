@@ -6,9 +6,6 @@ export const LAYOUT_KEYS = {
   brand: { name: 'brand.name' },
   a11y: {
     skipToMain: 'a11y.skipToMain',
-    mainNavigation: 'a11y.mainNavigation',
-    sidebarNavigation: 'a11y.sidebarNavigation',
-    mobileNavigation: 'a11y.mobileNavigation',
   },
   auth: {
     switchToRegister: 'auth.switchToRegister',
@@ -39,15 +36,11 @@ export const LAYOUT_KEYS = {
       shuffle: 'app.theme.shuffle',
     },
     search: 'app.search',
-    searchPlaceholder: 'app.searchPlaceholder',
     searchShortcutMac: 'app.searchShortcutMac',
     searchShortcutWindows: 'app.searchShortcutWindows',
-    userMenu: 'app.userMenu',
     userFallback: 'app.userFallback',
     settings: 'app.settings',
     logOut: 'app.logOut',
-    toggleSidebar: 'app.toggleSidebar',
-    footerCopyright: 'app.footerCopyright',
     sectionBar: {
       nav: 'app.sectionBar.nav',
       allSections: 'app.sectionBar.allSections',
@@ -76,7 +69,10 @@ export const LAYOUT_KEYS = {
       },
       statusToast: 'app.sectionBar.statusToast',
       switchClinic: 'app.sectionBar.switchClinic',
+      security: 'app.sectionBar.security',
+      billing: 'app.sectionBar.billing',
       devices: 'app.sectionBar.devices',
+      appearance: 'app.sectionBar.appearance',
       branch: {
         label: 'app.sectionBar.branch.label',
         title: 'app.sectionBar.branch.title',
@@ -94,20 +90,6 @@ export const LAYOUT_KEYS = {
         exit: 'app.sectionBar.viewAs.exit',
         exitToast: 'app.sectionBar.viewAs.exitToast',
       },
-    },
-    sidebar: {
-      workspace: 'app.sidebar.workspace',
-      menu: 'app.sidebar.menu',
-      shortcuts: 'app.sidebar.shortcuts',
-    },
-    contextStrip: {
-      label: 'app.contextStrip.label',
-      labelSolo: 'app.contextStrip.labelSolo',
-      profile: 'app.contextStrip.profile',
-      security: 'app.contextStrip.security',
-      billing: 'app.contextStrip.billing',
-      appearance: 'app.contextStrip.appearance',
-      shortcuts: 'app.contextStrip.shortcuts',
     },
     orgCreate: {
       namePlaceholder: 'app.orgCreate.namePlaceholder',

@@ -39,7 +39,6 @@ export const ERRORS_KEYS = {
     pageContent: 'widget.pageContent',
     navigation: 'widget.navigation',
     emailBanner: 'widget.emailBanner',
-    notifications: 'widget.notifications',
     organizationSwitcher: 'widget.organizationSwitcher',
     commandPalette: 'widget.commandPalette',
     settings: 'widget.settings',

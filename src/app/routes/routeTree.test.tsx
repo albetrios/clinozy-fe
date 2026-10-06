@@ -55,13 +55,9 @@ const notifyInfo = vi.hoisted(() => vi.fn());
 const preloadAuthLayoutVariant = vi.hoisted(() =>
   vi.fn((_variant: number) => Promise.resolve()),
 );
-const preloadSessionAppShell = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
 vi.mock('@/shared/layouts/AuthLayout/auth-layout-variants.ts', () => ({
   preloadAuthLayoutVariant,
-}));
-vi.mock('@/shared/layouts/AppLayout/app-layout-variants.ts', () => ({
-  preloadSessionAppShell,
 }));
 
 vi.mock('@/shared/layouts/AuthLayout/index.ts', () => {
@@ -345,7 +341,6 @@ describe('router configuration', () => {
 
     beforeEach(() => {
       preloadAuthLayoutVariant.mockClear();
-      preloadSessionAppShell.mockClear();
     });
 
     it('the auth shell loader fetches the active layout variant with the layout', async () => {
@@ -359,22 +354,12 @@ describe('router configuration', () => {
       useThemeStore.setState({ authVariant: 0 });
     });
 
-    it('the org shell loader fetches the app shell the session calls for', async () => {
-      // By the time a loader runs, `beforeLoad` has put me/context in the store,
-      // so the shell can be fetched alongside the route's own chunks instead of
-      // after AppLayout mounts.
-      await routeEndingWith('/organization/$organizationSlug')?.options.loader?.();
-
-      expect(preloadSessionAppShell).toHaveBeenCalledOnce();
-    });
-
     it('warms the sign-in side for a likely guest, in parallel with the auth bootstrap', async () => {
       preloadBootRoutes({ likelySignedIn: false });
 
       // The variant loaders are imported dynamically (they must stay out of the
       // entry chunk), so the call lands a tick after the warm-up starts.
       await vi.waitFor(() => expect(preloadAuthLayoutVariant).toHaveBeenCalledOnce());
-      expect(preloadSessionAppShell).not.toHaveBeenCalled();
     });
 
     it('warms the app side for a likely signed-in user, not the sign-in side', async () => {
@@ -383,10 +368,6 @@ describe('router configuration', () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(preloadAuthLayoutVariant).not.toHaveBeenCalled();
-      // The shell VARIANT is not guessed at boot: it depends on the session's
-      // deployment flags, so the shell route's loader fetches it once me/context
-      // is in the store.
-      expect(preloadSessionAppShell).not.toHaveBeenCalled();
     });
 
     // Called on INTENT (an email submitted, an OAuth redirect started), not only

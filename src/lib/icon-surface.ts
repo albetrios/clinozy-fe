@@ -6,9 +6,6 @@
 /** Icons on `bg-brand` / brand-tinted panels (auth marketing shell). */
 export const iconOnBrandSurface = 'text-brand-foreground';
 
-/** Icons on `bg-sidebar` / sidebar chrome (nav rail, mobile drawer). */
-export const iconOnSidebarSurface = 'text-sidebar-foreground';
-
 /** Icons on solid `bg-primary` chips, FABs, and brand marks. */
 export const iconOnPrimarySurface = 'text-primary-foreground';
 

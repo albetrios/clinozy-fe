@@ -37,7 +37,6 @@ export {
   type LayoutWidthId,
   MENU_STYLES,
   MOTION_PRESETS,
-  nextAppVariant,
   nextAuthVariant,
   nextPublicVariant,
   normalizeLayoutWidthId,

@@ -135,14 +135,11 @@ on its surface, in both modes.
   (96rem, a 1536px laptop). Two more are declared in `index.css` for the
   big-monitor tier: **`3xl:` = 120rem (1920px)** and **`4xl:` = 160rem
   (2560px)**. Use them wherever a layout would otherwise stop growing — the
-  content column, the sidebar (`3xl:w-80`), the auth hero's type and padding,
-  large overlays. At the other end:
-  - **Below `lg` the sidebar is a drawer**, not a column. `lg`, not `md`: at
-    768px a 280px column is over a third of a portrait tablet. The drawer is
-    `invisible` while closed (translated-away is still focusable), closes on
-    navigation and on Escape, and never exceeds `85vw`. From `lg` up the column
-    is pinned by CSS and ignores drawer state — `rtl:lg:translate-x-0` included,
-    because `rtl:translate-x-full` outranks a bare `lg:` utility.
+  content column, the auth hero's type and padding, large overlays. At the
+  other end:
+  - **There is no sidebar on any viewport.** The app's one shell is the section
+    bar (`AppLayoutSectionBar.tsx`, `shell.md`): a single header holds the nav —
+    All sections and the pinned tabs from `md`, the section chip on a phone.
   - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`). Anything
     else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` (published by `index.css` via `:has()`), never

@@ -208,18 +208,10 @@ function NotificationInbox({
  * locale-formatted time; unread rows mark themselves read on click. Data: useNotifications.
  */
 export function NotificationCenter({
-  surface = 'default',
-  popoverSide,
-  popoverAlign = 'end',
   open: openProp,
   onOpenChange,
   children,
 }: {
-  /** Tinted shell the bell trigger sits on (e.g. icon rail). */
-  surface?: 'default' | 'sidebar';
-  /** Popover side — `right` when the trigger is in a narrow left rail. */
-  popoverSide?: 'top' | 'right' | 'bottom' | 'left';
-  popoverAlign?: 'start' | 'center' | 'end';
   /** Controlled open state — a shell with no bell opens the inbox from a menu row. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -263,11 +255,6 @@ export function NotificationCenter({
     });
   }
 
-  const triggerSurfaceClass =
-    surface === 'sidebar'
-      ? 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-      : undefined;
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       {children === undefined ? (
@@ -275,7 +262,7 @@ export function NotificationCenter({
           <Button
             variant="ghost"
             size="icon"
-            className={cn('relative', triggerSurfaceClass)}
+            className="relative"
             aria-label={
               unread > 0
                 ? t(LAYOUT_KEYS.app.notifications.ariaWithUnread, { count: unread })
@@ -292,8 +279,7 @@ export function NotificationCenter({
       )}
 
       <PopoverContent
-        align={popoverAlign}
-        side={popoverSide}
+        align="end"
         sideOffset={8}
         collisionPadding={8}
         // A design popover (the Team / Contact card's frame, `_patterns.md:216`):

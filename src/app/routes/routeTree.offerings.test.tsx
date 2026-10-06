@@ -27,9 +27,6 @@ const gatewayFromManifest = vi.hoisted(() =>
 vi.mock('@/shared/layouts/AuthLayout/auth-layout-variants.ts', () => ({
   preloadAuthLayoutVariant: vi.fn(() => Promise.resolve()),
 }));
-vi.mock('@/shared/layouts/AppLayout/app-layout-variants.ts', () => ({
-  preloadSessionAppShell: vi.fn(() => Promise.resolve()),
-}));
 vi.mock('@/core/security/gateway.ts', () => ({ gatewayFromManifest }));
 vi.mock('@/core/security/gate-context.ts', () => ({
   toGateContext: vi.fn(() => ({ kind: 'gate-context-sentinel' })),

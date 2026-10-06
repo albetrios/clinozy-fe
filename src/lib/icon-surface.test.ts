@@ -4,16 +4,11 @@ import {
   closeControlClassName,
   iconOnBrandSurface,
   iconOnPrimarySurface,
-  iconOnSidebarSurface,
 } from './icon-surface.ts';
 
 describe('icon-surface', () => {
   it('exports brand surface icon token', () => {
     expect(iconOnBrandSurface).toBe('text-brand-foreground');
-  });
-
-  it('exports sidebar surface icon token', () => {
-    expect(iconOnSidebarSurface).toBe('text-sidebar-foreground');
   });
 
   it('exports primary surface icon token', () => {

@@ -18,7 +18,6 @@ import {
   generateTheme,
   hexToHue,
   isThemePreset,
-  nextAppVariant,
   nextAuthVariant,
   nextRandomHue,
   oklchToHex,
@@ -389,17 +388,6 @@ describe('orthogonal base colour + menu', () => {
     // adoption.md "Making a variant live": the default AND pinned.
     expect(SHUFFLE_TEMP.authLayout).toBe(false);
     expect(SHUFFLE_TEMP.publicLayout).toBe(false);
-  });
-
-  it('nextAppVariant returns a different shell index in range (TEMP)', () => {
-    for (const current of [0, 1, 2]) {
-      for (let i = 0; i < 20; i += 1) {
-        const v = nextAppVariant(current);
-        expect(v).toBeGreaterThanOrEqual(0);
-        expect(v).toBeLessThan(3);
-        expect(v).not.toBe(current);
-      }
-    }
   });
 
   it('applyIconWeight sets/clears --icon-stroke', () => {

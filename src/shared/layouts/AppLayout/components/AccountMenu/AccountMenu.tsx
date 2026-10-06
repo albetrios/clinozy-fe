@@ -200,7 +200,7 @@ function AppearancePills() {
   const { t } = useTranslation(LAYOUT_NS);
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
-  const label = t(LAYOUT_KEYS.app.contextStrip.appearance);
+  const label = t(keys.appearance);
   return (
     <PillGroup label={label}>
       <DropdownMenuRadioGroup
@@ -253,13 +253,13 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
       />
       <MenuRow
         icon={Shield}
-        label={t(LAYOUT_KEYS.app.contextStrip.security)}
+        label={t(keys.security)}
         testId="account-menu-security"
         onSelect={() => openSettings('security')}
       />
       <MenuRow
         icon={CreditCard}
-        label={t(LAYOUT_KEYS.app.contextStrip.billing)}
+        label={t(keys.billing)}
         testId="account-menu-billing"
         onSelect={() => openSettings('billing')}
       />

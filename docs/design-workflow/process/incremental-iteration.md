@@ -160,9 +160,9 @@ whole app. Planning writes a scoped section into `KICKOFF.md` and **stops**:
 - Which shell (auth / public / app) and which routes it owns — list them.
 - Exact values to port (type, spacing, colour, bg, radius, shadow) — read from
   the prototype CSS, not memory.
-- **Make it live** (Adoption → _Making a variant live_): set it as the default
-  **and** pin it (`SHUFFLE_TEMP.<axis> = false`); confirm the default isn't
-  overridden by a persisted value.
+- **Replace, don't fork** (Adoption → _One design per surface_): the changed
+  shell replaces the old design in the same change — no preview variant kept
+  beside it, nothing left that could load the old one.
 - Platform-surface check: relocate-never-delete — every surface still has a home.
 - Blast radius: **every route the shell owns** re-verifies, not one.
 

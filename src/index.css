@@ -309,7 +309,6 @@
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
   /* Subtle, professional content reveal used for page/route transitions. */
   --animate-fade-in: fade-in 0.2s ease-out both;
   --animate-fade-in-up: route-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1410,15 +1409,6 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -1499,16 +1489,6 @@
   padding: 8px 12px;
   font-size: 12px;
   color: var(--color-card-foreground);
-}
-
-.skeleton-shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    transparent 25%,
-    var(--color-muted) 50%,
-    transparent 75%
-  );
-  background-size: 200% 100%;
 }
 
 /* The in-place skeleton, one look for every room (KICKOFF §3.5 Skeletons,
@@ -1809,7 +1789,7 @@
 
 /* ── Accessibility: honour reduced-motion globally ──
    Users who set "reduce motion" get a near-instant, motion-free experience
-   (page fades, overlay transitions, shimmer, and hover lifts are neutralised). */
+   (page fades, overlay transitions and hover lifts are neutralised). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

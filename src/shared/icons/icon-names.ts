@@ -54,7 +54,6 @@ export type IconName =
   | 'Mail'
   | 'MapPin'
   | 'Maximize'
-  | 'Menu'
   | 'MessageSquare'
   | 'Minimize'
   | 'Minus'

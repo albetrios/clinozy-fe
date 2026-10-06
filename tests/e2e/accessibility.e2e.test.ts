@@ -68,7 +68,6 @@ test.describe('Accessibility', () => {
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .exclude('[data-slot="select-trigger"]')
-      .exclude('[data-testid="sidebar"]')
       .analyze();
 
     const critical = results.violations.filter(

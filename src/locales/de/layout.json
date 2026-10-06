@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "Zum Hauptinhalt springen",
-    "mainNavigation": "Hauptnavigation",
-    "sidebarNavigation": "Seitennavigation",
-    "mobileNavigation": "Mobilnavigation"
+    "skipToMain": "Zum Hauptinhalt springen"
   },
   "auth": {
     "switchToRegister": "Konto erstellen",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "Suchen",
-    "searchPlaceholder": "Suchen...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Benutzermenü",
     "userFallback": "Benutzer",
     "settings": "Einstellungen",
     "logOut": "Abmelden",
-    "toggleSidebar": "Seitenleiste umschalten",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "Arbeitsbereich",
-      "menu": "Menü",
-      "shortcuts": "Tastenkürzel"
-    },
-    "contextStrip": {
-      "label": "Schnellzugriff",
-      "labelSolo": "Gehe zu",
-      "profile": "Profil",
-      "security": "Sicherheit",
-      "billing": "Abrechnung",
-      "appearance": "Darstellung",
-      "shortcuts": "Tastenkürzel"
-    },
     "workspaceSwitch": {
       "preparing": "Arbeitsbereich wird vorbereitet",
       "loadingAccess": "Mitglieder und Berechtigungen werden geladen",
@@ -179,7 +158,10 @@
       },
       "statusToast": "Status · {{status}}",
       "switchClinic": "Klinik wechseln",
+      "security": "Sicherheit",
+      "billing": "Abrechnung",
       "devices": "Geräte",
+      "appearance": "Darstellung",
       "viewAs": {
         "previewing": "Vorschau als {{role}}",
         "noSections": "Keine Bereiche",

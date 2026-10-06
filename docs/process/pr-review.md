@@ -61,13 +61,13 @@ Check only what the PR touches.
 
 ### UI and tokens
 
-| Check           | What to look for                                                                                    | Typical severity |
-| --------------- | --------------------------------------------------------------------------------------------------- | ---------------- |
-| Semantic tokens | No raw palette classes (`bg-blue-500`, `text-white`) — `pnpm validate:tokens` clean                 | Blocker          |
-| shadcn sources  | Components from allowed sources only (`agent-os/rules/fe-ui-sources.mdc`)                           | Major            |
-| Dark surfaces   | Icons on `bg-brand` / `bg-sidebar` / `bg-primary` use foreground tokens (`src/lib/icon-surface.ts`) | Major            |
-| Deferred chunks | No static import of `@sentry/react`, `posthog-js`, SettingsModal/CommandPalette trees               | Blocker          |
-| A11y            | Interactive elements have ARIA; component tests use vitest-axe (`axeForDialog` for portals)         | Major            |
+| Check           | What to look for                                                                            | Typical severity |
+| --------------- | ------------------------------------------------------------------------------------------- | ---------------- |
+| Semantic tokens | No raw palette classes (`bg-blue-500`, `text-white`) — `pnpm validate:tokens` clean         | Blocker          |
+| shadcn sources  | Components from allowed sources only (`agent-os/rules/fe-ui-sources.mdc`)                   | Major            |
+| Dark surfaces   | Icons on `bg-brand` / `bg-primary` use foreground tokens (`src/lib/icon-surface.ts`)        | Major            |
+| Deferred chunks | No static import of `@sentry/react`, `posthog-js`, SettingsModal/CommandPalette trees       | Blocker          |
+| A11y            | Interactive elements have ARIA; component tests use vitest-axe (`axeForDialog` for portals) | Major            |
 
 ### Security
 

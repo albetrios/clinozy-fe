@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "تخطَّ إلى المحتوى الرئيسي",
-    "mainNavigation": "التنقل الرئيسي",
-    "sidebarNavigation": "تنقل الشريط الجانبي",
-    "mobileNavigation": "تنقل الجوال"
+    "skipToMain": "تخطَّ إلى المحتوى الرئيسي"
   },
   "auth": {
     "switchToRegister": "إنشاء حساب",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "بحث",
-    "searchPlaceholder": "بحث...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "قائمة المستخدم",
     "userFallback": "مستخدم",
     "settings": "الإعدادات",
     "logOut": "تسجيل الخروج",
-    "toggleSidebar": "تبديل الشريط الجانبي",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "مساحة العمل",
-      "menu": "القائمة",
-      "shortcuts": "الاختصارات"
-    },
-    "contextStrip": {
-      "label": "وصول سريع",
-      "labelSolo": "الانتقال إلى",
-      "profile": "الملف الشخصي",
-      "security": "الأمان",
-      "billing": "الفوترة",
-      "appearance": "المظهر",
-      "shortcuts": "الاختصارات"
-    },
     "workspaceSwitch": {
       "preparing": "جارٍ تحضير مساحة العمل الخاصة بك",
       "loadingAccess": "جارٍ تحميل الأعضاء والأذونات",
@@ -179,7 +158,10 @@
       },
       "statusToast": "الحالة · {{status}}",
       "switchClinic": "تبديل العيادة",
+      "security": "الأمان",
+      "billing": "الفوترة",
       "devices": "الأجهزة",
+      "appearance": "المظهر",
       "viewAs": {
         "previewing": "معاينة بصفة {{role}}",
         "noSections": "لا توجد أقسام",

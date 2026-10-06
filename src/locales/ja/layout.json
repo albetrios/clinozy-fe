@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "メインコンテンツへスキップ",
-    "mainNavigation": "メインナビゲーション",
-    "sidebarNavigation": "サイドバーナビゲーション",
-    "mobileNavigation": "モバイルナビゲーション"
+    "skipToMain": "メインコンテンツへスキップ"
   },
   "auth": {
     "switchToRegister": "アカウントを作成",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "検索",
-    "searchPlaceholder": "検索...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "ユーザーメニュー",
     "userFallback": "ユーザー",
     "settings": "設定",
     "logOut": "ログアウト",
-    "toggleSidebar": "サイドバーを切り替え",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "ワークスペース",
-      "menu": "メニュー",
-      "shortcuts": "ショートカット"
-    },
-    "contextStrip": {
-      "label": "クイックアクセス",
-      "labelSolo": "移動",
-      "profile": "プロフィール",
-      "security": "セキュリティ",
-      "billing": "請求",
-      "appearance": "外観",
-      "shortcuts": "ショートカット"
-    },
     "workspaceSwitch": {
       "preparing": "ワークスペースを準備しています",
       "loadingAccess": "メンバーと権限を読み込んでいます",
@@ -179,7 +158,10 @@
       },
       "statusToast": "ステータス · {{status}}",
       "switchClinic": "クリニックを切り替え",
+      "security": "セキュリティ",
+      "billing": "請求",
       "devices": "デバイス",
+      "appearance": "外観",
       "viewAs": {
         "previewing": "{{role}} としてプレビュー中",
         "noSections": "セクションなし",

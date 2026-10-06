@@ -53,7 +53,6 @@ import {
   Mail as LuMail,
   MapPin as LuMapPin,
   Maximize2 as LuMaximize,
-  Menu as LuMenu,
   MessageSquare as LuMessageSquare,
   Minimize as LuMinimize,
   Minus as LuMinus,
@@ -207,7 +206,6 @@ export const Mail = makeIcon('Mail', LuMail);
 export const MapPin = makeIcon('MapPin', LuMapPin);
 /** Lucide `maximize-2`: show every table column. */
 export const Maximize = makeIcon('Maximize', LuMaximize);
-export const Menu = makeIcon('Menu', LuMenu);
 /** Lucide `message-square`: notes, SMS and chat. */
 export const MessageSquare = makeIcon('MessageSquare', LuMessageSquare);
 /** Lucide `minimize`: fit the table to its width. */

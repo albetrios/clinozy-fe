@@ -56,7 +56,7 @@ anybody out.
   `logout()` itself.
 - **`logout({ reason })` is the ONE way to end a live session.** It dispatches
   the revoke (`POST /auth/logout` with the bearer) and calls `forceLogout()`
-  **without waiting for it**. The user menu, the command palette, **the
+  **without waiting for it**. The Account menu, the command palette, **the
   idle-timeout dialog (its button AND its deadline) and the absolute session
   cap** all go through it. `reason` (`logout` · `idle_timeout` ·
   `session_expired`) only labels the `session_ended` analytics event. It is

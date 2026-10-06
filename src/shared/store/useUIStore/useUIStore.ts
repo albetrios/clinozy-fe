@@ -5,7 +5,6 @@ import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 
 interface UIStore {
-  sidebarOpen: boolean;
   commandPaletteOpen: boolean;
   shortcutsOpen: boolean;
   /** The dedicated Appearance dialog (opened by the floating handle / Customize). */
@@ -22,8 +21,6 @@ interface UIStore {
    */
   fileActivityOpen: boolean | null;
 
-  toggleSidebar: () => void;
-  setSidebarOpen: (open: boolean) => void;
   toggleCommandPalette: () => void;
   setCommandPaletteOpen: (open: boolean) => void;
   toggleShortcuts: () => void;
@@ -34,27 +31,14 @@ interface UIStore {
   setFileActivityOpen: (open: boolean | null) => void;
 }
 
-/** Ephemeral, per-tab UI state: which overlays and the navigation drawer are open. */
+/** Ephemeral, per-tab UI state: which overlays are open. */
 export const useUIStore = create<UIStore>((set) => ({
-  /**
-   * Whether the off-canvas navigation DRAWER is open — phones and tablets only.
-   * From `lg` up the sidebar is a permanent column and this flag is ignored (the
-   * shell pins it with CSS).
-   *
-   * Always starts closed. It used to be seeded from a `min-width: 768px` media
-   * query "so desktop starts open", which made one boolean mean two things: a
-   * window loaded wide and then narrowed kept `true`, and the drawer sat open
-   * over the content on a screen size where nobody had opened it.
-   */
-  sidebarOpen: false,
   commandPaletteOpen: false,
   shortcutsOpen: false,
   appearanceOpen: false,
   previewRole: null,
   fileActivityOpen: null,
 
-  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
-  setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   toggleCommandPalette: () =>
     set((s) => {
       const next = !s.commandPaletteOpen;

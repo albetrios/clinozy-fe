@@ -44,7 +44,6 @@ export const ANIMATIONS = [
   'pop-in',
   'reveal',
   'sheet-up',
-  'shimmer',
   'spinner',
 ] as const;
 

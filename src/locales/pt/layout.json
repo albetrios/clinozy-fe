@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "Ir para o conteúdo principal",
-    "mainNavigation": "Navegação principal",
-    "sidebarNavigation": "Navegação lateral",
-    "mobileNavigation": "Navegação móvel"
+    "skipToMain": "Ir para o conteúdo principal"
   },
   "auth": {
     "switchToRegister": "Criar uma conta",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "Pesquisar",
-    "searchPlaceholder": "Pesquisar...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Menu do usuário",
     "userFallback": "Usuário",
     "settings": "Configurações",
     "logOut": "Sair",
-    "toggleSidebar": "Alternar barra lateral",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "Espaço de trabalho",
-      "menu": "Menu",
-      "shortcuts": "Atalhos"
-    },
-    "contextStrip": {
-      "label": "Acesso rápido",
-      "labelSolo": "Ir para",
-      "profile": "Perfil",
-      "security": "Segurança",
-      "billing": "Cobrança",
-      "appearance": "Aparência",
-      "shortcuts": "Atalhos"
-    },
     "workspaceSwitch": {
       "preparing": "Preparando seu espaço de trabalho",
       "loadingAccess": "Carregando membros e permissões",
@@ -179,7 +158,10 @@
       },
       "statusToast": "Status · {{status}}",
       "switchClinic": "Trocar de clínica",
+      "security": "Segurança",
+      "billing": "Cobrança",
       "devices": "Dispositivos",
+      "appearance": "Aparência",
       "viewAs": {
         "previewing": "Visualizando como {{role}}",
         "noSections": "Nenhuma seção",

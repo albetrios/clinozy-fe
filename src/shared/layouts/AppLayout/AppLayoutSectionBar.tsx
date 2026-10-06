@@ -89,7 +89,7 @@ function useTabSpace(refs: {
 }
 
 /**
- * The clinic launch's shell (`sectionBar`, KICKOFF §3.2; `shell.md`): one
+ * The clinic launch's shell — the app's one shell (KICKOFF §3.2; `shell.md`): one
  * header bar and no sidebar on any viewport. Mark · (phone) section chip ·
  * All sections · pinned tabs with a measured "More" · search · divider ·
  * branch picker · avatar and Account menu; on a phone the tab bar and the All
@@ -177,7 +177,7 @@ export function SectionBarShell({
           className="flex flex-[1_0_auto] items-center justify-end gap-1.5 md:min-w-0 md:flex-1"
         >
           <span ref={searchRef} className="contents">
-            <SearchTrigger sectionBar />
+            <SearchTrigger />
           </span>
           <div ref={rightItemsRef} className="flex flex-none items-center gap-1.5">
             <span aria-hidden className="bg-border mx-1 h-5 w-px flex-none" />
@@ -199,10 +199,9 @@ export function SectionBarShell({
           </div>
         </div>
       </header>
-      <AppMain flush={nav.current !== null} banner="none" />
+      <AppMain flush={nav.current !== null} />
       <NoticeStack />
       <MobileNav
-        navItems={navItems}
         organizationSlug={organizationSlug}
         sections={{
           nav,

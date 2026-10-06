@@ -2,7 +2,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { iconOnSidebarSurface } from '@/lib/icon-surface.ts';
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
@@ -36,27 +35,10 @@ import { useMyOrganizationSummaries } from '@/shared/tenancy/my-organization-sum
 import { switchToPersonal } from '@/shared/tenancy/switch.ts';
 
 interface OrganizationSwitcherProps {
-  /** Extra classes for the trigger button (e.g. `flex-1` inside the sidebar). */
+  /** Extra classes for the trigger button. */
   className?: string;
   /** Dropdown alignment relative to the trigger. */
   align?: 'start' | 'end';
-  /** Tinted shell the trigger sits on — adjusts trigger contrast. */
-  surface?: 'default' | 'sidebar';
-  /**
-   * Turns the trigger into a **brand lockup**: `leading` (the product mark)
-   * takes the place of the organization's initial and the trigger becomes one
-   * borderless identity row — mark · name · chevrons — instead of a small
-   * outlined field.
-   *
-   * This is what the sidebar header uses. The mark and the switcher used to be
-   * two separate things stacked in a column: a 32px logo top-aligned against an
-   * 11px caption, with the dropdown indented on a second row beneath them, so
-   * nothing in the block shared a baseline or an edge. As ONE control they are
-   * centred on one axis by construction, and the whole row is the hit target.
-   */
-  leading?: ReactNode;
-  /** Second line under the organization name in the lockup (the product name). */
-  caption?: string;
   /**
    * `submenu` renders the switcher as a row inside a parent dropdown — the
    * section-bar Account menu's "Switch clinic" (KICKOFF §3.2) — instead of its
@@ -82,83 +64,25 @@ function initialOf(name: string): string {
 }
 
 /**
- * The trigger's two shapes: a compact outlined **field** (headers), or the
- * sidebar's borderless, taller brand **lockup**.
+ * What the trigger says about the active organization: its initial in a small
+ * chip, then its name, on one line.
  */
-const TRIGGER_LAYOUTS = {
-  field: { name: 'field', variant: 'outline', className: 'h-9 gap-2' },
-  lockup: { name: 'lockup', variant: 'ghost', className: 'h-11 gap-3 px-2' },
-} as const;
-
-/**
- * What the trigger says about the active organization: a leading mark and its
- * name. In the **lockup** (`leading` given) the mark is the caller's — the
- * product logo — and a caption sits under the name; otherwise it is the
- * organization's initial in a small chip, on one line.
- */
-function TriggerIdentity({
-  name,
-  leading,
-  caption,
-  onSidebar,
-}: {
-  name: string;
-  leading: ReactNode | undefined;
-  caption: string | undefined;
-  onSidebar: boolean;
-}) {
-  const lockup = leading !== undefined;
+function TriggerIdentity({ name }: { name: string }) {
   return (
     <>
-      {lockup ? (
-        leading
-      ) : (
-        <span
-          // `icon-chip`, not a bare `rounded`: the chip follows the radius and
-          // shape axes (square under Sharp) like every other tile.
-          data-slot="icon-chip"
-          className={cn(
-            'flex size-6 shrink-0 items-center justify-center text-xs font-semibold',
-            onSidebar
-              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-              : 'bg-primary/10 text-primary',
-          )}
-        >
-          {initialOf(name)}
-        </span>
-      )}
+      <span
+        // `icon-chip`, not a bare `rounded`: the chip follows the radius and
+        // shape axes (square under Sharp) like every other tile.
+        data-slot="icon-chip"
+        className="bg-primary/10 text-primary flex size-6 shrink-0 items-center justify-center text-xs font-semibold"
+      >
+        {initialOf(name)}
+      </span>
       <span className="min-w-0 flex-1 text-start">
         <span className="block truncate text-sm leading-5 font-medium">{name}</span>
-        {lockup && caption ? (
-          <span
-            className={cn(
-              'block truncate text-xs leading-4 font-normal',
-              onSidebar ? 'text-sidebar-foreground/60' : 'text-muted-foreground',
-            )}
-            data-testid="organization-switcher-caption"
-          >
-            {caption}
-          </span>
-        ) : null}
       </span>
     </>
   );
-}
-
-/** The trigger's layout and surface classes: field or lockup, on the default or sidebar surface. */
-function triggerAppearance(
-  surface: 'default' | 'sidebar',
-  leading: ReactNode | undefined,
-) {
-  const onSidebar = surface === 'sidebar';
-  return {
-    layout: TRIGGER_LAYOUTS[leading === undefined ? 'field' : 'lockup'],
-    onSidebar,
-    surfaceClass: onSidebar
-      ? 'border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-      : undefined,
-    chevronClass: onSidebar ? iconOnSidebarSurface : undefined,
-  };
 }
 
 /**
@@ -543,13 +467,10 @@ export function OrganizationSwitcher(props: OrganizationSwitcherProps) {
   );
 }
 
-/** The switcher with its own trigger — a header field or the sidebar's brand lockup. */
+/** The switcher with its own trigger — a compact outlined field. */
 function OrganizationSwitcherMenu({
   className,
   align = 'start',
-  surface = 'default',
-  leading,
-  caption,
   onSwitched,
 }: OrganizationSwitcherProps) {
   const { t } = useTranslation(LAYOUT_NS);
@@ -570,47 +491,30 @@ function OrganizationSwitcherMenu({
 
   if (!visible) return null;
 
-  const {
-    layout: triggerLayout,
-    onSidebar,
-    surfaceClass: triggerSurfaceClass,
-    chevronClass,
-  } = triggerAppearance(surface, leading);
-
   return (
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            variant={triggerLayout.variant}
+            variant="outline"
             size="sm"
-            className={cn(
-              'min-w-0 justify-start',
-              triggerLayout.className,
-              triggerSurfaceClass,
-              className,
-            )}
+            className={cn('h-9 min-w-0 justify-start gap-2', className)}
             disabled={isLoading || switchingId !== null}
             aria-busy={switchingId !== null}
             aria-label={t(LAYOUT_KEYS.app.orgSwitcher.triggerLabel, {
               name: activeName,
             })}
             data-testid="organization-switcher-trigger"
-            data-layout={triggerLayout.name}
+            data-layout="field"
           >
-            <TriggerIdentity
-              name={activeName}
-              leading={leading}
-              caption={caption}
-              onSidebar={onSidebar}
-            />
-            <ChevronsUpDown className={cn('h-4 w-4 shrink-0 opacity-60', chevronClass)} />
+            <TriggerIdentity name={activeName} />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align={align}
-          // Never narrower than the control that opened it: under the full-width
-          // lockup a fixed 16rem menu stopped short of the trigger's end edge.
+          // Never narrower than the control that opened it: under a wide
+          // trigger a fixed 16rem menu stopped short of its end edge.
           className="w-[max(16rem,var(--radix-dropdown-menu-trigger-width))]"
         >
           <OrganizationMenuSections

@@ -17,8 +17,8 @@ import type {
  * **Everything here is pure string work** and imports only *types* from
  * `settings-sections.ts` (erased at build). That is deliberate: the
  * entry-resident settings surfaces — `SettingsModalLazy` (mounted on the root
- * route to listen for the hash), NotificationCenter, CommandPalette, AppLayout,
- * AppContextStrip, SidebarQuickLinks — need only this grammar. Importing them
+ * route to listen for the hash), NotificationCenter, CommandPalette, the
+ * AppLayout's Account menu — need only this grammar. Importing them
  * from `settings-hash.ts` instead would drag its `parseSettingsHash` →
  * `settings-sections.ts` → `settings.constants.ts` chain (the section registry
  * + full i18n key table) onto the first-paint chunk. Keep this module free of

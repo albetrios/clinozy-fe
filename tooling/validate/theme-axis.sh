@@ -168,7 +168,7 @@ PILL_RAW=$(grep -rEn 'rounded-full' src --include='*.tsx' --include='*.ts' \
   | grep -Ev "(^|[\"'\` ])(size-(1|1\.5|2|2\.5)|h-(1|1\.5|2|2\.5) w-(1|1\.5|2|2\.5))([^0-9.]|\$)" \
   || true)
 report_hits "rounded-full the Sharp shape cannot square (add data-slot=\"pill\")" \
-  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton|SkeletonShimmer)([[:space:]/>]|$)')"
+  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton)([[:space:]/>]|$)')"
 
 # 7 — spacing that ignores the Density axis. Only the spacing utilities, and
 # only a bare number + unit: sizes (`h-[640px]`), offsets (`top-[20%]`) and

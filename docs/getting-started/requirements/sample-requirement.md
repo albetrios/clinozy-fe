@@ -34,7 +34,7 @@ New page at `/notifications`, under the authenticated dashboard (AppLayout).
 
 ### UI / Behavior (if applicable)
 
-- **Layout:** AppLayout (same as dashboard, with sidebar and header).
+- **Layout:** AppLayout (the section bar shell: one header, no sidebar).
 - **Forms/inputs:** Optional filter dropdown: "All" / "Unread" (can be phase 2).
 - **Actions:** "Mark all as read" (button, top right); clicking a row can mark that notification as read (optional).
 - **Validation / errors:** Show toast or inline error on API failure; retry button in error state.

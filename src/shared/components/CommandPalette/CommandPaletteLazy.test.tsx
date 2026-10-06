@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -105,6 +105,22 @@ describe('CommandPaletteLazy', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+
+  it("draws the loading list as the design's flat bars — a heading, then 40px rows, no pulse", async () => {
+    useUIStore.setState({ commandPaletteOpen: true });
+    render(<CommandPaletteLazy />);
+    const pending = await screen.findByTestId('command-palette-pending');
+
+    const rows = within(pending).getAllByTestId('skeleton-row');
+    expect(rows).toHaveLength(5);
+    for (const row of rows) expect(row).toHaveClass('h-10');
+    const bars = pending.querySelectorAll('[data-slot="skeleton"]');
+    expect(bars).toHaveLength(6);
+    for (const bar of bars) {
+      expect(bar).toHaveClass('bg-muted-strong', 'animate-none');
+      expect(bar).not.toHaveClass('animate-pulse');
+    }
   });
 
   it('dismisses using the scrim while the list is loading', async () => {

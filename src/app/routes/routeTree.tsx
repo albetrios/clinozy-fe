@@ -379,19 +379,13 @@ const PublicLayout = lazyRouteComponent(
 /**
  * The variant loaders are imported DYNAMICALLY, never statically: this file is
  * the entry chunk, and the initial-JS budget has well under a kilobyte to spare.
- * A static import of either module costs more than that on every load, to save
- * one request on the loads that reach a shell. The import is a few hundred bytes
- * and runs alongside the route's own chunks, so nothing waits on it.
+ * A static import of the module costs more than that on every load, to save
+ * one request on the loads that reach the auth shell. The import is a few
+ * hundred bytes and runs alongside the route's own chunks, so nothing waits on it.
  */
 function preloadAuthLayoutVariant(): Promise<unknown> {
   return import('@/shared/layouts/AuthLayout/auth-layout-variants.ts').then((m) =>
     m.preloadAuthLayoutVariant(useThemeStore.getState().authVariant),
-  );
-}
-
-function preloadSessionAppShell(): Promise<unknown> {
-  return import('@/shared/layouts/AppLayout/app-layout-variants.ts').then((m) =>
-    m.preloadSessionAppShell(),
   );
 }
 
@@ -401,17 +395,17 @@ function preloadAuthShell(): Promise<unknown> {
 }
 
 /**
- * A signed-in shell's own island AND the app shell the session calls for. The
- * shell route renders its island inside a component of its own (the spinner
- * while the session loads), which the router's chunk preloader never sees:
- * unwarmed, the lazy island suspended through `use()` on its first render and
- * React warned on every cold entry into a clinic that it "did not call use()
- * when it finished" — and the spinner flashed once more.
+ * A signed-in shell's own island. The shell route renders its island inside a
+ * component of its own (the spinner while the session loads), which the
+ * router's chunk preloader never sees: unwarmed, the lazy island suspended
+ * through `use()` on its first render and React warned on every cold entry
+ * into a clinic that it "did not call use() when it finished" — and the
+ * spinner flashed once more. The island carries the app shell itself.
  */
 function preloadAppShell(island: {
   preload?: () => Promise<void> | undefined;
 }): Promise<unknown> {
-  return Promise.all([island.preload?.(), preloadSessionAppShell()]);
+  return Promise.resolve(island.preload?.());
 }
 
 /**
@@ -681,7 +675,7 @@ const organizationShellRoute = createRoute({
     await requireProvisionedWorkspace({ params, redirectFrom: location.href });
     await resolveActiveOrg({ params });
   },
-  // The shell's island and the AppLayout it will pick, fetched alongside the
+  // The shell's island (with the AppLayout in it), fetched alongside the
   // route's own chunks rather than after the layout mounts (preloadAppShell);
   // the rooms' module too, without holding the shell for it.
   loader: () => {

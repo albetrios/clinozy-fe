@@ -17,26 +17,26 @@ method we used for **corner radius + shape**.
 
 ## Status tracker (update as each axis is audited)
 
-| #   | Axis                                      | Mechanism                                    | Audit status      |
-| --- | ----------------------------------------- | -------------------------------------------- | ----------------- |
-| 1   | **Corner radius** (`radiusId`)            | `--radius-sm/md/lg/xl` inline; rest derived  | ✅ Done (2025-06) |
-| 2   | **Shape language** (`shapeId`)            | `data-shape` + `[data-slot]`                 | ✅ Done with #1   |
-| 3   | **Elevation + separation**                | `data-elevation`, `data-separation`          | ✅ Done (2025-06) |
-| 4   | **Focus ring** (`focusId`)                | `data-focus` + `data-slot`                   | ✅ Done (2025-06) |
-| 5   | **Density** (`densityId`)                 | `--spacing`                                  | ✅ Done (2025-06) |
-| 6   | **Motion** (`motionId`)                   | `--default-transition-*`                     | ✅ Done (2025-06) |
-| 7   | **Contrast** (`contrastId`)               | `data-contrast`                              | ✅ Done (2025-06) |
-| 8   | **Type scale** (`typeScaleId`)            | `--text-xs` … `--text-4xl`                   | ✅ Done (2025-06) |
-| 9   | **Base colour** (`baseId`)                | `data-base`                                  | ✅ Done (2025-06) |
-| 10  | **Menu style** (`menu`)                   | `data-menu`                                  | ✅ Done (2025-06) |
-| 11  | **Accent / chart / intensity**            | inline OKLCH vars                            | ✅ Done (2025-06) |
-| 12  | **Fonts** (`bodyFontId`, `headingFontId`) | `--font-sans`, `--font-heading`              | ✅ Done (2025-06) |
-| 13  | **Icon weight** (`iconWeight`)            | `--icon-stroke`                              | ✅ Done (2025-06) |
-| 14  | **Icon library** (`iconLibrary`)          | lazy icon chunks                             | ✅ Done (2025-06) |
-| 15  | **Light/dark mode** (`theme`)             | `.dark` on `<html>`                          | ✅ Done (2025-06) |
-| 16  | **Named presets** (`preset`)              | `data-theme`                                 | ✅ Done (2025-06) |
-| 17  | **Toasts** (one design since L-62)        | the bar on `primary` (sonner)                | ✅ Retired        |
-| 18  | **Layout preview variants** (TEMP)        | `authVariant`, `appVariant`, `publicVariant` | ✅ Done (2025-06) |
+| #   | Axis                                      | Mechanism                                   | Audit status      |
+| --- | ----------------------------------------- | ------------------------------------------- | ----------------- |
+| 1   | **Corner radius** (`radiusId`)            | `--radius-sm/md/lg/xl` inline; rest derived | ✅ Done (2025-06) |
+| 2   | **Shape language** (`shapeId`)            | `data-shape` + `[data-slot]`                | ✅ Done with #1   |
+| 3   | **Elevation + separation**                | `data-elevation`, `data-separation`         | ✅ Done (2025-06) |
+| 4   | **Focus ring** (`focusId`)                | `data-focus` + `data-slot`                  | ✅ Done (2025-06) |
+| 5   | **Density** (`densityId`)                 | `--spacing`                                 | ✅ Done (2025-06) |
+| 6   | **Motion** (`motionId`)                   | `--default-transition-*`                    | ✅ Done (2025-06) |
+| 7   | **Contrast** (`contrastId`)               | `data-contrast`                             | ✅ Done (2025-06) |
+| 8   | **Type scale** (`typeScaleId`)            | `--text-xs` … `--text-4xl`                  | ✅ Done (2025-06) |
+| 9   | **Base colour** (`baseId`)                | `data-base`                                 | ✅ Done (2025-06) |
+| 10  | **Menu style** (`menu`)                   | `data-menu`                                 | ✅ Done (2025-06) |
+| 11  | **Accent / chart / intensity**            | inline OKLCH vars                           | ✅ Done (2025-06) |
+| 12  | **Fonts** (`bodyFontId`, `headingFontId`) | `--font-sans`, `--font-heading`             | ✅ Done (2025-06) |
+| 13  | **Icon weight** (`iconWeight`)            | `--icon-stroke`                             | ✅ Done (2025-06) |
+| 14  | **Icon library** (`iconLibrary`)          | lazy icon chunks                            | ✅ Done (2025-06) |
+| 15  | **Light/dark mode** (`theme`)             | `.dark` on `<html>`                         | ✅ Done (2025-06) |
+| 16  | **Named presets** (`preset`)              | `data-theme`                                | ✅ Done (2025-06) |
+| 17  | **Toasts** (one design since L-62)        | the bar on `primary` (sonner)               | ✅ Retired        |
+| 18  | **Layout preview variants** (TEMP)        | `authVariant`, `publicVariant`              | ✅ Done (2025-06) |
 
 **All 18 axes audited.** Re-run a single axis by setting its row back to ⬜ Pending.
 
@@ -173,10 +173,13 @@ old `toastVariant` / `toastPosition` picks.
 
 ### F. Layout shell preview (TEMP — shuffle-gated via `SHUFFLE_TEMP`)
 
+One design per surface: the app shell is the section bar alone (no axis — the sidebar,
+top-nav, rail and Focus previews and `appVariant` are gone). The auth and public layouts
+still carry pre-launch previews, leftovers to remove:
+
 | Axis              | Store field     | Count      | Notes                                                                                                      |
 | ----------------- | --------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
 | **Auth layout**   | `authVariant`   | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.authLayout` off, L-65) / Split / Spotlight / Minimal |
-| **App layout**    | `appVariant`    | 3 variants | Sidebar / top / rail shells (the section bar resolves for 0; `SHUFFLE_TEMP.appLayout` off)                 |
 | **Public layout** | `publicVariant` | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.publicLayout` off, L-65) / Centered / Card / Brand   |
 
 ### G. Environment lock

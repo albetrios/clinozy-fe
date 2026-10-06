@@ -1,11 +1,10 @@
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Skeleton } from '@/lib/animations/Skeleton.tsx';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
+import { SkeletonBar, SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { Search } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
@@ -28,7 +27,6 @@ const loadCommandPalette = onceAsync(() =>
 
 function CommandPalettePending() {
   const { t } = useTranslation(LAYOUT_NS);
-  const { t: tLocale } = useTranslation(LOCALE_NS);
   const { t: tPicker } = useTranslation(PICKER_NS);
   const { query, setQuery, searchFocus, rememberFocus, rememberSelection } =
     useCommandPaletteSearch();
@@ -69,15 +67,15 @@ function CommandPalettePending() {
         />
         <CommandPaletteKbd>{tPicker(PICKER_KEYS.escKey)}</CommandPaletteKbd>
       </div>
-      {/* The design's list geometry (H:2674): a heading, then 40px rows. */}
-      <div data-testid="command-palette-pending" className="flex flex-col gap-1 p-1.5">
-        <output className="sr-only">{tLocale(LOCALE_KEYS.loading)}</output>
-        <Skeleton aria-hidden="true" className="ms-2.5 mt-2.5 mb-1 h-3 w-16" />
-        <Skeleton aria-hidden="true" className="h-10 w-full rounded-lg" />
-        <Skeleton aria-hidden="true" className="h-10 w-full rounded-lg" />
-        <Skeleton aria-hidden="true" className="h-10 w-full rounded-lg" />
-        <Skeleton aria-hidden="true" className="h-10 w-full rounded-lg" />
-        <Skeleton aria-hidden="true" className="h-10 w-full rounded-lg" />
+      {/* The design's list geometry (H:2674): a heading, then 40px rows — their
+          text replaced in place by the flat bars (`_patterns.md:282`). The rows
+          announce the load. */}
+      <div
+        data-testid="command-palette-pending"
+        className="text-body flex flex-col p-1.5"
+      >
+        <SkeletonBar className="ms-2.5 mt-2.5 mb-1 w-16" />
+        <SkeletonRows rows={5} rowClassName="h-10 px-2.5" />
       </div>
     </>
   );

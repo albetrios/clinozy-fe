@@ -43,7 +43,11 @@ describe('EmailVerificationBanner', () => {
     const user = userEvent.setup();
 
     render(<EmailVerificationBanner />);
-    expect(screen.getByTestId('email-verify-banner')).toBeInTheDocument();
+    // The shell's system-notice pill (`shell.md:63`) — its one shape.
+    expect(screen.getByTestId('email-verify-banner')).toHaveAttribute(
+      'data-slot',
+      'notice-pill',
+    );
 
     await user.click(screen.getByTestId('email-verify-resend'));
     await waitFor(() => expect(sendCodeMock).toHaveBeenCalledWith('user@example.com'));

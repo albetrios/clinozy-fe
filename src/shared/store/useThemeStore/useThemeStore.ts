@@ -21,7 +21,6 @@ import {
   generateSeededTheme,
   isThemePreset,
   type LayoutWidthId,
-  nextAppVariant,
   nextAuthVariant,
   nextPublicVariant,
   normalizeLayoutWidthId,
@@ -54,8 +53,6 @@ interface ThemeStore {
   iconLibrary: string;
   /** TEMP: AuthLayout preview design index (0..2); rolled by shuffle. */
   authVariant: number;
-  /** TEMP: AppLayout preview shell index (0..2); rolled by shuffle. */
-  appVariant: number;
   /** TEMP: PublicLayout preview shell index (0..2); rolled by shuffle. */
   publicVariant: number;
   /** Seed of the active generated look — enables shareable `?theme=<seed>` +
@@ -149,7 +146,6 @@ export const useThemeStore = create<ThemeStore>()(
       iconColor: DEFAULT_ICON_COLOR,
       iconLibrary: DEFAULT_ICON_LIBRARY,
       authVariant: 0,
-      appVariant: 0,
       publicVariant: 0,
       seed: null,
       layoutWidth: FIRST_VISIT_LAYOUT_WIDTH,
@@ -242,9 +238,6 @@ export const useThemeStore = create<ThemeStore>()(
           authVariant: SHUFFLE_TEMP.authLayout
             ? nextAuthVariant(get().authVariant)
             : get().authVariant,
-          appVariant: SHUFFLE_TEMP.appLayout
-            ? nextAppVariant(get().appVariant)
-            : get().appVariant,
           publicVariant: SHUFFLE_TEMP.publicLayout
             ? nextPublicVariant(get().publicVariant)
             : get().publicVariant,

@@ -753,19 +753,6 @@ export function nextAuthVariant(current: number): number {
   return v === current ? (v + 1) % AUTH_VARIANT_COUNT : v;
 }
 
-/** How many AppLayout preview shells exist (TEMP — see AppLayout variants). */
-const APP_VARIANT_COUNT = 3;
-
-/**
- * TEMP (app-layout preview): a different shell index in 0..N-1. Remove together
- * with the `appVariant` store field + the AppLayout variants.
- */
-export function nextAppVariant(current: number): number {
-  // eslint-disable-next-line sonarjs/pseudo-random -- cosmetic layout preview, not security
-  const v = Math.floor(Math.random() * APP_VARIANT_COUNT);
-  return v === current ? (v + 1) % APP_VARIANT_COUNT : v;
-}
-
 /**
  * How many PublicLayout shells exist (TEMP — see PublicLayout variants): the
  * launch's canvas (0, the default) and three earlier previews.
@@ -795,23 +782,11 @@ export const SHUFFLE_TEMP = {
    *
    * OFF since L-65: the default (variant 0) is the launch's sign-in canvas, and
    * a shuffle may not rotate it away (docs/design-workflow/process/adoption.md,
-   * "Making a variant live"). Structural for the same reason as `appLayout`:
-   * each auth shell owns the form, so rolling it mid-sign-in would remount the
-   * email step and drop a code the user is typing.
+   * "Making a variant live"). Structural, not cosmetic: each auth shell owns
+   * the form, so rolling it mid-sign-in would remount the email step and drop a
+   * code the user is typing.
    */
   authLayout: false,
-  /**
-   * Cycle the AppLayout (app shell) preview design on shuffle.
-   *
-   * OFF. Every other axis here is cosmetic — colour, type, radius, icons —
-   * and repaints in place. This one is structural: each shell is a different
-   * component owning its own `<main>`, so rolling it unmounts the routed island
-   * and takes a room's filters, a calendar selection and a drawer's draft with
-   * it. A theme shuffle is not a reason to throw away the user's page state
-   * (SHELL-5). The shell variants still exist and are still selectable — they
-   * are simply no longer part of a cosmetic dice roll.
-   */
-  appLayout: false,
   /**
    * Cycle the PublicLayout preview design on shuffle. OFF since L-65: the
    * default (variant 0) is the launch's signed-out canvas, pinned like the auth

@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "본문으로 건너뛰기",
-    "mainNavigation": "주 탐색",
-    "sidebarNavigation": "사이드바 탐색",
-    "mobileNavigation": "모바일 탐색"
+    "skipToMain": "본문으로 건너뛰기"
   },
   "auth": {
     "switchToRegister": "계정 만들기",
@@ -37,29 +34,11 @@
   },
   "app": {
     "search": "검색",
-    "searchPlaceholder": "검색...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "사용자 메뉴",
     "userFallback": "사용자",
     "settings": "설정",
     "logOut": "로그아웃",
-    "toggleSidebar": "사이드바 전환",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "워크스페이스",
-      "menu": "메뉴",
-      "shortcuts": "단축키"
-    },
-    "contextStrip": {
-      "label": "빠른 이동",
-      "labelSolo": "이동",
-      "profile": "프로필",
-      "security": "보안",
-      "billing": "결제",
-      "appearance": "모양",
-      "shortcuts": "단축키"
-    },
     "workspaceSwitch": {
       "preparing": "워크스페이스를 준비하는 중입니다",
       "loadingAccess": "멤버와 권한을 불러오는 중입니다",
@@ -179,7 +158,10 @@
       },
       "statusToast": "상태 · {{status}}",
       "switchClinic": "클리닉 전환",
+      "security": "보안",
+      "billing": "결제",
       "devices": "기기",
+      "appearance": "모양",
       "viewAs": {
         "previewing": "{{role}}(으)로 미리 보는 중",
         "noSections": "섹션 없음",

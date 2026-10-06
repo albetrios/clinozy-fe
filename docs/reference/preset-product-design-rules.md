@@ -316,13 +316,13 @@ hero subcopy). Headings and data components stay full column width.
 
 **Rule L-7 — Responsive breakpoints:** Mobile = single column, full bleed with
 `p-4` shell padding. `lg` (1024px+) = multi-column page grids (e.g. 3-col +
-2+1 split). Sidebar collapse is layout-shell concern (`AppLayout`), not per-page:
-the sidebar is a **drawer below `lg`** and a permanent column from `lg` up; the
-bottom tab bar exists below `md`.
+2+1 split). Navigation is a layout-shell concern (`AppLayout`), not per-page:
+there is no sidebar — the section bar's one header holds the nav on every
+viewport, and the bottom tab bar exists below `md`.
 
 **Rule L-8 — Big monitors keep growing.** Tailwind's scale ends at `2xl` (1536px).
 `index.css` declares **`3xl` (1920px)** and **`4xl` (2560px)**; the contained
-column, the sidebar, the auth hero and large overlays use them. A layout that stops
+column, the auth hero and large overlays use them. A layout that stops
 at `2xl` covers well under half of an ultrawide and stops lining up with the header
 above it. Reading (~768px) and Full widths are unaffected — a measure does not grow
 with the glass.

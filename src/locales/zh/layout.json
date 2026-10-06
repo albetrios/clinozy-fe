@@ -3,10 +3,7 @@
     "name": "{{productName}}"
   },
   "a11y": {
-    "skipToMain": "跳至主要内容",
-    "mainNavigation": "主导航",
-    "sidebarNavigation": "侧边栏导航",
-    "mobileNavigation": "移动端导航"
+    "skipToMain": "跳至主要内容"
   },
   "auth": {
     "switchToRegister": "创建账户",
@@ -39,27 +36,9 @@
     "search": "搜索",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "searchPlaceholder": "搜索...",
-    "userMenu": "用户菜单",
     "userFallback": "用户",
     "settings": "设置",
     "logOut": "退出登录",
-    "toggleSidebar": "切换侧边栏",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "sidebar": {
-      "workspace": "工作区",
-      "menu": "菜单",
-      "shortcuts": "快捷方式"
-    },
-    "contextStrip": {
-      "label": "快速访问",
-      "labelSolo": "前往",
-      "profile": "个人资料",
-      "security": "安全",
-      "billing": "账单",
-      "appearance": "外观",
-      "shortcuts": "快捷键"
-    },
     "workspaceSwitch": {
       "preparing": "正在准备您的工作区",
       "loadingAccess": "正在加载成员和权限",
@@ -179,7 +158,10 @@
       },
       "statusToast": "状态 · {{status}}",
       "switchClinic": "切换诊所",
+      "security": "安全",
+      "billing": "账单",
       "devices": "设备",
+      "appearance": "外观",
       "viewAs": {
         "previewing": "正在以{{role}}身份预览",
         "noSections": "没有版块",

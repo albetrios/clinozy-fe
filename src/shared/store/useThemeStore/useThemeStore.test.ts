@@ -22,7 +22,6 @@ describe('useThemeStore', () => {
       iconWeight: 'regular',
       iconLibrary: 'lucide',
       authVariant: 0,
-      appVariant: 0,
     });
     const root = document.documentElement;
     delete root.dataset.theme;
@@ -143,7 +142,6 @@ describe('useThemeStore', () => {
     // TEMP preview axes (layouts) roll only when their SHUFFLE_TEMP switch is
     // on; either way the stored index stays a valid variant.
     expect([0, 1, 2]).toContain(state.authVariant);
-    expect([0, 1, 2]).toContain(state.appVariant);
   });
 
   it('applyThemeSeed reproduces a look from its seed and stores it', () => {
@@ -184,18 +182,6 @@ describe('useThemeStore', () => {
 
     useThemeStore.getState().setIconLibrary('tabler');
     expect(useThemeStore.getState().iconLibrary).toBe('tabler');
-  });
-
-  it('shuffleTheme leaves the app shell alone — it is cosmetic, not structural (SHELL-5)', () => {
-    // Every other shuffled axis repaints in place. `appVariant` selects a
-    // DIFFERENT shell component, each owning its own <main>, so rolling it
-    // unmounts the routed island and takes a room's filters, a calendar
-    // selection and a drawer's draft with it.
-    useThemeStore.setState({ appVariant: 0 });
-    for (let i = 0; i < 25; i += 1) useThemeStore.getState().shuffleTheme();
-    expect(useThemeStore.getState().appVariant).toBe(0);
-    // ...while the cosmetic axes did roll, so this is not a dead shuffle.
-    expect(useThemeStore.getState().customTheme).not.toBeNull();
   });
 
   it('setPreset clears a generated custom look (keeps base/menu)', () => {
@@ -240,7 +226,7 @@ describe('useThemeStore', () => {
     ];
 
     /** Deliberately ephemeral: shuffle-only previews, stripped in `migrate` too. */
-    const EPHEMERAL_KEYS = ['appVariant', 'authVariant', 'publicVariant'];
+    const EPHEMERAL_KEYS = ['authVariant', 'publicVariant'];
 
     function persistedKeys(): string[] {
       const raw = window.localStorage.getItem('theme-preference');
@@ -255,7 +241,7 @@ describe('useThemeStore', () => {
     });
 
     it('never persists a shuffle-only preview axis', () => {
-      useThemeStore.setState({ appVariant: 2, authVariant: 1, publicVariant: 1 });
+      useThemeStore.setState({ authVariant: 1, publicVariant: 1 });
       useThemeStore.getState().setTheme('light');
       const keys = persistedKeys();
       for (const key of EPHEMERAL_KEYS) expect(keys).not.toContain(key);
@@ -491,7 +477,6 @@ describe('useThemeStore — persistence contract', () => {
     expect(persisted).toHaveProperty('theme');
     expect(persisted).toHaveProperty('preset');
     expect(persisted).not.toHaveProperty('authVariant');
-    expect(persisted).not.toHaveProperty('appVariant');
     expect(persisted).not.toHaveProperty('publicVariant');
   });
 
@@ -532,13 +517,11 @@ describe('useThemeStore — shuffle gates', () => {
     const saved = { ...SHUFFLE_TEMP };
     Object.assign(SHUFFLE_TEMP, {
       authLayout: false,
-      appLayout: false,
       publicLayout: false,
     });
     try {
       useThemeStore.setState({
         authVariant: 1,
-        appVariant: 2,
         publicVariant: 1,
       });
       const before = useThemeStore.getState();
@@ -547,7 +530,6 @@ describe('useThemeStore — shuffle gates', () => {
 
       const after = useThemeStore.getState();
       expect(after.authVariant).toBe(before.authVariant);
-      expect(after.appVariant).toBe(before.appVariant);
       expect(after.publicVariant).toBe(before.publicVariant);
       // The look itself still rolls — gates only pin the TEMP previews.
       expect(after.preset).toBe(GENERATED_PRESET);

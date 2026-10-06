@@ -104,7 +104,7 @@ export function NoticeStack() {
         testId="email-banner-error"
         variant="inline"
       >
-        <EmailVerificationBanner variant="pill" />
+        <EmailVerificationBanner />
       </SectionErrorBoundary>
       <ViewAsPill />
     </div>
