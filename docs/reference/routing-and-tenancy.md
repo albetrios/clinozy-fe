@@ -194,12 +194,20 @@ src/shared/tenancy/
 Slug parsing lives in `lib/routes/params.ts` (`parseOrganizationSlugParam`), not in this module;
 contracts are colocated per file (there is no `tenancy-contracts.ts`).
 
-## 7. Settings — one global modal, hash-based
+## 7. Settings — one global drawer, hash-based
 
 Hash state (`#settings/<scope>/<section>`) replaces the current `/settings/*` chrome routes,
-because the modal must overlay **any** page — including deep organization URLs — without
-unmounting it (a path change re-runs route matching; a hash change does not). Copy-link
-reproduces page + modal, refresh survives, back/Esc closes.
+because the Settings drawer must overlay **any** page — including deep organization URLs —
+without unmounting it (a path change re-runs route matching; a hash change does not).
+Copy-link reproduces page + drawer, refresh survives, back/Esc closes.
+
+**The UI is a drawer (L-65)** — the shared `RecordDrawer` at 1040px from `md`
+(`min(1040px, 100vw − 56px)`), the full screen below, where the section switch (the
+`Picker`) stands in for the rail. Its header reads "Settings" under the floating ×; there is no
+footer, because every section saves itself. The forms Settings opens — API key, webhook,
+delivery history, two-factor setup, passkey, step-up — stack on it as child
+drawers whose Back returns to Settings. The unit keeps its name (`SettingsModal`,
+`SettingsModalLazy`) and its `settings-modal` test id.
 
 ```text
 #settings/account/{profile|account|security|notifications|sessions|billing|integrations}
@@ -217,21 +225,21 @@ there — a personal workspace has no organization sections at all. It still req
 is the separate `AppearanceDialog` on the root route.)
 
 - Invalid hash → fall back to `#settings/account/profile` (or close). The fallback is
-  **written back to the URL**, so it is only decided once the modal has both answers:
+  **written back to the URL**, so it is only decided once the drawer has both answers:
   me/context (which sections exist) **and** the permission set (`useAccessResolved()`).
   Entering an organization clears the store's permissions a beat before the real set
   lands, and an empty _unresolved_ list means "not known yet" — reading it as "not allowed"
   rewrote a valid organization deep link to `account/profile` for good. If me/context settled
-  without data there is nothing to derive permissions from, and the modal does not wait.
+  without data there is nothing to derive permissions from, and the drawer does not wait.
 - **Same-route navigation must state the hash.** The router resolves an _omitted_ `hash` to
-  none, so `navigate({ to: '.', search, replace: true })` also closes this modal. Use
+  none, so `navigate({ to: '.', search, replace: true })` also closes this drawer. Use
   `hash: true` (keep) or `hash: ''` (clear on purpose) — ESLint rejects a same-route
   `navigate()` with neither. Stripe's return params are cleared through
   `stripeReturnCleanupNavigation()` (`lib/billing/stripe-return.ts`).
 - Organization scope requires organization context + permission (`settings-permissions.ts`,
   reusing `core/rbac` policies — never forked); outside an organization → "Select organization
   first" / redirect to `/organization`.
-- **Route guards never see hashes** — all gating lives inside the modal.
+- **Route guards never see hashes** — all gating lives inside the drawer.
 - **Analytics are hash-blind** — fire an explicit PostHog event on open/section change.
 - Lives in `src/shared/components/SettingsModal/`, with `settings-hash-grammar.ts`
   (the **dependency-free** hash grammar — `settingsHash` / `isSettingsHash` etc. — kept
@@ -249,7 +257,7 @@ is the separate `AppearanceDialog` on the root route.)
   `clinic-users` module is on and their codes view Users (`membership:read` + `role:read`,
   `useUsersRoomOpen`) — `#settings/organization/members` and `…/roles` keep their nav entries
   and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
-  that drops the hash, closing the modal. Everywhere else (production keeps the room off
+  that drops the hash, closing the drawer. Everywhere else (production keeps the room off
   until its API lands, D8; a Viewer without `role:read`) the panels stay as they were.
 
 ## 8. IDs and route params
@@ -350,7 +358,7 @@ Executed as phase 0 of the epic:
 | Pages layout         | mirrors URLs; `$param` folders; direct nesting (no `sub-pages/`)                          |
 | `$param` file naming | strip `$`, kebab-case: `organization-slug.route.tsx`, `ORGANIZATION_SLUG.OVERVIEW.md`     |
 | Per-island contract  | 4 files + optional prefixed role files; no `*.layout.tsx`                                 |
-| Settings             | one global modal, `#settings/<scope>/<section>`, in `shared/components/SettingsModal/`    |
+| Settings             | one global drawer, `#settings/<scope>/<section>`, in `shared/components/SettingsModal/`   |
 | Tenancy              | `src/shared/tenancy/` (kernel stays pure); URL is the source of truth                     |
 | Guards               | composable `beforeLoad` chain; resource scope = loader fetch + error mapping              |
 | Route strings        | `lib/routes/` builders returning `{ to, params }`                                         |

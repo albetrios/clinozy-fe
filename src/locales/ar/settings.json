@@ -47,7 +47,6 @@
       "recoveryTitle": "احفظ رموز الاسترداد",
       "recoveryDescription": "خزّنها في مكان آمن. يعمل كل منها مرة واحدة إذا فقدت جهازك.",
       "done": "تم",
-      "cancel": "إلغاء",
       "verifyEnable": "تحقق وتفعيل",
       "codeLabel": "أدخل الرمز المكون من 6 أرقام",
       "codeAria": "رمز المصادقة المكون من ستة أرقام",
@@ -70,7 +69,6 @@
       "addDescription": "سمِّه لتتعرف عليه لاحقًا. سيطلب جهازك إنشاء مفتاح المرور.",
       "nameLabel": "الاسم",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "إلغاء",
       "submit": "إضافة مفتاح مرور"
     },
     "overview": {
@@ -312,7 +310,6 @@
       "addWebhookDescription": "سنرسل الأحداث المحددة إلى هذا الرابط عبر POST.",
       "payloadUrlLabel": "رابط الحمولة",
       "eventsLabel": "الأحداث",
-      "cancel": "إلغاء",
       "createWebhook": "إنشاء ويب هوك",
       "creating": "جارٍ الإنشاء…",
       "deleteWebhookAria": "حذف الويب هوك {{url}}",
@@ -340,7 +337,6 @@
       "attemptCodeColumn": "الرمز",
       "attemptWhenColumn": "الوقت",
       "attemptCountLabel": "المحاولة {{count}}",
-      "closeDialog": "إغلاق",
       "eventsLoadFailed": "تعذّر تحميل قائمة الأحداث. حاول مرة أخرى.",
       "eventsLoading": "جارٍ تحميل الأحداث…",
       "eventsEmpty": "لا توجد أحداث متاحة للاشتراك."

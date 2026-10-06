@@ -3,37 +3,34 @@ import { useTranslation } from 'react-i18next';
 import type { WebhookDeliveryAttempt } from '@/shared/api/webhook-contracts.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
+import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useWebhookDeliveryAttempts } from '@/shared/hooks/useWebhooks/index.ts';
 import { Boxes } from '@/shared/icons/index.ts';
 
+/** One "field" — the history list: the light 560px (`_patterns.md:28`). */
+const DELIVERY_ATTEMPTS_PROFILE = { fieldCount: 1 } as const;
+
 /** Props for {@link WebhookDeliveryAttemptsDialog}. */
 export interface WebhookDeliveryAttemptsDialogProps {
-  /** The webhook whose history to show — `null` closes the dialog. */
+  /** The webhook whose history to show — `null` closes the drawer. */
   webhookId: string | null;
   /** The webhook's URL, shown so the reader knows which endpoint this is. */
   webhookUrl: string;
-  /** Called when the dialog wants to close. */
+  /** Called when the drawer wants to close. */
   onClose: () => void;
 }
 
 /**
- * A webhook's recent delivery attempts — the answer to "why did this stop working?".
+ * A webhook's recent delivery attempts — the answer to "why did this stop working?":
+ * a read-only child drawer stacked on Settings (L-65), whose Back returns to
+ * Integrations. The list scrolls with the drawer's body.
  *
  * @remarks
  * Read-only and gated on `webhook:read`, which is the permission clinozy-be enforces on
@@ -58,73 +55,62 @@ export function WebhookDeliveryAttemptsDialog({
   const rows = data?.rows ?? [];
 
   return (
-    <Dialog
+    <RecordDrawer
       open={webhookId !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
+      onClose={onClose}
+      title={t(integrations.deliveryAttemptsTitle)}
+      sub={t(integrations.deliveryAttemptsDescription)}
+      content={DELIVERY_ATTEMPTS_PROFILE}
+      stacked
+      dismissTestId="webhook-attempts-close"
+      testId="webhook-attempts-dialog"
     >
-      <DialogContent data-testid="webhook-attempts-dialog">
-        <DialogHeader>
-          <DialogTitle>{t(integrations.deliveryAttemptsTitle)}</DialogTitle>
-          <DialogDescription>
-            {t(integrations.deliveryAttemptsDescription)}
-          </DialogDescription>
-        </DialogHeader>
+      <p
+        dir="ltr"
+        className="text-muted-foreground bg-canvas truncate rounded-lg border px-2.5 py-1.5 [text-align:match-parent] font-mono text-xs"
+      >
+        {webhookUrl}
+      </p>
 
-        <p
-          dir="ltr"
-          className="text-muted-foreground bg-canvas truncate rounded-lg border px-2.5 py-1.5 [text-align:match-parent] font-mono text-xs"
-        >
-          {webhookUrl}
-        </p>
-
-        {isLoading ? (
-          <Skeleton className="h-24 w-full" data-testid="webhook-attempts-loading" />
-        ) : null}
-
-        {isError ? (
-          <div data-testid="webhook-attempts-error">
-            <RetryError
-              message={t(integrations.deliveryAttemptsLoadFailed)}
-              onRetry={() => {
-                void refetch();
-              }}
-              isRetrying={isFetching}
-            />
-          </div>
-        ) : null}
-
-        {!(isError || isLoading) && rows.length === 0 ? (
-          <EmptyState
-            icon={<Boxes />}
-            title={t(integrations.deliveryAttemptsEmptyTitle)}
-            description={t(integrations.deliveryAttemptsEmptyDescription)}
+      {isLoading ? (
+        // The list's rows as the design's flat bars, announced by name.
+        <div data-testid="webhook-attempts-loading">
+          <SkeletonRows
+            rows={3}
+            label={t(integrations.deliveryAttemptsTitle)}
+            rowClassName="h-10"
           />
-        ) : null}
+        </div>
+      ) : null}
 
-        {!isError && rows.length > 0 ? (
-          <ul
-            className="divide-border max-h-80 divide-y overflow-y-auto"
-            data-testid="webhook-attempts-list"
-          >
-            {rows.map((attempt) => (
-              <DeliveryAttemptRow key={attemptKey(attempt)} attempt={attempt} />
-            ))}
-          </ul>
-        ) : null}
+      {isError ? (
+        <div data-testid="webhook-attempts-error">
+          <RetryError
+            message={t(integrations.deliveryAttemptsLoadFailed)}
+            onRetry={() => {
+              void refetch();
+            }}
+            isRetrying={isFetching}
+          />
+        </div>
+      ) : null}
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            data-testid="webhook-attempts-close"
-          >
-            {t(integrations.closeDialog)}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      {!(isError || isLoading) && rows.length === 0 ? (
+        <EmptyState
+          icon={<Boxes />}
+          title={t(integrations.deliveryAttemptsEmptyTitle)}
+          description={t(integrations.deliveryAttemptsEmptyDescription)}
+        />
+      ) : null}
+
+      {!isError && rows.length > 0 ? (
+        <ul className="divide-border divide-y" data-testid="webhook-attempts-list">
+          {rows.map((attempt) => (
+            <DeliveryAttemptRow key={attemptKey(attempt)} attempt={attempt} />
+          ))}
+        </ul>
+      ) : null}
+    </RecordDrawer>
   );
 }
 

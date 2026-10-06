@@ -212,7 +212,15 @@ export interface RecordDrawerProps {
    */
   onDismiss?: () => void;
   saveLabel?: string;
+  /** The primary's words while the write runs ("Creating…"); "Saving…" by default. */
+  savingLabel?: string;
   onSave?: () => void;
+  /**
+   * The id of a `<form>` in the body that the primary submits (`type="submit"`),
+   * in place of `onSave`: Enter in its fields saves too. A drawer with steps
+   * saves through `onSave`, which opens the step with a gap.
+   */
+  saveFormId?: string;
   /** The primary's test id where the specs already name it (`<testId>-save` by default). */
   saveTestId?: string;
   saveState?: DrawerSaveState;
@@ -230,6 +238,8 @@ export interface RecordDrawerProps {
   onDelete?: () => void;
   /** Delete's test id where the specs already name it (`<testId>-delete` by default). */
   deleteTestId?: string;
+  /** Cancel / Back / Close's test id where the specs already name it (`<testId>-dismiss` by default). */
+  dismissTestId?: string;
   /** The failed save's note in the screen's words ("Not saved · your counts are kept"). */
   notSavedLabel?: string;
   /** Unsaved edits: every exit and the browser Back ask before discarding. */
@@ -584,7 +594,9 @@ function DrawerForm({
           onDismiss={props.onDismiss ?? onDismiss}
           dismissLabel={props.dismissLabel}
           saveLabel={props.saveLabel}
+          savingLabel={props.savingLabel}
           onSave={onSave}
+          saveFormId={props.saveFormId}
           saveState={props.saveState}
           saveDisabled={props.saveDisabled}
           saveIncomplete={props.saveIncomplete}
@@ -596,6 +608,7 @@ function DrawerForm({
           notSavedLabel={props.notSavedLabel}
           saveTestId={props.saveTestId}
           deleteTestId={props.deleteTestId}
+          dismissTestId={props.dismissTestId}
           testId={testId}
         />
       )}

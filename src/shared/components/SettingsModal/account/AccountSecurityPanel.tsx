@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
@@ -9,6 +9,7 @@ import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { QrCode } from '@/shared/components/QrCode/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RecoveryCodesPanel } from '@/shared/components/RecoveryCodesPanel/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SecurityOverviewCard } from '@/shared/components/SecurityOverviewCard/index.ts';
@@ -28,14 +29,6 @@ import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import {
   useBeginMfaEnrollment,
@@ -51,7 +44,25 @@ import {
 import { Copy, Fingerprint, ShieldCheck, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-/** Two-factor card: QR enroll → 6-digit OTP → recovery codes + disable. */
+/** The QR, the secret and the code — a light form: the 560px drawer (`_patterns.md:28`). */
+const MFA_SETUP_PROFILE = { fieldCount: 2 } as const;
+
+/** One name to type: the light 560px drawer. */
+const PASSKEY_ADD_PROFILE = { fieldCount: 1 } as const;
+
+/** The setup drawer's head for its phase: scan and verify, then the recovery codes. */
+function mfaSetupCopy(recoveryShown: boolean) {
+  const mfa = SETTINGS_KEYS.security.mfa;
+  return recoveryShown
+    ? { title: mfa.recoveryTitle, sub: mfa.recoveryDescription }
+    : { title: mfa.setupTitle, sub: mfa.setupDescription };
+}
+
+/**
+ * Two-factor card: QR enroll → 6-digit OTP → recovery codes + disable. Setup
+ * is a child drawer stacked on Settings (L-65): Back returns to Security, and
+ * the recovery codes' own Done closes it.
+ */
 function MfaCard() {
   const { t } = useTranslation(SETTINGS_NS);
   // The WHOLE query, not just `data`: `?? false` is indistinguishable from a
@@ -72,6 +83,7 @@ function MfaCard() {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [disableOpen, setDisableOpen] = useState(false);
   const [secretCopied, setSecretCopied] = useState(false);
+  const setupCopy = mfaSetupCopy(recoveryCodes !== null);
 
   function closeSetup() {
     setSetupOpen(false);
@@ -185,70 +197,48 @@ function MfaCard() {
         {mfaStatus.isSuccess ? mfaAction : null}
       </div>
 
-      <Dialog
+      <RecordDrawer
         open={setupOpen}
-        onOpenChange={(open) => {
-          if (!open) closeSetup();
-        }}
+        onClose={closeSetup}
+        title={t(setupCopy.title)}
+        sub={t(setupCopy.sub)}
+        content={MFA_SETUP_PROFILE}
+        stacked
+        saveLabel={t(SETTINGS_KEYS.security.mfa.verifyEnable)}
+        onSave={() => handleSubmitCode()}
+        saveDisabled={code.length < 6 || confirm.isPending}
+        saveTestId="mfa-verify"
+        hideFooter={recoveryCodes !== null}
+        testId="mfa-setup-dialog"
       >
-        <DialogContent className="sm:max-w-md" data-testid="mfa-setup-dialog">
-          {recoveryCodes ? (
-            <>
-              <DialogHeader>
-                <DialogTitle>{t(SETTINGS_KEYS.security.mfa.recoveryTitle)}</DialogTitle>
-                <DialogDescription>
-                  {t(SETTINGS_KEYS.security.mfa.recoveryDescription)}
-                </DialogDescription>
-              </DialogHeader>
-              <RecoveryCodesPanel codes={recoveryCodes} onDone={closeSetup} />
-            </>
-          ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle>{t(SETTINGS_KEYS.security.mfa.setupTitle)}</DialogTitle>
-                <DialogDescription>
-                  {t(SETTINGS_KEYS.security.mfa.setupDescription)}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                <MfaEnrollmentSecret
-                  enrollment={enrollment}
-                  secretCopied={secretCopied}
-                  onCopy={() => void handleCopySecret()}
-                />
+        {recoveryCodes ? (
+          <RecoveryCodesPanel codes={recoveryCodes} onDone={closeSetup} />
+        ) : (
+          <div className="flex flex-col gap-4">
+            <MfaEnrollmentSecret
+              enrollment={enrollment}
+              secretCopied={secretCopied}
+              onCopy={() => void handleCopySecret()}
+            />
 
-                <DrawerField
-                  label={t(SETTINGS_KEYS.security.mfa.codeLabel)}
-                  htmlFor="mfa-code"
-                  error={confirmError || undefined}
-                >
-                  <TotpCodeInput
-                    id="mfa-code"
-                    value={code}
-                    onChange={setCode}
-                    onComplete={handleSubmitCode}
-                    invalid={!!confirmError}
-                    testId="mfa-code"
-                    aria-label={t(SETTINGS_KEYS.security.mfa.codeAria)}
-                  />
-                </DrawerField>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={closeSetup}>
-                  {t(SETTINGS_KEYS.security.mfa.cancel)}
-                </Button>
-                <Button
-                  onClick={() => handleSubmitCode()}
-                  disabled={code.length < 6 || confirm.isPending}
-                  data-testid="mfa-verify"
-                >
-                  {t(SETTINGS_KEYS.security.mfa.verifyEnable)}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            <DrawerField
+              label={t(SETTINGS_KEYS.security.mfa.codeLabel)}
+              htmlFor="mfa-code"
+              error={confirmError || undefined}
+            >
+              <TotpCodeInput
+                id="mfa-code"
+                value={code}
+                onChange={setCode}
+                onComplete={handleSubmitCode}
+                invalid={!!confirmError}
+                testId="mfa-code"
+                aria-label={t(SETTINGS_KEYS.security.mfa.codeAria)}
+              />
+            </DrawerField>
+          </div>
+        )}
+      </RecordDrawer>
 
       <MfaDisableConfirm
         open={disableOpen}
@@ -413,6 +403,8 @@ function PasskeysCard() {
   const { guard, isGuarding, isSteppingUp, stepUpDialog } = useStepUpGuard();
   const [addOpen, setAddOpen] = useState(false);
   const [name, setName] = useState('');
+  // The name takes focus on open, as it did when this was a dialog.
+  const nameRef = useRef<HTMLInputElement>(null);
 
   function closeAdd() {
     setAddOpen(false);
@@ -476,45 +468,35 @@ function PasskeysCard() {
         {passkeysQuery.isSuccess ? passkeysBody : null}
       </div>
 
-      <Dialog
+      {/* Naming a new passkey: a child drawer stacked on Settings (L-65). */}
+      <RecordDrawer
         open={addOpen}
-        onOpenChange={(open) => {
-          if (!open) closeAdd();
-        }}
+        onClose={closeAdd}
+        title={t(SETTINGS_KEYS.security.passkeys.addTitle)}
+        sub={t(SETTINGS_KEYS.security.passkeys.addDescription)}
+        content={PASSKEY_ADD_PROFILE}
+        stacked
+        initialFocusRef={nameRef}
+        saveLabel={t(SETTINGS_KEYS.security.passkeys.submit)}
+        onSave={submitAdd}
+        saveDisabled={register.isPending || isGuarding}
+        saveTestId="passkey-add-submit"
+        testId="passkey-add-dialog"
       >
-        <DialogContent data-testid="passkey-add-dialog">
-          <DialogHeader>
-            <DialogTitle>{t(SETTINGS_KEYS.security.passkeys.addTitle)}</DialogTitle>
-            <DialogDescription>
-              {t(SETTINGS_KEYS.security.passkeys.addDescription)}
-            </DialogDescription>
-          </DialogHeader>
-          <DrawerField
-            label={t(SETTINGS_KEYS.security.passkeys.nameLabel)}
-            htmlFor="passkey-name"
-          >
-            <DrawerInput
-              id="passkey-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
-              data-testid="passkey-name"
-            />
-          </DrawerField>
-          <DialogFooter>
-            <Button variant="outline" onClick={closeAdd}>
-              {t(SETTINGS_KEYS.security.passkeys.cancel)}
-            </Button>
-            <Button
-              onClick={submitAdd}
-              disabled={register.isPending || isGuarding}
-              data-testid="passkey-add-submit"
-            >
-              {t(SETTINGS_KEYS.security.passkeys.submit)}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <DrawerField
+          label={t(SETTINGS_KEYS.security.passkeys.nameLabel)}
+          htmlFor="passkey-name"
+        >
+          <DrawerInput
+            ref={nameRef}
+            id="passkey-name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
+            data-testid="passkey-name"
+          />
+        </DrawerField>
+      </RecordDrawer>
 
       {stepUpDialog}
     </SettingsCard>

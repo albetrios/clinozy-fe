@@ -42,7 +42,6 @@
       "recoveryTitle": "복구 코드 저장",
       "recoveryDescription": "안전한 곳에 보관하세요. 기기를 잃어버리면 각 코드는 한 번만 사용할 수 있습니다.",
       "done": "완료",
-      "cancel": "취소",
       "verifyEnable": "확인하고 사용",
       "codeLabel": "6자리 코드 입력",
       "codeAria": "6자리 인증 코드",
@@ -65,7 +64,6 @@
       "addDescription": "나중에 알아볼 수 있도록 이름을 지정하세요. 기기에서 패스키 생성을 요청합니다.",
       "nameLabel": "이름",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "취소",
       "submit": "패스키 추가"
     },
     "overview": {
@@ -294,7 +292,6 @@
       "addWebhookDescription": "선택한 이벤트를 이 URL로 POST합니다.",
       "payloadUrlLabel": "페이로드 URL",
       "eventsLabel": "이벤트",
-      "cancel": "취소",
       "createWebhook": "웹훅 만들기",
       "creating": "만드는 중…",
       "deleteWebhookAria": "웹훅 {{url}} 삭제",
@@ -322,7 +319,6 @@
       "attemptCodeColumn": "코드",
       "attemptWhenColumn": "시각",
       "attemptCountLabel": "{{count}}번째 시도",
-      "closeDialog": "닫기",
       "eventsLoadFailed": "이벤트 목록을 불러오지 못했습니다. 다시 시도해 주세요.",
       "eventsLoading": "이벤트 불러오는 중…",
       "eventsEmpty": "구독할 수 있는 이벤트가 없습니다."

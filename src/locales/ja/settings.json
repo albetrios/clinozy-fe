@@ -42,7 +42,6 @@
       "recoveryTitle": "リカバリーコードを保存",
       "recoveryDescription": "安全な場所に保管してください。端末を紛失した場合、各コードは一度だけ使えます。",
       "done": "完了",
-      "cancel": "キャンセル",
       "verifyEnable": "確認して有効化",
       "codeLabel": "6桁のコードを入力",
       "codeAria": "6桁の認証コード",
@@ -65,7 +64,6 @@
       "addDescription": "後で識別できる名前を付けてください。デバイスがパスキー作成を促します。",
       "nameLabel": "名前",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "キャンセル",
       "submit": "パスキーを追加"
     },
     "overview": {
@@ -294,7 +292,6 @@
       "addWebhookDescription": "選択したイベントをこの URL に POST します。",
       "payloadUrlLabel": "ペイロード URL",
       "eventsLabel": "イベント",
-      "cancel": "キャンセル",
       "createWebhook": "Webhook を作成",
       "creating": "作成中…",
       "deleteWebhookAria": "Webhook {{url}} を削除",
@@ -322,7 +319,6 @@
       "attemptCodeColumn": "コード",
       "attemptWhenColumn": "日時",
       "attemptCountLabel": "{{count}} 回目",
-      "closeDialog": "閉じる",
       "eventsLoadFailed": "イベント一覧を読み込めませんでした。もう一度お試しください。",
       "eventsLoading": "イベントを読み込み中…",
       "eventsEmpty": "購読できるイベントがありません。"

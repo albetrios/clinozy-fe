@@ -19,9 +19,14 @@ import { isSettingsHash } from './settings-hash-grammar.ts';
 import { isSettingsPathAllowed } from './settings-route-policy.ts';
 
 const loadSettingsSurface = onceAsync(async () => {
-  const [, , module] = await Promise.all([
-    ensureNamespace(useLocaleStore.getState().locale, I18N_NAMESPACES.auth),
-    ensureNamespace(useLocaleStore.getState().locale, I18N_NAMESPACES.settings),
+  const locale = useLocaleStore.getState().locale;
+  const [, , , module] = await Promise.all([
+    ensureNamespace(locale, I18N_NAMESPACES.auth),
+    ensureNamespace(locale, I18N_NAMESPACES.settings),
+    // The drawer chrome its child drawers read ("Back", "Saving…") is `clinic`
+    // copy, which otherwise loads only with the org shell — and Settings also
+    // opens over the organization picker.
+    ensureNamespace(locale, I18N_NAMESPACES.clinic),
     import('./SettingsModal.tsx'),
   ]);
   return { default: module.SettingsModal };

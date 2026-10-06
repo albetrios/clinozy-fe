@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { FormEvent } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -91,6 +92,53 @@ describe('DrawerFooter', () => {
     expect(screen.getByTestId('pt-dismiss')).toHaveTextContent('Nothing next');
   });
 
+  it('carries the dismiss test id a drawer’s specs already name', () => {
+    renderFooter({ dismissTestId: 'apikey-cancel' });
+    expect(screen.getByTestId('apikey-cancel')).toHaveTextContent('Cancel');
+    expect(screen.queryByTestId('pt-dismiss')).not.toBeInTheDocument();
+  });
+
+  it('carries it on the read-only "Close" too', () => {
+    renderFooter({ readOnly: true, dismissTestId: 'history-close' });
+    expect(screen.getByTestId('history-close')).toHaveTextContent('Close');
+  });
+
+  it('submits a form in place of onSave — and is that form’s default button', async () => {
+    // A converted dialog keeps its `<form>`: the footer's primary submits it,
+    // so the form's own validation and submit run, and Enter in any of its
+    // fields saves in the browser (the default button is the first submit
+    // button the form OWNS, wherever it sits).
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event: FormEvent) => event.preventDefault());
+    const onSave = vi.fn();
+    render(
+      <>
+        <form id="role-form" aria-label="Role" onSubmit={onSubmit}>
+          <input aria-label="Name" />
+          <input aria-label="Description" />
+        </form>
+        <DrawerFooter
+          testId="pt"
+          onDismiss={vi.fn()}
+          onSave={onSave}
+          saveFormId="role-form"
+          saveLabel="Create role"
+        />
+      </>,
+    );
+
+    const save = screen.getByTestId('pt-save');
+    expect(save).toHaveAttribute('type', 'submit');
+    expect(save).toHaveAttribute('form', 'role-form');
+    const form = screen.getByRole('form', { name: 'Role' }) as HTMLFormElement;
+    expect([...form.elements]).toContain(save);
+
+    await user.click(save);
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    // The form's submit is the write — never both.
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
   it('is view only when read-only: "Close" and the role note, nothing to save or delete', () => {
     renderFooter({ readOnly: true });
 
@@ -125,6 +173,14 @@ describe('DrawerFooter', () => {
     expect(screen.getByTestId('pt-dismiss')).toBeDisabled();
     expect(screen.getByTestId('pt-save-and-add')).toBeDisabled();
     expect(screen.getByTestId('pt-delete')).toBeDisabled();
+  });
+
+  it('while saving reads the screen’s own words when it has them ("Creating…")', () => {
+    renderFooter({ saveState: 'saving', savingLabel: 'Creating…' });
+
+    expect(screen.getByTestId('pt-save')).toHaveTextContent('Creating…');
+    expect(screen.getByTestId('pt-save')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('pt-dismiss')).toBeDisabled();
   });
 
   describe('on a phone', () => {

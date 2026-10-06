@@ -30,7 +30,15 @@ export interface DrawerFooterProps {
   dismissLabel?: string;
   /** Primary label (the screen's own, e.g. "Create patient"); "Save" by default. */
   saveLabel?: string;
+  /** The primary's words while the write runs ("Creating…"); "Saving…" by default. */
+  savingLabel?: string;
   onSave?: () => void;
+  /**
+   * The id of a `<form>` in the drawer that the primary submits (`type="submit"`):
+   * the form's own submit runs in place of `onSave`, and Enter in its fields
+   * saves too.
+   */
+  saveFormId?: string;
   saveState?: DrawerSaveState;
   /**
    * Nothing to save yet — an edit form before its first change (Q-P1): the
@@ -61,6 +69,8 @@ export interface DrawerFooterProps {
   saveTestId?: string;
   /** Delete's test id, likewise (`<testId>-delete` by default). */
   deleteTestId?: string;
+  /** Cancel / Back / Close's test id, likewise (`<testId>-dismiss` by default). */
+  dismissTestId?: string;
   /** Prefix for the footer's test ids (`<testId>-save` …). */
   testId: string;
 }
@@ -79,12 +89,15 @@ const COMPACT_BUTTON = 'md:h-8';
 type EditActionsProps = Omit<DrawerFooterProps, 'summary' | 'readOnly' | 'start'>;
 
 /**
- * The primary: "Saving…" while a save runs, "Retry save" after one failed;
- * disabled until there is something to save, at 50% while incomplete.
+ * The primary: "Saving…" (or the screen's own words) while a save runs, "Retry
+ * save" after one failed; disabled until there is something to save, at 50%
+ * while incomplete. With `saveFormId` it is that form's submit button.
  */
 function PrimaryAction({
   saveLabel,
+  savingLabel,
   onSave,
+  saveFormId,
   saveState,
   saveDisabled,
   saveIncomplete,
@@ -94,7 +107,9 @@ function PrimaryAction({
 }: Pick<
   EditActionsProps,
   | 'saveLabel'
+  | 'savingLabel'
   | 'onSave'
+  | 'saveFormId'
   | 'saveState'
   | 'saveDisabled'
   | 'saveIncomplete'
@@ -104,15 +119,16 @@ function PrimaryAction({
   const { t } = useTranslation(RECORD_DRAWER_NS);
   const saving = saveState === 'saving';
   let label = saveLabel ?? t(RECORD_DRAWER_KEYS.save);
-  if (saving) label = t(RECORD_DRAWER_KEYS.saving);
+  if (saving) label = savingLabel ?? t(RECORD_DRAWER_KEYS.saving);
   else if (saveState === 'failed') label = t(RECORD_DRAWER_KEYS.retrySave);
   return (
     <Button
-      type="button"
+      type={saveFormId ? 'submit' : 'button'}
+      form={saveFormId}
       disabled={saving || saveDisabled}
       aria-busy={saving || undefined}
       data-incomplete={saveIncomplete || undefined}
-      onClick={onSave}
+      onClick={saveFormId ? undefined : onSave}
       data-testid={saveTestId ?? `${testId}-save`}
       className={cn(className, 'px-4', saveIncomplete && 'opacity-50')}
     >
@@ -127,7 +143,9 @@ function EditActions({
   onDismiss,
   dismissLabel,
   saveLabel,
+  savingLabel,
   onSave,
+  saveFormId,
   saveState,
   saveDisabled,
   saveIncomplete,
@@ -139,6 +157,7 @@ function EditActions({
   deleteLabel,
   saveTestId,
   deleteTestId,
+  dismissTestId,
   testId,
 }: EditActionsProps) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
@@ -167,7 +186,7 @@ function EditActions({
         variant="outline"
         disabled={saving}
         onClick={onDismiss}
-        data-testid={`${testId}-dismiss`}
+        data-testid={dismissTestId ?? `${testId}-dismiss`}
         className={button}
       >
         {dismissLabel ?? t(stacked ? RECORD_DRAWER_KEYS.back : RECORD_DRAWER_KEYS.cancel)}
@@ -204,10 +223,12 @@ function EditActions({
         </span>
       ) : null}
 
-      {onSave ? (
+      {onSave || saveFormId ? (
         <PrimaryAction
           saveLabel={saveLabel}
+          savingLabel={savingLabel}
           onSave={onSave}
+          saveFormId={saveFormId}
           saveState={saveState}
           saveDisabled={saveDisabled}
           saveIncomplete={saveIncomplete}
@@ -267,7 +288,7 @@ export function DrawerFooter({
           type="button"
           variant="outline"
           onClick={actions.onDismiss}
-          data-testid={`${actions.testId}-dismiss`}
+          data-testid={actions.dismissTestId ?? `${actions.testId}-dismiss`}
           className={cn(FOOTER_BUTTON, actions.compact && COMPACT_BUTTON)}
         >
           {t(RECORD_DRAWER_KEYS.close)}

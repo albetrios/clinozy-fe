@@ -2,7 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { ApiKeyCreateDialog } from './ApiKeyCreateDialog.tsx';
 
@@ -63,9 +64,11 @@ function createSucceeds(key: Partial<typeof CREATED> = {}) {
   });
 }
 
+/** Mounts the trigger (the drawer's dirty guard needs the router) and opens the drawer. */
 async function open() {
+  renderWithProviders(<ApiKeyCreateDialog />);
   const user = userEvent.setup();
-  await user.click(screen.getByTestId('apikey-create-open'));
+  await user.click(await screen.findByTestId('apikey-create-open'));
   await screen.findByTestId('apikey-create-dialog');
   return user;
 }
@@ -81,11 +84,24 @@ describe('ApiKeyCreateDialog', () => {
     notifySuccess.mockReset();
   });
 
+  it('is a child drawer stacked on Settings: named, Back returns, the name focused', async () => {
+    await open();
+
+    const drawer = screen.getByRole('dialog', { name: 'Create an API key' });
+    expect(drawer).toBe(screen.getByTestId('apikey-create-dialog'));
+    expect(drawer).toHaveAttribute('data-slot', 'sheet-content');
+    // Stacked over Settings, its dismiss reads "Back" — on the id the specs know.
+    expect(screen.getByTestId('apikey-cancel')).toHaveTextContent('Back');
+    expect(screen.getByTestId('apikey-create')).toHaveTextContent('Create API key');
+    // The name takes focus on open, as it did in the dialog.
+    await waitFor(() => expect(screen.getByTestId('apikey-name')).toHaveFocus());
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
   it('sends the name, chosen scopes and a NUMBER of days', async () => {
     // Regression: the fetcher used to omit `scopes` (required, and the body is
     // `.strict()` server-side) and send `expires_in_days` as a STRING, so every
     // create this dialog could have made would have been rejected 400.
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -103,7 +119,6 @@ describe('ApiKeyCreateDialog', () => {
   it('omits the expiry entirely for a key that never expires', async () => {
     // clinozy-be caps `expires_in_days` at 365, so "never" cannot be expressed as
     // a bigger number — the field has to be absent.
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Forever');
@@ -121,7 +136,6 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('refuses to submit without a scope, and says why', async () => {
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'No scopes');
@@ -134,7 +148,6 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('refuses to submit without a name, and says why', async () => {
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.click(screen.getByTestId('apikey-scope-organization:read'));
@@ -150,7 +163,6 @@ describe('ApiKeyCreateDialog', () => {
     // clinozy-be stores only a hash. A secret dismissed by a stray keypress is
     // gone, and the key has to be rotated — so the gate is not decoration.
     createSucceeds();
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -161,6 +173,9 @@ describe('ApiKeyCreateDialog', () => {
       'core_ab_SUPERSECRETVALUE',
     );
     expect(screen.getByTestId('apikey-secret-done')).toBeDisabled();
+    // Nothing to go back to: the reveal has no footer, only its own Done.
+    expect(screen.getByRole('dialog', { name: 'Copy your API key' })).toBeInTheDocument();
+    expect(screen.queryByTestId('apikey-cancel')).not.toBeInTheDocument();
 
     await user.click(screen.getByTestId('apikey-secret-ack'));
     expect(screen.getByTestId('apikey-secret-done')).toBeEnabled();
@@ -173,7 +188,6 @@ describe('ApiKeyCreateDialog', () => {
 
   it('keeps the dialog open while an unacknowledged secret is on screen', async () => {
     createSucceeds({ id: 'pat_y', name: 'Escape test', secret: 'core_cd_ANOTHERSECRET' });
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Escape test');
@@ -182,6 +196,9 @@ describe('ApiKeyCreateDialog', () => {
     await screen.findByTestId('apikey-secret');
 
     await user.keyboard('{Escape}');
+    expect(screen.getByTestId('apikey-secret')).toBeInTheDocument();
+    // …nor by the drawer's ×.
+    await user.click(screen.getByTestId('apikey-create-dialog-close'));
     expect(screen.getByTestId('apikey-secret')).toBeInTheDocument();
   });
 
@@ -193,7 +210,6 @@ describe('ApiKeyCreateDialog', () => {
     createMutate.mockImplementation((_vars, handlers) => {
       handlers.onError(new Error('An API key with that name already exists'));
     });
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Duplicate');
@@ -206,7 +222,6 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('a second click on a scope takes it off again', async () => {
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Toggling');
@@ -224,7 +239,6 @@ describe('ApiKeyCreateDialog', () => {
   });
 
   it('Cancel closes the dialog and the next open starts empty', async () => {
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Abandoned');
@@ -246,7 +260,6 @@ describe('ApiKeyCreateDialog', () => {
 
   it('Done closes the dialog once the secret is acknowledged', async () => {
     createSucceeds();
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -271,7 +284,6 @@ describe('ApiKeyCreateDialog', () => {
     // secret, closes the only screen that shows it, and has to rotate the key.
     createSucceeds();
     copySensitiveText.mockResolvedValue(false);
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -287,7 +299,6 @@ describe('ApiKeyCreateDialog', () => {
 
   it('confirms a copy that worked', async () => {
     createSucceeds();
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     await user.type(screen.getByTestId('apikey-name'), 'Production server');
@@ -305,10 +316,10 @@ describe('ApiKeyCreateDialog', () => {
     // Esc and the overlay both come through `onOpenChange`. Closing mid-request
     // would lose the secret of a key the server is about to create.
     createState.isPending = true;
-    renderWithQueryClient(<ApiKeyCreateDialog />);
     const user = await open();
 
     expect(screen.getByTestId('apikey-cancel')).toBeDisabled();
+    expect(screen.getByTestId('apikey-create')).toHaveTextContent('Creating…');
 
     await user.keyboard('{Escape}');
     expect(screen.getByTestId('apikey-create-dialog')).toBeInTheDocument();

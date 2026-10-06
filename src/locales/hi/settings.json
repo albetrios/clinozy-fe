@@ -43,7 +43,6 @@
       "recoveryTitle": "अपने रिकवरी कोड सहेजें",
       "recoveryDescription": "इन्हें सुरक्षित जगह रखें। डिवाइस खोने पर प्रत्येक एक बार काम करता है।",
       "done": "हो गया",
-      "cancel": "रद्द करें",
       "verifyEnable": "सत्यापित करें और सक्षम करें",
       "codeLabel": "6-अंकीय कोड दर्ज करें",
       "codeAria": "छह-अंकीय ऑथेंटिकेटर कोड",
@@ -66,7 +65,6 @@
       "addDescription": "बाद में पहचानने के लिए नाम दें। आपका डिवाइस पासकी बनाने के लिए संकेत देगा।",
       "nameLabel": "नाम",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "रद्द करें",
       "submit": "पासकी जोड़ें"
     },
     "overview": {
@@ -296,7 +294,6 @@
       "addWebhookDescription": "हम चुनी गई घटनाएँ इस URL पर POST करेंगे।",
       "payloadUrlLabel": "पेलोड URL",
       "eventsLabel": "घटनाएँ",
-      "cancel": "रद्द करें",
       "createWebhook": "वेबहुक बनाएँ",
       "creating": "बन रहा है…",
       "deleteWebhookAria": "वेबहुक {{url}} हटाएँ",
@@ -324,7 +321,6 @@
       "attemptCodeColumn": "कोड",
       "attemptWhenColumn": "कब",
       "attemptCountLabel": "प्रयास {{count}}",
-      "closeDialog": "बंद करें",
       "eventsLoadFailed": "ईवेंट सूची लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
       "eventsLoading": "ईवेंट लोड हो रहे हैं…",
       "eventsEmpty": "सदस्यता लेने योग्य कोई ईवेंट उपलब्ध नहीं।"

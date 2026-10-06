@@ -1,8 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { WebhookFormDialog } from './WebhookFormDialog.tsx';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+
+import { WebhookFormDialog, type WebhookFormDialogProps } from './WebhookFormDialog.tsx';
 
 const { createMutate, updateMutate, useWebhookEventsMock } = vi.hoisted(() => ({
   createMutate: vi.fn(),
@@ -44,9 +47,27 @@ beforeEach(() => {
   useWebhookEventsMock.mockReturnValue(catalog());
 });
 
+/** Opens the drawer (its dirty guard needs the router) and waits for it to mount. */
+async function renderForm(webhook: WebhookFormDialogProps['webhook']) {
+  renderWithProviders(
+    <WebhookFormDialog open onOpenChange={vi.fn()} webhook={webhook} />,
+  );
+  return screen.findByTestId('webhook-form-dialog');
+}
+
 describe('WebhookFormDialog — create', () => {
-  it('offers the catalog from the API, not a hardcoded list', () => {
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+  it('is a child drawer stacked on Settings: named, Back returns, the URL focused', async () => {
+    const drawer = await renderForm(null);
+
+    expect(screen.getByRole('dialog', { name: 'Add a webhook' })).toBe(drawer);
+    expect(screen.getByTestId('webhook-cancel')).toHaveTextContent('Back');
+    expect(screen.getByTestId('webhook-save')).toHaveTextContent('Create webhook');
+    await vi.waitFor(() => expect(screen.getByTestId('webhook-url')).toHaveFocus());
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
+  it('offers the catalog from the API, not a hardcoded list', async () => {
+    await renderForm(null);
     expect(screen.getByTestId('webhook-event-membership.created')).toBeInTheDocument();
     expect(screen.getByTestId('webhook-event-subscription.updated')).toBeInTheDocument();
     // The name the old client-side list offered and clinozy-be never dispatches.
@@ -55,7 +76,7 @@ describe('WebhookFormDialog — create', () => {
 
   it('submits the chosen url and events', async () => {
     const user = userEvent.setup();
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
 
     await user.type(screen.getByTestId('webhook-url'), 'https://new.test/hook');
     await user.click(screen.getByTestId('webhook-event-membership.created'));
@@ -71,7 +92,7 @@ describe('WebhookFormDialog — create', () => {
   // into a message on the field.
   it('refuses a non-HTTPS URL before it reaches the API', async () => {
     const user = userEvent.setup();
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
 
     await user.type(screen.getByTestId('webhook-url'), 'http://insecure.test/hook');
     await user.click(screen.getByTestId('webhook-event-membership.created'));
@@ -83,7 +104,7 @@ describe('WebhookFormDialog — create', () => {
 
   it('requires at least one event', async () => {
     const user = userEvent.setup();
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
 
     await user.type(screen.getByTestId('webhook-url'), 'https://new.test/hook');
     await user.click(screen.getByTestId('webhook-save'));
@@ -94,8 +115,8 @@ describe('WebhookFormDialog — create', () => {
 });
 
 describe('WebhookFormDialog — edit', () => {
-  it('prefills from the webhook being edited', () => {
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={WEBHOOK} />);
+  it('prefills from the webhook being edited', async () => {
+    await renderForm(WEBHOOK);
     expect(screen.getByTestId('webhook-url')).toHaveValue('https://x.test/hook');
     expect(screen.getByTestId('webhook-event-membership.created')).toHaveAttribute(
       'aria-pressed',
@@ -109,7 +130,7 @@ describe('WebhookFormDialog — edit', () => {
 
   it('updates through the id it was given', async () => {
     const user = userEvent.setup();
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={WEBHOOK} />);
+    await renderForm(WEBHOOK);
 
     await user.click(screen.getByTestId('webhook-event-subscription.updated'));
     await user.click(screen.getByTestId('webhook-save'));
@@ -129,24 +150,24 @@ describe('WebhookFormDialog — edit', () => {
 });
 
 describe('WebhookFormDialog — catalog states', () => {
-  it('shows a skeleton while the catalog loads', () => {
+  it('shows a skeleton while the catalog loads', async () => {
     useWebhookEventsMock.mockReturnValue(catalog({ isPending: true, rows: [] }));
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
     expect(screen.getByTestId('webhook-events-loading')).toBeInTheDocument();
   });
 
   // A failed catalog must never read as "no events exist" — that invites saving a webhook
   // subscribed to nothing, which is exactly the silent-no-op this work removes.
-  it('offers a retry when the catalog fails, rather than an empty checklist', () => {
+  it('offers a retry when the catalog fails, rather than an empty checklist', async () => {
     useWebhookEventsMock.mockReturnValue(catalog({ isError: true, rows: [] }));
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
     expect(screen.getByTestId('webhook-events-error')).toBeInTheDocument();
     expect(screen.queryByTestId('webhook-events-empty')).not.toBeInTheDocument();
   });
 
-  it('says so plainly when the catalog is genuinely empty', () => {
+  it('says so plainly when the catalog is genuinely empty', async () => {
     useWebhookEventsMock.mockReturnValue(catalog({ rows: [] }));
-    render(<WebhookFormDialog open onOpenChange={vi.fn()} webhook={null} />);
+    await renderForm(null);
     expect(screen.getByTestId('webhook-events-empty')).toBeInTheDocument();
   });
 });

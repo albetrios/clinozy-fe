@@ -43,7 +43,6 @@
       "recoveryTitle": "Save your recovery codes",
       "recoveryDescription": "Store these somewhere safe. Each one works once if you lose your device.",
       "done": "Done",
-      "cancel": "Cancel",
       "verifyEnable": "Verify & enable",
       "codeLabel": "Enter the 6-digit code",
       "codeAria": "Six-digit authenticator code",
@@ -66,7 +65,6 @@
       "addDescription": "Name it so you can recognize it later. Your device will prompt you to create the passkey.",
       "nameLabel": "Name",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Cancel",
       "submit": "Add passkey"
     },
     "overview": {
@@ -296,7 +294,6 @@
       "addWebhookDescription": "We'll POST the selected events to this URL.",
       "payloadUrlLabel": "Payload URL",
       "eventsLabel": "Events",
-      "cancel": "Cancel",
       "createWebhook": "Create webhook",
       "creating": "Creating…",
       "deleteWebhookAria": "Delete webhook {{url}}",
@@ -324,7 +321,6 @@
       "attemptCodeColumn": "Code",
       "attemptWhenColumn": "When",
       "attemptCountLabel": "Attempt {{count}}",
-      "closeDialog": "Close",
       "eventsLoadFailed": "Couldn't load the event list. Please try again.",
       "eventsLoading": "Loading events…",
       "eventsEmpty": "No events are available to subscribe to."

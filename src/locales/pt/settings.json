@@ -44,7 +44,6 @@
       "recoveryTitle": "Salve seus códigos de recuperação",
       "recoveryDescription": "Guarde-os em um lugar seguro. Cada um funciona uma vez se você perder o dispositivo.",
       "done": "Concluído",
-      "cancel": "Cancelar",
       "verifyEnable": "Verificar e ativar",
       "codeLabel": "Digite o código de 6 dígitos",
       "codeAria": "Código do autenticador de seis dígitos",
@@ -67,7 +66,6 @@
       "addDescription": "Dê um nome para reconhecê-la depois. Seu dispositivo pedirá para criar a passkey.",
       "nameLabel": "Nome",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Cancelar",
       "submit": "Adicionar passkey"
     },
     "overview": {
@@ -300,7 +298,6 @@
       "addWebhookDescription": "Enviaremos os eventos selecionados para esta URL via POST.",
       "payloadUrlLabel": "URL de destino",
       "eventsLabel": "Eventos",
-      "cancel": "Cancelar",
       "createWebhook": "Criar webhook",
       "creating": "Criando…",
       "deleteWebhookAria": "Excluir o webhook {{url}}",
@@ -328,7 +325,6 @@
       "attemptCodeColumn": "Código",
       "attemptWhenColumn": "Quando",
       "attemptCountLabel": "Tentativa {{count}}",
-      "closeDialog": "Fechar",
       "eventsLoadFailed": "Não foi possível carregar a lista de eventos. Tente novamente.",
       "eventsLoading": "Carregando eventos…",
       "eventsEmpty": "Nenhum evento disponível para assinar."

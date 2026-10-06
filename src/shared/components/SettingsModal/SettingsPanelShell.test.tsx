@@ -29,8 +29,9 @@ describe('SectionHeader', () => {
     expect(heading).toHaveClass('text-lg', 'font-semibold', 'tracking-[-0.01em]');
     const header = heading.closest('header');
     expect(header).toHaveClass('sticky', 'top-0', 'border-b', 'bg-background');
-    // From `sm` it keeps the dialog's close button's corner clear.
-    expect(header).toHaveClass('sm:pe-14');
+    // Settings is a drawer: its × floats outside the panel (inside its header on
+    // a phone), so the head row keeps no corner clear for one.
+    expect(header?.className ?? '').not.toMatch(/\bpe-14\b/);
   });
 
   it('draws the section’s icon on a tile in its scope’s tone', () => {
@@ -51,7 +52,7 @@ describe('SectionHeader', () => {
     expect(screen.getByTestId('settings-section-tile')).toHaveClass('bg-tone-slate');
   });
 
-  it('draws no tile outside the modal', () => {
+  it('draws no tile outside Settings', () => {
     render(<SectionHeader title="Profile" />);
     expect(screen.queryByTestId('settings-section-tile')).not.toBeInTheDocument();
   });

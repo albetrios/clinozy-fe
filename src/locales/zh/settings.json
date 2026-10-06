@@ -42,7 +42,6 @@
       "recoveryTitle": "保存恢复代码",
       "recoveryDescription": "请妥善保管。丢失设备时每个代码只能使用一次。",
       "done": "完成",
-      "cancel": "取消",
       "verifyEnable": "验证并启用",
       "codeLabel": "输入 6 位代码",
       "codeAria": "六位验证器代码",
@@ -65,7 +64,6 @@
       "addDescription": "为其命名以便识别。设备将提示您创建通行密钥。",
       "nameLabel": "名称",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "取消",
       "submit": "添加通行密钥"
     },
     "overview": {
@@ -294,7 +292,6 @@
       "addWebhookDescription": "我们会将所选事件以 POST 方式发送到此 URL。",
       "payloadUrlLabel": "负载 URL",
       "eventsLabel": "事件",
-      "cancel": "取消",
       "createWebhook": "创建 Webhook",
       "creating": "创建中…",
       "deleteWebhookAria": "删除 Webhook {{url}}",
@@ -322,7 +319,6 @@
       "attemptCodeColumn": "状态码",
       "attemptWhenColumn": "时间",
       "attemptCountLabel": "第 {{count}} 次尝试",
-      "closeDialog": "关闭",
       "eventsLoadFailed": "无法加载事件列表，请重试。",
       "eventsLoading": "正在加载事件…",
       "eventsEmpty": "没有可订阅的事件。"

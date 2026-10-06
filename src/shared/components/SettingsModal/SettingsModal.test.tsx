@@ -7,6 +7,7 @@ import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { SettingsModal } from './SettingsModal.tsx';
@@ -156,30 +157,44 @@ describe('SettingsModal', () => {
     expect(screen.queryByTestId('settings-modal')).not.toBeInTheDocument();
   });
 
-  it('is a sheet on phones and a gutter-ed, token-rounded dialog from sm up', async () => {
-    // Regression, twice over: `w-full` with only a `max-w` left the modal flush
-    // against both edges between 640px and 960px (every tablet), and an
-    // unconditional `rounded-none` kept it square on desktop under EVERY radius
-    // setting. The dialog slot is what squares it again under the Sharp shape.
+  it('is the record drawer — 1040px from md, the full screen below — titled Settings', async () => {
+    // Every centred modal became a drawer (L-65): Settings is the shared
+    // RecordDrawer at its widest width, so the rail and a section's page sit
+    // side by side, with the drawers' header, × and Esc layers.
     renderWithProviders(<SettingsModal />, {
       initialEntries: ['/#settings/account/profile'],
     });
 
-    const dialog = await screen.findByTestId('settings-modal');
-    expect(dialog).toHaveClass('sm:w-[calc(100%-2rem)]', 'sm:max-w-[960px]');
-    // 12px — the design's centred-dialog corners (the command menu's).
-    expect(dialog).toHaveClass('sm:rounded-xl');
-    expect(dialog).toHaveClass('3xl:h-[760px]', '3xl:max-w-[1120px]');
-    expect(dialog).toHaveAttribute('data-slot', 'dialog-content');
-    // Only the phone sheet is square by construction.
-    const rounded = [...dialog.classList].filter((name) => name.includes('rounded-none'));
-    expect(rounded.every((name) => !name.startsWith('sm:'))).toBe(true);
+    const drawer = await screen.findByTestId('settings-modal');
+    expect(drawer).toHaveAttribute('data-slot', 'sheet-content');
+    expect(drawer).toHaveClass('w-full', 'md:w-[min(1040px,calc(100vw-56px))]');
+    expect(screen.getByRole('dialog', { name: 'Settings' })).toBe(drawer);
+    expect(screen.getByTestId('settings-modal-title')).toHaveTextContent('Settings');
+    // Every section saves itself: the drawer has no footer of its own.
+    expect(screen.queryByTestId('settings-modal-footer')).not.toBeInTheDocument();
   });
 
-  it('gives every pane the standard dialog inset, on the spacing scale', async () => {
-    // One inset for the whole modal (it was 12px / 32px / 12px-over-16px), written
-    // as scale steps so the theme's Density setting moves it with every other
-    // dialog's `p-6`.
+  it('shows the rail from md and the section switch below it', async () => {
+    // Below `md` the drawer is the full screen and the phone picks its section
+    // from the Picker; from `md` the rail takes the inline-start column.
+    renderWithProviders(<SettingsModal />, {
+      initialEntries: ['/#settings/account/profile'],
+    });
+
+    const rail = await screen.findByTestId('settings-nav');
+    expect(rail).toHaveClass('hidden', 'md:flex');
+    expect(rail.parentElement).toHaveClass(
+      'grid-cols-1',
+      'md:grid-cols-[minmax(220px,264px)_minmax(0,1fr)]',
+    );
+    expect(
+      screen.getByTestId('settings-mobile-section').closest('[class*="md:hidden"]'),
+    ).not.toBeNull();
+  });
+
+  it('gives every pane the standard inset, on the spacing scale', async () => {
+    // One inset for the whole drawer body (it was 12px / 32px / 12px-over-16px),
+    // written as scale steps so the theme's Density setting moves it.
     renderWithProviders(<SettingsModal />, {
       initialEntries: ['/#settings/account/profile'],
     });
@@ -188,36 +203,39 @@ describe('SettingsModal', () => {
     expect(content).toHaveClass('px-4', 'sm:px-6', 'sm:pb-6');
     expect(content).not.toHaveClass('sm:px-8');
 
-    // Phone sheet: the section picker starts on the content's gutter, so it and
-    // the fields under it share a left edge. (Its row wraps the Picker's own
-    // field wrapper, hence `closest` rather than the trigger's parent.)
+    // Phone: the section picker sits on the content's gutter, so it and the
+    // fields under it share their edges. (Its row wraps the Picker's own field
+    // wrapper, hence `closest` rather than the trigger's parent.)
     const picker = screen
       .getByTestId('settings-mobile-section')
-      .closest('[class*="sm:hidden"]');
-    expect(picker).toHaveClass('ps-4', 'sm:hidden');
-    // Reserves room for the dialog's close button, which is pinned on the
-    // logical end too — so the two mirror together under RTL. They did not: the
-    // button was physical (`right-4`) while this was logical, which put them on
-    // opposite sides in Arabic and Hebrew and ran the picker under the X; fixed
-    // in `ui/dialog.tsx`, since every dialog had it. 14 rather than 12 leaves
-    // the pane's own 16px gutter between the two instead of flush (QA-V3
-    // suggestion 7: "the dropdown plus close icon feels tight").
-    expect(picker).toHaveClass('pe-14');
-    expect(picker).not.toHaveClass('pe-12');
+      .closest('[class*="md:hidden"]');
+    expect(picker).toHaveClass('px-4', 'md:hidden');
+    // It used to reserve the dialog's × corner (`pe-14`); the drawer's × sits in
+    // its header above (outside the panel from `md`), so nothing runs under it.
+    expect(picker?.className ?? '').not.toMatch(/\bpe-1[24]\b/);
     // And never physical — `validate:logical` is the CI half of this contract.
     expect(picker?.className ?? '').not.toMatch(/\bp[lr]-/);
 
-    // The other side of that reservation: the button it makes room for. It sits
-    // in vendored `ui/`, which `validate:logical` exempts — so nothing else
-    // would catch it going back to upstream's physical `right-4`, and the
-    // picker's logical inset would silently stop lining up under RTL.
-    const close = screen.getByRole('button', { name: 'Close', exact: true });
-    expect(close).toHaveClass('end-4');
-    expect(close.className).not.toMatch(/\b(right|left)-4\b/);
+    // The × is pinned on the logical end wherever it sits, so it mirrors with
+    // everything else under RTL.
+    const close = screen.getByTestId('settings-modal-close');
+    expect(close).toHaveAccessibleName('Close');
+    expect(close.className).not.toMatch(/\b(right|left)-/);
 
     for (const pane of [content, picker]) {
       expect(pane?.className ?? '').not.toMatch(/\bp[xysetb]?-\[/);
     }
+  });
+
+  it('has no accessibility violations in its frame — header, ×, rail and switch', async () => {
+    // The shell while the context loads: everything the drawer itself draws,
+    // around the section skeleton (each panel's own suite axes its content).
+    useMeContextMock.mockReturnValue(meCtxLoading);
+    renderWithProviders(<SettingsModal />, {
+      initialEntries: ['/#settings/account/profile'],
+    });
+    await screen.findByTestId('settings-content-loading');
+    expect(await axeForDialog(screen.getByTestId('settings-modal'))).toHaveNoViolations();
   });
 
   it('opens at the section addressed by the hash', async () => {
@@ -326,9 +344,15 @@ describe('SettingsModal', () => {
         initialEntries: ['/#settings/account/notifications'],
       });
 
-      // The section is replaced by a retryable fallback…
+      // The section is replaced by a retryable fallback… (The first case in this
+      // file to import the notifications chunk: a cold import outlasts findBy's
+      // 1s default, as the section cases above note.)
       expect(
-        await screen.findByTestId('settings-panel-error-notifications'),
+        await screen.findByTestId(
+          'settings-panel-error-notifications',
+          {},
+          { timeout: 15_000 },
+        ),
       ).toBeInTheDocument();
       // …while the modal shell around it survives: nav, header, the lot.
       expect(screen.getByTestId('settings-modal')).toBeInTheDocument();

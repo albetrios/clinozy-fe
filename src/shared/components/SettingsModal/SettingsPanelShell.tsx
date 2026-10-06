@@ -35,8 +35,7 @@ interface SectionHeaderProps {
  * section's icon, the title (the drawer title's 18px/600, −0.01em) and its sub
  * line (13px, muted), and any meta as a 24px pill. It stays put while the
  * panel scrolls beneath it — the pane's hairline-edged header, as a drawer's
- * (`_patterns.md:32`) — and from `sm` it leaves the dialog's close button its
- * corner.
+ * (`_patterns.md:32`).
  */
 export function SectionHeader({ title, description, meta }: SectionHeaderProps) {
   const section = use(SettingsSectionContext);
@@ -45,7 +44,7 @@ export function SectionHeader({ title, description, meta }: SectionHeaderProps) 
   return (
     <header
       // Bleeds over the pane's gutter so content scrolling under it is hidden.
-      className="bg-background sticky top-0 z-10 -mx-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-4 pt-5 pb-4 sm:-mx-6 sm:flex-nowrap sm:px-6 sm:pe-14"
+      className="bg-background sticky top-0 z-10 -mx-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-4 pt-5 pb-4 sm:-mx-6 sm:flex-nowrap sm:px-6"
     >
       {item && tone ? (
         <span

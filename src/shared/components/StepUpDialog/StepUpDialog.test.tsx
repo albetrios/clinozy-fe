@@ -1,9 +1,10 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const {
   listAuthMethods,
@@ -36,15 +37,11 @@ vi.mock('@/shared/hooks/useMfa/index.ts', () => ({
 
 import { StepUpDialog } from './StepUpDialog.tsx';
 
+/** Opens the drawer (its dirty guard needs the router — the helper brings a query client too). */
 function renderDialog(props: Partial<Parameters<typeof StepUpDialog>[0]> = {}) {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false, gcTime: 0 } },
-  });
   const onVerified = vi.fn();
-  const utils = render(
-    <QueryClientProvider client={client}>
-      <StepUpDialog open onOpenChange={vi.fn()} onVerified={onVerified} {...props} />
-    </QueryClientProvider>,
+  const utils = renderWithProviders(
+    <StepUpDialog open onOpenChange={vi.fn()} onVerified={onVerified} {...props} />,
   );
   return { ...utils, onVerified };
 }
@@ -61,6 +58,45 @@ beforeEach(() => {
 });
 
 describe('StepUpDialog', () => {
+  it('is a child drawer stacked on what asked: named, Back returns, Verify in its footer', async () => {
+    listAuthMethods.mockResolvedValue([{ id: 'am_1', methodType: 'PASSWORD' }]);
+    const onOpenChange = vi.fn();
+    renderDialog({ onOpenChange });
+
+    const drawer = await screen.findByTestId('step-up-dialog');
+    expect(screen.getByRole('dialog', { name: 'Confirm it’s you' })).toBe(drawer);
+    await screen.findByTestId('step-up-password');
+    expect(screen.getByTestId('step-up-submit')).toHaveTextContent('Verify');
+    expect(screen.getByTestId('step-up-submit')).toHaveAttribute('type', 'submit');
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    const back = screen.getByTestId('step-up-dialog-dismiss');
+    expect(back).toHaveTextContent('Back');
+    back.click();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('verifies on Enter in the factor’s field — the footer button submits its form', async () => {
+    listAuthMethods.mockResolvedValue([{ id: 'am_1', methodType: 'PASSWORD' }]);
+    stepUpWithPassword.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    const { onVerified } = renderDialog();
+
+    await user.type(await screen.findByTestId('step-up-password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(stepUpWithPassword).toHaveBeenCalledWith('hunter2'));
+    expect(onVerified).toHaveBeenCalledTimes(1);
+  });
+
+  it('draws the loading factor as the design’s flat bars, not a pulse', async () => {
+    useMfaStatusMock.mockReturnValue({ data: undefined, isPending: true });
+    renderDialog();
+
+    const loading = await screen.findByTestId('step-up-loading');
+    expect(loading.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(2);
+    expect(loading.querySelector('.animate-pulse')).toBeNull();
+  });
+
   it('passwordless-no-MFA: auto-sends the email code and verifies with it', async () => {
     stepUpWithEmailCode.mockResolvedValue(undefined);
     const user = userEvent.setup();
@@ -68,7 +104,9 @@ describe('StepUpDialog', () => {
 
     // Email factor resolved → the code is sent to the signed-in address once.
     await waitFor(() => expect(sendCode).toHaveBeenCalledWith('you@acme.test'));
-    expect(screen.getByTestId('step-up-sent-to')).toHaveTextContent('you@acme.test');
+    expect(await screen.findByTestId('step-up-sent-to')).toHaveTextContent(
+      'you@acme.test',
+    );
 
     await user.type(screen.getByTestId('step-up-code'), 'A1B2C3');
     await user.click(screen.getByTestId('step-up-submit'));
@@ -179,8 +217,10 @@ describe('StepUpDialog', () => {
     });
 
     expect(stepUpWithTotp).toHaveBeenCalledTimes(1);
+    // The drawer's busy primary: its own words, and every exit held meanwhile.
     expect(submit).toHaveAttribute('aria-busy', 'true');
-    expect(submit.querySelector('.animate-spin')).not.toBeNull();
+    expect(submit).toHaveTextContent('Verifying…');
+    expect(screen.getByTestId('step-up-dialog-dismiss')).toBeDisabled();
 
     await act(async () => release?.());
     expect(stepUpWithTotp).toHaveBeenCalledTimes(1);

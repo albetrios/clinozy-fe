@@ -44,7 +44,6 @@
       "recoveryTitle": "Enregistrez vos codes de récupération",
       "recoveryDescription": "Conservez-les en lieu sûr. Chacun ne fonctionne qu'une fois si vous perdez votre appareil.",
       "done": "Terminé",
-      "cancel": "Annuler",
       "verifyEnable": "Vérifier et activer",
       "codeLabel": "Entrez le code à 6 chiffres",
       "codeAria": "Code d'authentificateur à six chiffres",
@@ -67,7 +66,6 @@
       "addDescription": "Donnez-lui un nom pour la reconnaître plus tard. Votre appareil vous demandera de créer la clé.",
       "nameLabel": "Nom",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Annuler",
       "submit": "Ajouter la clé d'accès"
     },
     "overview": {
@@ -300,7 +298,6 @@
       "addWebhookDescription": "Nous enverrons les événements sélectionnés à cette URL en POST.",
       "payloadUrlLabel": "URL de destination",
       "eventsLabel": "Événements",
-      "cancel": "Annuler",
       "createWebhook": "Créer le webhook",
       "creating": "Création…",
       "deleteWebhookAria": "Supprimer le webhook {{url}}",
@@ -328,7 +325,6 @@
       "attemptCodeColumn": "Code",
       "attemptWhenColumn": "Quand",
       "attemptCountLabel": "Tentative {{count}}",
-      "closeDialog": "Fermer",
       "eventsLoadFailed": "Impossible de charger la liste d'événements. Veuillez réessayer.",
       "eventsLoading": "Chargement des événements…",
       "eventsEmpty": "Aucun événement disponible."

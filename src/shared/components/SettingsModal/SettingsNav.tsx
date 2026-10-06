@@ -69,7 +69,7 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
     <aside
       aria-label={t(SETTINGS_KEYS.nav.ariaSections)}
       data-testid="settings-nav"
-      className="bg-canvas hidden h-full min-h-0 flex-col border-e sm:flex"
+      className="bg-canvas hidden h-full min-h-0 flex-col border-e md:flex"
     >
       {/* The rail's own 8px inset (the role list's `p-2`), on the spacing scale so
           the theme's Density setting moves it; the search sits on the rows' 10px

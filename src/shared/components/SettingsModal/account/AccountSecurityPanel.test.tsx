@@ -1,7 +1,10 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
+
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const {
   useMfaStatusMock,
@@ -62,6 +65,17 @@ vi.mock('@/shared/notify/index.ts', () => ({
 import { AccountSecurityPanel } from './AccountSecurityPanel.tsx';
 
 /**
+ * Mounts the panel and waits for it. Two-factor setup and Add passkey are
+ * drawers now, mounted closed with their cards, and a drawer's dirty guard
+ * needs the router.
+ */
+async function renderPanel() {
+  const view = renderWithProviders(<AccountSecurityPanel />);
+  await screen.findByTestId('settings-section-security');
+  return view;
+}
+
+/**
  * Query results shaped the way the panel now reads them. The old mocks returned
  * `{ data }` alone — which is exactly how SET-3 hid: `data ?? false` looks
  * identical whether the answer is "off", "still loading" or "the read failed".
@@ -118,8 +132,8 @@ beforeEach(() => {
 });
 
 describe('AccountSecurityPanel', () => {
-  it('renders MFA status + setup + passkeys (sessions moved to their own panel)', () => {
-    render(<AccountSecurityPanel />);
+  it('renders MFA status + setup + passkeys (sessions moved to their own panel)', async () => {
+    await renderPanel();
     expect(screen.getByTestId('settings-section-security')).toBeInTheDocument();
     expect(screen.getByTestId('security-overview')).toBeInTheDocument();
     expect(screen.getByTestId('mfa-status')).toHaveTextContent('Disabled');
@@ -131,7 +145,7 @@ describe('AccountSecurityPanel', () => {
 
   it('runs the enrollment flow: QR → code → recovery codes', async () => {
     const user = userEvent.setup();
-    render(<AccountSecurityPanel />);
+    await renderPanel();
     await user.click(screen.getByTestId('mfa-setup'));
     expect(beginMutateAsync).toHaveBeenCalledTimes(1);
     expect(await screen.findByTestId('mfa-secret')).toHaveTextContent('JBSWY3DPEHPK3PXP');
@@ -139,23 +153,67 @@ describe('AccountSecurityPanel', () => {
     await user.type(screen.getByTestId('mfa-code'), '123456');
     await waitFor(() => expect(confirmMutateAsync).toHaveBeenCalledWith('123456'));
     expect(await screen.findByTestId('mfa-recovery-codes')).toBeInTheDocument();
+    // The codes have their own Done: the drawer drops its footer for them.
+    expect(
+      screen.getByRole('dialog', { name: 'Save your recovery codes' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('mfa-verify')).not.toBeInTheDocument();
     await user.click(screen.getByTestId('recovery-codes-panel-ack'));
     await user.click(screen.getByTestId('mfa-done'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('mfa-setup-dialog')).not.toBeInTheDocument(),
+    );
+  });
+
+  it('sets up two-factor in a child drawer stacked on Settings, whose Back returns', async () => {
+    const user = userEvent.setup();
+    await renderPanel();
+    await user.click(screen.getByTestId('mfa-setup'));
+
+    const drawer = await screen.findByTestId('mfa-setup-dialog');
+    expect(screen.getByRole('dialog', { name: 'Set up two-factor authentication' })).toBe(
+      drawer,
+    );
+    expect(screen.getByTestId('mfa-verify')).toHaveTextContent('Verify & enable');
+    // Six digits first: Verify waits for them.
+    expect(screen.getByTestId('mfa-verify')).toBeDisabled();
+    const back = screen.getByTestId('mfa-setup-dialog-dismiss');
+    expect(back).toHaveTextContent('Back');
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    await user.click(back);
+    await waitFor(() =>
+      expect(screen.queryByTestId('mfa-setup-dialog')).not.toBeInTheDocument(),
+    );
+    expect(confirmMutateAsync).not.toHaveBeenCalled();
   });
 
   it('shows Disable when enabled and confirms disabling', async () => {
     useMfaStatusMock.mockReturnValue({ ...querySuccess(true), refetch: refetchMfa });
     const user = userEvent.setup();
-    render(<AccountSecurityPanel />);
+    await renderPanel();
     expect(screen.getByTestId('mfa-status')).toHaveTextContent('Enabled');
     await user.click(screen.getByTestId('mfa-disable'));
     await user.click(screen.getByTestId('confirm-accept'));
     await waitFor(() => expect(disableMutateAsync).toHaveBeenCalledTimes(1));
   });
 
-  it('registers a passkey via the add dialog (FE-32)', async () => {
+  it('names a new passkey in a child drawer stacked on Settings, the name focused', async () => {
     const user = userEvent.setup();
-    render(<AccountSecurityPanel />);
+    await renderPanel();
+    await user.click(screen.getByTestId('add-passkey'));
+
+    const drawer = await screen.findByTestId('passkey-add-dialog');
+    expect(screen.getByRole('dialog', { name: 'Add a passkey' })).toBe(drawer);
+    expect(screen.getByTestId('passkey-add-dialog-dismiss')).toHaveTextContent('Back');
+    expect(screen.getByTestId('passkey-add-submit')).toHaveTextContent('Add passkey');
+    await waitFor(() => expect(screen.getByTestId('passkey-name')).toHaveFocus());
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
+  it('registers a passkey via the add drawer (FE-32)', async () => {
+    const user = userEvent.setup();
+    await renderPanel();
     await user.click(screen.getByTestId('add-passkey'));
     await user.type(await screen.findByTestId('passkey-name'), 'YubiKey');
     await user.click(screen.getByTestId('passkey-add-submit'));
@@ -164,13 +222,13 @@ describe('AccountSecurityPanel', () => {
 
   it('revokes a passkey (FE-32)', async () => {
     const user = userEvent.setup();
-    render(<AccountSecurityPanel />);
+    await renderPanel();
     await user.click(screen.getByTestId('passkey-remove'));
     await waitFor(() => expect(removePasskeyMutate).toHaveBeenCalledWith('pk_1'));
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<AccountSecurityPanel />);
+    const { container } = await renderPanel();
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -181,7 +239,7 @@ describe('AccountSecurityPanel', () => {
     // button on first paint, then flipped to Enabled a moment later.
     useMfaStatusMock.mockReturnValue(queryPending());
     usePasskeysMock.mockReturnValue(queryPending());
-    render(<AccountSecurityPanel />);
+    await renderPanel();
 
     expect(screen.getByTestId('mfa-status-loading')).toBeInTheDocument();
     expect(screen.queryByTestId('mfa-status')).not.toBeInTheDocument();
@@ -199,7 +257,7 @@ describe('AccountSecurityPanel', () => {
   it('reports a failed 2FA read as an error with a retry, not as "off"', async () => {
     const user = userEvent.setup();
     useMfaStatusMock.mockReturnValue(queryFailed(refetchMfa));
-    render(<AccountSecurityPanel />);
+    await renderPanel();
 
     expect(screen.getByTestId('mfa-error')).toBeInTheDocument();
     // Never claim a security posture the app could not read.
@@ -214,7 +272,7 @@ describe('AccountSecurityPanel', () => {
   it('reports a failed passkeys read instead of an empty list', async () => {
     // "You have no passkeys" is a claim; a failed read is not evidence for it.
     usePasskeysMock.mockReturnValue(queryFailed(refetchPasskeys));
-    render(<AccountSecurityPanel />);
+    await renderPanel();
 
     expect(screen.getByTestId('passkeys-error')).toBeInTheDocument();
     expect(screen.queryByTestId('passkeys-empty')).not.toBeInTheDocument();
@@ -223,7 +281,7 @@ describe('AccountSecurityPanel', () => {
   });
 
   it('shows the score only once both reads have landed', async () => {
-    render(<AccountSecurityPanel />);
+    await renderPanel();
     expect(screen.getByTestId('security-overview')).toBeInTheDocument();
     expect(screen.queryByTestId('security-overview-loading')).not.toBeInTheDocument();
   });
@@ -252,7 +310,7 @@ describe('AccountSecurityPanel', () => {
       ],
     });
     const user = userEvent.setup();
-    render(<AccountSecurityPanel />);
+    await renderPanel();
 
     const rows = await screen.findAllByTestId('passkey-remove');
     expect(rows).toHaveLength(2);
@@ -276,7 +334,7 @@ describe('AccountSecurityPanel', () => {
     // leave the other usable.
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     passkeysCardCrashes.value = true;
-    render(<AccountSecurityPanel />);
+    await renderPanel();
 
     expect(await screen.findByTestId('passkeys-card-error')).toBeInTheDocument();
     // Two-factor management is untouched.

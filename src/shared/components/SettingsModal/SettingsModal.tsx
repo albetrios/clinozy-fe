@@ -6,10 +6,9 @@ import { ORGANIZATION } from '@/core/config/constants.ts';
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
-import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
-import { Dialog, DialogContent, DialogTitle } from '@/shared/components/ui/dialog.tsx';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAccessResolved } from '@/shared/hooks/useCan/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
@@ -48,10 +47,10 @@ import { SettingsNav } from './SettingsNav.tsx';
 import { SectionHeader } from './SettingsPanelShell.tsx';
 
 /**
- * Global settings modal — ONE modal for account + organization settings,
+ * Global settings drawer — ONE drawer for account + organization settings,
  * driven by the URL hash (`#settings/<scope>/<section>`), mounted once on the
  * root route so it overlays any page without unmounting it. Deep links
- * reproduce page + modal, refresh keeps the section, back/Esc closes.
+ * reproduce page + drawer, refresh keeps the section, back/Esc closes.
  *
  * Route guards never see hashes: auth, organization-context, and permission
  * gating all happen here (settings-permissions.ts). routing-and-tenancy.md §7.
@@ -65,20 +64,11 @@ export function SettingsModal() {
 }
 
 /**
- * One dialog shell for both the loading and the resolved states: a full-screen
- * sheet on phones (square — it IS the screen), a dialog from `sm`, in the
- * design's centred-dialog frame (12px corners, the command menu's).
- *
- * The `sm:` half has to undo the sheet, not just cap it: `w-full` with only a
- * `max-w` left the modal flush against both edges on anything between 640px and
- * 960px (every tablet), and an unconditional `rounded-none` kept it square on
- * desktop under every radius setting. `sm:rounded-xl` is token-backed and the
- * dialog slot squares it again under the Sharp shape.
+ * The drawer's width from `md`: the widest record drawer, so the rail
+ * (220–264px) and a section's page sit side by side as the Users room's
+ * master–detail split does. Below `md` the drawer is the full screen.
  */
-const SETTINGS_DIALOG_CLASS =
-  'h-dvh max-h-dvh w-full max-w-full gap-0 overflow-hidden rounded-none p-0 ' +
-  'sm:h-[640px] sm:max-h-[85vh] sm:w-[calc(100%-2rem)] sm:max-w-[960px] sm:rounded-xl ' +
-  '3xl:h-[760px] 3xl:max-w-[1120px]';
+const SETTINGS_DRAWER_WIDTH = 1040;
 
 /**
  * Which settings section to show, and which nav groups exist yet: derived from the URL hash, the
@@ -174,19 +164,12 @@ function useSettingsSection() {
 }
 
 /**
- * Mobile section switch — the rail is hidden below `sm`, so a phone picks the
- * section from the shared Picker (its 72% bottom sheet), as the phone list
- * toolbars pick: a 44px trigger, each row the section's icon tile, the two
- * scopes as groups. `ps-4` is the content pane's gutter, so the switch and the
- * fields under it share a left edge.
- *
- * `pe-14` reserves room for the dialog's close button, which is pinned on the
- * logical end too (`ui/dialog.tsx`) — so the two mirror together. They did
- * not: the button was physical (`right-4`) while this inset was logical, which
- * put them on opposite sides in Arabic and Hebrew and ran the picker under the
- * X. 14 rather than 12: the button is 32px wide inset 16px, so 48px of
- * reservation left the picker flush against the X with nothing between them;
- * 56px keeps the pane's own 16px gutter between the two (QA-V3 suggestion 7).
+ * Mobile section switch — the rail is hidden below `md`, where the drawer is
+ * the full screen, so a phone picks the section from the shared Picker (its
+ * 72% bottom sheet), as the phone list toolbars pick: a 44px trigger, each row
+ * the section's icon tile, the two scopes as groups. `px-4` is the content
+ * pane's gutter, so the switch and the fields under it share their edges; the
+ * drawer's × sits in its header above, so nothing here makes room for it.
  */
 function MobileSectionPicker({
   groups,
@@ -210,7 +193,7 @@ function MobileSectionPicker({
     })),
   );
   return (
-    <div className="shrink-0 border-b py-2 ps-4 pe-14 sm:hidden">
+    <div className="shrink-0 border-b px-4 py-2 md:hidden">
       <Picker
         label={t(SETTINGS_KEYS.nav.ariaSections)}
         value={`${active.scope}/${active.section}`}
@@ -240,7 +223,6 @@ const SETTINGS_DISCARD_TEST_IDS = {
 function SettingsModalBody() {
   const { t } = useTranslation(SETTINGS_NS);
   // The shell stays mounted while panels load or change sections.
-  const enterProps = useEnterAnimationProps();
   const { active, readyGroups, contextReady } = useSettingsSection();
   const isDirty = useSettingsDirty()?.isDirty ?? false;
   // A guarded action (close, a section switch, Back) meets a dirty panel: the
@@ -277,50 +259,51 @@ function SettingsModalBody() {
     });
   };
 
+  // The record drawer's frame (header, floating ×, full screen on a phone); the
+  // body is Settings' own two panes, and every section saves itself, so there
+  // is no footer. Its dirty guard is the one above — with the ids the Settings
+  // specs know, and covering section switches too — so the drawer is handed
+  // the guarded close rather than a `dirty` flag of its own. A press on a toast
+  // is not an outside press: the toaster sits in the layer's branch.
   return (
     <>
-      <Dialog open onOpenChange={(o) => !o && guardedClose()}>
-        <DialogContent
-          className={SETTINGS_DIALOG_CLASS}
-          data-testid="settings-modal"
-          {...enterProps}
-          onInteractOutside={(e) => {
-            // Toasts render outside the dialog (sonner) — clicking one (e.g. its
-            // close button) must dismiss the toast, not close Settings.
-            const node = e.detail.originalEvent.target as Element | null;
-            if (node?.closest('[data-sonner-toaster]')) e.preventDefault();
-          }}
-        >
-          <DialogTitle className="sr-only">{t(SETTINGS_KEYS.dialog.title)}</DialogTitle>
-          {/* The Users room's master–detail split (`users.md:19`; H:1117): the
-              rail on `canvas`, minmax(220px, 264px), and the section's page
-              scrolling on its own beside it. */}
-          <div className="grid h-full min-h-0 grid-cols-1 sm:grid-cols-[minmax(220px,264px)_minmax(0,1fr)]">
-            <SettingsNav groups={readyGroups} active={active} onSelect={goTo} />
-            <div className="flex min-h-0 flex-col">
-              <MobileSectionPicker groups={readyGroups} active={active} onSelect={goTo} />
-              <div
-                // `sm:px-6` / `sm:pb-6`: the standard dialog inset. No top inset:
-                // each section's head row is the pane's header, pinned to its top
-                // while the panel scrolls beneath it (`SectionHeader`).
-                className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 sm:px-6 sm:pb-6"
-                data-testid="settings-content"
-              >
-                <SettingsSectionContext value={active}>
-                  {contextReady ? (
-                    <ActivePanel
-                      key={`${active.scope}/${active.section}`}
-                      active={active}
-                    />
-                  ) : (
-                    <SettingsContentLoading active={active} />
-                  )}
-                </SettingsSectionContext>
-              </div>
+      <RecordDrawer
+        open
+        onClose={guardedClose}
+        title={t(SETTINGS_KEYS.dialog.title)}
+        width={SETTINGS_DRAWER_WIDTH}
+        flushBody
+        hideFooter
+        testId="settings-modal"
+      >
+        {/* The Users room's master–detail split (`users.md:19`; H:1117): the
+            rail on `canvas`, minmax(220px, 264px), and the section's page
+            scrolling on its own beside it. */}
+        <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(220px,264px)_minmax(0,1fr)]">
+          <SettingsNav groups={readyGroups} active={active} onSelect={goTo} />
+          <div className="flex min-h-0 flex-col">
+            <MobileSectionPicker groups={readyGroups} active={active} onSelect={goTo} />
+            <div
+              // `sm:px-6` / `sm:pb-6`: the standard pane inset. No top inset:
+              // each section's head row is the pane's header, pinned to its top
+              // while the panel scrolls beneath it (`SectionHeader`).
+              className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 sm:px-6 sm:pb-6"
+              data-testid="settings-content"
+            >
+              <SettingsSectionContext value={active}>
+                {contextReady ? (
+                  <ActivePanel
+                    key={`${active.scope}/${active.section}`}
+                    active={active}
+                  />
+                ) : (
+                  <SettingsContentLoading active={active} />
+                )}
+              </SettingsSectionContext>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </RecordDrawer>
 
       {guardDialog}
     </>

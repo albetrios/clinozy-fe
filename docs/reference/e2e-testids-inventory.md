@@ -484,18 +484,45 @@ it may have been deleted"); an unknown path inside the organization goes to the 
 
 ## Organization routing (added 2026-06-11)
 
-| Test ID                             | Element                                                       | Source                                                             |
-| ----------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `organization-page`                 | Organization picker page                                      | `pages/organization/OrganizationPickerPage.tsx`                    |
-| `organization-picker-option-<slug>` | Picker card per organization                                  | `pages/organization/OrganizationPickerPage.tsx`                    |
-| `organization-picker-create`        | Picker create-organization button                             | `pages/organization/OrganizationPickerPage.tsx`                    |
-| `suspended-page`                    | Suspended-organization blocked state                          | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
-| `suspended-switch-organization`     | Switch-organization button                                    | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
-| `settings-modal`                    | Global settings modal (hash-driven)                           | `shared/components/SettingsModal/SettingsModal.tsx`                |
-| `settings-nav-<scope>-<section>`    | Settings nav items (e.g. `settings-nav-organization-members`) | `shared/components/SettingsModal/SettingsNav.tsx`                  |
-| `settings-section-tile`             | The open section's 40px icon tile in its head row (L-65)      | `shared/components/SettingsModal/SettingsPanelShell.tsx`           |
-| `settings-members-open-users`       | Settings › Members' link to the Team once Users holds it      | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
-| `settings-roles-open-users`         | Settings › Roles' link to Users › Roles & access (D17)        | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
+| Test ID                                     | Element                                                       | Source                                                             |
+| ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `organization-page`                         | Organization picker page                                      | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `organization-picker-option-<slug>`         | Picker card per organization                                  | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `organization-picker-create`                | Picker create-organization button                             | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `suspended-page`                            | Suspended-organization blocked state                          | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
+| `suspended-switch-organization`             | Switch-organization button                                    | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
+| `settings-modal`                            | Global settings drawer (hash-driven; `role="dialog"`, L-65)   | `shared/components/SettingsModal/SettingsModal.tsx`                |
+| `settings-modal-title` / `-close` / `-body` | The drawer's title ("Settings"), its ×, its two-pane body     | RecordDrawer parts of `SettingsModal.tsx`                          |
+| `settings-nav-<scope>-<section>`            | Settings nav items (e.g. `settings-nav-organization-members`) | `shared/components/SettingsModal/SettingsNav.tsx`                  |
+| `settings-section-tile`                     | The open section's 40px icon tile in its head row (L-65)      | `shared/components/SettingsModal/SettingsPanelShell.tsx`           |
+| `settings-members-open-users`               | Settings › Members' link to the Team once Users holds it      | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
+| `settings-roles-open-users`                 | Settings › Roles' link to Users › Roles & access (D17)        | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
+
+## Settings' child drawers (L-65)
+
+Every centred dialog became a `RecordDrawer` (L-65). The forms Settings opens stack on it as
+child drawers whose dismiss reads "Back". Each keeps the ids its dialog had and moves the content id onto the drawer root; every
+drawer also derives `<root>-title`, `<root>-close` (the ×), `<root>-body` and `<root>-footer`,
+and its dismiss is `<root>-dismiss` unless named below.
+
+| Test ID                                                                             | Element                                                                        | Source                                                         |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `apikey-create-open`                                                                | Integrations' "Create API key" (opens the drawer)                              | `SettingsModal/organization/ApiKeyCreateDialog.tsx`            |
+| `apikey-create-dialog`                                                              | API key drawer root (stacked on Settings)                                      | `ApiKeyCreateDialog.tsx`                                       |
+| `apikey-name` / `apikey-expiry` / `apikey-scope-<code>` / `apikey-error`            | Its fields and the inline error                                                | `ApiKeyCreateDialog.tsx`                                       |
+| `apikey-create` / `apikey-cancel`                                                   | Footer primary ("Create API key" / "Creating…") and Back                       | `ApiKeyCreateDialog.tsx`                                       |
+| `apikey-secret` / `apikey-secret-copy` / `apikey-secret-ack` / `apikey-secret-done` | The one-time reveal (no footer; Done held until acknowledged)                  | `ApiKeyCreateDialog.tsx`                                       |
+| `webhook-form-dialog`                                                               | Webhook drawer root (add / edit)                                               | `SettingsModal/organization/WebhookFormDialog.tsx`             |
+| `webhook-url` / `webhook-event-<event>` / `webhook-error`                           | Its fields and the inline error                                                | `WebhookFormDialog.tsx`                                        |
+| `webhook-save` / `webhook-cancel`                                                   | Footer primary and Back                                                        | `WebhookFormDialog.tsx`                                        |
+| `webhook-attempts-dialog`                                                           | Delivery history drawer root (read-only)                                       | `SettingsModal/organization/WebhookDeliveryAttemptsDialog.tsx` |
+| `webhook-attempts-list` / `-loading` / `-error` / `webhook-attempts-close`          | The list, its flat-bar loading, its retry, and Back                            | `WebhookDeliveryAttemptsDialog.tsx`                            |
+| `mfa-setup-dialog`                                                                  | Two-factor setup drawer root                                                   | `SettingsModal/account/AccountSecurityPanel.tsx`               |
+| `mfa-qr` / `mfa-secret` / `mfa-copy-secret` / `mfa-code` / `mfa-verify`             | QR, secret, copy, the code and "Verify & enable" (the codes' Done: `mfa-done`) | `AccountSecurityPanel.tsx`                                     |
+| `passkey-add-dialog` / `passkey-name` / `passkey-add-submit`                        | Add passkey drawer root, its name and "Add passkey"                            | `AccountSecurityPanel.tsx`                                     |
+| `step-up-dialog`                                                                    | Re-authentication drawer root (stacked on what asked)                          | `shared/components/StepUpDialog/StepUpDialog.tsx`              |
+| `step-up-password` / `step-up-code` / `step-up-resend` / `step-up-sent-to`          | The factor's field, resend and the "we emailed" line                           | `StepUpDialog.tsx`                                             |
+| `step-up-loading` / `step-up-error` / `step-up-submit`                              | Flat-bar loading, the error card and "Verify" (submits the form)               | `StepUpDialog.tsx`                                             |
 
 ## Shared pickers (`shared/components/Picker/`)
 
