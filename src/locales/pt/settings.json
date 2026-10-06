@@ -264,6 +264,7 @@
       "apiKeysNoResults": "Nenhuma chave de API correspondente",
       "apiKeysNoResultsDescription": "Nenhuma chave de API corresponde à sua pesquisa.",
       "apiKeyFallback": "esta chave de API",
+      "addedOn": "adicionada em <1></1>",
       "createApiKey": "Criar chave de API",
       "createApiKeyTitle": "Criar uma chave de API",
       "createApiKeyDescription": "Dê um nome à chave, escolha o que ela pode fazer e quanto tempo dura.",

@@ -5,13 +5,13 @@ import {
   organizationUsers,
   organizationUsersRoles,
 } from '@/lib/routes/users-builders.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import { ArrowUpRight, ShieldCheck, Users } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -39,29 +39,37 @@ export function UsersRoomLink({ section }: { section: 'members' | 'roles' }) {
   const organizationSlug = useOrganizationStore((state) => state.organizationSlug) ?? '';
   const { keys, route, icon: Icon } = LINKS[section];
   return (
-    <section className="space-y-6" data-testid={`settings-organization-${section}`}>
+    <section
+      className="flex flex-col gap-4"
+      data-testid={`settings-organization-${section}`}
+    >
       <SectionHeader title={t(keys.title)} description={t(keys.description)} />
-      <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-        <span
-          aria-hidden="true"
-          className="bg-muted text-muted-foreground flex size-10 flex-none items-center justify-center rounded-lg"
-        >
-          <Icon className="size-5" />
-        </span>
-        <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-sm font-medium">{t(keys.movedTitle)}</p>
-          <p className="text-muted-foreground text-sm text-pretty">{t(keys.movedBody)}</p>
-        </div>
-        <Button asChild size="sm" className="self-start sm:self-center">
-          <Link
-            {...route(organizationSlug)}
-            data-testid={`settings-${section}-open-users`}
+      {/* The Users room's own tile (slate, its section tone) beside what moved. */}
+      <SettingsCard>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <span
+            aria-hidden="true"
+            className="bg-tone-slate text-tone-slate-foreground flex size-10 flex-none items-center justify-center rounded-xl"
           >
-            {t(keys.open)}
-            <ArrowUpRight className="ms-1 size-4" aria-hidden="true" />
-          </Link>
-        </Button>
-      </Card>
+            <Icon className="size-4.5" />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <p className="text-field leading-[1.3] font-semibold">{t(keys.movedTitle)}</p>
+            <p className="text-muted-foreground text-xs leading-[1.45] text-pretty">
+              {t(keys.movedBody)}
+            </p>
+          </div>
+          <Button asChild size="sm" className="self-start sm:self-center">
+            <Link
+              {...route(organizationSlug)}
+              data-testid={`settings-${section}-open-users`}
+            >
+              {t(keys.open)}
+              <ArrowUpRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+            </Link>
+          </Button>
+        </div>
+      </SettingsCard>
     </section>
   );
 }

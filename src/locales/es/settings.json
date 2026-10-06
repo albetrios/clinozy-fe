@@ -264,6 +264,7 @@
       "apiKeysNoResults": "Ninguna clave de API coincide",
       "apiKeysNoResultsDescription": "Ninguna clave de API coincide con tu búsqueda.",
       "apiKeyFallback": "esta clave de API",
+      "addedOn": "añadida el <1></1>",
       "createApiKey": "Crear clave de API",
       "createApiKeyTitle": "Crear una clave de API",
       "createApiKeyDescription": "Nombra la clave, elige qué puede hacer y cuánto dura.",

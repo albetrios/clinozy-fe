@@ -261,6 +261,7 @@
       "apiKeysNoResults": "Keine passenden API-Schlüssel",
       "apiKeysNoResultsDescription": "Keine API-Schlüssel entsprechen Ihrer Suche.",
       "apiKeyFallback": "diesen API-Schlüssel",
+      "addedOn": "hinzugefügt am <1></1>",
       "createApiKey": "API-Schlüssel erstellen",
       "createApiKeyTitle": "Einen API-Schlüssel erstellen",
       "createApiKeyDescription": "Benennen Sie den Schlüssel, wählen Sie seine Rechte und seine Laufzeit.",

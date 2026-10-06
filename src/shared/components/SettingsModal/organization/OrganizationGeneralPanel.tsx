@@ -10,6 +10,7 @@ import {
 } from '@/shared/api/uploads-api.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
@@ -17,13 +18,6 @@ import {
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import {
   useRemoveOrganizationLogo,
@@ -92,15 +86,11 @@ function OrgLogoCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t(general.logoTitle)}</CardTitle>
-        <CardDescription>{t(general.logoDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center gap-4">
+    <SettingsCard title={t(general.logoTitle)} description={t(general.logoDescription)}>
+      <div className="flex flex-wrap items-center gap-4">
         <div
           data-slot="icon-chip"
-          className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden"
+          className="bg-tone-slate text-tone-slate-foreground flex size-16 shrink-0 items-center justify-center overflow-hidden"
           data-testid="org-logo-preview"
         >
           {logoUrl ? (
@@ -110,7 +100,7 @@ function OrgLogoCard({
               className="size-full object-cover"
             />
           ) : (
-            <span className="text-muted-foreground text-xl font-semibold">{initial}</span>
+            <span className="text-xl font-semibold">{initial}</span>
           )}
         </div>
         {canManage ? (
@@ -145,10 +135,10 @@ function OrgLogoCard({
             ) : null}
           </div>
         ) : (
-          <p className="text-muted-foreground text-sm">{t(general.logoReadOnly)}</p>
+          <p className="text-muted-foreground text-body">{t(general.logoReadOnly)}</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -177,7 +167,7 @@ export function OrganizationGeneralPanel() {
   const orgsQuery = useMyOrganizationSummaries();
 
   return (
-    <div className="space-y-6" data-testid="settings-section-org-general">
+    <div className="flex flex-col gap-4" data-testid="settings-section-org-general">
       <SectionHeader
         title={t(SETTINGS_KEYS.panels.general.title)}
         description={t(SETTINGS_KEYS.panels.general.description)}
@@ -231,12 +221,12 @@ function OrganizationGeneralForm({
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{tSettings(general.basicsTitle)}</CardTitle>
-          <CardDescription>{tSettings(general.basicsDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <SettingsCard
+        title={tSettings(general.basicsTitle)}
+        description={tSettings(general.basicsDescription)}
+      >
+        {/* The drawer form's grid gap; the name and the slug side by side from `sm`. */}
+        <div className="grid gap-(--form-gap) sm:grid-cols-2">
           <DrawerField label={tSettings(general.nameLabel)} htmlFor="org-name">
             <DrawerInput
               id="org-name"
@@ -262,20 +252,20 @@ function OrganizationGeneralForm({
               {tSettings(general.slugHint)}
             </p>
           </DrawerField>
-          {canManage ? (
-            <div className="flex justify-end">
-              <Button
-                size="sm"
-                onClick={save}
-                disabled={!dirty || update.isPending}
-                data-testid="org-general-save"
-              >
-                {tSettings(general.save)}
-              </Button>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+        </div>
+        {canManage ? (
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              onClick={save}
+              disabled={!dirty || update.isPending}
+              data-testid="org-general-save"
+            >
+              {tSettings(general.save)}
+            </Button>
+          </div>
+        ) : null}
+      </SettingsCard>
 
       <OrgLogoCard
         logoUrl={activeOrg?.logoUrl ?? null}

@@ -261,6 +261,7 @@
       "apiKeysNoResults": "No matching API keys",
       "apiKeysNoResultsDescription": "No API keys match your search.",
       "apiKeyFallback": "this API key",
+      "addedOn": "added <1></1>",
       "createApiKey": "Create API key",
       "createApiKeyTitle": "Create an API key",
       "createApiKeyDescription": "Name the key, choose what it may do, and set how long it lasts.",

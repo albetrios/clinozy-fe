@@ -250,6 +250,7 @@ export const SETTINGS_KEYS = {
       apiKeysNoResults: 'panels.integrations.apiKeysNoResults',
       apiKeysNoResultsDescription: 'panels.integrations.apiKeysNoResultsDescription',
       apiKeyFallback: 'panels.integrations.apiKeyFallback',
+      addedOn: 'panels.integrations.addedOn',
       createApiKey: 'panels.integrations.createApiKey',
       createApiKeyTitle: 'panels.integrations.createApiKeyTitle',
       createApiKeyDescription: 'panels.integrations.createApiKeyDescription',

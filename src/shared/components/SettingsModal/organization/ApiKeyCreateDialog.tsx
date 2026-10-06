@@ -83,7 +83,8 @@ function SecretReveal({
       </DialogHeader>
       <div className="space-y-3">
         <code
-          className="bg-muted block rounded-md p-3 font-mono text-xs break-all"
+          dir="ltr"
+          className="bg-canvas block rounded-lg border px-3 py-2.5 font-mono text-xs break-all"
           data-testid="apikey-secret"
         >
           {secret}
@@ -95,7 +96,7 @@ function SecretReveal({
           onClick={() => void copy()}
           data-testid="apikey-secret-copy"
         >
-          <Copy className="me-1.5 size-4" />
+          <Copy className="size-4" />
           {t(integrations.apiKeyCopy)}
         </Button>
         <div className="flex items-start gap-2">
@@ -216,7 +217,7 @@ export function ApiKeyCreateDialog() {
         onClick={() => setOpen(true)}
         data-testid="apikey-create-open"
       >
-        <Plus className="me-1.5 size-4" />
+        <Plus className="size-4" />
         {t(integrations.createApiKey)}
       </Button>
 
@@ -313,7 +314,7 @@ export function ApiKeyCreateDialog() {
             </div>
             <DialogFooter>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => {
                   setOpen(false);
                   reset();

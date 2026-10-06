@@ -72,7 +72,12 @@ export function WebhookDeliveryAttemptsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <p className="text-muted-foreground truncate font-mono text-xs">{webhookUrl}</p>
+        <p
+          dir="ltr"
+          className="text-muted-foreground bg-canvas truncate rounded-lg border px-2.5 py-1.5 [text-align:match-parent] font-mono text-xs"
+        >
+          {webhookUrl}
+        </p>
 
         {isLoading ? (
           <Skeleton className="h-24 w-full" data-testid="webhook-attempts-loading" />
@@ -110,7 +115,11 @@ export function WebhookDeliveryAttemptsDialog({
         ) : null}
 
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose} data-testid="webhook-attempts-close">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            data-testid="webhook-attempts-close"
+          >
             {t(integrations.closeDialog)}
           </Button>
         </DialogFooter>

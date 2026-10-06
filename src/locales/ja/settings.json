@@ -260,6 +260,7 @@
       "apiKeysNoResults": "一致する API キーがありません",
       "apiKeysNoResultsDescription": "検索に一致する API キーがありません。",
       "apiKeyFallback": "この API キー",
+      "addedOn": "<1></1> に追加",
       "createApiKey": "APIキーを作成",
       "createApiKeyTitle": "APIキーを作成する",
       "createApiKeyDescription": "キーに名前を付け、できることと有効期間を選びます。",

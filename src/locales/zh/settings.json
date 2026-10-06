@@ -260,6 +260,7 @@
       "apiKeysNoResults": "没有匹配的 API 密钥",
       "apiKeysNoResultsDescription": "没有与搜索匹配的 API 密钥。",
       "apiKeyFallback": "该 API 密钥",
+      "addedOn": "添加于 <1></1>",
       "createApiKey": "创建 API 密钥",
       "createApiKeyTitle": "创建一个 API 密钥",
       "createApiKeyDescription": "为密钥命名，选择它能做什么以及有效期。",

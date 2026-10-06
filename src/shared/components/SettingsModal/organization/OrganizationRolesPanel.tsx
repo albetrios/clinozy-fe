@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { isListStale, listRefreshClass } from '@/lib/list-refresh.ts';
-import { cn } from '@/lib/utils.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
@@ -14,12 +13,17 @@ import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
+  SettingsList,
+  SettingsListRow,
+  settingsRowActionClass,
+  SettingsRowTile,
+} from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,8 +62,9 @@ function RoleRowActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
+          className={settingsRowActionClass()}
           aria-label={t(panels.actionsAria, { name: role.name })}
           data-testid={`role-actions-${role.id}`}
         >
@@ -100,25 +105,30 @@ function RoleListItem({
   const { t } = useTranslation(SETTINGS_NS);
   const panels = SETTINGS_KEYS.panels.roles;
   return (
-    <li className="flex items-center gap-3 p-3">
+    <SettingsListRow>
+      <SettingsRowTile icon={ShieldCheck} tone="slate" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-medium">{role.name}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <p dir="auto" className="text-body truncate font-medium">
+            {role.name}
+          </p>
           {role.isSystem ? (
             <TonePill tone="neutral" size="sm">
               {t(panels.systemBadge)}
             </TonePill>
           ) : null}
         </div>
-        <p className="text-muted-foreground truncate text-xs">{role.description}</p>
+        <p dir="auto" className="text-muted-foreground text-caption truncate">
+          {role.description}
+        </p>
       </div>
-      <span className="text-muted-foreground shrink-0 text-xs">
+      <span className="text-muted-foreground text-caption shrink-0 tabular-nums">
         {t(panels.memberCount, { count: role.memberCount })}
       </span>
       {canManage && !role.isSystem ? (
         <RoleRowActions role={role} onEdit={onEdit} onDelete={onDelete} />
       ) : null}
-    </li>
+    </SettingsListRow>
   );
 }
 
@@ -160,6 +170,8 @@ function RolesResults({
   if (roles.rows.length === 0) {
     return (
       <EmptyState
+        tone="slate"
+        className="pt-8 pb-9"
         icon={<ShieldCheck />}
         title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}
         description={isSearching ? '' : t(panels.emptyDescription)}
@@ -168,22 +180,21 @@ function RolesResults({
   }
   return (
     <>
-      <Card
-        className={cn('gap-0 overflow-hidden py-0', listRefreshClass(stale))}
+      <SettingsList
+        frameClassName={listRefreshClass(stale)}
         aria-busy={stale}
+        data-testid="roles-list"
       >
-        <ul className="divide-border divide-y" data-testid="roles-list">
-          {roles.rows.map((role) => (
-            <RoleListItem
-              key={role.id}
-              role={role}
-              canManage={canManage}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
-        </ul>
-      </Card>
+        {roles.rows.map((role) => (
+          <RoleListItem
+            key={role.id}
+            role={role}
+            canManage={canManage}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </SettingsList>
       {roles.hasNextPage ? (
         <div className="flex justify-center">
           <Button
@@ -245,7 +256,7 @@ function RolesManager() {
   const isSearching = debouncedSearch.length > 0;
 
   return (
-    <section className="space-y-6" data-testid="settings-organization-roles">
+    <section className="flex flex-col gap-4" data-testid="settings-organization-roles">
       <SectionHeader title={t(panels.title)} description={t(panels.description)} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -260,7 +271,7 @@ function RolesManager() {
         />
         {accessResolved ? null : (
           <Button size="sm" disabled data-testid="role-create-pending">
-            <Plus className="me-2 h-4 w-4" />
+            <Plus className="size-4" />
             {t(panels.create)}
           </Button>
         )}

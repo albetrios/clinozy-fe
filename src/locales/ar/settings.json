@@ -273,6 +273,7 @@
       "apiKeysNoResults": "لا مفاتيح API مطابقة",
       "apiKeysNoResultsDescription": "لا مفاتيح API تطابق بحثك.",
       "apiKeyFallback": "مفتاح API هذا",
+      "addedOn": "أُضيف <1></1>",
       "createApiKey": "إنشاء مفتاح API",
       "createApiKeyTitle": "إنشاء مفتاح API",
       "createApiKeyDescription": "سمِّ المفتاح، واختر ما يمكنه فعله ومدة صلاحيته.",

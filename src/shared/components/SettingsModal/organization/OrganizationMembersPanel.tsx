@@ -23,13 +23,17 @@ import { InviteMemberDialog } from '@/shared/components/InviteMemberDialog/index
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
+  SettingsList,
+  SettingsListRow,
+  settingsRowActionClass,
+} from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -214,8 +218,9 @@ function MemberRowActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
+          className={settingsRowActionClass()}
           aria-label={t(panels.actionsAria, { name: member.name })}
           data-testid={`member-actions-${member.id}`}
           aria-busy={isWriting}
@@ -341,16 +346,25 @@ function MemberRow({
   const hasActions = canManageMembers || (canManageInvitations && invitation !== null);
 
   return (
-    <li className="flex items-center gap-3 p-3">
+    <SettingsListRow>
+      {/* A table row's primary cell: the 32px avatar, the name 13px/500, the
+          email under it 11.5px muted. */}
       <PersonAvatar
         initials={personInitials(member.name) || '?'}
         tone="stone"
-        size="field"
+        size="cell"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{member.name}</p>
+        <p dir="auto" className="text-body truncate font-medium">
+          {member.name}
+        </p>
         {member.email !== member.name ? (
-          <p className="text-muted-foreground truncate text-xs">{member.email}</p>
+          <p
+            dir="ltr"
+            className="text-muted-foreground text-caption truncate [text-align:match-parent]"
+          >
+            {member.email}
+          </p>
         ) : null}
         {invitation ? (
           <InvitationExpiry memberId={member.id} invitation={invitation} />
@@ -379,7 +393,7 @@ function MemberRow({
           />
         </SectionErrorBoundary>
       ) : null}
-    </li>
+    </SettingsListRow>
   );
 }
 
@@ -469,6 +483,8 @@ function MembersList({
 
       {!(members.isPending || members.isError) && members.rows.length === 0 ? (
         <EmptyState
+          tone="slate"
+          className="pt-8 pb-9"
           icon={<Users />}
           title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}
           description={isSearching ? '' : t(panels.emptyDescription)}
@@ -477,23 +493,22 @@ function MembersList({
 
       {!members.isError && members.rows.length > 0 ? (
         <>
-          <Card
-            className={cn('gap-0 overflow-hidden py-0', listRefreshClass(isStale))}
+          <SettingsList
+            frameClassName={listRefreshClass(isStale)}
             aria-busy={isStale}
+            data-testid="members-list"
           >
-            <ul className="divide-border divide-y" data-testid="members-list">
-              {members.rows.map((member) => (
-                <MemberRow
-                  key={member.id}
-                  member={member}
-                  canManageMembers={canManageMembers}
-                  canManageInvitations={canManageInvitations}
-                  onRemove={onRemove}
-                  onCancelInvitation={onCancelInvitation}
-                />
-              ))}
-            </ul>
-          </Card>
+            {members.rows.map((member) => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                canManageMembers={canManageMembers}
+                canManageInvitations={canManageInvitations}
+                onRemove={onRemove}
+                onCancelInvitation={onCancelInvitation}
+              />
+            ))}
+          </SettingsList>
           {members.hasNextPage ? (
             <div className="flex justify-center">
               <Button
@@ -583,7 +598,7 @@ function MembersManager() {
   const isStale = isListStale(members.isRefreshing, isSearchPending);
 
   return (
-    <section className="space-y-6" data-testid="settings-organization-members">
+    <section className="flex flex-col gap-4" data-testid="settings-organization-members">
       <SectionHeader title={t(panels.title)} description={t(panels.description)} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -598,7 +613,7 @@ function MembersManager() {
         />
         {accessResolved ? null : (
           <Button size="sm" disabled data-testid="invite-member-pending">
-            <UserPlus className="me-2 h-4 w-4" />
+            <UserPlus className="size-4" />
             {t(panels.invite)}
           </Button>
         )}

@@ -31,7 +31,10 @@ interface OrgListControlsProps {
   sortTestId: string;
 }
 
-/** Search + server-side sort toolbar for organization list panels. */
+/**
+ * Search + server-side sort toolbar for organization list panels — the room
+ * search field beside the sort Picker, wrapping on a phone.
+ */
 export function OrgListControls({
   search,
   onSearchChange,
@@ -44,7 +47,7 @@ export function OrgListControls({
   const { t } = useTranslation(SETTINGS_NS);
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
       <RoomSearchField
         layout="fill"
         value={search}

@@ -8,12 +8,17 @@ import {
   updateWebhookSchema,
   type Webhook,
 } from '@/shared/api/webhook-contracts.ts';
-import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import {
+  DrawerChips,
+  DrawerField,
+  DrawerInput,
+} from '@/shared/components/DrawerField/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Dialog,
@@ -23,7 +28,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useWebhookEvents } from '@/shared/hooks/useWebhookEvents/index.ts';
@@ -79,12 +83,6 @@ export function WebhookFormDialog({
   const [error, setError] = useState<string | null>(null);
 
   const isPending = isEdit ? update.isPending : create.isPending;
-
-  function toggleEvent(event: string) {
-    setEvents((prev) =>
-      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event],
-    );
-  }
 
   function close() {
     onOpenChange(false);
@@ -153,7 +151,7 @@ export function WebhookFormDialog({
             <WebhookEventChecklist
               catalog={catalog}
               selected={events}
-              onToggle={toggleEvent}
+              onChange={setEvents}
             />
           </DrawerField>
           {/*
@@ -164,7 +162,7 @@ export function WebhookFormDialog({
         </div>
         <DialogFooter>
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={close}
             disabled={isPending}
             data-testid="webhook-cancel"
@@ -189,21 +187,29 @@ function submitLabelKey({ isEdit, isPending }: { isEdit: boolean; isPending: boo
   return isPending ? integrations.creating : integrations.createWebhook;
 }
 
-/** The subscribe checklist, with its own loading / error / empty states. */
+/**
+ * The subscribe checklist — a drawer's chip field (pick any; a picked chip
+ * carries its boxed check, picks kept in the order they were made) — with its
+ * own loading / error / empty states.
+ */
 function WebhookEventChecklist({
   catalog,
   selected,
-  onToggle,
+  onChange,
 }: {
   catalog: ReturnType<typeof useWebhookEvents>;
   selected: string[];
-  onToggle: (event: string) => void;
+  onChange: (events: string[]) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
   const integrations = SETTINGS_KEYS.panels.integrations;
 
   if (catalog.isPending) {
-    return <Skeleton className="h-16 w-full" data-testid="webhook-events-loading" />;
+    return (
+      <span data-testid="webhook-events-loading" className="flex">
+        <SkeletonBar shape="field" className="h-16" />
+      </span>
+    );
   }
 
   // A failed catalog must not read as "there are no events" — that would invite saving a
@@ -222,28 +228,25 @@ function WebhookEventChecklist({
 
   if (catalog.rows.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm" data-testid="webhook-events-empty">
+      <p className="text-muted-foreground text-body" data-testid="webhook-events-empty">
         {t(integrations.eventsEmpty)}
       </p>
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {catalog.rows.map((entry) => (
-        <Button
-          key={entry.event}
-          type="button"
-          size="sm"
-          variant={selected.includes(entry.event) ? 'default' : 'outline'}
-          onClick={() => onToggle(entry.event)}
-          title={entry.description}
-          aria-pressed={selected.includes(entry.event)}
-          data-testid={`webhook-event-${entry.event}`}
-        >
-          {entry.event}
-        </Button>
-      ))}
-    </div>
+    <DrawerChips
+      multiple
+      ordered
+      label={t(integrations.eventsLabel)}
+      options={catalog.rows.map((entry) => ({
+        value: entry.event,
+        label: entry.event,
+        hint: entry.description,
+      }))}
+      value={selected}
+      onChange={onChange}
+      testId="webhook-event"
+    />
   );
 }

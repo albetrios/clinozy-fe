@@ -264,6 +264,7 @@
       "apiKeysNoResults": "Aucune clé d'API correspondante",
       "apiKeysNoResultsDescription": "Aucune clé d'API ne correspond à votre recherche.",
       "apiKeyFallback": "cette clé d'API",
+      "addedOn": "ajoutée le <1></1>",
       "createApiKey": "Créer une clé d'API",
       "createApiKeyTitle": "Créer une clé d'API",
       "createApiKeyDescription": "Nommez la clé, choisissez ce qu'elle peut faire et sa durée de vie.",

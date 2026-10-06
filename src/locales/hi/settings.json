@@ -261,6 +261,7 @@
       "apiKeysNoResults": "कोई मेल खाती API कुंजी नहीं",
       "apiKeysNoResultsDescription": "आपकी खोज से कोई API कुंजी मेल नहीं खाती।",
       "apiKeyFallback": "यह API कुंजी",
+      "addedOn": "<1></1> को जोड़ी गई",
       "createApiKey": "API कुंजी बनाएँ",
       "createApiKeyTitle": "एक API कुंजी बनाएँ",
       "createApiKeyDescription": "कुंजी को नाम दें, चुनें कि वह क्या कर सकती है और कब तक चलेगी।",
