@@ -238,8 +238,9 @@ keeps the device's language, text direction, date-time and number preferences.
 The axes stay **token-driven and orthogonal** in `index.css`, at the launch's
 defaults: contrast rules and slot hooks are fixed, and a component that honours
 the tokens (a named radius step, a `data-slot` on a surface, no hardcoded shadow)
-follows any future look for free. `VITE_THEME_LOCK=true` now only swaps the
-drawer's Mode card for the "managed by your organization" note.
+follows any future look for free. `VITE_THEME_LOCK=true` pins the mode: no surface
+offers Light / Dark / System, and the drawer's Mode card becomes the "managed by your
+organization" note.
 
 **Catalog source of truth:** `src/shared/theme/presets.ts` (the one look) and
 [theme-axis-audit-playbook.md](theme-axis-audit-playbook.md) (the hooks). Mechanics:

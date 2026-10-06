@@ -6,15 +6,28 @@ import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
 import { ThemeModeToggle } from './ThemeModeToggle.tsx';
 
+const platformOverrides = vi.hoisted(() => ({ themeLock: false }));
 // Devtools on, as locally: the old quick-Shuffle shortcut hid behind it. It is
-// gone for good now, whatever the flags say.
-vi.mock('@/core/config/env.ts', () => ({
-  platformConfig: { devtools: true, themeLock: false },
-}));
+// gone for good now, whatever the flags say. The theme lock is read per render,
+// so a test can pin the mode.
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      devtools: true,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
 
 // Real theme store (a Zustand store works in jsdom). Plain render — the toggle
 // is routing-free, so no providers are needed.
 beforeEach(() => {
+  platformOverrides.themeLock = false;
   useThemeStore.setState({ theme: 'system' });
 });
 
@@ -69,5 +82,15 @@ describe('ThemeModeToggle', () => {
         .map((item) => item.textContent?.trim()),
     ).toEqual(['Light', 'Dark', 'System']);
     expect(screen.queryByTestId('theme-shuffle-menu')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing on a theme-locked deployment — the mode is pinned', () => {
+    platformOverrides.themeLock = true;
+    // The signed-out canvas's header is where the toggle lives.
+    const { container } = render(<ThemeModeToggle surface="frame" />);
+
+    expect(screen.queryByTestId('theme-toggle')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
+    expect(useThemeStore.getState().theme).toBe('system');
   });
 });

@@ -144,8 +144,9 @@ layouts are the launch's signed-out canvas alone (`AuthLayout.tsx`, `PublicLayou
 — the Split / Spotlight / Minimal and Centered / Card / Brand previews,
 `authVariant` / `publicVariant` and `SHUFFLE_TEMP` are gone, L-65).
 
-`VITE_THEME_LOCK=true` now only swaps the Appearance drawer's Mode card for the
-"managed by your organization" note.
+`VITE_THEME_LOCK=true` pins the mode: no surface offers Light / Dark / System (the
+Account menu's pills, the ⌘K theme rows and the signed-out toggle give way), and the
+Appearance drawer's Mode card becomes the "managed by your organization" note.
 
 ---
 

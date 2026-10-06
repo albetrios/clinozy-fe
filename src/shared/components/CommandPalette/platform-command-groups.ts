@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { platformConfig } from '@/core/config/env.ts';
 import { logout } from '@/shared/auth/service.ts';
 import {
   SETTINGS_GROUP_LABEL_KEYS,
@@ -70,15 +71,16 @@ function matching(groups: CommandRowGroup[], query: string): CommandRowGroup[] {
 export interface PlatformCommandGroups {
   /** Settings. */
   leading: CommandRowGroup[];
-  /** Shortcuts, Theme and Account. */
+  /** Shortcuts, Theme (unless the deployment pins the mode) and Account. */
   trailing: CommandRowGroup[];
 }
 
 /**
  * The palette's platform rows, kept by the relocation table (KICKOFF §3.2):
  * Settings (user, organization and every section the Settings modal would
- * show), Keyboard shortcuts, the three theme modes and Log out. The rooms are
- * the clinic's "Go to" group. Each row answers the query by its label or its
+ * show), Keyboard shortcuts, the three theme modes and Log out. A theme-locked
+ * deployment (`VITE_THEME_LOCK`) pins the mode, so it gets no theme rows, as
+ * the Account menu gets no mode pills. The rooms are the clinic's "Go to" group. Each row answers the query by its label or its
  * keywords. They are the clinic rows' anatomy: a settings row names its scope
  * in the sub ("Account", "Organization" — as an action names its room), unless
  * that would repeat its own label; shortcuts and Log out take the Account
@@ -176,17 +178,21 @@ export function usePlatformCommandGroups({
         },
       ],
     },
-    {
-      id: 'theme',
-      heading: t(cp.groups.theme),
-      rows: THEME_MODES.map(({ mode, labelKey, icon }) => ({
-        value: `theme:${mode}`,
-        label: t(labelKey),
-        icon,
-        keywords: THEME_KEYWORDS,
-        onSelect: () => runCommand(() => setTheme(mode)),
-      })),
-    },
+    ...(platformConfig.themeLock
+      ? []
+      : [
+          {
+            id: 'theme',
+            heading: t(cp.groups.theme),
+            rows: THEME_MODES.map(({ mode, labelKey, icon }) => ({
+              value: `theme:${mode}`,
+              label: t(labelKey),
+              icon,
+              keywords: THEME_KEYWORDS,
+              onSelect: () => runCommand(() => setTheme(mode)),
+            })),
+          },
+        ]),
     {
       id: 'account',
       heading: t(cp.groups.account),

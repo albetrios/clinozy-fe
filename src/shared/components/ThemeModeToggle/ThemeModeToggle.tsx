@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { platformConfig } from '@/core/config/env.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -14,9 +15,11 @@ import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
 /**
  * Light / Dark / System mode toggle (shadcn-style ModeToggle). The trigger icon
- * reflects the active mode. Shared so it appears in the app header AND the
- * auth/public layouts — the mode is switchable everywhere, including before
- * sign-in. The look itself is the app's one look; there is nothing else to pick.
+ * reflects the active mode. Shared by the signed-out canvas's headers — sign-in,
+ * the public pages, the organization picker and the 404 — so the mode is
+ * switchable before sign-in too. The look itself is the app's one look; there
+ * is nothing else to pick. A theme-locked deployment (`VITE_THEME_LOCK`) pins
+ * the mode, so there the toggle renders nothing.
  */
 export function ThemeModeToggle({
   surface = 'default',
@@ -31,6 +34,9 @@ export function ThemeModeToggle({
   const { t } = useTranslation(LAYOUT_NS);
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
+
+  // The deployment pins the mode: nothing here may change it.
+  if (platformConfig.themeLock) return null;
 
   let ThemeIcon = Monitor;
   if (theme === 'dark') ThemeIcon = Moon;

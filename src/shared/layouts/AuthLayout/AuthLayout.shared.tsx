@@ -92,7 +92,8 @@ function AuthLocalePicker() {
 /**
  * Theme + language controls for the sign-in screen. `frame` is the signed-out
  * canvas's header (`PublicFrame`): two 32px bordered controls, 8px apart, as
- * the clinic header draws its own.
+ * the clinic header draws its own. A theme-locked deployment keeps the language
+ * alone (`ThemeModeToggle` renders nothing there).
  */
 export function AuthControls({ surface = 'default' }: { surface?: 'default' | 'frame' }) {
   // Subscribe to the layout namespace so the control re-renders on locale change.

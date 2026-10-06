@@ -1,6 +1,6 @@
 import { act, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
@@ -10,10 +10,26 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AuthLayout } from './AuthLayout.tsx';
 
+const platformOverrides = vi.hoisted(() => ({ themeLock: false }));
+// The deployment's theme lock (`VITE_THEME_LOCK`), read per render.
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
+
 const LANGUAGE = pickerTestIds('auth-locale-select');
 
 describe('AuthLayout', () => {
   beforeEach(() => {
+    platformOverrides.themeLock = false;
     useLocaleStore.setState({ locale: 'en', textDirection: 'auto' });
   });
 
@@ -52,6 +68,20 @@ describe('AuthLayout', () => {
     expect(card).toHaveAttribute('data-slot', 'card');
     expect(card).toHaveClass('max-w-90', 'rounded-xl');
     expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
+  });
+
+  it('on a theme-locked deployment, the header keeps the language picker and drops the theme toggle', async () => {
+    platformOverrides.themeLock = true;
+    const { findByTestId, getByTestId } = renderWithProviders(
+      <AuthLayout>
+        <span>child</span>
+      </AuthLayout>,
+    );
+
+    expect(await findByTestId('auth-layout')).toBeInTheDocument();
+    const controls = getByTestId('public-frame-controls');
+    expect(await within(controls).findByTestId(LANGUAGE.trigger)).toBeInTheDocument();
+    expect(within(controls).queryByTestId('theme-toggle')).not.toBeInTheDocument();
   });
 
   it('shows the auth language picker in multi-locale builds, and it switches the UI', async () => {

@@ -68,8 +68,10 @@ and the device's language, text direction, date-time and number preferences.
 - **Layout width** — `full`, the launch's (`LAUNCH_LAYOUT_WIDTH` in
   `src/shared/theme/layout-width.ts`); a deployment can still force `contained` or
   `reading` with `VITE_LAYOUT_WIDTH`.
-- **`VITE_THEME_LOCK`** — still read: under it the Appearance drawer shows the
-  "managed by your organization" note in place of its Mode card.
+- **`VITE_THEME_LOCK`** — pins the mode: the Account menu's Light / Dark / System
+  pills, the ⌘K menu's theme rows and the signed-out pages' theme toggle give way, and
+  the Appearance drawer shows the "managed by your organization" note in place of its
+  Mode card.
 
 ### No palette is written inline
 

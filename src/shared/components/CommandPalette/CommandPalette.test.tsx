@@ -19,6 +19,7 @@ const {
   switchToPersonalMock,
   notifyErrorMock,
   reportErrorMock,
+  platformOverrides,
 } = vi.hoisted(() => ({
   useMeContextMock: vi.fn(),
   navigateMock: vi.fn(),
@@ -26,7 +27,21 @@ const {
   switchToPersonalMock: vi.fn(),
   notifyErrorMock: vi.fn(),
   reportErrorMock: vi.fn(),
+  platformOverrides: { themeLock: false },
 }));
+// The deployment's theme lock (`VITE_THEME_LOCK`), read per render.
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
 vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
   const { TODAY_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
   return { useAppNav: () => TODAY_ONLY_NAV };
@@ -125,6 +140,7 @@ describe('CommandPalette', () => {
     switchToPersonalMock.mockResolvedValue(undefined);
     notifyErrorMock.mockClear();
     reportErrorMock.mockClear();
+    platformOverrides.themeLock = false;
     useOrganizationStore.setState({
       deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
     });
@@ -261,6 +277,27 @@ describe('CommandPalette', () => {
       expect(screen.getByText('System theme')).toBeInTheDocument();
       expect(screen.queryByText('Profile')).not.toBeInTheDocument();
     });
+  });
+
+  it('offers no theme rows on a theme-locked deployment — the mode is pinned', async () => {
+    platformOverrides.themeLock = true;
+    const user = userEvent.setup();
+    renderWithProviders(<CommandPalette />);
+
+    // The other platform rows stay; the Theme group and its three modes go.
+    expect(await screen.findByText('Keyboard shortcuts')).toBeInTheDocument();
+    expect(screen.getByText('Log out')).toBeInTheDocument();
+    expect(screen.queryByText('Theme')).not.toBeInTheDocument();
+    for (const mode of ['Light mode', 'Dark mode', 'System theme']) {
+      expect(screen.queryByText(mode)).not.toBeInTheDocument();
+    }
+
+    // Nor does a search reach them: "theme", the rows' own keyword, finds nothing.
+    await user.type(screen.getByPlaceholderText('Search or jump to…'), 'theme');
+    expect(await screen.findByTestId('command-palette-empty')).toHaveTextContent(
+      'No results found.',
+    );
+    expect(screen.queryByText('Dark mode')).not.toBeInTheDocument();
   });
 
   it('renders nothing when closed', () => {
