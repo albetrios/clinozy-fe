@@ -22,6 +22,7 @@ import {
 } from '@/shared/components/AppearanceDialog/appearance.constants.ts';
 import { DateTimePrefsCard } from '@/shared/components/DateTimePrefsCard/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { FieldLabel } from '@/shared/components/FieldLabel/index.ts';
 import { LanguagePrefsCard } from '@/shared/components/LanguagePrefsCard/index.ts';
 import { MoneyPrefsCard } from '@/shared/components/MoneyPrefsCard/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
@@ -187,15 +188,6 @@ function Choices({
         );
       })}
     </div>
-  );
-}
-
-/** A drawer field's label: 12px/500 in the strong muted ink (`_patterns.md:34`). */
-function FieldLabel({ children }: { children: string }) {
-  return (
-    <p className="text-muted-foreground-strong text-xs leading-[normal] font-medium">
-      {children}
-    </p>
   );
 }
 
