@@ -65,6 +65,10 @@ test.describe('Accessibility', () => {
   test('Today — the clinic home — has no critical a11y violations', async ({ page }) => {
     await registerNewUserAndGoToToday(page);
     await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    // Scan the loaded floor, not the first load's in-place skeleton.
+    await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
+      timeout: 15000,
+    });
     await settleAnimations(page);
 
     const results = await new AxeBuilder({ page })
@@ -99,6 +103,9 @@ test.describe('Accessibility', () => {
 
     await navigateInApp(page, `/organization/${slug}/today`);
     await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
+      timeout: 15000,
+    });
     await expect(page.getByTestId('today-lane-arriving')).toHaveAttribute(
       'data-dimmed',
       'true',
