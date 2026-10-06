@@ -123,20 +123,32 @@ export async function authenticateViaEmailCode(page: Page): Promise<{ email: str
 const LANDED_URL = /\/organization(?:\/[^/?#]+\/[^/?#]+)?(?:[?#]|$)/;
 
 /**
+ * How a sign-up fills the wizard: `firstName` replaces the random full name a
+ * test types by default — for a screen whose layout follows the name's length
+ * (Today's greeting wraps its row).
+ */
+export interface OnboardingProfile {
+  firstName?: string;
+}
+
+/**
  * Walks the onboarding wizard through to the workspace when the user still needs it.
  * Skips workspace/invite steps when they are hidden for the deployment mode. A team-only
  * deployment creates the clinic in the wizard and lands on its role home (Today for its
  * owner); where personal workspaces still exist the wizard creates none, and the user
  * lands on the organization picker (D44: a personal workspace has no clinic).
  */
-export async function completeOnboardingWizard(page: Page): Promise<void> {
+export async function completeOnboardingWizard(
+  page: Page,
+  profile: OnboardingProfile = {},
+): Promise<void> {
   await expect(page.getByTestId('onboarding-page')).toBeVisible({ timeout: 10000 });
 
   await clickTestId(page, 'onboarding-next');
 
   // Profile step splits into first/last name (onboarding-first-name /
   // onboarding-last-name); firstName is what gates the Continue button.
-  await fillTestId(page, 'onboarding-first-name', e2eDisplayName());
+  await fillTestId(page, 'onboarding-first-name', profile.firstName ?? e2eDisplayName());
   await clickTestId(page, 'onboarding-next');
 
   await clickTestId(page, 'onboarding-next');
@@ -225,8 +237,11 @@ async function expectEmailStepNeverReappeared(page: Page): Promise<void> {
  * hydrate — reliable across browsers. For explicit `/login` UI coverage see
  * `loginViaEmailCodeUI` and auth.e2e tests.
  */
-export async function registerNewUserAndGoToToday(page: Page): Promise<void> {
-  await authenticateViaEmailCodeAndLand(page);
+export async function registerNewUserAndGoToToday(
+  page: Page,
+  profile: OnboardingProfile = {},
+): Promise<void> {
+  await authenticateViaEmailCodeAndLand(page, profile);
 }
 
 /**
@@ -238,6 +253,7 @@ export async function registerNewUserAndGoToToday(page: Page): Promise<void> {
  */
 export async function authenticateViaEmailCodeAndLand(
   page: Page,
+  profile: OnboardingProfile = {},
 ): Promise<{ email: string }> {
   const { email } = await authenticateViaEmailCode(page);
   // Client-side nav keeps the in-memory access token; a full reload would require the refresh cookie.
@@ -246,7 +262,7 @@ export async function authenticateViaEmailCodeAndLand(
     timeout: 15000,
   });
   if (page.url().includes('/onboarding')) {
-    await completeOnboardingWizard(page);
+    await completeOnboardingWizard(page, profile);
   }
   if (new URL(page.url()).pathname === '/organization') {
     await createTeamOrgAndOpenToday(page);

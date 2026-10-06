@@ -29,6 +29,25 @@ async function settled(page: Page): Promise<void> {
   await page.addStyleTag({ content: HIDE_TRANSIENT });
 }
 
+/** `<html>` in dark mode — asserted before a dark shot is taken. */
+const DARK = /(?:^|\s)dark(?:\s|$)/;
+
+/**
+ * Dark mode the way a member has it: the saved preference (`useThemeStore`'s
+ * `theme-preference`), seeded before the app boots, so `theme-init.js` paints
+ * dark from the first frame and the store rehydrates to dark. Adding `.dark`
+ * after the load raced that rehydrate, which put the saved mode — light, the
+ * default — back: the "dark" 404 was shot light whenever it lost (flaky).
+ */
+async function seedDarkMode(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'theme-preference',
+      JSON.stringify({ state: { theme: 'dark' }, version: 8 }),
+    );
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
@@ -46,10 +65,11 @@ test.describe('Visual Regression', () => {
   });
 
   test('login page (dark mode)', async ({ page }) => {
+    await seedDarkMode(page);
     await gotoApp(page, '/login');
-    await page.evaluate(() => document.documentElement.classList.add('dark'));
     await expectAuthScreenReady(page);
     await settled(page);
+    await expect(page.locator('html')).toHaveClass(DARK);
     await expect(page).toHaveScreenshot('login-dark.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
@@ -75,14 +95,15 @@ test.describe('Visual Regression', () => {
   });
 
   test('login page (dark + hairline separation)', async ({ page }) => {
+    await seedDarkMode(page);
     await gotoApp(page, '/login');
     await page.evaluate(() => {
-      document.documentElement.classList.add('dark');
       document.documentElement.dataset.separation = 'hairline';
       document.documentElement.dataset.menu = 'glass';
     });
     await expectAuthScreenReady(page);
     await settled(page);
+    await expect(page.locator('html')).toHaveClass(DARK);
     await expect(page).toHaveScreenshot('login-dark-glass-hairline.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
@@ -94,16 +115,23 @@ test.describe('Visual Regression', () => {
   test('Today (the clinic home)', async ({ page }) => {
     // Date only: timers keep running, so boot, refresh and toasts behave as live.
     await page.clock.setFixedTime(FIXED_NOW);
-    await registerNewUserAndGoToToday(page);
+    // One first name every run: the greeting's length decides whether its row
+    // wraps, and a random full name moved the whole floor down when it did.
+    await registerNewUserAndGoToToday(page, { firstName: 'Riya' });
     await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    // Loaded, not the first load's in-place skeleton: the page is busy until the
+    // floor and the work queue have both answered.
+    await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
+      timeout: 15000,
+    });
     await settled(page);
 
     await expect(page).toHaveScreenshot('today.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.03,
       animations: 'disabled',
-      // A new user every run: their name in the greeting and their initials.
-      mask: [page.getByTestId('today-greeting'), page.getByTestId('user-menu-trigger')],
+      // A new user every run: their avatar.
+      mask: [page.getByTestId('user-menu-trigger')],
     });
   });
 
@@ -119,10 +147,11 @@ test.describe('Visual Regression', () => {
   });
 
   test('404 page (dark mode)', async ({ page }) => {
+    await seedDarkMode(page);
     await gotoApp(page, '/definitely-not-a-route');
-    await page.evaluate(() => document.documentElement.classList.add('dark'));
     await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 10000 });
     await settled(page);
+    await expect(page.locator('html')).toHaveClass(DARK);
     await expect(page).toHaveScreenshot('404-dark.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
