@@ -8,6 +8,7 @@ import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-api
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
   useAppointmentSlotLabel,
   usePatientAppointments,
@@ -27,7 +28,7 @@ import {
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
-import { BentoButton, BentoCard, BentoEmpty, BentoRow } from './bento-card.tsx';
+import { BentoButton, BentoCard, BentoRow } from './bento-card.tsx';
 
 /** How many records a card lists (H:4990 `slice(0, 3)`). */
 const LISTED = 3;
@@ -141,9 +142,11 @@ export function VisitsBentoCard({
         </div>
       ) : null}
       {visits.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${testId}-empty`}>
-          {t(TIMELINE_KEYS.visits.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${testId}-empty`}
+          title={t(TIMELINE_KEYS.visits.empty)}
+        />
       ) : null}
     </BentoCard>
   );
@@ -243,9 +246,11 @@ export function PackagesBentoCard({
         <PackageJourney key={row.package.id} row={row} late={late} onUse={onUse} />
       ))}
       {packages.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${TIMELINE_TEST_IDS.card('packages')}-empty`}>
-          {t(TIMELINE_KEYS.packages.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${TIMELINE_TEST_IDS.card('packages')}-empty`}
+          title={t(TIMELINE_KEYS.packages.empty)}
+        />
       ) : null}
     </BentoCard>
   );
@@ -302,9 +307,11 @@ export function PrescriptionsBentoCard({ onOpen, onNew }: CardLinks) {
         </div>
       ) : null}
       {prescriptions.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${testId}-empty`}>
-          {t(TIMELINE_KEYS.prescriptions.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${testId}-empty`}
+          title={t(TIMELINE_KEYS.prescriptions.empty)}
+        />
       ) : null}
     </BentoCard>
   );
@@ -352,9 +359,11 @@ export function TreatmentsBentoCard({
         </div>
       ) : null}
       {treatments.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${testId}-empty`}>
-          {t(TIMELINE_KEYS.treatments.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${testId}-empty`}
+          title={t(TIMELINE_KEYS.treatments.empty)}
+        />
       ) : null}
     </BentoCard>
   );

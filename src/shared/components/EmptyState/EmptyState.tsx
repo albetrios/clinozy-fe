@@ -33,9 +33,15 @@ export interface EmptyStateProps {
   /**
    * `card`: the dashed card a thread shows before its first message (KICKOFF
    * §3.5 Chat column › Empty) — a 12.5px title, a 12px line and the actions
-   * in a wrapping, centred row of chips. Without it, the room or plain look.
+   * in a wrapping, centred row of chips. `inline`: the muted one-liner in
+   * place of a list's or a card's rows ("No notes yet", "No snoozed tasks") —
+   * 12.5px by default, sized, spaced and aligned to its spec by `className`,
+   * an action (a link, a button) following the line. Without it, the room or
+   * plain look.
    */
-  variant?: 'card';
+  variant?: 'card' | 'inline';
+  /** Test id (default `empty-state`). */
+  testId?: string;
 }
 
 /** The design's 36px primary empty-state button, a 14px `Plus` before the label by default. */
@@ -67,10 +73,14 @@ function EmptyStateCard({
   description,
   action,
   className,
-}: Pick<EmptyStateProps, 'description' | 'action' | 'className'> & { title: string }) {
+  testId,
+}: Pick<EmptyStateProps, 'description' | 'action' | 'className'> & {
+  title: string;
+  testId: string;
+}) {
   return (
     <div
-      data-testid="empty-state"
+      data-testid={testId}
       data-variant="card"
       className={cn(
         'border-border-strong bg-card flex flex-col items-center gap-2.5 rounded-xl border border-dashed px-3.5 py-4.5 text-center',
@@ -93,11 +103,40 @@ function EmptyStateCard({
 }
 
 /**
+ * The inline variant: one muted line — its action, when it has one, inside
+ * the same paragraph, so "No appointments here · book one" reads as one line
+ * and a column layout (`flex flex-col`) stacks it under the words.
+ */
+function EmptyStateInline({
+  title,
+  description,
+  action,
+  className,
+  testId,
+}: Pick<EmptyStateProps, 'description' | 'action' | 'className'> & {
+  title: string;
+  testId: string;
+}) {
+  return (
+    <p
+      data-testid={testId}
+      data-variant="inline"
+      className={cn('text-detail text-muted-foreground', className)}
+    >
+      {title}
+      {description ? <span className="block">{description}</span> : null}
+      {action}
+    </p>
+  );
+}
+
+/**
  * Centered empty-state for lists/panels with no data yet (no members, no roles,
  * empty search). Pairs with `Skeleton` (loading) and the route error boundary
  * (error) to make every data surface cover loading / empty / error. With a
  * `tone` it is the clinic rooms' illustrated empty state; with
- * `onClearFilters` it is the filtered one; `variant="card"` is a thread's dashed starter card.
+ * `onClearFilters` it is the filtered one; `variant="card"` is a thread's dashed
+ * starter card; `variant="inline"` is a list's or a card's one-liner.
  */
 export function EmptyState({
   icon,
@@ -108,15 +147,18 @@ export function EmptyState({
   tone,
   onClearFilters,
   variant,
+  testId = 'empty-state',
 }: EmptyStateProps) {
   const { t } = useTranslation(EMPTY_STATE_NS);
-  if (variant === 'card') {
+  if (variant === 'card' || variant === 'inline') {
+    const Variant = variant === 'card' ? EmptyStateCard : EmptyStateInline;
     return (
-      <EmptyStateCard
+      <Variant
         title={title ?? t(EMPTY_STATE_KEYS.fallbackTitle)}
         description={description}
         action={action}
         className={className}
+        testId={testId}
       />
     );
   }
@@ -142,7 +184,7 @@ export function EmptyState({
     const toneClasses = TONE_CLASSES[tone];
     return (
       <div
-        data-testid="empty-state"
+        data-testid={testId}
         data-tone={tone}
         className={cn(
           'flex flex-col items-center gap-2.5 px-(--table-pad-x) pt-16 pb-18 text-center',
@@ -194,7 +236,7 @@ export function EmptyState({
 
   return (
     <div
-      data-testid="empty-state"
+      data-testid={testId}
       className={cn(
         'flex flex-col items-center justify-center gap-3 px-6 py-12 text-center',
         className,

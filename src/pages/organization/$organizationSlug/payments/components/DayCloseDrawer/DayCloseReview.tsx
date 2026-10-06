@@ -14,6 +14,7 @@ import {
   type DataTableRowAction,
   DataTableRowActions,
 } from '@/shared/components/DataTableRowActions/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
   LedgerAmountCell,
   LedgerModeCell,
@@ -278,12 +279,12 @@ export function DayCloseReview({
         />
       </button>
       {open && entries.length === 0 ? (
-        <p
-          data-testid={`${T}-empty`}
-          className="text-muted-foreground animate-reveal border-t px-4 py-6 text-center text-sm"
-        >
-          {t(K.empty)}
-        </p>
+        <EmptyState
+          variant="inline"
+          title={t(K.empty)}
+          testId={`${T}-empty`}
+          className="animate-reveal border-t px-4 py-6 text-center text-sm"
+        />
       ) : null}
       {open && entries.length > 0 ? (
         <div role="table" aria-label={t(K.title)} className="animate-reveal">

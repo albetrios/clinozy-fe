@@ -4,7 +4,7 @@
 // memoisation would hand the toolbar's Columns chooser a stale answer.
 
 import { Outlet, useLocation, useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -17,7 +17,7 @@ import { LEAD_HOLD_DAYS, leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { referrerFromPath } from '@/shared/clinic/clinic-referrer.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -109,6 +109,52 @@ function NewLeadDialog({
 /** An action offered only where it applies — the contact card hides the rest. */
 function offer(allowed: boolean, action: () => void): (() => void) | undefined {
   return allowed ? action : undefined;
+}
+
+/**
+ * The list's empty line (H:1745; `leads.md:393`): "No leads match" in the soft
+ * ink, with "Clear filters" while filters are on, else "New lead" for a member
+ * who may create.
+ */
+function LeadsEmpty({
+  filtered,
+  onClearFilters,
+  onNewLead,
+}: {
+  filtered: boolean;
+  onClearFilters: () => void;
+  onNewLead?: () => void;
+}) {
+  const { t } = useTranslation(LEADS_NS);
+  let action: ReactNode;
+  if (filtered) {
+    action = (
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onClearFilters}
+        className="text-detail rounded-lg"
+      >
+        {t(LEADS_KEYS.list.clearFilters)}
+      </Button>
+    );
+  } else if (onNewLead) {
+    action = (
+      <EmptyStateAction onClick={onNewLead}>
+        {t(LEADS_KEYS.list.newLead)}
+      </EmptyStateAction>
+    );
+  }
+  return (
+    <EmptyState
+      variant="inline"
+      title={t(LEADS_KEYS.list.empty)}
+      testId={LEADS_TEST_IDS.empty}
+      className="text-foreground-soft flex flex-col items-center gap-3 p-5.5 text-center"
+      action={action}
+    />
+  );
 }
 
 /**
@@ -301,28 +347,11 @@ export function LeadsPage() {
       rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
     />
   ) : (
-    <div
-      data-testid={LEADS_TEST_IDS.empty}
-      className="flex flex-col items-center gap-3 p-5.5 text-center"
-    >
-      <p className="text-detail text-foreground-soft">{t(LEADS_KEYS.list.empty)}</p>
-      {state.filtered ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={state.clearFilters}
-          className="text-detail rounded-lg"
-        >
-          {t(LEADS_KEYS.list.clearFilters)}
-        </Button>
-      ) : null}
-      {!state.filtered && canCreate ? (
-        <EmptyStateAction onClick={() => newLead()}>
-          {t(LEADS_KEYS.list.newLead)}
-        </EmptyStateAction>
-      ) : null}
-    </div>
+    <LeadsEmpty
+      filtered={state.filtered}
+      onClearFilters={state.clearFilters}
+      onNewLead={canCreate ? () => newLead() : undefined}
+    />
   );
 
   return (

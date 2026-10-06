@@ -10,6 +10,7 @@ import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.t
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -41,7 +42,7 @@ import {
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
-import { BentoButton, BentoCard, BentoEmpty, BentoRow } from './bento-card.tsx';
+import { BentoButton, BentoCard, BentoRow } from './bento-card.tsx';
 
 /** How many records a card lists (H:4996 `slice(0, 3)`). */
 const LISTED = 3;
@@ -119,9 +120,11 @@ export function PhotosBentoCard({
         </div>
       ) : null}
       {photos.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${testId}-empty`}>
-          {t(TIMELINE_KEYS.photos.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${testId}-empty`}
+          title={t(TIMELINE_KEYS.photos.empty)}
+        />
       ) : null}
     </BentoCard>
   );
@@ -304,9 +307,11 @@ export function ReportsBentoCard({ onOpen, onNew }: CardLinks) {
         </div>
       ) : null}
       {reports.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${testId}-empty`}>
-          {t(TIMELINE_KEYS.reports.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${testId}-empty`}
+          title={t(TIMELINE_KEYS.reports.empty)}
+        />
       ) : null}
     </BentoCard>
   );
@@ -400,9 +405,11 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
         </div>
       ) : null}
       {notes.isSuccess && rows.length === 0 ? (
-        <BentoEmpty testId={`${TIMELINE_TEST_IDS.card('notes')}-empty`}>
-          {t(K.empty)}
-        </BentoEmpty>
+        <EmptyState
+          variant="inline"
+          testId={`${TIMELINE_TEST_IDS.card('notes')}-empty`}
+          title={t(K.empty)}
+        />
       ) : null}
     </BentoCard>
   );

@@ -184,3 +184,55 @@ describe('EmptyState', () => {
     });
   });
 });
+
+describe('EmptyState — inline (a list’s or a card’s one-liner)', () => {
+  it('is one muted 12.5px line with its own test id, sized by the caller', () => {
+    render(
+      <EmptyState
+        variant="inline"
+        title="No notes yet"
+        testId="notes-empty"
+        className="text-body"
+      />,
+    );
+    const line = screen.getByTestId('notes-empty');
+    expect(line.tagName).toBe('P');
+    expect(line).toHaveAttribute('data-variant', 'inline');
+    expect(line).toHaveTextContent(/^No notes yet$/);
+    expect(line).toHaveClass('text-muted-foreground', 'text-body');
+    expect(line).not.toHaveClass('text-detail');
+  });
+
+  it('keeps its action in the same line — "No appointments here · book one"', async () => {
+    const onBook = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <EmptyState
+        variant="inline"
+        title="No appointments here · "
+        action={
+          <button type="button" onClick={onBook}>
+            book one
+          </button>
+        }
+      />,
+    );
+    expect(screen.getByTestId('empty-state')).toHaveTextContent(
+      'No appointments here · book one',
+    );
+    await user.click(screen.getByRole('button', { name: 'book one' }));
+    expect(onBook).toHaveBeenCalledOnce();
+  });
+
+  it('takes a test id on every look', () => {
+    render(<EmptyState title="No API keys" testId="api-keys-empty" />);
+    expect(screen.getByTestId('api-keys-empty')).toHaveTextContent('No API keys');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <EmptyState variant="inline" title="No snoozed tasks" description="Snooze one" />,
+    );
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});

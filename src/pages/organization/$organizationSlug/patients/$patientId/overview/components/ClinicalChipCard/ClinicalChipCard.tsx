@@ -6,6 +6,7 @@ import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 
 import { CLINICAL_KEYS, CLINICAL_NS } from '../../overview.constants.ts';
 
@@ -92,7 +93,10 @@ export function ClinicalChipCard({
           </CountBadge>
         ) : null}
       </h3>
-      <ul className="flex flex-wrap gap-1.5">
+      {items.length === 0 ? (
+        <EmptyState variant="inline" title={t(CLINICAL_KEYS.empty)} />
+      ) : null}
+      <ul className="flex flex-wrap gap-1.5 empty:hidden">
         {items.map((item) => (
           <li
             key={item}
@@ -123,9 +127,6 @@ export function ClinicalChipCard({
             ) : null}
           </li>
         ))}
-        {items.length === 0 ? (
-          <li className="text-detail text-muted-foreground">{t(CLINICAL_KEYS.empty)}</li>
-        ) : null}
       </ul>
       {canEdit ? (
         // The drawer input (its focus ring and first-letter capital), 32px on

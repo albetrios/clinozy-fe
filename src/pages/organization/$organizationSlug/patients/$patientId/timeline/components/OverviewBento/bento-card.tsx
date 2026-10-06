@@ -180,18 +180,3 @@ export function BentoRow({
     </button>
   );
 }
-
-/** A card's empty line (H:771 `empty`): "No visits yet". */
-export function BentoEmpty({
-  testId,
-  children,
-}: {
-  testId: string;
-  children: ReactNode;
-}) {
-  return (
-    <span data-testid={testId} className="text-detail text-muted-foreground">
-      {children}
-    </span>
-  );
-}

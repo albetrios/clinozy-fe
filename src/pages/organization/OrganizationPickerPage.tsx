@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { organizationHome } from '@/lib/routes/index.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Card, CardContent } from '@/shared/components/ui/card.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
@@ -75,8 +76,12 @@ function OrganizationList() {
 
       {isEmpty && (
         <Card data-testid="organization-picker-empty">
-          <CardContent className="text-muted-foreground p-6 text-center text-sm">
-            {t(AUTH_KEYS.organizationPicker.empty)}
+          <CardContent className="p-6">
+            <EmptyState
+              variant="inline"
+              title={t(AUTH_KEYS.organizationPicker.empty)}
+              className="text-center text-sm"
+            />
           </CardContent>
         </Card>
       )}

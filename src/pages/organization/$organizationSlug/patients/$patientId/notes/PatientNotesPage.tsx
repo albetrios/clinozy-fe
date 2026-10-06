@@ -9,6 +9,7 @@ import {
 } from '@/shared/api/clinic/patient-notes-api.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerTextarea } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
@@ -163,7 +164,11 @@ export function PatientNotesPage() {
           />
         ))}
         {notes.isSuccess && list.length === 0 ? (
-          <span className="text-body text-muted-foreground">{t(NOTES_KEYS.empty)}</span>
+          <EmptyState
+            variant="inline"
+            title={t(NOTES_KEYS.empty)}
+            className="text-body"
+          />
         ) : null}
       </div>
     </PatientSection>

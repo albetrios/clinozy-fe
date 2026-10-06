@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { MATRIX_PLATFORM_CODES } from '@/shared/api/clinic/access-api.ts';
 import type { ClinicRoleView } from '@/shared/api/clinic/access-contracts.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { useAssignablePermissions } from '@/shared/hooks/useAssignablePermissions/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -42,11 +43,7 @@ export function RoleWorkspace({
     (entry) => !MATRIX_PLATFORM_CODES.includes(entry.code),
   );
   if (rows.length === 0) {
-    return (
-      <span className="text-detail text-muted-foreground">
-        {t(USERS_KEYS.roles.workspace.none)}
-      </span>
-    );
+    return <EmptyState variant="inline" title={t(USERS_KEYS.roles.workspace.none)} />;
   }
   return (
     <div

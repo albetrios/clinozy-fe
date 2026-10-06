@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -380,9 +381,11 @@ function TableBody<TData extends RowData>({
         <div role="row">
           <div role="cell" aria-colspan={Math.max(1, columnCount)}>
             {empty ?? (
-              <p className="text-muted-foreground px-(--table-pad-x) py-12 text-center text-sm">
-                {emptyMessage ?? t(TABLE_KEYS.empty)}
-              </p>
+              <EmptyState
+                variant="inline"
+                title={emptyMessage ?? t(TABLE_KEYS.empty)}
+                className="px-(--table-pad-x) py-12 text-center text-sm"
+              />
             )}
           </div>
         </div>

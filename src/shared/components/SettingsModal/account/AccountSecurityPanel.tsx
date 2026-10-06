@@ -6,6 +6,7 @@ import type { MfaEnrollment } from '@/shared/api/mfa-api.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { QrCode } from '@/shared/components/QrCode/index.ts';
 import { RecoveryCodesPanel } from '@/shared/components/RecoveryCodesPanel/index.ts';
@@ -426,9 +427,12 @@ function PasskeysCard() {
   // Only rendered once the list is KNOWN — see passkeysQuery above.
   const passkeysBody =
     passkeys.length === 0 ? (
-      <p className="text-muted-foreground text-body" data-testid="passkeys-empty">
-        {t(SETTINGS_KEYS.security.passkeys.empty)}
-      </p>
+      <EmptyState
+        variant="inline"
+        title={t(SETTINGS_KEYS.security.passkeys.empty)}
+        testId="passkeys-empty"
+        className="text-body"
+      />
     ) : (
       <SettingsList>
         {passkeys.map((passkey) => (

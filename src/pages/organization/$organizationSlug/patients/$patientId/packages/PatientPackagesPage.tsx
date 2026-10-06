@@ -9,6 +9,7 @@ import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
@@ -180,9 +181,11 @@ export function PatientPackagesPage() {
             </div>
           ) : null}
           {packages.isSuccess && rows.length === 0 ? (
-            <p className="text-body text-muted-foreground p-10 text-center">
-              {t(K.empty, { ns: PACKAGE_NS })}
-            </p>
+            <EmptyState
+              variant="inline"
+              title={t(K.empty, { ns: PACKAGE_NS })}
+              className="text-body p-10 text-center"
+            />
           ) : null}
         </div>
       </PatientSection>

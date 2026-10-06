@@ -15,6 +15,7 @@ import type { BillingPaymentMethod } from '@/shared/api/billing-contracts.ts';
 import { billingQueryKeys } from '@/shared/api/billing-query-keys.ts';
 import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import {
   SettingsCard,
@@ -209,12 +210,12 @@ export function BillingPaymentMethods({
                 ))}
               </SettingsList>
             ) : (
-              <p
-                className="text-muted-foreground text-body"
-                data-testid="billing-payment-methods-empty"
-              >
-                {t(METHOD_KEYS.empty)}
-              </p>
+              <EmptyState
+                variant="inline"
+                title={t(METHOD_KEYS.empty)}
+                testId="billing-payment-methods-empty"
+                className="text-body"
+              />
             )
           }
         </QueryBoundary>

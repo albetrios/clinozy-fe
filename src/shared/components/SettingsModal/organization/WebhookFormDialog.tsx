@@ -13,6 +13,7 @@ import {
   DrawerField,
   DrawerInput,
 } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
@@ -228,9 +229,12 @@ function WebhookEventChecklist({
 
   if (catalog.rows.length === 0) {
     return (
-      <p className="text-muted-foreground text-body" data-testid="webhook-events-empty">
-        {t(integrations.eventsEmpty)}
-      </p>
+      <EmptyState
+        variant="inline"
+        title={t(integrations.eventsEmpty)}
+        testId="webhook-events-empty"
+        className="text-body"
+      />
     );
   }
 

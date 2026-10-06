@@ -12,6 +12,7 @@ import {
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
   type RoomViewTab,
   RoomViewTabs,
@@ -278,7 +279,7 @@ export function ActivityTimeline() {
         </div>
       ) : null}
       {!loading && entries.length === 0 ? (
-        <span className="text-detail text-muted-foreground">{t(K.empty)}</span>
+        <EmptyState variant="inline" title={t(K.empty)} />
       ) : null}
     </section>
   );

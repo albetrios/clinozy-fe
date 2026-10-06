@@ -62,28 +62,28 @@ one lazy module (`../patient-id.sections.ts`).
 
 ## Files
 
-| File                                               | Responsibility                                                                                         |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `timeline.route.tsx`                               | Route marker — exports `Component` rendering `PatientTimelinePage`.                                    |
-| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Overview". |
-| `timeline.constants.ts`                            | `TIMELINE_KEYS` (the file's own words reused where they are the same), the cards and tones, test ids.  |
-| `PatientTimelinePage.tsx`                          | The section: no header, the bento, then the activity timeline — or the visit flow on `?visit=open`.    |
-| `components/OverviewBento/OverviewBento.tsx`       | The grid and what each card opens, adds and does.                                                      |
-| `components/OverviewBento/bento-card.tsx`          | A card's frame — head, "New …", "Open" — its rows, outline actions and empty line.                     |
-| `components/OverviewBento/bento-clinical.tsx`      | Clinical: the smart note and the four lists.                                                           |
-| `components/OverviewBento/bento-care.tsx`          | Visits, Packages, Prescriptions, Treatments.                                                           |
-| `components/OverviewBento/bento-files.tsx`         | Photos, Billing, Reports, Team notes.                                                                  |
-| `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                            |
-| `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).   |
-| `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                       |
-| `components/ActivityTimeline/ActivityTimeline.tsx` | The card: the filter tabs, the day headings, the rows.                                                 |
-| `components/ActivityTimeline/activity-feed.ts`     | The kinds, chips and tones; rows (newest first, a day's photos joined) and counts.                     |
-| `components/ActivityTimeline/use-activity-feed.ts` | The patient's records as activity entries, in the viewer's words, each with what opens it.             |
-| `components/VisitFlow/VisitFlow.tsx`               | The visit flow: its head (Pause, Complete visit) and the five step cards with their status lines.      |
-| `components/VisitFlow/flow-steps.tsx`              | Each step's controls: the checks, the kits, Repeat / New treatment, the invoice, collect and share.    |
-| `components/VisitFlow/use-visit-flow.ts`           | The flow's writes and links, each left out for a member who can't, toasting in the flow's words.       |
-| `components/VisitFlow/visit-flow.ts`               | The step states, the remembered settings, the Invoice step's lines and the step button classes.        |
-| `components/VisitFlow/visit-flow.constants.ts`     | `VISIT_FLOW_KEYS` (`patient-file` › `visitFlow.*`), the steps, test ids.                               |
+| File                                               | Responsibility                                                                                                   |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `timeline.route.tsx`                               | Route marker — exports `Component` rendering `PatientTimelinePage`.                                              |
+| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Overview".           |
+| `timeline.constants.ts`                            | `TIMELINE_KEYS` (the file's own words reused where they are the same), the cards and tones, test ids.            |
+| `PatientTimelinePage.tsx`                          | The section: no header, the bento, then the activity timeline — or the visit flow on `?visit=open`.              |
+| `components/OverviewBento/OverviewBento.tsx`       | The grid and what each card opens, adds and does.                                                                |
+| `components/OverviewBento/bento-card.tsx`          | A card's frame — head, "New …", "Open" — its rows and outline actions (the empty line is `EmptyState` `inline`). |
+| `components/OverviewBento/bento-clinical.tsx`      | Clinical: the smart note and the four lists.                                                                     |
+| `components/OverviewBento/bento-care.tsx`          | Visits, Packages, Prescriptions, Treatments.                                                                     |
+| `components/OverviewBento/bento-files.tsx`         | Photos, Billing, Reports, Team notes.                                                                            |
+| `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                                      |
+| `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).             |
+| `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                                 |
+| `components/ActivityTimeline/ActivityTimeline.tsx` | The card: the filter tabs, the day headings, the rows.                                                           |
+| `components/ActivityTimeline/activity-feed.ts`     | The kinds, chips and tones; rows (newest first, a day's photos joined) and counts.                               |
+| `components/ActivityTimeline/use-activity-feed.ts` | The patient's records as activity entries, in the viewer's words, each with what opens it.                       |
+| `components/VisitFlow/VisitFlow.tsx`               | The visit flow: its head (Pause, Complete visit) and the five step cards with their status lines.                |
+| `components/VisitFlow/flow-steps.tsx`              | Each step's controls: the checks, the kits, Repeat / New treatment, the invoice, collect and share.              |
+| `components/VisitFlow/use-visit-flow.ts`           | The flow's writes and links, each left out for a member who can't, toasting in the flow's words.                 |
+| `components/VisitFlow/visit-flow.ts`               | The step states, the remembered settings, the Invoice step's lines and the step button classes.                  |
+| `components/VisitFlow/visit-flow.constants.ts`     | `VISIT_FLOW_KEYS` (`patient-file` › `visitFlow.*`), the steps, test ids.                                         |
 
 ## Test ids
 

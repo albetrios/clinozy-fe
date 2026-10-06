@@ -8,6 +8,7 @@ import {
   type ConfirmReasonChoice,
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -260,9 +261,11 @@ function PlanBody({
         />
       ))}
       {lines.length === 0 ? (
-        <p className="border-muted text-detail text-muted-foreground border-b px-3.5 py-3">
-          {t(KEYS.empty, { first: firstName })}
-        </p>
+        <EmptyState
+          variant="inline"
+          title={t(KEYS.empty, { first: firstName })}
+          className="border-muted border-b px-3.5 py-3"
+        />
       ) : null}
       {ideas.map((idea) => (
         <IdeaRow

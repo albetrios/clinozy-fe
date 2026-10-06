@@ -62,6 +62,10 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     (in-page views, panes, modes: `look` track / card / plain, `fill`, `activation`
     automatic, per-tab colours, `disabled` + `hint`). Never a hand-built `role="tablist"`;
     the Settings nav and `ToggleGroup` stay.
+  - Nothing to list → **`EmptyState`** (`tone` the room's illustration, `onClearFilters`
+    the filtered one, `variant="card"` a thread's starter, `variant="inline"` a list's or
+    a card's one-liner sized by `className`; `testId`). Never a hand-rolled muted `<p>`;
+    the Picker's and ⌘K's own one-line empties stay.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

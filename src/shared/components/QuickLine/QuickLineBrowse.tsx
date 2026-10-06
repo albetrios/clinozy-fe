@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Minus, Plus, X } from '@/shared/icons/index.ts';
 
 import {
@@ -219,9 +220,11 @@ export function QuickLineBrowse<TItem>({
         ) : null}
       </div>
       {tiles.length === 0 ? (
-        <p className="text-detail text-muted-foreground flex-none px-3 pb-2.5">
-          {t(K.emptyGroup)}
-        </p>
+        <EmptyState
+          variant="inline"
+          title={t(K.emptyGroup)}
+          className="flex-none px-3 pb-2.5"
+        />
       ) : null}
       <div className="bg-canvas flex h-11 flex-none items-center gap-2 border-t ps-3 pe-2.5">
         <span className="text-muted-foreground min-w-0 truncate text-xs">

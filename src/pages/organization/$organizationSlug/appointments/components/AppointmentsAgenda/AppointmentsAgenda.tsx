@@ -16,6 +16,7 @@ import type {
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTable, dataTableFeatures } from '@/shared/components/DataTable/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
   useAppointmentDaySummaries,
@@ -64,22 +65,24 @@ const AGENDA_METRICS = '[--dt-gap:0.625rem] [--dt-head-h:2.3125rem]';
 function AgendaEmpty({ onBook }: { onBook?: () => void }) {
   const { t } = useTranslation(APPOINTMENTS_NS);
   return (
-    <p
-      data-testid={APPOINTMENTS_TEST_IDS.empty}
-      className="text-body text-muted-foreground p-10 text-center"
-    >
-      {t(APPOINTMENTS_KEYS.agenda.empty)}
-      {onBook ? (
-        <button
-          type="button"
-          data-testid={APPOINTMENTS_TEST_IDS.bookOne}
-          onClick={onBook}
-          className="text-foreground underline underline-offset-2"
-        >
-          {t(APPOINTMENTS_KEYS.agenda.bookOne)}
-        </button>
-      ) : null}
-    </p>
+    <EmptyState
+      variant="inline"
+      title={t(APPOINTMENTS_KEYS.agenda.empty)}
+      testId={APPOINTMENTS_TEST_IDS.empty}
+      className="text-body p-10 text-center"
+      action={
+        onBook ? (
+          <button
+            type="button"
+            data-testid={APPOINTMENTS_TEST_IDS.bookOne}
+            onClick={onBook}
+            className="text-foreground underline underline-offset-2"
+          >
+            {t(APPOINTMENTS_KEYS.agenda.bookOne)}
+          </button>
+        ) : undefined
+      }
+    />
   );
 }
 

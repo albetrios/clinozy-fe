@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils.ts';
 import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -257,12 +258,12 @@ export function LanePanel({
               />
             ))}
         {!loading && cards.length === 0 ? (
-          <p
-            data-testid={TODAY_TEST_IDS.empty}
-            className="text-detail text-muted-foreground-strong"
-          >
-            {t(TODAY_KEYS.lanes.empty)}
-          </p>
+          <EmptyState
+            variant="inline"
+            title={t(TODAY_KEYS.lanes.empty)}
+            testId={TODAY_TEST_IDS.empty}
+            className="text-muted-foreground-strong"
+          />
         ) : null}
       </div>
     </section>

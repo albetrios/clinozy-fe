@@ -13,7 +13,7 @@ import type {
   TaskTab,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
@@ -88,16 +88,20 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
         role="cell"
         aria-colspan={COLUMNS}
         data-testid={TASKS_TEST_IDS.empty}
-        className="mx-auto my-12 flex max-w-105 flex-col items-center gap-3 px-(--table-pad-x) text-center"
+        className="mx-auto my-12 max-w-105 px-(--table-pad-x)"
       >
-        <p className="text-body text-muted-foreground leading-normal text-pretty">
-          {t(TASKS_KEYS.empty[tab])}
-        </p>
-        {tab === 'queue' && onNewTask ? (
-          <EmptyStateAction data-testid={TASKS_TEST_IDS.emptyNew} onClick={onNewTask}>
-            {t(TASKS_KEYS.primary.newTask)}
-          </EmptyStateAction>
-        ) : null}
+        <EmptyState
+          variant="inline"
+          title={t(TASKS_KEYS.empty[tab])}
+          className="text-body flex flex-col items-center gap-3 text-center leading-normal text-pretty"
+          action={
+            tab === 'queue' && onNewTask ? (
+              <EmptyStateAction data-testid={TASKS_TEST_IDS.emptyNew} onClick={onNewTask}>
+                {t(TASKS_KEYS.primary.newTask)}
+              </EmptyStateAction>
+            ) : undefined
+          }
+        />
       </div>
     </div>
   );
