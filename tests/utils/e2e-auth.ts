@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { withApiRetry } from '@/tests/utils/e2e-api-retry.ts';
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
@@ -35,6 +36,8 @@ type ClinozyFeEstablishSession = (accessToken: string) => Promise<void>;
 declare global {
   var __clinozyFeRouter: ClinozyFeRouter | undefined;
   var __clinozyFeEstablishSession: ClinozyFeEstablishSession | undefined;
+  /** Set by {@link asTheSessionsOnlyRefresher} while it holds the page's refresh lock. */
+  var __playwrightReleaseRefreshLock: (() => void) | undefined;
 }
 
 /**
@@ -48,6 +51,27 @@ export async function navigateInApp(page: Page, path: string): Promise<void> {
     if (!r) throw new Error('__clinozyFeRouter is not exposed (dev-only)');
     await r.navigate({ to });
   }, path);
+}
+
+/**
+ * Hands the page a session's access token through the dev-only
+ * `__clinozyFeEstablishSession` hook (`src/main.tsx`): the app holds it in
+ * memory, hydrates `me/context` with it and schedules its own refresh, as a
+ * sign-in does.
+ */
+export async function establishSessionInPage(
+  page: Page,
+  accessToken: string,
+): Promise<void> {
+  await page.waitForFunction(() => globalThis.__clinozyFeEstablishSession != null, null, {
+    timeout: 10_000,
+  });
+  await page.evaluate(async (token) => {
+    const establish = globalThis.__clinozyFeEstablishSession;
+    if (!establish)
+      throw new Error('__clinozyFeEstablishSession is not exposed (dev-only)');
+    await establish(token);
+  }, accessToken);
 }
 
 /**
@@ -86,15 +110,7 @@ export async function authenticateViaEmailCode(page: Page): Promise<{ email: str
   ).toBeTruthy();
 
   const body = (await login.json()) as { data: { access_token: string } };
-  await page.waitForFunction(() => globalThis.__clinozyFeEstablishSession != null, null, {
-    timeout: 10_000,
-  });
-  await page.evaluate(async (token) => {
-    const establish = globalThis.__clinozyFeEstablishSession;
-    if (!establish)
-      throw new Error('__clinozyFeEstablishSession is not exposed (dev-only)');
-    await establish(token);
-  }, body.data.access_token);
+  await establishSessionInPage(page, body.data.access_token);
 
   return { email };
 }
@@ -262,35 +278,97 @@ export async function registerNewUserOnPersonalWorkspace(page: Page): Promise<vo
 }
 
 /**
+ * The Web Lock the app's tabs take around every `/auth/refresh` —
+ * `refreshAccessToken()` in `src/shared/auth/service.ts`, whose unit test pins
+ * the name (CLAUDE.md, "One refresh path").
+ */
+const AUTH_REFRESH_LOCK = `${PRODUCT_NAMESPACE}-auth:refresh`;
+
+/**
+ * Runs `work` holding the page's own refresh lock, the way a second tab of the
+ * app would.
+ *
+ * `page.request` shares the page's session, and clinozy-be keeps ONE live access
+ * token per session: a refresh retires the token before it. So a refresh from
+ * here retires the page's token, the page's next call answers 401, and the page
+ * refreshes in turn — which retired THIS token whenever it landed between the
+ * helper's refresh and its writes: "team organization not created (401)", about
+ * one sign-up in ten. Holding the lock parks the page's recovery refresh until
+ * `work` is done, so the two clients take turns instead of interleaving.
+ */
+async function asTheSessionsOnlyRefresher<T>(
+  page: Page,
+  work: () => Promise<T>,
+): Promise<T> {
+  await page.evaluate(
+    (name) =>
+      new Promise<void>((held) => {
+        void navigator.locks.request(
+          name,
+          () =>
+            new Promise<void>((release) => {
+              globalThis.__playwrightReleaseRefreshLock = release;
+              held();
+            }),
+        );
+      }),
+    AUTH_REFRESH_LOCK,
+  );
+  try {
+    return await work();
+  } finally {
+    await page
+      .evaluate(() => {
+        globalThis.__playwrightReleaseRefreshLock?.();
+        globalThis.__playwrightReleaseRefreshLock = undefined;
+      })
+      // A full navigation since the acquire unloaded the document, and its lock with it.
+      .catch(() => undefined);
+  }
+}
+
+/**
  * Creates a team organization the signed-in user owns, through the API — the
  * clinic shell has no create-organization switcher (personal workspaces are out
  * of scope, D44). A cookie-authenticated refresh mints the token, sent with the
- * app's own origin as the app sends it; the page stays where it is. Skips the
- * test when the live clinozy-be has team organizations turned off.
+ * app's own origin as the app sends it, while the helper holds the app's refresh
+ * lock ({@link asTheSessionsOnlyRefresher}); the session stays in the workspace
+ * it was in, and so does the page. Skips the test when the live clinozy-be has
+ * team organizations turned off.
  */
 export async function createTeamOrgViaApi(
   page: Page,
   opts?: { name?: string; slug?: string },
 ): Promise<{ slug: string; name: string }> {
-  const refresh = await page.request.post('/api/v1/auth/refresh', {
-    headers: { origin: new URL(page.url()).origin },
+  return asTheSessionsOnlyRefresher(page, async () => {
+    const refresh = await withApiRetry(() =>
+      page.request.post('/api/v1/auth/refresh', {
+        headers: { origin: new URL(page.url()).origin },
+      }),
+    );
+    expect(refresh.ok(), `refresh failed: ${refresh.status()}`).toBeTruthy();
+    const { data } = (await refresh.json()) as { data: { access_token: string } };
+
+    const { flags } = await probeLiveDeployment(page.request, data.access_token);
+    test.skip(
+      !flags.teamOrganizations,
+      'team organizations are off on this clinozy-be (TEAM_ORGANIZATION_ENABLED=false)',
+    );
+
+    const { createStatus, org } = await createTeamOrganization(
+      page.request,
+      data.access_token,
+      { ...opts, switchInto: false },
+    );
+    expect(org?.slug, `team organization not created (${createStatus})`).toBeTruthy();
+
+    // The refresh above retired the page's token. Hand the page the live one
+    // while the lock is still held, so the page never refreshes to recover: a
+    // second rotation on every create, against clinozy-be's cap of 30 refreshes
+    // a minute per IP. Nothing switched, so the page keeps its workspace.
+    await establishSessionInPage(page, data.access_token);
+    return { slug: org?.slug ?? '', name: org?.name ?? '' };
   });
-  expect(refresh.ok(), `refresh failed: ${refresh.status()}`).toBeTruthy();
-  const { data } = (await refresh.json()) as { data: { access_token: string } };
-
-  const { flags } = await probeLiveDeployment(page.request, data.access_token);
-  test.skip(
-    !flags.teamOrganizations,
-    'team organizations are off on this clinozy-be (TEAM_ORGANIZATION_ENABLED=false)',
-  );
-
-  const { createStatus, org } = await createTeamOrganization(
-    page.request,
-    data.access_token,
-    opts,
-  );
-  expect(org?.slug, `team organization not created (${createStatus})`).toBeTruthy();
-  return { slug: org?.slug ?? '', name: org?.name ?? '' };
 }
 
 /**
@@ -298,8 +376,7 @@ export async function createTeamOrgViaApi(
  * which lands its owner on Today (D25). The navigation is client-side, so the
  * in-memory session carries over (a reload would need the refresh cookie).
  * Returns once Today is up in the new clinic: the guard's switch into it has
- * landed (the refresh above retired the page's token, so the app first renews
- * it), and a menu opened now is not torn down mid-click.
+ * landed, and a menu opened now is not torn down mid-click.
  */
 export async function createTeamOrgAndOpenToday(
   page: Page,

@@ -4,10 +4,12 @@ import {
   completeOnboardingWizard,
   createTeamOrgAndOpenToday,
   createTeamOrgViaApi,
+  establishSessionInPage,
   loginViaEmailCodeUI,
   navigateInApp,
   registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
+import { e2eOrganizationSlug } from '@/tests/utils/e2e-faker.ts';
 import {
   clickTestId,
   expectAppHeaderReady,
@@ -76,18 +78,7 @@ test.describe('Product journeys', () => {
       const inviteeSession = await createSessionViaEmailCode(inviteeApi, inviteeEmail);
 
       await gotoApp(page, '/login');
-      await page.waitForFunction(
-        () => globalThis.__clinozyFeEstablishSession != null,
-        null,
-        {
-          timeout: 10_000,
-        },
-      );
-      await page.evaluate(async (token) => {
-        const establish = globalThis.__clinozyFeEstablishSession;
-        if (!establish) throw new Error('__clinozyFeEstablishSession missing');
-        await establish(token);
-      }, inviteeSession.accessToken);
+      await establishSessionInPage(page, inviteeSession.accessToken);
 
       await navigateInApp(
         page,
@@ -137,7 +128,10 @@ test.describe('Product journeys', () => {
     page,
   }) => {
     await registerNewUserAndGoToToday(page);
-    const { slug } = await createTeamOrgViaApi(page);
+    // The answers say "suspended" from the moment the organization exists. The org
+    // guard reads the workspace list cache-first, and the app may read it as soon as
+    // the organization is created — so the routes go in first, then the create.
+    const slug = e2eOrganizationSlug();
     type OrgWire = { slug?: string | null; status?: string };
     const suspend = (org: OrgWire | null | undefined) => {
       if (org?.slug === slug) org.status = 'SUSPENDED';
@@ -158,6 +152,7 @@ test.describe('Product journeys', () => {
         await route.fulfill({ response, json: body });
       });
     }
+    await createTeamOrgViaApi(page, { slug });
 
     // The clinic's home runs the status guard before it picks a room.
     await navigateAuthenticated(page, `/organization/${slug}`);

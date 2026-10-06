@@ -1,6 +1,7 @@
 import { expect, type Page, type PlaywrightWorkerArgs, test } from '@playwright/test';
 
 import {
+  establishSessionInPage,
   navigateInApp,
   registerNewUserOnPersonalWorkspace,
 } from '@/tests/utils/e2e-auth.ts';
@@ -68,18 +69,7 @@ async function setUpTeamBilling(
     }
 
     await gotoApp(page, '/login');
-    await page.waitForFunction(
-      () => globalThis.__clinozyFeEstablishSession != null,
-      null,
-      {
-        timeout: 10_000,
-      },
-    );
-    await page.evaluate(async (token) => {
-      const establish = globalThis.__clinozyFeEstablishSession;
-      if (!establish) throw new Error('__clinozyFeEstablishSession missing');
-      await establish(token);
-    }, teamToken);
+    await establishSessionInPage(page, teamToken);
 
     if (!org.slug) throw new Error('team org slug missing');
     await navigateInApp(page, `/organization/${org.slug}`);

@@ -30,20 +30,28 @@ export async function expectNoPersonalBilling(res: APIResponse): Promise<void> {
   expect([403, 404, 422]).toContain(res.status());
 }
 
-/** Create a TEAM org and optionally switch the token into it. */
+/**
+ * Create a TEAM org and, unless `switchInto` is false, switch the session into
+ * it — `teamToken` is then the session's new token, scoped to the org (the
+ * switch retires `token`); without the switch it is `token`, still live.
+ */
 export async function createTeamOrganization(
   api: APIRequestContext,
   token: string,
-  opts?: { name?: string; slug?: string },
+  opts?: { name?: string; slug?: string; switchInto?: boolean },
 ): Promise<{ createStatus: number; org: TeamOrg | null; teamToken: string }> {
-  const { name, slug } = e2eTeamOrgProfile({ label: 'team', ...opts });
+  const { name, slug } = e2eTeamOrgProfile({
+    label: 'team',
+    name: opts?.name,
+    slug: opts?.slug,
+  });
   const create = await api.post(`${API}/tenancy/organizations`, {
     headers: bearerHeaders(token, true),
     data: { name, slug },
   });
   const org = create.ok() ? ((await create.json()) as { data: TeamOrg }).data : null;
   let teamToken = token;
-  if (org) {
+  if (org && opts?.switchInto !== false) {
     const sw = await api.post(`${API}/auth/switch-to-organization`, {
       headers: bearerHeaders(token),
       data: { organization_id: org.id },

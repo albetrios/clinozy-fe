@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-import { navigateInApp } from '@/tests/utils/e2e-auth.ts';
+import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { byTestId, expectLoginFormReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { createSessionViaEmailCode } from '@/tests/utils/e2e-session.ts';
@@ -119,14 +119,7 @@ export async function openNewClinic(page: Page): Promise<{ slug: string }> {
   const slug = org?.slug ?? '';
   expect(slug, `the clinic was not created (${createStatus})`).not.toBe('');
 
-  await page.waitForFunction(() => globalThis.__clinozyFeEstablishSession != null, null, {
-    timeout: 10_000,
-  });
-  await page.evaluate(async (token) => {
-    const establish = globalThis.__clinozyFeEstablishSession;
-    if (!establish) throw new Error('__clinozyFeEstablishSession is not exposed');
-    await establish(token);
-  }, teamToken);
+  await establishSessionInPage(page, teamToken);
 
   await navigateInApp(page, `/organization/${slug}`);
   await expectRoomReady(page, 'today');
