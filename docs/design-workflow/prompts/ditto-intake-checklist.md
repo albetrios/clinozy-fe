@@ -16,7 +16,7 @@ layer on top — keep project constraints here, never in the checklist.
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A3 tables/cards | shadcn primitives only — see `agent-os/skills/shadcn/SKILL.md`. Do not hand-roll a table.                                                                        |
 | A5 popup shape  | Dialog and Sheet both exist as shadcn primitives. Sheet is the bottom-sheet/drawer shape.                                                                        |
-| A8 icons        | Import from `@/shared/icons/index.ts` — never `lucide-react` directly (eslint-enforced). Library is swappable via one file: lucide / tabler / phosphor.          |
+| A8 icons        | Import from `@/shared/icons/index.ts` — never `lucide-react` directly (eslint-enforced). The barrel is the one file to swap the library in.                      |
 | A11 copy        | No hardcoded user-facing strings. Every string is an i18n key in `src/locales/<lang>/*.json` with a `*_KEYS` constant. New namespaces need a dev-server restart. |
 | A12 tokens      | **Semantic tokens only** — `bg-background`, never `bg-emerald-400`. Enforced by `pnpm validate:tokens`. OKLCH, light + dark, 19 axes.                            |
 | A12 fonts       | CSP is `font-src 'self'` — fonts must be self-hosted (Fontsource). A CDN font link will be blocked.                                                              |

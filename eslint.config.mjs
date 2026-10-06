@@ -22,16 +22,6 @@ const RESTRICTED_IMPORT_PATHS = [
     message: "Import icons from '@/shared/icons/index.ts' (one-file icon-library swap).",
   },
   {
-    name: '@tabler/icons-react',
-    message:
-      "Import icons from '@/shared/icons/index.ts' — Tabler is wired there as a swappable set.",
-  },
-  {
-    name: '@phosphor-icons/react',
-    message:
-      "Import icons from '@/shared/icons/index.ts' — Phosphor is wired there as a swappable set.",
-  },
-  {
     name: 'sonner',
     message:
       "Use '@/shared/notify' for toasts — the single toast surface (one place for durations/de-dupe/a11y).",
