@@ -4,9 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { Notification } from '@/shared/api/notification-contracts.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
@@ -14,7 +17,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   useMarkAllNotificationsRead,
@@ -22,29 +24,9 @@ import {
   useNotifications,
   useUnreadCount,
 } from '@/shared/hooks/useNotifications/index.ts';
-import {
-  Bell,
-  BellOff,
-  Settings,
-  ShieldCheck,
-  UserPlus,
-  Zap,
-} from '@/shared/icons/index.ts';
+import { Bell, BellOff, Settings } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
-
-/** Category → glyph, so the inbox is scannable at a glance. */
-function CategoryIcon({
-  category,
-  className,
-}: {
-  category: Notification['category'];
-  className: string;
-}) {
-  if (category === 'member') return <UserPlus className={className} />;
-  if (category === 'billing') return <Zap className={className} />;
-  if (category === 'security') return <ShieldCheck className={className} />;
-  return <Bell className={className} />;
-}
+import { NOTIFICATION_CATEGORY_LOOK } from '@/shared/notifications/category-look.ts';
 
 /** Mark-all-read header action — hidden entirely when the inbox is empty. */
 function MarkAllReadButton({
@@ -64,7 +46,7 @@ function MarkAllReadButton({
     <Button
       variant="ghost"
       size="sm"
-      className="h-7 px-2 text-xs"
+      className="text-caption text-muted-foreground-strong h-7 px-2"
       disabled={unread === 0 || pending}
       onClick={onMarkAll}
       data-testid="notification-mark-all"
@@ -80,7 +62,7 @@ function UnreadBadge({ unread }: { unread: number }) {
   return (
     <span
       data-slot="pill"
-      className="bg-primary text-primary-foreground absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold"
+      className="bg-primary text-primary-foreground text-tiny absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-semibold tabular-nums"
       data-testid="notification-badge"
     >
       {unread > 9 ? '9+' : unread}
@@ -89,8 +71,10 @@ function UnreadBadge({ unread }: { unread: number }) {
 }
 
 /**
- * One inbox row: category glyph (tinted while unread), title, body and when —
- * by the rooms' one time rule ("10:30 am", "Yesterday 4:10 pm", "24 Sep").
+ * One inbox row, as an All sections row (`shell.md:43`): the category's 28px
+ * tone tile, the title 13px (600 while unread, with the green unread dot), the
+ * body 11.5px muted, and when — by the rooms' one time rule ("10:30 am",
+ * "Yesterday 4:10 pm", "24 Sep").
  */
 function NotificationRow({
   item,
@@ -100,45 +84,47 @@ function NotificationRow({
   onClick: (item: Notification) => void;
 }) {
   const clock = useClinicClock();
+  const look = NOTIFICATION_CATEGORY_LOOK[item.category];
   return (
     <li>
       <button
         type="button"
         data-slot="menu-item"
         onClick={() => onClick(item)}
-        className={cn(
-          'flex w-full min-w-0 items-start gap-3 px-4 py-3 text-start transition-colors',
-          'hover:bg-muted/50 focus-visible:bg-muted/50 outline-none',
-          !item.isRead && 'bg-muted/30',
-        )}
+        className="hover:bg-muted flex w-full min-w-0 items-start gap-2.5 rounded-lg px-2.5 py-2 text-start transition-colors duration-120 outline-none"
         data-testid={`notification-${item.id}`}
       >
         <span
-          data-slot="icon-chip"
           className={cn(
-            'flex size-9 shrink-0 items-center justify-center',
-            item.isRead ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary',
+            'mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg',
+            TONE_CLASSES[look.tone].surface,
           )}
           aria-hidden="true"
         >
-          <CategoryIcon category={item.category} className="size-4" />
+          <look.icon className="size-3.5" />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2">
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="flex min-w-0 items-center gap-2">
+            <span
+              dir="auto"
+              className={cn(
+                'text-body min-w-0 flex-1 truncate leading-[1.35]',
+                item.isRead ? 'font-medium' : 'font-semibold',
+              )}
+            >
               {item.title}
             </span>
             {item.isRead ? null : (
               <span
-                className="bg-primary size-1.5 shrink-0 rounded-full"
+                className="bg-success size-1.5 shrink-0 rounded-full"
                 aria-hidden="true"
               />
             )}
           </span>
-          <span className="text-muted-foreground line-clamp-2 block text-xs">
+          <span className="text-caption text-muted-foreground line-clamp-2 leading-[1.4]">
             {item.body}
           </span>
-          <span className="text-muted-foreground/70 mt-1 block text-[11px]">
+          <span className="text-micro text-muted-foreground tabular-nums">
             <time dateTime={item.createdAt}>{clock.moment(item.createdAt)}</time>
           </span>
         </span>
@@ -167,9 +153,20 @@ function NotificationInbox({
   return (
     <div className="max-h-[24rem] overflow-y-auto overscroll-contain">
       {isLoading ? (
-        <div className="space-y-2 p-3" data-testid="notifications-loading">
-          {['a', 'b', 'c'].map((key) => (
-            <Skeleton key={key} className="h-14 w-full" />
+        // The rows' own shape in flat bars: a tile, the title and a line.
+        <div className="flex flex-col gap-0.5 p-1.5" data-testid="notifications-loading">
+          {[0, 1, 2].map((index) => (
+            <div
+              key={index}
+              aria-hidden="true"
+              className="flex items-start gap-2.5 px-2.5 py-2"
+            >
+              <SkeletonBar shape="field" className="size-7 shrink-0" />
+              <div className="flex min-w-0 flex-1 flex-col gap-2 pt-1">
+                <SkeletonBar index={index} />
+                <SkeletonBar index={index + 1} className="h-[0.6em]" />
+              </div>
+            </div>
           ))}
         </div>
       ) : null}
@@ -185,17 +182,17 @@ function NotificationInbox({
       ) : null}
 
       {items && items.length === 0 ? (
-        <div className="p-4">
-          <EmptyState
-            icon={<BellOff />}
-            title={t(LAYOUT_KEYS.app.notifications.emptyTitle)}
-            description={t(LAYOUT_KEYS.app.notifications.emptyDescription)}
-          />
-        </div>
+        <EmptyState
+          tone="stone"
+          className="pt-7 pb-8"
+          icon={<BellOff />}
+          title={t(LAYOUT_KEYS.app.notifications.emptyTitle)}
+          description={t(LAYOUT_KEYS.app.notifications.emptyDescription)}
+        />
       ) : null}
 
       {items && items.length > 0 ? (
-        <ul className="divide-border divide-y" data-testid="notifications-list">
+        <ul className="flex flex-col gap-0.5 p-1.5" data-testid="notifications-list">
           {items.map((item) => (
             <NotificationRow key={item.id} item={item} onClick={onItemClick} />
           ))}
@@ -299,21 +296,20 @@ export function NotificationCenter({
         side={popoverSide}
         sideOffset={8}
         collisionPadding={8}
-        className="w-[22rem] overflow-hidden p-0"
+        // A design popover (the Team / Contact card's frame, `_patterns.md:216`):
+        // 12px corners, the panel elevation, a hairline head and a canvas foot.
+        className="data-[state=open]:animate-dropdown-in w-88 max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl p-0"
         data-testid="notification-popover"
       >
-        <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex items-center justify-between gap-2 border-b px-3.5 py-3">
           <div className="flex min-w-0 items-center gap-2">
-            <p className="text-sm font-semibold">
+            <p className="text-field leading-[1.3] font-semibold">
               {t(LAYOUT_KEYS.app.notifications.title)}
             </p>
             {unread > 0 ? (
-              <span
-                data-slot="pill"
-                className="bg-primary/10 text-primary rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
-              >
+              <TonePill tone="inverse" size="xs" className="tabular-nums">
                 {t(LAYOUT_KEYS.app.notifications.newBadge, { count: unread })}
-              </span>
+              </TonePill>
             ) : null}
           </div>
           <MarkAllReadButton
@@ -336,19 +332,24 @@ export function NotificationCenter({
         />
 
         {items && items.length > 0 ? (
-          <button
-            type="button"
-            data-slot="menu-item"
-            onClick={() => {
-              setOpen(false);
-              void navigate({ to: '.', hash: settingsHash('account', 'notifications') });
-            }}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex w-full items-center justify-center gap-1.5 border-t py-2.5 text-xs font-medium transition-colors outline-none"
-            data-testid="notification-settings-link"
-          >
-            <Settings className="size-3.5" aria-hidden="true" />
-            {t(LAYOUT_KEYS.app.notifications.settingsLink)}
-          </button>
+          <div className="bg-canvas border-t p-1.5">
+            <button
+              type="button"
+              data-slot="menu-item"
+              onClick={() => {
+                setOpen(false);
+                void navigate({
+                  to: '.',
+                  hash: settingsHash('account', 'notifications'),
+                });
+              }}
+              className="text-muted-foreground-strong hover:text-foreground hover:bg-muted text-caption flex w-full items-center justify-center gap-1.5 rounded-lg py-2 font-medium transition-colors outline-none"
+              data-testid="notification-settings-link"
+            >
+              <Settings className="size-3.5" aria-hidden="true" />
+              {t(LAYOUT_KEYS.app.notifications.settingsLink)}
+            </button>
+          </div>
         ) : null}
       </PopoverContent>
     </Popover>

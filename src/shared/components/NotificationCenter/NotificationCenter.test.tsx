@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -120,6 +120,35 @@ describe('NotificationCenter', () => {
     await user.click(screen.getByTestId('notification-bell'));
     const row = await screen.findByTestId('notification-ntf_x');
     expect(row.querySelector(`svg.${iconClass}`)).not.toBeNull();
+  });
+
+  it('draws a row as an All sections row: the category tone tile, the unread weight and dot', async () => {
+    const user = userEvent.setup();
+    useNotificationsMock.mockReturnValue({
+      data: [ITEM, { ...ITEM, id: 'ntf_read', category: 'billing', isRead: true }],
+      isLoading: false,
+      isError: false,
+    });
+    render(<NotificationCenter />);
+    await user.click(screen.getByTestId('notification-bell'));
+    const unread = await screen.findByTestId('notification-ntf_x');
+    // Team changes take the Users room's slate; billing the Payments room's peach.
+    expect(unread.querySelector('.bg-tone-slate')).not.toBeNull();
+    expect(within(unread).getByText('New member joined')).toHaveClass('font-semibold');
+    expect(unread.querySelector('.bg-success')).not.toBeNull();
+    const read = screen.getByTestId('notification-ntf_read');
+    expect(read.querySelector('.bg-tone-peach')).not.toBeNull();
+    expect(read.querySelector('.bg-success')).toBeNull();
+  });
+
+  it('draws the illustrated empty state in the popover', async () => {
+    useNotificationsMock.mockReturnValue({ data: [], isLoading: false, isError: false });
+    useUnreadCountMock.mockReturnValue({ data: 0 });
+    const user = userEvent.setup();
+    render(<NotificationCenter />);
+    await user.click(screen.getByTestId('notification-bell'));
+    expect(await screen.findByTestId('empty-state-illustration')).toBeInTheDocument();
+    expect(screen.getByTestId('notification-popover')).toHaveClass('rounded-xl');
   });
 
   it('shows placeholders while the inbox loads', async () => {
