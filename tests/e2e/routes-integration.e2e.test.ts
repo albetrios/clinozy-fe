@@ -58,7 +58,10 @@ test.describe('Live routes integration', () => {
     test('unauthorized page renders without auth', async ({ page }) => {
       await gotoApp(page, '/unauthorized');
       await expect(page.getByTestId('unauthorized-page')).toBeVisible({ timeout: 15000 });
-      await expect(page.getByRole('heading', { name: /^403$/ })).toBeVisible();
+      // The status is a pill inside the page's one h1, before its title (L-65a).
+      await expect(
+        page.getByRole('heading', { level: 1, name: /^403\s*No access to this page$/ }),
+      ).toBeVisible();
     });
 
     test('the document title is composed from the route manifest', async ({ page }) => {
