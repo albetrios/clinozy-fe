@@ -607,7 +607,7 @@ if (isWriting || role === member.role) return;
   a grid of plan buttons greys out all of them and spins none — the click reads as a freeze. Track
   *which* item is running (`pendingPlanId === plan.id`) and pass `isLoading` to that one only
   (SET-13).
-- **A confirm dialog waits for its own request.** `AlertDialogAction` closes on click; without
+- **A confirm dialog waits for its own request.** Radix's `AlertDialog.Action` closes on click (the shared confirm's buttons are plain for that reason); without
   `event.preventDefault()`, `disabled={isPending}`, and closing in `onSuccess`, the outcome lands
   on a screen the dialog has already left. Block `onOpenChange` while the request runs, too.
 - **Never `void` a promise that can reject.** A click handler owns its failure: catch inside, so

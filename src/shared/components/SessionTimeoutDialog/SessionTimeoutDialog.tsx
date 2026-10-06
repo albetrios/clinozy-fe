@@ -7,14 +7,9 @@ import { type IdleTimeoutHandle, startIdleTimeout } from '@/shared/auth/idle-tim
 import { forceLogout, logout, type SessionEndReason } from '@/shared/auth/service.ts';
 import { startSessionLifetimeWatch } from '@/shared/auth/session-lifetime.ts';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
+  CONFIRM_BUTTON_CLASS,
+  ConfirmPanel,
+} from '@/shared/components/ConfirmDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
@@ -186,46 +181,48 @@ function SessionTimeoutDialogBody() {
   const signingOut = phase === 'signing-out';
 
   return (
-    <AlertDialog open={phase !== 'idle'}>
-      <AlertDialogContent
-        data-testid="session-timeout-dialog"
-        aria-busy={signingOut}
-        // Radix focuses the FIRST tabbable element when there is no Cancel, and
-        // that is "Sign out": someone who comes back to the keyboard and presses
-        // Space or Enter to wake the screen would sign themselves out. The safe
-        // default for an unattended prompt is the option that loses nothing.
-        onOpenAutoFocus={(event) => {
-          event.preventDefault();
-          stayRef.current?.focus({ preventScroll: true });
-        }}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t(keys.title)}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {signingOut
-              ? t(keys.signingOutDescription)
-              : t(keys.description, { countdown: formatCountdown(countdown) })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
+    // The frame every confirm shares: the end panel from `md`, the bottom sheet
+    // below. No `onDismiss`: an unattended prompt owes an explicit answer, so it
+    // draws no × and neither Esc, the backdrop nor a drag closes it.
+    <ConfirmPanel
+      open={phase !== 'idle'}
+      busy={signingOut}
+      title={t(keys.title)}
+      description={
+        <div className="text-body text-muted-foreground-strong text-pretty">
+          {signingOut
+            ? t(keys.signingOutDescription)
+            : t(keys.description, { countdown: formatCountdown(countdown) })}
+        </div>
+      }
+      // Radix focuses the FIRST tabbable element when nothing is named, and that
+      // is "Sign out": someone who comes back to the keyboard and presses Space
+      // or Enter to wake the screen would sign themselves out. The safe default
+      // for an unattended prompt is the option that loses nothing.
+      initialFocusRef={stayRef}
+      testId="session-timeout-dialog"
+      footer={(layout) => (
+        <>
           <Button
             variant="outline"
             onClick={() => signOut('logout')}
             isLoading={signingOut}
             data-testid="session-signout"
+            className={CONFIRM_BUTTON_CLASS[layout]}
           >
             {signingOut ? t(keys.signingOut) : t(keys.signOut)}
           </Button>
-          <AlertDialogAction
+          <Button
             ref={stayRef}
             onClick={handleStaySignedIn}
             disabled={signingOut}
             data-testid="session-stay"
+            className={CONFIRM_BUTTON_CLASS[layout]}
           >
             {t(keys.staySignedIn)}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </>
+      )}
+    />
   );
 }

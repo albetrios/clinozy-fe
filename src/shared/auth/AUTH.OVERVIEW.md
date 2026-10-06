@@ -124,7 +124,9 @@ suite that mocks the timer cannot see bug 1 — it lived _between_ the two modul
 - `core/http/fetch-client` — reads the token on every request; on 401 it awaits the
   shared `refreshAccessToken()` and calls `forceLogout()` for dead sessions
 - `shared/components/SessionTimeoutDialog` — reads auth state, runs the idle timer + the
-  absolute cap, and ends the session through `logout()` (never `forceLogout()` alone)
+  absolute cap, and ends the session through `logout()` (never `forceLogout()` alone);
+  the warning sits in the confirm frame every confirm shares (`ConfirmPanel`: the end
+  panel from `md`, the bottom sheet below) with no × — nothing but its two buttons answers it
 - `shared/components/PermissionGuard` — reads `isAuthenticated`
 - Most pages — call `login()`, `logout()`, read user
 

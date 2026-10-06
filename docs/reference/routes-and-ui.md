@@ -147,8 +147,10 @@ The app uses **shadcn/ui** as the selected component library. Allowed sources ar
 | Input        | `shared/components/ui/input.tsx`         | Text fields, search                            |
 | Label        | `shared/components/ui/label.tsx`         | Form labels                                    |
 | Card         | `shared/components/ui/card.tsx`          | Content blocks, settings panels                |
-| Dialog       | `shared/components/ui/dialog.tsx`        | Modals, SessionTimeoutDialog                   |
-| AlertDialog  | `shared/components/ui/alert-dialog.tsx`  | Confirmations                                  |
+| Dialog       | `shared/components/ui/dialog.tsx`        | Settings' remaining centred dialogs            |
+| AlertDialog  | `shared/components/ui/alert-dialog.tsx`  | The confirm frame's end panel (`ConfirmPanel`) |
+| Sheet        | `shared/components/ui/sheet.tsx`         | Side drawers (`RecordDrawer`)                  |
+| Drawer       | `shared/components/ui/drawer.tsx`        | Phone bottom sheets (pickers, confirms)        |
 | DropdownMenu | `shared/components/ui/dropdown-menu.tsx` | User menu, actions                             |
 | Tooltip      | `shared/components/ui/tooltip.tsx`       | Hints                                          |
 | Checkbox     | `shared/components/ui/checkbox.tsx`      | Settings, tables                               |

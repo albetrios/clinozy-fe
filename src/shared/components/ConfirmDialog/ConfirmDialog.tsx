@@ -1,29 +1,22 @@
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 
 import {
+  CONFIRM_BUTTON_CLASS,
   CONFIRM_KEYS,
   CONFIRM_NS,
   CONFIRM_TEST_IDS,
 } from './confirm-dialog.constants.ts';
+import { ConfirmPanel } from './confirm-panel.tsx';
 import { runConfirmedWrite } from './confirmed-write.ts';
 import { ReasonConfirm, type ReasonConfirmProps } from './ReasonConfirm.tsx';
 
 /** A plain confirm's own test ids, for a surface whose specs already name them. */
 export type ConfirmTestIds = Partial<Record<'dialog' | 'cancel' | 'accept', string>>;
 
-/** The centred confirm every platform surface uses — `ConfirmDialog` without `reason`. */
+/** The confirm every platform surface uses — `ConfirmDialog` without `reason`. */
 export interface PlainConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,7 +30,7 @@ export interface PlainConfirmDialogProps {
   destructive?: boolean;
   /** The surface's own test ids; `confirm-dialog` / `-cancel` / `-accept` otherwise. */
   testIds?: ConfirmTestIds;
-  /** Absent here: setting it switches to the reason panel. */
+  /** Absent here: setting it switches to the reason confirm. */
   reason?: undefined;
   /** Runs on confirm. If it resolves the dialog closes; if it throws it stays
    * open (the caller surfaces the error, e.g. via `notify`). */
@@ -45,15 +38,16 @@ export interface PlainConfirmDialogProps {
 }
 
 /**
- * Props of {@link ConfirmDialog}: the centred default, or — with `reason` —
- * the reason panel (from `md`) / bottom sheet (below) whose `onConfirm`
- * receives the picked reason and note.
+ * Props of {@link ConfirmDialog}: the plain confirm, or — with `reason` — the
+ * reason confirm whose `onConfirm` receives the picked reason and note. Both
+ * take the same frame: the end panel from `md`, the bottom sheet below.
  */
 export type ConfirmDialogProps = PlainConfirmDialogProps | ReasonConfirmProps;
 
 /**
- * The centred alert dialog: title, optional description, Cancel and the action.
- * On close it hands focus back to whatever was focused when it opened.
+ * The plain confirm in the confirm frame: title, optional description, Cancel
+ * and the action. Cancel takes the initial focus; on close focus goes back to
+ * whatever was focused when it opened.
  */
 function PlainConfirmDialog({
   open,
@@ -70,9 +64,12 @@ function PlainConfirmDialog({
   const [busy, setBusy] = useState(false);
   // `busy` lands a render late; the ref drops a second click inside that frame.
   const busyRef = useRef(false);
-  // Opened from state, not a Radix trigger, so Radix has nothing to give focus
-  // back to and it fell to <body>: remember what was focused and return there.
-  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Every exit — Cancel, ×, the backdrop, Esc — is held while the write runs.
+  const dismiss = () => {
+    if (!busyRef.current) onOpenChange(false);
+  };
 
   const handleConfirm = async () => {
     if (busyRef.current) return;
@@ -90,64 +87,58 @@ function PlainConfirmDialog({
   };
 
   return (
-    <AlertDialog
+    <ConfirmPanel
       open={open}
-      onOpenChange={(next) => {
-        // Don't allow dismissal mid-flight.
-        if (!busyRef.current) onOpenChange(next);
-      }}
-    >
-      <AlertDialogContent
-        data-testid={testIds?.dialog ?? CONFIRM_TEST_IDS.dialog}
-        onOpenAutoFocus={() => {
-          const previous = document.activeElement;
-          returnFocusRef.current = previous instanceof HTMLElement ? previous : null;
-        }}
-        onCloseAutoFocus={(event) => {
-          // A confirm that removed its opener (a deleted row) leaves focus to Radix.
-          const target = returnFocusRef.current;
-          if (!target?.isConnected) return;
-          event.preventDefault();
-          target.focus();
-        }}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description ? (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          ) : (
-            <AlertDialogDescription className="sr-only">
-              {t(CONFIRM_KEYS.fallbackDescription)}
-            </AlertDialogDescription>
-          )}
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel
+      onDismiss={dismiss}
+      busy={busy}
+      title={title}
+      description={
+        description ? (
+          <div className="text-body text-muted-foreground-strong text-pretty">
+            {description}
+          </div>
+        ) : (
+          <div className="sr-only">{t(CONFIRM_KEYS.fallbackDescription)}</div>
+        )
+      }
+      initialFocusRef={cancelRef}
+      testId={testIds?.dialog ?? CONFIRM_TEST_IDS.dialog}
+      footer={(layout) => (
+        <>
+          <Button
+            ref={cancelRef}
+            type="button"
+            variant="outline"
             disabled={busy}
+            onClick={dismiss}
             data-testid={testIds?.cancel ?? CONFIRM_TEST_IDS.cancel}
+            className={CONFIRM_BUTTON_CLASS[layout]}
           >
             {cancelLabel ?? t(CONFIRM_KEYS.cancel)}
-          </AlertDialogCancel>
+          </Button>
           <Button
+            type="button"
             variant={destructive ? 'destructive' : 'default'}
             onClick={handleConfirm}
             disabled={busy}
             isLoading={busy}
             data-testid={testIds?.accept ?? CONFIRM_TEST_IDS.accept}
+            className={CONFIRM_BUTTON_CLASS[layout]}
           >
             {confirmLabel ?? t(CONFIRM_KEYS.accept)}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </>
+      )}
+    />
   );
 }
 
 /**
- * Shared confirmation for destructive / irreversible actions. By default a
- * centred alert dialog (remove a member, delete a role or API key, delete an
- * organization); with `reason` the clinic rooms' reason confirm — a panel at
- * the inline end from `md`, a bottom sheet below, the schema's `delete_reason`
+ * Shared confirmation for destructive / irreversible actions, in one frame for
+ * every surface: a full-height panel at the inline end from `md`, a bottom
+ * sheet below (`ConfirmPanel`). By default the plain confirm (remove a member,
+ * delete a role or API key, delete an organization, discard changes); with
+ * `reason` the clinic rooms' reason confirm — the schema's `delete_reason`
  * chips, a note, and Undo for 10s after the write (KICKOFF §3.5). Either way it
  * holds its busy state across the async confirm and blocks dismissal while in
  * flight.

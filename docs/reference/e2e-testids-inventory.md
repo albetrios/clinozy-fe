@@ -167,7 +167,7 @@ organization picker and the 404 draw the same frame.
 | `full-page-spinner`                                     | Bootstrap loading                                                                                                         | `FullPageSpinner.tsx`                                          |
 | `organization-switcher-trigger`                         | Org switcher                                                                                                              | `OrganizationSwitcher.tsx`                                     |
 | `organization-switcher-create`                          | Create org from switcher                                                                                                  | OrganizationSwitcher                                           |
-| `session-timeout-dialog`                                | Inactivity warning (5 min idle, 90 s grace)                                                                               | `SessionTimeoutDialog.tsx`                                     |
+| `session-timeout-dialog`                                | Inactivity warning (5 min idle, 90 s grace) — the confirm frame, no ×: Esc, the backdrop and a drag do not close it       | `SessionTimeoutDialog.tsx`                                     |
 | `session-signout`                                       | "Sign out" on the inactivity warning — revokes server-side                                                                | SessionTimeoutDialog                                           |
 | `session-stay`                                          | "Stay signed in" — default focus; restarts the idle clock                                                                 | SessionTimeoutDialog                                           |
 | `consent-banner`                                        | Cookie-consent card (bottom-start corner; undecided only)                                                                 | `ConsentBanner.tsx`                                            |
@@ -203,25 +203,26 @@ Groups and rows render only for what the access in force (View-as included) may 
 
 ## Shared confirm (`ConfirmDialog`)
 
-The plain confirm and the reason confirm (`reason` set) share the first three ids; the
-reason confirm carries `data-layout="panel"` from `md` and `data-layout="sheet"` below. A
-plain confirm whose specs already named its ids passes them as `testIds` (L-62): Settings'
-discard prompt `settings-discard-dialog` / `-stay` / `-leave`, delete account
+Every confirm — plain, reason (`reason` set) and the session warning — takes one frame
+(`ConfirmPanel`, `confirm-panel.tsx`): the end panel from `md` (`data-layout="panel"`), the
+bottom sheet below (`data-layout="sheet"`). The plain and the reason confirm share the first
+four ids. A plain confirm whose specs already named its ids passes them as `testIds` (L-62):
+Settings' discard prompt `settings-discard-dialog` / `-stay` / `-leave`, delete account
 `account-delete-cancel` / `-confirm`, cancel subscription `billing-cancel-dialog` /
 `billing-cancel-confirm`, the profile save `profile-confirm-cancel` / `-save`.
 
-| Test ID                  | Element                                                                      | File                                        |
-| ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------- |
-| `confirm-dialog`         | The confirm (`role="alertdialog"`) — centred, the end panel or the sheet     | `shared/components/ConfirmDialog/`          |
-| `confirm-cancel`         | Dismiss — "Cancel" (plain) / "Keep it" (reason); initial focus on the reason | ConfirmDialog, `ReasonConfirm.tsx`          |
-| `confirm-accept`         | The action — `aria-disabled` until a reason (and an "Other" note) is in      | ConfirmDialog, `ReasonConfirm.tsx`          |
-| `confirm-close`          | × — outside the panel's start edge from `md`, inside the sheet below         | `ReasonConfirm.tsx`                         |
-| `confirm-record`         | The record pill under the title                                              | `ReasonConfirm.tsx`                         |
-| `confirm-reason-<value>` | One reason chip (radio), value kebab-cased (`confirm-reason-not-needed`)     | `ReasonConfirm.tsx` (`confirmReasonTestId`) |
-| `confirm-note`           | The note textarea                                                            | `ReasonConfirm.tsx`                         |
-| `confirm-note-error`     | The server's note message (422)                                              | `ReasonConfirm.tsx`                         |
-| `confirm-reasons-error`  | The server's reason message (422)                                            | `ReasonConfirm.tsx`                         |
-| `confirm-hint`           | Footer hint — "Pick a reason to continue" / "Add a short note for “Other”"   | `ReasonConfirm.tsx`                         |
+| Test ID                  | Element                                                                       | File                                        |
+| ------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| `confirm-dialog`         | The confirm (`role="alertdialog"`) — the end panel from `md`, the sheet below | `shared/components/ConfirmDialog/`          |
+| `confirm-cancel`         | Dismiss — "Cancel" (plain) / "Keep it" (reason); takes the initial focus      | ConfirmDialog, `ReasonConfirm.tsx`          |
+| `confirm-accept`         | The action — `aria-disabled` until a reason (and an "Other" note) is in       | ConfirmDialog, `ReasonConfirm.tsx`          |
+| `confirm-close`          | × — outside the panel's start edge from `md`, inside the sheet below          | `confirm-panel.tsx`                         |
+| `confirm-record`         | The record pill under the title                                               | `ReasonConfirm.tsx`                         |
+| `confirm-reason-<value>` | One reason chip (radio), value kebab-cased (`confirm-reason-not-needed`)      | `ReasonConfirm.tsx` (`confirmReasonTestId`) |
+| `confirm-note`           | The note textarea                                                             | `ReasonConfirm.tsx`                         |
+| `confirm-note-error`     | The server's note message (422)                                               | `ReasonConfirm.tsx`                         |
+| `confirm-reasons-error`  | The server's reason message (422)                                             | `ReasonConfirm.tsx`                         |
+| `confirm-hint`           | Footer hint — "Pick a reason to continue" / "Add a short note for “Other”"    | `ReasonConfirm.tsx`                         |
 
 ---
 

@@ -1,4 +1,10 @@
-export { CONFIRM_TEST_IDS, confirmReasonTestId } from './confirm-dialog.constants.ts';
+export {
+  CONFIRM_BUTTON_CLASS,
+  CONFIRM_TEST_IDS,
+  type ConfirmLayout,
+  confirmReasonTestId,
+} from './confirm-dialog.constants.ts';
+export { ConfirmPanel, type ConfirmPanelProps } from './confirm-panel.tsx';
 export type {
   ConfirmReasonChoice,
   ConfirmReasonKind,

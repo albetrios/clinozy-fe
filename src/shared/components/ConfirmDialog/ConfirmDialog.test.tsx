@@ -1,9 +1,17 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+
+const { viewport } = vi.hoisted(() => ({
+  viewport: { tier: 'desktop' as ViewportTier },
+}));
+vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
+  useViewportTier: () => viewport.tier,
+}));
 
 import { ConfirmDialog } from './ConfirmDialog.tsx';
 import { isConfirmedWriteRunning } from './confirmed-write.ts';
@@ -15,6 +23,10 @@ const base = {
   description: 'This action cannot be undone.',
   onConfirm: vi.fn(),
 };
+
+beforeEach(() => {
+  viewport.tier = 'desktop';
+});
 
 describe('ConfirmDialog', () => {
   it('renders the title + description when open', () => {
@@ -37,12 +49,59 @@ describe('ConfirmDialog', () => {
     expect(screen.getByTestId('confirm-cancel')).toHaveTextContent('Cancel');
   });
 
-  it('stays the centred alert dialog without `reason`', () => {
+  it.each(['desktop', 'tablet'] as const)(
+    'takes the reason confirm’s frame without `reason`: the end panel on %s',
+    (tier) => {
+      viewport.tier = tier;
+      render(<ConfirmDialog {...base} />);
+      const dialog = screen.getByRole('alertdialog', { name: 'Delete role?' });
+      expect(dialog).toBe(screen.getByTestId('confirm-dialog'));
+      expect(dialog).toHaveAttribute('data-layout', 'panel');
+      expect(dialog).toHaveAccessibleDescription('This action cannot be undone.');
+      expect(screen.getByTestId('confirm-close')).toHaveAccessibleName('Close');
+      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    },
+  );
+
+  it('is the bottom sheet on a phone, as the reason confirm is', () => {
+    viewport.tier = 'phone';
     render(<ConfirmDialog {...base} />);
     const dialog = screen.getByRole('alertdialog', { name: 'Delete role?' });
     expect(dialog).toBe(screen.getByTestId('confirm-dialog'));
-    expect(dialog).not.toHaveAttribute('data-layout');
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(dialog).toHaveAttribute('data-layout', 'sheet');
+    expect(dialog).toHaveAttribute('data-vaul-drawer-direction', 'bottom');
+    expect(screen.getByTestId('confirm-close')).toHaveAccessibleName('Close');
+  });
+
+  it.each(['desktop', 'phone'] as const)('starts on Cancel (%s)', async (tier) => {
+    viewport.tier = tier;
+    render(<ConfirmDialog {...base} />);
+    await waitFor(() => expect(screen.getByTestId('confirm-cancel')).toHaveFocus());
+  });
+
+  it('keeps the destructive action red', () => {
+    render(<ConfirmDialog {...base} destructive confirmLabel="Delete" />);
+    expect(screen.getByTestId('confirm-accept')).toHaveAttribute(
+      'data-variant',
+      'destructive',
+    );
+  });
+
+  it('the backdrop, the ×, Cancel and Esc all dismiss it', async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    render(<ConfirmDialog {...base} onOpenChange={onOpenChange} />);
+
+    const overlay = document.querySelector('[data-slot="alert-dialog-overlay"]');
+    expect(overlay).not.toBeNull();
+    await user.click(overlay as Element);
+    await user.click(screen.getByTestId('confirm-close'));
+    await user.click(screen.getByTestId('confirm-cancel'));
+    await user.keyboard('{Escape}');
+
+    expect(onOpenChange).toHaveBeenCalledTimes(4);
+    expect(onOpenChange.mock.calls.every(([open]) => open === false)).toBe(true);
+    expect(base.onConfirm).not.toHaveBeenCalled();
   });
 
   it('labels its buttons and fallback description from the locale', () => {
@@ -78,54 +137,77 @@ describe('ConfirmDialog', () => {
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 
-  it('confirms once for a double click that lands before the re-render', async () => {
-    let release!: () => void;
-    const onConfirm = vi.fn(
-      () =>
-        new Promise<void>((resolve) => {
-          release = resolve;
-        }),
-    );
-    render(<ConfirmDialog {...base} onConfirm={onConfirm} />);
-    const accept = screen.getByTestId('confirm-accept');
-
-    await act(async () => {
-      accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    expect(onConfirm).toHaveBeenCalledTimes(1);
-    await act(async () => {
-      release();
-    });
-  });
-
-  it('returns focus to what was focused when it opened', async () => {
-    const user = userEvent.setup();
-    function Opener() {
-      const [open, setOpen] = useState(false);
-      return (
-        <>
-          <button type="button" onClick={() => setOpen(true)}>
-            Remove member
-          </button>
-          <ConfirmDialog {...base} open={open} onOpenChange={setOpen} />
-        </>
+  it.each(['desktop', 'phone'] as const)(
+    'confirms once for a double click that lands before the re-render, and holds every exit meanwhile (%s)',
+    async (tier) => {
+      viewport.tier = tier;
+      let release!: () => void;
+      const onConfirm = vi.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve;
+          }),
       );
-    }
-    render(<Opener />);
-    const opener = screen.getByRole('button', { name: 'Remove member' });
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialog {...base} onConfirm={onConfirm} onOpenChange={onOpenChange} />,
+      );
+      const accept = screen.getByTestId('confirm-accept');
 
-    await user.click(opener);
-    await user.click(await screen.findByTestId('confirm-cancel'));
+      await act(async () => {
+        accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        accept.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
 
-    await waitFor(() => expect(opener).toHaveFocus());
-  });
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('confirm-dialog')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByTestId('confirm-cancel')).toBeDisabled();
+      expect(screen.getByTestId('confirm-close')).toBeDisabled();
+      await user.keyboard('{Escape}');
+      expect(onOpenChange).not.toHaveBeenCalled();
 
-  it('has no accessibility violations', async () => {
-    const { baseElement } = render(<ConfirmDialog {...base} />);
-    expect(await axeForDialog(baseElement)).toHaveNoViolations();
-  });
+      await act(async () => {
+        release();
+      });
+      await waitFor(() => expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(false));
+    },
+  );
+
+  it.each(['desktop', 'phone'] as const)(
+    'returns focus to what was focused when it opened (%s)',
+    async (tier) => {
+      viewport.tier = tier;
+      const user = userEvent.setup();
+      function Opener() {
+        const [open, setOpen] = useState(false);
+        return (
+          <>
+            <button type="button" onClick={() => setOpen(true)}>
+              Remove member
+            </button>
+            <ConfirmDialog {...base} open={open} onOpenChange={setOpen} />
+          </>
+        );
+      }
+      render(<Opener />);
+      const opener = screen.getByRole('button', { name: 'Remove member' });
+
+      await user.click(opener);
+      await user.click(await screen.findByTestId('confirm-cancel'));
+
+      await waitFor(() => expect(opener).toHaveFocus());
+    },
+  );
+
+  it.each(['desktop', 'phone'] as const)(
+    'has no accessibility violations (%s)',
+    async (tier) => {
+      viewport.tier = tier;
+      const { baseElement } = render(<ConfirmDialog {...base} />);
+      expect(await axeForDialog(baseElement)).toHaveNoViolations();
+    },
+  );
 
   it('marks its write as running for exactly as long as onConfirm runs (L-64)', async () => {
     const user = userEvent.setup();

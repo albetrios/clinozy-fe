@@ -10,7 +10,19 @@ export const CONFIRM_KEYS = {
   fallbackDescription: 'confirm.fallbackDescription',
 } as const;
 
-/** Test ids of the confirm — the plain dialog and the reason panel / sheet share the first three. */
+/** The confirm's frame: the end panel from `md`, the bottom sheet below. */
+export type ConfirmLayout = 'panel' | 'sheet';
+
+/**
+ * The footer buttons per frame: the panel's 36px buttons, the sheet's 44px
+ * buttons sharing the row (`_patterns.md` › Right drawer, footer).
+ */
+export const CONFIRM_BUTTON_CLASS: Readonly<Record<ConfirmLayout, string>> = {
+  panel: 'h-9 px-3.5',
+  sheet: 'h-11 flex-1 px-3',
+};
+
+/** Test ids of the confirm — the plain and the reason confirm share the first four. */
 export const CONFIRM_TEST_IDS = {
   dialog: 'confirm-dialog',
   cancel: 'confirm-cancel',
