@@ -407,6 +407,13 @@
         "expires": "Gültig bis {{month}}/{{year}}",
         "defaultBadge": "Standard"
       },
+      "paymentForm": {
+        "saveMethod": "Zahlungsmethode speichern",
+        "savingMethod": "Wird gespeichert…",
+        "confirmPayment": "Zahlung bestätigen",
+        "confirmingPayment": "Wird bestätigt…",
+        "cancel": "Abbrechen"
+      },
       "invoices": {
         "title": "Rechnungen",
         "description": "Datum, Fälligkeit, Betrag und Status von Ihrem Abrechnungsanbieter.",

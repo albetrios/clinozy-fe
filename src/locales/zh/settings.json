@@ -405,6 +405,13 @@
         "expires": "有效期至 {{month}}/{{year}}",
         "defaultBadge": "默认"
       },
+      "paymentForm": {
+        "saveMethod": "保存付款方式",
+        "savingMethod": "保存中…",
+        "confirmPayment": "确认付款",
+        "confirmingPayment": "确认中…",
+        "cancel": "取消"
+      },
       "invoices": {
         "title": "发票",
         "description": "来自账单服务商的日期、到期日、金额和状态。",

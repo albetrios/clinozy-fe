@@ -3,18 +3,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { BillingSubscription } from '@/shared/api/billing-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   useCancelSubscription,
@@ -44,16 +38,14 @@ export function BillingCancellationSection({
   const periodEnd = formatDate(subscription.currentPeriodEnd);
 
   return (
-    <Card data-testid="billing-cancellation-card">
-      <CardHeader>
-        <CardTitle className="text-base">{t(keys.title)}</CardTitle>
-        <CardDescription>
-          {t(subscription.cancelAtPeriodEnd ? keys.endsOn : keys.cancelAnytime, {
-            date: periodEnd,
-          })}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <SettingsCard
+      data-testid="billing-cancellation-card"
+      title={t(keys.title)}
+      description={t(subscription.cancelAtPeriodEnd ? keys.endsOn : keys.cancelAnytime, {
+        date: periodEnd,
+      })}
+    >
+      <div>
         {subscription.cancelAtPeriodEnd ? (
           <Button
             size="sm"
@@ -98,7 +90,7 @@ export function BillingCancellationSection({
             />
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

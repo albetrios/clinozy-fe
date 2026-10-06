@@ -22,6 +22,7 @@ import { billingQueryKeys } from '@/shared/api/billing-query-keys.ts';
 import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { BillingCancellationSection } from '@/shared/components/SettingsModal/account/BillingCancellationSection/index.ts';
 import { BillingInvoicesTable } from '@/shared/components/SettingsModal/account/BillingInvoicesTable/index.ts';
 import { BillingPaymentMethods } from '@/shared/components/SettingsModal/account/BillingPaymentMethods/index.ts';
@@ -32,13 +33,6 @@ import {
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -126,7 +120,12 @@ interface PlanCardProps {
   formatCurrency: (cents: number, currency: string) => string;
 }
 
-/** One plan in the comparison grid, with its own busy state. */
+/**
+ * One plan in the comparison grid, with its own busy state — a tile in the
+ * settings card's frame: the name 13.5px/600, the price in the 15px title step
+ * (tabular), the description muted; the current plan carries the ink edge, as a
+ * picked chip does (`preset.md:64`).
+ */
 function PlanCard({
   plan,
   current,
@@ -164,20 +163,68 @@ function PlanCard({
   }
 
   return (
-    <Card className={cn(current && 'border-primary ring-primary/20 ring-2')}>
-      <CardHeader>
-        <CardTitle className="text-base">{plan.name}</CardTitle>
-        <CardDescription>
-          {planPriceLabel(plan, billingCycle, formatCurrency, t)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-muted-foreground text-sm">
-          {plan.description ?? t(BILLING_KEYS.planFallbackDescription)}
-        </p>
-        {action}
-      </CardContent>
-    </Card>
+    <div
+      data-slot="card"
+      data-current={current || undefined}
+      className={cn(
+        'bg-card text-card-foreground flex flex-col gap-1.5 rounded-xl border p-(--step-pad)',
+        current && 'border-foreground ring-foreground ring-1',
+      )}
+    >
+      <h4 dir="auto" className="text-field leading-[1.3] font-semibold">
+        {plan.name}
+      </h4>
+      <p className="text-title leading-[1.3] font-semibold tabular-nums">
+        {planPriceLabel(plan, billingCycle, formatCurrency, t)}
+      </p>
+      <p className="text-muted-foreground text-xs leading-[1.45] text-pretty">
+        {plan.description ?? t(BILLING_KEYS.planFallbackDescription)}
+      </p>
+      {action ? <div className="mt-auto pt-2">{action}</div> : null}
+    </div>
+  );
+}
+
+/** The segmented track's classes (the room tabs', H:1086): a 36px `muted` track of 28px segments. */
+const CYCLE_TRACK =
+  'bg-muted border-muted inline-flex h-9 items-center gap-0.5 rounded-lg border p-0.75';
+const CYCLE_SEGMENT =
+  'text-detail h-7 rounded-md px-3 font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-150';
+
+/**
+ * Monthly · Yearly, on the room tabs' segmented track: the picked segment is the
+ * card with its 1px ring, the other the strong muted ink. Each segment states
+ * whether it is the one in force (`aria-pressed`).
+ */
+function BillingCycleSwitch({
+  value,
+  onChange,
+}: {
+  value: BillingCycle;
+  onChange: (cycle: BillingCycle) => void;
+}) {
+  const { t } = useTranslation(SETTINGS_NS);
+  return (
+    <fieldset className={CYCLE_TRACK} data-testid="billing-cycle-toggle">
+      <legend className="sr-only">{t(BILLING_KEYS.cycleLegend)}</legend>
+      {(['monthly', 'yearly'] as const).map((cycle) => (
+        <button
+          key={cycle}
+          type="button"
+          aria-pressed={value === cycle}
+          onClick={() => onChange(cycle)}
+          data-testid={`billing-cycle-${cycle}`}
+          className={cn(
+            CYCLE_SEGMENT,
+            value === cycle
+              ? 'bg-card text-foreground ring-border shadow-(--elevation-control) ring-1'
+              : 'text-muted-foreground-strong hover:bg-background/55 hover:text-foreground',
+          )}
+        >
+          {t(cycle === 'monthly' ? BILLING_KEYS.monthly : BILLING_KEYS.yearly)}
+        </button>
+      ))}
+    </fieldset>
   );
 }
 
@@ -292,101 +339,73 @@ function BillingContent({ sub, plans }: BillingContentProps) {
     : t(BILLING_KEYS.noSubscription);
 
   return (
-    <div className="space-y-6">
-      <Card data-testid="billing-summary">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-base">
-              {currentPlan
-                ? t(BILLING_KEYS.planHeading, { name: currentPlan.name })
-                : t(BILLING_KEYS.noPlan)}
-            </CardTitle>
-            {sub ? (
-              <TonePill tone={statusTone(sub.status)} size="sm" dot>
-                {sub.status.replace('_', ' ')}
-              </TonePill>
-            ) : null}
-          </div>
-          <CardDescription>{summaryDescription}</CardDescription>
-          {sub ? (
-            <p className="text-muted-foreground text-sm">
-              {t(
-                sub.billingCycle === 'yearly'
-                  ? BILLING_KEYS.billedYearly
-                  : BILLING_KEYS.billedMonthly,
-              )}
-            </p>
-          ) : null}
-        </CardHeader>
-      </Card>
+    <div className="flex flex-col gap-4">
+      <SettingsCard
+        data-testid="billing-summary"
+        title={
+          currentPlan
+            ? t(BILLING_KEYS.planHeading, { name: currentPlan.name })
+            : t(BILLING_KEYS.noPlan)
+        }
+        description={summaryDescription}
+        action={
+          sub ? (
+            <TonePill tone={statusTone(sub.status)} dot className="capitalize">
+              {sub.status.replace('_', ' ')}
+            </TonePill>
+          ) : undefined
+        }
+      >
+        {sub ? (
+          <p className="text-muted-foreground-strong text-xs">
+            {t(
+              sub.billingCycle === 'yearly'
+                ? BILLING_KEYS.billedYearly
+                : BILLING_KEYS.billedMonthly,
+            )}
+          </p>
+        ) : null}
+      </SettingsCard>
 
       {paymentClientSecret ? (
-        <Card data-testid="billing-payment-card">
-          <CardHeader>
-            <CardTitle className="text-base">
-              {t(BILLING_KEYS.completePaymentTitle)}
-            </CardTitle>
-            <CardDescription>
-              {t(BILLING_KEYS.completePaymentDescription)}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* Stripe Elements is third-party and mounts an iframe: a throw in
+        <SettingsCard
+          data-testid="billing-payment-card"
+          title={t(BILLING_KEYS.completePaymentTitle)}
+          description={t(BILLING_KEYS.completePaymentDescription)}
+        >
+          {/* Stripe Elements is third-party and mounts an iframe: a throw in
                 there must cost the payment card, not the billing panel. */}
-            <SectionErrorBoundary
-              title={i18n.t(ERRORS_KEYS.widget.payment, { ns: ERRORS_NS })}
-              testId="billing-payment-form-error"
-            >
-              <StripePaymentForm
-                clientSecret={paymentClientSecret}
-                intent="payment"
-                onCancel={() => setPaymentClientSecret(null)}
-                onComplete={() => {
-                  setPaymentClientSecret(null);
-                  stripStripeReturnParams();
-                  void refreshBilling();
-                }}
-              />
-            </SectionErrorBoundary>
-          </CardContent>
-        </Card>
+          <SectionErrorBoundary
+            title={i18n.t(ERRORS_KEYS.widget.payment, { ns: ERRORS_NS })}
+            testId="billing-payment-form-error"
+          >
+            <StripePaymentForm
+              clientSecret={paymentClientSecret}
+              intent="payment"
+              onCancel={() => setPaymentClientSecret(null)}
+              onComplete={() => {
+                setPaymentClientSecret(null);
+                stripStripeReturnParams();
+                void refreshBilling();
+              }}
+            />
+          </SectionErrorBoundary>
+        </SettingsCard>
       ) : null}
 
       <BillingPaymentMethods enabled={showBillingExtras} canManage={canManage} />
 
       <BillingInvoicesTable enabled={showBillingExtras} />
 
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-medium">{t(BILLING_KEYS.changePlanTitle)}</h3>
-            <p className="text-muted-foreground text-sm">
-              {t(BILLING_KEYS.changePlanDescription)}
-            </p>
-          </div>
-          {canManage ? (
-            <fieldset
-              className="inline-flex rounded-md border p-0.5"
-              data-testid="billing-cycle-toggle"
-            >
-              <legend className="sr-only">{t(BILLING_KEYS.cycleLegend)}</legend>
-              {(['monthly', 'yearly'] as const).map((cycle) => (
-                <Button
-                  key={cycle}
-                  type="button"
-                  size="sm"
-                  variant={billingCycle === cycle ? 'secondary' : 'ghost'}
-                  className="h-8"
-                  onClick={() => setBillingCycle(cycle)}
-                  data-testid={`billing-cycle-${cycle}`}
-                >
-                  {t(cycle === 'monthly' ? BILLING_KEYS.monthly : BILLING_KEYS.yearly)}
-                </Button>
-              ))}
-            </fieldset>
-          ) : null}
-        </div>
-
+      <SettingsCard
+        title={t(BILLING_KEYS.changePlanTitle)}
+        description={t(BILLING_KEYS.changePlanDescription)}
+        action={
+          canManage ? (
+            <BillingCycleSwitch value={billingCycle} onChange={setBillingCycle} />
+          ) : undefined
+        }
+      >
         <div className="grid gap-3 sm:grid-cols-3" data-testid="plan-options">
           {plans.map((plan) => (
             <PlanCard
@@ -411,7 +430,7 @@ function BillingContent({ sub, plans }: BillingContentProps) {
             />
           ))}
         </div>
-      </div>
+      </SettingsCard>
 
       {sub ? (
         // Ending a subscription is its own failure domain: a throw here must not
@@ -437,7 +456,7 @@ export function AccountBillingPanel() {
   const plansQuery = useBillingPlans();
 
   return (
-    <section className="space-y-6" data-testid="settings-account-billing">
+    <section className="flex flex-col gap-4" data-testid="settings-account-billing">
       <SectionHeader
         title={t(BILLING_KEYS.title)}
         description={t(BILLING_KEYS.description)}

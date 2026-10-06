@@ -10,18 +10,12 @@ import {
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { useBillingInvoices } from '@/shared/hooks/useBillingInvoices/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -60,7 +54,11 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
         accessorKey: 'status',
         header: t(INVOICE_KEYS.columns.status),
         cell: ({ row }) => (
-          <TonePill tone={invoiceStatusTone(row.original.status)} dot>
+          <TonePill
+            tone={invoiceStatusTone(row.original.status)}
+            dot
+            className="capitalize"
+          >
             {row.original.status}
           </TonePill>
         ),
@@ -70,7 +68,7 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
         header: t(INVOICE_KEYS.columns.actions),
         cell: ({ row }) => {
           const url = row.original.hostedInvoiceUrl ?? row.original.invoicePdfUrl ?? null;
-          if (!url) return <span className="text-muted-foreground text-sm">—</span>;
+          if (!url) return <span className="text-muted-foreground text-body">—</span>;
           return (
             <Button variant="ghost" size="sm" asChild data-testid="billing-invoice-view">
               <a href={url} target="_blank" rel="noopener noreferrer">
@@ -92,7 +90,12 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
 
   return (
     <div data-testid="billing-invoices-table">
-      <DataTable table={table} emptyMessage={t(INVOICE_KEYS.empty)} />
+      {/* The design's table card, kept edged on a phone inside the settings card. */}
+      <DataTable
+        table={table}
+        emptyMessage={t(INVOICE_KEYS.empty)}
+        className="max-md:rounded-xl max-md:border-x"
+      />
     </div>
   );
 }
@@ -108,20 +111,18 @@ export function BillingInvoicesTable({ enabled = true }: { enabled?: boolean }) 
   if (!enabled) return null;
 
   return (
-    <Card data-testid="billing-invoices-card">
-      <CardHeader>
-        <CardTitle className="text-base">{t(INVOICE_KEYS.title)}</CardTitle>
-        <CardDescription>{t(INVOICE_KEYS.description)}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <QueryBoundary
-          query={query}
-          errorMessage={t(INVOICE_KEYS.loadFailed)}
-          title={t(INVOICE_KEYS.title)}
-        >
-          {(invoices) => <InvoicesTable invoices={invoices} />}
-        </QueryBoundary>
-      </CardContent>
-    </Card>
+    <SettingsCard
+      data-testid="billing-invoices-card"
+      title={t(INVOICE_KEYS.title)}
+      description={t(INVOICE_KEYS.description)}
+    >
+      <QueryBoundary
+        query={query}
+        errorMessage={t(INVOICE_KEYS.loadFailed)}
+        title={t(INVOICE_KEYS.title)}
+      >
+        {(invoices) => <InvoicesTable invoices={invoices} />}
+      </QueryBoundary>
+    </SettingsCard>
   );
 }

@@ -411,6 +411,13 @@ export const SETTINGS_KEYS = {
         expires: 'panels.billing.paymentMethods.expires',
         defaultBadge: 'panels.billing.paymentMethods.defaultBadge',
       },
+      paymentForm: {
+        saveMethod: 'panels.billing.paymentForm.saveMethod',
+        savingMethod: 'panels.billing.paymentForm.savingMethod',
+        confirmPayment: 'panels.billing.paymentForm.confirmPayment',
+        confirmingPayment: 'panels.billing.paymentForm.confirmingPayment',
+        cancel: 'panels.billing.paymentForm.cancel',
+      },
       invoices: {
         title: 'panels.billing.invoices.title',
         description: 'panels.billing.invoices.description',

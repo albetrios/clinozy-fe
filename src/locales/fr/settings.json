@@ -411,6 +411,13 @@
         "expires": "Expire le {{month}}/{{year}}",
         "defaultBadge": "Par défaut"
       },
+      "paymentForm": {
+        "saveMethod": "Enregistrer le moyen de paiement",
+        "savingMethod": "Enregistrement…",
+        "confirmPayment": "Confirmer le paiement",
+        "confirmingPayment": "Confirmation…",
+        "cancel": "Annuler"
+      },
       "invoices": {
         "title": "Factures",
         "description": "Date, échéance, montant et statut fournis par votre prestataire de facturation.",

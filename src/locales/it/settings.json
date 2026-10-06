@@ -411,6 +411,13 @@
         "expires": "Scade il {{month}}/{{year}}",
         "defaultBadge": "Predefinito"
       },
+      "paymentForm": {
+        "saveMethod": "Salva metodo di pagamento",
+        "savingMethod": "Salvataggio…",
+        "confirmPayment": "Conferma pagamento",
+        "confirmingPayment": "Conferma in corso…",
+        "cancel": "Annulla"
+      },
       "invoices": {
         "title": "Fatture",
         "description": "Data, scadenza, importo e stato dal tuo provider di fatturazione.",

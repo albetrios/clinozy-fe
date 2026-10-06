@@ -407,6 +407,13 @@
         "expires": "Expires {{month}}/{{year}}",
         "defaultBadge": "Default"
       },
+      "paymentForm": {
+        "saveMethod": "Save payment method",
+        "savingMethod": "Saving…",
+        "confirmPayment": "Confirm payment",
+        "confirmingPayment": "Confirming…",
+        "cancel": "Cancel"
+      },
       "invoices": {
         "title": "Invoices",
         "description": "Date, due date, amount, and status from your billing provider.",

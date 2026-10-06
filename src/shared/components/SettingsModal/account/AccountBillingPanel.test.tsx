@@ -270,6 +270,35 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Switch to Pro');
   });
 
+  it('draws the current plan with the ink edge and the cycle on a segmented track', async () => {
+    const user = userEvent.setup();
+    useSubscriptionMock.mockReturnValue({
+      data: SUB,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    const current = screen.getByText('Current plan').closest('[data-current]');
+    expect(current).toHaveClass('border-foreground', 'ring-1');
+    // Monthly · Yearly states which cycle is in force, and moves with a press.
+    expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(screen.getByTestId('billing-cycle-yearly'));
+    expect(screen.getByTestId('billing-cycle-yearly')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
   it('switches plan when allowed', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,

@@ -423,6 +423,13 @@
         "expires": "تنتهي في {{month}}/{{year}}",
         "defaultBadge": "افتراضية"
       },
+      "paymentForm": {
+        "saveMethod": "حفظ طريقة الدفع",
+        "savingMethod": "جارٍ الحفظ…",
+        "confirmPayment": "تأكيد الدفع",
+        "confirmingPayment": "جارٍ التأكيد…",
+        "cancel": "إلغاء"
+      },
       "invoices": {
         "title": "الفواتير",
         "description": "التاريخ وتاريخ الاستحقاق والمبلغ والحالة من مزوّد الفوترة.",

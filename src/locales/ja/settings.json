@@ -405,6 +405,13 @@
         "expires": "有効期限 {{month}}/{{year}}",
         "defaultBadge": "既定"
       },
+      "paymentForm": {
+        "saveMethod": "支払い方法を保存",
+        "savingMethod": "保存中…",
+        "confirmPayment": "支払いを確定",
+        "confirmingPayment": "確定中…",
+        "cancel": "キャンセル"
+      },
       "invoices": {
         "title": "請求書",
         "description": "請求プロバイダーからの日付、支払期日、金額、ステータス。",

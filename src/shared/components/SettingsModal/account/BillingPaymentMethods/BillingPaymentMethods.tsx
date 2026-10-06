@@ -17,18 +17,17 @@ import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import {
+  SettingsCard,
+  SettingsList,
+  SettingsListRow,
+  SettingsRowTile,
+} from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useBillingPaymentMethods } from '@/shared/hooks/useBillingPaymentMethods/index.ts';
@@ -46,28 +45,26 @@ function formatCardLabel(method: BillingPaymentMethod, t: TFunction) {
   return `${brand} ···· ${method.last4}`;
 }
 
+/** One saved card as a list row: its tile, "VISA ···· 4242" and when it expires. */
 function PaymentMethodRow({ method }: { method: BillingPaymentMethod }) {
   const { t } = useTranslation(SETTINGS_NS);
   return (
-    <li
-      className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
-      data-testid={`billing-payment-method-${method.id}`}
-    >
-      <div className="flex items-center gap-2">
-        <CreditCard className="text-muted-foreground size-4" data-icon />
-        <div>
-          <p className="text-sm font-medium">{formatCardLabel(method, t)}</p>
-          <p className="text-muted-foreground text-xs">
-            {t(METHOD_KEYS.expires, { month: method.expMonth, year: method.expYear })}
-          </p>
-        </div>
+    <SettingsListRow data-testid={`billing-payment-method-${method.id}`}>
+      <SettingsRowTile icon={CreditCard} tone="peach" />
+      <div className="min-w-0 flex-1">
+        <p dir="ltr" className="text-body truncate [text-align:match-parent] font-medium">
+          {formatCardLabel(method, t)}
+        </p>
+        <p className="text-muted-foreground text-caption">
+          {t(METHOD_KEYS.expires, { month: method.expMonth, year: method.expYear })}
+        </p>
       </div>
       {method.isDefault ? (
         <TonePill tone="neutral" size="sm">
           {t(METHOD_KEYS.defaultBadge)}
         </TonePill>
       ) : null}
-    </li>
+    </SettingsListRow>
   );
 }
 
@@ -169,61 +166,59 @@ export function BillingPaymentMethods({
   }
 
   return (
-    <Card data-testid="billing-payment-methods-card">
-      <CardHeader>
-        <CardTitle className="text-base">{t(METHOD_KEYS.title)}</CardTitle>
-        <CardDescription>{t(METHOD_KEYS.description)}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {setupSecret ? (
-          // Stripe Elements is third-party and mounts an iframe: a throw in
-          // there costs the card form, not the whole billing panel.
-          <SectionErrorBoundary
-            title={i18n.t(ERRORS_KEYS.widget.payment, { ns: ERRORS_NS })}
-            testId="billing-payment-form-error"
+    <SettingsCard
+      data-testid="billing-payment-methods-card"
+      title={t(METHOD_KEYS.title)}
+      description={t(METHOD_KEYS.description)}
+      action={
+        canManage && !setupSecret ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isAdding}
+            onClick={() => void handleAddPaymentMethod()}
+            data-testid="billing-add-payment-method"
           >
-            <StripePaymentForm
-              clientSecret={setupSecret}
-              intent="setup"
-              onCancel={() => setSetupSecret(null)}
-              onComplete={() => void refreshPaymentMethods()}
-            />
-          </SectionErrorBoundary>
-        ) : (
-          <>
-            <QueryBoundary query={query} errorMessage={t(METHOD_KEYS.loadFailed)}>
-              {(methods) =>
-                methods.length > 0 ? (
-                  <ul className="space-y-2" data-testid="billing-payment-methods-list">
-                    {methods.map((method) => (
-                      <PaymentMethodRow key={method.id} method={method} />
-                    ))}
-                  </ul>
-                ) : (
-                  <p
-                    className="text-muted-foreground text-sm"
-                    data-testid="billing-payment-methods-empty"
-                  >
-                    {t(METHOD_KEYS.empty)}
-                  </p>
-                )
-              }
-            </QueryBoundary>
-            {canManage ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isAdding}
-                onClick={() => void handleAddPaymentMethod()}
-                data-testid="billing-add-payment-method"
+            {isAdding ? t(METHOD_KEYS.adding) : t(METHOD_KEYS.add)}
+          </Button>
+        ) : undefined
+      }
+    >
+      {setupSecret ? (
+        // Stripe Elements is third-party and mounts an iframe: a throw in
+        // there costs the card form, not the whole billing panel.
+        <SectionErrorBoundary
+          title={i18n.t(ERRORS_KEYS.widget.payment, { ns: ERRORS_NS })}
+          testId="billing-payment-form-error"
+        >
+          <StripePaymentForm
+            clientSecret={setupSecret}
+            intent="setup"
+            onCancel={() => setSetupSecret(null)}
+            onComplete={() => void refreshPaymentMethods()}
+          />
+        </SectionErrorBoundary>
+      ) : (
+        <QueryBoundary query={query} errorMessage={t(METHOD_KEYS.loadFailed)}>
+          {(methods) =>
+            methods.length > 0 ? (
+              <SettingsList data-testid="billing-payment-methods-list">
+                {methods.map((method) => (
+                  <PaymentMethodRow key={method.id} method={method} />
+                ))}
+              </SettingsList>
+            ) : (
+              <p
+                className="text-muted-foreground text-body"
+                data-testid="billing-payment-methods-empty"
               >
-                {isAdding ? t(METHOD_KEYS.adding) : t(METHOD_KEYS.add)}
-              </Button>
-            ) : null}
-          </>
-        )}
-      </CardContent>
-    </Card>
+                {t(METHOD_KEYS.empty)}
+              </p>
+            )
+          }
+        </QueryBoundary>
+      )}
+    </SettingsCard>
   );
 }

@@ -407,6 +407,13 @@
         "expires": "समाप्ति {{month}}/{{year}}",
         "defaultBadge": "डिफ़ॉल्ट"
       },
+      "paymentForm": {
+        "saveMethod": "भुगतान का तरीका सहेजें",
+        "savingMethod": "सहेजा जा रहा है…",
+        "confirmPayment": "भुगतान की पुष्टि करें",
+        "confirmingPayment": "पुष्टि हो रही है…",
+        "cancel": "रद्द करें"
+      },
       "invoices": {
         "title": "चालान",
         "description": "आपके बिलिंग प्रदाता से तिथि, नियत तिथि, राशि और स्थिति।",

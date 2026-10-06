@@ -405,6 +405,13 @@
         "expires": "만료 {{month}}/{{year}}",
         "defaultBadge": "기본"
       },
+      "paymentForm": {
+        "saveMethod": "결제 수단 저장",
+        "savingMethod": "저장 중…",
+        "confirmPayment": "결제 확인",
+        "confirmingPayment": "확인 중…",
+        "cancel": "취소"
+      },
       "invoices": {
         "title": "청구서",
         "description": "결제 제공업체의 날짜, 지급 기한, 금액, 상태.",

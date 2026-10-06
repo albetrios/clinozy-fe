@@ -411,6 +411,13 @@
         "expires": "Vence {{month}}/{{year}}",
         "defaultBadge": "Predeterminado"
       },
+      "paymentForm": {
+        "saveMethod": "Guardar método de pago",
+        "savingMethod": "Guardando…",
+        "confirmPayment": "Confirmar pago",
+        "confirmingPayment": "Confirmando…",
+        "cancel": "Cancelar"
+      },
       "invoices": {
         "title": "Facturas",
         "description": "Fecha, vencimiento, importe y estado según tu proveedor de facturación.",
