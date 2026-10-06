@@ -61,6 +61,14 @@ describe('Dialog', () => {
     expect(screen.getByText('Name the key.')).toHaveClass('text-body');
   });
 
+  it('keeps its × above a pinned head row', () => {
+    // The Settings pane's head row is `sticky z-10`; a z-auto close button
+    // would paint beneath it and vanish.
+    renderDialog();
+    const close = screen.getByRole('button', { name: 'Close', exact: true });
+    expect(close).toHaveClass('absolute', 'end-4', 'top-4', 'z-20');
+  });
+
   it('ends it with the canvas footer band, actions at the inline end', () => {
     renderDialog();
     expect(screen.getByTestId('footer')).toHaveClass(

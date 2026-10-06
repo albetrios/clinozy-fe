@@ -385,7 +385,7 @@ function SettingsContentLoading({ active }: { active: SettingsSectionRef }) {
   // panel draws while its own query resolves, so the shell-to-panel handoff
   // swaps identical markup instead of one skeleton shape for another.
   return (
-    <div className="flex flex-col gap-6" data-testid="settings-content-loading">
+    <div className="flex flex-col gap-4" data-testid="settings-content-loading">
       <SectionHeader title={sectionLabel} />
       {/* No width override here. The panel below draws the SAME component when its
           own query resolves, so any difference between the two — a max-width, a

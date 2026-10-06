@@ -73,7 +73,9 @@ function DialogContent({
               // physically, the button stayed on the right in Arabic and Hebrew
               // while every consumer reserved room for it on the logical end,
               // so the two were on opposite sides and content ran under the X.
-              'ring-offset-background focus-visible:ring-ring absolute end-4 top-4 focus-visible:ring-offset-2 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+              // `z-20`: above a pinned (`sticky z-10`) head row, such as the
+              // Settings pane's, which would otherwise paint over it.
+              'ring-offset-background focus-visible:ring-ring absolute end-4 top-4 z-20 focus-visible:ring-offset-2 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
             )}
           >
             <XIcon />

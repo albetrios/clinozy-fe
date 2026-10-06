@@ -478,6 +478,7 @@ it may have been deleted"); an unknown path inside the organization goes to the 
 | `suspended-switch-organization`     | Switch-organization button                                    | `pages/organization/$organizationSlug/suspended/SuspendedPage.tsx` |
 | `settings-modal`                    | Global settings modal (hash-driven)                           | `shared/components/SettingsModal/SettingsModal.tsx`                |
 | `settings-nav-<scope>-<section>`    | Settings nav items (e.g. `settings-nav-organization-members`) | `shared/components/SettingsModal/SettingsNav.tsx`                  |
+| `settings-section-tile`             | The open section's 40px icon tile in its head row (L-65)      | `shared/components/SettingsModal/SettingsPanelShell.tsx`           |
 | `settings-members-open-users`       | Settings › Members' link to the Team once Users holds it      | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
 | `settings-roles-open-users`         | Settings › Roles' link to Users › Roles & access (D17)        | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
 
