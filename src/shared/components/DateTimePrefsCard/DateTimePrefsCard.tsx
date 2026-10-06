@@ -20,13 +20,7 @@ import {
 } from '@/lib/i18n/locale.constants.ts';
 import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   localeFormatPrefs,
   useLocaleStore,
@@ -97,13 +91,13 @@ export function DateTimePrefsCard() {
   ]);
 
   return (
-    <Card data-testid={LOCALE_TEST_IDS.dateTimeCard}>
-      <CardHeader>
-        <CardTitle className="text-base">{t(LOCALE_KEYS.dateTimeHeading)}</CardTitle>
-        <CardDescription>{t(LOCALE_KEYS.dateTimeDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
-        <div className="flex flex-col gap-2">
+    <SettingsCard
+      data-testid={LOCALE_TEST_IDS.dateTimeCard}
+      title={t(LOCALE_KEYS.dateTimeHeading)}
+      description={t(LOCALE_KEYS.dateTimeDescription)}
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.formatLocaleHeading)}</FieldLabel>
           <Picker
             label={t(LOCALE_KEYS.formatLocaleHeading)}
@@ -118,7 +112,7 @@ export function DateTimePrefsCard() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.timeZoneHeading)}</FieldLabel>
           <Picker
             label={t(LOCALE_KEYS.timeZoneHeading)}
@@ -133,7 +127,7 @@ export function DateTimePrefsCard() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.dateFormatHeading)}</FieldLabel>
           <OptionPills
             ariaLabel={t(LOCALE_KEYS.dateFormatHeading)}
@@ -145,7 +139,7 @@ export function DateTimePrefsCard() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.hourCycleHeading)}</FieldLabel>
           <OptionPills
             ariaLabel={t(LOCALE_KEYS.hourCycleHeading)}
@@ -157,14 +151,14 @@ export function DateTimePrefsCard() {
           />
         </div>
 
-        <div className="bg-muted/30 text-muted-foreground rounded-md border border-dashed px-3 py-2 text-xs">
+        <div className="bg-canvas text-muted-foreground-strong rounded-lg border border-dashed px-3 py-2 text-xs leading-[1.6] tabular-nums">
           <p>{t(LOCALE_KEYS.previewDate, { value: previews.sampleDateTime })}</p>
           <p>{t(LOCALE_KEYS.previewTime, { value: previews.sampleTimeOnly })}</p>
           <p data-testid="locale-preview-timezone">
             {t(LOCALE_KEYS.previewTimeZone, { value: previews.zoneLabel })}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

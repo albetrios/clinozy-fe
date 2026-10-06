@@ -1,9 +1,20 @@
-import { appearanceChoiceClassName } from '@/lib/appearance-surface.ts';
+import {
+  appearanceChoiceActiveClassName,
+  appearanceChoiceClassName,
+  appearanceChoiceIdleClassName,
+} from '@/lib/appearance-surface.ts';
 import { cn } from '@/lib/utils.ts';
 
-/** Compact label above a prefs control (shared by locale preference cards). */
+/**
+ * Compact label above a prefs control (shared by locale preference cards): a
+ * drawer field's label — 12px/500 in the strong muted ink (`_patterns.md:34`).
+ */
 export function FieldLabel({ children }: { children: string }) {
-  return <p className="text-sm font-medium">{children}</p>;
+  return (
+    <p className="text-muted-foreground-strong text-xs leading-[normal] font-medium">
+      {children}
+    </p>
+  );
 }
 
 /**
@@ -28,23 +39,22 @@ export function OptionPills<T extends string>({
   return (
     <fieldset className="m-0 min-w-0 border-0 p-0">
       <legend className="sr-only">{ariaLabel}</legend>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {options.map((id) => {
           const active = value === id;
           return (
             <button
               key={id}
               type="button"
-              data-slot="button"
               aria-pressed={active}
               onClick={() => onPick(id)}
               data-testid={`${testPrefix}-${id}`}
+              data-slot="pill"
               className={cn(
                 appearanceChoiceClassName,
-                'max-w-full min-w-0 flex-none text-center text-xs wrap-anywhere whitespace-normal',
-                active
-                  ? 'border-primary bg-primary/10 text-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/50',
+                // A long label wraps inside its pill rather than squeezing the row.
+                'h-auto min-h-7 max-w-full min-w-0 flex-none rounded-full py-1 text-center wrap-anywhere whitespace-normal',
+                active ? appearanceChoiceActiveClassName : appearanceChoiceIdleClassName,
               )}
             >
               {labelFor(id)}

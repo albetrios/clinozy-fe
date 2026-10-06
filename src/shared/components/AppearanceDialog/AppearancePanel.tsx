@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import {
+  appearanceChoiceActiveClassName,
   appearanceChoiceClassName,
+  appearanceChoiceIdleClassName,
   appearanceModeCardClassName,
   appearancePreviewWellClassName,
   appearanceTileActiveClassName,
@@ -23,15 +25,8 @@ import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { LanguagePrefsCard } from '@/shared/components/LanguagePrefsCard/index.ts';
 import { MoneyPrefsCard } from '@/shared/components/MoneyPrefsCard/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { Separator } from '@/shared/components/ui/separator.tsx';
 import { Check, Monitor, Moon, Sparkles, Sun } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -169,7 +164,7 @@ function Choices({
   testPrefix: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label={ariaLabel} className="flex flex-wrap gap-1.5">
       {options.map((o) => {
         const active = value === o.id;
         return (
@@ -177,15 +172,14 @@ function Choices({
             key={o.id}
             type="button"
             role="radio"
-            data-slot="button"
+            data-slot="pill"
             aria-checked={active}
             onClick={() => onPick(o.id)}
             data-testid={`${testPrefix}-${o.id}`}
             className={cn(
               appearanceChoiceClassName,
-              active
-                ? 'border-primary bg-primary/10 text-foreground'
-                : 'border-border text-muted-foreground hover:border-primary/50',
+              'rounded-full',
+              active ? appearanceChoiceActiveClassName : appearanceChoiceIdleClassName,
             )}
           >
             {o.label}
@@ -196,8 +190,13 @@ function Choices({
   );
 }
 
+/** A drawer field's label: 12px/500 in the strong muted ink (`_patterns.md:34`). */
 function FieldLabel({ children }: { children: string }) {
-  return <p className="text-sm font-medium">{children}</p>;
+  return (
+    <p className="text-muted-foreground-strong text-xs leading-[normal] font-medium">
+      {children}
+    </p>
+  );
 }
 
 /** The web-safe font catalog as picker rows (font families are proper nouns). */
@@ -219,7 +218,7 @@ function FontPicker({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-1.5">
       <FieldLabel>{label}</FieldLabel>
       <Picker
         label={label}
@@ -258,10 +257,7 @@ function SectionShuffle({
       aria-label={tShuffle(APPEARANCE_KEYS.shuffleSection, { section: label })}
       title={tShuffle(APPEARANCE_KEYS.shuffleSection, { section: label })}
       data-testid={testId}
-      className={cn(
-        'text-muted-foreground hover:bg-accent hover:text-foreground rounded-md p-1.5 transition',
-        closeControlClassName,
-      )}
+      className={cn(closeControlClassName, 'rounded-lg')}
     >
       <Sparkles className="size-4" aria-hidden="true" />
     </button>
@@ -313,14 +309,11 @@ function ThemeCard() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.themeTitle)}
-        </CardTitle>
-        <CardDescription>{tAppearance(APPEARANCE_KEYS.themeDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.themeTitle)}
+      description={tAppearance(APPEARANCE_KEYS.themeDescription)}
+    >
+      <div className="flex flex-col gap-3">
         <Choices
           ariaLabel={tAppearance(APPEARANCE_KEYS.presetAria)}
           value={preset === GENERATED_PRESET ? '__none__' : preset}
@@ -329,7 +322,7 @@ function ThemeCard() {
           testPrefix="named-preset"
         />
         <Separator />
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2.5">
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
@@ -342,11 +335,14 @@ function ThemeCard() {
               {tAppearance(APPEARANCE_KEYS.copyLink)}
             </Button>
             {seed == null ? (
-              <span className="text-muted-foreground text-sm">
+              <span className="text-muted-foreground text-xs">
                 {tAppearance(APPEARANCE_KEYS.shuffleHint)}
               </span>
             ) : (
-              <span className="text-muted-foreground text-sm" data-testid="theme-seed">
+              <span
+                className="text-muted-foreground text-xs tabular-nums"
+                data-testid="theme-seed"
+              >
                 {tAppearance(APPEARANCE_KEYS.codeLabel, { seed })}
               </span>
             )}
@@ -373,8 +369,8 @@ function ThemeCard() {
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -385,16 +381,13 @@ function ModeCard() {
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.modeTitle)}
-        </CardTitle>
-        <CardDescription>{tAppearance(APPEARANCE_KEYS.modeDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.modeTitle)}
+      description={tAppearance(APPEARANCE_KEYS.modeDescription)}
+    >
+      <div>
         <div
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-2 sm:grid-cols-3"
           role="radiogroup"
           aria-label={tCommon(LOCALE_KEYS.mode)}
         >
@@ -415,19 +408,19 @@ function ModeCard() {
                 )}
               >
                 <div className="flex w-full items-center justify-between">
-                  <t.icon className="text-muted-foreground size-5" aria-hidden />
-                  {active && <Check className="text-primary size-4" aria-hidden />}
+                  <t.icon className="text-muted-foreground size-4" aria-hidden />
+                  {active && <Check className="text-foreground size-4" aria-hidden />}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{t.label}</p>
-                  <p className="text-muted-foreground text-xs">{t.description}</p>
+                  <p className="text-body font-semibold">{t.label}</p>
+                  <p className="text-muted-foreground text-caption">{t.description}</p>
                 </div>
               </button>
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -443,24 +436,19 @@ function ColourCard() {
   const chartHex = oklchToHex(0.64, 0.17, look.chartHue);
   const shuffleColour = () => updateLook(rollColour());
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.colourTitle)}
-        </CardTitle>
-        <CardDescription>
-          {tAppearance(APPEARANCE_KEYS.colourDescription)}
-        </CardDescription>
-        <CardAction>
-          <SectionShuffle
-            onClick={shuffleColour}
-            label={tAppearance(APPEARANCE_KEYS.sectionColour)}
-            testId="shuffle-colour"
-          />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="space-y-2">
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.colourTitle)}
+      description={tAppearance(APPEARANCE_KEYS.colourDescription)}
+      action={
+        <SectionShuffle
+          onClick={shuffleColour}
+          label={tAppearance(APPEARANCE_KEYS.sectionColour)}
+          testId="shuffle-colour"
+        />
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.accentColour)}</FieldLabel>
           <ColourField
             ariaLabel={tAppearance(APPEARANCE_KEYS.accentColour)}
@@ -470,7 +458,7 @@ function ColourCard() {
             testPrefix="accent"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.chartColour)}</FieldLabel>
           <ColourField
             ariaLabel={tAppearance(APPEARANCE_KEYS.chartColour)}
@@ -480,7 +468,7 @@ function ColourCard() {
             testPrefix="chart"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.baseColour)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.baseColour)}
@@ -490,7 +478,7 @@ function ColourCard() {
             testPrefix="base"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.harmony)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.harmonyAria)}
@@ -500,7 +488,7 @@ function ColourCard() {
             testPrefix="harmony"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.accentIntensity)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.accentIntensity)}
@@ -510,8 +498,8 @@ function ColourCard() {
             testPrefix="intensity"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -524,22 +512,19 @@ function TypographyCard() {
   const { bodyFontId, headingFontId, radiusId, look } = useCurrentLook();
   const shuffleTypography = () => updateLook(rollTypography());
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.typeTitle)}
-        </CardTitle>
-        <CardDescription>{tAppearance(APPEARANCE_KEYS.typeDescription)}</CardDescription>
-        <CardAction>
-          <SectionShuffle
-            onClick={shuffleTypography}
-            label={tAppearance(APPEARANCE_KEYS.sectionType)}
-            testId="shuffle-type"
-          />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="grid gap-4 sm:grid-cols-2">
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.typeTitle)}
+      description={tAppearance(APPEARANCE_KEYS.typeDescription)}
+      action={
+        <SectionShuffle
+          onClick={shuffleTypography}
+          label={tAppearance(APPEARANCE_KEYS.sectionType)}
+          testId="shuffle-type"
+        />
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <div className="grid gap-(--form-gap) sm:grid-cols-2">
           <FontPicker
             id="font-body"
             label={tAppearance(APPEARANCE_KEYS.bodyFont)}
@@ -553,7 +538,7 @@ function TypographyCard() {
             onChange={(value) => updateLook({ headingFontId: value })}
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.radius)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.radius)}
@@ -563,7 +548,7 @@ function TypographyCard() {
             testPrefix="radius"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.shapeLanguage)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.shapeLanguage)}
@@ -573,7 +558,7 @@ function TypographyCard() {
             testPrefix="shape"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.typeScale)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.typeScale)}
@@ -583,7 +568,7 @@ function TypographyCard() {
             testPrefix="typescale"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.menu)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.menuAria)}
@@ -593,8 +578,8 @@ function TypographyCard() {
             testPrefix="menu"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -608,20 +593,17 @@ function IconsCard() {
   const setIconColor = useThemeStore((s) => s.setIconColor);
   const setIconLibrary = useThemeStore((s) => s.setIconLibrary);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.iconsTitle)}
-        </CardTitle>
-        <CardDescription>{tAppearance(APPEARANCE_KEYS.iconsDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.iconsTitle)}
+      description={tAppearance(APPEARANCE_KEYS.iconsDescription)}
+    >
+      <div className="flex flex-col gap-4">
         <div className={appearancePreviewWellClassName} aria-hidden>
           <Sparkles className="size-6" data-testid="icon-preview-star" />
           <Sun className="size-6" data-testid="icon-preview-sun" />
           <Moon className="size-6" data-testid="icon-preview-moon" />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.iconWeight)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.iconWeight)}
@@ -631,7 +613,7 @@ function IconsCard() {
             testPrefix="icon"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.iconColour)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.iconColour)}
@@ -641,7 +623,7 @@ function IconsCard() {
             testPrefix="iconcolor"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.iconLibrary)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.iconLibrary)}
@@ -651,8 +633,8 @@ function IconsCard() {
             testPrefix="iconlib"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -662,16 +644,12 @@ function LayoutWidthCard() {
   const layoutWidth = useThemeStore((s) => s.layoutWidth);
   const setLayoutWidth = useThemeStore((s) => s.setLayoutWidth);
   return (
-    <Card data-testid="layout-width-card">
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.layoutTitle)}
-        </CardTitle>
-        <CardDescription>
-          {tAppearance(APPEARANCE_KEYS.layoutDescription)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <SettingsCard
+      data-testid="layout-width-card"
+      title={tAppearance(APPEARANCE_KEYS.layoutTitle)}
+      description={tAppearance(APPEARANCE_KEYS.layoutDescription)}
+    >
+      <div className="flex flex-col gap-1.5">
         <FieldLabel>{tAppearance(APPEARANCE_KEYS.contentWidth)}</FieldLabel>
         <Choices
           ariaLabel={tAppearance(APPEARANCE_KEYS.contentWidth)}
@@ -680,11 +658,11 @@ function LayoutWidthCard() {
           onPick={(value) => setLayoutWidth(value as typeof layoutWidth)}
           testPrefix="layout-width"
         />
-        <p className="text-muted-foreground text-xs leading-relaxed">
+        <p className="text-muted-foreground text-xs leading-[1.45]">
           {LAYOUT_WIDTHS.find((option) => option.id === layoutWidth)?.description}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -695,24 +673,19 @@ function SurfaceCard() {
   const { look } = useCurrentLook();
   const shuffleSurface = () => updateLook(rollSurface());
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {tAppearance(APPEARANCE_KEYS.surfaceTitle)}
-        </CardTitle>
-        <CardDescription>
-          {tAppearance(APPEARANCE_KEYS.surfaceDescription)}
-        </CardDescription>
-        <CardAction>
-          <SectionShuffle
-            onClick={shuffleSurface}
-            label={tAppearance(APPEARANCE_KEYS.sectionSurface)}
-            testId="shuffle-surface"
-          />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="space-y-2">
+    <SettingsCard
+      title={tAppearance(APPEARANCE_KEYS.surfaceTitle)}
+      description={tAppearance(APPEARANCE_KEYS.surfaceDescription)}
+      action={
+        <SectionShuffle
+          onClick={shuffleSurface}
+          label={tAppearance(APPEARANCE_KEYS.sectionSurface)}
+          testId="shuffle-surface"
+        />
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.density)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.density)}
@@ -722,7 +695,7 @@ function SurfaceCard() {
             testPrefix="density"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.contrast)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.contrast)}
@@ -732,7 +705,7 @@ function SurfaceCard() {
             testPrefix="contrast"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.elevation)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.elevation)}
@@ -742,7 +715,7 @@ function SurfaceCard() {
             testPrefix="elevation"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.separation)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.separationAria)}
@@ -752,7 +725,7 @@ function SurfaceCard() {
             testPrefix="separation"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.motion)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.motion)}
@@ -762,7 +735,7 @@ function SurfaceCard() {
             testPrefix="motion"
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{tAppearance(APPEARANCE_KEYS.focusRing)}</FieldLabel>
           <Choices
             ariaLabel={tAppearance(APPEARANCE_KEYS.focusRing)}
@@ -772,8 +745,8 @@ function SurfaceCard() {
             testPrefix="focus"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -784,10 +757,10 @@ function CustomLookNote() {
   const { customLook } = useCurrentLook();
   return preset === GENERATED_PRESET ? (
     <div
-      className="text-muted-foreground mt-2 inline-flex items-center gap-1.5 text-sm"
+      className="text-muted-foreground text-body mt-1 inline-flex items-center gap-1.5"
       data-testid="preset-custom"
     >
-      <Check className="text-primary size-4" aria-hidden />
+      <Check className="text-foreground size-4" aria-hidden />
       {customLook
         ? tAppearance(APPEARANCE_KEYS.customWith, { look: customLook })
         : tAppearance(APPEARANCE_KEYS.custom)}
@@ -807,17 +780,15 @@ export function AppearancePanel() {
 
   if (platformConfig.themeLock) {
     return (
-      <div className="flex flex-col gap-4" data-testid="appearance-panel">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {tAppearance(APPEARANCE_KEYS.themeTitle)}
-            </CardTitle>
-            <CardDescription data-testid="theme-locked">
+      <div className="flex flex-col gap-3" data-testid="appearance-panel">
+        <SettingsCard
+          title={tAppearance(APPEARANCE_KEYS.themeTitle)}
+          description={
+            <span data-testid="theme-locked">
               {tAppearance(APPEARANCE_KEYS.themeLocked)}
-            </CardDescription>
-          </CardHeader>
-        </Card>
+            </span>
+          }
+        />
         <LanguagePrefsCard />
         <DateTimePrefsCard />
         <MoneyPrefsCard />
@@ -826,7 +797,7 @@ export function AppearancePanel() {
   }
 
   return (
-    <div className="flex flex-col gap-4" data-testid="appearance-panel">
+    <div className="flex flex-col gap-3" data-testid="appearance-panel">
       <LanguagePrefsCard />
       <DateTimePrefsCard />
       <MoneyPrefsCard />

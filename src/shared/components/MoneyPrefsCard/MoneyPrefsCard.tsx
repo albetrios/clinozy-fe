@@ -17,13 +17,7 @@ import {
 } from '@/lib/i18n/locale.constants.ts';
 import { FieldLabel, OptionPills } from '@/shared/components/OptionPills/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -67,13 +61,13 @@ export function MoneyPrefsCard() {
   );
 
   return (
-    <Card data-testid={LOCALE_TEST_IDS.moneyCard}>
-      <CardHeader>
-        <CardTitle className="text-base">{t(LOCALE_KEYS.numberStyleHeading)}</CardTitle>
-        <CardDescription>{t(LOCALE_KEYS.numberStyleDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
-        <div className="flex flex-col gap-2">
+    <SettingsCard
+      data-testid={LOCALE_TEST_IDS.moneyCard}
+      title={t(LOCALE_KEYS.numberStyleHeading)}
+      description={t(LOCALE_KEYS.numberStyleDescription)}
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.numberStyleHeading)}</FieldLabel>
           <OptionPills
             ariaLabel={t(LOCALE_KEYS.numberStyleHeading)}
@@ -84,7 +78,7 @@ export function MoneyPrefsCard() {
             testPrefix="number-style"
           />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.currencyDisplayHeading)}</FieldLabel>
           <OptionPills
             ariaLabel={t(LOCALE_KEYS.currencyDisplayHeading)}
@@ -95,7 +89,7 @@ export function MoneyPrefsCard() {
             testPrefix="currency-display"
           />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <FieldLabel>{t(LOCALE_KEYS.currencyCodeHeading)}</FieldLabel>
           <Picker
             label={t(LOCALE_KEYS.currencyCodeHeading)}
@@ -110,7 +104,7 @@ export function MoneyPrefsCard() {
           />
         </div>
 
-        <div className="bg-muted/30 text-muted-foreground rounded-md border border-dashed px-3 py-2 text-xs">
+        <div className="bg-canvas text-muted-foreground-strong rounded-lg border border-dashed px-3 py-2 text-xs leading-[1.6] tabular-nums">
           <p>{t(LOCALE_KEYS.previewNumber, { value: previews.sampleNumber })}</p>
           <p>{t(LOCALE_KEYS.previewRelative, { value: previews.sampleRelative })}</p>
           <p>{t(LOCALE_KEYS.previewCurrency, { value: previews.sampleCurrency })}</p>
@@ -130,7 +124,7 @@ export function MoneyPrefsCard() {
             })}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

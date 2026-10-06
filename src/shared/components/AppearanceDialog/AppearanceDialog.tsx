@@ -2,7 +2,6 @@ import { Suspense, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { Skeleton } from '@/lib/animations/Skeleton.tsx';
 import { isMultiLocaleBuild } from '@/lib/i18n/build-runtime.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
@@ -11,6 +10,7 @@ import { useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PickerLayerContext } from '@/shared/components/Picker/picker-layer.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useEscapeLayer } from '@/shared/hooks/useEscapeLayer/index.ts';
@@ -59,15 +59,22 @@ function AppearanceContent() {
     >
       <Suspense
         fallback={
-          <div data-testid="appearance-dialog-pending" className="flex flex-col gap-4">
+          <div data-testid="appearance-dialog-pending" className="flex flex-col gap-3">
             <output className="sr-only">{tLocale(LOCALE_KEYS.loading)}</output>
+            {/* The cards' own frame and head, their pills as flat bars. */}
             {sections.map((section) => (
-              <div key={section} className="flex flex-col gap-3">
-                <h3 className="text-base font-semibold">{tLocale(section)}</h3>
-                <div className="flex gap-2" aria-hidden="true">
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-8 w-16" />
+              <div
+                key={section}
+                data-slot="card"
+                className="bg-card flex flex-col gap-3 rounded-xl border p-(--step-pad)"
+              >
+                <h3 className="text-field leading-[1.3] font-semibold">
+                  {tLocale(section)}
+                </h3>
+                <div className="flex gap-1.5" aria-hidden="true">
+                  <SkeletonBar shape="field" className="h-7 w-16" />
+                  <SkeletonBar shape="field" className="h-7 w-16" />
+                  <SkeletonBar shape="field" className="h-7 w-16" />
                 </div>
               </div>
             ))}
@@ -81,7 +88,10 @@ function AppearanceContent() {
 }
 
 /**
- * Dedicated Appearance popup — a NON-MODAL side panel pinned to the right edge.
+ * Dedicated Appearance popup — a NON-MODAL side panel pinned to the inline-end
+ * edge, in the launch's panel language: 12px corners, the panel elevation (its
+ * `popover-content` slot), a hairline-edged head in the 15px title step, and the
+ * settings cards on the canvas beneath it.
  * No scrim, no focus trap, no scroll lock: the page behind stays fully visible +
  * interactive while you tweak the theme. Sits above modals and any other layer
  * (z-80, pointer-events re-enabled), and is mounted at the route root, so it works
@@ -142,14 +152,17 @@ export function AppearanceDialog() {
       aria-labelledby="appearance-popover-title"
       data-testid="appearance-dialog"
       data-slot="popover-content"
-      className="bg-popover text-popover-foreground border-border animate-in slide-in-from-end-2 fade-in rtl:slide-in-from-start-2 pointer-events-auto fixed end-3 top-3 z-[80] flex max-h-[calc(100dvh-1.5rem)] w-[min(100vw-1.5rem,480px)] flex-col overflow-hidden rounded-md border transition"
+      className="bg-popover text-popover-foreground border-border animate-in slide-in-from-end-2 fade-in rtl:slide-in-from-start-2 pointer-events-auto fixed end-3 top-3 z-[80] flex max-h-[calc(100dvh-1.5rem)] w-[min(100vw-1.5rem,480px)] flex-col overflow-hidden rounded-xl border transition"
     >
-      <div className="border-border flex items-start justify-between gap-3 border-b px-5 py-3">
-        <div className="space-y-0.5">
-          <h2 id="appearance-popover-title" className="text-sm font-semibold">
+      <div className="border-border flex items-start justify-between gap-3 border-b px-(--drawer-pad-x) py-3.5">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <h2
+            id="appearance-popover-title"
+            className="text-title leading-[1.3] font-semibold tracking-[-0.01em]"
+          >
             {tSettings(APPEARANCE_DIALOG_KEYS.title)}
           </h2>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground text-xs leading-[1.45]">
             {tSettings(APPEARANCE_DIALOG_KEYS.description)}
           </p>
         </div>
@@ -176,7 +189,7 @@ export function AppearanceDialog() {
           </button>
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+      <div className="bg-canvas min-h-0 flex-1 overflow-y-auto px-(--drawer-pad-x) py-4">
         {/* The panel sits at z-80, over the app's overlays: its pickers open above it. */}
         <PickerLayerContext value="raised">
           <AppearanceContent />
