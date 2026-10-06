@@ -142,7 +142,8 @@
       "nameLabel": "조직 이름",
       "slugLabel": "워크스페이스 URL (선택)",
       "submit": "조직 만들기",
-      "submitting": "만드는 중…"
+      "submitting": "만드는 중…",
+      "cancel": "취소"
     },
     "theme": {
       "light": "라이트",

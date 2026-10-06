@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -8,21 +8,13 @@ import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
 import { isInvitableRole, leastPrivilegeRoleId } from '@/shared/api/clinic/users-api.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/shared/components/ui/dialog.tsx';
 import { useInviteMember } from '@/shared/hooks/useInvitations/index.ts';
 import { useRoles } from '@/shared/hooks/useRoles/index.ts';
 import { UserPlus } from '@/shared/icons/index.ts';
@@ -34,16 +26,24 @@ const inviteSchema = z.object({
 
 type InviteInput = z.infer<typeof inviteSchema>;
 
+/** Email and role: the light 560px drawer (`_patterns.md:28`). */
+const INVITE_FORM_PROFILE = { fieldCount: 2 } as const;
+
 /**
- * Dialog + form for inviting a new member to the active organization. Roles come
- * from the org's real role set (`role_id` is required by clinozy-be's add-member
- * endpoint), so a freshly-created org — which only has the system Owner role —
- * shows a "create a role first" hint instead of an unusable form. Gated by the
- * caller (render only when the user holds `invitation:manage`).
+ * Drawer + form for inviting a new member to the active organization — a child
+ * drawer stacked on Settings › Members (L-65), whose Back returns there. Roles
+ * come from the org's real role set (`role_id` is required by clinozy-be's
+ * add-member endpoint), so a freshly-created org — which only has the system
+ * Owner role — shows a "create a role first" hint instead of an unusable form.
+ * Gated by the caller (render only when the user holds `invitation:manage`).
  */
 export function InviteMemberDialog() {
   const { t } = useTranslation(SETTINGS_NS);
   const [open, setOpen] = useState(false);
+  // The email takes focus on open, as it did when this was a dialog.
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  /** The form the footer's Send submits — Enter in the email sends too. */
+  const formId = `invite-form-${useId().replace(/:/g, '')}`;
   const invite = useInviteMember();
   const roles = useRoles();
   const invitableRoles = (roles.rows ?? []).filter(isInvitableRole);
@@ -62,6 +62,7 @@ export function InviteMemberDialog() {
     resolver: zodResolver(inviteSchema),
     defaultValues: { email: '', roleId: '' },
   });
+  const { ref: registerEmailRef, ...emailField } = register('email');
 
   // Preselect the least-privileged well-known role once the list loads. Only
   // while the field is UNTOUCHED: this effect re-runs whenever that id changes,
@@ -79,6 +80,7 @@ export function InviteMemberDialog() {
     setOpen(false);
   };
 
+  const showForm = !roles.isPending && hasRoles;
   let body: ReactNode;
   if (roles.isPending) {
     body = (
@@ -89,6 +91,7 @@ export function InviteMemberDialog() {
   } else if (hasRoles) {
     body = (
       <form
+        id={formId}
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-4"
         data-testid="invite-member-form"
@@ -107,7 +110,11 @@ export function InviteMemberDialog() {
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'invite-email-error' : undefined}
             data-testid="invite-member-email"
-            {...register('email')}
+            {...emailField}
+            ref={(node) => {
+              registerEmailRef(node);
+              emailRef.current = node;
+            }}
           />
         </DrawerField>
 
@@ -142,16 +149,6 @@ export function InviteMemberDialog() {
               chosen, and `handleSubmit` then blocks the send: the field says
               why (its error line), as the Email field above always has. */}
         </DrawerField>
-
-        <DialogFooter>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            data-testid="invite-member-submit"
-          >
-            {isSubmitting ? 'Sending…' : 'Send invitation'}
-          </Button>
-        </DialogFooter>
       </form>
     );
   } else if (roles.isError) {
@@ -174,32 +171,35 @@ export function InviteMemberDialog() {
           <span className="text-foreground font-medium">Roles</span> tab, then come back
           here.
         </p>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Close
-          </Button>
-        </DialogFooter>
       </div>
     );
   }
 
+  // Send sits in the drawer's footer while the form shows; every other state
+  // (loading, a failed read, no role to assign) offers only Back.
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" data-testid="invite-member-open">
-          <UserPlus className="size-4" />
-          Invite member
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Invite a member</DialogTitle>
-          <DialogDescription>
-            Send an email invitation to join this organization.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Button size="sm" onClick={() => setOpen(true)} data-testid="invite-member-open">
+        <UserPlus className="size-4" />
+        Invite member
+      </Button>
+      <RecordDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Invite a member"
+        sub="Send an email invitation to join this organization."
+        content={INVITE_FORM_PROFILE}
+        stacked
+        initialFocusRef={emailRef}
+        saveLabel="Send invitation"
+        savingLabel="Sending…"
+        saveFormId={showForm ? formId : undefined}
+        saveState={isSubmitting ? 'saving' : 'idle'}
+        saveTestId="invite-member-submit"
+        testId="invite-member-dialog"
+      >
         {body}
-      </DialogContent>
-    </Dialog>
+      </RecordDrawer>
+    </>
   );
 }

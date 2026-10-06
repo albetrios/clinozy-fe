@@ -142,7 +142,8 @@
       "nameLabel": "संगठन का नाम",
       "slugLabel": "वर्कस्पेस URL (वैकल्पिक)",
       "submit": "संगठन बनाएँ",
-      "submitting": "बनाया जा रहा है…"
+      "submitting": "बनाया जा रहा है…",
+      "cancel": "रद्द करें"
     },
     "theme": {
       "light": "लाइट",

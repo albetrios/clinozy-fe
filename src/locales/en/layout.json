@@ -142,7 +142,8 @@
       "nameLabel": "Organization name",
       "slugLabel": "Workspace URL (optional)",
       "submit": "Create organization",
-      "submitting": "Creating…"
+      "submitting": "Creating…",
+      "cancel": "Cancel"
     },
     "theme": {
       "light": "Light",

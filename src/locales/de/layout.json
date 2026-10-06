@@ -142,7 +142,8 @@
       "nameLabel": "Name der Organisation",
       "slugLabel": "Workspace-URL (optional)",
       "submit": "Organisation erstellen",
-      "submitting": "Wird erstellt…"
+      "submitting": "Wird erstellt…",
+      "cancel": "Abbrechen"
     },
     "theme": {
       "light": "Hell",

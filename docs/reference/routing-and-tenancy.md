@@ -205,7 +205,7 @@ Copy-link reproduces page + drawer, refresh survives, back/Esc closes.
 (`min(1040px, 100vw − 56px)`), the full screen below, where the section switch (the
 `Picker`) stands in for the rail. Its header reads "Settings" under the floating ×; there is no
 footer, because every section saves itself. The forms Settings opens — API key, webhook,
-delivery history, two-factor setup, passkey, step-up — stack on it as child
+delivery history, two-factor setup, passkey, step-up, new role, invite — stack on it as child
 drawers whose Back returns to Settings. The unit keeps its name (`SettingsModal`,
 `SettingsModalLazy`) and its `settings-modal` test id.
 

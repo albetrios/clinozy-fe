@@ -142,7 +142,8 @@
       "nameLabel": "組織名",
       "slugLabel": "ワークスペース URL（任意）",
       "submit": "組織を作成",
-      "submitting": "作成中…"
+      "submitting": "作成中…",
+      "cancel": "キャンセル"
     },
     "theme": {
       "light": "ライト",

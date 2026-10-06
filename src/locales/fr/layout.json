@@ -142,7 +142,8 @@
       "nameLabel": "Nom de l’organisation",
       "slugLabel": "URL de l’espace (facultatif)",
       "submit": "Créer une organisation",
-      "submitting": "Création…"
+      "submitting": "Création…",
+      "cancel": "Annuler"
     },
     "theme": {
       "light": "Clair",

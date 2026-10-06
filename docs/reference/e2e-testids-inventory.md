@@ -498,31 +498,41 @@ it may have been deleted"); an unknown path inside the organization goes to the 
 | `settings-members-open-users`               | Settings › Members' link to the Team once Users holds it      | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
 | `settings-roles-open-users`                 | Settings › Roles' link to Users › Roles & access (D17)        | `shared/components/SettingsModal/organization/UsersRoomLink.tsx`   |
 
-## Settings' child drawers (L-65)
+## Settings' child drawers and the platform drawers (L-65)
 
 Every centred dialog became a `RecordDrawer` (L-65). The forms Settings opens stack on it as
-child drawers whose dismiss reads "Back". Each keeps the ids its dialog had and moves the content id onto the drawer root; every
+child drawers whose dismiss reads "Back"; Create organization opens from the org switcher and the
+picker. Each keeps the ids its dialog had and moves the content id onto the drawer root; every
 drawer also derives `<root>-title`, `<root>-close` (the ×), `<root>-body` and `<root>-footer`,
 and its dismiss is `<root>-dismiss` unless named below.
 
-| Test ID                                                                             | Element                                                                        | Source                                                         |
-| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| `apikey-create-open`                                                                | Integrations' "Create API key" (opens the drawer)                              | `SettingsModal/organization/ApiKeyCreateDialog.tsx`            |
-| `apikey-create-dialog`                                                              | API key drawer root (stacked on Settings)                                      | `ApiKeyCreateDialog.tsx`                                       |
-| `apikey-name` / `apikey-expiry` / `apikey-scope-<code>` / `apikey-error`            | Its fields and the inline error                                                | `ApiKeyCreateDialog.tsx`                                       |
-| `apikey-create` / `apikey-cancel`                                                   | Footer primary ("Create API key" / "Creating…") and Back                       | `ApiKeyCreateDialog.tsx`                                       |
-| `apikey-secret` / `apikey-secret-copy` / `apikey-secret-ack` / `apikey-secret-done` | The one-time reveal (no footer; Done held until acknowledged)                  | `ApiKeyCreateDialog.tsx`                                       |
-| `webhook-form-dialog`                                                               | Webhook drawer root (add / edit)                                               | `SettingsModal/organization/WebhookFormDialog.tsx`             |
-| `webhook-url` / `webhook-event-<event>` / `webhook-error`                           | Its fields and the inline error                                                | `WebhookFormDialog.tsx`                                        |
-| `webhook-save` / `webhook-cancel`                                                   | Footer primary and Back                                                        | `WebhookFormDialog.tsx`                                        |
-| `webhook-attempts-dialog`                                                           | Delivery history drawer root (read-only)                                       | `SettingsModal/organization/WebhookDeliveryAttemptsDialog.tsx` |
-| `webhook-attempts-list` / `-loading` / `-error` / `webhook-attempts-close`          | The list, its flat-bar loading, its retry, and Back                            | `WebhookDeliveryAttemptsDialog.tsx`                            |
-| `mfa-setup-dialog`                                                                  | Two-factor setup drawer root                                                   | `SettingsModal/account/AccountSecurityPanel.tsx`               |
-| `mfa-qr` / `mfa-secret` / `mfa-copy-secret` / `mfa-code` / `mfa-verify`             | QR, secret, copy, the code and "Verify & enable" (the codes' Done: `mfa-done`) | `AccountSecurityPanel.tsx`                                     |
-| `passkey-add-dialog` / `passkey-name` / `passkey-add-submit`                        | Add passkey drawer root, its name and "Add passkey"                            | `AccountSecurityPanel.tsx`                                     |
-| `step-up-dialog`                                                                    | Re-authentication drawer root (stacked on what asked)                          | `shared/components/StepUpDialog/StepUpDialog.tsx`              |
-| `step-up-password` / `step-up-code` / `step-up-resend` / `step-up-sent-to`          | The factor's field, resend and the "we emailed" line                           | `StepUpDialog.tsx`                                             |
-| `step-up-loading` / `step-up-error` / `step-up-submit`                              | Flat-bar loading, the error card and "Verify" (submits the form)               | `StepUpDialog.tsx`                                             |
+| Test ID                                                                                   | Element                                                                        | Source                                                                    |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `apikey-create-open`                                                                      | Integrations' "Create API key" (opens the drawer)                              | `SettingsModal/organization/ApiKeyCreateDialog.tsx`                       |
+| `apikey-create-dialog`                                                                    | API key drawer root (stacked on Settings)                                      | `ApiKeyCreateDialog.tsx`                                                  |
+| `apikey-name` / `apikey-expiry` / `apikey-scope-<code>` / `apikey-error`                  | Its fields and the inline error                                                | `ApiKeyCreateDialog.tsx`                                                  |
+| `apikey-create` / `apikey-cancel`                                                         | Footer primary ("Create API key" / "Creating…") and Back                       | `ApiKeyCreateDialog.tsx`                                                  |
+| `apikey-secret` / `apikey-secret-copy` / `apikey-secret-ack` / `apikey-secret-done`       | The one-time reveal (no footer; Done held until acknowledged)                  | `ApiKeyCreateDialog.tsx`                                                  |
+| `webhook-form-dialog`                                                                     | Webhook drawer root (add / edit)                                               | `SettingsModal/organization/WebhookFormDialog.tsx`                        |
+| `webhook-url` / `webhook-event-<event>` / `webhook-error`                                 | Its fields and the inline error                                                | `WebhookFormDialog.tsx`                                                   |
+| `webhook-save` / `webhook-cancel`                                                         | Footer primary and Back                                                        | `WebhookFormDialog.tsx`                                                   |
+| `webhook-attempts-dialog`                                                                 | Delivery history drawer root (read-only)                                       | `SettingsModal/organization/WebhookDeliveryAttemptsDialog.tsx`            |
+| `webhook-attempts-list` / `-loading` / `-error` / `webhook-attempts-close`                | The list, its flat-bar loading, its retry, and Back                            | `WebhookDeliveryAttemptsDialog.tsx`                                       |
+| `mfa-setup-dialog`                                                                        | Two-factor setup drawer root                                                   | `SettingsModal/account/AccountSecurityPanel.tsx`                          |
+| `mfa-qr` / `mfa-secret` / `mfa-copy-secret` / `mfa-code` / `mfa-verify`                   | QR, secret, copy, the code and "Verify & enable" (the codes' Done: `mfa-done`) | `AccountSecurityPanel.tsx`                                                |
+| `passkey-add-dialog` / `passkey-name` / `passkey-add-submit`                              | Add passkey drawer root, its name and "Add passkey"                            | `AccountSecurityPanel.tsx`                                                |
+| `step-up-dialog`                                                                          | Re-authentication drawer root (stacked on what asked)                          | `shared/components/StepUpDialog/StepUpDialog.tsx`                         |
+| `step-up-password` / `step-up-code` / `step-up-resend` / `step-up-sent-to`                | The factor's field, resend and the "we emailed" line                           | `StepUpDialog.tsx`                                                        |
+| `step-up-loading` / `step-up-error` / `step-up-submit`                                    | Flat-bar loading, the error card and "Verify" (submits the form)               | `StepUpDialog.tsx`                                                        |
+| `role-create-open` / `role-create-dialog` / `role-create-form`                            | "New role", the role drawer root and its form                                  | `shared/components/CreateRoleDialog/CreateRoleDialog.tsx`                 |
+| `role-create-name` / `role-create-description` / `role-perm-<code>` / `role-edit-loading` | Its fields and the edit form's flat-bar loading                                | `CreateRoleDialog.tsx`                                                    |
+| `role-create-submit`                                                                      | Footer primary (submits the form)                                              | `CreateRoleDialog.tsx`                                                    |
+| `invite-member-open` / `invite-member-dialog` / `invite-member-form`                      | "Invite member", the invite drawer root and its form                           | `shared/components/InviteMemberDialog/InviteMemberDialog.tsx`             |
+| `invite-member-email` / `invite-member-role` / `invite-member-submit`                     | Its fields and "Send invitation" (submits the form)                            | `InviteMemberDialog.tsx`                                                  |
+| `invite-member-loading` / `invite-member-roles-error` / `invite-member-no-roles`          | Roles loading, a failed read, no role to assign (footer: Back only)            | `InviteMemberDialog.tsx`                                                  |
+| `create-organization-dialog`                                                              | Create organization drawer root (switcher and picker)                          | `shared/components/CreateOrganizationDialog/CreateOrganizationDialog.tsx` |
+| `create-organization-dialog-form` / `-name` / `-slug` / `-name-error` / `-slug-error`     | Its form, fields and errors                                                    | `CreateOrganizationDialog.tsx`                                            |
+| `create-organization-dialog-submit` / `create-organization-dialog-dismiss`                | "Create organization" (submits the form) and "Cancel"                          | `CreateOrganizationDialog.tsx`                                            |
 
 ## Shared pickers (`shared/components/Picker/`)
 

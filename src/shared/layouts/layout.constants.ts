@@ -117,6 +117,11 @@ export const LAYOUT_KEYS = {
       slugLabel: 'app.orgCreate.slugLabel',
       submit: 'app.orgCreate.submit',
       submitting: 'app.orgCreate.submitting',
+      /**
+       * The drawer's own "Cancel": it also opens over the organization picker,
+       * outside the org shell, where the drawers' shared `clinic` copy is not loaded.
+       */
+      cancel: 'app.orgCreate.cancel',
     },
     workspaceSwitch: {
       preparing: 'app.workspaceSwitch.preparing',

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { CreateOrganizationDialog } from './CreateOrganizationDialog.tsx';
@@ -58,6 +59,54 @@ describe('CreateOrganizationDialog', () => {
       name: 'New Org',
       slug: 'new-org',
     });
+  });
+
+  it('is a drawer: named, Cancel and Create in its footer, the name focused', async () => {
+    const onOpenChange = vi.fn();
+    renderWithProviders(<CreateOrganizationDialog open onOpenChange={onOpenChange} />);
+
+    const drawer = await screen.findByTestId('create-organization-dialog');
+    expect(screen.getByRole('dialog', { name: 'Create organization' })).toBe(drawer);
+    const submit = screen.getByTestId('create-organization-dialog-submit');
+    expect(submit).toHaveTextContent('Create organization');
+    // It submits the form, so Enter in either field creates too.
+    expect(submit).toHaveAttribute('type', 'submit');
+    expect(submit).toHaveAttribute(
+      'form',
+      screen.getByTestId('create-organization-dialog-form').id,
+    );
+    await vi.waitFor(() =>
+      expect(screen.getByTestId('create-organization-dialog-name')).toHaveFocus(),
+    );
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    // Its own "Cancel" (layout copy — it also opens over the picker, outside the shell).
+    const cancel = screen.getByTestId('create-organization-dialog-dismiss');
+    expect(cancel).toHaveTextContent('Cancel');
+    cancel.click();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('holds every exit and reads "Creating…" while the create runs', async () => {
+    createOrganization.mockReturnValue(new Promise(() => {}));
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    renderWithProviders(<CreateOrganizationDialog open onOpenChange={onOpenChange} />);
+
+    await user.type(
+      await screen.findByTestId('create-organization-dialog-name'),
+      'New Org',
+    );
+    await user.click(screen.getByTestId('create-organization-dialog-submit'));
+
+    await vi.waitFor(() =>
+      expect(screen.getByTestId('create-organization-dialog-submit')).toHaveTextContent(
+        'Creating…',
+      ),
+    );
+    expect(screen.getByTestId('create-organization-dialog-dismiss')).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('creates the organization and navigates to its home', async () => {
