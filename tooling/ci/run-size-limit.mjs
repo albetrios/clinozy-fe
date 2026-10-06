@@ -32,7 +32,7 @@ if (jsPaths.length === 0) {
 }
 
 // Budgets are a RATCHET (same philosophy as coverage thresholds): pinned just
-// above the measured first-paint size (JS ~247 kB gz, CSS ~39 kB gz) so any
+// above the measured first-paint size (JS ~237 kB gz, CSS ~36 kB gz) so any
 // regression trips CI immediately — lower as the bundle shrinks, never raise
 // to absorb growth.
 //
@@ -247,8 +247,21 @@ const config = [
      * "Navigation" group, and the English copy only those used; the `/dashboard`
      * redirect and the org home's empty state (one `roomRoute` name) came
      * back. ~0.3 kB of headroom.
+     *
+     * 247.1 → 237 kB, lowered (L-65, the theme studio retired): measured
+     * 236.61 kB, from 246.07 kB on main (928f9b21). What left the first paint:
+     * the studio engine the theme store loaded at boot — the named presets,
+     * the generated looks with their seeded generator and OKLCH maths, the
+     * per-axis catalogs, Shuffle, the seed and its `?theme=` reader, the
+     * store's axis setters and its v1–v7 migrations — the icon registry
+     * (`makeIcon` and the Tabler / Phosphor set loader; the barrel exports
+     * Lucide directly now), the boot palette's release, and the edge handle
+     * the root mounted for Appearance. The Appearance drawer, the confirm frame
+     * and the shortcuts drawer stay off it (`appearance-dialog.constants.test.ts`
+     * pins the drawer's modules out of the entry). Not attributed per item;
+     * ~0.4 kB of headroom.
      */
-    limit: '247.1 kB',
+    limit: '237 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -391,8 +404,17 @@ const config = [
            * `carousel` and `table` primitives only they used, and the carousel
            * arrows' two Sharp-shape slots in `index.css`; the org home's empty
            * state reuses `EmptyState`'s look. ~0.3 kB of headroom.
+           *
+           * 39.6 → 35.9 kB, lowered (L-65): measured 35.53 kB, from 36.61 kB on
+           * main (928f9b21 — one app shell had already taken it below 39.34).
+           * What left with the theme studio: the four accent presets' light and
+           * dark blocks (`violet`, `emerald`, `rose`, `ocean`) and the
+           * swatch dots, the Tabler half of the icon-colour rules, the edge
+           * handle's slot, and the Appearance studio's controls — Tailwind emits
+           * a file's classes whether or not anything mounts it. ~0.4 kB of
+           * headroom.
            */
-          limit: '39.6 kB',
+          limit: '35.9 kB',
           gzip: true,
         },
       ]
