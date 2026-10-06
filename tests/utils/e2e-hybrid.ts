@@ -25,6 +25,7 @@ export const LAYOUT_LABELS = {
   userMenu: / · (online|away|busy)$/i,
   accountMenu: /^account$/i,
   notifications: /notification/i,
+  appearanceRow: /^appearance & language$/i,
 } as const;
 
 /**
@@ -253,6 +254,20 @@ export async function openAccountMenu(page: Page): Promise<void> {
   await expect(page.getByTestId('account-menu')).toBeVisible();
   // a11y guard: the menu is exposed as "Account".
   await expect(page.getByRole('menu', { name: LAYOUT_LABELS.accountMenu })).toBeVisible();
+}
+
+/**
+ * Opens the Appearance drawer from the Account menu's "Appearance & language"
+ * row (the old right-edge handle is gone) and waits for its cards.
+ */
+export async function openAppearanceDrawer(page: Page): Promise<void> {
+  await openAccountMenu(page);
+  // a11y guard: the row is a labelled menu item.
+  await expect(
+    page.getByRole('menuitem', { name: LAYOUT_LABELS.appearanceRow }),
+  ).toBeVisible();
+  await clickTestId(page, 'account-menu-appearance');
+  await expect(page.getByTestId('appearance-panel')).toBeVisible({ timeout: 10_000 });
 }
 
 /** Opens the notification center — the Account menu's Notifications row (the section bar has no bell). */

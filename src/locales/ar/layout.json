@@ -162,6 +162,7 @@
       "billing": "الفوترة",
       "devices": "الأجهزة",
       "appearance": "المظهر",
+      "appearanceLanguage": "المظهر واللغة",
       "viewAs": {
         "previewing": "معاينة بصفة {{role}}",
         "noSections": "لا توجد أقسام",

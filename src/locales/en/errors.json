@@ -34,7 +34,6 @@
     "appearance": "Appearance",
     "sessionTimeout": "Session timer",
     "securityCheck": "Security check",
-    "appearanceControls": "Appearance controls",
     "payment": "Payment",
     "cancellation": "Cancellation"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "Could not copy to clipboard",
-      "themeCodeNumeric": "Enter a numeric theme code",
       "copySuccess": "Account ID copied",
-      "themeLinkCopied": "Theme link copied",
-      "themeLinkCopiedDescription": "Share this URL to reproduce the look.",
       "accountDeletionPending": "Account deleted. Signing you out…",
       "avatarInvalidType": "Please choose an image file.",
       "avatarTooLarge": "Avatar must be under 2 MB.",

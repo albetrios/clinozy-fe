@@ -1,3 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -10,36 +14,55 @@ import {
   APPEARANCE_DIALOG_NS,
 } from './appearance-dialog.constants.ts';
 
-describe('appearance dialog header keys', () => {
-  // The dialog is mounted on the ROOT route, so it ships in the entry chunk.
-  // Reading these three strings off `SETTINGS_KEYS` dragged that module's whole
+const here = dirname(fileURLToPath(import.meta.url));
+
+/** Every module the root route reaches through this folder's lazy shell. */
+const ENTRY_FILES = [
+  'index.ts',
+  'AppearanceDialogLazy.tsx',
+  'appearance-dialog-pending.tsx',
+  'appearance-dialog-loader.ts',
+  'appearance-dialog.constants.ts',
+  'appearance.constants.ts',
+];
+
+describe('appearance drawer header keys', () => {
+  // The placeholder is mounted on the ROOT route, so it ships in the entry
+  // chunk. Reading these strings off `SETTINGS_KEYS` dragged that module's whole
   // key table (~17 kB of source) onto the first paint of every load — so they
   // are declared locally. This is the other half of that trade: they must stay
-  // identical to the originals, or the dialog and the Settings section that
-  // share the panel start showing different copy.
-  it('match the Settings panel they duplicate', () => {
+  // identical to the originals.
+  it('match the Settings panel keys they duplicate', () => {
     expect(APPEARANCE_DIALOG_KEYS).toEqual(SETTINGS_KEYS.panels.appearance);
     expect(APPEARANCE_DIALOG_NS).toBe(SETTINGS_NS);
   });
 });
 
-describe('appearance dialog — the entry chunk', () => {
-  it('does not import the settings key table', async () => {
-    const { readFileSync } = await import('node:fs');
-    const { dirname, join } = await import('node:path');
-    const { fileURLToPath } = await import('node:url');
-    const here = dirname(fileURLToPath(import.meta.url));
-
-    // Every module the root route reaches through this folder's lazy shell.
-    for (const file of [
-      'AppearanceDialog.tsx',
-      'AppearanceDialogLazy.tsx',
-      'appearance.constants.ts',
-      'appearance-dialog.constants.ts',
-      'index.ts',
-    ]) {
+describe('appearance drawer — the entry chunk', () => {
+  it('does not import the settings key table', () => {
+    for (const file of ENTRY_FILES) {
       const source = readFileSync(join(here, file), 'utf8');
       expect(source, file).not.toContain('SettingsModal/settings.constants');
     }
+  });
+
+  it('reaches the drawer, the record drawer and the panel only through the loader', () => {
+    // Initial JS has well under a kilobyte of headroom: one static import of the
+    // drawer would put the record drawer (and everything under it) on every
+    // first paint. The loader's dynamic import() is the one way in.
+    for (const file of ENTRY_FILES) {
+      const source = readFileSync(join(here, file), 'utf8');
+      const staticImports = [...source.matchAll(/^import[^;]*?from '([^']+)'/gms)].map(
+        (match) => match[1],
+      );
+      for (const path of staticImports) {
+        expect(path, `${file} imports ${path}`).not.toMatch(
+          /AppearanceDialog\.tsx$|AppearancePanel\.tsx$|RecordDrawer\/(index|RecordDrawer)\.tsx?$/,
+        );
+      }
+    }
+    expect(readFileSync(join(here, 'appearance-dialog-loader.ts'), 'utf8')).toContain(
+      "import('./AppearanceDialog.tsx')",
+    );
   });
 });

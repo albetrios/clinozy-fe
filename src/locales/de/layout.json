@@ -162,6 +162,7 @@
       "billing": "Abrechnung",
       "devices": "Geräte",
       "appearance": "Darstellung",
+      "appearanceLanguage": "Darstellung & Sprache",
       "viewAs": {
         "previewing": "Vorschau als {{role}}",
         "noSections": "Keine Bereiche",

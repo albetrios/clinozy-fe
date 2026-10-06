@@ -162,6 +162,7 @@
       "billing": "बिलिंग",
       "devices": "डिवाइस",
       "appearance": "दिखावट",
+      "appearanceLanguage": "दिखावट और भाषा",
       "viewAs": {
         "previewing": "{{role}} के रूप में पूर्वावलोकन",
         "noSections": "कोई अनुभाग नहीं",

@@ -34,7 +34,6 @@
     "appearance": "모양",
     "sessionTimeout": "세션 타이머",
     "securityCheck": "보안 확인",
-    "appearanceControls": "모양 컨트롤",
     "payment": "결제",
     "cancellation": "해지"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "클립보드에 복사할 수 없습니다",
-      "themeCodeNumeric": "숫자 테마 코드를 입력하세요",
       "copySuccess": "계정 ID가 복사됨",
-      "themeLinkCopied": "테마 링크가 복사됨",
-      "themeLinkCopiedDescription": "이 URL을 공유해 외관을 재현하세요.",
       "accountDeletionPending": "계정이 삭제됨. 로그아웃 중…",
       "avatarInvalidType": "이미지 파일을 선택해 주세요.",
       "avatarTooLarge": "아바타는 2MB 미만이어야 합니다.",

@@ -44,11 +44,15 @@ export function RecordDrawerClose({
   closeStyle = 'record',
   onClose,
   testId,
+  closeTestId = `${testId}-close`,
 }: {
   placement: 'floating' | 'inside';
   closeStyle?: 'record' | 'form';
   onClose: () => void;
+  /** The drawer's root test id; the × is `<testId>-close`… */
   testId: string;
+  /** …unless the specs already name it. */
+  closeTestId?: string;
 }) {
   // The shared "Close" name every dismiss button carries.
   const { t } = useTranslation(LOCALE_NS);
@@ -59,7 +63,7 @@ export function RecordDrawerClose({
         type="button"
         onClick={onClose}
         aria-label={label}
-        data-testid={`${testId}-close`}
+        data-testid={closeTestId}
         data-slot="button"
         className="text-foreground hover:bg-muted absolute end-2 top-2 flex size-11 items-center justify-center rounded-lg transition-colors"
       >
@@ -72,7 +76,7 @@ export function RecordDrawerClose({
       type="button"
       onClick={onClose}
       aria-label={label}
-      data-testid={`${testId}-close`}
+      data-testid={closeTestId}
       data-slot="floating-edge"
       className={cn(
         'bg-background hover:bg-muted animate-pop-in absolute top-[0.875rem] flex size-9 items-center justify-center transition-colors',

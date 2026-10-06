@@ -15,6 +15,7 @@ import {
   type DrawerSaveState,
 } from '@/shared/components/DrawerFooter/index.ts';
 import { type DrawerStep, DrawerSteps } from '@/shared/components/DrawerSteps/index.ts';
+import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import {
   type QuickFillItem,
   QuickFillRow,
@@ -251,6 +252,8 @@ export interface RecordDrawerProps {
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   /** Root test id; the parts derive theirs (`<testId>-save`, `-close` …). */
   testId?: string;
+  /** The ×'s test id where the specs already name it (`<testId>-close` by default). */
+  closeTestId?: string;
 }
 
 /** Title (focused on open) with its tag pill, the sub line, and the phone ×. */
@@ -670,8 +673,11 @@ export function RecordDrawer(props: RecordDrawerProps) {
       closeStyle={props.closeStyle}
       onClose={requestClose}
       testId={testId}
+      closeTestId={props.closeTestId}
     />
   );
+  // A lazy drawer whose placeholder already slid in does not slide in again.
+  const enter = useEnterAnimationProps();
   const aside = phone ? undefined : props.aside;
   // On a phone a column with panes is the drawer's second pane.
   const panes = phone ? props.aside?.panes : undefined;
@@ -725,14 +731,17 @@ export function RecordDrawer(props: RecordDrawerProps) {
       <SheetContent
         side="end"
         showCloseButton={false}
-        overlayClassName={RECORD_DRAWER_OVERLAY_CLASS}
+        overlayClassName={cn(
+          RECORD_DRAWER_OVERLAY_CLASS,
+          enter.style && 'data-[state=open]:animate-none',
+        )}
         data-testid={testId}
         // Without a sub line there is no description to point at.
         {...(props.sub ? {} : { 'aria-describedby': undefined })}
         onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={props.onEscapeKeyDown}
-        style={panelStyle(props.panelWidth, aside)}
+        style={{ ...panelStyle(props.panelWidth, aside), ...enter.style }}
         className={cn(
           RECORD_DRAWER_PANEL_CLASS,
           props.panelWidth === undefined

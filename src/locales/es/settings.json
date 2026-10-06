@@ -355,8 +355,7 @@
     },
     "appearance": {
       "title": "Apariencia",
-      "description": "Se guarda en este dispositivo: los cambios se aplican al instante.",
-      "shuffle": "Aleatorio"
+      "description": "Se guarda en este dispositivo: los cambios se aplican al instante."
     },
     "sessions": {
       "title": "Sesiones",

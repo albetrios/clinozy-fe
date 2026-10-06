@@ -1,12 +1,12 @@
-import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
-import { byTestId } from '@/tests/utils/e2e-hybrid.ts';
+import { openAppearanceDrawer } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
- * Locale & direction preferences through the Appearance panel — the 11-locale
+ * Locale & direction preferences through the Appearance drawer (the Account
+ * menu's "Appearance & language" row) — the 11-locale
  * i18n runtime had no E2E pin. Direction and language must apply live to
  * `<html>` and survive a reload (persisted store + pre-paint init script).
  */
@@ -18,22 +18,12 @@ test.describe('Locale & RTL preferences', () => {
     );
   });
 
-  async function openAppearance(page: Page) {
-    // The edge handle, by test id.
-    const handle = byTestId(page, 'floating-settings');
-    await expect(handle).toHaveAccessibleName(/open appearance/i);
-    await handle.click();
-    await expect(page.getByTestId('appearance-panel')).toBeVisible({
-      timeout: 10_000,
-    });
-  }
-
   test('forcing RTL flips the document live and auto restores it', async ({ page }) => {
     test.setTimeout(120_000);
     await registerNewUserAndGoToToday(page);
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
 
-    await openAppearance(page);
+    await openAppearanceDrawer(page);
     await page.getByTestId('text-direction-rtl').click();
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 
@@ -48,7 +38,7 @@ test.describe('Locale & RTL preferences', () => {
     // single-flight path now (`refreshAccessToken`), so a reload keeps the session.
     test.setTimeout(120_000);
     await registerNewUserAndGoToToday(page);
-    await openAppearance(page);
+    await openAppearanceDrawer(page);
     await page.getByTestId('text-direction-rtl').click();
     await page.keyboard.press('Escape');
 
@@ -63,7 +53,7 @@ test.describe('Locale & RTL preferences', () => {
     test.setTimeout(120_000);
     await registerNewUserAndGoToToday(page);
 
-    await openAppearance(page);
+    await openAppearanceDrawer(page);
     const arabic = page.getByTestId('language-ar');
     const pickerShown = await arabic
       .waitFor({ state: 'visible', timeout: 5_000 })

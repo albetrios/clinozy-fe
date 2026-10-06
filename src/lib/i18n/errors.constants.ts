@@ -45,7 +45,6 @@ export const ERRORS_KEYS = {
     appearance: 'widget.appearance',
     sessionTimeout: 'widget.sessionTimeout',
     securityCheck: 'widget.securityCheck',
-    appearanceControls: 'widget.appearanceControls',
     payment: 'widget.payment',
     cancellation: 'widget.cancellation',
   },
@@ -90,9 +89,6 @@ export const ERRORS_KEYS = {
     account: {
       copyFailed: 'frontend.account.copyFailed',
       copySuccess: 'frontend.account.copySuccess',
-      themeCodeNumeric: 'frontend.account.themeCodeNumeric',
-      themeLinkCopied: 'frontend.account.themeLinkCopied',
-      themeLinkCopiedDescription: 'frontend.account.themeLinkCopiedDescription',
       accountDeletionPending: 'frontend.account.accountDeletionPending',
       avatarInvalidType: 'frontend.account.avatarInvalidType',
       avatarTooLarge: 'frontend.account.avatarTooLarge',

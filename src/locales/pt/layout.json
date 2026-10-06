@@ -162,6 +162,7 @@
       "billing": "Cobrança",
       "devices": "Dispositivos",
       "appearance": "Aparência",
+      "appearanceLanguage": "Aparência e idioma",
       "viewAs": {
         "previewing": "Visualizando como {{role}}",
         "noSections": "Nenhuma seção",

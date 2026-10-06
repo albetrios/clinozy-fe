@@ -162,6 +162,7 @@
       "billing": "Fatturazione",
       "devices": "Dispositivi",
       "appearance": "Aspetto",
+      "appearanceLanguage": "Aspetto e lingua",
       "viewAs": {
         "previewing": "Anteprima come {{role}}",
         "noSections": "Nessuna sezione",

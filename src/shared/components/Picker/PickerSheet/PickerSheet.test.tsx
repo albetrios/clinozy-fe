@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PickerLayerContext } from '@/shared/components/Picker/picker-layer.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import { PickerSheet, type PickerSheetProps } from './PickerSheet.tsx';
@@ -34,28 +33,6 @@ beforeEach(() => {
 });
 
 describe('PickerSheet', () => {
-  it('opens at the overlays’ layer, and above them inside a raised surface', async () => {
-    const user = userEvent.setup();
-    const { unmount } = render(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-    expect(await screen.findByTestId('sheet')).not.toHaveClass('z-[90]');
-    unmount();
-
-    // The Appearance panel (z-80) provides `raised`: its lists open over it —
-    // the popover, and on a phone the sheet.
-    for (const at of ['desktop', 'phone'] as const) {
-      tier.current = at;
-      const view = render(
-        <PickerLayerContext value="raised">
-          <Harness />
-        </PickerLayerContext>,
-      );
-      await user.click(screen.getByRole('button', { name: 'Open' }));
-      expect(await screen.findByTestId('sheet')).toHaveClass('z-[90]');
-      view.unmount();
-    }
-  });
-
   it('is a popover from md up, named by its title, 6px below the trigger', async () => {
     tier.current = 'tablet';
     const user = userEvent.setup();

@@ -40,6 +40,7 @@ import {
   Monitor,
   MonitorSmartphone,
   Moon,
+  Palette,
   Settings,
   Shield,
   Sun,
@@ -308,9 +309,10 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
 /**
  * Header slot 10 and the Account menu (`shell.md:27, 56–62`; H:545–551,
  * H:4151): the avatar with its presence dot, then — identity (opens the
- * profile), "Switch clinic", Status, Appearance, the relocated platform rows
- * (Notifications, Settings, Security, Billing, Devices, Keyboard shortcuts)
- * and "Log out". The same popover on a phone (no phone override).
+ * profile), "Switch clinic", Status, Appearance (the mode pills, and the
+ * "Appearance & language" row that opens its drawer), the relocated platform
+ * rows (Notifications, Settings, Security, Billing, Devices, Keyboard
+ * shortcuts) and "Log out". The same popover on a phone (no phone override).
  */
 export function AccountMenu({
   onOpenNotifications,
@@ -392,6 +394,16 @@ export function AccountMenu({
         <StatusPills />
         <DropdownMenuSeparator className="m-0" />
         <AppearancePills />
+        {/* The rest of Appearance — the language, text direction, date-time and
+            number preferences — sits one tap away, in its drawer. */}
+        <div className="px-1.5 pb-1.5">
+          <MenuRow
+            icon={Palette}
+            label={t(keys.appearanceLanguage)}
+            testId="account-menu-appearance"
+            onSelect={() => useUIStore.getState().setAppearanceOpen(true)}
+          />
+        </div>
         <DropdownMenuSeparator className="m-0" />
         <PlatformRows
           onOpenNotifications={() => {

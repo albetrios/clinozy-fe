@@ -355,8 +355,7 @@
     },
     "appearance": {
       "title": "Aspetto",
-      "description": "Salvato su questo dispositivo: le modifiche sono immediate.",
-      "shuffle": "Casuale"
+      "description": "Salvato su questo dispositivo: le modifiche sono immediate."
     },
     "sessions": {
       "title": "Sessioni",

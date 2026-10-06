@@ -34,7 +34,6 @@
     "appearance": "Aspetto",
     "sessionTimeout": "Timer della sessione",
     "securityCheck": "Verifica di sicurezza",
-    "appearanceControls": "Controlli aspetto",
     "payment": "Pagamento",
     "cancellation": "Annullamento"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "Impossibile copiare negli appunti",
-      "themeCodeNumeric": "Inserisci un codice tema numerico",
       "copySuccess": "ID account copiato",
-      "themeLinkCopied": "Link del tema copiato",
-      "themeLinkCopiedDescription": "Condividi questo URL per riprodurre l'aspetto.",
       "accountDeletionPending": "Account eliminato. Disconnessione…",
       "avatarInvalidType": "Scegli un file immagine.",
       "avatarTooLarge": "L'avatar deve essere inferiore a 2 MB.",

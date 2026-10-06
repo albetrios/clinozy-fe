@@ -162,6 +162,7 @@
       "billing": "請求",
       "devices": "デバイス",
       "appearance": "外観",
+      "appearanceLanguage": "外観と言語",
       "viewAs": {
         "previewing": "{{role}} としてプレビュー中",
         "noSections": "セクションなし",

@@ -351,8 +351,7 @@
     },
     "appearance": {
       "title": "Appearance",
-      "description": "Saved on this device — changes apply live.",
-      "shuffle": "Shuffle"
+      "description": "Saved on this device — changes apply live."
     },
     "sessions": {
       "title": "Sessions",

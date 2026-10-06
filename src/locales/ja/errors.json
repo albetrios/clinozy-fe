@@ -34,7 +34,6 @@
     "appearance": "外観",
     "sessionTimeout": "セッションタイマー",
     "securityCheck": "セキュリティチェック",
-    "appearanceControls": "外観コントロール",
     "payment": "お支払い",
     "cancellation": "解約"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "クリップボードにコピーできませんでした",
-      "themeCodeNumeric": "数値のテーマコードを入力してください",
       "copySuccess": "アカウント ID をコピーしました",
-      "themeLinkCopied": "テーマリンクをコピーしました",
-      "themeLinkCopiedDescription": "この URL を共有して見た目を再現できます。",
       "accountDeletionPending": "アカウントを削除しました。サインアウト中…",
       "avatarInvalidType": "画像ファイルを選択してください。",
       "avatarTooLarge": "アバターは 2 MB 未満である必要があります。",

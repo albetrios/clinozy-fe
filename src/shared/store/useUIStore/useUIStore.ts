@@ -7,7 +7,7 @@ import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 interface UIStore {
   commandPaletteOpen: boolean;
   shortcutsOpen: boolean;
-  /** The dedicated Appearance dialog (opened by the floating handle / Customize). */
+  /** The Appearance drawer (opened from the Account menu's "Appearance & language" row). */
   appearanceOpen: boolean;
   /**
    * View-as (Users › Roles & access): the role whose access the clinic screens

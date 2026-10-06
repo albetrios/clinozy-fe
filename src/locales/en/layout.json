@@ -162,6 +162,7 @@
       "billing": "Billing",
       "devices": "Devices",
       "appearance": "Appearance",
+      "appearanceLanguage": "Appearance & language",
       "viewAs": {
         "previewing": "Previewing as {{role}}",
         "noSections": "No sections",

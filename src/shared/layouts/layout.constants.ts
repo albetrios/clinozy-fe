@@ -73,6 +73,8 @@ export const LAYOUT_KEYS = {
       billing: 'app.sectionBar.billing',
       devices: 'app.sectionBar.devices',
       appearance: 'app.sectionBar.appearance',
+      /** The row under the mode pills that opens the Appearance drawer. */
+      appearanceLanguage: 'app.sectionBar.appearanceLanguage',
       branch: {
         label: 'app.sectionBar.branch.label',
         title: 'app.sectionBar.branch.title',

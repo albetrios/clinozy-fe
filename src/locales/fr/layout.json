@@ -162,6 +162,7 @@
       "billing": "Facturation",
       "devices": "Appareils",
       "appearance": "Apparence",
+      "appearanceLanguage": "Apparence et langue",
       "viewAs": {
         "previewing": "Aperçu en tant que {{role}}",
         "noSections": "Aucune section",

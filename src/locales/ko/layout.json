@@ -162,6 +162,7 @@
       "billing": "결제",
       "devices": "기기",
       "appearance": "모양",
+      "appearanceLanguage": "모양 및 언어",
       "viewAs": {
         "previewing": "{{role}}(으)로 미리 보는 중",
         "noSections": "섹션 없음",

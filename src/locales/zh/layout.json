@@ -162,6 +162,7 @@
       "billing": "账单",
       "devices": "设备",
       "appearance": "外观",
+      "appearanceLanguage": "外观与语言",
       "viewAs": {
         "previewing": "正在以{{role}}身份预览",
         "noSections": "没有版块",

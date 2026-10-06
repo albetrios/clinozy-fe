@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
  * puts the contract in `index.css`, which jsdom cannot evaluate — hence a read
  * of the source, the same approach `theme/radius-shape-css.test.ts` takes.
  */
-const root = join(dirname(fileURLToPath(import.meta.url)), '../../../..');
+const root = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const css = readFileSync(join(root, 'src/index.css'), 'utf8');
 
 /** The stylesheet with comments stripped, so a rule quoted in prose can't pass. */
@@ -33,9 +33,9 @@ describe('Sentry feedback trigger placement', () => {
     expect(hidden).toBe(true);
   });
 
-  // Keyed on the OVERLAY, which is what marks a dialog modal. The Appearance
-  // panel has no scrim and leaves the page interactive, so nothing is being
-  // interrupted there and its trigger must survive.
+  // Keyed on the OVERLAY, which is what marks a surface modal: a popover or a
+  // menu has no scrim and leaves the page interactive, so nothing is being
+  // interrupted there and the trigger must survive.
   it('keys on the overlay, not the content, so non-modal panels keep it', () => {
     // Every block that hides the trigger — there is more than one (the consent
     // card claims the same corner below `sm`), so this asserts across all of

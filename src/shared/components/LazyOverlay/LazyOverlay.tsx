@@ -235,17 +235,16 @@ function LazyOverlayError({
         // Escape. Dropping the attributes was the other honest answer, but this
         // card sits on a `fixed inset-0` scrim that blocks every pointer route
         // to the page behind it — so a screen-reader user must not be able to
-        // browse out to content nobody else can reach. It IS a modal (unlike
-        // AppearanceDialog, which has no scrim and says `aria-modal="false"` for
-        // exactly that reason), so the claim is made true, not dropped.
+        // browse out to content nobody else can reach. It IS a modal, so the
+        // claim is made true, not dropped.
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         data-testid={testId ?? 'lazy-overlay-error'}
         // `data-slot="surface"` rather than a hardcoded depth utility: the
-        // elevation axis owns depth, so this card goes flat/soft/lifted with the
-        // theme instead of pinning one depth the Appearance picker cannot change.
+        // theme's elevation tokens own depth, so this card takes the look's own
+        // shadow instead of pinning one.
         data-slot="surface"
         className="bg-background flex w-full max-w-sm flex-col items-center gap-3 rounded-xl border p-6 text-center outline-none"
       >

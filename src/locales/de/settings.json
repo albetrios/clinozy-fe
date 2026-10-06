@@ -351,8 +351,7 @@
     },
     "appearance": {
       "title": "Darstellung",
-      "description": "Auf diesem Gerät gespeichert – Änderungen greifen sofort.",
-      "shuffle": "Zufall"
+      "description": "Auf diesem Gerät gespeichert – Änderungen greifen sofort."
     },
     "sessions": {
       "title": "Sitzungen",

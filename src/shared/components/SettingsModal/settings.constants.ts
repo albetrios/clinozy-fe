@@ -138,7 +138,6 @@ export const SETTINGS_KEYS = {
     appearance: {
       title: 'panels.appearance.title',
       description: 'panels.appearance.description',
-      shuffle: 'panels.appearance.shuffle',
     },
     members: {
       title: 'panels.members.title',

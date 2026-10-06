@@ -355,8 +355,7 @@
     },
     "appearance": {
       "title": "Apparence",
-      "description": "Enregistré sur cet appareil — les changements sont immédiats.",
-      "shuffle": "Aléatoire"
+      "description": "Enregistré sur cet appareil — les changements sont immédiats."
     },
     "sessions": {
       "title": "Sessions",

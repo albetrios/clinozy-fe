@@ -349,8 +349,7 @@
     },
     "appearance": {
       "title": "外观",
-      "description": "保存在此设备上，更改即时生效。",
-      "shuffle": "随机"
+      "description": "保存在此设备上，更改即时生效。"
     },
     "sessions": {
       "title": "会话",

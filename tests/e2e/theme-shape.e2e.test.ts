@@ -4,6 +4,7 @@ import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import {
   byTestId,
   expectLoginFormReady,
+  openAppearanceDrawer,
   openNotificationCenter,
 } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
@@ -162,9 +163,8 @@ test.describe('Square look — radius None + Sharp shape', () => {
       await page.keyboard.press('Escape');
       await expect(byTestId(page, 'settings-modal')).toHaveCount(0);
 
-      // The appearance panel — swatches, previews, every picker.
-      await byTestId(page, 'floating-settings').click();
-      await expect(byTestId(page, 'appearance-panel')).toBeVisible();
+      // The Appearance drawer — the mode tiles and every locale picker.
+      await openAppearanceDrawer(page);
       expect(await roundedElements(page)).toEqual([]);
       await page.keyboard.press('Escape');
       await expect(byTestId(page, 'appearance-panel')).toHaveCount(0);

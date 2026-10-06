@@ -34,7 +34,6 @@
     "appearance": "المظهر",
     "sessionTimeout": "مؤقّت الجلسة",
     "securityCheck": "فحص الأمان",
-    "appearanceControls": "عناصر المظهر",
     "payment": "الدفع",
     "cancellation": "الإلغاء"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "تعذّر النسخ إلى الحافظة",
-      "themeCodeNumeric": "أدخل رمز مظهر رقميًا",
       "copySuccess": "تم نسخ معرّف الحساب",
-      "themeLinkCopied": "تم نسخ رابط المظهر",
-      "themeLinkCopiedDescription": "شارك هذا الرابط لإعادة إنتاج المظهر.",
       "accountDeletionPending": "تم حذف الحساب. جارٍ تسجيل الخروج…",
       "avatarInvalidType": "يُرجى اختيار ملف صورة.",
       "avatarTooLarge": "يجب أن تكون الصورة الرمزية أقل من 2 ميجابايت.",

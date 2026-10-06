@@ -44,6 +44,10 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 vi.mock('@/shared/components/CommandPalette/CommandPalette.tsx', () => ({
   CommandPaletteContent: () => <input aria-label="Search" />,
 }));
+// Appearance's drawer is what joins the stack; its cards have their own suite.
+vi.mock('@/shared/components/AppearanceDialog/AppearancePanel.tsx', () => ({
+  AppearancePanel: () => <div data-testid="appearance-panel" />,
+}));
 
 const user = () => userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
@@ -192,12 +196,12 @@ describe('Esc layers — the command menu over a drawer', () => {
   });
 });
 
-describe('Esc layers — a surface outside the Radix stack over a drawer', () => {
+describe('Esc layers — the Appearance drawer over a record drawer', () => {
   afterEach(() => {
     act(() => useUIStore.setState({ appearanceOpen: false }));
   });
 
-  it('the Appearance panel takes one Esc alone; the next closes the drawer', async () => {
+  it('one Esc closes Appearance alone; the next closes the drawer under it', async () => {
     const onParentClose = vi.fn();
     const { u } = await openPurchase({ onParentClose }, <AppearanceDialog />);
 
@@ -206,7 +210,8 @@ describe('Esc layers — a surface outside the Radix stack over a drawer', () =>
 
     await u.keyboard('{Escape}');
 
-    expect(screen.queryByTestId('appearance-dialog')).toBeNull();
+    await waitFor(() => expect(screen.queryByTestId('appearance-dialog')).toBeNull());
+    expect(useUIStore.getState().appearanceOpen).toBe(false);
     expect(screen.getByTestId('po')).toBeInTheDocument();
     expect(onParentClose).not.toHaveBeenCalled();
 
@@ -215,7 +220,9 @@ describe('Esc layers — a surface outside the Radix stack over a drawer', () =>
     await waitFor(() => expect(screen.queryByTestId('po')).toBeNull());
     expect(onParentClose).toHaveBeenCalledTimes(1);
   });
+});
 
+describe('Esc layers — a surface outside the Radix stack over a drawer', () => {
   it('a lazy overlay still loading takes one Esc alone; the drawer under its scrim stays', async () => {
     const onParentClose = vi.fn();
     const { u } = await openPurchase({ onParentClose }, <SlowOverlay />);

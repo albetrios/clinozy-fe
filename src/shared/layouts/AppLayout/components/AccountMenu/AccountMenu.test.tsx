@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -74,6 +74,23 @@ describe('AccountMenu', () => {
     const { user, menu } = await openMenu();
     await user.click(within(menu).getByTestId('account-menu-theme-dark'));
     expect(useThemeStore.getState().theme).toBe('dark');
+  });
+
+  it('opens the Appearance drawer from the row under the mode pills', async () => {
+    useUIStore.setState({ appearanceOpen: false });
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    const { user, menu } = await openMenu();
+    const row = within(menu).getByTestId('account-menu-appearance');
+    expect(row).toHaveAccessibleName('Appearance & language');
+    // Right under the Light · Dark · System pills, before the platform rows.
+    const items = [...menu.querySelectorAll('[role="menuitem"], [role="menuitemradio"]')];
+    const systemPill = within(menu).getByTestId('account-menu-theme-system');
+    expect(items.indexOf(row)).toBe(items.indexOf(systemPill) + 1);
+
+    await user.click(row);
+
+    expect(useUIStore.getState().appearanceOpen).toBe(true);
+    act(() => useUIStore.setState({ appearanceOpen: false }));
   });
 
   it('opens the inbox and the shortcuts from their rows', async () => {

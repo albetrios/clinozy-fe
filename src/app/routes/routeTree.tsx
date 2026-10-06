@@ -124,7 +124,6 @@ import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sectio
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
 import { ConsentBannerLazy } from '@/shared/components/ConsentBanner/index.ts';
-import { FloatingEdgeControls } from '@/shared/components/FloatingEdgeControls/index.ts';
 import { FullPageSpinner } from '@/shared/components/FullPageSpinner/index.ts';
 import { OfflineIndicator } from '@/shared/components/OfflineIndicator/index.ts';
 import { RouteAnnouncer } from '@/shared/components/RouteAnnouncer/index.ts';
@@ -483,14 +482,11 @@ const rootRoute = createRootRoute({
         {/* Settings is ready alongside every authenticated app outlet. */}
         <SettingsModalLazy />
       </div>
-      {/* Right-edge handles: appearance (when unlocked) + language. Contains
-          itself — see FloatingEdgeControls. */}
-      <FloatingEdgeControls />
-      {/* Dedicated Appearance dialog — its own surface, opened via useUIStore.
-          A fixed-position overlay mounted at the ROOT: without its own boundary
-          a throw in here reached the global fallback and replaced the entire
-          app. Silent, because an overlay has nowhere in the layout to put an
-          error card — the dialog just is not there, and the throw is reported. */}
+      {/* The Appearance drawer — opened via useUIStore from the Account menu's
+          "Appearance & language" row. Mounted at the ROOT: without its own
+          boundary a throw in here reached the global fallback and replaced the
+          entire app. Silent, because an overlay has nowhere in the layout to put
+          an error card — the drawer just is not there, and the throw is reported. */}
       <SectionErrorBoundary
         title={i18n.t(ERRORS_KEYS.widget.appearance, { ns: ERRORS_NS })}
         variant="silent"

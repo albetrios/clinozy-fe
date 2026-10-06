@@ -34,7 +34,6 @@
     "appearance": "दिखावट",
     "sessionTimeout": "सत्र टाइमर",
     "securityCheck": "सुरक्षा जाँच",
-    "appearanceControls": "दिखावट नियंत्रण",
     "payment": "भुगतान",
     "cancellation": "रद्दीकरण"
   },
@@ -78,10 +77,7 @@
     },
     "account": {
       "copyFailed": "क्लिपबोर्ड पर कॉपी नहीं हो सका",
-      "themeCodeNumeric": "एक संख्यात्मक थीम कोड दर्ज करें",
       "copySuccess": "खाता ID कॉपी किया गया",
-      "themeLinkCopied": "थीम लिंक कॉपी किया गया",
-      "themeLinkCopiedDescription": "दिखावट दोहराने के लिए यह URL साझा करें।",
       "accountDeletionPending": "खाता हटाया गया। साइन आउट हो रहा है…",
       "avatarInvalidType": "कृपया एक छवि फ़ाइल चुनें।",
       "avatarTooLarge": "अवतार 2 MB से कम होना चाहिए।",

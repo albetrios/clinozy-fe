@@ -1,7 +1,6 @@
-import { type KeyboardEventHandler, type ReactElement, type ReactNode, use } from 'react';
+import type { KeyboardEventHandler, ReactElement, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import { PickerLayerContext } from '@/shared/components/Picker/picker-layer.ts';
 import {
   Drawer,
   DrawerContent,
@@ -38,9 +37,6 @@ const SHEET_VARIANTS = {
 
 /** Which bottom sheet {@link PickerSheet} becomes below `md`. */
 type PickerSheetVariant = keyof typeof SHEET_VARIANTS;
-
-/** The `raised` layer's z-index — over the Appearance panel's z-80 (`picker-layer.ts`). */
-const RAISED_LAYER = 'z-[90]';
 
 /** Props for {@link PickerSheet}. */
 export interface PickerSheetProps {
@@ -83,7 +79,8 @@ export interface PickerSheetProps {
  * and the 260ms `sheet-up` rise; its title is sr-only because the design draws
  * none. Both surfaces are modal, so an outside click or tap closes it without
  * reaching what is underneath — the design's "Close list" / "Close filters"
- * layer. Inside a `raised` {@link PickerLayerContext} both open at z-90.
+ * layer. Both open at the overlays' own z-50 and stack by portal order, so a
+ * list inside a drawer or a dialog lands on top of it.
  */
 export function PickerSheet({
   open,
@@ -102,7 +99,6 @@ export function PickerSheet({
   children,
 }: PickerSheetProps) {
   const tier = useViewportTier();
-  const layer = use(PickerLayerContext) === 'raised' ? RAISED_LAYER : undefined;
   const handleOpenAutoFocus = (event: Event) => {
     event.preventDefault();
     onOpenAutoFocus?.(event);
@@ -121,11 +117,10 @@ export function PickerSheet({
           data-picker-surface="sheet"
           onOpenAutoFocus={handleOpenAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
-          overlayClassName={cn(SHEET_VARIANTS[sheet].layer, 'animate-none!', layer)}
+          overlayClassName={cn(SHEET_VARIANTS[sheet].layer, 'animate-none!')}
           className={cn(
             'data-[state=open]:animate-sheet-up! pb-[env(safe-area-inset-bottom)] data-[state=closed]:animate-none! data-[vaul-drawer-direction=bottom]:rounded-t-2xl',
             SHEET_VARIANTS[sheet].height,
-            layer,
             sheetClassName,
           )}
         >
@@ -153,7 +148,6 @@ export function PickerSheet({
         onEscapeKeyDown={onEscapeKeyDown}
         className={cn(
           'data-[state=open]:data-[side=bottom]:animate-dropdown-in data-[state=open]:data-[side=top]:animate-dropdown-up flex max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-lg p-0 data-[state=closed]:data-[side]:animate-none',
-          layer,
           panelClassName,
         )}
       >

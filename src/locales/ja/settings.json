@@ -349,8 +349,7 @@
     },
     "appearance": {
       "title": "外観",
-      "description": "この端末に保存されます。変更はすぐに反映されます。",
-      "shuffle": "シャッフル"
+      "description": "この端末に保存されます。変更はすぐに反映されます。"
     },
     "sessions": {
       "title": "セッション",
