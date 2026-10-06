@@ -72,10 +72,8 @@ export function EmptyStateAction({
       type={asChild ? undefined : 'button'}
       asChild={asChild}
       data-testid="empty-state-action"
-      className={cn(
-        'text-body h-9 gap-1.5 rounded-lg px-3.5 has-[>svg]:px-3.5',
-        className,
-      )}
+      // The button's 36px, 13px, rounded-lg default; the design's 6px gap.
+      className={cn('gap-1.5', className)}
       {...props}
     >
       {asChild ? (

@@ -69,7 +69,7 @@ describe('DataTableRowActions', () => {
     expect(buttons[1]?.className).toContain('bg-destructive-tint');
   });
 
-  it('keeps the destructive tint and border in dark mode over the outline variant’s dark fill', () => {
+  it('draws the destructive action as the button’s light-red danger, in dark mode too', () => {
     renderActions([
       {
         id: 'delete',
@@ -80,11 +80,13 @@ describe('DataTableRowActions', () => {
       },
     ]);
     const button = screen.getByRole('button', { name: 'Delete' });
-    // tailwind-merge drops the vendored `dark:bg-input/30` / `dark:border-input` for these.
+    expect(button).toHaveAttribute('data-variant', 'danger');
     expect(button).toHaveClass(
-      'dark:bg-destructive-tint',
-      'dark:border-destructive-border',
+      'bg-destructive-tint',
+      'border-destructive-border',
+      'text-destructive',
     );
+    // Not the outline variant: no dark fill to drop the tint in dark mode.
     expect(button).not.toHaveClass('dark:bg-input/30');
     expect(button).not.toHaveClass('dark:border-input');
   });

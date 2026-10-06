@@ -135,10 +135,8 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
   const SecondaryIcon = secondary?.icon ?? Plus;
 
   if (tier === 'phone') {
-    // 52px pills, 14px, gap 8, the FAB shadow (H:55); a labelled pill is padded 16 / 20.
-    // Each is a <Button data-slot="pill">, so the Sharp shape squares it too.
-    const pill = 'text-sm h-13 gap-2 rounded-full font-medium shadow-(--elevation-fab)';
-    const labelled = cn(pill, 'ps-4 pe-5');
+    // The button's floating pill (52px, 14px, gap 8, the FAB shadow; H:55):
+    // a labelled pill is padded 16 / 20, the chevron segment at least 44px wide.
     return createPortal(
       <div
         data-slot="fab"
@@ -149,10 +147,9 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           <Button
             type="button"
             variant="outline"
-            data-slot="pill"
+            size="pill"
             data-testid={ids.primary(secondary.id)}
             onClick={secondary.onSelect}
-            className={labelled}
           >
             <ActionIcon icon={SecondaryIcon} className={secondary.iconClassName} />
             {secondary.label}
@@ -160,10 +157,9 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
         ) : null}
         <Button
           type="button"
-          data-slot="pill"
+          size="pill"
           data-testid={ids.primary(action.id)}
           onClick={action.onSelect}
-          className={labelled}
         >
           <ActionIcon icon={PrimaryIcon} className={action.iconClassName} />
           {action.label}
@@ -176,11 +172,11 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
             trigger={(open, label) => (
               <Button
                 type="button"
-                data-slot="pill"
+                size="pill"
                 aria-label={label}
                 title={label}
                 data-testid={ids.primaryMenu}
-                className={cn(pill, 'min-w-11 px-3.5')}
+                className="min-w-11 px-3.5"
               >
                 <ActionIcon icon={ChevronDown} turned={open} />
               </Button>
@@ -202,7 +198,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           data-testid={ids.primary(secondary.id)}
           onClick={secondary.onSelect}
           // The pair is padded 10 / 14 (H:969); a lone primary 12 / 14.
-          className="text-body h-9 gap-1.5 rounded-lg ps-2.5 pe-3.5 shadow-none"
+          className="gap-1.5 ps-2.5 pe-3.5 shadow-none"
         >
           <ActionIcon icon={SecondaryIcon} className={secondary.iconClassName} />
           {secondary.label}
@@ -215,7 +211,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           data-testid={ids.primary(action.id)}
           onClick={action.onSelect}
           className={cn(
-            'text-body h-9 gap-1.5 rounded-lg ps-3 pe-3.5',
+            'gap-1.5 ps-3 pe-3.5',
             secondary && 'ps-2.5',
             menu && 'rounded-e-none pe-3',
           )}
@@ -234,7 +230,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
                 aria-label={label}
                 title={label}
                 data-testid={ids.primaryMenu}
-                className="border-foreground-soft h-9 w-8 rounded-s-none rounded-e-lg border-s px-0"
+                className="border-foreground-soft w-8 rounded-s-none rounded-e-lg border-s px-0"
               >
                 <ActionIcon icon={ChevronDown} turned={open} />
               </Button>

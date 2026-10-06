@@ -97,7 +97,8 @@ export function DataTableRowActions({
               <TooltipTrigger asChild>
                 <Button
                   type="button"
-                  variant="outline"
+                  // The destructive action is the button's light-red `danger` (H:128).
+                  variant={action.destructive ? 'danger' : 'outline'}
                   aria-label={action.label}
                   disabled={action.disabled}
                   data-testid={`${testIdPrefix}-row-action-${action.id}`}
@@ -107,18 +108,14 @@ export function DataTableRowActions({
                   }}
                   className={cn(
                     BUTTON_SIZE,
-                    'text-detail rounded-lg px-0 shadow-none transition-colors duration-120',
+                    'text-detail px-0 shadow-none transition-colors duration-120',
                     labelled && 'gap-1.5 ps-2 pe-2.5 max-md:ps-2.5 max-md:pe-3',
-                    action.destructive
-                      ? // The `dark:` pair outranks the outline variant's `dark:bg-input/30 dark:border-input`,
-                        // which otherwise drop the tint in dark mode.
-                        'bg-destructive-tint border-destructive-border text-destructive hover:border-destructive hover:bg-destructive-tint hover:text-destructive dark:bg-destructive-tint dark:border-destructive-border dark:hover:bg-destructive-tint'
-                      : 'bg-card text-foreground-soft hover:border-primary hover:bg-muted hover:text-foreground',
+                    !action.destructive &&
+                      'bg-card text-foreground-soft hover:border-primary hover:bg-muted hover:text-foreground',
                   )}
                 >
-                  {/* Wrapped: the shadcn Button re-pads a button whose direct
-                      child is an svg (`has-[>svg]:px-3`), which made every
-                      icon button 40px wide instead of 32 / 36 / 40 by tier. */}
+                  {/* Wrapped, so no rule keyed on a direct svg child re-pads the
+                      32 / 36 / 40px icon buttons (the stock button once did). */}
                   <span aria-hidden="true" className="flex">
                     <Icon className="size-3.5" />
                   </span>
