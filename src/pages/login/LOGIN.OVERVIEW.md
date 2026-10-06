@@ -20,10 +20,11 @@ New passwordless users → `/onboarding` → app.
 | `shared/forms/AuthForm/` | Unified auth UI — default email OTP + provider buttons.   |
 
 The frame is `AuthLayout`'s default variant, the launch's sign-in canvas (L-65,
-`variants/AuthLayoutCanvas.tsx`): the signed-out canvas with the logo where the clinic
-header draws it, the language picker and theme toggle at the end, and the form in one
-360px card (the design's "Signed out" card, H:515). Default, pinned (shuffle never rolls
-it), not persisted; the earlier previews stay selectable as variants 1–3.
+`shared/layouts/AuthLayout/variants/AuthLayoutCanvas.tsx`): the signed-out canvas with
+the logo where the clinic header draws it, the language picker and theme toggle at the
+end, and the form in one 360px card (the design's "Signed out" card, H:515). Default,
+pinned (shuffle never rolls it), not persisted; the earlier previews stay selectable as
+variants 1–3.
 
 ## Flow
 
