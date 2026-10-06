@@ -12,15 +12,9 @@ import { authApi } from '@/shared/api/auth-api.ts';
 import { createRole, inviteMember, listRoles } from '@/shared/api/organization-api.ts';
 import { isSafeRedirectPath } from '@/shared/auth/redirect-safety.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { PublicCard, PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
@@ -480,9 +474,11 @@ function WizardActions(props: {
 }) {
   const { t } = useTranslation(ONBOARDING_NS);
   return (
-    <div className="flex items-center justify-between">
+    // The drawer footer's anatomy (`_patterns.md:35`): a hairline, 12px × the
+    // drawer's side inset, the outline "Back" and the primary at the end.
+    <footer className="flex items-center justify-between gap-2.5 border-t px-(--drawer-pad-x) py-3">
       <Button
-        variant="ghost"
+        variant="outline"
         onClick={props.onBack}
         disabled={props.isFirstStep || props.submitting}
         data-testid={ONBOARDING_TEST_IDS.back}
@@ -509,20 +505,22 @@ function WizardActions(props: {
           {t(ONBOARDING_KEYS.actions.continue)}
         </Button>
       )}
-    </div>
+    </footer>
   );
 }
 
 function SessionContextGate({ query }: { query: UseQueryResult<MeContext> }) {
   const { t } = useTranslation(ONBOARDING_NS);
   return (
-    <Card className="w-full">
-      <CardContent className="py-2" data-testid={ONBOARDING_TEST_IDS.contextGate}>
-        <QueryBoundary query={query} errorMessage={t(ONBOARDING_KEYS.session.loadError)}>
-          {() => null}
-        </QueryBoundary>
-      </CardContent>
-    </Card>
+    <PublicCard
+      width="wizard"
+      className="py-2"
+      data-testid={ONBOARDING_TEST_IDS.contextGate}
+    >
+      <QueryBoundary query={query} errorMessage={t(ONBOARDING_KEYS.session.loadError)}>
+        {() => null}
+      </QueryBoundary>
+    </PublicCard>
   );
 }
 
@@ -690,17 +688,20 @@ function OnboardingCard({
   const { t } = useTranslation(ONBOARDING_NS);
   const metaKeys = getStepMetaKeys(step);
   return (
-    <Card className="w-full">
-      <CardHeader className="space-y-4">
+    // The 480px card on the signed-out canvas, built like a drawer: the step
+    // circles and the step's heading, the body, then the footer with its hairline.
+    <PublicCard width="wizard" className="gap-0 p-0">
+      <div className="flex flex-col gap-5 px-(--drawer-pad-x) pt-6 pb-5">
         <StepIndicator current={clampedIndex} steps={effectiveSteps} />
         <div ref={headerRef} className="transform-gpu">
-          <CardTitle data-testid={ONBOARDING_TEST_IDS.stepTitle}>
-            {t(metaKeys.title)}
-          </CardTitle>
-          <CardDescription>{t(metaKeys.description)}</CardDescription>
+          <PublicCardHeader
+            title={t(metaKeys.title)}
+            description={t(metaKeys.description)}
+            titleTestId={ONBOARDING_TEST_IDS.stepTitle}
+          />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6 overflow-hidden">
+      </div>
+      <div className="flex flex-col gap-5 overflow-hidden px-(--drawer-pad-x) pb-6">
         <div
           ref={stepBodyRef}
           className="transform-gpu"
@@ -730,25 +731,21 @@ function OnboardingCard({
                   carries the icon, the destructive tokens and role="alert"
                   without this page re-deciding any of it.
                 */}
-        <FormError
-          message={finishError}
-          className="mt-4"
-          data-testid={ONBOARDING_TEST_IDS.finishError}
-        />
+        <FormError message={finishError} data-testid={ONBOARDING_TEST_IDS.finishError} />
+      </div>
 
-        <WizardActions
-          isFirstStep={clampedIndex === 0}
-          isDoneStep={step === 'done'}
-          submitting={submitting}
-          canProceed={canProceed}
-          onBack={() => onStepIndexChange(Math.max(clampedIndex - 1, 0))}
-          onNext={() =>
-            onStepIndexChange(Math.min(clampedIndex + 1, effectiveSteps.length - 1))
-          }
-          onFinish={onFinish}
-        />
-      </CardContent>
-    </Card>
+      <WizardActions
+        isFirstStep={clampedIndex === 0}
+        isDoneStep={step === 'done'}
+        submitting={submitting}
+        canProceed={canProceed}
+        onBack={() => onStepIndexChange(Math.max(clampedIndex - 1, 0))}
+        onNext={() =>
+          onStepIndexChange(Math.min(clampedIndex + 1, effectiveSteps.length - 1))
+        }
+        onFinish={onFinish}
+      />
+    </PublicCard>
   );
 }
 
@@ -1083,18 +1080,17 @@ export function OnboardingPage() {
   return (
     <>
       {guardDialog}
-      {/* No page-level background here. This island renders inside PublicLayout,
-          whose every variant already paints `bg-background` across a `min-h-dvh`
-          viewport — and it renders into `PublicMain`, which is `w-full max-w-md`.
-          A backdrop set here is therefore 448px wide over a full-width one: a
-          tinted vertical band down the middle of the page with visible seams,
-          which is exactly what `bg-muted/30` drew. Widening it cannot fix that
-          (`w-full` is still the 448px slot); the layout has to own the surface. */}
+      {/* No page-level background or height here. This island renders inside
+          PublicLayout, whose canvas paints the surface across a `min-h-dvh`
+          viewport and centres this column on it — a backdrop set here only ever
+          drew a band down the middle of the page (`bg-muted/30` did), and a
+          `min-h-screen` of its own stacked a second viewport under the header.
+          The layout owns the surface; the card brings its own 480px width. */}
       <div
-        className="flex min-h-screen items-center justify-center p-4"
+        className="flex w-full flex-col items-center"
         data-testid={ONBOARDING_TEST_IDS.page}
       >
-        <div ref={cardRef} className="w-full max-w-lg transform-gpu">
+        <div ref={cardRef} className="flex w-full transform-gpu justify-center">
           {contextReady ? (
             <OnboardingCard
               clampedIndex={clampedIndex}

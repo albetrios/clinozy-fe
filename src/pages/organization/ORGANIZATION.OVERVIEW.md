@@ -8,11 +8,11 @@ active workspace is personal — a personal workspace has no clinic (D44), so th
 
 ## Files
 
-| File                         | Responsibility                                                                               |
-| ---------------------------- | -------------------------------------------------------------------------------------------- |
-| `organization.route.tsx`     | Route marker — exports `Component` rendering `OrganizationPickerPage`.                       |
-| `organization.manifest.ts`   | Manifest — `kind: 'leaf'`, `children: []`, `permission: null` (bespoke guards in routeTree). |
-| `OrganizationPickerPage.tsx` | Picker UI — organization cards + create dialog. Owns `data-testid="organization-page"`.      |
+| File                         | Responsibility                                                                                                                                                                                                                   |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organization.route.tsx`     | Route marker — exports `Component` rendering `OrganizationPickerPage`.                                                                                                                                                           |
+| `organization.manifest.ts`   | Manifest — `kind: 'leaf'`, `children: []`, `permission: null` (bespoke guards in routeTree).                                                                                                                                     |
+| `OrganizationPickerPage.tsx` | Picker UI — the signed-out canvas (`PublicFrame`) and its 360px card: the organizations as All sections rows (tone tile, name, slug; the active one is the current row) + create dialog. Owns `data-testid="organization-page"`. |
 
 ## Children
 

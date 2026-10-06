@@ -1,9 +1,47 @@
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
 import { ONBOARDING_KEYS, ONBOARDING_NS } from '../../onboarding.constants.ts';
 import type { OnboardingStep } from '../../onboarding-flow.ts';
+
+/**
+ * One summary tile — a collapsed drawer step's peek tile (`_patterns.md:46`;
+ * `DrawerSteps`): the 10.5px/600 uppercase label over the 12.5px value,
+ * clamped to two lines; a value not given reads on a dashed tile in the
+ * disabled ink.
+ */
+function SummaryTile({
+  label,
+  value,
+  empty,
+}: {
+  label: string;
+  value: string;
+  empty: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'bg-background flex min-w-0 flex-col gap-0.5 rounded-lg border px-2.5 py-1.5',
+        empty && 'border-dashed',
+      )}
+    >
+      <dt className="text-tiny text-muted-foreground truncate font-semibold tracking-[0.04em] uppercase">
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          'text-detail line-clamp-2 wrap-anywhere',
+          empty ? 'text-disabled' : 'text-foreground',
+        )}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
 
 /**
  * Review summary shown before the final "Enter workspace" action. Only rows
@@ -30,32 +68,29 @@ export function DoneStep({ steps }: { steps: readonly OnboardingStep[] }) {
   const organizationName = useOnboardingStore((s) => s.data.organizationName);
   const inviteCount = useOnboardingStore((s) => s.data.invites.length);
   const empty = t(ONBOARDING_KEYS.done.emptyValue);
+  const name = [firstName, lastName].filter(Boolean).join(' ');
 
   return (
-    <dl className="space-y-3 text-sm">
-      <div className="flex justify-between">
-        <dt className="text-muted-foreground">{t(ONBOARDING_KEYS.done.nameLabel)}</dt>
-        <dd className="font-medium">
-          {[firstName, lastName].filter(Boolean).join(' ') || empty}
-        </dd>
-      </div>
+    // The peek's grid: auto-fit tiles at least 150px wide, 6px apart.
+    <dl className="grid grid-cols-[repeat(auto-fit,minmax(9.375rem,1fr))] gap-1.5">
+      <SummaryTile
+        label={t(ONBOARDING_KEYS.done.nameLabel)}
+        value={name || empty}
+        empty={!name}
+      />
       {steps.includes('workspace') ? (
-        <div className="flex justify-between">
-          <dt className="text-muted-foreground">
-            {t(ONBOARDING_KEYS.done.organizationLabel)}
-          </dt>
-          <dd className="font-medium">{organizationName || empty}</dd>
-        </div>
+        <SummaryTile
+          label={t(ONBOARDING_KEYS.done.organizationLabel)}
+          value={organizationName || empty}
+          empty={!organizationName}
+        />
       ) : null}
       {steps.includes('invite') ? (
-        <div className="flex justify-between">
-          <dt className="text-muted-foreground">
-            {t(ONBOARDING_KEYS.done.invitesLabel)}
-          </dt>
-          <dd className="font-medium">
-            {t(ONBOARDING_KEYS.done.invitesPending, { count: inviteCount })}
-          </dd>
-        </div>
+        <SummaryTile
+          label={t(ONBOARDING_KEYS.done.invitesLabel)}
+          value={t(ONBOARDING_KEYS.done.invitesPending, { count: inviteCount })}
+          empty={false}
+        />
       ) : null}
     </dl>
   );

@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -160,6 +161,50 @@ describe('AcceptInvitePage', () => {
 
     expect(await screen.findByTestId('accept-invite-error')).toBeInTheDocument();
     expect(navigateMock).not.toHaveBeenCalledWith(LOGIN_REDIRECT);
+  });
+
+  describe('the status card (the "Signed out" card holding the empty state)', () => {
+    it('reads pending in butter while it accepts', async () => {
+      acceptInvitationMock.mockImplementation(() => new Promise(() => undefined));
+      renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-loading');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute(
+        'data-tone',
+        'butter',
+      );
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Joining organization' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('accept-invite-page').querySelector('[data-slot="card"]'),
+      ).toHaveClass('max-w-90');
+    });
+
+    it('turns sage once the join is done', async () => {
+      renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-success');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'sage');
+    });
+
+    it('turns blush for trouble, with its ways on as 36px buttons', async () => {
+      acceptInvitationMock.mockRejectedValue(
+        new HttpError('Gone', 410, '/x', 'POST', { error: { detail: 'Expired' } }),
+      );
+      const { container } = renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-error');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'blush');
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Invitation problem' }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('accept-invite-retry')).toHaveClass('h-9', 'rounded-lg');
+      const login = screen.getByTestId('accept-invite-login');
+      expect(login.tagName).toBe('A');
+      expect(login).toHaveAttribute('href', '/login');
+      expect(await axe(container)).toHaveNoViolations();
+    });
   });
 
   describe('when the accept succeeds but opening the organization fails (INV-1)', () => {

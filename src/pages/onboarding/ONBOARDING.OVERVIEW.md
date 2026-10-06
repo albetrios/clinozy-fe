@@ -23,9 +23,15 @@ the wizard steps differ per mode.
 
 Step UIs live in `components/` (folder-per-unit): `WelcomeStep`, `ProfileStep`
 (**first name + last name** — maps 1:1 to clinozy-be `first_name` / `last_name`),
-`QuestionsStep` (optional team-size / use-case / referral chips), `WorkspaceStep` (org name +
+`QuestionsStep` (optional team-size / use-case / referral chips — the drawer's `DrawerChips`,
+one clearable pick each), `WorkspaceStep` (org name +
 live `{{productDomain}}/<slug>` preview, work-email-domain prefill), `InviteStep` (validated teammate
-emails), `DoneStep`, plus `StepIndicator`.
+emails, listed as person rows), `DoneStep` (a drawer step's peek tiles), plus `StepIndicator`
+(the drawer's 24px step circles).
+
+The wizard sits in the public layout's signed-out canvas as one 480px `PublicCard`,
+built like a drawer (L-65): the step circles and the step's heading, the body, then
+the footer with its hairline — outline "Back", the primary at the end.
 
 `WorkspaceStep`'s slug is validated **at that step**, against the same schema
 `createOrganization` uses (`isValidWorkspaceSlug` in `onboarding-flow.ts`): an uppercase

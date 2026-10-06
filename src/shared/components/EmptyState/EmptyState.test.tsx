@@ -183,6 +183,54 @@ describe('EmptyState', () => {
       expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument();
     });
   });
+
+  describe('as the page itself (headingLevel)', () => {
+    it('keeps an h3 inside a room by default', () => {
+      render(<EmptyState tone="stone" title="Nothing here" />);
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Nothing here' }),
+      ).toBeInTheDocument();
+    });
+
+    it('names the page with an h1 — the tone look and the plain one', () => {
+      const { unmount } = render(
+        <EmptyState tone="butter" headingLevel={1} title="Organization suspended" />,
+      );
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Organization suspended' }),
+      ).toBeInTheDocument();
+      unmount();
+
+      render(<EmptyState headingLevel={2} title="No roles" />);
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'No roles' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('EmptyStateAction', () => {
+    it('is a 36px button with a Plus before its label by default', () => {
+      render(<EmptyStateAction>New patient</EmptyStateAction>);
+      const action = screen.getByRole('button', { name: 'New patient' });
+      expect(action).toHaveAttribute('type', 'button');
+      expect(action).toHaveClass('h-9', 'rounded-lg', 'text-body');
+      expect(action.querySelector('svg')).not.toBeNull();
+    });
+
+    it('lends its look to a link with asChild, and draws no icon', () => {
+      render(
+        <EmptyStateAction asChild data-testid="go-home">
+          <a href="/">Go home</a>
+        </EmptyStateAction>,
+      );
+      const link = screen.getByRole('link', { name: 'Go home' });
+      expect(link).toHaveAttribute('href', '/');
+      expect(link).toHaveAttribute('data-testid', 'go-home');
+      expect(link).not.toHaveAttribute('type');
+      expect(link).toHaveClass('h-9', 'rounded-lg', 'text-body');
+      expect(link.querySelector('svg')).toBeNull();
+    });
+  });
 });
 
 describe('EmptyState — inline (a list’s or a card’s one-liner)', () => {

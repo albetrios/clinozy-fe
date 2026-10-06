@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import type { ComponentProps, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +16,13 @@ export interface EmptyStateProps {
   icon?: ReactNode;
   /** Defaults to "Nothing here yet". */
   title?: string;
+  /**
+   * The title's heading level — 3 inside a room or panel; 1 when the empty state
+   * IS the page (the suspended screen, an invitation's outcome), so it names
+   * the page. The dashed `card` variant lives inside a thread and keeps its `h3`;
+   * the `inline` one-liner is a paragraph, not a heading.
+   */
+  headingLevel?: 1 | 2 | 3;
   description?: ReactNode;
   /** Optional action — `EmptyStateAction` is the design's 36px primary button. */
   action?: ReactNode;
@@ -44,16 +52,25 @@ export interface EmptyStateProps {
   testId?: string;
 }
 
-/** The design's 36px primary empty-state button, a 14px `Plus` before the label by default. */
+/** The title's element per `headingLevel`. */
+const HEADING_TAGS = { 1: 'h1', 2: 'h2', 3: 'h3' } as const;
+
+/**
+ * The design's 36px primary empty-state button, a 14px `Plus` before the label by
+ * default. `asChild` lends its look to a link (`<Link>` as the only child) and
+ * draws no icon — a navigation, not a create.
+ */
 export function EmptyStateAction({
   icon = <Plus className="size-3.5" />,
   className,
   children,
+  asChild = false,
   ...props
 }: ComponentProps<typeof Button> & { icon?: ReactNode }) {
   return (
     <Button
-      type="button"
+      type={asChild ? undefined : 'button'}
+      asChild={asChild}
       data-testid="empty-state-action"
       className={cn(
         'text-body h-9 gap-1.5 rounded-lg px-3.5 has-[>svg]:px-3.5',
@@ -61,8 +78,14 @@ export function EmptyStateAction({
       )}
       {...props}
     >
-      {icon}
-      {children}
+      {asChild ? (
+        children
+      ) : (
+        <>
+          {icon}
+          {children}
+        </>
+      )}
     </Button>
   );
 }
@@ -131,6 +154,48 @@ function EmptyStateInline({
 }
 
 /**
+ * What the room and plain looks show: with `onClearFilters`, the filtered
+ * state's fixed copy and its "Clear filters" button; otherwise the caller's
+ * icon, title (else "Nothing here yet"), line and action.
+ */
+function shownContent(
+  {
+    icon,
+    title,
+    description,
+    action,
+    onClearFilters,
+  }: Pick<
+    EmptyStateProps,
+    'icon' | 'title' | 'description' | 'action' | 'onClearFilters'
+  >,
+  t: TFunction,
+) {
+  if (onClearFilters === undefined) {
+    return {
+      shownIcon: icon,
+      shownTitle: title ?? t(EMPTY_STATE_KEYS.fallbackTitle),
+      shownDescription: description,
+      shownAction: action,
+    };
+  }
+  return {
+    shownIcon: <Search />,
+    shownTitle: t(EMPTY_STATE_KEYS.filteredTitle),
+    shownDescription: t(EMPTY_STATE_KEYS.filteredHint),
+    shownAction: (
+      <EmptyStateAction
+        icon={null}
+        data-testid="empty-state-clear-filters"
+        onClick={onClearFilters}
+      >
+        {t(EMPTY_STATE_KEYS.clearFilters)}
+      </EmptyStateAction>
+    ),
+  };
+}
+
+/**
  * Centered empty-state for lists/panels with no data yet (no members, no roles,
  * empty search). Pairs with `Skeleton` (loading) and the route error boundary
  * (error) to make every data surface cover loading / empty / error. With a
@@ -141,6 +206,7 @@ function EmptyStateInline({
 export function EmptyState({
   icon,
   title,
+  headingLevel = 3,
   description,
   action,
   className,
@@ -150,6 +216,7 @@ export function EmptyState({
   testId = 'empty-state',
 }: EmptyStateProps) {
   const { t } = useTranslation(EMPTY_STATE_NS);
+  const Heading = HEADING_TAGS[headingLevel];
   if (variant === 'card' || variant === 'inline') {
     const Variant = variant === 'card' ? EmptyStateCard : EmptyStateInline;
     return (
@@ -162,22 +229,9 @@ export function EmptyState({
       />
     );
   }
-  const filtered = onClearFilters !== undefined;
-  const shownIcon = filtered ? <Search /> : icon;
-  const shownTitle = filtered
-    ? t(EMPTY_STATE_KEYS.filteredTitle)
-    : (title ?? t(EMPTY_STATE_KEYS.fallbackTitle));
-  const shownDescription = filtered ? t(EMPTY_STATE_KEYS.filteredHint) : description;
-  const shownAction = filtered ? (
-    <EmptyStateAction
-      icon={null}
-      data-testid="empty-state-clear-filters"
-      onClick={onClearFilters}
-    >
-      {t(EMPTY_STATE_KEYS.clearFilters)}
-    </EmptyStateAction>
-  ) : (
-    action
+  const { shownIcon, shownTitle, shownDescription, shownAction } = shownContent(
+    { icon, title, description, action, onClearFilters },
+    t,
   );
 
   if (tone) {
@@ -221,9 +275,9 @@ export function EmptyState({
           />
           <span className="bg-border absolute start-1.5 bottom-3.5 size-1.5 rounded-full" />
         </span>
-        <h3 className="text-foreground text-title leading-[1.2] font-semibold">
+        <Heading className="text-foreground text-title leading-[1.2] font-semibold">
           {shownTitle}
-        </h3>
+        </Heading>
         {shownDescription ? (
           <p className="text-muted-foreground text-detail max-w-80 leading-normal text-pretty">
             {shownDescription}
@@ -251,7 +305,7 @@ export function EmptyState({
         </div>
       ) : null}
       <div className="space-y-1">
-        <h3 className="text-foreground text-base font-medium">{shownTitle}</h3>
+        <Heading className="text-foreground text-base font-medium">{shownTitle}</Heading>
         {shownDescription ? (
           <p className="text-muted-foreground mx-auto max-w-sm text-sm text-pretty">
             {shownDescription}

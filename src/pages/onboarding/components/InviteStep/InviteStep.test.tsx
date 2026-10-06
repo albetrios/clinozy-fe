@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
@@ -86,5 +87,34 @@ describe('InviteStep', () => {
     fireEvent.click(removeButtons[0]!);
 
     expect(useOnboardingStore.getState().data.invites).toEqual(['b@example.com']);
+  });
+
+  it("lists each invitee as a person row in the design's item frame", () => {
+    useOnboardingStore.setState((s) => ({
+      data: { ...s.data, invites: ['dr.nisha@clinic.test'] },
+    }));
+    const { container } = render(<InviteStep />);
+
+    const list = screen.getByTestId('onboarding-invite-list');
+    expect(list).toHaveClass('rounded-xl', 'border', 'divide-y');
+    // The 26px avatar with the address's initials, then the address itself.
+    const avatar = container.querySelector('[data-slot="person-avatar"]');
+    expect(avatar).toHaveTextContent('DN');
+    const address = screen.getByText('dr.nisha@clinic.test');
+    expect(address).toHaveAttribute('dir', 'ltr');
+    expect(address).toHaveClass('truncate');
+    // The remove "×" warns in the danger soft on hover.
+    expect(screen.getByRole('button', { name: /dr\.nisha@clinic\.test/ })).toHaveClass(
+      'hover:bg-destructive-tint',
+      'hover:text-destructive',
+    );
+  });
+
+  it('has no accessibility violations with invites listed', async () => {
+    useOnboardingStore.setState((s) => ({
+      data: { ...s.data, invites: ['a@example.com'] },
+    }));
+    const { container } = render(<InviteStep />);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

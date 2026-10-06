@@ -1,8 +1,10 @@
 import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { queryClient } from '@/core/http/queryClient.ts';
 import { fetchAllPages } from '@/shared/api/fetch-all-pages.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -77,7 +79,49 @@ describe('OrganizationPickerPage', () => {
     fetchPagesMock.mockResolvedValue([]);
     renderWithProviders(<OrganizationPickerPage />);
 
-    expect(await screen.findByTestId('organization-picker-empty')).toBeInTheDocument();
+    // The list's one-liner (EmptyState `inline`) where the rows would be.
+    const empty = await screen.findByTestId('organization-picker-empty');
+    expect(empty).toHaveAttribute('data-variant', 'inline');
+    expect(empty.tagName).toBe('P');
+  });
+
+  it('sits in the 360px card on the signed-out canvas, under the page heading', async () => {
+    fetchPagesMock.mockResolvedValue([wireRow(ACME_ID)]);
+    renderWithProviders(<OrganizationPickerPage />);
+
+    const page = await screen.findByTestId('organization-page');
+    expect(page).toHaveClass('bg-canvas');
+    expect(screen.getByTestId('brand-logo')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Select organization' }),
+    ).toBeInTheDocument();
+    expect(page.querySelector('[data-slot="card"]')).toHaveClass('max-w-90');
+  });
+
+  it('draws each organization as an All sections row — tone tile, name, slug, chevron', async () => {
+    fetchPagesMock.mockResolvedValue([wireRow(ACME_ID)]);
+    const { container } = renderWithProviders(<OrganizationPickerPage />);
+
+    const row = await screen.findByTestId('organization-picker-option-acme');
+    expect(row).toHaveClass('rounded-lg', 'hover:bg-muted');
+    expect(row).toHaveTextContent('Acme Inc.acme');
+    expect(row.querySelector('.size-7.rounded-md')).not.toBeNull();
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('marks the active organization as the current row (All sections current)', async () => {
+    // `isActive` is derived on read from the organization store.
+    useOrganizationStore.setState({ organizationId: ACME_ID });
+    try {
+      fetchPagesMock.mockResolvedValue([wireRow(ACME_ID)]);
+      renderWithProviders(<OrganizationPickerPage />);
+
+      const row = await screen.findByTestId('organization-picker-option-acme');
+      expect(row).toHaveAttribute('aria-current', 'true');
+      expect(row).toHaveClass('bg-canvas', 'border-border-strong');
+    } finally {
+      useOrganizationStore.setState({ organizationId: null });
+    }
   });
 
   /*

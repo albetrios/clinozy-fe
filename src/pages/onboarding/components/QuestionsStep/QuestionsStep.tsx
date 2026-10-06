@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { cn } from '@/lib/utils.ts';
+// The field and the chips by their own modules: onboarding stays free of the other drawer controls.
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
 import { ONBOARDING_NS } from '../../onboarding.constants.ts';
@@ -13,11 +15,17 @@ import {
 
 type ChoiceField = 'teamSize' | 'primaryUseCase' | 'referralSource';
 
+/** A chip's stable value: its key's last segment in kebab case (`twoToTen` → `two-to-ten`). */
+function chipValue(optionKey: string): string {
+  const last = optionKey.slice(optionKey.lastIndexOf('.') + 1);
+  return last.replaceAll(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
 /**
- * Single-select chip group built as toggle buttons (`aria-pressed`) inside a
- * native `fieldset`/`legend`. Toggle buttons — not `role="radio"`/native radios
- * — because the choices are optional: clicking the active chip clears it, which
- * a radio cannot do.
+ * One optional question: the drawer field's 12px label over the design's chip
+ * group (`DrawerChips`, 24px pills on `muted`, the pick ringed in ink). One
+ * pick, and tapping the picked chip clears it — the answers are optional. The
+ * store keeps the chosen label, as it always has (analytics read it).
  */
 function ChoiceGroup({
   label,
@@ -33,34 +41,25 @@ function ChoiceGroup({
   testId: string;
 }) {
   const { t } = useTranslation(ONBOARDING_NS);
+  const options = optionKeys.map((optionKey) => ({
+    value: chipValue(optionKey),
+    label: t(optionKey),
+  }));
+  const picked = options.find((option) => option.label === value)?.value ?? null;
 
   return (
-    <fieldset className="space-y-2">
-      <legend className="mb-2 text-sm leading-none font-medium">{label}</legend>
-      <div className="flex flex-wrap gap-2" data-testid={testId}>
-        {optionKeys.map((optionKey) => {
-          const optionLabel = t(optionKey);
-          const selected = value === optionLabel;
-          return (
-            <button
-              key={optionKey}
-              type="button"
-              data-slot="button"
-              aria-pressed={selected}
-              onClick={() => onSelect(selected ? '' : optionLabel)}
-              className={cn(
-                'rounded-full border px-3 py-1.5 text-sm transition-colors',
-                selected
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-input text-foreground hover:bg-muted',
-              )}
-            >
-              {optionLabel}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
+    <DrawerField label={label}>
+      <DrawerChips
+        label={label}
+        options={options}
+        value={picked}
+        clearable
+        onChange={(next) =>
+          onSelect(options.find((option) => option.value === next)?.label ?? '')
+        }
+        testId={testId}
+      />
+    </DrawerField>
   );
 }
 
@@ -87,7 +86,7 @@ export function QuestionsStep() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-4">
       <ChoiceGroup
         label={t(QUESTIONS_STEP_KEYS.teamSize.label)}
         optionKeys={TEAM_SIZE_OPTION_KEYS}

@@ -1,22 +1,17 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationHome } from '@/lib/routes/index.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { acceptInvitation } from '@/shared/api/organization-api.ts';
 import { silentRefresh } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { PublicCard } from '@/shared/components/PublicFrame/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
@@ -49,6 +44,18 @@ interface InviteStatusCardProps {
   onRetry: () => void;
 }
 
+/**
+ * Each outcome's tone, by the status-tone rule the launch keeps for every state
+ * (L-62): butter while it is pending, sage once it is done — a join with a
+ * caveat is still a join — and blush for trouble.
+ */
+const INVITE_STATUS_TONES: Readonly<Record<Status, Tone>> = {
+  accepting: 'butter',
+  success: 'sage',
+  partial: 'sage',
+  error: 'blush',
+};
+
 function InviteStatusCard({
   status,
   error,
@@ -58,63 +65,58 @@ function InviteStatusCard({
 }: Readonly<InviteStatusCardProps>) {
   const { t } = useTranslation(AUTH_NS);
 
+  let icon: ReactNode = <XCircle data-testid={ACCEPT_INVITE_TEST_IDS.error} />;
+  if (status === 'accepting') {
+    icon = <Spinner data-testid={ACCEPT_INVITE_TEST_IDS.loading} />;
+  } else if (status === 'success' || status === 'partial') {
+    icon = <CheckCircle data-testid={ACCEPT_INVITE_TEST_IDS.success} />;
+  }
+
+  let description: ReactNode = error;
+  if (status === 'accepting') description = t(AUTH_KEYS.acceptInvite.accepting);
+  else if (status === 'success') description = t(AUTH_KEYS.acceptInvite.success);
+  else if (status === 'partial') description = t(AUTH_KEYS.acceptInvite.switchFailed);
+
   return (
-    <Card className="w-full max-w-md text-center">
-      <CardHeader>
-        <CardTitle>
-          {status === 'error'
+    // The "Signed out" card (H:515) holding the design's empty state: the
+    // outcome's tone illustration, its title and line, then the way on.
+    <PublicCard aria-live="polite">
+      <EmptyState
+        className="px-0 py-0"
+        tone={INVITE_STATUS_TONES[status]}
+        icon={icon}
+        headingLevel={1}
+        title={
+          status === 'error'
             ? t(AUTH_KEYS.acceptInvite.problemTitle)
-            : t(AUTH_KEYS.acceptInvite.joiningTitle)}
-        </CardTitle>
-        <CardDescription>
-          {status === 'accepting' && t(AUTH_KEYS.acceptInvite.accepting)}
-          {status === 'success' && t(AUTH_KEYS.acceptInvite.success)}
-          {status === 'partial' && t(AUTH_KEYS.acceptInvite.switchFailed)}
-          {status === 'error' && error}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-4">
-        {status === 'accepting' && (
-          <Spinner
-            className="text-muted-foreground size-10"
-            data-testid={ACCEPT_INVITE_TEST_IDS.loading}
-          />
-        )}
-        {(status === 'success' || status === 'partial') && (
-          <CheckCircle
-            className="text-success h-10 w-10"
-            data-testid={ACCEPT_INVITE_TEST_IDS.success}
-          />
-        )}
-        {status === 'error' && (
-          <>
-            <XCircle
-              className="text-destructive h-10 w-10"
-              data-testid={ACCEPT_INVITE_TEST_IDS.error}
-            />
+            : t(AUTH_KEYS.acceptInvite.joiningTitle)
+        }
+        description={description}
+        action={
+          status === 'error' ? (
             <div className="flex flex-wrap items-center justify-center gap-2">
               {canRetry && (
-                <Button
-                  type="button"
+                <EmptyStateAction
+                  icon={null}
                   onClick={onRetry}
                   disabled={isRetrying}
                   data-testid={ACCEPT_INVITE_TEST_IDS.retry}
                 >
                   {t(AUTH_KEYS.common.tryAgain)}
-                </Button>
+                </EmptyStateAction>
               )}
-              <Button
+              <EmptyStateAction
                 asChild
                 variant={canRetry ? 'outline' : 'default'}
                 data-testid={ACCEPT_INVITE_TEST_IDS.login}
               >
                 <Link to="/login">{t(AUTH_KEYS.common.goToSignIn)}</Link>
-              </Button>
+              </EmptyStateAction>
             </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+          ) : undefined
+        }
+      />
+    </PublicCard>
   );
 }
 
@@ -292,8 +294,9 @@ export function AcceptInvitePage() {
   }
 
   return (
+    // The public layout's canvas centres this column; the card brings its own width.
     <div
-      className="flex min-h-screen items-center justify-center p-4"
+      className="flex w-full flex-col items-center"
       data-testid={ACCEPT_INVITE_TEST_IDS.page}
     >
       {/* Contained here, a throw inside the status card leaves the public shell
