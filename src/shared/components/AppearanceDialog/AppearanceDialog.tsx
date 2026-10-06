@@ -10,7 +10,6 @@ import { useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
 import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PickerLayerContext } from '@/shared/components/Picker/picker-layer.ts';
-import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useEscapeLayer } from '@/shared/hooks/useEscapeLayer/index.ts';
@@ -61,7 +60,10 @@ function AppearanceContent() {
         fallback={
           <div data-testid="appearance-dialog-pending" className="flex flex-col gap-3">
             <output className="sr-only">{tLocale(LOCALE_KEYS.loading)}</output>
-            {/* The cards' own frame and head, their pills as flat bars. */}
+            {/* The cards' own frame and head, their pills as the design's flat
+                bars (`muted-strong`, no shimmer). Plain spans, not SkeletonBar:
+                this shell is on the entry chunk, and the import would carry the
+                skeleton module onto first paint. */}
             {sections.map((section) => (
               <div
                 key={section}
@@ -72,9 +74,9 @@ function AppearanceContent() {
                   {tLocale(section)}
                 </h3>
                 <div className="flex gap-1.5" aria-hidden="true">
-                  <SkeletonBar shape="field" className="h-7 w-16" />
-                  <SkeletonBar shape="field" className="h-7 w-16" />
-                  <SkeletonBar shape="field" className="h-7 w-16" />
+                  <span className="bg-muted-strong h-7 w-16 rounded-lg" />
+                  <span className="bg-muted-strong h-7 w-16 rounded-lg" />
+                  <span className="bg-muted-strong h-7 w-16 rounded-lg" />
                 </div>
               </div>
             ))}
