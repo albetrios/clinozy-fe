@@ -21,12 +21,29 @@ export interface LaneTilesProps {
   lanes: TodayLanes;
   /** The lane the panel shows (`aria-pressed`). */
   selected: TodayLane;
-  /** The member's focus — lanes outside it sit at 60%. */
+  /** The member's focus — lanes outside it recede ({@link DIMMED_TILE_INK}). */
   focus: ReadonlySet<TodayLane>;
   /** The clinic day, for wording each hint's time. */
   today: string;
   onSelect: (lane: TodayLane) => void;
 }
+
+/**
+ * A tile's text out of the member's focus. The design dims the whole tile to
+ * 60% opacity (`today.md:7`, H:588–597), which took the lane's name to 3.0:1
+ * and the hint to 2.5:1 on a light pastel — under WCAG AA. The fill, its border
+ * and the faces' ring keep the design's 60% (`LANE_TILE_TONES`); the text
+ * recedes a step instead, every pair at least 4.5:1 on the faded fill in both
+ * modes: the name and the faces' initials from the lane's ink to
+ * muted-foreground-strong, the count to foreground-soft. "+N" and the hint
+ * stay on muted-foreground-strong — the next step, muted-foreground, is
+ * 4.2–4.3:1 on a faded pastel.
+ */
+const DIMMED_TILE_INK = {
+  label: 'text-muted-foreground-strong',
+  count: 'text-foreground-soft',
+  face: 'text-muted-foreground-strong',
+} as const;
 
 /**
  * The lane tiles (KICKOFF §6.2 Lane tiles; `today.md:19, 31–36`; H:588–597):
@@ -41,7 +58,8 @@ export interface LaneTilesProps {
  * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds to
  * the screen edges. Each tile: the label in the lane's ink, the
  * count, up to four faces then "+N", and the hint. Lanes outside the member's
- * focus sit at 60%; hover inks the border at once (no transition).
+ * focus recede ({@link DIMMED_TILE_INK}); hover inks the border at once (no
+ * transition).
  */
 export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTilesProps) {
   const { t } = useTranslation(TODAY_NS);
@@ -61,28 +79,41 @@ export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTiles
         const paint = TONE_CLASSES[tone];
         const tile = LANE_TILE_TONES[tone];
         const pressed = lane === selected;
+        const dimmed = !isLaneInFocus(lane, focus);
         const faces = laneFaces(cards);
         const hint = laneHint(lane, cards);
+        let border = paint.border;
+        if (pressed) border = tile.ink;
+        else if (dimmed) border = tile.dimBorder;
         return (
           <button
             key={lane}
             type="button"
             aria-pressed={pressed}
             data-testid={TODAY_TEST_IDS.lane(lane)}
-            data-dimmed={isLaneInFocus(lane, focus) ? undefined : true}
+            data-dimmed={dimmed || undefined}
             onClick={() => onSelect(lane)}
             className={cn(
               'text-foreground flex w-32 shrink-0 snap-start flex-col items-start gap-1.5 rounded-lg border-[1.5px] px-3 py-2.5 text-start md:w-auto',
-              paint.bg,
-              pressed ? tile.ink : paint.border,
+              dimmed ? tile.dimFill : paint.bg,
+              border,
               tile.hover,
-              !isLaneInFocus(lane, focus) && 'opacity-60',
             )}
           >
-            <span className={cn('text-xs leading-[normal]', paint.ink)}>
+            <span
+              className={cn(
+                'text-xs leading-[normal]',
+                dimmed ? DIMMED_TILE_INK.label : paint.ink,
+              )}
+            >
               {t(TODAY_KEYS.lanes.names[lane])}
             </span>
-            <span className="font-heading text-stat leading-none font-semibold tabular-nums">
+            <span
+              className={cn(
+                'font-heading text-stat leading-none font-semibold tabular-nums',
+                dimmed && DIMMED_TILE_INK.count,
+              )}
+            >
               {formatNumber(cards.length)}
             </span>
             <span aria-hidden="true" className="flex min-h-5.5 items-center">
@@ -92,8 +123,8 @@ export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTiles
                   data-slot="pill"
                   className={cn(
                     'bg-background -me-0.5 box-content flex size-5.5 items-center justify-center rounded-full border-[1.5px] text-[length:calc(var(--text-xs)*19/24)] leading-none',
-                    tile.face,
-                    paint.ink,
+                    dimmed ? tile.dimFace : tile.face,
+                    dimmed ? DIMMED_TILE_INK.face : paint.ink,
                   )}
                 >
                   {face.initials}

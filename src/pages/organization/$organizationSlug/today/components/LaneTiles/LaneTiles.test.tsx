@@ -83,8 +83,8 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(screen.getByTestId('today-lane-pharmacy')).toHaveTextContent(/^Pharmacy0—$/);
   });
 
-  it('dims the lanes outside the member’s focus to 60%', async () => {
-    renderWithProviders(
+  it('dims the lanes outside the member’s focus — their fill at 60%, their text a step lighter', async () => {
+    const { container } = renderWithProviders(
       <LaneTiles
         lanes={LANES}
         selected="waiting"
@@ -103,8 +103,44 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
       'today-lane-checkout',
       'today-lane-pharmacy',
     ]);
-    expect(screen.getByTestId('today-lane-arriving')).toHaveClass('opacity-60');
-    expect(screen.getByTestId('today-lane-waiting')).not.toHaveClass('opacity-60');
+
+    // The design's 60% opacity took the tile's 11–12px lines to 2.5–3.0:1 (under
+    // WCAG AA). The surface keeps the 60%; the text recedes on AA-safe steps.
+    const arriving = screen.getByTestId('today-lane-arriving');
+    expect(arriving.className).not.toMatch(/\bopacity-/);
+    expect(arriving).toHaveClass('bg-tone-sky/60', 'border-tone-sky-border/60');
+    expect(within(arriving).getByText('Arriving')).toHaveClass(
+      'text-muted-foreground-strong',
+    );
+    expect(within(arriving).getByText('0')).toHaveClass('text-foreground-soft');
+
+    // A lane in focus keeps its full fill and the lane's ink.
+    const waiting = screen.getByTestId('today-lane-waiting');
+    expect(waiting).toHaveClass('bg-tone-butter');
+    expect(waiting).not.toHaveAttribute('data-dimmed');
+    expect(within(waiting).getByText('Waiting')).toHaveClass(
+      'text-tone-butter-foreground',
+    );
+    expect(within(waiting).getByText('6')).not.toHaveClass('text-foreground-soft');
+
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps a dimmed lane’s faces in the faded fill, their initials a step lighter', async () => {
+    renderWithProviders(
+      <LaneTiles
+        lanes={LANES}
+        selected="enquiries"
+        focus={todayFocus(['pharmacist'])}
+        today="2026-10-03"
+        onSelect={vi.fn()}
+      />,
+    );
+    const waiting = await screen.findByTestId('today-lane-waiting');
+    expect(waiting).toHaveAttribute('data-dimmed', 'true');
+    const face = within(waiting).getByText('RS');
+    expect(face).toHaveClass('border-tone-butter/60', 'text-muted-foreground-strong');
+    expect(face).not.toHaveClass('text-tone-butter-foreground');
   });
 
   it('selects a lane on click, and is a snap strip below md, a grid from md', async () => {

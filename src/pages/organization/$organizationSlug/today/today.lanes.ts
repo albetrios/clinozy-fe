@@ -48,40 +48,70 @@ export const TODAY_LANE_META: Readonly<Record<TodayLane, TodayLaneMeta>> = {
  * A tile's own paint beyond the tone's (`TONE_CLASSES`), as full literals so
  * Tailwind sees each: the pressed border in the lane's ink, hover inking the
  * border at once (no transition, `today.md:35`), and a face's ring in the
- * lane's fill.
+ * lane's fill. Out of the member's focus the fill, its border and the faces'
+ * ring take the design's 60% (`dimFill`, `dimBorder`, `dimFace`) — the
+ * surface only; the text recedes on AA-safe steps instead (`LaneTiles`).
  */
 export const LANE_TILE_TONES: Readonly<
-  Record<TodayLaneTone, { ink: string; hover: string; face: string }>
+  Record<
+    TodayLaneTone,
+    {
+      ink: string;
+      hover: string;
+      face: string;
+      dimFill: string;
+      dimBorder: string;
+      dimFace: string;
+    }
+  >
 > = {
   lav: {
     ink: 'border-tone-lav-foreground',
     hover: 'hover:border-tone-lav-foreground',
     face: 'border-tone-lav',
+    dimFill: 'bg-tone-lav/60',
+    dimBorder: 'border-tone-lav-border/60',
+    dimFace: 'border-tone-lav/60',
   },
   sky: {
     ink: 'border-tone-sky-foreground',
     hover: 'hover:border-tone-sky-foreground',
     face: 'border-tone-sky',
+    dimFill: 'bg-tone-sky/60',
+    dimBorder: 'border-tone-sky-border/60',
+    dimFace: 'border-tone-sky/60',
   },
   butter: {
     ink: 'border-tone-butter-foreground',
     hover: 'hover:border-tone-butter-foreground',
     face: 'border-tone-butter',
+    dimFill: 'bg-tone-butter/60',
+    dimBorder: 'border-tone-butter-border/60',
+    dimFace: 'border-tone-butter/60',
   },
   blush: {
     ink: 'border-tone-blush-foreground',
     hover: 'hover:border-tone-blush-foreground',
     face: 'border-tone-blush',
+    dimFill: 'bg-tone-blush/60',
+    dimBorder: 'border-tone-blush-border/60',
+    dimFace: 'border-tone-blush/60',
   },
   sage: {
     ink: 'border-tone-sage-foreground',
     hover: 'hover:border-tone-sage-foreground',
     face: 'border-tone-sage',
+    dimFill: 'bg-tone-sage/60',
+    dimBorder: 'border-tone-sage-border/60',
+    dimFace: 'border-tone-sage/60',
   },
   mint: {
     ink: 'border-tone-mint-foreground',
     hover: 'hover:border-tone-mint-foreground',
     face: 'border-tone-mint',
+    dimFill: 'bg-tone-mint/60',
+    dimBorder: 'border-tone-mint-border/60',
+    dimFace: 'border-tone-mint/60',
   },
 };
 

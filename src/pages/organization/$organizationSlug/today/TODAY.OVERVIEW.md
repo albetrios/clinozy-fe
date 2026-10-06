@@ -15,9 +15,9 @@ The screen: the greeting is its h1 — no other title ("Good morning, <first nam
 clinic-local clock, `greetingFor`; "there" without a name) — then the pulse ("<n> in clinic ·
 <n> waiting · <n> arriving · <day>, <time>"), "New booking" (→ `/leads/create`) and "Walk-in"
 (→ ⌘K). Seven lane tiles (a grid from `md`, a snap strip of 128px tiles below it) over the
-selected lane's panel of visit cards; lanes outside the member's role focus sit at 60%
-(`todayFocus`: the union of their clinic roles, the View-as role while previewing; Owner and
-Admin dim nothing). The default lane is the first in focus with people, else the first with
+selected lane's panel of visit cards; lanes outside the member's role focus recede — the fill
+at 60%, the text a step lighter at AA contrast (`todayFocus`: the union of their clinic roles,
+the View-as role while previewing; Owner and Admin dim nothing). The default lane is the first in focus with people, else the first with
 people, else Enquiries; a picked lane lives in the URL for the session (`?lane=`). The work
 queue (`?queue=everyone`; Mine by default — the tasks the member owns) is the Tasks room's one
 task model: its open tasks by due time and the ones closed today, the rule's pill and
