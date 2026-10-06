@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { holdAppSplash } from '@/lib/app-splash.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 
 /**
  * Suspense fallback while a layout variant chunk loads.
@@ -11,7 +12,10 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
  * sliver of an otherwise blank page, so a shell swap read as "the app broke"
  * rather than "the app is loading" (SHELL-1). `AppLayout` now preloads the
  * target chunk before committing a swap, so this should only ever be seen on a
- * genuine first mount — and when it is, it holds the frame's shape.
+ * genuine first mount — and when it is, it holds the frame's shape: the
+ * launch's — the section bar's header (52px on a phone, 60px from `md`, its
+ * hairline; no sidebar in the design) over the page, its content replaced in
+ * place by the design's flat bars (`_patterns.md:282`).
  */
 export function LayoutVariantFallback() {
   const { t } = useTranslation(LOCALE_NS);
@@ -29,24 +33,24 @@ export function LayoutVariantFallback() {
   return (
     <output
       data-testid="layout-variant-fallback"
-      className="bg-background flex min-h-0 flex-1"
+      className="bg-background flex min-h-0 flex-1 flex-col"
       aria-busy="true"
     >
       <span className="sr-only">{t(LOCALE_KEYS.loading)}</span>
-      {/* Nav rail placeholder — hidden on mobile, where no shell shows one. */}
       <div
-        className="bg-sidebar/40 hidden w-[17.5rem] shrink-0 animate-pulse border-e md:block"
+        data-slot="app-header"
+        className="bg-card min-h-13 shrink-0 border-b md:min-h-15"
         aria-hidden="true"
       />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div
-          className="bg-muted/40 h-14 shrink-0 animate-pulse border-b"
-          aria-hidden="true"
-        />
-        <div className="flex-1 space-y-4 p-4 sm:p-6" aria-hidden="true">
-          <div className="bg-muted/40 h-8 w-1/3 animate-pulse rounded-sm" />
-          <div className="bg-muted/30 h-40 animate-pulse rounded-sm" />
-          <div className="bg-muted/30 h-40 animate-pulse rounded-sm" />
+      <div
+        className="text-body flex flex-1 flex-col gap-3 p-(--room-toolbar-pad)"
+        aria-hidden="true"
+      >
+        <SkeletonBar shape="field" className="w-40" />
+        <div className="flex flex-col gap-4 rounded-xl border px-(--table-pad-x) py-4">
+          <SkeletonBar index={0} />
+          <SkeletonBar index={1} />
+          <SkeletonBar index={2} />
         </div>
       </div>
     </output>

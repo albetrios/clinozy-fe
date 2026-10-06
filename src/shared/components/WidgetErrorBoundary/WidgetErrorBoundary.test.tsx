@@ -65,6 +65,21 @@ describe('SectionErrorBoundary', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
   });
 
+  it("draws the card fallback as the design's dashed card — no lift", () => {
+    render(
+      <SectionErrorBoundary title="Analytics" testId="widget-error-analytics">
+        <Boom />
+      </SectionErrorBoundary>,
+    );
+    const card = screen.getByTestId('widget-error-analytics');
+    expect(card).toHaveClass('border-dashed', 'border-border-strong', 'rounded-xl');
+    expect(card).not.toHaveAttribute('data-slot', 'card');
+    expect(screen.getByText('Analytics unavailable')).toHaveClass(
+      'text-detail',
+      'font-semibold',
+    );
+  });
+
   it('reports the contained error instead of swallowing it', () => {
     render(
       <SectionErrorBoundary title="Analytics">

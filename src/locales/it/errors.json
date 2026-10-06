@@ -13,6 +13,7 @@
     "goHome": "Vai alla home",
     "refresh": "Aggiorna pagina",
     "forbidden": "Non hai i permessi per accedere a questa pagina.",
+    "forbiddenTitle": "Nessun accesso a questa pagina",
     "signOut": "Esci",
     "signingOut": "Disconnessione…",
     "pageNotFound": "Pagina non trovata",

@@ -10,19 +10,25 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 
 ## Auth (`AuthLayout` + unified form)
 
-| Test ID                                                                      | Element                          | File                                              |
-| ---------------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------- |
-| `auth-layout`                                                                | Auth shell                       | `shared/layouts/AuthLayout/AuthLayout.tsx`        |
-| `auth-form-container`                                                        | Form column                      | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
-| `auth-mobile-logo`                                                           | Mobile logo link                 | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
-| `login-page`                                                                 | Unified auth page root           | `pages/login/LoginPage.tsx`                       |
-| `auth-form`                                                                  | Unified auth root                | `shared/forms/AuthForm/AuthForm.tsx`              |
-| `auth-continue-google` / `auth-continue-github`                              | OAuth                            | AuthForm                                          |
-| `auth-continue-passkey`                                                      | Passkey                          | AuthForm                                          |
-| `auth-email-panel`                                                           | Email OTP panel                  | `AuthEmailPanel.tsx`                              |
-| `auth-email` / `auth-email-submit` / `auth-email-code` / `auth-email-verify` | Email OTP flow                   | AuthEmailPanel                                    |
-| `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email | AuthEmailPanel                                    |
-| `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                              | `MfaForm.tsx`                                     |
+| Test ID                                                                      | Element                                                  | File                                              |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------- |
+| `auth-layout`                                                                | Auth shell                                               | `shared/layouts/AuthLayout/AuthLayout.tsx`        |
+| `auth-form-container`                                                        | Form column                                              | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
+| `auth-mobile-logo`                                                           | Mobile logo link                                         | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
+| `login-page`                                                                 | Unified auth page root                                   | `pages/login/LoginPage.tsx`                       |
+| `auth-form`                                                                  | Unified auth root                                        | `shared/forms/AuthForm/AuthForm.tsx`              |
+| `auth-continue-google` / `auth-continue-github`                              | OAuth                                                    | AuthForm                                          |
+| `auth-continue-passkey`                                                      | Passkey                                                  | AuthForm                                          |
+| `auth-email-panel`                                                           | Email OTP panel                                          | `AuthEmailPanel.tsx`                              |
+| `auth-email` / `auth-email-submit` / `auth-email-code` / `auth-email-verify` | Email OTP flow                                           | AuthEmailPanel                                    |
+| `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email                         | AuthEmailPanel                                    |
+| `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                     |
+| `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/components/PublicFrame/`                  |
+
+The default auth shell (variant 0, `variants/AuthLayoutCanvas.tsx`) is the signed-out canvas
+(`PublicFrame`): it keeps `auth-layout` and `auth-form-container`, and its logo is `brand-logo`
+(`auth-mobile-logo` belongs to the Split preview). `PublicLayout`'s default variant, the
+organization picker and the 404 draw the same frame.
 
 **Hybrid helpers:** `tests/utils/e2e-hybrid.ts` — `expectAuthScreenReady`, `expectLoginFormReady`, `fillTestId`, `clickTestId`, label constants.
 
@@ -43,7 +49,7 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `main-content`                                          | Main content region (skip-link target)                                                                                    | `AppLayout.shared.tsx`                                        |
 | `mobile-bottom-bar`                                     | Mobile nav bar                                                                                                            | AppLayout                                                     |
 | `header`                                                | Top bar                                                                                                                   | AppLayout                                                     |
-| `brand-logo`                                            | Product mark (+ wordmark in the section bar)                                                                              | `AppLayout.shared.tsx`                                        |
+| `brand-logo`                                            | Product mark (+ wordmark in the section bar and on the signed-out canvas)                                                 | `shared/components/ProductMark/` (`BrandLogo`)                |
 | `section-chip`                                          | Phone header: the current room's name in its tone                                                                         | `AppLayout/components/SectionChip/`                           |
 | `all-sections-trigger`                                  | Section bar: All sections compass (tinted when the current room is unpinned)                                              | `AppLayout/components/AllSections/`                           |
 | `all-sections`                                          | All sections popover (dialog)                                                                                             | `AppLayout/components/AllSections/`                           |
@@ -367,11 +373,19 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 
 ## System routes
 
-| Test ID                | Route          |
-| ---------------------- | -------------- |
-| `not-found-page`       | 404            |
-| `unauthorized-page`    | 403            |
-| `route-error-boundary` | Error boundary |
+| Test ID                        | Route                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `not-found-page`               | 404                                                                        |
+| `unauthorized-page`            | 403                                                                        |
+| `route-error-boundary`         | Error boundary (route and global)                                          |
+| `fallback-illustration`        | The status pages' empty-state art (`FallbackState`, `RouteErrorBoundary/`) |
+| `retry-error` / `retry-button` | A panel's failed read and its retry (`RetryError/`)                        |
+| `widget-error`                 | A section's contained throw — the dashed card (`WidgetErrorBoundary/`)     |
+| `offline-indicator`            | The offline notice pill (root-mounted)                                     |
+
+Onboarding's question chips are `onboarding-team-size-<value>`, `onboarding-use-case-<value>` and
+`onboarding-referral-<value>` — `<value>` is the option key's last segment in kebab case
+(`two-to-ten`, `internal-tools`, `friend-or-colleague`); each group keeps its own id.
 
 ---
 

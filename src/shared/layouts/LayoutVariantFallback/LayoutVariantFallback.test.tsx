@@ -25,6 +25,20 @@ describe('LayoutVariantFallback', () => {
     expect(screen.getByTestId('layout-variant-fallback')).toHaveClass('flex-1');
   });
 
+  it("holds the launch shell's shape: the section bar's header and flat bars, no sidebar", () => {
+    const { container } = render(<LayoutVariantFallback />);
+    const fallback = screen.getByTestId('layout-variant-fallback');
+    const [, header, body] = Array.from(fallback.children);
+    expect(header).toHaveClass('min-h-13', 'md:min-h-15', 'border-b', 'bg-card');
+    expect(body).toHaveClass('p-(--room-toolbar-pad)');
+    // No nav rail: the design has no sidebar.
+    expect(container.querySelector('.bg-sidebar\\/40')).toBeNull();
+    // The design's skeleton is flat bars, never a pulse.
+    const bars = container.querySelectorAll('[data-slot="skeleton"]');
+    expect(bars.length).toBeGreaterThan(0);
+    for (const bar of bars) expect(bar).toHaveClass('animate-none', 'bg-muted-strong');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<LayoutVariantFallback />);
     const results = await axe(container);

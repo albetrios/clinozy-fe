@@ -50,4 +50,35 @@ describe('ErrorBoundary', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
+
+  it('lays the signed-out canvas: the logo, then the state as the page heading', async () => {
+    renderBoundary(new Error('Unexpected'));
+    const boundary = await screen.findByTestId('route-error-boundary');
+    expect(boundary).toHaveClass('bg-canvas', 'min-h-dvh');
+    expect(screen.getByTestId('brand-logo')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Something went wrong' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Refresh page' })).toBeInTheDocument();
+  });
+
+  it('tones a missing page stone and a failure blush, the status in a pill', async () => {
+    const { unmount } = renderBoundary({ status: 404 });
+    await screen.findByTestId('route-error-boundary');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      '404Page not found',
+    );
+    expect(screen.getByText('404')).toHaveAttribute('data-slot', 'pill');
+    expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'stone');
+    unmount();
+
+    renderBoundary({ status: 500 });
+    await screen.findByTestId('route-error-boundary');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      '500Something went wrong',
+    );
+    expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'blush');
+    // No status text: the generic line.
+    expect(screen.getByText('Something went wrong.')).toBeInTheDocument();
+  });
 });

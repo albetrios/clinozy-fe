@@ -13,6 +13,7 @@
     "goHome": "ホームへ",
     "refresh": "ページを更新",
     "forbidden": "このページにアクセスする権限がありません。",
+    "forbiddenTitle": "このページにはアクセスできません",
     "signOut": "サインアウト",
     "signingOut": "サインアウトしています…",
     "pageNotFound": "ページが見つかりません",

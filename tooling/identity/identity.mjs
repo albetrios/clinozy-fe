@@ -328,8 +328,17 @@ export function derivedSurfaces(identity, _root = ROOT) {
     },
     {
       file: 'public/offline.html',
-      label: 'offline page title',
-      apply: replaceValue(/(<title>Offline — )[^<]*/, () => productName),
+      label: 'offline page title and line',
+      // The title, and the splash's offline line the page body repeats
+      // ("Can’t reach <product> · check the internet connection").
+      apply: (text) =>
+        replaceValue(
+          /(<title>Offline — )[^<]*/,
+          () => productName,
+        )(text).replace(
+          /(Can’t reach )[^<·]*?( ·)/,
+          (_match, before, after) => `${before}${productName}${after}`,
+        ),
     },
     {
       file: 'public/robots.txt',

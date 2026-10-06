@@ -19,6 +19,8 @@ export const ERRORS_KEYS = {
     goHome: 'route.goHome',
     refresh: 'route.refresh',
     forbidden: 'route.forbidden',
+    /** The 403's heading — the sentence above is its line. */
+    forbiddenTitle: 'route.forbiddenTitle',
     signOut: 'route.signOut',
     signingOut: 'route.signingOut',
   },

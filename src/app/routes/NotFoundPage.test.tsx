@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { APP_TITLE } from '@/lib/routes/page-head.ts';
 
@@ -28,5 +29,23 @@ describe('NotFoundPage', () => {
     render(<NotFoundPage />);
 
     expect(document.title).toBe(`Page not found · ${APP_TITLE}`);
+  });
+
+  it('is the empty state on the signed-out canvas: the 404 pill in the page heading', () => {
+    render(<NotFoundPage />);
+
+    const page = screen.getByTestId('not-found-page');
+    expect(page).toHaveClass('bg-canvas');
+    expect(screen.getByTestId('brand-logo')).toBeInTheDocument();
+    expect(screen.getByTestId('theme-toggle')).toBeInTheDocument();
+    // The e2e lane finds this heading by "404" (navigation.e2e.test.ts).
+    const heading = screen.getByRole('heading', { level: 1, name: /404/ });
+    expect(heading).toHaveTextContent('Page not found');
+    expect(page.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'stone');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<NotFoundPage />);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

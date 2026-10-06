@@ -13,6 +13,7 @@
     "goHome": "Zur Startseite",
     "refresh": "Seite aktualisieren",
     "forbidden": "Sie haben keine Berechtigung für diese Seite.",
+    "forbiddenTitle": "Kein Zugriff auf diese Seite",
     "signOut": "Abmelden",
     "signingOut": "Abmeldung läuft…",
     "pageNotFound": "Seite nicht gefunden",

@@ -13,6 +13,7 @@
     "goHome": "返回首页",
     "refresh": "刷新页面",
     "forbidden": "你没有访问此页面的权限。",
+    "forbiddenTitle": "无权访问此页面",
     "signOut": "退出登录",
     "signingOut": "正在退出…",
     "pageNotFound": "找不到页面",
