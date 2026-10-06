@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { Card } from '@/shared/components/ui/card.tsx';
+import { SettingsList, SettingsListRow } from '@/shared/components/SettingsCard/index.ts';
 import {
   Dialog,
   DialogContent,
@@ -45,24 +45,20 @@ export function KeyboardShortcutsDialog() {
           <DialogTitle>{t(sk.title)}</DialogTitle>
           <DialogDescription>{t(sk.description)}</DialogDescription>
         </DialogHeader>
-        <Card className="gap-0 overflow-hidden py-0">
-          <ul className="divide-border divide-y">
-            {rows.map((row) => (
-              <li
-                key={row.labelKey}
-                className="flex items-center justify-between gap-4 px-4 py-3 text-sm"
+        {/* The settings list's table rows; each key as the design's kbd (mono, 4px). */}
+        <SettingsList>
+          {rows.map((row) => (
+            <SettingsListRow key={row.labelKey} className="justify-between gap-4">
+              <span className="text-body">{t(row.labelKey)}</span>
+              <kbd
+                data-slot="kbd"
+                className="bg-canvas text-foreground-soft text-micro rounded-sm border px-1.5 py-0.5 font-mono"
               >
-                <span>{t(row.labelKey)}</span>
-                <kbd
-                  data-slot="kbd"
-                  className="bg-muted rounded-sm px-2 py-0.5 font-mono text-xs"
-                >
-                  {row.keys}
-                </kbd>
-              </li>
-            ))}
-          </ul>
-        </Card>
+                {row.keys}
+              </kbd>
+            </SettingsListRow>
+          ))}
+        </SettingsList>
       </DialogContent>
     </Dialog>
   );
