@@ -2,15 +2,20 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { logout } from '@/shared/auth/service.ts';
-import { SETTINGS_NS } from '@/shared/components/SettingsModal/settings.constants.ts';
+import {
+  SETTINGS_GROUP_LABEL_KEYS,
+  SETTINGS_NS,
+} from '@/shared/components/SettingsModal/settings.constants.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
+import type { SettingsScope } from '@/shared/components/SettingsModal/settings-sections.ts';
 import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useVisibleSettingsSections } from '@/shared/hooks/useSettingsNav/index.ts';
 import {
   type AppIcon,
   Building,
-  LogOut,
+  ChevronLeft,
+  Keyboard,
   Monitor,
   Moon,
   Settings,
@@ -74,7 +79,10 @@ export interface PlatformCommandGroups {
  * Settings (user, organization and every section the Settings modal would
  * show), Keyboard shortcuts, the three theme modes and Log out. The rooms are
  * the clinic's "Go to" group. Each row answers the query by its label or its
- * keywords.
+ * keywords. They are the clinic rows' anatomy: a settings row names its scope
+ * in the sub ("Account", "Organization" — as an action names its room), unless
+ * that would repeat its own label; shortcuts and Log out take the Account
+ * menu's glyphs (the keyboard, the mirrored chevron).
  *
  * @param runCommand Closes the palette, then runs the command.
  */
@@ -101,17 +109,22 @@ export function usePlatformCommandGroups({
   const settingsRow = (
     value: string,
     label: string,
+    scope: SettingsScope,
     hash: string,
     icon: AppIcon,
     keywords?: readonly string[],
-  ): CommandRow => ({
-    value,
-    label,
-    icon,
-    keywords,
-    // A same-route navigation states its hash: the Settings modal lives there.
-    onSelect: () => runCommand(() => navigate({ to: '.', hash })),
-  });
+  ): CommandRow => {
+    const scopeLabel = tSettings(SETTINGS_GROUP_LABEL_KEYS[scope]);
+    return {
+      value,
+      label,
+      sub: scopeLabel === label ? undefined : scopeLabel,
+      icon,
+      keywords,
+      // A same-route navigation states its hash: the Settings modal lives there.
+      onSelect: () => runCommand(() => navigate({ to: '.', hash })),
+    };
+  };
 
   const leading: CommandRowGroup[] = [
     {
@@ -121,6 +134,7 @@ export function usePlatformCommandGroups({
         settingsRow(
           'settings:user',
           t(cp.userSettings),
+          'account',
           settingsHash('account', 'profile'),
           Settings,
         ),
@@ -129,6 +143,7 @@ export function usePlatformCommandGroups({
               settingsRow(
                 'settings:organization',
                 t(cp.organizationSettings),
+                'organization',
                 settingsHash('organization', 'general'),
                 Building,
               ),
@@ -138,6 +153,7 @@ export function usePlatformCommandGroups({
           settingsRow(
             `settings:${item.scope}/${item.section}`,
             tSettings(item.labelKey),
+            item.scope,
             settingsHash(item.scope, item.section),
             item.icon,
             item.keywords,
@@ -155,7 +171,7 @@ export function usePlatformCommandGroups({
         {
           value: 'shortcuts',
           label: t(cp.openShortcuts),
-          icon: Settings,
+          icon: Keyboard,
           onSelect: () => runCommand(() => setShortcutsOpen(true)),
         },
       ],
@@ -178,7 +194,8 @@ export function usePlatformCommandGroups({
         {
           value: 'account:log-out',
           label: t(cp.logOut),
-          icon: LogOut,
+          icon: ChevronLeft,
+          mirrored: true,
           destructive: true,
           onSelect: () =>
             runCommand(() => {

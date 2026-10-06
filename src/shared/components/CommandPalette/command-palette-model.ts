@@ -15,6 +15,8 @@ export interface CommandRow {
   /** Extra terms the query matches — locale-independent, unlike the label. */
   keywords?: readonly string[];
   destructive?: boolean;
+  /** The icon points along the reading direction (Log out's chevron): mirrored under RTL. */
+  mirrored?: boolean;
 }
 
 /** One headed group of rows. */

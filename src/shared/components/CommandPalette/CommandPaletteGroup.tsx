@@ -41,6 +41,7 @@ export function CommandPaletteGroup({ group }: { group: CommandRowGroup }) {
           sub={row.sub}
           onSelect={row.onSelect}
           destructive={row.destructive}
+          mirrored={row.mirrored}
           testId={row.testId}
         >
           {row.label}

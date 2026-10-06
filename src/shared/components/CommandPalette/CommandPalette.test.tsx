@@ -137,6 +137,32 @@ describe('CommandPalette', () => {
     expect(screen.getByText('Organization settings')).toBeInTheDocument();
   });
 
+  it('draws the platform rows as the clinic rows: scope subs, the menu’s glyphs', async () => {
+    useOrganizationStore.setState({ permissions: ['organization:read'] });
+    renderWithProviders(<CommandPalette />);
+
+    // A settings row names its scope at the inline end, as an action names its room.
+    const user = (await screen.findByText('User settings')).closest('[cmdk-item]');
+    expect(user).toHaveTextContent(/User settings\s*Account/);
+    const org = screen.getByText('Organization settings').closest('[cmdk-item]');
+    expect(org).toHaveTextContent(/Organization settings\s*Organization/);
+    // …unless that would repeat the row's own label (the Account section).
+    const account = screen
+      .getAllByText('Account')
+      .map((node) => node.closest('[cmdk-item]'))
+      .find((row) => row?.getAttribute('data-value') === 'settings:account/account');
+    expect(account?.textContent).toBe('Account');
+
+    // Shortcuts and Log out take the Account menu's keyboard and mirrored chevron;
+    // Log out is red, icon included.
+    const shortcuts = screen.getByText('Keyboard shortcuts').closest('[cmdk-item]');
+    expect(shortcuts?.querySelector('svg.lucide-keyboard')).not.toBeNull();
+    const logOut = screen.getByText('Log out').closest('[cmdk-item]');
+    const chevron = logOut?.querySelector('svg.lucide-chevron-left');
+    expect(chevron).toHaveClass('text-destructive', 'rtl:rotate-180');
+    expect(logOut).toHaveClass('data-[selected=true]:bg-destructive-tint');
+  });
+
   it('navigates to organization settings when the command is selected', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CommandPalette />);
