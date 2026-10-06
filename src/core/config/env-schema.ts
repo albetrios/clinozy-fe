@@ -131,7 +131,8 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_STRIPE_PUBLISHABLE_KEY:
     'Stripe publishable key (pk_test_ in dev, pk_live_ in prod); public, safe to expose.',
   VITE_LAYOUT_WIDTH: 'App layout width: contained (default), full, or reading.',
-  VITE_THEME_LOCK: '"true" hides the runtime theme switcher + shuffle.',
+  VITE_THEME_LOCK:
+    '"true" pins the theme mode: the Account menu hides its Light / Dark / System pills and Appearance shows a note in place of its Mode card.',
   VITE_PRIVACY_POLICY_URL:
     'Privacy-policy URL shown in the consent banner/footer (optional).',
   VITE_CSP_REPORT_URI:
@@ -155,8 +156,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     'Cloudflare Turnstile site key; required in production unless VITE_CAPTCHA_DISABLED is true.',
   VITE_DEBUG_LOGGING:
     '"true" emits [Module] diagnostic console logs (on locally and in the development deploy, off in production).',
-  VITE_DEVTOOLS:
-    '"true" mounts React Query Devtools + the localhost debug panel + theme-shuffle shortcut.',
+  VITE_DEVTOOLS: '"true" mounts React Query Devtools + the localhost debug panel.',
   VITE_E2E_HOOKS:
     '"true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession).',
   VITE_VERSION_CHECK:

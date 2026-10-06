@@ -14,11 +14,24 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AccountMenu } from './AccountMenu.tsx';
 
-const { logoutMock, disabledModules } = vi.hoisted(() => ({
+const { logoutMock, disabledModules, platformOverrides } = vi.hoisted(() => ({
   logoutMock: vi.fn(),
   disabledModules: new Set<string>(),
+  platformOverrides: { themeLock: false },
 }));
 vi.mock('@/shared/auth/service.ts', () => ({ logout: logoutMock }));
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
 // The deployment's module switch (`VITE_DISABLED_MODULES`), read through the
 // same gate the Settings rail uses.
 vi.mock('@/core/security/gates/require-module.ts', async (importOriginal) => ({
@@ -35,6 +48,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 beforeEach(() => {
   resetPresenceFixture();
   disabledModules.clear();
+  platformOverrides.themeLock = false;
   logoutMock.mockReset().mockResolvedValue(undefined);
   useAuthStore.setState({
     user: {
@@ -74,6 +88,14 @@ describe('AccountMenu', () => {
     const { user, menu } = await openMenu();
     await user.click(within(menu).getByTestId('account-menu-theme-dark'));
     expect(useThemeStore.getState().theme).toBe('dark');
+  });
+
+  it('hides the mode pills on a theme-locked deployment, keeping the Appearance row', async () => {
+    platformOverrides.themeLock = true;
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    const { menu } = await openMenu();
+    expect(within(menu).queryByTestId('account-menu-theme-dark')).not.toBeInTheDocument();
+    expect(within(menu).getByTestId('account-menu-appearance')).toBeInTheDocument();
   });
 
   it('opens the Appearance drawer from the row under the mode pills', async () => {

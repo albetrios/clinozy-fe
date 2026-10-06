@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { platformConfig } from '@/core/config/env.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
 import { logout } from '@/shared/auth/service.ts';
@@ -393,7 +394,9 @@ export function AccountMenu({
         <DropdownMenuSeparator className="m-0" />
         <StatusPills />
         <DropdownMenuSeparator className="m-0" />
-        <AppearancePills />
+        {/* A theme-locked deployment (`VITE_THEME_LOCK`) pins the mode, so the
+            pills give way — the Appearance drawer says why. */}
+        {platformConfig.themeLock ? null : <AppearancePills />}
         {/* The rest of Appearance — the language, text direction, date-time and
             number preferences — sits one tap away, in its drawer. */}
         <div className="px-1.5 pb-1.5">
