@@ -10,6 +10,7 @@ import {
   personFullName,
   shortPersonName,
 } from '@/shared/components/Cells/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
   PopoverContent,
@@ -302,8 +303,10 @@ function PersonRow({
         <span className="text-body font-medium">{personFullName(profile)}</span>
         <span className="text-muted-foreground text-micro truncate">{roleLine}</span>
       </span>
-      <button
+      <Button
         type="button"
+        variant={own ? 'default' : 'outline'}
+        size="sm"
         title={why}
         aria-pressed={own}
         disabled={own ? undefined : assignOff}
@@ -311,14 +314,13 @@ function PersonRow({
         onClick={() => {
           if (!assignOff) onAssign();
         }}
-        data-slot="button"
         className={cn(
-          'text-body h-8 rounded-lg border px-2 font-medium disabled:opacity-40',
-          own ? 'bg-primary text-primary-foreground border-primary' : 'bg-card',
+          'px-2 disabled:opacity-40',
+          own ? 'border-primary border' : 'bg-card shadow-none',
         )}
       >
         {t(own ? LEADS_KEYS.drawer.popover.assigned : LEADS_KEYS.drawer.popover.assign)}
-      </button>
+      </Button>
       <button
         type="button"
         title={t(LEADS_KEYS.drawer.popover.involved)}

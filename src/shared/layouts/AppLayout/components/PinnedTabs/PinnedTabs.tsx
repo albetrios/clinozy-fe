@@ -6,6 +6,7 @@ import { measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 import type {
   SectionBarEntry,
@@ -135,13 +136,15 @@ export function PinnedTabs({
           testId="nav-more"
           className="flex-none"
           renderTrigger={({ open }) => (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               aria-label={t(LAYOUT_KEYS.app.sectionBar.morePinned)}
               title={t(LAYOUT_KEYS.app.sectionBar.morePinned)}
               data-testid="nav-more"
               className={cn(
-                'text-foreground-soft hover:bg-muted text-body flex h-8 flex-none items-center gap-1 rounded-lg ps-2.5 pe-2 font-medium whitespace-nowrap transition-colors duration-160',
+                'text-foreground-soft hover:bg-muted gap-1 ps-2.5 pe-2 duration-160',
                 open && 'bg-muted',
               )}
             >
@@ -153,7 +156,7 @@ export function PinnedTabs({
                   open && 'rotate-180',
                 )}
               />
-            </button>
+            </Button>
           )}
         />
       ) : null}

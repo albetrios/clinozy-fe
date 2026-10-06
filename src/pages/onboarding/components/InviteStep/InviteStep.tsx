@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { closeControlClassName } from '@/lib/icon-surface.ts';
-import { cn } from '@/lib/utils.ts';
 import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 import {
   PersonAvatar,
@@ -127,18 +125,16 @@ export function InviteStep() {
               >
                 {invite}
               </span>
-              <button
+              <Button
                 type="button"
-                data-slot="button"
+                variant="ghost"
+                size="icon-xs"
                 aria-label={t(ONBOARDING_KEYS.invite.removeAriaLabel, { email: invite })}
                 onClick={() => patch({ invites: invites.filter((i) => i !== invite) })}
-                className={cn(
-                  closeControlClassName,
-                  'hover:bg-destructive-tint hover:text-destructive',
-                )}
+                className="text-muted-foreground hover:bg-destructive-tint dark:hover:bg-destructive-tint hover:text-destructive size-6.5 rounded-md"
               >
                 <X className="size-3.5" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

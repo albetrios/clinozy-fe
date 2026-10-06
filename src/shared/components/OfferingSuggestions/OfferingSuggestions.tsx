@@ -10,6 +10,7 @@ import {
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { ChevronDown, Eye, EyeOff, Plus } from '@/shared/icons/index.ts';
@@ -173,22 +174,23 @@ function PlanTotal({
         <span className="text-title font-semibold tabular-nums">{total}</span>
         <span className="text-caption text-muted-foreground tabular-nums">{summary}</span>
       </span>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon-sm"
         aria-pressed={pricesShown}
         aria-label={priceLabel}
         title={priceLabel}
         data-testid={OFFERING_SUGGESTIONS_TEST_IDS.prices}
         onClick={() => onPricesShownChange(!pricesShown)}
-        data-slot="button"
-        className="border-border bg-card text-muted-foreground-strong hover:bg-muted hover:text-foreground flex size-8 flex-none items-center justify-center rounded-lg border transition-colors"
+        className="border-border bg-card text-muted-foreground-strong hover:bg-muted hover:text-foreground shadow-none"
       >
         {pricesShown ? (
           <EyeOff aria-hidden="true" className="size-4" />
         ) : (
           <Eye aria-hidden="true" className="size-4" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -289,18 +291,19 @@ function PlanBody({
             testId={OFFERING_SUGGESTIONS_TEST_IDS.addOffering}
             className="w-auto"
             renderTrigger={() => (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 data-testid={OFFERING_SUGGESTIONS_TEST_IDS.addOffering}
-                data-slot="button"
-                className="border-border-strong bg-card hover:bg-muted text-detail inline-flex h-7.5 items-center gap-1.5 rounded-lg border border-dashed ps-2.5 pe-3 font-medium transition-colors"
+                className="border-border-strong bg-card hover:bg-muted text-detail h-7.5 border-dashed ps-2.5 shadow-none"
               >
                 <Plus
                   aria-hidden="true"
                   className="text-muted-foreground-strong size-3.5"
                 />
                 {t(KEYS.addOffering)}
-              </button>
+              </Button>
             )}
           />
         </div>

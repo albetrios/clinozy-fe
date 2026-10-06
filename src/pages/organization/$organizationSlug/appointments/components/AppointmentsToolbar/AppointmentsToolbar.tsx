@@ -8,6 +8,7 @@ import {
 import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { RoomToolbar, RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -69,18 +70,19 @@ function PeriodControls({ view }: { view: AppointmentCalendarView }) {
     <>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="outline"
             aria-pressed={current}
             data-testid={APPOINTMENTS_TEST_IDS.today}
             onClick={navigation.goToday}
             className={cn(
-              'text-body h-9 flex-none rounded-lg border px-3 font-medium whitespace-nowrap transition-colors',
+              'px-3 shadow-none',
               current ? 'bg-muted' : 'bg-card hover:bg-muted',
             )}
           >
             {t(keys.today[view])}
-          </button>
+          </Button>
         </TooltipTrigger>
         <TooltipContent>{t(keys.jump[view])}</TooltipContent>
       </Tooltip>

@@ -312,6 +312,45 @@ test('allows a bg-popover shell whose data-slot sits within four lines above', (
   assert.equal(runGateOn(source).status, 0);
 });
 
+test('allows a bg-card on a <Button>, which brings data-slot="button", however far its tag', () => {
+  const source = [
+    'export const probe = (',
+    '  <Button',
+    '    type="button"',
+    '    variant="outline"',
+    '    size="sm"',
+    '    aria-label="Probe"',
+    '    data-testid="probe"',
+    '    onClick={() => undefined}',
+    '    className="bg-card hover:bg-muted"',
+    '  />',
+    ');',
+  ].join('\n');
+
+  const { status, output } = runGateOn(source);
+  assert.equal(status, 0, output);
+});
+
+test('still flags a bg-card shell that only follows a <Button> — the nearest tag owns the class', () => {
+  const source = [
+    'export const probe = (',
+    '  <>',
+    '    <Button type="button" />',
+    '    <div',
+    '      data-testid="probe"',
+    '      aria-label="Probe"',
+    '      role="group"',
+    '      className="bg-card border p-4"',
+    '    />',
+    '  </>',
+    ');',
+  ].join('\n');
+
+  const { status, output } = runGateOn(source);
+  assert.equal(status, 1, output);
+  assert.match(output, /bg-card\/bg-popover without data-slot/);
+});
+
 // ── The older checks still fire through the injected root ───────────────────
 
 test('still flags a hardcoded shadow (check 1)', () => {

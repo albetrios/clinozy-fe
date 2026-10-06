@@ -14,6 +14,7 @@ import {
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import type { ContactEditorRecord } from '@/shared/forms/ContactEditor/index.ts';
@@ -214,16 +215,17 @@ function NewLeadPerson({
       onEditContact={onEdit}
       onChangeContact={onChange}
       aside={
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="xs"
           title={t(K.changeTitle)}
           onClick={onChange}
           data-testid={LEADS_TEST_IDS.newLeadChange}
-          data-slot="button"
-          className="bg-card text-foreground-soft hover:bg-muted h-7 rounded-lg border px-2.5 text-xs font-medium"
+          className="bg-card text-foreground-soft hover:bg-muted text-xs shadow-none"
         >
           {t(K.change)}
-        </button>
+        </Button>
       }
     />
   );

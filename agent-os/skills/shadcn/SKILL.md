@@ -43,6 +43,12 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     `CalendarPicker`, `compact` the booking step, `regular` the Filters; `tone`, a
     `dots` modifier, `testIds`). Never a hand-built grid of day buttons, never
     `ui/calendar`.
+  - A button → **`ui/button`** at the design's sizes (13px: `default` 36px, `sm` 32,
+    `xs` 28, the square `icon` / `icon-sm` / `icon-xs`, the phone's floating `pill`) —
+    `variant` `default` (the z900 fill), `outline`, `ghost`, `link`, `danger` (the
+    light-red row action) or `destructive` (the red fill). Never a raw `<button>` styled
+    as one; chips, list rows, steppers, tiles, the `Picker` trigger and the
+    `floating-edge` handles stay raw.
   - A menu of ACTIONS (Account, "+", row ⋯, theme toggle) → `ui/dropdown-menu`.
   - Confirm an action → **`ConfirmDialog`** (`reason` for a record delete / cancel /
     void; plain otherwise — it busy-blocks dismissal); "discard changes?" →

@@ -9,13 +9,15 @@ import type {
 
 import { VISIT_FLOW_STEPS, type VisitFlowStep } from './visit-flow.constants.ts';
 
-/** A 32px step button with a hairline (H:759–766). */
-export const OUTLINE_BUTTON =
-  'bg-background text-foreground hover:bg-muted text-detail h-8 rounded-lg border px-3 font-medium whitespace-nowrap';
+/** A 32px step button with a hairline (H:759–766): the props a `Button` spreads. */
+export const OUTLINE_BUTTON = {
+  variant: 'outline',
+  size: 'sm',
+  className: 'text-foreground hover:bg-muted text-detail shadow-none',
+} as const;
 
-/** A 32px dark step button ("✓ Complete visit", "Create invoice from visit"). */
-export const DARK_BUTTON =
-  'bg-primary text-primary-foreground hover:bg-primary/90 text-detail h-8 rounded-lg px-3 font-medium whitespace-nowrap';
+/** A 32px dark step button ("✓ Complete visit", "Create invoice from visit"): the props a `Button` spreads. */
+export const DARK_BUTTON = { size: 'sm', className: 'text-detail' } as const;
 
 /** Where a step stands: done (✓), current (the first not done after the done ones), or later. */
 export type VisitFlowStepState = 'done' | 'current' | 'later';

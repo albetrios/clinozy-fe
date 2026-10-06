@@ -11,6 +11,7 @@ import {
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import { PickerSheet } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Switch } from '@/shared/components/ui/switch.tsx';
 import { Sparkles } from '@/shared/icons/index.ts';
 
@@ -138,14 +139,15 @@ export function TaskRulesPopover({ settings, canEdit, onChange }: TaskRulesPopov
       testId={TASKS_TEST_IDS.rules}
       panelClassName="w-100 max-w-[calc(100vw-2.5rem)] max-h-(--radix-popover-content-available-height) rounded-xl"
       trigger={
-        <button
+        <Button
           type="button"
+          variant="outline"
           data-testid={TASKS_TEST_IDS.rulesTrigger}
-          className="text-body text-foreground hover:bg-muted bg-background border-border flex h-9 flex-none items-center gap-1.5 rounded-lg border ps-2.5 pe-3 leading-none font-medium whitespace-nowrap transition-colors duration-120"
+          className="text-foreground hover:bg-muted gap-1.5 ps-2.5 pe-3 leading-none shadow-none duration-120"
         >
           <Sparkles aria-hidden="true" className="text-muted-foreground size-3.75" />
           {label}
-        </button>
+        </Button>
       }
     >
       <div className="flex min-h-0 flex-1 flex-col">

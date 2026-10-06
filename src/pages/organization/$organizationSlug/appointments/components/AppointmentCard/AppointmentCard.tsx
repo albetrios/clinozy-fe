@@ -27,6 +27,7 @@ import {
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   HoverCard,
   HoverCardContent,
@@ -317,29 +318,29 @@ function CardButton({
   children: ReactNode;
 }) {
   const off = !guard.allowed;
-  let look = 'bg-card text-foreground border hover:bg-muted';
-  if (primary) look = 'bg-primary text-primary-foreground hover:bg-primary/90';
-  else if (destructive) {
-    look =
-      'bg-card text-destructive border border-destructive-border hover:bg-destructive-tint';
-  }
+  // The outline move: neutral, or red ink on a red edge that tints on hover.
+  const look = destructive
+    ? 'text-destructive border-destructive-border hover:bg-destructive-tint hover:text-destructive'
+    : 'text-foreground hover:bg-muted';
   return (
-    <button
+    <Button
       type="button"
+      variant={primary ? 'default' : 'outline'}
+      size="sm"
       aria-disabled={off || undefined}
       data-testid={testId}
       onClick={() => {
         if (!off) onClick();
       }}
       className={cn(
-        'h-8 rounded-lg font-medium transition-colors duration-120',
-        small ? 'px-2.5 text-xs' : 'text-detail min-w-0 flex-1 px-3',
-        look,
+        'duration-120',
+        small ? 'px-2.5 text-xs' : 'text-detail min-w-0 flex-1',
+        !primary && cn('bg-card shadow-none', look),
         off && 'cursor-not-allowed opacity-50',
       )}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

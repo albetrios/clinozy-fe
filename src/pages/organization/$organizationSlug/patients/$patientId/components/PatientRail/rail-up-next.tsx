@@ -13,6 +13,7 @@ import type {
   PatientNextVisit,
 } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
@@ -54,19 +55,19 @@ function CardButton({
   testId: string;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant={primary ? 'default' : 'outline'}
+      size="xs"
       onClick={onClick}
       data-testid={testId}
       className={cn(
-        'h-7 flex-none rounded-lg px-2.5 text-xs font-medium whitespace-nowrap transition-colors',
-        primary
-          ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-          : 'bg-card text-foreground hover:bg-muted border',
+        'text-xs',
+        !primary && 'bg-card text-foreground hover:bg-muted shadow-none',
       )}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

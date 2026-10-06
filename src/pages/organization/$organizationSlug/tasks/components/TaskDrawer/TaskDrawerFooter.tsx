@@ -9,6 +9,7 @@ import {
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import type { TaskAssignees } from '../../hooks/useTaskAssignees/index.ts';
@@ -17,9 +18,8 @@ import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 const K = TASKS_KEYS.drawer;
 const IDS = TASKS_TEST_IDS.drawer;
 
-/** The footer's 36px outline buttons (`tasks.md` › Task drawer › Footer). */
-const FOOTER_BUTTON =
-  'bg-card hover:bg-muted text-body text-foreground inline-flex h-9 flex-none items-center gap-1.5 rounded-lg border font-medium whitespace-nowrap transition-colors disabled:opacity-50';
+/** The footer's 36px outline buttons (`tasks.md` › Task drawer › Footer), on the outline `Button`. */
+const FOOTER_BUTTON = 'bg-card hover:bg-muted text-foreground gap-1.5 shadow-none';
 
 /** A dropdown's chevron, turned over while its list is open. */
 function Chevron({ open }: { open: boolean }) {
@@ -81,10 +81,14 @@ export function TaskDrawerFooterControls({
         testId={IDS.snooze}
         className="flex flex-none"
         renderTrigger={({ open: listOpen }) => (
-          <button type="button" className={cn(FOOTER_BUTTON, 'ps-3.5 pe-2.5')}>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(FOOTER_BUTTON, 'ps-3.5 pe-2.5')}
+          >
             {t(K.snooze)}
             <Chevron open={listOpen} />
-          </button>
+          </Button>
         )}
       />
       <Picker
@@ -101,15 +105,16 @@ export function TaskDrawerFooterControls({
         testId={IDS.assign}
         className="flex min-w-0 flex-none"
         renderTrigger={({ open: listOpen }) => (
-          <button
+          <Button
             type="button"
+            variant="outline"
             title={t(K.assignTip)}
             className={cn(FOOTER_BUTTON, 'max-w-full min-w-0 ps-3 pe-2.5')}
           >
             <span className="text-muted-foreground">{t(K.assigned)}</span>
             <span className="min-w-0 truncate">{owner}</span>
             <Chevron open={listOpen} />
-          </button>
+          </Button>
         )}
       />
       {was.length > 0 ? (

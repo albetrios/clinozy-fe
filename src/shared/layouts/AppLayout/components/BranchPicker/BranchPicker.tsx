@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { ChevronDown, MapPin } from '@/shared/icons/index.ts';
@@ -106,13 +107,15 @@ export function BranchPicker() {
       testId="branch-picker"
       className="flex-none"
       renderTrigger={({ open }) => (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           aria-label={t(keys.label, { label })}
           title={t(keys.title, { names: isAll ? t(keys.all) : names.join(', ') })}
           data-testid="branch-picker"
           className={cn(
-            'bg-card hover:bg-muted text-detail flex h-8 flex-none items-center gap-1 rounded-lg border px-2 font-medium whitespace-nowrap transition-colors md:gap-1.5 md:px-2.5',
+            'bg-card hover:bg-muted text-detail gap-1 px-2 shadow-none md:gap-1.5 md:px-2.5',
             open ? 'border-disabled' : 'border-border',
           )}
         >
@@ -131,7 +134,7 @@ export function BranchPicker() {
             )}
             aria-hidden
           />
-        </button>
+        </Button>
       )}
     />
   );

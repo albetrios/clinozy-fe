@@ -155,17 +155,19 @@ function CancelView({
   return (
     <div className="flex flex-col gap-0.5">
       <div className="flex items-center gap-1.5 px-1 pt-0.5 pb-1">
-        <button
+        <Button
           ref={backRef}
           type="button"
+          variant="ghost"
+          size="icon-xs"
           aria-label={t(APPOINTMENTS_KEYS.status.back)}
           title={t(APPOINTMENTS_KEYS.status.back)}
           data-testid={APPOINTMENTS_TEST_IDS.statusBack}
           onClick={onBack}
-          className="text-muted-foreground-strong hover:bg-muted flex size-6 flex-none items-center justify-center rounded-md transition-colors"
+          className="text-muted-foreground-strong hover:bg-muted size-6 rounded-md"
         >
           <ChevronLeft aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-        </button>
+        </Button>
         <span className="text-body font-semibold">{t(APPOINTMENTS_KEYS.status.why)}</span>
       </div>
       {CANCEL_REASON_GROUPS.map(({ side, reasons }) => (

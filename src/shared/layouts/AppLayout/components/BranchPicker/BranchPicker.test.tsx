@@ -64,7 +64,8 @@ describe('BranchPicker', () => {
     expect(label).toHaveTextContent('All branches');
     expect(label).toHaveClass('hidden', 'md:inline');
     expect(trigger).toHaveAccessibleName('Branch · All branches');
-    expect(trigger).toHaveClass('flex-none');
+    // The button never shrinks in the header row.
+    expect(trigger).toHaveClass('shrink-0');
   });
 
   it('keeps at least one branch', async () => {

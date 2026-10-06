@@ -5,6 +5,7 @@ import {
   TABLE_KEYS,
   TABLE_NS,
 } from '@/shared/components/DataTable/data-table.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { type AppIcon, Check, X } from '@/shared/icons/index.ts';
 
 /** One action of the bulk bar, run over the selected rows. */
@@ -66,14 +67,16 @@ export function DataTableBulkBar<TRow>({
         {t(TABLE_KEYS.selection.selected, { count })}
       </span>
       {count < total ? (
-        <button
+        <Button
           type="button"
+          variant="link"
+          size="xs"
           onClick={onSelectAll}
           data-testid={`${testIdPrefix}-table-bulk-select-all`}
-          className="text-detail text-primary-foreground/70 hover:text-primary-foreground h-7 flex-none rounded-md px-2 font-medium underline underline-offset-3"
+          className="text-detail text-primary-foreground/70 hover:text-primary-foreground rounded-md px-2 underline underline-offset-3"
         >
           {t(TABLE_KEYS.selection.selectAllCount, { count: total })}
-        </button>
+        </Button>
       ) : null}
       <span
         aria-hidden="true"
@@ -82,35 +85,41 @@ export function DataTableBulkBar<TRow>({
       {actions.map((action) => {
         const Icon = action.icon;
         return (
-          <button
+          <Button
             key={action.id}
             type="button"
+            variant="ghost"
+            size="xs"
             onClick={() => action.onSelect(selected)}
             data-testid={`${testIdPrefix}-table-bulk-${action.id}`}
             className={cn(
-              'text-detail hover:bg-primary-foreground/10 flex h-7.5 flex-none items-center gap-1.5 rounded-lg px-2.5 font-medium',
-              action.destructive && 'text-destructive-border',
+              'text-detail hover:bg-primary-foreground/10 dark:hover:bg-primary-foreground/10 h-7.5 gap-1.5',
+              action.destructive
+                ? 'text-destructive-border hover:text-destructive-border'
+                : 'hover:text-primary-foreground',
             )}
           >
             <Icon aria-hidden="true" className="size-3.5" />
             {action.label}
-          </button>
+          </Button>
         );
       })}
       <span className="flex-1" />
       <kbd className="border-primary-foreground/25 text-tiny text-primary-foreground/60 flex h-5 flex-none items-center rounded-sm border px-1.5 font-mono">
         {t(TABLE_KEYS.selection.escape)}
       </kbd>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-xs"
         onClick={onClear}
         aria-label={t(TABLE_KEYS.selection.clear)}
         title={t(TABLE_KEYS.selection.clearHint)}
         data-testid={`${testIdPrefix}-table-bulk-clear`}
-        className="text-primary-foreground/60 hover:bg-primary-foreground/10 hover:text-primary-foreground flex size-7.5 flex-none items-center justify-center rounded-lg"
+        className="text-primary-foreground/60 hover:bg-primary-foreground/10 dark:hover:bg-primary-foreground/10 hover:text-primary-foreground size-7.5"
       >
         <X aria-hidden="true" className="size-3.5" />
-      </button>
+      </Button>
     </div>
   );
 }

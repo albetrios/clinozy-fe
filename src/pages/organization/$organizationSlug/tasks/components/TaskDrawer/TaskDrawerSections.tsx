@@ -20,6 +20,7 @@ import {
   ContactCard,
   type ContactCardActions,
 } from '@/shared/components/PersonCard/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { Sparkles } from '@/shared/icons/index.ts';
 
@@ -144,15 +145,16 @@ function WhoRow({
       </ContactCard>
       <span className="flex-1" />
       {source ? (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           data-testid={IDS.source}
-          data-slot="button"
           onClick={() => onOpenTarget(source.target)}
-          className="bg-card hover:bg-muted text-detail h-8 flex-none rounded-lg border px-3 font-medium whitespace-nowrap transition-colors"
+          className="bg-card hover:bg-muted text-detail shadow-none"
         >
           {t(K.source[source.kind], { record })}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -269,16 +271,17 @@ function AutomationCard({
           {tRules(key)}
         </span>
       </span>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         disabled={disabled}
         data-testid={IDS.automationAction}
-        data-slot="button"
         onClick={onHandOver}
-        className="border-primary bg-card hover:bg-muted text-detail h-8 flex-none rounded-lg border px-3 font-medium whitespace-nowrap transition-colors disabled:opacity-50"
+        className="border-primary bg-card hover:bg-muted text-detail shadow-none"
       >
         {t(K.automation.action)}
-      </button>
+      </Button>
     </div>
   );
 }

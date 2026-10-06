@@ -27,6 +27,7 @@ import {
   PICKER_NS,
   type PickerOption,
 } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
@@ -272,16 +273,17 @@ function PackageField({
               ? t(K.noPackage, { name: draft.who.name })
               : t(K.pickContactPackages)}
           </span>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="xs"
             disabled={disabled}
             data-testid={IDS.packageAsTreatment}
-            data-slot="button"
             onClick={() => onChange({ kind: 'type', type: 'treatment', packages })}
-            className="bg-card hover:bg-muted h-7 flex-none rounded-lg border px-2.5 text-xs font-medium transition-colors disabled:opacity-50"
+            className="bg-card hover:bg-muted text-xs shadow-none"
           >
             {t(K.asTreatment)}
-          </button>
+          </Button>
         </div>
       )}
     </StepField>

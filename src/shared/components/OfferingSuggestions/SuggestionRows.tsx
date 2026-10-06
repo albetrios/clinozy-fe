@@ -9,6 +9,7 @@ import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -427,15 +428,16 @@ export function IdeaRow({ idea, onAdd }: { idea: SuggestionIdea; onAdd?: () => v
         {onAdd ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="xs"
                 aria-label={t(KEYS.addNamed, { name: idea.name })}
                 onClick={onAdd}
-                data-slot="button"
-                className="border-border bg-card hover:bg-muted hover:border-foreground h-7 rounded-md border px-2.5 text-xs font-medium whitespace-nowrap transition-colors"
+                className="border-border bg-card hover:bg-muted hover:border-foreground rounded-md text-xs shadow-none"
               >
                 {t(KEYS.add)}
-              </button>
+              </Button>
             </TooltipTrigger>
             <TooltipContent>{t(KEYS.addHint)}</TooltipContent>
           </Tooltip>

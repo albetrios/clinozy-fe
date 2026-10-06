@@ -7,6 +7,7 @@ import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
 import type { VisitDetail, VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useOpenInvoices } from '@/shared/hooks/usePayments/index.ts';
 import { useVisitCatalog, useVisitDetail } from '@/shared/hooks/useVisits/index.ts';
@@ -221,22 +222,22 @@ export function VisitFlow({ visit }: { visit: VisitRecord }) {
         <span className="text-body text-muted-foreground-strong">{t(K.lead)}</span>
         <span className="flex-1 max-md:hidden" />
         <div className="flex gap-2 max-md:basis-full">
-          <button
+          <Button
             type="button"
+            {...OUTLINE_BUTTON}
             onClick={actions.pause}
             data-testid={ids.pause}
-            className={OUTLINE_BUTTON}
           >
             {t(K.pause)}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            {...DARK_BUTTON}
             onClick={actions.complete}
             data-testid={ids.complete}
-            className={DARK_BUTTON}
           >
             {t(K.complete)}
-          </button>
+          </Button>
         </div>
       </div>
       {VISIT_FLOW_STEPS.map((step, index) => (

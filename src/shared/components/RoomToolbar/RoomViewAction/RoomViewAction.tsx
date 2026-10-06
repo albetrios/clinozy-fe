@@ -1,6 +1,7 @@
 import type { ComponentProps, Ref } from 'react';
 
 import { cn } from '@/lib/utils.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -45,20 +46,21 @@ export function RoomViewAction({
   ...props
 }: RoomViewActionProps) {
   const button = (
-    <button
+    <Button
       type="button"
+      variant="outline"
       aria-label={collapse ? label : undefined}
       data-testid={`${tableId}-view-action-${actionId}`}
       {...props}
       className={cn(
-        'text-body text-foreground bg-background hover:bg-muted border-border flex h-9 flex-none items-center justify-center gap-1.5 rounded-lg border leading-none font-medium whitespace-nowrap transition-colors duration-120',
-        collapse ? 'max-xl:w-9 xl:ps-2.5 xl:pe-3' : 'ps-2.5 pe-3',
+        'text-foreground hover:bg-muted gap-1.5 leading-none shadow-none duration-120',
+        collapse ? 'max-xl:w-9 max-xl:px-0 xl:ps-2.5 xl:pe-3' : 'ps-2.5 pe-3',
         className,
       )}
     >
       <Icon aria-hidden="true" className={cn('size-3.5 flex-none', iconClassName)} />
       <span className={cn(collapse && 'max-xl:sr-only')}>{label}</span>
-    </button>
+    </Button>
   );
   if (!collapse) return button;
   return (

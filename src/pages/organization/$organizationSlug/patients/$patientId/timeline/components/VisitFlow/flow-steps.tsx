@@ -11,6 +11,7 @@ import {
   type VisitRxKit,
 } from '@/shared/api/clinic/visits-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { WhatsAppMark } from '@/shared/icons/index.ts';
 
 import type { VisitFlowActions } from './use-visit-flow.ts';
@@ -26,6 +27,13 @@ const ids = VISIT_FLOW_TEST_IDS;
 
 /** Each collect mode's tone (H:766): UPI sage, Cash butter, Card sky. */
 const MODE_TONES = { upi: 'sage', cash: 'butter', card: 'sky' } as const;
+
+/** Each mode's button under the pointer: its tone at 80%. */
+const MODE_PRESS = {
+  upi: 'hover:bg-tone-sage/80',
+  cash: 'hover:bg-tone-butter/80',
+  card: 'hover:bg-tone-sky/80',
+} as const;
 
 /** Step 1 (H:762): the three safety checks, each a tile that ticks. */
 export function ChecksStep({
@@ -111,14 +119,14 @@ export function RxStep({
           })
         : null}
       {writeRx ? (
-        <button
+        <Button
           type="button"
+          {...OUTLINE_BUTTON}
           onClick={writeRx}
           data-testid={ids.writeRx}
-          className={OUTLINE_BUTTON}
         >
           {t(K.rx.write)}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -141,24 +149,25 @@ export function TreatmentStep({
   return (
     <div className="flex flex-wrap items-center gap-2">
       {actions.repeatTreatment && last ? (
-        <button
+        <Button
           type="button"
+          size="sm"
           onClick={actions.repeatTreatment}
           data-testid={ids.repeat}
-          className="bg-tone-lav text-tone-lav-foreground text-detail h-8 rounded-lg px-3 font-medium"
+          className="bg-tone-lav text-tone-lav-foreground hover:bg-tone-lav/80 text-detail"
         >
           {t(K.treatment.repeat, { name: last.name, session: last.sessionNo + 1 })}
-        </button>
+        </Button>
       ) : null}
       {actions.newTreatment ? (
-        <button
+        <Button
           type="button"
+          {...OUTLINE_BUTTON}
           onClick={actions.newTreatment}
           data-testid={ids.newTreatment}
-          className={OUTLINE_BUTTON}
         >
           {t(K.treatment.new)}
-        </button>
+        </Button>
       ) : null}
       {memo ? (
         <span className="text-muted-foreground text-xs">
@@ -209,24 +218,24 @@ export function InvoiceStep({
       ) : null}
       <div className="flex flex-wrap gap-2">
         {actions.createInvoice ? (
-          <button
+          <Button
             type="button"
+            {...DARK_BUTTON}
             onClick={actions.createInvoice}
             data-testid={ids.createInvoice}
-            className={DARK_BUTTON}
           >
             {t(K.invoice.create)}
-          </button>
+          </Button>
         ) : null}
         {actions.customInvoice ? (
-          <button
+          <Button
             type="button"
+            {...OUTLINE_BUTTON}
             onClick={actions.customInvoice}
             data-testid={ids.customInvoice}
-            className={OUTLINE_BUTTON}
           >
             {t(K.invoice.custom)}
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>
@@ -250,29 +259,33 @@ export function CollectStep({
     <div className="flex flex-wrap items-center gap-2">
       {collect && due
         ? VISIT_PAYMENT_MODES.map((mode) => (
-            <button
+            <Button
               key={mode}
               type="button"
+              size="sm"
               onClick={() => collect(mode)}
               data-testid={ids.collect(mode)}
               className={cn(
-                'text-detail h-8 rounded-lg px-3 font-semibold',
+                'text-detail font-semibold',
                 TONE_CLASSES[MODE_TONES[mode]].surface,
+                MODE_PRESS[mode],
               )}
             >
               {mode === 'upi' ? t(K.collect.upi, { amount: due }) : modeLabel(mode)}
-            </button>
+            </Button>
           ))
         : null}
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={actions.share}
         data-testid={ids.share}
-        className="bg-background border-tone-sage-border text-tone-sage-foreground text-detail flex h-8 items-center gap-1.5 rounded-lg border px-3 font-medium"
+        className="border-tone-sage-border text-tone-sage-foreground hover:text-tone-sage-foreground text-detail shadow-none"
       >
         <WhatsAppMark aria-hidden="true" className="size-3.5 flex-none" />
         {t(K.collect.share)}
-      </button>
+      </Button>
     </div>
   );
 }

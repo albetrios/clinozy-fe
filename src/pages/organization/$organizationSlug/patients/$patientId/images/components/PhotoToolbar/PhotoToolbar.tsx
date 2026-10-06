@@ -6,6 +6,7 @@ import type { PatientPhotoVisit } from '@/shared/api/clinic/patient-images-api.t
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -201,11 +202,11 @@ export function PhotoToolbar({
         testId={PHOTO_TOOLBAR_TEST_IDS.visitFilter}
         className="flex-none"
         renderTrigger={({ open, selected }) => (
-          <button
+          <Button
             type="button"
+            variant="outline"
             data-testid={PHOTO_TOOLBAR_TEST_IDS.visitFilter}
-            data-slot="button"
-            className="bg-card text-body text-foreground hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg border ps-3 pe-2.5 font-medium whitespace-nowrap transition-colors"
+            className="bg-card text-foreground hover:bg-muted gap-1.5 ps-3 pe-2.5 shadow-none"
           >
             {selected[0]?.label ?? t(K.visitFilter.all)}
             <ChevronDown
@@ -215,7 +216,7 @@ export function PhotoToolbar({
                 open && 'rotate-180',
               )}
             />
-          </button>
+          </Button>
         )}
       />
       <span className="flex-1" />

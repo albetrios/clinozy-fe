@@ -17,6 +17,7 @@ import {
   type RoomViewTab,
   RoomViewTabs,
 } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -157,17 +158,17 @@ function ActivityToggle({
   const Icon = open ? PanelRightClose : PanelRightOpen;
   return (
     <Tip label={label}>
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={onToggle}
         aria-pressed={open}
         aria-label={label}
         data-testid={ids.activity}
-        data-slot="button"
         className={cn(
-          'text-body relative flex h-9 flex-none items-center justify-center gap-1.5 rounded-lg border font-medium whitespace-nowrap transition-colors max-md:w-9 md:ps-2.5 md:pe-3',
+          'relative gap-1.5 shadow-none max-md:w-9 max-md:px-0 md:ps-2.5 md:pe-3',
           open
-            ? 'bg-tone-sage text-tone-sage-foreground border-tone-sage-border hover:bg-tone-sage/80'
+            ? 'bg-tone-sage text-tone-sage-foreground border-tone-sage-border hover:bg-tone-sage/80 hover:text-tone-sage-foreground'
             : 'bg-card text-foreground hover:bg-muted',
         )}
       >
@@ -181,7 +182,7 @@ function ActivityToggle({
             className="max-md:absolute max-md:-end-1 max-md:-top-1"
           />
         ) : null}
-      </button>
+      </Button>
     </Tip>
   );
 }
@@ -226,16 +227,17 @@ export function PatientFileBar({
       className="grid flex-none grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 p-(--room-toolbar-pad) md:flex md:flex-nowrap md:gap-2.5"
     >
       <Tip label={t(K.backHint)}>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           onClick={onBack}
           aria-label={t(K.back)}
           data-testid={ids.back}
-          data-slot="button"
-          className="bg-card text-foreground-soft hover:bg-muted col-start-1 row-start-1 flex size-9 flex-none items-center justify-center rounded-lg border transition-colors"
+          className="bg-card text-foreground-soft hover:bg-muted col-start-1 row-start-1 shadow-none"
         >
           <ChevronLeft aria-hidden="true" className="size-4 rtl:-scale-x-100" />
-        </button>
+        </Button>
       </Tip>
 
       {/* While the rail shows: "Patients / <name>" (H:703 `crumbDisp`). */}
@@ -313,8 +315,10 @@ export function PatientFileBar({
               onOpenSection(picked);
             }}
             trigger={
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
                 aria-haspopup="dialog"
                 aria-label={t(PATIENT_SECTIONS_POPOVER_KEYS.trigger, {
                   ns: PATIENT_SECTIONS_POPOVER_NS,
@@ -323,14 +327,13 @@ export function PatientFileBar({
                   ns: PATIENT_SECTIONS_POPOVER_NS,
                 })}
                 data-testid={PATIENT_SECTIONS_TEST_ID}
-                data-slot="button"
                 className={cn(
-                  'text-foreground-soft hover:bg-muted flex size-9 items-center justify-center rounded-lg border transition-colors md:size-8',
+                  'text-foreground-soft hover:bg-muted shadow-none md:size-8',
                   sectionsOpen ? 'bg-muted border-border-strong' : 'bg-card',
                 )}
               >
                 <FolderOpen aria-hidden="true" className="size-4" />
-              </button>
+              </Button>
             }
           />
         </div>
@@ -346,29 +349,30 @@ export function PatientFileBar({
             open={addOpen}
             onOpenChange={setAddOpen}
             trigger={
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
                 aria-label={t(K.addToRecord)}
                 title={t(K.addToRecord)}
                 data-testid={ids.add}
-                data-slot="button"
-                className="bg-card text-foreground hover:bg-muted flex size-9 flex-none items-center justify-center rounded-lg border transition-colors"
+                className="bg-card text-foreground hover:bg-muted shadow-none"
               >
                 <Plus aria-hidden="true" className="size-4" />
-              </button>
+              </Button>
             }
           />
         ) : null}
         {onStartVisit ? (
-          <button
+          <Button
             type="button"
             onClick={onStartVisit}
             data-testid={ids.startVisit}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 text-body flex h-9 flex-none items-center gap-1.5 rounded-lg ps-2 pe-2.5 font-medium whitespace-nowrap transition-colors md:ps-3 md:pe-3.5"
+            className="gap-1.5 ps-2 pe-2.5 md:ps-3 md:pe-3.5"
           >
             <Play aria-hidden="true" className="size-3.25 rtl:-scale-x-100" />
             {t(K.startVisit)}
-          </button>
+          </Button>
         ) : null}
         <ActivityToggle
           open={activityOpen}

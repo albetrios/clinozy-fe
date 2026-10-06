@@ -29,6 +29,7 @@ import {
   type RoomViewTab,
   RoomViewTabs,
 } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
   PopoverAnchor,
@@ -71,30 +72,37 @@ const MODE_ICONS: Readonly<Record<ComposerMode, AppIcon>> = {
  * AA foreground (§7.3).
  */
 const MODE_PAINT: Readonly<
-  Record<ComposerMode, { tint: string; line: string; fill: string; ink: string }>
+  Record<
+    ComposerMode,
+    { tint: string; line: string; fill: string; press: string; ink: string }
+  >
 > = {
   whatsapp: {
     tint: 'bg-tone-sage',
     line: 'border-tone-sage-foreground',
     fill: 'bg-channel-whatsapp',
+    press: 'hover:bg-channel-whatsapp/90',
     ink: 'text-tone-sage-foreground',
   },
   instagram: {
     tint: 'bg-tone-blush',
     line: 'border-tone-blush-foreground',
     fill: 'bg-channel-instagram',
+    press: 'hover:bg-channel-instagram/90',
     ink: 'text-channel-instagram-foreground',
   },
   call: {
     tint: 'bg-tone-sky',
     line: 'border-tone-sky-foreground',
     fill: 'bg-channel-call',
+    press: 'hover:bg-channel-call/90',
     ink: 'text-tone-sky-foreground',
   },
   note: {
     tint: 'bg-tone-butter',
     line: 'border-tone-butter-foreground',
     fill: 'bg-channel-note',
+    press: 'hover:bg-channel-note/90',
     ink: 'text-tone-butter-foreground',
   },
 };
@@ -304,14 +312,16 @@ function Suggestions({
       <div className="flex items-center gap-2">
         <Sparkles aria-hidden="true" className="text-assist size-3.5 flex-none" />
         <span className="text-detail min-w-0 flex-1 truncate font-semibold">{title}</span>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           aria-label={t(keys.closeSuggestions)}
           onClick={onClose}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-6 flex-none items-center justify-center rounded-md"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground size-6 rounded-md"
         >
           <X aria-hidden="true" className="size-3.5" />
-        </button>
+        </Button>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {suggestions.map((chip) => {
@@ -408,23 +418,25 @@ function ComposerActions({
       {messaging ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               aria-label={t(keys.suggestions)}
               aria-haspopup="dialog"
               aria-expanded={suggestOpen}
               data-testid={ids.suggest}
               onClick={onToggleSuggest}
               className={cn(
-                'hover:bg-tone-lav inline-flex h-7.5 items-center gap-1.25 rounded-lg ps-2 pe-2.5 text-xs font-semibold whitespace-nowrap',
+                'hover:bg-tone-lav dark:hover:bg-tone-lav h-7.5 gap-1.25 ps-2 pe-2.5 text-xs font-semibold',
                 suggestOpen
-                  ? 'bg-tone-lav text-tone-lav-foreground'
-                  : 'text-muted-foreground-strong',
+                  ? 'bg-tone-lav text-tone-lav-foreground hover:text-tone-lav-foreground'
+                  : 'text-muted-foreground-strong hover:text-muted-foreground-strong',
               )}
             >
               <Sparkles aria-hidden="true" className="size-3.5" />
               {t(keys.suggest)}
-            </button>
+            </Button>
           </TooltipTrigger>
           <TooltipContent>{t(keys.suggestHint)}</TooltipContent>
         </Tooltip>
@@ -432,32 +444,36 @@ function ComposerActions({
       {messaging && onBook ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               aria-label={t(keys.book)}
               data-testid={ids.book}
               onClick={onBook}
-              className="text-muted-foreground-strong hover:bg-muted hover:text-foreground flex size-7.5 items-center justify-center rounded-lg"
+              className="text-muted-foreground-strong hover:bg-muted hover:text-foreground size-7.5"
             >
               <Calendar aria-hidden="true" className="size-3.75" />
-            </button>
+            </Button>
           </TooltipTrigger>
           <TooltipContent>{t(keys.bookHint)}</TooltipContent>
         </Tooltip>
       ) : null}
       <span className="flex-1" />
-      <button
+      <Button
         type="button"
+        size="xs"
         data-testid={ids.send}
         onClick={onSend}
         className={cn(
-          'text-background text-detail inline-flex h-7.5 items-center gap-1.5 rounded-lg ps-2.5 pe-3 font-medium whitespace-nowrap transition-colors duration-200',
+          'text-background text-detail h-7.5 gap-1.5 ps-2.5 pe-3 duration-200',
           MODE_PAINT[mode].fill,
+          MODE_PAINT[mode].press,
         )}
       >
         <Send aria-hidden="true" className="size-3.25" />
         {t(SEND_LABELS[mode])}
-      </button>
+      </Button>
     </div>
   );
 }

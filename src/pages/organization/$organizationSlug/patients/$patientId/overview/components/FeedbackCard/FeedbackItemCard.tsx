@@ -6,6 +6,7 @@ import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type { FeedbackItem } from '@/shared/api/clinic/feedback-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -112,14 +113,15 @@ function ActionLine({
       {canEdit ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
+            <Button
               type="button"
+              size="xs"
               data-testid={`${testId}-log-action`}
-              className="bg-foreground text-background hover:bg-foreground/85 inline-flex h-7 flex-none items-center gap-1 rounded-lg ps-2.5 pe-1.5 text-xs font-medium whitespace-nowrap"
+              className="bg-foreground text-background hover:bg-foreground/85 ps-2.5 pe-1.5 text-xs"
             >
               {t(K.logAction)}
               <ChevronDown aria-hidden="true" className="size-3.5 opacity-70" />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-57.5">
             <DropdownMenuLabel>{t(K.nextAction)}</DropdownMenuLabel>

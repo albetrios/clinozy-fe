@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Minus, Plus, X } from '@/shared/icons/index.ts';
 
 import {
@@ -98,15 +99,16 @@ function NewItemField({
         }}
         className="text-detail placeholder:text-muted-foreground h-7 min-w-0 flex-1 bg-transparent px-1.5 outline-none"
       />
-      <button
+      <Button
         type="button"
+        size="icon-xs"
         onClick={add}
         aria-label={t(K.addNew)}
         title={t(K.addNew)}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-7 flex-none items-center justify-center rounded-md transition-colors"
+        className="rounded-md"
       >
         <Plus aria-hidden="true" className="size-3.5" />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -161,15 +163,17 @@ export function QuickLineBrowse<TItem>({
             );
           })}
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           onClick={onClose}
           aria-label={t(K.closeBrowse)}
           title={t(K.closeBrowse)}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-7 flex-none items-center justify-center rounded-md transition-colors"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md"
         >
           <X aria-hidden="true" className="size-3.5" />
-        </button>
+        </Button>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-[repeat(auto-fill,minmax(11.25rem,1fr))] content-start gap-1.5 overflow-y-auto p-2.5">
         {shown.map((item) => {
@@ -234,14 +238,15 @@ export function QuickLineBrowse<TItem>({
             : null}
         </span>
         <span className="flex-1" />
-        <button
+        <Button
           type="button"
+          size="sm"
           onClick={onClose}
           data-testid={ids.done}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 text-body h-8 flex-none rounded-lg px-3.5 font-medium transition-colors"
+          className="px-3.5"
         >
           {t(K.done)}
-        </button>
+        </Button>
       </div>
     </>
   );

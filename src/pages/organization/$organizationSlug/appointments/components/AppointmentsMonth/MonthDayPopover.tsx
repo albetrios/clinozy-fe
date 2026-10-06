@@ -6,6 +6,7 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { closeControlClassName } from '@/lib/icon-surface.ts';
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
   PopoverAnchor,
@@ -85,18 +86,19 @@ export function MonthDayPopover({
           <span className="text-field min-w-0 flex-1 truncate font-semibold">
             {title}
           </span>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="xs"
             data-testid={APPOINTMENTS_TEST_IDS.monthOpenDay}
             onClick={() => {
               setOpen(false);
               onOpenDay(date);
             }}
-            data-slot="button"
-            className="border-border bg-card hover:bg-muted h-7 flex-none rounded-md border px-2.5 text-xs font-medium transition-colors"
+            className="border-border bg-card hover:bg-muted rounded-md text-xs shadow-none"
           >
             {t(APPOINTMENTS_KEYS.calendar.openDay)}
-          </button>
+          </Button>
           <button
             type="button"
             data-slot="button"

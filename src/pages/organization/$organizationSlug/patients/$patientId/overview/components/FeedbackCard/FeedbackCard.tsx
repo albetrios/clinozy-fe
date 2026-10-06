@@ -11,6 +11,7 @@ import {
 } from '@/shared/api/clinic/feedback-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   useDeleteCheckIn,
   useDeleteReview,
@@ -360,16 +361,17 @@ export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCard
           />
         </button>
         {canEdit ? (
-          <button
+          <Button
             type="button"
+            size="sm"
             onClick={onLog}
             data-testid={`${ID}-log`}
-            className="bg-foreground text-background hover:bg-foreground/85 text-detail inline-flex h-8 flex-none items-center gap-1.5 rounded-lg px-2.5 font-medium whitespace-nowrap"
+            className="bg-foreground text-background hover:bg-foreground/85 text-detail px-2.5"
           >
             <Plus aria-hidden="true" className="size-3.5" />
             {t(K.log)}
             <ChevronDown aria-hidden="true" className="size-3.5 opacity-70" />
-          </button>
+          </Button>
         ) : null}
       </div>
       {open ? (

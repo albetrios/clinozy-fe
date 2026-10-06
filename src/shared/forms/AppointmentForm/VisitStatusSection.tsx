@@ -10,6 +10,7 @@ import {
 import type { AppointmentStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TONE_CLASSES, type ToneClasses } from '@/shared/clinic/clinic-tones.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -205,16 +206,17 @@ function CancelledBanner({
         </span>
       </span>
       {onRestore ? (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           disabled={restoring}
           data-testid={IDS.restore}
-          data-slot="button"
           onClick={onRestore}
-          className="bg-card hover:bg-muted text-detail h-8 flex-none rounded-lg border px-3 font-medium whitespace-nowrap transition-colors disabled:opacity-50"
+          className="bg-card hover:bg-muted text-detail shadow-none"
         >
           {t(K.restore)}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -279,21 +281,20 @@ function VisitAction({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant={destructive ? 'danger' : 'outline'}
+          size="xs"
           data-testid={testId}
-          data-slot="button"
           onClick={onClick}
           className={cn(
-            'text-detail inline-flex h-7.5 flex-none items-center gap-1.5 rounded-lg border px-2.5 font-medium whitespace-nowrap transition-colors',
-            destructive
-              ? 'border-destructive-border bg-destructive-tint text-destructive hover:border-destructive'
-              : 'bg-card hover:border-foreground hover:bg-muted',
+            'text-detail h-7.5 gap-1.5',
+            !destructive && 'bg-card hover:border-foreground hover:bg-muted shadow-none',
           )}
         >
           <Icon aria-hidden="true" className="size-3.25" />
           {label}
-        </button>
+        </Button>
       </TooltipTrigger>
       <TooltipContent>{hint}</TooltipContent>
     </Tooltip>

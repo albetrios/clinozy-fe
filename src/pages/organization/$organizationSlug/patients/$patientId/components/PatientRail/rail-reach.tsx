@@ -8,6 +8,7 @@ import {
   reachLinks,
   ReachRow,
 } from '@/shared/components/PersonCard/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -74,15 +75,17 @@ function NumberEye({ shown, onToggle }: { shown: boolean; onToggle: () => void }
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           onClick={onToggle}
           aria-label={label}
           aria-pressed={shown}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-7 items-center justify-center rounded-lg transition-colors"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Icon aria-hidden="true" className="size-3.25" />
-        </button>
+        </Button>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>

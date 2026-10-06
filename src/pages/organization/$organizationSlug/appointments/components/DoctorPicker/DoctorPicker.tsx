@@ -14,6 +14,7 @@ import {
   PICKER_NS,
   type PickerOption,
 } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useBookableStaff } from '@/shared/hooks/useAppointments/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
@@ -100,13 +101,9 @@ export function DoctorPicker({
                 >
                   {t(keys.showAll)}
                 </button>
-                <button
-                  type="button"
-                  onClick={close}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-detail h-8 rounded-lg px-3 font-medium transition-colors"
-                >
+                <Button type="button" size="sm" onClick={close} className="text-detail">
                   {t(keys.done)}
-                </button>
+                </Button>
               </>
             )
           : undefined

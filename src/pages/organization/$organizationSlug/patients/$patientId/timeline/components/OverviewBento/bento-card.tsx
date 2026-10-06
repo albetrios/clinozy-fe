@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { type AppIcon, ChevronRight, Plus } from '@/shared/icons/index.ts';
 
 import {
@@ -27,16 +28,18 @@ function SquareButton({
   testId: string;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon-xs"
       onClick={onClick}
       aria-label={label}
       title={label}
       data-testid={testId}
-      className="text-muted-foreground-strong hover:bg-muted hover:text-foreground flex size-7 flex-none items-center justify-center rounded-lg transition-colors"
+      className="text-muted-foreground-strong hover:bg-muted hover:text-foreground"
     >
       <Icon aria-hidden="true" className="size-3.5 rtl:-scale-x-100" />
-    </button>
+    </Button>
   );
 }
 
@@ -51,15 +54,16 @@ export function BentoButton({
   children: ReactNode;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="xs"
       onClick={onClick}
-      data-slot="button"
       data-testid={testId}
-      className="bg-card hover:bg-muted text-foreground h-7 flex-none rounded-lg border px-2.5 text-xs font-medium whitespace-nowrap transition-colors"
+      className="bg-card hover:bg-muted text-foreground text-xs shadow-none"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

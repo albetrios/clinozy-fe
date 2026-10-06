@@ -18,6 +18,7 @@ import {
   DrawerInput,
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -57,13 +58,13 @@ const CHANNELS: Readonly<Record<ContactChannel, { tone: Tone; icon: AppIcon }>> 
   instagram: { tone: 'blush', icon: InstagramMark },
 };
 
-/** A 32px dashed "add" button (H:1973, H:1978). */
+/** A 32px dashed "add" button (H:1973, H:1978): the outline `Button` at 13px/400. */
 const ADD_BUTTON =
-  'bg-card hover:bg-muted border-border-strong inline-flex h-8 items-center gap-1.25 self-start rounded-lg border border-dashed px-2.5 text-body';
+  'bg-card hover:bg-muted border-border-strong gap-1.25 self-start border-dashed px-2.5 font-normal shadow-none';
 
-/** A 32px "×" beside a number or a handle. */
+/** A 32px "×" beside a number or a handle, on the outline `Button`. */
 const REMOVE_BUTTON =
-  'bg-card text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 flex-none items-center justify-center rounded-lg border';
+  'bg-card text-muted-foreground hover:bg-muted hover:text-foreground shadow-none';
 
 /**
  * A list's row numbers, 1…n. Rows here are positions — a number or a handle
@@ -217,8 +218,10 @@ function PhoneRow({
           {tClinic(CLINIC_KEYS.channels.whatsapp)}
         </button>
         {value.phones.length > 1 ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-sm"
             aria-label={t(K.removeNumber)}
             title={t(K.removeNumber)}
             onClick={() => setPhones(value.phones.filter((_, at) => at !== index))}
@@ -226,7 +229,7 @@ function PhoneRow({
             className={REMOVE_BUTTON}
           >
             <X aria-hidden="true" className="size-3.5" />
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>
@@ -270,27 +273,31 @@ function HandleRows({ value, onChange, testId }: ContactStepProps) {
               data-testid={`${testId}-handle-${index + 1}`}
               className="min-w-0 flex-1"
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon-sm"
               aria-label={t(K.removeHandle)}
               title={t(K.removeHandleTitle)}
               onClick={() => remove(index)}
               className={REMOVE_BUTTON}
             >
               <X aria-hidden="true" className="size-3.5" />
-            </button>
+            </Button>
           </div>
         );
       })}
       {value.instagram.length < CONTACT_REACH_MAX ? (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setHandles([...value.instagram, ''])}
           data-testid={`${testId}-add-handle`}
           className={ADD_BUTTON}
         >
           {t(K.addHandle)}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -354,8 +361,10 @@ export function ContactIdentityFields({
           ))}
           <div className="flex flex-wrap gap-1.5">
             {value.phones.length < CONTACT_REACH_MAX ? (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() =>
                   onChange({
                     ...value,
@@ -366,18 +375,24 @@ export function ContactIdentityFields({
                 className={ADD_BUTTON}
               >
                 {t(K.addNumber)}
-              </button>
+              </Button>
             ) : null}
             {value.instagram.length === 0 ? (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => onChange({ ...value, instagram: [''] })}
                 data-testid={`${testId}-add-instagram`}
-                className={cn(ADD_BUTTON, 'text-xs', TONE_CLASSES.blush.ink)}
+                className={cn(
+                  ADD_BUTTON,
+                  'hover:text-tone-blush-foreground text-xs',
+                  TONE_CLASSES.blush.ink,
+                )}
               >
                 <InstagramMark aria-hidden="true" className="size-3" />
                 {t(K.addInstagram)}
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>

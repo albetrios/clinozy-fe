@@ -112,16 +112,18 @@ function NoteCard({
         </p>
       </div>
       {onDelete ? (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           onClick={onDelete}
           aria-label={t(NOTES_KEYS.delete)}
           title={t(NOTES_KEYS.delete)}
           data-testid={`${NOTES_TEST_IDS.delete}-${note.id}`}
-          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex size-7 flex-none items-center justify-center rounded-md transition-colors"
+          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-md"
         >
           <X aria-hidden="true" className="size-4" />
-        </button>
+        </Button>
       ) : null}
     </div>
   );

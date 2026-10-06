@@ -18,6 +18,7 @@ import {
   personInitials,
 } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -127,15 +128,17 @@ export function RailIdentity({
       {onEditContact ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               onClick={onEditContact}
               aria-label={t(K.editContact)}
               data-testid="patient-rail-edit"
-              className="text-muted-foreground-strong hover:bg-foreground/6 hover:text-foreground flex size-7 items-center justify-center rounded-lg transition-colors"
+              className="text-muted-foreground-strong hover:bg-foreground/6 hover:text-foreground"
             >
               <PenLine aria-hidden="true" className="size-3.75" />
-            </button>
+            </Button>
           </TooltipTrigger>
           <TooltipContent>{t(K.editContact)}</TooltipContent>
         </Tooltip>

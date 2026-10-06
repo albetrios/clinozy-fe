@@ -14,6 +14,7 @@ import {
   type PickerOption,
   PickerTriggerClear,
 } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
@@ -65,11 +66,12 @@ export function TaskTypePicker({ value, onChange }: TaskTypePickerProps) {
         minWidth={280}
         testId={TASKS_TEST_IDS.type}
         renderTrigger={({ open }) => (
-          <button
+          <Button
             type="button"
+            variant="outline"
             data-testid={`${TASKS_TEST_IDS.type}-trigger`}
             className={cn(
-              'text-body text-foreground hover:bg-muted bg-background flex h-9 flex-none items-center gap-1.5 rounded-lg border ps-3 pe-2.5 leading-none font-medium whitespace-nowrap transition-colors duration-120',
+              'text-foreground hover:bg-muted gap-1.5 ps-3 pe-2.5 leading-none shadow-none duration-120',
               open || filtered ? 'border-disabled' : 'border-border',
             )}
           >
@@ -83,7 +85,7 @@ export function TaskTypePicker({ value, onChange }: TaskTypePickerProps) {
                 open && 'rotate-180',
               )}
             />
-          </button>
+          </Button>
         )}
       />
       {filtered ? (

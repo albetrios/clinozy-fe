@@ -6,6 +6,7 @@
 #   2. Hardcoded focus-visible:ring / focus:ring (data-focus owns focus via data-slot)
 #   3. Direct lucide-react imports (must use @/shared/icons barrel)
 #   4. bg-card / bg-popover class shells with no data-slot within 4 lines above
+#      (a class on a <Button …> is fine: the button brings data-slot="button")
 #   5. Off-scale corner radius — a bare `rounded`, or an arbitrary `rounded-[…]`
 #      that is not a `var(--radius-*)`. Neither is driven by the Corner radius
 #      axis, so the element stays round when the rest of the app goes square.
@@ -121,12 +122,37 @@ without_nearby() {
   done | filter_allowlist
 }
 
+# Keep the hits whose nearest opening tag above them (within $2 lines, the
+# hit's own line included) is not one of the primitives in $3: a class on a
+# `<Button …>` is vouched for by the button's own `data-slot="button"`, however
+# many props stand between the tag and its className. A tag inside a prop
+# (`icon={<Plus />}`) is the nearest one, so that hit stays — it fails closed.
+outside_primitive() {
+  raw="$1"
+  window="$2"
+  tags="$3"
+  [ -z "$raw" ] && return 0
+  printf '%s\n' "$raw" | while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    file=${line%%:*}
+    rest=${line#*:}
+    linenum=${rest%%:*}
+    start=$((linenum - window))
+    [ "$start" -lt 1 ] && start=1
+    if sed -n "${start},${linenum}p" "$file" | grep -E '<[A-Za-z]' | tail -n 1 \
+      | grep -Eq "<($tags)([[:space:]/>]|\$)"; then
+      continue
+    fi
+    printf '%s\n' "$line"
+  done
+}
+
 SLOT_RAW=$(grep -rEn 'className=.*\bbg-(card|popover)\b' src --include='*.tsx' \
   | grep -v '^src/shared/components/ui/' \
   | grep -v '\.test\.' \
   || true)
 report_hits "bg-card/bg-popover without data-slot (within 4 lines)" \
-  "$(without_nearby "$SLOT_RAW" 4 'data-slot=')"
+  "$(outside_primitive "$(without_nearby "$SLOT_RAW" 4 'data-slot=')" 20 'Button')"
 
 # 6 — `rounded-full` with nothing for the Sharp shape to grab. Dropped before the
 # look-back, because they are indicators and not surfaces: comment lines, blurred

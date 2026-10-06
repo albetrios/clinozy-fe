@@ -11,6 +11,7 @@ import {
   ConfirmDialog,
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -76,14 +77,9 @@ export function NotPatientCard({ onCreate }: { onCreate?: () => void }) {
         </span>
       </span>
       {onCreate ? (
-        <button
-          type="button"
-          data-testid={IDS.createPatient}
-          onClick={onCreate}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 text-body h-9 flex-none rounded-lg px-3.5 font-medium whitespace-nowrap transition-colors"
-        >
+        <Button type="button" data-testid={IDS.createPatient} onClick={onCreate}>
           {t(N.action)}
-        </button>
+        </Button>
       ) : null}
     </section>
   );
@@ -303,15 +299,16 @@ export function VisitPhotos({
                   );
                 })}
               </div>
-              <button
+              <Button
                 type="button"
+                size="sm"
                 data-testid={IDS.photosUpload}
                 onClick={() => input.current?.click()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-detail inline-flex h-8 flex-none items-center gap-1.5 rounded-lg ps-2.5 pe-3 font-medium whitespace-nowrap transition-colors"
+                className="text-detail ps-2.5"
               >
                 <Camera aria-hidden="true" className="size-3.25" />
                 {t(P.upload)}
-              </button>
+              </Button>
               <input
                 ref={input}
                 type="file"
@@ -355,15 +352,16 @@ export function VisitPhotos({
             {t(P.locked)}
           </span>
           {onCheckIn ? (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               data-testid={IDS.photosCheckIn}
-              data-slot="button"
               onClick={onCheckIn}
-              className="bg-card hover:bg-muted text-detail h-8 flex-none rounded-lg border px-3 font-medium whitespace-nowrap transition-colors"
+              className="bg-card hover:bg-muted text-detail shadow-none"
             >
               {t(P.checkIn)}
-            </button>
+            </Button>
           ) : null}
         </div>
       )}

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Drawer,
   DrawerContent,
@@ -155,21 +156,23 @@ export function AllSectionsPopover({
       <PopoverAnchor asChild>
         <div ref={wrapperRef} className="relative me-1.5 flex-none border-x px-2.5">
           <PopoverTrigger asChild>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon-sm"
               aria-haspopup="dialog"
               aria-label={t(keys.allSections)}
               title={t(keys.allSectionsTitle)}
               data-testid="all-sections-trigger"
               data-current-unpinned={nav.currentUnpinned || undefined}
               className={cn(
-                'text-foreground-soft hover:bg-muted flex size-8 flex-none items-center justify-center rounded-lg border transition-colors',
+                'text-foreground-soft hover:bg-muted shadow-none',
                 nav.currentUnpinned ? 'border-border-strong' : 'border-border',
                 open || nav.currentUnpinned ? 'bg-muted' : 'bg-card',
               )}
             >
               <Compass className="size-4" aria-hidden />
-            </button>
+            </Button>
           </PopoverTrigger>
         </div>
       </PopoverAnchor>

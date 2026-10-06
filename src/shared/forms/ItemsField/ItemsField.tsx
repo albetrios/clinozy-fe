@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { useDrawerItemsField } from '@/shared/components/RecordDrawer/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -269,16 +270,18 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
       ))}
       {canRemove ? (
         <div role="cell" className={cellClass(phone, false, true)}>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-xs"
             data-slot="items-remove"
             data-testid={ids.remove}
             aria-label={t(ITEMS_FIELD_KEYS.removeRow)}
             onClick={() => onRemove(index)}
-            className="text-muted-foreground hover:bg-destructive-tint hover:text-destructive flex size-7 items-center justify-center rounded-md transition-colors"
+            className="text-muted-foreground hover:bg-destructive-tint dark:hover:bg-destructive-tint hover:text-destructive rounded-md"
           >
             <X aria-hidden="true" className="size-4" />
-          </button>
+          </Button>
         </div>
       ) : null}
       {removable && !canRemove ? <div role="cell" /> : null}
@@ -383,17 +386,18 @@ function ItemsFooter({
   return (
     <div className="flex items-center gap-2.5 px-2.5 py-2">
       {onAdd ? (
-        <button
+        <Button
           ref={addRef}
           type="button"
-          data-slot="button"
+          variant="outline"
+          size="sm"
           data-testid={ids.add}
           onClick={onAdd}
-          className="border-border-strong bg-card text-detail hover:bg-muted inline-flex h-8 items-center gap-1 rounded-lg border border-dashed px-3 font-medium transition-colors"
+          className="border-border-strong bg-card text-detail hover:bg-muted gap-1 border-dashed shadow-none"
         >
           <span aria-hidden="true">+</span>
           {addLabel ?? t(ITEMS_FIELD_KEYS.addRow)}
-        </button>
+        </Button>
       ) : null}
       {total === undefined ? null : (
         <span

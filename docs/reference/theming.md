@@ -239,7 +239,8 @@ Named presets and generated looks are mutually exclusive (`data-theme` vs inline
 - Hardcoded Tailwind shadows (`shadow-sm` … `shadow-2xl`)
 - Hardcoded focus rings (`focus-visible:ring`, `focus:ring`)
 - Direct `lucide-react` imports outside the icon barrel
-- `bg-card` / `bg-popover` without a nearby `data-slot=` marker
+- `bg-card` / `bg-popover` without a nearby `data-slot=` marker (a class on a `<Button>`
+  passes: the button brings `data-slot="button"`)
 - **Off-scale corner radius** — a bare `rounded`, or an arbitrary `rounded-[3px]`.
   Neither follows the Corner radius axis. Every _named_ step does (`rounded-xs` …
   `rounded-4xl`: `sm/md/lg/xl` are set inline by the axis, the rest derive from

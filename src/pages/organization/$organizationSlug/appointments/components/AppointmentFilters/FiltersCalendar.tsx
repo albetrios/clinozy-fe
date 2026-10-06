@@ -14,6 +14,7 @@ import {
   type CalendarDayDots,
   LocalizedCalendar,
 } from '@/shared/components/LocalizedCalendar/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
 
 import { loadDots } from '../../appointments.calendar.ts';
@@ -110,18 +111,20 @@ export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarP
           next: APPOINTMENTS_TEST_IDS.filtersMonthNext,
         }}
       />
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         aria-pressed={value === undefined}
         data-testid={APPOINTMENTS_TEST_IDS.filtersUpcoming}
         onClick={() => onChange(undefined)}
         className={cn(
-          'text-body h-8 rounded-lg border transition-colors',
+          'font-normal shadow-none',
           value === undefined ? 'bg-muted' : 'bg-card hover:bg-muted',
         )}
       >
         {t(keys.upcoming)}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
   PopoverAnchor,
@@ -163,22 +164,21 @@ function BrowseButton<TItem>({
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant={open ? 'default' : 'outline'}
           disabled={disabled}
           aria-label={t(K.browseAll)}
           title={t(K.browseAll)}
           data-testid={ids.browse}
           className={cn(
-            'text-body flex h-11 flex-none items-center gap-1.5 rounded-lg border px-3.5 font-medium whitespace-nowrap transition-colors disabled:opacity-50',
-            open
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-background text-foreground-soft hover:border-disabled',
+            'h-11 gap-1.5 shadow-none',
+            open ? 'border-primary border' : 'text-foreground-soft hover:border-disabled',
           )}
         >
           <LayoutGrid aria-hidden="true" className="size-3.75" />
           {t(K.browse)}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverAnchor
         aria-hidden="true"

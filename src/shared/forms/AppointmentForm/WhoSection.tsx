@@ -17,6 +17,7 @@ import {
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
 import { ContactCard } from '@/shared/components/PersonCard/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -187,8 +188,10 @@ function WhoSearch({
           ))
         : null}
       {typed.length >= 2 ? (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           data-testid={IDS.whoCreate}
           onClick={() =>
             pick({
@@ -200,11 +203,10 @@ function WhoSearch({
               seq: null,
             })
           }
-          data-slot="button"
-          className="border-border-strong bg-card hover:bg-muted text-body flex h-8 items-center gap-1.5 self-start rounded-lg border border-dashed px-3 font-medium transition-colors"
+          className="border-border-strong bg-card hover:bg-muted self-start border-dashed shadow-none"
         >
           {t(K.createContact, { query: typed })}
-        </button>
+        </Button>
       ) : null}
     </>
   );
@@ -271,15 +273,14 @@ function WhoEditor({
           data-testid={IDS.whoEditMobile}
         />
       </DrawerField>
-      <button
+      <Button
         type="button"
         disabled={saving}
         data-testid={IDS.whoEditSave}
         onClick={() => void save()}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 text-body h-9 rounded-lg px-3.5 font-medium transition-colors disabled:opacity-50"
       >
         {t(K.save)}
-      </button>
+      </Button>
     </div>
   );
 }

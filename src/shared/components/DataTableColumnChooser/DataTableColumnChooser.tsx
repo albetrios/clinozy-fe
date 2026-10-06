@@ -18,6 +18,7 @@ import {
 } from '@/shared/components/DataTable/data-table.constants.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Eye } from '@/shared/icons/index.ts';
 
 /** More columns than this and the list gets a search box (H:4185). */
@@ -145,13 +146,15 @@ export function DataTableColumnChooser<TData extends RowData>({
       testId={TABLE_TEST_IDS.columns(prefix)}
       className={cn('flex-none max-md:hidden', className)}
       renderTrigger={({ open }) => (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           aria-label={t(TABLE_KEYS.columns.trigger)}
           title={t(TABLE_KEYS.columns.title, { shown, total })}
           data-testid={TABLE_TEST_IDS.columnsTrigger(prefix)}
           className={cn(
-            'text-foreground-soft hover:bg-muted relative flex size-9 flex-none items-center justify-center rounded-lg border transition-colors duration-120',
+            'text-foreground-soft hover:bg-muted relative shadow-none duration-120',
             open ? 'border-disabled' : 'border-border',
           )}
         >
@@ -162,7 +165,7 @@ export function DataTableColumnChooser<TData extends RowData>({
               className="border-canvas absolute -end-1.75 -top-1.75 border-2"
             />
           ) : null}
-        </button>
+        </Button>
       )}
     />
   );

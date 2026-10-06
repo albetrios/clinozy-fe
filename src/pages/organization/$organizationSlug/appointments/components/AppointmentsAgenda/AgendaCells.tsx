@@ -29,6 +29,7 @@ import {
   TeamCard,
   type TeamCardData,
 } from '@/shared/components/PersonCard/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -184,15 +185,16 @@ export function QuickViewCell({ row }: AgendaCell) {
           }
         >
           <TooltipTrigger asChild>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon-sm"
               aria-label={label}
               data-testid={APPOINTMENTS_TEST_IDS.quickView}
-              data-slot="button"
-              className="border-border bg-card text-muted-foreground-strong hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-lg border transition-colors md:max-xl:size-9"
+              className="bg-card text-muted-foreground-strong hover:bg-muted hover:text-foreground shadow-none md:max-xl:size-9"
             >
               <Eye aria-hidden="true" className="size-3.75" />
-            </button>
+            </Button>
           </TooltipTrigger>
         </AppointmentQuickView>
         <TooltipContent>{label}</TooltipContent>
