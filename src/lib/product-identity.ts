@@ -14,7 +14,7 @@
 export const PRODUCT_NAME = 'Clinozy';
 
 /** One-line product description — `<meta name="description">` and the manifest. */
-export const PRODUCT_DESCRIPTION = 'Enterprise multi-tenant admin dashboard';
+export const PRODUCT_DESCRIPTION = 'Runs a skin, hair and aesthetic clinic end to end — leads, appointments, patient files, prescriptions, the medical store, clinic stock, payments, tasks and offerings — in one app.';
 
 /** Browser chrome / PWA `theme_color`. */
 export const PRODUCT_THEME_COLOR = '#18181b';

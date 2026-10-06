@@ -1,7 +1,7 @@
 {
   "name": "Clinozy",
   "short_name": "Clinozy",
-  "description": "Enterprise multi-tenant admin dashboard",
+  "description": "Runs a skin, hair and aesthetic clinic end to end — leads, appointments, patient files, prescriptions, the medical store, clinic stock, payments, tasks and offerings — in one app.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

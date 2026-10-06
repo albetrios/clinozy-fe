@@ -3,7 +3,7 @@ kind: Component
 metadata:
   name: clinozy-fe
   title: Clinozy Frontend
-  description: Enterprise multi-tenant admin dashboard (React + TypeScript + Vite)
+  description: Runs a skin, hair and aesthetic clinic end to end — leads, appointments, patient files, prescriptions, the medical store, clinic stock, payments, tasks and offerings — in one app (React + TypeScript + Vite)
   annotations:
     github.com/project-slug: albetrios/clinozy-fe
     backstage.io/techdocs-ref: dir:.

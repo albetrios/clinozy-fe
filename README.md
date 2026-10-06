@@ -1,6 +1,6 @@
 # Clinozy Frontend
 
-Enterprise-grade multi-tenant admin dashboard built with **React 19 + TypeScript + Vite**. Mirrors backend guarantees for security, multi-tenancy, RBAC, clean architecture, testability, observability, performance, and accessibility.
+Runs a skin, hair and aesthetic clinic end to end — leads, appointments, patient files, prescriptions, the medical store, clinic stock, payments, tasks and offerings — in one app. Built with **React 19 + TypeScript + Vite**; mirrors backend guarantees for security, multi-tenancy, RBAC, clean architecture, testability, observability, performance, and accessibility.
 
 ---
 
