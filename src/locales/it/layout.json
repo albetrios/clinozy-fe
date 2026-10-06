@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "Vai al contenuto principale"
-  },
-  "auth": {
-    "switchToRegister": "Crea un account",
-    "switchToSignIn": "Accedi",
-    "statusOperational": "Tutti i sistemi operativi",
-    "badge": "Operazioni, unificate",
-    "heroTitle": "Il sistema operativo della tua organizzazione.",
-    "heroSubtitle": "Membri, ruoli, fatturazione e sicurezza — uno spazio di lavoro veloce e pensato per la tastiera, per ogni team.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organizzazione di progettazione",
-        "body": "Cambia team senza cambiare strumento."
-      },
-      "secure": {
-        "title": "Sicuro per impostazione predefinita",
-        "body": "RBAC, MFA, passkey e tracce di audit."
-      },
-      "fast": {
-        "title": "Veloce ovunque",
-        "body": "Progettato per il lavoro in tempo reale, tastiera prima."
-      }
-    },
-    "stats": {
-      "teams": "team",
-      "uptime": "uptime",
-      "compliant": "conforme"
-    }
   },
   "app": {
     "search": "Cerca",
@@ -180,8 +150,5 @@
         "keepOne": "Tieni almeno una sede"
       }
     }
-  },
-  "public": {
-    "brandTagline": "Spazio di lavoro sicuro per il tuo team"
   }
 }

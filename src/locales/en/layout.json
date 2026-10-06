@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "Skip to main content"
-  },
-  "auth": {
-    "switchToRegister": "Create an account",
-    "switchToSignIn": "Sign in",
-    "statusOperational": "All systems operational",
-    "badge": "Operations, unified",
-    "heroTitle": "The operating system for your organization.",
-    "heroSubtitle": "Members, roles, billing, and security — one fast, keyboard-first workspace for every team you run.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-org by design",
-        "body": "Switch teams without switching tools."
-      },
-      "secure": {
-        "title": "Secure by default",
-        "body": "RBAC, MFA, passkeys, and audit trails."
-      },
-      "fast": {
-        "title": "Fast everywhere",
-        "body": "Built for keyboard-first, real-time work."
-      }
-    },
-    "stats": {
-      "teams": "teams",
-      "uptime": "uptime",
-      "compliant": "compliant"
-    }
   },
   "app": {
     "search": "Search",
@@ -180,8 +150,5 @@
         "keepOne": "Keep at least one branch"
       }
     }
-  },
-  "public": {
-    "brandTagline": "Secure workspace for your team"
   }
 }

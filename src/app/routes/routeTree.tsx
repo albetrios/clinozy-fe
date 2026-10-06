@@ -133,7 +133,6 @@ import { SettingsModalLazy } from '@/shared/components/SettingsModal/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { AppToaster } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { resolveRootRedirect } from '@/shared/tenancy/organization-resolver.ts';
 
 import type { DialogRoute } from './dialog-routes.ts';
@@ -375,22 +374,9 @@ const PublicLayout = lazyRouteComponent(
   'PublicLayout',
 );
 
-/**
- * The variant loaders are imported DYNAMICALLY, never statically: this file is
- * the entry chunk, and the initial-JS budget has well under a kilobyte to spare.
- * A static import of the module costs more than that on every load, to save
- * one request on the loads that reach the auth shell. The import is a few
- * hundred bytes and runs alongside the route's own chunks, so nothing waits on it.
- */
-function preloadAuthLayoutVariant(): Promise<unknown> {
-  return import('@/shared/layouts/AuthLayout/auth-layout-variants.ts').then((m) =>
-    m.preloadAuthLayoutVariant(useThemeStore.getState().authVariant),
-  );
-}
-
-/** The auth layout AND the variant it is about to lazy-load, side by side. */
+/** The auth layout's chunk — the sign-in screen's frame. */
 function preloadAuthShell(): Promise<unknown> {
-  return Promise.all([AuthLayout.preload?.(), preloadAuthLayoutVariant()]);
+  return Promise.resolve(AuthLayout.preload?.());
 }
 
 /**
@@ -413,8 +399,8 @@ function preloadAppShell(island: {
  *
  * Every entry route awaits `/auth/refresh` in `beforeLoad` before the router
  * loads a single component, so the destination's chunks were requested only
- * after the network had answered: guard, THEN chunks, THEN (for the layouts) a
- * variant chunk. None of that depends on the answer. `likelySignedIn` is a hint,
+ * after the network had answered: guard, THEN chunks. None of that depends on
+ * the answer. `likelySignedIn` is a hint,
  * not a decision — it only picks which side to warm first, and being wrong costs
  * a few idle kilobytes; the guards still decide where the user actually lands.
  *
@@ -512,8 +498,8 @@ const rootRoute = createRootRoute({
 
 // ── Auth shell ──
 // Pathless layout route (`id`, not `path`): mounts the AuthLayout (the launch's
-// sign-in canvas by default) once over every auth page; the pages keep their
-// top-level URLs (/login, …).
+// sign-in canvas) once over every auth page; the pages keep their top-level URLs
+// (/login, …).
 // AuthLayout is rendered inside a custom component (it wraps Outlet), so it
 // keeps a local Suspense boundary — the router only manages route components.
 const authShellRoute = createRoute({
@@ -524,9 +510,8 @@ const authShellRoute = createRoute({
   beforeLoad: async () => {
     await redirectIfAuthenticated();
   },
-  // Nested layouts are invisible to the router's component preloader — and so
-  // is the variant the layout then lazy-loads, which used to cost one more round
-  // trip AFTER the layout had mounted (skeleton → variant → form).
+  // Nested layouts are invisible to the router's component preloader: the
+  // layout is rendered inside this route's own component, so its loader warms it.
   loader: () => preloadAuthShell(),
   component: () => (
     <Suspense fallback={<FullPageSpinner />}>

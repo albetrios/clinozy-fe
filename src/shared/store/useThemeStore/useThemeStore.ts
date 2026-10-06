@@ -10,10 +10,6 @@ const MODES: readonly string[] = ['light', 'dark', 'system'] satisfies readonly 
 interface ThemeStore {
   /** Light/dark mode. */
   theme: Mode;
-  /** TEMP: AuthLayout preview design index; 0, the default, is the launch's canvas. */
-  authVariant: number;
-  /** TEMP: PublicLayout preview shell index; 0, the default, is the launch's canvas. */
-  publicVariant: number;
   setTheme: (theme: Mode) => void;
 }
 
@@ -65,8 +61,6 @@ export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
       theme: 'light',
-      authVariant: 0,
-      publicVariant: 0,
       setTheme: (theme) => {
         applyMode(theme);
         set({ theme });

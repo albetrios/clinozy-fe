@@ -341,7 +341,7 @@ function validateShellContracts() {
       rule: 'app-layout',
     },
     {
-      file: 'src/shared/layouts/AuthLayout/variants/AuthLayoutSplit.tsx',
+      file: 'src/shared/layouts/AuthLayout/AuthLayout.tsx',
       testId: 'auth-layout',
       rule: 'auth-layout',
     },

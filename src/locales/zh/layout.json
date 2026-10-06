@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "跳至主要内容"
-  },
-  "auth": {
-    "switchToRegister": "创建账户",
-    "switchToSignIn": "登录",
-    "statusOperational": "所有系统运行正常",
-    "badge": "运营，一体化",
-    "heroTitle": "您组织的操作系统。",
-    "heroSubtitle": "成员、角色、账单与安全 —— 为每个团队提供快速、键盘优先的工作空间。",
-    "features": {
-      "multiOrg": {
-        "title": "原生多组织",
-        "body": "切换团队，无需切换工具。"
-      },
-      "secure": {
-        "title": "默认安全",
-        "body": "RBAC、MFA、通行密钥与审计追踪。"
-      },
-      "fast": {
-        "title": "处处快速",
-        "body": "为键盘优先的实时工作而构建。"
-      }
-    },
-    "stats": {
-      "teams": "团队",
-      "uptime": "可用性",
-      "compliant": "合规"
-    }
   },
   "app": {
     "search": "搜索",
@@ -180,8 +150,5 @@
         "keepOne": "至少保留一个分院"
       }
     }
-  },
-  "public": {
-    "brandTagline": "团队安全工作空间"
   }
 }

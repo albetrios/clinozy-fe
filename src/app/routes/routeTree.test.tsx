@@ -23,7 +23,6 @@ import { manifest as taskManifest } from '@/pages/organization/$organizationSlug
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
 import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 
 import {
   BOOT_PENDING_POLICY,
@@ -49,17 +48,10 @@ const shellLoads = vi.hoisted(() => ({
   payments: vi.fn(),
   invoices: vi.fn(),
   emptyHome: vi.fn(),
+  login: vi.fn(),
 }));
 const clinicHomeRoute = vi.hoisted(() => vi.fn());
 const notifyInfo = vi.hoisted(() => vi.fn());
-const preloadAuthLayoutVariant = vi.hoisted(() =>
-  vi.fn((_variant: number) => Promise.resolve()),
-);
-
-vi.mock('@/shared/layouts/AuthLayout/auth-layout-variants.ts', () => ({
-  preloadAuthLayoutVariant,
-}));
-
 vi.mock('@/shared/layouts/AuthLayout/index.ts', () => {
   shellLoads.auth();
   return { AuthLayout: () => null };
@@ -67,6 +59,11 @@ vi.mock('@/shared/layouts/AuthLayout/index.ts', () => {
 vi.mock('@/shared/layouts/PublicLayout/index.ts', () => {
   shellLoads.public();
   return { PublicLayout: () => null };
+});
+// The sign-in side a guest's boot warms: the auth layout (above) and the login island.
+vi.mock('@/pages/login/login.route.tsx', () => {
+  shellLoads.login();
+  return { Component: () => null };
 });
 // The islands the signed-in shells and the invoices host render inside their own
 // components — the router's chunk preloader cannot see them, so their loaders must.
@@ -333,41 +330,19 @@ describe('router configuration', () => {
   });
 
   describe('chunk warm-up', () => {
-    type Loadable = { id: string; options: { loader?: () => unknown } };
-    const routeEndingWith = (suffix: string) =>
-      (Object.values(router.routesById) as unknown as Loadable[]).find((route) =>
-        route.id.endsWith(suffix),
-      );
-
     beforeEach(() => {
-      preloadAuthLayoutVariant.mockClear();
+      shellLoads.login.mockClear();
     });
 
-    it('the auth shell loader fetches the active layout variant with the layout', async () => {
-      // The layout lazy-loads its variant only AFTER mounting, which cost a second
-      // round trip (skeleton → variant → form) on the way to the login screen.
-      useThemeStore.setState({ authVariant: 2 });
-
-      await routeEndingWith('auth-shell')?.options.loader?.();
-
-      expect(preloadAuthLayoutVariant).toHaveBeenCalledExactlyOnceWith(2);
-      useThemeStore.setState({ authVariant: 0 });
-    });
-
-    it('warms the sign-in side for a likely guest, in parallel with the auth bootstrap', async () => {
-      preloadBootRoutes({ likelySignedIn: false });
-
-      // The variant loaders are imported dynamically (they must stay out of the
-      // entry chunk), so the call lands a tick after the warm-up starts.
-      await vi.waitFor(() => expect(preloadAuthLayoutVariant).toHaveBeenCalledOnce());
-    });
-
+    // The login island is fetched once per module instance (`lazyRouteComponent`
+    // drops its preload once the chunk is cached), so the two "never the sign-in
+    // side" checks run before the guest warm-up fetches it.
     it('warms the app side for a likely signed-in user, not the sign-in side', async () => {
       preloadBootRoutes({ likelySignedIn: true });
       // Give a wrongly-started sign-in warm-up the same tick to show itself.
       await new Promise((resolve) => setTimeout(resolve, 0));
 
-      expect(preloadAuthLayoutVariant).not.toHaveBeenCalled();
+      expect(shellLoads.login).not.toHaveBeenCalled();
     });
 
     // Called on INTENT (an email submitted, an OAuth redirect started), not only
@@ -376,33 +351,14 @@ describe('router configuration', () => {
     it('resolves when the signed-in shell is warmed directly', async () => {
       await expect(preloadSignedInShell()).resolves.toBeUndefined();
 
-      // Same side as the signed-in boot hint: never the sign-in variant loaders.
-      expect(preloadAuthLayoutVariant).not.toHaveBeenCalled();
+      // Same side as the signed-in boot hint: never the sign-in island.
+      expect(shellLoads.login).not.toHaveBeenCalled();
     });
 
-    it('never imports the variant loaders statically — the route tree IS the entry chunk', async () => {
-      const { readFileSync } = await import('node:fs');
-      const { dirname, join } = await import('node:path');
-      const { fileURLToPath } = await import('node:url');
-      const source = readFileSync(
-        join(dirname(fileURLToPath(import.meta.url)), 'routeTree.tsx'),
-        'utf8',
-      );
-      const staticImports = source
-        .split('\n')
-        .filter(
-          (line) => line.startsWith('import ') && line.includes('-layout-variants'),
-        );
+    it('warms the sign-in side for a likely guest, in parallel with the auth bootstrap', async () => {
+      preloadBootRoutes({ likelySignedIn: false });
 
-      expect(staticImports).toEqual([]);
-    });
-
-    it('swallows a failed warm-up — the router loads the same chunk again, with a Retry', async () => {
-      preloadAuthLayoutVariant.mockRejectedValueOnce(new Error('chunk 404'));
-
-      expect(() => preloadBootRoutes({ likelySignedIn: false })).not.toThrow();
-      // Let the rejection settle: an unhandled one would fail the run.
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await vi.waitFor(() => expect(shellLoads.login).toHaveBeenCalledOnce());
     });
   });
 

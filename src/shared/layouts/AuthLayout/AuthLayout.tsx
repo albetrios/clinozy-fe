@@ -1,58 +1,27 @@
-import { lazy, type ReactNode, Suspense } from 'react';
+import type { ReactNode } from 'react';
 
+import { PublicCard, PublicFrame } from '@/shared/components/PublicFrame/index.ts';
 import {
-  loadCanvasAuth,
-  loadMinimalAuth,
-  loadSplitAuth,
-  loadSpotlightAuth,
-  preloadAllAuthLayoutVariants,
-} from '@/shared/layouts/AuthLayout/auth-layout-variants.ts';
-import { LayoutVariantFallback } from '@/shared/layouts/LayoutVariantFallback/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
-// The loaders live in `auth-layout-variants.ts` so the route tree can warm the
-// active variant without importing this layout into the entry chunk.
-const CanvasAuth = lazy(() => loadCanvasAuth().then((m) => ({ default: m.CanvasAuth })));
-const SplitAuth = lazy(() => loadSplitAuth().then((m) => ({ default: m.SplitAuth })));
-const SpotlightAuth = lazy(() =>
-  loadSpotlightAuth().then((m) => ({ default: m.SpotlightAuth })),
-);
-const MinimalAuth = lazy(() =>
-  loadMinimalAuth().then((m) => ({ default: m.MinimalAuth })),
-);
+  AuthControls,
+  AuthForm,
+} from '@/shared/layouts/AuthLayout/AuthLayout.shared.tsx';
 
 interface AuthLayoutProps {
   children: ReactNode;
 }
 
-/** Index-aligned with `AUTH_VARIANT_LOADERS`: the launch's canvas first (L-65). */
-const AUTH_SHELLS = [CanvasAuth, SplitAuth, SpotlightAuth, MinimalAuth] as const;
-
-function AuthLayoutShell({
-  variant,
-  children,
-}: {
-  variant: number;
-  children: ReactNode;
-}) {
-  const Shell = AUTH_SHELLS[variant] ?? CanvasAuth;
-  return (
-    <Suspense fallback={<LayoutVariantFallback />}>
-      <Shell>{children}</Shell>
-    </Suspense>
-  );
-}
-
 /**
- * Auth layout shell for the sign-in / sign-up surfaces. The variant index is
- * `authVariant`: 0, the default, is the launch's canvas — default, pinned (the
- * shuffle no longer rolls it), not persisted; 1–3 are the earlier previews.
+ * The sign-in screen's layout (L-65) — sign-in, MFA and the OAuth hand-off:
+ * the signed-out canvas with the logo where the clinic header will draw it,
+ * the language picker and the theme toggle at the end, and the form in one
+ * 360px card — the design's "Signed out" card (H:515).
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const authVariant = useThemeStore((s) => s.authVariant);
-  return <AuthLayoutShell variant={authVariant}>{children}</AuthLayoutShell>;
+  return (
+    <PublicFrame testId="auth-layout" controls={<AuthControls surface="frame" />}>
+      <PublicCard>
+        <AuthForm>{children}</AuthForm>
+      </PublicCard>
+    </PublicFrame>
+  );
 }
-
-/* eslint-disable react-refresh/only-export-components -- test-facing preload hook */
-export { preloadAllAuthLayoutVariants as preloadAuthLayoutVariants };
-/* eslint-enable react-refresh/only-export-components */

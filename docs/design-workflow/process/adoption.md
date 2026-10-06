@@ -103,10 +103,7 @@ For **any** layout or shell you restyle or replace:
 3. **Verify it is what loads** — with the old design gone there is no index, no
    persisted value and no shuffle that can put it back.
 
-A theme preset is data, not a design fork: the default is `DEFAULT_PRESET` in
-`presets.ts`. (The auth and public layouts still carry pre-launch preview
-variants behind `authVariant` / `publicVariant`; they are leftovers to remove,
-not a pattern to follow.)
+The look is data, not a design fork: the one look is `THEME_ID` in `presets.ts`.
 
 State in the recap: _"<surface>: one design — <file>; the old one removed."_
 

@@ -3,30 +3,8 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 export const LAYOUT_NS = I18N_NAMESPACES.layout;
 
 export const LAYOUT_KEYS = {
-  brand: { name: 'brand.name' },
   a11y: {
     skipToMain: 'a11y.skipToMain',
-  },
-  auth: {
-    switchToRegister: 'auth.switchToRegister',
-    switchToSignIn: 'auth.switchToSignIn',
-    statusOperational: 'auth.statusOperational',
-    badge: 'auth.badge',
-    heroTitle: 'auth.heroTitle',
-    heroSubtitle: 'auth.heroSubtitle',
-    features: {
-      multiOrg: {
-        title: 'auth.features.multiOrg.title',
-        body: 'auth.features.multiOrg.body',
-      },
-      secure: { title: 'auth.features.secure.title', body: 'auth.features.secure.body' },
-      fast: { title: 'auth.features.fast.title', body: 'auth.features.fast.body' },
-    },
-    stats: {
-      teams: 'auth.stats.teams',
-      uptime: 'auth.stats.uptime',
-      compliant: 'auth.stats.compliant',
-    },
   },
   app: {
     theme: {
@@ -182,13 +160,4 @@ export const LAYOUT_KEYS = {
       signingOutDescription: 'app.sessionTimeout.signingOutDescription',
     },
   },
-  public: {
-    brandTagline: 'public.brandTagline',
-  },
 } as const;
-
-export const AUTH_LAYOUT_STAT_KEYS = [
-  { value: '10k+', labelKey: LAYOUT_KEYS.auth.stats.teams },
-  { value: '99.99%', labelKey: LAYOUT_KEYS.auth.stats.uptime },
-  { value: 'SOC 2', labelKey: LAYOUT_KEYS.auth.stats.compliant },
-] as const;

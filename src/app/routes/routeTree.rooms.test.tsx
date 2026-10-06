@@ -53,9 +53,6 @@ vi.mock('@/pages/organization/$organizationSlug/organization-slug.route.tsx', ()
 });
 // The signed-in warm-up's other islands, kept light: it warms onboarding first.
 vi.mock('@/pages/onboarding/onboarding.route.tsx', () => ({ Component: () => null }));
-vi.mock('@/shared/layouts/AuthLayout/auth-layout-variants.ts', () => ({
-  preloadAuthLayoutVariant: vi.fn(() => Promise.resolve()),
-}));
 
 type LazyRoute = {
   options: {

@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "Zum Hauptinhalt springen"
-  },
-  "auth": {
-    "switchToRegister": "Konto erstellen",
-    "switchToSignIn": "Anmelden",
-    "statusOperational": "Alle Systeme betriebsbereit",
-    "badge": "Betrieb, vereint",
-    "heroTitle": "Das Betriebssystem für Ihre Organisation.",
-    "heroSubtitle": "Mitglieder, Rollen, Abrechnung und Sicherheit — ein schneller, tastaturorientierter Arbeitsbereich für jedes Team.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-Org by Design",
-        "body": "Teams wechseln, ohne das Tool zu wechseln."
-      },
-      "secure": {
-        "title": "Standardmäßig sicher",
-        "body": "RBAC, MFA, Passkeys und Audit-Trails."
-      },
-      "fast": {
-        "title": "Überall schnell",
-        "body": "Für tastaturorientierte Echtzeitarbeit gebaut."
-      }
-    },
-    "stats": {
-      "teams": "Teams",
-      "uptime": "Verfügbarkeit",
-      "compliant": "konform"
-    }
   },
   "app": {
     "search": "Suchen",
@@ -180,8 +150,5 @@
         "keepOne": "Mindestens eine Filiale behalten"
       }
     }
-  },
-  "public": {
-    "brandTagline": "Sicherer Arbeitsbereich für Ihr Team"
   }
 }

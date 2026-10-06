@@ -45,7 +45,7 @@ hooks in `src/index.css`**. Use this when context is fresh or after a long break
 | 15  | **Light/dark mode** (`theme`)             | `.dark` on `<html>`                         | ✅ Done (2025-06) |
 | 16  | **Named presets** (`preset`)              | `data-theme`                                | ✅ Done (2025-06) |
 | 17  | **Toasts** (one design since L-62)        | the bar on `primary` (sonner)               | ✅ Retired        |
-| 18  | **Layout preview variants** (TEMP)        | `authVariant`, `publicVariant`              | ✅ Done (2025-06) |
+| 18  | **Layout preview variants** (TEMP)        | — (retired 2026-10: one layout each)        | ✅ Retired        |
 
 **All 18 axes audited.** Re-run a single axis by setting its row back to ⬜ Pending.
 
@@ -136,16 +136,13 @@ values remain, so an audit can still set one by hand:
 | `--spacing`        | any rem (default 0.25rem)                                     |
 | `--radius-lg`      | any rem (default 0.5rem; the scale derives from it)           |
 
-### Layout shell preview (TEMP)
+### Layout shells (one design each)
 
-One design per surface: the app shell is the section bar alone (no axis — the sidebar,
-top-nav, rail and Focus previews and `appVariant` are gone). The auth and public layouts
-still carry pre-launch previews, leftovers to remove:
-
-| Axis              | Store field     | Count      | Notes                                                                                                      |
-| ----------------- | --------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
-| **Auth layout**   | `authVariant`   | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.authLayout` off, L-65) / Split / Spotlight / Minimal |
-| **Public layout** | `publicVariant` | 4 variants | Canvas (0, the launch default, pinned — `SHUFFLE_TEMP.publicLayout` off, L-65) / Centered / Card / Brand   |
+One design per surface, no axis: the app shell is the section bar alone (the sidebar,
+top-nav, rail and Focus previews and `appVariant` are gone), and the auth and public
+layouts are the launch's signed-out canvas alone (`AuthLayout.tsx`, `PublicLayout.tsx`
+— the Split / Spotlight / Minimal and Centered / Card / Brand previews,
+`authVariant` / `publicVariant` and `SHUFFLE_TEMP` are gone, L-65).
 
 `VITE_THEME_LOCK=true` now only swaps the Appearance drawer's Mode card for the
 "managed by your organization" note.

@@ -14,7 +14,6 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------- |
 | `auth-layout`                                                                | Auth shell                                               | `shared/layouts/AuthLayout/AuthLayout.tsx`        |
 | `auth-form-container`                                                        | Form column                                              | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
-| `auth-mobile-logo`                                                           | Mobile logo link                                         | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
 | `login-page`                                                                 | Unified auth page root                                   | `pages/login/LoginPage.tsx`                       |
 | `auth-form`                                                                  | Unified auth root                                        | `shared/forms/AuthForm/AuthForm.tsx`              |
 | `auth-continue-google` / `auth-continue-github`                              | OAuth                                                    | AuthForm                                          |
@@ -25,9 +24,8 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                     |
 | `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/components/PublicFrame/`                  |
 
-The default auth shell (variant 0, `variants/AuthLayoutCanvas.tsx`) is the signed-out canvas
-(`PublicFrame`): it keeps `auth-layout` and `auth-form-container`, and its logo is `brand-logo`
-(`auth-mobile-logo` belongs to the Split preview). `PublicLayout`'s default variant, the
+The auth shell (`AuthLayout.tsx`) is the signed-out canvas (`PublicFrame`): it keeps
+`auth-layout` and `auth-form-container`, and its logo is `brand-logo`. `PublicLayout`, the
 organization picker and the 404 draw the same frame.
 
 **Hybrid helpers:** `tests/utils/e2e-hybrid.ts` — `expectAuthScreenReady`, `expectLoginFormReady`, `fillTestId`, `clickTestId`, label constants.

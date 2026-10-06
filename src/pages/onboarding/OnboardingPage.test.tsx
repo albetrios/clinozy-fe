@@ -370,11 +370,11 @@ describe('OnboardingPage', () => {
     expect(await screen.findByTestId('onboarding-page')).toBeInTheDocument();
   });
 
-  // The island renders into PublicLayout's `PublicMain`, which is `w-full
-  // max-w-md`, while every PublicLayout variant already paints `bg-background`
-  // over a `min-h-dvh` viewport. A background set HERE is 448px wide on top of a
-  // full-width one — a tinted vertical band with visible seams down the middle of
-  // the page. Widening it cannot help; the layout has to own the surface.
+  // The island renders inside PublicLayout's frame, which already paints the
+  // canvas over a `min-h-dvh` viewport. A background set HERE is only as wide as
+  // the wizard's column on top of a full-width one — a tinted vertical band with
+  // visible seams down the middle of the page. Widening it cannot help; the
+  // layout has to own the surface.
   it('paints no background of its own — the layout owns the page surface', async () => {
     renderWithProviders(<OnboardingPage />);
     const page = await screen.findByTestId('onboarding-page');

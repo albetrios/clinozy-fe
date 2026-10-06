@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "Aller au contenu principal"
-  },
-  "auth": {
-    "switchToRegister": "Créer un compte",
-    "switchToSignIn": "Se connecter",
-    "statusOperational": "Tous les systèmes opérationnels",
-    "badge": "Opérations, unifiées",
-    "heroTitle": "Le système d'exploitation de votre organisation.",
-    "heroSubtitle": "Membres, rôles, facturation et sécurité — un espace de travail rapide et pensé pour le clavier, pour chaque équipe.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organisation dès la conception",
-        "body": "Changez d'équipe sans changer d'outil."
-      },
-      "secure": {
-        "title": "Sécurisé par défaut",
-        "body": "RBAC, MFA, clés d'accès et pistes d'audit."
-      },
-      "fast": {
-        "title": "Rapide partout",
-        "body": "Conçu pour un travail en temps réel, clavier d'abord."
-      }
-    },
-    "stats": {
-      "teams": "équipes",
-      "uptime": "disponibilité",
-      "compliant": "conforme"
-    }
   },
   "app": {
     "search": "Rechercher",
@@ -180,8 +150,5 @@
         "keepOne": "Gardez au moins un établissement"
       }
     }
-  },
-  "public": {
-    "brandTagline": "Espace de travail sécurisé pour votre équipe"
   }
 }

@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "본문으로 건너뛰기"
-  },
-  "auth": {
-    "switchToRegister": "계정 만들기",
-    "switchToSignIn": "로그인",
-    "statusOperational": "모든 시스템 정상",
-    "badge": "운영, 하나로",
-    "heroTitle": "조직을 위한 운영 체제.",
-    "heroSubtitle": "멤버, 역할, 결제, 보안 — 모든 팀을 위한 빠르고 키보드 우선의 워크스페이스.",
-    "features": {
-      "multiOrg": {
-        "title": "멀티 조직 설계",
-        "body": "도구를 바꾸지 않고 팀을 전환하세요."
-      },
-      "secure": {
-        "title": "기본부터 안전",
-        "body": "RBAC, MFA, 패스키, 감사 추적."
-      },
-      "fast": {
-        "title": "어디서나 빠르게",
-        "body": "키보드 우선의 실시간 작업을 위해 설계되었습니다."
-      }
-    },
-    "stats": {
-      "teams": "팀",
-      "uptime": "가동률",
-      "compliant": "준수"
-    }
   },
   "app": {
     "search": "검색",
@@ -180,8 +150,5 @@
         "keepOne": "지점을 하나 이상 유지하세요"
       }
     }
-  },
-  "public": {
-    "brandTagline": "팀을 위한 안전한 워크스페이스"
   }
 }

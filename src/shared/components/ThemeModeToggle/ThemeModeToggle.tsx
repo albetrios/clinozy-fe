@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
-import { iconOnBrandSurface } from '@/lib/icon-surface.ts';
-import { cn } from '@/lib/utils.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
@@ -24,11 +22,10 @@ export function ThemeModeToggle({
   surface = 'default',
 }: {
   /**
-   * Tinted shell the trigger sits on — adjusts icon/button contrast. `frame` is
-   * the signed-out canvas's header: a 32px outline button, as the clinic header
-   * draws its own controls.
+   * Where the trigger sits. `frame` is the signed-out canvas's header: a 32px
+   * outline button, as the clinic header draws its own controls.
    */
-  surface?: 'default' | 'brand' | 'frame';
+  surface?: 'default' | 'frame';
 }) {
   const { t: tLocale } = useTranslation(LOCALE_NS);
   const { t } = useTranslation(LAYOUT_NS);
@@ -39,17 +36,10 @@ export function ThemeModeToggle({
   if (theme === 'dark') ThemeIcon = Moon;
   else if (theme === 'light') ThemeIcon = Sun;
 
-  let surfaceTriggerClass: string | undefined;
-  if (surface === 'brand') {
-    surfaceTriggerClass =
-      'text-brand-foreground/80 hover:bg-brand-foreground/10 hover:text-brand-foreground';
-  } else if (surface === 'frame') {
-    // The 8px corner of the header's 32px controls (`shell.md:20`) and of the
-    // language field beside it.
-    surfaceTriggerClass = 'text-foreground-soft rounded-lg';
-  }
-
-  const surfaceIconClass = surface === 'brand' ? iconOnBrandSurface : undefined;
+  // The 8px corner of the header's 32px controls (`shell.md:20`) and of the
+  // language field beside it.
+  const surfaceTriggerClass =
+    surface === 'frame' ? 'text-foreground-soft rounded-lg' : undefined;
 
   return (
     <DropdownMenu>
@@ -61,7 +51,7 @@ export function ThemeModeToggle({
           aria-label={tLocale(LOCALE_KEYS.toggleTheme)}
           data-testid="theme-toggle"
         >
-          <ThemeIcon className={cn('h-4 w-4', surfaceIconClass)} />
+          <ThemeIcon className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

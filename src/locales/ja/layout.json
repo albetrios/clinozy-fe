@@ -1,36 +1,6 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
     "skipToMain": "メインコンテンツへスキップ"
-  },
-  "auth": {
-    "switchToRegister": "アカウントを作成",
-    "switchToSignIn": "サインイン",
-    "statusOperational": "すべてのシステムが稼働中",
-    "badge": "オペレーションをひとつに",
-    "heroTitle": "組織のためのオペレーティングシステム。",
-    "heroSubtitle": "メンバー、ロール、請求、セキュリティ — すべてのチーム向けの高速でキーボードファーストなワークスペース。",
-    "features": {
-      "multiOrg": {
-        "title": "マルチ組織対応",
-        "body": "ツールを切り替えずにチームを切り替え。"
-      },
-      "secure": {
-        "title": "デフォルトで安全",
-        "body": "RBAC、MFA、パスキー、監査証跡。"
-      },
-      "fast": {
-        "title": "どこでも高速",
-        "body": "キーボードファーストのリアルタイム作業向けに構築。"
-      }
-    },
-    "stats": {
-      "teams": "チーム",
-      "uptime": "稼働率",
-      "compliant": "準拠"
-    }
   },
   "app": {
     "search": "検索",
@@ -180,8 +150,5 @@
         "keepOne": "少なくとも1つの院を残してください"
       }
     }
-  },
-  "public": {
-    "brandTagline": "チームのための安全なワークスペース"
   }
 }
