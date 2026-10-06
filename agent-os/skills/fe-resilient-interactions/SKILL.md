@@ -1133,10 +1133,11 @@ preloadBootRoutes({ likelySignedIn: hasSessionHint() });
   being wrong is a few idle kilobytes. **Nothing may authorize on it**: the refresh cookie is HttpOnly
   and the server alone knows whether the session is alive. A hint that skipped the refresh call would
   break every session the hint does not know about (cleared storage, a parent-domain cookie).
-- **Warm the level below, too.** A layout that lazy-loads its variant *after mounting* adds a round
-  trip the router's preloader cannot see. Fetch it from the route `loader` — after `beforeLoad` has
-  put `me/context` in the store, so the choice is exact, not a guess — and the layout finds it in
-  memory (`preloadSessionAppShell()`, `preloadAuthLayoutVariant()`).
+- **Warm the level below, too.** A layout or island a route renders inside its own component is
+  invisible to the router's preloader, and lazy-loading it *after mounting* adds a round trip. Fetch
+  it from the route `loader` — after `beforeLoad` has put `me/context` in the store, so the choice is
+  exact, not a guess — and the component finds it in memory (`preloadAppShell()`, `preloadAuthShell()`
+  in `routeTree.tsx`).
 - **Speculation swallows its failures.** A rejected warm-up is not an error: the router loads the same
   chunk again through the normal path, where a failure has a boundary and a Retry. (`onceAsync` does
   not cache a rejection, so the retry really refetches.)

@@ -305,7 +305,7 @@ src/shared/
 │   ├── use<X>/                             cross-page custom hooks
 │   ├── useList/, useOne/                   standard CRUD hooks (Refine-style)
 │   ├── useCreate/, useUpdate/, useDelete/
-├── layouts/<Name>/{...}                    AppLayout, AuthLayout, PublicLayout, LayoutVariantFallback
+├── layouts/<Name>/{...}                    AppLayout, AuthLayout, PublicLayout
 │   └── layout.constants.ts                 sanctioned cross-layout plain module (i18n keys, testids)
 ├── api/                                    cross-page API helpers (auth, organization, billing, …) — plain modules
 ├── auth/                                   auth runtime (token, refresh-timer, idle-timeout, service, captcha)

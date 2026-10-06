@@ -299,7 +299,7 @@ src/shared/
 ├── hooks/
 │   ├── use<X>/                      # cross-page custom hooks — folder-per-unit
 │   └── useList/, useOne/, useCreate/, useUpdate/, useDelete/   # standard CRUD hooks
-├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout, LayoutVariantFallback
+├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout
 ├── api/                             # cross-page API helpers (auth, organization, billing, mfa,
 │                                    #   passkeys, sessions, webhooks, notifications) — plain modules
 ├── auth/                            # auth runtime (token, refresh-timer, idle-timeout, service, captcha)
