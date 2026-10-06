@@ -77,9 +77,9 @@ the bill photo through the upload tray). Quick fill and "Add & another" on a new
 Delete on an edit. A day closed while either drawer is open turns it view only. The pending
 drawers live on Pending (`pending/PENDING.OVERVIEW.md`).
 
-**Day close** (`components/DayCloseDrawer/`, L-41) — the 1040px drawer on the canvas (full
-screen on a phone) under a sticky header with its inline ×; the ledger behind lists only its
-day. The bar picks the day (today back 120 days), shows the state ("Open", "Open ·
+**Day close** (`components/DayCloseDrawer/`, L-41) — the 1040px record drawer on the canvas
+(full screen on a phone), no footer — its actions sit in the bar; the ledger behind lists only
+its day. The bar picks the day (today back 120 days), shows the state ("Open", "Open ·
 auto-closes in 14 h", "Closed by Riya S.", "Force-closed"), "6 entries on Oct 3", yesterday's
 open-day chip while today shows, "Previous closes ⌄" (six chips that jump to their day) and
 "Close day". The day runs **gate → working → report**: accept the opening cash — carried

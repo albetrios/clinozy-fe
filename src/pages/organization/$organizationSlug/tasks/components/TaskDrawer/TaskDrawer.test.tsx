@@ -70,7 +70,8 @@ async function openTaskTitled(title: string, url = `${TASKS}?scope=everyone`) {
     .getAllByTestId('tasks-row')
     .find((candidate) => candidate.textContent?.includes(title));
   await user.click(within(row as HTMLElement).getByText(title));
-  await screen.findByTestId('task-drawer-title', {}, { timeout: OPEN_MS });
+  // The record drawer titles itself while the task loads: wait for its due label.
+  await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
   return { ...view, user };
 }
 
@@ -80,14 +81,16 @@ const undoToast = (index = 0) =>
 describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
   it('opens a visit task: header, who, What, the visit’s tiles, How and its outcomes', async () => {
     renderTasksRoutes(`${TASKS}/${PRITI}`, TasksPage);
-    const title = await screen.findByTestId(
-      'task-drawer-title',
-      {},
-      { timeout: OPEN_MS },
+    await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
+    expect(screen.getByTestId('task-drawer-title')).toHaveTextContent(
+      'Confirm Priti’s visit',
     );
-    expect(title).toHaveTextContent('Confirm Priti’s visit');
-    expect(drawer()).toHaveClass('md:w-(--task-total)');
-    expect(drawer()).toHaveStyle({ '--task-total': '900px', '--task-chat-w': '420px' });
+    // The record drawer at the measured width, the chat column inside it.
+    expect(drawer()).toHaveClass('md:w-(--drawer-panel-width)');
+    expect(drawer()).toHaveStyle({
+      '--drawer-panel-width': '900px',
+      '--drawer-aside-width': '420px',
+    });
     expect(drawer()).toHaveAccessibleDescription(
       expect.stringContaining(`Created by ${PRODUCT_NAME} · `),
     );
@@ -112,7 +115,8 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
   it('closes with an outcome, toasts it with Undo and asks what’s next', async () => {
     const user = userEvent.setup();
     const { router } = renderTasksRoutes(`${TASKS}/${PRITI}`, TasksPage);
-    await screen.findByTestId('task-drawer-title', {}, { timeout: OPEN_MS });
+    // The record drawer titles itself while the task loads: wait for its due label.
+    await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
     await user.type(screen.getByTestId('task-drawer-note'), 'Spoke to her mother');
     await user.click(screen.getByTestId('task-drawer-outcome-confirmedOnCall'));
 
@@ -141,7 +145,8 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
   it('snoozes from the footer and leaves the drawer', async () => {
     const user = userEvent.setup();
     const { router } = renderTasksRoutes(`${TASKS}/${PRITI}`, TasksPage);
-    await screen.findByTestId('task-drawer-title', {}, { timeout: OPEN_MS });
+    // The record drawer titles itself while the task loads: wait for its due label.
+    await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
     await user.click(screen.getByText('Snooze'));
     await user.click(await screen.findByRole('option', { name: '3 hours' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(TASKS));
@@ -154,7 +159,8 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
   it('moves a task to someone else and stays open, the previous owner named', async () => {
     const user = userEvent.setup();
     renderTasksRoutes(`${TASKS}/${PRITI}`, TasksPage);
-    await screen.findByTestId('task-drawer-title', {}, { timeout: OPEN_MS });
+    // The record drawer titles itself while the task loads: wait for its due label.
+    await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
     await user.click(
       screen.getByTitle(
         'Move this task to someone else · the previous person stays on it',
@@ -205,7 +211,8 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer)', () => {
   it('shows the task column alone on a phone', async () => {
     viewport.tier = 'phone';
     renderTasksRoutes(`${TASKS}/${PRITI}`, TasksPage);
-    await screen.findByTestId('task-drawer-title', {}, { timeout: OPEN_MS });
+    // The record drawer titles itself while the task loads: wait for its due label.
+    await screen.findByTestId('task-drawer-due', {}, { timeout: OPEN_MS });
     expect(screen.queryByTestId('task-drawer-chat')).toBeNull();
     expect(screen.getAllByRole('button', { name: 'Close' }).length).toBeGreaterThan(0);
   });

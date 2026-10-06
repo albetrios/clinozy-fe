@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -51,6 +52,15 @@ export interface DrawerFooterProps {
   /** Shown only when the record can be deleted; the caller opens the confirm. */
   onDelete?: () => void;
   deleteLabel?: string;
+  /**
+   * Controls before the buttons, in place of the summary — the task drawer's
+   * Snooze and Assigned (`tasks.md` › Task drawer › Footer).
+   */
+  start?: ReactNode;
+  /** The primary's test id, for a drawer whose specs already name it (`<testId>-save` by default). */
+  saveTestId?: string;
+  /** Delete's test id, likewise (`<testId>-delete` by default). */
+  deleteTestId?: string;
   /** Prefix for the footer's test ids (`<testId>-save` …). */
   testId: string;
 }
@@ -66,7 +76,7 @@ const FOOTER_BUTTON =
 /** The compact footer's 32px buttons from `md` (still 44px on a phone). */
 const COMPACT_BUTTON = 'md:h-8';
 
-type EditActionsProps = Omit<DrawerFooterProps, 'summary' | 'readOnly'>;
+type EditActionsProps = Omit<DrawerFooterProps, 'summary' | 'readOnly' | 'start'>;
 
 /**
  * The primary: "Saving…" while a save runs, "Retry save" after one failed;
@@ -79,10 +89,17 @@ function PrimaryAction({
   saveDisabled,
   saveIncomplete,
   className,
+  saveTestId,
   testId,
 }: Pick<
   EditActionsProps,
-  'saveLabel' | 'onSave' | 'saveState' | 'saveDisabled' | 'saveIncomplete' | 'testId'
+  | 'saveLabel'
+  | 'onSave'
+  | 'saveState'
+  | 'saveDisabled'
+  | 'saveIncomplete'
+  | 'saveTestId'
+  | 'testId'
 > & { className: string }) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
   const saving = saveState === 'saving';
@@ -96,7 +113,7 @@ function PrimaryAction({
       aria-busy={saving || undefined}
       data-incomplete={saveIncomplete || undefined}
       onClick={onSave}
-      data-testid={`${testId}-save`}
+      data-testid={saveTestId ?? `${testId}-save`}
       className={cn(className, 'px-4', saveIncomplete && 'opacity-50')}
     >
       {label}
@@ -120,6 +137,8 @@ function EditActions({
   notSavedLabel,
   onDelete,
   deleteLabel,
+  saveTestId,
+  deleteTestId,
   testId,
 }: EditActionsProps) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
@@ -136,7 +155,7 @@ function EditActions({
           variant="destructive"
           disabled={saving}
           onClick={onDelete}
-          data-testid={`${testId}-delete`}
+          data-testid={deleteTestId ?? `${testId}-delete`}
           className={button}
         >
           {deleteLabel ?? t(RECORD_DRAWER_KEYS.delete)}
@@ -193,6 +212,7 @@ function EditActions({
           saveDisabled={saveDisabled}
           saveIncomplete={saveIncomplete}
           className={button}
+          saveTestId={saveTestId}
           testId={testId}
         />
       ) : null}
@@ -212,6 +232,7 @@ function EditActions({
 export function DrawerFooter({
   summary,
   readOnly = false,
+  start,
   ...actions
 }: DrawerFooterProps) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
@@ -221,11 +242,21 @@ export function DrawerFooter({
       data-testid={`${actions.testId}-footer`}
       className="flex shrink-0 flex-wrap items-center gap-2 border-t p-(--drawer-footer-pad) md:flex-nowrap md:gap-2.5"
     >
+      {start ? (
+        <div
+          data-testid={`${actions.testId}-start`}
+          className="flex min-w-0 flex-1 flex-wrap items-center gap-2"
+        >
+          {start}
+        </div>
+      ) : null}
       <span
         data-testid={`${actions.testId}-summary`}
         className={cn(
           'text-detail text-muted-foreground min-w-0 flex-1 truncate max-md:order-last max-md:basis-full max-md:text-center max-md:text-xs max-md:leading-[1.3] max-md:whitespace-normal max-md:empty:hidden',
           actions.compact && 'md:text-body md:text-muted-foreground-strong',
+          // The start controls take the free room; an empty summary steps aside.
+          start && 'empty:hidden',
         )}
       >
         {readOnly ? t(RECORD_DRAWER_KEYS.readOnly) : summary}

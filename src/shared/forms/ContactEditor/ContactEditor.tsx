@@ -1,15 +1,14 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   PersonAvatar,
   personInitials,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
-import { type DrawerStep, DrawerSteps } from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
   KIND_TINT,
   KIND_TONE,
@@ -22,20 +21,15 @@ import {
   PERSON_CARD_KEYS,
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from '@/shared/components/ui/sheet.tsx';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import { X } from '@/shared/icons/index.ts';
+import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 
 import {
   CONTACT_EDITOR_KEYS,
@@ -211,8 +205,13 @@ function ContactEditorBand({
   );
 }
 
-/** One opening of the editor: its own copy of the values, so ×, backdrop and Esc keep nothing. */
+/**
+ * One opening of the editor (keyed on its session): its own copy of the
+ * values, kept only by "Done" — ×, the backdrop and Esc ask first when it was
+ * edited (Q-P1).
+ */
 function ContactEditorPanel({
+  open,
   value,
   record = null,
   linked,
@@ -220,10 +219,8 @@ function ContactEditorPanel({
   onClose,
   testId = CONTACT_EDITOR_TEST_ID,
   ...actions
-}: Omit<ContactEditorProps, 'open'>) {
+}: ContactEditorProps) {
   const { t } = useTranslation(CONTACT_EDITOR_NS);
-  const { t: tLocale } = useTranslation(LOCALE_NS);
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const [draft, setDraft] = useState(value);
   const [step, setStep] = useState<EditorStep>('identity');
   // "+ Custom" is being typed: Esc leaves the field, not the editor.
@@ -263,98 +260,60 @@ function ContactEditorPanel({
   ];
 
   return (
-    <SheetContent
-      side="end"
-      showCloseButton={false}
-      overlayClassName="bg-overlay/35 data-[state=open]:animate-backdrop-in data-[state=closed]:animate-none"
-      data-testid={testId}
-      onOpenAutoFocus={(event) => {
-        event.preventDefault();
-        titleRef.current?.focus();
-      }}
-      onEscapeKeyDown={(event) => {
-        if (!adding) return;
-        event.preventDefault();
-        setAdding(false);
-      }}
-      className="data-[state=open]:animate-drawer-in w-[min(35rem,calc(100vw-2.875rem))] max-w-none gap-0 outline-none data-[state=closed]:animate-none sm:max-w-none"
-    >
-      <TooltipProvider>
-        {/* The ×: 36px, 10px outside the inline-start edge — on a phone too,
-            in the 46px the panel leaves (H:1965, `leads.md:22`). */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={tLocale(LOCALE_KEYS.closeAria)}
-          data-testid={`${testId}-close`}
-          data-slot="floating-edge"
-          className="bg-background text-foreground-soft hover:bg-muted animate-pop-in absolute -start-[2.875rem] top-3.5 flex size-9 items-center justify-center rounded-lg border"
-        >
-          <X aria-hidden="true" className="size-4.5" />
-        </button>
-        <div className="flex flex-none flex-col gap-0.5 border-b px-(--drawer-pad-x) py-4">
-          <SheetTitle
-            ref={titleRef}
-            tabIndex={-1}
-            className="text-xl leading-[1.2] tracking-[-0.01em] outline-none"
-          >
-            {t(K.title)}
-          </SheetTitle>
-          <SheetDescription className="text-xs">{t(K.sub)}</SheetDescription>
-        </div>
-        <ContactEditorBand
-          name={draft.name}
-          record={record}
-          actions={actions}
-          onLeave={onClose}
-          testId={testId}
-        />
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-(--drawer-pad-x) py-4">
-          <DrawerSteps
-            steps={steps}
-            value={step}
-            onValueChange={(next) => setStep(next as EditorStep)}
-            // The prototype's step circles are ink, not a section's tone (`accVM`).
-            tone="stone"
+    <TooltipProvider>
+      <RecordDrawer
+        open={open}
+        onClose={onClose}
+        title={t(K.title)}
+        sub={t(K.sub)}
+        largeTitle
+        band={
+          <ContactEditorBand
+            name={draft.name}
+            record={record}
+            actions={actions}
+            onLeave={onClose}
             testId={testId}
           />
-        </div>
-        <div className="flex flex-none justify-end border-t p-(--drawer-footer-pad)">
-          <Button
-            type="button"
-            onClick={() => onDone(draft)}
-            data-testid={`${testId}-done`}
-            className="text-field h-9 rounded-lg px-(--drawer-pad-x) max-md:h-11 max-md:w-full"
-          >
-            {t(K.done)}
-          </Button>
-        </div>
-      </TooltipProvider>
-    </SheetContent>
+        }
+        steps={steps}
+        openStep={step}
+        onOpenStepChange={(next) => setStep(next as EditorStep)}
+        // The prototype's step circles are ink, not a section's tone (`accVM`).
+        tone="stone"
+        // Six fields, none heavy: the 560px drawer (`leads.md:22`).
+        content={{ fieldCount: 6 }}
+        closeStyle="form"
+        stacked
+        saveLabel={t(K.done)}
+        onSave={() => onDone(draft)}
+        saveTestId={`${testId}-done`}
+        dirty={JSON.stringify(draft) !== JSON.stringify(value)}
+        onEscapeKeyDown={(event) => {
+          if (!adding) return;
+          event.preventDefault();
+          setAdding(false);
+        }}
+        testId={testId}
+      />
+    </TooltipProvider>
   );
 }
 
 /**
  * The contact editor (KICKOFF §6.3; `leads.md:22, 92–107, 152–164, 289–296`,
  * H:1963–1984) — one shared child drawer, opened from New lead's "New contact"
- * and from "Edit contact" on a contact card. 560px at the inline end over a 35%
- * backdrop, the × floating outside; on a phone the panel leaves 46px for it.
+ * and from "Edit contact" on a contact card: the record drawer at 560px with
+ * the form drawers' floating × (full screen on a phone), stacked ("Back").
  * "Edit contact", the tinted band, then two step cards — "Identity & reach"
  * and "Contact preferences" — and "Done", the only way anything is kept: ×,
- * the backdrop and Esc (which the prototype misses, D33) close without it
- * (Q-P1). The caller decides what Done does — save the lead or patient now
- * ("Contact updated · applies everywhere"), or carry the contact back into
- * New lead.
+ * the backdrop, Esc (which the prototype misses, D33) and "Back" close without
+ * it, asking first once something was edited (Q-P1). Each opening starts from
+ * `value` (`useDrawerSession`). The caller decides what Done does — save the
+ * lead or patient now ("Contact updated · applies everywhere"), or carry the
+ * contact back into New lead.
  */
-export function ContactEditor({ open, onClose, ...props }: ContactEditorProps) {
-  return (
-    <Sheet
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) onClose();
-      }}
-    >
-      {open ? <ContactEditorPanel onClose={onClose} {...props} /> : null}
-    </Sheet>
-  );
+export function ContactEditor(props: ContactEditorProps) {
+  const { session } = useDrawerSession(props.open);
+  return <ContactEditorPanel key={session} {...props} />;
 }

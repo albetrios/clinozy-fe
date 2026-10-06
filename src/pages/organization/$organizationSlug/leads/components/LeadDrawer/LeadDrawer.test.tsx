@@ -123,7 +123,7 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     await user.click(within(drawer).getByRole('button', { name: 'Discard' }));
     expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled();
     await user.click(within(drawer).getByRole('button', { name: 'Peel' }));
-    await user.click(screen.getByRole('button', { name: 'Close lead' }));
+    await user.click(screen.getByTestId('lead-drawer-close'));
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Discard' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));

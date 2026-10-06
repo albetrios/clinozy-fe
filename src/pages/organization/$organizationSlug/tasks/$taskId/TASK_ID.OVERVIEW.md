@@ -9,7 +9,7 @@ shared link reopens it. An unknown id leaves the list in place, without a drawer
 toasts "Task not found · it may have been deleted" (`S:115`). Gated like the room —
 membership (`organization:read`) and the `clinic-tasks` module, then `requireOrgStatus`.
 
-The drawer (L-47c) is the parent's `../components/TaskDrawer/`: from `md` two columns in
+The drawer (L-47c) is the parent's `../components/TaskDrawer/`, on the record drawer: from `md` two columns in
 `min(900px, 100vw − 40px)` — the task column and the shared chat column, split by
 `taskDrawerColumns` (1440: 480 + 420; 820: 409 + 371) — and on a phone the task column alone.
 The task column: header, who · source, "1 · What", context tiles, "2 · How", "Clinozy can

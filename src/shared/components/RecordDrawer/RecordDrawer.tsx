@@ -19,6 +19,7 @@ import {
   type QuickFillItem,
   QuickFillRow,
 } from '@/shared/components/QuickFillRow/index.ts';
+import { RoomViewTabs } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
 import {
   Sheet,
   SheetContent,
@@ -27,6 +28,7 @@ import {
 } from '@/shared/components/ui/sheet.tsx';
 import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import type { AppIcon } from '@/shared/icons/index.ts';
 
 import { RECORD_DRAWER_TEST_ID } from './record-drawer.constants.ts';
 import {
@@ -51,6 +53,24 @@ export interface DrawerBadge {
   tone?: Tone;
 }
 
+/**
+ * The phone's two panes when the drawer has a column (the lead drawer's
+ * Details · Chat, `leads.md:136`): a switch under the header picks the form
+ * or the column, one at a time.
+ */
+interface RecordDrawerPanes {
+  /** The switch's accessible name ("Lead panes"). */
+  label: string;
+  /** The form's tab and the column's — each `id` names its tab's test id. */
+  main: { id: string; label: string; icon?: AppIcon };
+  aside: { id: string; label: string; icon?: AppIcon };
+  /** The pane shown — the screen may keep it between records. */
+  value: 'main' | 'aside';
+  onValueChange: (pane: 'main' | 'aside') => void;
+  /** The switch's test ids: `<prefix>-tabs`, `<prefix>-tab-<pane id>`. */
+  testIdPrefix: string;
+}
+
 /** Props of {@link RecordDrawer}. */
 export interface RecordDrawerProps {
   /** Controlled: URL-driven drawers pass `true` and close by navigating. */
@@ -67,6 +87,13 @@ export interface RecordDrawerProps {
   title: string;
   /** Grey tag pill beside the title, e.g. the record's "#273" — in its own direction. */
   tag?: string;
+  /**
+   * Controls on the title's row after it (and the tag) — the lead drawer's ID
+   * to copy and its "Re-target" pill (H:1755).
+   */
+  titleEnd?: ReactNode;
+  /** Before the title: a leading tile — the task drawer's 36px rule icon. */
+  headerStart?: ReactNode;
   /** At the header's inline end: Stock check's "2 of 10 counted". */
   headerEnd?: ReactNode;
   /**
@@ -91,6 +118,11 @@ export interface RecordDrawerProps {
    */
   initialFocusRef?: RefObject<HTMLElement | null>;
   badges?: readonly DrawerBadge[];
+  /**
+   * A band under the header, edge to edge, that stays put while the body
+   * scrolls — the contact editor's tinted band (H:1967). The caller draws it.
+   */
+  band?: ReactNode;
   /**
    * Presets that prefill the form ("⚡ <label>"); hidden on a read-only drawer,
    * but for a chip that opens another record (`keepWhenReadOnly`).
@@ -122,11 +154,13 @@ export interface RecordDrawerProps {
    */
   panelWidth?: number;
   /**
-   * A column at the drawer's inline end from `md` — the appointment form's
-   * chat (KICKOFF §6.4): its content and its width in px, inside `panelWidth`.
-   * The form keeps the rest behind a hairline. Not rendered on a phone.
+   * A column at the drawer's inline end from `md` — the appointment form's,
+   * the task drawer's and the lead drawer's chat (KICKOFF §6.4, §6.10, §6.3):
+   * its content and its width in px, inside `panelWidth`. The form keeps the
+   * rest behind a hairline. On a phone it is not rendered — unless `panes`
+   * makes it the drawer's second pane behind a switch under the header.
    */
-  aside?: { content: ReactNode; width: number };
+  aside?: { content: ReactNode; width: number; panes?: RecordDrawerPanes };
   /**
    * The floating ×: the record drawers' (`record`, 14px outside, `rounded-xl`,
    * no border — `_patterns.md:30`) or the form drawers' (`form`, 10px outside,
@@ -155,8 +189,14 @@ export interface RecordDrawerProps {
    * and pads its own rows — Stock check's count grid (`clinic-stock.md:78`).
    */
   flushBody?: boolean;
+  /** The body's own surface and spacing — Day close's canvas under its cards. */
+  bodyClassName?: string;
   /** Footer summary (ellipsis; a phone gives it its own last row). */
   summary?: string;
+  /** Controls before the footer's buttons, in place of the summary (the task drawer's Snooze, Assigned). */
+  footerStart?: ReactNode;
+  /** No footer: a drawer whose actions sit in its body (Day close's bar). */
+  hideFooter?: boolean;
   /**
    * View only: "Close", no Save / Delete, no Quick fill but a chip that opens
    * another record (`keepWhenReadOnly`), and the read-only note.
@@ -166,8 +206,15 @@ export interface RecordDrawerProps {
   stacked?: boolean;
   /** The close button's own words ("Nothing next"), in place of Cancel / Back. */
   dismissLabel?: string;
+  /**
+   * The footer's dismiss button does this instead of closing — the lead
+   * drawer's "Discard" puts its draft back in place while it is dirty.
+   */
+  onDismiss?: () => void;
   saveLabel?: string;
   onSave?: () => void;
+  /** The primary's test id where the specs already name it (`<testId>-save` by default). */
+  saveTestId?: string;
   saveState?: DrawerSaveState;
   /** Nothing to save yet (an edit before its first change, Q-P1): the primary is disabled. */
   saveDisabled?: boolean;
@@ -181,10 +228,17 @@ export interface RecordDrawerProps {
   deleteLabel?: string;
   /** Shown when the record can be deleted; the screen opens its confirm. */
   onDelete?: () => void;
+  /** Delete's test id where the specs already name it (`<testId>-delete` by default). */
+  deleteTestId?: string;
   /** The failed save's note in the screen's words ("Not saved · your counts are kept"). */
   notSavedLabel?: string;
   /** Unsaved edits: every exit and the browser Back ask before discarding. */
   dirty?: boolean;
+  /**
+   * Esc on the drawer, before it closes: an inline edit inside takes it first
+   * (the contact editor's "+ Custom") by calling `event.preventDefault()`.
+   */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   /** Root test id; the parts derive theirs (`<testId>-save`, `-close` …). */
   testId?: string;
 }
@@ -193,6 +247,8 @@ export interface RecordDrawerProps {
 function DrawerHeader({
   title,
   tag,
+  titleEnd,
+  start,
   sub,
   hideSubOnPhone,
   end,
@@ -203,6 +259,8 @@ function DrawerHeader({
 }: {
   title: string;
   tag?: string;
+  titleEnd?: ReactNode;
+  start?: ReactNode;
   sub?: string;
   hideSubOnPhone: boolean;
   end?: ReactNode;
@@ -214,7 +272,8 @@ function DrawerHeader({
   // On a phone a long sub wraps to a second line, as the design's does, and the
   // header grows past its 60px instead of cutting it.
   return (
-    <div className="relative flex h-(--drawer-header-height) shrink-0 items-center overflow-hidden border-b p-(--drawer-header-pad) max-md:h-auto max-md:min-h-(--drawer-header-height) max-md:pe-14">
+    <div className="relative flex h-(--drawer-header-height) shrink-0 items-center gap-3 overflow-hidden border-b p-(--drawer-header-pad) max-md:h-auto max-md:min-h-(--drawer-header-height) max-md:pe-14">
+      {start ? <div className="flex flex-none items-center">{start}</div> : null}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-2">
           <SheetTitle
@@ -238,6 +297,7 @@ function DrawerHeader({
               {tag}
             </span>
           ) : null}
+          {titleEnd}
         </div>
         {sub ? (
           <SheetDescription
@@ -252,7 +312,7 @@ function DrawerHeader({
         ) : null}
       </div>
       {end ? (
-        <div data-testid={`${testId}-header-end`} className="ms-3 shrink-0">
+        <div data-testid={`${testId}-header-end`} className="shrink-0">
           {end}
         </div>
       ) : null}
@@ -398,7 +458,10 @@ function DrawerColumns({
       >
         {main}
       </div>
-      <div data-testid={`${testId}-aside`} className="flex min-h-0 min-w-0 flex-col">
+      <div
+        data-testid={`${testId}-aside`}
+        className="relative flex min-h-0 min-w-0 flex-col"
+      >
         {aside}
       </div>
     </div>
@@ -419,6 +482,145 @@ function DrawerStrip({
   return (
     <div data-testid={testId} className={cn('shrink-0', className)}>
       {children}
+    </div>
+  );
+}
+
+/** The drawer's top: the header, its badges, the band and the phone's pane switch. */
+function DrawerTop({
+  props,
+  testId,
+  titleRef,
+  close,
+  panes,
+}: {
+  props: RecordDrawerProps;
+  testId: string;
+  titleRef: Ref<HTMLHeadingElement>;
+  close: ReactNode;
+  panes: RecordDrawerPanes | undefined;
+}) {
+  return (
+    <>
+      <DrawerHeader
+        title={props.title}
+        tag={props.tag}
+        titleEnd={props.titleEnd}
+        start={props.headerStart}
+        end={props.headerEnd}
+        sub={props.sub}
+        hideSubOnPhone={props.hideSubOnPhone ?? false}
+        large={props.largeTitle ?? false}
+        titleRef={titleRef}
+        testId={testId}
+        close={close}
+      />
+      <DrawerBadges badges={props.badges ?? []} testId={testId} />
+      {props.band ? <div className="shrink-0">{props.band}</div> : null}
+      {panes ? <DrawerPaneSwitch panes={panes} /> : null}
+    </>
+  );
+}
+
+/** The form pane: Quick fill, the strips, the body (content, then the steps) and the footer. */
+function DrawerForm({
+  props,
+  testId,
+  step,
+  onStepChange,
+  markItems,
+  onDismiss,
+  onSave,
+  onSaveAndAdd,
+}: {
+  props: RecordDrawerProps;
+  testId: string;
+  step: string;
+  onStepChange: (stepId: string) => void;
+  markItems: () => void;
+  onDismiss: () => void;
+  onSave?: () => void;
+  onSaveAndAdd?: () => void;
+}) {
+  return (
+    <>
+      <QuickFillRow
+        items={(props.quickFill ?? []).filter(
+          (item) => !props.readOnly || item.keepWhenReadOnly,
+        )}
+        testId={testId}
+      />
+      <DrawerStrip testId={`${testId}-header-strip`} className="px-(--drawer-pad-x) pt-3">
+        {props.headerStrip}
+      </DrawerStrip>
+
+      <div
+        data-testid={`${testId}-body`}
+        className={cn(
+          'flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto',
+          !props.flushBody && 'gap-3 p-(--drawer-body-pad)',
+          props.bodyClassName,
+        )}
+      >
+        <DrawerItemsContext.Provider value={markItems}>
+          {props.children}
+          <DrawerSteps
+            steps={props.steps ?? []}
+            value={step}
+            onValueChange={onStepChange}
+            tone={props.tone}
+            testId={testId}
+          />
+        </DrawerItemsContext.Provider>
+      </div>
+
+      <DrawerStrip testId={`${testId}-footer-strip`}>{props.footerStrip}</DrawerStrip>
+      {props.hideFooter ? null : (
+        <DrawerFooter
+          start={props.footerStart}
+          summary={props.summary}
+          readOnly={props.readOnly}
+          stacked={props.stacked}
+          onDismiss={props.onDismiss ?? onDismiss}
+          dismissLabel={props.dismissLabel}
+          saveLabel={props.saveLabel}
+          onSave={onSave}
+          saveState={props.saveState}
+          saveDisabled={props.saveDisabled}
+          saveIncomplete={props.saveIncomplete}
+          compact={props.compactFooter}
+          saveAndAddLabel={props.saveAndAddLabel}
+          onSaveAndAdd={onSaveAndAdd}
+          deleteLabel={props.deleteLabel}
+          onDelete={props.onDelete}
+          notSavedLabel={props.notSavedLabel}
+          saveTestId={props.saveTestId}
+          deleteTestId={props.deleteTestId}
+          testId={testId}
+        />
+      )}
+    </>
+  );
+}
+
+/** The phone's form · column switch under the header (the lead drawer's Details · Chat). */
+function DrawerPaneSwitch({ panes }: { panes: RecordDrawerPanes }) {
+  return (
+    <div className="shrink-0 border-b px-(--drawer-pad-x) py-2">
+      <RoomViewTabs
+        fill
+        activation="automatic"
+        label={panes.label}
+        tabs={[
+          { id: panes.main.id, label: panes.main.label, icon: panes.main.icon },
+          { id: panes.aside.id, label: panes.aside.label, icon: panes.aside.icon },
+        ]}
+        value={panes.value === 'aside' ? panes.aside.id : panes.main.id}
+        onValueChange={(id) =>
+          panes.onValueChange(id === panes.aside.id ? 'aside' : 'main')
+        }
+        testIdPrefix={panes.testIdPrefix}
+      />
     </div>
   );
 }
@@ -458,70 +660,45 @@ export function RecordDrawer(props: RecordDrawerProps) {
     />
   );
   const aside = phone ? undefined : props.aside;
+  // On a phone a column with panes is the drawer's second pane.
+  const panes = phone ? props.aside?.panes : undefined;
+
+  const header = (
+    <DrawerTop
+      props={props}
+      testId={testId}
+      titleRef={titleRef}
+      close={phone ? close('inside') : null}
+      panes={panes}
+    />
+  );
+
+  const form = (
+    <DrawerForm
+      props={props}
+      testId={testId}
+      step={currentStep}
+      onStepChange={selectStep}
+      markItems={markItems}
+      onDismiss={requestClose}
+      onSave={onSave}
+      onSaveAndAdd={onSaveAndAdd}
+    />
+  );
 
   const main = (
     <>
-      <DrawerHeader
-        title={props.title}
-        tag={props.tag}
-        end={props.headerEnd}
-        sub={props.sub}
-        hideSubOnPhone={props.hideSubOnPhone ?? false}
-        large={props.largeTitle ?? false}
-        titleRef={titleRef}
-        testId={testId}
-        close={phone ? close('inside') : null}
-      />
-      <DrawerBadges badges={props.badges ?? []} testId={testId} />
-      <QuickFillRow
-        items={(props.quickFill ?? []).filter(
-          (item) => !props.readOnly || item.keepWhenReadOnly,
-        )}
-        testId={testId}
-      />
-      <DrawerStrip testId={`${testId}-header-strip`} className="px-(--drawer-pad-x) pt-3">
-        {props.headerStrip}
-      </DrawerStrip>
-
-      <div
-        data-testid={`${testId}-body`}
-        className={cn(
-          'flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto',
-          !props.flushBody && 'gap-3 p-(--drawer-body-pad)',
-        )}
-      >
-        <DrawerItemsContext.Provider value={markItems}>
-          {props.children}
-          <DrawerSteps
-            steps={props.steps ?? []}
-            value={currentStep}
-            onValueChange={selectStep}
-            tone={props.tone}
-            testId={testId}
-          />
-        </DrawerItemsContext.Provider>
-      </div>
-
-      <DrawerStrip testId={`${testId}-footer-strip`}>{props.footerStrip}</DrawerStrip>
-      <DrawerFooter
-        summary={props.summary}
-        readOnly={props.readOnly}
-        stacked={props.stacked}
-        onDismiss={requestClose}
-        dismissLabel={props.dismissLabel}
-        saveLabel={props.saveLabel}
-        onSave={onSave}
-        saveState={props.saveState}
-        saveDisabled={props.saveDisabled}
-        saveIncomplete={props.saveIncomplete}
-        compact={props.compactFooter}
-        saveAndAddLabel={props.saveAndAddLabel}
-        onSaveAndAdd={onSaveAndAdd}
-        deleteLabel={props.deleteLabel}
-        onDelete={props.onDelete}
-        notSavedLabel={props.notSavedLabel}
-        testId={testId}
-      />
+      {header}
+      {panes?.value === 'aside' ? (
+        <div
+          data-testid={`${testId}-aside`}
+          className="relative flex min-h-0 min-w-0 flex-1 flex-col"
+        >
+          {props.aside?.content}
+        </div>
+      ) : (
+        form
+      )}
     </>
   );
 
@@ -541,6 +718,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
         {...(props.sub ? {} : { 'aria-describedby': undefined })}
         onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
+        onEscapeKeyDown={props.onEscapeKeyDown}
         style={panelStyle(props.panelWidth, aside)}
         className={cn(
           RECORD_DRAWER_PANEL_CLASS,

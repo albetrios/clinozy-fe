@@ -1,5 +1,4 @@
-import { Dialog as DialogPrimitive } from 'radix-ui';
-import { type Ref, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -9,12 +8,7 @@ import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
-import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
@@ -40,7 +34,7 @@ import { Copy, RefreshCw, UserPlus } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import type { LeadDraftState } from '../../hooks/useLeadDraft/index.ts';
-import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
+import { LEADS_KEYS, LEADS_NS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
 import {
   LeadCard,
@@ -52,8 +46,8 @@ import {
   LeadSourceField,
 } from '../LeadFormFields/index.ts';
 
-/** What the details pane reads and does beyond the draft. */
-export interface LeadDetailsPaneProps {
+/** What the lead drawer's body reads and does beyond the draft. */
+export interface LeadDetailsBodyProps {
   lead: LeadRecord;
   draft: LeadDraftState;
   staff: readonly StaffProfile[];
@@ -62,15 +56,10 @@ export interface LeadDetailsPaneProps {
   messages: readonly LeadMessage[] | undefined;
   people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'staff'>;
   canEdit: boolean;
-  canDelete: boolean;
   /** "Convert to patient" — shown while it applies (§6.3 Info). */
   onConvert?: () => void;
   /** The contact card's and the contact editor's band actions. */
   contactActions?: ContactCardActions;
-  /** The lead is gone (removed): the drawer closes. */
-  onRemoved: () => void;
-  titleRef: Ref<HTMLHeadingElement>;
-  className?: string;
 }
 
 /** "Contacted" or "Follow-up": a lead that may become a patient now (H:1813). */
@@ -83,17 +72,11 @@ function lastMessageOf(messages: readonly LeadMessage[] | undefined): LeadMessag
 }
 
 /**
- * The header (H:1755): "Edit lead", the ID to copy, "Re-target", the sub line.
- * The ID's tooltip names when the lead was created by the rooms' one time rule
- * ("9:20 am" today, "Yesterday 4:10 pm", "27 Sep").
+ * The title's chips (H:1755): the ID to copy — its tooltip names when the lead
+ * was created by the rooms' one time rule ("9:20 am" today, "Yesterday 4:10
+ * pm", "27 Sep") — and "Re-target" on a re-target lead.
  */
-function LeadDetailsHeader({
-  lead,
-  titleRef,
-}: {
-  lead: LeadRecord;
-  titleRef: Ref<HTMLHeadingElement>;
-}) {
+export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
   const clock = useClinicClock();
   const seq = String(lead.seq);
@@ -106,59 +89,47 @@ function LeadDetailsHeader({
     }
   };
   return (
-    <div className="relative flex h-15 flex-none flex-col justify-center gap-0.5 overflow-hidden border-b px-(--room-header-pad-x) md:h-19">
-      <div className="flex items-center gap-2.5">
-        <DialogPrimitive.Title
-          ref={titleRef}
-          tabIndex={-1}
-          className="text-xl leading-[1.2] font-semibold tracking-[-0.01em] outline-none"
-        >
-          {t(LEADS_KEYS.drawer.title)}
-        </DialogPrimitive.Title>
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => void copyId()}
+            aria-label={t(LEADS_KEYS.drawer.idAria, { seq })}
+            className="group/copy bg-muted text-muted-foreground-strong hover:bg-muted-strong flex h-8 flex-none items-center gap-1 rounded-lg border px-2.5 font-mono text-xs font-medium"
+          >
+            #{seq}
+            <Copy
+              aria-hidden="true"
+              className="-ms-1 size-0 opacity-0 transition-all duration-150 group-hover/copy:ms-0 group-hover/copy:size-3 group-hover/copy:opacity-100"
+            />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {t(LEADS_KEYS.drawer.idTooltip, {
+            seq,
+            created: clock.moment(lead.createdAt),
+          })}
+        </TooltipContent>
+      </Tooltip>
+      {lead.kind === 'retarget' ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => void copyId()}
-              aria-label={t(LEADS_KEYS.drawer.idAria, { seq })}
-              className="group/copy bg-muted text-muted-foreground-strong hover:bg-muted-strong flex h-8 flex-none items-center gap-1 rounded-lg border px-2.5 font-mono text-xs font-medium"
+            <span
+              tabIndex={-1}
+              data-slot="pill"
+              className="bg-tone-mint text-tone-mint-foreground inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap"
             >
-              #{seq}
-              <Copy
-                aria-hidden="true"
-                className="-ms-1 size-0 opacity-0 transition-all duration-150 group-hover/copy:ms-0 group-hover/copy:size-3 group-hover/copy:opacity-100"
-              />
-            </button>
+              <RefreshCw aria-hidden="true" className="size-3" />
+              {t(LEADS_KEYS.drawer.retarget)}
+            </span>
           </TooltipTrigger>
-          <TooltipContent>
-            {t(LEADS_KEYS.drawer.idTooltip, {
-              seq,
-              created: clock.moment(lead.createdAt),
-            })}
-          </TooltipContent>
+          {lead.retargetReason ? (
+            <TooltipContent>{lead.retargetReason}</TooltipContent>
+          ) : null}
         </Tooltip>
-        {lead.kind === 'retarget' ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span
-                tabIndex={-1}
-                data-slot="pill"
-                className="bg-tone-mint text-tone-mint-foreground inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap"
-              >
-                <RefreshCw aria-hidden="true" className="size-3" />
-                {t(LEADS_KEYS.drawer.retarget)}
-              </span>
-            </TooltipTrigger>
-            {lead.retargetReason ? (
-              <TooltipContent>{lead.retargetReason}</TooltipContent>
-            ) : null}
-          </Tooltip>
-        ) : null}
-      </div>
-      <DialogPrimitive.Description className="text-detail text-muted-foreground">
-        {t(LEADS_KEYS.drawer.sub)}
-      </DialogPrimitive.Description>
-    </div>
+      ) : null}
+    </>
   );
 }
 
@@ -332,137 +303,76 @@ function LeadInfoCard({
   );
 }
 
-/** "Save lead", "Saving…" or "Retry save". */
-function saveLabelKey(state: DrawerSaveState): { ns: 'drawer' | 'leads'; key: string } {
-  if (state === 'saving') return { ns: 'drawer', key: RECORD_DRAWER_KEYS.saving };
-  if (state === 'failed') return { ns: 'drawer', key: RECORD_DRAWER_KEYS.retrySave };
-  return { ns: 'leads', key: LEADS_KEYS.drawer.footer.save };
-}
-
-/** The footer (H:1818–1821): Remove lead · the failure line · Discard · Save lead, and the remove confirm. */
-function LeadDetailsFooter({
+/**
+ * "Remove lead?" (H:1818): the reason confirm — duplicate · test entry · spam ·
+ * other — then "Removed" with Undo; the drawer closes behind it.
+ */
+export function LeadRemoveConfirm({
   lead,
-  draft,
-  canEdit,
-  canDelete,
+  open,
+  onOpenChange,
   onRemoved,
 }: {
   lead: LeadRecord;
-  draft: LeadDraftState;
-  canEdit: boolean;
-  canDelete: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onRemoved: () => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const remove = useDeleteLead();
   const restore = useRestoreLead();
-  const [removing, setRemoving] = useState(false);
   const seq = String(lead.seq);
   const reasonLabel = (key: string) => `${LEADS_NS}:${key}`;
-  const save = saveLabelKey(draft.saveState);
   return (
-    <div
-      data-slot="surface"
-      className="bg-card flex flex-none items-center gap-2 border-t px-(--room-header-pad-x) py-3"
-    >
-      <div className="me-auto flex flex-wrap gap-2">
-        {canDelete ? (
-          <Button
-            type="button"
-            variant="destructive"
-            data-testid={LEADS_TEST_IDS.drawerRemove}
-            onClick={() => setRemoving(true)}
-            className="text-body h-9 rounded-lg px-4"
-          >
-            {t(LEADS_KEYS.drawer.footer.remove)}
-          </Button>
-        ) : null}
-      </div>
-      {draft.saveState === 'failed' ? (
-        <span
-          role="alert"
-          className="text-destructive me-auto inline-flex min-w-0 items-center gap-1.5 text-xs font-medium whitespace-nowrap"
-        >
-          <span
-            aria-hidden="true"
-            className="bg-destructive size-1.5 flex-none rounded-full"
-          />
-          {tDrawer(RECORD_DRAWER_KEYS.notSaved)}
-        </span>
-      ) : null}
-      {draft.dirty ? (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={draft.discard}
-          className="text-body h-9 rounded-lg px-4"
-        >
-          {t(LEADS_KEYS.drawer.footer.discard)}
-        </Button>
-      ) : null}
-      {canEdit ? (
-        <Button
-          type="button"
-          data-testid={LEADS_TEST_IDS.drawerSave}
-          disabled={!draft.dirty || draft.saveState === 'saving'}
-          onClick={draft.save}
-          className="text-body disabled:bg-border disabled:text-disabled h-9 rounded-lg px-4 disabled:opacity-100"
-        >
-          {save.ns === 'drawer' ? tDrawer(save.key) : t(save.key)}
-        </Button>
-      ) : null}
-      <ConfirmDialog
-        open={removing}
-        onOpenChange={setRemoving}
-        title={t(LEADS_KEYS.drawer.remove.title)}
-        description={t(LEADS_KEYS.drawer.remove.effect)}
-        confirmLabel={t(LEADS_KEYS.drawer.footer.remove)}
-        reason={{
-          record: lead.name,
-          options: [
-            {
-              value: 'duplicate',
-              labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.duplicate),
-            },
-            {
-              value: 'test_entry',
-              labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.testEntry),
-            },
-            {
-              value: 'spam',
-              labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.spam),
-            },
-            {
-              value: 'other',
-              labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.other),
-            },
-          ],
-        }}
-        onConfirm={async (choice) => {
-          await remove.mutateAsync({
-            id: lead.id,
-            reason: choice.reason,
-            note: choice.note,
-          });
-          notify.undo(
-            t(LEADS_KEYS.drawer.remove.removed, { seq, reason: choice.picked.label }),
-            { onUndo: () => restore.mutate(lead.id) },
-          );
-          onRemoved();
-        }}
-      />
-    </div>
+    <ConfirmDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t(LEADS_KEYS.drawer.remove.title)}
+      description={t(LEADS_KEYS.drawer.remove.effect)}
+      confirmLabel={t(LEADS_KEYS.drawer.footer.remove)}
+      reason={{
+        record: lead.name,
+        options: [
+          {
+            value: 'duplicate',
+            labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.duplicate),
+          },
+          {
+            value: 'test_entry',
+            labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.testEntry),
+          },
+          {
+            value: 'spam',
+            labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.spam),
+          },
+          {
+            value: 'other',
+            labelKey: reasonLabel(LEADS_KEYS.drawer.remove.reasons.other),
+          },
+        ],
+      }}
+      onConfirm={async (choice) => {
+        await remove.mutateAsync({
+          id: lead.id,
+          reason: choice.reason,
+          note: choice.note,
+        });
+        notify.undo(
+          t(LEADS_KEYS.drawer.remove.removed, { seq, reason: choice.picked.label }),
+          { onUndo: () => restore.mutate(lead.id) },
+        );
+        onRemoved();
+      }}
+    />
   );
 }
 
 /**
- * The details pane (`leads.md:133`, H:1754–1821): the header — "Edit lead",
- * the ID to copy, "Re-target" on re-target leads — the person's strip, the
- * three cards (Lead details · Progress · Info) and the footer (Remove lead ·
- * the failure line · Discard · Save lead).
+ * The lead drawer's body (`leads.md:133`, H:1754–1821): the person's strip,
+ * then the three cards — Lead details · Progress · Info. The record drawer
+ * draws the header (its title chips are {@link LeadTitleChips}) and the footer.
  */
-export function LeadDetailsPane({
+export function LeadDetailsBody({
   lead,
   draft,
   staff,
@@ -470,13 +380,9 @@ export function LeadDetailsPane({
   messages,
   people,
   canEdit,
-  canDelete,
   onConvert,
   contactActions = {},
-  onRemoved,
-  titleRef,
-  className,
-}: LeadDetailsPaneProps) {
+}: LeadDetailsBodyProps) {
   const { t } = useTranslation(LEADS_NS);
   const { draft: values, update } = draft;
   const detailsDone =
@@ -487,70 +393,56 @@ export function LeadDetailsPane({
     values.status !== null &&
     CONVERTIBLE.has(values.status);
   return (
-    <div data-slot="surface" className={cn('bg-card flex min-h-0 flex-col', className)}>
-      <LeadDetailsHeader lead={lead} titleRef={titleRef} />
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto px-(--room-header-pad-x) pt-4 pb-6">
-        <LeadPerson
-          lead={lead}
-          staffById={staffById}
-          canEdit={canEdit}
-          viewerId={people.viewer?.id ?? null}
-          actions={contactActions}
-        />
-        <LeadCard
-          label={t(LEADS_KEYS.drawer.cards.details)}
-          number={1}
-          done={detailsDone}
-        >
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4 gap-y-3.5">
-            <div className="col-span-full">
-              <LeadSourceField
-                value={values.source}
-                onChange={(source) => update({ source })}
-              />
-            </div>
-            <div className="col-span-full">
-              <LeadInterestsField
-                value={{
-                  interests: values.interests,
-                  customInterests: values.customInterests,
-                }}
-                onChange={(next) => update(next)}
-              />
-            </div>
-            <LeadPeopleField
-              ownerId={lead.ownerId}
-              involvedIds={lead.involvedIds}
-              staff={staff}
-              readOnly={!canEdit}
-              {...people}
+    <>
+      <LeadPerson
+        lead={lead}
+        staffById={staffById}
+        canEdit={canEdit}
+        viewerId={people.viewer?.id ?? null}
+        actions={contactActions}
+      />
+      <LeadCard label={t(LEADS_KEYS.drawer.cards.details)} number={1} done={detailsDone}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4 gap-y-3.5">
+          <div className="col-span-full">
+            <LeadSourceField
+              value={values.source}
+              onChange={(source) => update({ source })}
             />
           </div>
-        </LeadCard>
-        <LeadCard
-          label={t(LEADS_KEYS.drawer.cards.progress)}
-          number={2}
-          done={values.status !== null}
-        >
-          <LeadProgressField
-            status={values.status}
-            onChange={(status) => update({ status })}
+          <div className="col-span-full">
+            <LeadInterestsField
+              value={{
+                interests: values.interests,
+                customInterests: values.customInterests,
+              }}
+              onChange={(next) => update(next)}
+            />
+          </div>
+          <LeadPeopleField
+            ownerId={lead.ownerId}
+            involvedIds={lead.involvedIds}
+            staff={staff}
+            readOnly={!canEdit}
+            {...people}
           />
-        </LeadCard>
-        <LeadInfoCard
-          lead={lead}
-          messages={messages}
-          convertible={convertible}
-          onConvert={onConvert}
+        </div>
+      </LeadCard>
+      <LeadCard
+        label={t(LEADS_KEYS.drawer.cards.progress)}
+        number={2}
+        done={values.status !== null}
+      >
+        <LeadProgressField
+          status={values.status}
+          onChange={(status) => update({ status })}
         />
-      </div>
-      <LeadDetailsFooter
+      </LeadCard>
+      <LeadInfoCard
         lead={lead}
-        draft={draft}
-        canEdit={canEdit}
-        canDelete={canDelete}
-        onRemoved={onRemoved}
+        messages={messages}
+        convertible={convertible}
+        onConvert={onConvert}
       />
-    </div>
+    </>
   );
 }

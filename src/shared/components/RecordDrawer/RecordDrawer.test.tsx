@@ -710,6 +710,113 @@ describe('RecordDrawer — a stacked child', () => {
   });
 });
 
+describe('RecordDrawer — the other drawers’ slots (task, Day close, contact editor, lead)', () => {
+  it('draws a leading tile, chips after the title, a band and controls at the footer’s start', async () => {
+    renderWithProviders(
+      <Harness
+        startOpen
+        headerStart={<span data-testid="tile">T</span>}
+        titleEnd={<button type="button">#2363</button>}
+        band={<div data-testid="band">Rhea Shah</div>}
+        footerStart={<button type="button">Snooze</button>}
+        onSave={undefined}
+        dismissLabel="Close"
+      />,
+    );
+    const drawer = await screen.findByTestId('pt');
+    expect(within(drawer).getByTestId('tile')).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', { name: '#2363' })).toBeInTheDocument();
+    expect(within(drawer).getByTestId('band')).toHaveTextContent('Rhea Shah');
+    const start = screen.getByTestId('pt-start');
+    expect(within(start).getByRole('button', { name: 'Snooze' })).toBeInTheDocument();
+    expect(screen.getByTestId('pt-dismiss')).toHaveTextContent('Close');
+    expect(screen.queryByTestId('pt-save')).toBeNull();
+  });
+
+  it('can have no footer, a body surface of its own and footer test ids the specs name', async () => {
+    const plain = renderWithProviders(
+      <Harness startOpen hideFooter bodyClassName="bg-canvas" />,
+    );
+    await screen.findByTestId('pt');
+    expect(screen.queryByTestId('pt-footer')).toBeNull();
+    expect(screen.getByTestId('pt-body')).toHaveClass('bg-canvas');
+    plain.unmount();
+    renderWithProviders(
+      <Harness
+        startOpen
+        saveTestId="pt-done"
+        onDelete={vi.fn()}
+        deleteTestId="pt-remove"
+      />,
+    );
+    expect(await screen.findByTestId('pt-done')).toBeInTheDocument();
+    expect(screen.getByTestId('pt-remove')).toBeInTheDocument();
+  });
+
+  it('lets the dismiss button do its own thing (the lead’s Discard) instead of closing', async () => {
+    const onDismiss = vi.fn();
+    const onClose = vi.fn();
+    const { u } = await openDrawer({ onDismiss, onClose, dismissLabel: 'Discard' });
+    await u.click(screen.getByTestId('pt-dismiss'));
+    expect(onDismiss).toHaveBeenCalledOnce();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId('pt')).toBeInTheDocument();
+  });
+
+  it('hands Esc to the screen first — an inline edit may keep the drawer open', async () => {
+    const onClose = vi.fn();
+    const { u } = await openDrawer({
+      onClose,
+      onEscapeKeyDown: (event) => event.preventDefault(),
+    });
+    await u.keyboard('{Escape}');
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId('pt')).toBeInTheDocument();
+  });
+
+  it('shows the column beside the form from md, and on a phone behind a pane switch', async () => {
+    const panes = {
+      label: 'Lead panels',
+      main: { id: 'details', label: 'Details' },
+      aside: { id: 'chat', label: 'Chat' },
+      testIdPrefix: 'pt-panes',
+    };
+    function Panes() {
+      const [pane, setPane] = useState<'main' | 'aside'>('main');
+      return (
+        <Harness
+          startOpen
+          panelWidth={980}
+          aside={{
+            width: 420,
+            content: <p>the chat</p>,
+            panes: { ...panes, value: pane, onValueChange: setPane },
+          }}
+        >
+          <p>the details</p>
+        </Harness>
+      );
+    }
+    const desktop = renderWithProviders(<Panes />);
+    await screen.findByTestId('pt');
+    expect(screen.getByTestId('pt-aside')).toHaveTextContent('the chat');
+    expect(screen.queryByTestId('pt-panes-tabs')).toBeNull();
+    desktop.unmount();
+
+    viewport.tier = 'phone';
+    const u = user();
+    renderWithProviders(<Panes />);
+    await screen.findByTestId('pt');
+    expect(screen.getByText('the details')).toBeInTheDocument();
+    expect(screen.queryByText('the chat')).toBeNull();
+    await u.click(screen.getByTestId('pt-panes-tab-chat'));
+    expect(screen.getByTestId('pt-aside')).toHaveTextContent('the chat');
+    expect(screen.queryByText('the details')).toBeNull();
+    // The form's footer belongs to the form pane.
+    expect(screen.queryByTestId('pt-footer')).toBeNull();
+  });
+});
+
 describe('RecordDrawer — accessibility', () => {
   it('has no accessibility violations (desktop, with steps)', async () => {
     const { baseElement } = renderWithProviders(

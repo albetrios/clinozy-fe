@@ -66,6 +66,11 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     the filtered one, `variant="card"` a thread's starter, `variant="inline"` a list's or
     a card's one-liner sized by `className`; `testId`). Never a hand-rolled muted `<p>`;
     the Picker's and ⌘K's own one-line empties stay.
+  - A side drawer (a record, a form, a detail view) → **`RecordDrawer`** (steps, an `aside`
+    column with phone `panes`, `headerStart` / `titleEnd` / `band` / `footerStart`,
+    `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`).
+    Never a hand-built `ui/sheet` or Radix Dialog panel; `ui/dialog` stays the one centred
+    platform dialog.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

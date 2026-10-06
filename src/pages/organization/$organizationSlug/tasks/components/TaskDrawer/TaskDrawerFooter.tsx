@@ -9,7 +9,6 @@ import {
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import type { TaskAssignees } from '../../hooks/useTaskAssignees/index.ts';
@@ -36,26 +35,24 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 /**
- * The task column's footer (`tasks.md` › Task drawer › Footer): "Snooze ⌄"
- * (1 hour · 3 hours · Tomorrow 10:00 · Next week), "Assigned <name> ⌄" (the
- * team, the member "(you)") with "Was <A> → <B>" after a reassign, and
- * "Close". No primary — the outcomes are the actions. A resolved task keeps
- * only "Close".
+ * The task column's footer controls (`tasks.md` › Task drawer › Footer), at
+ * the record drawer footer's start: "Snooze ⌄" (1 hour · 3 hours · Tomorrow
+ * 10:00 · Next week), "Assigned <name> ⌄" (the team, the member "(you)") with
+ * "Was <A> → <B>" after a reassign. The footer's own "Close" follows; no
+ * primary — the outcomes are the actions. A resolved task has none of these.
  */
-export function TaskDrawerFooter({
+export function TaskDrawerFooterControls({
   row,
   assignees,
   busy,
   onSnooze,
   onReassign,
-  onClose,
 }: {
   row: TaskRow;
   assignees: TaskAssignees;
   busy: boolean;
   onSnooze: (option: TaskSnoozeOption) => void;
   onReassign: (ownerId: string) => void;
-  onClose: () => void;
 }) {
   const { t } = useTranslation(TASKS_NS);
   const { t: tRules } = useTranslation(TASK_RULES_NS);
@@ -64,78 +61,65 @@ export function TaskDrawerFooter({
     ? shortPersonName(personFullName(row.owner))
     : t(TASKS_KEYS.row.anyone);
   const was = row.previousOwners.map((staff) => shortPersonName(personFullName(staff)));
+  if (!open) return null;
   return (
-    <div className="flex flex-none flex-wrap items-center gap-2 border-t p-(--drawer-footer-pad)">
-      {open ? (
-        <>
-          <Picker
-            menu
-            label={t(K.snooze)}
-            value={null}
-            options={TASK_SNOOZE_OPTIONS.map((option) => ({
-              key: option,
-              label: tRules(TASK_RULE_KEYS.snoozeOptions[option]),
-              leading: { kind: 'none' },
-            }))}
-            onChange={(key) => {
-              if (key) onSnooze(key as TaskSnoozeOption);
-            }}
-            minWidth={200}
-            disabled={busy}
-            testId={IDS.snooze}
-            className="flex flex-none"
-            renderTrigger={({ open: listOpen }) => (
-              <button type="button" className={cn(FOOTER_BUTTON, 'ps-3.5 pe-2.5')}>
-                {t(K.snooze)}
-                <Chevron open={listOpen} />
-              </button>
-            )}
-          />
-          <Picker
-            label={t(K.assigned)}
-            value={row.ownerId}
-            options={assignees.options}
-            onChange={(key) => {
-              if (key) onReassign(key);
-            }}
-            searchable
-            searchPlaceholder={t(K.searchTeam)}
-            minWidth={260}
-            disabled={busy}
-            testId={IDS.assign}
-            className="flex min-w-0 flex-none"
-            renderTrigger={({ open: listOpen }) => (
-              <button
-                type="button"
-                title={t(K.assignTip)}
-                className={cn(FOOTER_BUTTON, 'max-w-full min-w-0 ps-3 pe-2.5')}
-              >
-                <span className="text-muted-foreground">{t(K.assigned)}</span>
-                <span className="min-w-0 truncate">{owner}</span>
-                <Chevron open={listOpen} />
-              </button>
-            )}
-          />
-          {was.length > 0 ? (
-            <span
-              data-testid={IDS.was}
-              className="text-muted-foreground text-xs whitespace-nowrap"
-            >
-              {t(K.was, { names: was.join(' → ') })}
-            </span>
-          ) : null}
-        </>
+    <>
+      <Picker
+        menu
+        label={t(K.snooze)}
+        value={null}
+        options={TASK_SNOOZE_OPTIONS.map((option) => ({
+          key: option,
+          label: tRules(TASK_RULE_KEYS.snoozeOptions[option]),
+          leading: { kind: 'none' },
+        }))}
+        onChange={(key) => {
+          if (key) onSnooze(key as TaskSnoozeOption);
+        }}
+        minWidth={200}
+        disabled={busy}
+        testId={IDS.snooze}
+        className="flex flex-none"
+        renderTrigger={({ open: listOpen }) => (
+          <button type="button" className={cn(FOOTER_BUTTON, 'ps-3.5 pe-2.5')}>
+            {t(K.snooze)}
+            <Chevron open={listOpen} />
+          </button>
+        )}
+      />
+      <Picker
+        label={t(K.assigned)}
+        value={row.ownerId}
+        options={assignees.options}
+        onChange={(key) => {
+          if (key) onReassign(key);
+        }}
+        searchable
+        searchPlaceholder={t(K.searchTeam)}
+        minWidth={260}
+        disabled={busy}
+        testId={IDS.assign}
+        className="flex min-w-0 flex-none"
+        renderTrigger={({ open: listOpen }) => (
+          <button
+            type="button"
+            title={t(K.assignTip)}
+            className={cn(FOOTER_BUTTON, 'max-w-full min-w-0 ps-3 pe-2.5')}
+          >
+            <span className="text-muted-foreground">{t(K.assigned)}</span>
+            <span className="min-w-0 truncate">{owner}</span>
+            <Chevron open={listOpen} />
+          </button>
+        )}
+      />
+      {was.length > 0 ? (
+        <span
+          data-testid={IDS.was}
+          className="text-muted-foreground text-xs whitespace-nowrap"
+        >
+          {t(K.was, { names: was.join(' → ') })}
+        </span>
       ) : null}
-      <span className="flex-1" />
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onClose}
-        data-testid={IDS.dismiss}
-        className="text-body h-9 rounded-lg px-3.5"
-      >
-        {t(K.close)}
-      </Button>
-    </div>
+    </>
   );
 }

@@ -1,11 +1,4 @@
-import { Dialog as DialogPrimitive } from 'radix-ui';
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  useRef,
-  useState,
-} from 'react';
+import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
@@ -17,7 +10,7 @@ import {
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import { RoomViewTabs } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -30,10 +23,9 @@ import {
   leadBookingPrefill,
 } from '@/shared/forms/AppointmentForm/index.ts';
 import { useThread } from '@/shared/hooks/useThread/index.ts';
-import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
-import { ChevronLeft, Users, WhatsAppMark, X } from '@/shared/icons/index.ts';
+import { Users, WhatsAppMark } from '@/shared/icons/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 import { useLeadDraft } from '../../hooks/useLeadDraft/index.ts';
@@ -45,7 +37,11 @@ import {
   clampChatWidth,
   leadDrawerWidths,
 } from './lead-drawer-widths.ts';
-import { LeadDetailsPane } from './LeadDetailsPane.tsx';
+import {
+  LeadDetailsBody,
+  LeadRemoveConfirm,
+  LeadTitleChips,
+} from './LeadDetailsPane.tsx';
 
 /** The phone's one pane at a time. */
 export type LeadDrawerPane = 'details' | 'chat';
@@ -136,13 +132,14 @@ function ChatResizeHandle({ width }: { width: number }) {
 }
 
 /**
- * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867): from `md`
- * two fixed panes at the inline end — details, then the chat with its resize
- * handle — over a 28% backdrop that appears at once, sliding in together over
- * 340ms, the 36px × floating 12px outside; on a phone the screen with a 52px
- * bar ("Close lead", Details · Chat), one pane at a time. A modal dialog
- * (§7.3): focus moves to "Edit lead" and back; closing with an unsaved draft
- * asks first (Q-P1).
+ * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
+ * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
+ * its column with the resize handle, the form drawers' × floating outside; on
+ * a phone the full screen with a Details · Chat switch under the header, one
+ * pane at a time (the page keeps the pane between leads). The header: "Edit
+ * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
+ * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
+ * title and back; closing with an unsaved draft asks first (Q-P1).
  */
 export function LeadDrawer({
   lead,
@@ -161,160 +158,103 @@ export function LeadDrawer({
 }: LeadDrawerProps) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const tier = useViewportTier();
-  const phone = tier === 'phone';
+  const phone = useViewportTier() === 'phone';
   const chatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
   const viewport = useViewportWidth();
   const widths = leadDrawerWidths(viewport, chatWidth);
   const draft = useLeadDraft(lead, viewer?.id ?? null);
-  const guard = useUnsavedChangesGuard({ when: draft.dirty });
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const thread = useThread({ kind: 'lead', leadId: lead.id });
-  const close = () => guard.confirmDiscard(onClose);
   const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
-
-  const style = {
-    '--lead-total': `${widths.total}px`,
-    '--lead-details-w': `${widths.details}px`,
-    '--lead-chat-w': `${widths.chat}px`,
-  } as CSSProperties;
+  const [removing, setRemoving] = useState(false);
 
   const chat = (
-    <ChatColumn
-      person={{ kind: 'lead', leadId: lead.id }}
-      contact={chatContactOfLead(lead)}
-      showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
-      contactCard={{
-        data: leadContactCardData(lead, staffById, {
-          role: (role) => tClinic(CLINIC_KEYS.roles[role]),
-          source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
-        }),
-      }}
-      onBookAppointment={
-        canBook ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason)) : undefined
-      }
-    />
-  );
-  const details = (
-    <LeadDetailsPane
-      lead={lead}
-      draft={draft}
-      staff={staff}
-      staffById={staffById}
-      messages={thread.data?.messages}
-      people={{ ...people, viewer }}
-      canEdit={canEdit}
-      canDelete={canDelete}
-      onConvert={onConvert}
-      contactActions={contactActions}
-      onRemoved={onClose}
-      titleRef={titleRef}
-      className="h-full"
-    />
+    <div
+      data-testid={LEADS_TEST_IDS.drawerChat}
+      data-slot="surface"
+      className="bg-card relative flex min-h-0 flex-1 flex-col"
+    >
+      {phone ? null : <ChatResizeHandle width={widths.chat} />}
+      <ChatColumn
+        person={{ kind: 'lead', leadId: lead.id }}
+        contact={chatContactOfLead(lead)}
+        showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
+        contactCard={{
+          data: leadContactCardData(lead, staffById, {
+            role: (role) => tClinic(CLINIC_KEYS.roles[role]),
+            source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
+          }),
+        }}
+        onBookAppointment={
+          canBook
+            ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason))
+            : undefined
+        }
+      />
+    </div>
   );
 
   return (
-    <DialogPrimitive.Root
-      open
-      onOpenChange={(open) => {
-        if (!open) close();
-      }}
-    >
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="bg-overlay/28 fixed inset-0 z-39" />
-        <DialogPrimitive.Content
-          aria-describedby={undefined}
-          data-testid={LEADS_TEST_IDS.drawer}
-          style={style}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            titleRef.current?.focus();
-          }}
-          className="pointer-events-none fixed inset-0 z-40 outline-none"
-        >
-          <TooltipProvider>
-            {phone ? (
-              <>
-                <div
-                  data-slot="surface"
-                  className="bg-card pointer-events-auto fixed inset-x-0 top-0 z-42 flex h-13 items-center gap-2 border-b px-3 py-2"
-                >
-                  <button
-                    type="button"
-                    onClick={close}
-                    aria-label={t(LEADS_KEYS.drawer.close)}
-                    data-slot="button"
-                    className="bg-card text-foreground-soft flex size-9 flex-none items-center justify-center rounded-lg border"
-                  >
-                    <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-                  </button>
-                  <RoomViewTabs
-                    fill
-                    activation="automatic"
-                    label={t(LEADS_KEYS.drawer.panels)}
-                    tabs={[
-                      { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
-                      {
-                        id: 'chat',
-                        label: t(LEADS_KEYS.drawer.chat),
-                        icon: WhatsAppMark,
-                      },
-                    ]}
-                    value={pane}
-                    onValueChange={(next) =>
-                      onPaneChange(next === 'chat' ? 'chat' : 'details')
-                    }
-                    testIdPrefix={LEADS_TEST_IDS.drawerPanes}
-                    className="min-w-0 flex-1"
-                  />
-                </div>
-                <div className="pointer-events-auto fixed inset-x-0 top-13 bottom-0 z-40 flex flex-col">
-                  {pane === 'details' ? (
-                    details
-                  ) : (
-                    <div
-                      data-testid={LEADS_TEST_IDS.drawerChat}
-                      className="flex min-h-0 flex-1 flex-col"
-                    >
-                      {chat}
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="animate-drawer-in pointer-events-auto fixed inset-y-0 end-(--lead-chat-w) z-40 flex w-(--lead-details-w) flex-col shadow-[-16px_0_40px_rgb(0_0_0/0.14)] [--drawer-enter-from:calc(var(--lead-total)+40px)] rtl:[--drawer-enter-from:calc(-1*(var(--lead-total)+40px))]">
-                  {details}
-                </div>
-                <aside
-                  data-testid={LEADS_TEST_IDS.drawerChat}
-                  data-slot="surface"
-                  className="animate-drawer-in bg-card pointer-events-auto fixed inset-y-0 end-0 z-40 flex w-(--lead-chat-w) flex-col border-s [--drawer-enter-from:calc(var(--lead-total)+40px)] rtl:[--drawer-enter-from:calc(-1*(var(--lead-total)+40px))]"
-                >
-                  <ChatResizeHandle width={widths.chat} />
-                  {chat}
-                </aside>
-                <button
-                  type="button"
-                  onClick={close}
-                  aria-label={t(LEADS_KEYS.drawer.close)}
-                  data-slot="floating-edge"
-                  className="bg-background text-foreground-soft hover:bg-muted animate-pop-in pointer-events-auto fixed end-[calc(var(--lead-total)+0.75rem)] top-3.5 z-41 flex size-9 items-center justify-center rounded-lg border shadow-(--elevation-md)"
-                >
-                  <X aria-hidden="true" className="size-4.5" />
-                </button>
-              </>
-            )}
-          </TooltipProvider>
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-      {guard.guardDialog}
+    <TooltipProvider>
+      <RecordDrawer
+        open
+        onClose={onClose}
+        title={t(LEADS_KEYS.drawer.title)}
+        titleEnd={<LeadTitleChips lead={lead} />}
+        sub={t(LEADS_KEYS.drawer.sub)}
+        largeTitle
+        panelWidth={widths.total}
+        aside={{
+          content: chat,
+          width: widths.chat,
+          panes: {
+            label: t(LEADS_KEYS.drawer.panels),
+            main: { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
+            aside: { id: 'chat', label: t(LEADS_KEYS.drawer.chat), icon: WhatsAppMark },
+            value: pane === 'chat' ? 'aside' : 'main',
+            onValueChange: (next) => onPaneChange(next === 'aside' ? 'chat' : 'details'),
+            testIdPrefix: LEADS_TEST_IDS.drawerPanes,
+          },
+        }}
+        closeStyle="form"
+        readOnly={!canEdit && !canDelete}
+        dirty={draft.dirty}
+        // "Discard" puts the draft back while it is dirty (H:1821); else "Cancel" closes.
+        dismissLabel={draft.dirty ? t(LEADS_KEYS.drawer.footer.discard) : undefined}
+        onDismiss={draft.dirty ? draft.discard : undefined}
+        saveLabel={t(LEADS_KEYS.drawer.footer.save)}
+        onSave={canEdit ? draft.save : undefined}
+        saveState={draft.saveState}
+        saveDisabled={!draft.dirty}
+        saveTestId={LEADS_TEST_IDS.drawerSave}
+        deleteLabel={t(LEADS_KEYS.drawer.footer.remove)}
+        onDelete={canDelete ? () => setRemoving(true) : undefined}
+        deleteTestId={LEADS_TEST_IDS.drawerRemove}
+        testId={LEADS_TEST_IDS.drawer}
+      >
+        <LeadDetailsBody
+          lead={lead}
+          draft={draft}
+          staff={staff}
+          staffById={staffById}
+          messages={thread.data?.messages}
+          people={{ ...people, viewer }}
+          canEdit={canEdit}
+          onConvert={onConvert}
+          contactActions={contactActions}
+        />
+      </RecordDrawer>
+      <LeadRemoveConfirm
+        lead={lead}
+        open={removing}
+        onOpenChange={setRemoving}
+        onRemoved={onClose}
+      />
       <AppointmentForm
         open={booking !== null}
         mode="create"
         prefill={booking ?? undefined}
         onClose={() => setBooking(null)}
       />
-    </DialogPrimitive.Root>
+    </TooltipProvider>
   );
 }

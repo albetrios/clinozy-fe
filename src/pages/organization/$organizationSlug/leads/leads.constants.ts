@@ -85,7 +85,6 @@ export const LEADS_KEYS = {
     idAria: 'drawer.idAria',
     idCopied: 'drawer.idCopied',
     retarget: 'drawer.retarget',
-    close: 'drawer.close',
     panels: 'drawer.panels',
     details: 'drawer.details',
     chat: 'drawer.chat',

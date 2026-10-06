@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
-import { cn } from '@/lib/utils.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
@@ -13,14 +11,8 @@ import {
   PaymentDeleteConfirm,
   type PaymentDeleteTarget,
 } from '@/shared/components/PaymentDeleteConfirm/index.ts';
-import {
-  DRAWER_WIDTH_CLASS,
-  RECORD_DRAWER_OVERLAY_CLASS,
-  RECORD_DRAWER_PANEL_CLASS,
-  useDrawerTitleFocus,
-} from '@/shared/components/RecordDrawer/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet.tsx';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
@@ -29,7 +21,6 @@ import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
-import { X } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
@@ -218,8 +209,8 @@ function EntryDrawer({
 
 /**
  * Day close (KICKOFF §6.9; `payments.md:57–80, 182–194, 268–280, 326–331`;
- * H:996–1012, H:5083–5125) — the right drawer at 1040px (full screen below
- * `md`) on the canvas, under a sticky header with its inline ×. The bar picks
+ * H:996–1012, H:5083–5125) — the record drawer at 1040px (full screen below
+ * `md`) on the canvas, with no footer: its actions sit in the bar. The bar picks
  * the day; the day runs gate → working → report: accept the opening cash, count
  * the drawer and "Close day" (the entries lock), then the report with Reopen
  * inside the grace period. "Review every entry" ticks the day's entries; a row
@@ -234,7 +225,6 @@ export function DayCloseDrawer({
   onClose,
 }: DayCloseDrawerProps) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tLocale } = useTranslation(LOCALE_NS);
   const [today] = useState(() => clinicToday());
   const date = search.date && search.date <= today ? search.date : today;
   const branchId = useDayCloseBranch(search.branch);
@@ -247,7 +237,6 @@ export function DayCloseDrawer({
   const [editing, setEditing] = useState<LedgerRow | null>(null);
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
   const actionsOf = useLedgerRowActions({ onEdit: setEditing, onDelete: setDeleting });
-  const { titleRef, onOpenAutoFocus, onCloseAutoFocus } = useDrawerTitleFocus();
 
   const openEntry = (row: LedgerRow) => {
     const lock = ledgerEntryLock(row, t);
@@ -261,47 +250,18 @@ export function DayCloseDrawer({
   };
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) onClose();
-      }}
-    >
-      <SheetContent
-        side="end"
-        showCloseButton={false}
-        overlayClassName={RECORD_DRAWER_OVERLAY_CLASS}
-        aria-describedby={undefined}
-        onOpenAutoFocus={onOpenAutoFocus}
-        onCloseAutoFocus={onCloseAutoFocus}
-        data-testid={DAY_CLOSE_TEST_ID}
-        className={cn(
-          RECORD_DRAWER_PANEL_CLASS,
-          DRAWER_WIDTH_CLASS[1040],
-          'bg-canvas overflow-y-auto',
-        )}
+    <>
+      <RecordDrawer
+        open={open}
+        onClose={onClose}
+        title={t(K.title)}
+        width={1040}
+        hideFooter
+        bodyClassName="bg-canvas px-(--drawer-pad-x) pt-3 pb-5"
+        testId={DAY_CLOSE_TEST_ID}
       >
         <TooltipProvider delayDuration={160}>
-          <header className="bg-background sticky top-0 z-10 flex h-(--drawer-header-height) flex-none items-center gap-3 border-b px-(--drawer-pad-x)">
-            <SheetTitle
-              ref={titleRef}
-              tabIndex={-1}
-              className="flex-1 text-lg font-semibold outline-none"
-            >
-              {t(K.title)}
-            </SheetTitle>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={tLocale(LOCALE_KEYS.closeAria)}
-              title={tLocale(LOCALE_KEYS.closeAria)}
-              data-testid={`${DAY_CLOSE_TEST_ID}-close`}
-              className="text-muted-foreground-strong hover:bg-muted flex size-8 flex-none items-center justify-center rounded-lg transition-colors"
-            >
-              <X aria-hidden="true" className="size-4.5" />
-            </button>
-          </header>
-          <div className="flex flex-col gap-3 px-(--drawer-pad-x) pt-3 pb-5">
+          <div className="flex flex-col gap-3">
             <DayCloseBar
               date={date}
               today={today}
@@ -341,10 +301,10 @@ export function DayCloseDrawer({
               </>
             ) : null}
           </div>
-          <EntryDrawer entry={editing} onClose={() => setEditing(null)} />
-          <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
         </TooltipProvider>
-      </SheetContent>
-    </Sheet>
+      </RecordDrawer>
+      <EntryDrawer entry={editing} onClose={() => setEditing(null)} />
+      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+    </>
   );
 }

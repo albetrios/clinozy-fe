@@ -1,4 +1,4 @@
-import { type ReactNode, type Ref, useId } from 'react';
+import { type ReactNode, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -14,17 +14,17 @@ import {
   personInitials,
   shortPersonName,
 } from '@/shared/components/Cells/index.ts';
+import { DrawerTextarea } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import {
   ContactCard,
   type ContactCardActions,
 } from '@/shared/components/PersonCard/index.ts';
-import { SheetDescription, SheetTitle } from '@/shared/components/ui/sheet.tsx';
-import { Textarea } from '@/shared/components/ui/textarea.tsx';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { Sparkles } from '@/shared/icons/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { lowerFirst, taskContactCard, taskSourceId } from '../../tasks.display.ts';
+import { taskContactCard, taskSourceId } from '../../tasks.display.ts';
 import { taskSourceTarget } from './task-drawer-targets.ts';
 import { useTaskContextTiles } from './use-task-context-tiles.ts';
 
@@ -46,89 +46,58 @@ function SectionLabel({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
+/** The header's leading tile: the rule's icon on its tone, 36px. */
+export function TaskRuleTile({ detail }: { detail: TaskDetail }) {
+  const { rule } = detail.task;
+  const Icon = TASK_RULE_ICONS[rule];
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'flex size-9 flex-none items-center justify-center rounded-lg',
+        TONE_CLASSES[TASK_RULES[rule].tone].surface,
+      )}
+    >
+      <Icon className="size-4.5" />
+    </span>
+  );
+}
+
 /**
- * The header (`tasks.md` › Task drawer › Header): the rule's 36px tile, the
- * title — focused on open — over "Created by Clinozy · <rule, lower-case>",
- * and at the inline end the due label (red when overdue) over the "Assigned
- * to" chip.
+ * The header's inline end (`tasks.md` › Task drawer › Header): the due label
+ * (red when overdue) over the "Assigned to" chip.
  */
-export function TaskDrawerHeader({
-  detail,
-  now,
-  titleRef,
-  close,
-}: {
-  detail: TaskDetail;
-  now: Date;
-  titleRef: Ref<HTMLHeadingElement>;
-  /** The phone's × inside the header. */
-  close: ReactNode;
-}) {
-  const { t, i18n } = useTranslation(TASKS_NS);
-  const { t: tRules } = useTranslation(TASK_RULES_NS);
+export function TaskDueOwner({ detail, now }: { detail: TaskDetail; now: Date }) {
+  const { t } = useTranslation(TASKS_NS);
   const dueLabel = useTaskDueLabel();
   const row = detail.task;
-  const Icon = TASK_RULE_ICONS[row.rule];
   const overdue = isTaskOverdue(row, now);
-  const rule = lowerFirst(
-    tRules(TASK_RULE_KEYS.rules[row.rule].description),
-    i18n.language,
-  );
   return (
-    <div className="relative flex h-(--drawer-header-height) flex-none items-center gap-3 overflow-hidden border-b p-(--drawer-header-pad) max-md:pe-14">
+    <div className="flex flex-none flex-col items-end gap-1">
       <span
-        aria-hidden="true"
+        data-testid={IDS.due}
         className={cn(
-          'flex size-9 flex-none items-center justify-center rounded-lg',
-          TONE_CLASSES[TASK_RULES[row.rule].tone].surface,
+          'text-detail font-semibold whitespace-nowrap tabular-nums',
+          overdue ? 'text-destructive' : 'text-foreground-soft',
         )}
       >
-        <Icon className="size-4.5" />
+        {dueLabel(row, now)}
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <SheetTitle
-          ref={titleRef}
-          tabIndex={-1}
-          data-testid={IDS.title}
-          className="truncate text-[length:calc(var(--text-base)*17/16)] leading-[1.25] font-semibold tracking-[-0.01em] outline-none"
-        >
-          {row.title}
-        </SheetTitle>
-        <SheetDescription className="text-detail text-muted-foreground truncate">
-          {t(K.sub, { rule })}
-        </SheetDescription>
-      </div>
-      <div className="flex flex-none flex-col items-end gap-1">
-        <span
-          data-testid={IDS.due}
-          className={cn(
-            'text-detail font-semibold whitespace-nowrap tabular-nums',
-            overdue ? 'text-destructive' : 'text-foreground-soft',
-          )}
-        >
-          {dueLabel(row, now)}
+      <span
+        title={t(K.assignedTo)}
+        data-testid={IDS.owner}
+        data-slot="pill"
+        className="bg-card text-caption text-foreground-soft inline-flex h-6 max-w-40 items-center gap-1.25 rounded-full border ps-0.5 pe-2 whitespace-nowrap"
+      >
+        {row.owner ? (
+          <PersonAvatar size="chip" initials={row.owner.initials} tone={row.owner.tone} />
+        ) : null}
+        <span className="truncate">
+          {row.owner
+            ? shortPersonName(personFullName(row.owner))
+            : t(TASKS_KEYS.row.anyone)}
         </span>
-        <span
-          title={t(K.assignedTo)}
-          data-testid={IDS.owner}
-          data-slot="pill"
-          className="bg-card text-caption text-foreground-soft inline-flex h-6 max-w-40 items-center gap-1.25 rounded-full border ps-0.5 pe-2 whitespace-nowrap"
-        >
-          {row.owner ? (
-            <PersonAvatar
-              size="chip"
-              initials={row.owner.initials}
-              tone={row.owner.tone}
-            />
-          ) : null}
-          <span className="truncate">
-            {row.owner
-              ? shortPersonName(personFullName(row.owner))
-              : t(TASKS_KEYS.row.anyone)}
-          </span>
-        </span>
-      </div>
-      {close}
+      </span>
     </div>
   );
 }
@@ -382,16 +351,19 @@ function OutcomesSection({
           );
         })}
       </div>
-      <Textarea
-        value={note}
-        onChange={(event) => onNote(event.currentTarget.value.slice(0, OUTCOME_NOTE_MAX))}
-        maxLength={OUTCOME_NOTE_MAX}
-        rows={2}
-        aria-label={t(K.outcomeNote.label)}
-        placeholder={t(K.outcomeNote.placeholder)}
-        data-testid={IDS.note}
-        className="text-body min-h-0 resize-y px-2.5 py-2 leading-[1.4]"
-      />
+      <DrawerField>
+        <DrawerTextarea
+          value={note}
+          onChange={(event) =>
+            onNote(event.currentTarget.value.slice(0, OUTCOME_NOTE_MAX))
+          }
+          maxLength={OUTCOME_NOTE_MAX}
+          rows={2}
+          aria-label={t(K.outcomeNote.label)}
+          placeholder={t(K.outcomeNote.placeholder)}
+          data-testid={IDS.note}
+        />
+      </DrawerField>
     </section>
   );
 }
@@ -430,7 +402,7 @@ export function TaskDrawerBody({
     first: detail.task.person.firstName,
   };
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto p-(--drawer-body-pad)">
+    <div className="flex flex-col gap-4 p-(--drawer-body-pad)">
       <WhoRow
         detail={detail}
         contactActions={contactActions}

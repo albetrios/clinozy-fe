@@ -82,7 +82,9 @@ describe('ContactEditor', () => {
     expect(
       screen.getByText('One contact · shared by leads, patients and chats'),
     ).toBeInTheDocument();
-    expect(dialog).toHaveClass('w-[min(35rem,calc(100vw-2.875rem))]');
+    // The record drawer's 560px (six light fields), the form drawers' ×.
+    expect(dialog).toHaveClass('md:w-[min(560px,calc(100vw-56px))]');
+    expect(screen.getByTestId('contact-editor-dismiss')).toHaveTextContent('Back');
   });
 
   it('shows a new contact as "New contact" on the canvas band, without an ID', async () => {
@@ -208,7 +210,7 @@ describe('ContactEditor', () => {
     expect(kept()).toBeNull();
   });
 
-  it('keeps nothing from ×: only Done hands the values back', async () => {
+  it('keeps nothing from ×: it asks first once edited, and only Done hands the values back', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     renderWithProviders(<Harness onClose={onClose} />);
@@ -216,9 +218,23 @@ describe('ContactEditor', () => {
     await user.clear(await screen.findByTestId('contact-editor-name'));
     await user.type(screen.getByTestId('contact-editor-name'), 'Rhea S');
     await user.click(screen.getByTestId('contact-editor-close'));
+    // An edited contact asks before discarding (Q-P1).
+    await screen.findByTestId('confirm-dialog');
+    expect(onClose).not.toHaveBeenCalled();
+    await user.click(screen.getByTestId('confirm-accept'));
 
-    expect(onClose).toHaveBeenCalledOnce();
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
     expect(kept()).toBeNull();
+  });
+
+  it('closes at once from × when nothing was edited', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    renderWithProviders(<Harness onClose={onClose} />);
+
+    await user.click(await screen.findByTestId('contact-editor-close'));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.queryByTestId('confirm-dialog')).toBeNull();
   });
 
   it('copies the record’s ID from its chip', async () => {

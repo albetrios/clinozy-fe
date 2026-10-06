@@ -1,12 +1,10 @@
 import { type RefObject, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { sanitizeNumberText } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
+import { DrawerChips, DrawerNumberInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import {
   Popover,
   PopoverAnchor,
@@ -158,24 +156,23 @@ function QuantityField({
         <label htmlFor={inputId} className="sr-only">
           {t(K.quantity)}
         </label>
-        <Input
+        <DrawerNumberInput
           ref={inputRef}
           id={inputId}
-          onFocus={(event) => event.currentTarget.select()}
-          type="text"
-          inputMode="decimal"
-          autoComplete="off"
           maxLength={QUANTITY_MAX_LENGTH}
           placeholder="0"
           value={quantity}
-          onChange={(event) => setQuantity(sanitizeNumberText(event.target.value, 2))}
+          onValueChange={setQuantity}
+          decimals={2}
           onKeyDown={(event) => {
             if (event.key !== 'Enter') return;
             event.preventDefault();
             onEnter();
           }}
           aria-invalid={invalid || undefined}
-          className="bg-background h-11 flex-1 rounded-lg px-2 text-center text-lg font-semibold tabular-nums md:text-lg"
+          // The popover's figure is its 44px big one (`clinic-stock.md:89–103`), on the drawer field's box.
+          className="h-11 flex-1"
+          inputClassName="px-2 text-center text-lg font-semibold"
           data-testid={`${testId}-quantity`}
         />
         <span className="text-muted-foreground-strong text-detail min-w-8">
