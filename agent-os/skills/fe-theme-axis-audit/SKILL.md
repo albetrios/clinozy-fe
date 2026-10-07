@@ -66,7 +66,7 @@ Categorize each hit:
 | G   | Round by design, no slot      | `rounded-full` on a chip/badge/disc/track → add `data-slot="pill"`; never on dots or glows; gate check 6 |
 | H   | Primitive re-slots a `<Button>` | e.g. the since-removed `ui/carousel`'s arrows carried `data-slot="carousel-previous"`, so the `button` rule missed them → add the primitive's OWN slot to the axis block |
 | I   | Pseudo-element draws the shape  | `before:rounded-full` cannot carry a slot → target `[data-slot='…']::before` in `index.css` |
-| J   | Fixed-size spacing (Density)    | `p-[24px]` / `gap-[6px]` → a scale step (`p-6`, `gap-1.5`); gate check 7. A `p-0` dialog repeats `DialogContent`'s `6` on each of its panes |
+| J   | Fixed-size spacing (Density)    | `p-[24px]` / `gap-[6px]` → a scale step (`p-6`, `gap-1.5`); gate check 7. A `flushBody` drawer repeats one step (`6`) on each of its panes |
 
 ---
 

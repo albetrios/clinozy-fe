@@ -4,15 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
+import { ConfirmPanel } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   Drawer,
   DrawerContent,
@@ -29,11 +24,17 @@ import {
 import { AppToaster } from './AppToaster.tsx';
 import { notify } from './notify.ts';
 
+// From `md` the confirm is the end panel (an alert dialog); below it, the
+// bottom sheet the table already covers.
+vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
+  useViewportTier: () => 'desktop',
+}));
+
 /**
- * Toasts are the top layer (KICKOFF L-20): above every drawer, sheet and
- * dialog — the prototype's z 50 left them under its drawers and sheets (§7.3) —
- * and still usable there: "Retry" on a failed save is pressed while the drawer
- * holding the draft is open, and that press must not dismiss the drawer.
+ * Toasts are the top layer (KICKOFF L-20): above every drawer, sheet and the
+ * confirm panel — the prototype's z 50 left them under its drawers and sheets
+ * (§7.3) — and still usable there: "Retry" on a failed save is pressed while the
+ * drawer holding the draft is open, and that press must not dismiss the drawer.
  */
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -60,6 +61,26 @@ function zIndexOf(element: Element): number {
     element.getAttribute('class') ?? '',
   );
   return Number(utility?.[1] ?? utility?.[2] ?? Number.NaN);
+}
+
+/** The confirm frame at `md` and up: the end panel, "Keep it" focused. */
+function ConfirmOverlay({ onOpenChange }: { onOpenChange: () => void }) {
+  const keepRef = useRef<HTMLButtonElement>(null);
+  return (
+    <ConfirmPanel
+      open
+      onDismiss={onOpenChange}
+      title="Delete this lead?"
+      description={<p>Priya Shah · #2363</p>}
+      initialFocusRef={keepRef}
+      testId="confirm"
+      footer={() => (
+        <button ref={keepRef} type="button">
+          Keep it
+        </button>
+      )}
+    />
+  );
 }
 
 afterEach(() => {
@@ -92,36 +113,42 @@ describe('toasts are the top layer', () => {
     expect(offenders).toEqual([]);
   });
 
-  const overlays: Record<string, (props: { onOpenChange: () => void }) => ReactNode> = {
-    dialog: ({ onOpenChange }) => (
-      <Dialog open onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogTitle>Edit patient</DialogTitle>
-          <DialogDescription>Priya Shah · #2363</DialogDescription>
-        </DialogContent>
-      </Dialog>
-    ),
-    'drawer (end sheet)': ({ onOpenChange }) => (
-      <Sheet open onOpenChange={onOpenChange}>
-        <SheetContent>
-          <SheetTitle>New lead</SheetTitle>
-          <SheetDescription>Enquiry details</SheetDescription>
-        </SheetContent>
-      </Sheet>
-    ),
-    'bottom sheet': ({ onOpenChange }) => (
-      <Drawer open onOpenChange={onOpenChange}>
-        <DrawerContent>
-          <DrawerTitle>Pick a doctor</DrawerTitle>
-          <DrawerDescription>Doctors on shift</DrawerDescription>
-        </DrawerContent>
-      </Drawer>
-    ),
+  /** Each modal surface the app opens, by the role it takes. */
+  const overlays: Record<
+    string,
+    {
+      role: 'dialog' | 'alertdialog';
+      Overlay: (props: { onOpenChange: () => void }) => ReactNode;
+    }
+  > = {
+    'drawer (end sheet)': {
+      role: 'dialog',
+      Overlay: ({ onOpenChange }) => (
+        <Sheet open onOpenChange={onOpenChange}>
+          <SheetContent>
+            <SheetTitle>New lead</SheetTitle>
+            <SheetDescription>Enquiry details</SheetDescription>
+          </SheetContent>
+        </Sheet>
+      ),
+    },
+    'bottom sheet': {
+      role: 'dialog',
+      Overlay: ({ onOpenChange }) => (
+        <Drawer open onOpenChange={onOpenChange}>
+          <DrawerContent>
+            <DrawerTitle>Pick a doctor</DrawerTitle>
+            <DrawerDescription>Doctors on shift</DrawerDescription>
+          </DrawerContent>
+        </Drawer>
+      ),
+    },
+    'confirm panel': { role: 'alertdialog', Overlay: ConfirmOverlay },
   };
 
   it.each(Object.entries(overlays))(
     'a toast over an open %s sits above it, stays exposed and its action leaves it open',
-    async (_name, Overlay) => {
+    async (_name, { role, Overlay }) => {
       // jsdom applies no Tailwind, so it cannot see the toast's
       // `pointer-events-auto` (asserted below) under the modal's
       // `pointer-events: none` on <body>; the real browser can.
@@ -130,7 +157,7 @@ describe('toasts are the top layer', () => {
       const retry = vi.fn();
       render(<AppToaster />);
       render(<Overlay onOpenChange={onOpenChange} />);
-      const overlay = screen.getByRole('dialog');
+      const overlay = screen.getByRole(role);
 
       act(() => {
         notify.error('Couldn’t save · connection dropped.', {
@@ -167,7 +194,7 @@ describe('toasts are the top layer', () => {
       await user.click(screen.getByRole('button', { name: 'Retry' }));
       expect(retry).toHaveBeenCalledOnce();
       expect(onOpenChange).not.toHaveBeenCalled();
-      expect(screen.getByRole('dialog')).toBe(overlay);
+      expect(screen.getByRole(role)).toBe(overlay);
     },
   );
 });

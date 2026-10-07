@@ -91,9 +91,9 @@ for free. A literal (`p-[24px]`, `gap-[0.5rem]`) is pixel-identical on the defau
 ignores the setting — `pnpm validate:theme-axis` (check 7) rejects it; `[var(--…)]` and
 `[calc(…)]` are fine.
 
-Dialogs are inset `p-6` by `DialogContent`. A surface that opts out with `p-0` to lay out
-its own panes (the settings modal) repeats that same step on **every** pane, so no pane
-hugs a corner while its neighbor floats.
+A `RecordDrawer` insets its body by `--drawer-body-pad`. A drawer that opts out
+(`flushBody`) to lay out its own panes (Settings) gives **every** pane the same step, so no
+pane hugs a corner while its neighbor floats.
 
 ## Corner radius
 

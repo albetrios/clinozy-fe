@@ -341,11 +341,11 @@ Paste your filled requirement into the chat; the AI will parse it and implement 
 ### 4. Ask for the right skill when you know it
 
 - **Good:** “Use the fe-page-scaffolding skill to add a new page `notifications` with a list and mark-as-read action.”
-- **Good:** “Review `shared/components/ui/dialog.tsx` for accessibility using the web-design-guidelines skill.”
+- **Good:** “Review `shared/components/RecordDrawer/RecordDrawer.tsx` for accessibility using the web-design-guidelines skill.”
 
 ### 5. Use Context7 for library-specific work
 
-- **Good:** “Add a shadcn Dialog for confirmations. use context7 /shadcn-ui/ui”
+- **Good:** “Add a submenu to a shadcn Dropdown Menu. use context7 /shadcn-ui/ui”
 - **Good:** “How do I use TanStack Query’s useInfiniteQuery? use context7 TanStack query”
 
 ### 6. Quick template (or use full requirement format)

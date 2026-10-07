@@ -201,9 +201,9 @@ studio (assertions in `src/shared/theme/catalog-doc.ts`).
   `[var(--…)]` and `[calc(…)]` pass; sizes and offsets (`h-[640px]`, `top-[20%]`) are not
   spacing and are not checked.
 
-**One inset for every dialog.** `DialogContent` gives each dialog `p-6`. A surface that opts
-out to lay out its own panes (the Settings drawer, a `flushBody` `RecordDrawer`) has to put the
-same step back on **each** pane — search box, nav and content are all `6` there, and the
+**One inset for every pane.** A `RecordDrawer` pads its body with `--drawer-body-pad`. A
+drawer that opts out to lay out its own panes (`flushBody` — the Settings drawer) has to put
+one step back on **each** pane — search box, nav and content are all `6` there, and the
 phone's section picker starts on the content's `4` gutter.
 
 Two traps the slot model has, both found by measuring rather than reading:

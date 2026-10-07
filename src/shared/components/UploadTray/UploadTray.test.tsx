@@ -7,11 +7,11 @@ const { uploadFileMock } = vi.hoisted(() => ({ uploadFileMock: vi.fn() }));
 vi.mock('@/shared/api/uploads-api.ts', () => ({ uploadFile: uploadFileMock }));
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/shared/components/ui/sheet.tsx';
 import {
   UPLOAD_ROW_LEAVE_MS,
   useUploadQueueStore,
@@ -252,14 +252,15 @@ describe('UploadTray', () => {
 
   it('is usable over an open modal: a press on it is never the modal’s outside press', async () => {
     const onOpenChange = vi.fn();
+    // The record drawer's own primitive, open as the drawer holding the draft.
     renderWithProviders(
       <>
-        <Dialog open onOpenChange={onOpenChange}>
-          <DialogContent>
-            <DialogTitle>New patient</DialogTitle>
-            <DialogDescription>Drawer stand-in</DialogDescription>
-          </DialogContent>
-        </Dialog>
+        <Sheet open onOpenChange={onOpenChange}>
+          <SheetContent>
+            <SheetTitle>New patient</SheetTitle>
+            <SheetDescription>Drawer stand-in</SheetDescription>
+          </SheetContent>
+        </Sheet>
         <UploadTray />
       </>,
     );

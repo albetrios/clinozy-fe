@@ -75,8 +75,11 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
   - A side drawer (a record, a form, a detail view) → **`RecordDrawer`** (steps, an `aside`
     column with phone `panes`, `headerStart` / `titleEnd` / `band` / `footerStart`,
     `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`).
-    Never a hand-built `ui/sheet` or Radix Dialog panel; `ui/dialog` stays the one centred
-    platform dialog.
+    Never a hand-built `ui/sheet` or Radix Dialog panel. Every overlay is a `RecordDrawer`,
+    the confirm frame (`ConfirmPanel`, through `ConfirmDialog`) or the ⌘K palette — menus,
+    popovers and the `Picker`'s own sheet aside. There is no `ui/dialog` (retired once
+    Settings, Appearance, the shortcuts and the platform dialogs became drawers): never
+    re-add it, and never build another centred dialog.
   - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
     photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
   - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer

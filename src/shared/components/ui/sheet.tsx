@@ -64,8 +64,8 @@ function SheetContent({
             data-slot="sheet-close"
             className={cn(
               closeControlClassName,
-              // `end-4`, as in dialog.tsx: a physical `right-4` stays on the right
-              // under RTL while the content reserves room on the logical end.
+              // `end-4`, not upstream's `right-4`: a physical inset stays on the
+              // right under RTL while the content reserves room on the logical end.
               'ring-offset-background focus-visible:ring-ring absolute end-4 top-4 focus-visible:ring-offset-2 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
             )}
           >
