@@ -179,7 +179,6 @@ export function AllSectionsPopover({
       <PopoverContent
         align="start"
         sideOffset={8}
-        role="dialog"
         aria-label={t(keys.allSections)}
         data-testid="all-sections"
         // The bar's own surface: G closes it from inside (section-bar-shortcuts.ts).

@@ -97,6 +97,13 @@ export interface ItemsFieldProps<
 
 type TestIds = ReturnType<typeof itemsFieldTestIds>;
 
+/*
+ * The table is an ARIA table on grid/flex `div`s: every row is a CSS grid (a
+ * wrapping flex box on a phone), and native `<table>` parts lose their table
+ * semantics once their `display` is changed — so the `NOSONAR(S6819)` marks on
+ * `role="table"`, `row`, `columnheader` and `cell` below are deliberate.
+ */
+
 /** A row on the shared grid (`md` up): gap 8px, 6px 10px, a `muted` hairline. */
 const ROW_GRID_CLASS =
   'grid grid-cols-(--items-cols) items-center gap-2 border-b border-b-muted px-2.5 py-1.5';
@@ -157,7 +164,7 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
   } = useController({ control, name });
   const placeholder = note.placeholder ?? t(ITEMS_FIELD_KEYS.notePlaceholder);
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
       role="cell"
       aria-colspan={span}
       className={phone ? 'basis-full' : 'col-span-full -mt-0.5'}
@@ -247,14 +254,14 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
   const lastColumn = canRemove ? -1 : columns.length - 1;
 
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
       role="row"
       tabIndex={-1}
       data-testid={ids.row}
       className={phone ? ROW_WRAP_CLASS : ROW_GRID_CLASS}
     >
       {columns.map((column, position) => (
-        <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
           key={column.id}
           role="cell"
           data-column={column.id}
@@ -269,7 +276,10 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
         </div>
       ))}
       {canRemove ? (
-        <div role="cell" className={cellClass(phone, false, true)}>
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
+          role="cell"
+          className={cellClass(phone, false, true)}
+        >
           <Button
             type="button"
             variant="ghost"
@@ -284,7 +294,11 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
           </Button>
         </div>
       ) : null}
-      {removable && !canRemove ? <div role="cell" /> : null}
+      {removable && !canRemove ? (
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
+          role="cell"
+        />
+      ) : null}
       {note ? (
         <RowNote
           control={control}
@@ -339,14 +353,14 @@ function ItemsHeaderRow<TForm extends FieldValues, TName extends FieldArrayPath<
 }) {
   const { t } = useTranslation(ITEMS_FIELD_NS);
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
       role="row"
       tabIndex={-1}
       data-testid={testId}
       className="bg-canvas text-tiny text-muted-foreground grid h-8.75 grid-cols-(--items-cols) items-center gap-2 border-b px-2.5 font-semibold tracking-[0.04em] uppercase"
     >
       {columns.map((column) => (
-        <span
+        <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
           key={column.id}
           role="columnheader"
           tabIndex={-1}
@@ -356,7 +370,10 @@ function ItemsHeaderRow<TForm extends FieldValues, TName extends FieldArrayPath<
         </span>
       ))}
       {removable ? (
-        <span role="columnheader" tabIndex={-1}>
+        <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
+          role="columnheader"
+          tabIndex={-1}
+        >
           <span className="sr-only">{t(ITEMS_FIELD_KEYS.remove)}</span>
         </span>
       ) : null}
@@ -485,7 +502,7 @@ export function ItemsField<
           className="bg-card overflow-hidden rounded-xl border"
         >
           {phone && fields.length === 0 ? null : (
-            <div
+            <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
               ref={tableRef}
               role="table"
               aria-label={props.label}

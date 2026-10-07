@@ -281,7 +281,7 @@ export function VisitPhotos({
                 {albums.map((value) => {
                   const on = value === album;
                   return (
-                    <button
+                    <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this pill
                       key={value}
                       type="button"
                       role="radio"

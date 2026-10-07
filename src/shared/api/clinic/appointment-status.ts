@@ -389,7 +389,7 @@ export function cancelReasonToContract(
     case 'booked_by_mistake':
       return { reason: 'other', note: label };
     case 'other':
-      return { reason: 'other', note: note?.trim() || null };
+      return { reason: 'other', note: (note?.trim() ?? '') || null };
   }
 }
 

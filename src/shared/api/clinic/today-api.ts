@@ -26,7 +26,7 @@ export function normalizeTodayFloorParams(
   const parsed = todayFloorParamsSchema.parse(params);
   return {
     date: parsed.date ?? clinicToday(),
-    branchIds: [...new Set(parsed.branchIds)].sort(),
+    branchIds: [...new Set(parsed.branchIds)].sort((a, b) => a.localeCompare(b)),
   };
 }
 

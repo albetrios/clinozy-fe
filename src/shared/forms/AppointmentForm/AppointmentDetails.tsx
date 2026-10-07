@@ -211,7 +211,7 @@ function PackageField({
             const on = draft.packageId === option.id;
             const tone = TONE_CLASSES[option.tone];
             return (
-              <button
+              <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this card
                 key={option.id}
                 type="button"
                 role="radio"

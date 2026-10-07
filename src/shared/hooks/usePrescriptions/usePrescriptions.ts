@@ -80,8 +80,11 @@ export function useRxSheetContext(patientId: string, doctorId: string | null) {
 export function useLoadRxSheetContext() {
   const queryClient = useQueryClient();
   return (patientId: string, doctorId: string | null) =>
-    queryClient.ensureQueryData({
+    // `query({ staleTime: 'static' })`, not the deprecated `ensureQueryData`: the copy
+    // the hook keeps is served as it is, and the network is touched only on a miss.
+    queryClient.query({
       ...rxSheetQuery(patientId, doctorId),
+      staleTime: 'static',
       meta: { notifyOnError: true },
     });
 }

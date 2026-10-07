@@ -171,7 +171,7 @@ function offeringDraft(fields: Partial<OfferingInput>): Partial<OfferingInput> {
     ...(searchTerms
       ? { searchTerms: searchTerms.map((term) => term.trim()).filter(Boolean) }
       : {}),
-    description: description?.trim() || null,
+    description: (description?.trim() ?? '') || null,
   };
 }
 
@@ -305,8 +305,8 @@ export async function fetchOffer(id: string): Promise<OfferRecord> {
 function offerDraft(fields: Partial<OfferInput>): Partial<OfferInput> {
   return {
     ...fields,
-    code: fields.code?.replace(/\s/g, '').toUpperCase() || null,
-    note: fields.note?.trim() || null,
+    code: (fields.code?.replace(/\s/g, '').toUpperCase() ?? '') || null,
+    note: (fields.note?.trim() ?? '') || null,
   };
 }
 

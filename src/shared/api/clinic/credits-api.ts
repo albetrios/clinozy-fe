@@ -316,7 +316,7 @@ export async function createCredit(input: CreditInput): Promise<PendingCreditRec
     status: 'open',
     settledPaymentId: null,
     reasonKey: fields.reasonKey,
-    note: fields.note || null,
+    note: fields.note === '' ? null : fields.note,
     invoiceId: fields.invoiceId,
     settleBy: fields.settleBy,
     adjusted: 0,
@@ -356,7 +356,7 @@ export async function updateCredit(
     amount: fields.amount,
     reason: reasonOf(fields),
     reasonKey: fields.reasonKey,
-    note: fields.note || null,
+    note: fields.note === '' ? null : fields.note,
     invoiceId: fields.invoiceId,
     settleBy: fields.settleBy,
   });

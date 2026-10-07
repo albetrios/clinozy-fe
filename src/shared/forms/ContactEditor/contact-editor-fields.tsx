@@ -183,7 +183,7 @@ function PhoneRow({
           </span>
           {t(primary ? K.primary : K.setPrimary)}
         </button>
-        <button
+        <button // NOSONAR(S6819): styled-button toggle; a native checkbox input cannot hold this chip
           type="button"
           role="checkbox"
           aria-checked={row.whatsapp}
@@ -248,7 +248,7 @@ function HandleRows({ value, onChange, testId }: ContactStepProps) {
     if (handle) notify.success(t(K.handleRemoved, { handle }));
   };
   return (
-    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-1.5">
+    <fieldset aria-labelledby={labelId} className="flex min-w-0 flex-col gap-1.5">
       <span id={labelId} className="text-muted-foreground-strong text-xs font-medium">
         {tClinic(CLINIC_KEYS.channels.instagram)}
       </span>
@@ -299,7 +299,7 @@ function HandleRows({ value, onChange, testId }: ContactStepProps) {
           {t(K.addHandle)}
         </Button>
       ) : null}
-    </div>
+    </fieldset>
   );
 }
 
@@ -343,7 +343,7 @@ export function ContactIdentityFields({
             data-testid={`${testId}-name`}
           />
         </DrawerField>
-        <div role="group" aria-labelledby={mobilesId} className="flex flex-col gap-1.5">
+        <fieldset aria-labelledby={mobilesId} className="flex min-w-0 flex-col gap-1.5">
           <span
             id={mobilesId}
             className="text-muted-foreground-strong text-xs font-medium"
@@ -395,7 +395,7 @@ export function ContactIdentityFields({
               </Button>
             ) : null}
           </div>
-        </div>
+        </fieldset>
         <div className="flex flex-col gap-1.5">
           <span
             id={channelId}

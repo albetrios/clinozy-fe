@@ -18,8 +18,8 @@ export function savedViewFilters(filters: SavedViewFilters): SavedViewFilters {
   return Object.fromEntries(
     Object.keys(filters)
       .filter((key) => !NEVER_SAVED.has(key) && (filters[key]?.length ?? 0) > 0)
-      .sort()
-      .map((key) => [key, [...(filters[key] ?? [])].sort()]),
+      .sort((a, b) => a.localeCompare(b))
+      .map((key) => [key, [...(filters[key] ?? [])].sort((a, b) => a.localeCompare(b))]),
   );
 }
 

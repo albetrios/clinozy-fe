@@ -87,7 +87,7 @@ export function openingCashFor(
         close.countedCash !== null,
     )
     .sort((a, b) => compareText(b.date, a.date))[0];
-  if (!before || before.countedCash === null) {
+  if (before?.countedCash == null) {
     return { cash: DEFAULT_OPENING_FLOAT, source: 'default_float', from: null };
   }
   return { cash: before.countedCash, source: 'carried', from: before.date };

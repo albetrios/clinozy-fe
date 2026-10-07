@@ -189,7 +189,8 @@ export function invoiceLineRate(
   gstPct: number,
   gstInclusive: boolean,
 ): number {
-  return gstInclusive && gstPct > 0 ? Math.round(price / (1 + gstPct / 100)) : price;
+  if (gstInclusive && gstPct > 0) return Math.round(price / (1 + gstPct / 100));
+  return price;
 }
 
 /** One Offer-drawer preview box: the price before → after, or the sessions before → after. */

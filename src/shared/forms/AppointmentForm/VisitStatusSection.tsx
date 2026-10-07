@@ -126,7 +126,7 @@ function StatusTile({
   const done = tile.step === 'done';
   const hint = tileHint(t, tile);
   const button = (
-    <button
+    <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this tile
       type="button"
       role="radio"
       aria-checked={current}

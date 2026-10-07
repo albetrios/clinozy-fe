@@ -53,7 +53,7 @@ export interface PatientPhotos {
 
 /** The name a photo goes by: its caption, else its file name (`S:429–432`). */
 export function photoName(photo: Pick<PatientImage, 'caption' | 'fileName'>): string {
-  return photo.caption?.trim() || photo.fileName;
+  return (photo.caption?.trim() ?? '') || photo.fileName;
 }
 
 const fixtureWorld = () => import('./fixtures/world.fixtures.ts');

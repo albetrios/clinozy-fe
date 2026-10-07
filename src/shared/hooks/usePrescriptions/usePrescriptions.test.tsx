@@ -150,6 +150,20 @@ describe('usePrescriptions', () => {
     expect(client.getQueryData(prescriptionQueryKeys.sheet(DHARTI, doctor))).toBe(sheet);
   });
 
+  it('serves the context the hook already keeps instead of reading it again', async () => {
+    const doctor = staffRef('DD');
+    const { result } = renderHook(useLoadRxSheetContext, { wrapper });
+    const read = await act(() => result.current(DHARTI, doctor));
+    expect(read.doctor?.firstName).toBe('Dr. Drashti');
+    // Swap the kept copy for one the server never sends: a second call serves it, not a read.
+    client.setQueryData(prescriptionQueryKeys.sheet(DHARTI, doctor), {
+      ...read,
+      doctor: null,
+    });
+    const kept = await act(() => result.current(DHARTI, doctor));
+    expect(kept.doctor).toBeNull();
+  });
+
   it('stays idle without a patient or a prescription', () => {
     const { result } = renderHook(
       () => ({ list: usePatientPrescriptions(''), one: usePrescription('') }),

@@ -380,8 +380,8 @@ export async function receivePayment(input: ReceivePaymentInput): Promise<Ledger
       splits: fields.splits,
       patientId: fields.patientId,
       invoiceId: fields.invoiceId,
-      reference: fields.reference || null,
-      note: fields.note || null,
+      reference: fields.reference === '' ? null : fields.reference,
+      note: fields.note === '' ? null : fields.note,
     }),
   );
   // Collected at the patient's open visit, it sends an Rx still to fill to the pharmacy.
@@ -455,7 +455,7 @@ export async function payExpense(input: PayExpenseInput): Promise<LedgerRow> {
       payeeName: fields.payeeName,
       expenseCategory: fields.expenseCategory,
       billRef: fields.billRef,
-      note: fields.note || null,
+      note: fields.note === '' ? null : fields.note,
       attachmentKeys: fields.attachmentKeys,
       paidAt: paidAtOn(fields.paidOn),
     }),
@@ -518,8 +518,8 @@ async function receiptChange(
   return {
     amount,
     splits: fields.splits,
-    reference: fields.reference || null,
-    note: fields.note || null,
+    reference: fields.reference === '' ? null : fields.reference,
+    note: fields.note === '' ? null : fields.note,
   };
 }
 
@@ -561,7 +561,7 @@ async function expenseChange(
     splits: [{ mode: fields.mode, amount: fields.amount }],
     payeeName: fields.payeeName,
     expenseCategory: fields.expenseCategory,
-    note: fields.note || null,
+    note: fields.note === '' ? null : fields.note,
     attachmentKeys: fields.attachmentKeys,
   };
 }

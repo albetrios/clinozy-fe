@@ -52,8 +52,7 @@ function ViewAsPill() {
     .map((section) => tClinic(CLINIC_KEYS.sections[section].label))
     .join(' · ');
   return (
-    <div
-      role="status"
+    <output
       data-slot="notice-pill"
       data-testid="view-as-bar"
       className="bg-primary text-primary-foreground animate-dropdown-up pointer-events-auto flex h-11 max-w-full items-center gap-2.5 rounded-full ps-3.5 pe-1.5 shadow-(--elevation-fab)"
@@ -85,7 +84,7 @@ function ViewAsPill() {
       >
         {t(keys.exit)}
       </button>
-    </div>
+    </output>
   );
 }
 

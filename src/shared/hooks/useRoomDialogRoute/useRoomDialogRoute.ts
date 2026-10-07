@@ -81,7 +81,7 @@ function recordRouteOf<T, TPrefill>(
   const after = pathname.split(`/${id}`)[1] ?? '';
   return {
     kind: 'record',
-    action: after.replace(/^\/|\/$/g, ''),
+    action: after.replace(/(?:^\/)|(?:\/$)/g, ''),
     id,
     record: drawer.record,
   };

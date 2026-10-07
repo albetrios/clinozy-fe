@@ -140,7 +140,7 @@ function useWhoActions(state: AppointmentFormState) {
     // The usual doctor — unless the prefill named one or a slot is already picked.
     if (!id || prefill.doctorId || draft.time) return;
     void queryClient
-      .fetchQuery({
+      .query({
         queryKey: appointmentQueryKeys.person(id),
         queryFn: () => fetchBookingPerson(id),
       })

@@ -327,41 +327,37 @@ export function AppMain({ flush = false }: { flush?: boolean } = {}) {
   }, []);
 
   return (
-    <>
-      <main
-        id="main-content"
-        ref={mainRef}
-        // `app-main`: index.css extends the bottom padding by the consent card's
-        // height on phones. `sm:pb-20` is not redundant — `sm:p-6` resets every
-        // side, and the tab bar this padding clears stays until `md`.
-        data-slot="app-main"
-        className={
-          flush
-            ? 'flex min-h-0 flex-1 flex-col overflow-y-auto pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom))]'
-            : '3xl:p-8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-20 md:pb-6'
-        }
-        data-testid="main-content"
-        data-layout-width={layoutWidth}
-        data-flush={flush || undefined}
+    <main
+      id="main-content"
+      ref={mainRef}
+      // `app-main`: index.css extends the bottom padding by the consent card's
+      // height on phones. `sm:pb-20` is not redundant — `sm:p-6` resets every
+      // side, and the tab bar this padding clears stays until `md`.
+      data-slot="app-main"
+      className={
+        flush
+          ? 'flex min-h-0 flex-1 flex-col overflow-y-auto pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom))]'
+          : '3xl:p-8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-20 md:pb-6'
+      }
+      data-testid="main-content"
+      data-layout-width={layoutWidth}
+      data-flush={flush || undefined}
+    >
+      <div
+        className={cn(
+          layoutMainClassName(layoutWidth),
+          flush && 'flex min-h-0 flex-1 flex-col',
+        )}
       >
-        <div
-          className={cn(
-            layoutMainClassName(layoutWidth),
-            flush && 'flex min-h-0 flex-1 flex-col',
-          )}
+        <SectionErrorBoundary
+          title={t(ERRORS_KEYS.widget.pageContent)}
+          testId="page-content-error"
         >
-          <SectionErrorBoundary
-            title={t(ERRORS_KEYS.widget.pageContent)}
-            testId="page-content-error"
-          >
-            <PageTransition
-              className={flush ? 'flex min-h-0 flex-1 flex-col' : undefined}
-            >
-              <Outlet />
-            </PageTransition>
-          </SectionErrorBoundary>
-        </div>
-      </main>
-    </>
+          <PageTransition className={flush ? 'flex min-h-0 flex-1 flex-col' : undefined}>
+            <Outlet />
+          </PageTransition>
+        </SectionErrorBoundary>
+      </div>
+    </main>
   );
 }

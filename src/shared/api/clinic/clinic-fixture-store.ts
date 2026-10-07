@@ -258,7 +258,7 @@ export function createFixtureCollection<T extends Row>(options: {
       Object.assign(row, {
         deletedAt: now().toISOString(),
         deleteReason: reason,
-        deleteNote: note?.trim() || null,
+        deleteNote: (note?.trim() ?? '') || null,
       });
       return clone(row);
     },

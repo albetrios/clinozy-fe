@@ -392,7 +392,7 @@ function leadDraft<T extends LeadFields>(draft: T, patched: { contact?: unknown 
     interests: [...new Set(fields.interests)],
     customInterests,
     involvedIds: [...new Set(fields.involvedIds)].filter((id) => id !== fields.ownerId),
-    notes: fields.notes?.trim() || null,
+    notes: (fields.notes?.trim() ?? '') || null,
   };
 }
 

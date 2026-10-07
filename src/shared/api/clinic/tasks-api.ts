@@ -34,7 +34,10 @@ export function normalizeTaskListQuery(query: TaskListQueryInput = {}): TaskList
     ...query,
     q: query.q?.trim().slice(0, TASK_SEARCH_MAX),
   });
-  return { ...parsed, type: [...new Set(parsed.type)].sort() };
+  return {
+    ...parsed,
+    type: [...new Set(parsed.type)].sort((a, b) => a.localeCompare(b)),
+  };
 }
 
 /** TanStack Query keys for tasks. */

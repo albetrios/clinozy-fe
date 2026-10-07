@@ -39,11 +39,12 @@ import type { DeleteReason, PatientImage } from './clinic-schema.ts';
 const server = () => import('./fixtures/appointments-server.fixtures.ts');
 
 /** Ids in a stable order, each once — equal filters share one cache entry. */
-const idSet = (ids: readonly string[]) => [...new Set(ids)].sort();
+const idSet = (ids: readonly string[]) =>
+  [...new Set(ids)].sort((a, b) => a.localeCompare(b));
 
 /** The search trimmed to its limit; an empty one is none. */
 const searchOf = (q: string | undefined) =>
-  q?.trim().slice(0, APPOINTMENT_SEARCH_MAX) || undefined;
+  (q?.trim().slice(0, APPOINTMENT_SEARCH_MAX) ?? '') || undefined;
 
 /** Agenda params with their defaults filled, the search trimmed and the ids in order. */
 export function normalizeAppointmentListParams(

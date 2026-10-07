@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 import type { AppointmentRow } from './appointments-contracts.ts';
-import type { prescriptionItemSchema } from './clinic-schema.ts';
 import {
   clinicCommonSchema,
   isoDateTimeSchema,
   type Prescription,
+  type prescriptionItemSchema,
   type Tone,
   type Treatment,
 } from './clinic-schema.ts';

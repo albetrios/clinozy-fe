@@ -95,7 +95,7 @@ function useFormUi(state: AppointmentFormState) {
   const detailsOpen = detailsToggled ?? !startsCollapsed(state);
   const setDetailsOpen = (next: boolean | ((open: boolean) => boolean)) =>
     setDetailsToggled(typeof next === 'function' ? next(detailsOpen) : next);
-  const [pagedMonth, setMonth] = useState<string | null>(null);
+  const [pagedMonth, setPagedMonth] = useState<string | null>(null);
   const [planOpen, setPlanOpen] = useState(true);
   const [pricesShown, setPricesShown] = useState(true);
   const [stackPatient, setStackPatient] = useState(false);
@@ -104,7 +104,7 @@ function useFormUi(state: AppointmentFormState) {
     detailsOpen,
     setDetailsOpen,
     month: pagedMonth ?? civilMonthStart(state.draft.date ?? state.today),
-    setMonth,
+    setMonth: setPagedMonth,
     planOpen,
     setPlanOpen,
     pricesShown,
@@ -301,9 +301,12 @@ function AppointmentFormSession(props: SessionProps) {
   const { ui, stackPatient, closePatientForm, asking, closeCancel } = useFormUi(state);
   useCopiedToast(state);
   const exits = useFormExits(props.onClose);
-  const { saveState, save } = useFormSave(state, ui, props);
+  const { saveState, save } = useFormSave(state, ui, {
+    onSaved: props.onSaved,
+    onClose: props.onClose,
+  });
   const planCard = useVisitPlan(state, exits);
-  const chat = useChatAside(state, props, exits);
+  const chat = useChatAside(state, { onOpenAppointment: props.onOpenAppointment }, exits);
   const footer = useFooterWords(state);
   const { row, draft } = state;
   const title = formTitle(t, state.mode, row);

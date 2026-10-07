@@ -380,7 +380,7 @@ function LeadRadios({
             clock.moment(lead.createdAt, { withTime: false }),
           ]);
           return (
-            <button
+            <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this row
               key={lead.id}
               type="button"
               role="radio"

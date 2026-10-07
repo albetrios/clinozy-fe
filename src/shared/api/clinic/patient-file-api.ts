@@ -77,7 +77,7 @@ function duesOf(world: World, patientId: string) {
 /** The latest check-in's feel and score, else the latest review, and the totals. */
 function feedbackOf(world: World, patientId: string): PatientFileFeedback {
   const newest = <T extends { date: string; createdAt: string }>(rows: T[]) =>
-    rows.sort(
+    [...rows].sort(
       (a, b) => compareText(b.date, a.date) || compareText(b.createdAt, a.createdAt),
     );
   const checkIns = newest(world.checkIns.snapshot((row) => row.patientId === patientId));

@@ -123,12 +123,11 @@ function BookingCalendar({
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
   const { formatDate } = useLocaleFormat();
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={t(K.calendar)}
       data-testid={IDS.calendar}
       data-slot="booking-calendar"
-      className="bg-card rounded-lg border p-2"
+      className="bg-card min-w-0 rounded-lg border p-2"
     >
       <LocalizedCalendar
         look="compact"
@@ -163,7 +162,7 @@ function BookingCalendar({
           next: IDS.calendarNext,
         }}
       />
-    </div>
+    </fieldset>
   );
 }
 
@@ -188,7 +187,7 @@ function SlotStepSwitch({
       {APPOINTMENT_SLOT_STEPS.map((option) => {
         const on = option === step;
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this pill
             key={option}
             type="button"
             role="radio"
@@ -267,7 +266,7 @@ function HourRow({
           const time = slotLabel(date, slot.time).time;
           const on = draft.time === slot.time;
           return (
-            <button
+            <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this slot
               key={slot.time}
               type="button"
               role="radio"
