@@ -286,6 +286,10 @@ clinozy-fe/
 │   │   ├── 2026-09-24-production-readiness.md
 │   │   └── README.md
 │   └── README.md
+├── handoff/
+│   └── sonar-2026-10-07/
+│       ├── issues.json
+│       └── README.md
 ├── iterations/
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
