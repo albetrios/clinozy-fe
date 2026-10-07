@@ -438,6 +438,15 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       VITE_VERSION_CHECK: 'false',
       // Multi-locale so Appearance → Language works locally; prod defaults single.
       BUILD_I18N_MODE: 'multi',
+      // Team-only deployment (D44): clinozy-be no longer sends the deployment flags on
+      // me/context, so the front end states the mode itself.
+      VITE_TEAM_ORGANIZATIONS: 'true',
+      VITE_PERSONAL_ORGANIZATIONS: 'false',
+      // Turnstile on, with Cloudflare's public always-pass TEST site key — it pairs with
+      // clinozy-be's local test secret, so the real sign-in flow runs on localhost and in a
+      // cloud session with no secret to hand over. Deploys use their own real key.
+      VITE_CAPTCHA_DISABLED: 'false',
+      VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
     },
     // Test-mode Stripe (development forbids pk_live_) and PostHog work on localhost as-is.
     externalCredentials: [
