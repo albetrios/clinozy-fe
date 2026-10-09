@@ -669,6 +669,94 @@ describe('useAppMutation', () => {
     expect(errorMock).toHaveBeenCalledWith(expect.any(String), { id: 'prefs' });
   });
 
+  describe('the idempotency key of a user action', () => {
+    const keysOf = (mutationFn: ReturnType<typeof vi.fn>) =>
+      mutationFn.mock.calls.map(
+        (call) => (call[1] as { idempotencyKey: string }).idempotencyKey,
+      );
+
+    it('a retry of the same write sends the same key', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (vars: { name: string }, action: { idempotencyKey: string }) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('network down'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await expect(result.current.mutateAsync({ name: 'Asha' })).rejects.toThrow();
+      await expect(result.current.mutateAsync({ name: 'Asha' })).resolves.toBe('ok');
+
+      const [first, retry] = keysOf(mutationFn);
+      expect(first).toMatch(/[0-9a-f-]{36}/);
+      expect(retry).toBe(first);
+    });
+
+    it('changed variables are a new action with a new key', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (vars: { name: string }, action: { idempotencyKey: string }) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('refused'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await expect(result.current.mutateAsync({ name: 'Asha' })).rejects.toThrow();
+      await result.current.mutateAsync({ name: 'Asha Patel' });
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
+
+    it('the same write again after a success is a new action', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi.fn(
+        async (_vars: { name: string }, _action: { idempotencyKey: string }) => 'ok',
+      );
+      const { result } = renderHook(() => useAppMutation({ mutationFn }), {
+        wrapper: makeWrapper(client),
+      });
+
+      await result.current.mutateAsync({ name: 'Asha' });
+      await result.current.mutateAsync({ name: 'Asha' });
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
+
+    it('variables with no stable form get a key per call', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (
+            vars: { run: () => void },
+            action: { idempotencyKey: string },
+          ) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('network down'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+      const vars = { run: () => undefined };
+
+      await expect(result.current.mutateAsync(vars)).rejects.toThrow();
+      await result.current.mutateAsync(vars);
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
+  });
+
   it('omits the options argument entirely when no toast id is set', async () => {
     const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
     const { result } = renderHook(

@@ -63,8 +63,19 @@ export interface WriteReportOptions {
   notifyOnError?: boolean;
 }
 
+/**
+ * The user action a write belongs to, handed to `mutationFn` as its second argument. Its
+ * `idempotencyKey` is the same for every attempt at the same write — the same variables, until
+ * one succeeds — so a "Retry save" after a dropped answer replays clinozy-be's first answer
+ * instead of acting twice; different variables are a different action with a new key.
+ */
+export interface MutationAction {
+  idempotencyKey: string;
+}
+
 export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unknown> {
-  mutationFn: (vars: TVars) => Promise<TData>;
+  /** The write. Pass `action.idempotencyKey` to the api call (`api.post(path, { idempotencyKey })`). */
+  mutationFn: (vars: TVars, action: MutationAction) => Promise<TData>;
   /**
    * Query keys to invalidate after a successful mutation. Fired, not awaited —
    * the refetch runs in the background and `isPending` ends with the write.
@@ -190,8 +201,8 @@ function once<TArgs extends unknown[]>(
 }
 
 /**
- * The standard write mutation. Runs `mutationFn` (the fetch client auto-attaches
- * the `Idempotency-Key` on writes), invalidates the given query keys, and
+ * The standard write mutation. Runs `mutationFn` with the user action's idempotency key
+ * ({@link MutationAction} — one key per write, kept across its retries), invalidates the given query keys, and
  * surfaces a success / error toast through the single `notify` surface — so
  * every Phase 6–7 mutation behaves identically. Returns the TanStack mutation,
  * so callers still get `mutate` / `mutateAsync` / `isPending`.
@@ -225,8 +236,24 @@ export function useAppMutation<
   const { optimistic, optimisticInfinite, optimisticQueries } = options;
   /** In-flight requests on this hook instance, keyed by their variables. */
   const inFlightRef = useRef(new Map<string, Promise<TData>>());
+  /**
+   * The idempotency key of each write not yet done, keyed by its variables: every attempt at the
+   * same write sends the same key until one succeeds (clinozy-be releases a key on an error answer,
+   * so a retry after a refusal runs again). Variables with no stable text form get a key per call.
+   */
+  const actionKeysRef = useRef(new Map<string, string>());
+  const actionFor = (vars: TVars): MutationAction => {
+    const key = variablesKey(vars);
+    if (key === null) return { idempotencyKey: crypto.randomUUID() };
+    let idempotencyKey = actionKeysRef.current.get(key);
+    if (idempotencyKey === undefined) {
+      idempotencyKey = crypto.randomUUID();
+      actionKeysRef.current.set(key, idempotencyKey);
+    }
+    return { idempotencyKey };
+  };
   const mutation = useMutation<TData, Error, TVars, OptimisticContext | undefined>({
-    mutationFn: options.mutationFn,
+    mutationFn: (vars) => options.mutationFn(vars, actionFor(vars)),
     onMutate: async (vars) => {
       if (optimisticInfinite) {
         // Cancel in-flight refetches so they can't clobber the optimistic patch.
@@ -272,6 +299,9 @@ export function useAppMutation<
       return undefined;
     },
     onSuccess: async (data, vars) => {
+      // The action is done: the same variables again are a new action with a new key.
+      const doneKey = variablesKey(vars);
+      if (doneKey !== null) actionKeysRef.current.delete(doneKey);
       // Marked stale synchronously, refetched in the background. Awaiting
       // `invalidateQueries` waits for every active observer to finish refetching
       // — and `isPending` stays true for all of it, so a button bound to it
