@@ -49,8 +49,8 @@ describe('QuestionsStep', () => {
   it("draws the drawer's chip groups: 24px pills under the field label, kebab ids", () => {
     render(<QuestionsStep />);
     const group = screen.getByTestId('onboarding-team-size');
-    expect(group).toHaveAttribute('role', 'group');
-    expect(group).toHaveAccessibleName('How big is your team?');
+    // A <fieldset>: a group by its own semantics, named by the field label.
+    expect(screen.getByRole('group', { name: 'How big is your team?' })).toBe(group);
     expect(screen.getByText('How big is your team?')).toHaveClass(
       'text-xs',
       'font-medium',
