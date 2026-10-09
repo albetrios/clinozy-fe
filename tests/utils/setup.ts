@@ -1,12 +1,19 @@
 import '@testing-library/jest-dom/vitest';
 import '@/lib/i18n/i18n.ts';
 
+import { configure } from '@testing-library/react';
 import { beforeAll, beforeEach, expect } from 'vitest';
 import * as matchers from 'vitest-axe/matchers';
 
 import { ensureLocale } from '@/lib/i18n/load-namespace.ts';
 
 expect.extend(matchers);
+
+// How long `findBy*` / `waitFor` wait before failing. Testing Library's 1s default is tight for a
+// route island's first, cold lazy load when the whole suite runs four workers beside a build (the
+// pre-push run): first opens took 1.5–1.6s there — Day close's gate, the booking drawer's slot
+// pick — and passed 3 of 3 alone. A real failure still fails; it takes up to 5s to say so.
+configure({ asyncUtilTimeout: 5000 });
 
 beforeAll(async () => {
   await ensureLocale('en');

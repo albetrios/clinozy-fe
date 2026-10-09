@@ -8,7 +8,7 @@ import {
   redirect,
   RouterProvider,
 } from '@tanstack/react-router';
-import { configure, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
@@ -48,11 +48,6 @@ import { PatientFileContext } from '../../shared/patient-file-context.ts';
 import { PatientTimelinePage } from '../../timeline/PatientTimelinePage.tsx';
 import { PatientTreatmentsPage } from '../../treatments/PatientTreatmentsPage.tsx';
 import { PatientVisitsPage } from '../../visits/PatientVisitsPage.tsx';
-
-// The file reads the fixture world on demand: on a loaded machine its first
-// paint can outlast testing-library's 1s default, so the file's suites wait
-// up to 5s for what they find (only the suites that import this module).
-configure({ asyncUtilTimeout: 5000 });
 
 /** Each section's URL-driven dialogs, as `routeTree.tsx` registers them under it (S:35–43). */
 const DIALOG_PATHS: Readonly<Record<string, readonly string[]>> = {
