@@ -9,9 +9,9 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   patientFileUrl,
@@ -47,10 +47,10 @@ const tabs = () =>
     .map((tab) => tab.textContent);
 
 beforeEach(() => {
+  signInTestMember();
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   resetClinicFixtures();
-  resetPreferencesFixture();
 });
 afterEach(() => {
   resetPatientFile();

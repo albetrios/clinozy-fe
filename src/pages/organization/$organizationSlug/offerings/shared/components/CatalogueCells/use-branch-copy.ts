@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import type { DataTableFoldValue } from '@/shared/components/DataTable/index.ts';
 import type { RoomFilterCopy } from '@/shared/components/RoomToolbar/index.ts';
@@ -15,7 +15,7 @@ import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.cons
  */
 export function useBranchFold(): (
   values: readonly string[],
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
 ) => DataTableFoldValue | null {
   const { t } = useTranslation(CATALOGUE_CELLS_NS);
   return (values, branches) => {
@@ -46,7 +46,7 @@ export function useBranchFold(): (
  */
 export function useBranchFilterCopy(): (
   label: string,
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
 ) => RoomFilterCopy {
   const { t } = useTranslation(CATALOGUE_CELLS_NS);
   return (label, branches) => ({

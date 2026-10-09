@@ -8,8 +8,8 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -54,7 +54,7 @@ function pillsFold(pills: readonly TeamPill[]): DataTableFoldValue | null {
 interface TeamColumnsInput {
   roles: RoleDirectory;
   /** The open branches, by id; with one open the Branches column is left out (`users.md:95`). */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   multiBranch: boolean;
 }
 

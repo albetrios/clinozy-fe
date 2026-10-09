@@ -161,14 +161,16 @@ function useNewFormSources(mode: AppointmentFormMode, prefill: AppointmentFormPr
   return { person: person.data, source: source.data, settled };
 }
 
-/** The branch a booking files under (`S:331`) and that branch's default doctor. */
+/**
+ * The branch a booking files under (`S:331`). Its default doctor is not offered: the member's
+ * branch list (`GET /app/branches/my`) does not carry it (api-integration §8 G5).
+ */
 function useBookingBranch(row: AppointmentRow | undefined) {
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
-  const branchId =
-    row?.branchId ?? defaultBranchId(openBranches, preferences.branchFilter);
-  const branch = openBranches.find((candidate) => candidate.id === branchId);
-  return { branchId, doctorId: branch?.defaultDoctorId ?? null };
+  return {
+    branchId: row?.branchId ?? defaultBranchId(openBranches, preferences.branchFilter),
+  };
 }
 
 /**
@@ -263,13 +265,11 @@ function useDraftReads(
 function startNewDraft({
   prefill,
   sources,
-  branchDoctorId,
   firstStaffId,
   today,
 }: {
   prefill: AppointmentFormPrefill;
   sources: ReturnType<typeof useNewFormSources>;
-  branchDoctorId: string | null;
   firstStaffId: string | undefined;
   today: string;
 }): AppointmentDraft {
@@ -281,7 +281,6 @@ function startNewDraft({
       prefill.doctorId,
       sources.source?.doctorId,
       sources.person?.usualDoctorId,
-      branchDoctorId,
       firstStaffId,
     ]),
   });
@@ -314,7 +313,6 @@ export function useAppointmentFormState(
       startNewDraft({
         prefill,
         sources,
-        branchDoctorId: branch.doctorId,
         firstStaffId: catalogs.staff[0]?.id,
         today,
       }),

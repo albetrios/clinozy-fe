@@ -15,7 +15,6 @@ import { axe } from 'vitest-axe';
 
 import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import { resetPresenceFixture } from '@/shared/api/clinic/presence-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
@@ -99,7 +98,6 @@ function renderShell(path = '/organization/acme/leads', content: RoomContent = {
 const header = () => screen.findByTestId('header');
 
 beforeEach(() => {
-  resetPreferencesFixture();
   resetPresenceFixture();
   notifyMock.success.mockReset();
   notifyMock.info.mockReset();
@@ -112,6 +110,7 @@ beforeEach(() => {
     } as AuthUser,
   });
   // The org owner holds every clinozy-be code (the Users room reads them, D17).
+  useOrganizationStore.getState().setOrganization('org_test', 'acme');
   useOrganizationStore
     .getState()
     .setPermissions([...organizationPermissionSchema.options]);

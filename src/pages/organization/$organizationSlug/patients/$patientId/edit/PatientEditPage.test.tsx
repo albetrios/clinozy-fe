@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import {
@@ -29,7 +28,6 @@ const DHARTI = patientRef('Dharti Galani');
 
 beforeEach(() => {
   resetClinicFixtures();
-  resetPreferencesFixture();
 });
 afterEach(() => {
   resetPatientFile();

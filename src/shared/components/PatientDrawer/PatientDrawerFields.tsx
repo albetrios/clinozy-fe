@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import {
-  type Branch,
   GENDER_VALUES,
   PATIENT_CONVERSION_VALUES,
   PATIENT_STATUS_VALUES,
@@ -94,7 +94,7 @@ export function PatientContactFields({
   /** Quick-add: the mobile's hint is "10 digits", not "primary · WhatsApp". */
   quick: boolean;
   /** The open branches; the Home branch field shows only with more than one. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   /** The branch the chips show picked: the form's, else the default. */
   homeBranchId: string | null;
   today: string;

@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { type ReactElement, useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import { DatePicker, type DatePickerProps } from './DatePicker.tsx';
@@ -46,9 +45,7 @@ function Controlled({
   );
 }
 
-beforeEach(() => {
-  resetPreferencesFixture();
-});
+beforeEach(() => {});
 
 describe('DatePicker', () => {
   it('opens on today, grouped Today / Coming up / month, at 32px with the date search', async () => {

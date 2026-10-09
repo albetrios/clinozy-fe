@@ -7,8 +7,7 @@ import {
   organizationUserCreate,
   organizationUserEdit,
 } from '@/lib/routes/users-builders.ts';
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
   compareTeamMembers,
@@ -84,7 +83,7 @@ const SORT_KEY: Readonly<Record<TeamSortColumn, TeamSortKey>> = {
  */
 function teamFilterFields(
   roles: RoleDirectory,
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
   multiBranch: boolean,
 ): RoomFilterFields {
   return {
@@ -100,7 +99,7 @@ function teamFilterFields(
 /** The copy of the Team's options filters, each value in its tone. */
 function useTeamFilterCopy(
   roles: RoleDirectory,
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
 ): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(USERS_NS);
   return {
@@ -141,7 +140,7 @@ function useTeamRows(
         teamMemberMatchesFilters(
           member,
           {
-            role: search.role as ClinicRoleKey | undefined,
+            role: search.role,
             branch: search.branch,
             status: search.status,
             created: search.created,

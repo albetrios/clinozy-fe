@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { compareOffersForList } from '@/shared/api/clinic/offerings-api.ts';
 import type {
   OfferingRecord,
@@ -94,7 +94,7 @@ export interface OfferingDrawerViewInput {
   offering: OfferingRecord | null;
   offers: readonly OfferRecord[];
   /** The open branches; "Available at" shows with two or more. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   /** The header's pricing branch (`pricingBranch`). */
   pricingBranchId: string | null;
   today: string;
@@ -151,7 +151,7 @@ function validityText(days: number, words: ViewWords): string {
 /** Step 1's heads: Name · Category · Colour · Available at · the prices and sessions. */
 function mainStepOf(
   values: OfferingFormValues,
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
   billedToday: string | null,
   words: ViewWords,
 ): OfferingStepView {

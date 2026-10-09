@@ -8,6 +8,7 @@ import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import * as preferencesApi from '@/shared/api/clinic/preferences-api.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { useOfferingsCatalogue } from './useOfferingsCatalogue.ts';
 
@@ -34,7 +35,6 @@ function wrapper({ children }: { children: ReactNode }) {
 beforeEach(() => {
   gate.failing = false;
   resetClinicFixtures();
-  preferencesApi.resetPreferencesFixture();
 });
 afterEach(() => {
   resetClinicFixtures();
@@ -76,6 +76,8 @@ describe('useOfferingsCatalogue', () => {
   });
 
   it('names the pricing branch the header picks alone', async () => {
+    // The member's preferences are read once they are signed in to an organization.
+    signInTestMember();
     const vesu = branchRef('Vesu');
     const spy = vi.spyOn(preferencesApi, 'fetchMyPreferences').mockResolvedValue({
       ...preferencesApi.DEFAULT_CLINIC_PREFERENCES,

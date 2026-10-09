@@ -2,10 +2,13 @@ import '@testing-library/jest-dom/vitest';
 import '@/lib/i18n/i18n.ts';
 
 import { configure } from '@testing-library/react';
-import { beforeAll, beforeEach, expect } from 'vitest';
+import { beforeAll, beforeEach, expect, vi } from 'vitest';
 import * as matchers from 'vitest-axe/matchers';
 
 import { ensureLocale } from '@/lib/i18n/load-namespace.ts';
+import type { ClinicPreferences } from '@/shared/api/clinic/preferences-api.ts';
+
+import { resetPreferencesDouble } from './clinic-shell-doubles.ts';
 
 expect.extend(matchers);
 
@@ -17,6 +20,24 @@ configure({ asyncUtilTimeout: 5000 });
 
 beforeAll(async () => {
   await ensureLocale('en');
+});
+
+// The clinic shell's server reads — the member's branches and preferences — as doubles, so no
+// component test reaches for HTTP (clinic-shell-doubles.ts). Each test starts on the defaults.
+vi.mock('@/shared/api/clinic/preferences-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<{
+    DEFAULT_CLINIC_PREFERENCES: ClinicPreferences;
+  }>();
+  const { preferencesDouble } = await import('./clinic-shell-doubles.ts');
+  return { ...actual, ...preferencesDouble(actual.DEFAULT_CLINIC_PREFERENCES) };
+});
+vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<object>();
+  const { fixtureActiveBranches } = await import('./clinic-shell-doubles.ts');
+  return { ...actual, fetchActiveBranches: fixtureActiveBranches };
+});
+beforeEach(() => {
+  resetPreferencesDouble();
 });
 
 // jsdom >= 30.1 parks the focus pointer on the Document when the focused node is

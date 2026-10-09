@@ -6,10 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   fetchMyPreferences,
-  resetPreferencesFixture,
   saveMyPreferences,
 } from '@/shared/api/clinic/preferences-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { Picker } from './Picker.tsx';
 import type { PickerOption, PickerSingleProps } from './picker.types.ts';
@@ -78,7 +78,7 @@ function optionRows(): HTMLElement[] {
 
 beforeEach(() => {
   tier.current = 'desktop';
-  resetPreferencesFixture();
+  signInTestMember();
 });
 
 afterEach(() => {

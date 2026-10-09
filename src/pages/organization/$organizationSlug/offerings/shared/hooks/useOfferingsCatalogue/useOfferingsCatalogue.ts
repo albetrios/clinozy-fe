@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   OfferingRecord,
@@ -24,7 +24,7 @@ export interface OfferingsCatalogue {
   /** Every live offer, in any state. */
   offers: readonly OfferRecord[];
   /** The open branches, the main branch first. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   /** Two or more open branches: only then do the Branches cells and filters show. */
   isMultiBranch: boolean;
   /** The branch prices are worked out for — the header's, when it names exactly one (H:5453). */

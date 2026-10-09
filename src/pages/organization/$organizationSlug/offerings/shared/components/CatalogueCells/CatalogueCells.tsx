@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   AvatarStack,
   type AvatarStackPerson,
@@ -75,13 +75,13 @@ export function CellText({
 interface BranchChip {
   id: string;
   label: string;
-  branch: Branch | undefined;
+  branch: BranchOption | undefined;
 }
 
 /** The chips of a Branches cell, by value (`branchValues`): branch ids or `all`. */
 function useBranchChips(
   values: readonly string[],
-  branches: readonly Branch[],
+  branches: readonly BranchOption[],
 ): BranchChip[] {
   const { t } = useTranslation(CATALOGUE_CELLS_NS);
   return values.map((value) => {
@@ -108,7 +108,7 @@ export function BranchChips({
   /** The record's chips (`branchValues`): branch ids, or `all`. */
   values: readonly string[];
   /** The open branches, for their names and tones. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
 }) {
   const chips = useBranchChips(values, branches);
   if (chips.length === 0) return null;

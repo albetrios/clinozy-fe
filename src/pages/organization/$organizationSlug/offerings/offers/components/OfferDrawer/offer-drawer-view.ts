@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { offerPreview } from '@/shared/api/clinic/offerings-pricing.ts';
 import { OFFER_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -67,7 +67,7 @@ export interface OfferDrawerViewInput {
   /** The catalogue — the picked offerings' names, prices and sessions. */
   offerings: readonly OfferingRecord[];
   /** The open branches; Branches shows with two or more. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
 }
 
 /** The words the view puts together, from the room's and the clinic's copy. */

@@ -5,12 +5,10 @@ import { axe } from 'vitest-axe';
 
 import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import {
-  fetchMyPreferences,
-  resetPreferencesFixture,
-} from '@/shared/api/clinic/preferences-api.ts';
+import { fetchMyPreferences } from '@/shared/api/clinic/preferences-api.ts';
 import { pickerTestIds } from '@/shared/components/Picker/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { BranchPicker } from './BranchPicker.tsx';
@@ -23,8 +21,8 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 beforeEach(() => {
+  signInTestMember();
   resetClinicFixtures();
-  resetPreferencesFixture();
   notifyMock.success.mockReset();
   notifyMock.info.mockReset();
   vi.restoreAllMocks();

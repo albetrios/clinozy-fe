@@ -4,6 +4,9 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as preferencesApi from '@/shared/api/clinic/preferences-api.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { usePreferences } from './usePreferences.ts';
 
@@ -22,7 +25,7 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 beforeEach(() => {
-  preferencesApi.resetPreferencesFixture();
+  signInTestMember();
 });
 
 afterEach(() => {
@@ -57,6 +60,30 @@ describe('usePreferences', () => {
     );
     expect(notifyMock.success).not.toHaveBeenCalled();
     expect(notifyMock.error).not.toHaveBeenCalled();
+  });
+
+  it('reads and saves nothing for a visitor who is not signed in — the sign-in pages', async () => {
+    useAuthStore.setState({ user: null });
+    const fetch = vi.spyOn(preferencesApi, 'fetchMyPreferences');
+    const save = vi.spyOn(preferencesApi, 'saveMyPreferences');
+    const { result } = renderHook(() => usePreferences(), { wrapper });
+    expect(result.current.isPending).toBe(false);
+    act(() => result.current.update({ pinnedSections: ['today'] }));
+    expect(result.current.preferences).toEqual(preferencesApi.DEFAULT_CLINIC_PREFERENCES);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it('keeps each organization’s record apart', async () => {
+    const { result, rerender } = renderHook(() => usePreferences(), { wrapper });
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+    act(() => result.current.update({ pinnedSections: ['tasks'] }));
+    await waitFor(() =>
+      expect(result.current.preferences.pinnedSections).toEqual(['tasks']),
+    );
+    act(() => useOrganizationStore.getState().setOrganization('org_other', 'other'));
+    rerender();
+    expect(result.current.preferences.pinnedSections).not.toEqual(['tasks']);
   });
 
   it('retries a failed save silently, then rolls back and reports it', async () => {

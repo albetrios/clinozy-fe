@@ -1,48 +1,113 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The test setup swaps this module for a double; here it is the real one, over a mocked `api`.
+vi.unmock('./preferences-api.ts');
+vi.mock('@/core/http/api.ts', () => ({ api: { get: vi.fn(), patch: vi.fn() } }));
+import { api } from '@/core/http/api.ts';
 
 import {
-  DEFAULT_CLINIC_PREFERENCES,
   fetchMyPreferences,
   recentPicksFor,
-  resetPreferencesFixture,
   saveMyPreferences,
   withRecentPick,
 } from './preferences-api.ts';
 
-beforeEach(() => {
-  resetPreferencesFixture();
+/** The record as the API answers it (the server's defaults, before a first save). */
+const record = (overrides: Record<string, unknown> = {}) => ({
+  data: {
+    id: null,
+    pinned_sections: ['appointments', 'leads', 'patients', 'payments'],
+    theme: 'light',
+    branch_ids: [],
+    patient_file_pins: ['clinical_notes', 'appointments', 'prescriptions', 'invoices'],
+    recent_picks: [],
+    created_at: null,
+    updated_at: null,
+    ...overrides,
+  },
+  meta: { request_id: 'req_1' },
 });
 
-describe('clinic preferences (fixture behind REPLACE_WITH_API)', () => {
-  it('starts on the design defaults', async () => {
+beforeEach(() => {
+  vi.resetAllMocks();
+});
+
+describe('fetchMyPreferences', () => {
+  it('reads the record and names its file pins as the file’s tabs', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(record() as never);
+
     const preferences = await fetchMyPreferences();
-    expect(preferences.pinnedSections).toEqual([
-      'appointments',
-      'leads',
-      'patients',
-      'payments',
-    ]);
-    expect(preferences.patientFilePins).toEqual([
-      'overview',
-      'visits',
-      'prescriptions',
-      'invoices',
-    ]);
-    expect(preferences.branchFilter).toEqual([]);
-    expect(preferences.theme).toBe('light');
+
+    expect(api.get).toHaveBeenCalledWith('/app/memberships/me/preferences');
+    expect(preferences).toEqual({
+      pinnedSections: ['appointments', 'leads', 'patients', 'payments'],
+      branchFilter: [],
+      theme: 'light',
+      patientFilePins: ['overview', 'visits', 'prescriptions', 'invoices'],
+      recentPicks: [],
+    });
   });
 
-  it('merges a change and keeps the rest', async () => {
-    await saveMyPreferences({ branchFilter: ['b1'] });
+  it('maps the Overview tab and drops what has no tab here', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      record({
+        pinned_sections: ['today', 'contacts', 'activity', 'stock'],
+        patient_file_pins: ['overview', 'activity', 'payments'],
+        branch_ids: ['br_aaaaaaaaaaaaaaaaaaaaa'],
+      }) as never,
+    );
+
     const preferences = await fetchMyPreferences();
-    expect(preferences.branchFilter).toEqual(['b1']);
-    expect(preferences.pinnedSections).toEqual(DEFAULT_CLINIC_PREFERENCES.pinnedSections);
+
+    expect(preferences.pinnedSections).toEqual(['today', 'stock']);
+    expect(preferences.patientFilePins).toEqual(['timeline', 'payments']);
+    expect(preferences.branchFilter).toEqual(['br_aaaaaaaaaaaaaaaaaaaaa']);
   });
 
-  it('never hands out its own record', async () => {
-    const preferences = await fetchMyPreferences();
-    preferences.pinnedSections.push('users');
-    expect((await fetchMyPreferences()).pinnedSections).not.toContain('users');
+  it('refuses an answer shaped differently', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(record({ theme: 'sepia' }) as never);
+
+    await expect(fetchMyPreferences()).rejects.toThrow();
+  });
+});
+
+describe('saveMyPreferences', () => {
+  it('sends only the fields it changes, in the API’s names', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce(
+      record({ branch_ids: ['br_aaaaaaaaaaaaaaaaaaaaa'] }) as never,
+    );
+
+    const saved = await saveMyPreferences({ branchFilter: ['br_aaaaaaaaaaaaaaaaaaaaa'] });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/memberships/me/preferences', {
+      body: { branch_ids: ['br_aaaaaaaaaaaaaaaaaaaaa'] },
+    });
+    expect(saved.branchFilter).toEqual(['br_aaaaaaaaaaaaaaaaaaaaa']);
+  });
+
+  it('names the file pins as the API does and leaves out Team notes', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce(record() as never);
+
+    await saveMyPreferences({
+      patientFilePins: ['timeline', 'overview', 'visits', 'notes'],
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/memberships/me/preferences', {
+      body: { patient_file_pins: ['overview', 'clinical_notes', 'appointments'] },
+    });
+  });
+
+  it('keeps only the recent picks the API accepts — room:field:value', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce(record() as never);
+
+    await saveMyPreferences({
+      recentPicks: ['appointments:doctor:mem_a', 'legacy:mem_b'],
+      pinnedSections: ['today'],
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/memberships/me/preferences', {
+      body: { pinned_sections: ['today'], recent_picks: ['appointments:doctor:mem_a'] },
+    });
   });
 });
 

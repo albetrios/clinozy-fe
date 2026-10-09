@@ -7,7 +7,6 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -53,7 +52,6 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   resetClinicFixtures();
-  resetPreferencesFixture();
 });
 afterEach(() => {
   resetPatientFile();

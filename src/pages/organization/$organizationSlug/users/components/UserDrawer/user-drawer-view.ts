@@ -6,7 +6,7 @@ import {
   resolveClinicAccess,
 } from '@/shared/api/clinic/access-api.ts';
 import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
 import {
@@ -75,7 +75,7 @@ export function useUserDrawerView({
   matrix: ClinicAccessMatrix | undefined;
   /** The picked roles as pills, in pick order. */
   rolePills: (keys: readonly ClinicRoleKey[]) => TeamPill[];
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   multiBranch: boolean;
   format: HoursFormat;
 }): UserDrawerView {

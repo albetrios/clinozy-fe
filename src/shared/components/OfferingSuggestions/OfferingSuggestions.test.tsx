@@ -9,7 +9,6 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => 'desktop',
 }));
 
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import {
   CONFIRM_TEST_IDS,
   confirmReasonTestId,
@@ -180,9 +179,7 @@ const row = (name: string) => {
   return found;
 };
 
-beforeEach(() => {
-  resetPreferencesFixture();
-});
+beforeEach(() => {});
 
 describe('OfferingSuggestions — header (H:2802–2804, H:4376)', () => {
   it('starts collapsed in the patient file: planned · accepted · ideas, and no rows', async () => {

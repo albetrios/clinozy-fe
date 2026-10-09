@@ -43,6 +43,9 @@ type SuccessOf<O> = O extends {
 export type ApiData<P extends ApiPath, M extends HttpMethod> =
   SuccessOf<Operation<P, M>> extends { data?: infer Data } ? Data : undefined;
 
+/** The JSON body an operation takes, as the API types it (`never` when it takes none). */
+export type ApiBody<P extends ApiPath, M extends HttpMethod> = BodyOf<Operation<P, M>>;
+
 type RequiredWhenPresent<Key extends string, Value> = [Value] extends [never]
   ? { [K in Key]?: never }
   : [Value] extends [undefined]

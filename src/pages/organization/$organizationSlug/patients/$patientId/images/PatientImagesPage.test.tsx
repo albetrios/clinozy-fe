@@ -10,7 +10,6 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { resetPreferencesFixture } from '@/shared/api/clinic/preferences-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -66,7 +65,6 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   resetClinicFixtures();
-  resetPreferencesFixture();
   useDevicePrefsStore.setState({ photoSize: 'medium' });
 });
 afterEach(() => {

@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { civilYearsBetween, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
@@ -101,7 +101,7 @@ function patientFormLabels(
 function contactPeekOf(
   values: PatientFormValues,
   labels: PatientFormLabels,
-  branch: { shown: boolean; picked: Branch | undefined },
+  branch: { shown: boolean; picked: BranchOption | undefined },
   t: TFunction,
 ): DrawerPeekItem[] {
   const digits = (value: string) => (value ? formatClinicPhoneDigits(value) : undefined);
@@ -200,7 +200,7 @@ export function usePatientDrawerView({
 }: {
   values: PatientFormValues;
   today: string;
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   homeBranchId: string | null;
 }): PatientDrawerView {
   const { t } = useTranslation(PATIENT_DRAWER_NS);

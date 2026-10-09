@@ -1,11 +1,9 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import {
-  type Branch,
-  OFFERING_CATEGORY_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import { OFFERING_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -41,15 +39,19 @@ import {
 const K = OFFERING_DRAWER_KEYS.groups;
 const F = OFFERING_DRAWER_KEYS.fields;
 
-/** What every group of fields reads: the form and its live values, the ids' prefix. */
+/** What every group of fields reads: the form, the ids' prefix, the root test id. */
 interface OfferingFieldsProps {
   form: UseFormReturn<OfferingFormValues>;
-  /** The form's values as they stand (`useWatch`), for what the fields derive. */
-  values: OfferingFormValues;
   /** Unique per drawer: the controls' DOM ids derive from it. */
   idPrefix: string;
   /** The drawer's root test id: the controls' derive from it (`offering-drawer-price`). */
   testId: string;
+}
+
+/** A group that derives from the form's live values (OFFERING, PRICING). */
+interface OfferingValueFieldsProps extends OfferingFieldsProps {
+  /** The form's values as they stand (`useWatch`), for what the fields derive. */
+  values: OfferingFormValues;
 }
 
 /**
@@ -72,9 +74,9 @@ export function OfferingIdentityFields({
   idPrefix,
   testId,
   branches,
-}: OfferingFieldsProps & {
+}: OfferingValueFieldsProps & {
   /** The open branches; "Available at" shows with two or more. */
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
 }) {
   const { t } = useTranslation(OFFERING_DRAWER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
@@ -186,7 +188,7 @@ export function OfferingPriceFields({
   floor,
   offerPriceHint,
   billedToday,
-}: OfferingFieldsProps & {
+}: OfferingValueFieldsProps & {
   /** Price and Offer price can't change (no `prices` ability). */
   pricesLocked: boolean;
   /** The Lowest price control — only with the `floor` ability; Hidden on every open. */

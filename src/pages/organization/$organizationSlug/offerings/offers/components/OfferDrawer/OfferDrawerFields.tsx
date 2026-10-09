@@ -1,9 +1,9 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import {
-  type Branch,
   OFFER_KIND_VALUES,
   OFFERING_CATEGORY_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
@@ -284,7 +284,7 @@ export function OfferWhereFields({
   today,
 }: OfferFieldsProps & {
   offerings: readonly OfferingRecord[];
-  branches: readonly Branch[];
+  branches: readonly BranchOption[];
   previews: readonly OfferPreviewBox[];
   today: string;
 }) {

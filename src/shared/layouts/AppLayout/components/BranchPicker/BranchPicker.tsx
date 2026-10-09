@@ -72,7 +72,6 @@ export function BranchPicker() {
     ...branches.map((branch) => ({
       key: branch.id,
       label: branch.name,
-      sub: branch.area,
       group: t(keys.branchesGroup),
       tone: branch.tone,
     })),

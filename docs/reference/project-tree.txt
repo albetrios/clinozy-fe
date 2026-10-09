@@ -2851,6 +2851,7 @@ clinozy-fe/
 │   │   ├── auth-api-paths.ts
 │   │   ├── axe-for-dialog.ts
 │   │   ├── bidi-marks.ts
+│   │   ├── clinic-shell-doubles.ts
 │   │   ├── e2e-api-retry.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts
