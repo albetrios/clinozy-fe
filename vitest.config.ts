@@ -91,6 +91,7 @@ export default defineConfig({
         'src/**/__tests__/**',
         'tests/**',
         'src/vite-env.d.ts',
+        'src/core/http/openapi-types.d.ts',
       ],
       // Coverage RATCHET — pinned just under measured coverage so CI fails on
       // regression, never on ambition. Raise (never lower) when coverage rises.

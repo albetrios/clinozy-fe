@@ -133,6 +133,16 @@ Further gates, all mirroring clinozy-be:
   (`../clinozy-be/docs/routes.txt`); intentional fe-ahead endpoints live in
   `tooling/ci/contract-drift-allowlist.json` with reasons, and stale entries fail the gate.
   Local-only (needs the sibling checkout); runs in pre-push.
+- **API types** (`pnpm api:types`, `pnpm api:types:check`) — `src/core/http/openapi-types.d.ts` is
+  clinozy-be's API as TypeScript types, generated from its OpenAPI document
+  (`tooling/codegen/api-types.mjs`; `pnpm docs:generate` in clinozy-be writes the document). The
+  generator drops the document's prose, shares its one error body, and applies the corrections
+  reported to clinozy-be (the error `reason`; defaulted query parameters optional). Clinic calls go
+  through `src/core/http/api.ts` (`api.get('/app/leads/{lead_id}', { params })`), which checks every
+  path, path parameter, query and body against the types; a room's Zod wire schema is checked
+  against the response type with `wireSchema<…>()` (`src/core/http/wire-schema.ts`). The check is
+  local-only like contract drift (it skips without the document) and runs in pre-push and
+  `pnpm sync:check:local`.
 - **Knip** (`pnpm knip`, `knip.jsonc`) — dead-code gate: unused files, exports, types,
   dependencies, and binaries. Validator-mandated unit barrels are entries (a unit's barrel is its
   public API); the only suppressions are declared in `knip.jsonc` with reasons. Runs in

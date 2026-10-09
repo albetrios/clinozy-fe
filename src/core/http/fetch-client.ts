@@ -44,7 +44,7 @@ export interface ResponseMeta {
   pagination?: PaginationMeta;
 }
 /** What every apiClient method resolves to: the unwrapped payload + its meta. */
-interface HttpResponse<T> {
+export interface HttpResponse<T> {
   data: T;
   meta?: ResponseMeta;
 }
@@ -297,18 +297,30 @@ async function parseJsonBody<T>(
 /** Write methods carry an auto-generated X-Idempotency-Key (server de-dupes). */
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+/**
+ * Per-call options. `idempotencyKey` is the caller's key for ONE user action: pass the same key
+ * when the user retries that action, so clinozy-be replays its first answer instead of acting twice
+ * (a create that landed but lost its response is not made again). Omitted, the call mints its own.
+ */
+export interface RequestOptions {
+  skip401?: boolean;
+  idempotencyKey?: string;
+}
+
 async function request<T>(
   method: string,
   path: string,
   body?: unknown,
-  options?: { skip401?: boolean },
+  options?: RequestOptions,
 ): Promise<HttpResponse<T>> {
   const url = buildRequestUrl(path);
   const isRefreshUrl =
     path === API_ENDPOINTS.AUTH.REFRESH || url.endsWith(API_ENDPOINTS.AUTH.REFRESH);
-  // Minted once per logical request: retries and the post-refresh replay all
-  // send the SAME key, so the server can collapse duplicates.
-  const idempotencyKey = WRITE_METHODS.has(method) ? crypto.randomUUID() : undefined;
+  // One key per logical request (or the caller's per-action key): retries and the post-refresh
+  // replay all send the SAME key, so the server can collapse duplicates.
+  const idempotencyKey = WRITE_METHODS.has(method)
+    ? (options?.idempotencyKey ?? crypto.randomUUID())
+    : undefined;
 
   function fetchOnce(): Promise<Response> {
     const headers = buildHeaders(url, idempotencyKey);
@@ -383,36 +395,36 @@ async function request<T>(
 // Public API (axios-like: .get().then(r => r.data))
 // ------------------------------------------------------------------
 export interface HttpClient {
-  get: <T>(url: string, options?: { skip401?: boolean }) => Promise<HttpResponse<T>>;
+  get: <T>(url: string, options?: RequestOptions) => Promise<HttpResponse<T>>;
   post: <T>(
     url: string,
     body?: unknown,
-    options?: { skip401?: boolean },
+    options?: RequestOptions,
   ) => Promise<HttpResponse<T>>;
   put: <T>(
     url: string,
     body?: unknown,
-    options?: { skip401?: boolean },
+    options?: RequestOptions,
   ) => Promise<HttpResponse<T>>;
   patch: <T>(
     url: string,
     body?: unknown,
-    options?: { skip401?: boolean },
+    options?: RequestOptions,
   ) => Promise<HttpResponse<T>>;
-  delete: <T>(url: string, options?: { skip401?: boolean }) => Promise<HttpResponse<T>>;
+  delete: <T>(url: string, options?: RequestOptions) => Promise<HttpResponse<T>>;
 }
 
 function createHttpClient(_overrides?: Partial<HttpClientConfig>): HttpClient {
   return {
-    get: <T>(path: string, options?: { skip401?: boolean }) =>
+    get: <T>(path: string, options?: RequestOptions) =>
       request<T>('GET', path, undefined, options),
-    post: <T>(path: string, body?: unknown, options?: { skip401?: boolean }) =>
+    post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
       request<T>('POST', path, body, options),
-    put: <T>(path: string, body?: unknown, options?: { skip401?: boolean }) =>
+    put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
       request<T>('PUT', path, body, options),
-    patch: <T>(path: string, body?: unknown, options?: { skip401?: boolean }) =>
+    patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
       request<T>('PATCH', path, body, options),
-    delete: <T>(path: string, options?: { skip401?: boolean }) =>
+    delete: <T>(path: string, options?: RequestOptions) =>
       request<T>('DELETE', path, undefined, options),
   };
 }

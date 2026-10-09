@@ -1,9 +1,9 @@
 # launch-2026-09-30-jxmr — API integration plan (L-60)
 
-**Status: draft for approval (2026-10-09). No code has changed.** This is the plan that replaces every
-fixture-backed and planned call in the clinic with clinozy-be's built API, and removes the design
-features the backend dropped. It is written before any code, as asked; the build starts once it is
-approved and the blocking questions in [§10](#10-open-questions) are answered.
+**Status: approved (2026-10-09, [D148](decisions.md)); the build is under way.** This is the plan that
+replaces every fixture-backed and planned call in the clinic with clinozy-be's built API, and removes
+the design features the backend dropped. It was written before any code, as asked. The five questions
+the foundation needed are answered (§10); the rest are asked as each screen comes up.
 
 ## 0. Where this sits
 
@@ -374,8 +374,10 @@ reaches: Q2.
 
 ## 8. Gaps — what a screen needs and the API does not have
 
-Proposed rule (Q1): **the element is removed** in this integration and the request listed here for
-the backend; no client-side substitute, and no reads fanned out per row.
+The rule (Q1, D148): a small gap is **implemented** — in clinozy-be when it is the API's, in the
+client only as a composition of existing routes (never a read per row) — and a larger one is
+**removed** from the screen and listed here for the backend. Each room's report says which way each
+gap went.
 
 | #   | Screen       | Needs                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -437,20 +439,23 @@ around. "Doc" is the OpenAPI document.
 
 ## 10. Open questions
 
-**Before the foundation** (they shape every room):
+**Before the foundation — answered 2026-10-09 ([D148](decisions.md)):**
 
-1. **Q1 — the gap rule.** Remove each element in §8 and list it for the backend, with no client
-   substitute and no per-row reads? (Proposed: yes.)
-2. **Q10 — money in rupees.** The domain contracts move from paise to rupees (JSON numbers with 2
-   places) as the API sends them. (Proposed: yes.)
-3. **Q11 — the type generator.** Add `openapi-typescript` as a pinned devDependency, commit the
-   generated types, check them with `pnpm api:types:check`. (Proposed: yes.)
-4. **Q3 — your own membership (B2).** Until `/auth/me/context` carries `membership_id`: find it in
-   `GET /app/memberships` by `user_id` (all pages; no `user_id` filter), or leave "Mine" / "(you)" /
-   owner filters off. (Proposed: find it, once per session, and list N10 for the backend.)
-5. **Q12 — data to verify against.** Demo Organization is empty. Create records through the screens
-   and the API on the local stack while verifying (writes on the local database only), and ask the
-   backend for a seeded demo clinic with the role presets. (Proposed: yes.)
+1. **Q1 — the gap rule.** _Answer: "implement if anything smaller, else remove it."_ A gap in §8 is
+   implemented when it is small — in clinozy-be when it is the API's (through clinozy-be's own
+   iteration process: its launch iteration is `done`, so a `fix` iteration), in the client only as a
+   composition of existing routes, never a read per row — and otherwise removed from the screen and
+   listed for the backend.
+2. **Q10 — money in rupees.** _Answer: yes._ The domain contracts move from paise to rupees (JSON
+   numbers with 2 places) as the API sends them.
+3. **Q11 — the type generator.** _Answer: yes._ `openapi-typescript` as a pinned devDependency, the
+   generated types committed, checked with `pnpm api:types:check`.
+4. **Q3 — your own membership (B2).** _Answer: as proposed._ Found once per session in
+   `GET /app/memberships` by `user_id` (all pages; no `user_id` filter) until `/auth/me/context`
+   carries `membership_id`; N10 stays listed for the backend.
+5. **Q12 — data to verify against.** _Answer: yes._ Records are created through the screens and the
+   API on the local stack while verifying (the local database only), and the backend is asked for a
+   seeded demo clinic with the role presets.
 
 **Per screen** (needed when that screen comes up):
 

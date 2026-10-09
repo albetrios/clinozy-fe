@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": {
-    "includes": ["src/**", "tests/**", "plugins/**", "tooling/**/*.mjs", "!**/*.css"]
+    "includes": [
+      "src/**",
+      "tests/**",
+      "plugins/**",
+      "tooling/**/*.mjs",
+      "!**/*.css",
+      "!src/core/http/openapi-types.d.ts"
+    ]
   },
   "vcs": {
     "enabled": true,

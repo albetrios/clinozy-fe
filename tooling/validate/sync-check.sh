@@ -9,7 +9,7 @@
 # `pnpm docs:staleness` scan.
 #
 #   pnpm sync:check          the CI-safe deterministic set
-#   pnpm sync:check:local    + contracts:drift (needs the sibling clinozy-be checkout)
+#   pnpm sync:check:local    + contracts:drift, api:types:check (need the sibling clinozy-be checkout)
 #
 # NOT included: the advisory `docs:staleness` semantic scan (allowed to have
 # false positives → canary issue, never a hard gate).
@@ -62,6 +62,7 @@ run "agent-os platform wiring  (agent-os:generate:check)"  pnpm agent-os:generat
 
 if [ "$LOCAL" = 1 ]; then
   run "API contract drift        (contracts:drift)"   pnpm contracts:drift
+  run "API types vs OpenAPI      (api:types:check)"   pnpm api:types:check
 fi
 
 echo ""

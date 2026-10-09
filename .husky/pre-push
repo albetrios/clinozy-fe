@@ -57,6 +57,10 @@ fi
 # clinozy-be checkout is absent). Catches endpoint typos before they ship.
 pnpm contracts:drift
 
+# API types — src/core/http/openapi-types.d.ts must match clinozy-be's OpenAPI document
+# (`pnpm docs:generate` there; skips with a notice when the document is absent).
+pnpm api:types:check
+
 # SonarQube quality gate — scans against the local SonarQube server and BLOCKS the push if any
 # unresolved Sonar issue exists. Runs only when the pushed commits touch deployed-surface code
 # (src/ runtime — the only thing Sonar analyzes; tests/mocks/fixtures/scripts are excluded). The

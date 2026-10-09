@@ -322,6 +322,45 @@ describe('fetch-client', () => {
       expect(first.get('X-Idempotency-Key')).toBe(replay.get('X-Idempotency-Key'));
       expect(first.get('X-Idempotency-Key')).toMatch(/[0-9a-f-]{36}/);
     });
+
+    it("a caller's key (one per user action) is sent as given, on every write method", async () => {
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.post('/things', { a: 1 }, { idempotencyKey: 'action-key-0001' });
+      await apiClient.patch('/things/1', { a: 2 }, { idempotencyKey: 'action-key-0002' });
+      await apiClient.put('/things/1', { a: 3 }, { idempotencyKey: 'action-key-0003' });
+      await apiClient.delete('/things/1', { idempotencyKey: 'action-key-0004' });
+
+      const keys = fetchMock.mock.calls.map((call) =>
+        ((call[1] as RequestInit).headers as Headers).get('X-Idempotency-Key'),
+      );
+      expect(keys).toEqual([
+        'action-key-0001',
+        'action-key-0002',
+        'action-key-0003',
+        'action-key-0004',
+      ]);
+    });
+
+    it("a caller's key survives the 401 refresh replay", async () => {
+      fetchMock.mockResolvedValueOnce(unauthorized()).mockResolvedValueOnce(ok());
+
+      await apiClient.post('/things', { a: 1 }, { idempotencyKey: 'action-key-0005' });
+
+      const keys = fetchMock.mock.calls.map((call) =>
+        ((call[1] as RequestInit).headers as Headers).get('X-Idempotency-Key'),
+      );
+      expect(keys).toEqual(['action-key-0005', 'action-key-0005']);
+    });
+
+    it('a read ignores a key it is given', async () => {
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.get('/things', { idempotencyKey: 'action-key-0006' });
+
+      const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+      expect(headers.get('X-Idempotency-Key')).toBeNull();
+    });
   });
 
   describe('write methods (PUT / DELETE)', () => {
