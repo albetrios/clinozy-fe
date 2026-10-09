@@ -21,8 +21,8 @@
  *
  *   - M5 — the error body gains `reason`: the server sends it on a 409 (and on several 400s,
  *     403s and 422s) and the document leaves it out;
- *   - M6 — a query parameter with a `default` is optional: the document marks `limit` and the
- *     `include_*` flags required while the server applies their defaults.
+ *   - M6 — what has a `default` is optional: the document marks `limit`, the `include_*` flags
+ *     and body fields such as `expires_in_days` required while the server applies their defaults.
  *
  * The answers the document leaves untyped (M3: slots, daily counts, messaging status, offering
  * ideas) stay untyped here; their rooms' wire schemas carry the live shape.
@@ -126,7 +126,31 @@ export function shareErrorResponses(document) {
   return true;
 }
 
-/** M6: a query parameter the server defaults is not required of the caller. */
+/** A request body schema's `required` lists without the fields it gives a `default`, at any depth. */
+function relaxDefaultedProperties(schema) {
+  if (!schema || typeof schema !== 'object') return;
+  for (const part of [
+    ...(schema.allOf ?? []),
+    ...(schema.oneOf ?? []),
+    ...(schema.anyOf ?? []),
+  ]) {
+    relaxDefaultedProperties(part);
+  }
+  if (schema.items) relaxDefaultedProperties(schema.items);
+  const properties = schema.properties ?? {};
+  if (Array.isArray(schema.required)) {
+    schema.required = schema.required.filter(
+      (name) => properties[name]?.default === undefined,
+    );
+    if (schema.required.length === 0) delete schema.required;
+  }
+  for (const property of Object.values(properties)) relaxDefaultedProperties(property);
+}
+
+/**
+ * M6: what the server defaults is not required of the caller — a query parameter with a
+ * `default` (`limit`, `include_ended`) and a request-body field with one (`expires_in_days`).
+ */
 export function relaxDefaultedQueryParameters(document) {
   for (const operation of operationsOf(document)) {
     for (const parameter of operation.parameters ?? []) {
@@ -138,6 +162,9 @@ export function relaxDefaultedQueryParameters(document) {
         parameter.required = false;
       }
     }
+    relaxDefaultedProperties(
+      operation.requestBody?.content?.['application/json']?.schema,
+    );
   }
 }
 

@@ -8680,9 +8680,9 @@ export interface operations {
                     last_name?: string | null;
                     phones: {
                         /** @default true */
-                        is_on_whatsapp: boolean;
+                        is_on_whatsapp?: boolean;
                         /** @default false */
-                        is_primary: boolean;
+                        is_primary?: boolean;
                         phone: string;
                     }[];
                     preference_tags?: string[];
@@ -8907,9 +8907,9 @@ export interface operations {
                     last_name?: string | null;
                     phones?: {
                         /** @default true */
-                        is_on_whatsapp: boolean;
+                        is_on_whatsapp?: boolean;
                         /** @default false */
-                        is_primary: boolean;
+                        is_primary?: boolean;
                         phone: string;
                     }[];
                     preference_tags?: string[];
@@ -11252,9 +11252,9 @@ export interface operations {
                         last_name?: string | null;
                         phones: {
                             /** @default true */
-                            is_on_whatsapp: boolean;
+                            is_on_whatsapp?: boolean;
                             /** @default false */
-                            is_primary: boolean;
+                            is_primary?: boolean;
                             phone: string;
                         }[];
                         preference_tags?: string[];
@@ -16938,9 +16938,9 @@ export interface operations {
                         last_name?: string | null;
                         phones: {
                             /** @default true */
-                            is_on_whatsapp: boolean;
+                            is_on_whatsapp?: boolean;
                             /** @default false */
-                            is_primary: boolean;
+                            is_primary?: boolean;
                             phone: string;
                         }[];
                         preference_tags?: string[];
@@ -26025,7 +26025,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @default false */
-                    is_primary: boolean;
+                    is_primary?: boolean;
                     /** @enum {string} */
                     method_type: "EMAIL_CODE";
                 };
@@ -28196,7 +28196,7 @@ export interface operations {
                 "application/json": {
                     events: string[];
                     /** @default true */
-                    is_enabled: boolean;
+                    is_enabled?: boolean;
                     secret?: string;
                     /** Format: uri */
                     url: string;
@@ -29243,7 +29243,7 @@ export interface operations {
                     /** Format: email */
                     email: string;
                     /** @default 7 */
-                    expires_in_days: number;
+                    expires_in_days?: number;
                     phone?: string | null;
                     role_ids: string[];
                     /** @enum {string} */
@@ -29561,7 +29561,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @default 7 */
-                    expires_in_days: number;
+                    expires_in_days?: number;
                 };
             };
         };
@@ -29775,9 +29775,9 @@ export interface operations {
                     /** @enum {string} */
                     channel: "EMAIL" | "SMS" | "WEB_PUSH" | "IN_APP";
                     /** @default true */
-                    default_enabled: boolean;
+                    default_enabled?: boolean;
                     /** @default false */
-                    is_mandatory: boolean;
+                    is_mandatory?: boolean;
                     /** Format: date-time */
                     muted_until?: string | null;
                     /** @enum {string} */

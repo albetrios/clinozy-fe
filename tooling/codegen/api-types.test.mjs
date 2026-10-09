@@ -133,6 +133,48 @@ describe('api-types: relaxDefaultedQueryParameters', () => {
   });
 });
 
+describe('api-types: defaulted body fields (M6)', () => {
+  it('drops a defaulted field from a body’s required list, at any depth', () => {
+    const document = documentWith({
+      post: {
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['email', 'expires_in_days'],
+                properties: {
+                  email: { type: 'string' },
+                  expires_in_days: { type: 'integer', default: 7 },
+                  phones: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: ['phone', 'is_primary'],
+                      properties: {
+                        phone: { type: 'string' },
+                        is_primary: { type: 'boolean', default: false },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    relaxDefaultedQueryParameters(document);
+
+    const schema =
+      document.paths['/api/v1/app/things'].post.requestBody.content['application/json']
+        .schema;
+    assert.deepEqual(schema.required, ['email']);
+    assert.deepEqual(schema.properties.phones.items.required, ['phone']);
+  });
+});
+
 describe('api-types: prepareDocument and renderModule', () => {
   it('reduces and corrects the document without changing the input', () => {
     const raw = documentWith({
