@@ -216,7 +216,7 @@ stored as `other` with its label leading the note.
 | Passkeys      | `useRemovePasskey`                                                | `optimistic`                     |
 | Webhooks      | `useDeleteWebhook`                                                | `optimistic`                     |
 | Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
-| Leads         | `useDeleteLead`, `useMarkLeadRead` (silent read receipt)          | `optimisticInfinite`             |
+| Leads         | `useDeleteLead` (every cached list page at once)                  | `optimisticInfinite`             |
 | Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
 | Appointments  | `useSetAppointmentStatus` (Agenda, calendars and drawer at once)  | `optimisticQueries`              |
 | Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
@@ -234,7 +234,8 @@ behind the undo toast by their panels (see above), which is why all three take a
 - **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`, `useCreateAppointment`
 - **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead`, `useUpdateAppointment` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch), `useRestoreAppointment` (a cancelled booking back to Scheduled)
 - **Appointment status:** `useCancelAppointment` (`S:1611`: not optimistic) and the optimistic `useSetAppointmentStatus` answer an Undo token — their toast's Undo (`useUndoAppointmentChange`) reverts the status and every side effect (open leads → Clinic visited, the rule tasks)
-- **Lead ownership:** `useClaimLead`, `useAssignLead` (`notify.undo` — Undo puts the team back), `useReleaseLead`; a status save's "<name> → <status>" toast also carries Undo (`useUpdateLead`)
+- **Lead ownership:** `useClaimLead`, `useAssignLead`, `useReleaseLead`, `useSetLeadInvolved` — clinozy-be has no undo for a claim, an assign or a release, so their toasts carry none, and neither does a status save's "<name> → <status>" (`useUpdateLead`)
+- **Contacts:** `useUpdateContact` (the lead drawer's Edit contact; sends `expected_updated_at`, a `409 record_changed` offers Reload)
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 
 > **Invitations ride on memberships.** clinozy-be has no invitation list: an invite is
