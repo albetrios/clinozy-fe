@@ -21,12 +21,10 @@ import {
   type LeadKind,
   type LeadStatus,
   type PatientType,
-  phoneSchema,
-  presenceSchema,
-  roleSchema,
+  type Presence,
+  type Role,
   roomSchema,
   type Tone,
-  toneSchema,
 } from './clinic-schema.ts';
 import type { LeadRecordSource } from './leads-contracts.ts';
 
@@ -65,53 +63,43 @@ export const appointmentRecordSchema = appointmentSchema.extend({
 export type AppointmentRecord = z.infer<typeof appointmentRecordSchema>;
 
 /** Who a booking is for: a patient, a lead, or a contact (a contact-thread lead, D32). */
-const APPOINTMENT_PERSON_KINDS = ['patient', 'lead', 'contact'] as const;
-/** One kind of person. */
-export type AppointmentPersonKind = (typeof APPOINTMENT_PERSON_KINDS)[number];
+export type AppointmentPersonKind = 'patient' | 'lead' | 'contact';
 
 /** The booked person as every view shows them (avatar, name, mobile, "P" badge). */
-const appointmentPersonSchema = z.object({
-  kind: z.enum(APPOINTMENT_PERSON_KINDS),
-  name: z.string(),
-  phone: phoneSchema.nullable(),
-  patientId: z.uuid().nullable(),
-  leadId: z.uuid().nullable(),
+export interface AppointmentPerson {
+  kind: AppointmentPersonKind;
+  name: string;
+  /** An Indian mobile in E.164. */
+  phone: string | null;
+  patientId: string | null;
+  leadId: string | null;
   /** The patient's or the lead's `seq`; null for a contact. */
-  seq: z.number().int().nonnegative().nullable(),
-});
-/** The booked person. */
-export type AppointmentPerson = z.infer<typeof appointmentPersonSchema>;
+  seq: number | null;
+}
 
 /** A bookable staff member — the doctor chip, the doctor pickers, the Day strip. */
-const appointmentStaffSchema = z.object({
-  id: z.uuid(),
-  firstName: z.string(),
-  lastName: z.string().nullable(),
-  initials: z.string(),
-  tone: toneSchema,
+export interface AppointmentStaff {
+  id: string;
+  firstName: string;
+  lastName: string | null;
+  initials: string;
+  tone: Tone;
   /** Real roles — a therapist reads "Therapist", never "Doctor" (§7.3). */
-  roles: z.array(roleSchema),
-  presence: presenceSchema,
-  active: z.boolean(),
-});
-/** A bookable staff member. */
-export type AppointmentStaff = z.infer<typeof appointmentStaffSchema>;
+  roles: Role[];
+  presence: Presence;
+  active: boolean;
+}
 
 /**
  * One appointment as a view reads it: the record, the person and the doctor
  * joined, and the plan behind "Plan ready · <n> offerings" — the suggestions
  * for this visit and the patient's whole plan (`S:352`, derived, never stored).
  */
-export const appointmentRowSchema = appointmentRecordSchema.extend({
-  person: appointmentPersonSchema,
-  doctor: appointmentStaffSchema.nullable(),
-  plan: z.object({
-    visit: z.number().int().nonnegative(),
-    patient: z.number().int().nonnegative(),
-  }),
-});
-/** An appointment row. */
-export type AppointmentRow = z.infer<typeof appointmentRowSchema>;
+export type AppointmentRow = AppointmentRecord & {
+  person: AppointmentPerson;
+  doctor: AppointmentStaff | null;
+  plan: { visit: number; patient: number };
+};
 
 // ── Lengths and slots ──
 

@@ -44,27 +44,15 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
     "medicines_one": "{{count}} दवा लिखी गई",
-    "medicines_other": "{{count}} दवाएँ लिखी गईं",
-    "rooms": {
-      "roomOne": "कमरा 1",
-      "roomTwo": "कमरा 2",
-      "laserRoom": "लेज़र कमरा"
-    }
+    "medicines_other": "{{count}} दवाएँ लिखी गईं"
   },
   "flags": {
     "newLead": "नई लीड",
     "confirmed": "पुष्ट",
     "unconfirmed": "अपुष्ट",
-    "firstVisit": "पहली विज़िट",
-    "packLeft": "पैक में {{left}} बाकी",
-    "due": "बकाया {{amount}}",
-    "allergy": "{{name}} एलर्जी",
     "waiting": "{{minutes}} मिनट से प्रतीक्षा",
     "inRoom": "कमरे में {{minutes}} मिनट",
-    "session": "सत्र {{number}} / {{total}}",
-    "toPay": "{{amount}} देना है",
     "rxApproved": "पर्चा स्वीकृत {{time}}"
   },
   "toasts": {

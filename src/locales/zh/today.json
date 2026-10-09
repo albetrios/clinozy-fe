@@ -43,26 +43,14 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
-    "medicines_other": "已开 {{count}} 种药",
-    "rooms": {
-      "roomOne": "1 号诊室",
-      "roomTwo": "2 号诊室",
-      "laserRoom": "激光室"
-    }
+    "medicines_other": "已开 {{count}} 种药"
   },
   "flags": {
     "newLead": "新线索",
     "confirmed": "已确认",
     "unconfirmed": "未确认",
-    "firstVisit": "初诊",
-    "packLeft": "疗程包剩 {{left}} 次",
-    "due": "欠款 {{amount}}",
-    "allergy": "{{name}}过敏",
     "waiting": "已等 {{minutes}} 分钟",
     "inRoom": "在诊室 {{minutes}} 分钟",
-    "session": "第 {{number}}/{{total}} 次",
-    "toPay": "应付 {{amount}}",
     "rxApproved": "处方已批准 {{time}}"
   },
   "toasts": {

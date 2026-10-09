@@ -11,8 +11,6 @@ import { createInvoice } from './invoices-api.ts';
 import { medicineStock } from './medicine-stock.ts';
 import { receivePayment } from './payments-api.ts';
 import { createPrescription } from './prescriptions-api.ts';
-import { fetchTodayFloor } from './today-api.ts';
-import { todayLaneOf } from './today-contracts.ts';
 import { createTreatment } from './treatments-api.ts';
 import {
   completeVisit,
@@ -216,10 +214,6 @@ async function sessionAt(seq: number) {
 const stageOf = async (seq: number) => (await fetchVisit(visitOf(seq))).visit.stage;
 const bookingStatusOf = async (seq: number) =>
   (await clinicFixtures.appointments.get(appointmentOf(seq))).status;
-/** A booking's card on Today's floor — undefined once it has left. */
-const floorCardOf = async (seq: number) =>
-  (await fetchTodayFloor()).find((row) => row.id === appointmentOf(seq));
-
 /** Receive an amount against an invoice, as the flow's Collect and the Receive drawer write it. */
 async function receive(seq: number, invoiceId: string, amount: number) {
   const invoice = await clinicFixtures.invoices.get(invoiceId);
@@ -291,7 +285,7 @@ describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
     expect(after.pack?.sessionsUsed).toBe(4);
   });
 
-  it('a receipt at Checkout sends a visit with an Rx to fill to the pharmacy, its booking completed — the sale takes the card off Today', async () => {
+  it('a receipt at Checkout sends a visit with an Rx to fill to the pharmacy, its booking completed — the sale fills it', async () => {
     const prescription = await prescribeAt(2866);
     const { invoice } = await createVisitBill({ visitId: visitOf(2866) });
     const due = invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due;
@@ -299,20 +293,16 @@ describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
     await receive(2866, invoice.id, Math.floor(due / 2));
     expect(await stageOf(2866)).toBe('pharmacy');
     expect(await bookingStatusOf(2866)).toBe('completed');
-    const card = await floorCardOf(2866);
-    expect(card && todayLaneOf(card)).toBe('pharmacy');
-    expect(card?.prescription?.id).toBe(prescription.id);
+    expect((await fetchVisit(visitOf(2866))).rxToFill).toBe(true);
 
     await dispense(2866, prescription.id);
-    expect(await floorCardOf(2866)).toBeUndefined();
+    expect((await fetchVisit(visitOf(2866))).rxToFill).toBe(false);
   });
 
-  it('a receipt that pays the bill in full with nothing to fill completes the visit and its booking — off the floor (S:352)', async () => {
-    expect(await floorCardOf(2864)).toBeDefined();
+  it('a receipt that pays the bill in full with nothing to fill completes the visit and its booking (S:352)', async () => {
     await receive(2864, ref.invoice(791), 371_700);
     expect(await stageOf(2864)).toBe('done');
     expect(await bookingStatusOf(2864)).toBe('completed');
-    expect(await floorCardOf(2864)).toBeUndefined();
   });
 
   it('a part payment with nothing to fill leaves the visit at Checkout for “Complete visit”', async () => {
@@ -355,9 +345,8 @@ describe('the records written at a visit move it on (D18, S:352; L-64)', () => {
       invoice.id,
       invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due,
     );
-    const card = await floorCardOf(2866);
-    expect(card && todayLaneOf(card)).toBe('pharmacy');
-    expect(card?.prescription?.id).toBe(prescription.id);
+    expect(await stageOf(2866)).toBe('pharmacy');
+    expect((await fetchVisit(visitOf(2866))).rxToFill).toBe(true);
   });
 
   it('leaves an Rx written with no open visit without a booking', async () => {

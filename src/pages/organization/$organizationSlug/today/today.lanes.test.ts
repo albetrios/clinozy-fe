@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { ROLE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { TODAY_LANES, type TodayLane } from '@/shared/api/clinic/today-contracts.ts';
+import {
+  type FloorStage,
+  TODAY_LANES,
+  type TodayLane,
+} from '@/shared/api/clinic/today-contracts.ts';
 
-import { enquiry, floorRow, uuid } from './__tests__/integration/today-fixtures.ts';
+import { enquiry, floorRow, publicId } from './__tests__/integration/today-fixtures.ts';
+
+/** A row's id for the tests. */
+const rowId = (n: number) => publicId('appt', n);
 import {
   defaultTodayLane,
   groupTodayLanes,
@@ -16,37 +23,28 @@ import {
   todayPulse,
 } from './today.lanes.ts';
 
-/** The booking status a lane's placeholder card needs. */
-function statusOf(lane: TodayLane) {
-  if (lane === 'arriving') return 'scheduled' as const;
-  if (lane === 'pharmacy') return 'completed' as const;
-  return 'checked_in' as const;
-}
-
 /** Lanes with `n` placeholder cards in the named lanes (the rest empty). */
 function lanesWith(counts: Partial<Record<TodayLane, number>>): TodayLanes {
   const rows = Object.entries(counts).flatMap(([lane, count]) =>
     Array.from({ length: count ?? 0 }, (_, index) => {
-      const id = uuid(100 + index + TODAY_LANES.indexOf(lane as TodayLane) * 10);
+      const id = rowId(100 + index + TODAY_LANES.indexOf(lane as TodayLane) * 10);
       if (lane === 'enquiries') return { kind: 'enquiry' as const, id };
       return { kind: 'row' as const, id, lane: lane as TodayLane };
     }),
   );
-  const visitStage = (lane: TodayLane) =>
-    lane === 'waiting' ? null : { id: uuid(7), stage: lane as never, stageAt: '' };
   return groupTodayLanes(
     rows.flatMap((row) =>
       row.kind === 'row'
         ? [
-            floorRow({
-              id: row.id,
-              status: statusOf(row.lane),
-              visit: row.lane === 'arriving' ? null : visitStage(row.lane),
-              prescription:
-                row.lane === 'pharmacy'
-                  ? { id: uuid(8), approvedAt: '2026-10-03T04:35:00.000Z', items: 3 }
-                  : null,
-            }),
+            floorRow(
+              row.lane === 'arriving'
+                ? { id: row.id, status: 'scheduled' }
+                : {
+                    id: row.id,
+                    status: 'checked_in',
+                    visitStage: row.lane as FloorStage,
+                  },
+            ),
           ]
         : [],
     ),
@@ -58,29 +56,24 @@ describe('groupTodayLanes (KICKOFF §6.2 Stage machine)', () => {
   it('puts every booking in its lane and each lane in time order', () => {
     const lanes = groupTodayLanes(
       [
-        floorRow({ id: uuid(1), status: 'scheduled', startTime: '11:30' }),
-        floorRow({ id: uuid(2), status: 'confirmed', startTime: '11:15' }),
-        floorRow({ id: uuid(3), status: 'checked_in', startTime: '10:40' }),
+        floorRow({ id: rowId(1), status: 'scheduled', startTime: '11:30' }),
+        floorRow({ id: rowId(2), status: 'confirmed', startTime: '11:15' }),
+        floorRow({ id: rowId(3), status: 'checked_in', startTime: '10:40' }),
         floorRow({
-          id: uuid(4),
+          id: rowId(4),
           status: 'checked_in',
           startTime: '10:20',
-          visit: {
-            id: uuid(40),
-            stage: 'with_doctor',
-            stageAt: '2026-10-03T05:03:00.000Z',
-          },
+          visitStage: 'with_doctor',
+          visitStageChangedAt: '2026-10-03T05:03:00.000Z',
         }),
-        floorRow({ id: uuid(5), status: 'cancelled' }),
       ],
-      [enquiry({ id: uuid(6) })],
+      [enquiry({ id: rowId(6) })],
     );
-    expect(lanes.arriving.map((card) => card.id)).toEqual([uuid(2), uuid(1)]);
-    expect(lanes.waiting.map((card) => card.id)).toEqual([uuid(3)]);
-    expect(lanes.with_doctor.map((card) => card.id)).toEqual([uuid(4)]);
+    expect(lanes.arriving.map((card) => card.id)).toEqual([rowId(2), rowId(1)]);
+    expect(lanes.waiting.map((card) => card.id)).toEqual([rowId(3)]);
+    expect(lanes.with_doctor.map((card) => card.id)).toEqual([rowId(4)]);
     expect(lanes.enquiries).toMatchObject([{ kind: 'enquiry', time: '10:31' }]);
     expect(Object.keys(lanes)).toEqual([...TODAY_LANES]);
-    // A cancelled booking is off the floor.
     expect(Object.values(lanes).flat()).toHaveLength(5);
   });
 });
@@ -148,7 +141,7 @@ describe('laneHint (today.md:33)', () => {
   const cards = (times: string[]) =>
     groupTodayLanes(
       times.map((startTime, index) =>
-        floorRow({ id: uuid(index + 1), status: 'checked_in', startTime }),
+        floorRow({ id: rowId(index + 1), status: 'checked_in', startTime }),
       ),
       [],
     ).waiting;
@@ -186,20 +179,20 @@ describe('laneFaces (today.md:32)', () => {
     const lanes = groupTodayLanes(
       names.map((name, index) =>
         floorRow({
-          id: uuid(index + 1),
+          id: rowId(index + 1),
           status: 'checked_in',
           startTime: `10:0${index}`,
-          person: { ...floorRow().person, name },
+          name,
         }),
       ),
       [],
     );
     expect(laneFaces(lanes.waiting)).toEqual({
       faces: [
-        { id: uuid(1), initials: 'RS' },
-        { id: uuid(2), initials: 'NR' },
-        { id: uuid(3), initials: 'MJ' },
-        { id: uuid(4), initials: 'FS' },
+        { id: rowId(1), initials: 'RS' },
+        { id: rowId(2), initials: 'NR' },
+        { id: rowId(3), initials: 'MJ' },
+        { id: rowId(4), initials: 'FS' },
       ],
       more: 2,
     });

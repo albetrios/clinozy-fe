@@ -43,26 +43,14 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
-    "medicines_other": "처방약 {{count}}개",
-    "rooms": {
-      "roomOne": "1번 방",
-      "roomTwo": "2번 방",
-      "laserRoom": "레이저실"
-    }
+    "medicines_other": "처방약 {{count}}개"
   },
   "flags": {
     "newLead": "신규 리드",
     "confirmed": "확정",
     "unconfirmed": "미확정",
-    "firstVisit": "첫 방문",
-    "packLeft": "패키지 {{left}}회 남음",
-    "due": "미수 {{amount}}",
-    "allergy": "{{name}} 알레르기",
     "waiting": "대기 {{minutes}}분",
     "inRoom": "진료실 {{minutes}}분",
-    "session": "{{total}}회 중 {{number}}회차",
-    "toPay": "결제 {{amount}}",
     "rxApproved": "처방 승인 {{time}}"
   },
   "toasts": {

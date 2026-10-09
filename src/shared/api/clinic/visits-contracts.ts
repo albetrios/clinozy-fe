@@ -34,7 +34,7 @@ export const VISIT_STAGES = [
   'done',
 ] as const;
 /** Zod enum of the stages. */
-export const visitStageSchema = z.enum(VISIT_STAGES);
+const visitStageSchema = z.enum(VISIT_STAGES);
 /** One stage. */
 export type VisitStage = z.infer<typeof visitStageSchema>;
 

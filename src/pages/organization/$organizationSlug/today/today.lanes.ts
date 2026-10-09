@@ -163,7 +163,7 @@ export type TodayCard =
       id: string;
       lane: 'enquiries';
       name: string;
-      /** Clinic-local `HH:mm` — when they last wrote. */
+      /** Clinic-local `HH:mm` — the enquiry's latest activity. */
       time: string;
       enquiry: TodayEnquiry;
     };
@@ -175,8 +175,8 @@ const byTime = (a: TodayCard, b: TodayCard) =>
   a.time.localeCompare(b.time) || a.name.localeCompare(b.name);
 
 /**
- * Group the floor (`listTodayFloor`, by start time) and today's enquiries into
- * the seven lanes. A booking off the floor is dropped (D20: no Done lane).
+ * Group the floor (today's open bookings, by start time) and today's enquiries
+ * into the seven lanes (D20: no Done lane — a completed booking is not read).
  */
 export function groupTodayLanes(
   rows: readonly TodayFloorRow[],
@@ -191,18 +191,17 @@ export function groupTodayLanes(
       id: enquiry.id,
       lane: 'enquiries',
       name: enquiry.name,
-      time: clinicClockTime(new Date(enquiry.askedAt)),
+      time: clinicClockTime(new Date(enquiry.lastActivityAt)),
       enquiry,
     });
   }
   for (const row of rows) {
     const lane = todayLaneOf(row);
-    if (!lane || lane === 'enquiries') continue;
     lanes[lane].push({
       kind: 'booking',
       id: row.id,
       lane,
-      name: row.person.name,
+      name: row.name,
       time: row.startTime,
       row,
     });
@@ -242,7 +241,7 @@ export function laneHint(
   lane: TodayLane,
   cards: readonly TodayCard[],
 ): TodayLaneHint | null {
-  const earliest = cards.map((card) => card.time).sort()[0];
+  const earliest = cards.map((card) => card.time).sort((a, b) => a.localeCompare(b))[0];
   if (earliest === undefined) return null;
   if (lane === 'enquiries') return { kind: 'oldest', time: earliest };
   if (lane === 'arriving') return { kind: 'next', time: earliest };

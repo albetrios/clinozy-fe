@@ -8,10 +8,9 @@ import {
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import { patientVisitTarget } from '@/shared/clinic/visit-redirect.ts';
-import { useSetAppointmentStatus } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
-import { useSetVisitStage, useUndoVisitChange } from '@/shared/hooks/useVisits/index.ts';
+import { useTodayMoves } from '@/shared/hooks/useTodayFloor/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { TODAY_KEYS, TODAY_NS } from '../../today.constants.ts';
@@ -33,44 +32,45 @@ export interface FloorActions {
 }
 
 /**
- * The floor's actions (KICKOFF §6.2 lanes table, Stage machine): "Book" opens
- * the enquiry's lead drawer; "Check in" moves the booking to Checked in and
- * "Send in" moves its visit to the doctor — both at once, with their own toast
- * and Undo, which reverts the side effects too; "Open session" and "Checkout"
- * open the patient's own page with the visit flow (`timeline?visit=open`,
- * §6.6), where the session, the bill and the collection are written and the
- * card moves on; "Dispense" opens the sale drawer from the Rx. With doctor
- * has no action (L-64: the consult is the patient page's — the card's name
- * opens it). Each is hidden from a member who can't take it: Book needs Leads
- * View, Check in and Send in Appointments Edit, Open session Patients View and
- * the treatments gate (Doctor, Therapist — `S:38`), Checkout Patients View and
- * Payments Create, Dispense Medical Create; a booking with no patient record
- * has no page to open.
+ * The floor's actions (KICKOFF §6.2 lanes table): "Book" opens the enquiry's
+ * lead; "Check in" checks the booking in (`POST …/check-in` — the server opens
+ * the patient file and moves the open lead to Clinic visited) with an Undo
+ * while the visit waits; "Send in" moves the visit to the doctor (`POST
+ * …/stage`, forward only, so no Undo); "Open session" and "Checkout" open the
+ * patient's own page with the visit flow (`timeline?visit=open`, §6.6);
+ * "Dispense" opens the sale drawer from the approved Rx. With doctor has no
+ * action (L-64: the consult is the patient page's — the card's name opens it).
+ * Each is hidden from a member who can't take it: Book needs Leads View, Check
+ * in and Send in Appointments Edit (`appointment:update`), Open session
+ * Patients View and the treatments gate, Checkout Patients View and Payments
+ * Create, Dispense Medical Create; a booking with no patient file has no page
+ * to open.
  */
 export function useFloorActions(organizationSlug: string): FloorActions {
   const { t } = useTranslation(TODAY_NS);
   const navigate = useClinicNavigate();
   const access = useClinicAccess();
-  const checkIn = useSetAppointmentStatus({
-    announce: ({ appointment }) =>
-      t(TODAY_KEYS.toasts.checkedIn, { name: appointment.person.name }),
-  });
-  const moveStage = useSetVisitStage();
-  const undoStage = useUndoVisitChange();
+  const moves = useTodayMoves();
   const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
   const canEditBookings = access.can('appointments', 'edit');
 
-  const sendIn = async (card: TodayCard) => {
+  const checkIn = async (card: TodayCard) => {
     try {
-      const change = await moveStage.mutateAsync({
-        appointmentId: card.id,
-        stage: 'with_doctor',
-      });
-      notify.undo(t(TODAY_KEYS.toasts.sentIn, { name: card.name }), {
-        onUndo: () => undoStage.mutate(change.undoToken),
+      await moves.checkIn.mutateAsync(card.id);
+      notify.undo(t(TODAY_KEYS.toasts.checkedIn, { name: card.name }), {
+        onUndo: () => moves.undoCheckIn.mutate(card.id),
       });
     } catch {
-      // The write's hook has toasted its error, and the card is back in Waiting.
+      // The write's hook has toasted the server's words; the card stays in Arriving.
+    }
+  };
+
+  const sendIn = async (card: TodayCard) => {
+    try {
+      await moves.moveStage.mutateAsync({ appointmentId: card.id, stage: 'with_doctor' });
+      notify.success(t(TODAY_KEYS.toasts.sentIn, { name: card.name }));
+    } catch {
+      // The write's hook has toasted the server's words; the card stays in Waiting.
     }
   };
 
@@ -93,7 +93,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
 
   /** "Open session" · "Checkout": the patient's page, the visit flow open, Today the way back. */
   const openPatientVisit = (row: TodayFloorRow, allowed: boolean) => {
-    const { patientId } = row.person;
+    const { patientId } = row;
     if (!(allowed && patientId && access.can('patients', 'view'))) return null;
     return () => {
       rememberVisitCard(row.id);
@@ -106,8 +106,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     Record<TodayLane, (card: BookingCard) => (() => void) | null>
   > = {
     enquiries: () => null,
-    arriving: ({ row }) =>
-      canEditBookings ? () => checkIn.mutate({ id: row.id, status: 'checked_in' }) : null,
+    arriving: (card) => (canEditBookings ? () => void checkIn(card) : null),
     waiting: (card) => (canEditBookings ? () => void sendIn(card) : null),
     with_doctor: () => null,
     treatment: ({ row }) =>
@@ -126,20 +125,19 @@ export function useFloorActions(organizationSlug: string): FloorActions {
       openLead(card.id);
       return;
     }
-    const { person } = card.row;
-    if (person.patientId) {
+    const { patientId, leadId } = card.row;
+    if (patientId) {
       go(
         taskTargetNavigation(
-          { kind: 'patient', patientId: person.patientId, section: 'timeline' },
+          { kind: 'patient', patientId, section: 'timeline' },
           organizationSlug,
           REFERRER,
         ),
       );
       return;
     }
-    // A chat-only contact has a thread, not a lead the Leads room shows.
-    if (person.leadId && person.kind === 'lead') {
-      openLead(person.leadId);
+    if (leadId) {
+      openLead(leadId);
       return;
     }
     notify.info(t(TODAY_KEYS.toasts.noRecord, { name: card.name }));

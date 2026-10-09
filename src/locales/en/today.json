@@ -44,27 +44,15 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
     "medicines_one": "{{count}} medicine prescribed",
-    "medicines_other": "{{count}} medicines prescribed",
-    "rooms": {
-      "roomOne": "Room 1",
-      "roomTwo": "Room 2",
-      "laserRoom": "Laser room"
-    }
+    "medicines_other": "{{count}} medicines prescribed"
   },
   "flags": {
     "newLead": "New lead",
     "confirmed": "Confirmed",
     "unconfirmed": "Unconfirmed",
-    "firstVisit": "First visit",
-    "packLeft": "Pack {{left}} left",
-    "due": "Due {{amount}}",
-    "allergy": "{{name}} allergy",
     "waiting": "Waiting {{minutes}} min",
     "inRoom": "In room {{minutes}} min",
-    "session": "Session {{number}} of {{total}}",
-    "toPay": "{{amount}} to pay",
     "rxApproved": "Rx approved {{time}}"
   },
   "toasts": {

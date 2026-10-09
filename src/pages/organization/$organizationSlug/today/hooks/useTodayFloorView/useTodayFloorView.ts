@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import type { TodayEnquiry } from '@/shared/api/clinic/today-contracts.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTodayEnquiries, useTodayFloor } from '@/shared/hooks/useTodayFloor/index.ts';
@@ -19,17 +20,22 @@ export interface TodayFloorView {
 
 /**
  * The floor as the room shows it (KICKOFF §6.2 Route and data, States): the
- * day's bookings and open enquiries in the header's branches (the D32
- * preference, read once it has loaded), polled every 60s; their lanes and the
- * pulse. A failed read toasts "Couldn’t load this list · connection dropped.
+ * day's bookings and — for a member who sees Leads — the open enquiries, in
+ * the header's branches (the D32 preference, read once it has loaded), polled
+ * every 60s; their lanes and the pulse. A failed read toasts "Couldn’t load this list · connection dropped.
  * Showing the last copy." with Retry, once, and the last copy stays.
  */
 export function useTodayFloorView(): TodayFloorView {
   const { preferences, isPending: preferencesPending } = usePreferences();
+  const readsEnquiries = useClinicAccess().can('leads', 'view');
   const params = { branchIds: preferences.branchFilter };
   const options = { enabled: !preferencesPending, notifyOnError: false };
   const floor = useTodayFloor(params, options);
-  const enquiries = useTodayEnquiries(params, options);
+  const enquiries = useTodayEnquiries(params, {
+    ...options,
+    enabled: options.enabled && readsEnquiries,
+  });
+  const enquiriesPending = readsEnquiries && enquiries.isPending;
   const { refetch: refetchFloor } = floor;
   const { refetch: refetchEnquiries } = enquiries;
   const retry = useCallback(() => {
@@ -38,7 +44,7 @@ export function useTodayFloorView(): TodayFloorView {
   }, [refetchFloor, refetchEnquiries]);
   const rows = useListLoadError(
     {
-      isError: floor.isError || enquiries.isError,
+      isError: floor.isError || (readsEnquiries && enquiries.isError),
       refetch: retry,
       rows: floor.data,
       isPending: floor.isPending,
@@ -50,6 +56,6 @@ export function useTodayFloorView(): TodayFloorView {
   return {
     lanes,
     pulse: todayPulse(lanes),
-    loading: floor.isPending || enquiries.isPending,
+    loading: floor.isPending || enquiriesPending,
   };
 }

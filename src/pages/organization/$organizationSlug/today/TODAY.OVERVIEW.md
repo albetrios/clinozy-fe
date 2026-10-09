@@ -27,23 +27,25 @@ line a text step lighter — the design's 70%, kept at AA contrast) and toasts
 Today (`components/TodayBooking/`), a record follow-on navigates. "What’s next" chains
 only in the Tasks room.
 
-Data: `listTodayFloor` (today's bookings joined with their visit, first visit, dues, today's
-bill, pack and unfilled Rx) and the open enquiries of today, in the header's branches (the
-D32 branch preference), polled every 60s and refetched by every booking, visit, lead or task
-write — `src/shared/api/clinic/today-api.ts` on the fixture server (REPLACE_WITH_API). The
-lane rule (`todayLaneOf`) is shared with the server; the pulse is derived. "Check in" is the
-shared status move (`useSetAppointmentStatus`, optimistic, Undo reverts its side effects);
-"Send in" moves the D18 Visit's stage (`useSetVisitStage`, optimistic, Undo — the Visit is
-plan-only, `src/shared/api/clinic/visits-*`); "Open session" and "Checkout" open the patient's
-own page with the visit flow (`patients/$patientId/timeline?visit=open&from=today`, §6.6) — the
-Rx, the session, the bill and the collection are written there, each moving the visit on (the
-card changes lane: a receipt at Checkout sends a visit whose Rx is still to fill to the pharmacy,
-its booking completed, so the sale takes the card off the floor, and completes one paid in full
-with nothing to fill), and the flow's Pause / Complete visit (or that Collect) come back here,
-focus on the card's action (`today.focus.ts`). The Visit sheet (`/visits/$visitId`) is gone (L-64): an old link
-redirects to the visit's patient page. A failed read toasts "Couldn’t load this list ·
-connection dropped. Showing the last copy." with Retry and keeps the last copy; the first load
-wears the in-place skeleton.
+Data — clinozy-be (`src/shared/api/clinic/today-api.ts`, api-integration §5.1, D149): every
+page of the day's scheduled, confirmed and checked-in bookings (`GET /app/appointments`, the
+header's branches from the member's preferences, D32), the doctors' and rooms' names (one
+read per set, cached) and — for a member holding `patient_prescription:read` — the pharmacy
+queue's approved Rx by appointment; the enquiries awaiting a reply whose latest activity is
+today (`GET /app/leads`, for a member who sees Leads). Both poll every 60s, wait for the
+member's access, and are refetched by every booking or lead write. A card's lane is its
+booking's `status` and `visit_stage` (`todayLaneOf`); the pulse is counted from the floor. "Check
+in" is `POST …/check-in` (the server opens the patient file and moves the open lead to
+Clinic visited) with an Undo (`POST …/undo-check-in`, while the visit waits); "Send in" is
+`POST …/stage` to `with_doctor` — forward only, so no Undo; each carries the action's
+idempotency key and a refusal toasts the server's words. "Open session" and "Checkout" open
+the patient's own page with the visit flow (`patients/$patientId/timeline?visit=open&from=today`,
+§6.6), and the flow's Pause / Complete visit come back here, focus on the card's action
+(`today.focus.ts`). The design's first visit, pack, dues, "₹n to pay", allergies and the
+enquiry's words have no field in the API and are not shown (G1). The work queue still reads
+the Tasks fixtures until the Tasks room goes live, so `clinic-today` stays fixture-backed until
+then. A failed read toasts "Couldn’t load this list · connection dropped. Showing the last
+copy." with Retry and keeps the last copy; the first load wears the in-place skeleton.
 
 ## Files
 
@@ -54,7 +56,7 @@ wears the in-place skeleton.
 | `today.search.ts`           | URL schema (`validateSearch`): `lane` (one of the seven), `queue` (`mine`, `everyone`) — entry-resident, so built on `src/lib/routes/search-params.ts` only.                                                     |
 | `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                      |
 | `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                |
-| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`) and their tones.                                                                                                                                         |
+| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`: channel, new lead, confirmed, minutes waiting or in the room, the Rx) and their tones.                                                                   |
 | `today.focus.ts`            | The card whose lane action opened the patient's visit flow, remembered for its panel to focus again (memory only, handed out once).                                                                              |
 | `TodayPage.tsx`             | Room page — greeting row, tiles, panel, work queue, the stacked booking form. Owns `data-testid="today-page"`.                                                                                                   |
 | `components/TodayGreeting/` | The greeting (the page's h1), the pulse, "New booking" and "Walk-in".                                                                                                                                            |

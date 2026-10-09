@@ -71,29 +71,15 @@ export const TODAY_KEYS = {
   card: {
     /** "Hydrafacial · Room 2" — the service and where (or with whom). */
     service: 'card.service',
-    /** "Acne scars — asks price, Saturday?" — the interest and their words. */
-    enquiry: 'card.enquiry',
     /** "3 medicines prescribed" (plural). */
     medicines: 'card.medicines',
-    /** Each room by name, keyed by the stored room (`ROOM_VALUES`; "any" names no place). */
-    rooms: {
-      room_1: 'card.rooms.roomOne',
-      room_2: 'card.rooms.roomTwo',
-      laser_room: 'card.rooms.laserRoom',
-    },
   },
   flags: {
     newLead: 'flags.newLead',
     confirmed: 'flags.confirmed',
     unconfirmed: 'flags.unconfirmed',
-    firstVisit: 'flags.firstVisit',
-    packLeft: 'flags.packLeft',
-    due: 'flags.due',
-    allergy: 'flags.allergy',
     waiting: 'flags.waiting',
     inRoom: 'flags.inRoom',
-    session: 'flags.session',
-    toPay: 'flags.toPay',
     rxApproved: 'flags.rxApproved',
   },
   toasts: {

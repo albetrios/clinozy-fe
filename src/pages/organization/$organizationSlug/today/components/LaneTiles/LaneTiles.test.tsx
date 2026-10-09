@@ -6,7 +6,7 @@ import { axe } from 'vitest-axe';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { floorRow, uuid } from '../../__tests__/integration/today-fixtures.ts';
+import { floorRow, publicId } from '../../__tests__/integration/today-fixtures.ts';
 import { groupTodayLanes, todayFocus } from '../../today.lanes.ts';
 import { LaneTiles } from './LaneTiles.tsx';
 
@@ -21,10 +21,10 @@ const NAMES = [
 const LANES = groupTodayLanes(
   NAMES.map((name, index) =>
     floorRow({
-      id: uuid(index + 1),
+      id: publicId('appt', index + 1),
       status: 'checked_in',
       startTime: `10:4${index}`,
-      person: { ...floorRow().person, name },
+      name,
     }),
   ),
   [],

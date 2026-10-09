@@ -4,11 +4,9 @@ import type {
   CompleteVisitInput,
   CreateVisitBillInput,
   SetVisitChecksInput,
-  SetVisitStageInput,
   ShareVisitInput,
   StartVisitInput,
   VisitCatalog,
-  VisitChange,
   VisitCompletion,
   VisitDetail,
   VisitRecord,
@@ -42,16 +40,6 @@ export const visitQueryKeys = {
  * follows (an Rx, a session, a receipt) refresh them too.
  */
 export const VISIT_WRITE_KEYS = [visitQueryKeys.all, appointmentQueryKeys.all] as const;
-
-/** Move a checked-in booking's visit to a stage — "Send in" moves it to the doctor. */
-export async function setVisitStage(input: SetVisitStageInput): Promise<VisitChange> {
-  return (await server()).setVisitStage(input);
-}
-
-/** Undo a stage write by the token it answered. */
-export async function undoVisitChange(undoToken: string): Promise<void> {
-  return (await server()).undoVisitChange(undoToken);
-}
 
 /** One visit with the records written at it (`getVisit`) — a 404 when it is unknown or gone. */
 export async function fetchVisit(id: string): Promise<VisitDetail> {

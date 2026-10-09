@@ -3,13 +3,10 @@ export {
   useCreateVisitBill,
   useOpenVisit,
   useSetVisitChecks,
-  useSetVisitStage,
   useShareVisit,
   useStartVisit,
-  useUndoVisitChange,
   useVisitCatalog,
   useVisitDetail,
   type VisitWriteOptions,
   withVisitChecks,
-  withVisitStage,
 } from './useVisits.ts';

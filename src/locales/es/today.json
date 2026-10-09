@@ -45,28 +45,16 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
     "medicines_one": "{{count}} medicamento recetado",
     "medicines_many": "{{count}} medicamentos recetados",
-    "medicines_other": "{{count}} medicamentos recetados",
-    "rooms": {
-      "roomOne": "Sala 1",
-      "roomTwo": "Sala 2",
-      "laserRoom": "Sala láser"
-    }
+    "medicines_other": "{{count}} medicamentos recetados"
   },
   "flags": {
     "newLead": "Prospecto nuevo",
     "confirmed": "Confirmada",
     "unconfirmed": "Sin confirmar",
-    "firstVisit": "Primera visita",
-    "packLeft": "Quedan {{left}} del paquete",
-    "due": "Debe {{amount}}",
-    "allergy": "Alergia: {{name}}",
     "waiting": "Esperando {{minutes}} min",
     "inRoom": "En sala {{minutes}} min",
-    "session": "Sesión {{number}} de {{total}}",
-    "toPay": "{{amount}} por pagar",
     "rxApproved": "Receta aprobada {{time}}"
   },
   "toasts": {

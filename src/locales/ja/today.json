@@ -43,26 +43,14 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
-    "medicines_other": "処方薬 {{count}}件",
-    "rooms": {
-      "roomOne": "1番室",
-      "roomTwo": "2番室",
-      "laserRoom": "レーザー室"
-    }
+    "medicines_other": "処方薬 {{count}}件"
   },
   "flags": {
     "newLead": "新規リード",
     "confirmed": "確認済み",
     "unconfirmed": "未確認",
-    "firstVisit": "初診",
-    "packLeft": "パック残り{{left}}回",
-    "due": "未払い {{amount}}",
-    "allergy": "{{name}}アレルギー",
     "waiting": "待ち {{minutes}}分",
     "inRoom": "入室 {{minutes}}分",
-    "session": "{{total}}回中{{number}}回目",
-    "toPay": "支払い {{amount}}",
     "rxApproved": "処方承認 {{time}}"
   },
   "toasts": {

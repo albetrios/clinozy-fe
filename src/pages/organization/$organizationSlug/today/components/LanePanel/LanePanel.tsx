@@ -9,7 +9,6 @@ import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
 import { TODAY_FLAG_TONES, todayCardFlags, type TodayFlag } from '../../today.flags.ts';
@@ -38,30 +37,16 @@ function useFlagWords(today: string): (flag: TodayFlag) => string {
   const { t } = useTranslation(TODAY_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { formatNumber } = useLocaleFormat();
-  const money = usePaiseFormat();
   const clock = useClinicClock();
   const K = TODAY_KEYS.flags;
   return (flag) => {
     switch (flag.id) {
       case 'channel':
         return tClinic(CLINIC_KEYS.channels[flag.channel]);
-      case 'packLeft':
-        return t(K.packLeft, { left: formatNumber(flag.left) });
-      case 'due':
-        return t(K.due, { amount: money(flag.paise) });
-      case 'allergy':
-        return t(K.allergy, { name: flag.name });
       case 'waiting':
         return t(K.waiting, { minutes: formatNumber(flag.minutes) });
       case 'inRoom':
         return t(K.inRoom, { minutes: formatNumber(flag.minutes) });
-      case 'session':
-        return t(K.session, {
-          number: formatNumber(flag.number),
-          total: formatNumber(flag.total),
-        });
-      case 'toPay':
-        return t(K.toPay, { amount: money(flag.paise) });
       case 'rxApproved':
         return t(K.rxApproved, { time: clock.wallTime(today, flag.time) });
       default:
@@ -124,7 +109,7 @@ function VisitCard({
         <span className="flex flex-wrap gap-1">
           {flags.map((flag) => (
             <span
-              key={flag.id === 'allergy' ? `allergy-${flag.name}` : flag.id}
+              key={flag.id}
               data-slot="pill"
               className={cn(
                 'text-micro rounded-full px-1.75 py-px leading-[normal]',

@@ -4,14 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  checkInAppointment,
+  moveFloorStage,
+  undoCheckIn,
+} from '@/shared/api/clinic/today-api.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { enquiry, floorRow, uuid } from '../../__tests__/integration/today-fixtures.ts';
+import {
+  enquiry,
+  floorRow,
+  publicId,
+} from '../../__tests__/integration/today-fixtures.ts';
 import {
   renderTodayRoute,
   resetTodayRoute,
@@ -24,6 +29,15 @@ import { type FloorActions, useFloorActions } from './useFloorActions.ts';
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
+vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  checkInAppointment: vi.fn(),
+  undoCheckIn: vi.fn(),
+  moveFloorStage: vi.fn(),
+}));
+
+/** A row's id for the tests. */
+const rowId = (n: number) => publicId('appt', n);
 
 /** The hook as the room holds it, read after each render. */
 const probe: { actions: FloorActions | null } = { actions: null };
@@ -46,28 +60,22 @@ async function actionsFor(role: Role) {
 
 const LANES = groupTodayLanes(
   [
-    floorRow({ id: ref.appointment(2869), status: 'confirmed' }),
-    floorRow({ id: uuid(2), status: 'checked_in' }),
+    floorRow({ id: rowId(1), name: 'Faizan Shaikh', status: 'confirmed' }),
+    floorRow({ id: rowId(2), name: 'Rhea Shah', status: 'checked_in' }),
+    floorRow({ id: rowId(3), status: 'checked_in', visitStage: 'treatment' }),
+    floorRow({ id: rowId(4), status: 'checked_in', visitStage: 'with_doctor' }),
     floorRow({
-      id: uuid(3),
+      id: rowId(5),
       status: 'checked_in',
-      visit: { id: uuid(30), stage: 'treatment', stageAt: '2026-10-03T04:55:00.000Z' },
+      visitStage: 'pharmacy',
+      prescription: {
+        id: publicId('rx', 50),
+        patientId: publicId('pat', 2),
+        approvedAt: '2026-10-03T04:35:00.000Z',
+        items: 3,
+      },
     }),
-    floorRow({
-      id: uuid(4),
-      status: 'checked_in',
-      visit: { id: '', stage: 'with_doctor', stageAt: '2026-10-03T05:00:00.000Z' },
-    }),
-    floorRow({
-      id: uuid(5),
-      status: 'completed',
-      prescription: { id: uuid(50), approvedAt: '2026-10-03T04:35:00.000Z', items: 3 },
-    }),
-    floorRow({
-      id: uuid(6),
-      status: 'checked_in',
-      visit: { id: uuid(60), stage: 'checkout', stageAt: '2026-10-03T05:05:00.000Z' },
-    }),
+    floorRow({ id: rowId(6), status: 'checked_in', visitStage: 'checkout' }),
   ],
   [enquiry()],
 );
@@ -80,7 +88,7 @@ function cardIn(lane: keyof typeof LANES): TodayCard {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
-  for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
+  vi.resetAllMocks();
   probe.actions = null;
   resetClinicFixtures();
 });
@@ -111,19 +119,54 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(probe.actions?.actionOf(cardIn('enquiries'))).toBeNull();
   });
 
-  it('checks in through the status machine with Today’s own words', async () => {
+  it('checks in with Today’s own words, and its Undo undoes the check-in', async () => {
     await actionsFor('front_desk');
     await waitFor(() =>
       expect(probe.actions?.actionOf(cardIn('arriving'))).toBeTypeOf('function'),
     );
     act(() => probe.actions?.actionOf(cardIn('arriving'))?.());
     await waitFor(() => expect(notify.undo).toHaveBeenCalled());
-    expect(vi.mocked(notify.undo).mock.lastCall?.[0]).toBe(
-      'Faizan Shaikh checked in · Dr. queue and room notified',
+    expect(checkInAppointment).toHaveBeenCalledWith({
+      appointmentId: rowId(1),
+      idempotencyKey: expect.any(String),
+    });
+    const [message, options] = vi.mocked(notify.undo).mock.lastCall ?? [];
+    expect(message).toBe('Faizan Shaikh checked in · Dr. queue and room notified');
+    act(() => options?.onUndo());
+    await waitFor(() =>
+      expect(undoCheckIn).toHaveBeenCalledWith({
+        appointmentId: rowId(1),
+        idempotencyKey: expect.any(String),
+      }),
     );
-    expect(
-      clinicFixtures.appointments.snapshot((row) => row.seq === 2869)[0]?.status,
-    ).toBe('checked_in');
+  });
+
+  it('sends in to the doctor with a plain toast — a stage move has no Undo', async () => {
+    await actionsFor('front_desk');
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('waiting'))).toBeTypeOf('function'),
+    );
+    act(() => probe.actions?.actionOf(cardIn('waiting'))?.());
+    await waitFor(() =>
+      expect(notify.success).toHaveBeenCalledWith('Rhea Shah sent in to the doctor'),
+    );
+    expect(moveFloorStage).toHaveBeenCalledWith({
+      appointmentId: rowId(2),
+      stage: 'with_doctor',
+      idempotencyKey: expect.any(String),
+    });
+    expect(notify.undo).not.toHaveBeenCalled();
+  });
+
+  it('keeps the card where it is when the server refuses the move', async () => {
+    vi.mocked(checkInAppointment).mockRejectedValueOnce(new Error('not due'));
+    await actionsFor('front_desk');
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('arriving'))).toBeTypeOf('function'),
+    );
+    act(() => probe.actions?.actionOf(cardIn('arriving'))?.());
+    await waitFor(() => expect(notify.error).toHaveBeenCalled());
+    expect(notify.undo).not.toHaveBeenCalled();
   });
 
   it('opens a therapist’s session on the patient’s page, the visit flow open (L-64)', async () => {
@@ -134,7 +177,7 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     act(() => probe.actions?.actionOf(cardIn('treatment'))?.());
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${uuid(2)}/timeline`,
+        `/organization/acme/patients/${publicId('pat', 2)}/timeline`,
       ),
     );
     expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
@@ -151,7 +194,7 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     act(() => probe.actions?.actionOf(cardIn('checkout'))?.());
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${uuid(2)}/timeline`,
+        `/organization/acme/patients/${publicId('pat', 2)}/timeline`,
       ),
     );
     expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
@@ -165,23 +208,16 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(probe.actions?.actionOf(cardIn('with_doctor'))).toBeNull();
   });
 
-  it('has no page to open for a booking with no patient record', async () => {
+  it('has no page to open for a booking with no patient file', async () => {
     await actionsFor('admin');
     const [card] = groupTodayLanes(
       [
         floorRow({
-          id: uuid(7),
+          id: rowId(7),
           status: 'checked_in',
+          visitStage: 'checkout',
           patientId: null,
-          person: {
-            kind: 'lead',
-            name: 'Kabir',
-            phone: null,
-            patientId: null,
-            leadId: uuid(70),
-            seq: 1,
-          },
-          visit: { id: uuid(71), stage: 'checkout', stageAt: '2026-10-03T05:05:00.000Z' },
+          leadId: publicId('lead', 70),
         }),
       ],
       [],
@@ -193,58 +229,49 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(probe.actions?.actionOf(card)).toBeNull();
   });
 
-  it('opens an enquiry’s lead, a patient’s file, or says there is no record', async () => {
+  it('opens an enquiry’s lead, a patient’s file, the open lead, or says there is no record', async () => {
     const { router } = await actionsFor('front_desk');
     act(() => probe.actions?.open(cardIn('enquiries')));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`/organization/acme/leads/${uuid(50)}`),
+      expect(router.state.location.pathname).toBe(
+        `/organization/acme/leads/${publicId('lead', 50)}`,
+      ),
     );
     act(() => probe.actions?.open(cardIn('waiting')));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${uuid(2)}/timeline`,
+        `/organization/acme/patients/${publicId('pat', 2)}/timeline`,
       ),
     );
-    const lead = groupTodayLanes(
+    const [lead, nobody] = groupTodayLanes(
       [
         floorRow({
+          id: rowId(8),
+          name: 'Kabir',
+          startTime: '11:00',
           status: 'confirmed',
           patientId: null,
-          person: {
-            kind: 'lead',
-            name: 'Kabir',
-            phone: null,
-            patientId: null,
-            leadId: uuid(60),
-            seq: 1,
-          },
+          leadId: publicId('lead', 60),
+        }),
+        floorRow({
+          id: rowId(9),
+          name: 'Faizan',
+          startTime: '11:30',
+          status: 'confirmed',
+          patientId: null,
+          leadId: null,
         }),
       ],
       [],
-    ).arriving[0];
-    const contact = groupTodayLanes(
-      [
-        floorRow({
-          status: 'confirmed',
-          patientId: null,
-          person: {
-            kind: 'contact',
-            name: 'Faizan',
-            phone: null,
-            patientId: null,
-            leadId: uuid(61),
-            seq: null,
-          },
-        }),
-      ],
-      [],
-    ).arriving[0];
-    if (!(lead && contact)) throw new Error('no card');
+    ).arriving;
+    if (!(lead && nobody)) throw new Error('no card');
     act(() => probe.actions?.open(lead));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`/organization/acme/leads/${uuid(60)}`),
+      expect(router.state.location.pathname).toBe(
+        `/organization/acme/leads/${publicId('lead', 60)}`,
+      ),
     );
-    act(() => probe.actions?.open(contact));
+    act(() => probe.actions?.open(nobody));
     expect(notify.info).toHaveBeenCalledWith('No patient record yet for Faizan');
   });
 });

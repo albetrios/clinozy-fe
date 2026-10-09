@@ -6,18 +6,20 @@ import { axe } from 'vitest-axe';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as TodayApiModule from '@/shared/api/clinic/today-api.ts';
-import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
+import type {
+  TodayEnquiry,
+  TodayFloorRow,
+  TodayLane,
+} from '@/shared/api/clinic/today-contracts.ts';
 import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { TodayPage } from '../../TodayPage.tsx';
+import { publicId, seededFloor } from './today-fixtures.ts';
 import { renderTodayRoute, resetTodayRoute, TODAY_PATH } from './today-test-router.tsx';
 
 vi.mock('@/shared/notify/index.ts', () => ({
@@ -32,15 +34,52 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-/** Fails the floor read while `failing` is set — the room's list error. */
-const floorGate = vi.hoisted(() => ({ failing: false }));
+/** The floor the mocked Today API serves and moves; `failing` fails its read. */
+const floor = vi.hoisted(() => ({
+  failing: false,
+  rows: [] as TodayFloorRow[],
+  enquiries: [] as TodayEnquiry[],
+}));
 vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TodayApiModule>();
+  const move = (id: string, patch: Partial<TodayFloorRow>) => {
+    floor.rows = floor.rows.map((row) => (row.id === id ? { ...row, ...patch } : row));
+  };
   return {
     ...actual,
-    fetchTodayFloor: async (...args: Parameters<typeof actual.fetchTodayFloor>) => {
-      if (floorGate.failing) throw new Error('connection dropped');
-      return actual.fetchTodayFloor(...args);
+    fetchTodayFloor: async () => {
+      if (floor.failing) throw new Error('connection dropped');
+      return structuredClone(floor.rows);
+    },
+    fetchTodayEnquiries: async () => structuredClone(floor.enquiries),
+    checkInAppointment: async ({ appointmentId }: { appointmentId: string }) => {
+      const at = new Date().toISOString();
+      move(appointmentId, {
+        status: 'checked_in',
+        visitStage: 'waiting',
+        checkedInAt: at,
+        visitStageChangedAt: at,
+      });
+    },
+    undoCheckIn: async ({ appointmentId }: { appointmentId: string }) => {
+      move(appointmentId, {
+        status: 'confirmed',
+        visitStage: null,
+        checkedInAt: null,
+        visitStageChangedAt: null,
+      });
+    },
+    moveFloorStage: async ({
+      appointmentId,
+      stage,
+    }: {
+      appointmentId: string;
+      stage: TodayFloorRow['visitStage'];
+    }) => {
+      move(appointmentId, {
+        visitStage: stage,
+        visitStageChangedAt: new Date().toISOString(),
+      });
     },
   };
 });
@@ -100,8 +139,9 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
   useLocaleStore.setState({ hourCycle: 'h23' });
-  floorGate.failing = false;
+  Object.assign(floor, seededFloor(), { failing: false });
   for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
+  // The work queue still reads the fixture world's tasks.
   resetClinicFixtures();
 });
 afterEach(() => {
@@ -128,7 +168,7 @@ describe('the Today room (KICKOFF §6.2)', () => {
       within(panel())
         .getAllByTestId('today-card')
         .map((card) => card.dataset.cardId),
-    ).toEqual([ref.lead(2364), ref.lead(2363)]);
+    ).toEqual([publicId('lead', 2364), publicId('lead', 2363)]);
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -195,17 +235,15 @@ describe('the Today room (KICKOFF §6.2)', () => {
     await waitFor(() => expect(countOf('arriving')).toBe('2'));
   });
 
-  it('sends in at once, and Undo puts the visit back', async () => {
+  it('sends in at once with its own toast — a stage move has no Undo', async () => {
     const user = userEvent.setup();
     renderTodayRoute(`${TODAY_PATH}?lane=waiting`, TodayPage);
     await loaded();
     await user.click(within(cardNamed('Rhea Shah')).getByTestId('today-card-action'));
     await waitFor(() => expect(countOf('with_doctor')).toBe('2'));
-    await waitFor(() => expect(notify.undo).toHaveBeenCalled());
-    const undo = lastUndo();
-    expect(undo.message).toBe('Rhea Shah sent in to the doctor');
-    act(() => undo.onUndo());
-    await waitFor(() => expect(countOf('waiting')).toBe('3'));
+    expect(countOf('waiting')).toBe('2');
+    expect(notify.success).toHaveBeenCalledWith('Rhea Shah sent in to the doctor');
+    expect(notify.undo).not.toHaveBeenCalled();
   });
 
   it('hides the lane actions a role can’t take (§3.7, §6.13)', async () => {
@@ -239,10 +277,9 @@ describe('the Today room (KICKOFF §6.2)', () => {
     );
     expect(checkout).toHaveTextContent('Checkout');
     await user.click(checkout);
-    const booking = await clinicFixtures.appointments.get(ref.appointment(2864));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${booking.patientId}/timeline`,
+        `/organization/acme/patients/${publicId('pat', 2864)}/timeline`,
       ),
     );
     expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
@@ -252,7 +289,7 @@ describe('the Today room (KICKOFF §6.2)', () => {
       within(await screen.findByTestId('today-panel')).getByTestId('today-card-action'),
     );
     // New sale opens over Today, which stays — the URL bar on the sale (A-P1).
-    const sale = `medical/sales/create?prescription=${ref.prescription(501)}&from=today`;
+    const sale = `medical/sales/create?prescription=${publicId('rx', 501)}&from=today`;
     await waitFor(() =>
       expect(router.history.location.href).toBe(`/organization/acme/${sale}`),
     );
@@ -270,7 +307,7 @@ describe('the Today room (KICKOFF §6.2)', () => {
     );
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/leads/${ref.lead(2364)}`,
+        `/organization/acme/leads/${publicId('lead', 2364)}`,
       ),
     );
   });
@@ -284,7 +321,7 @@ describe('the Today room (KICKOFF §6.2)', () => {
     await user.click(within(cardNamed('Priti Soni')).getByTestId('today-card-open'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${ref.patient(3511)}/timeline`,
+        `/organization/acme/patients/${publicId('pat', 3511)}/timeline`,
       ),
     );
   });
@@ -350,7 +387,7 @@ describe('the Today room (KICKOFF §6.2)', () => {
   });
 
   it('toasts a failed read with Retry and keeps what it has', async () => {
-    floorGate.failing = true;
+    floor.failing = true;
     renderTodayRoute(TODAY_PATH, TodayPage);
     await waitFor(() =>
       expect(notify.error).toHaveBeenCalledWith(

@@ -48,31 +48,19 @@
   },
   "card": {
     "service": "{{service}} · {{where}}",
-    "enquiry": "{{interest}} — {{message}}",
     "medicines_zero": "لا أدوية موصوفة",
     "medicines_one": "دواء واحد موصوف",
     "medicines_two": "دواءان موصوفان",
     "medicines_few": "{{count}} أدوية موصوفة",
     "medicines_many": "{{count}} دواءً موصوفًا",
-    "medicines_other": "{{count}} دواء موصوف",
-    "rooms": {
-      "roomOne": "الغرفة 1",
-      "roomTwo": "الغرفة 2",
-      "laserRoom": "غرفة الليزر"
-    }
+    "medicines_other": "{{count}} دواء موصوف"
   },
   "flags": {
     "newLead": "عميل محتمل جديد",
     "confirmed": "مؤكَّد",
     "unconfirmed": "غير مؤكَّد",
-    "firstVisit": "الزيارة الأولى",
-    "packLeft": "متبقٍ في الباقة {{left}}",
-    "due": "مستحق {{amount}}",
-    "allergy": "حساسية {{name}}",
     "waiting": "ينتظر {{minutes}} د",
     "inRoom": "في الغرفة {{minutes}} د",
-    "session": "الجلسة {{number}} من {{total}}",
-    "toPay": "{{amount}} للدفع",
     "rxApproved": "الوصفة معتمدة {{time}}"
   },
   "toasts": {
