@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { LEAD_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { LeadView } from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
   type RoomFilterCopy,
@@ -19,12 +18,12 @@ import type { LeadsTableInstance } from '../LeadsTable/index.ts';
 import { LEADS_FILTER_FIELDS } from './leads-filter-fields.ts';
 
 /** The views in order (`leads.md:42`). */
-const VIEWS = ['mine', 'unread', 'all'] as const satisfies readonly LeadView[];
+const VIEWS = ['mine', 'unreplied', 'all'] as const satisfies readonly LeadView[];
 
 /** The view tabs' labels. */
 const VIEW_KEYS = {
   mine: LEADS_KEYS.list.views.mine,
-  unread: LEADS_KEYS.list.views.unread,
+  unreplied: LEADS_KEYS.list.views.unreplied,
   all: LEADS_KEYS.list.views.all,
 } as const satisfies Record<LeadView, string>;
 
@@ -35,7 +34,7 @@ export interface LeadsToolbarProps {
   /** The Unreplied tab's count chip (hidden at 0). */
   unreplied: number;
   /** The team the Team filter lists. */
-  staff: readonly StaffProfile[];
+  members: readonly DirectoryMember[];
   /** The table the Columns chooser drives. */
   table: LeadsTableInstance;
   /** "New lead" shows only with Create on Leads (`leads.md:7`). */
@@ -44,7 +43,9 @@ export interface LeadsToolbarProps {
 }
 
 /** The Filters' copy: the statuses, sources and hold chips in their tones; the team. */
-function useFilterCopy(staff: readonly StaffProfile[]): Record<string, RoomFilterCopy> {
+function useFilterCopy(
+  members: readonly DirectoryMember[],
+): Record<string, RoomFilterCopy> {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const keys = LEADS_KEYS.filters;
@@ -85,21 +86,18 @@ function useFilterCopy(staff: readonly StaffProfile[]): Record<string, RoomFilte
         held: { label: t(keys.hold.held), tone: 'sage' },
       },
     },
-    owner: {
+    member: {
       label: t(keys.team.label),
       clearLabel: t(keys.clear),
       options: {},
       people: {
-        members: staff.map((profile) => {
-          const [role] = profile.roles;
-          return {
-            id: profile.id,
-            name: personFullName(profile),
-            initials: profile.initials,
-            tone: profile.tone,
-            role: role ? tClinic(CLINIC_KEYS.roles[role]) : '',
-          };
-        }),
+        members: members.map((member) => ({
+          id: member.id,
+          name: member.name,
+          initials: member.initials,
+          tone: member.tone,
+          role: '',
+        })),
         anyone: t(keys.team.anyone),
         count: (count) => t(keys.team.count, { count }),
         search: t(keys.team.search),
@@ -119,13 +117,13 @@ export function LeadsToolbar({
   view,
   onViewChange,
   unreplied,
-  staff,
+  members,
   table,
   canCreate,
   onNewLead,
 }: LeadsToolbarProps) {
   const { t } = useTranslation(LEADS_NS);
-  const copy = useFilterCopy(staff);
+  const copy = useFilterCopy(members);
   return (
     <RoomToolbar
       title={t(LEADS_KEYS.manifest.title)}
@@ -144,7 +142,7 @@ export function LeadsToolbar({
             id: entry,
             label: t(VIEW_KEYS[entry]),
             badge:
-              entry === 'unread' && unreplied > 0 ? (
+              entry === 'unreplied' && unreplied > 0 ? (
                 <>
                   <span
                     aria-hidden="true"
@@ -153,7 +151,7 @@ export function LeadsToolbar({
                     {unreplied}
                   </span>
                   <span className="sr-only">
-                    {t(LEADS_KEYS.list.views.unreadCount, { count: unreplied })}
+                    {t(LEADS_KEYS.list.views.unrepliedCount, { count: unreplied })}
                   </span>
                 </>
               ) : undefined,

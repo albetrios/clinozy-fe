@@ -10,7 +10,7 @@ import type {
   Treatment,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';

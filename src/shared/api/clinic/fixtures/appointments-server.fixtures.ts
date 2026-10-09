@@ -73,7 +73,7 @@ import {
   clockMinutes,
   clockOfMinutes,
 } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 
 import { writeAppointmentStatus } from './appointment-status.fixtures.ts';

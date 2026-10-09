@@ -1,16 +1,32 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
+import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  leadRecord,
+  type LeadsWorld,
+  seededLeadsWorld,
+} from '../../__tests__/integration/leads-test-data.ts';
 import { renderLeadsRoutes } from '../../__tests__/integration/leads-test-router.tsx';
 import { type LeadsDialogRoute, useLeadsDialogRoute } from './useLeadsDialogRoute.ts';
 
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+const world = vi.hoisted(() => ({}) as LeadsWorld);
+vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+  const { leadsApiDouble } =
+    await import('../../__tests__/integration/leads-test-data.ts');
+  return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };
+});
 
 const LEADS = '/organization/acme/leads';
+const ANAYA = leadRecord();
+/** A well-formed lead id no lead has. */
+const UNKNOWN = 'lead_gone0000000000000000';
 
 /** What the hook answered, minus the record itself (its name stands in). */
 function summary(route: LeadsDialogRoute) {
@@ -37,35 +53,51 @@ function seen(): unknown {
 
 beforeEach(() => {
   notifyMock.info.mockReset();
-  resetClinicFixtures();
+  Object.assign(world, seededLeadsWorld());
+  vi.mocked(fetchLead).mockClear();
+  signInTestMember();
 });
-afterEach(() => resetClinicFixtures());
+afterEach(() => useOrganizationStore.getState().clearOrganization());
 
 describe('useLeadsDialogRoute', () => {
   it('opens nothing on the list itself', async () => {
     renderLeadsRoutes(LEADS, Probe);
     await screen.findByTestId('probe');
     expect(seen()).toEqual({ kind: 'none' });
+    expect(fetchLead).not.toHaveBeenCalled();
   });
 
-  it('opens the lead drawer on a deep link and resolves the lead', async () => {
-    const id = ref.lead(2363);
-    const { router } = renderLeadsRoutes(`${LEADS}/${id}?view=all`, Probe);
+  it('opens the lead drawer on a deep link, reading the lead by its id', async () => {
+    const { router } = renderLeadsRoutes(`${LEADS}/${ANAYA.id}?view=all`, Probe);
     await waitFor(() =>
       expect(seen()).toEqual({
         kind: 'lead',
-        leadId: id,
+        leadId: ANAYA.id,
         name: 'Anaya Desai',
         isPending: false,
       }),
     );
-    expect(router.state.location.pathname).toBe(`${LEADS}/${id}`);
+    expect(fetchLead).toHaveBeenCalledWith(ANAYA.id);
+    expect(router.state.location.pathname).toBe(`${LEADS}/${ANAYA.id}`);
     expect(notifyMock.info).not.toHaveBeenCalled();
   });
 
-  it('sends an unknown id back to the list, filters kept, with "Lead not found" (S:115)', async () => {
+  it('is pending while the lead loads', async () => {
+    vi.mocked(fetchLead).mockReturnValueOnce(new Promise(() => undefined));
+    renderLeadsRoutes(`${LEADS}/${ANAYA.id}`, Probe);
+    await waitFor(() =>
+      expect(seen()).toEqual({
+        kind: 'lead',
+        leadId: ANAYA.id,
+        name: null,
+        isPending: true,
+      }),
+    );
+  });
+
+  it('sends an unknown lead back to the list, filters kept, with "Lead not found" (S:115)', async () => {
     const { router } = renderLeadsRoutes(
-      `${LEADS}/${ref.lead(1)}?view=all&status=new`,
+      `${LEADS}/${UNKNOWN}?view=all&status=new`,
       Probe,
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));
@@ -74,14 +106,6 @@ describe('useLeadsDialogRoute', () => {
       'Lead not found · it may have been deleted',
     );
     expect(seen()).toEqual({ kind: 'none' });
-  });
-
-  it('treats a contact thread’s id as no lead (S:261)', async () => {
-    const { router } = renderLeadsRoutes(`${LEADS}/${ref.lead(2372)}`, Probe);
-    await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));
-    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
-      'Lead not found · it may have been deleted',
-    );
   });
 
   it('opens New lead with the prefill, the mobile as E.164', async () => {

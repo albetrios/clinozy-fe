@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import type {
-  LeadRecord,
-  LeadRecordSource,
-} from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadInterest, LeadSource } from '@/shared/api/clinic/clinic-schema.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { clinicLeadStatusKey } from '@/shared/clinic/clinic-lead-status.ts';
 import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -19,17 +17,17 @@ import { LEAD_SOURCE_ICONS, leadInterestViews } from './lead-display.ts';
 
 /**
  * A lead's status as a 24px pill in its tone (H:3346) — "Re-targeted" for a
- * re-target lead still New (D22). Nothing for a lead without one.
+ * re-target lead still New (D22).
  */
 export function LeadStatusPill({ lead }: { lead: Pick<LeadRecord, 'status' | 'kind'> }) {
   const { t } = useTranslation(CLINIC_NS);
   const key = clinicLeadStatusKey(lead);
-  if (!(key && lead.status)) return null;
+  if (!key) return null;
   return <TonePill tone={LEAD_STATUS_TONES[lead.status]}>{t(key)}</TonePill>;
 }
 
 /** A lead's source as a 24px pill: its 13px icon and name, in its tone (H:3348). */
-export function LeadSourcePill({ source }: { source: LeadRecordSource | null }) {
+export function LeadSourcePill({ source }: { source: LeadSource | null }) {
   const { t } = useTranslation(CLINIC_NS);
   if (!source) return null;
   const Icon = LEAD_SOURCE_ICONS[source];
@@ -44,14 +42,10 @@ export function LeadSourcePill({ source }: { source: LeadRecordSource | null }) 
  * "Interested in" in a cell (`leads.md:32`): the first interest as a 24px pill
  * and a neutral "+N" pill whose tooltip lists them all.
  */
-export function LeadInterestPills({
-  lead,
-}: {
-  lead: Pick<LeadRecord, 'interests' | 'customInterests'>;
-}) {
+export function LeadInterestPills({ interests }: { interests: readonly LeadInterest[] }) {
   const { t } = useTranslation(CLINIC_NS);
   const { t: tLeads } = useTranslation(LEADS_NS);
-  const views = leadInterestViews(lead, (interest) =>
+  const views = leadInterestViews(interests, (interest) =>
     t(CLINIC_KEYS.leads.interests[interest]),
   );
   const [first] = views;

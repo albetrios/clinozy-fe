@@ -2,24 +2,33 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-contracts.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
+import { LEAD_SOURCE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
-import { leadRecord, NIDHI, RIYA } from '../../__tests__/integration/leads-test-data.ts';
+import {
+  contactRecord,
+  leadRecord,
+  NIDHI,
+  RIYA,
+  TEAM_BY_ID,
+} from '../../__tests__/integration/leads-test-data.ts';
 import { leadContactCardData, leadReach } from './lead-contact.ts';
 import {
+  LEAD_INTEREST_CHIPS,
   LEAD_SOURCE_ICONS,
   LEAD_SOURCE_ORDER,
   leadInterestViews,
 } from './lead-display.ts';
-import { staffPerson, teamCardDataOf } from './lead-people.ts';
+import { memberPerson, teamCardDataOf } from './lead-people.ts';
 import { LeadInterestPills, LeadSourcePill, LeadStatusPill } from './LeadFields.tsx';
 
+const labels = { source: (source: string) => `via ${source}` };
+
 describe('lead display', () => {
-  it('gives every source an icon and orders the chips as the design, Phone call last', () => {
-    for (const source of LEAD_RECORD_SOURCE_VALUES)
+  it('gives each of the seven sources an icon and orders the chips as the design, no Phone call', () => {
+    for (const source of LEAD_SOURCE_VALUES)
       expect(LEAD_SOURCE_ICONS[source]).toBeDefined();
+    expect(Object.keys(LEAD_SOURCE_ICONS)).toHaveLength(7);
     expect(LEAD_SOURCE_ORDER).toEqual([
       'instagram',
       'google',
@@ -28,86 +37,118 @@ describe('lead display', () => {
       'walk_in',
       'referral',
       'retarget',
-      'phone_call',
+    ]);
+    expect(LEAD_SOURCE_ORDER).not.toContain('phone_call');
+  });
+
+  it('offers six interest chips with "Others" last', () => {
+    expect(LEAD_INTEREST_CHIPS).toEqual([
+      'clinical',
+      'peel',
+      'lhr',
+      'hydrafacial',
+      'prp',
+      'others',
     ]);
   });
 
-  it('lists the contract interests, then the typed ones in their hash tone', () => {
-    const views = leadInterestViews(
-      { interests: ['lhr', 'others'], customInterests: ['Acne scars'] },
-      (interest) => interest.toUpperCase(),
-    );
-    expect(views).toEqual([
-      { key: 'lhr', label: 'LHR', tone: 'lav', custom: false },
-      { key: 'others', label: 'OTHERS', tone: 'stone', custom: false },
-      expect.objectContaining({ key: 'Acne scars', label: 'Acne scars', custom: true }),
+  it('shows a lead’s interests in their order, each labelled in its tone', () => {
+    expect(
+      leadInterestViews(['lhr', 'others', 'clinical'], (interest) =>
+        interest.toUpperCase(),
+      ),
+    ).toEqual([
+      { key: 'lhr', label: 'LHR', tone: 'lav' },
+      { key: 'others', label: 'OTHERS', tone: 'stone' },
+      { key: 'clinical', label: 'CLINICAL', tone: 'sky' },
     ]);
+    expect(leadInterestViews([], String)).toEqual([]);
   });
 });
 
-describe('lead people and contact', () => {
-  it('names staff and builds their team card', () => {
-    expect(personFullName(RIYA)).toBe('Riya Shah');
-    expect(staffPerson(RIYA, { presence: true })).toMatchObject({
+describe('lead people', () => {
+  it('shows a member as an avatar pill with no presence', () => {
+    const person = memberPerson(RIYA);
+    expect(person).toEqual({
+      id: RIYA.id,
       name: 'Riya Shah',
       initials: 'RS',
       tone: 'blush',
-      presence: 'online',
     });
-    expect(staffPerson(NIDHI)).not.toHaveProperty('presence');
-    expect(
-      teamCardDataOf(RIYA, (role) => role, '2026-10-03T04:30:00.000Z'),
-    ).toMatchObject({
-      name: 'Riya Shah',
-      role: 'front_desk',
-      online: true,
-      hours: { from: '10:00', to: '19:00' },
+    expect(person).not.toHaveProperty('presence');
+  });
+
+  it('builds the team card from the name alone — no role, presence or phone', () => {
+    const card = teamCardDataOf(NIDHI, '2026-10-03T04:30:00.000Z');
+    expect(card).toEqual({
+      name: 'Nidhi Kapoor',
+      initials: 'NK',
+      tone: 'sage',
+      role: '',
       updatedAt: '2026-10-03T04:30:00.000Z',
     });
+    expect(card).not.toHaveProperty('online');
+    expect(card).not.toHaveProperty('phone');
+    expect(teamCardDataOf(NIDHI).updatedAt).toBeNull();
+  });
+});
+
+describe('lead contact', () => {
+  it('reaches a list row’s person on their primary number only', () => {
+    expect(leadReach(leadRecord())).toEqual([
+      { channel: 'phone', phone: '+919879521034' },
+    ]);
+    expect(leadReach(leadRecord({ phone: null }))).toEqual([]);
   });
 
-  it('reaches the person on every number and handle, WhatsApp unless marked off', () => {
-    expect(leadReach(leadRecord())).toEqual([
-      { channel: 'whatsapp', phone: '+919879521034' },
-    ]);
-    expect(
-      leadReach(
-        leadRecord({
-          contact: {
-            phones: [
-              { phone: '+919825011241', whatsapp: true },
-              { phone: '+919099055120', whatsapp: false },
-            ],
-            instagram: ['@rhea'],
-            defaultChannel: 'whatsapp',
-            preferences: [],
-          },
-        }),
-      ),
-    ).toEqual([
+  it('reaches a read contact on every number, primary first, WhatsApp where they are on it, then every handle', () => {
+    const contact = contactRecord({
+      phones: [
+        { phone: '+919099055120', isPrimary: false, isOnWhatsapp: false },
+        { phone: '+919825011241', isPrimary: true, isOnWhatsapp: true },
+      ],
+      instagramHandles: ['@anaya', '@anaya.skin'],
+    });
+    expect(leadReach(leadRecord(), contact)).toEqual([
       { channel: 'whatsapp', phone: '+919825011241' },
       { channel: 'phone', phone: '+919099055120' },
-      { channel: 'instagram', handle: '@rhea' },
+      { channel: 'instagram', handle: '@anaya' },
+      { channel: 'instagram', handle: '@anaya.skin' },
     ]);
   });
 
-  it('reads a lead as a lead’s card — or a patient’s once linked', () => {
-    const staff = new Map([RIYA, NIDHI].map((profile) => [profile.id, profile]));
-    const labels = { role: (role: string) => role, source: (source: string) => source };
-    const lead = leadRecord({ involvedIds: [RIYA.id] });
-    expect(leadContactCardData(lead, staff, labels)).toMatchObject({
+  it('reads a lead as a lead’s card with its owner and involved members, and the source', () => {
+    const lead = leadRecord({ involvedIds: [RIYA.id, 'mem_gone0000000000000000'] });
+    expect(leadContactCardData(lead, TEAM_BY_ID, labels)).toEqual({
       kind: 'lead',
       name: 'Anaya Desai',
       since: lead.createdAt,
+      reach: [{ channel: 'phone', phone: '+919879521034' }],
       team: [
-        { name: 'Nidhi Kapoor', role: 'counsellor' },
-        { name: 'Riya Shah', role: 'front_desk' },
+        { id: NIDHI.id, name: 'Nidhi Kapoor', initials: 'NK', tone: 'sage', role: '' },
+        { id: RIYA.id, name: 'Riya Shah', initials: 'RS', tone: 'blush', role: '' },
       ],
-      about: { source: 'whatsapp' },
+      about: { source: 'via whatsapp' },
     });
-    expect(
-      leadContactCardData(leadRecord({ patientId: 'patient' }), staff, labels),
-    ).toMatchObject({ kind: 'patient', since: null });
+  });
+
+  it('reads a linked lead as a patient’s card, and uses the read contact’s reach', () => {
+    const card = leadContactCardData(
+      leadRecord({ patientId: 'pat_anaya0000000000000000', ownerId: null, source: null }),
+      TEAM_BY_ID,
+      labels,
+      contactRecord({ instagramHandles: ['@anaya'] }),
+    );
+    expect(card).toMatchObject({
+      kind: 'patient',
+      since: null,
+      team: [],
+      about: { source: null },
+      reach: [
+        { channel: 'whatsapp', phone: '+919879521034' },
+        { channel: 'instagram', handle: '@anaya' },
+      ],
+    });
   });
 });
 
@@ -122,26 +163,44 @@ describe('the lead pills', () => {
     );
     rerender(<LeadStatusPill lead={{ status: 'new', kind: 'retarget' }} />);
     expect(screen.getByText('Re-targeted')).toBeInTheDocument();
-    rerender(<LeadStatusPill lead={{ status: null, kind: 'contact_thread' }} />);
-    expect(screen.queryByText('Re-targeted')).toBeNull();
+    rerender(<LeadStatusPill lead={{ status: 'contacted', kind: 'retarget' }} />);
+    expect(screen.getByText('Contacted')).toBeInTheDocument();
   });
 
-  it('shows the source with its icon in its tone, "Phone call" included', () => {
-    render(<LeadSourcePill source="phone_call" />);
-    const pill = screen.getByText('Phone call').closest('[data-tone]');
-    expect(pill).toHaveAttribute('data-tone', 'sky');
+  it('shows the source with its icon in its tone, and nothing without one', () => {
+    const { container, rerender } = render(<LeadSourcePill source="walk_in" />);
+    const pill = screen.getByText('Walk-in').closest('[data-tone]');
+    expect(pill).toHaveAttribute('data-tone', 'lav');
     expect(pill?.querySelector('svg')).not.toBeNull();
+    rerender(<LeadSourcePill source={null} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('shows the first interest and a "+N" naming them all', async () => {
     const { container } = render(
       <TooltipProvider>
-        <LeadInterestPills lead={{ interests: ['peel', 'prp'], customInterests: [] }} />
+        <LeadInterestPills interests={['peel', 'prp', 'others']} />
       </TooltipProvider>,
     );
     expect(screen.getByText('Peel')).toBeInTheDocument();
-    expect(screen.getByText('+1')).toBeInTheDocument();
-    expect(screen.getByText('1 more: Peel, PRP')).toHaveClass('sr-only');
+    expect(screen.getByText('+2')).toBeInTheDocument();
+    expect(screen.getByText('2 more: Peel, PRP, Others')).toHaveClass('sr-only');
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('shows one interest without a "+N", and nothing for none', () => {
+    const { container, rerender } = render(
+      <TooltipProvider>
+        <LeadInterestPills interests={['lhr']} />
+      </TooltipProvider>,
+    );
+    expect(screen.getByText('LHR')).toBeInTheDocument();
+    expect(screen.queryByText(/^\+/)).toBeNull();
+    rerender(
+      <TooltipProvider>
+        <LeadInterestPills interests={[]} />
+      </TooltipProvider>,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 });

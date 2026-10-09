@@ -1,692 +1,534 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
 
-import { branchRef, MAIN_BRANCH } from './fixtures/organization.fixtures.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import { clinicInstant } from './clinic-time.ts';
 import {
-  assignLead,
   claimLead,
-  convertLead,
   countOpenLeadTasks,
   countUnrepliedLeads,
   createLead,
   deleteLead,
   fetchLead,
-  fetchLeadViewer,
-  findOpenLeadByPhone,
-  LEAD_CONTACT_SEARCH_LIMIT,
-  leadQueryKeys,
+  leadListQuery,
   listLeads,
-  markLeadRead,
   releaseLead,
   restoreLead,
-  restoreLeadTeam,
-  saveLead,
-  searchLeadContacts,
-  setLeadInvolved,
-  undoLeadChange,
   updateLead,
 } from './leads-api.ts';
-import type { LeadListParams } from './leads-contracts.ts';
-import { LEAD_HOLD_DAYS, leadHold } from './leads-hold.ts';
-import { fetchTaskPage } from './tasks-api.ts';
+import type { LeadFields } from './leads-contracts.ts';
 
-const RS = staffRef('RS');
-const NK = staffRef('NK');
-const DR = staffRef('DR');
-const AS = staffRef('AS');
-/** 10:00 on 3 Oct, clinic time — the seed day is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** The clinic's day every range here is read on. */
+const TODAY = '2026-10-03';
+/** Midnight at the start of a clinic day, as the API's instant. */
+const midnight = (date: string) => clinicInstant(date, '00:00');
 
-/** A lead's system lines in the chat, oldest first. */
-const systemLines = (id: string) =>
-  clinicFixtures.leadMessages
-    .snapshot((message) => message.leadId === id && message.isSystem)
-    .map((message) => message.body);
+const LEAD_ID = 'lead_anaya0000000000000000';
+const CONTACT_ID = 'con_anaya0000000000000000';
+const RIYA = 'mem_riya00000000000000000';
+const NIDHI = 'mem_nidhi0000000000000000';
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
+/** A lead as clinozy-be answers it. */
+const leadRow = (patch: Record<string, unknown> = {}) => ({
+  id: LEAD_ID,
+  lead_number: 2363,
+  contact_id: CONTACT_ID,
+  contact: {
+    contact_number: 10234,
+    first_name: 'Anaya',
+    last_name: 'Desai',
+    primary_phone: '+919879521034',
+    default_channel: 'whatsapp',
+  },
+  patient_id: null,
+  status: 'new',
+  source: 'whatsapp',
+  interests: ['clinical'],
+  kind: 'enquiry',
+  retarget_reason: null,
+  owner_membership_id: NIDHI,
+  involved_membership_ids: [RIYA],
+  held_until: '2026-10-05T04:30:00.000Z',
+  follow_up_at: null,
+  branch_id: null,
+  notes: null,
+  last_activity_at: '2026-10-02T04:30:00.000Z',
+  is_awaiting_reply: true,
+  created_at: '2026-09-30T04:30:00.000Z',
+  updated_at: '2026-10-02T04:30:00.000Z',
+  ...patch,
+});
+
+/** One list page as clinozy-be answers it. */
+const page = (
+  rows: unknown[],
+  pagination: { next?: string | null; has_more?: boolean; estimated_total?: number } = {},
+) => ({
+  data: rows,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 50, next: null, has_more: false, ...pagination },
+  },
+});
+
+/** Every field a drawer save sends. */
+const FIELDS: LeadFields = {
+  status: 'follow_up',
+  source: 'instagram',
+  interests: ['peel', 'others'],
+  ownerId: RIYA,
+  involvedIds: [NIDHI],
+  followUpAt: '2026-10-04T05:30:00.000Z',
+  branchId: 'brn_main000000000000000000',
+  notes: 'Call after six',
+};
+
+/** The same fields as the API names them. */
+const FIELDS_BODY = {
+  status: 'follow_up',
+  source: 'instagram',
+  interests: ['peel', 'others'],
+  owner_membership_id: RIYA,
+  involved_membership_ids: [NIDHI],
+  follow_up_at: '2026-10-04T05:30:00.000Z',
+  branch_id: 'brn_main000000000000000000',
+  notes: 'Call after six',
+};
+
+/** The body the last PATCH sent. */
+function lastPatchBody(): Record<string, unknown> {
+  const init = vi.mocked(api.patch).mock.lastCall?.[1] as
+    { body?: Record<string, unknown> } | undefined;
+  return init?.body ?? {};
 }
 
-const seqs = async (params: LeadListParams = {}) =>
-  (await listLeads(params)).items.map((lead) => lead.seq);
-
 beforeEach(() => {
+  vi.resetAllMocks();
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
 });
 
-describe('leadQueryKeys', () => {
-  it('nests every key under the domain, so one invalidation reaches them all', () => {
-    expect(leadQueryKeys.list({ view: 'all' })).toEqual([
-      'clinic',
-      'leads',
-      'list',
-      { view: 'all' },
-    ]);
-    expect(leadQueryKeys.detail('L1').slice(0, 2)).toEqual(leadQueryKeys.all);
-    expect(leadQueryKeys.unreplied(RS).slice(0, 3)).toEqual(
-      leadQueryKeys.unrepliedCounts(),
-    );
-  });
-});
-
-describe('the leads list (listLeads, S:1588)', () => {
-  it('reads the seventeen leads newest first — never a contact thread', async () => {
-    const page = await listLeads();
-    expect(page.nextCursor).toBeNull();
-    expect(page.items.map((lead) => lead.seq)).toEqual([
-      2363, 2364, 2365, 2371, 2362, 2361, 2360, 2359, 2370, 2358, 2357, 2356, 2355, 2354,
-      2353, 2352, 2210,
-    ]);
-    expect(page.items.some((lead) => lead.isContactThread)).toBe(false);
+describe('leadListQuery', () => {
+  it('reads everyone’s leads, newest first, fifty a page, for All', () => {
+    expect(leadListQuery({ view: 'all', viewerId: RIYA }, TODAY)).toEqual({ limit: 50 });
   });
 
-  it('reads the views: Mine, Unreplied (mine with unread messages) and All', async () => {
-    expect(await seqs({ view: 'mine', viewerId: RS })).toEqual([
-      2363, 2365, 2356, 2355, 2354, 2353,
-    ]);
-    expect(await seqs({ view: 'unread', viewerId: RS })).toEqual([2363, 2365]);
-    expect(await seqs({ view: 'unread', viewerId: NK })).toEqual([]);
-    expect(await seqs({ view: 'all', viewerId: RS })).toHaveLength(17);
+  it('reads the viewer’s own leads for Mine, and those awaiting their reply for Unreplied', () => {
+    expect(leadListQuery({ view: 'mine', viewerId: RIYA }, TODAY)).toEqual({
+      limit: 50,
+      owner_membership_id: RIYA,
+    });
+    expect(leadListQuery({ view: 'unreplied', viewerId: RIYA }, TODAY)).toEqual({
+      limit: 50,
+      owner_membership_id: RIYA,
+      is_awaiting_reply: 'true',
+    });
   });
 
-  it('matches nothing for "mine" without a viewer — never the leads nobody owns', async () => {
-    expect(await seqs({ view: 'mine', viewerId: null })).toEqual([]);
-    expect(await seqs({ view: 'unread' })).toEqual([]);
-  });
-
-  it('filters by status and by any of several sources', async () => {
-    expect(await seqs({ status: ['follow_up'] })).toEqual([2362, 2360, 2359, 2358, 2354]);
-    expect(await seqs({ source: ['google', 'facebook'] })).toEqual([2361, 2359, 2357]);
-  });
-
-  it('filters the team as owner or involved (H:5636)', async () => {
-    expect(await seqs({ owner: [NK] })).toEqual([
-      2363, 2364, 2371, 2370, 2358, 2352, 2210,
-    ]);
-  });
-
-  it('filters ownership on the hold: open, releasing later today, held', async () => {
-    // Asha has left the clinic, so her lead is open to anyone.
-    expect(await seqs({ hold: 'open' })).toEqual([2362]);
-    // Touched 30 Sep at 16:34 and 15:10: three days on is later today.
-    expect(await seqs({ hold: 'soon' })).toEqual([2356, 2354]);
-    expect(await seqs({ hold: 'held' })).toEqual([
-      2363, 2364, 2361, 2360, 2359, 2358, 2357, 2356, 2354,
-    ]);
-  });
-
-  it('filters on the created and follow-up dates', async () => {
-    expect(await seqs({ created: 'today' })).toEqual([2363, 2364, 2365, 2371]);
-    expect(await seqs({ created: 'yesterday' })).toEqual([2362, 2361, 2360, 2359, 2370]);
-    expect(await seqs({ created: 'last_7' })).toHaveLength(15);
-    expect(await seqs({ created: '2026-07-01..2026-08-31' })).toEqual([2352, 2210]);
-    // #2360 "Will call Monday": its follow-up is tomorrow.
-    expect(await seqs({ followUp: 'tomorrow' })).toEqual([2360]);
-    expect(await seqs({ followUp: 'not_set' })).toHaveLength(16);
-  });
-
-  it('searches the name, the mobile and "#id", ignoring spaces and "#" (H:5630)', async () => {
-    expect(await seqs({ q: 'rhea' })).toEqual([2365, 2210]);
-    expect(await seqs({ q: '98250 11241' })).toEqual([2365, 2210]);
-    expect(await seqs({ q: '#2363' })).toEqual([2363]);
-    expect(await seqs({ q: 'Kabir Meh' })).toEqual([2364]);
-    expect(await seqs({ q: '  ' })).toHaveLength(17);
-  });
-
-  it('combines the view with the filters', async () => {
-    expect(await seqs({ view: 'mine', viewerId: RS, status: ['new'] })).toEqual([
-      2363, 2365,
-    ]);
-  });
-
-  it('sorts by name, pipeline order, source or update, ascending unless told otherwise', async () => {
-    const byName = await listLeads({ sort: 'name' });
-    expect(byName.items.map((lead) => lead.name).slice(0, 3)).toEqual([
-      'Akshar Gajera',
-      'Alpa Bambhroliya',
-      'Anaya Desai',
-    ]);
-    // Equal names fall back to the newest id.
+  it('sends the search, the status, the sources joined and the one team member', () => {
     expect(
-      (await seqs({ sort: 'name' })).filter((seq) => [2365, 2210].includes(seq)),
-    ).toEqual([2365, 2210]);
-    expect((await seqs({ sort: 'status' })).slice(0, 4)).toEqual([
-      2371, 2365, 2363, 2361,
-    ]);
-    expect((await seqs({ sort: 'status', order: 'desc' }))[0]).toBe(2353);
-    expect((await listLeads({ sort: 'source' })).items[0]?.source).toBe('facebook');
-    const updated = (await listLeads({ sort: 'updated', order: 'desc' })).items.map(
-      (lead) => lead.updatedAt,
-    );
-    expect(updated).toEqual([...updated].sort().reverse());
-  });
-
-  it('pages by fifty with a cursor', async () => {
-    for (let index = 0; index < 40; index += 1) {
-      await createLead({
-        name: `Walk-in ${index}`,
-        phone: `+9170000${String(index).padStart(5, '0')}`,
-      });
-    }
-    const first = await listLeads();
-    expect(first.items).toHaveLength(50);
-    const second = await listLeads({}, first.nextCursor);
-    expect(second.items).toHaveLength(7);
-    expect(second.nextCursor).toBeNull();
-  });
-});
-
-describe('one lead (getLead, S:1589)', () => {
-  it('reads it by id', async () => {
-    expect((await fetchLead(ref.lead(2363))).name).toBe('Anaya Desai');
-  });
-
-  it('answers 404 for an unknown id, a contact thread or a deleted lead (S:115)', async () => {
-    expect((await failureOf(fetchLead(ref.lead(1)))).status).toBe(404);
-    const thread = await failureOf(fetchLead(ref.lead(2372)));
-    expect(thread).toMatchObject({ status: 404, detail: 'Lead not found' });
-    await deleteLead(ref.lead(2357), 'duplicate', null);
-    expect((await failureOf(fetchLead(ref.lead(2357)))).status).toBe(404);
-  });
-});
-
-describe('the Unreplied count', () => {
-  it('counts the viewer’s leads with unread messages', async () => {
-    expect(await countUnrepliedLeads(RS)).toBe(2);
-    expect(await countUnrepliedLeads(NK)).toBe(0);
-    expect(await countUnrepliedLeads(null)).toBe(0);
-  });
-});
-
-describe('the Leads room’s viewer (fetchLeadViewer)', () => {
-  it('reads the member by sign-in email, ignoring case and spaces', async () => {
-    expect((await fetchLeadViewer(' Nidhi@Cresence.SKIN '))?.id).toBe(NK);
-    expect(leadQueryKeys.viewer('nidhi@cresence.skin').slice(0, 2)).toEqual(
-      leadQueryKeys.all,
-    );
-  });
-
-  it('falls back to the fixture server’s own member — never nobody', async () => {
-    expect((await fetchLeadViewer('someone@else.test'))?.id).toBe(RS);
-    expect((await fetchLeadViewer('  '))?.id).toBe(RS);
-    expect((await fetchLeadViewer(null))?.id).toBe(RS);
-  });
-});
-
-describe('New lead’s contact search (searchLeadContacts)', () => {
-  it('searches from two characters, at most five people', async () => {
-    expect(await searchLeadContacts('r')).toEqual([]);
-    expect(await searchLeadContacts(' ')).toEqual([]);
-    expect(await searchLeadContacts('a')).toHaveLength(0);
-    expect((await searchLeadContacts('sh')).length).toBeLessThanOrEqual(
-      LEAD_CONTACT_SEARCH_LIMIT,
-    );
-  });
-
-  it('finds a patient by name with their last visit, before anyone else', async () => {
-    const patient = clinicFixtures.patients.snapshot()[0]!;
-    const name = [patient.firstName, patient.lastName].filter(Boolean).join(' ');
-    const hits = await searchLeadContacts(name);
-    expect(hits[0]).toMatchObject({
-      kind: 'patient',
-      id: patient.id,
-      seq: patient.seq,
-      name,
-      phone: patient.phone,
-    });
-    const visits = clinicFixtures.appointments
-      .snapshot(
-        (visit) =>
-          visit.patientId === patient.id &&
-          ['checked_in', 'completed'].includes(visit.status) &&
-          visit.date <= '2026-10-03',
-      )
-      .map((visit) => visit.date)
-      .sort();
-    expect(hits[0]).toMatchObject({ lastVisit: visits.at(-1) ?? null });
-  });
-
-  it('finds a person known only as a lead by their mobile, once, with their contact', async () => {
-    const patientPhones = new Set(
-      clinicFixtures.patients
-        .snapshot()
-        .flatMap((patient) => [patient.phone, patient.phone2]),
-    );
-    const lead = clinicFixtures.leads
-      .snapshot((row) => row.patientId === null && !patientPhones.has(row.phone))
-      .sort((a, b) => b.seq - a.seq)[0]!;
-    const hits = await searchLeadContacts(lead.phone.slice(-6));
-    const mine = hits.filter((hit) => hit.kind === 'lead' && hit.phone === lead.phone);
-    expect(mine).toHaveLength(1);
-    expect(mine[0]).toMatchObject({
-      kind: 'lead',
-      name: lead.name,
-      contactThread: lead.isContactThread,
-    });
-  });
-
-  it('never offers a lead whose mobile is a patient’s — the patient stands for them', async () => {
-    const patient = clinicFixtures.patients.snapshot()[0]!;
-    const hits = await searchLeadContacts(patient.phone.slice(-7));
-    expect(hits.some((hit) => hit.kind === 'lead' && hit.phone === patient.phone)).toBe(
-      false,
-    );
-    expect(leadQueryKeys.contactSearch('rh').slice(0, 2)).toEqual(leadQueryKeys.all);
-  });
-});
-
-describe('createLead (S:1593)', () => {
-  it('creates from a name and a mobile — New, from WhatsApp, its hold starting now', async () => {
-    const created = await createLead({ name: '  Hetal Parmar ', phone: '+919898012345' });
-    expect(created).toMatchObject({
-      seq: 2386,
-      name: 'Hetal Parmar',
-      status: 'new',
-      source: 'whatsapp',
-      kind: 'enquiry',
-      isContactThread: false,
-      interests: [],
-      customInterests: [],
-      ownerId: null,
-      involvedIds: [],
-      touchedAt: NOW.toISOString(),
-      releasedAt: null,
-      unreadCount: 0,
-      deletedAt: null,
-    });
-  });
-
-  it('puts the new lead first in the list (D28)', async () => {
-    // Past every seed's time today (Anaya wrote at 10:28).
-    vi.setSystemTime(new Date('2026-10-03T06:30:00Z'));
-    await createLead({ name: 'Hetal Parmar', phone: '+919898012345' });
-    expect((await seqs())[0]).toBe(2386);
-  });
-
-  it('takes the presets, a linked patient, and tidies the people and interests', async () => {
-    const created = await createLead({
-      name: 'Rhea Shah',
-      phone: '+919099055120',
-      status: 'contacted',
-      source: 'phone_call',
-      patientId: patientRef('Rhea Shah'),
-      ownerId: RS,
-      involvedIds: [RS, NK, NK],
-      interests: ['lhr', 'lhr'],
-      customInterests: [' Acne scars ', 'acne SCARS', 'LHR', 'Under-eye'],
-      branchId: branchRef(MAIN_BRANCH),
-    });
-    expect(created).toMatchObject({
-      status: 'contacted',
-      source: 'phone_call',
-      ownerId: RS,
-      involvedIds: [NK],
-      interests: ['lhr'],
-      customInterests: ['Acne scars', 'Under-eye'],
-    });
-  });
-
-  it('keeps the contact’s numbers and handles, its first number the lead’s mobile', async () => {
-    const created = await createLead({
-      name: 'Rhea Shah',
-      phone: '+919898012345',
-      contact: {
-        phones: [
-          { phone: '+919712300001', whatsapp: true },
-          { phone: '+919712300002', whatsapp: false },
-        ],
-        instagram: ['@rhea'],
-        defaultChannel: 'call',
-        preferences: ['No calls'],
-      },
-    });
-    expect(created.phone).toBe('+919712300001');
-    expect(created.contact).toMatchObject({
-      phones: [{ whatsapp: true }, { phone: '+919712300002', whatsapp: false }],
-      instagram: ['@rhea'],
-      defaultChannel: 'call',
-    });
-  });
-
-  it('answers 422 naming the field: no name, no 10-digit mobile, people or places the clinic lacks', async () => {
-    expect(
-      await failureOf(createLead({ name: ' ', phone: '+919898012345' })),
-    ).toMatchObject({
-      status: 422,
-      detail: 'Add a name',
-      fields: { name: ['Add a name'] },
-    });
-    expect(await failureOf(createLead({ name: 'Hetal', phone: '98980' }))).toMatchObject({
-      status: 422,
-      fields: { phone: ['Add a 10-digit mobile'] },
-    });
-    expect(
-      await failureOf(
-        createLead({ name: 'Hetal', phone: '+919898012345', ownerId: ref.user(99) }),
+      leadListQuery(
+        {
+          view: 'all',
+          viewerId: RIYA,
+          q: 'anaya',
+          status: 'follow_up',
+          source: ['google', 'facebook'],
+          member: NIDHI,
+        },
+        TODAY,
       ),
-    ).toMatchObject({ status: 422, fields: { ownerId: ['Pick someone on the team'] } });
-    expect(
-      (
-        await failureOf(
-          createLead({ name: 'Hetal', phone: '+919898012345', branchId: ref.branch(9) }),
-        )
-      ).fields,
-    ).toHaveProperty('branchId');
-    expect(
-      (
-        await failureOf(
-          createLead({
-            name: 'Hetal',
-            phone: '+919898012345',
-            patientId: ref.patient(1),
-          }),
-        )
-      ).fields,
-    ).toHaveProperty('patientId');
-  });
-
-  it('answers 409 when the mobile is already on an open lead, and finds that lead for "Open"', async () => {
-    expect(
-      await failureOf(createLead({ name: 'Anaya D', phone: '+919879521034' })),
-    ).toMatchObject({
-      status: 409,
-      code: 'conflict',
-      fields: { phone: [expect.any(String)] },
+    ).toEqual({
+      limit: 50,
+      q: 'anaya',
+      status: 'follow_up',
+      source: 'google,facebook',
+      team_membership_id: NIDHI,
     });
-    expect((await findOpenLeadByPhone('+919879521034'))?.seq).toBe(2363);
-    // Rhea's first lead is closed; her open one (#2365) is the match.
-    expect((await findOpenLeadByPhone('+919825011241'))?.seq).toBe(2365);
+    expect(leadListQuery({ view: 'all', viewerId: null, source: [] }, TODAY)).toEqual({
+      limit: 50,
+    });
   });
 
-  it('lets a closed lead’s person come back as a new lead', async () => {
-    // Tulsi (#2353) was Not interested.
-    expect(await findOpenLeadByPhone('+917016292085')).toBeNull();
-    const back = await createLead({ name: 'Tulsi', phone: '+917016292085' });
-    expect(back.seq).toBe(2386);
+  it.each([
+    ['open', 'open'],
+    ['soon', 'releasing_today'],
+    ['held', 'held'],
+  ] as const)('names the %s ownership filter "%s"', (hold, ownership) => {
+    expect(leadListQuery({ view: 'all', viewerId: null, hold }, TODAY)).toEqual({
+      limit: 50,
+      ownership,
+    });
+  });
+
+  it.each([
+    ['today', midnight('2026-10-03'), midnight('2026-10-04')],
+    ['yesterday', midnight('2026-10-02'), midnight('2026-10-03')],
+    ['last_7', midnight('2026-09-27'), midnight('2026-10-04')],
+    ['last_30', midnight('2026-09-04'), midnight('2026-10-04')],
+    ['this_month', midnight('2026-10-01'), midnight('2026-11-01')],
+    ['2026-07-01..2026-08-31', midnight('2026-07-01'), midnight('2026-09-01')],
+  ] as const)(
+    'turns the %s Created filter into whole clinic days',
+    (created, from, to) => {
+      expect(leadListQuery({ view: 'all', viewerId: null, created }, TODAY)).toEqual({
+        limit: 50,
+        created_from: from,
+        created_to: to,
+      });
+    },
+  );
+
+  it('reads the clinic’s midnight as an instant: 18:30 UTC the evening before', () => {
+    expect(
+      leadListQuery({ view: 'all', viewerId: null, created: 'today' }, TODAY),
+    ).toMatchObject({
+      created_from: '2026-10-02T18:30:00.000Z',
+      created_to: '2026-10-03T18:30:00.000Z',
+    });
+  });
+
+  it.each([
+    ['overdue', undefined, midnight('2026-10-03')],
+    ['today', midnight('2026-10-03'), midnight('2026-10-04')],
+    ['tomorrow', midnight('2026-10-04'), midnight('2026-10-05')],
+    ['next_7', midnight('2026-10-03'), midnight('2026-10-11')],
+    ['2026-10-10..2026-10-12', midnight('2026-10-10'), midnight('2026-10-13')],
+  ] as const)(
+    'turns the %s Follow-up filter into a follow_up_at range',
+    (followUp, from, to) => {
+      expect(leadListQuery({ view: 'all', viewerId: null, followUp }, TODAY)).toEqual({
+        limit: 50,
+        follow_up_at_from: from,
+        follow_up_at_to: to,
+      });
+    },
+  );
+
+  it.each([
+    ['name', 'name'],
+    ['status', 'status'],
+    ['source', 'source'],
+    ['activity', 'last_activity_at'],
+  ] as const)('sorts by %s as "%s", in the order asked', (sort, apiSort) => {
+    expect(
+      leadListQuery({ view: 'all', viewerId: null, sort, order: 'desc' }, TODAY),
+    ).toEqual({ limit: 50, sort: apiSort, order: 'desc' });
+  });
+
+  it('sends no order without a sort — the list runs newest first', () => {
+    expect(leadListQuery({ view: 'all', viewerId: null, order: 'asc' }, TODAY)).toEqual({
+      limit: 50,
+    });
+  });
+
+  it('reads the ranges on the clinic’s today when none is given', () => {
+    expect(leadListQuery({ view: 'all', viewerId: null, created: 'today' })).toEqual(
+      leadListQuery({ view: 'all', viewerId: null, created: 'today' }, TODAY),
+    );
   });
 });
 
-describe('updateLead (S:1594)', () => {
-  it('moves any status to any (Q-L4) and stamps the update', async () => {
-    const saved = await updateLead(ref.lead(2363), { status: 'lost' });
-    expect(saved.status).toBe('lost');
-    expect(saved.updatedAt).toBe(NOW.toISOString());
-    expect((await updateLead(ref.lead(2363), { status: 'new' })).status).toBe('new');
-  });
-
-  it('re-checks the merged record: a lead keeps a status and a source', async () => {
-    expect(await failureOf(updateLead(ref.lead(2363), { status: null }))).toMatchObject({
-      status: 422,
-    });
-    expect(
-      (await failureOf(updateLead(ref.lead(2363), { source: null }))).fields,
-    ).toHaveProperty('source');
-  });
-
-  it('answers 409 only when the mobile changes onto another open lead', async () => {
-    // #2365 shares Rhea's mobile with her closed #2210 — saving it is fine.
-    expect(
-      (await updateLead(ref.lead(2365), { interests: ['prp', 'lhr'] })).interests,
-    ).toEqual(['prp', 'lhr']);
-    expect(
-      (await failureOf(updateLead(ref.lead(2364), { phone: '+919879521034' }))).status,
-    ).toBe(409);
-  });
-
-  it('hands over to a new owner: the previous one stays involved, the hold starts again', async () => {
-    const before = await fetchLead(ref.lead(2357));
-    const assigned = await assignLead(ref.lead(2357), NK);
-    expect(assigned).toMatchObject({ ownerId: NK, involvedIds: [DR] });
-    expect(assigned.touchedAt).toBe(NOW.toISOString());
-    expect(before.touchedAt).not.toBe(NOW.toISOString());
-  });
-
-  it('writes the assignment into the chat: "Assigned to <name> · <previous> stays involved"', async () => {
-    const id = ref.lead(2357);
-    const lines = () => systemLines(id);
-    await assignLead(id, NK);
-    expect(lines().at(-1)).toBe('Assigned to Nidhi K. · Dr. Reenal stays involved');
-    const count = lines().length;
-    // Assigning the owner they already have writes nothing.
-    await assignLead(id, NK);
-    expect(lines()).toHaveLength(count);
-  });
-
-  it('writes an involved change into the chat: "Added <name> as involved" (H:5707)', async () => {
-    const id = ref.lead(2357);
-    const lines = () => systemLines(id);
-    const before = (await fetchLead(id)).involvedIds;
-    const added = await setLeadInvolved(id, [...before, AS]);
-    expect(added.involvedIds).toContain(AS);
-    expect(lines().at(-1)).toBe('Added Asha M. as involved');
-    await setLeadInvolved(id, before);
-    expect(lines().at(-1)).toBe('Removed Asha M. from involved');
-    const count = lines().length;
-    // The same list again changes nobody and writes nothing.
-    await setLeadInvolved(id, before);
-    expect(lines()).toHaveLength(count);
-  });
-
-  it('writes a name exactly as it is — never read as a replacement pattern', async () => {
-    const id = ref.lead(2357);
-    await clinicFixtures.staff.update(AS, { firstName: "Dr. $&$'" });
-    const before = (await fetchLead(id)).involvedIds;
-    await setLeadInvolved(id, [...before, AS]);
-    expect(systemLines(id).at(-1)).toBe("Added Dr. $&$' as involved");
-    await setLeadInvolved(id, before);
-    expect(systemLines(id).at(-1)).toBe("Removed Dr. $&$' from involved");
-  });
-
-  it('counts a save by the owner as their activity, not one by anyone else (Q-L9)', async () => {
-    const touched = (await fetchLead(ref.lead(2356))).touchedAt;
-    expect(
-      (await updateLead(ref.lead(2356), { notes: 'Call later' }, NK)).touchedAt,
-    ).toBe(touched);
-    expect((await updateLead(ref.lead(2356), { notes: 'Called' }, RS)).touchedAt).toBe(
-      NOW.toISOString(),
+describe('listLeads', () => {
+  it('reads one page for the params and maps every row', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([leadRow()], {
+        next: 'cursor-2',
+        has_more: true,
+        estimated_total: 73,
+      }) as never,
     );
-  });
 
-  it('edits a contact thread’s contact, which has no status or source', async () => {
-    const saved = await updateLead(ref.lead(2372), { name: 'Neha Gupta K' });
-    expect(saved).toMatchObject({
-      name: 'Neha Gupta K',
-      status: null,
-      isContactThread: true,
-    });
-  });
+    const result = await listLeads({ view: 'mine', viewerId: RIYA, q: 'anaya' });
 
-  it('keeps the mobile and the contact’s first number one number, either way in', async () => {
-    // #2365 is Rhea's, on two numbers (H:3382).
-    const moved = await updateLead(ref.lead(2365), { phone: '+919712300003' });
-    expect(moved.contact?.phones.map((entry) => entry.phone)).toEqual([
-      '+919712300003',
-      '+919099055120',
-    ]);
-    const edited = await updateLead(ref.lead(2365), {
-      contact: {
-        ...moved.contact!,
-        phones: [{ phone: '+919712300004', whatsapp: true }],
+    expect(api.get).toHaveBeenCalledWith('/app/leads', {
+      query: {
+        limit: 50,
+        q: 'anaya',
+        owner_membership_id: RIYA,
+        after: undefined,
       },
     });
-    expect(edited.phone).toBe('+919712300004');
+    expect(result.next).toBe('cursor-2');
+    expect(result.total).toBe(73);
+    expect(result.rows).toEqual([
+      {
+        id: LEAD_ID,
+        leadNumber: 2363,
+        contactId: CONTACT_ID,
+        person: {
+          contactNumber: 10234,
+          firstName: 'Anaya',
+          lastName: 'Desai',
+          name: 'Anaya Desai',
+          primaryPhone: '+919879521034',
+          defaultChannel: 'whatsapp',
+        },
+        name: 'Anaya Desai',
+        phone: '+919879521034',
+        patientId: null,
+        status: 'new',
+        source: 'whatsapp',
+        interests: ['clinical'],
+        kind: 'enquiry',
+        retargetReason: null,
+        ownerId: NIDHI,
+        involvedIds: [RIYA],
+        heldUntil: '2026-10-05T04:30:00.000Z',
+        followUpAt: null,
+        branchId: null,
+        notes: null,
+        lastActivityAt: '2026-10-02T04:30:00.000Z',
+        isAwaitingReply: true,
+        createdAt: '2026-09-30T04:30:00.000Z',
+        updatedAt: '2026-10-02T04:30:00.000Z',
+      },
+    ]);
   });
 
-  it('answers 404 for a lead that is gone', async () => {
-    expect((await failureOf(updateLead(ref.lead(1), { notes: 'x' }))).status).toBe(404);
-  });
-});
-
-describe('the drawer’s save and its side effects (saveLead, Q-T3)', () => {
-  const messagesOf = (id: string) =>
-    clinicFixtures.leadMessages.snapshot((message) => message.leadId === id);
-
-  it('opens a follow-up task due tomorrow on Follow-up, and Undo takes it all back', async () => {
-    const id = ref.lead(2363);
-    const before = messagesOf(id).length;
-    const saved = await saveLead(id, { status: 'follow_up' }, RS);
-    expect(saved).toMatchObject({ statusMoved: true, followUpTask: true });
-    expect(saved.lead.status).toBe('follow_up');
-    expect(saved.lead.followUpAt).toBe('2026-10-04T05:30:00.000Z');
-    expect(await countOpenLeadTasks(id)).toBe(1);
-    expect(messagesOf(id).at(-1)?.body).toBe('Status → Follow-up');
-
-    await undoLeadChange(saved.undoToken);
-    const back = await fetchLead(id);
-    expect(back).toMatchObject({ status: 'new', followUpAt: null });
-    expect(await countOpenLeadTasks(id)).toBe(0);
-    expect(messagesOf(id)).toHaveLength(before);
-    expect((await failureOf(undoLeadChange(saved.undoToken))).status).toBe(409);
-  });
-
-  it('leaves one follow-up task on its due day — the follow rule counts the status’s own', async () => {
-    const id = ref.lead(2363);
-    const followUps = async () =>
-      (await fetchTaskPage({ scope: 'everyone' })).rows
-        .filter((row) => row.leadId === id && row.title.startsWith('Follow'))
-        .map((row) => row.title);
-    await saveLead(id, { status: 'follow_up' }, RS);
-    // A second move to Follow-up the same day opens nothing more.
-    await saveLead(id, { status: 'contacted' }, RS);
-    await saveLead(id, { status: 'follow_up' }, RS);
-    expect(await followUps()).toEqual(['Follow-up']);
-
-    // 11:30 on the due day: the follow rule's condition is met — Follow-up, its date today.
-    vi.setSystemTime(new Date('2026-10-04T06:00:00Z'));
-    expect(await followUps()).toEqual(['Follow-up']);
-  });
-
-  it('opens one Call back on No response, never a second while it is open', async () => {
-    const id = ref.lead(2363);
-    await saveLead(id, { status: 'no_response' }, RS);
-    expect(await countOpenLeadTasks(id)).toBe(1);
-    await saveLead(id, { status: 'contacted' }, RS);
-    await saveLead(id, { status: 'no_response' }, RS);
-    expect(await countOpenLeadTasks(id)).toBe(1);
-  });
-
-  it('says nothing moved when the status stays', async () => {
-    const saved = await saveLead(ref.lead(2363), { interests: ['peel'] }, RS);
-    expect(saved).toMatchObject({ statusMoved: false, followUpTask: false });
-  });
-});
-
-describe('convertLead', () => {
-  it('creates a linked patient and moves the lead to Clinic visited; Undo removes them', async () => {
-    const id = ref.lead(2363);
-    const converted = await convertLead(id);
-    expect(converted.lead).toMatchObject({
-      status: 'clinic_visited',
-      patientId: converted.patientId,
+  it('asks for the page after the cursor it is given', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([]) as never);
+    await listLeads({ view: 'all', viewerId: null }, 'cursor-2');
+    expect(api.get).toHaveBeenCalledWith('/app/leads', {
+      query: { limit: 50, after: 'cursor-2' },
     });
-    const patient = await clinicFixtures.patients.get(converted.patientId);
-    expect(patient).toMatchObject({ firstName: 'Anaya', lastName: 'Desai', leadId: id });
-    expect((await failureOf(convertLead(id))).status).toBe(409);
-
-    await undoLeadChange(converted.undoToken);
-    expect(await fetchLead(id)).toMatchObject({ status: 'new', patientId: null });
-    expect(
-      clinicFixtures.patients.snapshot((row) => row.id === converted.patientId),
-    ).toHaveLength(0);
-  });
-});
-
-describe('claim, release and the team’s Undo (Appendix F)', () => {
-  it('claims an open lead: the viewer owns it, the previous owner stays involved, the hold restarts', async () => {
-    const claimed = await claimLead(ref.lead(2362), RS);
-    expect(claimed).toMatchObject({ ownerId: RS, involvedIds: [AS], releasedAt: null });
-    expect(claimed.touchedAt).toBe(NOW.toISOString());
-    expect(await seqs({ hold: 'open' })).toEqual([]);
   });
 
-  it('takes over a held lead too, and leaves one already mine as it is', async () => {
-    expect((await claimLead(ref.lead(2364), RS)).ownerId).toBe(RS);
-    const mine = await fetchLead(ref.lead(2363));
-    expect(await claimLead(ref.lead(2363), RS)).toEqual(mine);
-  });
-
-  it('refuses a closed lead (409), a stranger (422) and a contact thread (404)', async () => {
-    expect((await failureOf(claimLead(ref.lead(2371), RS))).status).toBe(409);
-    expect((await failureOf(claimLead(ref.lead(2364), ref.user(99)))).status).toBe(422);
-    expect((await failureOf(claimLead(ref.lead(2372), RS))).status).toBe(404);
-  });
-
-  it('puts the team back for Undo', async () => {
-    const before = await fetchLead(ref.lead(2362));
-    await claimLead(ref.lead(2362), RS);
-    const restored = await restoreLeadTeam(ref.lead(2362), before);
-    expect(restored).toMatchObject({
-      ownerId: AS,
-      involvedIds: [],
-      touchedAt: before.touchedAt,
-      releasedAt: null,
-    });
-    expect(await seqs({ hold: 'open' })).toEqual([2362]);
-  });
-
-  it('releases the owner’s lead to the team at once', async () => {
-    // Mehul (#2356) is Riya's, held until later today.
-    const released = await releaseLead(ref.lead(2356), RS);
-    expect(released.releasedAt).toBe(NOW.toISOString());
-    const hold = leadHold({ ...released, ownerGone: false }, LEAD_HOLD_DAYS, NOW);
-    expect(hold).toMatchObject({ open: true, released: true });
-  });
-
-  it('lets only the owner release (403), and never a closed lead (409)', async () => {
-    expect(await failureOf(releaseLead(ref.lead(2363), NK))).toMatchObject({
-      status: 403,
-      detail: "You don't have access to do this",
-    });
-    expect((await failureOf(releaseLead(ref.lead(2355), RS))).status).toBe(409);
-  });
-});
-
-describe('markLeadRead', () => {
-  it('clears the unread count without touching "Updated"', async () => {
-    const before = await fetchLead(ref.lead(2363));
-    const read = await markLeadRead(ref.lead(2363));
-    expect(read.unreadCount).toBe(0);
-    expect(read.updatedAt).toBe(before.updatedAt);
-    expect(await countUnrepliedLeads(RS)).toBe(1);
-    expect(await markLeadRead(ref.lead(2363))).toEqual(read);
-  });
-});
-
-describe('delete with a reason and restore (S:1546)', () => {
-  it('soft-deletes out of every list, and restore brings it back for Undo', async () => {
-    await deleteLead(ref.lead(2357), 'duplicate', null);
-    expect(await seqs()).not.toContain(2357);
-    expect(clinicFixtures.leads.snapshot((lead) => lead.seq === 2357)).toEqual([]);
-    await restoreLead(ref.lead(2357));
-    expect(await seqs()).toContain(2357);
-  });
-
-  it('needs a note for "Other" (422) and never deletes a contact thread (404)', async () => {
-    expect(
-      (await failureOf(deleteLead(ref.lead(2357), 'other', ' '))).fields,
-    ).toHaveProperty('note');
-    expect((await failureOf(deleteLead(ref.lead(2372), 'duplicate', null))).status).toBe(
-      404,
+  it('gives no next cursor on the last page, whatever cursor the answer carries', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([leadRow()], { next: 'stale', has_more: false }) as never,
     );
+    const result = await listLeads({ view: 'all', viewerId: null });
+    expect(result.next).toBeNull();
+    expect(result.total).toBeNull();
+  });
+
+  it('reads a person who is gone as no name and no number', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([leadRow({ contact: null })]) as never);
+    const [row] = (await listLeads({ view: 'all', viewerId: null })).rows;
+    expect(row).toMatchObject({ person: null, name: '', phone: null });
+  });
+
+  it('reads an answer without rows as an empty page', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: undefined } as never);
+    expect(await listLeads({ view: 'all', viewerId: null })).toEqual({
+      rows: [],
+      next: null,
+      total: null,
+    });
+  });
+});
+
+describe('fetchLead', () => {
+  it('reads one lead by its id', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: leadRow({ notes: 'Hi' }) } as never);
+    const lead = await fetchLead(LEAD_ID);
+    expect(api.get).toHaveBeenCalledWith('/app/leads/{lead_id}', {
+      params: { lead_id: LEAD_ID },
+    });
+    expect(lead).toMatchObject({ id: LEAD_ID, name: 'Anaya Desai', notes: 'Hi' });
+  });
+
+  it('refuses an answer that is not a lead', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: { id: LEAD_ID } } as never);
+    await expect(fetchLead(LEAD_ID)).rejects.toThrow();
+  });
+});
+
+describe('countUnrepliedLeads', () => {
+  it('is 0 without a viewer, and reads nothing', async () => {
+    expect(await countUnrepliedLeads(null)).toBe(0);
+    expect(api.get).not.toHaveBeenCalled();
+  });
+
+  it('reads the estimated total of the viewer’s leads awaiting a reply', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([leadRow()], { estimated_total: 4 }) as never,
+    );
+    expect(await countUnrepliedLeads(RIYA)).toBe(4);
+    expect(api.get).toHaveBeenCalledWith('/app/leads', {
+      query: { limit: 1, owner_membership_id: RIYA, is_awaiting_reply: 'true' },
+    });
+  });
+});
+
+describe('countOpenLeadTasks', () => {
+  it('reads the estimated total of everyone’s open tasks on the lead', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([{}], { estimated_total: 2 }) as never);
+    expect(await countOpenLeadTasks(LEAD_ID)).toBe(2);
+    expect(api.get).toHaveBeenCalledWith('/app/tasks', {
+      query: { limit: 1, tab: 'open', scope: 'everyone', lead_id: LEAD_ID },
+    });
+  });
+});
+
+describe('createLead', () => {
+  it('creates a lead for someone already known by their contact id', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: leadRow() } as never);
+
+    const created = await createLead({
+      person: { contactId: CONTACT_ID },
+      fields: FIELDS,
+      idempotencyKey: 'key-create',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/leads', {
+      body: { contact_id: CONTACT_ID, ...FIELDS_BODY },
+      idempotencyKey: 'key-create',
+    });
+    expect(created).toMatchObject({ id: LEAD_ID, leadNumber: 2363 });
+  });
+
+  it('creates a new person with the lead, the first number their primary', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: leadRow() } as never);
+
+    await createLead({
+      person: {
+        contact: {
+          firstName: 'Hetal',
+          lastName: null,
+          phones: [
+            { phone: '+919898012345', isOnWhatsapp: true },
+            { phone: '+919898012346', isOnWhatsapp: false },
+          ],
+          instagramHandles: ['hetal.p'],
+          defaultChannel: 'call',
+          preferenceTags: ['no_calls'],
+        },
+      },
+      fields: FIELDS,
+      idempotencyKey: 'key-new-person',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/leads', {
+      body: {
+        contact: {
+          first_name: 'Hetal',
+          last_name: null,
+          phones: [
+            { phone: '+919898012345', is_primary: true, is_on_whatsapp: true },
+            { phone: '+919898012346', is_primary: false, is_on_whatsapp: false },
+          ],
+          instagram_handles: ['hetal.p'],
+          default_channel: 'call',
+          preference_tags: ['no_calls'],
+        },
+        ...FIELDS_BODY,
+      },
+      idempotencyKey: 'key-new-person',
+    });
+  });
+});
+
+describe('updateLead', () => {
+  it('sends the changed fields with the read’s updated_at — a drawer save', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce({
+      data: leadRow({ status: 'contacted' }),
+    } as never);
+
+    const saved = await updateLead({
+      leadId: LEAD_ID,
+      fields: { status: 'contacted', notes: null },
+      expectedUpdatedAt: '2026-10-02T04:30:00.000Z',
+      idempotencyKey: 'key-save',
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/leads/{lead_id}', {
+      params: { lead_id: LEAD_ID },
+      body: {
+        status: 'contacted',
+        notes: null,
+        expected_updated_at: '2026-10-02T04:30:00.000Z',
+      },
+      idempotencyKey: 'key-save',
+    });
+    expect(saved.status).toBe('contacted');
+  });
+
+  it('sends no updated_at for a quick toggle', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce({ data: leadRow() } as never);
+
+    await updateLead({
+      leadId: LEAD_ID,
+      fields: { involvedIds: [RIYA, NIDHI] },
+      idempotencyKey: 'key-toggle',
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/leads/{lead_id}', {
+      params: { lead_id: LEAD_ID },
+      body: { involved_membership_ids: [RIYA, NIDHI] },
+      idempotencyKey: 'key-toggle',
+    });
+    expect(lastPatchBody().expected_updated_at).toBeUndefined();
+  });
+
+  it('names every field the API’s way', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce({ data: leadRow() } as never);
+    await updateLead({ leadId: LEAD_ID, fields: FIELDS, idempotencyKey: 'key-all' });
+    expect(lastPatchBody()).toEqual(FIELDS_BODY);
+  });
+});
+
+describe('claim, release and restore', () => {
+  it('claims a lead with the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: leadRow({ owner_membership_id: RIYA }),
+    } as never);
+    const claimed = await claimLead(LEAD_ID, 'key-claim');
+    expect(api.post).toHaveBeenCalledWith('/app/leads/{lead_id}/claim', {
+      params: { lead_id: LEAD_ID },
+      idempotencyKey: 'key-claim',
+    });
+    expect(claimed.ownerId).toBe(RIYA);
+  });
+
+  it('releases a lead with the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: leadRow({ held_until: null }),
+    } as never);
+    const released = await releaseLead(LEAD_ID, 'key-release');
+    expect(api.post).toHaveBeenCalledWith('/app/leads/{lead_id}/release', {
+      params: { lead_id: LEAD_ID },
+      idempotencyKey: 'key-release',
+    });
+    expect(released.heldUntil).toBeNull();
+  });
+
+  it('restores a deleted lead with the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: leadRow() } as never);
+    const restored = await restoreLead(LEAD_ID, 'key-restore');
+    expect(api.post).toHaveBeenCalledWith('/app/leads/{lead_id}/restore', {
+      params: { lead_id: LEAD_ID },
+      idempotencyKey: 'key-restore',
+    });
+    expect(restored.id).toBe(LEAD_ID);
+  });
+});
+
+describe('deleteLead', () => {
+  it('sends the reason and the note', async () => {
+    vi.mocked(api.delete).mockResolvedValueOnce({ data: undefined } as never);
+    await deleteLead({ leadId: LEAD_ID, reason: 'other', note: 'Spam number' });
+    expect(api.delete).toHaveBeenCalledWith('/app/leads/{lead_id}', {
+      params: { lead_id: LEAD_ID },
+      reason: 'other',
+      note: 'Spam number',
+    });
+  });
+
+  it('sends no note when there is none', async () => {
+    vi.mocked(api.delete).mockResolvedValueOnce({ data: undefined } as never);
+    await deleteLead({ leadId: LEAD_ID, reason: 'duplicate', note: null });
+    expect(api.delete).toHaveBeenCalledWith('/app/leads/{lead_id}', {
+      params: { lead_id: LEAD_ID },
+      reason: 'duplicate',
+      note: undefined,
+    });
   });
 });

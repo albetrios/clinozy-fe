@@ -9,7 +9,7 @@ import {
   clinicInstant,
   clinicToday,
 } from './clinic-time.ts';
-import { leadFieldsSchema, type LeadRecord } from './leads-contracts.ts';
+import { leadFieldsSchema, type LeadRecord } from './leads-fixture-contracts.ts';
 import {
   type ChatAuthor,
   type ChatPerson,
@@ -46,6 +46,8 @@ export const messageQueryKeys = {
   templateValues: (personKey: string) =>
     [...messageQueryKeys.all, 'template-values', personKey] as const,
   status: () => [...messageQueryKeys.all, 'status'] as const,
+  /** clinozy-be's messaging status — a contact's chat (`contact-activities-api.ts`). */
+  liveStatus: () => [...messageQueryKeys.status(), 'live'] as const,
 };
 
 /**
@@ -97,6 +99,8 @@ async function threadLeadOf(
   world: World,
   person: ChatPerson,
 ): Promise<LeadRecord | null> {
+  // A contact's stream is clinozy-be's (`contact-activities-api.ts`), never the fixture's.
+  if (person.kind === 'contact') return null;
   if (person.kind === 'lead') return world.leads.get(person.leadId);
   await world.patients.get(person.patientId);
   const { findPersonThread } = await threadFixtures();

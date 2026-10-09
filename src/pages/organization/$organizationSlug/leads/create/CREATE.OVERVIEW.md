@@ -9,11 +9,14 @@ reopens it. `?name=&phone=` prefill the drawer (⌘K "New lead", the contact car
 telemetry (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership
 (`organization:read`) and the `clinic-leads` module, then `requireOrgStatus`; in-room
 Create is `useClinicAccess`. The drawer is `NewLeadDrawer`
-(`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (search, Quick start,
-"New contact" → the shared `ContactEditor`) and Lead details, locked until there is a contact; with
-a prefill or a picked person, the person's strip with "Change" and Lead details alone. "Create lead"
-checks for a name and a 10-digit mobile; a mobile already on an open lead toasts with "Open". The
-new lead is picked out in the list; the drawer closes to `/leads` without the prefill.
+(`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (the person search
+`GET /app/contacts?q=`, Quick start, "New contact" → the shared `ContactEditor`) and Lead details,
+locked until there is a person; with a prefill or a picked person, the person's strip with "Change"
+and Lead details alone. Someone with an open lead opens it instead ("Open lead", one open lead each).
+"Create lead" checks a new person's first name and 10-digit mobile, then sends `POST /app/leads` with
+the picked `contact_id` or the new `contact`; a 409 toasts the server's words ("Open" for
+`lead_open_exists`). The new lead is picked out in the list; the drawer closes to `/leads` without
+the prefill.
 
 ## Files
 
@@ -27,5 +30,5 @@ new lead is picked out in the list; the drawer closes to `/leads` without the pr
 
 `new-lead-drawer` — the drawer the Leads page opens for this URL (L-35); the route renders
 no element of its own (`tooling/validate/test-ids-allowlist.txt`). Its parts: the record drawer's
-(`new-lead-drawer-save` …) and `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<kind>-<seq>`,
+(`new-lead-drawer-save` …) and `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`,
 `new-lead-no-match`, `new-lead-new-contact`, `new-lead-change` (`../leads.constants.ts`).

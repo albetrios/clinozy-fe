@@ -11,8 +11,17 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { listOf, oneOf, queryOf, RECORD_ID } from '@/lib/routes/search-params.ts';
-import { readCreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
+import {
+  listOf,
+  matchOf,
+  oneOf,
+  PUBLIC_ID,
+  queryOf,
+} from '@/lib/routes/search-params.ts';
+import {
+  readCreatedFilter,
+  readFollowUpFilter,
+} from '@/shared/api/clinic/clinic-list-filters.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
   LEAD_CHAT_WIDTH,
@@ -322,13 +331,24 @@ describe('RoomFilters — surfaces', () => {
 });
 
 describe('RoomFilters — a people section (the Leads "Team")', () => {
-  const RIYA = '00000000-0000-4000-8000-000000000012';
-  const NIDHI = '00000000-0000-4000-8000-000000000013';
+  // Team members by membership id (`mem_` + 21 lowercase alphanumerics), as clinozy-be names them.
+  const RIYA = 'mem_riya00000000000000000';
+  const NIDHI = 'mem_nidhi0000000000000000';
   const SOURCES = ['instagram', 'whatsapp'] as const;
   const TEAM_FIELDS = {
     source: { kind: 'options', values: SOURCES },
     owner: { kind: 'people' },
   } as const satisfies RoomFilterFields;
+  const TEAM = {
+    members: [
+      { id: RIYA, name: 'Riya Shah', tone: 'blush', role: 'Front desk' },
+      { id: NIDHI, name: 'Nidhi Kapoor', tone: 'sage', role: 'Counsellor' },
+    ],
+    anyone: 'Anyone on the team',
+    count: (count: number) => `${count} people`,
+    search: 'Search team',
+    noMatch: 'No match',
+  } as const satisfies RoomFilterCopy['people'];
   const TEAM_COPY: Record<string, RoomFilterCopy> = {
     source: {
       label: 'Source · pick any',
@@ -342,31 +362,31 @@ describe('RoomFilters — a people section (the Leads "Team")', () => {
       label: 'Team · assigned or involved',
       clearLabel: 'Clear',
       options: {},
-      people: {
-        members: [
-          { id: RIYA, name: 'Riya Shah', tone: 'blush', role: 'Front desk' },
-          { id: NIDHI, name: 'Nidhi Kapoor', tone: 'sage', role: 'Counsellor' },
-        ],
-        anyone: 'Anyone on the team',
-        count: (count) => `${count} people`,
-        search: 'Search team',
-        noMatch: 'No match',
-      },
+      people: TEAM,
     },
   };
 
-  function renderTeam(path = '/leads') {
+  /** A `/leads` route over `fields`, its search read by `validateSearch`. */
+  function renderLeads({
+    path = '/leads',
+    fields = TEAM_FIELDS,
+    copy = TEAM_COPY,
+    validateSearch = (search: Record<string, unknown>) => ({
+      source: listOf(search.source, (entry) => oneOf(SOURCES, entry) !== undefined),
+      owner: listOf(search.owner, (entry) => PUBLIC_ID.test(entry)),
+    }),
+  }: {
+    path?: string;
+    fields?: RoomFilterFields;
+    copy?: Record<string, RoomFilterCopy>;
+    validateSearch?: (search: Record<string, unknown>) => Record<string, unknown>;
+  } = {}) {
     const rootRoute = createRootRoute({ component: () => <Outlet /> });
     const leads = createRoute({
       getParentRoute: () => rootRoute,
       path: '/leads',
-      validateSearch: (search: Record<string, unknown>) => ({
-        source: listOf(search.source, (entry) => oneOf(SOURCES, entry) !== undefined),
-        owner: listOf(search.owner, (entry) => RECORD_ID.test(entry)),
-      }),
-      component: () => (
-        <RoomFilters fields={TEAM_FIELDS} copy={TEAM_COPY} testIdPrefix="leads" />
-      ),
+      validateSearch,
+      component: () => <RoomFilters fields={fields} copy={copy} testIdPrefix="leads" />,
     });
     const router = createRouter({
       routeTree: rootRoute.addChildren([leads]),
@@ -385,8 +405,8 @@ describe('RoomFilters — a people section (the Leads "Team")', () => {
     return screen.findByTestId('leads-filters');
   }
 
-  it('picks anyone on the team from the expanding list, then writes their ids', async () => {
-    const { router, user } = renderTeam();
+  it('picks anyone on the team from the expanding list, then writes their membership ids', async () => {
+    const { router, user } = renderLeads();
     const panel = await openTeam(user);
     const picker = within(panel).getByRole('button', { name: 'Anyone on the team' });
     expect(picker).toHaveAttribute('aria-expanded', 'false');
@@ -411,7 +431,7 @@ describe('RoomFilters — a people section (the Leads "Team")', () => {
   });
 
   it('searches the team by name or role, and says "No match"', async () => {
-    const { user } = renderTeam();
+    const { user } = renderLeads();
     const panel = await openTeam(user);
     await user.click(within(panel).getByRole('button', { name: 'Anyone on the team' }));
     const search = within(panel).getByRole('searchbox', { name: 'Search team' });
@@ -428,7 +448,7 @@ describe('RoomFilters — a people section (the Leads "Team")', () => {
   });
 
   it('offers "Clear" on a section only while it has picks', async () => {
-    const { user } = renderTeam(`/leads?source=instagram&owner=${RIYA}`);
+    const { user } = renderLeads({ path: `/leads?source=instagram&owner=${RIYA}` });
     const panel = await openTeam(user);
     const clears = within(panel).getAllByRole('button', { name: 'Clear' });
     expect(clears).toHaveLength(2);
@@ -437,5 +457,97 @@ describe('RoomFilters — a people section (the Leads "Team")', () => {
     expect(
       within(panel).getByRole('button', { name: 'Instagram', pressed: false }),
     ).toBeInTheDocument();
+  });
+
+  it('keeps one member in a single people filter — a pick replaces the last', async () => {
+    const { router, user } = renderLeads({
+      path: `/leads?member=${RIYA}`,
+      fields: { member: { kind: 'people', single: true } },
+      copy: {
+        member: {
+          label: 'Team · assigned or involved',
+          clearLabel: 'Clear',
+          options: {},
+          people: TEAM,
+        },
+      },
+      validateSearch: (search) => ({
+        member: matchOf(
+          PUBLIC_ID,
+          Array.isArray(search.member) ? search.member[0] : search.member,
+        ),
+      }),
+    });
+    const panel = await openTeam(user);
+    const picker = within(panel).getByRole('button', { name: 'Riya Shah' });
+    await user.click(picker);
+    expect(
+      within(panel).getByRole('button', { name: 'Riya Shah Front desk' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(
+      within(panel).getByRole('button', { name: 'Nidhi Kapoor Counsellor' }),
+    );
+    expect(
+      within(panel).getByRole('button', { name: 'Riya Shah Front desk' }),
+    ).toHaveAttribute('aria-pressed', 'false');
+    expect(
+      within(panel).getByRole('button', { name: 'Nidhi Kapoor Counsellor' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(picker).toHaveTextContent('Nidhi Kapoor');
+
+    await user.click(within(panel).getByRole('button', { name: 'Apply filter' }));
+    // One member is a plain value in the URL, not a list.
+    await waitFor(() => expect(router.state.location.search).toEqual({ member: NIDHI }));
+    expect(screen.getByTestId('leads-filters-trigger')).toHaveTextContent('Filters1');
+  });
+});
+
+describe('RoomFilters — a date section without some presets', () => {
+  const FOLLOW_UP_FIELDS = {
+    followUp: { kind: 'date', presets: 'followUp', without: ['not_set'] },
+  } as const satisfies RoomFilterFields;
+
+  function renderFollowUp(path = '/leads') {
+    const rootRoute = createRootRoute({ component: () => <Outlet /> });
+    const leads = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/leads',
+      validateSearch: (search: Record<string, unknown>) => ({
+        followUp: readFollowUpFilter(search.followUp),
+      }),
+      component: () => (
+        <RoomFilters fields={FOLLOW_UP_FIELDS} copy={{}} testIdPrefix="leads" />
+      ),
+    });
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([leads]),
+      history: createMemoryHistory({ initialEntries: [path] }),
+    });
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    return { user: userEvent.setup() };
+  }
+
+  it('does not offer a preset the room’s API cannot filter by, nor read it from the URL', async () => {
+    const { user } = renderFollowUp('/leads?followUp=not_set');
+    // "Not set" in the URL is no filter: nothing to count, nothing to clear.
+    const trigger = await screen.findByTestId('leads-filters-trigger');
+    expect(trigger).toHaveTextContent(/^Filters$/);
+    expect(screen.queryByRole('button', { name: 'Clear all filters' })).toBeNull();
+
+    await user.click(trigger);
+    const panel = await screen.findByTestId('leads-filters');
+    const followUp = within(panel).getByRole('group', { name: 'Follow-up date' });
+    expect(
+      within(followUp)
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['Any', 'Overdue', 'Today', 'Tomorrow', 'Next 7 days', 'Custom range']);
+    expect(within(followUp).queryByRole('button', { name: 'Not set' })).toBeNull();
+    expect(chip(followUp, 'Any')).toHaveAttribute('aria-pressed', 'true');
   });
 });

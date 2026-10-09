@@ -9,7 +9,7 @@ import { LEADS_SEARCH_DEFAULTS, type LeadsSearch } from '../../leads.search.ts';
 
 /**
  * The list read's params for the URL as it stands (defaults applied, the view
- * read against the viewer) — what the Leads list hands `useLeadList`.
+ * read against the viewer's membership) — what the Leads list hands `useLeadList`.
  */
 export function leadListParamsOf(
   search: LeadsSearch,
@@ -23,10 +23,10 @@ export function leadListParamsOf(
     view: search.view ?? LEADS_SEARCH_DEFAULTS.view,
     viewerId,
     q: search.q,
-    status: search.status ? [search.status] : undefined,
+    status: search.status,
     source: search.source,
     hold: search.hold,
-    owner: search.owner,
+    member: search.member,
     created: search.created,
     followUp: search.followUp,
     sort,

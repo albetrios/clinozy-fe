@@ -12,8 +12,8 @@ import { personFullName, shortPersonName } from '@/shared/components/Cells/index
 import { firstNameOf } from '@/shared/components/ChatColumn/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { useFixtureLead } from '@/shared/hooks/useFixtureLeads/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 import { useTaskDueAtWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
@@ -84,7 +84,7 @@ export interface NewTaskDrawerProps {
 /** The lead or patient the URL names, once read. */
 function usePrefilledPerson(prefill: TaskCreateSearch): NewTaskPerson | null {
   const patient = usePatient(prefill.patient);
-  const lead = useLead(prefill.patient ? undefined : prefill.lead);
+  const lead = useFixtureLead(prefill.patient ? undefined : prefill.lead);
   if (patient.data) return personOfPatient(patient.data);
   if (lead.data) return personOfLead(lead.data);
   return null;

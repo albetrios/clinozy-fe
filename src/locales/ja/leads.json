@@ -10,18 +10,16 @@
     "claimed": "{{name}} の担当になりました · {{owner}} は引き続き関与します",
     "claimedUnowned": "{{name}} の担当になりました",
     "released": "チームに開放しました · 誰でも引き受けられます",
-    "assigned": "{{name}} が担当になりました · 通知済み",
-    "followUpTask": " · 明日のフォローアップタスク",
-    "converted": "{{name}} の患者記録を作成しました · リードはリンクされたままです"
+    "assigned": "{{name}} が担当になりました · 通知済み"
   },
   "list": {
     "records": "リード",
     "views": {
       "label": "リードの表示",
       "mine": "自分",
-      "unread": "未返信",
+      "unreplied": "未返信",
       "all": "すべて",
-      "unreadCount_other": "未返信 {{count}} 件"
+      "unrepliedCount_other": "未返信 {{count}} 件"
     },
     "search": {
       "placeholder": "名前・電話番号・#ID で検索",
@@ -42,14 +40,12 @@
   },
   "team": {
     "claim": "開放中 · 引き受ける",
-    "join": "チームに開放 · 参加",
+    "openHint": "誰も確保していません · 誰でも担当できます",
     "openMine": "チームに開放",
-    "claimHint_other": "{{count}} 日間動きなし · 誰でも引き受けられます",
-    "joinHint": "{{name}} はクリニックを離れました · チームの誰でも参加して引き受けられます",
-    "releasesToday": "誰もフォローしなければ今日チームに開放されます",
-    "releasesTomorrow": "誰もフォローしなければ明日チームに開放されます",
+    "openMineHint": "確保期間が終了しました · 誰でも担当できます",
+    "releasesToday": "今日 {{time}} にチームへ戻ります",
+    "releasesTomorrow": "明日 {{time}} にチームへ戻ります",
     "claimFirst": "{{first}} を引き受ける",
-    "joinTake": "参加 · {{first}} を引き受ける",
     "takeOver": "{{first}} から引き継ぐ"
   },
   "filters": {
@@ -57,7 +53,7 @@
     "source": "流入元 · 複数選択可",
     "clear": "クリア",
     "hold": {
-      "label": "担当 · 無活動日数後の保持",
+      "label": "担当 · 担当後の確保",
       "any": "すべて",
       "open": "引き受け可能",
       "soon": "今日開放",
@@ -81,7 +77,6 @@
     "panels": "リードのパネル",
     "details": "詳細",
     "chat": "チャット",
-    "chatCount": "新着 {{n}} 件",
     "resize": "パネルのサイズを変更",
     "resizeHint": "ドラッグでサイズ変更 · ダブルクリックでリセット",
     "cards": {
@@ -91,7 +86,6 @@
     },
     "source": "流入元",
     "interests": "関心のある施術",
-    "addInterest": "関心を追加",
     "people": "担当者と関係者",
     "peopleAria": "担当者と関係者",
     "addInvolved": "+ 関係者を追加",
@@ -107,18 +101,17 @@
     "stepTips": {
       "done": "{{status}} · 完了",
       "current": "{{status}} · 現在のステップ",
-      "next": "{{status}} に進める"
+      "next": "{{status}} に進める",
+      "byCheckIn": "来院済み · チェックイン時に設定されます"
     },
     "closeAs": "終了理由",
     "info": {
       "created": "作成日",
-      "lastMessage": "最後のメッセージ",
-      "lastMessageValue": "{{channel}} · {{at}}",
+      "lastActivity": "最新のアクティビティ",
       "none": "まだありません",
       "patient": "患者",
       "linked": "リンク済み",
       "notYet": "まだ",
-      "convert": "患者に変換",
       "openTasks": "未完了のタスク",
       "retargetReason": "リターゲットの理由"
     },
@@ -135,18 +128,9 @@
       "assigned": "担当中",
       "currentlyAssigned": "現在の担当者",
       "assignTo": "{{name}} を担当にする",
-      "onlyAssignee": "担当者（{{name}}）のみが担当を変更できます",
-      "cantAssign": "{{role}} は {{other}} に割り当てられません",
       "involved": "関係者 · このリードを対応した人",
       "noMatch": "該当なし",
-      "note": "✓ 関係者 = このリードを対応したすべての人。返信・通話・メモ・予約で自動的に追加されます · 手動で追加することもできます",
-      "roleLine": "{{role}} · {{presence}}"
-    },
-    "presence": {
-      "online": "オンライン",
-      "away": "離席中",
-      "busy": "取り込み中",
-      "offline": "オフライン"
+      "note": "✓ 関係者 = このリードを対応したすべての人。返信・通話・メモ・予約で自動的に追加されます · 手動で追加することもできます"
     },
     "remove": {
       "title": "このリードを削除しますか？",
@@ -158,10 +142,6 @@
         "other": "その他"
       },
       "removed": "リード #{{seq}} を削除しました · {{reason}}"
-    },
-    "toasts": {
-      "claimedAfter_other": "{{count}} 日間動きがなかったため {{me}} が引き取りました · {{owner}} は関係者として残ります",
-      "releasedOpen": "{{name}} は誰でも引き取れるようになりました"
     }
   },
   "newLead": {
@@ -173,19 +153,17 @@
     "quickStart": "クイックスタート",
     "presets": {
       "walkIn": "飛び込み",
-      "phoneCall": "電話",
       "instagramDm": "Instagram の DM"
     },
     "presetHints": {
-      "walkIn": "今受付にいます · 流入元 飛び込み、ステータス 来院済み",
-      "phoneCall": "電話での問い合わせ",
+      "walkIn": "今受付にいます · 流入元 飛び込み",
       "instagramDm": "Instagram の DM"
     },
     "hits": {
-      "patient": "患者 {{id}} · 最終来院 {{date}}",
-      "patientNew": "患者 {{id}}",
-      "lead": "リード {{id}} · {{phone}}",
-      "contact": "連絡先 · {{phone}}",
+      "patient": "患者 · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "対応中のリード · {{id}} · {{phone}}",
+      "open": "リードを開く",
       "recreate": "リードを再作成",
       "useContact": "連絡先を使う"
     },
@@ -197,14 +175,12 @@
     "detailsSummary": "流入元、関心、担当者",
     "footer": "連絡先を 1 件作成または更新します",
     "create": "リードを作成",
-    "linked": "{{name}} にリンク · {{kind}} · チャネルと希望を引き継ぎ",
     "toasts": {
       "pickFirst": "先に連絡先を選ぶか追加してください",
       "presetApplied": "プリセット「{{preset}}」を適用しました",
       "existingPatient": "既存の患者 {{id}} · 新しいリードをリンクします",
       "existingContact": "既存の連絡先 {{name}} を使います",
       "missing": "名前と 10 桁の携帯番号を入力してください",
-      "duplicate": "この携帯番号はすでにリード {{id}} にあります",
       "open": "開く"
     }
   }

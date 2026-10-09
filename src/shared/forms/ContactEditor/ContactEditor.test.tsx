@@ -20,14 +20,15 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
 }));
 
 const RHEA: ContactEditorValue = {
-  name: 'Rhea Shah',
+  firstName: 'Rhea',
+  lastName: 'Shah',
   phones: [
     { digits: '9825011241', whatsapp: true },
     { digits: '9099055120', whatsapp: true },
   ],
   instagram: ['@rhea'],
   defaultChannel: 'whatsapp',
-  preferences: ['No calls', 'Call after lunch'],
+  preferences: ['no_calls', 'prefers_saturdays'],
 };
 
 /** A page that opens the editor and keeps what "Done" hands back. */
@@ -82,12 +83,17 @@ describe('ContactEditor', () => {
     expect(
       screen.getByText('One contact · shared by leads, patients and chats'),
     ).toBeInTheDocument();
+    // The first and last names in their own fields.
+    expect(screen.getByTestId('contact-editor-first-name')).toHaveValue('Rhea');
+    expect(screen.getByTestId('contact-editor-last-name')).toHaveValue('Shah');
+    expect(screen.getByRole('textbox', { name: /First name/ })).toBeRequired();
     // The record drawer's 560px (six light fields), the form drawers' ×.
     expect(dialog).toHaveClass('md:w-[min(560px,calc(100vw-56px))]');
     expect(screen.getByTestId('contact-editor-dismiss')).toHaveTextContent('Back');
   });
 
   it('shows a new contact as "New contact" on the canvas band, without an ID', async () => {
+    const user = userEvent.setup();
     renderWithProviders(<Harness value={emptyContactValue()} record={null} />);
 
     const band = await screen.findByTestId('contact-editor-band');
@@ -102,11 +108,15 @@ describe('ContactEditor', () => {
         .querySelector('[data-slot="pill"]');
     expect(circle()).not.toHaveClass('bg-success');
 
-    await userEvent.type(screen.getByTestId('contact-editor-name'), 'priya');
-    expect(within(band).getByText('Priya')).toBeInTheDocument();
+    // A last name alone is no name: the step waits for the first.
+    await user.type(screen.getByTestId('contact-editor-last-name'), 'mehta');
+    expect(circle()).not.toHaveClass('bg-success');
+
+    await user.type(screen.getByTestId('contact-editor-first-name'), 'priya');
+    expect(within(band).getByText('Priya Mehta')).toBeInTheDocument();
     expect(within(band).getByText('Contact')).toBeInTheDocument();
-    expect(within(band).getByText('P')).toBeInTheDocument();
-    // "Identity & reach" turns green once there is a name.
+    expect(within(band).getByText('PM')).toBeInTheDocument();
+    // "Identity & reach" turns green once there is a first name.
     expect(circle()).toHaveClass('bg-success');
   });
 
@@ -143,7 +153,7 @@ describe('ContactEditor', () => {
     expect(screen.getByRole('textbox', { name: 'Mobile 2' })).toHaveValue('98765 43210');
   });
 
-  it('adds and removes Instagram handles, and picks the default channel', async () => {
+  it('adds and removes Instagram handles, and picks the default channel — no SMS', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Harness value={{ ...RHEA, instagram: [] }} />);
 
@@ -154,29 +164,43 @@ describe('ContactEditor', () => {
     await user.click(screen.getAllByRole('button', { name: 'Remove handle' })[0]!);
     expect(notifyMock.success).toHaveBeenCalledWith('Removed @rhea.skin');
 
-    await user.click(screen.getByTestId('contact-editor-channel-sms'));
-    expect(screen.getByTestId('contact-editor-channel-sms')).toHaveAttribute(
+    // WhatsApp · Call · Instagram — SMS is no channel on the API.
+    const channels = within(screen.getByTestId('contact-editor-channel'))
+      .getAllByRole('button')
+      .map((chip) => chip.textContent);
+    expect(channels).toEqual(['WhatsApp', 'Call', 'Instagram']);
+    expect(screen.queryByTestId('contact-editor-channel-sms')).toBeNull();
+    await user.click(screen.getByTestId('contact-editor-channel-call'));
+    expect(screen.getByTestId('contact-editor-channel-call')).toHaveAttribute(
       'aria-pressed',
       'true',
     );
 
     await user.click(screen.getByTestId('contact-editor-done'));
-    expect(kept()).toMatchObject({ instagram: [''], defaultChannel: 'sms' });
+    expect(kept()).toMatchObject({ instagram: [''], defaultChannel: 'call' });
   });
 
-  it('moves to Contact preferences, toggles presets and adds a custom one', async () => {
+  it('moves to Contact preferences, toggles presets by tag and adds a custom one', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Harness />);
 
     await user.click(await screen.findByTestId('contact-editor-step-identity-next'));
     const group = screen.getByRole('group', { name: 'Contact preferences' });
+    // A preset reads its label; a custom tag reads its words.
+    expect(screen.getByTestId('contact-editor-preferences-no_calls')).toHaveTextContent(
+      'No calls',
+    );
     expect(within(group).getByRole('button', { name: 'No calls' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
     expect(
-      within(group).getByRole('button', { name: 'Call after lunch' }),
+      within(group).getByRole('button', { name: 'prefers saturdays' }),
     ).toHaveAttribute('aria-pressed', 'true');
+    expect(within(group).getByRole('button', { name: 'Hindi' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
     // Collapsed, Identity & reach names the contact.
     expect(screen.getByTestId('contact-editor-step-identity')).toHaveTextContent(
       'Rhea Shah',
@@ -184,13 +208,24 @@ describe('ContactEditor', () => {
 
     await user.click(within(group).getByRole('button', { name: 'Hindi' }));
     await user.click(within(group).getByRole('button', { name: 'No calls' }));
+    // Typed words already picked are not added twice.
     await user.click(screen.getByTestId('contact-editor-custom'));
     await user.type(screen.getByTestId('contact-editor-custom-input'), 'hindi{Enter}');
     await user.click(screen.getByTestId('contact-editor-custom'));
-    await user.type(screen.getByTestId('contact-editor-custom-input'), 'Weekends{Enter}');
+    await user.type(
+      screen.getByTestId('contact-editor-custom-input'),
+      'Call after lunch{Enter}',
+    );
+    expect(
+      screen.getByTestId('contact-editor-preferences-call_after_lunch'),
+    ).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(screen.getByTestId('contact-editor-done'));
-    expect(kept()?.preferences).toEqual(['Hindi', 'Call after lunch', 'Weekends']);
+    expect(kept()?.preferences).toEqual([
+      'hindi',
+      'prefers_saturdays',
+      'call_after_lunch',
+    ]);
   });
 
   it('leaves the custom field on Esc and keeps the editor open', async () => {
@@ -210,13 +245,12 @@ describe('ContactEditor', () => {
     expect(kept()).toBeNull();
   });
 
-  it('keeps nothing from ×: it asks first once edited, and only Done hands the values back', async () => {
+  it('keeps nothing from ×: it asks first once edited', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
     renderWithProviders(<Harness onClose={onClose} />);
 
-    await user.clear(await screen.findByTestId('contact-editor-name'));
-    await user.type(screen.getByTestId('contact-editor-name'), 'Rhea S');
+    await user.type(await screen.findByTestId('contact-editor-last-name'), ' Mehta');
     await user.click(screen.getByTestId('contact-editor-close'));
     // An edited contact asks before discarding (Q-P1).
     await screen.findByTestId('confirm-dialog');
@@ -235,6 +269,21 @@ describe('ContactEditor', () => {
     await user.click(await screen.findByTestId('contact-editor-close'));
     expect(onClose).toHaveBeenCalledOnce();
     expect(screen.queryByTestId('confirm-dialog')).toBeNull();
+  });
+
+  it('hands the values back on Done, as edited', async () => {
+    const user = userEvent.setup();
+    const onDone = vi.fn();
+    renderWithProviders(<Harness onDone={onDone} />);
+
+    const first = await screen.findByTestId('contact-editor-first-name');
+    await user.clear(first);
+    await user.type(first, 'Riya');
+    await user.clear(screen.getByTestId('contact-editor-last-name'));
+    await user.click(screen.getByTestId('contact-editor-done'));
+
+    expect(onDone).toHaveBeenCalledWith({ ...RHEA, firstName: 'Riya', lastName: '' });
+    await waitFor(() => expect(screen.queryByTestId('contact-editor')).toBeNull());
   });
 
   it('copies the record’s ID from its chip', async () => {
@@ -258,10 +307,11 @@ describe('ContactEditor', () => {
     const onNewLead = vi.fn();
     const onOpenPatientFile = vi.fn();
     const { unmount } = renderWithProviders(
-      <Harness onNewLead={onNewLead} onNewPatient={vi.fn()} />,
+      <Harness onNewLead={onNewLead} onNewAppointment={vi.fn()} />,
     );
 
-    await user.click(await screen.findByTestId('contact-editor-new-lead'));
+    expect(await screen.findByTestId('contact-editor-new-appointment')).toBeVisible();
+    await user.click(screen.getByTestId('contact-editor-new-lead'));
     expect(onNewLead).toHaveBeenCalledOnce();
     await waitFor(() => expect(screen.queryByTestId('contact-editor')).toBeNull());
     unmount();

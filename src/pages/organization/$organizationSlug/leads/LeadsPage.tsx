@@ -13,10 +13,10 @@ import {
   organizationLeads,
 } from '@/lib/routes/leads-builders.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { LEAD_HOLD_DAYS, leadHold } from '@/shared/api/clinic/leads-hold.ts';
+import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { referrerFromPath } from '@/shared/clinic/clinic-referrer.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
@@ -24,10 +24,9 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import {
+  LEAD_TOASTS_KEYS,
   useAssignLead,
   useClaimLead,
-  useConvertLead,
-  useMarkLeadRead,
   useReleaseLead,
   useSetLeadInvolved,
 } from '@/shared/hooks/useLeads/index.ts';
@@ -59,7 +58,11 @@ function withoutPrefill({
   return rest;
 }
 
-/** Where a person's contact card goes: their file, a new appointment, a new patient. */
+/**
+ * Where a person's contact card goes: their file, a new appointment for the contact (an
+ * appointment points at a contact, route map §4 #6). The design's "+ Patient" went with the
+ * backend: a check-in opens the file (§4 #5, #7).
+ */
 function personNavigation(
   navigate: ReturnType<typeof useClinicNavigate>,
   organizationSlug: string,
@@ -74,13 +77,6 @@ function personNavigation(
           organizationSlug,
           referrer: referrerFromPath(pathname),
           search: { who },
-        }),
-      ),
-    newPatient: (lead: LeadRecord) =>
-      void navigate(
-        clinicCommandNavigation('newPatient', {
-          organizationSlug,
-          search: { name: lead.name, phone: lead.phone, fromLead: lead.id },
         }),
       ),
   };
@@ -174,12 +170,10 @@ export function LeadsPage() {
   const navigate = useClinicNavigate();
   const { organizationSlug = '', leadId } = useParams({ strict: false });
   const pathname = useLocation({ select: (location) => location.pathname });
-  const markRead = useMarkLeadRead();
   const claim = useClaimLead();
   const release = useReleaseLead();
   const assign = useAssignLead();
   const setInvolved = useSetLeadInvolved();
-  const convert = useConvertLead();
   // The lead New lead just created: first in the list and picked out (D28).
   const [createdId, setCreatedId] = useState<string | null>(null);
   const { rows } = state.list;
@@ -187,7 +181,9 @@ export function LeadsPage() {
   // again when the rows change (the stored-previous-value pattern, keyed on
   // the rows' ids and stamps: a refetch that brings the same rows keeps the
   // clock, and the columns built on it, and so the cells under the pointer).
-  const rowsKey = rows.map((lead) => `${lead.id}:${lead.updatedAt}`).join(',');
+  const rowsKey = rows
+    .map((lead) => `${lead.id}:${lead.updatedAt}:${lead.lastActivityAt ?? ''}`)
+    .join(',');
   const [clock, setClock] = useState(() => ({ rowsKey, now: new Date() }));
   if (clock.rowsKey !== rowsKey) setClock({ rowsKey, now: new Date() });
   const { now } = clock;
@@ -198,13 +194,14 @@ export function LeadsPage() {
     now,
   });
 
-  const viewerId = state.viewer?.id ?? null;
+  const { viewerId, team } = state;
   const canCreate = access.can('leads', 'create');
-  const canClaim = access.can('leads', 'edit') && viewerId !== null;
-  const ownerGone = (ownerId: string | null) => {
-    if (ownerId === null) return true;
-    const owner = state.staffById.get(ownerId);
-    return owner !== undefined && !owner.active;
+  const canEdit = access.can('leads', 'edit');
+  // Claiming makes the caller the owner: only a member of the team claims (`403 not_a_member`).
+  const canClaim = canEdit && viewerId !== null;
+  const ownerShortName = (lead: LeadRecord) => {
+    const owner = lead.ownerId ? team.get(lead.ownerId) : undefined;
+    return owner ? shortPersonName(owner.name) : null;
   };
 
   const newLead = (prefill?: { name: string; phone: string }) =>
@@ -214,7 +211,6 @@ export function LeadsPage() {
       hash: true,
     });
   const openLead = (lead: LeadRecord) => {
-    if (lead.unreadCount > 0) markRead.mutate(lead.id);
     setCreatedId(null);
     void navigate({
       ...organizationLead(organizationSlug, lead.id),
@@ -223,37 +219,36 @@ export function LeadsPage() {
     });
   };
   const claimLead = (lead: LeadRecord) => {
-    if (viewerId === null) return;
-    const owner = lead.ownerId ? state.staffById.get(lead.ownerId) : undefined;
-    claim.mutate({
+    if (!canClaim) return;
+    claim.mutate({ lead, ownerName: ownerShortName(lead) });
+  };
+  /** Take over a lead someone holds: the viewer becomes its owner, the owner stays involved. */
+  const takeOverLead = (lead: LeadRecord) => {
+    const viewer = viewerId ? team.get(viewerId) : undefined;
+    const owner = ownerShortName(lead);
+    if (!(canClaim && viewer && owner)) return;
+    assign.mutate({
       lead,
-      viewerId,
-      ownerName: owner ? shortPersonName(personFullName(owner)) : null,
+      ownerId: viewer.id,
+      ownerName: viewer.name,
+      message: t(LEAD_TOASTS_KEYS.claimed, { name: lead.name, owner }),
     });
   };
 
   /** The contact card's actions for a lead's person — the rows', the drawer's, the contact editor's. */
   const goTo = personNavigation(navigate, organizationSlug, pathname);
   const contactActions = (lead: LeadRecord): ContactCardActions => {
-    const hold = leadHold(
-      { ...lead, ownerGone: ownerGone(lead.ownerId) },
-      LEAD_HOLD_DAYS,
-      now,
-    );
-    const { patientId } = lead;
+    const hold = leadHold(lead, now);
+    const { patientId, phone } = lead;
     const canClaimLead = canClaim && hold.open && lead.ownerId !== viewerId;
     return {
       onOpenPatientFile: patientId ? () => goTo.patient(patientId) : undefined,
       onNewLead: offered(
-        canCreate && (() => newLead({ name: lead.name, phone: lead.phone })),
+        canCreate && phone !== null && (() => newLead({ name: lead.name, phone })),
       ),
       onNewAppointment: offered(
-        access.can('appointments', 'create') && (() => goTo.newAppointment(lead.id)),
-      ),
-      onNewPatient: offered(
-        patientId === null &&
-          access.can('patients', 'create') &&
-          (() => goTo.newPatient(lead)),
+        access.can('appointments', 'create') &&
+          (() => goTo.newAppointment(lead.contactId)),
       ),
       onClaim: offered(canClaimLead && (() => claimLead(lead))),
     };
@@ -269,61 +264,31 @@ export function LeadsPage() {
   const drawer = drawerLead
     ? (() => {
         const lead = drawerLead;
-        const owner = lead.ownerId ? state.staffById.get(lead.ownerId) : undefined;
-        const hold = leadHold(
-          { ...lead, ownerGone: ownerGone(lead.ownerId) },
-          LEAD_HOLD_DAYS,
-          now,
-        );
+        const hold = leadHold(lead, now);
         const mine = viewerId !== null && lead.ownerId === viewerId;
-        const ownerShort = owner ? shortPersonName(personFullName(owner)) : null;
         return (
           <LeadDrawer
             lead={lead}
-            staff={state.staff}
-            staffById={state.staffById}
-            viewer={state.viewer}
-            canEdit={access.can('leads', 'edit')}
+            members={state.members}
+            team={team}
+            canEdit={canEdit}
             canDelete={access.can('leads', 'delete')}
-            canBook={access.can('appointments', 'create')}
+            canEditContact={access.canCode('contact:update')}
             pane={pane}
             onPaneChange={setPane}
             onClose={closeDrawer}
-            onConvert={() => convert.mutate({ id: lead.id, name: lead.name })}
             contactActions={contactActions(lead)}
             people={{
-              onClaim:
-                canClaim && hold.open && !mine && viewerId !== null && state.viewer
-                  ? () =>
-                      claim.mutate({
-                        lead,
-                        viewerId,
-                        ownerName: ownerShort,
-                        message: ownerShort
-                          ? t(LEADS_KEYS.drawer.toasts.claimedAfter, {
-                              me: shortPersonName(personFullName(state.viewer!)),
-                              count: hold.idleDays,
-                              owner: ownerShort,
-                            })
-                          : undefined,
-                      })
-                  : undefined,
-              onRelease:
-                mine && !hold.open && !hold.closed && viewerId !== null
-                  ? () => release.mutate({ lead, viewerId })
-                  : undefined,
-              onAssign: (person) =>
-                assign.mutate({
-                  lead,
-                  ownerId: person.id,
-                  ownerName: personFullName(person),
-                }),
-              onToggleInvolved: (person, involved) =>
+              onClaim: canClaim && hold.open && !mine ? () => claimLead(lead) : undefined,
+              onRelease: mine && !hold.closed ? () => release.mutate(lead) : undefined,
+              onAssign: (member) =>
+                assign.mutate({ lead, ownerId: member.id, ownerName: member.name }),
+              onToggleInvolved: (member, involved) =>
                 setInvolved.mutate({
                   id: lead.id,
                   involvedIds: involved
-                    ? [...lead.involvedIds, person.id]
-                    : lead.involvedIds.filter((id) => id !== person.id),
+                    ? [...lead.involvedIds, member.id]
+                    : lead.involvedIds.filter((id) => id !== member.id),
                 }),
             }}
           />
@@ -332,17 +297,17 @@ export function LeadsPage() {
     : null;
 
   const context: LeadsTableContextValue = {
-    staffById: state.staffById,
-    staffUpdatedAt: state.staffUpdatedAt,
+    team,
+    teamUpdatedAt: state.teamUpdatedAt,
     viewerId,
-    holdOf: (lead) =>
-      leadHold({ ...lead, ownerGone: ownerGone(lead.ownerId) }, LEAD_HOLD_DAYS, now),
+    holdOf: (lead) => leadHold(lead, now),
     canClaim,
     onClaim: claimLead,
+    onTakeOver: takeOverLead,
     contactActions,
   };
 
-  const empty = state.list.isPending ? (
+  const empty = state.loading ? (
     <SkeletonRows
       rows={8}
       avatar
@@ -363,7 +328,7 @@ export function LeadsPage() {
         view={state.view}
         onViewChange={state.setView}
         unreplied={state.unreplied}
-        staff={state.staff}
+        members={state.members}
         table={table}
         canCreate={canCreate}
         onNewLead={() => newLead()}
@@ -381,8 +346,8 @@ export function LeadsPage() {
       <NewLeadDialog
         dialog={dialog}
         canCreate={canCreate}
-        staff={state.staff}
-        viewer={state.viewer}
+        members={state.members}
+        viewerId={viewerId}
         onClose={closeDrawer}
         onCreated={(lead) => {
           setCreatedId(lead.id);

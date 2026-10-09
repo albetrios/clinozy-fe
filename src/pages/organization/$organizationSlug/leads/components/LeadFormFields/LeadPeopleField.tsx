@@ -2,14 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  PersonAvatar,
-  personFullName,
-  shortPersonName,
-} from '@/shared/components/Cells/index.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,
@@ -24,101 +18,57 @@ import {
 import { ChevronDown, Search, X } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
-import { canAssign } from './lead-assign.ts';
 import { LeadField } from './LeadFormFields.tsx';
 
 /** Props of {@link LeadPeopleField}. */
 export interface LeadPeopleFieldProps {
   ownerId: string | null;
   involvedIds: readonly string[];
-  /** The team as the Leads room reads it. */
-  staff: readonly StaffProfile[];
-  /** The signed-in member. */
-  viewer: StaffProfile | null;
+  /** The active members (`useTeamDirectory`). */
+  members: readonly DirectoryMember[];
   /** "Claim" (dark 20px pill): open to the team and not mine. */
   onClaim?: () => void;
   /** "Release": mine and held. */
   onRelease?: () => void;
-  onAssign: (person: StaffProfile) => void;
-  onToggleInvolved: (person: StaffProfile, involved: boolean) => void;
+  onAssign: (member: DirectoryMember) => void;
+  onToggleInvolved: (member: DirectoryMember, involved: boolean) => void;
   /** Without Edit the people only show. */
   readOnly?: boolean;
-  /** New lead: anyone can be assigned (`leads.md:84`) — the assign rules wait for the saved lead. */
-  anyoneAssignable?: boolean;
-}
-
-/** "Online" · "Away" · "Busy" · "Offline", as the row's activity. */
-function presenceKey(profile: StaffProfile) {
-  const keys = LEADS_KEYS.drawer.presence;
-  switch (profile.presence) {
-    case 'online':
-      return keys.online;
-    case 'away':
-      return keys.away;
-    case 'busy':
-      return keys.busy;
-    default:
-      return keys.offline;
-  }
 }
 
 /**
  * "Assigned & involved" (`leads.md:65`, H:1772–1791): a 36px button with the
  * owner's chip and the involved avatars, "Claim" / "Release" beside the label,
- * and "People on this lead" — search, "Assign" / "Assigned" by the assign
- * rules (`canAssign`), the involved toggle. It applies at once, never through
- * the draft.
+ * and "People on this lead" — search, "Assign" / "Assigned", the involved
+ * toggle. Anyone who edits leads may assign anyone (the design's role-to-role
+ * rules are not the API's, route map §4); it applies at once, never through the
+ * draft.
  */
 export function LeadPeopleField({
   ownerId,
   involvedIds,
-  staff,
-  viewer,
+  members,
   onClaim,
   onRelease,
   onAssign,
   onToggleInvolved,
   readOnly = false,
-  anyoneAssignable = false,
 }: LeadPeopleFieldProps) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
   const [query, setQuery] = useState('');
-  const owner = staff.find((profile) => profile.id === ownerId);
+  const owner = members.find((member) => member.id === ownerId);
   const involved = involvedIds.flatMap(
-    (id) => staff.find((profile) => profile.id === id) ?? [],
+    (id) => members.find((member) => member.id === id) ?? [],
   );
-  const roleLabel = (role: Role) => tClinic(CLINIC_KEYS.roles[role]);
-  const roleOf = (profile: StaffProfile) => profile.roles.map(roleLabel).join(' · ');
   const term = query.trim().toLowerCase();
-  const rows = staff.filter(
-    (profile) =>
-      profile.active &&
-      (!term ||
-        `${personFullName(profile)} ${roleOf(profile)}`.toLowerCase().includes(term)),
-  );
-  const isOwner = viewer !== null && viewer.id === ownerId;
-  const checkAssign = (profile: StaffProfile) =>
-    anyoneAssignable
-      ? ({ ok: true } as const)
-      : canAssign(viewer?.roles ?? [], profile.roles, isOwner);
-  /** The Assign button's tooltip: why it is off, or whom it assigns. */
-  const assignWhy = (profile: StaffProfile) => {
-    if (profile.id === ownerId) return t(LEADS_KEYS.drawer.popover.currentlyAssigned);
-    const check = checkAssign(profile);
-    if (check.ok) {
-      return t(LEADS_KEYS.drawer.popover.assignTo, { name: personFullName(profile) });
-    }
-    if (check.reason === 'notAssignee') {
-      return t(LEADS_KEYS.drawer.popover.onlyAssignee, {
-        name: owner ? personFullName(owner) : '—',
-      });
-    }
-    return t(LEADS_KEYS.drawer.popover.cantAssign, {
-      role: viewer ? roleOf(viewer) : '—',
-      other: roleOf(profile),
-    });
-  };
+  const rows = term
+    ? members.filter((member) => member.name.toLowerCase().includes(term))
+    : members;
+  /** The Assign button's tooltip: whom it assigns, or that they are. */
+  const assignWhy = (member: DirectoryMember) =>
+    member.id === ownerId
+      ? t(LEADS_KEYS.drawer.popover.currentlyAssigned)
+      : t(LEADS_KEYS.drawer.popover.assignTo, { name: member.name });
 
   const action =
     onClaim || onRelease ? (
@@ -167,29 +117,24 @@ export function LeadPeopleField({
                 data-slot="pill"
                 className="bg-card inline-flex h-7 max-w-full min-w-0 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5"
               >
-                <PersonAvatar
-                  initials={owner.initials}
-                  tone={owner.tone}
-                  size="chip"
-                  presence={owner.presence === 'online' ? 'online' : 'offline'}
-                />
+                <PersonAvatar initials={owner.initials} tone={owner.tone} size="chip" />
                 <span className="text-detail min-w-0 truncate font-medium">
-                  {shortPersonName(personFullName(owner))}
+                  {shortPersonName(owner.name)}
                 </span>
               </span>
             ) : null}
             {involved.length > 0 ? (
               <span className="flex flex-none items-center gap-1">
-                {involved.map((profile) => (
+                {involved.map((member) => (
                   <span
-                    key={profile.id}
+                    key={member.id}
                     data-slot="pill"
-                    title={personFullName(profile)}
+                    title={member.name}
                     className="bg-card inline-flex h-7 min-w-7 items-center justify-center rounded-full border px-0.5"
                   >
                     <PersonAvatar
-                      initials={profile.initials}
-                      tone={profile.tone}
+                      initials={member.initials}
+                      tone={member.tone}
                       size="chip"
                     />
                   </span>
@@ -232,21 +177,17 @@ export function LeadPeopleField({
           <span className="text-muted-foreground text-caption px-1.5 py-0.5 font-medium">
             {t(LEADS_KEYS.drawer.popover.assignedTo)}
           </span>
-          {rows.map((profile) => (
+          {rows.map((member) => (
             <PersonRow
-              key={profile.id}
-              profile={profile}
-              own={profile.id === ownerId}
-              involved={involvedIds.includes(profile.id)}
-              why={assignWhy(profile)}
-              assignOff={profile.id === ownerId || readOnly || !checkAssign(profile).ok}
-              roleLine={t(LEADS_KEYS.drawer.popover.roleLine, {
-                role: roleOf(profile),
-                presence: t(presenceKey(profile)),
-              })}
+              key={member.id}
+              member={member}
+              own={member.id === ownerId}
+              involved={involvedIds.includes(member.id)}
+              why={assignWhy(member)}
+              assignOff={member.id === ownerId || readOnly}
               readOnly={readOnly}
-              onAssign={() => onAssign(profile)}
-              onToggleInvolved={(next) => onToggleInvolved(profile, next)}
+              onAssign={() => onAssign(member)}
+              onToggleInvolved={(next) => onToggleInvolved(member, next)}
             />
           ))}
           {rows.length === 0 ? (
@@ -265,22 +206,20 @@ export function LeadPeopleField({
 
 /** One row of "People on this lead" (H:1784–1788). */
 function PersonRow({
-  profile,
+  member,
   own,
   involved,
   why,
   assignOff,
-  roleLine,
   readOnly,
   onAssign,
   onToggleInvolved,
 }: {
-  profile: StaffProfile;
+  member: DirectoryMember;
   own: boolean;
   involved: boolean;
   why: string;
   assignOff: boolean;
-  roleLine: string;
   readOnly: boolean;
   onAssign: () => void;
   onToggleInvolved: (involved: boolean) => void;
@@ -294,14 +233,13 @@ function PersonRow({
       )}
     >
       <PersonAvatar
-        initials={profile.initials}
-        tone={profile.tone}
+        initials={member.initials}
+        tone={member.tone}
         size="roster"
         selected={own}
       />
-      <span className="flex min-w-0 flex-col leading-tight">
-        <span className="text-body font-medium">{personFullName(profile)}</span>
-        <span className="text-muted-foreground text-micro truncate">{roleLine}</span>
+      <span className="text-body min-w-0 truncate leading-tight font-medium">
+        {member.name}
       </span>
       <Button
         type="button"

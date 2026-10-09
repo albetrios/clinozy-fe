@@ -1,4 +1,13 @@
-import type { ContactChannel, LeadContact } from '@/shared/api/clinic/leads-contracts.ts';
+import {
+  type Contact,
+  CONTACT_PREFERENCE_TAG_PATTERN,
+  CONTACT_PREFERENCE_TAGS,
+  CONTACT_PREFERENCE_TAGS_MAX,
+  CONTACT_REACH_MAX,
+  type ContactChannel,
+  type ContactFields,
+  type ContactPreferenceTag,
+} from '@/shared/api/clinic/contacts-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 /** One number as the editor holds it: its digits as typed, and whether they are on WhatsApp on it. */
@@ -9,61 +18,59 @@ export interface ContactEditorPhone {
 }
 
 /**
- * What the contact editor edits (`leads.md:92–107`; D32 — there is no Contact
- * entity, so these are the lead's or the patient's own fields, the plan's
- * contact fields among them, C16): the name, every number with the primary
- * first, the Instagram handles, the default channel and the preferences.
+ * What the contact editor edits (`leads.md:92–107`) — the contact's own fields on clinozy-be:
+ * the first and last name (Q17), every number with the primary first, the Instagram handles,
+ * the default channel and the preference tags.
  */
 export interface ContactEditorValue {
-  name: string;
+  firstName: string;
+  /** Empty when they gave none. */
+  lastName: string;
   /** Never empty: the primary first. */
   phones: ContactEditorPhone[];
   /** Handles as typed ("@rhea"); an empty row is one still being typed. */
   instagram: string[];
   defaultChannel: ContactChannel;
-  /** As stored: a preset's English words ("No calls") or a custom one as typed. */
+  /** Preference tags — a preset's (`no_calls`) or a custom one (`prefers_saturdays`). */
   preferences: string[];
 }
 
-/** The name's longest form (`leads.md:97`). */
+/** A name's longest form — first or last (the API's 60). */
 export const CONTACT_NAME_MAX = 60;
+
 /** A handle's longest form (`leads.md:99`). */
 export const CONTACT_HANDLE_MAX = 30;
-/** A custom preference's longest form (`leads.md:101`). */
+
+/** A custom preference's longest form, typed (`leads.md:101`; the tag keeps 40). */
 export const CONTACT_PREFERENCE_MAX = 40;
-/** The numbers, and the handles, one contact keeps (the plan's arrays). */
-export const CONTACT_REACH_MAX = 5;
 
-/**
- * The preference presets in the chips' order (`PREFS`, H:3368), as stored —
- * the chat composer reads "No calls" and "After 6 pm" back from the record.
- */
-export const CONTACT_PREFERENCE_PRESETS = [
-  'No calls',
-  'Sundays only',
-  'Weekdays only',
-  'After 6 pm',
-  'Mornings',
-  'Evenings',
-  'Weekends only',
-  'Gujarati',
-  'Hindi',
-  'English',
-  'Female doctor',
-  'Text before calling',
-] as const;
+export { CONTACT_REACH_MAX };
 
-/** One preset preference, as stored. */
-export type ContactPreferencePreset = (typeof CONTACT_PREFERENCE_PRESETS)[number];
+/** The preset preferences in the chips' order, as the API stores them. */
+export const CONTACT_PREFERENCE_PRESETS = CONTACT_PREFERENCE_TAGS;
 
-/** Whether a stored preference is one of the presets (then it is shown translated). */
+/** One preset preference. */
+export type ContactPreferencePreset = ContactPreferenceTag;
+
+/** Whether a tag is one of the presets (then it is shown translated). */
 export function isPresetPreference(value: string): value is ContactPreferencePreset {
   return (CONTACT_PREFERENCE_PRESETS as readonly string[]).includes(value);
+}
+
+/** A custom tag as the chip shows it: `prefers_saturdays` → "prefers saturdays". */
+export function customPreferenceLabel(tag: string): string {
+  return tag.replaceAll('_', ' ');
 }
 
 /** A stored E.164 mobile as the field's ten digits. */
 function digitsOf(phone: string | null | undefined): string {
   return (phone ?? '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+}
+
+/** A typed full name as first and last: the first word, then the rest. */
+function splitPersonName(name: string): { firstName: string; lastName: string } {
+  const [firstName = '', ...rest] = name.trim().split(/\s+/);
+  return { firstName, lastName: rest.join(' ') };
 }
 
 /** A blank contact — "New contact" in New lead; a prefilled name or mobile when known. */
@@ -72,7 +79,7 @@ export function emptyContactValue(
   phone: string | null = null,
 ): ContactEditorValue {
   return {
-    name,
+    ...splitPersonName(name),
     phones: [{ digits: digitsOf(phone), whatsapp: true }],
     instagram: [],
     defaultChannel: 'whatsapp',
@@ -80,27 +87,27 @@ export function emptyContactValue(
   };
 }
 
-/**
- * The editor's start from a record: its contact fields when someone has set
- * them, else its own mobile on WhatsApp, no handle, WhatsApp, no preferences.
- */
-export function contactValueOf(record: {
-  name: string;
-  phone: string | null;
-  contact?: LeadContact;
-}): ContactEditorValue {
-  const { contact } = record;
-  if (!contact) return emptyContactValue(record.name, record.phone);
+/** The editor's start from a contact read with every number. */
+export function contactValueOf(contact: Contact): ContactEditorValue {
+  const primaryFirst = [...contact.phones].sort(
+    (a, b) => Number(b.isPrimary) - Number(a.isPrimary),
+  );
   return {
-    name: record.name,
-    phones: contact.phones.map((entry) => ({
+    firstName: contact.firstName,
+    lastName: contact.lastName ?? '',
+    phones: primaryFirst.map((entry) => ({
       digits: digitsOf(entry.phone),
-      whatsapp: entry.whatsapp,
+      whatsapp: entry.isOnWhatsapp,
     })),
-    instagram: [...contact.instagram],
+    instagram: [...contact.instagramHandles],
     defaultChannel: contact.defaultChannel,
-    preferences: [...contact.preferences],
+    preferences: [...contact.preferenceTags],
   };
+}
+
+/** The name the band and the toasts show: "Riya Shah". */
+export function contactValueName(value: ContactEditorValue): string {
+  return [value.firstName.trim(), value.lastName.trim()].filter(Boolean).join(' ');
 }
 
 /** The numbers with row `index` moved first — it becomes the primary. */
@@ -114,22 +121,32 @@ export function withPrimaryPhone(
 }
 
 /**
- * The preferences after "+ Custom" (`leads.md:101`): the typed words trimmed
- * to 40 characters and added unless already there, case aside.
+ * The preferences after "+ Custom" (`leads.md:101`): the typed words as a tag — lowercase, `_`
+ * between words, a letter first — added unless already there or the twelve are taken.
  */
 export function withCustomPreference(
   preferences: readonly string[],
   typed: string,
 ): string[] {
-  const value = typed.trim().slice(0, CONTACT_PREFERENCE_MAX).trim();
-  const key = value.toLowerCase();
-  if (!value || preferences.some((preference) => preference.toLowerCase() === key)) {
+  const tag = typed
+    .trim()
+    .slice(0, CONTACT_PREFERENCE_MAX)
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .join('_')
+    .replace(/^[^a-z]+/, '');
+  if (
+    !CONTACT_PREFERENCE_TAG_PATTERN.test(tag) ||
+    preferences.includes(tag) ||
+    preferences.length >= CONTACT_PREFERENCE_TAGS_MAX
+  ) {
     return [...preferences];
   }
-  return [...preferences, value];
+  return [...preferences, tag];
 }
 
-/** The primary number as the contract stores it — `null` until it is a 10-digit mobile. */
+/** The primary number as the API stores it — `null` until it is a 10-digit mobile. */
 export function primaryPhoneOf(value: ContactEditorValue): string | null {
   return toClinicPhone(value.phones[0]?.digits ?? '');
 }
@@ -142,31 +159,24 @@ export function extraReachCount(value: ContactEditorValue): number {
 }
 
 /**
- * What a record stores from the editor: the trimmed name, the primary mobile
- * (`null` while it is not ten digits) and the contact fields — complete numbers
- * only, the handles that were typed, the channel and the preferences.
+ * What the editor writes: the trimmed names, the complete numbers (the primary first), the
+ * handles that were typed, the channel and the tags.
  */
-export function contactFieldsOf(value: ContactEditorValue): {
-  name: string;
-  phone: string | null;
-  contact: LeadContact;
-} {
+export function contactFieldsOf(value: ContactEditorValue): ContactFields {
   const phones = value.phones.flatMap((entry) => {
     const phone = toClinicPhone(entry.digits);
-    return phone ? [{ phone, whatsapp: entry.whatsapp }] : [];
+    return phone ? [{ phone, isOnWhatsapp: entry.whatsapp }] : [];
   });
-  const primary = primaryPhoneOf(value);
+  const lastName = value.lastName.trim();
   return {
-    name: value.name.trim(),
-    phone: primary,
-    contact: {
-      phones: phones.slice(0, CONTACT_REACH_MAX),
-      instagram: value.instagram
-        .map((handle) => handle.trim())
-        .filter(Boolean)
-        .slice(0, CONTACT_REACH_MAX),
-      defaultChannel: value.defaultChannel,
-      preferences: value.preferences.slice(0, 20),
-    },
+    firstName: value.firstName.trim(),
+    lastName: lastName === '' ? null : lastName,
+    phones: phones.slice(0, CONTACT_REACH_MAX),
+    instagramHandles: value.instagram
+      .map((handle) => handle.trim())
+      .filter(Boolean)
+      .slice(0, CONTACT_REACH_MAX),
+    defaultChannel: value.defaultChannel,
+    preferenceTags: value.preferences.slice(0, CONTACT_PREFERENCE_TAGS_MAX),
   };
 }

@@ -1,7 +1,7 @@
 /**
  * The Leads grid (`ldColsVM`, H:4176–4181): six columns in order, each with
  * its CSS track and the minimum width the row adds up. Lead is always shown;
- * Interested in and Team never sort.
+ * Interested in and Team never sort; Updated (`activity`) is the person's latest activity.
  */
 export const LEADS_COLUMNS = [
   { id: 'name', track: 'minmax(160px,1.5fr)', min: 160 },
@@ -9,7 +9,7 @@ export const LEADS_COLUMNS = [
   { id: 'source', track: 'minmax(116px,.7fr)', min: 116 },
   { id: 'interests', track: 'minmax(96px,.9fr)', min: 96 },
   { id: 'team', track: 'minmax(150px,1.2fr)', min: 150 },
-  { id: 'updated', track: '84px', min: 84 },
+  { id: 'activity', track: '84px', min: 84 },
 ] as const;
 
 /** One Leads column's id. */

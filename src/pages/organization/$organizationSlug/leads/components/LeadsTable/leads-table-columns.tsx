@@ -31,9 +31,10 @@ type LeadsColumnDef = ColumnDef<DataTableFeatures, LeadRecord>;
 /**
  * The Leads columns (`leads.md:32–34`; `ldColsVM`, H:4176): Lead (always
  * shown) · Status · Source · Interested in · Team · Updated, on the prototype's
- * tracks. Lead sorts A–Z, Status in pipeline order, Source by name, Updated
- * newest first → off; Interested in and Team don't sort. The server sorts
- * (`manualSorting`): the column ids are `listLeads`' sort keys.
+ * tracks. Lead sorts A–Z, Status in pipeline order, Source by name, Updated —
+ * the person's latest activity — newest first → off; Interested in and Team
+ * don't sort. The server sorts (`manualSorting`): the column ids are the list
+ * read's sort keys.
  */
 function useLeadsColumns(now: Date): LeadsColumnDef[] {
   const { t } = useTranslation(LEADS_NS);
@@ -73,7 +74,7 @@ function useLeadsColumns(now: Date): LeadsColumnDef[] {
         header: label(LEADS_KEYS.list.columns.interests),
         enableSorting: false,
         meta: { track: leadsColumn('interests').track },
-        cell: ({ row }) => <LeadInterestPills lead={row.original} />,
+        cell: ({ row }) => <LeadInterestPills interests={row.original.interests} />,
       },
       {
         id: 'team',
@@ -84,11 +85,11 @@ function useLeadsColumns(now: Date): LeadsColumnDef[] {
         cell: ({ row }) => <LeadTeamCell lead={row.original} />,
       },
       {
-        id: 'updated',
-        accessorKey: 'updatedAt',
+        id: 'activity',
+        accessorKey: 'lastActivityAt',
         header: label(LEADS_KEYS.list.columns.updated),
         meta: {
-          track: leadsColumn('updated').track,
+          track: leadsColumn('activity').track,
           align: 'end',
           sortStartsDescending: true,
         },

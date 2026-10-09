@@ -1,8 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
+import {
+  fetchContactMessagingStatus,
+  fetchContactTemplateValues,
+  fetchContactThread,
+  resendContactActivity,
+  sendContactActivity,
+} from '@/shared/api/clinic/contact-activities-api.ts';
 import { ensureContactThread } from '@/shared/api/clinic/contact-threads-api.ts';
+import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
 import {
   chatThreadOf,
   fetchContactHistory,
@@ -15,6 +22,7 @@ import {
   sendMessage,
 } from '@/shared/api/clinic/messages-api.ts';
 import {
+  type ChatMessage,
   type ChatPerson,
   chatPersonKey,
   type ChatThread,
@@ -34,32 +42,44 @@ import {
 } from './thread-outbox.ts';
 
 /**
- * A person's thread — the lead's, or a patient's — with its messages oldest
- * first and their authors (`getLead`, `S:1589`). A patient without a thread
- * reads as `thread: null` until their first message opens one.
+ * A person's thread — a fixture lead's or patient's, or a contact's stream on clinozy-be
+ * (`/app/contacts/:contact_id/activities`) — with its messages oldest first and their
+ * authors (`getLead`, `S:1589`). A patient without a thread, and a contact, read as
+ * `thread: null`.
  */
 export function useThread(person: ChatPerson) {
   return useAppQuery({
     queryKey: messageQueryKeys.thread(chatPersonKey(person)),
-    queryFn: () => fetchThread(person),
+    queryFn: () =>
+      person.kind === 'contact'
+        ? fetchContactThread(person.contactId)
+        : fetchThread(person),
     // The chat column shows this failure in place (RetryError), not in a toast.
     notifyOnError: false,
   });
 }
 
-/** A person's contact history, oldest first — merged into the thread as system chips. */
+/**
+ * A fixture person's contact history, oldest first — merged into the thread as system chips. A
+ * contact's history is in its stream already (the server's `system` entries): none here.
+ */
 export function useContactHistory(person: ChatPerson) {
   return useAppQuery({
     queryKey: messageQueryKeys.history(chatPersonKey(person)),
     queryFn: () => fetchContactHistory(person),
+    enabled: person.kind !== 'contact',
   });
 }
 
-/** Whether WhatsApp is down (Q-L10) — fresh for a minute, then read again on the next mount or focus. */
-export function useMessagingStatus() {
+/**
+ * Whether WhatsApp is down (Q-L10) — clinozy-be's `messaging-status` for a contact, the
+ * fixture's switch otherwise; fresh for a minute, then read again on the next mount or focus.
+ */
+export function useMessagingStatus(person: ChatPerson) {
+  const live = person.kind === 'contact';
   return useAppQuery({
-    queryKey: messageQueryKeys.status(),
-    queryFn: fetchMessagingStatus,
+    queryKey: live ? messageQueryKeys.liveStatus() : messageQueryKeys.status(),
+    queryFn: live ? fetchContactMessagingStatus : fetchMessagingStatus,
     staleTime: 60_000,
     // An unknown status shows no outage line — the composer still sends.
     notifyOnError: false,
@@ -70,7 +90,10 @@ export function useMessagingStatus() {
 export function useTemplateValues(person: ChatPerson) {
   return useAppQuery({
     queryKey: messageQueryKeys.templateValues(chatPersonKey(person)),
-    queryFn: () => fetchTemplateValues(person),
+    queryFn: () =>
+      person.kind === 'contact'
+        ? fetchContactTemplateValues()
+        : fetchTemplateValues(person),
   });
 }
 
@@ -86,8 +109,8 @@ interface SendVars {
 }
 
 interface Sent {
-  thread: ChatThread;
-  message: LeadMessage;
+  thread: ChatThread | null;
+  message: ChatMessage;
 }
 
 /** Who a first message is for: the name and mobile `ensureContactThread` needs. */
@@ -109,7 +132,16 @@ export function useSendMessage(person: ChatPerson, recipient: ChatRecipient) {
   const personKey = chatPersonKey(person);
   const { name, phone } = recipient;
   const { mutate } = useAppMutation<Sent, SendVars>({
-    mutationFn: async ({ channel, body }) => {
+    mutationFn: async ({ channel, body }, action) => {
+      if (person.kind === 'contact') {
+        const message = await sendContactActivity({
+          contactId: person.contactId,
+          channel,
+          body,
+          ...action,
+        });
+        return { thread: null, message };
+      }
       const known = queryClient.getQueryData<ChatThreadRead>(
         messageQueryKeys.thread(personKey),
       )?.thread;
@@ -149,7 +181,7 @@ export function useSendMessage(person: ChatPerson, recipient: ChatRecipient) {
             }));
             dropOutbox(personKey, message.clientId);
             void queryClient.invalidateQueries({ queryKey: threadKey });
-            for (const queryKey of MESSAGE_SIDE_EFFECT_KEYS) {
+            for (const queryKey of [...MESSAGE_SIDE_EFFECT_KEYS, contactQueryKeys.all]) {
               void queryClient.invalidateQueries({ queryKey });
             }
           },
@@ -196,11 +228,19 @@ export function useSendMessage(person: ChatPerson, recipient: ChatRecipient) {
 
 /**
  * Resend a message its provider could not deliver ("Not sent" on a stored
- * message; Appendix F). The thread refetches when it is queued again.
+ * message): a contact's on clinozy-be (`…/resend`), a fixture thread's on the
+ * fixture. The thread refetches when it is queued again.
  */
 export function useResendMessage(person: ChatPerson) {
-  return useAppMutation<LeadMessage, string>({
-    mutationFn: resendMessage,
+  return useAppMutation<ChatMessage, string>({
+    mutationFn: (messageId, action) =>
+      person.kind === 'contact'
+        ? resendContactActivity({
+            contactId: person.contactId,
+            activityId: messageId,
+            ...action,
+          })
+        : resendMessage(messageId),
     invalidateKeys: [messageQueryKeys.thread(chatPersonKey(person))],
   });
 }

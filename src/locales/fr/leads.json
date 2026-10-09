@@ -10,20 +10,18 @@
     "claimed": "{{name}} est maintenant à vous · {{owner}} reste impliqué",
     "claimedUnowned": "{{name}} est maintenant à vous",
     "released": "Libéré pour l’équipe · tout le monde peut le prendre",
-    "assigned": "{{name}} est maintenant responsable · notifié",
-    "followUpTask": " · tâche de relance pour demain",
-    "converted": "Dossier patient créé pour {{name}} · le lead reste lié"
+    "assigned": "{{name}} est maintenant responsable · notifié"
   },
   "list": {
     "records": "prospects",
     "views": {
       "label": "Vues des prospects",
       "mine": "Les miens",
-      "unread": "Sans réponse",
+      "unreplied": "Sans réponse",
       "all": "Tous",
-      "unreadCount_one": "{{count}} sans réponse",
-      "unreadCount_many": "{{count}} sans réponse",
-      "unreadCount_other": "{{count}} sans réponse"
+      "unrepliedCount_one": "{{count}} sans réponse",
+      "unrepliedCount_many": "{{count}} sans réponse",
+      "unrepliedCount_other": "{{count}} sans réponse"
     },
     "search": {
       "placeholder": "Rechercher nom, téléphone, #ID",
@@ -46,16 +44,12 @@
   },
   "team": {
     "claim": "Ouvert · Prendre",
-    "join": "Ouvert à l’équipe · Rejoindre",
+    "openHint": "Personne ne le détient · tout le monde peut le prendre",
     "openMine": "Ouvert à l’équipe",
-    "claimHint_one": "Aucune activité depuis {{count}} jour · tout le monde peut le prendre",
-    "claimHint_many": "Aucune activité depuis {{count}} jours · tout le monde peut le prendre",
-    "claimHint_other": "Aucune activité depuis {{count}} jours · tout le monde peut le prendre",
-    "joinHint": "{{name}} a quitté la clinique · n’importe qui dans l’équipe peut le rejoindre et le prendre",
-    "releasesToday": "Libéré pour l’équipe aujourd’hui si personne ne relance",
-    "releasesTomorrow": "Libéré pour l’équipe demain si personne ne relance",
+    "openMineHint": "Votre réservation a expiré · tout le monde peut le prendre",
+    "releasesToday": "Revient à l’équipe aujourd’hui à {{time}}",
+    "releasesTomorrow": "Revient à l’équipe demain à {{time}}",
     "claimFirst": "Prendre {{first}}",
-    "joinTake": "Rejoindre · prendre {{first}}",
     "takeOver": "Reprendre à {{first}}"
   },
   "filters": {
@@ -63,7 +57,7 @@
     "source": "Source · au choix",
     "clear": "Effacer",
     "hold": {
-      "label": "Propriété · réservation après jours d’inactivité",
+      "label": "Propriété · réservé après une prise en charge",
       "any": "Tous",
       "open": "Ouverts à la prise",
       "soon": "Libérés aujourd’hui",
@@ -89,7 +83,6 @@
     "panels": "Panneaux du lead",
     "details": "Détails",
     "chat": "Discussion",
-    "chatCount": "{{n}} nouveaux",
     "resize": "Redimensionner le panneau",
     "resizeHint": "Faites glisser pour redimensionner · double-cliquez pour réinitialiser",
     "cards": {
@@ -99,7 +92,6 @@
     },
     "source": "Source",
     "interests": "Intéressé par",
-    "addInterest": "Ajouter un intérêt",
     "people": "Assigné et impliqués",
     "peopleAria": "Personnes assignées et impliquées",
     "addInvolved": "+ Ajouter un impliqué",
@@ -115,18 +107,17 @@
     "stepTips": {
       "done": "{{status}} · terminé",
       "current": "{{status}} · étape en cours",
-      "next": "Passer à {{status}}"
+      "next": "Passer à {{status}}",
+      "byCheckIn": "Clinique visitée · défini à l’arrivée du patient"
     },
     "closeAs": "Clore comme",
     "info": {
       "created": "Créé",
-      "lastMessage": "Dernier message",
-      "lastMessageValue": "{{channel}} · {{at}}",
+      "lastActivity": "Dernière activité",
       "none": "Aucun pour l’instant",
       "patient": "Patient",
       "linked": "Lié",
       "notYet": "Pas encore",
-      "convert": "Convertir en patient",
       "openTasks": "Tâches ouvertes",
       "retargetReason": "Motif du reciblage"
     },
@@ -143,18 +134,9 @@
       "assigned": "Assigné",
       "currentlyAssigned": "Assigné actuellement",
       "assignTo": "Assigner à {{name}}",
-      "onlyAssignee": "Seule la personne assignée ({{name}}) peut réassigner",
-      "cantAssign": "{{role}} ne peut pas assigner à {{other}}",
       "involved": "Impliqué · a travaillé sur ce lead",
       "noMatch": "Aucun résultat",
-      "note": "✓ Impliqués = tous ceux qui ont travaillé sur ce lead. Ajoutés automatiquement quand ils répondent, appellent, notent ou réservent · vous pouvez aussi ajouter quelqu’un",
-      "roleLine": "{{role}} · {{presence}}"
-    },
-    "presence": {
-      "online": "En ligne",
-      "away": "Absent",
-      "busy": "Occupé",
-      "offline": "Hors ligne"
+      "note": "✓ Impliqués = tous ceux qui ont travaillé sur ce lead. Ajoutés automatiquement quand ils répondent, appellent, notent ou réservent · vous pouvez aussi ajouter quelqu’un"
     },
     "remove": {
       "title": "Supprimer ce lead ?",
@@ -166,12 +148,6 @@
         "other": "Autre"
       },
       "removed": "Lead #{{seq}} supprimé · {{reason}}"
-    },
-    "toasts": {
-      "claimedAfter_one": "Récupéré par {{me}} après {{count}} jour d’inactivité · {{owner}} reste impliqué",
-      "claimedAfter_many": "Récupéré par {{me}} après {{count}} jours d’inactivité · {{owner}} reste impliqué",
-      "claimedAfter_other": "Récupéré par {{me}} après {{count}} jours d’inactivité · {{owner}} reste impliqué",
-      "releasedOpen": "{{name}} peut être récupéré par n’importe qui"
     }
   },
   "newLead": {
@@ -183,19 +159,17 @@
     "quickStart": "Démarrage rapide",
     "presets": {
       "walkIn": "Visite spontanée",
-      "phoneCall": "Appel téléphonique",
       "instagramDm": "DM Instagram"
     },
     "presetHints": {
-      "walkIn": "À l’accueil maintenant · source Visite spontanée, statut Clinique visitée",
-      "phoneCall": "Demande par téléphone",
+      "walkIn": "À l’accueil maintenant · source Visite spontanée",
       "instagramDm": "DM sur Instagram"
     },
     "hits": {
-      "patient": "Patient {{id}} · dernière visite {{date}}",
-      "patientNew": "Patient {{id}}",
-      "lead": "Lead {{id}} · {{phone}}",
-      "contact": "Contact · {{phone}}",
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Lead ouvert · {{id}} · {{phone}}",
+      "open": "Ouvrir le lead",
       "recreate": "Recréer le lead",
       "useContact": "Utiliser le contact"
     },
@@ -209,14 +183,12 @@
     "detailsSummary": "Source, intérêt et qui s’en occupe",
     "footer": "Crée ou met à jour un contact",
     "create": "Créer le lead",
-    "linked": "Lié à {{name}} · {{kind}} · canaux et préférences repris",
     "toasts": {
       "pickFirst": "Choisissez ou ajoutez d’abord le contact",
       "presetApplied": "Préréglage « {{preset}} » appliqué",
       "existingPatient": "Patient existant {{id}} · le nouveau lead y sera lié",
       "existingContact": "Contact existant utilisé : {{name}}",
       "missing": "Ajoutez un nom et un mobile à 10 chiffres",
-      "duplicate": "Ce mobile est déjà sur le lead {{id}}",
       "open": "Ouvrir"
     }
   }

@@ -12,6 +12,8 @@ export const displayId = {
   /** The patient code on print: "PT-0412". */
   patientCode: (seq: number) => `PT-${padded(seq, 4)}`,
   lead: (seq: number) => `#${seq}`,
+  /** A person's contact number (`contact_number`): "C-12345". */
+  contact: (seq: number) => `C-${seq}`,
   appointment: (seq: number) => `#${seq}`,
   prescription: (seq: number) => `#${seq}`,
   offering: (seq: number) => `#${seq}`,

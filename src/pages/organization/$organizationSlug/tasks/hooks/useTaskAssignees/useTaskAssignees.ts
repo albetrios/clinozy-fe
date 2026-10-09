@@ -5,7 +5,7 @@ import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { personFullName } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
-import { useLeadViewer } from '@/shared/hooks/useLeads/index.ts';
+import { useFixtureLeadViewer } from '@/shared/hooks/useFixtureLeads/index.ts';
 import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
@@ -29,7 +29,7 @@ export interface TaskAssignees {
 export function useTaskAssignees(): TaskAssignees {
   const { t } = useTranslation([TASKS_NS, CLINIC_NS]);
   const staff = useStaffProfiles();
-  const viewer = useLeadViewer().data ?? null;
+  const viewer = useFixtureLeadViewer().data ?? null;
   const viewerId = viewer?.id ?? null;
   const profiles = staff.data;
 

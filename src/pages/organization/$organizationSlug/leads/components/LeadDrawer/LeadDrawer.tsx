@@ -1,12 +1,12 @@
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   ChatColumn,
-  chatContactOfLead,
+  chatContactOfContact,
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
@@ -17,12 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import {
-  AppointmentForm,
-  type AppointmentFormPrefill,
-  leadBookingPrefill,
-} from '@/shared/forms/AppointmentForm/index.ts';
-import { useThread } from '@/shared/hooks/useThread/index.ts';
+import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
 import { Users, WhatsAppMark } from '@/shared/icons/index.ts';
@@ -49,20 +44,15 @@ export type LeadDrawerPane = 'details' | 'chat';
 /** Props of {@link LeadDrawer}. */
 export interface LeadDrawerProps {
   lead: LeadRecord;
-  staff: readonly StaffProfile[];
-  staffById: ReadonlyMap<string, StaffProfile>;
-  viewer: StaffProfile | null;
-  people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'staff' | 'viewer'>;
+  /** The active members (`useTeamDirectory`). */
+  members: readonly DirectoryMember[];
+  team: ReadonlyMap<string, DirectoryMember>;
+  people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'members'>;
   canEdit: boolean;
   canDelete: boolean;
-  /**
-   * The composer's "Book an appointment" — the member may create
-   * appointments: the appointment form opens stacked over the drawer, the URL
-   * staying `/leads/$leadId` (KICKOFF §6.3, A-L7).
-   */
-  canBook?: boolean;
-  onConvert?: () => void;
-  /** The person's contact card actions — "+ Lead", "+ Appointment", "+ Patient", the file. */
+  /** May edit the person (`contact:update`). */
+  canEditContact: boolean;
+  /** The person's contact card actions — "+ Lead", "+ Appointment", the file. */
   contactActions?: ContactCardActions;
   /** Closing settled (nothing unsaved, or "Discard"): back to the list. */
   onClose: () => void;
@@ -142,14 +132,12 @@ function ChatResizeHandle({ width }: { width: number }) {
  */
 export function LeadDrawer({
   lead,
-  staff,
-  staffById,
-  viewer,
+  members,
+  team,
   people,
   canEdit,
   canDelete,
-  canBook = false,
-  onConvert,
+  canEditContact,
   contactActions,
   onClose,
   pane,
@@ -161,9 +149,8 @@ export function LeadDrawer({
   const chatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
   const viewport = useViewportWidth();
   const widths = leadDrawerWidths(viewport, chatWidth);
-  const draft = useLeadDraft(lead, viewer?.id ?? null);
-  const thread = useThread({ kind: 'lead', leadId: lead.id });
-  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
+  const draft = useLeadDraft(lead);
+  const contact = useContact(lead.contactId).data;
   const [removing, setRemoving] = useState(false);
 
   const chat = (
@@ -174,20 +161,32 @@ export function LeadDrawer({
     >
       {phone ? null : <ChatResizeHandle width={widths.chat} />}
       <ChatColumn
-        person={{ kind: 'lead', leadId: lead.id }}
-        contact={chatContactOfLead(lead)}
+        person={{ kind: 'contact', contactId: lead.contactId }}
+        contact={chatContactOfContact(
+          {
+            name: lead.name,
+            phone: lead.phone,
+            isPatient: lead.patientId !== null,
+            interests: lead.interests,
+          },
+          contact,
+        )}
+        lead={{
+          leadId: lead.id,
+          kind: lead.kind,
+          createdAt: lead.createdAt,
+          source: lead.source,
+          patientId: lead.patientId,
+        }}
         showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
         contactCard={{
-          data: leadContactCardData(lead, staffById, {
-            role: (role) => tClinic(CLINIC_KEYS.roles[role]),
-            source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
-          }),
+          data: leadContactCardData(
+            lead,
+            team,
+            { source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]) },
+            contact,
+          ),
         }}
-        onBookAppointment={
-          canBook
-            ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason))
-            : undefined
-        }
       />
     </div>
   );
@@ -215,7 +214,7 @@ export function LeadDrawer({
           },
         }}
         closeStyle="form"
-        readOnly={!canEdit && !canDelete}
+        readOnly={!(canEdit || canDelete)}
         dirty={draft.dirty}
         // "Discard" puts the draft back while it is dirty (H:1821); else "Cancel" closes.
         dismissLabel={draft.dirty ? t(LEADS_KEYS.drawer.footer.discard) : undefined}
@@ -233,12 +232,11 @@ export function LeadDrawer({
         <LeadDetailsBody
           lead={lead}
           draft={draft}
-          staff={staff}
-          staffById={staffById}
-          messages={thread.data?.messages}
-          people={{ ...people, viewer }}
+          members={members}
+          team={team}
+          people={people}
           canEdit={canEdit}
-          onConvert={onConvert}
+          canEditContact={canEditContact}
           contactActions={contactActions}
         />
       </RecordDrawer>
@@ -247,12 +245,6 @@ export function LeadDrawer({
         open={removing}
         onOpenChange={setRemoving}
         onRemoved={onClose}
-      />
-      <AppointmentForm
-        open={booking !== null}
-        mode="create"
-        prefill={booking ?? undefined}
-        onClose={() => setBooking(null)}
       />
     </TooltipProvider>
   );

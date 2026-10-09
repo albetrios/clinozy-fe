@@ -3,13 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -24,13 +22,13 @@ import {
   contactValueOf,
 } from '@/shared/forms/ContactEditor/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useContact, useUpdateContact } from '@/shared/hooks/useContacts/index.ts';
 import {
   useDeleteLead,
   useOpenLeadTasks,
   useRestoreLead,
-  useUpdateLead,
 } from '@/shared/hooks/useLeads/index.ts';
-import { Copy, RefreshCw, UserPlus } from '@/shared/icons/index.ts';
+import { Copy, RefreshCw } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import type { LeadDraftState } from '../../hooks/useLeadDraft/index.ts';
@@ -50,25 +48,15 @@ import {
 export interface LeadDetailsBodyProps {
   lead: LeadRecord;
   draft: LeadDraftState;
-  staff: readonly StaffProfile[];
-  staffById: ReadonlyMap<string, StaffProfile>;
-  /** The thread's messages for "Last message" (the chat column's read). */
-  messages: readonly LeadMessage[] | undefined;
-  people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'staff'>;
+  /** The active members (`useTeamDirectory`). */
+  members: readonly DirectoryMember[];
+  team: ReadonlyMap<string, DirectoryMember>;
+  people: Omit<LeadPeopleFieldProps, 'ownerId' | 'involvedIds' | 'members'>;
   canEdit: boolean;
-  /** "Convert to patient" — shown while it applies (§6.3 Info). */
-  onConvert?: () => void;
+  /** May edit the person (`contact:update`) — the contact card's "Edit contact". */
+  canEditContact: boolean;
   /** The contact card's and the contact editor's band actions. */
   contactActions?: ContactCardActions;
-}
-
-/** "Contacted" or "Follow-up": a lead that may become a patient now (H:1813). */
-const CONVERTIBLE = new Set<string>(['contacted', 'follow_up']);
-
-/** The lead's last real message: what Info's "Last message" names. */
-function lastMessageOf(messages: readonly LeadMessage[] | undefined): LeadMessage | null {
-  const real = (messages ?? []).filter((message) => !message.isSystem);
-  return real.at(-1) ?? null;
 }
 
 /**
@@ -79,7 +67,7 @@ function lastMessageOf(messages: readonly LeadMessage[] | undefined): LeadMessag
 export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
   const clock = useClinicClock();
-  const seq = String(lead.seq);
+  const seq = String(lead.leadNumber);
   const copyId = async () => {
     try {
       await navigator.clipboard.writeText(`#${seq}`);
@@ -135,67 +123,68 @@ export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
 
 /**
  * The person's strip over the cards, and "Edit contact" (its contact card's
- * pencil) opening the contact editor on the lead's own fields (D32): Done saves
- * them on the lead now — "Contact updated · applies everywhere" — unless the
- * name or the primary mobile is missing.
+ * pencil) opening the contact editor on the person (`GET /app/contacts/:contact_id`):
+ * Done saves them with the read's `updated_at` — "Contact updated · applies
+ * everywhere" — unless the first name or the primary mobile is missing. Their
+ * every number and handle shows on the card once the contact is read.
  */
 function LeadPerson({
   lead,
-  staffById,
+  team,
   canEdit,
-  viewerId,
   actions,
 }: {
   lead: LeadRecord;
-  staffById: ReadonlyMap<string, StaffProfile>;
+  team: ReadonlyMap<string, DirectoryMember>;
   canEdit: boolean;
-  viewerId: string | null;
   actions: ContactCardActions;
 }) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tEditor } = useTranslation(CONTACT_EDITOR_NS);
   const [editing, setEditing] = useState(false);
-  const save = useUpdateLead({ successMessage: tEditor(CONTACT_EDITOR_KEYS.updated) });
+  const contact = useContact(lead.contactId).data;
+  const save = useUpdateContact({
+    successMessage: tEditor(CONTACT_EDITOR_KEYS.updated),
+  });
   const done = (value: ContactEditorValue) => {
     const fields = contactFieldsOf(value);
-    if (!(fields.name && fields.phone)) {
+    if (!(contact && fields.firstName && fields.phones.length > 0)) {
       notify.warning(t(LEADS_KEYS.newLead.toasts.missing));
       return;
     }
     setEditing(false);
-    save.mutate({
-      id: lead.id,
-      patch: { name: fields.name, phone: fields.phone, contact: fields.contact },
-      viewerId,
-    });
+    save.mutate({ contact, fields });
   };
   return (
     <>
       <LeadContactStrip
-        card={leadContactCardData(lead, staffById, {
-          role: (role) => tClinic(CLINIC_KEYS.roles[role]),
-          source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]),
-        })}
+        card={leadContactCardData(
+          lead,
+          team,
+          { source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]) },
+          contact,
+        )}
         name={lead.name}
         phone={lead.phone}
         {...actions}
-        onEditContact={canEdit ? () => setEditing(true) : undefined}
+        onEditContact={canEdit && contact ? () => setEditing(true) : undefined}
       />
-      <ContactEditor
-        open={editing}
-        value={contactValueOf(lead)}
-        record={{
-          kind: lead.patientId ? 'patient' : 'lead',
-          displayId: displayId.lead(lead.seq),
-        }}
-        onOpenPatientFile={actions.onOpenPatientFile}
-        onNewLead={actions.onNewLead}
-        onNewAppointment={actions.onNewAppointment}
-        onNewPatient={actions.onNewPatient}
-        onDone={done}
-        onClose={() => setEditing(false)}
-      />
+      {contact ? (
+        <ContactEditor
+          open={editing}
+          value={contactValueOf(contact)}
+          record={{
+            kind: lead.patientId ? 'patient' : 'lead',
+            displayId: displayId.lead(lead.leadNumber),
+          }}
+          onOpenPatientFile={actions.onOpenPatientFile}
+          onNewLead={actions.onNewLead}
+          onNewAppointment={actions.onNewAppointment}
+          onDone={done}
+          onClose={() => setEditing(false)}
+        />
+      ) : null}
     </>
   );
 }
@@ -206,47 +195,36 @@ interface LeadFact {
   label: string;
   value: string;
   full?: boolean;
-  convert?: boolean;
 }
 
-/** Info (H:1813): Created · Last message · Patient (+ Convert) · Open tasks · Re-target reason. */
-function LeadInfoCard({
-  lead,
-  messages,
-  convertible,
-  onConvert,
-}: {
-  lead: LeadRecord;
-  messages: readonly LeadMessage[] | undefined;
-  convertible: boolean;
-  onConvert?: () => void;
-}) {
+/**
+ * Info (H:1813): Created · Last activity (the person's latest, on any record) · Patient —
+ * linked once a check-in opened their file; the design's "Convert to patient" went with the
+ * backend (route map §4 #5) · Open tasks · Re-target reason.
+ */
+function LeadInfoCard({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
   const clock = useClinicClock();
   const openTasks = useOpenLeadTasks(lead.id);
-  const last = lastMessageOf(messages);
-  const lastValue = last
-    ? t(LEADS_KEYS.drawer.info.lastMessageValue, {
-        channel: tClinic(CLINIC_KEYS.channels[last.channel]),
-        // By the rooms' one time rule, as the thread times it.
-        at: clock.moment(last.sentAt),
-      })
-    : t(LEADS_KEYS.drawer.info.none);
   const facts: LeadFact[] = [
     {
       key: 'created',
       label: t(LEADS_KEYS.drawer.info.created),
       value: clock.moment(lead.createdAt),
     },
-    { key: 'last', label: t(LEADS_KEYS.drawer.info.lastMessage), value: lastValue },
+    {
+      key: 'last',
+      label: t(LEADS_KEYS.drawer.info.lastActivity),
+      value: lead.lastActivityAt
+        ? clock.moment(lead.lastActivityAt)
+        : t(LEADS_KEYS.drawer.info.none),
+    },
     {
       key: 'patient',
       label: t(LEADS_KEYS.drawer.info.patient),
       value: t(
         lead.patientId ? LEADS_KEYS.drawer.info.linked : LEADS_KEYS.drawer.info.notYet,
       ),
-      convert: convertible,
     },
     {
       key: 'tasks',
@@ -283,19 +261,6 @@ function LeadInfoCard({
             <dd className="text-body leading-snug font-medium [overflow-wrap:anywhere]">
               {fact.value}
             </dd>
-            {fact.convert && onConvert ? (
-              <dd>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={onConvert}
-                  className="mt-px h-8 gap-1.5 rounded-lg px-2.5 text-xs"
-                >
-                  <UserPlus aria-hidden="true" className="size-3.25" />
-                  {t(LEADS_KEYS.drawer.info.convert)}
-                </Button>
-              </dd>
-            ) : null}
           </div>
         ))}
       </dl>
@@ -321,7 +286,7 @@ export function LeadRemoveConfirm({
   const { t } = useTranslation(LEADS_NS);
   const remove = useDeleteLead();
   const restore = useRestoreLead();
-  const seq = String(lead.seq);
+  const seq = String(lead.leadNumber);
   const reasonLabel = (key: string) => `${LEADS_NS}:${key}`;
   return (
     <ConfirmDialog
@@ -375,30 +340,22 @@ export function LeadRemoveConfirm({
 export function LeadDetailsBody({
   lead,
   draft,
-  staff,
-  staffById,
-  messages,
+  members,
+  team,
   people,
   canEdit,
-  onConvert,
+  canEditContact,
   contactActions = {},
 }: LeadDetailsBodyProps) {
   const { t } = useTranslation(LEADS_NS);
   const { draft: values, update } = draft;
-  const detailsDone =
-    values.source !== null && values.interests.length + values.customInterests.length > 0;
-  const convertible =
-    canEdit &&
-    lead.patientId === null &&
-    values.status !== null &&
-    CONVERTIBLE.has(values.status);
+  const detailsDone = values.source !== null && values.interests.length > 0;
   return (
     <>
       <LeadPerson
         lead={lead}
-        staffById={staffById}
-        canEdit={canEdit}
-        viewerId={people.viewer?.id ?? null}
+        team={team}
+        canEdit={canEditContact}
         actions={contactActions}
       />
       <LeadCard label={t(LEADS_KEYS.drawer.cards.details)} number={1} done={detailsDone}>
@@ -411,38 +368,26 @@ export function LeadDetailsBody({
           </div>
           <div className="col-span-full">
             <LeadInterestsField
-              value={{
-                interests: values.interests,
-                customInterests: values.customInterests,
-              }}
-              onChange={(next) => update(next)}
+              value={values.interests}
+              onChange={(interests) => update({ interests })}
             />
           </div>
           <LeadPeopleField
             ownerId={lead.ownerId}
             involvedIds={lead.involvedIds}
-            staff={staff}
+            members={members}
             readOnly={!canEdit}
             {...people}
           />
         </div>
       </LeadCard>
-      <LeadCard
-        label={t(LEADS_KEYS.drawer.cards.progress)}
-        number={2}
-        done={values.status !== null}
-      >
+      <LeadCard label={t(LEADS_KEYS.drawer.cards.progress)} number={2} done>
         <LeadProgressField
           status={values.status}
           onChange={(status) => update({ status })}
         />
       </LeadCard>
-      <LeadInfoCard
-        lead={lead}
-        messages={messages}
-        convertible={convertible}
-        onConvert={onConvert}
-      />
+      <LeadInfoCard lead={lead} />
     </>
   );
 }

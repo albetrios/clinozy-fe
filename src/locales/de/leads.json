@@ -10,19 +10,17 @@
     "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
     "claimedUnowned": "{{name}} gehört jetzt Ihnen",
     "released": "Für das Team freigegeben · jeder kann übernehmen",
-    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt",
-    "followUpTask": " · Nachfass-Aufgabe für morgen",
-    "converted": "Patientenakte für {{name}} angelegt · der Lead bleibt verknüpft"
+    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt"
   },
   "list": {
     "records": "Leads",
     "views": {
       "label": "Lead-Ansichten",
       "mine": "Meine",
-      "unread": "Unbeantwortet",
+      "unreplied": "Unbeantwortet",
       "all": "Alle",
-      "unreadCount_one": "{{count}} unbeantwortet",
-      "unreadCount_other": "{{count}} unbeantwortet"
+      "unrepliedCount_one": "{{count}} unbeantwortet",
+      "unrepliedCount_other": "{{count}} unbeantwortet"
     },
     "search": {
       "placeholder": "Name, Telefon, #ID suchen",
@@ -44,15 +42,12 @@
   },
   "team": {
     "claim": "Offen · Übernehmen",
-    "join": "Offen fürs Team · Beitreten",
+    "openHint": "Niemand hält ihn · jeder kann ihn übernehmen",
     "openMine": "Offen fürs Team",
-    "claimHint_one": "Seit {{count}} Tag keine Aktivität · jeder kann ihn übernehmen",
-    "claimHint_other": "Seit {{count}} Tagen keine Aktivität · jeder kann ihn übernehmen",
-    "joinHint": "{{name}} hat die Klinik verlassen · jeder im Team kann beitreten und ihn übernehmen",
-    "releasesToday": "Wird heute fürs Team freigegeben, wenn niemand nachfasst",
-    "releasesTomorrow": "Wird morgen fürs Team freigegeben, wenn niemand nachfasst",
+    "openMineHint": "Deine Reservierung ist abgelaufen · jeder kann ihn übernehmen",
+    "releasesToday": "Geht heute um {{time}} zurück ans Team",
+    "releasesTomorrow": "Geht morgen um {{time}} zurück ans Team",
     "claimFirst": "{{first}} übernehmen",
-    "joinTake": "Beitreten · {{first}} übernehmen",
     "takeOver": "Von {{first}} übernehmen"
   },
   "filters": {
@@ -60,7 +55,7 @@
     "source": "Quelle · beliebig wählen",
     "clear": "Löschen",
     "hold": {
-      "label": "Zuständigkeit · Halten nach inaktiven Tagen",
+      "label": "Zuständigkeit · gehalten nach Übernahme",
       "any": "Alle",
       "open": "Zur Übernahme offen",
       "soon": "Wird heute frei",
@@ -85,7 +80,6 @@
     "panels": "Lead-Bereiche",
     "details": "Details",
     "chat": "Chat",
-    "chatCount": "{{n}} neu",
     "resize": "Bereichsgröße ändern",
     "resizeHint": "Ziehen zum Ändern · Doppelklick zum Zurücksetzen",
     "cards": {
@@ -95,7 +89,6 @@
     },
     "source": "Quelle",
     "interests": "Interessiert an",
-    "addInterest": "Interesse hinzufügen",
     "people": "Zugewiesen & beteiligt",
     "peopleAria": "Zugewiesene und beteiligte Personen",
     "addInvolved": "+ Beteiligte hinzufügen",
@@ -111,18 +104,17 @@
     "stepTips": {
       "done": "{{status}} · abgeschlossen",
       "current": "{{status}} · aktueller Schritt",
-      "next": "Zu {{status}} wechseln"
+      "next": "Zu {{status}} wechseln",
+      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt"
     },
     "closeAs": "Schließen als",
     "info": {
       "created": "Erstellt",
-      "lastMessage": "Letzte Nachricht",
-      "lastMessageValue": "{{channel}} · {{at}}",
+      "lastActivity": "Letzte Aktivität",
       "none": "Noch keine",
       "patient": "Patient",
       "linked": "Verknüpft",
       "notYet": "Noch nicht",
-      "convert": "In Patient umwandeln",
       "openTasks": "Offene Aufgaben",
       "retargetReason": "Re-Targeting-Grund"
     },
@@ -139,18 +131,9 @@
       "assigned": "Zugewiesen",
       "currentlyAssigned": "Derzeit zugewiesen",
       "assignTo": "{{name}} zuweisen",
-      "onlyAssignee": "Nur die zugewiesene Person ({{name}}) kann neu zuweisen",
-      "cantAssign": "{{role}} kann nicht an {{other}} zuweisen",
       "involved": "Beteiligt · hat an diesem Lead gearbeitet",
       "noMatch": "Kein Treffer",
-      "note": "✓ Beteiligt = alle, die an diesem Lead gearbeitet haben. Automatisch hinzugefügt, wenn sie antworten, anrufen, eine Notiz schreiben oder buchen · Sie können auch selbst jemanden hinzufügen",
-      "roleLine": "{{role}} · {{presence}}"
-    },
-    "presence": {
-      "online": "Online",
-      "away": "Abwesend",
-      "busy": "Beschäftigt",
-      "offline": "Offline"
+      "note": "✓ Beteiligt = alle, die an diesem Lead gearbeitet haben. Automatisch hinzugefügt, wenn sie antworten, anrufen, eine Notiz schreiben oder buchen · Sie können auch selbst jemanden hinzufügen"
     },
     "remove": {
       "title": "Diesen Lead entfernen?",
@@ -162,11 +145,6 @@
         "other": "Sonstiges"
       },
       "removed": "Lead #{{seq}} entfernt · {{reason}}"
-    },
-    "toasts": {
-      "claimedAfter_one": "Von {{me}} übernommen nach {{count}} inaktivem Tag · {{owner}} bleibt beteiligt",
-      "claimedAfter_other": "Von {{me}} übernommen nach {{count}} inaktiven Tagen · {{owner}} bleibt beteiligt",
-      "releasedOpen": "{{name}} kann jetzt von allen übernommen werden"
     }
   },
   "newLead": {
@@ -178,19 +156,17 @@
     "quickStart": "Schnellstart",
     "presets": {
       "walkIn": "Laufkundschaft",
-      "phoneCall": "Telefonanruf",
       "instagramDm": "Instagram-DM"
     },
     "presetHints": {
-      "walkIn": "Jetzt am Empfang · Quelle Laufkundschaft, Status Klinik besucht",
-      "phoneCall": "Anfrage per Telefon",
+      "walkIn": "Jetzt am Empfang · Quelle Laufkundschaft",
       "instagramDm": "DM auf Instagram"
     },
     "hits": {
-      "patient": "Patient {{id}} · letzter Besuch {{date}}",
-      "patientNew": "Patient {{id}}",
-      "lead": "Lead {{id}} · {{phone}}",
-      "contact": "Kontakt · {{phone}}",
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Offener Lead · {{id}} · {{phone}}",
+      "open": "Lead öffnen",
       "recreate": "Lead neu anlegen",
       "useContact": "Kontakt verwenden"
     },
@@ -203,14 +179,12 @@
     "detailsSummary": "Quelle, Interesse und wer sich kümmert",
     "footer": "Legt einen Kontakt an oder aktualisiert ihn",
     "create": "Lead anlegen",
-    "linked": "Verknüpft mit {{name}} · {{kind}} · Kanäle und Präferenzen übernommen",
     "toasts": {
       "pickFirst": "Wählen Sie zuerst den Kontakt oder legen Sie ihn an",
       "presetApplied": "Vorgabe „{{preset}}“ übernommen",
       "existingPatient": "Vorhandener Patient {{id}} · der neue Lead wird verknüpft",
       "existingContact": "Vorhandener Kontakt {{name}} wird verwendet",
       "missing": "Geben Sie einen Namen und eine 10-stellige Mobilnummer ein",
-      "duplicate": "Diese Mobilnummer gehört bereits zu Lead {{id}}",
       "open": "Öffnen"
     }
   }

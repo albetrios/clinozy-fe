@@ -1,19 +1,19 @@
 import type { TFunction } from 'i18next';
 
 import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
-import type {
-  Channel,
-  LeadInterest,
-  LeadMessage,
-  Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { Channel, LeadInterest, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   addCivilDays,
   civilDayOffset,
   clinicInstant,
 } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
+  Contact,
+  ContactPreferenceTag,
+} from '@/shared/api/clinic/contacts-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
+import type {
+  ChatMessage,
   ChatSlot,
   ComposerMode,
   ContactHistoryEntry,
@@ -60,11 +60,11 @@ export interface ChatContact {
   interests?: readonly LeadInterest[];
 }
 
-/** The stored preferences the composer warns about (`PREFS`, H:3368). */
+/** The preference tags the composer warns about (`PREFS`, H:3368; `preference_tags`, CT14). */
 export const CONTACT_PREFERENCES = {
-  noCalls: 'No calls',
-  afterSix: 'After 6 pm',
-} as const;
+  noCalls: 'no_calls',
+  afterSix: 'after_six_pm',
+} satisfies Record<string, ContactPreferenceTag>;
 
 /** A person's first name, as messages and hints address them. */
 export function firstNameOf(name: string): string {
@@ -89,6 +89,35 @@ export function chatContactOfLead(
     defaultChannel: lead.contact?.defaultChannel ?? null,
     preferences: lead.contact?.preferences ?? [],
     interests: lead.interests,
+  };
+}
+
+/** Each default channel of a contact as the composer's channel. */
+const COMPOSER_CHANNEL_OF: Readonly<Record<Contact['defaultChannel'], Channel>> = {
+  whatsapp: 'whatsapp',
+  call: 'call',
+  instagram: 'instagram',
+};
+
+/**
+ * The person a contact's chat writes to (`GET /app/contacts/:contact_id`): whether any number is
+ * on WhatsApp, their first Instagram handle, their default channel and preference tags — the
+ * name, number, patient badge and interests from the host's record. Until the contact is read,
+ * the host's alone.
+ */
+export function chatContactOfContact(
+  person: Pick<ChatContact, 'name' | 'phone' | 'isPatient' | 'interests'>,
+  contact:
+    | Pick<Contact, 'phones' | 'instagramHandles' | 'defaultChannel' | 'preferenceTags'>
+    | undefined,
+): ChatContact {
+  if (!contact) return person;
+  return {
+    ...person,
+    onWhatsApp: contact.phones.some((entry) => entry.isOnWhatsapp),
+    instagram: contact.instagramHandles[0] ?? null,
+    defaultChannel: COMPOSER_CHANNEL_OF[contact.defaultChannel],
+    preferences: contact.preferenceTags,
   };
 }
 
@@ -138,7 +167,7 @@ function lastWhere<T>(items: readonly T[], test: (item: T) => boolean): T | unde
 }
 
 /** The newest message they sent us, if any. */
-export function lastInbound(messages: readonly LeadMessage[]): LeadMessage | null {
+export function lastInbound(messages: readonly ChatMessage[]): ChatMessage | null {
   return (
     lastWhere(
       messages,
@@ -153,7 +182,7 @@ export function lastInbound(messages: readonly LeadMessage[]): LeadMessage | nul
  * when that tab can't be picked, WhatsApp or else the call log.
  */
 export function initialComposerMode(
-  messages: readonly LeadMessage[],
+  messages: readonly ChatMessage[],
   contact: ChatContact,
 ): ComposerMode {
   const words = messages.filter(
@@ -191,7 +220,7 @@ export type ReplyHint =
  * other messaging channel the "<First> wrote on <Channel> · Switch" chip; on a
  * call log or note, nothing.
  */
-export function replyHint(lastFrom: LeadMessage | null, mode: ComposerMode): ReplyHint {
+export function replyHint(lastFrom: ChatMessage | null, mode: ComposerMode): ReplyHint {
   const channel = lastFrom?.channel;
   if (channel !== 'whatsapp' && channel !== 'instagram') return null;
   if (mode === channel) return { kind: 'here' };
@@ -221,7 +250,7 @@ export type BubbleKind = 'out' | 'in' | 'call' | 'note';
 
 /** A message's bubble kind (KICKOFF §3.5 Messages). */
 export function bubbleKind(
-  message: Pick<LeadMessage, 'channel' | 'direction'>,
+  message: Pick<ChatMessage, 'channel' | 'direction'>,
 ): BubbleKind {
   if (message.channel === 'note') return 'note';
   if (message.channel === 'call') return 'call';
@@ -241,7 +270,7 @@ export type DeliveryView =
  * reads "Not sent" with a Retry; theirs, notes and call logs say nothing.
  */
 export function deliveryView(
-  message: Pick<LeadMessage, 'channel' | 'direction' | 'deliveryStatus' | 'isSystem'>,
+  message: Pick<ChatMessage, 'channel' | 'direction' | 'deliveryStatus' | 'isSystem'>,
   whatsappDown: boolean,
 ): DeliveryView {
   if (message.isSystem || bubbleKind(message) !== 'out') return { kind: 'none' };
@@ -258,7 +287,7 @@ export function deliveryView(
 }
 
 /** "Book an appointment"'s reason: the first 80 characters of their last message (H:5751). */
-export function bookingReason(lastFrom: LeadMessage | null): string | null {
+export function bookingReason(lastFrom: ChatMessage | null): string | null {
   return lastFrom ? lastFrom.body.slice(0, 80) : null;
 }
 
@@ -617,7 +646,7 @@ const TREATMENT_TERM = /prp|hair fall|laser|lhr|peel|facial|acne|pigment\w*/;
  * The chips their last message calls for — price, timing, place and
  * treatment words — else "Greet" · "Offer 2 slots" · "Follow up" (H:5744–5748).
  */
-export function smartChips(lastFrom: LeadMessage | null): SmartChip[] {
+export function smartChips(lastFrom: ChatMessage | null): SmartChip[] {
   const text = (lastFrom?.body ?? '').toLowerCase();
   const chips: SmartChip[] = [];
   if (ASKED_PRICE.test(text)) chips.push({ kind: 'price', asked: true });
@@ -692,7 +721,7 @@ export interface ComposerTemplate {
  * why ("They asked about price"), the rest preview their message.
  */
 export function composerSuggestions(
-  lastFrom: LeadMessage | null,
+  lastFrom: ChatMessage | null,
   ctx: MessageContext,
   t: TFunction,
 ): ComposerSuggestion[] {

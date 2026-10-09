@@ -8,7 +8,7 @@ import type {
   CancelReason,
   LeadStatus,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-contracts.ts';
+import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 
 import { systemLine } from './messages.fixtures.ts';
 import { clinicFixtures } from './world.fixtures.ts';

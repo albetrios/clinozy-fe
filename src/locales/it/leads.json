@@ -10,20 +10,18 @@
     "claimed": "Ora {{name}} è tuo · {{owner}} resta coinvolto",
     "claimedUnowned": "Ora {{name}} è tuo",
     "released": "Rilasciato al team · chiunque può prenderlo",
-    "assigned": "{{name}} ora è responsabile · notificato",
-    "followUpTask": " · attività di follow-up per domani",
-    "converted": "Scheda paziente creata per {{name}} · il lead resta collegato"
+    "assigned": "{{name}} ora è responsabile · notificato"
   },
   "list": {
     "records": "lead",
     "views": {
       "label": "Viste dei lead",
       "mine": "Miei",
-      "unread": "Senza risposta",
+      "unreplied": "Senza risposta",
       "all": "Tutti",
-      "unreadCount_one": "{{count}} senza risposta",
-      "unreadCount_many": "{{count}} senza risposta",
-      "unreadCount_other": "{{count}} senza risposta"
+      "unrepliedCount_one": "{{count}} senza risposta",
+      "unrepliedCount_many": "{{count}} senza risposta",
+      "unrepliedCount_other": "{{count}} senza risposta"
     },
     "search": {
       "placeholder": "Cerca nome, telefono, #ID",
@@ -46,16 +44,12 @@
   },
   "team": {
     "claim": "Aperto · Prendi",
-    "join": "Aperto al team · Unisciti",
+    "openHint": "Nessuno lo tiene · chiunque può prenderlo",
     "openMine": "Aperto al team",
-    "claimHint_one": "Nessuna attività da {{count}} giorno · chiunque può prenderlo",
-    "claimHint_many": "Nessuna attività da {{count}} giorni · chiunque può prenderlo",
-    "claimHint_other": "Nessuna attività da {{count}} giorni · chiunque può prenderlo",
-    "joinHint": "{{name}} ha lasciato la clinica · chiunque del team può unirsi e prenderlo",
-    "releasesToday": "Rilasciato al team oggi se nessuno lo segue",
-    "releasesTomorrow": "Rilasciato al team domani se nessuno lo segue",
+    "openMineHint": "La tua riserva è scaduta · chiunque può prenderlo",
+    "releasesToday": "Torna al team oggi alle {{time}}",
+    "releasesTomorrow": "Torna al team domani alle {{time}}",
     "claimFirst": "Prendi {{first}}",
-    "joinTake": "Unisciti · prendi {{first}}",
     "takeOver": "Subentra a {{first}}"
   },
   "filters": {
@@ -63,7 +57,7 @@
     "source": "Fonte · scegli quelle che vuoi",
     "clear": "Cancella",
     "hold": {
-      "label": "Proprietà · trattenuto dopo giorni di inattività",
+      "label": "Proprietà · trattenuto dopo la presa in carico",
       "any": "Qualsiasi",
       "open": "Disponibili da prendere",
       "soon": "Rilasciati oggi",
@@ -89,7 +83,6 @@
     "panels": "Pannelli del lead",
     "details": "Dettagli",
     "chat": "Chat",
-    "chatCount": "{{n}} nuovi",
     "resize": "Ridimensiona pannello",
     "resizeHint": "Trascina per ridimensionare · doppio clic per ripristinare",
     "cards": {
@@ -99,7 +92,6 @@
     },
     "source": "Origine",
     "interests": "Interessato a",
-    "addInterest": "Aggiungi interesse",
     "people": "Assegnato e coinvolti",
     "peopleAria": "Persone assegnate e coinvolte",
     "addInvolved": "+ Aggiungi coinvolto",
@@ -115,18 +107,17 @@
     "stepTips": {
       "done": "{{status}} · completato",
       "current": "{{status}} · passaggio attuale",
-      "next": "Passa a {{status}}"
+      "next": "Passa a {{status}}",
+      "byCheckIn": "Visita in clinica · impostato al check-in"
     },
     "closeAs": "Chiudi come",
     "info": {
       "created": "Creato",
-      "lastMessage": "Ultimo messaggio",
-      "lastMessageValue": "{{channel}} · {{at}}",
+      "lastActivity": "Ultima attività",
       "none": "Ancora nessuno",
       "patient": "Paziente",
       "linked": "Collegato",
       "notYet": "Non ancora",
-      "convert": "Converti in paziente",
       "openTasks": "Attività aperte",
       "retargetReason": "Motivo del retargeting"
     },
@@ -143,18 +134,9 @@
       "assigned": "Assegnato",
       "currentlyAssigned": "Attualmente assegnato",
       "assignTo": "Assegna a {{name}}",
-      "onlyAssignee": "Solo l’assegnatario ({{name}}) può riassegnare",
-      "cantAssign": "{{role}} non può assegnare a {{other}}",
       "involved": "Coinvolto · ha lavorato su questo lead",
       "noMatch": "Nessun risultato",
-      "note": "✓ Coinvolti = tutti quelli che hanno lavorato su questo lead. Aggiunti automaticamente quando rispondono, chiamano, annotano o prenotano · puoi anche aggiungere qualcuno",
-      "roleLine": "{{role}} · {{presence}}"
-    },
-    "presence": {
-      "online": "Online",
-      "away": "Assente",
-      "busy": "Occupato",
-      "offline": "Offline"
+      "note": "✓ Coinvolti = tutti quelli che hanno lavorato su questo lead. Aggiunti automaticamente quando rispondono, chiamano, annotano o prenotano · puoi anche aggiungere qualcuno"
     },
     "remove": {
       "title": "Rimuovere questo lead?",
@@ -166,12 +148,6 @@
         "other": "Altro"
       },
       "removed": "Lead #{{seq}} rimosso · {{reason}}"
-    },
-    "toasts": {
-      "claimedAfter_one": "Preso in carico da {{me}} dopo {{count}} giorno di inattività · {{owner}} resta coinvolto",
-      "claimedAfter_many": "Preso in carico da {{me}} dopo {{count}} giorni di inattività · {{owner}} resta coinvolto",
-      "claimedAfter_other": "Preso in carico da {{me}} dopo {{count}} giorni di inattività · {{owner}} resta coinvolto",
-      "releasedOpen": "{{name}} può essere preso in carico da chiunque"
     }
   },
   "newLead": {
@@ -183,19 +159,17 @@
     "quickStart": "Avvio rapido",
     "presets": {
       "walkIn": "Senza appuntamento",
-      "phoneCall": "Telefonata",
       "instagramDm": "DM su Instagram"
     },
     "presetHints": {
-      "walkIn": "Ora alla reception · fonte Senza appuntamento, stato Visita in clinica",
-      "phoneCall": "Richiesta per telefono",
+      "walkIn": "Ora alla reception · fonte Senza appuntamento",
       "instagramDm": "DM su Instagram"
     },
     "hits": {
-      "patient": "Paziente {{id}} · ultima visita {{date}}",
-      "patientNew": "Paziente {{id}}",
-      "lead": "Lead {{id}} · {{phone}}",
-      "contact": "Contatto · {{phone}}",
+      "patient": "Paziente · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Lead aperto · {{id}} · {{phone}}",
+      "open": "Apri lead",
       "recreate": "Ricrea lead",
       "useContact": "Usa contatto"
     },
@@ -209,14 +183,12 @@
     "detailsSummary": "Fonte, interesse e chi lo gestisce",
     "footer": "Crea o aggiorna un contatto",
     "create": "Crea lead",
-    "linked": "Collegato a {{name}} · {{kind}} · canali e preferenze riutilizzati",
     "toasts": {
       "pickFirst": "Scegli o aggiungi prima il contatto",
       "presetApplied": "Preimpostazione «{{preset}}» applicata",
       "existingPatient": "Paziente esistente {{id}} · il nuovo lead sarà collegato",
       "existingContact": "Uso del contatto esistente {{name}}",
       "missing": "Aggiungi un nome e un cellulare di 10 cifre",
-      "duplicate": "Questo cellulare è già sul lead {{id}}",
       "open": "Apri"
     }
   }

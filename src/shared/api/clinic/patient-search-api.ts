@@ -4,7 +4,7 @@ import {
   isCommandSearchQuery,
   matchesCommandSearch,
 } from './command-search-api.ts';
-import type { LeadRecord } from './leads-contracts.ts';
+import type { LeadRecord } from './leads-fixture-contracts.ts';
 import { listPatients } from './patients-api.ts';
 import { patientName } from './patients-contracts.ts';
 

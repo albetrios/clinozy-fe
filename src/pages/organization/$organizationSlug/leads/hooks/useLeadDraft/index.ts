@@ -1,6 +1,6 @@
 export {
   type LeadDraft,
-  leadDraftPatch,
+  leadDraftFields,
   type LeadDraftState,
   useLeadDraft,
 } from './useLeadDraft.ts';

@@ -17,7 +17,7 @@ import {
   userSchema,
 } from './clinic-schema.ts';
 import { addCivilDays, clinicInstant, clinicToday } from './clinic-time.ts';
-import { leadRecordSchema } from './leads-contracts.ts';
+import { leadRecordSchema } from './leads-fixture-contracts.ts';
 
 /**
  * The Tasks domain beyond the generated contract (KICKOFF §6.10, Q-T3): the

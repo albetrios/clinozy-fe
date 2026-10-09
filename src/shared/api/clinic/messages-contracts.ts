@@ -18,7 +18,7 @@ import {
   taskOutcomeSchema,
   toneSchema,
 } from './clinic-schema.ts';
-import { leadRecordSourceSchema } from './leads-contracts.ts';
+import { leadRecordSourceSchema } from './leads-fixture-contracts.ts';
 
 /*
  * The messaging domain beyond the generated contract (KICKOFF §3.5 Chat column,
@@ -57,12 +57,15 @@ export type ComposerMode = z.infer<typeof composerModeSchema>;
 export const chatPersonSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('lead'), leadId: z.uuid() }),
   z.object({ kind: z.literal('patient'), patientId: z.uuid() }),
+  /** A person on clinozy-be: their stream (`/app/contacts/:contact_id/activities`). */
+  z.object({ kind: z.literal('contact'), contactId: z.string() }),
 ]);
-/** A lead or a patient, by id. */
+/** A fixture lead or patient, or a contact on clinozy-be, by id. */
 export type ChatPerson = z.infer<typeof chatPersonSchema>;
 
 /** A stable key per person — the thread's query keys, its draft and its outbox. */
 export function chatPersonKey(person: ChatPerson): string {
+  if (person.kind === 'contact') return `contact:${person.contactId}`;
   return person.kind === 'lead' ? `lead:${person.leadId}` : `patient:${person.patientId}`;
 }
 
@@ -110,10 +113,29 @@ const chatAuthorSchema = z.object({
   roles: z.array(roleSchema),
   phone: phoneSchema.nullable(),
   email: z.string().nullable(),
-  online: z.boolean(),
+  /** Absent when the room cannot know it (a contact's stream). */
+  online: z.boolean().optional(),
 });
 /** A message's author. */
 export type ChatAuthor = z.infer<typeof chatAuthorSchema>;
+
+/**
+ * A message as the chat column reads it — a fixture thread's `LeadMessage`, or an entry of a
+ * contact's stream on clinozy-be (`contact-activities-api.ts`).
+ */
+const chatMessageSchema = leadMessageSchema.pick({
+  id: true,
+  channel: true,
+  direction: true,
+  body: true,
+  deliveryStatus: true,
+  isSystem: true,
+  authorId: true,
+  taskId: true,
+  sentAt: true,
+});
+/** One message of a chat thread. */
+export type ChatMessage = z.infer<typeof chatMessageSchema>;
 
 /**
  * The chat's read of `getLead` (`S:1589`): the thread — `null` while a patient
@@ -122,7 +144,7 @@ export type ChatAuthor = z.infer<typeof chatAuthorSchema>;
  */
 export const chatThreadReadSchema = z.object({
   thread: chatThreadSchema.nullable(),
-  messages: z.array(leadMessageSchema),
+  messages: z.array(chatMessageSchema),
   authors: z.record(z.string(), chatAuthorSchema),
 });
 /** A thread with its messages and authors. */

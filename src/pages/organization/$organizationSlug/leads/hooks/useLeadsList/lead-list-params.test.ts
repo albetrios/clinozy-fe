@@ -3,18 +3,18 @@ import { describe, expect, it } from 'vitest';
 import { validateLeadsSearch } from '../../leads.search.ts';
 import { leadListParamsOf } from './lead-list-params.ts';
 
-const STAFF = '9f1c2b3a-4d5e-4f60-8a7b-1c2d3e4f5a6b';
+const ME = 'mem_me0000000000000000000';
 
 describe('leadListParamsOf — the URL as the list read', () => {
   it('applies the defaults: the viewer’s own leads, newest first', () => {
-    expect(leadListParamsOf(validateLeadsSearch({}), STAFF)).toEqual({
+    expect(leadListParamsOf(validateLeadsSearch({}), ME)).toEqual({
       view: 'mine',
-      viewerId: STAFF,
+      viewerId: ME,
       q: undefined,
       status: undefined,
       source: undefined,
       hold: undefined,
-      owner: undefined,
+      member: undefined,
       created: undefined,
       followUp: undefined,
       sort: undefined,
@@ -22,13 +22,14 @@ describe('leadListParamsOf — the URL as the list read', () => {
     });
   });
 
-  it('hands the contract its shapes: one status as a list, the sort split from its direction', () => {
+  it('splits the sort from its direction and keeps the one status and member', () => {
     expect(
       leadListParamsOf(
         validateLeadsSearch({
           view: 'all',
           status: 'new',
-          sort: 'status:desc',
+          member: ME,
+          sort: 'activity:desc',
           q: 'rhea',
         }),
         null,
@@ -36,8 +37,9 @@ describe('leadListParamsOf — the URL as the list read', () => {
     ).toMatchObject({
       view: 'all',
       viewerId: null,
-      status: ['new'],
-      sort: 'status',
+      status: 'new',
+      member: ME,
+      sort: 'activity',
       order: 'desc',
       q: 'rhea',
     });

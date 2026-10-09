@@ -1,26 +1,29 @@
-import { type KeyboardEvent, type ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type {
   LeadInterest,
+  LeadSource,
   LeadStatus,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import type { LeadRecordSource } from '@/shared/api/clinic/leads-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   LEAD_INTEREST_TONES,
   LEAD_SOURCE_TONES,
   LEAD_STATUS_TONES,
   TONE_CLASSES,
-  toneForLabel,
 } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
-import { Check, Plus } from '@/shared/icons/index.ts';
+import { Check } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS } from '../../leads.constants.ts';
-import { LEAD_SOURCE_ICONS, LEAD_SOURCE_ORDER } from '../LeadFields/lead-display.ts';
+import {
+  LEAD_INTEREST_CHIPS,
+  LEAD_SOURCE_ICONS,
+  LEAD_SOURCE_ORDER,
+} from '../LeadFields/lead-display.ts';
 
 /** The four steps of the track, in order (H:1810); the rest close the lead. */
 const MAIN_STATUSES = [
@@ -37,18 +40,6 @@ const CLOSING_STATUSES = [
   'invalid',
   'lost',
 ] as const satisfies readonly LeadStatus[];
-
-/** The interest chips the drawer offers — the six without "Others" (H:5722). */
-const INTEREST_CHIPS = [
-  'clinical',
-  'peel',
-  'lhr',
-  'hydrafacial',
-  'prp',
-] as const satisfies readonly LeadInterest[];
-
-/** A typed interest's longest form (`leads.md:64`). */
-const CUSTOM_INTEREST_MAX = 30;
 
 /** A drawer card (H:1768, H:1809, H:1813): a 24px number circle — green once filled — and the title. */
 export function LeadCard({
@@ -116,13 +107,13 @@ export function LeadField({
   );
 }
 
-/** Source (`leads.md:63`): one chip, each with its icon in its tone; "Phone call" last (Q-L6). */
+/** Source (`leads.md:63`): one chip, each with its icon in its tone. */
 export function LeadSourceField({
   value,
   onChange,
 }: {
-  value: LeadRecordSource | null;
-  onChange: (source: LeadRecordSource) => void;
+  value: LeadSource | null;
+  onChange: (source: LeadSource) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
@@ -145,117 +136,33 @@ export function LeadSourceField({
   );
 }
 
-/** The interests as the record keeps them: the contract's and the typed ones. */
-export interface LeadInterestsValue {
-  interests: readonly LeadInterest[];
-  customInterests: readonly string[];
-}
-
-const CUSTOM_PREFIX = 'custom:';
-
 /**
- * Interested in (`leads.md:64`): Clinical · Peel · LHR · Hydrafacial · PRP and
- * every typed one, picked chips with a check; the dashed 90px "Add interest"
- * adds on Enter or blur (≤ 30, case-insensitive dedupe), Esc clears it.
+ * Interested in (`leads.md:64`): Clinical · Peel · LHR · Hydrafacial · PRP · Others, picked
+ * chips with a check. The design's "Add interest" went with the backend — it keeps no typed
+ * interest (route map §4); "Others" stands for them.
  */
 export function LeadInterestsField({
   value,
   onChange,
 }: {
-  value: LeadInterestsValue;
-  onChange: (value: LeadInterestsValue) => void;
+  value: readonly LeadInterest[];
+  onChange: (value: LeadInterest[]) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const [typed, setTyped] = useState('');
-  const others = value.interests.filter(
-    (interest) => !(INTEREST_CHIPS as readonly string[]).includes(interest),
-  );
-  const options = [
-    ...INTEREST_CHIPS.map((interest) => ({
-      value: interest as string,
-      label: tClinic(CLINIC_KEYS.leads.interests[interest]),
-      tone: LEAD_INTEREST_TONES[interest],
-    })),
-    ...value.customInterests.map((label) => ({
-      value: `${CUSTOM_PREFIX}${label}`,
-      label,
-      tone: toneForLabel(label),
-    })),
-  ];
-  const picks = [
-    ...value.interests.filter((interest) =>
-      (INTEREST_CHIPS as readonly string[]).includes(interest),
-    ),
-    ...value.customInterests.map((label) => `${CUSTOM_PREFIX}${label}`),
-  ];
-  const add = () => {
-    const label = typed.trim().slice(0, CUSTOM_INTEREST_MAX);
-    setTyped('');
-    if (!label) return;
-    const key = label.toLowerCase();
-    const known = INTEREST_CHIPS.find(
-      (interest) =>
-        interest === key ||
-        tClinic(CLINIC_KEYS.leads.interests[interest]).toLowerCase() === key,
-    );
-    if (known) {
-      if (!value.interests.includes(known)) {
-        onChange({ ...value, interests: [...value.interests, known] });
-      }
-      return;
-    }
-    if (value.customInterests.some((custom) => custom.toLowerCase() === key)) return;
-    onChange({ ...value, customInterests: [...value.customInterests, label] });
-  };
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      add();
-    } else if (event.key === 'Escape' && typed) {
-      event.stopPropagation();
-      setTyped('');
-    }
-  };
   return (
     <LeadField label={t(LEADS_KEYS.drawer.interests)}>
-      <div className="flex flex-wrap items-center gap-1.5">
-        <DrawerChips
-          multiple
-          label={t(LEADS_KEYS.drawer.interests)}
-          options={options}
-          value={picks}
-          onChange={(next) => {
-            onChange({
-              interests: [
-                ...others,
-                ...next.filter(
-                  (pick): pick is LeadInterest => !pick.startsWith(CUSTOM_PREFIX),
-                ),
-              ],
-              customInterests: next
-                .filter((pick) => pick.startsWith(CUSTOM_PREFIX))
-                .map((pick) => pick.slice(CUSTOM_PREFIX.length)),
-            });
-          }}
-        />
-        <div
-          data-slot="pill"
-          className="text-muted-foreground bg-card border-border-strong inline-flex h-6 cursor-text items-center gap-1.5 rounded-full border border-dashed ps-2.5 pe-1.5"
-        >
-          <Plus aria-hidden="true" className="size-3 flex-none" />
-          <input
-            value={typed}
-            maxLength={CUSTOM_INTEREST_MAX}
-            onChange={(event) => setTyped(event.target.value)}
-            onKeyDown={onKeyDown}
-            onBlur={add}
-            placeholder={t(LEADS_KEYS.drawer.addInterest)}
-            aria-label={t(LEADS_KEYS.drawer.addInterest)}
-            className="text-foreground placeholder:text-muted-foreground h-full w-22.5 bg-transparent text-xs outline-none"
-          />
-        </div>
-      </div>
+      <DrawerChips
+        multiple
+        label={t(LEADS_KEYS.drawer.interests)}
+        options={LEAD_INTEREST_CHIPS.map((interest) => ({
+          value: interest,
+          label: tClinic(CLINIC_KEYS.leads.interests[interest]),
+          tone: LEAD_INTEREST_TONES[interest],
+        }))}
+        value={[...value]}
+        onChange={onChange}
+      />
     </LeadField>
   );
 }
@@ -270,24 +177,58 @@ const TRACK_TONES: Readonly<
   clinic_visited: { next: 'bg-tone-sage/30', bar: 'bg-tone-sage' },
 };
 
+/** Where a step of the track stands. */
+type StepState = 'done' | 'current' | 'byCheckIn' | 'next';
+
+/** A step's state: done, current, the check-in's own (Clinic visited, not yet), or next. */
+function stepStateOf({
+  done,
+  current,
+  byCheckIn,
+}: {
+  done: boolean;
+  current: boolean;
+  byCheckIn: boolean;
+}): StepState {
+  if (done) return 'done';
+  if (current) return 'current';
+  return byCheckIn ? 'byCheckIn' : 'next';
+}
+
+/** Each state's tooltip. */
+const STEP_TIP_KEYS: Readonly<Record<StepState, string>> = {
+  done: LEADS_KEYS.drawer.stepTips.done,
+  current: LEADS_KEYS.drawer.stepTips.current,
+  byCheckIn: LEADS_KEYS.drawer.stepTips.byCheckIn,
+  next: LEADS_KEYS.drawer.stepTips.next,
+};
+
+/** Each state's label over the step's name. */
+const STEP_LABEL_KEYS: Readonly<Record<Exclude<StepState, 'byCheckIn'>, string>> = {
+  done: LEADS_KEYS.drawer.steps.done,
+  current: LEADS_KEYS.drawer.steps.current,
+  next: LEADS_KEYS.drawer.steps.next,
+};
+
 /**
  * Progress (`leads.md:284`, H:1809–1811): the 4-tile track New · Contacted ·
  * Follow-up · Clinic visited — done tiles in the tone's ink with a check,
  * the current one tinted with a ringed dot, the next ones at 30% with a dashed
  * number — then "Close as" No response · Not interested · Invalid · Lost. Any
- * status may follow any (Q-L4).
+ * status may follow any (Q-L4) but Clinic visited: a check-in sets it, and then
+ * it is final (L8) — its tile never picks, and a visited lead's track only shows.
  */
 export function LeadProgressField({
   status,
   onChange,
 }: {
-  status: LeadStatus | null;
+  status: LeadStatus;
   onChange: (status: LeadStatus) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const at =
-    status === null ? -1 : (MAIN_STATUSES as readonly LeadStatus[]).indexOf(status);
+  const at = (MAIN_STATUSES as readonly LeadStatus[]).indexOf(status);
+  const visited = status === 'clinic_visited';
   const label = (value: LeadStatus) => tClinic(CLINIC_KEYS.leads.statuses[value]);
   return (
     <section
@@ -301,18 +242,17 @@ export function LeadProgressField({
           const done = at > index;
           const current = at === index;
           const name = label(step);
-          let tip = t(LEADS_KEYS.drawer.stepTips.next, { status: name });
-          if (done) tip = t(LEADS_KEYS.drawer.stepTips.done, { status: name });
-          else if (current) tip = t(LEADS_KEYS.drawer.stepTips.current, { status: name });
-          let stepLabel = t(LEADS_KEYS.drawer.steps.next);
-          if (done) stepLabel = t(LEADS_KEYS.drawer.steps.done);
-          else if (current) stepLabel = t(LEADS_KEYS.drawer.steps.current);
+          const byCheckIn = step === 'clinic_visited' && !current;
+          const state = stepStateOf({ done, current, byCheckIn });
+          const tip = t(STEP_TIP_KEYS[state], { status: name });
+          const stepLabel = t(STEP_LABEL_KEYS[state === 'byCheckIn' ? 'next' : state]);
           return (
             <button
               key={step}
               type="button"
               title={tip}
               aria-pressed={current}
+              disabled={visited || byCheckIn}
               onClick={() => onChange(step)}
               className={cn(
                 'relative flex min-w-0 flex-1 flex-col items-start gap-2 border-e px-3 pt-3 pb-2.5 text-start transition-colors last:border-e-0',
@@ -362,13 +302,14 @@ export function LeadProgressField({
         </span>
         <DrawerChips
           label={t(LEADS_KEYS.drawer.closeAs)}
+          disabled={visited}
           options={CLOSING_STATUSES.map((value) => ({
             value,
             label: label(value),
             tone: LEAD_STATUS_TONES[value],
           }))}
           value={
-            (CLOSING_STATUSES as readonly LeadStatus[]).includes(status ?? 'new')
+            (CLOSING_STATUSES as readonly LeadStatus[]).includes(status)
               ? (status as (typeof CLOSING_STATUSES)[number])
               : null
           }

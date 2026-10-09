@@ -22,8 +22,8 @@ import {
   clinicInstant,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { LEAD_HOLD_DAYS } from '@/shared/api/clinic/leads-hold.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
+import { LEAD_HOLD_DAYS } from '@/shared/api/clinic/leads-fixture-hold.ts';
 import {
   type CreateTaskInput,
   createTaskInputSchema,

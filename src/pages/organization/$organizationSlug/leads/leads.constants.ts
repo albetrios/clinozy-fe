@@ -19,10 +19,10 @@ export const LEADS_KEYS = {
     views: {
       label: 'list.views.label',
       mine: 'list.views.mine',
-      unread: 'list.views.unread',
+      unreplied: 'list.views.unreplied',
       all: 'list.views.all',
       /** The Unreplied chip, read out ("2 unreplied"). Plural. */
-      unreadCount: 'list.views.unreadCount',
+      unrepliedCount: 'list.views.unrepliedCount',
     },
     search: {
       placeholder: 'list.search.placeholder',
@@ -42,18 +42,20 @@ export const LEADS_KEYS = {
     /** The "+N" interests pill, read out with every interest. Plural. */
     moreInterests: 'list.moreInterests',
   },
-  /** The Team column's hold pills and the team card's take-over button (H:6151–6153). */
+  /** The Team column's hold pills and the team card's claim button (H:6151–6153). */
   team: {
     claim: 'team.claim',
-    join: 'team.join',
+    /** "Nobody holds it · anyone can claim it". */
+    openHint: 'team.openHint',
     openMine: 'team.openMine',
-    /** "No activity for <n> days · anyone can claim it". Plural. */
-    claimHint: 'team.claimHint',
-    joinHint: 'team.joinHint',
+    /** "Your hold has ended · anyone can claim it". */
+    openMineHint: 'team.openMineHint',
+    /** "Back to the team today at <time>". */
     releasesToday: 'team.releasesToday',
+    /** "Back to the team tomorrow at <time>". */
     releasesTomorrow: 'team.releasesTomorrow',
     claimFirst: 'team.claimFirst',
-    joinTake: 'team.joinTake',
+    /** "Take over from <first>" — the viewer becomes the owner of a lead someone holds. */
     takeOver: 'team.takeOver',
   },
   filters: {
@@ -88,8 +90,6 @@ export const LEADS_KEYS = {
     panels: 'drawer.panels',
     details: 'drawer.details',
     chat: 'drawer.chat',
-    /** "<n> new" — the Chat segment's count while Details shows. */
-    chatCount: 'drawer.chatCount',
     resize: 'drawer.resize',
     resizeHint: 'drawer.resizeHint',
     cards: {
@@ -99,7 +99,6 @@ export const LEADS_KEYS = {
     },
     source: 'drawer.source',
     interests: 'drawer.interests',
-    addInterest: 'drawer.addInterest',
     people: 'drawer.people',
     peopleAria: 'drawer.peopleAria',
     addInvolved: 'drawer.addInvolved',
@@ -116,18 +115,18 @@ export const LEADS_KEYS = {
       done: 'drawer.stepTips.done',
       current: 'drawer.stepTips.current',
       next: 'drawer.stepTips.next',
+      /** "Clinic visited · set when they check in" — the step a member never picks (L8). */
+      byCheckIn: 'drawer.stepTips.byCheckIn',
     },
     closeAs: 'drawer.closeAs',
     info: {
       created: 'drawer.info.created',
-      lastMessage: 'drawer.info.lastMessage',
-      /** "<channel> · <at>". */
-      lastMessageValue: 'drawer.info.lastMessageValue',
+      /** The person's latest activity, on any record. */
+      lastActivity: 'drawer.info.lastActivity',
       none: 'drawer.info.none',
       patient: 'drawer.info.patient',
       linked: 'drawer.info.linked',
       notYet: 'drawer.info.notYet',
-      convert: 'drawer.info.convert',
       openTasks: 'drawer.info.openTasks',
       retargetReason: 'drawer.info.retargetReason',
     },
@@ -144,19 +143,9 @@ export const LEADS_KEYS = {
       assigned: 'drawer.popover.assigned',
       currentlyAssigned: 'drawer.popover.currentlyAssigned',
       assignTo: 'drawer.popover.assignTo',
-      onlyAssignee: 'drawer.popover.onlyAssignee',
-      cantAssign: 'drawer.popover.cantAssign',
       involved: 'drawer.popover.involved',
       noMatch: 'drawer.popover.noMatch',
       note: 'drawer.popover.note',
-      /** "<role> · <presence>". */
-      roleLine: 'drawer.popover.roleLine',
-    },
-    presence: {
-      online: 'drawer.presence.online',
-      away: 'drawer.presence.away',
-      busy: 'drawer.presence.busy',
-      offline: 'drawer.presence.offline',
     },
     remove: {
       title: 'drawer.remove.title',
@@ -170,12 +159,6 @@ export const LEADS_KEYS = {
       /** "Lead #<seq> removed · <reason>". */
       removed: 'drawer.remove.removed',
     },
-    toasts: {
-      /** "Claimed by <me> after <n> idle days · <owner> stays involved". Plural. */
-      claimedAfter: 'drawer.toasts.claimedAfter',
-      /** "<name> is open for anyone to claim". */
-      releasedOpen: 'drawer.toasts.releasedOpen',
-    },
   },
   /** New lead (KICKOFF §6.3; `leads.md:75–90, 138–150, 246–262`, H:1883–1961). */
   newLead: {
@@ -187,23 +170,21 @@ export const LEADS_KEYS = {
     quickStart: 'newLead.quickStart',
     presets: {
       walkIn: 'newLead.presets.walkIn',
-      phoneCall: 'newLead.presets.phoneCall',
       instagramDm: 'newLead.presets.instagramDm',
     },
     presetHints: {
       walkIn: 'newLead.presetHints.walkIn',
-      phoneCall: 'newLead.presetHints.phoneCall',
       instagramDm: 'newLead.presetHints.instagramDm',
     },
     hits: {
-      /** "Patient <id> · last visit <date>". */
+      /** "Patient · <C-id> · <mobile>" — a person with a patient file. */
       patient: 'newLead.hits.patient',
-      /** "Patient <id>" — before the first visit. */
-      patientNew: 'newLead.hits.patientNew',
-      /** "Lead <id> · <mobile>". */
-      lead: 'newLead.hits.lead',
-      /** "Contact · <mobile>" — a chat-only person. */
+      /** "<C-id> · <mobile>". */
       contact: 'newLead.hits.contact',
+      /** "Open lead · <C-id> · <mobile>" — a person with an open lead. */
+      openLead: 'newLead.hits.openLead',
+      /** The action of a person with an open lead: "Open lead". */
+      open: 'newLead.hits.open',
       recreate: 'newLead.hits.recreate',
       useContact: 'newLead.hits.useContact',
     },
@@ -216,19 +197,16 @@ export const LEADS_KEYS = {
     detailsSummary: 'newLead.detailsSummary',
     footer: 'newLead.footer',
     create: 'newLead.create',
-    /** "Linked to <name> · <kind> · channels and preferences reused". */
-    linked: 'newLead.linked',
     toasts: {
       pickFirst: 'newLead.toasts.pickFirst',
       /** "<preset> preset applied". */
       presetApplied: 'newLead.toasts.presetApplied',
-      /** "Existing patient <id> · new lead will be linked". */
+      /** "Existing patient <C-id> · the new lead is theirs". */
       existingPatient: 'newLead.toasts.existingPatient',
       /** "Using existing contact <name>". */
       existingContact: 'newLead.toasts.existingContact',
       missing: 'newLead.toasts.missing',
-      /** "This mobile is already on lead <id>" — a 409, with "Open". */
-      duplicate: 'newLead.toasts.duplicate',
+      /** The "Open" of a 409's toast: the person's open lead. */
       open: 'newLead.toasts.open',
     },
   },

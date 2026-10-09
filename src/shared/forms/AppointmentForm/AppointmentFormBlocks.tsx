@@ -34,7 +34,7 @@ import {
   useSetAppointmentStatus,
   useUpdateAppointment,
 } from '@/shared/hooks/useAppointments/index.ts';
-import { useUpdateLead } from '@/shared/hooks/useLeads/index.ts';
+import { useUpdateFixtureLead } from '@/shared/hooks/useFixtureLeads/index.ts';
 import { useUpdatePatient } from '@/shared/hooks/usePatients/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -131,7 +131,7 @@ function useWhoActions(state: AppointmentFormState) {
   const queryClient = useQueryClient();
   const updated = t(CONTACT_EDITOR_KEYS.updated);
   const updatePatient = useUpdatePatient({ successMessage: updated });
-  const updateLead = useUpdateLead({ successMessage: updated });
+  const updateLead = useUpdateFixtureLead({ successMessage: updated });
   const { change, draft, prefill } = state;
 
   const pickWho = (next: WhoDraft | null) => {

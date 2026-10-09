@@ -1,79 +1,141 @@
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { listLeads } from '@/shared/api/clinic/leads-api.ts';
-import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import type * as NotifyModule from '@/shared/notify/index.ts';
+import * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
+import * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
+import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { notify } from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { renderLeadsRoutes } from '../../__tests__/integration/leads-test-router.tsx';
-import { LeadsPage } from '../../LeadsPage.tsx';
+import {
+  contactRecord,
+  leadRecord,
+  NIDHI,
+  RIYA,
+  TEAM,
+} from '../../__tests__/integration/leads-test-data.ts';
+import type { NewLeadPrefill } from './new-lead-form.ts';
+import { NewLeadDrawer } from './NewLeadDrawer.tsx';
 
-const { notifyMock } = vi.hoisted(() => ({
-  notifyMock: {
-    info: vi.fn(),
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: {
     success: vi.fn(),
-    warning: vi.fn(),
     error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
     undo: vi.fn(),
+    dismiss: vi.fn(),
   },
-}));
-vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
-  ...(await importOriginal<typeof NotifyModule>()),
-  notify: notifyMock,
-}));
-const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
-vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
-  useViewportTier: () => viewport.tier,
-}));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
-    roles: ['admin'],
-    previewRole: null,
-    can: () => true,
-    canAbility: () => true,
-    viewableSections: [],
-    isResolved: true,
-  }),
+  TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-const LEADS = '/organization/acme/leads';
-const CREATE = `${LEADS}/create`;
+vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof ContactsApiModule>()),
+  searchContacts: vi.fn(),
+  fetchContact: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof LeadsApiModule>()),
+  createLead: vi.fn(),
+}));
+
+const { fetchContact, searchContacts } = ContactsApiModule;
+const { createLead } = LeadsApiModule;
+
+/** A person as the search answers: the contact row, no other numbers. */
+function hit(overrides: Partial<ContactSummary>): ContactSummary {
+  return contactRecord({ openLeadId: null, ...overrides });
+}
+
+/** Someone who already has an open lead. */
+const WITH_OPEN_LEAD = hit({
+  id: 'con_anaya0000000000000000',
+  contactNumber: 10234,
+  firstName: 'Anaya',
+  lastName: 'Desai',
+  name: 'Anaya Desai',
+  primaryPhone: '+919879521034',
+  openLeadId: 'lead_anaya0000000000000000',
+});
+
+/** Someone with a patient file and no open lead. */
+const PATIENT = hit({
+  id: 'con_anvi00000000000000000',
+  contactNumber: 10871,
+  firstName: 'Anvi',
+  lastName: 'Galani',
+  name: 'Anvi Galani',
+  primaryPhone: '+918200603212',
+  patientId: 'pat_anvi00000000000000000',
+});
+
+/** Someone only known as a contact. */
+const CONTACT = hit({
+  id: 'con_anjali000000000000000',
+  contactNumber: 10412,
+  firstName: 'Anjali',
+  lastName: 'Shah',
+  name: 'Anjali Shah',
+  primaryPhone: '+919825011241',
+  instagramHandles: ['@anjali'],
+});
+
+const callbacks = {
+  onClose: vi.fn(),
+  onCreated: vi.fn(),
+  onOpenLead: vi.fn(),
+};
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-09-27', '11:40')));
-  viewport.tier = 'desktop';
-  for (const mock of Object.values(notifyMock)) mock.mockReset();
-  resetClinicFixtures();
-});
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
+  signInTestMember();
+  for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
+  for (const fn of Object.values(callbacks)) fn.mockReset();
+  vi.mocked(searchContacts).mockReset();
+  vi.mocked(fetchContact).mockReset();
+  vi.mocked(searchContacts).mockImplementation(async (typed) =>
+    [WITH_OPEN_LEAD, PATIENT, CONTACT].filter((person) =>
+      person.name.toLowerCase().includes(typed.trim().toLowerCase()),
+    ),
+  );
+  vi.mocked(createLead).mockReset();
+  vi.mocked(createLead).mockImplementation(async ({ fields }) =>
+    leadRecord({ id: 'lead_created00000000000000', leadNumber: 2371, ...fields }),
+  );
 });
 
-async function openNewLead(search = '') {
-  const view = renderLeadsRoutes(`${CREATE}${search}`, LeadsPage);
+async function openNewLead(prefill: NewLeadPrefill = {}) {
+  const view = renderWithProviders(
+    <TooltipProvider>
+      <NewLeadDrawer prefill={prefill} members={TEAM} viewerId={RIYA.id} {...callbacks} />
+    </TooltipProvider>,
+  );
   const drawer = await screen.findByTestId('new-lead-drawer');
   return { ...view, drawer, user: userEvent.setup() };
 }
 
 const step = (id: string) => screen.getByTestId(`new-lead-drawer-step-${id}`);
+const save = () => screen.getByTestId('new-lead-drawer-save');
+
+/** Types into the search and waits for the read of everything typed. */
+async function searchFor(user: ReturnType<typeof userEvent.setup>, typed: string) {
+  const search = screen.getByTestId('new-lead-search');
+  await user.type(search, typed);
+  const query = (search as HTMLInputElement).value;
+  await waitFor(() => expect(searchContacts).toHaveBeenCalledWith(query));
+}
 
 describe('NewLeadDrawer (KICKOFF §6.3)', () => {
   it('opens on the Contact step, the search focused, Lead details locked', async () => {
     const { drawer, user } = await openNewLead();
 
-    expect(within(drawer).getByRole('heading', { name: 'New lead' })).toHaveClass(
-      'text-xl',
-    );
+    expect(within(drawer).getByRole('heading', { name: 'New lead' })).toBeInTheDocument();
     expect(drawer).toHaveAccessibleDescription('Name and mobile are enough to start');
-    expect(drawer).toHaveClass('md:w-[min(640px,calc(100vw-56px))]');
     await waitFor(() =>
       expect(
         screen.getByRole('textbox', { name: 'Search existing patient or contact' }),
@@ -87,39 +149,50 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     );
 
     await user.click(screen.getByTestId('new-lead-drawer-step-details-trigger'));
-    expect(notifyMock.info).toHaveBeenCalledWith('Pick or add the contact first');
+    expect(notify.info).toHaveBeenCalledWith('Pick or add the contact first');
     expect(step('details')).toHaveAttribute('data-state', 'closed');
   });
 
-  it('applies a Quick start preset: values, not steps', async () => {
+  it('searches from three letters and lists each hit with its line and its action', async () => {
+    vi.mocked(searchContacts).mockResolvedValue([WITH_OPEN_LEAD, PATIENT, CONTACT]);
     const { user } = await openNewLead();
+    await user.type(screen.getByTestId('new-lead-search'), 'an');
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(searchContacts).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('new-lead-no-match')).toBeNull();
+    await searchFor(user, 'a');
 
-    await user.click(screen.getByTestId('new-lead-preset-walkIn'));
-    expect(notifyMock.success).toHaveBeenCalledWith('Walk-in preset applied');
-    expect(screen.getByTestId('new-lead-preset-walkIn')).toHaveAttribute(
-      'aria-pressed',
-      'true',
+    const open = await screen.findByTestId('new-lead-hit-10234');
+    expect(withoutBidiMarks(open.textContent)).toContain(
+      'Anaya DesaiOpen lead · C-10234 · +91 98795 21034Open lead',
     );
-    expect(screen.getByTestId('new-lead-preset-phoneCall')).toHaveAttribute(
-      'aria-pressed',
-      'false',
+    const patient = screen.getByTestId('new-lead-hit-10871');
+    expect(withoutBidiMarks(patient.textContent)).toContain(
+      'Anvi GalaniPatient · C-10871 · +91 82006 03212Re-create lead',
     );
-    expect(step('details')).toHaveAttribute('data-state', 'closed');
+    expect(within(patient).getByText('Anvi Galani')).toHaveAttribute('dir', 'auto');
+    expect(
+      withoutBidiMarks(screen.getByTestId('new-lead-hit-10412').textContent),
+    ).toContain('Anjali ShahC-10412 · +91 98250 11241Use contact');
   });
 
-  it('re-creates a lead for an existing patient: the strip, Re-target, one step', async () => {
+  it('"Open lead" goes to the person’s open lead, the form untouched', async () => {
     const { user } = await openNewLead();
+    await searchFor(user, 'anaya');
+    await user.click(await screen.findByTestId('new-lead-hit-10234'));
 
-    await user.type(screen.getByTestId('new-lead-search'), 'Dharti');
-    const hit = await screen.findByTestId('new-lead-hit-patient-3508');
-    expect(hit).toHaveTextContent('Re-create lead');
-    // The name in its own direction; the hit line's id isolated in its sentence.
-    expect(within(hit).getByText('Dharti Galani')).toHaveAttribute('dir', 'auto');
-    expect(hit).toHaveTextContent(`Patient ${fsi('#3508')} · last visit`);
-    await user.click(hit);
+    expect(callbacks.onOpenLead).toHaveBeenCalledWith('lead_anaya0000000000000000');
+    expect(step('contact')).toHaveAttribute('data-state', 'open');
+    expect(notify.success).not.toHaveBeenCalled();
+  });
 
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      'Existing patient #3508 · new lead will be linked',
+  it('re-creates a lead for a patient: the strip, Re-target, one step, then "Change"', async () => {
+    const { user } = await openNewLead();
+    await searchFor(user, 'anvi');
+    await user.click(await screen.findByTestId('new-lead-hit-10871'));
+
+    expect(notify.success).toHaveBeenCalledWith(
+      'Existing patient C-10871 · new lead will be linked',
     );
     expect(screen.queryByTestId('new-lead-drawer-step-contact')).toBeNull();
     expect(step('details')).toHaveAttribute('data-state', 'open');
@@ -127,101 +200,218 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
       'aria-pressed',
       'true',
     );
-    expect(screen.getByText('Dharti Galani')).toBeInTheDocument();
+    expect(screen.getByText('Anvi Galani')).toBeInTheDocument();
+    expect(screen.getByText('+91 82006 03212')).toBeInTheDocument();
+    expect(screen.getByText('P')).toBeInTheDocument();
 
-    // "Change" clears the contact and puts WhatsApp back: two steps again.
     await user.click(screen.getByTestId('new-lead-change'));
     expect(step('contact')).toHaveAttribute('data-state', 'open');
+    expect(screen.queryByText('Anvi Galani')).toBeNull();
   });
 
-  it('says so when nobody matches, from two characters', async () => {
+  it('says so when nobody matches', async () => {
     const { user } = await openNewLead();
-
-    await user.type(screen.getByTestId('new-lead-search'), 'q');
-    expect(screen.queryByTestId('new-lead-no-match')).toBeNull();
-    await user.type(screen.getByTestId('new-lead-search'), 'zxq');
+    await searchFor(user, 'zxq');
     expect(await screen.findByTestId('new-lead-no-match')).toHaveTextContent(
       'No existing match',
     );
   });
 
-  it('asks for a name and a 10-digit mobile before creating', async () => {
+  it('applies a Quick start preset — the source, not the steps — and keeps it for a picked contact', async () => {
     const { user } = await openNewLead();
 
-    await user.click(screen.getByTestId('new-lead-drawer-save'));
-    expect(notifyMock.warning).toHaveBeenCalledWith('Add a name and a 10-digit mobile');
+    await user.click(screen.getByTestId('new-lead-preset-walkIn'));
+    expect(notify.success).toHaveBeenCalledWith('Walk-in preset applied');
+    expect(screen.getByTestId('new-lead-preset-walkIn')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('new-lead-preset-instagramDm')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.queryByTestId('new-lead-preset-phoneCall')).toBeNull();
+    expect(step('contact')).toHaveAttribute('data-state', 'open');
+
+    await user.click(screen.getByTestId('new-lead-preset-instagramDm'));
+    expect(screen.getByTestId('new-lead-preset-walkIn')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    await searchFor(user, 'anjali');
+    await user.click(await screen.findByTestId('new-lead-hit-10412'));
+    expect(notify.success).toHaveBeenLastCalledWith('Using existing contact Anjali Shah');
+    expect(screen.getByRole('button', { name: 'Instagram' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await user.click(save());
+    await waitFor(() => expect(createLead).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(createLead).mock.lastCall?.[0].fields).toMatchObject({
+      source: 'instagram',
+      status: 'new',
+    });
   });
 
-  it('creates a lead from a new contact: closes, picks the lead out in the list', async () => {
-    const { user, router } = await openNewLead();
+  it('creates a lead for a picked person by their contact id, assigned to anyone', async () => {
+    const { user } = await openNewLead();
+    await searchFor(user, 'anjali');
+    await user.click(await screen.findByTestId('new-lead-hit-10412'));
+
+    await user.click(
+      screen.getByRole('button', { name: 'Assigned and involved people' }),
+    );
+    const people = await screen.findByRole('dialog', { name: 'People on this lead' });
+    await user.click(within(people).getByRole('button', { name: 'Assign' }));
+    await user.keyboard('{Escape}');
+    expect(callbacks.onClose).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Peel' }));
+    await user.click(save());
+
+    await waitFor(() => expect(callbacks.onCreated).toHaveBeenCalled());
+    expect(createLead).toHaveBeenCalledWith({
+      person: { contactId: CONTACT.id },
+      fields: {
+        status: 'new',
+        source: 'whatsapp',
+        interests: ['peel'],
+        ownerId: NIDHI.id,
+        involvedIds: [],
+        followUpAt: null,
+        branchId: null,
+        notes: null,
+      },
+      idempotencyKey: expect.any(String),
+    });
+    expect(callbacks.onCreated).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'lead_created00000000000000', leadNumber: 2371 }),
+    );
+    expect(notify.success).toHaveBeenLastCalledWith('Lead #2371 created');
+  });
+
+  it('creates a lead for a new contact typed in the contact editor', async () => {
+    const { user } = await openNewLead();
 
     await user.click(screen.getByTestId('new-lead-new-contact'));
     const editor = await screen.findByTestId('contact-editor');
-    await user.type(within(editor).getByTestId('contact-editor-name'), 'Meera Joshi');
-    await user.type(
-      within(editor).getByRole('textbox', { name: 'Mobile 1' }),
-      '9898012345',
-    );
+    await user.type(within(editor).getByTestId('contact-editor-first-name'), 'Meera');
+    await user.type(within(editor).getByTestId('contact-editor-last-name'), 'Joshi');
+    await user.type(within(editor).getByTestId('contact-editor-mobile-1'), '9898012345');
     await user.click(within(editor).getByTestId('contact-editor-done'));
     await waitFor(() => expect(screen.queryByTestId('contact-editor')).toBeNull());
 
     expect(screen.getByText('Meera Joshi')).toBeInTheDocument();
+    expect(screen.getByText('+91 98980 12345')).toBeInTheDocument();
     expect(step('details')).toHaveAttribute('data-state', 'open');
-    await user.click(screen.getByRole('button', { name: 'Instagram' }));
-    await user.click(screen.getByTestId('new-lead-drawer-save'));
+    await user.click(screen.getByRole('button', { name: 'Google' }));
+    await user.click(save());
 
-    await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));
-    expect(router.state.location.search).not.toHaveProperty('name');
-    const [created] = (await listLeads({ view: 'all' })).items;
-    expect(created).toMatchObject({
-      name: 'Meera Joshi',
-      phone: '+919898012345',
-      source: 'instagram',
-      status: 'new',
+    await waitFor(() => expect(callbacks.onCreated).toHaveBeenCalled());
+    expect(createLead).toHaveBeenCalledWith({
+      person: {
+        contact: {
+          firstName: 'Meera',
+          lastName: 'Joshi',
+          phones: [{ phone: '+919898012345', isOnWhatsapp: true }],
+          instagramHandles: [],
+          defaultChannel: 'whatsapp',
+          preferenceTags: [],
+        },
+      },
+      fields: expect.objectContaining({
+        source: 'google',
+        status: 'new',
+        ownerId: RIYA.id,
+      }),
+      idempotencyKey: expect.any(String),
     });
-    expect(notifyMock.success).toHaveBeenCalledWith(`Lead #${created!.seq} created`);
   });
 
-  it('starts from the contact card’s prefill with the person already known', async () => {
-    await openNewLead('?name=Priya%20Shah&phone=9898011111');
+  it('starts from the prefill with the person known', async () => {
+    await openNewLead({ name: 'Priya Shah', phone: '+919898011111' });
 
     expect(screen.queryByTestId('new-lead-drawer-step-contact')).toBeNull();
     expect(screen.getByText('Priya Shah')).toBeInTheDocument();
     expect(screen.getByText('+91 98980 11111')).toBeInTheDocument();
   });
 
-  it('points a mobile already on an open lead at that lead: "Open"', async () => {
-    const { user, router } = await openNewLead('?name=Kabir&phone=9925044710');
+  it('asks for a name and a 10-digit mobile before creating', async () => {
+    const { user, unmount } = await openNewLead();
+    await user.click(save());
+    expect(notify.warning).toHaveBeenCalledWith('Add a name and a 10-digit mobile');
+    unmount();
 
-    await user.click(screen.getByTestId('new-lead-drawer-save'));
+    await openNewLead({ name: 'Priya' });
+    expect(screen.getByText('Priya')).toBeInTheDocument();
+    await user.click(save());
+    expect(notify.warning).toHaveBeenCalledTimes(2);
+    expect(createLead).not.toHaveBeenCalled();
+  });
+
+  it('shows the server’s words when the person has an open lead meanwhile, with "Open" to it, and retries the same write', async () => {
+    vi.mocked(fetchContact).mockResolvedValue(
+      contactRecord({
+        id: 'con_anjali00000000000000',
+        openLeadId: 'lead_anjali0000000000000',
+      }),
+    );
+    vi.mocked(createLead).mockRejectedValueOnce(
+      new HttpError('Conflict', 409, '/app/leads', 'POST', {
+        error: {
+          reason: 'lead_open_exists',
+          detail: 'Anjali Shah already has open lead #2364',
+        },
+      }),
+    );
+    const { user } = await openNewLead();
+    await searchFor(user, 'anjali');
+    await user.click(await screen.findByTestId('new-lead-hit-10412'));
+    await user.click(save());
+
+    // The search answered before their lead existed: the person is read again for its id.
     await waitFor(() =>
-      expect(notifyMock.error).toHaveBeenCalledWith(
-        'This mobile is already on lead #2364',
+      expect(notify.error).toHaveBeenCalledWith(
+        'Anjali Shah already has open lead #2364',
         expect.objectContaining({ action: expect.objectContaining({ label: 'Open' }) }),
       ),
     );
+    const [, options] = vi.mocked(notify.error).mock.lastCall ?? [];
+    options?.action?.onClick();
+    expect(callbacks.onOpenLead).toHaveBeenCalledWith('lead_anjali0000000000000');
+    expect(callbacks.onCreated).not.toHaveBeenCalled();
     expect(screen.getByTestId('new-lead-drawer-not-saved')).toBeInTheDocument();
-    expect(screen.getByTestId('new-lead-drawer-save')).toHaveTextContent('Retry save');
+    expect(save()).toHaveTextContent('Retry save');
 
-    const [, options] = notifyMock.error.mock.lastCall ?? [];
-    act(() => options.action.onClick());
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${LEADS}/${ref.lead(2364)}`),
+    await user.click(save());
+    await waitFor(() => expect(callbacks.onCreated).toHaveBeenCalled());
+    const [first, second] = vi.mocked(createLead).mock.calls;
+    expect(second?.[0].idempotencyKey).toBe(first?.[0].idempotencyKey);
+  });
+
+  it('shows the server’s words when a new number is someone else’s', async () => {
+    vi.mocked(createLead).mockRejectedValueOnce(
+      new HttpError('Conflict', 409, '/app/leads', 'POST', {
+        error: {
+          reason: 'contact_phone_exists',
+          detail: '+91 98980 11111 is Priya Shah’s number',
+        },
+      }),
     );
+    const { user } = await openNewLead({ name: 'Priya Shah', phone: '+919898011111' });
+    await user.click(save());
+
+    await waitFor(() =>
+      expect(notify.error).toHaveBeenCalledWith('+91 98980 11111 is Priya Shah’s number'),
+    );
+    expect(callbacks.onOpenLead).not.toHaveBeenCalled();
   });
 
   it('closes from Cancel without asking', async () => {
-    const { user, router } = await openNewLead('?name=Priya&phone=9898011111');
-
+    const { user } = await openNewLead({ name: 'Priya', phone: '+919898011111' });
     await user.click(screen.getByTestId('new-lead-drawer-dismiss'));
-    await waitFor(() => expect(router.state.location.pathname).toBe(LEADS));
+    expect(callbacks.onClose).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('alertdialog')).toBeNull();
-  });
-
-  it('puts the × inside the header on a phone', async () => {
-    viewport.tier = 'phone';
-    const { drawer } = await openNewLead();
-    expect(within(drawer).getByTestId('new-lead-drawer-close')).toHaveClass('size-11');
   });
 
   it('has no accessibility violations', async () => {

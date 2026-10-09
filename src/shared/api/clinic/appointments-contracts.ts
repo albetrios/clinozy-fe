@@ -26,7 +26,7 @@ import {
   roomSchema,
   type Tone,
 } from './clinic-schema.ts';
-import type { LeadRecordSource } from './leads-contracts.ts';
+import type { LeadRecordSource } from './leads-fixture-contracts.ts';
 
 /*
  * The Appointments domain beyond the generated contract (KICKOFF §6.4, D22):

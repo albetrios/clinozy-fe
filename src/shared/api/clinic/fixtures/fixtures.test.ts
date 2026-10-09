@@ -39,7 +39,7 @@ import {
 } from '@/shared/api/clinic/clinic-time.ts';
 import { pendingCreditRecordSchema } from '@/shared/api/clinic/credits-contracts.ts';
 import { dayCloseRecordSchema } from '@/shared/api/clinic/day-close-contracts.ts';
-import { leadRecordSchema } from '@/shared/api/clinic/leads-contracts.ts';
+import { leadRecordSchema } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import { medicineRecordSchema } from '@/shared/api/clinic/medicines-contracts.ts';
 import {
   offeringRecordSchema,

@@ -1,30 +1,37 @@
 /**
  * URL search-param schemas for the Leads room (consumed by routeTree's
  * `validateSearch`): the list's view, search, filters and sort (KICKOFF §6.3,
- * `S:22`). A value the URL can't hold — an unknown status, a bad date range —
- * is dropped, never an error. Defaults stay out of the URL (`/leads` is the
- * Mine view). New lead's prefill is `leads.dialog-search.ts`'s, off the entry.
+ * `S:22`), as clinozy-be's lead list takes them (api-integration §5.2). A value
+ * the URL can't hold — an unknown status, a bad date range — is dropped, never an
+ * error. Defaults stay out of the URL (`/leads` is the Mine view). New lead's
+ * prefill is `leads.dialog-search.ts`'s, off the entry.
  *
- * The contract's values are declared here, not imported: `routeTree.tsx` is the
+ * The API's values are declared here, not imported: `routeTree.tsx` is the
  * entry chunk, and the generated schema module is pages of zod. The test pins
  * each list to the contract's enum.
  */
-import { listOf, oneOf, queryOf, RECORD_ID, sortOf } from '@/lib/routes/search-params.ts';
+import {
+  listOf,
+  matchOf,
+  oneOf,
+  PUBLIC_ID,
+  queryOf,
+  sortOf,
+} from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   type FollowUpFilter,
   readCreatedFilter,
   readFollowUpFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type { LeadSource, LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   LeadHoldFilter,
-  LeadRecordSource,
   LeadSortKey,
   LeadView,
 } from '@/shared/api/clinic/leads-contracts.ts';
 
-const VIEWS = ['mine', 'unread', 'all'] as const satisfies readonly LeadView[];
+const VIEWS = ['mine', 'unreplied', 'all'] as const satisfies readonly LeadView[];
 const STATUSES = [
   'new',
   'contacted',
@@ -43,40 +50,46 @@ const SOURCES = [
   'walk_in',
   'referral',
   'retarget',
-  'phone_call',
-] as const satisfies readonly LeadRecordSource[];
+] as const satisfies readonly LeadSource[];
 const HOLDS = ['open', 'soon', 'held'] as const satisfies readonly LeadHoldFilter[];
 const SORT_KEYS = [
   'name',
   'status',
   'source',
-  'updated',
+  'activity',
 ] as const satisfies readonly LeadSortKey[];
 
-/** A column sort in the URL: `name:asc`, `updated:desc` (the shared table's form). */
+/** A column sort in the URL: `name:asc`, `activity:desc` (the shared table's form). */
 type LeadsSort = `${LeadSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for `/leads` and its dialog routes. */
 export interface LeadsSearch {
   /** Mine (default) · Unreplied · All. */
   view?: LeadView;
-  /** Name, mobile or "#ID" (≤ 80 characters, the contract's `q`). */
+  /** A name, a number's digits, "#2371" or "C-12345" (≤ 80 characters). */
   q?: string;
   /** One status — the design's filter is single (`leads.md:180`). */
   status?: LeadStatus;
   /** Any of these sources. */
-  source?: LeadRecordSource[];
+  source?: LeadSource[];
   /** Ownership: open to claim, releasing today, held ("Any" when absent). */
   hold?: LeadHoldFilter;
-  /** Team: staff ids, each matched as owner or involved. */
-  owner?: string[];
+  /** Team: one member (`mem_…`), matched as the owner or one of the involved. */
+  member?: string;
   created?: CreatedFilter;
-  followUp?: FollowUpFilter;
+  /** Follow-up date — a preset or a range; the API has no "Not set" (G2). */
+  followUp?: Exclude<FollowUpFilter, 'not_set'>;
   sort?: LeadsSort;
 }
 
 /** The list's state when the URL says nothing. */
 export const LEADS_SEARCH_DEFAULTS = { view: 'mine' } as const satisfies LeadsSearch;
+
+/** A Follow-up filter the API can read — every preset but "Not set", or a range. */
+function readLeadFollowUp(value: unknown): LeadsSearch['followUp'] {
+  const filter = readFollowUpFilter(value);
+  return filter === 'not_set' ? undefined : filter;
+}
 
 /**
  * Parse `/leads` search params. Every key is answered, `undefined` included:
@@ -89,9 +102,12 @@ export function validateLeadsSearch(search: Record<string, unknown>): LeadsSearc
     status: oneOf(STATUSES, search.status),
     source: listOf(search.source, (entry) => oneOf(SOURCES, entry) !== undefined),
     hold: oneOf(HOLDS, search.hold),
-    owner: listOf(search.owner, (entry) => RECORD_ID.test(entry)),
+    member: matchOf(
+      PUBLIC_ID,
+      Array.isArray(search.member) ? search.member[0] : search.member,
+    ),
     created: readCreatedFilter(search.created),
-    followUp: readFollowUpFilter(search.followUp),
+    followUp: readLeadFollowUp(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),
   };
 }

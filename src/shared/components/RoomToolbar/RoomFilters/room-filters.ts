@@ -1,4 +1,4 @@
-import { listOf, oneOf, RECORD_ID } from '@/lib/routes/search-params.ts';
+import { listOf, matchOf, oneOf, PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import {
   readCreatedFilter,
   readFollowUpFilter,
@@ -10,8 +10,8 @@ import {
  * keys it edits and how, read from and written to the search the room's own
  * `validateSearch` parses with the shared readers (`lib/routes/search-params`,
  * `clinic-list-filters`). The URL form is theirs: an options filter is a list
- * (a single pick, a plain value), a people filter a list of record ids and a
- * date filter its preset or a custom range `YYYY-MM-DD..YYYY-MM-DD`.
+ * (a single pick, a plain value), a people filter a list of membership ids (one, a plain
+ * value) and a date filter its preset or a custom range `YYYY-MM-DD..YYYY-MM-DD`.
  */
 
 /** A date section of the popover: "Created" or "Follow-up date" (S:1541–1542). */
@@ -25,13 +25,20 @@ export type RoomFilterField =
       readonly values: readonly string[];
       readonly single?: boolean;
     }
-  /** A date section: its presets, or a custom range. */
-  | { readonly kind: 'date'; readonly presets: RoomDateFilterKind }
   /**
-   * Team members by id, any number — a picker that expands a searchable list
-   * (the Leads "Team · assigned or involved", H:1711–1718).
+   * A date section: its presets, or a custom range — less the presets the room's API cannot
+   * filter by (`without`).
    */
-  | { readonly kind: 'people' };
+  | {
+      readonly kind: 'date';
+      readonly presets: RoomDateFilterKind;
+      readonly without?: readonly string[];
+    }
+  /**
+   * Team members by membership id (`mem_…`), any number — or one (`single`) — a picker that
+   * expands a searchable list (the Leads "Team · assigned or involved", H:1711–1718).
+   */
+  | { readonly kind: 'people'; readonly single?: boolean };
 
 /**
  * An "automatic" options section — the values a list happens to hold (a
@@ -55,16 +62,22 @@ export type RoomFilterValues = Readonly<Record<string, readonly string[]>>;
 /** One field's value as the URL holds it, `undefined` when it is unset or invalid. */
 function paramOf(field: RoomFilterField, raw: unknown): string | string[] | undefined {
   if (field.kind === 'date') {
-    return field.presets === 'created' ? readCreatedFilter(raw) : readFollowUpFilter(raw);
+    const value =
+      field.presets === 'created' ? readCreatedFilter(raw) : readFollowUpFilter(raw);
+    return value && field.without?.includes(value) ? undefined : value;
   }
-  if (field.kind === 'people') return listOf(raw, (entry) => RECORD_ID.test(entry));
-  if (field.single) return oneOf(field.values, Array.isArray(raw) ? raw[0] : raw);
+  const first = Array.isArray(raw) ? raw[0] : raw;
+  if (field.kind === 'people') {
+    return field.single
+      ? matchOf(PUBLIC_ID, first)
+      : listOf(raw, (entry) => PUBLIC_ID.test(entry));
+  }
+  if (field.single) return oneOf(field.values, first);
   return listOf(raw, (entry) => field.values.includes(entry));
 }
 
-/** Whether a field's URL value is a list (many options, people), not one value. */
-const isListField = (field: RoomFilterField) =>
-  field.kind === 'people' || (field.kind === 'options' && !field.single);
+/** Whether a field's URL value is a list (many options or people), not one value. */
+const isListField = (field: RoomFilterField) => field.kind !== 'date' && !field.single;
 
 /** The filter values a search applies — the room's own keys, read with the shared readers. */
 export function roomFilterValues(

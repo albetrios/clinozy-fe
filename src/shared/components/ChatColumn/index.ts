@@ -1,6 +1,7 @@
 export { CHAT_COLUMN_TEST_IDS } from './chat-column.constants.ts';
 export {
   type ChatContact,
+  chatContactOfContact,
   chatContactOfLead,
   composerShowsLabels,
   CONTACT_PREFERENCES,

@@ -26,8 +26,10 @@ export const CONTACT_EDITOR_KEYS = {
   idAria: 'contactEditor.idAria',
   /** "Contact ID <id> copied". */
   idCopied: 'contactEditor.idCopied',
-  name: 'contactEditor.name',
-  namePlaceholder: 'contactEditor.namePlaceholder',
+  firstName: 'contactEditor.firstName',
+  firstNamePlaceholder: 'contactEditor.firstNamePlaceholder',
+  lastName: 'contactEditor.lastName',
+  lastNamePlaceholder: 'contactEditor.lastNamePlaceholder',
   mobiles: 'contactEditor.mobiles',
   /** "Mobile <n>". */
   mobileAria: 'contactEditor.mobileAria',
@@ -59,20 +61,20 @@ export const CONTACT_EDITOR_KEYS = {
   done: 'contactEditor.done',
   /** "Contact updated · applies everywhere" — a save from a lead or a contact card. */
   updated: 'contactEditor.updated',
-  /** The preset preferences' labels, by their stored English words. */
+  /** The preset preferences' labels, by their tags. */
   preferences: {
-    'No calls': 'contactEditor.preferences.noCalls',
-    'Sundays only': 'contactEditor.preferences.sundaysOnly',
-    'Weekdays only': 'contactEditor.preferences.weekdaysOnly',
-    'After 6 pm': 'contactEditor.preferences.afterSix',
-    Mornings: 'contactEditor.preferences.mornings',
-    Evenings: 'contactEditor.preferences.evenings',
-    'Weekends only': 'contactEditor.preferences.weekendsOnly',
-    Gujarati: 'contactEditor.preferences.gujarati',
-    Hindi: 'contactEditor.preferences.hindi',
-    English: 'contactEditor.preferences.english',
-    'Female doctor': 'contactEditor.preferences.femaleDoctor',
-    'Text before calling': 'contactEditor.preferences.textFirst',
+    no_calls: 'contactEditor.preferences.noCalls',
+    sundays_only: 'contactEditor.preferences.sundaysOnly',
+    weekdays_only: 'contactEditor.preferences.weekdaysOnly',
+    after_six_pm: 'contactEditor.preferences.afterSix',
+    mornings: 'contactEditor.preferences.mornings',
+    evenings: 'contactEditor.preferences.evenings',
+    weekends_only: 'contactEditor.preferences.weekendsOnly',
+    gujarati: 'contactEditor.preferences.gujarati',
+    hindi: 'contactEditor.preferences.hindi',
+    english: 'contactEditor.preferences.english',
+    female_doctor: 'contactEditor.preferences.femaleDoctor',
+    text_before_calling: 'contactEditor.preferences.textFirst',
   } satisfies Record<ContactPreferencePreset, string>,
 } as const;
 

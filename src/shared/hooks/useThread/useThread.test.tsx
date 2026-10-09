@@ -3,6 +3,14 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
+import {
+  fetchContactMessagingStatus,
+  fetchContactTemplateValues,
+  fetchContactThread,
+  resendContactActivity,
+  sendContactActivity,
+} from '@/shared/api/clinic/contact-activities-api.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import {
@@ -11,6 +19,7 @@ import {
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import * as messagesApi from '@/shared/api/clinic/messages-api.ts';
 import {
+  type ChatMessage,
   type ChatPerson,
   chatPersonKey,
 } from '@/shared/api/clinic/messages-contracts.ts';
@@ -32,6 +41,14 @@ vi.mock('@/shared/api/clinic/messages-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof messagesApi>();
   return { ...actual, sendMessage: vi.fn(actual.sendMessage) };
 });
+vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof ContactActivitiesApiModule>()),
+  fetchContactThread: vi.fn(),
+  sendContactActivity: vi.fn(),
+  resendContactActivity: vi.fn(),
+  fetchContactMessagingStatus: vi.fn(),
+  fetchContactTemplateValues: vi.fn(),
+}));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
@@ -39,6 +56,26 @@ vi.mock('@/shared/notify/index.ts', () => ({
 const ANAYA: ChatPerson = { kind: 'lead', leadId: ref.lead(2363) };
 const KABIR: ChatPerson = { kind: 'lead', leadId: ref.lead(2364) };
 const KIRAN: ChatPerson = { kind: 'patient', patientId: patientRef('Kiran Desai') };
+/** A person on clinozy-be: their stream is `/app/contacts/:contact_id/activities`. */
+const CONTACT_ID = 'con_anaya0000000000000000';
+const CONTACT: ChatPerson = { kind: 'contact', contactId: CONTACT_ID };
+
+/** One entry of a contact's stream, as the chat column reads it. */
+const streamEntry = (id: string, patch: Partial<ChatMessage> = {}): ChatMessage => ({
+  id,
+  channel: 'whatsapp',
+  direction: 'received',
+  body: 'Is the peel available?',
+  deliveryStatus: 'delivered',
+  isSystem: false,
+  authorId: null,
+  taskId: null,
+  sentAt: '2026-10-03T04:00:00.000Z',
+  ...patch,
+});
+
+/** The contact's stream on the mocked clinozy-be. */
+let stream: ChatMessage[] = [];
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
@@ -80,12 +117,49 @@ beforeEach(() => {
   vi.mocked(notify.error).mockClear();
   resetClinicFixtures();
   resetOutboxes();
+  stream = [streamEntry('act_first')];
+  vi.mocked(fetchContactThread).mockImplementation(async () => ({
+    thread: null,
+    messages: [...stream],
+    authors: {},
+  }));
+  vi.mocked(sendContactActivity).mockImplementation(async ({ channel, body }) => {
+    const sent = streamEntry(`act_sent_${stream.length}`, {
+      channel,
+      direction: 'sent',
+      body,
+      deliveryStatus: 'queued',
+    });
+    stream = [...stream, sent];
+    return sent;
+  });
+  vi.mocked(resendContactActivity).mockImplementation(async ({ activityId }) => {
+    stream = stream.map((entry) =>
+      entry.id === activityId ? { ...entry, deliveryStatus: 'queued' } : entry,
+    );
+    const queued = stream.find((entry) => entry.id === activityId);
+    if (!queued) throw new Error(`no activity ${activityId}`);
+    return queued;
+  });
+  vi.mocked(fetchContactMessagingStatus).mockResolvedValue({ whatsappDown: true });
+  vi.mocked(fetchContactTemplateValues).mockResolvedValue({
+    clinicName: 'Cresence Skin Clinic',
+    address: '',
+    mapsLink: '',
+    reviewLink: '',
+    freeSlots: [],
+  });
 });
 afterEach(() => {
   // Unmount before the stores reset, so no hook re-renders on the way out.
   cleanup();
   vi.useRealTimers();
   vi.mocked(messagesApi.sendMessage).mockClear();
+  vi.mocked(fetchContactThread).mockReset();
+  vi.mocked(sendContactActivity).mockReset();
+  vi.mocked(resendContactActivity).mockReset();
+  vi.mocked(fetchContactMessagingStatus).mockReset();
+  vi.mocked(fetchContactTemplateValues).mockReset();
   client.clear();
   resetClinicFixtures();
   resetOutboxes();
@@ -97,7 +171,7 @@ describe('the reads', () => {
       () => ({
         thread: useThread(ANAYA),
         history: useContactHistory({ kind: 'lead', leadId: ref.lead(2352) }),
-        status: useMessagingStatus(),
+        status: useMessagingStatus(ANAYA),
         values: useTemplateValues(ANAYA),
       }),
       { wrapper },
@@ -108,6 +182,33 @@ describe('the reads', () => {
     expect(result.current.history.data?.at(-1)).toMatchObject({ kind: 'appointment' });
     expect(result.current.status.data).toEqual({ whatsappDown: false });
     expect(result.current.values.data?.clinicName).toBe('Cresence Skin');
+    expect(fetchContactThread).not.toHaveBeenCalled();
+    expect(fetchContactMessagingStatus).not.toHaveBeenCalled();
+  });
+
+  it('reads a contact’s stream, status and template values from clinozy-be — with no history of its own', async () => {
+    const { result } = renderHook(
+      () => ({
+        thread: useThread(CONTACT),
+        history: useContactHistory(CONTACT),
+        status: useMessagingStatus(CONTACT),
+        values: useTemplateValues(CONTACT),
+      }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.status.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.values.isSuccess).toBe(true));
+
+    expect(fetchContactThread).toHaveBeenCalledWith(CONTACT_ID);
+    expect(result.current.thread.data).toEqual({
+      thread: null,
+      messages: [streamEntry('act_first')],
+      authors: {},
+    });
+    expect(result.current.status.data).toEqual({ whatsappDown: true });
+    expect(result.current.values.data?.clinicName).toBe('Cresence Skin Clinic');
+    expect(result.current.history.fetchStatus).toBe('idle');
   });
 });
 
@@ -195,6 +296,70 @@ describe('sending', () => {
     ]);
     // Its stale copy refetches on mount; let that land inside the test.
     await waitFor(() => expect(back.result.current.thread.isFetching).toBe(false));
+  });
+});
+
+describe('a contact’s stream', () => {
+  it('sends through clinozy-be with the action’s key and moves the message into the thread', async () => {
+    const { result } = renderChat(CONTACT);
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+
+    act(() => result.current.chat.send('call', '  No answer  '));
+    expect(result.current.outbox).toEqual([
+      expect.objectContaining({ body: 'No answer', channel: 'call', state: 'sending' }),
+    ]);
+
+    await waitFor(() => expect(result.current.outbox).toEqual([]));
+    expect(sendContactActivity).toHaveBeenCalledWith({
+      contactId: CONTACT_ID,
+      channel: 'call',
+      body: 'No answer',
+      idempotencyKey: expect.any(String),
+    });
+    expect(messagesApi.sendMessage).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(result.current.thread.data?.messages.map((message) => message.body)).toEqual(
+        ['Is the peel available?', 'No answer'],
+      ),
+    );
+  });
+
+  it('marks a failed send "Not sent" without a toast', async () => {
+    vi.mocked(sendContactActivity).mockRejectedValueOnce(new Error('offline'));
+    const { result } = renderChat(CONTACT);
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+
+    act(() => result.current.chat.send('whatsapp', 'Hello'));
+
+    await waitFor(() =>
+      expect(result.current.outbox).toEqual([
+        expect.objectContaining({ body: 'Hello', state: 'failed' }),
+      ]),
+    );
+    expect(notify.error).not.toHaveBeenCalled();
+  });
+
+  it('resends a failed entry through clinozy-be and refetches the stream', async () => {
+    stream = [streamEntry('act_failed', { direction: 'sent', deliveryStatus: 'failed' })];
+    const { result } = renderHook(
+      () => {
+        const { data, isSuccess } = useThread(CONTACT);
+        return { thread: { data, isSuccess }, resend: useResendMessage(CONTACT) };
+      },
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+
+    await act(() => result.current.resend.mutateAsync('act_failed'));
+
+    expect(resendContactActivity).toHaveBeenCalledWith({
+      contactId: CONTACT_ID,
+      activityId: 'act_failed',
+      idempotencyKey: expect.any(String),
+    });
+    await waitFor(() =>
+      expect(result.current.thread.data?.messages[0]?.deliveryStatus).toBe('queued'),
+    );
   });
 });
 

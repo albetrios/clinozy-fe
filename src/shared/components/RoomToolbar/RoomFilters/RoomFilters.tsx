@@ -272,6 +272,8 @@ export interface RoomDateFilterProps {
   /** The URL key the section edits (`created`, `followUp`). */
   fieldKey: string;
   kind: RoomDateFilterKind;
+  /** Presets the room's API cannot filter by — not offered. */
+  without?: readonly string[];
   /** The pending values, `RoomFilterValues` shaped. */
   values: RoomFilterValues;
   onChange: Dispatch<SetStateAction<RoomFilterValues>>;
@@ -286,6 +288,7 @@ export interface RoomDateFilterProps {
 export function RoomDateFilter({
   fieldKey,
   kind,
+  without = [],
   values,
   onChange,
 }: RoomDateFilterProps) {
@@ -329,11 +332,13 @@ export function RoomDateFilter({
   ) : null;
   const options: DrawerChipOption<string>[] = [
     { value: ANY_CHIP, label: t(ROOM_FILTERS_KEYS.any), tone: 'stone' },
-    ...chips.presets.map((preset) => ({
-      value: preset,
-      label: t(presetKeys[preset] ?? preset),
-      tone: tones[preset] ?? 'stone',
-    })),
+    ...chips.presets
+      .filter((preset) => !without.includes(preset))
+      .map((preset) => ({
+        value: preset,
+        label: t(presetKeys[preset] ?? preset),
+        tone: tones[preset] ?? 'stone',
+      })),
     { value: RANGE_CHIP, label: t(keys.range), tone: chips.range },
   ];
   let picked = value ?? ANY_CHIP;
@@ -503,15 +508,18 @@ function PersonRow({
  * 36px picker — the picked people's 18px avatars and "Anyone on the team",
  * the one name or "<n> people" — that expands an inline list: a "Search team"
  * field, then each member with a 24px check box, "No match" when the search
- * finds nobody. Any number may be picked; "Clear" empties the section.
+ * finds nobody. Any number may be picked — or one, for a `single` filter, a pick replacing the
+ * last; "Clear" empties the section.
  */
 function PeopleSection({
   fieldKey,
+  single = false,
   copy,
   values,
   onChange,
 }: {
   fieldKey: string;
+  single?: boolean;
   copy: RoomFilterCopy | undefined;
   values: RoomFilterValues;
   onChange: Dispatch<SetStateAction<RoomFilterValues>>;
@@ -530,7 +538,7 @@ function PeopleSection({
       )
     : people.members;
   const toggle = (id: string) =>
-    onChange((pending) => toggleRoomFilterOption(pending, fieldKey, id));
+    onChange((pending) => toggleRoomFilterOption(pending, fieldKey, id, single));
 
   return (
     <FilterSection
@@ -744,6 +752,7 @@ export function RoomFilters({
                     key={key}
                     fieldKey={key}
                     kind={field.presets}
+                    without={field.without}
                     values={pending}
                     onChange={setPending}
                   />
@@ -754,6 +763,7 @@ export function RoomFilters({
                   <PeopleSection
                     key={key}
                     fieldKey={key}
+                    single={field.single}
                     copy={copy[key]}
                     values={pending}
                     onChange={setPending}

@@ -16,7 +16,7 @@ import type {
   ContactChannel,
   LeadContact,
   LeadRecord,
-} from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/clinic/leads-fixture-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
@@ -307,7 +307,7 @@ const CONTACTS: Partial<Record<number, ContactRow>> = {
   2364: { defaultChannel: 'instagram' },
   2357: { defaultChannel: 'call' },
   2363: { preferences: ['Sundays only'] },
-  2360: { preferences: ['No calls', 'After 6 pm'] },
+  2360: { preferences: ['no_calls', 'after_six_pm'] },
   2352: { preferences: ['Gujarati'] },
 };
 

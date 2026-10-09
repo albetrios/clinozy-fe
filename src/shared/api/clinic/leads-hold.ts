@@ -1,94 +1,49 @@
 import { clinicToday } from './clinic-time.ts';
-import {
-  LEAD_CLOSED_STATUSES,
-  type LeadHoldFilter,
-  type LeadRecord,
-} from './leads-contracts.ts';
+import { LEAD_CLOSED_STATUSES, type LeadRecord } from './leads-contracts.ts';
 
 /*
- * Hold, claim and release (KICKOFF §6.3; `__czHold` H:3869): an owner holds a
- * lead while they work it; after `holdDays` without their activity it opens to
- * the team. None of this is in the contract (C17) — Appendix F, REPLACE_WITH_API.
+ * Hold, claim and release on clinozy-be (D40, L9): a claim holds a lead for the organization's
+ * `lead_hold_days` (`held_until`); while the hold runs only its owner works it, and once it has
+ * passed — or the owner released it — anyone on the team may claim it. A closed lead is neither
+ * held nor claimed. The server decides every claim (`409 lead_held`, `409 lead_closed`); this
+ * only reads `held_until` for the row's state, the Team column's dot and the drawer's line.
  */
-
-/**
- * Days without the owner's activity before a lead opens to the team — an org
- * setting, 3 by default (H:4013). Its "Auto-release after" control is never
- * rendered (H:5738) and isn't built, so every org runs the default.
- */
-export const LEAD_HOLD_DAYS = 3;
 
 const DAY_MS = 86_400_000;
 const CLOSED = new Set<string>(LEAD_CLOSED_STATUSES);
 
-/** A lead closed by its status, or linked to a patient: it never releases and can't be claimed. */
-export function isLeadClosed(lead: Pick<LeadRecord, 'status' | 'patientId'>): boolean {
-  return (lead.status !== null && CLOSED.has(lead.status)) || lead.patientId !== null;
+/** A lead closed by its status: it is never held and can't be claimed. */
+export function isLeadClosed(lead: Pick<LeadRecord, 'status'>): boolean {
+  return CLOSED.has(lead.status);
 }
-
-/** What the hold reads: the lead, and whether its owner has left the clinic (or there is none). */
-export type LeadHoldSubject = Pick<
-  LeadRecord,
-  'status' | 'patientId' | 'touchedAt' | 'releasedAt'
-> & {
-  ownerGone: boolean;
-};
 
 /** Where a lead stands with its owner and the team. */
 export interface LeadHold {
-  /** Closed or linked to a patient — never released. */
+  /** Closed by its status — never held. */
   closed: boolean;
-  /** Its owner left the clinic, or it has none — anyone on the team can join and take it. */
-  ownerGone: boolean;
-  /** Its owner let it go ("Release") and hasn't touched it since. */
-  released: boolean;
-  /** Anyone on the team may claim it. */
+  /** No running hold: anyone on the team may claim it. */
   open: boolean;
-  /** Whole days since the owner's last activity ("No activity for <n> days"). */
-  idleDays: number;
-  /** When it opens to the team if nobody follows up; `null` once open, or when it never will. */
+  /** When the running hold ends; `null` when open or closed. */
   releasesAt: string | null;
-  /** It opens later today (the Ownership filter's "Releasing today"). */
+  /** The hold ends today, on the clinic's calendar (the Ownership filter's "Releasing today"). */
   releasesToday: boolean;
-  /** It opens within a day — the Team column's 7px dot. */
+  /** The hold ends within a day — the Team column's dot. */
   releasesWithinDay: boolean;
 }
 
-/**
- * Where a lead stands (`__czHold`, H:3869): closed leads never release; idle
- * time runs from the owner's last activity (Q-L9); the lead opens once
- * `holdDays` have passed, the owner releases it, or the owner has left. The
- * prototype counts whole days, so "Releasing today" matched leads releasing
- * tomorrow (H:5636) — here the release is an instant, and "today" is the
- * clinic's (§7.3).
- */
-export function leadHold(lead: LeadHoldSubject, holdDays: number, now: Date): LeadHold {
+/** Where a lead stands at `now`: held while `held_until` is ahead, open once it has passed. */
+export function leadHold(
+  lead: Pick<LeadRecord, 'status' | 'heldUntil'>,
+  now: Date,
+): LeadHold {
   const closed = isLeadClosed(lead);
-  const touched = Date.parse(lead.touchedAt);
-  const idleDays = Math.max(0, Math.floor((now.getTime() - touched) / DAY_MS));
-  const released = lead.releasedAt !== null && Date.parse(lead.releasedAt) >= touched;
-  const releaseTime = touched + holdDays * DAY_MS;
-  const open = !closed && (lead.ownerGone || released || releaseTime <= now.getTime());
-  const held = !(closed || open);
+  const end = lead.heldUntil ? Date.parse(lead.heldUntil) : Number.NaN;
+  const held = !closed && end > now.getTime();
   return {
     closed,
-    ownerGone: lead.ownerGone,
-    released,
-    open,
-    idleDays,
-    releasesAt: held ? new Date(releaseTime).toISOString() : null,
-    releasesToday: held && clinicToday(new Date(releaseTime)) === clinicToday(now),
-    releasesWithinDay: held && releaseTime - now.getTime() <= DAY_MS,
+    open: !(closed || held),
+    releasesAt: held ? lead.heldUntil : null,
+    releasesToday: held && clinicToday(new Date(end)) === clinicToday(now),
+    releasesWithinDay: held && end - now.getTime() <= DAY_MS,
   };
-}
-
-/**
- * Whether a lead's hold passes the Ownership filter: "Open to claim", "Releasing
- * today", or "Held" (still its owner's, releasing today included, H:5636).
- */
-export function holdFilterMatches(hold: LeadHold, filter: LeadHoldFilter): boolean {
-  if (hold.closed) return false;
-  if (filter === 'open') return hold.open;
-  if (filter === 'soon') return hold.releasesToday;
-  return !hold.open;
 }

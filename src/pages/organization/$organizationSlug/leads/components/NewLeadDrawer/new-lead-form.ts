@@ -1,38 +1,43 @@
-import type { LeadInterest, LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  LeadContactHit,
-  LeadCreateInput,
-  LeadRecordSource,
-} from '@/shared/api/clinic/leads-contracts.ts';
+  LeadInterest,
+  LeadSource,
+  LeadStatus,
+} from '@/shared/api/clinic/clinic-schema.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
+import type { LeadPersonInput } from '@/shared/api/clinic/leads-api.ts';
+import type { LeadFields } from '@/shared/api/clinic/leads-contracts.ts';
 import {
   type ContactEditorValue,
   contactFieldsOf,
-  contactValueOf,
   emptyContactValue,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { type AppIcon, House, InstagramMark, Phone } from '@/shared/icons/index.ts';
+import { type AppIcon, House, InstagramMark } from '@/shared/icons/index.ts';
 
 /**
- * Where New lead's contact came from: a patient or a lead picked in the search
- * (the card's avatar, the patient link, the editor's linked notice), or nowhere
- * — typed in "New contact", or prefilled by the contact card's "+ Lead".
+ * The person New lead's search picked (`GET /app/contacts?q=`): the lead is created for them
+ * (`contact_id`), their own fields untouched — the lead drawer edits them afterwards.
  */
-type NewLeadOrigin = {
-  kind: LeadContactHit['kind'];
-  id: string;
-  seq: number;
-} | null;
+export type NewLeadPicked = Pick<
+  ContactSummary,
+  | 'id'
+  | 'contactNumber'
+  | 'name'
+  | 'primaryPhone'
+  | 'instagramHandles'
+  | 'patientId'
+  | 'openLeadId'
+>;
 
-/** The New lead form (`leads.md:75–90`): the contact, then the lead's own details. */
+/** The New lead form (`leads.md:75–90`): the person, then the lead's own details. */
 export interface NewLeadForm {
-  /** The person: no contact yet while the name is empty. */
+  /** A new person, as typed: no contact yet while the first name is empty. */
   contact: ContactEditorValue;
-  origin: NewLeadOrigin;
-  source: LeadRecordSource;
+  /** Someone already known, picked in the search — then `contact` is not sent. */
+  picked: NewLeadPicked | null;
+  source: LeadSource;
   /** New, unless a Quick start preset set another (H:6159). */
   status: LeadStatus;
   interests: LeadInterest[];
-  customInterests: string[];
   ownerId: string | null;
   involvedIds: string[];
 }
@@ -51,100 +56,91 @@ export function newLeadForm(
 ): NewLeadForm {
   return {
     contact: emptyContactValue(prefill.name?.trim() ?? '', prefill.phone ?? null),
-    origin: null,
+    picked: null,
     source: 'whatsapp',
     status: 'new',
     interests: [],
-    customInterests: [],
     ownerId: viewerId,
     involvedIds: [],
   };
 }
 
-/** Whether the form has its contact — then the Contact step gives way to the card (`leads.md:251–258`). */
+/** Whether the form has its person — then the Contact step gives way to the card (`leads.md:251–258`). */
 export function hasNewLeadContact(form: NewLeadForm): boolean {
-  return form.contact.name.trim() !== '';
+  return form.picked !== null || form.contact.firstName.trim() !== '';
 }
 
 /** One Quick start chip (H:6159): it changes values, never the steps. */
 export interface NewLeadPreset {
-  id: 'walkIn' | 'phoneCall' | 'instagramDm';
+  id: 'walkIn' | 'instagramDm';
   icon: AppIcon;
-  source: LeadRecordSource;
-  status: LeadStatus;
+  source: LeadSource;
 }
 
-/** Walk-in → Walk-in, Clinic visited · Phone call → Phone call, Contacted · Instagram DM → Instagram, New. */
+/**
+ * Walk-in → source Walk-in · Instagram DM → source Instagram. The design's Walk-in also set
+ * Clinic visited, which only a check-in sets (L8), and its "Phone call" preset had no source in
+ * the API (route map §4): both went.
+ */
 export const NEW_LEAD_PRESETS: readonly NewLeadPreset[] = [
-  { id: 'walkIn', icon: House, source: 'walk_in', status: 'clinic_visited' },
-  { id: 'phoneCall', icon: Phone, source: 'phone_call', status: 'contacted' },
-  { id: 'instagramDm', icon: InstagramMark, source: 'instagram', status: 'new' },
+  { id: 'walkIn', icon: House, source: 'walk_in' },
+  { id: 'instagramDm', icon: InstagramMark, source: 'instagram' },
 ];
 
-/** A preset is pressed while the form holds both its values. */
+/** A preset is pressed while the form holds its source. */
 export function presetPressed(form: NewLeadForm, preset: NewLeadPreset): boolean {
-  return form.source === preset.source && form.status === preset.status;
+  return form.source === preset.source;
 }
 
 /**
- * A search pick (`leads.md:252–253`): a patient's name and mobile with the
- * source Re-target, the new lead linked to them; a lead's or a chat's person
- * with their contact fields.
+ * A search pick (`leads.md:252–253`): the lead goes to that person; someone with a patient
+ * file comes back as a re-target.
  */
-export function withPickedContact(form: NewLeadForm, hit: LeadContactHit): NewLeadForm {
-  if (hit.kind === 'patient') {
-    return {
-      ...form,
-      contact: emptyContactValue(hit.name, hit.phone),
-      origin: { kind: 'patient', id: hit.id, seq: hit.seq },
-      source: 'retarget',
-    };
+export function withPickedContact(form: NewLeadForm, hit: NewLeadPicked): NewLeadForm {
+  return {
+    ...form,
+    contact: emptyContactValue(),
+    picked: hit,
+    source: hit.patientId ? 'retarget' : form.source,
+  };
+}
+
+/** "Change" (`leads.md:257`): no person, the source back to WhatsApp. */
+export function withoutContact(form: NewLeadForm): NewLeadForm {
+  return { ...form, contact: emptyContactValue(), picked: null, source: 'whatsapp' };
+}
+
+/** What "Create lead" sends: who it is for, and the lead's fields. */
+export interface NewLeadInput {
+  person: LeadPersonInput;
+  fields: LeadFields;
+}
+
+/**
+ * What "Create lead" sends (`POST /app/leads`) — the picked person's `contact_id`, or the new
+ * person's fields; `null` until a new person has a first name and a 10-digit mobile ("Add a
+ * name and a 10-digit mobile").
+ */
+export function newLeadInputOf(form: NewLeadForm): NewLeadInput | null {
+  let person: LeadPersonInput;
+  if (form.picked) {
+    person = { contactId: form.picked.id };
+  } else {
+    const contact = contactFieldsOf(form.contact);
+    if (!(contact.firstName && contact.phones.length > 0)) return null;
+    person = { contact };
   }
   return {
-    ...form,
-    contact: contactValueOf({ name: hit.name, phone: hit.phone, contact: hit.contact }),
-    origin: { kind: 'lead', id: hit.id, seq: hit.seq },
-  };
-}
-
-/** "Change" (`leads.md:257`): no contact, no link, the source back to WhatsApp. */
-export function withoutContact(form: NewLeadForm): NewLeadForm {
-  return { ...form, contact: emptyContactValue(), origin: null, source: 'whatsapp' };
-}
-
-/**
- * The linked notice's Undo: the person stays as typed, no longer tied to the
- * record they came from — a patient's Re-target source goes back to WhatsApp.
- */
-export function withoutOrigin(form: NewLeadForm): NewLeadForm {
-  return {
-    ...form,
-    origin: null,
-    source:
-      form.origin?.kind === 'patient' && form.source === 'retarget'
-        ? 'whatsapp'
-        : form.source,
-  };
-}
-
-/**
- * What "Create lead" sends (`createLead`, `S:1593`) — `null` until the contact
- * has a name and a 10-digit mobile ("Add a name and a 10-digit mobile").
- * The plan's status, patient link and contact fields ride along (Appendix F).
- */
-export function newLeadInputOf(form: NewLeadForm): LeadCreateInput | null {
-  const { name, phone, contact } = contactFieldsOf(form.contact);
-  if (!(name && phone)) return null;
-  return {
-    name,
-    phone,
-    contact,
-    source: form.source,
-    status: form.status,
-    interests: form.interests,
-    customInterests: form.customInterests,
-    ownerId: form.ownerId,
-    involvedIds: form.involvedIds.filter((id) => id !== form.ownerId),
-    patientId: form.origin?.kind === 'patient' ? form.origin.id : null,
+    person,
+    fields: {
+      status: form.status,
+      source: form.source,
+      interests: form.interests,
+      ownerId: form.ownerId,
+      involvedIds: form.involvedIds.filter((id) => id !== form.ownerId),
+      followUpAt: null,
+      branchId: null,
+      notes: null,
+    },
   };
 }

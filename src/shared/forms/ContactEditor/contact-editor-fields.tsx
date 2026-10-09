@@ -6,9 +6,9 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
-  CONTACT_CHANNEL_VALUES,
+  CONTACT_CHANNELS,
   type ContactChannel,
-} from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/clinic/contacts-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
@@ -28,7 +28,6 @@ import {
   type AppIcon,
   Copy,
   InstagramMark,
-  MessageSquare,
   Phone,
   WhatsAppMark,
   X,
@@ -43,6 +42,7 @@ import {
   CONTACT_PREFERENCE_PRESETS,
   CONTACT_REACH_MAX,
   type ContactEditorValue,
+  customPreferenceLabel,
   isPresetPreference,
   withCustomPreference,
   withPrimaryPhone,
@@ -50,11 +50,13 @@ import {
 
 const K = CONTACT_EDITOR_KEYS;
 
-/** The default channel chips (`CHS`, H:3362): WhatsApp sage · Call sky · SMS butter · Instagram blush. */
+/**
+ * The default channel chips (`CHS`, H:3362): WhatsApp sage · Call sky · Instagram blush — the
+ * design's SMS has no channel on clinozy-be (route map §4 #8).
+ */
 const CHANNELS: Readonly<Record<ContactChannel, { tone: Tone; icon: AppIcon }>> = {
   whatsapp: { tone: 'sage', icon: WhatsAppMark },
   call: { tone: 'sky', icon: Phone },
-  sms: { tone: 'butter', icon: MessageSquare },
   instagram: { tone: 'blush', icon: InstagramMark },
 };
 
@@ -326,23 +328,39 @@ export function ContactIdentityFields({
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
   const nameId = useId();
+  const lastNameId = useId();
   const mobilesId = useId();
   const channelId = useId();
   return (
     <>
       <div className="flex flex-col gap-3 rounded-lg border p-3">
         <ContactIdRow recordId={recordId} testId={testId} />
-        <DrawerField label={t(K.name)} htmlFor={nameId}>
-          <DrawerInput
-            id={nameId}
-            value={value.name}
-            maxLength={CONTACT_NAME_MAX}
-            placeholder={t(K.namePlaceholder)}
-            autoComplete="off"
-            onChange={(event) => onChange({ ...value, name: event.target.value })}
-            data-testid={`${testId}-name`}
-          />
-        </DrawerField>
+        <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
+          <DrawerField label={t(K.firstName)} htmlFor={nameId} required>
+            <DrawerInput
+              id={nameId}
+              value={value.firstName}
+              maxLength={CONTACT_NAME_MAX}
+              placeholder={t(K.firstNamePlaceholder)}
+              autoComplete="off"
+              onChange={(event) => onChange({ ...value, firstName: event.target.value })}
+              required
+              aria-required="true"
+              data-testid={`${testId}-first-name`}
+            />
+          </DrawerField>
+          <DrawerField label={t(K.lastName)} htmlFor={lastNameId}>
+            <DrawerInput
+              id={lastNameId}
+              value={value.lastName}
+              maxLength={CONTACT_NAME_MAX}
+              placeholder={t(K.lastNamePlaceholder)}
+              autoComplete="off"
+              onChange={(event) => onChange({ ...value, lastName: event.target.value })}
+              data-testid={`${testId}-last-name`}
+            />
+          </DrawerField>
+        </div>
         <fieldset aria-labelledby={mobilesId} className="flex min-w-0 flex-col gap-1.5">
           <span
             id={mobilesId}
@@ -409,7 +427,7 @@ export function ContactIdentityFields({
           <DrawerChips
             variant="button"
             label={t(K.defaultChannel)}
-            options={CONTACT_CHANNEL_VALUES.map((channel) => ({
+            options={CONTACT_CHANNELS.map((channel) => ({
               value: channel,
               label: tClinic(CLINIC_KEYS.channels[channel]),
               tone: CHANNELS[channel].tone,
@@ -454,15 +472,11 @@ function focusOnMount(node: HTMLInputElement | null) {
   node?.focus();
 }
 
-/** A preference chip's value: a preset's key leaf ("noCalls"), or "custom-<n>". */
-const presetSlug = (preset: (typeof CONTACT_PREFERENCE_PRESETS)[number]) =>
-  K.preferences[preset].split('.').at(-1) ?? preset;
-
 /**
  * Step 2, "Contact preferences" (`leads.md:101`, H:1982): the twelve presets
  * and the custom ones as outline chips, then "+ Custom" — a 28px field ("Type a
- * preference", ≤ 40) that adds on Enter or blur, duplicates ignored; Esc
- * leaves it (the editor's Esc waits while it is open — `adding`).
+ * preference", ≤ 40) that adds a tag on Enter or blur, duplicates ignored, twelve
+ * at most; Esc leaves it (the editor's Esc waits while it is open — `adding`).
  */
 export function ContactPreferenceFields({
   value,
@@ -479,19 +493,13 @@ export function ContactPreferenceFields({
   );
   const options = [
     ...CONTACT_PREFERENCE_PRESETS.map((preset) => ({
-      value: presetSlug(preset),
+      value: preset as string,
       label: t(K.preferences[preset]),
-      stored: preset as string,
     })),
-    ...customs.map((custom, index) => ({
-      value: `custom-${index + 1}`,
-      label: custom,
-      stored: custom,
-    })),
+    ...customs.map((custom) => ({ value: custom, label: customPreferenceLabel(custom) })),
   ];
-  const storedOf = new Map(options.map((option) => [option.value, option.stored]));
   const picks = options
-    .filter((option) => value.preferences.includes(option.stored))
+    .filter((option) => value.preferences.includes(option.value))
     .map((option) => option.value);
 
   const commit = () => {
@@ -520,13 +528,8 @@ export function ContactPreferenceFields({
         label={t(K.steps.preferences)}
         options={options}
         value={picks}
-        onChange={(next) =>
-          onChange({
-            ...value,
-            // Kept picks in the chips' order; a custom one dropped is gone.
-            preferences: next.flatMap((slug) => storedOf.get(slug) ?? []),
-          })
-        }
+        // Kept picks in the chips' order; a custom one dropped is gone.
+        onChange={(next) => onChange({ ...value, preferences: next })}
         testId={`${testId}-preferences`}
         className="gap-1.25"
         trailing={

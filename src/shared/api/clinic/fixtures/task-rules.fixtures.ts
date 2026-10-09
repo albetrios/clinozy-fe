@@ -23,8 +23,8 @@ import {
 import {
   LEAD_CLOSED_STATUSES,
   type LeadRecord,
-} from '@/shared/api/clinic/leads-contracts.ts';
-import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
+} from '@/shared/api/clinic/leads-fixture-contracts.ts';
+import { leadHold } from '@/shared/api/clinic/leads-fixture-hold.ts';
 import {
   TASK_RULES,
   type TaskDueAnchors,

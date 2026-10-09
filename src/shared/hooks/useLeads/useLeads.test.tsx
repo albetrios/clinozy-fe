@@ -1,21 +1,28 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { countOpenLeadTasks, fetchLead } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
+import {
+  claimLead,
+  countOpenLeadTasks,
+  countUnrepliedLeads,
+  createLead,
+  deleteLead,
+  fetchLead,
+  leadQueryKeys,
+  listLeads,
+  releaseLead,
+  restoreLead,
+  updateLead,
+} from '@/shared/api/clinic/leads-api.ts';
+import type { LeadFields, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   useAssignLead,
@@ -23,10 +30,8 @@ import {
   useCreateLead,
   useDeleteLead,
   useLead,
-  useLeadContactSearch,
   useLeadList,
-  useLeadViewer,
-  useMarkLeadRead,
+  useOpenLeadTasks,
   useReleaseLead,
   useRestoreLead,
   useSetLeadInvolved,
@@ -34,101 +39,237 @@ import {
   useUpdateLead,
 } from './useLeads.ts';
 
-/** Holds a write until a test lets it land, so the optimistic patch can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null, failList: false }));
-
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof LeadsApiModule>();
-  return {
-    ...actual,
-    deleteLead: async (...args: Parameters<typeof actual.deleteLead>) => {
-      await gate.hold;
-      return actual.deleteLead(...args);
-    },
-    listLeads: async (...args: Parameters<typeof actual.listLeads>) => {
-      if (gate.failList) throw new Error('connection dropped');
-      return actual.listLeads(...args);
-    },
-    markLeadRead: async (...args: Parameters<typeof actual.markLeadRead>) => {
-      await gate.hold;
-      return actual.markLeadRead(...args);
-    },
-  };
-});
+vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof LeadsApiModule>()),
+  listLeads: vi.fn(),
+  fetchLead: vi.fn(),
+  countUnrepliedLeads: vi.fn(),
+  countOpenLeadTasks: vi.fn(),
+  createLead: vi.fn(),
+  updateLead: vi.fn(),
+  claimLead: vi.fn(),
+  releaseLead: vi.fn(),
+  deleteLead: vi.fn(),
+  restoreLead: vi.fn(),
+}));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 
-const RS = staffRef('RS');
-const NK = staffRef('NK');
-const AS = staffRef('AS');
+const RIYA = 'mem_riya00000000000000000';
+const NIDHI = 'mem_nidhi0000000000000000';
+
+/** A pipeline lead: New, WhatsApp, Clinical, Nidhi's. */
+function leadRecord(overrides: Partial<LeadRecord> = {}): LeadRecord {
+  return {
+    id: 'lead_anaya0000000000000000',
+    leadNumber: 2363,
+    contactId: 'con_anaya0000000000000000',
+    person: {
+      contactNumber: 10234,
+      firstName: 'Anaya',
+      lastName: 'Desai',
+      name: 'Anaya Desai',
+      primaryPhone: '+919879521034',
+      defaultChannel: 'whatsapp',
+    },
+    name: 'Anaya Desai',
+    phone: '+919879521034',
+    patientId: null,
+    status: 'new',
+    source: 'whatsapp',
+    interests: ['clinical'],
+    kind: 'enquiry',
+    retargetReason: null,
+    ownerId: NIDHI,
+    involvedIds: [],
+    heldUntil: '2026-10-05T04:30:00.000Z',
+    followUpAt: null,
+    branchId: null,
+    notes: null,
+    lastActivityAt: '2026-10-02T04:30:00.000Z',
+    isAwaitingReply: false,
+    createdAt: '2026-09-30T04:30:00.000Z',
+    updatedAt: '2026-10-02T04:30:00.000Z',
+    ...overrides,
+  };
+}
+
+const ANAYA = leadRecord();
+const KABIR = leadRecord({
+  id: 'lead_kabir0000000000000000',
+  leadNumber: 2364,
+  contactId: 'con_kabir0000000000000000',
+  name: 'Kabir Mehta',
+  ownerId: null,
+});
+const POONAM = leadRecord({
+  id: 'lead_poonam000000000000000',
+  leadNumber: 2362,
+  contactId: 'con_poonam000000000000000',
+  name: 'Poonam Balar',
+  ownerId: RIYA,
+});
+
+/** What a create sends. */
+const NEW_FIELDS: LeadFields = {
+  status: 'new',
+  source: 'walk_in',
+  interests: ['peel'],
+  ownerId: RIYA,
+  involvedIds: [],
+  followUpAt: null,
+  branchId: null,
+  notes: null,
+};
+
+/** The server the mocked api serves: its leads, a page size, a write held until let go. */
+const server = {
+  leads: [] as LeadRecord[],
+  pageSize: 2,
+  hold: null as Promise<void> | null,
+  failList: false,
+};
+
+/** Hold the next writes until the returned function lets them land. */
+function holdWrites(): () => void {
+  let release: () => void = () => undefined;
+  server.hold = new Promise((resolve) => {
+    release = resolve;
+  });
+  return release;
+}
+
+/** The lead on the server with this id. */
+function stored(id: string): LeadRecord {
+  const lead = server.leads.find((candidate) => candidate.id === id);
+  if (!lead) throw new Error(`no lead ${id}`);
+  return lead;
+}
+
+/** Replace a lead on the server with its change applied. */
+function patchStored(id: string, patch: Partial<LeadRecord>): LeadRecord {
+  const saved = { ...stored(id), ...patch, updatedAt: '2026-10-03T04:30:00.000Z' };
+  server.leads = server.leads.map((lead) => (lead.id === id ? saved : lead));
+  return saved;
+}
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-/** The whole pipeline beside the write under test, sharing one cache. */
-function renderWith<T>(useWrite: () => T) {
-  return renderHook(() => ({ list: useLeadList({ view: 'all' }), write: useWrite() }), {
-    wrapper,
-  });
+/** The All list beside the write under test, sharing one cache. */
+function renderWithList<T>(useWrite: () => T) {
+  return renderHook(
+    () => ({ list: useLeadList({ view: 'all', viewerId: RIYA }), write: useWrite() }),
+    { wrapper },
+  );
 }
 
-const seqsOf = (rows: { seq: number }[]) => rows.map((row) => row.seq);
-
-/** The Undo the last undo toast offers — what the toast's button runs. */
-function lastUndo(): { message: string; onUndo: () => void } {
-  const [message, options] = vi.mocked(notify.undo).mock.lastCall ?? [];
-  if (!(message && options)) throw new Error('no undo toast');
-  return { message, onUndo: options.onUndo };
-}
+const namesOf = (rows: readonly LeadRecord[]) => rows.map((row) => row.name);
 
 beforeEach(() => {
-  // Midday: past every seed's time today, so a new lead sorts first.
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date('2026-10-03T06:30:00Z'));
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  gate.hold = null;
-  gate.failList = false;
-  for (const fn of Object.values(notify)) vi.mocked(fn).mockClear();
-  resetClinicFixtures();
+  signInTestMember();
+  Object.assign(server, {
+    leads: [ANAYA, KABIR, POONAM],
+    pageSize: 2,
+    hold: null,
+    failList: false,
+  });
+  for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
+
+  vi.mocked(listLeads).mockImplementation(async (_params, after) => {
+    if (server.failList) throw new Error('connection dropped');
+    const start = after ? Number(after.replace('cursor-', '')) : 0;
+    const end = start + server.pageSize;
+    return {
+      rows: server.leads.slice(start, end),
+      next: end < server.leads.length ? `cursor-${end}` : null,
+      total: server.leads.length,
+    };
+  });
+  vi.mocked(fetchLead).mockImplementation(async (id) => stored(id));
+  vi.mocked(countUnrepliedLeads).mockResolvedValue(3);
+  vi.mocked(countOpenLeadTasks).mockResolvedValue(2);
+  vi.mocked(createLead).mockImplementation(async ({ fields }) => {
+    const created = leadRecord({
+      ...fields,
+      id: 'lead_hetal0000000000000000',
+      leadNumber: 2386,
+      name: 'Hetal Parmar',
+    });
+    server.leads = [created, ...server.leads];
+    return created;
+  });
+  vi.mocked(updateLead).mockImplementation(async ({ leadId, fields }) =>
+    patchStored(leadId, fields),
+  );
+  vi.mocked(claimLead).mockImplementation(async (leadId) => {
+    const { ownerId, involvedIds } = stored(leadId);
+    return patchStored(leadId, {
+      ownerId: RIYA,
+      involvedIds: ownerId ? [...involvedIds, ownerId] : involvedIds,
+    });
+  });
+  vi.mocked(releaseLead).mockImplementation(async (leadId) =>
+    patchStored(leadId, { heldUntil: null }),
+  );
+  vi.mocked(deleteLead).mockImplementation(async ({ leadId }) => {
+    await server.hold;
+    server.leads = server.leads.filter((lead) => lead.id !== leadId);
+  });
+  vi.mocked(restoreLead).mockImplementation(async () => {
+    server.leads = [...server.leads, KABIR];
+    return KABIR;
+  });
 });
 afterEach(() => {
+  cleanup();
   client.clear();
-  vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
+  useAuthStore.setState({ user: null });
 });
 
 describe('useLeadList', () => {
-  it('reads the pipeline a cursor page at a time, for the view asked', async () => {
-    const all = renderHook(() => useLeadList({ view: 'all' }), { wrapper });
-    await waitFor(() => expect(all.result.current.isPending).toBe(false));
-    expect(all.result.current.rows).toHaveLength(17);
-    expect(all.result.current.hasNextPage).toBe(false);
+  it('reads the list a cursor page at a time, for the params asked', async () => {
+    const params = { view: 'mine', viewerId: RIYA } as const;
+    const { result } = renderHook(() => useLeadList(params), { wrapper });
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+    expect(namesOf(result.current.rows)).toEqual(['Anaya Desai', 'Kabir Mehta']);
+    expect(result.current.hasNextPage).toBe(true);
+    expect(listLeads).toHaveBeenLastCalledWith(params, undefined);
 
-    const mine = renderHook(() => useLeadList({ view: 'mine', viewerId: RS }), {
-      wrapper,
-    });
-    await waitFor(() => expect(mine.result.current.isPending).toBe(false));
-    expect(seqsOf(mine.result.current.rows)).toEqual([
-      2363, 2365, 2356, 2355, 2354, 2353,
-    ]);
+    act(() => result.current.fetchNextPage());
+
+    await waitFor(() => expect(result.current.rows).toHaveLength(3));
+    expect(namesOf(result.current.rows).at(-1)).toBe('Poonam Balar');
+    expect(result.current.hasNextPage).toBe(false);
+    expect(listLeads).toHaveBeenLastCalledWith(params, 'cursor-2');
   });
 
-  it('waits while told to — "Mine" reads nothing before the viewer is known', () => {
+  it('waits while told to — Mine reads nothing before the viewer is known', () => {
     const { result } = renderHook(
       () => useLeadList({ view: 'mine', viewerId: null }, { enabled: false }),
       { wrapper },
     );
     expect(result.current.isPending).toBe(true);
-    expect(client.isFetching()).toBe(0);
+    expect(listLeads).not.toHaveBeenCalled();
   });
 
-  it('says once that the list failed, with Retry, and keeps the toast to one', async () => {
-    gate.failList = true;
-    const { result } = renderHook(() => useLeadList({ view: 'all' }), { wrapper });
+  it('reads nothing outside an organization', () => {
+    useOrganizationStore.getState().clearOrganization();
+    renderHook(() => useLeadList({ view: 'all', viewerId: RIYA }), { wrapper });
+    expect(listLeads).not.toHaveBeenCalled();
+  });
+
+  it('says once that the list failed, with Retry', async () => {
+    server.failList = true;
+    const { result } = renderHook(() => useLeadList({ view: 'all', viewerId: RIYA }), {
+      wrapper,
+    });
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(notify.error).toHaveBeenCalledTimes(1);
     const [message, options] = vi.mocked(notify.error).mock.lastCall ?? [];
@@ -136,320 +277,299 @@ describe('useLeadList', () => {
       'Couldn’t load this list · connection dropped. Showing the last copy.',
     );
     expect(options).toMatchObject({ id: 'list-error:leads', action: { label: 'Retry' } });
-    gate.failList = false;
+
+    server.failList = false;
     act(() => options?.action?.onClick?.());
-    await waitFor(() => expect(result.current.rows).toHaveLength(17));
-  });
-});
-
-describe('useLeadViewer', () => {
-  afterEach(() => useAuthStore.setState({ user: null }));
-
-  it('reads the signed-in member by their email', async () => {
-    useAuthStore.setState({
-      user: { id: 'u', email: 'nidhi@cresence.skin', role: 'user' },
-    });
-    const { result } = renderHook(() => useLeadViewer(), { wrapper });
-    await waitFor(() => expect(result.current.data?.id).toBe(NK));
-  });
-
-  it('reads the fixture server’s own member before anyone is signed in', async () => {
-    const { result } = renderHook(() => useLeadViewer(), { wrapper });
-    await waitFor(() => expect(result.current.data?.id).toBe(RS));
+    await waitFor(() => expect(result.current.rows).toHaveLength(2));
   });
 });
 
 describe('useLead', () => {
   it('reads one lead, and stays idle without an id', async () => {
-    const { result } = renderHook(() => useLead(ref.lead(2364)), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.name).toBe('Kabir Mehta');
+    const { result } = renderHook(() => useLead(KABIR.id), { wrapper });
+    await waitFor(() => expect(result.current.data?.name).toBe('Kabir Mehta'));
+    expect(fetchLead).toHaveBeenCalledWith(KABIR.id);
 
     const idle = renderHook(() => useLead(undefined), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
-  });
-});
-
-describe('useLeadContactSearch', () => {
-  it('searches from two characters after the debounce, and says when nobody matches', async () => {
-    const { result, rerender } = renderHook(({ query }) => useLeadContactSearch(query), {
-      wrapper,
-      initialProps: { query: 'd' },
-    });
-    expect(result.current).toEqual({ hits: [], noMatch: false });
-
-    rerender({ query: 'Dharti' });
-    await waitFor(() => expect(result.current.hits[0]?.name).toBe('Dharti Galani'));
-    expect(result.current.noMatch).toBe(false);
-
-    rerender({ query: 'zzqx' });
-    await waitFor(() => expect(result.current.noMatch).toBe(true));
-    expect(result.current.hits).toEqual([]);
+    expect(fetchLead).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('useUnrepliedLeadCount', () => {
-  it('counts the viewer’s unread leads, and stays idle without a viewer', async () => {
-    const { result } = renderHook(() => useUnrepliedLeadCount(RS), { wrapper });
-    await waitFor(() => expect(result.current.data).toBe(2));
+  it('counts the viewer’s leads awaiting a reply, and stays idle without a viewer', async () => {
+    const { result } = renderHook(() => useUnrepliedLeadCount(RIYA), { wrapper });
+    await waitFor(() => expect(result.current.data).toBe(3));
+    expect(countUnrepliedLeads).toHaveBeenCalledWith(RIYA);
+
     const idle = renderHook(() => useUnrepliedLeadCount(null), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
+    expect(countUnrepliedLeads).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useOpenLeadTasks', () => {
+  it('counts a lead’s open tasks, and stays idle without an id', async () => {
+    const { result } = renderHook(() => useOpenLeadTasks(ANAYA.id), { wrapper });
+    await waitFor(() => expect(result.current.data).toBe(2));
+    expect(countOpenLeadTasks).toHaveBeenCalledWith(ANAYA.id);
+
+    const idle = renderHook(() => useOpenLeadTasks(undefined), { wrapper });
+    expect(idle.result.current.fetchStatus).toBe('idle');
+    expect(countOpenLeadTasks).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('useCreateLead', () => {
-  it('creates, says "Lead #2386 created" and puts the new lead first (D28)', async () => {
-    const { result } = renderWith(() => useCreateLead());
+  it('creates with the action’s key, says "Lead #2386 created" and lists it first (D28)', async () => {
+    const { result } = renderWithList(() => useCreateLead());
     await waitFor(() => expect(result.current.list.isPending).toBe(false));
 
     await act(() =>
-      result.current.write.mutateAsync({ name: 'Hetal Parmar', phone: '+919898012345' }),
+      result.current.write.mutateAsync({
+        person: { contactId: 'con_hetal0000000000000000' },
+        fields: NEW_FIELDS,
+      }),
     );
 
+    expect(createLead).toHaveBeenCalledWith({
+      person: { contactId: 'con_hetal0000000000000000' },
+      fields: NEW_FIELDS,
+      idempotencyKey: expect.any(String),
+    });
     expect(notify.success).toHaveBeenCalledWith('Lead #2386 created');
-    await waitFor(() => expect(result.current.list.rows[0]?.seq).toBe(2386));
+    await waitFor(() => expect(result.current.list.rows[0]?.leadNumber).toBe(2386));
   });
 
-  it('surfaces a refused create — the mobile is already a lead — and stores nothing', async () => {
+  it('says why a create was refused, and lists nothing new', async () => {
+    vi.mocked(createLead).mockRejectedValueOnce(new Error('connection dropped'));
     const { result } = renderHook(() => useCreateLead(), { wrapper });
     await act(async () => {
       await result.current
-        .mutateAsync({ name: 'Anaya D', phone: '+919879521034' })
+        .mutateAsync({ person: { contactId: ANAYA.contactId }, fields: NEW_FIELDS })
         .catch(() => undefined);
     });
-    expect(notify.error).toHaveBeenCalledWith('This number is already a lead');
+    expect(notify.error).toHaveBeenCalledTimes(1);
     expect(notify.success).not.toHaveBeenCalled();
+    expect(server.leads).toHaveLength(3);
   });
 });
 
 describe('useUpdateLead', () => {
-  it('says "Lead saved" when the status stays', async () => {
+  it('sends the read’s updatedAt and says "Lead saved" when the status stays', async () => {
     const { result } = renderHook(() => useUpdateLead(), { wrapper });
     await act(() =>
       result.current.mutateAsync({
-        id: ref.lead(2363),
-        patch: { interests: ['clinical', 'peel'] },
+        lead: ANAYA,
+        fields: { interests: ['clinical', 'peel'] },
       }),
     );
+    expect(updateLead).toHaveBeenCalledWith({
+      leadId: ANAYA.id,
+      fields: { interests: ['clinical', 'peel'] },
+      expectedUpdatedAt: ANAYA.updatedAt,
+      idempotencyKey: expect.any(String),
+    });
     expect(notify.success).toHaveBeenCalledWith('Lead saved');
     expect(notify.undo).not.toHaveBeenCalled();
   });
 
-  it('names a status move with Undo, which takes the status and its task back', async () => {
+  it('names a status move — "<name> → <status>" — with no Undo', async () => {
     const { result } = renderHook(() => useUpdateLead(), { wrapper });
     await act(() =>
-      result.current.mutateAsync({ id: ref.lead(2363), patch: { status: 'follow_up' } }),
+      result.current.mutateAsync({ lead: ANAYA, fields: { status: 'follow_up' } }),
     );
-    const undo = lastUndo();
-    expect(undo.message).toBe('Anaya Desai → Follow-up · follow-up task for tomorrow');
-    expect(notify.success).not.toHaveBeenCalled();
-    expect(await countOpenLeadTasks(ref.lead(2363))).toBe(1);
-
-    act(() => undo.onUndo());
-    await waitFor(async () =>
-      expect((await fetchLead(ref.lead(2363))).status).toBe('new'),
-    );
-    expect((await fetchLead(ref.lead(2363))).followUpAt).toBeNull();
-    expect(await countOpenLeadTasks(ref.lead(2363))).toBe(0);
+    expect(notify.success).toHaveBeenCalledWith('Anaya Desai → Follow-up');
+    expect(notify.undo).not.toHaveBeenCalled();
   });
 
-  it('takes the caller’s message instead, and runs the caller’s onSuccess either way', async () => {
+  it('takes the caller’s message instead, and runs the caller’s onSuccess', async () => {
     const onSuccess = vi.fn();
     const { result } = renderHook(
-      () =>
-        useUpdateLead({
-          successMessage: 'Contact updated · applies everywhere',
-          onSuccess,
-        }),
+      () => useUpdateLead({ successMessage: 'Changes saved', onSuccess }),
       { wrapper },
     );
-    await act(() =>
-      result.current.mutateAsync({ id: ref.lead(2364), patch: { name: 'Kabir M' } }),
-    );
-    expect(notify.success).toHaveBeenCalledWith('Contact updated · applies everywhere');
+    await act(() => result.current.mutateAsync({ lead: ANAYA, fields: { notes: 'Hi' } }));
     expect(notify.success).toHaveBeenCalledTimes(1);
+    expect(notify.success).toHaveBeenCalledWith('Changes saved');
     expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes the lead’s own read once it lands', async () => {
+    const { result } = renderHook(
+      () => ({ lead: useLead(ANAYA.id), save: useUpdateLead() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.lead.data?.status).toBe('new'));
+    await act(() =>
+      result.current.save.mutateAsync({ lead: ANAYA, fields: { status: 'contacted' } }),
+    );
+    await waitFor(() => expect(result.current.lead.data?.status).toBe('contacted'));
   });
 });
 
 describe('useClaimLead', () => {
-  it('claims from the row: "You now own …" with Undo, which puts the team back', async () => {
-    const lead = await fetchLead(ref.lead(2362));
-    const { result } = renderWith(() => useClaimLead());
-    await waitFor(() => expect(result.current.list.isPending).toBe(false));
-
-    await act(() =>
-      result.current.write.mutateAsync({ lead, viewerId: RS, ownerName: 'Asha M.' }),
+  it('claims with the action’s key: "You now own <name> · <owner> stays involved", no Undo', async () => {
+    const { result } = renderHook(() => useClaimLead(), { wrapper });
+    await act(() => result.current.mutateAsync({ lead: ANAYA, ownerName: 'Nidhi K.' }));
+    expect(claimLead).toHaveBeenCalledWith(ANAYA.id, expect.any(String));
+    expect(notify.success).toHaveBeenCalledWith(
+      'You now own Anaya Desai · Nidhi K. stays involved',
     );
-    const undo = lastUndo();
-    expect(undo.message).toBe('You now own Poonam Balar · Asha M. stays involved');
-    expect((await fetchLead(lead.id)).ownerId).toBe(RS);
-
-    act(() => undo.onUndo());
-    await waitFor(async () => expect((await fetchLead(lead.id)).ownerId).toBe(AS));
-    expect((await fetchLead(lead.id)).involvedIds).toEqual([]);
+    expect(notify.undo).not.toHaveBeenCalled();
   });
 
-  it('says only "You now own …" when nobody held it', async () => {
-    const lead: LeadRecord = await fetchLead(ref.lead(2361));
+  it('says only "You now own <name>" when nobody held it', async () => {
     const { result } = renderHook(() => useClaimLead(), { wrapper });
-    await act(() => result.current.mutateAsync({ lead, viewerId: RS, ownerName: null }));
-    expect(lastUndo().message).toBe('You now own Online Con');
+    await act(() => result.current.mutateAsync({ lead: KABIR, ownerName: null }));
+    expect(notify.success).toHaveBeenCalledWith('You now own Kabir Mehta');
+  });
+
+  it('says the caller’s own words when it brings them', async () => {
+    const { result } = renderHook(() => useClaimLead(), { wrapper });
+    await act(() =>
+      result.current.mutateAsync({
+        lead: ANAYA,
+        ownerName: 'Nidhi K.',
+        message: 'Claimed by Riya Shah',
+      }),
+    );
+    expect(notify.success).toHaveBeenCalledWith('Claimed by Riya Shah');
   });
 });
 
 describe('useAssignLead', () => {
-  it('assigns with "<name> is now assigned · notified" and Undo', async () => {
-    const lead = await fetchLead(ref.lead(2357));
+  it('sets the owner without a stale check: "<name> is now assigned · notified", no Undo', async () => {
     const { result } = renderHook(() => useAssignLead(), { wrapper });
     await act(() =>
-      result.current.mutateAsync({ lead, ownerId: NK, ownerName: 'Nidhi K.' }),
+      result.current.mutateAsync({ lead: ANAYA, ownerId: RIYA, ownerName: 'Riya S.' }),
     );
-    const undo = lastUndo();
-    expect(undo.message).toBe('Nidhi K. is now assigned · notified');
-    expect((await fetchLead(lead.id)).ownerId).toBe(NK);
-
-    act(() => undo.onUndo());
-    await waitFor(async () =>
-      expect((await fetchLead(lead.id)).ownerId).toBe(lead.ownerId),
-    );
+    expect(updateLead).toHaveBeenCalledWith({
+      leadId: ANAYA.id,
+      fields: { ownerId: RIYA },
+      idempotencyKey: expect.any(String),
+    });
+    expect(stored(ANAYA.id).ownerId).toBe(RIYA);
+    expect(notify.success).toHaveBeenCalledWith('Riya S. is now assigned · notified');
+    expect(notify.undo).not.toHaveBeenCalled();
   });
-});
 
-describe('useSetLeadInvolved', () => {
-  it('applies at once with no toast — the chat’s system line is its feedback, so the thread is read again', async () => {
-    const lead = await fetchLead(ref.lead(2357));
-    const thread = messageQueryKeys.thread(lead.id);
-    client.setQueryData(thread, []);
-    const { result } = renderHook(() => useSetLeadInvolved(), { wrapper });
+  it('says the caller’s own words when it brings them', async () => {
+    const { result } = renderHook(() => useAssignLead(), { wrapper });
     await act(() =>
-      result.current.mutateAsync({ id: lead.id, involvedIds: [...lead.involvedIds, AS] }),
+      result.current.mutateAsync({
+        lead: ANAYA,
+        ownerId: RIYA,
+        ownerName: 'Riya S.',
+        message: 'Assigned to you',
+      }),
     );
-    expect((await fetchLead(lead.id)).involvedIds).toContain(AS);
-    expect(client.getQueryState(thread)?.isInvalidated).toBe(true);
-    const lines = clinicFixtures.leadMessages
-      .snapshot((message) => message.leadId === lead.id && message.isSystem)
-      .map((message) => message.body);
-    expect(lines.at(-1)).toBe('Added Asha M. as involved');
-    for (const toast of Object.values(notify)) expect(toast).not.toHaveBeenCalled();
+    expect(notify.success).toHaveBeenCalledWith('Assigned to you');
   });
 });
 
 describe('useReleaseLead', () => {
-  it('releases with "Released to the team · anyone can claim" and Undo, which puts the team back', async () => {
-    const lead = await fetchLead(ref.lead(2356));
+  it('releases with the action’s key: "Released to the team · anyone can claim", no Undo', async () => {
     const { result } = renderHook(() => useReleaseLead(), { wrapper });
-    await act(() => result.current.mutateAsync({ lead, viewerId: RS }));
-    const undo = lastUndo();
-    expect(undo.message).toBe('Released to the team · anyone can claim');
-    expect(notify.success).not.toHaveBeenCalled();
-    expect((await fetchLead(lead.id)).releasedAt).not.toBeNull();
-
-    act(() => undo.onUndo());
-    await waitFor(async () =>
-      expect((await fetchLead(lead.id)).releasedAt).toBe(lead.releasedAt),
+    await act(() => result.current.mutateAsync(POONAM));
+    expect(releaseLead).toHaveBeenCalledWith(POONAM.id, expect.any(String));
+    expect(stored(POONAM.id).heldUntil).toBeNull();
+    expect(notify.success).toHaveBeenCalledWith(
+      'Released to the team · anyone can claim',
     );
-    expect((await fetchLead(lead.id)).ownerId).toBe(lead.ownerId);
+    expect(notify.undo).not.toHaveBeenCalled();
   });
 });
 
-describe('useMarkLeadRead', () => {
-  it('drops the unread count at once, silently, and refreshes the Unreplied count', async () => {
-    const { result } = renderHook(
-      () => ({
-        list: useLeadList({ view: 'all' }),
-        count: useUnrepliedLeadCount(RS),
-        read: useMarkLeadRead(),
-      }),
-      { wrapper },
+describe('useSetLeadInvolved', () => {
+  it('applies the new list at once, with no stale check and no toast', async () => {
+    const { result } = renderHook(() => useSetLeadInvolved(), { wrapper });
+    await act(() =>
+      result.current.mutateAsync({ id: ANAYA.id, involvedIds: [RIYA, NIDHI] }),
     );
-    await waitFor(() => expect(result.current.count.data).toBe(2));
-    let release: () => void = () => undefined;
-    gate.hold = new Promise((resolve) => {
-      release = resolve;
+    expect(updateLead).toHaveBeenCalledWith({
+      leadId: ANAYA.id,
+      fields: { involvedIds: [RIYA, NIDHI] },
+      idempotencyKey: expect.any(String),
     });
-
-    let landed: Promise<unknown> = Promise.resolve();
-    act(() => {
-      landed = result.current.read.mutateAsync(ref.lead(2363));
-    });
-    await waitFor(() =>
-      expect(result.current.list.rows.find((row) => row.seq === 2363)?.unreadCount).toBe(
-        0,
-      ),
-    );
-
-    release();
-    await act(() => landed);
-    await waitFor(() => expect(result.current.count.data).toBe(1));
-    expect(notify.success).not.toHaveBeenCalled();
+    expect(stored(ANAYA.id).involvedIds).toEqual([RIYA, NIDHI]);
+    for (const toast of Object.values(notify)) expect(toast).not.toHaveBeenCalled();
   });
 });
 
 describe('useDeleteLead', () => {
-  it('drops the row at once and raises no toast of its own', async () => {
-    const { result } = renderWith(() => useDeleteLead());
+  it('drops the row from the list at once, sends the reason, and raises no toast of its own', async () => {
+    const { result } = renderWithList(() => useDeleteLead());
     await waitFor(() => expect(result.current.list.isPending).toBe(false));
-    let release: () => void = () => undefined;
-    gate.hold = new Promise((resolve) => {
-      release = resolve;
-    });
+    const release = holdWrites();
 
     let landed: Promise<unknown> = Promise.resolve();
     act(() => {
       landed = result.current.write.mutateAsync({
-        id: ref.lead(2357),
-        reason: 'duplicate',
-        note: null,
+        id: KABIR.id,
+        reason: 'other',
+        note: 'Spam number',
       });
     });
-    await waitFor(() => expect(seqsOf(result.current.list.rows)).not.toContain(2357));
+    await waitFor(() =>
+      expect(namesOf(result.current.list.rows)).toEqual(['Anaya Desai']),
+    );
 
     release();
     await act(() => landed);
+    expect(deleteLead).toHaveBeenCalledWith({
+      leadId: KABIR.id,
+      reason: 'other',
+      note: 'Spam number',
+    });
     await waitFor(() => expect(result.current.list.isFetching).toBe(false));
-    expect(seqsOf(result.current.list.rows)).not.toContain(2357);
+    expect(namesOf(result.current.list.rows)).not.toContain('Kabir Mehta');
     expect(notify.success).not.toHaveBeenCalled();
   });
 
-  it('puts the row back and says why when the delete is refused', async () => {
-    const { result } = renderWith(() => useDeleteLead());
+  it('puts the row back and says why when the delete fails', async () => {
+    vi.mocked(deleteLead).mockRejectedValueOnce(new Error('connection dropped'));
+    const { result } = renderWithList(() => useDeleteLead());
     await waitFor(() => expect(result.current.list.isPending).toBe(false));
 
     await act(async () => {
       await result.current.write
-        .mutateAsync({ id: ref.lead(2357), reason: 'other', note: null })
+        .mutateAsync({ id: KABIR.id, reason: 'duplicate', note: null })
         .catch(() => undefined);
     });
 
-    expect(seqsOf(result.current.list.rows)).toContain(2357);
+    expect(namesOf(result.current.list.rows)).toEqual(['Anaya Desai', 'Kabir Mehta']);
     expect(notify.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves the lead’s own read alone — it would answer 404 while its drawer closes', async () => {
+    const { result } = renderHook(
+      () => ({ lead: useLead(KABIR.id), remove: useDeleteLead() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.lead.isSuccess).toBe(true));
+    await act(() =>
+      result.current.remove.mutateAsync({ id: KABIR.id, reason: 'mistake', note: null }),
+    );
+    const detail = leadQueryKeys.detail('org_test', KABIR.id);
+    expect(client.getQueryState(detail)?.isInvalidated).toBe(false);
+    expect(fetchLead).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('useRestoreLead', () => {
-  it('brings a removed lead back into the list, silently', async () => {
-    const { result } = renderHook(
-      () => ({
-        list: useLeadList({ view: 'all' }),
-        remove: useDeleteLead(),
-        restore: useRestoreLead(),
-      }),
-      { wrapper },
-    );
+  it('brings a removed lead back with the action’s key, silently', async () => {
+    Object.assign(server, { leads: [ANAYA, POONAM], pageSize: 3 });
+    const { result } = renderWithList(() => useRestoreLead());
     await waitFor(() => expect(result.current.list.isPending).toBe(false));
-    await act(() =>
-      result.current.remove.mutateAsync({
-        id: ref.lead(2357),
-        reason: 'mistake',
-        note: null,
-      }),
+    expect(namesOf(result.current.list.rows)).not.toContain('Kabir Mehta');
+
+    await act(() => result.current.write.mutateAsync(KABIR.id));
+
+    expect(restoreLead).toHaveBeenCalledWith(KABIR.id, expect.any(String));
+    await waitFor(() =>
+      expect(namesOf(result.current.list.rows)).toContain('Kabir Mehta'),
     );
-    await waitFor(() => expect(seqsOf(result.current.list.rows)).not.toContain(2357));
-
-    await act(() => result.current.restore.mutateAsync(ref.lead(2357)));
-
-    await waitFor(() => expect(seqsOf(result.current.list.rows)).toContain(2357));
     expect(notify.success).not.toHaveBeenCalled();
   });
 });

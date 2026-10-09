@@ -13,17 +13,13 @@ export const LEAD_TOASTS_KEYS = {
   created: 'toasts.created',
   /** A save that kept the status. */
   saved: 'toasts.saved',
-  /** "Rhea Shah → Follow-up", with Undo. */
+  /** "Rhea Shah → Follow-up". */
   statusChanged: 'toasts.statusChanged',
-  /** A claim from the row, with Undo. */
+  /** A claim from the row, or a take-over. */
   claimed: 'toasts.claimed',
-  /** A claim of a lead nobody held, with Undo. */
+  /** A claim of a lead nobody held. */
   claimedUnowned: 'toasts.claimedUnowned',
   released: 'toasts.released',
-  /** "<name> is now assigned · notified", with Undo. */
+  /** "<name> is now assigned · notified". */
   assigned: 'toasts.assigned',
-  /** " · follow-up task for tomorrow", after a move to Follow-up. */
-  followUpTask: 'toasts.followUpTask',
-  /** "Patient record created for <name> · lead stays linked", with Undo. */
-  converted: 'toasts.converted',
 } as const;

@@ -40,9 +40,10 @@ export interface TeamCardData {
   initials?: string;
   /** The member's own tone (`User.tone`). */
   tone: Tone;
-  /** Their role(s), as shown ("Doctor", "Front desk · Admin"). */
+  /** Their role(s), as shown ("Doctor", "Front desk · Admin"); empty when not known. */
   role: string;
-  online: boolean;
+  /** Their presence; absent when the room cannot know it (no line, no dot). */
+  online?: boolean;
   /** E.164. */
   phone?: string | null;
   email?: string | null;
@@ -90,6 +91,12 @@ function teamReach(data: TeamCardData, t: TFunction): ReachLine<string>[] {
   return rows.filter((row): row is ReachLine<string> => Boolean(row.text));
 }
 
+/** The avatar's presence dot — none when the presence is not known. */
+function presenceOf(online: boolean | undefined): 'online' | 'offline' | undefined {
+  if (online === undefined) return undefined;
+  return online ? 'online' : 'offline';
+}
+
 /** The header: 48px avatar with the presence dot, name, role, presence line, kind pill. */
 function TeamHeader({ data, kind }: { data: TeamCardData; kind?: TeamCardKind }) {
   const { t } = useTranslation(PERSON_CARD_NS);
@@ -100,7 +107,7 @@ function TeamHeader({ data, kind }: { data: TeamCardData; kind?: TeamCardKind })
         size="card"
         initials={data.initials ?? personInitials(data.name)}
         tone={data.tone}
-        presence={data.online ? 'online' : 'offline'}
+        presence={presenceOf(data.online)}
       />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.3]">
         <span
@@ -109,19 +116,23 @@ function TeamHeader({ data, kind }: { data: TeamCardData; kind?: TeamCardKind })
         >
           {data.name}
         </span>
-        <span className="text-muted-foreground-strong text-xs leading-[1.3]">
-          {data.role}
-        </span>
-        <span className="text-caption text-muted-foreground flex items-center gap-1.5 leading-[1.3]">
-          <span
-            aria-hidden="true"
-            className={cn(
-              'size-1.5 rounded-full',
-              data.online ? 'bg-presence-online' : 'bg-border-strong',
-            )}
-          />
-          {t(data.online ? keys.online : keys.offline)}
-        </span>
+        {data.role ? (
+          <span className="text-muted-foreground-strong text-xs leading-[1.3]">
+            {data.role}
+          </span>
+        ) : null}
+        {data.online === undefined ? null : (
+          <span className="text-caption text-muted-foreground flex items-center gap-1.5 leading-[1.3]">
+            <span
+              aria-hidden="true"
+              className={cn(
+                'size-1.5 rounded-full',
+                data.online ? 'bg-presence-online' : 'bg-border-strong',
+              )}
+            />
+            {t(data.online ? keys.online : keys.offline)}
+          </span>
+        )}
       </div>
       {kind ? (
         <TonePill tone={KIND_PILL[kind]} size="sm" className="self-start">

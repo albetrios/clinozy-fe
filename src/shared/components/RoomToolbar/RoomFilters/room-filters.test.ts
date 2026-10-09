@@ -132,14 +132,16 @@ describe('editing the pending set', () => {
 
 describe('a people filter (the Leads "Team")', () => {
   const PEOPLE = { owner: { kind: 'people' } } as const satisfies RoomFilterFields;
-  const RIYA = '00000000-0000-4000-8000-000000000012';
-  const NIDHI = '00000000-0000-4000-8000-000000000013';
+  const RIYA = 'mem_riya00000000000000000';
+  const NIDHI = 'mem_nidhi0000000000000000';
 
-  it('reads record ids from the URL and drops anything else', () => {
+  it('reads membership ids from the URL and drops anything else', () => {
     expect(roomFilterValues(PEOPLE, { owner: [RIYA, 'riya', NIDHI] })).toEqual({
       owner: [RIYA, NIDHI],
     });
-    expect(roomFilterValues(PEOPLE, { owner: 'nobody' })).toEqual({});
+    expect(
+      roomFilterValues(PEOPLE, { owner: '00000000-0000-4000-8000-000000000012' }),
+    ).toEqual({});
   });
 
   it('writes the picked ids as a list and counts each person', () => {
@@ -150,9 +152,39 @@ describe('a people filter (the Leads "Team")', () => {
     expect(countRoomFilters(PEOPLE, { owner: [RIYA, NIDHI] })).toBe(2);
   });
 
+  it('keeps one person, as a plain value, when the filter is single', () => {
+    const ONE = {
+      member: { kind: 'people', single: true },
+    } as const satisfies RoomFilterFields;
+    expect(roomFilterValues(ONE, { member: [NIDHI, RIYA] })).toEqual({ member: [NIDHI] });
+    expect(roomFilterSearchPatch(ONE, { member: [RIYA] })).toEqual({ member: RIYA });
+    expect(toggleRoomFilterOption({ member: [RIYA] }, 'member', NIDHI, true)).toEqual({
+      member: [NIDHI],
+    });
+  });
+
   it('clears one section with "Clear", the others kept', () => {
     expect(clearRoomFilter({ owner: [RIYA], gender: ['female'] }, 'owner')).toEqual({
       gender: ['female'],
+    });
+  });
+});
+
+describe('a date filter without some presets', () => {
+  const DATES = {
+    followUp: { kind: 'date', presets: 'followUp', without: ['not_set'] },
+  } as const satisfies RoomFilterFields;
+
+  it('drops a preset the room cannot filter by, keeps the rest and ranges', () => {
+    expect(roomFilterValues(DATES, { followUp: 'not_set' })).toEqual({});
+    expect(roomFilterValues(DATES, { followUp: 'overdue' })).toEqual({
+      followUp: ['overdue'],
+    });
+    expect(roomFilterSearchPatch(DATES, { followUp: ['not_set'] })).toEqual({
+      followUp: undefined,
+    });
+    expect(roomFilterValues(DATES, { followUp: '2026-10-01..2026-10-07' })).toEqual({
+      followUp: ['2026-10-01..2026-10-07'],
     });
   });
 });

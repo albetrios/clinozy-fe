@@ -1,17 +1,16 @@
 import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
+import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LeadContactHit } from '@/shared/api/clinic/leads-contracts.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   CONTACT_EDITOR_KEYS,
   CONTACT_EDITOR_NS,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { Plus, Search } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
@@ -25,43 +24,47 @@ export interface NewLeadContactStepProps {
   onQueryChange: (query: string) => void;
   /** Takes focus when the drawer opens (`leads.md:150`). */
   searchRef: Ref<HTMLInputElement>;
-  hits: readonly LeadContactHit[];
+  hits: readonly ContactSummary[];
   noMatch: boolean;
   /** Which Quick start chip the form's values match. */
   pressed: (preset: NewLeadPreset) => boolean;
   onPreset: (preset: NewLeadPreset) => void;
-  onPick: (hit: LeadContactHit) => void;
+  /** A person picked: the lead will be theirs. */
+  onPick: (hit: ContactSummary) => void;
+  /** A person with an open lead already: "Open lead" goes to it (one open lead each, L6). */
+  onOpenLead: (leadId: string) => void;
   onNewContact: () => void;
 }
 
 /**
- * A hit's second line: "Patient #3508 · last visit 24 Sep" or "Lead #2365 ·
- * +91 98250 11241" — the last visit's day by the rooms' one time rule ("Today",
- * as the design words it, H:3318, H:5824; "Yesterday", "Mon", "24 Sep"); the id
- * and the phone isolated, so each stays whole on a right-to-left page.
+ * A hit's second line: "Patient · C-12345 · +91 98250 11241", "Open lead · …" or
+ * "C-12345 · +91 98250 11241" — the id and the phone isolated, so each stays whole
+ * on a right-to-left page. The design's last visit is not on the person (route map §4).
  */
 function useHitLine() {
   const { t } = useTranslation(LEADS_NS);
-  const clock = useClinicClock();
-  return (hit: LeadContactHit) => {
-    if (hit.kind === 'patient') {
-      const id = displayId.patient(hit.seq);
-      if (!hit.lastVisit) return t(K.hits.patientNew, isolateValues({ id }));
-      // The rule's day word keeps the page's direction; the id is isolated.
-      return t(K.hits.patient, { id: isolateText(id), date: clock.day(hit.lastVisit) });
-    }
-    const phone = formatClinicPhone(hit.phone);
-    return hit.contactThread
-      ? t(K.hits.contact, isolateValues({ phone }))
-      : t(K.hits.lead, isolateValues({ id: displayId.lead(hit.seq), phone }));
+  return (hit: ContactSummary) => {
+    const values = isolateValues({
+      id: displayId.contact(hit.contactNumber),
+      phone: formatClinicPhone(hit.primaryPhone),
+    });
+    if (hit.openLeadId) return t(K.hits.openLead, values);
+    return t(hit.patientId ? K.hits.patient : K.hits.contact, values);
   };
 }
 
+/** A hit's action: "Open lead" while they have one, "Re-create lead" for a patient, else "Use contact". */
+function hitActionKey(hit: ContactSummary): string {
+  if (hit.openLeadId) return K.hits.open;
+  return hit.patientId ? K.hits.recreate : K.hits.useContact;
+}
+
 /**
- * New lead's Contact step (H:1890–1895): the 44px search — from two
- * characters, five people at most, "No existing match" — the Quick start
- * chips, the hits ("Re-create lead" for a patient, "Use contact" for anyone
- * else) and the 40px "New contact" row, which opens the contact editor.
+ * New lead's Contact step (H:1890–1895): the 44px search — from 3 letters or 4
+ * digits, eight people at most, "No existing match" — the Quick start chips,
+ * the hits ("Open lead" for someone with one, "Re-create lead" for a patient,
+ * "Use contact" for anyone else) and the 40px "New contact" row, which opens the
+ * contact editor.
  */
 export function NewLeadContactStep({
   query,
@@ -72,6 +75,7 @@ export function NewLeadContactStep({
   pressed,
   onPreset,
   onPick,
+  onOpenLead,
   onNewContact,
 }: NewLeadContactStepProps) {
   const { t } = useTranslation(LEADS_NS);
@@ -128,17 +132,20 @@ export function NewLeadContactStep({
       <div className="flex flex-col">
         {hits.map((hit) => (
           <button
-            key={`${hit.kind}-${hit.id}`}
+            key={hit.id}
             type="button"
-            onClick={() => onPick(hit)}
-            data-testid={`${LEADS_TEST_IDS.newLeadHit}-${hit.kind}-${hit.seq}`}
+            onClick={() => {
+              if (hit.openLeadId) onOpenLead(hit.openLeadId);
+              else onPick(hit);
+            }}
+            data-testid={`${LEADS_TEST_IDS.newLeadHit}-${hit.contactNumber}`}
             className="hover:bg-canvas border-b-muted flex items-center gap-2.5 border-b px-3 py-2 text-start"
           >
             <PersonAvatar
               initials={personInitials(hit.name)}
-              tone={hit.kind === 'patient' ? 'sage' : 'lav'}
+              tone={hit.patientId ? 'sage' : 'lav'}
               size="roster"
-              patient={hit.kind === 'patient'}
+              patient={hit.patientId !== null}
             />
             <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
               <span
@@ -152,7 +159,7 @@ export function NewLeadContactStep({
               </span>
             </span>
             <span className="text-foreground-soft flex-none text-xs font-medium">
-              {t(hit.kind === 'patient' ? K.hits.recreate : K.hits.useContact)}
+              {t(hitActionKey(hit))}
             </span>
           </button>
         ))}

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
+
 /**
  * Shared Zod helpers for clinozy-be wire shapes.
  *
@@ -22,9 +24,7 @@ export function publicId(prefix: string) {
 }
 
 /** Generic public-id guard accepting any valid 2–5 char prefix. */
-export const anyPublicIdSchema = z
-  .string()
-  .regex(/^[a-z]{2,5}_[a-z0-9]{21}$/, 'invalid public id');
+export const anyPublicIdSchema = z.string().regex(PUBLIC_ID, 'invalid public id');
 
 /** ISO-8601 timestamp string (clinozy-be returns dates as ISO strings, never epochs). */
 export const isoDateString = z

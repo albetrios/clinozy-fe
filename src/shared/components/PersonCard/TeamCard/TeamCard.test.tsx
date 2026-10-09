@@ -76,6 +76,24 @@ describe('TeamCardContent', () => {
     );
   });
 
+  it('shows no presence and no role when the room cannot know them', () => {
+    const { container } = render(
+      <TooltipProvider>
+        <TeamCardContent
+          data={{ name: 'Riya Shah', initials: 'RS', tone: 'blush', role: '' }}
+          close={() => {}}
+        />
+      </TooltipProvider>,
+    );
+    expect(screen.getByText('Riya Shah')).toBeInTheDocument();
+    // No presence line and no avatar dot…
+    expect(screen.queryByText('Online now')).toBeNull();
+    expect(screen.queryByText('Offline')).toBeNull();
+    expect(container.querySelector('[data-presence]')).toBeNull();
+    // …and under the name, no role line: the name is its column's only line.
+    expect(screen.getByText('Riya Shah').parentElement?.children).toHaveLength(1);
+  });
+
   it.each([
     ['assigned', 'Assigned', 'bg-primary'],
     ['sentThis', 'Sent this', 'bg-tone-sage'],

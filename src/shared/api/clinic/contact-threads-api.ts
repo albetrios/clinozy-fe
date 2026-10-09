@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { phoneSchema } from './clinic-schema.ts';
-import { leadRecordSchema } from './leads-contracts.ts';
+import { leadRecordSchema } from './leads-fixture-contracts.ts';
 
 /**
  * Contact threads (D32, S:251–262): a person who is not a lead still chats in

@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import type { LeadMessage, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
+  ChatMessage,
   ChatThread,
   ChatWhen,
   ContactHistoryEntry,
@@ -260,7 +261,7 @@ export function historyChip(entry: ContactHistoryEntry, format: ChatFormat): His
 export type ThreadEntry =
   | { kind: 'history'; key: string; sortAt: string; chip: HistoryChip; when: string }
   | { kind: 'system'; key: string; sortAt: string; text: string; when: string }
-  | { kind: 'message'; key: string; sortAt: string; message: LeadMessage }
+  | { kind: 'message'; key: string; sortAt: string; message: ChatMessage }
   | { kind: 'outbox'; key: string; sortAt: string; message: OutboxMessage };
 
 /**
@@ -271,7 +272,7 @@ export type ThreadEntry =
  * closed · <result>", `tasks.md:83`) gets no second line from the history.
  */
 export function threadEntries(
-  messages: readonly LeadMessage[],
+  messages: readonly ChatMessage[],
   outbox: readonly OutboxMessage[],
   history: readonly ContactHistoryEntry[],
   format: ChatFormat,

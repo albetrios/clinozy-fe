@@ -9,7 +9,9 @@ describe('leadTableMinWidth (H:4181)', () => {
 
   it('recomputes as columns hide: the sum of minimums, 12px gaps, plus 60', () => {
     // Lead 160 + Team 150 + Updated 84, two gaps, 60.
-    expect(leadTableMinWidth(['name', 'team', 'updated'])).toBe(160 + 150 + 84 + 24 + 60);
+    expect(leadTableMinWidth(['name', 'team', 'activity'])).toBe(
+      160 + 150 + 84 + 24 + 60,
+    );
     expect(leadTableMinWidth(['name'])).toBe(220);
     expect(leadTableMinWidth([])).toBe(0);
   });

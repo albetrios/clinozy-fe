@@ -15,7 +15,7 @@ import {
   ensureContactThreadInputSchema,
   type EnsureContactThreadResult,
 } from '@/shared/api/clinic/contact-threads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 
 import { systemLine } from './messages.fixtures.ts';
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';

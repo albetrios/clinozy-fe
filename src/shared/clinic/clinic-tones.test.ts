@@ -7,7 +7,7 @@ import {
   SECTION_VALUES,
   TONE_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-contracts.ts';
+import { LEAD_RECORD_SOURCE_VALUES } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 
 import {
   APPOINTMENT_STATUS_TONES,

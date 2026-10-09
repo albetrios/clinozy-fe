@@ -1,34 +1,29 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { findOpenLeadByPhone } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadContactHit, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import { fetchContact } from '@/shared/api/clinic/contacts-api.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
-import {
-  PERSON_CARD_KEYS,
-  PERSON_CARD_NS,
-} from '@/shared/components/PersonCard/person-card.constants.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-import type { ContactEditorRecord } from '@/shared/forms/ContactEditor/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import {
   ContactEditor,
   contactFieldsOf,
+  contactValueName,
   extraReachCount,
   primaryPhoneOf,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { useCreateLead, useLeadContactSearch } from '@/shared/hooks/useLeads/index.ts';
+import { useContactSearch } from '@/shared/hooks/useContacts/index.ts';
+import { useCreateLead } from '@/shared/hooks/useLeads/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
-import { leadReach } from '../LeadFields/lead-contact.ts';
 import {
   LeadContactStrip,
   LeadInterestsField,
@@ -44,7 +39,6 @@ import {
   type NewLeadPreset,
   presetPressed,
   withoutContact,
-  withoutOrigin,
   withPickedContact,
 } from './new-lead-form.ts';
 import { NewLeadContactStep } from './NewLeadContactStep.tsx';
@@ -55,38 +49,65 @@ const K = LEADS_KEYS.newLead;
 export interface NewLeadDrawerProps {
   /** `?name=&phone=` — ⌘K's "New lead", the contact card's "+ Lead". */
   prefill: NewLeadPrefill;
-  staff: readonly StaffProfile[];
-  /** The signed-in member — the owner until someone else is assigned. */
-  viewer: StaffProfile | null;
+  /** The active members (`useTeamDirectory`). */
+  members: readonly DirectoryMember[];
+  /** The signed-in member's membership — the owner until someone else is assigned. */
+  viewerId: string | null;
   /** Cancel, ×, the backdrop, Esc — nothing asks first (`leads.md:90`, Q-P1). */
   onClose: () => void;
   /** Created: the drawer closes over the list, which picks the new lead out (D28). */
   onCreated: (lead: LeadRecord) => void;
-  /** A 409's "Open": the lead already on this mobile. */
+  /** "Open lead": the person's open lead (a hit's, or a 409's). */
   onOpenLead: (leadId: string) => void;
 }
 
-/** The record the form's person came from, as the card and the editor name it ("#3508"). */
-function originRecordOf(form: NewLeadForm): ContactEditorRecord | null {
-  const { origin } = form;
-  if (!origin) return null;
-  return origin.kind === 'patient'
-    ? { kind: 'patient', displayId: displayId.patient(origin.seq) }
-    : { kind: 'lead', displayId: displayId.lead(origin.seq) };
+/**
+ * The contact card for the form's person: the one picked — a patient's card once they have a
+ * file — or the one typed, a lead's.
+ */
+function contactCardOf(form: NewLeadForm): ContactCardData {
+  const { picked } = form;
+  if (picked) {
+    return {
+      kind: picked.patientId ? 'patient' : 'lead',
+      name: picked.name,
+      displayId: displayId.contact(picked.contactNumber),
+      reach: [
+        { channel: 'phone', phone: picked.primaryPhone },
+        ...picked.instagramHandles.map((handle) => ({
+          channel: 'instagram' as const,
+          handle,
+        })),
+      ],
+    };
+  }
+  const fields = contactFieldsOf(form.contact);
+  return {
+    kind: 'lead',
+    name: contactValueName(form.contact),
+    reach: [
+      ...fields.phones.map((entry) => ({
+        channel: entry.isOnWhatsapp ? ('whatsapp' as const) : ('phone' as const),
+        phone: entry.phone,
+      })),
+      ...fields.instagramHandles.map((handle) => ({
+        channel: 'instagram' as const,
+        handle,
+      })),
+    ],
+  };
 }
 
-/** The contact card for the form's person — a patient's once one was picked, else a lead's. */
-function contactCardOf(form: NewLeadForm): ContactCardData {
-  const record = originRecordOf(form);
-  return {
-    kind: record?.kind === 'patient' ? 'patient' : 'lead',
-    name: form.contact.name.trim(),
-    displayId: record?.displayId ?? null,
-    reach: leadReach({
-      phone: primaryPhoneOf(form.contact) ?? '',
-      contact: contactFieldsOf(form.contact).contact,
-    }),
-  };
+/**
+ * The open lead a picked person has now — the 409 names it only in its words, and a lead opened
+ * since the search is not on the hit; `null` when the read fails.
+ */
+async function openLeadOf(contactId: string): Promise<string | null> {
+  try {
+    return (await fetchContact(contactId)).openLeadId;
+  } catch {
+    return null;
+  }
 }
 
 /** The form's write: "Saving…", then the new lead or the failure's toast. */
@@ -108,18 +129,20 @@ function useCreate(
       onCreated(await create.mutateAsync(input));
     } catch (error) {
       setFailed(true);
-      const existing =
-        isHttpError(error) && error.status === 409
-          ? await findOpenLeadByPhone(input.phone)
+      // The server's words name the clash: the person's open lead (`lead_open_exists`, L6) or
+      // the contact a new number belongs to (`contact_phone_exists`, CT3).
+      const message = mapApiError(error);
+      const openLeadId =
+        apiErrorReason(error) === 'lead_open_exists' && form.picked
+          ? await openLeadOf(form.picked.id)
           : null;
-      if (!existing) {
-        notify.error(mapApiError(error));
+      if (openLeadId) {
+        notify.error(message, {
+          action: { label: t(K.toasts.open), onClick: () => onOpenLead(openLeadId) },
+        });
         return;
       }
-      // The mobile is already on an open lead (`S:1593`): "Open" goes to it (Q-P7).
-      notify.error(t(K.toasts.duplicate, { id: displayId.lead(existing.seq) }), {
-        action: { label: t(K.toasts.open), onClick: () => onOpenLead(existing.id) },
-      });
+      notify.error(message);
     }
   };
   let saveState: DrawerSaveState = 'idle';
@@ -138,14 +161,12 @@ type FormSetter = (next: (current: NewLeadForm) => NewLeadForm) => void;
 function NewLeadDetails({
   form,
   ownerId,
-  staff,
-  viewer,
+  members,
   setForm,
 }: {
   form: NewLeadForm;
   ownerId: string | null;
-  staff: readonly StaffProfile[];
-  viewer: StaffProfile | null;
+  members: readonly DirectoryMember[];
   setForm: FormSetter;
 }) {
   return (
@@ -158,35 +179,27 @@ function NewLeadDetails({
       </div>
       <div className="col-span-full">
         <LeadInterestsField
-          value={{ interests: form.interests, customInterests: form.customInterests }}
-          onChange={(next) =>
-            setForm((current) => ({
-              ...current,
-              interests: [...next.interests],
-              customInterests: [...next.customInterests],
-            }))
-          }
+          value={form.interests}
+          onChange={(interests) => setForm((current) => ({ ...current, interests }))}
         />
       </div>
       <LeadPeopleField
         ownerId={ownerId}
         involvedIds={form.involvedIds}
-        staff={staff}
-        viewer={viewer}
-        anyoneAssignable
-        onAssign={(person) =>
+        members={members}
+        onAssign={(member) =>
           setForm((current) => ({
             ...current,
-            ownerId: person.id,
-            involvedIds: current.involvedIds.filter((id) => id !== person.id),
+            ownerId: member.id,
+            involvedIds: current.involvedIds.filter((id) => id !== member.id),
           }))
         }
-        onToggleInvolved={(person, involved) =>
+        onToggleInvolved={(member, involved) =>
           setForm((current) => ({
             ...current,
             involvedIds: involved
-              ? [...current.involvedIds, person.id]
-              : current.involvedIds.filter((id) => id !== person.id),
+              ? [...current.involvedIds, member.id]
+              : current.involvedIds.filter((id) => id !== member.id),
           }))
         }
       />
@@ -194,7 +207,10 @@ function NewLeadDetails({
   );
 }
 
-/** The person's strip in place of the Contact step (`leads.md:252–256`), with "Change". */
+/**
+ * The person's strip in place of the Contact step (`leads.md:252–256`), with "Change". A new
+ * person is edited here; a picked one in the lead drawer, once the lead is theirs.
+ */
 function NewLeadPerson({
   form,
   onEdit,
@@ -205,14 +221,17 @@ function NewLeadPerson({
   onChange: () => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const extra = extraReachCount(form.contact);
+  const { picked } = form;
+  const extra = picked ? picked.instagramHandles.length : extraReachCount(form.contact);
+  const typedPhone =
+    primaryPhoneOf(form.contact) ?? form.contact.phones[0]?.digits ?? null;
   return (
     <LeadContactStrip
       card={contactCardOf(form)}
-      name={form.contact.name.trim()}
-      phone={primaryPhoneOf(form.contact) ?? form.contact.phones[0]?.digits ?? null}
+      name={picked ? picked.name : contactValueName(form.contact)}
+      phone={picked ? picked.primaryPhone : typedPhone}
       more={extra > 0 ? t(K.more, { count: extra }) : undefined}
-      onEditContact={onEdit}
+      onEditContact={picked ? undefined : onEdit}
       onChangeContact={onChange}
       aside={
         <Button
@@ -240,36 +259,36 @@ function NewLeadPerson({
  * editor, or prefilled — the person's strip with "Change", and Lead details
  * as step 1: Source, Interested in, Assigned & involved (the signed-in member
  * first; anyone can be assigned). "Create lead" checks for a name and a
- * 10-digit mobile, then creates; a mobile already on an open lead toasts with
- * "Open". Every exit closes at once.
+ * 10-digit mobile, then creates — for the person picked (`contact_id`), or with
+ * the new one (`contact`); the server's 409 names the clash — the person's open
+ * lead, with "Open", or the contact a new number belongs to. Every exit closes at
+ * once.
  */
 export function NewLeadDrawer({
   prefill,
-  staff,
-  viewer,
+  members,
+  viewerId,
   onClose,
   onCreated,
   onOpenLead,
 }: NewLeadDrawerProps) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tCard } = useTranslation(PERSON_CARD_NS);
-  const [form, setForm] = useState(() => newLeadForm(prefill, viewer?.id ?? null));
+  const [form, setForm] = useState(() => newLeadForm(prefill, viewerId));
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
-  const search = useLeadContactSearch(query);
+  const search = useContactSearch(query);
   const { save, saveState } = useCreate(onCreated, onOpenLead);
   const contactSet = hasNewLeadContact(form);
-  // The member may load after the drawer opens: until someone is assigned, it is them.
-  const ownerId = form.ownerId ?? viewer?.id ?? null;
-  const record = originRecordOf(form);
+  // The membership may load after the drawer opens: until someone is assigned, it is them.
+  const ownerId = form.ownerId ?? viewerId;
 
-  const pick = (hit: LeadContactHit) => {
+  const pick = (hit: ContactSummary) => {
     setForm((current) => withPickedContact(current, hit));
     setQuery('');
     notify.success(
-      hit.kind === 'patient'
-        ? t(K.toasts.existingPatient, { id: displayId.patient(hit.seq) })
+      hit.patientId
+        ? t(K.toasts.existingPatient, { id: displayId.contact(hit.contactNumber) })
         : t(K.toasts.existingContact, { name: hit.name }),
     );
   };
@@ -277,13 +296,7 @@ export function NewLeadDrawer({
     id: 'details',
     title: t(LEADS_KEYS.drawer.cards.details),
     content: (
-      <NewLeadDetails
-        form={form}
-        ownerId={ownerId}
-        staff={staff}
-        viewer={viewer}
-        setForm={setForm}
-      />
+      <NewLeadDetails form={form} ownerId={ownerId} members={members} setForm={setForm} />
     ),
   };
   const contact: DrawerStep = {
@@ -298,14 +311,11 @@ export function NewLeadDrawer({
         noMatch={search.noMatch}
         pressed={(preset) => presetPressed(form, preset)}
         onPreset={(preset: NewLeadPreset) => {
-          setForm((current) => ({
-            ...current,
-            source: preset.source,
-            status: preset.status,
-          }));
+          setForm((current) => ({ ...current, source: preset.source }));
           notify.success(t(K.toasts.presetApplied, { preset: t(K.presets[preset.id]) }));
         }}
         onPick={pick}
+        onOpenLead={onOpenLead}
         onNewContact={() => setEditing(true)}
       />
     ),
@@ -351,18 +361,6 @@ export function NewLeadDrawer({
       <ContactEditor
         open={editing}
         value={form.contact}
-        record={record}
-        linked={
-          record
-            ? {
-                text: t(K.linked, {
-                  name: isolateText(form.contact.name.trim()),
-                  kind: `${tCard(PERSON_CARD_KEYS.kind[record.kind])} ${isolateText(record.displayId)}`,
-                }),
-                onUndo: () => setForm((current) => withoutOrigin(current)),
-              }
-            : undefined
-        }
         onDone={(value) => {
           setForm((current) => ({ ...current, contact: value }));
           setEditing(false);

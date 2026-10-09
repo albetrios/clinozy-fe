@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { Appointment, Treatment } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { TaskDetail, TaskStaff } from '@/shared/api/clinic/tasks-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';

@@ -12,6 +12,12 @@ export type SortDirection = 'asc' | 'desc';
 /** A record id in the URL — a UUID, either case (`?owner=`, `?doctor=`, `?who=`). */
 export const RECORD_ID = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
 
+/**
+ * A clinozy-be public id — `<prefix>_<21 lowercase alphanumerics>`, the prefix 2–5 letters
+ * (`mem_…`, `lead_…`): a record of a room on the API, in the URL or on the wire.
+ */
+export const PUBLIC_ID = /^[a-z]{2,5}_[a-z0-9]{21}$/;
+
 /** A raw param as trimmed text — the router reads `?q=2363` as a number. */
 export function textOf(value: unknown): string {
   return typeof value === 'string' || typeof value === 'number'

@@ -16,7 +16,7 @@ import type {
   AppointmentType,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clockMinutes } from '@/shared/api/clinic/clinic-time.ts';
-import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-contracts.ts';
+import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 /*

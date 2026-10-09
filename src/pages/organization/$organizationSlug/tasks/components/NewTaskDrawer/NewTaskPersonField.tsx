@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { searchLeadContacts } from '@/shared/api/clinic/leads-api.ts';
+import { searchFixtureLeadContacts } from '@/shared/api/clinic/leads-fixture-api.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
@@ -22,7 +22,7 @@ export interface NewTaskPersonFieldProps {
 /**
  * New task's "For" (KICKOFF §6.10 New task, Q-T4): the shared Picker over
  * patients and leads, searched by name, mobile or number — the contact search
- * New lead reads (`searchLeadContacts`). A hit shows its avatar (sage with the
+ * New lead read (`searchFixtureLeadContacts`). A hit shows its avatar (sage with the
  * "P" for a patient, lav otherwise), its record and its mobile.
  */
 export function NewTaskPersonField({
@@ -54,7 +54,7 @@ export function NewTaskPersonField({
   });
 
   const load = async (query: string): Promise<ListPage<PickerOption<NewTaskPerson>>> => {
-    const hits = await searchLeadContacts(query);
+    const hits = await searchFixtureLeadContacts(query);
     return {
       rows: hits.map((hit) => optionOf(personOfHit(hit), hit.phone)),
       next: null,

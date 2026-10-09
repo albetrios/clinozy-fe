@@ -1,42 +1,37 @@
 import { useState } from 'react';
 
-import type { LeadInterest, LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  LeadPatch,
-  LeadRecord,
-  LeadRecordSource,
-} from '@/shared/api/clinic/leads-contracts.ts';
+  LeadInterest,
+  LeadSource,
+  LeadStatus,
+} from '@/shared/api/clinic/clinic-schema.ts';
+import type { LeadFields, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import { useUpdateLead } from '@/shared/hooks/useLeads/index.ts';
 
 /** What the drawer drafts until "Save lead" (`leads.md:63–66`): the people apply at once. */
 export interface LeadDraft {
-  source: LeadRecordSource | null;
+  source: LeadSource | null;
   interests: readonly LeadInterest[];
-  customInterests: readonly string[];
-  status: LeadStatus | null;
+  status: LeadStatus;
 }
 
 const draftOf = (lead: LeadRecord): LeadDraft => ({
   source: lead.source,
   interests: lead.interests,
-  customInterests: lead.customInterests,
   status: lead.status,
 });
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((item, index) => item === b[index]);
 
-/** The draft's changes from the saved lead, as a patch — empty when nothing changed. */
-export function leadDraftPatch(lead: LeadRecord, draft: LeadDraft): LeadPatch {
-  const patch: LeadPatch = {};
-  if (draft.source !== lead.source && draft.source !== null) patch.source = draft.source;
-  if (!sameList(draft.interests, lead.interests)) patch.interests = [...draft.interests];
-  if (!sameList(draft.customInterests, lead.customInterests)) {
-    patch.customInterests = [...draft.customInterests];
-  }
-  if (draft.status !== lead.status && draft.status !== null) patch.status = draft.status;
-  return patch;
+/** The draft's changes from the saved lead — empty when nothing changed. */
+export function leadDraftFields(lead: LeadRecord, draft: LeadDraft): Partial<LeadFields> {
+  const fields: Partial<LeadFields> = {};
+  if (draft.source !== lead.source) fields.source = draft.source;
+  if (!sameList(draft.interests, lead.interests)) fields.interests = [...draft.interests];
+  if (draft.status !== lead.status) fields.status = draft.status;
+  return fields;
 }
 
 /** The lead drawer's draft, its save and its discard. */
@@ -49,21 +44,32 @@ export interface LeadDraftState {
   discard: () => void;
 }
 
+/** The newer of two reads of one lead — a save's answer until the refetch catches up. */
+const newerOf = (read: LeadRecord, saved: LeadRecord | null): LeadRecord =>
+  saved && saved.id === read.id && saved.updatedAt > read.updatedAt ? saved : read;
+
 /**
  * The lead drawer's draft (KICKOFF §6.3 Save): source, interests and status
- * held until "Save lead", which saves through `useUpdateLead` (the status's
- * side effects and their Undo are its own); "Discard" drops it. A draft
- * belongs to one lead — another lead starts from its own record.
+ * held until "Save lead", which sends them with the read's `updated_at`
+ * (`useUpdateLead` — a lead someone saved meanwhile is `409 record_changed`);
+ * "Discard" drops it. A draft belongs to one lead — another lead starts from
+ * its own record. A save's answer stands for the record until the refetch brings
+ * it: the draft is clean at once, and the next save carries the new `updated_at`.
  */
-export function useLeadDraft(lead: LeadRecord, viewerId: string | null): LeadDraftState {
-  const [state, setState] = useState(() => ({ id: lead.id, draft: draftOf(lead) }));
+export function useLeadDraft(lead: LeadRecord): LeadDraftState {
+  const [state, setState] = useState(() => ({
+    id: lead.id,
+    draft: draftOf(lead),
+    saved: null as LeadRecord | null,
+  }));
   const [saveState, setSaveState] = useState<DrawerSaveState>('idle');
   const save = useUpdateLead();
-  // Another lead, or the same one saved: the draft starts again from the record.
-  if (state.id !== lead.id) setState({ id: lead.id, draft: draftOf(lead) });
+  // Another lead: the draft starts again from its record.
+  if (state.id !== lead.id) setState({ id: lead.id, draft: draftOf(lead), saved: null });
+  const record = newerOf(lead, state.saved);
   const draft = state.id === lead.id ? state.draft : draftOf(lead);
-  const patch = leadDraftPatch(lead, draft);
-  const dirty = Object.keys(patch).length > 0;
+  const fields = leadDraftFields(record, draft);
+  const dirty = Object.keys(fields).length > 0;
 
   return {
     draft,
@@ -75,18 +81,18 @@ export function useLeadDraft(lead: LeadRecord, viewerId: string | null): LeadDra
       if (!dirty || saveState === 'saving') return;
       setSaveState('saving');
       save.mutate(
-        { id: lead.id, patch, viewerId },
+        { lead: record, fields },
         {
-          onSuccess: ({ lead: saved }) => {
+          onSuccess: (saved) => {
             setSaveState('idle');
-            setState({ id: saved.id, draft: draftOf(saved) });
+            setState({ id: saved.id, draft: draftOf(saved), saved });
           },
           onError: () => setSaveState('failed'),
         },
       );
     },
     discard: () => {
-      setState({ id: lead.id, draft: draftOf(lead) });
+      setState((previous) => ({ ...previous, draft: draftOf(record) }));
       setSaveState('idle');
     },
   };

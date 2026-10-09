@@ -41,7 +41,7 @@ import {
   type ContactLinkedNotice,
   ContactPreferenceFields,
 } from './contact-editor-fields.tsx';
-import type { ContactEditorValue } from './contact-editor-value.ts';
+import { type ContactEditorValue, contactValueName } from './contact-editor-value.ts';
 
 const K = CONTACT_EDITOR_KEYS;
 
@@ -226,14 +226,14 @@ function ContactEditorPanel({
   // "+ Custom" is being typed: Esc leaves the field, not the editor.
   const [adding, setAdding] = useState(false);
 
+  const name = contactValueName(draft);
   const steps: DrawerStep[] = [
     {
       id: 'identity',
       title: t(K.steps.identity),
-      // Collapsed, the card names the contact; green once it has a name (H:4483, `accVM`).
-      summary:
-        step === 'identity' ? undefined : isolateText(draft.name.trim()) || undefined,
-      complete: draft.name.trim() !== '',
+      // Collapsed, the card names the contact; green once it has a first name (H:4483, `accVM`).
+      summary: step === 'identity' || name === '' ? undefined : isolateText(name),
+      complete: draft.firstName.trim() !== '',
       content: (
         <ContactIdentityFields
           value={draft}
@@ -269,7 +269,7 @@ function ContactEditorPanel({
         largeTitle
         band={
           <ContactEditorBand
-            name={draft.name}
+            name={name}
             record={record}
             actions={actions}
             onLeave={onClose}

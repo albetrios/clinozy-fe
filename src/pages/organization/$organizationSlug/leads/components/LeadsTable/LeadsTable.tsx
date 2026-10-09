@@ -79,10 +79,7 @@ export function LeadsTable({
         refreshing={list.isRefreshing}
         onRowClick={(row) => onOpen(row.original)}
         isRowActive={(row) => row.original.id === openLeadId}
-        getRowTone={(row) => {
-          const { status } = row.original;
-          return status ? LEAD_STATUS_TONES[status] : undefined;
-        }}
+        getRowTone={(row) => LEAD_STATUS_TONES[row.original.status]}
         // The lead rows' edge is the status dot colour (`leads.md:35`, H:5643).
         rowEdge="dot"
         empty={empty}

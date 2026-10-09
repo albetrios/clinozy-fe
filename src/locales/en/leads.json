@@ -10,19 +10,17 @@
     "claimed": "You now own {{name}} · {{owner}} stays involved",
     "claimedUnowned": "You now own {{name}}",
     "released": "Released to the team · anyone can claim",
-    "assigned": "{{name}} is now assigned · notified",
-    "followUpTask": " · follow-up task for tomorrow",
-    "converted": "Patient record created for {{name}} · lead stays linked"
+    "assigned": "{{name}} is now assigned · notified"
   },
   "list": {
     "records": "leads",
     "views": {
       "label": "Lead views",
       "mine": "Mine",
-      "unread": "Unreplied",
+      "unreplied": "Unreplied",
       "all": "All",
-      "unreadCount_one": "{{count}} unreplied",
-      "unreadCount_other": "{{count}} unreplied"
+      "unrepliedCount_one": "{{count}} unreplied",
+      "unrepliedCount_other": "{{count}} unreplied"
     },
     "search": {
       "placeholder": "Search name, phone, #ID",
@@ -44,15 +42,12 @@
   },
   "team": {
     "claim": "Open · Claim",
-    "join": "Open to team · Join",
+    "openHint": "Nobody holds it · anyone can claim it",
     "openMine": "Open to team",
-    "claimHint_one": "No activity for {{count}} day · anyone can claim it",
-    "claimHint_other": "No activity for {{count}} days · anyone can claim it",
-    "joinHint": "{{name}} has left the clinic · anyone on the team can join and take it",
-    "releasesToday": "Released to the team today if nobody follows up",
-    "releasesTomorrow": "Released to the team tomorrow if nobody follows up",
+    "openMineHint": "Your hold has ended · anyone can claim it",
+    "releasesToday": "Back to the team today at {{time}}",
+    "releasesTomorrow": "Back to the team tomorrow at {{time}}",
     "claimFirst": "Claim {{first}}",
-    "joinTake": "Join · take {{first}}",
     "takeOver": "Take over from {{first}}"
   },
   "filters": {
@@ -60,7 +55,7 @@
     "source": "Source · pick any",
     "clear": "Clear",
     "hold": {
-      "label": "Ownership · hold after idle days",
+      "label": "Ownership · held after a claim",
       "any": "Any",
       "open": "Open to claim",
       "soon": "Releasing today",
@@ -85,7 +80,6 @@
     "panels": "Lead panels",
     "details": "Details",
     "chat": "Chat",
-    "chatCount": "{{n}} new",
     "resize": "Resize panel",
     "resizeHint": "Drag to resize · double-click to reset",
     "cards": {
@@ -95,7 +89,6 @@
     },
     "source": "Source",
     "interests": "Interested in",
-    "addInterest": "Add interest",
     "people": "Assigned & involved",
     "peopleAria": "Assigned and involved people",
     "addInvolved": "+ Add involved",
@@ -111,18 +104,17 @@
     "stepTips": {
       "done": "{{status}} · completed",
       "current": "{{status}} · current step",
-      "next": "Move to {{status}}"
+      "next": "Move to {{status}}",
+      "byCheckIn": "Clinic visited · set when they check in"
     },
     "closeAs": "Close as",
     "info": {
       "created": "Created",
-      "lastMessage": "Last message",
-      "lastMessageValue": "{{channel}} · {{at}}",
+      "lastActivity": "Last activity",
       "none": "None yet",
       "patient": "Patient",
       "linked": "Linked",
       "notYet": "Not yet",
-      "convert": "Convert to patient",
       "openTasks": "Open tasks",
       "retargetReason": "Re-target reason"
     },
@@ -139,18 +131,9 @@
       "assigned": "Assigned",
       "currentlyAssigned": "Currently assigned",
       "assignTo": "Assign to {{name}}",
-      "onlyAssignee": "Only the assignee ({{name}}) can reassign",
-      "cantAssign": "{{role}} can’t assign to {{other}}",
       "involved": "Involved · worked on this lead",
       "noMatch": "No match",
-      "note": "✓ Involved = everyone who worked on this lead. Added automatically when they reply, call, note or book · you can add someone too",
-      "roleLine": "{{role}} · {{presence}}"
-    },
-    "presence": {
-      "online": "Online",
-      "away": "Away",
-      "busy": "Busy",
-      "offline": "Offline"
+      "note": "✓ Involved = everyone who worked on this lead. Added automatically when they reply, call, note or book · you can add someone too"
     },
     "remove": {
       "title": "Remove this lead?",
@@ -162,11 +145,6 @@
         "other": "Other"
       },
       "removed": "Lead #{{seq}} removed · {{reason}}"
-    },
-    "toasts": {
-      "claimedAfter_one": "Claimed by {{me}} after {{count}} idle day · {{owner}} stays involved",
-      "claimedAfter_other": "Claimed by {{me}} after {{count}} idle days · {{owner}} stays involved",
-      "releasedOpen": "{{name}} is open for anyone to claim"
     }
   },
   "newLead": {
@@ -178,19 +156,17 @@
     "quickStart": "Quick start",
     "presets": {
       "walkIn": "Walk-in",
-      "phoneCall": "Phone call",
       "instagramDm": "Instagram DM"
     },
     "presetHints": {
-      "walkIn": "At the desk now · source Walk-in, status Clinic visited",
-      "phoneCall": "Enquiry by phone",
+      "walkIn": "At the desk now · source Walk-in",
       "instagramDm": "DM on Instagram"
     },
     "hits": {
-      "patient": "Patient {{id}} · last visit {{date}}",
-      "patientNew": "Patient {{id}}",
-      "lead": "Lead {{id}} · {{phone}}",
-      "contact": "Contact · {{phone}}",
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Open lead · {{id}} · {{phone}}",
+      "open": "Open lead",
       "recreate": "Re-create lead",
       "useContact": "Use contact"
     },
@@ -203,14 +179,12 @@
     "detailsSummary": "Source, interest and who handles it",
     "footer": "Creates or updates one contact",
     "create": "Create lead",
-    "linked": "Linked to {{name}} · {{kind}} · channels and preferences reused",
     "toasts": {
       "pickFirst": "Pick or add the contact first",
       "presetApplied": "{{preset}} preset applied",
       "existingPatient": "Existing patient {{id}} · new lead will be linked",
       "existingContact": "Using existing contact {{name}}",
       "missing": "Add a name and a 10-digit mobile",
-      "duplicate": "This mobile is already on lead {{id}}",
       "open": "Open"
     }
   }

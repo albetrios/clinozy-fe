@@ -1,52 +1,33 @@
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { AvatarStackPerson } from '@/shared/components/Cells/index.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
 import type { TeamCardData } from '@/shared/components/PersonCard/index.ts';
 
-/** A staff member's roles as the team shows them ("Front desk · Admin"). */
-export function staffRoleLine(
-  profile: Pick<StaffProfile, 'roles'>,
-  roleLabel: (role: Role) => string,
-): string {
-  return profile.roles.map(roleLabel).join(' · ');
-}
+/*
+ * The team as the Leads room shows it: the members of `GET /app/memberships` (`useTeamDirectory`)
+ * — a name, initials and a tone. The picker carries no role names, presence, phone, e-mail or
+ * hours (route map §4; the role names are a backend ask), so the team card shows the name alone.
+ */
 
-/** A staff member as an avatar pill: initials, tone, and presence when asked. */
-export function staffPerson(
-  profile: StaffProfile,
-  options: { presence?: boolean } = {},
-): AvatarStackPerson {
+/** A member as an avatar pill. */
+export function memberPerson(member: DirectoryMember): AvatarStackPerson {
   return {
-    id: profile.id,
-    name: personFullName(profile),
-    initials: profile.initials,
-    tone: profile.tone,
-    ...(options.presence
-      ? { presence: profile.presence === 'online' ? 'online' : 'offline' }
-      : {}),
+    id: member.id,
+    name: member.name,
+    initials: member.initials,
+    tone: member.tone,
   };
 }
 
-/**
- * The team card's data for a staff member (KICKOFF §6.0 Team card): name,
- * roles, presence, phone, e-mail, working hours — `updatedAt` when this copy
- * was read ("Updated HH:MM").
- */
+/** The team card's data for a member — `updatedAt` when the team was read ("Updated HH:MM"). */
 export function teamCardDataOf(
-  profile: StaffProfile,
-  roleLabel: (role: Role) => string,
+  member: DirectoryMember,
   updatedAt: string | null = null,
 ): TeamCardData {
   return {
-    name: personFullName(profile),
-    initials: profile.initials,
-    tone: profile.tone,
-    role: staffRoleLine(profile, roleLabel),
-    online: profile.presence === 'online',
-    phone: profile.phone,
-    email: profile.email,
-    hours: { from: profile.startsAt, to: profile.endsAt },
+    name: member.name,
+    initials: member.initials,
+    tone: member.tone,
+    role: '',
     updatedAt,
   };
 }

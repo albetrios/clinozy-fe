@@ -6,6 +6,7 @@ import { organizationLeads } from '@/lib/routes/leads-builders.ts';
 import { fetchLead, leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { LEADS_KEYS, LEADS_NS } from '../../leads.constants.ts';
 import {
@@ -28,7 +29,8 @@ const CREATE_PATH = /\/leads\/create\/?$/;
  * render nothing, so the page reads them here. A lead id that names no lead (a
  * stale link, a removed lead, a contact thread) opens nothing: the URL goes
  * back to `/leads` in place, filters kept, with "Lead not found · it may have
- * been deleted" (`S:115`).
+ * been deleted" (`S:115`). The lead comes from `GET /app/leads/:lead_id` — the same
+ * cache entry the drawer's writes refresh.
  */
 export function useLeadsDialogRoute(): LeadsDialogRoute {
   const { organizationSlug = '', leadId } = useParams({ strict: false });
@@ -36,6 +38,7 @@ export function useLeadsDialogRoute(): LeadsDialogRoute {
   const search: Record<string, unknown> = useSearch({ strict: false });
   const navigate = useNavigate();
   const { t } = useTranslation(LEADS_NS);
+  const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const backToList = useCallback(() => {
     void navigate({
@@ -48,7 +51,7 @@ export function useLeadsDialogRoute(): LeadsDialogRoute {
 
   const drawer = useDialogRouteRecord({
     id: leadId,
-    queryKey: leadQueryKeys.detail,
+    queryKey: (id) => leadQueryKeys.detail(organizationId, id),
     fetchRecord: fetchLead,
     recordLabel: t(LEADS_KEYS.record),
     onMissing: backToList,

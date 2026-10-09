@@ -6,15 +6,14 @@ import {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   LEAD_HOLD_FILTER_VALUES,
-  LEAD_RECORD_SOURCE_VALUES,
   LEAD_SORT_KEYS,
   LEAD_VIEW_VALUES,
 } from '@/shared/api/clinic/leads-contracts.ts';
 
 import { LEADS_SEARCH_DEFAULTS, validateLeadsSearch } from './leads.search.ts';
 
-const STAFF = '9f1c2b3a-4d5e-4f60-8a7b-1c2d3e4f5a6b';
-const OTHER_STAFF = '0a1b2c3d-4e5f-4a6b-9c8d-7e6f5a4b3c2d';
+const MEMBER = 'mem_riya00000000000000000';
+const OTHER_MEMBER = 'mem_nidhi0000000000000000';
 
 describe('validateLeadsSearch — the list URL (S:22)', () => {
   it('answers every key, undefined when the URL says nothing — the defaults stay out of the URL', () => {
@@ -24,7 +23,7 @@ describe('validateLeadsSearch — the list URL (S:22)', () => {
       status: undefined,
       source: undefined,
       hold: undefined,
-      owner: undefined,
+      member: undefined,
       created: undefined,
       followUp: undefined,
       sort: undefined,
@@ -35,55 +34,57 @@ describe('validateLeadsSearch — the list URL (S:22)', () => {
   it('keeps every valid value', () => {
     expect(
       validateLeadsSearch({
-        view: 'unread',
+        view: 'unreplied',
         q: ' Rhea ',
         status: 'follow_up',
-        source: ['instagram', 'phone_call'],
+        source: ['instagram', 'walk_in'],
         hold: 'soon',
-        owner: [STAFF, OTHER_STAFF],
+        member: MEMBER,
         created: 'last_7',
         followUp: '2026-10-01..2026-10-07',
-        sort: 'updated:desc',
+        sort: 'activity:desc',
       }),
     ).toEqual({
-      view: 'unread',
+      view: 'unreplied',
       q: 'Rhea',
       status: 'follow_up',
-      source: ['instagram', 'phone_call'],
+      source: ['instagram', 'walk_in'],
       hold: 'soon',
-      owner: [STAFF, OTHER_STAFF],
+      member: MEMBER,
       created: 'last_7',
       followUp: '2026-10-01..2026-10-07',
-      sort: 'updated:desc',
+      sort: 'activity:desc',
     });
   });
 
-  it('drops invalid values instead of failing', () => {
+  it('drops invalid values instead of failing — the retired ones included', () => {
     expect(
       validateLeadsSearch({
-        view: 'everyone',
+        view: 'unread',
         q: '   ',
         status: 'won',
-        source: ['tiktok'],
+        source: ['tiktok', 'phone_call'],
         hold: 'any',
-        owner: ['not-an-id'],
+        member: '9f1c2b3a-4d5e-4f60-8a7b-1c2d3e4f5a6b',
         created: 'last_90',
-        followUp: '2026-10-07..2026-10-01',
-        sort: 'phone:asc',
+        followUp: 'not_set',
+        sort: 'updated:desc',
       }),
     ).toEqual(validateLeadsSearch({}));
     expect(validateLeadsSearch({ sort: 'name:up' }).sort).toBeUndefined();
     expect(validateLeadsSearch({ status: ['new', 'lost'] }).status).toBeUndefined();
   });
 
-  it('reads a list as a JSON array or a comma list, keeping the valid entries once', () => {
+  it('reads a list as a JSON array or a comma list; the Team filter keeps one member', () => {
     expect(
       validateLeadsSearch({ source: 'instagram, google,tiktok,google' }).source,
     ).toEqual(['instagram', 'google']);
-    expect(validateLeadsSearch({ owner: `${STAFF},bogus` }).owner).toEqual([STAFF]);
+    expect(validateLeadsSearch({ member: [OTHER_MEMBER, MEMBER] }).member).toBe(
+      OTHER_MEMBER,
+    );
   });
 
-  it('reads a numeric search as text and keeps it to the contract’s 80 characters', () => {
+  it('reads a numeric search as text and keeps it to 80 characters', () => {
     // The router parses `?q=2363` into a number.
     expect(validateLeadsSearch({ q: 2363 }).q).toBe('2363');
     expect(validateLeadsSearch({ q: '#2363' }).q).toBe('#2363');
@@ -96,10 +97,9 @@ describe('validateLeadsSearch — the list URL (S:22)', () => {
     for (const status of LEAD_STATUS_VALUES) {
       expect(validateLeadsSearch({ status }).status).toBe(status);
     }
-    expect(
-      validateLeadsSearch({ source: [...LEAD_RECORD_SOURCE_VALUES] }).source,
-    ).toEqual([...LEAD_RECORD_SOURCE_VALUES]);
-    expect(LEAD_RECORD_SOURCE_VALUES).toEqual([...LEAD_SOURCE_VALUES, 'phone_call']);
+    expect(validateLeadsSearch({ source: [...LEAD_SOURCE_VALUES] }).source).toEqual([
+      ...LEAD_SOURCE_VALUES,
+    ]);
     for (const hold of LEAD_HOLD_FILTER_VALUES)
       expect(validateLeadsSearch({ hold }).hold).toBe(hold);
     for (const key of LEAD_SORT_KEYS) {

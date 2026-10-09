@@ -30,7 +30,7 @@ import type {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
 import type { DayCloseRecord } from '@/shared/api/clinic/day-close-contracts.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import type {
   OfferingRecord,

@@ -23,7 +23,7 @@ import type {
   Section,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import type { LeadRecordSource } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecordSource } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */

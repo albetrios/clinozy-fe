@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import i18n from '@/lib/i18n/i18n.ts';
 import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
 import type { ContactHistoryEntry } from '@/shared/api/clinic/messages-contracts.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 
@@ -10,6 +11,7 @@ import { CHAT_COLUMN_NS } from './chat-column.constants.ts';
 import {
   bookingReason,
   type ChatContact,
+  chatContactOfContact,
   chatContactOfLead,
   composerModes,
   composerShowsLabels,
@@ -215,11 +217,18 @@ describe('the notes beside the tabs', () => {
   });
 
   it('warns about their preferences (_patterns.md:166)', () => {
-    expect(preferenceWarning('call', ['No calls'])).toBe('noCalls');
-    expect(preferenceWarning('whatsapp', ['No calls'])).toBeNull();
-    expect(preferenceWarning('whatsapp', ['No calls', 'After 6 pm'])).toBe('afterSix');
-    expect(preferenceWarning('call', ['No calls', 'After 6 pm'])).toBe('noCalls');
+    expect(preferenceWarning('call', ['no_calls'])).toBe('noCalls');
+    expect(preferenceWarning('whatsapp', ['no_calls'])).toBeNull();
+    expect(preferenceWarning('whatsapp', ['no_calls', 'after_six_pm'])).toBe('afterSix');
+    expect(preferenceWarning('call', ['no_calls', 'after_six_pm'])).toBe('noCalls');
     expect(preferenceWarning('note')).toBeNull();
+  });
+
+  it('reads the preference tags as clinozy-be stores them, never their labels', () => {
+    expect(preferenceWarning('call', ['No calls'])).toBeNull();
+    expect(preferenceWarning('whatsapp', ['After 6 pm'])).toBeNull();
+    expect(preferenceWarning('note', ['after_six_pm'])).toBe('afterSix');
+    expect(preferenceWarning('call', ['prefers_saturdays'])).toBeNull();
   });
 
   it('reads the booking reason from their last message, 80 characters at most (H:5751)', () => {
@@ -534,5 +543,71 @@ describe('chatContactOfLead (D32)', () => {
       preferences: [],
       interests: ['lhr'],
     });
+  });
+});
+
+describe('chatContactOfContact', () => {
+  const HOST = {
+    name: 'Anaya Desai',
+    phone: '+919879521034',
+    isPatient: false,
+    interests: ['lhr'],
+  } satisfies Parameters<typeof chatContactOfContact>[0];
+  const CONTACT: Pick<
+    Contact,
+    'phones' | 'instagramHandles' | 'defaultChannel' | 'preferenceTags'
+  > = {
+    phones: [
+      { phone: '+919879521034', isPrimary: true, isOnWhatsapp: false },
+      { phone: '+919099055120', isPrimary: false, isOnWhatsapp: true },
+    ],
+    instagramHandles: ['@anaya.d', '@anaya.skin'],
+    defaultChannel: 'instagram',
+    preferenceTags: ['no_calls', 'after_six_pm'],
+  };
+
+  it('is the host’s fields alone until the contact is read', () => {
+    expect(chatContactOfContact(HOST, undefined)).toEqual(HOST);
+  });
+
+  it('adds the contact’s reach: WhatsApp on any number, the first handle, channel, tags', () => {
+    expect(chatContactOfContact(HOST, CONTACT)).toEqual({
+      ...HOST,
+      onWhatsApp: true,
+      instagram: '@anaya.d',
+      defaultChannel: 'instagram',
+      preferences: ['no_calls', 'after_six_pm'],
+    });
+  });
+
+  it('is off WhatsApp when no number is on it, with no handle when none is kept', () => {
+    const contact = chatContactOfContact(HOST, {
+      ...CONTACT,
+      phones: CONTACT.phones.map((entry) => ({ ...entry, isOnWhatsapp: false })),
+      instagramHandles: [],
+    });
+    expect(contact).toMatchObject({ onWhatsApp: false, instagram: null });
+    // Then the composer offers neither WhatsApp nor Instagram.
+    expect(composerModes(contact)).toEqual([
+      { mode: 'instagram', disabled: true },
+      { mode: 'call', disabled: false },
+      { mode: 'note', disabled: false },
+    ]);
+  });
+
+  it.each([
+    ['whatsapp', 'whatsapp'],
+    ['call', 'call'],
+    ['instagram', 'instagram'],
+  ] as const)('opens a %s contact on the %s tab with no message yet', (channel, mode) => {
+    const contact = chatContactOfContact(HOST, { ...CONTACT, defaultChannel: channel });
+    expect(contact.defaultChannel).toBe(mode);
+    expect(initialComposerMode([], contact)).toBe(mode);
+  });
+
+  it('warns from the contact’s tags', () => {
+    const contact = chatContactOfContact(HOST, CONTACT);
+    expect(preferenceWarning('call', contact.preferences)).toBe('noCalls');
+    expect(preferenceWarning('instagram', contact.preferences)).toBe('afterSix');
   });
 });

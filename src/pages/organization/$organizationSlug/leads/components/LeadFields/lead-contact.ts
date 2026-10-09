@@ -1,10 +1,7 @@
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type {
-  LeadRecord,
-  LeadRecordSource,
-} from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
+import type { LeadSource } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import type {
   ContactCardData,
   ContactReach,
@@ -13,24 +10,29 @@ import type {
 
 /** What the contact card's words need from the room's vocabulary. */
 export interface LeadContactLabels {
-  role: (role: Role) => string;
-  source: (source: LeadRecordSource) => string;
+  source: (source: LeadSource) => string;
 }
 
 /**
- * How to reach a lead's person (KICKOFF §6.0 Contact card › Reach): every
- * number — the primary first, WhatsApp unless it is marked off — then every
- * Instagram handle. Without the plan's contact fields, the lead's own mobile
- * on WhatsApp.
+ * How to reach a lead's person (KICKOFF §6.0 Contact card › Reach). With the contact read
+ * (`GET /app/contacts/:contact_id` — the drawer): every number, the primary first, WhatsApp
+ * where they are on it, then every Instagram handle. From the list row alone: the primary
+ * number — the row carries no other (route map §4).
  */
-export function leadReach(lead: Pick<LeadRecord, 'phone' | 'contact'>): ContactReach[] {
-  const phones = lead.contact?.phones ?? [{ phone: lead.phone, whatsapp: true }];
+export function leadReach(
+  lead: Pick<LeadRecord, 'phone'>,
+  contact?: Pick<Contact, 'phones' | 'instagramHandles'>,
+): ContactReach[] {
+  if (!contact) return lead.phone ? [{ channel: 'phone', phone: lead.phone }] : [];
+  const primaryFirst = [...contact.phones].sort(
+    (a, b) => Number(b.isPrimary) - Number(a.isPrimary),
+  );
   return [
-    ...phones.map((entry): ContactReach => ({
-      channel: entry.whatsapp ? 'whatsapp' : 'phone',
+    ...primaryFirst.map((entry): ContactReach => ({
+      channel: entry.isOnWhatsapp ? 'whatsapp' : 'phone',
       phone: entry.phone,
     })),
-    ...(lead.contact?.instagram ?? []).map((handle): ContactReach => ({
+    ...contact.instagramHandles.map((handle): ContactReach => ({
       channel: 'instagram',
       handle,
     })),
@@ -38,37 +40,39 @@ export function leadReach(lead: Pick<LeadRecord, 'phone' | 'contact'>): ContactR
 }
 
 /**
- * The contact card for a lead's person (the schema's `contactCard`, `S:1566`;
- * D32 — the lead is the record it reads): a patient's card once the lead is
- * linked to one, else a lead's — "Lead since <created>"; its reach; the owner
- * and the involved people; and "Came via <source>".
+ * The contact card for a lead's person (the schema's `contactCard`, `S:1566`; D32): a patient's
+ * card once a check-in opened their file, else a lead's — "Lead since <created>"; their reach;
+ * the owner and the involved people; and "Came via <source>".
  */
 export function leadContactCardData(
   lead: LeadRecord,
-  staffById: ReadonlyMap<string, StaffProfile>,
+  team: ReadonlyMap<string, DirectoryMember>,
   labels: LeadContactLabels,
+  contact?: Pick<Contact, 'phones' | 'instagramHandles'>,
 ): ContactCardData {
   const isPatient = lead.patientId !== null;
-  const team = [lead.ownerId, ...lead.involvedIds].flatMap((id): ContactTeamMember[] => {
-    const profile = id ? staffById.get(id) : undefined;
-    if (!profile) return [];
-    const [role] = profile.roles;
-    return [
-      {
-        id: profile.id,
-        name: personFullName(profile),
-        initials: profile.initials,
-        tone: profile.tone,
-        role: role ? labels.role(role) : '',
-      },
-    ];
-  });
+  const people = [lead.ownerId, ...lead.involvedIds].flatMap(
+    (id): ContactTeamMember[] => {
+      const member = id ? team.get(id) : undefined;
+      return member
+        ? [
+            {
+              id: member.id,
+              name: member.name,
+              initials: member.initials,
+              tone: member.tone,
+              role: '',
+            },
+          ]
+        : [];
+    },
+  );
   return {
     kind: isPatient ? 'patient' : 'lead',
     name: lead.name,
     since: isPatient ? null : lead.createdAt,
-    reach: leadReach(lead),
-    team,
+    reach: leadReach(lead, contact),
+    team: people,
     about: { source: lead.source ? labels.source(lead.source) : null },
   };
 }

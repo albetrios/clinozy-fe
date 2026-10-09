@@ -31,7 +31,7 @@ import { clinicInstant } from './clinic-time.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { staffRef } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
-import type { LeadRecord } from './leads-contracts.ts';
+import type { LeadRecord } from './leads-fixture-contracts.ts';
 import { messageQueryKeys } from './messages-api.ts';
 
 const TODAY = '2026-10-03';

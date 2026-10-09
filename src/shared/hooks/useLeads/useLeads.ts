@@ -1,55 +1,35 @@
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
-
 import i18n from '@/lib/i18n/i18n.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { isCommandSearchQuery } from '@/shared/api/clinic/command-search-api.ts';
+import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
 import {
-  assignLead,
   claimLead,
-  convertLead,
   countOpenLeadTasks,
   countUnrepliedLeads,
   createLead,
   deleteLead,
   fetchLead,
-  fetchLeadViewer,
-  type LeadConversion,
+  type LeadPersonInput,
   leadQueryKeys,
-  type LeadSave,
   listLeads,
-  markLeadRead,
   releaseLead,
   restoreLead,
-  restoreLeadTeam,
-  saveLead,
-  searchLeadContacts,
-  setLeadInvolved,
-  undoLeadChange,
+  updateLead,
 } from '@/shared/api/clinic/leads-api.ts';
 import type {
-  LeadContactHit,
-  LeadCreateInput,
+  LeadFields,
   LeadListParams,
-  LeadPatch,
   LeadRecord,
-  LeadTeam,
 } from '@/shared/api/clinic/leads-contracts.ts';
 import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import {
-  type CrudMutationOptions,
-  withUndoToast,
-} from '@/shared/hooks/useCreate/index.ts';
+import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
-import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { notify } from '@/shared/notify/index.ts';
-import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { LEAD_TOASTS_KEYS, LEAD_TOASTS_NS } from './leads-toasts.constants.ts';
 
@@ -58,52 +38,35 @@ function leadToast(key: string, values: Record<string, string> = {}): string {
   return i18n.t(key, { ns: LEAD_TOASTS_NS, ...values });
 }
 
-/** A lead's team as it stands — what a claim's or an assignment's Undo puts back. */
-function teamOf(lead: LeadRecord): LeadTeam {
-  return {
-    ownerId: lead.ownerId,
-    involvedIds: lead.involvedIds,
-    touchedAt: lead.touchedAt,
-    releasedAt: lead.releasedAt,
-  };
-}
+/** The active organization — every key carries it. */
+const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
-/** The Undo write behind a claim's, an assignment's or a release's toast; silent unless it fails. */
-function useRestoreLeadTeam() {
-  return useAppMutation<LeadRecord, { id: string; team: LeadTeam }>({
-    mutationFn: ({ id, team }) => restoreLeadTeam(id, team),
-    invalidateKeys: [leadQueryKeys.all],
-  });
-}
+/** What a lead write changes: the leads, their tasks (a follow-up), the person's activity. */
+const LEAD_WRITE_KEYS = [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all];
 
 // ── Reads ──
 
 /**
- * The pipeline, a cursor page of 50 at a time (D7, `S:1588`) — the Leads list's
- * infinite scroll. The params come from the URL (`leadListParamsOf`); while
- * new ones load the previous rows stay on screen (`isRefreshing`). A failed
- * page keeps the last rows and says so (`useListLoadError`, KICKOFF §6.0 List
- * error).
+ * The pipeline, 50 rows a page (`GET /app/leads`) — the Leads list's infinite scroll, for the
+ * URL's params; while new ones load the previous rows stay on screen. A failed page keeps the
+ * last rows and says so (`useListLoadError`).
  */
 export function useLeadList(
   params: LeadListParams,
   options: {
-    /** Read only once the params are known — "Mine" waits for the viewer. */
+    /** Read only once the params are known — Mine and Unreplied wait for the viewer. */
     enabled?: boolean;
   } = {},
 ) {
+  const organizationId = useOrganizationId();
   const list = useCursorList<LeadRecord>({
-    queryKey: leadQueryKeys.list(params),
+    queryKey: leadQueryKeys.list(organizationId, params),
     queryFn: async (after) => {
-      const page = await listLeads(params, after ?? null);
-      return {
-        rows: page.items,
-        next: page.nextCursor,
-        hasMore: page.nextCursor !== null,
-      };
+      const page = await listLeads(params, after);
+      return { rows: page.rows, next: page.next, hasMore: page.next !== null };
     },
     notifyOnError: false,
-    ...(options.enabled === undefined ? {} : { enabled: options.enabled }),
+    enabled: (options.enabled ?? true) && organizationId !== null,
   });
   useListLoadError(list, 'leads');
   return list;
@@ -111,71 +74,29 @@ export function useLeadList(
 
 /** A lead's open tasks — the drawer's Info count; idle without an id. */
 export function useOpenLeadTasks(id: string | undefined) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: leadQueryKeys.openTasks(id ?? ''),
+    queryKey: leadQueryKeys.openTasks(organizationId, id ?? ''),
     queryFn: () => countOpenLeadTasks(id ?? ''),
     enabled: id !== undefined,
   });
 }
 
-/**
- * The signed-in member as the Leads room reads them (`fetchLeadViewer`): the
- * owner "Mine" and "Unreplied" mean, the claimer, the releaser. `null` until
- * known.
- */
-export function useLeadViewer() {
-  const email = useAuthStore((state) => state.user?.email ?? null);
-  return useAppQuery({
-    queryKey: leadQueryKeys.viewer(email),
-    queryFn: () => fetchLeadViewer(email),
-    staleTime: 5 * 60_000,
-  });
-}
-
-/** One lead by id; idle while there is no id. A deleted, unknown or contact-thread id fails with a 404. */
+/** One lead by id; idle while there is no id. A deleted or unknown id fails with a 404. */
 export function useLead(id: string | undefined) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: leadQueryKeys.detail(id ?? ''),
+    queryKey: leadQueryKeys.detail(organizationId, id ?? ''),
     queryFn: () => fetchLead(id ?? ''),
     enabled: Boolean(id),
   });
 }
 
-/** New lead's search waits this long after the last keystroke (as ⌘K's, KICKOFF §6.0 Timers). */
-const CONTACT_SEARCH_DEBOUNCE_MS = 250;
-
-/** New lead's contact search as the drawer reads it. */
-export interface LeadContactSearch {
-  /** The people for the query as typed — or, while it loads, for the last one asked. */
-  hits: readonly LeadContactHit[];
-  /** The query as typed has its answer and it is empty: "No existing match". */
-  noMatch: boolean;
-}
-
-/**
- * New lead's contact search (`searchLeadContacts`): debounced 250ms, from two
- * characters, up to five people; the previous answer stays up while the next
- * one loads.
- */
-export function useLeadContactSearch(query: string): LeadContactSearch {
-  const typed = query.trim();
-  const { debounced, isPending } = useDebouncedSearch(typed, CONTACT_SEARCH_DEBOUNCE_MS);
-  const live = isCommandSearchQuery(typed);
-  const search = useAppQuery({
-    queryKey: leadQueryKeys.contactSearch(debounced.toLowerCase()),
-    queryFn: () => searchLeadContacts(debounced),
-    enabled: isCommandSearchQuery(debounced),
-    placeholderData: keepPreviousData,
-  });
-  const hits = live ? (search.data ?? []) : [];
-  const settled = live && !isPending && debounced === typed && !search.isPlaceholderData;
-  return { hits, noMatch: settled && search.isSuccess && hits.length === 0 };
-}
-
-/** The Unreplied tab's count chip: the viewer's leads with unread messages; idle without a viewer. */
+/** The Unreplied tab's count chip: the viewer's leads awaiting their reply; idle without a viewer. */
 export function useUnrepliedLeadCount(viewerId: string | null) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: leadQueryKeys.unreplied(viewerId),
+    queryKey: leadQueryKeys.unreplied(organizationId, viewerId),
     queryFn: () => countUnrepliedLeads(viewerId),
     enabled: viewerId !== null,
   });
@@ -183,185 +104,124 @@ export function useUnrepliedLeadCount(viewerId: string | null) {
 
 // ── Writes ──
 
+/** What a create sends: who the lead is for and its fields. */
+export interface LeadCreateVars {
+  person: LeadPersonInput;
+  fields: LeadFields;
+}
+
 /**
- * Create a lead — not optimistic (the drawer shows "Saving…"); on success
- * "Lead #2386 created" and the list refetches with the new lead first (D28).
+ * Create a lead — not optimistic (the drawer shows "Saving…"); on success "Lead #2386 created"
+ * and the list refetches with the new lead first (D28).
  */
 export function useCreateLead(
-  options: CrudMutationOptions<LeadRecord, LeadCreateInput> = {},
+  options: CrudMutationOptions<LeadRecord, LeadCreateVars> = {},
 ) {
-  return useAppMutation<LeadRecord, LeadCreateInput>({
-    mutationFn: createLead,
-    invalidateKeys: [leadQueryKeys.all],
+  return useAppMutation<LeadRecord, LeadCreateVars>({
+    mutationFn: (vars, action) => createLead({ ...vars, ...action }),
+    invalidateKeys: [leadQueryKeys.all, contactQueryKeys.all],
     successMessage: (lead) =>
-      leadToast(LEAD_TOASTS_KEYS.created, { id: displayId.lead(lead.seq) }),
+      leadToast(LEAD_TOASTS_KEYS.created, { id: displayId.lead(lead.leadNumber) }),
     ...options,
   });
 }
 
 /** What a lead save sends. */
 export interface LeadUpdateVars {
-  id: string;
-  patch: LeadPatch;
-  /** The signed-in member's staff id: a save by the owner counts as their activity (Q-L9). */
-  viewerId?: string | null;
+  lead: LeadRecord;
+  fields: Partial<LeadFields>;
 }
 
 /**
- * Save a lead from its drawer (`saveLead`) — not optimistic. "Lead saved", or
- * "<name> → <status>" with Undo when the status moved (" · follow-up task for
- * tomorrow" after Follow-up); Undo reverses the status and its side effects
- * together (KICKOFF §6.3 Save, §7.3).
+ * Save a lead from its drawer — not optimistic, refused when someone saved it meanwhile
+ * (`409 record_changed`, the drawer's Reload). "Lead saved", or "<name> → <status>" when the
+ * status moved — no Undo: the API has no way back (Q7).
  */
 export function useUpdateLead(
-  options: CrudMutationOptions<LeadSave, LeadUpdateVars> = {},
+  options: CrudMutationOptions<LeadRecord, LeadUpdateVars> = {},
 ) {
-  const undo = useUndoLeadChange();
-  return useAppMutation<LeadSave, LeadUpdateVars>({
-    mutationFn: ({ id, patch, viewerId }) => saveLead(id, patch, viewerId ?? null),
-    invalidateKeys: [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all],
-    ...withUndoToast(options, ({ lead, undoToken, statusMoved, followUpTask }) => {
-      if (!(statusMoved && lead.status)) {
-        notify.success(leadToast(LEAD_TOASTS_KEYS.saved));
-        return;
-      }
-      const status = i18n.t(CLINIC_KEYS.leads.statuses[lead.status], { ns: CLINIC_NS });
-      const message = leadToast(LEAD_TOASTS_KEYS.statusChanged, {
-        name: lead.name,
-        status,
-      });
-      notify.undo(
-        followUpTask ? `${message}${leadToast(LEAD_TOASTS_KEYS.followUpTask)}` : message,
-        { onUndo: () => undo.mutate(undoToken) },
-      );
-    }),
+  return useAppMutation<LeadRecord, LeadUpdateVars>({
+    mutationFn: ({ lead, fields }, action) =>
+      updateLead({
+        leadId: lead.id,
+        fields,
+        expectedUpdatedAt: lead.updatedAt,
+        ...action,
+      }),
+    invalidateKeys: LEAD_WRITE_KEYS,
+    successMessage: (saved, { lead }) => {
+      if (saved.status === lead.status) return leadToast(LEAD_TOASTS_KEYS.saved);
+      const status = i18n.t(CLINIC_KEYS.leads.statuses[saved.status], { ns: CLINIC_NS });
+      return leadToast(LEAD_TOASTS_KEYS.statusChanged, { name: saved.name, status });
+    },
+    ...options,
   });
 }
 
-/** Undo a drawer save or a conversion (`undoLeadChange`) — silent; the lists refetch. */
-function useUndoLeadChange() {
-  return useAppMutation<void, string>({
-    mutationFn: undoLeadChange,
-    invalidateKeys: [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all],
-  });
-}
-
-/** What a conversion sends. */
-export interface LeadConvertVars {
-  id: string;
-  /** The person's name for the toast. */
-  name: string;
-}
-
-/**
- * "Convert to patient" — "Patient record created for <name> · lead stays
- * linked" with Undo, which removes the patient and puts the lead back.
- */
-export function useConvertLead(
-  options: CrudMutationOptions<LeadConversion, LeadConvertVars> = {},
-) {
-  const undo = useUndoLeadChange();
-  return useAppMutation<LeadConversion, LeadConvertVars>({
-    mutationFn: ({ id }) => convertLead(id),
-    invalidateKeys: [leadQueryKeys.all, patientQueryKeys.all, messageQueryKeys.all],
-    ...withUndoToast(options, ({ undoToken }, { name }) => {
-      notify.undo(leadToast(LEAD_TOASTS_KEYS.converted, { name }), {
-        onUndo: () => undo.mutate(undoToken),
-      });
-    }),
-  });
-}
-
-/** What a claim sends. */
+/** What a claim sends: the lead as the row shows it. */
 export interface LeadClaimVars {
-  /** The lead as the row shows it — its team is what Undo puts back. */
   lead: LeadRecord;
-  /** The signed-in member's staff id: they become the owner. */
-  viewerId: string;
   /** The previous owner's name for the toast; `null` when nobody held it. */
   ownerName: string | null;
-  /** The drawer's own words ("Claimed by <me> after <n> idle days …"), still with Undo. */
+  /** The drawer's own words ("Claimed by <me> …"). */
   message?: string;
 }
 
 /**
- * Claim a lead — "Open · Claim" from the row: "You now own <name> · <owner>
- * stays involved" with Undo, which puts the team back. The drawer's claim
- * says its own ("Claimed by <me> after <n> idle days …") through `successMessage`.
+ * Claim a lead — "Open · Claim" from the row: "You now own <name> · <owner> stays involved".
+ * No Undo: the API has no way back to the previous owner (Q7).
  */
 export function useClaimLead(
   options: CrudMutationOptions<LeadRecord, LeadClaimVars> = {},
 ) {
-  const restoreTeam = useRestoreLeadTeam();
   return useAppMutation<LeadRecord, LeadClaimVars>({
-    mutationFn: ({ lead, viewerId }) => claimLead(lead.id, viewerId),
+    mutationFn: ({ lead }, action) => claimLead(lead.id, action.idempotencyKey),
     invalidateKeys: [leadQueryKeys.all],
-    ...withUndoToast(options, (_claimed, { lead, ownerName, message: given }) => {
-      const fallback = ownerName
+    successMessage: (_claimed, { lead, ownerName, message }) =>
+      message ??
+      (ownerName
         ? leadToast(LEAD_TOASTS_KEYS.claimed, { name: lead.name, owner: ownerName })
-        : leadToast(LEAD_TOASTS_KEYS.claimedUnowned, { name: lead.name });
-      const message = given ?? fallback;
-      notify.undo(message, {
-        onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
-      });
-    }),
+        : leadToast(LEAD_TOASTS_KEYS.claimedUnowned, { name: lead.name })),
+    ...options,
   });
 }
 
 /** What an assignment sends. */
 export interface LeadAssignVars {
-  /** The lead as the drawer shows it — its team is what Undo puts back. */
   lead: LeadRecord;
   ownerId: string;
   /** The new owner's name for the toast. */
   ownerName: string;
+  /** The caller's own words — a take-over says "You now own …". */
+  message?: string;
 }
 
 /**
- * Assign a lead — "<name> is now assigned · notified" with Undo; the previous
- * owner stays involved. Who may assign whom is the people popover's rule.
+ * Assign a lead (`owner_membership_id`; a new owner starts a hold and the previous one stays
+ * involved) — "<name> is now assigned · notified", or the caller's words; no Undo (Q7).
  */
 export function useAssignLead(
   options: CrudMutationOptions<LeadRecord, LeadAssignVars> = {},
 ) {
-  const restoreTeam = useRestoreLeadTeam();
   return useAppMutation<LeadRecord, LeadAssignVars>({
-    mutationFn: ({ lead, ownerId }) => assignLead(lead.id, ownerId),
-    // The chat shows the assignment's system line (H:5705) at once.
-    invalidateKeys: [leadQueryKeys.all, messageQueryKeys.all],
-    ...withUndoToast(options, (_assigned, { lead, ownerName }) => {
-      notify.undo(leadToast(LEAD_TOASTS_KEYS.assigned, { name: ownerName }), {
-        onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
-      });
-    }),
+    mutationFn: ({ lead, ownerId }, action) =>
+      updateLead({ leadId: lead.id, fields: { ownerId }, ...action }),
+    invalidateKeys: LEAD_WRITE_KEYS,
+    successMessage: (_assigned, { ownerName, message }) =>
+      message ?? leadToast(LEAD_TOASTS_KEYS.assigned, { name: ownerName }),
+    ...options,
   });
 }
 
-/** What a release sends. */
-export interface LeadReleaseVars {
-  /** The lead as the row shows it — its team is what Undo puts back. */
-  lead: LeadRecord;
-  /** The signed-in member's staff id — only the owner may release. */
-  viewerId: string;
-}
-
-/**
- * Release a lead to the team — "Released to the team · anyone can claim" with
- * Undo for 10s, which puts the team back (L-64), as a claim's and an
- * assignment's do.
- */
+/** Release a lead to the team — "Released to the team · anyone can claim"; no Undo (Q7). */
 export function useReleaseLead(
-  options: CrudMutationOptions<LeadRecord, LeadReleaseVars> = {},
+  options: CrudMutationOptions<LeadRecord, LeadRecord> = {},
 ) {
-  const restoreTeam = useRestoreLeadTeam();
-  return useAppMutation<LeadRecord, LeadReleaseVars>({
-    mutationFn: ({ lead, viewerId }) => releaseLead(lead.id, viewerId),
+  return useAppMutation<LeadRecord, LeadRecord>({
+    mutationFn: (lead, action) => releaseLead(lead.id, action.idempotencyKey),
     invalidateKeys: [leadQueryKeys.all],
-    ...withUndoToast(options, (_released, { lead }) => {
-      notify.undo(leadToast(LEAD_TOASTS_KEYS.released), {
-        onUndo: () => restoreTeam.mutate({ id: lead.id, team: teamOf(lead) }),
-      });
-    }),
+    successMessage: () => leadToast(LEAD_TOASTS_KEYS.released),
+    ...options,
   });
 }
 
@@ -372,37 +232,14 @@ export interface LeadInvolvedVars {
 }
 
 /**
- * Add or remove someone involved — the people popover's toggle; applies at
- * once. Its feedback is the chat's system line ("Added <name> as involved",
- * H:5707), so the thread is read again; no toast.
+ * Add or remove someone involved — the people popover's toggle; applies at once, with no
+ * stale check (a toggle carries no read) and no toast.
  */
 export function useSetLeadInvolved() {
   return useAppMutation<LeadRecord, LeadInvolvedVars>({
-    mutationFn: ({ id, involvedIds }) => setLeadInvolved(id, involvedIds),
-    invalidateKeys: [leadQueryKeys.all, messageQueryKeys.all],
-  });
-}
-
-/**
- * Mark a lead read — opening it from the list. Optimistic on the cached
- * lists (the name drops from 600 to 500 at once) and silent: a failed receipt
- * rolls back without a toast. The Unreplied count refetches; the open lead's
- * cached record takes the result.
- */
-export function useMarkLeadRead() {
-  const queryClient = useQueryClient();
-  return useAppMutation<LeadRecord, string, unknown, LeadRecord>({
-    mutationFn: markLeadRead,
-    invalidateKeys: [leadQueryKeys.unrepliedCounts()],
-    notifyOnError: false,
-    optimisticInfinite: {
-      queryKey: leadQueryKeys.lists(),
-      update: (rows, id) =>
-        rows.map((lead) => (lead.id === id ? { ...lead, unreadCount: 0 } : lead)),
-    },
-    onSuccess: (lead) => {
-      queryClient.setQueryData(leadQueryKeys.detail(lead.id), lead);
-    },
+    mutationFn: ({ id, involvedIds }, action) =>
+      updateLead({ leadId: id, fields: { involvedIds: [...involvedIds] }, ...action }),
+    invalidateKeys: LEAD_WRITE_KEYS,
   });
 }
 
@@ -414,29 +251,31 @@ export interface LeadDeleteVars {
 }
 
 /**
- * Remove a lead (`S:1546`) — optimistic: the row leaves every cached list page
- * at once and comes back if the write fails. No toast of its own: the Reason
- * confirm's `reason.undo` shows "Lead #<seq> removed · <reason>" with Undo,
- * which runs {@link useRestoreLead}.
+ * Remove a lead — optimistic: the row leaves every cached list page at once and comes back if
+ * the write fails. The lists and counts refresh — not the lead's own read, which would answer
+ * 404 while its drawer closes. No toast of its own: the Reason confirm's "removed · <reason>"
+ * with Undo runs {@link useRestoreLead}.
  */
-export function useDeleteLead(
-  options: CrudMutationOptions<LeadRecord, LeadDeleteVars> = {},
-) {
-  return useAppMutation<LeadRecord, LeadDeleteVars, unknown, LeadRecord>({
-    mutationFn: ({ id, reason, note }) => deleteLead(id, reason, note),
-    invalidateKeys: [leadQueryKeys.all],
+export function useDeleteLead(options: CrudMutationOptions<void, LeadDeleteVars> = {}) {
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, LeadDeleteVars, unknown, LeadRecord>({
+    mutationFn: ({ id, reason, note }) => deleteLead({ leadId: id, reason, note }),
+    invalidateKeys: [
+      leadQueryKeys.lists(organizationId),
+      leadQueryKeys.unrepliedCounts(organizationId),
+    ],
     optimisticInfinite: {
-      queryKey: leadQueryKeys.lists(),
+      queryKey: leadQueryKeys.lists(organizationId),
       update: (rows, { id }) => rows.filter((lead) => lead.id !== id),
     },
     ...options,
   });
 }
 
-/** Put a removed lead back — the Undo of its "removed" toast (10s, D32); silent on success. */
+/** Put a removed lead back — the Undo of its "removed" toast; silent on success. */
 export function useRestoreLead(options: CrudMutationOptions<LeadRecord, string> = {}) {
   return useAppMutation<LeadRecord, string>({
-    mutationFn: restoreLead,
+    mutationFn: (id, action) => restoreLead(id, action.idempotencyKey),
     invalidateKeys: [leadQueryKeys.all],
     ...options,
   });

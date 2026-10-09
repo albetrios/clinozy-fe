@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import * as contactActivitiesApi from '@/shared/api/clinic/contact-activities-api.ts';
 import { setFixtureWhatsAppOutage } from '@/shared/api/clinic/fixtures/messages.fixtures.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
@@ -30,6 +31,19 @@ vi.mock('@/shared/api/clinic/messages-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof messagesApi>();
   return { ...actual, sendMessage: vi.fn(actual.sendMessage) };
 });
+// A contact's stream is clinozy-be's (`/app/contacts/:contact_id/activities`).
+vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof contactActivitiesApi>()),
+  fetchContactThread: vi.fn(),
+  fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
+  fetchContactTemplateValues: vi.fn(async () => ({
+    clinicName: 'Cresence Skin',
+    address: '',
+    mapsLink: '',
+    reviewLink: '',
+    freeSlots: [],
+  })),
+}));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: vi.fn(() => 'desktop'),
   readViewportTier: vi.fn(() => 'desktop'),
@@ -193,6 +207,75 @@ describe('the conversation', () => {
       .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));
     expect(chips).toContain('Clinic invoice #787 · ₹ •••• · ₹ •••• dueWed');
     expect(chips.join(' ')).not.toMatch(/₹\d/);
+  });
+
+  it('reads a contact’s stream, its divider from the lead the host shows it for', async () => {
+    const riya = 'mem_riya00000000000000000';
+    vi.mocked(contactActivitiesApi.fetchContactThread).mockResolvedValue({
+      thread: null,
+      messages: [
+        {
+          id: 'msg_anaya0000000000000001',
+          channel: 'instagram',
+          direction: 'received',
+          body: 'Is PRP available on Saturday?',
+          deliveryStatus: 'delivered',
+          isSystem: false,
+          authorId: null,
+          taskId: null,
+          sentAt: '2026-10-03T05:10:00.000Z',
+        },
+        {
+          id: 'msg_anaya0000000000000002',
+          channel: 'instagram',
+          direction: 'sent',
+          body: 'Yes — 11:30 is free.',
+          deliveryStatus: 'read',
+          isSystem: false,
+          authorId: riya,
+          taskId: null,
+          sentAt: '2026-10-03T05:20:00.000Z',
+        },
+      ],
+      authors: {
+        [riya]: {
+          id: riya,
+          name: 'Riya Shah',
+          initials: 'RS',
+          tone: 'blush',
+          roles: [],
+          phone: null,
+          email: null,
+        },
+      },
+    });
+    renderChat({
+      person: { kind: 'contact', contactId: 'con_anaya0000000000000000' },
+      contact: { ...ANAYA_CONTACT, instagram: '@anaya.d' },
+      lead: {
+        leadId: 'lead_anaya0000000000000000',
+        kind: 'enquiry',
+        createdAt: '2026-10-03T04:58:00.000Z',
+        source: 'instagram',
+        patientId: null,
+      },
+    });
+
+    expect(await screen.findByTestId(ids.divider)).toHaveTextContent(
+      `Lead created · Today ${fsi('10:28 am')} · via Instagram`,
+    );
+    expect(contactActivitiesApi.fetchContactThread).toHaveBeenCalledWith(
+      'con_anaya0000000000000000',
+    );
+    expect(bubbles().map((bubble) => bubble.dataset.kind)).toEqual(['in', 'out']);
+    expect(bubbles()[0]).toHaveTextContent('Is PRP available on Saturday?');
+    // The member the stream names signs our reply.
+    expect(bubbles()[1]).toHaveTextContent(`${fsi('Riya S.')}·Instagram`);
+    // They last wrote on Instagram: the composer opens there.
+    expect(screen.getByRole('tab', { name: 'Instagram' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 
   it('shows the skeleton while the thread loads', () => {
@@ -447,7 +530,7 @@ describe('"Send via"', () => {
     const user = userEvent.setup();
     renderChat({
       person: ANAYA,
-      contact: { ...ANAYA_CONTACT, preferences: ['No calls', 'After 6 pm'] },
+      contact: { ...ANAYA_CONTACT, preferences: ['no_calls', 'after_six_pm'] },
     });
     expect(await screen.findByText('Prefers contact after 6 pm')).toBeVisible();
     await user.click(screen.getByRole('tab', { name: 'Call log' }));

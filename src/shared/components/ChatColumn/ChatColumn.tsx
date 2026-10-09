@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils.ts';
 import {
   type ChatPerson,
   chatPersonKey,
+  type ChatThread as ChatThreadRecord,
   type ChatThreadRead,
 } from '@/shared/api/clinic/messages-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
@@ -61,6 +62,11 @@ export interface ChatColumnProps {
   person: ChatPerson;
   /** The person as the host's record has them: name, phone, reach and preferences. */
   contact: ChatContact;
+  /**
+   * The lead the host shows the person's chat for — a contact's stream has no thread record, so
+   * its divider reads the lead's "Lead created · <time> · via <source>" from here.
+   */
+  lead?: ChatThreadRecord;
   /**
    * Labels beside the "Send via" glyphs — the lead drawer passes
    * `composerShowsLabels(viewport, dragged width)`. Never on a phone.
@@ -148,6 +154,7 @@ type ChatConversationProps = Omit<ChatColumnProps, 'contactCard' | 'className'>;
 function ChatLoaded({
   person,
   contact,
+  lead,
   read,
   showModeLabels = false,
   maskMoney = false,
@@ -159,7 +166,7 @@ function ChatLoaded({
   const format = useChatFormat(maskMoney);
   const { t, clock } = format;
   const history = useContactHistory(person).data;
-  const whatsappDown = useMessagingStatus().data?.whatsappDown ?? false;
+  const whatsappDown = useMessagingStatus(person).data?.whatsappDown ?? false;
   const outbox = useThreadOutbox(person);
   const { send, retry } = useSendMessage(person, contact);
   const resend = useResendMessage(person);
@@ -201,7 +208,7 @@ function ChatLoaded({
     <>
       <ChatThread
         entries={entries}
-        divider={threadDivider(read.thread, contact.isPatient, format)}
+        divider={threadDivider(read.thread ?? lead ?? null, contact.isPatient, format)}
         empty={
           conversed
             ? null

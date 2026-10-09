@@ -1,25 +1,21 @@
 import { useSearch } from '@tanstack/react-router';
 import type { SortingState } from '@tanstack/react-table';
-import { useMemo } from 'react';
 
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type {
   LeadListParams,
   LeadRecord,
   LeadView,
 } from '@/shared/api/clinic/leads-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import {
   sortingFromSearch,
   sortingToSearch,
   useDataTableUrlState,
 } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import {
-  useLeadList,
-  useLeadViewer,
-  useUnrepliedLeadCount,
-} from '@/shared/hooks/useLeads/index.ts';
-import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
+import { useLeadList, useUnrepliedLeadCount } from '@/shared/hooks/useLeads/index.ts';
+import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 
 import {
   LEADS_SEARCH_DEFAULTS,
@@ -34,7 +30,7 @@ const FILTER_KEYS = [
   'status',
   'source',
   'hold',
-  'owner',
+  'member',
   'created',
   'followUp',
 ] as const satisfies readonly (keyof LeadsSearch)[];
@@ -45,13 +41,15 @@ export interface LeadsListState {
   view: LeadView;
   params: LeadListParams;
   list: CursorListResult<LeadRecord>;
-  /** The signed-in member as the room reads them (`useLeadViewer`). */
-  viewer: StaffProfile | null;
-  /** Every staff profile — owners, involved people, the Team filter. */
-  staff: StaffProfile[];
-  staffById: ReadonlyMap<string, StaffProfile>;
+  /** The first page is on its way — a caller off the team has no Mine to wait for. */
+  loading: boolean;
+  /** The signed-in member's membership id; `null` for a caller who is not on the team. */
+  viewerId: string | null;
+  /** The active members — owners, involved people, the Team filter. */
+  members: readonly DirectoryMember[];
+  team: ReadonlyMap<string, DirectoryMember>;
   /** When the team was read — the team card's "Updated HH:MM". */
-  staffUpdatedAt: string | null;
+  teamUpdatedAt: string | null;
   /** The Unreplied tab's count. */
   unreplied: number;
   /** A search or a filter applies — the empty line offers "Clear filters". */
@@ -62,44 +60,38 @@ export interface LeadsListState {
   clearFilters: () => void;
 }
 
-const NO_STAFF: StaffProfile[] = [];
-
 /**
  * The Leads list's state (KICKOFF §6.3): the URL's view, search, filters and
- * sort (`leads.search.ts`) read against the signed-in member — "Mine" waits
- * for them — the cursor-paged list, the team and the Unreplied count; and the
- * URL writes the toolbar and the headers make (in place, hash kept).
+ * sort (`leads.search.ts`) read against the signed-in member's membership —
+ * "Mine" and "Unreplied" wait for it — the cursor-paged list, the team and the
+ * Unreplied count; and the URL writes the toolbar and the headers make (in
+ * place, hash kept).
  */
 export function useLeadsList(): LeadsListState {
   const raw: Record<string, unknown> = useSearch({ strict: false });
   const search = validateLeadsSearch(raw);
   const { patchSearch } = useDataTableUrlState(true);
-  const viewerQuery = useLeadViewer();
-  const viewer = viewerQuery.data ?? null;
+  const membershipId = useMyMembershipId();
+  const viewerId = membershipId ?? null;
   const view = search.view ?? LEADS_SEARCH_DEFAULTS.view;
-  const params = leadListParamsOf(search, viewer?.id ?? null);
-  const list = useLeadList(params, {
-    enabled: view === 'all' || !viewerQuery.isPending,
-  });
-  const staffQuery = useStaffProfiles();
-  const staff = staffQuery.data ?? NO_STAFF;
-  const staffById = useMemo(
-    () => new Map(staff.map((profile) => [profile.id, profile])),
-    [staff],
-  );
-  const unreplied = useUnrepliedLeadCount(viewer?.id ?? null).data ?? 0;
+  const params = leadListParamsOf(search, viewerId);
+  // Mine and Unreplied are the viewer's own: they wait for the membership, and a caller off
+  // the team (no membership) has none.
+  const enabled = view === 'all' || viewerId !== null;
+  const list = useLeadList(params, { enabled });
+  const directory = useTeamDirectory();
+  const unreplied = useUnrepliedLeadCount(viewerId).data ?? 0;
 
   return {
     search,
     view,
     params,
     list,
-    viewer,
-    staff,
-    staffById,
-    staffUpdatedAt: staffQuery.dataUpdatedAt
-      ? new Date(staffQuery.dataUpdatedAt).toISOString()
-      : null,
+    loading: list.isPending && (enabled || membershipId === undefined),
+    viewerId,
+    members: directory.members,
+    team: directory.byId,
+    teamUpdatedAt: directory.updatedAt,
     unreplied,
     filtered: FILTER_KEYS.some((key) => {
       const value = search[key];

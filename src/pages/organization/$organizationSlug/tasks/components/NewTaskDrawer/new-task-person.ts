@@ -2,7 +2,10 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LeadContactHit, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type {
+  LeadContactHit,
+  LeadRecord,
+} from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
