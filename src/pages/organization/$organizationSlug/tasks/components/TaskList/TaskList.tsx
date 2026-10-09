@@ -31,6 +31,14 @@ const SKELETON_ROWS = 8;
 const LOADING_MORE_ROWS = 2;
 /** The row metrics a skeleton row borrows. */
 const SKELETON_ROW = 'h-14 border-b border-b-muted px-(--table-pad-x)';
+/*
+ * The list is an ARIA table on `div`s: each row is a CSS grid that re-grids
+ * into two lines on a phone (TaskRow) and each group header is sticky inside
+ * its group, and native `<table>` parts lose their table semantics once their
+ * `display` is changed — so the `NOSONAR(S6819)` marks on `role="table"`,
+ * `rowgroup`, `row` and `cell` here and in TaskRow are deliberate.
+ */
+
 /** The five columns a group header or an empty line spans. */
 const COLUMNS = 5;
 
@@ -60,8 +68,12 @@ function GroupHeader({ group }: { group: TaskGroup<TaskRowRecord> }) {
   const { t } = useTranslation(TASKS_NS);
   const tone = TASK_GROUP_TONES[group.id];
   return (
-    <div role="row" tabIndex={-1} className="sticky top-0 z-2">
-      <div
+    <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+      role="row"
+      tabIndex={-1}
+      className="sticky top-0 z-2"
+    >
+      <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
         role="cell"
         aria-colspan={COLUMNS}
         className="bg-canvas text-micro text-muted-foreground-strong flex items-center gap-2 border-b px-(--table-pad-x) py-2 font-semibold tracking-[0.05em] uppercase"
@@ -83,8 +95,11 @@ function GroupHeader({ group }: { group: TaskGroup<TaskRowRecord> }) {
 function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void }) {
   const { t } = useTranslation(TASKS_NS);
   return (
-    <div role="row" tabIndex={-1}>
-      <div
+    <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+      role="row"
+      tabIndex={-1}
+    >
+      <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
         role="cell"
         aria-colspan={COLUMNS}
         data-testid={TASKS_TEST_IDS.empty}
@@ -161,7 +176,7 @@ export function TaskList({
             rowClassName={SKELETON_ROW}
           />
         ) : (
-          <div
+          <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
             role="table"
             aria-label={label}
             aria-busy={refreshing || undefined}
@@ -169,7 +184,7 @@ export function TaskList({
             data-tab={tab}
           >
             {groups.map((group) => (
-              <div
+              <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
                 key={group.id}
                 role="rowgroup"
                 // Bars in place while a new view loads — the rooms' one skeleton (index.css).
@@ -192,7 +207,9 @@ export function TaskList({
               </div>
             ))}
             {groups.length === 0 ? (
-              <div role="rowgroup">
+              <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+                role="rowgroup"
+              >
                 <EmptyLine tab={tab} onNewTask={onNewTask} />
               </div>
             ) : null}

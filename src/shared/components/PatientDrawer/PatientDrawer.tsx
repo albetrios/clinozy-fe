@@ -112,8 +112,11 @@ const K = PATIENT_DRAWER_KEYS;
 const CONTENT_PROFILE = { fieldCount: 17, hasHeavyField: true } as const;
 
 /** What an opening starts from: the URL's or the picker's prefill, never after "add another". */
-function sessionPrefill(props: SessionProps): PatientDrawerPrefill | undefined {
-  if (props.fresh) return undefined;
+function sessionPrefill(
+  props: PatientDrawerProps,
+  fresh: boolean,
+): PatientDrawerPrefill | undefined {
+  if (fresh) return undefined;
   if (props.mode === 'create') return props.prefill;
   if (props.mode === 'quick') return { name: props.query, ...props.prefill };
   return undefined;
@@ -149,7 +152,7 @@ function quickFillItems(
 }
 
 /** The drawer's words, ids and mode-only parts for each use (`patients.md:91–117`). */
-function drawerChrome(props: SessionProps, t: TFunction) {
+function drawerChrome(props: PatientDrawerProps, t: TFunction) {
   const quick = props.mode === 'quick';
   const create = props.mode === 'create';
   return {
@@ -187,7 +190,7 @@ function DrawerDeleteConfirm({
   record,
   onClose,
 }: {
-  props: SessionProps;
+  props: PatientDrawerProps;
   open: boolean;
   name: string;
   record: string;
@@ -205,7 +208,7 @@ function DrawerDeleteConfirm({
 }
 
 /** What follows a save: its toast, then the caller's hand-off (KICKOFF §6.5). */
-function useSaveOutcome(props: SessionProps) {
+function useSaveOutcome(props: PatientDrawerProps, onAnother: () => void) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
@@ -237,7 +240,7 @@ function useSaveOutcome(props: SessionProps) {
     notify.success(t(K.created, { id }), {
       action: { label: t(K.openFile), onClick: () => openFile(outcome.patient.id) },
     });
-    if (another) props.onAnother();
+    if (another) onAnother();
     else if (props.mode === 'create') props.onCreated(outcome.patient);
   };
 
@@ -255,13 +258,14 @@ function useSaveOutcome(props: SessionProps) {
 
 /** One opening of the drawer: the form, its checks and its save. */
 function PatientDrawerSession(props: SessionProps) {
+  const { fresh, onAnother } = props;
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
   const idPrefix = `patient-${useId().replace(/:/g, '')}`;
   const [today] = useState(() => clinicToday());
   const editing = props.mode === 'edit' ? props.patient : null;
-  const prefill = sessionPrefill(props);
+  const prefill = sessionPrefill(props, fresh);
   const chrome = drawerChrome(props, t);
   const { readOnly, canDelete } = useDrawerAccess(editing !== null);
 
@@ -283,7 +287,7 @@ function PatientDrawerSession(props: SessionProps) {
     homeBranchId,
   });
   const duplicate = useDuplicateMobile(values.phone, editing?.id ?? null);
-  const { finish, existingAction } = useSaveOutcome(props);
+  const { finish, existingAction } = useSaveOutcome(props, onAnother);
   const { saveState, save } = usePatientSave({
     form,
     patientId: editing?.id ?? null,

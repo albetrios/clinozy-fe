@@ -179,7 +179,7 @@ export function TaskRow({
   };
 
   return (
-    <div
+    <div // NOSONAR(S6819): grid ARIA table, see the note in TaskList
       role="row"
       tabIndex={0}
       // The focus personality's ring reaches a slotted element; the preset fills it.
@@ -191,7 +191,7 @@ export function TaskRow({
       onKeyDown={openOnKey}
       className={cn(ROW, edge)}
     >
-      <span
+      <span // NOSONAR(S6819): grid ARIA table, see the note in TaskList
         role="cell"
         className={cn(
           'flex size-8 items-center justify-center rounded-lg',
@@ -201,7 +201,7 @@ export function TaskRow({
       >
         <Icon aria-hidden="true" className="size-3.75" />
       </span>
-      <span
+      <span // NOSONAR(S6819): grid ARIA table, see the note in TaskList
         role="cell"
         className={cn('flex min-w-0 flex-col gap-0.5 leading-[1.3]', PHONE_CELL.main)}
       >
@@ -229,7 +229,10 @@ export function TaskRow({
           </span>
         ) : null}
       </span>
-      <span role="cell" className={cn('flex min-w-0 items-center', PHONE_CELL.contact)}>
+      <span // NOSONAR(S6819): grid ARIA table, see the note in TaskList
+        role="cell"
+        className={cn('flex min-w-0 items-center', PHONE_CELL.contact)}
+      >
         <ContactCard
           data={taskContactCard(row)}
           {...contactActions}
@@ -256,10 +259,13 @@ export function TaskRow({
           </span>
         </ContactCard>
       </span>
-      <span role="cell" className={cn('flex min-w-0', PHONE_CELL.owner)}>
+      <span // NOSONAR(S6819): grid ARIA table, see the note in TaskList
+        role="cell"
+        className={cn('flex min-w-0', PHONE_CELL.owner)}
+      >
         <OwnerCell row={row} />
       </span>
-      <span
+      <span // NOSONAR(S6819): grid ARIA table, see the note in TaskList
         role="cell"
         className={cn(
           'text-detail text-end leading-[1.2] whitespace-nowrap tabular-nums',

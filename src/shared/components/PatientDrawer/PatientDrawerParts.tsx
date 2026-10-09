@@ -37,8 +37,7 @@ export function PatientDuplicateNotice({
 }) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   return (
-    <p
-      role="status"
+    <output
       data-testid={`${testId}-duplicate`}
       className={cn(
         'flex flex-wrap items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs',
@@ -60,7 +59,7 @@ export function PatientDuplicateNotice({
       >
         {actionLabel}
       </button>
-    </p>
+    </output>
   );
 }
 

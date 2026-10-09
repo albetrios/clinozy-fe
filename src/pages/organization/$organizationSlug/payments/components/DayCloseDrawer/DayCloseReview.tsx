@@ -45,6 +45,11 @@ const T = `${DAY_CLOSE_TEST_ID}-review`;
  * · 88px, the last for a tablet's 36px action buttons (the prototype's `28px
  * 96px 64px 120px minmax(160px,1fr) 90px 110px 110px auto` had no actions to
  * fit) — so the grid placements of the narrow rows need no undoing.
+ *
+ * The review is therefore an ARIA table on grid/flex `div`s and `span`s:
+ * native `<table>` parts lose their table semantics once their `display` is
+ * changed — so the `NOSONAR(S6819)` marks on `role="table"`, `rowgroup`, `row`,
+ * `columnheader` and `cell` below are deliberate.
  */
 const ROW_LAYOUT =
   'grid grid-cols-[28px_minmax(0,1fr)_auto] gap-x-2.5 gap-y-1 @min-[910px]:flex';
@@ -129,7 +134,7 @@ function ReviewRow({
     onOpen();
   };
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
       role="row"
       tabIndex={0}
       onClick={onOpen}
@@ -142,12 +147,12 @@ function ReviewRow({
         checked ? 'bg-tone-sage-tint' : 'hover:bg-canvas',
       )}
     >
-      <span
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
         role="cell"
         className={cn('col-start-1 row-span-2 row-start-1 flex', COLUMN.check)}
       >
         {/* The design's 20px box (H:5108): `success` fills it once ticked. */}
-        <button
+        <button // NOSONAR(S6819): styled-button checkbox; a native checkbox input cannot hold this tick
           type="button"
           role="checkbox"
           aria-checked={checked}
@@ -169,7 +174,7 @@ function ReviewRow({
           {checked ? <Check aria-hidden="true" className="size-3.5" /> : null}
         </button>
       </span>
-      <span
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
         role="cell"
         className={cn(
           'text-muted-foreground-strong col-start-2 row-start-1 font-medium tabular-nums',
@@ -178,19 +183,31 @@ function ReviewRow({
       >
         {displayId.payment(row.seq)}
       </span>
-      <span role="cell" className={cn(WIDE_ONLY, COLUMN.what)}>
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+        role="cell"
+        className={cn(WIDE_ONLY, COLUMN.what)}
+      >
         <LedgerWhatCell row={row} size="sm" className="max-w-none" />
       </span>
-      <span role="cell" className={cn(WIDE_ONLY, COLUMN.when)}>
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+        role="cell"
+        className={cn(WIDE_ONLY, COLUMN.when)}
+      >
         <LedgerWhenCell row={row} />
       </span>
-      <span role="cell" className={cn('col-start-2 row-start-2 flex', COLUMN.party)}>
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+        role="cell"
+        className={cn('col-start-2 row-start-2 flex', COLUMN.party)}
+      >
         <LedgerPartyCell row={row} />
       </span>
-      <span role="cell" className={cn(WIDE_ONLY, COLUMN.mode)}>
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+        role="cell"
+        className={cn(WIDE_ONLY, COLUMN.mode)}
+      >
         <LedgerModeCell row={row} size="sm" />
       </span>
-      <span
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
         role="cell"
         className={cn(
           'col-start-3 row-start-1 flex justify-end justify-self-end',
@@ -199,10 +216,13 @@ function ReviewRow({
       >
         <LedgerAmountCell row={row} />
       </span>
-      <span role="cell" className={cn(WIDE_ONLY, COLUMN.state)}>
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+        role="cell"
+        className={cn(WIDE_ONLY, COLUMN.state)}
+      >
         <EntryState row={row} t={t} />
       </span>
-      <span
+      <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
         role="cell"
         className={cn(
           'col-start-3 row-start-2 flex justify-end justify-self-end',
@@ -287,9 +307,16 @@ export function DayCloseReview({
         />
       ) : null}
       {open && entries.length > 0 ? (
-        <div role="table" aria-label={t(K.title)} className="animate-reveal">
-          <div role="rowgroup" className="hidden flex-col @min-[910px]:flex">
-            <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+          role="table"
+          aria-label={t(K.title)}
+          className="animate-reveal"
+        >
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+            role="rowgroup"
+            className="hidden flex-col @min-[910px]:flex"
+          >
+            <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
               role="row"
               tabIndex={-1}
               className={cn(
@@ -297,56 +324,75 @@ export function DayCloseReview({
                 'bg-canvas text-micro text-muted-foreground h-9 items-center border-t px-4 font-semibold tracking-[0.04em] uppercase',
               )}
             >
-              <span role="columnheader" tabIndex={-1} className={COLUMN.check}>
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+                role="columnheader"
+                tabIndex={-1}
+                className={COLUMN.check}
+              >
                 <span className="sr-only">{t(K.check)}</span>
               </span>
-              <span role="columnheader" tabIndex={-1} className={COLUMN.ref}>
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+                role="columnheader"
+                tabIndex={-1}
+                className={COLUMN.ref}
+              >
                 {t(columns.ref)}
               </span>
-              <span
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
                 role="columnheader"
                 tabIndex={-1}
                 className={cn('flex-none', COLUMN.what)}
               >
                 {t(columns.what)}
               </span>
-              <span
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
                 role="columnheader"
                 tabIndex={-1}
                 className={cn('flex-none', COLUMN.when)}
               >
                 {t(columns.when)}
               </span>
-              <span role="columnheader" tabIndex={-1} className={COLUMN.party}>
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+                role="columnheader"
+                tabIndex={-1}
+                className={COLUMN.party}
+              >
                 {t(columns.party)}
               </span>
-              <span
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
                 role="columnheader"
                 tabIndex={-1}
                 className={cn('flex-none', COLUMN.mode)}
               >
                 {t(columns.mode)}
               </span>
-              <span
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
                 role="columnheader"
                 tabIndex={-1}
                 className={cn('text-end', COLUMN.amount)}
               >
                 {t(columns.amount)}
               </span>
-              <span
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
                 role="columnheader"
                 tabIndex={-1}
                 className={cn('flex-none', COLUMN.state)}
               >
                 {t(columns.state)}
               </span>
-              <span role="columnheader" tabIndex={-1} className={COLUMN.actions}>
+              <span // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+                role="columnheader"
+                tabIndex={-1}
+                className={COLUMN.actions}
+              >
                 <span className="sr-only">{tTable(TABLE_KEYS.actions)}</span>
               </span>
             </div>
           </div>
-          <div role="rowgroup" className="border-t">
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_LAYOUT
+            role="rowgroup"
+            className="border-t"
+          >
             {entries.map((row) => (
               <ReviewRow
                 key={row.id}

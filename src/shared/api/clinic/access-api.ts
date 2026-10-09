@@ -558,3 +558,93 @@ export function resolveClinicAccess(
     viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
   };
 }
+
+// ── From the caller's permission codes (L-60, D148) ──
+
+/**
+ * The clinozy-be code behind each action on a clinic section — the per-resource codes of its
+ * catalog (`GET /tenancy/permissions`). Offerings have no read code: reading them is
+ * `organization:read`. Today has no code (every member sees it); the Users section keeps
+ * {@link USERS_ROW_PLATFORM_CODES} until the Users room moves to the `membership:*` codes.
+ */
+const SECTION_ACTION_CODES: Readonly<
+  Record<
+    Exclude<Section, 'today' | 'users'>,
+    Readonly<Record<ClinicAction, OrganizationPermission>>
+  >
+> = {
+  leads: {
+    view: 'lead:read',
+    create: 'lead:create',
+    edit: 'lead:update',
+    delete: 'lead:delete',
+  },
+  appointments: {
+    view: 'appointment:read',
+    create: 'appointment:create',
+    edit: 'appointment:update',
+    delete: 'appointment:delete',
+  },
+  patients: {
+    view: 'patient:read',
+    create: 'patient:create',
+    edit: 'patient:update',
+    delete: 'patient:delete',
+  },
+  medical: {
+    view: 'medicine:read',
+    create: 'medicine:create',
+    edit: 'medicine:update',
+    delete: 'medicine:delete',
+  },
+  stock: {
+    view: 'stock_item:read',
+    create: 'stock_item:create',
+    edit: 'stock_item:update',
+    delete: 'stock_item:delete',
+  },
+  payments: {
+    view: 'payment:read',
+    create: 'payment:create',
+    edit: 'payment:update',
+    delete: 'payment:delete',
+  },
+  tasks: {
+    view: 'task:read',
+    create: 'task:create',
+    edit: 'task:update',
+    delete: 'task:delete',
+  },
+  offerings: {
+    view: 'organization:read',
+    create: 'offering:create',
+    edit: 'offering:update',
+    delete: 'offering:delete',
+  },
+};
+
+/**
+ * What the signed-in member may do in the clinic, from their own clinozy-be permission codes
+ * (`my_permissions` on `GET /auth/me/context`) — the server's answer, not a role matrix.
+ *
+ * @remarks
+ * Today is always viewable. The Users section reads {@link usersGrantsFromPlatformCodes} as
+ * before. Abilities are not answered here: a room on the API asks `canCode` for the exact code
+ * (`payment:delete`, `lead:export`, …). The server re-checks every request, so this decides only
+ * what the screens offer.
+ */
+export function resolveAccessFromCodes(codes: readonly string[]): ResolvedClinicAccess {
+  const held = new Set(codes);
+  const users = usersGrantsFromPlatformCodes(codes);
+  const can = (section: Section, action: ClinicAction): boolean => {
+    if (section === 'today') return action === 'view';
+    if (section === 'users') return users[action];
+    return held.has(SECTION_ACTION_CODES[section][action]);
+  };
+  return {
+    can,
+    // A room on the API asks for its exact codes (`canCode`), never an ability (§6 #11–#12).
+    canAbility: () => false,
+    viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
+  };
+}

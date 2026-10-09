@@ -1,9 +1,14 @@
 import { useMemo } from 'react';
 
 import {
+  CLINIC_MODULES,
+  FIXTURE_BACKED_CLINIC_MODULES,
+} from '@/core/config/clinic-modules.ts';
+import {
   clinicAccessQueryKeys,
   clinicRolesForMember,
   fetchClinicAccessMatrix,
+  resolveAccessFromCodes,
   resolveClinicAccess,
 } from '@/shared/api/clinic/access-api.ts';
 import {
@@ -13,6 +18,7 @@ import {
   isPresetRole,
 } from '@/shared/api/clinic/access-contracts.ts';
 import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
+import { CLINIC_SECTION_ORDER } from '@/shared/clinic/clinic-sections.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -29,6 +35,12 @@ export interface ClinicAccess {
   previewRole: ClinicRoleKey | null;
   can: (section: Section, action: ClinicAction) => boolean;
   canAbility: (ability: ClinicAbility) => boolean;
+  /**
+   * Whether the member holds one clinozy-be permission code (`lead:export`,
+   * `offering:lower_price:read`, …) — how a room on the API asks about an
+   * action the four section actions do not name. False during View-as.
+   */
+  canCode: (code: string) => boolean;
   /** Sections with View, in nav order; Today always. Empty until resolved. */
   viewableSections: Section[];
   /**
@@ -55,12 +67,29 @@ export function useClinicAccessMatrix() {
 const NOTHING_YET = {
   can: () => false,
   canAbility: () => false,
+  canCode: () => false,
   viewableSections: [] as Section[],
   isResolved: false,
 };
 
 /**
- * In-room access for the clinic screens (KICKOFF §3.7, D9): the fixture matrix
+ * The sections whose room is on clinozy-be's API (out of
+ * `FIXTURE_BACKED_CLINIC_MODULES`): their access is the member's own codes.
+ */
+const LIVE_SECTIONS: ReadonlySet<Section> = new Set(
+  (Object.entries(CLINIC_MODULES) as [Section, string][])
+    .filter(
+      ([, module]) =>
+        !(FIXTURE_BACKED_CLINIC_MODULES as readonly string[]).includes(module),
+    )
+    .map(([section]) => section),
+);
+
+/**
+ * In-room access for the clinic screens. A room on clinozy-be's API answers from
+ * the member's own permission codes (`my_permissions`; `resolveAccessFromCodes`,
+ * L-60 / D148) — it switches when the room leaves `FIXTURE_BACKED_CLINIC_MODULES`,
+ * with its fixtures. A room still on fixtures keeps (KICKOFF §3.7, D9) the fixture matrix
  * over the member's clinic roles — their staff profile's (L-31), else least
  * privilege from the platform codes — as the union, Admin and Owner passing
  * everything. The Users section and "Change roles & access" follow the
@@ -86,15 +115,33 @@ export function useClinicAccess(): ClinicAccess {
     if (!(matrix && permissionsResolved && profileResolved)) {
       return { roles, previewRole, ...NOTHING_YET };
     }
+    const fromMatrix = resolveClinicAccess(
+      matrix,
+      roleKeys,
+      previewRole ? {} : { platformCodes: permissions },
+    );
+    if (previewRole) {
+      return {
+        roles,
+        previewRole,
+        isResolved: true,
+        ...fromMatrix,
+        canCode: () => false,
+      };
+    }
+    const fromCodes = resolveAccessFromCodes(permissions);
+    const can = (section: Section, action: ClinicAction) =>
+      LIVE_SECTIONS.has(section)
+        ? fromCodes.can(section, action)
+        : fromMatrix.can(section, action);
     return {
       roles,
       previewRole,
       isResolved: true,
-      ...resolveClinicAccess(
-        matrix,
-        roleKeys,
-        previewRole ? {} : { platformCodes: permissions },
-      ),
+      can,
+      canAbility: fromMatrix.canAbility,
+      canCode: (code: string) => permissions.includes(code as never),
+      viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
     };
   }, [
     matrix,
