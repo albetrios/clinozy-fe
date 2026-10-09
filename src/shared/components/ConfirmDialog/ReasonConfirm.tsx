@@ -2,6 +2,7 @@ import { RadioGroup as RadioGroupPrimitive } from 'radix-ui';
 import {
   type ComponentProps,
   type ReactNode,
+  type RefObject,
   useEffect,
   useId,
   useRef,
@@ -388,6 +389,55 @@ function ReasonAction({
   );
 }
 
+/** What the reason confirm's footer draws. */
+interface ReasonFooterOptions {
+  draft: ReasonDraft;
+  ids: ReasonIds;
+  /** "Keep it" — the initial focus. */
+  keepRef: RefObject<HTMLButtonElement | null>;
+  keepLabel: string;
+  actionLabel: string;
+}
+
+/**
+ * The reason confirm's footer, sized for the frame's `layout`: the hint at its
+ * start (its own row on a phone), "Keep it" and the action.
+ */
+function reasonFooter(
+  layout: ConfirmLayout,
+  { draft, ids, keepRef, keepLabel, actionLabel }: ReasonFooterOptions,
+) {
+  return (
+    <>
+      <span
+        id={ids.hint}
+        aria-live="polite"
+        data-testid={CONFIRM_TEST_IDS.hint}
+        className={cn(
+          'text-muted-foreground min-w-0 text-xs',
+          layout === 'panel'
+            ? 'flex-1'
+            : 'order-last basis-full text-center empty:hidden',
+        )}
+      >
+        {draft.hint}
+      </span>
+      <Button
+        ref={keepRef}
+        type="button"
+        variant="outline"
+        disabled={draft.busy}
+        onClick={draft.keep}
+        data-testid={CONFIRM_TEST_IDS.cancel}
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {keepLabel}
+      </Button>
+      <ReasonAction layout={layout} draft={draft} ids={ids} label={actionLabel} />
+    </>
+  );
+}
+
 /**
  * The reason confirm (KICKOFF §3.5, `_patterns.md` › Delete confirm) in the
  * confirm frame — a full-height panel at the inline end from `md`, a bottom
@@ -432,35 +482,15 @@ export function ReasonConfirm({
       }
       initialFocusRef={keepRef}
       testId={CONFIRM_TEST_IDS.dialog}
-      footer={(layout) => (
-        <>
-          <span
-            id={ids.hint}
-            aria-live="polite"
-            data-testid={CONFIRM_TEST_IDS.hint}
-            className={cn(
-              'text-muted-foreground min-w-0 text-xs',
-              layout === 'panel'
-                ? 'flex-1'
-                : 'order-last basis-full text-center empty:hidden',
-            )}
-          >
-            {draft.hint}
-          </span>
-          <Button
-            ref={keepRef}
-            type="button"
-            variant="outline"
-            disabled={draft.busy}
-            onClick={draft.keep}
-            data-testid={CONFIRM_TEST_IDS.cancel}
-            className={CONFIRM_BUTTON_CLASS[layout]}
-          >
-            {cancelLabel ?? t(REASON_CONFIRM_KEYS.keep)}
-          </Button>
-          <ReasonAction layout={layout} draft={draft} ids={ids} label={actionLabel} />
-        </>
-      )}
+      footer={(layout) =>
+        reasonFooter(layout, {
+          draft,
+          ids,
+          keepRef,
+          keepLabel: cancelLabel ?? t(REASON_CONFIRM_KEYS.keep),
+          actionLabel,
+        })
+      }
     >
       <ReasonFields draft={draft} ids={ids} />
     </ConfirmPanel>

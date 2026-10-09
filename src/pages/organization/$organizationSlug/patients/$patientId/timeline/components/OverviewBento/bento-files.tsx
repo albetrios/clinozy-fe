@@ -53,9 +53,13 @@ const THUMBS = 8;
 /** A team note's most (H:778 `maxLength`). */
 const NOTE_MAX = 500;
 
-/** What a card's head opens and adds: each none for a member who may not. */
+/** What a card's head opens: none for a member who may not. */
 interface CardLinks {
   onOpen: (() => void) | null;
+}
+
+/** What a card's head opens and adds: each none for a member who may not. */
+interface NewCardLinks extends CardLinks {
   onNew?: { label: string; run: () => void } | null;
 }
 
@@ -189,7 +193,7 @@ export function BillingBentoCard({
   onNew,
   onInvoice,
   onCollect,
-}: CardLinks & {
+}: NewCardLinks & {
   onInvoice: (invoice: PatientInvoiceRow) => void;
   onCollect: (() => void) | null;
 }) {
@@ -274,7 +278,7 @@ export function BillingBentoCard({
  * Reports (H:777, H:4998): "Upload report"; the last three — the name over
  * "Lab · 20 Sep" — each opening Reports; "No reports yet".
  */
-export function ReportsBentoCard({ onOpen, onNew }: CardLinks) {
+export function ReportsBentoCard({ onOpen, onNew }: NewCardLinks) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
   const day = useTableDay();

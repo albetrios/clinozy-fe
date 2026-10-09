@@ -773,7 +773,7 @@ export function fillFirstVariable(
 ): string {
   const [first] = placeholdersIn(text);
   if (!first) return text;
-  const value = values[first.name] || first.name;
+  const value = values[first.name] || first.name; // NOSONAR(S6606): a blank clinic value ("") keeps the placeholder's name
   return text.slice(0, first.start) + value + text.slice(first.end);
 }
 

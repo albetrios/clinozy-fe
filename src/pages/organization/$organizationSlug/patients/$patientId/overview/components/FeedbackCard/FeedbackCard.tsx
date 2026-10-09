@@ -143,10 +143,9 @@ function TypeChips({
 }) {
   const { t } = useTranslation(CLINICAL_NS);
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={t(K.typesLabel)}
-      className="flex flex-wrap gap-1.5 border-b px-3.5 pb-3"
+      className="m-0 flex min-w-0 flex-wrap gap-1.5 border-b px-3.5 pt-0 pb-3"
     >
       {(['all', ...types] as FeedbackType[]).map((option) => {
         const on = option === value;
@@ -170,7 +169,7 @@ function TypeChips({
           </button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 

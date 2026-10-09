@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -81,17 +80,19 @@ function ActionIcon({
   );
 }
 
-/** The "⌄" segment's list: the Picker as an action menu (popover; a sheet on a phone). */
+/**
+ * The "⌄" segment's list: the Picker as an action menu (popover; a sheet on a
+ * phone), opened by the chevron segment — a 32px segment joined to the primary
+ * in the toolbar, a floating pill at least 44px wide on a phone.
+ */
 function CreateMenu({
   menu,
   testId,
   side,
-  trigger,
 }: {
   menu: NonNullable<RoomPrimaryProps['menu']>;
   testId: string;
   side: 'toolbar' | 'fab';
-  trigger: (open: boolean, label: string) => ReactElement;
 }) {
   const { t } = useTranslation(ROOM_TOOLBAR_NS);
   const label = menu.label ?? t(ROOM_TOOLBAR_KEYS.moreCreate);
@@ -113,7 +114,22 @@ function CreateMenu({
       minWidth={menu.minWidth ?? 200}
       testId={testId}
       className={cn('flex', side === 'fab' ? 'flex-none' : 'items-stretch')}
-      renderTrigger={({ open }) => trigger(open, label)}
+      renderTrigger={({ open }) => (
+        <Button
+          type="button"
+          size={side === 'fab' ? 'pill' : 'default'}
+          aria-label={label}
+          title={label}
+          data-testid={testId}
+          className={
+            side === 'fab'
+              ? 'min-w-11 px-3.5'
+              : 'border-foreground-soft w-8 rounded-s-none rounded-e-lg border-s px-0'
+          }
+        >
+          <ActionIcon icon={ChevronDown} turned={open} />
+        </Button>
+      )}
     />
   );
 }
@@ -164,25 +180,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           <ActionIcon icon={PrimaryIcon} className={action.iconClassName} />
           {action.label}
         </Button>
-        {menu ? (
-          <CreateMenu
-            menu={menu}
-            testId={ids.primaryMenu}
-            side="fab"
-            trigger={(open, label) => (
-              <Button
-                type="button"
-                size="pill"
-                aria-label={label}
-                title={label}
-                data-testid={ids.primaryMenu}
-                className="min-w-11 px-3.5"
-              >
-                <ActionIcon icon={ChevronDown} turned={open} />
-              </Button>
-            )}
-          />
-        ) : null}
+        {menu ? <CreateMenu menu={menu} testId={ids.primaryMenu} side="fab" /> : null}
       </div>,
       document.body,
     );
@@ -219,24 +217,7 @@ export function RoomPrimary({ action, menu, secondary, testIdPrefix }: RoomPrima
           <ActionIcon icon={PrimaryIcon} className={action.iconClassName} />
           {action.label}
         </Button>
-        {menu ? (
-          <CreateMenu
-            menu={menu}
-            testId={ids.primaryMenu}
-            side="toolbar"
-            trigger={(open, label) => (
-              <Button
-                type="button"
-                aria-label={label}
-                title={label}
-                data-testid={ids.primaryMenu}
-                className="border-foreground-soft w-8 rounded-s-none rounded-e-lg border-s px-0"
-              >
-                <ActionIcon icon={ChevronDown} turned={open} />
-              </Button>
-            )}
-          />
-        ) : null}
+        {menu ? <CreateMenu menu={menu} testId={ids.primaryMenu} side="toolbar" /> : null}
       </div>
     </div>
   );

@@ -63,6 +63,18 @@ import {
 
 export type { DataTablePhoneLayout } from './data-table-layout.ts';
 
+/*
+ * The table is an ARIA table on grid/flex `div`s: the column header sits outside
+ * the scroller while the rows scroll and virtualise inside it, with the pinned
+ * group header and the next-page sentinel between the row groups, and every row
+ * is a CSS grid (a wrapping flex box, or its own grid, on a phone). A native
+ * `<table>` cannot hold those wrappers between itself and its row groups, and
+ * its parts lose their table semantics once their `display` is changed — so the
+ * `NOSONAR(S6819)` marks on `role="table"`, `rowgroup`, `row`, `columnheader`
+ * and `cell` here and in `DataTableHeaderRow`, `DataTableRow` and
+ * `DataTableTail` are deliberate.
+ */
+
 /** One group as its header sees it: the key, its rows as loaded, and its place. */
 export interface DataTableGroup<TData extends RowData> {
   key: string;
@@ -169,6 +181,20 @@ export interface DataTableProps<TData extends RowData> {
   className?: string;
 }
 
+/** The props {@link resolveOptions} reads. */
+type OptionProps = Pick<
+  DataTableProps<RowData>,
+  | 'fold'
+  | 'phoneLayout'
+  | 'tableId'
+  | 'selectable'
+  | 'hasNextPage'
+  | 'isFetchingNextPage'
+  | 'virtualizeAbove'
+  | 'rowHeight'
+  | 'keyboardNav'
+>;
+
 /** The props that have defaults, resolved. */
 interface Options {
   fold: boolean;
@@ -182,7 +208,7 @@ interface Options {
   keyboardNav: boolean;
 }
 
-function resolveOptions<TData extends RowData>(props: DataTableProps<TData>): Options {
+function resolveOptions(props: OptionProps): Options {
   const fold = props.fold ?? false;
   return {
     fold,
@@ -207,9 +233,22 @@ function pickColumns<TData extends RowData>(
   });
 }
 
+/** The props {@link buildRowContext} reads. */
+type RowContextProps<TData extends RowData> = Pick<
+  DataTableProps<TData>,
+  | 'phoneGridClassName'
+  | 'phoneMetaSkip'
+  | 'phoneKeyFirst'
+  | 'rowActions'
+  | 'onRowClick'
+  | 'getRowTone'
+  | 'rowEdge'
+  | 'isRowActive'
+>;
+
 /** What every row reads from the table this render. */
 function buildRowContext<TData extends RowData>(args: {
-  props: DataTableProps<TData>;
+  props: RowContextProps<TData>;
   options: Options;
   isPhone: boolean;
   columns: readonly TableColumn<TData>[];
@@ -266,7 +305,7 @@ function GroupHeaderRow<TData extends RowData>({
   measureRow?: (node: HTMLDivElement | null) => void;
 }) {
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
       ref={measureRow}
       role="row"
       data-slot="data-table-group"
@@ -274,7 +313,10 @@ function GroupHeaderRow<TData extends RowData>({
       aria-rowindex={entryIndex + context.firstRowIndex}
       className="sticky top-0 z-3 min-w-(--dt-min-w)"
     >
-      <div role="cell" aria-colspan={Math.max(1, columnCount)}>
+      <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
+        role="cell"
+        aria-colspan={Math.max(1, columnCount)}
+      >
         {groups.header({
           key: entry.key,
           rows: entry.rows.map((row) => row.original),
@@ -369,7 +411,7 @@ function TableBody<TData extends RowData>({
     );
   };
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
       role="rowgroup"
       data-slot="data-table-body"
       data-refreshing={refreshing || undefined}
@@ -378,8 +420,13 @@ function TableBody<TData extends RowData>({
       {tableWindow.windowed.length > 0 ? (
         tableWindow.windowed.map(renderEntry)
       ) : (
-        <div role="row">
-          <div role="cell" aria-colspan={Math.max(1, columnCount)}>
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
+          role="row"
+        >
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
+            role="cell"
+            aria-colspan={Math.max(1, columnCount)}
+          >
             {empty ?? (
               <EmptyState
                 variant="inline"
@@ -413,7 +460,10 @@ function TableScroller<TData extends RowData>({
   body: TableEntries<TData>;
   tableWindow: TableWindow<TableEntry<TData>>;
   context: RowContext<TData>;
-  props: DataTableProps<TData>;
+  props: Pick<
+    DataTableProps<TData>,
+    'groups' | 'empty' | 'emptyMessage' | 'refreshing' | 'recordsLabel'
+  >;
   options: Options;
   rowCount: number;
   columnCount: number;
@@ -486,8 +536,37 @@ function TableScroller<TData extends RowData>({
  * ```
  */
 function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
-  const { table } = props;
-  const options = resolveOptions(props);
+  const {
+    table,
+    emptyMessage,
+    empty,
+    tableId,
+    fold,
+    phoneLayout,
+    phoneGridClassName,
+    phoneKeyFirst,
+    getRowTone,
+    rowEdge,
+    isRowActive,
+    selectable,
+    hasNextPage,
+    isFetchingNextPage,
+    virtualizeAbove,
+    rowHeight,
+    keyboardNav,
+    phoneMetaSkip,
+  } = props;
+  const options = resolveOptions({
+    fold,
+    phoneLayout,
+    tableId,
+    selectable,
+    hasNextPage,
+    isFetchingNextPage,
+    virtualizeAbove,
+    rowHeight,
+    keyboardNav,
+  });
   const tier = useViewportTier();
   const isPhone = tier === 'phone';
   const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -545,7 +624,16 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
     scrollToIndex: (index) => tableWindow.scrollToIndex(body.entryOfRow[index] ?? index),
   });
   const context = buildRowContext({
-    props,
+    props: {
+      phoneGridClassName,
+      phoneMetaSkip,
+      phoneKeyFirst,
+      rowActions: props.rowActions,
+      onRowClick: props.onRowClick,
+      getRowTone,
+      rowEdge,
+      isRowActive,
+    },
     options,
     isPhone,
     columns,
@@ -584,7 +672,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
           props.className,
         )}
       >
-        <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
           role="table"
           aria-label={props.label ?? props.recordsLabel}
           aria-rowcount={
@@ -611,7 +699,13 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
             body={body}
             tableWindow={tableWindow}
             context={context}
-            props={props}
+            props={{
+              groups: props.groups,
+              empty,
+              emptyMessage,
+              refreshing: props.refreshing,
+              recordsLabel: props.recordsLabel,
+            }}
             options={options}
             rowCount={rows.length}
             columnCount={columnCount}

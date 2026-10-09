@@ -64,6 +64,11 @@ const CHANNELS: { id: NotificationChannel; labelKey: string }[] = [
  * The matrix's grid, as Roles & access draws its own (H:1133): the kind of
  * update, then one 72px column per channel. It keeps its width and scrolls
  * sideways inside its bordered box on a phone.
+ *
+ * The matrix is an ARIA table on grid `div`s: every row is a CSS grid, and
+ * native `<table>` parts lose their table semantics once their `display` is
+ * changed — so the `NOSONAR(S6819)` marks on `role="table"`, `row`,
+ * `columnheader`, `rowheader` and `cell` below are deliberate.
  */
 const MATRIX_GRID = 'grid grid-cols-[minmax(200px,1fr)_repeat(3,72px)] items-center';
 
@@ -272,8 +277,12 @@ export function AccountNotificationsPanel() {
                 kind of update a row — its 26px tone tile, name and description —
                 and a switch per channel. */}
             <div className="[scrollbar-width:thin] overflow-x-auto rounded-xl border">
-              <div role="table" aria-label={t(panel.deliveryTitle)} className="min-w-110">
-                <div
+              <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+                role="table"
+                aria-label={t(panel.deliveryTitle)}
+                className="min-w-110"
+              >
+                <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
                   role="row"
                   tabIndex={-1}
                   className={cn(
@@ -281,11 +290,14 @@ export function AccountNotificationsPanel() {
                     'bg-canvas text-tiny text-muted-foreground h-9 border-b px-3 font-semibold tracking-[0.04em] uppercase',
                   )}
                 >
-                  <span role="columnheader" tabIndex={-1}>
+                  <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+                    role="columnheader"
+                    tabIndex={-1}
+                  >
                     {t(panel.kind)}
                   </span>
                   {CHANNELS.map((ch) => (
-                    <span
+                    <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
                       key={ch.id}
                       role="columnheader"
                       tabIndex={-1}
@@ -298,7 +310,7 @@ export function AccountNotificationsPanel() {
                 {CATEGORIES.map((cat) => {
                   const look = NOTIFICATION_CATEGORY_LOOK[cat.id];
                   return (
-                    <div
+                    <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
                       key={cat.id}
                       role="row"
                       tabIndex={-1}
@@ -307,7 +319,7 @@ export function AccountNotificationsPanel() {
                         'border-b-muted hover:bg-canvas min-h-12 border-b px-3 transition-colors duration-150 last:border-b-0',
                       )}
                     >
-                      <span
+                      <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
                         role="rowheader"
                         tabIndex={-1}
                         className="flex min-w-0 items-center gap-2.5 py-1.5"
@@ -331,7 +343,11 @@ export function AccountNotificationsPanel() {
                         </span>
                       </span>
                       {CHANNELS.map((ch) => (
-                        <span key={ch.id} role="cell" className="flex justify-center">
+                        <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+                          key={ch.id}
+                          role="cell"
+                          className="flex justify-center"
+                        >
                           <Switch
                             checked={isEnabled(cat.id, ch.id)}
                             onCheckedChange={(value) =>

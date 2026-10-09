@@ -74,7 +74,7 @@ export function useSaleActions(): SaleActions {
     collecting: collectSale.isPending,
     print: (sale) =>
       void queryClient
-        .fetchQuery({
+        .query({
           queryKey: invoiceQueryKeys.detail(sale.invoiceId),
           queryFn: () => fetchInvoice(sale.invoiceId),
         })

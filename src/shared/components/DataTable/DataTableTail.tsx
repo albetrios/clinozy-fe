@@ -31,13 +31,23 @@ export function DataTableTail({
   const span = Math.max(1, columnCount);
   return (
     // `mt-auto`: under a short list the end line keeps to the card's foot.
-    <div role="rowgroup" className="mt-auto shrink-0">
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+      role="rowgroup"
+      className="mt-auto shrink-0"
+    >
       {loading ? (
-        <div role="row" tabIndex={-1} data-testid={TABLE_TEST_IDS.loadingMore(prefix)}>
-          <div role="cell" aria-colspan={span}>
-            <span role="status" className="sr-only">
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+          role="row"
+          tabIndex={-1}
+          data-testid={TABLE_TEST_IDS.loadingMore(prefix)}
+        >
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+            role="cell"
+            aria-colspan={span}
+          >
+            <output className="sr-only">
               {t(TABLE_KEYS.length.loadingMore, { records: recordsLabel ?? '' })}
-            </span>
+            </output>
             {LOADING_ROWS.map((item) => (
               <div
                 key={item}
@@ -51,8 +61,12 @@ export function DataTableTail({
           </div>
         </div>
       ) : (
-        <div role="row" tabIndex={-1} data-testid={TABLE_TEST_IDS.end(prefix)}>
-          <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+          role="row"
+          tabIndex={-1}
+          data-testid={TABLE_TEST_IDS.end(prefix)}
+        >
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
             role="cell"
             aria-colspan={span}
             className="text-muted-foreground flex min-w-(--dt-min-w) items-center gap-3 px-(--table-pad-x) pt-4 pb-5.5 text-xs"

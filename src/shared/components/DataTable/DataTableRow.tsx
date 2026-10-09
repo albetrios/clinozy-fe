@@ -197,9 +197,17 @@ function RowActions<TData extends RowData>({
 }) {
   const actions = context.rowActions?.(row) ?? [];
   if (actions.length === 0)
-    return keepCell ? <div role="cell" className={className} /> : null;
+    return keepCell ? (
+      <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+        role="cell"
+        className={className}
+      />
+    ) : null;
   return (
-    <div role="cell" className={className}>
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+      role="cell"
+      className={className}
+    >
       <DataTableRowActions
         actions={actions}
         showPrimaryLabel={context.showPrimaryLabel}
@@ -225,7 +233,10 @@ function GridCells<TData extends RowData>({
   return (
     <>
       {selection.enabled ? (
-        <div role="cell" className="flex items-center justify-center">
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+          role="cell"
+          className="flex items-center justify-center"
+        >
           <SelectionBox
             checked={row.getIsSelected()}
             label={t(TABLE_KEYS.selection.selectRow, { name: name || row.id })}
@@ -236,7 +247,7 @@ function GridCells<TData extends RowData>({
         </div>
       ) : null}
       {context.keptColumns.map((column) => (
-        <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
           key={column.id}
           role="cell"
           className="flex min-w-0 flex-col justify-center gap-1"
@@ -281,7 +292,7 @@ function PhoneFoldCells<TData extends RowData>({
   );
   const keyFirst = context.phoneKeyFirst && keyColumn !== undefined;
   const primary = primaryColumn ? (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
       role="cell"
       className={cn(
         'flex min-w-0 flex-col justify-center gap-1',
@@ -298,13 +309,16 @@ function PhoneFoldCells<TData extends RowData>({
   return (
     <>
       {keyFirst && keyColumn ? (
-        <div role="cell" className="flex min-w-0 flex-1 basis-0 items-center self-center">
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+          role="cell"
+          className="flex min-w-0 flex-1 basis-0 items-center self-center"
+        >
           {renderCell(row, keyColumn)}
         </div>
       ) : null}
       {primary}
       {keyColumn && !keyFirst ? (
-        <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
           role="cell"
           className="ms-auto flex max-w-[46%] flex-none items-center justify-end self-start text-end"
         >
@@ -312,7 +326,11 @@ function PhoneFoldCells<TData extends RowData>({
         </div>
       ) : null}
       {others.map((column) => (
-        <div key={column.id} role="cell" className="flex max-w-full min-w-0 items-center">
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+          key={column.id}
+          role="cell"
+          className="flex max-w-full min-w-0 items-center"
+        >
           {renderCell(row, column)}
         </div>
       ))}
@@ -343,7 +361,7 @@ function PhoneFlowCells<TData extends RowData>({
   return (
     <>
       {columns.map((column) => (
-        <div
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
           key={column.id}
           role="cell"
           className={cn(
@@ -437,7 +455,7 @@ export function DataTableRow<TData extends RowData>({
     onRowClick(row);
   };
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
       ref={measureRow}
       role="row"
       data-slot="data-table-row"

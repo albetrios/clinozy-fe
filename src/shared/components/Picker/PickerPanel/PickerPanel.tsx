@@ -181,8 +181,7 @@ function PickerEmpty({
   testId: string;
 }) {
   return (
-    <div
-      role="status"
+    <output
       data-testid={testId}
       className="flex shrink-0 flex-col items-center gap-1 px-3 py-4.5 text-center"
     >
@@ -195,7 +194,7 @@ function PickerEmpty({
       </span>
       <span className="text-body font-medium">{title}</span>
       {hint ? <span className="text-muted-foreground text-xs">{hint}</span> : null}
-    </div>
+    </output>
   );
 }
 
@@ -258,12 +257,12 @@ export function PickerPanel<T>({
         className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain p-1"
       >
         {skeleton ? (
-          <div role="status" data-testid={testIds.loading} className="flex flex-col">
+          <output data-testid={testIds.loading} className="flex flex-col">
             <span className="sr-only">{t(PICKER_KEYS.loading)}</span>
             {SKELETON_ROWS.map((row) => (
               <SkeletonRow key={row.title} title={row.title} sub={row.sub} />
             ))}
-          </div>
+          </output>
         ) : null}
         {empty ? (
           <PickerEmpty title={empty.title} hint={empty.hint} testId={testIds.empty} />
@@ -321,8 +320,7 @@ export function PickerPanel<T>({
           ) : null}
         </CommandList>
         {loadingMore ? (
-          <div
-            role="status"
+          <output
             aria-busy="true"
             aria-label={t(PICKER_KEYS.loadingMore)}
             data-testid={testIds.loadingMore}
@@ -331,7 +329,7 @@ export function PickerPanel<T>({
             {LOADING_MORE_ROWS.map((row) => (
               <SkeletonRow key={row.title} title={row.title} sub={row.sub} />
             ))}
-          </div>
+          </output>
         ) : null}
       </div>
       {createFull ? (

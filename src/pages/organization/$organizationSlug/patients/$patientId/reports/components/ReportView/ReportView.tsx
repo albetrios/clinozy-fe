@@ -83,7 +83,7 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
     { day: 'numeric', month: 'short', year: 'numeric' },
     { civilDay: true },
   );
-  const notes = report.notes?.trim() || t(K.view.noNotes);
+  const notes = report.notes?.trim() || t(K.view.noNotes); // NOSONAR(S6606): blank notes are none — "" falls back
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
 
   const steps: DrawerStep[] = [

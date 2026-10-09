@@ -43,9 +43,8 @@ export function UserLeaveConfirm({
   const { t } = useTranslation(USERS_NS);
   const navigate = useNavigate();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const clinic =
-    useMeContext().data?.activeOrganization?.name?.trim() ||
-    t(USERS_KEYS.leave.clinicFallback);
+  const clinicName = useMeContext().data?.activeOrganization?.name?.trim();
+  const clinic = clinicName || t(USERS_KEYS.leave.clinicFallback); // NOSONAR(S6606): a blank name falls back too
   const scheduleRemoval = useDeferredRowRemoval<Member>(
     orgQueryKeys.members(organizationId),
   );

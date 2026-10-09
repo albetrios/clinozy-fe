@@ -104,7 +104,7 @@ export function PurchaseOrderPrint({
             <PrintField
               className="gap-[3mm]"
               label={t(keys.gstin)}
-              value={supplier.gstNumber || '—'}
+              value={supplier.gstNumber || '—'} // NOSONAR(S6606): a blank GSTIN prints the dash
             />
           </dl>
         </PrintBox>
@@ -129,7 +129,7 @@ export function PurchaseOrderPrint({
             <PrintField
               className="gap-[3mm]"
               label={t(keys.invoiceNumber)}
-              value={order.supplierBillNo || '—'}
+              value={order.supplierBillNo || '—'} // NOSONAR(S6606): a blank bill number prints the dash
             />
             <PrintField
               className="gap-[3mm]"

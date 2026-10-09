@@ -65,7 +65,7 @@ export function usePrescriptionRowActions({
 
   const print = async (prescription: Prescription) => {
     try {
-      const sheet = await queryClient.fetchQuery({
+      const sheet = await queryClient.query({
         queryKey: prescriptionQueryKeys.sheet(
           prescription.patientId,
           prescription.doctorId,

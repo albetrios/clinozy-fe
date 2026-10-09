@@ -151,6 +151,11 @@ function CancelView({
   const submit = () => {
     if (ready) onCancel('other', note.trim());
   };
+  // A reason's tap: "Other" opens its note, every other reason cancels.
+  const pick = (reason: CancelReason) => {
+    if (reason === 'other') setNote((current) => current ?? '');
+    else onCancel(reason, null);
+  };
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -171,11 +176,10 @@ function CancelView({
         <span className="text-body font-semibold">{t(APPOINTMENTS_KEYS.status.why)}</span>
       </div>
       {CANCEL_REASON_GROUPS.map(({ side, reasons }) => (
-        <div
+        <fieldset
           key={side}
-          role="group"
           aria-label={t(CLINIC_KEYS.appointments.cancelSides[side], { ns: CLINIC_NS })}
-          className="flex flex-col gap-0.5"
+          className="m-0 flex min-w-0 flex-col gap-0.5 border-0 p-0"
         >
           <span
             aria-hidden="true"
@@ -192,10 +196,7 @@ function CancelView({
                 aria-expanded={other ? noting : undefined}
                 aria-controls={other && noting ? formId : undefined}
                 data-testid={APPOINTMENTS_TEST_IDS.cancelReason(reason)}
-                onClick={() => {
-                  if (other) setNote((current) => current ?? '');
-                  else onCancel(reason, null);
-                }}
+                onClick={() => pick(reason)}
                 className={cn(
                   'text-body hover:bg-muted flex min-h-8 items-center rounded-md px-2 text-start transition-colors',
                   other && noting && 'bg-muted font-medium',
@@ -205,7 +206,7 @@ function CancelView({
               </button>
             );
           })}
-        </div>
+        </fieldset>
       ))}
       {noting ? (
         <form
@@ -359,8 +360,8 @@ export function AppointmentStatusPopover({
       ) : (
         <PopoverTrigger asChild>{children}</PopoverTrigger>
       )}
+      {/* Radix's popover content is a `role="dialog"` of its own. */}
       <PopoverContent
-        role="dialog"
         aria-label={t(APPOINTMENTS_KEYS.status.title)}
         side="bottom"
         align="end"

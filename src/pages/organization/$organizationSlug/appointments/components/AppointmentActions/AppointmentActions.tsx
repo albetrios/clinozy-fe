@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import { NEXT_ACTION_MOVES, nextAction } from '@/shared/api/clinic/appointment-status.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
@@ -24,39 +24,41 @@ import {
  */
 export function AppointmentActionsProvider({ children }: { children: ReactNode }) {
   const access = useClinicAccess();
-  const navigation = useAppointmentsNavigation();
-  const setStatus = useSetAppointmentStatus();
-  const cancelWrite = useCancelAppointment({ announce: 'status' });
+  const { openAppointment, openCreate } = useAppointmentsNavigation();
+  const { mutate: setStatus } = useSetAppointmentStatus();
+  const { mutate: cancelWrite } = useCancelAppointment({ announce: 'status' });
   const canEdit = access.can('appointments', 'edit');
   const canCreate = access.can('appointments', 'create');
 
-  const move: AppointmentActionsValue['move'] = (appointment, next) => {
-    if (next === 'reschedule') {
-      navigation.openAppointment(appointment.id, 'reschedule');
-      return;
-    }
-    setStatus.mutate({ id: appointment.id, status: next });
-  };
-
-  const value: AppointmentActionsValue = {
-    canEdit,
-    canCreate,
-    guardOptions: () => ({ now: new Date(), canEdit }),
-    move,
-    cancel: (appointment, reason, note = null) => {
-      cancelWrite.mutate({ id: appointment.id, reason, note: note?.trim() || null });
-    },
-    runNext: (appointment) => {
-      const step = nextAction(appointment, clinicToday());
-      if (step === 'rebook') {
-        navigation.openCreate({ copyOf: appointment.id });
+  const value = useMemo<AppointmentActionsValue>(() => {
+    const move: AppointmentActionsValue['move'] = (appointment, next) => {
+      if (next === 'reschedule') {
+        openAppointment(appointment.id, 'reschedule');
         return;
       }
-      const next = step ? NEXT_ACTION_MOVES[step] : null;
-      if (next && next !== 'cancelled') move(appointment, next);
-    },
-    open: (appointment) => navigation.openAppointment(appointment.id),
-  };
+      setStatus({ id: appointment.id, status: next });
+    };
+    return {
+      canEdit,
+      canCreate,
+      guardOptions: () => ({ now: new Date(), canEdit }),
+      move,
+      cancel: (appointment, reason, note = null) => {
+        const text = note?.trim() || null; // NOSONAR(S6606): a blank note is no note — "" falls back to null
+        cancelWrite({ id: appointment.id, reason, note: text });
+      },
+      runNext: (appointment) => {
+        const step = nextAction(appointment, clinicToday());
+        if (step === 'rebook') {
+          openCreate({ copyOf: appointment.id });
+          return;
+        }
+        const next = step ? NEXT_ACTION_MOVES[step] : null;
+        if (next && next !== 'cancelled') move(appointment, next);
+      },
+      open: (appointment) => openAppointment(appointment.id),
+    };
+  }, [canEdit, canCreate, openAppointment, openCreate, setStatus, cancelWrite]);
 
   return (
     <AppointmentActionsContext.Provider value={value}>

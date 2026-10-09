@@ -1,6 +1,5 @@
 import {
   type ButtonHTMLAttributes,
-  type CSSProperties,
   type HTMLAttributes,
   type Ref,
   useContext,
@@ -137,16 +136,16 @@ export function CalendarRoot({
   return <div data-slot="calendar" ref={rootRef} {...props} />;
 }
 
-/** The arrows' and the dropdowns' glyph, from the app's icon set. */
+/**
+ * The arrows' and the dropdowns' glyph, from the app's icon set. The day
+ * picker also hands it `size`, `disabled` and `style`; the glyph keeps its own.
+ */
 export function CalendarChevron({
   className,
   orientation,
 }: {
   className?: string;
   orientation?: 'up' | 'down' | 'left' | 'right';
-  size?: number;
-  disabled?: boolean;
-  style?: CSSProperties;
 }) {
   const classes = cn('size-4', className);
   if (orientation === 'left')

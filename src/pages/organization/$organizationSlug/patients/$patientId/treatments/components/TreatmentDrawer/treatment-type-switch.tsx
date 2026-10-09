@@ -50,7 +50,7 @@ export function TreatmentTypeSwitch({
       {TREATMENT_TEMPLATES.map(({ template, tone }) => {
         const on = template === value;
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this dot-and-label pill
             key={template}
             ref={(node) => {
               if (node) buttons.current.set(template, node);

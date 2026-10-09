@@ -79,7 +79,7 @@ function orderFields(world: FixtureWorld, input: PurchaseOrderInput) {
   );
   return {
     supplierId: fields.supplierId,
-    supplierBillNo: fields.supplierBillNo || null,
+    supplierBillNo: fields.supplierBillNo || null, // NOSONAR(S6606): a blank bill number is none
     date: fields.date,
     items: fields.items.map((item) => ({
       ...item,
@@ -206,14 +206,14 @@ export async function receivePurchaseOrder(
       if (!line?.arrived) return item;
       return {
         ...item,
-        batchNo: line.batchNo || newBatch,
+        batchNo: line.batchNo || newBatch, // NOSONAR(S6606): a blank batch takes the new one
         expiry: line.expiry,
         received: true,
       };
     }),
     ...extras.map((extra) => ({
       ...extra,
-      batchNo: extra.batchNo || newBatch,
+      batchNo: extra.batchNo || newBatch, // NOSONAR(S6606): a blank batch takes the new one
       received: true,
     })),
   ];

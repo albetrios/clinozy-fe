@@ -1,4 +1,4 @@
-import { type ReactNode, useRef, useState } from 'react';
+import { type ReactNode, type RefObject, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -8,6 +8,7 @@ import {
   CONFIRM_KEYS,
   CONFIRM_NS,
   CONFIRM_TEST_IDS,
+  type ConfirmLayout,
 } from './confirm-dialog.constants.ts';
 import { ConfirmPanel } from './confirm-panel.tsx';
 import { runConfirmedWrite } from './confirmed-write.ts';
@@ -31,7 +32,7 @@ export interface PlainConfirmDialogProps {
   /** The surface's own test ids; `confirm-dialog` / `-cancel` / `-accept` otherwise. */
   testIds?: ConfirmTestIds;
   /** Absent here: setting it switches to the reason confirm. */
-  reason?: undefined;
+  reason?: never;
   /** Runs on confirm. If it resolves the dialog closes; if it throws it stays
    * open (the caller surfaces the error, e.g. via `notify`). */
   onConfirm: () => void | Promise<void>;
@@ -43,6 +44,61 @@ export interface PlainConfirmDialogProps {
  * take the same frame: the end panel from `md`, the bottom sheet below.
  */
 export type ConfirmDialogProps = PlainConfirmDialogProps | ReasonConfirmProps;
+
+/** What the plain confirm's footer draws. */
+interface PlainConfirmFooterOptions {
+  busy: boolean;
+  destructive: boolean;
+  testIds: ConfirmTestIds | undefined;
+  /** "Cancel" — the initial focus. */
+  cancelRef: RefObject<HTMLButtonElement | null>;
+  cancelLabel: string;
+  confirmLabel: string;
+  onCancel: () => void;
+  onConfirm: () => Promise<void>;
+}
+
+/** The plain confirm's footer — Cancel and the action — sized for the frame's `layout`. */
+function plainConfirmFooter(
+  layout: ConfirmLayout,
+  {
+    busy,
+    destructive,
+    testIds,
+    cancelRef,
+    cancelLabel,
+    confirmLabel,
+    onCancel,
+    onConfirm,
+  }: PlainConfirmFooterOptions,
+) {
+  return (
+    <>
+      <Button
+        ref={cancelRef}
+        type="button"
+        variant="outline"
+        disabled={busy}
+        onClick={onCancel}
+        data-testid={testIds?.cancel ?? CONFIRM_TEST_IDS.cancel}
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {cancelLabel}
+      </Button>
+      <Button
+        type="button"
+        variant={destructive ? 'destructive' : 'default'}
+        onClick={onConfirm}
+        disabled={busy}
+        isLoading={busy}
+        data-testid={testIds?.accept ?? CONFIRM_TEST_IDS.accept}
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {confirmLabel}
+      </Button>
+    </>
+  );
+}
 
 /**
  * The plain confirm in the confirm frame: title, optional description, Cancel
@@ -59,7 +115,7 @@ function PlainConfirmDialog({
   destructive = false,
   testIds,
   onConfirm,
-}: PlainConfirmDialogProps) {
+}: Omit<PlainConfirmDialogProps, 'reason'>) {
   const { t } = useTranslation(CONFIRM_NS);
   const [busy, setBusy] = useState(false);
   // `busy` lands a render late; the ref drops a second click inside that frame.
@@ -103,32 +159,18 @@ function PlainConfirmDialog({
       }
       initialFocusRef={cancelRef}
       testId={testIds?.dialog ?? CONFIRM_TEST_IDS.dialog}
-      footer={(layout) => (
-        <>
-          <Button
-            ref={cancelRef}
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={dismiss}
-            data-testid={testIds?.cancel ?? CONFIRM_TEST_IDS.cancel}
-            className={CONFIRM_BUTTON_CLASS[layout]}
-          >
-            {cancelLabel ?? t(CONFIRM_KEYS.cancel)}
-          </Button>
-          <Button
-            type="button"
-            variant={destructive ? 'destructive' : 'default'}
-            onClick={handleConfirm}
-            disabled={busy}
-            isLoading={busy}
-            data-testid={testIds?.accept ?? CONFIRM_TEST_IDS.accept}
-            className={CONFIRM_BUTTON_CLASS[layout]}
-          >
-            {confirmLabel ?? t(CONFIRM_KEYS.accept)}
-          </Button>
-        </>
-      )}
+      footer={(layout) =>
+        plainConfirmFooter(layout, {
+          busy,
+          destructive,
+          testIds,
+          cancelRef,
+          cancelLabel: cancelLabel ?? t(CONFIRM_KEYS.cancel),
+          confirmLabel: confirmLabel ?? t(CONFIRM_KEYS.accept),
+          onCancel: dismiss,
+          onConfirm: handleConfirm,
+        })
+      }
     />
   );
 }

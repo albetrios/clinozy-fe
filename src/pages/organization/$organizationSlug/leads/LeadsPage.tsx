@@ -106,9 +106,9 @@ function NewLeadDialog({
   );
 }
 
-/** An action offered only where it applies — the contact card hides the rest. */
-function offer(allowed: boolean, action: () => void): (() => void) | undefined {
-  return allowed ? action : undefined;
+/** An action, or nothing where it does not apply (`false`) — the contact card hides the rest. */
+function offered(action: (() => void) | false): (() => void) | undefined {
+  return action === false ? undefined : action;
 }
 
 /**
@@ -241,18 +241,21 @@ export function LeadsPage() {
       now,
     );
     const { patientId } = lead;
+    const canClaimLead = canClaim && hold.open && lead.ownerId !== viewerId;
     return {
       onOpenPatientFile: patientId ? () => goTo.patient(patientId) : undefined,
-      onNewLead: offer(canCreate, () => newLead({ name: lead.name, phone: lead.phone })),
-      onNewAppointment: offer(access.can('appointments', 'create'), () =>
-        goTo.newAppointment(lead.id),
+      onNewLead: offered(
+        canCreate && (() => newLead({ name: lead.name, phone: lead.phone })),
       ),
-      onNewPatient: offer(patientId === null && access.can('patients', 'create'), () =>
-        goTo.newPatient(lead),
+      onNewAppointment: offered(
+        access.can('appointments', 'create') && (() => goTo.newAppointment(lead.id)),
       ),
-      onClaim: offer(canClaim && hold.open && lead.ownerId !== viewerId, () =>
-        claimLead(lead),
+      onNewPatient: offered(
+        patientId === null &&
+          access.can('patients', 'create') &&
+          (() => goTo.newPatient(lead)),
       ),
+      onClaim: offered(canClaimLead && (() => claimLead(lead))),
     };
   };
 

@@ -67,7 +67,7 @@ export function useInvoiceRowActions({
   const print = async (invoice: PatientInvoiceRow) => {
     try {
       await printInvoice(
-        await queryClient.fetchQuery({
+        await queryClient.query({
           queryKey: invoiceQueryKeys.detail(invoice.id),
           queryFn: () => fetchInvoice(invoice.id),
         }),

@@ -95,10 +95,9 @@ function QtyStepper({
   const step =
     'bg-canvas text-foreground-soft hover:bg-muted flex h-full w-7 items-center justify-center transition-colors disabled:opacity-45';
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={t(KEYS.quantity)}
-      className="border-border inline-flex h-7.5 w-23 items-center overflow-hidden rounded-lg border [grid-area:q]"
+      className="border-border m-0 inline-flex h-7.5 w-23 min-w-0 items-center overflow-hidden rounded-lg border p-0 [grid-area:q]"
     >
       <button
         type="button"
@@ -121,7 +120,7 @@ function QtyStepper({
       >
         <Plus aria-hidden="true" className="size-3.5" />
       </button>
-    </div>
+    </fieldset>
   );
 }
 

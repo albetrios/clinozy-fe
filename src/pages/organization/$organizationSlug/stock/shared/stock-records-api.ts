@@ -289,7 +289,7 @@ export async function revertStockMovement({
   const result = await moveStock(clinicFixtures, item, {
     type: 'reverted',
     deltaMilli: -original.deltaMilli,
-    usedFor: note?.trim() || null,
+    usedFor: note?.trim() || null, // NOSONAR(S6606): a blank remark is none
     revertsId: original.id,
     revertReason: reason,
   });

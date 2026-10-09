@@ -35,7 +35,7 @@ export function useCreditOnBill(): (credit: CreditRow) => Promise<void> {
   return async (credit) => {
     const patientId = credit.patientId ?? '';
     try {
-      const open = await queryClient.fetchQuery({
+      const open = await queryClient.query({
         queryKey: paymentQueryKeys.openInvoices(patientId),
         queryFn: () => listOpenInvoices(patientId),
       });

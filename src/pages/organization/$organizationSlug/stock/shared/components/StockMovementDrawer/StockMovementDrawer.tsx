@@ -111,12 +111,20 @@ function formFor(item: StockItemRow, type: StockMovementInputType): MovementForm
   };
 }
 
-/** What the step bodies read. */
-interface BodyProps {
+/** What every step body reads: the form and the root test id. */
+interface StepProps {
   form: UseFormReturn<MovementFormValues>;
-  item: StockItemRow;
-  idPrefix: string;
   testId: string;
+}
+
+/** A step body with typed fields: their DOM ids derive from the prefix. */
+interface TypedStepProps extends StepProps {
+  idPrefix: string;
+}
+
+/** What the step bodies read: MOVEMENT also reads the item. */
+interface BodyProps extends TypedStepProps {
+  item: StockItemRow;
 }
 
 /** MOVEMENT: Type · Quantity (with its quick chips) · Measure in (`clinic-stock.md:130–132`). */
@@ -235,7 +243,7 @@ function MovementFields({ form, item, idPrefix, testId }: BodyProps) {
 }
 
 /** DETAILS: Used for — optional, one at a time (`clinic-stock.md:133`). */
-function DetailsFields({ form, testId }: BodyProps) {
+function DetailsFields({ form, testId }: StepProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   return (
     <DrawerFieldGrid>
@@ -264,7 +272,7 @@ function DetailsFields({ form, testId }: BodyProps) {
 }
 
 /** NOTES: Remark — "Patient, batch or reason" (`clinic-stock.md:134`). */
-function NotesFields({ form, idPrefix, testId }: BodyProps) {
+function NotesFields({ form, idPrefix, testId }: TypedStepProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const note = useDrawerFieldIds(form, idPrefix)('note');
   return (

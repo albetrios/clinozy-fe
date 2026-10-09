@@ -40,21 +40,16 @@ export interface RxMedicinesFieldProps {
 }
 
 /**
- * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`): the quick line
- * and Browse above the item rows — Medicine (the store's, or typed: "Add
- * medicine") · "Dose · M A N" · Meal · Where (14 places, or typed: "Use") ·
- * Qty · × — each with its dashed note line, where "10 days" recomputes the
- * quantity from the dose; "+ Add medicine". The table keeps one row.
+ * The item rows' columns — Medicine · "Dose · M A N" · Meal · Where · Qty —
+ * and the dose → quantity recompute the note line shares with them.
  */
-export function RxMedicinesField({
+function useRxColumns({
   form,
-  items,
   catalog,
   readOnly,
-}: RxMedicinesFieldProps) {
+}: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'>) {
   const { t } = useTranslation(RX_NS);
   const money = usePaiseFormat();
-  const quickLine = useRxQuickLine(form, catalog, items);
   const dayWords = t(K.dayWords)
     .split(',')
     .map((word) => word.trim());
@@ -195,6 +190,25 @@ export function RxMedicinesField({
       ),
     },
   ];
+  return { columns, recompute };
+}
+
+/**
+ * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`): the quick line
+ * and Browse above the item rows — Medicine (the store's, or typed: "Add
+ * medicine") · "Dose · M A N" · Meal · Where (14 places, or typed: "Use") ·
+ * Qty · × — each with its dashed note line, where "10 days" recomputes the
+ * quantity from the dose; "+ Add medicine". The table keeps one row.
+ */
+export function RxMedicinesField({
+  form,
+  items,
+  catalog,
+  readOnly,
+}: RxMedicinesFieldProps) {
+  const { t } = useTranslation(RX_NS);
+  const quickLine = useRxQuickLine(form, catalog, items);
+  const { columns, recompute } = useRxColumns({ form, catalog, readOnly });
 
   return (
     <ItemsField<RxFormValues, 'items'>

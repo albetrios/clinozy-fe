@@ -46,11 +46,10 @@ export function QuickFillRow({ items, testId }: QuickFillRowProps) {
   if (items.length === 0) return null;
 
   return (
-    <div
-      role="group"
+    <fieldset
       aria-labelledby={labelId}
       data-testid={`${testId}-quick-fill`}
-      className="flex shrink-0 flex-wrap items-center gap-1.5 px-(--drawer-pad-x) pt-3"
+      className="m-0 flex min-w-0 shrink-0 flex-wrap items-center gap-1.5 border-0 px-(--drawer-pad-x) pt-3 pb-0"
     >
       <span
         id={labelId}
@@ -76,6 +75,6 @@ export function QuickFillRow({ items, testId }: QuickFillRowProps) {
           {item.label}
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 }

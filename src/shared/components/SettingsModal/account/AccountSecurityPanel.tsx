@@ -224,7 +224,7 @@ function MfaCard() {
             <DrawerField
               label={t(SETTINGS_KEYS.security.mfa.codeLabel)}
               htmlFor="mfa-code"
-              error={confirmError || undefined}
+              error={confirmError ?? undefined}
             >
               <TotpCodeInput
                 id="mfa-code"

@@ -37,6 +37,9 @@ export interface ItemFieldProps extends Pick<DrawerFieldProps, 'span' | 'stretch
   testId: string;
 }
 
+/** What a chip field reads: its chips label themselves, so it takes no DOM id. */
+type ItemChipFieldProps = Omit<ItemFieldProps, 'idPrefix'>;
+
 /** Name* (`clinic-stock.md:109`) — no placeholder (the prototype's "e.g. Priya Shah" is a slip, §7.3). */
 export function ItemNameField({ form, idPrefix, testId }: ItemFieldProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
@@ -56,7 +59,7 @@ export function ItemNameField({ form, idPrefix, testId }: ItemFieldProps) {
 }
 
 /** Category: the six in their tones (`clinic-stock.md:110`). */
-export function ItemCategoryField({ form, testId }: ItemFieldProps) {
+export function ItemCategoryField({ form, testId }: ItemChipFieldProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const words = useStockWords();
   return (
@@ -91,7 +94,7 @@ export function ItemUnitField({
   form,
   testId,
   units,
-}: ItemFieldProps & { units: readonly StockItemFormValues['unit'][] }) {
+}: ItemChipFieldProps & { units: readonly StockItemFormValues['unit'][] }) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const words = useStockWords();
   return (
@@ -152,7 +155,7 @@ export function ItemContentsField({ form, idPrefix, testId }: ItemFieldProps) {
 }
 
 /** "Measured in": ml · g · pcs · units (`clinic-stock.md:113`). */
-export function ItemMeasureField({ form, testId }: ItemFieldProps) {
+export function ItemMeasureField({ form, testId }: ItemChipFieldProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const words = useStockWords();
   return (

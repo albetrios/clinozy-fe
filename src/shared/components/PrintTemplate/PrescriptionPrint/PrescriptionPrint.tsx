@@ -174,7 +174,9 @@ export function PrescriptionPrint({
               !prescription.labReport && 'text-muted-foreground',
             )}
           >
-            {prescription.labReport || t(keys.noLabReports)}
+            {
+              prescription.labReport || t(keys.noLabReports) // NOSONAR(S6606): a blank field prints its empty line
+            }
           </p>
         </PrintBox>
         <PrintBox
@@ -188,7 +190,9 @@ export function PrescriptionPrint({
               !prescription.procedureToday && 'text-muted-foreground',
             )}
           >
-            {prescription.procedureToday || t(keys.noProcedures)}
+            {
+              prescription.procedureToday || t(keys.noProcedures) // NOSONAR(S6606): a blank field prints its empty line
+            }
           </p>
         </PrintBox>
       </div>
@@ -198,7 +202,9 @@ export function PrescriptionPrint({
         titleClassName="pb-[1.45mm]"
       >
         <p className={cn(noteClassName, !prescription.advice && 'text-muted-foreground')}>
-          {prescription.advice || t(keys.noAdvice)}
+          {
+            prescription.advice || t(keys.noAdvice) // NOSONAR(S6606): a blank field prints its empty line
+          }
         </p>
       </PrintBox>
 

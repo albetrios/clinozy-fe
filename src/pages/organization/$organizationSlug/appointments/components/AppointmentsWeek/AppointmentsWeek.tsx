@@ -93,7 +93,7 @@ function WeekDayHeader({
           />
         </span>
         {load.overlap ? (
-          <span
+          <span // NOSONAR(S6819): a CSS-drawn dot — a native <img> needs an image source to draw
             role="img"
             aria-label={t(keys.overlap)}
             className="bg-now-indicator size-1.5 flex-none rounded-full"

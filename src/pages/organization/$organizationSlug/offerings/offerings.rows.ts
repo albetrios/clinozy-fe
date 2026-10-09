@@ -172,6 +172,7 @@ export function sortOfferingRows(
   const newestFirst = [...rows].sort((a, b) => b.seq - a.seq);
   if (!sort) return newestFirst;
   const [key, direction] = sort.split(':') as [OfferingSortKey, 'asc' | 'desc'];
-  const sorted = newestFirst.sort(SORT_COMPARE[key]);
-  return direction === 'desc' ? sorted.reverse() : sorted;
+  newestFirst.sort(SORT_COMPARE[key]);
+  if (direction === 'desc') newestFirst.reverse();
+  return newestFirst;
 }

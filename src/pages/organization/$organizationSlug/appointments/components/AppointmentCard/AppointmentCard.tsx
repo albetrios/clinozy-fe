@@ -367,8 +367,8 @@ export function AppointmentQuickView({
   return (
     <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
+      {/* Radix's popover content is a `role="dialog"` of its own. */}
       <PopoverContent
-        role="dialog"
         aria-label={t(APPOINTMENTS_KEYS.record)}
         side="bottom"
         align="end"
@@ -413,7 +413,7 @@ export function AppointmentHoverCard({
   return (
     <HoverCard open={open} onOpenChange={setOpen} openDelay={420} closeDelay={160}>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent
+      <HoverCardContent // NOSONAR(S6819): Radix's portalled floating layer — a native <dialog> cannot be it
         role="dialog"
         aria-label={t(APPOINTMENTS_KEYS.record)}
         side="bottom"

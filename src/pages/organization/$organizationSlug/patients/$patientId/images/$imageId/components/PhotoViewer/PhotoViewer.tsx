@@ -93,10 +93,9 @@ function ZoomGroup({
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const { formatNumber } = useLocaleFormat();
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={t(K.zoom)}
-      className="border-canvas/20 flex h-9.5 flex-none items-center overflow-hidden rounded-lg border max-md:hidden"
+      className="border-canvas/20 m-0 flex h-9.5 min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0 max-md:hidden"
     >
       <button
         type="button"
@@ -127,7 +126,7 @@ function ZoomGroup({
       >
         +
       </button>
-    </div>
+    </fieldset>
   );
 }
 

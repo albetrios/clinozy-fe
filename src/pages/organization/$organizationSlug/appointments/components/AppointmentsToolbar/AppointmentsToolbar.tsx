@@ -86,11 +86,10 @@ function PeriodControls({ view }: { view: AppointmentCalendarView }) {
         </TooltipTrigger>
         <TooltipContent>{t(keys.jump[view])}</TooltipContent>
       </Tooltip>
-      <div
-        role="group"
+      <fieldset
         aria-label={t(keys.period)}
         data-slot="surface"
-        className="bg-card flex h-9 flex-none items-center overflow-hidden rounded-lg border"
+        className="bg-card m-0 flex h-9 min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0"
       >
         <button
           type="button"
@@ -119,7 +118,7 @@ function PeriodControls({ view }: { view: AppointmentCalendarView }) {
         >
           <ChevronRight aria-hidden="true" className="size-3.75 rtl:rotate-180" />
         </button>
-      </div>
+      </fieldset>
     </>
   );
 }

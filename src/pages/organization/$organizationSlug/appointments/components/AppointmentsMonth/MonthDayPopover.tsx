@@ -70,8 +70,8 @@ export function MonthDayPopover({
     <Popover open={open} onOpenChange={openChange}>
       <PopoverAnchor virtualRef={cellRef as RefObject<Measurable>} />
       <PopoverTrigger asChild>{children}</PopoverTrigger>
+      {/* Radix's popover content is a `role="dialog"` of its own. */}
       <PopoverContent
-        role="dialog"
         aria-label={title}
         side="bottom"
         align="start"

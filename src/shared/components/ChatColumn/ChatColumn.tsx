@@ -141,6 +141,9 @@ function ChatHeader({
   );
 }
 
+/** What the conversation below the header reads — the header owns the contact card, the column its class. */
+type ChatConversationProps = Omit<ChatColumnProps, 'contactCard' | 'className'>;
+
 /** The thread and composer once the thread has loaded — remounted per person. */
 function ChatLoaded({
   person,
@@ -150,7 +153,7 @@ function ChatLoaded({
   maskMoney = false,
   onBookAppointment,
   onOpenHistory,
-}: ChatColumnProps & { read: ChatThreadRead }) {
+}: ChatConversationProps & { read: ChatThreadRead }) {
   const personKey = chatPersonKey(person);
   const tier = useViewportTier();
   const format = useChatFormat(maskMoney);
@@ -250,7 +253,7 @@ function ChatLoaded({
 }
 
 /** Loads the person's thread: the skeleton, a retry on failure, then the conversation. */
-function ChatConversation(props: ChatColumnProps) {
+function ChatConversation(props: ChatConversationProps) {
   const thread = useThread(props.person);
   const { t } = useChatFormat(false);
   if (thread.isPending) {

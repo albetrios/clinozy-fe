@@ -5,6 +5,7 @@
 // stale answers. The table's own `useTable` re-renders us on every change.
 
 import type { Column, ReactTable, RowData } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -39,6 +40,21 @@ function columnLabel<TData extends RowData>(
   return (
     column.columnDef.meta?.label ?? (typeof header === 'string' ? header : column.id)
   );
+}
+
+/** The list's footer: "N of M shown". */
+function ShownCount({ shown, total }: { shown: number; total: number }) {
+  const { t } = useTranslation(TABLE_NS);
+  return (
+    <span className="text-caption text-muted-foreground px-1 tabular-nums">
+      {t(TABLE_KEYS.columns.shown, { shown, total })}
+    </span>
+  );
+}
+
+/** The Picker's `footer` render for the counts: the same line whatever the list does. */
+function shownCountFooter(counts: { shown: number; total: number }): () => ReactNode {
+  return () => <ShownCount {...counts} />;
 }
 
 /**
@@ -138,11 +154,7 @@ export function DataTableColumnChooser<TData extends RowData>({
       minWidth={260}
       maxHeight={320}
       align="end"
-      footer={() => (
-        <span className="text-caption text-muted-foreground px-1 tabular-nums">
-          {t(TABLE_KEYS.columns.shown, { shown, total })}
-        </span>
-      )}
+      footer={shownCountFooter({ shown, total })}
       testId={TABLE_TEST_IDS.columns(prefix)}
       className={cn('flex-none max-md:hidden', className)}
       renderTrigger={({ open }) => (

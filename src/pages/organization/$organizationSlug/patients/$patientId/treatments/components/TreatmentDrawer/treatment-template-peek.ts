@@ -59,7 +59,7 @@ function templateTiles(
   const value = (label: string, text: string | undefined): DrawerPeekItem => ({
     kind: 'value',
     label,
-    value: text?.trim() || undefined,
+    value: text?.trim() || undefined, // NOSONAR(S6606): a blank value is unset — "" falls back
   });
   switch (values.template) {
     case 'skin':

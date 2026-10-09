@@ -56,7 +56,7 @@ export function InvoiceTypeSwitch({ value, onChange, disabled }: InvoiceTypeSwit
       {INVOICE_TYPE_ORDER.map((type) => {
         const on = type === value;
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this segment
             key={type}
             ref={(node) => {
               if (node) buttons.current.set(type, node);

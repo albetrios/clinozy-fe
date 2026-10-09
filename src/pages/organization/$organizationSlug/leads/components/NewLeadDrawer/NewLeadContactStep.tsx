@@ -95,10 +95,9 @@ export function NewLeadContactStep({
           className="text-field placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent outline-none"
         />
       </div>
-      <div
-        role="group"
+      <fieldset
         aria-label={t(K.quickStart)}
-        className="mt-2 flex flex-wrap items-center gap-1.5 px-3"
+        className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 border-0 px-3"
       >
         <span className="text-caption text-muted-foreground">{t(K.quickStart)}</span>
         {NEW_LEAD_PRESETS.map((preset) => {
@@ -125,7 +124,7 @@ export function NewLeadContactStep({
             </button>
           );
         })}
-      </div>
+      </fieldset>
       <div className="flex flex-col">
         {hits.map((hit) => (
           <button

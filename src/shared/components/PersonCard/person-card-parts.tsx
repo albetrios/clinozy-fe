@@ -34,7 +34,10 @@ export function CardGroup({
 }) {
   const id = useId();
   return (
-    <div role="group" aria-labelledby={id} className={cn('flex flex-col', className)}>
+    <fieldset
+      aria-labelledby={id}
+      className={cn('m-0 flex min-w-0 flex-col border-0 p-0', className)}
+    >
       <div className="flex items-center gap-1.5">
         <span
           id={id}
@@ -45,6 +48,6 @@ export function CardGroup({
         {aside}
       </div>
       {children}
-    </div>
+    </fieldset>
   );
 }

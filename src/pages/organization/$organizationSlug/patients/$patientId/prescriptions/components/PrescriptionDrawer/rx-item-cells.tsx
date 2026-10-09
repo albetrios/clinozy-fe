@@ -48,7 +48,10 @@ export function RxDoseCell<TForm extends FieldValues>({
   };
 
   return (
-    <div role="group" aria-label={t(K.dose.group)} className="flex items-center gap-0.75">
+    <fieldset
+      aria-label={t(K.dose.group)}
+      className="m-0 flex min-w-0 items-center gap-0.75 border-0 p-0"
+    >
       {TIMES.map((time, index) => {
         const count = taps[index] ?? 0;
         const on = !sos && count > 0;
@@ -101,7 +104,7 @@ export function RxDoseCell<TForm extends FieldValues>({
       >
         {t(K.dose.sos)}
       </button>
-    </div>
+    </fieldset>
   );
 }
 

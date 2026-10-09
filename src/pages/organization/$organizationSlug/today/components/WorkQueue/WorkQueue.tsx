@@ -224,10 +224,9 @@ export function WorkQueue({
             {t(TODAY_KEYS.queue.sub, { open: formatNumber(openCount) })}
           </p>
         </div>
-        <div
-          role="group"
+        <fieldset
           aria-label={t(TODAY_KEYS.queue.scope)}
-          className="flex flex-none overflow-hidden rounded-md border"
+          className="m-0 flex min-w-0 flex-none overflow-hidden rounded-md border p-0"
         >
           {(['mine', 'everyone'] as const).map((value) => (
             <button
@@ -244,7 +243,7 @@ export function WorkQueue({
               {tTasks(TASK_QUEUE_KEYS.scope[value])}
             </button>
           ))}
-        </div>
+        </fieldset>
       </div>
       <div className="flex flex-col gap-2 px-3 pb-3 md:min-h-0 md:flex-1 md:overflow-y-auto">
         {loading

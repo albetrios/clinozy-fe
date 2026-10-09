@@ -81,18 +81,18 @@ function ChatResizeHandle({ width }: { width: number }) {
   const setWidth = useDevicePrefsStore((state) => state.setLeadChatWidth);
   const reset = useDevicePrefsStore((state) => state.resetLeadChatWidth);
   const drag = useRef<{ from: number; width: number; rtl: boolean } | null>(null);
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+  const onPointerDown = (event: PointerEvent<HTMLHRElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
     drag.current = { from: event.clientX, width, rtl };
   };
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (event: PointerEvent<HTMLHRElement>) => {
     const start = drag.current;
     if (!start) return;
     const moved = event.clientX - start.from;
     setWidth(clampChatWidth(start.width + (start.rtl ? moved : -moved)));
   };
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLHRElement>) => {
     const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
     // The handle sits on the chat's inline-start edge: towards the start widens it.
     const widen = rtl ? 'ArrowRight' : 'ArrowLeft';
@@ -106,8 +106,7 @@ function ChatResizeHandle({ width }: { width: number }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div
-          role="separator"
+        <hr
           aria-orientation="vertical"
           aria-label={t(LEADS_KEYS.drawer.resize)}
           aria-valuenow={width}
@@ -122,7 +121,7 @@ function ChatResizeHandle({ width }: { width: number }) {
           }}
           onDoubleClick={reset}
           onKeyDown={onKeyDown}
-          className="hover:bg-foreground/8 focus-visible:bg-foreground/8 absolute inset-y-0 start-0 z-5 w-1.75 cursor-col-resize outline-none"
+          className="hover:bg-foreground/8 focus-visible:bg-foreground/8 absolute inset-y-0 start-0 z-5 m-0 h-auto w-1.75 cursor-col-resize border-0 outline-none"
         />
       </TooltipTrigger>
       <TooltipContent side="left">{t(LEADS_KEYS.drawer.resizeHint)}</TooltipContent>

@@ -16,6 +16,15 @@ import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { MATRIX_CELL_KEYS, MATRIX_HEAD_KEYS } from './roles-access.ts';
 import type { RoleAccessWrites } from './use-role-access-writes.ts';
 
+/*
+ * The matrix is an ARIA table on grid `div`s: every row is a CSS grid, and
+ * native `<table>` parts lose their table semantics once their `display` is
+ * changed — so the `NOSONAR(S6819)` marks on `role="table"`, `row`,
+ * `columnheader`, `rowheader` and `cell` below are deliberate. Each box is a
+ * styled-button checkbox: a native checkbox input cannot hold the whole 64 × 47
+ * cell as its target around the drawn 22px box.
+ */
+
 /** The matrix's grid: the section, four 64px boxes, the 72px Row pill (H:1133). */
 const MATRIX_GRID = 'grid grid-cols-[minmax(200px,1fr)_repeat(4,64px)_72px] items-center';
 
@@ -53,12 +62,12 @@ export function RoleMatrix({
       data-testid="users-role-matrix"
       className="[scrollbar-width:thin] overflow-x-auto rounded-xl border"
     >
-      <div
+      <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
         role="table"
         aria-label={t(USERS_KEYS.roles.matrix.title)}
         className="min-w-140"
       >
-        <div
+        <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
           role="row"
           tabIndex={-1}
           className={cn(
@@ -66,15 +75,27 @@ export function RoleMatrix({
             'bg-canvas text-tiny text-muted-foreground h-9 border-b px-3 font-semibold tracking-[0.04em] uppercase',
           )}
         >
-          <span role="columnheader" tabIndex={-1}>
+          <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+            role="columnheader"
+            tabIndex={-1}
+          >
             {t(USERS_KEYS.roles.matrix.section)}
           </span>
           {CLINIC_ACTIONS.map((action) => (
-            <span key={action} role="columnheader" tabIndex={-1} className="text-center">
+            <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+              key={action}
+              role="columnheader"
+              tabIndex={-1}
+              className="text-center"
+            >
               {t(MATRIX_HEAD_KEYS[action])}
             </span>
           ))}
-          <span role="columnheader" tabIndex={-1} className="text-center">
+          <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+            role="columnheader"
+            tabIndex={-1}
+            className="text-center"
+          >
             {t(USERS_KEYS.roles.matrix.row)}
           </span>
         </div>
@@ -87,7 +108,7 @@ export function RoleMatrix({
           // The Users row of a role clinozy-be keeps as a system role is the platform's (D47).
           const cellLocked = locked || (section === 'users' && writes.platformLocked);
           return (
-            <div
+            <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
               key={section}
               role="row"
               tabIndex={-1}
@@ -97,7 +118,7 @@ export function RoleMatrix({
                 'border-b-muted hover:bg-canvas min-h-12 border-b px-3 transition-colors duration-150 last:border-b-0',
               )}
             >
-              <span
+              <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
                 role="rowheader"
                 tabIndex={-1}
                 className={cn(
@@ -130,8 +151,12 @@ export function RoleMatrix({
                   section: sectionLabel,
                 });
                 return (
-                  <span key={action} role="cell" className="flex justify-center">
-                    <button
+                  <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+                    key={action}
+                    role="cell"
+                    className="flex justify-center"
+                  >
+                    <button // NOSONAR(S6819): styled-button checkbox, see the note above MATRIX_GRID
                       type="button"
                       role="checkbox"
                       aria-checked={on}
@@ -161,7 +186,10 @@ export function RoleMatrix({
                   </span>
                 );
               })}
-              <span role="cell" className="flex justify-center">
+              <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
+                role="cell"
+                className="flex justify-center"
+              >
                 <button
                   type="button"
                   aria-disabled={cellLocked || undefined}

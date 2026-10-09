@@ -169,12 +169,14 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
   };
 
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={labelledBy ? undefined : label}
       aria-labelledby={labelledBy}
       data-testid={testId}
-      className={cn('flex flex-wrap items-center gap-1.5', className)}
+      className={cn(
+        'm-0 flex min-w-0 flex-wrap items-center gap-1.5 border-0 p-0',
+        className,
+      )}
     >
       {options.map((option) => {
         const picked = isPicked(option.value);
@@ -207,6 +209,6 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
         );
       })}
       {trailing}
-    </div>
+    </fieldset>
   );
 }

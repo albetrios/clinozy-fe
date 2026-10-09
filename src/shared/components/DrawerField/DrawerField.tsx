@@ -33,9 +33,9 @@ export interface DrawerFieldProps {
   /** Test id on the error line, for a form whose specs already name it. */
   errorTestId?: string;
   /** Width in the drawer's 6-column grid (read by {@link DrawerFieldGrid}). */
-  span?: DrawerFieldSpan;
+  span?: DrawerFieldSpan; // NOSONAR(S6767): DrawerFieldGrid reads it off the child element's props
   /** False keeps the field at its span when its row has room (pickers, names). */
-  stretch?: boolean;
+  stretch?: boolean; // NOSONAR(S6767): DrawerFieldGrid reads it off the child element's props
   children: ReactNode;
   className?: string;
   testId?: string;
@@ -147,7 +147,10 @@ export function DrawerFieldGrid({
   if (!title) return grid;
 
   return (
-    <div role="group" aria-labelledby={titleId} className="flex flex-col gap-3">
+    <fieldset
+      aria-labelledby={titleId}
+      className="m-0 flex min-w-0 flex-col gap-3 border-0 p-0"
+    >
       <span
         id={titleId}
         className="text-micro text-muted-foreground font-semibold tracking-[0.05em] uppercase"
@@ -155,6 +158,6 @@ export function DrawerFieldGrid({
         {title}
       </span>
       {grid}
-    </div>
+    </fieldset>
   );
 }

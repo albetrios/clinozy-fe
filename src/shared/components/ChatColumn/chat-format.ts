@@ -35,7 +35,7 @@ export function useChatFormat(maskMoney: boolean): ChatFormat {
 
 /** The signed-in member as messages name them ("Riya", "Riya S."). */
 function senderOf(user: AuthUser | null): ChatSender {
-  const name = user?.name?.trim() || user?.email.split('@')[0] || '';
+  const name = user?.name?.trim() || (user?.email.split('@')[0] ?? ''); // NOSONAR(S6606): a blank name ("") falls back to the email's local part
   return { first: firstNameOf(name), short: name ? shortPersonName(name) : '' };
 }
 

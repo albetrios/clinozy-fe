@@ -319,8 +319,8 @@ const VIEW_LOOKS: Readonly<
  * `<prefix>-tab-<id>`), or the ids a surface's specs already name.
  */
 type RoomViewTabsTestIds =
-  | { testIdPrefix: string; testIds?: undefined }
-  | { testIds: { list: string; tab: (id: string) => string }; testIdPrefix?: undefined };
+  | { testIdPrefix: string; testIds?: never }
+  | { testIds: { list: string; tab: (id: string) => string }; testIdPrefix?: never };
 
 /** Props for {@link RoomViewTabs}. */
 export type RoomViewTabsProps = RoomViewTabsTestIds & {
@@ -463,7 +463,7 @@ export function RoomViewTabs({
       dir={direction}
       className={cn('flex w-full min-w-0', className)}
     >
-      {tabs.some((tab) => tab.hint || tab.iconOnly) ? (
+      {tabs.some((tab) => tab.hint ?? tab.iconOnly) ? (
         <TooltipProvider>{list}</TooltipProvider>
       ) : (
         list

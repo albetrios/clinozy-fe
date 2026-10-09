@@ -67,85 +67,91 @@ export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTiles
   const clock = useClinicClock();
 
   return (
-    <div
-      role="group"
+    // The group is a fieldset around the strip, not the strip itself: a
+    // fieldset scrolls through an anonymous inner box, which the snap and the
+    // hidden scrollbar may not reach.
+    <fieldset
       aria-label={t(TODAY_KEYS.lanes.label)}
-      data-testid={TODAY_TEST_IDS.lanes}
-      className="-mx-3 flex flex-none snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))] [&::-webkit-scrollbar]:hidden"
+      className="m-0 min-w-0 flex-none border-0 p-0"
     >
-      {TODAY_LANES.map((lane) => {
-        const cards = lanes[lane];
-        const { tone } = TODAY_LANE_META[lane];
-        const paint = TONE_CLASSES[tone];
-        const tile = LANE_TILE_TONES[tone];
-        const pressed = lane === selected;
-        const dimmed = !isLaneInFocus(lane, focus);
-        const faces = laneFaces(cards);
-        const hint = laneHint(lane, cards);
-        let border = paint.border;
-        if (pressed) border = tile.ink;
-        else if (dimmed) border = tile.dimBorder;
-        return (
-          <button
-            key={lane}
-            type="button"
-            aria-pressed={pressed}
-            data-testid={TODAY_TEST_IDS.lane(lane)}
-            data-dimmed={dimmed || undefined}
-            onClick={() => onSelect(lane)}
-            className={cn(
-              'text-foreground flex w-32 shrink-0 snap-start flex-col items-start gap-1.5 rounded-lg border-[1.5px] px-3 py-2.5 text-start md:w-auto',
-              dimmed ? tile.dimFill : paint.bg,
-              border,
-              tile.hover,
-            )}
-          >
-            <span
+      <div
+        data-testid={TODAY_TEST_IDS.lanes}
+        className="-mx-3 flex snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))] [&::-webkit-scrollbar]:hidden"
+      >
+        {TODAY_LANES.map((lane) => {
+          const cards = lanes[lane];
+          const { tone } = TODAY_LANE_META[lane];
+          const paint = TONE_CLASSES[tone];
+          const tile = LANE_TILE_TONES[tone];
+          const pressed = lane === selected;
+          const dimmed = !isLaneInFocus(lane, focus);
+          const faces = laneFaces(cards);
+          const hint = laneHint(lane, cards);
+          let border = paint.border;
+          if (pressed) border = tile.ink;
+          else if (dimmed) border = tile.dimBorder;
+          return (
+            <button
+              key={lane}
+              type="button"
+              aria-pressed={pressed}
+              data-testid={TODAY_TEST_IDS.lane(lane)}
+              data-dimmed={dimmed || undefined}
+              onClick={() => onSelect(lane)}
               className={cn(
-                'text-xs leading-[normal]',
-                dimmed ? DIMMED_TILE_INK.label : paint.ink,
+                'text-foreground flex w-32 shrink-0 snap-start flex-col items-start gap-1.5 rounded-lg border-[1.5px] px-3 py-2.5 text-start md:w-auto',
+                dimmed ? tile.dimFill : paint.bg,
+                border,
+                tile.hover,
               )}
             >
-              {t(TODAY_KEYS.lanes.names[lane])}
-            </span>
-            <span
-              className={cn(
-                'font-heading text-stat leading-none font-semibold tabular-nums',
-                dimmed && DIMMED_TILE_INK.count,
-              )}
-            >
-              {formatNumber(cards.length)}
-            </span>
-            <span aria-hidden="true" className="flex min-h-5.5 items-center">
-              {faces.faces.map((face) => (
-                <span
-                  key={face.id}
-                  data-slot="pill"
-                  className={cn(
-                    'bg-background -me-0.5 box-content flex size-5.5 items-center justify-center rounded-full border-[1.5px] text-[length:calc(var(--text-xs)*19/24)] leading-none',
-                    dimmed ? tile.dimFace : tile.face,
-                    dimmed ? DIMMED_TILE_INK.face : paint.ink,
-                  )}
-                >
-                  {face.initials}
-                </span>
-              ))}
-              {faces.more > 0 ? (
-                <span className="text-micro text-muted-foreground-strong ms-2.25 leading-[normal]">
-                  {t(TODAY_KEYS.lanes.more, { more: formatNumber(faces.more) })}
-                </span>
-              ) : null}
-            </span>
-            <span className="text-micro text-muted-foreground-strong leading-[normal] tabular-nums">
-              {hint
-                ? t(TODAY_KEYS.lanes.hints[hint.kind], {
-                    time: clock.wallTime(today, hint.time),
-                  })
-                : t(TODAY_KEYS.lanes.hints.none)}
-            </span>
-          </button>
-        );
-      })}
-    </div>
+              <span
+                className={cn(
+                  'text-xs leading-[normal]',
+                  dimmed ? DIMMED_TILE_INK.label : paint.ink,
+                )}
+              >
+                {t(TODAY_KEYS.lanes.names[lane])}
+              </span>
+              <span
+                className={cn(
+                  'font-heading text-stat leading-none font-semibold tabular-nums',
+                  dimmed && DIMMED_TILE_INK.count,
+                )}
+              >
+                {formatNumber(cards.length)}
+              </span>
+              <span aria-hidden="true" className="flex min-h-5.5 items-center">
+                {faces.faces.map((face) => (
+                  <span
+                    key={face.id}
+                    data-slot="pill"
+                    className={cn(
+                      'bg-background -me-0.5 box-content flex size-5.5 items-center justify-center rounded-full border-[1.5px] text-[length:calc(var(--text-xs)*19/24)] leading-none',
+                      dimmed ? tile.dimFace : tile.face,
+                      dimmed ? DIMMED_TILE_INK.face : paint.ink,
+                    )}
+                  >
+                    {face.initials}
+                  </span>
+                ))}
+                {faces.more > 0 ? (
+                  <span className="text-micro text-muted-foreground-strong ms-2.25 leading-[normal]">
+                    {t(TODAY_KEYS.lanes.more, { more: formatNumber(faces.more) })}
+                  </span>
+                ) : null}
+              </span>
+              <span className="text-micro text-muted-foreground-strong leading-[normal] tabular-nums">
+                {hint
+                  ? t(TODAY_KEYS.lanes.hints[hint.kind], {
+                      time: clock.wallTime(today, hint.time),
+                    })
+                  : t(TODAY_KEYS.lanes.hints.none)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }

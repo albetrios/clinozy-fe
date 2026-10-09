@@ -164,7 +164,7 @@ function checkInCardView(item: CheckInFeedback, t: TFunction): FeedbackCardView 
     quote: now ? `“${now}”` : t(K.noNow),
     quoteEmpty: !now,
     detailLabel: t(K.nextLabel),
-    detail: checkIn.nextPlan?.trim() || checkIn.followedNote?.trim() || t(K.noNext),
+    detail: checkIn.nextPlan?.trim() || checkIn.followedNote?.trim() || t(K.noNext), // NOSONAR(S6606): a blank plan or note is none — "" falls through
   };
 }
 
@@ -188,6 +188,6 @@ export function feedbackCardView(item: FeedbackItem, t: TFunction): FeedbackCard
     quote: text ? `“${text}”` : t(K.noText),
     quoteEmpty: !text,
     detailLabel: t(K.linkLabel),
-    detail: review.link?.trim() || t(K.noLink),
+    detail: review.link?.trim() || t(K.noLink), // NOSONAR(S6606): a blank link is no link — "" falls back
   };
 }

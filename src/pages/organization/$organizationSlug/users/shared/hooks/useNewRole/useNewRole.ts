@@ -45,7 +45,7 @@ export function useNewRole(onCreated: (key: ClinicRoleKey) => void) {
         permissions: ['organization:read'],
       });
       // A custom role's key IS its clinozy-be id (`rol_…`, Appendix F).
-      const key = role.id as ClinicRoleKey;
+      const key = role.id;
       await updateMatrix.mutateAsync({
         kind: 'addCustom',
         key,

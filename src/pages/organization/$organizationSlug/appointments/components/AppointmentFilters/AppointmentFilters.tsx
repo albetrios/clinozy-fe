@@ -79,10 +79,13 @@ function Section({
     );
   }
   return (
-    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-1.5">
+    <fieldset
+      aria-labelledby={labelId}
+      className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
+    >
       {heading}
       {children}
-    </div>
+    </fieldset>
   );
 }
 

@@ -51,7 +51,7 @@ function MatchRow<TItem>({
   const sub = typed ? t(K.typed) : row.item.sub;
   const meta = typed ? undefined : row.item.meta;
   return (
-    <div
+    <div // NOSONAR(S6819): a combobox's rich match row (label, sub line, meta) — a native <option> holds plain text only
       id={id}
       role="option"
       tabIndex={-1}
@@ -105,11 +105,10 @@ function FrequentChips<TItem>({
   const labelId = useId();
   if (items.length === 0) return null;
   return (
-    <div
-      role="group"
+    <fieldset
       aria-labelledby={labelId}
       data-testid={testId}
-      className="flex flex-wrap items-center gap-1.5"
+      className="m-0 flex min-w-0 flex-wrap items-center gap-1.5 border-0 p-0"
     >
       <span
         id={labelId}
@@ -131,7 +130,7 @@ function FrequentChips<TItem>({
           {item.chip ?? item.label}
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 }
 
@@ -229,7 +228,7 @@ function MatchesList<TItem>({
   }
   return (
     <>
-      <div
+      <div // NOSONAR(S6819): the combobox's popup list (focus stays in the line, aria-activedescendant) — a native <select> or <datalist> cannot hold these rows
         id={listId}
         role="listbox"
         aria-label={t(K.matches)}
@@ -237,7 +236,7 @@ function MatchesList<TItem>({
         className="min-h-0 overflow-y-auto"
       >
         {state.suggesting ? (
-          <div
+          <div // NOSONAR(S6819): the listbox's "Suggested" caption, kept out of its options — no native element does that
             role="presentation"
             className="text-micro text-muted-foreground px-2.5 pt-1.5 pb-1 font-semibold tracking-[0.05em] uppercase"
           >
@@ -359,7 +358,7 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
             ) : null}
           </div>
         </PopoverAnchor>
-        <PopoverContent
+        <PopoverContent // NOSONAR(S6819): role="presentation" drops Radix's dialog role from the popup — no native element does that
           side="bottom"
           align="start"
           sideOffset={4}

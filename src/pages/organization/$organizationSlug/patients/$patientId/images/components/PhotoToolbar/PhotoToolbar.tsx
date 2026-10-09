@@ -107,7 +107,7 @@ function PhotoSizeRadios({
         const checked = option === size;
         const name = t(SIZE_KEYS[option].name);
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this segmented letter
             key={option}
             ref={(node) => {
               if (node) refs.current.set(option, node);

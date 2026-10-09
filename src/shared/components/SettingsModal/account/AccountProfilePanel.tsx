@@ -126,7 +126,7 @@ function AvatarCard({ name }: { name: string }) {
     >
       <div className="flex flex-wrap items-center gap-4">
         {/* The shared avatar is decorative; this frame names the picture. */}
-        <div
+        <div // NOSONAR(S6819): frames a photo OR its initials — a native <img> cannot hold the initials
           role="img"
           aria-label={
             name ? t(profile.avatarAlt, { name }) : t(profile.avatarAltFallback)

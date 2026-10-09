@@ -8,6 +8,7 @@ import { forceLogout, logout, type SessionEndReason } from '@/shared/auth/servic
 import { startSessionLifetimeWatch } from '@/shared/auth/session-lifetime.ts';
 import {
   CONFIRM_BUTTON_CLASS,
+  type ConfirmLayout,
   ConfirmPanel,
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -180,6 +181,30 @@ function SessionTimeoutDialogBody() {
 
   const signingOut = phase === 'signing-out';
 
+  // The footer's buttons, sized for the frame the panel renders them in.
+  const renderFooter = (layout: ConfirmLayout) => (
+    <>
+      <Button
+        variant="outline"
+        onClick={() => signOut('logout')}
+        isLoading={signingOut}
+        data-testid="session-signout"
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {signingOut ? t(keys.signingOut) : t(keys.signOut)}
+      </Button>
+      <Button
+        ref={stayRef}
+        onClick={handleStaySignedIn}
+        disabled={signingOut}
+        data-testid="session-stay"
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {t(keys.staySignedIn)}
+      </Button>
+    </>
+  );
+
   return (
     // The frame every confirm shares: the end panel from `md`, the bottom sheet
     // below. No `onDismiss`: an unattended prompt owes an explicit answer, so it
@@ -201,28 +226,7 @@ function SessionTimeoutDialogBody() {
       // for an unattended prompt is the option that loses nothing.
       initialFocusRef={stayRef}
       testId="session-timeout-dialog"
-      footer={(layout) => (
-        <>
-          <Button
-            variant="outline"
-            onClick={() => signOut('logout')}
-            isLoading={signingOut}
-            data-testid="session-signout"
-            className={CONFIRM_BUTTON_CLASS[layout]}
-          >
-            {signingOut ? t(keys.signingOut) : t(keys.signOut)}
-          </Button>
-          <Button
-            ref={stayRef}
-            onClick={handleStaySignedIn}
-            disabled={signingOut}
-            data-testid="session-stay"
-            className={CONFIRM_BUTTON_CLASS[layout]}
-          >
-            {t(keys.staySignedIn)}
-          </Button>
-        </>
-      )}
+      footer={renderFooter}
     />
   );
 }

@@ -49,7 +49,7 @@ export function ChecksStep({
       {VISIT_CHECKS.map((check) => {
         const on = visit.checks[check];
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button checkbox; a native checkbox input cannot hold this two-line tile
             key={check}
             type="button"
             role="checkbox"

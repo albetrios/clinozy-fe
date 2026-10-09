@@ -42,7 +42,8 @@ function useSignedInFirstName(): string | null {
   });
   if (!data) return null;
   const firstName = data.user.firstName?.trim();
-  return firstName || data.user.email.split('@')[0] || null;
+  // A blank first name falls back to the address's local part, and a blank one of those to none.
+  return firstName || data.user.email.split('@')[0] || null; // NOSONAR(S6606): "" must fall back too
 }
 
 /**

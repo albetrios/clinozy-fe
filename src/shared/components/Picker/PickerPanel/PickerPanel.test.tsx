@@ -79,7 +79,8 @@ describe('PickerPanel', () => {
     );
     expect(document.querySelector('.animate-spinner')).not.toBeNull();
     const loading = screen.getByTestId('who-loading');
-    expect(loading).toHaveAttribute('role', 'status');
+    // An `<output>`: its implicit role is `status`.
+    expect(screen.getAllByRole('status')).toContain(loading);
     expect(loading).toHaveTextContent('Loading');
   });
 

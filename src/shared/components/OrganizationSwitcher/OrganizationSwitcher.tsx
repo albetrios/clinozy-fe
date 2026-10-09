@@ -456,14 +456,18 @@ function OrganizationSwitcherSubmenu({
  * switch-on-navigation); switching to the **personal** org has no URL to drive
  * it, so it calls `switchToPersonal()` and lands on the `/organization` picker.
  */
-export function OrganizationSwitcher(props: OrganizationSwitcherProps) {
-  return props.presentation === 'submenu' ? (
+export function OrganizationSwitcher({
+  presentation,
+  submenuLabel,
+  ...menuProps
+}: OrganizationSwitcherProps) {
+  return presentation === 'submenu' ? (
     <OrganizationSwitcherSubmenu
-      submenuLabel={props.submenuLabel}
-      onSwitched={props.onSwitched}
+      submenuLabel={submenuLabel}
+      onSwitched={menuProps.onSwitched}
     />
   ) : (
-    <OrganizationSwitcherMenu {...props} />
+    <OrganizationSwitcherMenu {...menuProps} />
   );
 }
 
@@ -472,7 +476,7 @@ function OrganizationSwitcherMenu({
   className,
   align = 'start',
   onSwitched,
-}: OrganizationSwitcherProps) {
+}: Pick<OrganizationSwitcherProps, 'className' | 'align' | 'onSwitched'>) {
   const { t } = useTranslation(LAYOUT_NS);
   const [createOpen, setCreateOpen] = useState(false);
   const {

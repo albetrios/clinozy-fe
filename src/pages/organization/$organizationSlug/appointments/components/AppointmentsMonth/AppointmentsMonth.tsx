@@ -86,7 +86,7 @@ function MonthCell({ date, today, rows, fit, refreshing, onOpenDay }: MonthCellP
         </span>
         <span className="flex-1" />
         {doubleBooked(rows) ? (
-          <span
+          <span // NOSONAR(S6819): a CSS-drawn dot — a native <img> needs an image source to draw
             role="img"
             aria-label={t(APPOINTMENTS_KEYS.calendar.overlap)}
             title={t(APPOINTMENTS_KEYS.calendar.overlap)}

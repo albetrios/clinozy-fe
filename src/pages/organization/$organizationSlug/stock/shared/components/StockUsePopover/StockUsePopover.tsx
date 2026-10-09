@@ -189,7 +189,10 @@ function QuantityField({
           +
         </Button>
       </div>
-      <div role="group" aria-label={t(K.quantity)} className="flex flex-wrap gap-1.5">
+      <fieldset
+        aria-label={t(K.quantity)}
+        className="m-0 flex min-w-0 flex-wrap gap-1.5 border-0 p-0"
+      >
         {quickQuantities(mode, item, 'popover').map((value) => {
           const picked = Number.parseFloat(quantity) === value;
           return (
@@ -211,7 +214,7 @@ function QuantityField({
             </button>
           );
         })}
-      </div>
+      </fieldset>
     </>
   );
 }
@@ -387,8 +390,8 @@ export function StockUsePopover({
           align="end"
           sideOffset={6}
           collisionPadding={8}
+          // Radix gives the content its `dialog` role; the label names it.
           aria-label={t(K.label, { name: item.name })}
-          role="dialog"
           className="flex w-75 flex-col rounded-xl p-0"
           // The quantity is the popover's field: it takes focus, selected.
           onOpenAutoFocus={(event) => {

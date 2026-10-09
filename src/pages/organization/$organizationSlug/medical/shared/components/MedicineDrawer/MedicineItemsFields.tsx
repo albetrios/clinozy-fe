@@ -123,13 +123,16 @@ interface RatesProps extends ItemsProps {
   openChild?: OpenMedicalChild;
 }
 
+/** What the supplier-price columns read. */
+type RateColumnsProps = Pick<RatesProps, 'form' | 'values' | 'pickers' | 'openChild'>;
+
 /** The supplier-price rows: Supplier · Rate* · Free · Lead days (H:5373). */
 function useRateColumns({
   form,
   values,
   pickers,
   openChild,
-}: RatesProps): ItemsColumn<MedicineFormValues, 'supplierRates'>[] {
+}: RateColumnsProps): ItemsColumn<MedicineFormValues, 'supplierRates'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const makerId = values.manufacturerId;
   const makerIds = makerId ? [makerId] : [];
@@ -217,15 +220,22 @@ function useRateColumns({
  * "Enter this supplier’s rate"), free units and lead days. "+ Add supplier
  * price" offers the next supplier of its maker without a price.
  */
-export function MedicineRatesField(props: RatesProps) {
+export function MedicineRatesField({
+  form,
+  values,
+  readOnly,
+  testId,
+  pickers,
+  suppliers,
+  openChild,
+}: RatesProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { form, readOnly, testId, suppliers } = props;
   return (
     <ItemsField
       control={form.control}
       name="supplierRates"
       label={t(R.title)}
-      columns={useRateColumns(props)}
+      columns={useRateColumns({ form, values, pickers, openChild })}
       newRow={() =>
         nextSupplierRate(form.getValues(), suppliers, form.getValues('manufacturerId'))
       }

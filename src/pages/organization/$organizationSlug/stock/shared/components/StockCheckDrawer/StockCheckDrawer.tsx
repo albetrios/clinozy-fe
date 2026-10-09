@@ -33,6 +33,13 @@ const CONTENT_PROFILE = { fieldCount: 1, hasItems: true } as const;
 /** A count's longest text (8 characters, `clinic-stock.md:164`). */
 const COUNT_MAX_LENGTH = 8;
 
+/*
+ * The count table is an ARIA table on grid `div`s: every row is a CSS grid (a
+ * 2 × 2 card on a phone), and native `<table>` parts lose their table
+ * semantics once their `display` is changed — so the `NOSONAR(S6819)` marks on
+ * `role="table"`, `row`, `columnheader` and `cell` below are deliberate.
+ */
+
 /** The grid from `md` (`clinic-stock.md:78`); a phone's 2 × 2 card below it (`:84`). */
 const ROW_GRID =
   'grid items-center gap-x-3 px-(--drawer-pad-x) py-2 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(150px,190px)_minmax(96px,130px)] max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-x-2.5 max-md:gap-y-2 max-md:py-3';
@@ -96,26 +103,32 @@ function CountRow({
       : null;
 
   return (
-    <div
+    <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
       role="row"
       tabIndex={-1}
       className={cn(ROW_GRID, 'border-b')}
       data-testid={`${testId}-row`}
     >
-      <div role="cell" className="flex min-w-0 flex-col">
+      <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+        role="cell"
+        className="flex min-w-0 flex-col"
+      >
         <span className="text-body truncate font-medium">{item.name}</span>
         <span className="text-caption text-muted-foreground truncate">
           {words.category(item.category).label}
         </span>
       </div>
-      <div
+      <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
         role="cell"
         className="text-detail text-muted-foreground-strong max-md:text-end"
       >
         <span className="md:hidden">{t(K.inSystem, { quantity: system })}</span>
         <span className="max-md:hidden">{system}</span>
       </div>
-      <div role="cell" className="flex min-w-0 flex-col gap-0.5">
+      <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+        role="cell"
+        className="flex min-w-0 flex-col gap-0.5"
+      >
         <div className="flex items-center gap-1.5">
           <div className="border-input bg-background focus-within:ring-ring flex h-8 min-w-0 flex-1 items-center rounded-lg border px-2 focus-within:ring-2 max-md:h-10">
             <input
@@ -153,7 +166,10 @@ function CountRow({
           </span>
         ) : null}
       </div>
-      <div role="cell" className="flex justify-end">
+      <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+        role="cell"
+        className="flex justify-end"
+      >
         <TonePill tone={pill.tone} data-testid={`${testId}-difference`}>
           <span className="tabular-nums">{pill.label}</span>
         </TonePill>
@@ -271,8 +287,12 @@ function CheckSession({
             testId={`${testId}-category`}
           />
         </div>
-        <div role="table" aria-label={t(K.title)} className="flex flex-col">
-          <div
+        <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+          role="table"
+          aria-label={t(K.title)}
+          className="flex flex-col"
+        >
+          <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
             role="row"
             tabIndex={-1}
             className={cn(
@@ -280,16 +300,29 @@ function CheckSession({
               'bg-muted text-micro text-muted-foreground-strong sticky top-0 z-10 h-9 border-b py-0 font-semibold tracking-[0.04em] uppercase max-md:hidden',
             )}
           >
-            <span role="columnheader" tabIndex={-1}>
+            <span // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+              role="columnheader"
+              tabIndex={-1}
+            >
               {t(K.heads.item)}
             </span>
-            <span role="columnheader" tabIndex={-1}>
+            <span // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+              role="columnheader"
+              tabIndex={-1}
+            >
               {t(K.heads.inSystem)}
             </span>
-            <span role="columnheader" tabIndex={-1}>
+            <span // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+              role="columnheader"
+              tabIndex={-1}
+            >
               {t(K.heads.counted)}
             </span>
-            <span role="columnheader" tabIndex={-1} className="text-end">
+            <span // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
+              role="columnheader"
+              tabIndex={-1}
+              className="text-end"
+            >
               {t(K.heads.difference)}
             </span>
           </div>

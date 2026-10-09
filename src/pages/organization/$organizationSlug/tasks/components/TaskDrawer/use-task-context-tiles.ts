@@ -44,7 +44,7 @@ export function useTaskContextTiles(detail: TaskDetail, now: Date): TaskContextT
   const tiles: TaskContextTile[] = [];
   const add = (key: TaskContextTileKey, value: string | null | undefined) => {
     if (tiles.some((tile) => tile.key === key)) return;
-    tiles.push({ key, label: t(TASKS_KEYS.drawer.tiles[key]), value: value || NONE });
+    tiles.push({ key, label: t(TASKS_KEYS.drawer.tiles[key]), value: value || NONE }); // NOSONAR(S6606): an empty value shows the dash too
   };
   const named = (id: string | null) => {
     const staff = id ? detail.staff.find((member: TaskStaff) => member.id === id) : null;

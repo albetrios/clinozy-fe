@@ -229,11 +229,12 @@ export function planFold(
     folded.push(index);
   }
   const keptIds = kept.map((index) => columns[index]?.id ?? '');
+  // The desktop meta line reads in column order (H:4125).
+  folded.sort((a, b) => a - b);
   return {
     ...plan,
     kept: keptIds,
-    // The desktop meta line reads in column order (H:4125).
-    folded: folded.sort((a, b) => a - b).map((index) => columns[index]?.id ?? ''),
+    folded: folded.map((index) => columns[index]?.id ?? ''),
     template: rowTemplate(columns, keptIds, plan.primaryId, 'folded'),
   };
 }

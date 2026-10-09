@@ -158,7 +158,7 @@ export function InvoicePrint({
             <PrintField
               className="gap-[3mm]"
               label={t(PRINT_TEMPLATE_KEYS.name)}
-              value={name || '—'}
+              value={name || '—'} // NOSONAR(S6606): a blank name prints the dash
               strong
               valueClassName="uppercase"
             />
@@ -216,7 +216,9 @@ export function InvoicePrint({
         >
           {/* The Remark is the one note that prints (D33; the prototype read `note`). */}
           <p className="mt-[1.95mm] leading-[3.9mm] wrap-anywhere">
-            {invoice.remark || t(keys.noNotes)}
+            {
+              invoice.remark || t(keys.noNotes) // NOSONAR(S6606): a blank remark prints "No notes"
+            }
           </p>
         </PrintBox>
         <InvoicePaymentSummary totals={totals} balance={balance} format={format} />

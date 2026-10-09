@@ -42,12 +42,11 @@ export function DataTableSavedViews({
   if (views.length === 0) return null;
 
   return (
-    <div
-      role="group"
+    <fieldset
       aria-label={t(TABLE_KEYS.savedViews.label)}
       data-testid={TABLE_TEST_IDS.savedViews(tableId)}
       className={cn(
-        'bg-muted flex h-9 max-w-full flex-none [scrollbar-width:none] items-center gap-0.5 overflow-x-auto rounded-lg p-0.75',
+        'bg-muted m-0 flex h-9 max-w-full min-w-0 flex-none [scrollbar-width:none] items-center gap-0.5 overflow-x-auto rounded-lg border-0 p-0.75',
         className,
       )}
     >
@@ -91,6 +90,6 @@ export function DataTableSavedViews({
           </span>
         );
       })}
-    </div>
+    </fieldset>
   );
 }

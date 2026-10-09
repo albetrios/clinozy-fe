@@ -194,11 +194,10 @@ function TeethChart({ values, setParam, testId }: FieldProps) {
     <DrawerField label={t(K.dental.teeth)} hint={t(K.dental.teethHint)} span="full">
       <div className="grid gap-3 md:grid-cols-2">
         {FDI_QUADRANTS.map((quadrant) => (
-          <div
+          <fieldset
             key={quadrant.key}
-            role="group"
             aria-label={t(K.dental.quadrants[quadrant.key])}
-            className="flex min-w-0 flex-col gap-1.5"
+            className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
           >
             <span className="text-micro text-muted-foreground font-semibold tracking-[0.05em] uppercase">
               {t(K.dental.quadrants[quadrant.key])}
@@ -226,7 +225,7 @@ function TeethChart({ values, setParam, testId }: FieldProps) {
                 );
               })}
             </div>
-          </div>
+          </fieldset>
         ))}
       </div>
     </DrawerField>
@@ -239,6 +238,7 @@ function ParamStepper({
   param,
   suffix,
   max,
+  span,
   values,
   setParam,
   testId,
@@ -251,7 +251,7 @@ function ParamStepper({
 }) {
   const id = useId();
   return (
-    <DrawerField label={label} htmlFor={id}>
+    <DrawerField label={label} htmlFor={id} span={span}>
       <DrawerStepper
         id={id}
         label={label}
@@ -453,7 +453,7 @@ function GynacFields(props: FieldProps) {
         <DatePicker
           id={lmpId}
           label={t(K.gynac.lmp)}
-          value={props.values.params.lmp || null}
+          value={props.values.params.lmp || null} // NOSONAR(S6606): a cleared date is stored as "" — it means no date
           onChange={(date) => props.setParam('lmp', date ?? '')}
           past={300}
           future={0}

@@ -175,7 +175,7 @@ export function LeadInterestsField({
     ...INTEREST_CHIPS.map((interest) => ({
       value: interest as string,
       label: tClinic(CLINIC_KEYS.leads.interests[interest]),
-      tone: LEAD_INTEREST_TONES[interest] as Tone,
+      tone: LEAD_INTEREST_TONES[interest],
     })),
     ...value.customInterests.map((label) => ({
       value: `${CUSTOM_PREFIX}${label}`,

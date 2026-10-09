@@ -48,7 +48,7 @@ export function TodayGreeting({
   const today = clinicToday(now);
   const time = clinicClockTime(now);
   const part = greetingFor(Number(time.slice(0, 2)));
-  const name = firstName?.trim() || t(TODAY_KEYS.greeting.nobody);
+  const name = firstName?.trim() || t(TODAY_KEYS.greeting.nobody); // NOSONAR(S6606): a blank name greets nobody
   const day = formatDate(
     clinicWallClock(today, '00:00'),
     { weekday: 'short', day: 'numeric', month: 'short' },

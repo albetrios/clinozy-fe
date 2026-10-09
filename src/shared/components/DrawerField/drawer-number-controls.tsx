@@ -137,7 +137,10 @@ export function DrawerQuickChips<T extends string | number>({
   testId?: string;
 }) {
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-1.5">
+    <fieldset
+      aria-label={label}
+      className="m-0 flex min-w-0 flex-wrap gap-1.5 border-0 p-0"
+    >
       {options.map((option) => (
         <button
           key={option.value}
@@ -157,7 +160,7 @@ export function DrawerQuickChips<T extends string | number>({
           {option.label}
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 }
 

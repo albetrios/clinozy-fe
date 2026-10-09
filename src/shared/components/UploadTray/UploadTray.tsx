@@ -139,9 +139,9 @@ function UploadTrayPanel() {
       {/* Mounted for the whole session: a live region inserted together with its text is
           often announced to nobody, so the first "Uploading…" would go unread. The panel's
           own header is plain text — per-file percentages must never re-announce. */}
-      <p role="status" className="sr-only" data-testid="upload-tray-status">
+      <output className="sr-only" data-testid="upload-tray-status">
         {summary}
-      </p>
+      </output>
       {rows.length > 0 ? (
         // A dismissable-layer branch, like the toasts: a press on the tray (Retry, Remove,
         // the toggle) is never an open drawer's outside press, and the tray stays usable

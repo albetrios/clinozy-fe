@@ -36,9 +36,13 @@ const LISTED = 3;
 /** How many medicines the Prescriptions card names (H:4994 `slice(0, 4)`). */
 const MEDICINES_NAMED = 4;
 
-/** What a card's head opens and adds: each none for a member who may not. */
+/** What a card's head opens: none for a member who may not. */
 interface CardLinks {
   onOpen: (() => void) | null;
+}
+
+/** What a card's head opens and adds: each none for a member who may not. */
+interface NewCardLinks extends CardLinks {
   onNew?: { label: string; run: () => void } | null;
 }
 
@@ -260,7 +264,7 @@ export function PackagesBentoCard({
  * Prescriptions (H:774, H:4994): "New prescription"; the latest "Rx #500"
  * with its date, up to four medicines and its advice; "No prescriptions yet".
  */
-export function PrescriptionsBentoCard({ onOpen, onNew }: CardLinks) {
+export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
   const day = useTableDay();
@@ -326,7 +330,7 @@ export function TreatmentsBentoCard({
   onOpen,
   onNew,
   onEdit,
-}: CardLinks & { onEdit: (treatmentId: string) => void }) {
+}: NewCardLinks & { onEdit: (treatmentId: string) => void }) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
   const clock = useClinicClock();

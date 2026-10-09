@@ -129,19 +129,30 @@ function summaryOf(values: ManufacturerFormValues, t: TFunction): string {
   return [values.name.trim(), ...counts].filter(Boolean).join(' · ');
 }
 
-/** What the steps' bodies read. */
-interface BodyProps {
+/** What every step's body reads: the form, the DOM ids' prefix, the root test id. */
+interface FieldsProps {
   form: UseFormReturn<ManufacturerFormValues>;
-  values: ManufacturerFormValues;
   idPrefix: string;
   testId: string;
+}
+
+/** MANUFACTURER's body: the values, for a saved colour outside the six. */
+interface MakerFieldsProps extends FieldsProps {
+  values: ManufacturerFormValues;
+}
+
+/** CONNECTIONS' body: the pickers, the stack and the medicines it makes. */
+interface ConnectionFieldsProps extends FieldsProps {
   pickers: MedicalPickers;
   openChild?: OpenMedicalChild;
   medicineCount: number;
 }
 
+/** What the steps' bodies read. */
+type BodyProps = MakerFieldsProps & ConnectionFieldsProps;
+
 /** MANUFACTURER: Name* (upper case) · Colour. */
-function MakerFields({ form, values, idPrefix, testId }: BodyProps) {
+function MakerFields({ form, values, idPrefix, testId }: MakerFieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
@@ -204,7 +215,7 @@ function ConnectionFields({
   pickers,
   openChild,
   medicineCount,
-}: BodyProps) {
+}: ConnectionFieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const suppliers = field('supplierIds');

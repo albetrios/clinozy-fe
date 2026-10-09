@@ -126,15 +126,14 @@ function PhotosEmpty({ album, onUpload }: { album: string; onUpload?: () => void
 function PhotosSkeleton() {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   return (
-    <div
-      role="status"
+    <output
       aria-label={t(K.loading)}
       className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-2.5"
     >
       {[0, 1, 2].map((index) => (
         <SkeletonBar key={index} shape="field" className="aspect-square h-auto" />
       ))}
-    </div>
+    </output>
   );
 }
 

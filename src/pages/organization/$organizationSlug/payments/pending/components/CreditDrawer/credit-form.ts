@@ -51,7 +51,7 @@ export function partyByName(name: string): CreditParty {
   const slug = trimmed
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/(?:^-)|(?:-$)/g, '');
   return { key: `name:${slug}`, name: trimmed, patientId: null };
 }
 

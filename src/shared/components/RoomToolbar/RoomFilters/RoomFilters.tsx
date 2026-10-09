@@ -187,10 +187,13 @@ function FilterSection({
     );
   }
   return (
-    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
+    <fieldset
+      aria-labelledby={labelId}
+      className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0"
+    >
       {heading}
       <div className="flex flex-wrap gap-1.5">{children}</div>
-    </div>
+    </fieldset>
   );
 }
 

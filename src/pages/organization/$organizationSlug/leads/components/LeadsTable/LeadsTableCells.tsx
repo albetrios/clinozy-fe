@@ -1,13 +1,19 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { AvatarStack, PersonChip } from '@/shared/components/Cells/index.ts';
+import {
+  AvatarStack,
+  type AvatarStackPerson,
+  PersonChip,
+} from '@/shared/components/Cells/index.ts';
 import { ContactCard, TeamCard } from '@/shared/components/PersonCard/index.ts';
 import {
   Tooltip,
@@ -111,6 +117,45 @@ function HoldPill({ lead }: { lead: LeadRecord }) {
   );
 }
 
+/** What a Team-column team card reads beyond its person. */
+interface TeamCardSource {
+  staffById: ReadonlyMap<string, StaffProfile>;
+  roleLabel: (role: Role) => string;
+  staffUpdatedAt: string | null;
+}
+
+/** Wraps the owner's chip in their team card, with the take-over button when one is offered. */
+function ownerCardWrap(
+  owner: StaffProfile,
+  { roleLabel, staffUpdatedAt }: TeamCardSource,
+  assign: { label: string; onAssign: () => void } | undefined,
+) {
+  return (_person: AvatarStackPerson, pill: ReactNode) => (
+    <TeamCard
+      data={teamCardDataOf(owner, roleLabel, staffUpdatedAt)}
+      kind="assigned"
+      triggerClassName="max-w-full"
+      assign={assign}
+    >
+      {pill}
+    </TeamCard>
+  );
+}
+
+/** Wraps each involved person's chip in their team card — a person no longer on the team stays bare. */
+function involvedCardWrap({ staffById, roleLabel, staffUpdatedAt }: TeamCardSource) {
+  return (person: AvatarStackPerson, pill: ReactNode) => {
+    const profile = staffById.get(person.id);
+    return profile ? (
+      <TeamCard data={teamCardDataOf(profile, roleLabel, staffUpdatedAt)} kind="involved">
+        {pill}
+      </TeamCard>
+    ) : (
+      pill
+    );
+  };
+}
+
 /**
  * The Team cell (`leads.md:32`; H:1739–1741): the owner's 28px chip — avatar
  * with the 7px presence dot and short name, the team card on hover (160ms) with
@@ -140,6 +185,7 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
   const releaseHint = t(
     hold.releasesToday ? LEADS_KEYS.team.releasesToday : LEADS_KEYS.team.releasesTomorrow,
   );
+  const cards: TeamCardSource = { staffById, roleLabel, staffUpdatedAt };
 
   // Nothing in the cell shrinks: a narrow Team column lets the pills run on
   // over the gap, as the prototype's does at 820 — never cuts the owner's name.
@@ -151,19 +197,12 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
           max={1}
           nameFirst
           className="flex-none"
-          wrapPerson={(_person, pill) => (
-            <TeamCard
-              data={teamCardDataOf(owner, roleLabel, staffUpdatedAt)}
-              kind="assigned"
-              triggerClassName="max-w-full"
-              assign={
-                takeOver === null
-                  ? undefined
-                  : { label: takeOver, onAssign: () => onClaim(lead) }
-              }
-            >
-              {pill}
-            </TeamCard>
+          wrapPerson={ownerCardWrap(
+            owner,
+            cards,
+            takeOver === null
+              ? undefined
+              : { label: takeOver, onAssign: () => onClaim(lead) },
           )}
         />
       ) : (
@@ -173,7 +212,7 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
       {hold.releasesWithinDay ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span
+            <span // NOSONAR(S6819): a CSS-drawn 7px dot with a name, the tooltip's trigger — an <img> needs an image to draw
               role="img"
               data-slot="pill"
               aria-label={releaseHint}
@@ -189,19 +228,7 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
           people={involved.map((profile) => staffPerson(profile))}
           max={3}
           className="flex-none"
-          wrapPerson={(person, pill) => {
-            const profile = staffById.get(person.id);
-            return profile ? (
-              <TeamCard
-                data={teamCardDataOf(profile, roleLabel, staffUpdatedAt)}
-                kind="involved"
-              >
-                {pill}
-              </TeamCard>
-            ) : (
-              pill
-            );
-          }}
+          wrapPerson={involvedCardWrap(cards)}
         />
       ) : null}
     </span>

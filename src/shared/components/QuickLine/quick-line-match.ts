@@ -83,10 +83,8 @@ export function quickLineMatches<T extends QuickLineSearchable>(
     }
     scored.push({ entry, score });
   });
-  return scored
-    .sort((a, b) => a.score - b.score)
-    .slice(0, limit)
-    .map((match) => match.entry);
+  scored.sort((a, b) => a.score - b.score);
+  return scored.slice(0, limit).map((match) => match.entry);
 }
 
 /**

@@ -37,7 +37,7 @@ function HeaderCell<TData extends RowData>({
 }) {
   const custom = typeof column.columnDef.header === 'function';
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
       role="columnheader"
       tabIndex={-1}
       aria-sort={ariaSortOf(column)}
@@ -75,12 +75,12 @@ export function DataTableHeaderRow<TData extends RowData>({
 }) {
   const { t } = useTranslation(TABLE_NS);
   return (
-    <div
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
       ref={headerRef}
       role="rowgroup"
       className="bg-canvas flex-none [scrollbar-gutter:stable] overflow-hidden border-b"
     >
-      <div
+      <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
         role="row"
         tabIndex={-1}
         aria-rowindex={1}
@@ -88,7 +88,7 @@ export function DataTableHeaderRow<TData extends RowData>({
         className="group/row text-micro text-muted-foreground grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)] px-(--table-pad-x) font-semibold tracking-[0.03em] uppercase"
       >
         {selection.enabled ? (
-          <div
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
             role="columnheader"
             tabIndex={-1}
             className="flex items-center justify-center"
@@ -106,7 +106,10 @@ export function DataTableHeaderRow<TData extends RowData>({
           <HeaderCell key={column.id} column={column} header={headers.get(column.id)} />
         ))}
         {hasActions ? (
-          <div role="columnheader" tabIndex={-1}>
+          <div // NOSONAR(S6819): grid/flex ARIA table, see the note in DataTable.tsx
+            role="columnheader"
+            tabIndex={-1}
+          >
             <span className="sr-only">{t(TABLE_KEYS.actions)}</span>
           </div>
         ) : null}

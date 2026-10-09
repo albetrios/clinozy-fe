@@ -71,17 +71,25 @@ function nextVisitFor(pick: NextVisitPick, date: string): string {
   return pick === 'twoWeeks' ? addCivilDays(date, 14) : addCivilMonths(date, 1);
 }
 
-/** What the steps' bodies read. */
-interface BodyProps {
+/** What every step's body reads: the form, the DOM ids' prefix, the root test id. */
+interface FieldsProps {
   form: UseFormReturn<VisitFormValues>;
-  values: VisitFormValues;
   idPrefix: string;
   testId: string;
+}
+
+/** A body with a date picker: today bounds it. */
+interface DatedFieldsProps extends FieldsProps {
   today: string;
 }
 
+/** What the steps' bodies read: DETAILS also matches its quick picks to the values. */
+interface BodyProps extends DatedFieldsProps {
+  values: VisitFormValues;
+}
+
 /** VISIT: the day it happened. */
-function VisitFields({ form, idPrefix, testId, today }: BodyProps) {
+function VisitFields({ form, idPrefix, testId, today }: DatedFieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const date = field('date');
@@ -167,7 +175,7 @@ function DetailFields({ form, values, idPrefix, testId, today }: BodyProps) {
 }
 
 /** NOTES: anything else from the visit. */
-function NoteFields({ form, idPrefix, testId }: BodyProps) {
+function NoteFields({ form, idPrefix, testId }: FieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const note = field('notes');

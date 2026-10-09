@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -36,6 +37,37 @@ export interface DoctorPickerProps {
   align?: 'start' | 'end';
   testId: string;
   className?: string;
+}
+
+/** What the Day header's footer under the list needs. */
+interface DoctorPickerFooterOptions {
+  onShowAll: () => void;
+  showAllLabel: string;
+  doneLabel: string;
+}
+
+/**
+ * "Show all" · "Done" under the list (the Day header, `appointments.md:191`) —
+ * the Picker calls it with its `close`, which "Done" runs.
+ */
+function doctorPickerFooter(
+  close: () => void,
+  { onShowAll, showAllLabel, doneLabel }: DoctorPickerFooterOptions,
+): ReactNode {
+  return (
+    <>
+      <button
+        type="button"
+        onClick={onShowAll}
+        className="text-muted-foreground hover:text-foreground px-1 text-xs transition-colors"
+      >
+        {showAllLabel}
+      </button>
+      <Button type="button" size="sm" onClick={close} className="text-detail">
+        {doneLabel}
+      </Button>
+    </>
+  );
 }
 
 /**
@@ -92,20 +124,12 @@ export function DoctorPicker({
       className={className}
       footer={
         withFooter
-          ? (close) => (
-              <>
-                <button
-                  type="button"
-                  onClick={() => onChange([])}
-                  className="text-muted-foreground hover:text-foreground px-1 text-xs transition-colors"
-                >
-                  {t(keys.showAll)}
-                </button>
-                <Button type="button" size="sm" onClick={close} className="text-detail">
-                  {t(keys.done)}
-                </Button>
-              </>
-            )
+          ? (close) =>
+              doctorPickerFooter(close, {
+                onShowAll: () => onChange([]),
+                showAllLabel: t(keys.showAll),
+                doneLabel: t(keys.done),
+              })
           : undefined
       }
       renderTrigger={({ open }) => (

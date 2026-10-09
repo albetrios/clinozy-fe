@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2127 src files · ~1047 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
+Stats: ~2126 src files · ~1047 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -286,10 +286,6 @@ clinozy-fe/
 │   │   ├── 2026-09-24-production-readiness.md
 │   │   └── README.md
 │   └── README.md
-├── handoff/
-│   └── sonar-2026-10-07/
-│       ├── issues.json
-│       └── README.md
 ├── iterations/
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
@@ -1398,7 +1394,6 @@ clinozy-fe/
 │   │   │   │   │   ├── task-rules.fixtures.ts
 │   │   │   │   │   ├── tasks-server.fixtures.ts
 │   │   │   │   │   ├── tasks.fixtures.ts
-│   │   │   │   │   ├── today-server.fixtures.ts
 │   │   │   │   │   ├── visits-server.fixtures.ts
 │   │   │   │   │   ├── visits.fixtures.ts
 │   │   │   │   │   ├── world.fixtures.ts

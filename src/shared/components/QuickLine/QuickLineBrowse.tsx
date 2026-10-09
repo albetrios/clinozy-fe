@@ -136,10 +136,9 @@ export function QuickLineBrowse<TItem>({
   return (
     <>
       <div className="flex flex-none items-center gap-2 border-b py-2.5 ps-3 pe-2.5">
-        <div
-          role="group"
+        <fieldset
           aria-label={t(K.groups)}
-          className="flex min-w-0 flex-1 [scrollbar-width:none] gap-1.5 overflow-x-auto"
+          className="m-0 flex min-w-0 flex-1 [scrollbar-width:none] gap-1.5 overflow-x-auto border-0 p-0"
         >
           {config.groups.map((option) => {
             const on = option.id === group;
@@ -162,7 +161,7 @@ export function QuickLineBrowse<TItem>({
               </button>
             );
           })}
-        </div>
+        </fieldset>
         <Button
           type="button"
           variant="ghost"

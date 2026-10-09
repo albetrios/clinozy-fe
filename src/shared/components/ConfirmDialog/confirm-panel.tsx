@@ -59,8 +59,8 @@ export interface ConfirmPanelProps {
 
 type TextSlot = ComponentType<ComponentProps<typeof AlertDialogTitle>>;
 
-/** What both frames render. */
-interface FrameProps extends ConfirmPanelProps {
+/** What both frames render — the initial focus is already in the focus handlers. */
+interface FrameProps extends Omit<ConfirmPanelProps, 'initialFocusRef'> {
   onOpenAutoFocus: (event: Event) => void;
   onCloseAutoFocus: (event: Event) => void;
 }
@@ -284,12 +284,12 @@ function ConfirmSheet({
  * every confirm reads the same. Focus starts on `initialFocusRef` and returns
  * to whatever was focused when it opened.
  */
-export function ConfirmPanel(props: ConfirmPanelProps) {
+export function ConfirmPanel({ initialFocusRef, ...frame }: ConfirmPanelProps) {
   const tier = useViewportTier();
-  const focus = useConfirmFocus(props.initialFocusRef);
+  const focus = useConfirmFocus(initialFocusRef);
   return tier === 'phone' ? (
-    <ConfirmSheet {...props} {...focus} />
+    <ConfirmSheet {...frame} {...focus} />
   ) : (
-    <ConfirmEndPanel {...props} {...focus} />
+    <ConfirmEndPanel {...frame} {...focus} />
   );
 }

@@ -88,7 +88,7 @@ export function ProductWordmark({ className }: { className?: string }) {
  */
 export function BrandLogo({ wordmark }: { wordmark?: 'md' | 'always' }) {
   return (
-    <span
+    <span // NOSONAR(S6819): the inline SVG mark and the drawn wordmark, named once — an <img> cannot hold them
       role="img"
       aria-label={PRODUCT_NAME}
       className="flex flex-none items-center gap-2.25 leading-none"

@@ -116,11 +116,16 @@ function quickFillItems(
 }
 
 /** The member an edit shows, else null (a new user, or the Team still loading). */
-const editedMember = (props: SessionProps): TeamMember | null =>
+const editedMember = (props: UserDrawerProps): TeamMember | null =>
   props.mode === 'edit' ? (props.member ?? null) : null;
 
 /** The drawer's words and mode-only parts for each use (`users.md:169–170`). */
-function drawerChrome(props: SessionProps, member: TeamMember | null, t: TFunction) {
+function drawerChrome(
+  props: UserDrawerProps,
+  member: TeamMember | null,
+  ready: boolean,
+  t: TFunction,
+) {
   const create = props.mode === 'create';
   return {
     create,
@@ -128,7 +133,7 @@ function drawerChrome(props: SessionProps, member: TeamMember | null, t: TFuncti
      * Access or branches unknown yet, or an edit with the Team still loading:
      * the skeleton, no steps — the form starts once it knows its defaults.
      */
-    loading: !props.ready || (props.mode === 'edit' && !member),
+    loading: !ready || (props.mode === 'edit' && !member),
     title: create ? t(K.title.create) : t(K.title.edit),
     tag: member && member.seq !== null ? displayId.user(member.seq) : undefined,
     saveLabel: create ? t(K.save.create) : t(K.save.edit),
@@ -136,7 +141,7 @@ function drawerChrome(props: SessionProps, member: TeamMember | null, t: TFuncti
 }
 
 /** What follows a save: its toast — the person's full name (D28) — then the caller's hand-off. */
-function useSaveOutcome(props: SessionProps) {
+function useSaveOutcome(props: UserDrawerProps, onAnother: () => void) {
   const { t } = useTranslation(USERS_NS);
   return (outcome: UserSaveOutcome, another: boolean) => {
     notify.success(
@@ -145,7 +150,7 @@ function useSaveOutcome(props: SessionProps) {
         : t(K.saved, { name: outcome.name }),
     );
     if (props.mode === 'edit') props.onSaved();
-    else if (another) props.onAnother();
+    else if (another) onAnother();
     else props.onCreated();
   };
 }
@@ -246,7 +251,11 @@ function userDrawerSteps({
  * Undo in the confirm, and a confirm inside the drawer was unmounted — the
  * removal cancelled — the moment the drawer closed (L-64).
  */
-function useDrawerExit(props: SessionProps, member: TeamMember | null, record?: string) {
+function useDrawerExit(
+  props: UserDrawerProps,
+  member: TeamMember | null,
+  record?: string,
+) {
   const { t } = useTranslation(USERS_NS);
   if (props.mode !== 'edit' || !member)
     return { onDelete: undefined, deleteLabel: undefined };
@@ -264,11 +273,12 @@ function useDrawerExit(props: SessionProps, member: TeamMember | null, record?: 
 
 /** One opening of the drawer: the form, its checks and its save. */
 function UserDrawerSession(props: SessionProps) {
+  const { ready, onAnother } = props;
   const { t } = useTranslation(USERS_NS);
   const member = editedMember(props);
   const data = useDrawerData();
   const idPrefix = `user-${useId().replace(/:/g, '')}`;
-  const chrome = drawerChrome(props, member, t);
+  const chrome = drawerChrome(props, member, ready, t);
 
   const form = useForm<UserFormValues>({
     defaultValues: member ? userFormOf(member) : emptyUserForm(data.defaultBranchId),
@@ -291,7 +301,7 @@ function UserDrawerSession(props: SessionProps) {
     platformRoles: data.platformRoles,
     singleBranchId: data.singleBranchId,
     onStep: setOpenStep,
-    onDone: useSaveOutcome(props),
+    onDone: useSaveOutcome(props, onAnother),
   });
   // Still loading: no badges, no summary, no steps — the skeleton.
   const readouts = chrome.loading

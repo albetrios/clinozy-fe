@@ -194,11 +194,10 @@ export function PatientSectionsPopover({
       </div>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 pt-3 pb-3.5">
         {groups.map((group) => (
-          <div
+          <fieldset
             key={group.id}
-            role="group"
             aria-label={t(K.groups[group.id])}
-            className="flex flex-col gap-1.5"
+            className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0"
           >
             <span
               aria-hidden="true"
@@ -219,7 +218,7 @@ export function PatientSectionsPopover({
                 />
               ))}
             </div>
-          </div>
+          </fieldset>
         ))}
       </div>
       <div

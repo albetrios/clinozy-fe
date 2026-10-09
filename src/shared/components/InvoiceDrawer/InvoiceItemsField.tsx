@@ -176,14 +176,27 @@ function ItemPickerCellOf({
   );
 }
 
+/** What the table's columns read. */
+type ItemColumnsProps = Omit<
+  InvoiceItemsFieldProps,
+  'oftenBilled' | 'total' | 'canAddMedicine'
+>;
+
 /** The table's columns (H:5059): Offering · Qty · Rate · Disc % · GST · Final, then the ×. */
-function useItemColumns(
-  props: InvoiceItemsFieldProps,
-): ItemsColumn<InvoiceFormValues, 'items'>[] {
+function useItemColumns({
+  form,
+  values,
+  catalog,
+  floorOf,
+  floorVisible,
+  readOnly,
+  locked,
+  onNewOffering,
+  onPromo,
+}: ItemColumnsProps): ItemsColumn<InvoiceFormValues, 'items'>[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const formatPaise = usePaiseFormat();
-  const { form, catalog, readOnly, locked } = props;
-  const medical = props.values.type === 'medical';
+  const medical = values.type === 'medical';
   const editable = !(readOnly || locked);
   return [
     {
@@ -197,8 +210,8 @@ function useItemColumns(
           catalog={catalog}
           medical={medical}
           readOnly={!editable}
-          onNewOffering={props.onNewOffering}
-          onPromo={props.onPromo}
+          onNewOffering={onNewOffering}
+          onPromo={onPromo}
         />
       ),
     },
@@ -251,11 +264,11 @@ function useItemColumns(
       align: 'end',
       cell: (row) => {
         const named = row.row.name.trim() !== '';
-        const floor = named ? props.floorOf(row.row) : null;
+        const floor = named ? floorOf(row.row) : null;
         const below = belowFloor(row.row, floor);
         let message: string | undefined;
         if (below && floor !== null) {
-          message = props.floorVisible
+          message = floorVisible
             ? t(K.belowFloor, {
                 amount: formatPaise(Math.round(floor)),
                 name: row.row.name,
@@ -322,14 +335,35 @@ function useMedicineDraft(
  * floor — "Below the lowest price ₹4,000 for LHR Full Face · B4G7" for a role
  * that sees floors, else "Too much discount on … · ask an admin".
  */
-export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
+export function InvoiceItemsField({
+  form,
+  values,
+  catalog,
+  floorOf,
+  floorVisible,
+  oftenBilled,
+  total,
+  readOnly,
+  locked,
+  canAddMedicine,
+  onNewOffering,
+  onPromo,
+}: InvoiceItemsFieldProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const { form, catalog, oftenBilled, readOnly, locked } = props;
-  const medical = props.values.type === 'medical';
+  const medical = values.type === 'medical';
   const editable = !(readOnly || locked);
-  const rows = (useWatch({ control: form.control, name: 'items' }) ??
-    []) as InvoiceLineForm[];
-  const columns = useItemColumns(props);
+  const rows = useWatch({ control: form.control, name: 'items' }) ?? [];
+  const columns = useItemColumns({
+    form,
+    values,
+    catalog,
+    floorOf,
+    floorVisible,
+    readOnly,
+    locked,
+    onNewOffering,
+    onPromo,
+  });
   const groups = useBrowseGroups(catalog, oftenBilled, medical);
   const parse = useQuickLineTerms({
     numbers: nameNumbers(catalog.items.map((item) => item.label)),
@@ -341,9 +375,9 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
 
   const add = (item: InvoiceCatalogItem, values: QuickLineTermValues) => {
     setRows(withAddedLine(form.getValues('items'), item, values));
-    if (item.promo) props.onPromo(item);
+    if (item.promo) onPromo(item);
   };
-  const addMedicine = useMedicineDraft(medical && props.canAddMedicine, add);
+  const addMedicine = useMedicineDraft(medical && canAddMedicine, add);
 
   const countOf = (item: QuickLineItem<InvoiceCatalogItem>) =>
     namedLines(rows)
@@ -378,7 +412,7 @@ export function InvoiceItemsField(props: InvoiceItemsFieldProps) {
       newRow={() => blankLine()}
       minRows={1}
       addLabel={t(medical ? K.addMedicine : K.addItem)}
-      total={<MoneyCell paise={props.total} />}
+      total={<MoneyCell paise={total} />}
       totalLabel={t(K.total)}
       readOnly={!editable}
       testId={INVOICE_DRAWER_TEST_IDS.items}

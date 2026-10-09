@@ -10,12 +10,17 @@ import { useTranslation } from 'react-i18next';
 import { organizationLeadCreate } from '@/lib/routes/leads-builders.ts';
 import { groupAppointmentsByDay } from '@/shared/api/clinic/appointment-views.ts';
 import type {
+  AppointmentDaySummary,
   AppointmentPerson,
   AppointmentRow,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
-import { DataTable, dataTableFeatures } from '@/shared/components/DataTable/index.ts';
+import {
+  DataTable,
+  dataTableFeatures,
+  type DataTableGroup,
+} from '@/shared/components/DataTable/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
@@ -87,6 +92,25 @@ function AgendaEmpty({ onBook }: { onBook?: () => void }) {
 }
 
 /**
+ * A day's sticky header — the table calls it for each run of one day's rows,
+ * with the day's own count from `summaryOf`.
+ */
+function agendaDayHeader(
+  { key, index }: DataTableGroup<AppointmentRow>,
+  today: string,
+  summaryOf: ReadonlyMap<string, AppointmentDaySummary>,
+) {
+  return (
+    <AgendaDayHeader
+      date={key}
+      today={today}
+      groupIndex={index}
+      summary={summaryOf.get(key)}
+    />
+  );
+}
+
+/**
  * The Agenda (KICKOFF §6.4; H:2031–2052, `appointments.md:26–40`): the shared
  * table grouped by day under sticky headers — from today on, or the one day
  * picked in Filters — in cursor pages of 50 with infinite scroll and "All
@@ -130,28 +154,42 @@ export function AppointmentsAgenda() {
     navigation.patch({ sort: sortingToSearch(next) as AppointmentsSort | undefined });
   };
 
-  const newAppointment = (person: AppointmentPerson) => {
-    const who = person.patientId ?? person.leadId;
-    navigation.openCreate(who ? { who } : {});
-  };
-  const newLead = (person: AppointmentPerson) => {
-    void navigate({
-      ...organizationLeadCreate(organizationSlug),
-      search: { name: person.name, phone: person.phone ?? undefined },
-    });
-  };
+  const { openCreate } = navigation;
+  const { canEdit, canCreate } = actions;
+  const canCreateLead = access.can('leads', 'create');
 
   // One set of columns per language and tier: the cells read the live state
   // from `AgendaCellsContext`, so state changes never remount them.
   const columns = useMemo(() => agendaColumns(t, tier), [t, tier]);
-  const cells: AgendaCellsValue = {
-    timeOf: (row) => slotLabel(row.date, row.startTime).time,
-    canEdit: actions.canEdit,
+  const cells = useMemo<AgendaCellsValue>(() => {
+    const newAppointment = (person: AppointmentPerson) => {
+      const who = person.patientId ?? person.leadId;
+      openCreate(who ? { who } : {});
+    };
+    const newLead = (person: AppointmentPerson) => {
+      void navigate({
+        ...organizationLeadCreate(organizationSlug),
+        search: { name: person.name, phone: person.phone ?? undefined },
+      });
+    };
+    return {
+      timeOf: (row) => slotLabel(row.date, row.startTime).time,
+      canEdit,
+      statusTarget,
+      setStatusTarget,
+      onNewAppointment: canCreate ? newAppointment : undefined,
+      onNewLead: canCreateLead ? newLead : undefined,
+    };
+  }, [
+    slotLabel,
+    canEdit,
+    canCreate,
+    canCreateLead,
     statusTarget,
-    setStatusTarget,
-    onNewAppointment: actions.canCreate ? newAppointment : undefined,
-    onNewLead: access.can('leads', 'create') ? newLead : undefined,
-  };
+    openCreate,
+    navigate,
+    organizationSlug,
+  ]);
 
   const table = useTable({
     features: dataTableFeatures,
@@ -182,14 +220,7 @@ export function AppointmentsAgenda() {
         onRowClick={(row) => actions.open(row.original)}
         groups={{
           keyOf: (row) => row.date,
-          header: ({ key, index }) => (
-            <AgendaDayHeader
-              date={key}
-              today={today}
-              groupIndex={index}
-              summary={summaryOf.get(key)}
-            />
-          ),
+          header: (group) => agendaDayHeader(group, today, summaryOf),
         }}
         refreshing={list.isRefreshing}
         hasNextPage={list.hasNextPage}
@@ -204,9 +235,7 @@ export function AppointmentsAgenda() {
               rowClassName="h-13 px-(--table-pad-x)"
             />
           ) : (
-            <AgendaEmpty
-              onBook={actions.canCreate ? () => navigation.openCreate() : undefined}
-            />
+            <AgendaEmpty onBook={canCreate ? () => openCreate() : undefined} />
           )
         }
         className={`flex-1 ${AGENDA_METRICS}`}

@@ -51,8 +51,9 @@ export function DrawerSwatches({
         const picked = option === value;
         const tone = TONE_CLASSES[option];
         const name = t(RECORD_DRAWER_KEYS.colours[option]);
+        const pickedMark = mark || '✓'; // NOSONAR(S6606): an empty mark keeps "✓" too
         return (
-          <button
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this swatch
             key={option}
             type="button"
             role="radio"
@@ -73,7 +74,7 @@ export function DrawerSwatches({
                 : 'hover:ring-1 hover:ring-current',
             )}
           >
-            {picked ? <span aria-hidden="true">{mark || '✓'}</span> : null}
+            {picked ? <span aria-hidden="true">{pickedMark}</span> : null}
           </button>
         );
       })}

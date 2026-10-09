@@ -108,7 +108,7 @@ export function PersonCard<T>({
   useEffect(() => {
     if (!wanted || data !== undefined || !canLoad) return;
     const controller = new AbortController();
-    void fetchCard(controller.signal)?.then(
+    fetchCard(controller.signal)?.then(
       (value) => {
         if (!controller.signal.aborted) setLoaded({ value });
       },

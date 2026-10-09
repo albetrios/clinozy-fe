@@ -44,11 +44,6 @@ export interface PatientFileNavigation {
   bookAppointment?: () => void;
 }
 
-/** `action` when the member may, else nothing — a hidden control. */
-function when<A>(allowed: boolean, action: A): A | undefined {
-  return allowed ? action : undefined;
-}
-
 /**
  * The patient file's links (KICKOFF §6.6): its sections, the Patients list,
  * Edit patient over the open section, and the drawers of other rooms —
@@ -116,23 +111,28 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     });
   };
   const canBook = can('appointments', 'create');
+  const startVisit = () => start.mutate({ patientId }, { onSuccess: toFlow });
+  const bookOrReschedule = (next: PatientNextVisit | null) =>
+    next ? actions.reschedule(next) : book();
 
+  // Each action is left undefined — a hidden control — when the member can't.
   return {
     openSection,
     backToList: () => void navigate(organizationPatients(organizationSlug)),
-    startVisit: when(viewable.includes(PATIENT_FILE_DEFAULT_SECTION) && !openVisit, () =>
-      start.mutate({ patientId }, { onSuccess: toFlow }),
-    ),
-    resumeVisit: when(Boolean(openVisit) && !flowShowing, toFlow),
-    editContact: when(can('patients', 'edit'), editContact),
+    startVisit:
+      viewable.includes(PATIENT_FILE_DEFAULT_SECTION) && !openVisit
+        ? startVisit
+        : undefined,
+    resumeVisit: openVisit && !flowShowing ? toFlow : undefined,
+    editContact: can('patients', 'edit') ? editContact : undefined,
     railActions: {
-      onBook: when(canBook, (next: PatientNextVisit | null) =>
-        next ? actions.reschedule(next) : book(),
-      ),
-      onCollect: when(can('payments', 'create'), collect),
-      onFeedback: when(viewable.includes('overview'), () => openSection('overview')),
+      onBook: canBook ? bookOrReschedule : undefined,
+      onCollect: can('payments', 'create') ? collect : undefined,
+      onFeedback: viewable.includes('overview')
+        ? () => openSection('overview')
+        : undefined,
     },
     openHistory,
-    bookAppointment: when(canBook, book),
+    bookAppointment: canBook ? book : undefined,
   };
 }

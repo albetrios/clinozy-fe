@@ -215,7 +215,7 @@ function usePicks(form: UseFormReturn<ReceiveFormValues>) {
       return;
     }
     form.clearErrors('patientId');
-    const open = await queryClient.fetchQuery({
+    const open = await queryClient.query({
       queryKey: paymentQueryKeys.openInvoices(patient.id),
       queryFn: () => listOpenInvoices(patient.id),
     });

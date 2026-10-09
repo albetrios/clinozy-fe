@@ -46,6 +46,12 @@ const BRANCH_FILTER_FIELDS: RoomFilterFields = {
   created: { kind: 'date', presets: 'created' },
 };
 
+/** An accessor's value as a CSV cell: a text, number or yes/no as written, else blank. */
+function csvTextOf(value: unknown): string {
+  if (typeof value === 'string') return value;
+  return typeof value === 'number' || typeof value === 'boolean' ? String(value) : '';
+}
+
 /** Who may do what on Branches: the matrix's Users row (Admin by default, H:3605–3606). */
 function useBranchAccess() {
   const access = useClinicAccess();
@@ -168,7 +174,7 @@ export function BranchesPage() {
             const records = selected.map((row) =>
               columns.map((column) => {
                 const fold = column.columnDef.meta?.foldValue?.(row);
-                if (fold === undefined) return String(column.accessorFn?.(row, 0) ?? '');
+                if (fold === undefined) return csvTextOf(column.accessorFn?.(row, 0));
                 return typeof fold === 'string' ? fold : (fold?.value ?? '');
               }),
             );

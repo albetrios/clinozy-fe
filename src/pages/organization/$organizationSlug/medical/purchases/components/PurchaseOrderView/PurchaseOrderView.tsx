@@ -179,7 +179,7 @@ function usePrintOrder(order: PurchaseOrderRow) {
   const queryClient = useQueryClient();
   return () =>
     void queryClient
-      .fetchQuery({
+      .query({
         queryKey: medicalQueryKeys.purchaseOrderSheet(order.id),
         queryFn: () => fetchPurchaseOrderSheet(order.id),
       })

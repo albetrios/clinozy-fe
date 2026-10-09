@@ -192,10 +192,9 @@ export function FeedbackItemCard({
           <span className="text-caption text-muted-foreground truncate">{view.sub}</span>
         </span>
         {canEdit ? (
-          <span
-            role="group"
+          <fieldset
             aria-label={t(K.actions)}
-            className="flex flex-none items-center overflow-hidden rounded-lg border"
+            className="m-0 flex min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0"
           >
             <button
               type="button"
@@ -217,7 +216,7 @@ export function FeedbackItemCard({
             >
               <Trash aria-hidden="true" className="size-3.25" />
             </button>
-          </span>
+          </fieldset>
         ) : null}
       </div>
       <div className="flex h-6 min-w-0 items-center gap-1.5 overflow-hidden">

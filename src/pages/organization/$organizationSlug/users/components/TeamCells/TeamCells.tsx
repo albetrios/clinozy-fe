@@ -148,7 +148,7 @@ export function TeamTextCell({
         align === 'end' && 'text-end font-medium',
       )}
     >
-      {value || '—'}
+      {value || '—' /* NOSONAR(S6606): a blank value shows the dash too */}
     </span>
   );
 }
