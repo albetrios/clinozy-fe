@@ -31,34 +31,84 @@ function readFieldErrors(data: unknown): Record<string, string[]> | null {
   return Object.keys(out).length > 0 ? out : null;
 }
 
+/** clinozy-be's request-part prefixes on a validation field (`querystring.limit`, `body.items/0/rate`). */
+const REQUEST_PART_PREFIX = /^(?:body|querystring|params|headers)\./;
+
 /**
- * Map a 422 / validation failure onto react-hook-form field errors.
- * Returns `true` when at least one field error was applied.
+ * A validation field as the form names it: the request part dropped, `/` path steps as dots,
+ * each snake_case segment in camelCase — `body.items/0/discount_percent` → `items.0.discountPercent`.
+ * A form that spells a field differently maps the result itself (`useDrawerSave`'s `serverFields`).
+ */
+export function formFieldOf(serverField: string): string {
+  return serverField
+    .replace(REQUEST_PART_PREFIX, '')
+    .split(/[/.]/)
+    .filter((segment) => segment !== '')
+    .map((segment) =>
+      segment.replaceAll(/_([a-z0-9])/g, (_match, letter: string) =>
+        letter.toUpperCase(),
+      ),
+    )
+    .join('.');
+}
+
+/**
+ * clinozy-be's validation answer — `400 { error: { type: 'validation_error', errors: [{ field,
+ * message }] } }` — as form fields and their messages (first message per field kept).
+ */
+function readValidationList(data: unknown): Record<string, string[]> | null {
+  if (!data || typeof data !== 'object') return null;
+  const list = (data as { error?: { errors?: unknown } }).error?.errors;
+  if (!Array.isArray(list)) return null;
+  const out = Object.create(null) as Record<string, string[]>;
+  for (const entry of list) {
+    if (!entry || typeof entry !== 'object') continue;
+    const { field, message } = entry as { field?: unknown; message?: unknown };
+    if (typeof field !== 'string' || typeof message !== 'string' || field === '')
+      continue;
+    const name = formFieldOf(field);
+    if (name === '') continue;
+    out[name] = [...(out[name] ?? []), message];
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
+function applyFields<T extends FieldValues>(
+  fields: Record<string, string[]>,
+  setError: UseFormSetError<T>,
+): boolean {
+  let applied = false;
+  for (const [field, messages] of Object.entries(fields)) {
+    const message = messages[0];
+    if (!message) continue;
+    setError(field as Path<T>, { type: 'server', message });
+    applied = true;
+  }
+  return applied;
+}
+
+/**
+ * Map a validation failure onto react-hook-form field errors: clinozy-be's `400` with its
+ * `errors[]` list (fields named as the form names them, {@link formFieldOf}), a `422` with a
+ * field map, or a client {@link ValidationError}. Returns `true` when at least one field error
+ * was applied.
  */
 export function mapValidationErrors<T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,
 ): boolean {
   if (error instanceof ValidationError) {
-    let applied = false;
-    for (const [field, messages] of Object.entries(error.fieldErrors)) {
-      const message = messages[0];
-      if (!message) continue;
-      setError(field as Path<T>, { type: 'server', message });
-      applied = true;
-    }
-    return applied;
+    return applyFields(error.fieldErrors, setError);
+  }
+
+  if (isHttpError(error) && error.status === 400) {
+    const fields = readValidationList(error.data);
+    return fields ? applyFields(fields, setError) : false;
   }
 
   if (isHttpError(error) && error.status === 422) {
     const fields = readFieldErrors(error.data);
-    if (!fields) return false;
-    for (const [field, messages] of Object.entries(fields)) {
-      const message = messages[0];
-      if (!message) continue;
-      setError(field as Path<T>, { type: 'server', message });
-    }
-    return true;
+    return fields ? applyFields(fields, setError) : false;
   }
 
   return false;

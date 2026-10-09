@@ -8,7 +8,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { type HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -33,6 +33,11 @@ export interface UseDrawerSaveOptions<TValues extends FieldValues, TOutcome> {
    * screen shows it its own way. Without it a conflict reads as any refusal.
    */
   onConflict?: (error: HttpError) => void;
+  /**
+   * The record changed since the drawer loaded it (`409 record_changed`, sent when the save
+   * carries `expected_updated_at`): load it again. Given, the failure toast offers "Reload".
+   */
+  onStale?: () => void;
   /** Open the step that holds a field — the one a check or the server named. */
   onField: (field: FieldPath<TValues>) => void;
   /** The write itself: create or update, and whatever follows it. */
@@ -48,7 +53,8 @@ export interface UseDrawerSaveOptions<TValues extends FieldValues, TOutcome> {
  * The screen's client rules run first: a broken one outlines its fields, opens
  * the first one's step and toasts. Then the write, with "Saving…" holding
  * every exit. A `validation` error outlines its fields, opens the first one's
- * step and toasts its message; a `conflict` goes to the screen; another
+ * step and toasts its message; a stale save (`record_changed`) toasts with "Reload"
+ * (`onStale`); a `conflict` goes to the screen; another
  * refusal toasts the server's reason. A dropped connection — or a server
  * failure — keeps the draft with "Not saved · your changes are kept", "Retry
  * save", and a toast whose "Retry" saves again. On success the state stays
@@ -60,6 +66,7 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
   serverFields = {},
   check,
   onConflict,
+  onStale,
   onField,
   write,
   onDone,
@@ -70,6 +77,19 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
 
   const refused = (error: unknown) => {
     setSaveState('idle');
+    if (apiErrorReason(error) === 'record_changed') {
+      // Someone else saved first: the server's message, and a way to load what they saved.
+      notify.error(mapApiError(error), {
+        id: toastId,
+        ...(onStale && {
+          action: {
+            label: t(ERRORS_KEYS.api.reload, { ns: ERRORS_NS }),
+            onClick: onStale,
+          },
+        }),
+      });
+      return;
+    }
     if (onConflict && isHttpError(error) && error.status === 409) {
       onConflict(error);
       return;

@@ -55,7 +55,8 @@
     "http429": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
     "http500": "Ocurrió un error interno. Inténtalo más tarde.",
     "http502": "El servidor no está disponible temporalmente. Inténtalo más tarde.",
-    "http503": "El servicio no está disponible temporalmente. Inténtalo más tarde."
+    "http503": "El servicio no está disponible temporalmente. Inténtalo más tarde.",
+    "reload": "Recargar"
   },
   "frontend": {
     "query": {

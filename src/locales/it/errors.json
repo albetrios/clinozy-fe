@@ -55,7 +55,8 @@
     "http429": "Troppe richieste. Attendi un momento e riprova.",
     "http500": "Si è verificato un errore interno del server. Riprova più tardi.",
     "http502": "Il server è temporaneamente non disponibile. Riprova più tardi.",
-    "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi."
+    "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi.",
+    "reload": "Ricarica"
   },
   "frontend": {
     "query": {

@@ -18,6 +18,7 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
 }));
 
 import { reportError } from '@/shared/errors/errorHandler.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 
 import { queryClient } from './queryClient.ts';
 
@@ -107,5 +108,22 @@ describe('queryClient', () => {
     const defaults = queryClient.getDefaultOptions();
     const retryFn = defaults.queries?.retry as (count: number, error: unknown) => boolean;
     expect(typeof retryFn).toBe('function');
+  });
+
+  it('a 4xx answer is not asked again; a 5xx or a dropped connection is, twice', () => {
+    const retryFn = queryClient.getDefaultOptions().queries?.retry as (
+      count: number,
+      error: unknown,
+    ) => boolean;
+    const answer = (status: number) =>
+      new HttpError(`HTTP ${status}`, status, '/x', 'GET');
+
+    for (const status of [400, 401, 403, 404, 409, 422, 429]) {
+      expect(retryFn(0, answer(status))).toBe(false);
+    }
+    expect(retryFn(0, answer(503))).toBe(true);
+    expect(retryFn(1, answer(500))).toBe(true);
+    expect(retryFn(2, answer(500))).toBe(false);
+    expect(retryFn(0, answer(0))).toBe(true);
   });
 });

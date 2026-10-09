@@ -55,7 +55,8 @@
     "http429": "Zu viele Anfragen. Bitte kurz warten und erneut versuchen.",
     "http500": "Ein interner Serverfehler ist aufgetreten. Bitte später erneut versuchen.",
     "http502": "Der Server ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
-    "http503": "Der Dienst ist vorübergehend nicht verfügbar. Bitte später erneut versuchen."
+    "http503": "Der Dienst ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
+    "reload": "Neu laden"
   },
   "frontend": {
     "query": {

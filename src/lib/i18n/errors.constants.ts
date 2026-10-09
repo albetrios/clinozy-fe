@@ -67,6 +67,8 @@ export const ERRORS_KEYS = {
     http500: 'api.http500',
     http502: 'api.http502',
     http503: 'api.http503',
+    /** A stale save's toast action: load the record again (`409 record_changed`). */
+    reload: 'api.reload',
   },
   frontend: {
     query: {

@@ -1,5 +1,6 @@
 import { API_ENDPOINTS, HTTP } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
+import i18n from '@/lib/i18n/i18n.ts';
 import { forceLogout, refreshAccessToken } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
@@ -93,6 +94,11 @@ function buildHeaders(
   headers.set('Content-Type', 'application/json');
   headers.set('X-Requested-With', 'XMLHttpRequest');
   headers.set('X-Request-ID', generateRequestId());
+  // The app's language, not the browser's: clinozy-be words its error `detail` and
+  // validation messages in it (en and es; any other falls back to English).
+  const language = i18n.language || i18n.resolvedLanguage;
+  if (language && !headers.has('Accept-Language'))
+    headers.set('Accept-Language', language);
   if (idempotencyKey) {
     // clinozy-be requires `X-Idempotency-Key` (min 16 chars) on its write routes.
     headers.set('X-Idempotency-Key', idempotencyKey);

@@ -285,6 +285,21 @@ describe('fetch-client', () => {
     });
   });
 
+  describe('Accept-Language', () => {
+    it("carries the app's language, so the server words its messages in it", async () => {
+      const i18n = (await import('@/lib/i18n/i18n.ts')).default;
+      const before = i18n.language;
+      await i18n.changeLanguage('es');
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.get('/things');
+
+      const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+      expect(headers.get('Accept-Language')).toBe('es');
+      await i18n.changeLanguage(before);
+    });
+  });
+
   describe('X-Idempotency-Key', () => {
     const ok = () =>
       new Response(JSON.stringify({}), {
