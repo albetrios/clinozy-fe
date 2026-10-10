@@ -96,7 +96,7 @@ function useWhoActions(state: AppointmentFormState) {
       return;
     }
     const contactId = who.contactId;
-    const contact = await queryClient.fetchQuery({
+    const contact = await queryClient.query({
       queryKey: contactQueryKeys.one(organizationId, contactId),
       queryFn: () => fetchContact(contactId),
     });

@@ -87,7 +87,7 @@ function filterQuery(filters: AppointmentFilters, today: string) {
       filters.status === 'all' ? undefined : statusesForFilter(filters.status).join(','),
     doctor_membership_id: filters.doctorId,
     branch_ids: filters.branchIds.length ? filters.branchIds.join(',') : undefined,
-    q: q || undefined,
+    q: q === '' ? undefined : q,
     created_from: created.from,
     created_to: created.to,
   };
@@ -131,7 +131,7 @@ function formerMember(id: string, name: string): AppointmentStaff {
  */
 async function withDoctors(records: AppointmentRecord[]): Promise<AppointmentRow[]> {
   if (records.length === 0) return [];
-  const team = await queryClient.fetchQuery({
+  const team = await queryClient.query({
     queryKey: teamDirectoryQueryKey(activeOrganizationId()),
     queryFn: fetchTeamDirectory,
     staleTime: 5 * 60_000,
