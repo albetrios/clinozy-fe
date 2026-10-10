@@ -342,6 +342,9 @@ describe('LazyOverlay', () => {
       const retry = screen.getByTestId('lazy-overlay-retry');
       const dismiss = screen.getByTestId('lazy-overlay-dismiss');
       const behind = screen.getByTestId('behind-the-scrim');
+      // The card's mount effect moves focus to Retry; let it land before focus is
+      // sent behind the scrim, or a late effect undoes the escape this test sets up.
+      await waitFor(() => expect(retry).toHaveFocus());
 
       behind.focus();
       await user.tab();
